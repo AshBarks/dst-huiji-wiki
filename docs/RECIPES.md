@@ -1,0 +1,6 @@
+# Recipe解析
+
+- recipe文件存在于scripts.zip压缩包的scripts/recipes文件中
+- scripts.zip的路径通过环境变量DST_HUIJI_SCRIPTS_PATH指定
+- recipe文件的示例可以参考examples/recipes.lua
+- 观察recipe文件里的Recipe2函数，通过语法树解析将其中的数据结构化提取出来，注意有的Recipe2函数是通过for语句循环调用的，所以语法解析要有一定的执行代码能力

@@ -98,7 +98,7 @@ pub struct PoEntry {
 - `msgctxt`映射到`id`字段, 去掉`STRINGS.NAMES.`前缀然后小写, 作为id的值，field_type为`string`。
 - `msgstr`映射到`name_cn`字段, field_type为`string`。
 - `msgid`映射到`name_en`字段, field_type为`string`。
-- PoEntry中没有`item_img1`字段，将msgid添加".png"映射到`item_img1`字段，field_type为`string`，并且有覆盖规则，如果同msgid的值以及存在且不是空字符串，则保留历史数据，否则直接覆盖。
+- PoEntry中没有`item_img1`字段，将msgid添加".png"映射到`item_img1`字段，field_type为`string`，并且有覆盖规则，如果同msgid的值已经存在且不是空字符串，则保留历史数据，否则直接覆盖。
 - `comment`忽略。
 
 ### Recipe到wiki的Data:DSTRecipes.tabx的映射规则

@@ -14,5 +14,6 @@ clap = { version = "4", features = ["derive"] }
 full_moon = { version = "2.2", features = ["lua52"] }
 
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.12", features = ["json", "cookies", "rustls-tls"] }
+reqwest = { version = "0.13", features = ["json", "cookies", "query", "form"] }
 dotenvy = "0.15"
+zip = "8"

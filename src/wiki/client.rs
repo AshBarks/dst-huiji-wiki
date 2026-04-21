@@ -533,6 +533,17 @@ impl WikiClient {
             }
         }
     }
+
+    pub async fn get_json_data(&self, title: &str) -> Result<serde_json::Value> {
+        let page = self.get_page(title).await?;
+        
+        let content = page.content
+            .ok_or_else(|| Error::WikiApi(format!("Page '{}' has no content", title)))?;
+        
+        let json_str = content.trim();
+        serde_json::from_str(json_str)
+            .map_err(|e| Error::WikiApi(format!("Failed to parse JSON from page '{}': {}", title, e)))
+    }
 }
 
 #[cfg(test)]

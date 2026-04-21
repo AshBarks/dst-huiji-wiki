@@ -115,12 +115,26 @@ impl crate::mapping::WikiMapper for PoEntry {
             FieldMappingRule {
                 target_field: "name_cn".to_string(),
                 mapping: FieldMapping::Direct { source_field: "msgstr".to_string() },
-                merge_strategy: MergeStrategy::Overwrite,
+                merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
+                    if let serde_json::Value::String(s) = historical_val {
+                        if !s.is_empty() {
+                            return historical_val.clone();
+                        }
+                    }
+                    new_val.clone()
+                }),
             },
             FieldMappingRule {
                 target_field: "name_en".to_string(),
                 mapping: FieldMapping::Direct { source_field: "msgid".to_string() },
-                merge_strategy: MergeStrategy::Overwrite,
+                merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
+                    if let serde_json::Value::String(s) = historical_val {
+                        if !s.is_empty() {
+                            return historical_val.clone();
+                        }
+                    }
+                    new_val.clone()
+                }),
             },
             FieldMappingRule {
                 target_field: "item_img1".to_string(),

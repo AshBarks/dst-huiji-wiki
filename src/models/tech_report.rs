@@ -15,12 +15,9 @@ impl TechReport {
         }
     }
 
-    pub fn from_recipes(recipes: &[crate::models::Recipe]) -> Self {
-        let parsed_techs: HashSet<String> = recipes
-            .iter()
-            .map(|r| r.tech.clone())
-            .collect();
-        
+    pub fn from_recipes(recipes: &[super::Recipe]) -> Self {
+        let parsed_techs: HashSet<String> = recipes.iter().map(|r| r.tech.clone()).collect();
+
         Self {
             parsed_techs,
             wiki_techs: HashSet::new(),
@@ -30,21 +27,17 @@ impl TechReport {
 
     pub fn parse_wiki_lua_data(content: &str) -> HashSet<String> {
         let mut techs = HashSet::new();
-        
+
         for line in content.lines() {
             let line = line.trim();
-            
+
             if line.starts_with("'TECH.") || line.starts_with("\"TECH.") {
                 let tech = if line.starts_with("'TECH.") {
-                    line.split('\'')
-                        .nth(1)
-                        .map(|s| s.to_string())
+                    line.split('\'').nth(1).map(|s| s.to_string())
                 } else {
-                    line.split('"')
-                        .nth(1)
-                        .map(|s| s.to_string())
+                    line.split('"').nth(1).map(|s| s.to_string())
                 };
-                
+
                 if let Some(t) = tech {
                     if !t.is_empty() {
                         techs.insert(t);
@@ -52,30 +45,34 @@ impl TechReport {
                 }
             }
         }
-        
+
         techs
     }
 
     pub fn compare_with_wiki(&mut self, wiki_content: &str) {
         self.wiki_techs = Self::parse_wiki_lua_data(wiki_content);
-        
-        self.extra_in_parsed = self.parsed_techs
+
+        self.extra_in_parsed = self
+            .parsed_techs
             .difference(&self.wiki_techs)
             .cloned()
             .collect();
-        
+
         self.extra_in_parsed.sort();
     }
 
     pub fn generate_report(&self) -> String {
         let mut report = String::new();
-        
+
         report.push_str("=== Tech 比较报告 ===\n\n");
-        
+
         report.push_str(&format!("解析出的Tech数量: {}\n", self.parsed_techs.len()));
         report.push_str(&format!("Wiki页面中的Tech数量: {}\n", self.wiki_techs.len()));
-        report.push_str(&format!("解析中有但Wiki中没有的Tech数量: {}\n\n", self.extra_in_parsed.len()));
-        
+        report.push_str(&format!(
+            "解析中有但Wiki中没有的Tech数量: {}\n\n",
+            self.extra_in_parsed.len()
+        ));
+
         if !self.extra_in_parsed.is_empty() {
             report.push_str("解析中有但Wiki中没有的Tech:\n");
             for tech in &self.extra_in_parsed {
@@ -84,7 +81,7 @@ impl TechReport {
         } else {
             report.push_str("所有解析出的Tech都存在于Wiki页面中。\n");
         }
-        
+
         report
     }
 
@@ -116,9 +113,9 @@ mod tests {
         'TECH.MAGIC_THREE', 
     }
 }"#;
-        
+
         let techs = TechReport::parse_wiki_lua_data(content);
-        
+
         assert!(techs.contains("TECH.NONE"));
         assert!(techs.contains("TECH.SCIENCE_ONE"));
         assert!(techs.contains("TECH.SCIENCE_TWO"));
@@ -133,15 +130,15 @@ mod tests {
         report.parsed_techs.insert("TECH.NONE".to_string());
         report.parsed_techs.insert("TECH.SCIENCE_ONE".to_string());
         report.parsed_techs.insert("TECH.NEW_TECH".to_string());
-        
+
         let wiki_content = r#"
         'TECH.NONE', 
         'TECH.SCIENCE_ONE', 
         'TECH.SCIENCE_TWO', 
         "#;
-        
+
         report.compare_with_wiki(wiki_content);
-        
+
         assert!(report.has_extra_techs());
         assert_eq!(report.extra_in_parsed, vec!["TECH.NEW_TECH"]);
     }

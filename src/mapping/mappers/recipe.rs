@@ -1,223 +1,12 @@
-use serde::{Deserialize, Serialize};
+use crate::mapping::{
+    FieldMapping, FieldMappingRule, FieldSchema, FieldType, MergeStrategy, Schema, WikiMapper,
+};
+use crate::models::Recipe;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Ingredient {
-    pub item: String,
-    pub amount: i32,
-    pub atlas: Option<String>,
-    pub image: Option<String>,
-}
+pub struct RecipeMapper;
 
-impl Ingredient {
-    pub fn new(item: String, amount: i32) -> Self {
-        Self {
-            item,
-            amount,
-            atlas: None,
-            image: None,
-        }
-    }
-
-    pub fn with_atlas(mut self, atlas: String) -> Self {
-        self.atlas = Some(atlas);
-        self
-    }
-
-    pub fn with_image(mut self, image: String) -> Self {
-        self.image = Some(image);
-        self
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct RecipeOptions {
-    pub builder_tag: Option<String>,
-    pub builder_skill: Option<String>,
-    pub numtogive: Option<i32>,
-    pub product: Option<String>,
-    pub placer: Option<String>,
-    pub image: Option<String>,
-    pub nounlock: Option<bool>,
-    pub no_deconstruction: Option<bool>,
-    pub min_spacing: Option<f32>,
-    pub testfn: Option<String>,
-    pub action_str: Option<String>,
-    pub filter_text: Option<String>,
-    pub sg_state: Option<String>,
-    pub description: Option<String>,
-    pub override_numtogive_fn: Option<bool>,
-    pub is_crafting_station: Option<bool>,
-    pub icon_atlas: Option<String>,
-    pub icon_image: Option<String>,
-    pub hint_msg: Option<String>,
-    pub unlocks_from_skin: Option<bool>,
-    pub station_tag: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Recipe {
-    pub name: String,
-    pub ingredients: Vec<Ingredient>,
-    pub tech: String,
-    pub options: RecipeOptions,
-    pub source_file: Option<String>,
-    pub source_line: Option<usize>,
-}
-
-impl Recipe {
-    pub fn new(name: String, ingredients: Vec<Ingredient>, tech: String) -> Self {
-        Self {
-            name,
-            ingredients,
-            tech,
-            options: RecipeOptions::default(),
-            source_file: None,
-            source_line: None,
-        }
-    }
-
-    pub fn with_options(mut self, options: RecipeOptions) -> Self {
-        self.options = options;
-        self
-    }
-
-    pub fn with_source(mut self, file: String, line: usize) -> Self {
-        self.source_file = Some(file);
-        self.source_line = Some(line);
-        self
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PrototyperDef {
-    pub name: String,
-    pub icon_atlas: Option<String>,
-    pub icon_image: Option<String>,
-    pub is_crafting_station: Option<bool>,
-    pub action_str: Option<String>,
-    pub filter_text: Option<String>,
-}
-
-impl PrototyperDef {
-    pub fn new(name: String) -> Self {
-        Self {
-            name,
-            icon_atlas: None,
-            icon_image: None,
-            is_crafting_station: None,
-            action_str: None,
-            filter_text: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct RecipeContext {
-    pub recipes: Vec<Recipe>,
-    pub prototyper_defs: Vec<PrototyperDef>,
-    pub tech_constants: std::collections::HashMap<String, String>,
-    pub variables: std::collections::HashMap<String, String>,
-    pub character_ingredients: std::collections::HashMap<String, String>,
-    pub tech_ingredients: std::collections::HashMap<String, String>,
-    pub tuning_constants: std::collections::HashMap<String, i32>,
-}
-
-impl RecipeContext {
-    pub fn new() -> Self {
-        let mut ctx = Self {
-            recipes: Vec::new(),
-            prototyper_defs: Vec::new(),
-            tech_constants: std::collections::HashMap::new(),
-            variables: std::collections::HashMap::new(),
-            character_ingredients: std::collections::HashMap::new(),
-            tech_ingredients: std::collections::HashMap::new(),
-            tuning_constants: std::collections::HashMap::new(),
-        };
-        ctx.init_tech_constants();
-        ctx.init_ingredient_constants();
-        ctx.init_tuning_constants();
-        ctx
-    }
-
-    fn init_tech_constants(&mut self) {
-        let tech_levels = [
-            ("TECH.NONE", "NONE"),
-            ("TECH.SCIENCE_ONE", "SCIENCE_ONE"),
-            ("TECH.SCIENCE_TWO", "SCIENCE_TWO"),
-            ("TECH.MAGIC_TWO", "MAGIC_TWO"),
-            ("TECH.MAGIC_THREE", "MAGIC_THREE"),
-            ("TECH.ANCIENT_TWO", "ANCIENT_TWO"),
-            ("TECH.ANCIENT_FOUR", "ANCIENT_FOUR"),
-            ("TECH.FOODPROCESSING_ONE", "FOODPROCESSING_ONE"),
-            ("TECH.CELESTIAL_ONE", "CELESTIAL_ONE"),
-            ("TECH.CELESTIAL_TWO", "CELESTIAL_TWO"),
-            ("TECH.CELESTIAL_THREE", "CELESTIAL_THREE"),
-            ("TECH.SHADOW_ONE", "SHADOW_ONE"),
-            ("TECH.SHADOW_TWO", "SHADOW_TWO"),
-            ("TECH.SHADOW_THREE", "SHADOW_THREE"),
-            ("TECH.CARNIVAL_HOSTSHOP", "CARNIVAL_HOSTSHOP"),
-            ("TECH.CARNIVAL_PRIZESHOP", "CARNIVAL_PRIZESHOP"),
-        ];
-        for (key, value) in tech_levels {
-            self.tech_constants.insert(key.to_string(), value.to_string());
-        }
-    }
-
-    fn init_ingredient_constants(&mut self) {
-        let character_ingredients = [
-            ("CHARACTER_INGREDIENT.HEALTH", "decrease_health"),
-            ("CHARACTER_INGREDIENT.MAX_HEALTH", "half_health"),
-            ("CHARACTER_INGREDIENT.SANITY", "decrease_sanity"),
-            ("CHARACTER_INGREDIENT.MAX_SANITY", "half_sanity"),
-            ("CHARACTER_INGREDIENT.OLDAGE", "decrease_oldage"),
-        ];
-        for (key, value) in character_ingredients {
-            self.character_ingredients.insert(key.to_string(), value.to_string());
-        }
-
-        let tech_ingredients = [
-            ("TECH_INGREDIENT.SCULPTING", "sculpting_material"),
-        ];
-        for (key, value) in tech_ingredients {
-            self.tech_ingredients.insert(key.to_string(), value.to_string());
-        }
-    }
-
-    pub fn resolve_tech(&self, tech_expr: &str) -> String {
-        tech_expr.to_string()
-    }
-
-    pub fn resolve_ingredient(&self, item_expr: &str) -> Result<String, String> {
-        if item_expr.starts_with("CHARACTER_INGREDIENT.") || item_expr.starts_with("TECH_INGREDIENT.") {
-            if let Some(resolved) = self.character_ingredients.get(item_expr) {
-                return Ok(resolved.clone());
-            }
-            if let Some(resolved) = self.tech_ingredients.get(item_expr) {
-                return Ok(resolved.clone());
-            }
-            return Err(format!("Unknown ingredient constant: {}", item_expr));
-        }
-        Ok(item_expr.to_string())
-    }
-
-    fn init_tuning_constants(&mut self) {
-        let tuning_constants = [
-            ("TUNING.EFFIGY_HEALTH_PENALTY", 40),
-        ];
-        for (key, value) in tuning_constants {
-            self.tuning_constants.insert(key.to_string(), value);
-        }
-    }
-
-    pub fn resolve_tuning(&self, expr: &str) -> Option<i32> {
-        self.tuning_constants.get(expr).copied()
-    }
-}
-
-impl crate::mapping::WikiMapper for Recipe {
-    fn schema() -> crate::mapping::Schema {
-        use crate::mapping::{FieldSchema, FieldType, Schema};
-
+impl WikiMapper for Recipe {
+    fn schema() -> Schema {
         Schema::new()
             .add_field(
                 FieldSchema::new("recipe_name", FieldType::String)
@@ -299,9 +88,7 @@ impl crate::mapping::WikiMapper for Recipe {
             .add_field(FieldSchema::new("desc", FieldType::String).with_title("desc", "制作描述"))
     }
 
-    fn mapping_rules() -> Vec<crate::mapping::FieldMappingRule<Self>> {
-        use crate::mapping::{FieldMapping, FieldMappingRule, MergeStrategy};
-
+    fn mapping_rules() -> Vec<FieldMappingRule<Self>> {
         vec![
             FieldMappingRule {
                 target_field: "recipe_name".to_string(),
@@ -629,8 +416,17 @@ impl crate::mapping::WikiMapper for Recipe {
             },
             FieldMappingRule {
                 target_field: "desc".to_string(),
-                mapping: FieldMapping::Default { default: serde_json::Value::Null },
-                merge_strategy: MergeStrategy::Overwrite,
+                mapping: FieldMapping::Computed {
+                    compute: |_recipe| serde_json::Value::Null,
+                },
+                merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
+                    if let serde_json::Value::String(s) = historical_val {
+                        if !s.is_empty() {
+                            return historical_val.clone();
+                        }
+                    }
+                    new_val.clone()
+                }),
             },
         ]
     }
@@ -643,6 +439,8 @@ impl crate::mapping::WikiMapper for Recipe {
         match field_name {
             "name" => Some(serde_json::Value::String(self.name.clone())),
             "tech" => Some(serde_json::Value::String(self.tech.clone())),
+            "source_file" => self.source_file.as_ref().map(|s| serde_json::Value::String(s.clone())),
+            "source_line" => self.source_line.map(|n| serde_json::Value::Number(n.into())),
             _ => None,
         }
     }

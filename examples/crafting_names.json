@@ -1,0 +1,194 @@
+{
+  "crafting_stations": {
+    "ANCIENT": {
+      "station_en": "Ancient Pseudoscience",
+      "station_cn": "远古伪科学"
+    },
+    "CARNIVAL_HOSTSHOP": {
+      "station_en": "Cawnival Creation",
+      "station_cn": "鸦年华举办"
+    },
+    "CARNIVAL_PRIZESHOP": {
+      "station_en": "Trinket Trove",
+      "station_cn": "饰物馆"
+    },
+    "CARPENTRY": {
+      "station_en": "Carpentry",
+      "station_cn": "木工"
+    },
+    "CARTOGRAPHY": {
+      "station_en": "Cartography",
+      "station_cn": "制图"
+    },
+    "CELESTIAL": {
+      "station_en": "Celestial",
+      "station_cn": "天体"
+    },
+    "FOODPROCESSING": {
+      "station_en": "Seasonings",
+      "station_cn": "调味"
+    },
+    "HERMITCRABSHOP": {
+      "station_en": "Bottle Exchange",
+      "station_cn": "瓶罐交易"
+    },
+    "HERMITCRAB_TEASHOP": {
+      "station_en": "Tea Brewing",
+      "station_cn": "沏泡茶饮"
+    },
+    "LUNARFORGING": {
+      "station_en": "Brightsmithy",
+      "station_cn": "辉煌铁匠铺"
+    },
+    "MADSCIENCE": {
+      "station_en": "Mad Science",
+      "station_cn": "疯狂科学"
+    },
+    "ORPHANAGE": {
+      "station_en": "Critters",
+      "station_cn": "小动物"
+    },
+    "RABBITKINGSHOP": {
+      "station_en": "Trading Hutch",
+      "station_cn": "交易小窝"
+    },
+    "SCULPTING": {
+      "station_en": "Sculptures",
+      "station_cn": "雕像"
+    },
+    "SHADOW": {
+      "station_en": "Codex Umbra",
+      "station_cn": "暗影秘典"
+    },
+    "SHADOWFORGING": {
+      "station_en": "Shadowcraft",
+      "station_cn": "暗影术"
+    },
+    "SHELLWEAVER": {
+      "station_en": "Combrining",
+      "station_cn": "盐晶组合"
+    },
+    "WAGPUNK_WORKSTATION": {
+      "station_en": "Fabrication",
+      "station_cn": "制造"
+    },
+    "WANDERINGTRADERSHOP": {
+      "station_en": "Trading",
+      "station_cn": "交易"
+    },
+    "WINTERSFEASTCOOKING": {
+      "station_en": "Winter's Feast Cooking",
+      "station_cn": "冬季盛宴烹饪"
+    },
+    "YOT_SHRINE_DOFFERING": {
+      "station_en": "Offerings",
+      "station_cn": "供奉"
+    }
+  },
+  "craftings": {
+    "ARMOUR": {
+      "station_en": "Armor",
+      "station_cn": "盔甲"
+    },
+    "CHARACTER": {
+      "station_en": "Survivor Items",
+      "station_cn": "冒险家物品"
+    },
+    "CLOTHING": {
+      "station_en": "Clothing",
+      "station_cn": "服装"
+    },
+    "CONTAINERS": {
+      "station_en": "Storage Solutions",
+      "station_cn": "储物方案"
+    },
+    "COOKING": {
+      "station_en": "Cooking",
+      "station_cn": "烹饪"
+    },
+    "CRAFTING_STATION": {
+      "station_en": "All Crafting Stations",
+      "station_cn": "所有制作站"
+    },
+    "DECOR": {
+      "station_en": "Decorations",
+      "station_cn": "装饰"
+    },
+    "EVERYTHING": {
+      "station_en": "Everything",
+      "station_cn": "所有"
+    },
+    "FAVORITES": {
+      "station_en": "Favorites",
+      "station_cn": "收藏夹"
+    },
+    "FISHING": {
+      "station_en": "Fishing",
+      "station_cn": "钓鱼"
+    },
+    "GARDENING": {
+      "station_en": "Food & Gardening",
+      "station_cn": "食物和耕种"
+    },
+    "LIGHT": {
+      "station_en": "Light Sources",
+      "station_cn": "光源"
+    },
+    "MAGIC": {
+      "station_en": "Magic",
+      "station_cn": "魔法"
+    },
+    "MODS": {
+      "station_en": "Modded Items",
+      "station_cn": "模组物品"
+    },
+    "PROTOTYPERS": {
+      "station_en": "Prototypers & Stations",
+      "station_cn": "原型工具和制作站"
+    },
+    "RAIN": {
+      "station_en": "Rain Gear",
+      "station_cn": "雨具"
+    },
+    "REFINE": {
+      "station_en": "Refined Materials",
+      "station_cn": "精炼材料"
+    },
+    "RESTORATION": {
+      "station_en": "Healing",
+      "station_cn": "治疗"
+    },
+    "RIDING": {
+      "station_en": "Beefalo Riding",
+      "station_cn": "骑乘皮弗娄牛"
+    },
+    "SEAFARING": {
+      "station_en": "Seafaring",
+      "station_cn": "航行"
+    },
+    "SPECIAL_EVENT": {
+      "station_en": "Special Event",
+      "station_cn": "特别活动"
+    },
+    "STRUCTURES": {
+      "station_en": "Structures",
+      "station_cn": "建筑"
+    },
+    "SUMMER": {
+      "station_en": "Summer Items",
+      "station_cn": "夏季物品"
+    },
+    "TOOLS": {
+      "station_en": "Tools",
+      "station_cn": "工具"
+    },
+    "WEAPONS": {
+      "station_en": "Weapons",
+      "station_cn": "武器"
+    },
+    "WINTER": {
+      "station_en": "Winter Items",
+      "station_cn": "冬季物品"
+    }
+  }
+}

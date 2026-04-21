@@ -824,7 +824,7 @@ mod tests {
         assert_eq!(recipe.ingredients[0].item, "rope");
         assert_eq!(recipe.ingredients[0].amount, 1);
         assert_eq!(recipe.ingredients[1].item, "goldnugget");
-        assert_eq!(recipe.tech, "NONE");
+        assert_eq!(recipe.tech, "TECH.NONE");
         assert_eq!(recipe.options.builder_tag, Some("pyromaniac".to_string()));
     }
 
@@ -838,7 +838,7 @@ mod tests {
         assert_eq!(recipe.ingredients.len(), 1);
         assert_eq!(recipe.ingredients[0].item, "garlic");
         assert_eq!(recipe.ingredients[0].amount, 3);
-        assert_eq!(recipe.tech, "FOODPROCESSING_ONE");
+        assert_eq!(recipe.tech, "TECH.FOODPROCESSING_ONE");
         assert_eq!(recipe.options.builder_tag, Some("professionalchef".to_string()));
         assert_eq!(recipe.options.numtogive, Some(2));
         assert_eq!(recipe.options.nounlock, Some(true));
@@ -857,7 +857,7 @@ mod tests {
         assert!(lighter.is_some(), "Should find 'lighter' recipe");
         let lighter = lighter.unwrap();
         assert_eq!(lighter.ingredients.len(), 3);
-        assert_eq!(lighter.tech, "NONE");
+        assert_eq!(lighter.tech, "TECH.NONE");
     }
 
     #[test]

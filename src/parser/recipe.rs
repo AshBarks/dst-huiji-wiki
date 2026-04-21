@@ -139,6 +139,10 @@ impl RecipeParser {
                     let expanded = self.expand_for_loop_recipes(for_stmt, filename);
                     recipes.extend(expanded);
                 }
+                ast::Stmt::NumericFor(for_stmt) => {
+                    let expanded = self.expand_numeric_for_loop_recipes(for_stmt, filename);
+                    recipes.extend(expanded);
+                }
                 _ => {}
             }
         }
@@ -180,7 +184,7 @@ impl RecipeParser {
         }
 
         let name = self.extract_string_expr(&args_vec[0])?;
-        let ingredients = self.extract_ingredients(&args_vec[1])?;
+        let ingredients = self.extract_ingredients(&args_vec[1]).unwrap_or_default();
         let tech = self.extract_tech(&args_vec[2])?;
         
         let mut recipe = Recipe::new(name, ingredients, tech);
@@ -201,6 +205,20 @@ impl RecipeParser {
     fn extract_string_expr(&self, expr: &ast::Expression) -> Option<String> {
         match expr {
             ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
+            ast::Expression::Var(var) => {
+                let var_str = var.to_string();
+                if var_str.starts_with("CHARACTER_INGREDIENT.") || var_str.starts_with("TECH_INGREDIENT.") {
+                    match self.context.resolve_ingredient(&var_str) {
+                        Ok(resolved) => Some(resolved),
+                        Err(e) => {
+                            tracing::warn!("Failed to resolve ingredient: {}", e);
+                            None
+                        }
+                    }
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
@@ -235,11 +253,7 @@ impl RecipeParser {
             }
         }
         
-        if ingredients.is_empty() {
-            None
-        } else {
-            Some(ingredients)
-        }
+        Some(ingredients)
     }
 
     fn parse_ingredient_call(&self, call: &ast::FunctionCall) -> Option<Ingredient> {
@@ -301,7 +315,10 @@ impl RecipeParser {
 
     fn extract_number_expr(&self, expr: &ast::Expression) -> Option<i32> {
         match expr {
-            ast::Expression::Number(n) => n.to_string().parse().ok(),
+            ast::Expression::Number(n) => {
+                let s = n.to_string().trim().to_string();
+                s.parse().ok()
+            }
             _ => None,
         }
     }
@@ -352,11 +369,22 @@ impl RecipeParser {
             "min_spacing" => options.min_spacing = self.extract_expr_float(value),
             "testfn" => options.testfn = self.extract_expr_string(value),
             "action_str" => options.action_str = self.extract_expr_string(value),
+            "actionstr" => options.action_str = self.extract_expr_string(value),
             "filter_text" => options.filter_text = self.extract_expr_string(value),
             "sg_state" => options.sg_state = self.extract_expr_string(value),
             "description" => options.description = self.extract_expr_string(value),
-            "override_numtogive_fn" => options.override_numtogive_fn = self.extract_expr_string(value),
-            _ => {}
+            "override_numtogive_fn" => options.override_numtogive_fn = self.extract_expr_bool(value),
+            "hint_msg" => options.hint_msg = self.extract_expr_string(value),
+            "station_tag" => options.station_tag = self.extract_expr_string(value),
+            "unlocks_from_skin" => options.unlocks_from_skin = self.extract_expr_bool(value),
+            "is_crafting_station" => options.is_crafting_station = self.extract_expr_bool(value),
+            "icon_atlas" => options.icon_atlas = self.extract_expr_string(value),
+            "icon_image" => options.icon_image = self.extract_expr_string(value),
+            "manufactured" => {}
+            "allowautopick" => {}
+            _ => {
+                tracing::debug!("Unknown option field: {}", key);
+            }
         }
     }
 
@@ -369,7 +397,19 @@ impl RecipeParser {
 
     fn extract_expr_number(&self, expr: &ast::Expression) -> Option<i32> {
         match expr {
-            ast::Expression::Number(n) => n.to_string().parse().ok(),
+            ast::Expression::Number(n) => {
+                let s = n.to_string();
+                s.trim().parse().ok()
+            }
+            ast::Expression::Var(var) => {
+                if let ast::Var::Name(name) = var {
+                    let var_name = name.token().to_string();
+                    self.context.variables.get(&var_name)
+                        .and_then(|v| v.trim().parse().ok())
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
@@ -413,6 +453,56 @@ impl RecipeParser {
         }
         
         recipes
+    }
+
+    fn expand_numeric_for_loop_recipes(&self, for_stmt: &ast::NumericFor, filename: Option<&str>) -> Vec<Recipe> {
+        let mut recipes = Vec::new();
+        
+        let start = self.extract_expr_number(for_stmt.start());
+        let end_raw = for_stmt.end();
+        let end = self.extract_expr_number(end_raw);
+        let step = for_stmt.step().and_then(|e| self.extract_expr_number(e)).unwrap_or(1);
+        
+        if let (Some(start_val), Some(end_val)) = (start, end) {
+            let var_name = for_stmt.index_variable().to_string();
+            let var_name = var_name.trim().to_string();
+            let block = for_stmt.block();
+            
+            let range = if step > 0 {
+                start_val..=end_val
+            } else {
+                end_val..=start_val
+            };
+            
+            for i in range {
+                if let Some(expanded_recipes) = self.expand_block_with_var_name(block, &var_name, &i.to_string(), filename) {
+                    recipes.extend(expanded_recipes);
+                }
+            }
+        }
+        
+        recipes
+    }
+
+    fn expand_block_with_var_name(
+        &self,
+        block: &ast::Block,
+        var_name: &str,
+        var_value: &str,
+        filename: Option<&str>,
+    ) -> Option<Vec<Recipe>> {
+        let mut recipes = Vec::new();
+        
+        for stmt in block.stmts() {
+            if let ast::Stmt::FunctionCall(call) = stmt {
+                let expanded_call = self.substitute_var_in_call(call, var_name, var_value);
+                if let Some(recipe) = self.try_parse_recipe_call(&expanded_call, filename) {
+                    recipes.push(recipe);
+                }
+            }
+        }
+        
+        Some(recipes)
     }
 
     fn evaluate_iterator(&self, expr_list: ast::punctuated::Punctuated<ast::Expression>) -> Vec<String> {
@@ -473,7 +563,32 @@ impl RecipeParser {
 
     fn substitute_var_in_call(&self, call: &ast::FunctionCall, var_name: &str, var_value: &str) -> ast::FunctionCall {
         let call_str = call.to_string();
-        let substituted = call_str.replace(var_name, var_value);
+        
+        let substituted = if call_str.contains("..") {
+            let concat_after_string = format!("\"..{}", var_name);
+            let concat_before_string = format!("{}..\"", var_name);
+            let concat_both = format!("\"..{}..\"", var_name);
+            
+            if call_str.contains(&concat_after_string) {
+                call_str.replace(&concat_after_string, &format!("{}\"", var_value))
+            } else if call_str.contains(&concat_before_string) {
+                call_str.replace(&concat_before_string, &format!("\"{}", var_value))
+            } else if call_str.contains(&concat_both) {
+                call_str.replace(&concat_both, var_value)
+            } else {
+                let simple_pattern = format!("\"{}\"", var_name);
+                let simple_pattern2 = format!("'{}'", var_name);
+                if call_str.contains(&simple_pattern) {
+                    call_str.replace(&simple_pattern, var_value)
+                } else if call_str.contains(&simple_pattern2) {
+                    call_str.replace(&simple_pattern2, var_value)
+                } else {
+                    call_str.replace(var_name, var_value)
+                }
+            }
+        } else {
+            call_str.replace(var_name, var_value)
+        };
         
         let new_ast = full_moon::parse(&substituted).ok();
         if let Some(new_ast) = new_ast {
@@ -565,5 +680,22 @@ mod tests {
         let lighter = lighter.unwrap();
         assert_eq!(lighter.ingredients.len(), 3);
         assert_eq!(lighter.tech, "NONE");
+    }
+
+    #[test]
+    fn test_numeric_for_loop() {
+        let _ = tracing_subscriber::fmt::try_init();
+        let source = r#"for i = 1, 3 do
+    Recipe2("test_"..i, {Ingredient("item", 1)}, TECH.NONE)
+end"#;
+        let result = parse_recipes_from_str(source, None).unwrap();
+        println!("Found {} recipes", result.len());
+        for r in &result {
+            println!("  - {}", r.name);
+        }
+        assert_eq!(result.len(), 3, "Should parse 3 recipes from for loop");
+        assert!(result.iter().any(|r| r.name == "test_1"));
+        assert!(result.iter().any(|r| r.name == "test_2"));
+        assert!(result.iter().any(|r| r.name == "test_3"));
     }
 }

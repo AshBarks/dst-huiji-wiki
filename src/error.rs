@@ -31,6 +31,18 @@ pub enum Error {
 
     #[error("Configuration error: {0}")]
     Config(String),
+
+    #[error("Zip archive error: {0}")]
+    Zip(#[from] zip::result::ZipError),
+
+    #[error("File not found in archive: {0}")]
+    ArchiveFileNotFound(String),
+
+    #[error("DST directory does not exist: {0}")]
+    DstDirNotFound(String),
+
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

@@ -119,6 +119,7 @@ pub struct RecipeContext {
     pub variables: std::collections::HashMap<String, String>,
     pub character_ingredients: std::collections::HashMap<String, String>,
     pub tech_ingredients: std::collections::HashMap<String, String>,
+    pub tuning_constants: std::collections::HashMap<String, i32>,
 }
 
 impl RecipeContext {
@@ -130,9 +131,11 @@ impl RecipeContext {
             variables: std::collections::HashMap::new(),
             character_ingredients: std::collections::HashMap::new(),
             tech_ingredients: std::collections::HashMap::new(),
+            tuning_constants: std::collections::HashMap::new(),
         };
         ctx.init_tech_constants();
         ctx.init_ingredient_constants();
+        ctx.init_tuning_constants();
         ctx
     }
 
@@ -195,6 +198,19 @@ impl RecipeContext {
             return Err(format!("Unknown ingredient constant: {}", item_expr));
         }
         Ok(item_expr.to_string())
+    }
+
+    fn init_tuning_constants(&mut self) {
+        let tuning_constants = [
+            ("TUNING.EFFIGY_HEALTH_PENALTY", 40),
+        ];
+        for (key, value) in tuning_constants {
+            self.tuning_constants.insert(key.to_string(), value);
+        }
+    }
+
+    pub fn resolve_tuning(&self, expr: &str) -> Option<i32> {
+        self.tuning_constants.get(expr).copied()
     }
 }
 

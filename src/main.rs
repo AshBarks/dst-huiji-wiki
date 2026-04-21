@@ -1,5 +1,5 @@
 use clap::Parser;
-use dst_huiji_wiki::mapping::{compare_and_report, WikiDataConverter};
+use dst_huiji_wiki::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
 use dst_huiji_wiki::models::PoEntry;
 use dst_huiji_wiki::parser::{PoParser, RecipeParser};
 use std::path::PathBuf;
@@ -41,10 +41,13 @@ enum Commands {
         compare: Option<PathBuf>,
         #[arg(short, long)]
         merge: bool,
+        #[arg(long)]
+        po_file: Option<PathBuf>,
     },
 }
 
 fn main() {
+    tracing_subscriber::fmt::init();
     let args = Args::parse();
 
     match args.command {
@@ -98,13 +101,15 @@ fn main() {
 
                     println!("Found {} NAMES entries", names_entries.len());
 
+                    let converter = WikiDataConverter::new();
+
                     let wiki_data = if merge {
                         if let Some(compare_path) = &compare {
                             let historical_json =
                                 std::fs::read_to_string(compare_path).expect("Failed to read compare file");
                             let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)
                                 .expect("Failed to parse historical data");
-                            WikiDataConverter::convert_with_history(
+                            converter.convert_with_history(
                                 &names_entries,
                                 "Extract data from patch 722900",
                                 &historical_data,
@@ -114,7 +119,7 @@ fn main() {
                             std::process::exit(1);
                         }
                     } else {
-                        WikiDataConverter::convert_to_wiki_json(
+                        converter.convert_to_wiki_json(
                             &names_entries,
                             "Extract data from patch 722900",
                         )
@@ -153,6 +158,7 @@ fn main() {
             output,
             compare,
             merge,
+            po_file,
         } => {
             let lua_content = std::fs::read_to_string(&input).expect("Failed to read input file");
             let mut parser = RecipeParser::new();
@@ -160,23 +166,39 @@ fn main() {
                 Ok(recipes) => {
                     println!("Found {} recipes", recipes.len());
 
+                    let converter = if let Some(po_path) = &po_file {
+                        match PoParser::parse_from_file(po_path.to_str().unwrap()) {
+                            Ok(po_data) => {
+                                println!("Loaded {} PO entries for desc lookup", po_data.entries.len());
+                                WikiDataConverter::with_po_entries(po_data.entries.clone())
+                            }
+                            Err(e) => {
+                                eprintln!("Warning: Failed to load PO file: {}", e);
+                                WikiDataConverter::new()
+                            }
+                        }
+                    } else {
+                        WikiDataConverter::new()
+                    };
+
                     let wiki_data = if merge {
                         if let Some(compare_path) = &compare {
                             let historical_json =
                                 std::fs::read_to_string(compare_path).expect("Failed to read compare file");
                             let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)
                                 .expect("Failed to parse historical data");
-                            WikiDataConverter::convert_with_history(
+                            let mut data = converter.convert_recipes(
                                 &recipes,
                                 "Extract data from patch 722900",
-                                &historical_data,
-                            )
+                            );
+                            dst_huiji_wiki::models::Recipe::merge_with_history(&mut data, &historical_data);
+                            data
                         } else {
                             eprintln!("Error: --merge requires --compare");
                             std::process::exit(1);
                         }
                     } else {
-                        WikiDataConverter::convert_to_wiki_json(
+                        converter.convert_recipes(
                             &recipes,
                             "Extract data from patch 722900",
                         )

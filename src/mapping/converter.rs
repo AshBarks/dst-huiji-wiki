@@ -1,11 +1,83 @@
 use super::mapper::WikiMapper;
 use super::schema::WikiJsonData;
 use serde_json::Value;
+use std::collections::HashMap;
 
-pub struct WikiDataConverter;
+#[derive(Debug, Clone, Default)]
+pub struct PoLookupTable {
+    entries: HashMap<String, String>,
+}
+
+impl PoLookupTable {
+    pub fn new() -> Self {
+        Self { entries: HashMap::new() }
+    }
+
+    pub fn from_po_entries(entries: Vec<crate::models::PoEntry>) -> Self {
+        let mut table = Self::new();
+        for entry in entries {
+            if let Some(msgctxt) = &entry.msgctxt {
+                table.entries.insert(msgctxt.clone(), entry.msgstr);
+            }
+        }
+        table
+    }
+
+    pub fn get(&self, msgctxt: &str) -> Option<&String> {
+        self.entries.get(msgctxt)
+    }
+
+    pub fn get_recipe_desc(
+        &self,
+        description: Option<&str>,
+        recipe_name: &str,
+        product: Option<&str>,
+    ) -> Option<String> {
+        if let Some(desc) = description {
+            let key = format!("STRINGS.RECIPE_DESC.{}", desc.to_uppercase());
+            return self.get(&key).cloned();
+        }
+        
+        if let Some(prod) = product {
+            let key = format!("STRINGS.RECIPE_DESC.{}", prod.to_uppercase());
+            if let Some(s) = self.get(&key) {
+                return Some(s.clone());
+            }
+        }
+        
+        let key = format!("STRINGS.RECIPE_DESC.{}", recipe_name.to_uppercase());
+        self.get(&key).cloned()
+    }
+}
+
+pub struct WikiDataConverter {
+    po_lookup: Option<PoLookupTable>,
+}
+
+impl Default for WikiDataConverter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl WikiDataConverter {
-    pub fn convert_to_wiki_json<T: WikiMapper>(items: &[T], sources: &str) -> WikiJsonData {
+    pub fn new() -> Self {
+        Self { po_lookup: None }
+    }
+
+    pub fn with_po_entries(entries: Vec<crate::models::PoEntry>) -> Self {
+        Self { po_lookup: Some(PoLookupTable::from_po_entries(entries)) }
+    }
+
+    pub fn with_po_lookup(po_lookup: PoLookupTable) -> Self {
+        Self { po_lookup: Some(po_lookup) }
+    }
+
+    pub fn po_lookup(&self) -> Option<&PoLookupTable> {
+        self.po_lookup.as_ref()
+    }
+
+    pub fn convert_to_wiki_json<T: WikiMapper>(&self, items: &[T], sources: &str) -> WikiJsonData {
         let schema = T::schema();
         let wiki_schema = schema.to_wiki_schema();
 
@@ -14,12 +86,44 @@ impl WikiDataConverter {
         WikiJsonData { sources: sources.to_string(), schema: wiki_schema, data }
     }
 
+    pub fn convert_recipes(
+        &self,
+        recipes: &[crate::models::Recipe],
+        sources: &str,
+    ) -> WikiJsonData {
+        let schema = crate::models::Recipe::schema();
+        let wiki_schema = schema.to_wiki_schema();
+
+        let data = recipes
+            .iter()
+            .map(|recipe| {
+                let mut record = recipe.to_wiki_record();
+                if let Some(po_lookup) = &self.po_lookup {
+                    let desc = po_lookup.get_recipe_desc(
+                        recipe.options.description.as_deref(),
+                        &recipe.name,
+                        recipe.options.product.as_deref(),
+                    );
+                    if let Some(desc_value) = desc {
+                        if record.len() > 25 {
+                            record[25] = Value::String(desc_value);
+                        }
+                    }
+                }
+                record
+            })
+            .collect();
+
+        WikiJsonData { sources: sources.to_string(), schema: wiki_schema, data }
+    }
+
     pub fn convert_with_history<T: WikiMapper>(
+        &self,
         items: &[T],
         sources: &str,
         historical_data: &WikiJsonData,
     ) -> WikiJsonData {
-        let mut wiki_data = Self::convert_to_wiki_json(items, sources);
+        let mut wiki_data = self.convert_to_wiki_json(items, sources);
         T::merge_with_history(&mut wiki_data, historical_data);
         wiki_data
     }
@@ -237,5 +341,5 @@ pub fn merge_new_records<T: WikiMapper>(
 }
 
 pub fn replace_records<T: WikiMapper>(items: &[T], sources: &str) -> WikiJsonData {
-    WikiDataConverter::convert_to_wiki_json(items, sources)
+    WikiDataConverter::new().convert_to_wiki_json(items, sources)
 }

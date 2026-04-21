@@ -110,7 +110,7 @@ fn parse_multiline_string(input: &str) -> IResult<&str, String> {
     )).parse(input)?;
 
     let result = rest.into_iter().fold(first, |acc, s| acc + &s);
-    Ok((input, result))
+    Ok((input, result.trim().to_string()))
 }
 
 fn parse_comment(input: &str) -> IResult<&str, String> {

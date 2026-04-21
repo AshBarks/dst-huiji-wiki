@@ -425,4 +425,4 @@ pub struct PoEntry {
 - `station_tag`字段映射到`station_tag`字段, field_type为`string`,RecipeOptions中没有定义该字段，这意味着解析时漏了该字段，应当修复相关解析代码。
 - `builder_tag`字段映射到`builder_tag`字段, field_type为`string`,RecipeOptions中没有定义该字段，这意味着解析时漏了该字段，应当修复相关解析代码。
 - `builder_skill`字段映射到`builder_skill`字段, field_type为`string`。
-- Recipe中没有`desc`字段,应当使用`STRINGS.RECIPE_DESC.`拼接`description`字段的大写作为msgctxt在PoEntry中寻找到对应数据，使用其msgstr作为`desc`字段的值，如果`description`字段为空，则使用`STRINGS.RECIPE_DESC.`拼接`recipe_name`字段的大写作为msgctxt在PoEntry中寻找到对应数据，使用其msgstr作为`desc`字段的值。 field_type为`string`。
+- Recipe中没有`desc`字段,应当使用`STRINGS.RECIPE_DESC.`拼接`description`字段的大写作为msgctxt在PoEntry中寻找到对应数据，使用其msgstr作为`desc`字段的值，如果`description`字段为空，则使用`STRINGS.RECIPE_DESC.`拼接`product`字段的大写作为msgctxt在PoEntry中寻找到对应数据，使用其msgstr作为`desc`字段的值。 field_type为`string`。

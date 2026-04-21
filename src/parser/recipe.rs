@@ -34,11 +34,26 @@ impl RecipeParser {
                 let expr_list = assignment.expressions();
                 for (name, expr) in name_list.iter().zip(expr_list.iter()) {
                     let var_name = name.token().to_string();
-                    if let Some(value) = self.eval_expression(expr) {
+                    if let Some(value) = self.eval_expression_for_variable(expr) {
                         self.context.variables.insert(var_name, value);
                     }
                 }
             }
+        }
+    }
+
+    fn eval_expression_for_variable(&self, expr: &ast::Expression) -> Option<String> {
+        match expr {
+            ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
+            ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
+            ast::Expression::Symbol(s) => Some(s.to_string()),
+            ast::Expression::Var(var) => self.eval_var(var),
+            ast::Expression::Parentheses { expression, .. } => self.eval_expression_for_variable(expression),
+            ast::Expression::TableConstructor(table) => {
+                let values = self.extract_table_values(table);
+                Some(values.join(", "))
+            }
+            _ => None,
         }
     }
 
@@ -205,6 +220,7 @@ impl RecipeParser {
     fn extract_string_expr(&self, expr: &ast::Expression) -> Option<String> {
         match expr {
             ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
+            ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
             ast::Expression::Var(var) => {
                 let var_str = var.to_string();
                 if var_str.starts_with("CHARACTER_INGREDIENT.") || var_str.starts_with("TECH_INGREDIENT.") {
@@ -215,6 +231,16 @@ impl RecipeParser {
                             None
                         }
                     }
+                } else {
+                    None
+                }
+            }
+            ast::Expression::BinaryOperator { lhs, binop, rhs } => {
+                let op_str = binop.to_string().trim().to_string();
+                if op_str == ".." {
+                    let left = self.extract_string_expr(lhs)?;
+                    let right = self.extract_string_expr(rhs).unwrap_or_default();
+                    Some(format!("{}{}", left, right))
                 } else {
                     None
                 }
@@ -319,6 +345,14 @@ impl RecipeParser {
                 let s = n.to_string().trim().to_string();
                 s.parse().ok()
             }
+            ast::Expression::Var(var) => {
+                let var_str = var.to_string();
+                if var_str.starts_with("TUNING.") {
+                    self.context.resolve_tuning(&var_str)
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
@@ -365,7 +399,12 @@ impl RecipeParser {
             "placer" => options.placer = self.extract_expr_string(value),
             "image" => options.image = self.extract_expr_string(value),
             "nounlock" => options.nounlock = self.extract_expr_bool(value),
-            "no_deconstruction" => options.no_deconstruction = self.extract_expr_bool(value),
+            "no_deconstruction" => {
+                options.no_deconstruction = match self.extract_expr_bool(value) {
+                    Some(b) => Some(b),
+                    None => Some(false),
+                };
+            }
             "min_spacing" => options.min_spacing = self.extract_expr_float(value),
             "testfn" => options.testfn = self.extract_expr_string(value),
             "action_str" => options.action_str = self.extract_expr_string(value),
@@ -373,7 +412,12 @@ impl RecipeParser {
             "filter_text" => options.filter_text = self.extract_expr_string(value),
             "sg_state" => options.sg_state = self.extract_expr_string(value),
             "description" => options.description = self.extract_expr_string(value),
-            "override_numtogive_fn" => options.override_numtogive_fn = self.extract_expr_bool(value),
+            "override_numtogive_fn" => {
+                options.override_numtogive_fn = match self.extract_expr_bool(value) {
+                    Some(b) => Some(b),
+                    None => Some(true),
+                };
+            }
             "hint_msg" => options.hint_msg = self.extract_expr_string(value),
             "station_tag" => options.station_tag = self.extract_expr_string(value),
             "unlocks_from_skin" => options.unlocks_from_skin = self.extract_expr_bool(value),
@@ -468,6 +512,11 @@ impl RecipeParser {
             let var_name = var_name.trim().to_string();
             let block = for_stmt.block();
             
+            tracing::debug!(
+                "NumericFor expanding: var={}, start={}, end={}, variables={:?}",
+                var_name, start_val, end_val, self.context.variables
+            );
+            
             let range = if step > 0 {
                 start_val..=end_val
             } else {
@@ -492,17 +541,150 @@ impl RecipeParser {
         filename: Option<&str>,
     ) -> Option<Vec<Recipe>> {
         let mut recipes = Vec::new();
+        let mut local_vars: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        
+        tracing::debug!("expand_block_with_var_name: var_name={}, var_value={}", var_name, var_value);
         
         for stmt in block.stmts() {
-            if let ast::Stmt::FunctionCall(call) = stmt {
-                let expanded_call = self.substitute_var_in_call(call, var_name, var_value);
-                if let Some(recipe) = self.try_parse_recipe_call(&expanded_call, filename) {
-                    recipes.push(recipe);
+            match stmt {
+                ast::Stmt::LocalAssignment(assignment) => {
+                    let names = assignment.names();
+                    let exprs = assignment.expressions();
+                    for (name, expr) in names.iter().zip(exprs.iter()) {
+                        let local_name = name.token().to_string();
+                        let resolved_value = self.resolve_local_var_expr(expr, var_name, var_value, &local_vars);
+                        tracing::debug!("LocalAssignment: {} = {:?} (from {:?})", local_name, resolved_value, expr);
+                        if let Some(v) = resolved_value {
+                            local_vars.insert(local_name, v);
+                        }
+                    }
                 }
+                ast::Stmt::FunctionCall(call) => {
+                    let expanded_call = self.substitute_var_in_call_with_locals(call, var_name, var_value, &local_vars);
+                    tracing::debug!("FunctionCall after substitution: {}", expanded_call);
+                    if let Some(recipe) = self.try_parse_recipe_call(&expanded_call, filename) {
+                        recipes.push(recipe);
+                    }
+                }
+                _ => {}
             }
         }
         
         Some(recipes)
+    }
+
+    fn resolve_local_var_expr(
+        &self,
+        expr: &ast::Expression,
+        loop_var_name: &str,
+        loop_var_value: &str,
+        local_vars: &std::collections::HashMap<String, String>,
+    ) -> Option<String> {
+        match expr {
+            ast::Expression::Var(var) => {
+                match var {
+                    ast::Var::Name(name) => {
+                        let name_str = name.token().to_string();
+                        if name_str == loop_var_name {
+                            Some(loop_var_value.to_string())
+                        } else if let Some(v) = local_vars.get(&name_str) {
+                            Some(v.clone())
+                        } else if let Some(v) = self.context.variables.get(&name_str) {
+                            Some(v.clone())
+                        } else {
+                            None
+                        }
+                    }
+                    ast::Var::Expression(var_expr) => {
+                        let prefix = var_expr.prefix().to_string();
+                        let suffixes: Vec<_> = var_expr.suffixes().collect();
+                        if let Some(suffix) = suffixes.first() {
+                            if let ast::Suffix::Index(ast::Index::Brackets { expression, .. }) = suffix {
+                                let index = self.resolve_local_var_expr(expression, loop_var_name, loop_var_value, local_vars)?;
+                                let table_values = self.context.variables.get(&prefix);
+                                if let Some(table_str) = table_values {
+                                    let values: Vec<String> = table_str.split(',').map(|s| s.trim().to_string()).collect();
+                                    let idx: usize = index.parse().ok()?;
+                                    if idx > 0 && idx <= values.len() {
+                                        return Some(values[idx - 1].clone());
+                                    }
+                                }
+                            }
+                        }
+                        None
+                    }
+                    _ => None,
+                }
+            }
+            ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
+            ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
+            _ => None,
+        }
+    }
+
+    fn substitute_var_in_call_with_locals(
+        &self,
+        call: &ast::FunctionCall,
+        var_name: &str,
+        var_value: &str,
+        local_vars: &std::collections::HashMap<String, String>,
+    ) -> ast::FunctionCall {
+        let call_str = call.to_string();
+        
+        let mut substituted = call_str.clone();
+        
+        for (local_name, local_value) in local_vars {
+            substituted = Self::replace_identifier(&substituted, local_name, local_value);
+        }
+        substituted = Self::replace_identifier(&substituted, var_name, var_value);
+        
+        let new_ast = full_moon::parse(&substituted).ok();
+        if let Some(new_ast) = new_ast {
+            for stmt in new_ast.nodes().stmts() {
+                if let ast::Stmt::FunctionCall(new_call) = stmt {
+                    return new_call.clone();
+                }
+            }
+        }
+        
+        call.clone()
+    }
+
+    fn replace_identifier(s: &str, name: &str, value: &str) -> String {
+        let mut result = String::new();
+        let chars: Vec<char> = s.chars().collect();
+        let name_chars: Vec<char> = name.chars().collect();
+        let mut i = 0;
+        
+        while i < chars.len() {
+            if i + name_chars.len() <= chars.len() {
+                let slice: String = chars[i..i + name_chars.len()].iter().collect();
+                if slice == name {
+                    let before_is_ident = if i > 0 {
+                        let c = chars[i - 1];
+                        c.is_alphanumeric() || c == '_'
+                    } else {
+                        false
+                    };
+                    let after_is_ident = if i + name_chars.len() < chars.len() {
+                        let c = chars[i + name_chars.len()];
+                        c.is_alphanumeric() || c == '_'
+                    } else {
+                        false
+                    };
+                    
+                    if !before_is_ident && !after_is_ident {
+                        result.push_str(value);
+                        i += name_chars.len();
+                        continue;
+                    }
+                }
+            }
+            result.push(chars[i]);
+            i += 1;
+        }
+        
+        result
     }
 
     fn evaluate_iterator(&self, expr_list: ast::punctuated::Punctuated<ast::Expression>) -> Vec<String> {
@@ -525,11 +707,15 @@ impl RecipeParser {
                 ast::Field::NoKey(expr) => {
                     if let Some(s) = self.extract_expr_string(expr) {
                         values.push(s);
+                    } else if let Some(n) = self.extract_expr_number(expr) {
+                        values.push(n.to_string());
                     }
                 }
                 ast::Field::NameKey { value, .. } => {
                     if let Some(s) = self.extract_expr_string(value) {
                         values.push(s);
+                    } else if let Some(n) = self.extract_expr_number(value) {
+                        values.push(n.to_string());
                     }
                 }
                 _ => {}
@@ -576,18 +762,10 @@ impl RecipeParser {
             } else if call_str.contains(&concat_both) {
                 call_str.replace(&concat_both, var_value)
             } else {
-                let simple_pattern = format!("\"{}\"", var_name);
-                let simple_pattern2 = format!("'{}'", var_name);
-                if call_str.contains(&simple_pattern) {
-                    call_str.replace(&simple_pattern, var_value)
-                } else if call_str.contains(&simple_pattern2) {
-                    call_str.replace(&simple_pattern2, var_value)
-                } else {
-                    call_str.replace(var_name, var_value)
-                }
+                Self::replace_identifier(&call_str, var_name, var_value)
             }
         } else {
-            call_str.replace(var_name, var_value)
+            Self::replace_identifier(&call_str, var_name, var_value)
         };
         
         let new_ast = full_moon::parse(&substituted).ok();
@@ -612,11 +790,11 @@ impl Default for RecipeParser {
 fn extract_string_literal(s: &str) -> String {
     let s = s.trim();
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
-        s[1..s.len()-1].to_string()
+        s[1..s.len()-1].trim().to_string()
     } else if s.starts_with("[[") && s.ends_with("]]") {
-        s[2..s.len()-2].to_string()
+        s[2..s.len()-2].trim().to_string()
     } else {
-        s.to_string()
+        s.trim().to_string()
     }
 }
 

@@ -4,7 +4,9 @@ use dst_huiji_wiki::diff_lines;
 use dst_huiji_wiki::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
 use dst_huiji_wiki::models::PoEntry;
 use dst_huiji_wiki::parser::{extract_field_assignment_range, PoParser, RecipeParser};
+use dst_huiji_wiki::wiki::WikiClient;
 use dst_huiji_wiki::{DstContext, Error, Result, TechReport};
+use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 
 pub async fn run(args: Commands) -> Result<()> {
@@ -189,6 +191,9 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     let mut ctx = DstContext::from_env()?;
     println!("DST version: {}", ctx.version);
 
+    println!("Logging in to wiki...");
+    ctx.client.login().await?;
+
     let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
     let names_entries: Vec<PoEntry> = po_file
         .entries
@@ -207,7 +212,8 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     let converter = WikiDataConverter::new();
 
     println!("Fetching historical data from wiki...");
-    let historical_data = match ctx.client.get_json_data("Data:ItemTable.tabx").await {
+    let page_title = "Data:ItemTable.tabx";
+    let historical_data = match ctx.client.get_json_data(page_title).await {
         Ok(historical_json) => {
             Some(WikiDataConverter::parse_wiki_json(&historical_json.to_string())?)
         }
@@ -226,12 +232,21 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_result(&wiki_data.data, output)
+    output_json_result_with_update(
+        &ctx.client,
+        page_title,
+        &wiki_data,
+        output,
+    )
+    .await
 }
 
 async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     let mut ctx = DstContext::from_env()?;
     println!("DST version: {}", ctx.version);
+
+    println!("Logging in to wiki...");
+    ctx.client.login().await?;
 
     let recipes_string = ctx.read_zip_file("scripts/recipes.lua")?;
 
@@ -266,7 +281,8 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     let converter = WikiDataConverter::with_po_entries(po_file.entries.clone());
 
     println!("Fetching historical data from wiki...");
-    let historical_data = match ctx.client.get_json_data("Data:DSTRecipes.tabx").await {
+    let page_title = "Data:DSTRecipes.tabx";
+    let historical_data = match ctx.client.get_json_data(page_title).await {
         Ok(historical_json) => {
             Some(WikiDataConverter::parse_wiki_json(&historical_json.to_string())?)
         }
@@ -285,10 +301,22 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_result(&wiki_data.data, output)
+    output_json_result_with_update(
+        &ctx.client,
+        page_title,
+        &wiki_data,
+        output,
+    )
+    .await
 }
 
 async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>) -> Result<()> {
+    let mut ctx = DstContext::from_env()?;
+    println!("DST version: {}", ctx.version);
+
+    println!("Logging in to wiki...");
+    ctx.client.login().await?;
+
     let types_to_run = if let Some(t) = r#type {
         vec![t.to_lowercase()]
     } else {
@@ -304,16 +332,16 @@ async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>)
         println!("\n========== Running: {} ==========\n", t);
         match t.as_str() {
             "recipe_builder_tag_lookup" | "rbtl" => {
-                maintain_recipe_builder_tag_lookup(output.clone()).await?;
+                maintain_recipe_builder_tag_lookup(&mut ctx, output.clone()).await?;
             }
             "tech" => {
-                maintain_tech(output.clone()).await?;
+                maintain_tech(&mut ctx, output.clone()).await?;
             }
             "crafting_filters" | "filters" => {
-                maintain_crafting_filters(output.clone()).await?;
+                maintain_crafting_filters(&mut ctx, output.clone()).await?;
             }
             "crafting_names" | "names" => {
-                maintain_crafting_names(output.clone()).await?;
+                maintain_crafting_names(&mut ctx, output.clone()).await?;
             }
             _ => {
                 eprintln!("Unknown type: {}. Valid types are:", t);
@@ -329,17 +357,15 @@ async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>)
     Ok(())
 }
 
-async fn maintain_recipe_builder_tag_lookup(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
+async fn maintain_recipe_builder_tag_lookup(
+    ctx: &mut DstContext,
+    output: Option<PathBuf>,
+) -> Result<()> {
     let debugcommands_string = ctx.read_zip_file("scripts/debugcommands.lua")?;
 
     println!("Fetching wiki page content...");
-    let page = ctx
-        .client
-        .get_page("模块:Constants/RecipeBuilderTagLookup")
-        .await?;
+    let page_title = "模块:Constants/RecipeBuilderTagLookup";
+    let page = ctx.client.get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -358,17 +384,22 @@ async fn maintain_recipe_builder_tag_lookup(output: Option<PathBuf>) -> Result<(
         result.extracted_content.len()
     );
 
-    output_copyclip_result(&target_content, &result.updated_content, output)
+    output_copyclip_result_with_update(
+        &ctx.client,
+        page_title,
+        &target_content,
+        &result.updated_content,
+        output,
+    )
+    .await
 }
 
-async fn maintain_tech(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
+async fn maintain_tech(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
     let constants_string = ctx.read_zip_file("scripts/constants.lua")?;
 
     println!("Fetching wiki page content...");
-    let page = ctx.client.get_page("模块:Constants/Tech").await?;
+    let page_title = "模块:Constants/Tech";
+    let page = ctx.client.get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -383,20 +414,22 @@ async fn maintain_tech(output: Option<PathBuf>) -> Result<()> {
         result.extracted_content.len()
     );
 
-    output_copyclip_result(&target_content, &result.updated_content, output)
+    output_copyclip_result_with_update(
+        &ctx.client,
+        page_title,
+        &target_content,
+        &result.updated_content,
+        output,
+    )
+    .await
 }
 
-async fn maintain_crafting_filters(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
+async fn maintain_crafting_filters(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
     let filter_string = ctx.read_zip_file("scripts/recipes_filter.lua")?;
 
     println!("Fetching wiki page content...");
-    let page = ctx
-        .client
-        .get_page("模块:Constants/CraftingFilters")
-        .await?;
+    let page_title = "模块:Constants/CraftingFilters";
+    let page = ctx.client.get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -425,13 +458,17 @@ async fn maintain_crafting_filters(output: Option<PathBuf>) -> Result<()> {
 
     println!("CopyClip completed successfully!");
 
-    output_copyclip_result(&target_content, &updated_content, output)
+    output_copyclip_result_with_update(
+        &ctx.client,
+        page_title,
+        &target_content,
+        &updated_content,
+        output,
+    )
+    .await
 }
 
-async fn maintain_crafting_names(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
+async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
     let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
 
     let station_prefix = "STRINGS.UI.CRAFTING_STATION_FILTERS.";
@@ -485,7 +522,8 @@ async fn maintain_crafting_names(output: Option<PathBuf>) -> Result<()> {
     );
 
     println!("Fetching wiki page content...");
-    let page = ctx.client.get_page("模块:Constants/CraftingNames").await?;
+    let page_title = "模块:Constants/CraftingNames";
+    let page = ctx.client.get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -515,41 +553,111 @@ async fn maintain_crafting_names(output: Option<PathBuf>) -> Result<()> {
 
     println!("CopyClip completed successfully!");
 
-    output_copyclip_result(&target_content, &updated_content, output)
+    output_copyclip_result_with_update(
+        &ctx.client,
+        page_title,
+        &target_content,
+        &updated_content,
+        output,
+    )
+    .await
 }
 
-fn output_result<T: serde::Serialize + std::fmt::Debug>(
-    data: &[T],
+async fn output_json_result_with_update(
+    client: &WikiClient,
+    page_title: &str,
+    wiki_data: &dst_huiji_wiki::mapping::WikiJsonData,
     output: Option<PathBuf>,
 ) -> Result<()> {
+    let new_json = WikiDataConverter::to_json_string(wiki_data)?;
+
     if let Some(output_path) = output {
-        let json = serde_json::to_string_pretty(&data)?;
-        std::fs::write(&output_path, json)?;
-        println!("Written {} records to {:?}", data.len(), output_path);
-    } else {
-        println!("\nFirst 5 records:");
-        for (i, record) in data.iter().take(5).enumerate() {
-            println!("{}: {:?}", i + 1, record);
-        }
+        std::fs::write(&output_path, &new_json)?;
+        println!("Written {} records to {:?}", wiki_data.data.len(), output_path);
     }
+
+    let historical_json = match client.get_json_data(page_title).await {
+        Ok(json) => serde_json::to_string_pretty(&json)?,
+        Err(e) => {
+            println!("Warning: Failed to fetch current wiki data: {}", e);
+            println!("Cannot compare with wiki data.");
+            return Ok(());
+        }
+    };
+
+    if new_json.trim() == historical_json.trim() {
+        println!("No changes detected.");
+        return Ok(());
+    }
+
+    println!("\n--- Changes Detected ---");
+    println!("{}", diff_lines(&historical_json, &new_json));
+
+    if prompt_confirm("Update wiki page?")? {
+        println!("Updating wiki page: {}", page_title);
+
+        let edit_result = client
+            .edit_page(page_title, &new_json, Some("Update via dst-huiji-wiki tool"), false)
+            .await?;
+
+        println!(
+            "Successfully updated page '{}' (new revision: {:?})",
+            edit_result.title.as_deref().unwrap_or(page_title),
+            edit_result.newrevid
+        );
+    } else {
+        println!("Skipped updating wiki page.");
+    }
+
     Ok(())
 }
 
-fn output_copyclip_result(
+fn prompt_confirm(prompt: &str) -> Result<bool> {
+    print!("{} (y/N): ", prompt);
+    io::stdout().flush()?;
+
+    let stdin = io::stdin();
+    let mut line = String::new();
+    stdin.lock().read_line(&mut line)?;
+
+    let answer = line.trim().to_lowercase();
+    Ok(answer == "y" || answer == "yes")
+}
+
+async fn output_copyclip_result_with_update(
+    client: &WikiClient,
+    page_title: &str,
     target_content: &str,
     updated_content: &str,
     output: Option<PathBuf>,
 ) -> Result<()> {
     if target_content == updated_content {
         println!("No changes detected.");
-    } else {
-        println!("\n--- Changes Detected ---");
-        println!("{}", diff_lines(target_content, updated_content));
+        return Ok(());
     }
+
+    println!("\n--- Changes Detected ---");
+    println!("{}", diff_lines(target_content, updated_content));
 
     if let Some(output_path) = output {
         std::fs::write(&output_path, updated_content)?;
         println!("Written updated content to {:?}", output_path);
+    }
+
+    if prompt_confirm("Update wiki page?")? {
+        println!("Updating wiki page: {}", page_title);
+        
+        let edit_result = client
+            .edit_page(page_title, updated_content, Some("Update via dst-huiji-wiki tool"), false)
+            .await?;
+
+        println!(
+            "Successfully updated page '{}' (new revision: {:?})",
+            edit_result.title.as_deref().unwrap_or(page_title),
+            edit_result.newrevid
+        );
+    } else {
+        println!("Skipped updating wiki page.");
     }
 
     Ok(())

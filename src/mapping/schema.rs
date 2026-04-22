@@ -5,8 +5,7 @@ pub type FieldName = String;
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
     String,
-    Integer,
-    Float,
+    Number,
     Boolean,
     Array(Box<FieldType>),
     Object,
@@ -16,8 +15,7 @@ impl FieldType {
     pub fn to_json_type(&self) -> &'static str {
         match self {
             FieldType::String => "string",
-            FieldType::Integer => "integer",
-            FieldType::Float => "float",
+            FieldType::Number => "number",
             FieldType::Boolean => "boolean",
             FieldType::Array(_) => "array",
             FieldType::Object => "object",
@@ -93,14 +91,18 @@ pub struct WikiSchema {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WikiJsonData {
+    pub license: String,
+    pub description: serde_json::Value,
     pub sources: String,
     pub schema: WikiSchema,
     pub data: Vec<Vec<serde_json::Value>>,
 }
 
 impl WikiJsonData {
-    pub fn new(sources: String, schema: WikiSchema) -> Self {
+    pub fn new(sources: String, schema: WikiSchema, description: serde_json::Value) -> Self {
         Self {
+            license: "CC0-1.0".to_string(),
+            description,
             sources,
             schema,
             data: Vec::new(),

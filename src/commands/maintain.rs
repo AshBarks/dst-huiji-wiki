@@ -85,7 +85,10 @@ fn handle_map_names(
 
     let converter = WikiDataConverter::new();
     let version_str = version.as_deref().unwrap_or("unknown");
-    let sources = format!("Extract data from DST version {}", version_str);
+    let sources = format!("Extract data from patch {}", version_str);
+    let description = serde_json::json!({
+        "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
+    });
 
     let wiki_data = if merge {
         let compare_path = compare
@@ -93,9 +96,9 @@ fn handle_map_names(
             .ok_or_else(|| Error::Config("--merge requires --compare".to_string()))?;
         let historical_json = std::fs::read_to_string(compare_path)?;
         let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-        converter.convert_with_history(&names_entries, &sources, &historical_data)
+        converter.convert_with_history(&names_entries, &sources, &historical_data, description)
     } else {
-        converter.convert_to_wiki_json(&names_entries, &sources)
+        converter.convert_to_wiki_json(&names_entries, &sources, description)
     };
 
     if let Some(compare_path) = &compare {
@@ -150,7 +153,10 @@ fn handle_map_recipes(
     };
 
     let version_str = version.as_deref().unwrap_or("unknown");
-    let sources = format!("Extract data from DST version {}", version_str);
+    let sources = format!("Extract data from patch {}", version_str);
+    let description = serde_json::json!({
+        "zh": "饥荒联机版的合成配方列表"
+    });
 
     let wiki_data = if merge {
         let compare_path = compare
@@ -158,11 +164,11 @@ fn handle_map_recipes(
             .ok_or_else(|| Error::Config("--merge requires --compare".to_string()))?;
         let historical_json = std::fs::read_to_string(compare_path)?;
         let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-        let mut data = converter.convert_recipes(&recipes, &sources);
+        let mut data = converter.convert_recipes(&recipes, &sources, description);
         dst_huiji_wiki::models::Recipe::merge_with_history(&mut data, &historical_data);
         data
     } else {
-        converter.convert_recipes(&recipes, &sources)
+        converter.convert_recipes(&recipes, &sources, description)
     };
 
     if let Some(compare_path) = &compare {
@@ -225,7 +231,10 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     };
 
     let sources = ctx.sources();
-    let mut wiki_data = converter.convert_to_wiki_json(&names_entries, &sources);
+    let description = serde_json::json!({
+        "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
+    });
+    let mut wiki_data = converter.convert_to_wiki_json(&names_entries, &sources, description);
 
     if let Some(ref historical) = historical_data {
         PoEntry::merge_with_history(&mut wiki_data, historical);
@@ -294,7 +303,10 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     };
 
     let sources = ctx.sources();
-    let mut wiki_data = converter.convert_recipes(&recipes, &sources);
+    let description = serde_json::json!({
+        "zh": "饥荒联机版的合成配方列表"
+    });
+    let mut wiki_data = converter.convert_recipes(&recipes, &sources, description);
 
     if let Some(ref historical) = historical_data {
         dst_huiji_wiki::models::Recipe::merge_with_history(&mut wiki_data, historical);

@@ -168,12 +168,12 @@ impl SchemaBuilder {
     }
 
     pub fn integer_field(mut self, name: &str) -> Self {
-        self.schema.fields.push(FieldSchema::new(name, FieldType::Integer));
+        self.schema.fields.push(FieldSchema::new(name, FieldType::Number));
         self
     }
 
     pub fn float_field(mut self, name: &str) -> Self {
-        self.schema.fields.push(FieldSchema::new(name, FieldType::Float));
+        self.schema.fields.push(FieldSchema::new(name, FieldType::Number));
         self
     }
 

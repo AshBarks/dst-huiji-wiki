@@ -77,6 +77,6 @@ impl DstContext {
     }
 
     pub fn sources(&self) -> String {
-        format!("Extract data from DST version {}", self.version)
+        format!("Extract data from patch {}", self.version)
     }
 }

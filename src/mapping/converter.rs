@@ -77,19 +77,31 @@ impl WikiDataConverter {
         self.po_lookup.as_ref()
     }
 
-    pub fn convert_to_wiki_json<T: WikiMapper>(&self, items: &[T], sources: &str) -> WikiJsonData {
+    pub fn convert_to_wiki_json<T: WikiMapper>(
+        &self,
+        items: &[T],
+        sources: &str,
+        description: serde_json::Value,
+    ) -> WikiJsonData {
         let schema = T::schema();
         let wiki_schema = schema.to_wiki_schema();
 
         let data = items.iter().map(|item| item.to_wiki_record()).collect();
 
-        WikiJsonData { sources: sources.to_string(), schema: wiki_schema, data }
+        WikiJsonData {
+            license: "CC0-1.0".to_string(),
+            description,
+            sources: sources.to_string(),
+            schema: wiki_schema,
+            data,
+        }
     }
 
     pub fn convert_recipes(
         &self,
         recipes: &[crate::models::Recipe],
         sources: &str,
+        description: serde_json::Value,
     ) -> WikiJsonData {
         let schema = crate::models::Recipe::schema();
         let wiki_schema = schema.to_wiki_schema();
@@ -114,7 +126,13 @@ impl WikiDataConverter {
             })
             .collect();
 
-        WikiJsonData { sources: sources.to_string(), schema: wiki_schema, data }
+        WikiJsonData {
+            license: "CC0-1.0".to_string(),
+            description,
+            sources: sources.to_string(),
+            schema: wiki_schema,
+            data,
+        }
     }
 
     pub fn convert_with_history<T: WikiMapper>(
@@ -122,8 +140,9 @@ impl WikiDataConverter {
         items: &[T],
         sources: &str,
         historical_data: &WikiJsonData,
+        description: serde_json::Value,
     ) -> WikiJsonData {
-        let mut wiki_data = self.convert_to_wiki_json(items, sources);
+        let mut wiki_data = self.convert_to_wiki_json(items, sources, description);
         T::merge_with_history(&mut wiki_data, historical_data);
         wiki_data
     }
@@ -340,6 +359,10 @@ pub fn merge_new_records<T: WikiMapper>(
     result
 }
 
-pub fn replace_records<T: WikiMapper>(items: &[T], sources: &str) -> WikiJsonData {
-    WikiDataConverter::new().convert_to_wiki_json(items, sources)
+pub fn replace_records<T: WikiMapper>(
+    items: &[T],
+    sources: &str,
+    description: serde_json::Value,
+) -> WikiJsonData {
+    WikiDataConverter::new().convert_to_wiki_json(items, sources, description)
 }

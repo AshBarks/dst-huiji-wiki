@@ -6,7 +6,7 @@ use nom::{
     combinator::opt,
     multi::many0,
     sequence::preceded,
-    Parser, IResult,
+    IResult, Parser,
 };
 
 fn line_ending(input: &str) -> IResult<&str, &str> {
@@ -52,10 +52,7 @@ impl PoParser {
             entries
         };
 
-        Ok(PoFile {
-            header,
-            entries,
-        })
+        Ok(PoFile { header, entries })
     }
 
     pub fn parse_from_file(path: &str) -> Result<PoFile> {
@@ -69,7 +66,7 @@ fn parse_string_content(input: &str) -> IResult<&str, String> {
     let mut content = String::new();
     let mut chars = input.chars().peekable();
     let mut end_pos = 0;
-    
+
     while let Some(c) = chars.next() {
         end_pos += c.len_utf8();
         if c == '"' {
@@ -97,17 +94,15 @@ fn parse_string_content(input: &str) -> IResult<&str, String> {
             content.push(c);
         }
     }
-    
+
     let input = &input[end_pos..];
     Ok((input, content))
 }
 
 fn parse_multiline_string(input: &str) -> IResult<&str, String> {
     let (input, first) = parse_string_content(input)?;
-    let (input, rest) = many0(preceded(
-        (line_ending, space0),
-        parse_string_content,
-    )).parse(input)?;
+    let (input, rest) =
+        many0(preceded((line_ending, space0), parse_string_content)).parse(input)?;
 
     let result = rest.into_iter().fold(first, |acc, s| acc + &s);
     Ok((input, result.trim().to_string()))
@@ -145,11 +140,9 @@ fn parse_header(input: &str) -> IResult<&str, String> {
     let (input, _) = line_ending(input)?;
     let (input, content) = many0(preceded(
         opt(line_ending),
-        preceded(
-            space0,
-            parse_string_content,
-        ),
-    )).parse(input)?;
+        preceded(space0, parse_string_content),
+    ))
+    .parse(input)?;
 
     let (input, _) = opt(line_ending).parse(input)?;
 
@@ -157,8 +150,7 @@ fn parse_header(input: &str) -> IResult<&str, String> {
 }
 
 fn is_header_start(input: &str) -> bool {
-    input.starts_with("msgid \"\"\nmsgstr \"\"")
-        || input.starts_with("msgid \"\"\r\nmsgstr \"\"")
+    input.starts_with("msgid \"\"\nmsgstr \"\"") || input.starts_with("msgid \"\"\r\nmsgstr \"\"")
 }
 
 fn parse_entry(input: &str) -> IResult<&str, PoEntry> {

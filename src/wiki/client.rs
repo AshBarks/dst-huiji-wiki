@@ -23,7 +23,7 @@ impl WikiConfig {
             .map_err(|_| Error::EnvVarNotFound("HUIJI__PASSWORD".to_string()))?;
         let x_authkey = env::var("HUIJI__X_AUTHKEY")
             .map_err(|_| Error::EnvVarNotFound("HUIJI__X_AUTHKEY".to_string()))?;
-        
+
         Ok(Self {
             host: DEFAULT_WIKI_HOST.to_string(),
             username,
@@ -143,7 +143,7 @@ impl WikiClient {
             .redirect(redirect::Policy::limited(10))
             .cookie_store(true)
             .build()?;
-        
+
         Ok(Self {
             client,
             config,
@@ -182,7 +182,7 @@ impl WikiClient {
             .await?;
 
         let token_resp: TokenResponse = response.json().await?;
-        
+
         token_resp
             .query
             .and_then(|q| q.tokens)
@@ -192,7 +192,7 @@ impl WikiClient {
 
     pub async fn login(&mut self) -> Result<()> {
         let token = self.get_login_token().await?;
-        
+
         let url = self.config.api_url();
         let params = [
             ("action", "login"),
@@ -211,7 +211,7 @@ impl WikiClient {
             .await?;
 
         let login_resp: LoginResponse = response.json().await?;
-        
+
         if let Some(result) = login_resp.result {
             match result.result.as_str() {
                 "Success" | "success" => {
@@ -222,14 +222,15 @@ impl WikiClient {
                     );
                     Ok(())
                 }
-                "NeedToken" | "Failed" | "WrongPass" | "WrongPluginPass" | "NotExists" 
+                "NeedToken" | "Failed" | "WrongPass" | "WrongPluginPass" | "NotExists"
                 | "EmptyPass" | "CreateBlocked" | "Throttled" | "Blocked" => {
                     let reason = result.reason.unwrap_or_else(|| result.result.clone());
                     Err(Error::LoginFailed(reason))
                 }
-                _ => {
-                    Err(Error::LoginFailed(format!("Unknown result: {}", result.result)))
-                }
+                _ => Err(Error::LoginFailed(format!(
+                    "Unknown result: {}",
+                    result.result
+                ))),
             }
         } else {
             Err(Error::LoginFailed("No login response received".to_string()))
@@ -238,7 +239,7 @@ impl WikiClient {
 
     pub async fn get(&self, params: &[(&str, &str)]) -> Result<Response> {
         let url = self.config.api_url();
-        
+
         let response = self
             .client
             .get(&url)
@@ -252,7 +253,7 @@ impl WikiClient {
 
     pub async fn post(&self, params: &[(&str, &str)]) -> Result<Response> {
         let url = self.config.api_url();
-        
+
         let response = self
             .client
             .post(&url)
@@ -265,24 +266,20 @@ impl WikiClient {
     }
 
     pub async fn get_csrf_token(&self) -> Result<String> {
-        let params = [
-            ("action", "query"),
-            ("meta", "tokens"),
-            ("format", "json"),
-        ];
+        let params = [("action", "query"), ("meta", "tokens"), ("format", "json")];
 
         let response = self.get(&params).await?;
-        
+
         #[derive(Debug, Deserialize)]
         struct CsrfResponse {
             query: Option<CsrfQuery>,
         }
-        
+
         #[derive(Debug, Deserialize)]
         struct CsrfQuery {
             tokens: Option<CsrfTokens>,
         }
-        
+
         #[derive(Debug, Deserialize)]
         struct CsrfTokens {
             #[serde(rename = "csrftoken")]
@@ -290,7 +287,7 @@ impl WikiClient {
         }
 
         let csrf_resp: CsrfResponse = response.json().await?;
-        
+
         csrf_resp
             .query
             .and_then(|q| q.tokens)
@@ -329,7 +326,7 @@ impl WikiClient {
             return Err(Error::WikiApi(format!("Invalid page title: '{}'", title)));
         }
 
-        let (content, last_rev_user, last_rev_timestamp, last_rev_id) = 
+        let (content, last_rev_user, last_rev_timestamp, last_rev_id) =
             if let Some(revisions) = &page.revisions {
                 if let Some(rev) = revisions.first() {
                     (
@@ -367,7 +364,7 @@ impl WikiClient {
         }
 
         let csrf_token = self.get_csrf_token().await?;
-        
+
         let mut params: Vec<(&str, String)> = vec![
             ("action", "edit".to_string()),
             ("title", title.to_string()),
@@ -384,10 +381,7 @@ impl WikiClient {
             params.push(("minor", "true".to_string()));
         }
 
-        let params_refs: Vec<(&str, &str)> = params
-            .iter()
-            .map(|(k, v)| (*k, v.as_str()))
-            .collect();
+        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
 
         let response = self.post(&params_refs).await?;
         let edit_resp: EditResponse = response.json().await?;
@@ -413,12 +407,10 @@ impl WikiClient {
                     reason: edit_info.reason,
                 })
             }
-            _ => {
-                Err(Error::EditFailed(format!(
-                    "Edit failed: {}",
-                    edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
-                )))
-            }
+            _ => Err(Error::EditFailed(format!(
+                "Edit failed: {}",
+                edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
+            ))),
         }
     }
 
@@ -433,7 +425,7 @@ impl WikiClient {
         }
 
         let csrf_token = self.get_csrf_token().await?;
-        
+
         let mut params: Vec<(&str, String)> = vec![
             ("action", "edit".to_string()),
             ("title", title.to_string()),
@@ -446,10 +438,7 @@ impl WikiClient {
             params.push(("summary", s.to_string()));
         }
 
-        let params_refs: Vec<(&str, &str)> = params
-            .iter()
-            .map(|(k, v)| (*k, v.as_str()))
-            .collect();
+        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
 
         let response = self.post(&params_refs).await?;
         let edit_resp: EditResponse = response.json().await?;
@@ -459,22 +448,18 @@ impl WikiClient {
             .ok_or_else(|| Error::WikiApi("No edit response received".to_string()))?;
 
         match edit_info.result.as_str() {
-            "Success" | "success" => {
-                Ok(EditResult {
-                    result: edit_info.result,
-                    pageid: edit_info.pageid,
-                    title: edit_info.title,
-                    newrevid: edit_info.newrevid,
-                    oldrevid: edit_info.oldrevid,
-                    reason: edit_info.reason,
-                })
-            }
-            _ => {
-                Err(Error::EditFailed(format!(
-                    "Edit failed: {}",
-                    edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
-                )))
-            }
+            "Success" | "success" => Ok(EditResult {
+                result: edit_info.result,
+                pageid: edit_info.pageid,
+                title: edit_info.title,
+                newrevid: edit_info.newrevid,
+                oldrevid: edit_info.oldrevid,
+                reason: edit_info.reason,
+            }),
+            _ => Err(Error::EditFailed(format!(
+                "Edit failed: {}",
+                edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
+            ))),
         }
     }
 
@@ -489,7 +474,7 @@ impl WikiClient {
         }
 
         let csrf_token = self.get_csrf_token().await?;
-        
+
         let mut params: Vec<(&str, String)> = vec![
             ("action", "edit".to_string()),
             ("title", title.to_string()),
@@ -502,10 +487,7 @@ impl WikiClient {
             params.push(("summary", s.to_string()));
         }
 
-        let params_refs: Vec<(&str, &str)> = params
-            .iter()
-            .map(|(k, v)| (*k, v.as_str()))
-            .collect();
+        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
 
         let response = self.post(&params_refs).await?;
         let edit_resp: EditResponse = response.json().await?;
@@ -515,34 +497,32 @@ impl WikiClient {
             .ok_or_else(|| Error::WikiApi("No edit response received".to_string()))?;
 
         match edit_info.result.as_str() {
-            "Success" | "success" => {
-                Ok(EditResult {
-                    result: edit_info.result,
-                    pageid: edit_info.pageid,
-                    title: edit_info.title,
-                    newrevid: edit_info.newrevid,
-                    oldrevid: edit_info.oldrevid,
-                    reason: edit_info.reason,
-                })
-            }
-            _ => {
-                Err(Error::EditFailed(format!(
-                    "Edit failed: {}",
-                    edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
-                )))
-            }
+            "Success" | "success" => Ok(EditResult {
+                result: edit_info.result,
+                pageid: edit_info.pageid,
+                title: edit_info.title,
+                newrevid: edit_info.newrevid,
+                oldrevid: edit_info.oldrevid,
+                reason: edit_info.reason,
+            }),
+            _ => Err(Error::EditFailed(format!(
+                "Edit failed: {}",
+                edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
+            ))),
         }
     }
 
     pub async fn get_json_data(&self, title: &str) -> Result<serde_json::Value> {
         let page = self.get_page(title).await?;
-        
-        let content = page.content
+
+        let content = page
+            .content
             .ok_or_else(|| Error::WikiApi(format!("Page '{}' has no content", title)))?;
-        
+
         let json_str = content.trim();
-        serde_json::from_str(json_str)
-            .map_err(|e| Error::WikiApi(format!("Failed to parse JSON from page '{}': {}", title, e)))
+        serde_json::from_str(json_str).map_err(|e| {
+            Error::WikiApi(format!("Failed to parse JSON from page '{}': {}", title, e))
+        })
     }
 }
 
@@ -575,7 +555,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_page() {
         dotenvy::dotenv().ok();
-        
+
         let client = match WikiClient::from_env() {
             Ok(c) => c,
             Err(_) => {
@@ -588,7 +568,10 @@ mod tests {
         match result {
             Ok(page) => {
                 assert_eq!(page.title, TEST_PAGE);
-                println!("Page content length: {:?}", page.content.as_ref().map(|c| c.len()));
+                println!(
+                    "Page content length: {:?}",
+                    page.content.as_ref().map(|c| c.len())
+                );
             }
             Err(e) => {
                 eprintln!("Error getting page: {:?}", e);
@@ -599,7 +582,7 @@ mod tests {
     #[tokio::test]
     async fn test_login_and_get_page() {
         dotenvy::dotenv().ok();
-        
+
         let mut client = match WikiClient::from_env() {
             Ok(c) => c,
             Err(_) => {
@@ -612,7 +595,7 @@ mod tests {
             Ok(_) => {
                 println!("Login successful");
                 assert!(client.is_logged_in());
-                
+
                 let page = client.get_page(TEST_PAGE).await.unwrap();
                 println!("Page title: {}", page.title);
             }

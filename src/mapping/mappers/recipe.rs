@@ -14,55 +14,67 @@ impl WikiMapper for Recipe {
                     .required(),
             )
             .add_field(
-                FieldSchema::new("ingredient1", FieldType::String).with_title("ingredient1", "材料1"),
+                FieldSchema::new("ingredient1", FieldType::String)
+                    .with_title("ingredient1", "材料1"),
             )
             .add_field(
                 FieldSchema::new("amount1", FieldType::Number).with_title("amount1", "材料1数量"),
             )
             .add_field(
-                FieldSchema::new("ingredient2", FieldType::String).with_title("ingredient2", "材料2"),
+                FieldSchema::new("ingredient2", FieldType::String)
+                    .with_title("ingredient2", "材料2"),
             )
             .add_field(
                 FieldSchema::new("amount2", FieldType::Number).with_title("amount2", "材料2数量"),
             )
             .add_field(
-                FieldSchema::new("ingredient3", FieldType::String).with_title("ingredient3", "材料3"),
+                FieldSchema::new("ingredient3", FieldType::String)
+                    .with_title("ingredient3", "材料3"),
             )
             .add_field(
                 FieldSchema::new("amount3", FieldType::Number).with_title("amount3", "材料3数量"),
             )
             .add_field(
-                FieldSchema::new("ingredient4", FieldType::String).with_title("ingredient4", "材料4"),
+                FieldSchema::new("ingredient4", FieldType::String)
+                    .with_title("ingredient4", "材料4"),
             )
             .add_field(
                 FieldSchema::new("amount4", FieldType::Number).with_title("amount4", "材料4数量"),
             )
             .add_field(
-                FieldSchema::new("ingredient5", FieldType::String).with_title("ingredient5", "材料5"),
+                FieldSchema::new("ingredient5", FieldType::String)
+                    .with_title("ingredient5", "材料5"),
             )
             .add_field(
                 FieldSchema::new("amount5", FieldType::Number).with_title("amount5", "材料5数量"),
             )
             .add_field(
-                FieldSchema::new("ingredient6", FieldType::String).with_title("ingredient6", "材料6"),
+                FieldSchema::new("ingredient6", FieldType::String)
+                    .with_title("ingredient6", "材料6"),
             )
             .add_field(
                 FieldSchema::new("amount6", FieldType::Number).with_title("amount6", "材料6数量"),
             )
             .add_field(FieldSchema::new("product", FieldType::String).with_title("product", "产物"))
             .add_field(
-                FieldSchema::new("numtogive", FieldType::Number).with_title("numtogive", "产物数量"),
+                FieldSchema::new("numtogive", FieldType::Number)
+                    .with_title("numtogive", "产物数量"),
             )
             .add_field(
                 FieldSchema::new("override_numtogive_fn", FieldType::Boolean)
                     .with_title("override_numtogive_fn", "产物数量函数"),
             )
-            .add_field(FieldSchema::new("tech", FieldType::String).with_title("tech", "科技").required())
+            .add_field(
+                FieldSchema::new("tech", FieldType::String)
+                    .with_title("tech", "科技")
+                    .required(),
+            )
             .add_field(
                 FieldSchema::new("hint_msg", FieldType::String).with_title("hint_msg", "提示信息"),
             )
             .add_field(
-                FieldSchema::new("description", FieldType::String).with_title("description", "描述"),
+                FieldSchema::new("description", FieldType::String)
+                    .with_title("description", "描述"),
             )
             .add_field(
                 FieldSchema::new("nounlock", FieldType::Boolean).with_title("nounlock", "不可解锁"),
@@ -76,10 +88,12 @@ impl WikiMapper for Recipe {
                     .with_title("unlocks_from_skin", "皮肤锁定"),
             )
             .add_field(
-                FieldSchema::new("station_tag", FieldType::String).with_title("station_tag", "制作站标签"),
+                FieldSchema::new("station_tag", FieldType::String)
+                    .with_title("station_tag", "制作站标签"),
             )
             .add_field(
-                FieldSchema::new("builder_tag", FieldType::String).with_title("builder_tag", "制作者标签"),
+                FieldSchema::new("builder_tag", FieldType::String)
+                    .with_title("builder_tag", "制作者标签"),
             )
             .add_field(
                 FieldSchema::new("builder_skill", FieldType::String)
@@ -92,7 +106,9 @@ impl WikiMapper for Recipe {
         vec![
             FieldMappingRule {
                 target_field: "recipe_name".to_string(),
-                mapping: FieldMapping::Direct { source_field: "name".to_string() },
+                mapping: FieldMapping::Direct {
+                    source_field: "name".to_string(),
+                },
                 merge_strategy: MergeStrategy::Overwrite,
             },
             FieldMappingRule {
@@ -101,7 +117,7 @@ impl WikiMapper for Recipe {
                     compute: |recipe| {
                         recipe
                             .ingredients
-                            .get(0)
+                            .first()
                             .map(|ing| serde_json::Value::String(ing.item.clone()))
                             .unwrap_or(serde_json::Value::Null)
                     },
@@ -114,7 +130,7 @@ impl WikiMapper for Recipe {
                     compute: |recipe| {
                         recipe
                             .ingredients
-                            .get(0)
+                            .first()
                             .map(|ing| {
                                 serde_json::Value::Number(serde_json::Number::from(ing.amount))
                             })
@@ -302,7 +318,9 @@ impl WikiMapper for Recipe {
             },
             FieldMappingRule {
                 target_field: "tech".to_string(),
-                mapping: FieldMapping::Direct { source_field: "tech".to_string() },
+                mapping: FieldMapping::Direct {
+                    source_field: "tech".to_string(),
+                },
                 merge_strategy: MergeStrategy::Overwrite,
             },
             FieldMappingRule {
@@ -439,8 +457,13 @@ impl WikiMapper for Recipe {
         match field_name {
             "name" => Some(serde_json::Value::String(self.name.clone())),
             "tech" => Some(serde_json::Value::String(self.tech.clone())),
-            "source_file" => self.source_file.as_ref().map(|s| serde_json::Value::String(s.clone())),
-            "source_line" => self.source_line.map(|n| serde_json::Value::Number(n.into())),
+            "source_file" => self
+                .source_file
+                .as_ref()
+                .map(|s| serde_json::Value::String(s.clone())),
+            "source_line" => self
+                .source_line
+                .map(|n| serde_json::Value::Number(n.into())),
             _ => None,
         }
     }

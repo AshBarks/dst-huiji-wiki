@@ -9,7 +9,7 @@ pub use mapper::{
 };
 pub use mappers::{PoEntryMapper, RecipeMapper};
 pub use schema::{
-    FieldSchema, FieldType, FieldTitle, Schema, WikiFieldSchema, WikiJsonData, WikiSchema,
+    FieldSchema, FieldTitle, FieldType, Schema, WikiFieldSchema, WikiJsonData, WikiSchema,
 };
 
 mod converter;

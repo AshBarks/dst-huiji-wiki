@@ -67,7 +67,10 @@ impl TechReport {
         report.push_str("=== Tech 比较报告 ===\n\n");
 
         report.push_str(&format!("解析出的Tech数量: {}\n", self.parsed_techs.len()));
-        report.push_str(&format!("Wiki页面中的Tech数量: {}\n", self.wiki_techs.len()));
+        report.push_str(&format!(
+            "Wiki页面中的Tech数量: {}\n",
+            self.wiki_techs.len()
+        ));
         report.push_str(&format!(
             "解析中有但Wiki中没有的Tech数量: {}\n\n",
             self.extra_in_parsed.len()

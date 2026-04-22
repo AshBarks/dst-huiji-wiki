@@ -49,7 +49,7 @@ impl CopyClipConfig {
         target_file_path: Option<&str>,
     ) -> std::io::Result<Self> {
         let source_content = std::fs::read_to_string(source_file_path)?;
-        
+
         let target_content = if let Some(path) = target_file_path {
             Some(std::fs::read_to_string(path)?)
         } else {
@@ -67,10 +67,12 @@ impl CopyClipConfig {
 
 impl CopyClipMappings {
     pub fn new() -> Self {
-        Self { mappings: Vec::new() }
+        Self {
+            mappings: Vec::new(),
+        }
     }
 
-    pub fn add(mut self, mapping: CopyClipMapping) -> Self {
+    pub fn with_mapping(mut self, mapping: CopyClipMapping) -> Self {
         self.mappings.push(mapping);
         self
     }
@@ -88,7 +90,9 @@ impl CopyClipMappings {
     }
 
     pub fn find_by_target_module(&self, module_name: &str) -> Option<&CopyClipMapping> {
-        self.mappings.iter().find(|m| m.target_module == module_name)
+        self.mappings
+            .iter()
+            .find(|m| m.target_module == module_name)
     }
 }
 
@@ -119,37 +123,38 @@ mod tests {
             "source".to_string(),
             "start".to_string(),
             Some("target".to_string()),
-        ).with_end_var("end".to_string());
-        
+        )
+        .with_end_var("end".to_string());
+
         assert_eq!(config.source_var_name, "start");
         assert_eq!(config.end_var_name, Some("end".to_string()));
     }
 
     #[test]
     fn test_copy_clip_mappings() {
-        let mappings = CopyClipMappings::new()
-            .add(CopyClipMapping {
-                source_file: "debugcommands.lua".to_string(),
-                source_var_name: "RECIPE_BUILDER_TAG_LOOKUP".to_string(),
-                end_var_name: None,
-                target_module: "Module:recipe_builder_tag_lookup".to_string(),
-                description: Some("Recipe builder tag lookup".to_string()),
-            });
+        let mappings = CopyClipMappings::new().with_mapping(CopyClipMapping {
+            source_file: "debugcommands.lua".to_string(),
+            source_var_name: "RECIPE_BUILDER_TAG_LOOKUP".to_string(),
+            end_var_name: None,
+            target_module: "Module:recipe_builder_tag_lookup".to_string(),
+            description: Some("Recipe builder tag lookup".to_string()),
+        });
 
         assert_eq!(mappings.mappings.len(), 1);
-        assert!(mappings.find_by_var_name("RECIPE_BUILDER_TAG_LOOKUP").is_some());
+        assert!(mappings
+            .find_by_var_name("RECIPE_BUILDER_TAG_LOOKUP")
+            .is_some());
     }
 
     #[test]
     fn test_copy_clip_mappings_with_end_var() {
-        let mappings = CopyClipMappings::new()
-            .add(CopyClipMapping {
-                source_file: "debugcommands.lua".to_string(),
-                source_var_name: "START_VAR".to_string(),
-                end_var_name: Some("END_VAR".to_string()),
-                target_module: "Module:test".to_string(),
-                description: None,
-            });
+        let mappings = CopyClipMappings::new().with_mapping(CopyClipMapping {
+            source_file: "debugcommands.lua".to_string(),
+            source_var_name: "START_VAR".to_string(),
+            end_var_name: Some("END_VAR".to_string()),
+            target_module: "Module:test".to_string(),
+            description: None,
+        });
 
         assert_eq!(mappings.mappings.len(), 1);
         let mapping = mappings.find_by_var_name("START_VAR").unwrap();

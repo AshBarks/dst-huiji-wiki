@@ -14,9 +14,8 @@ impl RecipeParser {
     }
 
     pub fn parse(&mut self, source: &str, filename: Option<&str>) -> Result<Vec<Recipe>> {
-        let ast = full_moon::parse(source).map_err(|e| {
-            crate::Error::ParseError(format!("Lua parse error: {:?}", e))
-        })?;
+        let ast = full_moon::parse(source)
+            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
 
         self.extract_variables(&ast);
         self.extract_prototyper_defs(&ast, filename);
@@ -48,7 +47,9 @@ impl RecipeParser {
             ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
             ast::Expression::Symbol(s) => Some(s.to_string()),
             ast::Expression::Var(var) => self.eval_var(var),
-            ast::Expression::Parentheses { expression, .. } => self.eval_expression_for_variable(expression),
+            ast::Expression::Parentheses { expression, .. } => {
+                self.eval_expression_for_variable(expression)
+            }
             ast::Expression::TableConstructor(table) => {
                 let values = self.extract_table_values(table);
                 Some(values.join(", "))
@@ -83,7 +84,7 @@ impl RecipeParser {
             if let ast::Stmt::Assignment(assignment) = stmt {
                 let var_list = assignment.variables();
                 let expr_list = assignment.expressions();
-                
+
                 for (var, expr) in var_list.iter().zip(expr_list.iter()) {
                     if let ast::Var::Expression(var_expr) = var {
                         let prefix = var_expr.prefix().to_string();
@@ -108,9 +109,7 @@ impl RecipeParser {
                 ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
                     self.eval_expression(expression)
                 }
-                ast::Suffix::Index(ast::Index::Dot { name, .. }) => {
-                    Some(name.token().to_string())
-                }
+                ast::Suffix::Index(ast::Index::Dot { name, .. }) => Some(name.token().to_string()),
                 _ => None,
             }
         } else {
@@ -120,7 +119,7 @@ impl RecipeParser {
 
     fn parse_prototyper_def(&self, name: &str, table: &ast::TableConstructor) -> PrototyperDef {
         let mut def = PrototyperDef::new(name.to_string());
-        
+
         for field in table.fields() {
             if let ast::Field::NameKey { key, value, .. } = field {
                 let key_str = key.token().to_string();
@@ -136,13 +135,13 @@ impl RecipeParser {
                 }
             }
         }
-        
+
         def
     }
 
     fn extract_recipes(&self, ast: &Ast, filename: Option<&str>) -> Result<Vec<Recipe>> {
         let mut recipes = Vec::new();
-        
+
         for stmt in ast.nodes().stmts() {
             match stmt {
                 ast::Stmt::FunctionCall(call) => {
@@ -161,13 +160,17 @@ impl RecipeParser {
                 _ => {}
             }
         }
-        
+
         Ok(recipes)
     }
 
-    fn try_parse_recipe_call(&self, call: &ast::FunctionCall, filename: Option<&str>) -> Option<Recipe> {
+    fn try_parse_recipe_call(
+        &self,
+        call: &ast::FunctionCall,
+        filename: Option<&str>,
+    ) -> Option<Recipe> {
         let prefix = call.prefix();
-        
+
         if let ast::Prefix::Name(name) = prefix {
             if name.token().to_string() != "Recipe2" {
                 return None;
@@ -188,7 +191,11 @@ impl RecipeParser {
         None
     }
 
-    fn parse_recipe_args(&self, args: &ast::FunctionArgs, filename: Option<&str>) -> Option<Recipe> {
+    fn parse_recipe_args(
+        &self,
+        args: &ast::FunctionArgs,
+        filename: Option<&str>,
+    ) -> Option<Recipe> {
         let args_vec: Vec<_> = match args {
             ast::FunctionArgs::Parentheses { arguments, .. } => arguments.iter().collect(),
             _ => return None,
@@ -198,22 +205,22 @@ impl RecipeParser {
             return None;
         }
 
-        let name = self.extract_string_expr(&args_vec[0])?;
-        let ingredients = self.extract_ingredients(&args_vec[1]).unwrap_or_default();
-        let tech = self.extract_tech(&args_vec[2])?;
-        
+        let name = self.extract_string_expr(args_vec[0])?;
+        let ingredients = self.extract_ingredients(args_vec[1]).unwrap_or_default();
+        let tech = self.extract_tech(args_vec[2])?;
+
         let mut recipe = Recipe::new(name, ingredients, tech);
-        
+
         if args_vec.len() > 3 {
-            if let Some(options) = self.extract_options(&args_vec[3]) {
+            if let Some(options) = self.extract_options(args_vec[3]) {
                 recipe = recipe.with_options(options);
             }
         }
-        
+
         if let Some(f) = filename {
             recipe.source_file = Some(f.to_string());
         }
-        
+
         Some(recipe)
     }
 
@@ -223,7 +230,9 @@ impl RecipeParser {
             ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
             ast::Expression::Var(var) => {
                 let var_str = var.to_string();
-                if var_str.starts_with("CHARACTER_INGREDIENT.") || var_str.starts_with("TECH_INGREDIENT.") {
+                if var_str.starts_with("CHARACTER_INGREDIENT.")
+                    || var_str.starts_with("TECH_INGREDIENT.")
+                {
                     match self.context.resolve_ingredient(&var_str) {
                         Ok(resolved) => Some(resolved),
                         Err(e) => {
@@ -258,33 +267,32 @@ impl RecipeParser {
 
     fn parse_ingredients_table(&self, table: &ast::TableConstructor) -> Option<Vec<Ingredient>> {
         let mut ingredients = Vec::new();
-        
+
         for field in table.fields() {
             match field {
-                ast::Field::ExpressionKey { value, .. } => {
-                    if let ast::Expression::FunctionCall(call) = value {
-                        if let Some(ing) = self.parse_ingredient_call(call) {
-                            ingredients.push(ing);
-                        }
+                ast::Field::ExpressionKey {
+                    value: ast::Expression::FunctionCall(call),
+                    ..
+                } => {
+                    if let Some(ing) = self.parse_ingredient_call(call) {
+                        ingredients.push(ing);
                     }
                 }
-                ast::Field::NoKey(expr) => {
-                    if let ast::Expression::FunctionCall(call) = expr {
-                        if let Some(ing) = self.parse_ingredient_call(call) {
-                            ingredients.push(ing);
-                        }
+                ast::Field::NoKey(ast::Expression::FunctionCall(call)) => {
+                    if let Some(ing) = self.parse_ingredient_call(call) {
+                        ingredients.push(ing);
                     }
                 }
                 _ => {}
             }
         }
-        
+
         Some(ingredients)
     }
 
     fn parse_ingredient_call(&self, call: &ast::FunctionCall) -> Option<Ingredient> {
         let prefix = call.prefix();
-        
+
         if let ast::Prefix::Name(name) = prefix {
             if name.token().to_string() != "Ingredient" {
                 return None;
@@ -315,9 +323,9 @@ impl RecipeParser {
             return None;
         }
 
-        let item = self.extract_string_expr(&args_vec[0])?;
+        let item = self.extract_string_expr(args_vec[0])?;
         let amount = if args_vec.len() > 1 {
-            self.extract_number_expr(&args_vec[1]).unwrap_or(1)
+            self.extract_number_expr(args_vec[1]).unwrap_or(1)
         } else {
             1
         };
@@ -325,13 +333,13 @@ impl RecipeParser {
         let mut ingredient = Ingredient::new(item, amount);
 
         if args_vec.len() > 2 {
-            ingredient.atlas = self.extract_string_expr(&args_vec[2]);
+            ingredient.atlas = self.extract_string_expr(args_vec[2]);
         }
         if args_vec.len() > 3 {
-            ingredient.image = self.extract_string_expr(&args_vec[3]);
+            ingredient.image = self.extract_string_expr(args_vec[3]);
         }
         if args_vec.len() > 4 {
-            if let Some(img) = self.extract_string_expr(&args_vec[4]) {
+            if let Some(img) = self.extract_string_expr(args_vec[4]) {
                 ingredient.image = Some(img);
             }
         }
@@ -379,14 +387,14 @@ impl RecipeParser {
 
     fn parse_options_table(&self, table: &ast::TableConstructor) -> Option<RecipeOptions> {
         let mut options = RecipeOptions::default();
-        
+
         for field in table.fields() {
             if let ast::Field::NameKey { key, value, .. } = field {
                 let key_str = key.token().to_string();
                 self.set_option_field(&mut options, &key_str, value);
             }
         }
-        
+
         Some(options)
     }
 
@@ -448,7 +456,9 @@ impl RecipeParser {
             ast::Expression::Var(var) => {
                 if let ast::Var::Name(name) = var {
                     let var_name = name.token().to_string();
-                    self.context.variables.get(&var_name)
+                    self.context
+                        .variables
+                        .get(&var_name)
                         .and_then(|v| v.trim().parse().ok())
                 } else {
                     None
@@ -476,9 +486,13 @@ impl RecipeParser {
         }
     }
 
-    fn expand_for_loop_recipes(&self, for_stmt: &ast::GenericFor, filename: Option<&str>) -> Vec<Recipe> {
+    fn expand_for_loop_recipes(
+        &self,
+        for_stmt: &ast::GenericFor,
+        filename: Option<&str>,
+    ) -> Vec<Recipe> {
         let mut recipes = Vec::new();
-        
+
         let expr_list = for_stmt.expressions();
         if expr_list.is_empty() {
             return recipes;
@@ -491,45 +505,59 @@ impl RecipeParser {
 
         let block = for_stmt.block();
         for value in iter_values {
-            if let Some(expanded_recipes) = self.expand_block_with_var(block, for_stmt.names(), &value, filename) {
+            if let Some(expanded_recipes) =
+                self.expand_block_with_var(block, for_stmt.names(), &value, filename)
+            {
                 recipes.extend(expanded_recipes);
             }
         }
-        
+
         recipes
     }
 
-    fn expand_numeric_for_loop_recipes(&self, for_stmt: &ast::NumericFor, filename: Option<&str>) -> Vec<Recipe> {
+    fn expand_numeric_for_loop_recipes(
+        &self,
+        for_stmt: &ast::NumericFor,
+        filename: Option<&str>,
+    ) -> Vec<Recipe> {
         let mut recipes = Vec::new();
-        
+
         let start = self.extract_expr_number(for_stmt.start());
         let end_raw = for_stmt.end();
         let end = self.extract_expr_number(end_raw);
-        let step = for_stmt.step().and_then(|e| self.extract_expr_number(e)).unwrap_or(1);
-        
+        let step = for_stmt
+            .step()
+            .and_then(|e| self.extract_expr_number(e))
+            .unwrap_or(1);
+
         if let (Some(start_val), Some(end_val)) = (start, end) {
             let var_name = for_stmt.index_variable().to_string();
             let var_name = var_name.trim().to_string();
             let block = for_stmt.block();
-            
+
             tracing::debug!(
                 "NumericFor expanding: var={}, start={}, end={}, variables={:?}",
-                var_name, start_val, end_val, self.context.variables
+                var_name,
+                start_val,
+                end_val,
+                self.context.variables
             );
-            
+
             let range = if step > 0 {
                 start_val..=end_val
             } else {
                 end_val..=start_val
             };
-            
+
             for i in range {
-                if let Some(expanded_recipes) = self.expand_block_with_var_name(block, &var_name, &i.to_string(), filename) {
+                if let Some(expanded_recipes) =
+                    self.expand_block_with_var_name(block, &var_name, &i.to_string(), filename)
+                {
                     recipes.extend(expanded_recipes);
                 }
             }
         }
-        
+
         recipes
     }
 
@@ -541,10 +569,15 @@ impl RecipeParser {
         filename: Option<&str>,
     ) -> Option<Vec<Recipe>> {
         let mut recipes = Vec::new();
-        let mut local_vars: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-        
-        tracing::debug!("expand_block_with_var_name: var_name={}, var_value={}", var_name, var_value);
-        
+        let mut local_vars: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
+
+        tracing::debug!(
+            "expand_block_with_var_name: var_name={}, var_value={}",
+            var_name,
+            var_value
+        );
+
         for stmt in block.stmts() {
             match stmt {
                 ast::Stmt::LocalAssignment(assignment) => {
@@ -552,15 +585,26 @@ impl RecipeParser {
                     let exprs = assignment.expressions();
                     for (name, expr) in names.iter().zip(exprs.iter()) {
                         let local_name = name.token().to_string();
-                        let resolved_value = self.resolve_local_var_expr(expr, var_name, var_value, &local_vars);
-                        tracing::debug!("LocalAssignment: {} = {:?} (from {:?})", local_name, resolved_value, expr);
+                        let resolved_value =
+                            self.resolve_local_var_expr(expr, var_name, var_value, &local_vars);
+                        tracing::debug!(
+                            "LocalAssignment: {} = {:?} (from {:?})",
+                            local_name,
+                            resolved_value,
+                            expr
+                        );
                         if let Some(v) = resolved_value {
                             local_vars.insert(local_name, v);
                         }
                     }
                 }
                 ast::Stmt::FunctionCall(call) => {
-                    let expanded_call = self.substitute_var_in_call_with_locals(call, var_name, var_value, &local_vars);
+                    let expanded_call = self.substitute_var_in_call_with_locals(
+                        call,
+                        var_name,
+                        var_value,
+                        &local_vars,
+                    );
                     tracing::debug!("FunctionCall after substitution: {}", expanded_call);
                     if let Some(recipe) = self.try_parse_recipe_call(&expanded_call, filename) {
                         recipes.push(recipe);
@@ -569,7 +613,7 @@ impl RecipeParser {
                 _ => {}
             }
         }
-        
+
         Some(recipes)
     }
 
@@ -581,41 +625,42 @@ impl RecipeParser {
         local_vars: &std::collections::HashMap<String, String>,
     ) -> Option<String> {
         match expr {
-            ast::Expression::Var(var) => {
-                match var {
-                    ast::Var::Name(name) => {
-                        let name_str = name.token().to_string();
-                        if name_str == loop_var_name {
-                            Some(loop_var_value.to_string())
-                        } else if let Some(v) = local_vars.get(&name_str) {
-                            Some(v.clone())
-                        } else if let Some(v) = self.context.variables.get(&name_str) {
-                            Some(v.clone())
-                        } else {
-                            None
-                        }
+            ast::Expression::Var(var) => match var {
+                ast::Var::Name(name) => {
+                    let name_str = name.token().to_string();
+                    if name_str == loop_var_name {
+                        Some(loop_var_value.to_string())
+                    } else if let Some(v) = local_vars.get(&name_str) {
+                        Some(v.clone())
+                    } else {
+                        self.context.variables.get(&name_str).cloned()
                     }
-                    ast::Var::Expression(var_expr) => {
-                        let prefix = var_expr.prefix().to_string();
-                        let suffixes: Vec<_> = var_expr.suffixes().collect();
-                        if let Some(suffix) = suffixes.first() {
-                            if let ast::Suffix::Index(ast::Index::Brackets { expression, .. }) = suffix {
-                                let index = self.resolve_local_var_expr(expression, loop_var_name, loop_var_value, local_vars)?;
-                                let table_values = self.context.variables.get(&prefix);
-                                if let Some(table_str) = table_values {
-                                    let values: Vec<String> = table_str.split(',').map(|s| s.trim().to_string()).collect();
-                                    let idx: usize = index.parse().ok()?;
-                                    if idx > 0 && idx <= values.len() {
-                                        return Some(values[idx - 1].clone());
-                                    }
-                                }
+                }
+                ast::Var::Expression(var_expr) => {
+                    let prefix = var_expr.prefix().to_string();
+                    let suffixes: Vec<_> = var_expr.suffixes().collect();
+                    if let Some(ast::Suffix::Index(ast::Index::Brackets { expression, .. })) =
+                        suffixes.first()
+                    {
+                        let index = self.resolve_local_var_expr(
+                            expression,
+                            loop_var_name,
+                            loop_var_value,
+                            local_vars,
+                        )?;
+                        if let Some(table_str) = self.context.variables.get(&prefix) {
+                            let values: Vec<String> =
+                                table_str.split(',').map(|s| s.trim().to_string()).collect();
+                            let idx: usize = index.parse().ok()?;
+                            if idx > 0 && idx <= values.len() {
+                                return Some(values[idx - 1].clone());
                             }
                         }
-                        None
                     }
-                    _ => None,
+                    None
                 }
-            }
+                _ => None,
+            },
             ast::Expression::Number(n) => Some(n.to_string().trim().to_string()),
             ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
             _ => None,
@@ -630,14 +675,14 @@ impl RecipeParser {
         local_vars: &std::collections::HashMap<String, String>,
     ) -> ast::FunctionCall {
         let call_str = call.to_string();
-        
+
         let mut substituted = call_str.clone();
-        
+
         for (local_name, local_value) in local_vars {
             substituted = Self::replace_identifier(&substituted, local_name, local_value);
         }
         substituted = Self::replace_identifier(&substituted, var_name, var_value);
-        
+
         let new_ast = full_moon::parse(&substituted).ok();
         if let Some(new_ast) = new_ast {
             for stmt in new_ast.nodes().stmts() {
@@ -646,7 +691,7 @@ impl RecipeParser {
                 }
             }
         }
-        
+
         call.clone()
     }
 
@@ -655,7 +700,7 @@ impl RecipeParser {
         let chars: Vec<char> = s.chars().collect();
         let name_chars: Vec<char> = name.chars().collect();
         let mut i = 0;
-        
+
         while i < chars.len() {
             if i + name_chars.len() <= chars.len() {
                 let slice: String = chars[i..i + name_chars.len()].iter().collect();
@@ -672,7 +717,7 @@ impl RecipeParser {
                     } else {
                         false
                     };
-                    
+
                     if !before_is_ident && !after_is_ident {
                         result.push_str(value);
                         i += name_chars.len();
@@ -683,25 +728,28 @@ impl RecipeParser {
             result.push(chars[i]);
             i += 1;
         }
-        
+
         result
     }
 
-    fn evaluate_iterator(&self, expr_list: ast::punctuated::Punctuated<ast::Expression>) -> Vec<String> {
+    fn evaluate_iterator(
+        &self,
+        expr_list: ast::punctuated::Punctuated<ast::Expression>,
+    ) -> Vec<String> {
         let mut values = Vec::new();
-        
+
         for expr in expr_list {
             if let ast::Expression::TableConstructor(table) = expr {
                 values.extend(self.extract_table_values(&table));
             }
         }
-        
+
         values
     }
 
     fn extract_table_values(&self, table: &ast::TableConstructor) -> Vec<String> {
         let mut values = Vec::new();
-        
+
         for field in table.fields() {
             match field {
                 ast::Field::NoKey(expr) => {
@@ -721,7 +769,7 @@ impl RecipeParser {
                 _ => {}
             }
         }
-        
+
         values
     }
 
@@ -734,7 +782,7 @@ impl RecipeParser {
     ) -> Option<Vec<Recipe>> {
         let var_name = var_names.iter().next()?.to_string();
         let mut recipes = Vec::new();
-        
+
         for stmt in block.stmts() {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 let expanded_call = self.substitute_var_in_call(call, &var_name, var_value);
@@ -743,18 +791,23 @@ impl RecipeParser {
                 }
             }
         }
-        
+
         Some(recipes)
     }
 
-    fn substitute_var_in_call(&self, call: &ast::FunctionCall, var_name: &str, var_value: &str) -> ast::FunctionCall {
+    fn substitute_var_in_call(
+        &self,
+        call: &ast::FunctionCall,
+        var_name: &str,
+        var_value: &str,
+    ) -> ast::FunctionCall {
         let call_str = call.to_string();
-        
+
         let substituted = if call_str.contains("..") {
             let concat_after_string = format!("\"..{}", var_name);
             let concat_before_string = format!("{}..\"", var_name);
             let concat_both = format!("\"..{}..\"", var_name);
-            
+
             if call_str.contains(&concat_after_string) {
                 call_str.replace(&concat_after_string, &format!("{}\"", var_value))
             } else if call_str.contains(&concat_before_string) {
@@ -767,7 +820,7 @@ impl RecipeParser {
         } else {
             Self::replace_identifier(&call_str, var_name, var_value)
         };
-        
+
         let new_ast = full_moon::parse(&substituted).ok();
         if let Some(new_ast) = new_ast {
             for stmt in new_ast.nodes().stmts() {
@@ -776,7 +829,7 @@ impl RecipeParser {
                 }
             }
         }
-        
+
         call.clone()
     }
 }
@@ -790,9 +843,9 @@ impl Default for RecipeParser {
 fn extract_string_literal(s: &str) -> String {
     let s = s.trim();
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
-        s[1..s.len()-1].trim().to_string()
+        s[1..s.len() - 1].trim().to_string()
     } else if s.starts_with("[[") && s.ends_with("]]") {
-        s[2..s.len()-2].trim().to_string()
+        s[2..s.len() - 2].trim().to_string()
     } else {
         s.trim().to_string()
     }
@@ -839,7 +892,10 @@ mod tests {
         assert_eq!(recipe.ingredients[0].item, "garlic");
         assert_eq!(recipe.ingredients[0].amount, 3);
         assert_eq!(recipe.tech, "TECH.FOODPROCESSING_ONE");
-        assert_eq!(recipe.options.builder_tag, Some("professionalchef".to_string()));
+        assert_eq!(
+            recipe.options.builder_tag,
+            Some("professionalchef".to_string())
+        );
         assert_eq!(recipe.options.numtogive, Some(2));
         assert_eq!(recipe.options.nounlock, Some(true));
     }
@@ -852,7 +908,7 @@ mod tests {
         }
         let recipes = result.unwrap();
         assert!(!recipes.is_empty(), "Should parse at least one recipe");
-        
+
         let lighter = recipes.iter().find(|r| r.name == "lighter");
         assert!(lighter.is_some(), "Should find 'lighter' recipe");
         let lighter = lighter.unwrap();

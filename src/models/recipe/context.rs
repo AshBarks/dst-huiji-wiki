@@ -49,7 +49,8 @@ impl RecipeContext {
             ("TECH.CARNIVAL_PRIZESHOP", "CARNIVAL_PRIZESHOP"),
         ];
         for (key, value) in tech_levels {
-            self.tech_constants.insert(key.to_string(), value.to_string());
+            self.tech_constants
+                .insert(key.to_string(), value.to_string());
         }
     }
 
@@ -62,14 +63,14 @@ impl RecipeContext {
             ("CHARACTER_INGREDIENT.OLDAGE", "decrease_oldage"),
         ];
         for (key, value) in character_ingredients {
-            self.character_ingredients.insert(key.to_string(), value.to_string());
+            self.character_ingredients
+                .insert(key.to_string(), value.to_string());
         }
 
-        let tech_ingredients = [
-            ("TECH_INGREDIENT.SCULPTING", "sculpting_material"),
-        ];
+        let tech_ingredients = [("TECH_INGREDIENT.SCULPTING", "sculpting_material")];
         for (key, value) in tech_ingredients {
-            self.tech_ingredients.insert(key.to_string(), value.to_string());
+            self.tech_ingredients
+                .insert(key.to_string(), value.to_string());
         }
     }
 
@@ -78,7 +79,9 @@ impl RecipeContext {
     }
 
     pub fn resolve_ingredient(&self, item_expr: &str) -> Result<String, String> {
-        if item_expr.starts_with("CHARACTER_INGREDIENT.") || item_expr.starts_with("TECH_INGREDIENT.") {
+        if item_expr.starts_with("CHARACTER_INGREDIENT.")
+            || item_expr.starts_with("TECH_INGREDIENT.")
+        {
             if let Some(resolved) = self.character_ingredients.get(item_expr) {
                 return Ok(resolved.clone());
             }
@@ -91,9 +94,7 @@ impl RecipeContext {
     }
 
     fn init_tuning_constants(&mut self) {
-        let tuning_constants = [
-            ("TUNING.EFFIGY_HEALTH_PENALTY", 40),
-        ];
+        let tuning_constants = [("TUNING.EFFIGY_HEALTH_PENALTY", 40)];
         for (key, value) in tuning_constants {
             self.tuning_constants.insert(key.to_string(), value);
         }
@@ -101,5 +102,121 @@ impl RecipeContext {
 
     pub fn resolve_tuning(&self, expr: &str) -> Option<i32> {
         self.tuning_constants.get(expr).copied()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_context_new() {
+        let ctx = RecipeContext::new();
+        assert!(ctx.recipes.is_empty());
+        assert!(ctx.prototyper_defs.is_empty());
+        assert!(!ctx.tech_constants.is_empty());
+        assert!(!ctx.character_ingredients.is_empty());
+    }
+
+    #[test]
+    fn test_tech_constants_initialized() {
+        let ctx = RecipeContext::new();
+        assert!(ctx.tech_constants.contains_key("TECH.NONE"));
+        assert!(ctx.tech_constants.contains_key("TECH.SCIENCE_ONE"));
+        assert!(ctx.tech_constants.contains_key("TECH.MAGIC_TWO"));
+        assert!(ctx.tech_constants.contains_key("TECH.SHADOW_THREE"));
+        assert_eq!(
+            ctx.tech_constants.get("TECH.NONE"),
+            Some(&"NONE".to_string())
+        );
+    }
+
+    #[test]
+    fn test_character_ingredients_initialized() {
+        let ctx = RecipeContext::new();
+        assert!(ctx
+            .character_ingredients
+            .contains_key("CHARACTER_INGREDIENT.HEALTH"));
+        assert!(ctx
+            .character_ingredients
+            .contains_key("CHARACTER_INGREDIENT.SANITY"));
+        assert_eq!(
+            ctx.character_ingredients.get("CHARACTER_INGREDIENT.HEALTH"),
+            Some(&"decrease_health".to_string())
+        );
+    }
+
+    #[test]
+    fn test_tech_ingredients_initialized() {
+        let ctx = RecipeContext::new();
+        assert!(ctx
+            .tech_ingredients
+            .contains_key("TECH_INGREDIENT.SCULPTING"));
+        assert_eq!(
+            ctx.tech_ingredients.get("TECH_INGREDIENT.SCULPTING"),
+            Some(&"sculpting_material".to_string())
+        );
+    }
+
+    #[test]
+    fn test_tuning_constants_initialized() {
+        let ctx = RecipeContext::new();
+        assert!(ctx
+            .tuning_constants
+            .contains_key("TUNING.EFFIGY_HEALTH_PENALTY"));
+        assert_eq!(
+            ctx.tuning_constants.get("TUNING.EFFIGY_HEALTH_PENALTY"),
+            Some(&40)
+        );
+    }
+
+    #[test]
+    fn test_resolve_tech() {
+        let ctx = RecipeContext::new();
+        assert_eq!(ctx.resolve_tech("TECH.NONE"), "TECH.NONE");
+        assert_eq!(ctx.resolve_tech("TECH.SCIENCE_ONE"), "TECH.SCIENCE_ONE");
+    }
+
+    #[test]
+    fn test_resolve_ingredient_character() {
+        let ctx = RecipeContext::new();
+        let result = ctx.resolve_ingredient("CHARACTER_INGREDIENT.HEALTH");
+        assert_eq!(result, Ok("decrease_health".to_string()));
+    }
+
+    #[test]
+    fn test_resolve_ingredient_tech() {
+        let ctx = RecipeContext::new();
+        let result = ctx.resolve_ingredient("TECH_INGREDIENT.SCULPTING");
+        assert_eq!(result, Ok("sculpting_material".to_string()));
+    }
+
+    #[test]
+    fn test_resolve_ingredient_normal() {
+        let ctx = RecipeContext::new();
+        let result = ctx.resolve_ingredient("rope");
+        assert_eq!(result, Ok("rope".to_string()));
+    }
+
+    #[test]
+    fn test_resolve_ingredient_unknown_constant() {
+        let ctx = RecipeContext::new();
+        let result = ctx.resolve_ingredient("CHARACTER_INGREDIENT.UNKNOWN");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Unknown ingredient constant"));
+    }
+
+    #[test]
+    fn test_resolve_tuning() {
+        let ctx = RecipeContext::new();
+        assert_eq!(ctx.resolve_tuning("TUNING.EFFIGY_HEALTH_PENALTY"), Some(40));
+        assert_eq!(ctx.resolve_tuning("TUNING.UNKNOWN"), None);
+    }
+
+    #[test]
+    fn test_context_default() {
+        let ctx = RecipeContext::default();
+        assert!(ctx.recipes.is_empty());
+        assert!(ctx.tech_constants.is_empty());
     }
 }

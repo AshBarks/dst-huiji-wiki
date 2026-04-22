@@ -39,6 +39,7 @@ impl DstContext {
         })
     }
 
+    #[allow(clippy::unnecessary_unwrap)]
     pub fn open_scripts_zip(&mut self) -> Result<&mut ZipArchive<BufReader<std::fs::File>>> {
         if self.archive.is_some() {
             return Ok(self.archive.as_mut().unwrap());

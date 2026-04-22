@@ -8,7 +8,11 @@ pub struct PoEntryMapper;
 impl WikiMapper for PoEntry {
     fn schema() -> Schema {
         Schema::new()
-            .add_field(FieldSchema::new("id", FieldType::String).with_title("id", "").required())
+            .add_field(
+                FieldSchema::new("id", FieldType::String)
+                    .with_title("id", "")
+                    .required(),
+            )
             .add_field(
                 FieldSchema::new("name_cn", FieldType::String)
                     .with_title("name_cn", "")
@@ -45,7 +49,9 @@ impl WikiMapper for PoEntry {
             },
             FieldMappingRule {
                 target_field: "name_cn".to_string(),
-                mapping: FieldMapping::Direct { source_field: "msgstr".to_string() },
+                mapping: FieldMapping::Direct {
+                    source_field: "msgstr".to_string(),
+                },
                 merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
                     if let serde_json::Value::String(s) = historical_val {
                         if !s.is_empty() {
@@ -57,7 +63,9 @@ impl WikiMapper for PoEntry {
             },
             FieldMappingRule {
                 target_field: "name_en".to_string(),
-                mapping: FieldMapping::Direct { source_field: "msgid".to_string() },
+                mapping: FieldMapping::Direct {
+                    source_field: "msgid".to_string(),
+                },
                 merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
                     if let serde_json::Value::String(s) = historical_val {
                         if !s.is_empty() {
@@ -70,9 +78,7 @@ impl WikiMapper for PoEntry {
             FieldMappingRule {
                 target_field: "item_img1".to_string(),
                 mapping: FieldMapping::Computed {
-                    compute: |entry| {
-                        serde_json::Value::String(format!("{}.png", entry.msgid))
-                    },
+                    compute: |entry| serde_json::Value::String(format!("{}.png", entry.msgid)),
                 },
                 merge_strategy: MergeStrategy::Custom(|new_val, historical_val| {
                     if let serde_json::Value::String(s) = historical_val {
@@ -92,10 +98,16 @@ impl WikiMapper for PoEntry {
 
     fn get_field_value(&self, field_name: &str) -> Option<serde_json::Value> {
         match field_name {
-            "msgctxt" => self.msgctxt.as_ref().map(|s| serde_json::Value::String(s.clone())),
+            "msgctxt" => self
+                .msgctxt
+                .as_ref()
+                .map(|s| serde_json::Value::String(s.clone())),
             "msgid" => Some(serde_json::Value::String(self.msgid.clone())),
             "msgstr" => Some(serde_json::Value::String(self.msgstr.clone())),
-            "comment" => self.comment.as_ref().map(|s| serde_json::Value::String(s.clone())),
+            "comment" => self
+                .comment
+                .as_ref()
+                .map(|s| serde_json::Value::String(s.clone())),
             _ => None,
         }
     }

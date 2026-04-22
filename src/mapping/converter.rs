@@ -10,7 +10,9 @@ pub struct PoLookupTable {
 
 impl PoLookupTable {
     pub fn new() -> Self {
-        Self { entries: HashMap::new() }
+        Self {
+            entries: HashMap::new(),
+        }
     }
 
     pub fn from_po_entries(entries: Vec<crate::models::PoEntry>) -> Self {
@@ -37,14 +39,14 @@ impl PoLookupTable {
             let key = format!("STRINGS.RECIPE_DESC.{}", desc.to_uppercase());
             return self.get(&key).cloned();
         }
-        
+
         if let Some(prod) = product {
             let key = format!("STRINGS.RECIPE_DESC.{}", prod.to_uppercase());
             if let Some(s) = self.get(&key) {
                 return Some(s.clone());
             }
         }
-        
+
         let key = format!("STRINGS.RECIPE_DESC.{}", recipe_name.to_uppercase());
         self.get(&key).cloned()
     }
@@ -66,11 +68,15 @@ impl WikiDataConverter {
     }
 
     pub fn with_po_entries(entries: Vec<crate::models::PoEntry>) -> Self {
-        Self { po_lookup: Some(PoLookupTable::from_po_entries(entries)) }
+        Self {
+            po_lookup: Some(PoLookupTable::from_po_entries(entries)),
+        }
     }
 
     pub fn with_po_lookup(po_lookup: PoLookupTable) -> Self {
-        Self { po_lookup: Some(po_lookup) }
+        Self {
+            po_lookup: Some(po_lookup),
+        }
     }
 
     pub fn po_lookup(&self) -> Option<&PoLookupTable> {
@@ -207,7 +213,7 @@ impl DataDiffReport {
             for key in &self.added {
                 report.push_str(&format!("  + {}\n", format_value(key)));
             }
-            report.push_str("\n");
+            report.push('\n');
         }
 
         if !self.deleted.is_empty() {
@@ -215,7 +221,7 @@ impl DataDiffReport {
             for key in &self.deleted {
                 report.push_str(&format!("  - {}\n", format_value(key)));
             }
-            report.push_str("\n");
+            report.push('\n');
         }
 
         if !self.modified.is_empty() {
@@ -225,7 +231,11 @@ impl DataDiffReport {
                 for change in &record_change.changes {
                     report.push_str(&format!(
                         "      {}\n",
-                        format_field_change(&change.field_name, &change.old_value, &change.new_value)
+                        format_field_change(
+                            &change.field_name,
+                            &change.old_value,
+                            &change.new_value
+                        )
                     ));
                 }
             }
@@ -250,7 +260,11 @@ fn format_field_change(field: &str, old: &Value, new: &Value) -> String {
 }
 
 pub fn compare_data(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> DataDiffReport {
-    let new_keys: Vec<Value> = new_data.data.iter().map(|r| r.first().cloned().unwrap_or(Value::Null)).collect();
+    let new_keys: Vec<Value> = new_data
+        .data
+        .iter()
+        .map(|r| r.first().cloned().unwrap_or(Value::Null))
+        .collect();
 
     let historical_keys: Vec<Value> = historical_data
         .data
@@ -276,7 +290,12 @@ pub fn compare_data(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> 
         .filter_map(|new_record| {
             let key = new_record.first().cloned().unwrap_or(Value::Null);
             if let Some(historical_record) = historical_data.find_record_by_field(
-                new_data.schema.fields.first().map(|f| f.name.as_str()).unwrap_or(""),
+                new_data
+                    .schema
+                    .fields
+                    .first()
+                    .map(|f| f.name.as_str())
+                    .unwrap_or(""),
                 &key,
             ) {
                 let changes = compare_records(new_record, historical_record, new_data);
@@ -329,7 +348,12 @@ fn compare_records(
 
 pub fn compare_and_report(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> String {
     let report = compare_data(new_data, historical_data);
-    let field_names: Vec<&str> = new_data.schema.fields.iter().map(|f| f.name.as_str()).collect();
+    let field_names: Vec<&str> = new_data
+        .schema
+        .fields
+        .iter()
+        .map(|f| f.name.as_str())
+        .collect();
     report.detailed_report(&field_names)
 }
 
@@ -343,8 +367,7 @@ pub fn merge_new_records<T: WikiMapper>(
     for item in new_items {
         let new_record = item.to_wiki_record();
 
-        if let Some(existing_idx) =
-            result.find_record_idx_by_field(T::key_field(), &new_record[0])
+        if let Some(existing_idx) = result.find_record_idx_by_field(T::key_field(), &new_record[0])
         {
             let schema = T::schema();
             let mut record_to_merge = new_record.clone();
@@ -365,4 +388,192 @@ pub fn replace_records<T: WikiMapper>(
     description: serde_json::Value,
 ) -> WikiJsonData {
     WikiDataConverter::new().convert_to_wiki_json(items, sources, description)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::PoEntry;
+
+    fn create_po_entry(msgctxt: &str, msgstr: &str) -> PoEntry {
+        PoEntry {
+            msgctxt: Some(msgctxt.to_string()),
+            msgid: "test".to_string(),
+            msgstr: msgstr.to_string(),
+            comment: None,
+        }
+    }
+
+    #[test]
+    fn test_po_lookup_table_new() {
+        let table = PoLookupTable::new();
+        assert!(table.get("any_key").is_none());
+    }
+
+    #[test]
+    fn test_po_lookup_table_from_entries() {
+        let entries = vec![
+            create_po_entry("STRINGS.RECIPE_DESC.AXE", "斧头描述"),
+            create_po_entry("STRINGS.RECIPE_DESC.PICKAXE", "镐描述"),
+        ];
+        let table = PoLookupTable::from_po_entries(entries);
+        assert_eq!(
+            table.get("STRINGS.RECIPE_DESC.AXE"),
+            Some(&"斧头描述".to_string())
+        );
+        assert_eq!(
+            table.get("STRINGS.RECIPE_DESC.PICKAXE"),
+            Some(&"镐描述".to_string())
+        );
+    }
+
+    #[test]
+    fn test_po_lookup_table_get_recipe_desc_from_description() {
+        let entries = vec![create_po_entry("STRINGS.RECIPE_DESC.AXE", "斧头描述")];
+        let table = PoLookupTable::from_po_entries(entries);
+        let result = table.get_recipe_desc(Some("axe"), "other", None);
+        assert_eq!(result, Some("斧头描述".to_string()));
+    }
+
+    #[test]
+    fn test_po_lookup_table_get_recipe_desc_from_product() {
+        let entries = vec![create_po_entry("STRINGS.RECIPE_DESC.PICKAXE", "镐描述")];
+        let table = PoLookupTable::from_po_entries(entries);
+        let result = table.get_recipe_desc(None, "other", Some("pickaxe"));
+        assert_eq!(result, Some("镐描述".to_string()));
+    }
+
+    #[test]
+    fn test_po_lookup_table_get_recipe_desc_from_name() {
+        let entries = vec![create_po_entry("STRINGS.RECIPE_DESC.SHOVEL", "铲子描述")];
+        let table = PoLookupTable::from_po_entries(entries);
+        let result = table.get_recipe_desc(None, "shovel", None);
+        assert_eq!(result, Some("铲子描述".to_string()));
+    }
+
+    #[test]
+    fn test_po_lookup_table_get_recipe_desc_not_found() {
+        let table = PoLookupTable::new();
+        let result = table.get_recipe_desc(None, "unknown", None);
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_wiki_data_converter_new() {
+        let converter = WikiDataConverter::new();
+        assert!(converter.po_lookup().is_none());
+    }
+
+    #[test]
+    fn test_wiki_data_converter_with_po_entries() {
+        let entries = vec![create_po_entry("STRINGS.RECIPE_DESC.TEST", "测试")];
+        let converter = WikiDataConverter::with_po_entries(entries);
+        assert!(converter.po_lookup().is_some());
+    }
+
+    #[test]
+    fn test_wiki_data_converter_to_json_string() {
+        let schema = super::super::schema::WikiSchema { fields: vec![] };
+        let data = WikiJsonData::new("source".to_string(), schema, serde_json::json!({}));
+        let json = WikiDataConverter::to_json_string(&data).unwrap();
+        assert!(json.contains("CC0-1.0"));
+        assert!(json.contains("source"));
+    }
+
+    #[test]
+    fn test_wiki_data_converter_parse_wiki_json() {
+        let json = r#"{
+            "license": "CC0-1.0",
+            "description": {},
+            "sources": "test",
+            "schema": {"fields": []},
+            "data": []
+        }"#;
+        let data = WikiDataConverter::parse_wiki_json(json).unwrap();
+        assert_eq!(data.license, "CC0-1.0");
+        assert_eq!(data.sources, "test");
+    }
+
+    #[test]
+    fn test_data_diff_report_is_empty() {
+        let report = DataDiffReport {
+            added: vec![],
+            deleted: vec![],
+            modified: vec![],
+            total_new: 0,
+            total_historical: 0,
+        };
+        assert!(report.is_empty());
+    }
+
+    #[test]
+    fn test_data_diff_report_not_empty() {
+        let report = DataDiffReport {
+            added: vec![Value::String("new".to_string())],
+            deleted: vec![],
+            modified: vec![],
+            total_new: 1,
+            total_historical: 0,
+        };
+        assert!(!report.is_empty());
+    }
+
+    #[test]
+    fn test_data_diff_report_summary() {
+        let report = DataDiffReport {
+            added: vec![Value::String("a".to_string())],
+            deleted: vec![Value::String("b".to_string())],
+            modified: vec![],
+            total_new: 5,
+            total_historical: 4,
+        };
+        let summary = report.summary();
+        assert!(summary.contains("新增: 1 条"));
+        assert!(summary.contains("删除: 1 条"));
+        assert!(summary.contains("新数据总数: 5 条"));
+    }
+
+    #[test]
+    fn test_format_value() {
+        assert_eq!(format_value(&Value::String("test".to_string())), "test");
+        assert_eq!(format_value(&Value::Number(42.into())), "42");
+        assert_eq!(format_value(&Value::Bool(true)), "true");
+        assert_eq!(format_value(&Value::Null), "null");
+    }
+
+    #[test]
+    fn test_format_field_change() {
+        let result = format_field_change(
+            "name",
+            &Value::String("old".to_string()),
+            &Value::String("new".to_string()),
+        );
+        assert_eq!(result, "name: old => new");
+    }
+
+    #[test]
+    fn test_field_change() {
+        let change = FieldChange {
+            field_name: "test_field".to_string(),
+            old_value: Value::String("old".to_string()),
+            new_value: Value::String("new".to_string()),
+        };
+        assert_eq!(change.field_name, "test_field");
+        assert_eq!(change.old_value, Value::String("old".to_string()));
+        assert_eq!(change.new_value, Value::String("new".to_string()));
+    }
+
+    #[test]
+    fn test_record_change() {
+        let change = RecordChange {
+            key: Value::String("id1".to_string()),
+            changes: vec![FieldChange {
+                field_name: "name".to_string(),
+                old_value: Value::String("old".to_string()),
+                new_value: Value::String("new".to_string()),
+            }],
+        };
+        assert_eq!(change.key, Value::String("id1".to_string()));
+        assert_eq!(change.changes.len(), 1);
+    }
 }

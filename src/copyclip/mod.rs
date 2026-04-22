@@ -30,17 +30,13 @@ impl CopyClipProcessor {
     }
 
     pub fn find_marker_range(content: &str) -> Result<MarkerRange> {
-        let start_pos = content
-            .find(START_MARKER)
-            .ok_or_else(|| {
-                crate::Error::ParseError("COPYCLIPSTART marker not found".to_string())
-            })?;
+        let start_pos = content.find(START_MARKER).ok_or_else(|| {
+            crate::Error::ParseError("COPYCLIPSTART marker not found".to_string())
+        })?;
 
         let end_pos = content
             .find(END_MARKER)
-            .ok_or_else(|| {
-                crate::Error::ParseError("COPYCLIPEND marker not found".to_string())
-            })?;
+            .ok_or_else(|| crate::Error::ParseError("COPYCLIPEND marker not found".to_string()))?;
 
         if start_pos >= end_pos {
             return Err(crate::Error::ParseError(
@@ -63,9 +59,9 @@ impl CopyClipProcessor {
         new_content: &str,
     ) -> String {
         let mut result = String::new();
-        
+
         result.push_str(&content[..range.start_marker_end]);
-        
+
         if !new_content.starts_with('\n') {
             result.push('\n');
         }
@@ -73,9 +69,9 @@ impl CopyClipProcessor {
         if !new_content.ends_with('\n') {
             result.push('\n');
         }
-        
+
         result.push_str(&content[range.end_marker_start..]);
-        
+
         result
     }
 
@@ -101,7 +97,8 @@ impl CopyClipProcessor {
         };
 
         let range = Self::find_marker_range(&target_content)?;
-        let updated_content = Self::replace_between_markers(&target_content, &range, &extracted_content);
+        let updated_content =
+            Self::replace_between_markers(&target_content, &range, &extracted_content);
 
         Ok(CopyClipResult {
             updated_content,
@@ -215,7 +212,7 @@ old content
         let range = CopyClipProcessor::find_marker_range(content).unwrap();
         let new_content = "new content";
         let result = CopyClipProcessor::replace_between_markers(content, &range, new_content);
-        
+
         assert!(result.contains("-- COPYCLIPSTART --"));
         assert!(result.contains("-- COPYCLIPEND --"));
         assert!(result.contains("new content"));
@@ -237,7 +234,7 @@ return RECIPE_BUILDER_TAG_LOOKUP
 "#;
         let result = process_copyclip(source, "RECIPE_BUILDER_TAG_LOOKUP", target);
         assert!(result.is_ok());
-        
+
         let clip_result = result.unwrap();
         assert!(clip_result.updated_content.contains("balloonomancer"));
         assert!(clip_result.updated_content.contains("winona"));
@@ -267,7 +264,7 @@ return result
 "#;
         let result = process_copyclip_range(source, "START_VAR", "END_VAR", target);
         assert!(result.is_ok());
-        
+
         let clip_result = result.unwrap();
         assert!(clip_result.extracted_content.contains("START_VAR"));
         assert!(clip_result.extracted_content.contains("MIDDLE_VAR"));

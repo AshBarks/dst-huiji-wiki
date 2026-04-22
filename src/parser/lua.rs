@@ -36,17 +36,15 @@ impl LuaParser {
     }
 
     pub fn locate_variable(source: &str, var_name: &str) -> Result<VariableLocation> {
-        let ast = full_moon::parse(source).map_err(|e| {
-            crate::Error::ParseError(format!("Lua parse error: {:?}", e))
-        })?;
+        let ast = full_moon::parse(source)
+            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
 
         Self::find_variable_in_ast(&ast, source, var_name)
     }
 
     pub fn locate_field_assignment(source: &str, field_path: &str) -> Result<FieldLocation> {
-        let ast = full_moon::parse(source).map_err(|e| {
-            crate::Error::ParseError(format!("Lua parse error: {:?}", e))
-        })?;
+        let ast = full_moon::parse(source)
+            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
 
         Self::find_field_assignment_in_ast(&ast, source, field_path)
     }
@@ -56,9 +54,8 @@ impl LuaParser {
         start_field_path: &str,
         end_field_path: &str,
     ) -> Result<FieldLocation> {
-        let ast = full_moon::parse(source).map_err(|e| {
-            crate::Error::ParseError(format!("Lua parse error: {:?}", e))
-        })?;
+        let ast = full_moon::parse(source)
+            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
 
         let start_location = Self::find_field_assignment_in_ast(&ast, source, start_field_path)?;
         let end_location = Self::find_field_assignment_in_ast(&ast, source, end_field_path)?;
@@ -80,7 +77,11 @@ impl LuaParser {
         })
     }
 
-    fn find_field_assignment_in_ast(ast: &Ast, source: &str, field_path: &str) -> Result<FieldLocation> {
+    fn find_field_assignment_in_ast(
+        ast: &Ast,
+        source: &str,
+        field_path: &str,
+    ) -> Result<FieldLocation> {
         for stmt in ast.nodes().stmts() {
             if let ast::Stmt::Assignment(assignment) = stmt {
                 for var in assignment.variables().iter() {
@@ -131,9 +132,8 @@ impl LuaParser {
         start_var_name: &str,
         end_var_name: Option<&str>,
     ) -> Result<VariableRange> {
-        let ast = full_moon::parse(source).map_err(|e| {
-            crate::Error::ParseError(format!("Lua parse error: {:?}", e))
-        })?;
+        let ast = full_moon::parse(source)
+            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
 
         let start_location = Self::find_variable_in_ast(&ast, source, start_var_name)?;
 
@@ -229,24 +229,16 @@ impl LuaParser {
         var_name: &str,
         is_local: bool,
     ) -> Result<VariableLocation> {
-        let start_byte = if let Some(first_var) = assignment.variables().iter().next() {
-            if let ast::Var::Name(name) = first_var {
-                name.token().start_position().bytes()
-            } else {
-                0
-            }
+        let start_byte = if let Some(ast::Var::Name(name)) = assignment.variables().iter().next() {
+            name.token().start_position().bytes()
         } else {
             0
         };
 
         let end_byte = if let Some(last_expr) = assignment.expressions().iter().last() {
             Self::find_expression_end_in_source(last_expr, source)
-        } else if let Some(last_var) = assignment.variables().iter().last() {
-            if let ast::Var::Name(name) = last_var {
-                name.token().end_position().bytes()
-            } else {
-                start_byte
-            }
+        } else if let Some(ast::Var::Name(name)) = assignment.variables().iter().last() {
+            name.token().end_position().bytes()
         } else {
             start_byte
         };
@@ -264,11 +256,11 @@ impl LuaParser {
 
     fn find_expression_end_in_source(expr: &ast::Expression, source: &str) -> usize {
         let expr_str = expr.to_string();
-        
+
         if let Some(pos) = source.find(&expr_str) {
             return pos + expr_str.len();
         }
-        
+
         0
     }
 }
@@ -393,10 +385,13 @@ local SECOND = 2
     { "character", "wilson" },
 }
 "#;
-        let result = LuaParser::locate_field_assignment(source, "CRAFTING_FILTERS.CHARACTER.recipes");
+        let result =
+            LuaParser::locate_field_assignment(source, "CRAFTING_FILTERS.CHARACTER.recipes");
         assert!(result.is_ok());
         let location = result.unwrap();
-        assert!(location.content.contains("CRAFTING_FILTERS.CHARACTER.recipes"));
+        assert!(location
+            .content
+            .contains("CRAFTING_FILTERS.CHARACTER.recipes"));
         assert!(location.content.contains("wilson"));
     }
 
@@ -417,7 +412,9 @@ CRAFTING_FILTERS.DECOR.recipes = {
         );
         assert!(result.is_ok());
         let location = result.unwrap();
-        assert!(location.content.contains("CRAFTING_FILTERS.CHARACTER.recipes"));
+        assert!(location
+            .content
+            .contains("CRAFTING_FILTERS.CHARACTER.recipes"));
         assert!(location.content.contains("CRAFTING_FILTERS.DECOR.recipes"));
     }
 }

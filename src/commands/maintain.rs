@@ -39,7 +39,11 @@ pub async fn run(args: Commands) -> Result<()> {
     }
 }
 
-fn handle_parse_po(input: PathBuf, output: Option<PathBuf>, category: Option<String>) -> Result<()> {
+fn handle_parse_po(
+    input: PathBuf,
+    output: Option<PathBuf>,
+    category: Option<String>,
+) -> Result<()> {
     let po_file = PoParser::parse_from_file(input.to_str().unwrap())?;
     let entries = if let Some(cat) = category {
         po_file.filter_by_category(&cat)
@@ -112,7 +116,11 @@ fn handle_map_names(
     if let Some(output_path) = output {
         let json = WikiDataConverter::to_json_string(&wiki_data)?;
         std::fs::write(&output_path, json)?;
-        println!("Written {} records to {:?}", wiki_data.data.len(), output_path);
+        println!(
+            "Written {} records to {:?}",
+            wiki_data.data.len(),
+            output_path
+        );
     } else {
         println!("\nFirst 5 records:");
         for (i, record) in wiki_data.data.iter().take(5).enumerate() {
@@ -140,7 +148,10 @@ fn handle_map_recipes(
     let converter = if let Some(po_path) = &po_file {
         match PoParser::parse_from_file(po_path.to_str().unwrap()) {
             Ok(po_data) => {
-                println!("Loaded {} PO entries for desc lookup", po_data.entries.len());
+                println!(
+                    "Loaded {} PO entries for desc lookup",
+                    po_data.entries.len()
+                );
                 WikiDataConverter::with_po_entries(po_data.entries.clone())
             }
             Err(e) => {
@@ -182,7 +193,11 @@ fn handle_map_recipes(
     if let Some(output_path) = output {
         let json = WikiDataConverter::to_json_string(&wiki_data)?;
         std::fs::write(&output_path, json)?;
-        println!("Written {} records to {:?}", wiki_data.data.len(), output_path);
+        println!(
+            "Written {} records to {:?}",
+            wiki_data.data.len(),
+            output_path
+        );
     } else {
         println!("\nFirst 5 records:");
         for (i, record) in wiki_data.data.iter().take(5).enumerate() {
@@ -220,9 +235,9 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     println!("Fetching historical data from wiki...");
     let page_title = "Data:ItemTable.tabx";
     let historical_data = match ctx.client.get_json_data(page_title).await {
-        Ok(historical_json) => {
-            Some(WikiDataConverter::parse_wiki_json(&historical_json.to_string())?)
-        }
+        Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
+            &historical_json.to_string(),
+        )?),
         Err(e) => {
             println!("Warning: Failed to fetch historical data from wiki: {}", e);
             println!("Proceeding without historical data...");
@@ -241,13 +256,7 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_json_result_with_update(
-        &ctx.client,
-        page_title,
-        &wiki_data,
-        output,
-    )
-    .await
+    output_json_result_with_update(&ctx.client, page_title, &wiki_data, output).await
 }
 
 async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
@@ -285,16 +294,19 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
 
     println!("\nParsing chinese_s.po for desc lookup...");
     let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
-    println!("Loaded {} PO entries for desc lookup", po_file.entries.len());
+    println!(
+        "Loaded {} PO entries for desc lookup",
+        po_file.entries.len()
+    );
 
     let converter = WikiDataConverter::with_po_entries(po_file.entries.clone());
 
     println!("Fetching historical data from wiki...");
     let page_title = "Data:DSTRecipes.tabx";
     let historical_data = match ctx.client.get_json_data(page_title).await {
-        Ok(historical_json) => {
-            Some(WikiDataConverter::parse_wiki_json(&historical_json.to_string())?)
-        }
+        Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
+            &historical_json.to_string(),
+        )?),
         Err(e) => {
             println!("Warning: Failed to fetch historical data from wiki: {}", e);
             println!("Proceeding without historical data...");
@@ -313,13 +325,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_json_result_with_update(
-        &ctx.client,
-        page_title,
-        &wiki_data,
-        output,
-    )
-    .await
+    output_json_result_with_update(&ctx.client, page_title, &wiki_data, output).await
 }
 
 async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>) -> Result<()> {
@@ -553,7 +559,9 @@ async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) 
         .ok_or_else(|| Error::ParseError("']]' marker not found".to_string()))?;
 
     if start_pos >= end_pos {
-        return Err(Error::ParseError("'[[' must appear before ']]'".to_string()));
+        return Err(Error::ParseError(
+            "'[[' must appear before ']]'".to_string(),
+        ));
     }
 
     let updated_content = format!(
@@ -585,7 +593,11 @@ async fn output_json_result_with_update(
 
     if let Some(output_path) = output {
         std::fs::write(&output_path, &new_json)?;
-        println!("Written {} records to {:?}", wiki_data.data.len(), output_path);
+        println!(
+            "Written {} records to {:?}",
+            wiki_data.data.len(),
+            output_path
+        );
     }
 
     let historical_json = match client.get_json_data(page_title).await {
@@ -609,7 +621,12 @@ async fn output_json_result_with_update(
         println!("Updating wiki page: {}", page_title);
 
         let edit_result = client
-            .edit_page(page_title, &new_json, Some("Update via dst-huiji-wiki tool"), false)
+            .edit_page(
+                page_title,
+                &new_json,
+                Some("Update via dst-huiji-wiki tool"),
+                false,
+            )
             .await?;
 
         println!(
@@ -658,9 +675,14 @@ async fn output_copyclip_result_with_update(
 
     if prompt_confirm("Update wiki page?")? {
         println!("Updating wiki page: {}", page_title);
-        
+
         let edit_result = client
-            .edit_page(page_title, updated_content, Some("Update via dst-huiji-wiki tool"), false)
+            .edit_page(
+                page_title,
+                updated_content,
+                Some("Update via dst-huiji-wiki tool"),
+                false,
+            )
             .await?;
 
         println!(

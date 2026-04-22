@@ -66,9 +66,11 @@ mod tests {
 
     #[test]
     fn test_recipe_with_options() {
-        let mut options = RecipeOptions::default();
-        options.builder_tag = Some("pyromaniac".to_string());
-        options.numtogive = Some(2);
+        let options = RecipeOptions {
+            builder_tag: Some("pyromaniac".to_string()),
+            numtogive: Some(2),
+            ..Default::default()
+        };
 
         let recipe = Recipe::new("lighter".to_string(), vec![], "TECH.NONE".to_string())
             .with_options(options.clone());

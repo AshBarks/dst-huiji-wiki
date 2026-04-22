@@ -536,8 +536,8 @@ mod tests {
     fn test_config_from_env_missing() {
         dotenvy::dotenv().ok();
         let result = WikiConfig::from_env();
-        if result.is_err() {
-            assert!(matches!(result.unwrap_err(), Error::EnvVarNotFound(_)));
+        if let Err(e) = result {
+            assert!(matches!(e, Error::EnvVarNotFound(_)));
         }
     }
 

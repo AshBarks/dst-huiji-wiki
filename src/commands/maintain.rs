@@ -3,9 +3,12 @@ use dst_huiji_wiki::copyclip::{process_copyclip, CopyClipProcessor};
 use dst_huiji_wiki::diff_lines;
 use dst_huiji_wiki::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
 use dst_huiji_wiki::models::PoEntry;
-use dst_huiji_wiki::parser::{extract_field_assignment_range, PoParser, RecipeParser};
+use dst_huiji_wiki::parser::{
+    extract_field_assignment_range, parse_prefab_overrides, OverrideValue, PoParser, RecipeParser,
+};
 use dst_huiji_wiki::wiki::WikiClient;
 use dst_huiji_wiki::{DstContext, Error, Result, TechReport};
+use std::collections::BTreeMap;
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 
@@ -35,6 +38,9 @@ pub async fn run(args: Commands) -> Result<()> {
         Commands::MaintainDSTRecipes { output } => handle_maintain_dst_recipes(output).await,
         Commands::MaintainCopyClip { r#type, output } => {
             handle_maintain_copyclip(r#type.as_deref(), output).await
+        }
+        Commands::PrefabOverrides { input, output } => {
+            handle_prefab_overrides(input, output)
         }
     }
 }
@@ -636,6 +642,45 @@ async fn output_json_result_with_update(
         );
     } else {
         println!("Skipped updating wiki page.");
+    }
+
+    Ok(())
+}
+
+fn handle_prefab_overrides(input: PathBuf, output: Option<PathBuf>) -> Result<()> {
+    let lua_content = std::fs::read_to_string(&input)?;
+    let overrides = parse_prefab_overrides(&lua_content)?;
+
+    println!("Found {} prefab overrides", overrides.len());
+
+    let mut mapping: BTreeMap<String, serde_json::Value> = BTreeMap::new();
+
+    for override_info in overrides {
+        let prefab_name = override_info.prefab_name;
+        let override_value = match override_info.override_name {
+            OverrideValue::Static(s) => serde_json::json!({
+                "override_name": s,
+                "type": "static"
+            }),
+            OverrideValue::Dynamic(s) => serde_json::json!({
+                "override_name": s,
+                "type": "dynamic"
+            }),
+            OverrideValue::Unknown => serde_json::json!({
+                "override_name": null,
+                "type": "unknown"
+            }),
+        };
+        mapping.insert(prefab_name, override_value);
+    }
+
+    let json_output = serde_json::to_string_pretty(&mapping)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(&output_path, &json_output)?;
+        println!("Written {} mappings to {:?}", mapping.len(), output_path);
+    } else {
+        println!("{}", json_output);
     }
 
     Ok(())

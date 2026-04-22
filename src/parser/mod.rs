@@ -1,5 +1,6 @@
 pub mod lua;
 pub mod po;
+pub mod prefab_override;
 pub mod recipe;
 
 pub use lua::{
@@ -7,4 +8,8 @@ pub use lua::{
     extract_variable_range, FieldLocation, LuaParser, VariableLocation, VariableRange,
 };
 pub use po::PoParser;
+pub use prefab_override::{
+    parse_prefab_overrides, OverrideValue, PrefabNameOverride, PrefabOverrideParser,
+    SourceLocation,
+};
 pub use recipe::{parse_recipes_from_file, parse_recipes_from_str, RecipeParser};

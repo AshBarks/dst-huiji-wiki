@@ -63,6 +63,12 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    PrefabOverrides {
+        #[arg(short, long)]
+        input: PathBuf,
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
 }
 
 #[cfg(test)]

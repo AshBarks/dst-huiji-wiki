@@ -1,0 +1,246 @@
+use std::collections::HashMap;
+
+use crate::error::{Error, Result};
+use crate::hash::dst_hash;
+use crate::reader::Reader;
+use crate::writer::Writer;
+
+pub struct BuildVert {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub u: f32,
+    pub v: f32,
+    pub w: u32,
+}
+
+pub struct BuildAtlasRef {
+    pub name: String,
+}
+
+pub struct BuildFrame {
+    pub frame_num: u32,
+    pub duration: u32,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+    pub verts: Vec<BuildVert>,
+}
+
+pub struct BuildSymbol {
+    pub name: String,
+    pub frames: Vec<BuildFrame>,
+}
+
+pub struct BuildFile {
+    pub version: i32,
+    pub name: String,
+    pub symbols: Vec<BuildSymbol>,
+    pub atlases: Vec<BuildAtlasRef>,
+}
+
+pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
+    let mut reader = Reader::new(data);
+    let magic = reader.read_string(4)?;
+    if magic != crate::specs::MAGIC_BILD {
+        return Err(Error::InvalidMagic {
+            expected: crate::specs::MAGIC_BILD.to_string(),
+            actual: magic,
+        });
+    }
+    let version = reader.read_le_i32()?;
+    reader.seek(8);
+    let num_symbols = reader.read_le_u32()?;
+    let _total_frames = reader.read_le_u32()?;
+    let name_len = reader.read_le_i32_at(16)? as usize;
+    let name = reader.read_string(name_len)?;
+    let num_atlases = reader.read_le_u32()?;
+    let mut atlases = Vec::with_capacity(num_atlases as usize);
+    for _ in 0..num_atlases {
+        let atlas_name_len = reader.read_le_i32()? as usize;
+        let atlas_name = reader.read_string(atlas_name_len)?;
+        atlases.push(BuildAtlasRef { name: atlas_name });
+    }
+
+    let saved_cursor = reader.pos();
+
+    for _ in 0..num_symbols {
+        let frame_count = reader.read_le_u32_at(reader.pos() + 4)?;
+        reader.seek(reader.pos() + frame_count as usize * 32);
+    }
+
+    let num_verts = reader.read_le_u32()?;
+    let mut verts: Vec<BuildVert> = Vec::with_capacity(num_verts as usize);
+    for _ in 0..num_verts {
+        let x = reader.read_le_f32()?;
+        let y = reader.read_le_f32()?;
+        let z = reader.read_le_f32()?;
+        let u = reader.read_le_f32()?;
+        let v = reader.read_le_f32()?;
+        let w = reader.read_le_f32()?;
+        verts.push(BuildVert {
+            x,
+            y,
+            z,
+            u,
+            v,
+            w: w as u32,
+        });
+    }
+
+    let hash_count = reader.read_le_u32()?;
+    let mut hash_map: HashMap<u32, String> = HashMap::new();
+    for _ in 0..hash_count {
+        let hash = reader.read_le_u32()?;
+        let str_len = reader.read_le_i32()? as usize;
+        let s = reader.read_string(str_len)?;
+        hash_map.insert(hash, s);
+    }
+
+    reader.seek(saved_cursor);
+    let mut symbols = Vec::with_capacity(num_symbols as usize);
+    for _ in 0..num_symbols {
+        let symbol_hash = reader.read_le_u32()?;
+        let frame_count = reader.read_le_u32()?;
+        let symbol_name = hash_map
+            .get(&symbol_hash)
+            .cloned()
+            .unwrap_or_else(|| symbol_hash.to_string());
+        let mut frames = Vec::with_capacity(frame_count as usize);
+        for _ in 0..frame_count {
+            let frame_num = reader.read_le_u32()?;
+            let duration = reader.read_le_u32()?;
+            let pivot_x = reader.read_le_f32()?;
+            let pivot_y = reader.read_le_f32()?;
+            let width = reader.read_le_f32()?;
+            let height = reader.read_le_f32()?;
+            let vert_idx = reader.read_le_u32()? as usize;
+            let vert_count = reader.read_le_u32()? as usize;
+            if vert_idx + vert_count > verts.len() {
+                return Err(Error::OutOfBounds {
+                    pos: vert_idx + vert_count,
+                    len: verts.len(),
+                });
+            }
+            let frame_verts: Vec<BuildVert> = verts[vert_idx..vert_idx + vert_count]
+                .iter()
+                .map(|v| BuildVert {
+                    x: v.x,
+                    y: v.y,
+                    z: v.z,
+                    u: v.u,
+                    v: v.v,
+                    w: v.w,
+                })
+                .collect();
+            frames.push(BuildFrame {
+                frame_num,
+                duration,
+                x: pivot_x,
+                y: pivot_y,
+                width,
+                height,
+                verts: frame_verts,
+            });
+        }
+        frames.sort_by_key(|f| f.frame_num);
+        symbols.push(BuildSymbol {
+            name: symbol_name,
+            frames,
+        });
+    }
+
+    Ok(BuildFile {
+        version,
+        name,
+        symbols,
+        atlases,
+    })
+}
+
+pub fn write_build(file: &BuildFile) -> Vec<u8> {
+    let mut w = Writer::new();
+    let mut hash_map: HashMap<u32, String> = HashMap::new();
+    let mut all_verts: Vec<&BuildVert> = Vec::new();
+
+    w.write_string("BILD");
+    w.write_le_i32(file.version);
+    w.write_le_u32(file.symbols.len() as u32);
+    let total_frames: u32 = file.symbols.iter().map(|s| s.frames.len() as u32).sum();
+    w.write_le_u32(total_frames);
+    w.write_le_i32(file.name.len() as i32);
+    w.write_string(&file.name);
+    w.write_le_u32(file.atlases.len() as u32);
+    for atlas in &file.atlases {
+        w.write_le_i32(atlas.name.len() as i32);
+        w.write_string(&atlas.name);
+    }
+
+    let mut sorted_hashes: Vec<u32> = file.symbols.iter().map(|s| dst_hash(&s.name)).collect();
+    sorted_hashes.sort();
+    hash_map.insert(dst_hash(&file.name), file.name.clone());
+
+    for hash in &sorted_hashes {
+        let symbol = file
+            .symbols
+            .iter()
+            .find(|s| dst_hash(&s.name) == *hash)
+            .unwrap();
+        hash_map.insert(*hash, symbol.name.clone());
+        w.write_le_u32(*hash);
+        w.write_le_u32(symbol.frames.len() as u32);
+        for frame in &symbol.frames {
+            let vert_idx = all_verts.len() as u32;
+            let vert_count = frame.verts.len() as u32;
+            w.write_le_u32(frame.frame_num);
+            w.write_le_u32(frame.duration);
+            w.write_le_f32(frame.x);
+            w.write_le_f32(frame.y);
+            w.write_le_f32(frame.width);
+            w.write_le_f32(frame.height);
+            w.write_le_u32(vert_idx);
+            w.write_le_u32(vert_count);
+            all_verts.extend(&frame.verts);
+        }
+    }
+
+    w.write_le_u32(all_verts.len() as u32);
+    for v in &all_verts {
+        w.write_le_f32(v.x);
+        w.write_le_f32(v.y);
+        w.write_le_f32(v.z);
+        w.write_le_f32(v.u);
+        w.write_le_f32(v.v);
+        w.write_le_f32(v.w as f32);
+    }
+
+    w.write_le_u32(hash_map.len() as u32);
+    for (hash, string) in &hash_map {
+        w.write_le_u32(*hash);
+        w.write_le_i32(string.len() as i32);
+        w.write_string(string);
+    }
+
+    w.into_vec()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_build_empty_roundtrip() {
+        let file = BuildFile {
+            version: 6,
+            name: "test".to_string(),
+            symbols: Vec::new(),
+            atlases: Vec::new(),
+        };
+        let buf = write_build(&file);
+        let parsed = parse_build(&buf).unwrap();
+        assert_eq!(parsed.version, 6);
+        assert_eq!(parsed.name, "test");
+        assert!(parsed.symbols.is_empty());
+    }
+}

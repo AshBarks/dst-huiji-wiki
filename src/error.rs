@@ -16,6 +16,9 @@ pub enum Error {
 
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
+
+    #[error("ZIP error: {0}")]
+    Zip(#[from] zip::result::ZipError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

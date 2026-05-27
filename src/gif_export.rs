@@ -1,4 +1,5 @@
 use std::io::Write;
+use std::path::Path;
 
 use crate::error::Result;
 
@@ -6,6 +7,15 @@ pub fn export_gif(
     frames: &[image::RgbaImage],
     frame_rate: f32,
     output: &mut dyn Write,
+) -> Result<()> {
+    export_gif_with_bg(frames, frame_rate, output, [255, 255, 255])
+}
+
+pub fn export_gif_with_bg(
+    frames: &[image::RgbaImage],
+    frame_rate: f32,
+    output: &mut dyn Write,
+    bg: [u8; 3],
 ) -> Result<()> {
     if frames.is_empty() {
         return Err(crate::error::Error::UnknownFormat(
@@ -41,7 +51,7 @@ pub fn export_gif(
             }
         }
 
-        let (palette, indices) = simple_quantize(&pixels);
+        let (palette, indices) = simple_quantize(&pixels, bg);
 
         let gif_frame = gif::Frame {
             width,
@@ -50,6 +60,7 @@ pub fn export_gif(
             palette: Some(palette),
             transparent: Some(0),
             delay: frame_delay,
+            dispose: gif::DisposalMethod::Background,
             ..Default::default()
         };
 
@@ -61,11 +72,12 @@ pub fn export_gif(
 
 const TRANSPARENT_ALPHA_THRESHOLD: u8 = 128;
 
-fn simple_quantize(rgba: &[u8]) -> (Vec<u8>, Vec<u8>) {
-    let mut palette = vec![0, 0, 0];
+fn simple_quantize(rgba: &[u8], bg: [u8; 3]) -> (Vec<u8>, Vec<u8>) {
+    let sentinel = [0, 0, 2];
+    let mut palette = vec![sentinel[0], sentinel[1], sentinel[2]];
     let mut color_map: std::collections::HashMap<[u8; 3], u8> = std::collections::HashMap::new();
-    color_map.insert([0, 0, 0], 0);
-    let mut palette_colors: Vec<[u8; 3]> = vec![[0, 0, 0]];
+    color_map.insert(sentinel, 0);
+    let mut palette_colors: Vec<[u8; 3]> = vec![sentinel];
 
     let mut indices = Vec::with_capacity(rgba.len() / 4);
 
@@ -76,9 +88,21 @@ fn simple_quantize(rgba: &[u8]) -> (Vec<u8>, Vec<u8>) {
             continue;
         }
 
-        let r = chunk[0] & 0xFC;
-        let g = chunk[1] & 0xFC;
-        let b = chunk[2] & 0xFC;
+        let (r, g, b) = if a < 255 {
+            let ia = 255 - a as u32;
+            let sa = a as u32;
+            (
+                ((chunk[0] as u32 * sa + bg[0] as u32 * ia + 127) / 255) as u8,
+                ((chunk[1] as u32 * sa + bg[1] as u32 * ia + 127) / 255) as u8,
+                ((chunk[2] as u32 * sa + bg[2] as u32 * ia + 127) / 255) as u8,
+            )
+        } else {
+            (chunk[0], chunk[1], chunk[2])
+        };
+
+        let r = r & 0xFC;
+        let g = g & 0xFC;
+        let b = b & 0xFC;
         let key = [r, g, b];
 
         let idx = match color_map.get(&key) {
@@ -108,9 +132,9 @@ fn simple_quantize(rgba: &[u8]) -> (Vec<u8>, Vec<u8>) {
 }
 
 fn nearest_palette_index(palette: &[[u8; 3]], color: &[u8; 3]) -> u8 {
-    let mut best_idx = 0u8;
+    let mut best_idx = 1u8;
     let mut best_dist = i32::MAX;
-    for (i, p) in palette.iter().enumerate() {
+    for (i, p) in palette.iter().enumerate().skip(1) {
         let dr = color[0] as i32 - p[0] as i32;
         let dg = color[1] as i32 - p[1] as i32;
         let db = color[2] as i32 - p[2] as i32;
@@ -123,6 +147,94 @@ fn nearest_palette_index(palette: &[[u8; 3]], color: &[u8; 3]) -> u8 {
     best_idx
 }
 
+pub fn export_png_sequence(frames: &[image::RgbaImage], output_dir: &Path) -> Result<()> {
+    if frames.is_empty() {
+        return Err(crate::error::Error::UnknownFormat(
+            "no frames to export".to_string(),
+        ));
+    }
+    std::fs::create_dir_all(output_dir)?;
+    let digits = format!("{}", frames.len()).len().max(4);
+    for (i, frame) in frames.iter().enumerate() {
+        let filename = format!("frame_{:0>width$}.png", i, width = digits);
+        let path = output_dir.join(filename);
+        frame
+            .save(&path)
+            .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+    }
+    Ok(())
+}
+
+pub fn ffmpeg_gif_from_sequence(
+    input_dir: &Path,
+    output_path: &Path,
+    frame_rate: f32,
+    frame_count: usize,
+) -> Result<()> {
+    let has_ffmpeg = which::which("ffmpeg").is_ok();
+    if !has_ffmpeg {
+        return Err(crate::error::Error::UnknownFormat(
+            "ffmpeg not found in PATH".to_string(),
+        ));
+    }
+    let digits = format!("{}", frame_count).len().max(4);
+    let pattern = format!("frame_%0{}d.png", digits);
+    let input_pattern = input_dir.join(&pattern);
+    let palette_path = input_dir.join("palette.png");
+    let fps = format!("{:.2}", frame_rate);
+
+    let palette_status = std::process::Command::new("ffmpeg")
+        .args([
+            "-framerate",
+            &fps,
+            "-i",
+            input_pattern.to_str().unwrap_or(""),
+            "-vf",
+            "palettegen=stats_mode=diff",
+            "-y",
+            palette_path.to_str().unwrap_or(""),
+        ])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map_err(crate::error::Error::Io)?;
+
+    if !palette_status.success() {
+        let _ = std::fs::remove_file(&palette_path);
+        return Err(crate::error::Error::UnknownFormat(
+            "ffmpeg palettegen failed".to_string(),
+        ));
+    }
+
+    let gif_status = std::process::Command::new("ffmpeg")
+        .args([
+            "-framerate",
+            &fps,
+            "-i",
+            input_pattern.to_str().unwrap_or(""),
+            "-i",
+            palette_path.to_str().unwrap_or(""),
+            "-lavfi",
+            "paletteuse=dither=sierra2_4a",
+            "-y",
+            output_path.to_str().unwrap_or(""),
+        ])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map_err(crate::error::Error::Io)?;
+
+    let _ = std::fs::remove_file(&palette_path);
+
+    if !gif_status.success() {
+        return Err(crate::error::Error::UnknownFormat(
+            "ffmpeg gif encoding failed".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -132,7 +244,7 @@ mod tests {
         let rgba: Vec<u8> = vec![
             255, 0, 0, 0, 0, 255, 0, 255, 0, 0, 255, 255, 128, 128, 128, 200,
         ];
-        let (_, indices) = simple_quantize(&rgba);
+        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
         assert_eq!(indices[0], 0, "fully transparent pixel should be idx 0");
         assert_ne!(indices[1], 0, "opaque green pixel should not be idx 0");
         assert_ne!(indices[2], 0, "opaque blue pixel should not be idx 0");
@@ -142,7 +254,7 @@ mod tests {
     #[test]
     fn semi_transparent_below_threshold_is_transparent() {
         let rgba: Vec<u8> = vec![255, 0, 0, 50, 0, 255, 0, 127];
-        let (_, indices) = simple_quantize(&rgba);
+        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
         assert_eq!(indices[0], 0);
         assert_eq!(indices[1], 0);
     }
@@ -150,7 +262,7 @@ mod tests {
     #[test]
     fn semi_transparent_at_threshold_is_opaque() {
         let rgba: Vec<u8> = vec![255, 0, 0, 128, 0, 255, 0, 200];
-        let (_, indices) = simple_quantize(&rgba);
+        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
         assert_ne!(indices[0], 0);
         assert_ne!(indices[1], 0);
     }

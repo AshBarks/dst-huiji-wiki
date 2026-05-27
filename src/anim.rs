@@ -10,6 +10,7 @@ use crate::writer::Writer;
 pub struct AnimElement {
     pub z_index: f32,
     pub symbol: String,
+    pub symbol_lower: String,
     pub frame_num: u32,
     pub layer_name: String,
     pub a: f32,
@@ -176,6 +177,7 @@ pub fn parse_anim(data: &[u8]) -> Result<AnimFile> {
                 let z_index = reader.read_le_f32()?;
                 elements.push(AnimElement {
                     z_index,
+                    symbol_lower: symbol_name.to_lowercase(),
                     symbol: symbol_name,
                     frame_num,
                     layer_name,

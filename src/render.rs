@@ -34,93 +34,6 @@ fn find_symbol_frame<'a>(
     None
 }
 
-fn apply_transform(
-    sprite: &image::RgbaImage,
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-) -> Option<image::RgbaImage> {
-    let is_identity =
-        (a - 1.0).abs() < 1e-6 && b.abs() < 1e-6 && c.abs() < 1e-6 && (d - 1.0).abs() < 1e-6;
-    if is_identity {
-        return Some(sprite.clone());
-    }
-
-    let det = a * d - b * c;
-    if det == 0.0 {
-        return None;
-    }
-
-    let sw = sprite.width() as f32;
-    let sh = sprite.height() as f32;
-
-    let corners_x = [0.0, sw * a, sh * c, sw * a + sh * c];
-    let corners_y = [0.0, sw * b, sh * d, sw * b + sh * d];
-
-    let min_x = corners_x.iter().cloned().fold(f32::INFINITY, f32::min);
-    let max_x = corners_x.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-    let min_y = corners_y.iter().cloned().fold(f32::INFINITY, f32::min);
-    let max_y = corners_y.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-
-    let out_w = (max_x - min_x).round() as u32;
-    let out_h = (max_y - min_y).round() as u32;
-    if out_w == 0 || out_h == 0 {
-        return None;
-    }
-
-    let is_uniform_scale = b.abs() < 1e-6 && c.abs() < 1e-6;
-
-    let inv_a = d / det;
-    let inv_b = -b / det;
-    let inv_c = -c / det;
-    let inv_d = a / det;
-
-    let mut out = image::RgbaImage::new(out_w, out_h);
-
-    if is_uniform_scale {
-        for oy in 0..out_h {
-            for ox in 0..out_w {
-                let px = ox as f32 + min_x;
-                let py = oy as f32 + min_y;
-                let src_x = px * inv_a + py * inv_c;
-                let src_y = py * inv_d;
-                let sx = src_x.round() as i64;
-                let sy = src_y.round() as i64;
-                if sx >= 0
-                    && sy >= 0
-                    && (sx as u32) < sprite.width()
-                    && (sy as u32) < sprite.height()
-                {
-                    let pixel = *sprite.get_pixel(sx as u32, sy as u32);
-                    out.put_pixel(ox, oy, pixel);
-                }
-            }
-        }
-    } else {
-        for oy in 0..out_h {
-            for ox in 0..out_w {
-                let px = ox as f32 + min_x;
-                let py = oy as f32 + min_y;
-                let src_x = px * inv_a + py * inv_c;
-                let src_y = px * inv_b + py * inv_d;
-                let sx = src_x.round() as i64;
-                let sy = src_y.round() as i64;
-                if sx >= 0
-                    && sy >= 0
-                    && (sx as u32) < sprite.width()
-                    && (sy as u32) < sprite.height()
-                {
-                    let pixel = *sprite.get_pixel(sx as u32, sy as u32);
-                    out.put_pixel(ox, oy, pixel);
-                }
-            }
-        }
-    }
-
-    Some(out)
-}
-
 struct ElementData {
     sprite: std::sync::Arc<image::RgbaImage>,
     bf_x: f32,
@@ -147,8 +60,7 @@ fn compute_frame_bounds(
     let mut elements_data: Vec<ElementData> = Vec::new();
 
     for element in &anim_frame.elements {
-        let lower = element.symbol.to_lowercase();
-        let bf = find_symbol_frame(build_list, &lower, element.frame_num);
+        let bf = find_symbol_frame(build_list, &element.symbol_lower, element.frame_num);
         if let Some(bf) = bf {
             let Some(sprite) = &bf.image else {
                 continue;
@@ -239,6 +151,41 @@ pub fn compute_animation_bounds(
     })
 }
 
+fn composite_pixel(canvas_buf: &mut [u8], dst_off: usize, sprite_buf: &[u8], src_off: usize) {
+    let src_a = sprite_buf[src_off + 3] as u32;
+    if src_a == 0 {
+        return;
+    }
+    if src_a == 255 {
+        canvas_buf[dst_off..dst_off + 4].copy_from_slice(&sprite_buf[src_off..src_off + 4]);
+        return;
+    }
+    let dst_a = canvas_buf[dst_off + 3] as u32;
+    let out_a = src_a + dst_a - (src_a * dst_a + 127) / 255;
+    if out_a == 0 {
+        return;
+    }
+    let src_a_255 = src_a * 255;
+    let dst_contrib = dst_a * (255 - src_a);
+    let denom = out_a * 255;
+    let half = denom / 2;
+    canvas_buf[dst_off] =
+        ((sprite_buf[src_off] as u32 * src_a_255 + canvas_buf[dst_off] as u32 * dst_contrib + half)
+            / denom)
+            .min(255) as u8;
+    canvas_buf[dst_off + 1] = ((sprite_buf[src_off + 1] as u32 * src_a_255
+        + canvas_buf[dst_off + 1] as u32 * dst_contrib
+        + half)
+        / denom)
+        .min(255) as u8;
+    canvas_buf[dst_off + 2] = ((sprite_buf[src_off + 2] as u32 * src_a_255
+        + canvas_buf[dst_off + 2] as u32 * dst_contrib
+        + half)
+        / denom)
+        .min(255) as u8;
+    canvas_buf[dst_off + 3] = out_a.min(255) as u8;
+}
+
 pub fn render_frame(
     anim_frame: &AnimFrame,
     build_list: &[&BuildFile],
@@ -261,33 +208,122 @@ pub fn render_frame(
     }
 
     let mut canvas = image::RgbaImage::new(w, h);
+    let canvas_buf = canvas.as_mut();
+    let cw = w as usize;
 
     for elem in elements_data.iter().rev() {
         let sprite: &image::RgbaImage = &elem.sprite;
-        if let Some(transformed) = apply_transform(sprite, elem.a, elem.b, elem.c, elem.d) {
-            let elem_left = elem.tx * scale + offset.0 + elem.bf_x * elem.a + elem.bf_y * elem.c;
-            let elem_top = elem.ty * scale + offset.1 + elem.bf_x * elem.b + elem.bf_y * elem.d;
+        let sprite_buf = sprite.as_raw();
+        let sw = sprite.width() as usize;
+        let sh = sprite.height() as usize;
 
-            let dest_x =
-                (elem_left - transformed.width() as f32 / 2.0 - bounds.left).round() as i64;
-            let dest_y = (elem_top - transformed.height() as f32 / 2.0 - bounds.top).round() as i64;
+        let a = elem.a;
+        let b = elem.b;
+        let c = elem.c;
+        let d = elem.d;
 
-            let tw = transformed.width();
-            let th = transformed.height();
+        let elem_left = elem.tx * scale + offset.0 + elem.bf_x * a + elem.bf_y * c;
+        let elem_top = elem.ty * scale + offset.1 + elem.bf_x * b + elem.bf_y * d;
 
-            for sy in 0..th {
-                let dy = dest_y + sy as i64;
-                if dy < 0 || dy >= h as i64 {
-                    continue;
+        let is_identity =
+            (a - 1.0).abs() < 1e-6 && b.abs() < 1e-6 && c.abs() < 1e-6 && (d - 1.0).abs() < 1e-6;
+
+        if is_identity {
+            let dest_x = (elem_left - sw as f32 / 2.0 - bounds.left).round() as i64;
+            let dest_y = (elem_top - sh as f32 / 2.0 - bounds.top).round() as i64;
+
+            let y_start = 0i64.max(-dest_y) as usize;
+            let y_end = sh.min((h as i64 - dest_y).max(0) as usize);
+            let x_start = 0i64.max(-dest_x) as usize;
+            let x_end = sw.min((w as i64 - dest_x).max(0) as usize);
+
+            for sy in y_start..y_end {
+                let dy = (dest_y + sy as i64) as usize;
+                let src_row = sy * sw * 4;
+                let dst_row = dy * cw * 4;
+                for sx in x_start..x_end {
+                    let dx = (dest_x + sx as i64) as usize;
+                    let src_off = src_row + sx * 4;
+                    let dst_off = dst_row + dx * 4;
+                    composite_pixel(canvas_buf, dst_off, sprite_buf, src_off);
                 }
-                for sx in 0..tw {
-                    let dx = dest_x + sx as i64;
-                    if dx < 0 || dx >= w as i64 {
+            }
+        } else {
+            let det = a * d - b * c;
+            if det == 0.0 {
+                continue;
+            }
+
+            let inv_a = d / det;
+            let inv_b = -b / det;
+            let inv_c = -c / det;
+            let inv_d = a / det;
+
+            let swf = sw as f32;
+            let shf = sh as f32;
+            let corners_x = [0.0f32, swf * a, shf * c, swf * a + shf * c];
+            let corners_y = [0.0f32, swf * b, shf * d, swf * b + shf * d];
+            let min_cx = corners_x.iter().cloned().fold(f32::INFINITY, f32::min);
+            let max_cx = corners_x.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+            let min_cy = corners_y.iter().cloned().fold(f32::INFINITY, f32::min);
+            let max_cy = corners_y.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+
+            let out_w = (max_cx - min_cx).round() as u32;
+            let out_h = (max_cy - min_cy).round() as u32;
+            if out_w == 0 || out_h == 0 {
+                continue;
+            }
+
+            let dest_x = (elem_left - out_w as f32 / 2.0 - bounds.left).round() as i64;
+            let dest_y = (elem_top - out_h as f32 / 2.0 - bounds.top).round() as i64;
+
+            let x_start = dest_x.max(0);
+            let x_end = (dest_x + out_w as i64).min(w as i64);
+            let y_start = dest_y.max(0);
+            let y_end = (dest_y + out_h as i64).min(h as i64);
+
+            let is_uniform_scale = b.abs() < 1e-6 && c.abs() < 1e-6;
+
+            if is_uniform_scale {
+                for cy in y_start..y_end {
+                    let oy = (cy - dest_y) as f32;
+                    let py = oy + min_cy;
+                    let src_y = py * inv_d;
+                    let sy = src_y.round() as i64;
+                    if sy < 0 || (sy as usize) >= sh {
                         continue;
                     }
-                    let pixel = *transformed.get_pixel(sx, sy);
-                    if pixel[3] > 0 {
-                        canvas.put_pixel(dx as u32, dy as u32, pixel);
+                    let dst_row = cy as usize * cw * 4;
+                    let src_row = sy as usize * sw * 4;
+                    for cx in x_start..x_end {
+                        let ox = (cx - dest_x) as f32;
+                        let px = ox + min_cx;
+                        let src_x = px * inv_a;
+                        let sx = src_x.round() as i64;
+                        if sx >= 0 && (sx as usize) < sw {
+                            let src_off = src_row + sx as usize * 4;
+                            let dst_off = dst_row + cx as usize * 4;
+                            composite_pixel(canvas_buf, dst_off, sprite_buf, src_off);
+                        }
+                    }
+                }
+            } else {
+                for cy in y_start..y_end {
+                    let oy = (cy - dest_y) as f32;
+                    let py = oy + min_cy;
+                    let dst_row = cy as usize * cw * 4;
+                    for cx in x_start..x_end {
+                        let ox = (cx - dest_x) as f32;
+                        let px = ox + min_cx;
+                        let src_x = px * inv_a + py * inv_c;
+                        let src_y = px * inv_b + py * inv_d;
+                        let sx = src_x.round() as i64;
+                        let sy = src_y.round() as i64;
+                        if sx >= 0 && sy >= 0 && (sx as usize) < sw && (sy as usize) < sh {
+                            let src_off = (sy as usize * sw + sx as usize) * 4;
+                            let dst_off = dst_row + cx as usize * 4;
+                            composite_pixel(canvas_buf, dst_off, sprite_buf, src_off);
+                        }
                     }
                 }
             }
@@ -303,7 +339,6 @@ pub fn render_frame(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::Arc;
 
     #[test]
     fn render_abigail_flower() {
@@ -332,15 +367,5 @@ mod tests {
         let rendered = rendered.unwrap();
         assert!(rendered.image.width() > 0);
         assert!(rendered.image.height() > 0);
-    }
-
-    #[test]
-    fn apply_transform_identity() {
-        let sprite = image::RgbaImage::from_pixel(4, 4, image::Rgba([255, 0, 0, 255]));
-        let result = apply_transform(&sprite, 1.0, 0.0, 0.0, 1.0);
-        assert!(result.is_some());
-        let result = result.unwrap();
-        assert_eq!(result.width(), 4);
-        assert_eq!(result.height(), 4);
     }
 }

@@ -34,15 +34,29 @@ fn calc_xy_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
 }
 
 fn paste(canvas: &mut image::RgbaImage, sprite: &image::RgbaImage, dest_x: i64, dest_y: i64) {
-    for sy in 0..sprite.height() {
-        for sx in 0..sprite.width() {
-            let dx = dest_x + sx as i64;
-            let dy = dest_y + sy as i64;
-            if dx >= 0 && dy >= 0 && (dx as u32) < canvas.width() && (dy as u32) < canvas.height() {
-                let pixel = sprite.get_pixel(sx, sy);
-                if pixel[3] > 0 {
-                    canvas.put_pixel(dx as u32, dy as u32, *pixel);
-                }
+    let cw = canvas.width() as usize;
+    let ch = canvas.height() as i64;
+    let sw = sprite.width() as usize;
+    let sh = sprite.height() as usize;
+    let canvas_w = canvas.width() as i64;
+    let canvas_buf = canvas.as_mut();
+    let sprite_buf = sprite.as_raw();
+
+    let y_start = 0i64.max(-dest_y) as usize;
+    let y_end = sh.min((ch - dest_y).max(0) as usize);
+    let x_start = 0i64.max(-dest_x) as usize;
+    let x_end = sw.min((canvas_w - dest_x).max(0) as usize);
+
+    for sy in y_start..y_end {
+        let dy = (dest_y + sy as i64) as usize;
+        let src_row = sy * sw * 4;
+        let dst_row = dy * cw * 4;
+        for sx in x_start..x_end {
+            let dx = (dest_x + sx as i64) as usize;
+            let src_off = src_row + sx * 4;
+            let dst_off = dst_row + dx * 4;
+            if sprite_buf[src_off + 3] > 0 {
+                canvas_buf[dst_off..dst_off + 4].copy_from_slice(&sprite_buf[src_off..src_off + 4]);
             }
         }
     }

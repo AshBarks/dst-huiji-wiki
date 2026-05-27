@@ -4,11 +4,23 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, mpsc};
 use std::time::{Duration, Instant};
 
+use rayon::prelude::*;
+
 use crate::archive::{BinType, ParsedArchive, parse_dyn, parse_zip};
 use crate::atlas::{gather_atlas_images, split_atlas};
-use crate::gif_export::export_gif;
+use crate::gif_export::{export_gif, export_png_sequence, ffmpeg_gif_from_sequence};
 use crate::ktex::parse_ktex;
 use crate::render::{BoundingBox, compute_animation_bounds, render_frame};
+
+enum GifExportResult {
+    Done(Vec<u8>),
+    Failed(String),
+}
+
+enum PngExportResult {
+    Done,
+    Failed(String),
+}
 
 struct AnimEntry {
     anim: crate::anim::AnimFile,
@@ -31,6 +43,15 @@ struct AtlasEntry {
 struct FrameCacheEntry {
     image: image::RgbaImage,
     texture: Option<egui::TextureHandle>,
+}
+
+struct BackgroundGifExport {
+    receiver: mpsc::Receiver<GifExportResult>,
+    path: PathBuf,
+}
+
+struct BackgroundPngExport {
+    receiver: mpsc::Receiver<PngExportResult>,
 }
 
 struct BackgroundRenderer {
@@ -75,6 +96,8 @@ pub struct App {
     cache_dirty: bool,
     bg_renderer: Option<BackgroundRenderer>,
     animation_bounds: Option<BoundingBox>,
+    gif_export: Option<BackgroundGifExport>,
+    png_export: Option<BackgroundPngExport>,
 }
 
 impl App {
@@ -103,6 +126,8 @@ impl App {
             cache_dirty: false,
             bg_renderer: None,
             animation_bounds: None,
+            gif_export: None,
+            png_export: None,
         }
     }
 
@@ -693,7 +718,7 @@ impl App {
         }
     }
 
-    fn export_gif(&mut self) {
+    fn start_gif_export(&mut self) {
         let Some(anim) = self.get_current_animation() else {
             return;
         };
@@ -712,37 +737,178 @@ impl App {
             return;
         }
 
-        let frame_rate = anim.frame_rate;
-        let total_frames = anim.frames.len();
+        let anim_data = anim.clone();
+        let build_data: Vec<crate::build_file::BuildFile> =
+            build_list.iter().map(|b| (*b).clone()).collect();
         let bounds = self.animation_bounds.clone();
-        let frames: Vec<image::RgbaImage> = (0..total_frames)
-            .map(|fi| {
-                if let Some(entry) = self.frame_cache.get(&fi) {
-                    return entry.image.clone();
-                }
-                anim.frames
-                    .get(fi)
-                    .and_then(|f| render_frame(f, &build_list, 1.0, (0.0, 0.0), bounds.as_ref()))
-                    .map(|r| r.image)
-                    .unwrap_or_else(|| image::RgbaImage::new(1, 1))
-            })
+
+        let cached_frames: HashMap<usize, image::RgbaImage> = self
+            .frame_cache
+            .iter()
+            .map(|(&fi, entry)| (fi, entry.image.clone()))
             .collect();
 
-        let has_real_frames = frames.iter().any(|f| f.width() > 1 || f.height() > 1);
-        if !has_real_frames {
-            self.error_message = Some("No frames to export".to_string());
-            return;
-        }
+        let (sender, receiver) = mpsc::channel::<GifExportResult>();
 
-        let mut buf = Vec::new();
-        match export_gif(&frames, frame_rate, &mut buf) {
-            Ok(()) => {
+        std::thread::spawn(move || {
+            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
+            let total_frames = anim_data.frames.len();
+            let frame_rate = anim_data.frame_rate;
+
+            let frames: Vec<image::RgbaImage> = (0..total_frames)
+                .into_par_iter()
+                .map(|fi| {
+                    if let Some(cached) = cached_frames.get(&fi) {
+                        return cached.clone();
+                    }
+                    anim_data
+                        .frames
+                        .get(fi)
+                        .and_then(|f| render_frame(f, &bl, 1.0, (0.0, 0.0), bounds.as_ref()))
+                        .map(|r| r.image)
+                        .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                })
+                .collect();
+
+            let has_real_frames = frames.iter().any(|f| f.width() > 1 || f.height() > 1);
+            if !has_real_frames {
+                let _ = sender.send(GifExportResult::Failed("No frames to export".to_string()));
+                return;
+            }
+
+            let mut buf = Vec::new();
+            match export_gif(&frames, frame_rate, &mut buf) {
+                Ok(()) => {
+                    let _ = sender.send(GifExportResult::Done(buf));
+                }
+                Err(e) => {
+                    let _ = sender.send(GifExportResult::Failed(format!(
+                        "Failed to encode GIF: {e}"
+                    )));
+                }
+            }
+        });
+
+        self.gif_export = Some(BackgroundGifExport { receiver, path });
+    }
+
+    fn poll_gif_export(&mut self) {
+        let Some(bg) = self.gif_export.as_ref() else {
+            return;
+        };
+        match bg.receiver.try_recv() {
+            Ok(GifExportResult::Done(buf)) => {
+                let path = self.gif_export.take().unwrap().path;
                 if let Err(e) = std::fs::write(&path, &buf) {
                     self.error_message = Some(format!("Failed to save GIF: {e}"));
                 }
             }
-            Err(e) => {
-                self.error_message = Some(format!("Failed to encode GIF: {e}"));
+            Ok(GifExportResult::Failed(msg)) => {
+                self.gif_export = None;
+                self.error_message = Some(msg);
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.gif_export = None;
+            }
+        }
+    }
+
+    fn start_png_export(&mut self) {
+        let Some(anim) = self.get_current_animation() else {
+            return;
+        };
+        let Some(dir) = rfd::FileDialog::new()
+            .set_title("Select output directory for PNG sequence")
+            .pick_folder()
+        else {
+            return;
+        };
+
+        let build_list = self.collect_build_list();
+        if build_list.is_empty() {
+            self.error_message = Some("No builds loaded".to_string());
+            return;
+        }
+
+        let anim_data = anim.clone();
+        let build_data: Vec<crate::build_file::BuildFile> =
+            build_list.iter().map(|b| (*b).clone()).collect();
+        let bounds = self.animation_bounds.clone();
+        let cached_frames: HashMap<usize, image::RgbaImage> = self
+            .frame_cache
+            .iter()
+            .map(|(&fi, entry)| (fi, entry.image.clone()))
+            .collect();
+        let frame_rate = anim_data.frame_rate;
+
+        let (sender, receiver) = mpsc::channel::<PngExportResult>();
+        let dir_clone = dir.clone();
+
+        std::thread::spawn(move || {
+            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
+            let total_frames = anim_data.frames.len();
+
+            let frames: Vec<image::RgbaImage> = (0..total_frames)
+                .into_par_iter()
+                .map(|fi| {
+                    if let Some(cached) = cached_frames.get(&fi) {
+                        return cached.clone();
+                    }
+                    anim_data
+                        .frames
+                        .get(fi)
+                        .and_then(|f| render_frame(f, &bl, 1.0, (0.0, 0.0), bounds.as_ref()))
+                        .map(|r| r.image)
+                        .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                })
+                .collect();
+
+            let has_real_frames = frames.iter().any(|f| f.width() > 1 || f.height() > 1);
+            if !has_real_frames {
+                let _ = sender.send(PngExportResult::Failed("No frames to export".to_string()));
+                return;
+            }
+
+            if let Err(e) = export_png_sequence(&frames, &dir_clone) {
+                let _ = sender.send(PngExportResult::Failed(format!(
+                    "Failed to export PNG sequence: {e}"
+                )));
+                return;
+            }
+
+            let gif_path = dir_clone.join("animation.gif");
+            match ffmpeg_gif_from_sequence(&dir_clone, &gif_path, frame_rate, frames.len()) {
+                Ok(()) => {
+                    let _ = sender.send(PngExportResult::Done);
+                }
+                Err(_) => {
+                    let _ = sender.send(PngExportResult::Failed(
+                        "PNG sequence exported. ffmpeg not found or failed — GIF not generated."
+                            .to_string(),
+                    ));
+                }
+            }
+        });
+
+        self.png_export = Some(BackgroundPngExport { receiver });
+    }
+
+    fn poll_png_export(&mut self) {
+        let Some(bg) = self.png_export.as_ref() else {
+            return;
+        };
+        match bg.receiver.try_recv() {
+            Ok(PngExportResult::Done) => {
+                self.png_export = None;
+            }
+            Ok(PngExportResult::Failed(msg)) => {
+                self.png_export = None;
+                self.error_message = Some(msg);
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.png_export = None;
             }
         }
     }
@@ -776,8 +942,40 @@ impl App {
 
                     let has_animation = self.get_current_animation().is_some();
                     ui.add_enabled_ui(has_animation, |ui| {
-                        if ui.button("Export GIF").clicked() {
-                            self.export_gif();
+                        let exporting = self.gif_export.is_some() || self.png_export.is_some();
+                        let label = if exporting {
+                            "Exporting..."
+                        } else {
+                            "Export GIF"
+                        };
+                        if ui
+                            .add_enabled(!exporting, egui::Button::new(label))
+                            .on_hover_text(if exporting {
+                                "Export in progress..."
+                            } else {
+                                "Export animation as GIF (builtin quantizer)"
+                            })
+                            .clicked()
+                        {
+                            self.start_gif_export();
+                        }
+
+                        let png_exporting = self.gif_export.is_some() || self.png_export.is_some();
+                        let png_label = if png_exporting {
+                            "Exporting..."
+                        } else {
+                            "Export PNG+GIF"
+                        };
+                        if ui
+                            .add_enabled(!png_exporting, egui::Button::new(png_label))
+                            .on_hover_text(if png_exporting {
+                                "Export in progress..."
+                            } else {
+                                "Export PNG sequence, then convert to GIF via ffmpeg (better quality)"
+                            })
+                            .clicked()
+                        {
+                            self.start_png_export();
                         }
                     });
                 });
@@ -1427,6 +1625,8 @@ impl eframe::App for App {
         }
 
         self.poll_background_results(ctx);
+        self.poll_gif_export();
+        self.poll_png_export();
 
         if self.playing {
             if let Some(anim) = self.get_current_animation() {

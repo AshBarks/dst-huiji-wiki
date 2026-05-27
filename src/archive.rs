@@ -13,14 +13,30 @@ pub enum ParsedEntry {
     Build(BuildFile),
 }
 
+#[derive(Clone)]
+pub struct TexSource {
+    pub source_name: String,
+    pub tex_files: HashMap<String, Vec<u8>>,
+}
+
 pub struct ParsedArchive {
     pub anim: Option<AnimFile>,
     pub build: Option<BuildFile>,
-    pub tex_files: HashMap<String, Vec<u8>>,
+    pub tex_sources: Vec<TexSource>,
     pub raw_files: HashMap<String, Vec<u8>>,
 }
 
 impl ParsedArchive {
+    pub fn tex_files(&self) -> HashMap<String, Vec<u8>> {
+        let mut merged = HashMap::new();
+        for source in &self.tex_sources {
+            for (k, v) in &source.tex_files {
+                merged.insert(k.clone(), v.clone());
+            }
+        }
+        merged
+    }
+
     pub fn merge(&mut self, other: ParsedArchive) {
         if other.anim.is_some() {
             self.anim = other.anim;
@@ -28,12 +44,22 @@ impl ParsedArchive {
         if other.build.is_some() {
             self.build = other.build;
         }
-        for (k, v) in other.tex_files {
-            self.tex_files.insert(k, v);
+        for source in other.tex_sources {
+            self.tex_sources.push(source);
         }
         for (k, v) in other.raw_files {
             self.raw_files.insert(k, v);
         }
+    }
+
+    pub fn find_tex_source(&self, name: &str) -> Option<&TexSource> {
+        let lower = name.to_lowercase();
+        self.tex_sources.iter().find(|s| {
+            s.source_name.to_lowercase() == lower
+                || s.source_name
+                    .to_lowercase()
+                    .starts_with(&format!("{lower}."))
+        })
     }
 }
 
@@ -52,7 +78,7 @@ pub fn parse_anim_bin(data: &[u8]) -> Result<ParsedArchive> {
     Ok(ParsedArchive {
         anim: Some(anim),
         build: None,
-        tex_files: HashMap::new(),
+        tex_sources: Vec::new(),
         raw_files: HashMap::new(),
     })
 }
@@ -62,7 +88,7 @@ pub fn parse_build_bin(data: &[u8]) -> Result<ParsedArchive> {
     Ok(ParsedArchive {
         anim: None,
         build: Some(build),
-        tex_files: HashMap::new(),
+        tex_sources: Vec::new(),
         raw_files: HashMap::new(),
     })
 }
@@ -118,10 +144,28 @@ pub fn load_archives(paths: &[std::path::PathBuf]) -> Result<ParsedArchive> {
 
     let first_data = std::fs::read(&paths[0])?;
     let mut merged = parse_file_by_path(&paths[0], &first_data)?;
+    let first_name = paths[0]
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("unknown");
+    for source in &mut merged.tex_sources {
+        if source.source_name.is_empty() {
+            source.source_name = first_name.to_string();
+        }
+    }
 
     for path in &paths[1..] {
         let data = std::fs::read(path)?;
-        let archive = parse_file_by_path(path, &data)?;
+        let mut archive = parse_file_by_path(path, &data)?;
+        let source_name = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown");
+        for source in &mut archive.tex_sources {
+            if source.source_name.is_empty() {
+                source.source_name = source_name.to_string();
+            }
+        }
         merged.merge(archive);
     }
 
@@ -153,10 +197,19 @@ fn parse_zip_archive(
         }
     }
 
+    let tex_sources = if !tex_files.is_empty() {
+        vec![TexSource {
+            source_name: String::new(),
+            tex_files,
+        }]
+    } else {
+        Vec::new()
+    };
+
     Ok(ParsedArchive {
         anim,
         build,
-        tex_files,
+        tex_sources,
         raw_files,
     })
 }
@@ -181,7 +234,8 @@ mod tests {
     fn parse_abigail_ice_dyn() {
         let data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
         let result = parse_dyn(&data).unwrap();
-        assert!(!result.tex_files.is_empty());
+        assert!(!result.tex_sources.is_empty());
+        assert!(!result.tex_sources[0].tex_files.is_empty());
     }
 
     #[test]
@@ -218,22 +272,30 @@ mod tests {
         let dyn_data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
 
         let mut archive = parse_zip(&zip_data).unwrap();
-        assert!(archive.tex_files.len() > 0);
+        assert!(archive.tex_sources.len() > 0);
         let dyn_archive = parse_dyn(&dyn_data).unwrap();
-        assert!(dyn_archive.tex_files.len() > 0);
+        assert!(dyn_archive.tex_sources.len() > 0);
 
-        let zip_tex_names: std::collections::HashSet<&String> = archive.tex_files.keys().collect();
-        let dyn_tex_names: std::collections::HashSet<&String> =
-            dyn_archive.tex_files.keys().collect();
+        let zip_tex_count = archive.tex_sources[0].tex_files.len();
+        let dyn_tex_count = dyn_archive.tex_sources[0].tex_files.len();
+        let zip_tex_names: std::collections::HashSet<String> =
+            archive.tex_sources[0].tex_files.keys().cloned().collect();
+        let dyn_tex_names: std::collections::HashSet<String> = dyn_archive.tex_sources[0]
+            .tex_files
+            .keys()
+            .cloned()
+            .collect();
         let has_new = dyn_tex_names.difference(&zip_tex_names).count() > 0;
 
-        let orig_tex_count = archive.tex_files.len();
+        let orig_source_count = archive.tex_sources.len();
         archive.merge(dyn_archive);
 
+        assert!(archive.tex_sources.len() > orig_source_count);
+        assert!(archive.tex_sources[0].tex_files.len() == zip_tex_count);
+        assert!(archive.tex_sources[1].tex_files.len() == dyn_tex_count);
         if has_new {
-            assert!(archive.tex_files.len() > orig_tex_count);
-        } else {
-            assert!(archive.tex_files.len() >= orig_tex_count);
+            let merged_tex = archive.tex_files();
+            assert!(merged_tex.len() >= zip_tex_count);
         }
     }
 

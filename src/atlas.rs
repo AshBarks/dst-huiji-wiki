@@ -113,7 +113,8 @@ pub fn decode_atlas_images(archive: &ParsedArchive) -> Vec<Arc<image::RgbaImage>
     let Some(build) = archive.build.as_ref() else {
         return Vec::new();
     };
-    decode_atlas_images_inner(&build.atlases, &archive.tex_files)
+    let tex_files = archive.tex_files();
+    decode_atlas_images_inner(&build.atlases, &tex_files)
 }
 
 pub fn decode_atlas_images_from_tex(
@@ -165,20 +166,11 @@ mod tests {
     #[test]
     fn split_atlas_abigail_flower() {
         use crate::archive::parse_zip;
-        use crate::ktex::parse_ktex;
 
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = parse_zip(&data).unwrap();
 
-        let mut atlas_images: Vec<Arc<image::RgbaImage>> = Vec::new();
-        for atlas in &archive.build.as_ref().unwrap().atlases {
-            let tex_data = archive.tex_files.get(&atlas.name);
-            if let Some(tex_data) = tex_data {
-                let ktex = parse_ktex(tex_data).unwrap();
-                let img = ktex.to_image_rgba().unwrap();
-                atlas_images.push(Arc::new(img));
-            }
-        }
+        let atlas_images = decode_atlas_images(&archive);
 
         split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
 

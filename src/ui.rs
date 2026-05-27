@@ -1,12 +1,11 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, mpsc};
 use std::time::{Duration, Instant};
 
 use crate::archive::{BinType, ParsedArchive, parse_dyn, parse_zip};
 use crate::atlas::{gather_atlas_images, split_atlas};
-use crate::build_file::BuildFile;
 use crate::gif_export::export_gif;
 use crate::ktex::parse_ktex;
 use crate::render::{BoundingBox, compute_animation_bounds, render_frame};
@@ -18,29 +17,15 @@ struct AnimEntry {
 }
 
 pub struct BuildEntry {
-    pub build: BuildFile,
+    pub build: Option<crate::build_file::BuildFile>,
     pub enabled: bool,
     pub source_name: String,
     pub assigned_atlas: Option<usize>,
 }
 
 struct AtlasEntry {
-    enabled: bool,
     source_name: String,
-    decoded: HashMap<String, Arc<image::RgbaImage>>,
-}
-
-struct PendingBuild {
-    build: BuildFile,
-    source_name: String,
-}
-
-struct AtlasDisplayInfo {
-    atlas_idx: usize,
-    header: String,
-    decoded_images: Vec<(String, u32, u32)>,
-    build_options: Vec<(usize, String)>,
-    default_open: bool,
+    decoded: std::collections::HashMap<String, Arc<image::RgbaImage>>,
 }
 
 struct FrameCacheEntry {
@@ -76,7 +61,7 @@ pub struct App {
     builds: Vec<BuildEntry>,
     selected_build_idx: Option<usize>,
     atlas_entries: Vec<AtlasEntry>,
-    pending_builds: Vec<PendingBuild>,
+    loaded_paths: HashSet<PathBuf>,
     playing: bool,
     play_speed: f32,
     last_frame_time: Instant,
@@ -104,7 +89,7 @@ impl App {
             builds: Vec::new(),
             selected_build_idx: None,
             atlas_entries: Vec::new(),
-            pending_builds: Vec::new(),
+            loaded_paths: HashSet::new(),
             playing: false,
             play_speed: 1.0,
             last_frame_time: Instant::now(),
@@ -122,8 +107,8 @@ impl App {
     }
 
     fn decode_tex_files(
-        tex_files: &HashMap<String, Vec<u8>>,
-    ) -> HashMap<String, Arc<image::RgbaImage>> {
+        tex_files: &std::collections::HashMap<String, Vec<u8>>,
+    ) -> std::collections::HashMap<String, Arc<image::RgbaImage>> {
         let mut decoded = HashMap::new();
         for (name, data) in tex_files {
             if let Ok(ktex) = parse_ktex(data)
@@ -142,80 +127,35 @@ impl App {
         let Some(atlas_entry) = self.atlas_entries.get(atlas_idx) else {
             return;
         };
-        let atlas_images = gather_atlas_images(&self.builds[build_idx].build, &atlas_entry.decoded);
-        let _ = split_atlas(&mut self.builds[build_idx].build, &atlas_images);
+        let Some(build) = &mut self.builds[build_idx].build else {
+            return;
+        };
+        let atlas_images = gather_atlas_images(build, &atlas_entry.decoded);
+        let _ = split_atlas(build, &atlas_images);
         self.cache_dirty = true;
         self.needs_re_render = true;
     }
 
-    fn try_auto_match_atlas(&mut self, build: &mut BuildFile, build_source: &str) -> Option<usize> {
-        let lower_name = build.name.to_lowercase();
-        let lower_source = build_source.to_lowercase();
-
-        for (i, atlas_entry) in self.atlas_entries.iter().enumerate() {
-            let atlas_lower = atlas_entry.source_name.to_lowercase();
-            if atlas_lower == lower_name || atlas_lower == lower_source {
-                let atlas_images = gather_atlas_images(build, &atlas_entry.decoded);
-                let _ = split_atlas(build, &atlas_images);
-                return Some(i);
-            }
-        }
-        None
+    fn canonicalize_path(path: &Path) -> PathBuf {
+        path.canonicalize().unwrap_or_else(|_| path.to_path_buf())
     }
 
-    fn try_auto_match_build(&mut self, atlas_idx: usize) {
-        let atlas_entry = &self.atlas_entries[atlas_idx];
-        let lower = atlas_entry.source_name.to_lowercase();
-
-        for entry in self.builds.iter_mut() {
-            if entry.assigned_atlas.is_some() {
-                continue;
-            }
-            let build_lower = entry.build.name.to_lowercase();
-            let source_lower = entry.source_name.to_lowercase();
-            if build_lower == lower || source_lower == lower {
-                let atlas_images = gather_atlas_images(&entry.build, &atlas_entry.decoded);
-                let _ = split_atlas(&mut entry.build, &atlas_images);
-                entry.assigned_atlas = Some(atlas_idx);
-                self.cache_dirty = true;
-                self.needs_re_render = true;
-                return;
-            }
-        }
-
-        for (i, pb) in self.pending_builds.iter().enumerate() {
-            let pb_lower = pb.build.name.to_lowercase();
-            let pb_src_lower = pb.source_name.to_lowercase();
-            if pb_lower == lower || pb_src_lower == lower {
-                let mut build = std::mem::replace(
-                    &mut self.pending_builds[i].build,
-                    BuildFile {
-                        version: 0,
-                        name: String::new(),
-                        symbols: Vec::new(),
-                        atlases: Vec::new(),
-                        symbol_index: HashMap::new(),
-                    },
-                );
-                let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
-                let _ = split_atlas(&mut build, &atlas_images);
-                self.pending_builds.remove(i);
-                self.builds.push(BuildEntry {
-                    build,
-                    enabled: true,
-                    source_name: atlas_entry.source_name.clone(),
-                    assigned_atlas: Some(atlas_idx),
-                });
-                self.selected_build_idx = Some(self.builds.len() - 1);
-                self.cache_dirty = true;
-                self.needs_re_render = true;
-                return;
-            }
-        }
+    fn is_real_path(path: &Path) -> bool {
+        path.canonicalize().is_ok()
     }
 
-    fn load_file(&mut self, name: &str, data: &[u8]) {
-        let ext = name.rsplit('.').next().unwrap_or("").to_lowercase();
+    fn load_file(&mut self, path: &Path, data: &[u8]) {
+        let canonical = Self::canonicalize_path(path);
+        if self.loaded_paths.contains(&canonical) {
+            return;
+        }
+
+        let ext = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_lowercase();
+
         let result = match ext.as_str() {
             "dyn" => parse_dyn(data),
             "zip" => parse_zip(data),
@@ -225,7 +165,8 @@ impl App {
                     BinType::Anim => crate::archive::parse_anim_bin(data),
                     BinType::Build => crate::archive::parse_build_bin(data),
                     BinType::Unknown => {
-                        self.error_message = Some(format!("Unknown .bin magic in {name}"));
+                        self.error_message =
+                            Some(format!("Unknown .bin magic in {}", path.display()));
                         return;
                     }
                 }
@@ -236,29 +177,107 @@ impl App {
             }
         };
 
-        let archive = match result {
+        let mut archive = match result {
             Ok(a) => a,
             Err(e) => {
-                self.error_message = Some(format!("Failed to load {name}: {e}"));
+                self.error_message = Some(format!("Failed to load {}: {e}", path.display()));
                 return;
             }
         };
 
-        self.integrate_archive(name, archive);
+        let has_anim = archive.anim.is_some();
+        let has_build = archive.build.is_some();
+        let has_tex = archive.tex_sources.iter().any(|s| !s.tex_files.is_empty());
+        let real_path = Self::is_real_path(path);
+
+        match ext.as_str() {
+            "zip" => {
+                if !has_tex && !has_build && !has_anim {
+                    return;
+                }
+                if !has_tex && !has_build && has_anim {
+                    self.loaded_paths.insert(canonical);
+                    let name = path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or("unknown");
+                    self.integrate_archive(name, archive);
+                    return;
+                }
+                if !has_tex && has_build {
+                    if real_path {
+                        let companion = path.with_extension("dyn");
+                        let companion_canonical = Self::canonicalize_path(&companion);
+                        if companion.exists()
+                            && !self.loaded_paths.contains(&companion_canonical)
+                            && let Ok(companion_data) = std::fs::read(&companion)
+                            && let Ok(companion_archive) = parse_dyn(&companion_data)
+                        {
+                            archive.merge(companion_archive);
+                            self.loaded_paths.insert(companion_canonical);
+                        }
+                    }
+                    self.loaded_paths.insert(canonical);
+                    let name = path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or("unknown");
+                    self.integrate_archive(name, archive);
+                    return;
+                }
+                if has_tex && !has_build && !has_anim {
+                    self.error_message = Some(
+                        "ZIP contains only textures without build data — cannot be used alone"
+                            .to_string(),
+                    );
+                    return;
+                }
+                self.loaded_paths.insert(canonical);
+                let name = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown");
+                self.integrate_archive(name, archive);
+            }
+            "dyn" => {
+                if real_path {
+                    let companion = path.with_extension("zip");
+                    let companion_canonical = Self::canonicalize_path(&companion);
+                    if companion.exists()
+                        && !self.loaded_paths.contains(&companion_canonical)
+                        && let Ok(companion_data) = std::fs::read(&companion)
+                        && let Ok(companion_archive) = parse_zip(&companion_data)
+                    {
+                        archive.merge(companion_archive);
+                        self.loaded_paths.insert(companion_canonical);
+                    }
+                }
+                self.loaded_paths.insert(canonical);
+                let name = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown");
+                if archive.build.is_some() {
+                    self.integrate_archive(name, archive);
+                } else {
+                    self.integrate_as_pending_atlas(name, archive);
+                }
+            }
+            _ => {
+                self.loaded_paths.insert(canonical);
+                let name = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown");
+                self.integrate_archive(name, archive);
+            }
+        }
     }
 
-    fn integrate_archive(&mut self, name: &str, archive: ParsedArchive) {
-        let ParsedArchive {
-            anim,
-            build,
-            tex_files,
-            raw_files: _,
-        } = archive;
+    fn integrate_archive(&mut self, name: &str, mut archive: ParsedArchive) {
+        let has_tex = archive.tex_sources.iter().any(|s| !s.tex_files.is_empty());
 
-        let has_build = build.is_some();
-        let has_tex = !tex_files.is_empty();
-
-        if let Some(anim_file) = anim {
+        if let Some(anim_file) = archive.anim.take() {
             self.anims.push(AnimEntry {
                 anim: anim_file,
                 enabled: true,
@@ -271,51 +290,158 @@ impl App {
         }
 
         if has_tex {
-            let decoded = Self::decode_tex_files(&tex_files);
+            let all_tex_files = archive.tex_files();
+            let decoded = Self::decode_tex_files(&all_tex_files);
             let atlas_idx = self.atlas_entries.len();
             self.atlas_entries.push(AtlasEntry {
-                enabled: true,
                 source_name: name.to_string(),
                 decoded,
             });
 
-            if has_build {
-                if let Some(mut build) = build {
-                    let atlas_entry = &self.atlas_entries[atlas_idx];
-                    let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
-                    let _ = split_atlas(&mut build, &atlas_images);
-                    self.builds.push(BuildEntry {
-                        build,
-                        enabled: true,
-                        source_name: name.to_string(),
-                        assigned_atlas: Some(atlas_idx),
-                    });
-                    self.selected_build_idx = Some(self.builds.len() - 1);
-                    self.cache_dirty = true;
-                    self.needs_re_render = true;
-                }
-            } else {
-                self.try_auto_match_build(atlas_idx);
-            }
-        } else if has_build && let Some(mut build) = build {
-            let assigned = self.try_auto_match_atlas(&mut build, name);
-            if assigned.is_some() {
+            if let Some(mut build) = archive.build.take() {
+                let atlas_entry = &self.atlas_entries[atlas_idx];
+                let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
+                let _ = split_atlas(&mut build, &atlas_images);
                 self.builds.push(BuildEntry {
-                    build,
+                    build: Some(build),
                     enabled: true,
                     source_name: name.to_string(),
-                    assigned_atlas: assigned,
+                    assigned_atlas: Some(atlas_idx),
                 });
                 self.selected_build_idx = Some(self.builds.len() - 1);
                 self.cache_dirty = true;
                 self.needs_re_render = true;
-            } else {
-                self.pending_builds.push(PendingBuild {
-                    build,
-                    source_name: name.to_string(),
-                });
             }
+        } else if let Some(build) = archive.build.take() {
+            self.builds.push(BuildEntry {
+                build: Some(build),
+                enabled: true,
+                source_name: name.to_string(),
+                assigned_atlas: None,
+            });
+            self.selected_build_idx = Some(self.builds.len() - 1);
         }
+    }
+
+    fn integrate_as_pending_atlas(&mut self, name: &str, archive: ParsedArchive) {
+        let all_tex_files = archive.tex_files();
+        let decoded = Self::decode_tex_files(&all_tex_files);
+        let atlas_idx = self.atlas_entries.len();
+        self.atlas_entries.push(AtlasEntry {
+            source_name: name.to_string(),
+            decoded,
+        });
+
+        self.builds.push(BuildEntry {
+            build: None,
+            enabled: true,
+            source_name: name.to_string(),
+            assigned_atlas: Some(atlas_idx),
+        });
+    }
+
+    fn associate_dyn_to_build(&mut self, build_idx: usize, path: &Path) {
+        let canonical = Self::canonicalize_path(path);
+        if self.loaded_paths.contains(&canonical) {
+            self.error_message = Some("File already loaded".to_string());
+            return;
+        }
+
+        let data = match std::fs::read(path) {
+            Ok(d) => d,
+            Err(e) => {
+                self.error_message = Some(format!("Failed to read {}: {e}", path.display()));
+                return;
+            }
+        };
+
+        let archive = match parse_dyn(&data) {
+            Ok(a) => a,
+            Err(e) => {
+                self.error_message = Some(format!("Failed to parse {}: {e}", path.display()));
+                return;
+            }
+        };
+
+        if archive.tex_sources.iter().all(|s| s.tex_files.is_empty()) {
+            self.error_message = Some("No textures in .dyn file".to_string());
+            return;
+        }
+
+        let all_tex_files = archive.tex_files();
+        let decoded = Self::decode_tex_files(&all_tex_files);
+        let atlas_idx = self.atlas_entries.len();
+        self.atlas_entries.push(AtlasEntry {
+            source_name: path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown")
+                .to_string(),
+            decoded,
+        });
+
+        self.loaded_paths.insert(canonical);
+        self.builds[build_idx].assigned_atlas = Some(atlas_idx);
+        self.split_atlas_for_build(build_idx);
+    }
+
+    fn associate_zip_to_pending_atlas(&mut self, build_idx: usize, path: &Path) {
+        let canonical = Self::canonicalize_path(path);
+        if self.loaded_paths.contains(&canonical) {
+            self.error_message = Some("File already loaded".to_string());
+            return;
+        }
+
+        let data = match std::fs::read(path) {
+            Ok(d) => d,
+            Err(e) => {
+                self.error_message = Some(format!("Failed to read {}: {e}", path.display()));
+                return;
+            }
+        };
+
+        let archive = match parse_zip(&data) {
+            Ok(a) => a,
+            Err(e) => {
+                self.error_message = Some(format!("Failed to parse {}: {e}", path.display()));
+                return;
+            }
+        };
+
+        if archive.build.is_none() {
+            self.error_message = Some("No build.bin in .zip file".to_string());
+            return;
+        }
+
+        if let Some(anim_file) = archive.anim {
+            self.anims.push(AnimEntry {
+                anim: anim_file,
+                enabled: true,
+                source_name: path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown")
+                    .to_string(),
+            });
+            self.active_anim_idx = self.anims.len() - 1;
+            self.active_bank_idx = 0;
+            self.active_anim_inner_idx = 0;
+            self.active_frame_idx = 0;
+        }
+
+        let mut build = archive.build.unwrap();
+        let Some(atlas_idx) = self.builds[build_idx].assigned_atlas else {
+            return;
+        };
+        let Some(atlas_entry) = self.atlas_entries.get(atlas_idx) else {
+            return;
+        };
+        let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
+        let _ = split_atlas(&mut build, &atlas_images);
+        self.builds[build_idx].build = Some(build);
+        self.loaded_paths.insert(canonical);
+        self.cache_dirty = true;
+        self.needs_re_render = true;
     }
 
     fn get_current_animation(&self) -> Option<&crate::anim::AnimAnimation> {
@@ -345,12 +471,12 @@ impl App {
         )
     }
 
-    fn collect_build_list(&self) -> Vec<&BuildFile> {
+    fn collect_build_list(&self) -> Vec<&crate::build_file::BuildFile> {
         self.builds
             .iter()
             .rev()
-            .filter(|e| e.enabled && e.assigned_atlas.is_some())
-            .map(|e| &e.build)
+            .filter(|e| e.enabled && e.build.is_some() && e.assigned_atlas.is_some())
+            .filter_map(|e| e.build.as_ref())
             .collect()
     }
 
@@ -379,7 +505,8 @@ impl App {
         }
 
         let anim_data = anim.clone();
-        let build_data: Vec<BuildFile> = build_list.iter().map(|b| (*b).clone()).collect();
+        let build_data: Vec<crate::build_file::BuildFile> =
+            build_list.iter().map(|b| (*b).clone()).collect();
         let cache_gen_val = self.cache_gen;
         let total_frames = anim_data.frames.len();
         let stop_flag = Arc::new(AtomicBool::new(false));
@@ -388,7 +515,7 @@ impl App {
         let (sender, receiver) = mpsc::channel::<(u64, usize, image::RgbaImage)>();
 
         let handle = std::thread::spawn(move || {
-            let bl: Vec<&BuildFile> = build_data.iter().collect();
+            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
             for fi in 0..total_frames {
                 if stop_flag_clone.load(Ordering::Relaxed) {
                     return;
@@ -630,11 +757,7 @@ impl App {
                 {
                     for path in paths {
                         if let Ok(data) = std::fs::read(&path) {
-                            let name = path
-                                .file_name()
-                                .and_then(|n| n.to_str())
-                                .unwrap_or("unknown");
-                            self.load_file(name, &data);
+                            self.load_file(&path, &data);
                         }
                     }
                 }
@@ -671,8 +794,6 @@ impl App {
                     self.show_anim_section(ui);
                     ui.separator();
                     self.show_build_section(ui);
-                    ui.separator();
-                    self.show_atlas_section(ui);
                 });
             });
     }
@@ -785,28 +906,18 @@ impl App {
             return;
         }
 
-        let build_summaries: Vec<(bool, String, String, usize, usize, Option<usize>)> = self
+        let build_summaries: Vec<(bool, String, Option<usize>, bool)> = self
             .builds
             .iter()
             .enumerate()
             .map(|(idx, entry)| {
                 let is_selected = self.selected_build_idx == Some(idx);
-                let frame_count: usize = entry.build.symbols.iter().map(|s| s.frames.len()).sum();
-                let atlas_info = match entry.assigned_atlas {
-                    Some(ai) => self
-                        .atlas_entries
-                        .get(ai)
-                        .map(|a| a.source_name.clone())
-                        .unwrap_or_else(|| "?".to_string()),
-                    None => String::new(),
-                };
+                let has_build = entry.build.is_some();
                 (
                     is_selected,
                     entry.source_name.clone(),
-                    atlas_info,
-                    entry.build.symbols.len(),
-                    frame_count,
                     entry.assigned_atlas,
+                    has_build,
                 )
             })
             .collect();
@@ -816,82 +927,141 @@ impl App {
         let mut swap_actions: Vec<(usize, usize)> = Vec::new();
         let mut remove_indices: Vec<usize> = Vec::new();
         let mut select_idx: Option<usize> = None;
+        let mut browse_dyn: Option<usize> = None;
+        let mut browse_zip: Option<usize> = None;
         let mut need_re_render = false;
 
-        for (idx, (is_selected, source_name, atlas_info, sym_count, _frame_count, _assigned)) in
+        for (idx, (is_selected, source_name, assigned, has_build)) in
             build_summaries.iter().enumerate()
         {
-            let header = if atlas_info.is_empty() {
-                format!("{} (no atlas)", source_name)
+            let atlas_name = assigned
+                .and_then(|ai| self.atlas_entries.get(ai))
+                .map(|a| a.source_name.clone())
+                .unwrap_or_default();
+
+            let header = if *has_build && assigned.is_some() {
+                if atlas_name.is_empty() {
+                    source_name.clone()
+                } else {
+                    format!("{} [{}]", source_name, atlas_name)
+                }
+            } else if *has_build {
+                format!("{} (pending atlas)", source_name)
             } else {
-                source_name.clone()
+                format!("{} (pending build)", source_name)
             };
-            egui::CollapsingHeader::new(egui::RichText::new(header).color(if *is_selected {
+
+            let header_color = if !has_build || assigned.is_none() {
+                egui::Color32::YELLOW
+            } else if *is_selected {
                 egui::Color32::from_rgb(100, 180, 255)
             } else {
                 egui::Color32::PLACEHOLDER
-            }))
-            .id_salt(format!("build_{idx}"))
-            .default_open(false)
-            .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    let mut enabled = self.builds[idx].enabled;
-                    if ui.checkbox(&mut enabled, "Enabled").changed() {
-                        new_enabled.push((idx, enabled));
-                    }
-                    if idx > 0 && ui.small_button("Up").clicked() {
-                        swap_actions.push((idx, idx - 1));
-                    }
-                    if idx + 1 < builds_len && ui.small_button("Down").clicked() {
-                        swap_actions.push((idx, idx + 1));
-                    }
-                    if ui.small_button("X").clicked() {
-                        remove_indices.push(idx);
-                    }
-                });
+            };
 
-                if atlas_info.is_empty() {
-                    ui.label(
-                        egui::RichText::new("No atlas assigned")
-                            .small()
-                            .color(egui::Color32::YELLOW),
-                    );
-                } else {
-                    ui.label(
-                        egui::RichText::new(format!("Atlas: {}", atlas_info))
-                            .small()
-                            .italics(),
-                    );
-                }
-
-                ui.label(
-                    egui::RichText::new(format!("Build: {}", self.builds[idx].build.name))
-                        .small()
-                        .italics(),
-                );
-
-                egui::CollapsingHeader::new(
-                    egui::RichText::new(format!("Symbols ({})", sym_count)).small(),
-                )
-                .id_salt(format!("build_{idx}_symbols"))
-                .default_open(false)
+            egui::CollapsingHeader::new(egui::RichText::new(header).color(header_color))
+                .id_salt(format!("build_{idx}"))
+                .default_open(!*has_build || assigned.is_none())
                 .show(ui, |ui| {
-                    for symbol in &self.builds[idx].build.symbols {
+                    ui.horizontal(|ui| {
+                        if *has_build {
+                            let mut enabled = self.builds[idx].enabled;
+                            if ui.checkbox(&mut enabled, "Enabled").changed() {
+                                new_enabled.push((idx, enabled));
+                            }
+                        }
+                        if *has_build && idx > 0 && ui.small_button("Up").clicked() {
+                            swap_actions.push((idx, idx - 1));
+                        }
+                        if *has_build && idx + 1 < builds_len && ui.small_button("Down").clicked() {
+                            swap_actions.push((idx, idx + 1));
+                        }
+                        if ui.small_button("X").clicked() {
+                            remove_indices.push(idx);
+                        }
+                    });
+
+                    if *has_build && assigned.is_none() {
                         ui.label(
-                            egui::RichText::new(format!(
-                                "{}  ({} frames)",
-                                symbol.name,
-                                symbol.frames.len(),
-                            ))
-                            .small(),
+                            egui::RichText::new("No atlas — needs a .dyn atlas file")
+                                .small()
+                                .color(egui::Color32::YELLOW),
                         );
+                        if ui.small_button("Browse .dyn...").clicked() {
+                            browse_dyn = Some(idx);
+                        }
+                    }
+
+                    if !has_build && assigned.is_some() {
+                        ui.label(
+                            egui::RichText::new("No build — needs a .zip build file")
+                                .small()
+                                .color(egui::Color32::YELLOW),
+                        );
+                        if ui.small_button("Browse .zip...").clicked() {
+                            browse_zip = Some(idx);
+                        }
+                        if let Some(atlas_idx) = assigned
+                            && let Some(atlas_entry) = self.atlas_entries.get(*atlas_idx)
+                        {
+                            for (name, img) in &atlas_entry.decoded {
+                                ui.label(
+                                    egui::RichText::new(format!(
+                                        "{} ({}x{})",
+                                        name,
+                                        img.width(),
+                                        img.height()
+                                    ))
+                                    .small()
+                                    .color(egui::Color32::LIGHT_BLUE),
+                                );
+                            }
+                        }
+                    }
+
+                    if *has_build {
+                        if let Some(atlas_idx) = assigned
+                            && let Some(ae) = self.atlas_entries.get(*atlas_idx)
+                        {
+                            ui.label(
+                                egui::RichText::new(format!("Atlas: {}", ae.source_name))
+                                    .small()
+                                    .italics(),
+                            );
+                        }
+
+                        if let Some(build) = &self.builds[idx].build {
+                            ui.label(
+                                egui::RichText::new(format!("Build: {}", build.name))
+                                    .small()
+                                    .italics(),
+                            );
+
+                            egui::CollapsingHeader::new(
+                                egui::RichText::new(format!("Symbols ({})", build.symbols.len()))
+                                    .small(),
+                            )
+                            .id_salt(format!("build_{idx}_symbols"))
+                            .default_open(false)
+                            .show(ui, |ui| {
+                                for symbol in &build.symbols {
+                                    ui.label(
+                                        egui::RichText::new(format!(
+                                            "{}  ({} frames)",
+                                            symbol.name,
+                                            symbol.frames.len(),
+                                        ))
+                                        .small(),
+                                    );
+                                }
+                            });
+                        }
+
+                        if ui.small_button("Select").clicked() {
+                            select_idx = Some(idx);
+                        }
                     }
                 });
-
-                if ui.small_button("Select").clicked() {
-                    select_idx = Some(idx);
-                }
-            });
         }
 
         for (idx, enabled) in new_enabled {
@@ -912,6 +1082,27 @@ impl App {
         remove_indices.sort();
         remove_indices.reverse();
         for idx in remove_indices {
+            if let Some(atlas_idx) = self.builds[idx].assigned_atlas {
+                let other_refs = self
+                    .builds
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| *i != idx)
+                    .filter(|(_, b)| b.assigned_atlas == Some(atlas_idx))
+                    .count();
+                if other_refs == 0 {
+                    self.atlas_entries.remove(atlas_idx);
+                    for entry in self.builds.iter_mut() {
+                        if let Some(ai) = entry.assigned_atlas {
+                            if ai > atlas_idx {
+                                entry.assigned_atlas = Some(ai - 1);
+                            } else if ai == atlas_idx {
+                                entry.assigned_atlas = None;
+                            }
+                        }
+                    }
+                }
+            }
             self.builds.remove(idx);
             need_re_render = true;
             if let Some(sel) = self.selected_build_idx {
@@ -926,6 +1117,21 @@ impl App {
             self.selected_build_idx = Some(idx);
         }
 
+        if let Some(build_idx) = browse_dyn
+            && let Some(path) = rfd::FileDialog::new()
+                .add_filter("DST Atlas", &["dyn"])
+                .pick_file()
+        {
+            self.associate_dyn_to_build(build_idx, &path);
+        }
+        if let Some(build_idx) = browse_zip
+            && let Some(path) = rfd::FileDialog::new()
+                .add_filter("DST Build", &["zip"])
+                .pick_file()
+        {
+            self.associate_zip_to_pending_atlas(build_idx, &path);
+        }
+
         if need_re_render {
             self.cache_dirty = true;
             self.needs_re_render = true;
@@ -933,185 +1139,6 @@ impl App {
 
         if self.builds.is_empty() {
             ui.label("No builds loaded");
-        }
-    }
-
-    fn show_atlas_section(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Atlas Pool");
-
-        if self.atlas_entries.is_empty() && self.pending_builds.is_empty() {
-            ui.label("No atlas files loaded");
-            return;
-        }
-
-        let builds_len = self.builds.len();
-
-        let atlas_info: Vec<AtlasDisplayInfo> = self
-            .atlas_entries
-            .iter()
-            .enumerate()
-            .map(|(atlas_idx, atlas_entry)| {
-                let assigned_builds: Vec<(usize, String)> = self
-                    .builds
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, b)| b.assigned_atlas == Some(atlas_idx))
-                    .map(|(i, b)| (i, b.build.name.clone()))
-                    .collect();
-
-                let status = if assigned_builds.is_empty() {
-                    "unassigned".to_string()
-                } else {
-                    assigned_builds
-                        .iter()
-                        .map(|(_, n)| n.clone())
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                };
-
-                let tex_count = atlas_entry.decoded.len();
-                let decoded_images: Vec<(String, u32, u32)> = atlas_entry
-                    .decoded
-                    .iter()
-                    .map(|(name, img)| (name.clone(), img.width(), img.height()))
-                    .collect();
-
-                let build_options: Vec<(usize, String)> =
-                    self.builds
-                        .iter()
-                        .enumerate()
-                        .filter(|(_, b)| b.assigned_atlas.is_none())
-                        .map(|(i, b)| (i, format!("{} ({})", b.source_name, b.build.name)))
-                        .chain(self.pending_builds.iter().enumerate().map(|(i, pb)| {
-                            (builds_len + i, format!("{} (pending)", pb.source_name))
-                        }))
-                        .collect();
-
-                let header = format!("{} ({}) → {}", atlas_entry.source_name, tex_count, status);
-
-                let default_open = assigned_builds.is_empty();
-
-                AtlasDisplayInfo {
-                    atlas_idx,
-                    header,
-                    decoded_images,
-                    build_options,
-                    default_open,
-                }
-            })
-            .collect();
-
-        let mut remove_atlas_idx: Option<usize> = None;
-        let mut assign_action: Option<(usize, usize)> = None;
-
-        for info in &atlas_info {
-            egui::CollapsingHeader::new(&info.header)
-                .id_salt(format!("atlas_{atlas_idx}", atlas_idx = info.atlas_idx))
-                .default_open(info.default_open)
-                .show(ui, |ui| {
-                    ui.horizontal(|ui| {
-                        if ui.small_button("X").clicked() {
-                            remove_atlas_idx = Some(info.atlas_idx);
-                        }
-                    });
-
-                    if !info.build_options.is_empty() {
-                        let mut selected: usize = 0;
-                        egui::ComboBox::from_id_salt(format!("atlas_assign_{}", info.atlas_idx))
-                            .selected_text("Assign to Build...")
-                            .show_ui(ui, |ui| {
-                                for (i, label) in &info.build_options {
-                                    ui.selectable_value(&mut selected, *i, label);
-                                }
-                            });
-
-                        if ui.small_button("Assign").clicked() {
-                            assign_action = Some((info.atlas_idx, info.build_options[selected].0));
-                        }
-                    }
-
-                    for (name, w, h) in &info.decoded_images {
-                        ui.label(
-                            egui::RichText::new(format!("{} ({}×{})", name, w, h))
-                                .small()
-                                .color(egui::Color32::LIGHT_BLUE),
-                        );
-                    }
-                });
-        }
-
-        if let Some((atlas_idx, target)) = assign_action {
-            if target < builds_len {
-                self.builds[target].assigned_atlas = Some(atlas_idx);
-                self.split_atlas_for_build(target);
-            } else {
-                let pb_idx = target - builds_len;
-                if pb_idx < self.pending_builds.len() {
-                    let mut build = std::mem::replace(
-                        &mut self.pending_builds[pb_idx].build,
-                        BuildFile {
-                            version: 0,
-                            name: String::new(),
-                            symbols: Vec::new(),
-                            atlases: Vec::new(),
-                            symbol_index: HashMap::new(),
-                        },
-                    );
-                    let atlas_entry = &self.atlas_entries[atlas_idx];
-                    let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
-                    let _ = split_atlas(&mut build, &atlas_images);
-                    self.pending_builds.remove(pb_idx);
-                    self.builds.push(BuildEntry {
-                        build,
-                        enabled: true,
-                        source_name: self.atlas_entries[atlas_idx].source_name.clone(),
-                        assigned_atlas: Some(atlas_idx),
-                    });
-                    self.selected_build_idx = Some(self.builds.len() - 1);
-                    self.cache_dirty = true;
-                    self.needs_re_render = true;
-                }
-            }
-        }
-
-        if let Some(idx) = remove_atlas_idx {
-            for entry in self.builds.iter_mut() {
-                if entry.assigned_atlas == Some(idx) {
-                    entry.assigned_atlas = None;
-                } else if let Some(ai) = entry.assigned_atlas
-                    && ai > idx
-                {
-                    entry.assigned_atlas = Some(ai - 1);
-                }
-            }
-            self.atlas_entries.remove(idx);
-            self.cache_dirty = true;
-            self.needs_re_render = true;
-        }
-
-        if !self.pending_builds.is_empty() {
-            ui.add_space(4.0);
-            ui.label(
-                egui::RichText::new("Pending Builds (need atlas):")
-                    .small()
-                    .color(egui::Color32::YELLOW),
-            );
-            let mut remove_pb: Option<usize> = None;
-            for (i, pb) in self.pending_builds.iter().enumerate() {
-                ui.horizontal(|ui| {
-                    ui.label(
-                        egui::RichText::new(format!("{} — {}", pb.source_name, pb.build.name))
-                            .small()
-                            .color(egui::Color32::LIGHT_BLUE),
-                    );
-                    if ui.small_button("X").clicked() {
-                        remove_pb = Some(i);
-                    }
-                });
-            }
-            if let Some(i) = remove_pb {
-                self.pending_builds.remove(i);
-            }
         }
     }
 
@@ -1228,49 +1255,63 @@ impl App {
             return;
         };
 
-        let build = &entry.build;
-
         ui.label(egui::RichText::new("Source").strong());
         ui.label(format!("  {}", entry.source_name));
-        ui.label(egui::RichText::new("Build").strong());
-        ui.label(format!("  Name: {}", build.name));
-        ui.label(format!("  Version: {}", build.version));
-        ui.label(format!("  Symbols: {}", build.symbols.len()));
 
-        ui.label(egui::RichText::new("Atlas").strong());
-        if let Some(ai) = entry.assigned_atlas {
-            if let Some(ae) = self.atlas_entries.get(ai) {
-                let atlas_name = build
-                    .atlases
-                    .first()
-                    .map(|a| a.name.as_str())
-                    .unwrap_or("?");
-                ui.label(format!("  {} (from {})", atlas_name, ae.source_name));
-            } else {
-                ui.label("  (invalid ref)");
-            }
-        } else {
-            ui.label("  (none)");
-        }
+        if let Some(build) = &entry.build {
+            ui.label(egui::RichText::new("Build").strong());
+            ui.label(format!("  Name: {}", build.name));
+            ui.label(format!("  Version: {}", build.version));
+            ui.label(format!("  Symbols: {}", build.symbols.len()));
 
-        ui.add_space(2.0);
-        egui::CollapsingHeader::new(format!("Symbols ({})", build.symbols.len()))
-            .id_salt("build_info_symbols")
-            .default_open(false)
-            .show(ui, |ui| {
-                for symbol in &build.symbols {
-                    let frame_count = symbol.frames.len();
-                    let has_image = symbol.frames.iter().any(|f| f.image.is_some());
-                    let img_mark = if has_image { " [img]" } else { "" };
-                    ui.label(
-                        egui::RichText::new(format!(
-                            "{}  ({} frames){}",
-                            symbol.name, frame_count, img_mark
-                        ))
-                        .small(),
-                    );
+            ui.label(egui::RichText::new("Atlas").strong());
+            if let Some(ai) = entry.assigned_atlas {
+                if let Some(ae) = self.atlas_entries.get(ai) {
+                    let atlas_name = build
+                        .atlases
+                        .first()
+                        .map(|a| a.name.as_str())
+                        .unwrap_or("?");
+                    ui.label(format!("  {} (from {})", atlas_name, ae.source_name));
+                } else {
+                    ui.label("  (invalid ref)");
                 }
-            });
+            } else {
+                ui.label("  (none)");
+            }
+
+            ui.add_space(2.0);
+            egui::CollapsingHeader::new(format!("Symbols ({})", build.symbols.len()))
+                .id_salt("build_info_symbols")
+                .default_open(false)
+                .show(ui, |ui| {
+                    for symbol in &build.symbols {
+                        let frame_count = symbol.frames.len();
+                        let has_image = symbol.frames.iter().any(|f| f.image.is_some());
+                        let img_mark = if has_image { " [img]" } else { "" };
+                        ui.label(
+                            egui::RichText::new(format!(
+                                "{}  ({} frames){}",
+                                symbol.name, frame_count, img_mark
+                            ))
+                            .small(),
+                        );
+                    }
+                });
+        } else {
+            ui.label(egui::RichText::new("Atlas").strong());
+            if let Some(ai) = entry.assigned_atlas
+                && let Some(ae) = self.atlas_entries.get(ai)
+            {
+                for (name, img) in &ae.decoded {
+                    ui.label(format!("  {} ({}x{})", name, img.width(), img.height()));
+                }
+            }
+            ui.label(
+                egui::RichText::new("Pending — needs a .zip build file")
+                    .color(egui::Color32::YELLOW),
+            );
+        }
     }
 
     fn show_central_panel(&mut self, ctx: &egui::Context) {
@@ -1367,25 +1408,21 @@ impl eframe::App for App {
         {
             for path in paths {
                 if let Ok(data) = std::fs::read(&path) {
-                    let name = path
-                        .file_name()
-                        .and_then(|n| n.to_str())
-                        .unwrap_or("unknown");
-                    self.load_file(name, &data);
+                    self.load_file(&path, &data);
                 }
             }
         }
 
         let dropped_files = ctx.input(|i| i.raw.dropped_files.clone());
         for dropped in dropped_files {
-            let name = dropped.name.clone();
-            if let Some(bytes) = &dropped.bytes {
-                self.load_file(&name, bytes);
-            } else if let Some(path) = &dropped.path
-                && let Ok(data) = std::fs::read(path)
-            {
-                let display_name = path.file_name().and_then(|n| n.to_str()).unwrap_or(&name);
-                self.load_file(display_name, &data);
+            if let Some(path) = &dropped.path {
+                if let Ok(data) = std::fs::read(path) {
+                    self.load_file(path, &data);
+                }
+            } else if let Some(bytes) = &dropped.bytes {
+                let name = dropped.name.clone();
+                let fake_path = PathBuf::from(&name);
+                self.load_file(&fake_path, bytes);
             }
         }
 

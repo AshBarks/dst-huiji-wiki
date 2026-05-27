@@ -15,6 +15,7 @@ pub struct ParsedArchive {
     pub anim: Option<AnimFile>,
     pub build: Option<BuildFile>,
     pub tex_files: HashMap<String, Vec<u8>>,
+    pub raw_files: HashMap<String, Vec<u8>>,
 }
 
 pub fn parse_zip(data: &[u8]) -> Result<ParsedArchive> {
@@ -33,12 +34,15 @@ fn parse_zip_archive(
     let mut anim: Option<AnimFile> = None;
     let mut build: Option<BuildFile> = None;
     let mut tex_files: HashMap<String, Vec<u8>> = HashMap::new();
+    let mut raw_files: HashMap<String, Vec<u8>> = HashMap::new();
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
         let name = file.name().to_string();
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)?;
+
+        raw_files.insert(name.clone(), buf.clone());
 
         if name == "anim.bin" {
             anim = Some(parse_anim(&buf)?);
@@ -53,6 +57,7 @@ fn parse_zip_archive(
         anim,
         build,
         tex_files,
+        raw_files,
     })
 }
 

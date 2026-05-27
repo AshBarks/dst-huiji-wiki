@@ -26,6 +26,7 @@ pub struct BuildFrame {
     pub width: f32,
     pub height: f32,
     pub verts: Vec<BuildVert>,
+    pub image: Option<image::RgbaImage>,
 }
 
 pub struct BuildSymbol {
@@ -142,6 +143,7 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
                 width,
                 height,
                 verts: frame_verts,
+                image: None,
             });
         }
         frames.sort_by_key(|f| f.frame_num);
@@ -242,5 +244,6 @@ mod tests {
         assert_eq!(parsed.version, 6);
         assert_eq!(parsed.name, "test");
         assert!(parsed.symbols.is_empty());
+        assert!(parsed.atlases.is_empty());
     }
 }

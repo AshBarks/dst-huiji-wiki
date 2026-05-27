@@ -411,6 +411,12 @@ impl Ktex {
             data: pixels,
         })
     }
+
+    pub fn to_image_rgba(&self) -> Result<image::RgbaImage> {
+        let img = self.to_image()?;
+        image::RgbaImage::from_raw(img.width, img.height, img.data)
+            .ok_or_else(|| Error::UnknownFormat("decoded pixel data size mismatch".to_string()))
+    }
 }
 
 #[cfg(test)]

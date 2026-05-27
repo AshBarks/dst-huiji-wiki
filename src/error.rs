@@ -19,6 +19,12 @@ pub enum Error {
 
     #[error("ZIP error: {0}")]
     Zip(#[from] zip::result::ZipError),
+
+    #[error("GIF error: {0}")]
+    Gif(#[from] gif::EncodingError),
+
+    #[error("UI error: {0}")]
+    Ui(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

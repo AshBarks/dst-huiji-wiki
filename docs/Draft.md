@@ -227,8 +227,7 @@ pub struct Ktex {
 ### 密钥与置换表
 
 ```rust
-const XOR_KEY: [u8; 16] = [141, 142, 143, 144, 145, 146, 147, 148,
-                           149, 150, 151, 152, 153, 154, 155, 156];
+const XOR_KEY: [u8; 8] = [141, 142, 143, 144, 145, 146, 147, 148];
 const PERMUTATION: [usize; 8] = [5, 3, 6, 7, 4, 2, 0, 1];
 ```
 
@@ -237,7 +236,7 @@ const PERMUTATION: [usize; 8] = [5, 3, 6, 7, 4, 2, 0, 1];
 ```rust
 pub fn xor_decrypt(data: &[u8]) -> Vec<u8> {
     // 1. 检测是否已解密（前2字节 == "PK"）
-    // 2. 对前 32 字节（2 个 16 字节块）做置换 XOR
+    // 2. 对前 16 字节（2 个 8 字节块）做置换 XOR
     // 3. 滑动窗口：后续块用前一块密文作为密钥一部分
     // 4. 返回解密后的 ZIP 数据
 }
@@ -248,9 +247,12 @@ pub fn xor_encrypt(data: &[u8]) -> Vec<u8> { ... }
 8 字节块置换 XOR：
 
 ```rust
-fn xor_cipher_block(block: &[u8; 16], encrypt: bool) -> [u8; 16] {
-    let mut result = [0u8; 16];
-    for i in 0..16 {
+fn xor_cipher_block(block: &[u8], encrypt: bool) -> Vec<u8> {
+    if block.len() <= 8 {
+        return block.to_vec();
+    }
+    let mut result = vec![0u8; 8];
+    for i in 0..8 {
         let j = PERMUTATION[i];
         result[if encrypt { j } else { i }] = block[if encrypt { i } else { j }] ^ XOR_KEY[i];
     }

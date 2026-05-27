@@ -1,10 +1,12 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::error::{Error, Result};
 use crate::hash::dst_hash;
 use crate::reader::Reader;
 use crate::writer::Writer;
 
+#[derive(Clone)]
 pub struct BuildVert {
     pub x: f32,
     pub y: f32,
@@ -14,10 +16,12 @@ pub struct BuildVert {
     pub w: u32,
 }
 
+#[derive(Clone)]
 pub struct BuildAtlasRef {
     pub name: String,
 }
 
+#[derive(Clone)]
 pub struct BuildFrame {
     pub frame_num: u32,
     pub duration: u32,
@@ -26,19 +30,37 @@ pub struct BuildFrame {
     pub width: f32,
     pub height: f32,
     pub verts: Vec<BuildVert>,
-    pub image: Option<image::RgbaImage>,
+    pub image: Option<Arc<image::RgbaImage>>,
 }
 
+impl BuildFrame {
+    pub fn image_ref(&self) -> Option<&image::RgbaImage> {
+        self.image.as_ref().map(|arc| arc.as_ref())
+    }
+}
+
+#[derive(Clone)]
 pub struct BuildSymbol {
     pub name: String,
     pub frames: Vec<BuildFrame>,
 }
 
+#[derive(Clone)]
 pub struct BuildFile {
     pub version: i32,
     pub name: String,
     pub symbols: Vec<BuildSymbol>,
     pub atlases: Vec<BuildAtlasRef>,
+    pub symbol_index: HashMap<String, usize>,
+}
+
+impl BuildFile {
+    pub fn build_symbol_index(&mut self) {
+        self.symbol_index.clear();
+        for (i, symbol) in self.symbols.iter().enumerate() {
+            self.symbol_index.insert(symbol.name.to_lowercase(), i);
+        }
+    }
 }
 
 pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
@@ -153,12 +175,15 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
         });
     }
 
-    Ok(BuildFile {
+    let mut file = BuildFile {
         version,
         name,
         symbols,
         atlases,
-    })
+        symbol_index: HashMap::new(),
+    };
+    file.build_symbol_index();
+    Ok(file)
 }
 
 pub fn write_build(file: &BuildFile) -> Vec<u8> {
@@ -238,6 +263,7 @@ mod tests {
             name: "test".to_string(),
             symbols: Vec::new(),
             atlases: Vec::new(),
+            symbol_index: HashMap::new(),
         };
         let buf = write_build(&file);
         let parsed = parse_build(&buf).unwrap();

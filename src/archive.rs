@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::io::Read;
+use std::path::Path;
 
 use crate::anim::{AnimFile, parse_anim};
 use crate::build_file::{BuildFile, parse_build};
-use crate::error::Result;
+use crate::error::{Error, Result};
+use crate::specs::{MAGIC_ANIM, MAGIC_BILD};
 use crate::xor::xor_decrypt;
 
 pub enum ParsedEntry {
@@ -18,6 +20,23 @@ pub struct ParsedArchive {
     pub raw_files: HashMap<String, Vec<u8>>,
 }
 
+impl ParsedArchive {
+    pub fn merge(&mut self, other: ParsedArchive) {
+        if other.anim.is_some() {
+            self.anim = other.anim;
+        }
+        if other.build.is_some() {
+            self.build = other.build;
+        }
+        for (k, v) in other.tex_files {
+            self.tex_files.insert(k, v);
+        }
+        for (k, v) in other.raw_files {
+            self.raw_files.insert(k, v);
+        }
+    }
+}
+
 pub fn parse_zip(data: &[u8]) -> Result<ParsedArchive> {
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data))?;
     parse_zip_archive(&mut archive)
@@ -26,6 +45,87 @@ pub fn parse_zip(data: &[u8]) -> Result<ParsedArchive> {
 pub fn parse_dyn(data: &[u8]) -> Result<ParsedArchive> {
     let decrypted = xor_decrypt(data);
     parse_zip(&decrypted)
+}
+
+pub fn parse_anim_bin(data: &[u8]) -> Result<ParsedArchive> {
+    let anim = parse_anim(data)?;
+    Ok(ParsedArchive {
+        anim: Some(anim),
+        build: None,
+        tex_files: HashMap::new(),
+        raw_files: HashMap::new(),
+    })
+}
+
+pub fn parse_build_bin(data: &[u8]) -> Result<ParsedArchive> {
+    let build = parse_build(data)?;
+    Ok(ParsedArchive {
+        anim: None,
+        build: Some(build),
+        tex_files: HashMap::new(),
+        raw_files: HashMap::new(),
+    })
+}
+
+pub fn detect_bin_type(data: &[u8]) -> BinType {
+    if data.len() < 4 {
+        return BinType::Unknown;
+    }
+    let magic = &data[0..4];
+    if magic == MAGIC_ANIM.as_bytes() {
+        BinType::Anim
+    } else if magic == MAGIC_BILD.as_bytes() {
+        BinType::Build
+    } else {
+        BinType::Unknown
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BinType {
+    Anim,
+    Build,
+    Unknown,
+}
+
+pub fn parse_file_by_path(path: &Path, data: &[u8]) -> Result<ParsedArchive> {
+    let ext = path
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+
+    match ext.as_str() {
+        "zip" => parse_zip(data),
+        "dyn" => parse_dyn(data),
+        "bin" => match detect_bin_type(data) {
+            BinType::Anim => parse_anim_bin(data),
+            BinType::Build => parse_build_bin(data),
+            BinType::Unknown => Err(Error::UnknownFormat(
+                "unknown .bin magic, expected ANIM or BILD".to_string(),
+            )),
+        },
+        _ => Err(Error::UnknownFormat(format!(
+            "unsupported file extension: .{ext}"
+        ))),
+    }
+}
+
+pub fn load_archives(paths: &[std::path::PathBuf]) -> Result<ParsedArchive> {
+    if paths.is_empty() {
+        return Err(Error::UnknownFormat("no input files".to_string()));
+    }
+
+    let first_data = std::fs::read(&paths[0])?;
+    let mut merged = parse_file_by_path(&paths[0], &first_data)?;
+
+    for path in &paths[1..] {
+        let data = std::fs::read(path)?;
+        let archive = parse_file_by_path(path, &data)?;
+        merged.merge(archive);
+    }
+
+    Ok(merged)
 }
 
 fn parse_zip_archive(
@@ -82,5 +182,66 @@ mod tests {
         let data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
         let result = parse_dyn(&data).unwrap();
         assert!(!result.tex_files.is_empty());
+    }
+
+    #[test]
+    fn detect_anim_bin_type() {
+        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            if file.name() == "anim.bin" {
+                let mut buf = Vec::new();
+                file.read_to_end(&mut buf).unwrap();
+                assert_eq!(detect_bin_type(&buf), BinType::Anim);
+            }
+        }
+    }
+
+    #[test]
+    fn detect_build_bin_type() {
+        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            if file.name() == "build.bin" {
+                let mut buf = Vec::new();
+                file.read_to_end(&mut buf).unwrap();
+                assert_eq!(detect_bin_type(&buf), BinType::Build);
+            }
+        }
+    }
+
+    #[test]
+    fn merge_archives() {
+        let zip_data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let dyn_data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
+
+        let mut archive = parse_zip(&zip_data).unwrap();
+        assert!(archive.tex_files.len() > 0);
+        let dyn_archive = parse_dyn(&dyn_data).unwrap();
+        assert!(dyn_archive.tex_files.len() > 0);
+
+        let zip_tex_names: std::collections::HashSet<&String> = archive.tex_files.keys().collect();
+        let dyn_tex_names: std::collections::HashSet<&String> =
+            dyn_archive.tex_files.keys().collect();
+        let has_new = dyn_tex_names.difference(&zip_tex_names).count() > 0;
+
+        let orig_tex_count = archive.tex_files.len();
+        archive.merge(dyn_archive);
+
+        if has_new {
+            assert!(archive.tex_files.len() > orig_tex_count);
+        } else {
+            assert!(archive.tex_files.len() >= orig_tex_count);
+        }
+    }
+
+    #[test]
+    fn load_archives_multi() {
+        let zip_path = std::path::PathBuf::from("data/anim/abigail_flower.zip");
+        let result = load_archives(&[zip_path]).unwrap();
+        assert!(result.anim.is_some());
+        assert!(result.build.is_some());
     }
 }

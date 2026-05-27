@@ -1,4 +1,4 @@
-use crate::anim::{AnimElement, AnimFrame};
+use crate::anim::AnimFrame;
 use crate::build_file::BuildFile;
 
 #[derive(Debug, Clone)]
@@ -17,17 +17,16 @@ pub struct RenderedFrame {
 
 fn find_symbol_frame<'a>(
     build_list: &[&'a BuildFile],
-    symbol_name: &str,
+    symbol_name_lower: &str,
     frame_num: u32,
 ) -> Option<&'a crate::build_file::BuildFrame> {
-    let resolved = symbol_name;
     for build in build_list {
-        for symbol in &build.symbols {
-            if symbol.name.to_lowercase() == resolved.to_lowercase() {
-                for frame in &symbol.frames {
-                    if frame.frame_num == frame_num {
-                        return Some(frame);
-                    }
+        if let Some(&sym_idx) = build.symbol_index.get(symbol_name_lower)
+            && let Some(symbol) = build.symbols.get(sym_idx)
+        {
+            for frame in &symbol.frames {
+                if frame.frame_num == frame_num {
+                    return Some(frame);
                 }
             }
         }
@@ -42,6 +41,12 @@ fn apply_transform(
     c: f32,
     d: f32,
 ) -> Option<image::RgbaImage> {
+    let is_identity =
+        (a - 1.0).abs() < 1e-6 && b.abs() < 1e-6 && c.abs() < 1e-6 && (d - 1.0).abs() < 1e-6;
+    if is_identity {
+        return Some(sprite.clone());
+    }
+
     let det = a * d - b * c;
     if det == 0.0 {
         return None;
@@ -64,6 +69,8 @@ fn apply_transform(
         return None;
     }
 
+    let is_uniform_scale = b.abs() < 1e-6 && c.abs() < 1e-6;
+
     let inv_a = d / det;
     let inv_b = -b / det;
     let inv_c = -c / det;
@@ -71,20 +78,42 @@ fn apply_transform(
 
     let mut out = image::RgbaImage::new(out_w, out_h);
 
-    for oy in 0..out_h {
-        for ox in 0..out_w {
-            let px = ox as f32 + min_x;
-            let py = oy as f32 + min_y;
-
-            let src_x = px * inv_a + py * inv_c;
-            let src_y = px * inv_b + py * inv_d;
-
-            let sx = src_x.round() as i64;
-            let sy = src_y.round() as i64;
-
-            if sx >= 0 && sy >= 0 && (sx as u32) < sprite.width() && (sy as u32) < sprite.height() {
-                let pixel = sprite.get_pixel(sx as u32, sy as u32);
-                out.put_pixel(ox, oy, *pixel);
+    if is_uniform_scale {
+        for oy in 0..out_h {
+            for ox in 0..out_w {
+                let px = ox as f32 + min_x;
+                let py = oy as f32 + min_y;
+                let src_x = px * inv_a + py * inv_c;
+                let src_y = py * inv_d;
+                let sx = src_x.round() as i64;
+                let sy = src_y.round() as i64;
+                if sx >= 0
+                    && sy >= 0
+                    && (sx as u32) < sprite.width()
+                    && (sy as u32) < sprite.height()
+                {
+                    let pixel = *sprite.get_pixel(sx as u32, sy as u32);
+                    out.put_pixel(ox, oy, pixel);
+                }
+            }
+        }
+    } else {
+        for oy in 0..out_h {
+            for ox in 0..out_w {
+                let px = ox as f32 + min_x;
+                let py = oy as f32 + min_y;
+                let src_x = px * inv_a + py * inv_c;
+                let src_y = px * inv_b + py * inv_d;
+                let sx = src_x.round() as i64;
+                let sy = src_y.round() as i64;
+                if sx >= 0
+                    && sy >= 0
+                    && (sx as u32) < sprite.width()
+                    && (sy as u32) < sprite.height()
+                {
+                    let pixel = *sprite.get_pixel(sx as u32, sy as u32);
+                    out.put_pixel(ox, oy, pixel);
+                }
             }
         }
     }
@@ -92,24 +121,38 @@ fn apply_transform(
     Some(out)
 }
 
-fn calc_frame_bounds(
+struct ElementData {
+    sprite: std::sync::Arc<image::RgbaImage>,
+    bf_x: f32,
+    bf_y: f32,
+    a: f32,
+    b: f32,
+    c: f32,
+    d: f32,
+    tx: f32,
+    ty: f32,
+}
+
+fn compute_frame_bounds(
     anim_frame: &AnimFrame,
     build_list: &[&BuildFile],
     scale: f32,
     offset: (f32, f32),
-) -> BoundingBox {
+) -> Option<(BoundingBox, Vec<ElementData>)> {
     let mut top = f32::INFINITY;
     let mut left = f32::INFINITY;
     let mut bottom = f32::NEG_INFINITY;
     let mut right = f32::NEG_INFINITY;
 
+    let mut elements_data: Vec<ElementData> = Vec::new();
+
     for element in &anim_frame.elements {
-        let bf = find_symbol_frame(build_list, &element.symbol, element.frame_num);
+        let lower = element.symbol.to_lowercase();
+        let bf = find_symbol_frame(build_list, &lower, element.frame_num);
         if let Some(bf) = bf {
-            if bf.image.is_none() {
+            let Some(sprite) = &bf.image else {
                 continue;
-            }
-            let sprite = bf.image.as_ref().unwrap();
+            };
 
             let a = element.a * scale;
             let b = element.b * scale;
@@ -134,15 +177,66 @@ fn calc_frame_bounds(
             right = right.max(elem_left + tw / 2.0);
             top = top.min(elem_top - th / 2.0);
             bottom = bottom.max(elem_top + th / 2.0);
+
+            elements_data.push(ElementData {
+                sprite: sprite.clone(),
+                bf_x: bf.x,
+                bf_y: bf.y,
+                a,
+                b,
+                c,
+                d,
+                tx: element.tx,
+                ty: element.ty,
+            });
         }
     }
 
-    BoundingBox {
-        left,
-        top,
-        right,
-        bottom,
+    if left.is_infinite() || right.is_infinite() {
+        return None;
     }
+
+    Some((
+        BoundingBox {
+            left,
+            top,
+            right,
+            bottom,
+        },
+        elements_data,
+    ))
+}
+
+pub fn compute_animation_bounds(
+    frames: &[AnimFrame],
+    build_list: &[&BuildFile],
+    scale: f32,
+    offset: (f32, f32),
+) -> Option<BoundingBox> {
+    let mut union_top = f32::INFINITY;
+    let mut union_left = f32::INFINITY;
+    let mut union_bottom = f32::NEG_INFINITY;
+    let mut union_right = f32::NEG_INFINITY;
+
+    for frame in frames {
+        if let Some((bounds, _)) = compute_frame_bounds(frame, build_list, scale, offset) {
+            union_left = union_left.min(bounds.left);
+            union_top = union_top.min(bounds.top);
+            union_right = union_right.max(bounds.right);
+            union_bottom = union_bottom.max(bounds.bottom);
+        }
+    }
+
+    if union_left.is_infinite() || union_right.is_infinite() {
+        return None;
+    }
+
+    Some(BoundingBox {
+        left: union_left,
+        top: union_top,
+        right: union_right,
+        bottom: union_bottom,
+    })
 }
 
 pub fn render_frame(
@@ -150,11 +244,15 @@ pub fn render_frame(
     build_list: &[&BuildFile],
     scale: f32,
     offset: (f32, f32),
+    bounds_override: Option<&BoundingBox>,
 ) -> Option<RenderedFrame> {
-    let bounds = calc_frame_bounds(anim_frame, build_list, scale, offset);
-    if bounds.left.is_infinite() || bounds.right.is_infinite() {
-        return None;
-    }
+    let (bounds, elements_data) = match bounds_override {
+        Some(ub) => {
+            let (_, elements_data) = compute_frame_bounds(anim_frame, build_list, scale, offset)?;
+            (ub.clone(), elements_data)
+        }
+        None => compute_frame_bounds(anim_frame, build_list, scale, offset)?,
+    };
 
     let w = (bounds.right - bounds.left).ceil() as u32;
     let h = (bounds.bottom - bounds.top).ceil() as u32;
@@ -164,55 +262,32 @@ pub fn render_frame(
 
     let mut canvas = image::RgbaImage::new(w, h);
 
-    let mut sorted_elements: Vec<&AnimElement> = anim_frame.elements.iter().collect();
-    sorted_elements.sort_by(|a, b| {
-        a.z_index
-            .partial_cmp(&b.z_index)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    for elem in elements_data.iter().rev() {
+        let sprite: &image::RgbaImage = &elem.sprite;
+        if let Some(transformed) = apply_transform(sprite, elem.a, elem.b, elem.c, elem.d) {
+            let elem_left = elem.tx * scale + offset.0 + elem.bf_x * elem.a + elem.bf_y * elem.c;
+            let elem_top = elem.ty * scale + offset.1 + elem.bf_x * elem.b + elem.bf_y * elem.d;
 
-    for element in sorted_elements {
-        let bf = find_symbol_frame(build_list, &element.symbol, element.frame_num);
-        if let Some(bf) = bf {
-            if bf.image.is_none() {
-                continue;
-            }
-            let sprite = bf.image.as_ref().unwrap();
+            let dest_x =
+                (elem_left - transformed.width() as f32 / 2.0 - bounds.left).round() as i64;
+            let dest_y = (elem_top - transformed.height() as f32 / 2.0 - bounds.top).round() as i64;
 
-            let a = element.a * scale;
-            let b = element.b * scale;
-            let c = element.c * scale;
-            let d = element.d * scale;
+            let tw = transformed.width();
+            let th = transformed.height();
 
-            if let Some(transformed) = apply_transform(sprite, a, b, c, d) {
-                let elem_left = element.tx * scale
-                    + offset.0
-                    + bf.x * element.a * scale
-                    + bf.y * element.c * scale;
-                let elem_top = element.ty * scale
-                    + offset.1
-                    + bf.x * element.b * scale
-                    + bf.y * element.d * scale;
-
-                let dest_x =
-                    (elem_left - transformed.width() as f32 / 2.0 - bounds.left).round() as i64;
-                let dest_y =
-                    (elem_top - transformed.height() as f32 / 2.0 - bounds.top).round() as i64;
-
-                for sy in 0..transformed.height() {
-                    for sx in 0..transformed.width() {
-                        let dx = dest_x + sx as i64;
-                        let dy = dest_y + sy as i64;
-                        if dx >= 0
-                            && dy >= 0
-                            && (dx as u32) < canvas.width()
-                            && (dy as u32) < canvas.height()
-                        {
-                            let pixel = transformed.get_pixel(sx, sy);
-                            if pixel[3] > 0 {
-                                canvas.put_pixel(dx as u32, dy as u32, *pixel);
-                            }
-                        }
+            for sy in 0..th {
+                let dy = dest_y + sy as i64;
+                if dy < 0 || dy >= h as i64 {
+                    continue;
+                }
+                for sx in 0..tw {
+                    let dx = dest_x + sx as i64;
+                    if dx < 0 || dx >= w as i64 {
+                        continue;
+                    }
+                    let pixel = *transformed.get_pixel(sx, sy);
+                    if pixel[3] > 0 {
+                        canvas.put_pixel(dx as u32, dy as u32, pixel);
                     }
                 }
             }
@@ -228,6 +303,7 @@ pub fn render_frame(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Arc;
 
     #[test]
     fn render_abigail_flower() {
@@ -238,13 +314,13 @@ mod tests {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = parse_zip(&data).unwrap();
 
-        let mut atlas_images: Vec<image::RgbaImage> = Vec::new();
+        let mut atlas_images: Vec<Arc<image::RgbaImage>> = Vec::new();
         for atlas in &archive.build.as_ref().unwrap().atlases {
             let tex_data = archive.tex_files.get(&atlas.name);
             if let Some(tex_data) = tex_data {
                 let ktex = parse_ktex(tex_data).unwrap();
                 let img = ktex.to_image_rgba().unwrap();
-                atlas_images.push(img);
+                atlas_images.push(Arc::new(img));
             }
         }
 
@@ -261,7 +337,7 @@ mod tests {
         assert!(!animation.frames.is_empty());
 
         let frame = &animation.frames[0];
-        let rendered = render_frame(frame, &build_list, 1.0, (0.0, 0.0));
+        let rendered = render_frame(frame, &build_list, 1.0, (0.0, 0.0), None);
         assert!(rendered.is_some());
         let rendered = rendered.unwrap();
         assert!(rendered.image.width() > 0);

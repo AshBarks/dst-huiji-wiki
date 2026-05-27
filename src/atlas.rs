@@ -1,5 +1,9 @@
+use std::sync::Arc;
+
+use crate::archive::ParsedArchive;
 use crate::build_file::{BuildFile, BuildVert};
 use crate::error::Result;
+use crate::ktex::parse_ktex;
 
 fn calc_uv_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
     let mut min_u = f32::INFINITY;
@@ -36,13 +40,15 @@ fn paste(canvas: &mut image::RgbaImage, sprite: &image::RgbaImage, dest_x: i64, 
             let dy = dest_y + sy as i64;
             if dx >= 0 && dy >= 0 && (dx as u32) < canvas.width() && (dy as u32) < canvas.height() {
                 let pixel = sprite.get_pixel(sx, sy);
-                canvas.put_pixel(dx as u32, dy as u32, *pixel);
+                if pixel[3] > 0 {
+                    canvas.put_pixel(dx as u32, dy as u32, *pixel);
+                }
             }
         }
     }
 }
 
-pub fn split_atlas(build: &mut BuildFile, atlas_images: &[image::RgbaImage]) -> Result<()> {
+pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]) -> Result<()> {
     for symbol in &mut build.symbols {
         for frame in &mut symbol.frames {
             let verts = &frame.verts;
@@ -57,7 +63,7 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[image::RgbaImage]) -> 
             if atlas_idx >= atlas_images.len() {
                 continue;
             }
-            let atlas_img = &atlas_images[atlas_idx];
+            let atlas_img: &image::RgbaImage = atlas_images[atlas_idx].as_ref();
 
             let src_x = (min_u * atlas_img.width() as f32).round() as u32;
             let src_y = ((1.0 - max_v) * atlas_img.height() as f32).round() as u32;
@@ -97,10 +103,59 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[image::RgbaImage]) -> 
             let mut canvas = image::RgbaImage::new(canvas_w, canvas_h);
             paste(&mut canvas, &sprite, dest_x, dest_y);
 
-            frame.image = Some(canvas);
+            frame.image = Some(Arc::new(canvas));
         }
     }
     Ok(())
+}
+
+pub fn decode_atlas_images(archive: &ParsedArchive) -> Vec<Arc<image::RgbaImage>> {
+    let Some(build) = archive.build.as_ref() else {
+        return Vec::new();
+    };
+    decode_atlas_images_inner(&build.atlases, &archive.tex_files)
+}
+
+pub fn decode_atlas_images_from_tex(
+    atlases: &[crate::build_file::BuildAtlasRef],
+    tex_files: &std::collections::HashMap<String, Vec<u8>>,
+) -> Vec<Arc<image::RgbaImage>> {
+    decode_atlas_images_inner(atlases, tex_files)
+}
+
+pub fn gather_atlas_images(
+    build: &BuildFile,
+    atlas_decoded: &std::collections::HashMap<String, Arc<image::RgbaImage>>,
+) -> Vec<Arc<image::RgbaImage>> {
+    build
+        .atlases
+        .iter()
+        .map(|atlas| {
+            atlas_decoded
+                .get(&atlas.name)
+                .cloned()
+                .unwrap_or_else(|| Arc::new(image::RgbaImage::new(1, 1)))
+        })
+        .collect()
+}
+
+fn decode_atlas_images_inner(
+    atlases: &[crate::build_file::BuildAtlasRef],
+    tex_files: &std::collections::HashMap<String, Vec<u8>>,
+) -> Vec<Arc<image::RgbaImage>> {
+    let mut images = Vec::new();
+    for atlas in atlases {
+        let tex_data = tex_files.get(&atlas.name);
+        if let Some(tex_data) = tex_data
+            && let Ok(ktex) = parse_ktex(tex_data)
+            && let Ok(img) = ktex.to_image_rgba()
+        {
+            images.push(Arc::new(img));
+            continue;
+        }
+        images.push(Arc::new(image::RgbaImage::new(1, 1)));
+    }
+    images
 }
 
 #[cfg(test)]
@@ -115,13 +170,13 @@ mod tests {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = parse_zip(&data).unwrap();
 
-        let mut atlas_images: Vec<image::RgbaImage> = Vec::new();
+        let mut atlas_images: Vec<Arc<image::RgbaImage>> = Vec::new();
         for atlas in &archive.build.as_ref().unwrap().atlases {
             let tex_data = archive.tex_files.get(&atlas.name);
             if let Some(tex_data) = tex_data {
                 let ktex = parse_ktex(tex_data).unwrap();
                 let img = ktex.to_image_rgba().unwrap();
-                atlas_images.push(img);
+                atlas_images.push(Arc::new(img));
             }
         }
 

@@ -6,6 +6,7 @@ use crate::reader::Reader;
 use crate::specs::direction_suffix;
 use crate::writer::Writer;
 
+#[derive(Clone)]
 pub struct AnimElement {
     pub z_index: f32,
     pub symbol: String,
@@ -19,6 +20,7 @@ pub struct AnimElement {
     pub ty: f32,
 }
 
+#[derive(Clone)]
 pub struct AnimFrame {
     pub idx: u32,
     pub x: f32,
@@ -29,17 +31,20 @@ pub struct AnimFrame {
     pub events: Vec<String>,
 }
 
+#[derive(Clone)]
 pub struct AnimAnimation {
     pub name: String,
     pub frame_rate: f32,
     pub frames: Vec<AnimFrame>,
 }
 
+#[derive(Clone)]
 pub struct AnimBank {
     pub name: String,
     pub animations: Vec<AnimAnimation>,
 }
 
+#[derive(Clone)]
 pub struct AnimFile {
     pub version: i32,
     pub banks: Vec<AnimBank>,

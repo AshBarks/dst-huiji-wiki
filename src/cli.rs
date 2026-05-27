@@ -12,56 +12,41 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     Extract {
-        input: PathBuf,
+        #[arg(short, long, num_args = 1.., required = true)]
+        input: Vec<PathBuf>,
         output_dir: PathBuf,
     },
     Split {
-        input: PathBuf,
+        #[arg(short, long, num_args = 1.., required = true)]
+        input: Vec<PathBuf>,
         output_dir: PathBuf,
     },
     Render {
-        input: PathBuf,
+        #[arg(short, long, num_args = 1.., required = true)]
+        input: Vec<PathBuf>,
         anim_path: String,
         output_dir: PathBuf,
     },
     List {
-        input: PathBuf,
+        #[arg(short, long, num_args = 1.., required = true)]
+        input: Vec<PathBuf>,
     },
     Info {
-        input: PathBuf,
+        #[arg(short, long, num_args = 1.., required = true)]
+        input: Vec<PathBuf>,
     },
-}
-
-fn load_archive(path: &PathBuf) -> crate::error::Result<crate::archive::ParsedArchive> {
-    let data = std::fs::read(path)?;
-    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-    match ext {
-        "zip" => crate::archive::parse_zip(&data),
-        "dyn" => crate::archive::parse_dyn(&data),
-        _ => Err(crate::error::Error::UnknownFormat(format!(
-            "unsupported file extension: .{ext}"
-        ))),
-    }
-}
-
-fn decode_atlas_images(archive: &crate::archive::ParsedArchive) -> Vec<image::RgbaImage> {
-    let build = match &archive.build {
-        Some(b) => b,
-        None => return Vec::new(),
-    };
-    let mut atlas_images: Vec<image::RgbaImage> = Vec::new();
-    for atlas in &build.atlases {
-        let tex_data = archive.tex_files.get(&atlas.name);
-        if let Some(tex_data) = tex_data
-            && let Ok(ktex) = crate::ktex::parse_ktex(tex_data)
-            && let Ok(img) = ktex.to_image_rgba()
-        {
-            atlas_images.push(img);
-            continue;
-        }
-        atlas_images.push(image::RgbaImage::new(1, 1));
-    }
-    atlas_images
+    Decrypt {
+        input: PathBuf,
+        output: PathBuf,
+    },
+    Decode {
+        input: PathBuf,
+        output_dir: PathBuf,
+    },
+    Preview {
+        #[arg(short, long)]
+        input: Option<Vec<PathBuf>>,
+    },
 }
 
 pub fn run(cli: Cli) -> crate::error::Result<()> {
@@ -75,11 +60,14 @@ pub fn run(cli: Cli) -> crate::error::Result<()> {
         } => cmd_render(&input, &anim_path, &output_dir),
         Commands::List { input } => cmd_list(&input),
         Commands::Info { input } => cmd_info(&input),
+        Commands::Decrypt { input, output } => cmd_decrypt(&input, &output),
+        Commands::Decode { input, output_dir } => cmd_decode(&input, &output_dir),
+        Commands::Preview { input } => cmd_preview(input),
     }
 }
 
-fn cmd_extract(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()> {
-    let archive = load_archive(input)?;
+fn cmd_extract(inputs: &[PathBuf], output_dir: &PathBuf) -> crate::error::Result<()> {
+    let archive = crate::archive::load_archives(inputs)?;
     std::fs::create_dir_all(output_dir)?;
     for (name, data) in &archive.raw_files {
         let out_path = output_dir.join(name);
@@ -92,15 +80,15 @@ fn cmd_extract(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()
     Ok(())
 }
 
-fn cmd_split(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()> {
-    let mut archive = load_archive(input)?;
+fn cmd_split(inputs: &[PathBuf], output_dir: &PathBuf) -> crate::error::Result<()> {
+    let mut archive = crate::archive::load_archives(inputs)?;
     if archive.build.is_none() {
         return Err(crate::error::Error::UnknownFormat(
             "no build.bin found".to_string(),
         ));
     }
 
-    let atlas_images = decode_atlas_images(&archive);
+    let atlas_images = crate::atlas::decode_atlas_images(&archive);
     crate::atlas::split_atlas(archive.build.as_mut().unwrap(), &atlas_images)?;
 
     let build = archive.build.as_ref().unwrap();
@@ -114,7 +102,7 @@ fn cmd_split(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()> 
         }
         std::fs::create_dir_all(&sym_dir)?;
         for frame in &symbol.frames {
-            if let Some(ref img) = frame.image {
+            if let Some(img) = frame.image_ref() {
                 let out_path = sym_dir.join(format!("frame_{}.png", frame.frame_num));
                 img.save(&out_path)
                     .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
@@ -125,8 +113,12 @@ fn cmd_split(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()> 
     Ok(())
 }
 
-fn cmd_render(input: &PathBuf, anim_path: &str, output_dir: &PathBuf) -> crate::error::Result<()> {
-    let mut archive = load_archive(input)?;
+fn cmd_render(
+    inputs: &[PathBuf],
+    anim_path: &str,
+    output_dir: &PathBuf,
+) -> crate::error::Result<()> {
+    let mut archive = crate::archive::load_archives(inputs)?;
     let anim = archive
         .anim
         .as_ref()
@@ -160,7 +152,7 @@ fn cmd_render(input: &PathBuf, anim_path: &str, output_dir: &PathBuf) -> crate::
         }
     };
 
-    let atlas_images = decode_atlas_images(&archive);
+    let atlas_images = crate::atlas::decode_atlas_images(&archive);
     crate::atlas::split_atlas(archive.build.as_mut().unwrap(), &atlas_images)?;
 
     let animation = &archive.anim.as_ref().unwrap().banks[bank_idx].animations[anim_idx];
@@ -168,8 +160,13 @@ fn cmd_render(input: &PathBuf, anim_path: &str, output_dir: &PathBuf) -> crate::
     let build_list: Vec<&crate::build_file::BuildFile> = vec![build];
     std::fs::create_dir_all(output_dir)?;
 
+    let bounds =
+        crate::render::compute_animation_bounds(&animation.frames, &build_list, 1.0, (0.0, 0.0));
+
     for (i, frame) in animation.frames.iter().enumerate() {
-        if let Some(rendered) = crate::render::render_frame(frame, &build_list, 1.0, (0.0, 0.0)) {
+        if let Some(rendered) =
+            crate::render::render_frame(frame, &build_list, 1.0, (0.0, 0.0), bounds.as_ref())
+        {
             let out_path = output_dir.join(format!("frame_{i:03}.png"));
             rendered
                 .image
@@ -181,8 +178,8 @@ fn cmd_render(input: &PathBuf, anim_path: &str, output_dir: &PathBuf) -> crate::
     Ok(())
 }
 
-fn cmd_list(input: &PathBuf) -> crate::error::Result<()> {
-    let archive = load_archive(input)?;
+fn cmd_list(inputs: &[PathBuf]) -> crate::error::Result<()> {
+    let archive = crate::archive::load_archives(inputs)?;
     if let Some(anim) = &archive.anim {
         for bank in &anim.banks {
             for animation in &bank.animations {
@@ -195,8 +192,8 @@ fn cmd_list(input: &PathBuf) -> crate::error::Result<()> {
     Ok(())
 }
 
-fn cmd_info(input: &PathBuf) -> crate::error::Result<()> {
-    let archive = load_archive(input)?;
+fn cmd_info(inputs: &[PathBuf]) -> crate::error::Result<()> {
+    let archive = crate::archive::load_archives(inputs)?;
 
     if let Some(anim) = &archive.anim {
         println!("anim.bin:");
@@ -250,4 +247,84 @@ fn cmd_info(input: &PathBuf) -> crate::error::Result<()> {
     }
 
     Ok(())
+}
+
+fn cmd_decrypt(input: &PathBuf, output: &PathBuf) -> crate::error::Result<()> {
+    let ext = input
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+    if ext != "dyn" {
+        return Err(crate::error::Error::UnknownFormat(
+            "decrypt only supports .dyn files".to_string(),
+        ));
+    }
+    let data = std::fs::read(input)?;
+    let decrypted = crate::xor::xor_decrypt(&data);
+    std::fs::write(output, &decrypted)?;
+    println!("{}", output.display());
+    Ok(())
+}
+
+fn cmd_decode(input: &PathBuf, output_dir: &PathBuf) -> crate::error::Result<()> {
+    let archive = crate::archive::load_archives(&[input.clone()])?;
+    if archive.tex_files.is_empty() {
+        eprintln!("no .tex files found");
+        return Ok(());
+    }
+    std::fs::create_dir_all(output_dir)?;
+    for (name, data) in &archive.tex_files {
+        let ktex = crate::ktex::parse_ktex(data)?;
+        let img = ktex.to_image_rgba()?;
+        let out_name = format!("{}.png", name);
+        let out_path = output_dir.join(&out_name);
+        img.save(&out_path)
+            .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+        println!("{}", out_path.display());
+    }
+    Ok(())
+}
+
+fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> crate::error::Result<()> {
+    let native_options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default().with_inner_size([1200.0, 800.0]),
+        ..Default::default()
+    };
+    eframe::run_native(
+        "DST Anim Tool",
+        native_options,
+        Box::new(move |_cc| Ok(Box::new(crate::ui::App::new(inputs)))),
+    )
+    .map_err(|e| crate::error::Error::Ui(e.to_string()))?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decrypt_produces_valid_zip() {
+        let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
+        let data = std::fs::read(&input).unwrap();
+        let decrypted = crate::xor::xor_decrypt(&data);
+        let archive = zip::ZipArchive::new(std::io::Cursor::new(decrypted.as_slice())).unwrap();
+        assert!(archive.len() > 0);
+    }
+
+    #[test]
+    fn decode_dyn_to_png() {
+        let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
+        let archive = crate::archive::load_archives(&[input]).unwrap();
+        assert!(!archive.tex_files.is_empty());
+        for (name, data) in &archive.tex_files {
+            let ktex = crate::ktex::parse_ktex(data).unwrap();
+            let img = ktex.to_image_rgba().unwrap();
+            assert!(img.width() > 0);
+            assert!(img.height() > 0);
+            let out_name = format!("{}.png", name);
+            assert!(out_name.ends_with(".tex.png"));
+        }
+    }
 }

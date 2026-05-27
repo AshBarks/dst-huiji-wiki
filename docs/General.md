@@ -696,17 +696,17 @@ async function Ci(animFrame) {
 
 ```javascript
 // 密钥生成
-const xr = new Uint8Array(16);
-for (let i = 0; i < 16; i++) xr[i] = 141 + i;  // [141, 142, ..., 156]
+const xr = new Uint8Array(8);
+for (let i = 0; i < 8; i++) xr[i] = 141 + i;  // [141, 142, ..., 148]
 
 // 置换表
 const Ac = [5, 3, 6, 7, 4, 2, 0, 1];
 
-// 加解密核心 (8字节块)
+// 加解密核心 (8字节块，输入需 > 8 字节才处理)
 function xorCipher(block, encrypt) {
-  if (block.length > 16) {
-    const result = new Uint8Array(16);
-    for (let i = 0; i < 16; i++) {
+  if (block.length > 8) {
+    const result = new Uint8Array(8);
+    for (let i = 0; i < 8; i++) {
       const j = Ac[i];
       result[encrypt ? j : i] = block[encrypt ? i : j] ^ xr[i];
     }
@@ -723,8 +723,8 @@ async function vr(buffer, isEncrypt) {
   const reader = new BinaryDataReader(buffer);
   const writer = new BinaryDataWriter();
   
-  // 读取前32字节(2个16字节块)
-  let firstBlock = reader.readBytes(32);
+  // 读取前16字节(2个8字节块)
+  let firstBlock = reader.readBytes(16);
   
   // 如果不是加密的(前2字节是"PK" = ZIP签名)，直接返回
   if (!isEncrypt && asciiDecode(firstBlock.slice(0,2)) === "PK") {

@@ -281,8 +281,13 @@ fn cmd_render(
         .collect();
     std::fs::create_dir_all(output_dir)?;
 
-    let (bounds, prepared) =
-        dst_anim_tool::render::prepare_animation_frames(&animation.frames, &bl, 1.0, (0.0, 0.0));
+    let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
+        &animation.frames,
+        &bl,
+        1.0,
+        (0.0, 0.0),
+        &HashSet::new(),
+    );
 
     for (i, pf) in prepared.iter().enumerate() {
         if let Some(pf) = pf {

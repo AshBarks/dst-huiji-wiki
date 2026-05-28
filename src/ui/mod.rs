@@ -68,6 +68,7 @@ pub struct App {
     bg_renderer: Option<BackgroundRenderer>,
     bg_loader: Option<BackgroundLoader>,
     animation_bounds: Option<BoundingBox>,
+    disabled_elements: HashSet<(String, String)>,
     #[cfg(feature = "gif")]
     gif_export: Option<BackgroundGifExport>,
     #[cfg(feature = "gif")]
@@ -100,6 +101,7 @@ impl App {
             bg_renderer: None,
             bg_loader: None,
             animation_bounds: None,
+            disabled_elements: HashSet::new(),
             #[cfg(feature = "gif")]
             gif_export: None,
             #[cfg(feature = "gif")]
@@ -199,6 +201,7 @@ impl App {
             self.active_bank_idx = 0;
             self.active_anim_inner_idx = 0;
             self.active_frame_idx = 0;
+            self.disabled_elements.clear();
         }
 
         let mut build = archive.build.unwrap();
@@ -242,7 +245,12 @@ impl App {
             .map(|(&fi, entry)| (fi, entry.image.clone()))
             .collect();
 
-        let receiver = export::start_gif_export_thread(anim, &build_list, cached_frames);
+        let receiver = export::start_gif_export_thread(
+            anim,
+            &build_list,
+            cached_frames,
+            self.disabled_elements.clone(),
+        );
         self.gif_export = Some(BackgroundGifExport { receiver, path });
     }
 
@@ -293,7 +301,13 @@ impl App {
             .map(|(&fi, entry)| (fi, entry.image.clone()))
             .collect();
 
-        let receiver = export::start_png_export_thread(anim, &build_list, cached_frames, dir);
+        let receiver = export::start_png_export_thread(
+            anim,
+            &build_list,
+            cached_frames,
+            self.disabled_elements.clone(),
+            dir,
+        );
         self.png_export = Some(BackgroundPngExport { receiver });
     }
 

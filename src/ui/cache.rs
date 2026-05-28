@@ -155,6 +155,7 @@ impl App {
             &build_list,
             1.0,
             (0.0, 0.0),
+            &self.disabled_elements,
         );
     }
 
@@ -172,6 +173,7 @@ impl App {
             &build_list,
             1.0,
             (0.0, 0.0),
+            &self.disabled_elements,
         );
         let cache_gen_val = self.cache_gen;
         let total_frames = anim.frames.len();
@@ -308,6 +310,7 @@ impl App {
             1.0,
             (0.0, 0.0),
             self.animation_bounds.as_ref(),
+            &self.disabled_elements,
         ) {
             let img_arc = Arc::new(rendered.image);
             let size = [img_arc.width() as usize, img_arc.height() as usize];
@@ -578,6 +581,7 @@ impl App {
             self.active_bank_idx = 0;
             self.active_anim_inner_idx = 0;
             self.active_frame_idx = 0;
+            self.disabled_elements.clear();
         }
 
         if !data.decoded_textures.is_empty() {

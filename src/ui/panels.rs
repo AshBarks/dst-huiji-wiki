@@ -160,6 +160,7 @@ impl App {
                                         self.active_anim_inner_idx = *anim_inner_idx;
                                         self.active_frame_idx = 0;
                                         self.playing = false;
+                                        self.disabled_elements.clear();
                                         self.cache_dirty = true;
                                         self.needs_re_render = true;
                                     }
@@ -175,14 +176,14 @@ impl App {
                 self.active_anim_idx = 0;
                 self.active_bank_idx = 0;
                 self.active_anim_inner_idx = 0;
-                self.active_frame_idx = 0;
+                self.disabled_elements.clear();
                 self.cache_dirty = true;
                 self.needs_re_render = true;
             } else if idx <= self.active_anim_idx {
                 self.active_anim_idx = self.active_anim_idx.saturating_sub(1);
                 self.active_bank_idx = 0;
                 self.active_anim_inner_idx = 0;
-                self.active_frame_idx = 0;
+                self.disabled_elements.clear();
                 self.cache_dirty = true;
                 self.needs_re_render = true;
             }
@@ -508,14 +509,24 @@ impl App {
                 .id_salt("anim_info_elements")
                 .default_open(false)
                 .show(ui, |ui| {
+                    let mut element_toggles: Vec<((String, String), bool)> = Vec::new();
                     for (i, elem) in frame.elements.iter().enumerate() {
+                        let key = (elem.symbol_lower.clone(), elem.layer_name.clone());
+                        let is_enabled = !self.disabled_elements.contains(&key);
+                        let mut toggle = is_enabled;
                         egui::CollapsingHeader::new(format!(
-                            "#{} z={:.1} {}",
-                            i, elem.z_index, elem.symbol
+                            "#{} z={:.1} {}{}",
+                            i,
+                            elem.z_index,
+                            elem.symbol,
+                            if !is_enabled { " [hidden]" } else { "" }
                         ))
                         .id_salt(format!("anim_info_elem_{i}"))
                         .default_open(false)
                         .show(ui, |ui| {
+                            if ui.checkbox(&mut toggle, "Visible").changed() {
+                                element_toggles.push((key, toggle));
+                            }
                             ui.label(
                                 egui::RichText::new(format!("  symbol: {}", elem.symbol)).small(),
                             );
@@ -539,6 +550,15 @@ impl App {
                                 .small(),
                             );
                         });
+                    }
+                    for (key, enabled) in element_toggles {
+                        if enabled {
+                            self.disabled_elements.remove(&key);
+                        } else {
+                            self.disabled_elements.insert(key);
+                        }
+                        self.cache_dirty = true;
+                        self.needs_re_render = true;
                     }
                 });
         }

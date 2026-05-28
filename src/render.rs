@@ -56,9 +56,16 @@ pub(crate) fn compute_frame_elements(
     anim_frame: &AnimFrame,
     build_list: &[BuildRef<'_>],
     scale: f32,
+    disabled_elements: &HashSet<(String, String)>,
 ) -> Option<Vec<ElementData>> {
     let mut elements_data: Vec<ElementData> = Vec::new();
     for element in &anim_frame.elements {
+        if disabled_elements
+            .iter()
+            .any(|(s, l)| s == &element.symbol_lower && l == &element.layer_name)
+        {
+            continue;
+        }
         let bf = find_symbol_frame(build_list, &element.symbol_lower, element.frame_num);
         if let Some(bf) = bf {
             let Some(sprite) = &bf.image else {
@@ -135,6 +142,7 @@ pub fn prepare_animation_frames(
     build_list: &[BuildRef<'_>],
     scale: f32,
     offset: (f32, f32),
+    disabled_elements: &HashSet<(String, String)>,
 ) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
     let mut prepared: Vec<Option<PreparedFrame>> = Vec::with_capacity(frames.len());
     let mut union_top = f32::INFINITY;
@@ -143,7 +151,7 @@ pub fn prepare_animation_frames(
     let mut union_right = f32::NEG_INFINITY;
 
     for frame in frames {
-        if let Some(elements) = compute_frame_elements(frame, build_list, scale)
+        if let Some(elements) = compute_frame_elements(frame, build_list, scale, disabled_elements)
             && let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset)
         {
             union_left = union_left.min(bounds.left);
@@ -175,8 +183,10 @@ pub fn compute_animation_bounds(
     build_list: &[BuildRef<'_>],
     scale: f32,
     offset: (f32, f32),
+    disabled_elements: &HashSet<(String, String)>,
 ) -> Option<BoundingBox> {
-    let (bounds, _) = prepare_animation_frames(frames, build_list, scale, offset);
+    let (bounds, _) =
+        prepare_animation_frames(frames, build_list, scale, offset, disabled_elements);
     bounds
 }
 
@@ -366,8 +376,9 @@ pub fn render_frame(
     scale: f32,
     offset: (f32, f32),
     bounds_override: Option<&BoundingBox>,
+    disabled_elements: &HashSet<(String, String)>,
 ) -> Option<RenderedFrame> {
-    let elements = compute_frame_elements(anim_frame, build_list, scale)?;
+    let elements = compute_frame_elements(anim_frame, build_list, scale, disabled_elements)?;
     let bounds = match bounds_override {
         Some(ub) => ub.clone(),
         None => compute_bounds_from_elements(&elements, scale, offset)?,
@@ -458,7 +469,7 @@ mod tests {
         assert!(!animation.frames.is_empty());
 
         let frame = &animation.frames[0];
-        let rendered = render_frame(frame, &build_list, 1.0, (0.0, 0.0), None);
+        let rendered = render_frame(frame, &build_list, 1.0, (0.0, 0.0), None, &HashSet::new());
         assert!(rendered.is_some());
         let rendered = rendered.unwrap();
         assert!(rendered.image.width() > 0);
@@ -580,7 +591,7 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        assert!(compute_frame_elements(&anim_frame, &build_list, 1.0).is_none());
+        assert!(compute_frame_elements(&anim_frame, &build_list, 1.0, &HashSet::new()).is_none());
     }
 
     #[test]
@@ -607,7 +618,7 @@ mod tests {
             disabled_symbols: &empty,
         }];
         assert!(
-            compute_frame_elements(&anim_frame, &build_list, 1.0).is_none(),
+            compute_frame_elements(&anim_frame, &build_list, 1.0, &HashSet::new()).is_none(),
             "element with no image should be skipped, yielding None"
         );
     }
@@ -648,7 +659,10 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        assert!(compute_animation_bounds(&frames, &build_list, 1.0, (0.0, 0.0)).is_none());
+        assert!(
+            compute_animation_bounds(&frames, &build_list, 1.0, (0.0, 0.0), &HashSet::new())
+                .is_none()
+        );
     }
 
     #[test]
@@ -678,7 +692,7 @@ mod tests {
             make_anim_frame(vec![elem.clone()]),
         ];
         let (union_bounds, prepared) =
-            prepare_animation_frames(&frames, &build_list, 1.0, (0.0, 0.0));
+            prepare_animation_frames(&frames, &build_list, 1.0, (0.0, 0.0), &HashSet::new());
         assert!(union_bounds.is_some());
         assert!(prepared[0].is_some());
         assert!(prepared[1].is_none());
@@ -708,7 +722,14 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = render_frame(&anim_frame, &build_list, 1.0, (0.0, 0.0), None);
+        let result = render_frame(
+            &anim_frame,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+            None,
+            &HashSet::new(),
+        );
         assert!(result.is_none());
     }
 
@@ -735,7 +756,14 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = render_frame(&anim_frame, &build_list, 1.0, (0.0, 0.0), None);
+        let result = render_frame(
+            &anim_frame,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+            None,
+            &HashSet::new(),
+        );
         assert!(result.is_some());
         let rendered = result.unwrap();
         assert!(
@@ -768,7 +796,14 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = render_frame(&anim_frame, &build_list, 1.0, (0.0, 0.0), None);
+        let result = render_frame(
+            &anim_frame,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+            None,
+            &HashSet::new(),
+        );
         assert!(result.is_some());
         let rendered = result.unwrap();
         assert!(rendered.image.width() > 0);
@@ -804,7 +839,14 @@ mod tests {
             right: 200.0,
             bottom: 200.0,
         };
-        let result = render_frame(&anim_frame, &build_list, 1.0, (0.0, 0.0), Some(&bounds));
+        let result = render_frame(
+            &anim_frame,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+            Some(&bounds),
+            &HashSet::new(),
+        );
         assert!(result.is_some());
         let rendered = result.unwrap();
         assert_eq!(rendered.image.width(), 200);
@@ -833,7 +875,8 @@ mod tests {
         let bank = &anim.banks[0];
         let animation = &bank.animations[0];
         let frame = &animation.frames[0];
-        let rendered = render_frame(frame, &build_list, 1.0, (0.0, 0.0), None).unwrap();
+        let rendered =
+            render_frame(frame, &build_list, 1.0, (0.0, 0.0), None, &HashSet::new()).unwrap();
         let has_opaque = rendered.image.as_raw().chunks_exact(4).any(|px| px[3] > 0);
         assert!(
             has_opaque,
@@ -863,7 +906,8 @@ mod tests {
         for bank in &anim.banks {
             for animation in &bank.animations {
                 for frame in &animation.frames {
-                    if let Some(rendered) = render_frame(frame, &build_list, 1.0, (0.0, 0.0), None)
+                    if let Some(rendered) =
+                        render_frame(frame, &build_list, 1.0, (0.0, 0.0), None, &HashSet::new())
                     {
                         assert!(
                             rendered.image.width() > 0 && rendered.image.height() > 0,
@@ -873,5 +917,35 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn compute_frame_elements_disabled_element_skipped() {
+        let build = make_build_with_symbol("sym", 0, image::RgbaImage::new(10, 10));
+        let empty = HashSet::new();
+        let build_list = vec![BuildRef {
+            build: &build,
+            disabled_symbols: &empty,
+        }];
+        let elem = AnimElement {
+            z_index: 0.0,
+            symbol: "sym".into(),
+            symbol_lower: "sym".into(),
+            frame_num: 0,
+            layer_name: "layer".into(),
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 50.0,
+            ty: 50.0,
+        };
+        let anim_frame = make_anim_frame(vec![elem]);
+        let mut disabled = HashSet::new();
+        disabled.insert(("sym".into(), "layer".into()));
+        assert!(
+            compute_frame_elements(&anim_frame, &build_list, 1.0, &disabled).is_none(),
+            "disabled element should be skipped"
+        );
     }
 }

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::mpsc;
@@ -31,8 +31,15 @@ pub fn start_gif_export_thread(
     anim: &dst_anim_tool::anim::AnimAnimation,
     build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
+    disabled_elements: HashSet<(String, String)>,
 ) -> mpsc::Receiver<GifExportResult> {
-    let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
+    let (bounds, prepared) = prepare_animation_frames(
+        &anim.frames,
+        build_list,
+        1.0,
+        (0.0, 0.0),
+        &disabled_elements,
+    );
     let frame_rate = anim.frame_rate;
 
     let (sender, receiver) = mpsc::channel::<GifExportResult>();
@@ -83,9 +90,16 @@ pub fn start_png_export_thread(
     anim: &dst_anim_tool::anim::AnimAnimation,
     build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
+    disabled_elements: HashSet<(String, String)>,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {
-    let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
+    let (bounds, prepared) = prepare_animation_frames(
+        &anim.frames,
+        build_list,
+        1.0,
+        (0.0, 0.0),
+        &disabled_elements,
+    );
     let frame_rate = anim.frame_rate;
 
     let (sender, receiver) = mpsc::channel::<PngExportResult>();

@@ -279,13 +279,11 @@ impl App {
                         if let Some(atlas_idx) = assigned
                             && let Some(Some(atlas_entry)) = self.atlas_entries.get(*atlas_idx)
                         {
-                            for (name, img) in &atlas_entry.decoded {
+                            for tm in &atlas_entry.tex_meta {
                                 ui.label(
                                     egui::RichText::new(format!(
-                                        "{} ({}x{})",
-                                        name,
-                                        img.width(),
-                                        img.height()
+                                        "{} ({}x{} {:?})",
+                                        tm.name, tm.width, tm.height, tm.pixel_format
                                     ))
                                     .small()
                                     .color(egui::Color32::LIGHT_BLUE),
@@ -303,14 +301,47 @@ impl App {
                                     .small()
                                     .italics(),
                             );
+                            for tm in &ae.tex_meta {
+                                ui.label(
+                                    egui::RichText::new(format!(
+                                        "{} ({}x{} {:?})",
+                                        tm.name, tm.width, tm.height, tm.pixel_format
+                                    ))
+                                    .small()
+                                    .color(egui::Color32::LIGHT_BLUE),
+                                );
+                            }
                         }
 
                         if let Some(build) = &self.builds[idx].build {
                             ui.label(
-                                egui::RichText::new(format!("Build: {}", build.name))
-                                    .small()
-                                    .italics(),
+                                egui::RichText::new(format!(
+                                    "Build: {} (v{})",
+                                    build.name, build.version
+                                ))
+                                .small()
+                                .italics(),
                             );
+
+                            if !build.atlases.is_empty() {
+                                egui::CollapsingHeader::new(
+                                    egui::RichText::new(format!(
+                                        "Atlases ({})",
+                                        build.atlases.len()
+                                    ))
+                                    .small(),
+                                )
+                                .id_salt(format!("build_{idx}_atlases"))
+                                .default_open(false)
+                                .show(ui, |ui| {
+                                    for atlas in &build.atlases {
+                                        ui.label(
+                                            egui::RichText::new(format!("  {}", atlas.name))
+                                                .small(),
+                                        );
+                                    }
+                                });
+                            }
 
                             egui::CollapsingHeader::new(
                                 egui::RichText::new(format!("Symbols ({})", build.symbols.len()))
@@ -440,6 +471,8 @@ impl App {
 
         ui.label(egui::RichText::new("Source").strong());
         ui.label(format!("  {}", anim_entry.source_name));
+        ui.label(egui::RichText::new("Version").strong());
+        ui.label(format!("  {}", anim.version));
         ui.label(egui::RichText::new("Bank").strong());
         ui.label(format!("  {}", bank.name));
         ui.label(egui::RichText::new("Animation").strong());

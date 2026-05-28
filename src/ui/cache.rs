@@ -7,7 +7,7 @@ use crate::atlas::gather_atlas_images;
 use crate::ktex::parse_ktex;
 use crate::render::{render_frame, render_frame_with_elements};
 
-use super::{AnimEntry, App, AtlasEntry, BuildEntry};
+use super::{AnimEntry, App, AtlasEntry, BuildEntry, TexMeta};
 
 pub struct FrameCacheEntry {
     pub image: Arc<image::RgbaImage>,
@@ -21,6 +21,7 @@ pub struct LoadedData {
     pub anim: Option<crate::anim::AnimFile>,
     pub build: Option<crate::build_file::BuildFile>,
     pub decoded_textures: HashMap<String, Arc<image::RgbaImage>>,
+    pub(super) tex_meta: Vec<TexMeta>,
     pub is_pending_atlas: bool,
 }
 
@@ -56,18 +57,29 @@ impl Drop for BackgroundRenderer {
 }
 
 impl App {
-    pub fn decode_tex_files(
+    pub fn decode_tex_files_with_meta(
         tex_files: &std::collections::HashMap<String, std::sync::Arc<Vec<u8>>>,
-    ) -> std::collections::HashMap<String, Arc<image::RgbaImage>> {
+    ) -> (
+        std::collections::HashMap<String, Arc<image::RgbaImage>>,
+        Vec<TexMeta>,
+    ) {
         let mut decoded = HashMap::new();
+        let mut tex_meta = Vec::new();
         for (name, data) in tex_files {
             if let Ok(ktex) = parse_ktex(data)
                 && let Ok(img) = ktex.to_image_rgba()
             {
+                let m0 = ktex.mipmaps.first();
+                tex_meta.push(TexMeta {
+                    name: name.clone(),
+                    width: m0.map(|m| m.width).unwrap_or(0),
+                    height: m0.map(|m| m.height).unwrap_or(0),
+                    pixel_format: ktex.header.pixel_format,
+                });
                 decoded.insert(name.clone(), Arc::new(img));
             }
         }
-        decoded
+        (decoded, tex_meta)
     }
 
     pub fn split_atlas_for_build(&mut self, build_idx: usize) {
@@ -435,6 +447,7 @@ impl App {
                         anim: None,
                         build: None,
                         decoded_textures: HashMap::new(),
+                        tex_meta: Vec::new(),
                         is_pending_atlas: false,
                     }));
                 }
@@ -446,6 +459,7 @@ impl App {
                         anim: archive.anim.take(),
                         build: None,
                         decoded_textures: HashMap::new(),
+                        tex_meta: Vec::new(),
                         is_pending_atlas: false,
                     }));
                 }
@@ -491,11 +505,11 @@ impl App {
             _ => {}
         }
 
-        let decoded = if archive.tex_sources.iter().any(|s| !s.tex_files.is_empty()) {
+        let (decoded, tex_meta) = if archive.tex_sources.iter().any(|s| !s.tex_files.is_empty()) {
             let all_tex = archive.tex_files();
-            Self::decode_tex_files(all_tex)
+            Self::decode_tex_files_with_meta(all_tex)
         } else {
-            HashMap::new()
+            (HashMap::new(), Vec::new())
         };
 
         let mut build = archive.build.take();
@@ -514,6 +528,7 @@ impl App {
             anim: archive.anim.take(),
             build,
             decoded_textures: decoded,
+            tex_meta,
             is_pending_atlas,
         }))
     }
@@ -533,6 +548,7 @@ impl App {
             self.atlas_entries.push(Some(AtlasEntry {
                 source_name: data.source_name.clone(),
                 decoded: data.decoded_textures,
+                tex_meta: data.tex_meta,
             }));
             self.builds.push(BuildEntry {
                 build: None,
@@ -561,6 +577,7 @@ impl App {
             self.atlas_entries.push(Some(AtlasEntry {
                 source_name: data.source_name.clone(),
                 decoded: data.decoded_textures,
+                tex_meta: data.tex_meta,
             }));
 
             if let Some(build) = data.build {

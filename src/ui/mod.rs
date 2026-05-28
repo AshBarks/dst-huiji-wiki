@@ -13,6 +13,20 @@ use export::{BackgroundGifExport, BackgroundPngExport, GifExportResult, PngExpor
 use crate::archive::{parse_dyn, parse_zip};
 use crate::atlas::gather_atlas_images;
 use crate::render::BoundingBox;
+use crate::specs::PixelFormat;
+
+pub(super) struct TexMeta {
+    name: String,
+    width: u16,
+    height: u16,
+    pixel_format: PixelFormat,
+}
+
+pub(super) struct AtlasEntry {
+    source_name: String,
+    decoded: std::collections::HashMap<String, Arc<image::RgbaImage>>,
+    tex_meta: Vec<TexMeta>,
+}
 
 struct AnimEntry {
     anim: crate::anim::AnimFile,
@@ -26,11 +40,6 @@ pub struct BuildEntry {
     pub source_name: String,
     pub assigned_atlas: Option<usize>,
     pub disabled_symbols: std::collections::HashSet<String>,
-}
-
-struct AtlasEntry {
-    source_name: String,
-    decoded: std::collections::HashMap<String, Arc<image::RgbaImage>>,
 }
 
 pub struct App {
@@ -125,7 +134,7 @@ impl App {
         }
 
         let all_tex_files = archive.tex_files();
-        let decoded = Self::decode_tex_files(all_tex_files);
+        let (decoded, tex_meta) = Self::decode_tex_files_with_meta(all_tex_files);
         let atlas_idx = self.atlas_entries.len();
         self.atlas_entries.push(Some(AtlasEntry {
             source_name: path
@@ -134,6 +143,7 @@ impl App {
                 .unwrap_or("unknown")
                 .to_string(),
             decoded,
+            tex_meta,
         }));
 
         self.loaded_paths.insert(canonical);

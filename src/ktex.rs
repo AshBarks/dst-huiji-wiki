@@ -28,13 +28,6 @@ pub struct Ktex {
     pub pre_multiply_alpha: bool,
 }
 
-#[derive(Debug, Clone)]
-pub struct RgbaImage {
-    pub width: u32,
-    pub height: u32,
-    pub data: Vec<u8>,
-}
-
 fn decode_spec(spec_data: u32) -> Result<KtexHeader> {
     let spec = detect_spec(spec_data);
     let platform_val =
@@ -54,13 +47,9 @@ fn decode_spec(spec_data: u32) -> Result<KtexHeader> {
         };
 
     Ok(KtexHeader {
-        platform: Platform::try_from(platform_val)
-            .map_err(|_| Error::UnknownFormat(format!("unknown platform: {platform_val}")))?,
-        pixel_format: PixelFormat::try_from(pixel_format_val)
-            .map_err(|_| Error::UnsupportedPixelFormat(PixelFormat::UNKNOWN))?,
-        texture_type: TextureType::try_from(texture_type_val).map_err(|_| {
-            Error::UnknownFormat(format!("unknown texture type: {texture_type_val}"))
-        })?,
+        platform: Platform::try_from(platform_val)?,
+        pixel_format: PixelFormat::try_from(pixel_format_val)?,
+        texture_type: TextureType::try_from(texture_type_val)?,
         mipmap_count,
         flags,
         fill,
@@ -219,7 +208,12 @@ fn decode_dxt1(data: &[u8], width: u16, height: u16) -> Vec<u8> {
     pixels
 }
 
-fn decode_dxt3(data: &[u8], width: u16, height: u16) -> Vec<u8> {
+fn decode_dxt_with_alpha(
+    data: &[u8],
+    width: u16,
+    height: u16,
+    extract_alpha: impl Fn(&[u8]) -> [u8; 16],
+) -> Vec<u8> {
     let w = width as usize;
     let h = height as usize;
     let blocks_x = w.div_ceil(4);
@@ -234,16 +228,7 @@ fn decode_dxt3(data: &[u8], width: u16, height: u16) -> Vec<u8> {
             }
             let block = &data[block_idx..block_idx + 16];
 
-            let mut alpha = [0u8; 16];
-            for i in 0..4 {
-                let a0 = block[i * 2];
-                let a1 = block[i * 2 + 1];
-                alpha[i * 4] = (a0 & 0x0F) * 17;
-                alpha[i * 4 + 1] = ((a0 >> 4) & 0x0F) * 17;
-                alpha[i * 4 + 2] = (a1 & 0x0F) * 17;
-                alpha[i * 4 + 3] = ((a1 >> 4) & 0x0F) * 17;
-            }
-
+            let alpha = extract_alpha(block);
             let color_block = &block[8..16];
             let decoded = decode_dxt1_color_block(color_block, false);
 
@@ -285,96 +270,60 @@ fn decode_dxt3(data: &[u8], width: u16, height: u16) -> Vec<u8> {
     pixels
 }
 
-fn decode_dxt5(data: &[u8], width: u16, height: u16) -> Vec<u8> {
-    let w = width as usize;
-    let h = height as usize;
-    let blocks_x = w.div_ceil(4);
-    let blocks_y = h.div_ceil(4);
-    let mut pixels = vec![0u8; w * h * 4];
-
-    for by in 0..blocks_y {
-        for bx in 0..blocks_x {
-            let block_idx = (by * blocks_x + bx) * 16;
-            if block_idx + 16 > data.len() {
-                break;
-            }
-            let block = &data[block_idx..block_idx + 16];
-
-            let a0 = block[0];
-            let a1 = block[1];
-            let mut alpha = [0u16; 8];
-            if a0 > a1 {
-                alpha[0] = a0 as u16;
-                alpha[1] = a1 as u16;
-                alpha[2] = (6 * a0 as u16 + a1 as u16) / 7;
-                alpha[3] = (5 * a0 as u16 + 2 * a1 as u16) / 7;
-                alpha[4] = (4 * a0 as u16 + 3 * a1 as u16) / 7;
-                alpha[5] = (3 * a0 as u16 + 4 * a1 as u16) / 7;
-                alpha[6] = (2 * a0 as u16 + 5 * a1 as u16) / 7;
-                alpha[7] = (a0 as u16 + 6 * a1 as u16) / 7;
-            } else {
-                alpha[0] = a0 as u16;
-                alpha[1] = a1 as u16;
-                alpha[2] = (4 * a0 as u16 + a1 as u16) / 5;
-                alpha[3] = (3 * a0 as u16 + 2 * a1 as u16) / 5;
-                alpha[4] = (2 * a0 as u16 + 3 * a1 as u16) / 5;
-                alpha[5] = (a0 as u16 + 4 * a1 as u16) / 5;
-                alpha[6] = 0;
-                alpha[7] = 255;
-            }
-
-            let alpha_indices = (block[2] as u64)
-                | ((block[3] as u64) << 8)
-                | ((block[4] as u64) << 16)
-                | ((block[5] as u64) << 24)
-                | ((block[6] as u64) << 32)
-                | ((block[7] as u64) << 40);
-
-            let mut pixel_alpha = [0u8; 16];
-            for (i, pa) in pixel_alpha.iter_mut().enumerate() {
-                let idx = ((alpha_indices >> (i * 3)) & 7) as usize;
-                *pa = alpha[idx] as u8;
-            }
-
-            let color_block = &block[8..16];
-            let decoded = decode_dxt1_color_block(color_block, false);
-
-            let full_block = (bx + 1) * 4 <= w && (by + 1) * 4 <= h;
-            if full_block {
-                let base_x = bx * 4;
-                let base_y = by * 4;
-                for dy in 0..4usize {
-                    let dst = ((base_y + dy) * w + base_x) * 4;
-                    let row = dy * 4;
-                    pixels[dst..dst + 4].copy_from_slice(&decoded[row]);
-                    pixels[dst + 4..dst + 8].copy_from_slice(&decoded[row + 1]);
-                    pixels[dst + 8..dst + 12].copy_from_slice(&decoded[row + 2]);
-                    pixels[dst + 12..dst + 16].copy_from_slice(&decoded[row + 3]);
-                    let a_off = dy * 4;
-                    pixels[dst + 3] = pixel_alpha[a_off];
-                    pixels[dst + 7] = pixel_alpha[a_off + 1];
-                    pixels[dst + 11] = pixel_alpha[a_off + 2];
-                    pixels[dst + 15] = pixel_alpha[a_off + 3];
-                }
-            } else {
-                for dy in 0..4usize {
-                    for dx in 0..4usize {
-                        let px = bx * 4 + dx;
-                        let py = by * 4 + dy;
-                        if px < w && py < h {
-                            let dst = (py * w + px) * 4;
-                            let c = decoded[dy * 4 + dx];
-                            pixels[dst] = c[0];
-                            pixels[dst + 1] = c[1];
-                            pixels[dst + 2] = c[2];
-                            pixels[dst + 3] = pixel_alpha[dy * 4 + dx];
-                        }
-                    }
-                }
-            }
+fn decode_dxt3(data: &[u8], width: u16, height: u16) -> Vec<u8> {
+    decode_dxt_with_alpha(data, width, height, |block| {
+        let mut alpha = [0u8; 16];
+        for i in 0..4 {
+            let a0 = block[i * 2];
+            let a1 = block[i * 2 + 1];
+            alpha[i * 4] = (a0 & 0x0F) * 17;
+            alpha[i * 4 + 1] = ((a0 >> 4) & 0x0F) * 17;
+            alpha[i * 4 + 2] = (a1 & 0x0F) * 17;
+            alpha[i * 4 + 3] = ((a1 >> 4) & 0x0F) * 17;
         }
-    }
-    pixels
+        alpha
+    })
+}
+
+fn decode_dxt5(data: &[u8], width: u16, height: u16) -> Vec<u8> {
+    decode_dxt_with_alpha(data, width, height, |block| {
+        let a0 = block[0];
+        let a1 = block[1];
+        let mut alpha_table = [0u16; 8];
+        if a0 > a1 {
+            alpha_table[0] = a0 as u16;
+            alpha_table[1] = a1 as u16;
+            alpha_table[2] = (6 * a0 as u16 + a1 as u16) / 7;
+            alpha_table[3] = (5 * a0 as u16 + 2 * a1 as u16) / 7;
+            alpha_table[4] = (4 * a0 as u16 + 3 * a1 as u16) / 7;
+            alpha_table[5] = (3 * a0 as u16 + 4 * a1 as u16) / 7;
+            alpha_table[6] = (2 * a0 as u16 + 5 * a1 as u16) / 7;
+            alpha_table[7] = (a0 as u16 + 6 * a1 as u16) / 7;
+        } else {
+            alpha_table[0] = a0 as u16;
+            alpha_table[1] = a1 as u16;
+            alpha_table[2] = (4 * a0 as u16 + a1 as u16) / 5;
+            alpha_table[3] = (3 * a0 as u16 + 2 * a1 as u16) / 5;
+            alpha_table[4] = (2 * a0 as u16 + 3 * a1 as u16) / 5;
+            alpha_table[5] = (a0 as u16 + 4 * a1 as u16) / 5;
+            alpha_table[6] = 0;
+            alpha_table[7] = 255;
+        }
+
+        let alpha_indices = (block[2] as u64)
+            | ((block[3] as u64) << 8)
+            | ((block[4] as u64) << 16)
+            | ((block[5] as u64) << 24)
+            | ((block[6] as u64) << 32)
+            | ((block[7] as u64) << 40);
+
+        let mut alpha = [0u8; 16];
+        for (i, pa) in alpha.iter_mut().enumerate() {
+            let idx = ((alpha_indices >> (i * 3)) & 7) as usize;
+            *pa = alpha_table[idx] as u8;
+        }
+        alpha
+    })
 }
 
 fn decode_rgba(data: &[u8], width: u16, height: u16) -> Vec<u8> {
@@ -437,9 +386,9 @@ fn flip_y(pixels: &mut [u8], width: usize, height: usize) {
 }
 
 impl Ktex {
-    pub fn to_image(&self) -> Result<RgbaImage> {
+    pub fn to_image_rgba(&self) -> Result<image::RgbaImage> {
         if self.mipmaps.is_empty() {
-            return Err(Error::UnknownFormat("no mipmaps".to_string()));
+            return Err(Error::MissingData("mipmaps".to_string()));
         }
         let mipmap = &self.mipmaps[0];
         let width = mipmap.width;
@@ -461,17 +410,8 @@ impl Ktex {
 
         flip_y(&mut pixels, width as usize, height as usize);
 
-        Ok(RgbaImage {
-            width: width as u32,
-            height: height as u32,
-            data: pixels,
-        })
-    }
-
-    pub fn to_image_rgba(&self) -> Result<image::RgbaImage> {
-        let img = self.to_image()?;
-        image::RgbaImage::from_raw(img.width, img.height, img.data)
-            .ok_or_else(|| Error::UnknownFormat("decoded pixel data size mismatch".to_string()))
+        image::RgbaImage::from_raw(width as u32, height as u32, pixels)
+            .ok_or_else(|| Error::Other("decoded pixel data size mismatch".to_string()))
     }
 }
 
@@ -611,10 +551,13 @@ mod tests {
                 assert!(m0.width > 0);
                 assert!(m0.height > 0);
                 assert!(!m0.block_data.is_empty());
-                let img = ktex.to_image().unwrap();
-                assert_eq!(img.width, m0.width as u32);
-                assert_eq!(img.height, m0.height as u32);
-                assert_eq!(img.data.len(), m0.width as usize * m0.height as usize * 4);
+                let img = ktex.to_image_rgba().unwrap();
+                assert_eq!(img.width(), m0.width as u32);
+                assert_eq!(img.height(), m0.height as u32);
+                assert_eq!(
+                    img.as_raw().len(),
+                    m0.width as usize * m0.height as usize * 4
+                );
                 return;
             }
         }

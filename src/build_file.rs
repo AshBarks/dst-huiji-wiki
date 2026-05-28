@@ -22,8 +22,6 @@ pub struct BuildAtlasRef {
 #[derive(Clone)]
 pub struct BuildFrame {
     pub frame_num: u32,
-    #[allow(dead_code)]
-    pub duration: u32,
     pub x: f32,
     pub y: f32,
     pub width: f32,
@@ -42,6 +40,7 @@ impl BuildFrame {
 pub struct BuildSymbol {
     pub name: String,
     pub frames: Vec<BuildFrame>,
+    pub frame_index: HashMap<u32, usize>,
 }
 
 #[derive(Clone)]
@@ -132,7 +131,7 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
         let mut frames = Vec::with_capacity(frame_count as usize);
         for _ in 0..frame_count {
             let frame_num = reader.read_le_u32()?;
-            let duration = reader.read_le_u32()?;
+            let _duration = reader.read_le_u32()?;
             let pivot_x = reader.read_le_f32()?;
             let pivot_y = reader.read_le_f32()?;
             let width = reader.read_le_f32()?;
@@ -158,7 +157,6 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
                 .collect();
             frames.push(BuildFrame {
                 frame_num,
-                duration,
                 x: pivot_x,
                 y: pivot_y,
                 width,
@@ -168,9 +166,15 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
             });
         }
         frames.sort_by_key(|f| f.frame_num);
+        let frame_index: HashMap<u32, usize> = frames
+            .iter()
+            .enumerate()
+            .map(|(i, f)| (f.frame_num, i))
+            .collect();
         symbols.push(BuildSymbol {
             name: symbol_name,
             frames,
+            frame_index,
         });
     }
 

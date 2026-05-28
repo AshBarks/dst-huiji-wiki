@@ -13,7 +13,7 @@ pub enum Platform {
 }
 
 impl TryFrom<u32> for Platform {
-    type Error = ();
+    type Error = crate::error::Error;
 
     fn try_from(v: u32) -> std::result::Result<Self, Self::Error> {
         match v {
@@ -21,7 +21,10 @@ impl TryFrom<u32> for Platform {
             10 => Ok(Platform::PS3),
             11 => Ok(Platform::Xbox360),
             12 => Ok(Platform::PC),
-            _ => Err(()),
+            _ => Err(crate::error::Error::InvalidValue {
+                typ: "platform",
+                value: v,
+            }),
         }
     }
 }
@@ -38,7 +41,7 @@ pub enum PixelFormat {
 }
 
 impl TryFrom<u32> for PixelFormat {
-    type Error = ();
+    type Error = crate::error::Error;
 
     fn try_from(v: u32) -> std::result::Result<Self, Self::Error> {
         match v {
@@ -48,7 +51,10 @@ impl TryFrom<u32> for PixelFormat {
             4 => Ok(PixelFormat::RGBA),
             5 => Ok(PixelFormat::RGB),
             7 => Ok(PixelFormat::UNKNOWN),
-            _ => Err(()),
+            _ => Err(crate::error::Error::InvalidValue {
+                typ: "pixel_format",
+                value: v,
+            }),
         }
     }
 }
@@ -62,7 +68,7 @@ pub enum TextureType {
 }
 
 impl TryFrom<u32> for TextureType {
-    type Error = ();
+    type Error = crate::error::Error;
 
     fn try_from(v: u32) -> std::result::Result<Self, Self::Error> {
         match v {
@@ -70,7 +76,10 @@ impl TryFrom<u32> for TextureType {
             1 => Ok(TextureType::TwoD),
             2 => Ok(TextureType::ThreeD),
             3 => Ok(TextureType::CubeMapped),
-            _ => Err(()),
+            _ => Err(crate::error::Error::InvalidValue {
+                typ: "texture_type",
+                value: v,
+            }),
         }
     }
 }

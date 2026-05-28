@@ -18,18 +18,8 @@ impl<'a> Reader<'a> {
         self.pos = pos;
     }
 
-    #[allow(dead_code)]
-    pub fn len(&self) -> usize {
-        self.data.len()
-    }
-
     pub fn remaining(&self) -> usize {
         self.data.len().saturating_sub(self.pos)
-    }
-
-    #[allow(dead_code)]
-    pub fn is_empty(&self) -> bool {
-        self.data.is_empty()
     }
 
     fn check_bounds(&self, offset: usize, size: usize) -> Result<()> {
@@ -125,12 +115,6 @@ impl<'a> Reader<'a> {
         Ok(slice)
     }
 
-    #[allow(dead_code)]
-    pub fn read_bytes_remaining(&mut self) -> Result<&'a [u8]> {
-        let len = self.remaining();
-        self.read_bytes(len)
-    }
-
     pub fn read_string(&mut self, len: usize) -> Result<String> {
         self.read_string_at(self.pos, len)
     }
@@ -138,7 +122,7 @@ impl<'a> Reader<'a> {
     pub fn read_string_at(&mut self, offset: usize, len: usize) -> Result<String> {
         let bytes = self.read_bytes_at(offset, len)?;
         String::from_utf8(bytes.to_vec())
-            .map_err(|e| Error::UnknownFormat(format!("invalid ascii string: {e}")))
+            .map_err(|e| Error::Other(format!("invalid ascii string: {e}")))
     }
 }
 
@@ -230,14 +214,5 @@ mod tests {
         let mut r = Reader::new(data);
         let err = r.read_le_u32().unwrap_err();
         assert!(matches!(err, Error::OutOfBounds { pos: 0, len: 2 }));
-    }
-
-    #[test]
-    fn read_bytes_remaining() {
-        let data: &[u8] = &[0x01, 0x02, 0x03, 0x04];
-        let mut r = Reader::new(data);
-        r.seek(2);
-        let bytes = r.read_bytes_remaining().unwrap();
-        assert_eq!(bytes, [0x03, 0x04]);
     }
 }

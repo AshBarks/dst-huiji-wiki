@@ -10,10 +10,8 @@ pub struct BoundingBox {
 }
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub struct RenderedFrame {
     pub image: image::RgbaImage,
-    pub bounds: BoundingBox,
 }
 
 fn find_symbol_frame<'a>(
@@ -24,12 +22,9 @@ fn find_symbol_frame<'a>(
     for build in build_list {
         if let Some(&sym_idx) = build.symbol_index.get(symbol_name_lower)
             && let Some(symbol) = build.symbols.get(sym_idx)
+            && let Some(&fi) = symbol.frame_index.get(&frame_num)
         {
-            for frame in &symbol.frames {
-                if frame.frame_num == frame_num {
-                    return Some(frame);
-                }
-            }
+            return Some(&symbol.frames[fi]);
         }
     }
     None
@@ -352,10 +347,7 @@ pub fn render_frame_with_elements(
         }
     }
 
-    Some(RenderedFrame {
-        image: canvas,
-        bounds: bounds.clone(),
-    })
+    Some(RenderedFrame { image: canvas })
 }
 
 pub fn render_frame(
@@ -387,7 +379,7 @@ mod tests {
 
         let atlas_images = decode_atlas_images_from_tex(
             &archive.build.as_ref().unwrap().atlases,
-            &archive.tex_files(),
+            archive.tex_files(),
         );
         split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
 

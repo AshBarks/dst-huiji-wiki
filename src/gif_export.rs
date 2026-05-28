@@ -18,8 +18,8 @@ pub fn export_gif_with_bg(
     bg: [u8; 3],
 ) -> Result<()> {
     if frames.is_empty() {
-        return Err(crate::error::Error::UnknownFormat(
-            "no frames to export".to_string(),
+        return Err(crate::error::Error::MissingData(
+            "frames to export".to_string(),
         ));
     }
 
@@ -31,6 +31,8 @@ pub fn export_gif_with_bg(
 
     let mut encoder = gif::Encoder::new(output, width, height, &[])?;
     encoder.set_repeat(gif::Repeat::Infinite)?;
+
+    let mut quantize_ctx = QuantizeContext::new();
 
     for frame in frames {
         let mut pixels: Vec<u8> =
@@ -51,7 +53,7 @@ pub fn export_gif_with_bg(
             }
         }
 
-        let (palette, indices) = simple_quantize(&pixels, bg);
+        let (palette, indices) = quantize_ctx.quantize(&pixels, bg);
 
         let gif_frame = gif::Frame {
             width,
@@ -71,72 +73,84 @@ pub fn export_gif_with_bg(
 }
 
 const TRANSPARENT_ALPHA_THRESHOLD: u8 = 128;
+const COLOR_TABLE_SIZE: usize = 64 * 64 * 64;
 
-fn simple_quantize(rgba: &[u8], bg: [u8; 3]) -> (Vec<u8>, Vec<u8>) {
-    let sentinel = [0, 0, 2];
-    let mut palette = vec![sentinel[0], sentinel[1], sentinel[2]];
-    let mut palette_colors: Vec<[u8; 3]> = vec![sentinel];
+struct QuantizeContext {
+    color_table: Box<[u16; COLOR_TABLE_SIZE]>,
+}
 
-    const TABLE_SIZE: usize = 64 * 64 * 64;
-    let mut color_table = vec![0xFFFFu16; TABLE_SIZE];
-    let sq = (sentinel[0] >> 2) as usize;
-    let sg = (sentinel[1] >> 2) as usize;
-    let sb = (sentinel[2] >> 2) as usize;
-    color_table[sq * 64 * 64 + sg * 64 + sb] = 0;
-    let mut palette_len = 1usize;
+impl QuantizeContext {
+    fn new() -> Self {
+        Self {
+            color_table: Box::new([0xFFFFu16; COLOR_TABLE_SIZE]),
+        }
+    }
 
-    let mut indices = Vec::with_capacity(rgba.len() / 4);
+    fn quantize(&mut self, rgba: &[u8], bg: [u8; 3]) -> (Vec<u8>, Vec<u8>) {
+        let sentinel = [0, 0, 2];
+        let mut palette = vec![sentinel[0], sentinel[1], sentinel[2]];
+        let mut palette_colors: Vec<[u8; 3]> = vec![sentinel];
 
-    for chunk in rgba.chunks_exact(4) {
-        let a = chunk[3];
-        if a < TRANSPARENT_ALPHA_THRESHOLD {
-            indices.push(0);
-            continue;
+        self.color_table.fill(0xFFFF);
+        let sq = (sentinel[0] >> 2) as usize;
+        let sg = (sentinel[1] >> 2) as usize;
+        let sb = (sentinel[2] >> 2) as usize;
+        self.color_table[sq * 64 * 64 + sg * 64 + sb] = 0;
+        let mut palette_len = 1usize;
+
+        let mut indices = Vec::with_capacity(rgba.len() / 4);
+
+        for chunk in rgba.chunks_exact(4) {
+            let a = chunk[3];
+            if a < TRANSPARENT_ALPHA_THRESHOLD {
+                indices.push(0);
+                continue;
+            }
+
+            let (r, g, b) = if a < 255 {
+                let ia = 255 - a as u32;
+                let sa = a as u32;
+                (
+                    ((chunk[0] as u32 * sa + bg[0] as u32 * ia + 127) / 255) as u8,
+                    ((chunk[1] as u32 * sa + bg[1] as u32 * ia + 127) / 255) as u8,
+                    ((chunk[2] as u32 * sa + bg[2] as u32 * ia + 127) / 255) as u8,
+                )
+            } else {
+                (chunk[0], chunk[1], chunk[2])
+            };
+
+            let rq = (r >> 2) as usize;
+            let gq = (g >> 2) as usize;
+            let bq = (b >> 2) as usize;
+            let table_idx = rq * 64 * 64 + gq * 64 + bq;
+
+            let idx = match self.color_table[table_idx] {
+                0xFFFF => {
+                    let key = [r & 0xFC, g & 0xFC, b & 0xFC];
+                    if palette_len < 256 {
+                        let i = palette_len as u8;
+                        palette.push(key[0]);
+                        palette.push(key[1]);
+                        palette.push(key[2]);
+                        palette_colors.push(key);
+                        self.color_table[table_idx] = i as u16;
+                        palette_len += 1;
+                        i
+                    } else {
+                        nearest_palette_index(&palette_colors, &key)
+                    }
+                }
+                i => i as u8,
+            };
+            indices.push(idx);
         }
 
-        let (r, g, b) = if a < 255 {
-            let ia = 255 - a as u32;
-            let sa = a as u32;
-            (
-                ((chunk[0] as u32 * sa + bg[0] as u32 * ia + 127) / 255) as u8,
-                ((chunk[1] as u32 * sa + bg[1] as u32 * ia + 127) / 255) as u8,
-                ((chunk[2] as u32 * sa + bg[2] as u32 * ia + 127) / 255) as u8,
-            )
-        } else {
-            (chunk[0], chunk[1], chunk[2])
-        };
+        while palette.len() < 256 * 3 {
+            palette.push(0);
+        }
 
-        let rq = (r >> 2) as usize;
-        let gq = (g >> 2) as usize;
-        let bq = (b >> 2) as usize;
-        let table_idx = rq * 64 * 64 + gq * 64 + bq;
-
-        let idx = match color_table[table_idx] {
-            0xFFFF => {
-                let key = [r & 0xFC, g & 0xFC, b & 0xFC];
-                if palette_len < 256 {
-                    let i = palette_len as u8;
-                    palette.push(key[0]);
-                    palette.push(key[1]);
-                    palette.push(key[2]);
-                    palette_colors.push(key);
-                    color_table[table_idx] = i as u16;
-                    palette_len += 1;
-                    i
-                } else {
-                    nearest_palette_index(&palette_colors, &key)
-                }
-            }
-            i => i as u8,
-        };
-        indices.push(idx);
+        (palette, indices)
     }
-
-    while palette.len() < 256 * 3 {
-        palette.push(0);
-    }
-
-    (palette, indices)
 }
 
 fn nearest_palette_index(palette: &[[u8; 3]], color: &[u8; 3]) -> u8 {
@@ -157,8 +171,8 @@ fn nearest_palette_index(palette: &[[u8; 3]], color: &[u8; 3]) -> u8 {
 
 pub fn export_png_sequence(frames: &[image::RgbaImage], output_dir: &Path) -> Result<()> {
     if frames.is_empty() {
-        return Err(crate::error::Error::UnknownFormat(
-            "no frames to export".to_string(),
+        return Err(crate::error::Error::MissingData(
+            "frames to export".to_string(),
         ));
     }
     std::fs::create_dir_all(output_dir)?;
@@ -181,7 +195,7 @@ pub fn ffmpeg_gif_from_sequence(
 ) -> Result<()> {
     let has_ffmpeg = which::which("ffmpeg").is_ok();
     if !has_ffmpeg {
-        return Err(crate::error::Error::UnknownFormat(
+        return Err(crate::error::Error::Other(
             "ffmpeg not found in PATH".to_string(),
         ));
     }
@@ -209,7 +223,7 @@ pub fn ffmpeg_gif_from_sequence(
 
     if !palette_status.success() {
         let _ = std::fs::remove_file(&palette_path);
-        return Err(crate::error::Error::UnknownFormat(
+        return Err(crate::error::Error::Other(
             "ffmpeg palettegen failed".to_string(),
         ));
     }
@@ -235,7 +249,7 @@ pub fn ffmpeg_gif_from_sequence(
     let _ = std::fs::remove_file(&palette_path);
 
     if !gif_status.success() {
-        return Err(crate::error::Error::UnknownFormat(
+        return Err(crate::error::Error::Other(
             "ffmpeg gif encoding failed".to_string(),
         ));
     }
@@ -252,7 +266,8 @@ mod tests {
         let rgba: Vec<u8> = vec![
             255, 0, 0, 0, 0, 255, 0, 255, 0, 0, 255, 255, 128, 128, 128, 200,
         ];
-        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
+        let mut ctx = QuantizeContext::new();
+        let (_, indices) = ctx.quantize(&rgba, [255, 255, 255]);
         assert_eq!(indices[0], 0, "fully transparent pixel should be idx 0");
         assert_ne!(indices[1], 0, "opaque green pixel should not be idx 0");
         assert_ne!(indices[2], 0, "opaque blue pixel should not be idx 0");
@@ -262,7 +277,8 @@ mod tests {
     #[test]
     fn semi_transparent_below_threshold_is_transparent() {
         let rgba: Vec<u8> = vec![255, 0, 0, 50, 0, 255, 0, 127];
-        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
+        let mut ctx = QuantizeContext::new();
+        let (_, indices) = ctx.quantize(&rgba, [255, 255, 255]);
         assert_eq!(indices[0], 0);
         assert_eq!(indices[1], 0);
     }
@@ -270,7 +286,8 @@ mod tests {
     #[test]
     fn semi_transparent_at_threshold_is_opaque() {
         let rgba: Vec<u8> = vec![255, 0, 0, 128, 0, 255, 0, 200];
-        let (_, indices) = simple_quantize(&rgba, [255, 255, 255]);
+        let mut ctx = QuantizeContext::new();
+        let (_, indices) = ctx.quantize(&rgba, [255, 255, 255]);
         assert_ne!(indices[0], 0);
         assert_ne!(indices[1], 0);
     }

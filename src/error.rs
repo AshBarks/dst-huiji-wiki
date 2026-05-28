@@ -8,11 +8,20 @@ pub enum Error {
     #[error("read out of bounds: pos {pos}, len {len}")]
     OutOfBounds { pos: usize, len: usize },
 
-    #[error("unknown format: {0}")]
-    UnknownFormat(String),
+    #[error("missing companion file: {0}")]
+    MissingCompanion(String),
+
+    #[error("no {0} found in archive")]
+    MissingData(String),
 
     #[error("unsupported pixel format: {0:?}")]
     UnsupportedPixelFormat(PixelFormat),
+
+    #[error("invalid value for {typ}: {value}")]
+    InvalidValue { typ: &'static str, value: u32 },
+
+    #[error("{0}")]
+    Other(String),
 
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),

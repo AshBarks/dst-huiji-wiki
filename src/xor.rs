@@ -42,34 +42,9 @@ pub fn xor_decrypt(data: &[u8]) -> Vec<u8> {
     xor_process(data, false)
 }
 
-#[allow(dead_code)]
-pub fn xor_encrypt(data: &[u8]) -> Vec<u8> {
-    if data.len() < 16 {
-        return data.to_vec();
-    }
-    xor_process(data, true)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn xor_roundtrip() {
-        let original = vec![0u8; 32];
-        let encrypted = xor_encrypt(&original);
-        assert_ne!(encrypted, original);
-        let decrypted = xor_decrypt(&encrypted);
-        assert_eq!(decrypted, original);
-    }
-
-    #[test]
-    fn xor_roundtrip_random() {
-        let original: Vec<u8> = (0..100).map(|i| (i * 7 + 13) as u8).collect();
-        let encrypted = xor_encrypt(&original);
-        let decrypted = xor_decrypt(&encrypted);
-        assert_eq!(decrypted, original);
-    }
 
     #[test]
     fn pk_detection() {

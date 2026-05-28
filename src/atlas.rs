@@ -177,7 +177,7 @@ mod tests {
 
         let atlas_images = decode_atlas_images_from_tex(
             &archive.build.as_ref().unwrap().atlases,
-            &archive.tex_files(),
+            archive.tex_files(),
         );
 
         split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();

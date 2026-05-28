@@ -1,3 +1,4 @@
+use std::cell::OnceCell;
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::Path;
@@ -20,17 +21,20 @@ pub struct ParsedArchive {
     pub build: Option<BuildFile>,
     pub tex_sources: Vec<TexSource>,
     pub raw_files: HashMap<String, Arc<Vec<u8>>>,
+    merged_tex_cache: OnceCell<HashMap<String, Arc<Vec<u8>>>>,
 }
 
 impl ParsedArchive {
-    pub fn tex_files(&self) -> HashMap<String, Arc<Vec<u8>>> {
-        let mut merged = HashMap::new();
-        for source in &self.tex_sources {
-            for (k, v) in &source.tex_files {
-                merged.insert(k.clone(), v.clone());
+    pub fn tex_files(&self) -> &HashMap<String, Arc<Vec<u8>>> {
+        self.merged_tex_cache.get_or_init(|| {
+            let mut merged = HashMap::new();
+            for source in &self.tex_sources {
+                for (k, v) in &source.tex_files {
+                    merged.insert(k.clone(), v.clone());
+                }
             }
-        }
-        merged
+            merged
+        })
     }
 
     pub fn merge(&mut self, other: ParsedArchive) {
@@ -46,6 +50,7 @@ impl ParsedArchive {
         for (k, v) in other.raw_files {
             self.raw_files.insert(k, v);
         }
+        self.merged_tex_cache = OnceCell::new();
     }
 }
 
@@ -66,6 +71,7 @@ pub fn parse_anim_bin(data: &[u8]) -> Result<ParsedArchive> {
         build: None,
         tex_sources: Vec::new(),
         raw_files: HashMap::new(),
+        merged_tex_cache: OnceCell::new(),
     })
 }
 
@@ -76,6 +82,7 @@ pub fn parse_build_bin(data: &[u8]) -> Result<ParsedArchive> {
         build: Some(build),
         tex_sources: Vec::new(),
         raw_files: HashMap::new(),
+        merged_tex_cache: OnceCell::new(),
     })
 }
 
@@ -113,19 +120,17 @@ pub fn parse_file_by_path(path: &Path, data: &[u8]) -> Result<ParsedArchive> {
         "bin" => match detect_bin_type(data) {
             BinType::Anim => parse_anim_bin(data),
             BinType::Build => parse_build_bin(data),
-            BinType::Unknown => Err(Error::UnknownFormat(
+            BinType::Unknown => Err(Error::Other(
                 "unknown .bin magic, expected ANIM or BILD".to_string(),
             )),
         },
-        _ => Err(Error::UnknownFormat(format!(
-            "unsupported file extension: .{ext}"
-        ))),
+        _ => Err(Error::Other(format!("unsupported file extension: .{ext}"))),
     }
 }
 
 pub fn load_archives(paths: &[std::path::PathBuf]) -> Result<ParsedArchive> {
     if paths.is_empty() {
-        return Err(Error::UnknownFormat("no input files".to_string()));
+        return Err(Error::Other("no input files".to_string()));
     }
 
     let first_data = std::fs::read(&paths[0])?;
@@ -198,6 +203,7 @@ fn parse_zip_archive(
         build,
         tex_sources,
         raw_files,
+        merged_tex_cache: OnceCell::new(),
     })
 }
 

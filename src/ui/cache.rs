@@ -86,12 +86,17 @@ impl App {
         self.needs_re_render = true;
     }
 
-    pub fn collect_build_list(&self) -> Vec<&crate::build_file::BuildFile> {
+    pub fn collect_build_list(&self) -> Vec<crate::render::BuildRef<'_>> {
         self.builds
             .iter()
             .rev()
             .filter(|e| e.enabled && e.build.is_some() && e.assigned_atlas.is_some())
-            .filter_map(|e| e.build.as_ref())
+            .filter_map(|e| {
+                e.build.as_ref().map(|b| crate::render::BuildRef {
+                    build: b,
+                    disabled_symbols: &e.disabled_symbols,
+                })
+            })
             .collect()
     }
 
@@ -518,6 +523,7 @@ impl App {
                 enabled: true,
                 source_name: data.source_name,
                 assigned_atlas: Some(atlas_idx),
+                disabled_symbols: std::collections::HashSet::new(),
             });
             return;
         }
@@ -547,8 +553,8 @@ impl App {
                     enabled: true,
                     source_name: data.source_name,
                     assigned_atlas: Some(atlas_idx),
+                    disabled_symbols: std::collections::HashSet::new(),
                 });
-                self.selected_build_idx = Some(self.builds.len() - 1);
                 self.cache_dirty = true;
                 self.needs_re_render = true;
             }
@@ -558,8 +564,8 @@ impl App {
                 enabled: true,
                 source_name: data.source_name,
                 assigned_atlas: None,
+                disabled_symbols: std::collections::HashSet::new(),
             });
-            self.selected_build_idx = Some(self.builds.len() - 1);
         }
     }
 

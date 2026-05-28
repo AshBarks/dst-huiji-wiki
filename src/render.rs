@@ -1,5 +1,12 @@
+use std::collections::HashSet;
+
 use crate::anim::AnimFrame;
 use crate::build_file::BuildFile;
+
+pub struct BuildRef<'a> {
+    pub build: &'a BuildFile,
+    pub disabled_symbols: &'a HashSet<String>,
+}
 
 #[derive(Debug, Clone)]
 pub struct BoundingBox {
@@ -15,13 +22,16 @@ pub struct RenderedFrame {
 }
 
 fn find_symbol_frame<'a>(
-    build_list: &[&'a BuildFile],
+    build_list: &[BuildRef<'a>],
     symbol_name_lower: &str,
     frame_num: u32,
 ) -> Option<&'a crate::build_file::BuildFrame> {
-    for build in build_list {
-        if let Some(&sym_idx) = build.symbol_index.get(symbol_name_lower)
-            && let Some(symbol) = build.symbols.get(sym_idx)
+    for br in build_list {
+        if br.disabled_symbols.contains(symbol_name_lower) {
+            continue;
+        }
+        if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower)
+            && let Some(symbol) = br.build.symbols.get(sym_idx)
             && let Some(&fi) = symbol.frame_index.get(&frame_num)
         {
             return Some(&symbol.frames[fi]);
@@ -44,7 +54,7 @@ pub struct ElementData {
 
 pub fn compute_frame_elements(
     anim_frame: &AnimFrame,
-    build_list: &[&BuildFile],
+    build_list: &[BuildRef<'_>],
     scale: f32,
 ) -> Option<Vec<ElementData>> {
     let mut elements_data: Vec<ElementData> = Vec::new();
@@ -122,7 +132,7 @@ pub struct PreparedFrame {
 
 pub fn prepare_animation_frames(
     frames: &[AnimFrame],
-    build_list: &[&BuildFile],
+    build_list: &[BuildRef<'_>],
     scale: f32,
     offset: (f32, f32),
 ) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
@@ -162,7 +172,7 @@ pub fn prepare_animation_frames(
 
 pub fn compute_animation_bounds(
     frames: &[AnimFrame],
-    build_list: &[&BuildFile],
+    build_list: &[BuildRef<'_>],
     scale: f32,
     offset: (f32, f32),
 ) -> Option<BoundingBox> {
@@ -352,7 +362,7 @@ pub fn render_frame_with_elements(
 
 pub fn render_frame(
     anim_frame: &AnimFrame,
-    build_list: &[&BuildFile],
+    build_list: &[BuildRef<'_>],
     scale: f32,
     offset: (f32, f32),
     bounds_override: Option<&BoundingBox>,
@@ -386,7 +396,11 @@ mod tests {
         let anim = archive.anim.as_ref().unwrap();
         assert!(!anim.banks.is_empty());
 
-        let build_list: Vec<&BuildFile> = vec![archive.build.as_ref().unwrap()];
+        let empty = HashSet::new();
+        let build_list: Vec<BuildRef<'_>> = vec![BuildRef {
+            build: archive.build.as_ref().unwrap(),
+            disabled_symbols: &empty,
+        }];
         let bank = &anim.banks[0];
         assert!(!bank.animations.is_empty());
 

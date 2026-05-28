@@ -194,19 +194,12 @@ impl App {
             return;
         }
 
-        let build_summaries: Vec<(bool, String, Option<usize>, bool)> = self
+        let build_summaries: Vec<(String, Option<usize>, bool)> = self
             .builds
             .iter()
-            .enumerate()
-            .map(|(idx, entry)| {
-                let is_selected = self.selected_build_idx == Some(idx);
+            .map(|entry| {
                 let has_build = entry.build.is_some();
-                (
-                    is_selected,
-                    entry.source_name.clone(),
-                    entry.assigned_atlas,
-                    has_build,
-                )
+                (entry.source_name.clone(), entry.assigned_atlas, has_build)
             })
             .collect();
 
@@ -214,14 +207,12 @@ impl App {
         let mut new_enabled: Vec<(usize, bool)> = Vec::new();
         let mut swap_actions: Vec<(usize, usize)> = Vec::new();
         let mut remove_indices: Vec<usize> = Vec::new();
-        let mut select_idx: Option<usize> = None;
+        let mut symbol_toggles: Vec<(usize, String, bool)> = Vec::new();
         let mut browse_dyn: Option<usize> = None;
         let mut browse_zip: Option<usize> = None;
         let mut need_re_render = false;
 
-        for (idx, (is_selected, source_name, assigned, has_build)) in
-            build_summaries.iter().enumerate()
-        {
+        for (idx, (source_name, assigned, has_build)) in build_summaries.iter().enumerate() {
             let atlas_name = assigned
                 .and_then(|ai| self.atlas_entries.get(ai).and_then(|e| e.as_ref()))
                 .map(|a| a.source_name.clone())
@@ -241,8 +232,6 @@ impl App {
 
             let header_color = if !has_build || assigned.is_none() {
                 egui::Color32::YELLOW
-            } else if *is_selected {
-                egui::Color32::from_rgb(100, 180, 255)
             } else {
                 egui::Color32::PLACEHOLDER
             };
@@ -333,20 +322,25 @@ impl App {
                             .default_open(false)
                             .show(ui, |ui| {
                                 for symbol in &build.symbols {
-                                    ui.label(
-                                        egui::RichText::new(format!(
-                                            "{}  ({} frames)",
-                                            symbol.name,
-                                            symbol.frames.len(),
-                                        ))
-                                        .small(),
-                                    );
+                                    let key = symbol.name.to_lowercase();
+                                    let is_enabled =
+                                        !self.builds[idx].disabled_symbols.contains(&key);
+                                    let mut toggle = is_enabled;
+                                    if ui
+                                        .checkbox(
+                                            &mut toggle,
+                                            format!(
+                                                "{} ({} frames)",
+                                                symbol.name,
+                                                symbol.frames.len()
+                                            ),
+                                        )
+                                        .changed()
+                                    {
+                                        symbol_toggles.push((idx, key, toggle));
+                                    }
                                 }
                             });
-                        }
-
-                        if ui.small_button("Select").clicked() {
-                            select_idx = Some(idx);
                         }
                     }
                 });
@@ -359,13 +353,14 @@ impl App {
         for (a, b) in swap_actions {
             self.builds.swap(a, b);
             need_re_render = true;
-            if let Some(sel) = self.selected_build_idx {
-                if sel == a {
-                    self.selected_build_idx = Some(b);
-                } else if sel == b {
-                    self.selected_build_idx = Some(a);
-                }
+        }
+        for (idx, key, enabled) in symbol_toggles {
+            if enabled {
+                self.builds[idx].disabled_symbols.remove(&key);
+            } else {
+                self.builds[idx].disabled_symbols.insert(key);
             }
+            need_re_render = true;
         }
         remove_indices.sort();
         remove_indices.reverse();
@@ -384,16 +379,6 @@ impl App {
             }
             self.builds.remove(idx);
             need_re_render = true;
-            if let Some(sel) = self.selected_build_idx {
-                if sel == idx {
-                    self.selected_build_idx = None;
-                } else if sel > idx {
-                    self.selected_build_idx = Some(sel - 1);
-                }
-            }
-        }
-        if let Some(idx) = select_idx {
-            self.selected_build_idx = Some(idx);
         }
 
         if let Some(build_idx) = browse_dyn
@@ -429,7 +414,7 @@ impl App {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     self.show_anim_info(ui);
                     ui.separator();
-                    self.show_build_info(ui);
+                    self.show_symbol_dependencies(ui);
                 });
             });
     }
@@ -523,73 +508,118 @@ impl App {
         }
     }
 
-    pub fn show_build_info(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Build Info");
-        let Some(idx) = self.selected_build_idx else {
-            ui.label("No build selected");
+    pub fn show_symbol_dependencies(&mut self, ui: &mut egui::Ui) {
+        ui.heading("Symbol Dependencies");
+
+        let Some(anim_entry) = self.anims.get(self.active_anim_idx) else {
+            ui.label("No animation loaded");
             return;
         };
-        let Some(entry) = self.builds.get(idx) else {
-            ui.label("Build not found");
+        if !anim_entry.enabled {
+            ui.label("Animation disabled");
+            return;
+        }
+
+        let anim = &anim_entry.anim;
+        let Some(bank) = anim.banks.get(self.active_bank_idx) else {
+            ui.label("No bank selected");
+            return;
+        };
+        let Some(animation) = bank.animations.get(self.active_anim_inner_idx) else {
+            ui.label("No animation selected");
             return;
         };
 
-        ui.label(egui::RichText::new("Source").strong());
-        ui.label(format!("  {}", entry.source_name));
+        let mut symbol_names: std::collections::BTreeSet<String> =
+            std::collections::BTreeSet::new();
+        for frame in &animation.frames {
+            for elem in &frame.elements {
+                symbol_names.insert(elem.symbol_lower.clone());
+            }
+        }
 
-        if let Some(build) = &entry.build {
-            ui.label(egui::RichText::new("Build").strong());
-            ui.label(format!("  Name: {}", build.name));
-            ui.label(format!("  Version: {}", build.version));
-            ui.label(format!("  Symbols: {}", build.symbols.len()));
+        if symbol_names.is_empty() {
+            ui.label("No symbols referenced");
+            return;
+        }
 
-            ui.label(egui::RichText::new("Atlas").strong());
-            if let Some(ai) = entry.assigned_atlas {
-                if let Some(Some(ae)) = self.atlas_entries.get(ai) {
-                    let atlas_name = build
-                        .atlases
-                        .first()
-                        .map(|a| a.name.as_str())
-                        .unwrap_or("?");
-                    ui.label(format!("  {} (from {})", atlas_name, ae.source_name));
-                } else {
-                    ui.label("  (invalid ref)");
+        let eligible_builds: Vec<(usize, &str, bool)> = self
+            .builds
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.enabled && e.build.is_some() && e.assigned_atlas.is_some())
+            .map(|(idx, e)| (idx, e.source_name.as_str(), false))
+            .collect();
+
+        for sym_lower in &symbol_names {
+            let mut winner_build_idx: Option<usize> = None;
+            let mut all_providers: Vec<(usize, &str)> = Vec::new();
+
+            for &(build_idx, source_name, _) in &eligible_builds {
+                let build = self.builds[build_idx].build.as_ref().unwrap();
+                if build.symbol_index.contains_key(sym_lower.as_str()) {
+                    all_providers.push((build_idx, source_name));
                 }
-            } else {
-                ui.label("  (none)");
             }
 
-            ui.add_space(2.0);
-            egui::CollapsingHeader::new(format!("Symbols ({})", build.symbols.len()))
-                .id_salt("build_info_symbols")
+            for &(build_idx, _, _) in eligible_builds.iter().rev() {
+                let entry = &self.builds[build_idx];
+                if entry.disabled_symbols.contains(sym_lower.as_str()) {
+                    continue;
+                }
+                let build = entry.build.as_ref().unwrap();
+                if build.symbol_index.contains_key(sym_lower.as_str()) {
+                    winner_build_idx = Some(build_idx);
+                    break;
+                }
+            }
+
+            egui::CollapsingHeader::new(sym_lower.as_str())
+                .id_salt(format!("sym_dep_{}", sym_lower))
                 .default_open(false)
                 .show(ui, |ui| {
-                    for symbol in &build.symbols {
-                        let frame_count = symbol.frames.len();
-                        let has_image = symbol.frames.iter().any(|f| f.image.is_some());
-                        let img_mark = if has_image { " [img]" } else { "" };
+                    if all_providers.is_empty() {
+                        ui.label(
+                            egui::RichText::new("missing — no build provides this symbol")
+                                .small()
+                                .color(egui::Color32::RED),
+                        );
+                        return;
+                    }
+
+                    for (build_idx, source_name) in &all_providers {
+                        let build = self.builds[*build_idx].build.as_ref().unwrap();
+                        let sym = build
+                            .symbol_index
+                            .get(sym_lower.as_str())
+                            .and_then(|&si| build.symbols.get(si));
+                        let frame_count = sym.map(|s| s.frames.len()).unwrap_or(0);
+                        let is_disabled = self.builds[*build_idx]
+                            .disabled_symbols
+                            .contains(sym_lower.as_str());
+                        let is_winner = winner_build_idx == Some(*build_idx);
+
+                        let (color, suffix) = if is_disabled {
+                            (egui::Color32::YELLOW, " (disabled)")
+                        } else if is_winner {
+                            (egui::Color32::LIGHT_BLUE, "")
+                        } else {
+                            (egui::Color32::GRAY, " (shadowed)")
+                        };
+
                         ui.label(
                             egui::RichText::new(format!(
-                                "{}  ({} frames){}",
-                                symbol.name, frame_count, img_mark
+                                "  {} [{} frames] from {}{}",
+                                if is_winner { "\u{2500}" } else { "\u{2514}" },
+                                frame_count,
+                                source_name,
+                                suffix,
                             ))
-                            .small(),
+                            .small()
+                            .color(color),
                         );
                     }
                 });
-        } else {
-            ui.label(egui::RichText::new("Atlas").strong());
-            if let Some(ai) = entry.assigned_atlas
-                && let Some(Some(ae)) = self.atlas_entries.get(ai)
-            {
-                for (name, img) in &ae.decoded {
-                    ui.label(format!("  {} ({}x{})", name, img.width(), img.height()));
-                }
-            }
-            ui.label(
-                egui::RichText::new("Pending — needs a .zip build file")
-                    .color(egui::Color32::YELLOW),
-            );
         }
     }
 

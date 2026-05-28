@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use clap::Subcommand;
@@ -260,7 +261,14 @@ fn cmd_render(
     }
 
     let animation = &base_archive.anim.as_ref().unwrap().banks[bank_idx].animations[anim_idx];
-    let bl: Vec<&crate::build_file::BuildFile> = build_list.iter().collect();
+    let empty_disabled: HashSet<String> = HashSet::new();
+    let bl: Vec<crate::render::BuildRef<'_>> = build_list
+        .iter()
+        .map(|b| crate::render::BuildRef {
+            build: b,
+            disabled_symbols: &empty_disabled,
+        })
+        .collect();
     std::fs::create_dir_all(output_dir)?;
 
     let (bounds, prepared) =

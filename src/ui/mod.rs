@@ -25,6 +25,7 @@ pub struct BuildEntry {
     pub enabled: bool,
     pub source_name: String,
     pub assigned_atlas: Option<usize>,
+    pub disabled_symbols: std::collections::HashSet<String>,
 }
 
 struct AtlasEntry {
@@ -40,7 +41,6 @@ pub struct App {
     active_anim_inner_idx: usize,
     active_frame_idx: usize,
     builds: Vec<BuildEntry>,
-    selected_build_idx: Option<usize>,
     atlas_entries: Vec<Option<AtlasEntry>>,
     loaded_paths: HashSet<PathBuf>,
     playing: bool,
@@ -71,7 +71,6 @@ impl App {
             active_anim_inner_idx: 0,
             active_frame_idx: 0,
             builds: Vec::new(),
-            selected_build_idx: None,
             atlas_entries: Vec::new(),
             loaded_paths: HashSet::new(),
             playing: false,

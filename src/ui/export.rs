@@ -28,7 +28,7 @@ pub struct BackgroundPngExport {
 
 pub fn start_gif_export_thread(
     anim: &crate::anim::AnimAnimation,
-    build_list: &[&crate::build_file::BuildFile],
+    build_list: &[crate::render::BuildRef<'_>],
     cached_frames: HashMap<usize, image::RgbaImage>,
 ) -> mpsc::Receiver<GifExportResult> {
     let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
@@ -80,7 +80,7 @@ pub fn start_gif_export_thread(
 
 pub fn start_png_export_thread(
     anim: &crate::anim::AnimAnimation,
-    build_list: &[&crate::build_file::BuildFile],
+    build_list: &[crate::render::BuildRef<'_>],
     cached_frames: HashMap<usize, image::RgbaImage>,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {

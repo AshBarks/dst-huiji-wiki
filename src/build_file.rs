@@ -192,21 +192,192 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Read;
 
-    #[test]
-    fn parse_build_basic() {
-        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+    fn read_build_bin_from_zip(path: &str) -> Vec<u8> {
+        let data = std::fs::read(path).unwrap();
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).unwrap();
             if file.name() == "build.bin" {
                 let mut buf = Vec::new();
-                std::io::Read::read_to_end(&mut file, &mut buf).unwrap();
-                let build = parse_build(&buf).unwrap();
-                assert!(!build.symbols.is_empty());
-                return;
+                file.read_to_end(&mut buf).unwrap();
+                return buf;
             }
         }
-        panic!("no build.bin found");
+        panic!("no build.bin found in {path}");
+    }
+
+    #[test]
+    fn parse_build_basic() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        assert!(!build.symbols.is_empty());
+    }
+
+    #[test]
+    fn parse_build_invalid_magic() {
+        let data = b"ANIM\x00\x00\x00\x00";
+        match parse_build(data) {
+            Err(crate::error::Error::InvalidMagic { expected, actual }) => {
+                assert_eq!(expected, "BILD");
+                assert_eq!(actual, "ANIM");
+            }
+            _ => panic!("expected InvalidMagic error"),
+        }
+    }
+
+    #[test]
+    fn parse_build_truncated_header() {
+        let data = b"BIL";
+        match parse_build(data) {
+            Err(crate::error::Error::OutOfBounds { .. }) => {}
+            _ => panic!("expected OutOfBounds error"),
+        }
+    }
+
+    #[test]
+    fn parse_build_wrong_magic_anim() {
+        let data = b"ANIM\x00\x00\x00\x00";
+        match parse_build(data) {
+            Err(crate::error::Error::InvalidMagic { expected, actual }) => {
+                assert_eq!(expected, "BILD");
+                assert_eq!(actual, "ANIM");
+            }
+            _ => panic!("expected InvalidMagic error"),
+        }
+    }
+
+    #[test]
+    fn parse_build_version() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        assert_eq!(build.version, 6);
+    }
+
+    #[test]
+    fn parse_build_name() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        assert_eq!(build.name, "abigail_flower");
+    }
+
+    #[test]
+    fn parse_build_symbol_count() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        assert_eq!(build.symbols.len(), 10);
+    }
+
+    #[test]
+    fn parse_build_symbol_names() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        let names: Vec<&str> = build.symbols.iter().map(|s| s.name.as_str()).collect();
+        assert!(names.contains(&"petal1"), "missing petal1: {names:?}");
+        assert!(names.contains(&"flower1"), "missing flower1: {names:?}");
+        assert!(names.contains(&"shdw"), "missing shdw: {names:?}");
+    }
+
+    #[test]
+    fn parse_build_atlas_count() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        assert_eq!(build.atlases.len(), 1);
+        assert_eq!(build.atlases[0].name, "atlas-0.tex");
+    }
+
+    #[test]
+    fn parse_build_verts_nonempty() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        let has_verts = build
+            .symbols
+            .iter()
+            .any(|s| s.frames.iter().any(|f| !f.verts.is_empty()));
+        assert!(has_verts, "expected at least one frame with verts");
+    }
+
+    #[test]
+    fn parse_build_vert_uv_range() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        for symbol in &build.symbols {
+            for frame in &symbol.frames {
+                for v in &frame.verts {
+                    let u = v.u;
+                    let vv = v.v;
+                    assert!(
+                        u >= 0.0 && u <= 1.0,
+                        "u={u} out of [0,1] in symbol '{}' frame {}",
+                        symbol.name,
+                        frame.frame_num
+                    );
+                    assert!(
+                        vv >= 0.0 && vv <= 1.0,
+                        "v={vv} out of [0,1] in symbol '{}' frame {}",
+                        symbol.name,
+                        frame.frame_num
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn parse_build_frame_index_consistency() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        for symbol in &build.symbols {
+            assert_eq!(
+                symbol.frame_index.len(),
+                symbol.frames.len(),
+                "frame_index length mismatch for symbol '{}'",
+                symbol.name
+            );
+            for (&frame_num, &idx) in &symbol.frame_index {
+                assert!(
+                    idx < symbol.frames.len(),
+                    "frame_index[{frame_num}] = {idx} >= frames.len() = {}",
+                    symbol.frames.len()
+                );
+                assert_eq!(
+                    symbol.frames[idx].frame_num, frame_num,
+                    "frame_index maps {frame_num} to idx {idx} but frames[{idx}].frame_num = {}",
+                    symbol.frames[idx].frame_num
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn parse_build_symbol_index() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
+        let build = parse_build(&buf).unwrap();
+        for (i, symbol) in build.symbols.iter().enumerate() {
+            let key = symbol.name.to_lowercase();
+            assert_eq!(
+                build.symbol_index.get(&key),
+                Some(&i),
+                "symbol_index['{key}'] mismatch"
+            );
+        }
+    }
+
+    #[test]
+    fn parse_build_multi_atlas() {
+        let buf = read_build_bin_from_zip("data/anim/abigail_shield.zip");
+        let build = parse_build(&buf).unwrap();
+        assert_eq!(build.atlases.len(), 2);
+        let atlas_indices: std::collections::HashSet<u32> = build
+            .symbols
+            .iter()
+            .flat_map(|s| s.frames.iter())
+            .filter_map(|f| f.verts.first().map(|v| v.w))
+            .collect();
+        assert!(
+            atlas_indices.len() >= 2,
+            "expected verts referencing at least 2 atlas indices, got {atlas_indices:?}"
+        );
     }
 }

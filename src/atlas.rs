@@ -167,6 +167,12 @@ fn decode_atlas_images_inner(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::build_file::{BuildAtlasRef, BuildFrame, BuildSymbol};
+    use std::collections::HashMap;
+
+    fn make_vert(x: f32, y: f32, z: f32, u: f32, v: f32, w: u32) -> BuildVert {
+        BuildVert { x, y, z, u, v, w }
+    }
 
     #[test]
     fn split_atlas_abigail_flower() {
@@ -189,5 +195,256 @@ mod tests {
             .map(|s| s.frames.iter().filter(|f| f.image.is_some()).count())
             .sum();
         assert!(frames_with_images > 0);
+    }
+
+    #[test]
+    fn calc_uv_bounds_basic() {
+        let verts = vec![
+            make_vert(0.0, 0.0, 0.0, 0.1, 0.9, 0),
+            make_vert(1.0, 0.0, 0.0, 0.5, 0.9, 0),
+            make_vert(0.0, 1.0, 0.0, 0.1, 0.5, 0),
+            make_vert(0.0, 1.0, 0.0, 0.1, 0.5, 0),
+            make_vert(1.0, 0.0, 0.0, 0.5, 0.9, 0),
+            make_vert(1.0, 1.0, 0.0, 0.5, 0.5, 0),
+        ];
+        let (min_u, max_u, min_v, max_v) = calc_uv_bounds(&verts);
+        assert!((min_u - 0.1).abs() < 1e-6, "min_u={min_u}");
+        assert!((max_u - 0.5).abs() < 1e-6, "max_u={max_u}");
+        assert!((min_v - 0.5).abs() < 1e-6, "min_v={min_v}");
+        assert!((max_v - 0.9).abs() < 1e-6, "max_v={max_v}");
+    }
+
+    #[test]
+    fn calc_uv_bounds_empty_verts() {
+        let verts: Vec<BuildVert> = Vec::new();
+        let (min_u, max_u, _min_v, _max_v) = calc_uv_bounds(&verts);
+        assert!(min_u.is_infinite(), "empty verts should yield INF min_u");
+        assert!(
+            max_u.is_infinite() && max_u.is_sign_negative(),
+            "empty verts should yield -INF max_u"
+        );
+    }
+
+    #[test]
+    fn calc_uv_bounds_partial_chunk_ignored() {
+        let mut verts = vec![
+            make_vert(0.0, 0.0, 0.0, 0.1, 0.9, 0),
+            make_vert(1.0, 0.0, 0.0, 0.5, 0.9, 0),
+            make_vert(0.0, 1.0, 0.0, 0.1, 0.5, 0),
+            make_vert(0.0, 1.0, 0.0, 0.1, 0.5, 0),
+            make_vert(1.0, 0.0, 0.0, 0.5, 0.9, 0),
+            make_vert(1.0, 1.0, 0.0, 0.5, 0.5, 0),
+        ];
+        verts.push(make_vert(0.0, 0.0, 0.0, 0.9, 0.1, 0));
+        let (min_u, max_u, _min_v, _max_v) = calc_uv_bounds(&verts);
+        assert!((min_u - 0.1).abs() < 1e-6, "7th vert should be ignored");
+        assert!((max_u - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn calc_xy_bounds_basic() {
+        let verts = vec![
+            make_vert(10.0, 20.0, 0.0, 0.0, 1.0, 0),
+            make_vert(50.0, 20.0, 0.0, 1.0, 1.0, 0),
+            make_vert(10.0, 60.0, 0.0, 0.0, 0.0, 0),
+            make_vert(10.0, 60.0, 0.0, 0.0, 0.0, 0),
+            make_vert(50.0, 20.0, 0.0, 1.0, 1.0, 0),
+            make_vert(50.0, 60.0, 0.0, 1.0, 0.0, 0),
+        ];
+        let (min_x, max_x, min_y, max_y) = calc_xy_bounds(&verts);
+        assert!((min_x - 10.0).abs() < 1e-6, "min_x={min_x}");
+        assert!((max_x - 50.0).abs() < 1e-6, "max_x={max_x}");
+        assert!((min_y - 20.0).abs() < 1e-6, "min_y={min_y}");
+        assert!((max_y - 60.0).abs() < 1e-6, "max_y={max_y}");
+    }
+
+    #[test]
+    fn paste_within_canvas() {
+        let mut canvas = image::RgbaImage::new(4, 4);
+        let sprite = image::RgbaImage::from_pixel(2, 2, image::Rgba([255, 0, 0, 255]));
+        paste(&mut canvas, &sprite, 1, 1);
+        assert_eq!(canvas.get_pixel(1, 1), &image::Rgba([255, 0, 0, 255]));
+        assert_eq!(canvas.get_pixel(2, 2), &image::Rgba([255, 0, 0, 255]));
+        assert_eq!(canvas.get_pixel(0, 0), &image::Rgba([0, 0, 0, 0]));
+        assert_eq!(canvas.get_pixel(3, 3), &image::Rgba([0, 0, 0, 0]));
+    }
+
+    #[test]
+    fn paste_clips_at_edge() {
+        let mut canvas = image::RgbaImage::new(4, 4);
+        let sprite = image::RgbaImage::from_pixel(4, 4, image::Rgba([0, 255, 0, 255]));
+        paste(&mut canvas, &sprite, -1, -1);
+        assert_eq!(canvas.get_pixel(0, 0), &image::Rgba([0, 255, 0, 255]));
+        assert_eq!(canvas.get_pixel(2, 2), &image::Rgba([0, 255, 0, 255]));
+        assert_eq!(
+            canvas.get_pixel(3, 3),
+            &image::Rgba([0, 0, 0, 0]),
+            "pixel at (3,3) should remain untouched since sprite extends to canvas edge at offset -1"
+        );
+    }
+
+    #[test]
+    fn paste_transparent_pixels_ignored() {
+        let mut canvas = image::RgbaImage::from_pixel(4, 4, image::Rgba([100, 100, 100, 255]));
+        let mut sprite = image::RgbaImage::new(2, 2);
+        *sprite.get_pixel_mut(0, 0) = image::Rgba([255, 0, 0, 0]);
+        *sprite.get_pixel_mut(1, 0) = image::Rgba([0, 255, 0, 255]);
+        paste(&mut canvas, &sprite, 0, 0);
+        assert_eq!(
+            canvas.get_pixel(0, 0),
+            &image::Rgba([100, 100, 100, 255]),
+            "transparent sprite pixel should not overwrite canvas"
+        );
+        assert_eq!(
+            canvas.get_pixel(1, 0),
+            &image::Rgba([0, 255, 0, 255]),
+            "opaque sprite pixel should overwrite canvas"
+        );
+    }
+
+    #[test]
+    fn split_atlas_skip_empty_verts() {
+        let mut build = BuildFile {
+            version: 6,
+            name: "test".into(),
+            symbols: vec![BuildSymbol {
+                name: "empty_sym".into(),
+                frames: vec![BuildFrame {
+                    frame_num: 0,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                }],
+                frame_index: HashMap::new(),
+            }],
+            atlases: Vec::new(),
+            symbol_index: HashMap::new(),
+        };
+        let atlas_images: Vec<Arc<image::RgbaImage>> = Vec::new();
+        split_atlas(&mut build, &atlas_images).unwrap();
+        assert!(
+            build.symbols[0].frames[0].image.is_none(),
+            "frame with empty verts should not get an image"
+        );
+    }
+
+    #[test]
+    fn split_atlas_skip_invalid_atlas_idx() {
+        let verts = vec![
+            make_vert(0.0, 0.0, 0.0, 0.0, 1.0, 99),
+            make_vert(10.0, 0.0, 0.0, 1.0, 1.0, 99),
+            make_vert(0.0, 10.0, 0.0, 0.0, 0.0, 99),
+            make_vert(0.0, 10.0, 0.0, 0.0, 0.0, 99),
+            make_vert(10.0, 0.0, 0.0, 1.0, 1.0, 99),
+            make_vert(10.0, 10.0, 0.0, 1.0, 0.0, 99),
+        ];
+        let mut build = BuildFile {
+            version: 6,
+            name: "test".into(),
+            symbols: vec![BuildSymbol {
+                name: "bad_idx".into(),
+                frames: vec![BuildFrame {
+                    frame_num: 0,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts,
+                    image: None,
+                }],
+                frame_index: HashMap::new(),
+            }],
+            atlases: Vec::new(),
+            symbol_index: HashMap::new(),
+        };
+        let atlas_images = vec![Arc::new(image::RgbaImage::new(64, 64))];
+        split_atlas(&mut build, &atlas_images).unwrap();
+        assert!(
+            build.symbols[0].frames[0].image.is_none(),
+            "frame with atlas_idx=99 should be skipped"
+        );
+    }
+
+    #[test]
+    fn decode_atlas_images_from_tex_missing_key() {
+        let atlases = vec![BuildAtlasRef {
+            name: "nonexistent.tex".into(),
+        }];
+        let tex_files = HashMap::new();
+        let images = decode_atlas_images_from_tex(&atlases, &tex_files);
+        assert_eq!(images.len(), 1);
+        assert_eq!(images[0].width(), 1);
+        assert_eq!(images[0].height(), 1);
+    }
+
+    #[test]
+    fn gather_atlas_images_missing_key() {
+        let build = BuildFile {
+            version: 6,
+            name: "test".into(),
+            symbols: Vec::new(),
+            atlases: vec![BuildAtlasRef {
+                name: "missing.tex".into(),
+            }],
+            symbol_index: HashMap::new(),
+        };
+        let atlas_decoded = HashMap::new();
+        let images = gather_atlas_images(&build, &atlas_decoded);
+        assert_eq!(images.len(), 1);
+        assert_eq!(images[0].width(), 1);
+        assert_eq!(images[0].height(), 1);
+    }
+
+    #[test]
+    fn split_atlas_frame_dimensions_positive() {
+        use crate::archive::parse_zip;
+
+        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let mut archive = parse_zip(&data).unwrap();
+        let atlas_images = decode_atlas_images_from_tex(
+            &archive.build.as_ref().unwrap().atlases,
+            archive.tex_files(),
+        );
+        split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
+        let build = archive.build.as_ref().unwrap();
+        for symbol in &build.symbols {
+            for frame in &symbol.frames {
+                if let Some(img) = &frame.image {
+                    assert!(
+                        img.width() >= 1 && img.height() >= 1,
+                        "frame image should have positive dims, got {}x{}",
+                        img.width(),
+                        img.height()
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn split_atlas_multi_atlas() {
+        use crate::archive::parse_zip;
+
+        let data = std::fs::read("data/anim/abigail_shield.zip").unwrap();
+        let mut archive = parse_zip(&data).unwrap();
+        let atlas_images = decode_atlas_images_from_tex(
+            &archive.build.as_ref().unwrap().atlases,
+            archive.tex_files(),
+        );
+        assert_eq!(atlas_images.len(), 2, "should have 2 atlas images");
+        split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
+        let build = archive.build.as_ref().unwrap();
+        let frames_with_images: usize = build
+            .symbols
+            .iter()
+            .map(|s| s.frames.iter().filter(|f| f.image.is_some()).count())
+            .sum();
+        assert!(
+            frames_with_images > 0,
+            "multi-atlas split should produce images"
+        );
     }
 }

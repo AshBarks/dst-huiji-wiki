@@ -143,7 +143,7 @@ fn cmd_extract(inputs: &[PathBuf], output_dir: &Path) -> crate::error::Result<()
         if let Some(parent) = out_path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        std::fs::write(&out_path, data)?;
+        std::fs::write(&out_path, data.as_ref())?;
         println!("{}", out_path.display());
     }
     Ok(())
@@ -280,18 +280,25 @@ fn cmd_render(
     let bl: Vec<&crate::build_file::BuildFile> = build_list.iter().collect();
     std::fs::create_dir_all(output_dir)?;
 
-    let bounds = crate::render::compute_animation_bounds(&animation.frames, &bl, 1.0, (0.0, 0.0));
+    let (bounds, prepared) =
+        crate::render::prepare_animation_frames(&animation.frames, &bl, 1.0, (0.0, 0.0));
 
-    for (i, frame) in animation.frames.iter().enumerate() {
-        if let Some(rendered) =
-            crate::render::render_frame(frame, &bl, 1.0, (0.0, 0.0), bounds.as_ref())
-        {
-            let out_path = output_dir.join(format!("frame_{i:03}.png"));
-            rendered
-                .image
-                .save(&out_path)
-                .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
-            println!("{}", out_path.display());
+    for (i, pf) in prepared.iter().enumerate() {
+        if let Some(pf) = pf {
+            let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
+            if let Some(rendered) = crate::render::render_frame_with_elements(
+                &pf.elements,
+                render_bounds,
+                1.0,
+                (0.0, 0.0),
+            ) {
+                let out_path = output_dir.join(format!("frame_{i:03}.png"));
+                rendered
+                    .image
+                    .save(&out_path)
+                    .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+                println!("{}", out_path.display());
+            }
         }
     }
     Ok(())

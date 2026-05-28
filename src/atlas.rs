@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use crate::archive::ParsedArchive;
 use crate::build_file::{BuildFile, BuildVert};
 use crate::error::Result;
 use crate::ktex::parse_ktex;
@@ -123,17 +122,9 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]
     Ok(())
 }
 
-pub fn decode_atlas_images(archive: &ParsedArchive) -> Vec<Arc<image::RgbaImage>> {
-    let Some(build) = archive.build.as_ref() else {
-        return Vec::new();
-    };
-    let tex_files = archive.tex_files();
-    decode_atlas_images_inner(&build.atlases, &tex_files)
-}
-
 pub fn decode_atlas_images_from_tex(
     atlases: &[crate::build_file::BuildAtlasRef],
-    tex_files: &std::collections::HashMap<String, Vec<u8>>,
+    tex_files: &std::collections::HashMap<String, std::sync::Arc<Vec<u8>>>,
 ) -> Vec<Arc<image::RgbaImage>> {
     decode_atlas_images_inner(atlases, tex_files)
 }
@@ -156,7 +147,7 @@ pub fn gather_atlas_images(
 
 fn decode_atlas_images_inner(
     atlases: &[crate::build_file::BuildAtlasRef],
-    tex_files: &std::collections::HashMap<String, Vec<u8>>,
+    tex_files: &std::collections::HashMap<String, std::sync::Arc<Vec<u8>>>,
 ) -> Vec<Arc<image::RgbaImage>> {
     let mut images = Vec::new();
     for atlas in atlases {
@@ -184,7 +175,10 @@ mod tests {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = parse_zip(&data).unwrap();
 
-        let atlas_images = decode_atlas_images(&archive);
+        let atlas_images = decode_atlas_images_from_tex(
+            &archive.build.as_ref().unwrap().atlases,
+            &archive.tex_files(),
+        );
 
         split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
 

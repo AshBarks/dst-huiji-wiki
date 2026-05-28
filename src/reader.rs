@@ -18,6 +18,7 @@ impl<'a> Reader<'a> {
         self.pos = pos;
     }
 
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.data.len()
     }
@@ -26,6 +27,7 @@ impl<'a> Reader<'a> {
         self.data.len().saturating_sub(self.pos)
     }
 
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
@@ -123,6 +125,7 @@ impl<'a> Reader<'a> {
         Ok(slice)
     }
 
+    #[allow(dead_code)]
     pub fn read_bytes_remaining(&mut self) -> Result<&'a [u8]> {
         let len = self.remaining();
         self.read_bytes(len)

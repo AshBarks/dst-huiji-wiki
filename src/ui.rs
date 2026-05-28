@@ -10,7 +10,10 @@ use crate::archive::{BinType, ParsedArchive, parse_dyn, parse_zip};
 use crate::atlas::{gather_atlas_images, split_atlas};
 use crate::gif_export::{export_gif, export_png_sequence, ffmpeg_gif_from_sequence};
 use crate::ktex::parse_ktex;
-use crate::render::{BoundingBox, compute_animation_bounds, render_frame};
+use crate::render::{
+    BoundingBox, compute_animation_bounds, prepare_animation_frames, render_frame,
+    render_frame_with_elements,
+};
 
 enum GifExportResult {
     Done(Vec<u8>),
@@ -132,7 +135,7 @@ impl App {
     }
 
     fn decode_tex_files(
-        tex_files: &std::collections::HashMap<String, Vec<u8>>,
+        tex_files: &std::collections::HashMap<String, std::sync::Arc<Vec<u8>>>,
     ) -> std::collections::HashMap<String, Arc<image::RgbaImage>> {
         let mut decoded = HashMap::new();
         for (name, data) in tex_files {
@@ -529,27 +532,27 @@ impl App {
             return;
         }
 
-        let anim_data = anim.clone();
-        let build_data: Vec<crate::build_file::BuildFile> =
-            build_list.iter().map(|b| (*b).clone()).collect();
+        let (bounds, prepared) =
+            prepare_animation_frames(&anim.frames, &build_list, 1.0, (0.0, 0.0));
         let cache_gen_val = self.cache_gen;
-        let total_frames = anim_data.frames.len();
+        let total_frames = anim.frames.len();
         let stop_flag = Arc::new(AtomicBool::new(false));
         let stop_flag_clone = stop_flag.clone();
-        let bounds = self.animation_bounds.clone();
         let (sender, receiver) = mpsc::channel::<(u64, usize, image::RgbaImage)>();
 
         let handle = std::thread::spawn(move || {
-            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
             for fi in 0..total_frames {
                 if stop_flag_clone.load(Ordering::Relaxed) {
                     return;
                 }
-                if let Some(rendered) =
-                    render_frame(&anim_data.frames[fi], &bl, 1.0, (0.0, 0.0), bounds.as_ref())
-                    && sender.send((cache_gen_val, fi, rendered.image)).is_err()
-                {
-                    return;
+                if let Some(pf) = &prepared.get(fi).and_then(|p| p.as_ref()) {
+                    let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
+                    if let Some(rendered) =
+                        render_frame_with_elements(&pf.elements, render_bounds, 1.0, (0.0, 0.0))
+                        && sender.send((cache_gen_val, fi, rendered.image)).is_err()
+                    {
+                        return;
+                    }
                 }
             }
         });
@@ -737,10 +740,9 @@ impl App {
             return;
         }
 
-        let anim_data = anim.clone();
-        let build_data: Vec<crate::build_file::BuildFile> =
-            build_list.iter().map(|b| (*b).clone()).collect();
-        let bounds = self.animation_bounds.clone();
+        let (bounds, prepared) =
+            prepare_animation_frames(&anim.frames, &build_list, 1.0, (0.0, 0.0));
+        let frame_rate = anim.frame_rate;
 
         let cached_frames: HashMap<usize, image::RgbaImage> = self
             .frame_cache
@@ -751,9 +753,7 @@ impl App {
         let (sender, receiver) = mpsc::channel::<GifExportResult>();
 
         std::thread::spawn(move || {
-            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
-            let total_frames = anim_data.frames.len();
-            let frame_rate = anim_data.frame_rate;
+            let total_frames = prepared.len();
 
             let frames: Vec<image::RgbaImage> = (0..total_frames)
                 .into_par_iter()
@@ -761,12 +761,14 @@ impl App {
                     if let Some(cached) = cached_frames.get(&fi) {
                         return cached.clone();
                     }
-                    anim_data
-                        .frames
-                        .get(fi)
-                        .and_then(|f| render_frame(f, &bl, 1.0, (0.0, 0.0), bounds.as_ref()))
-                        .map(|r| r.image)
-                        .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                    if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
+                        let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
+                        render_frame_with_elements(&pf.elements, render_bounds, 1.0, (0.0, 0.0))
+                            .map(|r| r.image)
+                            .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                    } else {
+                        image::RgbaImage::new(1, 1)
+                    }
                 })
                 .collect();
 
@@ -831,23 +833,20 @@ impl App {
             return;
         }
 
-        let anim_data = anim.clone();
-        let build_data: Vec<crate::build_file::BuildFile> =
-            build_list.iter().map(|b| (*b).clone()).collect();
-        let bounds = self.animation_bounds.clone();
+        let (bounds, prepared) =
+            prepare_animation_frames(&anim.frames, &build_list, 1.0, (0.0, 0.0));
+        let frame_rate = anim.frame_rate;
         let cached_frames: HashMap<usize, image::RgbaImage> = self
             .frame_cache
             .iter()
             .map(|(&fi, entry)| (fi, entry.image.clone()))
             .collect();
-        let frame_rate = anim_data.frame_rate;
 
         let (sender, receiver) = mpsc::channel::<PngExportResult>();
         let dir_clone = dir.clone();
 
         std::thread::spawn(move || {
-            let bl: Vec<&crate::build_file::BuildFile> = build_data.iter().collect();
-            let total_frames = anim_data.frames.len();
+            let total_frames = prepared.len();
 
             let frames: Vec<image::RgbaImage> = (0..total_frames)
                 .into_par_iter()
@@ -855,12 +854,14 @@ impl App {
                     if let Some(cached) = cached_frames.get(&fi) {
                         return cached.clone();
                     }
-                    anim_data
-                        .frames
-                        .get(fi)
-                        .and_then(|f| render_frame(f, &bl, 1.0, (0.0, 0.0), bounds.as_ref()))
-                        .map(|r| r.image)
-                        .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                    if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
+                        let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
+                        render_frame_with_elements(&pf.elements, render_bounds, 1.0, (0.0, 0.0))
+                            .map(|r| r.image)
+                            .unwrap_or_else(|| image::RgbaImage::new(1, 1))
+                    } else {
+                        image::RgbaImage::new(1, 1)
+                    }
                 })
                 .collect();
 

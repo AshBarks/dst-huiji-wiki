@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::Path;
+use std::sync::Arc;
 
 use crate::anim::{AnimFile, parse_anim};
 use crate::build_file::{BuildFile, parse_build};
@@ -8,26 +9,21 @@ use crate::error::{Error, Result};
 use crate::specs::{MAGIC_ANIM, MAGIC_BILD};
 use crate::xor::xor_decrypt;
 
-pub enum ParsedEntry {
-    Anim(AnimFile),
-    Build(BuildFile),
-}
-
 #[derive(Clone)]
 pub struct TexSource {
     pub source_name: String,
-    pub tex_files: HashMap<String, Vec<u8>>,
+    pub tex_files: HashMap<String, Arc<Vec<u8>>>,
 }
 
 pub struct ParsedArchive {
     pub anim: Option<AnimFile>,
     pub build: Option<BuildFile>,
     pub tex_sources: Vec<TexSource>,
-    pub raw_files: HashMap<String, Vec<u8>>,
+    pub raw_files: HashMap<String, Arc<Vec<u8>>>,
 }
 
 impl ParsedArchive {
-    pub fn tex_files(&self) -> HashMap<String, Vec<u8>> {
+    pub fn tex_files(&self) -> HashMap<String, Arc<Vec<u8>>> {
         let mut merged = HashMap::new();
         for source in &self.tex_sources {
             for (k, v) in &source.tex_files {
@@ -50,16 +46,6 @@ impl ParsedArchive {
         for (k, v) in other.raw_files {
             self.raw_files.insert(k, v);
         }
-    }
-
-    pub fn find_tex_source(&self, name: &str) -> Option<&TexSource> {
-        let lower = name.to_lowercase();
-        self.tex_sources.iter().find(|s| {
-            s.source_name.to_lowercase() == lower
-                || s.source_name
-                    .to_lowercase()
-                    .starts_with(&format!("{lower}."))
-        })
     }
 }
 
@@ -177,8 +163,8 @@ fn parse_zip_archive(
 ) -> Result<ParsedArchive> {
     let mut anim: Option<AnimFile> = None;
     let mut build: Option<BuildFile> = None;
-    let mut tex_files: HashMap<String, Vec<u8>> = HashMap::new();
-    let mut raw_files: HashMap<String, Vec<u8>> = HashMap::new();
+    let mut tex_files: HashMap<String, Arc<Vec<u8>>> = HashMap::new();
+    let mut raw_files: HashMap<String, Arc<Vec<u8>>> = HashMap::new();
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
@@ -186,14 +172,15 @@ fn parse_zip_archive(
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)?;
 
-        raw_files.insert(name.clone(), buf.clone());
+        let buf_arc = Arc::new(buf);
+        raw_files.insert(name.clone(), buf_arc.clone());
 
         if name == "anim.bin" {
-            anim = Some(parse_anim(&buf)?);
+            anim = Some(parse_anim(&buf_arc)?);
         } else if name == "build.bin" {
-            build = Some(parse_build(&buf)?);
+            build = Some(parse_build(&buf_arc)?);
         } else if name.ends_with(".tex") {
-            tex_files.insert(name, buf);
+            tex_files.insert(name, buf_arc);
         }
     }
 

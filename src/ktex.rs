@@ -3,6 +3,7 @@ use crate::reader::Reader;
 use crate::specs::{MAGIC_KTEX, PRE_CAVE_SPEC, PixelFormat, Platform, TextureType, detect_spec};
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct KtexHeader {
     pub platform: Platform,
     pub pixel_format: PixelFormat,
@@ -189,13 +190,27 @@ fn decode_dxt1(data: &[u8], width: u16, height: u16) -> Vec<u8> {
             let has_alpha = c0 <= c1;
             let decoded = decode_dxt1_color_block(block, has_alpha);
 
-            for dy in 0..4usize {
-                for dx in 0..4usize {
-                    let px = bx * 4 + dx;
-                    let py = by * 4 + dy;
-                    if px < w && py < h {
-                        let dst = (py * w + px) * 4;
-                        pixels[dst..dst + 4].copy_from_slice(&decoded[dy * 4 + dx]);
+            let full_block = (bx + 1) * 4 <= w && (by + 1) * 4 <= h;
+            if full_block {
+                let base_x = bx * 4;
+                let base_y = by * 4;
+                for dy in 0..4usize {
+                    let dst = ((base_y + dy) * w + base_x) * 4;
+                    let row = dy * 4;
+                    pixels[dst..dst + 4].copy_from_slice(&decoded[row]);
+                    pixels[dst + 4..dst + 8].copy_from_slice(&decoded[row + 1]);
+                    pixels[dst + 8..dst + 12].copy_from_slice(&decoded[row + 2]);
+                    pixels[dst + 12..dst + 16].copy_from_slice(&decoded[row + 3]);
+                }
+            } else {
+                for dy in 0..4usize {
+                    for dx in 0..4usize {
+                        let px = bx * 4 + dx;
+                        let py = by * 4 + dy;
+                        if px < w && py < h {
+                            let dst = (py * w + px) * 4;
+                            pixels[dst..dst + 4].copy_from_slice(&decoded[dy * 4 + dx]);
+                        }
                     }
                 }
             }
@@ -232,17 +247,36 @@ fn decode_dxt3(data: &[u8], width: u16, height: u16) -> Vec<u8> {
             let color_block = &block[8..16];
             let decoded = decode_dxt1_color_block(color_block, false);
 
-            for dy in 0..4usize {
-                for dx in 0..4usize {
-                    let px = bx * 4 + dx;
-                    let py = by * 4 + dy;
-                    if px < w && py < h {
-                        let dst = (py * w + px) * 4;
-                        let c = decoded[dy * 4 + dx];
-                        pixels[dst] = c[0];
-                        pixels[dst + 1] = c[1];
-                        pixels[dst + 2] = c[2];
-                        pixels[dst + 3] = alpha[dy * 4 + dx];
+            let full_block = (bx + 1) * 4 <= w && (by + 1) * 4 <= h;
+            if full_block {
+                let base_x = bx * 4;
+                let base_y = by * 4;
+                for dy in 0..4usize {
+                    let dst = ((base_y + dy) * w + base_x) * 4;
+                    let row = dy * 4;
+                    pixels[dst..dst + 4].copy_from_slice(&decoded[row]);
+                    pixels[dst + 4..dst + 8].copy_from_slice(&decoded[row + 1]);
+                    pixels[dst + 8..dst + 12].copy_from_slice(&decoded[row + 2]);
+                    pixels[dst + 12..dst + 16].copy_from_slice(&decoded[row + 3]);
+                    let a_off = dy * 4;
+                    pixels[dst + 3] = alpha[a_off];
+                    pixels[dst + 7] = alpha[a_off + 1];
+                    pixels[dst + 11] = alpha[a_off + 2];
+                    pixels[dst + 15] = alpha[a_off + 3];
+                }
+            } else {
+                for dy in 0..4usize {
+                    for dx in 0..4usize {
+                        let px = bx * 4 + dx;
+                        let py = by * 4 + dy;
+                        if px < w && py < h {
+                            let dst = (py * w + px) * 4;
+                            let c = decoded[dy * 4 + dx];
+                            pixels[dst] = c[0];
+                            pixels[dst + 1] = c[1];
+                            pixels[dst + 2] = c[2];
+                            pixels[dst + 3] = alpha[dy * 4 + dx];
+                        }
                     }
                 }
             }
@@ -305,17 +339,36 @@ fn decode_dxt5(data: &[u8], width: u16, height: u16) -> Vec<u8> {
             let color_block = &block[8..16];
             let decoded = decode_dxt1_color_block(color_block, false);
 
-            for dy in 0..4usize {
-                for dx in 0..4usize {
-                    let px = bx * 4 + dx;
-                    let py = by * 4 + dy;
-                    if px < w && py < h {
-                        let dst = (py * w + px) * 4;
-                        let c = decoded[dy * 4 + dx];
-                        pixels[dst] = c[0];
-                        pixels[dst + 1] = c[1];
-                        pixels[dst + 2] = c[2];
-                        pixels[dst + 3] = pixel_alpha[dy * 4 + dx];
+            let full_block = (bx + 1) * 4 <= w && (by + 1) * 4 <= h;
+            if full_block {
+                let base_x = bx * 4;
+                let base_y = by * 4;
+                for dy in 0..4usize {
+                    let dst = ((base_y + dy) * w + base_x) * 4;
+                    let row = dy * 4;
+                    pixels[dst..dst + 4].copy_from_slice(&decoded[row]);
+                    pixels[dst + 4..dst + 8].copy_from_slice(&decoded[row + 1]);
+                    pixels[dst + 8..dst + 12].copy_from_slice(&decoded[row + 2]);
+                    pixels[dst + 12..dst + 16].copy_from_slice(&decoded[row + 3]);
+                    let a_off = dy * 4;
+                    pixels[dst + 3] = pixel_alpha[a_off];
+                    pixels[dst + 7] = pixel_alpha[a_off + 1];
+                    pixels[dst + 11] = pixel_alpha[a_off + 2];
+                    pixels[dst + 15] = pixel_alpha[a_off + 3];
+                }
+            } else {
+                for dy in 0..4usize {
+                    for dx in 0..4usize {
+                        let px = bx * 4 + dx;
+                        let py = by * 4 + dy;
+                        if px < w && py < h {
+                            let dst = (py * w + px) * 4;
+                            let c = decoded[dy * 4 + dx];
+                            pixels[dst] = c[0];
+                            pixels[dst + 1] = c[1];
+                            pixels[dst + 2] = c[2];
+                            pixels[dst + 3] = pixel_alpha[dy * 4 + dx];
+                        }
                     }
                 }
             }
@@ -361,22 +414,25 @@ fn un_premultiply_alpha(pixels: &mut [u8], width: usize, height: usize) {
             if a == 0 || a == 255 {
                 continue;
             }
-            let scale = 255.0 / a as f32;
-            pixels[idx] = ((pixels[idx] as f32 * scale).ceil() as u32).min(255) as u8;
-            pixels[idx + 1] = ((pixels[idx + 1] as f32 * scale).ceil() as u32).min(255) as u8;
-            pixels[idx + 2] = ((pixels[idx + 2] as f32 * scale).ceil() as u32).min(255) as u8;
+            let r = pixels[idx] as u32;
+            let g = pixels[idx + 1] as u32;
+            let b = pixels[idx + 2] as u32;
+            pixels[idx] = (r * 255).div_ceil(a).min(255) as u8;
+            pixels[idx + 1] = (g * 255).div_ceil(a).min(255) as u8;
+            pixels[idx + 2] = (b * 255).div_ceil(a).min(255) as u8;
         }
     }
 }
 
 fn flip_y(pixels: &mut [u8], width: usize, height: usize) {
     let stride = width * 4;
+    let mut tmp = vec![0u8; stride];
     for row in 0..height / 2 {
         let top = row * stride;
         let bottom = (height - 1 - row) * stride;
-        for i in 0..stride {
-            pixels.swap(top + i, bottom + i);
-        }
+        tmp[..stride].copy_from_slice(&pixels[top..top + stride]);
+        pixels.copy_within(bottom..bottom + stride, top);
+        pixels[bottom..bottom + stride].copy_from_slice(&tmp[..stride]);
     }
 }
 

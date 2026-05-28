@@ -75,9 +75,15 @@ const TRANSPARENT_ALPHA_THRESHOLD: u8 = 128;
 fn simple_quantize(rgba: &[u8], bg: [u8; 3]) -> (Vec<u8>, Vec<u8>) {
     let sentinel = [0, 0, 2];
     let mut palette = vec![sentinel[0], sentinel[1], sentinel[2]];
-    let mut color_map: std::collections::HashMap<[u8; 3], u8> = std::collections::HashMap::new();
-    color_map.insert(sentinel, 0);
     let mut palette_colors: Vec<[u8; 3]> = vec![sentinel];
+
+    const TABLE_SIZE: usize = 64 * 64 * 64;
+    let mut color_table = vec![0xFFFFu16; TABLE_SIZE];
+    let sq = (sentinel[0] >> 2) as usize;
+    let sg = (sentinel[1] >> 2) as usize;
+    let sb = (sentinel[2] >> 2) as usize;
+    color_table[sq * 64 * 64 + sg * 64 + sb] = 0;
+    let mut palette_len = 1usize;
 
     let mut indices = Vec::with_capacity(rgba.len() / 4);
 
@@ -100,26 +106,28 @@ fn simple_quantize(rgba: &[u8], bg: [u8; 3]) -> (Vec<u8>, Vec<u8>) {
             (chunk[0], chunk[1], chunk[2])
         };
 
-        let r = r & 0xFC;
-        let g = g & 0xFC;
-        let b = b & 0xFC;
-        let key = [r, g, b];
+        let rq = (r >> 2) as usize;
+        let gq = (g >> 2) as usize;
+        let bq = (b >> 2) as usize;
+        let table_idx = rq * 64 * 64 + gq * 64 + bq;
 
-        let idx = match color_map.get(&key) {
-            Some(&i) => i,
-            None => {
-                if color_map.len() < 256 {
-                    let i = color_map.len() as u8;
-                    palette.push(r);
-                    palette.push(g);
-                    palette.push(b);
+        let idx = match color_table[table_idx] {
+            0xFFFF => {
+                let key = [r & 0xFC, g & 0xFC, b & 0xFC];
+                if palette_len < 256 {
+                    let i = palette_len as u8;
+                    palette.push(key[0]);
+                    palette.push(key[1]);
+                    palette.push(key[2]);
                     palette_colors.push(key);
-                    color_map.insert(key, i);
+                    color_table[table_idx] = i as u16;
+                    palette_len += 1;
                     i
                 } else {
                     nearest_palette_index(&palette_colors, &key)
                 }
             }
+            i => i as u8,
         };
         indices.push(idx);
     }

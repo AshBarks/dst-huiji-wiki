@@ -2,19 +2,36 @@ const BLOCK_SIZE: usize = 8;
 const XOR_KEY: [u8; BLOCK_SIZE] = [141, 142, 143, 144, 145, 146, 147, 148];
 const PERMUTATION: [usize; BLOCK_SIZE] = [5, 3, 6, 7, 4, 2, 0, 1];
 
-fn xor_cipher_block(input: &[u8], encrypt: bool) -> Vec<u8> {
-    if input.len() <= BLOCK_SIZE {
-        return input.to_vec();
+fn xor_process(data: &[u8], encrypt: bool) -> Vec<u8> {
+    if !encrypt && data.len() >= 2 && data[0] == b'P' && data[1] == b'K' {
+        return data.to_vec();
     }
-    let mut output = vec![0u8; BLOCK_SIZE];
-    for n in 0..BLOCK_SIZE {
-        let perm_idx = PERMUTATION[n];
-        if encrypt {
-            output[perm_idx] = input[n] ^ XOR_KEY[n];
-        } else {
-            output[n] = input[perm_idx] ^ XOR_KEY[n];
+    if data.len() < 16 {
+        return data.to_vec();
+    }
+
+    let mut output = Vec::with_capacity(data.len());
+    let data_len = data.len();
+    let mut pos = 0;
+
+    while pos + 8 < data_len {
+        let mut block = [0u8; BLOCK_SIZE];
+        for n in 0..BLOCK_SIZE {
+            let perm_idx = PERMUTATION[n];
+            if encrypt {
+                block[perm_idx] = data[pos + n] ^ XOR_KEY[n];
+            } else {
+                block[n] = data[pos + perm_idx] ^ XOR_KEY[n];
+            }
         }
+        output.extend_from_slice(&block);
+        pos += 8;
     }
+
+    if pos < data_len {
+        output.extend_from_slice(&data[pos..]);
+    }
+
     output
 }
 
@@ -22,86 +39,15 @@ pub fn xor_decrypt(data: &[u8]) -> Vec<u8> {
     if data.len() < 2 {
         return data.to_vec();
     }
-    if data[0] == b'P' && data[1] == b'K' {
-        return data.to_vec();
-    }
-    if data.len() < 16 {
-        return data.to_vec();
-    }
-
-    let mut output = Vec::new();
-    let data_len = data.len();
-    let mut cursor = 16;
-
-    let mut window = data[0..16].to_vec();
-    output.extend(xor_cipher_block(&window, false));
-
-    loop {
-        let second_half = window[BLOCK_SIZE..].to_vec();
-        let fresh_len = std::cmp::min(BLOCK_SIZE, data_len - cursor);
-        let fresh = if fresh_len > 0 {
-            data[cursor..cursor + fresh_len].to_vec()
-        } else {
-            Vec::new()
-        };
-        cursor += fresh_len;
-
-        window = second_half;
-        window.extend_from_slice(&fresh);
-
-        if window.is_empty() {
-            break;
-        }
-
-        if window.len() > BLOCK_SIZE {
-            output.extend(xor_cipher_block(&window, false));
-        } else {
-            output.extend_from_slice(&window);
-            break;
-        }
-    }
-
-    output
+    xor_process(data, false)
 }
 
+#[allow(dead_code)]
 pub fn xor_encrypt(data: &[u8]) -> Vec<u8> {
     if data.len() < 16 {
         return data.to_vec();
     }
-
-    let mut output = Vec::new();
-    let data_len = data.len();
-    let mut cursor = 16;
-
-    let mut window = data[0..16].to_vec();
-    output.extend(xor_cipher_block(&window, true));
-
-    loop {
-        let second_half = window[BLOCK_SIZE..].to_vec();
-        let fresh_len = std::cmp::min(BLOCK_SIZE, data_len - cursor);
-        let fresh = if fresh_len > 0 {
-            data[cursor..cursor + fresh_len].to_vec()
-        } else {
-            Vec::new()
-        };
-        cursor += fresh_len;
-
-        window = second_half;
-        window.extend_from_slice(&fresh);
-
-        if window.is_empty() {
-            break;
-        }
-
-        if window.len() > BLOCK_SIZE {
-            output.extend(xor_cipher_block(&window, true));
-        } else {
-            output.extend_from_slice(&window);
-            break;
-        }
-    }
-
-    output
+    xor_process(data, true)
 }
 
 #[cfg(test)]

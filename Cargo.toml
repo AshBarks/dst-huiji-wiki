@@ -8,7 +8,7 @@ clap = { version = "4", features = ["derive"] }
 eframe = "0.30"
 egui = "0.30"
 gif = "0.13"
-image = "0.25"
+image = { version = "0.25", default-features = false, features = ["png"] }
 rfd = "0.15"
 rayon = "1.10"
 thiserror = "2"

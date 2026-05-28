@@ -5,13 +5,11 @@ mod build_file;
 mod cli;
 mod error;
 mod gif_export;
-mod hash;
 mod ktex;
 mod reader;
 mod render;
 mod specs;
 mod ui;
-mod writer;
 mod xor;
 
 fn main() {

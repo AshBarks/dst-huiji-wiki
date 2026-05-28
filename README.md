@@ -1,6 +1,6 @@
 # dst-anim-tool
 
-Rust rewrite of [dont-starve-anim-tool](https://dont-starve-anim-tool.pages.dev/) — a CLI for extracting, splitting, and rendering Don't Starve Together (DST) animation files.
+Rust rewrite of [dont-starve-anim-tool](https://dont-starve-anim-tool.pages.dev/) — a CLI and GUI tool for extracting, splitting, rendering, and previewing Don't Starve Together (DST) animation files.
 
 ## Requirements
 
@@ -25,22 +25,26 @@ Commands:
   render   Render animation frames to PNG
   list     List available animations
   info     Show file metadata
+  decrypt  Decrypt .dyn to .zip
+  decode   Decode .tex files to PNG
+  preview  Launch interactive GUI preview
 ```
 
 ### extract
 
-Extract raw files (anim.bin, build.bin, .tex) from a .zip or .dyn archive.
+Extract raw files (anim.bin, build.bin, .tex) from archives.
 
 ```sh
-dst-anim-tool extract <input> <output-dir>
+dst-anim-tool extract -i <input> <output-dir>
 ```
 
 - `.dyn` files are automatically XOR-decrypted before extraction
 - All internal files are written to `output-dir/` preserving original filenames
+- Multiple inputs supported: `-i a.zip -i b.dyn`
 
 ```sh
-dst-anim-tool extract data/anim/abigail_flower.zip output/abigail_flower
-dst-anim-tool extract data/anim/dynamic/abigail_ice.dyn output/abigail_ice
+dst-anim-tool extract -i data/anim/abigail_flower.zip output/abigail_flower
+dst-anim-tool extract -i data/anim/dynamic/abigail_ice.dyn output/abigail_ice
 ```
 
 ### split
@@ -48,27 +52,16 @@ dst-anim-tool extract data/anim/dynamic/abigail_ice.dyn output/abigail_ice
 Decode atlas textures and split into per-symbol PNG frames.
 
 ```sh
-dst-anim-tool split <input> <output-dir>
+dst-anim-tool split -i <input> [--skin <skin-file>] <output-dir>
 ```
 
 - Decodes KTEX textures (DXT1/3/5/RGBA/RGB)
 - Crops sprite frames from atlas using build.bin vertex data
 - Output structure: `output-dir/<symbol_name>/frame_N.png`
+- `--skin`: overlay a skin (.zip or .dyn with build + textures)
 
 ```sh
-dst-anim-tool split data/anim/abigail_flower.zip output/split
-```
-
-Output example:
-
-```
-output/split/
-  petal1/frame_0.png
-  petal2/frame_0.png
-  flower1/frame_0.png
-  shdw/frame_0.png
-  shdw/frame_1.png
-  ...
+dst-anim-tool split -i data/anim/abigail_flower.zip output/split
 ```
 
 ### render
@@ -76,17 +69,18 @@ output/split/
 Render a specific animation as a sequence of composed PNG frames.
 
 ```sh
-dst-anim-tool render <input> <bank_name>/<animation_name> <output-dir>
+dst-anim-tool render -i <input> [--skin <skin-file>] <bank_name>/<animation_name> <output-dir>
 ```
 
 - Uses anim.bin elements + build.bin sprites + atlas textures
 - Each frame is composited from multiple elements with transform matrices
 - Output: `output-dir/frame_000.png`, `frame_001.png`, ...
+- `--skin`: overlay a skin for alternate textures
 
 Use `list` to discover available animation names.
 
 ```sh
-dst-anim-tool render data/anim/abigail_flower.zip abigail_flower/idle_1 output/render
+dst-anim-tool render -i data/anim/abigail_flower.zip abigail_flower/idle_1 output/render
 ```
 
 ### list
@@ -94,11 +88,11 @@ dst-anim-tool render data/anim/abigail_flower.zip abigail_flower/idle_1 output/r
 List all available animations (bank_name/animation_name) in an archive.
 
 ```sh
-dst-anim-tool list <input>
+dst-anim-tool list -i <input>
 ```
 
 ```sh
-$ dst-anim-tool list data/anim/abigail_flower.zip
+$ dst-anim-tool list -i data/anim/abigail_flower.zip
 abigail_flower/haunted_pre
 abigail_flower/haunted_pst
 abigail_flower/idle_1
@@ -111,10 +105,44 @@ abigail_flower/idle_haunted_loop
 Show detailed metadata about an archive.
 
 ```sh
-dst-anim-tool info <input>
+dst-anim-tool info -i <input>
 ```
 
 Displays: anim version, banks, animations with frame counts, build symbols, atlas files, texture dimensions and pixel format.
+
+### decrypt
+
+Decrypt a .dyn file to a plain .zip.
+
+```sh
+dst-anim-tool decrypt <input.dyn> <output.zip>
+```
+
+### decode
+
+Decode all .tex files in an archive to PNG.
+
+```sh
+dst-anim-tool decode <input> <output-dir>
+```
+
+### preview
+
+Launch an interactive GUI for browsing and previewing animations.
+
+```sh
+dst-anim-tool preview [-i <input-files>...]
+```
+
+Features:
+- Drag-and-drop multi-archive loading
+- Animation/bank/frame tree navigation
+- Playback with adjustable speed
+- Frame-by-frame stepping
+- PNG export of current frame
+- GIF export (builtin quantizer or ffmpeg-based for better quality)
+- Multi-build layering with atlas assignment
+- Background frame pre-rendering
 
 ## Supported File Types
 
@@ -122,6 +150,7 @@ Displays: anim version, banks, animations with frame counts, build symbols, atla
 |------|-----------|-------------|
 | ZIP archive | `.zip` | Standard DST animation package |
 | Dynamic skin | `.dyn` | XOR-encrypted ZIP (auto-decrypted) |
+| Binary | `.bin` | Standalone anim.bin or build.bin |
 
 ## Supported Texture Formats
 
@@ -137,9 +166,9 @@ Displays: anim version, banks, animations with frame counts, build symbols, atla
 
 ```sh
 cargo build          # compile
-cargo test           # run tests
+cargo test           # run tests (63 tests)
 cargo clippy         # lint
 cargo fmt            # format
 ```
 
-Pre-commit order: `cargo fmt` -> `cargo clippy` -> `cargo test`
+Pre-commit order: `cargo fmt` → `cargo clippy` → `cargo test`

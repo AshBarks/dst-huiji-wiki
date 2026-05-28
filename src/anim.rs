@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
 use crate::error::{Error, Result};
-use crate::hash::dst_hash;
 use crate::reader::Reader;
 use crate::specs::direction_suffix;
-use crate::writer::Writer;
 
 #[derive(Clone)]
 pub struct AnimElement {
@@ -219,99 +217,24 @@ pub fn parse_anim(data: &[u8]) -> Result<AnimFile> {
     Ok(file)
 }
 
-pub fn write_anim(file: &AnimFile) -> Vec<u8> {
-    let mut w = Writer::new();
-    let mut hash_map: HashMap<u32, String> = HashMap::new();
-
-    w.write_string("ANIM");
-    w.write_le_i32(file.version);
-
-    let mut total_elements = 0u32;
-    let mut total_frames = 0u32;
-    let mut total_events = 0u32;
-    let mut total_anims = 0u32;
-
-    for bank in &file.banks {
-        total_anims += bank.animations.len() as u32;
-        for anim in &bank.animations {
-            total_frames += anim.frames.len() as u32;
-            for frame in &anim.frames {
-                total_elements += frame.elements.len() as u32;
-                total_events += frame.events.len() as u32;
-            }
-        }
-    }
-
-    w.write_le_u32(total_elements);
-    w.write_le_u32(total_frames);
-    w.write_le_u32(total_events);
-    w.write_le_u32(total_anims);
-
-    for bank in &file.banks {
-        let bank_hash = dst_hash(&bank.name);
-        hash_map.insert(bank_hash, bank.name.clone());
-
-        for anim in &bank.animations {
-            let anim_name = anim.name.clone();
-            let direction = 0u8;
-            w.write_le_i32(anim_name.len() as i32);
-            w.write_string(&anim_name);
-            w.write_u8(direction);
-            w.write_le_u32(bank_hash);
-            w.write_le_f32(anim.frame_rate);
-            w.write_le_u32(anim.frames.len() as u32);
-
-            for frame in &anim.frames {
-                w.write_le_f32(frame.x);
-                w.write_le_f32(frame.y);
-                w.write_le_f32(frame.width);
-                w.write_le_f32(frame.height);
-                w.write_le_u32(frame.events.len() as u32);
-                for event in &frame.events {
-                    let event_hash = dst_hash(event);
-                    hash_map.insert(event_hash, event.clone());
-                    w.write_le_u32(event_hash);
-                }
-                w.write_le_u32(frame.elements.len() as u32);
-                for element in &frame.elements {
-                    let symbol_hash = dst_hash(&element.symbol);
-                    let layer_hash = dst_hash(&element.layer_name);
-                    hash_map.insert(symbol_hash, element.symbol.clone());
-                    hash_map.insert(layer_hash, element.layer_name.clone());
-                    w.write_le_u32(symbol_hash);
-                    w.write_le_u32(element.frame_num);
-                    w.write_le_u32(layer_hash);
-                    w.write_le_f32(element.a);
-                    w.write_le_f32(element.b);
-                    w.write_le_f32(element.c);
-                    w.write_le_f32(element.d);
-                    w.write_le_f32(element.tx);
-                    w.write_le_f32(element.ty);
-                    w.write_le_f32(element.z_index);
-                }
-            }
-        }
-    }
-
-    w.write_le_u32(hash_map.len() as u32);
-    for (hash, string) in &hash_map {
-        w.write_le_u32(*hash);
-        w.write_le_i32(string.len() as i32);
-        w.write_string(string);
-    }
-
-    w.into_vec()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn parse_anim_empty_roundtrip() {
-        let original = write_anim(&AnimFile::new());
-        let parsed = parse_anim(&original).unwrap();
-        assert_eq!(parsed.version, 4);
-        assert!(parsed.banks.is_empty());
+    fn parse_anim_basic() {
+        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            if file.name() == "anim.bin" {
+                let mut buf = Vec::new();
+                std::io::Read::read_to_end(&mut file, &mut buf).unwrap();
+                let anim = parse_anim(&buf).unwrap();
+                assert!(!anim.banks.is_empty());
+                return;
+            }
+        }
+        panic!("no anim.bin found");
     }
 }

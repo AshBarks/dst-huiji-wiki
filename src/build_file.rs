@@ -2,9 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::error::{Error, Result};
-use crate::hash::dst_hash;
 use crate::reader::Reader;
-use crate::writer::Writer;
 
 #[derive(Clone)]
 pub struct BuildVert {
@@ -24,6 +22,7 @@ pub struct BuildAtlasRef {
 #[derive(Clone)]
 pub struct BuildFrame {
     pub frame_num: u32,
+    #[allow(dead_code)]
     pub duration: u32,
     pub x: f32,
     pub y: f32,
@@ -186,90 +185,24 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
     Ok(file)
 }
 
-pub fn write_build(file: &BuildFile) -> Vec<u8> {
-    let mut w = Writer::new();
-    let mut hash_map: HashMap<u32, String> = HashMap::new();
-    let mut all_verts: Vec<&BuildVert> = Vec::new();
-
-    w.write_string("BILD");
-    w.write_le_i32(file.version);
-    w.write_le_u32(file.symbols.len() as u32);
-    let total_frames: u32 = file.symbols.iter().map(|s| s.frames.len() as u32).sum();
-    w.write_le_u32(total_frames);
-    w.write_le_i32(file.name.len() as i32);
-    w.write_string(&file.name);
-    w.write_le_u32(file.atlases.len() as u32);
-    for atlas in &file.atlases {
-        w.write_le_i32(atlas.name.len() as i32);
-        w.write_string(&atlas.name);
-    }
-
-    let mut sorted_hashes: Vec<u32> = file.symbols.iter().map(|s| dst_hash(&s.name)).collect();
-    sorted_hashes.sort();
-    hash_map.insert(dst_hash(&file.name), file.name.clone());
-
-    for hash in &sorted_hashes {
-        let symbol = file
-            .symbols
-            .iter()
-            .find(|s| dst_hash(&s.name) == *hash)
-            .unwrap();
-        hash_map.insert(*hash, symbol.name.clone());
-        w.write_le_u32(*hash);
-        w.write_le_u32(symbol.frames.len() as u32);
-        for frame in &symbol.frames {
-            let vert_idx = all_verts.len() as u32;
-            let vert_count = frame.verts.len() as u32;
-            w.write_le_u32(frame.frame_num);
-            w.write_le_u32(frame.duration);
-            w.write_le_f32(frame.x);
-            w.write_le_f32(frame.y);
-            w.write_le_f32(frame.width);
-            w.write_le_f32(frame.height);
-            w.write_le_u32(vert_idx);
-            w.write_le_u32(vert_count);
-            all_verts.extend(&frame.verts);
-        }
-    }
-
-    w.write_le_u32(all_verts.len() as u32);
-    for v in &all_verts {
-        w.write_le_f32(v.x);
-        w.write_le_f32(v.y);
-        w.write_le_f32(v.z);
-        w.write_le_f32(v.u);
-        w.write_le_f32(v.v);
-        w.write_le_f32(v.w as f32);
-    }
-
-    w.write_le_u32(hash_map.len() as u32);
-    for (hash, string) in &hash_map {
-        w.write_le_u32(*hash);
-        w.write_le_i32(string.len() as i32);
-        w.write_string(string);
-    }
-
-    w.into_vec()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn parse_build_empty_roundtrip() {
-        let file = BuildFile {
-            version: 6,
-            name: "test".to_string(),
-            symbols: Vec::new(),
-            atlases: Vec::new(),
-            symbol_index: HashMap::new(),
-        };
-        let buf = write_build(&file);
-        let parsed = parse_build(&buf).unwrap();
-        assert_eq!(parsed.version, 6);
-        assert_eq!(parsed.name, "test");
-        assert!(parsed.symbols.is_empty());
-        assert!(parsed.atlases.is_empty());
+    fn parse_build_basic() {
+        let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            if file.name() == "build.bin" {
+                let mut buf = Vec::new();
+                std::io::Read::read_to_end(&mut file, &mut buf).unwrap();
+                let build = parse_build(&buf).unwrap();
+                assert!(!build.symbols.is_empty());
+                return;
+            }
+        }
+        panic!("no build.bin found");
     }
 }

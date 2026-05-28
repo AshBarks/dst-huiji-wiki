@@ -10,6 +10,7 @@ pub struct BoundingBox {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct RenderedFrame {
     pub image: image::RgbaImage,
     pub bounds: BoundingBox,
@@ -34,89 +35,134 @@ fn find_symbol_frame<'a>(
     None
 }
 
-struct ElementData {
-    sprite: std::sync::Arc<image::RgbaImage>,
-    bf_x: f32,
-    bf_y: f32,
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-    tx: f32,
-    ty: f32,
+pub struct ElementData {
+    pub sprite: std::sync::Arc<image::RgbaImage>,
+    pub bf_x: f32,
+    pub bf_y: f32,
+    pub a: f32,
+    pub b: f32,
+    pub c: f32,
+    pub d: f32,
+    pub tx: f32,
+    pub ty: f32,
 }
 
-fn compute_frame_bounds(
+pub fn compute_frame_elements(
     anim_frame: &AnimFrame,
     build_list: &[&BuildFile],
     scale: f32,
-    offset: (f32, f32),
-) -> Option<(BoundingBox, Vec<ElementData>)> {
-    let mut top = f32::INFINITY;
-    let mut left = f32::INFINITY;
-    let mut bottom = f32::NEG_INFINITY;
-    let mut right = f32::NEG_INFINITY;
-
+) -> Option<Vec<ElementData>> {
     let mut elements_data: Vec<ElementData> = Vec::new();
-
     for element in &anim_frame.elements {
         let bf = find_symbol_frame(build_list, &element.symbol_lower, element.frame_num);
         if let Some(bf) = bf {
             let Some(sprite) = &bf.image else {
                 continue;
             };
-
-            let a = element.a * scale;
-            let b = element.b * scale;
-            let c = element.c * scale;
-            let d = element.d * scale;
-
-            let elem_left = element.tx * scale + offset.0 + bf.x * a + bf.y * c;
-            let elem_top = element.ty * scale + offset.1 + bf.x * b + bf.y * d;
-
-            let sw = sprite.width() as f32;
-            let sh = sprite.height() as f32;
-            let corners_x = [0.0, sw * a, sh * c, sw * a + sh * c];
-            let corners_y = [0.0, sw * b, sh * d, sw * b + sh * d];
-            let min_sx = corners_x.iter().cloned().fold(f32::INFINITY, f32::min);
-            let max_sx = corners_x.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-            let min_sy = corners_y.iter().cloned().fold(f32::INFINITY, f32::min);
-            let max_sy = corners_y.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-            let tw = max_sx - min_sx;
-            let th = max_sy - min_sy;
-
-            left = left.min(elem_left - tw / 2.0);
-            right = right.max(elem_left + tw / 2.0);
-            top = top.min(elem_top - th / 2.0);
-            bottom = bottom.max(elem_top + th / 2.0);
-
             elements_data.push(ElementData {
                 sprite: sprite.clone(),
                 bf_x: bf.x,
                 bf_y: bf.y,
-                a,
-                b,
-                c,
-                d,
+                a: element.a * scale,
+                b: element.b * scale,
+                c: element.c * scale,
+                d: element.d * scale,
                 tx: element.tx,
                 ty: element.ty,
             });
         }
+    }
+    if elements_data.is_empty() {
+        None
+    } else {
+        Some(elements_data)
+    }
+}
+
+fn compute_bounds_from_elements(
+    elements_data: &[ElementData],
+    scale: f32,
+    offset: (f32, f32),
+) -> Option<BoundingBox> {
+    let mut top = f32::INFINITY;
+    let mut left = f32::INFINITY;
+    let mut bottom = f32::NEG_INFINITY;
+    let mut right = f32::NEG_INFINITY;
+
+    for elem in elements_data {
+        let elem_left = elem.tx * scale + offset.0 + elem.bf_x * elem.a + elem.bf_y * elem.c;
+        let elem_top = elem.ty * scale + offset.1 + elem.bf_x * elem.b + elem.bf_y * elem.d;
+
+        let sw = elem.sprite.width() as f32;
+        let sh = elem.sprite.height() as f32;
+        let corners_x = [0.0, sw * elem.a, sh * elem.c, sw * elem.a + sh * elem.c];
+        let corners_y = [0.0, sw * elem.b, sh * elem.d, sw * elem.b + sh * elem.d];
+        let tw = corners_x.iter().cloned().fold(f32::NEG_INFINITY, f32::max)
+            - corners_x.iter().cloned().fold(f32::INFINITY, f32::min);
+        let th = corners_y.iter().cloned().fold(f32::NEG_INFINITY, f32::max)
+            - corners_y.iter().cloned().fold(f32::INFINITY, f32::min);
+
+        left = left.min(elem_left - tw / 2.0);
+        right = right.max(elem_left + tw / 2.0);
+        top = top.min(elem_top - th / 2.0);
+        bottom = bottom.max(elem_top + th / 2.0);
     }
 
     if left.is_infinite() || right.is_infinite() {
         return None;
     }
 
-    Some((
-        BoundingBox {
-            left,
-            top,
-            right,
-            bottom,
-        },
-        elements_data,
-    ))
+    Some(BoundingBox {
+        left,
+        top,
+        right,
+        bottom,
+    })
+}
+
+pub struct PreparedFrame {
+    pub elements: Vec<ElementData>,
+    pub bounds: BoundingBox,
+}
+
+pub fn prepare_animation_frames(
+    frames: &[AnimFrame],
+    build_list: &[&BuildFile],
+    scale: f32,
+    offset: (f32, f32),
+) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
+    let mut prepared: Vec<Option<PreparedFrame>> = Vec::with_capacity(frames.len());
+    let mut union_top = f32::INFINITY;
+    let mut union_left = f32::INFINITY;
+    let mut union_bottom = f32::NEG_INFINITY;
+    let mut union_right = f32::NEG_INFINITY;
+
+    for frame in frames {
+        if let Some(elements) = compute_frame_elements(frame, build_list, scale)
+            && let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset)
+        {
+            union_left = union_left.min(bounds.left);
+            union_top = union_top.min(bounds.top);
+            union_right = union_right.max(bounds.right);
+            union_bottom = union_bottom.max(bounds.bottom);
+            prepared.push(Some(PreparedFrame { elements, bounds }));
+            continue;
+        }
+        prepared.push(None);
+    }
+
+    let union_bounds = if union_left.is_infinite() || union_right.is_infinite() {
+        None
+    } else {
+        Some(BoundingBox {
+            left: union_left,
+            top: union_top,
+            right: union_right,
+            bottom: union_bottom,
+        })
+    };
+
+    (union_bounds, prepared)
 }
 
 pub fn compute_animation_bounds(
@@ -125,30 +171,8 @@ pub fn compute_animation_bounds(
     scale: f32,
     offset: (f32, f32),
 ) -> Option<BoundingBox> {
-    let mut union_top = f32::INFINITY;
-    let mut union_left = f32::INFINITY;
-    let mut union_bottom = f32::NEG_INFINITY;
-    let mut union_right = f32::NEG_INFINITY;
-
-    for frame in frames {
-        if let Some((bounds, _)) = compute_frame_bounds(frame, build_list, scale, offset) {
-            union_left = union_left.min(bounds.left);
-            union_top = union_top.min(bounds.top);
-            union_right = union_right.max(bounds.right);
-            union_bottom = union_bottom.max(bounds.bottom);
-        }
-    }
-
-    if union_left.is_infinite() || union_right.is_infinite() {
-        return None;
-    }
-
-    Some(BoundingBox {
-        left: union_left,
-        top: union_top,
-        right: union_right,
-        bottom: union_bottom,
-    })
+    let (bounds, _) = prepare_animation_frames(frames, build_list, scale, offset);
+    bounds
 }
 
 fn composite_pixel(canvas_buf: &mut [u8], dst_off: usize, sprite_buf: &[u8], src_off: usize) {
@@ -161,6 +185,13 @@ fn composite_pixel(canvas_buf: &mut [u8], dst_off: usize, sprite_buf: &[u8], src
         return;
     }
     let dst_a = canvas_buf[dst_off + 3] as u32;
+    if dst_a == 0 {
+        canvas_buf[dst_off] = sprite_buf[src_off];
+        canvas_buf[dst_off + 1] = sprite_buf[src_off + 1];
+        canvas_buf[dst_off + 2] = sprite_buf[src_off + 2];
+        canvas_buf[dst_off + 3] = src_a as u8;
+        return;
+    }
     let out_a = src_a + dst_a - (src_a * dst_a + 127) / 255;
     if out_a == 0 {
         return;
@@ -186,21 +217,12 @@ fn composite_pixel(canvas_buf: &mut [u8], dst_off: usize, sprite_buf: &[u8], src
     canvas_buf[dst_off + 3] = out_a.min(255) as u8;
 }
 
-pub fn render_frame(
-    anim_frame: &AnimFrame,
-    build_list: &[&BuildFile],
+pub fn render_frame_with_elements(
+    elements_data: &[ElementData],
+    bounds: &BoundingBox,
     scale: f32,
     offset: (f32, f32),
-    bounds_override: Option<&BoundingBox>,
 ) -> Option<RenderedFrame> {
-    let (bounds, elements_data) = match bounds_override {
-        Some(ub) => {
-            let (_, elements_data) = compute_frame_bounds(anim_frame, build_list, scale, offset)?;
-            (ub.clone(), elements_data)
-        }
-        None => compute_frame_bounds(anim_frame, build_list, scale, offset)?,
-    };
-
     let w = (bounds.right - bounds.left).ceil() as u32;
     let h = (bounds.bottom - bounds.top).ceil() as u32;
     if w == 0 || h == 0 {
@@ -332,8 +354,23 @@ pub fn render_frame(
 
     Some(RenderedFrame {
         image: canvas,
-        bounds,
+        bounds: bounds.clone(),
     })
+}
+
+pub fn render_frame(
+    anim_frame: &AnimFrame,
+    build_list: &[&BuildFile],
+    scale: f32,
+    offset: (f32, f32),
+    bounds_override: Option<&BoundingBox>,
+) -> Option<RenderedFrame> {
+    let elements = compute_frame_elements(anim_frame, build_list, scale)?;
+    let bounds = match bounds_override {
+        Some(ub) => ub.clone(),
+        None => compute_bounds_from_elements(&elements, scale, offset)?,
+    };
+    render_frame_with_elements(&elements, &bounds, scale, offset)
 }
 
 #[cfg(test)]
@@ -343,12 +380,15 @@ mod tests {
     #[test]
     fn render_abigail_flower() {
         use crate::archive::parse_zip;
-        use crate::atlas::{decode_atlas_images, split_atlas};
+        use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
 
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = parse_zip(&data).unwrap();
 
-        let atlas_images = decode_atlas_images(&archive);
+        let atlas_images = decode_atlas_images_from_tex(
+            &archive.build.as_ref().unwrap().atlases,
+            &archive.tex_files(),
+        );
         split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
 
         let anim = archive.anim.as_ref().unwrap();

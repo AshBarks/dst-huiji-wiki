@@ -10,7 +10,7 @@ use crate::render::{render_frame, render_frame_with_elements};
 use super::{AnimEntry, App, AtlasEntry, BuildEntry};
 
 pub struct FrameCacheEntry {
-    pub image: image::RgbaImage,
+    pub image: Arc<image::RgbaImage>,
     pub texture: Option<egui::TextureHandle>,
 }
 
@@ -155,15 +155,20 @@ impl App {
             crate::render::prepare_animation_frames(&anim.frames, &build_list, 1.0, (0.0, 0.0));
         let cache_gen_val = self.cache_gen;
         let total_frames = anim.frames.len();
+        if total_frames == 0 {
+            return;
+        }
+        let start_frame = (self.active_frame_idx + 1) % total_frames;
         let stop_flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let stop_flag_clone = stop_flag.clone();
         let (sender, receiver) = std::sync::mpsc::channel::<(u64, usize, image::RgbaImage)>();
 
         let handle = std::thread::spawn(move || {
-            for fi in 0..total_frames {
+            for offset in 0..total_frames {
                 if stop_flag_clone.load(std::sync::atomic::Ordering::Relaxed) {
                     return;
                 }
+                let fi = (start_frame + offset) % total_frames;
                 if let Some(pf) = &prepared.get(fi).and_then(|p| p.as_ref()) {
                     let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
                     if let Some(rendered) =
@@ -192,9 +197,10 @@ impl App {
             match bg.receiver.try_recv() {
                 Ok((recv_gen, fi, img)) => {
                     if recv_gen == current_gen {
-                        let size = [img.width() as usize, img.height() as usize];
+                        let img_arc = Arc::new(img);
+                        let size = [img_arc.width() as usize, img_arc.height() as usize];
                         let color_image =
-                            egui::ColorImage::from_rgba_unmultiplied(size, img.as_raw());
+                            egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
                         let texture = ctx.load_texture(
                             format!("cached_frame_{fi}"),
                             color_image,
@@ -203,7 +209,7 @@ impl App {
                         self.frame_cache.insert(
                             fi,
                             FrameCacheEntry {
-                                image: img,
+                                image: img_arc,
                                 texture: Some(texture),
                             },
                         );
@@ -283,23 +289,20 @@ impl App {
             (0.0, 0.0),
             self.animation_bounds.as_ref(),
         ) {
-            let size = [
-                rendered.image.width() as usize,
-                rendered.image.height() as usize,
-            ];
-            let color_image =
-                egui::ColorImage::from_rgba_unmultiplied(size, rendered.image.as_raw());
+            let img_arc = Arc::new(rendered.image);
+            let size = [img_arc.width() as usize, img_arc.height() as usize];
+            let color_image = egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
             let texture = ctx.load_texture(
                 format!("cached_frame_{}", self.active_frame_idx),
                 color_image,
                 egui::TextureOptions::LINEAR,
             );
             self.frame_texture = Some(texture.clone());
-            self.rendered_image = Some(rendered.image.clone());
+            self.rendered_image = Some(img_arc.clone());
             self.frame_cache.insert(
                 self.active_frame_idx,
                 FrameCacheEntry {
-                    image: rendered.image,
+                    image: img_arc,
                     texture: Some(texture),
                 },
             );
@@ -340,7 +343,7 @@ impl App {
         }
     }
 
-    pub fn spawn_file_load(&mut self, path: PathBuf, data: Vec<u8>) {
+    pub fn spawn_file_load(&mut self, path: PathBuf, data: Option<Vec<u8>>) {
         let canonical = Self::canonicalize_path(&path);
         if self.loaded_paths.contains(&canonical) {
             return;
@@ -359,6 +362,19 @@ impl App {
         self.bg_loader.as_mut().unwrap().pending += 1;
 
         std::thread::spawn(move || {
+            let data = match data {
+                Some(d) => d,
+                None => match std::fs::read(&path) {
+                    Ok(d) => d,
+                    Err(e) => {
+                        let _ = sender.send(LoadResult::Failed(
+                            path,
+                            format!("Failed to read file: {e}"),
+                        ));
+                        return;
+                    }
+                },
+            };
             let result = Self::do_load_file(path, data, &canonical);
             let _ = sender.send(result);
         });

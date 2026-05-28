@@ -375,13 +375,13 @@ fn un_premultiply_alpha(pixels: &mut [u8], width: usize, height: usize) {
 
 fn flip_y(pixels: &mut [u8], width: usize, height: usize) {
     let stride = width * 4;
-    let mut tmp = vec![0u8; stride];
-    for row in 0..height / 2 {
-        let top = row * stride;
-        let bottom = (height - 1 - row) * stride;
-        tmp[..stride].copy_from_slice(&pixels[top..top + stride]);
-        pixels.copy_within(bottom..bottom + stride, top);
-        pixels[bottom..bottom + stride].copy_from_slice(&tmp[..stride]);
+    let half = height / 2;
+    let (top_half, bottom_half) = pixels.split_at_mut(half * stride);
+    for (top_row, bottom_row) in top_half
+        .chunks_exact_mut(stride)
+        .zip(bottom_half.rchunks_exact_mut(stride))
+    {
+        top_row.swap_with_slice(bottom_row);
     }
 }
 

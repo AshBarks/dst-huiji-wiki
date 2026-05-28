@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::sync::mpsc;
 
 use rayon::prelude::*;
@@ -29,7 +30,7 @@ pub struct BackgroundPngExport {
 pub fn start_gif_export_thread(
     anim: &crate::anim::AnimAnimation,
     build_list: &[crate::render::BuildRef<'_>],
-    cached_frames: HashMap<usize, image::RgbaImage>,
+    cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
 ) -> mpsc::Receiver<GifExportResult> {
     let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
     let frame_rate = anim.frame_rate;
@@ -43,7 +44,7 @@ pub fn start_gif_export_thread(
             .into_par_iter()
             .map(|fi| {
                 if let Some(cached) = cached_frames.get(&fi) {
-                    return cached.clone();
+                    return (**cached).clone();
                 }
                 if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
                     let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
@@ -81,7 +82,7 @@ pub fn start_gif_export_thread(
 pub fn start_png_export_thread(
     anim: &crate::anim::AnimAnimation,
     build_list: &[crate::render::BuildRef<'_>],
-    cached_frames: HashMap<usize, image::RgbaImage>,
+    cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {
     let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
@@ -96,7 +97,7 @@ pub fn start_png_export_thread(
             .into_par_iter()
             .map(|fi| {
                 if let Some(cached) = cached_frames.get(&fi) {
-                    return cached.clone();
+                    return (**cached).clone();
                 }
                 if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
                     let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);

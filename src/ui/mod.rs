@@ -47,7 +47,7 @@ pub struct App {
     play_speed: f32,
     last_frame_time: Instant,
     frame_texture: Option<egui::TextureHandle>,
-    rendered_image: Option<image::RgbaImage>,
+    rendered_image: Option<Arc<image::RgbaImage>>,
     needs_re_render: bool,
     error_message: Option<String>,
     frame_cache: HashMap<usize, FrameCacheEntry>,
@@ -219,7 +219,7 @@ impl App {
             return;
         }
 
-        let cached_frames: HashMap<usize, image::RgbaImage> = self
+        let cached_frames: HashMap<usize, Arc<image::RgbaImage>> = self
             .frame_cache
             .iter()
             .map(|(&fi, entry)| (fi, entry.image.clone()))
@@ -268,7 +268,7 @@ impl App {
             return;
         }
 
-        let cached_frames: HashMap<usize, image::RgbaImage> = self
+        let cached_frames: HashMap<usize, Arc<image::RgbaImage>> = self
             .frame_cache
             .iter()
             .map(|(&fi, entry)| (fi, entry.image.clone()))
@@ -304,22 +304,18 @@ impl eframe::App for App {
             && !paths.is_empty()
         {
             for path in paths {
-                if let Ok(data) = std::fs::read(&path) {
-                    self.spawn_file_load(path, data);
-                }
+                self.spawn_file_load(path, None);
             }
         }
 
         let dropped_files = ctx.input(|i| i.raw.dropped_files.clone());
         for dropped in dropped_files {
             if let Some(path) = &dropped.path {
-                if let Ok(data) = std::fs::read(path) {
-                    self.spawn_file_load(path.clone(), data);
-                }
+                self.spawn_file_load(path.clone(), None);
             } else if let Some(bytes) = &dropped.bytes {
                 let name = dropped.name.clone();
                 let fake_path = PathBuf::from(&name);
-                self.spawn_file_load(fake_path, bytes.to_vec());
+                self.spawn_file_load(fake_path, Some(bytes.to_vec()));
             }
         }
 

@@ -12,9 +12,7 @@ impl App {
                         .pick_files()
                 {
                     for path in paths {
-                        if let Ok(data) = std::fs::read(&path) {
-                            self.spawn_file_load(path, data);
-                        }
+                        self.spawn_file_load(path, None);
                     }
                 }
 

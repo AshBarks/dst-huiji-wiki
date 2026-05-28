@@ -20,7 +20,6 @@ Binary output: `target/release/dst-anim-tool`
 dst-anim-tool <COMMAND>
 
 Commands:
-  extract  Extract raw files from .zip/.dyn
   split    Split atlas into individual sprite frame PNGs
   render   Render animation frames to PNG
   list     List available animations
@@ -28,23 +27,6 @@ Commands:
   decrypt  Decrypt .dyn to .zip
   decode   Decode .tex files to PNG
   preview  Launch interactive GUI preview
-```
-
-### extract
-
-Extract raw files (anim.bin, build.bin, .tex) from archives.
-
-```sh
-dst-anim-tool extract -i <input> <output-dir>
-```
-
-- `.dyn` files are automatically XOR-decrypted before extraction
-- All internal files are written to `output-dir/` preserving original filenames
-- Multiple inputs supported: `-i a.zip -i b.dyn`
-
-```sh
-dst-anim-tool extract -i data/anim/abigail_flower.zip output/abigail_flower
-dst-anim-tool extract -i data/anim/dynamic/abigail_ice.dyn output/abigail_ice
 ```
 
 ### split
@@ -166,7 +148,7 @@ Features:
 
 ```sh
 cargo build          # compile
-cargo test           # run tests (63 tests)
+cargo test           # run tests (106 tests)
 cargo clippy         # lint
 cargo fmt            # format
 ```

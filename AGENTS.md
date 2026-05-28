@@ -2,13 +2,13 @@
 
 ## Project
 
-Rust rewrite of a JS-based Don't Starve Together (DST) animation file extraction tool. Single crate `dst-anim-tool`. All planned features implemented — CLI (extract/split/render/list/info/decrypt/decode/preview) and GUI preview with GIF/PNG export.
+Rust rewrite of a JS-based Don't Starve Together (DST) animation file extraction tool. Single crate `dst-anim-tool`. All planned features implemented — CLI (split/render/list/info/decrypt/decode/preview) and GUI preview with GIF/PNG export.
 
 ## Build & Verify
 
 ```
 cargo build          # compile
-cargo test           # run all tests (48 per-module #[test])
+cargo test           # run all tests (106 per-module #[test])
 cargo clippy         # lint — run before committing
 cargo fmt            # format — run before committing
 cargo fmt -- --check # format check (non-destructive)
@@ -25,7 +25,7 @@ Modules (all in `src/`):
 | File | Role |
 |------|------|
 | `main.rs` | Entry point, delegates to `cli::run()` |
-| `cli.rs` | clap (derive) CLI: `extract`, `split`, `render`, `list`, `info`, `decrypt`, `decode`, `preview` subcommands |
+| `cli.rs` | clap (derive) CLI: `split`, `render`, `list`, `info`, `decrypt`, `decode`, `preview` subcommands |
 | `reader.rs` | Binary reader — LE byte order, **jump reads** (offset-based reads for pre-scan passes in anim.bin/build.bin) |
 | `specs.rs` | Magic constants (`ANIM/BILD/KTEX`), enums (`Platform/PixelFormat/TextureType/Direction`), direction suffix map via `LazyLock<HashMap>`, `KtexSpec` bit-field offsets, `detect_spec()` |
 | `xor.rs` | XOR stream cipher — key `[141..148]`, permutation `[5,3,6,7,4,2,0,1]`, sequential block processing |

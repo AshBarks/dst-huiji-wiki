@@ -53,7 +53,7 @@ pub struct BuildFile {
 }
 
 impl BuildFile {
-    pub fn build_symbol_index(&mut self) {
+    pub(crate) fn build_symbol_index(&mut self) {
         self.symbol_index.clear();
         for (i, symbol) in self.symbols.iter().enumerate() {
             self.symbol_index.insert(symbol.name.to_lowercase(), i);

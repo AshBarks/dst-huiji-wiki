@@ -37,7 +37,7 @@ impl<'a> Reader<'a> {
         self.read_u8_at(self.pos)
     }
 
-    pub fn read_u8_at(&mut self, offset: usize) -> Result<u8> {
+    pub(crate) fn read_u8_at(&mut self, offset: usize) -> Result<u8> {
         self.check_bounds(offset, 1)?;
         let v = self.data[offset];
         self.pos = offset + 1;
@@ -48,7 +48,7 @@ impl<'a> Reader<'a> {
         self.read_le_u16_at(self.pos)
     }
 
-    pub fn read_le_u16_at(&mut self, offset: usize) -> Result<u16> {
+    pub(crate) fn read_le_u16_at(&mut self, offset: usize) -> Result<u16> {
         self.check_bounds(offset, 2)?;
         let v = u16::from_le_bytes([self.data[offset], self.data[offset + 1]]);
         self.pos = offset + 2;
@@ -91,7 +91,7 @@ impl<'a> Reader<'a> {
         self.read_le_f32_at(self.pos)
     }
 
-    pub fn read_le_f32_at(&mut self, offset: usize) -> Result<f32> {
+    pub(crate) fn read_le_f32_at(&mut self, offset: usize) -> Result<f32> {
         self.check_bounds(offset, 4)?;
         let bytes = [
             self.data[offset],
@@ -119,7 +119,7 @@ impl<'a> Reader<'a> {
         self.read_string_at(self.pos, len)
     }
 
-    pub fn read_string_at(&mut self, offset: usize, len: usize) -> Result<String> {
+    pub(crate) fn read_string_at(&mut self, offset: usize, len: usize) -> Result<String> {
         let bytes = self.read_bytes_at(offset, len)?;
         String::from_utf8(bytes.to_vec())
             .map_err(|e| Error::Other(format!("invalid ascii string: {e}")))

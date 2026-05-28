@@ -52,7 +52,7 @@ pub struct ElementData {
     pub ty: f32,
 }
 
-pub fn compute_frame_elements(
+pub(crate) fn compute_frame_elements(
     anim_frame: &AnimFrame,
     build_list: &[BuildRef<'_>],
     scale: f32,

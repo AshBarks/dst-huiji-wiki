@@ -3,7 +3,6 @@ use crate::reader::Reader;
 use crate::specs::{MAGIC_KTEX, PRE_CAVE_SPEC, PixelFormat, Platform, TextureType, detect_spec};
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub struct KtexHeader {
     pub platform: Platform,
     pub pixel_format: PixelFormat,

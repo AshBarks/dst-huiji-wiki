@@ -1,4 +1,4 @@
-use crate::ui::App;
+use super::App;
 
 type BankData = Vec<(usize, String, Vec<(usize, String)>)>;
 
@@ -28,44 +28,49 @@ impl App {
                         self.error_message = Some(format!("Failed to save PNG: {e}"));
                     }
 
-                    let has_animation = self.get_current_animation().is_some();
-                    ui.add_enabled_ui(has_animation, |ui| {
-                        let exporting = self.gif_export.is_some() || self.png_export.is_some();
-                        let label = if exporting {
-                            "Exporting..."
-                        } else {
-                            "Export GIF"
-                        };
-                        if ui
-                            .add_enabled(!exporting, egui::Button::new(label))
-                            .on_hover_text(if exporting {
-                                "Export in progress..."
+                    #[cfg(feature = "gif")]
+                    {
+                        let has_animation = self.get_current_animation().is_some();
+                        ui.add_enabled_ui(has_animation, |ui| {
+                            let exporting = self.gif_export.is_some()
+                                || self.png_export.is_some();
+                            let label = if exporting {
+                                "Exporting..."
                             } else {
-                                "Export animation as GIF (builtin quantizer)"
-                            })
-                            .clicked()
-                        {
-                            self.start_gif_export();
-                        }
+                                "Export GIF"
+                            };
+                            if ui
+                                .add_enabled(!exporting, egui::Button::new(label))
+                                .on_hover_text(if exporting {
+                                    "Export in progress..."
+                                } else {
+                                    "Export animation as GIF (builtin quantizer)"
+                                })
+                                .clicked()
+                            {
+                                self.start_gif_export();
+                            }
 
-                        let png_exporting = self.gif_export.is_some() || self.png_export.is_some();
-                        let png_label = if png_exporting {
-                            "Exporting..."
-                        } else {
-                            "Export PNG+GIF"
-                        };
-                        if ui
-                            .add_enabled(!png_exporting, egui::Button::new(png_label))
-                            .on_hover_text(if png_exporting {
-                                "Export in progress..."
+                            let png_exporting = self.gif_export.is_some()
+                                || self.png_export.is_some();
+                            let png_label = if png_exporting {
+                                "Exporting..."
                             } else {
-                                "Export PNG sequence, then convert to GIF via ffmpeg (better quality)"
-                            })
-                            .clicked()
-                        {
-                            self.start_png_export();
-                        }
-                    });
+                                "Export PNG+GIF"
+                            };
+                            if ui
+                                .add_enabled(!png_exporting, egui::Button::new(png_label))
+                                .on_hover_text(if png_exporting {
+                                    "Export in progress..."
+                                } else {
+                                    "Export PNG sequence, then convert to GIF via ffmpeg (better quality)"
+                                })
+                                .clicked()
+                            {
+                                self.start_png_export();
+                            }
+                        });
+                    }
                 });
             });
         });

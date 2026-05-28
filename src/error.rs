@@ -29,6 +29,7 @@ pub enum Error {
     #[error("ZIP error: {0}")]
     Zip(#[from] zip::result::ZipError),
 
+    #[cfg(feature = "gif")]
     #[error("GIF error: {0}")]
     Gif(#[from] gif::EncodingError),
 

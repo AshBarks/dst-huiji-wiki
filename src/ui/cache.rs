@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::archive::{BinType, parse_dyn, parse_zip};
-use crate::atlas::gather_atlas_images;
-use crate::ktex::parse_ktex;
-use crate::render::{render_frame, render_frame_with_elements};
+use dst_anim_tool::archive::{BinType, parse_dyn, parse_zip};
+use dst_anim_tool::atlas::gather_atlas_images;
+use dst_anim_tool::ktex::parse_ktex;
+use dst_anim_tool::render::{render_frame, render_frame_with_elements};
 
 use super::{AnimEntry, App, AtlasEntry, BuildEntry, TexMeta};
 
@@ -18,8 +18,8 @@ pub struct LoadedData {
     pub canonical: PathBuf,
     pub companion_canonical: Option<PathBuf>,
     pub source_name: String,
-    pub anim: Option<crate::anim::AnimFile>,
-    pub build: Option<crate::build_file::BuildFile>,
+    pub anim: Option<dst_anim_tool::anim::AnimFile>,
+    pub build: Option<dst_anim_tool::build_file::BuildFile>,
     pub decoded_textures: HashMap<String, Arc<image::RgbaImage>>,
     pub(super) tex_meta: Vec<TexMeta>,
     pub is_pending_atlas: bool,
@@ -93,18 +93,18 @@ impl App {
             return;
         };
         let atlas_images = gather_atlas_images(build, &atlas_entry.decoded);
-        let _ = crate::atlas::split_atlas(build, &atlas_images);
+        let _ = dst_anim_tool::atlas::split_atlas(build, &atlas_images);
         self.cache_dirty = true;
         self.needs_re_render = true;
     }
 
-    pub fn collect_build_list(&self) -> Vec<crate::render::BuildRef<'_>> {
+    pub fn collect_build_list(&self) -> Vec<dst_anim_tool::render::BuildRef<'_>> {
         self.builds
             .iter()
             .rev()
             .filter(|e| e.enabled && e.build.is_some() && e.assigned_atlas.is_some())
             .filter_map(|e| {
-                e.build.as_ref().map(|b| crate::render::BuildRef {
+                e.build.as_ref().map(|b| dst_anim_tool::render::BuildRef {
                     build: b,
                     disabled_symbols: &e.disabled_symbols,
                 })
@@ -131,7 +131,7 @@ impl App {
         )
     }
 
-    pub fn get_current_animation(&self) -> Option<&crate::anim::AnimAnimation> {
+    pub fn get_current_animation(&self) -> Option<&dst_anim_tool::anim::AnimAnimation> {
         self.anims
             .get(self.active_anim_idx)
             .filter(|e| e.enabled)
@@ -150,8 +150,12 @@ impl App {
         if build_list.is_empty() {
             return;
         }
-        self.animation_bounds =
-            crate::render::compute_animation_bounds(&anim.frames, &build_list, 1.0, (0.0, 0.0));
+        self.animation_bounds = dst_anim_tool::render::compute_animation_bounds(
+            &anim.frames,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+        );
     }
 
     pub fn start_background_render(&mut self) {
@@ -163,8 +167,12 @@ impl App {
             return;
         }
 
-        let (bounds, prepared) =
-            crate::render::prepare_animation_frames(&anim.frames, &build_list, 1.0, (0.0, 0.0));
+        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
+            &anim.frames,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+        );
         let cache_gen_val = self.cache_gen;
         let total_frames = anim.frames.len();
         if total_frames == 0 {
@@ -403,10 +411,10 @@ impl App {
             "dyn" => parse_dyn(&data),
             "zip" => parse_zip(&data),
             "bin" => {
-                let bin_type = crate::archive::detect_bin_type(&data);
+                let bin_type = dst_anim_tool::archive::detect_bin_type(&data);
                 match bin_type {
-                    BinType::Anim => crate::archive::parse_anim_bin(&data),
-                    BinType::Build => crate::archive::parse_build_bin(&data),
+                    BinType::Anim => dst_anim_tool::archive::parse_anim_bin(&data),
+                    BinType::Build => dst_anim_tool::archive::parse_build_bin(&data),
                     BinType::Unknown => {
                         let msg = format!("Unknown .bin magic in {}", path.display());
                         return LoadResult::Failed(path, msg);
@@ -518,7 +526,7 @@ impl App {
             && !decoded.is_empty()
         {
             let atlas_images = gather_atlas_images(b, &decoded);
-            let _ = crate::atlas::split_atlas(b, &atlas_images);
+            let _ = dst_anim_tool::atlas::split_atlas(b, &atlas_images);
         }
 
         LoadResult::Success(Box::new(LoadedData {

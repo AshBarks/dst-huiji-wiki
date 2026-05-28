@@ -49,12 +49,18 @@ pub struct AnimFile {
     pub banks: Vec<AnimBank>,
 }
 
-impl AnimFile {
-    pub fn new() -> Self {
+impl Default for AnimFile {
+    fn default() -> Self {
         Self {
             version: 4,
             banks: Vec::new(),
         }
+    }
+}
+
+impl AnimFile {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn add_animation(&mut self, bank_name: &str, animation: AnimAnimation) {

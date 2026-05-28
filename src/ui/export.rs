@@ -5,8 +5,8 @@ use std::sync::mpsc;
 
 use rayon::prelude::*;
 
-use crate::gif_export::{export_gif, export_png_sequence, ffmpeg_gif_from_sequence};
-use crate::render::{prepare_animation_frames, render_frame_with_elements};
+use dst_anim_tool::gif_export::{export_gif, export_png_sequence, ffmpeg_gif_from_sequence};
+use dst_anim_tool::render::{prepare_animation_frames, render_frame_with_elements};
 
 pub enum GifExportResult {
     Done(Vec<u8>),
@@ -28,8 +28,8 @@ pub struct BackgroundPngExport {
 }
 
 pub fn start_gif_export_thread(
-    anim: &crate::anim::AnimAnimation,
-    build_list: &[crate::render::BuildRef<'_>],
+    anim: &dst_anim_tool::anim::AnimAnimation,
+    build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
 ) -> mpsc::Receiver<GifExportResult> {
     let (bounds, prepared) = prepare_animation_frames(&anim.frames, build_list, 1.0, (0.0, 0.0));
@@ -80,8 +80,8 @@ pub fn start_gif_export_thread(
 }
 
 pub fn start_png_export_thread(
-    anim: &crate::anim::AnimAnimation,
-    build_list: &[crate::render::BuildRef<'_>],
+    anim: &dst_anim_tool::anim::AnimAnimation,
+    build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, Arc<image::RgbaImage>>,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {

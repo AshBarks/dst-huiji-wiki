@@ -1,4 +1,5 @@
 mod cache;
+#[cfg(feature = "gif")]
 mod export;
 mod panels;
 
@@ -8,12 +9,13 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use cache::{BackgroundLoader, BackgroundRenderer, FrameCacheEntry};
+#[cfg(feature = "gif")]
 use export::{BackgroundGifExport, BackgroundPngExport, GifExportResult, PngExportResult};
 
-use crate::archive::{parse_dyn, parse_zip};
-use crate::atlas::gather_atlas_images;
-use crate::render::BoundingBox;
-use crate::specs::PixelFormat;
+use dst_anim_tool::archive::{parse_dyn, parse_zip};
+use dst_anim_tool::atlas::gather_atlas_images;
+use dst_anim_tool::render::BoundingBox;
+use dst_anim_tool::specs::PixelFormat;
 
 pub(super) struct TexMeta {
     name: String,
@@ -29,13 +31,13 @@ pub(super) struct AtlasEntry {
 }
 
 struct AnimEntry {
-    anim: crate::anim::AnimFile,
+    anim: dst_anim_tool::anim::AnimFile,
     enabled: bool,
     source_name: String,
 }
 
 pub struct BuildEntry {
-    pub build: Option<crate::build_file::BuildFile>,
+    pub build: Option<dst_anim_tool::build_file::BuildFile>,
     pub enabled: bool,
     pub source_name: String,
     pub assigned_atlas: Option<usize>,
@@ -66,7 +68,9 @@ pub struct App {
     bg_renderer: Option<BackgroundRenderer>,
     bg_loader: Option<BackgroundLoader>,
     animation_bounds: Option<BoundingBox>,
+    #[cfg(feature = "gif")]
     gif_export: Option<BackgroundGifExport>,
+    #[cfg(feature = "gif")]
     png_export: Option<BackgroundPngExport>,
 }
 
@@ -96,7 +100,9 @@ impl App {
             bg_renderer: None,
             bg_loader: None,
             animation_bounds: None,
+            #[cfg(feature = "gif")]
             gif_export: None,
+            #[cfg(feature = "gif")]
             png_export: None,
         }
     }
@@ -203,13 +209,14 @@ impl App {
             return;
         };
         let atlas_images = gather_atlas_images(&build, &atlas_entry.decoded);
-        let _ = crate::atlas::split_atlas(&mut build, &atlas_images);
+        let _ = dst_anim_tool::atlas::split_atlas(&mut build, &atlas_images);
         self.builds[build_idx].build = Some(build);
         self.loaded_paths.insert(canonical);
         self.cache_dirty = true;
         self.needs_re_render = true;
     }
 
+    #[cfg(feature = "gif")]
     fn start_gif_export(&mut self) {
         let Some(anim) = self.get_current_animation() else {
             return;
@@ -239,6 +246,7 @@ impl App {
         self.gif_export = Some(BackgroundGifExport { receiver, path });
     }
 
+    #[cfg(feature = "gif")]
     fn poll_gif_export(&mut self) {
         let Some(bg) = self.gif_export.as_ref() else {
             return;
@@ -261,6 +269,7 @@ impl App {
         }
     }
 
+    #[cfg(feature = "gif")]
     fn start_png_export(&mut self) {
         let Some(anim) = self.get_current_animation() else {
             return;
@@ -288,6 +297,7 @@ impl App {
         self.png_export = Some(BackgroundPngExport { receiver });
     }
 
+    #[cfg(feature = "gif")]
     fn poll_png_export(&mut self) {
         let Some(bg) = self.png_export.as_ref() else {
             return;
@@ -331,8 +341,11 @@ impl eframe::App for App {
 
         self.poll_loader(ctx);
         self.poll_background_results(ctx);
-        self.poll_gif_export();
-        self.poll_png_export();
+        #[cfg(feature = "gif")]
+        {
+            self.poll_gif_export();
+            self.poll_png_export();
+        }
 
         if self.playing {
             if let Some(anim) = self.get_current_animation() {

@@ -49,7 +49,7 @@ pub enum Commands {
     },
 }
 
-pub fn run(cli: Cli) -> crate::error::Result<()> {
+pub fn run(cli: Cli) -> dst_anim_tool::error::Result<()> {
     match cli.command {
         None => cmd_preview(None),
         Some(command) => match command {
@@ -73,9 +73,11 @@ pub fn run(cli: Cli) -> crate::error::Result<()> {
     }
 }
 
-fn load_skin_archive(path: &Path) -> crate::error::Result<crate::archive::ParsedArchive> {
+fn load_skin_archive(
+    path: &Path,
+) -> dst_anim_tool::error::Result<dst_anim_tool::archive::ParsedArchive> {
     let data = std::fs::read(path)?;
-    let mut archive = crate::archive::parse_file_by_path(path, &data)?;
+    let mut archive = dst_anim_tool::archive::parse_file_by_path(path, &data)?;
 
     let ext = path
         .extension()
@@ -89,10 +91,10 @@ fn load_skin_archive(path: &Path) -> crate::error::Result<crate::archive::Parsed
             if companion.exists() {
                 let companion_data = std::fs::read(&companion)?;
                 let companion_archive =
-                    crate::archive::parse_file_by_path(&companion, &companion_data)?;
+                    dst_anim_tool::archive::parse_file_by_path(&companion, &companion_data)?;
                 archive.merge(companion_archive);
             } else {
-                return Err(crate::error::Error::MissingCompanion(
+                return Err(dst_anim_tool::error::Error::MissingCompanion(
                     "no companion .zip found for .dyn skin file".to_string(),
                 ));
             }
@@ -103,29 +105,29 @@ fn load_skin_archive(path: &Path) -> crate::error::Result<crate::archive::Parsed
                 if companion.exists() {
                     let companion_data = std::fs::read(&companion)?;
                     let companion_archive =
-                        crate::archive::parse_file_by_path(&companion, &companion_data)?;
+                        dst_anim_tool::archive::parse_file_by_path(&companion, &companion_data)?;
                     archive.merge(companion_archive);
                 } else {
-                    return Err(crate::error::Error::MissingCompanion(
+                    return Err(dst_anim_tool::error::Error::MissingCompanion(
                         "no companion .dyn found for build-only .zip skin file".to_string(),
                     ));
                 }
             }
         }
         _ => {
-            return Err(crate::error::Error::Other(
+            return Err(dst_anim_tool::error::Error::Other(
                 "skin file must be .dyn or .zip".to_string(),
             ));
         }
     }
 
     if archive.build.is_none() {
-        return Err(crate::error::Error::MissingData(
+        return Err(dst_anim_tool::error::Error::MissingData(
             "build.bin in skin".to_string(),
         ));
     }
     if archive.tex_sources.iter().all(|s| s.tex_files.is_empty()) {
-        return Err(crate::error::Error::MissingData(
+        return Err(dst_anim_tool::error::Error::MissingData(
             "atlas textures in skin".to_string(),
         ));
     }
@@ -134,9 +136,9 @@ fn load_skin_archive(path: &Path) -> crate::error::Result<crate::archive::Parsed
 }
 
 fn write_symbol_frames(
-    symbol: &crate::build_file::BuildSymbol,
+    symbol: &dst_anim_tool::build_file::BuildSymbol,
     output_dir: &Path,
-) -> crate::error::Result<()> {
+) -> dst_anim_tool::error::Result<()> {
     let has_images = symbol.frames.iter().any(|f| f.image.is_some());
     if !has_images {
         return Ok(());
@@ -147,8 +149,9 @@ fn write_symbol_frames(
     for frame in &symbol.frames {
         if let Some(img) = frame.image_ref() {
             let out_path = sym_dir.join(format!("frame_{}.png", frame.frame_num));
-            img.save(&out_path)
-                .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+            img.save(&out_path).map_err(|e| {
+                dst_anim_tool::error::Error::Io(std::io::Error::other(e.to_string()))
+            })?;
             println!("{}", out_path.display());
         }
     }
@@ -159,30 +162,32 @@ fn cmd_split(
     inputs: &[PathBuf],
     skin: Option<&Path>,
     output_dir: &Path,
-) -> crate::error::Result<()> {
-    let mut base_archive = crate::archive::load_archives(inputs)?;
+) -> dst_anim_tool::error::Result<()> {
+    let mut base_archive = dst_anim_tool::archive::load_archives(inputs)?;
     if base_archive.build.is_none() {
-        return Err(crate::error::Error::MissingData("build.bin".to_string()));
+        return Err(dst_anim_tool::error::Error::MissingData(
+            "build.bin".to_string(),
+        ));
     }
 
     {
         let base_tex = base_archive.tex_files();
-        let base_atlas = crate::atlas::decode_atlas_images_from_tex(
+        let base_atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(
             &base_archive.build.as_ref().unwrap().atlases,
             base_tex,
         );
-        crate::atlas::split_atlas(base_archive.build.as_mut().unwrap(), &base_atlas)?;
+        dst_anim_tool::atlas::split_atlas(base_archive.build.as_mut().unwrap(), &base_atlas)?;
     }
 
-    let skin_build: Option<crate::build_file::BuildFile> = match skin {
+    let skin_build: Option<dst_anim_tool::build_file::BuildFile> = match skin {
         Some(skin_path) => {
             let mut skin_archive = load_skin_archive(skin_path)?;
             let skin_tex = skin_archive.tex_files().clone();
-            let skin_atlas = crate::atlas::decode_atlas_images_from_tex(
+            let skin_atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(
                 &skin_archive.build.as_ref().unwrap().atlases,
                 &skin_tex,
             );
-            crate::atlas::split_atlas(skin_archive.build.as_mut().unwrap(), &skin_atlas)?;
+            dst_anim_tool::atlas::split_atlas(skin_archive.build.as_mut().unwrap(), &skin_atlas)?;
             Some(skin_archive.build.unwrap())
         }
         None => None,
@@ -191,7 +196,7 @@ fn cmd_split(
     let base_build = base_archive.build.as_ref().unwrap();
     std::fs::create_dir_all(output_dir)?;
     for symbol in &base_build.symbols {
-        let effective: &crate::build_file::BuildSymbol = match &skin_build {
+        let effective: &dst_anim_tool::build_file::BuildSymbol = match &skin_build {
             Some(sb) => sb
                 .symbol_index
                 .get(&symbol.name.to_lowercase())
@@ -209,14 +214,16 @@ fn cmd_render(
     skin: Option<&Path>,
     anim_path: &str,
     output_dir: &Path,
-) -> crate::error::Result<()> {
-    let mut base_archive = crate::archive::load_archives(inputs)?;
+) -> dst_anim_tool::error::Result<()> {
+    let mut base_archive = dst_anim_tool::archive::load_archives(inputs)?;
     let anim = base_archive
         .anim
         .as_ref()
-        .ok_or_else(|| crate::error::Error::MissingData("anim.bin".to_string()))?;
+        .ok_or_else(|| dst_anim_tool::error::Error::MissingData("anim.bin".to_string()))?;
     if base_archive.build.is_none() {
-        return Err(crate::error::Error::MissingData("build.bin".to_string()));
+        return Err(dst_anim_tool::error::Error::MissingData(
+            "build.bin".to_string(),
+        ));
     }
 
     let parts: Vec<&str> = anim_path.splitn(2, '/').collect();
@@ -236,7 +243,7 @@ fn cmd_render(
     let (bank_idx, anim_idx) = match (bank_idx, anim_idx) {
         (Some(bi), Some(ai)) => (bi, ai),
         _ => {
-            return Err(crate::error::Error::Other(format!(
+            return Err(dst_anim_tool::error::Error::Other(format!(
                 "animation not found: {anim_path}"
             )));
         }
@@ -245,26 +252,29 @@ fn cmd_render(
     {
         let base_tex = base_archive.tex_files();
         let base_build = base_archive.build.as_ref().unwrap();
-        let base_atlas = crate::atlas::decode_atlas_images_from_tex(&base_build.atlases, base_tex);
-        crate::atlas::split_atlas(base_archive.build.as_mut().unwrap(), &base_atlas)?;
+        let base_atlas =
+            dst_anim_tool::atlas::decode_atlas_images_from_tex(&base_build.atlases, base_tex);
+        dst_anim_tool::atlas::split_atlas(base_archive.build.as_mut().unwrap(), &base_atlas)?;
     }
 
-    let mut build_list: Vec<crate::build_file::BuildFile> = vec![base_archive.build.unwrap()];
+    let mut build_list: Vec<dst_anim_tool::build_file::BuildFile> =
+        vec![base_archive.build.unwrap()];
 
     if let Some(skin_path) = skin {
         let mut skin_archive = load_skin_archive(skin_path)?;
         let skin_tex = skin_archive.tex_files().clone();
         let skin_build = skin_archive.build.as_mut().unwrap();
-        let skin_atlas = crate::atlas::decode_atlas_images_from_tex(&skin_build.atlases, &skin_tex);
-        crate::atlas::split_atlas(skin_build, &skin_atlas)?;
+        let skin_atlas =
+            dst_anim_tool::atlas::decode_atlas_images_from_tex(&skin_build.atlases, &skin_tex);
+        dst_anim_tool::atlas::split_atlas(skin_build, &skin_atlas)?;
         build_list.insert(0, skin_archive.build.unwrap());
     }
 
     let animation = &base_archive.anim.as_ref().unwrap().banks[bank_idx].animations[anim_idx];
     let empty_disabled: HashSet<String> = HashSet::new();
-    let bl: Vec<crate::render::BuildRef<'_>> = build_list
+    let bl: Vec<dst_anim_tool::render::BuildRef<'_>> = build_list
         .iter()
-        .map(|b| crate::render::BuildRef {
+        .map(|b| dst_anim_tool::render::BuildRef {
             build: b,
             disabled_symbols: &empty_disabled,
         })
@@ -272,22 +282,21 @@ fn cmd_render(
     std::fs::create_dir_all(output_dir)?;
 
     let (bounds, prepared) =
-        crate::render::prepare_animation_frames(&animation.frames, &bl, 1.0, (0.0, 0.0));
+        dst_anim_tool::render::prepare_animation_frames(&animation.frames, &bl, 1.0, (0.0, 0.0));
 
     for (i, pf) in prepared.iter().enumerate() {
         if let Some(pf) = pf {
             let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
-            if let Some(rendered) = crate::render::render_frame_with_elements(
+            if let Some(rendered) = dst_anim_tool::render::render_frame_with_elements(
                 &pf.elements,
                 render_bounds,
                 1.0,
                 (0.0, 0.0),
             ) {
                 let out_path = output_dir.join(format!("frame_{i:03}.png"));
-                rendered
-                    .image
-                    .save(&out_path)
-                    .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+                rendered.image.save(&out_path).map_err(|e| {
+                    dst_anim_tool::error::Error::Io(std::io::Error::other(e.to_string()))
+                })?;
                 println!("{}", out_path.display());
             }
         }
@@ -295,8 +304,8 @@ fn cmd_render(
     Ok(())
 }
 
-fn cmd_list(inputs: &[PathBuf]) -> crate::error::Result<()> {
-    let archive = crate::archive::load_archives(inputs)?;
+fn cmd_list(inputs: &[PathBuf]) -> dst_anim_tool::error::Result<()> {
+    let archive = dst_anim_tool::archive::load_archives(inputs)?;
     if let Some(anim) = &archive.anim {
         for bank in &anim.banks {
             for animation in &bank.animations {
@@ -309,8 +318,8 @@ fn cmd_list(inputs: &[PathBuf]) -> crate::error::Result<()> {
     Ok(())
 }
 
-fn cmd_info(inputs: &[PathBuf]) -> crate::error::Result<()> {
-    let archive = crate::archive::load_archives(inputs)?;
+fn cmd_info(inputs: &[PathBuf]) -> dst_anim_tool::error::Result<()> {
+    let archive = dst_anim_tool::archive::load_archives(inputs)?;
 
     if let Some(anim) = &archive.anim {
         println!("anim.bin:");
@@ -354,7 +363,7 @@ fn cmd_info(inputs: &[PathBuf]) -> crate::error::Result<()> {
     for source in &archive.tex_sources {
         println!("  source '{}':", source.source_name);
         for (name, data) in &source.tex_files {
-            if let Ok(ktex) = crate::ktex::parse_ktex(data) {
+            if let Ok(ktex) = dst_anim_tool::ktex::parse_ktex(data) {
                 let m0 = &ktex.mipmaps[0];
                 println!(
                     "    {}: {}x{} {:?}",
@@ -369,26 +378,26 @@ fn cmd_info(inputs: &[PathBuf]) -> crate::error::Result<()> {
     Ok(())
 }
 
-fn cmd_decrypt(input: &Path, output: &Path) -> crate::error::Result<()> {
+fn cmd_decrypt(input: &Path, output: &Path) -> dst_anim_tool::error::Result<()> {
     let ext = input
         .extension()
         .and_then(|e| e.to_str())
         .unwrap_or("")
         .to_lowercase();
     if ext != "dyn" {
-        return Err(crate::error::Error::Other(
+        return Err(dst_anim_tool::error::Error::Other(
             "decrypt only supports .dyn files".to_string(),
         ));
     }
     let data = std::fs::read(input)?;
-    let decrypted = crate::xor::xor_decrypt(&data);
+    let decrypted = dst_anim_tool::xor::xor_decrypt(&data);
     std::fs::write(output, &decrypted)?;
     println!("{}", output.display());
     Ok(())
 }
 
-fn cmd_decode(input: &Path, output_dir: &Path) -> crate::error::Result<()> {
-    let archive = crate::archive::load_archives(&[input.to_path_buf()])?;
+fn cmd_decode(input: &Path, output_dir: &Path) -> dst_anim_tool::error::Result<()> {
+    let archive = dst_anim_tool::archive::load_archives(&[input.to_path_buf()])?;
     if archive.tex_sources.is_empty() {
         eprintln!("no .tex files found");
         return Ok(());
@@ -396,18 +405,18 @@ fn cmd_decode(input: &Path, output_dir: &Path) -> crate::error::Result<()> {
     std::fs::create_dir_all(output_dir)?;
     let tex_files = archive.tex_files();
     for (name, data) in tex_files {
-        let ktex = crate::ktex::parse_ktex(data)?;
+        let ktex = dst_anim_tool::ktex::parse_ktex(data)?;
         let img = ktex.to_image_rgba()?;
         let out_name = format!("{}.png", name);
         let out_path = output_dir.join(&out_name);
         img.save(&out_path)
-            .map_err(|e| crate::error::Error::Io(std::io::Error::other(e.to_string())))?;
+            .map_err(|e| dst_anim_tool::error::Error::Io(std::io::Error::other(e.to_string())))?;
         println!("{}", out_path.display());
     }
     Ok(())
 }
 
-fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> crate::error::Result<()> {
+fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> dst_anim_tool::error::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([1200.0, 800.0]),
         ..Default::default()
@@ -417,7 +426,7 @@ fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> crate::error::Result<()> {
         native_options,
         Box::new(move |_cc| Ok(Box::new(crate::ui::App::new(inputs)))),
     )
-    .map_err(|e| crate::error::Error::Ui(e.to_string()))?;
+    .map_err(|e| dst_anim_tool::error::Error::Ui(e.to_string()))?;
     Ok(())
 }
 
@@ -429,7 +438,7 @@ mod tests {
     fn decrypt_produces_valid_zip() {
         let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
         let data = std::fs::read(&input).unwrap();
-        let decrypted = crate::xor::xor_decrypt(&data);
+        let decrypted = dst_anim_tool::xor::xor_decrypt(&data);
         let archive = zip::ZipArchive::new(std::io::Cursor::new(decrypted.as_slice())).unwrap();
         assert!(archive.len() > 0);
     }
@@ -437,12 +446,12 @@ mod tests {
     #[test]
     fn decode_dyn_to_png() {
         let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
-        let archive = crate::archive::load_archives(&[input]).unwrap();
+        let archive = dst_anim_tool::archive::load_archives(&[input]).unwrap();
         assert!(!archive.tex_sources.is_empty());
         let tex_files = archive.tex_files();
         assert!(!tex_files.is_empty());
         for (name, data) in tex_files {
-            let ktex = crate::ktex::parse_ktex(data).unwrap();
+            let ktex = dst_anim_tool::ktex::parse_ktex(data).unwrap();
             let img = ktex.to_image_rgba().unwrap();
             assert!(img.width() > 0);
             assert!(img.height() > 0);

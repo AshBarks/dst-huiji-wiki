@@ -84,14 +84,14 @@ impl TryFrom<u32> for TextureType {
     }
 }
 
-pub const DIR_RIGHT: u8 = 1;
-pub const DIR_UP: u8 = 2;
-pub const DIR_LEFT: u8 = 4;
-pub const DIR_DOWN: u8 = 8;
-pub const DIR_UPRIGHT: u8 = 16;
-pub const DIR_UPLEFT: u8 = 32;
-pub const DIR_DOWNLEFT: u8 = 64;
-pub const DIR_DOWNRIGHT: u8 = 128;
+pub(crate) const DIR_RIGHT: u8 = 1;
+pub(crate) const DIR_UP: u8 = 2;
+pub(crate) const DIR_LEFT: u8 = 4;
+pub(crate) const DIR_DOWN: u8 = 8;
+pub(crate) const DIR_UPRIGHT: u8 = 16;
+pub(crate) const DIR_UPLEFT: u8 = 32;
+pub(crate) const DIR_DOWNLEFT: u8 = 64;
+pub(crate) const DIR_DOWNRIGHT: u8 = 128;
 
 static DIRECTION_SUFFIX_MAP: LazyLock<std::collections::HashMap<u8, &str>> = LazyLock::new(|| {
     let mut m = std::collections::HashMap::new();
@@ -120,12 +120,12 @@ pub fn direction_suffix(flag: u8) -> &'static str {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KtexSpec {
-    pub offset_platform: u32,
-    pub offset_pixel_format: u32,
-    pub offset_texture_type: u32,
-    pub offset_mipmap_count: u32,
-    pub offset_flags: u32,
-    pub offset_fill: u32,
+    pub(crate) offset_platform: u32,
+    pub(crate) offset_pixel_format: u32,
+    pub(crate) offset_texture_type: u32,
+    pub(crate) offset_mipmap_count: u32,
+    pub(crate) offset_flags: u32,
+    pub(crate) offset_fill: u32,
 }
 
 pub const PRE_CAVE_SPEC: KtexSpec = KtexSpec {

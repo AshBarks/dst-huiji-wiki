@@ -3,14 +3,18 @@ name = "dst-anim-tool"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["gif"]
+gif = ["dep:gif", "dep:which"]
+
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 eframe = "0.30"
 egui = "0.30"
-gif = "0.13"
+gif = { version = "0.13", optional = true }
 image = { version = "0.25", default-features = false, features = ["png"] }
 rfd = "0.15"
 rayon = "1.10"
 thiserror = "2"
-which = "7"
+which = { version = "7", optional = true }
 zip = "2"

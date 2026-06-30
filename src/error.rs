@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+#[non_exhaustive]
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("IO error: {0}")]
@@ -40,6 +41,9 @@ pub enum Error {
 
     #[error("DST directory does not exist: {0}")]
     DstDirNotFound(String),
+
+    #[error("Invalid path (non-UTF-8): {0}")]
+    InvalidPath(String),
 
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),

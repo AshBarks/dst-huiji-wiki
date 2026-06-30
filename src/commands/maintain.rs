@@ -511,14 +511,16 @@ async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) 
     for entry in &po_file.entries {
         if let Some(ref entry_ctx) = entry.msgctxt {
             if let Some(key) = entry_ctx.strip_prefix(station_prefix) {
-                crafting_stations.insert(key.to_string(),
+                crafting_stations.insert(
+                    key.to_string(),
                     serde_json::json!({
                         "station_en": entry.msgid.clone(),
                         "station_cn": entry.msgstr.clone(),
                     }),
                 );
             } else if let Some(key) = entry_ctx.strip_prefix(filter_prefix) {
-                craftings.insert(key.to_string(),
+                craftings.insert(
+                    key.to_string(),
                     serde_json::json!({
                         "station_en": entry.msgid.clone(),
                         "station_cn": entry.msgstr.clone(),

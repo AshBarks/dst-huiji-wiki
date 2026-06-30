@@ -384,7 +384,8 @@ impl WikiClient {
             all_params.push(("minor", "true".to_string()));
         }
 
-        let params_refs: Vec<(&str, &str)> = all_params.iter().map(|(k, v)| (*k, v.as_str())).collect();
+        let params_refs: Vec<(&str, &str)> =
+            all_params.iter().map(|(k, v)| (*k, v.as_str())).collect();
 
         let response = self.post(&params_refs).await?;
         let edit_resp: EditResponse = response.json().await?;

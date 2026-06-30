@@ -16,8 +16,7 @@ pub struct PrefabOverrideParser {
 
 impl PrefabOverrideParser {
     pub fn new(source: &str) -> Result<Self> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         let mut parser = Self {
             source: source.to_string(),

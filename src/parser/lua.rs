@@ -36,15 +36,13 @@ impl LuaParser {
     }
 
     pub fn locate_variable(source: &str, var_name: &str) -> Result<VariableLocation> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         Self::find_variable_in_ast(&ast, source, var_name)
     }
 
     pub fn locate_field_assignment(source: &str, field_path: &str) -> Result<FieldLocation> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         Self::find_field_assignment_in_ast(&ast, source, field_path)
     }
@@ -54,8 +52,7 @@ impl LuaParser {
         start_field_path: &str,
         end_field_path: &str,
     ) -> Result<FieldLocation> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         let start_location = Self::find_field_assignment_in_ast(&ast, source, start_field_path)?;
         let end_location = Self::find_field_assignment_in_ast(&ast, source, end_field_path)?;
@@ -132,8 +129,7 @@ impl LuaParser {
         start_var_name: &str,
         end_var_name: Option<&str>,
     ) -> Result<VariableRange> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         let start_location = Self::find_variable_in_ast(&ast, source, start_var_name)?;
 

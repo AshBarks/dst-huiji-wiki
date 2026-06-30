@@ -18,6 +18,9 @@ pub enum Error {
     #[error("Parse error: {0}")]
     ParseError(String),
 
+    #[error("Lua parse error: {}", .0.iter().map(|e| e.error_message().into_owned()).collect::<Vec<_>>().join(", "))]
+    LuaParse(Vec<full_moon::Error>),
+
     #[error("HTTP request error: {0}")]
     Http(#[from] reqwest::Error),
 
@@ -50,3 +53,27 @@ pub enum Error {
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lua_parse_error_display() {
+        let errors = vec![];
+        let err = Error::LuaParse(errors);
+        let display = err.to_string();
+        assert!(display.contains("Lua parse error"));
+    }
+
+    #[test]
+    fn test_lua_parse_error_with_errors() {
+        // Test that LuaParse variant can be constructed and displayed
+        // without panicking even with actual parse errors
+        let source = "local x = ";
+        let errors = full_moon::parse(source).unwrap_err();
+        let err = Error::LuaParse(errors);
+        let display = err.to_string();
+        assert!(display.contains("Lua parse error"));
+    }
+}

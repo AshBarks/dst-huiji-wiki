@@ -14,8 +14,7 @@ impl RecipeParser {
     }
 
     pub fn parse(&mut self, source: &str, filename: Option<&str>) -> Result<Vec<Recipe>> {
-        let ast = full_moon::parse(source)
-            .map_err(|e| crate::Error::ParseError(format!("Lua parse error: {:?}", e)))?;
+        let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
         self.extract_variables(&ast);
         self.extract_prototyper_defs(&ast, filename);

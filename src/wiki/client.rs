@@ -357,12 +357,11 @@ impl WikiClient {
         })
     }
 
-    pub async fn edit_page(
+    async fn do_edit(
         &self,
         title: &str,
-        text: &str,
-        summary: Option<&str>,
-        minor: bool,
+        params: Vec<(&str, &str)>,
+        minor: Option<bool>,
     ) -> Result<EditResult> {
         if !self.logged_in {
             return Err(Error::EditFailed("Not logged in".to_string()));
@@ -370,23 +369,22 @@ impl WikiClient {
 
         let csrf_token = self.get_csrf_token().await?;
 
-        let mut params: Vec<(&str, String)> = vec![
+        let mut all_params: Vec<(&str, String)> = vec![
             ("action", "edit".to_string()),
             ("title", title.to_string()),
-            ("text", text.to_string()),
             ("token", csrf_token),
             ("format", "json".to_string()),
         ];
 
-        if let Some(s) = summary {
-            params.push(("summary", s.to_string()));
+        for (k, v) in &params {
+            all_params.push((*k, (*v).to_string()));
         }
 
-        if minor {
-            params.push(("minor", "true".to_string()));
+        if let Some(true) = minor {
+            all_params.push(("minor", "true".to_string()));
         }
 
-        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
+        let params_refs: Vec<(&str, &str)> = all_params.iter().map(|(k, v)| (*k, v.as_str())).collect();
 
         let response = self.post(&params_refs).await?;
         let edit_resp: EditResponse = response.json().await?;
@@ -396,27 +394,44 @@ impl WikiClient {
             .ok_or_else(|| Error::WikiApi("No edit response received".to_string()))?;
 
         match edit_info.result.as_str() {
-            "Success" | "success" => {
-                tracing::info!(
-                    "Successfully edited page '{}' (pageid: {:?}, newrevid: {:?})",
-                    edit_info.title.as_deref().unwrap_or(title),
-                    edit_info.pageid,
-                    edit_info.newrevid
-                );
-                Ok(EditResult {
-                    result: edit_info.result,
-                    pageid: edit_info.pageid,
-                    title: edit_info.title,
-                    newrevid: edit_info.newrevid,
-                    oldrevid: edit_info.oldrevid,
-                    reason: edit_info.reason,
-                })
-            }
+            "Success" | "success" => Ok(EditResult {
+                result: edit_info.result,
+                pageid: edit_info.pageid,
+                title: edit_info.title,
+                newrevid: edit_info.newrevid,
+                oldrevid: edit_info.oldrevid,
+                reason: edit_info.reason,
+            }),
             _ => Err(Error::EditFailed(format!(
                 "Edit failed: {}",
                 edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
             ))),
         }
+    }
+
+    pub async fn edit_page(
+        &self,
+        title: &str,
+        text: &str,
+        summary: Option<&str>,
+        minor: bool,
+    ) -> Result<EditResult> {
+        let mut params: Vec<(&str, &str)> = vec![("text", text)];
+
+        if let Some(s) = summary {
+            params.push(("summary", s));
+        }
+
+        let result = self.do_edit(title, params, Some(minor)).await?;
+
+        tracing::info!(
+            "Successfully edited page '{}' (pageid: {:?}, newrevid: {:?})",
+            result.title.as_deref().unwrap_or(title),
+            result.pageid,
+            result.newrevid
+        );
+
+        Ok(result)
     }
 
     pub async fn append_to_page(
@@ -425,47 +440,13 @@ impl WikiClient {
         text: &str,
         summary: Option<&str>,
     ) -> Result<EditResult> {
-        if !self.logged_in {
-            return Err(Error::EditFailed("Not logged in".to_string()));
-        }
-
-        let csrf_token = self.get_csrf_token().await?;
-
-        let mut params: Vec<(&str, String)> = vec![
-            ("action", "edit".to_string()),
-            ("title", title.to_string()),
-            ("appendtext", text.to_string()),
-            ("token", csrf_token),
-            ("format", "json".to_string()),
-        ];
+        let mut params: Vec<(&str, &str)> = vec![("appendtext", text)];
 
         if let Some(s) = summary {
-            params.push(("summary", s.to_string()));
+            params.push(("summary", s));
         }
 
-        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
-
-        let response = self.post(&params_refs).await?;
-        let edit_resp: EditResponse = response.json().await?;
-
-        let edit_info = edit_resp
-            .edit
-            .ok_or_else(|| Error::WikiApi("No edit response received".to_string()))?;
-
-        match edit_info.result.as_str() {
-            "Success" | "success" => Ok(EditResult {
-                result: edit_info.result,
-                pageid: edit_info.pageid,
-                title: edit_info.title,
-                newrevid: edit_info.newrevid,
-                oldrevid: edit_info.oldrevid,
-                reason: edit_info.reason,
-            }),
-            _ => Err(Error::EditFailed(format!(
-                "Edit failed: {}",
-                edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
-            ))),
-        }
+        self.do_edit(title, params, None).await
     }
 
     pub async fn prepend_to_page(
@@ -474,47 +455,13 @@ impl WikiClient {
         text: &str,
         summary: Option<&str>,
     ) -> Result<EditResult> {
-        if !self.logged_in {
-            return Err(Error::EditFailed("Not logged in".to_string()));
-        }
-
-        let csrf_token = self.get_csrf_token().await?;
-
-        let mut params: Vec<(&str, String)> = vec![
-            ("action", "edit".to_string()),
-            ("title", title.to_string()),
-            ("prependtext", text.to_string()),
-            ("token", csrf_token),
-            ("format", "json".to_string()),
-        ];
+        let mut params: Vec<(&str, &str)> = vec![("prependtext", text)];
 
         if let Some(s) = summary {
-            params.push(("summary", s.to_string()));
+            params.push(("summary", s));
         }
 
-        let params_refs: Vec<(&str, &str)> = params.iter().map(|(k, v)| (*k, v.as_str())).collect();
-
-        let response = self.post(&params_refs).await?;
-        let edit_resp: EditResponse = response.json().await?;
-
-        let edit_info = edit_resp
-            .edit
-            .ok_or_else(|| Error::WikiApi("No edit response received".to_string()))?;
-
-        match edit_info.result.as_str() {
-            "Success" | "success" => Ok(EditResult {
-                result: edit_info.result,
-                pageid: edit_info.pageid,
-                title: edit_info.title,
-                newrevid: edit_info.newrevid,
-                oldrevid: edit_info.oldrevid,
-                reason: edit_info.reason,
-            }),
-            _ => Err(Error::EditFailed(format!(
-                "Edit failed: {}",
-                edit_info.reason.unwrap_or_else(|| edit_info.result.clone())
-            ))),
-        }
+        self.do_edit(title, params, None).await
     }
 
     pub async fn get_json_data(&self, title: &str) -> Result<serde_json::Value> {

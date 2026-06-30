@@ -18,11 +18,11 @@ pub struct WikiConfig {
 impl WikiConfig {
     pub fn from_env() -> Result<Self> {
         let username = env::var("HUIJI__USERNAME")
-            .map_err(|_| Error::EnvVarNotFound("HUIJI__USERNAME".to_string()))?;
+            .map_err(|e| Error::EnvVarNotFound(format!("HUIJI__USERNAME: {}", e)))?;
         let password = env::var("HUIJI__PASSWORD")
-            .map_err(|_| Error::EnvVarNotFound("HUIJI__PASSWORD".to_string()))?;
+            .map_err(|e| Error::EnvVarNotFound(format!("HUIJI__PASSWORD: {}", e)))?;
         let x_authkey = env::var("HUIJI__X_AUTHKEY")
-            .map_err(|_| Error::EnvVarNotFound("HUIJI__X_AUTHKEY".to_string()))?;
+            .map_err(|e| Error::EnvVarNotFound(format!("HUIJI__X_AUTHKEY: {}", e)))?;
 
         Ok(Self {
             host: DEFAULT_WIKI_HOST.to_string(),

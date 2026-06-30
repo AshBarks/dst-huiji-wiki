@@ -16,7 +16,7 @@ pub struct DstContext {
 impl DstContext {
     pub fn from_env() -> Result<Self> {
         let dst_root = std::env::var("DST__ROOT")
-            .map_err(|_| Error::EnvVarNotFound("DST__ROOT".to_string()))?;
+            .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
 
         let dst_path = Path::new(&dst_root);
         if !dst_path.exists() {
@@ -43,25 +43,26 @@ impl DstContext {
         })
     }
 
-    #[allow(clippy::unnecessary_unwrap)]
     pub fn open_scripts_zip(&mut self) -> Result<&mut ZipArchive<BufReader<std::fs::File>>> {
-        if self.archive.is_some() {
-            return Ok(self.archive.as_mut().unwrap());
+        if self.archive.is_none() {
+            let scripts_zip = Path::new(&self.dst_root).join("data/databundles/scripts.zip");
+            if !scripts_zip.exists() {
+                return Err(Error::DstDirNotFound(
+                    scripts_zip.to_string_lossy().to_string(),
+                ));
+            }
+
+            let file = std::fs::File::open(&scripts_zip)?;
+            let reader = BufReader::new(file);
+            let archive = ZipArchive::new(reader)?;
+
+            self.archive = Some(archive);
         }
 
-        let scripts_zip = Path::new(&self.dst_root).join("data/databundles/scripts.zip");
-        if !scripts_zip.exists() {
-            return Err(Error::DstDirNotFound(
-                scripts_zip.to_string_lossy().to_string(),
-            ));
-        }
-
-        let file = std::fs::File::open(&scripts_zip)?;
-        let reader = BufReader::new(file);
-        let archive = ZipArchive::new(reader)?;
-
-        self.archive = Some(archive);
-        Ok(self.archive.as_mut().unwrap())
+        Ok(self
+            .archive
+            .as_mut()
+            .expect("archive was verified/initialized as Some above"))
     }
 
     pub fn read_zip_file(&mut self, path: &str) -> Result<String> {
@@ -69,7 +70,7 @@ impl DstContext {
 
         let mut file = archive
             .by_name(path)
-            .map_err(|_| Error::ArchiveFileNotFound(path.to_string()))?;
+            .map_err(|e| Error::ArchiveFileNotFound(format!("{}: {}", path, e)))?;
 
         let mut content = String::new();
         file.read_to_string(&mut content)?;

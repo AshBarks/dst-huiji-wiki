@@ -48,7 +48,11 @@ fn handle_parse_po(
     output: Option<PathBuf>,
     category: Option<String>,
 ) -> Result<()> {
-    let po_file = PoParser::parse_from_file(input.to_str().unwrap())?;
+    let po_file = PoParser::parse_from_file(
+        input
+            .to_str()
+            .ok_or_else(|| Error::InvalidPath(format!("{:?}", input)))?,
+    )?;
     let entries = if let Some(cat) = category {
         po_file.filter_by_category(&cat)
     } else {
@@ -56,8 +60,8 @@ fn handle_parse_po(
     };
 
     if let Some(output_path) = output {
-        let json = serde_json::to_string_pretty(&entries).unwrap();
-        std::fs::write(&output_path, json).unwrap();
+        let json = serde_json::to_string_pretty(&entries)?;
+        std::fs::write(&output_path, json)?;
         println!("Written {} entries to {:?}", entries.len(), output_path);
     } else {
         for entry in entries.iter().take(10) {
@@ -76,7 +80,11 @@ fn handle_map_names(
     merge: bool,
     version: Option<String>,
 ) -> Result<()> {
-    let po_file = PoParser::parse_from_file(input.to_str().unwrap())?;
+    let po_file = PoParser::parse_from_file(
+        input
+            .to_str()
+            .ok_or_else(|| Error::InvalidPath(format!("{:?}", input)))?,
+    )?;
     let names_entries: Vec<PoEntry> = po_file
         .entries
         .iter()
@@ -150,7 +158,11 @@ fn handle_map_recipes(
     println!("Found {} recipes", recipes.len());
 
     let converter = if let Some(po_path) = &po_file {
-        match PoParser::parse_from_file(po_path.to_str().unwrap()) {
+        match PoParser::parse_from_file(
+            po_path
+                .to_str()
+                .ok_or_else(|| Error::InvalidPath(format!("{:?}", po_path)))?,
+        ) {
             Ok(po_data) => {
                 println!(
                     "Loaded {} PO entries for desc lookup",
@@ -363,12 +375,10 @@ async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>)
                 maintain_crafting_names(&mut ctx, output.clone()).await?;
             }
             _ => {
-                eprintln!("Unknown type: {}. Valid types are:", t);
-                eprintln!("  - recipe_builder_tag_lookup (or rbtl)");
-                eprintln!("  - tech");
-                eprintln!("  - crafting_filters (or filters)");
-                eprintln!("  - crafting_names (or names)");
-                std::process::exit(1);
+                return Err(Error::Config(format!(
+                    "Unknown copyclip type: {}. Valid types are: recipe_builder_tag_lookup (rbtl), tech, crafting_filters (filters), crafting_names (names)",
+                    t
+                )));
             }
         }
     }
@@ -500,19 +510,15 @@ async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) 
 
     for entry in &po_file.entries {
         if let Some(ref entry_ctx) = entry.msgctxt {
-            if entry_ctx.starts_with(station_prefix) {
-                let key = entry_ctx.strip_prefix(station_prefix).unwrap().to_string();
-                crafting_stations.insert(
-                    key,
+            if let Some(key) = entry_ctx.strip_prefix(station_prefix) {
+                crafting_stations.insert(key.to_string(),
                     serde_json::json!({
                         "station_en": entry.msgid.clone(),
                         "station_cn": entry.msgstr.clone(),
                     }),
                 );
-            } else if entry_ctx.starts_with(filter_prefix) {
-                let key = entry_ctx.strip_prefix(filter_prefix).unwrap().to_string();
-                craftings.insert(
-                    key,
+            } else if let Some(key) = entry_ctx.strip_prefix(filter_prefix) {
+                craftings.insert(key.to_string(),
                     serde_json::json!({
                         "station_en": entry.msgid.clone(),
                         "station_cn": entry.msgstr.clone(),

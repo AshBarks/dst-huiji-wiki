@@ -1978,28 +1978,25 @@ impl PrefabOverrideParser {
                         if args_vec.len() == 1 {
                             if let ast::Expression::Var(ast::Var::Name(name)) = args_vec[0] {
                                 let var_name = name.token().to_string();
-                                if iter_tables.contains_key(&var_name) {
-                                    let table_expr = iter_tables.get(&var_name).unwrap();
-                                    if let ast::Expression::TableConstructor(table_constructor) =
-                                        table_expr
-                                    {
-                                        for field in table_constructor.fields() {
-                                            if let ast::Field::NoKey(
-                                                ast::Expression::TableConstructor(item_table),
-                                            ) = field
-                                            {
-                                                let mut synthetic_tables: HashMap<
-                                                    String,
-                                                    ast::Expression,
-                                                > = HashMap::new();
-                                                synthetic_tables.insert(
-                                                    var_name.clone(),
-                                                    ast::Expression::TableConstructor(
-                                                        item_table.clone(),
-                                                    ),
-                                                );
-                                                results.push((call.clone(), synthetic_tables));
-                                            }
+                                if let Some(ast::Expression::TableConstructor(table_constructor)) =
+                                    iter_tables.get(&var_name)
+                                {
+                                    for field in table_constructor.fields() {
+                                        if let ast::Field::NoKey(
+                                            ast::Expression::TableConstructor(item_table),
+                                        ) = field
+                                        {
+                                            let mut synthetic_tables: HashMap<
+                                                String,
+                                                ast::Expression,
+                                            > = HashMap::new();
+                                            synthetic_tables.insert(
+                                                var_name.clone(),
+                                                ast::Expression::TableConstructor(
+                                                    item_table.clone(),
+                                                ),
+                                            );
+                                            results.push((call.clone(), synthetic_tables));
                                         }
                                     }
                                 }

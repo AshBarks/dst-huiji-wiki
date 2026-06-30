@@ -206,7 +206,14 @@ impl RecipeParser {
         }
 
         let name = self.extract_string_expr(args_vec[0])?;
-        let ingredients = self.extract_ingredients(args_vec[1]).unwrap_or_default();
+        let ingredients = self.extract_ingredients(args_vec[1]);
+        if ingredients.is_none() {
+            tracing::warn!(
+                "Failed to extract ingredients for recipe, defaulting to empty list. recipe_name_expr={:?}",
+                args_vec[0]
+            );
+        }
+        let ingredients = ingredients.unwrap_or_default();
         let tech = self.extract_tech(args_vec[2])?;
 
         let mut recipe = Recipe::new(name, ingredients, tech);
@@ -325,7 +332,15 @@ impl RecipeParser {
 
         let item = self.extract_string_expr(args_vec[0])?;
         let amount = if args_vec.len() > 1 {
-            self.extract_number_expr(args_vec[1]).unwrap_or(1)
+            let amount_expr = self.extract_number_expr(args_vec[1]);
+            if amount_expr.is_none() {
+                tracing::warn!(
+                    "Failed to extract ingredient amount, defaulting to 1. item={}, expr={:?}",
+                    item,
+                    args_vec[1]
+                );
+            }
+            amount_expr.unwrap_or(1)
         } else {
             1
         };
@@ -527,7 +542,16 @@ impl RecipeParser {
         let end = self.extract_expr_number(end_raw);
         let step = for_stmt
             .step()
-            .and_then(|e| self.extract_expr_number(e))
+            .and_then(|e| {
+                let result = self.extract_expr_number(e);
+                if result.is_none() {
+                    tracing::warn!(
+                        "Failed to extract numeric for-loop step value, defaulting to 1. expr={:?}",
+                        e
+                    );
+                }
+                result
+            })
             .unwrap_or(1);
 
         if let (Some(start_val), Some(end_val)) = (start, end) {

@@ -692,6 +692,9 @@ impl RecipeParser {
             }
         }
 
+        tracing::warn!(
+            "Failed to re-parse substituted Lua in substitute_var_in_call_with_locals, falling back to original call"
+        );
         call.clone()
     }
 
@@ -830,6 +833,9 @@ impl RecipeParser {
             }
         }
 
+        tracing::warn!(
+            "Failed to re-parse substituted Lua in substitute_var_in_call_with_string_concat, falling back to original call"
+        );
         call.clone()
     }
 }

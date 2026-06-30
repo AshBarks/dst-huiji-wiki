@@ -159,7 +159,7 @@ fn handle_map_recipes(
                 WikiDataConverter::with_po_entries(po_data.entries.clone())
             }
             Err(e) => {
-                eprintln!("Warning: Failed to load PO file: {}", e);
+                tracing::warn!("Failed to load PO file: {}", e);
                 WikiDataConverter::new()
             }
         }
@@ -243,8 +243,7 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
             &historical_json.to_string(),
         )?),
         Err(e) => {
-            println!("Warning: Failed to fetch historical data from wiki: {}", e);
-            println!("Proceeding without historical data...");
+            tracing::warn!("Failed to fetch historical data from wiki: {}", e);
             None
         }
     };
@@ -291,8 +290,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
             }
         }
         Err(e) => {
-            println!("Warning: Failed to fetch Tech data from wiki: {}", e);
-            println!("Proceeding without Tech comparison...");
+            tracing::warn!("Failed to fetch Tech data from wiki: {}", e);
         }
     }
 
@@ -312,8 +310,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
             &historical_json.to_string(),
         )?),
         Err(e) => {
-            println!("Warning: Failed to fetch historical data from wiki: {}", e);
-            println!("Proceeding without historical data...");
+            tracing::warn!("Failed to fetch historical data from wiki: {}", e);
             None
         }
     };
@@ -607,8 +604,7 @@ async fn output_json_result_with_update(
     let historical_json = match client.get_json_data(page_title).await {
         Ok(json) => serde_json::to_string_pretty(&json)?,
         Err(e) => {
-            println!("Warning: Failed to fetch current wiki data: {}", e);
-            println!("Cannot compare with wiki data.");
+            tracing::warn!("Failed to fetch current wiki data: {}", e);
             return Ok(());
         }
     };

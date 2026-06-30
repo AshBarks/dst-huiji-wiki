@@ -44,7 +44,12 @@ impl PoParser {
                         entries.push(entry);
                         current = rem;
                     }
-                    Err(_) => {
+                    Err(e) => {
+                        tracing::warn!(
+                            "Skipping malformed PO entry at remaining input: {} bytes, error: {}",
+                            current.len(),
+                            e
+                        );
                         break;
                     }
                 }

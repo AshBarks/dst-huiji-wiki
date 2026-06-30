@@ -24,9 +24,13 @@ impl DstContext {
         }
 
         let version_file = dst_path.join("version.txt");
-        let version = std::fs::read_to_string(&version_file)
-            .map(|v| v.trim().to_string())
-            .unwrap_or_else(|_| "unknown".to_string());
+        let version = match std::fs::read_to_string(&version_file) {
+            Ok(v) => v.trim().to_string(),
+            Err(e) => {
+                tracing::warn!("Failed to read version.txt: {}, defaulting to 'unknown'", e);
+                "unknown".to_string()
+            }
+        };
 
         let client = WikiClient::from_env()
             .map_err(|e| Error::Config(format!("Failed to create wiki client: {}", e)))?;

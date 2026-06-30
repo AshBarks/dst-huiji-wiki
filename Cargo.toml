@@ -18,3 +18,4 @@ reqwest = { version = "0.13", features = ["json", "cookies", "query", "form"] }
 dotenvy = "0.15"
 zip = "8"
 toml = { version = "0.8", features = ["parse", "display"] }
+similar = "3"

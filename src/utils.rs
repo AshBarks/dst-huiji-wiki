@@ -1,43 +1,22 @@
+use similar::{Algorithm, TextDiff};
+
+fn normalize_lines(s: &str) -> String {
+    s.lines().map(|l| l.trim()).collect::<Vec<_>>().join("\n")
+}
+
 pub fn diff_lines(old: &str, new: &str) -> String {
-    let old_lines: Vec<&str> = old.lines().collect();
-    let new_lines: Vec<&str> = new.lines().collect();
+    let old_normalized = normalize_lines(old);
+    let new_normalized = normalize_lines(new);
 
-    let mut result = String::new();
+    let diff = TextDiff::configure()
+        .algorithm(Algorithm::Histogram)
+        .diff_lines(&old_normalized, &new_normalized);
 
-    let max_lines = old_lines.len().max(new_lines.len());
-    let mut changed = 0;
-    let mut removed = 0;
-    let mut unchanged = 0;
-
-    for i in 0..max_lines {
-        let old_line = old_lines.get(i);
-        let new_line = new_lines.get(i);
-
-        match (old_line, new_line) {
-            (Some(o), Some(n)) if o.trim() == n.trim() => {
-                unchanged += 1;
-            }
-            (Some(o), Some(n)) => {
-                result.push_str(&format!("- {}\n", o));
-                result.push_str(&format!("+ {}\n", n));
-                changed += 1;
-            }
-            (Some(o), None) => {
-                result.push_str(&format!("- {}\n", o));
-                removed += 1;
-            }
-            (None, Some(n)) => {
-                result.push_str(&format!("+ {}\n", n));
-                changed += 1;
-            }
-            (None, None) => {}
-        }
-    }
-
-    format!(
-        "Summary: {} lines unchanged, {} lines changed, {} lines removed\n\n{}\n",
-        unchanged, changed, removed, result
-    )
+    diff.unified_diff()
+        .context_radius(3)
+        .header("old", "new")
+        .missing_newline_hint(false)
+        .to_string()
 }
 
 #[cfg(test)]
@@ -46,67 +25,88 @@ mod tests {
 
     #[test]
     fn test_diff_lines_identical() {
-        let old = "line1\nline2\nline3";
-        let new = "line1\nline2\nline3";
-        let result = diff_lines(old, new);
-        assert!(result.contains("3 lines unchanged"));
-        assert!(result.contains("0 lines changed"));
-        assert!(result.contains("0 lines removed"));
+        let result = diff_lines("line1\nline2\nline3", "line1\nline2\nline3");
+        assert!(
+            !result.contains("@@"),
+            "expected no hunks for identical content"
+        );
     }
 
     #[test]
     fn test_diff_lines_changed() {
-        let old = "line1\nline2\nline3";
-        let new = "line1\nmodified\nline3";
-        let result = diff_lines(old, new);
-        assert!(result.contains("1 lines changed"));
-        assert!(result.contains("- line2"));
-        assert!(result.contains("+ modified"));
+        let result = diff_lines("line1\nline2\nline3", "line1\nmodified\nline3");
+        assert!(result.contains("-line2"), "expected -line2");
+        assert!(result.contains("+modified"), "expected +modified");
     }
 
     #[test]
     fn test_diff_lines_removed() {
-        let old = "line1\nline2\nline3";
-        let new = "line1\nline2";
-        let result = diff_lines(old, new);
-        assert!(result.contains("1 lines removed"));
-        assert!(result.contains("- line3"));
+        let result = diff_lines("line1\nline2\nline3", "line1\nline2");
+        assert!(result.contains("-line3"), "expected -line3");
     }
 
     #[test]
     fn test_diff_lines_added() {
-        let old = "line1\nline2";
-        let new = "line1\nline2\nline3";
-        let result = diff_lines(old, new);
-        assert!(result.contains("1 lines changed"));
-        assert!(result.contains("+ line3"));
+        let result = diff_lines("line1\nline2", "line1\nline2\nline3");
+        assert!(result.contains("+line3"), "expected +line3");
     }
 
     #[test]
     fn test_diff_lines_empty() {
-        let old = "";
-        let new = "";
-        let result = diff_lines(old, new);
-        assert!(result.contains("0 lines unchanged"));
+        let result = diff_lines("", "");
+        assert!(
+            !result.contains("@@"),
+            "expected no hunks for empty content"
+        );
     }
 
     #[test]
     fn test_diff_lines_whitespace_trim() {
-        let old = "line1  \nline2\t\nline3";
-        let new = "line1\n  line2  \nline3";
-        let result = diff_lines(old, new);
-        assert!(result.contains("3 lines unchanged"));
+        let result = diff_lines("line1  \nline2\t\nline3", "line1\n  line2  \nline3");
+        assert!(!result.contains("@@"), "expected no hunks after trim");
     }
 
     #[test]
     fn test_diff_lines_multiple_changes() {
-        let old = "a\nb\nc\nd";
-        let new = "a\nx\nc\ny";
-        let result = diff_lines(old, new);
-        assert!(result.contains("2 lines changed"));
-        assert!(result.contains("- b"));
-        assert!(result.contains("+ x"));
-        assert!(result.contains("- d"));
-        assert!(result.contains("+ y"));
+        let result = diff_lines("a\nb\nc\nd", "a\nx\nc\ny");
+        assert!(result.contains("-b"), "expected -b");
+        assert!(result.contains("+x"), "expected +x");
+        assert!(result.contains("-d"), "expected -d");
+        assert!(result.contains("+y"), "expected +y");
+    }
+
+    #[test]
+    fn test_diff_lines_insertion_in_middle() {
+        let result = diff_lines("a\nb\nc\nd", "a\nb\nX\nc\nd");
+        assert!(result.contains("+X"), "expected +X");
+        assert!(
+            !(result.contains("-b") && result.contains("+b")),
+            "expected no simultaneous -b/+b (insertion should not misalign)"
+        );
+    }
+
+    #[test]
+    fn test_diff_lines_deletion_in_middle() {
+        let result = diff_lines("a\nb\nc\nd", "a\nc\nd");
+        assert!(result.contains("-b"), "expected -b");
+        assert!(
+            !(result.contains("-c") && result.contains("+c")),
+            "expected no simultaneous -c/+c (deletion should not misalign)"
+        );
+    }
+
+    #[test]
+    fn test_diff_lines_all_deleted() {
+        let result = diff_lines("a\nb\nc", "");
+        assert!(result.contains("-a"), "expected -a");
+        assert!(result.contains("-b"), "expected -b");
+        assert!(result.contains("-c"), "expected -c");
+    }
+
+    #[test]
+    fn test_diff_lines_cjk_content() {
+        let result = diff_lines("斧头描述", "斧头说明");
+        assert!(result.contains("-斧头描述"), "expected -斧头描述");
+        assert!(result.contains("+斧头说明"), "expected +斧头说明");
     }
 }

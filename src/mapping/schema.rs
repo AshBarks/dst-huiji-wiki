@@ -91,17 +91,23 @@ pub struct WikiSchema {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WikiJsonData {
-    pub license: String,
-    pub description: serde_json::Value,
+    #[serde(default)]
+    pub license: Option<String>,
+    #[serde(default)]
+    pub description: Option<serde_json::Value>,
     pub sources: String,
     pub schema: WikiSchema,
     pub data: Vec<Vec<serde_json::Value>>,
 }
 
 impl WikiJsonData {
-    pub fn new(sources: String, schema: WikiSchema, description: serde_json::Value) -> Self {
+    pub fn new(
+        sources: String,
+        schema: WikiSchema,
+        description: Option<serde_json::Value>,
+    ) -> Self {
         Self {
-            license: "CC0-1.0".to_string(),
+            license: Some("CC0-1.0".to_string()),
             description,
             sources,
             schema,
@@ -277,9 +283,9 @@ mod tests {
         let data = WikiJsonData::new(
             "test source".to_string(),
             schema,
-            serde_json::json!({"zh": "测试"}),
+            Some(serde_json::json!({"zh": "测试"})),
         );
-        assert_eq!(data.license, "CC0-1.0");
+        assert_eq!(data.license, Some("CC0-1.0".to_string()));
         assert_eq!(data.sources, "test source");
         assert!(data.data.is_empty());
     }
@@ -293,7 +299,7 @@ mod tests {
                 title: None,
             }],
         };
-        let mut data = WikiJsonData::new("source".to_string(), schema, serde_json::json!({}));
+        let mut data = WikiJsonData::new("source".to_string(), schema, Some(serde_json::json!({})));
         data.add_record(vec![serde_json::json!("test_id")]);
         assert_eq!(data.data.len(), 1);
     }
@@ -314,7 +320,7 @@ mod tests {
                 },
             ],
         };
-        let mut data = WikiJsonData::new("source".to_string(), schema, serde_json::json!({}));
+        let mut data = WikiJsonData::new("source".to_string(), schema, Some(serde_json::json!({})));
         data.add_record(vec![serde_json::json!("id1"), serde_json::json!("name1")]);
         data.add_record(vec![serde_json::json!("id2"), serde_json::json!("name2")]);
 
@@ -336,7 +342,7 @@ mod tests {
                 title: None,
             }],
         };
-        let mut data = WikiJsonData::new("source".to_string(), schema, serde_json::json!({}));
+        let mut data = WikiJsonData::new("source".to_string(), schema, Some(serde_json::json!({})));
         data.add_record(vec![serde_json::json!("id1")]);
         data.add_record(vec![serde_json::json!("id2")]);
 
@@ -369,7 +375,7 @@ mod tests {
         let data = WikiJsonData::new(
             "source".to_string(),
             schema,
-            serde_json::json!({"zh": "测试数据"}),
+            Some(serde_json::json!({"zh": "测试数据"})),
         );
 
         let json = serde_json::to_string(&data).unwrap();

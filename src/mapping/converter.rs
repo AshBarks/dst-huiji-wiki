@@ -87,7 +87,7 @@ impl WikiDataConverter {
         &self,
         items: &[T],
         sources: &str,
-        description: serde_json::Value,
+        description: Option<serde_json::Value>,
     ) -> WikiJsonData {
         let schema = T::schema();
         let wiki_schema = schema.to_wiki_schema();
@@ -95,7 +95,7 @@ impl WikiDataConverter {
         let data = items.iter().map(|item| item.to_wiki_record()).collect();
 
         WikiJsonData {
-            license: "CC0-1.0".to_string(),
+            license: Some("CC0-1.0".to_string()),
             description,
             sources: sources.to_string(),
             schema: wiki_schema,
@@ -107,7 +107,7 @@ impl WikiDataConverter {
         &self,
         recipes: &[crate::models::Recipe],
         sources: &str,
-        description: serde_json::Value,
+        description: Option<serde_json::Value>,
     ) -> WikiJsonData {
         let schema = crate::models::Recipe::schema();
         let wiki_schema = schema.to_wiki_schema();
@@ -133,7 +133,7 @@ impl WikiDataConverter {
             .collect();
 
         WikiJsonData {
-            license: "CC0-1.0".to_string(),
+            license: Some("CC0-1.0".to_string()),
             description,
             sources: sources.to_string(),
             schema: wiki_schema,
@@ -146,7 +146,7 @@ impl WikiDataConverter {
         items: &[T],
         sources: &str,
         historical_data: &WikiJsonData,
-        description: serde_json::Value,
+        description: Option<serde_json::Value>,
     ) -> WikiJsonData {
         let mut wiki_data = self.convert_to_wiki_json(items, sources, description);
         T::merge_with_history(&mut wiki_data, historical_data);
@@ -385,7 +385,7 @@ pub fn merge_new_records<T: WikiMapper>(
 pub fn replace_records<T: WikiMapper>(
     items: &[T],
     sources: &str,
-    description: serde_json::Value,
+    description: Option<serde_json::Value>,
 ) -> WikiJsonData {
     WikiDataConverter::new().convert_to_wiki_json(items, sources, description)
 }
@@ -474,7 +474,7 @@ mod tests {
     #[test]
     fn test_wiki_data_converter_to_json_string() {
         let schema = super::super::schema::WikiSchema { fields: vec![] };
-        let data = WikiJsonData::new("source".to_string(), schema, serde_json::json!({}));
+        let data = WikiJsonData::new("source".to_string(), schema, Some(serde_json::json!({})));
         let json = WikiDataConverter::to_json_string(&data).unwrap();
         assert!(json.contains("CC0-1.0"));
         assert!(json.contains("source"));
@@ -490,7 +490,7 @@ mod tests {
             "data": []
         }"#;
         let data = WikiDataConverter::parse_wiki_json(json).unwrap();
-        assert_eq!(data.license, "CC0-1.0");
+        assert_eq!(data.license, Some("CC0-1.0".to_string()));
         assert_eq!(data.sources, "test");
     }
 

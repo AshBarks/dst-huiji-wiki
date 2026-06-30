@@ -3,7 +3,9 @@ use full_moon::ast::{self, Ast};
 use full_moon::node::Node;
 use std::collections::HashMap;
 
-use super::types::{FunctionInfo, OverrideValue, PrefabNameOverride, SourceLocation, VariableValue};
+use super::types::{
+    FunctionInfo, OverrideValue, PrefabNameOverride, SourceLocation, VariableValue,
+};
 
 pub struct PrefabOverrideParser {
     source: String,
@@ -43,12 +45,8 @@ impl PrefabOverrideParser {
                         for (name, expr) in name_list.iter().zip(expr_list.iter()) {
                             let var_name = name.token().to_string();
                             if let Some(value) = self.extract_string_value(expr) {
-                                self.variables.insert(
-                                    var_name,
-                                    VariableValue {
-                                        value: Some(value),
-                                    },
-                                );
+                                self.variables
+                                    .insert(var_name, VariableValue { value: Some(value) });
                             }
                             if let ast::Expression::Function(func) = expr {
                                 blocks_to_visit.push(func.body().block());
@@ -205,12 +203,12 @@ impl PrefabOverrideParser {
                     if let ast::Parameter::Name(param_name) = param {
                         let param_name_str = param_name.token().to_string();
                         if i < call_args_vec.len() {
-                            if let ast::Expression::Var(var) = &call_args_vec[i] {
-                                if let ast::Var::Name(var_name) = var {
-                                    let var_name_str = var_name.token().to_string();
-                                    if let Some(table_expr) = iter_tables.get(&var_name_str) {
-                                        param_tables.insert(param_name_str.clone(), table_expr.clone());
-                                    }
+                            if let ast::Expression::Var(ast::Var::Name(var_name)) =
+                                &call_args_vec[i]
+                            {
+                                let var_name_str = var_name.token().to_string();
+                                if let Some(table_expr) = iter_tables.get(&var_name_str) {
+                                    param_tables.insert(param_name_str.clone(), table_expr.clone());
                                 }
                             }
                         }
@@ -249,55 +247,56 @@ impl PrefabOverrideParser {
         calls
     }
 
-    fn find_factory_calls_in_table_constructor(&self, expr: &ast::Expression, calls: &mut Vec<ast::FunctionCall>) {
-        match expr {
-            ast::Expression::TableConstructor(table) => {
-                for field in table.fields() {
-                    match field {
-                        ast::Field::NoKey(expression) => {
-                            if let ast::Expression::FunctionCall(call) = expression {
-                                let prefix = call.prefix();
-                                if let ast::Prefix::Name(name) = prefix {
-                                    let fn_name = name.token().to_string();
-                                    if self.functions.contains_key(&fn_name) {
-                                        calls.push(call.clone());
-                                    }
+    fn find_factory_calls_in_table_constructor(
+        &self,
+        expr: &ast::Expression,
+        calls: &mut Vec<ast::FunctionCall>,
+    ) {
+        if let ast::Expression::TableConstructor(table) = expr {
+            for field in table.fields() {
+                match field {
+                    ast::Field::NoKey(expression) => {
+                        if let ast::Expression::FunctionCall(call) = expression {
+                            let prefix = call.prefix();
+                            if let ast::Prefix::Name(name) = prefix {
+                                let fn_name = name.token().to_string();
+                                if self.functions.contains_key(&fn_name) {
+                                    calls.push(call.clone());
                                 }
-                            } else {
-                                self.find_factory_calls_in_table_constructor(expression, calls);
                             }
+                        } else {
+                            self.find_factory_calls_in_table_constructor(expression, calls);
                         }
-                        ast::Field::NameKey { value, .. } => {
-                            if let ast::Expression::FunctionCall(call) = value {
-                                let prefix = call.prefix();
-                                if let ast::Prefix::Name(name) = prefix {
-                                    let fn_name = name.token().to_string();
-                                    if self.functions.contains_key(&fn_name) {
-                                        calls.push(call.clone());
-                                    }
-                                }
-                            } else {
-                                self.find_factory_calls_in_table_constructor(value, calls);
-                            }
-                        }
-                        ast::Field::ExpressionKey { value, .. } => {
-                            if let ast::Expression::FunctionCall(call) = value {
-                                let prefix = call.prefix();
-                                if let ast::Prefix::Name(name) = prefix {
-                                    let fn_name = name.token().to_string();
-                                    if self.functions.contains_key(&fn_name) {
-                                        calls.push(call.clone());
-                                    }
-                                }
-                            } else {
-                                self.find_factory_calls_in_table_constructor(value, calls);
-                            }
-                        }
-                        _ => {}
                     }
+                    ast::Field::NameKey { value, .. } => {
+                        if let ast::Expression::FunctionCall(call) = value {
+                            let prefix = call.prefix();
+                            if let ast::Prefix::Name(name) = prefix {
+                                let fn_name = name.token().to_string();
+                                if self.functions.contains_key(&fn_name) {
+                                    calls.push(call.clone());
+                                }
+                            }
+                        } else {
+                            self.find_factory_calls_in_table_constructor(value, calls);
+                        }
+                    }
+                    ast::Field::ExpressionKey { value, .. } => {
+                        if let ast::Expression::FunctionCall(call) = value {
+                            let prefix = call.prefix();
+                            if let ast::Prefix::Name(name) = prefix {
+                                let fn_name = name.token().to_string();
+                                if self.functions.contains_key(&fn_name) {
+                                    calls.push(call.clone());
+                                }
+                            }
+                        } else {
+                            self.find_factory_calls_in_table_constructor(value, calls);
+                        }
+                    }
+                    _ => {}
                 }
             }
-            _ => {}
         }
     }
 
@@ -350,17 +349,19 @@ impl PrefabOverrideParser {
                             false
                         }
                     });
-                    
+
                     if has_insert_index {
                         for suffix in &suffixes {
-                            if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = suffix {
-                                if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
-                                    let args_vec: Vec<_> = arguments.iter().collect();
-                                    if args_vec.len() >= 2 {
-                                        if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
-                                            if self.is_prefab_call(inner_call) {
-                                                return true;
-                                            }
+                            if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                                ast::FunctionArgs::Parentheses { arguments, .. },
+                            )) = suffix
+                            {
+                                let args_vec: Vec<_> = arguments.iter().collect();
+                                if args_vec.len() >= 2 {
+                                    if let ast::Expression::FunctionCall(inner_call) = &args_vec[1]
+                                    {
+                                        if self.is_prefab_call(inner_call) {
+                                            return true;
                                         }
                                     }
                                 }
@@ -387,20 +388,22 @@ impl PrefabOverrideParser {
                             false
                         }
                     });
-                    
+
                     if has_insert_index {
                         for suffix in &suffixes {
-                            if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = suffix {
-                                if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
-                                    let args_vec: Vec<_> = arguments.iter().collect();
-                                    if args_vec.len() >= 2 {
-                                        if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
-                                            let inner_prefix = inner_call.prefix();
-                                            if let ast::Prefix::Name(inner_name) = inner_prefix {
-                                                let inner_fn_name = inner_name.token().to_string();
-                                                if self.functions.contains_key(&inner_fn_name) {
-                                                    return true;
-                                                }
+                            if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                                ast::FunctionArgs::Parentheses { arguments, .. },
+                            )) = suffix
+                            {
+                                let args_vec: Vec<_> = arguments.iter().collect();
+                                if args_vec.len() >= 2 {
+                                    if let ast::Expression::FunctionCall(inner_call) = &args_vec[1]
+                                    {
+                                        let inner_prefix = inner_call.prefix();
+                                        if let ast::Prefix::Name(inner_name) = inner_prefix {
+                                            let inner_fn_name = inner_name.token().to_string();
+                                            if self.functions.contains_key(&inner_fn_name) {
+                                                return true;
                                             }
                                         }
                                     }
@@ -414,7 +417,10 @@ impl PrefabOverrideParser {
         false
     }
 
-    fn extract_factory_from_table_insert(&self, call: &ast::FunctionCall) -> Option<ast::FunctionCall> {
+    fn extract_factory_from_table_insert(
+        &self,
+        call: &ast::FunctionCall,
+    ) -> Option<ast::FunctionCall> {
         let prefix = call.prefix();
         if let ast::Prefix::Name(name) = prefix {
             let prefix_name = name.token().to_string();
@@ -427,16 +433,17 @@ impl PrefabOverrideParser {
                         false
                     }
                 });
-                
+
                 if has_insert_index {
                     for suffix in &suffixes {
-                        if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = suffix {
-                            if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
-                                let args_vec: Vec<_> = arguments.iter().collect();
-                                if args_vec.len() >= 2 {
-                                    if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
-                                        return Some(inner_call.clone());
-                                    }
+                        if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                            ast::FunctionArgs::Parentheses { arguments, .. },
+                        )) = suffix
+                        {
+                            let args_vec: Vec<_> = arguments.iter().collect();
+                            if args_vec.len() >= 2 {
+                                if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
+                                    return Some(inner_call.clone());
                                 }
                             }
                         }
@@ -447,7 +454,10 @@ impl PrefabOverrideParser {
         None
     }
 
-    fn extract_prefab_from_table_insert(&self, call: &ast::FunctionCall) -> Option<ast::FunctionCall> {
+    fn extract_prefab_from_table_insert(
+        &self,
+        call: &ast::FunctionCall,
+    ) -> Option<ast::FunctionCall> {
         let prefix = call.prefix();
         if let ast::Prefix::Name(name) = prefix {
             let prefix_name = name.token().to_string();
@@ -460,16 +470,17 @@ impl PrefabOverrideParser {
                         false
                     }
                 });
-                
+
                 if has_insert_index {
                     for suffix in &suffixes {
-                        if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = suffix {
-                            if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
-                                let args_vec: Vec<_> = arguments.iter().collect();
-                                if args_vec.len() >= 2 {
-                                    if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
-                                        return Some(inner_call.clone());
-                                    }
+                        if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                            ast::FunctionArgs::Parentheses { arguments, .. },
+                        )) = suffix
+                        {
+                            let args_vec: Vec<_> = arguments.iter().collect();
+                            if args_vec.len() >= 2 {
+                                if let ast::Expression::FunctionCall(inner_call) = &args_vec[1] {
+                                    return Some(inner_call.clone());
                                 }
                             }
                         }
@@ -511,7 +522,8 @@ impl PrefabOverrideParser {
                     let params: Vec<_> = func_info.body.parameters().iter().collect();
 
                     if !args_vec.is_empty() {
-                        prefab_name_from_call = self.extract_string_from_arg_with_params(args_vec[0], &param_values);
+                        prefab_name_from_call =
+                            self.extract_string_from_arg_with_params(args_vec[0], &param_values);
                     }
 
                     for (i, param) in params.iter().enumerate() {
@@ -520,7 +532,9 @@ impl PrefabOverrideParser {
                                 ast::Parameter::Name(name) => name.token().to_string(),
                                 _ => continue,
                             };
-                            if let Some(value) = self.extract_string_from_arg_with_params(args_vec[i], &param_values) {
+                            if let Some(value) =
+                                self.extract_string_from_arg_with_params(args_vec[i], &param_values)
+                            {
                                 param_values.insert(param_name.clone(), value);
                             }
                             if let ast::Expression::TableConstructor(_) = args_vec[i] {
@@ -566,11 +580,18 @@ impl PrefabOverrideParser {
     fn is_external_factory_function(&self, name: &str) -> bool {
         matches!(
             name,
-            "MakeBundle" | "MakeWrap" | "MakeContainer" | "AddWinterTree" | "MakeGlobalTrackingIcons"
+            "MakeBundle"
+                | "MakeWrap"
+                | "MakeContainer"
+                | "AddWinterTree"
+                | "MakeGlobalTrackingIcons"
         )
     }
 
-    fn analyze_external_factory_call(&self, call: &ast::FunctionCall) -> Option<Vec<PrefabNameOverride>> {
+    fn analyze_external_factory_call(
+        &self,
+        call: &ast::FunctionCall,
+    ) -> Option<Vec<PrefabNameOverride>> {
         let args = self.get_call_args(call)?;
         let args_vec: Vec<_> = args.iter().collect();
 
@@ -590,7 +611,10 @@ impl PrefabOverrideParser {
                     match field {
                         ast::Field::NameKey { key, value, .. } => {
                             let key_name = key.token().to_string();
-                            if key_name == "global_common_postinit" || key_name == "postinit" || key_name == "fn" {
+                            if key_name == "global_common_postinit"
+                                || key_name == "postinit"
+                                || key_name == "fn"
+                            {
                                 if let ast::Expression::Function(func) = value {
                                     self.find_set_prefab_name_override_in_function_body(
                                         func.body(),
@@ -602,16 +626,14 @@ impl PrefabOverrideParser {
                                 }
                             }
                         }
-                        ast::Field::NoKey(expr) => {
-                            if let ast::Expression::Function(func) = expr {
-                                self.find_set_prefab_name_override_in_function_body(
-                                    func.body(),
-                                    prefab_name.as_deref(),
-                                    &local_functions,
-                                    &param_values,
-                                    &mut results,
-                                );
-                            }
+                        ast::Field::NoKey(ast::Expression::Function(func)) => {
+                            self.find_set_prefab_name_override_in_function_body(
+                                func.body(),
+                                prefab_name.as_deref(),
+                                &local_functions,
+                                &param_values,
+                                &mut results,
+                            );
                         }
                         _ => {}
                     }
@@ -672,7 +694,9 @@ impl PrefabOverrideParser {
         for stmt in body.block().stmts() {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 if self.is_set_prefab_name_override_call(call) {
-                    if let Some(override_info) = self.extract_override_from_call_with_default(call, default_prefab_name) {
+                    if let Some(override_info) =
+                        self.extract_override_from_call_with_default(call, default_prefab_name)
+                    {
                         results.push(override_info);
                     }
                 }
@@ -701,7 +725,9 @@ impl PrefabOverrideParser {
         for stmt in block.stmts() {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 if self.is_set_prefab_name_override_call(call) {
-                    if let Some(override_info) = self.extract_override_from_call_with_default(call, default_prefab_name) {
+                    if let Some(override_info) =
+                        self.extract_override_from_call_with_default(call, default_prefab_name)
+                    {
                         results.push(override_info);
                     }
                 }
@@ -709,7 +735,11 @@ impl PrefabOverrideParser {
         }
     }
 
-    fn extract_override_from_call_with_default(&self, call: &ast::FunctionCall, default_prefab_name: Option<&str>) -> Option<PrefabNameOverride> {
+    fn extract_override_from_call_with_default(
+        &self,
+        call: &ast::FunctionCall,
+        default_prefab_name: Option<&str>,
+    ) -> Option<PrefabNameOverride> {
         let args = self.get_call_args(call)?;
         let args_vec: Vec<_> = args.iter().collect();
 
@@ -730,12 +760,12 @@ impl PrefabOverrideParser {
         })
     }
 
-     fn extract_override_value_from_expr(&self, arg: &ast::Expression) -> Option<OverrideValue> {
-         if let Some(s) = self.extract_string_from_arg(arg) {
-             return Some(OverrideValue::Static(s));
-         }
-         Some(OverrideValue::Dynamic(arg.to_string()))
-     }
+    fn extract_override_value_from_expr(&self, arg: &ast::Expression) -> Option<OverrideValue> {
+        if let Some(s) = self.extract_string_from_arg(arg) {
+            return Some(OverrideValue::Static(s));
+        }
+        Some(OverrideValue::Dynamic(arg.to_string()))
+    }
 
     // ============================================================================
     // Section 8: Function Body Prefab Analysis with Tracking
@@ -749,14 +779,16 @@ impl PrefabOverrideParser {
     ) {
         let mut current_local_functions = local_functions.clone();
         let mut local_variables: HashMap<String, String> = HashMap::new();
-        
+
         for stmt in body.block().stmts() {
             if let ast::Stmt::LocalAssignment(assignment) = stmt {
                 let names: Vec<_> = assignment.names().iter().collect();
                 let exprs: Vec<_> = assignment.expressions().iter().collect();
                 for (name, expr) in names.iter().zip(exprs.iter()) {
                     let var_name = name.token().to_string();
-                    if let Some(value) = self.extract_string_from_arg_with_params(expr, param_values) {
+                    if let Some(value) =
+                        self.extract_string_from_arg_with_params(expr, param_values)
+                    {
                         local_variables.insert(var_name.clone(), value);
                     }
                     if let ast::Expression::Function(nested_func) = expr {
@@ -781,7 +813,8 @@ impl PrefabOverrideParser {
             }
         }
 
-        let combined_values: HashMap<String, String> = param_values.iter()
+        let combined_values: HashMap<String, String> = param_values
+            .iter()
             .chain(local_variables.iter())
             .map(|(k, v)| (k.clone(), v.clone()))
             .collect();
@@ -789,12 +822,22 @@ impl PrefabOverrideParser {
         for stmt in body.block().stmts() {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 if self.is_prefab_call(call) {
-                    if let Some(override_info) = self.analyze_prefab_call_with_local_fns_and_params(call, &current_local_functions, &combined_values) {
+                    if let Some(override_info) = self.analyze_prefab_call_with_local_fns_and_params(
+                        call,
+                        &current_local_functions,
+                        &combined_values,
+                    ) {
                         results.push(override_info);
                     }
                 } else if self.is_table_insert_with_prefab(call) {
                     if let Some(prefab_call) = self.extract_prefab_from_table_insert(call) {
-                        if let Some(override_info) = self.analyze_prefab_call_with_local_fns_and_params(&prefab_call, &current_local_functions, &combined_values) {
+                        if let Some(override_info) = self
+                            .analyze_prefab_call_with_local_fns_and_params(
+                                &prefab_call,
+                                &current_local_functions,
+                                &combined_values,
+                            )
+                        {
                             results.push(override_info);
                         }
                     }
@@ -802,14 +845,18 @@ impl PrefabOverrideParser {
             }
         }
 
-        if let Some(last_stmt) = body.block().last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    if let ast::Expression::FunctionCall(call) = expr {
-                        if self.is_prefab_call(call) {
-                            if let Some(override_info) = self.analyze_prefab_call_with_local_fns_and_params(call, &current_local_functions, &combined_values) {
-                                results.push(override_info);
-                            }
+        if let Some(ast::LastStmt::Return(ret)) = body.block().last_stmt() {
+            for expr in ret.returns().iter() {
+                if let ast::Expression::FunctionCall(call) = expr {
+                    if self.is_prefab_call(call) {
+                        if let Some(override_info) = self
+                            .analyze_prefab_call_with_local_fns_and_params(
+                                call,
+                                &current_local_functions,
+                                &combined_values,
+                            )
+                        {
+                            results.push(override_info);
                         }
                     }
                 }
@@ -847,7 +894,12 @@ impl PrefabOverrideParser {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 if self.is_table_insert_with_prefab(call) {
                     if let Some(prefab_call) = self.extract_prefab_from_table_insert(call) {
-                        if let Some(override_info) = self.analyze_prefab_call_with_tables(&prefab_call, &current_local_functions, param_values, param_tables) {
+                        if let Some(override_info) = self.analyze_prefab_call_with_tables(
+                            &prefab_call,
+                            &current_local_functions,
+                            param_values,
+                            param_tables,
+                        ) {
                             results.push(override_info);
                         }
                     }
@@ -887,14 +939,17 @@ impl PrefabOverrideParser {
             }
         }
 
-        if let Some(last_stmt) = body.block().last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    if let ast::Expression::FunctionCall(call) = expr {
-                        if self.is_prefab_call(call) {
-                            if let Some(override_info) = self.analyze_prefab_call_with_tables(call, &current_local_functions, param_values, param_tables) {
-                                results.push(override_info);
-                            }
+        if let Some(ast::LastStmt::Return(ret)) = body.block().last_stmt() {
+            for expr in ret.returns().iter() {
+                if let ast::Expression::FunctionCall(call) = expr {
+                    if self.is_prefab_call(call) {
+                        if let Some(override_info) = self.analyze_prefab_call_with_tables(
+                            call,
+                            &current_local_functions,
+                            param_values,
+                            param_tables,
+                        ) {
+                            results.push(override_info);
                         }
                     }
                 }
@@ -914,7 +969,12 @@ impl PrefabOverrideParser {
             if let ast::Stmt::FunctionCall(call) = stmt {
                 if self.is_table_insert_with_prefab(call) {
                     if let Some(prefab_call) = self.extract_prefab_from_table_insert(call) {
-                        if let Some(override_info) = self.analyze_prefab_call_with_tables(&prefab_call, local_functions, param_values, param_tables) {
+                        if let Some(override_info) = self.analyze_prefab_call_with_tables(
+                            &prefab_call,
+                            local_functions,
+                            param_values,
+                            param_tables,
+                        ) {
                             results.push(override_info);
                         }
                     }
@@ -969,7 +1029,8 @@ impl PrefabOverrideParser {
             return None;
         }
 
-        let prefab_name = self.extract_prefab_name_from_arg(args_vec[0], param_values, param_tables);
+        let prefab_name =
+            self.extract_prefab_name_from_arg(args_vec[0], param_values, param_tables);
 
         if args_vec.len() < 2 {
             return None;
@@ -978,7 +1039,11 @@ impl PrefabOverrideParser {
         let prefab_name = prefab_name?;
 
         let fn_arg = args_vec[1];
-        let override_value = self.find_override_in_fn_arg_with_local_fns_and_params(fn_arg, local_functions, param_values);
+        let override_value = self.find_override_in_fn_arg_with_local_fns_and_params(
+            fn_arg,
+            local_functions,
+            param_values,
+        );
 
         let override_value = override_value?;
 
@@ -1024,8 +1089,11 @@ impl PrefabOverrideParser {
             ast::Expression::BinaryOperator { lhs, binop, rhs } => {
                 let op_str = binop.to_string().trim().to_string();
                 if op_str == ".." {
-                    let left = self.extract_prefab_name_from_arg(lhs, param_values, param_tables)?;
-                    let right = self.extract_prefab_name_from_arg(rhs, param_values, param_tables).unwrap_or_default();
+                    let left =
+                        self.extract_prefab_name_from_arg(lhs, param_values, param_tables)?;
+                    let right = self
+                        .extract_prefab_name_from_arg(rhs, param_values, param_tables)
+                        .unwrap_or_default();
                     Some(format!("{}{}", left, right))
                 } else {
                     None
@@ -1039,7 +1107,11 @@ impl PrefabOverrideParser {
                         if let Some(args) = self.get_call_args(call) {
                             let args_vec: Vec<_> = args.iter().collect();
                             if !args_vec.is_empty() {
-                                return self.extract_prefab_name_from_arg(args_vec[0], param_values, param_tables);
+                                return self.extract_prefab_name_from_arg(
+                                    args_vec[0],
+                                    param_values,
+                                    param_tables,
+                                );
                             }
                         }
                     }
@@ -1067,13 +1139,10 @@ impl PrefabOverrideParser {
 
     fn extract_name_from_table_constructor(&self, table: &ast::TableConstructor) -> Option<String> {
         for field in table.fields() {
-            match field {
-                ast::Field::NameKey { key, value, .. } => {
-                    if key.token().to_string() == "name" {
-                        return self.extract_string_from_arg(value);
-                    }
+            if let ast::Field::NameKey { key, value, .. } = field {
+                if key.token().to_string() == "name" {
+                    return self.extract_string_from_arg(value);
                 }
-                _ => {}
             }
         }
         None
@@ -1142,9 +1211,13 @@ impl PrefabOverrideParser {
         }
 
         let prefab_name = prefab_name?;
-        
+
         let fn_arg = args_vec[1];
-        let override_value = self.find_override_in_fn_arg_with_local_fns_and_params(fn_arg, local_functions, param_values);
+        let override_value = self.find_override_in_fn_arg_with_local_fns_and_params(
+            fn_arg,
+            local_functions,
+            param_values,
+        );
 
         let override_value = override_value?;
 
@@ -1156,7 +1229,11 @@ impl PrefabOverrideParser {
         })
     }
 
-    fn extract_string_from_arg_with_params(&self, arg: &ast::Expression, param_values: &HashMap<String, String>) -> Option<String> {
+    fn extract_string_from_arg_with_params(
+        &self,
+        arg: &ast::Expression,
+        param_values: &HashMap<String, String>,
+    ) -> Option<String> {
         match arg {
             ast::Expression::String(s) => Some(extract_string_literal(&s.to_string())),
             ast::Expression::Var(var) => {
@@ -1174,7 +1251,9 @@ impl PrefabOverrideParser {
                 let op_str = binop.to_string().trim().to_string();
                 if op_str == ".." {
                     let left = self.extract_string_from_arg_with_params(lhs, param_values)?;
-                    let right = self.extract_string_from_arg_with_params(rhs, param_values).unwrap_or_default();
+                    let right = self
+                        .extract_string_from_arg_with_params(rhs, param_values)
+                        .unwrap_or_default();
                     Some(format!("{}{}", left, right))
                 } else {
                     None
@@ -1188,7 +1267,10 @@ impl PrefabOverrideParser {
                         if let Some(args) = self.get_call_args(call) {
                             let args_vec: Vec<_> = args.iter().collect();
                             if !args_vec.is_empty() {
-                                return self.extract_string_from_arg_with_params(args_vec[0], param_values);
+                                return self.extract_string_from_arg_with_params(
+                                    args_vec[0],
+                                    param_values,
+                                );
                             }
                         }
                     }
@@ -1197,15 +1279,14 @@ impl PrefabOverrideParser {
             }
             ast::Expression::TableConstructor(table) => {
                 for field in table.fields() {
-                    match field {
-                        ast::Field::NameKey { key, value, .. } => {
-                            if key.token().to_string() == "name" {
-                                if let Some(val) = self.extract_string_from_arg_with_params(value, param_values) {
-                                    return Some(val);
-                                }
+                    if let ast::Field::NameKey { key, value, .. } = field {
+                        if key.token().to_string() == "name" {
+                            if let Some(val) =
+                                self.extract_string_from_arg_with_params(value, param_values)
+                            {
+                                return Some(val);
                             }
                         }
-                        _ => {}
                     }
                 }
                 None
@@ -1264,7 +1345,12 @@ impl PrefabOverrideParser {
         param_values: &HashMap<String, String>,
     ) -> Option<OverrideValue> {
         for stmt in body.block().stmts() {
-            if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+            if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(
+                stmt,
+                visited,
+                local_functions,
+                param_values,
+            ) {
                 return Some(override_val);
             }
         }
@@ -1315,7 +1401,12 @@ impl PrefabOverrideParser {
             }
         }
 
-        self.find_override_in_function_body_deep_with_local_fns_and_params(body, visited, &local_functions, param_values)
+        self.find_override_in_function_body_deep_with_local_fns_and_params(
+            body,
+            visited,
+            &local_functions,
+            param_values,
+        )
     }
 
     fn find_override_in_function_body_with_params(
@@ -1339,12 +1430,24 @@ impl PrefabOverrideParser {
                 if self.is_set_prefab_name_override_call(call) {
                     self.extract_override_from_call_with_params(call, param_values)
                 } else {
-                    self.try_find_override_in_call_chain_with_local_fns_and_params(call, visited, local_functions, param_values)
+                    self.try_find_override_in_call_chain_with_local_fns_and_params(
+                        call,
+                        visited,
+                        local_functions,
+                        param_values,
+                    )
                 }
             }
             ast::Stmt::LocalAssignment(assignment) => {
                 for expr in assignment.expressions().iter() {
-                    if let Some(override_val) = self.find_override_in_expr_deep_with_local_fns_and_params(expr, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_expr_deep_with_local_fns_and_params(
+                            expr,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
@@ -1352,14 +1455,28 @@ impl PrefabOverrideParser {
             }
             ast::Stmt::If(if_stmt) => {
                 for stmt in if_stmt.block().stmts() {
-                    if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_stmt_deep_with_local_fns_and_params(
+                            stmt,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
                 if let Some(else_ifs) = if_stmt.else_if() {
                     for else_if in else_ifs {
                         for stmt in else_if.block().stmts() {
-                            if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                            if let Some(override_val) = self
+                                .find_override_in_stmt_deep_with_local_fns_and_params(
+                                    stmt,
+                                    visited,
+                                    local_functions,
+                                    param_values,
+                                )
+                            {
                                 return Some(override_val);
                             }
                         }
@@ -1367,7 +1484,14 @@ impl PrefabOverrideParser {
                 }
                 if let Some(else_block) = if_stmt.else_block() {
                     for stmt in else_block.stmts() {
-                        if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                        if let Some(override_val) = self
+                            .find_override_in_stmt_deep_with_local_fns_and_params(
+                                stmt,
+                                visited,
+                                local_functions,
+                                param_values,
+                            )
+                        {
                             return Some(override_val);
                         }
                     }
@@ -1376,7 +1500,14 @@ impl PrefabOverrideParser {
             }
             ast::Stmt::While(while_stmt) => {
                 for stmt in while_stmt.block().stmts() {
-                    if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_stmt_deep_with_local_fns_and_params(
+                            stmt,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
@@ -1384,7 +1515,14 @@ impl PrefabOverrideParser {
             }
             ast::Stmt::Repeat(repeat_stmt) => {
                 for stmt in repeat_stmt.block().stmts() {
-                    if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_stmt_deep_with_local_fns_and_params(
+                            stmt,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
@@ -1392,7 +1530,14 @@ impl PrefabOverrideParser {
             }
             ast::Stmt::GenericFor(generic_for_stmt) => {
                 for stmt in generic_for_stmt.block().stmts() {
-                    if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_stmt_deep_with_local_fns_and_params(
+                            stmt,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
@@ -1400,15 +1545,26 @@ impl PrefabOverrideParser {
             }
             ast::Stmt::NumericFor(numeric_for_stmt) => {
                 for stmt in numeric_for_stmt.block().stmts() {
-                    if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, local_functions, param_values) {
+                    if let Some(override_val) = self
+                        .find_override_in_stmt_deep_with_local_fns_and_params(
+                            stmt,
+                            visited,
+                            local_functions,
+                            param_values,
+                        )
+                    {
                         return Some(override_val);
                     }
                 }
                 None
             }
-            ast::Stmt::LocalFunction(local_fn) => {
-                self.find_override_in_function_body_deep_with_local_fns_and_params(local_fn.body(), visited, local_functions, param_values)
-            }
+            ast::Stmt::LocalFunction(local_fn) => self
+                .find_override_in_function_body_deep_with_local_fns_and_params(
+                    local_fn.body(),
+                    visited,
+                    local_functions,
+                    param_values,
+                ),
             _ => None,
         }
     }
@@ -1421,12 +1577,20 @@ impl PrefabOverrideParser {
         param_values: &HashMap<String, String>,
     ) -> Option<OverrideValue> {
         match expr {
-            ast::Expression::FunctionCall(call) => {
-                self.try_find_override_in_call_chain_with_local_fns_and_params(call, visited, local_functions, param_values)
-            }
-            ast::Expression::Function(func) => {
-                self.find_override_in_function_body_deep_with_local_fns_and_params(func.body(), visited, local_functions, param_values)
-            }
+            ast::Expression::FunctionCall(call) => self
+                .try_find_override_in_call_chain_with_local_fns_and_params(
+                    call,
+                    visited,
+                    local_functions,
+                    param_values,
+                ),
+            ast::Expression::Function(func) => self
+                .find_override_in_function_body_deep_with_local_fns_and_params(
+                    func.body(),
+                    visited,
+                    local_functions,
+                    param_values,
+                ),
             _ => None,
         }
     }
@@ -1446,13 +1610,22 @@ impl PrefabOverrideParser {
             }
             if let Some(body) = local_functions.get(&fn_name) {
                 visited.push(fn_name);
-                let result = self.find_override_in_function_body_deep_with_local_fns_and_params(body, visited, local_functions, param_values);
+                let result = self.find_override_in_function_body_deep_with_local_fns_and_params(
+                    body,
+                    visited,
+                    local_functions,
+                    param_values,
+                );
                 visited.pop();
                 return result;
             }
             if let Some(func_info) = self.functions.get(&fn_name) {
                 visited.push(fn_name);
-                let result = self.find_override_in_function_body_deep_with_params(&func_info.body, visited, param_values);
+                let result = self.find_override_in_function_body_deep_with_params(
+                    &func_info.body,
+                    visited,
+                    param_values,
+                );
                 visited.pop();
                 return result;
             }
@@ -1471,7 +1644,9 @@ impl PrefabOverrideParser {
             if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
                 let args_vec: Vec<_> = arguments.iter().collect();
                 if !args_vec.is_empty() {
-                    if let Some(value) = self.extract_string_from_arg_with_params(args_vec[0], param_values) {
+                    if let Some(value) =
+                        self.extract_string_from_arg_with_params(args_vec[0], param_values)
+                    {
                         return Some(OverrideValue::Static(value));
                     } else {
                         return Some(OverrideValue::Dynamic(args_vec[0].to_string()));
@@ -1493,13 +1668,11 @@ impl PrefabOverrideParser {
             }
         }
 
-        if let Some(last_stmt) = self.ast.nodes().last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    if let ast::Expression::FunctionCall(call) = expr {
-                        if self.is_prefab_call(call) {
-                            calls.push(call.clone());
-                        }
+        if let Some(ast::LastStmt::Return(ret)) = self.ast.nodes().last_stmt() {
+            for expr in ret.returns().iter() {
+                if let ast::Expression::FunctionCall(call) = expr {
+                    if self.is_prefab_call(call) {
+                        calls.push(call.clone());
                     }
                 }
             }
@@ -1529,10 +1702,10 @@ impl PrefabOverrideParser {
     fn find_factory_calls_in_block(&self, block: &ast::Block, calls: &mut Vec<ast::FunctionCall>) {
         for stmt in block.stmts() {
             match stmt {
-                ast::Stmt::FunctionCall(call) => {
-                    if self.is_factory_call(call) || self.is_known_function_call(call) {
-                        calls.push(call.clone());
-                    }
+                ast::Stmt::FunctionCall(call)
+                    if (self.is_factory_call(call) || self.is_known_function_call(call)) =>
+                {
+                    calls.push(call.clone());
                 }
                 ast::Stmt::LocalAssignment(assignment) => {
                     for expr in assignment.expressions().iter() {
@@ -1557,7 +1730,11 @@ impl PrefabOverrideParser {
                     self.find_factory_calls_in_block(repeat_stmt.block(), calls);
                 }
                 ast::Stmt::GenericFor(for_stmt) => {
-                    let names: Vec<_> = for_stmt.names().iter().map(|n| n.token().to_string()).collect();
+                    let names: Vec<_> = for_stmt
+                        .names()
+                        .iter()
+                        .map(|n| n.token().to_string())
+                        .collect();
                     let exprs: Vec<_> = for_stmt.expressions().iter().collect();
                     if !names.is_empty() && !exprs.is_empty() {
                         let mut iter_tables: HashMap<String, ast::Expression> = HashMap::new();
@@ -1568,7 +1745,11 @@ impl PrefabOverrideParser {
                                 }
                             }
                         }
-                        self.find_factory_calls_in_block_with_iter_tables(for_stmt.block(), calls, &iter_tables);
+                        self.find_factory_calls_in_block_with_iter_tables(
+                            for_stmt.block(),
+                            calls,
+                            &iter_tables,
+                        );
                     } else {
                         self.find_factory_calls_in_block(for_stmt.block(), calls);
                     }
@@ -1586,11 +1767,9 @@ impl PrefabOverrideParser {
             }
         }
 
-        if let Some(last_stmt) = block.last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    self.find_factory_calls_in_expr(expr, calls);
-                }
+        if let Some(ast::LastStmt::Return(ret)) = block.last_stmt() {
+            for expr in ret.returns().iter() {
+                self.find_factory_calls_in_expr(expr, calls);
             }
         }
     }
@@ -1613,10 +1792,10 @@ impl PrefabOverrideParser {
     ) {
         for stmt in block.stmts() {
             match stmt {
-                ast::Stmt::FunctionCall(call) => {
-                    if self.is_factory_call(call) || self.is_known_function_call(call) {
-                        calls.push(call.clone());
-                    }
+                ast::Stmt::FunctionCall(call)
+                    if (self.is_factory_call(call) || self.is_known_function_call(call)) =>
+                {
+                    calls.push(call.clone());
                 }
                 ast::Stmt::LocalAssignment(assignment) => {
                     for expr in assignment.expressions().iter() {
@@ -1624,30 +1803,62 @@ impl PrefabOverrideParser {
                     }
                 }
                 ast::Stmt::LocalFunction(local_fn) => {
-                    self.find_factory_calls_in_block_with_iter_tables(local_fn.body().block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        local_fn.body().block(),
+                        calls,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::FunctionDeclaration(func_decl) => {
-                    self.find_factory_calls_in_block_with_iter_tables(func_decl.body().block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        func_decl.body().block(),
+                        calls,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::If(if_stmt) => {
-                    self.find_factory_calls_in_block_with_iter_tables(if_stmt.block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        if_stmt.block(),
+                        calls,
+                        iter_tables,
+                    );
                     if let Some(else_ifs) = if_stmt.else_if() {
                         for else_if_block in else_ifs {
-                            self.find_factory_calls_in_block_with_iter_tables(else_if_block.block(), calls, iter_tables);
+                            self.find_factory_calls_in_block_with_iter_tables(
+                                else_if_block.block(),
+                                calls,
+                                iter_tables,
+                            );
                         }
                     }
                     if let Some(else_block) = if_stmt.else_block() {
-                        self.find_factory_calls_in_block_with_iter_tables(else_block, calls, iter_tables);
+                        self.find_factory_calls_in_block_with_iter_tables(
+                            else_block,
+                            calls,
+                            iter_tables,
+                        );
                     }
                 }
                 ast::Stmt::While(while_stmt) => {
-                    self.find_factory_calls_in_block_with_iter_tables(while_stmt.block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        while_stmt.block(),
+                        calls,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::Repeat(repeat_stmt) => {
-                    self.find_factory_calls_in_block_with_iter_tables(repeat_stmt.block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        repeat_stmt.block(),
+                        calls,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::GenericFor(for_stmt) => {
-                    let names: Vec<_> = for_stmt.names().iter().map(|n| n.token().to_string()).collect();
+                    let names: Vec<_> = for_stmt
+                        .names()
+                        .iter()
+                        .map(|n| n.token().to_string())
+                        .collect();
                     let exprs: Vec<_> = for_stmt.expressions().iter().collect();
                     if !names.is_empty() && !exprs.is_empty() {
                         let mut new_iter_tables = iter_tables.clone();
@@ -1658,23 +1869,33 @@ impl PrefabOverrideParser {
                                 }
                             }
                         }
-                        self.find_factory_calls_in_block_with_iter_tables(for_stmt.block(), calls, &new_iter_tables);
+                        self.find_factory_calls_in_block_with_iter_tables(
+                            for_stmt.block(),
+                            calls,
+                            &new_iter_tables,
+                        );
                     } else {
-                        self.find_factory_calls_in_block_with_iter_tables(for_stmt.block(), calls, iter_tables);
+                        self.find_factory_calls_in_block_with_iter_tables(
+                            for_stmt.block(),
+                            calls,
+                            iter_tables,
+                        );
                     }
                 }
                 ast::Stmt::NumericFor(for_stmt) => {
-                    self.find_factory_calls_in_block_with_iter_tables(for_stmt.block(), calls, iter_tables);
+                    self.find_factory_calls_in_block_with_iter_tables(
+                        for_stmt.block(),
+                        calls,
+                        iter_tables,
+                    );
                 }
                 _ => {}
             }
         }
 
-        if let Some(last_stmt) = block.last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    self.find_factory_calls_in_expr_with_iter_tables(expr, calls, iter_tables);
-                }
+        if let Some(ast::LastStmt::Return(ret)) = block.last_stmt() {
+            for expr in ret.returns().iter() {
+                self.find_factory_calls_in_expr_with_iter_tables(expr, calls, iter_tables);
             }
         }
     }
@@ -1686,25 +1907,41 @@ impl PrefabOverrideParser {
         _iter_tables: &HashMap<String, ast::Expression>,
     ) {
         match expr {
-            ast::Expression::FunctionCall(call) => {
-                if self.is_factory_call(call) || self.is_known_function_call(call) {
-                    calls.push(call.clone());
-                }
+            ast::Expression::FunctionCall(call)
+                if (self.is_factory_call(call) || self.is_known_function_call(call)) =>
+            {
+                calls.push(call.clone());
             }
             ast::Expression::Function(func) => {
-                self.find_factory_calls_in_block_with_iter_tables(func.body().block(), calls, _iter_tables);
+                self.find_factory_calls_in_block_with_iter_tables(
+                    func.body().block(),
+                    calls,
+                    _iter_tables,
+                );
             }
             ast::Expression::TableConstructor(table) => {
                 for field in table.fields() {
                     match field {
                         ast::Field::NoKey(expression) => {
-                            self.find_factory_calls_in_expr_with_iter_tables(expression, calls, _iter_tables);
+                            self.find_factory_calls_in_expr_with_iter_tables(
+                                expression,
+                                calls,
+                                _iter_tables,
+                            );
                         }
                         ast::Field::NameKey { value, .. } => {
-                            self.find_factory_calls_in_expr_with_iter_tables(value, calls, _iter_tables);
+                            self.find_factory_calls_in_expr_with_iter_tables(
+                                value,
+                                calls,
+                                _iter_tables,
+                            );
                         }
                         ast::Field::ExpressionKey { value, .. } => {
-                            self.find_factory_calls_in_expr_with_iter_tables(value, calls, _iter_tables);
+                            self.find_factory_calls_in_expr_with_iter_tables(
+                                value,
+                                calls,
+                                _iter_tables,
+                            );
                         }
                         _ => {}
                     }
@@ -1718,7 +1955,9 @@ impl PrefabOverrideParser {
         }
     }
 
-    fn find_ipairs_factory_calls(&self) -> Vec<(ast::FunctionCall, HashMap<String, ast::Expression>)> {
+    fn find_ipairs_factory_calls(
+        &self,
+    ) -> Vec<(ast::FunctionCall, HashMap<String, ast::Expression>)> {
         let mut results = Vec::new();
         self.find_ipairs_factory_calls_in_block(self.ast.nodes(), &mut results, &HashMap::new());
         results
@@ -1732,27 +1971,34 @@ impl PrefabOverrideParser {
     ) {
         for stmt in block.stmts() {
             match stmt {
-                ast::Stmt::FunctionCall(call) => {
-                    if self.is_factory_call(call) {
-                        let call_args = self.get_call_args(call);
-                        if let Some(args) = call_args {
-                            let args_vec: Vec<_> = args.iter().collect();
-                            if args_vec.len() == 1 {
-                                if let ast::Expression::Var(var) = args_vec[0] {
-                                    if let ast::Var::Name(name) = var {
-                                        let var_name = name.token().to_string();
-                                        if iter_tables.contains_key(&var_name) {
-                                            let table_expr = iter_tables.get(&var_name).unwrap();
-                                            if let ast::Expression::TableConstructor(table_constructor) = table_expr {
-                                                for field in table_constructor.fields() {
-                                                    if let ast::Field::NoKey(expr) = field {
-                                                        if let ast::Expression::TableConstructor(item_table) = expr {
-                                                            let mut synthetic_tables: HashMap<String, ast::Expression> = HashMap::new();
-                                                            synthetic_tables.insert(var_name.clone(), ast::Expression::TableConstructor(item_table.clone()));
-                                                            results.push((call.clone(), synthetic_tables));
-                                                        }
-                                                    }
-                                                }
+                ast::Stmt::FunctionCall(call) if self.is_factory_call(call) => {
+                    let call_args = self.get_call_args(call);
+                    if let Some(args) = call_args {
+                        let args_vec: Vec<_> = args.iter().collect();
+                        if args_vec.len() == 1 {
+                            if let ast::Expression::Var(ast::Var::Name(name)) = args_vec[0] {
+                                let var_name = name.token().to_string();
+                                if iter_tables.contains_key(&var_name) {
+                                    let table_expr = iter_tables.get(&var_name).unwrap();
+                                    if let ast::Expression::TableConstructor(table_constructor) =
+                                        table_expr
+                                    {
+                                        for field in table_constructor.fields() {
+                                            if let ast::Field::NoKey(
+                                                ast::Expression::TableConstructor(item_table),
+                                            ) = field
+                                            {
+                                                let mut synthetic_tables: HashMap<
+                                                    String,
+                                                    ast::Expression,
+                                                > = HashMap::new();
+                                                synthetic_tables.insert(
+                                                    var_name.clone(),
+                                                    ast::Expression::TableConstructor(
+                                                        item_table.clone(),
+                                                    ),
+                                                );
+                                                results.push((call.clone(), synthetic_tables));
                                             }
                                         }
                                     }
@@ -1770,7 +2016,11 @@ impl PrefabOverrideParser {
                     self.find_ipairs_factory_calls_in_block(if_stmt.block(), results, iter_tables);
                     if let Some(else_ifs) = if_stmt.else_if() {
                         for else_if_block in else_ifs {
-                            self.find_ipairs_factory_calls_in_block(else_if_block.block(), results, iter_tables);
+                            self.find_ipairs_factory_calls_in_block(
+                                else_if_block.block(),
+                                results,
+                                iter_tables,
+                            );
                         }
                     }
                     if let Some(else_block) = if_stmt.else_block() {
@@ -1778,13 +2028,25 @@ impl PrefabOverrideParser {
                     }
                 }
                 ast::Stmt::While(while_stmt) => {
-                    self.find_ipairs_factory_calls_in_block(while_stmt.block(), results, iter_tables);
+                    self.find_ipairs_factory_calls_in_block(
+                        while_stmt.block(),
+                        results,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::Repeat(repeat_stmt) => {
-                    self.find_ipairs_factory_calls_in_block(repeat_stmt.block(), results, iter_tables);
+                    self.find_ipairs_factory_calls_in_block(
+                        repeat_stmt.block(),
+                        results,
+                        iter_tables,
+                    );
                 }
                 ast::Stmt::GenericFor(for_stmt) => {
-                    let names: Vec<_> = for_stmt.names().iter().map(|n| n.token().to_string()).collect();
+                    let names: Vec<_> = for_stmt
+                        .names()
+                        .iter()
+                        .map(|n| n.token().to_string())
+                        .collect();
                     let exprs: Vec<_> = for_stmt.expressions().iter().collect();
                     if !names.is_empty() && !exprs.is_empty() {
                         let mut new_iter_tables = iter_tables.clone();
@@ -1804,9 +2066,17 @@ impl PrefabOverrideParser {
                                 }
                             }
                         }
-                        self.find_ipairs_factory_calls_in_block(for_stmt.block(), results, &new_iter_tables);
+                        self.find_ipairs_factory_calls_in_block(
+                            for_stmt.block(),
+                            results,
+                            &new_iter_tables,
+                        );
                     } else {
-                        self.find_ipairs_factory_calls_in_block(for_stmt.block(), results, iter_tables);
+                        self.find_ipairs_factory_calls_in_block(
+                            for_stmt.block(),
+                            results,
+                            iter_tables,
+                        );
                     }
                 }
                 ast::Stmt::NumericFor(for_stmt) => {
@@ -1816,11 +2086,9 @@ impl PrefabOverrideParser {
             }
         }
 
-        if let Some(last_stmt) = block.last_stmt() {
-            if let ast::LastStmt::Return(ret) = last_stmt {
-                for expr in ret.returns().iter() {
-                    self.find_factory_calls_in_expr(expr, &mut Vec::new());
-                }
+        if let Some(ast::LastStmt::Return(ret)) = block.last_stmt() {
+            for expr in ret.returns().iter() {
+                self.find_factory_calls_in_expr(expr, &mut Vec::new());
             }
         }
     }
@@ -1833,29 +2101,30 @@ impl PrefabOverrideParser {
                 if suffixes.len() != 1 {
                     return None;
                 }
-                match &suffixes[0] {
-                    ast::Suffix::Call(ast::Call::AnonymousCall(args)) => match args {
-                        ast::FunctionArgs::Parentheses { arguments, .. } => {
-                            let args_vec: Vec<_> = arguments.iter().collect();
-                            if !args_vec.is_empty() {
-                                return Some(args_vec[0].clone());
-                            }
-                        }
-                        _ => {}
-                    },
-                    _ => {}
+                if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                    ast::FunctionArgs::Parentheses { arguments, .. },
+                )) = &suffixes[0]
+                {
+                    let args_vec: Vec<_> = arguments.iter().collect();
+                    if !args_vec.is_empty() {
+                        return Some(args_vec[0].clone());
+                    }
                 }
             }
         }
         None
     }
 
-    fn find_factory_calls_in_expr(&self, expr: &ast::Expression, calls: &mut Vec<ast::FunctionCall>) {
+    fn find_factory_calls_in_expr(
+        &self,
+        expr: &ast::Expression,
+        calls: &mut Vec<ast::FunctionCall>,
+    ) {
         match expr {
-            ast::Expression::FunctionCall(call) => {
-                if self.is_factory_call(call) || self.is_known_function_call(call) {
-                    calls.push(call.clone());
-                }
+            ast::Expression::FunctionCall(call)
+                if (self.is_factory_call(call) || self.is_known_function_call(call)) =>
+            {
+                calls.push(call.clone());
             }
             ast::Expression::TableConstructor(table) => {
                 for field in table.fields() {
@@ -1889,7 +2158,11 @@ impl PrefabOverrideParser {
             let name_str = name.token().to_string();
             matches!(
                 name_str.as_str(),
-                "MakeBundle" | "MakeWrap" | "MakeContainer" | "AddWinterTree" | "MakeGlobalTrackingIcons"
+                "MakeBundle"
+                    | "MakeWrap"
+                    | "MakeContainer"
+                    | "AddWinterTree"
+                    | "MakeGlobalTrackingIcons"
             )
         } else {
             false
@@ -1921,30 +2194,23 @@ impl PrefabOverrideParser {
         })
     }
 
-    fn get_call_args(
-        &self,
-        call: &ast::FunctionCall,
-    ) -> Option<Vec<ast::Expression>> {
+    fn get_call_args(&self, call: &ast::FunctionCall) -> Option<Vec<ast::Expression>> {
         let suffixes: Vec<_> = call.suffixes().collect();
         if suffixes.len() != 1 {
             return None;
         }
 
         match &suffixes[0] {
-            ast::Suffix::Call(ast::Call::AnonymousCall(args)) => match args {
+            ast::Suffix::Call(ast::Call::AnonymousCall(ast::FunctionArgs::Parentheses {
+                arguments,
+                ..
+            })) => Some(arguments.iter().cloned().collect()),
+            ast::Suffix::Call(ast::Call::MethodCall(method_call)) => match method_call.args() {
                 ast::FunctionArgs::Parentheses { arguments, .. } => {
                     Some(arguments.iter().cloned().collect())
                 }
                 _ => None,
             },
-            ast::Suffix::Call(ast::Call::MethodCall(method_call)) => {
-                match method_call.args() {
-                    ast::FunctionArgs::Parentheses { arguments, .. } => {
-                        Some(arguments.iter().cloned().collect())
-                    }
-                    _ => None,
-                }
-            }
             _ => None,
         }
     }
@@ -1964,9 +2230,7 @@ impl PrefabOverrideParser {
                     None
                 }
             }
-            ast::Expression::Function(func) => {
-                self.find_override_in_function_body(func.body())
-            }
+            ast::Expression::Function(func) => self.find_override_in_function_body(func.body()),
             _ => None,
         }
     }
@@ -2024,7 +2288,12 @@ impl PrefabOverrideParser {
         }
 
         for stmt in body.block().stmts() {
-            if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(stmt, visited, &local_functions, &HashMap::new()) {
+            if let Some(override_val) = self.find_override_in_stmt_deep_with_local_fns_and_params(
+                stmt,
+                visited,
+                &local_functions,
+                &HashMap::new(),
+            ) {
                 return Some(override_val);
             }
         }
@@ -2180,10 +2449,8 @@ impl PrefabOverrideParser {
 
     fn find_config_table_in_args(&self, args: &[ast::Expression]) -> Option<String> {
         for arg in args {
-            if let ast::Expression::Var(var) = arg {
-                if let ast::Var::Name(name) = var {
-                    return Some(name.token().to_string());
-                }
+            if let ast::Expression::Var(ast::Var::Name(name)) = arg {
+                return Some(name.token().to_string());
             }
         }
         None
@@ -2224,14 +2491,8 @@ impl PrefabOverrideParser {
     // Section 16: Location and Utility Functions
     // ============================================================================
     fn get_call_location(&self, call: &ast::FunctionCall) -> SourceLocation {
-        let start_byte = call
-            .start_position()
-            .map(|p| p.bytes())
-            .unwrap_or(0);
-        let end_byte = call
-            .end_position()
-            .map(|p| p.bytes())
-            .unwrap_or(0);
+        let start_byte = call.start_position().map(|p| p.bytes()).unwrap_or(0);
+        let end_byte = call.end_position().map(|p| p.bytes()).unwrap_or(0);
 
         let start_line = self.byte_to_line(start_byte);
         let end_line = self.byte_to_line(end_byte);
@@ -2451,10 +2712,7 @@ return Prefab("test_prefab", fn)
             .iter()
             .find(|r| r.prefab_name == "ancient_altar_broken");
 
-        assert!(
-            ancient_altar.is_some(),
-            "Should find ancient_altar prefab"
-        );
+        assert!(ancient_altar.is_some(), "Should find ancient_altar prefab");
         assert!(
             ancient_altar_broken.is_some(),
             "Should find ancient_altar_broken prefab"
@@ -2483,20 +2741,19 @@ return Prefab("test_prefab", fn)
         let redpouch_yotc = result.iter().find(|r| r.prefab_name == "redpouch_yotc");
         let redpouch_yotb = result.iter().find(|r| r.prefab_name == "redpouch_yotb");
 
-        assert!(
-            redpouch_yotp.is_some(),
-            "Should find redpouch_yotp prefab"
-        );
-        assert!(
-            redpouch_yotc.is_some(),
-            "Should find redpouch_yotc prefab"
-        );
-        assert!(
-            redpouch_yotb.is_some(),
-            "Should find redpouch_yotb prefab"
-        );
+        assert!(redpouch_yotp.is_some(), "Should find redpouch_yotp prefab");
+        assert!(redpouch_yotc.is_some(), "Should find redpouch_yotc prefab");
+        assert!(redpouch_yotb.is_some(), "Should find redpouch_yotb prefab");
 
-        for prefab in ["redpouch_yotp", "redpouch_yotc", "redpouch_yotb", "redpouch_yotr", "redpouch_yotd", "redpouch_yoth", "redpouch_yot_catcoon"] {
+        for prefab in [
+            "redpouch_yotp",
+            "redpouch_yotc",
+            "redpouch_yotb",
+            "redpouch_yotr",
+            "redpouch_yotd",
+            "redpouch_yoth",
+            "redpouch_yot_catcoon",
+        ] {
             if let Some(override_info) = result.iter().find(|r| r.prefab_name == prefab) {
                 assert_eq!(
                     override_info.override_name,
@@ -2536,14 +2793,24 @@ return Prefab("test_prefab", fn)
     fn test_wx78_drone_delivery_example() {
         let source = include_str!("../../../examples/prefabs/wx78_drone_delivery.lua");
         let result = parse_prefab_overrides(source).unwrap();
-        
-        assert!(!result.is_empty(), "Should find at least one prefab override");
-        
-        let delivery = result.iter().find(|r| r.prefab_name == "wx78_drone_delivery");
+
+        assert!(
+            !result.is_empty(),
+            "Should find at least one prefab override"
+        );
+
+        let delivery = result
+            .iter()
+            .find(|r| r.prefab_name == "wx78_drone_delivery");
         assert!(delivery.is_some(), "Should find wx78_drone_delivery prefab");
-        
-        let delivery_small = result.iter().find(|r| r.prefab_name == "wx78_drone_delivery_small");
-        assert!(delivery_small.is_some(), "Should find wx78_drone_delivery_small prefab");
+
+        let delivery_small = result
+            .iter()
+            .find(|r| r.prefab_name == "wx78_drone_delivery_small");
+        assert!(
+            delivery_small.is_some(),
+            "Should find wx78_drone_delivery_small prefab"
+        );
     }
 
     #[test]
@@ -2565,7 +2832,10 @@ return makewormhole(1)
 
         let result = parser.parse().unwrap();
 
-        assert!(!result.is_empty(), "Should find at least one prefab override");
+        assert!(
+            !result.is_empty(),
+            "Should find at least one prefab override"
+        );
         assert_eq!(result[0].prefab_name, "wormhole_limited_");
         assert_eq!(
             result[0].override_name,
@@ -2576,38 +2846,127 @@ return makewormhole(1)
     #[test]
     fn test_all_prefabs_files() {
         let prefab_files = [
-            "yots_worm_lantern", "wx78_taser_projectile", "wx78_drone_scout",
-            "wormwood_lightflier", "wx78_drone_delivery", "wormwood_fruitdragon",
-            "wormwood_carrat", "wormhole_limited", "worm_boss", "winter_tree",
-            "wobster", "winter_ornaments", "winona_teleport_pad", "winona_spotlight",
-            "winona_catapult_projectile", "winona_catapult", "winona_battery_low",
-            "waterplant_seed", "winona_battery_high", "waterplant_rock", "wagstaff_npc",
-            "wagdrone_projectile", "wagdrone_laserwire", "wagboss_beam", "veggies",
-            "tree_rocks", "vault_switch", "support_pillar", "statueruins",
-            "statue_marble", "stalker", "stalker_minions", "stalker_ferns",
-            "stalker_bulb", "stalker_berry", "stalagmite_tall", "spiderhole",
-            "stalagmite", "slingshot", "skeleton", "slingshotammo_debuffs",
-            "shadowwaxwell", "sharkboi_ice_hazard", "shadowthrall_centipede",
-            "scrapbook_page", "scrapbook_notes", "sapling", "sand_spike",
-            "rock_ice_temperature", "redlantern", "rock_avocado_fruit",
-            "quagmire_shadowwaxwell", "quagmire_parkspike", "quagmire_plantables",
-            "quagmire_food_burnt", "quagmire_book_shadow", "quagmire_evergreen",
-            "propsign", "quagmire_book_fertilizer", "preparedfoods",
-            "portablespicer", "portablefirepit", "portablecookpot", "portableblender",
-            "pocketwatch_portal", "pigman", "oceanfish", "nightmarefissure",
-            "oceanfishingbobber", "multiplayer_portal", "moonstorm_glass", "moon_device",
-            "minisign", "miniflare", "merm_fx", "mast_broken", "megaflare",
-            "lunarthrall_plant", "livingtree_halloween", "lightflier_flower",
-            "lavaarena_trails", "lava_pond", "lavaarena_peghook", "lavaarena_fossilizing",
-            "lavaarena_groundlifts", "lavaarena_blooms", "lavaarena_abigail",
-            "lavaarena_battlestandard", "lavaarena_abigail_flower", "hound",
-            "hermithouse", "hats", "grotto_pool_moonglass", "grotto_waterfall_small",
-            "gnarwail", "goosplash", "glass_spike", "gelblob", "gestalt_cage",
-            "gargoyles", "flower_cave", "fused_shadeling_bomb", "firepit", "deer",
-            "driftwood_trees", "deerclops_laser", "deer_antler", "collapsedchest",
-            "cave_vents", "cave_banana_tree", "carrat", "carnivaldecor_figure",
-            "cactus", "campfire", "bundle", "bramblefx", "bullkelp_beached",
-            "bishop_charge", "archive_props", "atrium_statue", "alterguardian_laser",
+            "yots_worm_lantern",
+            "wx78_taser_projectile",
+            "wx78_drone_scout",
+            "wormwood_lightflier",
+            "wx78_drone_delivery",
+            "wormwood_fruitdragon",
+            "wormwood_carrat",
+            "wormhole_limited",
+            "worm_boss",
+            "winter_tree",
+            "wobster",
+            "winter_ornaments",
+            "winona_teleport_pad",
+            "winona_spotlight",
+            "winona_catapult_projectile",
+            "winona_catapult",
+            "winona_battery_low",
+            "waterplant_seed",
+            "winona_battery_high",
+            "waterplant_rock",
+            "wagstaff_npc",
+            "wagdrone_projectile",
+            "wagdrone_laserwire",
+            "wagboss_beam",
+            "veggies",
+            "tree_rocks",
+            "vault_switch",
+            "support_pillar",
+            "statueruins",
+            "statue_marble",
+            "stalker",
+            "stalker_minions",
+            "stalker_ferns",
+            "stalker_bulb",
+            "stalker_berry",
+            "stalagmite_tall",
+            "spiderhole",
+            "stalagmite",
+            "slingshot",
+            "skeleton",
+            "slingshotammo_debuffs",
+            "shadowwaxwell",
+            "sharkboi_ice_hazard",
+            "shadowthrall_centipede",
+            "scrapbook_page",
+            "scrapbook_notes",
+            "sapling",
+            "sand_spike",
+            "rock_ice_temperature",
+            "redlantern",
+            "rock_avocado_fruit",
+            "quagmire_shadowwaxwell",
+            "quagmire_parkspike",
+            "quagmire_plantables",
+            "quagmire_food_burnt",
+            "quagmire_book_shadow",
+            "quagmire_evergreen",
+            "propsign",
+            "quagmire_book_fertilizer",
+            "preparedfoods",
+            "portablespicer",
+            "portablefirepit",
+            "portablecookpot",
+            "portableblender",
+            "pocketwatch_portal",
+            "pigman",
+            "oceanfish",
+            "nightmarefissure",
+            "oceanfishingbobber",
+            "multiplayer_portal",
+            "moonstorm_glass",
+            "moon_device",
+            "minisign",
+            "miniflare",
+            "merm_fx",
+            "mast_broken",
+            "megaflare",
+            "lunarthrall_plant",
+            "livingtree_halloween",
+            "lightflier_flower",
+            "lavaarena_trails",
+            "lava_pond",
+            "lavaarena_peghook",
+            "lavaarena_fossilizing",
+            "lavaarena_groundlifts",
+            "lavaarena_blooms",
+            "lavaarena_abigail",
+            "lavaarena_battlestandard",
+            "lavaarena_abigail_flower",
+            "hound",
+            "hermithouse",
+            "hats",
+            "grotto_pool_moonglass",
+            "grotto_waterfall_small",
+            "gnarwail",
+            "goosplash",
+            "glass_spike",
+            "gelblob",
+            "gestalt_cage",
+            "gargoyles",
+            "flower_cave",
+            "fused_shadeling_bomb",
+            "firepit",
+            "deer",
+            "driftwood_trees",
+            "deerclops_laser",
+            "deer_antler",
+            "collapsedchest",
+            "cave_vents",
+            "cave_banana_tree",
+            "carrat",
+            "carnivaldecor_figure",
+            "cactus",
+            "campfire",
+            "bundle",
+            "bramblefx",
+            "bullkelp_beached",
+            "bishop_charge",
+            "archive_props",
+            "atrium_statue",
+            "alterguardian_laser",
             "altar_prototyper",
         ];
 
@@ -2641,8 +3000,13 @@ return makewormhole(1)
             }
         }
 
-        println!("\nParsing results: {} succeeded, {} empty, {} failed out of {} files",
-            success_count, empty_count, fail_count, prefab_files.len());
+        println!(
+            "\nParsing results: {} succeeded, {} empty, {} failed out of {} files",
+            success_count,
+            empty_count,
+            fail_count,
+            prefab_files.len()
+        );
 
         assert!(fail_count == 0, "Some files failed to parse");
     }
@@ -2652,6 +3016,9 @@ return makewormhole(1)
         let source = include_str!("../../../examples/prefabs/deer.lua");
         let parser = PrefabOverrideParser::new(source).unwrap();
         let result = parser.parse().unwrap();
-        assert!(!result.is_empty(), "Should find at least one prefab override");
+        assert!(
+            !result.is_empty(),
+            "Should find at least one prefab override"
+        );
     }
 }

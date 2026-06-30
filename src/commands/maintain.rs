@@ -39,9 +39,7 @@ pub async fn run(args: Commands) -> Result<()> {
         Commands::MaintainCopyClip { r#type, output } => {
             handle_maintain_copyclip(r#type.as_deref(), output).await
         }
-        Commands::PrefabOverrides { input, output } => {
-            handle_prefab_overrides(input, output)
-        }
+        Commands::PrefabOverrides { input, output } => handle_prefab_overrides(input, output),
     }
 }
 

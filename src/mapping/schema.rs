@@ -173,6 +173,10 @@ impl Schema {
             fields: self.fields.iter().map(|f| f.to_wiki_field()).collect(),
         }
     }
+
+    pub fn field_index(&self, name: &str) -> Option<usize> {
+        self.fields.iter().position(|f| f.name == name)
+    }
 }
 
 impl Default for Schema {
@@ -184,6 +188,7 @@ impl Default for Schema {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::mapping::WikiMapper;
 
     #[test]
     fn test_field_type_to_json_type() {
@@ -357,6 +362,37 @@ mod tests {
         assert_eq!(
             data.find_record_idx_by_field("id", &serde_json::json!("id3")),
             None
+        );
+    }
+
+    #[test]
+    fn test_field_index_found() {
+        let schema = Schema::new()
+            .add_field(FieldSchema::new("id", FieldType::String))
+            .add_field(FieldSchema::new("name", FieldType::String))
+            .add_field(FieldSchema::new("count", FieldType::Number));
+        assert_eq!(schema.field_index("id"), Some(0));
+        assert_eq!(schema.field_index("name"), Some(1));
+        assert_eq!(schema.field_index("count"), Some(2));
+    }
+
+    #[test]
+    fn test_field_index_not_found() {
+        let schema = Schema::new()
+            .add_field(FieldSchema::new("id", FieldType::String))
+            .add_field(FieldSchema::new("name", FieldType::String));
+        assert_eq!(schema.field_index("nonexistent"), None);
+    }
+
+    #[test]
+    fn test_field_index_recipe_schema() {
+        assert_eq!(
+            crate::models::Recipe::schema().field_index("desc"),
+            Some(25)
+        );
+        assert_eq!(
+            crate::models::Recipe::schema().field_index("recipe_name"),
+            Some(0)
         );
     }
 

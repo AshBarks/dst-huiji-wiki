@@ -693,7 +693,8 @@ impl RecipeParser {
         }
 
         tracing::warn!(
-            "Failed to re-parse substituted Lua in substitute_var_in_call_with_locals, falling back to original call"
+            "Failed to re-parse substituted Lua in substitute_var_in_call_with_locals, falling back to original call. var_name={}, var_value={}, substituted={}",
+            var_name, var_value, substituted
         );
         call.clone()
     }
@@ -834,7 +835,8 @@ impl RecipeParser {
         }
 
         tracing::warn!(
-            "Failed to re-parse substituted Lua in substitute_var_in_call_with_string_concat, falling back to original call"
+            "Failed to re-parse substituted Lua in substitute_var_in_call, falling back to original call. var_name={}, var_value={}, substituted={}",
+            var_name, var_value, substituted
         );
         call.clone()
     }

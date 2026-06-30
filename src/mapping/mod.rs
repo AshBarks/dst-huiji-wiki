@@ -7,7 +7,6 @@ pub use builder::{MappingBuilder, SchemaBuilder};
 pub use mapper::{
     FieldMapping, FieldMappingRule, JsonValue, MergeFn, MergePriority, MergeStrategy, WikiMapper,
 };
-pub use mappers::{PoEntryMapper, RecipeMapper};
 pub use schema::{
     FieldSchema, FieldTitle, FieldType, Schema, WikiFieldSchema, WikiJsonData, WikiSchema,
 };

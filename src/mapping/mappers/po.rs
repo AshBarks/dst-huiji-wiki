@@ -3,8 +3,6 @@ use crate::mapping::{
 };
 use crate::models::PoEntry;
 
-pub struct PoEntryMapper;
-
 impl WikiMapper for PoEntry {
     fn schema() -> Schema {
         Schema::new()

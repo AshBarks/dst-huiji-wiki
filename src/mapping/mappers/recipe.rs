@@ -3,8 +3,6 @@ use crate::mapping::{
 };
 use crate::models::Recipe;
 
-pub struct RecipeMapper;
-
 impl WikiMapper for Recipe {
     fn schema() -> Schema {
         Schema::new()

@@ -3,9 +3,12 @@ use reqwest::{redirect, Client, Response};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::env;
+use std::time::Duration;
 
 const DEFAULT_WIKI_HOST: &str = "dontstarve.huijiwiki.com";
 const API_PATH: &str = "/api.php";
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[derive(Debug, Clone)]
 pub struct WikiConfig {
@@ -142,6 +145,8 @@ impl WikiClient {
         let client = Client::builder()
             .redirect(redirect::Policy::limited(10))
             .cookie_store(true)
+            .timeout(REQUEST_TIMEOUT)
+            .connect_timeout(CONNECT_TIMEOUT)
             .build()?;
 
         Ok(Self {

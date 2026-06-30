@@ -123,8 +123,14 @@ impl WikiDataConverter {
                         recipe.options.product.as_deref(),
                     );
                     if let Some(desc_value) = desc {
-                        if record.len() > 25 {
-                            record[25] = Value::String(desc_value);
+                        if let Some(desc_idx) = schema.field_index("desc") {
+                            if record.len() > desc_idx {
+                                record[desc_idx] = Value::String(desc_value);
+                            }
+                        } else {
+                            tracing::warn!(
+                                "Schema field 'desc' not found, skipping PO description lookup"
+                            );
                         }
                     }
                 }

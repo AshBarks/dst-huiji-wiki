@@ -116,32 +116,44 @@ impl<T> MappingBuilder<T> {
         self
     }
 
-    pub fn with_overwrite(mut self, target: &str) -> Self {
+    pub fn with_overwrite(mut self, target: &str) -> Result<Self, String> {
         if let Some(rule) = self.rules.iter_mut().find(|r| r.target_field == target) {
             rule.merge_strategy = MergeStrategy::Overwrite;
+            Ok(self)
+        } else {
+            Err(format!("Field '{}' not found in mapping rules", target))
         }
-        self
     }
 
-    pub fn with_preserve_history(mut self, target: &str) -> Self {
+    pub fn with_preserve_history(mut self, target: &str) -> Result<Self, String> {
         if let Some(rule) = self.rules.iter_mut().find(|r| r.target_field == target) {
             rule.merge_strategy = MergeStrategy::PreserveHistory;
+            Ok(self)
+        } else {
+            Err(format!("Field '{}' not found in mapping rules", target))
         }
-        self
     }
 
-    pub fn with_merge_priority(mut self, target: &str, priority: MergePriority) -> Self {
+    pub fn with_merge_priority(
+        mut self,
+        target: &str,
+        priority: MergePriority,
+    ) -> Result<Self, String> {
         if let Some(rule) = self.rules.iter_mut().find(|r| r.target_field == target) {
             rule.merge_strategy = MergeStrategy::Merge { priority };
+            Ok(self)
+        } else {
+            Err(format!("Field '{}' not found in mapping rules", target))
         }
-        self
     }
 
-    pub fn with_custom_merge(mut self, target: &str, merge_fn: MergeFn) -> Self {
+    pub fn with_custom_merge(mut self, target: &str, merge_fn: MergeFn) -> Result<Self, String> {
         if let Some(rule) = self.rules.iter_mut().find(|r| r.target_field == target) {
             rule.merge_strategy = MergeStrategy::Custom(merge_fn);
+            Ok(self)
+        } else {
+            Err(format!("Field '{}' not found in mapping rules", target))
         }
-        self
     }
 
     pub fn build(self) -> (Schema, Vec<FieldMappingRule<T>>, String) {
@@ -382,7 +394,8 @@ mod tests {
         let builder: MappingBuilder<TestItem> = MappingBuilder::new()
             .field("id", FieldType::String)
             .map_direct("id", "name")
-            .with_overwrite("id");
+            .with_overwrite("id")
+            .unwrap();
         assert_eq!(builder.rules[0].merge_strategy, MergeStrategy::Overwrite);
     }
 
@@ -391,7 +404,8 @@ mod tests {
         let builder: MappingBuilder<TestItem> = MappingBuilder::new()
             .field("id", FieldType::String)
             .map_direct("id", "name")
-            .with_preserve_history("id");
+            .with_preserve_history("id")
+            .unwrap();
         assert_eq!(
             builder.rules[0].merge_strategy,
             MergeStrategy::PreserveHistory
@@ -403,12 +417,36 @@ mod tests {
         let builder: MappingBuilder<TestItem> = MappingBuilder::new()
             .field("id", FieldType::String)
             .map_direct("id", "name")
-            .with_merge_priority("id", MergePriority::NewData);
+            .with_merge_priority("id", MergePriority::NewData)
+            .unwrap();
         match &builder.rules[0].merge_strategy {
             MergeStrategy::Merge { priority } => {
                 assert_eq!(*priority, MergePriority::NewData);
             }
             _ => panic!("Expected Merge strategy"),
+        }
+    }
+
+    #[test]
+    fn test_with_overwrite_nonexistent_returns_err() {
+        let result = MappingBuilder::<TestItem>::new()
+            .field("id", FieldType::String)
+            .map_direct("id", "name")
+            .with_overwrite("nonexistent");
+        match result {
+            Err(err) => {
+                assert!(
+                    err.contains("not found"),
+                    "Error message should contain 'not found', got: {}",
+                    err
+                );
+                assert!(
+                    err.contains("nonexistent"),
+                    "Error message should contain field name, got: {}",
+                    err
+                );
+            }
+            Ok(_) => panic!("Expected Err, got Ok"),
         }
     }
 

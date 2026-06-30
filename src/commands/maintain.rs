@@ -94,9 +94,9 @@ fn handle_map_names(
     let converter = WikiDataConverter::new();
     let version_str = version.as_deref().unwrap_or("unknown");
     let sources = format!("Extract data from patch {}", version_str);
-    let description = serde_json::json!({
+    let description = Some(serde_json::json!({
         "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
-    });
+    }));
 
     let wiki_data = if merge {
         let compare_path = compare
@@ -169,9 +169,9 @@ fn handle_map_recipes(
 
     let version_str = version.as_deref().unwrap_or("unknown");
     let sources = format!("Extract data from patch {}", version_str);
-    let description = serde_json::json!({
+    let description = Some(serde_json::json!({
         "zh": "饥荒联机版的合成配方列表"
-    });
+    }));
 
     let wiki_data = if merge {
         let compare_path = compare
@@ -250,9 +250,9 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     };
 
     let sources = ctx.sources();
-    let description = serde_json::json!({
+    let description = Some(serde_json::json!({
         "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
-    });
+    }));
     let mut wiki_data = converter.convert_to_wiki_json(&names_entries, &sources, description);
 
     if let Some(ref historical) = historical_data {
@@ -319,9 +319,9 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     };
 
     let sources = ctx.sources();
-    let description = serde_json::json!({
+    let description = Some(serde_json::json!({
         "zh": "饥荒联机版的合成配方列表"
-    });
+    }));
     let mut wiki_data = converter.convert_recipes(&recipes, &sources, description);
 
     if let Some(ref historical) = historical_data {

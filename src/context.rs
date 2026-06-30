@@ -10,7 +10,7 @@ pub struct DstContext {
     pub version: String,
     pub dst_root: String,
     archive: Option<ZipArchive<BufReader<std::fs::File>>>,
-    pub client: WikiClient,
+    pub(crate) client: WikiClient,
 }
 
 impl DstContext {
@@ -84,5 +84,13 @@ impl DstContext {
 
     pub fn sources(&self) -> String {
         format!("Extract data from patch {}", self.version)
+    }
+
+    pub fn wiki(&self) -> &WikiClient {
+        &self.client
+    }
+
+    pub fn wiki_mut(&mut self) -> &mut WikiClient {
+        &mut self.client
     }
 }

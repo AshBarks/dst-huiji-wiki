@@ -229,7 +229,7 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
     println!("DST version: {}", ctx.version);
 
     println!("Logging in to wiki...");
-    ctx.client.login().await?;
+    ctx.wiki_mut().login().await?;
 
     let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
     let names_entries: Vec<PoEntry> = po_file
@@ -250,7 +250,7 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
 
     println!("Fetching historical data from wiki...");
     let page_title = "Data:ItemTable.tabx";
-    let historical_data = match ctx.client.get_json_data(page_title).await {
+    let historical_data = match ctx.wiki().get_json_data(page_title).await {
         Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
             &historical_json.to_string(),
         )?),
@@ -271,7 +271,7 @@ async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_json_result_with_update(&ctx.client, page_title, &wiki_data, output).await
+    output_json_result_with_update(ctx.wiki(), page_title, &wiki_data, output).await
 }
 
 async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
@@ -279,7 +279,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     println!("DST version: {}", ctx.version);
 
     println!("Logging in to wiki...");
-    ctx.client.login().await?;
+    ctx.wiki_mut().login().await?;
 
     let recipes_string = ctx.read_zip_file("scripts/recipes.lua")?;
 
@@ -292,7 +292,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
     println!("\nFetching Tech data from wiki for comparison...");
     let mut tech_report = TechReport::from_recipes(&recipes);
 
-    match ctx.client.get_page("模块:RenderRecsByIngre/Data").await {
+    match ctx.wiki().get_page("模块:RenderRecsByIngre/Data").await {
         Ok(page) => {
             if let Some(content) = &page.content {
                 tech_report.compare_with_wiki(content);
@@ -317,7 +317,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
 
     println!("Fetching historical data from wiki...");
     let page_title = "Data:DSTRecipes.tabx";
-    let historical_data = match ctx.client.get_json_data(page_title).await {
+    let historical_data = match ctx.wiki().get_json_data(page_title).await {
         Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
             &historical_json.to_string(),
         )?),
@@ -338,7 +338,7 @@ async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
         println!("\n{}", compare_and_report(&wiki_data, historical));
     }
 
-    output_json_result_with_update(&ctx.client, page_title, &wiki_data, output).await
+    output_json_result_with_update(ctx.wiki(), page_title, &wiki_data, output).await
 }
 
 async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>) -> Result<()> {
@@ -346,7 +346,7 @@ async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>)
     println!("DST version: {}", ctx.version);
 
     println!("Logging in to wiki...");
-    ctx.client.login().await?;
+    ctx.wiki_mut().login().await?;
 
     let types_to_run = if let Some(t) = r#type {
         vec![t.to_lowercase()]
@@ -394,7 +394,7 @@ async fn maintain_recipe_builder_tag_lookup(
 
     println!("Fetching wiki page content...");
     let page_title = "模块:Constants/RecipeBuilderTagLookup";
-    let page = ctx.client.get_page(page_title).await?;
+    let page = ctx.wiki().get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -414,7 +414,7 @@ async fn maintain_recipe_builder_tag_lookup(
     );
 
     output_copyclip_result_with_update(
-        &ctx.client,
+        ctx.wiki(),
         page_title,
         &target_content,
         &result.updated_content,
@@ -428,7 +428,7 @@ async fn maintain_tech(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<
 
     println!("Fetching wiki page content...");
     let page_title = "模块:Constants/Tech";
-    let page = ctx.client.get_page(page_title).await?;
+    let page = ctx.wiki().get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -444,7 +444,7 @@ async fn maintain_tech(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<
     );
 
     output_copyclip_result_with_update(
-        &ctx.client,
+        ctx.wiki(),
         page_title,
         &target_content,
         &result.updated_content,
@@ -458,7 +458,7 @@ async fn maintain_crafting_filters(ctx: &mut DstContext, output: Option<PathBuf>
 
     println!("Fetching wiki page content...");
     let page_title = "模块:Constants/CraftingFilters";
-    let page = ctx.client.get_page(page_title).await?;
+    let page = ctx.wiki().get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -488,7 +488,7 @@ async fn maintain_crafting_filters(ctx: &mut DstContext, output: Option<PathBuf>
     println!("CopyClip completed successfully!");
 
     output_copyclip_result_with_update(
-        &ctx.client,
+        ctx.wiki(),
         page_title,
         &target_content,
         &updated_content,
@@ -548,7 +548,7 @@ async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) 
 
     println!("Fetching wiki page content...");
     let page_title = "模块:Constants/CraftingNames";
-    let page = ctx.client.get_page(page_title).await?;
+    let page = ctx.wiki().get_page(page_title).await?;
 
     let target_content = page
         .content
@@ -581,7 +581,7 @@ async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) 
     println!("CopyClip completed successfully!");
 
     output_copyclip_result_with_update(
-        &ctx.client,
+        ctx.wiki(),
         page_title,
         &target_content,
         &updated_content,

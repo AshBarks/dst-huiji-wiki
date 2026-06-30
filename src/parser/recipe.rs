@@ -255,7 +255,14 @@ impl RecipeParser {
                 let op_str = binop.to_string().trim().to_string();
                 if op_str == ".." {
                     let left = self.extract_string_expr(lhs)?;
-                    let right = self.extract_string_expr(rhs).unwrap_or_default();
+                    let right = self.extract_string_expr(rhs);
+                    if right.is_none() {
+                        tracing::warn!(
+                            "Failed to extract RHS of string concatenation, defaulting to empty string. lhs={:?}",
+                            left
+                        );
+                    }
+                    let right = right.unwrap_or_default();
                     Some(format!("{}{}", left, right))
                 } else {
                     None

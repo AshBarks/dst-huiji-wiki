@@ -6,7 +6,7 @@ pub struct RecipeContext {
     pub recipes: Vec<Recipe>,
     pub prototyper_defs: Vec<PrototyperDef>,
     pub tech_constants: HashMap<String, String>,
-    pub variables: HashMap<String, String>,
+    pub(crate) variables: HashMap<String, String>,
     pub character_ingredients: HashMap<String, String>,
     pub tech_ingredients: HashMap<String, String>,
     pub tuning_constants: HashMap<String, i32>,

@@ -265,9 +265,9 @@ mod tests {
         let dyn_data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
 
         let mut archive = parse_zip(&zip_data).unwrap();
-        assert!(archive.tex_sources.len() > 0);
+        assert!(!archive.tex_sources.is_empty());
         let dyn_archive = parse_dyn(&dyn_data).unwrap();
-        assert!(dyn_archive.tex_sources.len() > 0);
+        assert!(!dyn_archive.tex_sources.is_empty());
 
         let zip_tex_count = archive.tex_sources[0].tex_files.len();
         let dyn_tex_count = dyn_archive.tex_sources[0].tex_files.len();

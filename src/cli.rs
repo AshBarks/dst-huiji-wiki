@@ -447,7 +447,7 @@ mod tests {
         let data = std::fs::read(&input).unwrap();
         let decrypted = dst_anim_tool::xor::xor_decrypt(&data);
         let archive = zip::ZipArchive::new(std::io::Cursor::new(decrypted.as_slice())).unwrap();
-        assert!(archive.len() > 0);
+        assert!(!archive.is_empty());
     }
 
     #[test]

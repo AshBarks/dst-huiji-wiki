@@ -308,13 +308,13 @@ mod tests {
                     let u = v.u;
                     let vv = v.v;
                     assert!(
-                        u >= 0.0 && u <= 1.0,
+                        (0.0..=1.0).contains(&u),
                         "u={u} out of [0,1] in symbol '{}' frame {}",
                         symbol.name,
                         frame.frame_num
                     );
                     assert!(
-                        vv >= 0.0 && vv <= 1.0,
+                        (0.0..=1.0).contains(&vv),
                         "v={vv} out of [0,1] in symbol '{}' frame {}",
                         symbol.name,
                         frame.frame_num

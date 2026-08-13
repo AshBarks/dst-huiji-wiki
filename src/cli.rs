@@ -369,11 +369,13 @@ fn cmd_info(inputs: &[PathBuf]) -> dst_anim_tool::error::Result<()> {
         println!("  source '{}':", source.source_name);
         for (name, data) in &source.tex_files {
             if let Ok(ktex) = dst_anim_tool::ktex::parse_ktex(data) {
-                let m0 = &ktex.mipmaps[0];
-                println!(
-                    "    {}: {}x{} {:?}",
-                    name, m0.width, m0.height, ktex.header.pixel_format
-                );
+                match ktex.mipmaps.first() {
+                    Some(m0) => println!(
+                        "    {}: {}x{} {:?}",
+                        name, m0.width, m0.height, ktex.header.pixel_format
+                    ),
+                    None => println!("    {}: 0 mipmaps", name),
+                }
             } else {
                 println!("    {}: parse error", name);
             }

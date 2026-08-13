@@ -119,6 +119,7 @@ dst-anim-tool preview [-i <input-files>...]
 Features:
 - Drag-and-drop multi-archive loading
 - Animation/bank/frame tree navigation
+- Per-element visibility toggling with live preview
 - Playback with adjustable speed
 - Frame-by-frame stepping
 - PNG export of current frame
@@ -148,7 +149,7 @@ Features:
 
 ```sh
 cargo build          # compile
-cargo test           # run tests (106 tests)
+cargo test           # run tests (107 tests)
 cargo clippy         # lint
 cargo fmt            # format
 ```

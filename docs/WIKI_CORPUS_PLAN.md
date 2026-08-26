@@ -1,9 +1,10 @@
 # 页面全量语料抓取方案（Wiki Corpus Harvesting）
 
-**状态**：v1.1（初版已实现：`corpus-fetch` 命令 + `service::JobKind::CorpusSync`）
+**状态**：v1.2（初版已实现：`corpus-fetch` 命令 + `service::JobKind::CorpusSync`；recentchanges 增量通道见 §12）
 **修订记录**：
 - v1（本版）：主命名空间全量抓取方案——范围界定、存储布局、DST/单机版分类器、增量同步与验收标准
 - v1.1：落地修正——①本站 MediaWiki 1.38 的 `list=allpages` 不返回 `touched/len/redirect`，枚举改用 `generator=allpages&prop=info`（长度字段名为 `length`）；②版本信号补充「/单机版」子页后缀（577 页）；③首轮回填结果见 §11
+- v1.2：新增 §12 **recentchanges 增量通道设计**——低频增量 + 作者/动作归因事件流（CodeTextAtlas 对账的供料层），基于 2026-08-26 本站接口实测
 
 **关联文档**：[UPDATE_IMPACT_PLAN.md](UPDATE_IMPACT_PLAN.md)（v3.1，本方案为其 CodeTextAtlas / 类别范式分析的数据底座）
 
@@ -167,7 +168,7 @@ wikis/                          # 整目录加入 .gitignore
 
 1. 消歧义模板的具体变体（`{{消歧义}}`/`{{消歧义重定向}}`…）全集需在校准步确认；
 2. 未来 Tier0 需要 `Data:DST Prefab/*.json` 快照做他方同步核对——是否在本布局下扩展第二命名空间抓取通道，届时另立小节，当前明确排除；
-3. recentchanges 增量通道（作者/评论元数据）为 Atlas 对账归因而规划，作为下一步实现——当前 touched 对账已覆盖"何页变更"，recentchanges 补的是"谁改的、为什么改"。
+3. ~~recentchanges 增量通道~~ → 已定稿为 §12 设计，待实施。
 
 已决：~~`分类:图鉴收录` 能否作为 entity/content 区分信号~~——**不采用**（官方图鉴分类本身混乱，2026-08 拍板）；entity 判定以信息框模板存在性为准。
 
@@ -187,3 +188,95 @@ wikis/                          # 整目录加入 .gitignore
 1. MediaWiki 1.38 的 `list=allpages` 输出**不含** `touched/len/new/redirect` 字段——增量同步若基于它会静默失效；必须用 `generator=allpages&prop=info`，且其长度字段名为 `length` 而非 `len`；
 2. 「单机版」命名惯例的真实形态是**子页后缀** `<实体>/单机版`（577 页），非标题前缀；
 3. unknown 残余 128 页以版本中立内容为主（首页、机制总览、版本历史等），符合预期，清单见 `index/classes_summary.json`。
+
+---
+
+## 12. recentchanges 增量通道设计（v1.2，待实施）
+
+### 12.1 定位
+
+| 通道 | 请求成本 | 回答的问题 | 角色 |
+|------|---------|-----------|------|
+| touched 枚举对账（已实现） | ~15 请求/轮，与间隔无关 | 何页变更 | 兜底 + 自愈 + 周期校准 |
+| **recentchanges（本节）** | 通常 1~2 请求/天 | 何页变更 × **谁改的、什么动作、何时** | 日常增量；Atlas 对账的供料层 |
+
+RC 通道不替代枚举对账：它更快、更省，且事件流（作者/动作/时间）正是 §7 窗口纪律"分诊—对账—静止期"所需的原始素材。两层共用同一存储布局；RC 通道只追加 `events.jsonl` 事件日志。
+
+### 12.2 接口实测事实（2026-08-26 本站验证）
+
+| 项 | 结论 |
+|----|------|
+| 参数形态 | `list=recentchanges` + `rcnamespace=0` + `rctype=edit\|new\|log`（categorize 单列类型，当前稀疏，过滤） |
+| rcprop 可用集 | title/timestamp/ids/sizes/sha1/user/userid/flags/comment/parsedcomment/loginfo；**patrolled → permissiondenied**（本站不可用，剔除） |
+| 日志事件字段 | 扁平化在 rc 行上：`logid`/`logtype`/`logaction`/`logparams`（非嵌套 loginfo 对象） |
+| 分页上限 | rclimit=max = **500 条/次**；续传键 `rccontinue`（格式 `"ts\|rcid"`） |
+| 无内容变化检测 | 每行带修订 `sha1` ⇒ 与 meta.rev_sha1 比对可跳过内容重抓 |
+| 归因可行性 | user 字段实名可见：实测 **Mr鲁鲁 直接编辑主命名空间页面**（含 delete 日志动作）、数字账号（如 1007369644）、普通人类账号并存 |
+
+### 12.3 检查点与拉取算法
+
+状态文件 `wikis/<host>/rc_state.json`：`{last_ts, last_rcid, updated_at_ms}`。
+
+```
+1 start   = checkpoint - OVERLAP(10min)        # 重叠窗自愈时钟边界
+2 loop:    rcdir=newer, rcstart=start, rctype=edit|new|log, rcnamespace=0,
+           rcprop=title|timestamp|ids|sizes|sha1|user|flags|comment|loginfo
+3 dedup    by rcid（重叠窗会重复投递）；同页多事件合并为一次重抓
+4 apply    （§12.5 规则），events 追加写入 events.jsonl
+5 advance  checkpoint = 本轮观察到的最大 (timestamp, rcid)，
+           仅在语料+events 全部落盘成功后推进（崩溃即重放，幂等兜底）
+6 fallback 若 checkpoint 距今 > 60 天（保守值 < $wgRCMaxAge 默认 90 天）：
+           放弃 RC 通道，自动回落全量枚举对账并在报告标注原因
+```
+
+### 12.4 事件模型（`wikis/<host>/events.jsonl`，追加式）
+
+```json
+{"rcid":259702,"ts":"...","pageid":73480,"title":"群系连接",
+ "actor":"1007369644","actor_class":"human","action":"edit",
+ "revid":201372,"old_revid":201361,"sha1":"a42f…","oldlen":0,"newlen":0,
+ "comment":"/* 森林世界（主陆地） */","bot_flag":false,
+ "in_bot_window":false,"applied":"refetched"}
+```
+
+`actor_class` 判定（配置外置 TOML）：`HUIJI__USERNAME` 匹配 → `self`；用户名白名单（初版含 `Mr鲁鲁`）→ `bot_lulu`；rc flags 含 `B` → `bot_flagged`；其余 `human`。
+
+### 12.5 事件应用规则
+
+| 事件 | 本地动作 |
+|------|---------|
+| edit/create 且 sha1 ≠ 本地 | 批量重抓该页（≤50/批复用 get_pages_wikitext），更新 meta + 重分类 |
+| edit/create 且 sha1 == 本地 rev_sha1 | 仅刷新 touched——零内容请求 |
+| logtype=move | 用 logparams 新标题更新 meta.title（pageid 文件名不动），重抓确认 |
+| logtype=delete | 页面文件归档 `_removed/<tag>/`，meta 移除 |
+| logtype=restore | 按 edit 重抓 |
+| 其他 logtype | 仅记 events，不动语料 |
+
+窗口纪律延续：`in_bot_window=true` 时照常更新语料与 events，但下游 Atlas 不得据其做关联重建归因（标记随行传递）。
+
+### 12.6 CLI 形态
+
+`corpus-fetch --rc`：在现有命令上加增量策略开关（默认仍为枚举对账）。语义矩阵：
+
+| 调用 | 行为 |
+|------|------|
+| `corpus-fetch` | 枚举对账（现状，兜底/校准） |
+| `corpus-fetch --rc` | RC 增量拉取；checkpoint 缺失或超保留期时自动回落枚举模式并提示 |
+| `corpus-fetch --full` | 全量重抓 |
+| 任一 + `--dry-run` | 只产出报告与（RC 模式的）事件预览，不落盘不推进 checkpoint |
+
+运行节奏建议：RC 模式可挂 cron 每小时；每 7 天跑一次枚举对账校准漂移。
+
+### 12.7 验收标准
+
+1. 事件捕获：真实编辑后运行 `--rc`，语料更新、events.jsonl 记录正确；
+2. 幂等：checkpoint 不推进的重复运行零副作用、events 无重复行；
+3. 崩溃安全：任意时刻 kill 后重启，重叠窗口自愈，无丢事件；
+4. 归因抽样：Mr鲁鲁 的编辑正确标为 bot_lulu；self 编辑正确识别；
+5. 回退：把 checkpoint 人为拨老于 60 天，自动回落枚举模式且报告说明。
+
+### 12.8 开放问题
+
+1. `$wgRCMaxAge` 本站实际值未知（按保守 60 天自限）；若未来发现 RC 表更短，缩短 checkpoint 容忍度即可；
+2. categorize 事件是否需要跟踪（分类成员变化对 segmenter 有价值）？暂不，预留 rctype 参数化；
+3. 是否扩展监听 `Data:`/`模块:` 命名空间（Tier0 他方同步核对）？通道天然支持 rcnamespace 参数化，默认仍仅主空间。

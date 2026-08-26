@@ -1,0 +1,296 @@
+//! Grading: classify FactChanges into intervention tiers (report-only).
+//!
+//! Implements docs/UPDATE_IMPACT_PLAN.md §4.2.6 step 4 as a pure function.
+//! The corpus side supplies a read-only [`CorpusPageView`] (variant→page
+//! mapping + per-page numeric fact candidates); this module never mutates
+//! anything and never talks to the wiki.
+
+use std::collections::{BTreeMap, HashMap};
+
+use serde::Serialize;
+
+use super::fact::{FactChange, FactKind, Literal};
+use crate::corpus::facts::FactCandidate;
+
+/// Intervention tier per §4.2.6. `AutoHandled`/`NotifyOnly` are reserved for
+/// the Tier0 scheduler and third-party targets and are not produced here.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GradeTier {
+    /// F1 privileged path / stat template — deterministic draft candidate.
+    SuggestDraft,
+    /// No reliable landing point on the page — human review with evidence.
+    Manual,
+    /// Entity variant has no page — creation checklist row.
+    CreateCheck,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct GradedChange {
+    pub prefab: String,
+    pub field: String,
+    pub tier: GradeTier,
+    pub pageid: Option<i64>,
+    /// Landing-point evidence: the matched page fact's region and raw text.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub landing: Option<LandingRef>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LandingRef {
+    pub region_id: String,
+    pub raw: String,
+}
+
+/// Read-only corpus lookup structures, loaded once per scan.
+#[derive(Debug, Default)]
+pub struct CorpusPageView {
+    /// prefab variant → pageid (from `index/pages_by_prefab.json`).
+    pub pages: HashMap<String, i64>,
+    /// pageid → numeric fact candidates (from `index/facts.jsonl`).
+    pub facts: HashMap<i64, Vec<FactCandidate>>,
+}
+
+impl CorpusPageView {
+    /// Loads the view from a corpus host root (`wikis/<host>/`). Missing
+    /// files yield an empty view rather than failing — grading degrades to
+    /// CreateCheck/Manual rows and the report says so.
+    pub fn load(root: &std::path::Path) -> std::io::Result<Self> {
+        let mut view = Self::default();
+        let reg_raw = match std::fs::read_to_string(root.join("index/pages_by_prefab.json")) {
+            Ok(s) => s,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(view),
+            Err(e) => return Err(e),
+        };
+        #[derive(serde::Deserialize)]
+        struct RegView {
+            prefabs: BTreeMap<String, Vec<i64>>,
+        }
+        let reg: RegView = serde_json::from_str(&reg_raw)?;
+        for (variant, ids) in reg.prefabs {
+            if let [pageid] = ids.as_slice() {
+                view.pages.insert(variant, *pageid);
+            }
+        }
+        let facts_raw = match std::fs::read_to_string(root.join("index/facts.jsonl")) {
+            Ok(s) => s,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(view),
+            Err(e) => return Err(e),
+        };
+        for line in facts_raw.lines() {
+            if line.is_empty() {
+                continue;
+            }
+            if let Ok(f) = serde_json::from_str::<FactCandidate>(line) {
+                view.facts.entry(f.pageid).or_default().push(f);
+            }
+        }
+        Ok(view)
+    }
+}
+
+fn literal_of(old: Option<&Literal>) -> Option<f64> {
+    match old {
+        Some(Literal::Num(n)) => Some(*n),
+        _ => None,
+    }
+}
+
+/// Locates the strongest landing point for one numeric old-literal on the
+/// page: the first fact numerically compatible with it.
+fn find_landing(facts: &[FactCandidate], old_num: f64) -> Option<&FactCandidate> {
+    facts.iter().find(|f| {
+        f.values
+            .iter()
+            .any(|v| crate::corpus::facts::numbers_compatible(old_num, *v))
+    })
+}
+
+/// Grades every change. Loot-family rules only for now (M2); Stat/Behavior/
+/// Backref land in `Manual` with their depth recorded until their extractor
+/// families define landing semantics (§4.2.3 期次表).
+pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<GradedChange> {
+    changes
+        .iter()
+        .map(|c| {
+            let pageid = view.pages.get(&c.prefab).copied();
+            let Some(pageid) = pageid else {
+                return GradedChange {
+                    prefab: c.prefab.clone(),
+                    field: c.field.clone(),
+                    tier: GradeTier::CreateCheck,
+                    pageid: None,
+                    landing: None,
+                };
+            };
+            let empty = Vec::new();
+            let facts = view.facts.get(&pageid).unwrap_or(&empty);
+            let tier = match c.kind {
+                FactKind::Loot => {
+                    let num = literal_of(c.old.as_ref());
+                    let hit = num.and_then(|n| find_landing(facts, n));
+                    match (&c.old, hit) {
+                        // Paired numeric old-value with a page landing →
+                        // deterministic draft candidate (F1 privileged path).
+                        (Some(_), Some(f)) => GradedChange {
+                            prefab: c.prefab.clone(),
+                            field: c.field.clone(),
+                            tier: GradeTier::SuggestDraft,
+                            pageid: Some(pageid),
+                            landing: Some(LandingRef {
+                                region_id: f.region_id.clone(),
+                                raw: f.raw.clone(),
+                            }),
+                        },
+                        // Old value present but nothing on the page carries
+                        // it: either stale-page cleanup or non-transcribed
+                        // fact — human decides.
+                        (Some(_), None) => no_landing(c, pageid),
+                        // Current-state anchor (pre-pairing): report row.
+                        (None, _) => no_landing(c, pageid),
+                    }
+                }
+                _ => no_landing(c, pageid),
+            };
+            tier
+        })
+        .collect()
+}
+
+fn no_landing(c: &FactChange, pageid: i64) -> GradedChange {
+    GradedChange {
+        prefab: c.prefab.clone(),
+        field: c.field.clone(),
+        tier: GradeTier::Manual,
+        pageid: Some(pageid),
+        landing: None,
+    }
+}
+
+/// Tier distribution for the report summary section.
+pub fn summarize(graded: &[GradedChange]) -> BTreeMap<&'static str, usize> {
+    let mut m = BTreeMap::new();
+    for g in graded {
+        let key = match g.tier {
+            GradeTier::SuggestDraft => "suggest_draft",
+            GradeTier::Manual => "manual",
+            GradeTier::CreateCheck => "create_check",
+        };
+        *m.entry(key).or_default() += 1;
+    }
+    m
+}
+
+/// Report-facing Layer B summary (attached to [`super::impact::ImpactReport`]
+/// when a corpus directory was supplied).
+#[derive(Debug, Clone, Serialize)]
+pub struct LayerBSummary {
+    /// Current-state loot anchors graded (pre-pairing).
+    pub anchors: usize,
+    pub tiers: BTreeMap<&'static str, usize>,
+}
+
+impl From<&[GradedChange]> for LayerBSummary {
+    fn from(graded: &[GradedChange]) -> Self {
+        Self {
+            anchors: graded.len(),
+            tiers: summarize(graded),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    //! 猎犬页 fixture：mini RichTab 页跑通 segment→facts→grading 全链。
+    use super::*;
+    use crate::corpus::{facts::extract as extract_facts, segment::segment};
+
+    fn hound_view() -> CorpusPageView {
+        const PAGE: &str = "{{RichTab/信息框\n\
+             |普通猎犬|\n{{实体信息框/自动|dst|hound\n|掉落 = {{Pic|32|怪物肉}}×1<br>{{Pic|32|犬牙}}×1（12.5%）\n}}\n\
+             }}\n'''猎犬'''是联机版中的一种生物。\n==行为==\n成群袭击玩家。";
+        let regions = segment(13857, PAGE);
+        let mut view = CorpusPageView {
+            pages: [("hound".to_string(), 13857i64)].into_iter().collect(),
+            facts: HashMap::new(),
+        };
+        let mut facts = Vec::new();
+        for r in &regions {
+            facts.extend(extract_facts(13857, &r.id, &PAGE[r.start_byte..r.end_byte]));
+        }
+        assert!(
+            facts.iter().any(|f| f.fact_kind == "loot"),
+            "fixture 必须产出掉落事实"
+        );
+        view.facts.insert(13857, facts);
+        view
+    }
+
+    fn loot_change(old_num: Option<f64>) -> FactChange {
+        FactChange {
+            prefab: "hound".into(),
+            kind: FactKind::Loot,
+            field: "loot[monstermeat]".into(),
+            context: None,
+            source_file: "prefabs/hound.lua".into(),
+            old: old_num.map(Literal::Num),
+            new: None,
+            derivation_depth: 1,
+            evidence: vec![],
+        }
+    }
+
+    #[test]
+    fn paired_hit_lands_on_page_loot_fact() {
+        let view = hound_view();
+        let graded = grade_changes(&[loot_change(Some(12.5))], &view);
+        assert_eq!(graded[0].tier, GradeTier::SuggestDraft);
+        assert_eq!(graded[0].pageid, Some(13857));
+        let l = graded[0].landing.as_ref().unwrap();
+        assert!(l.region_id.starts_with("13857:"));
+        assert!(
+            l.raw.contains("12.5%") || l.raw.contains("犬牙"),
+            "{}",
+            l.raw
+        );
+    }
+
+    #[test]
+    fn fraction_percent_tolerance_applies() {
+        let view = hound_view();
+        // Code-side fraction 0.125 ↔ page percent 12.5%.
+        let graded = grade_changes(&[loot_change(Some(0.125))], &view);
+        assert_eq!(graded[0].tier, GradeTier::SuggestDraft);
+    }
+
+    #[test]
+    fn unmatched_old_value_and_unknown_variants() {
+        let view = hound_view();
+        // Number present nowhere on the page → manual.
+        assert_eq!(
+            grade_changes(&[loot_change(Some(99.0))], &view)[0].tier,
+            GradeTier::Manual
+        );
+        // Unpaired current-state anchor → manual row awaiting pairing.
+        assert_eq!(
+            grade_changes(&[loot_change(None)], &view)[0].tier,
+            GradeTier::Manual
+        );
+        // Unknown variant → create-check.
+        let mut unknown = loot_change(Some(12.5));
+        unknown.prefab = "moonbeast".into();
+        let graded = grade_changes(&[unknown], &view);
+        assert_eq!(graded[0].tier, GradeTier::CreateCheck);
+        assert_eq!(graded[0].pageid, None);
+    }
+
+    #[test]
+    fn summarize_counts_tiers() {
+        let view = hound_view();
+        let changes = vec![loot_change(Some(12.5)), loot_change(Some(99.0))];
+        let graded = grade_changes(&changes, &view);
+        let s = summarize(&graded);
+        assert_eq!(s.get("suggest_draft"), Some(&1));
+        assert_eq!(s.get("manual"), Some(&1));
+    }
+}

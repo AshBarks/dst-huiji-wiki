@@ -169,8 +169,10 @@ fn infobox_params(text: &str, start: usize, end: usize) -> Vec<ParamSpan> {
         Some((name.to_string(), vs))
     }
 
-    let params_at: Vec<Option<(String, usize)>> =
-        line_starts.iter().map(|&ls| param_line(text, ls, end)).collect();
+    let params_at: Vec<Option<(String, usize)>> = line_starts
+        .iter()
+        .map(|&ls| param_line(text, ls, end))
+        .collect();
 
     let mut out = Vec::new();
     for (idx, entry) in params_at.iter().enumerate() {
@@ -280,7 +282,14 @@ pub fn segment(pageid: i64, wikitext: &str) -> Vec<Region> {
             .get(idx + 1)
             .map(|&(s, _)| s)
             .unwrap_or(wikitext.len());
-        push(&mut out, "section", Some(title.clone()), start, end, Vec::new());
+        push(
+            &mut out,
+            "section",
+            Some(title.clone()),
+            start,
+            end,
+            Vec::new(),
+        );
     }
 
     out
@@ -383,7 +392,10 @@ mod tests {
         assert_eq!(names, vec!["掉落", "生成自"]);
         let loot = &tab.params[0];
         let value = &page[loot.start_byte..loot.end_byte];
-        assert!(value.contains("Monster_Meat") && value.ends_with("（50%）"), "{value:?}");
+        assert!(
+            value.contains("Monster_Meat") && value.ends_with("（50%）"),
+            "{value:?}"
+        );
         assert_eq!(loot.hash, fnv1a64(value));
         // Positional head (dst|tentacle) is not a named param.
         assert!(!names.contains(&"dst"));

@@ -147,12 +147,18 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
-        Commands::UpdateScan { old, new, out } => {
+        Commands::UpdateScan {
+            old,
+            new,
+            out,
+            corpus,
+        } => {
             execute(
                 JobKind::UpdateScan {
                     old,
                     new,
                     out: opt_path_to_string(&out)?,
+                    corpus: opt_path_to_string(&corpus)?,
                 },
                 // Read-only pipeline: no wiki writes ever.
                 WriteMode::AutoConfirm,

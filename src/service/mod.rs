@@ -133,6 +133,9 @@ pub enum JobKind {
         new: String,
         #[serde(default)]
         out: Option<String>,
+        /// 语料 host 根目录（wikis/<host>/）：提供时附加 Layer B 定级摘要
+        #[serde(default)]
+        corpus: Option<String>,
     },
     /// Build the code association atlas (index + tuning) from a scripts root.
     UpdateIndex {
@@ -302,9 +305,12 @@ async fn execute_job_inner(
             run_corpus_index(dir.as_deref(), join.as_deref(), reporter, mode).await
         }
         JobKind::UpdateIndex { root, out } => run_update_index(root, opt_path(out), reporter).await,
-        JobKind::UpdateScan { old, new, out } => {
-            run_update_scan(old, new, opt_path(out), reporter).await
-        }
+        JobKind::UpdateScan {
+            old,
+            new,
+            out,
+            corpus,
+        } => run_update_scan(old, new, opt_path(out), corpus.as_deref(), reporter).await,
     }
 }
 
@@ -319,6 +325,7 @@ async fn run_update_scan(
     old_id: &str,
     new_id: &str,
     out: Option<PathBuf>,
+    corpus: Option<&str>,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     reporter.stage("快照差异与影响评估");
@@ -356,7 +363,7 @@ async fn run_update_scan(
         .as_deref()
         .map(crate::update::index::tuning::build_tuning)
         .transpose()?;
-    let report = crate::update::build_report(
+    let mut report = crate::update::build_report(
         &diff,
         &atlas.index,
         old_tuning.as_ref(),
@@ -364,6 +371,26 @@ async fn run_update_scan(
         old_id,
         new_id,
     );
+
+    // Layer B (report-only): grade current-state loot anchors against the
+    // local corpus. Read-only; skipped when no corpus dir was supplied.
+    if let Some(corpus_root) = corpus {
+        reporter.stage("Layer B 定级（loot 锚点，只读）");
+        let view = crate::update::CorpusPageView::load(std::path::Path::new(corpus_root))?;
+        let mut changes = Vec::new();
+        for (file, records) in &atlas.index.loot {
+            for r in records {
+                changes.extend(crate::update::FactChange::from_loot_record(file, r));
+            }
+        }
+        let graded = crate::update::grade_changes(&changes, &view);
+        let summary = crate::update::grade::LayerBSummary::from(graded.as_slice());
+        reporter.log(format!(
+            "Layer B: {} 个 loot 锚点定级 {:?}",
+            summary.anchors, summary.tiers
+        ));
+        report.layer_b = Some(summary);
+    }
 
     let changed_paths: Vec<String> = report.files.iter().map(|f| f.path.clone()).collect();
     let tier0 = crate::update::evaluate_rules(&crate::update::default_rules(), &changed_paths);
@@ -393,6 +420,7 @@ async fn run_update_scan(
         "changed_files": report.files.len(),
         "affected_entities": report.affected_entities.len(),
         "tuning_added": report.tuning.added.len(),
+        "layer_b": report.layer_b,
         "tuning_removed": report.tuning.removed.len(),
         "tuning_changed": report.tuning.changed.len(),
         "tier0_hits": tier0.len(),

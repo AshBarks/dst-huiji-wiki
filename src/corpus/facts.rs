@@ -11,15 +11,15 @@
 //! percent.
 
 use regex::Regex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FactCandidate {
     pub pageid: i64,
     pub region_id: String,
     /// `interval` | `quantity` | `loot` | `percent`.
-    pub fact_kind: &'static str,
+    pub fact_kind: String,
     /// The exact matched text — the old_literal matching key.
     pub raw: String,
     /// Normalized values, meaning depends on `fact_kind`:
@@ -127,7 +127,7 @@ fn push(
     out: &mut Vec<FactCandidate>,
     claimed: &mut Vec<Claimed>,
     m: &regex::Captures<'_>,
-    kind: &'static str,
+    kind: &str,
     values: Vec<f64>,
     unit: Option<String>,
     text: &str,
@@ -147,7 +147,7 @@ fn push(
     out.push(FactCandidate {
         pageid,
         region_id: region_id.to_string(),
-        fact_kind: kind,
+        fact_kind: kind.to_string(),
         raw: text[s..e].to_string(),
         values,
         unit,
@@ -288,7 +288,7 @@ mod tests {
     #[test]
     fn quantities_and_distance_units() {
         let facts = extract(4, RID, "仇恨范围为 100 距离单位，攻击间隔 3 秒。");
-        let kinds: Vec<&str> = facts.iter().map(|f| f.fact_kind).collect();
+        let kinds: Vec<&str> = facts.iter().map(|f| f.fact_kind.as_str()).collect();
         assert_eq!(kinds, vec!["quantity", "quantity"]);
         assert_eq!(facts[0].unit.as_deref(), Some("距离单位"));
         assert_eq!(facts[1].values, vec![3.0]);

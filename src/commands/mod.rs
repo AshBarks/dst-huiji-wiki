@@ -117,6 +117,9 @@ pub enum Commands {
         /// 输出目录（默认 output/scan/<old>_<new>/）
         #[arg(short, long)]
         out: Option<PathBuf>,
+        /// 语料 host 根目录（wikis/<host>/），提供时附加 Layer B 定级摘要
+        #[arg(long)]
+        corpus: Option<PathBuf>,
     },
     /// 构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/
     UpdateIndex {

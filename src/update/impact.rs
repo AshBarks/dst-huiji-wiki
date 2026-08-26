@@ -73,6 +73,10 @@ pub struct ImpactReport {
     pub tuning: TuningDiff,
     /// Union of all affected entities, sorted and deduplicated.
     pub affected_entities: Vec<String>,
+    /// Layer B grading summary — `Some` only when a corpus directory was
+    /// supplied to update-scan (report-only; never mutates the wiki).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub layer_b: Option<super::grade::LayerBSummary>,
 }
 
 fn hunk_overlaps_lines(hunks: &[super::diffdata::Hunk], start_line: u32, end_line: u32) -> bool {
@@ -174,6 +178,7 @@ pub fn build_report(
         files,
         tuning: TuningDiff::diff(old_tuning, new_tuning),
         affected_entities: all_entities.into_iter().collect(),
+        layer_b: None,
     }
 }
 

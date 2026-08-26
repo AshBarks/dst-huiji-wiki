@@ -118,7 +118,10 @@ mod tests {
     fn loot_record_expands_per_item_and_variant() {
         let changes = FactChange::from_loot_record(
             "prefabs/hound.lua",
-            &record(vec!["hound", "firehound"], vec!["monstermeat", "houndstooth"]),
+            &record(
+                vec!["hound", "firehound"],
+                vec!["monstermeat", "houndstooth"],
+            ),
         );
         assert_eq!(changes.len(), 4);
         assert!(changes.iter().all(|c| c.kind == FactKind::Loot));
@@ -138,8 +141,7 @@ mod tests {
 
     #[test]
     fn file_level_records_yield_nothing() {
-        let changes =
-            FactChange::from_loot_record("prefabs/x.lua", &record(vec![], vec!["meat"]));
+        let changes = FactChange::from_loot_record("prefabs/x.lua", &record(vec![], vec!["meat"]));
         assert!(changes.is_empty());
     }
 

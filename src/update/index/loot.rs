@@ -29,6 +29,16 @@ pub struct LootFact {
     pub line: u32,
 }
 
+/// A [`LootFact`] joined against variant ownership (empty variants =
+/// file-level / non-prefab source).
+#[derive(Debug, Clone, Serialize)]
+pub struct LootRecord {
+    pub kind: LootKind,
+    pub items: Vec<String>,
+    pub line: u32,
+    pub variants: Vec<String>,
+}
+
 struct LootVisitor<'s> {
     source: &'s str,
     facts: Vec<LootFact>,

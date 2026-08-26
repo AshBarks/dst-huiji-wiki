@@ -124,4 +124,7 @@ pub struct IndexArtifact {
     pub fn_owners: BTreeMap<String, BTreeMap<String, Vec<String>>>,
     /// Per prefab file: fn name -> inclusive (start_line, end_line).
     pub fn_ranges: BTreeMap<String, BTreeMap<String, (u32, u32)>>,
+    /// Per file: loot facts attributed to owning variants (empty variants =
+    /// file-level / non-prefab source).
+    pub loot: BTreeMap<String, Vec<super::loot::LootRecord>>,
 }

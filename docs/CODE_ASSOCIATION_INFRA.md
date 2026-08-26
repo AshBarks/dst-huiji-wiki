@@ -172,7 +172,7 @@ struct SymbolProfile {
 ## 8. 决策记录
 
 1. **说明文本存放——已拍板（2026-08-26）**：落仓库 `docs/atlas/`，git 版本化；产物新鲜度的 CI 校验随 M2 一并引入；
-2. **L0 黑名单人工复核——已拍板（2026-08-26）**：启用降噪前人工复核一轮，作为 F1 启动项执行（届时导出真实树 GenericityReport 全表逐个对照页面证据）；
+2. **L0 黑名单人工复核——已执行（2026-08-26）**：Universal 档 24 组件逐个判定——21 个承载页面事实（lootdropper/combat/health/perishable 等）保留；新增种子 `placer`（纯放置预览 UI）、`knownlocations`（引擎位置缓存）、`timer`（通用计时管道）；既有碎片规则（fader/updater/looper/netvar 族）经实名单核对无误杀；
 3. E2 助手画像范围：已在实现期解决（§9 修正记录 3、§10）。
 
 ---

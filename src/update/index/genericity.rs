@@ -7,8 +7,16 @@ use super::edges::{AssocEdge, ComponentTier, EdgeKind, GenericityReport, Tier};
 /// L0 heuristic blacklist: name fragments that mark purely technical
 /// components (net-var sync / render plumbing) with no page-facing facts.
 const BLACKLIST_FRAGMENTS: &[&str] = &["fader", "updater", "looper", "netvar"];
-/// Seed list confirmed by page evidence (hound case: spawnfader never appears).
-const BLACKLIST_SEEDS: &[&str] = &["spawnfader", "updatelooper"];
+/// Seed list confirmed by manual review (2026-08-26, Universal tier 24
+/// components): `placer` 纯放置预览 UI、`knownlocations` 引擎位置缓存、
+/// `timer` 通用计时管道——三者均无页面事实。
+const BLACKLIST_SEEDS: &[&str] = &[
+    "spawnfader",
+    "updatelooper",
+    "placer",
+    "knownlocations",
+    "timer",
+];
 
 pub fn compute(edges: &[AssocEdge]) -> GenericityReport {
     // Distinct prefab variants per component target.

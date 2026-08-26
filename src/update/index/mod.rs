@@ -8,6 +8,7 @@
 pub mod edges;
 pub mod genericity;
 pub mod loot;
+pub use loot::{LootFact, LootKind, LootRecord};
 pub mod resolve;
 pub mod scan;
 pub mod symbols;
@@ -34,6 +35,51 @@ const SCAN_DIRS: &[&str] = &[
 /// Root-level helper files profiled for `MakeXxx` expansion (E2).
 const UTIL_FILES: &[&str] = &["standardcomponents.lua", "prefabutil.lua"];
 
+/// Join raw loot facts with variant ownership (M1b-style attribution).
+fn attribute_loot(
+    path: &str,
+    facts: &[LootFact],
+    scan: &FileScan,
+    fn_owners: &BTreeMap<String, BTreeMap<String, Vec<String>>>,
+) -> Vec<loot::LootRecord> {
+    use std::collections::BTreeSet;
+    let owners_of_file = fn_owners.get(path);
+    let all_variants: BTreeSet<String> = owners_of_file
+        .map(|m| m.values().flatten().cloned().collect())
+        .unwrap_or_default();
+    let ranges: Vec<(&str, u32, u32)> = scan
+        .fns
+        .iter()
+        .filter(|f| f.start_line > 0 && f.end_line >= f.start_line)
+        .map(|f| (f.name.as_str(), f.start_line, f.end_line))
+        .collect();
+
+    facts
+        .iter()
+        .map(|fact| {
+            let mut variants: BTreeSet<String> = BTreeSet::new();
+            for (name, start, end) in &ranges {
+                if fact.line >= *start && fact.line <= *end {
+                    if let Some(owners) = owners_of_file.and_then(|m| m.get(*name)) {
+                        variants.extend(owners.iter().cloned());
+                    }
+                }
+            }
+            if variants.is_empty() {
+                // Top-level registration or unmapped region: conservative
+                // whole-file attribution.
+                variants = all_variants.clone();
+            }
+            loot::LootRecord {
+                kind: fact.kind,
+                items: fact.items.clone(),
+                line: fact.line,
+                variants: variants.into_iter().collect(),
+            }
+        })
+        .collect()
+}
+
 pub(crate) fn role_for(path: &str) -> Role {
     if path.starts_with("prefabs/") {
         Role::Prefab
@@ -51,14 +97,28 @@ pub(crate) fn role_for(path: &str) -> Role {
 }
 
 /// Build the index from an in-memory file set: `(relative path, content)`.
-/// Pass 1 only: scan every source, recording parse failures.
-fn scan_files(files: &[(String, String)]) -> (BTreeMap<FileKey, FileScan>, Vec<UnresolvedNote>) {
+/// Pass-1 outputs: per-file scans, parse failures and raw loot facts.
+type ScanOutput = (
+    BTreeMap<FileKey, FileScan>,
+    Vec<UnresolvedNote>,
+    BTreeMap<FileKey, Vec<LootFact>>,
+);
+
+/// Pass 1 only: scan every source, recording parse failures. Also runs the
+/// loot extractor per file (independent of the association scanner).
+fn scan_files(files: &[(String, String)]) -> ScanOutput {
     let mut scans: BTreeMap<FileKey, FileScan> = BTreeMap::new();
     let mut parse_failures = Vec::new();
+    let mut loot_raw: BTreeMap<FileKey, Vec<LootFact>> = BTreeMap::new();
     for (path, content) in files {
         let role = role_for(path);
         match scan::Scanner::scan(path.clone(), role, content) {
             Ok(file_scan) => {
+                if let Ok(facts) = loot::extract_loot(content) {
+                    if !facts.is_empty() {
+                        loot_raw.insert(path.clone(), facts);
+                    }
+                }
                 scans.insert(path.clone(), file_scan);
             }
             Err(errors) => parse_failures.push(UnresolvedNote {
@@ -69,7 +129,7 @@ fn scan_files(files: &[(String, String)]) -> (BTreeMap<FileKey, FileScan>, Vec<U
             }),
         }
     }
-    (scans, parse_failures)
+    (scans, parse_failures, loot_raw)
 }
 
 pub fn build_from_sources<S: AsRef<str>>(files: &[(S, S)]) -> Result<IndexArtifact> {
@@ -79,8 +139,8 @@ pub fn build_from_sources<S: AsRef<str>>(files: &[(S, S)]) -> Result<IndexArtifa
         .collect();
     sorted.sort_by(|a, b| a.0.cmp(&b.0));
 
-    let (scans, parse_failures) = scan_files(&sorted);
-    Ok(assemble(scans, parse_failures, None))
+    let (scans, parse_failures, loot_raw) = scan_files(&sorted);
+    Ok(assemble(scans, parse_failures, None, loot_raw))
 }
 
 /// Collect all association-relevant script sources from a scripts root.
@@ -161,6 +221,7 @@ fn assemble(
     scans: BTreeMap<FileKey, FileScan>,
     parse_failures: Vec<UnresolvedNote>,
     tuning: Option<&TuningTable>,
+    loot_raw: BTreeMap<FileKey, Vec<LootFact>>,
 ) -> IndexArtifact {
     let resolution = resolve::Resolver::run(&scans, tuning);
 
@@ -216,9 +277,20 @@ fn assemble(
         }
     }
 
+    let fn_owners = resolution.fn_owners;
     IndexArtifact {
         schema_version: INDEX_SCHEMA_VERSION,
-        fn_owners: resolution.fn_owners,
+        fn_owners: fn_owners.clone(),
+        loot: {
+            let mut loot_map = BTreeMap::new();
+            for (path, facts) in loot_raw {
+                if let Some(scan) = scans.get(&path) {
+                    let records = attribute_loot(&path, &facts, scan, &fn_owners);
+                    loot_map.insert(path, records);
+                }
+            }
+            loot_map
+        },
         fn_ranges,
         scanned_files: scans.len(),
         parse_failures,
@@ -488,11 +560,11 @@ end
         ];
         let mut sorted = files.clone();
         sorted.sort_by(|a, b| a.0.cmp(&b.0));
-        let (scans, failures) = scan_files(&sorted);
+        let (scans, failures, _loot) = scan_files(&sorted);
         assert!(failures.is_empty());
 
         // Without the tuning table the arg stays Unknown.
-        let plain = assemble(scans.clone(), Vec::new(), None);
+        let plain = assemble(scans.clone(), Vec::new(), None, BTreeMap::new());
         let call = plain
             .behaviour_calls
             .iter()
@@ -508,7 +580,7 @@ end
             "TUNING = {}\nfunction Tune()\nTUNING = { HOUND_TARGET_DIST = 20 }\nend\nTune()\n",
         )
         .unwrap();
-        let with_tt = assemble(scans, Vec::new(), Some(&tuning));
+        let with_tt = assemble(scans, Vec::new(), Some(&tuning), BTreeMap::new());
         let call = with_tt
             .behaviour_calls
             .iter()
@@ -518,6 +590,38 @@ end
             call.args.iter().find(|(p, _)| p == "max_dist"),
             Some(&("max_dist".to_string(), ArgValue::Num("20".to_string())))
         );
+    }
+
+    #[test]
+    fn loot_facts_attribute_to_owning_variants() {
+        const SRC: &str = r#"
+local brain = require("brains/houndbrain")
+local moonbrain = require("brains/moonbeastbrain")
+
+local function fncommon(inst)
+    inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetLoot({ "meat", "houndstooth" })
+    return inst
+end
+
+local function fndefault()
+    return fncommon("hound")
+end
+
+local function fnmoon()
+    return fncommon("hound_ocean")
+end
+
+return Prefab("hound", fndefault, {}, {}),
+       Prefab("moonhound", fnmoon, {}, {})
+"#;
+        let files: Vec<(String, String)> = vec![("prefabs/hound.lua".into(), SRC.into())];
+        let artifact = build_from_sources(&files).unwrap();
+        let records = &artifact.loot["prefabs/hound.lua"];
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].items, vec!["meat", "houndstooth"]);
+        // fncommon is owned by BOTH variants via the registration closure.
+        assert_eq!(records[0].variants, vec!["hound", "moonhound"]);
     }
 
     #[test]

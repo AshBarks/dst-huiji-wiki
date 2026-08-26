@@ -94,40 +94,40 @@ pub fn classify(
         return classify_without_templates(title, cat_dst, cat_ds);
     };
 
-    // S1: disambiguation pages link to both versions by design.
-    if text.contains(DISAMBIG_MARKER) {
-        return Classification::new(GameClass::Disambig, ClassConfidence::High, &["tpl:消歧义"]);
-    }
-
     let tpl_dst = DST_MARKERS.iter().any(|m| text.contains(m));
     let tpl_ds = DS_MARKERS.iter().any(|m| text.contains(m));
 
     match (tpl_dst, tpl_ds) {
-        (true, true) => {
-            return Classification::new(
-                GameClass::Mixed,
-                ClassConfidence::High,
-                &["tpl_param:mixed"],
-            );
-        }
+        (true, true) => Classification::new(
+            GameClass::Mixed,
+            ClassConfidence::High,
+            &["tpl_param:mixed"],
+        ),
         (true, false) => {
             let mut signals = vec!["tpl_param:dst"];
             if cat_dst {
                 signals.push("cat:联机版");
             }
-            return Classification::new(GameClass::Dst, ClassConfidence::High, &signals);
+            Classification::new(GameClass::Dst, ClassConfidence::High, &signals)
         }
         (false, true) => {
             let mut signals = vec!["tpl_param:ds"];
             if cat_ds {
                 signals.push("cat:单机版系");
             }
-            return Classification::new(GameClass::Ds, ClassConfidence::High, &signals);
+            Classification::new(GameClass::Ds, ClassConfidence::High, &signals)
         }
-        (false, false) => {}
+        (false, false) => {
+            // S1 降级兜底：无实体信息框时消歧义标记才生效。
+            // 校准（2026-08-26 人工标定 48/48）：完整信息框页即使带
+            // {{消歧义}} 也是版本实体页（标记仅引导误入读者）。
+            if text.contains(DISAMBIG_MARKER) {
+                Classification::new(GameClass::Disambig, ClassConfidence::High, &["tpl:消歧义"])
+            } else {
+                classify_without_templates(title, cat_dst, cat_ds)
+            }
+        }
     }
-
-    classify_without_templates(title, cat_dst, cat_ds)
 }
 
 fn classify_without_templates(title: &str, cat_dst: bool, cat_ds: bool) -> Classification {
@@ -216,11 +216,31 @@ mod tests {
     }
 
     #[test]
-    fn disambiguation_page_wins_over_templates() {
+    fn calibration_dst_infobox_beats_disambig_marker() {
+        // 校准（2026-08-26 人工标定 48/48）：带完整 dst 信息框的页面即使
+        // 含 {{消歧义}} 也是版本实体页（标记仅引导误入读者）。
+        let c = classify(
+            "书",
+            false,
+            Some("{{消歧义}}\n{{实体信息框/自动|dst|book}}"),
+            &[],
+        );
+        assert_eq!(c.game_class, GameClass::Dst);
+        assert_eq!(c.confidence, ClassConfidence::High);
+    }
+
+    #[test]
+    fn disambig_only_without_infobox() {
+        let c = classify("代码", false, Some("{{消歧义}}\n列出多义条目"), &[]);
+        assert_eq!(c.game_class, GameClass::Disambig);
+        assert!(c.signals.contains(&"tpl:消歧义".to_string()));
+    }
+
+    #[test]
+    fn disambig_with_both_version_infoboxes_is_mixed() {
         let text = "{{消歧义}}\n本页列出：{{实体信息框/自动|dst|x}} 与 {{实体信息框/自动|ds|y}}";
         let c = classify("代码", false, Some(text), &[]);
-        assert_eq!(c.game_class, GameClass::Disambig);
-        assert_eq!(c.confidence, ClassConfidence::High);
+        assert_eq!(c.game_class, GameClass::Mixed);
     }
 
     #[test]

@@ -181,7 +181,12 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                                     new: c.new.clone(),
                                     pageid: Some(pageid),
                                     landing: None,
-                    change_text: format!("{}：{} → {}", c.field, lit_text(&c.old), lit_text(&c.new)),
+                                    change_text: format!(
+                                        "{}：{} → {}",
+                                        c.field,
+                                        lit_text(&c.old),
+                                        lit_text(&c.new)
+                                    ),
                                 }
                             } else {
                                 no_landing(c, pageid)

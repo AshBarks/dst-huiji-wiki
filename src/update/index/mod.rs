@@ -10,14 +10,16 @@ pub mod genericity;
 pub mod resolve;
 pub mod scan;
 pub mod symbols;
+pub mod tuning;
 
 use std::collections::BTreeMap;
 use std::path::Path;
 
 use crate::Result;
 pub use edges::IndexArtifact;
-use edges::{AssocEdge, EdgeKind, UnresolvedNote};
+use edges::{AssocEdge, EdgeKind, UnresolvedNote, INDEX_SCHEMA_VERSION};
 use symbols::{FileKey, FileScan, Role};
+pub use tuning::TuningTable;
 
 /// Directories scanned relative to the scripts root.
 const SCAN_DIRS: &[&str] = &[
@@ -47,17 +49,11 @@ fn role_for(path: &str) -> Role {
 }
 
 /// Build the index from an in-memory file set: `(relative path, content)`.
-pub fn build_from_sources<S: AsRef<str>>(files: &[(S, S)]) -> Result<IndexArtifact> {
+/// Pass 1 only: scan every source, recording parse failures.
+fn scan_files(files: &[(String, String)]) -> (BTreeMap<FileKey, FileScan>, Vec<UnresolvedNote>) {
     let mut scans: BTreeMap<FileKey, FileScan> = BTreeMap::new();
     let mut parse_failures = Vec::new();
-
-    let mut sorted: Vec<(String, String)> = files
-        .iter()
-        .map(|(p, c)| (normalize(p.as_ref()), c.as_ref().to_string()))
-        .collect();
-    sorted.sort_by(|a, b| a.0.cmp(&b.0));
-
-    for (path, content) in &sorted {
+    for (path, content) in files {
         let role = role_for(path);
         match scan::Scanner::scan(path.clone(), role, content) {
             Ok(file_scan) => {
@@ -71,19 +67,23 @@ pub fn build_from_sources<S: AsRef<str>>(files: &[(S, S)]) -> Result<IndexArtifa
             }),
         }
     }
-
-    Ok(assemble(scans, parse_failures))
+    (scans, parse_failures)
 }
 
-/// Build the index from a game scripts directory (current tree or snapshot).
-pub fn build_from_dir(root: &Path) -> Result<IndexArtifact> {
-    let mut files: Vec<(String, String)> = Vec::new();
-    let mut push_file = |rel: String, abs: &Path| -> Result<()> {
-        let content = std::fs::read_to_string(abs)?;
-        files.push((rel, content));
-        Ok(())
-    };
+pub fn build_from_sources<S: AsRef<str>>(files: &[(S, S)]) -> Result<IndexArtifact> {
+    let mut sorted: Vec<(String, String)> = files
+        .iter()
+        .map(|(p, c)| (normalize(p.as_ref()), c.as_ref().to_string()))
+        .collect();
+    sorted.sort_by(|a, b| a.0.cmp(&b.0));
 
+    let (scans, parse_failures) = scan_files(&sorted);
+    Ok(assemble(scans, parse_failures, None))
+}
+
+/// Collect all association-relevant script sources from a scripts root.
+fn gather_script_files(root: &Path) -> Result<Vec<(String, String)>> {
+    let mut files: Vec<(String, String)> = Vec::new();
     for dir in SCAN_DIRS {
         let dir_abs = root.join(dir);
         let entries = std::fs::read_dir(&dir_abs)
@@ -94,25 +94,73 @@ pub fn build_from_dir(root: &Path) -> Result<IndexArtifact> {
             let p = entry.path();
             if p.extension().is_some_and(|e| e == "lua") {
                 let rel = format!("{dir}/{}", entry.file_name().to_string_lossy());
-                push_file(rel, &p)?;
+                let content = std::fs::read_to_string(&p)?;
+                files.push((rel, content));
             }
         }
     }
     for util in UTIL_FILES {
         let abs = root.join(util);
         if abs.is_file() {
-            push_file((*util).to_string(), &abs)?;
+            let content = std::fs::read_to_string(&abs)?;
+            files.push(((*util).to_string(), content));
         }
     }
+    Ok(files)
+}
 
+/// Build the index from a game scripts directory (current tree or snapshot).
+pub fn build_from_dir(root: &Path) -> Result<IndexArtifact> {
+    let files = gather_script_files(root)?;
     build_from_sources(&files)
 }
+
+/// Combined output of one full atlas build (association index + tuning).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct AtlasBuild {
+    pub schema_version: u32,
+    /// `version.txt` build identifier when available.
+    pub build_id: Option<String>,
+    pub index: IndexArtifact,
+    pub tuning: TuningTable,
+}
+
+/// Build the atlas (index + tuning) from a scripts root directory.
+///
+/// `tuning.lua` and `version.txt` are read from the root when present.
+pub fn build_atlas_from_dir(root: &Path) -> Result<AtlasBuild> {
+    let files = gather_script_files(root)?;
+    let index = build_from_sources(&files)?;
+
+    let tuning_src = std::fs::read_to_string(root.join("tuning.lua")).ok();
+    let tuning = match tuning_src {
+        Some(src) => Some(tuning::build_tuning(&src)?),
+        None => None,
+    }
+    .unwrap_or_default();
+
+    let build_id = std::fs::read_to_string(root.join("version.txt"))
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty());
+
+    Ok(AtlasBuild {
+        schema_version: ATLAS_SCHEMA_VERSION,
+        build_id,
+        index,
+        tuning,
+    })
+}
+
+/// Serialization contract version of the combined [`AtlasBuild`] output.
+pub const ATLAS_SCHEMA_VERSION: u32 = 1;
 
 fn assemble(
     scans: BTreeMap<FileKey, FileScan>,
     parse_failures: Vec<UnresolvedNote>,
+    tuning: Option<&TuningTable>,
 ) -> IndexArtifact {
-    let resolution = resolve::Resolver::run(&scans);
+    let resolution = resolve::Resolver::run(&scans, tuning);
 
     // Reverse index over file-like targets; raw prefab names in PrefabDep
     // edges are promoted to their conventional path when the target exists.
@@ -150,6 +198,7 @@ fn assemble(
     let genericity = genericity::compute(&edges_out);
 
     IndexArtifact {
+        schema_version: INDEX_SCHEMA_VERSION,
         scanned_files: scans.len(),
         parse_failures,
         edges: edges_out,
@@ -169,6 +218,7 @@ fn normalize(path: &str) -> String {
 mod tests {
     use super::*;
     use edges::{ArgValue, Confidence, EdgeKind};
+    use tuning::TuningVal;
 
     const STD_COMPONENTS: &str = r#"
 function MakeHauntableChangePrefab(inst, data)
@@ -391,6 +441,65 @@ return Prefab("aliastest", fntest, {})
     }
 
     #[test]
+    fn tuning_args_resolve_in_behaviour_calls() {
+        const TT_PREFAB: &str = r#"
+local brain = require("brains/ttbrain")
+
+return CreatePrefab("tt", function(inst)
+    inst:SetBrain(brain)
+end)
+"#;
+        const TT_BRAIN: &str = r#"
+require "behaviours/wander"
+
+local function ttbrain(inst)
+    local root = PriorityNode(
+    {
+        Wander(inst, GetHomePos, TUNING.HOUND_TARGET_DIST, 5),
+    }, 1)
+    return Brain(inst, root)
+end
+"#;
+        let files: Vec<(String, String)> = vec![
+            ("prefabs/tt.lua".into(), TT_PREFAB.into()),
+            ("brains/ttbrain.lua".into(), TT_BRAIN.into()),
+            ("behaviours/wander.lua".into(), WANDER_BEHAVIOUR.into()),
+        ];
+        let mut sorted = files.clone();
+        sorted.sort_by(|a, b| a.0.cmp(&b.0));
+        let (scans, failures) = scan_files(&sorted);
+        assert!(failures.is_empty());
+
+        // Without the tuning table the arg stays Unknown.
+        let plain = assemble(scans.clone(), Vec::new(), None);
+        let call = plain
+            .behaviour_calls
+            .iter()
+            .find(|c| c.ctor == "Wander")
+            .unwrap();
+        assert_eq!(
+            call.args.iter().find(|(p, _)| p == "max_dist"),
+            Some(&("max_dist".to_string(), ArgValue::Unknown))
+        );
+
+        // With it, `TUNING.HOUND_TARGET_DIST` resolves to its scalar value.
+        let tuning = super::super::index::tuning::build_tuning(
+            "TUNING = {}\nfunction Tune()\nTUNING = { HOUND_TARGET_DIST = 20 }\nend\nTune()\n",
+        )
+        .unwrap();
+        let with_tt = assemble(scans, Vec::new(), Some(&tuning));
+        let call = with_tt
+            .behaviour_calls
+            .iter()
+            .find(|c| c.ctor == "Wander")
+            .unwrap();
+        assert_eq!(
+            call.args.iter().find(|(p, _)| p == "max_dist"),
+            Some(&("max_dist".to_string(), ArgValue::Num("20".to_string())))
+        );
+    }
+
+    #[test]
     fn behaviour_calls_capture_arguments() {
         let artifact = build_from_sources(&fixture_files()).unwrap();
         let wanders: Vec<_> = artifact
@@ -461,7 +570,23 @@ return Prefab("aliastest", fntest, {})
         } else {
             base.to_path_buf()
         };
-        let artifact = build_from_dir(&scripts).unwrap_or_else(|e| panic!("build failed: {e:?}"));
+        let atlas =
+            build_atlas_from_dir(&scripts).unwrap_or_else(|e| panic!("build failed: {e:?}"));
+        let artifact = &atlas.index;
+        // TuningTable: scalar leaves resolve on the real tuning.lua.
+        assert!(
+            atlas.tuning.values.len() > 3000,
+            "tuning values {}",
+            atlas.tuning.values.len()
+        );
+        assert_eq!(
+            atlas.tuning.resolve("TUNING.HOUND_DAMAGE"),
+            Some(&TuningVal::Num(20.0))
+        );
+        assert_eq!(
+            atlas.tuning.resolve("TUNING.HOUND_TARGET_DIST"),
+            Some(&TuningVal::Num(20.0))
+        );
         assert!(
             artifact.scanned_files > 2500,
             "scanned {}",

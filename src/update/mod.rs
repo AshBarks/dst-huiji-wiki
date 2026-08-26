@@ -5,4 +5,7 @@
 
 pub mod index;
 
-pub use index::{build_from_dir, build_from_sources, IndexArtifact};
+pub use index::{
+    build_atlas_from_dir, build_from_dir, build_from_sources, AtlasBuild, IndexArtifact,
+    TuningTable,
+};

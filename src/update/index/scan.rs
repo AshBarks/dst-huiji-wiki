@@ -512,9 +512,11 @@ impl<'s> Scanner<'s> {
     fn classify_expr(&self, expr: &ast::Expression) -> ArgExpr {
         match expr {
             ast::Expression::String(s) => ArgExpr::Str(string_literal_text(&s.to_string())),
-            ast::Expression::Number(n) => ArgExpr::Num(n.to_string()),
+            ast::Expression::Number(n) => ArgExpr::Num(n.to_string().trim().to_string()),
             ast::Expression::Var(ast::Var::Name(n)) => ArgExpr::Ident(n.token().to_string()),
-            ast::Expression::Var(ast::Var::Expression(vex)) => ArgExpr::Field(vex.to_string()),
+            ast::Expression::Var(ast::Var::Expression(vex)) => {
+                ArgExpr::Field(vex.to_string().trim().to_string())
+            }
             ast::Expression::BinaryOperator { lhs, binop, rhs } => {
                 let op = binop.to_string().trim().to_string();
                 let l = Box::new(self.classify_expr(lhs));

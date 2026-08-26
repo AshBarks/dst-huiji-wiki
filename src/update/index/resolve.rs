@@ -11,6 +11,7 @@ use super::edges::{
     ArgValue, AssocEdge, BehaviourCallRecord, Confidence, EdgeKind, OverrideMark, UnresolvedNote,
 };
 use super::symbols::{ArgExpr, AssocCall, CallKind, ConstVal, FileScan, Role};
+use super::tuning::{TuningTable, TuningVal};
 
 #[derive(Debug, Clone, PartialEq)]
 enum ResolvedValue {
@@ -25,6 +26,7 @@ enum ResolvedValue {
 /// Per-owner evaluation context: which prefab variant(s) own a call site.
 pub(crate) struct Resolver<'a> {
     scans: &'a BTreeMap<String, FileScan>,
+    tuning: Option<&'a TuningTable>,
     /// callee -> call sites (intra-file, prefab-role files only).
     call_graph: HashMap<(String, String), Vec<&'a AssocCall>>,
     helpers: HashMap<String, HelperProfile>,
@@ -44,7 +46,10 @@ pub struct Resolution {
 }
 
 impl<'a> Resolver<'a> {
-    pub fn run(scans: &'a BTreeMap<String, FileScan>) -> Resolution {
+    pub fn run(
+        scans: &'a BTreeMap<String, FileScan>,
+        tuning: Option<&'a TuningTable>,
+    ) -> Resolution {
         let mut call_graph = HashMap::new();
         for scan in scans.values() {
             for call in &scan.calls {
@@ -114,6 +119,7 @@ impl<'a> Resolver<'a> {
 
         let mut resolver = Resolver {
             scans,
+            tuning,
             call_graph,
             helpers,
         };
@@ -504,6 +510,22 @@ impl<'a> Resolver<'a> {
         (out, dynamic)
     }
 
+    /// Resolve a dotted `TUNING.KEY` reference against the tuning table.
+    fn resolve_tuning_field(&self, field: &str) -> Option<ArgValue> {
+        field.strip_prefix("TUNING.")?;
+        let val = self.tuning?.resolve(field)?;
+        Some(match val {
+            TuningVal::Num(n) => {
+                if n.fract() == 0.0 && n.abs() < 1e15 {
+                    ArgValue::Num(format!("{}", *n as i64))
+                } else {
+                    ArgValue::Num(format!("{n}"))
+                }
+            }
+            TuningVal::Str(s) => ArgValue::Str(s.clone()),
+        })
+    }
+
     fn owners_of(&self, scan: &FileScan, fn_name: &str) -> Option<HashSet<String>> {
         // Recompute lazily; small files make this cheap and avoids threading
         // the cache through every recursion level.
@@ -587,6 +609,9 @@ impl<'a> Resolver<'a> {
                         ArgExpr::Str(s) => ArgValue::Str(s.clone()),
                         ArgExpr::Num(n) => ArgValue::Num(n.clone()),
                         ArgExpr::FnRef => ArgValue::FnRef,
+                        ArgExpr::Field(f) => {
+                            self.resolve_tuning_field(f).unwrap_or(ArgValue::Unknown)
+                        }
                         _ => {
                             let (vals, _) = self.eval_for_owner(
                                 scan,

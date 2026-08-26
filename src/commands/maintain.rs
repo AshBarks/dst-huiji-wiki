@@ -147,6 +147,18 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::UpdateIndex { root, out } => {
+            execute(
+                JobKind::UpdateIndex {
+                    root: path_to_string(&root)?,
+                    out: opt_path_to_string(&out)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
         Commands::Serve { host, port } => {
             crate::web::serve(host, port).await?;
         }

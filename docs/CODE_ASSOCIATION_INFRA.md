@@ -199,3 +199,12 @@ struct SymbolProfile {
 3. **零组件助手画像**：MakeInventoryPhysics 等走引擎级 `entity:AddPhysics()`、不含任何 AddComponent——为所有扫描到的全局 Make* 定义建立（可能为空的）画像，调用点静默解析而非误报 unknown。
 
 测试：8 组嵌入式 Lua fixture（hound 全链/warglet 共享 SG/behaviour 实参/unresolved 回归/inst 别名/解析失败容错等）+ DST__ROOT 门控的真实树冒烟，全部通过；`cargo fmt --check`、`cargo clippy --all-targets -- -D warnings` 干净。
+
+---
+
+## 10. 落地记录（TuningTable 与 update-index 命令，2026-08-26）
+
+- **TuningTable**（`src/update/index/tuning.rs`）：真实 tuning.lua 为「`function Tune(overrides)` 内局部常量折叠 + 单个巨型 `TUNING = {…}` 表构造」，非逐行赋值。解析器先对数值局部变量做不动点折叠，再求值表内 NameKey 字段：标量数字/字符串入表，表值/依赖 overrides 的表达式记入 skipped 台账。full_moon 的 token Display 携带空白 trivia——数值解析前必须 trim。
+- **集成**：BehaviourCall 实参中 `TUNING.X` 经 `resolve_tuning_field` 出真值（Num/Str）；真实树解析出 **4558** 个标量。
+- **产物接口**：`IndexArtifact.schema_version = 1`（正式契约字段）；组合产物 `AtlasBuild { schema_version, build_id, index, tuning }` 由 `build_atlas_from_dir(root)` 构建。
+- **CLI**：`update-index <scripts-root> [--out DIR]`（JobKind::UpdateIndex，纯本地无 wiki 写入），落盘 `output/atlas/<build>/index.json + tuning.json`；build 号优先取 version.txt，否则从快照目录名 `scripts_<时间戳>` 提取，兜底 "unknown"。

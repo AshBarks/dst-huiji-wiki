@@ -101,9 +101,14 @@ pub struct GenericityReport {
     pub blacklisted: Vec<String>,
 }
 
+/// Current [`IndexArtifact`] serialization contract version.
+pub const INDEX_SCHEMA_VERSION: u32 = 1;
+
 /// Final output of one index build.
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct IndexArtifact {
+    /// Serialization contract version ([`INDEX_SCHEMA_VERSION`]).
+    pub schema_version: u32,
     /// Number of files scanned and how many failed to parse.
     pub scanned_files: usize,
     pub parse_failures: Vec<UnresolvedNote>,

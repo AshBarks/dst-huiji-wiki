@@ -108,6 +108,14 @@ pub enum Commands {
         #[arg(long)]
         dry_run: bool,
     },
+    /// 构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/
+    UpdateIndex {
+        /// 游戏脚本根目录（当前树或快照目录）
+        root: PathBuf,
+        /// 输出目录（默认 output/atlas/<build 号>/）
+        #[arg(short, long)]
+        out: Option<PathBuf>,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -131,6 +139,7 @@ impl Commands {
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::CorpusFetch { .. } => "corpus-fetch",
+            Commands::UpdateIndex { .. } => "update-index",
             Commands::Serve { .. } => "serve",
         }
     }
@@ -337,6 +346,40 @@ mod tests {
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected MaintainItemTable command"),
+        }
+    }
+
+    #[test]
+    fn test_update_index_command() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "update-index",
+            "/path/to/scripts",
+            "--out",
+            "output/atlas/custom",
+        ]);
+        assert!(args.is_ok());
+        let args = args.unwrap();
+        match args.command {
+            Commands::UpdateIndex { root, out } => {
+                assert_eq!(root, PathBuf::from("/path/to/scripts"));
+                assert_eq!(out, Some(PathBuf::from("output/atlas/custom")));
+            }
+            _ => panic!("Expected UpdateIndex command"),
+        }
+    }
+
+    #[test]
+    fn test_update_index_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "update-index", "scripts"]);
+        assert!(args.is_ok());
+        let args = args.unwrap();
+        match args.command {
+            Commands::UpdateIndex { root, out } => {
+                assert_eq!(root, PathBuf::from("scripts"));
+                assert!(out.is_none());
+            }
+            _ => panic!("Expected UpdateIndex command"),
         }
     }
 

@@ -127,6 +127,12 @@ pub enum JobKind {
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
+    /// Build the code association atlas (index + tuning) from a scripts root.
+    UpdateIndex {
+        root: String,
+        #[serde(default)]
+        out: Option<String>,
+    },
     CorpusSync {
         #[serde(default)]
         full: bool,
@@ -147,6 +153,7 @@ impl JobKind {
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::CorpusSync { .. } => "corpus-sync",
+            JobKind::UpdateIndex { .. } => "update-index",
         }
     }
 
@@ -273,12 +280,68 @@ async fn execute_job_inner(
         JobKind::CorpusSync { full, dir } => {
             run_corpus_sync(*full, dir.as_deref(), reporter, mode).await
         }
+        JobKind::UpdateIndex { root, out } => run_update_index(root, opt_path(out), reporter).await,
     }
 }
 
 // ---------------------------------------------------------------------------
 // Local-file commands (no game dir required)
 // ---------------------------------------------------------------------------
+
+/// `update-index`: build the association atlas and cache it under
+/// `output/atlas/<build>/` (or an explicit `--out` directory).
+///
+/// Purely local: reads game scripts, writes two JSON artifacts, no wiki I/O.
+async fn run_update_index(
+    root: &str,
+    out: Option<PathBuf>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    reporter.stage("构建代码关联索引");
+    let root_path = std::path::Path::new(root);
+    let atlas = crate::update::build_atlas_from_dir(root_path)?;
+
+    let build_dir = atlas
+        .build_id
+        .clone()
+        .or_else(|| {
+            // Snapshot directories follow databundles/scripts_<yyyymmddhhmm>;
+            // fall back to their timestamp so caches land per-build.
+            root_path
+                .file_name()
+                .and_then(std::ffi::OsStr::to_str)
+                .filter(|n| n.starts_with("scripts_"))
+                .map(|n| n.trim_start_matches("scripts_").to_string())
+        })
+        .unwrap_or_else(|| "unknown".to_string());
+    let out_dir = out.unwrap_or_else(|| PathBuf::from("output").join("atlas").join(build_dir));
+    std::fs::create_dir_all(&out_dir)?;
+
+    let index_path = out_dir.join("index.json");
+    std::fs::write(&index_path, serde_json::to_string_pretty(&atlas.index)?)?;
+    let tuning_path = out_dir.join("tuning.json");
+    std::fs::write(&tuning_path, serde_json::to_string_pretty(&atlas.tuning)?)?;
+
+    reporter.log(format!(
+        "{} 文件 / {} 边 / {} 行为实参 / TUNING 标量 {}",
+        atlas.index.scanned_files,
+        atlas.index.edges.len(),
+        atlas.index.behaviour_calls.len(),
+        atlas.tuning.values.len()
+    ));
+    reporter.log(format!("已写入 {}", out_dir.display()));
+
+    Ok(serde_json::json!({
+        "schema_version": atlas.schema_version,
+        "build_id": atlas.build_id,
+        "scanned_files": atlas.index.scanned_files,
+        "edges": atlas.index.edges.len(),
+        "behaviour_calls": atlas.index.behaviour_calls.len(),
+        "unresolved": atlas.index.unresolved.len(),
+        "tuning_values": atlas.tuning.values.len(),
+        "output": out_dir,
+    }))
+}
 
 async fn run_parse_po(
     input: &str,

@@ -11,7 +11,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::index::loot::LootRecord;
+use super::index::loot::{LootKind, LootRecord};
 
 /// Which extractor family produced the change.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

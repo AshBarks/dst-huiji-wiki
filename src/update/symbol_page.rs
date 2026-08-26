@@ -4,11 +4,12 @@
 //! it can influence, and collects the candidate page evidence (regions/facts)
 //! that will later drive consistency checks and Code → Page prompts.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
 use super::grade::CorpusPageView;
 use super::index::edges::IndexArtifact;
+use crate::Result;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -313,6 +314,95 @@ pub fn annotate_symbol(
     }
 }
 
+/// P3 output contract: one page's verdict for a symbol annotation task.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct PageSymbolVerdict {
+    pub pageid: i64,
+    pub mentions: bool,
+    #[serde(default)]
+    pub wording: Option<String>,
+    #[serde(default)]
+    pub semantic_consistent: Option<bool>,
+    #[serde(default)]
+    pub missing: bool,
+    #[serde(default)]
+    pub confidence: Option<String>,
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+/// P3 output contract: full LLM response for one symbol.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct SymbolAnnotationResponse {
+    pub symbol: String,
+    pub verdicts: Vec<PageSymbolVerdict>,
+}
+
+fn symbol_display(symbol: &SymbolRef) -> String {
+    match symbol {
+        SymbolRef::File { path } => path.clone(),
+        SymbolRef::Fn { file, name } => format!("{file}#{name}"),
+        SymbolRef::Const { file, name } => format!("{file}#{name}"),
+        SymbolRef::Behaviour { name } => format!("behaviours/{name}"),
+    }
+}
+
+/// P3: render a Page → Symbol annotation prompt from one evidence pack.
+pub fn render_symbol_annotation_prompt(ann: &SymbolPageAnnotation, code_semantics: &str) -> String {
+    let symbol = symbol_display(&ann.symbol);
+    let mut out = String::new();
+    out.push_str("你是 DST Huiji Wiki 的代码符号页面影响标注助手。\n");
+    out.push_str("请判断给定代码符号是否影响以下 wiki 页面，并检测页面是否提及、是否语义一致、是否缺失。\n\n");
+    out.push_str(&format!("## Symbol\n`{symbol}`\n\n"));
+    out.push_str(&format!("## Code semantics\n{code_semantics}\n\n"));
+    out.push_str(&format!(
+        "## Affected variants\n{}\n\n",
+        ann.affected_variants.join(", ")
+    ));
+    out.push_str("## Affected pages and candidate evidence\n");
+    for pageid in &ann.affected_pageids {
+        out.push_str(&format!("### page {pageid}\n"));
+        let evs: Vec<_> = ann
+            .page_evidence
+            .iter()
+            .filter(|e| e.pageid == *pageid)
+            .collect();
+        if evs.is_empty() {
+            out.push_str("（无候选数值事实）\n");
+        }
+        for e in evs {
+            out.push_str(&format!("- [{}] {}\n", e.region_id, e.snippet));
+        }
+        out.push('\n');
+    }
+    out.push_str(
+        "## 输出要求\n请输出 JSON 数组，每个元素包含：\n         {\"pageid\": 数字, \"mentions\": true/false, \"wording\": 字符串或null, \"semantic_consistent\": true/false或null, \"missing\": true/false, \"confidence\": \"high|medium|low\", \"note\": 字符串或null}\n",
+    );
+    out
+}
+
+/// P3: parse an LLM response into page verdicts.
+///
+/// Accepts either a bare JSON array or `{"symbol": "...", "verdicts": [...]}`.
+pub fn parse_symbol_annotation_response(raw: &str) -> Result<Vec<PageSymbolVerdict>> {
+    let trimmed = raw.trim();
+    if let Ok(v) = serde_json::from_str::<Vec<PageSymbolVerdict>>(trimmed) {
+        return Ok(v);
+    }
+    let v: serde_json::Value = serde_json::from_str(trimmed)?;
+    if let Some(arr) = v
+        .get("verdicts")
+        .or_else(|| v.get("results"))
+        .and_then(|x| x.as_array())
+    {
+        let arr = serde_json::Value::Array(arr.clone());
+        return Ok(serde_json::from_value(arr)?);
+    }
+    Err(crate::error::Error::Config(
+        "SymbolAnnotationResponse 缺少 verdicts/results 数组".to_string(),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -422,5 +512,47 @@ return Brain(inst, PriorityNode({}, 1))
         let md = render_symbol_pack_md(&packs[0]);
         assert!(md.contains("## `"));
         assert!(md.contains("affected_variants"));
+    }
+
+    #[test]
+    fn prompt_renders_symbol_and_evidence() {
+        let files = vec![
+            ("prefabs/hound.lua".to_string(), HOUND_PREFAB.to_string()),
+            ("brains/houndbrain.lua".to_string(), HOUND_BRAIN.to_string()),
+        ];
+        let artifact = build_from_sources(&files).unwrap();
+        let view = hound_view();
+        let ann = annotate_symbol(
+            &artifact,
+            &view,
+            SymbolRef::Const {
+                file: "brains/houndbrain.lua".to_string(),
+                name: "SEE_DIST".to_string(),
+            },
+        );
+        let prompt = render_symbol_annotation_prompt(&ann, "hound 在 30 距离单位内寻找目标");
+        assert!(prompt.contains("## Symbol"));
+        assert!(prompt.contains("brains/houndbrain.lua#SEE_DIST"));
+        assert!(prompt.contains("page 13857"));
+        assert!(prompt.contains("30 距离单位"));
+    }
+
+    #[test]
+    fn parse_symbol_annotation_response_accepts_array_and_object() {
+        let array = r#"[
+            {"pageid": 13857, "mentions": true, "wording": "30 距离单位", "semantic_consistent": true, "missing": false, "confidence": "high", "note": null}
+        ]"#;
+        let parsed = parse_symbol_annotation_response(array).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0].pageid, 13857);
+        assert!(parsed[0].mentions);
+
+        let wrapped = r#"{"symbol": "SEE_DIST", "verdicts": [
+            {"pageid": 13857, "mentions": false, "missing": true, "semantic_consistent": null, "confidence": "medium", "note": "missing"}
+        ]}"#;
+        let parsed = parse_symbol_annotation_response(wrapped).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert!(!parsed[0].mentions);
+        assert!(parsed[0].missing);
     }
 }

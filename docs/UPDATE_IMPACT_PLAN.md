@@ -8,7 +8,7 @@
 - **v3.1**：决策落定——①基础设施预构建方向确认：代码侧符号级关联索引 + wiki 大面积扫描产出 CodeTextAtlas 与 per-file/per-fn 说明文本（入仓库，作为 LLM 提示词资产；fn 级标注排期 M4）；②相关性标签是先验非闸门：old_literal 回查命中可推翻任何低相关标签；③§5 多数开放问题结案（见该节标记）；④页面全量语料抓取方案独立成文：[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)
 - **v3.2**：§4.2.4 增补**章节级 LLM 介入边界表**（基于全语料结构分析 [CORPUS_PAGE_PATTERNS.md](CORPUS_PAGE_PATTERNS.md) + 语料实证抽样；含无标题导语区边界、料理配方≠制作配方的溯源区分、制作章新增的纯代码检验点）
 - **v3.3**：§4.2 各小节标注可执行状态；**§4.2.6 页面匹配修订**——语料侧注册表（pages_by_prefab.json）取代"标题候选猜测+API 往返"，匹配变为离线确定性查表；PageSegmenter 补信息框参数级细分以支撑 F1 字节级锚定
-- **v3.4（2026-08-26 实施记录）**：M2/M3a/M4 前段落地——F1 loot、F2 stats、F3 行为常量子集、fn 标注 MVP、BrainEdge 动态解析验证、atlas 全覆盖关联渲染、F4 SpawnPrefab 反向生成首版、create-check 清单正式化、state.json 缓存断点续跑、Page→Symbol 标注 P0/P1/P2（SymbolPageAnnotation + 受影响页/证据组装 + 高引用 symbol 证据包生成）；join 阶段大小写归一（case_only 不再进人工纠错）、vault_crawler create_check 关闭；§4.2.2 反向传播收窄已实施（组件变更仅传播本地覆写者，超阈值聚合）。
+- **v3.4（2026-08-26 实施记录）**：M2/M3a/M4 前段落地——F1 loot、F2 stats、F3 行为常量子集、fn 标注 MVP、BrainEdge 动态解析验证、atlas 全覆盖关联渲染、F4 SpawnPrefab 反向生成首版、create-check 清单正式化、state.json 缓存断点续跑、Page→Symbol 标注 P0/P1/P2/P3（SymbolPageAnnotation + 受影响页/证据组装 + 高引用 symbol 证据包 + Prompt/输出契约）；join 阶段大小写归一（case_only 不再进人工纠错）、vault_crawler create_check 关闭；§4.2.2 反向传播收窄已实施（组件变更仅传播本地覆写者，超阈值聚合）。
 
 **关联文档**：[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)（现有工具评估，§6 改进项已落地）、[CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md)、[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)（语料底座）
 

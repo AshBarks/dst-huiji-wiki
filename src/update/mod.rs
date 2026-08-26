@@ -4,6 +4,7 @@
 //! docs/CODE_ASSOCIATION_INFRA.md) plus M1 snapshot management and the
 //! structured tree diff.
 
+pub mod annotate;
 pub mod consts;
 pub mod diffdata;
 pub mod fact;
@@ -15,6 +16,7 @@ pub mod snapshot;
 pub mod stats;
 pub mod takeup;
 
+pub use annotate::{annotate_file, batch_annotate};
 pub use consts::{collect_brain_consts, pair_const_changes};
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
 pub use fact::{

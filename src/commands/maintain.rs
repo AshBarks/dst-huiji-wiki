@@ -152,6 +152,7 @@ pub async fn run(args: Commands) -> Result<()> {
             new,
             out,
             corpus,
+            annotate,
         } => {
             execute(
                 JobKind::UpdateScan {
@@ -159,6 +160,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     new,
                     out: opt_path_to_string(&out)?,
                     corpus: opt_path_to_string(&corpus)?,
+                    annotate: opt_path_to_string(&annotate)?,
                 },
                 // Read-only pipeline: no wiki writes ever.
                 WriteMode::AutoConfirm,

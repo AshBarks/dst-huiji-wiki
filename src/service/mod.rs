@@ -136,6 +136,9 @@ pub enum JobKind {
         /// 语料 host 根目录（wikis/<host>/）：提供时附加 Layer B 定级摘要
         #[serde(default)]
         corpus: Option<String>,
+        /// 输出 fn 标注骨架到该目录（prefabs 前 50 文件 + hound.lua）
+        #[serde(default)]
+        annotate: Option<String>,
     },
     /// Build the code association atlas (index + tuning) from a scripts root.
     UpdateIndex {
@@ -310,7 +313,18 @@ async fn execute_job_inner(
             new,
             out,
             corpus,
-        } => run_update_scan(old, new, opt_path(out), corpus.as_deref(), reporter).await,
+            annotate,
+        } => {
+            run_update_scan(
+                old,
+                new,
+                opt_path(out),
+                corpus.as_deref(),
+                annotate.as_deref(),
+                reporter,
+            )
+            .await
+        }
     }
 }
 
@@ -326,6 +340,7 @@ async fn run_update_scan(
     new_id: &str,
     out: Option<PathBuf>,
     corpus: Option<&str>,
+    annotate: Option<&str>,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     reporter.stage("快照差异与影响评估");
@@ -428,6 +443,33 @@ async fn run_update_scan(
     std::fs::create_dir_all(&out_dir)?;
 
     // Persist draft-eligible suggestions for human comparison (L1).
+    if let Some(annotate_dir) = annotate {
+        reporter.stage("fn 标注骨架生成");
+        // hound.lua + 按字母序前 50 个 prefab 文件
+        let mut files: Vec<&str> = atlas
+            .index
+            .fn_ranges
+            .keys()
+            .filter(|f| f.starts_with("prefabs/") && f.ends_with(".lua"))
+            .map(|s| s.as_str())
+            .collect();
+        files.sort();
+        let mut chosen: Vec<&str> = files.iter().copied().take(50).collect();
+        if !chosen.iter().any(|f| *f == "prefabs/hound.lua") {
+            chosen.insert(0, "prefabs/hound.lua");
+        }
+        let written = crate::update::batch_annotate(
+            &atlas.index,
+            &std::path::PathBuf::from(annotate_dir),
+            &chosen,
+        )?;
+        reporter.log(format!(
+            "标注骨架 {} 个文件 → {}",
+            written.len(),
+            annotate_dir
+        ));
+    }
+
     if let Some(graded) = &graded_layer_b {
         let path = out_dir.join("layer_b_rows.json");
         std::fs::write(&path, serde_json::to_string_pretty(graded)?)?;

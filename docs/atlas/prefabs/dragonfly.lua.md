@@ -53,6 +53,9 @@
 - `vomitfire_fx`：dragonfly（Direct；line 624）
 - `yellowgem`：dragonfly（Direct；line 624）
 
+### 生成引用
+- `prefabs/dragon_scales.lua`：dragonfly（Direct；line 383）
+
 ### 行为
 - `brains/dragonflybrain.lua`：ChaseAndAttack, DoAction, Leash（prefabs/dragonfly.lua#dragonfly）
 

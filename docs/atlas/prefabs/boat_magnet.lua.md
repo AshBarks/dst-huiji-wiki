@@ -20,6 +20,9 @@
 ### 预制体依赖
 - `collapse_small`：boat_magnet（Direct；line 145）
 
+### 生成引用
+- `collapse_small`：boat_magnet（Direct；line 14）
+
 
 ## 函数
 

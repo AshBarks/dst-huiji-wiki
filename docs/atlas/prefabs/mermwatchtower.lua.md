@@ -19,6 +19,9 @@
 - `collapse_big`：mermwatchtower（Direct；line 355）
 - `mermguard`：mermwatchtower（Direct；line 355）
 
+### 生成引用
+- `collapse_big`：mermwatchtower（Direct；line 30）
+
 
 ## 函数
 

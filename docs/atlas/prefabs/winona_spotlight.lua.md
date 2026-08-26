@@ -30,6 +30,13 @@
 - `winona_spotlight_head`：winona_spotlight（Direct；line 1374）
 - `winona_spotlight_item`：winona_spotlight（Direct；line 1374）
 
+### 生成引用
+- `collapse_small`：winona_spotlight（Direct；line 801,847）
+- `prefabs/winona_battery_sparks.lua`：winona_spotlight（Direct；line 779,910）
+- `prefabs/winona_spotlight.lua`：winona_spotlight_item（Direct；line 1317）
+- `winona_spotlight_head`：winona_spotlight（Direct；line 1113）
+- `winona_spotlight_item`：winona_spotlight（Direct；line 772）
+
 
 ## 函数
 

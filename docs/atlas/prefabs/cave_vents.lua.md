@@ -21,6 +21,9 @@
 - `prefabs/rocks.lua`：cave_vent_rock（Direct；line 455）
 - `redgem`：cave_vent_rock（Direct；line 455）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：cave_vent_rock（Direct；line 251）
+
 
 ## 函数
 

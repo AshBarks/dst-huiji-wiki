@@ -11,6 +11,10 @@
 - `chumpiece`：waterplant_pollen_fx_ocean（Direct；line 196）
 - `waterplant_pollen_fx_ocean`：waterplant_pollen_fx（Direct；line 195）
 
+### 生成引用
+- `chumpiece`：waterplant_pollen_fx_ocean（Direct；line 108）
+- `waterplant_pollen_fx_ocean`：waterplant_pollen_fx（Direct；line 27）
+
 
 ## 函数
 

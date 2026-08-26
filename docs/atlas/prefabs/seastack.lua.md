@@ -18,6 +18,11 @@
 - `prefabs/waterplant_baby.lua`：seastack, seastack_spawner_rough, seastack_spawner_swell（Direct；line 256,257,258）
 - `waterplant_destroy`：seastack, seastack_spawner_rough, seastack_spawner_swell（Direct；line 256,257,258）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：seastack（Direct；line 52）
+- `prefabs/waterplant_baby.lua`：seastack（Direct；line 64）
+- `waterplant_destroy`：seastack（Direct；line 75）
+
 
 ## 函数
 

@@ -14,6 +14,10 @@
 - `prefabs/balloon_held_child.lua`：balloonspeed（Direct；line 224）
 - `prefabs/globalmapicon.lua`：balloonspeed（Direct；line 224）
 
+### 生成引用
+- `balloon_mapicon`：balloonspeed（Direct；line 66）
+- `prefabs/globalmapicon.lua`：balloon_mapicon（Direct；line 189）
+
 
 ## 函数
 

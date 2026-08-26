@@ -34,6 +34,10 @@
 - `ocean_splash_med2`：beeguard（Direct；line 587）
 - `prefabs/stinger.lua`：beeguard（Direct；line 587）
 
+### 生成引用
+- `bee_poof_big`：beeguard（Direct；line 363）
+- `bee_poof_small`：beeguard（Direct；line 376）
+
 ### 行为
 - `brains/beeguardbrain.lua`：AvoidElectricFence, ChaseAndAttack, Leash, Panic, RunAway, Wander（prefabs/beeguard.lua#beeguard）
 

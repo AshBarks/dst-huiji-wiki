@@ -12,6 +12,9 @@
 ### 预制体依赖
 - `dirt_puff`：farm_soil_debris（Direct；line 104）
 
+### 生成引用
+- `dirt_puff`：farm_soil_debris（Direct；line 31）
+
 
 ## 函数
 

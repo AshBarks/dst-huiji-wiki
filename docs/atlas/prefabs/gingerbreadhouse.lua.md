@@ -16,6 +16,10 @@
 - `prefabs/crumbs.lua`：gingerbreadhouse（Direct；line 143）
 - `prefabs/wintersfeastfuel.lua`：gingerbreadhouse（Direct；line 143）
 
+### 生成引用
+- `collapse_small`：gingerbreadhouse（Direct；line 57）
+- `gingerdeadpig`：gingerbreadhouse（Direct；line 64）
+
 
 ## 函数
 

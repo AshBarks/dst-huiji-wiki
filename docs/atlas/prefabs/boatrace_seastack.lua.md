@@ -19,6 +19,10 @@
 - `prefabs/rock_break_fx.lua`：boatrace_seastack, boatrace_seastack_monkey（Direct；line 297,301）
 - `redpouch_yotd_unwrap`：boatrace_seastack, boatrace_seastack_monkey（Direct；line 297,301）
 
+### 生成引用
+- `balloon_pop_body`：boatrace_seastack, boatrace_seastack_monkey（Direct；line 28）
+- `redpouch_yotd_unwrap`：boatrace_seastack, boatrace_seastack_monkey（Direct；line 279,292）
+
 
 ## 函数
 

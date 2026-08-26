@@ -19,6 +19,9 @@
 - `arrowsign_panel`：arrowsign_panel, arrowsign_post（Direct；line 165,167）
 - `collapse_small`：arrowsign_panel, arrowsign_post（Direct；line 165,167）
 
+### 生成引用
+- `collapse_small`：arrowsign_post（Direct；line 22）
+
 
 ## 函数
 

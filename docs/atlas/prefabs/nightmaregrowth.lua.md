@@ -13,6 +13,11 @@
 - `nightmaregrowth_crack`：nightmaregrowth（Direct；line 260）
 - `prefabs/nightmaregrowth.lua`：nightmaregrowth_spawner, retrofitted_grotterwar_homepoint, retrofitted_grotterwar_spawnpoint（Direct；line 262,263,264）
 
+### 生成引用
+- `collapse_small`：nightmaregrowth（Direct；line 53）
+- `nightmaregrowth_crack`：nightmaregrowth（Direct；line 59）
+- `prefabs/nightmaregrowth.lua`：nightmaregrowth_spawner（Direct；line 193,203）
+
 
 ## 函数
 

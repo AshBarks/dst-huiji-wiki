@@ -58,6 +58,11 @@
 - `prefabs/poop.lua`：beefalo, beefalo_carry（Direct；line 1349,1350）
 - `spawn_fx_medium`：beefalo, beefalo_carry（Direct；line 1349,1350）
 
+### 生成引用
+- `explode_reskin`：beefalo, beefalo_carry（Direct；line 416）
+- `prefabs/carrat.lua`：beefalo（Direct；line 137）
+- `spawn_fx_medium`：beefalo, beefalo_carry（Direct；line 907）
+
 ### 行为
 - `brains/beefalobrain.lua`：AttackWall, ChaseAndAttack, FaceEntity, Follow, Wander（prefabs/beefalo.lua#beefalo）
 

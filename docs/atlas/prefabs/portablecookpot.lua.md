@@ -25,6 +25,12 @@
 - `prefabs/ash.lua`：portablecookpot（Direct；line 382）
 - `prefabs/portablecookpot.lua`：portablecookpot_item（Direct；line 384）
 
+### 生成引用
+- `collapse_small`：portablecookpot（Direct；line 58）
+- `portablecookpot_item`：portablecookpot（Direct；line 45）
+- `prefabs/ash.lua`：portablecookpot（Direct；line 219）
+- `prefabs/portablecookpot.lua`：portablecookpot_item（Direct；line 325）
+
 
 ## 函数
 

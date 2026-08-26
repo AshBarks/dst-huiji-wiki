@@ -24,6 +24,10 @@
 - `construction_container`：hermithotspring_constr（Direct；line 1024）
 - `prefabs/hermithotspring.lua`：hermithotspring_constr（Direct；line 1024）
 
+### 生成引用
+- `collapse_big`：hermithotspring, hermithotspring_constr（Direct；line 529）
+- `prefabs/hermithotspring.lua`：hermithotspring_constr（Direct；line 896）
+
 
 ## 函数
 

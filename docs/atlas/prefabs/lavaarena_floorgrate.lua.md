@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `ember_short_fx`：lavaarena_floorgrate（Direct；line 96）
 
+### 生成引用
+- `ember_short_fx`：lavaarena_floorgrate（Direct；line 41）
+
 
 ## 函数
 

@@ -16,6 +16,9 @@
 - `prefabs/globalmapicon.lua`：vault_key_icon（Direct；line 149）
 - `vault_key_icon`：vault_key（Direct；line 148）
 
+### 生成引用
+- `vault_key_icon`：vault_key（Direct；line 109）
+
 
 ## 函数
 

@@ -13,6 +13,10 @@
 ### 预制体依赖
 - `wave_splash`：wave_med（Direct；line 195）
 
+### 生成引用
+- `splash`：wave_med（Direct；line 28）
+- `wave_splash`：wave_med（Direct；line 19）
+
 
 ## 函数
 

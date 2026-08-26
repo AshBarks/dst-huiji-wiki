@@ -22,6 +22,9 @@
 - `lucy_ground_transform_fx`：lucy（Direct；line 234）
 - `lucy_transform_fx`：lucy（Direct；line 234）
 
+### 生成引用
+- `prefabs/lucy_classified.lua`：lucy（Direct；line 189）
+
 
 ## 函数
 

@@ -15,6 +15,11 @@
 - `prefabs/boneshard.lua`：skeleton, skeleton_notplayer, skeleton_notplayer_1, skeleton_notplayer_2, skeleton_player（Direct；line 236,237,238,239,240）
 - `prefabs/scrapbook_page.lua`：skeleton, skeleton_notplayer, skeleton_notplayer_1, skeleton_notplayer_2, skeleton_player（Direct；line 236,237,238,239,240）
 
+### 生成引用
+- `collapse_small`：skeleton, skeleton_notplayer, skeleton_notplayer_1, skeleton_notplayer_2, skeleton_player（Direct；line 32,53）
+- `prefabs/ash.lua`：skeleton_player（Direct；line 31）
+- `prefabs/shallow_grave.lua`：skeleton, skeleton_notplayer, skeleton_notplayer_1, skeleton_notplayer_2, skeleton_player（Direct；line 71）
+
 
 ## 函数
 

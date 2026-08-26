@@ -30,6 +30,9 @@
 - `prefabs/voidcloth.lua`：shadowthrall_mouth（Direct；line 317）
 - `shadowthrall_mouth_dupe_fx`：shadowthrall_mouth（Direct；line 317）
 
+### 生成引用
+- `shadowthrall_mouth_dupe_fx`：shadowthrall_mouth（Direct；line 203）
+
 ### 行为
 - `brains/shadowthrall_mouth_brain.lua`：ChaseAndAttack, Wander（prefabs/shadowthrall_mouth.lua#shadowthrall_mouth）
 

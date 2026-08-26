@@ -22,6 +22,9 @@
 - `dug_berrybush_juicy`：perdshrine（Direct；line 266）
 - `prefabs/ash.lua`：perdshrine（Direct；line 266）
 
+### 生成引用
+- `collapse_small`：perdshrine（Direct；line 30）
+
 
 ## 函数
 

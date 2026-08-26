@@ -12,6 +12,10 @@
 - `components/inventoryitem.lua`：graveurn（Direct；line 199）
 - `components/placer.lua`：graveurn（HelperExpanded；line 282）
 
+### 生成引用
+- `prefabs/gravestone.lua`：graveurn（Direct；line 61）
+- `prefabs/petals.lua`：graveurn（Direct；line 130）
+
 
 ## 函数
 

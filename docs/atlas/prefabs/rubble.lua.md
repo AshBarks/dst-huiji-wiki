@@ -22,6 +22,9 @@
 - `trinket_6`：rubble, rubble_low, rubble_med（Direct；line 125,126,127）
 - `yellowgem`：rubble, rubble_low, rubble_med（Direct；line 125,126,127）
 
+### 生成引用
+- `collapse_small`：rubble, rubble_low, rubble_med（Direct；line 22）
+
 
 ## 函数
 

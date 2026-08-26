@@ -42,6 +42,15 @@
 - `support_pillar_scaffold_blueprint`：minotaur（Direct；line 724）
 - `winter_ornament_boss_minotaur`：minotaur（Direct；line 724）
 
+### 生成引用
+- `minotaur_blood_big`：minotaur（Direct；line 322）
+- `minotaurchest`：minotaurchestspawner（Direct；line 607）
+- `prefabs/atrium_key.lua`：minotaurchestspawner（Direct；line 613）
+- `prefabs/bigshadowtentacle.lua`：minotaur_blood_big（Direct；line 300）
+- `prefabs/ruins_cavein_obstacle.lua`：minotaur（Direct；line 375）
+- `statue_transition`：minotaurchestspawner（Direct；line 644）
+- `statue_transition_2`：minotaurchestspawner（Direct；line 638）
+
 
 ## 函数
 

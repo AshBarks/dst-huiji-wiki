@@ -20,6 +20,11 @@
 - `prefabs/bullkelp_root.lua`：cannonball_rock（Direct；line 307）
 - `wave_splash`：cannonball_rock（Direct；line 307）
 
+### 生成引用
+- `cannonball_used`：cannonball_rock（Direct；line 131,165）
+- `crab_king_waterspout`：cannonball_rock（Direct；line 128）
+- `prefabs/bullkelp_root.lua`：cannonball_rock（Direct；line 111）
+
 
 ## 函数
 

@@ -21,6 +21,9 @@
 - `prefabs/ash.lua`：burnt_marsh_bush（Direct；line 226）
 - `prefabs/twigs.lua`：marsh_bush（Direct；line 225）
 
+### 生成引用
+- `burnt_marsh_bush_erode`：burnt_marsh_bush（Direct；line 67）
+
 
 ## 函数
 

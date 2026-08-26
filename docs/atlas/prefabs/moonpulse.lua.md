@@ -10,6 +10,9 @@
 - `moonpulse_fx`：moonpulse（Direct；line 257）
 - `prefabs/moonpulse.lua`：moonpulse_spawner（Direct；line 258）
 
+### 生成引用
+- `prefabs/moonpulse.lua`：moonpulse_spawner（Direct；line 236）
+
 
 ## 函数
 

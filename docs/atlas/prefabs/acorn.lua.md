@@ -27,6 +27,9 @@
 - `spoiled_food`：acorn（Direct；line 193）
 - `winter_deciduoustree`：acorn（Direct；line 193）
 
+### 生成引用
+- `acorn_sapling`：acorn（Direct；line 17）
+
 
 ## 函数
 

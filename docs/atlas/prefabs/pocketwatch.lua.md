@@ -19,6 +19,11 @@
 - `pocketwatch_warpback_fx`：pocketwatch_heal, pocketwatch_recall, pocketwatch_revive, pocketwatch_warp（Direct；line 423,424,426,428）
 - `pocketwatch_warpbackout_fx`：pocketwatch_heal, pocketwatch_recall, pocketwatch_revive, pocketwatch_warp（Direct；line 423,424,426,428）
 
+### 生成引用
+- `pocketwatch_revive_reviver`：pocketwatch_revive（Direct；line 122）
+- `prefabs/brokentool.lua`：pocketwatch_revive（Direct；line 139）
+- `prefabs/pocketwatch_portal.lua`：pocketwatch_recall（Direct；line 261）
+
 
 ## 函数
 

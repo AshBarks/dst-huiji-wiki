@@ -13,6 +13,9 @@
 - `components/inventoryitem.lua`：firepen（Direct；line 100）
 - `components/weapon.lua`：firepen（Direct；line 112）
 
+### 生成引用
+- `prefabs/cutgrass.lua`：firepen（Direct；line 35）
+
 
 ## 函数
 

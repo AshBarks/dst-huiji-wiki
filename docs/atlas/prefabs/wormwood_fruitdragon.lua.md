@@ -27,6 +27,10 @@
 - `dragonfruit`：wormwood_fruitdragon（Direct；line 194）
 - `wormwood_lunar_transformation_finish`：wormwood_fruitdragon（Direct；line 194）
 
+### 生成引用
+- `dragonfruit`：wormwood_fruitdragon（Direct；line 40）
+- `wormwood_lunar_transformation_finish`：wormwood_fruitdragon（Direct；line 44）
+
 ### 行为
 - `brains/wormwood_fruitdragonbrain.lua`：Follow, Wander（prefabs/wormwood_fruitdragon.lua#wormwood_fruitdragon）
 

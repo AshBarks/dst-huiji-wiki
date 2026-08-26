@@ -41,6 +41,11 @@
 - `waterplant_pollen_fx`：waterplant, waterplant_spawner_rough（Direct；line 583,585）
 - `waterplant_projectile`：waterplant, waterplant_spawner_rough（Direct；line 583,585）
 
+### 生成引用
+- `prefabs/waterplant_rock.lua`：waterplant（Direct；line 129,257）
+- `waterplant_base`：waterplant（Direct；line 421）
+- `waterplant_pollen_fx`：waterplant（Direct；line 304）
+
 ### 行为
 - `brains/waterplantbrain.lua`：FaceEntity, StandAndAttack（prefabs/waterplant.lua#waterplant）
 

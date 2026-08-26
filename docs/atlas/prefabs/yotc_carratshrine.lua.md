@@ -21,6 +21,10 @@
 - `prefabs/charcoal.lua`：yotc_carratshrine（Direct；line 298）
 - `redpouch_yotc`：yotc_carratshrine（Direct；line 298）
 
+### 生成引用
+- `collapse_small`：yotc_carratshrine（Direct；line 154）
+- `spoiled_food`：yotc_carratshrine（Direct；line 173）
+
 
 ## 函数
 

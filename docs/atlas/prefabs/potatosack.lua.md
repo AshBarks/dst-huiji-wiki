@@ -17,6 +17,9 @@
 - `components/symbolswapdata.lua`：potatosack（Direct；line 71）
 - `components/workable.lua`：potatosack（Direct；line 86）
 
+### 生成引用
+- `collapse_small`：potatosack（Direct；line 25）
+
 
 ## 函数
 

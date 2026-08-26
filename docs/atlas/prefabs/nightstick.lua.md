@@ -19,6 +19,9 @@
 - `electrichitsparks`：nightstick（Direct；line 198）
 - `prefabs/nightstickfire.lua`：nightstick（Direct；line 198）
 
+### 生成引用
+- `prefabs/nightstickfire.lua`：nightstick（Direct；line 40）
+
 
 ## 函数
 

@@ -39,6 +39,15 @@
 - `redpouch_yoth_small`：charlie_seat, charlie_stage, charlie_stage_lip, charlie_stage_post（Direct；line 675,676,677,678）
 - `shadow_puff_solid`：charlie_seat, charlie_stage, charlie_stage_lip, charlie_stage_post（Direct；line 675,676,677,678）
 
+### 生成引用
+- `charlie_stage_lip`：charlie_stage_post（Direct；line 297）
+- `playbill_the_doll`：charlie_stage_post（Direct；line 286）
+- `playbill_the_veil`：charlie_stage_post（Direct；line 420）
+- `prefabs/charlie_lecturn.lua`：charlie_stage_post（Direct；line 278）
+- `prefabs/charlie_stage.lua`：charlie_stage_post（Direct；line 300）
+- `prefabs/hedgehound_bush.lua`：charlie_stage_post（Direct；line 148）
+- `shadow_puff_solid`：charlie_stage_post（Direct；line 425）
+
 
 ## 函数
 

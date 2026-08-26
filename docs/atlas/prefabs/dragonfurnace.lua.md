@@ -19,6 +19,9 @@
 ### 预制体依赖
 - `collapse_big`：dragonflyfurnace, saladfurnace（Direct；line 238,239）
 
+### 生成引用
+- `collapse_big`：dragonflyfurnace, saladfurnace（Direct；line 21）
+
 
 ## 函数
 

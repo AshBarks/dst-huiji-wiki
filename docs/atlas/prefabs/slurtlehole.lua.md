@@ -21,6 +21,9 @@
 - `prefabs/slurtleslime.lua`：slurtlehole（Direct；line 174）
 - `snurtle`：slurtlehole（Direct；line 174）
 
+### 生成引用
+- `explode_small_slurtlehole`：slurtlehole（Direct；line 79）
+
 
 ## 函数
 

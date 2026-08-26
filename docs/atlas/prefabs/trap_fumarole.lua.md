@@ -20,6 +20,9 @@
 - `fumarole_ember`：trap_fumarole（Direct；line 636）
 - `trap_fumarole_burn_fx`：trap_fumarole（Direct；line 636）
 
+### 生成引用
+- `fumarole_ember`：trap_fumarole（Direct；line 79）
+
 
 ## 函数
 

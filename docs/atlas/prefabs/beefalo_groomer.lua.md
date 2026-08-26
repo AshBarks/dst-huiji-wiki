@@ -20,6 +20,9 @@
 - `beefalo_groomer_item`：beefalo_groomer（Direct；line 275）
 - `collapse_big`：beefalo_groomer（Direct；line 275）
 
+### 生成引用
+- `collapse_big`：beefalo_groomer（Direct；line 45）
+
 
 ## 函数
 

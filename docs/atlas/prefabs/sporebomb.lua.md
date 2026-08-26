@@ -11,6 +11,9 @@
 ### 预制体依赖
 - `prefabs/sporecloud.lua`：sporebomb（Direct；line 184）
 
+### 生成引用
+- `prefabs/sporecloud.lua`：sporebomb（Direct；line 79）
+
 
 ## 函数
 

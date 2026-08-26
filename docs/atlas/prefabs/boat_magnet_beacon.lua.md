@@ -21,6 +21,9 @@
 ### 预制体依赖
 - `collapse_small`：boat_magnet_beacon（Direct；line 110）
 
+### 生成引用
+- `collapse_small`：boat_magnet_beacon（Direct；line 20）
+
 
 ## 函数
 

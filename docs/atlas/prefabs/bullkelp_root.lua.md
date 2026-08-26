@@ -19,6 +19,10 @@
 - `components/stackable.lua`：bullkelp_root（Direct；line 93）
 - `components/weapon.lua`：bullkelp_root（Direct；line 99）
 
+### 生成引用
+- `prefabs/bullkelp_plant.lua`：bullkelp_root（Direct；line 54）
+- `prefabs/impact.lua`：bullkelp_root（Direct；line 40）
+
 
 ## 函数
 

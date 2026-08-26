@@ -13,6 +13,10 @@
 - `carnivalgame_wheelspin_hand_outer`：carnivalgame_wheelspin_station（Direct；line 422）
 - `prefabs/carnival_prizeticket.lua`：carnivalgame_wheelspin_station（Direct；line 422）
 
+### 生成引用
+- `carnivalgame_wheelspin_hand_inner`：carnivalgame_wheelspin_station（Direct；line 298）
+- `carnivalgame_wheelspin_hand_outer`：carnivalgame_wheelspin_station（Direct；line 305）
+
 
 ## 函数
 

@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `marblebean_sapling`：marblebean（Direct；line 62）
 
+### 生成引用
+- `marblebean_sapling`：marblebean（Direct；line 14）
+
 
 ## 函数
 

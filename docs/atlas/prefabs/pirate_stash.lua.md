@@ -10,6 +10,9 @@
 - `components/preserver.lua`：pirate_stash（Direct；line 226）
 - `components/workable.lua`：pirate_stash（Direct；line 230）
 
+### 生成引用
+- `collapse_small`：pirate_stash（Direct；line 58）
+
 
 ## 函数
 

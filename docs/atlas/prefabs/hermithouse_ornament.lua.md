@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `hermithouse_ornament_fx`：hermithouse_ornament（Direct；line 175）
 
+### 生成引用
+- `hermithouse_ornament_fx`：hermithouse_ornament（Direct；line 119）
+
 
 ## 函数
 

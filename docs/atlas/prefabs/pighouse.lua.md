@@ -19,6 +19,9 @@
 - `prefabs/pigman.lua`：pighouse（Direct；line 452）
 - `splash_sink`：pighouse（Direct；line 452）
 
+### 生成引用
+- `collapse_big`：pighouse（Direct；line 187）
+
 
 ## 函数
 

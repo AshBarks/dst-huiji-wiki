@@ -16,6 +16,10 @@
 - `prefabs/pondfish.lua`：oasislake（Direct；line 274）
 - `wetpouch`：oasislake（Direct；line 274）
 
+### 生成引用
+- `prefabs/fireflies.lua`：oasislake（Direct；line 49）
+- `prefabs/succulent_plant.lua`：oasislake（Direct；line 72）
+
 
 ## 函数
 

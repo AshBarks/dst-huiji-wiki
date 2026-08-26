@@ -25,6 +25,12 @@
 - `prefabs/ash.lua`：portablespicer（Direct；line 374）
 - `prefabs/portablespicer.lua`：portablespicer_item（Direct；line 376）
 
+### 生成引用
+- `collapse_small`：portablespicer（Direct；line 58）
+- `portablespicer_item`：portablespicer（Direct；line 45）
+- `prefabs/ash.lua`：portablespicer（Direct；line 220）
+- `prefabs/portablespicer.lua`：portablespicer_item（Direct；line 317）
+
 
 ## 函数
 

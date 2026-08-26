@@ -30,6 +30,10 @@
 - `prefabs/carrot.lua`：wormwood_carrat（Direct；line 184）
 - `wormwood_lunar_transformation_finish`：wormwood_carrat（Direct；line 184）
 
+### 生成引用
+- `prefabs/carrot.lua`：wormwood_carrat（Direct；line 41）
+- `wormwood_lunar_transformation_finish`：wormwood_carrat（Direct；line 47）
+
 ### 行为
 - `brains/wormwood_carratbrain.lua`：Follow, RunAway, Wander（prefabs/wormwood_carrat.lua#wormwood_carrat）
 

@@ -37,6 +37,9 @@
 - `winter_ornament_boss_celestialchampion3`：alterguardian_phase3（Direct；line 477）
 - `winter_ornament_boss_celestialchampion4`：alterguardian_phase3（Direct；line 477）
 
+### 生成引用
+- `alterguardian_phase3trapprojectile`：alterguardian_phase3（Direct；line 143）
+
 
 ## 函数
 

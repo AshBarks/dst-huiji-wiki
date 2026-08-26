@@ -44,6 +44,10 @@
 - `squidcorpse`：squid（Direct；line 376）
 - `squideyelight`：squid（Direct；line 376）
 
+### 生成引用
+- `inksplat`：squid（Direct；line 56）
+- `squideyelight`：squid（Direct；line 290）
+
 ### 行为
 - `brains/squidbrain.lua`：AttackWall, ChaseAndAttack, DoAction, Wander（prefabs/squid.lua#squid）
 

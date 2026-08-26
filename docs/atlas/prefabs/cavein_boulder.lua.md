@@ -26,6 +26,10 @@
 - `prefabs/underwater_salvageable.lua`：cavein_boulder（Direct；line 693）
 - `splash_green`：cavein_boulder（Direct；line 693）
 
+### 生成引用
+- `cavein_dust_low`：cavein_boulder（Direct；line 498,505）
+- `prefabs/rock_break_fx.lua`：cavein_boulder（Direct；line 102）
+
 
 ## 函数
 

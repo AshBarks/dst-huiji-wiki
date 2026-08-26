@@ -20,6 +20,9 @@
 - `prefabs/poopcloud.lua`：soil_amender（Direct；line 251）
 - `soil_amender_fermented`：soil_amender（Direct；line 251）
 
+### 生成引用
+- `messagebottleempty`：soil_amender, soil_amender_fermented（Direct；line 46）
+
 
 ## 函数
 

@@ -13,6 +13,9 @@
 - `components/propagator.lua`：yotc_carrat_race_checkpoint（HelperExpanded；line 136）
 - `components/workable.lua`：yotc_carrat_race_checkpoint（Direct；line 126）
 
+### 生成引用
+- `collapse_big`：yotc_carrat_race_checkpoint（Direct；line 43）
+
 
 ## 函数
 

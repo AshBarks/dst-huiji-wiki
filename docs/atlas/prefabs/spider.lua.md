@@ -47,6 +47,9 @@
 - `spider_web_spit_acidinfused`：spider, spider_dropper, spider_healer, spider_hider, spider_moon, spider_spitter, spider_warrior, spider_water（Direct；line 1087,1088,1089,1090,1091,1092,1093,1094）
 - `spidercorpse`：spider, spider_dropper, spider_healer, spider_hider, spider_moon, spider_spitter, spider_warrior, spider_water（Direct；line 1087,1088,1089,1090,1091,1092,1093,1094）
 
+### 生成引用
+- `prefabs/moonspider_spike.lua`：spider_moon（Direct；line 458）
+
 
 ## 函数
 

@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `collapse_small`：cartographydesk（Direct；line 134）
 
+### 生成引用
+- `collapse_small`：cartographydesk（Direct；line 18）
+
 
 ## 函数
 

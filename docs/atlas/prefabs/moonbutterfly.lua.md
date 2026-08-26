@@ -30,6 +30,9 @@
 - `moonbutterfly_sapling`：moonbutterfly（Direct；line 220）
 - `prefabs/moonbutterflywings.lua`：moonbutterfly（Direct；line 220）
 
+### 生成引用
+- `moonbutterfly_sapling`：moonbutterfly（Direct；line 70）
+
 
 ## 函数
 

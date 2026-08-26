@@ -14,6 +14,10 @@
 - `purebrilliance_mark_hit_fx`：slingshotammo_purebrilliance_debuff（Direct；line 590）
 - `slingshotammo_purebrilliance_debuff_fx`：slingshotammo_purebrilliance_debuff（Direct；line 590）
 
+### 生成引用
+- `purebrilliance_mark_hit_fx`：slingshotammo_purebrilliance_debuff（Direct；line 112）
+- `slingshotammo_purebrilliance_debuff_fx`：slingshotammo_purebrilliance_debuff, slingshotammo_purebrilliance_debuff_fx（Direct；line 194,296）
+
 
 ## 函数
 

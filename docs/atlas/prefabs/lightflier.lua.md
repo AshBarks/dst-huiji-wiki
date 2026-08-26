@@ -31,6 +31,9 @@
 ### 预制体依赖
 - `prefabs/formationleader.lua`：lightflier（Direct；line 538）
 
+### 生成引用
+- `prefabs/formationleader.lua`：lightflier（Direct；line 199）
+
 
 ## 函数
 

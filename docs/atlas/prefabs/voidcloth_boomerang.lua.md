@@ -28,6 +28,11 @@
 - `voidcloth_boomerang_launch_fx`：voidcloth_boomerang（Direct；line 675）
 - `voidcloth_boomerang_proj`：voidcloth_boomerang（Direct；line 675）
 
+### 生成引用
+- `voidcloth_boomerang_fx`：voidcloth_boomerang（Direct；line 294）
+- `voidcloth_boomerang_impact_fx`：voidcloth_boomerang_proj（Direct；line 365）
+- `voidcloth_boomerang_launch_fx`：voidcloth_boomerang_proj（Direct；line 461）
+
 
 ## 函数
 

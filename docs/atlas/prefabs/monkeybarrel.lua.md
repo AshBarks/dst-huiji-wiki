@@ -20,6 +20,9 @@
 - `prefabs/monkey.lua`：monkeybarrel（Direct；line 258）
 - `prefabs/poop.lua`：monkeybarrel（Direct；line 258）
 
+### 生成引用
+- `collapse_small`：monkeybarrel（Direct；line 50）
+
 
 ## 函数
 

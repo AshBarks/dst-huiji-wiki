@@ -19,6 +19,10 @@
 - `redlanternbody`：redlantern, yots_redlantern（Direct；line 422,425）
 - `redlanternlight`：redlantern, yots_redlantern（Direct；line 422,425）
 
+### 生成引用
+- `redlanternbody`：redlantern, yots_redlantern（Direct；line 150）
+- `redlanternlight`：redlantern, yots_redlantern（Direct；line 64）
+
 
 ## 函数
 

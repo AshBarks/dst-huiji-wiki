@@ -34,6 +34,9 @@
 - `mask_treehat`：statueharp_hedgespawner（Direct；line 216）
 - `prefabs/rock_break_fx.lua`：statueharp_hedgespawner（Direct；line 216）
 
+### 生成引用
+- `prefabs/hedgehound_bush.lua`：statueharp_hedgespawner（Direct；line 71）
+
 
 ## 函数
 

@@ -18,6 +18,10 @@
 - `mastupgrade_lightningrod_fx`：mastupgrade_lightningrod_item（Direct；line 264）
 - `mastupgrade_lightningrod_top`：mastupgrade_lightningrod_item（Direct；line 264）
 
+### 生成引用
+- `collapse_small`：mastupgrade_lightningrod（Direct；line 30）
+- `mastupgrade_lightningrod_fx`：mastupgrade_lightningrod（Direct；line 40）
+
 
 ## 函数
 

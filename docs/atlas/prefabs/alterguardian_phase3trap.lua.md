@@ -16,6 +16,13 @@
 - `prefabs/alterguardian_phase3trap.lua`：alterguardian_phase3trapprojectile（Direct；line 359）
 - `prefabs/gestalt.lua`：alterguardian_phase3trap（Direct；line 360）
 
+### 生成引用
+- `alterguardian_phase3trapgroundfx`：alterguardian_phase3trap（Direct；line 208）
+- `alterguardian_phase3trappst`：alterguardian_phase3trap（Direct；line 277）
+- `collapse_small`：alterguardian_phase3trapprojectile（Direct；line 66）
+- `prefabs/alterguardian_phase3trap.lua`：alterguardian_phase3trapprojectile（Direct；line 91）
+- `prefabs/gestalt.lua`：alterguardian_phase3trap（Direct；line 241）
+
 
 ## 函数
 

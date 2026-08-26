@@ -73,6 +73,21 @@
 - `walkingplank_ancient`：boat_ancient（Direct；line 1647）
 - `walkingplank_grass`：boat, boat_pirate（Direct；line 1639,1645）
 
+### 生成引用
+- `boat_ancient_container`：boat_ancient（Direct；line 987）
+- `boat_grass_erode`：boat_grass（Direct；line 862）
+- `boat_grass_erode_water`：boat_grass（Direct；line 865）
+- `boat_ice_deploy_blocker`：boat_ice, boat_ice_crabking（Direct；line 1365）
+- `boat_otterden_erode`：boat_otterden（Direct；line 1244）
+- `boat_otterden_erode_water`：boat_otterden（Direct；line 1247）
+- `fx_boat_pop`：boat, boat_ancient, boat_pirate（Direct；line 797,936,1015）
+- `fx_grass_boat_fluff`：boat_grass, boat_otterden（Direct；line 220）
+- `mining_ice_fx`：boat_ice, boat_ice_crabking（Direct；line 1399）
+- `prefabs/boat_leak.lua`：boat, boat_ancient, boat_ice, boat_ice_crabking, boat_pirate（Direct；line 192）
+- `prefabs/burnable_locator_medium.lua`：boat, boat_ancient, boat_grass, boat_ice, boat_ice_crabking, boat_otterden, boat_pirate（Direct；line 550,554,558,562,566）
+- `prefabs/otterden.lua`：boat_otterden（Direct；line 1106）
+- `splash_green_small`：boat_grass, boat_otterden（Direct；line 221）
+
 
 ## 函数
 

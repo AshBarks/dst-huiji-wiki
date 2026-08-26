@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `vault_decon_mister_fx`：vault_decon_mister（Direct；line 225）
 
+### 生成引用
+- `vault_decon_mister_fx`：vault_decon_mister（Direct；line 41）
+
 
 ## 函数
 

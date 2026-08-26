@@ -30,6 +30,9 @@
 ### 预制体依赖
 - `prefabs/winona_battery_sparks.lua`：winona_storage_robot（Direct；line 827）
 
+### 生成引用
+- `prefabs/winona_battery_sparks.lua`：winona_storage_robot（Direct；line 614）
+
 ### 行为
 - `brains/storage_robotbrain.lua`：StandStill（prefabs/winona_storage_robot.lua#winona_storage_robot）
 

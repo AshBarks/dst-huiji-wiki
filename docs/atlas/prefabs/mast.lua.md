@@ -30,6 +30,9 @@
 - `prefabs/mastupgrade_lamp.lua`：mast, mast_malbatross, mast_yotd（Direct；line 613,617,621）
 - `prefabs/mastupgrade_lightningrod.lua`：mast, mast_malbatross, mast_yotd（Direct；line 613,617,621）
 
+### 生成引用
+- `collapse_small`：mast, mast_malbatross, mast_yotd（Direct；line 76）
+
 
 ## 函数
 

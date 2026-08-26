@@ -23,6 +23,9 @@
 - `spoiled_food`：tree_rock_seed（Direct；line 106）
 - `tree_rock_sapling`：tree_rock_seed（Direct；line 106）
 
+### 生成引用
+- `tree_rock_sapling`：tree_rock_seed（Direct；line 18）
+
 
 ## 函数
 

@@ -23,6 +23,9 @@
 - `prefabs/brilliance_projectile_fx.lua`：staff_lunarplant（Direct；line 271）
 - `staff_lunarplant_fx`：staff_lunarplant（Direct；line 271）
 
+### 生成引用
+- `staff_lunarplant_fx`：staff_lunarplant（Direct；line 203）
+
 
 ## 函数
 

@@ -26,6 +26,11 @@
 - `prefabs/shadow_battleaxe_classified.lua`：shadow_battleaxe（Direct；line 1032）
 - `shadow_battleaxe_fx`：shadow_battleaxe（Direct；line 1032）
 
+### 生成引用
+- `prefabs/hitsparks_fx.lua`：shadow_battleaxe（Direct；line 258）
+- `prefabs/shadow_battleaxe_classified.lua`：shadow_battleaxe（Direct；line 774）
+- `shadow_battleaxe_fx`：shadow_battleaxe（Direct；line 815）
+
 
 ## 函数
 

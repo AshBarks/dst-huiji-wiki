@@ -19,6 +19,9 @@
 - `prefabs/twigs.lua`：mermhead, pighead（Direct；line 179,180）
 - `spoiled_food`：mermhead（Direct；line 180）
 
+### 生成引用
+- `collapse_small`：mermhead, pighead（Direct；line 31）
+
 
 ## 函数
 

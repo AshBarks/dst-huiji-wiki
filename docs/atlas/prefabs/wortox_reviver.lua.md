@@ -19,6 +19,10 @@
 - `wortox_teleport_reviver_bottom`：wortox_reviver（Direct；line 294）
 - `wortox_teleport_reviver_top`：wortox_reviver（Direct；line 294）
 
+### 生成引用
+- `prefabs/wortox_soul.lua`：wortox_reviver（Direct；line 104,155）
+- `wortox_reviver_body`：wortox_reviver（Direct；line 187）
+
 
 ## 函数
 

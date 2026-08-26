@@ -19,6 +19,9 @@
 - `globalmapiconunderfog`：oceanwhirlbigportal（Direct；line 580）
 - `wave_med`：oceanwhirlbigportal（Direct；line 580）
 
+### 生成引用
+- `globalmapiconunderfog`：oceanwhirlbigportal（Direct；line 33）
+
 
 ## 函数
 

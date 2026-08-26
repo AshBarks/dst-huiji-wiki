@@ -24,6 +24,9 @@
 ### 预制体依赖
 - `collapse_big`：punchingbag, punchingbag_lunar, punchingbag_shadow（Direct；line 305,308,311）
 
+### 生成引用
+- `collapse_big`：punchingbag, punchingbag_lunar, punchingbag_shadow（Direct；line 94）
+
 
 ## 函数
 

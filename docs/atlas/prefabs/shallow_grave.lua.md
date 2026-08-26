@@ -14,6 +14,10 @@
 - `collapse_small`：shallow_grave, shallow_grave_player（Direct；line 201,202）
 - `prefabs/boneshard.lua`：shallow_grave, shallow_grave_player（Direct；line 201,202）
 
+### 生成引用
+- `collapse_small`：shallow_grave, shallow_grave_player（Direct；line 24,45）
+- `prefabs/ash.lua`：shallow_grave_player（Direct；line 23）
+
 
 ## 函数
 

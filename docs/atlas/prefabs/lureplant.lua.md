@@ -27,6 +27,9 @@
 - `plantmeat`：lureplant（Direct；line 441）
 - `prefabs/eyeplant.lua`：lureplant（Direct；line 441）
 
+### 生成引用
+- `plantmeat`：lureplant（Direct；line 192）
+
 
 ## 函数
 

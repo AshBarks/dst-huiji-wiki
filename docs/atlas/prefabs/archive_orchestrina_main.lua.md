@@ -13,6 +13,9 @@
 - `archive_orchestrina_small`：archive_orchestrina_main（Direct；line 505）
 - `prefabs/archive_lockbox.lua`：archive_orchestrina_main（Direct；line 505）
 
+### 生成引用
+- `archive_orchestrina_base`：archive_orchestrina_main（Direct；line 410）
+
 
 ## 函数
 

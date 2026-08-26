@@ -237,7 +237,7 @@ fn assemble(
     let mut edges_out: Vec<AssocEdge> = Vec::with_capacity(resolution.edges.len());
     for edge in resolution.edges {
         let target = match edge.kind {
-            EdgeKind::PrefabDep => {
+            EdgeKind::PrefabDep | EdgeKind::SpawnPrefab => {
                 let candidate = format!("prefabs/{}.lua", edge.target);
                 if known_prefab_files.contains(candidate.as_str()) {
                     candidate
@@ -688,6 +688,44 @@ return Prefab("hound", fndefault, {}, {})
             owners.get("OnSave").map(Vec::as_slice),
             Some(&["hound".to_string()][..])
         );
+    }
+
+    #[test]
+    fn spawn_prefab_builds_reverse_generation_edges() {
+        const HOUND_SRC: &str = r#"
+local function fnhound()
+    local inst = CreateEntity()
+    inst:AddComponent("health")
+    return inst
+end
+return Prefab("hound", fnhound, {}, {})
+"#;
+        const SPAWNER_SRC: &str = r#"
+local function fnspawner()
+    SpawnPrefab("hound")
+    SpawnPrefab(dynamic)
+    return CreateEntity()
+end
+return Prefab("spawner", fnspawner, {}, {})
+"#;
+        let files: Vec<(String, String)> = vec![
+            ("prefabs/hound.lua".into(), HOUND_SRC.into()),
+            ("prefabs/spawner.lua".into(), SPAWNER_SRC.into()),
+        ];
+        let artifact = build_from_sources(&files).unwrap();
+        let spawn_edges: Vec<_> = artifact
+            .edges
+            .iter()
+            .filter(|e| e.kind == EdgeKind::SpawnPrefab)
+            .collect();
+        assert_eq!(spawn_edges.len(), 1);
+        assert_eq!(spawn_edges[0].prefab_variant, "spawner");
+        // Known prefab target is promoted to its file path.
+        assert_eq!(spawn_edges[0].target, "prefabs/hound.lua");
+        assert!(artifact.reverse["prefabs/hound.lua"]
+            .contains(&"prefabs/spawner.lua#spawner".to_string()));
+        // SpawnPrefab must not create phantom fn ownership.
+        assert!(!artifact.fn_owners["prefabs/spawner.lua"].contains_key("SpawnPrefab"));
     }
 
     #[test]

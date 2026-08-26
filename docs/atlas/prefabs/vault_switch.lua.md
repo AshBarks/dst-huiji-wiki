@@ -11,6 +11,9 @@
 ### 预制体依赖
 - `prefabs/vault_switch.lua`：vault_switch_base（Direct；line 130）
 
+### 生成引用
+- `prefabs/vault_switch.lua`：vault_switch_base（Direct；line 114）
+
 
 ## 函数
 

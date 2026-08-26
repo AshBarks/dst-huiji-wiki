@@ -11,6 +11,9 @@
 ### 预制体依赖
 - `fused_shadeling_bomb_scorch`：shadowthrall_projectile_fx（Direct；line 122）
 
+### 生成引用
+- `fused_shadeling_bomb_scorch`：shadowthrall_projectile_fx（Direct；line 53）
+
 
 ## 函数
 

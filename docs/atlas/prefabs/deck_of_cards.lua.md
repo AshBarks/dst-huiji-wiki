@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `playing_card`：deck_of_cards（Direct；line 425）
 
+### 生成引用
+- `playing_card`：deck_of_cards（Direct；line 168）
+
 
 ## 函数
 

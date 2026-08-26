@@ -39,6 +39,11 @@
 - `splash_green_large`：sharkboi（Direct；line 804）
 - `winter_ornament_boss_sharkboi`：sharkboi（Direct；line 804）
 
+### 生成引用
+- `chesspiece_sharkboi_sketch`：sharkboi（Direct；line 335）
+- `gift`：sharkboi（Direct；line 340）
+- `prefabs/bootleg.lua`：sharkboi（Direct；line 366）
+
 ### 行为
 - `brains/sharkboibrain.lua`：ChaseAndAttack, ChattyNode, FaceEntity, Leash, Wander（prefabs/sharkboi.lua#sharkboi）
 

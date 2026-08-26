@@ -16,6 +16,10 @@
 - `collapse_small`：lightning_rod（Direct；line 208）
 - `lightning_rod_fx`：lightning_rod（Direct；line 208）
 
+### 生成引用
+- `collapse_small`：lightning_rod（Direct；line 18）
+- `lightning_rod_fx`：lightning_rod（Direct；line 35）
+
 
 ## 函数
 

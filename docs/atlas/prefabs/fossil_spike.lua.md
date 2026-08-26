@@ -11,6 +11,10 @@
 - `erode_ash`：fossilspike（Direct；line 256）
 - `fossilspike_base`：fossilspike（Direct；line 256）
 
+### 生成引用
+- `erode_ash`：fossilspike（Direct；line 119）
+- `fossilspike_base`：fossilspike（Direct；line 154）
+
 
 ## 函数
 

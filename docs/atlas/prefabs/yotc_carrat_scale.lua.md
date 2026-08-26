@@ -17,6 +17,9 @@
 - `components/trader.lua`：yotc_carrat_scale（Direct；line 351）
 - `components/workable.lua`：yotc_carrat_scale（Direct；line 339）
 
+### 生成引用
+- `collapse_small`：yotc_carrat_scale（Direct；line 68）
+
 
 ## 函数
 

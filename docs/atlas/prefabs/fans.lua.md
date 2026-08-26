@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `tornado`：perdfan（Direct；line 168）
 
+### 生成引用
+- `tornado`：perdfan（Direct；line 56）
+
 
 ## 函数
 

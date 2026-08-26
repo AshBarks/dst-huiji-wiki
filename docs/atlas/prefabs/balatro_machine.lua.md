@@ -16,6 +16,10 @@
 ### 状态图
 - `stategraphs/SGbalatro_machine.lua`：balatro_machine（Direct；line 739）
 
+### 生成引用
+- `die_fx`：balatro_machine（Direct；line 100,121,165）
+- `record`：balatro_machine（Direct；line 117）
+
 
 ## 函数
 

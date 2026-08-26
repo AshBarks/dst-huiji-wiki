@@ -22,6 +22,11 @@
 - `wortox_nabbag_body_fx`：wortox_nabbag_body（Direct；line 510）
 - `wortox_nabbag_body_soulfx`：wortox_nabbag_body（Direct；line 510）
 
+### 生成引用
+- `wortox_nabbag_body`：wortox_nabbag（Direct；line 122）
+- `wortox_nabbag_body_fx`：wortox_nabbag_body（Direct；line 274）
+- `wortox_nabbag_body_soulfx`：wortox_nabbag_body（Direct；line 279）
+
 
 ## 函数
 

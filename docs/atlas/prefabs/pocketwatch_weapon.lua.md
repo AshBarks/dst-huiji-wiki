@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `prefabs/pocketwatch_weapon_fx.lua`：pocketwatch_weapon（Direct；line 189）
 
+### 生成引用
+- `prefabs/pocketwatch_weapon_fx.lua`：pocketwatch_weapon（Direct；line 28）
+
 
 ## 函数
 

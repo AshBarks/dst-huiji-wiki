@@ -38,6 +38,10 @@
 - `sleepbomb_blueprint`：toadstool_dark（Direct；line 1047）
 - `toadstoolcorpse`：toadstool, toadstool_dark（Direct；line 1046,1047）
 
+### 生成引用
+- `collapse_small`：toadstool, toadstool_dark（Direct；line 785）
+- `prefabs/shroom_skin.lua`：toadstool, toadstool_dark（Direct；line 699）
+
 ### 行为
 - `brains/toadstoolbrain.lua`：ChaseAndAttack, Leash, Wander（prefabs/toadstool.lua#toadstool, prefabs/toadstool.lua#toadstool_dark）
 

@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `collapse_small`：yotb_sewingmachine（Direct；line 210）
 
+### 生成引用
+- `collapse_small`：yotb_sewingmachine（Direct；line 37）
+
 
 ## 函数
 

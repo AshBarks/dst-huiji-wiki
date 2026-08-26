@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `prefabs/explode_small.lua`：slurtleslime（Direct；line 88）
 
+### 生成引用
+- `prefabs/explode_small.lua`：slurtleslime（Direct；line 23）
+
 
 ## 函数
 

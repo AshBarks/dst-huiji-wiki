@@ -11,6 +11,10 @@
 - `lunarrift_terraformer_visual`：rift_terraformer（Direct；line 454）
 - `prefabs/lunarrift_terraformer_explosion.lua`：rift_terraformer（Direct；line 454）
 
+### 生成引用
+- `lunarrift_terraformer_visual`：rift_terraformer（Direct；line 118）
+- `prefabs/lunarrift_terraformer_explosion.lua`：lunarrift_terraformer_visual, rift_terraformer（Direct；line 92,275,381）
+
 
 ## 函数
 

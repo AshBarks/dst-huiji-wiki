@@ -20,6 +20,9 @@
 - `components/stackable.lua`：compostwrap（Direct；line 102）
 - `components/timer.lua`：compostheal_buff（Direct；line 204）
 
+### 生成引用
+- `prefabs/poopcloud.lua`：compostwrap（Direct；line 35）
+
 
 ## 函数
 

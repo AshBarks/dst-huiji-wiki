@@ -8,6 +8,9 @@
 - `components/placer.lua`：gridplacer, gridplacer_farmablesoil, gridplacer_group_outline（Direct；line 36,183,327）
 - `components/updatelooper.lua`：gridplacer_turfhat（Direct；line 145）
 
+### 生成引用
+- `prefabs/gridplacer.lua`：gridplacer_group_outline（Direct；line 259）
+
 
 ## 函数
 

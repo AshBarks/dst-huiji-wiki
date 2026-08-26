@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `collapse_small`：succulent_potted（Direct；line 97）
 
+### 生成引用
+- `collapse_small`：succulent_potted（Direct；line 34）
+
 
 ## 函数
 

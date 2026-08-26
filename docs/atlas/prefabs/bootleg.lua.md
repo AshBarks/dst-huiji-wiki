@@ -17,6 +17,10 @@
 - `dirt_puff`：bootleg（Direct；line 164）
 - `prefabs/oceanwhirlportal.lua`：bootleg（Direct；line 164）
 
+### 生成引用
+- `dirt_puff`：bootleg（Direct；line 59）
+- `prefabs/oceanwhirlportal.lua`：bootleg（Direct；line 12,15）
+
 
 ## 函数
 

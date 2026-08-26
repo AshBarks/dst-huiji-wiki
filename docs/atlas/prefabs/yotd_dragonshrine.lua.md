@@ -19,6 +19,9 @@
 - `collapse_small`：yotd_dragonshrine（Direct；line 292）
 - `prefabs/ash.lua`：yotd_dragonshrine（Direct；line 292）
 
+### 生成引用
+- `collapse_small`：yotd_dragonshrine（Direct；line 149）
+
 
 ## 函数
 

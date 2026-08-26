@@ -12,6 +12,11 @@
 - `alterguardian_laserscorch`：alterguardian_laser, alterguardian_laserempty（Direct；line 488,489）
 - `alterguardian_lasertrail`：alterguardian_laser, alterguardian_laserempty（Direct；line 488,489）
 
+### 生成引用
+- `alterguardian_laserhit`：alterguardian_laser, alterguardian_laserempty（Direct；line 163）
+- `alterguardian_laserscorch`：alterguardian_laser, alterguardian_laserempty（Direct；line 58）
+- `alterguardian_lasertrail`：alterguardian_laser, alterguardian_laserempty（Direct；line 65）
+
 
 ## 函数
 

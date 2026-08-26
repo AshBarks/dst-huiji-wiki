@@ -19,6 +19,10 @@
 - `prefabs/ash.lua`：coldfirepit（Direct；line 189）
 - `prefabs/coldfirefire.lua`：coldfirepit（Direct；line 189）
 
+### 生成引用
+- `collapse_small`：coldfirepit（Direct；line 19）
+- `prefabs/ash.lua`：coldfirepit（Direct；line 18）
+
 
 ## 函数
 

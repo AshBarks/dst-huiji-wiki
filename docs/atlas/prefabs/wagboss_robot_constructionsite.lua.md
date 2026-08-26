@@ -19,6 +19,9 @@
 - `prefabs/wagboss_robot.lua`：wagboss_robot_constructionsite（Direct；line 334）
 - `prefabs/wagboss_robot_constructionsite.lua`：wagboss_robot_constructionsite_kit（Direct；line 335）
 
+### 生成引用
+- `prefabs/wagboss_robot_constructionsite.lua`：wagboss_robot_constructionsite_kit（Direct；line 142）
+
 
 ## 函数
 

@@ -29,6 +29,11 @@
 - `archive_switch_pad`：archive_switch（Direct；line 1053）
 - `grotto_war_sfx`：archive_switch（Direct；line 1053）
 
+### 生成引用
+- `archive_dispencer_sfx`：archive_switch（Direct；line 582）
+- `archive_switch_pad`：archive_switch（Direct；line 829）
+- `opalpreciousgem`：archive_switch（Direct；line 756）
+
 ### 行为
 - `brains/archive_securitypulsebrain.lua`：Follow, StandStill（prefabs/archive_props.lua#archive_security_pulse）
 

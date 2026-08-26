@@ -11,6 +11,10 @@
 - `prefabs/poop.lua`：monkeyprojectile（Direct；line 90）
 - `splash_ocean`：monkeyprojectile（Direct；line 90）
 
+### 生成引用
+- `prefabs/poop.lua`：monkeyprojectile（Direct；line 23）
+- `splash_ocean`：monkeyprojectile（Direct；line 16）
+
 
 ## 函数
 

@@ -13,6 +13,9 @@
 - `components/inventoryitem.lua`：whip（Direct；line 130）
 - `components/weapon.lua`：whip（Direct；line 118）
 
+### 生成引用
+- `prefabs/impact.lua`：whip（Direct；line 69）
+
 
 ## 函数
 

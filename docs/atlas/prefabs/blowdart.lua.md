@@ -18,6 +18,9 @@
 - `electrichitsparks`：blowdart_yellow（Direct；line 316）
 - `prefabs/impact.lua`：blowdart_fire, blowdart_pipe, blowdart_sleep, blowdart_walrus, blowdart_yellow（Direct；line 313,314,315,316,317）
 
+### 生成引用
+- `prefabs/impact.lua`：blowdart_fire, blowdart_pipe, blowdart_sleep, blowdart_walrus, blowdart_yellow（Direct；line 32）
+
 
 ## 函数
 

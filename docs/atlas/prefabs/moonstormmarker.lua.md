@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `prefabs/globalmapicon.lua`：moonstormmarker_big（Direct；line 67）
 
+### 生成引用
+- `prefabs/globalmapicon.lua`：monstormmarker_debug, moonstormmarker_big（Direct；line 29）
+
 
 ## 函数
 

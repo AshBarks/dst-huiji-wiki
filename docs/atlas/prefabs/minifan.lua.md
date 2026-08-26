@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `prefabs/fan_wheel.lua`：minifan（Direct；line 168）
 
+### 生成引用
+- `prefabs/fan_wheel.lua`：minifan（Direct；line 28）
+
 
 ## 函数
 

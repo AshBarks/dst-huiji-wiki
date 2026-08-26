@@ -29,6 +29,10 @@
 - `prefabs/froglegs.lua`：mermking（Direct；line 644）
 - `prefabs/pondfish.lua`：mermking（Direct；line 644）
 
+### 生成引用
+- `merm_spawn_fx`：mermking（Direct；line 365）
+- `mermguard`：mermking（Direct；line 360）
+
 
 ## 函数
 

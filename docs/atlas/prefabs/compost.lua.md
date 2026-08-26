@@ -22,6 +22,9 @@
 - `gridplacer_farmablesoil`：compost（Direct；line 92）
 - `prefabs/poopcloud.lua`：compost（Direct；line 92）
 
+### 生成引用
+- `prefabs/poopcloud.lua`：compost（Direct；line 23）
+
 
 ## 函数
 

@@ -30,6 +30,18 @@
 - `waterballoon_splash`：waterballoon（Direct；line 387）
 - `waterstreak_burst`：waterstreak_projectile（Direct；line 390）
 
+### 生成引用
+- `bile_puddle_land`：bilesplat（Direct；line 64）
+- `bile_puddle_water`：bilesplat（Direct；line 62）
+- `bile_splash`：bilesplat（Direct；line 60）
+- `ink_puddle_land`：inksplat（Direct；line 83）
+- `ink_puddle_water`：inksplat（Direct；line 81）
+- `ink_splash`：inksplat（Direct；line 79）
+- `ocean_splash_small2`：waterstreak_projectile（Direct；line 332）
+- `splash_snow_fx`：snowball（Direct；line 96）
+- `waterballoon_splash`：waterballoon（Direct；line 102）
+- `waterstreak_burst`：waterstreak_projectile（Direct；line 329）
+
 
 ## 函数
 

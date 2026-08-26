@@ -12,6 +12,11 @@
 - `deerclops_laserscorch`：deerclops_laser, deerclops_laserempty（Direct；line 404,405）
 - `deerclops_lasertrail`：deerclops_laser, deerclops_laserempty（Direct；line 404,405）
 
+### 生成引用
+- `deerclops_laserhit`：deerclops_laser, deerclops_laserempty（Direct；line 111）
+- `deerclops_laserscorch`：deerclops_laser, deerclops_laserempty（Direct；line 52）
+- `deerclops_lasertrail`：deerclops_laser, deerclops_laserempty（Direct；line 53）
+
 
 ## 函数
 

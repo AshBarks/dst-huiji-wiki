@@ -43,6 +43,9 @@
 - `wobster_sheller_dead_cooked`：wobster_sheller_dead, wobster_sheller_land（Direct；line 533,537）
 - `wobster_sheller_land`：wobster_sheller（Direct；line 535）
 
+### 生成引用
+- `splash`：wobster_moonglass, wobster_moonglass_land, wobster_sheller, wobster_sheller_land（Direct；line 103,122,271）
+
 
 ## 函数
 

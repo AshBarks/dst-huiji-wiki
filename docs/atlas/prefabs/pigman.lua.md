@@ -42,6 +42,9 @@
 - `strawhat`：pigguard, pigman（Direct；line 859,860）
 - `tophat`：pigguard, pigman（Direct；line 859,860）
 
+### 生成引用
+- `prefabs/poop.lua`：moonpig, pigguard, pigman（Direct；line 131）
+
 
 ## 函数
 

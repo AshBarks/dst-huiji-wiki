@@ -48,6 +48,17 @@
 - `yotd_oar`：dragonboat_pack（Direct；line 919）
 - `yotd_steeringwheel`：dragonboat_pack（Direct；line 919）
 
+### 生成引用
+- `dragonboat_item_collision`：dragonboat_body, dragonboat_shadowboat（Direct；line 225）
+- `dragonboat_shadowboat_deploy_blocker`：dragonboat_shadowboat（Direct；line 575）
+- `mast_yotd`：dragonboat_kit, dragonboat_pack（Direct；line 493）
+- `prefabs/boat_leak.lua`：dragonboat_body, dragonboat_shadowboat（Direct；line 304）
+- `prefabs/boatrace_primemate.lua`：dragonboat_shadowboat（Direct；line 561）
+- `prefabs/burnable_locator_medium.lua`：dragonboat_body, dragonboat_shadowboat（Direct；line 426,430,434,438,442）
+- `yotd_anchor`：dragonboat_kit, dragonboat_pack（Direct；line 500）
+- `yotd_oar`：dragonboat_kit, dragonboat_pack（Direct；line 521）
+- `yotd_steeringwheel`：dragonboat_kit, dragonboat_pack（Direct；line 510）
+
 
 ## 函数
 

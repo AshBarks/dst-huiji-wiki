@@ -13,6 +13,9 @@
 - `prefabs/splash_spiderweb.lua`：spider_web_spit（Direct；line 91）
 - `round_puff_fx_sm`：spider_web_spit_acidinfused（Direct；line 92）
 
+### 生成引用
+- `round_puff_fx_sm`：spider_web_spit_acidinfused（Direct；line 24）
+
 
 ## 函数
 

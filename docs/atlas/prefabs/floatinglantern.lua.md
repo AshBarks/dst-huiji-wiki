@@ -19,6 +19,10 @@
 - `prefabs/floatinglanternfire.lua`：floatinglantern（Direct；line 496）
 - `prefabs/globalmapicon.lua`：floatinglantern（Direct；line 496）
 
+### 生成引用
+- `floatinglantern_shadow`：floatinglantern（Direct；line 415）
+- `prefabs/globalmapicon.lua`：floatinglantern（Direct；line 179）
+
 
 ## 函数
 

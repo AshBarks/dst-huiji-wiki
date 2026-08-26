@@ -20,6 +20,9 @@
 ### 状态图
 - `stategraphs/SGoceantrawler.lua`：ocean_trawler（Direct；line 163）
 
+### 生成引用
+- `collapse_small`：ocean_trawler（Direct；line 34）
+
 
 ## 函数
 

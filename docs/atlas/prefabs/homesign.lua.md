@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_small`：homesign（Direct；line 106）
 
+### 生成引用
+- `collapse_small`：homesign（Direct；line 20）
+
 
 ## 函数
 

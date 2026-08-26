@@ -44,6 +44,9 @@
 - `wall_dreadstone_item_blueprint`：daywalker（Direct；line 1301）
 - `winter_ornament_boss_daywalker`：daywalker（Direct；line 1301）
 
+### 生成引用
+- `prefabs/shadow_leech.lua`：daywalker（Direct；line 380）
+
 ### 行为
 - `brains/daywalkerbrain.lua`：ChaseAndAttack, FaceEntity, Leash, RunAway, Wander（prefabs/daywalker.lua#daywalker）
 

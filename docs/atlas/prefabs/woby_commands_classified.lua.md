@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `prefabs/globalmapicon.lua`：woby_commands_classified（Direct；line 1080）
 
+### 生成引用
+- `prefabs/globalmapicon.lua`：woby_commands_classified（Direct；line 684）
+
 
 ## 函数
 

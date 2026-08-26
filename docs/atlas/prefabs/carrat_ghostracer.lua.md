@@ -19,6 +19,9 @@
 ### 预制体依赖
 - `shadow_puff`：carrat_ghostracer（Direct；line 160）
 
+### 生成引用
+- `shadow_puff`：carrat_ghostracer（Direct；line 68）
+
 ### 行为
 - `brains/carratbrain.lua`：DoAction, FaceEntity, Leash, Panic, RunAway, Wander（prefabs/carrat_ghostracer.lua#carrat_ghostracer）
 

@@ -41,6 +41,10 @@
 - `spat_splash_fx_melted`：spat_bomb（Direct；line 399）
 - `spat_splat_fx`：spat_bomb（Direct；line 399）
 
+### 生成引用
+- `koalefantcorpse_prop`：spat（Direct；line 171）
+- `spat_splat_fx`：spat_bomb（Direct；line 298）
+
 ### 行为
 - `brains/spatbrain.lua`：ChaseAndAttack, FaceEntity, RunAway, Wander（prefabs/spat.lua#spat）
 

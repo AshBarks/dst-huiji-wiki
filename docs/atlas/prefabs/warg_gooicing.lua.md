@@ -14,6 +14,9 @@
 - `icing_splash_fx_melted`：warg_gooicing（Direct；line 114）
 - `icing_splat_fx`：warg_gooicing（Direct；line 114）
 
+### 生成引用
+- `icing_splat_fx`：warg_gooicing（Direct；line 28）
+
 
 ## 函数
 

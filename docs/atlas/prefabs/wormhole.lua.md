@@ -15,6 +15,9 @@
 ### 状态图
 - `stategraphs/SGwormhole.lua`：wormhole（Direct；line 152）
 
+### 生成引用
+- `globalmapiconseeable`：wormhole（Direct；line 108）
+
 
 ## 函数
 

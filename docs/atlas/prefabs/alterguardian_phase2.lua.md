@@ -31,6 +31,10 @@
 - `prefabs/moonrocknugget.lua`：alterguardian_phase2（Direct；line 430）
 - `smallguard_alterguardian_projectile`：alterguardian_phase2（Direct；line 430）
 
+### 生成引用
+- `alterguardian_phase2spiketrail`：alterguardian_phase2（Direct；line 79）
+- `prefabs/alterguardian_phase3.lua`：alterguardian_phase2（Direct；line 239）
+
 
 ## 函数
 

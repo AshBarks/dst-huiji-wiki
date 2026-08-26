@@ -16,6 +16,10 @@
 - `kelp`：bullkelp_beachedroot（Direct；line 88）
 - `prefabs/bullkelp_root.lua`：bullkelp_beachedroot（Direct；line 88）
 
+### 生成引用
+- `kelp`：bullkelp_beachedroot（Direct；line 21）
+- `prefabs/bullkelp_root.lua`：bullkelp_beachedroot（Direct；line 22）
+
 
 ## 函数
 

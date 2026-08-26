@@ -11,6 +11,10 @@
 ### 预制体依赖
 - `wintersfeastbuff_fx`：wintersfeastbuff（Direct；line 168）
 
+### 生成引用
+- `prefabs/wintersfeastfuel.lua`：wintersfeastbuff（Direct；line 46）
+- `wintersfeastbuff_fx`：wintersfeastbuff（Direct；line 30）
+
 
 ## 函数
 

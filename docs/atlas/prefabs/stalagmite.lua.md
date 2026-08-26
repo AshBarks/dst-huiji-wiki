@@ -21,6 +21,9 @@
 - `prefabs/rock_break_fx.lua`：stalagmite, stalagmite_full, stalagmite_low, stalagmite_med（Direct；line 165,166,167,168）
 - `prefabs/rocks.lua`：stalagmite, stalagmite_full, stalagmite_low, stalagmite_med（Direct；line 165,166,167,168）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：stalagmite, stalagmite_full, stalagmite_low, stalagmite_med（Direct；line 57）
+
 
 ## 函数
 

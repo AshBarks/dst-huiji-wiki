@@ -18,6 +18,11 @@
 - `prefabs/dreadstone.lua`：daywalker_pillar（Direct；line 838）
 - `shadow_despawn`：daywalker_pillar（Direct；line 838）
 
+### 生成引用
+- `daywalker_pillar_base_fx`：daywalker_pillar（Direct；line 702）
+- `daywalker_pillar_hole`：daywalker_pillar（Direct；line 699）
+- `shadow_despawn`：daywalker_pillar（Direct；line 739）
+
 
 ## 函数
 

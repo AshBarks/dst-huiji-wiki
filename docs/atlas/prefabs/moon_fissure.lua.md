@@ -17,6 +17,9 @@
 - `moon_fissure_fx`：moon_fissure（Direct；line 290）
 - `prefabs/moon_altar.lua`：moon_fissure（Direct；line 290）
 
+### 生成引用
+- `moon_fissure_fx`：moon_fissure（Direct；line 210）
+
 
 ## 函数
 

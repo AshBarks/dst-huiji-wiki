@@ -14,6 +14,10 @@
 - `moonrockseed_icon`：moonrockseed（Direct；line 357）
 - `prefabs/globalmapicon.lua`：moonrockseed_icon（Direct；line 358）
 
+### 生成引用
+- `moonrockseed_icon`：moonrockseed（Direct；line 307）
+- `prefabs/globalmapicon.lua`：moonrockseed_icon（Direct；line 324）
+
 
 ## 函数
 

@@ -12,6 +12,9 @@
 ### 预制体依赖
 - `alterguardian_lunar_fissure_burn_fx`：alterguardian_lunar_fissures（Direct；line 341）
 
+### 生成引用
+- `prefabs/alterguardian_lunar_fissures.lua`：alterguardian_lunar_fissures（Direct；line 192）
+
 
 ## 函数
 

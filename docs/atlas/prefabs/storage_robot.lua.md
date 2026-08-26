@@ -20,6 +20,9 @@
 ### 状态图
 - `stategraphs/SGstorage_robot.lua`：storage_robot（Direct；line 600）
 
+### 生成引用
+- `prefabs/sparks.lua`：storage_robot（Direct；line 347）
+
 
 ## 函数
 

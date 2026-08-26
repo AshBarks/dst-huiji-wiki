@@ -21,6 +21,9 @@
 - `gestalt_guard_head`：gestalt_guard（Direct；line 276）
 - `prefabs/gestalt_head.lua`：gestalt_guard（Direct；line 276）
 
+### 生成引用
+- `gestalt_guard_head`：gestalt_guard（Direct；line 203）
+
 
 ## 函数
 

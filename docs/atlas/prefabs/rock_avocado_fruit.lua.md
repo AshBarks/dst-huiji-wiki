@@ -29,6 +29,10 @@
 - `rock_avocado_fruit_sprout`：rock_avocado_fruit（Direct；line 437）
 - `rock_avocado_fruit_sprout_sapling`：rock_avocado_fruit（Direct；line 437）
 
+### 生成引用
+- `prefabs/rock_avocado_bush.lua`：rock_avocado_fruit_sprout_sapling（Direct；line 295）
+- `rock_avocado_fruit_sprout_sapling`：rock_avocado_fruit_sprout（Direct；line 378）
+
 
 ## 函数
 

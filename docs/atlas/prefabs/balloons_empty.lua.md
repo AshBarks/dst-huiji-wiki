@@ -17,6 +17,10 @@
 - `prefabs/mosquitosack.lua`：balloons_empty（Direct；line 123）
 - `waterballoon_splash`：balloons_empty（Direct；line 123）
 
+### 生成引用
+- `small_puff`：balloons_empty（Direct；line 20）
+- `waterballoon_splash`：balloons_empty（Direct；line 58）
+
 
 ## 函数
 

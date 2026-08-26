@@ -23,6 +23,10 @@
 - `prefabs/charlie_heckler.lua`：yoth_knightshrine（Direct；line 378）
 - `yoth_knightshrine_placer`：yoth_knightshrine（Direct；line 378）
 
+### 生成引用
+- `collapse_small`：yoth_knightshrine（Direct；line 243）
+- `prefabs/charlie_heckler.lua`：yoth_knightshrine（Direct；line 264）
+
 
 ## 函数
 

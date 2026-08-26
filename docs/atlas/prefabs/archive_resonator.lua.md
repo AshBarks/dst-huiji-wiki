@@ -16,6 +16,13 @@
 - `components/timer.lua`：archive_resonator_base（Direct；line 510）
 - `components/workable.lua`：archive_resonator（Direct；line 426）
 
+### 生成引用
+- `archive_resonator_base`：archive_resonator_item（Direct；line 201）
+- `archive_resonator_item`：archive_resonator, archive_resonator_item（Direct；line 112）
+- `collapse_big`：archive_resonator（Direct；line 303）
+- `collapse_small`：archive_resonator（Direct；line 293）
+- `prefabs/archive_resonator.lua`：archive_resonator_item（Direct；line 243）
+
 
 ## 函数
 

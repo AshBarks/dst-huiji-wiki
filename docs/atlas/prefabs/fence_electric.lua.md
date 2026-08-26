@@ -26,6 +26,10 @@
 - `prefabs/fence_electric.lua`：fence_electric_item（Direct；line 317）
 - `prefabs/fence_electric_field.lua`：fence_electric（Direct；line 316）
 
+### 生成引用
+- `collapse_small`：fence_electric（Direct；line 58）
+- `prefabs/fence_electric.lua`：fence_electric_item（Direct；line 225）
+
 
 ## 函数
 

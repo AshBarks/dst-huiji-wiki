@@ -13,6 +13,11 @@
 - `prefabs/junk_pile.lua`：junkball_fall_fx（Direct；line 601）
 - `splash_green_large`：junkball_fall_fx（Direct；line 601）
 
+### 生成引用
+- `junkball_fall_fx`：junkball_fx（Direct；line 188）
+- `prefabs/junk_pile.lua`：junkball_fall_fx（Direct；line 523）
+- `splash_green_large`：junkball_fall_fx（Direct；line 489）
+
 
 ## 函数
 

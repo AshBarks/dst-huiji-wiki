@@ -25,6 +25,12 @@
 - `gelblob_small_fx`：gelblob（Direct；line 963）
 - `prefabs/gelblob_attach_fx.lua`：gelblob（Direct；line 963）
 
+### 生成引用
+- `gelblob_back_fx`：gelblob（Direct；line 560）
+- `gelblob_item_fx`：gelblob（Direct；line 500）
+- `gelblob_small_fx`：gelblob（Direct；line 405）
+- `prefabs/gelblob_attach_fx.lua`：gelblob, gelblob_small_fx（Direct；line 154）
+
 
 ## 函数
 

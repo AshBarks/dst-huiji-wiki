@@ -24,6 +24,9 @@
 - `prefabs/wx78_drone_zap.lua`：wx78_drone_zap_remote（Direct；line 421）
 - `wx78_drone_zap_projectile_fx`：wx78_drone_zap（Direct；line 420）
 
+### 生成引用
+- `prefabs/wx78_drone_zap.lua`：wx78_drone_zap_remote（Direct；line 266）
+
 
 ## 函数
 

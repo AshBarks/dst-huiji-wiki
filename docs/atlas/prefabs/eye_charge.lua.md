@@ -7,6 +7,9 @@
 ### 组件
 - `components/projectile.lua`：eye_charge（Direct；line 48）
 
+### 生成引用
+- `eye_charge_hit`：eye_charge（Direct；line 8）
+
 
 ## 函数
 

@@ -29,6 +29,9 @@
 - `prefabs/guano.lua`：molebat（Direct；line 359）
 - `prefabs/molebathill.lua`：molebat（Direct；line 359）
 
+### 生成引用
+- `prefabs/molebat.lua`：molebat（Direct；line 47）
+
 
 ## 函数
 

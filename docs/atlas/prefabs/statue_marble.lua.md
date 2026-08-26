@@ -14,6 +14,9 @@
 - `marble`：statue_marble, statue_marble_muse, statue_marble_pawn（Direct；line 199,200,201）
 - `prefabs/rock_break_fx.lua`：statue_marble, statue_marble_muse, statue_marble_pawn（Direct；line 199,200,201）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：statue_marble（Direct；line 61）
+
 
 ## 函数
 

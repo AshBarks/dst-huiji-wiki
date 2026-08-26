@@ -18,6 +18,9 @@
 - `collapse_small`：nightlight（Direct；line 163）
 - `prefabs/nightlight_flame.lua`：nightlight（Direct；line 163）
 
+### 生成引用
+- `collapse_small`：nightlight（Direct；line 16）
+
 
 ## 函数
 

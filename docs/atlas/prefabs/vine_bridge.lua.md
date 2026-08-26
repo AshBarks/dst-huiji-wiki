@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `vine_bridge_decor_fx`：vine_bridge_fx（Direct；line 160）
 
+### 生成引用
+- `vine_bridge_decor_fx`：vine_bridge_fx（Direct；line 15）
+
 
 ## 函数
 

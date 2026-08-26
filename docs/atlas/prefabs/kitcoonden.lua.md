@@ -22,6 +22,12 @@
 ### 预制体依赖
 - `kitcoonden_kit_placer`：kitcoonden（Direct；line 448）
 
+### 生成引用
+- `collapse_small`：kitcoonden（Direct；line 21）
+- `kitcoon_yot`：kitcoonden（Direct；line 81）
+- `lucky_goldnugget`：kitcoonden（Direct；line 120,122）
+- `redpouch_yot_catcoon`：kitcoonden（Direct；line 125）
+
 
 ## 函数
 

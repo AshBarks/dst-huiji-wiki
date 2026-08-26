@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `collapse_small`：saltbox（Direct；line 105）
 
+### 生成引用
+- `collapse_small`：saltbox（Direct；line 27）
+
 
 ## 函数
 

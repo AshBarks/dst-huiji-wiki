@@ -16,6 +16,9 @@
 - `atrium_key_icon`：atrium_key（Direct；line 150）
 - `prefabs/globalmapicon.lua`：atrium_key_icon（Direct；line 151）
 
+### 生成引用
+- `atrium_key_icon`：atrium_key（Direct；line 111）
+
 
 ## 函数
 

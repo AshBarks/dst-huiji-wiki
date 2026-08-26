@@ -46,6 +46,10 @@
 - `shadow_despawn`：bunnyman（Direct；line 521）
 - `statue_transition_2`：bunnyman（Direct；line 521）
 
+### 生成引用
+- `shadow_despawn`：bunnyman（Direct；line 46）
+- `statue_transition_2`：bunnyman（Direct；line 40）
+
 ### 行为
 - `brains/bunnymanbrain.lua`：ChaseAndAttack, ChattyNode, DoAction, FaceEntity, Follow, Leash, Panic, RunAway, Wander（prefabs/bunnyman.lua#bunnyman）
 

@@ -29,6 +29,10 @@
 - `worm_boss_head`：worm_boss, worm_boss_dirt, worm_boss_dirt_ground_fx, worm_boss_head, worm_boss_segment, worm_boss_tail（Direct；line 1324,1325,1326,1327,1328,1329）
 - `worm_boss_segment`：worm_boss, worm_boss_dirt, worm_boss_dirt_ground_fx, worm_boss_head, worm_boss_segment, worm_boss_tail（Direct；line 1324,1325,1326,1327,1328,1329）
 
+### 生成引用
+- `worm_boss_dirt_ground_fx`：worm_boss_dirt（Direct；line 1076）
+- `worm_boss_segment`：worm_boss（Direct；line 523）
+
 
 ## 函数
 

@@ -10,6 +10,10 @@
 ### 预制体依赖
 - `abysspillar_fx`：abysspillar（Direct；line 830）
 
+### 生成引用
+- `abysspillar_fx`：abysspillar, abysspillar_fx（Direct；line 278,706）
+- `prefabs/abysspillar.lua`：abysspillar_fx（Direct；line 750,775）
+
 
 ## 函数
 

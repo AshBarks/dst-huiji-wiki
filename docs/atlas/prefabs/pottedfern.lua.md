@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `collapse_small`：pottedfern（Direct；line 85）
 
+### 生成引用
+- `collapse_small`：pottedfern（Direct；line 28）
+
 
 ## 函数
 

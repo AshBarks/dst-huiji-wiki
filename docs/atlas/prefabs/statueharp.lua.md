@@ -14,6 +14,9 @@
 - `marble`：statueharp（Direct；line 133）
 - `prefabs/rock_break_fx.lua`：statueharp（Direct；line 133）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：statueharp（Direct；line 45）
+
 
 ## 函数
 

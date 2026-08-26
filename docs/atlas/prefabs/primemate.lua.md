@@ -37,6 +37,9 @@
 - `prefabs/stash_map.lua`：prime_mate（Direct；line 410）
 - `smallmeat`：prime_mate（Direct；line 410）
 
+### 生成引用
+- `prefabs/cursed_monkey_token.lua`：prime_mate（Direct；line 280）
+
 
 ## 函数
 

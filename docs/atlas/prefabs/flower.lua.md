@@ -21,6 +21,11 @@
 - `prefabs/petals.lua`：flower, flower_rose, planted_flower（Direct；line 261,262,263）
 - `small_puff`：flower, flower_rose, planted_flower（Direct；line 261,262,263）
 
+### 生成引用
+- `prefabs/charlierose.lua`：flower, flower_rose, planted_flower（Direct；line 127）
+- `prefabs/flower_withered.lua`：flower, flower_rose, planted_flower（Direct；line 92）
+- `small_puff`：flower, flower_rose, planted_flower（Direct；line 121）
+
 
 ## 函数
 

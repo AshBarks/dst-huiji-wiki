@@ -19,6 +19,9 @@
 - `prefabs/tacklesketch.lua`：tacklestation（Direct；line 207）
 - `small_puff`：tacklestation（Direct；line 207）
 
+### 生成引用
+- `collapse_small`：tacklestation（Direct；line 36）
+
 
 ## 函数
 

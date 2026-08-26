@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `prefabs/ash.lua`：spicepack（Direct；line 126）
 
+### 生成引用
+- `prefabs/ash.lua`：spicepack（Direct；line 53）
+
 
 ## 函数
 

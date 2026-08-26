@@ -15,6 +15,11 @@
 - `prefabs/abysspillar.lua`：abysspillar_trial（Direct；line 620）
 - `prefabs/abysspillar_minion.lua`：abysspillar_trial（Direct；line 620）
 
+### 生成引用
+- `abysspillar_fx`：abysspillar_trial（Direct；line 75）
+- `prefabs/abysspillar.lua`：abysspillar_trial（Direct；line 97）
+- `prefabs/abysspillar_minion.lua`：abysspillar_trial（Direct；line 603）
+
 
 ## 函数
 

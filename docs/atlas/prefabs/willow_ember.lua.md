@@ -29,6 +29,9 @@
 - `willow_shadow_flame`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
 - `willow_throw_flame`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
 
+### 生成引用
+- `willow_frenzy`：buff_firefrenzy（Direct；line 1023）
+
 
 ## 函数
 

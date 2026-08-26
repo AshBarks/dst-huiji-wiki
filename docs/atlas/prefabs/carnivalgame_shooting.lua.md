@@ -25,6 +25,10 @@
 - `carnivalgame_shooting_target`：carnivalgame_shooting_station（Direct；line 846）
 - `prefabs/carnival_prizeticket.lua`：carnivalgame_shooting_station（Direct；line 846）
 
+### 生成引用
+- `carnivalgame_shooting_button`：carnivalgame_shooting_station（Direct；line 539）
+- `carnivalgame_shooting_projectile_fx`：carnivalgame_shooting_projectile（Direct；line 766,779）
+
 
 ## 函数
 

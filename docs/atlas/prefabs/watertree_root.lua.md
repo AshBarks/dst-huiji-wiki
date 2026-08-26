@@ -15,6 +15,9 @@
 - `driftwood_log`：watertree_root（Direct；line 131）
 - `prefabs/twigs.lua`：watertree_root（Direct；line 131）
 
+### 生成引用
+- `collapse_small`：watertree_root（Direct；line 42）
+
 
 ## 函数
 

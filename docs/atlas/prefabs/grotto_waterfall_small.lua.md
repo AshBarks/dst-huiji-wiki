@@ -8,6 +8,10 @@
 - `components/lootdropper.lua`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 112,160）
 - `components/workable.lua`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 105,153）
 
+### 生成引用
+- `halloween_moonpuff`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 23）
+- `prefabs/rock_break_fx.lua`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 54）
+
 
 ## 函数
 

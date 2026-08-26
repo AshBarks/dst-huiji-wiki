@@ -102,6 +102,10 @@
 - `wurt_lunar_merm_planar_fx`：wurt_merm_planar（Direct；line 878）
 - `wurt_shadow_merm_planar_fx`：wurt_merm_planar（Direct；line 878）
 
+### 生成引用
+- `wurt_lunar_merm_planar_fx`：wurt_merm_planar（Direct；line 737,772）
+- `wurt_shadow_merm_planar_fx`：wurt_merm_planar（Direct；line 727）
+
 
 ## 函数
 

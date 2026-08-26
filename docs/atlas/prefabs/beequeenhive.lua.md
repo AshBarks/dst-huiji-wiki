@@ -19,6 +19,11 @@
 - `prefabs/honey.lua`：beequeenhivegrown（Direct；line 574）
 - `prefabs/honeycomb.lua`：beequeenhivegrown（Direct；line 574）
 
+### 生成引用
+- `beequeenhivegrown`：beequeenhive（Direct；line 319）
+- `honey_splash`：beequeenhivegrown（Direct；line 186）
+- `prefabs/beequeen.lua`：beequeenhivegrown（Direct；line 139）
+
 
 ## 函数
 

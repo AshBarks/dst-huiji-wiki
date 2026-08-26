@@ -23,6 +23,9 @@
 - `prefabs/flies.lua`：poop（Direct；line 126）
 - `prefabs/poopcloud.lua`：poop（Direct；line 126）
 
+### 生成引用
+- `prefabs/poopcloud.lua`：poop（Direct；line 32）
+
 
 ## 函数
 

@@ -33,6 +33,9 @@
 - `prefabs/butter.lua`：butterfly（Direct；line 199）
 - `prefabs/butterflywings.lua`：butterfly（Direct；line 199）
 
+### 生成引用
+- `planted_flower`：butterfly（Direct；line 55）
+
 
 ## 函数
 

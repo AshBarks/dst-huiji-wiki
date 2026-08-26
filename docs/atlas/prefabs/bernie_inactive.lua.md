@@ -21,6 +21,10 @@
 - `prefabs/silk.lua`：bernie_inactive（Direct；line 316）
 - `small_puff`：bernie_inactive（Direct；line 316）
 
+### 生成引用
+- `prefabs/bernie_active.lua`：bernie_inactive（Direct；line 87）
+- `small_puff`：bernie_inactive（Direct；line 35）
+
 
 ## 函数
 

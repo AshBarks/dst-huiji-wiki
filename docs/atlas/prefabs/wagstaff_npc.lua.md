@@ -40,6 +40,14 @@
 - `wagstaff_tool_5`：wagstaff_npc（Direct；line 1760）
 - `winter_ornament_boss_wagstaff`：wagstaff_npc（Direct；line 1760）
 
+### 生成引用
+- `alterguardian_contained`：wagstaff_npc_pstboss（Direct；line 593）
+- `mapscroll_tricker`：wagstaff_npc_wagpunk_arena（Direct；line 1232）
+- `prefabs/gestalt_cage.lua`：wagstaff_npc_wagpunk_arena（Direct；line 1286）
+- `prefabs/security_pulse_cage.lua`：wagstaff_npc_mutations（Direct；line 878）
+- `wagstaff_npc_pstboss`：wagstaff_npc_pstboss（Direct；line 695）
+- `winter_ornament_boss_wagstaff`：alterguardian_contained（Direct；line 1678）
+
 
 ## 函数
 

@@ -16,6 +16,10 @@
 - `vault_compass_marker`：vault_compass（Direct；line 207）
 - `vault_compass_visual`：vault_compass（Direct；line 207）
 
+### 生成引用
+- `vault_compass_marker`：vault_compass（Direct；line 56）
+- `vault_compass_visual`：vault_compass（Direct；line 60）
+
 
 ## 函数
 

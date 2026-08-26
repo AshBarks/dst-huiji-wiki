@@ -24,6 +24,10 @@
 - `prefabs/rocks.lua`：monkeyisland_portal（Direct；line 445）
 - `prefabs/twigs.lua`：monkeyisland_portal（Direct；line 445）
 
+### 生成引用
+- `monkeyisland_portal_lootfollowfx`：monkeyisland_portal（Direct；line 174）
+- `prefabs/monkeyisland_portal_fxloot.lua`：monkeyisland_portal（Direct；line 161）
+
 
 ## 函数
 

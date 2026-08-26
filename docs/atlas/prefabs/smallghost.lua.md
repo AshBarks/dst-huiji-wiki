@@ -22,6 +22,10 @@
 - `hotcold_fx`：smallghost（Direct；line 574）
 - `prefabs/ghostflower.lua`：smallghost（Direct；line 574）
 
+### 生成引用
+- `hotcold_fx`：smallghost（Direct；line 51）
+- `prefabs/ghostflower.lua`：smallghost（Direct；line 282）
+
 
 ## 函数
 

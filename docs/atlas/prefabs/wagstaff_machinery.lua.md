@@ -20,6 +20,9 @@
 - `wagstaff_machinery_marker`：wagstaff_machinery, wagstaff_machinery_marker（Direct；line 203,204）
 - `wagstaff_mutations_note`：wagstaff_machinery, wagstaff_machinery_marker（Direct；line 203,204）
 
+### 生成引用
+- `collapse_small`：wagstaff_machinery（Direct；line 40）
+
 
 ## 函数
 

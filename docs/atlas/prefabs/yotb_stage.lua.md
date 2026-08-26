@@ -32,6 +32,10 @@
 - `yotb_pattern_fragment_3`：yotb_stage（Direct；line 230）
 - `yotb_stage_voice`：yotb_stage（Direct；line 230）
 
+### 生成引用
+- `collapse_big`：yotb_stage（Direct；line 42）
+- `prefabs/yotb_stage.lua`：yotb_stage_item（Direct；line 177）
+
 
 ## 函数
 

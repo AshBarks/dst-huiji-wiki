@@ -19,6 +19,9 @@
 - `gestalt_trail`：gestalt（Direct；line 263）
 - `prefabs/gestalt_head.lua`：gestalt（Direct；line 263）
 
+### 生成引用
+- `prefabs/gestalt_head.lua`：gestalt（Direct；line 149）
+
 
 ## 函数
 

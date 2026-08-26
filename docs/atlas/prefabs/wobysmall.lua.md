@@ -35,6 +35,10 @@
 - `prefabs/wobybig.lua`：wobysmall（Direct；line 850）
 - `woby_rack_container`：wobysmall（Direct；line 850）
 
+### 生成引用
+- `prefabs/pet_hunger_classified.lua`：wobysmall（Direct；line 314）
+- `prefabs/woby_commands_classified.lua`：wobysmall（Direct；line 331）
+
 ### 行为
 - `brains/wobysmallbrain.lua`：FaceEntity, Follow, Leash（prefabs/wobysmall.lua#wobysmall）
 

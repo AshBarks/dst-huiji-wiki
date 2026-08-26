@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `brilliance_projectile_blast_fx`：brilliance_projectile_fx（Direct；line 244）
 
+### 生成引用
+- `brilliance_projectile_blast_fx`：brilliance_projectile_fx（Direct；line 104）
+
 
 ## 函数
 

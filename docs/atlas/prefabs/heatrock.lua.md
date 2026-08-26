@@ -14,6 +14,9 @@
 - `components/temperature.lua`：heatrock（Direct；line 237）
 - `components/tradable.lua`：heatrock（Direct；line 234）
 
+### 生成引用
+- `heatrocklight`：heatrock（Direct；line 258）
+
 
 ## 函数
 

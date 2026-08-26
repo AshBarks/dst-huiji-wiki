@@ -28,6 +28,10 @@
 - `prefabs/lunarplant_husk.lua`：lunarthrall_plant（Direct；line 863）
 - `prefabs/lunarthrall_plant_gestalt.lua`：lunarthrall_plant（Direct；line 863）
 
+### 生成引用
+- `lunarthrall_plant_back`：lunarthrall_plant（Direct；line 100）
+- `lunarthrall_plant_vine_end`：lunarthrall_plant（Direct；line 356）
+
 
 ## 函数
 

@@ -19,6 +19,13 @@
 - `shadow_pillar_base_fx`：shadow_trap（Direct；line 415）
 - `shadow_trap_debuff_fx`：shadow_trap（Direct；line 415）
 
+### 生成引用
+- `prefabs/shadow_glob_fx.lua`：shadow_trap（Direct；line 36）
+- `reticuleaoeshadowtarget_6`：shadow_trap（Direct；line 104）
+- `shadow_despawn`：shadow_trap（Direct；line 150）
+- `shadow_pillar_base_fx`：shadow_trap（Direct；line 327）
+- `shadow_trap_debuff_fx`：shadow_trap（Direct；line 174）
+
 
 ## 函数
 

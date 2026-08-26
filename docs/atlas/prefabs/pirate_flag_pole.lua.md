@@ -16,6 +16,9 @@
 - `collapse_big`：pirate_flag_pole（Direct；line 162）
 - `prefabs/blackflag.lua`：pirate_flag_pole（Direct；line 162）
 
+### 生成引用
+- `collapse_big`：pirate_flag_pole（Direct；line 16）
+
 
 ## 函数
 

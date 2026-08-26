@@ -26,6 +26,14 @@
 - `prefabs/farm_soil_debris.lua`：farm_plow（Direct；line 362）
 - `tile_outline`：farm_plow_item（Direct；line 363）
 
+### 生成引用
+- `collapse_small`：farm_plow（Direct；line 31,63）
+- `dirt_puff`：farm_plow（Direct；line 60,96,97,98,99）
+- `prefabs/farm_plow.lua`：farm_plow_item（Direct；line 251）
+- `prefabs/farm_soil.lua`：farm_plow（Direct；line 123）
+- `prefabs/farm_soil_debris.lua`：farm_plow（Direct；line 92）
+- `tile_outline`：farm_plow_item_placer（Direct；line 354）
+
 
 ## 函数
 

@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `carnival_prizebooth_kit`：carnival_prizebooth（Direct；line 168）
 
+### 生成引用
+- `collapse_small`：carnival_prizebooth（Direct；line 52）
+
 
 ## 函数
 

@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `lanternlight`：lantern（Direct；line 302）
 
+### 生成引用
+- `lanternlight`：lantern（Direct；line 71）
+
 
 ## 函数
 

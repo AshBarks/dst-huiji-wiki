@@ -43,6 +43,9 @@
 - `spoiled_fish_small`：fishmeat_small（Direct；line 914）
 - `spoiled_food`：batnose, batwing, drumstick, humanmeat, meat, mitegland, monstermeat, plantmeat, smallmeat（Direct；line 899,902,905,908,910,912,920,927,929）
 
+### 生成引用
+- `small_puff`：cookedmeat, meat, meat_dried（Direct；line 108）
+
 
 ## 函数
 

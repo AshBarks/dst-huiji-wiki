@@ -15,6 +15,9 @@
 - `prefabs/lavae_tooth.lua`：lavae_egg, lavae_egg_cracked（Direct；line 191,192）
 - `prefabs/rocks.lua`：lavae_egg, lavae_egg_cracked（Direct；line 191,192）
 
+### 生成引用
+- `lavae_egg_cracked`：lavae_egg, lavae_egg_cracked（Direct；line 85）
+
 
 ## 函数
 

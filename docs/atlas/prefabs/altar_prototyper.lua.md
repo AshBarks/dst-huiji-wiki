@@ -49,6 +49,13 @@
 - `yellowamulet`：ancient_altar, ancient_altar_broken（Direct；line 502,503）
 - `yellowstaff`：ancient_altar, ancient_altar_broken（Direct；line 502,503）
 
+### 生成引用
+- `ancient_altar`：ancient_altar_broken（Direct；line 413）
+- `ancient_altar_broken`：ancient_altar（Direct；line 330）
+- `collapse_big`：ancient_altar_broken（Direct；line 416）
+- `collapse_small`：ancient_altar, ancient_altar_broken（Direct；line 149,334,428）
+- `sanity_lower`：ancient_altar_broken（Direct；line 391）
+
 
 ## 函数
 

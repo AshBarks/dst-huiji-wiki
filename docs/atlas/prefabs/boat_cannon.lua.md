@@ -27,6 +27,9 @@
 - `collapse_small`：boat_cannon（Direct；line 354）
 - `prefabs/cannon_aoe_range_fx.lua`：boat_cannon（Direct；line 354）
 
+### 生成引用
+- `collapse_small`：boat_cannon（Direct；line 24）
+
 
 ## 函数
 

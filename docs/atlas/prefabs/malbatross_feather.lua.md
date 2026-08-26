@@ -15,6 +15,9 @@
 - `components/snowmandecor.lua`：malbatross_feather（Direct；line 41）
 - `components/stackable.lua`：malbatross_feather（Direct；line 35）
 
+### 生成引用
+- `prefabs/malbatross_feather.lua`：malbatross_feather_fall（Direct；line 72）
+
 
 ## 函数
 

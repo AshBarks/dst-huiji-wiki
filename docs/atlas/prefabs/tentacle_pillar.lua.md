@@ -22,6 +22,11 @@
 - `tentacle_pillar_arm`：tentacle_pillar, tentacle_pillar_atrium（Direct；line 532,533）
 - `turf_marsh`：tentacle_pillar, tentacle_pillar_atrium（Direct；line 532,533）
 
+### 生成引用
+- `globalmapiconseeable`：tentacle_pillar, tentacle_pillar_atrium（Direct；line 317）
+- `prefabs/tentacle_pillar_hole.lua`：tentacle_pillar, tentacle_pillar_atrium（Direct；line 181）
+- `tentacle_pillar_arm`：tentacle_pillar, tentacle_pillar_atrium（Direct；line 99）
+
 
 ## 函数
 

@@ -14,6 +14,10 @@
 - `statue_transition`：sacred_chest（Direct；line 256）
 - `statue_transition_2`：sacred_chest（Direct；line 256）
 
+### 生成引用
+- `statue_transition`：sacred_chest（Direct；line 62）
+- `statue_transition_2`：sacred_chest（Direct；line 63）
+
 
 ## 函数
 

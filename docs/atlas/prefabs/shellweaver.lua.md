@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `collapse_small`：shellweaver（Direct；line 251）
 
+### 生成引用
+- `collapse_small`：shellweaver（Direct；line 64）
+
 
 ## 函数
 

@@ -40,6 +40,10 @@
 - `smallmeat`：rabbit（Direct；line 451）
 - `statue_transition_2`：rabbit（Direct；line 451）
 
+### 生成引用
+- `shadow_despawn`：rabbit（Direct；line 58）
+- `statue_transition_2`：rabbit（Direct；line 52）
+
 ### 行为
 - `brains/rabbitbrain.lua`：DoAction, RunAway, Wander（prefabs/rabbit.lua#rabbit）
 

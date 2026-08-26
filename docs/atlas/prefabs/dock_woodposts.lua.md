@@ -20,6 +20,10 @@
 - `collapse_small`：dock_woodposts, dock_woodposts_item（Direct；line 161,162）
 - `prefabs/log.lua`：dock_woodposts, dock_woodposts_item（Direct；line 161,162）
 
+### 生成引用
+- `collapse_small`：dock_woodposts（Direct；line 20）
+- `prefabs/dock_woodposts.lua`：dock_woodposts_item（Direct；line 109）
+
 
 ## 函数
 

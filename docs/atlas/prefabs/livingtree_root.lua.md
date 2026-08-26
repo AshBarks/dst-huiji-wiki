@@ -16,6 +16,9 @@
 - `components/propagator.lua`：livingtree_root（HelperExpanded；line 117）
 - `components/stackable.lua`：livingtree_root（Direct；line 107）
 
+### 生成引用
+- `livingtree_sapling`：livingtree_root（Direct；line 45）
+
 
 ## 函数
 

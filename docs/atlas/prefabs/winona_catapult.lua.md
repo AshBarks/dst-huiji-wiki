@@ -42,6 +42,12 @@
 - `prefabs/winona_catapult_projectile.lua`：winona_catapult（Direct；line 1285）
 - `winona_catapult_item`：winona_catapult（Direct；line 1285）
 
+### 生成引用
+- `collapse_small`：winona_catapult（Direct；line 223,250）
+- `prefabs/winona_battery_sparks.lua`：winona_catapult（Direct；line 207,908）
+- `prefabs/winona_catapult.lua`：winona_catapult_item（Direct；line 1228）
+- `winona_catapult_item`：winona_catapult（Direct；line 200）
+
 ### 行为
 - `brains/winonacatapultbrain.lua`：StandAndAttack（prefabs/winona_catapult.lua#winona_catapult）
 

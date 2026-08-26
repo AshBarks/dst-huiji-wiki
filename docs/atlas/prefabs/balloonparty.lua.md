@@ -14,6 +14,10 @@
 - `balloonparty_confetti_cloud`：balloonparty（Direct；line 307）
 - `prefabs/balloon_held_child.lua`：balloonparty（Direct；line 307）
 
+### 生成引用
+- `balloonparty_confetti_balloon`：balloonparty_confetti_cloud（Direct；line 159,162,165,168）
+- `balloonparty_confetti_cloud`：balloonparty（Direct；line 55）
+
 
 ## 函数
 

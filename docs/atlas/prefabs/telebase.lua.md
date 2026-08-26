@@ -22,6 +22,9 @@
 - `prefabs/globalmapicon.lua`：telebase（Direct；line 279）
 - `prefabs/vault_orb_refined.lua`：telebase（Direct；line 279）
 
+### 生成引用
+- `collapse_small`：telebase（Direct；line 106）
+
 
 ## 函数
 

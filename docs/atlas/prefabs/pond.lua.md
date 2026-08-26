@@ -24,6 +24,9 @@
 - `prefabs/nitre_formation.lua`：pond_cave（Direct；line 510）
 - `prefabs/pondfish.lua`：pond, pond_mos（Direct；line 508,509）
 
+### 生成引用
+- `prefabs/nitre_formation.lua`：pond_cave（Direct；line 53）
+
 
 ## 函数
 

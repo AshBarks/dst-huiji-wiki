@@ -26,6 +26,12 @@
 - `prefabs/moonrocknugget.lua`：moonbase（Direct；line 686）
 - `staffcoldlightfx`：moonbase（Direct；line 686）
 
+### 生成引用
+- `positronbeam_back`：moonbase（Direct；line 91）
+- `positronbeam_front`：moonbase（Direct；line 85）
+- `positronpulse`：moonbase（Direct；line 79）
+- `staffcoldlightfx`：moonbase（Direct；line 149）
+
 
 ## 函数
 

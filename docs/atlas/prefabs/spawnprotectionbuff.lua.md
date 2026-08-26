@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `battlesong_instant_panic_fx`：spawnprotectionbuff（Direct；line 148）
 
+### 生成引用
+- `battlesong_instant_panic_fx`：spawnprotectionbuff（Direct；line 12）
+
 
 ## 函数
 

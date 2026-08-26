@@ -27,6 +27,11 @@
 - `wurt_terraform_cast_debuff`：wurt_swampitem_lunar, wurt_swampitem_shadow（Direct；line 463,465）
 - `wurt_terraform_projectile`：wurt_swampitem_lunar, wurt_swampitem_shadow（Direct；line 463,465）
 
+### 生成引用
+- `groundpoundring_fx`：wurt_swampitem_lunar（Direct；line 267）
+- `prefabs/wurt_swamp_terraformer.lua`：wurt_terraform_projectile（Direct；line 318）
+- `wurt_terraform_projectile`：wurt_swampitem_lunar, wurt_swampitem_shadow（Direct；line 49）
+
 
 ## 函数
 

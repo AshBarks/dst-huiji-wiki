@@ -14,6 +14,11 @@
 - `crab_king_waterspout`：winona_catapult_projectile（Direct；line 567）
 - `prefabs/trap_vines.lua`：winona_catapult_projectile（Direct；line 567）
 
+### 生成引用
+- `crab_king_waterspout`：winona_catapult_projectile（Direct；line 259）
+- `prefabs/bullkelp_root.lua`：winona_catapult_projectile（Direct；line 142）
+- `prefabs/trap_vines.lua`：winona_catapult_projectile（Direct；line 278）
+
 
 ## 函数
 

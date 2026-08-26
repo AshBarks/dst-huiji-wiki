@@ -16,6 +16,10 @@
 - `yots_worm`：yots_worm_lantern（Direct；line 282）
 - `yots_worm_lantern_light`：yots_worm_lantern（Direct；line 282）
 
+### 生成引用
+- `prefabs/yots_worm_lantern.lua`：yots_worm_lantern_spawner（Direct；line 134）
+- `yots_worm_lantern_light`：yots_worm_lantern（Direct；line 93）
+
 
 ## 函数
 

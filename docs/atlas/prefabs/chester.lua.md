@@ -32,6 +32,9 @@
 - `prefabs/frostbreath.lua`：chester（Direct；line 760）
 - `shadow_chester_swirl_fx`：chester（Direct；line 760）
 
+### 生成引用
+- `prefabs/frostbreath.lua`：chester（Direct；line 247,248）
+
 
 ## 函数
 

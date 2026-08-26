@@ -16,6 +16,9 @@
 - `moon_altar_link_fx`：moon_altar_link_fx_spawner（Direct；line 758）
 - `moon_altar_ward`：moon_altar_astral_marker_1, moon_altar_astral_marker_2（Direct；line 756,757）
 
+### 生成引用
+- `moon_altar_link_fx`：moon_altar_link_fx_spawner（Direct；line 687）
+
 
 ## 函数
 

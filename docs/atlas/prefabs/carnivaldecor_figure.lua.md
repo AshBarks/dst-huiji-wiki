@@ -16,6 +16,10 @@
 ### 预制体依赖
 - `carnival_unwrap_fx`：carnivaldecor_figure, carnivaldecor_figure_season2（Direct；line 237,240）
 
+### 生成引用
+- `carnival_unwrap_fx`：carnivaldecor_figure, carnivaldecor_figure_season2（Direct；line 115）
+- `collapse_small`：carnivaldecor_figure, carnivaldecor_figure_season2（Direct；line 82）
+
 
 ## 函数
 

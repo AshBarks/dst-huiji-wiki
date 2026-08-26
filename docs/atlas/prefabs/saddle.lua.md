@@ -17,6 +17,9 @@
 - `components/planardefense.lua`：saddle_shadow_fx（Direct；line 389）
 - `components/updatelooper.lua`：saddle_shadow_fx（Direct；line 165）
 
+### 生成引用
+- `saddle_shadow_footprint`：saddle_shadow_fx（Direct；line 123）
+
 
 ## 函数
 

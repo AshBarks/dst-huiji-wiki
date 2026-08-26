@@ -28,6 +28,12 @@
 - `prefabs/lunar_goop_cloud_fx.lua`：lunar_grazer（Direct；line 586）
 - `prefabs/lunar_goop_trail_fx.lua`：lunar_grazer（Direct；line 586）
 
+### 生成引用
+- `lunar_grazer_core_fx`：lunar_grazer（Direct；line 428）
+- `lunar_grazer_debris`：lunar_grazer（Direct；line 98）
+- `prefabs/lunar_goop_cloud_fx.lua`：lunar_grazer（Direct；line 425）
+- `prefabs/lunar_goop_trail_fx.lua`：lunar_grazer（Direct；line 43）
+
 ### 行为
 - `brains/lunar_grazer_brain.lua`：ChaseAndAttack, Leash, Wander（prefabs/lunar_grazer.lua#lunar_grazer）
 

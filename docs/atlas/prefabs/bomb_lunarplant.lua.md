@@ -24,6 +24,9 @@
 - `prefabs/reticuleaoe.lua`：bomb_lunarplant（Direct；line 282）
 - `reticuleaoeping`：bomb_lunarplant（Direct；line 282）
 
+### 生成引用
+- `bomb_lunarplant_explode_fx`：bomb_lunarplant（Direct；line 37）
+
 
 ## 函数
 

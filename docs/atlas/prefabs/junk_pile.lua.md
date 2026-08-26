@@ -15,6 +15,9 @@
 - `junk_break_fx`：junk_pile（Direct；line 328）
 - `prefabs/storage_robot.lua`：junk_pile（Direct；line 328）
 
+### 生成引用
+- `junk_break_fx`：junk_pile（Direct；line 98,114）
+
 
 ## 函数
 

@@ -26,6 +26,11 @@
 - `prefabs/propsign.lua`：pigking（Direct；line 723）
 - `redpouch_yotp`：pigking（Direct；line 723）
 
+### 生成引用
+- `prefabs/goldnugget.lua`：pigking（Direct；line 75）
+- `prefabs/pig_coin.lua`：pigking（Direct；line 423）
+- `redpouch_yotp`：pigking（Direct；line 407）
+
 
 ## 函数
 

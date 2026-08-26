@@ -12,6 +12,9 @@
 ### 预制体依赖
 - `prefabs/rock_break_fx.lua`：moonrock_pieces（Direct；line 71）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：moonrock_pieces（Direct；line 29）
+
 
 ## 函数
 

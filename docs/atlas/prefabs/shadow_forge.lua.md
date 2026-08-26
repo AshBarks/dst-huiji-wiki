@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `collapse_small`：shadow_forge（Direct；line 177）
 
+### 生成引用
+- `collapse_small`：shadow_forge（Direct；line 24）
+
 
 ## 函数
 

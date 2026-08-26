@@ -15,6 +15,9 @@
 - `components/repairable.lua`：saltlick_improved（Direct；line 216）
 - `components/workable.lua`：saltlick, saltlick_improved（Direct；line 173）
 
+### 生成引用
+- `collapse_small`：saltlick, saltlick_improved（Direct；line 78）
+
 
 ## 函数
 

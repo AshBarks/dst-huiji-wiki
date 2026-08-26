@@ -19,6 +19,11 @@
 - `prefabs/yotc_carrat_rug.lua`：yotc_carrat_race_start（Direct；line 213）
 - `small_puff`：yotc_carrat_race_start（Direct；line 213）
 
+### 生成引用
+- `collapse_big`：yotc_carrat_race_start（Direct；line 92）
+- `prefabs/carrat_ghostracer.lua`：yotc_carrat_race_start（Direct；line 44）
+- `shadow_puff`：yotc_carrat_race_start（Direct；line 61）
+
 
 ## 函数
 

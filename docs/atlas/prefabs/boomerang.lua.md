@@ -14,6 +14,9 @@
 - `components/projectile.lua`：boomerang（Direct；line 134）
 - `components/weapon.lua`：boomerang（Direct；line 121）
 
+### 生成引用
+- `prefabs/impact.lua`：boomerang（Direct；line 72）
+
 
 ## 函数
 

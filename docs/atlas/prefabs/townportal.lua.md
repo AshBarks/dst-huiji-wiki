@@ -18,6 +18,10 @@
 - `prefabs/globalmapicon.lua`：townportal（Direct；line 288）
 - `townportalsandcoffin_fx`：townportal（Direct；line 288）
 
+### 生成引用
+- `collapse_small`：townportal（Direct；line 122）
+- `prefabs/globalmapicon.lua`：townportal（Direct；line 157）
+
 
 ## 函数
 

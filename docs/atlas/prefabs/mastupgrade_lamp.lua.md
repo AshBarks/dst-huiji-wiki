@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `collapse_small`：mastupgrade_lamp_item, mastupgrade_lamp_item_yotd, mastupgrade_lamp_yotd（Direct；line 189,192,193）
 
+### 生成引用
+- `collapse_small`：mastupgrade_lamp, mastupgrade_lamp_yotd（Direct；line 31）
+
 
 ## 函数
 

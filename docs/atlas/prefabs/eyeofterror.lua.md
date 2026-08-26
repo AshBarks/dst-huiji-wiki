@@ -51,6 +51,10 @@
 - `winter_ornament_boss_eyeofterror2`：twinofterror1, twinofterror2（Direct；line 981,982）
 - `yellowgem`：twinofterror1, twinofterror2（Direct；line 981,982）
 
+### 生成引用
+- `twinofterror1`：twinmanager（Direct；line 794）
+- `twinofterror2`：twinmanager（Direct；line 800）
+
 
 ## 函数
 

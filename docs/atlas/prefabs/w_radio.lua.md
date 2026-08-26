@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_small`：w_radio（Direct；line 319）
 
+### 生成引用
+- `collapse_small`：w_radio（Direct；line 75）
+
 
 ## 函数
 

@@ -18,6 +18,9 @@
 - `prefabs/glommer.lua`：statueglommer（Direct；line 295）
 - `prefabs/glommerflower.lua`：statueglommer（Direct；line 295）
 
+### 生成引用
+- `prefabs/glommer.lua`：statueglommer（Direct；line 73）
+
 
 ## 函数
 

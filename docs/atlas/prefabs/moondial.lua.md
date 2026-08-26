@@ -20,6 +20,11 @@
 - `prefabs/moonglass.lua`：moondial（Direct；line 223）
 - `prefabs/rock_break_fx.lua`：moondial（Direct；line 223）
 
+### 生成引用
+- `prefabs/globalmapicon.lua`：moondial（Direct；line 94）
+- `prefabs/moonglass.lua`：moondial（Direct；line 66）
+- `prefabs/rock_break_fx.lua`：moondial（Direct；line 77）
+
 
 ## 函数
 

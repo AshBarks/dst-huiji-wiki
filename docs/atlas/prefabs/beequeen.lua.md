@@ -44,6 +44,9 @@
 - `prefabs/royal_jelly.lua`：beequeen（Direct；line 497）
 - `prefabs/stinger.lua`：beequeen（Direct；line 497）
 
+### 生成引用
+- `prefabs/honey_trail.lua`：beequeen（Direct；line 87）
+
 ### 行为
 - `brains/beequeenbrain.lua`：ChaseAndAttack, FaceEntity, Leash, Wander（prefabs/beequeen.lua#beequeen）
 

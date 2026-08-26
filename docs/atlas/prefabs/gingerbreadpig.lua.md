@@ -25,6 +25,9 @@
 - `prefabs/gingerbreadhouse.lua`：gingerbreadpig, gingerdeadpig（Direct；line 224,225）
 - `prefabs/wintersfeastfuel.lua`：gingerbreadpig, gingerdeadpig（Direct；line 224,225）
 
+### 生成引用
+- `prefabs/crumbs.lua`：gingerbreadpig（Direct；line 34）
+
 
 ## 函数
 

@@ -18,6 +18,10 @@
 ### 预制体依赖
 - `crab_king_waterspout`：trident（Direct；line 281）
 
+### 生成引用
+- `crab_king_waterspout`：trident（Direct；line 183）
+- `prefabs/bullkelp_root.lua`：trident（Direct；line 117）
+
 
 ## 函数
 

@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `fossil_stalker`：fossil_piece, fossil_piece_clean（Direct；line 107,109）
 
+### 生成引用
+- `fossil_stalker`：fossil_piece, fossil_piece_clean（Direct；line 36）
+
 
 ## 函数
 

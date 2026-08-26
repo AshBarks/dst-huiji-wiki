@@ -18,6 +18,13 @@
 - `moonstorm_glass_ground_fx`：moonstorm_glass（Direct；line 263）
 - `moonstorm_glass_nub`：moonstorm_glass（Direct；line 263）
 
+### 生成引用
+- `collapse_small`：moonstorm_glass（Direct；line 76）
+- `moonstorm_glass_fx`：moonstorm_glass（Direct；line 38）
+- `moonstorm_glass_ground_fx`：moonstorm_glass（Direct；line 37）
+- `moonstorm_glass_nub`：moonstorm_glass（Direct；line 196）
+- `prefabs/rock_break_fx.lua`：moonstorm_glass（Direct；line 72）
+
 
 ## 函数
 

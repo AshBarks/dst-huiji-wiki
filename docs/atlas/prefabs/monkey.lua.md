@@ -40,6 +40,12 @@
 - `shadow_despawn`：monkey（Direct；line 529）
 - `smallmeat`：monkey（Direct；line 529）
 
+### 生成引用
+- `prefabs/poop.lua`：monkey（Direct；line 61）
+- `shadow_despawn`：monkey（Direct；line 254）
+- `statue_transition`：monkey（Direct；line 235）
+- `statue_transition_2`：monkey（Direct；line 230,248）
+
 
 ## 函数
 

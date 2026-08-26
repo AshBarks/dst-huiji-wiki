@@ -19,6 +19,14 @@
 - `shadow_pillar_base_fx`：shadow_pillar（Direct；line 774）
 - `shadow_pillar_target`：shadow_pillar_spell（Direct；line 777）
 
+### 生成引用
+- `prefabs/shadow_glob_fx.lua`：shadow_pillar_spell（Direct；line 604）
+- `prefabs/shadow_pillar.lua`：shadow_pillar_spell（Direct；line 702）
+- `sanity_lower`：shadow_pillar（Direct；line 158）
+- `sanity_raise`：shadow_pillar（Direct；line 135）
+- `shadow_pillar_base_fx`：shadow_pillar（Direct；line 123,254）
+- `shadow_pillar_target`：shadow_pillar_spell（Direct；line 689）
+
 
 ## 函数
 

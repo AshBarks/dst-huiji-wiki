@@ -21,6 +21,9 @@
 - `prefabs/ash.lua`：yots_snakeshrine（Direct；line 290）
 - `yots_snakeshrine_placer`：yots_snakeshrine（Direct；line 290）
 
+### 生成引用
+- `collapse_small`：yots_snakeshrine（Direct；line 158）
+
 
 ## 函数
 

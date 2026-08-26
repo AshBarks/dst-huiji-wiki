@@ -101,6 +101,9 @@
 ### 预制体依赖
 - `wolfgang_coach_buff_fx`：wolfgang_coach_buff（Direct；line 786）
 
+### 生成引用
+- `wolfgang_coach_buff_fx`：wolfgang_coach_buff（Direct；line 711）
+
 
 ## 函数
 

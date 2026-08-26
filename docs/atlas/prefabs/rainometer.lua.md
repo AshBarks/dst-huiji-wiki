@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `collapse_small`：rainometer（Direct；line 128）
 
+### 生成引用
+- `collapse_small`：rainometer（Direct；line 8）
+
 
 ## 函数
 

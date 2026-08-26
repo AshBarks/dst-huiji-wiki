@@ -13,6 +13,11 @@
 - `alterguardian_spike_breakfx`：alterguardian_phase2spiketrail（Direct；line 320）
 - `prefabs/alterguardian_phase2spike.lua`：alterguardian_phase2spiketrail（Direct；line 320）
 
+### 生成引用
+- `alterguardian_spike_breakfx`：alterguardian_phase2spiketrail（Direct；line 80）
+- `collapse_small`：alterguardian_phase2spiketrail（Direct；line 49）
+- `prefabs/alterguardian_phase2spike.lua`：alterguardian_phase2spiketrail（Direct；line 83）
+
 
 ## 函数
 

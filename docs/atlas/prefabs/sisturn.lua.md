@@ -21,6 +21,10 @@
 - `collapse_small`：sisturn, sisturn_moon_petal_fx（Direct；line 413,414）
 - `sisturn_moon_petal_fx`：sisturn, sisturn_moon_petal_fx（Direct；line 413,414）
 
+### 生成引用
+- `collapse_small`：sisturn（Direct；line 58）
+- `sisturn_moon_petal_fx`：sisturn（Direct；line 153）
+
 
 ## 函数
 

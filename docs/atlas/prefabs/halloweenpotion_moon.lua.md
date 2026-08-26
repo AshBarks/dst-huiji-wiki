@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `halloween_moonpuff`：halloweenpotion_moon（Direct；line 83）
 
+### 生成引用
+- `halloween_moonpuff`：halloweenpotion_moon（Direct；line 18）
+
 
 ## 函数
 

@@ -23,6 +23,10 @@
 - `prefabs/bernie_big.lua`：bernie_active（Direct；line 179）
 - `prefabs/bernie_inactive.lua`：bernie_active（Direct；line 179）
 
+### 生成引用
+- `prefabs/bernie_big.lua`：bernie_active（Direct；line 51）
+- `prefabs/bernie_inactive.lua`：bernie_active（Direct；line 25）
+
 ### 行为
 - `brains/berniebrain.lua`：Follow, Wander（prefabs/bernie_active.lua#bernie_active）
 

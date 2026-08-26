@@ -22,6 +22,10 @@
 ### 预制体依赖
 - `prefabs/potatosack.lua`：mighty_gym（Direct；line 136）
 
+### 生成引用
+- `collapse_big`：mighty_gym（Direct；line 22）
+- `prefabs/potatosack.lua`：mighty_gym（Direct；line 38）
+
 
 ## 函数
 

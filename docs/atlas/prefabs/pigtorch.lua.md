@@ -24,6 +24,10 @@
 - `prefabs/pigtorch_flame.lua`：pigtorch（Direct；line 185）
 - `prefabs/poop.lua`：pigtorch（Direct；line 185）
 
+### 生成引用
+- `collapse_small`：pigtorch（Direct；line 31,83）
+- `pigtorch_fuel`：pigtorch（Direct；line 87）
+
 
 ## 函数
 

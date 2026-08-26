@@ -24,6 +24,12 @@
 - `prefabs/ash.lua`：portableblender（Direct；line 257）
 - `prefabs/portableblender.lua`：portableblender_item（Direct；line 259）
 
+### 生成引用
+- `collapse_small`：portableblender（Direct；line 34）
+- `portableblender_item`：portableblender（Direct；line 21）
+- `prefabs/ash.lua`：portableblender（Direct；line 76）
+- `prefabs/portableblender.lua`：portableblender_item（Direct；line 188）
+
 
 ## 函数
 

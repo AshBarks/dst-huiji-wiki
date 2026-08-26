@@ -14,6 +14,9 @@
 - `components/preserver.lua`：wx78_inventorycontainer（Direct；line 195）
 - `components/updatelooper.lua`：wx78_inventorycontainer（Direct；line 130）
 
+### 生成引用
+- `collapse_small`：wx78_inventorycontainer（Direct；line 59）
+
 
 ## 函数
 

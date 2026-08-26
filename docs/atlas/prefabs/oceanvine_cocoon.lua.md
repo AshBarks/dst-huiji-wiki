@@ -25,6 +25,10 @@
 - `prefabs/twigs.lua`：oceanvine_cocoon（Direct；line 452）
 - `spider_water`：oceanvine_cocoon（Direct；line 452）
 
+### 生成引用
+- `oceanvine_cocoon_burnt`：oceanvine_cocoon（Direct；line 55）
+- `prefabs/character_fire.lua`：oceanvine_cocoon（Direct；line 77）
+
 
 ## 函数
 

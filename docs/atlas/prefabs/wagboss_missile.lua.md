@@ -14,6 +14,11 @@
 - `prefabs/ash.lua`：wagboss_missile（Direct；line 898）
 - `wagboss_missile_target_fx`：wagboss_missile（Direct；line 898）
 
+### 生成引用
+- `missile_explosion_fx`：wagboss_missile（Direct；line 522）
+- `prefabs/ash.lua`：wagboss_missile（Direct；line 547,558,568）
+- `wagboss_missile_target_fx`：wagboss_missile（Direct；line 389）
+
 
 ## 函数
 

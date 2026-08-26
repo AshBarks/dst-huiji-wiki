@@ -21,6 +21,9 @@
 - `otterden_dead`：otterden（Direct；line 471）
 - `prefabs/otter.lua`：otterden（Direct；line 471）
 
+### 生成引用
+- `otterden_dead`：otterden（Direct；line 206）
+
 
 ## 函数
 

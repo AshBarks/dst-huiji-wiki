@@ -21,6 +21,9 @@
 - `ipecacsyrup_buff`：ipecacsyrup（Direct；line 165）
 - `prefabs/poop.lua`：ipecacsyrup（Direct；line 165）
 
+### 生成引用
+- `prefabs/poop.lua`：ipecacsyrup_buff（Direct；line 93）
+
 
 ## 函数
 

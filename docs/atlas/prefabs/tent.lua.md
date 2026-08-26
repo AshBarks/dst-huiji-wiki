@@ -15,6 +15,9 @@
 - `components/sleepingbag.lua`：siestahut, tent（Direct；line 181）
 - `components/workable.lua`：siestahut, tent（Direct；line 172）
 
+### 生成引用
+- `collapse_big`：siestahut, tent（Direct；line 45）
+
 
 ## 函数
 

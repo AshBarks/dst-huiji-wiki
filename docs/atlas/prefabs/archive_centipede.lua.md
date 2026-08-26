@@ -25,6 +25,11 @@
 - `archive_centipede_husk`：archive_centipede, archive_centipede_husk（Direct；line 518,519）
 - `prefabs/gears.lua`：archive_centipede, archive_centipede_husk（Direct；line 518,519）
 
+### 生成引用
+- `archive_centipede_husk`：archive_centipede（Direct；line 322）
+- `collapse_small`：archive_centipede（Direct；line 200）
+- `prefabs/archive_centipede.lua`：archive_centipede_husk（Direct；line 412）
+
 
 ## 函数
 

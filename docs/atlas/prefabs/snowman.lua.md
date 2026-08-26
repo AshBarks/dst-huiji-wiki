@@ -31,6 +31,13 @@
 - `snowmandecorating_swap_fx`：snowman（Direct；line 849）
 - `snowmanhat_fx`：snowman（Direct；line 849）
 
+### 生成引用
+- `beeswax_spray_fx`：snowman（Direct；line 352）
+- `prefabs/snowball_item.lua`：snowman（Direct；line 84,585）
+- `snowball_rolling_fx`：snowman（Direct；line 167）
+- `snowball_shatter_fx`：snowman（Direct；line 508）
+- `snowman_debris_fx`：snowman（Direct；line 423）
+
 
 ## 函数
 

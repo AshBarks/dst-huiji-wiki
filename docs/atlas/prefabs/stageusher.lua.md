@@ -26,6 +26,10 @@
 - `stageusher_attackarm`：stageusher（Direct；line 550）
 - `stageusher_attackhand`：stageusher（Direct；line 550）
 
+### 生成引用
+- `stageusher_attackarm`：stageusher_attackhand（Direct；line 288）
+- `stageusher_attackhand`：stageusher（Direct；line 81）
+
 ### 行为
 - `brains/stageusherbrain.lua`：ChaseAndAttack, DoAction, StandStill, Wander（prefabs/stageusher.lua#stageusher）
 

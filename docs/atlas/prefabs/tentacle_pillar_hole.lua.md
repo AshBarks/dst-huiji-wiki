@@ -17,6 +17,10 @@
 - `globalmapiconseeable`：tentacle_pillar_hole（Direct；line 218）
 - `prefabs/tentacle_pillar.lua`：tentacle_pillar_hole（Direct；line 218）
 
+### 生成引用
+- `globalmapiconseeable`：tentacle_pillar_hole（Direct；line 123）
+- `prefabs/tentacle_pillar.lua`：tentacle_pillar_hole（Direct；line 20）
+
 
 ## 函数
 

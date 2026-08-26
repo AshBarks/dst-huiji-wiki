@@ -16,6 +16,10 @@
 - `components/repairable.lua`：orangeamulet（Direct；line 560）
 - `components/shadowlevel.lua`：amulet, blueamulet, greenamulet, orangeamulet, purpleamulet, yellowamulet（Direct；line 418）
 
+### 生成引用
+- `sand_puff`：orangeamulet（Direct；line 208）
+- `yellowamuletlight`：yellowamulet（Direct；line 267）
+
 
 ## 函数
 

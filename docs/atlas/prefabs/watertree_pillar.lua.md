@@ -19,6 +19,13 @@
 - `prefabs/oceantreenut.lua`：watertree_pillar（Direct；line 580）
 - `prefabs/oceanvine_cocoon.lua`：watertree_pillar（Direct；line 580）
 
+### 生成引用
+- `prefabs/fireflies.lua`：watertree_pillar（Direct；line 398）
+- `prefabs/oceanvine.lua`：watertree_pillar（Direct；line 229）
+- `prefabs/oceanvine_cocoon.lua`：watertree_pillar（Direct；line 202）
+- `watertree_pillar_ripples`：watertree_pillar（Direct；line 509）
+- `watertree_pillar_roots`：watertree_pillar（Direct；line 512）
+
 
 ## 函数
 

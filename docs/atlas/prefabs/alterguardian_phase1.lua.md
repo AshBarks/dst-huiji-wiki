@@ -35,6 +35,12 @@
 - `prefabs/moonrocknugget.lua`：alterguardian_phase1, alterguardian_phase1_lunarrift（Direct；line 752,753）
 - `winter_ornament_boss_celestialrevenant`：alterguardian_phase1_lunarrift（Direct；line 753）
 
+### 生成引用
+- `collapse_small`：alterguardian_phase1, alterguardian_phase1_lunarrift（Direct；line 189）
+- `prefabs/alterguardian_phase2.lua`：alterguardian_phase1, alterguardian_phase1_lunarrift（Direct；line 171）
+- `prefabs/alterguardian_summon_fx.lua`：alterguardian_phase1, alterguardian_phase1_lunarrift（Direct；line 251）
+- `prefabs/gestalt_alterguardian_projectile.lua`：alterguardian_phase1, alterguardian_phase1_lunarrift（Direct；line 266）
+
 
 ## 函数
 

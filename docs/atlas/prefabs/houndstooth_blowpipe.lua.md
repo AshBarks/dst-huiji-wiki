@@ -21,6 +21,9 @@
 - `houndstooth_proj`：houndstooth_blowpipe（Direct；line 316）
 - `prefabs/houndstooth.lua`：houndstooth_blowpipe（Direct；line 316）
 
+### 生成引用
+- `hitsparks_piercing_fx`：houndstooth_proj（Direct；line 150）
+
 
 ## 函数
 

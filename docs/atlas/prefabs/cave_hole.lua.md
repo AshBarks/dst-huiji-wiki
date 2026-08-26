@@ -13,6 +13,11 @@
 - `cavehole_flick_warn`：cave_hole（Direct；line 369）
 - `small_puff`：cave_hole（Direct；line 369）
 
+### 生成引用
+- `cavehole_flick`：cave_hole（Direct；line 226）
+- `cavehole_flick_warn`：cave_hole（Direct；line 245）
+- `small_puff`：cave_hole（Direct；line 54）
+
 
 ## 函数
 

@@ -13,6 +13,9 @@
 - `components/placer.lua`：wagpunk_floor_kit, wagpunk_floor_marker, wagpunk_floor_placerindicator（HelperExpanded；line 277）
 - `components/stackable.lua`：wagpunk_floor_kit（Direct；line 124）
 
+### 生成引用
+- `splash_sink`：wagpunk_floor_kit（Direct；line 63）
+
 
 ## 函数
 

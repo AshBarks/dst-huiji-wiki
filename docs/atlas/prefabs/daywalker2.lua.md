@@ -63,6 +63,9 @@
 - `wagpunkhat_blueprint`：daywalker2（Direct；line 1341）
 - `winter_ornament_boss_daywalker2`：daywalker2（Direct；line 1341）
 
+### 生成引用
+- `daywalker2_buried_fx`：daywalker2（Direct；line 803）
+
 ### 行为
 - `brains/daywalker2brain.lua`：ChaseAndAttackAndAvoid, FaceEntity, Leash, LeashAndAvoid, StandStill, Wander（prefabs/daywalker2.lua#daywalker2）
 

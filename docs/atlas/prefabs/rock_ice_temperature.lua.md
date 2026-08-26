@@ -18,6 +18,10 @@
 - `prefabs/ice_puddle.lua`：rock_ice_temperature（Direct；line 345）
 - `prefabs/ice_splash.lua`：rock_ice_temperature（Direct；line 345）
 
+### 生成引用
+- `prefabs/ice_puddle.lua`：rock_ice_temperature（Direct；line 296）
+- `prefabs/ice_splash.lua`：rock_ice_temperature（Direct；line 80）
+
 
 ## 函数
 

@@ -25,6 +25,11 @@
 - `prefabs/charcoal.lua`：pigshrine（Direct；line 311）
 - `spoiled_food`：pigshrine（Direct；line 311）
 
+### 生成引用
+- `collapse_small`：pigshrine（Direct；line 161）
+- `mudpuddle_splash`：pigshrine（Direct；line 151,164,177）
+- `spoiled_food`：pigshrine（Direct；line 185）
+
 
 ## 函数
 

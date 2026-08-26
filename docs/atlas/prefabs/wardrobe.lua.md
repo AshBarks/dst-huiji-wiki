@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_big`：wardrobe（Direct；line 141）
 
+### 生成引用
+- `collapse_big`：wardrobe（Direct；line 43）
+
 
 ## 函数
 

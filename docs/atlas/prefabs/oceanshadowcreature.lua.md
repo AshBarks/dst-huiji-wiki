@@ -26,6 +26,12 @@
 - `shadow_teleport_in`：oceanhorror（Direct；line 511）
 - `shadow_teleport_out`：oceanhorror（Direct；line 511）
 
+### 生成引用
+- `oceanhorror_attachpivot`：oceanhorror（Direct；line 97）
+- `oceanhorror_ripples`：oceanhorror（Direct；line 380）
+- `shadow_teleport_in`：oceanhorror（Direct；line 313）
+- `terrorbeak`：oceanhorror（Direct；line 307）
+
 ### 行为
 - `brains/oceanshadowcreaturebrain.lua`：StandAndAttack, StandStill, Wander（prefabs/oceanshadowcreature.lua#oceanhorror）
 

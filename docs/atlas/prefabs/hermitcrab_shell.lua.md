@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `hermitcrab_fx_med`：hermitcrab_shell（Direct；line 209）
 
+### 生成引用
+- `hermitcrab_fx_med`：hermitcrab_shell（Direct；line 45,98）
+
 
 ## 函数
 

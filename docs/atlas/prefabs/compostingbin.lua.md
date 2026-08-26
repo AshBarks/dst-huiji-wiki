@@ -21,6 +21,9 @@
 - `prefabs/compost.lua`：compostingbin（Direct；line 430）
 - `prefabs/poopcloud.lua`：compostingbin（Direct；line 430）
 
+### 生成引用
+- `collapse_small`：compostingbin（Direct；line 65）
+
 
 ## 函数
 

@@ -11,6 +11,9 @@
 ### 预制体依赖
 - `chumpiece`：chum_aoe（Direct；line 213）
 
+### 生成引用
+- `chumpiece`：chum_aoe（Direct；line 95）
+
 
 ## 函数
 

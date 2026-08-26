@@ -29,6 +29,9 @@
 - `prefabs/boat_leak.lua`：gnarwail（Direct；line 628）
 - `prefabs/gnarwail_horn.lua`：gnarwail_attack_horn（Direct；line 627）
 
+### 生成引用
+- `gnarwail_water_shadow`：gnarwail（Direct；line 560）
+
 
 ## 函数
 

@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_small`：magician_chest（Direct；line 198）
 
+### 生成引用
+- `collapse_small`：magician_chest（Direct；line 79）
+
 
 ## 函数
 

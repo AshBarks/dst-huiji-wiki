@@ -25,6 +25,10 @@
 - `prefabs/campfirefire.lua`：cotl_tabernacle_level1, cotl_tabernacle_level2, cotl_tabernacle_level3（Direct；line 335,336,337）
 - `prefabs/charcoal.lua`：cotl_tabernacle_level1, cotl_tabernacle_level2, cotl_tabernacle_level3（Direct；line 335,336,337）
 
+### 生成引用
+- `collapse_small`：cotl_tabernacle_level1, cotl_tabernacle_level2, cotl_tabernacle_level3（Direct；line 87）
+- `prefabs/ash.lua`：cotl_tabernacle_level1, cotl_tabernacle_level2, cotl_tabernacle_level3（Direct；line 86）
+
 
 ## 函数
 

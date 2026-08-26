@@ -22,6 +22,9 @@
 - `prefabs/reticuleaoe.lua`：mosquitobomb（Direct；line 316）
 - `reticuleaoeping`：mosquitobomb（Direct；line 316）
 
+### 生成引用
+- `prefabs/mosquito.lua`：mosquitobomb（Direct；line 46）
+
 
 ## 函数
 

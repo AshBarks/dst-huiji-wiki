@@ -25,6 +25,9 @@
 - `forgetmelots_dried`：forgetmelots（Direct；line 194）
 - `spoiled_food`：forgetmelots（Direct；line 194）
 
+### 生成引用
+- `weed_forgetmelots`：weed_forgetmelots_respawner（Direct；line 98）
+
 
 ## 函数
 

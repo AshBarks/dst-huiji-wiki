@@ -24,6 +24,9 @@
 - `gestalt_cage_filled3`：gestalt_cage（Direct；line 788）
 - `gestalt_cage_swap_fx`：gestalt_cage（Direct；line 788）
 
+### 生成引用
+- `gestalt_cage_swap_fx`：gestalt_cage（Direct；line 38）
+
 
 ## 函数
 

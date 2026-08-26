@@ -36,6 +36,9 @@
 - `fruitflyfruit`：lordfruitfly（Direct；line 583）
 - `prefabs/fruitfly.lua`：lordfruitfly（Direct；line 583）
 
+### 生成引用
+- `friendlyfruitfly`：fruitflyfruit（Direct；line 521）
+
 ### 行为
 - `brains/friendlyfruitflybrain.lua`：FaceEntity, FindFarmPlant, Follow, Wander（prefabs/fruitfly.lua#friendlyfruitfly）
 - `brains/fruitflybrain.lua`：ChaseAndAttack, Wander（prefabs/fruitfly.lua#fruitfly, prefabs/fruitfly.lua#lordfruitfly）

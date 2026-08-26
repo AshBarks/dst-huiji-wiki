@@ -16,6 +16,11 @@
 - `prefabs/rocks.lua`：ruins_cavein_obstacle, ruins_cavein_obstacle_rubble_fx（Direct；line 360,361）
 - `ruins_cavein_obstacle_rubble_fx`：ruins_cavein_obstacle, ruins_cavein_obstacle_rubble_fx（Direct；line 360,361）
 
+### 生成引用
+- `prefabs/ground_chunks_breaking.lua`：ruins_cavein_obstacle, ruins_cavein_obstacle_rubble_fx（Direct；line 69）
+- `prefabs/warningshadow.lua`：ruins_cavein_obstacle（Direct；line 225）
+- `ruins_cavein_obstacle_rubble_fx`：ruins_cavein_obstacle（Direct；line 28）
+
 
 ## 函数
 

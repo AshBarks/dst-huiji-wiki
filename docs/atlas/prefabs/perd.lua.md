@@ -27,6 +27,9 @@
 - `perdcorpse`：perd（Direct；line 184）
 - `redpouch`：perd（Direct；line 184）
 
+### 生成引用
+- `redpouch`：perd（Direct；line 88）
+
 
 ## 函数
 

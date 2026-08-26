@@ -27,6 +27,11 @@
 - `prefabs/rock_ice.lua`：deerclopseyeball_sentryward（Direct；line 644）
 - `prefabs/rock_ice_temperature.lua`：deerclopseyeball_sentryward（Direct；line 644）
 
+### 生成引用
+- `collapse_small`：deerclopseyeball_sentryward（Direct；line 119）
+- `deerclopseyeball_sentryward_fx`：deerclopseyeball_sentryward（Direct；line 178）
+- `prefabs/globalmapicon.lua`：deerclopseyeball_sentryward（Direct；line 147）
+
 
 ## 函数
 

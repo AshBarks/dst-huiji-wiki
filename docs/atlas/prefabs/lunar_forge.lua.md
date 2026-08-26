@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `collapse_small`：lunar_forge（Direct；line 171）
 
+### 生成引用
+- `collapse_small`：lunar_forge（Direct；line 22）
+
 
 ## 函数
 

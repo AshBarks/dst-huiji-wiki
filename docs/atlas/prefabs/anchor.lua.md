@@ -22,6 +22,9 @@
 - `anchor_item`：anchor, yotd_anchor（Direct；line 152,156）
 - `collapse_small`：anchor, yotd_anchor（Direct；line 152,156）
 
+### 生成引用
+- `collapse_small`：anchor, yotd_anchor（Direct；line 26）
+
 
 ## 函数
 

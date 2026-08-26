@@ -28,6 +28,11 @@
 - `spear_wathgrithr_lightning_fx`：spear_wathgrithr_lightning_charged（Direct；line 694）
 - `spear_wathgrithr_lightning_lunge_fx`：spear_wathgrithr_lightning, spear_wathgrithr_lightning_charged（Direct；line 693,694）
 
+### 生成引用
+- `spear_wathgrithr_lightning_charged`：spear_wathgrithr_lightning（Direct；line 253）
+- `spear_wathgrithr_lightning_fx`：spear_wathgrithr_lightning_charged（Direct；line 524）
+- `spear_wathgrithr_lightning_lunge_fx`：spear_wathgrithr_lightning, spear_wathgrithr_lightning_charged（Direct；line 175）
+
 
 ## 函数
 

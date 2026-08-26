@@ -14,6 +14,9 @@
 ### 预制体依赖
 - `security_pulse_cage_full`：security_pulse_cage（Direct；line 198）
 
+### 生成引用
+- `prefabs/security_pulse_cage.lua`：security_pulse_cage_full（Direct；line 159）
+
 
 ## 函数
 

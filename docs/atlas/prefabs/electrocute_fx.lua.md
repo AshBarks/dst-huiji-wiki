@@ -8,6 +8,9 @@
 - `components/colouradder.lua`：electrocute_fx（Direct；line 160）
 - `components/updatelooper.lua`：electrocute_fx（Direct；line 213）
 
+### 生成引用
+- `shock_arc_fx`：electrocute_fx（Direct；line 76）
+
 
 ## 函数
 

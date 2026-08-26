@@ -37,6 +37,12 @@
 - `prefabs/shadowheart_infused.lua`：chest_mimic（Direct；line 547）
 - `slingshot_band_mimic`：chest_mimic（Direct；line 547）
 
+### 生成引用
+- `chest_mimic_revealed`：chest_mimic（Direct；line 34）
+- `chest_mimic_ruinsspawn_tracker`：chest_mimic（Direct；line 79）
+- `pandorachest_reset`：chest_mimic, chest_mimic_ruinsspawn_tracker（Direct；line 174,535）
+- `prefabs/chest_mimic.lua`：chest_mimic_revealed（Direct；line 270）
+
 
 ## 函数
 

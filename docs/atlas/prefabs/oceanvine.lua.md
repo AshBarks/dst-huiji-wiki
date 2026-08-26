@@ -15,6 +15,9 @@
 - `fig`：oceanvine, oceanvine_patch（Direct；line 334,335）
 - `oceanvine_patch`：oceanvine, oceanvine_patch（Direct；line 334,335）
 
+### 生成引用
+- `prefabs/ash.lua`：oceanvine（Direct；line 183）
+
 
 ## 函数
 

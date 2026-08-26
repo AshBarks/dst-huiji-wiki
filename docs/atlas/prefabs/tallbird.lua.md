@@ -25,6 +25,10 @@
 - `meat`：tallbird（Direct；line 257）
 - `tallbirdcorpse`：tallbird（Direct；line 257）
 
+### 生成引用
+- `prefabs/smallbird.lua`：tallbird（Direct；line 149）
+- `prefabs/tallbirdnest.lua`：tallbird（Direct；line 136）
+
 
 ## 函数
 

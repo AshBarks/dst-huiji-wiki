@@ -17,6 +17,10 @@
 - `eyeofterror_mini_grounded`：eyeofterror_mini_projectile（Direct；line 187）
 - `prefabs/eyeofterror_mini.lua`：eyeofterror_mini_grounded（Direct；line 188）
 
+### 生成引用
+- `eyeofterror_mini_grounded`：eyeofterror_mini_projectile（Direct；line 19）
+- `prefabs/eyeofterror_mini.lua`：eyeofterror_mini_grounded（Direct；line 120）
+
 
 ## 函数
 

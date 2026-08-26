@@ -31,6 +31,10 @@
 - `slurtlecorpse`：slurtle, snurtle（Direct；line 261,262）
 - `slurtlehat`：slurtle, snurtle（Direct；line 261,262）
 
+### 生成引用
+- `explode_small_slurtle`：slurtle, snurtle（Direct；line 78）
+- `prefabs/slurtleslime.lua`：slurtle, snurtle（Direct；line 90）
+
 
 ## 函数
 

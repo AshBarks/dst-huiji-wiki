@@ -32,6 +32,9 @@
 - `meat`：ticoon（Direct；line 371）
 - `prefabs/coontail.lua`：ticoon（Direct；line 371）
 
+### 生成引用
+- `prefabs/ticoon.lua`：ticoon_builder（Direct；line 341）
+
 ### 行为
 - `brains/ticoonbrain.lua`：FaceEntity, Follow, Leash, StandStill, Wander（prefabs/ticoon.lua#ticoon）
 

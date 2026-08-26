@@ -27,6 +27,9 @@
 - `slurper_ruinsrespawner_inst`：slurper（Direct；line 427）
 - `slurperlight`：slurper（Direct；line 427）
 
+### 生成引用
+- `slurperlight`：slurper（Direct；line 294）
+
 
 ## 函数
 

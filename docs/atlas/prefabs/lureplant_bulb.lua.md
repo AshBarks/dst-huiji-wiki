@@ -16,6 +16,9 @@
 - `components/propagator.lua`：lureplantbulb（HelperExpanded；line 52）
 - `components/stackable.lua`：lureplantbulb（Direct；line 44）
 
+### 生成引用
+- `prefabs/lureplant.lua`：lureplantbulb（Direct；line 10）
+
 
 ## 函数
 

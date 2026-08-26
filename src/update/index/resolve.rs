@@ -444,6 +444,22 @@ impl<'a> Resolver<'a> {
                         });
                 }
             }
+            CallKind::SpawnPrefab => {
+                let Some(ArgExpr::Str(target)) = call.args.first() else {
+                    return;
+                };
+                for variant in &owners {
+                    edges.push(edge(
+                        EdgeKind::SpawnPrefab,
+                        scan,
+                        variant,
+                        target,
+                        call.line,
+                        Confidence::Direct,
+                        None,
+                    ));
+                }
+            }
             CallKind::LocalFnCall { .. } | CallKind::CtorCall { .. } => {}
         }
     }

@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_small`：seafaring_prototyper（Direct；line 150）
 
+### 生成引用
+- `collapse_small`：seafaring_prototyper（Direct；line 19）
+
 
 ## 函数
 

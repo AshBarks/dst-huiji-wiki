@@ -28,6 +28,10 @@
 - `smallbirdcorpse`：smallbird（Direct；line 501）
 - `teenbird`：smallbird（Direct；line 501）
 
+### 生成引用
+- `prefabs/tallbird.lua`：smallbird, teenbird（Direct；line 234）
+- `teenbird`：smallbird, teenbird（Direct；line 214）
+
 
 ## 函数
 

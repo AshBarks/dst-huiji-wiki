@@ -16,6 +16,10 @@
 - `kelp`：bullkelp_plant（Direct；line 150）
 - `prefabs/bullkelp_root.lua`：bullkelp_plant（Direct；line 150）
 
+### 生成引用
+- `bullkelp_plant_leaves`：bullkelp_plant（Direct；line 92）
+- `prefabs/bullkelp_root.lua`：bullkelp_plant（Direct；line 51）
+
 
 ## 函数
 

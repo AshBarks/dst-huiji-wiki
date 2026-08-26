@@ -41,6 +41,10 @@
 - `wave_med`：malbatross（Direct；line 586）
 - `winter_ornament_boss_malbatross`：malbatross（Direct；line 586）
 
+### 生成引用
+- `collapse_small`：malbatross（Direct；line 286）
+- `malbatross_feather_fall`：malbatross（Direct；line 189）
+
 
 ## 函数
 

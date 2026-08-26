@@ -28,6 +28,9 @@
 ### 预制体依赖
 - `bilesplat`：bird_mutant, bird_mutant_spitter（Direct；line 284,285）
 
+### 生成引用
+- `bilesplat`：bird_mutant_spitter（Direct；line 33）
+
 
 ## 函数
 

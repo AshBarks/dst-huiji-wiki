@@ -9,6 +9,9 @@
 - `components/projectile.lua`：bishop_charge（Direct；line 60）
 - `components/updatelooper.lua`：bishop_charge2_fx（Direct；line 153,254）
 
+### 生成引用
+- `bishop_charge_hit`：bishop_charge（Direct；line 20）
+
 
 ## 函数
 

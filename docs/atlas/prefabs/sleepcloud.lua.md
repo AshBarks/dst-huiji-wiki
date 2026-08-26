@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `sleepcloud_overlay`：sleepcloud, sleepcloud_lunar（Direct；line 405,407）
 
+### 生成引用
+- `sleepcloud_overlay`：sleepcloud, sleepcloud_lunar（Direct；line 44）
+
 
 ## 函数
 

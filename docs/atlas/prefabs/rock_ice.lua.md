@@ -17,6 +17,10 @@
 - `prefabs/ice_puddle.lua`：rock_ice（Direct；line 423）
 - `prefabs/ice_splash.lua`：rock_ice（Direct；line 423）
 
+### 生成引用
+- `prefabs/ice_puddle.lua`：rock_ice（Direct；line 355）
+- `prefabs/ice_splash.lua`：rock_ice（Direct；line 87）
+
 
 ## 函数
 

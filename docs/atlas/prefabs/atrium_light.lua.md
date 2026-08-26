@@ -12,6 +12,10 @@
 - `atrium_light_back`：atrium_light（Direct；line 155）
 - `atrium_light_light`：atrium_light（Direct；line 155）
 
+### 生成引用
+- `atrium_light_back`：atrium_light（Direct；line 51）
+- `atrium_light_light`：atrium_light（Direct；line 54）
+
 
 ## 函数
 

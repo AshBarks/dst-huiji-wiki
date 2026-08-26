@@ -59,6 +59,11 @@
 - `tumbleweedbreakfx`：tumbleweed（Direct；line 505）
 - `yellowgem`：tumbleweed（Direct；line 505）
 
+### 生成引用
+- `prefabs/ash.lua`：tumbleweed（Direct；line 254）
+- `splash_sink`：tumbleweed（Direct；line 89）
+- `tumbleweedbreakfx`：tumbleweed（Direct；line 142,262）
+
 
 ## 函数
 

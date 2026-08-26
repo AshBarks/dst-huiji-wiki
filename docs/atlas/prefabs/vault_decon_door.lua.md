@@ -7,6 +7,9 @@
 ### 组件
 - `components/inspectable.lua`：vault_decon_door（Direct；line 68）
 
+### 生成引用
+- `prefabs/vault_decon_door.lua`：vault_decon_door_collision（Direct；line 218）
+
 
 ## 函数
 

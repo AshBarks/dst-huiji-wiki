@@ -24,6 +24,9 @@
 ### 预制体依赖
 - `collapse_big`：sewing_mannequin（Direct；line 273）
 
+### 生成引用
+- `collapse_small`：sewing_mannequin（Direct；line 38）
+
 
 ## 函数
 

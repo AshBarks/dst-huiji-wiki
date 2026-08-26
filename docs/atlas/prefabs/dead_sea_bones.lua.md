@@ -14,6 +14,9 @@
 - `collapse_small`：dead_sea_bones（Direct；line 98）
 - `prefabs/boneshard.lua`：dead_sea_bones（Direct；line 98）
 
+### 生成引用
+- `collapse_small`：dead_sea_bones（Direct；line 30）
+
 
 ## 函数
 

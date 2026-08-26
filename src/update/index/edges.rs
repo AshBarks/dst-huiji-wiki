@@ -12,6 +12,8 @@ pub enum EdgeKind {
     StateGraph,
     Brain,
     PrefabDep,
+    /// `SpawnPrefab("name")` global call — F4 reverse generation.
+    SpawnPrefab,
     Behaviour,
 }
 

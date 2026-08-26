@@ -18,6 +18,11 @@
 - `singingshell_creature_woodfx`：?（Direct；line 232）
 - `singingshell_critterfx`：?（Direct；line 232）
 
+### 生成引用
+- `singingshell_creature_rockfx`：singingshell_critterfx（Direct；line 287）
+- `singingshell_creature_woodfx`：singingshell_critterfx（Direct；line 285）
+- `splash_green_small`：singingshell_critterfx（Direct；line 319）
+
 
 ## 函数
 

@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `enable_shadow_rift_construction_container`：charlie_hand, charlie_hand_keystone（Direct；line 352,353）
 
+### 生成引用
+- `shadowhand_arm`：charlie_hand, charlie_hand_keystone（Direct；line 106）
+
 
 ## 函数
 

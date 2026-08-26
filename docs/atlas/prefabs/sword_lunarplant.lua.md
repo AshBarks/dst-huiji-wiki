@@ -24,6 +24,10 @@
 - `prefabs/lunarplanttentacle.lua`：sword_lunarplant（Direct；line 309）
 - `sword_lunarplant_blade_fx`：sword_lunarplant（Direct；line 309）
 
+### 生成引用
+- `prefabs/hitsparks_fx.lua`：sword_lunarplant（Direct；line 137）
+- `sword_lunarplant_blade_fx`：sword_lunarplant（Direct；line 242,243）
+
 
 ## 函数
 

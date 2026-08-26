@@ -23,6 +23,10 @@
 - `tallbirdegg_cooked`：tallbirdegg（Direct；line 284）
 - `tallbirdegg_cracked`：tallbirdegg（Direct；line 284）
 
+### 生成引用
+- `prefabs/smallbird.lua`：tallbirdegg, tallbirdegg_cracked（Direct；line 27）
+- `tallbirdegg_cracked`：tallbirdegg, tallbirdegg_cracked（Direct；line 110）
+
 
 ## 函数
 

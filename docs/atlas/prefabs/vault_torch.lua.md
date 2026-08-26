@@ -13,6 +13,9 @@
 - `prefabs/firefx_light.lua`：vault_torch_flame（Direct；line 377）
 - `vault_torch_flame`：vault_torch（Direct；line 376）
 
+### 生成引用
+- `vault_torch_flame`：vault_torch（Direct；line 25）
+
 
 ## 函数
 

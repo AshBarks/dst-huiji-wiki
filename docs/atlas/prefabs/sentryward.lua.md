@@ -18,6 +18,10 @@
 - `collapse_small`：sentryward（Direct；line 130）
 - `prefabs/globalmapicon.lua`：sentryward（Direct；line 130）
 
+### 生成引用
+- `collapse_small`：sentryward（Direct；line 16）
+- `prefabs/globalmapicon.lua`：sentryward（Direct；line 57）
+
 
 ## 函数
 

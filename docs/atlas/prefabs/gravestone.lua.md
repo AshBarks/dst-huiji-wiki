@@ -20,6 +20,13 @@
 - `prefabs/mound.lua`：gravestone（Direct；line 431）
 - `prefabs/smallghost.lua`：gravestone（Direct；line 431）
 
+### 生成引用
+- `attune_out_fx`：gravestone（Direct；line 68,100,126）
+- `ghostflower_spirit1_fx`：gravestone（Direct；line 133）
+- `prefabs/flower_evil.lua`：gravestone（Direct；line 98）
+- `prefabs/gravestone.lua`：dug_gravestone（Direct；line 316）
+- `prefabs/smallghost.lua`：gravestone（Direct；line 40）
+
 
 ## 函数
 

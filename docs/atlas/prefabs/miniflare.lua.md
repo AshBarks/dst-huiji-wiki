@@ -18,6 +18,10 @@
 - `miniflare_minimap`：miniflare（Direct；line 219）
 - `prefabs/globalmapicon.lua`：miniflare_minimap（Direct；line 221）
 
+### 生成引用
+- `miniflare_minimap`：miniflare（Direct；line 143）
+- `prefabs/globalmapicon.lua`：miniflare_minimap（Direct；line 79）
+
 
 ## 函数
 

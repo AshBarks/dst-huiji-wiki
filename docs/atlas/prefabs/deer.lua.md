@@ -42,6 +42,9 @@
 - `prefabs/deer_antler.lua`：deer（Direct；line 700）
 - `redgem`：deer_red（Direct；line 701）
 
+### 生成引用
+- `collapse_small`：deer, deer_blue, deer_red（Direct；line 85）
+
 ### 行为
 - `brains/deerbrain.lua`：AttackWall, Leash, Panic, RunAway, StandStill, Wander（prefabs/deer.lua#deer, prefabs/deer.lua#deer_blue, prefabs/deer.lua#deer_red）
 - `brains/deergemmedbrain.lua`：AttackWall, ChaseAndAttack, FaceEntity, Leash, Panic, StandStill（prefabs/deer.lua#deer, prefabs/deer.lua#deer_blue, prefabs/deer.lua#deer_red）

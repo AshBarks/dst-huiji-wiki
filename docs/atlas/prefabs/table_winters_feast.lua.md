@@ -24,6 +24,11 @@
 - `winters_feast_depletefood`：table_winters_feast（Direct；line 606）
 - `winters_feast_food_depleted`：table_winters_feast（Direct；line 606）
 
+### 生成引用
+- `collapse_small`：table_winters_feast（Direct；line 79）
+- `winters_feast_depletefood`：table_winters_feast（Direct；line 144）
+- `winters_feast_food_depleted`：table_winters_feast（Direct；line 186）
+
 
 ## 函数
 

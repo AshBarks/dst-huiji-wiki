@@ -16,6 +16,10 @@
 - `prefabs/lavae_pet.lua`：lavae_tooth（Direct；line 89）
 - `small_puff`：lavae_tooth（Direct；line 89）
 
+### 生成引用
+- `prefabs/ash.lua`：lavae_tooth（Direct；line 33）
+- `small_puff`：lavae_tooth（Direct；line 15,27,44）
+
 
 ## 函数
 

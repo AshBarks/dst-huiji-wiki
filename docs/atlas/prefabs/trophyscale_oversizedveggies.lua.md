@@ -17,6 +17,10 @@
 ### 预制体依赖
 - `collapse_small`：trophyscale_oversizedveggies（Direct；line 437）
 
+### 生成引用
+- `collapse_small`：trophyscale_oversizedveggies（Direct；line 247）
+- `pumpkincarving_swap_fx`：trophyscale_oversizedveggies（Direct；line 231,346）
+
 
 ## 函数
 

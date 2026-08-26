@@ -22,6 +22,14 @@
 - `components/upgrademoduleowner.lua`：wx78_backupbody（Direct；line 953）
 - `components/workable.lua`：wx78_backupbody（Direct；line 919）
 
+### 生成引用
+- `collapse_small`：wx78_backupbody（Direct；line 33）
+- `explode_reskin`：wx78_backupbody（Direct；line 145）
+- `prefabs/wx78_big_spark.lua`：wx78_backupbody（Direct；line 28）
+- `prefabs/wx78_classified.lua`：wx78_backupbody（Direct；line 908）
+- `prefabs/wx78_possessedbody.lua`：wx78_backupbody（Direct；line 175）
+- `wx78_backupbody_inventory`：wx78_backupbody（Direct；line 912）
+
 
 ## 函数
 

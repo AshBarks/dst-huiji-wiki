@@ -106,6 +106,10 @@
 - `wortox_soul_spawn_fx`：wortox_decoy（Direct；line 1606）
 - `wortox_soulecho_buff_fx`：wortox_soulecho_buff（Direct；line 1601）
 
+### 生成引用
+- `wortox_soul_spawn_fx`：wortox_decoy（Direct；line 1437）
+- `wortox_soulecho_buff_fx`：wortox_soulecho_buff（Direct；line 831）
+
 
 ## 函数
 

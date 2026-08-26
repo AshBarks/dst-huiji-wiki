@@ -17,6 +17,10 @@
 ### 预制体依赖
 - `boatrace_checkpoint_flag`：boatrace_checkpoint（Direct；line 301）
 
+### 生成引用
+- `boatrace_checkpoint_flag`：boatrace_checkpoint（Direct；line 86）
+- `collapse_big`：boatrace_checkpoint（Direct；line 50）
+
 
 ## 函数
 

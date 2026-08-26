@@ -23,6 +23,12 @@
 - `prefabs/atrium_key.lua`：atrium_gate（Direct；line 817）
 - `prefabs/charlie_hand.lua`：atrium_gate（Direct；line 817）
 
+### 生成引用
+- `atrium_gate_explodesfx`：atrium_gate（Direct；line 334）
+- `prefabs/atrium_gate_activatedfx.lua`：atrium_gate（Direct；line 126）
+- `prefabs/atrium_gate_pulsesfx.lua`：atrium_gate（Direct；line 244）
+- `prefabs/atrium_key.lua`：atrium_gate（Direct；line 311,325,498）
+
 
 ## 函数
 

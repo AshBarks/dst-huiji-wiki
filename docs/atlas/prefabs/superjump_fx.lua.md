@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `superjump_debris`：superjump_fx（Direct；line 108）
 
+### 生成引用
+- `superjump_debris`：superjump_fx（Direct；line 28）
+
 
 ## 函数
 

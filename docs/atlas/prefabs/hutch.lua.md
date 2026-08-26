@@ -33,6 +33,10 @@
 - `prefabs/hutch_fishbowl.lua`：hutch（Direct；line 664）
 - `prefabs/impact.lua`：hutch（Direct；line 664）
 
+### 生成引用
+- `hutch_music_light_fx`：hutch（Direct；line 170）
+- `prefabs/impact.lua`：hutch（Direct；line 156）
+
 
 ## 函数
 

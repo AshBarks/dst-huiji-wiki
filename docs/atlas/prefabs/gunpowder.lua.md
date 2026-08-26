@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `prefabs/explode_small.lua`：gunpowder（Direct；line 85）
 
+### 生成引用
+- `prefabs/explode_small.lua`：gunpowder（Direct；line 23）
+
 
 ## 函数
 

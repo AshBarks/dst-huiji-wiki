@@ -19,6 +19,12 @@
 - `terrarium_fx`：terrarium（Direct；line 646）
 - `twinmanager`：terrarium（Direct；line 646）
 
+### 生成引用
+- `prefabs/eyeofterror.lua`：terrarium（Direct；line 331）
+- `shadow_despawn`：terrarium（Direct；line 301,410）
+- `terrarium_fx`：terrarium（Direct；line 217）
+- `twinmanager`：terrarium（Direct；line 329）
+
 
 ## 函数
 

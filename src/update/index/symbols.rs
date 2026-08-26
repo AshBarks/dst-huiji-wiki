@@ -101,6 +101,8 @@ pub enum CallKind {
     LocalFnCall {
         callee: String,
     },
+    /// `SpawnPrefab("name")` global call (F4 reverse-generation edge).
+    SpawnPrefab,
     /// Capitalized constructor call in a brain file (behaviour node candidate).
     CtorCall {
         name: String,

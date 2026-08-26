@@ -20,6 +20,10 @@
 - `prefabs/waterplant.lua`：waterplant_baby（Direct；line 263）
 - `prefabs/waterplant_rock.lua`：waterplant_baby（Direct；line 263）
 
+### 生成引用
+- `prefabs/waterplant.lua`：waterplant_baby（Direct；line 41）
+- `prefabs/waterplant_rock.lua`：waterplant_baby（Direct；line 137）
+
 
 ## 函数
 

@@ -13,6 +13,10 @@
 - `components/inventoryitem.lua`：panflute（Direct；line 144）
 - `components/tool.lua`：panflute（Direct；line 134）
 
+### 生成引用
+- `prefabs/wortox_soul_spawn.lua`：panflute（Direct；line 61）
+- `wortox_soul_spawn_fx`：panflute（Direct；line 59）
+
 
 ## 函数
 

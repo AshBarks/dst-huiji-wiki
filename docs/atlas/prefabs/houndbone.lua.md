@@ -15,6 +15,9 @@
 - `prefabs/boneshard.lua`：houndbone（Direct；line 89）
 - `prefabs/houndstooth.lua`：houndbone（Direct；line 89）
 
+### 生成引用
+- `collapse_small`：houndbone（Direct；line 33）
+
 
 ## 函数
 

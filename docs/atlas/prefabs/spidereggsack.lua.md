@@ -20,6 +20,9 @@
 ### 预制体依赖
 - `prefabs/spiderden.lua`：spidereggsack（Direct；line 83）
 
+### 生成引用
+- `prefabs/spiderden.lua`：spidereggsack（Direct；line 16）
+
 
 ## 函数
 

@@ -23,6 +23,9 @@
 ### 预制体依赖
 - `armor_voidcloth_fx`：armor_voidcloth（Direct；line 257）
 
+### 生成引用
+- `armor_voidcloth_fx`：armor_voidcloth（Direct；line 30）
+
 
 ## 函数
 

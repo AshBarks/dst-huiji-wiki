@@ -15,6 +15,9 @@
 - `components/trader.lua`：carnivaldecor_lamp（Direct；line 140）
 - `components/workable.lua`：carnivaldecor_lamp（Direct；line 135）
 
+### 生成引用
+- `collapse_small`：carnivaldecor_lamp（Direct；line 10）
+
 
 ## 函数
 

@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `prefabs/lightflier.lua`：lightflier_flower（Direct；line 492）
 
+### 生成引用
+- `prefabs/lightflier.lua`：lightflier_flower（Direct；line 82）
+
 
 ## 函数
 

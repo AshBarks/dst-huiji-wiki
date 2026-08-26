@@ -33,6 +33,13 @@
 - `prefabs/impact.lua`：gestalt_guard_projectile（Direct；line 562）
 - `prefabs/purebrilliance.lua`：gestalt_guard_evolved（Direct；line 561）
 
+### 生成引用
+- `alterguardianhat_projectile`：gestalt_guard_evolved（Direct；line 263）
+- `gestalt_guard_head`：gestalt_guard_evolved（Direct；line 394）
+- `gestalt_guard_projectile`：gestalt_guard_evolved（Direct；line 303）
+- `mining_moonglass_fx`：gestalt_guard_projectile（Direct；line 487）
+- `prefabs/impact.lua`：gestalt_guard_projectile（Direct；line 494）
+
 
 ## 函数
 

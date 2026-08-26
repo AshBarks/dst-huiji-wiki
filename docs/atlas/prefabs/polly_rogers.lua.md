@@ -31,6 +31,9 @@
 - `polly_rogerscorpse`：polly_rogers（Direct；line 252）
 - `prefabs/saltrock.lua`：salty_dog（Direct；line 253）
 
+### 生成引用
+- `prefabs/saltrock.lua`：salty_dog（Direct；line 130,145）
+
 ### 行为
 - `brains/pollyrogerbrain.lua`：Follow, StandStill, Wander（prefabs/polly_rogers.lua#polly_rogers, prefabs/polly_rogers.lua#salty_dog）
 

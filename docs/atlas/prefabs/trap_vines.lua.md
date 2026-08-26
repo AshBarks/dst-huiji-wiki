@@ -13,6 +13,9 @@
 ### 预制体依赖
 - `trap_vines_base_fx`：trap_vines（Direct；line 308）
 
+### 生成引用
+- `trap_vines_base_fx`：trap_vines（Direct；line 179,200）
+
 
 ## 函数
 

@@ -13,6 +13,9 @@
 - `warg_mutated_breath_fx`：flamethrower_fx（Direct；line 128）
 - `warg_mutated_ember_fx`：flamethrower_fx（Direct；line 128）
 
+### 生成引用
+- `warg_mutated_breath_fx`：flamethrower_fx（Direct；line 19）
+
 
 ## 函数
 

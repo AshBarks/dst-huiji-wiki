@@ -26,6 +26,10 @@
 - `winter_food1`：klaus_sack（Direct；line 233）
 - `winter_food2`：klaus_sack（Direct；line 233）
 
+### 生成引用
+- `prefabs/boneshard.lua`：klaus_sack（Direct；line 78）
+- `prefabs/klaus.lua`：klaus_sack（Direct；line 115）
+
 
 ## 函数
 

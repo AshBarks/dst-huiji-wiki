@@ -30,6 +30,19 @@
 - `prefabs/boatrace_spectator_dragonling.lua`：boatrace_start（Direct；line 1091）
 - `redpouch_yotd`：boatrace_start（Direct；line 1091）
 
+### 生成引用
+- `boatrace_checkpoint_throwable_deploykit`：boatrace_start（Direct；line 104）
+- `boatrace_fireworks`：boatrace_start（Direct；line 575）
+- `boatrace_start_bobber`：boatrace_start（Direct；line 792）
+- `boatrace_start_flag`：boatrace_start（Direct；line 636）
+- `collapse_big`：boatrace_start（Direct；line 62）
+- `dragonboat_shadowboat`：boatrace_start（Direct；line 232）
+- `prefabs/boatrace_checkpoint_indicator.lua`：boatrace_start（Direct；line 317,410）
+- `prefabs/boatrace_spectator_dragonling.lua`：boatrace_start（Direct；line 449）
+- `redpouch_yotd`：boatrace_start（Direct；line 557）
+- `redpouch_yotd_unwrap`：boatrace_start（Direct；line 551）
+- `shadow_puff_large_front`：boatrace_start（Direct；line 333）
+
 
 ## 函数
 

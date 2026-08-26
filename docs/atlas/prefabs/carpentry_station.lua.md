@@ -19,6 +19,9 @@
 - `collapse_small`：carpentry_station（Direct；line 212）
 - `prefabs/ash.lua`：carpentry_station（Direct；line 212）
 
+### 生成引用
+- `collapse_small`：carpentry_station（Direct；line 37）
+
 
 ## 函数
 

@@ -19,6 +19,9 @@
 - `prefabs/eyeflame.lua`：livingtree_halloween（Direct；line 386）
 - `prefabs/livinglog.lua`：livingtree_halloween（Direct；line 386）
 
+### 生成引用
+- `prefabs/eyeflame.lua`：livingtree_halloween（Direct；line 86,92）
+
 
 ## 函数
 

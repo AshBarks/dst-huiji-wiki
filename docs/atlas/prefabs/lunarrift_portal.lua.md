@@ -18,6 +18,12 @@
 - `prefabs/lunar_grazer.lua`：lunarrift_portal（Direct；line 752）
 - `prefabs/rift_terraformer.lua`：lunarrift_portal（Direct；line 752）
 
+### 生成引用
+- `lunarrift_portal_shadow`：lunarrift_portal（Direct；line 642）
+- `prefabs/globalmapicon.lua`：lunarrift_portal（Direct；line 587）
+- `prefabs/lunar_grazer.lua`：lunarrift_portal（Direct；line 191）
+- `prefabs/rift_terraformer.lua`：lunarrift_portal（Direct；line 49）
+
 
 ## 函数
 

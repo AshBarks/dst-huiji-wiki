@@ -18,6 +18,9 @@
 - `vault_orb`：vault_teleporter（Direct；line 432）
 - `vault_portal_fx`：vault_teleporter（Direct；line 432）
 
+### 生成引用
+- `vault_orb`：vault_teleporter（Direct；line 256）
+
 
 ## 函数
 

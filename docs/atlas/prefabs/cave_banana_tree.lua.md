@@ -22,6 +22,11 @@
 - `prefabs/log.lua`：cave_banana_tree（Direct；line 313）
 - `prefabs/twigs.lua`：cave_banana_tree（Direct；line 313）
 
+### 生成引用
+- `cave_banana_burnt`：cave_banana_tree（Direct；line 91）
+- `cave_banana_stump`：cave_banana_tree（Direct；line 52）
+- `prefabs/ash.lua`：cave_banana_stump（Direct；line 185）
+
 
 ## 函数
 

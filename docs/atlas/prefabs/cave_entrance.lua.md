@@ -16,6 +16,10 @@
 - `prefabs/bat.lua`：cave_entrance, cave_entrance_open, cave_entrance_ruins（Direct；line 243,244,245）
 - `prefabs/rock_break_fx.lua`：cave_entrance, cave_entrance_open, cave_entrance_ruins（Direct；line 243,244,245）
 
+### 生成引用
+- `cave_entrance_open`：cave_entrance, cave_entrance_ruins（Direct；line 65）
+- `prefabs/rock_break_fx.lua`：cave_entrance, cave_entrance_ruins（Direct；line 59）
+
 
 ## 函数
 

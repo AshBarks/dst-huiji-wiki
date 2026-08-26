@@ -28,6 +28,9 @@
 - `frogsplash`：frog（Direct；line 258）
 - `prefabs/froglegs.lua`：frog, lunarfrog（Direct；line 258,259）
 
+### 生成引用
+- `frogsplash`：frog, lunarfrog（Direct；line 94）
+
 
 ## 函数
 

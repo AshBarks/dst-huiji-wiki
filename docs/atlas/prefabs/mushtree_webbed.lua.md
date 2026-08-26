@@ -21,6 +21,9 @@
 - `prefabs/log.lua`：mushtree_tall_webbed（Direct；line 339）
 - `prefabs/silk.lua`：mushtree_tall_webbed（Direct；line 339）
 
+### 生成引用
+- `mushtree_tall_webbed_burntfx`：mushtree_tall_webbed（Direct；line 157）
+
 
 ## 函数
 

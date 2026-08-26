@@ -26,6 +26,10 @@
 - `prefabs/petals_evil.lua`：petals（Direct；line 138）
 - `small_puff`：petals（Direct；line 138）
 
+### 生成引用
+- `prefabs/petals_evil.lua`：petals（Direct；line 23）
+- `small_puff`：petals（Direct；line 21）
+
 
 ## 函数
 

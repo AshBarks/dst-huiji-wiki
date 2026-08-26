@@ -25,6 +25,13 @@
 - `prefabs/moonrockseed.lua`：alterguardian_phase3dead（Direct；line 277）
 - `wagstaff_npc_pstboss`：alterguardian_phase3deadorb（Direct；line 276）
 
+### 生成引用
+- `collapse_big`：alterguardian_phase3dead（Direct；line 205）
+- `prefabs/alterguardian_phase3dead.lua`：alterguardian_phase3deadorb（Direct；line 51）
+- `prefabs/moonrockseed.lua`：alterguardian_phase3dead（Direct；line 218）
+- `prefabs/rock_break_fx.lua`：alterguardian_phase3dead（Direct；line 204）
+- `wagstaff_npc_pstboss`：alterguardian_phase3deadorb（Direct；line 130）
+
 
 ## 函数
 

@@ -26,6 +26,9 @@
 - `wagdrone_rolling_collide_med_fx`：wagdrone_rolling（Direct；line 227）
 - `wagdrone_rolling_collide_small_fx`：wagdrone_rolling（Direct；line 227）
 
+### 生成引用
+- `wagdrone_laserwire_fx`：wagdrone_rolling（Direct；line 83）
+
 ### 行为
 - `brains/wagdrone_rollingbrain.lua`：Leash, StandStill（prefabs/wagdrone_rolling.lua#wagdrone_rolling）
 

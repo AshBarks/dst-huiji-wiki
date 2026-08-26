@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `reticulemultitargetsub`：reticulemultitarget, reticulemultitargetping, reticulemultitargetsub（Direct；line 158,159,160）
 
+### 生成引用
+- `reticulemultitargetsub`：reticulemultitarget（Direct；line 40）
+
 
 ## 函数
 

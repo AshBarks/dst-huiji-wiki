@@ -27,6 +27,11 @@
 - `rook_nightmare`：chessjunk, chessjunk1, chessjunk2, chessjunk3（Direct；line 246,247,248,249）
 - `yellowgem`：chessjunk, chessjunk1, chessjunk2, chessjunk3（Direct；line 246,247,248,249）
 
+### 生成引用
+- `collapse_small`：chessjunk（Direct；line 116）
+- `lucky_goldnugget`：chessjunk（Direct；line 149）
+- `maxwell_smoke`：chessjunk（Direct；line 47）
+
 
 ## 函数
 

@@ -19,6 +19,12 @@
 - `rock_moon_shell`：shadowmeteor（Direct；line 343）
 - `splash_ocean`：shadowmeteor（Direct；line 343）
 
+### 生成引用
+- `prefabs/burntground.lua`：shadowmeteor（Direct；line 68）
+- `prefabs/ground_chunks_breaking.lua`：shadowmeteor（Direct；line 111）
+- `prefabs/meteorwarning.lua`：shadowmeteor（Direct；line 231）
+- `splash_ocean`：shadowmeteor（Direct；line 63）
+
 
 ## 函数
 

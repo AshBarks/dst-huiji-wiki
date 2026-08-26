@@ -18,6 +18,13 @@
 - `junkball_fx`：junk_pile_big（Direct；line 711）
 - `prefabs/daywalker2.lua`：junk_pile_big（Direct；line 711）
 
+### 生成引用
+- `junk_break_fx`：junk_pile_big（Direct；line 303,329,409,514,525）
+- `junk_pile_blueprint`：junk_pile_big（Direct；line 235）
+- `junk_pile_side`：junk_pile_big（Direct；line 61）
+- `junkball_fx`：junk_pile_big（Direct；line 227）
+- `prefabs/daywalker2.lua`：junk_pile_big（Direct；line 93）
+
 
 ## 函数
 

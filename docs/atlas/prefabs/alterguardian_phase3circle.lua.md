@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `alterguardian_lasertrail`：alterguardian_phase3circle（Direct；line 61）
 
+### 生成引用
+- `alterguardian_lasertrail`：alterguardian_phase3circle（Direct；line 36）
+
 
 ## 函数
 

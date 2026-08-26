@@ -16,6 +16,9 @@
 - `components/stackable.lua`：dug_trap_starfish（Direct；line 266）
 - `components/workable.lua`：trap_starfish（Direct；line 189）
 
+### 生成引用
+- `prefabs/trap_starfish.lua`：dug_trap_starfish（Direct；line 222）
+
 
 ## 函数
 

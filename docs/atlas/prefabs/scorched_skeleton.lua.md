@@ -14,6 +14,9 @@
 - `prefabs/ash.lua`：scorched_skeleton（Direct；line 88）
 - `prefabs/boneshard.lua`：scorched_skeleton（Direct；line 88）
 
+### 生成引用
+- `collapse_small`：scorched_skeleton（Direct；line 25）
+
 
 ## 函数
 

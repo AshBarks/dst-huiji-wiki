@@ -43,6 +43,9 @@
 - `prefabs/hareball.lua`：cozy_bunnyman（Direct；line 637）
 - `prefabs/manrabbit_tail.lua`：cozy_bunnyman（Direct；line 637）
 
+### 生成引用
+- `redpouch_yotr`：cozy_bunnyman（Direct；line 335）
+
 ### 行为
 - `brains/cozy_bunnymanbrain.lua`：ChaseAndAttack, ChattyNode, DoAction, FaceEntity, Leash, Panic, StandStill, Wander（prefabs/cozy_bunnyman.lua#cozy_bunnyman）
 

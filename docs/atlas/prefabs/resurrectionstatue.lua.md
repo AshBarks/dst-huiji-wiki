@@ -18,6 +18,10 @@
 - `collapse_small`：resurrectionstatue（Direct；line 181）
 - `prefabs/charcoal.lua`：resurrectionstatue（Direct；line 181）
 
+### 生成引用
+- `collapse_big`：resurrectionstatue（Direct；line 30）
+- `collapse_small`：resurrectionstatue（Direct；line 25）
+
 
 ## 函数
 

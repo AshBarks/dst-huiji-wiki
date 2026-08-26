@@ -26,6 +26,13 @@
 - `waveyjones_hand_art`：waveyjones_hand（Direct；line 523）
 - `waveyjones_marker`：waveyjones, waveyjones_marker（Direct；line 522,526）
 
+### 生成引用
+- `prefabs/waveyjones.lua`：waveyjones_marker（Direct；line 406）
+- `shadowhand_fx`：waveyjones_hand_art（Direct；line 309）
+- `waveyjones_arm`：waveyjones（Direct；line 85）
+- `waveyjones_hand`：waveyjones_arm（Direct；line 367）
+- `waveyjones_hand_art`：waveyjones_hand（Direct；line 223）
+
 
 ## 函数
 

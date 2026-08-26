@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `wave_splash`：gnarwail_horn（Direct；line 156）
 
+### 生成引用
+- `wave_splash`：gnarwail_horn（Direct；line 54,63）
+
 
 ## 函数
 

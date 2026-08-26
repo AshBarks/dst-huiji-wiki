@@ -46,6 +46,10 @@
 - `winter_ornament_boss_mutateddeerclops`：mutateddeerclops（Direct；line 714）
 - `winter_ornament_light1`：deerclops（Direct；line 713）
 
+### 生成引用
+- `collapse_small`：deerclops, mutateddeerclops（Direct；line 256）
+- `deerclops_spikefire_fx`：mutateddeerclops（Direct；line 312）
+
 
 ## 函数
 

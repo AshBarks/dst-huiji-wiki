@@ -21,6 +21,9 @@
 - `prefabs/charcoal.lua`：yotb_beefaloshrine（Direct；line 275）
 - `redpouch_yotb`：yotb_beefaloshrine（Direct；line 275）
 
+### 生成引用
+- `collapse_small`：yotb_beefaloshrine（Direct；line 146）
+
 
 ## 函数
 

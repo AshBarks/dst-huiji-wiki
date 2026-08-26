@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `beef_bell_shadow_cursefx`：shadow_beef_bell_curse（Direct；line 110）
 
+### 生成引用
+- `beef_bell_shadow_cursefx`：shadow_beef_bell_curse（Direct；line 50）
+
 
 ## 函数
 

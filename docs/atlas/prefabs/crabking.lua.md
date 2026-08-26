@@ -57,6 +57,19 @@
 - `winter_ornament_boss_crabking`：crabking（Direct；line 2137）
 - `winter_ornament_boss_crabkingpearl`：crabking（Direct；line 2137）
 
+### 生成引用
+- `crab_king_shine`：crabking（Direct；line 280）
+- `crab_king_waterspout`：crabking（Direct；line 1096）
+- `crabking_ring_fx`：crabking（Direct；line 954）
+- `mining_fx`：crabking（Direct；line 339）
+- `prefabs/crabking_cannontower.lua`：crabking（Direct；line 998）
+- `prefabs/crabking_claw.lua`：crabking（Direct；line 1257）
+- `prefabs/crabking_icewall.lua`：crabking（Direct；line 908）
+- `prefabs/crabking_spawner.lua`：crabking（Direct；line 705）
+- `prefabs/seastack.lua`：crabking（Direct；line 1147）
+- `round_puff_fx_lg`：crabking（Direct；line 1412）
+- `splash_green_large`：crabking（Direct；line 1155）
+
 
 ## 函数
 

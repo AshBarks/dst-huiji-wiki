@@ -32,6 +32,11 @@
 - `bernie_big_fire`：bernie_big, bernie_big_fire（Direct；line 775,776）
 - `prefabs/bernie_inactive.lua`：bernie_big, bernie_big_fire（Direct；line 775,776）
 
+### 生成引用
+- `bernie_big_fire`：bernie_big（Direct；line 240）
+- `prefabs/bernie_inactive.lua`：bernie_big（Direct；line 83）
+- `prefabs/impact.lua`：bernie_big（Direct；line 48）
+
 ### 行为
 - `brains/berniebigbrain.lua`：ChaseAndAttack, FaceEntity, Follow, Wander（prefabs/bernie_big.lua#bernie_big）
 

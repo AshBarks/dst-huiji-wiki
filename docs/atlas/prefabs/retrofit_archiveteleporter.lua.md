@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `prefabs/wormhole.lua`：retrofit_archiveteleporter（Direct；line 98）
 
+### 生成引用
+- `prefabs/wormhole.lua`：retrofit_archiveteleporter（Direct；line 38,49,57）
+
 
 ## 函数
 

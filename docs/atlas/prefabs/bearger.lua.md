@@ -51,6 +51,9 @@
 - `spoiled_food`：mutatedbearger（Direct；line 846）
 - `winter_ornament_boss_mutatedbearger`：mutatedbearger（Direct；line 846）
 
+### 生成引用
+- `collapse_small`：bearger, mutatedbearger（Direct；line 207）
+
 ### 行为
 - `brains/beargerbrain.lua`：ChaseAndAttack, ChaseAndRam, DoAction, Wander（prefabs/bearger.lua#bearger, prefabs/bearger.lua#mutatedbearger）
 

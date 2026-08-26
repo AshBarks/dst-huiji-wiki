@@ -30,6 +30,12 @@
 - `prefabs/winona_teleport_pad.lua`：winona_teleport_pad_item（Direct；line 906）
 - `winona_teleport_pad_item`：winona_teleport_pad（Direct；line 904）
 
+### 生成引用
+- `collapse_small`：winona_teleport_pad（Direct；line 358,382）
+- `prefabs/winona_battery_sparks.lua`：winona_teleport_pad（Direct；line 330）
+- `prefabs/winona_teleport_pad.lua`：winona_teleport_pad_item（Direct；line 850）
+- `winona_teleport_pad_item`：winona_teleport_pad（Direct；line 315）
+
 
 ## 函数
 

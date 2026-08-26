@@ -19,6 +19,9 @@
 - `ice`：sharkboi_ice_hazard（Direct；line 411）
 - `prefabs/ice_splash.lua`：sharkboi_ice_hazard（Direct；line 411）
 
+### 生成引用
+- `prefabs/ice_splash.lua`：sharkboi_ice_hazard（Direct；line 76,281）
+
 
 ## 函数
 

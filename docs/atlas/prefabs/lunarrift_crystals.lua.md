@@ -18,6 +18,11 @@
 - `prefabs/lunarrift_crystal_spawn_fx.lua`：lunarrift_crystal_big, lunarrift_crystal_small（Direct；line 267,268）
 - `prefabs/purebrilliance.lua`：lunarrift_crystal_big, lunarrift_crystal_small（Direct；line 267,268）
 
+### 生成引用
+- `collapse_small`：lunarrift_crystal_big, lunarrift_crystal_small（Direct；line 205,243）
+- `mining_moonglass_fx`：lunarrift_crystal_big, lunarrift_crystal_small（Direct；line 204,242）
+- `prefabs/lunarrift_crystal_spawn_fx.lua`：lunarrift_crystal_big, lunarrift_crystal_small（Direct；line 34）
+
 
 ## 函数
 

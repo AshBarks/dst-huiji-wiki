@@ -21,6 +21,13 @@
 - `messagebottle_throwable`：messagebottle（Direct；line 484）
 - `messagebottleempty`：messagebottle（Direct；line 484）
 
+### 生成引用
+- `gelblob_bottle`：messagebottleempty（Direct；line 219）
+- `gelblob_small_fx`：gelblob_bottle（Direct；line 396）
+- `messagebottle_break_fx`：gelblob_bottle, messagebottle_throwable（Direct；line 294,394）
+- `messagebottleempty`：messagebottle, messagebottle_throwable（Direct；line 60）
+- `splash_green_small`：gelblob_bottle, messagebottle_throwable（Direct；line 288,388）
+
 
 ## 函数
 

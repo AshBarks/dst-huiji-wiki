@@ -22,6 +22,13 @@
 - `oceantree_pillar_ripples`：oceantree_pillar（Direct；line 726）
 - `oceantree_pillar_roots`：oceantree_pillar（Direct；line 726）
 
+### 生成引用
+- `oceantree_leaf_fx_fall`：oceantree_pillar（Direct；line 110）
+- `oceantree_pillar_leaves`：oceantree_pillar（Direct；line 116）
+- `oceantree_pillar_ripples`：oceantree_pillar（Direct；line 613）
+- `oceantree_pillar_roots`：oceantree_pillar（Direct；line 616）
+- `prefabs/oceanvine.lua`：oceantree_pillar（Direct；line 237）
+
 
 ## 函数
 

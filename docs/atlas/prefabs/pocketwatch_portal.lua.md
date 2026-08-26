@@ -15,6 +15,13 @@
 - `pocketwatch_portal_entrance_underlay`：pocketwatch_portal_entrance（Direct；line 510）
 - `pocketwatch_portal_exit`：pocketwatch_portal_entrance（Direct；line 510）
 
+### 生成引用
+- `pocketwatch_portal_entrance`：pocketwatch_portal（Direct；line 58）
+- `pocketwatch_portal_entrance_overlay`：pocketwatch_portal_entrance（Direct；line 297）
+- `pocketwatch_portal_entrance_underlay`：pocketwatch_portal_entrance（Direct；line 300）
+- `pocketwatch_portal_exit`：pocketwatch_portal_entrance（Direct；line 209）
+- `pocketwatch_recall`：pocketwatch_portal（Direct；line 63）
+
 
 ## 函数
 

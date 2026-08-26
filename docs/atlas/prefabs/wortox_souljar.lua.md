@@ -18,6 +18,9 @@
 - `collapse_small`：wortox_souljar（Direct；line 238）
 - `prefabs/wortox_soul.lua`：wortox_souljar（Direct；line 238）
 
+### 生成引用
+- `collapse_small`：wortox_souljar（Direct；line 138）
+
 
 ## 函数
 

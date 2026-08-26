@@ -23,6 +23,9 @@
 - `prefabs/flies.lua`：mosquitofertilizer（Direct；line 138）
 - `prefabs/poopcloud.lua`：mosquitofertilizer（Direct；line 138）
 
+### 生成引用
+- `prefabs/poopcloud.lua`：mosquitofertilizer（Direct；line 40）
+
 
 ## 函数
 

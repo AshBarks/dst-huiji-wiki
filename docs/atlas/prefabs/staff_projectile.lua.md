@@ -11,6 +11,10 @@
 - `fire_fail_fx`：fire_projectile（Direct；line 111）
 - `prefabs/shatter.lua`：ice_projectile（Direct；line 110）
 
+### 生成引用
+- `fire_fail_fx`：fire_projectile（Direct；line 37）
+- `prefabs/shatter.lua`：ice_projectile（Direct；line 18）
+
 
 ## 函数
 

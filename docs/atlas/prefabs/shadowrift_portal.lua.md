@@ -18,6 +18,11 @@
 - `prefabs/gelblob.lua`：shadowrift_portal, shadowrift_portal_fx（Direct；line 521,522）
 - `shadowrift_portal_fx`：shadowrift_portal, shadowrift_portal_fx（Direct；line 521,522）
 
+### 生成引用
+- `prefabs/globalmapicon.lua`：shadowrift_portal（Direct；line 346）
+- `shadowrift_portal_fx`：shadowrift_portal（Direct；line 207）
+- `statue_transition`：shadowrift_portal（Direct；line 69）
+
 
 ## 函数
 

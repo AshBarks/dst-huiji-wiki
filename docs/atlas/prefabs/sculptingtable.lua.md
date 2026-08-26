@@ -21,6 +21,9 @@
 - `collapse_small`：sculptingtable（Direct；line 365）
 - `prefabs/sketch.lua`：sculptingtable（Direct；line 365）
 
+### 生成引用
+- `collapse_small`：sculptingtable（Direct；line 64,220）
+
 
 ## 函数
 

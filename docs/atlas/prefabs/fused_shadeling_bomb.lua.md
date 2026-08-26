@@ -19,6 +19,11 @@
 - `fused_shadeling_bomb_scorch`：fused_shadeling_bomb（Direct；line 445）
 - `round_puff_fx_sm`：fused_shadeling_bomb（Direct；line 445）
 
+### 生成引用
+- `fused_shadeling_bomb_death_fx`：fused_shadeling_bomb, fused_shadeling_quickfuse_bomb（Direct；line 99）
+- `fused_shadeling_bomb_scorch`：fused_shadeling_bomb, fused_shadeling_quickfuse_bomb（Direct；line 105）
+- `fused_shadeling_quickfuse_bomb`：fused_shadeling_bomb（Direct；line 109）
+
 
 ## 函数
 

@@ -12,6 +12,9 @@
 - `wurt_terraformer_fx_lunar`：wurt_swamp_terraformer（Direct；line 268）
 - `wurt_terraformer_fx_shadow`：wurt_swamp_terraformer（Direct；line 268）
 
+### 生成引用
+- `wurt_swamp_terraform_fx`：wurt_swamp_terraformer（Direct；line 99,163）
+
 
 ## 函数
 

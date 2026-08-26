@@ -8,7 +8,7 @@
 - **v3.1**：决策落定——①基础设施预构建方向确认：代码侧符号级关联索引 + wiki 大面积扫描产出 CodeTextAtlas 与 per-file/per-fn 说明文本（入仓库，作为 LLM 提示词资产；fn 级标注排期 M4）；②相关性标签是先验非闸门：old_literal 回查命中可推翻任何低相关标签；③§5 多数开放问题结案（见该节标记）；④页面全量语料抓取方案独立成文：[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)
 - **v3.2**：§4.2.4 增补**章节级 LLM 介入边界表**（基于全语料结构分析 [CORPUS_PAGE_PATTERNS.md](CORPUS_PAGE_PATTERNS.md) + 语料实证抽样；含无标题导语区边界、料理配方≠制作配方的溯源区分、制作章新增的纯代码检验点）
 - **v3.3**：§4.2 各小节标注可执行状态；**§4.2.6 页面匹配修订**——语料侧注册表（pages_by_prefab.json）取代"标题候选猜测+API 往返"，匹配变为离线确定性查表；PageSegmenter 补信息框参数级细分以支撑 F1 字节级锚定
-- **v3.4（2026-08-26 实施记录）**：M2/M3a/M4 前段落地——F1 loot、F2 stats、F3 行为常量子集、fn 标注 MVP、BrainEdge 动态解析验证、atlas 全覆盖关联渲染；join 阶段大小写归一（case_only 不再进人工纠错）、vault_crawler create_check 关闭；§4.2.2 反向传播收窄已实施（组件变更仅传播本地覆写者，超阈值聚合）。
+- **v3.4（2026-08-26 实施记录）**：M2/M3a/M4 前段落地——F1 loot、F2 stats、F3 行为常量子集、fn 标注 MVP、BrainEdge 动态解析验证、atlas 全覆盖关联渲染、F4 SpawnPrefab 反向生成首版；join 阶段大小写归一（case_only 不再进人工纠错）、vault_crawler create_check 关闭；§4.2.2 反向传播收窄已实施（组件变更仅传播本地覆写者，超阈值聚合）。
 
 **关联文档**：[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)（现有工具评估，§6 改进项已落地）、[CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md)、[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)（语料底座）
 
@@ -228,7 +228,7 @@ return Prefab("hound", fndefault, ...), Prefab("firehound", fnfire, ...), ...  -
 | 4.2.2 关联链反向传播 | ✅ 已完成首版 | 组件变更仅传播本地覆写者；超过 30 实体聚合为计数行 |
 | 4.2.3 F1 掉落表 | ✅ 已完成 | loot 提取/配对/join/定级闭环；L1 人工比对结论已回填 |
 | 4.2.3 F2 数值属性 | ✅ 已完成（M3a 只读留档） | stats 提取/归属/配对/定级/审阅记录；apply 写回仍冻结 |
-| 4.2.3 F3/F4 | F3 常量子集 ✅；F4 ⏸ | F3 brains 常量提取与配对已落地；F4 待全局引用索引成熟 |
+| 4.2.3 F3/F4 | F3 常量子集 ✅；F4 首版 ✅ | F3 brains 常量提取与配对已落地；F4 SpawnPrefab 反向生成边/atlas 展示已落地 |
 | 4.2.4 编辑取舍模型 | ✅ 已完成初版 | 取舍配置 TOML（TakeupConfig）已落地 |
 | 4.2.5 FactChange 类型 | ✅ 已完成 | fact.rs 统一模型已落地 |
 | 4.2.6 页面匹配与定级 | ✅ 已完成 | 注册表查表 + 大小写归一；vault_crawler create_check 已关闭 |
@@ -412,7 +412,7 @@ src/update/
 | M1 A+Tier0 | snapshot/diff/rules + 静态管线调度与核对报告 + **AssociationIndex 字面量边（component/SG）与反向传播计数** | ✅ 基本完成 |
 | M2 F1 MVP | PrefabIndex(loot 部分)+TuningTable+loot.rs+segmenter(RichTab)+匹配+确定性建议 | ✅ 已完成并闭环 |
 | M3 F2 | stats.rs+stat-update LLM 模板+apply 流程实战 | 🟨 F2+审阅记录完成，apply 写回按用户要求冻结 |
-| M4 F3/F4+打磨 | behavior/backref、**BrainEdge 动态解析（require 追踪/参数流/常量折叠）**、取舍配置回填、create-check、缓存断点续跑 | 🟨 F3/BrainEdge/atlas 前段完成；F4/缓存/create-check 清单化待做 |
+| M4 F3/F4+打磨 | behavior/backref、**BrainEdge 动态解析（require 追踪/参数流/常量折叠）**、取舍配置回填、create-check、缓存断点续跑 | 🟨 F3/BrainEdge/atlas/F4 首版完成；缓存/create-check 清单化待做 |
 
 ### 4.9 风险与对策（v2/v3 增补）
 

@@ -21,6 +21,10 @@
 - `prefabs/campfirefire.lua`：firepit（Direct；line 266）
 - `prefabs/charcoal.lua`：firepit（Direct；line 266）
 
+### 生成引用
+- `collapse_small`：firepit（Direct；line 20）
+- `prefabs/ash.lua`：firepit（Direct；line 19）
+
 
 ## 函数
 

@@ -18,6 +18,9 @@
 ### 预制体依赖
 - `bramblefx_armor`：armor_bramble（Direct；line 141）
 
+### 生成引用
+- `bramblefx_armor`：armor_bramble（Direct；line 23）
+
 
 ## 函数
 

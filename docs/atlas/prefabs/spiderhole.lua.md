@@ -25,6 +25,10 @@
 - `spider_hider`：spiderhole, spiderhole_rock（Direct；line 277,278）
 - `spider_spitter`：spiderhole, spiderhole_rock（Direct；line 277,278）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：spiderhole_rock（Direct；line 60）
+- `spiderhole_rock`：spiderhole（Direct；line 85）
+
 
 ## 函数
 

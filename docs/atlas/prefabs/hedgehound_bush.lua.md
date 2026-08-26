@@ -13,6 +13,10 @@
 ### 预制体依赖
 - `prefabs/petals.lua`：hedgehound_bush（Direct；line 178）
 
+### 生成引用
+- `hedgehound`：hedgehound_bush（Direct；line 65）
+- `prefabs/petals.lua`：hedgehound_bush（Direct；line 96）
+
 
 ## 函数
 

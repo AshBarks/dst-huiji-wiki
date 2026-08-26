@@ -19,6 +19,11 @@
 - `splash`：trophyscale_fish（Direct；line 372）
 - `wave_splash`：trophyscale_fish（Direct；line 372）
 
+### 生成引用
+- `collapse_small`：trophyscale_fish（Direct；line 187）
+- `splash`：trophyscale_fish（Direct；line 211）
+- `wave_splash`：trophyscale_fish（Direct；line 193）
+
 
 ## 函数
 

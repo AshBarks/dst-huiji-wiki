@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `prefabs/ash.lua`：candybag（Direct；line 103）
 
+### 生成引用
+- `prefabs/ash.lua`：candybag（Direct；line 34）
+
 
 ## 函数
 

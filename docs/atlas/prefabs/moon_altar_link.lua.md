@@ -14,6 +14,10 @@
 - `moon_altar_link_contained`：moon_altar_link（Direct；line 236）
 - `moonpulse_spawner`：moon_altar_link（Direct；line 236）
 
+### 生成引用
+- `collapse_small`：moon_altar_link（Direct；line 41）
+- `moonpulse_spawner`：moon_altar_link（Direct；line 57）
+
 
 ## 函数
 

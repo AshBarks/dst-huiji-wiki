@@ -34,6 +34,9 @@
 - `shadowthrall_centipede_body`：shadowthrall_centipede_controller（Direct；line 485）
 - `shadowthrall_centipede_head`：shadowthrall_centipede_controller（Direct；line 485）
 
+### 生成引用
+- `collapse_small`：shadowthrall_centipede_body, shadowthrall_centipede_head（Direct；line 55）
+
 ### 行为
 - `brains/shadowthrall_centipede_brain.lua`：Wander（prefabs/shadowthrall_centipede.lua#shadowthrall_centipede_head）
 

@@ -31,6 +31,9 @@
 - `seeds_cooked`：seeds（Direct；line 216）
 - `spoiled_food`：seeds（Direct；line 216）
 
+### 生成引用
+- `farm_plant_randomseed`：seeds（Direct；line 132）
+
 
 ## 函数
 

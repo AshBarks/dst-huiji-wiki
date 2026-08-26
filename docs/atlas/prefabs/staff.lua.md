@@ -18,6 +18,10 @@
 - `components/tradable.lua`：firestaff, greenstaff, icestaff, icestaff2, icestaff3, opalstaff, orangestaff, telestaff, yellowstaff（Direct；line 772）
 - `components/weapon.lua`：firestaff, icestaff, icestaff2, icestaff3, orangestaff（Direct；line 820,860,998）
 
+### 生成引用
+- `collapse_small`：greenstaff（Direct；line 659）
+- `prefabs/cutgrass.lua`：firestaff（Direct；line 90）
+
 
 ## 函数
 

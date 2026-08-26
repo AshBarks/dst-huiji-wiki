@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `propsignshatterfx`：propsign（Direct；line 222）
 
+### 生成引用
+- `propsignshatterfx`：propsign（Direct；line 39）
+
 
 ## 函数
 

@@ -12,6 +12,9 @@
 ### 预制体依赖
 - `small_puff`：dirtpile（Direct；line 73）
 
+### 生成引用
+- `small_puff`：dirtpile（Direct；line 22）
+
 
 ## 函数
 

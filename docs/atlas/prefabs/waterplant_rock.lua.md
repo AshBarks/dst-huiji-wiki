@@ -18,6 +18,11 @@
 - `prefabs/waterplant_baby.lua`：waterplant_rock（Direct；line 146）
 - `waterplant_destroy`：waterplant_rock（Direct；line 146）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：waterplant_rock（Direct；line 24）
+- `prefabs/waterplant_baby.lua`：waterplant_rock（Direct；line 39）
+- `waterplant_destroy`：waterplant_rock（Direct；line 45）
+
 
 ## 函数
 

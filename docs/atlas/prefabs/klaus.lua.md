@@ -42,6 +42,11 @@
 - `prefabs/charcoal.lua`：klaus（Direct；line 634）
 - `prefabs/staff_castinglight.lua`：klaus（Direct；line 634）
 
+### 生成引用
+- `collapse_small`：klaus（Direct；line 464）
+- `deer_blue`：klaus（Direct；line 314）
+- `deer_red`：klaus（Direct；line 302）
+
 ### 行为
 - `brains/klausbrain.lua`：ChaseAndAttack, Wander（prefabs/klaus.lua#klaus）
 

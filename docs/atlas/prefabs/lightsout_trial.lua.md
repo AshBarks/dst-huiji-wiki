@@ -14,6 +14,11 @@
 - `prefabs/shadowhand.lua`：lightsout_trial（Direct；line 543）
 - `prefabs/vault_torch.lua`：lightsout_trial（Direct；line 543）
 
+### 生成引用
+- `abysspillar_fx`：lightsout_trial（Direct；line 321）
+- `prefabs/abysspillar.lua`：lightsout_trial（Direct；line 334）
+- `prefabs/shadowhand.lua`：lightsout_trial（Direct；line 248）
+
 
 ## 函数
 

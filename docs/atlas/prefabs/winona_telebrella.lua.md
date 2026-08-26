@@ -24,6 +24,10 @@
 - `prefabs/winona_battery_sparks.lua`：winona_telebrella（Direct；line 512）
 - `winona_telebrella_swap_fx`：winona_telebrella（Direct；line 512）
 
+### 生成引用
+- `prefabs/winona_battery_sparks.lua`：winona_telebrella（Direct；line 332）
+- `winona_telebrella_swap_fx`：winona_telebrella（Direct；line 28,33）
+
 
 ## 函数
 

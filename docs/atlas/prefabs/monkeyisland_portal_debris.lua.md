@@ -15,6 +15,9 @@
 - `prefabs/wagpunk_bits.lua`：monkeyisland_portal_debris（Direct；line 96）
 - `trinket_6`：monkeyisland_portal_debris（Direct；line 96）
 
+### 生成引用
+- `collapse_small`：monkeyisland_portal_debris（Direct；line 24）
+
 
 ## 函数
 

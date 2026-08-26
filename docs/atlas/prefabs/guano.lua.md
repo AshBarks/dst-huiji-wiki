@@ -24,6 +24,9 @@
 - `prefabs/flies.lua`：guano（Direct；line 124）
 - `prefabs/poopcloud.lua`：guano（Direct；line 124）
 
+### 生成引用
+- `prefabs/poopcloud.lua`：guano（Direct；line 25）
+
 
 ## 函数
 

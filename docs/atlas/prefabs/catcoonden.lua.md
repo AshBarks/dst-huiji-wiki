@@ -23,6 +23,9 @@
 - `prefabs/twigs.lua`：catcoonden（Direct；line 304）
 - `trinket_22`：catcoonden（Direct；line 304）
 
+### 生成引用
+- `collapse_small`：catcoonden（Direct；line 36）
+
 
 ## 函数
 

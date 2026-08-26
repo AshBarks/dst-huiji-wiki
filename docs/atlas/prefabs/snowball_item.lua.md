@@ -26,6 +26,11 @@
 - `prefabs/snowman.lua`：snowball_item（Direct；line 275）
 - `snowball_shatter_fx`：snowball_item（Direct；line 275）
 
+### 生成引用
+- `prefabs/snowman.lua`：snowball_item（Direct；line 135）
+- `snowball_shatter_fx`：snowball_item（Direct；line 154）
+- `splash_snow_fx`：snowball_item（Direct；line 46）
+
 
 ## 函数
 

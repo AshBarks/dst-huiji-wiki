@@ -20,6 +20,10 @@
 - `nonslipgrit_buff_fx`：nonslipgrit_buff（Direct；line 380）
 - `nonslipgritpool`：nonslipgritboosted（Direct；line 378）
 
+### 生成引用
+- `nonslipgrit_buff_fx`：nonslipgrit_buff（Direct；line 185）
+- `nonslipgritpool`：nonslipgrit, nonslipgritboosted（Direct；line 26）
+
 
 ## 函数
 

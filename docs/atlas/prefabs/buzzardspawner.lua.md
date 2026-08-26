@@ -11,6 +11,9 @@
 - `prefabs/buzzard.lua`：buzzardspawner（Direct；line 359）
 - `prefabs/circlingbuzzard.lua`：buzzardspawner（Direct；line 359）
 
+### 生成引用
+- `prefabs/circlingbuzzard.lua`：buzzardspawner（Direct；line 26）
+
 
 ## 函数
 

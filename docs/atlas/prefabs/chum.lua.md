@@ -24,6 +24,11 @@
 - `reticuleaoeping`：chum（Direct；line 147）
 - `splash_green`：chum（Direct；line 147）
 
+### 生成引用
+- `prefabs/chum.lua`：chum（Direct；line 23）
+- `prefabs/chum_aoe.lua`：chum（Direct；line 27）
+- `splash_green`：chum（Direct；line 25）
+
 
 ## 函数
 

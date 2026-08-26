@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `explode_firecrackers`：firecrackers（Direct；line 121）
 
+### 生成引用
+- `explode_firecrackers`：firecrackers（Direct；line 14）
+
 
 ## 函数
 

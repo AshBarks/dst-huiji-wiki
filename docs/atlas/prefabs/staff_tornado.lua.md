@@ -24,6 +24,9 @@
 ### 预制体依赖
 - `tornado`：staff_tornado（Direct；line 175）
 
+### 生成引用
+- `tornado`：staff_tornado（Direct；line 20）
+
 ### 行为
 - `brains/tornadobrain.lua`：Leash, Wander（prefabs/staff_tornado.lua#tornado）
 

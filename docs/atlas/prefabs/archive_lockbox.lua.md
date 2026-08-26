@@ -16,6 +16,11 @@
 - `archive_dispencer_sfx`：archive_lockbox_dispencer（Direct；line 421）
 - `prefabs/archive_lockbox.lua`：archive_lockbox_dispencer（Direct；line 421）
 
+### 生成引用
+- `archive_dispencer_sfx`：archive_lockbox_dispencer（Direct；line 203）
+- `archive_lockbox_player_fx`：archive_lockbox（Direct；line 67）
+- `prefabs/archive_lockbox.lua`：archive_lockbox_dispencer（Direct；line 332）
+
 
 ## 函数
 

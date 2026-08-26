@@ -16,6 +16,9 @@
 - `collapse_small`：gelblob_storage（Direct；line 207）
 - `messagebottleempty`：gelblob_storage（Direct；line 207）
 
+### 生成引用
+- `collapse_small`：gelblob_storage（Direct；line 39）
+
 
 ## 函数
 

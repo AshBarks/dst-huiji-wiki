@@ -19,6 +19,13 @@
 - `prefabs/oceanfishableflotsam.lua`：oceanfishableflotsam_water（Direct；line 355）
 - `splash`：oceanfishableflotsam_water（Direct；line 355）
 
+### 生成引用
+- `flotsam_break`：oceanfishableflotsam（Direct；line 198）
+- `flotsam_puddle`：oceanfishableflotsam_water（Direct；line 109）
+- `oceanfishableflotsam_water`：oceanfishableflotsam（Direct；line 295）
+- `prefabs/oceanfishableflotsam.lua`：oceanfishableflotsam_water（Direct；line 130,212）
+- `splash`：oceanfishableflotsam_water（Direct；line 128,154,160,184）
+
 
 ## 函数
 

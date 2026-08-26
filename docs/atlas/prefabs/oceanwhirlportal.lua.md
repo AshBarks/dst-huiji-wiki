@@ -14,6 +14,9 @@
 - `oceanwhirlportal_splash`：oceanwhirlportal（Direct；line 264）
 - `wave_med`：oceanwhirlportal（Direct；line 264）
 
+### 生成引用
+- `oceanwhirlportal_splash`：oceanwhirlportal（Direct；line 138,139）
+
 
 ## 函数
 

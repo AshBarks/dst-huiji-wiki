@@ -26,6 +26,11 @@
 - `collapse_small`：hermitcrab_teashop（Direct；line 484）
 - `hermitcrab_teashop_front`：hermitcrab_teashop（Direct；line 484）
 
+### 生成引用
+- `collapse_big`：hermitcrab_teashop（Direct；line 104）
+- `hermitcrab_fx_med`：hermitcrab_teashop（Direct；line 263）
+- `hermitcrab_teashop_front`：hermitcrab_teashop（Direct；line 373）
+
 
 ## 函数
 

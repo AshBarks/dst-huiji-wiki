@@ -21,6 +21,10 @@
 - `backpack_swap_fx`：backpack（Direct；line 328）
 - `prefabs/ash.lua`：backpack（Direct；line 328）
 
+### 生成引用
+- `backpack_swap_fx`：backpack（Direct；line 18,46）
+- `prefabs/ash.lua`：backpack（Direct；line 207）
+
 
 ## 函数
 

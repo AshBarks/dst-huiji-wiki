@@ -16,6 +16,10 @@
 - `prefabs/thurible_smoke.lua`：thurible（Direct；line 311）
 - `thuriblebody`：thurible（Direct；line 311）
 
+### 生成引用
+- `prefabs/thurible_smoke.lua`：thurible（Direct；line 44）
+- `thuriblebody`：thurible（Direct；line 120）
+
 
 ## 函数
 

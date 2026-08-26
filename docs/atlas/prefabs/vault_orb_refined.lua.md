@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `prefabs/bufferedmapaction.lua`：vault_orb_refined（Direct；line 108）
 
+### 生成引用
+- `vault_portal_fx`：vault_orb_refined（Direct；line 17）
+
 
 ## 函数
 

@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `collapse_small`：endtable（Direct；line 217）
 
+### 生成引用
+- `collapse_small`：endtable（Direct；line 45）
+
 
 ## 函数
 

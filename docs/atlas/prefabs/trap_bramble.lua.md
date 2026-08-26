@@ -17,6 +17,9 @@
 ### 预制体依赖
 - `bramblefx_trap`：trap_bramble（Direct；line 161）
 
+### 生成引用
+- `bramblefx_trap`：trap_bramble（Direct；line 25）
+
 
 ## 函数
 

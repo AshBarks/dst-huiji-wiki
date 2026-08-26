@@ -18,6 +18,10 @@
 - `prefabs/bullkelp_root.lua`：mortarball（Direct；line 304）
 - `wave_splash`：mortarball（Direct；line 304）
 
+### 生成引用
+- `crab_king_waterspout`：mortarball（Direct；line 147）
+- `prefabs/bullkelp_root.lua`：mortarball（Direct；line 130）
+
 
 ## 函数
 

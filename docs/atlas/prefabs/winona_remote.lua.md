@@ -28,6 +28,9 @@
 - `reticuleaoehostiletarget_1d25`：winona_remote（Direct；line 753）
 - `reticuleaoewinonaengineeringping`：winona_remote（Direct；line 753）
 
+### 生成引用
+- `prefabs/winona_battery_sparks.lua`：winona_remote（Direct；line 617）
+
 
 ## 函数
 

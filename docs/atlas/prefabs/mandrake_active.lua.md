@@ -21,6 +21,11 @@
 - `mandrake`：mandrake_active（Direct；line 197）
 - `prefabs/mandrake_planted.lua`：mandrake_active（Direct；line 197）
 
+### 生成引用
+- `cookedmandrake`：mandrake_active（Direct；line 95）
+- `mandrake`：mandrake_active（Direct；line 86）
+- `prefabs/mandrake_planted.lua`：mandrake_active（Direct；line 72）
+
 
 ## 函数
 

@@ -52,6 +52,9 @@
 - `rabbitkingminion_bunnymancorpse`：rabbitkingminion_bunnyman（Direct；line 610）
 - `smallmeat`：rabbitking_lucky, rabbitking_passive（Direct；line 608,611）
 
+### 生成引用
+- `rabbitkingminion_bunnyman`：rabbitking_aggressive（Direct；line 229）
+
 ### 行为
 - `brains/rabbitking_bunnymanbrain.lua`：ChaseAndAttack, ChattyNode, Follow, Panic, Wander（prefabs/rabbitking.lua#rabbitkingminion_bunnyman）
 - `brains/rabbitkingbrain.lua`：DoAction, FaceEntity, Leash, RunAway, Wander（prefabs/rabbitking.lua#rabbitking_aggressive, prefabs/rabbitking.lua#rabbitking_lucky, prefabs/rabbitking.lua#rabbitking_passive）

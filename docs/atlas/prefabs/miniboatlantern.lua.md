@@ -25,6 +25,11 @@
 - `miniboatlanternlight`：miniboatlantern（Direct；line 316）
 - `small_puff`：miniboatlantern（Direct；line 316）
 
+### 生成引用
+- `miniboatlantern_loseballoon`：miniboatlantern（Direct；line 106）
+- `miniboatlanternlight`：miniboatlantern（Direct；line 67）
+- `small_puff`：miniboatlantern（Direct；line 169）
+
 
 ## 函数
 

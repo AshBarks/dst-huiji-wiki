@@ -10,6 +10,9 @@
 ### 预制体依赖
 - `splash_green_large`：icefishing_hole（Direct；line 146）
 
+### 生成引用
+- `splash_green_large`：icefishing_hole（Direct；line 76）
+
 
 ## 函数
 

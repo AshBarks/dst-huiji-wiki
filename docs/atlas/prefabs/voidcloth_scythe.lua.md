@@ -26,6 +26,11 @@
 - `prefabs/voidcloth_scythe_classified.lua`：voidcloth_scythe（Direct；line 600）
 - `voidcloth_scythe_fx`：voidcloth_scythe（Direct；line 600）
 
+### 生成引用
+- `prefabs/hitsparks_fx.lua`：voidcloth_scythe（Direct；line 253）
+- `prefabs/voidcloth_scythe_classified.lua`：voidcloth_scythe（Direct；line 435）
+- `voidcloth_scythe_fx`：voidcloth_scythe（Direct；line 444）
+
 
 ## 函数
 

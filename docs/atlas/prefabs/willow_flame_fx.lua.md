@@ -15,6 +15,11 @@
 - `prefabs/firefx_light.lua`：willow_shadow_flame, willow_throw_flame（Direct；line 375,376）
 - `willow_shadow_fire_explode`：willow_shadow_flame, willow_throw_flame（Direct；line 375,376）
 
+### 生成引用
+- `deerclops_laserscorch`：willow_throw_flame（Direct；line 268）
+- `willow_shadow_fire_explode`：willow_shadow_flame（Direct；line 125）
+- `willow_shadow_flame`：willow_shadow_flame（Direct；line 172）
+
 
 ## 函数
 

@@ -486,6 +486,9 @@ impl<'s> Scanner<'s> {
     }
 
     fn classify_plain_call(&self, callee: &str) -> CallKind {
+        if callee == "SpawnPrefab" {
+            return CallKind::SpawnPrefab;
+        }
         if callee.starts_with("Make") {
             return CallKind::Helper {
                 name: callee.to_string(),

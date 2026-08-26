@@ -11,6 +11,9 @@
 ### 预制体依赖
 - `prefabs/antlion.lua`：antlion_spawner（Direct；line 109）
 
+### 生成引用
+- `prefabs/antlion.lua`：antlion_spawner（Direct；line 9）
+
 
 ## 函数
 

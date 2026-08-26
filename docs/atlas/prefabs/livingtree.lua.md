@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `prefabs/livinglog.lua`：livingtree（Direct；line 219）
 
+### 生成引用
+- `prefabs/livingtree_halloween.lua`：livingtree（Direct；line 124）
+
 
 ## 函数
 

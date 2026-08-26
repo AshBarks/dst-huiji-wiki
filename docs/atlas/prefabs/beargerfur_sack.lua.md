@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `beargerfur_sack_frost_fx`：beargerfur_sack（Direct；line 252）
 
+### 生成引用
+- `beargerfur_sack_frost_fx`：beargerfur_sack（Direct；line 39）
+
 
 ## 函数
 

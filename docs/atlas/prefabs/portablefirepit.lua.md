@@ -26,6 +26,10 @@
 - `prefabs/charcoal.lua`：portablefirepit（Direct；line 288）
 - `prefabs/portablefirepit.lua`：portablefirepit_item（Direct；line 290）
 
+### 生成引用
+- `portablefirepit_item`：portablefirepit（Direct；line 19）
+- `prefabs/portablefirepit.lua`：portablefirepit_item（Direct；line 214）
+
 
 ## 函数
 

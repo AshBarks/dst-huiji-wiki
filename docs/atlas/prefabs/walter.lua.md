@@ -101,6 +101,9 @@
 ### 预制体依赖
 - `wobycourier_marker_close`：wobycourier_marker（Direct；line 1390）
 
+### 生成引用
+- `wobycourier_marker_close`：wobycourier_marker（Direct；line 1362）
+
 
 ## 函数
 

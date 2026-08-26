@@ -31,6 +31,10 @@
 - `shadowthrall_parasite_attach_poof_fx`：shadowthrall_parasite, shadowthrall_parasite_fx（Direct；line 209,210）
 - `shadowthrall_parasite_fx`：shadowthrall_parasite, shadowthrall_parasite_fx（Direct；line 209,210）
 
+### 生成引用
+- `shadow_thrall_parasitehat`：shadowthrall_parasite_fx（Direct；line 150）
+- `shadowthrall_parasite_attach_poof_fx`：shadowthrall_parasite_fx（Direct；line 166）
+
 
 ## 函数
 

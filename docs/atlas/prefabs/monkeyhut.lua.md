@@ -20,6 +20,10 @@
 - `powder_monkey`：monkeyhut（Direct；line 382）
 - `prefabs/rocks.lua`：monkeyhut（Direct；line 382）
 
+### 生成引用
+- `collapse_big`：monkeyhut（Direct；line 31）
+- `splash_sink`：monkeyhut（Direct；line 95）
+
 
 ## 函数
 

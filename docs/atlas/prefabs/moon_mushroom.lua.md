@@ -23,6 +23,9 @@
 - `sleepcloud_lunar`：moon_cap（Direct；line 170）
 - `small_puff`：moon_cap, moon_cap_cooked（Direct；line 170,171）
 
+### 生成引用
+- `sleepcloud_lunar`：moon_cap（Direct；line 38）
+
 
 ## 函数
 

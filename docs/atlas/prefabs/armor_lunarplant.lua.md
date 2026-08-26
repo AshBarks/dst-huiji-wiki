@@ -26,6 +26,10 @@
 - `prefabs/wormwood_vined_debuff.lua`：armor_lunarplant（Direct；line 430）
 - `wortox_resist_fx`：armor_lunarplant（Direct；line 430）
 
+### 生成引用
+- `bramblefx_armor_upgrade`：armor_lunarplant_husk（Direct；line 257）
+- `hitsparks_reflect_fx`：armor_lunarplant, armor_lunarplant_husk（Direct；line 160）
+
 
 ## 函数
 

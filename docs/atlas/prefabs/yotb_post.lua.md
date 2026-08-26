@@ -20,6 +20,11 @@
 - `yotb_post_rug`：yotb_post, yotb_post_ribbon, yotb_post_rug, yotb_post_spotlight（Direct；line 493,494,496,497）
 - `yotb_post_spotlight`：yotb_post, yotb_post_ribbon, yotb_post_rug, yotb_post_spotlight（Direct；line 493,494,496,497）
 
+### 生成引用
+- `collapse_big`：yotb_post（Direct；line 46）
+- `yotb_post_ribbon`：yotb_post（Direct；line 93）
+- `yotb_post_rug`：yotb_post（Direct；line 251）
+
 
 ## 函数
 

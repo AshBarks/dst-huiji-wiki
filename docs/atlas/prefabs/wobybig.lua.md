@@ -41,6 +41,11 @@
 - `woby_rack_container`：wobybig（Direct；line 1087）
 - `woby_rack_swap_fx`：wobybig（Direct；line 1087）
 
+### 生成引用
+- `prefabs/pet_hunger_classified.lua`：wobybig（Direct；line 699）
+- `prefabs/woby_commands_classified.lua`：wobybig（Direct；line 716）
+- `woby_rack_swap_fx`：wobybig（Direct；line 236,237）
+
 ### 行为
 - `brains/wobybigbrain.lua`：FaceEntity, Follow, Wander（prefabs/wobybig.lua#wobybig）
 

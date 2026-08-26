@@ -14,6 +14,9 @@
 ### 预制体依赖
 - `collapse_small`：icebox（Direct；line 100）
 
+### 生成引用
+- `collapse_small`：icebox（Direct；line 27）
+
 
 ## 函数
 

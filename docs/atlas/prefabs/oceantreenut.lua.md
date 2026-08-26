@@ -21,6 +21,10 @@
 - `prefabs/twigs.lua`：oceantreenut（Direct；line 233）
 - `spoiled_fish_small`：oceantreenut（Direct；line 233）
 
+### 生成引用
+- `collapse_small`：oceantreenut（Direct；line 32）
+- `oceantree_short`：oceantreenut（Direct；line 75）
+
 
 ## 函数
 

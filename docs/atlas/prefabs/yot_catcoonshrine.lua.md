@@ -19,6 +19,9 @@
 - `collapse_small`：yot_catcoonshrine（Direct；line 260）
 - `prefabs/ash.lua`：yot_catcoonshrine（Direct；line 260）
 
+### 生成引用
+- `collapse_small`：yot_catcoonshrine（Direct；line 145）
+
 
 ## 函数
 

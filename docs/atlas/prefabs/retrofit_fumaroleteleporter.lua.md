@@ -7,6 +7,9 @@
 ### 预制体依赖
 - `prefabs/wormhole.lua`：retrofit_fumaroleteleporter（Direct；line 111）
 
+### 生成引用
+- `prefabs/wormhole.lua`：retrofit_fumaroleteleporter（Direct；line 51,62,70）
+
 
 ## 函数
 

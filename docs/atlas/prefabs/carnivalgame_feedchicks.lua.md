@@ -23,6 +23,10 @@
 - `carnivalgame_feedchicks_nest`：carnivalgame_feedchicks_station（Direct；line 461）
 - `prefabs/carnival_prizeticket.lua`：carnivalgame_feedchicks_station（Direct；line 461）
 
+### 生成引用
+- `carnivalgame_feedchicks_food`：carnivalgame_feedchicks_station（Direct；line 138）
+- `dirt_puff`：carnivalgame_feedchicks_station（Direct；line 165）
+
 
 ## 函数
 

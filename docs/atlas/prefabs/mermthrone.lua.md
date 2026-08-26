@@ -19,6 +19,9 @@
 - `prefabs/mermking.lua`：mermthrone, mermthrone_construction（Direct；line 252,253）
 - `prefabs/mermthrone.lua`：mermthrone, mermthrone_construction（Direct；line 252,253）
 
+### 生成引用
+- `collapse_big`：mermthrone, mermthrone_construction（Direct；line 46）
+
 
 ## 函数
 

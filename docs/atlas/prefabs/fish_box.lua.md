@@ -16,6 +16,9 @@
 - `collapse_small`：fish_box（Direct；line 185）
 - `prefabs/boat_leak.lua`：fish_box（Direct；line 185）
 
+### 生成引用
+- `collapse_small`：fish_box（Direct；line 87）
+
 
 ## 函数
 

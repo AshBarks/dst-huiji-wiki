@@ -18,6 +18,11 @@
 - `collapsed_dragonflychest`：dragonflychest（Direct；line 273）
 - `prefabs/alterguardianhatshard.lua`：dragonflychest（Direct；line 273）
 
+### 生成引用
+- `chestupgrade_stacksize_taller_fx`：dragonflychest（Direct；line 162）
+- `collapse_small`：dragonflychest（Direct；line 40,73,100）
+- `collapsed_dragonflychest`：dragonflychest（Direct；line 53）
+
 
 ## 函数
 

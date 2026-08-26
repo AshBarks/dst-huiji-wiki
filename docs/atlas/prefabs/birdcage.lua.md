@@ -29,6 +29,10 @@
 - `robin_winter`：birdcage（Direct；line 656）
 - `rottenegg`：birdcage（Direct；line 656）
 
+### 生成引用
+- `collapse_small`：birdcage（Direct；line 384）
+- `smallmeat`：birdcage（Direct；line 438）
+
 
 ## 函数
 

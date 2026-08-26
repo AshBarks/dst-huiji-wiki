@@ -19,6 +19,9 @@
 ### 预制体依赖
 - `record`：phonograph（Direct；line 225）
 
+### 生成引用
+- `collapse_small`：phonograph（Direct；line 25）
+
 
 ## 函数
 

@@ -41,6 +41,10 @@
 - `redpouch`：clayhound（Direct；line 924）
 - `splash_green`：firehound, hedgehound, hound, houndfire, icehound, mutatedhound（Direct；line 920,921,922,925,926,928）
 
+### 生成引用
+- `prefabs/eyeflame.lua`：clayhound, firehound, hedgehound, hound, icehound, moonhound, mutatedhound（Direct；line 363,369）
+- `small_puff`：moonhound（Direct；line 724）
+
 ### 行为
 - `brains/houndbrain.lua`：AttackWall, ChaseAndAttack, DoAction, FaceEntity, Leash, StandStill, Wander（prefabs/hound.lua#clayhound, prefabs/hound.lua#firehound, prefabs/hound.lua#hedgehound, prefabs/hound.lua#hound, prefabs/hound.lua#icehound, prefabs/hound.lua#moonhound, prefabs/hound.lua#mutatedhound）
 - `brains/moonbeastbrain.lua`：AttackWall, ChaseAndAttack, Leash, StandStill（prefabs/hound.lua#moonhound）

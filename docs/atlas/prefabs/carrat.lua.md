@@ -42,6 +42,9 @@
 - `prefabs/carrat.lua`：carrat_planted（Direct；line 941）
 - `redpouch_yotc`：carrat（Direct；line 940）
 
+### 生成引用
+- `prefabs/carrat.lua`：carrat_planted（Direct；line 825）
+
 ### 行为
 - `brains/carratbrain.lua`：DoAction, FaceEntity, Leash, Panic, RunAway, Wander（prefabs/carrat.lua#carrat）
 

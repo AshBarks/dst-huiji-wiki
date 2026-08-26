@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `prefabs/rabbitkinghorn_chest.lua`：rabbitkinghorn（Direct；line 143）
 
+### 生成引用
+- `prefabs/rabbitkinghorn_chest.lua`：rabbitkinghorn（Direct；line 46）
+
 
 ## 函数
 

@@ -23,6 +23,9 @@
 - `singingshell_octave5`：shell_cluster（Direct；line 107）
 - `splash_green`：shell_cluster（Direct；line 107）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：shell_cluster（Direct；line 33）
+
 
 ## 函数
 

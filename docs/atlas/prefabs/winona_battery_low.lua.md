@@ -26,6 +26,11 @@
 - `prefabs/winona_battery_low.lua`：winona_battery_low_item（Direct；line 1136）
 - `winona_battery_low_item`：winona_battery_low（Direct；line 1134）
 
+### 生成引用
+- `collapse_small`：winona_battery_low（Direct；line 381,389）
+- `prefabs/winona_battery_low.lua`：winona_battery_low_item（Direct；line 1024）
+- `winona_battery_low_item`：winona_battery_low（Direct；line 343）
+
 
 ## 函数
 

@@ -20,6 +20,9 @@
 - `prefabs/charcoal.lua`：wendy_resurrectiongrave（Direct；line 251）
 - `wendy_gravestone_rebirth_fx`：wendy_resurrectiongrave（Direct；line 251）
 
+### 生成引用
+- `collapse_big`：wendy_resurrectiongrave（Direct；line 38）
+
 
 ## 函数
 

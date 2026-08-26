@@ -13,6 +13,9 @@
 ### 预制体依赖
 - `warg_mutated_ember_fx`：warg_mutated_breath_fx（Direct；line 594）
 
+### 生成引用
+- `warg_mutated_ember_fx`：warg_mutated_breath_fx（Direct；line 194）
+
 
 ## 函数
 

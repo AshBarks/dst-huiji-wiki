@@ -23,6 +23,9 @@
 - `prefabs/carnival_prizeticket.lua`：carnivalgame_herding_station（Direct；line 345）
 - `prefabs/carnivalgame_placementblocker.lua`：carnivalgame_herding_station（Direct；line 345）
 
+### 生成引用
+- `carnivalgame_herding_chick`：carnivalgame_herding_station（Direct；line 108）
+
 ### 行为
 - `brains/carnivalgame_herding_chick_brain.lua`：RunAway, Wander（prefabs/carnivalgame_herding.lua#carnivalgame_herding_chick）
 

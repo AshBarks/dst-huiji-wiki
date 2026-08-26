@@ -23,6 +23,9 @@
 - `wagpunksteam_armor_down`：armorwagpunk（Direct；line 540）
 - `wagpunksteam_armor_up`：armorwagpunk（Direct；line 540）
 
+### 生成引用
+- `armorwagpunk_fx`：armorwagpunk（Direct；line 245）
+
 
 ## 函数
 

@@ -19,6 +19,9 @@
 ### 预制体依赖
 - `collapse_big`：scarecrow（Direct；line 228）
 
+### 生成引用
+- `collapse_big`：scarecrow（Direct；line 52）
+
 
 ## 函数
 

@@ -24,6 +24,11 @@
 - `firesuppressor_glow`：firesuppressor（Direct；line 487）
 - `snowball`：firesuppressor（Direct；line 487）
 
+### 生成引用
+- `collapse_small`：firesuppressor（Direct；line 178）
+- `firesuppressor_glow`：firesuppressor（Direct；line 328）
+- `snowball`：firesuppressor（Direct；line 28）
+
 
 ## 函数
 

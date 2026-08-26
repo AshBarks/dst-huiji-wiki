@@ -16,6 +16,10 @@
 - `prefabs/explode_small.lua`：rock_light（Direct；line 226）
 - `prefabs/lavalight.lua`：rock_light（Direct；line 226）
 
+### 生成引用
+- `prefabs/explode_small.lua`：rock_light（Direct；line 98）
+- `prefabs/lavalight.lua`：rock_light（Direct；line 97）
+
 
 ## 函数
 

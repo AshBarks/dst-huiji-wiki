@@ -51,6 +51,12 @@
 ### 大脑
 - `brains/wx78_possessedbodybrain.lua`：wx78_possessedbody（Direct；line 635）
 
+### 生成引用
+- `explode_reskin`：wx78_possessedbody（Direct；line 62）
+- `prefabs/wx78_backupbody.lua`：wx78_possessedbody（Direct；line 183）
+- `prefabs/wx78_big_spark.lua`：wx78_possessedbody（Direct；line 22）
+- `prefabs/wx78_classified.lua`：wx78_possessedbody（Direct；line 573）
+
 ### 行为
 - `brains/wx78_possessedbodybrain.lua`：ChaseAndAttack, DoAction, FaceEntity, RunToDist, StandStill（prefabs/wx78_possessedbody.lua#wx78_possessedbody）
 

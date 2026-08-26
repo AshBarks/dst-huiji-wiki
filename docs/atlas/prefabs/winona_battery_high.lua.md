@@ -32,6 +32,14 @@
 - `winona_battery_high_item`：winona_battery_high（Direct；line 1578）
 - `winona_battery_high_shatterfx`：winona_battery_high（Direct；line 1578）
 
+### 生成引用
+- `alterguardianhatshard_symbol_fx`：winona_battery_high, winona_battery_high_item（Direct；line 276）
+- `collapse_small`：winona_battery_high（Direct；line 626,636）
+- `prefabs/winona_battery_high.lua`：winona_battery_high_item（Direct；line 1468）
+- `purebrilliance_symbol_fx`：winona_battery_high, winona_battery_high_item（Direct；line 269）
+- `winona_battery_high_item`：winona_battery_high（Direct；line 556）
+- `winona_battery_high_shatterfx`：winona_battery_high, winona_battery_high_item（Direct；line 150）
+
 
 ## 函数
 

@@ -14,6 +14,10 @@
 - `prefabs/wortox_soul_heal_fx.lua`：wortox_soul_spawn（Direct；line 379）
 - `prefabs/wortox_soul_in_fx.lua`：wortox_soul_spawn（Direct；line 379）
 
+### 生成引用
+- `prefabs/wortox_soul.lua`：wortox_soul_spawn（Direct；line 78,81）
+- `prefabs/wortox_soul_in_fx.lua`：wortox_soul_spawn（Direct；line 73）
+
 
 ## 函数
 

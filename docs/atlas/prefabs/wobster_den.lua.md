@@ -22,6 +22,9 @@
 - `wobster_moonglass`：moonglass_wobster_den（Direct；line 312）
 - `wobster_sheller`：wobster_den（Direct；line 311）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：moonglass_wobster_den, wobster_den（Direct；line 169）
+
 
 ## 函数
 

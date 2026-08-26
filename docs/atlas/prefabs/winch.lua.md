@@ -26,6 +26,10 @@
 ### 预制体依赖
 - `collapse_small`：winch（Direct；line 546）
 
+### 生成引用
+- `collapse_small`：winch（Direct；line 61）
+- `pumpkincarving_swap_fx`：winch（Direct；line 287,419）
+
 
 ## 函数
 

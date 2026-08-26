@@ -25,6 +25,9 @@
 - `spore_small`：mushroom_farm（Direct；line 411）
 - `spore_tall`：mushroom_farm（Direct；line 411）
 
+### 生成引用
+- `collapse_small`：mushroom_farm（Direct；line 168）
+
 
 ## 函数
 

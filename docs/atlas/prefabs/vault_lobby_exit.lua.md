@@ -13,6 +13,9 @@
 - `prefabs/ceiling_rope.lua`：vault_lobby_exit（Direct；line 236）
 - `prefabs/rope.lua`：vault_lobby_exit（Direct；line 236）
 
+### 生成引用
+- `prefabs/ceiling_rope.lua`：vault_lobby_exit（Direct；line 81）
+
 
 ## 函数
 

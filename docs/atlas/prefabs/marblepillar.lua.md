@@ -14,6 +14,9 @@
 - `marble`：marblepillar（Direct；line 75）
 - `prefabs/rock_break_fx.lua`：marblepillar（Direct；line 75）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：marblepillar（Direct；line 22）
+
 
 ## 函数
 

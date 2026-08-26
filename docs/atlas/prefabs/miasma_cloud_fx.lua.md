@@ -12,6 +12,10 @@
 - `prefabs/miasma_cloud_fx.lua`：miasma_cloud（Direct；line 641）
 - `prefabs/miasmadebuff.lua`：miasma_cloud（Direct；line 641）
 
+### 生成引用
+- `miasma_ember_fx`：miasma_cloud, miasma_cloud_fx（Direct；line 183,186）
+- `prefabs/miasma_cloud_fx.lua`：miasma_cloud, miasma_cloud_fx, miasma_ember_fx（Direct；line 493,498）
+
 
 ## 函数
 

@@ -18,6 +18,9 @@
 - `prefabs/bunnyman.lua`：rabbithouse（Direct；line 243）
 - `splash_sink`：rabbithouse（Direct；line 243）
 
+### 生成引用
+- `collapse_big`：rabbithouse（Direct；line 61）
+
 
 ## 函数
 

@@ -41,6 +41,13 @@
 - `prefabs/abigail_attack_fx.lua`：abigail（Direct；line 1292）
 - `prefabs/abigailforcefield.lua`：abigail（Direct；line 1292）
 
+### 生成引用
+- `abigail_attack_shadow_fx`：abigail（Direct；line 592）
+- `abigail_retaliation`：abigail（Direct；line 208）
+- `abigail_rising_twinkles_fx`：abigail（Direct；line 637）
+- `abigail_shadow_buff_fx`：abigail（Direct；line 593）
+- `shadow_puff_large_front`：abigail_murder_buff（Direct；line 1233,1259）
+
 ### 行为
 - `brains/abigailbrain.lua`：DoAction, Follow, Wander（prefabs/abigail.lua#abigail）
 

@@ -16,6 +16,9 @@
 - `boat_mast_sink_fx`：mast_broken（Direct；line 133）
 - `collapse_small`：mast_broken（Direct；line 133）
 
+### 生成引用
+- `prefabs/rudder.lua`：mast_broken（Direct；line 99）
+
 
 ## 函数
 

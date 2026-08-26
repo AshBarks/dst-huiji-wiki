@@ -31,6 +31,17 @@
 - `yotr_fightring_bell`：yotr_fightring（Direct；line 1105）
 - `yotr_fightring_torch`：yotr_fightring（Direct；line 1105）
 
+### 生成引用
+- `collapse_big`：yotr_fightring_bell（Direct；line 932）
+- `collapse_small`：yotr_fightring_bell（Direct；line 942）
+- `pillowfight_confetti_fx`：yotr_fightring（Direct；line 136）
+- `prefabs/torchfire.lua`：yotr_fightring_torch（Direct；line 826）
+- `prefabs/torchfire_yotrpillowfight.lua`：yotr_fightring_torch（Direct；line 811）
+- `prefabs/yotr_fightring.lua`：yotr_fightring_kit（Direct；line 730）
+- `rabbit_confetti_fx`：yotr_fightring（Direct；line 252）
+- `yotr_fightring_bell`：yotr_fightring（Direct；line 556）
+- `yotr_fightring_torch`：yotr_fightring（Direct；line 528）
+
 
 ## 函数
 

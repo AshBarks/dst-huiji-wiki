@@ -12,6 +12,9 @@
 ### 预制体依赖
 - `sporecloud_overlay`：sporecloud（Direct；line 421）
 
+### 生成引用
+- `sporecloud_overlay`：sporecloud（Direct；line 86）
+
 
 ## 函数
 

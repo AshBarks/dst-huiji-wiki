@@ -23,6 +23,11 @@
 - `prefabs/rock_break_fx.lua`：moonglass_rock, rock1, rock2, rock_flintless, rock_flintless_low, rock_flintless_med, rock_moon, rock_moon_shell, rock_petrified_tree, rock_petrified_tree_med, rock_petrified_tree_old, rock_petrified_tree_short, rock_petrified_tree_tall（Direct；line 524,525,526,527,528,529,530,531,532,533,534,535,536）
 - `prefabs/rocks.lua`：moonglass_rock, rock1, rock2, rock_flintless, rock_flintless_low, rock_flintless_med, rock_moon, rock_moon_shell, rock_petrified_tree, rock_petrified_tree_med, rock_petrified_tree_old, rock_petrified_tree_short, rock_petrified_tree_tall（Direct；line 524,525,526,527,528,529,530,531,532,533,534,535,536）
 
+### 生成引用
+- `collapse_small`：moonglass_rock, rock1, rock2, rock_flintless, rock_flintless_low, rock_flintless_med, rock_moon, rock_moon_shell, rock_petrified_tree, rock_petrified_tree_med, rock_petrified_tree_old, rock_petrified_tree_short, rock_petrified_tree_tall（Direct；line 175）
+- `prefabs/moonrockseed.lua`：rock_moon_shell（Direct；line 394）
+- `prefabs/rock_break_fx.lua`：moonglass_rock, rock1, rock2, rock_flintless, rock_flintless_low, rock_flintless_med, rock_moon, rock_moon_shell, rock_petrified_tree, rock_petrified_tree_med, rock_petrified_tree_old, rock_petrified_tree_short, rock_petrified_tree_tall（Direct；line 171）
+
 
 ## 函数
 

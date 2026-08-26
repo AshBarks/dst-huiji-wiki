@@ -19,6 +19,9 @@
 - `prefabs/rocks.lua`：stalagmite_tall, stalagmite_tall_full, stalagmite_tall_low, stalagmite_tall_med（Direct；line 152,153,154,155）
 - `yellowgem`：stalagmite_tall, stalagmite_tall_full, stalagmite_tall_low, stalagmite_tall_med（Direct；line 152,153,154,155）
 
+### 生成引用
+- `prefabs/rock_break_fx.lua`：stalagmite_tall, stalagmite_tall_full, stalagmite_tall_low, stalagmite_tall_med（Direct；line 53）
+
 
 ## 函数
 

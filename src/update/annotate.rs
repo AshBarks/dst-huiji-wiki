@@ -108,6 +108,12 @@ fn render_associations(out: &mut String, path: &str, artifact: &IndexArtifact) {
         EdgeKind::PrefabDep,
         relevant.iter().copied(),
     );
+    render_edge_section(
+        &mut sections,
+        "生成引用",
+        EdgeKind::SpawnPrefab,
+        relevant.iter().copied(),
+    );
     render_behaviour_section(&mut sections, path, artifact);
 
     if !sections.is_empty() {

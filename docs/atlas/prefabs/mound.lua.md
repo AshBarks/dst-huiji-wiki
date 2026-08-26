@@ -24,6 +24,10 @@
 - `prefabs/scrapbook_page.lua`：mound（Direct；line 224）
 - `redgem`：mound（Direct；line 224）
 
+### 生成引用
+- `prefabs/bat.lua`：mound（Direct；line 104）
+- `prefabs/ghost.lua`：mound（Direct；line 59）
+
 
 ## 函数
 

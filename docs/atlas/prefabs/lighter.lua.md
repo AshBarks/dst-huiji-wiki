@@ -24,6 +24,9 @@
 - `prefabs/channel_absorb_fire_fx.lua`：lighter（Direct；line 399）
 - `prefabs/lighterfire.lua`：lighter（Direct；line 399）
 
+### 生成引用
+- `prefabs/channel_absorb_fire_fx.lua`：lighter（Direct；line 76）
+
 
 ## 函数
 

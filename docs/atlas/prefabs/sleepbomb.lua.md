@@ -23,6 +23,10 @@
 - `reticuleaoeping`：sleepbomb（Direct；line 146）
 - `sleepbomb_burst`：sleepbomb（Direct；line 146）
 
+### 生成引用
+- `prefabs/sleepcloud.lua`：sleepbomb（Direct；line 20）
+- `sleepbomb_burst`：sleepbomb（Direct；line 19）
+
 
 ## 函数
 

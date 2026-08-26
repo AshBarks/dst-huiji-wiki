@@ -24,6 +24,10 @@
 - `portabletent_item`：portabletent（Direct；line 309）
 - `prefabs/portabletent.lua`：portabletent_item（Direct；line 311）
 
+### 生成引用
+- `collapse_big`：portabletent（Direct；line 47）
+- `prefabs/portabletent.lua`：portabletent_item（Direct；line 244）
+
 
 ## 函数
 

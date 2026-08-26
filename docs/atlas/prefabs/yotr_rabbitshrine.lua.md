@@ -33,6 +33,12 @@
 - `yotr_decor_2`：yotr_rabbitshrine（Direct；line 514）
 - `yotr_decor_2_item`：yotr_rabbitshrine（Direct；line 514）
 
+### 生成引用
+- `collapse_small`：yotr_rabbitshrine（Direct；line 307）
+- `nightcaphat`：yotr_rabbitshrine（Direct；line 129）
+- `prefabs/cozy_bunnyman.lua`：yotr_rabbitshrine（Direct；line 102）
+- `spoiled_food`：yotr_rabbitshrine（Direct；line 326）
+
 
 ## 函数
 

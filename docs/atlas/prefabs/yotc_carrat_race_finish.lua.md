@@ -18,6 +18,9 @@
 - `small_puff`：yotc_carrat_race_finish（Direct；line 287）
 - `yotc_carrat_race_finish_light`：yotc_carrat_race_finish（Direct；line 287）
 
+### 生成引用
+- `collapse_big`：yotc_carrat_race_finish（Direct；line 130）
+
 
 ## 函数
 

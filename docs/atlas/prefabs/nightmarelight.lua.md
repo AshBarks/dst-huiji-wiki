@@ -15,6 +15,9 @@
 - `prefabs/nightmarelightfx.lua`：nightmarelight（Direct；line 299）
 - `ruinsnightmare`：nightmarelight（Direct；line 299）
 
+### 生成引用
+- `prefabs/nightmarelightfx.lua`：nightmarelight（Direct；line 265）
+
 
 ## 函数
 

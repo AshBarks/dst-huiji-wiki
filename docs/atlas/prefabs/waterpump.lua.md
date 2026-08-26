@@ -19,6 +19,10 @@
 - `collapse_small`：waterpump（Direct；line 307）
 - `waterstreak_projectile`：waterpump（Direct；line 307）
 
+### 生成引用
+- `collapse_small`：waterpump（Direct；line 33）
+- `waterstreak_projectile`：waterpump（Direct；line 95）
+
 
 ## 函数
 

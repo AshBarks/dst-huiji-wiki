@@ -33,6 +33,12 @@
 - `wx78_scanner_fx`：wx78_scanner（Direct；line 1219）
 - `wx78_scanner_succeeded`：wx78_scanner（Direct；line 1219）
 
+### 生成引用
+- `prefabs/scandata.lua`：wx78_scanner（Direct；line 741）
+- `prefabs/wx78_scanner.lua`：wx78_scanner_item（Direct；line 223）
+- `wx78_scanner_fx`：wx78_scanner（Direct；line 557）
+- `wx78_scanner_item`：wx78_scanner_succeeded（Direct；line 1029,1093）
+
 
 ## 函数
 

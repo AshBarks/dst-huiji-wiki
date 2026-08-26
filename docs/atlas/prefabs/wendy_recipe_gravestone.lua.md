@@ -12,6 +12,10 @@
 - `attune_out_fx`：wendy_recipe_gravestone（Direct；line 165）
 - `prefabs/gravestone.lua`：wendy_recipe_gravestone（Direct；line 165）
 
+### 生成引用
+- `attune_out_fx`：wendy_recipe_gravestone（Direct；line 37）
+- `prefabs/gravestone.lua`：wendy_recipe_gravestone（Direct；line 39）
+
 
 ## 函数
 

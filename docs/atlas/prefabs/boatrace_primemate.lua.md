@@ -30,6 +30,11 @@
 - `prefabs/poop.lua`：boatrace_primemate（Direct；line 268）
 - `smallmeat`：boatrace_primemate（Direct；line 268）
 
+### 生成引用
+- `boatrace_seastack_monkey_throwable_deploykit`：boatrace_primemate（Direct；line 111）
+- `dragonheadhat`：boatrace_primemate（Direct；line 61）
+- `prefabs/treegrowthsolution.lua`：boatrace_primemate（Direct；line 135）
+
 
 ## 函数
 

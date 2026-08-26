@@ -17,6 +17,9 @@
 - `prefabs/tallbird.lua`：tallbirdnest（Direct；line 201）
 - `prefabs/tallbirdegg.lua`：tallbirdnest（Direct；line 201）
 
+### 生成引用
+- `prefabs/smallbird.lua`：tallbirdnest（Direct；line 121）
+
 
 ## 函数
 

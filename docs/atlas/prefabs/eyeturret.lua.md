@@ -26,6 +26,10 @@
 - `eyeturret_base`：eyeturret, eyeturret_item（Direct；line 356,357）
 - `prefabs/eye_charge.lua`：eyeturret, eyeturret_item（Direct；line 356,357）
 
+### 生成引用
+- `eyeturret_base`：eyeturret（Direct；line 270）
+- `prefabs/eyeturret.lua`：eyeturret_item（Direct；line 153）
+
 
 ## 函数
 

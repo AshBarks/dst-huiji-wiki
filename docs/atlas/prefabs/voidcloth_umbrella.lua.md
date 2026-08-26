@@ -26,6 +26,9 @@
 ### 预制体依赖
 - `voidcloth_umbrella_fx`：voidcloth_umbrella（Direct；line 526）
 
+### 生成引用
+- `voidcloth_umbrella_fx`：voidcloth_umbrella（Direct；line 35）
+
 
 ## 函数
 

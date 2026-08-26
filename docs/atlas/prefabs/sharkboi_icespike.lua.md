@@ -13,6 +13,9 @@
 - `ice`：sharkboi_icespike（Direct；line 488）
 - `prefabs/sharkboi_icespike.lua`：sharkboi_icetunnel_fx（Direct；line 489）
 
+### 生成引用
+- `prefabs/sharkboi_icespike.lua`：sharkboi_icetunnel_fx（Direct；line 387）
+
 
 ## 函数
 

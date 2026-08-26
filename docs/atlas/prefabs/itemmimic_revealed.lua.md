@@ -24,6 +24,9 @@
 - `itemmimic_revealed_shadow`：itemmimic_revealed（Direct；line 287）
 - `prefabs/nightmarefuel.lua`：itemmimic_revealed（Direct；line 287）
 
+### 生成引用
+- `itemmimic_revealed_shadow`：itemmimic_revealed（Direct；line 122）
+
 ### 行为
 - `brains/itemmimic_revealedbrain.lua`：RunAway（prefabs/itemmimic_revealed.lua#itemmimic_revealed）
 

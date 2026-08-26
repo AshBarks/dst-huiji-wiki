@@ -44,6 +44,14 @@
 - `winter_ornament_boss_hermithouse`：hermitcrab（Direct；line 2177）
 - `winter_ornament_boss_pearl`：hermitcrab（Direct；line 2177）
 
+### 生成引用
+- `carpentry_station_blueprint`：hermitcrab（Direct；line 1244）
+- `hermit_bundle`：hermitcrab（Direct；line 818）
+- `oceanfishingbobber_ball`：hermitcrab（Direct；line 1597）
+- `prefabs/hermit_pearl.lua`：hermitcrab（Direct；line 835）
+- `prefabs/lureplant.lua`：hermitcrab（Direct；line 1694）
+- `prefabs/oceanfishingrod.lua`：hermitcrab（Direct；line 1614）
+
 
 ## 函数
 

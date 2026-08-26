@@ -21,6 +21,11 @@
 - `prefabs/campfirefire.lua`：campfire, quagmire_campfire（Direct；line 231,233）
 - `prefabs/charcoal.lua`：campfire, quagmire_campfire（Direct；line 231,233）
 
+### 生成引用
+- `collapse_small`：campfire, quagmire_campfire（Direct；line 19）
+- `prefabs/ash.lua`：campfire, quagmire_campfire（Direct；line 18,56）
+- `prefabs/charcoal.lua`：campfire, quagmire_campfire（Direct；line 53）
+
 
 ## 函数
 

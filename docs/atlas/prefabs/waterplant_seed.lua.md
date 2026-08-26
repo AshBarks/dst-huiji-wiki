@@ -25,6 +25,10 @@
 - `splash_sink`：waterplant_bomb, waterplant_projectile（Direct；line 293,294）
 - `waterplant_burr_burst`：waterplant_bomb, waterplant_projectile（Direct；line 293,294）
 
+### 生成引用
+- `splash_sink`：waterplant_bomb, waterplant_projectile（Direct；line 115,232）
+- `waterplant_burr_burst`：waterplant_bomb, waterplant_projectile（Direct；line 118,235）
+
 
 ## 函数
 

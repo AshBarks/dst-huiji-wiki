@@ -26,6 +26,10 @@
 - `prefabs/lightbulb.lua`：wormwood_lightflier（Direct；line 206）
 - `wormwood_lunar_transformation_finish`：wormwood_lightflier（Direct；line 206）
 
+### 生成引用
+- `prefabs/lightbulb.lua`：wormwood_lightflier（Direct；line 32）
+- `wormwood_lunar_transformation_finish`：wormwood_lightflier（Direct；line 36）
+
 
 ## 函数
 

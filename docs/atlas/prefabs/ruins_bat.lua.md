@@ -16,6 +16,9 @@
 ### 预制体依赖
 - `prefabs/shadowtentacle.lua`：ruins_bat（Direct；line 117）
 
+### 生成引用
+- `prefabs/shadowtentacle.lua`：ruins_bat（Direct；line 50）
+
 
 ## 函数
 

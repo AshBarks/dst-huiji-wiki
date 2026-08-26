@@ -39,6 +39,10 @@
 - `prefabs/poop.lua`：powder_monkey（Direct；line 355）
 - `smallmeat`：powder_monkey（Direct；line 355）
 
+### 生成引用
+- `prefabs/cursed_monkey_token.lua`：powder_monkey（Direct；line 159）
+- `prefabs/poop.lua`：powder_monkey（Direct；line 43）
+
 
 ## 函数
 

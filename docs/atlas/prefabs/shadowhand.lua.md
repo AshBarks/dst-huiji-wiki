@@ -15,6 +15,9 @@
 ### 预制体依赖
 - `shadowhand_arm`：shadowhand（Direct；line 288）
 
+### 生成引用
+- `shadowhand_arm`：shadowhand（Direct；line 150）
+
 
 ## 函数
 

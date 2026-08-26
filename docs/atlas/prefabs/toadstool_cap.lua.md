@@ -17,6 +17,10 @@
 - `toadstool_cap_releasefx`：toadstool_cap（Direct；line 377）
 - `toadstool_dark`：toadstool_cap（Direct；line 377）
 
+### 生成引用
+- `toadstool_cap_absorbfx`：toadstool_cap（Direct；line 78）
+- `toadstool_cap_releasefx`：toadstool_cap（Direct；line 56）
+
 
 ## 函数
 

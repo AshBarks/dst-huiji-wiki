@@ -45,8 +45,9 @@ pub struct LandingRef {
 /// Read-only corpus lookup structures, loaded once per scan.
 #[derive(Debug, Default)]
 pub struct CorpusPageView {
-    /// prefab variant → pageid (from `index/pages_by_prefab.json`).
-    pub pages: HashMap<String, i64>,
+    /// prefab variant → pageids (from `index/pages_by_prefab.json`);
+    /// multi-page variants fan out into one graded row per page.
+    pub pages: HashMap<String, Vec<i64>>,
     /// pageid → numeric fact candidates (from `index/facts.jsonl`).
     pub facts: HashMap<i64, Vec<FactCandidate>>,
 }
@@ -67,9 +68,10 @@ impl CorpusPageView {
             prefabs: BTreeMap<String, Vec<i64>>,
         }
         let reg: RegView = serde_json::from_str(&reg_raw)?;
-        for (variant, ids) in reg.prefabs {
-            if let [pageid] = ids.as_slice() {
-                view.pages.insert(variant, *pageid);
+        for (variant, mut ids) in reg.prefabs {
+            ids.sort();
+            if !ids.is_empty() {
+                view.pages.insert(variant, ids);
             }
         }
         let facts_raw = match std::fs::read_to_string(root.join("index/facts.jsonl")) {
@@ -114,71 +116,80 @@ fn find_landing(facts: &[FactCandidate], old_num: f64) -> Option<&FactCandidate>
 /// Backref land in `Manual` with their depth recorded until their extractor
 /// families define landing semantics (§4.2.3 期次表).
 pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<GradedChange> {
-    changes
-        .iter()
-        .map(|c| {
-            let pageid = view.pages.get(&c.prefab).copied();
-            let Some(pageid) = pageid else {
-                return GradedChange {
-                    prefab: c.prefab.clone(),
-                    field: c.field.clone(),
-                    tier: GradeTier::CreateCheck,
-                    pageid: None,
-                    landing: None,
-                };
-            };
-            let empty = Vec::new();
-            let facts = view.facts.get(&pageid).unwrap_or(&empty);
-            let tier = match c.kind {
-                FactKind::Loot => {
-                    let num = c.old.as_ref().and_then(Literal::as_num);
-                    let hit = num.and_then(|n| find_landing(facts, n));
-                    match (&c.old, hit) {
-                        // Paired numeric old-value with a page landing →
-                        // deterministic draft candidate (F1 privileged path).
-                        (Some(_), Some(f)) => GradedChange {
-                            prefab: c.prefab.clone(),
-                            field: c.field.clone(),
-                            tier: GradeTier::SuggestDraft,
-                            pageid: Some(pageid),
-                            landing: Some(LandingRef {
-                                region_id: f.region_id.clone(),
-                                raw: f.raw.clone(),
-                            }),
-                        },
-                        // Numeric old value with nothing on the page carrying
-                        // it: either stale-page cleanup or non-transcribed
-                        // fact — human decides.
-                        (Some(Literal::Num(_)), None) => no_landing(c, pageid),
-                        // No numeric side: paired presence change — locate by
-                        // the moved item's name on the page.
-                        _ => {
-                            let item = c
-                                .old
-                                .as_ref()
-                                .and_then(Literal::as_str)
-                                .or_else(|| c.new.as_ref().and_then(Literal::as_str));
-                            match item.and_then(|i| find_name_landing(facts, i)) {
-                                Some(f) => GradedChange {
-                                    prefab: c.prefab.clone(),
-                                    field: c.field.clone(),
-                                    tier: GradeTier::SuggestDraft,
-                                    pageid: Some(pageid),
-                                    landing: Some(LandingRef {
-                                        region_id: f.region_id.clone(),
-                                        raw: f.raw.clone(),
-                                    }),
-                                },
-                                None => no_landing(c, pageid),
-                            }
+    let mut out = Vec::new();
+    for c in changes {
+        match view.pages.get(&c.prefab) {
+            None => out.push(GradedChange {
+                prefab: c.prefab.clone(),
+                field: c.field.clone(),
+                tier: GradeTier::CreateCheck,
+                pageid: None,
+                landing: None,
+            }),
+            Some(pageids) => {
+                for &pageid in pageids {
+                    out.push(grade_on_page(c, pageid, view));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Grades one change against one page.
+fn grade_on_page(c: &FactChange, pageid: i64, view: &CorpusPageView) -> GradedChange {
+    {
+        let empty = Vec::new();
+        let facts = view.facts.get(&pageid).unwrap_or(&empty);
+        let tier = match c.kind {
+            FactKind::Loot => {
+                let num = c.old.as_ref().and_then(Literal::as_num);
+                let hit = num.and_then(|n| find_landing(facts, n));
+                match (&c.old, hit) {
+                    // Paired numeric old-value with a page landing →
+                    // deterministic draft candidate (F1 privileged path).
+                    (Some(_), Some(f)) => GradedChange {
+                        prefab: c.prefab.clone(),
+                        field: c.field.clone(),
+                        tier: GradeTier::SuggestDraft,
+                        pageid: Some(pageid),
+                        landing: Some(LandingRef {
+                            region_id: f.region_id.clone(),
+                            raw: f.raw.clone(),
+                        }),
+                    },
+                    // Numeric old value with nothing on the page carrying
+                    // it: either stale-page cleanup or non-transcribed
+                    // fact — human decides.
+                    (Some(Literal::Num(_)), None) => no_landing(c, pageid),
+                    // No numeric side: paired presence change — locate by
+                    // the moved item's name on the page.
+                    _ => {
+                        let item = c
+                            .old
+                            .as_ref()
+                            .and_then(Literal::as_str)
+                            .or_else(|| c.new.as_ref().and_then(Literal::as_str));
+                        match item.and_then(|i| find_name_landing(facts, i)) {
+                            Some(f) => GradedChange {
+                                prefab: c.prefab.clone(),
+                                field: c.field.clone(),
+                                tier: GradeTier::SuggestDraft,
+                                pageid: Some(pageid),
+                                landing: Some(LandingRef {
+                                    region_id: f.region_id.clone(),
+                                    raw: f.raw.clone(),
+                                }),
+                            },
+                            None => no_landing(c, pageid),
                         }
                     }
                 }
-                _ => no_landing(c, pageid),
-            };
-            tier
-        })
-        .collect()
+            }
+            _ => no_landing(c, pageid),
+        };
+        tier
+    }
 }
 
 fn no_landing(c: &FactChange, pageid: i64) -> GradedChange {
@@ -235,7 +246,9 @@ mod tests {
              }}\n'''猎犬'''是联机版中的一种生物。\n==行为==\n成群袭击玩家。";
         let regions = segment(13857, PAGE);
         let mut view = CorpusPageView {
-            pages: [("hound".to_string(), 13857i64)].into_iter().collect(),
+            pages: [("hound".to_string(), vec![13857i64])]
+                .into_iter()
+                .collect(),
             facts: HashMap::new(),
         };
         let mut facts = Vec::new();

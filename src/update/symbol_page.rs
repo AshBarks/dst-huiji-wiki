@@ -403,6 +403,130 @@ pub fn parse_symbol_annotation_response(raw: &str) -> Result<Vec<PageSymbolVerdi
     ))
 }
 
+/// P4: one page that should mention a symbol but does not.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct MissingPage {
+    pub pageid: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+}
+
+/// P4: one page whose wording semantically disagrees with the code symbol.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct InconsistentPage {
+    pub pageid: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub wording: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub confidence: Option<String>,
+}
+
+/// P4: cross-page coverage report for a single symbol.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct SymbolCoverageReport {
+    pub symbol: String,
+    pub total_pages: usize,
+    pub mentioned_pages: Vec<i64>,
+    pub missing_pages: Vec<MissingPage>,
+    pub inconsistent_pages: Vec<InconsistentPage>,
+}
+
+/// P4: aggregate per-page verdicts into a cross-page coverage report.
+pub fn build_coverage_report(symbol: &str, verdicts: &[PageSymbolVerdict]) -> SymbolCoverageReport {
+    let mut mentioned: Vec<i64> = verdicts
+        .iter()
+        .filter(|v| v.mentions)
+        .map(|v| v.pageid)
+        .collect();
+    mentioned.sort_unstable();
+    mentioned.dedup();
+
+    let mut missing: Vec<MissingPage> = verdicts
+        .iter()
+        .filter(|v| v.missing)
+        .map(|v| MissingPage {
+            pageid: v.pageid,
+            note: v.note.clone(),
+        })
+        .collect();
+    missing.sort_by_key(|m| m.pageid);
+
+    let mut inconsistent: Vec<InconsistentPage> = verdicts
+        .iter()
+        .filter(|v| v.mentions && v.semantic_consistent == Some(false))
+        .map(|v| InconsistentPage {
+            pageid: v.pageid,
+            wording: v.wording.clone(),
+            note: v.note.clone(),
+            confidence: v.confidence.clone(),
+        })
+        .collect();
+    inconsistent.sort_by_key(|i| i.pageid);
+
+    SymbolCoverageReport {
+        symbol: symbol.to_string(),
+        total_pages: verdicts.len(),
+        mentioned_pages: mentioned,
+        missing_pages: missing,
+        inconsistent_pages: inconsistent,
+    }
+}
+
+/// P4: build coverage reports from a batch of symbol annotation responses.
+pub fn build_coverage_reports(responses: &[SymbolAnnotationResponse]) -> Vec<SymbolCoverageReport> {
+    responses
+        .iter()
+        .map(|r| build_coverage_report(&r.symbol, &r.verdicts))
+        .collect()
+}
+
+/// P4: render a coverage report as Markdown for human review.
+pub fn render_coverage_report_md(report: &SymbolCoverageReport) -> String {
+    let mut out = String::new();
+    out.push_str(&format!("## `{}`\n\n", report.symbol));
+    out.push_str(&format!("- total_pages: {}\n", report.total_pages));
+    out.push_str(&format!(
+        "- mentioned_pages: {} ({})\n",
+        report.mentioned_pages.len(),
+        report
+            .mentioned_pages
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>()
+            .join(", ")
+    ));
+    out.push_str(&format!(
+        "- missing_pages: {}\n",
+        report.missing_pages.len()
+    ));
+    for m in &report.missing_pages {
+        out.push_str(&format!(
+            "  - {} {}\n",
+            m.pageid,
+            m.note.as_deref().unwrap_or("")
+        ));
+    }
+    out.push_str(&format!(
+        "- inconsistent_pages: {}\n",
+        report.inconsistent_pages.len()
+    ));
+    for i in &report.inconsistent_pages {
+        out.push_str(&format!(
+            "  - {} {}{}\n",
+            i.pageid,
+            i.wording.as_deref().unwrap_or(""),
+            i.note
+                .as_deref()
+                .map(|n| format!(" — {n}"))
+                .unwrap_or_default()
+        ));
+    }
+    out.push('\n');
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -554,5 +678,89 @@ return Brain(inst, PriorityNode({}, 1))
         assert_eq!(parsed.len(), 1);
         assert!(!parsed[0].mentions);
         assert!(parsed[0].missing);
+    }
+
+    #[test]
+    fn coverage_report_aggregates_verdicts() {
+        let verdicts = vec![
+            PageSymbolVerdict {
+                pageid: 13857,
+                mentions: true,
+                wording: Some("30 距离单位".to_string()),
+                semantic_consistent: Some(true),
+                missing: false,
+                confidence: Some("high".to_string()),
+                note: None,
+            },
+            PageSymbolVerdict {
+                pageid: 23210,
+                mentions: false,
+                wording: None,
+                semantic_consistent: None,
+                missing: true,
+                confidence: Some("medium".to_string()),
+                note: Some("同组页面均描述该行为".to_string()),
+            },
+            PageSymbolVerdict {
+                pageid: 73451,
+                mentions: true,
+                wording: Some("40 距离单位".to_string()),
+                semantic_consistent: Some(false),
+                missing: false,
+                confidence: Some("high".to_string()),
+                note: Some("代码为 30".to_string()),
+            },
+        ];
+        let report = build_coverage_report("SEE_DIST", &verdicts);
+        assert_eq!(report.total_pages, 3);
+        assert_eq!(report.mentioned_pages, vec![13857, 73451]);
+        assert_eq!(report.missing_pages.len(), 1);
+        assert_eq!(report.missing_pages[0].pageid, 23210);
+        assert_eq!(report.inconsistent_pages.len(), 1);
+        assert_eq!(report.inconsistent_pages[0].pageid, 73451);
+        assert_eq!(
+            report.inconsistent_pages[0].wording.as_deref(),
+            Some("40 距离单位")
+        );
+
+        let md = render_coverage_report_md(&report);
+        assert!(md.contains("## `SEE_DIST`"));
+        assert!(md.contains("missing_pages: 1"));
+        assert!(md.contains("inconsistent_pages: 1"));
+    }
+
+    #[test]
+    fn coverage_reports_batch_from_responses() {
+        let responses = vec![
+            SymbolAnnotationResponse {
+                symbol: "SEE_DIST".to_string(),
+                verdicts: vec![PageSymbolVerdict {
+                    pageid: 1,
+                    mentions: true,
+                    wording: None,
+                    semantic_consistent: Some(true),
+                    missing: false,
+                    confidence: None,
+                    note: None,
+                }],
+            },
+            SymbolAnnotationResponse {
+                symbol: "Wander".to_string(),
+                verdicts: vec![PageSymbolVerdict {
+                    pageid: 2,
+                    mentions: false,
+                    wording: None,
+                    semantic_consistent: None,
+                    missing: true,
+                    confidence: None,
+                    note: None,
+                }],
+            },
+        ];
+        let reports = build_coverage_reports(&responses);
+        assert_eq!(reports.len(), 2);
+        assert_eq!(reports[0].symbol, "SEE_DIST");
+        assert_eq!(reports[1].symbol, "Wander");
+        assert_eq!(reports[1].missing_pages.len(), 1);
     }
 }

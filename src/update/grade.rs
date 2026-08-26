@@ -155,7 +155,23 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                                 }
                             }
                         }
-                        _ => no_landing(c, pageid),
+                        _ => {
+                            // 校准（2026-08-26 比对 #7-10）：既有页数值新增在
+                            // autoinfobot 维护域（A 层），人工不处理。
+                            if c.old.is_none() && c.new.is_some() {
+                                GradedChange {
+                                    prefab: c.prefab.clone(),
+                                    field: c.field.clone(),
+                                    tier: GradeTier::AutoHandled,
+                                    old: c.old.clone(),
+                                    new: c.new.clone(),
+                                    pageid: Some(pageid),
+                                    landing: None,
+                                }
+                            } else {
+                                no_landing(c, pageid)
+                            }
+                        }
                     };
                     out.push(g);
                 }

@@ -36,7 +36,7 @@ fn classify_str_arg(expr: &ast::Expression) -> Option<String> {
     }
 }
 
-fn line_of(source: &str, byte: usize) -> u32 {
+pub(crate) fn line_of(source: &str, byte: usize) -> u32 {
     source.as_bytes()[..byte.min(source.len())]
         .iter()
         .filter(|b| **b == b'\n')
@@ -342,11 +342,14 @@ impl<'s> Scanner<'s> {
         start: Option<full_moon::tokenizer::Position>,
         end: Option<full_moon::tokenizer::Position>,
     ) {
+        let line_of_byte = |b: usize| line_of(self.source, b);
         self.out.fns.push(FnDef {
             name: name.to_string(),
             params: body.parameters().iter().map(|p| p.to_string()).collect(),
             start_byte: start.map(|p| p.bytes()).unwrap_or(0),
             end_byte: end.map(|p| p.bytes()).unwrap_or(0),
+            start_line: start.map(|p| line_of_byte(p.bytes())).unwrap_or(0),
+            end_line: end.map(|p| line_of_byte(p.bytes())).unwrap_or(0),
             is_local,
         });
     }

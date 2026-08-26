@@ -120,4 +120,8 @@ pub struct IndexArtifact {
     pub behaviour_calls: Vec<BehaviourCallRecord>,
     pub unresolved: Vec<UnresolvedNote>,
     pub genericity: GenericityReport,
+    /// Per prefab file: fn name -> owning variants (M1b attribution).
+    pub fn_owners: BTreeMap<String, BTreeMap<String, Vec<String>>>,
+    /// Per prefab file: fn name -> inclusive (start_line, end_line).
+    pub fn_ranges: BTreeMap<String, BTreeMap<String, (u32, u32)>>,
 }

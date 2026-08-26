@@ -213,7 +213,7 @@ return Prefab("hound", fndefault, ...), Prefab("firehound", fnfire, ...), ...  -
 
 - 更新检测（version.txt/zip hash）、SnapshotStore 目录布局、`snapshot import` 兼容 databundles 快照；
 - DiffEngine 产出 `FileDiff{path,status,hunks}`（similar 行级）+ changes.patch；
-- 金标准：`scripts_202604271353 ↔ scripts_202605291134` 对照人工 0529.diff。
+- 金标准（实测修正）：人工流程将更新前旧树改名为 `scripts_<更新时刻>`，故 0529.diff 实际对照 `scripts_202605291134 ↔ 当前 scripts`（在其后下一次官方更新落地前有效）；快照对 0427↔0529 仅作相邻版本回归参考。
 
 ### 4.2 Layer B：实体事实管线（v2 核心）
 

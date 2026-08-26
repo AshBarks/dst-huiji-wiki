@@ -38,6 +38,9 @@ pub struct FnDef {
     pub params: Vec<String>,
     pub start_byte: usize,
     pub end_byte: usize,
+    /// 1-based inclusive line range (0 when unknown).
+    pub start_line: u32,
+    pub end_line: u32,
     pub is_local: bool,
 }
 

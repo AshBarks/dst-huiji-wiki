@@ -18,8 +18,9 @@ use std::path::Path;
 use crate::Result;
 pub use edges::IndexArtifact;
 use edges::{AssocEdge, EdgeKind, UnresolvedNote, INDEX_SCHEMA_VERSION};
-use symbols::{FileKey, FileScan, Role};
-pub use tuning::TuningTable;
+pub(crate) use symbols::Role;
+use symbols::{FileKey, FileScan};
+pub use tuning::{TuningTable, TuningVal};
 
 /// Directories scanned relative to the scripts root.
 const SCAN_DIRS: &[&str] = &[
@@ -32,7 +33,7 @@ const SCAN_DIRS: &[&str] = &[
 /// Root-level helper files profiled for `MakeXxx` expansion (E2).
 const UTIL_FILES: &[&str] = &["standardcomponents.lua", "prefabutil.lua"];
 
-fn role_for(path: &str) -> Role {
+pub(crate) fn role_for(path: &str) -> Role {
     if path.starts_with("prefabs/") {
         Role::Prefab
     } else if path.starts_with("components/") {
@@ -197,8 +198,27 @@ fn assemble(
 
     let genericity = genericity::compute(&edges_out);
 
+    // Prefab fn line ranges for hunk attribution.
+    let mut fn_ranges: BTreeMap<String, BTreeMap<String, (u32, u32)>> = BTreeMap::new();
+    for (path, scan) in &scans {
+        if scan.role != Role::Prefab {
+            continue;
+        }
+        let mut ranges = BTreeMap::new();
+        for fd in &scan.fns {
+            if fd.start_line > 0 && fd.end_line >= fd.start_line {
+                ranges.insert(fd.name.clone(), (fd.start_line, fd.end_line));
+            }
+        }
+        if !ranges.is_empty() {
+            fn_ranges.insert(path.clone(), ranges);
+        }
+    }
+
     IndexArtifact {
         schema_version: INDEX_SCHEMA_VERSION,
+        fn_owners: resolution.fn_owners,
+        fn_ranges,
         scanned_files: scans.len(),
         parse_failures,
         edges: edges_out,

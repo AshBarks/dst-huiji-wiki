@@ -43,6 +43,9 @@ pub struct Resolution {
     pub overrides: BTreeMap<String, Vec<OverrideMark>>,
     pub behaviour_calls: Vec<BehaviourCallRecord>,
     pub unresolved: Vec<UnresolvedNote>,
+    /// Per prefab file: fn name -> owning variants (call-graph closure from
+    /// each registration's builder fn). Drives hunk attribution in M1b.
+    pub fn_owners: BTreeMap<String, BTreeMap<String, Vec<String>>>,
 }
 
 impl<'a> Resolver<'a> {
@@ -123,6 +126,7 @@ impl<'a> Resolver<'a> {
             call_graph,
             helpers,
         };
+
         resolver.resolve_all()
     }
 
@@ -170,6 +174,25 @@ impl<'a> Resolver<'a> {
 
         let behaviour_calls = self.collect_behaviour_calls(&edges);
 
+        // fn -> variant ownership per prefab file (impact attribution).
+        let mut fn_owners: BTreeMap<String, BTreeMap<String, Vec<String>>> = BTreeMap::new();
+        for (path, scan) in self.scans.iter() {
+            if scan.role != Role::Prefab {
+                continue;
+            }
+            for (fn_name, owners) in self.collect_owners(scan) {
+                if owners.is_empty() {
+                    continue;
+                }
+                let mut sorted: Vec<String> = owners.into_iter().collect();
+                sorted.sort();
+                fn_owners
+                    .entry(path.clone())
+                    .or_default()
+                    .insert(fn_name, sorted);
+            }
+        }
+
         edges.sort_by_key(dedup_key);
         edges.dedup_by(|a, b| dedup_key(a) == dedup_key(b));
         unresolved.sort_by(|a, b| (&a.file, a.line, a.kind).cmp(&(&b.file, b.line, b.kind)));
@@ -179,6 +202,7 @@ impl<'a> Resolver<'a> {
             overrides,
             behaviour_calls,
             unresolved,
+            fn_owners,
         }
     }
 

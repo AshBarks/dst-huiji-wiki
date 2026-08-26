@@ -5,3 +5,7 @@
 .env
 
 .omo/
+.cargo_home/
+build.log
+*.log
+.scratch/

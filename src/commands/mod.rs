@@ -96,6 +96,18 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
+    CorpusFetch {
+        /// 忽略增量对账，全量重抓所有页面
+        #[arg(long)]
+        full: bool,
+        /// 语料根目录（默认 wikis）
+        #[arg(long)]
+        dir: Option<PathBuf>,
+        /// 只枚举与对账出报告，不写任何本地文件
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -118,6 +130,7 @@ impl Commands {
             Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
+            Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::Serve { .. } => "serve",
         }
     }

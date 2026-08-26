@@ -124,6 +124,15 @@ pub enum JobKind {
         #[serde(default)]
         output: Option<String>,
     },
+    /// Harvest the wiki main namespace into the local corpus tree
+    /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
+    /// ignores `touched`-based incremental skipping.
+    CorpusSync {
+        #[serde(default)]
+        full: bool,
+        #[serde(default)]
+        dir: Option<String>,
+    },
 }
 
 impl JobKind {
@@ -137,6 +146,7 @@ impl JobKind {
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
+            JobKind::CorpusSync { .. } => "corpus-sync",
         }
     }
 
@@ -259,6 +269,9 @@ async fn execute_job_inner(
         }
         JobKind::PrefabOverrides { input, output } => {
             run_prefab_overrides(input, opt_path(output), reporter).await
+        }
+        JobKind::CorpusSync { full, dir } => {
+            run_corpus_sync(*full, dir.as_deref(), reporter, mode).await
         }
     }
 }
@@ -461,6 +474,30 @@ async fn run_prefab_overrides(
         reporter.log(json_output);
         Ok(serde_json::json!({ "overrides": mapping.len() }))
     }
+}
+
+// ---------------------------------------------------------------------------
+// Corpus harvesting (wiki read-only, no game dir required)
+// ---------------------------------------------------------------------------
+
+async fn run_corpus_sync(
+    full: bool,
+    dir: Option<&str>,
+    reporter: &dyn Reporter,
+    mode: WriteMode,
+) -> Result<serde_json::Value> {
+    // Anonymous reads suffice; the client only needs the HUIJI__* config to
+    // know host/headers. Login is deliberately skipped — this job never edits.
+    let client = WikiClient::from_env()?;
+    let base_dir = PathBuf::from(dir.unwrap_or("wikis"));
+    crate::corpus::sync(
+        &client,
+        &base_dir,
+        full,
+        mode == WriteMode::DryRun,
+        reporter,
+    )
+    .await
 }
 
 // ---------------------------------------------------------------------------

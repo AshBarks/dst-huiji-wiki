@@ -1,8 +1,9 @@
 # 页面全量语料抓取方案（Wiki Corpus Harvesting）
 
-**状态**：v1（评审中）
+**状态**：v1.1（初版已实现：`corpus-fetch` 命令 + `service::JobKind::CorpusSync`）
 **修订记录**：
 - v1（本版）：主命名空间全量抓取方案——范围界定、存储布局、DST/单机版分类器、增量同步与验收标准
+- v1.1：落地修正——①本站 MediaWiki 1.38 的 `list=allpages` 不返回 `touched/len/redirect`，枚举改用 `generator=allpages&prop=info`（长度字段名为 `length`）；②版本信号补充「/单机版」子页后缀（577 页）；③首轮回填结果见 §11
 
 **关联文档**：[UPDATE_IMPACT_PLAN.md](UPDATE_IMPACT_PLAN.md)（v3.1，本方案为其 CodeTextAtlas / 类别范式分析的数据底座）
 
@@ -142,10 +143,12 @@ wikis/                          # 整目录加入 .gitignore
 
 ## 8. 实现载体
 
-- 服务层新增 `JobKind::CorpusSync`（CLI wrapper 免费获得），CLI 子命令 `corpus fetch [--full|--incremental] [--report-json]`；
-- 复用现有 `service::WriteMode` 语义：DryRun 只跑 enumerate+reconcile 出报告不写盘；
-- Web UI 进度展示为可选后续项（JobManager SSE 现成）；
-- 校准期允许一次性 Python 脚本探路（不落 `output/` 之外的仓库路径），生产路径统一收编到 Rust job。
+- 服务层 `JobKind::CorpusSync`（WebUI 免费获得），CLI 子命令 **`corpus-fetch`**：`corpus-fetch [--full] [--dir <path>] [--dry-run]`；
+  - 默认增量：枚举后仅抓 `touched` 变化页与本地缺文件页（自愈断点）；`--full` 全量重抓；
+  - `--dry-run` 只枚举+对账出报告，不写任何本地文件；语料作业永不写维基；
+- 核心逻辑在库内 `src/corpus/`：`mod.rs`（sync 编排+对账纯函数）、`model.rs`(PageMeta/GameClass/Manifest)、`classify.rs`（信号规则，常量表待校准后外置 TOML）、`store.rs`（布局与派生索引）；
+- 批量 API 在 `src/wiki/client.rs`：`enumerate_namespace()`（generator=allpages+prop=info）、`get_pages_wikitext()`（≤50 titles/批，含 sha1 与分类成员），共享节流重试；
+- Web UI 进度展示为可选后续项（JobManager SSE 现成）。
 
 ---
 
@@ -163,6 +166,24 @@ wikis/                          # 整目录加入 .gitignore
 ## 10. 开放问题
 
 1. 消歧义模板的具体变体（`{{消歧义}}`/`{{消歧义重定向}}`…）全集需在校准步确认；
-2. 未来 Tier0 需要 `Data:DST Prefab/*.json` 快照做他方同步核对——是否在本布局下扩展第二命名空间抓取通道，届时另立小节，当前明确排除。
+2. 未来 Tier0 需要 `Data:DST Prefab/*.json` 快照做他方同步核对——是否在本布局下扩展第二命名空间抓取通道，届时另立小节，当前明确排除；
+3. recentchanges 增量通道（作者/评论元数据）为 Atlas 对账归因而规划，作为下一步实现——当前 touched 对账已覆盖"何页变更"，recentchanges 补的是"谁改的、为什么改"。
 
 已决：~~`分类:图鉴收录` 能否作为 entity/content 区分信号~~——**不采用**（官方图鉴分类本身混乱，2026-08 拍板）；entity 判定以信息框模板存在性为准。
+
+---
+
+## 11. 落地记录（2026-08 首轮回填）
+
+| 项 | 结果 |
+|----|------|
+| 全量抓取 | 枚举 6,889 == 落盘 6,889，缺失 0，长度不符 0 |
+| 语料体量 | 9,257,811 字节 wikitext / 6889 文件 |
+| 分类分布 | redirect 3153 / dst 1685 / ds 1607 / mixed 93 / disambig 223 / **unknown 128（1.9%，达标 ≤5%）** |
+| 幂等验证 | 第二轮增量：待抓取 0、未变化 6889、零网络写请求之外的开销 |
+| 抽样质检 | 猎犬页本地 wikitext 与 API 现取逐字节一致 |
+
+工程教训（已固化到实现）：
+1. MediaWiki 1.38 的 `list=allpages` 输出**不含** `touched/len/new/redirect` 字段——增量同步若基于它会静默失效；必须用 `generator=allpages&prop=info`，且其长度字段名为 `length` 而非 `len`；
+2. 「单机版」命名惯例的真实形态是**子页后缀** `<实体>/单机版`（577 页），非标题前缀；
+3. unknown 残余 128 页以版本中立内容为主（首页、机制总览、版本历史等），符合预期，清单见 `index/classes_summary.json`。

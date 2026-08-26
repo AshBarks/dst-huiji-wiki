@@ -148,6 +148,34 @@ pub struct PageBrief {
     pub missing: bool,
 }
 
+/// One entry of a namespace enumeration (`list=allpages`).
+///
+/// Carries the fields required for touched-based incremental syncing.
+#[derive(Debug, Clone)]
+pub struct PageListingEntry {
+    pub pageid: i64,
+    pub ns: i64,
+    pub title: String,
+    pub touched: Option<String>,
+    pub len: Option<u64>,
+    pub is_new: bool,
+    pub redirect: bool,
+}
+
+/// Current-revision wikitext plus categories for one fetched page.
+///
+/// A missing title yields `missing = true` with no wikitext instead of an
+/// error so that callers reconciling enumerations can count gaps.
+#[derive(Debug, Clone)]
+pub struct PageRevisionContent {
+    pub pageid: Option<i64>,
+    pub title: String,
+    pub wikitext: Option<String>,
+    pub sha1: Option<String>,
+    pub categories: Vec<String>,
+    pub missing: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct EditResult {
     pub result: String,
@@ -391,6 +419,145 @@ fn parse_allpages_batch(body: &Value) -> Result<(Vec<String>, Option<String>)> {
         .map(|i| i.title)
         .collect();
     Ok((titles, parsed.cont.and_then(|c| c.ap_continue)))
+}
+
+#[derive(Debug, Deserialize)]
+struct RawInfoFullPage {
+    pageid: i64,
+    ns: i64,
+    title: String,
+    touched: Option<String>,
+    /// prop=info names this field `length` (list=allpages uses `len`).
+    #[serde(rename = "length")]
+    len: Option<u64>,
+    #[serde(default, deserialize_with = "de_bc_bool")]
+    new: bool,
+    #[serde(default, deserialize_with = "de_bc_bool")]
+    redirect: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawInfoFullQuery {
+    pages: Option<HashMap<String, RawInfoFullPage>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawGapContinue {
+    #[serde(rename = "gapcontinue")]
+    gap_continue: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawInfoFullResponse {
+    query: Option<RawInfoFullQuery>,
+    #[serde(default, rename = "continue")]
+    cont: Option<RawGapContinue>,
+}
+
+/// Extracts `(entries, next_gapcontinue)` from one `generator=allpages&
+/// prop=info` batch. Unlike plain `list=allpages` on this wiki's MediaWiki
+/// (1.38), the info-prop page set reliably carries `touched`, `len`, `new`
+/// and the redirect flag — all required for touched-based incremental sync.
+fn parse_allpages_info_entries(body: &Value) -> Result<(Vec<PageListingEntry>, Option<String>)> {
+    let parsed: RawInfoFullResponse =
+        serde_json::from_value(body.clone()).map_err(|e| Error::WikiApi(e.to_string()))?;
+    let pages = parsed
+        .query
+        .and_then(|q| q.pages)
+        .ok_or_else(|| Error::WikiApi("No pages in response".to_string()))?;
+    let mut entries: Vec<PageListingEntry> = pages
+        .into_values()
+        .map(|p| PageListingEntry {
+            pageid: p.pageid,
+            ns: p.ns,
+            title: p.title,
+            touched: p.touched,
+            len: p.len,
+            is_new: p.new,
+            redirect: p.redirect,
+        })
+        .collect();
+    // Page maps are unordered; sort by pageid so rounds are reproducible.
+    entries.sort_by_key(|e| e.pageid);
+    Ok((entries, parsed.cont.and_then(|c| c.gap_continue)))
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentSlot {
+    #[serde(rename = "*")]
+    content: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentSlots {
+    main: Option<RawContentSlot>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentRevision {
+    slots: Option<RawContentSlots>,
+    sha1: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawCategory {
+    title: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentPage {
+    pageid: Option<i64>,
+    title: String,
+    #[serde(default, deserialize_with = "de_bc_bool")]
+    missing: bool,
+    revisions: Option<Vec<RawContentRevision>>,
+    categories: Option<Vec<RawCategory>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentQuery {
+    pages: Option<HashMap<String, RawContentPage>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawContentResponse {
+    query: Option<RawContentQuery>,
+}
+
+/// Extracts fetched page contents from one `prop=revisions|categories` batch.
+fn parse_pages_content_response(body: &Value) -> Result<Vec<PageRevisionContent>> {
+    let parsed: RawContentResponse =
+        serde_json::from_value(body.clone()).map_err(|e| Error::WikiApi(e.to_string()))?;
+    let pages = parsed
+        .query
+        .and_then(|q| q.pages)
+        .ok_or_else(|| Error::WikiApi("No pages in response".to_string()))?;
+
+    let mut out = Vec::with_capacity(pages.len());
+    for page in pages.into_values() {
+        let (wikitext, sha1) = match page.revisions.as_ref().and_then(|r| r.first()) {
+            Some(rev) => (
+                rev.slots
+                    .as_ref()
+                    .and_then(|s| s.main.as_ref())
+                    .and_then(|m| m.content.clone()),
+                rev.sha1.clone(),
+            ),
+            None => (None, None),
+        };
+        out.push(PageRevisionContent {
+            pageid: page.pageid,
+            title: page.title,
+            wikitext,
+            sha1,
+            categories: page
+                .categories
+                .map(|cs| cs.into_iter().map(|c| c.title).collect())
+                .unwrap_or_default(),
+            missing: page.missing,
+        });
+    }
+    Ok(out)
 }
 
 impl WikiClient {
@@ -781,6 +948,76 @@ impl WikiClient {
         Ok(titles)
     }
 
+    /// Enumerates every page of a namespace (redirects included) via
+    /// `generator=allpages` + `prop=info`, following `gapcontinue` until
+    /// exhausted.
+    ///
+    /// One request per 500 entries under the shared throttle. Each entry
+    /// carries the metadata required for touched-based incremental sync
+    /// (`touched`, `len`, `new`, redirect flag), so no per-page info queries
+    /// are needed before deciding what to (re)fetch. Plain `list=allpages`
+    /// is deliberately avoided: on MediaWiki 1.38 its entries lack these
+    /// fields, which would silently disable incremental detection.
+    pub async fn enumerate_namespace(&self, namespace: i64) -> Result<Vec<PageListingEntry>> {
+        let mut entries = Vec::new();
+        let mut cont: Option<String> = None;
+        loop {
+            let mut params: Vec<(String, String)> = vec![
+                ("action".to_string(), "query".to_string()),
+                ("generator".to_string(), "allpages".to_string()),
+                ("gapnamespace".to_string(), namespace.to_string()),
+                ("gaplimit".to_string(), "max".to_string()),
+                ("prop".to_string(), "info".to_string()),
+                ("format".to_string(), "json".to_string()),
+            ];
+            if let Some(c) = &cont {
+                params.push(("gapcontinue".to_string(), c.clone()));
+            }
+            let params_ref: Vec<(&str, &str)> = params
+                .iter()
+                .map(|(k, v)| (k.as_str(), v.as_str()))
+                .collect();
+
+            let response = self.get(&params_ref).await?;
+            let body: Value = response.json().await?;
+            let (batch, next) = parse_allpages_info_entries(&body)?;
+            entries.extend(batch);
+
+            match next {
+                Some(c) => cont = Some(c),
+                None => break,
+            }
+        }
+        Ok(entries)
+    }
+
+    /// Fetches current-revision wikitext, revision sha1 and visible category
+    /// members for the given titles, in batches of [`TITLES_PER_QUERY`] with
+    /// throttling applied across batches.
+    ///
+    /// Missing titles come back with `missing == true` and no wikitext rather
+    /// than an error — callers reconciling an enumeration against local state
+    /// need to count gaps, not abort on them.
+    pub async fn get_pages_wikitext(&self, titles: &[&str]) -> Result<Vec<PageRevisionContent>> {
+        let mut out = Vec::with_capacity(titles.len());
+        for chunk in chunk_titles(titles, TITLES_PER_QUERY) {
+            let joined = chunk.join("|");
+            let params = [
+                ("action", "query"),
+                ("prop", "revisions|categories"),
+                ("rvprop", "content|sha1"),
+                ("rvslots", "main"),
+                ("cllimit", "max"),
+                ("titles", joined.as_str()),
+                ("format", "json"),
+            ];
+            let response = self.get(&params).await?;
+            let body: Value = response.json().await?;
+            out.extend(parse_pages_content_response(&body)?);
+        }
+        Ok(out)
+    }
+
     async fn do_edit(
         &self,
         title: &str,
@@ -1098,6 +1335,84 @@ mod tests {
             map_api_error("unknowncode", "x", "P"),
             Error::EditFailed(_)
         ));
+    }
+
+    #[test]
+    fn test_parse_allpages_info_entries() {
+        // formatversion=1 shape: BC booleans as empty strings; page map keyed
+        // by pageid (unordered by design); continue carries gapcontinue;
+        // prop=info names the byte length field `length`.
+        let body: Value = serde_json::json!({
+            "continue": {"gapcontinue": "下一页|2"},
+            "query": {
+                "pages": {
+                    "99": {
+                        "pageid": 99, "ns": 0, "title": "猎犬",
+                        "touched": "2026-08-01T00:00:00Z", "length": 5650,
+                        "new": ""
+                    },
+                    "7": {
+                        "pageid": 7, "ns": 0, "title": "野狗",
+                        "touched": "2026-07-01T00:00:00Z", "length": 30,
+                        "redirect": ""
+                    }
+                }
+            }
+        });
+        let (entries, next) = parse_allpages_info_entries(&body).unwrap();
+        assert_eq!(next.as_deref(), Some("下一页|2"));
+        // Sorted by pageid for reproducible rounds.
+        assert_eq!(entries[0].pageid, 7);
+        assert!(entries[0].redirect, "BC empty string means true");
+        assert_eq!(entries[1].pageid, 99);
+        assert!(!entries[1].redirect);
+        assert_eq!(entries[1].len, Some(5650));
+        assert!(entries[1].is_new);
+    }
+
+    #[test]
+    fn test_parse_allpages_info_entries_no_continue() {
+        let body: Value = serde_json::json!({
+            "query": {"pages": {}}
+        });
+        let (entries, next) = parse_allpages_info_entries(&body).unwrap();
+        assert!(entries.is_empty());
+        assert!(next.is_none());
+    }
+
+    #[test]
+    fn test_parse_pages_content_response() {
+        let body: Value = serde_json::json!({
+            "query": {
+                "pages": {
+                    "13857": {
+                        "pageid": 13857, "ns": 0, "title": "猎犬",
+                        "revisions": [{
+                            "slots": {"main": {"contentmodel": "wikitext", "*": "{{实体信息框/自动|dst|hound}}"}},
+                            "sha1": "deadbeef"
+                        }],
+                        "categories": [{"ns": 14, "title": "分类:联机版"}]
+                    },
+                    "-1": {"ns": 0, "title": "不存在页", "missing": ""}
+                }
+            }
+        });
+        let mut pages = parse_pages_content_response(&body).unwrap();
+        pages.sort_by(|a, b| a.title.cmp(&b.title));
+        assert_eq!(pages.len(), 2);
+
+        let hound = pages.iter().find(|p| p.title == "猎犬").unwrap();
+        assert_eq!(
+            hound.wikitext.as_deref(),
+            Some("{{实体信息框/自动|dst|hound}}")
+        );
+        assert_eq!(hound.sha1.as_deref(), Some("deadbeef"));
+        assert_eq!(hound.categories, vec!["分类:联机版".to_string()]);
+        assert!(!hound.missing);
+
+        let missing = pages.iter().find(|p| p.title == "不存在页").unwrap();
+        assert!(missing.missing);
+        assert!(missing.wikitext.is_none());
     }
 
     #[tokio::test]

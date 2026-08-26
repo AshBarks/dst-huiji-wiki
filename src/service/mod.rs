@@ -477,11 +477,36 @@ async fn run_update_scan(
             .iter()
             .filter(|g| g.tier == crate::update::GradeTier::SuggestDraft)
             .count();
+
+        // Formal create-check list: entities the pipeline believes need a wiki
+        // page but currently have no page mapping.
+        let create_checks: Vec<&crate::update::GradedChange> = graded
+            .iter()
+            .filter(|g| g.tier == crate::update::GradeTier::CreateCheck)
+            .collect();
+        let cc_json = out_dir.join("create_check.json");
+        std::fs::write(&cc_json, serde_json::to_string_pretty(&create_checks)?)?;
+        let mut cc_md = String::from("# Create-Check 清单\n\n");
+        for g in &create_checks {
+            cc_md.push_str(&format!(
+                "- `{}` {}：{}\n",
+                g.prefab, g.field, g.change_text
+            ));
+        }
+        let cc_md_path = out_dir.join("create_check.md");
+        std::fs::write(&cc_md_path, cc_md)?;
         reporter.log(format!(
-            "Layer B 明细 {} 条（建议 {}）→ {}",
+            "Layer B 明细 {} 条（建议 {}，create_check {}）→ {}",
             graded.len(),
             drafts,
+            create_checks.len(),
             path.display()
+        ));
+        reporter.log(format!(
+            "Create-Check 清单 {} 条 → {} / {}",
+            create_checks.len(),
+            cc_json.display(),
+            cc_md_path.display()
         ));
     }
 

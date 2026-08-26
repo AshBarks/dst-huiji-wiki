@@ -34,6 +34,44 @@ fn num(text: &str) -> Option<f64> {
     text.parse().ok()
 }
 
+/// Unit equivalence for old-literal matching (§4.2.6 step 3: 距离单位写法
+/// 容差). The wiki writes combat distances both as `N 单位` and
+/// `N 距离单位`; every other unit compares verbatim, `None` only matches
+/// `None`.
+pub fn units_compatible(a: Option<&str>, b: Option<&str>) -> bool {
+    match (a, b) {
+        (None, None) => true,
+        (Some(x), Some(y)) => x == y || (is_distance_unit(x) && is_distance_unit(y)),
+        _ => false,
+    }
+}
+
+fn is_distance_unit(u: &str) -> bool {
+    u == "单位" || u == "距离单位"
+}
+
+fn approx(a: f64, b: f64) -> bool {
+    (a - b).abs() <= 1e-9_f64.max(a.abs() * 1e-9)
+}
+
+/// Numeric tolerance per §4.2.6: `0.125 ↔ 12.5%` — one side scaled by 100
+/// still matches.
+pub fn numbers_compatible(a: f64, b: f64) -> bool {
+    approx(a, b) || approx(a * 100.0, b) || approx(b * 100.0, a)
+}
+
+/// Whether a code-side old literal (`values`, `unit`) can refer to the same
+/// page fact as a candidate extracted by this module. Requires the same
+/// value count plus pairwise numeric and unit compatibility.
+pub fn literal_matches(values: &[f64], unit: Option<&str>, fact: &FactCandidate) -> bool {
+    values.len() == fact.values.len()
+        && values
+            .iter()
+            .zip(&fact.values)
+            .all(|(a, b)| numbers_compatible(*a, *b))
+        && units_compatible(unit, fact.unit.as_deref())
+}
+
 static INTERVAL: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
         r"(?<lo>\d+(?:\.\d+)?)\s*~\s*(?<hi>\d+(?:\.\d+)?)\s*(?<unit>距离单位|单位|秒|分钟|天)?",
@@ -259,5 +297,34 @@ mod tests {
     #[test]
     fn bare_numbers_are_ignored() {
         assert!(extract(5, RID, "版本号 16000 出现在历史记录里。").is_empty());
+    }
+
+    #[test]
+    fn percent_fraction_tolerance_both_directions() {
+        assert!(numbers_compatible(0.125, 12.5));
+        assert!(numbers_compatible(12.5, 0.125));
+        assert!(numbers_compatible(30.0, 30.0));
+        assert!(!numbers_compatible(0.5, 51.0));
+    }
+
+    #[test]
+    fn distance_unit_phrasing_is_equivalent() {
+        assert!(units_compatible(Some("单位"), Some("距离单位")));
+        assert!(units_compatible(None, None));
+        assert!(!units_compatible(Some("秒"), Some("距离单位")));
+        assert!(!units_compatible(Some("秒"), None));
+    }
+
+    #[test]
+    fn literal_match_end_to_end() {
+        // Code-side old loot chance 0.125 (fraction) vs page candidate 12.5%.
+        let facts = extract(6, RID, "{{Pic|32|CutGrass}}×1（12.5%）");
+        assert!(literal_matches(&[1.0, 0.125], None, &facts[0]));
+        // Distance phrasing: code TUNING 100 vs page "100 距离单位".
+        let d = extract(7, RID, "仇恨范围为 100 距离单位");
+        assert!(literal_matches(&[100.0], Some("单位"), &d[0]));
+        // Wrong unit family must not match even with equal numbers.
+        let s = extract(8, RID, "燃烧 12 秒");
+        assert!(!literal_matches(&[12.0], Some("天"), &s[0]));
     }
 }

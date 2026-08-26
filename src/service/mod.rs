@@ -387,6 +387,11 @@ async fn run_update_scan(
         let new_stats = crate::update::collect_stat_records(&new_root, &atlas.index, &atlas.tuning);
         let stat_changes = crate::update::pair_stat_changes(&old_stats, &new_stats);
         reporter.log(format!("配对出数值变更 {} 条", stat_changes.len()));
+        let old_consts = crate::update::collect_brain_consts(&old_root)?;
+        let new_consts = crate::update::collect_brain_consts(&new_root)?;
+        let const_changes = crate::update::pair_const_changes(&old_consts, &new_consts);
+        reporter.log(format!("配对出行为常量变更 {} 条", const_changes.len()));
+        changes.extend(const_changes);
         changes.extend(stat_changes);
         reporter.log(format!("配对变更合计 {} 条", changes.len()));
         let view = crate::update::CorpusPageView::load(std::path::Path::new(corpus_root))?;

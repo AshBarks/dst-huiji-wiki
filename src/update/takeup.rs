@@ -106,7 +106,9 @@ impl Default for TakeupConfig {
                 "<!--".to_string(),
                 "-->".to_string(),
             ],
-            calibration_notes: vec!["SpawnLootPrefab 变更不进掉落建议：镶嵌摧毁/                过程生成属内部机制（telebase 紫宝石、vault_lobby_exit 绳索比对结论）"
+            calibration_notes: vec![
+                "F2 数值新增在 autoinfobox 覆盖域归 auto_handled（vault_pillar_guard 判定）".to_string(),
+                "Stat setter 消失多为逻辑迁移仅记 manual（stalker×3 判定）".to_string(),"SpawnLootPrefab 变更不进掉落建议：镶嵌摧毁/                过程生成属内部机制（telebase 紫宝石、vault_lobby_exit 绳索比对结论）"
                 .to_string()],
         }
     }

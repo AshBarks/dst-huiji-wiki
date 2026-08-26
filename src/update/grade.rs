@@ -7,6 +7,8 @@ use std::collections::{BTreeMap, HashMap};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GradeTier {
+    /// Autoinfobox/A 层已覆盖（bot 同步域）。
+    AutoHandled,
     SuggestDraft,
     Manual,
     CreateCheck,
@@ -167,6 +169,7 @@ pub fn summarize(graded: &[GradedChange]) -> BTreeMap<&'static str, usize> {
     let mut m = BTreeMap::new();
     for g in graded {
         let key = match g.tier {
+            GradeTier::AutoHandled => "auto_handled",
             GradeTier::SuggestDraft => "suggest_draft",
             GradeTier::Manual => "manual",
             GradeTier::CreateCheck => "create_check",

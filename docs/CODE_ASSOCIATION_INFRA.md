@@ -169,11 +169,11 @@ struct SymbolProfile {
 | 画像漂移（游戏更新改变代码结构） | 产物挂快照 build 号；Pass 1 增量随内容哈希自动失效 |
 | 相关性标签误伤（把相关标成无关导致漏报） | 标签只是先验非闸门：更新时 old_literal 精确回查命中可推翻任何"无关"标签（安全阀，与主方案一致） |
 
-## 8. 开放决策点
+## 8. 决策记录
 
-1. P4 说明文本落仓库 `docs/atlas/`（git 版本化）还是 `output/atlas/`（视为纯再生产物不入库）——影响 CI 是否校验其新鲜度；
-2. A1 的 GenericityReport 黑名单在 Scan B 完成前先用名称启发式，是否需要人工复核一轮再启用降噪；
-3. E2 助手画像的覆盖范围：实现中发现除 standardcomponents/prefabutil 外，prefabs/ 内还有 wagboss_util 等文件定义 Make*——已放宽为"任意扫描到的全局 `function MakeXxx` 定义均可成画像"；文件内 `local MakeX = function(...)` 匿名赋值形式的定义仍不识别（真实树残留 49 条 helper_unknown，显式留痕待后续支持）。
+1. **说明文本存放——已拍板（2026-08-26）**：落仓库 `docs/atlas/`，git 版本化；产物新鲜度的 CI 校验随 M2 一并引入；
+2. **L0 黑名单人工复核——已拍板（2026-08-26）**：启用降噪前人工复核一轮，作为 F1 启动项执行（届时导出真实树 GenericityReport 全表逐个对照页面证据）；
+3. E2 助手画像范围：已在实现期解决（§9 修正记录 3、§10）。
 
 ---
 

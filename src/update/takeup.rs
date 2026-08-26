@@ -45,6 +45,9 @@ pub struct TakeupConfig {
     /// Collaborative traces preserved verbatim through generation and
     /// validated as protected content (横切规则 ③).
     pub collaborative_traces: Vec<String>,
+    /// 人审结论回填的提取规则注记（§4.2.4 维护方式）。
+    #[serde(default)]
+    pub calibration_notes: Vec<String>,
 }
 
 impl Default for TakeupConfig {
@@ -103,6 +106,8 @@ impl Default for TakeupConfig {
                 "<!--".to_string(),
                 "-->".to_string(),
             ],
+            calibration_notes: vec!["SpawnLootPrefab 变更不进掉落建议：镶嵌摧毁/                过程生成属内部机制（telebase 紫宝石、vault_lobby_exit 绳索比对结论）"
+                .to_string()],
         }
     }
 }

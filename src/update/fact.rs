@@ -134,6 +134,11 @@ pub fn pair_loot_changes(
         let mut m = std::collections::BTreeMap::new();
         for (file, records) in side {
             for r in records {
+                // 校准（2026-08-26 人工比对 B/D）：SpawnLootPrefab 多为内部
+                // 机制产物（镶嵌摧毁、过程生成），玩家认知不算掉落，不进建议流。
+                if r.kind == LootKind::SpawnPrefab {
+                    continue;
+                }
                 for v in &r.variants {
                     for item in &r.items {
                         m.entry((v.clone(), item.clone()))

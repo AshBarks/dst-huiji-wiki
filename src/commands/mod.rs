@@ -108,6 +108,16 @@ pub enum Commands {
         #[arg(long)]
         dry_run: bool,
     },
+    /// 快照差异 + 关联影响评估（M1，只读）：产出 impact.json 与 changes.patch
+    UpdateScan {
+        /// 旧快照（时间戳或目录名）
+        old: String,
+        /// 新快照（时间戳、目录名，或 "current" 表示当前 scripts 树）
+        new: String,
+        /// 输出目录（默认 output/scan/<old>_<new>/）
+        #[arg(short, long)]
+        out: Option<PathBuf>,
+    },
     /// 构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/
     UpdateIndex {
         /// 游戏脚本根目录（当前树或快照目录）
@@ -149,6 +159,7 @@ impl Commands {
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
+            Commands::UpdateScan { .. } => "update-scan",
             Commands::CorpusIndex { .. } => "corpus-index",
             Commands::Serve { .. } => "serve",
         }

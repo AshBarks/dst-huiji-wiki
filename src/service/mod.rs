@@ -127,6 +127,13 @@ pub enum JobKind {
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
+    /// Snapshot diff + impact report (M1): read-only pipeline.
+    UpdateScan {
+        old: String,
+        new: String,
+        #[serde(default)]
+        out: Option<String>,
+    },
     /// Build the code association atlas (index + tuning) from a scripts root.
     UpdateIndex {
         root: String,
@@ -161,6 +168,7 @@ impl JobKind {
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
+            JobKind::UpdateScan { .. } => "update-scan",
         }
     }
 
@@ -289,12 +297,116 @@ async fn execute_job_inner(
         }
         JobKind::CorpusIndex { dir } => run_corpus_index(dir.as_deref(), reporter, mode).await,
         JobKind::UpdateIndex { root, out } => run_update_index(root, opt_path(out), reporter).await,
+        JobKind::UpdateScan { old, new, out } => {
+            run_update_scan(old, new, opt_path(out), reporter).await
+        }
     }
 }
 
 // ---------------------------------------------------------------------------
 // Local-file commands (no game dir required)
 // ---------------------------------------------------------------------------
+
+/// `update-scan`: snapshot diff -> association attribution -> Tier0 rules.
+///
+/// Read-only: writes `impact.json` + `changes.patch` under the output dir.
+async fn run_update_scan(
+    old_id: &str,
+    new_id: &str,
+    out: Option<PathBuf>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    reporter.stage("快照差异与影响评估");
+    let store = crate::update::SnapshotStore::from_env()?;
+    let old_root = store.resolve(old_id);
+    let new_root = if new_id == "current" {
+        store.current_dir()
+    } else {
+        store.resolve(new_id)
+    };
+    if !old_root.is_dir() || !new_root.is_dir() {
+        return Err(crate::error::Error::Io(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!(
+                "snapshot dirs missing: {} or {}",
+                old_root.display(),
+                new_root.display()
+            ),
+        )));
+    }
+
+    reporter.log(format!(
+        "diff: {} <-> {}",
+        old_root.display(),
+        new_root.display()
+    ));
+    let diff = crate::update::TreeDiff::diff_trees(&old_root, &new_root)?;
+    reporter.log(format!("变更文件 {} 个", diff.files.len()));
+
+    reporter.stage("构建关联索引（新树）");
+    let atlas = crate::update::build_atlas_from_dir(&new_root)?;
+
+    let old_tuning_src = std::fs::read_to_string(old_root.join("tuning.lua")).ok();
+    let old_tuning = old_tuning_src
+        .as_deref()
+        .map(crate::update::index::tuning::build_tuning)
+        .transpose()?;
+    let report = crate::update::build_report(
+        &diff,
+        &atlas.index,
+        old_tuning.as_ref(),
+        Some(&atlas.tuning),
+        old_id,
+        new_id,
+    );
+
+    let changed_paths: Vec<String> = report.files.iter().map(|f| f.path.clone()).collect();
+    let tier0 = crate::update::evaluate_rules(&crate::update::default_rules(), &changed_paths);
+    for hit in &tier0 {
+        reporter.log(format!(
+            "Tier0 [{}] {} 文件 → jobs: {}",
+            hit.label,
+            hit.files.len(),
+            if hit.jobs.is_empty() {
+                "(无自动作业)".to_string()
+            } else {
+                hit.jobs.join(", ")
+            }
+        ));
+    }
+
+    let out_dir = out.unwrap_or_else(|| {
+        PathBuf::from("output")
+            .join("scan")
+            .join(format!("{old_id}_{new_id}"))
+    });
+    std::fs::create_dir_all(&out_dir)?;
+
+    let summary = serde_json::json!({
+        "old": report.old_id,
+        "new": report.new_id,
+        "changed_files": report.files.len(),
+        "affected_entities": report.affected_entities.len(),
+        "tuning_added": report.tuning.added.len(),
+        "tuning_removed": report.tuning.removed.len(),
+        "tuning_changed": report.tuning.changed.len(),
+        "tier0_hits": tier0.len(),
+    });
+    std::fs::write(
+        out_dir.join("impact.json"),
+        serde_json::to_string_pretty(&serde_json::json!({
+            "report": report,
+            "tier0": tier0,
+        }))?,
+    )?;
+    let patch = diff.to_patch(&old_root, &new_root)?;
+    std::fs::write(out_dir.join("changes.patch"), &patch)?;
+
+    reporter.log(format!("受影响实体 {}", report.affected_entities.len()));
+    reporter.log(format!("已写入 {}", out_dir.display()));
+
+    Ok(summary)
+}
 
 /// `update-index`: build the association atlas and cache it under
 /// `output/atlas/<build>/` (or an explicit `--out` directory).

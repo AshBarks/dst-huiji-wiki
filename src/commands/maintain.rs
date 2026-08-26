@@ -147,6 +147,19 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::UpdateScan { old, new, out } => {
+            execute(
+                JobKind::UpdateScan {
+                    old,
+                    new,
+                    out: opt_path_to_string(&out)?,
+                },
+                // Read-only pipeline: no wiki writes ever.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
         Commands::UpdateIndex { root, out } => {
             execute(
                 JobKind::UpdateIndex {

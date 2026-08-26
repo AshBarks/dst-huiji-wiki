@@ -7,6 +7,7 @@
 pub mod diffdata;
 pub mod impact;
 pub mod index;
+pub mod rules;
 pub mod snapshot;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
@@ -15,4 +16,5 @@ pub use index::{
     build_atlas_from_dir, build_from_dir, build_from_sources, AtlasBuild, IndexArtifact,
     TuningTable,
 };
+pub use rules::{default_rules, evaluate as evaluate_rules, RuleHit, Tier0Rule};
 pub use snapshot::SnapshotStore;

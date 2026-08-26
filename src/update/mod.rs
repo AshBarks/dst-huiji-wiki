@@ -5,12 +5,14 @@
 //! structured tree diff.
 
 pub mod diffdata;
+pub mod fact;
 pub mod impact;
 pub mod index;
 pub mod rules;
 pub mod snapshot;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
+pub use fact::{EvidenceRef, FactChange, FactKind, Literal};
 pub use impact::{build_report, FileImpact, ImpactReport, TuningDiff};
 pub use index::{
     build_atlas_from_dir, build_from_dir, build_from_sources, AtlasBuild, IndexArtifact,

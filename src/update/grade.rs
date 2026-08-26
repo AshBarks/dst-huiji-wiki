@@ -64,9 +64,18 @@ impl CorpusPageView {
         let reg: RegView = serde_json::from_str(&reg_raw)?;
         for (variant, mut ids) in reg.prefabs {
             ids.sort();
-            if !ids.is_empty() {
-                view.pages.insert(variant, ids);
+            if ids.is_empty() {
+                continue;
             }
+            // Case-insensitive lookup: wiki infobox parameters may be written
+            // uppercase while code-side prefab names are lowercase. Keep the
+            // original key and add a lowercase alias when absent.
+            view.pages
+                .entry(variant.clone())
+                .or_insert_with(|| ids.clone());
+            view.pages
+                .entry(variant.to_lowercase())
+                .or_insert_with(|| ids.clone());
         }
         let facts_raw = match std::fs::read_to_string(root.join("index/facts.jsonl")) {
             Ok(s) => s,
@@ -134,7 +143,14 @@ fn landed(c: &FactChange, pageid: i64, f: &FactCandidate) -> GradedChange {
 pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<GradedChange> {
     let mut out = Vec::new();
     for c in changes {
-        match view.pages.get(&c.prefab) {
+        let prefab_lower = c.prefab.to_lowercase();
+        let pageids = view.pages.get(&c.prefab).or_else(|| {
+            view.pages
+                .iter()
+                .find(|(k, _)| k.to_lowercase() == prefab_lower)
+                .map(|(_, v)| v)
+        });
+        match pageids {
             None => out.push(GradedChange {
                 prefab: c.prefab.clone(),
                 field: c.field.clone(),
@@ -298,6 +314,23 @@ mod tests {
         let mut u = loot_change(Some(12.5));
         u.prefab = "moonbeast".into();
         assert_eq!(grade_changes(&[u], &v)[0].tier, GradeTier::CreateCheck);
+    }
+
+    #[test]
+    fn case_only_wiki_parameter_avoids_create_check() {
+        let mut v = CorpusPageView {
+            pages: [("VAULT_CRAWLER".to_string(), vec![73451i64])]
+                .into_iter()
+                .collect(),
+            facts: HashMap::new(),
+        };
+        v.facts.insert(73451, Vec::new());
+        let mut c = loot_change(Some(40.0));
+        c.prefab = "vault_crawler".into();
+        let graded = grade_changes(&[c], &v);
+        assert_eq!(graded[0].tier, GradeTier::Manual);
+        assert_eq!(graded[0].pageid, Some(73451));
+        assert_ne!(graded[0].tier, GradeTier::CreateCheck);
     }
 
     #[test]

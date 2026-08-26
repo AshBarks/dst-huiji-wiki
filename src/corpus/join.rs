@@ -61,7 +61,8 @@ pub struct JoinReport {
     /// `(exact + normalized) / wiki_variants`.
     pub match_rate_wiki: f64,
     pub dangling_wiki: Vec<DanglingVariant>,
-    /// Deterministic infobox-parameter corrections (case_only + naming_drift).
+    /// Deterministic infobox-parameter corrections (naming_drift only;
+    /// case_only is auto-normalized during join and not actionable).
     pub corrections: Vec<ParamCorrection>,
     /// Code-side variants no wiki page references (FX/internal prefabs are
     /// expected here).
@@ -160,12 +161,7 @@ pub fn build_join_report(
 
     let corrections: Vec<ParamCorrection> = dangling
         .iter()
-        .filter(|d| {
-            matches!(
-                d.bucket,
-                DanglingBucket::CaseOnly | DanglingBucket::NamingDrift
-            )
-        })
+        .filter(|d| matches!(d.bucket, DanglingBucket::NamingDrift))
         .filter_map(|d| {
             d.suggestion.clone().map(|fix_to| ParamCorrection {
                 pageid: d.pageids[0],
@@ -273,10 +269,22 @@ mod tests {
                 .collect()
         };
         assert_eq!(by_bucket(DanglingBucket::CaseOnly).len(), 1);
+        assert!(!report
+            .corrections
+            .iter()
+            .any(|c| c.bucket == DanglingBucket::CaseOnly));
         let drifts = by_bucket(DanglingBucket::NamingDrift);
         assert_eq!(drifts.len(), 1);
         assert_eq!(drifts[0].variant, "abyss_pillar");
         assert_eq!(drifts[0].suggestion.as_deref(), Some("abysspillar"));
+        assert_eq!(
+            report
+                .corrections
+                .iter()
+                .filter(|c| c.bucket == DanglingBucket::NamingDrift)
+                .count(),
+            1
+        );
         assert_eq!(report.code_only_count, 1); // abigail_flame_fx
         assert!((report.match_rate_wiki - 2.0 / 3.0).abs() < 1e-9);
         assert_eq!(report.schema_version, JOIN_SCHEMA_VERSION);

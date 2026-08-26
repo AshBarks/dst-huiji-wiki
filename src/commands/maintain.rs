@@ -196,6 +196,27 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::SymbolAnnotate {
+            root,
+            corpus,
+            limit,
+            out,
+            verdicts,
+        } => {
+            execute(
+                JobKind::SymbolAnnotate {
+                    root: path_to_string(&root)?,
+                    corpus: path_to_string(&corpus)?,
+                    limit,
+                    out: opt_path_to_string(&out)?,
+                    verdicts: opt_path_to_string(&verdicts)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
         Commands::Serve { host, port } => {
             crate::web::serve(host, port).await?;
         }

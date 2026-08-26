@@ -144,6 +144,24 @@ pub enum Commands {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Page→Symbol 标注 CLI：生成高引用 symbol 证据包和 Prompt，
+    /// 可选读取已有 LLM 输出并生成跨页一致性报告（纯本地，不写 wiki）
+    SymbolAnnotate {
+        /// 游戏脚本根目录（当前树或快照目录）
+        root: PathBuf,
+        /// 语料 host 根目录（wikis/<host>/）
+        #[arg(long)]
+        corpus: PathBuf,
+        /// 只处理引用量最高的前 N 个 symbol
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+        /// 输出目录（默认 output/symbol-annotate/）
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// 可选的 LLM/人工标注结果文件（JSON 数组或 SymbolAnnotationResponse）
+        #[arg(long)]
+        verdicts: Option<PathBuf>,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -170,6 +188,7 @@ impl Commands {
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",
             Commands::CorpusIndex { .. } => "corpus-index",
+            Commands::SymbolAnnotate { .. } => "symbol-annotate",
             Commands::Serve { .. } => "serve",
         }
     }
@@ -410,6 +429,41 @@ mod tests {
                 assert!(out.is_none());
             }
             _ => panic!("Expected UpdateIndex command"),
+        }
+    }
+
+    #[test]
+    fn test_symbol_annotate_command() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "symbol-annotate",
+            "scripts",
+            "--corpus",
+            "wikis/dontstarve.huijiwiki.com",
+            "--limit",
+            "10",
+            "--out",
+            "output/symbol-annotate/test",
+            "--verdicts",
+            "verdicts.json",
+        ]);
+        assert!(args.is_ok());
+        let args = args.unwrap();
+        match args.command {
+            Commands::SymbolAnnotate {
+                root,
+                corpus,
+                limit,
+                out,
+                verdicts,
+            } => {
+                assert_eq!(root, PathBuf::from("scripts"));
+                assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
+                assert_eq!(limit, 10);
+                assert_eq!(out, Some(PathBuf::from("output/symbol-annotate/test")));
+                assert_eq!(verdicts, Some(PathBuf::from("verdicts.json")));
+            }
+            _ => panic!("Expected SymbolAnnotate command"),
         }
     }
 

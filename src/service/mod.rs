@@ -161,6 +161,21 @@ pub enum JobKind {
         #[serde(default)]
         join: Option<String>,
     },
+    /// Page→Symbol 标注 CLI：生成证据包/Prompt，可选生成跨页一致性报告。
+    SymbolAnnotate {
+        root: String,
+        corpus: String,
+        #[serde(default = "default_symbol_limit")]
+        limit: usize,
+        #[serde(default)]
+        out: Option<String>,
+        #[serde(default)]
+        verdicts: Option<String>,
+    },
+}
+
+fn default_symbol_limit() -> usize {
+    20
 }
 
 impl JobKind {
@@ -178,6 +193,7 @@ impl JobKind {
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
+            JobKind::SymbolAnnotate { .. } => "symbol-annotate",
         }
     }
 
@@ -321,6 +337,23 @@ async fn execute_job_inner(
                 opt_path(out),
                 corpus.as_deref(),
                 annotate.as_deref(),
+                reporter,
+            )
+            .await
+        }
+        JobKind::SymbolAnnotate {
+            root,
+            corpus,
+            limit,
+            out,
+            verdicts,
+        } => {
+            run_symbol_annotate(
+                root,
+                corpus,
+                *limit,
+                opt_path(out),
+                verdicts.as_deref(),
                 reporter,
             )
             .await
@@ -623,6 +656,100 @@ async fn run_update_index(
         "tuning_values": atlas.tuning.values.len(),
         "output": out_dir,
     }))
+}
+
+/// `symbol-annotate`: build Page→Symbol evidence packs, render prompts, and
+/// optionally consume LLM/human verdicts to produce coverage reports.
+///
+/// Local-only; never writes the wiki.
+async fn run_symbol_annotate(
+    root: &str,
+    corpus: &str,
+    limit: usize,
+    out: Option<PathBuf>,
+    verdicts: Option<&str>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    reporter.stage("构建代码关联索引");
+    let atlas = crate::update::build_atlas_from_dir(std::path::Path::new(root))?;
+
+    reporter.stage("加载语料页面视图");
+    let view = crate::update::CorpusPageView::load(std::path::Path::new(corpus))?;
+    reporter.log(format!(
+        "页面 {} 个 / facts {} 页",
+        view.pages.len(),
+        view.facts.len()
+    ));
+
+    reporter.stage("生成高引用 symbol 证据包");
+    let packs = crate::update::build_symbol_evidence_packs(&atlas.index, &view, limit);
+    reporter.log(format!("生成 {} 个 symbol 证据包", packs.len()));
+
+    let out_dir = out.unwrap_or_else(|| {
+        PathBuf::from("output").join("symbol-annotate").join(
+            atlas
+                .build_id
+                .clone()
+                .unwrap_or_else(|| "unknown".to_string()),
+        )
+    });
+    std::fs::create_dir_all(&out_dir)?;
+
+    let packs_path = out_dir.join("symbol_packs.json");
+    std::fs::write(&packs_path, serde_json::to_string_pretty(&packs)?)?;
+
+    let mut prompts = String::from("# Symbol Annotation Prompts\n\n");
+    for pack in &packs {
+        let symbol = match &pack.symbol {
+            crate::update::SymbolRef::File { path } => path.clone(),
+            crate::update::SymbolRef::Fn { file, name } => format!("{file}#{name}"),
+            crate::update::SymbolRef::Const { file, name } => format!("{file}#{name}"),
+            crate::update::SymbolRef::Behaviour { name } => format!("behaviours/{name}"),
+        };
+        let semantics = format!("{}（代码证据待补充）", symbol);
+        prompts.push_str(&crate::update::render_symbol_annotation_prompt(
+            pack, &semantics,
+        ));
+        prompts.push('\n');
+    }
+    let prompts_path = out_dir.join("symbol_prompts.md");
+    std::fs::write(&prompts_path, &prompts)?;
+
+    let mut summary = serde_json::json!({
+        "packs": packs.len(),
+        "output": out_dir,
+        "prompts": prompts_path,
+        "packs_file": packs_path,
+    });
+
+    if let Some(vp) = verdicts {
+        reporter.stage("读取标注结果并生成覆盖报告");
+        let raw = std::fs::read_to_string(vp)?;
+        let responses: Vec<crate::update::SymbolAnnotationResponse> = serde_json::from_str(&raw)?;
+        let reports = crate::update::build_coverage_reports(&responses);
+        let cov_json = out_dir.join("symbol_coverage.json");
+        std::fs::write(&cov_json, serde_json::to_string_pretty(&reports)?)?;
+        let mut md = String::from("# Symbol Coverage 报告\n\n");
+        for r in &reports {
+            md.push_str(&crate::update::render_coverage_report_md(r));
+        }
+        let cov_md = out_dir.join("symbol_coverage.md");
+        std::fs::write(&cov_md, &md)?;
+        reporter.log(format!(
+            "覆盖报告 {} 个 symbol → {} / {}",
+            reports.len(),
+            cov_json.display(),
+            cov_md.display()
+        ));
+        summary["coverage"] = serde_json::json!({
+            "symbols": reports.len(),
+            "json": cov_json,
+            "markdown": cov_md,
+        });
+    }
+
+    reporter.log(format!("已写入 {}", out_dir.display()));
+    Ok(summary)
 }
 
 async fn run_parse_po(

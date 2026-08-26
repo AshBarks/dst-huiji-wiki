@@ -11,6 +11,7 @@ pub mod impact;
 pub mod index;
 pub mod rules;
 pub mod snapshot;
+pub mod stats;
 pub mod takeup;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
@@ -25,4 +26,5 @@ pub use index::{
 };
 pub use rules::{default_rules, evaluate as evaluate_rules, RuleHit, Tier0Rule};
 pub use snapshot::SnapshotStore;
+pub use stats::{extract_stats, StatFact, StatKind};
 pub use takeup::{TakeupConfig, Tier};

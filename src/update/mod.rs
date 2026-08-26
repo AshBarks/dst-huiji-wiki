@@ -14,7 +14,7 @@ pub mod snapshot;
 pub mod takeup;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
-pub use fact::{EvidenceRef, FactChange, FactKind, Literal};
+pub use fact::{pair_loot_changes, EvidenceRef, FactChange, FactKind, Literal};
 pub use grade::{
     grade_changes, summarize as summarize_grades, CorpusPageView, GradeTier, GradedChange,
 };

@@ -101,6 +101,69 @@ impl FactChange {
     }
 }
 
+/// Pairs two snapshots' attributed loot facts into presence changes.
+///
+/// A `(variant, item)` present on the old side only is a removal
+/// (`old=Str(item)`, `new=None`); new-side only is an addition. Chance-only
+/// drift is invisible until [`LootRecord`] carries weights (known F1
+/// limitation, plan §4.2.3). A fact that merely moved files keeps its page
+/// meaning and produces nothing.
+pub fn pair_loot_changes(
+    old: &std::collections::BTreeMap<String, Vec<LootRecord>>,
+    new: &std::collections::BTreeMap<String, Vec<LootRecord>>,
+) -> Vec<FactChange> {
+    fn index(
+        side: &std::collections::BTreeMap<String, Vec<LootRecord>>,
+    ) -> std::collections::BTreeMap<(String, String), EvidenceRef> {
+        let mut m = std::collections::BTreeMap::new();
+        for (file, records) in side {
+            for r in records {
+                for v in &r.variants {
+                    for item in &r.items {
+                        m.entry((v.clone(), item.clone()))
+                            .or_insert_with(|| EvidenceRef {
+                                file: file.clone(),
+                                line: r.line,
+                            });
+                    }
+                }
+            }
+        }
+        m
+    }
+
+    let old_idx = index(old);
+    let new_idx = index(new);
+    let keys: std::collections::BTreeSet<(String, String)> =
+        old_idx.keys().chain(new_idx.keys()).cloned().collect();
+    let mut out = Vec::new();
+    for key in keys {
+        let was = old_idx.get(&key);
+        let now = new_idx.get(&key);
+        if was == now {
+            continue;
+        }
+        let item = key.1.clone();
+        let (old_lit, new_lit, ev) = match (was, now) {
+            (Some(w), None) => (Some(Literal::Str(item.clone())), None, w.clone()),
+            (None, Some(n)) => (None, Some(Literal::Str(item.clone())), n.clone()),
+            _ => continue,
+        };
+        out.push(FactChange {
+            prefab: key.0.clone(),
+            kind: FactKind::Loot,
+            field: format!("loot[{item}]"),
+            context: None,
+            source_file: ev.file.clone(),
+            old: old_lit,
+            new: new_lit,
+            derivation_depth: 1,
+            evidence: vec![ev],
+        });
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -154,5 +217,40 @@ mod tests {
         assert_eq!(c.context, None);
         let back = serde_json::to_string(&c).unwrap();
         assert!(!back.contains("\"old\""));
+    }
+
+    #[test]
+    fn loot_pairing_produces_removals_and_additions() {
+        use std::collections::BTreeMap;
+        let rec = |items: &[&str], variants: &[&str], line: u32| LootRecord {
+            kind: super::super::index::loot::LootKind::SetLoot,
+            items: items.iter().map(|s| s.to_string()).collect(),
+            line,
+            variants: variants.iter().map(|s| s.to_string()).collect(),
+        };
+        let mut old = BTreeMap::new();
+        old.insert(
+            "prefabs/hound.lua".to_string(),
+            vec![rec(&["monstermeat", "houndstooth"], &["hound"], 10)],
+        );
+        let mut new = BTreeMap::new();
+        new.insert(
+            "prefabs/hound.lua".to_string(),
+            vec![rec(&["houndstooth", "rocks"], &["hound"], 12)],
+        );
+
+        let changes = pair_loot_changes(&old, &new);
+        assert_eq!(changes.len(), 2);
+        let removed = changes
+            .iter()
+            .find(|c| c.field == "loot[monstermeat]")
+            .unwrap();
+        assert_eq!(removed.old, Some(Literal::Str("monstermeat".into())));
+        assert_eq!(removed.new, None);
+        let added = changes.iter().find(|c| c.field == "loot[rocks]").unwrap();
+        assert_eq!(added.old, None);
+        assert_eq!(added.new, Some(Literal::Str("rocks".into())));
+        // Unchanged fact (houndstooth) and file-moved-only facts produce nothing.
+        assert!(!changes.iter().any(|c| c.field == "loot[houndstooth]"));
     }
 }

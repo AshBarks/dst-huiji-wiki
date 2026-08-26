@@ -372,24 +372,25 @@ async fn run_update_scan(
         new_id,
     );
 
-    // Layer B (report-only): grade current-state loot anchors against the
-    // local corpus. Read-only; skipped when no corpus dir was supplied.
+    // Layer B (report-only): pair loot facts across snapshots and grade the
+    // changes against the local corpus. Read-only; skipped when no corpus
+    // dir was supplied.
+    let mut graded_layer_b: Option<Vec<crate::update::GradedChange>> = None;
     if let Some(corpus_root) = corpus {
-        reporter.stage("Layer B 定级（loot 锚点，只读）");
+        reporter.stage("Layer B 定级（loot 配对，只读）");
+        reporter.log("构建旧树索引（loot 配对需要）".to_string());
+        let old_atlas = crate::update::build_atlas_from_dir(&old_root)?;
+        let changes = crate::update::pair_loot_changes(&old_atlas.index.loot, &atlas.index.loot);
+        reporter.log(format!("配对出掉落变更 {} 条", changes.len()));
         let view = crate::update::CorpusPageView::load(std::path::Path::new(corpus_root))?;
-        let mut changes = Vec::new();
-        for (file, records) in &atlas.index.loot {
-            for r in records {
-                changes.extend(crate::update::FactChange::from_loot_record(file, r));
-            }
-        }
         let graded = crate::update::grade_changes(&changes, &view);
-        let summary = crate::update::grade::LayerBSummary::from(graded.as_slice());
+        report.layer_b = Some(crate::update::grade::LayerBSummary::from(graded.as_slice()));
         reporter.log(format!(
-            "Layer B: {} 个 loot 锚点定级 {:?}",
-            summary.anchors, summary.tiers
+            "Layer B: {} 条定级 {:?}",
+            graded.len(),
+            crate::update::summarize_grades(&graded)
         ));
-        report.layer_b = Some(summary);
+        graded_layer_b = Some(graded);
     }
 
     let changed_paths: Vec<String> = report.files.iter().map(|f| f.path.clone()).collect();
@@ -413,6 +414,17 @@ async fn run_update_scan(
             .join(format!("{old_id}_{new_id}"))
     });
     std::fs::create_dir_all(&out_dir)?;
+
+    // Persist draft-eligible suggestions for human comparison (L1).
+    if let Some(graded) = &graded_layer_b {
+        let drafts: Vec<&crate::update::GradedChange> = graded
+            .iter()
+            .filter(|g| g.tier == crate::update::GradeTier::SuggestDraft)
+            .collect();
+        let path = out_dir.join("layer_b_suggestions.json");
+        std::fs::write(&path, serde_json::to_string_pretty(&drafts)?)?;
+        reporter.log(format!("建议清单 {} 条 → {}", drafts.len(), path.display()));
+    }
 
     let summary = serde_json::json!({
         "old": report.old_id,

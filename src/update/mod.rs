@@ -15,6 +15,7 @@ pub mod rules;
 pub mod snapshot;
 pub mod state;
 pub mod stats;
+pub mod symbol_page;
 pub mod takeup;
 
 pub use annotate::{annotate_file, batch_annotate};
@@ -35,4 +36,7 @@ pub use index::{
 pub use rules::{default_rules, evaluate as evaluate_rules, RuleHit, Tier0Rule};
 pub use snapshot::SnapshotStore;
 pub use stats::{extract_stats, StatFact, StatKind};
+pub use symbol_page::{
+    annotate_symbol, SymbolKind, SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
+};
 pub use takeup::{TakeupConfig, Tier};

@@ -208,3 +208,32 @@ struct SymbolProfile {
 - **集成**：BehaviourCall 实参中 `TUNING.X` 经 `resolve_tuning_field` 出真值（Num/Str）；真实树解析出 **4558** 个标量。
 - **产物接口**：`IndexArtifact.schema_version = 1`（正式契约字段）；组合产物 `AtlasBuild { schema_version, build_id, index, tuning }` 由 `build_atlas_from_dir(root)` 构建。
 - **CLI**：`update-index <scripts-root> [--out DIR]`（JobKind::UpdateIndex，纯本地无 wiki 写入），落盘 `output/atlas/<build>/index.json + tuning.json`；build 号优先取 version.txt，否则从快照目录名 `scripts_<时间戳>` 提取，兜底 "unknown"。
+
+---
+
+## 11. 落地记录（Page→Symbol 标注与 CLI，2026-08-27）
+
+### 11.1 目标
+
+将代码侧 symbol 的“页面影响面”标注出来，为后续 Code→Page 提供前置过滤，并通过高引用 symbol 的跨页扫描发现“该提没提 / 提法不一致”。
+
+### 11.2 已实现
+
+- `src/update/symbol_page.rs`：
+  - P0：`SymbolRef` / `SymbolKind` / `SymbolPageVisibility` / `PageEvidence` / `SymbolPageAnnotation`
+  - P1：`annotate_symbol()` 从代码索引解析受影响变体 → 页面 → 候选事实证据
+  - P2：`top_symbols()` / `build_symbol_evidence_packs()` / `render_symbol_pack_md()`
+  - P3：`render_symbol_annotation_prompt()` / `PageSymbolVerdict` / `SymbolAnnotationResponse` / `parse_symbol_annotation_response()`
+  - P4：`SymbolCoverageReport` / `MissingPage` / `InconsistentPage` / `build_coverage_report()` / `build_coverage_reports()` / `render_coverage_report_md()`
+- CLI `symbol-annotate`：
+  - 参数：`root`、`--corpus`、`--limit`、`--out`、`--verdicts`、`--llm`
+  - 输出：`symbol_packs.json`、`symbol_prompts.md`、可选 `symbol_verdicts.json`、`symbol_coverage.json/.md`
+- LLM 配置层 `src/llm.rs`：
+  - 环境变量：`LLM__API_KEY`、`LLM__BASE_URL`、`LLM__MODEL`
+  - 未配置 `LLM__API_KEY` 时跳过 LLM 标注；配置后请求失败返回 `Error::Llm`
+
+### 11.3 验证
+
+- `cargo fmt --check`、`cargo clippy --all-targets -- -D warnings` 通过
+- 测试：命令解析、LLM 配置缺失、P0–P4 单测、全量 lib 测试（排除 real-tree smoke）
+- 模拟 P4 示例报告见 `docs/symbol_coverage_example.md` / `.json`

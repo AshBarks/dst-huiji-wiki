@@ -439,3 +439,51 @@ src/update/
 6. ~~报告是否投递 wiki 用户页？~~ **暂缓**：先不考虑投递；
 7. （v3）组件收窄的"覆写过被改成员"判定粒度与聚合阈值——随实现定，暂记 fn 级粗粒度 + >30 页聚合为缺省；
 8. （v3）FactChange 的 context 取值清单能否半自动枚举——并入语料大面积扫描阶段讨论。
+
+---
+
+## 6. 当前实施状态与下一步计划（2026-08-27）
+
+### 6.1 已完成（截至 2026-08-27）
+
+| 模块/能力 | 状态 |
+|-----------|------|
+| M1 快照/diff/Tier0/反向传播 | ✅ 基本完成 |
+| M2 F1 掉落表 | ✅ 完成并闭环 |
+| M3a F2 数值提取+审阅记录 | ✅ 完成（apply 写回暂冻结） |
+| F3 行为常量子集 | ✅ 完成 |
+| BrainEdge 动态解析 | ✅ 验证完成 |
+| atlas fn 归属 / 发散关联渲染 | ✅ 完成 |
+| F4 SpawnPrefab 反向生成 | ✅ 首版完成 |
+| create-check 清单化 | ✅ 完成 |
+| state.json 缓存断点续跑 | ✅ 完成 |
+| Page→Symbol 标注 P0/P1/P2/P3/P4 | ✅ 完成 |
+| `symbol-annotate` CLI runner | ✅ 完成 |
+| LLM API 配置层 | ✅ 完成（未配置跳过，配置后失败报错） |
+
+### 6.2 当前 CLI
+
+```bash
+# 生成高引用 symbol 证据包 + Prompt
+dst-huiji-wiki symbol-annotate <scripts-root> \
+  --corpus wikis/dontstarve.huijiwiki.com \
+  --limit 20
+
+# 使用已有 LLM/人工 verdicts 生成覆盖报告
+dst-huiji-wiki symbol-annotate <scripts-root> \
+  --corpus wikis/dontstarve.huijiwiki.com \
+  --verdicts verdicts.json
+
+# 配置 LLM 后直接调用大模型标注
+dst-huiji-wiki symbol-annotate <scripts-root> \
+  --corpus wikis/dontstarve.huijiwiki.com \
+  --llm
+```
+
+### 6.3 下一步计划
+
+1. **Page→Symbol 实跑**：用真实 LLM 或人工标注跑一轮高引用 symbol，生成实际 `symbol_coverage`，验证 missing / inconsistent 质量；
+2. **四档 region tier 落地**：把 draft/flag/ignore/Tier0-only 写入 region/证据包，接入 `grade` 与 Prompt；
+3. **Code→Page 方向**：基于 Page→Symbol 标注结果实现“代码变更 → 页面生成/修订”；
+4. **recentchanges 增量抓取**：按 `WIKI_CORPUS_PLAN.md` §12 实施；
+5. **真实版本端到端验收**：下次游戏更新后跑 `update-scan --corpus` + `symbol-annotate`，形成完整人工比对包。

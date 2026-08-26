@@ -1,16 +1,12 @@
+//! Thin CLI wrappers around the shared service layer.
+
 use super::Commands;
-use dst_huiji_wiki::copyclip::{process_copyclip, CopyClipProcessor};
-use dst_huiji_wiki::diff_lines;
-use dst_huiji_wiki::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
-use dst_huiji_wiki::models::PoEntry;
-use dst_huiji_wiki::parser::{
-    extract_field_assignment_range, parse_prefab_overrides, OverrideValue, PoParser, RecipeParser,
+use dst_huiji_wiki::service::{
+    execute_job_with_mode, ConfirmMode, JobKind, StdoutReporter, WriteMode,
 };
-use dst_huiji_wiki::wiki::WikiClient;
-use dst_huiji_wiki::{DstContext, Error, Result, TechReport};
-use std::collections::BTreeMap;
-use std::io::{self, BufRead, Write};
+use dst_huiji_wiki::Result;
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub async fn run(args: Commands) -> Result<()> {
     match args {
@@ -18,14 +14,38 @@ pub async fn run(args: Commands) -> Result<()> {
             input,
             output,
             category,
-        } => handle_parse_po(input, output, category),
+        } => {
+            execute(
+                JobKind::ParsePo {
+                    input: path_to_string(&input)?,
+                    output: opt_path_to_string(&output)?,
+                    category,
+                },
+                WriteMode::Interactive,
+                None,
+            )
+            .await?;
+        }
         Commands::MapNames {
             input,
             output,
             compare,
             merge,
             version,
-        } => handle_map_names(input, output, compare, merge, version),
+        } => {
+            execute(
+                JobKind::MapNames {
+                    input: path_to_string(&input)?,
+                    output: opt_path_to_string(&output)?,
+                    compare: opt_path_to_string(&compare)?,
+                    merge,
+                    version,
+                },
+                WriteMode::Interactive,
+                None,
+            )
+            .await?;
+        }
         Commands::MapRecipes {
             input,
             output,
@@ -33,713 +53,140 @@ pub async fn run(args: Commands) -> Result<()> {
             merge,
             po_file,
             version,
-        } => handle_map_recipes(input, output, compare, merge, po_file, version),
-        Commands::MaintainItemTable { output } => handle_maintain_item_table(output).await,
-        Commands::MaintainDSTRecipes { output } => handle_maintain_dst_recipes(output).await,
-        Commands::MaintainCopyClip { r#type, output } => {
-            handle_maintain_copyclip(r#type.as_deref(), output).await
-        }
-        Commands::PrefabOverrides { input, output } => handle_prefab_overrides(input, output),
-    }
-}
-
-fn handle_parse_po(
-    input: PathBuf,
-    output: Option<PathBuf>,
-    category: Option<String>,
-) -> Result<()> {
-    let po_file = PoParser::parse_from_file(
-        input
-            .to_str()
-            .ok_or_else(|| Error::InvalidPath(format!("{:?}", input)))?,
-    )?;
-    let entries = if let Some(cat) = category {
-        po_file.filter_by_category(&cat)
-    } else {
-        po_file.entries.iter().collect()
-    };
-
-    if let Some(output_path) = output {
-        let json = serde_json::to_string_pretty(&entries)?;
-        std::fs::write(&output_path, json)?;
-        println!("Written {} entries to {:?}", entries.len(), output_path);
-    } else {
-        for entry in entries.iter().take(10) {
-            println!("{:?}", entry);
-        }
-        println!("... ({} total entries)", entries.len());
-    }
-
-    Ok(())
-}
-
-fn handle_map_names(
-    input: PathBuf,
-    output: Option<PathBuf>,
-    compare: Option<PathBuf>,
-    merge: bool,
-    version: Option<String>,
-) -> Result<()> {
-    let po_file = PoParser::parse_from_file(
-        input
-            .to_str()
-            .ok_or_else(|| Error::InvalidPath(format!("{:?}", input)))?,
-    )?;
-    let names_entries: Vec<PoEntry> = po_file
-        .entries
-        .iter()
-        .filter(|e| {
-            e.msgctxt
-                .as_ref()
-                .map(|ctx: &String| ctx.starts_with("STRINGS.NAMES."))
-                .unwrap_or(false)
-        })
-        .cloned()
-        .collect();
-
-    println!("Found {} NAMES entries", names_entries.len());
-
-    let converter = WikiDataConverter::new();
-    let version_str = version.as_deref().unwrap_or("unknown");
-    let sources = format!("Extract data from patch {}", version_str);
-    let description = Some(serde_json::json!({
-        "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
-    }));
-
-    let wiki_data = if merge {
-        let compare_path = compare
-            .as_ref()
-            .ok_or_else(|| Error::Config("--merge requires --compare".to_string()))?;
-        let historical_json = std::fs::read_to_string(compare_path)?;
-        let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-        converter.convert_with_history(&names_entries, &sources, &historical_data, description)
-    } else {
-        converter.convert_to_wiki_json(&names_entries, &sources, description)
-    };
-
-    if let Some(compare_path) = &compare {
-        if !merge {
-            let historical_json = std::fs::read_to_string(compare_path)?;
-            let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-            println!("\n{}", compare_and_report(&wiki_data, &historical_data));
-        }
-    }
-
-    if let Some(output_path) = output {
-        let json = WikiDataConverter::to_json_string(&wiki_data)?;
-        std::fs::write(&output_path, json)?;
-        println!(
-            "Written {} records to {:?}",
-            wiki_data.data.len(),
-            output_path
-        );
-    } else {
-        println!("\nFirst 5 records:");
-        for (i, record) in wiki_data.data.iter().take(5).enumerate() {
-            println!("{}: {:?}", i + 1, record);
-        }
-    }
-
-    Ok(())
-}
-
-fn handle_map_recipes(
-    input: PathBuf,
-    output: Option<PathBuf>,
-    compare: Option<PathBuf>,
-    merge: bool,
-    po_file: Option<PathBuf>,
-    version: Option<String>,
-) -> Result<()> {
-    let lua_content = std::fs::read_to_string(&input)?;
-    let mut parser = RecipeParser::new();
-    let recipes = parser.parse(&lua_content, input.to_str())?;
-
-    println!("Found {} recipes", recipes.len());
-
-    let converter = if let Some(po_path) = &po_file {
-        match PoParser::parse_from_file(
-            po_path
-                .to_str()
-                .ok_or_else(|| Error::InvalidPath(format!("{:?}", po_path)))?,
-        ) {
-            Ok(po_data) => {
-                println!(
-                    "Loaded {} PO entries for desc lookup",
-                    po_data.entries.len()
-                );
-                WikiDataConverter::with_po_entries(po_data.entries.clone())
-            }
-            Err(e) => {
-                tracing::warn!("Failed to load PO file: {}", e);
-                WikiDataConverter::new()
-            }
-        }
-    } else {
-        WikiDataConverter::new()
-    };
-
-    let version_str = version.as_deref().unwrap_or("unknown");
-    let sources = format!("Extract data from patch {}", version_str);
-    let description = Some(serde_json::json!({
-        "zh": "饥荒联机版的合成配方列表"
-    }));
-
-    let wiki_data = if merge {
-        let compare_path = compare
-            .as_ref()
-            .ok_or_else(|| Error::Config("--merge requires --compare".to_string()))?;
-        let historical_json = std::fs::read_to_string(compare_path)?;
-        let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-        let mut data = converter.convert_recipes(&recipes, &sources, description);
-        dst_huiji_wiki::models::Recipe::merge_with_history(&mut data, &historical_data);
-        data
-    } else {
-        converter.convert_recipes(&recipes, &sources, description)
-    };
-
-    if let Some(compare_path) = &compare {
-        if !merge {
-            let historical_json = std::fs::read_to_string(compare_path)?;
-            let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-            println!("\n{}", compare_and_report(&wiki_data, &historical_data));
-        }
-    }
-
-    if let Some(output_path) = output {
-        let json = WikiDataConverter::to_json_string(&wiki_data)?;
-        std::fs::write(&output_path, json)?;
-        println!(
-            "Written {} records to {:?}",
-            wiki_data.data.len(),
-            output_path
-        );
-    } else {
-        println!("\nFirst 5 records:");
-        for (i, record) in wiki_data.data.iter().take(5).enumerate() {
-            println!("{}: {:?}", i + 1, record);
-        }
-    }
-
-    Ok(())
-}
-
-async fn handle_maintain_item_table(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
-    println!("Logging in to wiki...");
-    ctx.wiki_mut().login().await?;
-
-    let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
-    let names_entries: Vec<PoEntry> = po_file
-        .entries
-        .iter()
-        .filter(|e| {
-            e.msgctxt
-                .as_ref()
-                .map(|ctx: &String| ctx.starts_with("STRINGS.NAMES."))
-                .unwrap_or(false)
-        })
-        .cloned()
-        .collect();
-
-    println!("Found {} NAMES entries", names_entries.len());
-
-    let converter = WikiDataConverter::new();
-
-    println!("Fetching historical data from wiki...");
-    let page_title = "Data:ItemTable.tabx";
-    let historical_data = match ctx.wiki().get_json_data(page_title).await {
-        Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
-            &historical_json.to_string(),
-        )?),
-        Err(e) => {
-            tracing::warn!("Failed to fetch historical data from wiki: {}", e);
-            None
-        }
-    };
-
-    let sources = ctx.sources();
-    let description = Some(serde_json::json!({
-        "zh": "饥荒联机版的实体代码、中英文名及图片对照表"
-    }));
-    let mut wiki_data = converter.convert_to_wiki_json(&names_entries, &sources, description);
-
-    if let Some(ref historical) = historical_data {
-        PoEntry::merge_with_history(&mut wiki_data, historical);
-        println!("\n{}", compare_and_report(&wiki_data, historical));
-    }
-
-    output_json_result_with_update(ctx.wiki(), page_title, &wiki_data, output).await
-}
-
-async fn handle_maintain_dst_recipes(output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
-    println!("Logging in to wiki...");
-    ctx.wiki_mut().login().await?;
-
-    let recipes_string = ctx.read_zip_file("scripts/recipes.lua")?;
-
-    println!("Parsing recipes.lua...");
-    let mut parser = RecipeParser::new();
-    let recipes = parser.parse(&recipes_string, Some("scripts/recipes.lua"))?;
-
-    println!("Found {} recipes", recipes.len());
-
-    println!("\nFetching Tech data from wiki for comparison...");
-    let mut tech_report = TechReport::from_recipes(&recipes);
-
-    match ctx.wiki().get_page("模块:RenderRecsByIngre/Data").await {
-        Ok(page) => {
-            if let Some(content) = &page.content {
-                tech_report.compare_with_wiki(content);
-                println!("\n{}", tech_report.generate_report());
-            } else {
-                println!("Warning: Wiki page has no content");
-            }
-        }
-        Err(e) => {
-            tracing::warn!("Failed to fetch Tech data from wiki: {}", e);
-        }
-    }
-
-    println!("\nParsing chinese_s.po for desc lookup...");
-    let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
-    println!(
-        "Loaded {} PO entries for desc lookup",
-        po_file.entries.len()
-    );
-
-    let converter = WikiDataConverter::with_po_entries(po_file.entries.clone());
-
-    println!("Fetching historical data from wiki...");
-    let page_title = "Data:DSTRecipes.tabx";
-    let historical_data = match ctx.wiki().get_json_data(page_title).await {
-        Ok(historical_json) => Some(WikiDataConverter::parse_wiki_json(
-            &historical_json.to_string(),
-        )?),
-        Err(e) => {
-            tracing::warn!("Failed to fetch historical data from wiki: {}", e);
-            None
-        }
-    };
-
-    let sources = ctx.sources();
-    let description = Some(serde_json::json!({
-        "zh": "饥荒联机版的合成配方列表"
-    }));
-    let mut wiki_data = converter.convert_recipes(&recipes, &sources, description);
-
-    if let Some(ref historical) = historical_data {
-        dst_huiji_wiki::models::Recipe::merge_with_history(&mut wiki_data, historical);
-        println!("\n{}", compare_and_report(&wiki_data, historical));
-    }
-
-    output_json_result_with_update(ctx.wiki(), page_title, &wiki_data, output).await
-}
-
-async fn handle_maintain_copyclip(r#type: Option<&str>, output: Option<PathBuf>) -> Result<()> {
-    let mut ctx = DstContext::from_env()?;
-    println!("DST version: {}", ctx.version);
-
-    println!("Logging in to wiki...");
-    ctx.wiki_mut().login().await?;
-
-    let types_to_run = if let Some(t) = r#type {
-        vec![t.to_lowercase()]
-    } else {
-        vec![
-            "recipe_builder_tag_lookup".to_string(),
-            "tech".to_string(),
-            "crafting_filters".to_string(),
-            "crafting_names".to_string(),
-        ]
-    };
-
-    for t in types_to_run {
-        println!("\n========== Running: {} ==========\n", t);
-        match t.as_str() {
-            "recipe_builder_tag_lookup" | "rbtl" => {
-                maintain_recipe_builder_tag_lookup(&mut ctx, output.clone()).await?;
-            }
-            "tech" => {
-                maintain_tech(&mut ctx, output.clone()).await?;
-            }
-            "crafting_filters" | "filters" => {
-                maintain_crafting_filters(&mut ctx, output.clone()).await?;
-            }
-            "crafting_names" | "names" => {
-                maintain_crafting_names(&mut ctx, output.clone()).await?;
-            }
-            _ => {
-                return Err(Error::Config(format!(
-                    "Unknown copyclip type: {}. Valid types are: recipe_builder_tag_lookup (rbtl), tech, crafting_filters (filters), crafting_names (names)",
-                    t
-                )));
-            }
-        }
-    }
-
-    Ok(())
-}
-
-async fn maintain_recipe_builder_tag_lookup(
-    ctx: &mut DstContext,
-    output: Option<PathBuf>,
-) -> Result<()> {
-    let debugcommands_string = ctx.read_zip_file("scripts/debugcommands.lua")?;
-
-    println!("Fetching wiki page content...");
-    let page_title = "模块:Constants/RecipeBuilderTagLookup";
-    let page = ctx.wiki().get_page(page_title).await?;
-
-    let target_content = page
-        .content
-        .ok_or_else(|| Error::WikiApi("Wiki page has no content".to_string()))?;
-
-    println!("Extracting RECIPE_BUILDER_TAG_LOOKUP from debugcommands.lua...");
-    let result = process_copyclip(
-        &debugcommands_string,
-        "RECIPE_BUILDER_TAG_LOOKUP",
-        &target_content,
-    )?;
-
-    println!("CopyClip completed successfully!");
-    println!(
-        "Extracted content length: {} bytes",
-        result.extracted_content.len()
-    );
-
-    output_copyclip_result_with_update(
-        ctx.wiki(),
-        page_title,
-        &target_content,
-        &result.updated_content,
-        output,
-    )
-    .await
-}
-
-async fn maintain_tech(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
-    let constants_string = ctx.read_zip_file("scripts/constants.lua")?;
-
-    println!("Fetching wiki page content...");
-    let page_title = "模块:Constants/Tech";
-    let page = ctx.wiki().get_page(page_title).await?;
-
-    let target_content = page
-        .content
-        .ok_or_else(|| Error::WikiApi("Wiki page has no content".to_string()))?;
-
-    println!("Extracting TECH from constants.lua...");
-    let result = process_copyclip(&constants_string, "TECH", &target_content)?;
-
-    println!("CopyClip completed successfully!");
-    println!(
-        "Extracted content length: {} bytes",
-        result.extracted_content.len()
-    );
-
-    output_copyclip_result_with_update(
-        ctx.wiki(),
-        page_title,
-        &target_content,
-        &result.updated_content,
-        output,
-    )
-    .await
-}
-
-async fn maintain_crafting_filters(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
-    let filter_string = ctx.read_zip_file("scripts/recipes_filter.lua")?;
-
-    println!("Fetching wiki page content...");
-    let page_title = "模块:Constants/CraftingFilters";
-    let page = ctx.wiki().get_page(page_title).await?;
-
-    let target_content = page
-        .content
-        .ok_or_else(|| Error::WikiApi("Wiki page has no content".to_string()))?;
-
-    println!(
-        "Extracting CRAFTING_FILTERS.CHARACTER.recipes to CRAFTING_FILTERS.DECOR.recipes from recipes_filter.lua..."
-    );
-    let field_location = extract_field_assignment_range(
-        &filter_string,
-        "CRAFTING_FILTERS.CHARACTER.recipes",
-        "CRAFTING_FILTERS.DECOR.recipes",
-    )?;
-
-    println!(
-        "Extracted content length: {} bytes",
-        field_location.content.len()
-    );
-
-    let marker_range = CopyClipProcessor::find_marker_range(&target_content)?;
-    let updated_content = CopyClipProcessor::replace_between_markers(
-        &target_content,
-        &marker_range,
-        &field_location.content,
-    );
-
-    println!("CopyClip completed successfully!");
-
-    output_copyclip_result_with_update(
-        ctx.wiki(),
-        page_title,
-        &target_content,
-        &updated_content,
-        output,
-    )
-    .await
-}
-
-async fn maintain_crafting_names(ctx: &mut DstContext, output: Option<PathBuf>) -> Result<()> {
-    let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
-
-    let station_prefix = "STRINGS.UI.CRAFTING_STATION_FILTERS.";
-    let filter_prefix = "STRINGS.UI.CRAFTING_FILTERS.";
-
-    let mut crafting_stations: std::collections::BTreeMap<String, serde_json::Value> =
-        std::collections::BTreeMap::new();
-    let mut craftings: std::collections::BTreeMap<String, serde_json::Value> =
-        std::collections::BTreeMap::new();
-
-    for entry in &po_file.entries {
-        if let Some(ref entry_ctx) = entry.msgctxt {
-            if let Some(key) = entry_ctx.strip_prefix(station_prefix) {
-                crafting_stations.insert(
-                    key.to_string(),
-                    serde_json::json!({
-                        "station_en": entry.msgid.clone(),
-                        "station_cn": entry.msgstr.clone(),
-                    }),
-                );
-            } else if let Some(key) = entry_ctx.strip_prefix(filter_prefix) {
-                craftings.insert(
-                    key.to_string(),
-                    serde_json::json!({
-                        "station_en": entry.msgid.clone(),
-                        "station_cn": entry.msgstr.clone(),
-                    }),
-                );
-            }
-        }
-    }
-
-    let crafting_names = serde_json::json!({
-        "crafting_stations": crafting_stations,
-        "craftings": craftings
-    });
-
-    let json_content = serde_json::to_string_pretty(&crafting_names)?;
-    println!(
-        "Found {} crafting stations and {} craftings",
-        crafting_names["crafting_stations"]
-            .as_object()
-            .map(|o| o.len())
-            .unwrap_or(0),
-        crafting_names["craftings"]
-            .as_object()
-            .map(|o| o.len())
-            .unwrap_or(0)
-    );
-
-    println!("Fetching wiki page content...");
-    let page_title = "模块:Constants/CraftingNames";
-    let page = ctx.wiki().get_page(page_title).await?;
-
-    let target_content = page
-        .content
-        .ok_or_else(|| Error::WikiApi("Wiki page has no content".to_string()))?;
-
-    println!("Finding [[ and ]] markers...");
-    let start_marker = "[[";
-    let end_marker = "]]";
-
-    let start_pos = target_content
-        .find(start_marker)
-        .ok_or_else(|| Error::ParseError("'[[' marker not found".to_string()))?;
-    let end_pos = target_content
-        .rfind(end_marker)
-        .ok_or_else(|| Error::ParseError("']]' marker not found".to_string()))?;
-
-    if start_pos >= end_pos {
-        return Err(Error::ParseError(
-            "'[[' must appear before ']]'".to_string(),
-        ));
-    }
-
-    let updated_content = format!(
-        "{}{}\n{}",
-        &target_content[..start_pos + start_marker.len()],
-        &json_content,
-        &target_content[end_pos..]
-    );
-
-    println!("CopyClip completed successfully!");
-
-    output_copyclip_result_with_update(
-        ctx.wiki(),
-        page_title,
-        &target_content,
-        &updated_content,
-        output,
-    )
-    .await
-}
-
-async fn output_json_result_with_update(
-    client: &WikiClient,
-    page_title: &str,
-    wiki_data: &dst_huiji_wiki::mapping::WikiJsonData,
-    output: Option<PathBuf>,
-) -> Result<()> {
-    let new_json = WikiDataConverter::to_json_string(wiki_data)?;
-
-    if let Some(output_path) = output {
-        std::fs::write(&output_path, &new_json)?;
-        println!(
-            "Written {} records to {:?}",
-            wiki_data.data.len(),
-            output_path
-        );
-    }
-
-    let historical_json = match client.get_json_data(page_title).await {
-        Ok(json) => serde_json::to_string_pretty(&json)?,
-        Err(e) => {
-            tracing::warn!("Failed to fetch current wiki data: {}", e);
-            return Ok(());
-        }
-    };
-
-    if new_json.trim() == historical_json.trim() {
-        println!("No changes detected.");
-        return Ok(());
-    }
-
-    println!("\n--- Changes Detected ---");
-    println!("{}", diff_lines(&historical_json, &new_json));
-
-    if prompt_confirm("Update wiki page?")? {
-        println!("Updating wiki page: {}", page_title);
-
-        let edit_result = client
-            .edit_page(
-                page_title,
-                &new_json,
-                Some("Update via dst-huiji-wiki tool"),
-                false,
+        } => {
+            execute(
+                JobKind::MapRecipes {
+                    input: path_to_string(&input)?,
+                    output: opt_path_to_string(&output)?,
+                    compare: opt_path_to_string(&compare)?,
+                    merge,
+                    po_file: opt_path_to_string(&po_file)?,
+                    version,
+                },
+                WriteMode::Interactive,
+                None,
             )
             .await?;
-
-        println!(
-            "Successfully updated page '{}' (new revision: {:?})",
-            edit_result.title.as_deref().unwrap_or(page_title),
-            edit_result.newrevid
-        );
-    } else {
-        println!("Skipped updating wiki page.");
-    }
-
-    Ok(())
-}
-
-fn handle_prefab_overrides(input: PathBuf, output: Option<PathBuf>) -> Result<()> {
-    let lua_content = std::fs::read_to_string(&input)?;
-    let overrides = parse_prefab_overrides(&lua_content)?;
-
-    println!("Found {} prefab overrides", overrides.len());
-
-    let mut mapping: BTreeMap<String, serde_json::Value> = BTreeMap::new();
-
-    for override_info in overrides {
-        let prefab_name = override_info.prefab_name;
-        let override_value = match override_info.override_name {
-            OverrideValue::Static(s) => serde_json::json!({
-                "override_name": s,
-                "type": "static"
-            }),
-            OverrideValue::Dynamic(s) => serde_json::json!({
-                "override_name": s,
-                "type": "dynamic"
-            }),
-            OverrideValue::Unknown => serde_json::json!({
-                "override_name": null,
-                "type": "unknown"
-            }),
-        };
-        mapping.insert(prefab_name, override_value);
-    }
-
-    let json_output = serde_json::to_string_pretty(&mapping)?;
-
-    if let Some(output_path) = output {
-        std::fs::write(&output_path, &json_output)?;
-        println!("Written {} mappings to {:?}", mapping.len(), output_path);
-    } else {
-        println!("{}", json_output);
-    }
-
-    Ok(())
-}
-
-fn prompt_confirm(prompt: &str) -> Result<bool> {
-    print!("{} (y/N): ", prompt);
-    io::stdout().flush()?;
-
-    let stdin = io::stdin();
-    let mut line = String::new();
-    stdin.lock().read_line(&mut line)?;
-
-    let answer = line.trim().to_lowercase();
-    Ok(answer == "y" || answer == "yes")
-}
-
-async fn output_copyclip_result_with_update(
-    client: &WikiClient,
-    page_title: &str,
-    target_content: &str,
-    updated_content: &str,
-    output: Option<PathBuf>,
-) -> Result<()> {
-    if target_content == updated_content {
-        println!("No changes detected.");
-        return Ok(());
-    }
-
-    println!("\n--- Changes Detected ---");
-    println!("{}", diff_lines(target_content, updated_content));
-
-    if let Some(output_path) = output {
-        std::fs::write(&output_path, updated_content)?;
-        println!("Written updated content to {:?}", output_path);
-    }
-
-    if prompt_confirm("Update wiki page?")? {
-        println!("Updating wiki page: {}", page_title);
-
-        let edit_result = client
-            .edit_page(
-                page_title,
-                updated_content,
-                Some("Update via dst-huiji-wiki tool"),
-                false,
+        }
+        Commands::MaintainItemTable {
+            output,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainItemTable {
+                    output: opt_path_to_string(&output)?,
+                    snapshot: None,
+                },
+                write_mode(yes, dry_run),
+                report_json,
             )
             .await?;
-
-        println!(
-            "Successfully updated page '{}' (new revision: {:?})",
-            edit_result.title.as_deref().unwrap_or(page_title),
-            edit_result.newrevid
-        );
-    } else {
-        println!("Skipped updating wiki page.");
+        }
+        Commands::MaintainDSTRecipes {
+            output,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainDstRecipes {
+                    output: opt_path_to_string(&output)?,
+                    snapshot: None,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
+        Commands::MaintainCopyClip {
+            r#type,
+            output,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainCopyClip {
+                    r#type,
+                    output: opt_path_to_string(&output)?,
+                    snapshot: None,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
+        Commands::PrefabOverrides { input, output } => {
+            execute(
+                JobKind::PrefabOverrides {
+                    input: path_to_string(&input)?,
+                    output: opt_path_to_string(&output)?,
+                },
+                WriteMode::Interactive,
+                None,
+            )
+            .await?;
+        }
+        Commands::Serve { host, port } => {
+            crate::web::serve(host, port).await?;
+        }
     }
 
     Ok(())
+}
+
+/// Resolves the CLI `--yes`/`--dry-run` flags into a service [`WriteMode`].
+/// (The two flags are already mutually exclusive at the clap level.)
+fn write_mode(yes: bool, dry_run: bool) -> WriteMode {
+    if dry_run {
+        WriteMode::DryRun
+    } else if yes {
+        WriteMode::AutoConfirm
+    } else {
+        WriteMode::Interactive
+    }
+}
+
+async fn execute(kind: JobKind, mode: WriteMode, report_json: Option<PathBuf>) -> Result<()> {
+    // AutoConfirm/DryRun never consult the reporter (decide_write
+    // short-circuits), so stdin prompting stays Interactive-only.
+    let reporter = StdoutReporter {
+        confirm: ConfirmMode::Interactive,
+    };
+
+    let result = execute_job_with_mode(&kind, &reporter, mode).await?;
+
+    if let Some(path) = report_json {
+        let now_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(0);
+        let report = serde_json::json!({
+            "generated_at_ms": now_ms,
+            "job": kind.name(),
+            "params": serde_json::to_value(&kind).unwrap_or_default(),
+            "write_mode": mode.name(),
+            "result": result,
+        });
+        let text = serde_json::to_string_pretty(&report)?;
+        std::fs::write(&path, text)?;
+        println!("报告已写入 {:?}", path);
+    }
+
+    Ok(())
+}
+
+fn path_to_string(p: &PathBuf) -> Result<String> {
+    p.to_str()
+        .map(|s| s.to_string())
+        .ok_or_else(|| dst_huiji_wiki::Error::InvalidPath(format!("{:?}", p)))
+}
+
+fn opt_path_to_string(p: &Option<PathBuf>) -> Result<Option<String>> {
+    match p {
+        Some(path) => Ok(Some(path_to_string(path)?)),
+        None => Ok(None),
+    }
 }

@@ -4,10 +4,12 @@ pub mod error;
 pub mod mapping;
 pub mod models;
 pub mod parser;
+pub mod service;
 pub mod utils;
 pub mod wiki;
 
 pub use context::DstContext;
+pub use context::SnapshotInfo;
 pub use copyclip::{
     process_copyclip, process_copyclip_range, CopyClipConfig, CopyClipMapping, CopyClipMappings,
     CopyClipProcessor, CopyClipResult, MarkerRange,

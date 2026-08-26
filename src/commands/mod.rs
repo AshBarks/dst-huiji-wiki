@@ -52,16 +52,43 @@ pub enum Commands {
     MaintainItemTable {
         #[arg(short, long)]
         output: Option<PathBuf>,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
     },
     MaintainDSTRecipes {
         #[arg(short, long)]
         output: Option<PathBuf>,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
     },
     MaintainCopyClip {
         #[arg(short = 't', long)]
         r#type: Option<String>,
         #[arg(short, long)]
         output: Option<PathBuf>,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
     },
     PrefabOverrides {
         #[arg(short, long)]
@@ -69,6 +96,31 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// 启动 WebUI 服务器
+    Serve {
+        /// 监听地址（默认 127.0.0.1）
+        #[arg(long, default_value = "127.0.0.1")]
+        host: String,
+        /// 监听端口
+        #[arg(long, default_value_t = 8420)]
+        port: u16,
+    },
+}
+
+impl Commands {
+    /// Stable machine-readable name used in logs and reports.
+    pub fn name(&self) -> &'static str {
+        match self {
+            Commands::ParsePo { .. } => "parse-po",
+            Commands::MapNames { .. } => "map-names",
+            Commands::MapRecipes { .. } => "map-recipes",
+            Commands::MaintainItemTable { .. } => "maintain-item-table",
+            Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
+            Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
+            Commands::PrefabOverrides { .. } => "prefab-overrides",
+            Commands::Serve { .. } => "serve",
+        }
+    }
 }
 
 #[cfg(test)]
@@ -222,8 +274,16 @@ mod tests {
         assert!(args.is_ok());
         let args = args.unwrap();
         match args.command {
-            Commands::MaintainItemTable { output } => {
+            Commands::MaintainItemTable {
+                output,
+                yes,
+                dry_run,
+                report_json,
+            } => {
                 assert_eq!(output, Some(PathBuf::from("item_table.json")));
+                assert!(!yes);
+                assert!(!dry_run);
+                assert!(report_json.is_none());
             }
             _ => panic!("Expected MaintainItemTable command"),
         }
@@ -235,10 +295,74 @@ mod tests {
         assert!(args.is_ok());
         let args = args.unwrap();
         match args.command {
-            Commands::MaintainDSTRecipes { output } => {
+            Commands::MaintainDSTRecipes { output, .. } => {
                 assert!(output.is_none());
             }
             _ => panic!("Expected MaintainDSTRecipes command"),
+        }
+    }
+
+    #[test]
+    fn test_maintain_yes_flag() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "maintain-item-table",
+            "--yes",
+            "--report-json",
+            "report.json",
+        ]);
+        let args = args.unwrap();
+        match args.command {
+            Commands::MaintainItemTable {
+                yes,
+                dry_run,
+                report_json,
+                ..
+            } => {
+                assert!(yes);
+                assert!(!dry_run);
+                assert_eq!(report_json, Some(PathBuf::from("report.json")));
+            }
+            _ => panic!("Expected MaintainItemTable command"),
+        }
+    }
+
+    #[test]
+    fn test_maintain_dry_run_flag() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-dst-recipes", "--dry-run"]);
+        let args = args.unwrap();
+        match args.command {
+            Commands::MaintainDSTRecipes { dry_run, .. } => assert!(dry_run),
+            _ => panic!("Expected MaintainDSTRecipes command"),
+        }
+    }
+
+    #[test]
+    fn test_maintain_yes_and_dry_run_conflict() {
+        let args =
+            Args::try_parse_from(["dst-huiji-wiki", "maintain-copy-clip", "--yes", "--dry-run"]);
+        assert!(
+            args.is_err(),
+            "--yes and --dry-run must be mutually exclusive"
+        );
+    }
+
+    #[test]
+    fn test_write_mode_flags_rejected_together_for_all_commands() {
+        for cmd in [
+            vec!["maintain-item-table"],
+            vec!["maintain-dst-recipes"],
+            vec!["maintain-copy-clip"],
+        ] {
+            let mut argv = vec!["dst-huiji-wiki"];
+            argv.extend_from_slice(&cmd);
+            argv.push("--yes");
+            argv.push("--dry-run");
+            assert!(
+                Args::try_parse_from(&argv).is_err(),
+                "expected conflict for {:?}",
+                cmd
+            );
         }
     }
 

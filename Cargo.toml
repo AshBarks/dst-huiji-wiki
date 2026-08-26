@@ -19,3 +19,11 @@ dotenvy = "0.15"
 zip = "8"
 toml = { version = "0.8", features = ["parse", "display"] }
 similar = "3"
+
+# WebUI (axum server + job management)
+axum = { version = "0.8", features = ["macros"] }
+tower-http = { version = "0.6", features = ["trace", "compression-gzip"] }
+uuid = { version = "1", features = ["v4"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+futures-util = "0.3"

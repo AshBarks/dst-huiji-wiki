@@ -139,6 +139,12 @@ pub enum JobKind {
         #[serde(default)]
         dir: Option<String>,
     },
+    /// Rebuild derived corpus indexes from the local corpus tree
+    /// (docs/CORPUS_CODE_ATLAS_CONTRACT.md). Local-only, no wiki traffic.
+    CorpusIndex {
+        #[serde(default)]
+        dir: Option<String>,
+    },
 }
 
 impl JobKind {
@@ -153,6 +159,7 @@ impl JobKind {
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::CorpusSync { .. } => "corpus-sync",
+            JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
         }
     }
@@ -280,6 +287,7 @@ async fn execute_job_inner(
         JobKind::CorpusSync { full, dir } => {
             run_corpus_sync(*full, dir.as_deref(), reporter, mode).await
         }
+        JobKind::CorpusIndex { dir } => run_corpus_index(dir.as_deref(), reporter, mode).await,
         JobKind::UpdateIndex { root, out } => run_update_index(root, opt_path(out), reporter).await,
     }
 }
@@ -566,6 +574,17 @@ async fn run_corpus_sync(
 // ---------------------------------------------------------------------------
 // Game-dir maintenance commands (require DST__ROOT, touch the wiki)
 // ---------------------------------------------------------------------------
+
+/// Rebuilds derived corpus indexes from the local tree. Purely local I/O —
+/// no client, no login, `DST__ROOT` not required.
+async fn run_corpus_index(
+    dir: Option<&str>,
+    reporter: &dyn Reporter,
+    mode: WriteMode,
+) -> Result<serde_json::Value> {
+    let base_dir = PathBuf::from(dir.unwrap_or("wikis"));
+    crate::corpus::build_indexes(&base_dir, mode == WriteMode::DryRun, reporter).await
+}
 
 async fn run_maintain_item_table(
     output: Option<PathBuf>,

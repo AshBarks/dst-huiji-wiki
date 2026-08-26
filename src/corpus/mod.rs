@@ -9,12 +9,13 @@
 
 pub mod classify;
 pub mod model;
+pub mod prefab_index;
 pub mod store;
 
 pub use model::{ClassConfidence, CorpusManifest, GameClass, PageMeta};
 pub use store::CorpusStore;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::service::Reporter;
 use crate::wiki::{PageListingEntry, WikiClient, TITLES_PER_QUERY};
 use std::collections::{BTreeMap, HashMap};
@@ -225,6 +226,80 @@ pub async fn sync(
     ));
 
     Ok(manifest_summary(&manifest, store.root()))
+}
+
+/// Builds the derived corpus indexes (docs/CORPUS_CODE_ATLAS_CONTRACT.md).
+/// Local-only: reads `wikis/<host>/` and writes under its `index/`; no wiki
+/// traffic at all. `dir` is the corpus base (default `wikis/`) and must
+/// contain exactly one host tree.
+pub async fn build_indexes(
+    dir: &Path,
+    dry_run: bool,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let host = detect_host(dir)?;
+    reporter.stage("装载语料元数据");
+    let store = CorpusStore::new(dir, &host);
+    let metas = store.load_meta()?;
+    reporter.log(format!("host={host}，页面 {} 条", metas.len()));
+
+    reporter.stage("构建 prefab 注册表");
+    let now_ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+    let registry = prefab_index::build_registry(&store, &metas, now_ms)?;
+    reporter.log(format!(
+        "实体页 {}，变体 {} 种，多变体页 {}，无信息框页 {}",
+        registry.stats.entity_pages,
+        registry.stats.distinct_variants,
+        registry.stats.multi_variant_pages,
+        registry.pages_without_prefab.len(),
+    ));
+
+    if dry_run {
+        reporter.log("dry-run：不写任何工件".to_string());
+        return Ok(serde_json::json!({
+            "host": host,
+            "dry_run": true,
+            "stats": serde_json::to_value(&registry.stats)?,
+        }));
+    }
+
+    reporter.stage("写出工件");
+    let path = prefab_index::save_registry(store.root(), &registry)?;
+    reporter.log(format!("已写 {}", path.display()));
+
+    Ok(serde_json::json!({
+        "host": host,
+        "dry_run": false,
+        "artifacts": ["index/pages_by_prefab.json"],
+        "stats": serde_json::to_value(&registry.stats)?,
+        "pages_without_prefab_count": registry.pages_without_prefab.len(),
+    }))
+}
+
+/// A corpus base dir holds one tree per wiki host; index building operates on
+/// the single present host.
+fn detect_host(base: &Path) -> Result<String> {
+    let mut hosts = std::fs::read_dir(base)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir() && !e.file_name().to_string_lossy().starts_with('.'))
+        .map(|e| e.file_name().to_string_lossy().into_owned())
+        .collect::<Vec<_>>();
+    hosts.sort();
+    match hosts.as_slice() {
+        [one] => Ok(one.clone()),
+        [] => Err(Error::Config(format!(
+            "{} 下没有任何语料目录，请先运行 corpus-fetch",
+            base.display()
+        ))),
+        many => Err(Error::Config(format!(
+            "{} 下存在多个语料目录（{}），请用 --dir 指定单一 host 树的父目录或整理后重试",
+            base.display(),
+            many.join("、")
+        ))),
+    }
 }
 
 #[allow(clippy::too_many_arguments)]

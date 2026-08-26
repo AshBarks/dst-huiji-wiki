@@ -102,6 +102,15 @@ impl CorpusStore {
         Ok(path)
     }
 
+    /// Local wikitext of a page, or `None` when the file is absent.
+    pub fn read_page(&self, pageid: i64) -> Result<Option<String>> {
+        match std::fs::read_to_string(self.page_path(pageid)) {
+            Ok(text) => Ok(Some(text)),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(e.into()),
+        }
+    }
+
     /// Moves a page file into `_removed/<tag>/`; returns the archive path or
     /// `None` when the page had no local file.
     pub fn archive_removed(&self, pageid: i64, tag: &str) -> Result<Option<PathBuf>> {
@@ -190,24 +199,31 @@ impl CorpusStore {
     }
 }
 
+/// Unique temp dir without external dev-dependencies. Shared by sibling test
+/// modules via `store::tests_temp_dir`.
+#[cfg(test)]
+pub(crate) fn tests_temp_dir(tag: &str) -> PathBuf {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir = std::env::temp_dir().join(format!(
+        "corpus-test-{}-{}-{}",
+        tag,
+        std::process::id(),
+        nanos
+    ));
+    std::fs::create_dir_all(&dir).unwrap();
+    dir
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     /// Unique temp dir without external dev-dependencies.
     fn temp_root(tag: &str) -> PathBuf {
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let dir = std::env::temp_dir().join(format!(
-            "corpus-store-test-{}-{}-{}",
-            tag,
-            std::process::id(),
-            nanos
-        ));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
+        tests_temp_dir(tag)
     }
 
     fn sample_meta(pageid: i64, title: &str) -> PageMeta {

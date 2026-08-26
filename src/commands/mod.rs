@@ -116,6 +116,15 @@ pub enum Commands {
         #[arg(short, long)]
         out: Option<PathBuf>,
     },
+    /// 从本地语料树重建派生索引（prefab 注册表等，纯本地操作）
+    CorpusIndex {
+        /// 语料根目录（默认 wikis，其下需恰好一个 host 树）
+        #[arg(long)]
+        dir: Option<PathBuf>,
+        /// 只构建并报告统计，不写工件
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -140,6 +149,7 @@ impl Commands {
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
+            Commands::CorpusIndex { .. } => "corpus-index",
             Commands::Serve { .. } => "serve",
         }
     }

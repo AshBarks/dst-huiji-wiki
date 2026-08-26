@@ -159,6 +159,21 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::CorpusIndex { dir, dry_run } => {
+            let mode = if dry_run {
+                WriteMode::DryRun
+            } else {
+                WriteMode::AutoConfirm
+            };
+            execute(
+                JobKind::CorpusIndex {
+                    dir: opt_path_to_string(&dir)?,
+                },
+                mode,
+                None,
+            )
+            .await?;
+        }
         Commands::Serve { host, port } => {
             crate::web::serve(host, port).await?;
         }

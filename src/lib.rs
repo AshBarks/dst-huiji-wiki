@@ -6,6 +6,7 @@ pub mod mapping;
 pub mod models;
 pub mod parser;
 pub mod service;
+pub mod update;
 pub mod utils;
 pub mod wiki;
 

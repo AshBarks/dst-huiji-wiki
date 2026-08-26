@@ -131,6 +131,9 @@ pub enum Commands {
         /// 语料根目录（默认 wikis，其下需恰好一个 host 树）
         #[arg(long)]
         dir: Option<PathBuf>,
+        /// 代码侧 index.json 路径：额外产出 join_report.json 校准报告
+        #[arg(long)]
+        join: Option<PathBuf>,
         /// 只构建并报告统计，不写工件
         #[arg(long)]
         dry_run: bool,

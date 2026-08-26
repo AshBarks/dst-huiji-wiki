@@ -151,6 +151,9 @@ pub enum JobKind {
     CorpusIndex {
         #[serde(default)]
         dir: Option<String>,
+        /// Optional code-side index.json for the join calibration report.
+        #[serde(default)]
+        join: Option<String>,
     },
 }
 
@@ -295,7 +298,9 @@ async fn execute_job_inner(
         JobKind::CorpusSync { full, dir } => {
             run_corpus_sync(*full, dir.as_deref(), reporter, mode).await
         }
-        JobKind::CorpusIndex { dir } => run_corpus_index(dir.as_deref(), reporter, mode).await,
+        JobKind::CorpusIndex { dir, join } => {
+            run_corpus_index(dir.as_deref(), join.as_deref(), reporter, mode).await
+        }
         JobKind::UpdateIndex { root, out } => run_update_index(root, opt_path(out), reporter).await,
         JobKind::UpdateScan { old, new, out } => {
             run_update_scan(old, new, opt_path(out), reporter).await
@@ -691,11 +696,18 @@ async fn run_corpus_sync(
 /// no client, no login, `DST__ROOT` not required.
 async fn run_corpus_index(
     dir: Option<&str>,
+    join: Option<&str>,
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
     let base_dir = PathBuf::from(dir.unwrap_or("wikis"));
-    crate::corpus::build_indexes(&base_dir, mode == WriteMode::DryRun, reporter).await
+    crate::corpus::build_indexes(
+        &base_dir,
+        join.map(PathBuf::from).as_deref(),
+        mode == WriteMode::DryRun,
+        reporter,
+    )
+    .await
 }
 
 async fn run_maintain_item_table(

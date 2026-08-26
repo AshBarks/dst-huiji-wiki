@@ -172,7 +172,7 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
-        Commands::CorpusIndex { dir, dry_run } => {
+        Commands::CorpusIndex { dir, join, dry_run } => {
             let mode = if dry_run {
                 WriteMode::DryRun
             } else {
@@ -181,6 +181,7 @@ pub async fn run(args: Commands) -> Result<()> {
             execute(
                 JobKind::CorpusIndex {
                     dir: opt_path_to_string(&dir)?,
+                    join: opt_path_to_string(&join)?,
                 },
                 mode,
                 None,

@@ -9,6 +9,7 @@
 
 pub mod classify;
 pub mod facts;
+pub mod join;
 pub mod model;
 pub mod prefab_index;
 pub mod segment;
@@ -236,6 +237,7 @@ pub async fn sync(
 /// contain exactly one host tree.
 pub async fn build_indexes(
     dir: &Path,
+    join: Option<&Path>,
     dry_run: bool,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
@@ -304,6 +306,7 @@ pub async fn build_indexes(
             "stats": serde_json::to_value(&registry.stats)?,
             "regions": {"pages": pages_segmented, "total": region_count},
             "facts": {"total": fact_count},
+            "join_pending": join.is_some(),
         }));
     }
 
@@ -315,14 +318,40 @@ pub async fn build_indexes(
     let fact_path = save_lines(store.root(), "facts.jsonl", &facts_buf)?;
     reporter.log(format!("已写 {}", fact_path.display()));
 
+    let mut artifacts = vec![
+        "index/pages_by_prefab.json",
+        "index/regions.jsonl",
+        "index/facts.jsonl",
+    ];
+    let mut join_summary = serde_json::json!(null);
+    if let Some(code_index) = join {
+        reporter.stage("对齐代码侧索引（join）");
+        let report = join::build_join_report(&registry, code_index, now_ms)?;
+        reporter.log(format!(
+            "连接率 {:.1}%（精确 {} / 归一后 {}）；语料侧悬空 {}，代码侧独有 {}",
+            report.match_rate_wiki * 100.0,
+            report.exact_matches,
+            report.exact_matches + report.normalized_extra,
+            report.dangling_wiki.len(),
+            report.code_only_count,
+        ));
+        let path = save_json(store.root(), "join_report.json", &report)?;
+        reporter.log(format!("已写 {}", path.display()));
+        artifacts.push("index/join_report.json");
+        join_summary = serde_json::json!({
+            "match_rate_wiki": report.match_rate_wiki,
+            "exact": report.exact_matches,
+            "normalized_extra": report.normalized_extra,
+            "dangling_wiki": report.dangling_wiki.len(),
+            "code_only": report.code_only_count,
+        });
+    }
+
     Ok(serde_json::json!({
         "host": host,
         "dry_run": false,
-        "artifacts": [
-            "index/pages_by_prefab.json",
-            "index/regions.jsonl",
-            "index/facts.jsonl",
-        ],
+        "artifacts": artifacts,
+        "join": join_summary,
         "stats": serde_json::to_value(&registry.stats)?,
         "pages_without_prefab_count": registry.pages_without_prefab.len(),
         "regions": {"pages": pages_segmented, "total": region_count},
@@ -346,6 +375,21 @@ impl std::io::Write for LineWriter<'_> {
 /// Writes the regions JSONL atomically under `<root>/index/`.
 fn save_regions(root: &Path, body: &str) -> Result<std::path::PathBuf> {
     save_lines(root, "regions.jsonl", body)
+}
+
+/// Atomically writes a pretty-JSON artifact under `<root>/index/<name>`.
+fn save_json<T: serde::Serialize>(
+    root: &Path,
+    name: &str,
+    value: &T,
+) -> Result<std::path::PathBuf> {
+    let dir = root.join("index");
+    std::fs::create_dir_all(&dir)?;
+    let target = dir.join(name);
+    let tmp = dir.join(format!(".{name}.tmp"));
+    std::fs::write(&tmp, serde_json::to_string_pretty(value)?)?;
+    std::fs::rename(&tmp, &target)?;
+    Ok(target)
 }
 
 /// Atomically writes a JSONL artifact under `<root>/index/<name>`.

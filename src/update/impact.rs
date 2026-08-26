@@ -12,6 +12,10 @@ use super::diffdata::{DiffStatus, TreeDiff};
 use super::index::tuning::TuningVal;
 use super::index::{role_for, IndexArtifact, Role, TuningTable};
 
+/// When reverse propagation would enumerate more than this many entities,
+/// collapse the list into a counted aggregate row (docs/UPDATE_IMPACT_PLAN.md §4.2.2).
+const PROPAGATION_AGGREGATE_THRESHOLD: usize = 30;
+
 /// Differences between two snapshots' tuning tables.
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct TuningDiff {
@@ -61,6 +65,10 @@ pub struct FileImpact {
     /// Entities affected through the association reverse index
     /// (`prefabs/x#variant` entries).
     pub propagated_entities: Vec<String>,
+    /// When `propagated_entities` is collapsed due to the aggregation
+    /// threshold, the original count is stored here.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub propagated_count: Option<usize>,
     pub hunk_count: usize,
 }
 
@@ -131,6 +139,22 @@ fn variants_in_changed_fns(
     out
 }
 
+fn component_name_from_path(path: &str) -> Option<&str> {
+    path.strip_prefix("components/")?.strip_suffix(".lua")
+}
+
+/// Prefab files that locally override any method of `component`.
+/// These are the B-layer relevant users: their pages may carry hand-written
+/// values that differ from component defaults.
+fn component_override_files<'a>(artifact: &'a IndexArtifact, component: &str) -> BTreeSet<&'a str> {
+    artifact
+        .overrides
+        .iter()
+        .filter(|(_, marks)| marks.iter().any(|m| m.component == component))
+        .map(|(file, _)| file.as_str())
+        .collect()
+}
+
 /// Build the report for one snapshot pair.
 pub fn build_report(
     diff: &TreeDiff,
@@ -152,9 +176,34 @@ pub fn build_report(
             _ => Vec::new(),
         };
 
-        let propagated_entities = match role {
+        let mut propagated_entities = match role {
             Role::Prefab => Vec::new(),
+            Role::Component => match component_name_from_path(&fd.path) {
+                Some(component) => {
+                    let override_files = component_override_files(artifact, component);
+                    artifact
+                        .reverse
+                        .get(&fd.path)
+                        .into_iter()
+                        .flatten()
+                        .filter(|entry| {
+                            let file = entry.split('#').next().unwrap_or("");
+                            override_files.contains(file)
+                        })
+                        .cloned()
+                        .collect()
+                }
+                None => artifact.reverse.get(&fd.path).cloned().unwrap_or_default(),
+            },
             _ => artifact.reverse.get(&fd.path).cloned().unwrap_or_default(),
+        };
+        let propagated_count = if propagated_entities.len() > PROPAGATION_AGGREGATE_THRESHOLD {
+            let count = propagated_entities.len();
+            propagated_entities.clear();
+            all_entities.insert(format!("{}#aggregated({count})", fd.path));
+            Some(count)
+        } else {
+            None
         };
         all_entities.extend(
             attributed_variants
@@ -168,6 +217,7 @@ pub fn build_report(
             status: fd.status,
             attributed_variants,
             propagated_entities,
+            propagated_count,
             hunk_count: fd.hunks.len(),
         });
     }
@@ -277,6 +327,60 @@ return Prefab("hound", fndefault, {}, {})
             .propagated_entities
             .contains(&"prefabs/hound.lua#hound".to_string()));
         assert!(combat.attributed_variants.is_empty());
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn component_change_only_propagates_to_local_overriders() {
+        const PIG_SRC: &str = r#"
+local function fnpig()
+    local inst = CreateEntity()
+    inst:AddComponent("combat")
+    return inst
+end
+return Prefab("pig", fnpig, {}, {})
+"#;
+        let tmp = std::env::temp_dir().join(format!("dst_impact_narrow_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&tmp);
+        let old = tmp.join("old");
+        let new = tmp.join("new");
+        write_tree(
+            &old,
+            &[
+                ("prefabs/hound.lua", HOUND_OLD),
+                ("prefabs/pig.lua", PIG_SRC),
+                ("components/combat.lua", COMBAT_OLD),
+            ],
+        );
+        write_tree(
+            &new,
+            &[
+                ("prefabs/hound.lua", HOUND_NEW),
+                ("prefabs/pig.lua", PIG_SRC),
+                ("components/combat.lua", COMBAT_NEW),
+            ],
+        );
+        let files: Vec<(String, String)> = vec![
+            ("prefabs/hound.lua".into(), HOUND_NEW.into()),
+            ("prefabs/pig.lua".into(), PIG_SRC.into()),
+            ("components/combat.lua".into(), COMBAT_NEW.into()),
+        ];
+        let artifact = build_from_sources(&files).unwrap();
+        let diff = TreeDiff::diff_trees(&old, &new).unwrap();
+        let report = build_report(&diff, &artifact, None, None, "old", "new");
+
+        let combat = report
+            .files
+            .iter()
+            .find(|f| f.path == "components/combat.lua")
+            .unwrap();
+        assert!(combat
+            .propagated_entities
+            .contains(&"prefabs/hound.lua#hound".to_string()));
+        assert!(!combat
+            .propagated_entities
+            .contains(&"prefabs/pig.lua#pig".to_string()));
+        assert_eq!(combat.propagated_entities.len(), 1);
         let _ = std::fs::remove_dir_all(&tmp);
     }
 

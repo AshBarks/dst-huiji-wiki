@@ -10,6 +10,7 @@ pub mod impact;
 pub mod index;
 pub mod rules;
 pub mod snapshot;
+pub mod takeup;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
 pub use fact::{EvidenceRef, FactChange, FactKind, Literal};
@@ -20,3 +21,4 @@ pub use index::{
 };
 pub use rules::{default_rules, evaluate as evaluate_rules, RuleHit, Tier0Rule};
 pub use snapshot::SnapshotStore;
+pub use takeup::{TakeupConfig, Tier};

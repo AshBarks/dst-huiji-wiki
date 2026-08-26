@@ -1,0 +1,168 @@
+# 页面全量语料抓取方案（Wiki Corpus Harvesting）
+
+**状态**：v1（评审中）
+**修订记录**：
+- v1（本版）：主命名空间全量抓取方案——范围界定、存储布局、DST/单机版分类器、增量同步与验收标准
+
+**关联文档**：[UPDATE_IMPACT_PLAN.md](UPDATE_IMPACT_PLAN.md)（v3.1，本方案为其 CodeTextAtlas / 类别范式分析的数据底座）
+
+---
+
+## 1. 目标与非目标
+
+### 1.1 目标
+
+在本地 `wikis/` 目录（不入仓库）建立 dontstarve.huijiwiki.com **主命名空间全量原始 wikitext 语料库**：
+
+| # | 目标 | 验收标准 |
+|---|------|----------|
+| C1 | 全量抓取：主命名空间全部页面（含重定向）的当前版本 wikitext | 枚举数 == 落盘数，无缺漏 |
+| C2 | 元数据完备：每页带 pageid/touched/分类/版本类别标注 | meta 覆盖率 100% |
+| C3 | 版本分类：联机版/单机版/双版本聚合/消歧义等可区分，不确定项进人工分诊而非误判 | unknown 占比 ≤5% 且清单可见 |
+| C4 | 可增量：基于 touched 时间戳的增量同步 + 删除/移动检测 | 二次运行仅拉取变更页 |
+| C5 | 幂等可审计：manifest 记录每轮快照参数与统计 | 重复运行无副作用 |
+
+### 1.2 非目标
+
+- 不抓非主命名空间（`Data:*`、`模块:*`、`属性:`、`Form:`、`Rule:` 等——siteinfo 实测清单见 §2.2）；
+- 不抓渲染 HTML（Atlas 以原始 wikitext 为唯一文本面，规避数据层刷新干扰）；
+- 不做页面历史版本回溯（惯例研究需要时按页后补）；
+- 本方案不涉及 wikitext 解析与图谱构建（属 CodeTextAtlas 方案）。
+
+---
+
+## 2. 取证结论（2026-08 实测，方案的事实基础）
+
+### 2.1 规模
+
+| 项 | 数值 |
+|----|------|
+| 主命名空间非重定向页 | 3,736 |
+| 主命名空间重定向页 | 3,153 |
+| 合计需抓取 | **≈6,889** |
+| 批量内容接口（≤50 titles/次）估算请求 | ≈140 次 ⇒ 1 QPS 下 **<5 分钟** |
+
+全站 statistics：pages 29,473 / articles 3,690——主命名空间外体量巨大但明确排除。
+
+### 2.2 命名空间边界（siteinfo 实测自定义命名空间）
+
+`属性`(102)、`Form`(106)、`概念`(108)、`smw/schema`(112)、`Rule`(114)、`Html`(274)、`博客`(500)、`模块`(828)、`零件`(2300)、`零件定义`(2302)、`Data`(3500)、`SMW`(3502) 及各自讨论页——**均不抓取**。
+
+### 2.3 版本信号实测（重要：纠正「单机板/」前缀假设）
+
+- **标题前缀 `单机版/` 与 `单机板/` 实际不存在（均为 0 页）**，不能作为识别依据；
+- 真实信号一：**信息框模板的游戏参数**。单机版实体页写作 `{{实体信息框/自动|ds|tigershark}}`（配套 `{{DSPic}}`、`{{全角色台词|ds|…}}`），联机版为 `|dst|`（`{{Pic}}`、`{{DST}}`）——**页面自我声明版本**，是最强逐页信号；
+- 真实信号二：**版本分类体系**。`分类:联机版` ×1779、`分类:单机版` ×1633，交集 81 页（多为"交易者""催眠"这类跨版本机制页）；DLC 另有子标签（如虎鲨 ∈ `分类:海难`）；
+- 单机版分类内混有非实体页（更新日志"2019年生活质量更新"、技术页 `DSRoom/*`）⇒ 版本分类 ≠ 实体分类，两者正交；
+- 消歧义页存在且使用 `{{消歧义…}}` 模板（insource 实测命中"代码""书""潮湿度"等页）。
+
+---
+
+## 3. 抓取范围界定
+
+1. **仅主命名空间**，含重定向页（重定向正文极小但承载"别名→规范页"引导信息，按原样保留并额外产出映射索引）；
+2. **抓取层不做有损过滤**：单机版页面照抓，版本归属写入元数据由下游（Atlas/segmenter）按类消费。理由：无损可回溯；聚合页/消歧义页本身是实体名→规范页链接结构的组成部分，正是 Atlas 需要的素材；
+3. 消歧义页、跨版本聚合页作为**独立类别**参与结构范式分析，不并入任何单一版本类。
+
+---
+
+## 4. 存储布局与元数据
+
+```
+wikis/                          # 整目录加入 .gitignore
+└── dontstarve.huijiwiki.com/
+    ├── manifest.json           # 每轮快照：时间戳、API 统计、计数、工具版本、参数
+    ├── meta.jsonl              # 每页一行 JSON（权威元数据，可重建一切派生索引）
+    └── pages/
+        └── <pageid>.wikitext   # 以 pageid 为文件名——标题含 / : 中文与特殊符号，不适合做路径
+```
+
+`meta.jsonl` 行结构：
+
+```json
+{"pageid":123,"title":"猎犬","ns":0,"touched":"...","len":2805,
+ "new":false,"redirect":false,"rev_sha1":"...",
+ "categories":["分类:联机版","分类:怪物","分类:猎犬族","..."],
+ "game_class":"dst_entity","class_signals":["tpl_param:dst","cat:联机版"],
+ "class_confidence":"high"}
+```
+
+设计要点：
+- **pageid 寻址**：页面改名时 pageid 不变，增量同步天然跟踪移动；标题→文件映射查 meta；
+- 派生索引（`redirects.json`：redirect→target 映射；`classes_summary.json`：各类别计数与清单）由脚本从 meta 再生，不手工维护；
+- `wikis/` 入 `.gitignore`，随 `5a35735` 已有的本地产物忽略模式管理。
+
+---
+
+## 5. 版本/类型分类器（多信号，先验排序）
+
+类别枚举：`dst_entity`｜`dst_content`（机制/系统页）｜`ds_entity`｜`ds_content`｜`mixed`（双版本聚合）｜`disambig`｜`redirect`｜`non_entity`（帮助/更新日志/沙盒等）｜`unknown`。
+
+| 优先级 | 信号 | 判定 |
+|--------|------|------|
+| S0 | 枚举 redirect 标志 | redirect |
+| S1 | 正文含 `{{消歧义` 模板 | disambig |
+| S2 | 信息框/台词模板参数：全文出现 `\|dst\|` 且无 `\|ds\|` → dst_*；反之 ds_*；**两者皆有 → mixed** | 逐页最强信号 |
+| S3 | 版本分类成员（联机版/单机版/海难/巨人国/猪镇…） | 与 S2 交叉验证；冲突记 low confidence |
+| S4 | 标题/杂讯特征（"更新"后缀、`DSRoom/` 等） | 辅助 non_entity 判定 |
+
+规则落 TOML 配置（信号模板名/分类白名单可增补）；S2/S3 均无法判定的进 `unknown` + 人工分诊队列，**不允许静默猜测**。首轮抓取完成后执行**校准步骤**：分层抽样 ~30 页人工核对类别，据此修订信号规则再全量重算（纯本地操作，秒级）。
+
+---
+
+## 6. 抓取流程
+
+```
+1 enumerate     list=allpages apnamespace=0 aplimit=500（redirects/nonredirects 各一遍）
+                → 全量 {pageid,title,touched,len,new} 清单（~15 请求）
+2 reconcile     与 meta.jsonl 比对：新增 / touched 变化 / 消失（疑似删除或移动）
+3 fetch         action=query&prop=revisions|categories&rvprop=content&rvslots=main
+                &titles=<≤50 个/批>（~140 请求）；记录 rev_sha1 与分类成员
+4 write         pages/<pageid>.wikitext + meta.jsonl 追改；消失页标记 removed（文件归档 _removed/ 一轮）
+5 classify      本地跑 §5 分类器，回填 game_class 字段
+6 validate      计数对账（枚举==落盘）、len 对账、sha1 抽验、unknown 清单输出
+7 manifest      写本轮统计；输出简报（新增/变更/删除/分类分布）
+```
+
+工程约束：
+- 节流与重试直接复用 `WikiClient` 的 `RateLimitCfg`（默认 1 QPS、WAF 403/429 退避）——这正是此前客户端加固的直接受益场景；
+- 匿名读即可完成（公共 API），配置了 `HUIJI__X_AUTHKEY` 则附带以提升稳定性；UA 标识 `dst-huiji-wiki-corpus/<version>`；
+- 预计初轮墙钟时间 **<10 分钟**，可在任意时段执行，夜间低峰更稳。
+
+---
+
+## 7. 增量同步
+
+- **变更检测**：每轮 enumerate 后仅抓 `touched` 晚于上轮 manifest 的页（通常个位数请求）；
+- **删除/移动**：枚举中消失的 pageid → 查 `action=query&titles=` 复核，确认删除则归档本地文件；移动则沿用同一 pageid 更新标题；
+- **窗口期纪律**（承接对账原则）：游戏更新后 1~3 天 bot 同步窗口内照常抓取快照（快照本身无害），但该轮产生的语料**不用于**编辑惯例归纳与关联重建的因果推断，仅在 manifest 中标记 `in_bot_window=true`；
+- 全量一致性校验（sha1 全量比对）每月一次或手动触发。
+
+---
+
+## 8. 实现载体
+
+- 服务层新增 `JobKind::CorpusSync`（CLI wrapper 免费获得），CLI 子命令 `corpus fetch [--full|--incremental] [--report-json]`；
+- 复用现有 `service::WriteMode` 语义：DryRun 只跑 enumerate+reconcile 出报告不写盘；
+- Web UI 进度展示为可选后续项（JobManager SSE 现成）；
+- 校准期允许一次性 Python 脚本探路（不落 `output/` 之外的仓库路径），生产路径统一收编到 Rust job。
+
+---
+
+## 9. 验收清单
+
+1. 枚举 6,889 页 == meta 行数 == pages 文件数（removed 归档除外）；
+2. `len` 字段与实际字节数偏差 0（容差：行尾规范化前后一致即可）；
+3. 分类覆盖：unknown ≤5%，其完整清单进入分诊报告；
+4. 幂等：连续两轮增量运行，第二轮网络请求为 0；
+5. 断点续跑：中途 kill 后重启，已完成页不重复抓取；
+6. 抽样质检：随机 20 页 wikitext 与 API 现取结果逐字节一致。
+
+---
+
+## 10. 开放问题
+
+1. 消歧义模板的具体变体（`{{消歧义}}`/`{{消歧义重定向}}`…）全集需在校准步确认；
+2. 未来 Tier0 需要 `Data:DST Prefab/*.json` 快照做他方同步核对——是否在本布局下扩展第二命名空间抓取通道，届时另立小节，当前明确排除。
+
+已决：~~`分类:图鉴收录` 能否作为 entity/content 区分信号~~——**不采用**（官方图鉴分类本身混乱，2026-08 拍板）；entity 判定以信息框模板存在性为准。

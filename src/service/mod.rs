@@ -171,6 +171,8 @@ pub enum JobKind {
         out: Option<String>,
         #[serde(default)]
         verdicts: Option<String>,
+        #[serde(default)]
+        llm: bool,
     },
 }
 
@@ -347,6 +349,7 @@ async fn execute_job_inner(
             limit,
             out,
             verdicts,
+            llm,
         } => {
             run_symbol_annotate(
                 root,
@@ -354,6 +357,7 @@ async fn execute_job_inner(
                 *limit,
                 opt_path(out),
                 verdicts.as_deref(),
+                *llm,
                 reporter,
             )
             .await
@@ -668,6 +672,7 @@ async fn run_symbol_annotate(
     limit: usize,
     out: Option<PathBuf>,
     verdicts: Option<&str>,
+    llm: bool,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     reporter.stage("构建代码关联索引");
@@ -722,10 +727,46 @@ async fn run_symbol_annotate(
         "packs_file": packs_path,
     });
 
+    let mut llm_responses: Option<Vec<crate::update::SymbolAnnotationResponse>> = None;
     if let Some(vp) = verdicts {
         reporter.stage("读取标注结果并生成覆盖报告");
         let raw = std::fs::read_to_string(vp)?;
         let responses: Vec<crate::update::SymbolAnnotationResponse> = serde_json::from_str(&raw)?;
+        llm_responses = Some(responses);
+    } else if llm {
+        reporter.stage("LLM 标注");
+        match crate::llm::LlmConfig::from_env() {
+            None => {
+                reporter
+                    .log("未配置 LLM__API_KEY，跳过 LLM 标注，仅生成 Prompt/证据包".to_string());
+            }
+            Some(config) => {
+                reporter.log(format!("使用模型 {} / {}", config.model, config.base_url));
+                let mut responses = Vec::new();
+                for pack in &packs {
+                    let symbol = crate::update::symbol_display(&pack.symbol);
+                    let semantics = format!("{symbol}（代码证据待补充）");
+                    let prompt = crate::update::render_symbol_annotation_prompt(pack, &semantics);
+                    let system =
+                        "你是 DST Huiji Wiki 的代码符号页面影响标注助手。必须严格按用户要求输出 JSON。";
+                    let raw = config.complete(system, &prompt).await?;
+                    let verdicts = crate::update::parse_symbol_annotation_response(&raw)?;
+                    responses.push(crate::update::SymbolAnnotationResponse { symbol, verdicts });
+                }
+                let verdicts_path = out_dir.join("symbol_verdicts.json");
+                std::fs::write(&verdicts_path, serde_json::to_string_pretty(&responses)?)?;
+                reporter.log(format!(
+                    "LLM 标注完成 {} 个 symbol → {}",
+                    responses.len(),
+                    verdicts_path.display()
+                ));
+                summary["llm_verdicts"] = serde_json::json!(verdicts_path);
+                llm_responses = Some(responses);
+            }
+        }
+    }
+
+    if let Some(responses) = llm_responses {
         let reports = crate::update::build_coverage_reports(&responses);
         let cov_json = out_dir.join("symbol_coverage.json");
         std::fs::write(&cov_json, serde_json::to_string_pretty(&reports)?)?;

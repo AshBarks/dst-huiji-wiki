@@ -39,8 +39,8 @@ pub use stats::{extract_stats, StatFact, StatKind};
 pub use symbol_page::{
     annotate_symbol, build_coverage_report, build_coverage_reports, build_symbol_evidence_packs,
     parse_symbol_annotation_response, render_coverage_report_md, render_symbol_annotation_prompt,
-    render_symbol_pack_md, top_symbols, InconsistentPage, MissingPage, PageSymbolVerdict,
-    SymbolAnnotationResponse, SymbolCoverageReport, SymbolKind, SymbolPageAnnotation,
-    SymbolPageVisibility, SymbolRef,
+    render_symbol_pack_md, symbol_display, top_symbols, InconsistentPage, MissingPage,
+    PageSymbolVerdict, SymbolAnnotationResponse, SymbolCoverageReport, SymbolKind,
+    SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
 };
 pub use takeup::{TakeupConfig, Tier};

@@ -338,7 +338,7 @@ pub struct SymbolAnnotationResponse {
     pub verdicts: Vec<PageSymbolVerdict>,
 }
 
-fn symbol_display(symbol: &SymbolRef) -> String {
+pub fn symbol_display(symbol: &SymbolRef) -> String {
     match symbol {
         SymbolRef::File { path } => path.clone(),
         SymbolRef::Fn { file, name } => format!("{file}#{name}"),

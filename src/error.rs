@@ -69,6 +69,9 @@ pub enum Error {
 
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
+
+    #[error("LLM error: {0}")]
+    Llm(String),
 }
 
 impl Error {

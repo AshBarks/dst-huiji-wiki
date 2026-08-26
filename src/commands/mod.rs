@@ -161,6 +161,9 @@ pub enum Commands {
         /// 可选的 LLM/人工标注结果文件（JSON 数组或 SymbolAnnotationResponse）
         #[arg(long)]
         verdicts: Option<PathBuf>,
+        /// 配置了 LLM__API_KEY 时直接调用大模型生成标注；未配置则跳过
+        #[arg(long)]
+        llm: bool,
     },
     /// 启动 WebUI 服务器
     Serve {
@@ -446,6 +449,7 @@ mod tests {
             "output/symbol-annotate/test",
             "--verdicts",
             "verdicts.json",
+            "--llm",
         ]);
         assert!(args.is_ok());
         let args = args.unwrap();
@@ -456,12 +460,14 @@ mod tests {
                 limit,
                 out,
                 verdicts,
+                llm,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
                 assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
                 assert_eq!(limit, 10);
                 assert_eq!(out, Some(PathBuf::from("output/symbol-annotate/test")));
                 assert_eq!(verdicts, Some(PathBuf::from("verdicts.json")));
+                assert!(llm);
             }
             _ => panic!("Expected SymbolAnnotate command"),
         }

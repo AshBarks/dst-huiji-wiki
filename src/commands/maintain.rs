@@ -202,6 +202,7 @@ pub async fn run(args: Commands) -> Result<()> {
             limit,
             out,
             verdicts,
+            llm,
         } => {
             execute(
                 JobKind::SymbolAnnotate {
@@ -210,6 +211,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     limit,
                     out: opt_path_to_string(&out)?,
                     verdicts: opt_path_to_string(&verdicts)?,
+                    llm,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

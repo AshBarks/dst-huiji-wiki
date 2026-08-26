@@ -29,6 +29,7 @@
 PageSegmenter 把每页切成互不重叠的字节区间：
 
 - **kinds**：`intro`（文首至首个 h2，含模板栈）/ `infobox`（预留）/ `tab:<变体>`（RichTab 内各信息框实例）/ `section:<标题>`（一个 h2 一区，h3 折叠进父区）；
+- **参数级细分**：`infobox`/`tab` 区域内每个 `\|name = value` 参数附 `params:[{name, start_byte, end_byte, hash}]`（绝对字节区间，与区域坐标同系）——F1 类提取器的旧值回查可落到参数值字节级锚点；字段为**增量扩展**，不升 schema_version；
 - **id** = `{pageid}:{kind}:{序号}`，序号按字节顺序在 kind 内递增；
 - **稳定性规则**：id 只绑定结构位置——文本修改只更新 `hash`（FNV-1a 64，跨版本确定）；插入/删除章节会使后续序号位移，消费方须用 `(pageid, kind, title)` 三元组做跨轮次语义匹配，id 仅用于单轮内引用；
 - 每区带 `{start_byte, end_byte, len, hash, title?}`，hash 相同的区域可跳过重析。

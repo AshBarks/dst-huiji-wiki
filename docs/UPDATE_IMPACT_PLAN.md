@@ -7,6 +7,7 @@
 - **v3（本版）**：补全**实体关联链深度追溯**设计——以 prefabs/ 下 prefab 定义为起点，经 `AddComponent`/`SetStateGraph`/`SetBrain` 追溯到 components/、stategraphs/、brains/ 的关联文件（§2.6 取证、§4.2.1 关联链索引行、§4.2.2 关联链模型与追溯规则、§4.2.4 编辑取舍模型）；影响传播从"单文件归属"扩展为"链式传播"
 - **v3.1**：决策落定——①基础设施预构建方向确认：代码侧符号级关联索引 + wiki 大面积扫描产出 CodeTextAtlas 与 per-file/per-fn 说明文本（入仓库，作为 LLM 提示词资产；fn 级标注排期 M4）；②相关性标签是先验非闸门：old_literal 回查命中可推翻任何低相关标签；③§5 多数开放问题结案（见该节标记）；④页面全量语料抓取方案独立成文：[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)
 - **v3.2**：§4.2.4 增补**章节级 LLM 介入边界表**（基于全语料结构分析 [CORPUS_PAGE_PATTERNS.md](CORPUS_PAGE_PATTERNS.md) + 语料实证抽样；含无标题导语区边界、料理配方≠制作配方的溯源区分、制作章新增的纯代码检验点）
+- **v3.3**：§4.2 各小节标注可执行状态；**§4.2.6 页面匹配修订**——语料侧注册表（pages_by_prefab.json）取代"标题候选猜测+API 往返"，匹配变为离线确定性查表；PageSegmenter 补信息框参数级细分以支撑 F1 字节级锚定
 
 **关联文档**：[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)（现有工具评估，§6 改进项已落地）、[CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md)、[WIKI_CORPUS_PLAN.md](WIKI_CORPUS_PLAN.md)（语料底座）
 
@@ -217,6 +218,20 @@ return Prefab("hound", fndefault, ...), Prefab("firehound", fnfire, ...), ...  -
 
 ### 4.2 Layer B：实体事实管线（v2 核心）
 
+**可执行状态速览（v3.3，2026-08-26 评定）**：
+
+| 小节 | 状态 | 依据 |
+|------|------|------|
+| 4.2.0 Tier0 触发与核对 | ✅ 可执行 | DiffEngine 已落地（M1a/M1b），纯调度接线 |
+| 4.2.1 每版本基础设施 | ✅ 基本完成 | PrefabIndex/AssociationIndex/TuningTable=update-index 工件；PageSegmenter=语料侧 regions.jsonl |
+| 4.2.2 关联链反向传播 | 🔶 数据已备 | reverse 索引+OverrideMark 在 index.json；收窄策略实现排在 F1 后避免同域冲突 |
+| 4.2.3 F1 掉落表 | 🚧 并行线实现中 | 页面侧检索面已就绪：facts.jsonl loot 族 1204 条 + tab 区字节锚点 |
+| 4.2.3 F2 数值属性 | 🔶 可做原型 | 代码侧 setter/TuningTable 已有；页面侧 facts quantity/interval 族已备，缺容差归一（v3.3 已补） |
+| 4.2.3 F3/F4 | ⏸ 等前置 | F3 先做常量子集；F4 待全局引用索引成熟 |
+| 4.2.4 编辑取舍模型 | ✅ 可执行 | 规则已成文（本节两表），TOML 化为转写工作 |
+| 4.2.5 FactChange 类型 | ✅ 可执行 | 纯类型定义，随首个提取器接线 |
+| 4.2.6 页面匹配与定级 | ✅ 可执行（v3.3 修订后） | 注册表查表取代标题猜测；定级框架可先跑报告模式 |
+
 #### 4.2.0 Tier0：静态管线触发与核对
 
 规则注册表（impact-rules.toml）保留，但职责收窄：
@@ -322,7 +337,7 @@ struct FactChange {
 
 #### 4.2.6 页面匹配与定级
 
-1. prefab → 标题候选（ItemTable 中文名缓存 + 消歧义变体 + RichTab 子页检测）→ API 批量存在性校验（get_pages_meta）；
+1. **（v3.3 修订）** prefab → 页面直查：语料侧注册表 `index/pages_by_prefab.json` 提供变体→pageid 的**确定性映射**（RichTab 多变体自然展开；join 质量实测见 [CORPUS_CODE_ATLAS_CONTRACT.md](CORPUS_CODE_ATLAS_CONTRACT.md) §6，悬空清单即校准输入）。原"ItemTable 标题候选 + API 存在性往返"设计废除——匹配完全离线；注册表未命中的变体直接进 create-check 清单。API 批量校验仅保留为可选的语料新鲜度核对（只读，不写维基）；
 2. 取 wikitext，PageSegmenter 切区，**只在 B 层（参数值+散文）检索**；
 3. `old.literal` 精确回查（数值按格式容差：`0.125`↔`12.5%`、距离单位写法）；
 4. 定级：

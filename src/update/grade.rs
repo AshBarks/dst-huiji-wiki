@@ -89,11 +89,15 @@ impl CorpusPageView {
     }
 }
 
-fn literal_of(old: Option<&Literal>) -> Option<f64> {
-    match old {
-        Some(Literal::Num(n)) => Some(*n),
-        _ => None,
-    }
+fn squash(v: &str) -> String {
+    v.to_lowercase().replace('_', "")
+}
+
+/// Locates the strongest landing point for one presence-style old value
+/// (item name) on the page: first fact whose normalized raw mentions it.
+fn find_name_landing<'a>(facts: &'a [FactCandidate], item: &str) -> Option<&'a FactCandidate> {
+    let needle = squash(item);
+    facts.iter().find(|f| squash(&f.raw).contains(&needle))
 }
 
 /// Locates the strongest landing point for one numeric old-literal on the
@@ -127,7 +131,7 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
             let facts = view.facts.get(&pageid).unwrap_or(&empty);
             let tier = match c.kind {
                 FactKind::Loot => {
-                    let num = literal_of(c.old.as_ref());
+                    let num = c.old.as_ref().and_then(Literal::as_num);
                     let hit = num.and_then(|n| find_landing(facts, n));
                     match (&c.old, hit) {
                         // Paired numeric old-value with a page landing →
@@ -142,12 +146,32 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                                 raw: f.raw.clone(),
                             }),
                         },
-                        // Old value present but nothing on the page carries
+                        // Numeric old value with nothing on the page carrying
                         // it: either stale-page cleanup or non-transcribed
                         // fact — human decides.
-                        (Some(_), None) => no_landing(c, pageid),
-                        // Current-state anchor (pre-pairing): report row.
-                        (None, _) => no_landing(c, pageid),
+                        (Some(Literal::Num(_)), None) => no_landing(c, pageid),
+                        // No numeric side: paired presence change — locate by
+                        // the moved item's name on the page.
+                        _ => {
+                            let item = c
+                                .old
+                                .as_ref()
+                                .and_then(Literal::as_str)
+                                .or_else(|| c.new.as_ref().and_then(Literal::as_str));
+                            match item.and_then(|i| find_name_landing(facts, i)) {
+                                Some(f) => GradedChange {
+                                    prefab: c.prefab.clone(),
+                                    field: c.field.clone(),
+                                    tier: GradeTier::SuggestDraft,
+                                    pageid: Some(pageid),
+                                    landing: Some(LandingRef {
+                                        region_id: f.region_id.clone(),
+                                        raw: f.raw.clone(),
+                                    }),
+                                },
+                                None => no_landing(c, pageid),
+                            }
+                        }
                     }
                 }
                 _ => no_landing(c, pageid),
@@ -282,6 +306,21 @@ mod tests {
         let graded = grade_changes(&[unknown], &view);
         assert_eq!(graded[0].tier, GradeTier::CreateCheck);
         assert_eq!(graded[0].pageid, None);
+    }
+
+    #[test]
+    fn presence_change_locates_by_item_name() {
+        let view = hound_view();
+        // Removal of an item the page lists → draft candidate anchored there.
+        let mut rm = loot_change(Some(12.5));
+        rm.old = Some(Literal::Str("犬牙".into()));
+        rm.new = None;
+        assert_eq!(grade_changes(&[rm], &view)[0].tier, GradeTier::SuggestDraft);
+        // Item absent from the page entirely → manual.
+        let mut gone = loot_change(Some(12.5));
+        gone.old = Some(Literal::Str("不存在的材料".into()));
+        gone.new = None;
+        assert_eq!(grade_changes(&[gone], &view)[0].tier, GradeTier::Manual);
     }
 
     #[test]

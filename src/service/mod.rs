@@ -417,13 +417,18 @@ async fn run_update_scan(
 
     // Persist draft-eligible suggestions for human comparison (L1).
     if let Some(graded) = &graded_layer_b {
-        let drafts: Vec<&crate::update::GradedChange> = graded
+        let path = out_dir.join("layer_b_rows.json");
+        std::fs::write(&path, serde_json::to_string_pretty(graded)?)?;
+        let drafts = graded
             .iter()
             .filter(|g| g.tier == crate::update::GradeTier::SuggestDraft)
-            .collect();
-        let path = out_dir.join("layer_b_suggestions.json");
-        std::fs::write(&path, serde_json::to_string_pretty(&drafts)?)?;
-        reporter.log(format!("建议清单 {} 条 → {}", drafts.len(), path.display()));
+            .count();
+        reporter.log(format!(
+            "Layer B 明细 {} 条（建议 {}）→ {}",
+            graded.len(),
+            drafts,
+            path.display()
+        ));
     }
 
     let summary = serde_json::json!({

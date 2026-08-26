@@ -33,6 +33,22 @@ pub enum Literal {
     Str(String),
 }
 
+impl Literal {
+    pub fn as_num(&self) -> Option<f64> {
+        match self {
+            Literal::Num(n) => Some(*n),
+            _ => None,
+        }
+    }
+
+    pub fn as_str(&self) -> Option<&str> {
+        match self {
+            Literal::Str(s) => Some(s),
+            _ => None,
+        }
+    }
+}
+
 /// Where to look in the tree: file plus line anchor.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EvidenceRef {

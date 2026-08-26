@@ -4,7 +4,8 @@
 **修订记录**：
 - v1（本版）：主命名空间全量抓取方案——范围界定、存储布局、DST/单机版分类器、增量同步与验收标准
 - v1.1：落地修正——①本站 MediaWiki 1.38 的 `list=allpages` 不返回 `touched/len/redirect`，枚举改用 `generator=allpages&prop=info`（长度字段名为 `length`）；②版本信号补充「/单机版」子页后缀（577 页）；③首轮回填结果见 §11
-- v1.2：新增 §12 **recentchanges 增量通道设计**——低频增量 + 作者/动作归因事件流（CodeTextAtlas 对账的供料层），基于 2026-08-26 本站接口实测
+- v1.2：新增 §12 **recentchanges 增量通道设计**——低频增量 + 作者/动作归因事件流（CodeTextAtlas 对账的供料层），基于 2026-08-26 本站接口实测；RC 实施暂缓
+- v1.3：语料首轮结构/习惯分析产出独立成文：[CORPUS_PAGE_PATTERNS.md](CORPUS_PAGE_PATTERNS.md)（页面大类地图、实体页通用骨架、分簇特有结构、书写习惯、不规范观察）
 
 **关联文档**：[UPDATE_IMPACT_PLAN.md](UPDATE_IMPACT_PLAN.md)（v3.1，本方案为其 CodeTextAtlas / 类别范式分析的数据底座）
 

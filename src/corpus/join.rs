@@ -38,6 +38,15 @@ pub struct DanglingVariant {
     pub suggestion: Option<String>,
 }
 
+/// One infobox parameter fix: wiki wrote `from`, code says `to`.
+#[derive(Debug, Clone, Serialize)]
+pub struct ParamCorrection {
+    pub pageid: i64,
+    pub wiki_variant: String,
+    pub fix_to: String,
+    pub bucket: DanglingBucket,
+}
+
 #[derive(Debug, Serialize)]
 pub struct JoinReport {
     pub schema_version: u32,
@@ -52,6 +61,8 @@ pub struct JoinReport {
     /// `(exact + normalized) / wiki_variants`.
     pub match_rate_wiki: f64,
     pub dangling_wiki: Vec<DanglingVariant>,
+    /// Deterministic infobox-parameter corrections (case_only + naming_drift).
+    pub corrections: Vec<ParamCorrection>,
     /// Code-side variants no wiki page references (FX/internal prefabs are
     /// expected here).
     pub code_only_count: usize,
@@ -147,6 +158,24 @@ pub fn build_join_report(
     }
     dangling.sort_by(|a, b| a.variant.cmp(&b.variant));
 
+    let corrections: Vec<ParamCorrection> = dangling
+        .iter()
+        .filter(|d| {
+            matches!(
+                d.bucket,
+                DanglingBucket::CaseOnly | DanglingBucket::NamingDrift
+            )
+        })
+        .filter_map(|d| {
+            d.suggestion.clone().map(|fix_to| ParamCorrection {
+                pageid: d.pageids[0],
+                wiki_variant: d.variant.clone(),
+                fix_to,
+                bucket: d.bucket,
+            })
+        })
+        .collect();
+
     let wiki_variants = registry.prefabs.len();
     let joined = exact_matches + normalized_extra;
     // Code-only excludes variants a dangling entry already points at via
@@ -173,6 +202,7 @@ pub fn build_join_report(
             joined as f64 / wiki_variants as f64
         },
         dangling_wiki: dangling,
+        corrections,
         code_only_count: code_only.len(),
         code_only_sample: code_only.into_iter().take(24).collect(),
     })

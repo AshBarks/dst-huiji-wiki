@@ -14,11 +14,22 @@ pub enum GradeTier {
     CreateCheck,
 }
 
+/// Renders both sides of a literal change in page-facing text.
+fn lit_text(l: &Option<Literal>) -> String {
+    match l {
+        Some(Literal::Num(n)) => format!("{n}"),
+        Some(Literal::Str(s)) => s.clone(),
+        None => "（无）".to_string(),
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct GradedChange {
     pub prefab: String,
     pub field: String,
     pub tier: GradeTier,
+    /// Human-readable before → after for the review record.
+    pub change_text: String,
     pub old: Option<Literal>,
     pub new: Option<Literal>,
     pub pageid: Option<i64>,
@@ -98,6 +109,7 @@ fn no_landing(c: &FactChange, pageid: i64) -> GradedChange {
         tier: GradeTier::Manual,
         old: c.old.clone(),
         new: c.new.clone(),
+        change_text: format!("{}：{} → {}", c.field, lit_text(&c.old), lit_text(&c.new)),
         pageid: Some(pageid),
         landing: None,
     }
@@ -110,6 +122,7 @@ fn landed(c: &FactChange, pageid: i64, f: &FactCandidate) -> GradedChange {
         tier: GradeTier::SuggestDraft,
         old: c.old.clone(),
         new: c.new.clone(),
+        change_text: format!("{}：{} → {}", c.field, lit_text(&c.old), lit_text(&c.new)),
         pageid: Some(pageid),
         landing: Some(LandingRef {
             region_id: f.region_id.clone(),
@@ -128,6 +141,7 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                 tier: GradeTier::CreateCheck,
                 old: c.old.clone(),
                 new: c.new.clone(),
+                change_text: format!("{}：{} → {}", c.field, lit_text(&c.old), lit_text(&c.new)),
                 pageid: None,
                 landing: None,
             }),
@@ -167,6 +181,7 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                                     new: c.new.clone(),
                                     pageid: Some(pageid),
                                     landing: None,
+                    change_text: format!("{}：{} → {}", c.field, lit_text(&c.old), lit_text(&c.new)),
                                 }
                             } else {
                                 no_landing(c, pageid)

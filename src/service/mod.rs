@@ -455,7 +455,7 @@ async fn run_update_scan(
             .collect();
         files.sort();
         let mut chosen: Vec<&str> = files.iter().copied().take(50).collect();
-        if !chosen.iter().any(|f| *f == "prefabs/hound.lua") {
+        if !chosen.contains(&"prefabs/hound.lua") {
             chosen.insert(0, "prefabs/hound.lua");
         }
         let written = crate::update::batch_annotate(

@@ -4,7 +4,6 @@
 
 use super::index::edges::IndexArtifact;
 use crate::Result;
-use std::collections::BTreeMap;
 
 /// Renders one file's fn-level skeleton to markdown.
 pub fn annotate_file(path: &str, artifact: &IndexArtifact) -> String {
@@ -44,7 +43,7 @@ pub fn annotate_file(path: &str, artifact: &IndexArtifact) -> String {
             if !loots.is_empty() {
                 out.push_str(&format!("- 掉落锚点：{}\n", loots.join("；")));
             }
-            out.push_str("\n");
+            out.push('\n');
         }
     }
     out
@@ -71,6 +70,7 @@ pub fn batch_annotate(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::BTreeMap;
     use crate::update::index::loot::{LootKind, LootRecord};
 
     #[test]

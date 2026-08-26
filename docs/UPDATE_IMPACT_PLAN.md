@@ -1,21 +1,24 @@
 # 游戏更新影响评估与自动修订方案（Update Impact Assessment）
 
-**状态**：早期设计（评估阶段产出，待评审）
-**日期**：2026-08（基于 build 747465 / 快照 202605291134 调研）
-**关联文档**：[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)（现有工具质量评估）、[CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md)、[FLOWS.md](FLOWS.md)
+**状态**：v2 细化版（评审中）
+**修订记录**：
+- v1（初稿）：三层流水线总体框架、静态规则注册表、LLM 输出契约
+- **v2（本版）**：根据对实体页面内容分层的深入取证重新聚焦——静态数据管线已被既有工具与其他维护脚本覆盖，方案重心收敛到**手写内容的实体事实管线**（详见 §2.5 取证与 §4.2 重设计）
+
+**关联文档**：[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)（现有工具评估，§6 改进项已落地）、[CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md)
 
 ---
 
 ## 0. TL;DR
 
-每次游戏更新后，用一条命令完成：**结构化 diff → 受影响 wiki 页面清单（分级+证据）→ 确定性管线自动更新 → LLM 起草"读 diff 就知道怎么改"的页面修改 → 人审后推送 → 报告与审计**。
+每次游戏更新后，一条命令完成：**结构化 diff → 受影响实体页面清单（精确到"页面的哪一句因哪个 hunk 过期"）→ 静态管线照常触发 → 手写内容由确定性建议或 LLM 起草修改 → 人审后推送 → 报告与审计**。
 
-核心设计决策：
+v2 的核心认知修正：
 
-1. **三层流水线**：A 快照与结构化 diff → B 影响映射（静态规则注册表 + 实体级提取）→ C 分层修复（确定性 / LLM / 报告）。
-2. **prefab 代码是全链路关联键**——这是对"页面↔代码文件关联"初步思路的深化：不做整文件粗粒度关联，而是从 diff **hunk 中提取实体**（配方名、prefab 名、字符串键、TUNING 键），再经本地 ItemTable 缓存解析到具体 wiki 页面，使影响清单精确到"页面 × 变更原因"。
-3. **LLM 只做有界编辑**：输出契约是 `{find, replace, rationale, evidence}` 列表而非全文重写；经四重校验（唯一匹配 / 模板平衡 / 数值溯源 / 保护内容不可删）后才进入人审；默认 dry-run。
-4. **前置改造是硬阻塞**：现有 WikiClient 无重试/节流/批量查询/编辑冲突保护，且实测灰机 API 有 WAF 间歇 403（见 §2.4 与审计报告），必须先修。
+1. **静态部分不重复建设**。recipes/tabx/常量模块等由本项目既有管线与其他维护脚本负责；且这些 Data 页被 wiki 模块运行时直查，更新后全站引用处自动重渲染，无需逐页修改。新流程只做"触发 + 核对"（Tier0）。
+2. **实体提取器的真正靶心是页面中"手写但代码强溯源"的内容**：infobox 的手写参数（掉落 Pic 串、生成来源等）与正文机制描述中的数值事实——它们转写自 `prefabs/<x>.lua` 及其关联的 components/brains/stategraphs。
+3. **影响映射的基本单位是 FactChange**：`(prefab, 字段, 旧字面量, 新字面量, 证据)`。用旧值在页面手写区域做精确回查命中，而不是整页相关性猜测。
+4. **前置改造已完成**：WikiClient 节流/重试/basetimestamp/批量 API/错误细分均已落地（见审计报告 §6 落地状态）。
 
 ---
 
@@ -23,30 +26,29 @@
 
 ### 1.1 背景
 
-实测更新节奏约每 1~3 周一次（databundles 下 2025-03 至 2026-05 共 40 个手工快照目录）。每次更新后维基需要：
+实测更新节奏约每 1~3 周一次（databundles 下 2025-03 至 2026-05 共 40 个手工快照）。更新后维基工作分两类：
 
-- 同步数据页（配方表、物品表、常量模块）——现有 4 条管线已覆盖；
-- 修正内容页正文中手写的数值/文本（伤害、耐久、台词、材料列表等）——**目前完全人工比对**；
-- 盘点新内容（新实体缺页、新配方、新字符串）——目前靠人翻 changelog。
+- **数据同步**：tabx/常量模块/Prefab JSON 数据页——已有明确维护渠道（本工具静态管线、其他维护脚本、鲁鲁bot），且模块运行时直查使内容页展示自动更新；
+- **手写内容修订**：编辑们把代码里的机制与数值人工转写成页面正文和 infobox 参数，版本更新后逐句过期——目前完全靠人肉翻 diff。
 
-现状缺口：没有"这次更新影响了哪些页面"的系统性答案，也没有批量无人值守能力。
+现状缺口是后者没有系统性工具支撑。页面上甚至留有编辑者的等待注释（如猎犬页 `<!--lulu：实体数据更新后再来删掉这个-->`），说明需求真实存在。
 
 ### 1.2 目标
 
 | # | 目标 | 验收标准 |
 |---|------|----------|
-| G1 | 更新后一条命令产出《影响评估报告》：受影响页面分级清单，每条附 diff 证据 | 报告覆盖 ≥90% 实际需要维护的页面（以下次真实更新人工盘点为基准） |
-| G2 | 命中确定性管线的页面零人工干预自动更新 | Tier1 页面成功率 100%，无错误写入 |
-| G3 | "读 diff 就知道怎么改"的页面由 LLM 起草修改，校验后人审推送 | llm-auto 类建议采纳率 ≥80%；进入 wiki 的错误编辑 0 起 |
+| G1 | 更新后产出《影响评估报告》：受影响实体页面清单，每条精确到"哪个字段/哪句话 × 哪个 hunk 证据" | 对下次真实更新人工盘点，覆盖率 ≥90% |
+| G2 | 静态管线自动触发并核对，报告标注"已自动处理"避免重复劳动 | Tier0 零人工干预 |
+| G3 | 强溯源手写内容（掉落表、数值替换）给出确定性或 LLM 起草的修改建议，校验后人审推送 | llm/auto 建议采纳率 ≥80%；错误编辑 0 起 |
 | G4 | 新内容检查清单（缺页实体、新增配方/字符串） | 清单完整率可核对 |
-| G5 | 全程幂等、可审计、可回滚 | 任何一次运行可从 state.json 续跑；每次编辑记录 oldrevid/newrevid |
+| G5 | 全程幂等、可审计、可回滚 | state.json 断点续跑；编辑记录 oldrevid/newrevid |
 
 ### 1.3 非目标
 
-- 不做全自动无监督推送（初期始终有人审环节，llm-auto 白名单极窄）；
-- 不接管 `Data:DST Prefab/*.json`（3869 页，第三方 bot「鲁鲁bot」在维护，见 §2.3）与 `模块:DST Strings CN/EN` 系列（疑似 bot 维护，见 §5 开放问题），只做一致性核对与通报；
-- 不处理与游戏代码无映射关系的纯社区内容（攻略、同人等）；
-- 不做 wikitext 的通用语法重构（渲染类问题不归本功能管）。
+- 不重复实现静态数据管线（只调度既有 maintain-* 与核对结果）；
+- 不接管 `Data:DST Prefab/*.json`（鲁鲁bot）与 `模块:DST Strings CN/EN`（疑似 bot）——仅一致性核对通报；
+- 不处理弱溯源内容（攻略/花絮/多跳推导机制描述）的自动改写——只提示；
+- 不做 wikitext 通用语法重构。
 
 ---
 
@@ -54,368 +56,258 @@
 
 ### 2.1 游戏侧
 
-**scripts.zip 关键数据文件**（解压后 4010 个 .lua，272MB）：
+**scripts.zip 关键文件**（解压后 4010 个 .lua，272MB）：
 
-| 文件 | 规模 | 驱动的 wiki 数据 |
-|------|------|------------------|
-| `recipes.lua` | 1544 行，~910 个 Recipe/Recipe2 调用 | Data:DSTRecipes.tabx；各内容页配方栏 |
-| `languages/chinese_s.po` | 429,073 行（~17MB） | Data:ItemTable.tabx、模块:DST Strings CN、模块:Constants/CraftingNames |
-| `tuning.lua` | 9,534 行 | 各内容页数值的最终来源之一 |
-| `constants.lua` | 3,030 行（TECH 定义等） | 模块:Constants/Tech |
-| `recipes_filter.lua` | 1,644 行 | 模块:Constants/CraftingFilters |
-| `debugcommands.lua` | RECIPE_BUILDER_TAG_LOOKUP | 模块:Constants/RecipeBuilderTagLookup |
-| `prefabs/*.lua` | 1,582 个文件 | Data:DST Prefab/<prefab>.json（bot）；实体组件行为 |
-| `components/*.lua` | 815 个文件 | 同上（数值常在此） |
-| `speech_*.lua` ×17 | 角色台词 | 台词相关页面/模板 |
-| `preparedfoods.lua` / `cooking.lua` / `cookbookdata.lua` | 食物与锅 | 食物页、模块:Cookpot |
+| 文件 | 规模 | 说明 |
+|------|------|------|
+| `recipes.lua` | ~910 个 Recipe/Recipe2 | 静态管线已覆盖 |
+| `languages/chinese_s.po` | 429,073 行 | 静态管线已覆盖 |
+| `tuning.lua` | 9,534 行 | **数值事实的最终来源**；prefabs 下有 8,216 处 `TUNING.*` 引用 |
+| `prefabs/*.lua` | 1,582 个文件 | **手写内容的主要代码对应物**（见 §2.5） |
+| `components/*.lua` | 815 个文件 | 组件默认值；prefab 通常在 AddComponent 后覆写 |
+| brains/stategraphs/behaviours | 各数十~数百文件 | 行为逻辑（正文"行为"章节的素材） |
+| `speech_*.lua` ×17 | 角色台词 | 台词模板自动消费 |
 
-**版本识别**：游戏根 `version.txt` 即 build 号（当前 `747465`）。`DstContext` 已读取该文件。
+**版本识别**：游戏根 `version.txt` build 号；`DstContext` 已读取并支持快照目录。
 
-**现有人工流程**（重要资产）：更新时把旧版目录改名为 `scripts_<yyyymmddhhmm>`，解压新版到 `scripts/`，再手工生成目录 diff（如 `databundles/0529.diff`，14.4 万行）。**databundles 下已有 40 个历史快照**——这既是本功能要形式化自动化的流程，也是免费的离线测试金标准（见 §4.7）。
+**现有人工流程**：更新时旧目录改名 `scripts_<yyyymmddhhmm>` + 解压新版 + 手工 diff（如 `0529.diff`，302 文件）。databundles 下已有 40 个历史快照 = 免费的离线测试金标准。
 
-**典型更新规模**（0529.diff，Rifts 7 大版本）：302 个变更文件 = 144 prefabs + 53 components + 20 stategraphs + 12 languages + 17 speech_* + recipes.lua / strings.lua / tuning.lua / constants.lua / actions.lua 等。平衡性小补丁通常只有个位数文件。
-
-**diff 形态**：标准 git unified diff；新文件带 `new file mode` 且 `--- /dev/null`；本功能将自行生成统一格式（旧路径统一规范化为相对 scripts 根），不再依赖手工 diff。
-
-### 2.2 维基侧数据架构（映射设计的事实依据）
+### 2.2 维基侧数据架构
 
 ```
-游戏代码(lua/po)
-   │ ①本工具 maintain-item-table / map-names
-   ├──────────> Data:ItemTable.tabx ──(mw.huiji.db.find 运行时直查)──> 模块:ItemTable/Data ──┐
-   │ ②鲁鲁bot(第三方)                                                                        │
-   ├──────────> Data:DST Prefab/<prefab>.json ×3869 ──────────────────────────────────────┤
-   │ ③本工具 maintain-dst-recipes                                                          ├──> 模块:AutoInfobox <── {{实体信息框/自动|dst|<prefab>}}
-   ├──────────> Data:DSTRecipes.tabx ──(db.find 直查 + 人工 override 表)──> 模块:DSTRecipe/Data ┘        │
-   │ ④疑似 bot                                                                                            ▼
-   └──────────> 模块:DST Strings CN/EN 00~99+                                                    内容页正文(火腿棒等)
-   │ ⑤本工具 maintain-copy-clip
-   └──────────> 模块:Constants/{Tech,CraftingFilters,CraftingNames,RecipeBuilderTagLookup}      (手写参数优先于自动数据)
+游戏代码 ──(本工具静态管线)──> Data:ItemTable.tabx / Data:DSTRecipes.tabx / 模块:Constants/* ──┐
+游戏代码 ──(鲁鲁bot)──────> Data:DST Prefab/<prefab>.json ×3869                               │ 运行时直查
+游戏代码 ──(疑似 bot)─────> 模块:DST Strings CN/EN                                            ├─> 模块:AutoInfobox 等
+                                                                                              ▼
+                                                            内容页 {{实体信息框/自动|dst|<prefab>|手写参数…}} + 手写正文
 ```
 
-**页面分类清单**：
+关键机制（v2 补充实证）：
 
-| 类型 | 示例 | 数据来源 | 当前维护者 | 更新敏感度 |
-|------|------|----------|-----------|-----------|
-| Data 表格页 | `Data:ItemTable.tabx`(188KB)、`Data:DSTRecipes.tabx` | po / recipes.lua | **本工具**（Tier1 直接复用） | 高，但已自动化 |
-| 常量模块 | `模块:Constants/Tech` 等 4 个 | constants.lua 等 | **本工具**（COPYCLIP 标记替换） | 高，已自动化 |
-| Prefab 数据页 | `Data:DST Prefab/hambat.json` | prefabs/*.lua + components | 鲁鲁bot（hambat.json 于更新后 3 天由其更新） | 高，他方负责 → notify-only |
-| 字符串模块 | `模块:DST Strings CN 00~99`、EN 系列 | languages/*.po | 待确认（疑似 bot） | 高，待确认归属 |
-| 内容页 | `火腿棒`、`荧光果`… | `{{实体信息框/自动}}` 自动拉数据 + **手写参数与正文** | 人工 | **中——本功能 LLM 层的主战场** |
-| 聚合/列表页 | 食物表、科技树等 | 多由模块实时组装 | 半自动 | 低（数据页更新即生效） |
-
-**三个关键机制**（决定了方案形态）：
-
-1. **prefab code 是全链路关联键**。内容页 infobox 第一个匿名参数就是 prefab 代码（`{{实体信息框/自动|dst|hambat}}`），ItemTable 提供 prefab↔中文名双向索引。→ 影响映射应**以实体为中心**，而不是"文件→页面"的静态边表。
-2. **AutoInfobox 参数覆盖规则：页面手写参数 > 自动数据**。结构化字段（伤害、食物值、配方栏）大多已被 Data 页自动化；真正会过期的恰是**手写部分**（正文里的数字、描述、掉落列表 Pic 串、皮肤信息）。→ 这就是 LLM 层的工作对象，也解释了为什么不能全文重写。
-3. **Data 页被模块运行时直查**（`mw.huiji.db.find`），tabx 更新即全站生效，无逐页回填问题。→ Tier1 的杠杆极高：改一个 tabx 等于更新上千个内容页的展示。
+1. **AutoInfobox 的数值来自 `mw.huiji.loadJson('DST_Prefab/'..prefab)`**（模块源码第 56 行），即生命/伤害/饥饿/燃料等展示全部自动。配方栏走 DSTRecipes.tabx 直查，台词走 Strings 模块。
+2. **手写参数 > 自动数据**：infobox 同名参数被页面显式赋值时覆盖自动值（如火腿棒页 `|装备/伤害 = 59.5~29.5` 是公式化手写）。这些覆盖参数正是会过期的手工数据点。
+3. **Data 页运行时直查 ⇒ 静态管线更新即全站生效**：改一个 tabx 无需回填任何内容页。⇒ 静态部分在新流程中降级为"触发+核对"。
 
 ### 2.3 他方 bot 观察
 
-`Data:DST Prefab/hambat.json` 版本历史：创建于 2025-12-21、更新于 2026-06-01（0529 更新后 3 天），编辑者均为「鲁鲁bot」。说明：(a) 该数据集有专职维护渠道，我们不应重复建设；(b) 更新后存在 1~3 天窗口期，我们的报告可以把"Prefab 数据页是否已同步"列为核对项而不是执行项。
+`Data:DST Prefab/*` 由鲁鲁bot 在更新后 1~3 天内批量更新。我们的报告将其列为核对项（窗口期内提示"Prefab JSON 尚未同步，以下自动展示可能滞后"）。
 
 ### 2.4 API 行为观察（工程约束）
 
-| 观察 | 证据 | 工程结论 |
-|------|------|----------|
-| MediaWiki 1.38.4；Data 命名空间 3500、模块 828 | siteinfo | 可用的标准 MW API 面 |
-| **连续快速请求触发间歇 403（WAF）** | 调研中多次复现：首个请求成功，紧接着的同型请求 403；间隔 15~30s 后恢复 | 批量功能必须内置全局节流 + 403/429 指数退避重试，否则不可用 |
-| 搜索后端偶发 `cirrussearch-backend-error` | list=search 复现 | 不要依赖站内搜索做定位；用 ItemTable 缓存 + titles 批量查询 |
-| allpages 上限 500，需 apcontinue 翻页 | 实测 | 枚举类操作要实现 continuation 循环 |
-| prop=revisions 多标题批量 ≤50 且 rvlimit 只能为 1 | API invalidparammix 错误 | 页面批量抓取按 50/批设计 |
+| 观察 | 工程结论 |
+|------|----------|
+| 连续快速请求间歇 403（WAF） | ✅ 已落地节流+退避重试（WikiClient RateLimitCfg） |
+| 搜索后端不稳 | 用 ItemTable 缓存 + titles 批量查询定位页面 |
+| allpages ≤500 需续传；titles 批量 ≤50 | ✅ list_all_pages / get_pages_meta 已封装 |
+| MediaWiki 1.38.4 formatversion=1 BC 布尔 | 解析需兼容 `"missing": ""` 形态 |
+
+### 2.5 实体页面内容分层取证（v2 核心依据）
+
+以"猎犬"页全文比对 `prefabs/hound.lua` + `tuning.lua` 得到的三层模型：
+
+| 层 | 内容 | 来源 | 处置 |
+|----|------|------|------|
+| **A 自动层** | infobox 数值（生命/伤害/攻速/食物值）、配方栏、台词、名称图片 | `loadJson('DST_Prefab/')`、tabx、Strings | 不碰；Tier0 核对 |
+| **B 手写·强溯源层** | 见下表 | prefabs/*.lua 及关联组件 | **本功能靶心** |
+| **C 手写·弱溯源层** | 提示/花絮/攻略、多跳推导事实 | 行为链推理 | 仅提示 |
+
+B 层实例（页面原文 ↔ 代码锚点一一对照）：
+
+```
+|掉落 = {{Pic|32|怪物肉}}×1<br>{{Pic|32|犬牙}}×1（12.5%） ← SetSharedLootTable('hound',{{'monstermeat',1.0},{'houndstooth',0.125}})
+正文："死亡后生成 3 团猎犬火焰"                            ← NUM_HOUND_FIRE = 3（firehound OnDeath 循环）
+正文："有猎犬丘的猎犬仇恨范围为 20 单位"                    ← FindEntity(inst, TUNING.HOUND_TARGET_DIST=20)
+正文："寒冰猎犬对 4 单位内施加 2 层冰冻"                    ← icehound 死亡回调
+```
+
+反例（C 层）：野狗"仇恨范围 100 单位"在 hound.lua 无直接出处（多跳，源自袭击系统）——此类必须标记为不可自动改写。
+
+**决定设计的四个代码侧事实**：
+
+1. **一文件多 prefab**：hound.lua 定义 8 个变体（hound/firehound/icehound/moonhound/clayhound/mutatedhound/hedgehound/houndfire），各 fn 内独立设属性。统计确认此为主流组织方式 ⇒ 事实归属必须做**函数作用域分析**（可复用 prefab_override parser 的局部函数追踪技术）。
+2. **数值引用形态混合**：`SetMaxHealth(TUNING.X)` 为主、少量字面量（spiderden 200）。prefabs 下模式出现次数：SetMaxHealth×264、SetDefaultDamage×245、SetRange×203、SetLoot×227、SetAttackPeriod×169、SetPerishTime×127、SetRetargetFunction×141。
+3. **掉落表结构高度规整**：`SetSharedLootTable('name', { {'prefab', chance}, ... })` 与页面 Pic 串几乎一一对应（12.5% ↔ 0.125）——最理想的确定性提取目标。
+4. **TUNING 反向索引必需**：改 tuning.lua 一个 key 影响所有引用它的 prefab 对应页面。
 
 ---
 
-## 3. 总体架构
+## 3. 总体架构（v2）
 
 ```
-┌──────────────────── Layer A 快照与 Diff ─────────────────────┐
-│ UpdateDetector(version.txt/zip hash) → SnapshotStore          │
-│   → StructuredDiff: diff.json(+changes.patch 人读)            │
-└───────────────────────────┬───────────────────────────────────┘
-                            ▼
-┌──────────────────── Layer B 影响映射 ────────────────────────┐
-│ impact-rules.toml 静态管线规则      实体提取器(recipe_call/     │
-│   → Tier1 候选(Data:*.tabx等)        prefab_def/po_msgctxt/    │
-│                                     tuning_ref/speech_key…)   │
-│              └────────────┬───────────┘                       │
-│                           ▼                                   │
-│ 页面解析: 本地ItemTable缓存 → 标题候选 → API批量存在性校验       │
-│                           ▼                                   │
-│ 相关性定级(旧值回查wikitext等信号) → ImpactPlan                │
-│   [{page, tier: auto|llm|manual|notify|create-check,          │
-│     evidence: [file@hunk]}]                                   │
-└───────────────────────────┬───────────────────────────────────┘
-                            ▼
-┌──────────────────── Layer C 修复执行 ────────────────────────┐
-│ Tier1 auto   : 进程内调度 maintain-* (--yes/--dry-run)         │
-│ Tier2 llm    : 上下文包 → edits{find,replace} → 四重校验        │
-│               → review bundle → 授权应用(basetimestamp保护)    │
-│ Tier3 report : report.md + impact.json + applied.jsonl 审计    │
-└───────────────────────────────────────────────────────────────┘
+┌──────────────── Layer A 快照与 Diff（不变）───────────────────┐
+│ UpdateDetector → SnapshotStore → StructuredDiff(diff.json)     │
+└──────────────────────────┬─────────────────────────────────────┘
+                           ▼
+┌──────────────── Layer B 影响映射（v2 重构）────────────────────┐
+│ Tier0 静态管线：规则注册表命中 → 触发既有 maintain-*            │
+│                 + 结果核对登记（"已自动处理"）                   │
+│                                                                │
+│ 实体事实管线（主线）：                                          │
+│   diff hunk ──实体提取──> 受影响 prefab 集合                    │
+│      ↓ PrefabIndex/TuningTable（每版本基础设施，缓存）          │
+│   事实提取器族 F1~F4 ──> FactChange{field, old, new, evidence}  │
+│      ↓                                                         │
+│   页面解析(prefab→标题候选→存在性校验) + 区域分割(B层限定)       │
+│      ↓ old_literal 精确回查                                     │
+│   ImpactPlan[{page, region, tier, fact, evidence}]              │
+└──────────────────────────┬─────────────────────────────────────┘
+                           ▼
+┌──────────────── Layer C 修复执行 ──────────────────────────────┐
+│ Tier1 auto   : 静态管线调度（--dry-run/--yes/--report-json 已备）│
+│ Tier2 llm    : 按 fact-kind 模板起草 edits → 四重校验 → 人审     │
+│ Tier3 report : report.md + impact.json + applied.jsonl          │
+└─────────────────────────────────────────────────────────────────┘
 ```
-
-分层原则：
-- A/B/C 通过 `ImpactPlan` JSON 解耦，每层可独立运行/测试/重放；
-- B 层产出的每一项必须携带 evidence（文件+hunk 定位），报告和 LLM prompt 都引用同一份证据，保证可追溯；
-- C 层对 wiki 的所有写入都走统一的 apply 通道（节流、冲突保护、审计集中在一处）。
 
 ---
 
 ## 4. 详细设计
 
-### 4.1 Layer A：快照管理与结构化 Diff
+### 4.1 Layer A：快照管理与结构化 Diff（与 v1 一致）
 
-**更新检测**
-- 比较 `DST__ROOT/version.txt` build 号与 `updates/state.json` 记录的 last-build；
-- scripts.zip 以 size+mtime+（可选）CRC 做二次确认。
+- 更新检测（version.txt/zip hash）、SnapshotStore 目录布局、`snapshot import` 兼容 databundles 快照；
+- DiffEngine 产出 `FileDiff{path,status,hunks}`（similar 行级）+ changes.patch；
+- 金标准：`scripts_202604271353 ↔ scripts_202605291134` 对照人工 0529.diff。
 
-**SnapshotStore 目录布局**（项目仓库内新增，gitignore 大文件）：
+### 4.2 Layer B：实体事实管线（v2 核心）
 
-```
-updates/
-├── snapshots/<build>/          # 解压后的 scripts 树（符号链接或硬链接到 databundles 手工快照亦可）
-├── <from>..<to>/               # 一次更新的工作目录
-│   ├── diff.json               # 结构化差异（机器）
-│   ├── changes.patch           # unified diff（人类浏览）
-│   ├── impact.json             # ImpactPlan
-│   ├── artifacts/              # Tier1 dry-run 产物（新 tabx 文本、copyclip 结果等）
-│   ├── review/<page>.md        # LLM 建议的人审 bundle
-│   └── applied.jsonl           # 已应用的编辑审计
-├── cache/
-│   ├── itemtable.json          # Data:ItemTable.tabx 本地镜像
-│   └── page-index.json         # title → {pageid, checked_at}
-└── state.json                  # 幂等状态机
-```
+#### 4.2.0 Tier0：静态管线触发与核对
 
-**兼容导入**：`snapshot import <dir>` 解析 databundles 的 `scripts_YYYYMMDDHHMM` 命名，登记为快照（避免重复解压 268MB×N）。已有 40 个快照全部可导入，立刻构成回归测试集。
+规则注册表（impact-rules.toml）保留，但职责收窄：
+- po/recipes/constants/debugcommands/recipes_filter 变更 → 调度既有 maintain-*（WriteMode::DryRun/AutoConfirm）；
+- 结果登记为 `auto_handled`，报告中单列，不再进入实体匹配流程；
+- 附带核对项：DST Strings/Prefab JSON 是否已被他方 bot 同步（窗口期提醒）。
 
-**DiffEngine**
-- 文件级：双树遍历 + 内容哈希 → `added / deleted / modified`；相似度 >阈值 的 added+deleted 对启发式标记 `renamed`（游戏更新偶发 prefab 改名）。
-- hunk 级：对 modified 文本文件用 `similar`（已在依赖中）生成行级 hunks；序列化为：
+#### 4.2.1 每版本基础设施（构建一次、缓存复用）
 
-```json
-{"path":"prefabs/fumaroleaxe.lua","status":"added",
- "hunks":[{"old_start":0,"old_lines":0,"new_start":1,"new_lines":37,
-           "lines":[["+", "local assets = {"], ...]}]}
-```
+| 设施 | 输入 | 产出 | 用途 |
+|------|------|------|------|
+| `PrefabIndex` | 扫描 prefabs/*.lua（AST） | prefab → {file, fn 区间, 引用的 TUNING keys, loot 表名, SpawnPrefab 出边} | hunk→prefab 归属；F4 反向引用；tuning 反查 |
+| `TuningTable` | tuning.lua（后续含 override 分段） | key → 字面量值 | F2 提取时解析数值；FactChange 的 new_literal |
+| `PageSegmenter` | 页面 wikitext | 区域树：RichTab 子页 / 模板骨架(保护) / 参数值 / 章节 / 散文 / 注释 / 分类 | B 层限定匹配；LLM 上下文裁剪 |
 
-- 性能预算：~8000 文件对比应在 60s 内完成（哈希过滤后仅少数文件做行 diff）；diff.json 按 `<from>..<to>/` 缓存，重复扫描直接复用。
+注意：猎犬类页面用 `{{RichTab/信息框}}`在一页内嵌多个变体 infobox——**页面↔prefab 是双向多对多**，分割器必须支持子页结构，每个子页独立绑定 prefab code。
 
-### 4.2 Layer B：影响映射
+#### 4.2.2 事实提取器族（按精度排序，分期落地）
 
-#### 4.2.1 映射规则注册表（静态部分）
+| 族 | 代码锚点 | 页面对应物 | 自动化程度 | 期次 |
+|----|----------|-----------|-----------|------|
+| **F1 掉落表** | `SetSharedLootTable`（规整 `{prefab,chance}`）/`SetLoot`/`SpawnLootPrefab` | infobox `\|掉落=` Pic 串（×数量、（概率%）） | ★★★ 近乎确定性生成 | **M2 首发** |
+| **F2 数值属性** | health/combat/locomotor/perishable setter（见 §2.5 统计） | infobox 覆盖参数 + 正文带数字句子 | ★★☆ 数值可靠，句子定位交给 LLM | M2~M3 |
+| **F3 行为机制** | retargetfn/keeptargetfn/OnDeath 等回调内距离/次数/条件 | "行为"章节机制描述 | ★☆☆ 多数仅提示 | M3 之后 |
+| **F4 反向生成** | 全局 SpawnPrefab/spawner 引用 | `\|生成自=` Pic 列表 | ★☆☆ 依赖全局索引 | M3 之后 |
 
-`impact-rules.toml` 随仓库版本化管理。规则只是**候选生成器**，最终定级由相关性评估决定（§4.2.3）：
+**函数作用域归属**（F1~F3 共同前提）：diff hunk 只有行号，需回答"属于哪个 prefab"。实现：PrefabIndex 记录每个文件的 `local function <fn>(...)` 区间与 `Prefab("x", fnY, ...)` 的绑定关系；hunk 行号 → 所在 fn → prefab。跨文件共享 fn（common_fn 模式，如 hound 的 fncommon）沿调用链向上归并到最终 Prefab 名。
 
-```toml
-[[rule]]
-id = "recipes-tabx"
-when.file = "recipes.lua"
-pipeline = "maintain-dst-recipes"                 # 命中即 Tier1
-targets  = [{ page = "Data:DSTRecipes.tabx", action = "regenerate" }]
-extract.entities = ["recipe_call"]                # 同时提取受影响配方实体
+**TUNING 解析**：提取时把 `TUNING.HOUND_DAMAGE` 解析为具体值（复用 models/recipe/context.rs 的 resolve_tuning 思路）；tuning_override 的分段/条件结构首期不支持，遇到即降级 manual 并记录。
 
-[[rule]]
-id = "po-itemtable"
-when.file = "languages/chinese_s.po"
-when.hunk_ctx = "STRINGS.NAMES."                  # 只有 NAMES 块变化才触发重建
-pipeline = "maintain-item-table"
-targets  = [{ page = "Data:ItemTable.tabx", action = "regenerate" }]
-extract.entities = ["po_msgctxt"]
+#### 4.2.3 FactChange 模型
 
-[[rule]]
-id = "copyclip-tech"
-when.file = "constants.lua"
-when.hunk_ctx = "TECH"
-pipeline = "maintain-copy-clip:tech"
-targets  = [{ page = "模块:Constants/Tech", action = "copyclip" }]
-
-[[rule]]                                          # 泛化规则：任意 prefab 文件
-id = "prefab-file"
-when.file.glob = "prefabs/*.lua"
-extract.entities = ["prefab_def", "component_add", "tuning_ref"]
-targets = [
-  { page = "Data:DST Prefab/{{entity}}.json", action = "notify", owner = "lulu-bot" },
-  { page = "{{entity_cn}}",                   action = "assess" },   # 走相关性定级
-]
-
-[[rule]]
-id = "speech-file"
-when.file.glob = "speech_*.lua"
-extract.entities = ["speech_key"]
-targets = [{ page = "{{char_cn}}", action = "assess" }]
+```rust
+struct FactChange {
+    prefab: String,            // 归属实体
+    kind: FactKind,            // Loot | Stat | Behavior | Backref
+    field: String,             // "combat.damage" / "loot[houndstooth]" / ...
+    old: Option<Literal>,      // None = 新增
+    new: Option<Literal>,      // None = 删除
+    derivation_depth: u8,      // 1=直接 setter；2+=链式推导（只提示）
+    evidence: Vec<EvidenceRef> // file+hunk 定位，报告与 prompt 共用
+}
 ```
 
-字段语义：`when.file`（精确/glob）、`when.hunk_ctx`（hunk 上下文行过滤，避免 po 一变就全量重建）、`pipeline`（Tier1 管线标识）、`extract.entities`（启用的提取器）、`targets[].action ∈ {regenerate, copyclip, assess, notify}`。
+#### 4.2.4 页面匹配与定级
 
-#### 4.2.2 实体提取器
+1. prefab → 标题候选（ItemTable 中文名缓存 + 消歧义变体 + RichTab 子页检测）→ API 批量存在性校验（get_pages_meta）；
+2. 取 wikitext，PageSegmenter 切区，**只在 B 层（参数值+散文）检索**；
+3. `old.literal` 精确回查（数值按格式容差：`0.125`↔`12.5%`、距离单位写法）；
+4. 定级：
 
-核心思路深化：**不做"文件→页面"的静态边表，而从 hunk 提取实体，再解析实体→页面**。静态边表粒度太粗（recipes.lua 一变，几百个物品页全算候选），无法回答"哪些页面的哪句话要改"；实体级才能给出精确证据链。
-
-| 提取器 | 输入 | 方法 | 产出 |
-|--------|------|------|------|
-| `recipe_call` | 含 Recipe/Recipe2 的 ± 行 | 正则 `Recipe2?\(\s*"([a-z0-9_]+)"` + Ingredient 参数扫描（沿用 parser/recipe.rs 的语义约定，但作用于单行/局部） | 配方名、产物、材料表、tech |
-| `prefab_def` | prefabs/*.lua | **新增文件→full_moon 全文件 AST**（可靠）；modified→hunk 行正则 `Prefab\("([a-z0-9_]+)"` | prefab 名、AddComponent 列表、SetPrefabNameOverride |
-| `po_msgctxt` | po hunk 所在块 | 向上回溯到 msgctxt/msgid/msgstr 三元组（复用 PoParser 的块切分逻辑做增量版） | 字符串键（如 STRINGS.NAMES.X）、中英文值 |
-| `tuning_ref` | tuning.lua hunk | `KEY = <literal>,` | TUNING 键 + 新值 |
-| `component_add` | 任意 hunk / components/x.lua 文件名 | `AddComponent("x")`、文件名反推 | 组件名 |
-| `speech_key` | speech_*.lua hunk | 键路径 + 引号文本 | 角色 + 台词键 + 新英文文本 |
-
-原则：hunk 是局部上下文，**默认用正则**；只有整个文件是新增时才值得全文件 AST。每个提取结果都附带 `evidence = {file, hunk_index, line_in_hunk}`。
-
-#### 4.2.3 页面解析与相关性定级
-
-**实体→页面解析链**：
-1. 本地 ItemTable 缓存（首次从 wiki 拉 `Data:ItemTable.tabx` 存 `cache/itemtable.json`，之后随 Tier1 产物自更新）：提供 `prefab → 中文名/英文名`；叠加项目已有的 `output/prefab_overrides.json` 处理 override 名；
-2. 标题候选生成：中文名直连页、常见消歧义变体（`X (DST)` 等）、命名空间模板（`Data:DST Prefab/<prefab>.json`）；
-3. 批量存在性校验：titles≤50/批 + 节流重试，结果写 `cache/page-index.json`；
-4. 解析不出页面的实体 → 进入 `create-check` 清单（新内容或缺索引）。
-
-**相关性评分（针对候选内容页）**：
-1. 取页面 wikitext（走缓存）；
-2. **信号 S1（主信号）——旧值回查**：从 evidence 提取"旧字面量"（被删除行中的数值、英文字符串、材料名），在 wikitext 中查找。命中 ⇒ 强相关（页面确实引用了刚被改掉的值）；
-3. 信号 S2：infobox 手写参数名与新数据字段对应（如 `装备/伤害` ↔ weapon_damage 变更）；
-4. 信号 S3：页面显式依赖变更的模板/模块。
-
-**定级规则**：
-
-| tier | 判定条件 | 动作 |
-|------|----------|------|
-| `auto` | 命中带 pipeline 的规则 | Tier1 确定性管线 |
-| `llm` | S1 命中，且改动类型属于机械可推导集合：数值替换 / 英文原文替换（台词）/ 材料列表增删 / 单句事实陈述 | Tier2 LLM 起草 |
-| `manual` | S1/S2 相关但属评价性、攻略性内容（提示/花絮/平衡讨论） | 仅报告提示，附证据链接 |
-| `notify-only` | 他方维护目标（DST Prefab bot 页、Strings 模块） | 报告核对项，不写 |
-| `create-check` | 新实体无对应内容页 | 新内容清单（含 prefab、中文名、来源文件），供编辑建页参考 |
+| 条件 | tier |
+|------|------|
+| Tier0 规则命中 | auto_handled（触发管线+登记） |
+| F1 命中（B 层找到旧掉落串） | llm（优先：确定性重生成建议，人审即采纳） |
+| F2 命中且 depth=1 | llm（stat-update 模板） |
+| B/F2 命中但 depth≥2 或语义句 | manual（附双方证据链接） |
+| 他方维护目标（Prefab JSON/Strings） | notify-only |
+| 新实体无页面 | create-check 清单 |
 
 ### 4.3 Layer C：修复执行
 
-#### Tier 1：确定性管线（无 LLM）
+与 v1 相同的三层结构（校验器四重门、review bundle、apply 授权分级、basetimestamp 保护均保留），两点调整：
 
-- `maintain-dst-recipes` / `maintain-item-table` / `maintain-copy-clip:<type>` 增加库函数入口与 `--yes` / `--dry-run`（产物落 `artifacts/`）/ `--report-json`；
-- ImpactPlan 中的 auto 项在同一进程内调用处理函数（不是 shell 出 CLI）；
-- 交互式确认改为三态：交互（默认）/ `--yes` / dry-run——这也是审计报告指出的无人值守能力缺口（见 [MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md) §4.4）。
+1. **LLM 任务模板按 FactKind 细化**：`loot-sync`（多数情况退化为确定性模板填充，不经 LLM）、`stat-update`、`text-sync`、`section-note`（manual 类的"建议核查"批注草稿）；
+2. **F1 特权路径**：掉落表新旧结构都规整时，直接由代码生成目标 Pic 串（`{{Pic|32|X}}×N（P%）`），作为"确定性建议"进 review bundle——零幻觉风险，预期占 llm 类的大头。
 
-#### Tier 2：LLM 辅助修改
+其余（Provider 抽象、上下文包预算、成本预估、报告章节）沿用 v1 设计。
 
-**Provider 抽象**：OpenAI 兼容 `/chat/completions`，reqwest 直连（不引 SDK）；配置 `LLM__BASE_URL` / `LLM__API_KEY` / `LLM__MODEL`（进 `.env`，不入库）；temperature=0；超时 + 退避重试；记录每次调用 token 用量到 `applied.jsonl`。
-
-**任务模板**（prompts/*.md 入库版本化，按任务类型分）：
-
-| 任务 | 场景示例（来自 0529.diff） |
-|------|---------------------------|
-| `stat-update` | 数值替换：武器伤害调整后，正文"伤害为 X"及 infobox 手写参数 |
-| `text-sync` | 台词/描述同步：`ANNOUNCE_VAULT_LOBBY_EXIT` 文案变更对应的引用 |
-| `list-sync` | 掉落列表 `{{Pic|32|…}}` 串增删、配方材料行更新 |
-| `section-rewrite` | 少数复杂段落（如机制描述因 actions.lua 行为变化而过时） |
-
-**上下文包组装**（控制预算，单页 ≤~8k tokens）：
-- 与该页面实体相关的 evidence hunks（含实体名的优先，超限截断并注明）；
-- 页面中含旧值的 section（按 `==` 标题切分选取；infobox 整体提供但不允许模型改结构）；
-- 风格约束摘要 + 2 个 few-shot 样例（从历史 review bundle 中挑选同类已采纳案例）。
-
-**输出契约与四重校验**（防幻觉的核心，宁拒勿错）：
-
-```json
-{"edits":[{"find":"伤害为 59.5","replace":"伤害为 62","rationale":"TUNING 更新","evidence":["tuning.lua@L512"]}],
- "not_editable_reason": null}
-```
-
-1. **唯一匹配**：find 必须在当前 wikitext 中恰好命中一次，否则整包拒绝；
-2. **结构守恒**：替换后 `{{ }}`、`[[ ]]` 平衡计数不变；模板名白名单外的模板不得增删；分类与维护模板（如 `{{置顶导航}}`）出现在 find/replace 中则拒绝；
-3. **数值溯源**：stat-update 类的 replace 中的数字必须等于提取器产出的新值（不允许模型自行推算）；
-4. **尺寸限制**：单页 edits ≤ N 条、单条 replace 长度上限，超出降级为 manual。
-
-**人审与应用**：
-- 产出 `review/<页面>.md`：原 wikitext、建议 diff、证据、rationale、校验结果；
-- 应用授权分级：`--apply none`（默认，只出 bundle）→ `--apply llm-auto`（仅应用通过全部校验且属 stat/text 单点替换的）→ `--apply llm-all`（交互逐条确认）→ 人工修订 bundle 后 `--apply bundle:<path>`；
-- 编辑参数：summary 固定前缀 `游戏更新同步(<build>)：<规则id>`；minor=true；携带 `basetimestamp` 做编辑冲突保护（当前 client 缺失，见前置改造）；失败页记入重试队列。
-
-**成本预估**：平衡补丁约 10~40 页 × ~3k tokens ≈ 十万级 tokens/次；Rifts 级大版本 200+ 页，靠 state.json 断点续跑分批消化。
-
-#### Tier 3：报告
-
-`report.md` 固定章节：概览统计（各 tier 数量、diff 规模）/ Tier1 执行结果 / LLM 待审清单（按置信度排序）/ manual 清单 / 新内容 checklist / 他方维护核对项 / API 异常与重试记录。同时产出机器可读 `impact.json`（供 CI 或后续工具消费）。
-
-### 4.4 CLI 设计
+### 4.4 CLI（不变）
 
 ```
-update-scan [--from <build>] [--to <build>] [--full]   # Layer A+B；默认最新 vs 上一已知版本；纯只读(wiki 仅缓存拉取)，产出 impact.json + report.md
-update-fix  [--plan <path>] [--only-tier auto|llm|manual]
-            [--apply none|llm-auto|llm-all] [--yes]     # Layer C
-snapshot import <dir>                                   # 导入 databundles 历史/未来手工快照
-update-report <pair-dir>                                # 重渲染报告
+update-scan [--from] [--to] [--full]   # A+B → impact.json + report.md（只读）
+update-fix  [--plan] [--only-tier] [--apply none|llm-auto|llm-all] [--yes]
+snapshot import <dir>
+update-report <pair-dir>
 ```
 
-环境变量新增：`LLM__BASE_URL / LLM__API_KEY / LLM__MODEL`、可选 `WIKI__QPS`（默认 1）。
-
-### 4.5 模块布局
+### 4.5 模块布局（v2 调整）
 
 ```
 src/update/
-├── mod.rs          # 编排与状态机
-├── snapshot.rs     # 更新检测 / 解压 / 导入
-├── diffdata.rs     # FileDiff/Hunk 类型 + 序列化 + similar 封装
-├── rules.rs        # impact-rules.toml 加载与匹配
-├── extract.rs      # 六个实体提取器
-├── pageresolve.rs  # prefab→标题候选→存在性校验→索引缓存
-├── assess.rs       # 相关性评分与定级 → ImpactPlan
-├── execute/
-│   ├── pipeline.rs # Tier1 调度（调 maintain-* 库函数）
-│   ├── llm.rs      # provider + prompt 组装（不依赖 wiki，纯文本进出，便于离线测试）
-│   ├── validate.rs # edits 四重校验器
-│   └── apply.rs    # 统一应用通道（节流/basetimestamp/审计）
-└── report.rs       # md/json 渲染
+├── mod.rs / snapshot.rs / diffdata.rs / rules.rs     # 与 v1 一致
+├── index/
+│   ├── prefab_index.rs    # AST 扫描：fn 区间/TUNING 引用/loot 表/SpawnPrefab 出边
+│   └── tuning_table.rs    # key→值（复用 resolve_tuning 思路）
+├── segment.rs             # PageSegmenter：RichTab/模板骨架/参数值/章节/散文
+├── facts/
+│   ├── mod.rs             # FactChange/FactKind 模型
+│   ├── loot.rs            # F1（首发）
+│   ├── stats.rs           # F2
+│   ├── behavior.rs        # F3
+│   └── backref.rs         # F4
+├── matchmod.rs            # FactChange×页面 B 层回查与定级
+├── pageresolve.rs / assess.rs / execute/ / report.rs   # 与 v1 一致
 ```
 
-依赖方向：`update → {parser, copyclip, wiki, mapping, models}`，禁止反向；`commands/update.rs` 仅做 CLI 参数到 update 库的转接，**不要重蹈 commands/maintain.rs 743 行单体的覆辙**（见审计报告 §5）。
+依赖方向不变：update → {parser, copyclip, wiki, mapping, models}。
 
-### 4.6 前置改造（硬阻塞项）
+### 4.6 前置改造（✅ 已完成，2026-08）
 
-| # | 改造 | 原因 | 位置 |
-|---|------|------|------|
-| 1 | WikiClient 全局节流（默认 1 QPS，可配）+ 403/429/5xx 指数退避重试 | 实测 WAF 间歇 403（§2.4）；批量场景必挂 | wiki/client.rs |
-| 2 | `get_pages_batch(titles≤50)` 与 `page_exists()` | 影响扫描需批量校验几十~几百个标题 | wiki/client.rs |
-| 3 | edit 携带 `basetimestamp`（可选 `assert=user`） | 当前无冲突检测，自动编辑可能覆盖人工并发修改 | wiki/client.rs do_edit |
-| 4 | Error 细分：从 `WikiApi(String)` 拆出 `RateLimited` / `PageNotFound` / `AuthExpired` | 自动化流程需要按错误类别分支决策 | error.rs |
-| 5 | maintain-* 处理函数抽为库函数（CLI 与逻辑分离） | Tier1 进程内调度 + 补测试 | commands/maintain.rs → 相应库模块 |
-| 6 | `prompt_confirm` 非交互模式（全局 `--yes/--dry-run`） | 批处理会在 stdin 卡死 | commands/maintain.rs |
+审计报告 §6 所列 P0/P1/P2 已全部落地并随 `7cfbafb` 入库：节流重试、basetimestamp/assert、错误细分、get_pages_meta/page_exists/list_all_pages、WriteMode/--yes/--dry-run/--report-json、凭据收敛、run_id 日志 span。217 测试通过，真实 API 冒烟通过。
 
 ### 4.7 测试策略
 
-- **金标准端到端 fixture**：`scripts_202604271353` vs `scripts_202605291134`（对应人工 0529.diff，302 文件）——Layer A 输出的文件清单可与 0529.diff 逐文件比对；后续每次真实更新滚动补充；
-- 单测：diffdata 序列化稳定性（golden file）；六个提取器各配样例 hunk（正例+漏提+误提用例）；validate.rs 拒绝路径全覆盖（多义 find、模板不平衡、数值不溯源、触碰保护内容）；
-- LLM 测试：录制/回放（provider 响应存 fixture），CI 不打真 API；
-- wiki client 测试沿用现有约定（`.env` 缺失则 skip）。
+- 金标准 e2e：0427→0529 快照对（对应人工 0529.diff）；
+- **猎犬案例固定为 F1/F2 回归 fixture**：断言能从 hound.lua 提取 8 个变体的 loot/health/damage 事实、正确归属函数作用域、`HOUND_TARGET_DIST` 变更时命中文页"20 单位"句子；
+- 提取器正/漏/误例集；segmenter 对 RichTab/嵌套模板/HTML 注释的结构化断言；
+- validate.rs 拒绝路径全覆盖；LLM 录制/回放，CI 不打真 API。
 
-### 4.8 实施里程碑
+### 4.8 里程碑（v2 重排）
 
-| 阶段 | 内容 | 预估 | 出口条件 |
-|------|------|------|----------|
-| M0 前置加固 | §4.6 六项 | 1~2 天 | 对 wiki 连续 200 次请求 0 失败；模拟冲突下 edit 正确报 editconflict |
-| M1 A+B 最小闭环 | snapshot/diff/rules/report（纯确定性） | 3~5 天 | 用 0427→0529 fixture 重放出 0529.diff 同等文件清单；report.md 可读可用 |
-| M2 定级完善 | pageresolve + assess + create-check | 2~4 天 | 对 0529 更新产出分级清单，人工抽查 30 条准确率 ≥85% |
-| M3 LLM 子系统 | provider/prompts/validate/review/apply | 3~5 天 | fixture 回放测试全绿；bundle 评审流程走通 |
-| M4 实战演练 | 随下次真实更新运行 | — | 见 §1.2 验收标准 |
+| 阶段 | 内容 | 出口条件 |
+|------|------|----------|
+| M1 A+Tier0 | snapshot/diff/rules + 静态管线调度与核对报告 | 重放出 0529 文件清单；报告可用 |
+| M2 F1 MVP | PrefabIndex(loot 部分)+TuningTable+loot.rs+segmenter(RichTab)+匹配+确定性建议 | 猎犬 fixture 全绿；对 0427→0529 中掉落相关变更的建议采纳率 ≥80% |
+| M3 F2 | stats.rs+stat-update LLM 模板+apply 流程实战 | stat 替换零事故；人审工作量明显低于纯人工基线 |
+| M4 F3/F4+打磨 | behavior/backref、create-check、缓存与断点续跑 | 覆盖下次真实大版本 |
 
-### 4.9 风险与对策
+### 4.9 风险与对策（v2 增补）
 
 | 风险 | 对策 |
 |------|------|
-| WAF 限流导致批量中断 | M0 节流+退避；低峰运行；断点续跑；异常页入报告重试队列 |
-| LLM 幻觉/误改 | 输出契约 + 四重校验 + 默认人审 + llm-auto 白名单极窄 + newrevid 记录可秒回退 |
-| 页面命名/消歧义长尾（中文名≠页面名） | 标题候选 + page-index 缓存逐步积累；解析失败的进 manual 清单人工归类 |
-| 大版本 diff 过大 | 先让 Tier1 消化大头（tabx/常量模块），LLM 只处理内容页；分批续跑 |
-| 与他方 bot 写冲突 | notify-only 不碰其页面；报告给出"请核对"建议 |
-| PO 文件巨大（43 万行） | hunk 所属块的增量解析；ItemTable 全量重建仍可行（现有管线已是全量模式，188KB tabx 可承受） |
+| 组件默认值变更（diff 在 components/ 而非 prefabs/）影响面难归属 | 首期仅当 PrefabIndex 显示该组件被目标 prefab 直接配置时才关联；否则 manual+提示 |
+| 多跳推导事实（如野狗仇恨 100 来自袭击系统） | derivation_depth≥2 一律 manual，绝不代改 |
+| 一页多实体/RichTab/消歧义命名长尾 | segmenter 子页绑定 + page-index 缓存积累 + 解析失败进 manual |
+| LLM 幻觉 | F1 确定性特权路径绕开 LLM；输出契约+四重校验+人审兜底 |
+| PO/tabx 巨大体量 | 静态管线已有全量重建能力，Tier0 只做调度 |
+| WAF 限流 | 已落地节流重试；夜间低峰 + 断点续跑 |
 
 ---
 
-## 5. 开放问题（待确认）
+## 5. 开放问题
 
-1. `模块:DST Strings CN/EN` 系列的实际维护者与生成方式？若是 bot 从 po 生成，是否可协调纳入 notify 清单或拿到生成脚本？
-2. 是否认识/联系得上鲁鲁bot 维护者，建立 `Data:DST Prefab/*` 更新的通报渠道？
-3. 内容页消歧义命名的社区惯例全集（除 `(DST)` 后缀外还有哪些模式）？
-4. LLM 选型与预算额度（影响 llm-auto 白名单宽严与并发度）；是否优先接本地模型以满足"凭证不出本机"偏好？
-5. 报告除了落仓库 markdown，是否需要同时投递到 wiki 用户页（如 `用户:<bot>/更新速报`）供其他编辑订阅？
-6. 旧版快照清理策略：snapshots 占盘 268MB/份，保留最近 N 份还是全部？
+1. `模块:DST Strings CN/EN` 与 `Data:DST Prefab/*` 的维护者协调渠道？（notify-only 的核对阈值如何定）
+2. F2 的正文数值句定位：先只做 infobox 覆盖参数（结构化、低风险），散文句是否纳入 M3？
+3. TuningTable 是否需要处理 tuning_override.lua 的世界选项分段？（涉及"不同世界设置下数值不同"的页面表达）
+4. 生物类之外（物品/植物/建筑）的页面结构差异有多大？是否需要 per-category segmenter 配置？
+5. LLM 选型与预算额度；F1 确定性路径普及后，llm 类余量是否足够覆盖 F2？
+6. 报告除落仓库外是否投递 wiki 用户页供编辑订阅？

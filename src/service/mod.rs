@@ -454,7 +454,7 @@ async fn run_update_scan(
             .map(|s| s.as_str())
             .collect();
         files.sort();
-        let mut chosen: Vec<&str> = files.iter().copied().take(50).collect();
+        let mut chosen: Vec<&str> = files.clone();
         if !chosen.contains(&"prefabs/hound.lua") {
             chosen.insert(0, "prefabs/hound.lua");
         }

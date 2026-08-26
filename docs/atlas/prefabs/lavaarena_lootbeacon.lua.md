@@ -1,7 +1,7 @@
 # `prefabs/lavaarena_lootbeacon.lua`
 
 - 扫描角色：prefabs/lavaarena_lootbeacon.lua
-- 归属变体（3 个）：lavaarena_lootbeacon, lavaarena_lootbeacon, lavaarena_lootbeacon
+- 归属变体（1 个）：lavaarena_lootbeacon
 
 ## 函数
 

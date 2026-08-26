@@ -1,6 +1,13 @@
 # `prefabs/offering_pot.lua`
 
 - 扫描角色：prefabs/offering_pot.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 383）
+- `kelp`：?（Direct；line 383）
+- `offering_pot_upgraded`：?（Direct；line 383）
+
 
 ## 函数
 

@@ -1,6 +1,11 @@
 # `prefabs/reeds.lua`
 
 - 扫描角色：prefabs/reeds.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/cutreeds.lua`：?（Direct；line 82）
+
 
 ## 函数
 

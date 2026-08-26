@@ -1,7 +1,19 @@
 # `prefabs/quagmire_swampigelder.lua`
 
 - 扫描角色：prefabs/quagmire_swampigelder.lua
-- 归属变体（4 个）：quagmire_swampigelder, quagmire_swampigelder, quagmire_swampigelder, quagmire_swampigelder
+- 归属变体（1 个）：quagmire_swampigelder
+## 关联
+
+### 组件
+- `components/talker.lua`：quagmire_swampigelder（Direct；line 39）
+
+### 预制体依赖
+- `prefabs/axe.lua`：quagmire_swampigelder（Direct；line 58）
+- `prefabs/fertilizer.lua`：quagmire_swampigelder（Direct；line 58）
+- `prefabs/quagmire_hoe.lua`：quagmire_swampigelder（Direct；line 58）
+- `prefabs/quagmire_key.lua`：quagmire_swampigelder（Direct；line 58）
+- `prefabs/shovel.lua`：quagmire_swampigelder（Direct；line 58）
+
 
 ## 函数
 

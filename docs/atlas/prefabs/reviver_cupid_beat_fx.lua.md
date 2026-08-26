@@ -1,7 +1,7 @@
 # `prefabs/reviver_cupid_beat_fx.lua`
 
 - 扫描角色：prefabs/reviver_cupid_beat_fx.lua
-- 归属变体（8 个）：reviver_cupid_beat_fx, reviver_cupid_glow_fx, reviver_cupid_beat_fx, reviver_cupid_beat_fx, reviver_cupid_beat_fx, reviver_cupid_beat_fx, reviver_cupid_beat_fx, reviver_cupid_glow_fx
+- 归属变体（2 个）：reviver_cupid_beat_fx, reviver_cupid_glow_fx
 
 ## 函数
 
@@ -15,7 +15,7 @@
 - 归属：reviver_cupid_beat_fx
 
 ### OnGlowFXReplicated  [118–125]
-- 归属：（未归属）
+- 归属：reviver_cupid_glow_fx
 
 ### fn  [95–114]
 - 归属：reviver_cupid_beat_fx

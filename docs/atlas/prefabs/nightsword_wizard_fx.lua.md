@@ -1,7 +1,7 @@
 # `prefabs/nightsword_wizard_fx.lua`
 
 - 扫描角色：prefabs/nightsword_wizard_fx.lua
-- 归属变体（9 个）：nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx, nightsword_wizard_fx
+- 归属变体（1 个）：nightsword_wizard_fx
 
 ## 函数
 

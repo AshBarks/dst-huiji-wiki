@@ -1,7 +1,7 @@
 # `prefabs/quagmire_book_fertilizer.lua`
 
 - 扫描角色：prefabs/quagmire_book_fertilizer.lua
-- 归属变体（3 个）：quagmire_book_fertilizer, quagmire_book_fertilizer, quagmire_book_fertilizer
+- 归属变体（1 个）：quagmire_book_fertilizer
 
 ## 函数
 

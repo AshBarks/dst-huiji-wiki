@@ -1,18 +1,18 @@
 # `prefabs/atrium_fence.lua`
 
 - 扫描角色：prefabs/atrium_fence.lua
-- 归属变体（9 个）：atrium_fence, atrium_fence, atrium_fence, atrium_fence, atrium_fence, atrium_fence, atrium_fence, atrium_fence, atrium_fence
+- 归属变体（1 个）：atrium_fence
 
 ## 函数
 
 ### OnLoad  [94–98]
-- 归属：（未归属）
+- 归属：atrium_fence
 
 ### OnPoweredFn  [78–88]
 - 归属：atrium_fence
 
 ### OnSave  [90–92]
-- 归属：（未归属）
+- 归属：atrium_fence
 
 ### fn  [100–135]
 - 归属：atrium_fence
@@ -24,7 +24,7 @@
 - 归属：atrium_fence
 
 ### setclosedphysics  [11–19]
-- 归属：（未归属）
+- 归属：atrium_fence
 
 ### setopened  [56–65]
 - 归属：atrium_fence
@@ -33,8 +33,8 @@
 - 归属：atrium_fence
 
 ### transitionclosed  [29–35]
-- 归属：（未归属）
+- 归属：atrium_fence
 
 ### transitionopened  [37–43]
-- 归属：（未归属）
+- 归属：atrium_fence
 

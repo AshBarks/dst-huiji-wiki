@@ -660,6 +660,37 @@ return Prefab("hound", fndefault, {}, {}),
     }
 
     #[test]
+    fn fn_owners_propagate_through_callbacks_and_assignments() {
+        const SRC: &str = r#"
+local function OnAttacked(inst) end
+local function OnSave(inst, data) end
+
+local function fncommon(inst)
+    inst:ListenForEvent("attacked", OnAttacked)
+    inst.OnSave = OnSave
+    return inst
+end
+
+local function fndefault()
+    return fncommon(inst)
+end
+
+return Prefab("hound", fndefault, {}, {})
+"#;
+        let files: Vec<(String, String)> = vec![("prefabs/hound.lua".into(), SRC.into())];
+        let artifact = build_from_sources(&files).unwrap();
+        let owners = &artifact.fn_owners["prefabs/hound.lua"];
+        assert_eq!(
+            owners.get("OnAttacked").map(Vec::as_slice),
+            Some(&["hound".to_string()][..])
+        );
+        assert_eq!(
+            owners.get("OnSave").map(Vec::as_slice),
+            Some(&["hound".to_string()][..])
+        );
+    }
+
+    #[test]
     fn parse_failure_is_recorded_not_fatal() {
         let files = vec![
             ("prefabs/broken.lua".to_string(), "local x = ".to_string()),

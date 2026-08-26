@@ -1,6 +1,24 @@
 # `prefabs/tree_rocks.lua`
 
 - 扫描角色：prefabs/tree_rocks.lua
+## 关联
+
+### 预制体依赖
+- `-- NOTES(JBK): Keep the above loot items in sync with shadow_heart_vein. [SHLTLP]
+    "rock_break_fx"`：?（Direct；line 796）
+- `--halloween
+	"spooked_spider_rock_fx"`：?（Direct；line 796）
+- `collapse_small`：?（Direct；line 796）
+- `prefabs/flint.lua`：?（Direct；line 796）
+- `prefabs/goldnugget.lua`：?（Direct；line 796）
+- `prefabs/moonglass.lua`：?（Direct；line 796）
+- `prefabs/moonrocknugget.lua`：?（Direct；line 796）
+- `prefabs/nitre.lua`：?（Direct；line 796）
+- `prefabs/rocks.lua`：?（Direct；line 796）
+- `prefabs/tree_rock_seed.lua`：?（Direct；line 796）
+- `tree_rock_chop`：?（Direct；line 796）
+- `tree_rock_fall`：?（Direct；line 796）
+
 
 ## 函数
 

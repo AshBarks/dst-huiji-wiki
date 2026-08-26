@@ -1,12 +1,18 @@
 # `prefabs/grotto_waterfall_small.lua`
 
 - 扫描角色：prefabs/grotto_waterfall_small.lua
-- 归属变体（4 个）：grotto_waterfall_small1, grotto_waterfall_small2, grotto_waterfall_small1, grotto_waterfall_small2
+- 归属变体（2 个）：grotto_waterfall_small1, grotto_waterfall_small2
+## 关联
+
+### 组件
+- `components/lootdropper.lua`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 112,160）
+- `components/workable.lua`：grotto_waterfall_small1, grotto_waterfall_small2（Direct；line 105,153）
+
 
 ## 函数
 
 ### OnCaveFullMoon  [31–37]
-- 归属：（未归属）
+- 归属：grotto_waterfall_small1, grotto_waterfall_small2
 
 ### falls1  [74–118]
 - 归属：grotto_waterfall_small1
@@ -15,14 +21,14 @@
 - 归属：grotto_waterfall_small2
 
 ### on_mined  [50–66]
-- 归属：（未归属）
+- 归属：grotto_waterfall_small1, grotto_waterfall_small2
 
 ### set_full  [17–29]
-- 归属：（未归属）
+- 归属：grotto_waterfall_small1, grotto_waterfall_small2
 
 ### set_fully_mined  [39–48]
-- 归属：（未归属）
+- 归属：grotto_waterfall_small1, grotto_waterfall_small2
 
 ### workableload  [68–72]
-- 归属：（未归属）
+- 归属：grotto_waterfall_small1, grotto_waterfall_small2
 

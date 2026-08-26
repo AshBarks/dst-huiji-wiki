@@ -1,7 +1,16 @@
 # `prefabs/fireball_projectile.lua`
 
 - 扫描角色：prefabs/fireball_projectile.lua
-- 归属变体（9 个）：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx, blossom_hit_fx, blossom_hit_fx, fireball_hit_fx, gooball_hit_fx, fireball_hit_fx, gooball_hit_fx
+- 归属变体（3 个）：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx
+## 关联
+
+### 组件
+- `components/combat.lua`：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx（HelperExpanded；line 223,224,225）
+- `components/complexprojectile.lua`：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx（HelperExpanded；line 223,224,225）
+- `components/entitytracker.lua`：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx（HelperExpanded；line 223,224,225）
+- `components/locomotor.lua`：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx（HelperExpanded；line 223,224,225）
+- `components/updatelooper.lua`：blossom_hit_fx, fireball_hit_fx, gooball_hit_fx（HelperExpanded；line 223,224,225）
+
 
 ## 函数
 

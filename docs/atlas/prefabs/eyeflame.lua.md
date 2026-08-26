@@ -1,7 +1,7 @@
 # `prefabs/eyeflame.lua`
 
 - 扫描角色：prefabs/eyeflame.lua
-- 归属变体（9 个）：eyeflame, eyeflame, eyeflame, eyeflame, eyeflame, eyeflame, eyeflame, eyeflame, eyeflame
+- 归属变体（1 个）：eyeflame
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/quagmire_oldstructures.lua`
 
 - 扫描角色：prefabs/quagmire_oldstructures.lua
-- 归属变体（2 个）：quagmire_old_rubble, quagmire_old_rubble
+- 归属变体（1 个）：quagmire_old_rubble
 
 ## 函数
 

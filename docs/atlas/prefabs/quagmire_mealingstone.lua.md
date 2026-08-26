@@ -1,7 +1,12 @@
 # `prefabs/quagmire_mealingstone.lua`
 
 - 扫描角色：prefabs/quagmire_mealingstone.lua
-- 归属变体（3 个）：quagmire_mealingstone, quagmire_mealingstone, quagmire_mealingstone
+- 归属变体（1 个）：quagmire_mealingstone
+## 关联
+
+### 预制体依赖
+- `collapse_small`：quagmire_mealingstone（Direct；line 60）
+
 
 ## 函数
 

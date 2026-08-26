@@ -1,6 +1,11 @@
 # `prefabs/dumbbells.lua`
 
 - 扫描角色：prefabs/dumbbells.lua
+## 关联
+
+### 预制体依赖
+- `houndfire`：?（Direct；line 607）
+
 
 ## 函数
 

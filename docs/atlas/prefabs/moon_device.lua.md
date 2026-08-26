@@ -1,6 +1,25 @@
 # `prefabs/moon_device.lua`
 
 - 扫描角色：prefabs/moon_device.lua
+## 关联
+
+### 预制体依赖
+- `alterguardian_phase1fallfx`：?（Direct；line 508）
+- `construction_container`：?（Direct；line 508）
+- `moon_altar_claw_break`：?（Direct；line 508）
+- `moon_altar_crown_break`：?（Direct；line 508）
+- `moon_altar_link_contained`：?（Direct；line 508）
+- `moon_device_break_stage1`：?（Direct；line 508）
+- `moon_device_break_stage2`：?（Direct；line 508）
+- `moon_device_break_stage3`：?（Direct；line 508）
+- `moon_device_meteor_spawner`：?（Direct；line 508）
+- `moon_device_pillar`：?（Direct；line 508）
+- `moon_device_top`：?（Direct；line 508）
+- `moon_geyser_explode`：?（Direct；line 508）
+- `prefabs/alterguardian_phase1.lua`：?（Direct；line 508）
+- `prefabs/burntground.lua`：?（Direct；line 508）
+- `prefabs/moon_altar_break.lua`：?（Direct；line 508）
+
 
 ## 函数
 

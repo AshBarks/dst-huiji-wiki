@@ -1,7 +1,12 @@
 # `prefabs/globalmapicon.lua`
 
 - 扫描角色：prefabs/globalmapicon.lua
-- 归属变体（21 个）：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog, globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog, globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog, globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog, globalmapiconnamed, globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog
+- 归属变体（4 个）：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog
+## 关联
+
+### 组件
+- `components/updatelooper.lua`：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog（Direct；line 26）
+
 
 ## 函数
 
@@ -9,10 +14,10 @@
 - 归属：（未归属）
 
 ### TrackEntity  [10–30]
-- 归属：（未归属）
+- 归属：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog
 
 ### UpdatePosition  [1–8]
-- 归属：（未归属）
+- 归属：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog
 
 ### common_fn  [32–48]
 - 归属：globalmapicon, globalmapiconnamed, globalmapiconseeable, globalmapiconunderfog

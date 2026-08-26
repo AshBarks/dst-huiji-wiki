@@ -1,18 +1,18 @@
 # `prefabs/staff_castinglight.lua`
 
 - 扫描角色：prefabs/staff_castinglight.lua
-- 归属变体（8 个）：staff_castinglight, staff_castinglight_small, staff_castinglight, staff_castinglight_small, staff_castinglight, staff_castinglight, staff_castinglight_small, staff_castinglight_small
+- 归属变体（2 个）：staff_castinglight, staff_castinglight_small
 
 ## 函数
 
 ### OnSetUpDirty  [26–29]
-- 归属：（未归属）
+- 归属：staff_castinglight, staff_castinglight_small
 
 ### OnUpdate  [1–24]
-- 归属：（未归属）
+- 归属：staff_castinglight, staff_castinglight_small
 
 ### SetUp  [31–36]
-- 归属：（未归属）
+- 归属：staff_castinglight, staff_castinglight_small
 
 ### common_fn  [38–68]
 - 归属：staff_castinglight, staff_castinglight_small

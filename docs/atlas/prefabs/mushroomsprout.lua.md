@@ -1,6 +1,11 @@
 # `prefabs/mushroomsprout.lua`
 
 - 扫描角色：prefabs/mushroomsprout.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/sporecloud.lua`：?（Direct；line 350）
+
 
 ## 函数
 

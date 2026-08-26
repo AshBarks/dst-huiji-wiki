@@ -1,7 +1,12 @@
 # `prefabs/merm_fx.lua`
 
 - 扫描角色：prefabs/merm_fx.lua
-- 归属变体（2 个）：merm_soil_marker, merm_soil_marker
+- 归属变体（1 个）：merm_soil_marker
+## 关联
+
+### 组件
+- `components/updatelooper.lua`：merm_soil_marker（HelperExpanded；line 145）
+
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/reticule.lua`
 
 - 扫描角色：prefabs/reticule.lua
-- 归属变体（2 个）：reticule, reticule
+- 归属变体（1 个）：reticule
 
 ## 函数
 

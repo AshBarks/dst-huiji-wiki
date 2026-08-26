@@ -1,7 +1,15 @@
 # `prefabs/grassgekkoherd.lua`
 
 - 扫描角色：prefabs/grassgekkoherd.lua
-- 归属变体（2 个）：grassgekkoherd, grassgekkoherd
+- 归属变体（1 个）：grassgekkoherd
+## 关联
+
+### 组件
+- `components/herd.lua`：grassgekkoherd（Direct；line 27）
+
+### 预制体依赖
+- `prefabs/grassgekko.lua`：grassgekkoherd（Direct；line 47）
+
 
 ## 函数
 

@@ -1,18 +1,23 @@
 # `prefabs/spider_buffs.lua`
 
 - 扫描角色：prefabs/spider_buffs.lua
-- 归属变体（6 个）：bedazzle_buff, spider_summoned_buff, spider_whistle_buff, bedazzle_buff, spider_summoned_buff, spider_whistle_buff
+- 归属变体（3 个）：bedazzle_buff, spider_summoned_buff, spider_whistle_buff
+## 关联
+
+### 组件
+- `components/debuff.lua`：bedazzle_buff, spider_summoned_buff, spider_whistle_buff（Direct；line 65,113,148）
+
 
 ## 函数
 
 ### OnAttached  [13–15]
-- 归属：（未归属）
+- 归属：bedazzle_buff, spider_summoned_buff, spider_whistle_buff
 
 ### OnDetached  [17–28]
-- 归属：（未归属）
+- 归属：bedazzle_buff, spider_summoned_buff, spider_whistle_buff
 
 ### OnExtended  [1–11]
-- 归属：（未归属）
+- 归属：bedazzle_buff, spider_summoned_buff, spider_whistle_buff
 
 ### bedazzle_fn  [73–119]
 - 归属：bedazzle_buff

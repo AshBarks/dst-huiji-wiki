@@ -1,6 +1,13 @@
 # `prefabs/farm_plants.lua`
 
 - 扫描角色：prefabs/farm_plants.lua
+## 关联
+
+### 预制体依赖
+- `farm_plant_happy`：?（Direct；line 926）
+- `farm_plant_unhappy`：?（Direct；line 926）
+- `spoiled_food`：?（Direct；line 926）
+
 
 ## 函数
 

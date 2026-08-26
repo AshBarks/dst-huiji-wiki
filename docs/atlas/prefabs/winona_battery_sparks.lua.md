@@ -1,7 +1,7 @@
 # `prefabs/winona_battery_sparks.lua`
 
 - 扫描角色：prefabs/winona_battery_sparks.lua
-- 归属变体（3 个）：winona_battery_sparks, winona_battery_sparks, winona_battery_sparks
+- 归属变体（1 个）：winona_battery_sparks
 
 ## 函数
 

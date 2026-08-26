@@ -1,6 +1,13 @@
 # `prefabs/eel.lua`
 
 - 扫描角色：prefabs/eel.lua
+## 关联
+
+### 预制体依赖
+- `eel_cooked`：?（Direct；line 141）
+- `fishmeat_small_dried`：?（Direct；line 141）
+- `spoiled_fish`：?（Direct；line 141）
+
 
 ## 函数
 

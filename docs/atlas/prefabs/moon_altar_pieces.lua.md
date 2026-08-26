@@ -1,6 +1,14 @@
 # `prefabs/moon_altar_pieces.lua`
 
 - 扫描角色：prefabs/moon_altar_pieces.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 197）
+- `prefabs/rock_break_fx.lua`：?（Direct；line 197）
+- `prefabs/underwater_salvageable.lua`：?（Direct；line 96）
+- `splash_green`：?（Direct；line 96）
+
 
 ## 函数
 

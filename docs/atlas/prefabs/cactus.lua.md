@@ -1,7 +1,26 @@
 # `prefabs/cactus.lua`
 
 - 扫描角色：prefabs/cactus.lua
-- 归属变体（2 个）：cactus_flower, cactus_flower
+- 归属变体（1 个）：cactus_flower
+## 关联
+
+### 组件
+- `components/burnable.lua`：cactus_flower（HelperExpanded；line 169）
+- `components/edible.lua`：cactus_flower（Direct；line 153）
+- `components/floater.lua`：cactus_flower（HelperExpanded；line 142）
+- `components/hauntable.lua`：cactus_flower（HelperExpanded；line 172）
+- `components/inspectable.lua`：cactus_flower（Direct/HelperExpanded；line 150,177,178）
+- `components/inventoryitem.lua`：cactus_flower（Direct；line 151）
+- `components/perishable.lua`：cactus_flower（Direct；line 159）
+- `components/pickable.lua`：cactus_flower（HelperExpanded；line 177,178）
+- `components/propagator.lua`：cactus_flower（HelperExpanded；line 170）
+- `components/stackable.lua`：cactus_flower（Direct；line 164）
+- `components/tradable.lua`：cactus_flower（Direct；line 167）
+
+### 预制体依赖
+- `cactus_flower`：?（Direct；line 126）
+- `cactus_meat`：?（Direct；line 126）
+
 
 ## 函数
 

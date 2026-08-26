@@ -1,6 +1,12 @@
 # `prefabs/quagmire_plantables.lua`
 
 - 扫描角色：prefabs/quagmire_plantables.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/quagmire_burnt_ingredients.lua`：?（Direct；line 194,349,402）
+- `spoiled_food`：?（Direct；line 194,349,402）
+
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/smoke_plant.lua`
 
 - 扫描角色：prefabs/smoke_plant.lua
-- 归属变体（2 个）：smoke_plant, smoke_plant
+- 归属变体（1 个）：smoke_plant
 
 ## 函数
 

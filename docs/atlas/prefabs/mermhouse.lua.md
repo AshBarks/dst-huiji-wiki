@@ -1,6 +1,16 @@
 # `prefabs/mermhouse.lua`
 
 - 扫描角色：prefabs/mermhouse.lua
+## 关联
+
+### 预制体依赖
+- `--loot:
+    "boards"`：?（Direct；line 279）
+- `collapse_big`：?（Direct；line 279）
+- `prefabs/merm.lua`：?（Direct；line 279）
+- `prefabs/pondfish.lua`：?（Direct；line 279）
+- `prefabs/rocks.lua`：?（Direct；line 279）
+
 
 ## 函数
 

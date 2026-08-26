@@ -12,7 +12,8 @@ use full_moon::ast;
 use full_moon::node::Node;
 
 use super::symbols::{
-    ArgExpr, AssocCall, CallKind, ConstVal, ExportedCtor, FileKey, FileScan, FnDef, PrefabReg, Role,
+    ArgExpr, AssocCall, CallKind, ConstVal, ExportedCtor, FileKey, FileScan, FnDef, FnRefUse,
+    PrefabReg, Role,
 };
 
 /// Extracts the plain text of a string literal expression (quotes stripped).
@@ -568,6 +569,16 @@ impl<'s> Scanner<'s> {
             ast::Expression::UnaryOperator { expression, .. } => self.scan_expr(expression),
             ast::Expression::Parentheses { expression, .. } => self.scan_expr(expression),
             ast::Expression::TableConstructor(table) => self.walk_table(table),
+            ast::Expression::Var(ast::Var::Name(name)) => {
+                let name = name.token().to_string();
+                if self.out.fn_def(&name).is_some() {
+                    self.out.fn_refs.push(FnRefUse {
+                        name,
+                        scope: self.scope.clone(),
+                        line: self.line(expr),
+                    });
+                }
+            }
             ast::Expression::Var(ast::Var::Expression(vex)) => self.scan_var_expression(vex),
             _ => {}
         }

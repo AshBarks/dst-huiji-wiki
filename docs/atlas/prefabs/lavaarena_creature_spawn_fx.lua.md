@@ -1,6 +1,13 @@
 # `prefabs/lavaarena_creature_spawn_fx.lua`
 
 - 扫描角色：prefabs/lavaarena_creature_spawn_fx.lua
+## 关联
+
+### 预制体依赖
+- `lavaarena_creature_teleport_smoke_fx_1`：?（Direct；line 108）
+- `lavaarena_creature_teleport_smoke_fx_2`：?（Direct；line 108）
+- `lavaarena_creature_teleport_smoke_fx_3`：?（Direct；line 108）
+
 
 ## 函数
 

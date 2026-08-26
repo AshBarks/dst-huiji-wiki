@@ -1,7 +1,7 @@
 # `prefabs/ice_puddle.lua`
 
 - 扫描角色：prefabs/ice_puddle.lua
-- 归属变体（2 个）：ice_puddle, ice_puddle
+- 归属变体（1 个）：ice_puddle
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/lunar_goop_cloud_fx.lua`
 
 - 扫描角色：prefabs/lunar_goop_cloud_fx.lua
-- 归属变体（9 个）：lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx, lunar_goop_cloud_fx
+- 归属变体（1 个）：lunar_goop_cloud_fx
 
 ## 函数
 

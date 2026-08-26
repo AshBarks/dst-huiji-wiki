@@ -1,6 +1,48 @@
 # `prefabs/player_common.lua`
 
 - 扫描角色：prefabs/player_common.lua
+## 关联
+
+### 预制体依赖
+- `-- Player specific classified prefabs
+        "player_classified"`：?（Direct；line 2981）
+- `attune_ghost_in_fx`：?（Direct；line 2981）
+- `attune_in_fx`：?（Direct；line 2981）
+- `attune_out_fx`：?（Direct；line 2981）
+- `die_fx`：?（Direct；line 2981）
+- `elixir_player_forcefield`：?（Direct；line 2981）
+- `emote_fx`：?（Direct；line 2981）
+- `globalmapiconnamed`：?（Direct；line 2981）
+- `lavaarena_player_revive_from_corpse_fx`：?（Direct；line 2981）
+- `mining_fx`：?（Direct；line 2981）
+- `mining_ice_fx`：?（Direct；line 2981）
+- `mining_moonglass_fx`：?（Direct；line 2981）
+- `ocean_splash_swim1`：?（Direct；line 2981）
+- `ocean_splash_swim2`：?（Direct；line 2981）
+- `player_float_hop_water_fx`：?（Direct；line 2981）
+- `player_hotspring_water_fx`：?（Direct；line 2981）
+- `prefabs/battreefx.lua`：?（Direct；line 2981）
+- `prefabs/brokentool.lua`：?（Direct；line 2981）
+- `prefabs/frostbreath.lua`：?（Direct；line 2981）
+- `prefabs/ghost_transform_overlay_fx.lua`：?（Direct；line 2981）
+- `prefabs/ghostvision_buff.lua`：?（Direct；line 2981）
+- `prefabs/impact.lua`：?（Direct；line 2981）
+- `prefabs/inventory_classified.lua`：?（Direct；line 2981）
+- `prefabs/spawnprotectionbuff.lua`：?（Direct；line 2981）
+- `prefabs/spellbookcooldown.lua`：?（Direct；line 2981）
+- `prefabs/staff_castinglight.lua`：?（Direct；line 2981）
+- `prefabs/staffcastfx.lua`：?（Direct；line 2981）
+- `prefabs/superjump_fx.lua`：?（Direct；line 2981）
+- `prefabs/wonkey.lua`：?（Direct；line 2981）
+- `round_puff_fx_sm`：?（Direct；line 2981）
+- `shock_fx`：?（Direct；line 2981）
+- `splash`：?（Direct；line 2981）
+- `splash_sink`：?（Direct；line 2981）
+- `staff_castinglight_small`：?（Direct；line 2981）
+- `staffcastfx_mount`：?（Direct；line 2981）
+- `tears`：?（Direct；line 2981）
+- `washashore_puddle_fx`：?（Direct；line 2981）
+
 
 ## 函数
 

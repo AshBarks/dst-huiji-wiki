@@ -1,7 +1,7 @@
 # `prefabs/wake_small.lua`
 
 - 扫描角色：prefabs/wake_small.lua
-- 归属变体（2 个）：wake_small, wake_small
+- 归属变体（1 个）：wake_small
 
 ## 函数
 

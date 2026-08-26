@@ -1,7 +1,23 @@
 # `prefabs/shadowwaxwell.lua`
 
 - 扫描角色：prefabs/shadowwaxwell.lua
-- 归属变体（2 个）：shadow_despawn, shadow_despawn
+- 归属变体（1 个）：shadow_despawn
+## 关联
+
+### 组件
+- `components/combat.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/entitytracker.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/follower.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/health.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/inspectable.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/locomotor.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/sanityaura.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/skinner.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+- `components/timer.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+
+### 状态图
+- `stategraphs/SGstalker_minion.lua`：shadow_despawn（HelperExpanded；line 666,668,669,671,673,674,675）
+
 
 ## 函数
 
@@ -9,7 +25,7 @@
 - 归属：（未归属）
 
 ### DoDespawnFxSound  [628–630]
-- 归属：（未归属）
+- 归属：shadow_despawn
 
 ### DoRemove  [79–84]
 - 归属：（未归属）

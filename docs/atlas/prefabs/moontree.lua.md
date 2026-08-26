@@ -1,6 +1,15 @@
 # `prefabs/moontree.lua`
 
 - 扫描角色：prefabs/moontree.lua
+## 关联
+
+### 预制体依赖
+- `moon_tree_blossom`：?（Direct；line 666）
+- `prefabs/charcoal.lua`：?（Direct；line 666）
+- `prefabs/log.lua`：?（Direct；line 666）
+- `prefabs/moonbutterfly.lua`：?（Direct；line 666）
+- `tree_petal_fx_chop`：?（Direct；line 666）
+
 
 ## 函数
 

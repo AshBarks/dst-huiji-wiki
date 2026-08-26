@@ -1,6 +1,11 @@
 # `prefabs/pigelite.lua`
 
 - 扫描角色：prefabs/pigelite.lua
+## 关联
+
+### 预制体依赖
+- `slide_puff`：?（Direct；line 267）
+
 
 ## 函数
 

@@ -1,6 +1,14 @@
 # `prefabs/beebox.lua`
 
 - 扫描角色：prefabs/beebox.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 330）
+- `prefabs/bee.lua`：?（Direct；line 330）
+- `prefabs/honey.lua`：?（Direct；line 330）
+- `prefabs/honeycomb.lua`：?（Direct；line 330）
+
 
 ## 函数
 

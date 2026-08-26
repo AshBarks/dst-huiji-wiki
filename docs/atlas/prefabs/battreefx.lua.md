@@ -1,7 +1,7 @@
 # `prefabs/battreefx.lua`
 
 - 扫描角色：prefabs/battreefx.lua
-- 归属变体（5 个）：battreefx, battreefx, battreefx, battreefx, battreefx
+- 归属变体（1 个）：battreefx
 
 ## 函数
 
@@ -9,7 +9,7 @@
 - 归属：battreefx
 
 ### MoveForward  [8–10]
-- 归属：（未归属）
+- 归属：battreefx
 
 ### PlaySounds  [21–31]
 - 归属：battreefx
@@ -18,7 +18,7 @@
 - 归属：battreefx
 
 ### SetViewerAndAnim  [41–57]
-- 归属：（未归属）
+- 归属：battreefx
 
 ### fn  [59–88]
 - 归属：battreefx

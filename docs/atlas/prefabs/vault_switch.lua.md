@@ -1,7 +1,16 @@
 # `prefabs/vault_switch.lua`
 
 - 扫描角色：prefabs/vault_switch.lua
-- 归属变体（6 个）：vault_switch, vault_switch_base, vault_switch, vault_switch_base, vault_switch_base, vault_switch
+- 归属变体（2 个）：vault_switch, vault_switch_base
+## 关联
+
+### 组件
+- `components/inspectable.lua`：vault_switch（Direct；line 69）
+- `components/pickable.lua`：vault_switch（Direct；line 72）
+
+### 预制体依赖
+- `prefabs/vault_switch.lua`：vault_switch_base（Direct；line 130）
+
 
 ## 函数
 
@@ -9,13 +18,13 @@
 - 归属：vault_switch
 
 ### GetStatus  [42–44]
-- 归属：（未归属）
+- 归属：vault_switch
 
 ### base_OnEntitySleep  [87–89]
-- 归属：（未归属）
+- 归属：vault_switch_base
 
 ### base_OnEntityWake  [81–85]
-- 归属：（未归属）
+- 归属：vault_switch_base
 
 ### basefn  [91–125]
 - 归属：vault_switch_base

@@ -1,7 +1,48 @@
 # `prefabs/meats.lua`
 
 - 扫描角色：prefabs/meats.lua
-- 归属变体（172 个）：cookedmeat, meat, meat_dried, cookedmeat, meat, meat_dried, barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, mitegland_debuff, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried, cookedmeat, meat, meat_dried, barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried, cookedmeat, cookedmonstermeat, cookedsmallmeat, meat_dried, monstermeat_dried, smallmeat_dried, drumstick, drumstick_cooked, barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried, mitegland, mitegland_cooked, mitegland_debuff, mitegland_debuff, monstermeat, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, meat, smallmeat
+- 归属变体（33 个）：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, mitegland_debuff, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried
+## 关联
+
+### 组件
+- `components/bait.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 186）
+- `components/cookable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 210）
+- `components/debuff.lua`：mitegland_debuff（Direct；line 883）
+- `components/dryable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 202）
+- `components/edible.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 182）
+- `components/floater.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（HelperExpanded；line 174）
+- `components/hauntable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（HelperExpanded；line 218）
+- `components/inspectable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 188）
+- `components/inventoryitem.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 190）
+- `components/perishable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 196）
+- `components/selfstacker.lua`：barnacle, humanmeat, monstermeat（Direct；line 241,300,709）
+- `components/snowmandecor.lua`：batwing（Direct；line 617）
+- `components/stackable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 191）
+- `components/timer.lua`：mitegland_debuff（Direct；line 889）
+- `components/tradable.lua`：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried（Direct；line 193）
+
+### 预制体依赖
+- `batwing_cooked`：batnose, batwing（Direct；line 910,927）
+- `cookedmeat`：meat（Direct；line 899）
+- `cookedmonstermeat`：monstermeat（Direct；line 902）
+- `cookedsmallmeat`：smallmeat（Direct；line 905）
+- `drumstick_cooked`：drumstick（Direct；line 908）
+- `fishmeat_cooked`：fishmeat（Direct；line 917）
+- `fishmeat_dried`：fishmeat（Direct；line 917）
+- `fishmeat_small_cooked`：fishmeat_small（Direct；line 914）
+- `fishmeat_small_dried`：fishmeat_small（Direct；line 914）
+- `humanmeat_cooked`：humanmeat（Direct；line 920）
+- `humanmeat_dried`：humanmeat（Direct；line 920）
+- `meat_dried`：batnose, batwing, meat（Direct；line 899,910,927）
+- `mitegland_cooked`：mitegland（Direct；line 929）
+- `monstermeat_dried`：monstermeat（Direct；line 902）
+- `plantmeat_cooked`：plantmeat（Direct；line 912）
+- `quagmire_cookedsmallmeat`：quagmire_smallmeat（Direct；line 923）
+- `smallmeat_dried`：smallmeat（Direct；line 905）
+- `spoiled_fish`：fishmeat（Direct；line 917）
+- `spoiled_fish_small`：fishmeat_small（Direct；line 914）
+- `spoiled_food`：batnose, batwing, drumstick, humanmeat, meat, mitegland, monstermeat, plantmeat, smallmeat（Direct；line 899,902,905,908,910,912,920,927,929）
+
 
 ## 函数
 
@@ -9,7 +50,7 @@
 - 归属：cookedmeat, meat, meat_dried
 
 ### OnSpawnedFromHaunt  [134–136]
-- 归属：（未归属）
+- 归属：barnacle, barnacle_cooked, batnose, batnose_cooked, batwing, batwing_cooked, cookedmeat, cookedmonstermeat, cookedsmallmeat, drumstick, drumstick_cooked, fishmeat, fishmeat_cooked, fishmeat_dried, fishmeat_small, fishmeat_small_cooked, fishmeat_small_dried, humanmeat, humanmeat_cooked, humanmeat_dried, meat, meat_dried, mitegland, mitegland_cooked, monstermeat, monstermeat_dried, plantmeat, plantmeat_cooked, quagmire_cookedsmallmeat, quagmire_smallmeat, smallmeat, smallmeat_dried
 
 ### barnacle  [690–712]
 - 归属：barnacle
@@ -93,22 +134,22 @@
 - 归属：mitegland_debuff
 
 ### mitegland_oneaten  [778–782]
-- 归属：（未归属）
+- 归属：mitegland
 
 ### miteglanddebuff_DoT_OnTick  [822–826]
-- 归属：（未归属）
+- 归属：mitegland_debuff
 
 ### miteglanddebuff_OnAttached  [828–841]
-- 归属：（未归属）
+- 归属：mitegland_debuff
 
 ### miteglanddebuff_OnDetached  [843–852]
-- 归属：（未归属）
+- 归属：mitegland_debuff
 
 ### miteglanddebuff_OnExtended  [854–857]
 - 归属：mitegland_debuff
 
 ### miteglanddebuff_OnTimerDone  [859–863]
-- 归属：（未归属）
+- 归属：mitegland_debuff
 
 ### monster  [282–303]
 - 归属：monstermeat

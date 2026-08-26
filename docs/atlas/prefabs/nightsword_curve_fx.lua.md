@@ -1,7 +1,7 @@
 # `prefabs/nightsword_curve_fx.lua`
 
 - 扫描角色：prefabs/nightsword_curve_fx.lua
-- 归属变体（11 个）：nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx, nightsword_curve_fx
+- 归属变体（1 个）：nightsword_curve_fx
 
 ## 函数
 

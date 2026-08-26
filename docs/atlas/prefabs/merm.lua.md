@@ -1,6 +1,24 @@
 # `prefabs/merm.lua`
 
 - 扫描角色：prefabs/merm.lua
+## 关联
+
+### 预制体依赖
+- `lunarmerm_thorns_fx`：?（Direct；line 1158）
+- `merm_shadow`：?（Direct；line 1158）
+- `merm_soil_marker`：?（Direct；line 1158）
+- `merm_spawn_fx`：?（Direct；line 1158）
+- `merm_splash`：?（Direct；line 1158）
+- `mermcorpse`：?（Direct；line 1158）
+- `mermking_buff_crown`：?（Direct；line 1158）
+- `mermking_buff_pauldron`：?（Direct；line 1158）
+- `mermking_buff_trident`：?（Direct；line 1158）
+- `prefabs/froglegs.lua`：?（Direct；line 1158）
+- `prefabs/mermking.lua`：?（Direct；line 1158）
+- `prefabs/pondfish.lua`：?（Direct；line 1158）
+- `shadow_merm_smacked_poof_fx`：?（Direct；line 1158）
+- `shadow_merm_spawn_poof_fx`：?（Direct；line 1158）
+
 
 ## 函数
 

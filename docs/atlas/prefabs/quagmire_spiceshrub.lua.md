@@ -1,7 +1,13 @@
 # `prefabs/quagmire_spiceshrub.lua`
 
 - 扫描角色：prefabs/quagmire_spiceshrub.lua
-- 归属变体（9 个）：quagmire_spotspice_ground, quagmire_spotspice_shrub, quagmire_spotspice_sprig, quagmire_spotspice_ground, quagmire_spotspice_shrub, quagmire_spotspice_sprig, quagmire_spotspice_ground, quagmire_spotspice_shrub, quagmire_spotspice_sprig
+- 归属变体（3 个）：quagmire_spotspice_ground, quagmire_spotspice_shrub, quagmire_spotspice_sprig
+## 关联
+
+### 预制体依赖
+- `prefabs/quagmire_burnt_ingredients.lua`：quagmire_spotspice_ground（Direct；line 102）
+- `quagmire_spotspice_sprig`：quagmire_spotspice_shrub（Direct；line 100）
+
 
 ## 函数
 

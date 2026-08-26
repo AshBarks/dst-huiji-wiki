@@ -1,7 +1,7 @@
 # `prefabs/deerspawningground.lua`
 
 - 扫描角色：prefabs/deerspawningground.lua
-- 归属变体（2 个）：deerspawningground, deerspawningground
+- 归属变体（1 个）：deerspawningground
 
 ## 函数
 

@@ -1,7 +1,12 @@
 # `prefabs/lavaarena_floorgrate.lua`
 
 - 扫描角色：prefabs/lavaarena_floorgrate.lua
-- 归属变体（5 个）：lavaarena_floorgrate, lavaarena_floorgrate, lavaarena_floorgrate, lavaarena_floorgrate, lavaarena_floorgrate
+- 归属变体（1 个）：lavaarena_floorgrate
+## 关联
+
+### 预制体依赖
+- `ember_short_fx`：lavaarena_floorgrate（Direct；line 96）
+
 
 ## 函数
 
@@ -12,7 +17,7 @@
 - 归属：lavaarena_floorgrate
 
 ### SpawnEmber  [40–42]
-- 归属：（未归属）
+- 归属：lavaarena_floorgrate
 
 ### lavaarena_floorgratefn  [50–94]
 - 归属：lavaarena_floorgrate

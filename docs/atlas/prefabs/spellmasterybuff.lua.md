@@ -1,7 +1,13 @@
 # `prefabs/spellmasterybuff.lua`
 
 - 扫描角色：prefabs/spellmasterybuff.lua
-- 归属变体（8 个）：spellmasterybuff, spellmasteryorb, spellmasteryorbs, spellmasterybuff, spellmasteryorbs, spellmasterybuff, spellmasteryorb, spellmasteryorbs
+- 归属变体（3 个）：spellmasterybuff, spellmasteryorb, spellmasteryorbs
+## 关联
+
+### 预制体依赖
+- `spellmasteryorb`：spellmasteryorbs（Direct；line 103）
+- `spellmasteryorbs`：spellmasterybuff（Direct；line 101）
+
 
 ## 函数
 

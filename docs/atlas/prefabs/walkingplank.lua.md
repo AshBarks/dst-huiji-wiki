@@ -1,6 +1,11 @@
 # `prefabs/walkingplank.lua`
 
 - 扫描角色：prefabs/walkingplank.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 49）
+
 
 ## 函数
 

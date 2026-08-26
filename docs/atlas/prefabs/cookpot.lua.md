@@ -1,6 +1,11 @@
 # `prefabs/cookpot.lua`
 
 - 扫描角色：prefabs/cookpot.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 356）
+
 
 ## 函数
 

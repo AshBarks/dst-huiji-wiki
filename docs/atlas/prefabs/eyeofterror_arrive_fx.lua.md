@@ -1,7 +1,7 @@
 # `prefabs/eyeofterror_arrive_fx.lua`
 
 - 扫描角色：prefabs/eyeofterror_arrive_fx.lua
-- 归属变体（6 个）：eyeofterror_arrive_fx, eyeofterror_arrive_fx, eyeofterror_arrive_fx, eyeofterror_arrive_fx, eyeofterror_arrive_fx, eyeofterror_arrive_fx
+- 归属变体（1 个）：eyeofterror_arrive_fx
 
 ## 函数
 
@@ -12,14 +12,14 @@
 - 归属：eyeofterror_arrive_fx
 
 ### OnUpdateLightColour  [33–46]
-- 归属：（未归属）
+- 归属：eyeofterror_arrive_fx
 
 ### TurnLightOff  [68–71]
-- 归属：（未归属）
+- 归属：eyeofterror_arrive_fx
 
 ### fn  [77–121]
 - 归属：eyeofterror_arrive_fx
 
 ### play_arrive_sound  [73–75]
-- 归属：（未归属）
+- 归属：eyeofterror_arrive_fx
 

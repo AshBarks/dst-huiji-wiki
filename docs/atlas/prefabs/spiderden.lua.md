@@ -1,6 +1,15 @@
 # `prefabs/spiderden.lua`
 
 - 扫描角色：prefabs/spiderden.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/silk.lua`：spiderden, spiderden_2, spiderden_3（Direct；line 838,839,840）
+- `prefabs/spider.lua`：spiderden, spiderden_2, spiderden_3（Direct；line 838,839,840）
+- `prefabs/spidereggsack.lua`：spiderden, spiderden_2, spiderden_3（Direct；line 838,839,840）
+- `prefabs/spiderqueen.lua`：spiderden, spiderden_2, spiderden_3（Direct；line 838,839,840）
+- `spider_warrior`：spiderden, spiderden_2, spiderden_3（Direct；line 838,839,840）
+
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/lavaarena_rhinobuff.lua`
 
 - 扫描角色：prefabs/lavaarena_rhinobuff.lua
-- 归属变体（3 个）：rhinobuff, rhinobuff, rhinobuff
+- 归属变体（1 个）：rhinobuff
 
 ## 函数
 

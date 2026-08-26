@@ -1,7 +1,15 @@
 # `prefabs/multiplayer_portal.lua`
 
 - 扫描角色：prefabs/multiplayer_portal.lua
-- 归属变体（2 个）：multiplayer_portal_moonrock_fx, multiplayer_portal_moonrock_fx
+- 归属变体（1 个）：multiplayer_portal_moonrock_fx
+## 关联
+
+### 组件
+- `components/inspectable.lua`：multiplayer_portal_moonrock_fx（HelperExpanded；line 456,457,458）
+
+### 状态图
+- `stategraphs/SGmultiplayerportal.lua`：multiplayer_portal_moonrock_fx（HelperExpanded；line 456,457,458）
+
 
 ## 函数
 

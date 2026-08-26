@@ -1,6 +1,12 @@
 # `prefabs/sculpture_pieces.lua`
 
 - 扫描角色：prefabs/sculpture_pieces.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/underwater_salvageable.lua`：?（Direct；line 87）
+- `splash_green`：?（Direct；line 87）
+
 
 ## 函数
 

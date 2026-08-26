@@ -1,6 +1,12 @@
 # `prefabs/sculptures.lua`
 
 - 扫描角色：prefabs/sculptures.lua
+## 关联
+
+### 预制体依赖
+- `marble`：?（Direct；line 298）
+- `prefabs/gears.lua`：?（Direct；line 298）
+
 
 ## 函数
 

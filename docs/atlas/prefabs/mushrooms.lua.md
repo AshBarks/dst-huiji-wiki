@@ -1,6 +1,11 @@
 # `prefabs/mushrooms.lua`
 
 - 扫描角色：prefabs/mushrooms.lua
+## 关联
+
+### 预制体依赖
+- `small_puff`：?（Direct；line 442,443,444）
+
 
 ## 函数
 

@@ -1,7 +1,12 @@
 # `prefabs/entityproxy.lua`
 
 - 扫描角色：prefabs/entityproxy.lua
-- 归属变体（2 个）：entityproxy, entityproxy
+- 归属变体（1 个）：entityproxy
+## 关联
+
+### 组件
+- `components/replayproxy.lua`：entityproxy（Direct；line 9）
+
 
 ## 函数
 

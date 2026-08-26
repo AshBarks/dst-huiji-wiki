@@ -1,6 +1,12 @@
 # `prefabs/quagmire_casseroledish.lua`
 
 - 扫描角色：prefabs/quagmire_casseroledish.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/quagmire_burnt_ingredients.lua`：?（Direct；line 47）
+- `quagmire_food`：?（Direct；line 47）
+
 
 ## 函数
 

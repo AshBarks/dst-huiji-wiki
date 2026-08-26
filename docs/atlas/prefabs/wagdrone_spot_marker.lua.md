@@ -1,7 +1,7 @@
 # `prefabs/wagdrone_spot_marker.lua`
 
 - 扫描角色：prefabs/wagdrone_spot_marker.lua
-- 归属变体（2 个）：wagdrone_spot_marker, wagdrone_spot_marker
+- 归属变体（1 个）：wagdrone_spot_marker
 
 ## 函数
 

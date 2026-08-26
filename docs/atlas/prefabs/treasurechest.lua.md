@@ -1,7 +1,17 @@
 # `prefabs/treasurechest.lua`
 
 - 扫描角色：prefabs/treasurechest.lua
-- 归属变体（2 个）：terrariumchest_fx, terrariumchest_fx
+- 归属变体（1 个）：terrariumchest_fx
+## 关联
+
+### 组件
+- `components/container.lua`：terrariumchest_fx（HelperExpanded；line 766,768,769,770,772,773）
+- `components/hauntable.lua`：terrariumchest_fx（HelperExpanded；line 766,768,769,770,772,773）
+- `components/inspectable.lua`：terrariumchest_fx（HelperExpanded；line 766,768,769,770,772,773）
+- `components/lootdropper.lua`：terrariumchest_fx（HelperExpanded；line 766,768,769,770,772,773）
+- `components/placer.lua`：terrariumchest_fx（HelperExpanded；line 767）
+- `components/workable.lua`：terrariumchest_fx（HelperExpanded；line 766,768,769,770,772,773）
+
 
 ## 函数
 

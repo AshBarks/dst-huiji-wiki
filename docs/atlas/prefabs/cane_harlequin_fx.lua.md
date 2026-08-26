@@ -1,7 +1,7 @@
 # `prefabs/cane_harlequin_fx.lua`
 
 - 扫描角色：prefabs/cane_harlequin_fx.lua
-- 归属变体（10 个）：cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx, cane_harlequin_fx
+- 归属变体（1 个）：cane_harlequin_fx
 
 ## 函数
 

@@ -1,7 +1,15 @@
 # `prefabs/scienceprototyper.lua`
 
 - 扫描角色：prefabs/scienceprototyper.lua
-- 归属变体（2 个）：researchlab2_pod_fx, researchlab2_pod_fx
+- 归属变体（1 个）：researchlab2_pod_fx
+## 关联
+
+### 组件
+- `components/placer.lua`：researchlab2_pod_fx（HelperExpanded；line 301,302）
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 252）
+
 
 ## 函数
 
@@ -12,7 +20,7 @@
 - 归属：（未归属）
 
 ### OnFXReplicated  [257–266]
-- 归属：（未归属）
+- 归属：researchlab2_pod_fx
 
 ### createmachine  [73–253]
 - 归属：（未归属）

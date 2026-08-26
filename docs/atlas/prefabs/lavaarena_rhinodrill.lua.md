@@ -1,6 +1,17 @@
 # `prefabs/lavaarena_rhinodrill.lua`
 
 - 扫描角色：prefabs/lavaarena_rhinodrill.lua
+## 关联
+
+### 预制体依赖
+- `fossilizing_fx`：?（Direct；line 191）
+- `lavaarena_creature_teleport_small_fx`：?（Direct；line 191）
+- `rhinobuff`：?（Direct；line 191）
+- `rhinobumpfx`：?（Direct；line 191）
+- `rhinodrill_fossilized_break_fx`：?（Direct；line 191）
+- `rhinodrill_fossilized_break_fx_left`：?（Direct；line 191）
+- `rhinodrill_fossilized_break_fx_right`：?（Direct；line 191）
+
 
 ## 函数
 

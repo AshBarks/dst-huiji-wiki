@@ -1,7 +1,7 @@
 # `prefabs/lunarrift_crystal_spawn_fx.lua`
 
 - 扫描角色：prefabs/lunarrift_crystal_spawn_fx.lua
-- 归属变体（9 个）：lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx, lunarrift_crystal_spawn_fx
+- 归属变体（1 个）：lunarrift_crystal_spawn_fx
 
 ## 函数
 

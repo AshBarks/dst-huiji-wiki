@@ -1,7 +1,7 @@
 # `prefabs/snow.lua`
 
 - 扫描角色：prefabs/snow.lua
-- 归属变体（5 个）：snow, snow, snow, snow, snow
+- 归属变体（1 个）：snow
 
 ## 函数
 
@@ -12,7 +12,7 @@
 - 归属：snow
 
 ### emit_fn  [97–123]
-- 归属：（未归属）
+- 归属：snow
 
 ### fn  [64–172]
 - 归属：snow
@@ -21,5 +21,5 @@
 - 归属：（未归属）
 
 ### update_fn  [126–157]
-- 归属：（未归属）
+- 归属：snow
 

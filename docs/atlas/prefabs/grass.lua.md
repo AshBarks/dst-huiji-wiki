@@ -1,7 +1,18 @@
 # `prefabs/grass.lua`
 
 - 扫描角色：prefabs/grass.lua
-- 归属变体（2 个）：grasspartfx, grasspartfx
+- 归属变体（1 个）：grasspartfx
+## 关联
+
+### 预制体依赖
+- `disease_puff`：?（Direct；line 289）
+- `dug_grass`：?（Direct；line 289）
+- `grasspartfx`：?（Direct；line 289）
+- `prefabs/cutgrass.lua`：?（Direct；line 289）
+- `prefabs/diseaseflies.lua`：?（Direct；line 289）
+- `prefabs/grassgekko.lua`：?（Direct；line 289）
+- `spoiled_food`：?（Direct；line 289）
+
 
 ## 函数
 

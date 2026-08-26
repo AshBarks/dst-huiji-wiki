@@ -1,7 +1,7 @@
 # `prefabs/pollen.lua`
 
 - 扫描角色：prefabs/pollen.lua
-- 归属变体（5 个）：pollen, pollen, pollen, pollen, pollen
+- 归属变体（1 个）：pollen
 
 ## 函数
 
@@ -12,7 +12,7 @@
 - 归属：pollen
 
 ### emit_fn  [95–122]
-- 归属：（未归属）
+- 归属：pollen
 
 ### fn  [51–165]
 - 归属：pollen
@@ -21,5 +21,5 @@
 - 归属：（未归属）
 
 ### updateFunc  [124–147]
-- 归属：（未归属）
+- 归属：pollen
 

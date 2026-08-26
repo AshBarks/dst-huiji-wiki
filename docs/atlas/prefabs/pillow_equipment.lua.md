@@ -1,6 +1,12 @@
 # `prefabs/pillow_equipment.lua`
 
 - 扫描角色：prefabs/pillow_equipment.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/reticulearc.lua`：?（Direct；line 239）
+- `reticulearcping`：?（Direct；line 239）
+
 
 ## 函数
 

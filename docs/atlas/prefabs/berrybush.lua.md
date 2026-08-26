@@ -1,6 +1,12 @@
 # `prefabs/berrybush.lua`
 
 - 扫描角色：prefabs/berrybush.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/perd.lua`：?（Direct；line 339）
+- `prefabs/twigs.lua`：?（Direct；line 339）
+
 
 ## 函数
 

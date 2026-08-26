@@ -1,7 +1,7 @@
 # `prefabs/atrium_pillar.lua`
 
 - 扫描角色：prefabs/atrium_pillar.lua
-- 归属变体（3 个）：pillar_atrium, pillar_atrium, pillar_atrium
+- 归属变体（1 个）：pillar_atrium
 
 ## 函数
 

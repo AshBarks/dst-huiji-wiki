@@ -1,6 +1,11 @@
 # `prefabs/turfs.lua`
 
 - 扫描角色：prefabs/turfs.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/gridplacer.lua`：?（Direct；line 80）
+
 
 ## 函数
 

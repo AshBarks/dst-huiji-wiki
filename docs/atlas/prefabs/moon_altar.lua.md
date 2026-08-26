@@ -1,7 +1,21 @@
 # `prefabs/moon_altar.lua`
 
 - 扫描角色：prefabs/moon_altar.lua
-- 归属变体（2 个）：moon_altar_link_fx_spawner, moon_altar_link_fx_spawner
+- 归属变体（1 个）：moon_altar_link_fx_spawner
+## 关联
+
+### 组件
+- `components/hauntable.lua`：moon_altar_astral_marker_1, moon_altar_astral_marker_2, moon_altar_link_fx_spawner（HelperExpanded；line 722,733,744）
+- `components/inspectable.lua`：moon_altar_astral_marker_1, moon_altar_astral_marker_2, moon_altar_link_fx_spawner（HelperExpanded；line 722,733,744）
+- `components/lootdropper.lua`：moon_altar_astral_marker_1, moon_altar_astral_marker_2, moon_altar_link_fx_spawner（HelperExpanded；line 722,733,744）
+- `components/moonaltarlinktarget.lua`：moon_altar_astral_marker_1, moon_altar_astral_marker_2, moon_altar_link_fx_spawner（HelperExpanded；line 722,733,744）
+- `components/workable.lua`：moon_altar_astral_marker_1, moon_altar_astral_marker_2, moon_altar_link_fx_spawner（HelperExpanded；line 722,733,744）
+
+### 预制体依赖
+- `moon_altar_icon`：moon_altar_astral_marker_1, moon_altar_astral_marker_2（Direct；line 756,757）
+- `moon_altar_link_fx`：moon_altar_link_fx_spawner（Direct；line 758）
+- `moon_altar_ward`：moon_altar_astral_marker_1, moon_altar_astral_marker_2（Direct；line 756,757）
+
 
 ## 函数
 
@@ -15,10 +29,10 @@
 - 归属：（未归属）
 
 ### LinkFxSpawnerMoveAndSpawn  [677–691]
-- 归属：（未归属）
+- 归属：moon_altar_link_fx_spawner
 
 ### LinkFxSpawnerSetTargetPosition  [693–697]
-- 归属：（未归属）
+- 归属：moon_altar_link_fx_spawner
 
 ### MakeAltar  [549–648]
 - 归属：（未归属）

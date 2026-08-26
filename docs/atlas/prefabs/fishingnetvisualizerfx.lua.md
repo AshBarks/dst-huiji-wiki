@@ -1,7 +1,7 @@
 # `prefabs/fishingnetvisualizerfx.lua`
 
 - 扫描角色：prefabs/fishingnetvisualizerfx.lua
-- 归属变体（2 个）：fishingnetvisualizerfx, fishingnetvisualizerfx
+- 归属变体（1 个）：fishingnetvisualizerfx
 
 ## 函数
 

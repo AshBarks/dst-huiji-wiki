@@ -1,7 +1,7 @@
 # `prefabs/fossilized_fx.lua`
 
 - 扫描角色：prefabs/fossilized_fx.lua
-- 归属变体（2 个）：fossilized_break_fx, fossilized_break_fx
+- 归属变体（1 个）：fossilized_break_fx
 
 ## 函数
 

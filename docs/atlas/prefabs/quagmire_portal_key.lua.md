@@ -1,7 +1,7 @@
 # `prefabs/quagmire_portal_key.lua`
 
 - 扫描角色：prefabs/quagmire_portal_key.lua
-- 归属变体（3 个）：quagmire_portal_key, quagmire_portal_key, quagmire_portal_key
+- 归属变体（1 个）：quagmire_portal_key
 
 ## 函数
 

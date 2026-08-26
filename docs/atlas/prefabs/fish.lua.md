@@ -1,6 +1,13 @@
 # `prefabs/fish.lua`
 
 - 扫描角色：prefabs/fish.lua
+## 关联
+
+### 预制体依赖
+- `fish_cooked`：?（Direct；line 170）
+- `fishmeat_small_dried`：?（Direct；line 170）
+- `spoiled_food`：?（Direct；line 170）
+
 
 ## 函数
 

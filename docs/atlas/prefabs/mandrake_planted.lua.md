@@ -1,7 +1,19 @@
 # `prefabs/mandrake_planted.lua`
 
 - 扫描角色：prefabs/mandrake_planted.lua
-- 归属变体（3 个）：mandrake_planted, mandrake_planted, mandrake_planted
+- 归属变体（1 个）：mandrake_planted
+## 关联
+
+### 组件
+- `components/burnable.lua`：mandrake_planted（HelperExpanded；line 66）
+- `components/inspectable.lua`：mandrake_planted（Direct；line 58）
+- `components/pickable.lua`：mandrake_planted（Direct；line 59）
+- `components/propagator.lua`：mandrake_planted（HelperExpanded；line 67）
+
+### 预制体依赖
+- `cookedmandrake`：mandrake_planted（Direct；line 76）
+- `mandrake`：mandrake_planted（Direct；line 76）
+
 
 ## 函数
 
@@ -9,8 +21,8 @@
 - 归属：mandrake_planted
 
 ### onpicked  [26–33]
-- 归属：（未归属）
+- 归属：mandrake_planted
 
 ### replant  [19–24]
-- 归属：（未归属）
+- 归属：mandrake_planted
 

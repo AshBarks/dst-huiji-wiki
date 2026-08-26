@@ -1,7 +1,17 @@
 # `prefabs/lavaarena_portal.lua`
 
 - 扫描角色：prefabs/lavaarena_portal.lua
-- 归属变体（8 个）：lavaarena_portal, lavaarena_keyhole, lavaarena_portal, lavaarena_portal_activefx, lavaarena_portal_activefx, lavaarena_portal, lavaarena_portal, lavaarena_keyhole
+- 归属变体（3 个）：lavaarena_keyhole, lavaarena_portal, lavaarena_portal_activefx
+## 关联
+
+### 组件
+- `components/inspectable.lua`：lavaarena_keyhole（Direct；line 107）
+
+### 预制体依赖
+- `lavaarena_keyhole`：lavaarena_portal（Direct；line 143）
+- `lavaarena_portal_activefx`：lavaarena_portal（Direct；line 143）
+- `lavaarena_portal_player_fx`：lavaarena_portal（Direct；line 143）
+
 
 ## 函数
 

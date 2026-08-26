@@ -1,7 +1,7 @@
 # `prefabs/forcefieldfx.lua`
 
 - 扫描角色：prefabs/forcefieldfx.lua
-- 归属变体（6 个）：forcefieldfx, forcefieldfx, forcefieldfx, forcefieldfx, forcefieldfx, forcefieldfx
+- 归属变体（1 个）：forcefieldfx
 
 ## 函数
 
@@ -15,5 +15,5 @@
 - 归属：forcefieldfx
 
 ### kill_fx  [35–41]
-- 归属：（未归属）
+- 归属：forcefieldfx
 

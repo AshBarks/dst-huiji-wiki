@@ -1,7 +1,7 @@
 # `prefabs/boatlip.lua`
 
 - 扫描角色：prefabs/boatlip.lua
-- 归属变体（18 个）：boatlip, boatlip_ancient, boatlip_grass, boatlip_ice, boatlip_otterden, boatlip_yotd, boatlip_ancient, boatlip, boatlip_ancient, boatlip_grass, boatlip_ice, boatlip_otterden, boatlip_yotd, boatlip, boatlip_grass, boatlip_ice, boatlip_otterden, boatlip_yotd
+- 归属变体（6 个）：boatlip, boatlip_ancient, boatlip_grass, boatlip_ice, boatlip_otterden, boatlip_yotd
 
 ## 函数
 

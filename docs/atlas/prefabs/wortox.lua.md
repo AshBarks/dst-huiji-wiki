@@ -1,12 +1,116 @@
 # `prefabs/wortox.lua`
 
 - 扫描角色：prefabs/wortox.lua
-- 归属变体（25 个）：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_decoy, wortox_overloading_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_soulecho_buff_fx, wortox_overloading_fx, wortox_soulecho_buff_fx, wortox_decoy, wortox_forget_debuff, wortox_panflute_buff, wortox_soulecho_buff
+- 归属变体（6 个）：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx
+## 关联
+
+### 组件
+- `components/acidlevel.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/age.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/areaaware.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/attuner.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/aura.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/avengingghost.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/birdattractor.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/bloomer.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/boatcannonuser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/builder.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/bundler.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/carefulwalker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/catcher.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/channelcaster.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/colouradder.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 1570,1600）
+- `components/colourtweener.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/combat.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 1581,1600）
+- `components/constructionbuilder.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/constructionbuilderuidata.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/cookbookupdater.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/counter.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/cursable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/damagetypebonus.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/damagetyperesist.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/debuff.lua`：wortox_forget_debuff, wortox_panflute_buff, wortox_soulecho_buff（Direct；line 878,1177,1247）
+- `components/debuffable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/distancetracker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/drownable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/eater.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/embarker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/experiencecollector.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/follower.lua`：wortox_decoy（Direct；line 1563）
+- `components/foodaffinity.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/frostybreather.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/ghostlyelixirable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/giftreceiver.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/grogginess.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/grue.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/health.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 1577,1600）
+- `components/healthsyncer.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/hudindicatable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/hunger.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/inkable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/inspectable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 1574,1600）
+- `components/inventory.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/joustuser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/leader.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/locomotor.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/luckuser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/maprevealable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/miasmawatcher.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/moisture.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/moonstormwatcher.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/petleash.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/pinnable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/planardamage.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/planardefense.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/plantregistryupdater.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/playeravatardata.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/playerinspectable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/playerlightningtarget.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/playerspeedmult.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/playervision.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/revivablecorpse.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/rider.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/sandstormwatcher.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/sanity.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/seamlessplayerswapper.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/sheltered.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/singingshelltrigger.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/skilltreeupdater.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/skinner.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 1571,1600）
+- `components/sleepingbaguser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/slipperyfeet.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/spectatorcorpse.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/spellbookcooldowns.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/spooked.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/stageactor.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/steeringwheeluser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/stormwatcher.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/talker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/temperature.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/timer.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（Direct/HelperExpanded；line 884,1600）
+- `components/touchstonetracker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/trader.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/walkableplatformplayer.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/walkingplankuser.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/wintertreegiftable.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/wisecracker.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `components/workmultiplier.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+
+### 状态图
+- `stategraphs/SGwilson.lua`：wortox_decoy, wortox_forget_debuff, wortox_overloading_fx, wortox_panflute_buff, wortox_soulecho_buff, wortox_soulecho_buff_fx（HelperExpanded；line 1600）
+- `stategraphs/SGwortox_decoy.lua`：wortox_decoy（Direct；line 1593）
+
+### 预制体依赖
+- `wortox_decoy_explode_fx`：wortox_decoy（Direct；line 1606）
+- `wortox_decoy_fizzle_fx`：wortox_decoy（Direct；line 1606）
+- `wortox_soul_spawn_fx`：wortox_decoy（Direct；line 1606）
+- `wortox_soulecho_buff_fx`：wortox_soulecho_buff（Direct；line 1601）
+
 
 ## 函数
 
 ### BreakDecoysFor  [1301–1310]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### CLIENT_Wortox_HostileTest  [659–669]
 - 归属：（未归属）
@@ -33,7 +137,7 @@
 - 归属：（未归属）
 
 ### ClearPanfluteBuffIconFX  [1196–1200]
-- 归属：（未归属）
+- 归属：wortox_panflute_buff
 
 ### ClearSoulOverloadTask  [277–279]
 - 归属：（未归属）
@@ -48,19 +152,19 @@
 - 归属：（未归属）
 
 ### DisplayNameFn_decoy  [1507–1510]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### DoCheckSoulsAdded  [442–448]
 - 归属：（未归属）
 
 ### DoExplosion_decoy  [1456–1499]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### DoFizzle_decoy  [1501–1505]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### DoThorns_decoy  [1420–1454]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### DropSouls  [222–244]
 - 归属：（未归属）
@@ -84,7 +188,7 @@
 - 归属：（未归属）
 
 ### GetSpecialDescription_decoy  [1512–1523]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### GetStackSize  [205–207]
 - 归属：（未归属）
@@ -114,31 +218,31 @@
 - 归属：（未归属）
 
 ### OnAttached_forget  [1126–1141]
-- 归属：（未归属）
+- 归属：wortox_forget_debuff
 
 ### OnAttached_panflute  [1202–1214]
-- 归属：（未归属）
+- 归属：wortox_panflute_buff
 
 ### OnAttached_soulecho  [821–835]
-- 归属：（未归属）
+- 归属：wortox_soulecho_buff
 
 ### OnAttacked_decoy  [1410–1418]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### OnBecameGhost  [155–168]
 - 归属：（未归属）
 
 ### OnDeath_decoy  [1377–1408]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### OnDetached_forget  [1143–1150]
-- 归属：（未归属）
+- 归属：wortox_forget_debuff
 
 ### OnDetached_panflute  [1216–1229]
-- 归属：（未归属）
+- 归属：wortox_panflute_buff
 
 ### OnDetached_soulecho  [837–846]
-- 归属：（未归属）
+- 归属：wortox_soulecho_buff
 
 ### OnDropItem  [475–491]
 - 归属：（未归属）
@@ -153,10 +257,10 @@
 - 归属：（未归属）
 
 ### OnExtendedBuff_forget  [1152–1159]
-- 归属：（未归属）
+- 归属：wortox_forget_debuff
 
 ### OnExtendedBuff_soulecho  [848–854]
-- 归属：（未归属）
+- 归属：wortox_soulecho_buff
 
 ### OnFreesoulhopsChanged  [653–655]
 - 归属：（未归属）
@@ -168,7 +272,7 @@
 - 归属：（未归属）
 
 ### OnKillBuff_forget  [1122–1124]
-- 归属：（未归属）
+- 归属：wortox_forget_debuff
 
 ### OnLoad  [728–736]
 - 归属：（未归属）
@@ -207,7 +311,7 @@
 - 归属：（未归属）
 
 ### OnTimerDone_soulecho  [856–860]
-- 归属：（未归属）
+- 归属：wortox_soulecho_buff
 
 ### PutSoulOnCooldown  [178–191]
 - 归属：（未归属）
@@ -225,10 +329,10 @@
 - 归属：（未归属）
 
 ### SetOwner_decoy  [1312–1375]
-- 归属：（未归属）
+- 归属：wortox_decoy
 
 ### SetPanfluteBuffIconFX  [1190–1194]
-- 归属：（未归属）
+- 归属：wortox_panflute_buff
 
 ### SortByStackSize  [209–211]
 - 归属：（未归属）

@@ -1,7 +1,7 @@
 # `prefabs/quagmire_shadowwaxwell.lua`
 
 - 扫描角色：prefabs/quagmire_shadowwaxwell.lua
-- 归属变体（3 个）：quagmire_shadowwaxwell, quagmire_shadowwaxwell, quagmire_shadowwaxwell
+- 归属变体（1 个）：quagmire_shadowwaxwell
 
 ## 函数
 

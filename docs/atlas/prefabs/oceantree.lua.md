@@ -1,7 +1,28 @@
 # `prefabs/oceantree.lua`
 
 - 扫描角色：prefabs/oceantree.lua
-- 归属变体（2 个）：oceantree_falling, oceantree_falling
+- 归属变体（1 个）：oceantree_falling
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 777）
+- `oceantree_falling`：?（Direct；line 777）
+- `oceantree_leaf_fx_chop`：?（Direct；line 777）
+- `oceantree_ripples_normal`：?（Direct；line 777）
+- `oceantree_ripples_short`：?（Direct；line 777）
+- `oceantree_ripples_tall`：?（Direct；line 777）
+- `oceantree_roots_normal`：?（Direct；line 777）
+- `oceantree_roots_short`：?（Direct；line 777）
+- `oceantree_roots_tall`：?（Direct；line 777）
+- `pine_needles_chop`：?（Direct；line 777）
+- `prefabs/charcoal.lua`：?（Direct；line 777）
+- `prefabs/log.lua`：?（Direct；line 777）
+- `prefabs/oceantree_pillar.lua`：?（Direct；line 777）
+- `prefabs/oceantreenut.lua`：?（Direct；line 777）
+- `small_puff`：?（Direct；line 777）
+- `splash_green`：?（Direct；line 777）
+- `splash_green_large`：?（Direct；line 777）
+
 
 ## 函数
 
@@ -93,10 +114,10 @@
 - 归属：oceantree_falling
 
 ### falling_tree_land  [843–872]
-- 归属：（未归属）
+- 归属：oceantree_falling
 
 ### falling_tree_start_falling  [874–895]
-- 归属：（未归属）
+- 归属：oceantree_falling
 
 ### fn  [615–775]
 - 归属：（未归属）

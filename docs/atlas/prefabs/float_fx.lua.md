@@ -1,7 +1,7 @@
 # `prefabs/float_fx.lua`
 
 - 扫描角色：prefabs/float_fx.lua
-- 归属变体（6 个）：float_fx_back, float_fx_front, float_fx_back, float_fx_back, float_fx_front, float_fx_front
+- 归属变体（2 个）：float_fx_back, float_fx_front
 
 ## 函数
 

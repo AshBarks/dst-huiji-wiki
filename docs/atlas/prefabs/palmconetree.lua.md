@@ -1,6 +1,18 @@
 # `prefabs/palmconetree.lua`
 
 - 扫描角色：prefabs/palmconetree.lua
+## 关联
+
+### 预制体依赖
+- `palmcone_leaf_fx_normal`：?（Direct；line 660）
+- `palmcone_leaf_fx_short`：?（Direct；line 660）
+- `palmcone_leaf_fx_tall`：?（Direct；line 660）
+- `palmcone_seed`：?（Direct；line 660）
+- `prefabs/charcoal.lua`：?（Direct；line 660）
+- `prefabs/log.lua`：?（Direct；line 660）
+- `prefabs/palmcone_scale.lua`：?（Direct；line 660）
+- `tree_petal_fx_chop`：?（Direct；line 660）
+
 
 ## 函数
 

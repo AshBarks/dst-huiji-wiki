@@ -1,7 +1,7 @@
 # `prefabs/sunderarmordebuff.lua`
 
 - 扫描角色：prefabs/sunderarmordebuff.lua
-- 归属变体（3 个）：sunderarmordebuff, sunderarmordebuff, sunderarmordebuff
+- 归属变体（1 个）：sunderarmordebuff
 
 ## 函数
 

@@ -1,6 +1,16 @@
 # `prefabs/fossil_mound.lua`
 
 - 扫描角色：prefabs/fossil_mound.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 220）
+- `prefabs/fossil_piece.lua`：?（Direct；line 220）
+- `prefabs/stalker.lua`：?（Direct；line 220）
+- `stalker_atrium`：?（Direct；line 220）
+- `stalker_forest`：?（Direct；line 220）
+- `stalker_npc`：?（Direct；line 220）
+
 
 ## 函数
 

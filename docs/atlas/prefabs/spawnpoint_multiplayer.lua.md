@@ -1,7 +1,7 @@
 # `prefabs/spawnpoint_multiplayer.lua`
 
 - 扫描角色：prefabs/spawnpoint_multiplayer.lua
-- 归属变体（6 个）：spawnpoint_master, spawnpoint_multiplayer, spawnpoint_master, spawnpoint_multiplayer, spawnpoint_master, spawnpoint_multiplayer
+- 归属变体（2 个）：spawnpoint_master, spawnpoint_multiplayer
 
 ## 函数
 

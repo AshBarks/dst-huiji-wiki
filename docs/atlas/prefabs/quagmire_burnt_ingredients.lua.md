@@ -1,7 +1,7 @@
 # `prefabs/quagmire_burnt_ingredients.lua`
 
 - 扫描角色：prefabs/quagmire_burnt_ingredients.lua
-- 归属变体（2 个）：quagmire_burnt_ingredients, quagmire_burnt_ingredients
+- 归属变体（1 个）：quagmire_burnt_ingredients
 
 ## 函数
 

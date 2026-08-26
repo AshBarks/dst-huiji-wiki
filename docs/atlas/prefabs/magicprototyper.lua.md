@@ -1,6 +1,11 @@
 # `prefabs/magicprototyper.lua`
 
 - 扫描角色：prefabs/magicprototyper.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 215）
+
 
 ## 函数
 

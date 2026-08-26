@@ -1,6 +1,11 @@
 # `prefabs/mooneye.lua`
 
 - 扫描角色：prefabs/mooneye.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/globalmapicon.lua`：?（Direct；line 90）
+
 
 ## 函数
 

@@ -1,6 +1,11 @@
 # `prefabs/bundle.lua`
 
 - 扫描角色：prefabs/bundle.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/ash.lua`：?（Direct；line 67,397）
+
 
 ## 函数
 

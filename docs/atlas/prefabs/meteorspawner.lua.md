@@ -1,7 +1,12 @@
 # `prefabs/meteorspawner.lua`
 
 - 扫描角色：prefabs/meteorspawner.lua
-- 归属变体（2 个）：meteorspawner, meteorspawner
+- 归属变体（1 个）：meteorspawner
+## 关联
+
+### 组件
+- `components/meteorshower.lua`：meteorspawner（Direct；line 9）
+
 
 ## 函数
 

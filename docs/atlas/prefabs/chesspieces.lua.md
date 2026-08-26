@@ -1,6 +1,13 @@
 # `prefabs/chesspieces.lua`
 
 - 扫描角色：prefabs/chesspieces.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 375）
+- `prefabs/underwater_salvageable.lua`：?（Direct；line 375）
+- `splash_green`：?（Direct；line 375）
+
 
 ## 函数
 

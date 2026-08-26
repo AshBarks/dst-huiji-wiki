@@ -1,6 +1,11 @@
 # `prefabs/weed_plants.lua`
 
 - 扫描角色：prefabs/weed_plants.lua
+## 关联
+
+### 预制体依赖
+- `farm_plant_happy`：?（Direct；line 599）
+
 
 ## 函数
 

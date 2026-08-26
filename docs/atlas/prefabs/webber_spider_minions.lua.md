@@ -1,7 +1,7 @@
 # `prefabs/webber_spider_minions.lua`
 
 - 扫描角色：prefabs/webber_spider_minions.lua
-- 归属变体（3 个）：webber_spider_minion, webber_spider_minion, webber_spider_minion
+- 归属变体（1 个）：webber_spider_minion
 
 ## 函数
 

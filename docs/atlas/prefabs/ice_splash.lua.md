@@ -1,7 +1,7 @@
 # `prefabs/ice_splash.lua`
 
 - 扫描角色：prefabs/ice_splash.lua
-- 归属变体（2 个）：ice_splash, ice_splash
+- 归属变体（1 个）：ice_splash
 
 ## 函数
 

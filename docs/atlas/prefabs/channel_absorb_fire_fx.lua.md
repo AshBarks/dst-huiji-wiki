@@ -1,7 +1,7 @@
 # `prefabs/channel_absorb_fire_fx.lua`
 
 - 扫描角色：prefabs/channel_absorb_fire_fx.lua
-- 归属变体（11 个）：channel_absorb_embers, channel_absorb_fire, channel_absorb_smoulder, channel_absorb_embers, channel_absorb_fire, channel_absorb_fire_fx, channel_absorb_smoulder, channel_absorb_embers, channel_absorb_fire, channel_absorb_fire_fx, channel_absorb_smoulder
+- 归属变体（4 个）：channel_absorb_embers, channel_absorb_fire, channel_absorb_fire_fx, channel_absorb_smoulder
 
 ## 函数
 
@@ -9,7 +9,7 @@
 - 归属：channel_absorb_embers, channel_absorb_fire, channel_absorb_smoulder
 
 ### KillFX  [6–12]
-- 归属：（未归属）
+- 归属：channel_absorb_fire_fx
 
 ### embersfn  [84–88]
 - 归属：channel_absorb_embers

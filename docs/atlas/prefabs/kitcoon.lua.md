@@ -1,7 +1,30 @@
 # `prefabs/kitcoon.lua`
 
 - 扫描角色：prefabs/kitcoon.lua
-- 归属变体（4 个）：kitcoon_hide_fx, kitcoon_hider_prop, kitcoon_hide_fx, kitcoon_hider_prop
+- 归属变体（2 个）：kitcoon_hide_fx, kitcoon_hider_prop
+## 关联
+
+### 组件
+- `components/drownable.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/embarker.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/entitytracker.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/follower.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/hideandseekhider.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/inspectable.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/kitcoon.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/locomotor.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/named.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/sleeper.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+- `components/spawnfader.lua`：kitcoon_hider_prop（Direct；line 389）
+- `components/timer.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+
+### 状态图
+- `stategraphs/SGkitcoon.lua`：kitcoon_hide_fx, kitcoon_hider_prop（HelperExpanded；line 442,443,444,445,446,447,448,449,450）
+
+### 预制体依赖
+- `kitcoon_hide_fx`：?（Direct；line 335）
+- `kitcoon_hider_prop`：?（Direct；line 335）
+
 
 ## 函数
 
@@ -30,10 +53,10 @@
 - 归属：（未归属）
 
 ### OnHiderPropSleep  [359–364]
-- 归属：（未归属）
+- 归属：kitcoon_hider_prop
 
 ### OnHiderPropWake  [366–370]
-- 归属：（未归属）
+- 归属：kitcoon_hider_prop
 
 ### OnLoad  [193–195]
 - 归属：（未归属）
@@ -81,7 +104,7 @@
 - 归属：kitcoon_hider_prop
 
 ### play_hider_periodic_sound  [354–357]
-- 归属：（未归属）
+- 归属：kitcoon_hider_prop
 
 ### yotbuild_master_postinit  [339–340]
 - 归属：（未归属）

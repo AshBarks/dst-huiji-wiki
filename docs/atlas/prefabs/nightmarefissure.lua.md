@@ -1,6 +1,13 @@
 # `prefabs/nightmarefissure.lua`
 
 - 扫描角色：prefabs/nightmarefissure.lua
+## 关联
+
+### 预制体依赖
+- `crawlingnightmare`：?（Direct；line 567）
+- `nightmarebeak`：?（Direct；line 567）
+- `ruinsnightmare`：?（Direct；line 567）
+
 
 ## 函数
 

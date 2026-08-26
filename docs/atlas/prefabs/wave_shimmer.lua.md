@@ -1,7 +1,7 @@
 # `prefabs/wave_shimmer.lua`
 
 - 扫描角色：prefabs/wave_shimmer.lua
-- 归属变体（12 个）：wave_shimmer, wave_shimmer_deep, wave_shimmer_flood, wave_shimmer_med, wave_shimmer, wave_shimmer_deep, wave_shimmer_flood, wave_shimmer_med, wave_shimmer_deep, wave_shimmer_flood, wave_shimmer_med, wave_shimmer
+- 归属变体（4 个）：wave_shimmer, wave_shimmer_deep, wave_shimmer_flood, wave_shimmer_med
 
 ## 函数
 

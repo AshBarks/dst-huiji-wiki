@@ -1,7 +1,7 @@
 # `prefabs/reticuleline.lua`
 
 - 扫描角色：prefabs/reticuleline.lua
-- 归属变体（3 个）：reticulelineping, reticulelineping, reticulelineping
+- 归属变体（1 个）：reticulelineping
 
 ## 函数
 
@@ -9,7 +9,7 @@
 - 归属：（未归属）
 
 ### UpdatePing  [10–27]
-- 归属：（未归属）
+- 归属：reticulelineping
 
 ### fn  [63–84]
 - 归属：（未归属）

@@ -1,6 +1,12 @@
 # `prefabs/marbletree.lua`
 
 - 扫描角色：prefabs/marbletree.lua
+## 关联
+
+### 预制体依赖
+- `marble`：?（Direct；line 110）
+- `prefabs/rock_break_fx.lua`：?（Direct；line 110）
+
 
 ## 函数
 

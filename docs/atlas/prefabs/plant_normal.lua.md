@@ -1,6 +1,17 @@
 # `prefabs/plant_normal.lua`
 
 - 扫描角色：prefabs/plant_normal.lua
+## 关联
+
+### 预制体依赖
+- `plant_dug_large_fx`：?（Direct；line 287）
+- `plant_dug_medium_fx`：?（Direct；line 287）
+- `plant_dug_small_fx`：?（Direct；line 287）
+- `prefabs/ash.lua`：?（Direct；line 287）
+- `prefabs/cutgrass.lua`：?（Direct；line 287）
+- `seeds_cooked`：?（Direct；line 287）
+- `spoiled_food`：?（Direct；line 287）
+
 
 ## 函数
 

@@ -230,6 +230,11 @@ impl<'a> Resolver<'a> {
                         stack.push(callee.clone());
                     }
                 }
+                for r in &scan.fn_refs {
+                    if r.scope.last().map(String::as_str) == Some(fn_name.as_str()) {
+                        stack.push(r.name.clone());
+                    }
+                }
             }
         }
         cache

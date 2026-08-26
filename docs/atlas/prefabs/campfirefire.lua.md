@@ -1,6 +1,11 @@
 # `prefabs/campfirefire.lua`
 
 - 扫描角色：prefabs/campfirefire.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/firefx_light.lua`：?（Direct；line 81）
+
 
 ## 函数
 

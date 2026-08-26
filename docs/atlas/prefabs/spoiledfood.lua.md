@@ -1,6 +1,13 @@
 # `prefabs/spoiledfood.lua`
 
 - 扫描角色：prefabs/spoiledfood.lua
+## 关联
+
+### 预制体依赖
+- `gridplacer_farmablesoil`：spoiled_food（Direct；line 263）
+- `prefabs/boneshard.lua`：spoiled_fish, spoiled_fish_small（Direct；line 264,265）
+- `spoiled_food`：spoiled_fish, spoiled_fish_small（Direct；line 264,265）
+
 
 ## 函数
 

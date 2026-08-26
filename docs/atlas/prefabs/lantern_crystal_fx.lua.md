@@ -1,12 +1,12 @@
 # `prefabs/lantern_crystal_fx.lua`
 
 - 扫描角色：prefabs/lantern_crystal_fx.lua
-- 归属变体（6 个）：lantern_crystal_fx_ground, lantern_crystal_fx_held, lantern_crystal_fx_ground, lantern_crystal_fx_held, lantern_crystal_fx_ground, lantern_crystal_fx_held
+- 归属变体（2 个）：lantern_crystal_fx_ground, lantern_crystal_fx_held
 
 ## 函数
 
 ### KillFX  [7–9]
-- 归属：（未归属）
+- 归属：lantern_crystal_fx_ground, lantern_crystal_fx_held
 
 ### commonfn  [11–36]
 - 归属：lantern_crystal_fx_ground, lantern_crystal_fx_held

@@ -1,6 +1,16 @@
 # `prefabs/eyeofterror_sinkhole.lua`
 
 - 扫描角色：prefabs/eyeofterror_sinkhole.lua
+## 关联
+
+### 预制体依赖
+- `mining_fx`：?（Direct；line 224）
+- `mining_ice_fx`：?（Direct；line 224）
+- `mining_moonglass_fx`：?（Direct；line 224）
+- `sinkhole_spawn_fx_1`：?（Direct；line 224）
+- `sinkhole_spawn_fx_2`：?（Direct；line 224）
+- `sinkhole_spawn_fx_3`：?（Direct；line 224）
+
 
 ## 函数
 

@@ -1,6 +1,11 @@
 # `prefabs/grotto_pool_moonglass.lua`
 
 - 扫描角色：prefabs/grotto_pool_moonglass.lua
+## 关联
+
+### 预制体依赖
+- `halloween_moonpuff`：?（Direct；line 127）
+
 
 ## 函数
 

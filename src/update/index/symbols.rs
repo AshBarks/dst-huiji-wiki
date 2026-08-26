@@ -44,6 +44,18 @@ pub struct FnDef {
     pub is_local: bool,
 }
 
+/// A function-value reference inside a scanned file (`inst.OnSave = OnSave`,
+/// `ListenForEvent("attacked", OnAttacked)`, etc.). Used to propagate prefab
+/// ownership through callbacks/assignments, not just direct local calls.
+#[derive(Debug, Clone, Serialize)]
+pub struct FnRefUse {
+    /// Referenced function name (a function defined in the same file).
+    pub name: String,
+    /// Chain of enclosing *named* function names, outermost first.
+    pub scope: Vec<String>,
+    pub line: u32,
+}
+
 /// A global assignment `Name = Class(...)` exporting a constructor whose
 /// parameter list is taken from the anonymous function argument of `Class`.
 #[derive(Debug, Clone, Serialize)]
@@ -130,6 +142,8 @@ pub struct FileScan {
     /// File-local numeric/string constants (`local SEE_DIST = 30`).
     pub consts: BTreeMap<String, ConstVal>,
     pub fns: Vec<FnDef>,
+    /// Function-value references used to expand owner propagation.
+    pub fn_refs: Vec<FnRefUse>,
     pub exports: Vec<ExportedCtor>,
     /// Tables of string literals (`local prefabs = {"a", "b"}`).
     pub dep_tables: BTreeMap<String, Vec<String>>,
@@ -148,6 +162,7 @@ impl FileScan {
             requires: Vec::new(),
             consts: BTreeMap::new(),
             fns: Vec::new(),
+            fn_refs: Vec::new(),
             exports: Vec::new(),
             dep_tables: BTreeMap::new(),
             prefab_regs: Vec::new(),

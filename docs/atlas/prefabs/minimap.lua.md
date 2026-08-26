@@ -1,7 +1,7 @@
 # `prefabs/minimap.lua`
 
 - 扫描角色：prefabs/minimap.lua
-- 归属变体（8 个）：minimap, minimap, minimap, minimap, minimap, minimap, minimap, minimap
+- 归属变体（1 个）：minimap
 
 ## 函数
 

@@ -1,6 +1,11 @@
 # `prefabs/fertilizer.lua`
 
 - 扫描角色：prefabs/fertilizer.lua
+## 关联
+
+### 预制体依赖
+- `gridplacer_farmablesoil`：?（Direct；line 74）
+
 
 ## 函数
 

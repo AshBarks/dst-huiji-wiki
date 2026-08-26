@@ -1,7 +1,19 @@
 # `prefabs/vault_key_trial.lua`
 
 - 扫描角色：prefabs/vault_key_trial.lua
-- 归属变体（19 个）：vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial, vault_key_trial
+- 归属变体（1 个）：vault_key_trial
+## 关联
+
+### 组件
+- `components/entitytracker.lua`：vault_key_trial（Direct；line 375）
+
+### 预制体依赖
+- `vault_crawler_chandelier`：vault_key_trial（Direct；line 471）
+- `vault_crawler_socket`：vault_key_trial（Direct；line 471）
+- `vault_key_activator_plate`：vault_key_trial（Direct；line 471）
+- `vault_key_pedestal_plate`：vault_key_trial（Direct；line 471）
+- `vault_pillar_guard_dormant`：vault_key_trial（Direct；line 471）
+
 
 ## 函数
 
@@ -27,7 +39,7 @@
 - 归属：vault_key_trial
 
 ### InitializeLayout  [235–268]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### KillSounds  [24–28]
 - 归属：vault_key_trial
@@ -36,19 +48,19 @@
 - 归属：vault_key_trial
 
 ### OnLoadPostPass  [270–299]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### OnPuzzleProgressDirty  [324–333]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### SpawnActivatorAtXZ  [229–233]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### SpawnTrackedPrefabAtXZ  [222–227]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### TrackActivator  [217–220]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### TrackCrawler  [145–150]
 - 归属：vault_key_trial
@@ -57,10 +69,10 @@
 - 归属：vault_key_trial
 
 ### TrackLight  [209–211]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### TrackSocket  [213–215]
-- 归属：（未归属）
+- 归属：vault_key_trial
 
 ### _dbg_print  [20–22]
 - 归属：vault_key_trial

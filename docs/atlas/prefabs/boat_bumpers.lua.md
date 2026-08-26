@@ -1,6 +1,11 @@
 # `prefabs/boat_bumpers.lua`
 
 - 扫描角色：prefabs/boat_bumpers.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 310）
+
 
 ## 函数
 

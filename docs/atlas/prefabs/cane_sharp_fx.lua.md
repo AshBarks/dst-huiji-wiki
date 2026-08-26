@@ -1,7 +1,7 @@
 # `prefabs/cane_sharp_fx.lua`
 
 - 扫描角色：prefabs/cane_sharp_fx.lua
-- 归属变体（8 个）：cane_sharp_fx, cane_sharp_fx, cane_sharp_fx, cane_sharp_fx, cane_sharp_fx, cane_sharp_fx, cane_sharp_fx, cane_sharp_fx
+- 归属变体（1 个）：cane_sharp_fx
 
 ## 函数
 

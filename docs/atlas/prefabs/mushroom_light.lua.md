@@ -1,6 +1,11 @@
 # `prefabs/mushroom_light.lua`
 
 - 扫描角色：prefabs/mushroom_light.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 320）
+
 
 ## 函数
 

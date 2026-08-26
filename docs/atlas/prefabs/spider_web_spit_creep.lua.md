@@ -1,7 +1,7 @@
 # `prefabs/spider_web_spit_creep.lua`
 
 - 扫描角色：prefabs/spider_web_spit_creep.lua
-- 归属变体（2 个）：spider_web_spit_creep, spider_web_spit_creep
+- 归属变体（1 个）：spider_web_spit_creep
 
 ## 函数
 

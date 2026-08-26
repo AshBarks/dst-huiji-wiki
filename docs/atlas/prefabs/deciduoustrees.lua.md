@@ -1,6 +1,29 @@
 # `prefabs/deciduoustrees.lua`
 
 - 扫描角色：prefabs/deciduoustrees.lua
+## 关联
+
+### 预制体依赖
+- `green_leaves`：?（Direct；line 1450）
+- `green_leaves_chop`：?（Direct；line 1450）
+- `orange_leaves`：?（Direct；line 1450）
+- `orange_leaves_chop`：?（Direct；line 1450）
+- `prefabs/acorn.lua`：?（Direct；line 1450）
+- `prefabs/birchnutdrake.lua`：?（Direct；line 1450）
+- `prefabs/charcoal.lua`：?（Direct；line 1450）
+- `prefabs/deciduous_root.lua`：?（Direct；line 1450）
+- `prefabs/livinglog.lua`：?（Direct；line 1450）
+- `prefabs/log.lua`：?（Direct；line 1450）
+- `prefabs/nightmarefuel.lua`：?（Direct；line 1450）
+- `purple_leaves`：?（Direct；line 1450）
+- `purple_leaves_chop`：?（Direct；line 1450）
+- `red_leaves`：?（Direct；line 1450）
+- `red_leaves_chop`：?（Direct；line 1450）
+- `small_puff`：?（Direct；line 1450）
+- `spoiled_food`：?（Direct；line 1450）
+- `yellow_leaves`：?（Direct；line 1450）
+- `yellow_leaves_chop`：?（Direct；line 1450）
+
 
 ## 函数
 

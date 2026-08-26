@@ -1,6 +1,13 @@
 # `prefabs/shadowcreature.lua`
 
 - 扫描角色：prefabs/shadowcreature.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/nightmarefuel.lua`：?（Direct；line 326）
+- `shadow_teleport_in`：?（Direct；line 326）
+- `shadow_teleport_out`：?（Direct；line 326）
+
 
 ## 函数
 

@@ -1,7 +1,7 @@
 # `prefabs/sounddebugicon.lua`
 
 - 扫描角色：prefabs/sounddebugicon.lua
-- 归属变体（2 个）：sounddebugicon, sounddebugicon
+- 归属变体（1 个）：sounddebugicon
 
 ## 函数
 

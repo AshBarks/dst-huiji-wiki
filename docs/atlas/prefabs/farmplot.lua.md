@@ -1,6 +1,30 @@
 # `prefabs/farmplot.lua`
 
 - 扫描角色：prefabs/farmplot.lua
+## 关联
+
+### 组件
+- `components/placer.lua`：fast_farmplot, slow_farmplot（HelperExpanded；line 378,379）
+
+### 预制体依赖
+- `burntfencepost`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `burntfencepostright`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `burntstick`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `burntstickleft`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `burntstickright`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `collapse_small`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `farmrock`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `farmrockflat`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `farmrocktall`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `fencepost`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `fencepostright`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `prefabs/plant_normal.lua`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `signleft`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `signright`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `stick`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `stickleft`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+- `stickright`：fast_farmplot, slow_farmplot（Direct；line 376,377）
+
 
 ## 函数
 

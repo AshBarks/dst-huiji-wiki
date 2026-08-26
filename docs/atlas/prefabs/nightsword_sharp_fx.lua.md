@@ -1,7 +1,7 @@
 # `prefabs/nightsword_sharp_fx.lua`
 
 - 扫描角色：prefabs/nightsword_sharp_fx.lua
-- 归属变体（10 个）：nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx, nightsword_sharp_fx
+- 归属变体（1 个）：nightsword_sharp_fx
 
 ## 函数
 

@@ -1,7 +1,19 @@
 # `prefabs/slingshot.lua`
 
 - 扫描角色：prefabs/slingshot.lua
-- 归属变体（2 个）：slingshotparts_fx, slingshotparts_fx
+- 归属变体（1 个）：slingshotparts_fx
+## 关联
+
+### 组件
+- `components/clientpickupsoundsuppressor.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/container.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/equippable.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/inspectable.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/inventoryitem.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/linkeditem.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/slingshotmods.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+- `components/weapon.lua`：slingshotparts_fx（HelperExpanded；line 909,910,911,912,913）
+
 
 ## 函数
 
@@ -54,7 +66,7 @@
 - 归属：（未归属）
 
 ### OnRemoveFx  [177–182]
-- 归属：（未归属）
+- 归属：slingshotparts_fx
 
 ### OnSlingshotSkinChanged  [169–173]
 - 归属：（未归属）
@@ -96,7 +108,7 @@
 - 归属：（未归属）
 
 ### SetHighlightChildren  [184–192]
-- 归属：（未归属）
+- 归属：slingshotparts_fx
 
 ### UpdateLinkedItemOwner  [415–426]
 - 归属：（未归属）
@@ -108,7 +120,7 @@
 - 归属：（未归属）
 
 ### partsfx_OnEntityReplicated  [873–878]
-- 归属：（未归属）
+- 归属：slingshotparts_fx
 
 ### partsfxfn  [880–905]
 - 归属：slingshotparts_fx

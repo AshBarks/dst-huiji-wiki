@@ -1,7 +1,7 @@
 # `prefabs/quagmire_coins.lua`
 
 - 扫描角色：prefabs/quagmire_coins.lua
-- 归属变体（3 个）：quagmire_coin_fx, quagmire_coin_fx, quagmire_coin_fx
+- 归属变体（1 个）：quagmire_coin_fx
 
 ## 函数
 

@@ -1,7 +1,23 @@
 # `prefabs/singingshell.lua`
 
 - 扫描角色：prefabs/singingshell.lua
-- 归属变体（5 个）：singingshell_critterfx, singingshell_critterfx, singingshell_critterfx, singingshell_critterfx, singingshell_critterfx
+- 归属变体（1 个）：singingshell_critterfx
+## 关联
+
+### 组件
+- `components/cyclable.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+- `components/hauntable.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+- `components/inspectable.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+- `components/inventoryitem.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+- `components/lootdropper.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+- `components/workable.lua`：singingshell_critterfx（HelperExpanded；line 330,331,332）
+
+### 预制体依赖
+- `prefabs/slurtle_shellpieces.lua`：?（Direct；line 232）
+- `singingshell_creature_rockfx`：?（Direct；line 232）
+- `singingshell_creature_woodfx`：?（Direct；line 232）
+- `singingshell_critterfx`：?（Direct；line 232）
+
 
 ## 函数
 

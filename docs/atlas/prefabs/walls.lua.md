@@ -1,6 +1,11 @@
 # `prefabs/walls.lua`
 
 - 扫描角色：prefabs/walls.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 377）
+
 
 ## 函数
 

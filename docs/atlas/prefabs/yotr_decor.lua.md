@@ -1,6 +1,14 @@
 # `prefabs/yotr_decor.lua`
 
 - 扫描角色：prefabs/yotr_decor.lua
+## 关联
+
+### 预制体依赖
+- `collapse_small`：?（Direct；line 206）
+- `prefabs/ash.lua`：?（Direct；line 206）
+- `prefabs/charcoal.lua`：?（Direct；line 206）
+- `prefabs/torchfire.lua`：?（Direct；line 206）
+
 
 ## 函数
 

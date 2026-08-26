@@ -1,7 +1,7 @@
 # `prefabs/thurible_smoke.lua`
 
 - 扫描角色：prefabs/thurible_smoke.lua
-- 归属变体（10 个）：thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke, thurible_smoke
+- 归属变体（1 个）：thurible_smoke
 
 ## 函数
 
@@ -15,10 +15,10 @@
 - 归属：thurible_smoke
 
 ### OnEntitySleep  [26–28]
-- 归属：（未归属）
+- 归属：thurible_smoke
 
 ### OnEntityWake  [20–24]
-- 归属：（未归属）
+- 归属：thurible_smoke
 
 ### emit_hand_fn  [104–118]
 - 归属：thurible_smoke

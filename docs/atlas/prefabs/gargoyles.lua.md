@@ -1,6 +1,11 @@
 # `prefabs/gargoyles.lua`
 
 - 扫描角色：prefabs/gargoyles.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/moonrocknugget.lua`：?（Direct；line 216）
+
 
 ## 函数
 

@@ -1,6 +1,26 @@
 # `prefabs/statueruins.lua`
 
 - 扫描角色：prefabs/statueruins.lua
+## 关联
+
+### 预制体依赖
+- `bluegem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `collapse_small`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `greengem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `marble`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `orangegem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `prefabs/nightmarefuel.lua`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `prefabs/thulecite.lua`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `purplegem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `redgem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `ruins_statue_head`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `ruins_statue_head_nogem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `ruins_statue_mage`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `ruins_statue_mage_nogem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `statue_transition`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `statue_transition_2`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+- `yellowgem`：ruins_statue_head, ruins_statue_head_nogem, ruins_statue_mage, ruins_statue_mage_nogem（Direct；line 340,341,342,343）
+
 
 ## 函数
 

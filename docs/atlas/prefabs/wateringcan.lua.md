@@ -1,6 +1,11 @@
 # `prefabs/wateringcan.lua`
 
 - 扫描角色：prefabs/wateringcan.lua
+## 关联
+
+### 预制体依赖
+- `prefabs/gridplacer.lua`：?（Direct；line 171）
+
 
 ## 函数
 

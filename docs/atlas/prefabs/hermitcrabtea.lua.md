@@ -1,6 +1,11 @@
 # `prefabs/hermitcrabtea.lua`
 
 - 扫描角色：prefabs/hermitcrabtea.lua
+## 关联
+
+### 预制体依赖
+- `messagebottleempty`：?（Direct；line 149,238）
+
 
 ## 函数
 

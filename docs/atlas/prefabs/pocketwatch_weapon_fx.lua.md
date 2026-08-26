@@ -1,7 +1,7 @@
 # `prefabs/pocketwatch_weapon_fx.lua`
 
 - 扫描角色：prefabs/pocketwatch_weapon_fx.lua
-- 归属变体（9 个）：pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx, pocketwatch_weapon_fx
+- 归属变体（1 个）：pocketwatch_weapon_fx
 
 ## 函数
 

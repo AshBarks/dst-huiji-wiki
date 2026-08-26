@@ -1,6 +1,12 @@
 # `prefabs/support_pillar.lua`
 
 - 扫描角色：prefabs/support_pillar.lua
+## 关联
+
+### 预制体依赖
+- `collapse_big`：?（Direct；line 617,765）
+- `construction_container`：?（Direct；line 617,765）
+
 
 ## 函数
 

@@ -1,21 +1,48 @@
 # `prefabs/willow_ember.lua`
 
 - 扫描角色：prefabs/willow_ember.lua
-- 归属变体（13 个）：buff_firefrenzy, willow_ember, willow_ember, willow_ember, willow_ember, willow_ember, buff_firefrenzy, willow_ember, willow_ember, willow_ember, willow_ember, willow_ember, willow_ember
+- 归属变体（2 个）：buff_firefrenzy, willow_ember
+## 关联
+
+### 组件
+- `components/aoespell.lua`：willow_ember（Direct；line 973）
+- `components/aoetargeting.lua`：willow_ember（Direct；line 944）
+- `components/clientpickupsoundsuppressor.lua`：willow_ember（Direct；line 954）
+- `components/debuff.lua`：buff_firefrenzy（Direct；line 1068）
+- `components/fuel.lua`：willow_ember（Direct；line 969）
+- `components/inspectable.lua`：willow_ember（Direct；line 987）
+- `components/inventoryitem.lua`：willow_ember（Direct；line 975）
+- `components/locomotor.lua`：willow_ember（Direct；line 980）
+- `components/spellbook.lua`：willow_ember（Direct；line 935）
+- `components/stackable.lua`：willow_ember（Direct；line 984）
+
+### 预制体依赖
+- `deerclops_laserscorch`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `firering_fx`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `firesplash_fx`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `prefabs/flamethrower_fx.lua`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `prefabs/reticulemultitarget.lua`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `reticuleaoe5line`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `reticuleaoeping5line`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `spell_fire_throw`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `willow_frenzy`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `willow_shadow_flame`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+- `willow_throw_flame`：buff_firefrenzy, willow_ember（Direct；line 1077,1078）
+
 
 ## 函数
 
 ### Buff_OnAttached  [1010–1028]
-- 归属：（未归属）
+- 归属：buff_firefrenzy
 
 ### Buff_OnDetached  [1030–1041]
-- 归属：（未归属）
+- 归属：buff_firefrenzy
 
 ### Buff_OnExtended  [1043–1048]
-- 归属：（未归属）
+- 归属：buff_firefrenzy
 
 ### Buff_OnKill  [1006–1008]
-- 归属：（未归属）
+- 归属：buff_firefrenzy
 
 ### CheckStackSize  [109–111]
 - 归属：（未归属）
@@ -30,7 +57,7 @@
 - 归属：willow_ember
 
 ### DoOnClientInit  [890–893]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### DoShadowFire  [354–359]
 - 归属：（未归属）
@@ -51,22 +78,22 @@
 - 归属：（未归属）
 
 ### KillEmber  [65–70]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### LunarFireSpellFn  [425–437]
 - 归属：（未归属）
 
 ### OnCloseSpellBook  [122–129]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### OnDropped  [91–104]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### OnOpenSpellBook  [113–120]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### OnUpdateSpellsDirty  [886–888]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### ReticuleFireBallTargetFn  [476–478]
 - 归属：（未归属）
@@ -75,7 +102,7 @@
 - 归属：（未归属）
 
 ### ReticuleTargetAllowWaterFn  [461–474]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### ShadowFireSpellFn  [439–449]
 - 归属：（未归属）
@@ -159,7 +186,7 @@
 - 归属：willow_ember
 
 ### topocket  [895–907]
-- 归属：（未归属）
+- 归属：willow_ember
 
 ### tryconsume  [131–142]
 - 归属：（未归属）

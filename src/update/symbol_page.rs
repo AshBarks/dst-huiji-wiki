@@ -125,6 +125,143 @@ fn affected_variants(artifact: &IndexArtifact, symbol: &SymbolRef) -> Vec<String
     out
 }
 
+fn symbol_variant_count(artifact: &IndexArtifact, symbol: &SymbolRef) -> usize {
+    match symbol {
+        SymbolRef::File { path } => {
+            if path.starts_with("prefabs/") {
+                artifact
+                    .fn_owners
+                    .get(path)
+                    .map(|m| m.values().map(|vs| vs.len()).sum::<usize>())
+                    .unwrap_or(0)
+            } else {
+                artifact.reverse.get(path).map(Vec::len).unwrap_or(0)
+            }
+        }
+        SymbolRef::Fn { file, name } => artifact
+            .fn_owners
+            .get(file)
+            .and_then(|m| m.get(name))
+            .map(Vec::len)
+            .unwrap_or(0),
+        SymbolRef::Const { file, .. } => {
+            if file.starts_with("prefabs/") {
+                artifact
+                    .fn_owners
+                    .get(file)
+                    .map(|m| m.values().map(|vs| vs.len()).sum::<usize>())
+                    .unwrap_or(0)
+            } else {
+                artifact.reverse.get(file).map(Vec::len).unwrap_or(0)
+            }
+        }
+        SymbolRef::Behaviour { name } => artifact
+            .behaviour_calls
+            .iter()
+            .filter(|b| b.ctor == *name)
+            .map(|b| b.prefab_variants.len())
+            .sum(),
+    }
+}
+
+/// P2: select high-reference symbols (file / fn / behaviour) by the number
+/// of prefab variants they affect.
+pub fn top_symbols(artifact: &IndexArtifact, limit: usize) -> Vec<SymbolRef> {
+    let mut seen = BTreeSet::new();
+    let mut candidates: Vec<SymbolRef> = Vec::new();
+
+    for path in artifact.reverse.keys() {
+        let sym = SymbolRef::File { path: path.clone() };
+        if seen.insert(format!("file:{path}")) {
+            candidates.push(sym);
+        }
+    }
+    for (file, fns) in &artifact.fn_owners {
+        for name in fns.keys() {
+            let sym = SymbolRef::Fn {
+                file: file.clone(),
+                name: name.clone(),
+            };
+            if seen.insert(format!("fn:{file}:{name}")) {
+                candidates.push(sym);
+            }
+        }
+    }
+    let mut behaviour_names: BTreeSet<String> = BTreeSet::new();
+    for b in &artifact.behaviour_calls {
+        behaviour_names.insert(b.ctor.clone());
+    }
+    for name in behaviour_names {
+        let sym = SymbolRef::Behaviour { name: name.clone() };
+        if seen.insert(format!("behaviour:{name}")) {
+            candidates.push(sym);
+        }
+    }
+
+    let mut with_count: Vec<(usize, SymbolRef)> = candidates
+        .into_iter()
+        .map(|s| (symbol_variant_count(artifact, &s), s))
+        .collect();
+    with_count.sort_by(|a, b| {
+        b.0.cmp(&a.0)
+            .then_with(|| format!("{:?}", a.1).cmp(&format!("{:?}", b.1)))
+    });
+    with_count.into_iter().take(limit).map(|(_, s)| s).collect()
+}
+
+/// P2: build candidate evidence packs for the top `limit` symbols.
+pub fn build_symbol_evidence_packs(
+    artifact: &IndexArtifact,
+    view: &CorpusPageView,
+    limit: usize,
+) -> Vec<SymbolPageAnnotation> {
+    top_symbols(artifact, limit)
+        .into_iter()
+        .map(|symbol| annotate_symbol(artifact, view, symbol))
+        .collect()
+}
+
+/// Render one annotation as a compact Markdown evidence pack for review.
+pub fn render_symbol_pack_md(ann: &SymbolPageAnnotation) -> String {
+    let symbol = match &ann.symbol {
+        SymbolRef::File { path } => path.clone(),
+        SymbolRef::Fn { file, name } => format!("{file}#{name}"),
+        SymbolRef::Const { file, name } => format!("{file}#{name}"),
+        SymbolRef::Behaviour { name } => format!("behaviours/{name}"),
+    };
+    let mut out = String::new();
+    out.push_str(&format!(
+        "## `{symbol}`
+
+"
+    ));
+    out.push_str(&format!("- kind: {:?}\n", ann.kind));
+    out.push_str(&format!("- visibility: {:?}\n", ann.visibility));
+    out.push_str(&format!(
+        "- affected_variants: {} ({})\n",
+        ann.affected_variants.len(),
+        ann.affected_variants.join(", ")
+    ));
+    out.push_str(&format!(
+        "- affected_pageids: {} ({})\n",
+        ann.affected_pageids.len(),
+        ann.affected_pageids
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>()
+            .join(", ")
+    ));
+    out.push_str(&format!("- evidence: {} 条\n", ann.page_evidence.len()));
+    for e in ann.page_evidence.iter().take(8) {
+        out.push_str(&format!(
+            "  - page {} `{}`：{}（{}）\n",
+            e.pageid, e.region_id, e.raw, e.snippet
+        ));
+    }
+    out.push('\n');
+    out
+}
+
 /// Builds a P1 annotation for one symbol: affected variants → affected pages
 /// → candidate page evidence.
 pub fn annotate_symbol(
@@ -268,5 +405,22 @@ return Brain(inst, PriorityNode({}, 1))
             .affected_variants
             .contains(&"prefabs/hound.lua#hound".to_string()));
         assert_eq!(ann.affected_pageids, vec![13857]);
+    }
+
+    #[test]
+    fn top_symbols_and_evidence_packs_are_generated() {
+        let files = vec![
+            ("prefabs/hound.lua".to_string(), HOUND_PREFAB.to_string()),
+            ("brains/houndbrain.lua".to_string(), HOUND_BRAIN.to_string()),
+        ];
+        let artifact = build_from_sources(&files).unwrap();
+        let view = hound_view();
+
+        assert!(!top_symbols(&artifact, 10).is_empty());
+        let packs = build_symbol_evidence_packs(&artifact, &view, 10);
+        assert!(!packs.is_empty());
+        let md = render_symbol_pack_md(&packs[0]);
+        assert!(md.contains("## `"));
+        assert!(md.contains("affected_variants"));
     }
 }

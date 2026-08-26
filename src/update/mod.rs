@@ -37,6 +37,7 @@ pub use rules::{default_rules, evaluate as evaluate_rules, RuleHit, Tier0Rule};
 pub use snapshot::SnapshotStore;
 pub use stats::{extract_stats, StatFact, StatKind};
 pub use symbol_page::{
-    annotate_symbol, SymbolKind, SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
+    annotate_symbol, build_symbol_evidence_packs, render_symbol_pack_md, top_symbols, SymbolKind,
+    SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
 };
 pub use takeup::{TakeupConfig, Tier};

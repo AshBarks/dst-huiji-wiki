@@ -1,0 +1,55 @@
+[
+  {
+    "symbol": "SEE_DIST",
+    "total_pages": 3,
+    "mentioned_pages": [
+      13857,
+      73451
+    ],
+    "missing_pages": [
+      {
+        "pageid": 23210,
+        "note": "同组页面均描述该行为，此页缺失"
+      }
+    ],
+    "inconsistent_pages": [
+      {
+        "pageid": 73451,
+        "wording": "40 距离单位",
+        "note": "代码当前值为 30",
+        "confidence": "high"
+      }
+    ]
+  },
+  {
+    "symbol": "combat.SetDefaultDamage",
+    "total_pages": 2,
+    "mentioned_pages": [
+      13857,
+      15642
+    ],
+    "missing_pages": [],
+    "inconsistent_pages": [
+      {
+        "pageid": 15642,
+        "wording": "伤害 100",
+        "note": "代码当前为 75，需确认是否版本差异",
+        "confidence": "medium"
+      }
+    ]
+  },
+  {
+    "symbol": "Wander",
+    "total_pages": 2,
+    "mentioned_pages": [
+      13857
+    ],
+    "missing_pages": [
+      {
+        "pageid": 23210,
+        "note": "未能确认是否应有游荡描述"
+      }
+    ],
+    "inconsistent_pages": []
+  }
+]

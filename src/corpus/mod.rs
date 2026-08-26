@@ -8,6 +8,7 @@
 //! (redirect map, class summary) is derived and rebuildable.
 
 pub mod classify;
+pub mod facts;
 pub mod model;
 pub mod prefab_index;
 pub mod segment;
@@ -260,7 +261,8 @@ pub async fn build_indexes(
 
     reporter.stage("切分页面区域");
     let mut regions_buf = String::new();
-    let (mut pages_segmented, mut region_count) = (0usize, 0usize);
+    let mut facts_buf = String::new();
+    let (mut pages_segmented, mut region_count, mut fact_count) = (0usize, 0usize, 0usize);
     for meta in metas.values() {
         if meta.redirect {
             continue;
@@ -277,9 +279,21 @@ pub async fn build_indexes(
             &serde_json::json!({"pageid": meta.pageid, "title": meta.title, "regions": regions}),
         )?;
         regions_buf.push('\n');
+
+        for region in &regions {
+            for fact in facts::extract(
+                meta.pageid,
+                &region.id,
+                &text[region.start_byte..region.end_byte],
+            ) {
+                fact_count += 1;
+                serde_json::to_writer(LineWriter(&mut facts_buf), &fact)?;
+                facts_buf.push('\n');
+            }
+        }
     }
     reporter.log(format!(
-        "切分 {pages_segmented} 页，共 {region_count} 个区域"
+        "切分 {pages_segmented} 页，共 {region_count} 个区域、{fact_count} 条数值事实候选"
     ));
 
     if dry_run {
@@ -289,6 +303,7 @@ pub async fn build_indexes(
             "dry_run": true,
             "stats": serde_json::to_value(&registry.stats)?,
             "regions": {"pages": pages_segmented, "total": region_count},
+            "facts": {"total": fact_count},
         }));
     }
 
@@ -297,14 +312,21 @@ pub async fn build_indexes(
     reporter.log(format!("已写 {}", reg_path.display()));
     let seg_path = save_regions(store.root(), &regions_buf)?;
     reporter.log(format!("已写 {}", seg_path.display()));
+    let fact_path = save_lines(store.root(), "facts.jsonl", &facts_buf)?;
+    reporter.log(format!("已写 {}", fact_path.display()));
 
     Ok(serde_json::json!({
         "host": host,
         "dry_run": false,
-        "artifacts": ["index/pages_by_prefab.json", "index/regions.jsonl"],
+        "artifacts": [
+            "index/pages_by_prefab.json",
+            "index/regions.jsonl",
+            "index/facts.jsonl",
+        ],
         "stats": serde_json::to_value(&registry.stats)?,
         "pages_without_prefab_count": registry.pages_without_prefab.len(),
         "regions": {"pages": pages_segmented, "total": region_count},
+        "facts": {"total": fact_count},
     }))
 }
 
@@ -323,10 +345,15 @@ impl std::io::Write for LineWriter<'_> {
 
 /// Writes the regions JSONL atomically under `<root>/index/`.
 fn save_regions(root: &Path, body: &str) -> Result<std::path::PathBuf> {
+    save_lines(root, "regions.jsonl", body)
+}
+
+/// Atomically writes a JSONL artifact under `<root>/index/<name>`.
+fn save_lines(root: &Path, name: &str, body: &str) -> Result<std::path::PathBuf> {
     let dir = root.join("index");
     std::fs::create_dir_all(&dir)?;
-    let target = dir.join("regions.jsonl");
-    let tmp = dir.join(".regions.jsonl.tmp");
+    let target = dir.join(name);
+    let tmp = dir.join(format!(".{name}.tmp"));
     std::fs::write(&tmp, body)?;
     std::fs::rename(&tmp, &target)?;
     Ok(target)

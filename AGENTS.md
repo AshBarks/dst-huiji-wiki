@@ -44,7 +44,7 @@ dst-huiji-wiki/
 | Change write/confirm policy | `src/service/mod.rs` (`WriteMode`, `decide_write`) | CLI maps --yes/--dry-run to WriteMode |
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs |
-| Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/` |
+| Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
 | Add environment config | `.env.example` → `.env` | HUIJI__* and DST__ROOT vars |
 

@@ -10,6 +10,7 @@
 pub mod classify;
 pub mod model;
 pub mod prefab_index;
+pub mod segment;
 pub mod store;
 
 pub use model::{ClassConfidence, CorpusManifest, GameClass, PageMeta};
@@ -257,26 +258,78 @@ pub async fn build_indexes(
         registry.pages_without_prefab.len(),
     ));
 
+    reporter.stage("切分页面区域");
+    let mut regions_buf = String::new();
+    let (mut pages_segmented, mut region_count) = (0usize, 0usize);
+    for meta in metas.values() {
+        if meta.redirect {
+            continue;
+        }
+        let Some(text) = store.read_page(meta.pageid)? else {
+            continue;
+        };
+        let regions = segment::segment(meta.pageid, &text);
+        region_count += regions.len();
+        pages_segmented += 1;
+        serde_json::to_writer(
+            // One JSON line per page: {"pageid","title","regions":[…]}
+            LineWriter(&mut regions_buf),
+            &serde_json::json!({"pageid": meta.pageid, "title": meta.title, "regions": regions}),
+        )?;
+        regions_buf.push('\n');
+    }
+    reporter.log(format!(
+        "切分 {pages_segmented} 页，共 {region_count} 个区域"
+    ));
+
     if dry_run {
         reporter.log("dry-run：不写任何工件".to_string());
         return Ok(serde_json::json!({
             "host": host,
             "dry_run": true,
             "stats": serde_json::to_value(&registry.stats)?,
+            "regions": {"pages": pages_segmented, "total": region_count},
         }));
     }
 
     reporter.stage("写出工件");
-    let path = prefab_index::save_registry(store.root(), &registry)?;
-    reporter.log(format!("已写 {}", path.display()));
+    let reg_path = prefab_index::save_registry(store.root(), &registry)?;
+    reporter.log(format!("已写 {}", reg_path.display()));
+    let seg_path = save_regions(store.root(), &regions_buf)?;
+    reporter.log(format!("已写 {}", seg_path.display()));
 
     Ok(serde_json::json!({
         "host": host,
         "dry_run": false,
-        "artifacts": ["index/pages_by_prefab.json"],
+        "artifacts": ["index/pages_by_prefab.json", "index/regions.jsonl"],
         "stats": serde_json::to_value(&registry.stats)?,
         "pages_without_prefab_count": registry.pages_without_prefab.len(),
+        "regions": {"pages": pages_segmented, "total": region_count},
     }))
+}
+
+/// Appends JSON via `Display`-free `io::Write` on a String buffer so json!
+/// values stream without intermediate allocations per field.
+struct LineWriter<'a>(&'a mut String);
+impl std::io::Write for LineWriter<'_> {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.push_str(&String::from_utf8_lossy(buf));
+        Ok(buf.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+/// Writes the regions JSONL atomically under `<root>/index/`.
+fn save_regions(root: &Path, body: &str) -> Result<std::path::PathBuf> {
+    let dir = root.join("index");
+    std::fs::create_dir_all(&dir)?;
+    let target = dir.join("regions.jsonl");
+    let tmp = dir.join(".regions.jsonl.tmp");
+    std::fs::write(&tmp, body)?;
+    std::fs::rename(&tmp, &target)?;
+    Ok(target)
 }
 
 /// A corpus base dir holds one tree per wiki host; index building operates on

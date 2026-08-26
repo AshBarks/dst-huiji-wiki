@@ -15,7 +15,10 @@ pub mod stats;
 pub mod takeup;
 
 pub use diffdata::{DiffStatus, FileDiff, Hunk, TreeDiff};
-pub use fact::{pair_loot_changes, EvidenceRef, FactChange, FactKind, Literal};
+pub use fact::{
+    collect_stat_records, pair_loot_changes, pair_stat_changes, EvidenceRef, FactChange, FactKind,
+    Literal,
+};
 pub use grade::{
     grade_changes, summarize as summarize_grades, CorpusPageView, GradeTier, GradedChange,
 };

@@ -170,6 +170,62 @@ pub fn attribute_stats(
         .collect()
 }
 
+/// Walks `<root>/prefabs/*.lua`, extracts stats, attributes them via the
+/// side's fn ranges/owners. Unreadable files are skipped (diff engine
+/// reports them separately).
+pub fn collect_stat_records(
+    root: &std::path::Path,
+    index: &super::index::edges::IndexArtifact,
+    tuning: &super::index::tuning::TuningTable,
+) -> std::collections::BTreeMap<String, Vec<StatRecord>> {
+    use std::collections::BTreeSet;
+    let mut out = std::collections::BTreeMap::new();
+    for (file, ranges) in &index.fn_ranges {
+        if !file.starts_with("prefabs/") || !file.ends_with(".lua") {
+            continue;
+        }
+        let Ok(src) = std::fs::read_to_string(root.join(file)) else {
+            continue;
+        };
+        let Ok(facts) = super::stats::extract_stats(&src, tuning) else {
+            continue;
+        };
+        let owners_of_file = index.fn_owners.get(file);
+        let all: BTreeSet<String> = owners_of_file
+            .map(|m| m.values().flatten().cloned().collect())
+            .unwrap_or_default();
+        let rl: Vec<(&str, u32, u32)> = ranges
+            .iter()
+            .map(|(n, (s, e))| (n.as_str(), *s, *e))
+            .collect();
+        for f in &facts {
+            let mut vs: BTreeSet<String> = BTreeSet::new();
+            for (name, start, end) in &rl {
+                if f.line >= *start && f.line <= *end {
+                    if let Some(o) = owners_of_file.and_then(|m| m.get(*name)) {
+                        vs.extend(o.iter().cloned());
+                    }
+                }
+            }
+            if vs.is_empty() {
+                vs = all.clone();
+            }
+            for v in vs {
+                out.entry(v.clone())
+                    .or_insert_with(Vec::new)
+                    .push(StatRecord {
+                        field: f.kind.field(),
+                        value: f.value,
+                        raw_arg: f.raw_arg.clone(),
+                        line: f.line,
+                        variants: vec![v],
+                    });
+            }
+        }
+    }
+    out
+}
+
 /// Pairs two snapshots' attributed stats into numeric changes.
 /// Key = (variant, field); a (file-level) item moving files does not fire —
 /// only genuine old≠new values or presence flips do.

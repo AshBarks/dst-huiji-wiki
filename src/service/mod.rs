@@ -380,8 +380,15 @@ async fn run_update_scan(
         reporter.stage("Layer B 定级（loot 配对，只读）");
         reporter.log("构建旧树索引（loot 配对需要）".to_string());
         let old_atlas = crate::update::build_atlas_from_dir(&old_root)?;
-        let changes = crate::update::pair_loot_changes(&old_atlas.index.loot, &atlas.index.loot);
-        reporter.log(format!("配对出掉落变更 {} 条", changes.len()));
+        let mut changes =
+            crate::update::pair_loot_changes(&old_atlas.index.loot, &atlas.index.loot);
+        let old_stats =
+            crate::update::collect_stat_records(&old_root, &old_atlas.index, &old_atlas.tuning);
+        let new_stats = crate::update::collect_stat_records(&new_root, &atlas.index, &atlas.tuning);
+        let stat_changes = crate::update::pair_stat_changes(&old_stats, &new_stats);
+        reporter.log(format!("配对出数值变更 {} 条", stat_changes.len()));
+        changes.extend(stat_changes);
+        reporter.log(format!("配对变更合计 {} 条", changes.len()));
         let view = crate::update::CorpusPageView::load(std::path::Path::new(corpus_root))?;
         let graded = crate::update::grade_changes(&changes, &view);
         report.layer_b = Some(crate::update::grade::LayerBSummary::from(graded.as_slice()));

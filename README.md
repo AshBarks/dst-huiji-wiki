@@ -54,6 +54,8 @@ cp .env.example .env
 | `HUIJI__PASSWORD` | 灰机维基密码 | `your-password` |
 | `HUIJI__X_AUTHKEY` | 灰机维基站点认证密钥 | `site-authkey` |
 | `DST__ROOT` | DST 游戏根目录路径 | `/path/to/Don't Starve Together` |
+| `WIKI__QPS` | 可选，维基 API 每秒请求数上限（默认 1） | `1` |
+| `WIKI__MAX_RETRIES` | 可选，403/429/5xx 退避重试次数（默认 3） | `3` |
 
 #### 获取灰机维基认证信息
 
@@ -65,6 +67,30 @@ cp .env.example .env
 - **Linux**: `~/.steam/debian-installation/steamapps/common/Don't Starve Together`
 - **macOS**: `~/Library/Application Support/Steam/steamapps/common/Don't Starve Together`
 - **Windows**: `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together`
+
+## WebUI（网页控制台）
+
+内置 WebUI，可在浏览器中提交维护任务、实时查看日志、浏览与可视化游戏数据：
+
+```bash
+cargo run --release -- serve            # 默认 http://127.0.0.1:8420
+cargo run --release -- serve --host 0.0.0.0 --port 9000   # 自定义监听
+```
+
+功能一览：
+
+| 页面 | 说明 |
+|------|------|
+| 概览 | 数据规模卡片 + 最近任务 |
+| 任务 | 提交所有 CLI 命令（含**干跑模式**）、任务列表、SSE 实时日志流、取消 |
+| 配方/材料 | 配方检索（按科技/名称）、点击材料即可反查引用它的配方 |
+| 翻译 | PO 分类进度条形图、85k+ 条目分页检索 |
+| 技能树 | 直接使用游戏内 `pos/connects` 坐标 1:1 还原角色技能树（含中文标题） |
+| 常量 | TUNING 表 5000+ 常量搜索浏览 |
+| 快照对比 | 任选两个 `scripts_日期` 快照对比新增/移除/修改的配方与翻译 |
+
+安全说明：默认只绑定 `127.0.0.1`；涉及维基写入的任务在页面中默认勾选"干跑模式"，
+取消勾选并确认后才会真实编辑页面。
 
 ## 使用
 
@@ -175,6 +201,9 @@ cargo run --release -- maintain-item-table [OPTIONS]
 | 参数 | 简写 | 说明 |
 |------|------|------|
 | `--output <FILE>` | `-o` | 输出的 JSON 文件路径（可选） |
+| `--yes` | | 跳过确认，直接写入维基（无人值守） |
+| `--dry-run` | | 只生成产物与 diff，不写入维基（与 `--yes` 互斥） |
+| `--report-json <FILE>` | | 将机器可读的执行报告写入该文件 |
 
 **说明：** 此命令需要配置 `DST__ROOT` 环境变量，会自动从游戏文件中提取数据并与维基历史数据合并。
 
@@ -210,6 +239,8 @@ cargo run --release -- maintain-dst-recipes [OPTIONS]
 cargo run --release -- maintain-dst-recipes
 ```
 
+同样支持 `--yes` / `--dry-run` / `--report-json <FILE>` 参数。
+
 ---
 
 #### `maintain-copy-clip` - 维基模块数据更新
@@ -234,6 +265,14 @@ cargo run --release -- maintain-copy-clip [OPTIONS]
 | `crafting_filters` | `filters` | 制作分类 | `模块:Constants/CraftingFilters` |
 | `crafting_names` | `names` | 制作名称翻译 | `模块:Constants/CraftingNames` |
 
+除上述参数外，还支持：
+
+| 参数 | 说明 |
+|------|------|
+| `--yes` | 跳过确认，直接写入维基（无人值守） |
+| `--dry-run` | 只生成产物与 diff，不写入维基（与 `--yes` 互斥） |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
+
 **示例：**
 
 ```bash
@@ -245,6 +284,9 @@ cargo run --release -- maintain-copy-clip -t tech
 
 # 只更新配方构建器标签查找表
 cargo run --release -- maintain-copy-clip -t rbtl
+
+# 试运行：只看 diff 不写维基，并把结果报告落盘
+cargo run --release -- maintain-copy-clip -t filters --dry-run --report-json report.json
 ```
 
 ## 项目结构

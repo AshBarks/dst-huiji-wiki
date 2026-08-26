@@ -14,6 +14,7 @@ dst-huiji-wiki/
 │   ├── main.rs              # Binary entry (tokio + clap dispatch)
 │   ├── lib.rs               # Library root (8 public modules)
 │   ├── commands/            # CLI arg definitions + all handlers
+│   ├── web/                 # WebUI server (binary-only; axum routes, JobManager, embedded SPA assets)
 │   ├── parser/              # Game data parsers (Lua, PO, recipes, prefab overrides)
 │   │   └── prefab_override/ # Complex Lua AST walker (2657-line parser.rs)
 │   ├── models/              # Data models (Recipe, PoEntry, TechReport)
@@ -33,10 +34,14 @@ dst-huiji-wiki/
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Add a new CLI command | `src/commands/mod.rs` (enum) → `src/commands/maintain.rs` (handler) | All handlers in maintain.rs |
+| Add a new CLI command | `src/commands/mod.rs` (enum) → `src/commands/maintain.rs` (handler) | Handlers are thin wrappers over `service::execute_job` |
+| Add a new job type (CLI+Web) | `src/service/mod.rs` (`JobKind`) | Add variant + run fn; CLI wrapper comes free |
+| Change WebUI behavior | `src/web/` | Binary-only module like commands; assets in `src/web/assets/` embedded via include_str! |
+| Add a data browse endpoint | `src/web/api_data.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |
 | Parse a new Lua data type | `src/parser/` | Add new module, re-export in mod.rs |
 | Add a new wiki data mapping | `src/mapping/mappers/` | Implement WikiMapper trait |
-| Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here |
+| Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here (throttle+retry in `send_with_retry`) |
+| Change write/confirm policy | `src/service/mod.rs` (`WriteMode`, `decide_write`) | CLI maps --yes/--dry-run to WriteMode |
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
@@ -99,6 +104,12 @@ cargo run --release -- --help      # Show CLI help
 
 ## NOTES
 - `.env` required for wiki operations (HUIJI__USERNAME, HUIJI__PASSWORD, HUIJI__X_AUTHKEY, DST__ROOT)
+- WikiClient: global throttle (default 1 QPS, `WIKI__QPS`) + retry on 403/429/GET-5xx (`WIKI__MAX_RETRIES`); POST only retries WAF-level 403/429
+- Edits carry `basetimestamp` + `assert=user`; conflicts surface as `Error::EditConflict`
+- Batch APIs: `get_pages_meta` (≤50 titles), `page_exists`, `list_all_pages` (continuation-aware)
+- Error variants RateLimited/PageNotFound/AuthExpired/EditConflict + `Error::is_retryable()` for automated branching
+- Maintenance commands accept `--yes` (auto-confirm writes), `--dry-run` (no wiki writes, artifacts still written), `--report-json <path>` (machine-readable report); service-level enum is `service::WriteMode` with pure decision fn `decide_write`
+- Structured logging: `cli_run` span (uuid run_id, command) wraps every invocation; `job` and `wiki_edit` (page, oldrevid/newrevid) spans inside service
 - `examples/` contains game data (.po, .lua) + a Python login script, NOT Rust examples — `cargo run --example` finds nothing
 - `src/commands/maintain.rs` is 743 lines with all 7+ command handlers — the largest non-parser file
 - `src/parser/prefab_override/parser.rs` is 2657 lines — the most complex file in the project

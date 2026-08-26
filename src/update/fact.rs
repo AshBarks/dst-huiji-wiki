@@ -117,6 +117,116 @@ impl FactChange {
     }
 }
 
+/// Attributed stat fact (F2): one numeric setter joined to owning variants.
+#[derive(Debug, Clone, Serialize)]
+pub struct StatRecord {
+    pub field: &'static str,
+    pub value: f64,
+    pub raw_arg: String,
+    pub line: u32,
+    pub variants: Vec<String>,
+}
+
+/// Joins raw stat facts with variant ownership (mirrors `attribute_loot`).
+pub fn attribute_stats(
+    path: &str,
+    facts: &[super::stats::StatFact],
+    scan: &super::index::symbols::FileScan,
+    fn_owners: &std::collections::BTreeMap<String, std::collections::BTreeMap<String, Vec<String>>>,
+) -> Vec<StatRecord> {
+    use std::collections::BTreeSet;
+    let owners_of_file = fn_owners.get(path);
+    let all: BTreeSet<String> = owners_of_file
+        .map(|m| m.values().flatten().cloned().collect())
+        .unwrap_or_default();
+    let ranges: Vec<(&str, u32, u32)> = scan
+        .fns
+        .iter()
+        .filter(|f| f.start_line > 0)
+        .map(|f| (f.name.as_str(), f.start_line, f.end_line))
+        .collect();
+    facts
+        .iter()
+        .map(|fact| {
+            let mut variants: BTreeSet<String> = BTreeSet::new();
+            for (name, start, end) in &ranges {
+                if fact.line >= *start && fact.line <= *end {
+                    if let Some(owners) = owners_of_file.and_then(|m| m.get(*name)) {
+                        variants.extend(owners.iter().cloned());
+                    }
+                }
+            }
+            if variants.is_empty() {
+                variants = all.clone();
+            }
+            StatRecord {
+                field: fact.kind.field(),
+                value: fact.value,
+                raw_arg: fact.raw_arg.clone(),
+                line: fact.line,
+                variants: variants.into_iter().collect(),
+            }
+        })
+        .collect()
+}
+
+/// Pairs two snapshots' attributed stats into numeric changes.
+/// Key = (variant, field); a (file-level) item moving files does not fire —
+/// only genuine old≠new values or presence flips do.
+pub fn pair_stat_changes(
+    old: &std::collections::BTreeMap<String, Vec<StatRecord>>,
+    new: &std::collections::BTreeMap<String, Vec<StatRecord>>,
+) -> Vec<FactChange> {
+    use std::collections::BTreeMap;
+    fn index(
+        side: &BTreeMap<String, Vec<StatRecord>>,
+    ) -> BTreeMap<(String, String), (f64, EvidenceRef)> {
+        let mut m = BTreeMap::new();
+        for (file, records) in side {
+            for r in records {
+                for v in &r.variants {
+                    m.entry((v.clone(), r.field.to_string()))
+                        .or_insert_with(|| {
+                            (
+                                r.value,
+                                EvidenceRef {
+                                    file: file.clone(),
+                                    line: r.line,
+                                },
+                            )
+                        });
+                }
+            }
+        }
+        m
+    }
+    let oi = index(old);
+    let ni = index(new);
+    let keys: std::collections::BTreeSet<(String, String)> =
+        oi.keys().chain(ni.keys()).cloned().collect();
+    let mut out = Vec::new();
+    for key in keys {
+        let was = oi.get(&key).map(|(v, _)| *v);
+        let now = ni.get(&key).map(|(v, _)| *v);
+        if was == now {
+            continue;
+        }
+        let ev = oi.get(&key).or_else(|| ni.get(&key)).unwrap().1.clone();
+        out.push(FactChange {
+            prefab: key.0.clone(),
+            kind: FactKind::Stat,
+            field: key.1.clone(),
+            context: None,
+            source_file: ev.file.clone(),
+            old: was.map(Literal::Num),
+            new: now.map(Literal::Num),
+            derivation_depth: 1,
+            evidence: vec![ev],
+        });
+    }
+    out
+}
+
 /// Pairs two snapshots' attributed loot facts into presence changes.
 ///
 /// A `(variant, item)` present on the old side only is a removal
@@ -238,6 +348,29 @@ mod tests {
         assert_eq!(c.context, None);
         let back = serde_json::to_string(&c).unwrap();
         assert!(!back.contains("\"old\""));
+    }
+
+    #[test]
+    fn stat_pairing_fires_only_on_value_change() {
+        use std::collections::BTreeMap;
+        let sr = |value: f64| StatRecord {
+            field: "combat.damage",
+            value,
+            raw_arg: "TUNING.X".into(),
+            line: 5,
+            variants: vec!["hound".into()],
+        };
+        let mut o = BTreeMap::new();
+        o.insert("prefabs/hound.lua".into(), vec![sr(20.0)]);
+        let mut n = BTreeMap::new();
+        n.insert("prefabs/hound.lua".into(), vec![sr(25.0)]);
+
+        let changes = pair_stat_changes(&o, &n);
+        assert_eq!(changes.len(), 1);
+        assert_eq!(changes[0].old, Some(Literal::Num(20.0)));
+        assert_eq!(changes[0].new, Some(Literal::Num(25.0)));
+        // 同值不触发
+        assert!(pair_stat_changes(&o, &o).is_empty());
     }
 
     #[test]

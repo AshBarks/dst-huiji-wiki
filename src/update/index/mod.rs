@@ -7,6 +7,7 @@
 
 pub mod edges;
 pub mod genericity;
+pub mod loot;
 pub mod resolve;
 pub mod scan;
 pub mod symbols;

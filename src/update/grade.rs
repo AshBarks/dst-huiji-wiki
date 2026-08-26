@@ -30,6 +30,9 @@ pub struct GradedChange {
     pub prefab: String,
     pub field: String,
     pub tier: GradeTier,
+    /// Change payload carried through so review records are self-contained.
+    pub old: Option<super::fact::Literal>,
+    pub new: Option<super::fact::Literal>,
     pub pageid: Option<i64>,
     /// Landing-point evidence: the matched page fact's region and raw text.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,6 +126,8 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
                 prefab: c.prefab.clone(),
                 field: c.field.clone(),
                 tier: GradeTier::CreateCheck,
+                old: c.old.clone(),
+                new: c.new.clone(),
                 pageid: None,
                 landing: None,
             }),
@@ -138,6 +143,10 @@ pub fn grade_changes(changes: &[FactChange], view: &CorpusPageView) -> Vec<Grade
 
 /// Grades one change against one page.
 fn grade_on_page(c: &FactChange, pageid: i64, view: &CorpusPageView) -> GradedChange {
+    let old = c.old.clone();
+    let new = c.new.clone();
+    let _ = (&old, &new);
+
     {
         let empty = Vec::new();
         let facts = view.facts.get(&pageid).unwrap_or(&empty);
@@ -149,6 +158,9 @@ fn grade_on_page(c: &FactChange, pageid: i64, view: &CorpusPageView) -> GradedCh
                     // Paired numeric old-value with a page landing →
                     // deterministic draft candidate (F1 privileged path).
                     (Some(_), Some(f)) => GradedChange {
+                        old: c.old.clone(),
+                        new: c.new.clone(),
+
                         prefab: c.prefab.clone(),
                         field: c.field.clone(),
                         tier: GradeTier::SuggestDraft,
@@ -172,6 +184,9 @@ fn grade_on_page(c: &FactChange, pageid: i64, view: &CorpusPageView) -> GradedCh
                             .or_else(|| c.new.as_ref().and_then(Literal::as_str));
                         match item.and_then(|i| find_name_landing(facts, i)) {
                             Some(f) => GradedChange {
+                                old: c.old.clone(),
+                                new: c.new.clone(),
+
                                 prefab: c.prefab.clone(),
                                 field: c.field.clone(),
                                 tier: GradeTier::SuggestDraft,
@@ -193,7 +208,13 @@ fn grade_on_page(c: &FactChange, pageid: i64, view: &CorpusPageView) -> GradedCh
 }
 
 fn no_landing(c: &FactChange, pageid: i64) -> GradedChange {
+    let old = c.old.clone();
+    let new = c.new.clone();
+
     GradedChange {
+        old: c.old.clone(),
+        new: c.new.clone(),
+
         prefab: c.prefab.clone(),
         field: c.field.clone(),
         tier: GradeTier::Manual,

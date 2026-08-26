@@ -332,6 +332,26 @@ async fn execute_job_inner(
 // Local-file commands (no game dir required)
 // ---------------------------------------------------------------------------
 
+fn cached_scan_summary(out_dir: &std::path::Path) -> Result<serde_json::Value> {
+    let raw = std::fs::read_to_string(out_dir.join("impact.json"))?;
+    let v: serde_json::Value = serde_json::from_str(&raw)?;
+    let report = v.get("report").cloned().unwrap_or_default();
+    let tier0 = v.get("tier0").cloned().unwrap_or_default();
+    Ok(serde_json::json!({
+        "cached": true,
+        "output_dir": out_dir.display().to_string(),
+        "old": report.get("old_id").cloned().unwrap_or_default(),
+        "new": report.get("new_id").cloned().unwrap_or_default(),
+        "changed_files": report.get("files").and_then(|x| x.as_array()).map(|a| a.len()).unwrap_or(0),
+        "affected_entities": report.get("affected_entities").and_then(|x| x.as_array()).map(|a| a.len()).unwrap_or(0),
+        "tuning_added": report.get("tuning").and_then(|t| t.get("added")).and_then(|x| x.as_array()).map(|a| a.len()).unwrap_or(0),
+        "tuning_removed": report.get("tuning").and_then(|t| t.get("removed")).and_then(|x| x.as_array()).map(|a| a.len()).unwrap_or(0),
+        "tuning_changed": report.get("tuning").and_then(|t| t.get("changed")).and_then(|x| x.as_object()).map(|m| m.len()).unwrap_or(0),
+        "layer_b": report.get("layer_b").cloned().unwrap_or(serde_json::Value::Null),
+        "tier0_hits": tier0.as_array().map(|a| a.len()).unwrap_or(0),
+    }))
+}
+
 /// `update-scan`: snapshot diff -> association attribution -> Tier0 rules.
 ///
 /// Read-only: writes `impact.json` + `changes.patch` under the output dir.
@@ -362,16 +382,34 @@ async fn run_update_scan(
         )));
     }
 
+    let out_dir = out.unwrap_or_else(|| {
+        PathBuf::from("output")
+            .join("scan")
+            .join(format!("{old_id}_{new_id}"))
+    });
+    std::fs::create_dir_all(&out_dir)?;
+    if let Some(state) = crate::update::state::ScanState::load(&out_dir) {
+        if state.old_id == old_id && state.new_id == new_id && state.status == "completed" {
+            reporter.log("检测到已完成 state.json，跳过重算".to_string());
+            reporter.log(format!("输出目录 {}", out_dir.display()));
+            return cached_scan_summary(&out_dir);
+        }
+    }
+    let mut state = crate::update::state::ScanState::new(old_id, new_id);
+    state.save(&out_dir)?;
+
     reporter.log(format!(
         "diff: {} <-> {}",
         old_root.display(),
         new_root.display()
     ));
     let diff = crate::update::TreeDiff::diff_trees(&old_root, &new_root)?;
+    state.mark_stage("diff", true, &out_dir)?;
     reporter.log(format!("变更文件 {} 个", diff.files.len()));
 
     reporter.stage("构建关联索引（新树）");
     let atlas = crate::update::build_atlas_from_dir(&new_root)?;
+    state.mark_stage("atlas", true, &out_dir)?;
 
     let old_tuning_src = std::fs::read_to_string(old_root.join("tuning.lua")).ok();
     let old_tuning = old_tuning_src
@@ -418,6 +456,7 @@ async fn run_update_scan(
             crate::update::summarize_grades(&graded)
         ));
         graded_layer_b = Some(graded);
+        state.mark_stage("layer_b", true, &out_dir)?;
     }
 
     let changed_paths: Vec<String> = report.files.iter().map(|f| f.path.clone()).collect();
@@ -434,13 +473,6 @@ async fn run_update_scan(
             }
         ));
     }
-
-    let out_dir = out.unwrap_or_else(|| {
-        PathBuf::from("output")
-            .join("scan")
-            .join(format!("{old_id}_{new_id}"))
-    });
-    std::fs::create_dir_all(&out_dir)?;
 
     // Persist draft-eligible suggestions for human comparison (L1).
     if let Some(annotate_dir) = annotate {
@@ -533,6 +565,7 @@ async fn run_update_scan(
 
     reporter.log(format!("受影响实体 {}", report.affected_entities.len()));
     reporter.log(format!("已写入 {}", out_dir.display()));
+    state.complete(&out_dir)?;
 
     Ok(summary)
 }

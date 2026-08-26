@@ -13,6 +13,7 @@ pub mod impact;
 pub mod index;
 pub mod rules;
 pub mod snapshot;
+pub mod state;
 pub mod stats;
 pub mod takeup;
 

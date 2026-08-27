@@ -2,6 +2,7 @@ pub mod context;
 pub mod copyclip;
 pub mod corpus;
 pub mod error;
+pub mod knowledge;
 pub mod llm;
 pub mod mapping;
 pub mod models;

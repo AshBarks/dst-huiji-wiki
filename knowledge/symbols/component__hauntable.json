@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/hauntable.lua"
+  },
+  "category": "component",
+  "display_name": "hauntable",
+  "summary": "该组件管理实体被附身（haunt）的状态、冷却计时、恐慌与闪烁特效等数据。参与幽灵或玩家对实体进行附身互动的核心玩法，处理附身成功或失败的逻辑、幽灵复活、视觉着色与标签切换。",
+  "api": [
+    {
+      "name": "SetOnHauntFn",
+      "effect": "设置 self.onhaunt 为给定函数，该函数应返回 true 表示附身成功以触发附身者效果；替换原有回调，无其它副作用。"
+    },
+    {
+      "name": "SetOnUnHauntFn",
+      "effect": "设置 self.onunhaunt 回调，在附身结束（StopHaunt）时调用；仅存储函数。"
+    },
+    {
+      "name": "SetHauntValue",
+      "effect": "若 val 非 nil，设置 self.hauntvalue=val 且 self.no_wipe_value=true，使成功附身后不清除该值；修改附身值与标志。"
+    },
+    {
+      "name": "Panic",
+      "effect": "强制进入被附身与恐慌状态：设置 haunted=true（触发添加 'haunted' 标签）、panic=true，计时器取最大值，并启动组件更新；副作用为添加标签与启动 OnUpdate 循环。"
+    },
+    {
+      "name": "StartFX",
+      "effect": "若 noflicker 为假且 self.usefx 为真，则推进闪烁状态（AdvanceFlickerState）；可能改变 flicker 字段。"
+    },
+    {
+      "name": "AdvanceFlickerState",
+      "effect": "将 flicker 状态在 'off'->'on'->'fadeout'->'off' 间循环切换；修改 self.flicker。"
+    },
+    {
+      "name": "StopFX",
+      "effect": "强制 flicker 经 'fadeout' 转为 'off'；确保闪烁关闭。"
+    },
+    {
+      "name": "DoHaunt",
+      "effect": "执行附身逻辑：若存在 itemmimic 组件则使其邪恶化并返回；否则调用 onhaunt 回调，根据返回值设置 haunted 状态与后续冷却、特效、事件。若成功且 doer 为幽灵且 hauntvalue 为瞬间复活则推送复活事件；最后对 inst 推送 'haunted' 事件。副作用包括可能添加/移除标签、启动更新、改变着色器、推送事件、清除 hauntvalue 等。"
+    },
+    {
+      "name": "SetAnimStateGetterFn",
+      "effect": "设置 animstatefn 用于自定义获取 AnimState 的函数；存储函数。"
+    },
+    {
+      "name": "GetAnimState",
+      "effect": "返回 animstatefn(inst) 或 inst.AnimState；无副作用。"
+    },
+    {
+      "name": "StartShaderFx",
+      "effect": "获取 AnimState 并调用 SetHaunted(true) 开启着色特效；产生视觉变化。"
+    },
+    {
+      "name": "StopShaderFX",
+      "effect": "若 inst 有效，获取 AnimState 调用 SetHaunted(false) 关闭着色特效；产生视觉变化。"
+    },
+    {
+      "name": "IsHaunted",
+      "effect": "返回 self.haunted 布尔值；无副作用。"
+    },
+    {
+      "name": "StopHaunt",
+      "effect": "重置冷却、设置 haunted=false（移除标签），调用 onunhaunt，停止着色特效，并尝试停止更新；副作用为移除 'haunted' 标签与可能触发回调。"
+    },
+    {
+      "name": "TryStopUpdating",
+      "effect": "若非 haunted 且非 panic 则停止组件更新；可能停止 OnUpdate 调用。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新冷却与恐慌计时器；冷却结束则停止附身；处理闪烁状态切换；递减计时器并尝试停止更新；可能触发 StopHaunt、改变 flicker。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理特效与标签：调用 StopFX、StopShaderFX，移除 'haunted' 标签；副作用为移除标签。"
+    }
+  ],
+  "events_published": [
+    "haunted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.HAUNT_PANIC_TIME_SMALL",
+    "TUNING.HAUNT_COOLDOWN_MEDIUM",
+    "TUNING.HAUNT_COOLDOWN_SMALL",
+    "TUNING.HAUNT_INSTANT_REZ"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20162,
+      72238,
+      13701,
+      15922,
+      15022,
+      16197,
+      16419,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅提及'附身座狼'、'附身底盘'等实体名称及'巨兽恐慌效果'等无关技能，未描述hauntable组件能力（如附身函数、附身值、特效、闪烁、着色器、是否被附身等）的玩家表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "附身",
+    "闹鬼",
+    "幽灵复活",
+    "恐慌",
+    "闪烁特效",
+    "冷却",
+    "邪恶化",
+    "附身值"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+    "source_bytes": 4770,
+    "model": "hy3-free",
+    "generated_at_ms": 1787844517104
+  }
+}

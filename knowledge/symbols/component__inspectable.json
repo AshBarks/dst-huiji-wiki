@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/inspectable.lua"
+  },
+  "category": "component",
+  "display_name": "inspectable",
+  "summary": "该组件为实体添加 'inspectable' 标签，管理检查描述、名称覆盖及状态获取等数据。它参与核心玩法中的实体查看交互，向玩家提供物体描述文本与实时状态（如死亡、燃烧、睡眠等），并在不可见时返回过暗提示。组件还支持记录查看统计以供档案追踪。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除实体上的 'inspectable' 标签。"
+    },
+    {
+      "name": "SetDescription",
+      "effect": "将传入的 desc（可为字符串、字符串表或函数）赋值给 self.description，作为后续获取描述的基础数据。"
+    },
+    {
+      "name": "SetNameOverride",
+      "effect": "将传入的 nameoverride 赋值给 self.nameoverride，该字段实际用作检查字符串名而非显示名。"
+    },
+    {
+      "name": "RecordViews",
+      "effect": "根据参数 state 设置 self.recordview（state 不为 false 时为真），决定是否在 GetStatus 调用时通过 ProfileStatsSet 记录该 prefab 被检查。"
+    },
+    {
+      "name": "GetStatus",
+      "effect": "若实体与 viewer 相同则返回 nil；若开启记录则在档案统计标记。随后按优先级返回自定义 getstatus 结果或基于其他组件/标签的状态字符串（如 DEAD、SLEEPING、BURNING 等），无匹配则返回 nil。"
+    },
+    {
+      "name": "GetDescription",
+      "effect": "若实体与 viewer 相同返回 nil；若 viewer 不可见目标且不在口袋维度容器打开中，返回过暗描述。按优先级通过 getspecialdescription、descriptionfn 或 description 获取描述；若描述缺失或 viewer 为幽灵/默剧则强制调用通用描述获取并附状态；若实体冒烟则返回冒烟描述；否则返回描述及可能的 filter_context 与 author。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      24836,
+      15022,
+      14938,
+      15327,
+      15832,
+      13897,
+      19832
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均围绕实体属性（生成、攻击、掉落、压力值等），未提及 inspectable 组件的任何能力（设置描述、名称覆盖、记录视图、获取状态/描述、移除回调）；21485的'检查状态'与24836的'检查对应实体'分属作物内部逻辑与图鉴系统，不体现该组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "物体描述",
+    "检查状态",
+    "过暗描述",
+    "冒烟描述",
+    "幽灵检查",
+    "默剧检查",
+    "查看统计",
+    "名称覆盖"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+    "source_bytes": 3470,
+    "model": "hy3-free",
+    "generated_at_ms": 1787844422446
+  }
+}

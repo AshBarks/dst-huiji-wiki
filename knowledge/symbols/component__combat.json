@@ -1,0 +1,510 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/combat.lua"
+  },
+  "category": "component",
+  "display_name": "combat",
+  "summary": "战斗组件管理实体的攻击范围、冷却时间、当前目标与仇恨规则等战斗相关数据。它参与实体间的攻击执行、受击伤害计算、目标追踪、仇恨共享与范围攻击等核心战斗玩法。",
+  "api": [
+    {
+      "name": "SetLastTarget",
+      "effect": "设置最后攻击目标GUID并通过replica同步最后目标。"
+    },
+    {
+      "name": "SetAttackPeriod",
+      "effect": "设置最小攻击间隔周期min_attack_period。"
+    },
+    {
+      "name": "TargetIs",
+      "effect": "返回给定目标是否为当前战斗目标。"
+    },
+    {
+      "name": "InCooldown",
+      "effect": "返回是否处于攻击冷却中（基于最后攻击时间）。"
+    },
+    {
+      "name": "GetCooldown",
+      "effect": "返回剩余攻击冷却时间，无则0。"
+    },
+    {
+      "name": "ResetCooldown",
+      "effect": "将laststartattacktime设为nil以清除冷却。"
+    },
+    {
+      "name": "RestartCooldown",
+      "effect": "将laststartattacktime设为当前时间以重启冷却。"
+    },
+    {
+      "name": "OverrideCooldown",
+      "effect": "调整laststartattacktime使剩余冷却等于给定值。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "设置attackrange与hitrange（默认同attack）。"
+    },
+    {
+      "name": "SetHitArc",
+      "effect": "设置命中弧度hitarc。"
+    },
+    {
+      "name": "SetPlayerStunlock",
+      "effect": "设置playerstunlock硬直锁类型。"
+    },
+    {
+      "name": "SetAreaDamage",
+      "effect": "设置areahitrange、areahitcheck与areahitdamagepercent；无范围则百分比nil。"
+    },
+    {
+      "name": "EnableAreaDamage",
+      "effect": "根据参数false设置areahitdisabled禁用范围伤害。"
+    },
+    {
+      "name": "BlankOutAttacks",
+      "effect": "临时设canattack为false并定时恢复，取消旧定时任务。"
+    },
+    {
+      "name": "ShareTarget",
+      "effect": "查找范围内实体调用其SuggestTarget共享目标，受最大数量限制。"
+    },
+    {
+      "name": "SetDefaultDamage",
+      "effect": "设置defaultdamage基础伤害。"
+    },
+    {
+      "name": "SetOnHit",
+      "effect": "设置受击回调onhitfn。"
+    },
+    {
+      "name": "SetCanSuggestTargetFn",
+      "effect": "设置cansuggesttargetfn建议目标条件函数。"
+    },
+    {
+      "name": "SuggestTarget",
+      "effect": "若无当前目标且条件满足则SetTarget并返回true。"
+    },
+    {
+      "name": "SetKeepTargetFunction",
+      "effect": "设置keeptargetfn保持目标函数。"
+    },
+    {
+      "name": "TryRetarget",
+      "effect": "调用targetfn获取新目标并按规则设置或建议。"
+    },
+    {
+      "name": "SetRetargetFunction",
+      "effect": "设置targetfn与retargetperiod并创建周期重寻任务。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体睡眠时取消retargettask。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时重建重寻任务与保持目标更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新时递减保持目标计时，条件不符则丢目标并停更。"
+    },
+    {
+      "name": "IsRecentTarget",
+      "effect": "返回目标是否为当前或最后目标GUID。"
+    },
+    {
+      "name": "StartTrackingTarget",
+      "effect": "监听目标的limbo、移除、转移、领导变更事件。"
+    },
+    {
+      "name": "StopTrackingTarget",
+      "effect": "移除目标相关事件监听。"
+    },
+    {
+      "name": "DropTarget",
+      "effect": "清目标、停追踪、推droppedtarget事件（无下家时）、重置受击时间。"
+    },
+    {
+      "name": "EngageTarget",
+      "effect": "设新目标、推newcombattarget、开始追踪、可能解除跟随。"
+    },
+    {
+      "name": "SetShouldAggroFn",
+      "effect": "设置shouldaggrofn仇恨判定函数。"
+    },
+    {
+      "name": "SetShouldAvoidAggro",
+      "effect": "在shouldavoidaggro表对目标计数+1。"
+    },
+    {
+      "name": "RemoveShouldAvoidAggro",
+      "effect": "减少目标避免仇恨计数，归零则清理。"
+    },
+    {
+      "name": "ShouldAggro",
+      "effect": "根据函数、避免表、标签等返回是否应仇恨目标。"
+    },
+    {
+      "name": "AddNoAggroTag",
+      "effect": "向forbiddenaggrotags插入禁止仇恨标签。"
+    },
+    {
+      "name": "RemoveNoAggroTag",
+      "effect": "从forbiddenaggrotags移除标签，空则nil。"
+    },
+    {
+      "name": "SetNoAggroTags",
+      "effect": "直接替换forbiddenaggrotags为给定表。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "验证目标有效且应仇恨后丢弃旧目标并EngageTarget。"
+    },
+    {
+      "name": "IsValidTarget",
+      "effect": "通过replica判断目标是否有效。"
+    },
+    {
+      "name": "ValidateTarget",
+      "effect": "当前目标无效时调用DropTarget。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回含目标、伤害、距离等调试字符串。"
+    },
+    {
+      "name": "GetGiveUpString",
+      "effect": "返回放弃目标语音字符串（默认nil）。"
+    },
+    {
+      "name": "GiveUp",
+      "effect": "说话、推giveuptarget事件并DropTarget。"
+    },
+    {
+      "name": "GetBattleCryString",
+      "effect": "返回战吼字符串（默认nil）。"
+    },
+    {
+      "name": "ResetBattleCryCooldown",
+      "effect": "设置nextbattlecrytime为当前+间隔。"
+    },
+    {
+      "name": "BattleCry",
+      "effect": "冷却允许时说话或触发taunt状态。"
+    },
+    {
+      "name": "SetHurtSound",
+      "effect": "设置hurtsound受伤音效。"
+    },
+    {
+      "name": "GetAttacked",
+      "effect": "处理受击：算伤、护甲、反弹、推attacked/blocked、播音效、调回调。"
+    },
+    {
+      "name": "GetImpactSound",
+      "effect": "根据目标与武器返回受击音效名或nil。"
+    },
+    {
+      "name": "StartAttack",
+      "effect": "强制面向目标并RestartCooldown。"
+    },
+    {
+      "name": "CancelAttack",
+      "effect": "同ResetCooldown清除冷却。"
+    },
+    {
+      "name": "CanTarget",
+      "effect": "通过replica返回目标能否被锁定。"
+    },
+    {
+      "name": "HasTarget",
+      "effect": "返回是否有当前目标。"
+    },
+    {
+      "name": "CanAttack",
+      "effect": "返回能否攻击（有效、可攻、无冷却、在范围）。"
+    },
+    {
+      "name": "LocomotorCanAttack",
+      "effect": "返回移动器用可达、有效、冷却三状态。"
+    },
+    {
+      "name": "TryAttack",
+      "effect": "可攻击则推doattack事件并返回true。"
+    },
+    {
+      "name": "ForceAttack",
+      "effect": "尝试攻击或强制推doattack事件。"
+    },
+    {
+      "name": "GetWeapon",
+      "effect": "返回手中装备的武器实体或nil。"
+    },
+    {
+      "name": "GetLastAttackedTime",
+      "effect": "返回lastwasattackedtime。"
+    },
+    {
+      "name": "CalcDamage",
+      "effect": "计算对目标基础伤害与特殊伤害（含武器、乘数等）。"
+    },
+    {
+      "name": "CalcReflectedDamage",
+      "effect": "计算目标及装备反弹给攻击者的伤害。"
+    },
+    {
+      "name": "GetAttackRange",
+      "effect": "返回attackrange加武器攻击范围。"
+    },
+    {
+      "name": "CalcAttackRangeSq",
+      "effect": "返回加物理半径的攻击范围平方。"
+    },
+    {
+      "name": "GetHitRange",
+      "effect": "返回hitrange加武器命中范围或临时范围。"
+    },
+    {
+      "name": "CalcHitRangeSq",
+      "effect": "返回加物理半径的命中范围平方。"
+    },
+    {
+      "name": "CanExtinguishTarget",
+      "effect": "返回目标可燃且自身或武器可熄灭。"
+    },
+    {
+      "name": "CanLightTarget",
+      "effect": "返回武器可点燃目标且目标未燃。"
+    },
+    {
+      "name": "CanHitTarget",
+      "effect": "返回能否命中（范围、弧度、抛射物距离）。"
+    },
+    {
+      "name": "ClearAttackTemps",
+      "effect": "清除temppos与temprange临时攻击参数。"
+    },
+    {
+      "name": "DoAttack",
+      "effect": "执行攻击：检查命中、算伤、抛射、范围伤、反弹自身伤。"
+    },
+    {
+      "name": "SetRequiresToughCombat",
+      "effect": "设置tough标记影响反弹判定。"
+    },
+    {
+      "name": "SetShouldRecoilFn",
+      "effect": "设置shouldrecoilfn反弹判定函数。"
+    },
+    {
+      "name": "ShouldRecoil",
+      "effect": "返回攻击是否反弹及剩余伤害。"
+    },
+    {
+      "name": "AddConditionExternalDamageTakenMultiplier",
+      "effect": "向条件受伤乘数表添加函数。"
+    },
+    {
+      "name": "RemoveConditionExternalDamageTakenMultiplier",
+      "effect": "从条件受伤乘数表移除函数。"
+    },
+    {
+      "name": "ApplyConditionExternalDamageTakenMultiplier",
+      "effect": "应用条件乘数返回修改后伤害。"
+    },
+    {
+      "name": "GetDamageReflect",
+      "effect": "调用目标damagereflect（注释未使用）。"
+    },
+    {
+      "name": "DoAreaAttack",
+      "effect": "对范围内有效目标造成GetAttacked伤害并返回命中数。"
+    },
+    {
+      "name": "CanBeAlly",
+      "effect": "通过replica返回目标是否为盟友。"
+    },
+    {
+      "name": "IsAlly",
+      "effect": "通过replica返回目标是否为盟友。"
+    },
+    {
+      "name": "TargetHasFriendlyLeader",
+      "effect": "废弃，通过replica返回目标有友好领导。"
+    },
+    {
+      "name": "CanBeAttacked",
+      "effect": "通过replica返回能否被攻击。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除时停追踪、取任务、移监听。"
+    }
+  ],
+  "events_published": [
+    "droppedtarget",
+    "newcombattarget",
+    "losttarget",
+    "giveuptarget",
+    "attacked",
+    "blocked",
+    "onhitother",
+    "killed",
+    "onmissother",
+    "recoil_off",
+    "weapontooweak",
+    "onattackother",
+    "onareaattackother",
+    "onreflectdamage",
+    "doattack"
+  ],
+  "events_listened": [
+    "knockback",
+    "enterlimbo",
+    "onremove",
+    "transfercombattarget",
+    "leaderchanged"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15386,
+      15415,
+      15973,
+      35104,
+      13156,
+      13701,
+      13823,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨目标存在状态标注",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "有仇恨目标"
+          },
+          {
+            "pageid": 15415,
+            "quote": "没有仇恨目标"
+          },
+          {
+            "pageid": 13701,
+            "quote": "没有仇恨目标后"
+          },
+          {
+            "pageid": 13823,
+            "quote": "没有仇恨目标时"
+          }
+        ]
+      },
+      {
+        "aspect": "保持仇恨条件描述",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "保持仇恨：鱼人所属的生物巢穴存在"
+          }
+        ]
+      },
+      {
+        "aspect": "战吼技能描述",
+        "evidence": [
+          {
+            "pageid": 15551,
+            "quote": "蜂王会在原地战吼"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击伤害加成标注",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "造成的位面伤害+10"
+          },
+          {
+            "pageid": 13156,
+            "quote": "攻击造成伤害会增加力量值"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击距离范围标注",
+        "evidence": [
+          {
+            "pageid": 35104,
+            "quote": "当仇恨目标进入其 3 距离单位时"
+          },
+          {
+            "pageid": 35104,
+            "quote": "处于 10 ~ 25 距离单位内时"
+          },
+          {
+            "pageid": 13823,
+            "quote": "主动攻击 16 距离单位内单位"
+          }
+        ]
+      },
+      {
+        "aspect": "目标可攻击判定标注",
+        "evidence": [
+          {
+            "pageid": 15973,
+            "quote": "combat组件的CanTarget方法判断该目标可攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "锁定与主动仇恨行为描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "锁定仇恨该仇恨目标"
+          },
+          {
+            "pageid": 13701,
+            "quote": "主动仇恨远古大门所在房间内玩家"
+          },
+          {
+            "pageid": 15551,
+            "quote": "蜂王正在仇恨玩家"
+          },
+          {
+            "pageid": 15551,
+            "quote": "优先仇恨玩家"
+          },
+          {
+            "pageid": 15551,
+            "quote": "嗡嗡蜜蜂会与蜂王一起攻击、追逐目标"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "攻击冷却",
+    "仇恨目标",
+    "范围伤害",
+    "受击反馈",
+    "武器攻击",
+    "战斗仇恨",
+    "反弹伤害",
+    "战吼喊叫"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+    "source_bytes": 47678,
+    "model": "hy3-free",
+    "generated_at_ms": 1787846901359
+  }
+}

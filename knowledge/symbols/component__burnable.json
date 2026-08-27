@@ -1,0 +1,308 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/burnable.lua"
+  },
+  "category": "component",
+  "display_name": "burnable",
+  "summary": "该组件管理实体的燃烧状态、阴燃计时、火焰特效与燃料消耗等数据。它参与火的引燃、蔓延、熄灭以及野生火灾等核心生存玩法，并支持角色可控燃烧等技能交互。",
+  "api": [
+    {
+      "name": "SetOnStopSmolderingFn",
+      "effect": "设置 self.onstopsmoldering 回调函数为传入的 fn，仅存储，无立即游戏状态改变。"
+    },
+    {
+      "name": "SetOnSmolderingFn",
+      "effect": "设置 self.onsmoldering 回调函数为传入的 fn，仅存储。"
+    },
+    {
+      "name": "SetOnIgniteFn",
+      "effect": "设置 self.onignite 回调函数为传入的 fn，仅存储。"
+    },
+    {
+      "name": "OnBurnt_Internal",
+      "effect": "调用 RemoveLunarHailBuildup(self.inst) 移除实体的月冰堆积；若实体无效则跳过。"
+    },
+    {
+      "name": "SetOnBurntFn",
+      "effect": "若 fn 非 nil，将 self.onburnt 包装为先调用 fn 再在实体有效时调用 OnBurnt_Internal；若 fn 为 nil 则 self.onburnt 置 nil。改变烧尽回调逻辑。"
+    },
+    {
+      "name": "SetOnExtinguishFn",
+      "effect": "设置 self.onextinguish 回调函数为传入的 fn，仅存储。"
+    },
+    {
+      "name": "SetBurningFX",
+      "effect": "设置 self.fxprefab 为传入的 name，覆盖默认燃烧特效 prefab，仅存储。"
+    },
+    {
+      "name": "SetBurnTime",
+      "effect": "设置 self.burntime 为传入的 time，影响烧尽所需时间，仅存储。"
+    },
+    {
+      "name": "IsBurning",
+      "effect": "返回 self.burning 的布尔值，无副作用。"
+    },
+    {
+      "name": "IsSmoldering",
+      "effect": "返回 self.smoldering 的布尔值，无副作用。"
+    },
+    {
+      "name": "AddBurnFX",
+      "effect": "向 self.fxdata 插入包含 prefab、偏移、跟随符号等信息的表，供后续 SpawnFX 生成火焰特效使用。"
+    },
+    {
+      "name": "OverrideBurnFXBuild",
+      "effect": "遍历 self.fxdata 与 self.fxchildren，设置特效的 Bank 和 Build；立即改变已有特效外观并更新未来特效。"
+    },
+    {
+      "name": "OverrideBurnFXFinalOffset",
+      "effect": "遍历 self.fxdata 与 self.fxchildren，设置特效的最终绘制偏移；立即改变已有特效层级偏移。"
+    },
+    {
+      "name": "OverrideBurnFXRadius",
+      "effect": "遍历 self.fxdata 与 self.fxchildren，设置 firefx 组件的 radius_levels 并立即更新半径；改变火焰光照范围。"
+    },
+    {
+      "name": "SetFXOffset",
+      "effect": "设置 self.fxoffset 为基于参数构造的 Vector3 或 nil，作为所有特效的额外偏移，仅存储。"
+    },
+    {
+      "name": "SetFXLevel",
+      "effect": "设置 self.fxlevel 为 level，遍历 self.fxchildren 调用 firefx:SetLevel 与 SetPercentInLevel；立即改变火焰特效等级与强度。"
+    },
+    {
+      "name": "GetLargestLightRadius",
+      "effect": "遍历 self.fxchildren 计算启用光源的最大计算半径并返回，无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "根据阴燃/燃烧状态返回相应描述字符串，无副作用。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "调用 StopSmoldering 停止阴燃，设置 self.fastextinguish 为 true，调用 KillFX 移除火焰特效；清理实体移除时的燃烧表现。"
+    },
+    {
+      "name": "StartWildfire",
+      "effect": "若实体未燃烧/阴燃/火免疫，则标记 smoldering=true，调用 onsmoldering 回调，生成 smoke_plant 烟雾特效，设置 smoldertimeremaining（基于 propagator 闪点或随机区间），启动周期任务 SmolderUpdate；实体开始阴燃并可能随时间引燃。"
+    },
+    {
+      "name": "IsControlledBurn",
+      "effect": "返回 self.controlled_burn 是否非 nil，指示是否处于可控燃烧状态，无副作用。"
+    },
+    {
+      "name": "GetControlledBurn",
+      "effect": "返回 self.controlled_burn 表或 nil，无副作用。"
+    },
+    {
+      "name": "StokeControlledBurn",
+      "effect": "置 self.controlled_burn 为 nil，self.stokeablefire 为 false（移除标签），调用 SetFXLevel 重置特效等级；取消可控燃烧状态。"
+    },
+    {
+      "name": "Ignite",
+      "effect": "若未燃烧且非火免疫，根据 source/doer 标签设置可控燃烧参数与 stokeablefire，停止阴燃，标记 burning=true，监听 death 事件，生成火焰特效，推送 onignite 事件并调用回调，启动燃料消耗与火势传播，重设烧尽任务；实体着火并产生光热与伤害。"
+    },
+    {
+      "name": "CalculateControlledBurnDuration",
+      "effect": "若 controlled_burn.duration_creature 存在且实体有 health 组件则返回该时长，否则返回 nil，无副作用。"
+    },
+    {
+      "name": "ExtendBurning",
+      "effect": "取消原有烧尽任务，若 burntime 非 nil 则根据可控燃烧倍率重设定时调用 DoneBurning 的任务；重设烧尽计时。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "若正在燃烧，取消任务并立即调用 DoneBurning 使实体烧尽；用于长帧更新跳跃。"
+    },
+    {
+      "name": "SmotherSmolder",
+      "effect": "对传入的 smotherer 消耗有限次数/堆叠或造成火伤并推送 burnt 事件，随后调用 StopSmoldering(-1) 扑灭阴燃并给予短暂防火宽容；副作用为消耗或伤害扑灭者。"
+    },
+    {
+      "name": "StopSmoldering",
+      "effect": "若阴燃中，移除烟雾特效，取消周期任务，清空计时，调用 propagator:StopSpreading 停止热传播，调用 onstopsmoldering 回调；停止阴燃状态。"
+    },
+    {
+      "name": "Extinguish",
+      "effect": "调用 StopSmoldering，处理 smotherer 消耗，若燃烧中则取消任务、移除 death 监听、停止传播、清除可控燃烧与 stokeablefire、标记 burning=false、KillFX 移除特效、停止燃料消耗、调用 onextinguish 回调并推送 onextinguish 事件；彻底灭火。"
+    },
+    {
+      "name": "SpawnFX",
+      "effect": "先 KillFX 清除旧特效，再根据 fxdata 生成火焰特效子物体并加入 fxchildren，设置缩放、位置跟随与光照附加；实体上出现火焰表现。"
+    },
+    {
+      "name": "FixFX",
+      "effect": "遍历 fxchildren 与 fxdata 重新绑定特效的跟随符号；修复构造期生成的特效跟随关系。"
+    },
+    {
+      "name": "KillFX",
+      "effect": "遍历 fxchildren 调用 firefx:Extinguish 或移除实体并清空表；移除所有火焰特效。"
+    },
+    {
+      "name": "HasEndothermicHeat",
+      "effect": "检查 fxchildren 中是否存在制冷 heater 组件并返回布尔值，无副作用。"
+    },
+    {
+      "name": "HasExothermicHeat",
+      "effect": "检查 fxchildren 中是否存在制热 heater 组件并返回布尔值，无副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "调用 Extinguish 灭火，取消任务，移除 canlight/nolight/burnableignorefuel 标签；清理组件脱离实体时的所有状态。"
+    }
+  ],
+  "events_published": [
+    "onburnt",
+    "onignite",
+    "onextinguish"
+  ],
+  "events_listened": [
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MIN_SMOLDER_TIME",
+    "TUNING.MAX_SMOLDER_TIME",
+    "TUNING.CONTROLLED_BURN_DURATION_CREATURE_MULT",
+    "TUNING.CONTROLLED_BURN_DAMAGE_MULT",
+    "TUNING.SMOTHER_DAMAGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      57029,
+      10375,
+      20496,
+      17973,
+      19913,
+      20152,
+      35727
+    ],
+    "aspects": [
+      {
+        "aspect": "可控燃烧状态标注",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "所有燃烧状态变为可控"
+          }
+        ]
+      },
+      {
+        "aspect": "扑灭与熄灭行为",
+        "evidence": [
+          {
+            "pageid": 35727,
+            "quote": "皇家守卫会扑灭附近…点燃的营地火"
+          },
+          {
+            "pageid": 35727,
+            "quote": "火把会呈现熄灭状态"
+          }
+        ]
+      },
+      {
+        "aspect": "点燃动作描述",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "100% 将其点燃"
+          },
+          {
+            "pageid": 57029,
+            "quote": "远距离点燃可燃烧物体"
+          },
+          {
+            "pageid": 10375,
+            "quote": "随机在身旁点火，引燃附近"
+          },
+          {
+            "pageid": 20496,
+            "quote": "可以造成燃烧状态的点燃行为"
+          },
+          {
+            "pageid": 20152,
+            "quote": "迅速将其点燃"
+          },
+          {
+            "pageid": 35727,
+            "quote": "攻击可以点燃除了玩家以外的生物"
+          }
+        ]
+      },
+      {
+        "aspect": "点燃后实体特殊反应",
+        "evidence": [
+          {
+            "pageid": 57029,
+            "quote": "毒桦栗树被点燃后会产生一波桦栗果精"
+          },
+          {
+            "pageid": 20152,
+            "quote": "被点燃时，背部的冰枪将会燃烧"
+          },
+          {
+            "pageid": 57029,
+            "quote": "攻击你的敌人会被点燃"
+          }
+        ]
+      },
+      {
+        "aspect": "燃烧完毕产物生成",
+        "evidence": [
+          {
+            "pageid": 17973,
+            "quote": "可点燃的物品[[燃烧]]后产生"
+          },
+          {
+            "pageid": 17973,
+            "quote": "亦会被点燃并烧成灰烬"
+          }
+        ]
+      },
+      {
+        "aspect": "燃烧持续时间数值",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "燃烧状态持续时长 + 200%"
+          }
+        ]
+      },
+      {
+        "aspect": "野火触发环境条件",
+        "evidence": [
+          {
+            "pageid": 19913,
+            "quote": "夏季的白天、世界温度≥80度且世界湿度为0"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "点燃",
+    "着火",
+    "阴燃",
+    "熄灭",
+    "冒烟",
+    "烧尽",
+    "防火",
+    "火特效"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+    "source_bytes": 20250,
+    "model": "hy3-free",
+    "generated_at_ms": 1787846258707
+  }
+}

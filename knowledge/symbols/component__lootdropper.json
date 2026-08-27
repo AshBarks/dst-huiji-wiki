@@ -1,0 +1,202 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/lootdropper.lua"
+  },
+  "category": "component",
+  "display_name": "lootdropper",
+  "summary": "该组件管理实体在死亡、拆解或受击时产生的战利品数据，包括固定、随机权重、概率及配方返还等掉落配置。它参与核心生存物资获取、建造回收与战斗奖励玩法，并支持燃烧、受惊与冬季盛宴等状态下的特殊掉落逻辑。",
+  "api": [
+    {
+      "name": "SetChanceLootTable",
+      "effect": "设置共享掉落表名称（self.chanceloottable），供 GenerateLoot 从全局 LootTables 中读取并按几率抽取掉落物。"
+    },
+    {
+      "name": "SetLoot",
+      "effect": "设置固定掉落列表 self.loot，同时清空 self.chanceloot、self.randomloot、self.numrandomloot。"
+    },
+    {
+      "name": "SetLootSetupFn",
+      "effect": "设置掉落前回调 self.lootsetupfn，GenerateLoot 时会以 self 为参调用以动态修改掉落。"
+    },
+    {
+      "name": "AddRandomLoot",
+      "effect": "向 self.randomloot 插入带权重的 prefab 项，并累加 self.totalrandomweight。"
+    },
+    {
+      "name": "ClearRandomLoot",
+      "effect": "将 self.randomloot、self.totalrandomweight、self.numrandomloot 置空，移除随机掉落配置。"
+    },
+    {
+      "name": "AddRandomHauntedLoot",
+      "effect": "向 self.randomhauntedloot 插入带权重项并累加总权重，用于实体受惊时替代普通随机掉落池。"
+    },
+    {
+      "name": "AddChanceLoot",
+      "effect": "向 self.chanceloot 插入带几率的 prefab 项，后续按几率抽取。"
+    },
+    {
+      "name": "AddIfNotChanceLoot",
+      "effect": "向 self.ifnotchanceloot 插入保底 prefab 项，当未触发任何概率掉落时补充掉落。"
+    },
+    {
+      "name": "GetRandomLootTable",
+      "effect": "返回当前适用的随机掉落表：若实体含 hauntable 组件且 haunted 则返回 self.randomhauntedloot，否则返回 self.randomloot。"
+    },
+    {
+      "name": "PickRandomLoot",
+      "effect": "从适用随机掉落表按权重随机返回 prefab 名，无表则返回 nil。"
+    },
+    {
+      "name": "GetFullRecipeLoot",
+      "effect": "递归展开配方及子配方（deconstruct）的全部原料，返回完整原料列表，无副作用。"
+    },
+    {
+      "name": "GetRecipeLoot",
+      "effect": "依据实体有限使用组件耐久百分比及燃烧标签，按 TUNING 比例计算配方原料返还列表（支持递归拆解）。"
+    },
+    {
+      "name": "GetLuckyUser",
+      "effect": "返回实体死因实体或最后工作实体（若有效），用于幸运几率修正，无则返回 nil。"
+    },
+    {
+      "name": "GetChance",
+      "effect": "若有幸运用户则通过 GetEntityLuckChance 与 LuckFormulas.LootDropperChance 修正几率后返回，否则返回原几率。"
+    },
+    {
+      "name": "GenerateLoot",
+      "effect": "汇总所有掉落配置生成 prefab 名列表：先执行 lootsetupfn，再处理随机数量、概率、共享表、保底、固定、配方、木炭；可能置 droppingchanceloot 并推送 ifnotchanceloot 事件。"
+    },
+    {
+      "name": "GetAllPossibleLoot",
+      "effect": "收集所有可能掉落的 prefab 名（去重）至表，可选执行 lootsetupfn，包含冬季盛宴特殊物，用于调试或图鉴。"
+    },
+    {
+      "name": "SetFlingTarget",
+      "effect": "设置抛射目标点 self.flingtargetpos 与角度方差 self.flingtargetvariance。"
+    },
+    {
+      "name": "FlingItem",
+      "effect": "将传入实体从 pt 或自身位置抛射，依据目标与速度参数设置物理速度与位置，处理睡眠与半径偏移。"
+    },
+    {
+      "name": "SpawnLootPrefab",
+      "effect": "生成指定 prefab 实体并继承潮湿/燃烧，调用 FlingItem 抛射，推送 on_loot_dropped 与 loot_prefab_spawned 事件，若父体受控燃烧则引燃，返回实体。"
+    },
+    {
+      "name": "DropLoot",
+      "effect": "执行完整掉落：生成或接收 prefab 列表，燃烧状态覆盖为灰烬/熟食，逐个 SpawnLootPrefab，处理冬季盛宴装饰掉落，向世界推送 entity_droploot。"
+    }
+  ],
+  "events_published": [
+    "ifnotchanceloot",
+    "on_loot_dropped",
+    "loot_prefab_spawned",
+    "entity_droploot"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.HAMMER_LOOT_PERCENT",
+    "TUNING.BURNT_HAMMER_LOOT_PERCENT",
+    "TUNING.BURNED_LOOT_OVERRIDES",
+    "TUNING.WINTERS_FEAST_TREE_DECOR_LOOT",
+    "TUNING.WINTERS_FEAST_LOOT_EXCLUSION",
+    "TUNING.WINTERS_FEAST_BASIC_ORNAMENT_DROP_CHANCE",
+    "TUNING.WINTERS_FEAST_WINTER_FOOD_DROP_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      17979,
+      24877,
+      70530,
+      52336,
+      34523,
+      35104,
+      35611,
+      13847
+    ],
+    "aspects": [
+      {
+        "aspect": "战利品掉落击杀判定",
+        "evidence": [
+          {
+            "pageid": 70530,
+            "quote": "战利品掉落的判定方式是需要玩家或附身底盘杀死生效"
+          }
+        ]
+      },
+      {
+        "aspect": "摧毁遗物掉落战利品",
+        "evidence": [
+          {
+            "pageid": 13847,
+            "quote": "遗物可以被攻击并摧毁，掉落各种战利品"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡解体掉落战利品",
+        "evidence": [
+          {
+            "pageid": 35104,
+            "quote": "远古兵器死亡会在解体后掉落战利品"
+          }
+        ]
+      },
+      {
+        "aspect": "调查条件额外掉落",
+        "evidence": [
+          {
+            "pageid": 35611,
+            "quote": "若在摧毁蹊跷的事物前不进行调查，则不会掉落额外的战利品"
+          }
+        ]
+      },
+      {
+        "aspect": "随机掉落物品数量描述",
+        "evidence": [
+          {
+            "pageid": 52336,
+            "quote": "从以下物品随机掉落 2 个（可重复，下同）"
+          },
+          {
+            "pageid": 52336,
+            "quote": "从以下物品随机掉落其 3 个"
+          },
+          {
+            "pageid": 34523,
+            "quote": "战利品从下表抽取 9 个"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "战利品",
+    "随机掉落",
+    "拆解返还",
+    "燃烧木炭",
+    "抛扔物品",
+    "几率掉宝",
+    "配方回收",
+    "冬季装饰",
+    "幸运玩家",
+    "受惊掉落"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+    "source_bytes": 15157,
+    "model": "hy3-free",
+    "generated_at_ms": 1787845941151
+  }
+}

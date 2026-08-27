@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/propagator.lua"
+  },
+  "category": "component",
+  "display_name": "propagator",
+  "summary": "该组件管理实体的燃点、当前热量、传播范围与热量输出等数据，负责火焰与热量的扩散逻辑。它参与火灾蔓延核心玩法，使附近实体升温至燃点燃烧，并对范围内目标造成火焰伤害、解冻或融化效果。春季等地块修饰会影响传播范围与伤害范围。",
+  "api": [
+    {
+      "name": "CalculateHeatCap",
+      "effect": "重置本次更新已加热量 heat_this_update 为0，并根据随机数、燃点 flashpoint 与立方缓动计算本次更新周期允许的最大加热量 max_heat_this_update。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "调用 StopSpreading(true) 停止传播并重置热量，立即调用 OnUpdate(0) 处理衰减与清理，若延迟任务存在则取消。副作用：可能清除周围实体的 firemelt 标签并停止热量更新。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "若实体有效且自身非制冷加热器，寻找范围内带 frozen 或 firemelt 标签的实体，为其推送 stopfiremelt 事件并移除 firemelt 标签。副作用：修改其他实体的标签与事件状态。"
+    },
+    {
+      "name": "SetOnFlashPoint",
+      "effect": "设置达到燃点时的回调函数 self.onflashpoint 为传入函数 fn。"
+    },
+    {
+      "name": "Delay",
+      "effect": "取消已有的延迟任务，并在指定时间后启动新延迟任务 self.delay，时间到后将其置 nil。副作用：在延迟期间 AddHeat 会忽略加热请求。"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "调用 CalculateHeatCap 重算热上限，并取消周期更新任务 self.task（若存在）。"
+    },
+    {
+      "name": "StartUpdating",
+      "effect": "若无周期任务 self.task，则启动以 PROPAGATOR_DT 为间隔的周期任务调用内部更新。副作用：开始周期性执行 OnUpdate。"
+    },
+    {
+      "name": "StartSpreading",
+      "effect": "记录热源 source，标记 spreading 为真，并启动更新任务。副作用：开始向周围实体传播热量。"
+    },
+    {
+      "name": "StopSpreading",
+      "effect": "清除热源与 spreading 标记；若 reset 为真，则按 heatpct 随机重置 currentheat 并清除 pauseheating 暂停标记。"
+    },
+    {
+      "name": "GetHeatResistance",
+      "effect": "根据当前地块类型返回热阻力系数：no_fire_spread 地块返回0，有 flashpoint_modifier 时返回计算比例，否则返回1。用于减少接受的热量。"
+    },
+    {
+      "name": "CanSpreadHeat",
+      "effect": "返回当前地块是否允许传播热（非 no_fire_spread 地块）。"
+    },
+    {
+      "name": "AcceptsHeat",
+      "effect": "返回 self.acceptsheat 为真且 pauseheating 未暂停时的布尔值，表示当前是否可接受热量。"
+    },
+    {
+      "name": "AddHeat",
+      "effect": "若处于延迟、实体有 fireimmune 标签或已达本次更新上限则忽略；否则按热阻力计算实际加热量，增加 heat_this_update 与 currentheat，若热量非零则启动更新，若超燃点则暂停加热并可能触发 onflashpoint 回调（非受控燃烧源时）。副作用：改变热量，可能触发燃点回调。"
+    },
+    {
+      "name": "Flash",
+      "effect": "若接受热且未暂停且无延迟，则通过减少 heat_this_update 并调用 AddHeat 强制尝试添加超过燃点的热量以触发燃点。副作用：可能触发燃点回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "周期更新：重算热上限，按衰减率衰减 currentheat；若 spreading 则寻找范围内实体，按距离比例传递热量给可受热实体、解冻 freezable、给冻结/可融实体加 firemelt 标签与事件，并在伤害范围内对无燃烧组件但有生命的实体造成火焰伤害（考虑PVP修正）；若不 spreading 则清理 firemelt 标签与事件，热量零时停止更新。副作用：广泛影响周围实体状态、标签与生命值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含范围、输出、热阻、燃点、延迟、传播、受热与当前热量的调试字符串。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.PVP_DAMAGE_MOD",
+    "TUNING.SPRING_FIRE_RANGE_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      14484,
+      14099,
+      15722,
+      15675,
+      16633,
+      19167,
+      21620
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录内容均为实体掉落物、生长周期、耐久、电力等，未出现任何热量、火焰、传播、闪烁、更新等相关描述，不涉及propagator组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "火焰蔓延",
+    "热量传递",
+    "燃点触发",
+    "火灾伤害",
+    "解冻融化",
+    "春季防火",
+    "地块阻火",
+    "热源范围"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+    "source_bytes": 9660,
+    "model": "hy3-free",
+    "generated_at_ms": 1787846551572
+  }
+}

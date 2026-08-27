@@ -1,0 +1,192 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/workable.lua"
+  },
+  "category": "component",
+  "display_name": "workable",
+  "summary": "该组件管理实体可被重复工作（如砍伐、挖掘）的剩余次数、最大次数、工作动作类型及可否工作的状态。它参与资源采集、建筑物拆除等核心玩法，通过工作量消耗触发完成回调与事件，并支持坚硬物体需特殊工具才能生效的逻辑。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "实体移除组件时调用，移除实例的 'workrepairable' 标签以及当前动作 ID 对应的 '_workable' 标签。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含 workleft、maxwork、workable 状态的调试字符串，无副作用。"
+    },
+    {
+      "name": "SetRequiresToughWork",
+      "effect": "设置内部 tough 属性，影响后续 ShouldRecoil 对坚硬工作判定的逻辑，无即时副作用。"
+    },
+    {
+      "name": "SetWorkAction",
+      "effect": "设置工作动作 self.action，因属性监听触发标签更新：移除旧动作标签，添加新动作标签（若可工作且剩余工作量>0）。"
+    },
+    {
+      "name": "GetWorkAction",
+      "effect": "返回当前设置的工作动作 self.action，无副作用。"
+    },
+    {
+      "name": "Destroy",
+      "effect": "若 CanBeWorked() 为真，调用 WorkedBy 以剩余工作量一次性完成工作，触发工作减损、事件与回调。"
+    },
+    {
+      "name": "SetWorkable",
+      "effect": "设置 workable 布尔值，触发监听更新修复组件状态及动作标签的添加/移除。"
+    },
+    {
+      "name": "SetWorkLeft",
+      "effect": "强制设置 workable 为 true，并按 maxwork 限制（或至少1）设定 workleft，触发监听更新标签与修复状态。"
+    },
+    {
+      "name": "GetWorkLeft",
+      "effect": "返回当前可工作时的剩余工作量，不可工作时返回 0，无副作用。"
+    },
+    {
+      "name": "CanBeWorked",
+      "effect": "返回 workable 且 workleft>0 的布尔值，无副作用。"
+    },
+    {
+      "name": "SetOnLoadFn",
+      "effect": "若传入参数为函数，则记录为 onloadfn 供加载时调用，无副作用。"
+    },
+    {
+      "name": "SetMaxWork",
+      "effect": "设置 maxwork 为至少 1 的值，触发监听更新标签与修复状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 savestate 开启，返回包含 maxwork 与 workleft 的表，否则返回空表，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载 workleft 与 maxwork（赋值触发监听更新标签），若存在 onloadfn 则调用之。"
+    },
+    {
+      "name": "WorkedBy",
+      "effect": "获取工人手持工具，经 ShouldRecoil 判定反弹后调用 WorkedBy_Internal 执行实际工作逻辑。"
+    },
+    {
+      "name": "WorkedBy_Internal",
+      "effect": "核心工作处理：计算工作量乘数、扣减 workleft、记录时间与工人、向工人推 'working' 与实例推 'worked' 事件、调用 onwork；若完工则调用 onfinish、推 'workfinished' 与工人 'finishedwork'，植物另推世界 'plantkilled' 事件。"
+    },
+    {
+      "name": "SetOnWorkCallback",
+      "effect": "设置每次工作时的回调 onwork，无副作用。"
+    },
+    {
+      "name": "SetOnFinishCallback",
+      "effect": "设置工作完成时的回调 onfinish，无副作用。"
+    },
+    {
+      "name": "SetWorkMultiplierFn",
+      "effect": "设置工作量乘数函数 workmultiplierfn，无副作用。"
+    },
+    {
+      "name": "SetShouldRecoilFn",
+      "effect": "设置反弹判定函数 shouldrecoilfn，无副作用。"
+    },
+    {
+      "name": "ShouldRecoil",
+      "effect": "依据自定义函数或 tough 属性判定是否反弹及剩余工作量，返回 recoil 布尔与 numworks，无副作用。"
+    }
+  ],
+  "events_published": [
+    "working",
+    "worked",
+    "workfinished",
+    "finishedwork",
+    "plantkilled"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19287,
+      34523,
+      52053,
+      72238,
+      15022,
+      22249,
+      19825,
+      21432
+    ],
+    "aspects": [
+      {
+        "aspect": "剩余使用次数随机标注",
+        "evidence": [
+          {
+            "pageid": 34523,
+            "quote": "针线包剩余使用次数在 2~4 次之间随机"
+          }
+        ]
+      },
+      {
+        "aspect": "协助工作类型列举",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘可以协助跟随的玩家进行以下工作：砍伐、开采、挖掘、犁地、锤击"
+          }
+        ]
+      },
+      {
+        "aspect": "寄生植物破坏取出描述",
+        "evidence": [
+          {
+            "pageid": 19287,
+            "quote": "可以通过[[天气风向标]]等方式将被寄生的植物破坏从而取出"
+          }
+        ]
+      },
+      {
+        "aspect": "开采工具与剩余次数标注",
+        "evidence": [
+          {
+            "pageid": 52053,
+            "quote": "木炭岩石可以用鹤嘴锄开采，随着开采剩余次数降到 3 和 1"
+          }
+        ]
+      },
+      {
+        "aspect": "敲击次数与状态成长描述",
+        "evidence": [
+          {
+            "pageid": 19825,
+            "quote": "敲击至少 5 次后[[蜂王]]有概率从"
+          },
+          {
+            "pageid": 19825,
+            "quote": "总共需经历 4 个状态，每个形态 6."
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "可砍可挖",
+    "剩余次数",
+    "工作动作",
+    "坚硬度",
+    "工具反弹",
+    "植物破坏",
+    "修复判定",
+    "采集完成"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+    "source_bytes": 5805,
+    "model": "hy3-free",
+    "generated_at_ms": 1787846628936
+  }
+}

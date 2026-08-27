@@ -1,8 +1,9 @@
 //! Grading: classify FactChanges into intervention tiers (report-only).
 use super::fact::{FactChange, FactKind, Literal};
 use crate::corpus::facts::FactCandidate;
+use crate::corpus::model::{GameClass, PageMeta};
 use serde::Serialize;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -52,6 +53,27 @@ pub struct CorpusPageView {
 impl CorpusPageView {
     pub fn load(root: &std::path::Path) -> std::io::Result<Self> {
         let mut view = Self::default();
+
+        // 只保留联机版（dst）与混合（mixed，含联机版内容）页面；单机版
+        // /DLC 页面不参与知识管线和页面关联。
+        let allowed: Option<HashSet<i64>> = match std::fs::read_to_string(root.join("meta.jsonl")) {
+            Ok(content) => {
+                let mut set = HashSet::new();
+                for line in content.lines() {
+                    if line.is_empty() {
+                        continue;
+                    }
+                    if let Ok(meta) = serde_json::from_str::<PageMeta>(line) {
+                        if matches!(meta.game_class, GameClass::Dst | GameClass::Mixed) {
+                            set.insert(meta.pageid);
+                        }
+                    }
+                }
+                Some(set)
+            }
+            Err(_) => None,
+        };
+
         let reg_raw = match std::fs::read_to_string(root.join("index/pages_by_prefab.json")) {
             Ok(s) => s,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(view),
@@ -63,6 +85,9 @@ impl CorpusPageView {
         }
         let reg: RegView = serde_json::from_str(&reg_raw)?;
         for (variant, mut ids) in reg.prefabs {
+            if let Some(allowed) = &allowed {
+                ids.retain(|id| allowed.contains(id));
+            }
             ids.sort();
             if ids.is_empty() {
                 continue;
@@ -87,7 +112,12 @@ impl CorpusPageView {
                 continue;
             }
             if let Ok(f) = serde_json::from_str::<FactCandidate>(line) {
-                view.facts.entry(f.pageid).or_default().push(f);
+                if allowed
+                    .as_ref()
+                    .is_none_or(|allowed| allowed.contains(&f.pageid))
+                {
+                    view.facts.entry(f.pageid).or_default().push(f);
+                }
             }
         }
         Ok(view)

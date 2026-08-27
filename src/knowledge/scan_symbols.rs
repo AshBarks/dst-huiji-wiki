@@ -29,6 +29,31 @@ pub struct WikiTextCache {
 impl WikiTextCache {
     pub fn load(corpus_root: &Path) -> Result<Self> {
         let dir = corpus_root.join("pages");
+        // 只加载联机版/混合页面，避免单机版页面进入全文检索采样。
+        let allowed: Option<std::collections::HashSet<i64>> =
+            match std::fs::read_to_string(corpus_root.join("meta.jsonl")) {
+                Ok(content) => {
+                    let mut set = std::collections::HashSet::new();
+                    for line in content.lines() {
+                        if line.is_empty() {
+                            continue;
+                        }
+                        if let Ok(meta) =
+                            serde_json::from_str::<crate::corpus::model::PageMeta>(line)
+                        {
+                            if matches!(
+                                meta.game_class,
+                                crate::corpus::model::GameClass::Dst
+                                    | crate::corpus::model::GameClass::Mixed
+                            ) {
+                                set.insert(meta.pageid);
+                            }
+                        }
+                    }
+                    Some(set)
+                }
+                Err(_) => None,
+            };
         let mut pages = std::collections::HashMap::new();
         for entry in std::fs::read_dir(&dir)? {
             let path = entry?.path();
@@ -40,6 +65,9 @@ impl WikiTextCache {
                 .and_then(|s| s.to_str())
                 .and_then(|s| s.parse::<i64>().ok());
             if let Some(pid) = stem {
+                if allowed.as_ref().is_some_and(|a| !a.contains(&pid)) {
+                    continue;
+                }
                 let text = std::fs::read_to_string(&path)?;
                 pages.insert(pid, text);
             }
@@ -482,11 +510,118 @@ fn sample_pages_for_component(
         .collect()
 }
 
-/// 单页摘录行:grep 命中行优先,否则 facts 摘要。
+/// pass2 章节优先级：只把高/中优先级章节送进 LLM，低优先级（花絮/皮肤/Bug/画廊等）完全排除。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Pass2SectionTier {
+    High,
+    Medium,
+    Ignore,
+}
+
+const HIGH_SECTION_TITLES: &[&str] = &[
+    "行为",
+    "战斗",
+    "攻击",
+    "掉落",
+    "战利品",
+    "获取",
+    "制作",
+    "用途",
+    "生成",
+    "技能",
+    "互动",
+];
+const IGNORE_SECTION_TITLES: &[&str] = &[
+    "花絮",
+    "皮肤",
+    "皮肤套装",
+    "画廊",
+    "脚注",
+    "Bug",
+    "漏洞",
+    "历史",
+    "注释",
+    "外部链接",
+    "参考",
+    "你知道吗",
+    "轶事",
+];
+
+fn pass2_section_tier(kind: &str, title: Option<&str>) -> Pass2SectionTier {
+    match kind {
+        "intro" | "infobox" | "tab" => Pass2SectionTier::High,
+        "section" => {
+            let t = title.map(str::trim).unwrap_or("");
+            if HIGH_SECTION_TITLES.contains(&t) {
+                Pass2SectionTier::High
+            } else if IGNORE_SECTION_TITLES.contains(&t) {
+                Pass2SectionTier::Ignore
+            } else {
+                Pass2SectionTier::Medium
+            }
+        }
+        _ => Pass2SectionTier::Medium,
+    }
+}
+
+/// 在给定区域文本内按检索词提取命中行；行去重并限制条数。
+fn hit_lines_in_text(text: &str, terms: &[String], max_lines: usize) -> Vec<String> {
+    let lower = text.to_lowercase();
+    let mut lines: Vec<String> = Vec::new();
+    for t in terms {
+        let tl = t.to_lowercase();
+        if tl.is_empty() {
+            continue;
+        }
+        let mut from = 0usize;
+        while let Some(pos) = lower[from..].find(&tl) {
+            let abs = from + pos;
+            let start = text
+                .char_indices()
+                .map(|(i, _)| i)
+                .rev()
+                .find(|&i| i <= abs)
+                .unwrap_or(0);
+            let line_start = text[..start].rfind('\n').map(|i| i + 1).unwrap_or(0);
+            let rest = &text[line_start..];
+            let line_end = rest
+                .find('\n')
+                .map(|i| line_start + i)
+                .unwrap_or(text.len());
+            let mut le = line_end;
+            while le > line_start && !text.is_char_boundary(le) {
+                le -= 1;
+            }
+            let line = text[line_start..le].trim();
+            if !line.is_empty() && !lines.contains(&line.to_string()) {
+                let mut cut = line.to_string();
+                if cut.len() > 160 {
+                    let mut e2 = 160;
+                    while e2 > 0 && !cut.is_char_boundary(e2) {
+                        e2 -= 1;
+                    }
+                    cut.truncate(e2);
+                    cut.push('…');
+                }
+                lines.push(cut);
+                if lines.len() >= max_lines {
+                    return lines;
+                }
+            }
+            from = abs + tl.len();
+        }
+    }
+    lines
+}
+
+/// 单页摘录：有全文缓存时按章节优先级输出；无缓存时才退回旧的全局 grep 行。
+#[allow(clippy::too_many_arguments)]
 fn out_line(
     out: &mut String,
     prefab_of: &std::collections::HashMap<i64, String>,
     view: &CorpusPageView,
+    cache: Option<&WikiTextCache>,
+    terms: &[String],
     hit_lines: &std::collections::HashMap<i64, Vec<String>>,
     pageid: i64,
 ) {
@@ -496,22 +631,74 @@ fn out_line(
     }
     out.push('\n');
     let mut pushed = false;
-    if let Some(lines) = hit_lines.get(&pageid) {
-        for l in lines {
-            out.push_str(&format!("- 命中:{l}\n"));
-            pushed = true;
+
+    if let Some(cache) = cache {
+        if let Some(text) = cache.pages.get(&pageid) {
+            let regions = crate::corpus::segment::segment(pageid, text);
+            let mut budget = 6usize;
+            for region in regions {
+                if pass2_section_tier(region.kind, region.title.as_deref())
+                    == Pass2SectionTier::Ignore
+                {
+                    continue;
+                }
+                let region_text = &text[region.start_byte..region.end_byte];
+                let hits = hit_lines_in_text(region_text, terms, 2);
+                let facts: Vec<_> = view
+                    .facts
+                    .get(&pageid)
+                    .map(|fs| {
+                        fs.iter()
+                            .filter(|f| f.region_id == region.id)
+                            .take(2)
+                            .collect::<Vec<_>>()
+                    })
+                    .unwrap_or_default();
+                if hits.is_empty() && facts.is_empty() {
+                    continue;
+                }
+                let label = region
+                    .title
+                    .clone()
+                    .unwrap_or_else(|| region.kind.to_string());
+                out.push_str(&format!("- 【{label}】\n"));
+                for l in &hits {
+                    out.push_str(&format!("  命中:{l}\n"));
+                    pushed = true;
+                    budget = budget.saturating_sub(1);
+                }
+                for f in facts {
+                    out.push_str(&format!("  [{}] {}\n", f.fact_kind, f.snippet));
+                    pushed = true;
+                    budget = budget.saturating_sub(1);
+                }
+                if budget == 0 {
+                    break;
+                }
+            }
         }
     }
-    if !pushed {
-        if let Some(facts) = view.facts.get(&pageid) {
-            for f in facts.iter().take(6) {
-                out.push_str(&format!("- [{}] {}\n", f.region_id, f.snippet));
+
+    // 无全文缓存（理论不会发生在 pass2 开启时）才使用旧逻辑。
+    if !pushed && cache.is_none() {
+        if let Some(lines) = hit_lines.get(&pageid) {
+            for l in lines {
+                out.push_str(&format!("- 命中:{l}\n"));
             }
             pushed = true;
         }
+        if !pushed {
+            if let Some(facts) = view.facts.get(&pageid) {
+                for f in facts.iter().take(6) {
+                    out.push_str(&format!("- [{}] {}\n", f.region_id, f.snippet));
+                }
+                pushed = true;
+            }
+        }
     }
+
     if !pushed {
-        out.push_str("- (无摘要行)\n");
+        out.push_str("- (无相关章节摘录)\n");
     }
     out.push('\n');
 }
@@ -628,7 +815,15 @@ async fn enrich_with_wiki(
     }
     let mut excerpts = String::new();
     for pid in &pageids {
-        out_line(&mut excerpts, &prefab_of, ctx.view, &hit_lines, *pid);
+        out_line(
+            &mut excerpts,
+            &prefab_of,
+            ctx.view,
+            ctx.cache,
+            &doc.search_terms,
+            &hit_lines,
+            *pid,
+        );
     }
     let caps: Vec<String> = doc.api.iter().map(|a| a.name.clone()).collect();
 

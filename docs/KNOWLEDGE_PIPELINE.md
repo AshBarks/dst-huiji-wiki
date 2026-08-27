@@ -1,6 +1,6 @@
 # Knowledge Pipeline 设计(符号知识文档驱动)
 
-> 状态:M0 设计冻结 v2(2026-08-27):按 pilot 评审拆分双通道,wiki_aspects/page_hint 移出代码事实通道。
+> 状态:M1 扩量至 50 份 SymbolDoc(2026-08-28);pass2 已加入版本过滤/章节过滤/重试容错;待全量 force 刷新与人工 review 后进入 M2。
 > 决策记录:knowledge/ 入库 git;文档正文中文;a 阶段先 component;b 暂只做实体/prefab 页(系统机制页挂起);目标 1/3 输出建议清单而非代写内容;并发策略待 pilot 后定,当前串行。
 
 ## 1. 意图(与产品构想的映射)
@@ -96,7 +96,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - M2 `scan-wiki`:仅 (page, component) 经索引路由的相关对;实体页优先;产出 PageSymbolMap(mentions/aspects_covered/aspects_ignored/detail_level)。
 - M3 `sync`:update-scan 变更集 → 脏 SymbolDoc 重扫 → 与 PageSymbolMap 交叉 → 页面修订建议清单;新增 `page-assist`(目标1/3,仅建议清单)。
 
-## 8. 实施进度(2026-08-27)
+## 8. 实施进度(更新至 2026-08-28)
 
 ### 8.1 已完成
 
@@ -106,6 +106,11 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | M0 | Schema v3 + 目录契约 + 提示词契约 p3 定稿(本文档) | — |
 | M1 pass1 | `knowledge-scan-symbols`:component 源码 → SymbolDoc(纯代码事实通道) | pilot 3/3 文档,schema 合格率 100% |
 | M1 pass2 | link-wiki 语料归因:search_terms 全文检索采样 → 带证据 aspects / 负结果声明 | 见 8.2 |
+| M1 扩量 | `--limit 50` 生成 50 份 component SymbolDoc(含 tradable) | schema 合格率 49/50(首轮 tradable 因空 api 失败,补 api_note 后通过) |
+| M1 pass2 健壮性 | pass2 LLM 重试 1 次;连续失败不中断整批,保留 pass1 文档待补跑 | 长跑未因单次流式错误中断 |
+| M1 纯数据组件 | `api` 允许为空,但必须填 `api_note` 说明 | tradable 成功入库 |
+| M1 版本过滤 | 只保留 dst/mixed 页面,排除 ds/unknown/redirect/disambig | 全文页 6891→1849;facts 页 1881→1051 |
+| M1 章节过滤 | 提交 LLM 前按章节优先级过滤,低优先级完全排除 | 8 组件对照见 8.2 v4 |
 
 ### 8.2 Pilot 三轮演进(关键教训)
 
@@ -114,6 +119,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | v1 (p1) | 仅源码;强制产出 wiki_aspects/page_hint | **自由发挥**:inspectable 被捏造出 7 条 aspects——「无语境+必填字段」必然幻觉 |
 | v2 (p2) | 拆双通道;pass2 用 路由链+fact数排序 采样 | inspectable 空结果 ✔;但 inventoryitem 也空——fact 排序是组件无关信号,生物页霸榜 |
 | v3 (p3) | pass1 增产 `search_terms`;pass2 以**全文检索命中数**为主采样(6891 页 wikitext 本地缓存),路由链降为兜底 | inventoryitem 3 条 aspects 全带引文(捡起/储物/掉出),inspectable 仍为空(命中仅 2 页)——**空即结论**成立 |
+| v4 (p3+过滤) | 仅使用 dst/mixed 页面;提交语料前按章节高/中优先级裁剪 | 8 组件对照:采样页全部为联机版;旧混入 ds 证据被清除;floater 回退 no_wiki_mention,inspectable/hauntable 从 0 到 1;inventoryitem 旧的“储物/捡起”证据中 ds 页被移除 |
 
 ### 8.3 数据事实(记录备查)
 
@@ -121,13 +127,18 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - inventoryitem 变体 553 个(全部物品+可拾取生物),路由可达 417 页
 - fact 富裕度排序与组件相关性无关 → 必须组件感知采样(v3 的 search_terms 即为此设计)
 - 3 个 pilot 文档耗时:pass1 52~81s/个,pass2 20~24s/个(hy3-free,串行)
+- 全文检索/缓存的页面从 6891 收敛到 1849(dst/mixed);facts 来源页从 1881 收敛到 1051
+- 旧文档中确实混入 ds 证据:如 inventoryitem 的根箱/皮弗娄牛(单机版),lootdropper 的鲸鱼尸体/远古兵器/蹊跷的事物,workable 的木炭岩石
 
 ## 9. 后续计划
 
-### M1 收尾(下一步)
-1. **扩量**:limit=20~50 全量 component(串行预计 1~2.5h;扩量前先跑 10 个验证 search_terms 质量的稳定性)
-2. **search_terms 质量杠杆**:候选改进——每个 API 条目强制 1~2 个词;对 0 命中组件允许模型二次修正检索词重试一次
-3. 可选:pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
+### M1 收尾(当前)
+1. **全量刷新主库**:用新逻辑 `--limit 50 --force` 重跑 `knowledge/symbols/`,将当前仍含旧 ds 证据的 50 份文档替换为纯联机版+章节过滤版本
+2. **人工 review 重点 diff**:inventoryitem / lootdropper / workable / floater / inspectable / hauntable,确认新 aspects 更符合联机版页面
+3. **search_terms 质量杠杆**(可选):每个 API 条目强制 1~2 个词;对 0 命中组件允许模型二次修正检索词重试一次
+4. **二次确认**(可选):pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
+
+> 当前 `output/knowledge_compare/` 为 8 组件对照临时产物,不入库;确认后可用它作为全量刷新前的预期样本。
 
 ### M2(构想 b 完整版)
 1. `knowledge scan-wiki`:对 2268 页 × 已有 SymbolDoc 的组件做 (page,symbol) 归因,产出 PageSymbolMap(aspects_covered/aspects_ignored/detail_level)

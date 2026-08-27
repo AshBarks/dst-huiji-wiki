@@ -41,6 +41,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
   "display_name": "health",
   "summary": "中文 2~4 句:该组件管理什么、如何参与玩法。",
   "api": [{"name": "DoDelta", "signature": "(delta)", "effect": "…", "page_hint": "实体页应写…"}],
+  "api_note": null,                  // api 为空时必填说明,例如“纯数据组件,无公开方法”
   "events_published": ["healthdelta"],
   "events_listened": [],
   "netvars": [],
@@ -62,7 +63,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - v2 双通道:`wiki_aspects`/`api.page_hint` 已从代码事实通道**移除**(pilot 证明仅凭源码必然自由发挥;inspectable 类基础设施组件在 wiki 中几乎不被提及,空即是结论)。页面组织建议改由目标 1 流程在编辑时动态合成。
 - LLM 只产出 knowledge 部分;`reference/schema_version/prompt_rev/provenance` 由管线回填。
 - 解析走容错链(围栏/散文剥离/尾逗号/残缺元素),复用 symbol_page 既有工具。
-- 硬校验:`summary` 非空、`api` 非空(component 必有方法);失败 → raw 已归档,报错含定位。
+- 硬校验:`summary` 非空;`api` 为空时必须提供 `api_note` 说明(允许纯数据组件);失败 → raw 已归档,报错含定位。
 
 ### pass2(link-wiki)契约
 
@@ -81,7 +82,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 ## 5. 提示词契约(p1, component)
 
 - system:资深 DST 源码分析员;输出单个 JSON 对象;全中文;禁止编造源码中不存在的内容。
-- user:`<源码全文>` + 空文档骨架说明 + 字段填写规则(api 至少覆盖全部 public 方法;page_hint 站在维基编辑者视角)。
+- user:`<源码全文>` + 空文档骨架说明 + 字段填写规则(api 至少覆盖全部 public 方法;若确实没有方法则 api 为空并填写 api_note;page_hint 站在维基编辑者视角)。
 - 源码 >48KB 截断并在 `truncation_note` 声明(当前 components 最大 ~27KB,未触发)。
 
 ## 6. 可观测性与公平基准

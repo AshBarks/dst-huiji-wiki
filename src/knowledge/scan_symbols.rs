@@ -364,10 +364,11 @@ fn build_prompt(display: &str, source: &str, truncated: bool) -> String {
 1. 全部用中文;不得编造源码中不存在的内容。
 2. summary:2~4 句,说明组件管理的数据与参与的核心玩法。
 3. api:覆盖全部对外(实体/其他系统)暴露的方法;effect 写清行为与副作用。不要猜测页面该如何撰写——文档只承载代码可证实的事实。
-4. events_published / events_listened / netvars / tunables:严格取自源码标识符,可为空数组。
-5. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
-6. search_terms:5~10 个用于在维基全文中检索该组件能力表达的词汇,以中文玩家语言为主(可混英文),每词 2~6 字;不要照抄 API 名。
-7. 只输出一个 JSON 对象,字段名与上述一致;除 api 确无方法外不得为空数组。
+4. 若源码确实没有任何对外方法(纯数据组件),api 返回空数组,并必须用 api_note 说明原因(如“纯数据组件,无公开方法”);不得为了凑数编造方法。
+5. events_published / events_listened / netvars / tunables:严格取自源码标识符,可为空数组。
+6. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
+7. search_terms:5~10 个用于在维基全文中检索该组件能力表达的词汇,以中文玩家语言为主(可混英文),每词 2~6 字;不要照抄 API 名。
+8. 只输出一个 JSON 对象,字段名与上述一致;除 api 确无方法外不得为空数组。
 
 源码:
 ```lua

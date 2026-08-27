@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/tradable.lua"
+  },
+  "category": "component",
+  "display_name": "tradable",
+  "summary": "该组件为实体存储了黄金价值（goldvalue）数据，并在注释中预留了交易目标（tradefor）与岩石献祭（rocktribute）字段。它作为交易相关玩法的数据载体，目前仅初始化了基础数值。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14484,
+      52631,
+      15737,
+      20113,
+      14695,
+      15235,
+      15314,
+      19765
+    ],
+    "aspects": [],
+    "no_evidence_reason": "组件能力清单未提供具体能力，且页面摘录文本中无交易、可交易、给予、交换等相关表达，故认为页面不讨论该组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "黄金价值",
+    "以物易物",
+    "换金",
+    "交易用",
+    "物品价值",
+    "岩石祭",
+    "买卖"
+  ],
+  "gameplay_tags": [
+    "交易"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+    "source_bytes": 185,
+    "model": "hy3-free",
+    "generated_at_ms": 1787853029652
+  }
+}

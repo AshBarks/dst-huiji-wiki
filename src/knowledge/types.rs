@@ -100,6 +100,9 @@ pub struct SymbolDoc {
     pub display_name: String,
     pub summary: String,
     pub api: Vec<ApiEntry>,
+    /// api 为空时的说明，例如“纯数据组件，无公开方法”。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_note: Option<String>,
     #[serde(default)]
     pub events_published: Vec<String>,
     #[serde(default)]
@@ -133,6 +136,9 @@ pub struct SymbolDocLlm {
     pub summary: String,
     #[serde(default)]
     pub api: Vec<ApiEntry>,
+    /// api 为空时必须填写原因，例如“纯数据组件，无公开方法”。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_note: Option<String>,
     #[serde(default)]
     pub events_published: Vec<String>,
     #[serde(default)]
@@ -159,7 +165,14 @@ impl SymbolDocLlm {
             return Err("summary 为空".to_string());
         }
         if self.api.is_empty() {
-            return Err("api 为空(component 必有方法)".to_string());
+            let has_note = self
+                .api_note
+                .as_deref()
+                .map(str::trim)
+                .is_some_and(|s| !s.is_empty());
+            if !has_note {
+                return Err("api 为空且未提供 api_note 说明".to_string());
+            }
         }
         Ok(())
     }
@@ -196,6 +209,7 @@ pub fn assemble(
         },
         summary: llm.summary.clone(),
         api: llm.api.clone(),
+        api_note: llm.api_note.clone(),
         events_published: llm.events_published.clone(),
         events_listened: llm.events_listened.clone(),
         netvars: llm.netvars.clone(),
@@ -250,13 +264,15 @@ mod tests {
     }
 
     #[test]
-    fn validate_rejects_empty_summary_or_api() {
+    fn validate_rejects_empty_summary_or_api_without_note() {
         let mut d = sample();
         d.summary = "  ".to_string();
         assert!(d.validate().is_err());
         let mut d = sample();
         d.api.clear();
         assert!(d.validate().is_err());
+        d.api_note = Some("纯数据组件，无公开方法".to_string());
+        assert!(d.validate().is_ok());
     }
 
     #[test]

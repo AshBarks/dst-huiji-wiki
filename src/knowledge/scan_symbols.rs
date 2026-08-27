@@ -18,7 +18,7 @@ use std::path::{Path, PathBuf};
 
 /// 单文档源码输入上限;超出截断并写入 truncation_note(§5)。
 const SOURCE_BYTES_CAP: usize = 48 * 1024;
-/// 每文档失败后的总尝试次数(含首次,即重试 1 次)。
+/// pass1/pass2 每文档失败后的总尝试次数(含首次,即重试 1 次)。
 const MAX_ATTEMPTS: u32 = 2;
 
 /// 语料全文缓存:pages/<pageid>.wikitext → 全文(每 run 加载一次)。
@@ -194,6 +194,7 @@ pub async fn run_scan_symbols(
         None => (None, None, 0),
     };
     let mut wiki_written = 0u32;
+    let mut wiki_failed = 0u32;
 
     let (mut written, mut skipped, mut failed) = (0u32, 0u32, 0u32);
     for (idx, (key, src_path, src_bytes)) in picked.iter().enumerate() {
@@ -221,7 +222,7 @@ pub async fn run_scan_symbols(
                             // 文档已是 v2 但缺 wiki 节点 → 只补 pass2
                             reporter.log("代码文档新鲜,仅补 pass2 语料归因".to_string());
                             let mut doc = existing;
-                            enrich_with_wiki(
+                            match enrich_with_wiki(
                                 &config,
                                 &mut doc,
                                 WikiContext {
@@ -233,9 +234,19 @@ pub async fn run_scan_symbols(
                                 &raw_dir,
                                 reporter,
                             )
-                            .await?;
-                            write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
-                            wiki_written += 1;
+                            .await
+                            {
+                                Ok(()) => {
+                                    write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
+                                    wiki_written += 1;
+                                }
+                                Err(e) => {
+                                    wiki_failed += 1;
+                                    reporter.log(format!(
+                                        "pass2 失败,保留 pass1 文档(可下次补跑): {e}"
+                                    ));
+                                }
+                            }
                             continue;
                         }
                     }
@@ -284,7 +295,7 @@ pub async fn run_scan_symbols(
                 write_atomic(&doc_path, &body)?;
                 let mut doc = doc;
                 if let Some(v) = &view {
-                    enrich_with_wiki(
+                    match enrich_with_wiki(
                         &config,
                         &mut doc,
                         WikiContext {
@@ -296,9 +307,17 @@ pub async fn run_scan_symbols(
                         &raw_dir,
                         reporter,
                     )
-                    .await?;
-                    write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
-                    wiki_written += 1;
+                    .await
+                    {
+                        Ok(()) => {
+                            write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
+                            wiki_written += 1;
+                        }
+                        Err(e) => {
+                            wiki_failed += 1;
+                            reporter.log(format!("pass2 失败,已保留 pass1 文档(可下次补跑): {e}"));
+                        }
+                    }
                 }
                 reporter.log(format!(
                     "文档已写入 {}(api {} 条 / wiki 节点 {})",
@@ -327,6 +346,7 @@ pub async fn run_scan_symbols(
         "skipped_fresh": skipped,
         "failed": failed,
         "wiki_enriched": wiki_written,
+        "wiki_failed": wiki_failed,
     }))
 }
 
@@ -503,6 +523,42 @@ struct WikiContext<'a> {
     sample: usize,
 }
 
+/// 单次 pass2 LLM 调用 + 容错解析;失败由调用方决定重试/降级。
+async fn generate_wiki_once(
+    config: &LlmConfig,
+    doc_id: &str,
+    prompt: &str,
+    raw_dir: &Path,
+    reporter: &dyn Reporter,
+) -> Result<WikiLinkLlm> {
+    let system = "你是维基语料分析员,任务是在真实页面文本中检索组件能力的表达证据。只输出一个合法 JSON 对象,除 JSON 外不得输出任何其他文字。";
+    let raw = config
+        .complete_streaming(system, prompt, |ev| match ev {
+            LlmStreamEvent::FirstToken { elapsed_secs } => {
+                reporter.log(format!("pass2 首个分片({elapsed_secs}s)"));
+            }
+            LlmStreamEvent::Done {
+                chars,
+                elapsed_secs,
+            } => {
+                reporter.log(format!("pass2 输出完成:{chars} 字符 / {elapsed_secs}s"));
+            }
+            _ => {}
+        })
+        .await?;
+
+    let raw_path = raw_dir.join(format!("{}__wiki__{}.json", doc_id, PROMPT_REV));
+    std::fs::write(&raw_path, &raw)?;
+    reporter.log(format!("pass2 raw 已归档 {}", raw_path.display()));
+
+    parse_wiki_tolerant(&raw).map_err(|e| {
+        Error::Llm(format!(
+            "pass2 输出无法解析(raw 已存 {}):{e}",
+            raw_path.display()
+        ))
+    })
+}
+
 async fn enrich_with_wiki(
     config: &LlmConfig,
     doc: &mut SymbolDoc,
@@ -595,33 +651,20 @@ async fn enrich_with_wiki(
         excerpts = excerpts,
     );
 
-    let system = "你是维基语料分析员,任务是在真实页面文本中检索组件能力的表达证据。只输出一个合法 JSON 对象,除 JSON 外不得输出任何其他文字。";
-
-    let raw = config
-        .complete_streaming(system, &prompt, |ev| match ev {
-            LlmStreamEvent::FirstToken { elapsed_secs } => {
-                reporter.log(format!("pass2 首个分片({elapsed_secs}s)"));
+    let mut wiki_outcome: Option<Result<WikiLinkLlm>> = None;
+    for attempt in 1..=MAX_ATTEMPTS {
+        if attempt > 1 {
+            reporter.log("pass2 重试第 2 次…".to_string());
+        }
+        match generate_wiki_once(config, &key.doc_id(), &prompt, raw_dir, reporter).await {
+            Ok(llm) => {
+                wiki_outcome = Some(Ok(llm));
+                break;
             }
-            LlmStreamEvent::Done {
-                chars,
-                elapsed_secs,
-            } => {
-                reporter.log(format!("pass2 输出完成:{chars} 字符 / {elapsed_secs}s"));
-            }
-            _ => {}
-        })
-        .await?;
-
-    let raw_path = raw_dir.join(format!("{}__wiki__{}.json", key.doc_id(), PROMPT_REV));
-    std::fs::write(&raw_path, &raw)?;
-    reporter.log(format!("pass2 raw 已归档 {}", raw_path.display()));
-
-    let llm = parse_wiki_tolerant(&raw).map_err(|e| {
-        Error::Llm(format!(
-            "pass2 输出无法解析(raw 已存 {}):{e}",
-            raw_path.display()
-        ))
-    })?;
+            Err(e) => wiki_outcome = Some(Err(e)),
+        }
+    }
+    let llm = wiki_outcome.expect("at least one attempt")?;
 
     // 证据页必须 ∈ 采样集合;过滤后无证据的 aspect 整条丢弃(宁空勿造)。
     let allowed: HashSet<i64> = pageids.iter().copied().collect();

@@ -61,7 +61,7 @@ pub struct SymbolPageAnnotation {
     pub page_evidence: Vec<PageEvidence>,
 }
 
-fn variant_pages(view: &CorpusPageView, variants: &[String]) -> BTreeSet<i64> {
+pub(crate) fn variant_pages(view: &CorpusPageView, variants: &[String]) -> BTreeSet<i64> {
     let mut out = BTreeSet::new();
     for v in variants {
         let variant = v.rsplit('#').next().unwrap_or(v);
@@ -77,7 +77,7 @@ fn variant_pages(view: &CorpusPageView, variants: &[String]) -> BTreeSet<i64> {
     out
 }
 
-fn affected_variants(artifact: &IndexArtifact, symbol: &SymbolRef) -> Vec<String> {
+pub(crate) fn affected_variants(artifact: &IndexArtifact, symbol: &SymbolRef) -> Vec<String> {
     let mut set = BTreeSet::new();
     match symbol {
         SymbolRef::File { path } => {
@@ -349,6 +349,178 @@ pub fn symbol_display(symbol: &SymbolRef) -> String {
 
 /// P3: render a Page → Symbol annotation prompt from one evidence pack.
 pub fn render_symbol_annotation_prompt(ann: &SymbolPageAnnotation, code_semantics: &str) -> String {
+    render_symbol_annotation_prompt_for_pages(ann, code_semantics, &ann.affected_pageids)
+}
+
+/// Default per-batch rendered-input budget (`--batch-max-chars`).
+///
+/// Tuned so one batch stays inside a comfortable single-request size: page
+/// sections average a few hundred bytes, pathological ones a few KB, so
+/// ~32KB ≈ mid-single-digit-K tokens of evidence.
+pub const DEFAULT_BATCH_MAX_CHARS: usize = 32_000;
+
+/// Evidence count and rendered byte size of each page's prompt section
+/// (byte-for-byte mirror of the renderer's per-page loop body).
+struct PageWeights {
+    counts: std::collections::HashMap<i64, usize>,
+    chars: std::collections::HashMap<i64, usize>,
+}
+
+impl PageWeights {
+    fn build(ann: &SymbolPageAnnotation) -> Self {
+        let mut grouped: std::collections::HashMap<i64, Vec<&PageEvidence>> =
+            std::collections::HashMap::new();
+        for e in &ann.page_evidence {
+            grouped.entry(e.pageid).or_default().push(e);
+        }
+        let mut counts = std::collections::HashMap::new();
+        let mut chars = std::collections::HashMap::new();
+        for pid in &ann.affected_pageids {
+            let evs = grouped.get(pid);
+            let n = evs.map_or(0, Vec::len);
+            counts.insert(*pid, n);
+            let mut sec = format!("### page {pid}\n");
+            if n == 0 {
+                sec.push_str("（无候选数值事实）\n");
+            }
+            if let Some(evs) = evs {
+                for e in evs {
+                    sec.push_str(&format!("- [{}] {}\n", e.region_id, e.snippet));
+                }
+            }
+            sec.push('\n');
+            chars.insert(*pid, sec.len());
+        }
+        Self { counts, chars }
+    }
+
+    fn count(&self, pid: i64) -> usize {
+        self.counts.get(&pid).copied().unwrap_or(0)
+    }
+
+    fn chars(&self, pid: i64) -> usize {
+        self.chars.get(&pid).copied().unwrap_or(0)
+    }
+}
+
+/// Splits a symbol's affected pages into LLM-friendly annotation batches.
+///
+/// Pages are ordered by evidence density (candidate-fact count descending;
+/// ties keep the original order) so information-rich pages land in early
+/// batches, then greedily cut into consecutive chunks respecting **both**
+/// caps:
+///
+/// - `max_pages` — structural ceiling on verdicts per request (`0` = unset);
+/// - `max_chars` — rendered-input byte budget, so dense mega-pages cannot
+///   inflate a page-count-bounded batch into a mega-prompt (`0` = unset).
+///
+/// With both caps unset the historical single-batch behaviour is preserved
+/// exactly (original order, one request). Batches are non-empty and every
+/// page lands in exactly one batch; a single page heavier than `max_chars`
+/// still gets its own batch rather than being dropped.
+pub fn paginate_affected_pages(
+    ann: &SymbolPageAnnotation,
+    max_pages: usize,
+    max_chars: usize,
+) -> Vec<Vec<i64>> {
+    if max_pages == 0 && max_chars == 0 {
+        return vec![ann.affected_pageids.clone()];
+    }
+
+    let weights = PageWeights::build(ann);
+    let mut ranked = ann.affected_pageids.clone();
+    ranked.sort_by_key(|pid| std::cmp::Reverse(weights.count(*pid)));
+
+    let mut batches: Vec<Vec<i64>> = Vec::new();
+    let mut cur: Vec<i64> = Vec::new();
+    let mut cur_chars = 0usize;
+    for pid in ranked {
+        let w = weights.chars(pid);
+        let page_full = max_pages > 0 && cur.len() >= max_pages;
+        let char_full = max_chars > 0 && !cur.is_empty() && cur_chars + w > max_chars;
+        if page_full || char_full {
+            batches.push(std::mem::take(&mut cur));
+            cur_chars = 0;
+        }
+        cur.push(pid);
+        cur_chars += w;
+    }
+    if !cur.is_empty() {
+        batches.push(cur);
+    }
+    batches
+}
+
+/// Splits the affected pages into the LLM workload (`Some`) and pages that
+/// carry no candidate evidence at all (`None`-worthy leftovers) when
+/// `skip_no_facts` is set; otherwise nothing is filtered.
+///
+/// The returned filter summary pairs every excluded pageid with a locally
+/// synthesized verdict so coverage statistics remain complete without paying
+/// LLM tokens for sections that would read "（无候选数值事实）" anyway.
+pub fn partition_no_fact_pages(
+    ann: &SymbolPageAnnotation,
+    skip_no_facts: bool,
+) -> (Vec<i64>, Vec<PageSymbolVerdict>) {
+    if !skip_no_facts {
+        return (ann.affected_pageids.clone(), Vec::new());
+    }
+    let with_facts: std::collections::HashSet<i64> =
+        ann.page_evidence.iter().map(|e| e.pageid).collect();
+    let mut sent = Vec::new();
+    let mut synthesized = Vec::new();
+    for pid in &ann.affected_pageids {
+        if with_facts.contains(pid) {
+            sent.push(*pid);
+        } else {
+            synthesized.push(PageSymbolVerdict {
+                pageid: *pid,
+                mentions: false,
+                wording: None,
+                semantic_consistent: None,
+                missing: true,
+                confidence: Some("low".to_string()),
+                note: Some("页面无候选数值事实证据（未单独送审）".to_string()),
+            });
+        }
+    }
+    (sent, synthesized)
+}
+
+/// Appends locally synthesized verdicts for every requested page that never
+/// appeared in any batch output, returning how many were added.
+///
+/// Guardrail for multi-batch runs: an LLM occasionally omits 1–2 pages from a
+/// chunk's JSON array. Coverage statistics require the requested page set to
+/// be fully answered, so gaps are filled with explicit low-confidence
+/// placeholders instead of being silently lost.
+pub fn fill_missing_requested(requested: &[i64], verdicts: &mut Vec<PageSymbolVerdict>) -> usize {
+    let have: std::collections::HashSet<i64> = verdicts.iter().map(|v| v.pageid).collect();
+    let mut added = 0usize;
+    for pid in requested {
+        if !have.contains(pid) {
+            verdicts.push(PageSymbolVerdict {
+                pageid: *pid,
+                mentions: false,
+                wording: None,
+                semantic_consistent: None,
+                missing: true,
+                confidence: Some("low".to_string()),
+                note: Some("该页未出现在批次输出中（本地补判）".to_string()),
+            });
+            added += 1;
+        }
+    }
+    added
+}
+
+/// Renders the annotation prompt for an explicit subset of the symbol's
+/// affected pages (see [`paginate_affected_pages`] for the batching policy).
+pub fn render_symbol_annotation_prompt_for_pages(
+    ann: &SymbolPageAnnotation,
+    code_semantics: &str,
+    pageids: &[i64],
+) -> String {
     let symbol = symbol_display(&ann.symbol);
     let mut out = String::new();
     out.push_str("你是 DST Huiji Wiki 的代码符号页面影响标注助手。\n");
@@ -359,8 +531,12 @@ pub fn render_symbol_annotation_prompt(ann: &SymbolPageAnnotation, code_semantic
         "## Affected variants\n{}\n\n",
         ann.affected_variants.join(", ")
     ));
-    out.push_str("## Affected pages and candidate evidence\n");
-    for pageid in &ann.affected_pageids {
+    out.push_str(&format!(
+        "## Affected pages and candidate evidence（本批 {} 页 / 全部 {} 页）\n",
+        pageids.len(),
+        ann.affected_pageids.len(),
+    ));
+    for pageid in pageids {
         out.push_str(&format!("### page {pageid}\n"));
         let evs: Vec<_> = ann
             .page_evidence
@@ -376,7 +552,7 @@ pub fn render_symbol_annotation_prompt(ann: &SymbolPageAnnotation, code_semantic
         out.push('\n');
     }
     out.push_str(
-        "## 输出要求\n请输出 JSON 数组，每个元素包含：\n         {\"pageid\": 数字, \"mentions\": true/false, \"wording\": 字符串或null, \"semantic_consistent\": true/false或null, \"missing\": true/false, \"confidence\": \"high|medium|low\", \"note\": 字符串或null}\n",
+        "## 输出要求\n请输出 JSON 数组，每个元素包含：\n         {\"pageid\": 数字, \"mentions\": true/false, \"wording\": 字符串或null, \"semantic_consistent\": true/false或null, \"missing\": true/false, \"confidence\": \"high|medium|low\", \"note\": 字符串或null}\n为节省输出，可选项（wording/semantic_consistent/note）若无内容请直接省略该键，不要输出 null；仅输出本批给出的页面。\n",
     );
     out
 }
@@ -384,23 +560,116 @@ pub fn render_symbol_annotation_prompt(ann: &SymbolPageAnnotation, code_semantic
 /// P3: parse an LLM response into page verdicts.
 ///
 /// Accepts either a bare JSON array or `{"symbol": "...", "verdicts": [...]}`.
+/// Common LLM output defects are tolerated, in order:
+///
+/// 1. a Markdown code fence (```json ... ```) around the payload;
+/// 2. prose before/after the payload (the outermost `[...]` is extracted);
+/// 3. trailing commas inside objects/arrays.
 pub fn parse_symbol_annotation_response(raw: &str) -> Result<Vec<PageSymbolVerdict>> {
-    let trimmed = raw.trim();
-    if let Ok(v) = serde_json::from_str::<Vec<PageSymbolVerdict>>(trimmed) {
-        return Ok(v);
+    let trimmed = strip_code_fence(raw.trim());
+    let sliced = extract_outermost_array(trimmed);
+    // Independent fixes plus their combination (a payload may suffer from
+    // several defects at once).
+    let sliced_fixed = sliced.map(remove_trailing_commas);
+    let fixed = remove_trailing_commas(trimmed);
+    let candidates: Vec<&str> = Vec::from_iter(
+        [
+            Some(trimmed),
+            Some(fixed.as_str()),
+            sliced,
+            sliced_fixed.as_deref(),
+        ]
+        .into_iter()
+        .flatten(),
+    );
+    for cand in candidates {
+        // Fast path: exact contract.
+        if let Ok(v) = serde_json::from_str::<Vec<PageSymbolVerdict>>(cand) {
+            return Ok(v);
+        }
+        // Lenient path: skip malformed/partial elements instead of failing
+        // the whole batch when at least one usable verdict survives.
+        if let Ok(v) = serde_json::from_str::<serde_json::Value>(cand) {
+            if let Some(kept) = salvage_verdict_elems(&v) {
+                return Ok(kept);
+            }
+        }
     }
-    let v: serde_json::Value = serde_json::from_str(trimmed)?;
-    if let Some(arr) = v
-        .get("verdicts")
-        .or_else(|| v.get("results"))
-        .and_then(|x| x.as_array())
-    {
-        let arr = serde_json::Value::Array(arr.clone());
-        return Ok(serde_json::from_value(arr)?);
+    Err(crate::error::Error::Config(format!(
+        "SymbolAnnotationResponse 缺少 verdicts/results 数组或 JSON 无法修复：{}",
+        excerpt(trimmed)
+    )))
+}
+
+/// Accepts `[...]` or `{..., "verdicts"|"results": [...]}` and keeps only the
+/// elements that deserialize cleanly into [`PageSymbolVerdict`].
+///
+/// Returns `None` when the shape does not apply or nothing usable survives.
+fn salvage_verdict_elems(v: &serde_json::Value) -> Option<Vec<PageSymbolVerdict>> {
+    let arr = match v {
+        serde_json::Value::Array(arr) => arr.as_slice(),
+        obj @ serde_json::Value::Object(_) => obj
+            .get("verdicts")
+            .or_else(|| obj.get("results"))?
+            .as_array()?,
+        _ => return None,
+    };
+    let kept: Vec<PageSymbolVerdict> = arr
+        .iter()
+        .filter_map(|e| serde_json::from_value::<PageSymbolVerdict>(e.clone()).ok())
+        .collect();
+    (!kept.is_empty()).then_some(kept)
+}
+
+/// Returns the substring spanning the first `[` to the last `]`, inclusive.
+pub(crate) fn extract_outermost_array(s: &str) -> Option<&str> {
+    let start = s.find('[')?;
+    let end = s.rfind(']')?;
+    (start < end).then_some(&s[start..=end])
+}
+
+/// Removes trailing commas before `}` / `]` (outside of this heuristic's
+/// scope: commas that legitimately appear inside string literals immediately
+/// followed by a closing bracket are vanishingly rare in practice).
+pub(crate) fn remove_trailing_commas(s: &str) -> String {
+    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+    RE.get_or_init(|| regex::Regex::new(r",(\s*[}\]])").unwrap())
+        .replace_all(s, "$1")
+        .into_owned()
+}
+
+/// Short tail excerpt used in error messages so failures are diagnosable.
+pub(crate) fn excerpt(s: &str) -> String {
+    const MAX: usize = 200;
+    // 先回退到 char 边界再切片(中文等多字节字符不能从中间截断)。
+    let mut end = s.len().min(MAX);
+    while end > 0 && !s.is_char_boundary(end) {
+        end -= 1;
     }
-    Err(crate::error::Error::Config(
-        "SymbolAnnotationResponse 缺少 verdicts/results 数组".to_string(),
-    ))
+    let mut cut = s[..end].to_string();
+    if s.len() > MAX {
+        cut.push('…');
+    }
+    cut.replace('\n', "\\n")
+}
+
+/// Strips a single leading/trailing Markdown code fence from `s`, if present.
+pub(crate) fn strip_code_fence(s: &str) -> &str {
+    const FENCE_STARTS: [&str; 4] = ["```json", "```JSON", "``` Json", "```"];
+    let mut s = s;
+    for start in FENCE_STARTS {
+        if let Some(rest) = s.strip_prefix(start) {
+            s = rest;
+            break;
+        }
+    }
+    if let Some(end) = s.rfind("```") {
+        // Only treat it as a closing fence if nothing but whitespace follows.
+        if s[end + 3..].trim().is_empty() {
+            s = &s[..end];
+        }
+    }
+    s.trim()
 }
 
 /// P4: one page that should mention a symbol but does not.
@@ -661,6 +930,214 @@ return Brain(inst, PriorityNode({}, 1))
         assert!(prompt.contains("30 距离单位"));
     }
 
+    fn test_annotation_fixture() -> SymbolPageAnnotation {
+        SymbolPageAnnotation {
+            symbol: SymbolRef::File {
+                path: "components/health.lua".to_string(),
+            },
+            kind: SymbolKind::File,
+            affected_variants: Vec::new(),
+            affected_pageids: Vec::new(),
+            visibility: SymbolPageVisibility::PageVisible,
+            page_evidence: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn paginate_affected_pages_bounds_and_ranks_by_evidence() {
+        let mut ann = test_annotation_fixture();
+        ann.affected_pageids = vec![1, 2, 3, 4, 5];
+        // Evidence density: page 3 has 2 facts, page 1 has 1, others none.
+        for pid in [1, 3, 3] {
+            ann.page_evidence.push(PageEvidence {
+                pageid: pid,
+                region_id: "r".to_string(),
+                raw: "raw".to_string(),
+                snippet: "snippet".to_string(),
+                matched_by: "candidate",
+            });
+        }
+
+        // Both caps unset → legacy passthrough, original order untouched.
+        let batches = paginate_affected_pages(&ann, 0, 0);
+        assert_eq!(batches, vec![vec![1, 2, 3, 4, 5]]);
+        // Any cap enabled → density ordering applies even when everything
+        // fits in one batch.
+        let batches = paginate_affected_pages(&ann, 10, 0);
+        assert_eq!(batches, vec![vec![3, 1, 2, 4, 5]]);
+
+        // Structural cap only: dense pages first (3, then 1), ties stable.
+        let batches = paginate_affected_pages(&ann, 2, 0);
+        assert_eq!(batches.len(), 3);
+        assert_eq!(batches[0], vec![3, 1]);
+        assert_eq!(batches[2], vec![5]);
+
+        // Union covers every page exactly once.
+        let mut seen: Vec<i64> = batches.iter().flatten().copied().collect();
+        seen.sort_unstable();
+        assert_eq!(seen, vec![1, 2, 3, 4, 5]);
+    }
+
+    #[test]
+    fn paginate_respects_char_budget_and_mega_page_singleton() {
+        let mut ann = test_annotation_fixture();
+        ann.affected_pageids = vec![1, 2, 3];
+        for (pid, snippet_len) in [(1, 40usize), (2, 300), (3, 10)] {
+            ann.page_evidence.push(PageEvidence {
+                pageid: pid,
+                region_id: "r".to_string(),
+                raw: "x".to_string(),
+                snippet: "s".repeat(snippet_len),
+                matched_by: "candidate",
+            });
+        }
+        let w = |pids: &[Vec<i64>]| -> Vec<usize> {
+            let weights = PageWeights::build(&ann);
+            pids.iter()
+                .map(|b| b.iter().map(|p| weights.chars(*p)).sum())
+                .collect()
+        };
+
+        // Char cap forces a split even though max_pages alone would not.
+        let batches = paginate_affected_pages(&ann, 0, DEFAULT_BATCH_MAX_CHARS.min(120));
+        assert!(batches.len() >= 2);
+        // No batch may exceed the budget unless it is a singleton holding an
+        // over-weight page.
+        let ws = w(&batches);
+        let singletons_over = batches
+            .iter()
+            .zip(&ws)
+            .all(|(b, &sz)| b.len() == 1 || sz <= 120);
+        assert!(singletons_over, "char cap violated: {ws:?}");
+
+        // A lone page heavier than the whole budget still survives in its
+        // own singleton batch.
+        let mut one = test_annotation_fixture();
+        one.affected_pageids = vec![7];
+        one.page_evidence.push(PageEvidence {
+            pageid: 7,
+            region_id: "r".to_string(),
+            raw: "x".to_string(),
+            snippet: "s".repeat(500),
+            matched_by: "candidate",
+        });
+        let batches = paginate_affected_pages(&one, 0, 50);
+        assert_eq!(batches, vec![vec![7]]);
+    }
+
+    #[test]
+    fn partition_no_fact_pages_filters_and_synthesizes() {
+        let mut ann = test_annotation_fixture();
+        ann.affected_pageids = vec![10, 11, 12];
+        ann.page_evidence.push(PageEvidence {
+            pageid: 11,
+            region_id: "r".to_string(),
+            raw: "x".to_string(),
+            snippet: "s".to_string(),
+            matched_by: "candidate",
+        });
+
+        // Flag off → passthrough, nothing synthesized.
+        let (sent, synth) = partition_no_fact_pages(&ann, false);
+        assert_eq!(sent, vec![10, 11, 12]);
+        assert!(synth.is_empty());
+
+        // Flag on → only fact-bearing pages go out; the rest get local
+        // low-confidence "missing" verdicts.
+        let (sent, synth) = partition_no_fact_pages(&ann, true);
+        assert_eq!(sent, vec![11]);
+        assert_eq!(synth.len(), 2);
+        assert!(synth.iter().all(|v| v.missing && !v.mentions));
+        assert_eq!(synth[0].confidence.as_deref(), Some("low"));
+    }
+
+    #[test]
+    fn fill_missing_requested_covers_batch_gaps() {
+        let requested = [1, 2, 3];
+        let mut verdicts = vec![
+            PageSymbolVerdict {
+                pageid: 1,
+                mentions: true,
+                wording: None,
+                semantic_consistent: None,
+                missing: false,
+                confidence: Some("high".to_string()),
+                note: None,
+            },
+            PageSymbolVerdict {
+                pageid: 2,
+                mentions: false,
+                wording: None,
+                semantic_consistent: None,
+                missing: true,
+                confidence: Some("low".to_string()),
+                note: None,
+            },
+        ];
+        let added = fill_missing_requested(&requested, &mut verdicts);
+        assert_eq!(added, 1);
+        let ids: Vec<i64> = verdicts.iter().map(|v| v.pageid).collect();
+        assert_eq!(ids, vec![1, 2, 3]);
+        let third = verdicts.last().unwrap();
+        assert!(third.missing && !third.mentions);
+        assert_eq!(
+            third.note.as_deref(),
+            Some("该页未出现在批次输出中（本地补判）")
+        );
+
+        // Nothing missing → no-op.
+        let mut complete = vec![PageSymbolVerdict {
+            pageid: 1,
+            mentions: true,
+            wording: None,
+            semantic_consistent: None,
+            missing: false,
+            confidence: None,
+            note: None,
+        }];
+        assert_eq!(fill_missing_requested(&[1], &mut complete), 0);
+    }
+
+    #[test]
+    fn prompt_for_pages_renders_only_requested_subset() {
+        let files = vec![
+            ("prefabs/hound.lua".to_string(), HOUND_PREFAB.to_string()),
+            ("brains/houndbrain.lua".to_string(), HOUND_BRAIN.to_string()),
+        ];
+        let artifact = build_from_sources(&files).unwrap();
+        let view = hound_view();
+        let ann = annotate_symbol(
+            &artifact,
+            &view,
+            SymbolRef::Const {
+                file: "brains/houndbrain.lua".to_string(),
+                name: "SEE_DIST".to_string(),
+            },
+        );
+        assert!(!ann.affected_pageids.is_empty());
+        let first = ann.affected_pageids[0];
+        let full = render_symbol_annotation_prompt(&ann, "semantics");
+        let subset = render_symbol_annotation_prompt_for_pages(&ann, "semantics", &[first]);
+        assert!(subset.contains(&format!("### page {first}")));
+        assert!(!subset.contains("### page 999999"));
+        assert_eq!(
+            full.contains(&format!("### page {first}")),
+            subset.contains(&format!("### page {first}"))
+        );
+        // Subset header reports both scoped and total counts.
+        assert!(subset.contains("本批 1 页"));
+        assert!(subset.contains(&format!("全部 {} 页", ann.affected_pageids.len())));
+    }
+
+    #[test]
+    fn excerpt_handles_multibyte_boundary() {
+        let s = "状态".repeat(200); // '态' 正好跨 200 字节边界
+        let out = excerpt(&s);
+        assert!(out.ends_with('…'));
+        assert!(!out.is_empty());
+        assert!(out.starts_with("状态"));
+    }
+
     #[test]
     fn parse_symbol_annotation_response_accepts_array_and_object() {
         let array = r#"[
@@ -678,6 +1155,64 @@ return Brain(inst, PriorityNode({}, 1))
         assert_eq!(parsed.len(), 1);
         assert!(!parsed[0].mentions);
         assert!(parsed[0].missing);
+    }
+
+    #[test]
+    fn parse_symbol_annotation_response_strips_code_fence() {
+        let fenced = "```json\n[\n  {\"pageid\": 1, \"mentions\": true, \"missing\": false, \"confidence\": \"high\"}\n]\n```";
+        let parsed = parse_symbol_annotation_response(fenced).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert!(parsed[0].mentions);
+
+        // Bare fence without language tag.
+        let bare = "```\n[{\"pageid\": 2, \"mentions\": false, \"missing\": true}]\n```";
+        let parsed = parse_symbol_annotation_response(bare).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert!(parsed[0].missing);
+
+        // Fence + surrounding prose-free whitespace only is tolerated.
+        let wrapped = "```json\n{\"verdicts\": [{\"pageid\": 3, \"mentions\": true, \"missing\": false}]}\n```";
+        let parsed = parse_symbol_annotation_response(wrapped).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0].pageid, 3);
+
+        // Plain JSON keeps working (no regression).
+        let plain = "[{\"pageid\": 4, \"mentions\": true, \"missing\": false}]";
+        let parsed = parse_symbol_annotation_response(plain).unwrap();
+        assert_eq!(parsed[0].pageid, 4);
+    }
+
+    #[test]
+    fn parse_symbol_annotation_response_repairs_common_defects() {
+        // Prose around the payload.
+        let prose = "好的，以下是标注结果：\n[{\"pageid\": 5, \"mentions\": true, \"missing\": false}]\n如需调整请告知。";
+        let parsed = parse_symbol_annotation_response(prose).unwrap();
+        assert_eq!(parsed[0].pageid, 5);
+
+        // Trailing comma inside an object.
+        let trailing =
+            "[{\"pageid\": 6, \"mentions\": true, \"missing\": false, \"confidence\": \"high\",}]";
+        let parsed = parse_symbol_annotation_response(trailing).unwrap();
+        assert_eq!(parsed[0].pageid, 6);
+
+        // Trailing comma + fence + prose combined.
+        let combo = "```json\n[{\"verdicts_level\": 1},\n {\"pageid\": 7, \"mentions\": false, \"missing\": true},]\n```\n以上。";
+        let parsed = parse_symbol_annotation_response(combo).unwrap();
+        assert_eq!(parsed[0].pageid, 7);
+
+        // Genuinely broken JSON now reports a diagnostic excerpt instead of a
+        // bare serde message.
+        let broken = "[{\"pageid\": 8,\nline391 has unescaped \" here}";
+        let err = parse_symbol_annotation_response(broken)
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("无法修复"), "{}", err);
+
+        // Partial elements are salvaged element-wise; usable ones survive.
+        let partial = "```json\n[{\"symbol\": \"components/health.lua\"},\n {\"pageid\": 9, \"mentions\": true, \"missing\": false},\n {\"pageid\": \"oops\"}]\n```";
+        let parsed = parse_symbol_annotation_response(partial).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0].pageid, 9);
     }
 
     #[test]

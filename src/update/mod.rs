@@ -38,9 +38,11 @@ pub use snapshot::SnapshotStore;
 pub use stats::{extract_stats, StatFact, StatKind};
 pub use symbol_page::{
     annotate_symbol, build_coverage_report, build_coverage_reports, build_symbol_evidence_packs,
-    parse_symbol_annotation_response, render_coverage_report_md, render_symbol_annotation_prompt,
-    render_symbol_pack_md, symbol_display, top_symbols, InconsistentPage, MissingPage,
-    PageSymbolVerdict, SymbolAnnotationResponse, SymbolCoverageReport, SymbolKind,
-    SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
+    fill_missing_requested, paginate_affected_pages, parse_symbol_annotation_response,
+    partition_no_fact_pages, render_coverage_report_md, render_symbol_annotation_prompt,
+    render_symbol_annotation_prompt_for_pages, render_symbol_pack_md, symbol_display, top_symbols,
+    InconsistentPage, MissingPage, PageSymbolVerdict, SymbolAnnotationResponse,
+    SymbolCoverageReport, SymbolKind, SymbolPageAnnotation, SymbolPageVisibility, SymbolRef,
+    DEFAULT_BATCH_MAX_CHARS,
 };
 pub use takeup::{TakeupConfig, Tier};

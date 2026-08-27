@@ -173,11 +173,51 @@ pub enum JobKind {
         verdicts: Option<String>,
         #[serde(default)]
         llm: bool,
+        /// 每批最多交给 LLM 的页面数（0 = 不按页数设限）
+        #[serde(default = "default_symbol_batch_pages")]
+        batch_pages: usize,
+        /// 每批渲染输入的字节预算（0 = 不按字节设限）
+        #[serde(default = "default_symbol_batch_max_chars")]
+        batch_max_chars: usize,
+        /// 零候选证据的页面不送 LLM，本地合成 low-confidence missing 判定
+        #[serde(default)]
+        skip_no_fact_pages: bool,
     },
+    /// M1:LLM 阅读 component 源码生成 SymbolDoc 知识文档(本地,不写 wiki)
+    KnowledgeScanSymbols {
+        root: String,
+        #[serde(default = "default_knowledge_dir")]
+        knowledge_dir: String,
+        /// 提供则启用 pass2 语料归因
+        #[serde(default)]
+        corpus: Option<String>,
+        #[serde(default = "default_sample_pages")]
+        sample_pages: usize,
+        #[serde(default = "default_symbol_limit")]
+        limit: usize,
+        #[serde(default)]
+        force: bool,
+    },
+}
+
+fn default_knowledge_dir() -> String {
+    "knowledge".to_string()
+}
+
+fn default_sample_pages() -> usize {
+    8
 }
 
 fn default_symbol_limit() -> usize {
     20
+}
+
+fn default_symbol_batch_pages() -> usize {
+    40
+}
+
+fn default_symbol_batch_max_chars() -> usize {
+    crate::update::DEFAULT_BATCH_MAX_CHARS
 }
 
 impl JobKind {
@@ -195,6 +235,7 @@ impl JobKind {
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
+            JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
             JobKind::SymbolAnnotate { .. } => "symbol-annotate",
         }
     }
@@ -343,6 +384,27 @@ async fn execute_job_inner(
             )
             .await
         }
+        JobKind::KnowledgeScanSymbols {
+            root,
+            knowledge_dir,
+            corpus,
+            sample_pages,
+            limit,
+            force,
+        } => {
+            crate::knowledge::run_scan_symbols(
+                &crate::knowledge::ScanSymbolsParams {
+                    scripts_root: root.clone(),
+                    knowledge_root: knowledge_dir.clone(),
+                    corpus: corpus.clone(),
+                    sample_pages: *sample_pages,
+                    limit: *limit,
+                    force: *force,
+                },
+                reporter,
+            )
+            .await
+        }
         JobKind::SymbolAnnotate {
             root,
             corpus,
@@ -350,14 +412,22 @@ async fn execute_job_inner(
             out,
             verdicts,
             llm,
+            batch_pages,
+            batch_max_chars,
+            skip_no_fact_pages,
         } => {
             run_symbol_annotate(
-                root,
-                corpus,
-                *limit,
-                opt_path(out),
-                verdicts.as_deref(),
-                *llm,
+                &SymbolAnnotateParams {
+                    root: root.clone(),
+                    corpus: corpus.clone(),
+                    limit: *limit,
+                    out: out.clone(),
+                    verdicts: verdicts.clone(),
+                    llm: *llm,
+                    batch_pages: *batch_pages,
+                    batch_max_chars: *batch_max_chars,
+                    skip_no_fact_pages: *skip_no_fact_pages,
+                },
                 reporter,
             )
             .await
@@ -666,15 +736,36 @@ async fn run_update_index(
 /// optionally consume LLM/human verdicts to produce coverage reports.
 ///
 /// Local-only; never writes the wiki.
-async fn run_symbol_annotate(
-    root: &str,
-    corpus: &str,
+struct SymbolAnnotateParams {
+    root: String,
+    corpus: String,
     limit: usize,
-    out: Option<PathBuf>,
-    verdicts: Option<&str>,
+    out: Option<String>,
+    verdicts: Option<String>,
     llm: bool,
+    batch_pages: usize,
+    batch_max_chars: usize,
+    skip_no_fact_pages: bool,
+}
+
+async fn run_symbol_annotate(
+    params: &SymbolAnnotateParams,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
+    let SymbolAnnotateParams {
+        root,
+        corpus,
+        limit,
+        out,
+        verdicts,
+        llm,
+        batch_pages,
+        batch_max_chars,
+        skip_no_fact_pages,
+    } = params;
+    let out = opt_path(out);
+    let verdicts = verdicts.as_deref();
+    let (root, corpus) = (root.as_str(), corpus.as_str());
     reporter.stage("构建代码关联索引");
     let atlas = crate::update::build_atlas_from_dir(std::path::Path::new(root))?;
 
@@ -687,8 +778,14 @@ async fn run_symbol_annotate(
     ));
 
     reporter.stage("生成高引用 symbol 证据包");
-    let packs = crate::update::build_symbol_evidence_packs(&atlas.index, &view, limit);
+    let packs = crate::update::build_symbol_evidence_packs(&atlas.index, &view, *limit);
     reporter.log(format!("生成 {} 个 symbol 证据包", packs.len()));
+    if *llm {
+        reporter.log(format!(
+            "LLM 分批策略：每批 ≤ {} 页（0 = 单批）",
+            batch_pages
+        ));
+    }
 
     let out_dir = out.unwrap_or_else(|| {
         PathBuf::from("output").join("symbol-annotate").join(
@@ -733,7 +830,7 @@ async fn run_symbol_annotate(
         let raw = std::fs::read_to_string(vp)?;
         let responses: Vec<crate::update::SymbolAnnotationResponse> = serde_json::from_str(&raw)?;
         llm_responses = Some(responses);
-    } else if llm {
+    } else if *llm {
         reporter.stage("LLM 标注");
         match crate::llm::LlmConfig::from_env() {
             None => {
@@ -743,15 +840,151 @@ async fn run_symbol_annotate(
             Some(config) => {
                 reporter.log(format!("使用模型 {} / {}", config.model, config.base_url));
                 let mut responses = Vec::new();
+                let mut batches_total = 0usize;
+                let mut batches_failed = 0usize;
+                let mut batches_skipped_local = 0usize;
+                // Raw LLM responses are kept on disk first so a malformed
+                // output can be diagnosed (or repaired) after the fact.
+                let raw_dir = out_dir.join("llm_raw");
+                std::fs::create_dir_all(&raw_dir)?;
+                let system =
+                    "你是 DST Huiji Wiki 的代码符号页面影响标注助手。必须严格按用户要求输出 JSON。";
                 for pack in &packs {
                     let symbol = crate::update::symbol_display(&pack.symbol);
+                    let raw_stem = symbol.replace(['/', '\\', '#', ':'], "_");
                     let semantics = format!("{symbol}（代码证据待补充）");
-                    let prompt = crate::update::render_symbol_annotation_prompt(pack, &semantics);
-                    let system =
-                        "你是 DST Huiji Wiki 的代码符号页面影响标注助手。必须严格按用户要求输出 JSON。";
-                    let raw = config.complete(system, &prompt).await?;
-                    let verdicts = crate::update::parse_symbol_annotation_response(&raw)?;
-                    responses.push(crate::update::SymbolAnnotationResponse { symbol, verdicts });
+
+                    // Bounded per-request work: optionally keep zero-evidence
+                    // pages out of the LLM path, then split the rest into
+                    // evidence-ranked batches under both caps.
+                    let (send_pids, local_verdicts) =
+                        crate::update::partition_no_fact_pages(pack, *skip_no_fact_pages);
+                    let mut working = pack.clone();
+                    working.affected_pageids = send_pids;
+                    let batches = crate::update::paginate_affected_pages(
+                        &working,
+                        *batch_pages,
+                        *batch_max_chars,
+                    );
+                    let total_pages: usize = batches.iter().map(Vec::len).sum();
+                    reporter.log(format!(
+                        "标注 {symbol}：送审 {total_pages} 页分 {} 批（≤ {} 页 / ≤ {}B 每批）",
+                        batches.len(),
+                        batch_pages,
+                        batch_max_chars,
+                    ));
+                    let mut sym_verdicts = Vec::new();
+                    let mut sym_local = Vec::new();
+                    if !local_verdicts.is_empty() {
+                        reporter.log(format!(
+                            "另有 {} 个零证据页走本地判定（不消耗 LLM）",
+                            local_verdicts.len()
+                        ));
+                        batches_skipped_local += 1;
+                        sym_local.extend(local_verdicts);
+                    }
+                    batches_total += batches.len();
+
+                    for (bi, batch) in batches.iter().enumerate() {
+                        let prompt = crate::update::render_symbol_annotation_prompt_for_pages(
+                            pack, &semantics, batch,
+                        );
+                        // One immediate retry per batch; a twice-failed batch
+                        // is skipped and accounted for instead of sinking the
+                        // whole run.
+                        let mut outcome = None;
+                        for attempt in 1..=2 {
+                            reporter.log(format!(
+                                "批次 {}/{}（{} 页）第 {attempt} 次尝试…",
+                                bi + 1,
+                                batches.len(),
+                                batch.len(),
+                            ));
+                            let raw_file = raw_dir.join(format!("{raw_stem}_b{:02}.json", bi + 1));
+                            let result = async {
+                                let raw = config
+                                    .complete_streaming(system, &prompt, |ev| match ev {
+                                        crate::llm::LlmStreamEvent::FirstToken { elapsed_secs } => {
+                                            reporter.log(format!(
+                                                "首个输出分片已到达（{elapsed_secs}s）"
+                                            ));
+                                        }
+                                        crate::llm::LlmStreamEvent::Tick { chars } => {
+                                            if chars == 0 {
+                                                reporter.log("仍在等待模型输出…".to_string());
+                                            } else {
+                                                reporter.log(format!("流式接收中：{chars} 字符"));
+                                            }
+                                        }
+                                        crate::llm::LlmStreamEvent::Done {
+                                            chars,
+                                            elapsed_secs,
+                                        } => {
+                                            reporter.log(format!(
+                                                "输出完成：{chars} 字符 / {elapsed_secs}s"
+                                            ));
+                                        }
+                                    })
+                                    .await?;
+                                std::fs::write(&raw_file, &raw).map_err(crate::error::Error::Io)?;
+                                crate::update::parse_symbol_annotation_response(&raw).map_err(|e| {
+                                    crate::error::Error::Llm(format!(
+                                        "输出无法解析为 JSON（原始响应已保存到 {}）：{e}",
+                                        raw_file.display()
+                                    ))
+                                })
+                            }
+                            .await;
+                            match result {
+                                Ok(verdicts) => {
+                                    outcome = Some(Ok(verdicts));
+                                    break;
+                                }
+                                Err(e) => outcome = Some(Err(e)),
+                            }
+                        }
+                        match outcome.expect("loop ran at least once") {
+                            Ok(verdicts) => sym_verdicts.extend(verdicts),
+                            Err(e) => {
+                                batches_failed += 1;
+                                reporter.log(format!(
+                                    "批次 {}/{} 两次失败，跳过：{e}",
+                                    bi + 1,
+                                    batches.len()
+                                ));
+                            }
+                        }
+                    }
+                    // Guardrail: every requested page must end up answered.
+                    let gap_filled = crate::update::fill_missing_requested(
+                        &working.affected_pageids,
+                        &mut sym_verdicts,
+                    );
+                    if gap_filled > 0 {
+                        reporter.log(format!("对账补齐 {gap_filled} 页批次输出缺失的判定"));
+                    }
+                    sym_verdicts.append(&mut sym_local);
+                    reporter.log(format!(
+                        "标注 {} 完成（{} 条 verdict）",
+                        symbol,
+                        sym_verdicts.len()
+                    ));
+                    responses.push(crate::update::SymbolAnnotationResponse {
+                        symbol,
+                        verdicts: sym_verdicts,
+                    });
+                }
+                summary["llm_batches"] = serde_json::json!({
+                    "total": batches_total,
+                    "failed": batches_failed,
+                    "max_pages_per_batch": *batch_pages,
+                    "max_input_chars_per_batch": *batch_max_chars,
+                    "symbols_with_local_only_pages": batches_skipped_local,
+                });
+                if batches_failed > 0 {
+                    reporter.log(format!(
+                        "警告：{batches_failed}/{batches_total} 个批次失败被跳过"
+                    ));
                 }
                 let verdicts_path = out_dir.join("symbol_verdicts.json");
                 std::fs::write(&verdicts_path, serde_json::to_string_pretty(&responses)?)?;

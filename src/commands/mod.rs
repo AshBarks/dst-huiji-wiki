@@ -164,6 +164,35 @@ pub enum Commands {
         /// 配置了 LLM__API_KEY 时直接调用大模型生成标注；未配置则跳过
         #[arg(long)]
         llm: bool,
+        /// LLM 分批大小：每批最多交给模型的页面数（0 = 不按页数设限）
+        #[arg(long, default_value_t = 40)]
+        batch_pages: usize,
+        /// 每批渲染输入的字节预算（0 = 不按字节设限，默认 32000）
+        #[arg(long, default_value_t = dst_huiji_wiki::update::DEFAULT_BATCH_MAX_CHARS)]
+        batch_max_chars: usize,
+        /// 零候选证据的页面不送 LLM，本地合成 low-confidence missing 判定
+        #[arg(long)]
+        skip_no_fact_pages: bool,
+    },
+    /// M1:LLM 阅读 component 源码,产出/更新 SymbolDoc 知识文档
+    KnowledgeScanSymbols {
+        /// 游戏脚本根目录(当前树或快照目录)
+        root: PathBuf,
+        /// 知识文档根目录(默认 knowledge/)
+        #[arg(long, default_value = "knowledge")]
+        knowledge_dir: PathBuf,
+        /// wiki 语料 host 根目录;提供则启用 pass2 语料归因(link-wiki)
+        #[arg(long)]
+        corpus: Option<PathBuf>,
+        /// pass2 每组件采样的页面数
+        #[arg(long, default_value_t = 8)]
+        sample_pages: usize,
+        /// 只处理引用量最高的前 N 个 component
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+        /// 忽略 sha/prompt_rev 一致性,强制重扫
+        #[arg(long)]
+        force: bool,
     },
     /// 启动 WebUI 服务器
     Serve {
@@ -192,6 +221,7 @@ impl Commands {
             Commands::UpdateScan { .. } => "update-scan",
             Commands::CorpusIndex { .. } => "corpus-index",
             Commands::SymbolAnnotate { .. } => "symbol-annotate",
+            Commands::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
             Commands::Serve { .. } => "serve",
         }
     }
@@ -450,6 +480,11 @@ mod tests {
             "--verdicts",
             "verdicts.json",
             "--llm",
+            "--batch-pages",
+            "25",
+            "--batch-max-chars",
+            "16000",
+            "--skip-no-fact-pages",
         ]);
         assert!(args.is_ok());
         let args = args.unwrap();
@@ -461,6 +496,9 @@ mod tests {
                 out,
                 verdicts,
                 llm,
+                batch_pages,
+                batch_max_chars,
+                skip_no_fact_pages,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
                 assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
@@ -468,6 +506,67 @@ mod tests {
                 assert_eq!(out, Some(PathBuf::from("output/symbol-annotate/test")));
                 assert_eq!(verdicts, Some(PathBuf::from("verdicts.json")));
                 assert!(llm);
+                assert_eq!(batch_pages, 25);
+                assert_eq!(batch_max_chars, 16000);
+                assert!(skip_no_fact_pages);
+            }
+            _ => panic!("Expected SymbolAnnotate command"),
+        }
+
+        // knowledge-scan-symbols wiring
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "knowledge-scan-symbols",
+            "scripts",
+            "--corpus",
+            "wikis/dontstarve.huijiwiki.com",
+            "--sample-pages",
+            "12",
+            "--limit",
+            "3",
+            "--force",
+        ]);
+        match args.unwrap().command {
+            Commands::KnowledgeScanSymbols {
+                root,
+                knowledge_dir,
+                corpus,
+                sample_pages,
+                limit,
+                force,
+            } => {
+                assert_eq!(root, PathBuf::from("scripts"));
+                assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
+                assert_eq!(
+                    corpus,
+                    Some(PathBuf::from("wikis/dontstarve.huijiwiki.com"))
+                );
+                assert_eq!(sample_pages, 12);
+                assert_eq!(limit, 3);
+                assert!(force);
+            }
+            _ => panic!("Expected KnowledgeScanSymbols command"),
+        }
+
+        // Default: batching falls back to 40 pages per LLM request.
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "symbol-annotate",
+            "scripts",
+            "--corpus",
+            "wikis/dontstarve.huijiwiki.com",
+        ]);
+        match args.unwrap().command {
+            Commands::SymbolAnnotate {
+                batch_pages,
+                batch_max_chars,
+                ..
+            } => {
+                assert_eq!(batch_pages, 40);
+                assert_eq!(
+                    batch_max_chars,
+                    dst_huiji_wiki::update::DEFAULT_BATCH_MAX_CHARS
+                );
             }
             _ => panic!("Expected SymbolAnnotate command"),
         }

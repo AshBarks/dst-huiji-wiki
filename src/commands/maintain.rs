@@ -203,6 +203,9 @@ pub async fn run(args: Commands) -> Result<()> {
             out,
             verdicts,
             llm,
+            batch_pages,
+            batch_max_chars,
+            skip_no_fact_pages,
         } => {
             execute(
                 JobKind::SymbolAnnotate {
@@ -212,6 +215,32 @@ pub async fn run(args: Commands) -> Result<()> {
                     out: opt_path_to_string(&out)?,
                     verdicts: opt_path_to_string(&verdicts)?,
                     llm,
+                    batch_pages,
+                    batch_max_chars,
+                    skip_no_fact_pages,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
+        Commands::KnowledgeScanSymbols {
+            root,
+            knowledge_dir,
+            corpus,
+            sample_pages,
+            limit,
+            force,
+        } => {
+            execute(
+                JobKind::KnowledgeScanSymbols {
+                    root: path_to_string(&root)?,
+                    knowledge_dir: path_to_string(&knowledge_dir)?,
+                    corpus: opt_path_to_string(&corpus)?,
+                    sample_pages,
+                    limit,
+                    force,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

@@ -28,3 +28,7 @@ uuid = { version = "1", features = ["v4"] }
 tokio-util = { version = "0.7", features = ["rt"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 futures-util = "0.3"
+# OpenAI-compatible LLM client (SSE streaming); chat-completion pulls the REST
+# client (`_api`), rustls stays the crate default TLS backend.
+async-openai = { version = "0.41", features = ["chat-completion"] }
+sha2 = "0.10"

@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/sleeper.lua"
+  },
+  "category": "component",
+  "display_name": "sleeper",
+  "summary": "该组件管理实体的睡眠状态、困倦值、抵抗系数与睡眠/唤醒测试函数，并监听攻击与战斗目标事件以打断睡眠。它参与生物的昼夜行为、催眠与冬眠逻辑，通过周期性条件检测控制实体入睡或唤醒，从而影响生物AI与玩家对抗策略。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除实体上的 'sleeper' 标签，取消测试、磨损与衰减任务，并移除对 onignite、firedamage、attacked、newcombattarget 事件的监听。副作用：清理组件所有定时任务与事件绑定。"
+    },
+    {
+      "name": "SetDefaultTests",
+      "effect": "将 sleeptestfn 与 waketestfn 重置为 DefaultSleepTest 与 DefaultWakeTest。副作用：改变睡眠与唤醒的判定逻辑。"
+    },
+    {
+      "name": "StopTesting",
+      "effect": "取消当前的 testtask 并置空。副作用：停止周期性的睡眠/唤醒检查。"
+    },
+    {
+      "name": "SetNocturnal",
+      "effect": "传入 true 时设置睡眠/唤醒测试为夜行生物逻辑，false 时恢复默认。副作用：改变生物昼夜睡眠习性。"
+    },
+    {
+      "name": "SetWakeTest",
+      "effect": "设置 waketestfn 为给定函数，并调用 StartTesting(time) 重启测试。副作用：更新唤醒条件并重置测试计时。"
+    },
+    {
+      "name": "SetSleepTest",
+      "effect": "设置 sleeptestfn 为给定函数，并调用 StartTesting() 重启测试。副作用：更新睡眠条件并重置测试计时。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "调用 StopTesting()。副作用：实体离开活动范围时暂停睡眠测试。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "调用 StartTesting()。副作用：实体进入活动范围时恢复睡眠测试。"
+    },
+    {
+      "name": "SetResistance",
+      "effect": "设置 resistance 字段为给定值。副作用：调整触发睡眠所需的困倦阈值。"
+    },
+    {
+      "name": "StartTesting",
+      "effect": "根据 isasleep 状态安排 ShouldWakeUp 或 ShouldSleep 周期任务。副作用：启动睡眠/唤醒的定时检测。"
+    },
+    {
+      "name": "IsAsleep",
+      "effect": "返回 isasleep 布尔值。无副作用。"
+    },
+    {
+      "name": "IsHibernating",
+      "effect": "返回 hibernate 布尔值。无副作用。"
+    },
+    {
+      "name": "IsInDeepSleep",
+      "effect": "返回 isasleep 且 sleepiness > 0 的布尔值（表示被催眠深度睡眠）。无副作用。"
+    },
+    {
+      "name": "GetTimeAwake",
+      "effect": "返回当前清醒持续时间（若睡眠则返回0）。无副作用。"
+    },
+    {
+      "name": "GetTimeAsleep",
+      "effect": "返回当前睡眠持续时间（若清醒则返回0）。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含睡眠状态、时长、困倦值等调试信息的字符串。无副作用。"
+    },
+    {
+      "name": "AddSleepiness",
+      "effect": "增加 sleepiness 值；若已睡或超抵抗则立即 GoToSleep，若等于抵抗则延时 GoToSleep，否则启动周期减少 sleepiness 的任务。副作用：可能强制睡眠、修改困倦值、启动磨损任务。"
+    },
+    {
+      "name": "SetExtraResist",
+      "effect": "设置 extraresist 并限制在 [0, wearofftime]；大于0时启动周期衰减任务，否则取消。副作用：影响睡眠时长乘数，管理衰减任务。"
+    },
+    {
+      "name": "GetSleepTimeMultiplier",
+      "effect": "根据 extraresist 返回睡眠时长乘数（默认1）。无副作用。"
+    },
+    {
+      "name": "GoToSleep",
+      "effect": "若实体可见且未死，标记睡眠、停止大脑与移动、清除战斗目标、推送 gotosleep 事件、可能提升 extraresist、设置带乘数的唤醒测试。副作用：实体进入睡眠，AI暂停，触发事件。"
+    },
+    {
+      "name": "SetTest",
+      "effect": "取消旧测试任务，按随机周期安排新测试函数。副作用：重启定时测试任务。"
+    },
+    {
+      "name": "WakeUp",
+      "effect": "清除 hibernate，若睡眠且未死则标记清醒、归零困倦、重启大脑、推送 onwakeup 事件、恢复睡眠测试。副作用：实体唤醒，AI恢复，触发事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回 extraresist 的存档数据（若有）。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据恢复 extraresist。副作用：可能启动衰减任务。"
+    }
+  ],
+  "events_published": [
+    "gotosleep",
+    "onwakeup"
+  ],
+  "events_listened": [
+    "onignite",
+    "firedamage",
+    "attacked",
+    "newcombattarget"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14938,
+      15832,
+      13897,
+      15238,
+      13823,
+      15601,
+      15651,
+      15642
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录仅涉及各实体的掉落物、生成时间、攻击间隔、移动行为（motor组件）等，未出现任何与睡眠、冬眠、清醒、睡意、睡眠测试或抵抗相关的描述，故无 component__sleeper 组件能力的表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "生物睡觉",
+    "战斗惊醒",
+    "昼夜习性",
+    "催眠抵抗",
+    "冬眠状态",
+    "光照睡眠",
+    "困倦值",
+    "深度睡眠"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+    "source_bytes": 11323,
+    "model": "hy3-free",
+    "generated_at_ms": 1787849240384
+  }
+}

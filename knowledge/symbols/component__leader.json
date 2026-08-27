@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/leader.lua"
+  },
+  "category": "component",
+  "display_name": "leader",
+  "summary": "组件 Leader 管理实体（如玩家或生物）的真实跟随者与虚拟物品跟随者数据，记录其数量并维护跟随关系。它参与的核心玩法包括：在领导者被攻击或锁定新战斗目标时，将目标建议给符合条件的跟随者以实现协同战斗；处理双方死亡或移除时的关系解除，并支持点名呼叫、宠物判定与成就统计。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除实体时清理：取消监听 newcombattarget、attacked、death 事件，调用 RemoveAllFollowers 移除所有真实跟随者，若存在 roll_call_sources 则重置。副作用：清除所有跟随关系与事件监听。"
+    },
+    {
+      "name": "SetForceLeash",
+      "effect": "设置内部标记 self.forceleash 为 true。副作用：修改组件内部状态（强制拴绳标记）。"
+    },
+    {
+      "name": "IsFollower",
+      "effect": "检查给定实体 guy 是否在 followers 或 itemfollowers 表中并返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnAttacked",
+      "effect": "当领导者被攻击时（或由事件调用），若攻击者非跟随者且非自身并满足小游戏/PVP条件，则遍历两个跟随者表，对拥有 combat 与 follower 组件且 canaccepttarget 为真的实体调用 SuggestTarget(attacker)。副作用：跟随者可能将攻击者设为建议战斗目标。"
+    },
+    {
+      "name": "GetNumFollowers",
+      "effect": "返回 self.numfollowers（真实跟随者数量）。无副作用。"
+    },
+    {
+      "name": "CountFollowers",
+      "effect": "若 tag 为 nil 返回 self.numfollowers（旧行为），否则统计两个表中具有该标签的实体数量并返回。无副作用。"
+    },
+    {
+      "name": "GetFollowersByTag",
+      "effect": "若 tag 为 nil 返回空表，否则遍历两个表将具有该标签的实体插入新表并返回。无副作用。"
+    },
+    {
+      "name": "SetIsRollCaller",
+      "effect": "若 roll_call_sources 不存在则创建 SourceModifierList，然后设置来源 source 的布尔修改器为 boolval。副作用：修改点名呼叫状态修改器列表。"
+    },
+    {
+      "name": "IsRollCalling",
+      "effect": "若 inst 有 leaderrollcall 组件且启用则返回 true，否则返回 roll_call_sources:Get() 或 false。无副作用。"
+    },
+    {
+      "name": "IsTargetedByFollowers",
+      "effect": "遍历两个跟随者表，检查 follower.combat 是否 TargetIs(target)，若有则返回 true。无副作用。"
+    },
+    {
+      "name": "IsTargetPet",
+      "effect": "检查 target 是否为 inst 的 petleash 宠物或装备中 petleash 的宠物，返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnNewTarget",
+      "effect": "当领导者有新战斗目标时（或由事件调用），若目标是宠物则忽略；否则若目标为 nil 或满足小游戏/PVP条件，遍历两个表对符合条件的跟随者调用 SuggestTarget(target)。副作用：跟随者可能获得建议目标。"
+    },
+    {
+      "name": "RemoveFollower",
+      "effect": "若 follower 在 followers 表中，移除并减少计数，取消监听其 death/onremove 事件，调用 onremovefollower 回调；若 invalid 非真，推送 stopfollowing 事件并设其 follower 组件 leader 为 nil。副作用：解除跟随关系并触发事件与回调。"
+    },
+    {
+      "name": "AddFollower",
+      "effect": "若 follower 不在表中且有 follower 组件，加入并增加计数，设置其 leader，推送 startfollowing 事件，通知玩家进度，调用 onfolloweradded 回调，监听其 death/onremove 事件，若 inst 是玩家且 follower 有 prefab 则检查成就与统计。副作用：建立跟随关系，触发事件，可能颁发成就。"
+    },
+    {
+      "name": "AddItemFollower",
+      "effect": "若 itemfollower 不在 itemfollowers 表中，加入并增加 numitemfollowers。副作用：增加虚拟物品跟随者计数。"
+    },
+    {
+      "name": "RemoveItemFollower",
+      "effect": "若 itemfollower 在 itemfollowers 表中，移除并减少 numitemfollowers。副作用：减少虚拟物品跟随者计数。"
+    },
+    {
+      "name": "RemoveFollowersByTag",
+      "effect": "遍历 followers 表，对具有 tag 且通过 validateremovefn（若有）的实体调用 RemoveFollower。副作用：移除符合条件的跟随者。"
+    },
+    {
+      "name": "RemoveAllFollowers",
+      "effect": "遍历 followers 表对所有实体调用 RemoveFollower。副作用：移除所有真实跟随者。"
+    },
+    {
+      "name": "RemoveAllFollowersOnDeath",
+      "effect": "遍历 followers 表，对不保持死亡领导者的实体调用 RemoveFollower。副作用：领导者死亡时移除相关跟随者。"
+    },
+    {
+      "name": "HaveFollowersCachePlayerLeader",
+      "effect": "遍历 followers 表，调用各 follower 的 follower 组件 CachePlayerLeader。副作用：跟随者缓存玩家领导者。"
+    },
+    {
+      "name": "IsBeingFollowedBy",
+      "effect": "遍历两个表，检查是否有 prefab 等于 prefabName 的实体，返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 inst 是玩家则返回 nil；否则收集 followers 的 GUID 返回保存数据与引用。无副作用（仅返回数据）。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "若 inst 是玩家则返回；否则从 savedata 中读取 followers GUID 并通过 AddFollower 重新添加。副作用：恢复存档中的跟随关系。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回字符串 'followers:' 附带 numfollowers。无副作用。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "同 RemoveAllFollowers，移除所有真实跟随者。副作用：清空跟随者表。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "newcombattarget",
+    "attacked",
+    "death",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ACHIEVEMENT_PIG_POSSE_SIZE",
+    "TUNING.ACHIEVEMENT_ROCKY_POSSE_SIZE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      72299,
+      16630,
+      20162,
+      13156,
+      16419,
+      20044,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "无随从时的角色状态修正",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "沃尔夫冈没有随从时，提升至1.25倍"
+          }
+        ]
+      },
+      {
+        "aspect": "物品作为领袖的称谓",
+        "evidence": [
+          {
+            "pageid": 72299,
+            "quote": "当领袖是一件物品时，称该物品为追随物。"
+          }
+        ]
+      },
+      {
+        "aspect": "通过道具雇佣随从",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "可通过独奏乐器、合唱盒电路等方式雇佣随从。"
+          },
+          {
+            "pageid": 16630,
+            "quote": "玩家装备独奏乐器后，如果雇佣的猪人、兔人和鱼人族数量不足 10 个"
+          }
+        ]
+      },
+      {
+        "aspect": "随从数量影响理智消耗",
+        "evidence": [
+          {
+            "pageid": 16630,
+            "quote": "每拥有一个雇佣的随从则每分钟额外 -25{{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "随从范畴包含宠物等",
+        "evidence": [
+          {
+            "pageid": 20044,
+            "quote": "随从包括所有能雇佣的生物和小动物|宠物，但不包括切斯特"
+          }
+        ]
+      },
+      {
+        "aspect": "随从误伤领袖不引发仇恨",
+        "evidence": [
+          {
+            "pageid": 20162,
+            "quote": "猎犬随从们即便被附身座狼误伤，也不会仇恨它。"
+          }
+        ]
+      },
+      {
+        "aspect": "随从追随领袖的关系描述",
+        "evidence": [
+          {
+            "pageid": 72299,
+            "quote": "随从会追随它的领袖。"
+          }
+        ]
+      },
+      {
+        "aspect": "领袖实体类型多样性",
+        "evidence": [
+          {
+            "pageid": 72299,
+            "quote": "领袖既可以是玩家，也可以是其他生物，甚至可以是物品。"
+          }
+        ]
+      },
+      {
+        "aspect": "领袖攻击随从的伤害判定",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "对玩家领袖攻击附身底盘随从的情况也有效。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "跟随者",
+    "跟班",
+    "宠物",
+    "点名",
+    "集火",
+    "随从",
+    "小弟",
+    "仇恨共享"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
+    "source_bytes": 9492,
+    "model": "hy3-free",
+    "generated_at_ms": 1787852100812
+  }
+}

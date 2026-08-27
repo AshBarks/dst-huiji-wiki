@@ -1,0 +1,186 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/follower.lua"
+  },
+  "category": "component",
+  "display_name": "follower",
+  "summary": "该组件管理实体的领导者（leader）与物品所有者（itemowner），以及跟随忠诚度计时与牵引传送行为。它参与宠物、随从等生物的跟随玩法，处理领导者变更、忠诚度过期、距离过远传送及玩家重连后恢复跟随等逻辑。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含领导者、物品所有者、剩余跟随时间与忠诚百分比的调试字符串。无副作用。"
+    },
+    {
+      "name": "GetLeader",
+      "effect": "返回 itemowner 或 leader（优先 itemowner）。无副作用。"
+    },
+    {
+      "name": "StartLeashing",
+      "effect": "若 noleashing 为真则直接返回；否则为领导者唤醒与自身睡眠添加监听以触发传送，并推送 'startleashing' 事件。副作用：添加事件监听，可能创建传送任务。"
+    },
+    {
+      "name": "StopLeashing",
+      "effect": "移除实体睡眠与领导者唤醒的事件监听，取消传送任务，若非 noleashing 则推送 'stopleashing' 事件。副作用：移除监听并取消任务。"
+    },
+    {
+      "name": "DisableLeashing",
+      "effect": "若当前未禁止牵引，则设置 noleashing 为真并调用 StopLeashing 停止牵引。副作用：永久禁止牵引直至 EnableLeashing 调用。"
+    },
+    {
+      "name": "EnableLeashing",
+      "effect": "若已禁止牵引则清除该标志，若领导者为玩家或物品则启动牵引并在自身睡眠时尝试传送。副作用：重新启用牵引行为及监听。"
+    },
+    {
+      "name": "SetCanBeRollCalledFn",
+      "effect": "存储用于判断可否被点名召集的回调函数 canberollcalledfn。副作用：覆盖原有回调。"
+    },
+    {
+      "name": "CanBeRollCalled",
+      "effect": "检查领导者点名组件是否启用，并调用存储的回调函数判断，返回布尔值。无副作用。"
+    },
+    {
+      "name": "CachePlayerLeader",
+      "effect": "缓存玩家领导者 ID 与剩余时间，监听世界事件 'ms_playerjoined' 与 'ms_newplayerspawned'，并设定时任务清除缓存。副作用：添加全局事件监听与定时任务。"
+    },
+    {
+      "name": "ClearCachedPlayerLeader",
+      "effect": "移除玩家加入/生成事件监听，取消缓存任务，清空用户 ID 与时间。副作用：移除监听并清空缓存字段。"
+    },
+    {
+      "name": "OnItemSourceNewOwner",
+      "effect": "设置 itemowner 为新的所有者，若其含 leader 组件则添加为物品跟随者。副作用：修改 itemowner 并改变领导者组件状态。"
+    },
+    {
+      "name": "OnItemSourceRemoved",
+      "effect": "清空 itemowner，若原所有者含 leader 组件则移除物品跟随者。副作用：解除物品源关联。"
+    },
+    {
+      "name": "SetLeader",
+      "effect": "变更领导者：解除旧领导者关联（移除 leader 组件、牵引、监听与忠诚任务），若新领导者为物品则建立物品源，添加新关联并视情况启动牵引，触发记忆组件、外部回调、丢弃战斗目标并推送 'leaderchanged' 事件。副作用：广泛修改多组件状态与事件。"
+    },
+    {
+      "name": "GetLoyaltyPercent",
+      "effect": "根据剩余时间与最大跟随时间计算忠诚比例，返回 0 至 1 之间数值或 0。无副作用。"
+    },
+    {
+      "name": "AddLoyaltyTime",
+      "effect": "增加忠诚持续时间（受领导者效率影响），重设 targettime 并安排停止跟随任务，推送 'gainloyalty' 事件；若 neverexpire 则无效。副作用：修改计时器与任务，推送事件。"
+    },
+    {
+      "name": "CancelLoyaltyTask",
+      "effect": "清空 targettime 并取消忠诚任务。副作用：终止忠诚倒计时。"
+    },
+    {
+      "name": "StopFollowing",
+      "effect": "若 neverexpire 则无效；否则推送 'loseloyalty' 事件并解除领导者。副作用：结束跟随关系。"
+    },
+    {
+      "name": "IsNearLeader",
+      "effect": "检查领导者是否存在且实体在指定距离内，返回布尔。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含剩余忠诚时间与缓存玩家领导者信息的表，无数据则返回 nil。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "根据存档数据恢复忠诚时间并重建玩家领导者缓存。副作用：可能触发忠诚任务与事件监听。"
+    },
+    {
+      "name": "IsLeaderSame",
+      "effect": "比较目标实体与自身的领导者是否一致，返回布尔。无副作用。"
+    },
+    {
+      "name": "KeepLeaderOnAttacked",
+      "effect": "设置标志并移除 'attacked' 事件监听，使被领导者攻击时不解除跟随。副作用：改变受击行为。"
+    },
+    {
+      "name": "LoseLeaderOnAttacked",
+      "effect": "恢复 'attacked' 事件监听，使被领导者攻击时解除跟随。副作用：恢复默认受击解除逻辑。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "快进更新忠诚任务与缓存任务的剩余时间，可能解除领导者或清除缓存。副作用：调整计时器与任务。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理所有事件监听、忠诚任务、牵引与物品源关联。副作用：彻底解除组件相关状态。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "若曾为物品源则移除该关联。副作用：清理 itemowner 引用。"
+    }
+  ],
+  "events_published": [
+    "startleashing",
+    "stopleashing",
+    "gainloyalty",
+    "loseloyalty",
+    "leaderchanged"
+  ],
+  "events_listened": [
+    "attacked",
+    "entitywake",
+    "entitysleep",
+    "ms_playerjoined",
+    "ms_newplayerspawned",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FOLLOWER_REFOLLOW_DIST_SQ"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      52773,
+      15239,
+      15427,
+      13857,
+      13556,
+      15237,
+      18778
+    ],
+    "aspects": [
+      {
+        "aspect": "与领导者邻近距离描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "保持在温蒂附近 1 ~ 5 距离单位"
+          },
+          {
+            "pageid": 13556,
+            "quote": "激怒状态下则是 3 ~ 10 单位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "领队",
+    "忠诚期限",
+    "牵引传送",
+    "宠物跟随",
+    "物品主人",
+    "点名召集",
+    "重连恢复",
+    "攻击弃主"
+  ],
+  "gameplay_tags": [
+    "跟随",
+    "生存",
+    "宠物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+    "source_bytes": 16653,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850755728
+  }
+}

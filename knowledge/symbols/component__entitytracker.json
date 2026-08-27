@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/entitytracker.lua"
+  },
+  "category": "component",
+  "display_name": "entitytracker",
+  "summary": "该组件维护一个从名称到实体实例的映射表，用于管理实体对其他实体的引用。它在被追踪实体移除时自动清理对应记录，并在存档时保存引用GUID、加载后重建追踪，支持需要持续感知其他实体存在的逻辑。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "遍历 self.entities，为其中每个被追踪实体移除 self.inst 对其 'onremove' 事件的监听回调。无返回值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含所有追踪实体名称与实例信息的多行字符串，用于调试。不修改状态。"
+    },
+    {
+      "name": "TrackEntity",
+      "effect": "以给定 name 追踪 inst：定义当 inst 触发 'onremove' 时清空 self.entities[name] 的回调，将 {inst=inst, onremove=回调} 存入 self.entities[name]，并让 self.inst 监听 inst 的 'onremove' 事件。副作用：修改 self.entities 并增加事件监听。"
+    },
+    {
+      "name": "ForgetEntity",
+      "effect": "若 self.entities[name] 存在，移除 self.inst 对该实体 'onremove' 事件的监听回调，并将 self.entities[name] 置为 nil。副作用：修改 self.entities 并减少事件监听。"
+    },
+    {
+      "name": "GetEntity",
+      "effect": "返回 self.entities[name] 中存储的实体实例，若不存在则返回 nil。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 self.entities 非空，返回包含实体信息数组（每项含 name 与 GUID）的表以及引用 GUID 列表；否则返回 nil。仅读取状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "接收存档数据，若含 entities 列表则通过 GUID 从传入的 ents 映射获取实体实例，并调用 TrackEntity 重新建立追踪。副作用：可能重新填充 self.entities 并添加事件监听。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57029,
+      13701,
+      19832,
+      13606,
+      19110,
+      22249,
+      22383,
+      13698
+    ],
+    "aspects": [
+      {
+        "aspect": "保存实体引用漏洞修复标注",
+        "evidence": [
+          {
+            "pageid": 57029,
+            "quote": "容器现在能正确保存实体引用"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "追踪实体",
+    "实体引用",
+    "自动遗忘",
+    "存档引用",
+    "读取恢复",
+    "监听销毁",
+    "按名查物",
+    "调试清单"
+  ],
+  "gameplay_tags": [
+    "通用"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+    "source_bytes": 1689,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850353872
+  }
+}

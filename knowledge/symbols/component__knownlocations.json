@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/knownlocations.lua"
+  },
+  "category": "component",
+  "display_name": "knownlocations",
+  "summary": "该组件管理实体所知的命名位置集合（locations），支持记忆、查询与遗忘坐标点。它参与存档序列化与加载，使实体能够持久化重要地点信息，支撑依赖位置记忆的游戏逻辑。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回所有已知位置名称与坐标拼接的字符串，不修改组件内部状态。"
+    },
+    {
+      "name": "SerializeLocations",
+      "effect": "将内部 locations 表转换为包含 name,x,y,z 的数组，返回该数组或 nil，无副作用。"
+    },
+    {
+      "name": "DeserializeLocations",
+      "effect": "遍历输入数据表，对每个条目调用 RememberLocation 以恢复位置，从而修改内部 locations 数据。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "调用 SerializeLocations 获取序列化数据，返回 {locations=序列化数据} 或 nil 以供存档，不直接修改状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "若存档数据包含 locations 则调用 DeserializeLocations 加载，修改内部 locations 数据。"
+    },
+    {
+      "name": "RememberLocation",
+      "effect": "将指定名称与坐标位置存入 locations；若 dont_overwrite 为真且已存在同名则跳过；若坐标含非法数值则打印错误并抛出异常。修改内部 locations。"
+    },
+    {
+      "name": "GetLocation",
+      "effect": "返回指定名称对应的位置 Vector3 或 nil，无副作用。"
+    },
+    {
+      "name": "ForgetLocation",
+      "effect": "将指定名称的位置从 locations 中移除（置 nil），修改内部 locations。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      14938,
+      15832,
+      13897,
+      15238,
+      13823,
+      15651,
+      13606
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容均为实体掉落、攻击范围、生成间隔、重生时间等数值或行为，未包含任何关于已知位置组件能力如记住/获取/忘记位置、序列化/保存加载位置的表述，即便有“同一位置重生”也未明确体现记忆或存取位置能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "已知地点",
+    "记忆位置",
+    "记录坐标",
+    "遗忘地点",
+    "位置存档",
+    "地点查询",
+    "导航记忆",
+    "地点加载"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
+    "source_bytes": 2333,
+    "model": "hy3-free",
+    "generated_at_ms": 1787848864871
+  }
+}

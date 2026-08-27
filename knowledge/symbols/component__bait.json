@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/bait.lua"
+  },
+  "category": "component",
+  "display_name": "bait",
+  "summary": "组件 Bait 管理一个指向陷阱（trap）的引用，用于标记物品作为诱饵时的归属状态。它监听物品的移除、拾取、被吃和被偷事件，以通知关联陷阱更新诱饵状态或转移物品。该组件参与陷阱捕捉与诱饵管理的核心玩法。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件在实体上监听的 onremove、onpickup、oneaten、onstolen 事件回调，使后续相关事件不再触发与 trap 的交互逻辑。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前 trap 引用信息的调试字符串，无副作用。"
+    },
+    {
+      "name": "IsFree",
+      "effect": "返回 trap 是否为 nil 的布尔值，表示诱饵是否未被陷阱引用，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "onpickup",
+    "oneaten",
+    "onstolen"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24751,
+      39622,
+      14674,
+      24542,
+      14676,
+      15022,
+      35020,
+      15722
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅讨论诱饵物品的玩法，未提及组件bait的代码能力OnRemoveFromEntity、GetDebugString、IsFree的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "诱饵",
+    "陷阱",
+    "捕捉",
+    "被吃",
+    "被偷",
+    "拾取",
+    "移除",
+    "钓饵"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
+    "source_bytes": 1220,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850651608
+  }
+}

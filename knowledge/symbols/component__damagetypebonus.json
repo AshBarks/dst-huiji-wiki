@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/damagetypebonus.lua"
+  },
+  "category": "component",
+  "display_name": "damagetypebonus",
+  "summary": "该组件管理实体基于目标标签和回调函数的伤害加成乘数数据。它参与战斗伤害计算流程，允许按目标标签叠加多个来源的增益百分比，并支持通过回调动态返回乘数，从而影响最终造成的伤害。",
+  "api": [
+    {
+      "name": "AddBonus",
+      "effect": "为指定标签创建或获取对应的来源修正列表，并设置来自 src 的加成百分比 pct（以 key 区分）。副作用：若标签不存在则初始化修正列表并存入 self.tags；修改内部修正列表的修饰符。"
+    },
+    {
+      "name": "RemoveBonus",
+      "effect": "从指定标签的修正列表中移除 src 的修饰符（按 key 定位）。副作用：若修正列表移除后为空，则将该标签从 self.tags 中清除。"
+    },
+    {
+      "name": "AddBonusCallback",
+      "effect": "将回调函数 fn 加入 self.bonuscallbacks 列表，用于后续 GetBonus 计算动态乘数。副作用：懒初始化 self.bonuscallbacks 表；若已存在相同函数则先移除再添加，避免重复。"
+    },
+    {
+      "name": "RemoveBonusCallback",
+      "effect": "从 self.bonuscallbacks 数组中移除指定的回调函数 fn。副作用：若 self.bonuscallbacks 存在则修改该数组，否则无操作。"
+    },
+    {
+      "name": "GetBonus",
+      "effect": "计算对 target 的总伤害乘数。遍历 self.tags，若 target 拥有某标签则乘上该标签修正列表的合计值；再遍历 bonuscallbacks 调用 fn(inst, target) 并乘上返回值（nil 则视为 1）。返回最终乘数（默认 1）。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "生成并返回调试字符串，列出所有标签及其当前修正值。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      13156,
+      10374,
+      10379,
+      10355,
+      13437,
+      72238,
+      20058
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害类型与阵营加成减伤描述",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "沃尔夫冈获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+          },
+          {
+            "pageid": 10355,
+            "quote": "威尔逊获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+          },
+          {
+            "pageid": 13437,
+            "quote": "沃尔特获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+          },
+          {
+            "pageid": 10374,
+            "quote": "薇洛获得暗影亲和。伯尼！变为暗影阵营、增加5点位面伤害"
+          },
+          {
+            "pageid": 10379,
+            "quote": "温蒂的进攻端物理伤害倍率为 0.75"
+          },
+          {
+            "pageid": 20150,
+            "quote": "对玩家角色和龙蝇：伤害倍率为干燥伤害倍率，一般为 ×1.5"
+          },
+          {
+            "pageid": 72238,
+            "quote": "响应PVP伤害倍率。对玩家领袖攻击附身底盘随从的情况也有效"
+          },
+          {
+            "pageid": 20058,
+            "quote": "部分盔甲所具有的阵营减伤，能减免物理伤害和位面伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "伤害倍率",
+    "标签克制",
+    "对怪增伤",
+    "伤害修正",
+    "战斗加成",
+    "目标标签",
+    "来源增益",
+    "回调乘区"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+    "source_bytes": 1631,
+    "model": "hy3-free",
+    "generated_at_ms": 1787852251898
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/eater.lua"
+  },
+  "category": "component",
+  "display_name": "eater",
+  "summary": "该组件管理实体的饮食相关数据，包括可吃与偏好食物类型、吸收倍率、上次进食时间以及多种特殊饮食标签状态。它参与进食核心玩法，负责判定实体能否或偏好吃某食物，并在执行 Eat 时结算属性增减、触发事件、消耗食物与调用回调。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时调用 clearcaneat 清除 caneat 列表中各食物类型对应的 '<type>_eater' 标签。"
+    },
+    {
+      "name": "SetDiet",
+      "effect": "设置 self.caneat 与 self.preferseating（缺省同 caneat）。因 caneat 属性 setter 触发 oncaneat，移除旧 caneat 标签并添加新 caneat 对应的 '<type>_eater' 标签。"
+    },
+    {
+      "name": "SetAbsorptionModifiers",
+      "effect": "设置 healthabsorption、hungerabsorption、sanityabsorption 三个吸收倍率数值，影响后续 Eat 计算属性增减。"
+    },
+    {
+      "name": "TimeSinceLastEating",
+      "effect": "返回 GetTime() - self.lasteattime 的数值；若 lasteattime 为 nil 则返回 nil。无副作用。"
+    },
+    {
+      "name": "HasBeen",
+      "effect": "返回 self.lasteattime 为 nil 或 TimeSinceLastEating() >= time 的布尔结果。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 lasteattime 非 nil，返回包含 time_since_eat 字段的表（值为距上次进食秒数），否则返回 nil。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "若 data.time_since_eat 存在，设置 self.lasteattime = GetTime() - data.time_since_eat，恢复进食时间记录。无标签副作用。"
+    },
+    {
+      "name": "SetCanEatHorrible",
+      "effect": "将 FOODTYPE.HORRIBLE 插入 self.preferseating 与 self.caneat，并为实体添加 'HORRIBLE_eater' 标签，扩展饮食能力。"
+    },
+    {
+      "name": "SetCanEatGears",
+      "effect": "将 FOODTYPE.GEARS 插入 self.preferseating 与 self.caneat，并添加 'GEARS_eater' 标签。"
+    },
+    {
+      "name": "SetCanEatNitre",
+      "effect": "参数 can_eat 为 true 且无 'NITRE_eater' 标签时，将 FOODTYPE.NITRE 加入偏好与能吃列表并加标签；为 false 且有标签时移除对应列表项与标签。"
+    },
+    {
+      "name": "SetCanEatRaw",
+      "effect": "将 FOODTYPE.RAW 插入偏好与能吃列表，并添加 'RAW_eater' 标签。"
+    },
+    {
+      "name": "SetPrefersEatingTag",
+      "effect": "将 tag 加入 self.preferseatingtags（若原为空则初始化为单元素表），使 PrefersToEat 要求食物具有这些标签之一。"
+    },
+    {
+      "name": "SetStrongStomach",
+      "effect": "is_strong 为 true 时添加 'strongstomach' 标签且置 strongstomach=true；为 false 且原为真时移除标签并置 false。影响 DoFoodEffects 对怪物肉的处理。"
+    },
+    {
+      "name": "SetCanEatRawMeat",
+      "effect": "can_eat 为 true 时添加 'eatsrawmeat' 标签且置 eatsrawmeat=true；为 false 且原为真时移除标签并置 false。影响生肉进食效果判定。"
+    },
+    {
+      "name": "SetIgnoresSpoilage",
+      "effect": "ignores 为 true 时添加 'ignoresspoilage' 标签且置 ignoresspoilage=true；为 false 且原为真时移除标签并置 false。"
+    },
+    {
+      "name": "SetRefusesSpoiledFood",
+      "effect": "refuses 为 true 时添加 'nospoiledfood' 标签且置 nospoiledfood=true；为 false 且原为真时移除标签并置 false。使 PrefersToEat 拒绝已腐烂食物。"
+    },
+    {
+      "name": "SetSpoiledProcessor",
+      "effect": "processor 为 true 时添加 'spoiledprocessor' 标签且置 spoiledprocessor=true，并根据 allspoiled 添加/移除 'allspoiledprocessor' 标签与变量；为 false 且原为真时清除相关标签与变量。"
+    },
+    {
+      "name": "IsSpoiledProcessor",
+      "effect": "返回 self.spoiledprocessor 布尔值。无副作用。"
+    },
+    {
+      "name": "CanProcessSpoiledItem",
+      "effect": "返回是否为腐烂处理器且食物组件 edible 为腐烂食物，或（全腐烂处理器且食物 perishable 已腐烂）的布尔结果。无副作用。"
+    },
+    {
+      "name": "SetOnEatFn",
+      "effect": "设置 self.oneatfn 为传入函数 fn，在 Eat 成功进食后调用。无标签副作用。"
+    },
+    {
+      "name": "DoFoodEffects",
+      "effect": "返回布尔：若（强胃且食物有 monstermeat 标签）或（吃生肉且食物有 rawmeat 标签）或（存在 foodaffinity 组件且对食物有偏好）则为 false，否则 true。用于 Eat 中决定是否应用负向属性变化。"
+    },
+    {
+      "name": "GetEdibleTags",
+      "effect": "遍历 caneat 生成 'edible_<type>' 标签表；若 self.cacheedibletags 不为 false 则缓存该表并返回，否则直接返回。无外部副作用。"
+    },
+    {
+      "name": "Eat",
+      "effect": "若 PrefersToEat 通过，计算食物对健康/饥饿/理智的增量（乘吸收、食物记忆倍率、自定义函数等），调用对应组件 DoDelta 改变属性；若喂养者非自身则对其推 'feedincontainer' 或 'feedmount' 事件；自身推 'oneat' 事件，调用 oneatfn；执行食物 edible 的 OnEaten 与 HandleEatRemove 消耗食物；更新 lasteattime；记录食物记忆（非药水）。返回 true。大幅改变状态与外部事件。"
+    },
+    {
+      "name": "TestFood",
+      "effect": "检查食物是否带有 'edible_'..v 标签（v 来自 testvalues 列表或其中的 types 表），有则返回 true，否则 nil。无副作用。"
+    },
+    {
+      "name": "PrefersToEat",
+      "effect": "综合特例（水果蛋糕玩家不可吃）、nospoiledfood 拒绝腐烂、preferseatingtags 要求、TestFood(preferseating) 等判定是否愿意吃，返回布尔。无副作用。"
+    },
+    {
+      "name": "CanEat",
+      "effect": "调用 TestFood(food, self.caneat) 返回是否可吃（仅基于 caneat 标签，不检查偏好与拒绝腐烂）。无副作用。"
+    },
+    {
+      "name": "IsTryingToFeedMe",
+      "effect": "检查传入 inst 的缓冲动作或远程交互是否为 FEED/FEEDPLAYER 且目标为自身，返回布尔。无副作用。"
+    }
+  ],
+  "events_published": [
+    "oneat",
+    "feedincontainer",
+    "feedmount"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      70494,
+      15237,
+      15421,
+      18483,
+      24600,
+      34037,
+      34216,
+      45870
+    ],
+    "aspects": [
+      {
+        "aspect": "可怕食物进食提及",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "肉类食物和可怕食物可以雇佣猪人"
+          },
+          {
+            "pageid": 45870,
+            "quote": "肉类食物和可怕食物可以雇佣猪人"
+          }
+        ]
+      },
+      {
+        "aspect": "可进食对象说明",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "能进食无数素食"
+          }
+        ]
+      },
+      {
+        "aspect": "未进食时长描述",
+        "evidence": [
+          {
+            "pageid": 24600,
+            "quote": "超过70秒未进食就会回家"
+          }
+        ]
+      },
+      {
+        "aspect": "进食行为描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪人进食后会进入冷却时间"
+          },
+          {
+            "pageid": 15421,
+            "quote": "在它进食时"
+          },
+          {
+            "pageid": 18483,
+            "quote": "靠近并进食附近 6 距离单位的食物"
+          },
+          {
+            "pageid": 24600,
+            "quote": "每进食 6 点饥饿值也会产生 1 个黏液"
+          },
+          {
+            "pageid": 34216,
+            "quote": "城镇猪人完成一次进食后"
+          },
+          {
+            "pageid": 45870,
+            "quote": "猪人进食后会进入冷却时间"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "进食",
+    "饮食偏好",
+    "吃生肉",
+    "忽略变质",
+    "腐烂处理",
+    "饱食度",
+    "精神值",
+    "喂食物",
+    "食物组",
+    "强胃"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "饮食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+    "source_bytes": 11787,
+    "model": "hy3-free",
+    "generated_at_ms": 1787849357363
+  }
+}

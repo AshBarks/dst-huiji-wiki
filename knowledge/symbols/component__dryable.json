@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/dryable.lua"
+  },
+  "category": "component",
+  "display_name": "dryable",
+  "summary": "该组件在初始化时为实体添加 'dryable' 标签，并管理干燥产物、干燥时间以及相关美术构建文件等数据。它为游戏内的晾晒与风干机制提供基础属性支持。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除 'dryable' 标签，无其他数据改动。"
+    },
+    {
+      "name": "SetProduct",
+      "effect": "将组件内部 product 字段设为传入的 product 参数，记录干燥后产物。"
+    },
+    {
+      "name": "GetProduct",
+      "effect": "返回组件内部 product 字段当前值，无副作用。"
+    },
+    {
+      "name": "SetDryTime",
+      "effect": "将组件内部 drytime 字段设为传入的 time 参数，记录干燥所需时间。"
+    },
+    {
+      "name": "GetDryTime",
+      "effect": "返回组件内部 drytime 字段当前值，无副作用。"
+    },
+    {
+      "name": "SetBuildFile",
+      "effect": "将组件内部 buildfile 字段设为传入的 buildfile 参数，记录基础构建文件。"
+    },
+    {
+      "name": "GetBuildFile",
+      "effect": "返回组件内部 buildfile 字段当前值，无副作用。"
+    },
+    {
+      "name": "SetDriedBuildFile",
+      "effect": "将组件内部 dried_buildfile 字段设为传入的 dried_buildfile 参数，记录干燥后的构建文件。"
+    },
+    {
+      "name": "GetDriedBuildFile",
+      "effect": "若 dried_buildfile 字段已设置则返回它，否则返回 buildfile 字段值，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      70347,
+      14714,
+      46866,
+      13493,
+      51085,
+      14484,
+      18031,
+      39718
+    ],
+    "aspects": [
+      {
+        "aspect": "晾干后产物说明",
+        "evidence": [
+          {
+            "pageid": 51085,
+            "quote": "玩家可以将部分食物挂到晾肉架上晾晒，一段时间后变为对应的晾晒产物"
+          },
+          {
+            "pageid": 14484,
+            "quote": "在晾肉架上晾干必忘我，就会变成干必忘我"
+          },
+          {
+            "pageid": 18031,
+            "quote": "在晾肉架上晾干蛙腿，就会变成小肉干"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "可干燥",
+    "晾晒",
+    "风干",
+    "晒干",
+    "干燥时间",
+    "干燥产物",
+    "烘干",
+    "晾肉"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "91f6430ae20b9466cf0c3a688f5be2923bef4d18c31423922ca650ed40ef24a2",
+    "source_bytes": 911,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851855268
+  }
+}

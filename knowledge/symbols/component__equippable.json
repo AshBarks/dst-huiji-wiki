@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/equippable.lua"
+  },
+  "category": "component",
+  "display_name": "equippable",
+  "summary": "该组件管理物品装备状态、装备槽位、行走速度加成、精神值影响、绝缘与潮湿等数据。它参与装备系统的核心玩法，处理装备与卸下时的回调函数和事件推送，并支持限制特定标签角色穿戴或阻止卸下等行为。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用。取消禁止卸下状态，并若 replica.inventoryitem 存在则重置行走速度乘数为1、装备限制标签为nil。"
+    },
+    {
+      "name": "IsInsulated",
+      "effect": "返回 self.insulated 布尔值，表示是否绝缘防电。无副作用。"
+    },
+    {
+      "name": "SetOnEquip",
+      "effect": "设置装备时回调函数 onequipfn，覆盖之前的函数。"
+    },
+    {
+      "name": "SetOnPocket",
+      "effect": "设置放入口袋时回调函数 onpocketfn。"
+    },
+    {
+      "name": "SetOnUnequip",
+      "effect": "设置卸下时回调函数 onunequipfn。"
+    },
+    {
+      "name": "SetDappernessFn",
+      "effect": "设置精神值计算函数 dapperfn。"
+    },
+    {
+      "name": "SetOnEquipToModel",
+      "effect": "设置装备到模型实体时的回调函数 onequiptomodelfn。"
+    },
+    {
+      "name": "IsEquipped",
+      "effect": "返回 self.isequipped 布尔值，表示当前是否已装备。"
+    },
+    {
+      "name": "Equip",
+      "effect": "执行装备操作：标记已装备，停止燃烧组件阴燃，调用 onequipfn，推送 'equipped' 事件，若满足条件调用 onequiptomodelfn。改变状态并触发回调与事件。"
+    },
+    {
+      "name": "ToPocket",
+      "effect": "若设置了 onpocketfn 则调用之，用于物品放入口袋时。"
+    },
+    {
+      "name": "Unequip",
+      "effect": "执行卸下操作：标记未装备，调用 onunequipfn，推送 'unequipped' 事件。改变状态并触发回调与事件。"
+    },
+    {
+      "name": "GetWalkSpeedMult",
+      "effect": "计算并返回行走速度乘数，考虑基础值、拥有者 'vigorbuff' 标签加成及拥有者的自定义修正函数。无副作用。"
+    },
+    {
+      "name": "IsRestricted",
+      "effect": "判断目标实体是否被限制装备此物品，基于关联物品拥有者限制及 restrictedtag 标签限制。返回布尔值。"
+    },
+    {
+      "name": "IsRestricted_FromLoad",
+      "effect": "从存档加载时判断目标是否受限制，先处理技能树标签例外再调用 IsRestricted。返回布尔值。"
+    },
+    {
+      "name": "ShouldPreventUnequipping",
+      "effect": "返回 preventunequipping 是否为 true，表示是否应阻止卸下。"
+    },
+    {
+      "name": "SetPreventUnequipping",
+      "effect": "设置或取消阻止卸下状态。若启用则监听实体 'onremove' 事件，若取消则移除监听。改变监听与状态。"
+    },
+    {
+      "name": "GetDapperness",
+      "effect": "计算物品提供的精神值影响，考虑基础值、人鱼标签反转、自定义函数及潮湿加成（除非忽略）。返回数值。"
+    },
+    {
+      "name": "GetEquippedMoisture",
+      "effect": "返回包含当前装备潮湿值与最大潮湿值的表。"
+    }
+  ],
+  "events_published": [
+    "equipped",
+    "unequipped"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WET_ITEM_DAPPERNESS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14938,
+      20704,
+      51698,
+      51812,
+      13602,
+      13641,
+      13784,
+      13933
+    ],
+    "aspects": [
+      {
+        "aspect": "佩戴行为表述",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "佩戴潮湿装备"
+          },
+          {
+            "pageid": 51698,
+            "quote": "佩戴潮湿装备"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿装备状态描述",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "佩戴潮湿装备带来的"
+          },
+          {
+            "pageid": 51698,
+            "quote": "佩戴潮湿装备带来的"
+          }
+        ]
+      },
+      {
+        "aspect": "装备理智减益数值标注",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "佩戴潮湿装备带来的理智减益：-6 点/分钟"
+          },
+          {
+            "pageid": 51698,
+            "quote": "佩戴潮湿装备带来的理智减益：-0.1 理智值/秒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "装备槽",
+    "穿戴物品",
+    "卸下装备",
+    "行走速度",
+    "精神影响",
+    "防电绝缘",
+    "装备限制",
+    "禁止卸下",
+    "潮湿装备"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+    "source_bytes": 6262,
+    "model": "hy3-free",
+    "generated_at_ms": 1787848555937
+  }
+}

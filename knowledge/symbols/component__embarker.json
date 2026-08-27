@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/embarker.lua"
+  },
+  "category": "component",
+  "display_name": "embarker",
+  "summary": "组件管理实体登船目标、下船坐标、移动速度与跳跃距离限制等状态数据。参与核心玩法为驱动实体向可行走平台或岸边移动、传送，完成上下船的交互过程。",
+  "api": [
+    {
+      "name": "UpdateEmbarkingPos",
+      "effect": "计算当前登船或下船目标位置并记录到 last_embark_x/z；比较剩余距离与帧移动距离，若到达则传送实体并推送 'done_embark_movement' 事件；若超过最大跳跃距离则取消移动并推送事件；否则设置实体朝向目标并施加马达速度。副作用：可能修改实体坐标、旋转、物理速度，推送事件或触发取消。"
+    },
+    {
+      "name": "SetEmbarkable",
+      "effect": "设置登船目标对象 embarkable，更新 last_embark 坐标为目标登船点，强制实体面朝该点，并清除下船坐标。副作用：改变组件状态与实体朝向。"
+    },
+    {
+      "name": "SetDisembarkPos",
+      "effect": "设置下船坐标 disembark_x/z，强制实体面朝该点，清除登船目标与 last_embark 坐标。副作用：改变组件状态与实体朝向。"
+    },
+    {
+      "name": "SetDisembarkActionPos",
+      "effect": "调用 GetDisembarkPosAndDistance 计算并仅设置下船坐标 disembark_x/z（忽略第三返回值），不修改朝向或清除其他状态。副作用：改变组件下船坐标状态。"
+    },
+    {
+      "name": "StartMoving",
+      "effect": "若未设置最大跳跃距离，则停止物理运动，启动组件更新循环，计算基于 locomotor 跳跃距离与速度倍数得出的 max_hop_dist_sq 并记录起点，推送 'start_embark_movement' 事件。副作用：停止物理、启动更新、设置距离限制、推送事件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新钩子，调用 UpdateEmbarkingPos(dt) 执行移动逻辑。副作用：同 UpdateEmbarkingPos。"
+    },
+    {
+      "name": "HasDestination",
+      "effect": "返回是否存在有效目的地（embarkable 有效或 disembark_x 不为 nil）。无副作用。"
+    },
+    {
+      "name": "GetEmbarkPosition",
+      "effect": "若 embarkable 有效则返回其 walkableplatform 组件提供的登船点；否则返回 disembark 或 last_embark 坐标，若均无则返回实体当前坐标。无副作用。"
+    },
+    {
+      "name": "Embark",
+      "effect": "停止物理，将实体传送到登船位置，清除所有登船/下船状态与更新标记，停止组件更新并调用 locomotor:FinishHopping()。副作用：传送实体、清除状态、结束跳跃。"
+    },
+    {
+      "name": "Cancel",
+      "effect": "停止物理，清除所有登船/下船状态与更新标记，停止组件更新并调用 locomotor:FinishHopping()。副作用：清除状态、结束跳跃（不传送）。"
+    }
+  ],
+  "events_published": [
+    "done_embark_movement",
+    "start_embark_movement"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13602,
+      15746,
+      18504,
+      18540,
+      34991,
+      65881,
+      13828,
+      15902
+    ],
+    "aspects": [
+      {
+        "aspect": "上船动作描述",
+        "evidence": [
+          {
+            "pageid": 13602,
+            "quote": "刚上船"
+          },
+          {
+            "pageid": 15746,
+            "quote": "跳上船时"
+          },
+          {
+            "pageid": 18540,
+            "quote": "跳上船去放下锚"
+          },
+          {
+            "pageid": 34991,
+            "quote": "上船"
+          },
+          {
+            "pageid": 65881,
+            "quote": "跳上船吸引大副仇恨"
+          }
+        ]
+      },
+      {
+        "aspect": "下船落点位置提及",
+        "evidence": [
+          {
+            "pageid": 15746,
+            "quote": "跳船的落点附近会有伤害判定"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "登船",
+    "下船",
+    "上船",
+    "跳船",
+    "登船点",
+    "下船点",
+    "靠岸",
+    "离岸",
+    "船只移动"
+  ],
+  "gameplay_tags": [
+    "航行",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
+    "source_bytes": 5385,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851204986
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/debuff.lua"
+  },
+  "category": "component",
+  "display_name": "debuff",
+  "summary": "Debuff 组件管理减益效果的标识、目标实体及附加/分离/延长/改变跟随符号的回调逻辑。它作为负面状态载体，与 debuffable 组件协同实现实体上 debuff 的附着、刷新与解除，参与战斗与生存中的状态效果玩法。",
+  "api": [
+    {
+      "name": "SetAttachedFn",
+      "effect": "将传入的函数 fn 保存为 onattachedfn 回调，供 AttachTo 时调用。无其它副作用。"
+    },
+    {
+      "name": "SetDetachedFn",
+      "effect": "将传入的函数 fn 保存为 ondetachedfn 回调，供 OnDetach 时调用。无其它副作用。"
+    },
+    {
+      "name": "SetExtendedFn",
+      "effect": "将传入的函数 fn 保存为 onextendedfn 回调，供 Extend 时调用。无其它副作用。"
+    },
+    {
+      "name": "SetChangeFollowSymbolFn",
+      "effect": "将传入的函数 fn 保存为 onchangefollowsymbolfn 回调，供 ChangeFollowSymbol 时调用。无其它副作用。"
+    },
+    {
+      "name": "Stop",
+      "effect": "若当前已附着目标（self.target 非空），则调用目标的 RemoveDebuff 方法并传入当前 debuff 名称，从而触发移除流程。副作用：可能导致自身被分离并清空内部记录。"
+    },
+    {
+      "name": "AttachTo",
+      "effect": "仅应由 debuffable 组件调用。记录 debuff 名称与目标实体，并若设置了 onattachedfn 则调用之，传入自身实例、目标、跟随符号、偏移、数据与缓冲。副作用：设置内部 name 与 target，可能通过回调修改目标状态。"
+    },
+    {
+      "name": "OnDetach",
+      "effect": "仅应由 debuffable 组件调用。清除内部 name 与 target 记录，并若设置了 ondetachedfn 则调用之，传入自身实例与原目标。副作用：断开与目标关联，可能通过回调清理效果。"
+    },
+    {
+      "name": "Extend",
+      "effect": "若设置了 onextendedfn 则调用之，传入自身实例、当前目标、跟随符号、偏移、数据与缓冲。用于延长 debuff 持续时间或刷新效果，具体逻辑由回调定义，可能修改目标状态。"
+    },
+    {
+      "name": "ChangeFollowSymbol",
+      "effect": "仅应由 debuffable 组件调用。若设置了 onchangefollowsymbolfn 则调用之，传入自身实例、当前目标、新的跟随符号与偏移。用于动态改变 debuff 在目标上的附着位置，具体逻辑由回调定义。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      13211,
+      18838,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅提及“减益效果”词语（页面13156、13211、18838），未描述减益组件的附加、分离、扩展、停止或改变跟随符号等能力行为，页面15539仅涉及伤害无减益内容，故无组件能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "减益效果",
+    "负面状态",
+    "附着目标",
+    "解除减益",
+    "延长负面",
+    "跟随符号",
+    "移除效果",
+    "状态附加"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+    "source_bytes": 1753,
+    "model": "hy3-free",
+    "generated_at_ms": 1787852488689
+  }
+}

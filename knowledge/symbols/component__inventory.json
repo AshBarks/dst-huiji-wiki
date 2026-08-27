@@ -1,0 +1,330 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventory.lua"
+  },
+  "category": "component",
+  "display_name": "inventory",
+  "summary": "Inventory 组件管理实体的物品栏槽位、装备槽位与手持物品，处理物品的存取、堆叠、装备与掉落。它参与核心生存玩法如死亡掉落、护甲伤害减免、背包溢出容器及专用口袋容器逻辑。",
+  "api": [
+    {
+      "name": "EnableDropOnDeath",
+      "effect": "若 dropondeath 为 false，则设为 true 并监听实体 death 事件以触发掉落所有物品。"
+    },
+    {
+      "name": "DisableDropOnDeath",
+      "effect": "若 dropondeath 为 true，则设为 false 并移除 death 事件监听，阻止死亡掉落。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用，等同于 DisableDropOnDeath 关闭死亡掉落。"
+    },
+    {
+      "name": "NumItems",
+      "effect": "返回 itemslots 表中键值对数量，即非堆叠计数的物品格数。"
+    },
+    {
+      "name": "NumStackedItems",
+      "effect": "遍历 itemslots 累加每个物品的堆叠大小（无堆叠组件计1），返回总堆叠数。"
+    },
+    {
+      "name": "TransferInventory",
+      "effect": "将自身物品栏、装备栏、手持中 persists 为 true 的物品转移给接收者 inventory；装备受限时改为给予物品，副作用是清空自身对应物品。"
+    },
+    {
+      "name": "SwapEquipment",
+      "effect": "与另一实体交换全部或指定装备槽物品，受限装备放入对方物品栏；返回操作是否执行。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含 items/equip/activeitem 存档记录及引用的表，仅序列化 persists 为 true 的物品。"
+    },
+    {
+      "name": "CanTakeItemInSlot",
+      "effect": "检查物品是否满足入容器条件及指定槽位范围、锁定状态，返回布尔。"
+    },
+    {
+      "name": "AcceptsStacks",
+      "effect": "返回 acceptsstacks 标志，表示是否接受堆叠物品。"
+    },
+    {
+      "name": "IgnoresCanGoInContainer",
+      "effect": "返回 ignorescangoincontainer 标志。"
+    },
+    {
+      "name": "IsThiefProof",
+      "effect": "返回 self.thiefproof 的值（源码中未初始化，可能为 nil）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据生成物品并调用 GiveItem/Equip 放入，处理迁移宠物；设置 isloading 标志。"
+    },
+    {
+      "name": "DropActiveItem",
+      "effect": "掉落当前手持物品并置空手持，返回掉落的实体。"
+    },
+    {
+      "name": "ReturnActiveActionItem",
+      "effect": "将指定手持物品强制放回物品栏（忽略满格/溢出限制），并修正缓冲动作所有者信息。"
+    },
+    {
+      "name": "HasAnyEquipment",
+      "effect": "返回 equipslots 是否非空。"
+    },
+    {
+      "name": "IsWearingArmor",
+      "effect": "遍历装备栏，若存在带 armor 组件的物品则返回 true。"
+    },
+    {
+      "name": "ArmorHasTag",
+      "effect": "遍历装备栏，若某装备有 armor 组件且实体含指定 tag 则返回 true。"
+    },
+    {
+      "name": "EquipHasTag",
+      "effect": "遍历装备栏，若任意装备含指定 tag 则返回 true。"
+    },
+    {
+      "name": "EquipHasSpDefenseForType",
+      "effect": "遍历装备栏，若任意装备对指定特殊伤害类型有防御值>0则返回 true。"
+    },
+    {
+      "name": "IsHeavyLifting",
+      "effect": "返回 heavylifting 标志，表示是否装备重型身体物品。"
+    },
+    {
+      "name": "IsFloaterHeld",
+      "effect": "返回 floaterheld 或 false，表示手部是否持浮空物。"
+    },
+    {
+      "name": "ApplyDamage",
+      "effect": "计算装备抗性、护甲吸收比例与特殊伤害防御，对护甲调用 TakeDamage 损耗耐久，返回剩余普通伤害与剩余特殊伤害表。"
+    },
+    {
+      "name": "GetActiveItem",
+      "effect": "返回当前 activeitem 手持物品。"
+    },
+    {
+      "name": "IsItemEquipped",
+      "effect": "若物品在 equipslots 中则返回其槽位名，否则 nil。"
+    },
+    {
+      "name": "SelectActiveItemFromEquipSlot",
+      "effect": "卸下指定装备槽物品并设为手持，旧手持物品尝试放回物品栏。"
+    },
+    {
+      "name": "CombineActiveStackWithSlot",
+      "effect": "将手持可堆叠物品与指定槽位物品合并，支持单件转移或整堆合并。"
+    },
+    {
+      "name": "SelectActiveItemFromSlot",
+      "effect": "从物品槽取出物品设为手持，旧手持放回该槽（若未装备），锁定槽位物品忽略。"
+    },
+    {
+      "name": "ReturnActiveItem",
+      "effect": "将手持物品放回指定槽或物品栏，满则掉落；支持堆叠拆分返回。"
+    },
+    {
+      "name": "GetNumSlots",
+      "effect": "返回 maxslots 物品栏总槽数。"
+    },
+    {
+      "name": "GetItemSlot",
+      "effect": "返回物品在 itemslots 中的槽位号，不存在则 nil。"
+    },
+    {
+      "name": "IsHolding",
+      "effect": "检查物品是否在手持、对应装备槽或物品槽中，可选递归检查容器内部。"
+    },
+    {
+      "name": "FindItem",
+      "effect": "在物品栏、手持、溢出容器中查找首个满足条件的物品并返回。"
+    },
+    {
+      "name": "FindItems",
+      "effect": "收集物品栏、装备、手持及溢出容器中满足条件的所有物品数组。"
+    },
+    {
+      "name": "ForEachItem",
+      "effect": "对物品栏、装备、手持及溢出容器每个物品执行回调。"
+    },
+    {
+      "name": "ForEachWetableItem",
+      "effect": "对物品栏、装备、手持中可能淋湿的物品执行回调。"
+    },
+    {
+      "name": "ForEachEquipment",
+      "effect": "对每件装备物品执行回调。"
+    },
+    {
+      "name": "ForEachItemSlot",
+      "effect": "对每个物品槽中的物品执行回调。"
+    },
+    {
+      "name": "RemoveItemBySlot",
+      "effect": "移除指定物品槽物品并返回该物品实体。"
+    },
+    {
+      "name": "DropItem",
+      "effect": "将物品从所有者移除并生成到世界指定位置或实体位置，触发 dropitem 事件，返回掉落物。"
+    },
+    {
+      "name": "ForceNoInsulated",
+      "effect": "设置 force_no_insulation 标志以覆盖电力绝缘判定。"
+    },
+    {
+      "name": "IsInsulated",
+      "effect": "返回是否绝缘（电力），检查强制标志、装备绝缘组件及外部修饰列表。"
+    },
+    {
+      "name": "GetEquippedItem",
+      "effect": "返回指定装备槽当前物品。"
+    },
+    {
+      "name": "GetItemInSlot",
+      "effect": "返回指定物品槽当前物品。"
+    },
+    {
+      "name": "GetFirstItemInAnySlot",
+      "effect": "返回第一个非空物品槽的物品，无则 nil。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查所有物品槽是否被占用，返回是否满。"
+    },
+    {
+      "name": "GetNextAvailableSlot",
+      "effect": "计算物品可放入的下一个可用槽位及容器（考虑堆叠、溢出、专用容器），返回 slot, container。"
+    },
+    {
+      "name": "CanAcceptCount",
+      "effect": "计算物品栏及溢出容器能接受该物品的最大数量，考虑空格与堆叠余量。"
+    },
+    {
+      "name": "GiveActiveItem",
+      "effect": "将物品设为手持，若原手持非空先返回；触发拾取与 itemget 事件，装备转口袋状态。"
+    },
+    {
+      "name": "GiveItem",
+      "effect": "将物品放入物品栏或溢出/专用容器，处理堆叠、槽位建议、声音、满格事件；可能掉落或置为手持，返回槽位或布尔。"
+    },
+    {
+      "name": "Unequip",
+      "effect": "卸下指定装备槽物品，触发 unequip 事件，重置举重/浮空标志，返回物品。"
+    },
+    {
+      "name": "SetActiveItem",
+      "effect": "设置手持物品并推 newactiveitem 事件；若物品不可入容器则掉落。"
+    },
+    {
+      "name": "Equip",
+      "effect": "将物品装备到对应槽，处理旧装备冲突、举重规则、堆叠拆分，触发 equip 与 setoverflow 事件。"
+    },
+    {
+      "name": "RemoveItem",
+      "effect": "从物品栏/手持/装备/溢出/打开容器移除物品，支持拆分堆叠，返回移除物品。"
+    },
+    {
+      "name": "GetOverflowContainer",
+      "effect": "返回身体装备且可打开的容器组件作为溢出背包，受 ignoreoverflow 影响。"
+    },
+    {
+      "name": "GetSpecializedContainers",
+      "effect": "返回物品栏中标记为专用口袋容器的组件列表，受 ignorespoverflow 影响。"
+    },
+    {
+      "name": "IsSpecializedContainer",
+      "effect": "检查给定容器是否为当前物品栏中的有效专用容器。"
+    },
+    {
+      "name": "Has",
+      "effect": "统计物品栏、手持、溢出等中指定 prefab 数量是否达到 amount，返回布尔与计数。"
+    },
+    {
+      "name": "HasItemThatMatches",
+      "effect": "遍历物品栏与手持统计满足条件函数的物品数量（源码截断，可见部分仅初始累加逻辑）。"
+    }
+  ],
+  "events_published": [
+    "itemlose",
+    "dropitem",
+    "itemget",
+    "gotnewitem",
+    "newactiveitem",
+    "unequip",
+    "equip",
+    "setoverflow",
+    "inventoryfull"
+  ],
+  "events_listened": [
+    "death",
+    "player_despawn"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13698,
+      15225,
+      15235,
+      15239,
+      15560,
+      15718,
+      17929,
+      17994
+    ],
+    "aspects": [
+      {
+        "aspect": "物品堆叠至上限行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "在捡起物品时会优先将物品堆叠至上限"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏槽位数标注",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影仆从拥有 1 格[[物品栏]]"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏空位状态描述",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "如果召唤者物品栏有空位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "背包物品",
+    "装备槽位",
+    "手持物品",
+    "死亡掉落",
+    "护甲吸收",
+    "溢出背包",
+    "物品堆叠",
+    "装备切换"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "truncation_note": "源码在 Inventory:HasItemThatMatches 函数中部截断，本文档仅基于可见部分标注，未包含可能后续定义的方法与完整 HasItemThatMatches 逻辑。",
+  "provenance": {
+    "source_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+    "source_bytes": 91041,
+    "model": "hy3-free",
+    "generated_at_ms": 1787849943564
+  }
+}

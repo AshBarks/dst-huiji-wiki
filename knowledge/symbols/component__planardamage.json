@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/planardamage.lua"
+  },
+  "category": "component",
+  "display_name": "planardamage",
+  "summary": "该组件管理实体的平面伤害数据，包括基础伤害值、外部乘数修饰与附加加值。它参与战斗系统中的伤害计算，为攻击行为提供可扩展的平面伤害修正机制。",
+  "api": [
+    {
+      "name": "SetBaseDamage",
+      "effect": "设置组件的基础伤害数值。行为：将内部 basedamage 字段赋值为参数 damage。副作用：无。"
+    },
+    {
+      "name": "GetBaseDamage",
+      "effect": "返回当前基础伤害数值。行为：返回内部 basedamage 字段。副作用：无。"
+    },
+    {
+      "name": "GetDamage",
+      "effect": "计算并返回最终平面伤害值。行为：返回基于公式 basedamage * externalmultipliers:Get() + externalbonuses:Get() 的计算结果。副作用：无。"
+    },
+    {
+      "name": "AddMultiplier",
+      "effect": "添加伤害乘数修饰符。行为：调用外部乘数列表的 SetModifier 方法，以 src 为来源、mult 为倍率、key 为键进行设置。副作用：修改外部乘数状态，影响后续 GetDamage 结果。"
+    },
+    {
+      "name": "RemoveMultiplier",
+      "effect": "移除伤害乘数修饰符。行为：调用外部乘数列表的 RemoveModifier 方法，移除指定 src 和 key 的修饰符。副作用：修改外部乘数状态。"
+    },
+    {
+      "name": "GetMultiplier",
+      "effect": "获取当前总伤害乘数。行为：返回外部乘数列表的 Get 结果。副作用：无。"
+    },
+    {
+      "name": "AddBonus",
+      "effect": "添加伤害加值修饰符。行为：调用外部加值列表的 SetModifier 方法，以 src 为来源、bonus 为加值、key 为键进行设置。副作用：修改外部加值状态，影响后续 GetDamage 结果。"
+    },
+    {
+      "name": "RemoveBonus",
+      "effect": "移除伤害加值修饰符。行为：调用外部加值列表的 RemoveModifier 方法，移除指定 src 和 key 的修饰符。副作用：修改外部加值状态。"
+    },
+    {
+      "name": "GetBonus",
+      "effect": "获取当前总伤害加值。行为：返回外部加值列表的 Get 结果。副作用：无。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "生成调试字符串。行为：格式化输出包含总伤害、基础伤害、乘数和加值的字符串。副作用：无。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      13156,
+      10374,
+      10379,
+      10355,
+      13437,
+      65422,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "位面伤害数值增加",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "增加 5 点位面伤害和 15 点位面防御"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "平面伤害",
+    "伤害加成",
+    "伤害倍率",
+    "额外伤害",
+    "基础伤害",
+    "总伤计算",
+    "攻击附伤"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+    "source_bytes": 1609,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850440812
+  }
+}

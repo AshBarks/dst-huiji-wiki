@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/cookable.lua"
+  },
+  "category": "component",
+  "display_name": "cookable",
+  "summary": "该组件管理实体的烹饪产物（product）与烹饪后回调（oncooked）数据，并为实体添加“cookable”标签以标识可烹饪性。核心玩法中，当实体被烹饪时，组件会触发回调并生成指定产物，且可能将原实体的腐烂进度按比例继承到产物上。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时由系统调用，移除实体的“cookable”标签。"
+    },
+    {
+      "name": "SetOnCookedFn",
+      "effect": "接收函数 fn 并赋值给 self.oncooked，用于设定烹饪完成时执行的回调，无其它副作用。"
+    },
+    {
+      "name": "Cook",
+      "effect": "执行烹饪逻辑：若 self.oncooked 非空则调用之并传入 (inst, cooker, chef)；若 self.product 非空则生成对应 prefab（若为函数则先调用取得名称），生成成功且原实体与产物均含 perishable 组件且原实体无“smallcreature”标签时，将产物腐烂百分比设为 1 - (1 - 原百分比)*0.5；返回生成的产物实体或 nil。副作用包括可能生成新实体、修改产物腐烂度及执行回调带来的任意影响。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20789,
+      34833,
+      24540,
+      13476,
+      16278,
+      19126,
+      46636,
+      46637
+    ],
+    "aspects": [
+      {
+        "aspect": "烤熟后实体转化叙述",
+        "evidence": [
+          {
+            "pageid": 24540,
+            "quote": "烤熟后会变成熟小鱼块"
+          },
+          {
+            "pageid": 16278,
+            "quote": "如果玩家使用了重复或烤熟的蘑菇，将会烹饪出蔬菜杂烩"
+          }
+        ]
+      },
+      {
+        "aspect": "烹饪与直接烤熟策略对比",
+        "evidence": [
+          {
+            "pageid": 19126,
+            "quote": "建议将生鸟腿做成火鸡正餐而不是直接烤熟食用"
+          }
+        ]
+      },
+      {
+        "aspect": "烹饪后新鲜度计算公式标注",
+        "evidence": [
+          {
+            "pageid": 20789,
+            "quote": "烹饪后的新鲜度 = 原新鲜度 * 0.5 + 0.5"
+          },
+          {
+            "pageid": 34833,
+            "quote": "烹饪后的新鲜度=原新鲜度*0.5+0.5"
+          }
+        ]
+      },
+      {
+        "aspect": "熟食生命与理智增益描述",
+        "evidence": [
+          {
+            "pageid": 20789,
+            "quote": "熟食往往具有更高的生命值和理智值增益"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "可烹饪",
+    "烹饪物",
+    "熟食",
+    "烤熟",
+    "烹饪回调",
+    "产物生成",
+    "腐烂减半",
+    "保鲜继承"
+  ],
+  "gameplay_tags": [
+    "烹饪",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2ae9fb18536e93105b0c0da2376d90c401806ca79d2a6fda87c349af5aec40ed",
+    "source_bytes": 1132,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851025436
+  }
+}

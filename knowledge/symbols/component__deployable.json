@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/deployable.lua"
+  },
+  "category": "component",
+  "display_name": "deployable",
+  "summary": "该组件管理实体能否被部署（放置）的相关数据，包括部署模式、间距、限制标签与网格放置标志。它参与建造、种植、铺地皮、放墙及水域部署等核心玩法，负责校验部署者与目标点的合法性，并在部署时执行回调与推送事件。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件时，将 replica.inventoryitem 的部署模式设为 DEPLOYMODE.NONE、限制标签设为 nil，并移除实体上的 'deployable' 标签。"
+    },
+    {
+      "name": "SetDeployMode",
+      "effect": "设置 self.mode 为传入值，并通过属性监听调用 replica.inventoryitem:SetDeployMode 同步至客户端。"
+    },
+    {
+      "name": "GetDeployMode",
+      "effect": "返回 self.mode 当前值。"
+    },
+    {
+      "name": "SetDeploySpacing",
+      "effect": "设置 self.spacing 为传入值，并通过属性监听调用 replica.inventoryitem:SetDeploySpacing 同步至客户端。"
+    },
+    {
+      "name": "SetUseGridPlacer",
+      "effect": "设置 self.usegridplacer 为传入值或 nil，并通过属性监听调用 replica.inventoryitem:SetUseGridPlacer 同步至客户端。"
+    },
+    {
+      "name": "DeploySpacingRadius",
+      "effect": "返回查表 DEPLOYSPACING_RADIUS[self.spacing] 得到的间距半径数值。"
+    },
+    {
+      "name": "SetDeployTossSymbolOverride",
+      "effect": "设置 self.deploytoss_symbol_override 为传入的 data，用于部署投掷动画的符号覆盖。"
+    },
+    {
+      "name": "IsDeployable",
+      "effect": "根据 restrictedtag 检查部署者标签；若部署者骑马则仅当实体有 complexprojectile 组件时返回 true；若部署者持浮物则仅当实体有 boatbuilder 标签时返回 true；否则返回 true。返回布尔值。"
+    },
+    {
+      "name": "CanDeploy",
+      "effect": "先调用 IsDeployable 检查，若否返回 false；否则依据 self.mode 调用 TheWorld.Map 对应的点位检测函数（如 CanDeployAtPoint 等）检测目标点 pt 是否可部署，返回布尔值。"
+    },
+    {
+      "name": "Deploy",
+      "effect": "以 mouseover 为 nil 调用 CanDeploy 检测，若失败返回 false 及原因；若成功则记录是否为植物标签，调用 self.ondeploy 回调（若存在），向 deployer 推送 'deployitem' 事件，若原为植物则向 TheWorld 推送 'itemplanted' 事件，最后返回 true。"
+    }
+  ],
+  "events_published": [
+    "deployitem",
+    "itemplanted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21416,
+      70494,
+      19761,
+      28596,
+      34523,
+      39556,
+      57028,
+      21620
+    ],
+    "aspects": [
+      {
+        "aspect": "可部署物品标注",
+        "evidence": [
+          {
+            "pageid": 57028,
+            "quote": "{{单机版|犬牙陷阱}}和{{单机版|蜜蜂地雷}}现在是“可部署”物品"
+          }
+        ]
+      },
+      {
+        "aspect": "部署放置间距限制描述",
+        "evidence": [
+          {
+            "pageid": 57028,
+            "quote": "不能再通过丢弃的方式将它们放置得过于紧密"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "可部署",
+    "放置模式",
+    "部署间距",
+    "限制标签",
+    "网格放置",
+    "骑马投掷",
+    "水上建造",
+    "种植物",
+    "放墙",
+    "铺地皮"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "种植"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+    "source_bytes": 4723,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850535457
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/stackable.lua"
+  },
+  "category": "component",
+  "display_name": "stackable",
+  "summary": "该组件管理物品的当前堆叠数量与最大堆叠上限，支持临时忽略上限以允许超量堆叠。它参与物品合并、拆分与部分取出等核心库存交互，并与易腐、可食用等组件联动处理属性稀释。",
+  "api": [
+    {
+      "name": "SetIgnoreMaxSize",
+      "effect": "若 ignoremaxsize 为 true 且当前 maxsize 不为无穷，则将原 maxsize 存入 originalmaxsize，设 maxsize 为 math.huge，并通知 replica 忽略最大尺寸；若 false 且存在 originalmaxsize，则恢复 maxsize 并清除 originalmaxsize，通知 replica 取消忽略。修改内部状态并同步至 replica。"
+    },
+    {
+      "name": "IsStack",
+      "effect": "返回 stacksize > 1 的布尔值，无副作用。"
+    },
+    {
+      "name": "StackSize",
+      "effect": "返回当前 stacksize 数值，无副作用。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "返回 stacksize >= maxsize 的布尔值，无副作用。"
+    },
+    {
+      "name": "IsOverStacked",
+      "effect": "返回 stacksize > (originalmaxsize or maxsize) 的布尔值，无副作用。"
+    },
+    {
+      "name": "CanStackWith",
+      "effect": "检查自身与 item 的 prefab、skinname 是否相同，并执行可选的 inst.stackable_CanStackWithFn 回调，返回是否可堆叠的布尔值，无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 stacksize 不等于 1，返回包含 stack 字段的表用于存档，否则返回 nil，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "将 stacksize 设为 data.stack 与 MAXUINT 的最小值，并推送 \"stacksizechange\" 事件（旧大小为1），修改堆叠数量并触发事件。"
+    },
+    {
+      "name": "SetOnDeStack",
+      "effect": "设置 self.ondestack 回调函数为 fn，用于 Get 拆分时调用，无立即副作用。"
+    },
+    {
+      "name": "SetStackSize",
+      "effect": "记录原 stacksize，将 stacksize 设为 sz 与 MAXUINT 的最小值，推送 \"stacksizechange\" 事件（含新 sz 与旧大小），修改堆叠数量并触发事件。"
+    },
+    {
+      "name": "Get",
+      "effect": "默认取出1个。若当前 stacksize 大于取出数，则生成同 prefab 新实例，减少自身堆叠，设置新实例堆叠，调用 ondestack 回调，并复制 perishable、curseditem、rechargeable、inventoryitem 等组件相关属性，返回新实例；否则返回自身。副作用包括可能生成实体、修改自身与其他组件数据。"
+    },
+    {
+      "name": "RoomLeft",
+      "effect": "返回 maxsize - stacksize 的数值，无副作用。"
+    },
+    {
+      "name": "Put",
+      "effect": "断言 item 非自身，若 CanStackWith 则合并堆叠：计算新增数量，稀释自身 perishable/inventoryitem/edible/curseditem 属性，若未超限则移除 item，否则调整 item 堆叠大小并推送其 \"stacksizechange\" 事件，最后更新自身堆叠并推送自身 \"stacksizechange\" 事件，返回剩余 item 或 nil。副作用：修改双方堆叠与关联组件数据，可能移除实体，推送事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回描述堆叠状态与最大尺寸的调试字符串，无副作用。"
+    }
+  ],
+  "events_published": [
+    "stacksizechange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.STACK_SIZE_MEDITEM"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19129,
+      22552,
+      72441,
+      34096,
+      15011,
+      15012,
+      15225,
+      20042
+    ],
+    "aspects": [
+      {
+        "aspect": "可堆叠物品描述",
+        "evidence": [
+          {
+            "pageid": 22552,
+            "quote": "其中的可堆叠"
+          }
+        ]
+      },
+      {
+        "aspect": "堆叠数量效果联动",
+        "evidence": [
+          {
+            "pageid": 19129,
+            "quote": "冰的堆叠数量"
+          },
+          {
+            "pageid": 20042,
+            "quote": "2×堆叠数量 棵"
+          }
+        ]
+      },
+      {
+        "aspect": "堆叠至上限行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "优先将物品堆叠至上限"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "堆叠数量",
+    "合并物品",
+    "拆分堆叠",
+    "最大堆叠",
+    "忽略上限",
+    "剩余空间",
+    "物品堆",
+    "超量堆叠"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+    "source_bytes": 6919,
+    "model": "hy3-free",
+    "generated_at_ms": 1787848141364
+  }
+}

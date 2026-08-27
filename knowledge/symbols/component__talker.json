@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/talker.lua"
+  },
+  "category": "component",
+  "display_name": "talker",
+  "summary": "组件 Talker 管理实体说话时的跟随文本控件、忽略来源表、聊天网络变量及说话线程任务等数据。其核心玩法包括让实体通过头顶气泡显示对话文本并广播到网络，支持 Chatter 功能与战斗呼喊、ChattyNode 配合实现 NPC 台词。组件允许实体忽略交谈或强制静音，参与生存交流与社会互动。",
+  "api": [
+    {
+      "name": "SetOffsetFn",
+      "effect": "设置 self.offset_fn 为传入函数，用于动态计算说话气泡的偏移量，无副作用。"
+    },
+    {
+      "name": "MakeChatter",
+      "effect": "若 self.chatter 为空，则创建包含多个网络变量的 chatter 表；在非主模拟时监听 'chatterdirty' 事件以触发本地文本显示。副作用：注册网络变量与事件监听。"
+    },
+    {
+      "name": "Chatter",
+      "effect": "仅在主模拟有效。设置 chatter 网络变量（字符串表、ID、时间、强制文本、聊天回显优先级），取消旧任务并安排新取消任务，立即调用 OnChatterDirty 触发说话与可能的聊天回显。副作用：修改网络变量，可能广播聊天消息。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除 'chatterdirty' 事件监听，主模拟下移除 'ignoretalking' 标签，并调用 ShutUp 取消当前说话。副作用：清理事件与标签。"
+    },
+    {
+      "name": "IgnoreAll",
+      "effect": "将来源加入 ignoring 表，若表原为空则在主模拟下给实体添加 'ignoretalking' 标签。副作用：实体可能被标记为忽略交谈。"
+    },
+    {
+      "name": "StopIgnoringAll",
+      "effect": "将来源从 ignoring 表移除，若表空则清除表并在主模拟移除 'ignoretalking' 标签。副作用：可能恢复交谈能力。"
+    },
+    {
+      "name": "Say",
+      "effect": "核心说话方法。若世界禁用语音或实体处于忽略/死亡/睡眠（非强制）则返回；取消当前说话，将脚本转为行表并启动线程显示跟随文本、广播网络说话、触发 ontalk 事件与 donetalking 事件。副作用：创建 widget、调用 TheNet:Talker 广播、推送事件。"
+    },
+    {
+      "name": "ShutUp",
+      "effect": "取消当前说话（销毁 widget、杀线程、推事件），若主模拟且存在 chatter 则清空 strtbl 网络变量并取消 chatter 任务。副作用：停止所有说话表现。"
+    },
+    {
+      "name": "IsTalking",
+      "effect": "返回 self.task 是否非空，指示实体当前是否正在说话线程中。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "等价于 CancelSay，移除 widget 并杀掉说话线程任务，触发 donetalking 事件。副作用：强制中断说话。"
+    }
+  ],
+  "events_published": [
+    "ontalk",
+    "donetalking"
+  ],
+  "events_listened": [
+    "chatterdirty"
+  ],
+  "netvars": [
+    "talker.chatter.strtbl",
+    "talker.chatter.strid",
+    "talker.chatter.strtime",
+    "talker.chatter.forcetext",
+    "talker.chatter.echotochatpriority"
+  ],
+  "tunables": [
+    "TUNING.DEFAULT_TALKER_DURATION",
+    "TUNING.MAX_TALKER_DURATION"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18790,
+      50964,
+      53085,
+      45135,
+      19110,
+      22383,
+      15239,
+      21432
+    ],
+    "aspects": [
+      {
+        "aspect": "与角色对话目的描述",
+        "evidence": [
+          {
+            "pageid": 50964,
+            "quote": "可能是用于在冒险模式与角色对话"
+          },
+          {
+            "pageid": 53085,
+            "quote": "可能是在冒险模式时与角色对话"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "说话气泡",
+    "角色对话",
+    "npc喊话",
+    "忽略说话",
+    "头顶文字",
+    "战斗呼喊",
+    "聊天广播",
+    "跟随文本"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+    "source_bytes": 11071,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850972918
+  }
+}

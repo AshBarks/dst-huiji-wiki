@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/colouradder.lua"
+  },
+  "category": "component",
+  "display_name": "colouradder",
+  "summary": "该组件管理一个颜色来源栈与子实体列表，通过计算栈中所有来源颜色的累加值得到当前附加颜色。它参与实体视觉表现的核心玩法，将叠加后的颜色应用到自身动画状态或同步组件，并可传递给绑定的子物体实现统一染色。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "遍历 colourstack 与 children，移除所有相关的 'onremove' 事件监听，并对 children 中拥有 colouradder 组件的实体调用 PopColour 移除自身颜色贡献。副作用：清除事件回调，可能改变子实体颜色。"
+    },
+    {
+      "name": "AttachChild",
+      "effect": "若 child 不在 children 中，记录并监听其 'onremove' 事件，并立即将自身当前颜色推送给 child（根据其 colouradder/colouraddersync/AnimState 情况调用对应方法）。副作用：注册事件监听，立即改变 child 的附加颜色。"
+    },
+    {
+      "name": "DetachChild",
+      "effect": "若 child 在 children 中，移除对其 'onremove' 事件的监听并从表移除，若 child 有 colouradder 则调用其 PopColour 撤销贡献。副作用：注销监听，可能改变 child 颜色。"
+    },
+    {
+      "name": "GetCurrentColour",
+      "effect": "返回 self.colour 中存储的当前四个颜色分量（r,g,b,a）。无副作用。"
+    },
+    {
+      "name": "CalculateCurrentColour",
+      "effect": "遍历 colourstack 中所有来源颜色累加，将每个分量 clamp 到 [0,1] 后返回。无副作用。"
+    },
+    {
+      "name": "OnSetColour",
+      "effect": "更新 self.colour 为给定值，若自身有 colouraddersync 则 SyncColour 否则若自身 AnimState 则 SetAddColour，并遍历 children 传递颜色。副作用：改变自身及子实体的附加颜色表现。"
+    },
+    {
+      "name": "PushColour",
+      "effect": "若参数有效，全零时转 PopColour；否则在 colourstack 新建或更新来源颜色，若来源是实体则监听其 'onremove'，重算颜色变化则调用 OnSetColour 应用。副作用：可能注册监听，改变自身及子实体颜色。"
+    },
+    {
+      "name": "PopColour",
+      "effect": "移除指定来源的颜色贡献，若来源是实体则移除监听，重算颜色变化则调用 OnSetColour 应用。副作用：注销监听，改变颜色。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "格式化返回当前颜色及栈中所有来源颜色的字符串。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15526,
+      71461,
+      72299,
+      15169,
+      16250,
+      35409,
+      65505,
+      70854
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均讨论实体绑定解除或洞穴光照RGB减半，无任何与colouradder组件能力（子节点附加分离、推弹颜色、获取计算设置颜色、移除回调、调试字符串）相关的表述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "颜色叠加",
+    "附加颜色",
+    "子物染色",
+    "解除绑定",
+    "当前色值",
+    "计算颜色",
+    "同步着色",
+    "动画染色",
+    "调试信息"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
+    "source_bytes": 4562,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851123623
+  }
+}

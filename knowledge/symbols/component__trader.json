@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/trader.lua"
+  },
+  "category": "component",
+  "display_name": "trader",
+  "summary": "该组件管理实体作为交易对象的状态，包括启用开关、是否接受非可交易物品与堆叠、以及接受测试与回调函数的引用。它参与玩家给予物品的核心玩法，判定实体能否及是否愿意接受礼物，并在接受或拒绝时触发相应回调与事件。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体上的 \"trader\" 和 \"alltrader\" 标签，无其他副作用。"
+    },
+    {
+      "name": "IsTryingToTradeWithMe",
+      "effect": "传入一个实体 inst，检查该实体是否正试图与本组件实体交易（其缓冲动作或远程交互的目标为本实体且动作为 GIVE、GIVEALLTOPLAYER 或 GIVETOPLAYER）。返回布尔值。"
+    },
+    {
+      "name": "IsAcceptingStacks",
+      "effect": "返回 self.acceptstacks 的值，指示实体是否被设置为接受堆叠物品。"
+    },
+    {
+      "name": "Enable",
+      "effect": "设置 self.enabled 为 true，触发属性监听函数，为实体添加 \"trader\" 标签；若 acceptnontradable 为 true 则同时添加 \"alltrader\" 标签。"
+    },
+    {
+      "name": "Disable",
+      "effect": "设置 self.enabled 为 false，触发属性监听函数，为实体移除 \"trader\" 标签；若 acceptnontradable 为 true 则同时移除 \"alltrader\" 标签。"
+    },
+    {
+      "name": "SetAcceptTest",
+      "effect": "设置 self.test 为给定函数 fn，该函数将在 WantsToAccept 中用于判定实体是否愿意接受物品的意愿测试。"
+    },
+    {
+      "name": "SetAbleToAcceptTest",
+      "effect": "设置 self.abletoaccepttest 为给定函数 fn，用于覆盖 AbleToAccept 中的物理接受能力测试，可返回自定义失败原因字符串。"
+    },
+    {
+      "name": "SetOnAccept",
+      "effect": "设置 self.onaccept 为给定回调函数 fn，在成功接受礼物后调用，传入本实体、给予者、物品和数量。"
+    },
+    {
+      "name": "SetOnRefuse",
+      "effect": "设置 self.onrefuse 为给定回调函数 fn，在拒绝礼物时调用，传入本实体、给予者和物品。"
+    },
+    {
+      "name": "SetAcceptStacks",
+      "effect": "设置 self.acceptstacks 为 true，使实体能够接受堆叠物品（IsAcceptingStacks 将返回 true）。"
+    },
+    {
+      "name": "AbleToAccept",
+      "effect": "判定实体物理上能否接受物品。检查 enabled、item 非 nil；若未设置 acceptsmimics 且物品为 itemmimic 则返回 false,\"ITEMMIMIC\"；若设置了 abletoaccepttest 则调用它；若实体死亡返回 false,\"DEAD\"；若实体睡眠或忙碌（且不在物品栏中）返回 false,\"SLEEPING\" 或 \"BUSY\"。成功返回 true，否则返回 false 及原因。"
+    },
+    {
+      "name": "WantsToAccept",
+      "effect": "判定实体是否想要接受物品。要求 enabled 为 true 且（未设置 test 或 test 函数返回真）。返回布尔值，不触发回调。"
+    },
+    {
+      "name": "AcceptGift",
+      "effect": "核心交易方法。若 AbleToAccept 失败直接返回 false；若 WantsToAccept 失败则调用 onrefuse 回调并返回 false。若成功：处理物品（堆叠超出则取部分，否则从原所有者移除），若 deleteitemonaccept 则删除物品否则放入实体背包；调用 onaccept 回调；推送 \"trade\" 事件（含 giver 和 item）；返回 true。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回表示 enabled 状态的字符串 \"true\" 或 \"false\"。"
+    }
+  ],
+  "events_published": [
+    "trade"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      34915,
+      34990,
+      39684,
+      39685,
+      51559,
+      53023,
+      65693
+    ],
+    "aspects": [
+      {
+        "aspect": "拒绝交易行为描述",
+        "evidence": [
+          {
+            "pageid": 34990,
+            "quote": "拒绝交易（给予错误的物品）"
+          },
+          {
+            "pageid": 39684,
+            "quote": "他们会拒绝交易"
+          },
+          {
+            "pageid": 39685,
+            "quote": "他们会拒绝交易"
+          }
+        ]
+      },
+      {
+        "aspect": "给予物品接受描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "给予物品时"
+          },
+          {
+            "pageid": 34915,
+            "quote": "给予物品"
+          },
+          {
+            "pageid": 51559,
+            "quote": "给予物品时"
+          },
+          {
+            "pageid": 53023,
+            "quote": "给予物品"
+          },
+          {
+            "pageid": 65693,
+            "quote": "给予物品不会消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "交易对象",
+    "给予物品",
+    "接受礼物",
+    "拒绝交易",
+    "交易标签",
+    "全交易",
+    "物品删除",
+    "交易回调"
+  ],
+  "gameplay_tags": [
+    "交易",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+    "source_bytes": 4814,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850057519
+  }
+}

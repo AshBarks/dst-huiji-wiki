@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/sanityaura.lua"
+  },
+  "category": "component",
+  "display_name": "sanityaura",
+  "summary": "该组件管理实体的精神光环数值与衰减参数，并为实体添加“sanityaura”标签。它根据观察者距离动态计算对玩家精神值的影响，参与生存玩法中的理智维持机制。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除实体上的 'sanityaura' 标签，无返回值。"
+    },
+    {
+      "name": "GetBaseAura",
+      "effect": "返回无距离衰减的基础光环值：若 self.aurafn 为 nil 则返回 self.aura，否则返回 self.aurafn(self.inst, observer) 的调用结果。"
+    },
+    {
+      "name": "SetBaseAuraName",
+      "effect": "设置 self.baseauraname 字段，用于标记同源光环以便合并计算（假设同名光环量级相同）。"
+    },
+    {
+      "name": "GetAura",
+      "effect": "计算考虑距离与衰减后的光环值。获取观察者到实体的距离平方，若超过 self.max_distsq 或默认的 SANITY_EFFECT_RANGE_SQ 则返回 0；否则返回基础光环值除以衰减函数 self.fallofffn(self.inst, observer, distsq) 或 math.max(1, distsq) 的结果。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51775,
+      51639,
+      70494,
+      13437,
+      51640,
+      65737,
+      13701,
+      18234
+    ],
+    "aspects": [
+      {
+        "aspect": "精神光环名称标注",
+        "evidence": [
+          {
+            "pageid": 65737,
+            "quote": "尸体的负面精神光环"
+          }
+        ]
+      },
+      {
+        "aspect": "精神光环数值标注",
+        "evidence": [
+          {
+            "pageid": 65737,
+            "quote": "格罗姆的负面光环为大量"
+          },
+          {
+            "pageid": 13437,
+            "quote": "半径为 4、+10理智值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "精神光环",
+    "理智影响",
+    "距离衰减",
+    "光环范围",
+    "基础光环",
+    "观察者",
+    "精神值",
+    "光环叠加"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+    "source_bytes": 1141,
+    "model": "hy3-free",
+    "generated_at_ms": 1787848932332
+  }
+}

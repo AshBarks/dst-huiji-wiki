@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerprox.lua"
+  },
+  "category": "component",
+  "display_name": "playerprox",
+  "summary": "该组件管理实体与玩家之间的距离检测数据（近/远阈值、目标模式、当前是否接近等），并周期性检查玩家位置。核心玩法是通过回调函数在玩家进入或离开指定范围时触发逻辑，支持全体/任意/特定/锁定玩家等多种追踪模式，常用于怪物觉醒、机关触发等依赖玩家临近的交互。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回基于 self.isclose 的字符串 'NEAR' 或 'FAR'。"
+    },
+    {
+      "name": "SetOnPlayerNear",
+      "effect": "设置玩家靠近时的回调函数 self.onnear 为传入的 fn，覆盖原有值。"
+    },
+    {
+      "name": "SetOnPlayerFar",
+      "effect": "设置玩家远离时的回调函数 self.onfar 为传入的 fn，覆盖原有值。"
+    },
+    {
+      "name": "IsPlayerClose",
+      "effect": "返回 self.isclose 布尔值，表示当前是否有玩家在近距离内。"
+    },
+    {
+      "name": "SetDist",
+      "effect": "设置 self.near 和 self.far 距离阈值，影响后续检测逻辑。"
+    },
+    {
+      "name": "SetLostTargetFn",
+      "effect": "设置目标丢失时的回调函数 self.losttargetfn 为 func，覆盖原有值。"
+    },
+    {
+      "name": "SetPlayerAliveMode",
+      "effect": "设置 self.alivemode，指定检测时过滤玩家的存活状态（AliveOnly/DeadOnly/DeadOrAlive）。"
+    },
+    {
+      "name": "Schedule",
+      "effect": "若提供 new_period 则更新 self.period；停止现有周期任务并启动新的 DoPeriodicTask 以 self.targetmode 为周期函数，副作用是重启检测任务。"
+    },
+    {
+      "name": "ForceUpdate",
+      "effect": "若任务和目标模式存在，立即调用一次 self.targetmode(inst, self) 执行检测，可能触发 onnear/onfar 回调。"
+    },
+    {
+      "name": "Stop",
+      "effect": "取消当前周期任务 self.task 并置 nil，停止检测。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "调用 Schedule() 启动周期任务，随后 ForceUpdate() 立即检测一次。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "调用 ForceUpdate() 立即检测一次，随后 Stop() 停止周期任务。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "等同于 Stop()，移除组件时取消周期任务。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "等同于 Stop()，从实体移除组件时取消周期任务。"
+    },
+    {
+      "name": "SetTargetMode",
+      "effect": "若 not override 则记录 self.originaltargetmode = mode；设置 self.targetmode = mode；调用 SetTarget(target) 设置目标（若 mode 为 SpecificPlayer 则断言 target 非 nil）；调用 Schedule() 重启任务。副作用：切换检测模式并重启周期检测。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "若原有 self.target 非 nil 则移除其 'onremove' 事件监听；设置 self.target = target；若新 target 非 nil 则监听其 'onremove' 事件以触发 _ontargetleft 回调。副作用：切换目标并管理事件监听。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13698,
+      15054,
+      15402,
+      18232,
+      65697,
+      13874,
+      13897,
+      14344
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家靠近触发实体行为描述",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "邪天翁因玩家靠近而生成概率由 25% 提升至 50%"
+          },
+          {
+            "pageid": 15054,
+            "quote": "升级前的天体宝球也会在玩家靠近时发出微弱的“光芒”"
+          },
+          {
+            "pageid": 15402,
+            "quote": "玩家靠近时，海象会站在玩家一定距离处看着玩家"
+          },
+          {
+            "pageid": 18232,
+            "quote": "如果玩家靠近远古哨所 6 距离单位以内，安保脉冲便离开哨所"
+          },
+          {
+            "pageid": 65697,
+            "quote": "当玩家靠近水晶冠秃鹫的“食物”时，水晶冠秃鹫会尝试攻击玩家"
+          },
+          {
+            "pageid": 13874,
+            "quote": "一旦玩家靠近，企鸥就会冲过去把蛋藏在自己身上"
+          },
+          {
+            "pageid": 14344,
+            "quote": "这些吊灯会在玩家靠近时发光"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家靠近距离阈值数值标注",
+        "evidence": [
+          {
+            "pageid": 18232,
+            "quote": "如果玩家靠近远古哨所 6 距离单位以内"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "玩家靠近",
+    "远离触发",
+    "范围检测",
+    "附近玩家",
+    "锁定玩家",
+    "失去目标",
+    "周期检测",
+    "距离远近"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
+    "source_bytes": 6855,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851775816
+  }
+}

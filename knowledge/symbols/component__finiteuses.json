@@ -1,0 +1,185 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/finiteuses.lua"
+  },
+  "category": "component",
+  "display_name": "finiteuses",
+  "summary": "该组件管理实体的有限使用次数（耐久），记录总次数与当前剩余次数，并支持按动作定义消耗速率。它参与工具消耗、修理与战斗耐久损失豁免等玩法，在用量耗尽时触发完成回调与标签变更。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，移除实体上的 'usesdepleted' 标签。"
+    },
+    {
+      "name": "SetConsumption",
+      "effect": "在 consumption 表中设置指定动作对应的消耗次数；若动作为 ACTIONS.MINE，则同时设置 ACTIONS.REMOVELUNARBUILDUP 消耗为相同值。修改内部数据。"
+    },
+    {
+      "name": "ClearAllConsumptions",
+      "effect": "将 consumption 表清空为新空表，清除所有动作消耗设置。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化字符串，显示当前次数与总次数（如 '100.00/100'），无副作用。"
+    },
+    {
+      "name": "SetDoesNotStartFull",
+      "effect": "设置 doesnotstartfull 标记，改变存档时是否默认满耐久的假设。仅赋值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若当前次数不等于总次数或 doesnotstartfull 为真，返回包含 uses 字段的存档表，否则返回 nil。无状态修改。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "若载入数据包含 uses 字段，则调用 SetUses 设置当前次数，从而可能触发事件与标签变更。"
+    },
+    {
+      "name": "SetMaxUses",
+      "effect": "设置 total 值为传入参数，并因属性监听触发 onfiniteuses 更新关联修复组件（repairable/forgerepairable）的可修复状态。"
+    },
+    {
+      "name": "SetUses",
+      "effect": "设置 current 为给定值；推送 'percentusedchange' 事件并附带百分比；若结果小于等于0则置0，若之前为正则添加 'usesdepleted' 标签并调用 onfinished 回调；若之前非正且新值为正则移除标签。修改状态并可能触发回调。"
+    },
+    {
+      "name": "GetUses",
+      "effect": "返回当前剩余次数 current，无副作用。"
+    },
+    {
+      "name": "Use",
+      "effect": "默认消耗1次或指定次数，调用 SetUses 减少当前次数，副作用同 SetUses。"
+    },
+    {
+      "name": "IgnoresCombatDurabilityLoss",
+      "effect": "返回 ignorecombatdurabilityloss 布尔值，表示是否忽略战斗耐久损失。"
+    },
+    {
+      "name": "SetIgnoreCombatDurabilityLoss",
+      "effect": "设置 ignorecombatdurabilityloss 的值，仅内部赋值。"
+    },
+    {
+      "name": "SetModifyUseConsumption",
+      "effect": "设置 modifyuseconsumption 函数，供 OnUsedAsItem 消耗前调整用量。"
+    },
+    {
+      "name": "OnUsedAsItem",
+      "effect": "根据动作从 consumption 获取基础消耗；若使用者有 efficientuser 组件则乘效率倍数；若设置了 modifyuseconsumption 则调用其调整；最后调用 Use 实际消耗。可能减少耐久。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回 current 除以 total 的比例值，无副作用。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "根据比例计算次数并调用 SetUses，副作用同 SetUses。"
+    },
+    {
+      "name": "SetOnFinished",
+      "effect": "设置 onfinished 回调函数，在耐久耗尽时被执行。"
+    },
+    {
+      "name": "Repair",
+      "effect": "调用 SetUses 将当前次数增加修复值但不超过总次数，副作用同 SetUses。"
+    }
+  ],
+  "events_published": [
+    "percentusedchange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      21620,
+      15903,
+      70494,
+      18216,
+      21485,
+      35121,
+      24866
+    ],
+    "aspects": [
+      {
+        "aspect": "使用行为消耗耐久描述",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "阅读书籍会消耗书籍的耐久度"
+          },
+          {
+            "pageid": 15903,
+            "quote": "基础耐久消耗为 0.8，每举重一次消耗一倍耐久"
+          },
+          {
+            "pageid": 24866,
+            "quote": "攻击消耗 1 耐久，砍伐消耗 1 耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "差异化动作耐久消耗",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "近战攻击消耗 2 倍耐久，投掷攻击消耗 10 倍耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "最大耐久数值标注",
+        "evidence": [
+          {
+            "pageid": 24866,
+            "quote": "劣质工具的耐久为 50 点"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久百分比消耗标注",
+        "evidence": [
+          {
+            "pageid": 35121,
+            "quote": "每次阅读消耗 33.4% 的耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久自动回复机制",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "放入书柜的书籍会以每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "耐久度",
+    "使用次数",
+    "修理",
+    "耗尽",
+    "消耗",
+    "战斗无损",
+    "百分比",
+    "用量存档"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
+    "source_bytes": 3243,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850267638
+  }
+}

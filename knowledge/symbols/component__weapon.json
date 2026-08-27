@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/weapon.lua"
+  },
+  "category": "component",
+  "display_name": "weapon",
+  "summary": "Weapon 组件管理实体的武器属性，包括伤害、攻击范围、远程抛射物与攻击回调等数据。它参与核心战斗玩法，负责计算攻击伤害与特殊伤害，处理近战与远程攻击流程，并联动物品耐久消耗与事件推送。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除实体上的 'weapon' 标签，若 replica.inventoryitem 存在则将其攻击范围设为 -1。"
+    },
+    {
+      "name": "SetDamage",
+      "effect": "设置组件内部 damage 属性为传入的 dmg，影响后续 GetDamage 计算的基础伤害。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "设置 attackrange 为 attack，hitrange 为 hit 或默认 attack；因属性监听会同步更新 replica.inventoryitem 的攻击范围。"
+    },
+    {
+      "name": "SetOnAttack",
+      "effect": "设置 onattack 回调函数，在 OnAttack 被调用时触发。"
+    },
+    {
+      "name": "SetOnProjectileLaunch",
+      "effect": "设置 onprojectilelaunch 回调函数，在 LaunchProjectile 生成抛射物前触发。"
+    },
+    {
+      "name": "SetOnProjectileLaunched",
+      "effect": "设置 onprojectilelaunched 回调函数，在 LaunchProjectile 生成抛射物后触发。"
+    },
+    {
+      "name": "SetProjectile",
+      "effect": "设置 projectile 预制体名称，使 CanRangedAttack 返回 true 以启用远程攻击。"
+    },
+    {
+      "name": "SetProjectileOffset",
+      "effect": "设置 projectile_offset，影响远程抛射物生成时相对于攻击者的偏移坐标。"
+    },
+    {
+      "name": "SetElectric",
+      "effect": "将 stimuli 设为 'electric'，并存储 electric_damage_mult 与 electric_wet_damage_mult 用于电击相关伤害修正。"
+    },
+    {
+      "name": "SetOverrideStimuliFn",
+      "effect": "设置 overridestimulifn 函数，用于外部覆盖 stimuli 判定逻辑。"
+    },
+    {
+      "name": "CanRangedAttack",
+      "effect": "返回 projectile 是否非空，指示该武器能否进行远程攻击。"
+    },
+    {
+      "name": "SetAttackCallback",
+      "effect": "废弃方法，同 SetOnAttack，设置 onattack 回调函数。"
+    },
+    {
+      "name": "GetDamage",
+      "effect": "计算并返回基础伤害与特殊伤害表；会应用 damagetypebonus 组件的倍数修正（若存在），返回 dmg, spdmg。"
+    },
+    {
+      "name": "OnAttack",
+      "effect": "调用 onattack 回调（若有），推送 'weapononattack' 事件；若实体有 finiteuses 组件且未忽略战斗耐久损耗，且非弹射抛射物，则根据 attackwear 与攻击磨损乘数消耗耐久，攻击者高效用户乘数也生效。"
+    },
+    {
+      "name": "LaunchProjectile",
+      "effect": "若 projectile 非空，先调用 onprojectilelaunch 回调，生成抛射物预制体并依据 projectile_offset 或攻击者位置设置坐标，通过 projectile 或 complexprojectile 组件投掷/发射（支持 projectiledelay 延迟可见），最后调用 onprojectilelaunched 回调。"
+    },
+    {
+      "name": "EnableToughFight",
+      "effect": "设置 tough 标志（默认 true），用于 CanDoToughFight 判定。"
+    },
+    {
+      "name": "CanDoToughFight",
+      "effect": "返回 tough 是否为 true，指示是否可进行坚韧战斗。"
+    }
+  ],
+  "events_published": [
+    "weapononattack"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      15022,
+      15651,
+      13379,
+      13482,
+      13828,
+      65422,
+      13897
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击范围数值标注",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "|攻击范围=3.5"
+          },
+          {
+            "pageid": 15651,
+            "quote": "|攻击范围 = 4（暴怒时6）"
+          },
+          {
+            "pageid": 13828,
+            "quote": "|攻击范围= 2.3 / 3.91 / 5.75"
+          },
+          {
+            "pageid": 13897,
+            "quote": "|攻击范围 = 3<br>4.2（狂暴）"
+          },
+          {
+            "pageid": 20150,
+            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+          },
+          {
+            "pageid": 65422,
+            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+          }
+        ]
+      },
+      {
+        "aspect": "武器伤害概念提及",
+        "evidence": [
+          {
+            "pageid": 65422,
+            "quote": "基础伤害：实体自身的伤害或武器伤害或骑乘皮弗娄牛伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "武器伤害",
+    "攻击范围",
+    "远程抛射",
+    "耐久损耗",
+    "电击加成",
+    "攻击回调",
+    "伤害类型",
+    "战斗标签",
+    "投掷物体",
+    "坚韧战斗"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+    "source_bytes": 5049,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850169927
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/pickable.lua"
+  },
+  "category": "component",
+  "display_name": "pickable",
+  "summary": "该组件管理实体可否被采摘、采摘产物、再生时间及采摘周期等数据。它参与核心的采集与农业玩法，支持采摘、再生、贫瘠、施肥、移植与计时暂停等逻辑，并通过标签与交互及枯萎系统联动。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "若计时任务存在则取消；移除实体上的 'pickable'、'barren'、'quickpick'、'jostlepick' 标签。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "当未暂停、有目标时间且实体无 'withered' 标签时，根据是否使用外部计时器调整再生计时（取消原任务并按剩余时间重新调度或立即再生，应用春季生长修正）。"
+    },
+    {
+      "name": "IsWildfireStarter",
+      "effect": "返回 wildfirestarter 为 true 或实体带有 'withered' 标签的结果。"
+    },
+    {
+      "name": "FinishGrowing",
+      "effect": "若未使用外部计时器且任务存在且当前不可采摘且无枯萎标签，则取消任务并调用 Regen 返回 true；使用外部计时器时类似判断并停止计时后 Regen 返回 true；否则返回 false。"
+    },
+    {
+      "name": "Resume",
+      "effect": "恢复暂停的再生计时：清除暂停状态，若未可采摘且未贫瘠，则根据暂停时间重建计时任务或调用 MakeEmpty（外部计时器时恢复外部计时）。"
+    },
+    {
+      "name": "Pause",
+      "effect": "暂停再生计时：设置 paused 状态，记录剩余时间并取消内部任务，或调用外部计时器的暂停函数。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含交互、暂停、移植、周期、保护周期、再生剩余时间等信息的调试字符串。"
+    },
+    {
+      "name": "SetUp",
+      "effect": "设置 canbepicked 为 true，配置 product、baseregentime、regentime 和 numtoharvest（默认1）。"
+    },
+    {
+      "name": "SetOnPickedFn",
+      "effect": "设置采摘时调用的回调函数 onpickedfn。"
+    },
+    {
+      "name": "SetOnRegenFn",
+      "effect": "设置再生时调用的回调函数 onregenfn。"
+    },
+    {
+      "name": "SetMakeBarrenFn",
+      "effect": "设置变贫瘠时调用的回调函数 makebarrenfn。"
+    },
+    {
+      "name": "SetMakeEmptyFn",
+      "effect": "设置变空时调用的回调函数 makeemptyfn。"
+    },
+    {
+      "name": "CanBeFertilized",
+      "effect": "返回实体是否处于贫瘠或带有 'withered' 标签（即可施肥状态）。"
+    },
+    {
+      "name": "ChangeProduct",
+      "effect": "更改产出物 product 为新值。"
+    },
+    {
+      "name": "Fertilize",
+      "effect": "停止燃烧，播放施肥音效，重置 cycles_left 为 max_cycles，增加 protected_cycles，启用或恢复枯萎组件，调用 MakeEmpty 或强制恢复，返回 true。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含保护周期、是否已采摘、移植、暂停、可交互、卡住、周期数据、计时数据等的表用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "根据存档数据恢复 transplanted、cycles_left、max_cycles、stuck、可采摘状态、可交互、暂停或计时任务、贫瘠状态等，并配置枯萎组件。"
+    },
+    {
+      "name": "IsBarren",
+      "effect": "返回 cycles_left 等于 0 的判断。"
+    },
+    {
+      "name": "CanBePicked",
+      "effect": "返回 canbepicked 当前值。"
+    },
+    {
+      "name": "Regen",
+      "effect": "设置 canbepicked 为 true，调用 onregenfn 和 makefullfn 回调，清空 targettime 和 task。"
+    },
+    {
+      "name": "MakeBarren",
+      "effect": "设置 cycles_left 为 0，canbepicked 为 false，取消计时，调用 makebarrenfn（传入原是否为空）。"
+    },
+    {
+      "name": "OnTransplant",
+      "effect": "设置 transplanted 为 true，调用 ontransplantfn 回调。"
+    },
+    {
+      "name": "MakeEmpty",
+      "effect": "取消计时，调用 makeemptyfn，设置 canbepicked 为 false，若未暂停且有基础再生时间则计算再生时间并启动计时任务或外部计时器。"
+    },
+    {
+      "name": "SpawnProductLoot",
+      "effect": "根据配置生成产品实体并给予采摘者库存或掉落地面，支持 lootdropper 方式，返回生成的 loot 或 nil。"
+    },
+    {
+      "name": "Pick",
+      "effect": "当可采摘、可交互且未卡住时，减少周期与保护周期，生成产物，调用 onpickedfn，设置不可采摘，启动再生计时，推送 'picked' 事件，若 remove_when_picked 则移除实体，返回 true 和 loot。"
+    },
+    {
+      "name": "ConsumeCycles",
+      "effect": "减少 transplanted 下的 cycles_left 和 protected_cycles（不低于0）。"
+    },
+    {
+      "name": "SetStuck",
+      "effect": "设置 stuck 状态值。"
+    },
+    {
+      "name": "IsStuck",
+      "effect": "返回 stuck 是否为 true。"
+    }
+  ],
+  "events_published": [
+    "picked"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51951,
+      71994,
+      15675,
+      19729,
+      51839,
+      18441,
+      61065,
+      57239
+    ],
+    "aspects": [
+      {
+        "aspect": "卡住状态标识",
+        "evidence": [
+          {
+            "pageid": 61065,
+            "quote": "图像2文字=卡住"
+          },
+          {
+            "pageid": 61065,
+            "quote": "卡住的谜之火焰"
+          }
+        ]
+      },
+      {
+        "aspect": "可采集次数数值标注",
+        "evidence": [
+          {
+            "pageid": 71994,
+            "quote": "可采集次数为 0"
+          },
+          {
+            "pageid": 18441,
+            "quote": "只能被采收 3 ~ 5 次"
+          }
+        ]
+      },
+      {
+        "aspect": "施肥恢复与解除枯萎",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "使作物的可采集次数恢复至上限"
+          },
+          {
+            "pageid": 19729,
+            "quote": "移植后需要对植株进行施肥"
+          },
+          {
+            "pageid": 71994,
+            "quote": "恢复可采集次数至上限"
+          }
+        ]
+      },
+      {
+        "aspect": "瞬间成长阶段",
+        "evidence": [
+          {
+            "pageid": 15675,
+            "quote": "瞬间成长为下一阶段"
+          }
+        ]
+      },
+      {
+        "aspect": "移植处理说明",
+        "evidence": [
+          {
+            "pageid": 19729,
+            "quote": "移植后需要对植株进行施肥"
+          },
+          {
+            "pageid": 18441,
+            "quote": "移植的浆果丛默认为枯萎状态"
+          }
+        ]
+      },
+      {
+        "aspect": "贫瘠枯萎状态描述",
+        "evidence": [
+          {
+            "pageid": 71994,
+            "quote": "处于贫瘠枯萎状态"
+          },
+          {
+            "pageid": 18441,
+            "quote": "默认为枯萎状态"
+          },
+          {
+            "pageid": 18441,
+            "quote": "采收次数耗尽后就会枯萎"
+          }
+        ]
+      },
+      {
+        "aspect": "采集掉落产物",
+        "evidence": [
+          {
+            "pageid": 51839,
+            "quote": "挖起后只会掉落一个采下的草"
+          },
+          {
+            "pageid": 18441,
+            "quote": "挖枯萎状态的浆果丛只会获得 2 个"
+          }
+        ]
+      },
+      {
+        "aspect": "高温枯萎与生长暂停",
+        "evidence": [
+          {
+            "pageid": 51839,
+            "quote": "无法采集和生长"
+          },
+          {
+            "pageid": 51951,
+            "quote": "解除作物高温枯萎状态"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "可采摘",
+    "再生期",
+    "施肥",
+    "贫瘠",
+    "移植",
+    "产出物",
+    "速摘",
+    "摇摘",
+    "卡住",
+    "引火"
+  ],
+  "gameplay_tags": [
+    "采集",
+    "种植",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+    "source_bytes": 18199,
+    "model": "hy3-free",
+    "generated_at_ms": 1787851415863
+  }
+}

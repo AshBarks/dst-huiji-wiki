@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/fueled.lua"
+  },
+  "category": "component",
+  "display_name": "fueled",
+  "summary": "该组件管理实体的燃料储量（当前值与最大值）、燃料类型、消耗速率及分段状态等数据。它参与燃料消耗（如照明保暖）、接受燃料补充、燃料耗尽处理等核心生存玩法，并支持缝补需求与锻造修复等扩展交互。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "停止燃料消耗任务，移除实体上由燃料类型或缝补需求产生的标签（如 needssewing 或 <fueltype>_fueled）以及 fueldepleted 标签。"
+    },
+    {
+      "name": "MakeEmpty",
+      "effect": "若当前燃料大于0，则调用 DoDelta 使燃料归零，触发相应分段变化与事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若当前燃料不等于最大燃料，返回包含燃料量的表 {fuel = currentfuel} 用于存档，否则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "若传入数据包含 fuel 字段，则调用 InitializeFuelLevel 以非负燃料值初始化燃料水平。"
+    },
+    {
+      "name": "SetSectionCallback",
+      "effect": "设置分段变化时的回调函数 self.sectionfn。"
+    },
+    {
+      "name": "SetDepletedFn",
+      "effect": "设置燃料耗尽时调用的回调函数 self.depleted。"
+    },
+    {
+      "name": "IsEmpty",
+      "effect": "返回当前燃料是否小于等于0的布尔值，无副作用。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "返回最大燃料大于0且当前燃料大于等于最大燃料的布尔值，无副作用。"
+    },
+    {
+      "name": "SetSections",
+      "effect": "设置燃料分段总数 self.sections，影响分段计算。"
+    },
+    {
+      "name": "SetMultiplierFn",
+      "effect": "设置燃料补充时的乘数函数 self.multfn，供 TakeFuelItem 使用。"
+    },
+    {
+      "name": "CanAcceptFuelItem",
+      "effect": "检查组件是否接受燃料且物品的 fuel/fueler 组件类型匹配主/副燃料类型，返回布尔值，无副作用。"
+    },
+    {
+      "name": "GetCurrentSection",
+      "effect": "根据燃料百分比与分段数计算并返回当前分段索引（空时返回0），无副作用。"
+    },
+    {
+      "name": "ChangeSection",
+      "effect": "按给定分段增量调用 DoDelta 调整燃料量，触发分段变化与事件。"
+    },
+    {
+      "name": "SetCanTakeFuelItemFn",
+      "effect": "设置接受燃料物品前的谓词函数 self.cantakefuelitemfn。"
+    },
+    {
+      "name": "SetTakeFuelItemFn",
+      "effect": "设置成功拿走燃料物品后的回调函数 self.ontakefuelitemfn。"
+    },
+    {
+      "name": "SetTakeFuelFn",
+      "effect": "设置成功添加燃料后的回调函数 self.ontakefuelfn。"
+    },
+    {
+      "name": "TakeFuelItem",
+      "effect": "验证后可增加燃料：计算含潮湿/燃料大师等修正的燃料值，调用 DoDelta 增补燃料，触发燃料对象 Taken、移除物品（若传入）、调用各类回调并推送 takefuel 事件，返回 true。"
+    },
+    {
+      "name": "SetUpdateFn",
+      "effect": "设置每次周期更新时调用的回调函数 self.updatefn。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回描述消耗状态、燃料量、速率与分段的调试字符串，无副作用。"
+    },
+    {
+      "name": "AddThreshold",
+      "effect": "将百分比阈值与对应函数插入 self.thresholds 表，供外部逻辑使用。"
+    },
+    {
+      "name": "GetSectionPercent",
+      "effect": "返回当前分段内的局部百分比数值，无副作用。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前燃料占最大燃料的比例（0~1），无副作用。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "按给定比例计算目标燃料并调用 DoDelta 调整，改变燃料水平。"
+    },
+    {
+      "name": "SetFirstPeriod",
+      "effect": "设置首次消耗周期时长 self.firstperiod 及可选的首周期满燃料时长 self.firstperiodfull。"
+    },
+    {
+      "name": "StartConsuming",
+      "effect": "标记开始消耗，启动周期任务 DoPeriodicTask；若设首周期则启动墙更新组件，开始按速率扣减燃料。"
+    },
+    {
+      "name": "OnWallUpdate",
+      "effect": "使用首周期 dt 执行一次 DoUpdate 并停止墙更新组件，用于首周期特殊消耗。"
+    },
+    {
+      "name": "InitializeFuelLevel",
+      "effect": "设置最大与当前燃料水平，若分段变化则调用分段回调并推送 onfueldsectionchanged 事件。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "按增量调整并钳制燃料量，分段变化时调用 sectionfn、推送 onfueldsectionchanged，耗尽时调用 depleted，并推送 percentusedchange 事件。"
+    },
+    {
+      "name": "DoUpdate",
+      "effect": "若处于消耗状态则按时间扣减燃料，空则停止消耗，若设更新回调则调用之。"
+    },
+    {
+      "name": "StopConsuming",
+      "effect": "标记停止消耗，取消周期任务与墙更新，终止燃料扣减。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "等同于 DoUpdate，用于长时更新（如离线模拟）。"
+    }
+  ],
+  "events_published": [
+    "takefuel",
+    "onfueldsectionchanged",
+    "percentusedchange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18216,
+      51836,
+      15303,
+      10374,
+      10413,
+      14426,
+      15418,
+      21620
+    ],
+    "aspects": [
+      {
+        "aspect": "初始燃料量标注",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "拥有 10 单位的电力，也是它最多储存的电力"
+          }
+        ]
+      },
+      {
+        "aspect": "可接受燃料物品说明",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "薇诺娜可以用噩梦燃料为薇诺娜的发电机添加燃料。"
+          },
+          {
+            "pageid": 18216,
+            "quote": "可以用[[硝石]]来…"
+          },
+          {
+            "pageid": 14426,
+            "quote": "可以用[[荧光燃料]]为其添加燃料。"
+          },
+          {
+            "pageid": 51836,
+            "quote": "燃料可以为对应的燃料消耗者添加燃料"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料值乘数描述",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "燃料值提高了 50%"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料消耗过程描述",
+        "evidence": [
+          {
+            "pageid": 14426,
+            "quote": "随着燃料耗尽"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料耗尽状态描述",
+        "evidence": [
+          {
+            "pageid": 15303,
+            "quote": "包括燃料耗尽的[[警钟]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "燃料耗尽",
+    "添加燃料",
+    "燃烧消耗",
+    "燃料类型",
+    "需要缝补",
+    "燃料分段",
+    "接受燃料",
+    "燃料补充",
+    "空燃料"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+    "source_bytes": 10455,
+    "model": "hy3-free",
+    "generated_at_ms": 1787850857505
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/updatelooper.lua"
+  },
+  "category": "component",
+  "display_name": "updatelooper",
+  "summary": "组件管理实体的多种更新回调函数列表（每帧更新、长更新、墙体更新、帧后更新），并在游戏循环相应阶段调用它们。它提供了比 DoPeriodicTask(0) 更精确的每帧触发机制，为需要持续逻辑刷新的实体（如墙体）提供通用更新支持。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "停止实体的更新与墙体更新组件，并清除全局后更新表中该实体的记录。副作用：实体不再接收此组件的更新与墙体更新回调，后更新回调被取消注册。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清除全局后更新表中该实体的记录。副作用：后更新回调被取消注册。"
+    },
+    {
+      "name": "AddOnUpdateFn",
+      "effect": "若当前每帧更新函数列表为空，则启动实体更新组件；将给定函数加入列表。副作用：实体可能开始每帧更新，注册了回调函数。"
+    },
+    {
+      "name": "RemoveOnUpdateFn",
+      "effect": "若每帧更新函数列表非空，将函数加入待移除列表，延迟至下次 OnUpdate 时真正移除。副作用：函数不会立即移除，期间仍可能执行。"
+    },
+    {
+      "name": "AddLongUpdateFn",
+      "effect": "将给定函数插入长更新函数列表。副作用：注册了长更新回调。"
+    },
+    {
+      "name": "RemoveLongUpdateFn",
+      "effect": "若长更新函数列表非空，将函数加入待移除列表，延迟至下次 LongUpdate 时真正移除。副作用：函数不会立即移除。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "处理待移除的每帧更新函数（移除并可能停止更新组件），随后逆序执行所有每帧更新函数（传入实体与帧时间）。副作用：执行回调，可能改变实体状态，可能停止组件更新。"
+    },
+    {
+      "name": "AddOnWallUpdateFn",
+      "effect": "若墙体更新函数列表为空，则启动实体墙体更新组件；将给定函数加入列表。副作用：实体可能开始墙体更新，注册了回调。"
+    },
+    {
+      "name": "RemoveOnWallUpdateFn",
+      "effect": "若墙体更新函数列表非空，将函数加入待移除列表，延迟至下次 OnWallUpdate 时真正移除。副作用：函数不会立即移除。"
+    },
+    {
+      "name": "OnWallUpdate",
+      "effect": "若服务器暂停则直接返回；否则处理待移除墙体更新函数（移除并可能停止墙体更新），然后正序执行所有墙体更新函数（传入实体与帧时间）。副作用：执行回调，服务器暂停时跳过，可能停止墙体更新组件。"
+    },
+    {
+      "name": "AddPostUpdateFn",
+      "effect": "若帧后更新函数列表为空，则在全局后更新表中注册该实体列表；将给定函数追加到列表。副作用：注册了帧后更新回调，将在全局后更新阶段被调用。"
+    },
+    {
+      "name": "RemovePostUpdateFn",
+      "effect": "在帧后更新函数列表中查找并移除函数；若正在后更新循环中则仅标记为空位延迟压缩，否则立即压缩数组，若列表空则注销全局表记录。副作用：移除回调，可能修改全局后更新表。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理待移除的长更新函数，随后逆序执行所有长更新函数（传入实体与时间）。副作用：执行长更新回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      15539,
+      45135,
+      19110,
+      22249,
+      22383,
+      28611,
+      22181
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均描述实体伤害、掉落、分数奖励或局部机制片段（如房间移除后静止、灵魂距离感应），未包含与updatelooper组件能力（更新函数挂载/移除、长更新、墙更新、实体移除回调等）相对应的玩家语言表述或行为证据，故页面不讨论该组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "每帧更新",
+    "墙体更新",
+    "长更新",
+    "帧后更新",
+    "更新循环",
+    "延迟移除",
+    "通用钩子",
+    "暂停跳过"
+  ],
+  "gameplay_tags": [
+    "通用",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+    "source_bytes": 5168,
+    "model": "hy3-free",
+    "generated_at_ms": 1787849688455
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p3",
+  "reference": {
+    "kind": "component",
+    "path": "components/edible.lua"
+  },
+  "category": "component",
+  "display_name": "edible",
+  "summary": "该组件管理食物的可食用属性数据，包括生命、饥饿、理智增益、食物类型、变质与香料影响以及温度效果等。它参与进食核心玩法，计算食用者摄入的各项数值效果，并处理被吃时的回调、体温作用、事件推送与实体移除。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时调用，移除实体上的 'badfood' 标签、'edible_' 加当前 foodtype 与 secondaryfoodtype 的标签，以及硬编码的 'edible_BERRY' 标签。"
+    },
+    {
+      "name": "GetWoodiness",
+      "effect": "已废弃方法，忽略参数直接返回 0，无副作用。"
+    },
+    {
+      "name": "GetSanity",
+      "effect": "根据 getsanityfn 或 sanityvalue 计算基础理智值，结合变质状态、食用者 eater 的 ignoresspoilage 与 CanProcessSpoiledItem、香料乘数，返回最终理智值。无副作用。"
+    },
+    {
+      "name": "GetHunger",
+      "effect": "根据 hungervalue 计算基础饥饿值，结合变质乘数、食用者 eater 的 ignoresspoilage 与 CanProcessSpoiledItem、食物亲和 affinity 乘数，返回最终饥饿值。无副作用。"
+    },
+    {
+      "name": "GetHealth",
+      "effect": "根据 gethealthfn 或 healthvalue 计算基础生命值，结合变质乘数、香料乘数，返回最终生命值。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含食物类型与生命、饥饿、理智值的调试字符串。无副作用。"
+    },
+    {
+      "name": "SetOnEatenFn",
+      "effect": "设置 self.oneaten 为传入函数。副作用：改变未来 OnEaten 调用的回调。"
+    },
+    {
+      "name": "SetHandleRemoveFn",
+      "effect": "设置 self.handleremovefn 为传入函数。副作用：改变未来 HandleEatRemove 的移除处理逻辑。"
+    },
+    {
+      "name": "SetOverrideStackMultiplierFn",
+      "effect": "设置 self.overridestackmultiplierfn 为传入函数。副作用：改变未来 GetStackMultiplier 的返回值逻辑。"
+    },
+    {
+      "name": "SetForceSpoiledFood",
+      "effect": "参数为真时添加 'spoiledfood' 标签并置 self.spoiledfood=true，为假且原为真时移除标签并置 false。副作用：修改标签与状态。"
+    },
+    {
+      "name": "IsSpoiledFood",
+      "effect": "返回 self.spoiledfood 布尔值。无副作用。"
+    },
+    {
+      "name": "SetGetHealthFn",
+      "effect": "设置 self.gethealthfn 为传入函数。副作用：改变未来 GetHealth 计算逻辑。"
+    },
+    {
+      "name": "SetGetSanityFn",
+      "effect": "设置 self.getsanityfn 为传入函数。副作用：改变未来 GetSanity 计算逻辑。"
+    },
+    {
+      "name": "OnEaten",
+      "effect": "执行 oneaten 回调；根据香料调整温度增量与持续时间乘数，若 temperaturedelta 非0且 chill<1 且食用者有 temperature 组件，调用其 SetTemperatureInBelly；推送 'oneaten' 事件；若实体有 eatensound 且食用者有 SoundEmitter 则播放声音。副作用：可能改变食用者体温、推送事件、播放声音、触发回调。"
+    },
+    {
+      "name": "HandleEatRemove",
+      "effect": "由 eater 系统内部调用；若实体有效，调用 handleremovefn 或根据 eatwholestack 与 stackable 移除实体或单个堆叠。副作用：可能移除实体或物品。"
+    },
+    {
+      "name": "GetStackMultiplier",
+      "effect": "返回 overridestackmultiplierfn 结果或 stackable 堆叠大小或 1。无副作用。"
+    },
+    {
+      "name": "AddChill",
+      "effect": "若 temperaturedelta>0 且非 nochill，将 self.chill 增加 delta/temperatureduration 并限制在[0,1]。副作用：修改 self.chill。"
+    },
+    {
+      "name": "DiluteChill",
+      "effect": "若 temperaturedelta>0 且非 nochill 且有堆叠与传入物品 edible，按堆叠数量稀释 self.chill。副作用：修改 self.chill。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "若 self.chill>0 返回 {chill=self.chill} 否则 nil。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "若数据含 chill 且温度条件满足，加载并限制 self.chill 到[0,1]。副作用：修改 self.chill。"
+    }
+  ],
+  "events_published": [
+    "oneaten"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.STALE_FOOD_HUNGER",
+    "TUNING.STALE_FOOD_HEALTH",
+    "TUNING.SPOILED_FOOD_HUNGER",
+    "TUNING.SPOILED_FOOD_HEALTH",
+    "TUNING.SANITY_SMALL",
+    "TUNING.SPICE_MULTIPLIERS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      13456,
+      19686,
+      21669,
+      51703,
+      52383,
+      65881,
+      14484
+    ],
+    "aspects": [
+      {
+        "aspect": "回血食物描述",
+        "evidence": [
+          {
+            "pageid": 21669,
+            "quote": "游戏前期，蝴蝶翅膀是良好的回血食物。"
+          },
+          {
+            "pageid": 52383,
+            "quote": "游戏前期，蝴蝶翅膀是良好的回血食物。"
+          },
+          {
+            "pageid": 65881,
+            "quote": "准备一些回血食物和防御力高的护甲"
+          }
+        ]
+      },
+      {
+        "aspect": "食物变质数值标注",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "若食物变质，则为 0.5。"
+          },
+          {
+            "pageid": 16197,
+            "quote": "若食物变质，则为 0。"
+          },
+          {
+            "pageid": 16197,
+            "quote": "若食物变质、基础恢复生命值大于 0、且食用者不是 WX-78，则为 0；"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "回血食物",
+    "加饥饿",
+    "补理智",
+    "食物变质",
+    "香料效果",
+    "食物标签",
+    "体温影响",
+    "堆叠倍数",
+    "坏食物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "食物",
+    "进食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+    "source_bytes": 9322,
+    "model": "hy3-free",
+    "generated_at_ms": 1787849053912
+  }
+}

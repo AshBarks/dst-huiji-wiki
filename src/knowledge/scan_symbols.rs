@@ -16,8 +16,12 @@ use crate::update::{build_atlas_from_dir, top_symbols, IndexArtifact};
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
-/// 单文档源码输入上限;超出截断并写入 truncation_note(§5)。
-const SOURCE_BYTES_CAP: usize = 48 * 1024;
+/// 单文档源码输入上限;超出后采用“头 + 尾”截断并写入 truncation_note(§5)。
+const SOURCE_BYTES_CAP: usize = 128 * 1024;
+/// 超限时保留的头部字节数。
+const SOURCE_HEAD_BYTES: usize = 96 * 1024;
+/// 超限时保留的尾部字节数。
+const SOURCE_TAIL_BYTES: usize = 32 * 1024;
 /// pass1/pass2 每文档失败后的总尝试次数(含首次,即重试 1 次)。
 const MAX_ATTEMPTS: u32 = 2;
 
@@ -284,11 +288,16 @@ pub async fn run_scan_symbols(
         }
 
         let (visible, truncated) = if source.len() > SOURCE_BYTES_CAP {
-            (&source[..SOURCE_BYTES_CAP], true)
+            let head = &source[..SOURCE_HEAD_BYTES];
+            let tail_start = source.len().saturating_sub(SOURCE_TAIL_BYTES);
+            let mut body = Vec::with_capacity(source.len());
+            body.extend_from_slice(head);
+            body.extend_from_slice(b"\n-- ...(middle omitted)...\n");
+            body.extend_from_slice(&source[tail_start..]);
+            (String::from_utf8_lossy(&body).to_string(), true)
         } else {
-            (&source[..], false)
+            (String::from_utf8_lossy(&source).to_string(), false)
         };
-        let visible = String::from_utf8_lossy(visible).to_string();
 
         let mut outcome: Option<Result<SymbolDocLlm>> = None;
         for attempt in 1..=MAX_ATTEMPTS {
@@ -518,18 +527,47 @@ enum Pass2SectionTier {
     Ignore,
 }
 
-const HIGH_SECTION_TITLES: &[&str] = &[
+/// 高优先级章节关键词：标题包含任一关键词即视为 High。
+const HIGH_SECTION_KEYWORDS: &[&str] = &[
     "行为",
     "战斗",
     "攻击",
+    "技能",
+    "互动",
     "掉落",
     "战利品",
     "获取",
     "制作",
     "用途",
     "生成",
-    "技能",
-    "互动",
+    "进食",
+    "食性",
+    "繁殖",
+    "孵化",
+    "生长",
+    "建造",
+    "采集",
+    "工作",
+    "睡眠",
+    "跟随",
+    "雇佣",
+    "交易",
+    "献祭",
+    "治疗",
+    "光环",
+    "仇恨",
+    "群体",
+    "耐久",
+    "温度",
+    "潮湿",
+    "燃烧",
+    "冰冻",
+    "解冻",
+    "腐败",
+    "烹饪",
+    "容器",
+    "物品栏",
+    "装备",
 ];
 const IGNORE_SECTION_TITLES: &[&str] = &[
     "花絮",
@@ -552,9 +590,9 @@ fn pass2_section_tier(kind: &str, title: Option<&str>) -> Pass2SectionTier {
         "intro" | "infobox" | "tab" => Pass2SectionTier::High,
         "section" => {
             let t = title.map(str::trim).unwrap_or("");
-            if HIGH_SECTION_TITLES.contains(&t) {
+            if HIGH_SECTION_KEYWORDS.iter().any(|k| t.contains(k)) {
                 Pass2SectionTier::High
-            } else if IGNORE_SECTION_TITLES.contains(&t) {
+            } else if IGNORE_SECTION_TITLES.iter().any(|k| t.contains(k)) {
                 Pass2SectionTier::Ignore
             } else {
                 Pass2SectionTier::Medium
@@ -562,6 +600,28 @@ fn pass2_section_tier(kind: &str, title: Option<&str>) -> Pass2SectionTier {
         }
         _ => Pass2SectionTier::Medium,
     }
+}
+
+/// 从区域文本提取前几行实质内容，跳过纯模板行/章节标题行。
+fn first_content_lines(text: &str, max_lines: usize) -> Vec<String> {
+    let mut out = Vec::new();
+    for line in text.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        if t.starts_with("{{") && t.ends_with("}}") {
+            continue;
+        }
+        if t.starts_with('=') {
+            continue;
+        }
+        out.push(t.to_string());
+        if out.len() >= max_lines {
+            break;
+        }
+    }
+    out
 }
 
 /// 在给定区域文本内按检索词提取命中行；行去重并限制条数。
@@ -635,26 +695,32 @@ fn out_line(
     if let Some(cache) = cache {
         if let Some(text) = cache.pages.get(&pageid) {
             let regions = crate::corpus::segment::segment(pageid, text);
-            let mut budget = 6usize;
+            let mut budget = 12usize;
             for region in regions {
-                if pass2_section_tier(region.kind, region.title.as_deref())
-                    == Pass2SectionTier::Ignore
-                {
+                let tier = pass2_section_tier(region.kind, region.title.as_deref());
+                if tier == Pass2SectionTier::Ignore {
                     continue;
                 }
                 let region_text = &text[region.start_byte..region.end_byte];
-                let hits = hit_lines_in_text(region_text, terms, 2);
+                let high = tier == Pass2SectionTier::High;
+                let hits = hit_lines_in_text(region_text, terms, if high { 3 } else { 2 });
                 let facts: Vec<_> = view
                     .facts
                     .get(&pageid)
                     .map(|fs| {
                         fs.iter()
                             .filter(|f| f.region_id == region.id)
-                            .take(2)
+                            .take(if high { 2 } else { 1 })
                             .collect::<Vec<_>>()
                     })
                     .unwrap_or_default();
-                if hits.is_empty() && facts.is_empty() {
+                // 高优先级 prose 区域额外给开头实质内容，避免只看到检索命中单句。
+                let leads: Vec<String> = if high && matches!(region.kind, "intro" | "section") {
+                    first_content_lines(region_text, 2)
+                } else {
+                    Vec::new()
+                };
+                if hits.is_empty() && facts.is_empty() && leads.is_empty() {
                     continue;
                 }
                 let label = region
@@ -662,8 +728,13 @@ fn out_line(
                     .clone()
                     .unwrap_or_else(|| region.kind.to_string());
                 out.push_str(&format!("- 【{label}】\n"));
+                for l in &leads {
+                    out.push_str(&format!("  上下文:{}\n", l));
+                    pushed = true;
+                    budget = budget.saturating_sub(1);
+                }
                 for l in &hits {
-                    out.push_str(&format!("  命中:{l}\n"));
+                    out.push_str(&format!("  命中:{}\n", l));
                     pushed = true;
                     budget = budget.saturating_sub(1);
                 }

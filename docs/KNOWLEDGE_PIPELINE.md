@@ -2,6 +2,7 @@
 
 > 状态:M1 扩量至 50 份 SymbolDoc(2026-08-28);pass2 已加入版本过滤/章节过滤/重试容错;待全量 force 刷新与人工 review 后进入 M2。
 > 决策记录:knowledge/ 入库 git;文档正文中文;a 阶段先 component;b 暂只做实体/prefab 页(系统机制页挂起);目标 1/3 输出建议清单而非代写内容;并发策略待 pilot 后定,当前串行。
+> 决策记录(2026-08-28 补):a 阶段类别扩展**方案 B** 已定案——behaviours 全量(词典层)+ brains pilot 先行,stategraph 延后;细化见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md)。
 
 ## 1. 意图(与产品构想的映射)
 
@@ -64,12 +65,13 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - LLM 只产出 knowledge 部分;`reference/schema_version/prompt_rev/provenance` 由管线回填。
 - 解析走容错链(围栏/散文剥离/尾逗号/残缺元素),复用 symbol_page 既有工具。
 - 硬校验:`summary` 非空;`api` 为空时必须提供 `api_note` 说明(允许纯数据组件);失败 → raw 已归档,报错含定位。
+- envelope 字段(reference/category/summary/wiki/related_symbols/provenance 等)类别无关;类别专属载荷(behaviour 的 ctor_params、brain 的 behaviour_invocations/context_branches 等)为可选字段,component 文档不受影响——细化见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md) §4。
 
 ### pass2(link-wiki)契约
 
 - 路由:组件 →(关联索引)→ 变体 → 页面;按 fact 富裕度采样 `--sample-pages`(默认 8)。
 - 版本过滤:只使用联机版(dst)/混合(mixed)页面,排除单机版/DLC、重定向、消歧义与未知页;全文缓存与 facts 同步过滤。
-- 章节过滤:提交 LLM 前按章节优先级裁剪——高/中优先级章节(导语/信息框/行为/掉落/获取/提示/策略等)进入上下文,低优先级(花絮/皮肤/Bug/画廊/脚注等)完全排除。
+- 章节过滤:提交 LLM 前按章节优先级裁剪——高/中优先级章节(导语/信息框/行为/掉落/获取/提示/策略等)进入上下文,低优先级(花絮/皮肤/Bug/画廊/脚注等)完全排除;未收录章节默认 Medium 不忽略,高优先级关键词覆盖行为/战斗/掉落/获取/进食/温度/容器等常见机制章节,并对高优先级区域额外提供开头上下文行。
 - 输入:组件 API 能力清单 + 每页摘录(含实体名,单页 2KB 封顶)。
 - 任务性质:**检索 + 归因**(在真实页面里找能力的玩家语言表达),不是生成建议。
 - 证据约束:evidence.pageid 必须 ∈ 采样集合,过滤后无证据的 aspect 整条丢弃(宁空勿造)。
@@ -85,7 +87,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 
 - system:资深 DST 源码分析员;输出单个 JSON 对象;全中文;禁止编造源码中不存在的内容。
 - user:`<源码全文>` + 空文档骨架说明 + 字段填写规则(api 至少覆盖全部 public 方法;若确实没有方法则 api 为空并填写 api_note;page_hint 站在维基编辑者视角)。
-- 源码 >48KB 截断并在 `truncation_note` 声明(当前 components 最大 ~27KB,未触发)。
+- 源码 >128KB 采用“头 + 尾”截断(默认保留前 96KB + 后 32KB)并在 `truncation_note` 声明;当前仅 `playercontroller.lua` 超出。
 
 ## 6. 可观测性与公平基准
 
@@ -110,7 +112,8 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | M1 pass2 健壮性 | pass2 LLM 重试 1 次;连续失败不中断整批,保留 pass1 文档待补跑 | 长跑未因单次流式错误中断 |
 | M1 纯数据组件 | `api` 允许为空,但必须填 `api_note` 说明 | tradable 成功入库 |
 | M1 版本过滤 | 只保留 dst/mixed 页面,排除 ds/unknown/redirect/disambig | 全文页 6891→1849;facts 页 1881→1051 |
-| M1 章节过滤 | 提交 LLM 前按章节优先级过滤,低优先级完全排除 | 8 组件对照见 8.2 v4 |
+| M1 章节过滤 | 提交 LLM 前按章节优先级过滤,低优先级完全排除;高优先级关键词扩展 + 高优先级区域增加上下文行 | 8 组件对照见 8.2 v4 |
+| M1 源码上限 | `SOURCE_BYTES_CAP` 提升至 128KB,超限采用头尾截断 | 当前仅 `playercontroller.lua` 超限 |
 
 ### 8.2 Pilot 三轮演进(关键教训)
 
@@ -139,6 +142,15 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 4. **二次确认**(可选):pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
 
 > 当前 `output/knowledge_compare/` 为 8 组件对照临时产物,不入库;确认后可用它作为全量刷新前的预期样本。
+
+### M1.5 行为链类别扩展(方案 B,已定案未实施)
+
+细化方案、批次定义、schema 载荷草案、协同边界见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md)。要点:
+
+1. 批次 1a:behaviours 全量 29 份(词典层,pass1 only;抽 2 个验证 pass2 负结果路径);
+2. 批次 1b:brains pilot 3 份(houndbrain / spiderbrain / beefalobrain,对应页均有"行为"章;brain pass1 注入所引用 behaviour 的参数语义);
+3. stategraph 延后:per-file 截断版起步,排除 SGwilson* / *_client / commonstates;粒度与边界决策已记录,重开条件 = brains pilot 完成;
+4. 与 component 线解耦:新增 category 分派,不动 pick_components 与组件 prompt。
 
 ### M2(构想 b 完整版)
 1. `knowledge scan-wiki`:对 2268 页 × 已有 SymbolDoc 的组件做 (page,symbol) 归因,产出 PageSymbolMap(aspects_covered/aspects_ignored/detail_level)

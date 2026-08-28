@@ -26,6 +26,30 @@
     "FAILED: 当 READY 时 pollinator.target 为空，或 RUNNING 时目标丢失/不可授粉/被其他 pollinator 在2范围内占用",
     "RUNNING: 当 READY 找到有效花朵目标并成功通过 locomotor 推送 POLLINATE 动作后"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15551,
+      15314,
+      14713,
+      15818,
+      19167,
+      22066,
+      18234,
+      14808
+    ],
+    "aspects": [
+      {
+        "aspect": "花朵吸引蜜蜂授粉表述",
+        "evidence": [
+          {
+            "pageid": 22066,
+            "quote": "花会吸引蜜蜂授粉"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "找花",
     "授粉",

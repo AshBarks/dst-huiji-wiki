@@ -41,6 +41,93 @@
     "FAILED: READY 时无目标且 findnewtargetfn 返回 nil；或 RUNNING 中目标 nil/无效；或超时（timeout 非 nil 且 GetTime()-starttime > timeout）",
     "RUNNING: READY 找到有效目标后进入，并在目标有效、未死亡且未超时时持续尝试攻击并 Sleep(.125)"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15354,
+      20426,
+      15539,
+      15551,
+      19075,
+      52726,
+      72981
+    ],
+    "aspects": [
+      {
+        "aspect": "可攻击目标条件标注",
+        "evidence": [
+          {
+            "pageid": 19075,
+            "quote": "攻击除同类和墙体的一切带有战斗组件的实体"
+          },
+          {
+            "pageid": 15354,
+            "quote": "具有生命值；不是建筑或墙体；不是敌意虚影"
+          }
+        ]
+      },
+      {
+        "aspect": "战斗中原地停止描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "其余守卫在靠近到一定程度后会停在原地"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击实施与伤害标注",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "触碰到第一个可攻击目标就会攻击该目标一次"
+          },
+          {
+            "pageid": 19075,
+            "quote": "跳向目标进行啃咬攻击"
+          },
+          {
+            "pageid": 15551,
+            "quote": "攻击造成 120 点伤害（对玩家 50%）"
+          },
+          {
+            "pageid": 15539,
+            "quote": "命中目标能造成 17 点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "目标锁定行为描述",
+        "evidence": [
+          {
+            "pageid": 19075,
+            "quote": "锁定目标后会跳向目标进行啃咬攻击"
+          },
+          {
+            "pageid": 20426,
+            "quote": "锁定目标"
+          },
+          {
+            "pageid": 52726,
+            "quote": "锁定一个目标后，如果锁定目标附近"
+          },
+          {
+            "pageid": 72981,
+            "quote": "一旦锁定目标，至少3 ~ 5 秒之内会保持追击"
+          },
+          {
+            "pageid": 15551,
+            "quote": "嗡嗡蜜蜂们会尝试分别锁定不同目标"
+          },
+          {
+            "pageid": 15022,
+            "quote": "不会锁定目标，触碰到第一个可攻击目标就攻击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "站立攻击",
     "原地攻击",

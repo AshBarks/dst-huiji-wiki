@@ -53,6 +53,21 @@
     "FAILED: 当 hunter 无效或死亡、无法计算出有效逃跑位置、或当前位置与计算位置距离平方小于等于 0.16 无移动空间时，停止并返回失败",
     "RUNNING: 当 hunter 存在且 shouldrunfn 允许、尚未达到安全距离时，持续计算位置并移动，每次休眠 0.125 秒"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15551,
+      10379,
+      15235,
+      13556,
+      13698,
+      14938,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的所有页面摘录中，生物行为描述仅涉及泛泛的逃离、跑向巢穴、保持距离或仇恨范围等，未出现与 behaviour__runtodist 代码能力清单对应的表达，如计算安全点并移向、成功或失败时停止移动、清除原目的地、walk_instead 行走替代、allow_boats、fix_overhang、hunterparams 或 safe_dist 等术语或等效描述，故认为页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "跑开",
     "保持距离",

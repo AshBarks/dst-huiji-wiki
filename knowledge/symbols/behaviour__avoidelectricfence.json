@@ -28,6 +28,12 @@
     "FAILED: 源码未显式设置 FAILED 状态",
     "RUNNING: 当 status 为 READY 且 self.run_angle 非空时进入 RUNNING，并在 RUNNING 状态下持续驱动 locomotor 沿计算角度奔跑"
   ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "电网躲避",
     "触电逃跑",

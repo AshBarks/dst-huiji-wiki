@@ -50,6 +50,100 @@
     "FAILED: 当 GetHomePos 返回 nil（无家园位置）时，或状态为 READY 且 IsInsideLeash 为 true（已在拴绳最大范围内）时，状态置为 FAILED",
     "RUNNING: 当状态为 READY 且不在拴绳范围内时进入 RUNNING 并停止移动；之后若仍超出返回距离则保持 RUNNING 并持续前往目标点"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13493,
+      13199,
+      15596,
+      15746,
+      15987,
+      20678,
+      13408
+    ],
+    "aspects": [
+      {
+        "aspect": "到达家园停止状态",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "到达猪屋10单位范围时恢复正常活动状态"
+          }
+        ]
+      },
+      {
+        "aspect": "前往目标点移动描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "超出距离会径直朝猪屋移动"
+          },
+          {
+            "pageid": 13493,
+            "quote": "黄昏和夜晚时珍珠会试图回屋"
+          }
+        ]
+      },
+      {
+        "aspect": "家园位置标注",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "所属的猪屋附近"
+          },
+          {
+            "pageid": 13493,
+            "quote": "黄昏和夜晚时珍珠会试图回屋"
+          },
+          {
+            "pageid": 15596,
+            "quote": "麋鹿鹅幼崽会以麋鹿鹅巢为中心"
+          }
+        ]
+      },
+      {
+        "aspect": "归位返回距离标注",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "到达猪屋10单位范围时恢复正常活动状态"
+          }
+        ]
+      },
+      {
+        "aspect": "最大活动距离描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪屋附近30距离单位范围内活动"
+          },
+          {
+            "pageid": 15746,
+            "quote": "有各自的活动范围限制，超出后"
+          }
+        ]
+      },
+      {
+        "aspect": "超距返家移动行为",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "超出距离会径直朝猪屋移动"
+          }
+        ]
+      },
+      {
+        "aspect": "避开对象行为描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "回屋路径上遭遇玩家会试图远离"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "拴绳",
     "避开",

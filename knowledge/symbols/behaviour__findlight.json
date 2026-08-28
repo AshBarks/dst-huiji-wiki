@@ -36,6 +36,25 @@
     "FAILED: 跟随检查间隔发现目标光源无效或失去 lightsource 标签时，状态变为失败",
     "RUNNING: 初始 READY 转入后持续运行；或目标有效但未到达安全距时，走向目标并保持运行"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13570,
+      13214
+    ],
+    "aspects": [
+      {
+        "aspect": "找光移动行为描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "没有猪屋或被雇佣的猪人会主动靠近附近的光源"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "找光",
     "靠近光源",

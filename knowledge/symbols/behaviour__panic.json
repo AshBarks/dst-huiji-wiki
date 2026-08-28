@@ -22,6 +22,30 @@
     "FAILED: 源码未设置，该节点永远不会返回失败状态",
     "RUNNING: 节点首次访问后始终处于 RUNNING，周期性调用 PickNewDirection 随机跑动并通过 Sleep 等待"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      18778,
+      35817,
+      15415,
+      10379,
+      15237,
+      15753,
+      45173,
+      15239
+    ],
+    "aspects": [
+      {
+        "aspect": "慌张乱跑行为描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "发现猪屋着火会持续慌张乱跑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "恐慌",
     "逃跑",

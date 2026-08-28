@@ -47,6 +47,30 @@
     "FAILED: 由父类 ChaseAndAttackAndAvoid 判定，源码未直接定义",
     "RUNNING: 由父类 ChaseAndAttackAndAvoid 判定，源码未直接定义"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      13700,
+      13784,
+      18474,
+      45249,
+      20714,
+      21613,
+      13761
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨脱离范围描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "潜行者",
     "追逐攻击",

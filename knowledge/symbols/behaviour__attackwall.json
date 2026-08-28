@@ -29,6 +29,63 @@
     "FAILED: READY 状态下未找到前方30度内距离1.5+物理半径内的墙实体；或 RUNNING 状态下目标无效/死亡；或 RUNNING 状态下 TryAttack 返回 false",
     "RUNNING: READY 状态下找到符合条件的墙实体后设置，并在同次 Visit 中立即处理攻击逻辑（可能瞬时转为 SUCCESS/FAILED）"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15246,
+      15651,
+      15729,
+      15751,
+      70704,
+      13823,
+      13874,
+      15239
+    ],
+    "aspects": [
+      {
+        "aspect": "墙体作为攻击目标描述",
+        "evidence": [
+          {
+            "pageid": 15246,
+            "quote": "蜘蛛会主动攻击墙"
+          },
+          {
+            "pageid": 15751,
+            "quote": "座狼与其召唤的猎犬都不会攻击墙体"
+          },
+          {
+            "pageid": 70704,
+            "quote": "蜘蛛变得中立，不会攻击墙体"
+          },
+          {
+            "pageid": 15239,
+            "quote": "兔人不会攻击墙，因此不可能逃出"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击墙体行为描述",
+        "evidence": [
+          {
+            "pageid": 15246,
+            "quote": "在黄昏和夜晚，蜘蛛会主动攻击墙体"
+          },
+          {
+            "pageid": 13823,
+            "quote": "独眼巨鹿会主动攻击墙体"
+          },
+          {
+            "pageid": 13874,
+            "quote": "会主动攻击墙体"
+          },
+          {
+            "pageid": 15729,
+            "quote": "充电的伏特羊会攻击墙体"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "攻击墙",
     "打墙",

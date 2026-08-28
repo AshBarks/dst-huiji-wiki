@@ -58,6 +58,111 @@
     "SUCCESS: 靠近时进入目标距离(target_dist)内（且同平台），或后退时超出目标距离(target_dist)外",
     "FAILED: 目标不存在/无效/死亡/在limbo(若inlimbo_invalid)、或初始距离已在[min_dist,max_dist]内且同平台、或运行中目标失效"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15415,
+      24875,
+      72299,
+      61235,
+      72238,
+      13898,
+      73216,
+      17998
+    ],
+    "aspects": [
+      {
+        "aspect": "主动远离目标描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘主动远离目标的距离"
+          }
+        ]
+      },
+      {
+        "aspect": "解除追随停止移动描述",
+        "evidence": [
+          {
+            "pageid": 72299,
+            "quote": "立即解除绑定、停止追随"
+          },
+          {
+            "pageid": 73216,
+            "quote": "取消装备后立刻解散"
+          }
+        ]
+      },
+      {
+        "aspect": "跨平台跳跃能力说明",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "鱼人能够在漂浮平台和陆地地块间跳跃"
+          }
+        ]
+      },
+      {
+        "aspect": "追随保持距离范围标注",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "会与其追随者保持 3 ~ 15 距离单位"
+          },
+          {
+            "pageid": 13898,
+            "quote": "且会与玩家保持一定"
+          }
+        ]
+      },
+      {
+        "aspect": "追随目标对象描述",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "成为该玩家的追随者"
+          },
+          {
+            "pageid": 72299,
+            "quote": "随从会追随它的领袖。领袖既可以是玩家"
+          },
+          {
+            "pageid": 72238,
+            "quote": "附身底盘平时跟随在玩家身边"
+          },
+          {
+            "pageid": 13898,
+            "quote": "曼德拉草会作为随从跟随采摘者玩家"
+          },
+          {
+            "pageid": 73216,
+            "quote": "安保脉冲会主动追随玩家"
+          },
+          {
+            "pageid": 17998,
+            "quote": "聚集跟随玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "靠近追随目标行为",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "聚集跟随玩家"
+          },
+          {
+            "pageid": 72299,
+            "quote": "试传送至距离领袖 30 单位"
+          },
+          {
+            "pageid": 72238,
+            "quote": "附身底盘平时跟随在玩家身边"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "跟随",
     "追随",

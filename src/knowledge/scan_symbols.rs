@@ -207,6 +207,7 @@ fn pick_symbols(
     let picked = match category {
         "behaviour" => pick_behaviours(scripts_root, index, scan_limit),
         "brain" => pick_brains(scripts_root, index, scan_limit),
+        "stategraph" => pick_stategraphs(scripts_root, index, scan_limit),
         _ => pick_components(scripts_root, index, scan_limit),
     };
     let Some(names) = pick_names else {
@@ -326,6 +327,72 @@ fn pick_brains(
                 name.clone(),
                 SymbolRefKey {
                     kind: "brain".to_string(),
+                    path: rel,
+                },
+                path,
+                source.len(),
+            ));
+        }
+    }
+    entries.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    entries
+        .into_iter()
+        .take(limit)
+        .map(|(_, _, key, full, bytes)| (key, full, bytes))
+        .collect()
+}
+
+/// stategraph 执行层:直接扫 stategraphs/ 目录(反向边仅作排序信号),
+/// 按拍板决策排除 SGwilson* / *_client / commonstates;要求源码含
+/// `StateGraph(` 构造标记。doc_id 沿用文件词干(如 stategraph__SGhound),
+/// path ↔ doc_id 保持 1:1,不做前缀剥离特例。
+fn pick_stategraphs(
+    scripts_root: &Path,
+    index: &IndexArtifact,
+    limit: usize,
+) -> Vec<(SymbolRefKey, PathBuf, usize)> {
+    let dir = scripts_root.join("stategraphs");
+    let mut entries: Vec<(usize, String, SymbolRefKey, PathBuf, usize)> = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("lua") {
+                continue;
+            }
+            let Some(name) = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(str::to_string)
+            else {
+                continue;
+            };
+            let excluded =
+                name == "commonstates" || name.starts_with("SGwilson") || name.ends_with("_client");
+            if excluded {
+                continue;
+            }
+            let Ok(source) = std::fs::read(&path) else {
+                continue;
+            };
+            if !source.windows(11).any(|w| w == b"StateGraph(") {
+                continue; // 非状态图文件(共享工具等)
+            }
+            let rel = format!("stategraphs/{name}.lua");
+            let variants = index
+                .reverse
+                .get(&rel)
+                .map(|vs| {
+                    vs.iter()
+                        .filter_map(|v| v.rsplit('#').next())
+                        .collect::<std::collections::HashSet<_>>()
+                        .len()
+                })
+                .unwrap_or(0);
+            entries.push((
+                variants,
+                name.clone(),
+                SymbolRefKey {
+                    kind: "stategraph".to_string(),
                     path: rel,
                 },
                 path,
@@ -891,6 +958,26 @@ fn build_prompt(
 11. 只输出一个 JSON 对象,字段名与上述一致。
 
 {extra}源码:
+```lua
+{source}
+```",
+        ),
+        "stategraph" => format!(
+            "{head}以下是饥荒联机版(DST)状态图 `{display}` 的 Lua 源码。\
+请通读后产出该状态图的知识文档 JSON。
+
+要求:
+1. 全部用中文;不得编造源码中不存在的内容。
+2. summary:2~4 句,说明该状态图驱动什么实体、整体状态组织方式。
+3. states:字符串数组,源码中 State{{...}} 定义的全部状态名,严格取自源码,按出现顺序。
+4. state_notes:对象数组,只挑与玩法/页面相关的关键状态(≤10 个),每项 {{\"state\":状态名,\"note\":1~2 句玩家语义(进入条件/表现/数值配置,如无敌帧、硬直、特殊动画窗口)}};大量纯动画/音效状态不要写。
+5. api:对外方法(通常少量或没有);若没有,api 返回空数组,并必须用 api_note 说明原因。
+6. events_published / events_listened / netvars / tunables:字符串数组,严格取自源码标识符(PushEvent/ListenForEvent/NetEvent 等),可为空数组。
+7. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
+8. search_terms:5~10 个用于在维基全文中检索该实体行为表现的词汇,以中文玩家语言为主(可混英文),每词 2~6 字。
+9. 只输出一个 JSON 对象,字段名与上述一致。
+
+源码:
 ```lua
 {source}
 ```",
@@ -1685,6 +1772,41 @@ mod tests {
     }
 
     #[test]
+    fn pick_stategraphs_excludes_player_and_shared_files() {
+        let root = temp_dir("stategraphs");
+        std::fs::create_dir_all(root.join("stategraphs")).unwrap();
+        let sg = "return StateGraph(\"hound\", states, events, \"idle\")";
+        std::fs::write(root.join("stategraphs/SGhound.lua"), sg).unwrap();
+        std::fs::write(root.join("stategraphs/SGwilson.lua"), sg).unwrap();
+        std::fs::write(root.join("stategraphs/SGdeerbrain_client.lua"), sg).unwrap();
+        std::fs::write(
+            root.join("stategraphs/commonstates.lua"),
+            "local States = {}",
+        )
+        .unwrap();
+        // 无 StateGraph( 标记的杂项文件
+        std::fs::write(
+            root.join("stategraphs/SGhelpers.lua"),
+            "local Helper = function() end",
+        )
+        .unwrap();
+
+        let mut index = IndexArtifact::default();
+        index.reverse.insert(
+            "stategraphs/SGhound.lua".to_string(),
+            vec![
+                "prefabs/hound.lua#hound".to_string(),
+                "prefabs/hound.lua#icehound".to_string(),
+            ],
+        );
+
+        let picked = pick_stategraphs(&root, &index, 10);
+        assert_eq!(picked.len(), 1, "只应剩下 SGhound");
+        assert_eq!(picked[0].0.path, "stategraphs/SGhound.lua");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
     fn build_prompt_switches_by_category() {
         let brain = build_prompt("brain__houndbrain", "src", false, "brain", None);
         assert!(brain.contains("大脑"));
@@ -1699,6 +1821,10 @@ mod tests {
         let component = build_prompt("component__health", "src", false, "component", None);
         assert!(component.contains("组件"));
         assert!(component.contains("api"));
+
+        let stategraph = build_prompt("stategraph__SGhound", "src", false, "stategraph", None);
+        assert!(stategraph.contains("状态图"));
+        assert!(stategraph.contains("state_notes"));
     }
 
     #[test]

@@ -31,6 +31,12 @@
     "FAILED: READY 时仆从数量(self.ms.numminions)为0；或 RUNNING 时 minionpositions 为 nil 无法计算半径；或半径内无符合条件的实体(#ents==0)",
     "RUNNING: 节点在 READY 且 numminions>0 时内部置为 RUNNING，但同一次 Visit 中随即判定为 SUCCESS/FAILED，不向外持续返回 RUNNING 状态"
   ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "控制仆从",
     "仆从采集",

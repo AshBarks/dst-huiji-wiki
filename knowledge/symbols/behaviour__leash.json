@@ -42,6 +42,118 @@
     "FAILED: 无法获取家位置（GetHomePos 返回 nil/false），或在 READY 状态下实体已在 leash 范围内（距离平方小于 max_dist 平方）时，状态置为 FAILED。",
     "RUNNING: 在 READY 状态下实体不在 leash 内时进入 RUNNING 并停止当前移动；在 RUNNING 状态下若实体距离家位置大于 inner_return_dist 则保持 RUNNING 并命令 locomotor 走向家。"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15258,
+      15434,
+      13785,
+      15237,
+      15594,
+      18213,
+      72299
+    ],
+    "aspects": [
+      {
+        "aspect": "受惊停止移动描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "草鳄鱼会停止移动并警觉"
+          }
+        ]
+      },
+      {
+        "aspect": "最大游荡距离标注",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "在距离自己大树干 26 距离单位的范围内游荡"
+          },
+          {
+            "pageid": 15237,
+            "quote": "猪人会在所属的猪屋附近 30 距离单位范围内活动"
+          },
+          {
+            "pageid": 15594,
+            "quote": "麋鹿鹅远离其巢穴 20 单位"
+          }
+        ]
+      },
+      {
+        "aspect": "游荡中心（家位置）描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "距离自己大树干 26 距离单位的范围"
+          },
+          {
+            "pageid": 15434,
+            "quote": "蜘蛛会返回巢穴"
+          },
+          {
+            "pageid": 15237,
+            "quote": "猪人会在所属的猪屋附近 30 距离单位范围内活动"
+          },
+          {
+            "pageid": 15594,
+            "quote": "麋鹿鹅远离其巢穴 20 单位"
+          },
+          {
+            "pageid": 18213,
+            "quote": "有巢穴的蜘蛛会返回巢穴"
+          }
+        ]
+      },
+      {
+        "aspect": "返回后恢复活动的距离标注",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "到达猪屋 10 单位范围时恢复正常活动状态"
+          }
+        ]
+      },
+      {
+        "aspect": "返回或朝向目标移动描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "试图走回去"
+          },
+          {
+            "pageid": 15434,
+            "quote": "蜘蛛会返回巢穴"
+          },
+          {
+            "pageid": 15237,
+            "quote": "径直朝猪屋移动"
+          },
+          {
+            "pageid": 15594,
+            "quote": "试图返回巢穴"
+          },
+          {
+            "pageid": 18213,
+            "quote": "有巢穴的蜘蛛会返回巢穴"
+          }
+        ]
+      },
+      {
+        "aspect": "逃离或慌张奔跑描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "向反方向逃跑直到距离拉开到 14 单位"
+          },
+          {
+            "pageid": 15237,
+            "quote": "发现猪屋着火会持续慌张乱跑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "拴绳",
     "返回家",

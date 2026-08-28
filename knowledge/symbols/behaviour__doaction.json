@@ -41,6 +41,45 @@
     "FAILED: 1) getactionfn 返回 nil；2) 动作执行超时（当前时间-开始时间 > timeout）；3) 动作失败回调触发；4) 动作在执行中变为无效（action:IsValid() 为 false）",
     "RUNNING: 动作已被推送到 locomotor 且尚未成功、失败、超时或无效，处于等待动作完成的状态"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      16596
+    ],
+    "aspects": [
+      {
+        "aspect": "抛锚减速行为描述",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "建在[[漂浮平台]]上的锚可以为抛锚以使其大幅减速"
+          }
+        ]
+      },
+      {
+        "aspect": "起锚下锚时长标注",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "锚定动作名称标注",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "建在[[漂浮平台]]上的锚可以为抛锚以使其大幅减速"
+          },
+          {
+            "pageid": 16596,
+            "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "执行动作",
     "做动作",

@@ -61,6 +61,64 @@
     "FAILED: 追逐时间 GetTime()-startruntime > max_chase_time",
     "RUNNING: 存在有效目标且未满足上述成功/失败条件时持续运行并 Sleep(.125)"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      72238,
+      15314,
+      15386,
+      10374,
+      10379,
+      13556,
+      13874,
+      14713
+    ],
+    "aspects": [
+      {
+        "aspect": "放弃追逐行为描述",
+        "evidence": [
+          {
+            "pageid": 14713,
+            "quote": "跑出一定范围之后外出的蜜蜂会放弃追逐开始采蜜"
+          },
+          {
+            "pageid": 15314,
+            "quote": "蜜蜂将会放弃追逐目标"
+          }
+        ]
+      },
+      {
+        "aspect": "放弃追逐距离标注",
+        "evidence": [
+          {
+            "pageid": 15314,
+            "quote": "目标已在 15 单位外，蜜蜂将会放弃追逐目标"
+          },
+          {
+            "pageid": 15314,
+            "quote": "目标已在 25 单位外，杀人蜂将会放弃追逐目标"
+          }
+        ]
+      },
+      {
+        "aspect": "最大追逐时间描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "如果超过最大追逐时间，或与所属的高脚鸟巢"
+          },
+          {
+            "pageid": 15314,
+            "quote": "如果在 8 秒内未能追上目标"
+          },
+          {
+            "pageid": 13874,
+            "quote": "追逐攻击者时肚皮滑行速度和玩家默认速度相近，至多滑行 5 秒。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
     "冲撞行为",
     "追逐攻击",

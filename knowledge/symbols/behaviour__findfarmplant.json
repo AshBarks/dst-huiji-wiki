@@ -47,6 +47,16 @@
     "FAILED: 在 READY 中未找到符合条件的植物；或在 RUNNING 中目标失效、不在跟随点附近、未通过 validplantfn 验证或不再可修剪（tendable）时，清除目标并返回 FAILED。",
     "RUNNING: READY 中找到目标并推送动作后进入；RUNNING 中若目标仍有效、靠近、通过验证、可修剪且 happiness 等于 wantsstressed，则保持 RUNNING 等待状态变化或动作完成。"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      19932,
+      21485,
+      47057
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录仅描述植物登记表界面获取与内容、耕种机制与农作物生长阶段/压力/营养物质、资料界面显示植物登记表信息，未提及任何实体寻找农场植物、推送动作、移动执行、planttarget设置等组件行为或相关玩家语言表达，故页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "农场植物",
     "寻找农植",

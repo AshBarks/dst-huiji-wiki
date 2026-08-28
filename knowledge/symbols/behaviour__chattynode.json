@@ -52,6 +52,12 @@
     "FAILED: 当子节点 child 返回 FAILED 时，本节点状态设为 FAILED",
     "RUNNING: 当子节点 child 返回 RUNNING 时，本节点状态设为 RUNNING 并周期性触发聊天与休眠"
   ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "聊天节点",
     "说话行为",

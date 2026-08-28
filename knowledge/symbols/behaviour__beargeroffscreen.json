@@ -38,6 +38,12 @@
     "FAILED: 该节点在源码中从未调用 Fail()，因此不会返回失败",
     "RUNNING: 节点在 Visit 中将 status 设为 RUNNING 并持续 Sleep 循环，始终处于运行状态"
   ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "熊大离线",
     "熊大破坏",

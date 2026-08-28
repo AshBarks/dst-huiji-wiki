@@ -32,6 +32,15 @@
     "FAILED: 源码中未设置 FAILED 状态，该节点永远不会返回失败",
     "RUNNING: 节点从 READY 进入后设置 status 为 RUNNING，后续每次 Visit 保持 RUNNING 并执行奔跑与转向逻辑"
   ],
+  "wiki": {
+    "scanned_pageids": [
+      14099,
+      18551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面仅描述可恐慌生物被施加恐慌状态（如“恐慌12秒”“使可恐慌生物恐…”）及月熠飘向玩家，未提及恐慌生物寻找回避对象、保持回避距离或定向逃跑，无findavoidanceobjectfn/avoid_dist/locomotor:RunInDirection证据。",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "恐慌躲避",
     "逃跑行为",

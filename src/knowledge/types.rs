@@ -10,12 +10,14 @@ pub const PROMPT_REV: &str = "p4";
 pub const PROMPT_REV_BEHAVIOUR: &str = "p4-behaviour";
 /// p5-brain:pass2 语义清单改用 behaviour_invocations 参数语义文本(§9.1)。
 pub const PROMPT_REV_BRAIN: &str = "p5-brain";
+pub const PROMPT_REV_STATEGRAPH: &str = "p5-stategraph";
 
 /// 按 SymbolDoc 类别返回当前 prompt 修订号;component 沿用全局版本,新类别独立演进。
 pub fn prompt_rev_for(category: &str) -> &'static str {
     match category {
         "behaviour" => PROMPT_REV_BEHAVIOUR,
         "brain" => PROMPT_REV_BRAIN,
+        "stategraph" => PROMPT_REV_STATEGRAPH,
         _ => PROMPT_REV,
     }
 }
@@ -222,6 +224,13 @@ pub struct ContextBranch {
     pub semantic: String,
 }
 
+/// stategraph 执行层:关键状态的玩家语义注释。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct StateNote {
+    pub state: String,
+    pub note: String,
+}
+
 /// 落盘的完整文档(管线回填元数据后)。
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SymbolDoc {
@@ -261,6 +270,12 @@ pub struct SymbolDoc {
     /// brain 组合层:BT 优先级结构摘要(意图粒度)。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bt_structure: Option<String>,
+    /// stategraph 执行层:源码中定义的全部状态名。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub states: Vec<String>,
+    /// stategraph 执行层:关键状态的玩家语义注释(≤10 个)。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub state_notes: Vec<StateNote>,
     /// pass2 语料归因结果;pass1 生成时为 None。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wiki: Option<WikiSection>,
@@ -318,6 +333,12 @@ pub struct SymbolDocLlm {
     /// brain 组合层:BT 优先级结构摘要(意图粒度)。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bt_structure: Option<String>,
+    /// stategraph 执行层:源码中定义的全部状态名。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub states: Vec<String>,
+    /// stategraph 执行层:关键状态的玩家语义注释(≤10 个)。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub state_notes: Vec<StateNote>,
     #[serde(default)]
     pub gameplay_tags: Vec<String>,
     /// 面向维基全文检索的玩家语言词汇(中文为主,可混英文);pass2 采样依据。
@@ -343,6 +364,16 @@ impl SymbolDocLlm {
                 .is_some_and(|s| !s.is_empty());
             if !has_note {
                 return Err("api 为空且未提供 api_note 说明".to_string());
+            }
+        }
+        if self.category == "stategraph" && self.states.is_empty() {
+            let has_note = self
+                .api_note
+                .as_deref()
+                .map(str::trim)
+                .is_some_and(|s| !s.is_empty());
+            if !has_note {
+                return Err("stategraph 的 states 为空且未提供 api_note 说明".to_string());
             }
         }
         if self.category == "behaviour" && self.ctor_params.is_empty() {
@@ -402,6 +433,8 @@ pub fn assemble(
         behaviour_invocations: llm.behaviour_invocations.clone(),
         context_branches: llm.context_branches.clone(),
         bt_structure: llm.bt_structure.clone(),
+        states: llm.states.clone(),
+        state_notes: llm.state_notes.clone(),
         wiki: None,
         auto_maintained: None,
         search_terms: llm.search_terms.clone(),

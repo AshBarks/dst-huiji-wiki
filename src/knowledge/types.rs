@@ -39,12 +39,60 @@ impl SymbolRefKey {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ApiEntry {
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signature: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_effect_text")]
     pub effect: String,
+}
+
+/// api 条目容错:effect 缺省视为空;条目本身可能是裸方法名(模型偷懒),
+/// 统一转成 `{name, effect:"待补充"}`。
+fn deserialize_effect_text<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Null => String::new(),
+        serde_json::Value::String(s) => s,
+        other => other.to_string(),
+    })
+}
+
+impl<'de> Deserialize<'de> for ApiEntry {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Raw {
+            name: String,
+            #[serde(default)]
+            signature: Option<String>,
+            #[serde(default, deserialize_with = "deserialize_effect_text")]
+            effect: String,
+        }
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Loose {
+            Object(Raw),
+            Bare(String),
+        }
+        match Loose::deserialize(deserializer)? {
+            Loose::Object(r) => Ok(ApiEntry {
+                name: r.name,
+                signature: r.signature,
+                effect: r.effect,
+            }),
+            Loose::Bare(name) => Ok(ApiEntry {
+                name,
+                signature: None,
+                effect: String::new(),
+            }),
+        }
+    }
 }
 
 /// pass2(link-wiki)产物:一条被语料证实的「页面写作方面」及其引文。

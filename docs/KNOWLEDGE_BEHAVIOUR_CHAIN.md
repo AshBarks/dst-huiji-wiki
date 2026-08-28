@@ -1,7 +1,7 @@
 # 行为链符号知识文档方案(behaviours / brains / stategraphs)
 
-> 状态:v1.1(2026-08-28,方案 B 已拍板;**代码基础设施已落地,LLM pilot 未跑**)。
-> 实施进度:CLI `--category` / `--pass2-names`、behaviour 目录扫描 pick、brain/behaviour schema 与 prompt、brain 注入 behaviour 参数语义、pass2 抽样控制、单元测试已完成;1a(behaviours 29 份)与 1b(brains pilot 3 份)待跑。
+> 状态:v1.2(2026-08-28,方案 B 已拍板;**1a 已落地 29/29,1b pilot 已落地 3/3,待人工 review**)。
+> 实施进度:代码基础设施 + `--pick-names` + pick_brains 目录扫描已完成;1a(behaviours 29 份词典,pass2 抽 wander/chaseandattack)与 1b(houndbrain/spiderbrain/beefalobrain)已跑完;LLM 输出形状容错(param_name 别名、default 原生类型、api 裸字符串)已加入。
 > 定位:本文是 [KNOWLEDGE_PIPELINE.md](KNOWLEDGE_PIPELINE.md) 的类别扩展细化——把 SymbolDoc 从 component 扩展到行为链三类符号。基础管线(schema envelope、pass1/pass2 双通道、store 原子落盘、sha 增量、可观测性纪律)以该文档为准,本文只写**类别差异**。
 > 决策记录(2026-08-28 拍板):
 > 1. **方案 B**:behaviours 全量(词典层)+ brains pilot 联合先行;stategraph 延后;
@@ -131,14 +131,33 @@ prompt 注入:brain pass1 附带**本 brain 实际调用的** behaviour 构造�
 - store 命名 `{category}__{name}.json` 天然支持新类别;
 - M1 收尾(50 份 component 全量 `--force` 刷新 + 人工 review)为另一条工作线,本方案不触碰其产物与配置。
 
-## 9. 实施清单(未实施,供排期)
+## 9. 实施清单
 
 1. ✅ `scan_symbols.rs`:类别分派(pick 泛化)+ brain / behaviour prompt 模板 + brain 注入 behaviour 参数语义;
 2. ✅ `types.rs`:类别载荷可选字段(behaviour:ctor_params / effects / success_fail_conditions;brain:behaviour_invocations / context_branches;tunables 重定义说明);
 3. ✅ 校验:brain 的 behaviour_invocations 与 atlas behaviour_calls 报告级交叉核对;behaviour 空参数规则;
-4. ⬜ 跑批次 1a → 抽检 → 跑 1b → 人工 review(对照猎犬/蜘蛛/皮弗娄牛"行为"章);
+4. ✅ 跑批次 1a(29/29 入库)→ 1b(3/3 入库);人工 review 待做(对照猎犬/蜘蛛/皮弗娄牛"行为"章);
 5. ⬜ 回填 KNOWLEDGE_PIPELINE §8 进度与本文状态;
 6. ⬜ (独立工作项)§1.3 "100 单位"疑点核实,结论回填本文与 UPDATE_IMPACT_PLAN(若属实)。
+
+### 9.1 pilot 实测记录(2026-08-28)
+
+**批次与产物**
+
+- 1a:`--category behaviour --limit 29 --pass2-names wander,chaseandattack`,29/29 入库;`--concurrency 2` 稳定。
+- 1b:`--category brain --limit 3 --pick-names houndbrain,spiderbrain,beefalobrain --corpus …`,3/3 入库。
+
+**质量观察**
+
+- **词典层可用性达标**:`max_chase_time` 被标注为"最长追逐时间(秒)",Wander/RunAway/Leash 等参数语义合理;§1.3 疑点获得词典锚点——houndbrain 文档 `behaviour_invocations` 已按语境分支区分 `ChaseAndAttack(inst, 100)`(非 clay 非宠物无家)→"追击最长 100 秒"、`(inst, 10, 20)`(有家)→"追击最长 10 秒 + 放弃距离 20"。
+- **pass2 对 behaviour 的价值高于预期**:chaseandattack = well_documented(10 aspects,含 pageid 15386"超过最大追逐时间"表述)、wander = partial(2)。"节点名不上页面"成立,但节点*效果*有大量页面表达——1a 抽样只跑 2 个的决策仍有效,但后续全量 behaviour pass2 值得重估。
+- **brain pass2 偏保守**:houndbrain 采样 8 页(含猎犬相关页)返回 no_wiki_mention,而猎犬页"行为"章确有数值事实;疑因 caps 清单只有 tunables 名与裸 ctor 名(如 `ChaseAndAttack`),页面语言无法对上。候选改进:brain pass2 的语义清单改用 behaviour_invocations 的 args_semantic 文本(需先有 1a 词典,现已具备)。
+- **spiderbrain/beefalobrain 路由弱**:spiderbrain 路由 0 页(负结果),beefalobrain 仅 1 页——这两个 brain 的 SetBrain 不走 atlas 可追踪路径,pass2 依赖 search_terms 全文检索兜底,符合设计但印证 §1.2"二跳路由免费"只对被 atlas 记录的 brain 成立。
+
+**过程修复**(已入库)
+
+- `CtorParam.name` 别名(param_name/param)、`default` 原生布尔/数字→文本、`ApiEntry` 裸字符串→{name, effect:""};prompt 逐字段写明 JSON 形状。
+- `pick_brains` 从 top_symbols(反向边枚举)改为直接扫 `brains/` 目录:spider/beefalo 等动态 SetBrain 的 brain 在 atlas 中无 Brain 边,原逻辑选不到;反向边降级为排序信号。新增 `--pick-names`。
 
 ## 10. 开放问题
 

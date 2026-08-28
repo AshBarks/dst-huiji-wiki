@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/houndbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "houndbrain",
+  "summary": "该大脑管理猎犬（含黏土犬、普通犬、变异犬）的 AI。黏土犬优先处理雕像复活与领袖偏移跟随，无领袖则攻击墙壁并周期变雕像游荡。普通犬在战斗外会吃尸体与食物，按宠物/家园状态调整追击距离，并跟随领袖或拴家游荡。",
+  "api": [
+    {
+      "name": "SelectCarcass",
+      "effect": ""
+    },
+    {
+      "name": "CheckCarcass",
+      "effect": ""
+    },
+    {
+      "name": "GetCarcassPos",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "reanimate",
+    "becomestatue",
+    "chomp"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "MIN_FOLLOW_LEADER",
+    "MAX_FOLLOW_LEADER",
+    "TARGET_FOLLOW_LEADER",
+    "HOUSE_MAX_DIST",
+    "HOUSE_RETURN_DIST",
+    "SIT_BOY_DIST",
+    "CARCASS_TAGS",
+    "CARCASS_NO_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "无领袖时（clay 与非 clay 分支均出现）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 10 秒"
+      ],
+      "context": "clay 分支通用或非 clay 分支宠物犬"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 10 秒",
+        "放弃距离 20"
+      ],
+      "context": "非 clay 分支非宠物有家"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 100 秒"
+      ],
+      "context": "非 clay 分支非宠物无家"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "返回黏土领袖偏移位置的函数",
+        "拴绳最大半径 1",
+        "内部返回距离 1"
+      ],
+      "context": "clay 分支追随领袖偏移或变雕像时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "无领袖时返回家位置的函数",
+        "拴绳最大半径 40",
+        "内部返回距离 50"
+      ],
+      "context": "非 clay 分支无领袖拴家"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "返回尸体位置的函数",
+        "拴绳最大半径函数(攻击范围+尸体半径-0.5)",
+        "内部返回距离函数(攻击范围+尸体半径-1)",
+        "以跑步速度返回"
+      ],
+      "context": "非 clay 分支非变异犬吃尸体"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "获取领袖的函数",
+        "最小跟随距离 2",
+        "目标跟随距离 4",
+        "最大跟随距离 6"
+      ],
+      "context": "有领袖时（clay 与非 clay）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取领袖作为目标实体的函数",
+        "保持面对领袖的函数"
+      ],
+      "context": "有领袖时面对领袖"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取尸体作为目标的函数",
+        "保持面对尸体的函数"
+      ],
+      "context": "非 clay 分支吃尸体时面对"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "clay 分支变雕像并行内"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体",
+        "开始站立的条件函数（宠物犬夜间无领袖无目标近家）"
+      ],
+      "context": "非 clay 分支宠物夜间近家"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置的函数",
+        "离家最大距离 8"
+      ],
+      "context": "有家时游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取游荡点（领袖或最近玩家）的函数",
+        "最大距离 20"
+      ],
+      "context": "通用游荡"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取进食动作的函数",
+        "节点调试名称 'eat food'",
+        "以跑动方式执行"
+      ],
+      "context": "非 clay 分支非变异犬进食"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HasTag(\"clay\")",
+      "semantic": "黏土犬行为树：处理雕像状态复活、无领袖攻击墙壁、追击、追随领袖偏移、无领袖时周期性变雕像并游荡。"
+    },
+    {
+      "condition": "not inst:HasTag(\"clay\")",
+      "semantic": "普通犬行为树：包含恐慌触发、无领袖攻击墙壁、非变异犬吃尸体与食物、根据宠物/家园状态选择追击参数、拴绳回家、跟随领袖、站立及游荡。"
+    },
+    {
+      "condition": "not inst:HasTag(\"clay\") and inst:HasTag(\"lunar_aligned\")",
+      "semantic": "变异犬在非 clay 分支中跳过吃尸体和吃食物节点，仅战斗与游荡。"
+    }
+  ],
+  "bt_structure": "黏土犬：优先级节点[雕像复活->无领袖攻墙->追击->变雕像并行(循环变雕像+优先(拴领袖偏移->面对->站立))->拴领袖偏移->跟随领袖->面对领袖->无领袖并行(变雕像+优先(有家游荡/游荡))->有家游荡->游荡]。普通犬：非跳跃行为下优先级节点[恐慌->电栅栏恐慌->无领袖攻墙->非变异吃尸体->宠物/非宠物有家/非宠物无家追击->拴绳回家->非变异进食->跟随领袖->面对领袖->站立->有家游荡->游荡]。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15238,
+      51046,
+      13701,
+      15246,
+      15434,
+      15560,
+      15729
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录实体分别为天体英雄(15022)、皮弗娄牛(15238)、战争瓦器人(51046)、远古织影者(13701)、蜘蛛(15246)、蜘蛛巢(15434)、穴居猴(15560)、伏特羊(15729)，文本描述的行为（游荡距离、仇恨追击、追随父母等）均属各实体自身，未出现任何与 brain__houndbrain 专属能力（如 SEE_DIST、FINDFOOD_CANT_TAGS、MIN/MAX_FOLLOW_LEADER、HOUSE_MAX/RETURN_DIST、SIT_BOY_DIST、CARCASS_TAGS、AttackWall、Leash 等）相关的表达，无法认定页面讨论了该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猎犬大脑",
+    "黏土犬",
+    "雕像复活",
+    "吃尸体",
+    "攻击墙壁",
+    "跟随领袖",
+    "拴绳回家",
+    "宠物犬",
+    "变异犬",
+    "游荡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "41ec8bc4dbd8cbe35fdf0250767dcb634ea49ed686c70bbd634483bb22deda44",
+    "source_bytes": 9461,
+    "model": "hy3-free",
+    "generated_at_ms": 1787928599361
+  }
+}

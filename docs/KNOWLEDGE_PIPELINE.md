@@ -155,7 +155,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 
 > 当前 `output/knowledge_compare/` 为 8 组件对照临时产物,不入库;确认后可用它作为全量刷新前的预期样本。
 
-### M1.5 行为链类别扩展(方案 B,代码基础已落地,待跑 pilot)
+### M1.5 行为链类别扩展(方案 B,1a/1b pilot 已落地,待人工 review)
 
 细化方案、批次定义、schema 载荷草案、协同边界见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md)。要点:
 
@@ -163,7 +163,8 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 2. 批次 1b:brains pilot 3 份(houndbrain / spiderbrain / beefalobrain,对应页均有"行为"章;brain pass1 注入所引用 behaviour 的参数语义);
 3. stategraph 延后:per-file 截断版起步,排除 SGwilson* / *_client / commonstates;粒度与边界决策已记录,重开条件 = brains pilot 完成;
 4. 与 component 线解耦:新增 category 分派,不动 pick_components 与组件 prompt;
-5. 已落地:`--category` / `--pass2-names`、behaviour 目录扫描 pick、brain/behaviour schema 与 prompt、brain 注入 behaviour 参数语义、pass2 抽样控制、单元测试;1a/1b 尚未跑。
+5. 已落地:`--category` / `--pass2-names` / `--pick-names`、behaviour 与 brain 目录扫描 pick、brain/behaviour schema 与 prompt、brain 注入 behaviour 参数语义、pass2 抽样控制、LLM 输出形状容错、单元测试;
+6. pilot 实测(2026-08-28):1a 29/29、1b 3/3 入库;chaseandattack 页面证据丰富(well_documented)优于预期;brain pass2 语义清单偏代码标识符导致保守判空,改进项见行为链文档 §9.1。
 
 ### M2(构想 b 完整版)
 1. `knowledge scan-wiki`:对 2268 页 × 已有 SymbolDoc 的组件做 (page,symbol) 归因,产出 PageSymbolMap(aspects_covered/aspects_ignored/detail_level)

@@ -202,6 +202,9 @@ pub enum Commands {
         /// 仅对指定文件名词干跑 pass2(逗号分隔);默认全部跑
         #[arg(long, value_delimiter = ',')]
         pass2_names: Option<Vec<String>>,
+        /// 仅选取指定文件名词干的符号(逗号分隔);默认按排序取 limit
+        #[arg(long, value_delimiter = ',')]
+        pick_names: Option<Vec<String>>,
         /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
         #[arg(long)]
         refresh_auto: bool,
@@ -549,6 +552,7 @@ mod tests {
                 force,
                 concurrency,
                 pass2_names,
+                pick_names,
                 refresh_auto,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
@@ -563,6 +567,7 @@ mod tests {
                 assert!(force);
                 assert_eq!(concurrency, 1);
                 assert_eq!(pass2_names, None);
+                assert_eq!(pick_names, None);
                 assert!(!refresh_auto);
             }
             _ => panic!("Expected KnowledgeScanSymbols command"),

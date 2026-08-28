@@ -235,6 +235,7 @@ pub async fn run(args: Commands) -> Result<()> {
             force,
             concurrency,
             pass2_names,
+            pick_names,
             refresh_auto,
         } => {
             execute(
@@ -248,6 +249,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     force,
                     concurrency,
                     pass2_names,
+                    pick_names,
                     refresh_auto,
                 },
                 // Local-only job: never touches the wiki.

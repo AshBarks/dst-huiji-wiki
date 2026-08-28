@@ -160,6 +160,8 @@ pub struct ScanSymbolsParams {
     pub concurrency: usize,
     /// 仅对指定文件名词干(fn stem)跑 pass2;None = 全部跑(component 兼容)
     pub pass2_names: Option<Vec<String>>,
+    /// 仅选取指定文件名词干的符号(绕过引用数排序截断);None = 按排序取 limit
+    pub pick_names: Option<Vec<String>>,
     /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
     pub refresh_auto: bool,
 }
@@ -198,12 +200,34 @@ fn pick_symbols(
     index: &IndexArtifact,
     category: &str,
     limit: usize,
+    pick_names: Option<&[String]>,
 ) -> Vec<(SymbolRefKey, PathBuf, usize)> {
-    match category {
-        "behaviour" => pick_behaviours(scripts_root, index, limit),
-        "brain" => pick_brains(scripts_root, index, limit),
-        _ => pick_components(scripts_root, index, limit),
-    }
+    // 名称过滤时先放开 limit,避免目标符号被引用数排序截断。
+    let scan_limit = if pick_names.is_some() { 100_000 } else { limit };
+    let picked = match category {
+        "behaviour" => pick_behaviours(scripts_root, index, scan_limit),
+        "brain" => pick_brains(scripts_root, index, scan_limit),
+        _ => pick_components(scripts_root, index, scan_limit),
+    };
+    let Some(names) = pick_names else {
+        return picked;
+    };
+    let wanted: std::collections::HashSet<String> =
+        names.iter().map(|n| n.trim().to_lowercase()).collect();
+    picked
+        .into_iter()
+        .filter(|(key, _, _)| {
+            let stem = key
+                .path
+                .rsplit('/')
+                .next()
+                .unwrap_or("")
+                .trim_end_matches(".lua")
+                .to_lowercase();
+            wanted.contains(&stem)
+        })
+        .take(limit)
+        .collect()
 }
 
 /// behaviour 词典层:直接扫 behaviours/ 目录,优先已被 behaviour_calls 调用的节点。
@@ -257,35 +281,63 @@ fn pick_behaviours(
         .collect()
 }
 
-/// brain 组合层:从 top_symbols(引用变体数降序)过滤 brains/ 文件,
-/// 排除 braincommon/beecommon 等共享 helper(源码不含 `Class(Brain`)。
+/// brain 组合层:直接扫 brains/ 目录(不依赖反向边——spider/beefalo 等
+/// 动态 SetBrain 的文件在 atlas 里无 Brain 边,反向边只作排序信号),
+/// 按 prefab 引用变体数降序;排除共享 helper(源码不含 `Class(Brain`)。
 fn pick_brains(
     scripts_root: &Path,
     index: &IndexArtifact,
     limit: usize,
 ) -> Vec<(SymbolRefKey, PathBuf, usize)> {
-    top_symbols(index, limit.max(64) * 4)
-        .into_iter()
-        .filter_map(|sym| match sym {
-            crate::update::SymbolRef::File { path } if path.starts_with("brains/") => {
-                let full = scripts_root.join(&path);
-                let bytes = std::fs::metadata(&full).ok()?.len() as usize;
-                let source = std::fs::read(&full).ok()?;
-                if !source.windows(11).any(|w| w == b"Class(Brain") {
-                    return None;
-                }
-                Some((
-                    SymbolRefKey {
-                        kind: "brain".to_string(),
-                        path,
-                    },
-                    full,
-                    bytes,
-                ))
+    let dir = scripts_root.join("brains");
+    let mut entries: Vec<(usize, String, SymbolRefKey, PathBuf, usize)> = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("lua") {
+                continue;
             }
-            _ => None,
-        })
+            let Ok(source) = std::fs::read(&path) else {
+                continue;
+            };
+            if !source.windows(11).any(|w| w == b"Class(Brain") {
+                continue; // braincommon 等共享 helper,非 Brain 子类
+            }
+            let Some(name) = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(str::to_string)
+            else {
+                continue;
+            };
+            let rel = format!("brains/{name}.lua");
+            let variants = index
+                .reverse
+                .get(&rel)
+                .map(|vs| {
+                    vs.iter()
+                        .filter_map(|v| v.rsplit('#').next())
+                        .collect::<std::collections::HashSet<_>>()
+                        .len()
+                })
+                .unwrap_or(0);
+            entries.push((
+                variants,
+                name.clone(),
+                SymbolRefKey {
+                    kind: "brain".to_string(),
+                    path: rel,
+                },
+                path,
+                source.len(),
+            ));
+        }
+    }
+    entries.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    entries
+        .into_iter()
         .take(limit)
+        .map(|(_, _, key, full, bytes)| (key, full, bytes))
         .collect()
 }
 
@@ -349,7 +401,13 @@ pub async fn run_scan_symbols(
     };
     let prompt_rev = prompt_rev_for(category);
     reporter.stage(&format!("选择 {category} 符号"));
-    let picked = pick_symbols(scripts_root, &atlas.index, category, params.limit);
+    let picked = pick_symbols(
+        scripts_root,
+        &atlas.index,
+        category,
+        params.limit,
+        params.pick_names.as_deref(),
+    );
     reporter.log(format!(
         "候选 {} 个 {category}(按关联引用降序;force={})",
         picked.len(),
@@ -1571,6 +1629,50 @@ mod tests {
     }
 
     #[test]
+    fn pick_brains_covers_dynamically_bound_and_pick_names_filters() {
+        let root = temp_dir("brains-dyn");
+        std::fs::create_dir_all(root.join("brains")).unwrap();
+        std::fs::write(
+            root.join("brains/houndbrain.lua"),
+            "local HoundBrain = Class(Brain, function(self, inst) end)",
+        )
+        .unwrap();
+        // spiderbrain 无反向边(动态 SetBrain),也应入选
+        std::fs::write(
+            root.join("brains/spiderbrain.lua"),
+            "local SpiderBrain = Class(Brain, function(self, inst) end)",
+        )
+        .unwrap();
+
+        let mut index = IndexArtifact::default();
+        index.reverse.insert(
+            "brains/houndbrain.lua".to_string(),
+            vec![
+                "prefabs/hound.lua#hound".to_string(),
+                "prefabs/hound.lua#icehound".to_string(),
+            ],
+        );
+
+        let picked = pick_brains(&root, &index, 10);
+        assert_eq!(picked.len(), 2);
+        assert_eq!(picked[0].0.path, "brains/houndbrain.lua"); // 有引用变体,排前
+        assert_eq!(picked[1].0.path, "brains/spiderbrain.lua");
+
+        // pick_names:绕过排序/limit 截断,精确选取目标
+        let picked = pick_symbols(
+            &root,
+            &index,
+            "brain",
+            1,
+            Some(&["spiderbrain".to_string()].to_vec()),
+        );
+        assert_eq!(picked.len(), 1);
+        assert_eq!(picked[0].0.path, "brains/spiderbrain.lua");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
     fn build_prompt_switches_by_category() {
         let brain = build_prompt("brain__houndbrain", "src", false, "brain", None);
         assert!(brain.contains("大脑"));
@@ -1594,7 +1696,7 @@ mod tests {
         std::fs::create_dir_all(root.join("components")).unwrap();
         std::fs::write(root.join("components/health.lua"), "Health = Class").unwrap();
         let index = IndexArtifact::default();
-        let picked = pick_symbols(&root, &index, "unknown", 10);
+        let picked = pick_symbols(&root, &index, "unknown", 10, None);
         assert!(picked.is_empty()); // 无 reverse 边，component 也没有候选
         let _ = std::fs::remove_dir_all(&root);
     }

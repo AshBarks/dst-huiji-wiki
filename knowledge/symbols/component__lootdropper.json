@@ -7,87 +7,87 @@
   },
   "category": "component",
   "display_name": "lootdropper",
-  "summary": "LootDropper 组件管理实体的掉落物配置数据，包括固定列表、随机权重池、概率项及共享掉落表等。它参与核心玩法中的战利品获取、建筑拆除材料返还、燃烧变异以及节日特殊掉落等过程。组件提供生成、抛掷和生成预制体等方法实际执行掉落行为。",
+  "summary": "LootDropper组件管理实体被破坏或死亡时产生的掉落物数据，包括固定列表、随机权重池、概率掉落及配方回收材料。它参与击杀、采集、锤毁建筑等核心玩法，负责生成并物理抛掷战利品，并处理燃烧、附身与节日活动的特殊掉落逻辑。",
   "api": [
     {
       "name": "SetChanceLootTable",
-      "effect": "设置 self.chanceloottable 为传入的 name，用于后续从全局 LootTables 读取概率掉落表。无其它副作用。"
+      "effect": "设置实例的概率掉落表名称（self.chanceloottable），供GenerateLoot从全局LootTables查表使用，无其它副作用。"
     },
     {
       "name": "SetLoot",
-      "effect": "将 self.loot 设为 loots，同时清空 self.chanceloot、self.randomloot、self.numrandomloot。副作用：覆盖原有概率与随机掉落配置。"
+      "effect": "设置固定掉落列表self.loot，同时清空self.chanceloot、self.randomloot、self.numrandomloot为nil。副作用：覆盖原有掉落配置。"
     },
     {
       "name": "SetLootSetupFn",
-      "effect": "将 self.lootsetupfn 设为 fn，该函数在 GenerateLoot 或 GetAllPossibleLoot(当 setuploot 为真) 时可能被调用以动态修改掉落。无其它副作用。"
+      "effect": "设置掉落生成前回调self.lootsetupfn = fn，该回调在GenerateLoot与GetAllPossibleLoot中可能被执行。副作用：存储函数引用。"
     },
     {
       "name": "AddRandomLoot",
-      "effect": "向随机掉落池 self.randomloot 添加一项 {prefab, weight}，若池不存在则初始化并重置 self.totalrandomweight 为 0，随后累加权重。副作用：扩充随机掉落池。"
+      "effect": "向self.randomloot插入{prefab=prefab, weight=weight}并累加self.totalrandomweight；若原表为空则初始化表与权重和。副作用：增加随机掉落池。"
     },
     {
       "name": "ClearRandomLoot",
-      "effect": "将 self.randomloot、self.totalrandomweight、self.numrandomloot 设为 nil。副作用：清除随机掉落配置。"
+      "effect": "将self.randomloot、self.totalrandomweight、self.numrandomloot设为nil。副作用：清除随机掉落配置。"
     },
     {
       "name": "AddRandomHauntedLoot",
-      "effect": "向闹鬼状态随机掉落池 self.randomhauntedloot 添加一项 {prefab, weight}，若池不存在则初始化并重置 self.totalhauntedrandomweight 为 0，随后累加权重。副作用：扩充闹鬼随机掉落池。"
+      "effect": "向self.randomhauntedloot插入条目并累加self.totalhauntedrandomweight，用于实体被附身时的随机掉落。副作用：增加附身随机掉落池。"
     },
     {
       "name": "AddChanceLoot",
-      "effect": "向概率掉落表 self.chanceloot 添加一项 {prefab, chance}，若表不存在则初始化。无其它副作用。"
+      "effect": "向self.chanceloot插入{prefab=prefab, chance=chance}。副作用：增加概率掉落项。"
     },
     {
       "name": "AddIfNotChanceLoot",
-      "effect": "向条件掉落表 self.ifnotchanceloot 添加一项 {prefab}，当未触发任何概率掉落时补充掉落，若表不存在则初始化。无其它副作用。"
+      "effect": "向self.ifnotchanceloot插入{prefab=prefab}，当未触发任何概率掉落时作为保底掉落。副作用：增加保底掉落项。"
     },
     {
       "name": "GetRandomLootTable",
-      "effect": "返回当前适用的随机掉落表：若实体有 hauntable 组件且处于 haunted 状态则返回 self.randomhauntedloot，否则返回 self.randomloot。无副作用。"
+      "effect": "根据实例是否拥有hauntable组件且haunted状态，返回self.randomhauntedloot或self.randomloot。无副作用。"
     },
     {
       "name": "PickRandomLoot",
-      "effect": "从 GetRandomLootTable 获取的表中按权重随机抽取一个 prefab 名返回；若表不存在则返回 nil。依赖 math.random，消耗随机状态。"
+      "effect": "计算随机掉落表总权重，math.random按权重随机返回其中的prefab名；若表不存在则返回nil。无副作用（除消耗随机数）。"
     },
     {
       "name": "GetFullRecipeLoot",
-      "effect": "递归展开给定 recipe 的 ingredients，对可拆解(deconstruct)材料继续递归，否则收集材料类型，返回完整材料列表。无副作用。"
+      "effect": "递归遍历配方ingredients，返回包含所有基础材料prefab的列表（考虑deconstruct嵌套）。无副作用。"
     },
     {
       "name": "GetRecipeLoot",
-      "effect": "根据实体 finiteuses 耐久百分比或 burnt 标签计算配方材料返还数量（受 TUNING 系数影响），递归处理可拆解材料，返回返还列表。无副作用。"
+      "effect": "根据实例finiteuses耐久百分比或燃烧标签，计算每种材料掉落数量（乘TUNING系数），递归处理deconstruct，返回掉落列表。无副作用。"
     },
     {
       "name": "GetLuckyUser",
-      "effect": "返回导致实体死亡的原因实体(health.causeofdeath)或最后工作者(workable.lastworker)，若有效则返回，否则 nil。无副作用。"
+      "effect": "检查health.causeofdeath或workable.lastworker是否有效，返回该触发掉落的玩家实体或nil。无副作用。"
     },
     {
       "name": "GetChance",
-      "effect": "若 chance>=1 直接返回；否则尝试获取幸运用户，有则通过 GetEntityLuckChance 调整概率，无则返回原 chance。无副作用。"
+      "effect": "若chance>=1直接返回；否则获取幸运用户并通过GetEntityLuckChance调整概率后返回。无副作用。"
     },
     {
       "name": "GenerateLoot",
-      "effect": "综合 lootsetupfn、随机数量掉落、概率掉落、共享概率表、条件掉落、固定掉落、配方返还及燃烧木炭等规则，生成最终掉落 prefab 列表并返回。副作用：可能调用 lootsetupfn，可能设置 self.droppingchanceloot，可能在未触发概率掉落时向实体推送 'ifnotchanceloot' 事件。"
+      "effect": "综合执行lootsetupfn、随机掉落、概率掉落、概率表、保底掉落、固定掉落与配方掉落，返回prefab列表。副作用：可能调用lootsetupfn，设置self.droppingchanceloot，若未触发概率掉落且存在保底项则推送事件ifnotchanceloot。"
     },
     {
       "name": "GetAllPossibleLoot",
-      "effect": "收集组件配置中所有可能出现的掉落 prefab 到表中（键为 prefab 值 true），包括闹鬼/普通随机池、概率池、共享表、条件池、固定池及冬季盛宴特殊物；若 setuploot 且 lootsetupfn 存在则先调用之。返回该表。无其它副作用。"
+      "effect": "收集随机、概率、保底、固定及冬季盛宴等所有可能掉落prefab以表形式返回（key为prefab）。若setuploot且存在lootsetupfn则调用之。无其它副作用。"
     },
     {
       "name": "SetFlingTarget",
-      "effect": "设置 self.flingtargetpos 与 self.flingtargetvariance，用于抛掷物品时计算方向。无其它副作用。"
+      "effect": "设置self.flingtargetpos与self.flingtargetvariance，影响后续抛掷方向。副作用：修改实例字段。"
     },
     {
       "name": "FlingItem",
-      "effect": "将传入 loot 实体从 pt（默认实体位置）抛掷：设置位置并根据物理组件赋予随机速度或直接计算落点；若 loot 睡眠则直接设位置。副作用：修改 loot 的位置与物理速度。"
+      "effect": "给定物品与位置，根据物理状态施加抛掷速度或设置位置（考虑flingtargetpos角度与速度参数）。副作用：修改loot的Transform与Physics速度，若休眠则直接移开避免物理。"
     },
     {
       "name": "SpawnLootPrefab",
-      "effect": "生成指定 lootprefab 的实体，处理湿度继承、重型物理强制掉落，调用 FlingItem 抛掷，向 loot 推送 'on_loot_dropped'、向实体推送 'loot_prefab_spawned'，若实体受控燃烧且 loot 可燃烧则启动野火。返回生成的实体。副作用：生成实体、推送事件、可能引燃。"
+      "effect": "生成指定prefab实体，继承湿度，强制重物理，调用FlingItem抛掷，推送on_loot_dropped与loot_prefab_spawned事件，若父实体受控燃烧则引燃掉落物。返回生成实体。副作用：生成实体、修改状态、推送事件。"
     },
     {
       "name": "DropLoot",
-      "effect": "执行完整掉落流程：默认调用 GenerateLoot 获取列表，处理燃烧/烧毁导致的掉落物替换（烤制、灰烬等），逐个 SpawnLootPrefab 生成，若冬季盛宴活动则追加装饰物掉落，最后向世界推送 'entity_droploot' 事件。副作用：生成多个实体、修改掉落物、世界事件。"
+      "effect": "主掉落函数：未提供prefabs时调用GenerateLoot生成；若实体燃烧或烧焦则替换掉落物为烹饪版或灰烬等；遍历生成每个掉落物；冬季盛宴活动时追加装饰掉落；最后推送全局事件entity_droploot。副作用：生成多个实体、修改传入prefabs表、推送事件。"
     }
   ],
   "events_published": [
@@ -112,77 +112,53 @@
       22094,
       18939,
       19776,
+      17979,
       13493,
       23187,
       19832,
-      24877,
-      70704
+      24877
     ],
     "aspects": [
       {
-        "aspect": "冬季树烧毁与工作掉落物标注",
+        "aspect": "实体破坏或死亡掉落物标注",
         "evidence": [
           {
             "pageid": 22094,
-            "quote": "被破坏、烧毁时，除下表外还会掉落破坏盛宴树盆的掉落物（1 个木板"
-          }
-        ]
-      },
-      {
-        "aspect": "地震周期生成掉落物描述",
-        "evidence": [
+            "quote": "被破坏、烧毁时，除下表外还会掉落破坏盛宴树盆的掉落物"
+          },
           {
-            "pageid": 19776,
-            "quote": "每秒会在洞穴内每个玩家的 50 {{解释|距离单位}}范围内生成 5 ~ 6 个掉落物"
-          }
-        ]
-      },
-      {
-        "aspect": "怪物死亡概率掉落装饰品",
-        "evidence": [
+            "pageid": 17979,
+            "quote": "1 个贝壳钟掉落1 个[[壳碎片]]"
+          },
           {
             "pageid": 23187,
-            "quote": "任何动物和怪物死亡后都有 0.5% 的概率掉"
+            "quote": "任何[[动物]]和[[怪物]]死亡后都有 0.5% 的概率掉…"
           }
         ]
       },
       {
-        "aspect": "战利品坑内容物品概率标注",
-        "evidence": [
-          {
-            "pageid": 24877,
-            "quote": "战利品坑内容物品"
-          }
-        ]
-      },
-      {
-        "aspect": "蜘蛛击杀与刷取掉落物描述",
-        "evidence": [
-          {
-            "pageid": 70704,
-            "quote": "普通黑蜘蛛仅有100生命值便于处死，并且可以掉落绝大部分蜘蛛的掉落物"
-          }
-        ]
-      },
-      {
-        "aspect": "装饰树下礼物概率出现装饰品",
-        "evidence": [
-          {
-            "pageid": 23187,
-            "quote": "在完全装饰的冬季盛宴树下睡觉时获得的礼物中有概率出现"
-          }
-        ]
-      },
-      {
-        "aspect": "赃物袋战利品生成与变化",
+        "aspect": "礼物刷新重置策略",
         "evidence": [
           {
             "pageid": 18939,
-            "quote": "赃物袋会无视季节每隔一段时间生成，其中的战利品也会变化。"
+            "quote": "当冬季盛宴树离开人物加载范围外时，会重置其礼物刷新"
+          }
+        ]
+      },
+      {
+        "aspect": "随机与机制生成掉落描述",
+        "evidence": [
+          {
+            "pageid": 18939,
+            "quote": "生物会随机掉落[[冬季盛宴装饰品]]和[[冬季食物]]。"
           },
           {
-            "pageid": 19832,
-            "quote": "在冬季盛宴期间，赃物袋会在第一天就生成，并且能在任何季节生成"
+            "pageid": 19776,
+            "quote": "每秒会在洞穴内每个玩家的 50 距离单位范围内生成 5 ~ 6 个掉落物"
+          },
+          {
+            "pageid": 23187,
+            "quote": "杀死三阶段[[天体英雄]]会随机掉落“天体英雄一阶段”"
           }
         ]
       }
@@ -191,26 +167,25 @@
   },
   "search_terms": [
     "掉落物",
-    "战利品",
-    "随机权重",
+    "随机掉落",
     "概率掉落",
     "配方拆解",
-    "燃烧灰烬",
     "抛掷物品",
-    "共享掉落表",
+    "燃烧替换",
     "冬季盛宴",
-    "闹鬼掉落"
+    "保底掉落",
+    "战利品"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗",
-    "建造"
+    "建造",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
     "source_bytes": 15157,
     "model": "hy3-free",
-    "generated_at_ms": 1787891552682
+    "generated_at_ms": 1787895103203
   }
 }

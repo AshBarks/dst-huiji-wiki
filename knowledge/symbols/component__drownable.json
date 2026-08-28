@@ -7,107 +7,107 @@
   },
   "category": "component",
   "display_name": "drownable",
-  "summary": "该组件管理实体在海洋或虚空上方坠落的状态与伤害判定，参与溺水、掉入虚空后的传送与惩罚等核心生存玩法。它负责检测实体是否处于可溺水区域，计算并施加潮湿、饥饿、生命和理智等溺水伤害，以及处理掉落物品和传送上岸等逻辑。",
+  "summary": "该组件管理实体在海洋或虚空上方时的溺水与坠落判定逻辑，以及相关的伤害、物品掉落和传送行为。它参与核心生存玩法，处理实体落水、坠空、被冲上岸及对应的惩罚机制。",
   "api": [
     {
       "name": "SetOnTakeDrowningDamageFn",
-      "effect": "设置 self.ontakedrowningdamage 回调函数为传入的 fn，无其它副作用。"
+      "effect": "设置实体承受溺水伤害后的回调函数，赋值给 self.ontakedrowningdamage，在 TakeDrowningDamage 末尾调用。"
     },
     {
       "name": "SetCustomTuningsFn",
-      "effect": "设置 self.customtuningsfn 回调函数为传入的 fn，无其它副作用。"
+      "effect": "设置自定义溺水伤害参数获取函数，赋值给 self.customtuningsfn，供 GetDrowningDamageTuning 使用。"
     },
     {
       "name": "IsInDrownableMapBounds",
-      "effect": "接收坐标 (x,y,z)，返回 TheWorld.Map:IsInMapBounds 的结果，用于判断点是否在地图边界内；无副作用。"
+      "effect": "接收坐标 (x,y,z)，返回 TheWorld.Map:IsInMapBounds 结果，用于判断是否在地图边界内，可被子类或 mod 重写。"
     },
     {
       "name": "IsSafeFromFalling",
-      "effect": "检查实体是否在平台上、是否在地图边界外、是否在视觉地面上，返回是否安全不会坠落；无副作用。"
+      "effect": "若实体在平台上、在地图边界外或位于视觉地面点，返回 true 表示不会坠落；否则 false。"
     },
     {
       "name": "IsOverVoid",
-      "effect": "基于 IsSafeFromFalling 与 TheWorld.Map:IsInvalidTileAtPoint 判断，返回实体是否在虚空上方；无副作用。"
+      "effect": "若不满足安全坠落且所在地图点为无效地块，返回 true 表示在虚空上方；否则 false。"
     },
     {
       "name": "IsOverWater",
-      "effect": "基于 IsSafeFromFalling 与 TheWorld.Map:IsOceanTileAtPoint 判断，返回实体是否在海洋上方；无副作用。"
+      "effect": "若不满足安全坠落且所在地图点为海洋地块，返回 true 表示在水面上方；否则 false。"
     },
     {
       "name": "ShouldX_InternalCheck",
-      "effect": "检查 self.enabled 是否为真且实体不处于无敌状态，返回布尔值；无副作用。"
+      "effect": "内部检查：若组件未启用 (self.enabled 为 false) 或实体生命组件无敌，返回 false；否则 true。"
     },
     {
       "name": "ShouldDrown",
-      "effect": "调用内部检查与 IsOverWater，返回实体是否应该溺水；无副作用。"
+      "effect": "调用内部检查且 IsOverWater 为 true 时返回 true，表示实体应当溺水。"
     },
     {
       "name": "ShouldFallInVoid",
-      "effect": "调用内部检查与 IsOverVoid，返回实体是否应该掉入虚空；无副作用。"
+      "effect": "调用内部检查且 IsOverVoid 为 true 时返回 true，表示实体应当坠入虚空。"
     },
     {
       "name": "GetFallingReason",
-      "effect": "根据 ShouldDrown 和 ShouldFallInVoid 返回 FALLINGREASON.OCEAN、FALLINGREASON.VOID 或 nil；无副作用。"
+      "effect": "返回坠落原因枚举：ShouldDrown 时返回 FALLINGREASON.OCEAN，ShouldFallInVoid 时返回 FALLINGREASON.VOID，否则 nil。"
     },
     {
       "name": "CheckDrownable",
-      "effect": "调用 GetFallingReason，若原因为海洋则推送 'onsink' 事件，若为虚空则推送 'onfallinvoid' 事件，并返回 true；否则返回 false。副作用为推送事件。"
+      "effect": "获取坠落原因，若为海洋则推送 'onsink' 事件并返回 true，若为虚空则推送 'onfallinvoid' 事件并返回 true，否则返回 false。"
     },
     {
       "name": "Teleport",
-      "effect": "使用 self.dest_x/y/z 与随机偏移寻找可行走点，通过 Physics 或 Transform 将实体传送到目标位置；副作用为改变实体世界坐标。"
+      "effect": "根据 self.dest_x/y/z 与随机半径偏移寻找可行走点，通过 Physics 或 Transform 将实体传送到目标位置。"
     },
     {
       "name": "GetWashingAshoreTeleportSpot",
-      "effect": "接收 excludeclosest 参数，返回从海洋找到的随机岸边点及偏移坐标；无副作用（源码注释标记似乎未使用）。"
+      "effect": "从实体所在海洋点寻找随机岸边点并加随机偏移，返回坐标 (x,y,z)；若找不到则返回原位置。源码注释标记似乎未使用。"
     },
     {
       "name": "WashAshore",
-      "effect": "调用 Teleport；若实体有 player 标签则屏幕淡出并定时恢复；定时推送 'on_washed_ashore' 事件。副作用为传送、屏幕效果、定时任务与事件推送。"
+      "effect": "调用 Teleport 传送实体；若实体有 player 标签则屏幕淡出并在3秒后恢复相机，4秒后推送 'on_washed_ashore' 事件。"
     },
     {
       "name": "ShouldDropItems",
-      "effect": "检查实体是否有 stronggrip 标签及 self.shoulddropitemsfn 回调，返回是否应掉落物品；无副作用。"
+      "effect": "若实体有 'stronggrip' 标签返回 false；否则若 self.shoulddropitemsfn 不存在返回 true，存在则调用该函数返回结果。"
     },
     {
       "name": "GetTeleportPtFor",
-      "effect": "从 self.teleport_pt_stack 中查找与 src 关联的点并返回；无副作用。"
+      "effect": "从 teleport_pt_stack 中查找与 src 匹配的项并返回其 pt，无则返回 nil。"
     },
     {
       "name": "PushTeleportPt",
-      "effect": "将 src 与 pt 推入 teleport_pt_stack 栈，若 src 是实体实例则监听其 'onremove' 事件。副作用为修改栈并可能添加事件监听。"
+      "effect": "将 src 与 pt 压入 teleport_pt_stack 栈顶；若 src 是实体实例，则监听其 'onremove' 事件以自动清理。"
     },
     {
       "name": "PopTeleportPt",
-      "effect": "从 teleport_pt_stack 移除与 src 相关的项，并移除对应的 'onremove' 监听。副作用为修改栈并移除事件监听。"
+      "effect": "从 teleport_pt_stack 移除指定 src 的项，若 src 是实体实例则移除对应的 'onremove' 事件监听。"
     },
     {
       "name": "GetTeleportPtOverride",
-      "effect": "若栈非空则返回栈顶点坐标，若栈空则清空 teleport_pt_stack 与 teleport_pt_stack_ent_onremoved 变量并返回 nil。副作用为可能清空内部变量。"
+      "effect": "若 teleport_pt_stack 非空，返回栈顶项的 pt 坐标并保留栈；若为空则清空栈与监听函数并返回 nil。"
     },
     {
       "name": "OnFallInOcean",
-      "effect": "接收可选岸边坐标，记录实体源坐标并确定目标坐标，唤醒睡眠组件，可能掉落主动物品与手部装备（若 ShouldDropItems 且非不可替代/keepondrown）。副作用为设置 self.src_*/dest_*、唤醒实体、可能 Launch 物品。"
+      "effect": "记录源坐标，确定目的地（参数或栈覆盖或随机岸边），唤醒睡眠组件；若背包活动物品或手部物品满足条件则抛出。设置 dest 坐标。"
     },
     {
       "name": "VoidArrive",
-      "effect": "类似 WashAshore 但定时推送 'on_void_arrive' 事件。副作用为传送、屏幕效果、定时任务与事件推送。"
+      "effect": "调用 Teleport 传送；若玩家则淡出屏幕并定时恢复相机，4秒后推送 'on_void_arrive' 事件。"
     },
     {
       "name": "OnFallInVoid",
-      "effect": "接收可选传送坐标，记录源坐标与目标坐标，唤醒睡眠组件。副作用为设置 self.src_*/dest_*、唤醒实体。"
+      "effect": "记录源坐标，确定目的地（参数或栈覆盖或随机岸边），唤醒睡眠组件；虚空惩罚待实现（源码 FIXME）。"
     },
     {
       "name": "GetDrowningDamageTuning",
-      "effect": "返回 customtuningsfn 计算结果或 TUNING.DROWNING_DAMAGE 中对应实体的配置；无副作用。"
+      "effect": "返回 customtuningsfn 结果，或按 prefab 名、玩家/生物默认从 TUNING.DROWNING_DAMAGE 获取伤害参数表。"
     },
     {
       "name": "TakeDrowningDamage",
-      "effect": "根据调谐参数施加潮湿、饥饿、健康惩罚、生命与理智损失，若存在启用浮力设备则阻止伤害，最后调用 ontakedrowningdamage 回调。副作用为修改实体属性、可能调用浮力设备方法、调用回调。"
+      "effect": "根据调参与浅海缩放计算潮湿、饥饿、生命惩罚、生命、理智扣减；若检测到启用浮具则阻止伤害；最后调用 ontakedrowningdamage 回调。"
     },
     {
       "name": "DropInventory",
-      "effect": "若 ShouldDropItems 为真，按浅海/深海比例从物品栏掉落部分非不可替代且非 keepondrown 的物品。副作用为 Launch 掉落物品。"
+      "effect": "若 ShouldDropItems 为真，按浅海/深海比例随机丢弃背包中非 'irreplaceable' 且无 keepondrown 标签的物品。"
     }
   ],
   "events_published": [
@@ -116,43 +116,51 @@
     "on_washed_ashore",
     "on_void_arrive"
   ],
-  "events_listened": [],
+  "events_listened": [
+    "onremove"
+  ],
   "netvars": [],
-  "tunables": [],
+  "tunables": [
+    "TUNING.DROWNING_DAMAGE",
+    "TUNING.DROWNING_SHALLOW_SCALE",
+    "TUNING.DROWNING_ITEMDROP_SHALLOWS",
+    "TUNING.DROWNING_ITEMDROP_NORMAL"
+  ],
   "wiki": {
     "scanned_pageids": [
-      13437,
-      23956,
-      23957,
-      24880,
-      24881,
       34314,
-      70562,
-      15022
+      15022,
+      14938,
+      13897,
+      15238,
+      13823,
+      15642,
+      19110
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录未包含任何与溺水、落水、虚空掉落、水上判定、上岸传送等drownable组件能力相关的描述；零星出现的地图边界、虚空、船只等词汇均属其他实体机制（如沃比回船、天灯损坏、沼泽地块限制），未体现该组件能力清单中的任何函数行为。",
+    "no_evidence_reason": "提供的页面摘录涉及世界生成选项及多种巨兽的行为与掉落，无任何溺水、落水、虚空、传送或溺水伤害等 drownable 组件能力描述。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "溺水伤害",
-    "落水沉没",
-    "掉入虚空",
-    "传送上岸",
+    "落水伤害",
+    "沉没事件",
+    "冲上岸",
+    "坠入虚空",
     "物品掉落",
-    "浮力设备",
-    "安全地面",
-    "地图边界"
+    "防溺水",
+    "溺水判定",
+    "传送岸边",
+    "浅海惩罚"
   ],
   "gameplay_tags": [
     "生存",
-    "环境"
+    "海洋"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
     "source_bytes": 13429,
     "model": "hy3-free",
-    "generated_at_ms": 1787892765490
+    "generated_at_ms": 1787896238638
   }
 }

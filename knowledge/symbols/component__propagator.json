@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "propagator",
-  "summary": "组件管理实体的热量、燃点、传播范围与热输出等数据，并周期性更新热量衰减与传播逻辑。它参与火焰蔓延、冰冻解冻、火伤害以及春季防火范围调整等核心玩法，使实体能够作为热源影响周围物体。",
+  "summary": "该组件管理实体的当前热量、闪点、传播范围与衰减率等数据，负责在周期更新中向周围实体传递热量。它参与火焰蔓延、融化冰冻物体、造成火焰伤害等核心玩法，并受地块属性与春季季节调节。组件支持延迟传热、受控燃烧与闪点回调，以精细控制火势行为。",
   "api": [
     {
       "name": "CalculateHeatCap",
-      "effect": "重置本次更新已加热量 heat_this_update 为 0，并根据 flashpoint 与随机缓动函数计算并设置本次更新最大可加热量 max_heat_this_update。"
+      "effect": "重置本次更新累计热量为0，依据闪点、随机数与固定时间间隔通过缓动函数计算本次更新可吸收的最大热量，并存入实例属性。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "停止传播（调用 StopSpreading(true)），立即调用 OnUpdate(0) 处理残留热量，并取消延迟任务 delay（若存在）。"
+      "effect": "停止传播并重置热量，立即执行一次更新（可能推送停止融化事件），取消存在的延迟任务。副作用：清除延迟定时器，可能改变其他实体标签与事件。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "若实体有效且自身非制冷加热器，寻找范围内带 frozen 或 firemelt 标签的实体，向其推送 stopfiremelt 事件并移除 firemelt 标签。"
+      "effect": "若实体有效且非制冷加热器，查找范围内带冻结或火融标签的实体，向其推送停止火融事件并移除对应标签。副作用：修改其他实体的标签与事件状态。"
     },
     {
       "name": "SetOnFlashPoint",
-      "effect": "设置达到燃点时的回调函数，将传入函数 fn 赋值给 self.onflashpoint。"
+      "effect": "将传入函数设为达到闪点时的回调。副作用：覆盖实例原有的闪点回调引用。"
     },
     {
       "name": "Delay",
-      "effect": "取消已有延迟任务，并在指定时间后创建新任务将 self.delay 置空，用于暂时阻止受热。"
+      "effect": "取消已有延迟任务并启动新延迟定时器，在指定时间后将延迟标记清空。副作用：在延迟期间阻止热量添加与闪现行为。"
     },
     {
       "name": "StopUpdating",
-      "effect": "重新计算热量上限（调用 CalculateHeatCap），并取消周期更新任务 task（若存在）。"
+      "effect": "重新计算热上限并取消周期更新任务。副作用：停止组件的周期更新循环。"
     },
     {
       "name": "StartUpdating",
-      "effect": "若周期更新任务 task 不存在，则创建每 PROPAGATOR_DT 秒执行的周期任务以调用 OnUpdate。"
+      "effect": "若未启动则创建周期任务以固定间隔调用更新逻辑。副作用：开始周期更新，使热量传播与衰减生效。"
     },
     {
       "name": "StartSpreading",
-      "effect": "设置热源 source，标记 spreading 为 true，并开始周期更新（调用 StartUpdating）。"
+      "effect": "记录热源，标记组件为传播状态并启动更新。副作用：开始向周围实体传递热量、融化或造成伤害。"
     },
     {
       "name": "StopSpreading",
-      "effect": "清除 source 与 spreading 标记；若 reset 为真，则按 heatpct 随机重置 currentheat 并清除暂停加热标记 pauseheating。"
+      "effect": "清除热源并退出传播状态；若重置则按给定比例随机重置当前热量并解除加热暂停。副作用：停止传热，可能重置热量数值。"
     },
     {
       "name": "GetHeatResistance",
-      "effect": "根据当前地块类型返回热阻力系数：no_fire_spread 地块返回 0，有 flashpoint_modifier 的地块返回计算值，否则返回 1。"
+      "effect": "根据当前地块类型返回热量抵抗系数（0到1以上），无特殊地块返回1。无副作用。"
     },
     {
       "name": "CanSpreadHeat",
-      "effect": "根据当前地块类型返回是否可传播热（地块非 no_fire_spread 时返回 true）。"
+      "effect": "返回当前地块是否允许火势传播。无副作用。"
     },
     {
       "name": "AcceptsHeat",
-      "effect": "返回是否接受热量（要求 self.acceptsheat 为 true 且 self.pauseheating 不为真）。"
+      "effect": "返回组件是否配置接受热量且未暂停加热。无副作用。"
     },
     {
       "name": "AddHeat",
-      "effect": "在延迟外、实体无 fireimmune 标签、未超本周期热量上限时，按热阻计算添加热量至 currentheat 并启动更新；若超燃点则暂停加热并触发 onflashpoint 回调（除非热源为受控燃烧）。"
+      "effect": "在延迟与免疫标签检查后，按热阻与上限限制增加当前热量与更新热量；若超闪点则暂停加热并可能触发闪点回调（非受控燃烧时）。副作用：可能启动更新、改变热量值、触发回调。"
     },
     {
       "name": "Flash",
-      "effect": "若接受热量且未暂停且无延迟，强制减去并添加超过燃点的热量以尝试触发燃点逻辑（调用 AddHeat）。"
+      "effect": "若允许接受热量且无延迟，强制减去并添加热量以试图突破闪点。副作用：可能触发闪点回调与加热暂停。"
     },
     {
       "name": "OnUpdate",
-      "effect": "周期更新：重算热量上限，衰减 currentheat；若 spreading 则寻找实体传播热量、解冻、添加 firemelt 标签/事件，并按需造成火伤害；否则清理 firemelt 并可能在热量归零时停止更新。"
+      "effect": "重新计算热上限并衰减热量；传播状态下对范围内实体传热、解冻、加火融标签并可能造成火焰伤害；非传播状态则清理火融标签并在热量归零时停止更新。副作用：广泛影响周围实体状态、可能造成伤害或事件推送。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含范围、输出、热阻、燃点、延迟、传播状态、受热状态、当前热量的调试字符串。"
+      "effect": "返回包含范围、输出、热阻、闪点等信息的调试字符串。无副作用。"
     }
   ],
   "events_published": [],
@@ -83,41 +83,38 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      15651,
-      14484,
-      14099,
-      15722,
-      15675,
-      16633,
-      19167,
-      21620
+      20496,
+      10374,
+      18219,
+      72974,
+      13897,
+      15734,
+      16419,
+      20719
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录涉及龙蝇、杂草、暗影秘典、食人花、疙瘩树、桨、蜂窝、宝石发电机等实体，内容主要描述生成间隔、掉落数量、行为距离、耐久、电力等，未出现任何与热量计算、传播、闪烁、加热、更新等 propagator 组件能力相关的表达。",
+    "no_evidence_reason": "页面摘录涉及火焰伤害、燃烧状态、物品温度及免疫等，但未出现热量(heat)传播、热阻、添加热量等propagator组件能力对应的玩家语言表达；如20496页提及燃烧状态传递，但未明确关联热量传播机制，其余页面均无相关描述，故认为不讨论该组件能力。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "火焰传播",
-    "热量传递",
-    "点燃判定",
-    "解冻功能",
-    "火伤范围",
-    "冰块融化",
-    "防火地形",
-    "加热延迟",
-    "燃点回调",
-    "热量衰减"
+    "热量积累",
+    "闪点点燃",
+    "融化冰冻",
+    "防火免疫",
+    "春季火势",
+    "火焰伤害",
+    "停止传热"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗",
-    "环境"
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
     "source_bytes": 9660,
     "model": "hy3-free",
-    "generated_at_ms": 1787891711177
+    "generated_at_ms": 1787895215153
   }
 }

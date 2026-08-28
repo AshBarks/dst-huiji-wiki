@@ -7,75 +7,75 @@
   },
   "category": "component",
   "display_name": "eater",
-  "summary": "Eater 组件管理实体的饮食能力与偏好数据，包括可吃食物组、吸收倍率、上次进食时间等。它参与进食核心玩法，负责判定能否进食、施加食物对健康/饥饿/理智的影响，并支持特殊饮食规则如吃生肉、齿轮或忽略腐烂。",
+  "summary": "Eater 组件管理实体进食相关的状态数据，包括可食食物组、偏好、三维吸收系数与最后进食时间等。它参与生存核心玩法，负责判定实体能否或偏好进食、执行进食结算生命/饥饿/理智变化，并触发进食事件与回调。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "清除实体上由 caneat 属性产生的食物类型标签（调用 clearcaneat）。"
+      "effect": "调用 clearcaneat 移除实体身上由 caneat 列表产生的各类 *_eater 标签。"
     },
     {
       "name": "SetDiet",
-      "effect": "设置 self.caneat 与 self.preferseating（缺省同 caneat），因 caneat 属性监听触发标签移除与添加。"
+      "effect": "设置 self.caneat 与 self.preferseating（默认同 caneat）。因 caneat 字段设有 setter，会先清除旧标签再添加新标签。"
     },
     {
       "name": "SetAbsorptionModifiers",
-      "effect": "设置 healthabsorption、hungerabsorption、sanityabsorption 三个吸收倍率，无其它副作用。"
+      "effect": "直接赋值 healthabsorption, hungerabsorption, sanityabsorption 三个字段，用于进食时乘算三维变化。"
     },
     {
       "name": "TimeSinceLastEating",
-      "effect": "返回当前时间减去 lasteattime 的差值，若 lasteattime 为 nil 则返回 nil。"
+      "effect": "返回 GetTime() - self.lasteattime 或 nil，无副作用。"
     },
     {
       "name": "HasBeen",
-      "effect": "返回 lasteattime 为 nil 或距上次进食时间大于等于给定 time 的布尔值。"
+      "effect": "返回 self.lasteattime 为 nil 或 TimeSinceLastEating() >= time 的布尔值，无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "若 lasteattime 非 nil 则返回包含 time_since_eat 的表，否则返回 nil，用于存档。"
+      "effect": "若 lasteattime 非 nil 则返回 {time_since_eat = 差值} 表，否则 nil。"
     },
     {
       "name": "OnLoad",
-      "effect": "若 data.time_since_eat 存在，据此重设 lasteattime 为 GetTime() 减去该值。"
+      "effect": "若 data.time_since_eat 存在，设置 lasteattime 为 GetTime() - 该值。"
     },
     {
       "name": "SetCanEatHorrible",
-      "effect": "将 FOODTYPE.HORRIBLE 插入 preferseating 与 caneat，并为实体添加 HORRIBLE_eater 标签。"
+      "effect": "将 FOODTYPE.HORRIBLE 插入 preferseating 与 caneat 表，并添加 'HORRIBLE_eater' 标签。"
     },
     {
       "name": "SetCanEatGears",
-      "effect": "将 FOODTYPE.GEARS 插入 preferseating 与 caneat，并添加 GEARS_eater 标签。"
+      "effect": "将 FOODTYPE.GEARS 插入 preferseating 与 caneat 表，并添加 'GEARS_eater' 标签。"
     },
     {
       "name": "SetCanEatNitre",
-      "effect": "根据布尔参数添加或移除 NITRE 到饮食表与 NITRE_eater 标签。"
+      "effect": "参数 can_eat 为真时插入 NITRE 类型与标签；为假时移除，同步更新 preferseating 与 caneat 及标签。"
     },
     {
       "name": "SetCanEatRaw",
-      "effect": "将 FOODTYPE.RAW 插入饮食表并添加 RAW_eater 标签。"
+      "effect": "将 FOODTYPE.RAW 插入 preferseating 与 caneat 表，并添加 'RAW_eater' 标签。"
     },
     {
       "name": "SetPrefersEatingTag",
-      "effect": "初始化或追加 preferseatingtags 表，用于后续进食偏好判定。"
+      "effect": "将 tag 加入 self.preferseatingtags（无则创建表），用于后续 PrefersToEat 的标签匹配。"
     },
     {
       "name": "SetStrongStomach",
-      "effect": "根据布尔值添加或移除 strongstomach 标签与对应属性，影响怪物肉负面效果。"
+      "effect": "根据布尔值添加/移除 'strongstomach' 标签并设置 self.strongstomach，影响 DoFoodEffects 对怪物肉的判断。"
     },
     {
       "name": "SetCanEatRawMeat",
-      "effect": "根据布尔值添加或移除 eatsrawmeat 标签与属性，允许吃生肉无惩罚。"
+      "effect": "根据布尔值添加/移除 'eatsrawmeat' 标签并设置字段，影响 DoFoodEffects 对生肉的判断。"
     },
     {
       "name": "SetIgnoresSpoilage",
-      "effect": "根据布尔值添加或移除 ignoresspoilage 标签与属性。"
+      "effect": "根据布尔值添加/移除 'ignoresspoilage' 标签并设置字段。"
     },
     {
       "name": "SetRefusesSpoiledFood",
-      "effect": "根据布尔值添加或移除 nospoiledfood 标签与属性，拒绝吃腐烂食物。"
+      "effect": "根据布尔值添加/移除 'nospoiledfood' 标签并设置字段，影响 PrefersToEat 判定。"
     },
     {
       "name": "SetSpoiledProcessor",
-      "effect": "设置腐烂处理器标签与属性；allspoiled 控制是否处理所有易腐品；移除时清理标签。"
+      "effect": "设置 'spoiledprocessor' 标签与字段；若 allspoiled 为真额外加 'allspoiledprocessor' 标签，否则移除；为假时全清。"
     },
     {
       "name": "IsSpoiledProcessor",
@@ -83,103 +83,118 @@
     },
     {
       "name": "CanProcessSpoiledItem",
-      "effect": "判定是否为腐烂处理器且食物处于腐烂状态（或全腐烂处理器且易腐品腐烂）。"
+      "effect": "结合 IsSpoiledProcessor 与食物 edible 变质状态或 perishable 变质状态返回布尔。"
     },
     {
       "name": "SetOnEatFn",
-      "effect": "设置进食回调函数 oneatfn。"
+      "effect": "设置 self.oneatfn 回调，进食后调用。"
     },
     {
       "name": "DoFoodEffects",
-      "effect": "返回是否施加食物正常效果的布尔（考虑强胃、生肉、食物亲和组件）。"
+      "effect": "返回并非 (强壮胃且怪物肉) 或 (吃生肉且生肉) 或 (有食物亲和且亲和) 的布尔，用于决定是否结算三维。"
     },
     {
       "name": "GetEdibleTags",
-      "effect": "返回基于 caneat 计算的 edible_xxx 标签表，可能使用或写入缓存 cacheedibletags。"
+      "effect": "遍历 caneat 生成 'edible_类型' 标签表；若 cacheedibletags 不为 false 则缓存并返回。"
     },
     {
       "name": "Eat",
-      "effect": "若 PrefersToEat 通过，计算并施加食物三维属性变化，触发 oneat 事件与回调，消耗食物，更新进食时间，并可能推送喂食事件给 feeder。"
+      "effect": "若 PrefersToEat 通过，计算三维增量（乘吸收系数与食物记忆等，若 self.custom_stats_mod_fn 存在则调用修正），调用对应组件 DoDelta，向 feeder 可能推事件，向自身推 'oneat' 事件，调用 oneatfn，执行食物 OnEaten 与移除，更新 lasteattime 与食物记忆，返回 true。"
     },
     {
       "name": "TestFood",
-      "effect": "检测食物是否含有与 testvalues 对应的 edible_xxx 标签，返回布尔。"
+      "effect": "检查食物是否具有 testvalues 中类型对应的 'edible_*' 标签，返回布尔。"
     },
     {
       "name": "PrefersToEat",
-      "effect": "综合特殊规则（如果酱蛋糕、拒腐、偏好标签）与 TestFood 判定是否偏好吃该食物。"
+      "effect": "综合水果蛋糕特例、拒变质、偏好标签及 TestFood(preferseating) 返回是否偏好吃该食物。"
     },
     {
       "name": "CanEat",
-      "effect": "调用 TestFood 以 caneat 表判定实体能否吃该食物。"
+      "effect": "调用 TestFood(food, self.caneat) 返回是否能吃。"
     },
     {
       "name": "IsTryingToFeedMe",
-      "effect": "检查给定实体的当前或远程交互动作是否为喂食且目标为本实体。"
+      "effect": "检查传入实体的缓冲动作或远程交互是否以自身为目标且动作是 FEED 或 FEEDPLAYER，返回布尔。"
     }
   ],
   "events_published": [
-    "oneat",
-    "feedincontainer",
-    "feedmount"
+    "oneat"
   ],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      16419,
-      13139,
-      20719,
-      10374,
-      13156,
-      13901,
-      15237,
-      15258
+      16197,
+      13437,
+      15244,
+      15245,
+      13261,
+      18234,
+      13456,
+      16419
     ],
     "aspects": [
       {
-        "aspect": "猪人喂食肉类与可怕食物标注",
+        "aspect": "实体可食用食物类型差异",
         "evidence": [
           {
-            "pageid": 15237,
-            "quote": "玩家也可以给予猪人食物。其中肉类食物和可怕食物可以雇佣猪人"
+            "pageid": 16197,
+            "quote": "不同实体可食用的食物类型有所不同"
           }
         ]
       },
       {
-        "aspect": "素食进食与浆果采摘描述",
+        "aspect": "实体食用食物行为描述",
         "evidence": [
           {
-            "pageid": 13901,
-            "quote": "寻找地上的素食食物慢步走过去吃掉，或是快步跑向未采摘的浆果丛进行采摘和食用"
+            "pageid": 16197,
+            "quote": "食物可以被玩家、生物等实体食用"
+          }
+        ]
+      },
+      {
+        "aspect": "特殊食物食用额外效果",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "一些特殊的食物（例如发光浆果）在食用时会有额外的效果"
+          }
+        ]
+      },
+      {
+        "aspect": "进食后属性效果计算描述",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "交由相应的（饥饿值/生命值/理智值）组件进行进一步的计算"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "啥能吃",
-    "吃东西",
-    "食物偏好",
-    "饥饿回复",
-    "理智回复",
-    "健康回复",
-    "腐烂无视",
-    "生肉食用",
-    "齿轮食用",
-    "上次进食"
+    "进食",
+    "能吃",
+    "饮食",
+    "饥饿",
+    "生命",
+    "理智",
+    "变质",
+    "生肉",
+    "吸收",
+    "偏好"
   ],
   "gameplay_tags": [
-    "生存",
-    "进食"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
     "source_bytes": 11787,
     "model": "hy3-free",
-    "generated_at_ms": 1787892563799
+    "generated_at_ms": 1787896038466
   }
 }

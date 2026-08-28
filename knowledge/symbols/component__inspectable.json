@@ -7,31 +7,31 @@
   },
   "category": "component",
   "display_name": "inspectable",
-  "summary": "该组件管理实体的可检查数据，包括描述文本、名称覆盖及状态查询逻辑。它参与游戏中的观察与交互核心玩法，使玩家能够查看物体描述与实时状态（如死亡、睡眠、燃烧、枯萎等），并可选记录查看统计。",
+  "summary": "该组件管理实体的检查描述、名称覆盖及状态获取逻辑，并为实体添加 inspectable 标签以支持玩家查看。它参与核心的探索与生存玩法，根据实体组件状态（如燃烧、死亡、枯萎）和查看者条件（如黑暗、幽灵）动态返回描述与状态文本。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "从所属实体移除 'inspectable' 标签，副作用是实体不再被系统视为可检查对象。"
+      "effect": "从实体移除 'inspectable' 标签，清理组件关联标记，无参数。"
     },
     {
       "name": "SetDescription",
-      "effect": "将传入的 desc（字符串、字符串表或函数）赋值给 self.description，供 GetDescription 使用，无其它副作用。"
+      "effect": "设置 self.description 字段，接受字符串、字符串表或函数，作为 GetDescription 返回的基础描述数据。"
     },
     {
       "name": "SetNameOverride",
-      "effect": "设置 self.nameoverride 字段，根据注释该字段用于覆盖检查时的字符串名称（非显示名），可能影响后续检查文本生成，无直接副作用。"
+      "effect": "设置 self.nameoverride 字段，覆盖检查时的名称字符串（注释指明实际为检查字符串名而非显示名）。"
     },
     {
       "name": "RecordViews",
-      "effect": "设置 self.recordview 为 state ~= false（即非 false 即为真）。当为真时，GetStatus 被调用会触发 ProfileStatsSet 记录该 prefab 被检查的统计信息。"
+      "effect": "设置 self.recordview 标记：当参数 state 不为 false 时记为 true，使得后续 GetStatus 调用时通过 ProfileStatsSet 记录该 prefab 被查看的统计信息。"
     },
     {
       "name": "GetStatus",
-      "effect": "返回实体状态字符串或 nil。若查看者为实体自身则返回 nil；若 recordview 为真，则调用 ProfileStatsSet 写入玩家档案统计；随后按优先级检测组件状态（如死亡、睡眠、燃烧、疾病、枯萎、持有等）或标签返回对应字符串，否则 nil。无修改实体状态副作用。"
+      "effect": "若查看者与自身实体相同则返回 nil；若 recordview 开启则记录查看统计；依次检查 getstatus 回调及 health、sleeper、burnable、diseaseable、pickable、witherable、inventoryitem、occupiable 组件或 burnt 标签，返回对应状态字符串（如 'DEAD'、'BURNING'）或 nil。副作用仅为可能的统计记录。"
     },
     {
       "name": "GetDescription",
-      "effect": "返回实体描述文本及可能的 filter_context、author。若查看者为自身返回 nil；若查看者不可见目标且不在特定口袋维度容器中打开，返回太暗提示字符串；优先调用 getspecialdescription 或 descriptionfn 获取描述，否则用 self.description；若描述缺失或查看者为幽灵/哑剧则强制调用通用 GetDescription 并附状态；若实体阴燃返回阴燃提示。纯查询无副作用。"
+      "effect": "返回实体描述文本及可能的上下文。若查看者为自身返回 nil；若查看者不可见目标且非口袋维度容器打开则返回太暗提示字符串；优先通过 getspecialdescription 或 descriptionfn 或 description 获取描述；若描述缺失或查看者为幽灵/默剧演员则强制调用全局 GetDescription 并附 GetStatus 状态；若实体阴燃返回阴燃字符串；否则返回描述、filter_context 与 author。"
     }
   ],
   "events_published": [],
@@ -42,36 +42,36 @@
     "scanned_pageids": [
       20496,
       10374,
+      13260,
       15596,
+      18838,
       21291,
       15022,
-      14938,
-      15327,
-      15832
+      14938
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的所有页面摘录均围绕实体的燃烧、技能、掉落、生成与行为展开，无任何涉及检查（inspectable）组件的描述设置、名称覆盖、查看记录或状态获取等能力表达。",
+    "no_evidence_reason": "提供的页面摘录主要讨论燃烧状态、角色技能、生物行为、掉落等，未出现 inspectable 组件能力（如设置描述、名称覆盖、记录查看、获取状态/描述、移除回调）的玩家语言表达；页面18838提及‘鬼魂拥有独特的检查物品台词’属于角色侧检查台词而非该组件能力，故无对应证据。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "检查物体",
-    "查看描述",
-    "物体状态",
-    "太暗提示",
+    "查看状态",
+    "物体描述",
+    "检查物品",
     "燃烧状态",
+    "枯萎判断",
+    "太暗提示",
+    "幽灵描述",
     "名称覆盖",
-    "可检查",
     "记录查看"
   ],
   "gameplay_tags": [
-    "生存",
-    "探索"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
     "source_bytes": 3470,
     "model": "hy3-free",
-    "generated_at_ms": 1787891427449
+    "generated_at_ms": 1787894896290
   }
 }

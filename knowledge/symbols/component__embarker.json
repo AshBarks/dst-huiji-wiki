@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "embarker",
-  "summary": "Embarker 组件管理实体登船或离船的目标实体、目标坐标、速度及跳跃起点等数据。它参与核心玩法为控制实体从水中跳到可行走平台（船）或跳离至陆地的移动插值、传送与物理马达驱动，并协同 locomotor 完成跳跃动作。",
+  "summary": "组件管理实体登船与离船的目标位置、速度及移动状态数据，用于实现角色在船只平台与陆地间的跳跃移动。核心玩法涉及通过步行平台组件定位登船点，控制实体以特定速度寻路并传送至目标，并支持取消与完成事件反馈。",
   "api": [
     {
       "name": "UpdateEmbarkingPos",
-      "effect": "计算当前登船目标位置并存入 last_embark_x/z；若剩余距离小于等于本帧移动距离则传送至目标并推送 'done_embark_movement' 事件；否则若已跳跃距离超阈值则调用 Cancel 并推送事件，否则设置实体朝向目标并启动物理马达速度。副作用：修改坐标缓存、可能传送、推送事件、可能取消、设置旋转与速度。"
+      "effect": "计算登船目标位置并更新 last_embark_x/z；根据剩余距离与本帧移动距离比较，若到达则传送实体并推送 done_embark_movement 事件；否则若已移动距离超过最大跳跃距离则取消移动并推送事件，否则设置实体朝向目标并启动物理马达速度。"
     },
     {
       "name": "SetEmbarkable",
-      "effect": "设置 self.embarkable 为目标，更新 last_embark_x/z 为登船位置，强制面朝该点，清空 disembark_x/z。副作用：数据变更与转向。"
+      "effect": "设置 embarkable 目标，更新 last_embark_x/z 为登船位置，强制实体面朝该点，并清除 disembark_x/z。"
     },
     {
       "name": "SetDisembarkPos",
-      "effect": "设置 disembark_x/z 为指定坐标，强制面朝该点，清空 embarkable 与 last_embark 坐标。副作用：数据变更与转向。"
+      "effect": "设置 disembark_x/z 为指定坐标，强制实体面朝该点，清除 embarkable 与 last_embark_x/z 状态。"
     },
     {
       "name": "SetDisembarkActionPos",
-      "effect": "调用辅助函数 GetDisembarkPosAndDistance 计算离船位置并赋值给 disembark_x/z。副作用：仅数据变更。"
+      "effect": "调用全局函数 GetDisembarkPosAndDistance 计算登陆位置，并将返回的前两个坐标值设置为 disembark_x/z。"
     },
     {
       "name": "StartMoving",
-      "effect": "若未初始化跳跃距离，停止物理，启动组件更新，计算 max_hop_dist_sq 与 hop_start_pt，并推送 'start_embark_movement' 事件。副作用：启动更新循环、停止物理、推送事件。"
+      "effect": "若未设置最大跳跃距离，则停止物理，启动组件更新，基于 locomotor 跳跃距离计算 max_hop_dist_sq 并记录 hop_start_pt，推送 start_embark_movement 事件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "调用 UpdateEmbarkingPos(dt)。副作用同 UpdateEmbarkingPos。"
+      "effect": "每帧更新回调，调用 UpdateEmbarkingPos 执行移动逻辑与副作用。"
     },
     {
       "name": "HasDestination",
-      "effect": "返回 (self.embarkable 有效) 或 (self.disembark_x 不为 nil)。无副作用。"
+      "effect": "返回布尔值，指示是否存在有效 embarkable 或已设置 disembark_x，无副作用。"
     },
     {
       "name": "GetEmbarkPosition",
-      "effect": "返回登船坐标：若 embarkable 有效则从平台组件获取，否则用 disembark 或 last_embark 或当前坐标。无副作用。"
+      "effect": "返回登船目标坐标：若 embarkable 有效则委托 walkableplatform 组件计算，否则使用 disembark 或 last_embark 坐标，若无则使用实体自身坐标；无副作用。"
     },
     {
       "name": "Embark",
-      "effect": "停止物理，将实体传送到登船位置，清空所有状态数据，停止组件更新，并调用 locomotor:FinishHopping()。副作用：传送、状态清除、停止更新、结束跳跃。"
+      "effect": "停止物理，将实体传送到登船位置，清除所有移动状态与更新，调用 locomotor:FinishHopping 结束跳跃。"
     },
     {
       "name": "Cancel",
-      "effect": "停止物理，清空状态数据，停止组件更新，调用 locomotor:FinishHopping()。副作用：状态清除、停止更新、结束跳跃。"
+      "effect": "停止物理，清除所有移动状态与更新，调用 locomotor:FinishHopping 结束跳跃，不传送实体。"
     }
   ],
   "events_published": [
@@ -59,32 +59,52 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      18503,
-      18510,
-      20156,
-      20293,
-      45525,
+      13602,
+      15746,
+      18504,
       18540,
-      20117,
-      20180
+      65881,
+      13556,
+      13828,
+      15351
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录均围绕月亮码头布景、女王、码头套装、自动航行仪、海盗袭击、地皮、码头桩等实体，未提及任何与登船(embark)、下船(disembark)、登船位置设置、移动目的地等组件能力相关的玩家语言描述或数值行为。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "跳上船行为描述",
+        "evidence": [
+          {
+            "pageid": 13602,
+            "quote": "它会跳上船发动三连范围攻击"
+          },
+          {
+            "pageid": 15746,
+            "quote": "靠近船后会从海中跳到船上啃噬"
+          },
+          {
+            "pageid": 18540,
+            "quote": "火药猴就会跳上船去放下锚"
+          },
+          {
+            "pageid": 65881,
+            "quote": "可以跳上船吸引大副仇恨即可恢复"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
+    "上船",
+    "下船",
+    "跳船",
     "登船",
     "离船",
-    "跳上船",
-    "下平台",
     "登陆点",
-    "乘船",
-    "航行",
-    "码头"
+    "船只移动",
+    "位移"
   ],
   "gameplay_tags": [
     "航行",
-    "登船",
     "移动"
   ],
   "related_symbols": [],
@@ -92,6 +112,6 @@
     "source_sha256": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
     "source_bytes": 5385,
     "model": "hy3-free",
-    "generated_at_ms": 1787893471823
+    "generated_at_ms": 1787896879663
   }
 }

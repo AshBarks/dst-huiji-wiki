@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "cookable",
-  "summary": "该组件管理实体的烹饪产物（product）与烹饪完成回调（oncooked），并为实体添加“cookable”标签。它参与烹饪核心玩法，在调用 Cook 时生成对应食物产物，并按比例继承原实体的易腐度，支撑生存中的食物制作系统。",
+  "summary": "该组件管理实体能否被烹饪的相关数据，包括烹饪产物标识与烹饪完成回调。它参与烹饪核心玩法，在烹饪时生成指定产物并可能根据原材料的保鲜度调整产物的保鲜度。组件通过为实体添加 'cookable' 标签来标识其可烹饪性。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "从实体移除 'cookable' 标签，无返回值。"
-    },
-    {
       "name": "SetOnCookedFn",
-      "effect": "将传入函数 fn 存储至 self.oncooked，作为烹饪完成时调用的回调，无额外副作用。"
+      "effect": "将内部回调属性 oncooked 设置为传入的函数 fn。仅修改组件内部状态，无其它副作用。"
     },
     {
       "name": "Cook",
-      "effect": "若 self.oncooked 非空则调用之（参数：inst, cooker, chef）；若 self.product 非空则生成对应 prefab（若为函数则调用得到名称），生成成功后若原实体与产物均有 perishable 组件且原实体无 'smallcreature' 标签，则按 1 - (1 - 原易腐百分比)*0.5 设置产物易腐百分比；返回生成的产物实体或 nil。"
+      "effect": "触发烹饪：若设置了 oncooked 回调则调用之（参数含实体、烹饪器、厨师）；若 product 非空则生成对应预制体（支持函数动态决定），并对符合条件的易腐产物按原材料剩余保鲜度折半损耗规则设置初始保鲜百分比；返回生成的产物实例或 nil。副作用包括可能生成新实体、修改产物保鲜度、执行回调。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的 'cookable' 标签。副作用为实体失去该标签。"
     }
   ],
   "events_published": [],
@@ -28,43 +28,51 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      20789,
       13476,
+      24170,
       24540,
       65872,
-      15737,
-      15235,
-      19765,
-      17997,
-      15715
+      10374,
+      13456,
+      14709
     ],
     "aspects": [
       {
-        "aspect": "烹饪后产物描述",
+        "aspect": "烹饪后转化与属性标注",
         "evidence": [
           {
-            "pageid": 15235,
-            "quote": "烹饪兔子会获得 1 个烤小肉"
+            "pageid": 20789,
+            "quote": "食物在烹饪后会转化为对应的熟食，并恢复部分新鲜度"
+          },
+          {
+            "pageid": 20789,
+            "quote": "熟食往往具有更高的生命值和理智值增益"
+          },
+          {
+            "pageid": 13456,
+            "quote": "熟食通常比生食恢复得更多"
+          },
+          {
+            "pageid": 10374,
+            "quote": "无法避免将食物类转变为对应的熟食"
           }
         ]
       },
       {
-        "aspect": "食材可烹饪标注",
+        "aspect": "烹饪触发操作描述",
         "evidence": [
           {
-            "pageid": 19765,
-            "quote": "均可作为食材放入锅中烹饪"
+            "pageid": 20789,
+            "quote": "用鼠标将物品栏中的食物移到火源上，显示“烹饪”提示时点击即可"
           },
           {
-            "pageid": 17997,
-            "quote": "可作为食材放入锅中烹饪"
+            "pageid": 13476,
+            "quote": "向烹饪用具中放入 4 个食材即可开始烹饪"
           },
           {
-            "pageid": 15715,
-            "quote": "可作为食材放入锅中烹饪"
-          },
-          {
-            "pageid": 15235,
-            "quote": "烹饪兔子会获得 1 个烤小肉"
+            "pageid": 65872,
+            "quote": "其余五者需放入对应加热装置内才可进行添火烹饪"
           }
         ]
       }
@@ -74,22 +82,22 @@
   "search_terms": [
     "可烹饪",
     "烹饪产物",
-    "烤熟食物",
-    "煮食",
-    "食物转化",
-    "易腐继承",
-    "烹饪标签",
-    "熟食制作"
+    "熟食",
+    "烤制",
+    "烹饪回调",
+    "易腐食物",
+    "保鲜度",
+    "生成食物"
   ],
   "gameplay_tags": [
-    "烹饪",
-    "生存"
+    "生存",
+    "烹饪"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "2ae9fb18536e93105b0c0da2376d90c401806ca79d2a6fda87c349af5aec40ed",
     "source_bytes": 1132,
     "model": "hy3-free",
-    "generated_at_ms": 1787893341919
+    "generated_at_ms": 1787896776787
   }
 }

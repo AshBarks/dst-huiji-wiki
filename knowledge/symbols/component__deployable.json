@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "deployable",
-  "summary": "该组件管理实体的部署模式、间距、限制标签与网格放置器等数据，并为实体添加 'deployable' 标签以标识可放置物品。它参与建造核心玩法，提供在地图上检查与执行物品部署（如种植物、建墙、铺地皮、水域放置）的逻辑，并在部署时触发相关事件。",
+  "summary": "该组件管理物品的可部署数据，包括部署模式、间距、限制标签与网格放置标志等。它参与建造、种植、放墙及水面放置等核心部署玩法，通过地图检测与事件推送完成放置逻辑。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，重置关联 replica.inventoryitem 的部署模式为 DEPLOYMODE.NONE 与限制标签为 nil（若存在），并移除实体上的 'deployable' 标签。"
+      "effect": "组件从实体移除时，将 replica.inventoryitem 的部署模式设为 DEPLOYMODE.NONE、限制标签设为 nil，并移除实体 'deployable' 标签。"
     },
     {
       "name": "SetDeployMode",
-      "effect": "设置 self.mode 为给定值，并通过元表回调同步至 replica.inventoryitem 的部署模式（若存在），影响客户端表现。"
+      "effect": "设置 self.mode 并触发 onmode 回调，通过 replica.inventoryitem:SetDeployMode 同步客户端部署模式。"
     },
     {
       "name": "GetDeployMode",
-      "effect": "返回当前 self.mode 部署模式，无副作用。"
+      "effect": "返回 self.mode 当前值。"
     },
     {
       "name": "SetDeploySpacing",
-      "effect": "设置 self.spacing 部署间距，并通过元表回调同步至 replica.inventoryitem 的部署间距（若存在）。"
+      "effect": "设置 self.spacing 并触发 onspacing 回调，通过 replica.inventoryitem:SetDeploySpacing 同步客户端部署间距。"
     },
     {
       "name": "SetUseGridPlacer",
-      "effect": "设置 self.usegridplacer 为给定值或 nil，并通过元表回调同步至 replica.inventoryitem 的网格放置器标记（若存在）。"
+      "effect": "设置 self.usegridplacer 为传入值或 nil，并触发 onusegridplacer 回调，通过 replica.inventoryitem:SetUseGridPlacer 同步网格放置器标志。"
     },
     {
       "name": "DeploySpacingRadius",
-      "effect": "根据当前 spacing 从全局表 DEPLOYSPACING_RADIUS 中返回对应半径值，无副作用。"
+      "effect": "返回 DEPLOYSPACING_RADIUS 表中以 self.spacing 为键的半径值，无副作用。"
     },
     {
       "name": "SetDeployTossSymbolOverride",
-      "effect": "设置 self.deploytoss_symbol_override 为传入的数据，用于部署投掷动画的符号覆盖。"
+      "effect": "设置 self.deploytoss_symbol_override 为传入 data，用于部署投掷动画符号覆盖，无客户端同步。"
     },
     {
       "name": "IsDeployable",
-      "effect": "检查部署者是否满足限制标签及骑乘/浮漂等状态约束，返回布尔值表示当前是否可部署，无副作用。"
+      "effect": "根据 restrictedtag、deployer 骑乘状态或手持浮船器状态判断物品是否可部署，返回布尔值，无副作用。"
     },
     {
       "name": "CanDeploy",
-      "effect": "先调用 IsDeployable 检查，再依据部署模式调用地图相关接口检测指定点是否允许部署，返回布尔值及可能的原因，纯查询无副作用。"
+      "effect": "先调用 IsDeployable 检查，再根据 self.mode 调用地图相应方法检测点位可否部署，返回布尔值及可选原因，无副作用。"
     },
     {
       "name": "Deploy",
-      "effect": "调用 CanDeploy 校验，若不可部署则返回 false 与原因；若可部署则执行 self.ondeploy 回调（可能导致实体移除），令部署者推送 'deployitem' 事件，若为植物则令世界推送 'itemplanted' 事件，最后返回 true。"
+      "effect": "调用 CanDeploy 检查点位，若不可部署则返回 false 及原因；若可部署则执行 self.ondeploy 回调（可能移除自身实体），令 deployer 推送 'deployitem' 事件，若原实体有 'deployedplant' 标签则令 TheWorld 推送 'itemplanted' 事件，返回 true。"
     }
   ],
   "events_published": [],
@@ -57,38 +57,39 @@
   "wiki": {
     "scanned_pageids": [
       28738,
-      21416,
       13457,
       15551,
-      19761,
-      34523,
       21620,
-      18216
+      18216,
+      18843,
+      13707,
+      16118
     ],
     "aspects": [],
-    "no_evidence_reason": "所有页面摘录未讨论 component__deployable 的任何能力，仅涉及容器内放置物品、燃料填充或实体自然生成，无部署模式、间距、可部署性等表达。",
+    "no_evidence_reason": "页面摘录中‘放置物品’指向存放物品至实体而非部署实体；建筑类仅称‘可制作建筑’未描述部署机制（模式/间距/网格等）；生物与药剂无关；全文本无deployable组件能力（OnRemoveFromEntity等）的玩家语言表达。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "可部署",
-    "放置物",
-    "建墙壁",
-    "种植物",
-    "铺地皮",
-    "水域放",
+    "放置物品",
+    "部署模式",
+    "建造间距",
     "网格放置",
-    "部署限制",
-    "投掷动画",
-    "放置间距"
+    "限制标签",
+    "种植地点",
+    "建墙地点",
+    "水面部署",
+    "自定义部署"
   ],
   "gameplay_tags": [
-    "建造"
+    "建造",
+    "装饰"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
     "source_bytes": 4723,
     "model": "hy3-free",
-    "generated_at_ms": 1787893098765
+    "generated_at_ms": 1787896562861
   }
 }

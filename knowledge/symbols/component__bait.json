@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "bait",
-  "summary": "bait 组件管理实体作为诱饵时的所属陷阱引用（trap）。它监听实体的移除、捡起、被吃、被偷事件，联动陷阱组件进行诱饵移除或转移。该组件服务于陷阱捕捉与生存狩猎玩法，并提供诱饵空闲状态查询。",
+  "summary": "该组件管理诱饵实体对陷阱实体的引用（trap字段），并监听实体的移除、拾取、被吃、被偷事件以联动陷阱逻辑。它参与陷阱捕捉核心玩法，在诱饵状态变化时通知陷阱或处理物品转移。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除组件在实体上监听的 'onremove', 'onpickup', 'oneaten', 'onstolen' 事件回调，用于组件卸载时清理。"
+      "effect": "移除实体上针对 'onremove'、'onpickup'、'oneaten'、'onstolen' 事件的监听回调，清理组件关联的事件订阅，无其他副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回调试字符串，格式为 'Trap:' 拼接 self.trap 的 tostring 结果，无副作用。"
+      "effect": "返回字符串 'Trap:' 拼接 trap 字段的 tostring 结果，用于调试信息显示，无副作用。"
     },
     {
       "name": "IsFree",
-      "effect": "返回 self.trap == nil 的布尔结果，用于判断诱饵是否未被陷阱占用，无副作用。"
+      "effect": "返回布尔值，指示 self.trap 是否为 nil（即诱饵是否未被任何陷阱使用），无副作用。"
     }
   ],
   "events_published": [],
@@ -33,37 +33,38 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      14785,
-      15895,
-      17948,
-      18077,
-      18179,
-      20538,
-      17973,
-      18031
+      22181,
+      15722,
+      13260,
+      14676,
+      13761,
+      15327,
+      20832,
+      15237
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录涵盖实体 gunpowder、rock_avocado_fruit_ripe、barnacle_cooked、drumstick、plantmeat、cookedmonstermeat、ash、froglegs_cooked，内容仅涉及爆炸、成熟、烹饪肉度、掉落、燃烧消失等，无任何与 bait 组件能力（OnRemoveFromEntity、GetDebugString、IsFree）对应的玩家语言描述或数值行为，故无证据。",
+    "no_evidence_reason": "页面摘录围绕诱饵实体或物品的生成、吸引、消失及互动机制，未以玩家语言体现component__bait的OnRemoveFromEntity、GetDebugString、IsFree等代码级能力表现。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "诱饵陷阱",
-    "饵被吃掉",
-    "饵被偷走",
-    "饵被捡起",
-    "空闲诱饵",
-    "陷阱绑饵"
+    "诱饵",
+    "陷阱饵",
+    "饵被吃",
+    "饵被偷",
+    "脱离陷阱",
+    "自由诱饵",
+    "绑陷阱",
+    "移除饵"
   ],
   "gameplay_tags": [
     "生存",
-    "陷阱",
-    "诱饵"
+    "陷阱"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
     "source_bytes": 1220,
     "model": "hy3-free",
-    "generated_at_ms": 1787893147943
+    "generated_at_ms": 1787896614582
   }
 }

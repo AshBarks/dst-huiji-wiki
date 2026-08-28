@@ -7,75 +7,75 @@
   },
   "category": "component",
   "display_name": "weapon",
-  "summary": "武器组件管理实体的伤害、攻击范围、弹射物及攻击回调等数据，支撑战斗系统中的近战与远程攻击玩法。它负责计算伤害、触发攻击事件与消耗耐久，是物品战斗能力的核心载体。",
+  "summary": "武器组件管理实体的基础伤害、攻击与命中距离、投射物、电击属性及攻击回调等数据。它深度参与战斗玩法，负责计算实际伤害（含特殊伤害与类型加成）、处理攻击时的回调与耐久消耗，并支持远程投射物发射。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "实体移除组件时调用，移除自身的 'weapon' 标签，并通过 replica.inventoryitem 将攻击范围重置为 -1。"
+      "effect": "移除实体上的 'weapon' 标签；若实体存在 inventoryitem 的 replica，则将其攻击距离设为 -1。"
     },
     {
       "name": "SetDamage",
-      "effect": "设置组件内部基础伤害值 self.damage 为传入的 dmg 参数，无其它副作用。"
+      "effect": "设置组件内部 damage 属性为传入的 dmg，作为后续 GetDamage 计算的基础伤害值。"
     },
     {
       "name": "SetRange",
-      "effect": "设置攻击范围 attackrange 与命中范围 hitrange，若 hit 未提供则 hitrange 等于 attackrange。"
+      "effect": "设置 attackrange 与 hitrange 属性；attackrange 设置会触发 setter 同步更新 replica.inventoryitem 的攻击距离（若可用），hitrange 缺省时等于 attackrange。"
     },
     {
       "name": "SetOnAttack",
-      "effect": "设置攻击发生时的回调函数 self.onattack，供 OnAttack 中调用。"
+      "effect": "设置 self.onattack 回调函数，该函数在 OnAttack 执行时被调用，接收 inst, attacker, target 参数。"
     },
     {
       "name": "SetOnProjectileLaunch",
-      "effect": "设置发射弹射物之前执行的回调函数 self.onprojectilelaunch。"
+      "effect": "设置 self.onprojectilelaunch 回调函数，在 LaunchProjectile 生成投射物之前调用。"
     },
     {
       "name": "SetOnProjectileLaunched",
-      "effect": "设置发射弹射物之后执行的回调函数 self.onprojectilelaunched。"
+      "effect": "设置 self.onprojectilelaunched 回调函数，在 LaunchProjectile 发射投射物之后调用，并传入生成的 proj 实体。"
     },
     {
       "name": "SetProjectile",
-      "effect": "设置远程攻击使用的弹射物 prefab 名称 self.projectile。"
+      "effect": "设置 self.projectile 为指定的 prefab 名称，决定 LaunchProjectile 生成的远程攻击实体。"
     },
     {
       "name": "SetProjectileOffset",
-      "effect": "设置弹射物生成时相对于攻击者位置的世界坐标偏移量 self.projectile_offset。"
+      "effect": "设置 self.projectile_offset 偏移量，用于 LaunchProjectile 时计算投射物生成的初始位置偏移。"
     },
     {
       "name": "SetElectric",
-      "effect": "将刺激类型 self.stimuli 设为 'electric'，并记录电击伤害乘数 electric_damage_mult 与潮湿电击伤害乘数 electric_wet_damage_mult。"
+      "effect": "将 stimuli 设为 'electric'，并记录 electric_damage_mult 与 electric_wet_damage_mult 乘数，赋予武器电击属性。"
     },
     {
       "name": "SetOverrideStimuliFn",
-      "effect": "设置用于覆盖刺激类型（stimuli）的函数 self.overridestimulifn。"
+      "effect": "设置 self.overridestimulifn 函数，用于覆盖武器刺激类型（stimuli）的获取逻辑。"
     },
     {
       "name": "CanRangedAttack",
-      "effect": "返回 self.projectile 是否非空，用于判断能否进行远程攻击，无副作用。"
+      "effect": "返回布尔值，指示 self.projectile 是否非空，即武器能否进行远程攻击。无副作用。"
     },
     {
       "name": "SetAttackCallback",
-      "effect": "废弃方法，效果同 SetOnAttack，将传入函数设为攻击回调 self.onattack。"
+      "effect": "废弃方法，功能等同于 SetOnAttack，将 self.onattack 设为传入函数。"
     },
     {
       "name": "GetDamage",
-      "effect": "计算最终伤害与特殊伤害表：解析伤害函数、收集特殊伤害、应用伤害类型加成组件的乘数，返回伤害数值与特殊伤害表，不修改状态。"
+      "effect": "计算并返回基础伤害 dmg 与特殊伤害 spdmg 表。会解析 damage 可能为函数的情况，收集特殊伤害，并若存在 damagetypebonus 组件则乘对应加成。纯计算无副作用。"
     },
     {
       "name": "OnAttack",
-      "effect": "执行攻击逻辑：调用攻击回调、推送 'weapononattack' 事件；若实体有 finiteuses 组件且非忽略战斗耐久损耗，且非弹射物反弹，则按攻击磨损倍率与高效用户乘数消耗耐久。"
+      "effect": "执行攻击逻辑：调用 onattack 回调；向实体推送 'weapononattack' 事件；若实体有 finiteuses 组件且未忽略战斗耐久损耗、且非弹射投射物，则根据 attackwear（默认1）与 attackwearmultipliers 及 efficientuser 乘数计算消耗并调用 finiteuses:Use 减少耐久。副作用包括触发回调、推送事件、消耗耐久。"
     },
     {
       "name": "LaunchProjectile",
-      "effect": "若配置了弹射物，则调用发射前回调，生成弹射物实体并依据偏移量设置位置后投掷向目标，处理延迟可见，最后调用发射后回调。会创建新实体。"
+      "effect": "若配置了 projectile，则先调用 onprojectilelaunch 回调；生成投射物 prefab，依据 projectile_offset 或攻击者位置设置坐标，并通过 projectile 或 complexprojectile 组件发射向目标；最后调用 onprojectilelaunched 回调。副作用为生成实体、发射投射物及触发回调。"
     },
     {
       "name": "EnableToughFight",
-      "effect": "设置 self.tough 标志（参数 tough 不为 false 时置真），影响 CanDoToughFight 的结果。"
+      "effect": "设置 self.tough 标记（tough 参数不为 false 时为真），用于标记武器是否参与硬仗逻辑。"
     },
     {
       "name": "CanDoToughFight",
-      "effect": "返回 self.tough 是否等于 true，无副作用。"
+      "effect": "返回 self.tough 是否等于 true 的布尔值，无副作用。"
     }
   ],
   "events_published": [
@@ -86,77 +86,105 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      20150,
-      20058,
       15022,
-      72238,
-      13409,
-      15238,
-      18843,
-      14816
+      20150,
+      15651,
+      13379,
+      13828,
+      13897,
+      14816,
+      15532
     ],
     "aspects": [
       {
-        "aspect": "伤害数值标注",
+        "aspect": "攻击伤害数值标注",
         "evidence": [
           {
-            "pageid": 13409,
-            "quote": "战斗长矛则可造成 42.5 点伤害"
+            "pageid": 15022,
+            "quote": "击中目标造成 135 点伤害"
           },
           {
-            "pageid": 18843,
-            "quote": "攻击造成17点物理伤害和30点位面"
+            "pageid": 13379,
+            "quote": "造成累计68伤害"
+          },
+          {
+            "pageid": 13897,
+            "quote": "造成 150（75 × 2）点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击范围数值标注",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "|攻击范围=3.5"
+          },
+          {
+            "pageid": 15651,
+            "quote": "|攻击范围 = 4（暴怒时6）"
+          },
+          {
+            "pageid": 13828,
+            "quote": "|攻击范围= 2.3 / 3.91 / 5.75"
+          },
+          {
+            "pageid": 13897,
+            "quote": "|攻击范围 = 3<br>4.2（狂暴）"
+          },
+          {
+            "pageid": 14816,
+            "quote": "|攻击范围 = 2"
+          },
+          {
+            "pageid": 15532,
+            "quote": "|攻击范围 = 2（近战）/ 6（远程）"
+          },
+          {
+            "pageid": 20150,
+            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击行为模式描述",
+        "evidence": [
+          {
+            "pageid": 13379,
+            "quote": "触手会从地下伸出发起攻击"
           },
           {
             "pageid": 15022,
-            "quote": "小虚影刺，击中目标造成 135 点伤害"
+            "quote": "优先使用翻滚攻击"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下"
+          },
+          {
+            "pageid": 13379,
+            "quote": "目标超出攻击范围，触手会停止攻击"
           }
         ]
       },
       {
-        "aspect": "弹射物抛射描述",
+        "aspect": "远程攻击与抛射描述",
         "evidence": [
           {
-            "pageid": 18843,
-            "quote": "投石机的弹射物通过抛射攻击目标"
+            "pageid": 15532,
+            "quote": "它会咬人，也会吐出网状物远程攻击"
           },
           {
-            "pageid": 14816,
-            "quote": "当目标在 2~5 距离内时，喷吐出"
-          }
-        ]
-      },
-      {
-        "aspect": "攻击距离标注",
-        "evidence": [
-          {
-            "pageid": 20150,
-            "quote": "攻击距离均为触发攻击距离"
+            "pageid": 15532,
+            "quote": "近战范围内时，不会发动远程攻击"
           },
-          {
-            "pageid": 72238,
-            "quote": "最大攻击距离与实际最大控制距离分开计算"
-          },
-          {
-            "pageid": 18843,
-            "quote": "自动攻击距离自身 5.5 到 15 距离单位范围内"
-          },
-          {
-            "pageid": 14816,
-            "quote": "当目标在 2~5 距离内时"
-          }
-        ]
-      },
-      {
-        "aspect": "远程攻击能力说明",
-        "evidence": [
           {
             "pageid": 14816,
             "quote": "它们是熔炉中唯二的远程攻击怪物"
           },
           {
-            "pageid": 18843,
-            "quote": "投石机的弹射物通过抛射攻击目标"
+            "pageid": 14816,
+            "quote": "能够使用远程攻击，压制力很强"
           }
         ]
       }
@@ -165,13 +193,14 @@
   },
   "search_terms": [
     "武器伤害",
-    "攻击距离",
+    "攻击范围",
     "远程攻击",
-    "弹射物",
+    "投掷物",
     "电击武器",
     "攻击回调",
     "耐久损耗",
-    "伤害计算"
+    "战斗标签",
+    "特殊刺激"
   ],
   "gameplay_tags": [
     "战斗"
@@ -181,6 +210,6 @@
     "source_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
     "source_bytes": 5049,
     "model": "hy3-free",
-    "generated_at_ms": 1787892947880
+    "generated_at_ms": 1787896391871
   }
 }

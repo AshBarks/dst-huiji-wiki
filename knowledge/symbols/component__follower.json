@@ -7,111 +7,111 @@
   },
   "category": "component",
   "display_name": "follower",
-  "summary": "Follower组件管理实体（如宠物或生物）的领导者、物品所有者及忠诚时间等数据，处理跟随、牵引回位、忠诚度衰减与脱离等逻辑。它参与核心玩法包括生物跟随玩家或物品、被攻击脱离、远距离传送至领导者附近以及玩家重连后恢复跟随。",
+  "summary": "该组件管理实体的跟随领袖（leader）、物品主人（itemowner）、忠诚剩余时间（targettime）及牵引（leashing）等状态数据。它参与生物跟随玩家或物品、忠诚度的增减与过期、距离过远时的传送等核心玩法，并支持被攻击时脱离领袖等行为控制。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回描述当前跟随状态（领导者、物品所有者、剩余忠诚时间）的字符串，无副作用。"
+      "effect": "返回包含当前跟随领袖、物品主人及剩余忠诚时间的调试字符串，无副作用。"
     },
     {
       "name": "GetLeader",
-      "effect": "返回物品所有者或领导者（优先物品所有者），无副作用。"
+      "effect": "返回物品主人或领袖（优先物品主人），无副作用。"
     },
     {
       "name": "StartLeashing",
-      "effect": "若未禁用牵引且存在领导者，则监听领导者唤醒与自身睡眠事件以进行远距离传送，并推送“startleashing”事件。"
+      "effect": "若未禁用牵引，则为领袖的 entitywake 与自身的 entitysleep 事件添加监听，并推送 startleashing 事件；若已禁用则无操作。"
     },
     {
       "name": "StopLeashing",
-      "effect": "移除牵引相关事件监听与传送任务，若未禁用牵引则推送“stopleashing”事件。"
+      "effect": "移除 entitysleep 与 entitywake 监听，取消传送任务，并在未禁用牵引时推送 stopleashing 事件。"
     },
     {
       "name": "DisableLeashing",
-      "effect": "永久禁用牵引（设置noleashing标志）并停止当前牵引。"
+      "effect": "标记 noleashing 为 true 并调用 StopLeashing 停止当前牵引行为。"
     },
     {
       "name": "EnableLeashing",
-      "effect": "重新启用牵引，若领导者为玩家或物品则开始牵引并在自身睡眠时尝试传送。"
+      "effect": "清除 noleashing 标记，若领袖为玩家或物品则重新开启牵引，若自身睡眠则触发睡眠处理。"
     },
     {
       "name": "SetCanBeRollCalledFn",
-      "effect": "设置判断可否被点名召集的函数，无副作用。"
+      "effect": "设置用于判断能否被点名召集的回调函数 canberollcalledfn。"
     },
     {
       "name": "CanBeRollCalled",
-      "effect": "检查领导者点名组件是否启用及自定义函数，返回布尔值，无副作用。"
+      "effect": "检查领袖的 leaderrollcall 组件是否启用，并返回自定义回调函数结果或默认允许，无副作用。"
     },
     {
       "name": "CachePlayerLeader",
-      "effect": "缓存玩家领导者ID与剩余时间，监听玩家加入与新玩家生成事件以便重连，可能启动缓存任务。"
+      "effect": "缓存玩家领袖的用户ID与剩余时间，监听世界 ms_playerjoined 与 ms_newplayerspawned 事件，并启动缓存过期任务。"
     },
     {
       "name": "ClearCachedPlayerLeader",
-      "effect": "清除缓存的玩家领导者信息并移除相关世界事件监听与任务。"
+      "effect": "移除世界事件监听与缓存任务，清空缓存的玩家领袖信息。"
     },
     {
       "name": "OnItemSourceNewOwner",
-      "effect": "设置物品所有者并通知领导者组件添加物品跟随者。"
+      "effect": "设置 itemowner 为新所有者，若其有 leader 组件则添加为物品跟随者。"
     },
     {
       "name": "OnItemSourceRemoved",
-      "effect": "清除物品所有者并通知领导者组件移除物品跟随者。"
+      "effect": "清除 itemowner 引用，若原所有者有 leader 组件则移除物品跟随者。"
     },
     {
       "name": "SetLeader",
-      "effect": "变更领导者：移除旧领导者关系与监听、可能停止牵引，建立新领导者关系、添加监听、根据情况开始牵引，推送“leaderchanged”事件并可能丢弃战斗目标。"
+      "effect": "切换跟随领袖：清理旧领袖关联与任务，建立新领袖关联、监听与牵引，推送 leaderchanged 事件，并可能触发战斗目标丢弃。"
     },
     {
       "name": "GetLoyaltyPercent",
-      "effect": "返回当前忠诚时间剩余比例（0~1），无副作用。"
+      "effect": "返回当前忠诚剩余时间占最大跟随时间的比例，无副作用。"
     },
     {
       "name": "AddLoyaltyTime",
-      "effect": "增加忠诚持续时间（受领导者效率影响），更新目标时间，推送“gainloyalty”事件并安排到期停止跟随任务。"
+      "effect": "增加忠诚持续时间（受领袖效率影响），更新目标时间，推送 gainloyalty 事件并重启过期任务。"
     },
     {
       "name": "CancelLoyaltyTask",
-      "effect": "清除目标时间与取消忠诚到期任务。"
+      "effect": "清空 targettime 并取消忠诚过期任务。"
     },
     {
       "name": "StopFollowing",
-      "effect": "若非永不失效，则清除忠诚时间、推送“loseloyalty”事件并设领导者为nil以脱离。"
+      "effect": "若非永久跟随，则清空目标时间、推送 loseloyalty 事件并调用 SetLeader(nil) 解除领袖。"
     },
     {
       "name": "IsNearLeader",
-      "effect": "检查领导者是否存在且在指定距离内，无副作用。"
+      "effect": "判断领袖是否存在且实体在指定距离内，无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含剩余忠诚时间与缓存玩家领导者信息的存档表，无副作用。"
+      "effect": "返回包含剩余忠诚时间与缓存玩家领袖信息的存档数据表或 nil，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据存档数据恢复忠诚时间与缓存玩家领导者，副作用为调用AddLoyaltyTime与CachePlayerLeader。"
+      "effect": "根据存档数据恢复忠诚时间并重建缓存玩家领袖。"
     },
     {
       "name": "IsLeaderSame",
-      "effect": "比较目标实体与自身是否具有相同领导者，无副作用。"
+      "effect": "比较自身与另一实体是否具有相同领袖，无副作用。"
     },
     {
       "name": "KeepLeaderOnAttacked",
-      "effect": "设置标志使被攻击时不脱离领导者，并移除“attacked”事件监听。"
+      "effect": "设置 keepleaderonattacked 标记并移除 attacked 事件监听，使被攻击时不再自动脱离领袖。"
     },
     {
       "name": "LoseLeaderOnAttacked",
-      "effect": "清除上述标志并恢复“attacked”事件监听以在被攻击者攻击时脱离。"
+      "effect": "清除 keepleaderonattacked 标记并恢复 attacked 事件监听，使被攻击时可能脱离领袖。"
     },
     {
       "name": "LongUpdate",
-      "effect": "长时间更新时调整忠诚任务与缓存任务剩余时间，可能立即脱离或清除缓存。"
+      "effect": "模拟长时间流逝，调整忠诚任务与缓存任务计时，可能直接解除领袖或清除缓存。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "清理所有监听、任务、牵引及物品源关联。"
+      "effect": "清理所有事件监听、任务、牵引及物品源引用。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "若作为物品源则移除物品源关联以清除itemowner。"
+      "effect": "清理物品源引用。"
     }
   ],
   "events_published": [
@@ -123,41 +123,98 @@
   ],
   "events_listened": [
     "attacked",
-    "entitysleep",
     "entitywake",
+    "entitysleep",
     "ms_playerjoined",
     "ms_newplayerspawned",
     "onremove"
   ],
   "netvars": [],
   "tunables": [
-    "FOLLOWER_REFOLLOW_DIST_SQ"
+    "TUNING.FOLLOWER_REFOLLOW_DIST_SQ"
   ],
   "wiki": {
     "scanned_pageids": [
-      18057,
-      57263,
-      18001,
-      16641,
-      17930,
-      24578,
-      39366,
-      19693
+      17998,
+      15238,
+      52773,
+      15239,
+      15427,
+      13857,
+      13556,
+      15237
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录中，仅页面18057描述宠物“跟随玩家”和“被遗弃”行为，但未体现领导者、拴绳、忠诚度、点名、保存加载等follower组件具体能力；其余页面涉及传送实体或区域，无相关表达。故认为页面根本不讨论该组件能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "忠诚时间数值标注",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "获得对使用牛角的玩家 30 秒的忠诚时间"
+          },
+          {
+            "pageid": 15237,
+            "quote": "最大追随时间 2.5 天"
+          }
+        ]
+      },
+      {
+        "aspect": "牛铃绑定解除描述",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "如果它们绑定了皮弗娄牛铃，还会解除与铃铛的绑定"
+          }
+        ]
+      },
+      {
+        "aspect": "绑定领导者关系描述",
+        "evidence": [
+          {
+            "pageid": 52773,
+            "quote": "生成一个绑定该玩家的敌意虚影"
+          },
+          {
+            "pageid": 13556,
+            "quote": "每个阿比盖尔都与一个温蒂相绑定"
+          },
+          {
+            "pageid": 15237,
+            "quote": "雇佣猪人为随从"
+          }
+        ]
+      },
+      {
+        "aspect": "聚集跟随玩家行为",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "皮弗娄牛聚集跟随玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "跟随距离保持描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔会试图保持在温蒂附近 1 ~ 5 距离单位的位置"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "跟随",
-    "忠诚度",
-    "领导者",
-    "牵引",
-    "传送",
-    "宠物",
+    "跟随领袖",
+    "忠诚度数",
+    "牵引机制",
     "物品跟随",
-    "点名",
-    "脱离"
+    "缓存玩家",
+    "脱离跟随",
+    "攻击解除",
+    "宠物忠诚",
+    "传送跟随"
   ],
   "gameplay_tags": [
     "生存",
@@ -168,6 +225,6 @@
     "source_sha256": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
     "source_bytes": 16653,
     "model": "hy3-free",
-    "generated_at_ms": 1787893221150
+    "generated_at_ms": 1787896672593
   }
 }

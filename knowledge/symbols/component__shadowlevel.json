@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "shadowlevel",
-  "summary": "该组件管理实体的暗影等级数据，支持静态默认等级与动态计算函数。它在实体上添加 'shadowlevel' 标签，供其他系统查询当前暗影等级以参与暗影相关玩法逻辑。",
+  "summary": "该组件管理实体的暗影等级数据，支持设定默认等级与动态等级计算函数。它通过为实体添加 \"shadowlevel\" 标签并对外提供当前等级查询接口，供游戏内其他系统判定实体的暗影层级属性。",
   "api": [
     {
       "name": "SetDefaultLevel",
-      "effect": "接收参数 level 并赋值给组件实例的 self.level 字段，作为默认暗影等级；无返回值，直接修改内部状态。"
+      "effect": "将组件的默认暗影等级字段 self.level 设置为传入参数 level；此值作为未设置动态函数时 GetCurrentLevel 返回的基准值。"
     },
     {
       "name": "SetLevelFn",
-      "effect": "接收函数 fn 并赋值给组件实例的 self.levelfn 字段，用于动态计算等级；无返回值，直接修改内部状态。"
+      "effect": "设置动态等级计算函数 self.levelfn 为传入的 fn；此后 GetCurrentLevel 将优先调用该函数并传入实体自身，以返回值作为当前等级。"
     },
     {
       "name": "GetCurrentLevel",
-      "effect": "返回当前暗影等级：若 self.levelfn 已设置则调用其并传入实体返回结果，否则返回 self.level；无副作用，仅读取状态。"
+      "effect": "返回实体当前暗影等级：若 levelfn 不为 nil 则调用 levelfn(self.inst) 并返回其结果，否则返回默认等级 self.level。该方法无副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时调用，移除实体上的 'shadowlevel' 标签；无返回值，修改实体标签状态。"
+      "effect": "组件从实体移除时由系统调用，移除实体上的 \"shadowlevel\" 标签，使实体不再带有该组件标识。"
     }
   ],
   "events_published": [],
@@ -43,7 +43,7 @@
     ],
     "aspects": [
       {
-        "aspect": "升级条件描述",
+        "aspect": "击杀参与升级机制",
         "evidence": [
           {
             "pageid": 34037,
@@ -52,7 +52,7 @@
         ]
       },
       {
-        "aspect": "等级重置标注",
+        "aspect": "耐久耗尽等级重置",
         "evidence": [
           {
             "pageid": 34037,
@@ -65,22 +65,23 @@
   },
   "search_terms": [
     "暗影等级",
-    "影子等级",
+    "暗影层级",
+    "阴影级别",
     "暗影标签",
-    "当前影级",
-    "等级函数",
-    "暗影实体",
     "动态等级",
-    "影级查询"
+    "当前暗影",
+    "实体影子",
+    "层级查询"
   ],
   "gameplay_tags": [
-    "暗影"
+    "暗影",
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
     "source_bytes": 576,
     "model": "hy3-free",
-    "generated_at_ms": 1787893927000
+    "generated_at_ms": 1787897371070
   }
 }

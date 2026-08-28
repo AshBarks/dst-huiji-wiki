@@ -7,39 +7,39 @@
   },
   "category": "component",
   "display_name": "workable",
-  "summary": "组件 Workable 管理实体的剩余工作量（workleft）、最大工作量（maxwork）、工作动作（action）及可否工作（workable）等状态数据。它参与砍树等资源采集与破坏的核心玩法，通过被玩家或工具工作来扣减工作量，并在耗尽时触发完成事件与回调。组件还支持坚硬工作限制、工作倍率修正及反弹逻辑，并与修复组件联动标记可修复状态。",
+  "summary": "Workable 组件管理实体的剩余工作量、最大工作量及关联的工作动作（如砍伐、挖掘），决定实体能否被对应动作交互。其参与核心玩法包括资源采集、物体破坏与修复状态联动，并通过事件通知工作者与实体本身工作进度。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'workrepairable' 标签，以及当前 self.action.id..'_workable' 标签，清理组件残留标签。"
+      "effect": "从实体移除标签 \"workrepairable\"；若 self.action 不为 nil，移除标签 (self.action.id .. \"_workable\")。无其它副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含 workleft、maxwork、workable 状态的调试字符串，无副作用。"
+      "effect": "返回包含 workleft、maxwork、workable 当前值的调试字符串，无副作用。"
     },
     {
       "name": "SetRequiresToughWork",
-      "effect": "设置 self.tough 属性为传入的 tough 值，影响后续 ShouldRecoil 判定，无立即副作用。"
+      "effect": "设置内部字段 self.tough 为传入参数 tough，标记是否需要强硬工作（如特定工具或角色）。无直接标签副作用。"
     },
     {
       "name": "SetWorkAction",
-      "effect": "设置 self.action 为新动作；触发 onaction 回调，移除旧动作的 '_workable' 标签（若原可工作且工作量>0），添加新动作的 '_workable' 标签（若可工作且工作量>0）。"
+      "effect": "设置 self.action = act，触发 action 的 setter（onaction），若原动作存在则移除其 \"<old_action.id>_workable\" 标签，若新动作存在且 workleft>0 且 workable 则添加 \"<action.id>_workable\" 标签。"
     },
     {
       "name": "GetWorkAction",
-      "effect": "返回当前 self.action，无副作用。"
+      "effect": "返回 self.action，无副作用。"
     },
     {
       "name": "Destroy",
-      "effect": "若 CanBeWorked() 为真，以 destroyer 为 worker、self.workleft 为 numworks 调用 WorkedBy，可能触发完整工作逻辑。"
+      "effect": "若 CanBeWorked() 为真，调用 WorkedBy(destroyer, self.workleft) 以一次性耗尽工作量，触发工作与完成逻辑。"
     },
     {
       "name": "SetWorkable",
-      "effect": "设置 self.workable 为 able；触发 onworkable 回调，根据条件添加或移除动作 '_workable' 标签，并通知 repairable 组件更新修复状态。"
+      "effect": "设置 self.workable = able，触发 workable 的 setter（onworkable），更新 repairable 组件修复状态及动作标签。"
     },
     {
       "name": "SetWorkLeft",
-      "effect": "设置 self.workable 为 true，按 maxwork 限制计算并赋值 self.workleft；触发 onworkable 回调更新标签与修复状态。"
+      "effect": "强制 self.workable = true，并根据 self.maxwork 是否大于0将 work 限制在 [1, maxwork] 或至少1，赋值 self.workleft，触发 workleft setter 更新标签等。"
     },
     {
       "name": "GetWorkLeft",
@@ -51,47 +51,47 @@
     },
     {
       "name": "SetOnLoadFn",
-      "effect": "若传入 fn 为函数，则设置 self.onloadfn，供 OnLoad 时调用，无立即副作用。"
+      "effect": "若传入 fn 为函数，设置 self.onloadfn = fn，供 OnLoad 时调用；否则忽略。"
     },
     {
       "name": "SetMaxWork",
-      "effect": "设置 self.maxwork 为 max(1, work or 10)；触发 onworkable 回调更新标签与修复状态。"
+      "effect": "设置 self.maxwork = max(1, work or 10)，触发 maxwork setter 更新标签等。"
     },
     {
       "name": "OnSave",
-      "effect": "若 self.savestate 为真，返回包含 maxwork 与 workleft 的表，否则返回空表，无副作用。"
+      "effect": "若 self.savestate 为真，返回包含 maxwork 与 workleft 的表，否则返回空表；无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "从 data 载入 workleft 与 maxwork，若存在 onloadfn 则调用之，可能改变组件状态。"
+      "effect": "用 data.workleft 与 data.maxwork 覆盖 self.workleft 与 self.maxwork（若提供），若 self.onloadfn 存在则调用之。"
     },
     {
       "name": "WorkedBy",
-      "effect": "获取 worker 手部工具，调用 ShouldRecoil 计算反弹与有效工作量，随后调用 WorkedBy_Internal 执行实际工作逻辑。"
+      "effect": "获取 worker 手部装备作为 tool，调用 ShouldRecoil 得到 recoil 与调整后的 numworks，随后调用 WorkedBy_Internal(worker, numworks) 执行实际工作。"
     },
     {
       "name": "WorkedBy_Internal",
-      "effect": "核心工作处理：根据倍率函数调整 numworks，扣减 self.workleft（处理边界至0），记录 lastworktime 与 lastworker；向 worker 推 'working' 事件、向实体推 'worked' 事件，调用 onwork 回调；若工作量耗尽，调用 onfinish 回调，推 'workfinished' 与 'finishedwork' 事件，若为植物则推 TheWorld 'plantkilled' 事件。"
+      "effect": "计算工作量乘数（若设 workmultiplierfn），扣除 self.workleft（处理小于1或浮点epsilon），记录 lastworktime 与 lastworker；向 worker 推送 \"working\" 事件、向实体推送 \"worked\" 事件，调用 onwork 回调；若 workleft<=0，调用 onfinish 回调，推送 \"workfinished\" 与 \"finishedwork\" 事件，若实体为未烧焦非病害植物则向 TheWorld 推送 \"plantkilled\" 事件。"
     },
     {
       "name": "SetOnWorkCallback",
-      "effect": "设置 self.onwork 回调，在工作发生时被调用，无立即副作用。"
+      "effect": "设置 self.onwork = fn，在工作发生时调用。"
     },
     {
       "name": "SetOnFinishCallback",
-      "effect": "设置 self.onfinish 回调，在工作完成时被调用，无立即副作用。"
+      "effect": "设置 self.onfinish = fn，在工作完成时调用。"
     },
     {
       "name": "SetWorkMultiplierFn",
-      "effect": "设置 self.workmultiplierfn 倍率函数，影响后续工作量计算，无立即副作用。"
+      "effect": "设置 self.workmultiplierfn = fn，用于在工作时修改工作量乘数。"
     },
     {
       "name": "SetShouldRecoilFn",
-      "effect": "设置 self.shouldrecoilfn 反弹判定函数，影响 ShouldRecoil 逻辑，无立即副作用。"
+      "effect": "设置 self.shouldrecoilfn = fn，用于自定义反弹判定逻辑。"
     },
     {
       "name": "ShouldRecoil",
-      "effect": "纯计算：若设有 shouldrecoilfn 则用之返回反弹与剩余工作量；否则若 self.tough 且 worker 与工具均不满足坚硬工作条件则返回 true,0；否则返回 false,numworks。无状态修改。"
+      "effect": "若 self.shouldrecoilfn 存在则调用并返回其 recoil 与剩余工作量；否则若 self.tough 且 worker 无 \"toughworker\" 标签且 tool 不能执行 toughwork，则返回 true,0；否则返回 false,numworks。无强制副作用。"
     }
   ],
   "events_published": [
@@ -106,31 +106,44 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      19954,
+      15133,
       15225,
-      19287,
-      52773,
-      65639,
-      72238,
-      73480,
-      15022,
-      22249
+      28733,
+      19296,
+      19749,
+      20156,
+      34992
     ],
     "aspects": [],
-    "no_evidence_reason": "所有页面摘录中出现的“工作”相关词汇均不表示 workable 组件能力：页面15225与72238描述暗影傀儡、附身底盘作为工作者自动执行砍伐等动作；页面65639指盐架自身放置后运作；页面52773提及敌意虚影转换的“工作量”比较；页面73480指生物群系编辑工作量；页面19287、15022、22249未涉及工作概念。全文未体现 SetWorkAction、GetWorkLeft、CanBeWorked 等 component__workable 能力清单中的任何玩家侧表达。",
+    "no_evidence_reason": "提供的页面摘录讨论修补套件修复耐久、月亮祭坛不可修复、暗影傀儡作为工人执行砍伐开采、桥梁耐久与修复、武器可修复、码头建造、图鉴修复标注等，未提及任何实体具有可工作(workable)组件的能力如工作动作、工作剩余量、最大工作量、被工作回调等玩家语言表达，故无证据。",
     "coverage_status": "no_wiki_mention"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "工作量",
+      "工作类型"
+    ],
+    "code_fields": [
+      "workable.workleft",
+      "workable.workaction"
+    ],
+    "overridable_fields": [],
+    "note": "初始版本仅少量重点组件，待后续从 AutoInfobox/Data doc 校准扩充。"
   },
   "search_terms": [
     "可工作",
-    "工作量",
-    "工作动作",
-    "砍树工作",
+    "剩余工作量",
+    "砍伐对象",
+    "挖掘对象",
+    "锤击对象",
+    "可修复",
     "坚硬工作",
-    "完成工作",
-    "工具反弹",
-    "工作回调",
-    "植物破坏"
+    "动作标签"
   ],
   "gameplay_tags": [
+    "采集",
     "建造",
     "生存"
   ],
@@ -139,6 +152,6 @@
     "source_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
     "source_bytes": 5805,
     "model": "hy3-free",
-    "generated_at_ms": 1787891784290
+    "generated_at_ms": 1787895305898
   }
 }

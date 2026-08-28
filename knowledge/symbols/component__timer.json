@@ -7,67 +7,67 @@
   },
   "category": "component",
   "display_name": "timer",
-  "summary": "该组件为实体维护一组命名计时器，记录剩余时间、暂停状态与初始时长等数据。它支持启动、停止、暂停、恢复及时间调整，并在计时结束时推送事件，参与各类依赖定时触发的玩法逻辑，同时提供存档、长更新与组件转移能力。",
+  "summary": "组件 Timer 管理实体上多个命名定时器的数据，包括剩余时间、暂停状态和初始时间等。它通过 DoTaskInTime 调度回调，在计时结束时推送 timerdone 事件，并支持暂停、恢复、存档与长更新等，参与游戏中各类需要计时或冷却的核心玩法。",
   "api": [
     {
-      "name": "TimerExists",
-      "effect": "检查指定名称的计时器是否存在，返回布尔值。无副作用。"
-    },
-    {
-      "name": "StartTimer",
-      "effect": "启动新计时器。若同名已存在则打印警告并返回；否则创建计时器数据并安排定时任务，若参数 paused 为真则立即暂停。副作用：创建任务、修改 self.timers、可能打印日志。"
-    },
-    {
-      "name": "StopTimer",
-      "effect": "停止并移除计时器。若不存在则返回；否则取消定时任务并清空对应数据。副作用：取消任务、修改 self.timers。"
-    },
-    {
-      "name": "IsPaused",
-      "effect": "返回计时器是否处于暂停状态（存在且 paused 为真）。无副作用。"
-    },
-    {
-      "name": "PauseTimer",
-      "effect": "暂停计时器。若不存在或已暂停则返回；否则更新剩余时间、取消任务并标记暂停。副作用：取消任务、更新 timeleft 与 paused。"
-    },
-    {
-      "name": "ResumeTimer",
-      "effect": "恢复暂停的计时器。若未暂停则返回；否则标记未暂停、按剩余时间重排任务并更新 end_time，返回 true。副作用：安排新任务、修改数据。"
-    },
-    {
-      "name": "GetTimeLeft",
-      "effect": "返回计时器剩余时间。若不存在返回 nil；若未暂停则先按当前时间更新 timeleft 字段再返回。副作用：可能更新 timeleft 字段。"
-    },
-    {
-      "name": "SetTimeLeft",
-      "effect": "设置计时器剩余时间。若不存在返回；若暂停则直接设非负值，否则暂停后设值再恢复。副作用：修改 timeleft，可能触发暂停与恢复（取消及重排任务）。"
-    },
-    {
-      "name": "GetTimeElapsed",
-      "effect": "返回已过时间（初始时长减剩余时间），不存在返回 nil。调用 GetTimeLeft 可能更新剩余时间。"
+      "name": "OnRemoveFromEntity",
+      "effect": "遍历所有定时器，取消其关联的任务。副作用：所有未完成的定时任务被取消，不再触发 timerdone 事件。"
     },
     {
       "name": "GetDebugString",
-      "effect": "生成包含所有计时器名称、剩余时间与暂停状态的调试字符串并返回。无状态修改。"
+      "effect": "生成包含各定时器名称、剩余时间和暂停状态的调试字符串。无副作用。"
     },
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时遍历取消所有未完成的定时任务。副作用：取消任务。"
+      "name": "TimerExists",
+      "effect": "检查指定名称的定时器是否存在并返回布尔值。无副作用。"
+    },
+    {
+      "name": "StartTimer",
+      "effect": "以给定名称、时长创建定时器，可选暂停和初始时间覆盖；若同名已存在则打印错误并跳过。副作用：注册新定时任务，时间到触发 OnTimerDone 推送事件；若 paused 则立即暂停任务。"
+    },
+    {
+      "name": "StopTimer",
+      "effect": "取消并删除指定定时器。副作用：任务取消，数据从 timers 表移除。"
+    },
+    {
+      "name": "IsPaused",
+      "effect": "返回定时器是否处于暂停状态（存在且 paused 为真）。无副作用。"
+    },
+    {
+      "name": "PauseTimer",
+      "effect": "更新剩余时间并取消任务，标记暂停。副作用：定时器停止倒计时，任务被取消，timeleft 被刷新。"
+    },
+    {
+      "name": "ResumeTimer",
+      "effect": "以剩余时间重新调度任务，标记恢复并返回 true。副作用：定时器继续倒计时，新任务创建，end_time 更新。"
+    },
+    {
+      "name": "GetTimeLeft",
+      "effect": "若未暂停则刷新剩余时间字段，返回剩余时间或 nil。副作用：可能更新内部 timeleft 与 end_time 计算。"
+    },
+    {
+      "name": "SetTimeLeft",
+      "effect": "设置定时器剩余时间为 max(0, time)，必要时暂停再恢复以重启任务。副作用：改变倒计时长度，可能取消并重建任务。"
+    },
+    {
+      "name": "GetTimeElapsed",
+      "effect": "返回初始时间减去剩余时间得到的已用时间或 nil。无直接副作用（内部调用 GetTimeLeft 可能刷新剩余时间）。"
     },
     {
       "name": "OnSave",
-      "effect": "收集所有计时器的 timeleft、paused、initial_time 用于存档，返回包含 timers 字段的表或 nil。调用 GetTimeLeft 可能更新数据。"
+      "effect": "收集所有定时器状态（timeleft, paused, initial_time）用于存档，返回包含 timers 表的数据或 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "从存档数据恢复计时器：先停止同名计时器，再按存档时间、暂停状态和初始时间重新启动。副作用：修改 self.timers、安排任务。"
+      "effect": "根据存档数据对每个定时器先停止再启动以恢复状态。副作用：重建定时器，创建新任务。"
     },
     {
       "name": "LongUpdate",
-      "effect": "对所有计时器将其剩余时间减去 dt（快进）。副作用：更新所有计时器时间，可能触发任务重排或完成。"
+      "effect": "对所有定时器减去 dt 时间以快进计时。副作用：可能使定时器剩余时间减少至触发完成并推送 timerdone 事件。"
     },
     {
       "name": "TransferComponent",
-      "effect": "将当前所有计时器按剩余时间与状态转移到新实体的 timer 组件上启动。副作用：在新实体安排任务，原组件数据不变。"
+      "effect": "将当前所有定时器参数复制到新实体的 timer 组件上启动。副作用：新实体上创建相同定时器，原定时器保留。"
     }
   ],
   "events_published": [
@@ -89,45 +89,29 @@
     ],
     "aspects": [
       {
-        "aspect": "倒计时启动与设置描述",
+        "aspect": "倒计时重置设置",
         "evidence": [
-          {
-            "pageid": 15642,
-            "quote": "天亮设置倒计时时，t 短于当前计时剩余时间"
-          },
           {
             "pageid": 35001,
-            "quote": "若不满足其他条件，则重置倒计时"
-          },
-          {
-            "pageid": 65605,
-            "quote": "在倒计时为 25 秒、20 秒、15 秒、10 秒时"
+            "quote": "则重置倒计时"
           }
         ]
       },
       {
-        "aspect": "倒计时时间修改描述",
-        "evidence": [
-          {
-            "pageid": 15642,
-            "quote": "天亮设置倒计时时，t 短于当前计时剩余时间"
-          },
-          {
-            "pageid": 18540,
-            "quote": "海盗袭击的倒计时会减少"
-          },
-          {
-            "pageid": 18540,
-            "quote": "每个玩家都会分别令倒计时流逝"
-          }
-        ]
-      },
-      {
-        "aspect": "实体计时器存在标注",
+        "aspect": "实体计时器存在说明",
         "evidence": [
           {
             "pageid": 35001,
             "quote": "每棵树都有一个计时器"
+          }
+        ]
+      },
+      {
+        "aspect": "生成倒计时启动",
+        "evidence": [
+          {
+            "pageid": 15642,
+            "quote": "尝试为熊獾设置生成倒计时"
           }
         ]
       },
@@ -141,10 +125,6 @@
           {
             "pageid": 65605,
             "quote": "在倒计时为 25 秒、20 秒、15 秒、10 秒时"
-          },
-          {
-            "pageid": 18540,
-            "quote": "海盗袭击的倒计时会减少"
           }
         ]
       },
@@ -153,20 +133,16 @@
         "evidence": [
           {
             "pageid": 15642,
-            "quote": "入冬时计时器暂停，此时计时剩余时间为 0 ~ 150 秒"
+            "quote": "入冬时计时器暂停"
           },
           {
             "pageid": 35001,
-            "quote": "在冬季和夜晚或有积雪时暂停计时"
-          },
-          {
-            "pageid": 35001,
-            "quote": "新月暂停计时"
+            "quote": "在[[冬季]]暂停计时。"
           }
         ]
       },
       {
-        "aspect": "长周期更新重试机制",
+        "aspect": "计时更新重试周期",
         "evidence": [
           {
             "pageid": 35001,
@@ -182,18 +158,20 @@
     "倒计时",
     "剩余时间",
     "暂停计时",
-    "时间到",
     "冷却时间",
-    "定时任务"
+    "定时完成",
+    "计时存档",
+    "计时转移"
   ],
   "gameplay_tags": [
-    "生存"
+    "生存",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
     "source_bytes": 3867,
     "model": "hy3-free",
-    "generated_at_ms": 1787892120175
+    "generated_at_ms": 1787895617513
   }
 }

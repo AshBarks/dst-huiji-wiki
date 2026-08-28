@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "talker",
-  "summary": "Talker 组件管理实体的对话表现数据，包括说话内容、偏移量、忽略说话状态以及 NPC 的 chatter 网络同步信息。它参与核心玩法中的角色与 NPC 对话气泡显示、战斗喊话同步至聊天框、以及通过事件通知其他系统说话开始与结束。",
+  "summary": "Talker组件管理实体说话时的跟随文本控件、忽略说话状态及NPC的Chatter网络变量。它参与核心玩法包括角色对话广播、头顶文字显示、战斗喊话以及将对话复制到玩家聊天框。",
   "api": [
     {
       "name": "SetOffsetFn",
-      "effect": "将传入的函数 fn 保存为 self.offset_fn。后续显示跟随文本时若 offset_fn 不为空则调用它计算偏移，否则用 offset 或默认偏移。仅存储函数，无其它副作用。"
+      "effect": "设置 self.offset_fn 为传入函数，用于动态计算跟随文本偏移，无其它副作用。"
     },
     {
       "name": "MakeChatter",
-      "effect": "若 self.chatter 为空，则创建 strtbl、strid、strtime、forcetext、echotochatpriority 等网络变量用于 NPC 对话同步，并在非主模拟端监听 'chatterdirty' 事件以触发本地说话表现。仅初始化一次。"
+      "effect": "若 self.chatter 不存在，则创建 strtbl、strid、strtime、forcetext、echotochatpriority 等网络变量，并在非主机端监听 'chatterdirty' 事件。副作用：增加网络同步数据并注册事件监听。"
     },
     {
       "name": "Chatter",
-      "effect": "仅在主模拟端且已初始化 chatter 时生效。设置网络变量字符串表、ID、时间、强制文本与聊天优先级，启动1秒后取消 chatter 的任务，并立即调用 OnChatterDirty 使客户端解析字符串说话或镜像到聊天框。修改网络状态并可能触发说话与聊天历史。"
+      "effect": "仅主机执行。设置 chatter 网络变量（字符串表、ID、时间、强制文本、聊天优先级），强制刷新 strid 脏标记，安排1秒后取消 chatter 的任务，并立即调用 OnChatterDirty 触发说话或聊天复制。副作用：修改网络变量，可能导致客户端显示跟随文本及聊天框消息。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体对 'chatterdirty' 事件的监听；若为主模拟端则移除实体的 'ignoretalking' 标签；调用 ShutUp 取消当前说话与 chatter 表现。用于组件卸载清理。"
+      "effect": "移除 'chatterdirty' 事件监听，主机移除 'ignoretalking' 标签，并调用 ShutUp 停止说话。副作用：清理事件与标签。"
     },
     {
       "name": "IgnoreAll",
-      "effect": "将来源 source 记入 self.ignoring 表（默认可为空则用自身），首次记录时在主模拟端给实体添加 'ignoretalking' 标签，导致后续非强制的 Say 被阻止。"
+      "effect": "将来源加入 ignoring 表，若之前为空则在主机添加 'ignoretalking' 标签。副作用：实体可能被标记为忽略说话，阻止其发声。"
     },
     {
       "name": "StopIgnoringAll",
-      "effect": "将来源 source 从 self.ignoring 表移除，若表变空则清除表并在主模拟端移除 'ignoretalking' 标签，恢复非强制说话能力。"
+      "effect": "将来源从 ignoring 表移除，若表空则移除 'ignoretalking' 标签。副作用：恢复说话能力。"
     },
     {
       "name": "Say",
-      "effect": "若世界禁用语音或满足忽略/死亡/睡眠条件（且非强制）则直接返回。否则取消当前说话，将脚本转为逐行任务，启动线程显示跟随文本、网络广播语音、推送 'ontalk' 事件，结束后销毁 widget 并推送 'donetalking' 事件。副作用包括创建 FollowText、网络传输与事件分发。"
+      "effect": "根据世界设置、忽略状态、死亡/睡眠状态等条件判断是否允许说话；取消当前说话，将脚本转为行表并启动线程显示跟随文本、广播对话（除非 nobroadcast）、推送 'ontalk' 与 'donetalking' 事件、调用回调。副作用：创建/销毁跟随文本控件，网络广播，事件推送，可能改变实体表现。"
     },
     {
       "name": "ShutUp",
-      "effect": "调用 CancelSay 销毁跟随文本 widget 并杀死说话任务；若主模拟且存在 chatter 则清空其字符串表并取消任务。停止一切说话表现。"
+      "effect": "取消当前说话（销毁控件、杀任务），若为主机则清空 chatter 网络变量并取消相关任务。副作用：停止所有说话表现。"
     },
     {
       "name": "IsTalking",
-      "effect": "返回 self.task ~= nil，指示当前是否有说话线程在运行。"
+      "effect": "返回 self.task 是否非空，指示当前是否正在说话线程中。无副作用。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "实体移除时引擎调用，等效执行 CancelSay：销毁跟随文本 widget，杀死说话任务，调用 donetalking 回调并推送 'donetalking' 事件。"
+      "effect": "实体移除时调用，取消说话、销毁控件、杀任务、调用 donetalkingfn 并推送 'donetalking' 事件。副作用：清理说话相关资源。"
     }
   ],
   "events_published": [
@@ -70,40 +70,75 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      15137,
-      45135,
-      19110,
-      22383,
-      15239,
-      21432,
+      13152,
       13493,
-      15237
+      13406,
+      15237,
+      18825,
+      18829,
+      10413,
+      15797
     ],
     "aspects": [
       {
-        "aspect": "发表意见行为描述",
+        "aspect": "台词位置偏移描述",
         "evidence": [
           {
+            "pageid": 18829,
+            "quote": "台词位于角色下方与角色本身台词区分"
+          }
+        ]
+      },
+      {
+        "aspect": "说话与对话行为描述",
+        "evidence": [
+          {
+            "pageid": 13152,
+            "quote": "韦斯不会说话，而是用哑剧代替台词。"
+          },
+          {
             "pageid": 13493,
-            "quote": "她还会走到帮她干活的玩家附近发表意见。"
+            "quote": "说话语气从暴躁变得温柔"
+          },
+          {
+            "pageid": 18825,
+            "quote": "玩家角色说出任意台词都会做出表演动作"
+          },
+          {
+            "pageid": 18829,
+            "quote": "露西斧会用红色的字体说话"
+          },
+          {
+            "pageid": 15797,
+            "quote": "损失玩家对话的增益"
+          }
+        ]
+      },
+      {
+        "aspect": "闲聊行为描述",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "内容大多为怂恿伍迪砍树或和他闲聊"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "说话气泡",
+    "说话",
+    "喊话",
+    "头顶文字",
+    "对话",
+    "忽略说话",
+    "闭嘴",
     "跟随文本",
-    "角色喊话",
-    "战斗呼喊",
-    "忽略对话",
-    "台词显示",
-    "聊天镜像",
-    "文字过滤"
+    "战斗喊话",
+    "交谈"
   ],
   "gameplay_tags": [
-    "对话",
+    "社交",
     "战斗",
     "生存"
   ],
@@ -112,6 +147,6 @@
     "source_sha256": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
     "source_bytes": 11071,
     "model": "hy3-free",
-    "generated_at_ms": 1787893305608
+    "generated_at_ms": 1787896786148
   }
 }

@@ -7,157 +7,158 @@
   },
   "category": "component",
   "display_name": "burnable",
-  "summary": "该组件管理实体的燃烧、阴燃状态与火焰特效，并记录燃烧时间、可控燃烧及燃料消耗等数据。它参与饥荒的核心火灾玩法，包括物体被点燃、自然阴燃引发野火、可控燃烧以及被熄灭等机制，并与火势传播系统协作。",
+  "summary": "组件管理实体的可燃性、燃烧与阴燃状态、燃烧特效及持续时间等数据。它参与点火、野生火灾起始、物体烧毁与熄灭等核心玩法，并与燃料、传播等组件协作实现消耗与热量扩散。",
   "api": [
     {
       "name": "SetOnStopSmolderingFn",
-      "effect": "行为：设置 self.onstopsmoldering 为传入函数 fn。副作用：无。"
+      "effect": "设置 self.onstopsmoldering 回调函数为 fn，当对象停止阴燃时会被调用，仅存储函数无其它副作用。"
     },
     {
       "name": "SetOnSmolderingFn",
-      "effect": "行为：设置 self.onsmoldering 为传入函数 fn。副作用：无。"
+      "effect": "设置 self.onsmoldering 回调函数为 fn，当对象开始阴燃时会被调用，仅存储函数。"
     },
     {
       "name": "SetOnIgniteFn",
-      "effect": "行为：设置 self.onignite 为传入函数 fn。副作用：无。"
+      "effect": "设置 self.onignite 回调函数为 fn，当对象开始燃烧时会被调用并传入 inst, source, doer，仅存储函数。"
     },
     {
       "name": "OnBurnt_Internal",
-      "effect": "行为：调用 RemoveLunarHailBuildup(self.inst) 移除实体的月雹堆积。副作用：清除实体上的月雹堆积状态。"
+      "effect": "内部方法，调用 RemoveLunarHailBuildup 移除月球冰雹堆积；被烧毁回调包装调用，可供 Mod 挂钩。"
     },
     {
       "name": "SetOnBurntFn",
-      "effect": "行为：将 self.onburnt 设置为包裹函数，先执行传入 fn 再在实体有效时调用 OnBurnt_Internal；若 fn 为 nil 则置空。副作用：改变燃烧完毕时的回调链。"
+      "effect": "设置 self.onburnt 回调，将其包装为先调用 fn 再在实体有效时调用 OnBurnt_Internal 的函数，用于对象完全烧毁时触发。"
     },
     {
       "name": "SetOnExtinguishFn",
-      "effect": "行为：设置 self.onextinguish 为传入函数 fn。副作用：无。"
+      "effect": "设置 self.onextinguish 回调函数为 fn，当对象熄灭时会被调用，仅存储函数。"
     },
     {
       "name": "SetBurningFX",
-      "effect": "行为：设置 self.fxprefab 为 name 以覆盖默认燃烧特效。副作用：无直接副作用，影响后续特效生成。"
+      "effect": "设置 self.fxprefab 为给定 name，覆盖默认燃烧特效 prefab。"
     },
     {
       "name": "SetBurnTime",
-      "effect": "行为：设置 self.burntime 为 time。副作用：无。"
+      "effect": "设置 self.burntime 为 time，决定燃烧持续时长（影响 DoneBurning 任务延时）。"
     },
     {
       "name": "IsBurning",
-      "effect": "行为：返回 self.burning 布尔值。副作用：无。"
+      "effect": "返回 self.burning 布尔值，指示实体是否正在燃烧。"
     },
     {
       "name": "IsSmoldering",
-      "effect": "行为：返回 self.smoldering 布尔值。副作用：无。"
+      "effect": "返回 self.smoldering 布尔值，指示实体是否正在阴燃。"
     },
     {
       "name": "AddBurnFX",
-      "effect": "行为：将特效参数表插入 self.fxdata。副作用：增加未来生成燃烧特效的配置。"
+      "effect": "向 self.fxdata 插入包含 prefab、偏移、跟随符号等信息的表，用于燃烧时生成对应特效。"
     },
     {
       "name": "OverrideBurnFXBuild",
-      "effect": "行为：遍历 fxdata 和 fxchildren 设置动画构建。副作用：覆盖现有及未来火焰特效的 Bank 与 Build。"
+      "effect": "遍历 self.fxdata 与 self.fxchildren，将其动画 Bank 和 Build 覆盖为指定 build。"
     },
     {
       "name": "OverrideBurnFXFinalOffset",
-      "effect": "行为：设置 fxdata 和 fxchildren 的最终绘制偏移。副作用：覆盖特效绘制顺序偏移。"
+      "effect": "遍历 self.fxdata 与 self.fxchildren，设置特效的最终绘制偏移量 offs。"
     },
     {
       "name": "OverrideBurnFXRadius",
-      "effect": "行为：设置 fxdata 和 fxchildren 的火焰半径等级并刷新。副作用：改变火焰光照或传播半径。"
+      "effect": "遍历 self.fxdata 与 self.fxchildren，设置 firefx 组件的 radius_levels 并调用 UpdateRadius 更新。"
     },
     {
       "name": "SetFXOffset",
-      "effect": "行为：设置 self.fxoffset 为 Vector3 或 nil。副作用：影响后续特效相对位置。"
+      "effect": "根据参数设置 self.fxoffset 为合并后的 Vector3，作为所有燃烧特效的额外总偏移。"
     },
     {
       "name": "SetFXLevel",
-      "effect": "行为：设置 self.fxlevel 并调整现有 fxchildren 的火焰等级与百分比。副作用：实时改变火焰特效强度。"
+      "effect": "设置 self.fxlevel 并遍历 self.fxchildren 调用 firefx:SetLevel 与 SetPercentInLevel 以调整特效等级。"
     },
     {
       "name": "GetLargestLightRadius",
-      "effect": "行为：计算并返回 fxchildren 中启用光源的最大计算半径。副作用：无。"
+      "effect": "遍历 self.fxchildren 的光照组件，返回计算出的较大光照半径数值或 nil。"
     },
     {
       "name": "GetDebugString",
-      "effect": "行为：返回描述燃烧或阴燃状态的调试字符串。副作用：无。"
+      "effect": "返回描述当前阴燃剩余时间、燃烧中或未按的调试字符串。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "行为：停止阴燃，设 fastextinguish 为真，杀死特效。副作用：清理燃烧相关状态与子特效。"
+      "effect": "实体移除时调用，停止阴燃、强制 fastextinguish 并杀死特效（KillFX）。"
     },
     {
       "name": "StartWildfire",
-      "effect": "行为：若未燃烧、未阴燃且无 fireimmune 标签，则开始阴燃，生成烟雾，设定阴燃剩余时间并启动周期更新任务。副作用：实体进入阴燃状态，可能随时间自燃。"
+      "effect": "若未燃烧/阴燃且无 fireimmune 标签，则进入阴燃状态：生成烟雾、设定阴燃剩余时间、启动周期更新任务 SmolderUpdate，并触发 onsmoldering 回调。"
     },
     {
       "name": "IsControlledBurn",
-      "effect": "行为：返回 self.controlled_burn 是否非 nil。副作用：无。"
+      "effect": "返回 self.controlled_burn ~= nil，指示当前是否为受控燃烧。"
     },
     {
       "name": "GetControlledBurn",
-      "effect": "行为：返回 self.controlled_burn 表。副作用：无。"
+      "effect": "返回 self.controlled_burn 数据表（可能含 duration_creature 与 damage 字段）。"
     },
     {
       "name": "StokeControlledBurn",
-      "effect": "行为：清除 controlled_burn 与 stokeablefire 状态，重置特效等级。副作用：取消可控燃烧增益。"
+      "effect": "清除 self.controlled_burn 与 self.stokeablefire，并调用 SetFXLevel 重置特效等级为当前等级满百分比。"
     },
     {
       "name": "Ignite",
-      "effect": "行为：若未燃烧且无防火标签，则根据来源设置可控燃烧，停止阴燃，置 burning 真，监听死亡，生成特效，推送 onignite 事件，调用回调，启动燃料消耗与火势传播，安排燃烧结束。副作用：实体着火，产生火焰，可能影响周围。"
+      "effect": "若未燃烧且无 fireimmune，根据 source/doer 标签设置受控燃烧数据，停止阴燃，置 burning=true，监听 death 事件，生成特效，推送 onignite 事件并执行回调，启动 fueled 消耗与 propagator 传播，并安排烧毁任务。"
     },
     {
       "name": "CalculateControlledBurnDuration",
-      "effect": "行为：若满足可控燃烧生物持续时间条件则返回对应倍数，否则返回 nil。副作用：无。"
+      "effect": "若 controlled_burn.duration_creature 存在且实体有 health 组件，返回该持续时间倍率，否则返回 nil。"
     },
     {
       "name": "ExtendBurning",
-      "effect": "行为：取消旧任务并按 burntime 安排 DoneBurning 调用。副作用：重设燃烧结束定时器。"
+      "effect": "取消原有烧毁任务，根据 burntime 与受控燃烧倍率重新安排 DoneBurning 延时任务。"
     },
     {
       "name": "LongUpdate",
-      "effect": "行为：若燃烧中则立即取消任务并调用 DoneBurning。副作用：立即结束燃烧流程。"
+      "effect": "若正在燃烧，立即取消任务并直接调用 DoneBurning 完成烧毁，用于长帧跳跃。"
     },
     {
       "name": "SmotherSmolder",
-      "effect": "行为：消耗或伤害熄灭者，调用 StopSmoldering(-1)。副作用：熄灭阴燃并给予熄灭者代价。"
+      "effect": "若提供 smotherer 则消耗其有限次数/堆叠或造成火焰伤害并推 burnt 事件，随后调用 StopSmoldering(-1) 给予复燃宽容期。"
     },
     {
       "name": "StopSmoldering",
-      "effect": "行为：若阴燃中则移除烟雾，取消任务，停止传播，调用回调。副作用：退出阴燃状态。"
+      "effect": "若阴燃中，移除烟雾、取消周期任务、清剩余时间，通知 propagator 停止传播并执行 onstopsmoldering 回调。"
     },
     {
       "name": "Extinguish",
-      "effect": "行为：停止阴燃，处理熄灭者，若燃烧中则清理状态、特效、燃料消耗，推送 onextinguish 事件。副作用：完全熄灭实体火焰。"
+      "effect": "停止阴燃，处理 smotherer 消耗；若燃烧中则取消任务、移除 death 监听、停止传播、清受控燃烧、置 burning=false、杀特效、停燃料消耗、执行 onextinguish 回调并推 onextinguish 事件。"
     },
     {
       "name": "SpawnFX",
-      "effect": "行为：杀死旧特效并根据 fxdata 生成新火焰子特效。副作用：在实体上创建视觉火焰特效。"
+      "effect": "杀死旧特效，依据 fxdata 与 fxoffset 生成并附加燃烧特效子物体，设置缩放、跟随符号及 firefx 等级与光照。"
     },
     {
       "name": "FixFX",
-      "effect": "行为：修复已生成特效的跟随符号绑定。副作用：更新特效位置绑定。"
+      "effect": "修复已生成特效的跟随符号绑定，用于实体构建期间生成的特效修正。"
     },
     {
       "name": "KillFX",
-      "effect": "行为：熄灭或移除所有 fxchildren 特效并清空表。副作用：移除火焰视觉表现。"
+      "effect": "遍历 fxchildren，通过 firefx:Extinguish 播放熄灭动画后移除或立即移除，并清空表。"
     },
     {
       "name": "HasEndothermicHeat",
-      "effect": "行为：检查子特效是否含制冷热源。副作用：无。"
+      "effect": "检查 fxchildren 中是否存在制冷型 heater 组件，返回布尔值。"
     },
     {
       "name": "HasExothermicHeat",
-      "effect": "行为：检查子特效是否含制热源。副作用：无。"
+      "effect": "检查 fxchildren 中是否存在制热型 heater 组件，返回布尔值。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "行为：调用 Extinguish 熄灭，取消任务，移除相关标签。副作用：组件脱离实体时彻底清理。"
+      "effect": "从实体移除组件时调用，执行 Extinguish 停止燃烧与阴燃，取消任务，移除 canlight/nolight/burnableignorefuel 标签。"
     }
   ],
   "events_published": [
     "onburnt",
     "onignite",
-    "onextinguish"
+    "onextinguish",
+    "plantkilled"
   ],
   "events_listened": [
     "death"
@@ -172,133 +173,113 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      15295,
       10374,
+      15237,
       20496,
-      19913,
-      17973,
-      20152,
+      33991,
       13214,
-      14785,
-      15587
+      15722,
+      22638
     ],
     "aspects": [
       {
-        "aspect": "可控燃烧状态说明",
+        "aspect": "可控燃烧机制与视觉弱化",
+        "evidence": [
+          {
+            "pageid": 20496,
+            "quote": "可控燃烧的视觉效果是普通燃烧的弱化版。"
+          },
+          {
+            "pageid": 20496,
+            "quote": "远程右键该实体进行“拨火”，使火势恢复至普通燃"
+          }
+        ]
+      },
+      {
+        "aspect": "墙体不防火与烧毁变灰烬",
+        "evidence": [
+          {
+            "pageid": 15295,
+            "quote": "不防火的墙会因为火的灼烧伤害而逐渐损失生命值，并在完全烧毁后变为灰烬。"
+          },
+          {
+            "pageid": 15295,
+            "quote": "不防火的墙不会因为生命值为 0 而烧毁，而是燃烧时间足够长后而烧毁。"
+          }
+        ]
+      },
+      {
+        "aspect": "实体燃烧与闷烧状态传递",
+        "evidence": [
+          {
+            "pageid": 20496,
+            "quote": "周围被传递的实体依次进入闷烧状态和燃烧状态。"
+          },
+          {
+            "pageid": 20496,
+            "quote": "生物的级别决定了它们燃烧时间的长短、施加的燃烧伤害的大小。"
+          }
+        ]
+      },
+      {
+        "aspect": "物体烧毁状态与掉落",
+        "evidence": [
+          {
+            "pageid": 33991,
+            "quote": "|烧毁|{{全角色台词|dst|yotc_carrat_gym_speed.BURNT}}"
+          },
+          {
+            "pageid": 22638,
+            "quote": "|烧毁|{{全角色台词|dst|oceanvine_cocoon_burnt}}"
+          },
+          {
+            "pageid": 22638,
+            "quote": "烧毁海黾巢穴或摧毁已经烧毁的海黾巢穴均不会触发该机制"
+          },
+          {
+            "pageid": 15295,
+            "quote": "完全烧毁后变为灰烬"
+          }
+        ]
+      },
+      {
+        "aspect": "猪屋着火与烧毁灭火行为",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪屋着火时，里面的猪人会逃出；所属的猪人能检测 18 单位内的猪屋着火状态"
+          },
+          {
+            "pageid": 15237,
+            "quote": "发现猪屋着火会持续慌张乱跑，直到猪屋被烧毁、破坏或灭火。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色熄灭明火与闷烧技能",
         "evidence": [
           {
             "pageid": 10374,
-            "quote": "由薇洛造成的所有燃烧状态变为可控"
-          },
-          {
-            "pageid": 20496,
-            "quote": "造成的燃烧都将是可控燃烧"
+            "quote": "在半径 2.2 的范围内，熄灭所有明火和闷烧"
           }
         ]
       },
       {
-        "aspect": "可控燃烧视觉效果弱化",
+        "aspect": "闷烧熄灭伤害",
         "evidence": [
           {
             "pageid": 20496,
-            "quote": "可控燃烧的视觉效果是普通燃烧的弱化版"
+            "quote": "熄灭闷烧时玩家会受到 3 点火焰固定伤害。"
           }
         ]
       },
       {
-        "aspect": "夏季野生火触发条件",
+        "aspect": "食人花引燃行为",
         "evidence": [
           {
-            "pageid": 19913,
-            "quote": "处于夏季的白天、世界温度≥80度且湿度为0的情况下每45秒"
-          }
-        ]
-      },
-      {
-        "aspect": "点燃行为描述",
-        "evidence": [
-          {
-            "pageid": 10374,
-            "quote": "100% 将其点燃"
-          },
-          {
-            "pageid": 20496,
-            "quote": "可以造成燃烧状态的点燃行为"
-          },
-          {
-            "pageid": 17973,
-            "quote": "可点燃的物品[[燃烧]]后产生"
-          },
-          {
-            "pageid": 20152,
-            "quote": "被点燃时，背部的冰枪将会燃烧"
-          },
-          {
-            "pageid": 14785,
-            "quote": "在被点燃后会在燃尽时爆炸"
-          },
-          {
-            "pageid": 15587,
-            "quote": "被点燃后会在燃尽时爆炸"
-          }
-        ]
-      },
-      {
-        "aspect": "熄灭行为描述",
-        "evidence": [
-          {
-            "pageid": 17973,
-            "quote": "燃料值未到达上限的75%及以上的营火熄灭后"
-          },
-          {
-            "pageid": 20152,
-            "quote": "冰鹿法阵每秒对其上所有实体施加 3 层冰冻、熄灭火焰"
-          }
-        ]
-      },
-      {
-        "aspect": "燃尽与掉落物变化",
-        "evidence": [
-          {
-            "pageid": 17973,
-            "quote": "自然燃尽后也会产生灰烬"
-          },
-          {
-            "pageid": 14785,
-            "quote": "在被点燃后会在燃尽时爆炸"
-          },
-          {
-            "pageid": 15587,
-            "quote": "被点燃后会在燃尽时爆炸"
-          },
-          {
-            "pageid": 20496,
-            "quote": "如果生物在燃烧状态下死亡，掉落物中有烤 / 熟形态"
-          }
-        ]
-      },
-      {
-        "aspect": "燃烧持续时长与伤害加成",
-        "evidence": [
-          {
-            "pageid": 10374,
-            "quote": "燃烧状态持续时长 + 200%"
-          },
-          {
-            "pageid": 10374,
-            "quote": "受到的燃烧伤害 + 50%"
-          },
-          {
-            "pageid": 20496,
-            "quote": "生物的级别决定了它们燃烧时间的长短"
-          }
-        ]
-      },
-      {
-        "aspect": "闷烧与燃烧状态传递",
-        "evidence": [
-          {
-            "pageid": 20496,
-            "quote": "依次进入闷烧状态和燃烧状态"
+            "pageid": 15722,
+            "quote": "可以用火把直接引燃，引燃后所有眼球草会立刻死亡"
           }
         ]
       }
@@ -306,25 +287,25 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "点燃",
+    "着火",
     "阴燃",
     "熄灭",
-    "野火",
-    "燃烧特效",
-    "烧尽",
-    "可控燃烧",
-    "烟雾"
+    "烧毁",
+    "防火",
+    "火势",
+    "冒烟",
+    "焦黑"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗",
-    "建造"
+    "建造",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
     "source_bytes": 20250,
     "model": "hy3-free",
-    "generated_at_ms": 1787891658794
+    "generated_at_ms": 1787895194618
   }
 }

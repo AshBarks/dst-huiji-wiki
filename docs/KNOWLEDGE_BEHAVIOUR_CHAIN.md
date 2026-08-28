@@ -33,13 +33,17 @@
 - pass2 的 search_terms 全文检索采样、dst/mixed 版本过滤、章节优先级("行为"=高优先)均**类别无关**,原样可用;
 - update 侧 F3"行为常量子集"已落地:brain 文件级常量 ↔ 行为章配对已验证(猎犬 SEE_DIST 类)。SymbolDoc 与 F3 共用"**brain 文件级常量 = 页面数值事实**"的认知,可互相校准;update 侧该类事实的 `derivation_depth=2`(关联文件常量),认知对齐。
 
-### 1.3 语义歧义案例:ChaseAndAttack 的"100"(立案,待核实)
+### 1.3 语义歧义案例:ChaseAndAttack 的"100"(立案,词典证据已就位,待正式核实)
 
-- 页面(猎犬页行为章):"完全野生的猎犬仇恨范围为 100 单位";
+- 页面(猎犬页 pageid 13857 行为章,原文三条):
+  - "完全野生的猎犬仇恨范围为 100 单位。"
+  - "有[[猎犬丘]]的猎犬的仇恨范围为 20 单位。"
+  - "海象营地的寒冰猎犬的仇恨范围为 10 单位。超过 20 单位时则放弃追击。"
 - 代码:`brains/houndbrain.lua:224` `ChaseAndAttack(self.inst, 100)`;而 ChaseAndAttack 构造子为 `(inst, max_chase_time, give_up_dist, max_attacks, …)`(`behaviours/chaseandattack.lua:1`),即 **100 是追击时长上限(秒)**,give_up_dist 为 nil;
 - 索敌距离实际来自 `prefabs/hound.lua:198` retargetfn 的 `FindEntity(inst, TUNING.HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10)`(tuning.lua:1481/1488);
-- **推断**:页面"100 单位"疑似把 max_chase_time(秒)误读为距离(单位)。待核实后处置:①猎犬页行为章纠错;②UPDATE_IMPACT_PLAN §4.2.4 中"野生 100 / 有丘 20 / 海象营地 10"语境分句**范例**需修正;③该句若作为 F3 旧值回查锚点会命中错误旧值;
-- **教训**:brain 的位置参数语义没有权威出处时,人和 LLM 都会猜——behaviour 词典文档(`ctor_params`)正是为此而设;brain 文档生成同样依赖。
+- **1a 词典交叉印证(2026-08-28)**:houndbrain 文档 `behaviour_invocations` 按语境分支记录——野生无家 `ChaseAndAttack(inst, 100)` → "追击最长 100 秒";有家 `(inst, 10, 20)` → "追击最长 10 秒 + 放弃距离 20"。三条页面句与代码的映射:①"野生 100 单位" ↔ max_chase_time=100 秒(**疑似把时间误读为距离**);②"有丘 20 单位" ↔ give_up_dist=20(确是距离,但来源更可能是 give_up_dist 而非索敌距离);③"海象营地 10 单位" ↔ HOUND_FOLLOWER_TARGET_DIST=10(确是距离)。
+- **结论倾向**:三条中两条数字恰好真是距离,一条疑似时间误读——正是"brain 位置参数语义无权威出处时人和 LLM 都会猜"的实例。正式核实(历史版本比对/游戏实测)仍归 UPDATE_IMPACT_PLAN L1 人工比对项;核实后处置:①猎犬页行为章纠错;②UPDATE_IMPACT_PLAN §4.2.4 语境分句范例修正;③F3 旧值回查锚点排查。
+- **教训**:behaviour 词典文档(`ctor_params`)正是为此而设——本例的语义锚点即来自 1a 词典。
 
 ## 2. 四类符号的性质差异(为什么不能一套模板套四次)
 

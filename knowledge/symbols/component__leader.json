@@ -1,121 +1,120 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/leader.lua"
   },
   "category": "component",
   "display_name": "leader",
-  "summary": "该组件管理实体（领袖）的真实跟随者与虚拟物品跟随者列表及其数量，处理跟随者的添加、移除、死亡脱离与存档。它参与指挥跟随者共享攻击目标、在领袖受击或获得新目标时让跟随者参战，并涉及宠物识别与跟随成就统计等核心玩法。",
+  "summary": "Leader 组件管理实体（领袖）的普通跟随者与物品虚拟跟随者列表及其数量，并处理跟随者的添加、移除与死亡清理。该组件参与战斗目标共享、宠物判定、点名呼叫与成就解锁等核心玩法，使领袖的追随者能协同攻击或响应领袖状态。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上监听的 'newcombattarget'、'attacked'、'death' 事件回调；调用 RemoveAllFollowers 移除所有真实跟随者；若存在 roll_call_sources 则重置。清除监听与跟随关系。"
+      "effect": "移除宿主实体对 newcombattarget、attacked、death 事件的监听回调；调用 RemoveAllFollowers 移除所有普通跟随者；若存在 roll_call_sources 修改器列表则调用其 Reset 方法。"
     },
     {
       "name": "SetForceLeash",
-      "effect": "将 self.forceleash 设为 true，仅做标记，无其它副作用。"
+      "effect": "设置内部标记 self.forceleash = true，源码中未在其他位置读取该标记。"
     },
     {
       "name": "IsFollower",
-      "effect": "检查传入 guy 是否在 followers 或 itemfollowers 表中，返回布尔值。"
+      "effect": "返回传入实体 guy 是否存在于 self.followers 或 self.itemfollowers 表中，即判断是否为该领袖的跟随者或物品虚拟跟随者。"
     },
     {
       "name": "OnAttacked",
-      "effect": "当 attacker 非跟随者且非自身，且满足小游戏/PVP条件时，遍历 followers 与 itemfollowers，对具有 combat 与 follower 组件且 canaccepttarget 为真的实体调用 combat:SuggestTarget(attacker)。可能改变跟随者攻击目标。"
+      "effect": "当攻击者 attacker 不是跟随者且非自身，并满足小游戏/PVP条件时，遍历 followers 与 itemfollowers，对具有 combat 与 follower 组件且 canaccepttarget 为真的实体调用 combat:SuggestTarget(attacker) 建议攻击攻击者。"
     },
     {
       "name": "GetNumFollowers",
-      "effect": "返回 self.numfollowers（仅真实跟随者数量，不含物品跟随者）。"
+      "effect": "返回 self.numfollowers，即普通跟随者的数量。"
     },
     {
       "name": "CountFollowers",
-      "effect": "若 tag 为 nil 返回 self.numfollowers；否则统计 followers 与 itemfollowers 中拥有该 tag 的实体数量并返回。"
+      "effect": "若 tag 为 nil 则返回 self.numfollowers；否则统计 followers 与 itemfollowers 中带有该 tag 的实体数量并返回。"
     },
     {
       "name": "GetFollowersByTag",
-      "effect": "若 tag 为 nil 返回空表；否则返回 followers 与 itemfollowers 中拥有该 tag 的实体组成的数组。"
+      "effect": "若 tag 为 nil 则返回空表；否则返回 followers 与 itemfollowers 中带有该 tag 的实体数组。"
     },
     {
       "name": "SetIsRollCaller",
-      "effect": "初始化 roll_call_sources（SourceModifierList）并为指定 source 设置布尔 modifier 值，影响后续 IsRollCalling 结果。"
+      "effect": "若 self.roll_call_sources 不存在则创建 SourceModifierList 布尔修改器列表；随后设置来源 source 的修改器为 boolval，用于点名呼叫状态管理。"
     },
     {
       "name": "IsRollCalling",
-      "effect": "若实体拥有 leaderrollcall 组件且启用则返回 true；否则返回 roll_call_sources 的布尔值或 false。"
+      "effect": "若宿主有 leaderrollcall 组件且启用则返回 true；否则返回 self.roll_call_sources 的 Get 值或 false。"
     },
     {
       "name": "IsTargetedByFollowers",
-      "effect": "遍历 followers 与 itemfollowers，若任一 follower 的 combat:TargetIs(target) 为真则返回 true，否则返回 nil。"
+      "effect": "遍历 followers 与 itemfollowers，若任一 follower 的 combat 组件 TargetIs(target) 为真则返回 true；否则返回 nil。"
     },
     {
       "name": "IsTargetPet",
-      "effect": "检查 target 是否为自身 petleash 组件或装备中 petleash 组件的宠物，返回布尔值（dismiss_pet）。"
+      "effect": "检查 target 是否是通过宿主自身 petleash 组件或宿主装备中 petleash 组件认定的宠物，返回布尔值 dismiss_pet。"
     },
     {
       "name": "OnNewTarget",
-      "effect": "若 target 是自身宠物则忽略；否则当 target 有效且满足小游戏/PVP条件时，遍历 followers 与 itemfollowers 对可接受的调用 SuggestTarget。可能使跟随者获得新攻击目标。"
+      "effect": "若目标是宠物则直接返回；若目标有效且满足小游戏/PVP条件，遍历 followers 与 itemfollowers，对具有 combat 与 follower 组件、canaccepttarget 为真且有效的实体调用 combat:SuggestTarget(target) 共享攻击目标。"
     },
     {
       "name": "RemoveFollower",
-      "effect": "若 follower 在 followers 表中，将其移除并递减计数，移除相关事件监听，调用 onremovefollower 回调；若 invalid 非真，推送 'stopfollowing' 事件并将 follower 的 leader 设为 nil。使跟随者脱离领导。"
+      "effect": "若 follower 在 followers 表中，将其移除并减少计数，移除在 follower 上的 death 与 onremove 事件监听，调用 onremovefollower 回调；若 invalid 参数非真，向 follower 推送 stopfollowing 事件并将其 follower 组件 leader 设为 nil。"
     },
     {
       "name": "AddFollower",
-      "effect": "若 follower 不在表中且有 follower 组件，加入并计数，设 leader，推送 'startfollowing' 事件，通知玩家进度，调用 onfolloweradded 回调，按需监听 follower 死亡/移除事件；若领袖是玩家且达到成就数量则颁奖并记录 ProfileStats。添加跟随者并可能触发成就。"
+      "effect": "若 follower 不在表中且有 follower 组件，加入 followers 并增加计数，设其 leader 为宿主，推送 startfollowing 事件，通知玩家进度统计，调用 onfolloweradded 回调，根据 keepdeadleader 监听 death 事件并监听 onremove 事件；若宿主是玩家且 follower 有 prefab，检查猪人/石虾成就并增加 ProfileStatsAdd 统计。"
     },
     {
       "name": "AddItemFollower",
-      "effect": "若 itemfollower 不在 itemfollowers 表中则加入并递增 numitemfollowers，不计入存档。"
+      "effect": "若 itemfollower 不在 itemfollowers 表中，则加入并增加 self.numitemfollowers 计数。"
     },
     {
       "name": "RemoveItemFollower",
-      "effect": "若 itemfollower 在 itemfollowers 表中则移除并递减 numitemfollowers。"
+      "effect": "若 itemfollower 在 itemfollowers 表中，则移除并减少 self.numitemfollowers 计数。"
     },
     {
       "name": "RemoveFollowersByTag",
-      "effect": "遍历 followers，若实体具有 tag 且 validateremovefn 为空或通过验证，则调用 RemoveFollower 移除之。"
+      "effect": "遍历 followers，对带有指定 tag 且通过可选 validateremovefn 验证的实体调用 RemoveFollower 进行移除。"
     },
     {
       "name": "RemoveAllFollowers",
-      "effect": "遍历 followers 调用 RemoveFollower 移除全部真实跟随者。"
+      "effect": "遍历 followers 表，对所有跟随者调用 RemoveFollower 移除全部普通跟随者。"
     },
     {
       "name": "RemoveAllFollowersOnDeath",
-      "effect": "遍历 followers，若 follower 没有 keepdeadleader 标记则调用 RemoveFollower 移除，用于死亡时清理。"
+      "effect": "遍历 followers，对不带有 keepdeadleader 标记的跟随者调用 RemoveFollower 移除，用于领袖死亡时的清理。"
     },
     {
       "name": "HaveFollowersCachePlayerLeader",
-      "effect": "遍历 followers，若具有 follower 组件则调用其 CachePlayerLeader 方法缓存玩家领袖。"
+      "effect": "遍历 followers，若跟随者具有 follower 组件则调用其 CachePlayerLeader 方法缓存玩家领袖。"
     },
     {
       "name": "IsBeingFollowedBy",
-      "effect": "检查 followers 与 itemfollowers 中是否存在 prefab 等于 prefabName 的实体，返回布尔值。"
+      "effect": "遍历 followers 与 itemfollowers，若任一实体 prefab 等于 prefabName 则返回 true，否则返回 false。"
     },
     {
       "name": "OnSave",
-      "effect": "若实体是玩家则返回 nil；否则收集 followers 的 GUID 返回存档表 {followers = followers} 及引用列表用于持久化。"
+      "effect": "若宿主有 player 标签则直接返回；否则收集所有 followers 的 GUID 数组，若有跟随者则返回包含 followers 字段的保存数据及 GUID 列表供存档使用。"
     },
     {
       "name": "LoadPostPass",
-      "effect": "若非玩家，遍历存档中的 followers GUID 从 newents 获取实体并调用 AddFollower 恢复跟随关系。"
+      "effect": "若宿主有 player 标签则直接返回；否则从 savedata.followers 中通过 newents 映射找到对应实体并调用 AddFollower 恢复跟随关系。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "等价于 RemoveAllFollowers（源码直接赋值），移除所有真实跟随者。"
+      "effect": "等同于 RemoveAllFollowers，在实体被移除时清除所有普通跟随者。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回字符串 'followers:' 拼接 self.numfollowers，用于调试显示。"
+      "effect": "返回字符串 'followers:' 拼接 self.numfollowers 的调试信息。"
     }
   ],
   "events_published": [],
   "events_listened": [
     "newcombattarget",
     "attacked",
-    "death",
-    "onremove"
+    "death"
   ],
   "netvars": [],
   "tunables": [
@@ -124,75 +123,58 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      18057,
       72299,
       23210,
       72238,
-      15022,
-      13493,
-      20426,
-      13857
+      72314,
+      20514,
+      34037,
+      15238,
+      13493
     ],
     "aspects": [
-      {
-        "aspect": "判断攻击者非领袖随从",
-        "evidence": [
-          {
-            "pageid": 72299,
-            "quote": "若攻击者不是其随从"
-          }
-        ]
-      },
       {
         "aspect": "领袖受击联动随从仇恨",
         "evidence": [
           {
             "pageid": 72299,
-            "quote": "当领袖受到其他实体的攻击时，随从都将仇恨攻击者"
+            "quote": "若攻击者不是其随从，则该领袖的所有具有战斗能力且空闲的随从都将仇恨攻击者"
           }
         ]
       },
       {
-        "aspect": "领袖新目标联动随从仇恨",
+        "aspect": "领袖锁定新目标联动随从仇恨",
         "evidence": [
           {
             "pageid": 72299,
-            "quote": "当领袖开始仇恨某一目标时，随从都将仇恨该目标"
-          }
-        ]
-      },
-      {
-        "aspect": "领袖死亡导致随从死亡",
-        "evidence": [
-          {
-            "pageid": 72238,
-            "quote": "领袖死亡、理智值归零与被其领袖攻击时都会死亡"
+            "quote": "该领袖的所有具有战斗能力且空闲的随从都将仇恨该目标"
           }
         ]
       }
     ],
-    "coverage_status": "well_documented"
+    "coverage_status": "partial"
   },
   "search_terms": [
     "跟随者",
     "领袖",
-    "仇恨共享",
-    "攻击目标",
-    "宠物",
-    "猪人队",
-    "石虾队",
-    "点名",
-    "解散"
+    "共享目标",
+    "宠物判定",
+    "点名呼叫",
+    "猪人团",
+    "石虾团",
+    "移除跟随",
+    "添加跟随"
   ],
   "gameplay_tags": [
+    "战斗",
     "生存",
-    "战斗"
+    "宠物"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
     "source_bytes": 9492,
     "model": "hy3-free",
-    "generated_at_ms": 1787897252328
+    "generated_at_ms": 1787933057700
   }
 }

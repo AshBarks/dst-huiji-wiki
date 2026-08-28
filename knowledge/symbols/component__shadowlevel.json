@@ -1,29 +1,29 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/shadowlevel.lua"
   },
   "category": "component",
   "display_name": "shadowlevel",
-  "summary": "该组件管理实体的暗影等级数据，支持设定默认等级与动态等级计算函数。它通过为实体添加 \"shadowlevel\" 标签并对外提供当前等级查询接口，供游戏内其他系统判定实体的暗影层级属性。",
+  "summary": "该组件管理实体的阴影等级数据，存储一个默认等级并允许设置动态等级计算函数。它在挂载时给实体添加“shadowlevel”标签，卸载时移除该标签。外部可通过其方法获取实体当前的阴影等级值。",
   "api": [
     {
       "name": "SetDefaultLevel",
-      "effect": "将组件的默认暗影等级字段 self.level 设置为传入参数 level；此值作为未设置动态函数时 GetCurrentLevel 返回的基准值。"
+      "effect": "将组件内部默认阴影等级 self.level 设置为传入的 level 参数，无返回值，仅修改内部状态，无其它副作用。"
     },
     {
       "name": "SetLevelFn",
-      "effect": "设置动态等级计算函数 self.levelfn 为传入的 fn；此后 GetCurrentLevel 将优先调用该函数并传入实体自身，以返回值作为当前等级。"
+      "effect": "设置组件内部用于动态计算阴影等级的函数 self.levelfn 为传入的 fn，无返回值，仅修改内部状态。"
     },
     {
       "name": "GetCurrentLevel",
-      "effect": "返回实体当前暗影等级：若 levelfn 不为 nil 则调用 levelfn(self.inst) 并返回其结果，否则返回默认等级 self.level。该方法无副作用。"
+      "effect": "返回实体当前阴影等级：若 levelfn 不为 nil 则调用 levelfn(self.inst) 并返回其结果，否则返回默认等级 self.level。无副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时由系统调用，移除实体上的 \"shadowlevel\" 标签，使实体不再带有该组件标识。"
+      "effect": "当组件从实体移除时由引擎调用，将实体上的“shadowlevel”标签移除，无返回值。"
     }
   ],
   "events_published": [],
@@ -43,16 +43,7 @@
     ],
     "aspects": [
       {
-        "aspect": "击杀参与升级机制",
-        "evidence": [
-          {
-            "pageid": 34037,
-            "quote": "可为暗影槌升级"
-          }
-        ]
-      },
-      {
-        "aspect": "耐久耗尽等级重置",
+        "aspect": "等级回退至0级标注",
         "evidence": [
           {
             "pageid": 34037,
@@ -65,13 +56,13 @@
   },
   "search_terms": [
     "暗影等级",
-    "暗影层级",
     "阴影级别",
     "暗影标签",
+    "等级函数",
+    "默认等级",
+    "当前等级",
     "动态等级",
-    "当前暗影",
-    "实体影子",
-    "层级查询"
+    "影子等级"
   ],
   "gameplay_tags": [
     "暗影",
@@ -82,6 +73,6 @@
     "source_sha256": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
     "source_bytes": 576,
     "model": "hy3-free",
-    "generated_at_ms": 1787897371070
+    "generated_at_ms": 1787933233145
   }
 }

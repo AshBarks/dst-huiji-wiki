@@ -1,25 +1,21 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/fuel.lua"
   },
   "category": "component",
   "display_name": "fuel",
-  "summary": "该组件管理实体的燃料值、燃料类型及被拿走时的回调函数，并为实体打上对应燃料类型的标签。它参与燃料消耗核心玩法，在燃料被取走时推送事件并可能触发外部逻辑。",
+  "summary": "该组件管理实体的燃料值、燃料类型以及被取走时的回调函数。它通过添加与燃料类型相关的标签（如“<类型>_fuel”）来标识实体可作为燃料，并在被取走时推送事件与执行回调。",
   "api": [
     {
       "name": "SetOnTakenFn",
-      "effect": "将传入的函数 fn 保存至内部字段 ontaken。副作用：覆盖之前设置的回调，改变未来 Taken 调用时的执行逻辑。"
+      "effect": "将组件内部字段 ontaken 设为传入的函数 fn，用于燃料被拿走时回调。仅存储函数，无其它副作用。"
     },
     {
       "name": "Taken",
-      "effect": "以 target 为参数向实体推送 'fueltaken' 事件，若 ontaken 非空则以其调用 self.inst 与 target。副作用：触发事件监听者与回调函数的执行，具体影响由外部逻辑决定。"
-    },
-    {
-      "name": "OnRemoveFromEntity",
-      "effect": "组件被移除时由系统调用，若 fueltype 非空则移除实体上 '<fueltype>_fuel' 标签。副作用：实体丢失对应的燃料类型标签。"
+      "effect": "向实体推送事件 'fueltaken' 并携带 {taker = target} 数据；若 ontaken 已设置，则以 self.inst 和 target 为参数调用该回调。表示燃料被 target 取走并触发后续逻辑。"
     }
   ],
   "events_published": [
@@ -30,36 +26,18 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      28610,
       18216,
-      20061,
-      21620,
-      51388,
       10374,
-      14792,
-      15170
+      10413,
+      15418,
+      21620,
+      14426,
+      14661,
+      14792
     ],
-    "aspects": [
-      {
-        "aspect": "摧毁掉落燃料联动",
-        "evidence": [
-          {
-            "pageid": 21620,
-            "quote": "宝石发电机被摧毁时会掉落其中消耗不足 1 单位电力的宝石。"
-          }
-        ]
-      },
-      {
-        "aspect": "燃料消耗行为描述",
-        "evidence": [
-          {
-            "pageid": 21620,
-            "quote": "消耗其中的宝石（即后放置的先消耗）"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中燃料相关表述均为“添加燃料”、燃料数值或消耗，未出现任何关于燃料被取走（Taken）或设置取走回调（SetOnTakenFn）的玩家语言表达，如“取出燃料”等。",
+    "coverage_status": "no_wiki_mention"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -76,14 +54,14 @@
     "note": "导出脚本仅在同时含 inventoryitem 时导出;燃料类型还会生成「<类型>消耗者」分类。"
   },
   "search_terms": [
-    "燃料值",
-    "燃料类型",
-    "燃料标签",
-    "被取走",
-    "取燃料",
+    "燃料价值",
+    "燃料种类",
+    "可燃标签",
+    "燃料被取",
     "燃料回调",
-    "生火材料",
-    "燃料物品"
+    "燃料事件",
+    "添加燃料",
+    "生火材料"
   ],
   "gameplay_tags": [
     "生存"
@@ -93,6 +71,6 @@
     "source_sha256": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
     "source_bytes": 783,
     "model": "hy3-free",
-    "generated_at_ms": 1787896002903
+    "generated_at_ms": 1787931624705
   }
 }

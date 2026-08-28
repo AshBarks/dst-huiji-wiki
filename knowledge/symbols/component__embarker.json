@@ -1,53 +1,53 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/embarker.lua"
   },
   "category": "component",
   "display_name": "embarker",
-  "summary": "组件管理实体登船与离船的目标位置、速度及移动状态数据，用于实现角色在船只平台与陆地间的跳跃移动。核心玩法涉及通过步行平台组件定位登船点，控制实体以特定速度寻路并传送至目标，并支持取消与完成事件反馈。",
+  "summary": "该组件管理实体登船与离船的目标位置、移动速度及跳跃距离等数据。其核心玩法为控制实体在水上平台与陆地间的移动过渡，包括自动寻路至登船点、物理或传送移动以及取消操作。",
   "api": [
     {
       "name": "UpdateEmbarkingPos",
-      "effect": "计算登船目标位置并更新 last_embark_x/z；根据剩余距离与本帧移动距离比较，若到达则传送实体并推送 done_embark_movement 事件；否则若已移动距离超过最大跳跃距离则取消移动并推送事件，否则设置实体朝向目标并启动物理马达速度。"
+      "effect": "计算当前登船/离船目标位置并更新 last_embark_x/z；若剩余距离小于等于本帧移动距离则传送至目标并推送 done_embark_movement 事件；否则若已旅行距离平方超过最大跳跃距离平方则取消并推送事件，否则设置朝向并设定电机速度。"
     },
     {
       "name": "SetEmbarkable",
-      "effect": "设置 embarkable 目标，更新 last_embark_x/z 为登船位置，强制实体面朝该点，并清除 disembark_x/z。"
+      "effect": "设置目标 embarkable 实体，更新 last_embark_x/z 为登船位置，强制面向该点，清除 disembark_x/z。"
     },
     {
       "name": "SetDisembarkPos",
-      "effect": "设置 disembark_x/z 为指定坐标，强制实体面朝该点，清除 embarkable 与 last_embark_x/z 状态。"
+      "effect": "设置离船坐标，强制面向该点，清除 embarkable 与 last_embark_x/z。"
     },
     {
       "name": "SetDisembarkActionPos",
-      "effect": "调用全局函数 GetDisembarkPosAndDistance 计算登陆位置，并将返回的前两个坐标值设置为 disembark_x/z。"
+      "effect": "调用内部函数 GetDisembarkPosAndDistance 计算离船点并赋值给 disembark_x/z。"
     },
     {
       "name": "StartMoving",
-      "effect": "若未设置最大跳跃距离，则停止物理，启动组件更新，基于 locomotor 跳跃距离计算 max_hop_dist_sq 并记录 hop_start_pt，推送 start_embark_movement 事件。"
+      "effect": "若 max_hop_dist_sq 未设置，则停止物理、启动组件更新、计算最大跳跃距离平方与跳跃起点，并推送 start_embark_movement 事件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧更新回调，调用 UpdateEmbarkingPos 执行移动逻辑与副作用。"
+      "effect": "调用 UpdateEmbarkingPos(dt) 进行每帧更新。"
     },
     {
       "name": "HasDestination",
-      "effect": "返回布尔值，指示是否存在有效 embarkable 或已设置 disembark_x，无副作用。"
+      "effect": "返回是否存在有效 embarkable 或已设置离船坐标，无副作用。"
     },
     {
       "name": "GetEmbarkPosition",
-      "effect": "返回登船目标坐标：若 embarkable 有效则委托 walkableplatform 组件计算，否则使用 disembark 或 last_embark 坐标，若无则使用实体自身坐标；无副作用。"
+      "effect": "返回目标位置 x,z：若有有效 embarkable 则调用其 walkableplatform 组件的 GetEmbarkPosition 方法（传入自身坐标与 self.embarker_min_dist），否则使用 disembark 或 last_embark 或自身位置。"
     },
     {
       "name": "Embark",
-      "effect": "停止物理，将实体传送到登船位置，清除所有移动状态与更新，调用 locomotor:FinishHopping 结束跳跃。"
+      "effect": "停止物理，直接传送至目标位置，清除所有状态字段，停止组件更新，并调用 locomotor:FinishHopping()。"
     },
     {
       "name": "Cancel",
-      "effect": "停止物理，清除所有移动状态与更新，调用 locomotor:FinishHopping 结束跳跃，不传送实体。"
+      "effect": "停止物理，清除所有状态字段，停止组件更新，并调用 locomotor:FinishHopping() 结束跳跃。"
     }
   ],
   "events_published": [
@@ -59,49 +59,27 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13602,
-      15746,
-      18504,
-      18540,
-      65881,
-      13556,
-      13828,
-      15351
+      15239,
+      13857,
+      15237,
+      24762,
+      15915,
+      24364,
+      15246,
+      61235
     ],
-    "aspects": [
-      {
-        "aspect": "跳上船行为描述",
-        "evidence": [
-          {
-            "pageid": 13602,
-            "quote": "它会跳上船发动三连范围攻击"
-          },
-          {
-            "pageid": 15746,
-            "quote": "靠近船后会从海中跳到船上啃噬"
-          },
-          {
-            "pageid": 18540,
-            "quote": "火药猴就会跳上船去放下锚"
-          },
-          {
-            "pageid": 65881,
-            "quote": "可以跳上船吸引大副仇恨即可恢复"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及兔人、猎犬、猪人、蟹卫、伯尼、水獭、蜘蛛、圣殿谜题等实体，内容为其生成、掉落、活动距离、雇佣、攻击等行为，未出现任何与登船(embark)、下船(disembark)、设置可登船、登船位置更新、取消登船等 embarker 组件能力相关的玩家语言描述或数值，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "上船",
-    "下船",
-    "跳船",
-    "登船",
-    "离船",
-    "登陆点",
-    "船只移动",
-    "位移"
+    "上船移动",
+    "下船位置",
+    "跳船取消",
+    "登船目标",
+    "水域换乘",
+    "平台跳跃",
+    "航行终点"
   ],
   "gameplay_tags": [
     "航行",
@@ -112,6 +90,6 @@
     "source_sha256": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
     "source_bytes": 5385,
     "model": "hy3-free",
-    "generated_at_ms": 1787896879663
+    "generated_at_ms": 1787932660502
   }
 }

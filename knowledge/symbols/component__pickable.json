@@ -1,354 +1,293 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/pickable.lua"
   },
   "category": "component",
   "display_name": "pickable",
-  "summary": "Pickable 组件管理实体可否被采摘、再生时间、产物类型、采摘周期与移植状态等数据。它参与核心玩法包括采集资源、再生刷新、施肥恢复、贫瘠枯萎以及快速采摘等交互逻辑。",
+  "summary": "该组件管理实体是否可被采摘、产物类型、再生时间以及采摘周期等数据。它参与核心的采集玩法，支持资源再生、施肥复活、移植衰减与贫瘠状态，并可通过标签影响交互与火源逻辑。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "取消未完成的再生任务并移除实体上的 pickable、barren、quickpick、jostlepick 标签。"
+      "effect": "取消未完成的再生任务，并移除实体上的 pickable、barren、quickpick、jostlepick 标签。"
     },
     {
       "name": "LongUpdate",
-      "effect": "根据 dt 调整再生计时；若未暂停、有目标时间且未枯萎，重新安排或立即触发再生，使用外部计时器时则调整外部计时器剩余时间。"
+      "effect": "处理长时间跳跃更新，根据是否使用外部计时器调整再生任务剩余时间或外部计时器，忽略暂停或枯萎状态。"
     },
     {
       "name": "IsWildfireStarter",
-      "effect": "返回 wildfirestarter 为 true 或实体带有 withered 标签的结果，无副作用。"
+      "effect": "返回 wildfirestarter 为 true 或实体带有 withered 标签时判定为火源引发者。"
     },
     {
       "name": "FinishGrowing",
-      "effect": "若未使用外部计时器且有待处理再生任务且当前不可采摘且未枯萎，取消任务并立即再生并返回 true；使用外部计时器时类似判断；否则返回 false。"
+      "effect": "强制立即完成生长：取消再生任务并调用 Regen 使实体可采摘，返回是否成功执行。"
     },
     {
       "name": "Resume",
-      "effect": "解除暂停状态，根据是否使用外部计时器重新安排再生任务或调用 MakeEmpty，恢复生长计时。"
+      "effect": "恢复暂停的再生计时，重新安排任务或调用外部恢复，若无法恢复则置为空状态。"
     },
     {
       "name": "Pause",
-      "effect": "设置 paused 为 true，记录剩余再生时间并取消内部任务，或调用外部计时器暂停，停止生长计时。"
+      "effect": "暂停再生计时，取消当前任务并记录剩余时间，或调用外部暂停计时器。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述组件状态的调试字符串，无状态修改。"
+      "effect": "返回包含交互、暂停、移植、周期、保护周期、再生剩余时间等信息的调试字符串。"
     },
     {
       "name": "SetUp",
-      "effect": "初始化产物、基础再生时间与每次采摘数量，并设 canbepicked 为 true。"
+      "effect": "初始化组件：设置可采摘为 true，指定产物 prefab、基础再生时间及每次收获数量。"
     },
     {
       "name": "SetOnPickedFn",
-      "effect": "设置采摘时回调 onpickedfn。"
+      "effect": "设置采摘时调用的回调函数（源码注释为废弃保留，供 MOD 使用）。"
     },
     {
       "name": "SetOnRegenFn",
-      "effect": "设置再生时回调 onregenfn。"
+      "effect": "设置再生时调用的回调函数（源码注释为废弃保留，供 MOD 使用）。"
     },
     {
       "name": "SetMakeBarrenFn",
-      "effect": "设置变为贫瘠时回调 makebarrenfn。"
+      "effect": "设置变为贫瘠时调用的回调函数（源码注释为废弃保留，供 MOD 使用）。"
     },
     {
       "name": "SetMakeEmptyFn",
-      "effect": "设置变为空时回调 makeemptyfn。"
+      "effect": "设置变为空时调用的回调函数（源码注释为废弃保留，供 MOD 使用）。"
     },
     {
       "name": "CanBeFertilized",
-      "effect": "返回是否处于贫瘠或枯萎状态，无副作用。"
+      "effect": "返回实体是否处于贫瘠状态或带有 withered 标签，用于判断能否施肥。"
     },
     {
       "name": "ChangeProduct",
-      "effect": "修改 product 字段为新的产物预制体名。"
+      "effect": "更改采摘产物的 prefab 名称。"
     },
     {
       "name": "Fertilize",
-      "effect": "停止燃烧，播放施肥音效，重置 cycles_left 为 max_cycles，增加 protected_cycles，启用或禁用 witherable 组件并强制恢复或调用 MakeEmpty，返回 true。"
+      "effect": "执行施肥：停止燃烧，恢复周期计数，通过枯萎组件强制恢复或置空，返回 true。"
     },
     {
       "name": "OnSave",
-      "effect": "收集并返回组件状态数据表（如 protected_cycles、picked、transplanted、cycles_left 等），无副作用。"
+      "effect": "返回包含保护周期、已采摘、移植、暂停、交互、卡住、周期及计时等状态的存档数据表。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据存档数据恢复 transplanted、cycles_left、max_cycles、stuck 等状态，可能调用 makebarrenfn/makeemptyfn/makefullfn，安排再生任务或暂停，重建计时器。"
+      "effect": "从存档数据恢复组件状态、任务计时、标签与回调，处理贫瘠与满状态。"
     },
     {
       "name": "IsBarren",
-      "effect": "返回 cycles_left 是否为 0，无副作用。"
+      "effect": "返回 cycles_left 等于 0 即实体是否已贫瘠不可再生。"
     },
     {
       "name": "CanBePicked",
-      "effect": "返回 canbepicked 布尔值，无副作用。"
+      "effect": "返回 canbepicked 当前是否可被采摘。"
     },
     {
       "name": "Regen",
-      "effect": "设置 canbepicked 为 true，调用 onregenfn 与 makefullfn 回调，并清除 targettime 与 task。"
+      "effect": "设置可采摘为 true，调用再生与变满回调，清除目标时间与任务。"
     },
     {
       "name": "MakeBarren",
-      "effect": "设置 cycles_left 为 0 且 canbepicked 为 false，停止再生任务或外部计时器，调用 makebarrenfn 回调。"
+      "effect": "将周期置 0，取消任务，设为不可采摘，调用变贫瘠回调。"
     },
     {
       "name": "OnTransplant",
-      "effect": "标记 transplanted 为 true，若存在 ontransplantfn 则调用之。"
+      "effect": "标记实体已移植，调用移植回调（若存在）。"
     },
     {
       "name": "MakeEmpty",
-      "effect": "取消再生任务，调用 makeemptyfn，设置 canbepicked 为 false，若未暂停且有基础再生时间则安排再生任务或启动外部计时器。"
+      "effect": "取消任务，调用变空回调，设为不可采摘，并根据设置安排再生任务或启动外部计时器。"
     },
     {
       "name": "SpawnProductLoot",
-      "effect": "根据配置生成产物实体，给予 picker 库存或掉落世界，可能向 picker 推送 picksomething 事件，返回生成的 loot。"
+      "effect": "生成采摘产物：给予采摘者库存或掉落地面，支持 lootdropper 模式，返回产物实体或表。"
     },
     {
       "name": "Pick",
-      "effect": "若可交互且未被卡住，减少周期计数，生成产物，调用 onpickedfn，设 canbepicked 为 false，安排再生，向实体推送 picked 事件，若 remove_when_picked 则移除自身，返回 true 与产物。"
+      "effect": "执行采摘：校验状态后消耗周期、生成产物、触发回调、安排再生、推送 picked 事件，可移除实体，返回成功与产物。"
     },
     {
       "name": "ConsumeCycles",
-      "effect": "按给定数值减少 cycles_left 与 protected_cycles，最低至 0。"
+      "effect": "直接减少移植剩余周期与保护周期计数，不低于零。"
     },
     {
       "name": "SetStuck",
-      "effect": "设置 stuck 状态值。"
+      "effect": "设置 stuck 属性以阻止采摘。"
     },
     {
       "name": "IsStuck",
-      "effect": "返回 stuck 是否为 true，无副作用。"
+      "effect": "返回 stuck 是否为 true 即当前卡住不可摘。"
     }
   ],
   "events_published": [
-    "picked"
+    "picked",
+    "picksomething"
   ],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      35001,
+      34314,
       51951,
-      15675,
+      14486,
       19729,
+      14712,
       18441,
-      61065,
-      13261,
-      19813,
-      21177
+      70704
     ],
     "aspects": [
       {
-        "aspect": "作物成长阶段推进描述",
+        "aspect": "再生与重新生长计时",
         "evidence": [
           {
-            "pageid": 15675,
-            "quote": "用树果酱施肥，它会瞬间成长为下一阶段"
+            "pageid": 35001,
+            "quote": "再生有四种主要机制，工作方式略有不同"
+          },
+          {
+            "pageid": 34314,
+            "quote": "===资源再生=== 再生速度"
           },
           {
             "pageid": 19729,
-            "quote": "之后植株成长至预备阶段"
-          }
-        ]
-      },
-      {
-        "aspect": "卡住状态标识",
-        "evidence": [
-          {
-            "pageid": 61065,
-            "quote": "游戏内谜题样式一：7号位卡住"
-          }
-        ]
-      },
-      {
-        "aspect": "可采集状态及限制说明",
-        "evidence": [
-          {
-            "pageid": 51951,
-            "quote": "无法生长和采集"
+            "quote": "并让植株回到初生阶段"
           },
           {
-            "pageid": 21177,
-            "quote": "无法采集和生长"
-          }
-        ]
-      },
-      {
-        "aspect": "挖起或采集掉落物标注",
-        "evidence": [
-          {
-            "pageid": 51951,
-            "quote": "被挖起后不会掉落可种植的植株而是会掉落采下的草"
-          },
-          {
-            "pageid": 15675,
-            "quote": "掉落 = 木头×1"
+            "pageid": 14712,
+            "quote": "每 7.5 分钟 +1 蘑菇，成长所需总时间为 22.5 分钟"
           },
           {
             "pageid": 18441,
-            "quote": "枯萎状态：树枝×2"
-          },
-          {
-            "pageid": 21177,
-            "quote": "挖起后只会掉落一个采下的草"
+            "quote": "采集后需要 3 ~ 5 天重新生长"
           }
         ]
       },
       {
-        "aspect": "施肥操作与状态解除描述",
+        "aspect": "施肥恢复与促生长",
         "evidence": [
           {
             "pageid": 51951,
-            "quote": "用肥料施肥会在解除作物高温枯萎状态的同时使可采集次数恢复"
-          }
-        ]
-      },
-      {
-        "aspect": "施肥条件与可行性标注",
-        "evidence": [
-          {
-            "pageid": 51951,
-            "quote": "用肥料施肥会在解除作物高温枯萎状态"
+            "quote": "用肥料施肥会在解除作物高温枯萎状态的同时使作物的可采集次数恢复至上限"
           },
           {
             "pageid": 19729,
             "quote": "移植后需要对植株进行施肥"
           },
           {
+            "pageid": 19729,
+            "quote": "初生阶段：刚施肥的植株或重新开始生长的植株"
+          },
+          {
+            "pageid": 14712,
+            "quote": "需要使用一个活木头进行施肥来恢复使用"
+          },
+          {
             "pageid": 18441,
             "quote": "需要施肥才能开始生长"
           },
           {
-            "pageid": 19813,
-            "quote": "需要用肥料施肥才会长出香蕉"
-          },
-          {
-            "pageid": 21177,
-            "quote": "可以对其施肥"
+            "pageid": 18441,
+            "quote": "需要重新施肥"
           }
         ]
       },
       {
-        "aspect": "枯萎状态标识与限制",
+        "aspect": "移植后状态变化",
         "evidence": [
           {
-            "pageid": 51951,
-            "quote": "枯萎的作物有特殊的贴图，无法生长和采集"
+            "pageid": 19729,
+            "quote": "重新种植于地面。移植后需要施肥"
           },
           {
             "pageid": 18441,
             "quote": "移植的浆果丛默认为枯萎状态"
-          },
-          {
-            "pageid": 21177,
-            "quote": "草会高温枯萎，无法采集和生长"
           }
         ]
       },
       {
-        "aspect": "枯萎触发条件描述",
+        "aspect": "荒芜枯萎状态描述",
         "evidence": [
           {
             "pageid": 51951,
-            "quote": "每采集 4 ~ 5 次就会再次进入贫瘠枯萎"
+            "quote": "部分可采集实体会因缺少肥料而发生枯萎"
           },
           {
-            "pageid": 18441,
-            "quote": "采收次数耗尽后就会枯萎"
+            "pageid": 51951,
+            "quote": "枯萎的作物有特殊的贴图，无法生长和采集"
           },
           {
             "pageid": 19729,
             "quote": "收获 3 次后会枯萎需要再次施肥"
           },
           {
-            "pageid": 21177,
-            "quote": "每收获 20 次就会进入枯萎状态"
-          }
-        ]
-      },
-      {
-        "aspect": "移植行为及后续需求",
-        "evidence": [
-          {
-            "pageid": 19729,
-            "quote": "挖出来，然后在新的地方重新种植于地面"
+            "pageid": 14712,
+            "quote": "最多可以收获 4 次，之后便会枯萎"
           },
           {
             "pageid": 18441,
             "quote": "移植的浆果丛默认为枯萎状态"
           },
           {
-            "pageid": 19813,
-            "quote": "被移植的香蕉丛需要用肥料施肥"
+            "pageid": 18441,
+            "quote": "采收次数耗尽后就会枯萎"
           },
           {
-            "pageid": 21177,
-            "quote": "草丛可以种植于地面，成为草"
+            "pageid": 35001,
+            "quote": "荒芜再生时间是50天，只在冬季计时"
+          },
+          {
+            "pageid": 18441,
+            "quote": "枯萎状态：树枝×2"
           }
         ]
       },
       {
-        "aspect": "采集/收获行为描述",
+        "aspect": "采集与收获行为",
         "evidence": [
           {
             "pageid": 51951,
-            "quote": "每采集 4 ~ 5 次"
+            "quote": "无法生长和采集"
+          },
+          {
+            "pageid": 19729,
+            "quote": "此时收获可以获得 3 个石果"
+          },
+          {
+            "pageid": 14712,
+            "quote": "最终阶段能收获 4 朵蘑菇"
+          },
+          {
+            "pageid": 18441,
+            "quote": "且只能被采收 3 ~ 5 次"
+          },
+          {
+            "pageid": 14486,
+            "quote": "已长成 | 0 ~ 6 | 对应作物×1"
+          }
+        ]
+      },
+      {
+        "aspect": "采集次数消耗限制",
+        "evidence": [
+          {
+            "pageid": 19729,
+            "quote": "移植的石果灌木丛有 3 次收获次数"
+          },
+          {
+            "pageid": 14712,
+            "quote": "一个蘑菇农场最多可以收获 4 次"
           },
           {
             "pageid": 18441,
             "quote": "只能被采收 3 ~ 5 次"
           },
           {
-            "pageid": 19729,
-            "quote": "3 次收获次数"
-          },
-          {
-            "pageid": 19813,
-            "quote": "只能被采收 5 ~ 7 次"
-          }
-        ]
-      },
-      {
-        "aspect": "采集次数限制与消耗",
-        "evidence": [
-          {
             "pageid": 51951,
-            "quote": "每采集 4 ~ 5 次就会再次进入贫"
-          },
-          {
-            "pageid": 18441,
-            "quote": "只能被采收 3 ~ 5 次"
-          },
-          {
-            "pageid": 19729,
-            "quote": "有 3 次收获次数"
-          },
-          {
-            "pageid": 19813,
-            "quote": "只能被采收 5 ~ 7 次"
-          },
-          {
-            "pageid": 21177,
-            "quote": "每收获 20 次就会进入枯萎状态"
-          }
-        ]
-      },
-      {
-        "aspect": "重新生长与次数恢复描述",
-        "evidence": [
-          {
-            "pageid": 51951,
-            "quote": "可采集次数恢复至上限"
-          },
-          {
-            "pageid": 18441,
-            "quote": "重新生长所需"
-          },
-          {
-            "pageid": 21177,
-            "quote": "需要 3 天的时间重新生长"
+            "quote": "每采集 4 ~ 5 次就会再次进入贫瘠"
           }
         ]
       }
@@ -368,24 +307,26 @@
   },
   "search_terms": [
     "可采摘",
-    "再生时间",
-    "采摘产物",
+    "再生",
     "施肥",
     "贫瘠",
     "移植",
-    "快速摘",
-    "暂停生长",
+    "收获",
+    "快摘",
+    "摇摘",
+    "防火星",
     "卡住"
   ],
   "gameplay_tags": [
     "生存",
-    "采集"
+    "采集",
+    "种植"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
     "source_bytes": 18199,
     "model": "hy3-free",
-    "generated_at_ms": 1787896935980
+    "generated_at_ms": 1787932724423
   }
 }

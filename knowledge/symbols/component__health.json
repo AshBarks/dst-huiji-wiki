@@ -1,173 +1,173 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/health.lua"
   },
   "category": "component",
   "display_name": "health",
-  "summary": "该组件管理实体的生命值核心数据，包括当前生命、最大生命、生命惩罚与无敌状态等。它参与生存与战斗玩法，处理伤害、治疗、火焰与月火伤害、再生、死亡事件以及生命值到客户端的同步。",
+  "summary": "该组件管理实体的生命值、最大生命、无敌状态、火焰与月焰伤害、再生与死亡惩罚等数据。它参与生存、战斗与死亡核心玩法，处理伤害吸收、生命恢复、死亡事件及尸体淡出等逻辑。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "停止再生任务，遍历 regensources 移除每个源，清理 lunarburns 监听与标志并推送 stoplunarburn 事件，调用 onpercent 更新战斗组件恐慌阈值。"
+      "effect": "组件从实体移除时调用，停止再生与月焰燃烧，取消相关任务与事件监听，并触发百分比更新。副作用：停止更新任务，移除监听，调用 onpercent 设置 combat.panic_thresh。"
     },
     {
       "name": "RecalculatePenalty",
-      "effect": "已废弃的空函数，无任何行为，仅为了防止 mod 崩溃而保留。"
+      "effect": "已弃用空函数，仅保持 mod 兼容，无实际行为与副作用。"
     },
     {
       "name": "SetInvincible",
-      "effect": "设置 self.invincible 字段为传入值，并推送事件 invincibletoggle 携带 {invincible=val}。"
+      "effect": "设置无敌标志并推送 'invincibletoggle' 事件。副作用：修改 invincible 字段，推送事件；若 CHEATS_ENABLED 还会添加或移除 'invincible' 标签。"
     },
     {
       "name": "ForceUpdateHUD",
-      "effect": "调用 DoDelta(0, overtime, nil, true, nil, true) 强制触发生命变化逻辑与 HUD 更新。"
+      "effect": "通过调用 DoDelta(0, overtime, nil, true, nil, true) 强制刷新 HUD。副作用：触发健康变化逻辑与可能的 'healthdelta' 事件。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含 health（当前生命）、penalty（若>0）、maxhealth（若 self.save_maxhealth 为真）的表用于存档。"
+      "effect": "返回包含当前生命、惩罚及可能最大生命的存档表。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据 data 加载最大生命、惩罚、无敌状态，并通过 SetVal 或 SetPercent 恢复生命值，必要时强制更新 HUD；支持 data.percent 用于预设。"
+      "effect": "从存档加载生命、惩罚、无敌等数据并应用，强制更新 HUD。副作用：修改状态，可能推送事件与更新 replica。"
     },
     {
       "name": "GetFireDamageScale",
-      "effect": "返回 fire_damage_scale 乘以外部火焰伤害乘数，再乘以燃烧组件受控燃烧伤害（若无则为1）的计算值。"
+      "effect": "计算并返回火焰伤害缩放系数，基于基础缩放、外部修改器与燃烧组件控制燃烧伤害。无副作用。"
     },
     {
       "name": "DoFireDamage",
-      "effect": "若非无敌且满足条件，管理 takingfiredamage 状态，启动组件更新，推送 startfiredamage/changefiredamage 事件，应用每秒伤害上限后调用 DoDelta 造成火焰伤害并推送 firedamage 事件。"
+      "effect": "根据缩放与状态施加火焰伤害，管理燃烧计时与低伤害状态，推送 'startfiredamage'、'changefiredamage'、'firedamage' 等事件并调用 DoDelta 造成实际伤害。副作用：修改生命，启动/停止更新组件，推送事件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "检查火焰伤害超时，若超时则清除 takingfiredamage 状态，停止组件更新，推送 stopfiredamage 事件。"
+      "effect": "组件更新时检查火焰伤害超时，停止燃烧状态并推送 'stopfiredamage'。副作用：状态改变，停止更新，推送事件。"
     },
     {
       "name": "GetLunarBurnFlags",
-      "effect": "返回 self.lunarburnflags 或 0。"
+      "effect": "返回当前月焰燃烧标志位（lunarburnflags 或 0）。无副作用。"
     },
     {
       "name": "CalcLunarBurnFlags",
-      "effect": "遍历 lunarburns 表将所有标志位或计算并返回。"
+      "effect": "计算所有月焰燃烧源标志的按位或结果。无副作用。"
     },
     {
       "name": "RegisterLunarBurnSource",
-      "effect": "注册或更新月火源与标志，若源为实体则监听其 onremove 事件，更新 lunarburnflags 并推送 startlunarburn 事件携带标志。"
+      "effect": "注册月焰燃烧源，更新标志，监听源移除事件并推送 'startlunarburn'。副作用：修改 lunarburns，监听事件，推送事件。"
     },
     {
       "name": "UnregisterLunarBurnSource",
-      "effect": "注销指定月火源，移除监听，重新计算标志，推送 startlunarburn 或 stoplunarburn 事件。"
+      "effect": "注销月焰燃烧源，清理监听，更新标志并推送 'stoplunarburn' 或 'startlunarburn'。副作用：修改状态，移除监听，推送事件。"
     },
     {
       "name": "StartRegen",
-      "effect": "根据 interruptcurrentregen 参数可能停止现有再生，设置 regen 参数并启动周期任务调用 DoRegen 恢复生命。"
+      "effect": "开始生命再生，设置定期任务按周期回复生命（可中断先前再生）。副作用：创建/取消定期任务。"
     },
     {
       "name": "AddRegenSource",
-      "effect": "为特定源（source）添加周期再生任务，若源是实体则监听其 onremove 以清理任务，支持多 key 管理。"
+      "effect": "添加带来源的再生任务，若为实体则监听其移除，按 key 管理多任务。副作用：创建定期任务，监听事件。"
     },
     {
       "name": "RemoveRegenSource",
-      "effect": "取消指定源或键的再生周期任务，移除实体源监听，清理 regensources 表。"
+      "effect": "移除指定来源或 key 的再生任务，取消并清理监听。副作用：取消任务，移除监听。"
     },
     {
       "name": "SetAbsorptionAmount",
-      "effect": "设置废弃字段 self.absorb 为给定值（仅供旧 mod 兼容）。"
+      "effect": "设置已弃用的吸收值 absorb。副作用：修改字段。"
     },
     {
       "name": "SetAbsorptionAmountFromPlayer",
-      "effect": "设置废弃字段 self.playerabsorb 为给定值（仅供旧 mod 兼容）。"
+      "effect": "设置已弃用的玩家吸收值 playerabsorb。副作用：修改字段。"
     },
     {
       "name": "StopRegen",
-      "effect": "取消 regen.task 周期任务并清空 regen 表。"
+      "effect": "停止再生并取消定期任务。副作用：取消任务，清空 regen 表。"
     },
     {
       "name": "SetPenalty",
-      "effect": "若未禁用惩罚，则将惩罚值限制在 [0, TUNING.MAXIMUM_HEALTH_PENALTY] 并赋值给 self.penalty。"
+      "effect": "设置生命惩罚比例（夹取范围，若禁用则忽略）。副作用：修改 penalty，触发 onpenalty 更新 replica。"
     },
     {
       "name": "DeltaPenalty",
-      "effect": "调用 SetPenalty 调整惩罚值后，调用 ForceUpdateHUD(false) 处理生命上限变更。"
+      "effect": "调整惩罚比例并强制更新 HUD。副作用：修改 penalty，调用 ForceUpdateHUD 刷新。"
     },
     {
       "name": "GetPenaltyPercent",
-      "effect": "返回当前 self.penalty 值。"
+      "effect": "返回当前惩罚比例。无副作用。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回当前生命与最大生命的比值。"
+      "effect": "返回当前生命占最大生命比例。无副作用。"
     },
     {
       "name": "GetPercentWithPenalty",
-      "effect": "返回当前生命与扣除惩罚后最大生命的比值。"
+      "effect": "返回当前生命占含惩罚最大生命比例。无副作用。"
     },
     {
       "name": "IsInvincible",
-      "effect": "返回 self.invincible 为真或实体状态组含有 temp_invincible 标签。"
+      "effect": "返回是否处于无敌状态（含 sg 临时无敌标签）。无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回格式化当前生命、最大生命（含惩罚）及再生信息的调试字符串。"
+      "effect": "返回调试用字符串，包含生命与再生信息。无副作用。"
     },
     {
       "name": "SetCurrentHealth",
-      "effect": "直接将 self.currenthealth 设为给定值，不触发事件或同步。"
+      "effect": "直接设置当前生命值，因 setter 存在会触发 oncurrenthealth 更新 replica 与 repairable。副作用：更新网络变量与可修复状态。"
     },
     {
       "name": "SetMaxHealth",
-      "effect": "设置 self.maxhealth 与 self.currenthealth 为给定值，并调用 ForceUpdateHUD(true) 同步。"
+      "effect": "设置最大与当前生命值为 amount，强制更新 HUD。副作用：触发 onmaxhealth 与 oncurrenthealth，更新 replica、repairable 与 HUD。"
     },
     {
       "name": "SetMinHealth",
-      "effect": "设置 self.minhealth 为给定值。"
+      "effect": "设置最小生命值。副作用：修改 minhealth 字段。"
     },
     {
       "name": "SetMaxDamageTakenPerHit",
-      "effect": "若传入值非 nil 且大于0则将其负值存入 self.maxdamagetakenperhit，否则存为原传入值（可能为 nil）。"
+      "effect": "设置每次受击最大伤害（存储为负值，nil 则清空）。副作用：修改 maxdamagetakenperhit 字段。"
     },
     {
       "name": "IsHurt",
-      "effect": "返回当前生命是否小于扣除惩罚后的最大生命。"
+      "effect": "返回当前生命是否低于含惩罚最大生命。无副作用。"
     },
     {
       "name": "GetMaxWithPenalty",
-      "effect": "返回 maxhealth 减去其乘以 penalty 后的数值。"
+      "effect": "返回扣除惩罚后的最大生命值。无副作用。"
     },
     {
       "name": "Kill",
-      "effect": "若当前生命大于0，临时忽略单次伤害上限并调用 DoDelta 扣光生命（受无敌状态影响，可能被阻挡）。"
+      "effect": "若存活则扣光生命造成死亡（遵循最大伤害限制）。副作用：可能触发死亡事件、尸体逻辑。"
     },
     {
       "name": "ForceKill",
-      "effect": "同 Kill 但传入 ignore_invincible=true 绕过无敌强制扣光生命。"
+      "effect": "忽略无敌强制扣光生命造成死亡。副作用：可能触发死亡事件、尸体逻辑。"
     },
     {
       "name": "IsDead",
-      "effect": "返回当前生命是否小于等于0。"
+      "effect": "返回当前生命是否小于等于零。无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "按百分比计算生命值调用 SetVal，随后调用 DoDelta(0, overtime, cause, true, nil, true) 强制更新。"
+      "effect": "按百分比设置生命并强制更新 HUD。副作用：修改生命，刷新 HUD。"
     },
     {
       "name": "CanFadeOut",
-      "effect": "返回 not self.nofadeout 且 not self.is_corpsing，决定是否可淡出消失。"
+      "effect": "返回实体死亡后能否淡出消失（不受 nofadeout 等阻止）。无副作用。"
     },
     {
       "name": "SetVal",
-      "effect": "核心赋值：推送 pre_health_setval，将生命限制在最大/最小间，若降至0推送世界 entity_death 与自身 death 事件，处理尸体淡出或睡眠转尸体逻辑。"
+      "effect": "核心设置生命值函数，处理上下限，推送 'pre_health_setval' 与 'minhealth'，死亡时推送世界 'entity_death' 与实体 'death' 事件并处理尸体淡出或 Corpse 状态。副作用：大量事件推送，可能添加标签、安排腐蚀任务、通知进度。"
     },
     {
       "name": "DoDelta",
-      "effect": "核心生命变更：处理非致命保护、重定向、无敌、吸收减免、最大伤害限制，调用 SetVal 改值，推送 healthdelta 事件并执行 ondelta 回调。"
+      "effect": "核心生命变化函数，处理无敌、吸收、修改器、最大伤害，调用 SetVal 并推送 'healthdelta' 事件与 ondelta 回调。副作用：修改生命，推送事件，触发死亡。"
     },
     {
       "name": "TransferComponent",
-      "effect": "将当前生命百分比与火焰伤害状态复制到新实体的 health 组件，并启动其更新与事件。"
+      "effect": "将当前生命百分比与火焰状态转移到新实体组件。副作用：修改新实体状态，启动更新，推送 'startfiredamage' 事件。"
     }
   ],
   "events_published": [
@@ -180,9 +180,10 @@
     "stoplunarburn",
     "pre_health_setval",
     "minhealth",
+    "entity_death",
     "death",
     "healthdelta",
-    "entity_death"
+    "forcecorpsereplace"
   ],
   "events_listened": [
     "onremove",
@@ -200,64 +201,46 @@
   "wiki": {
     "scanned_pageids": [
       15244,
-      34314,
-      35001,
-      13606,
-      15303,
-      13260,
+      20496,
+      13261,
+      15022,
       34003,
-      20496
+      16197,
+      13606,
+      15303
     ],
     "aspects": [
       {
-        "aspect": "单次承伤上限标注",
+        "aspect": "制作消耗生命值描述",
         "evidence": [
           {
-            "pageid": 34003,
-            "quote": "具有有 200 生命值的单次承伤上限"
-          }
-        ]
-      },
-      {
-        "aspect": "火焰伤害机制",
-        "evidence": [
-          {
-            "pageid": 20496,
-            "quote": "火焰伤害是一种特殊的伤害类型"
+            "pageid": 13261,
+            "quote": "消耗 20{{生命值}}制作"
           },
           {
-            "pageid": 20496,
-            "quote": "所施加的火焰伤害，减半"
+            "pageid": 13261,
+            "quote": "消耗 1 个[[荧光果]]和 10 {{生命值}}制作"
           }
         ]
       },
       {
-        "aspect": "生命值上限惩罚",
-        "evidence": [
-          {
-            "pageid": 34314,
-            "quote": "生命值上限惩罚"
-          },
-          {
-            "pageid": 13260,
-            "quote": "不会受到生命值上限惩罚"
-          }
-        ]
-      },
-      {
-        "aspect": "生命值回复与治疗",
+        "aspect": "医疗与食物回复生命值描述",
         "evidence": [
           {
             "pageid": 15244,
-            "quote": "回复自身或其他实体的生命值"
+            "quote": "角色可以使用医疗用品来回复自身或其他实体的生命值"
           },
           {
-            "pageid": 13606,
-            "quote": "开始尝试治疗自己"
+            "pageid": 16197,
+            "quote": "食物具有各自的饥饿值、理智值和生命值属性"
           },
           {
-            "pageid": 13260,
-            "quote": "恢复一定的饥饿值、生命值和理智值"
+            "pageid": 16197,
+            "quote": "交由相应的（饥饿值/生命值/理智值）组件进行进一步的计算"
+          },
+          {
+            "pageid": 16197,
+            "quote": "烹饪可显著恢复理智值及生命值的料理食物时"
           },
           {
             "pageid": 34003,
@@ -266,54 +249,59 @@
         ]
       },
       {
-        "aspect": "生命值数值标注",
+        "aspect": "单次承伤上限标注",
         "evidence": [
           {
-            "pageid": 15244,
-            "quote": "生命值上限"
+            "pageid": 34003,
+            "quote": "还具有有 200 {{生命值}}的单次承伤上限"
+          }
+        ]
+      },
+      {
+        "aspect": "实体最大生命值标注",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "|生命值 = 150"
           },
           {
-            "pageid": 13260,
-            "quote": "生命值 = 200"
+            "pageid": 15022,
+            "quote": "|生命值=10000"
+          },
+          {
+            "pageid": 13261,
+            "quote": "具有 25 点生命值，持续 2.5 天"
+          }
+        ]
+      },
+      {
+        "aspect": "持续回复与自我治疗描述",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "恢复沃姆伍德 40{{生命值}}（立即恢复 8 点，在接下来 32 秒内每 2 秒恢复 2 点）"
           },
           {
             "pageid": 13606,
-            "quote": "帝王蟹的生命值低于 10800"
-          },
-          {
-            "pageid": 34003,
-            "quote": "恶液的生命值低于 100 的整倍数"
+            "quote": "帝王蟹就会开始尝试治疗自己"
           }
         ]
       },
       {
-        "aspect": "生命值比例查询",
+        "aspect": "火焰伤害减半描述",
         "evidence": [
           {
-            "pageid": 13260,
-            "quote": "生命值比例最低的玩家移动"
+            "pageid": 20496,
+            "quote": "由此方式造成点燃状态所施加的火焰伤害，减半"
           }
         ]
       },
       {
-        "aspect": "生命值计算机制",
-        "evidence": [
-          {
-            "pageid": 15244,
-            "quote": "生命值组件自身的计算机制"
-          }
-        ]
-      },
-      {
-        "aspect": "角色死亡判定",
+        "aspect": "生命值归零导致死亡描述",
         "evidence": [
           {
             "pageid": 15244,
             "quote": "生命值降低至 0 会导致角色死亡"
-          },
-          {
-            "pageid": 13606,
-            "quote": "帝王蟹死亡后会在 20 天后于同一位置重生"
           }
         ]
       }
@@ -337,25 +325,25 @@
   },
   "search_terms": [
     "生命值",
-    "受伤",
-    "治疗",
-    "无敌",
-    "火焰伤",
-    "月火",
-    "再生",
-    "死亡",
-    "惩罚",
-    "吸收"
+    "最大生命",
+    "无敌状态",
+    "火焰伤害",
+    "月焰燃烧",
+    "生命再生",
+    "死亡惩罚",
+    "受伤判断",
+    "强制死亡"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗"
+    "战斗",
+    "死亡"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
     "source_bytes": 22115,
     "model": "hy3-free",
-    "generated_at_ms": 1787895569637
+    "generated_at_ms": 1787931089019
   }
 }

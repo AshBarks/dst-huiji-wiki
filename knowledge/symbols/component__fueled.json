@@ -1,137 +1,137 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/fueled.lua"
   },
   "category": "component",
   "display_name": "fueled",
-  "summary": "该组件管理实体的燃料储量、消耗速率、燃料类型与分段等数据。参与核心玩法包括燃料持续消耗（如燃烧）、接受燃料物品补充、分段变化回调以及衣物类燃料的缝补需求标记。",
+  "summary": "该组件管理实体的燃料数据，包括当前与最大燃料值、消耗速率、燃料类型及章节划分。它参与核心生存玩法，处理燃料的持续消耗、外部加燃料、耗尽与缝补状态标签维护，并触发章节变更与耗尽回调以支持火堆、灯具等设备的运作。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "停止消耗燃料（调用StopConsuming），移除实体上燃料类型对应的'_fueled'或'needssewing'标签以及'fueldepleted'标签。"
+      "effect": "停止燃料消耗，移除实体上燃料类型或次要燃料类型相关的标签（如needssewing或<type>_fueled）以及fueldepleted标签。"
     },
     {
       "name": "MakeEmpty",
-      "effect": "若当前燃料大于0，则通过DoDelta将当前燃料减去当前值使其归零，触发燃料变更相关事件与回调。"
+      "effect": "若当前燃料大于0，通过DoDelta将当前燃料减去使归零，触发燃料变更事件与章节回调。"
     },
     {
       "name": "OnSave",
-      "effect": "若当前燃料不等于最大燃料，返回包含当前燃料值的表{fuel = self.currentfuel}用于存档；否则返回nil。"
+      "effect": "当当前燃料不等于最大燃料时返回包含fuel字段的存档表，否则返回nil，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若读取数据中包含fuel字段，则调用InitializeFuelLevel以该值（非负）初始化燃料等级。"
+      "effect": "若载入数据含fuel字段，调用InitializeFuelLevel以max(0,data.fuel)初始化燃料，可能触发章节变化事件。"
     },
     {
       "name": "SetSectionCallback",
-      "effect": "设置分段变化时的回调函数self.sectionfn。"
+      "effect": "设置sectionfn回调，在燃料章节改变时被执行，仅内部字段赋值。"
     },
     {
       "name": "SetDepletedFn",
-      "effect": "设置燃料耗尽时的回调函数self.depleted。"
+      "effect": "设置depleted回调，在燃料耗尽且章节变化时调用，仅内部字段赋值。"
     },
     {
       "name": "IsEmpty",
-      "effect": "返回当前燃料是否小于等于0的布尔值。"
+      "effect": "返回当前燃料是否小于等于0的布尔值，无副作用。"
     },
     {
       "name": "IsFull",
-      "effect": "返回最大燃料大于0且当前燃料大于等于最大燃料的布尔值。"
+      "effect": "返回最大燃料大于0且当前燃料大于等于最大燃料的布尔值，无副作用。"
     },
     {
       "name": "SetSections",
-      "effect": "设置燃料分段总数self.sections。"
+      "effect": "设置章节总数sections，影响后续章节计算，仅内部字段赋值。"
     },
     {
       "name": "SetMultiplierFn",
-      "effect": "设置燃料接受时的倍数计算函数self.multfn。"
+      "effect": "设置multfn函数，用于TakeFuelItem时计算燃料加成的乘数，仅内部字段赋值。"
     },
     {
       "name": "CanAcceptFuelItem",
-      "effect": "检查是否正在接受燃料且物品具有fuel或fueler组件且类型匹配主/副燃料类型，返回布尔值；否则false。"
+      "effect": "检查是否正在接受燃料且物品燃料类型匹配自身燃料或次要燃料类型，返回布尔值，无副作用。"
     },
     {
       "name": "GetCurrentSection",
-      "effect": "返回当前燃料所在分段索引（空时0，否则min(floor(百分比*分段数)+1, 分段数)）。"
+      "effect": "返回当前燃料对应的章节索引（空为0，否则1~sections），无副作用。"
     },
     {
       "name": "ChangeSection",
-      "effect": "根据给定分段变化量，通过DoDelta调整燃料值（amount * maxfuel / sections - 1）。"
+      "effect": "通过DoDelta调整燃料值以切换指定数量的章节，触发燃料变更与事件。"
     },
     {
       "name": "SetCanTakeFuelItemFn",
-      "effect": "设置接受燃料物品前的额外条件检查函数self.cantakefuelitemfn。"
+      "effect": "设置cantakefuelitemfn额外接受条件函数，在TakeFuelItem时校验，仅内部字段赋值。"
     },
     {
       "name": "SetTakeFuelItemFn",
-      "effect": "设置成功接受燃料物品并移除后的回调函数self.ontakefuelitemfn。"
+      "effect": "设置ontakefuelitemfn回调，在TakeFuelItem成功消耗物品后调用，仅内部字段赋值。"
     },
     {
       "name": "SetTakeFuelFn",
-      "effect": "设置成功添加燃料值后的回调函数self.ontakefuelfn。"
+      "effect": "设置ontakefuelfn回调，在TakeFuelItem成功添加燃料后调用，仅内部字段赋值。"
     },
     {
       "name": "TakeFuelItem",
-      "effect": "验证后可计算燃料值（含bonusmult、multfn、湿润惩罚、燃料大师加成），调用DoDelta增加燃料，标记燃料物被取用并移除物品，触发各项回调及'takefuel'事件，返回true；不满足条件则无操作返回nil。"
+      "effect": "验证后计算乘数（含潮湿惩罚与fuelmaster奖励）并DoDelta增加燃料，调用燃料组件Taken、移除物品、执行回调并推送takefuel事件；副作用为燃料增加、物品消失、标签更新与事件发布。"
     },
     {
       "name": "SetUpdateFn",
-      "effect": "设置每次燃料更新（DoUpdate）时调用的函数self.updatefn。"
+      "effect": "设置updatefn回调，在DoUpdate每周期被调用，仅内部字段赋值。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述消耗状态、燃料值、速率、分段等信息的调试字符串。"
+      "effect": "返回包含消耗状态、燃料值、速率与章节信息的调试字符串，无副作用。"
     },
     {
       "name": "AddThreshold",
-      "effect": "将给定的百分比阈值与回调函数作为表项插入self.thresholds（注：构造函数未初始化该表，但方法存在）。"
+      "effect": "向self.thresholds表插入包含百分比与函数的记录（注：源码中thresholds未显式初始化），副作用为表变更。"
     },
     {
       "name": "GetSectionPercent",
-      "effect": "返回当前分段内的局部百分比。"
+      "effect": "返回当前章节内的进度百分比，无副作用。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回当前燃料占最大燃料的比例（钳制0~1，最大燃料非正时返回0）。"
+      "effect": "返回当前燃料占最大燃料的比例（钳制0~1），无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "根据给定比例计算目标燃料值，并通过DoDelta调整差值。"
+      "effect": "按给定比例计算目标燃料并DoDelta差值，改变燃料值并触发事件。"
     },
     {
       "name": "SetFirstPeriod",
-      "effect": "设置首次消耗周期时长self.firstperiod及可选的满燃料时首次周期self.firstperiodfull。"
+      "effect": "设置首周期时长firstperiod及可选firstperiodfull，用于开始消耗时的首次更新延迟，仅内部字段赋值。"
     },
     {
       "name": "StartConsuming",
-      "effect": "标记开始消耗，创建周期任务按period调用DoUpdate；若设置了firstperiod则启动墙体更新组件以处理首次周期。"
+      "effect": "标记consuming=true并创建周期任务执行DoUpdate；若设首周期则启动墙更新；副作用为开始燃料消耗与任务调度。"
     },
     {
       "name": "OnWallUpdate",
-      "effect": "若服务器未暂停，使用预设的firstperioddt作为时间步调用DoUpdate，并停止墙体更新。"
+      "effect": "墙更新触发时若未暂停则用首周期dt执行一次DoUpdate并停止墙更新，副作用为单次更新。"
     },
     {
       "name": "InitializeFuelLevel",
-      "effect": "若给定燃料大于最大燃料则扩充最大燃料，设定当前燃料，若分段变化则触发分段回调与'onfueldsectionchanged'事件。"
+      "effect": "设置当前燃料并可能提升最大燃料，若章节变化调用sectionfn并推送onfueldsectionchanged事件，副作用为燃料初始化与事件。"
     },
     {
       "name": "DoDelta",
-      "effect": "按给定量调整当前燃料并钳制范围，若分段变化则触发分段回调、'onfueldsectionchanged'事件及耗尽回调，最后推送'percentusedchange'事件。"
+      "effect": "钳制并改变当前燃料，章节变化时调用回调并推送onfueldsectionchanged，耗尽时调depleted，最后推送percentusedchange；副作用为燃料变更、标签更新（通过setter）与事件。"
     },
     {
       "name": "DoUpdate",
-      "effect": "若正在消耗则按时间步与速率扣除燃料，空则停止消耗，若设置了updatefn则调用之。"
+      "effect": "若消耗中则按时间扣减燃料，空则停止消耗，最后调用updatefn；副作用为燃料消耗与可能的停止。"
     },
     {
       "name": "StopConsuming",
-      "effect": "标记停止消耗，取消周期任务与墙体更新。"
+      "effect": "标记consuming=false并取消周期任务与墙更新，副作用为停止消耗与任务清除。"
     },
     {
       "name": "LongUpdate",
-      "effect": "等同于DoUpdate，用于长时更新（如离线模拟）。"
+      "effect": "等同于DoUpdate，用于长更新时调用。"
     }
   ],
   "events_published": [
@@ -146,111 +146,99 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      28610,
-      13874,
-      15162,
-      15170,
-      15171,
-      15172,
-      15246,
-      15247
+      18216,
+      18572,
+      10374,
+      10413,
+      14426,
+      15303,
+      15418,
+      21620
     ],
     "aspects": [
       {
-        "aspect": "剩余燃料量分等级影响火焰效果",
+        "aspect": "摧毁时剩余燃料掉落描述",
         "evidence": [
           {
-            "pageid": 15171,
-            "quote": "剩余燃料量也会影响火焰的效果，分为四个大小等级"
-          },
-          {
-            "pageid": 15172,
-            "quote": "剩余燃料量也会影响火焰的效果，分为四个大小等级"
+            "pageid": 21620,
+            "quote": "被摧毁时会掉落其中消耗不足 1 单位电力的宝石"
           }
         ]
       },
       {
-        "aspect": "加满燃料后持续燃烧时长标注",
+        "aspect": "最大燃料储量标注",
         "evidence": [
           {
-            "pageid": 15162,
-            "quote": "加满以后可持续燃烧 4.5 分钟"
+            "pageid": 18216,
+            "quote": "拥有 10 单位的电力，也是它最多储存的电力"
           },
           {
-            "pageid": 15170,
-            "quote": "加满以后可持续燃烧 6 分钟"
-          },
-          {
-            "pageid": 15171,
-            "quote": "加满以后可持续燃烧 4.5 分钟"
-          },
-          {
-            "pageid": 15172,
-            "quote": "加满以后可持续燃烧 6 分钟"
+            "pageid": 21620,
+            "quote": "最多储存 60 单位的电力"
           }
         ]
       },
       {
-        "aspect": "放置初始燃料时长标注",
+        "aspect": "添加燃料数值加成描述",
         "evidence": [
           {
-            "pageid": 15162,
-            "quote": "营火放置时带有可以燃烧 2.25 分钟的燃料"
-          },
-          {
-            "pageid": 15170,
-            "quote": "火坑放置时带有可以燃烧 4.5 分钟的燃料"
-          },
-          {
-            "pageid": 15171,
-            "quote": "吸热营火放置时带有可以燃烧 2.25 分钟的燃料"
-          },
-          {
-            "pageid": 15172,
-            "quote": "吸热火坑放置时带有可以燃烧 4.5 分钟的燃料"
+            "pageid": 10374,
+            "quote": "燃料值提高了 50%"
           }
         ]
       },
       {
-        "aspect": "无燃料状态台词提示",
+        "aspect": "添加燃料行为描述",
         "evidence": [
           {
-            "pageid": 15170,
-            "quote": "|无燃料|{{全角色台词|dst|firepit.OUT|首选=wilson}}"
+            "pageid": 18216,
+            "quote": "可以用[[硝石]]来添加燃料，每个提供 5 单位的电力"
+          },
+          {
+            "pageid": 10374,
+            "quote": "薇洛为[[营地火源]]添加燃料时，燃料值提高了 50%"
+          },
+          {
+            "pageid": 10413,
+            "quote": "薇诺娜可以用[[噩梦燃料]]为[[薇诺娜的发电机]]添加燃料"
+          },
+          {
+            "pageid": 14426,
+            "quote": "可以用[[荧光燃料]]为其添加燃料"
+          },
+          {
+            "pageid": 15418,
+            "quote": "会时刻待在火炬周围为火炬添加燃料"
+          },
+          {
+            "pageid": 21620,
+            "quote": "可以放置最多 3 个宝石作为燃料"
           }
         ]
       },
       {
-        "aspect": "燃料值转燃烧时间倍数说明",
+        "aspect": "燃料消耗与补满机制描述",
         "evidence": [
           {
-            "pageid": 15170,
-            "quote": "每个燃料会提供双倍于其燃料值的时间"
+            "pageid": 21620,
+            "quote": "以由上至下的顺序消耗其中的宝石（即后放置的先消耗）"
           },
           {
-            "pageid": 15172,
-            "quote": "每个燃料会提供双倍于其燃料值的时间"
+            "pageid": 21620,
+            "quote": "每次填入新宝石时，都会重新补满上一个宝石被消耗的电力"
           }
         ]
       },
       {
-        "aspect": "燃料物品添加延长燃烧说明",
+        "aspect": "燃料耗尽状态描述",
         "evidence": [
           {
-            "pageid": 15162,
-            "quote": "可以通过添加[[火焰燃料]]来使其燃烧更久"
+            "pageid": 14426,
+            "quote": "随着燃料耗尽它的光照范围会逐渐缩小"
           },
           {
-            "pageid": 15170,
-            "quote": "可以通过添加[[火焰燃料]]来使其燃烧更久"
-          },
-          {
-            "pageid": 15171,
-            "quote": "可以通过添加[[火焰燃料]]或[[硝石]]来使其燃烧更久"
-          },
-          {
-            "pageid": 15172,
-            "quote": "可以通过添加[[火焰燃料]]或[[硝石]]来使其燃烧更久"
+            "pageid": 15303,
+            "quote": "包括燃料耗尽的[[警钟]]攻击时只能造成 0.5 倍伤害"
           }
         ]
       }
@@ -278,25 +266,24 @@
     "note": "按 scrapbook_fueled_uses 分流 maxuses(次数)或 maxseconds(时长);USAGE 型且未禁缝补(no_sewing)时自动计算缝补百分比并加「可缝补」分类。"
   },
   "search_terms": [
-    "燃料量",
-    "燃烧中",
-    "补燃料",
-    "已耗尽",
-    "需缝补",
-    "分段数",
-    "湿润惩罚",
+    "燃料耗尽",
+    "添加燃料",
+    "燃料比例",
+    "缝补需求",
     "燃料类型",
-    "接受燃料",
-    "燃料空"
+    "潮湿惩罚",
+    "开始消耗",
+    "燃料容量"
   ],
   "gameplay_tags": [
-    "生存"
+    "生存",
+    "建造"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
     "source_bytes": 10455,
     "model": "hy3-free",
-    "generated_at_ms": 1787896703161
+    "generated_at_ms": 1787932552315
   }
 }

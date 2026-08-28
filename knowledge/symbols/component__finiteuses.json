@@ -1,89 +1,89 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/finiteuses.lua"
   },
   "category": "component",
   "display_name": "finiteuses",
-  "summary": "组件 finiteuses 管理实体的有限使用次数（耐久），记录总次数与当前次数，并支持按动作定义消耗、修复及耗尽回调。它参与生存玩法中的物品耐久消耗、战斗武器磨损与建造工具损耗，在次数耗尽时触发完成回调并标记实体。",
+  "summary": "该组件管理实体的有限使用次数（耐久度），记录当前与最大用量及不同动作的消耗速率。参与核心玩法包括工具采集消耗、武器战斗损耗、物品修复与耗尽判定，并在用量变化时通知相关系统。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时，移除实体上的 'usesdepleted' 标签，无其他副作用。"
+      "effect": "从实体移除 'usesdepleted' 标签，无其他副作用。"
     },
     {
       "name": "SetConsumption",
-      "effect": "在 consumption 表中记录指定动作(action)对应的使用次数消耗值(uses)；若动作是 ACTIONS.MINE，则同时设置 ACTIONS.REMOVELUNARBUILDUP 的消耗为相同值。影响后续 OnUsedAsItem 的消耗计算。"
+      "effect": "设置指定动作（action）的每次使用消耗次数到 self.consumption 表；若动作为 ACTIONS.MINE，则同时设置 ACTIONS.REMOVELUNARBUILDUP 相同消耗。修改内部消耗数据。"
     },
     {
       "name": "ClearAllConsumptions",
-      "effect": "清空 consumption 表，移除所有动作消耗记录，影响后续消耗计算。"
+      "effect": "将 self.consumption 清空为空表，无其它副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回格式化字符串显示当前与总使用次数（如 '100.00/100'），仅用于调试。"
+      "effect": "返回格式化字符串如 '%.2f/%d' 表示当前与最大用量，无副作用。"
     },
     {
       "name": "SetDoesNotStartFull",
-      "effect": "设置 doesnotstartfull 标记，改变存档行为（不再默认假设物品满耐久存档），无即时副作用。"
+      "effect": "设置 self.doesnotstartfull 标记，影响 OnSave 是否保存用量。"
     },
     {
       "name": "OnSave",
-      "effect": "若当前使用次数不等于总次数或 doesnotstartfull 为真，返回 {uses = self.current} 用于存档；否则返回 nil。"
+      "effect": "若 self.current 不等于 self.total 或 doesnotstartfull 为真，返回 {uses = self.current} 表，否则返回 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若载入数据包含 uses 字段，调用 SetUses 设置当前使用次数，触发更新、事件及可能的耗尽逻辑。"
+      "effect": "若传入数据包含 uses 字段，则调用 SetUses 设置当前用量。"
     },
     {
       "name": "SetMaxUses",
-      "effect": "设置总使用次数(total)为 val，因属性回调会更新关联 repairable/forgerepairable 组件的可修复状态。"
+      "effect": "设置 self.total 为给定值，因属性监听触发 onfiniteuses 更新 repairable/forgerepairable 组件的可修复状态。"
     },
     {
       "name": "SetUses",
-      "effect": "设置当前使用次数(current)为 val，推送 'percentusedchange' 事件并附带百分比；若 val<=0 置0且之前>0则加 'usesdepleted' 标签并调用 onfinished 回调；若 val>0 且之前<=0 则移除标签；同时触发可修复状态更新。"
+      "effect": "设置 self.current 为给定值，因属性监听触发 onfiniteuses 更新 repairable/forgerepairable 状态；推送 'percentusedchange' 事件；若结果小于等于0则置0，若之前为正则添加 'usesdepleted' 标签并调用 onfinished 回调；若结果大于0且之前非正，则移除 'usesdepleted' 标签。"
     },
     {
       "name": "GetUses",
-      "effect": "返回当前使用次数(current)的数值。"
+      "effect": "返回 self.current 当前用量值，无副作用。"
     },
     {
       "name": "Use",
-      "effect": "将当前使用次数减去 num（默认1），通过 SetUses 触发耗尽处理与事件等副作用。"
+      "effect": "减少当前用量（默认1，可指定 num），通过调用 SetUses 实现，触发其所有副作用。"
     },
     {
       "name": "IgnoresCombatDurabilityLoss",
-      "effect": "返回 ignorecombatdurabilityloss 布尔值，表示是否忽略战斗耐久损失。"
+      "effect": "返回 self.ignorecombatdurabilityloss 布尔值，无副作用。"
     },
     {
       "name": "SetIgnoreCombatDurabilityLoss",
-      "effect": "设置 ignorecombatdurabilityloss 为给定值，供外部系统判断战斗耐久损失逻辑。"
+      "effect": "设置 self.ignorecombatdurabilityloss 为给定值，无其它副作用。"
     },
     {
       "name": "SetModifyUseConsumption",
-      "effect": "设置 modifyuseconsumption 回调函数，用于在 OnUsedAsItem 中修改动作消耗值。"
+      "effect": "设置 self.modifyuseconsumption 回调函数，用于修改消耗计算。"
     },
     {
       "name": "OnUsedAsItem",
-      "effect": "根据 consumption 表获取动作消耗；若 doer 有 efficientuser 组件则乘效率系数；若设了 modifyuseconsumption 则再修改；最后调用 Use 消耗次数，可能触发耗尽。"
+      "effect": "根据 self.consumption[action] 获取基础消耗，若有 doer 的 efficientuser 组件则乘其乘数，再应用 modifyuseconsumption 回调，最后调用 Use 实际扣减；若消耗为空则无操作。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回当前使用次数占总次数的比例（current/total）。"
+      "effect": "返回 self.current / self.total 比例值，无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "将当前使用次数设为总次数乘以 amount（通过 SetUses），触发更新与事件。"
+      "effect": "按给定比例乘以 total 调用 SetUses 设置用量，触发其副作用。"
     },
     {
       "name": "SetOnFinished",
-      "effect": "设置 onfinished 回调函数，在物品使用次数耗尽时被调用。"
+      "effect": "设置 self.onfinished 回调函数，在用量耗尽时调用。"
     },
     {
       "name": "Repair",
-      "effect": "将当前使用次数增加 repairvalue 但不超过总次数（通过 SetUses），触发更新与事件，可能移除耗尽标签。"
+      "effect": "增加当前用量 repairvalue 点，不超过 total，通过 SetUses 实现并触发其副作用。"
     }
   ],
   "events_published": [
@@ -105,64 +105,20 @@
     ],
     "aspects": [
       {
-        "aspect": "使用消耗耐久",
+        "aspect": "使用次数消耗描述",
         "evidence": [
+          {
+            "pageid": 24927,
+            "quote": "随使用次数消耗耐久"
+          },
           {
             "pageid": 18234,
             "quote": "阅读书籍会消耗书籍的耐久度"
           },
           {
-            "pageid": 24927,
-            "quote": "随使用次数消耗耐久"
-          }
-        ]
-      },
-      {
-        "aspect": "修改消耗速率",
-        "evidence": [
-          {
-            "pageid": 23211,
-            "quote": "火炬耐久度下降速度会是平时的0.2倍"
-          }
-        ]
-      },
-      {
-        "aspect": "耐久修补与回复",
-        "evidence": [
-          {
-            "pageid": 15915,
-            "quote": "可以使用针线包或可靠的胶布进行修补"
+            "pageid": 13261,
+            "quote": "但会触发并消耗"
           },
-          {
-            "pageid": 16639,
-            "quote": "添加燃料，每个分别回复37.5%和75%耐久度"
-          },
-          {
-            "pageid": 18234,
-            "quote": "放入书柜的书籍会以每30秒1%的速度自动回复耐久度"
-          }
-        ]
-      },
-      {
-        "aspect": "耐久百分比标注",
-        "evidence": [
-          {
-            "pageid": 15915,
-            "quote": "按照耐久度百分比转化拥有最高1000"
-          },
-          {
-            "pageid": 24927,
-            "quote": "具有耐久度的物品在其物品栏图标上会显示百分数"
-          },
-          {
-            "pageid": 23211,
-            "quote": "一个100％耐久度的火炬通常只能使用75秒"
-          }
-        ]
-      },
-      {
-        "aspect": "耐久耗尽行为",
-        "evidence": [
           {
             "pageid": 15915,
             "quote": "耐久耗尽后不会消失但无法装备"
@@ -170,6 +126,71 @@
           {
             "pageid": 16639,
             "quote": "耐久度归零时会直接消失"
+          }
+        ]
+      },
+      {
+        "aspect": "修补与回复耐久描述",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "可以使用针线包或可靠的胶布进行修补"
+          },
+          {
+            "pageid": 16639,
+            "quote": "回复 37.5% 和 75% 耐久度"
+          },
+          {
+            "pageid": 18234,
+            "quote": "以每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久归零触发行为描述",
+        "evidence": [
+          {
+            "pageid": 16639,
+            "quote": "耐久度归零时会直接消失"
+          },
+          {
+            "pageid": 15915,
+            "quote": "耐久度归零时自动降解"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久消耗速度修改描述",
+        "evidence": [
+          {
+            "pageid": 23211,
+            "quote": "耐久度下降速度会是平时的 0.2 倍"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久百分比回复描述",
+        "evidence": [
+          {
+            "pageid": 16639,
+            "quote": "回复 37.5% 和 75% 耐久度"
+          },
+          {
+            "pageid": 18234,
+            "quote": "每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      },
+      {
+        "aspect": "耐久百分比读取描述",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "按照耐久度百分比转化拥有最高 1000"
+          },
+          {
+            "pageid": 24927,
+            "quote": "图标上会显示百分数"
           }
         ]
       }
@@ -192,11 +213,12 @@
   "search_terms": [
     "耐久度",
     "使用次数",
-    "物品耗尽",
-    "修复耐久",
-    "战斗损耗",
-    "消耗设定",
-    "百分比耐久"
+    "工具损耗",
+    "物品修复",
+    "耗尽标签",
+    "战斗免损",
+    "动作消耗",
+    "用量存档"
   ],
   "gameplay_tags": [
     "生存",
@@ -208,6 +230,6 @@
     "source_sha256": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
     "source_bytes": 3243,
     "model": "hy3-free",
-    "generated_at_ms": 1787896408177
+    "generated_at_ms": 1787932097128
   }
 }

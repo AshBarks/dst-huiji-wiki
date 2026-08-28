@@ -1,49 +1,49 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/perishable.lua"
   },
   "category": "component",
   "display_name": "perishable",
-  "summary": "该组件管理物品（如食物）的腐烂时间与新鲜/半腐/腐烂状态标签，通过周期任务根据环境温度、容器、湿度、酸雨等条件递减剩余时间。核心玩法涉及生存中的食物保鲜、冰箱与防腐剂减缓腐烂、以及腐烂后替换为废料等机制。",
+  "summary": "该组件管理实体的腐烂总时间（perishtime）与剩余时间（perishremainingtime），并通过 fresh/stale/spoiled 标签反映物品新鲜度状态。它参与生存玩法中的食物保鲜与变质机制，根据环境温度、容器、天气等动态调整腐烂速率，并在腐烂殆尽时触发回调或替换为腐败物。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'fresh'、'stale'、'spoiled' 标签，清除腐烂状态标记。"
+      "effect": "移除实体上的 'fresh'、'stale'、'spoiled' 标签，无其他副作用。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "调用 StopPerishing 取消进行中的腐烂周期任务。"
+      "effect": "调用 StopPerishing 取消腐烂周期任务。"
     },
     {
       "name": "IsFresh",
-      "effect": "返回实体是否含有 'fresh' 标签（布尔值），无副作用。"
+      "effect": "返回实体是否拥有 'fresh' 标签，无副作用。"
     },
     {
       "name": "IsStale",
-      "effect": "返回实体是否含有 'stale' 标签（布尔值），无副作用。"
+      "effect": "返回实体是否拥有 'stale' 标签，无副作用。"
     },
     {
       "name": "IsSpoiled",
-      "effect": "返回实体是否含有 'spoiled' 标签（布尔值），无副作用。"
+      "effect": "返回实体是否拥有 'spoiled' 标签，无副作用。"
     },
     {
       "name": "Dilute",
-      "effect": "若实体可堆叠，根据堆叠数与参数混合计算新的 perishremainingtime，并推送 'perishchange' 事件；修改剩余腐烂时间并触发事件。"
+      "effect": "若实体可堆叠，根据当前堆叠数与传入数量及时间左重新计算剩余腐烂时间为加权平均，并推送 perishchange 事件；修改剩余时间。"
     },
     {
       "name": "AddTime",
-      "effect": "若腐烂任务存在，将 perishremainingtime 增加指定时间（不超过 perishtime），百分比变化时推送 'perishchange'；修改计时并可能推送事件。"
+      "effect": "若正在腐烂，将剩余时间增加指定时间（不超过总时间），若百分比整数变化则推送 perishchange 事件；修改剩余时间。"
     },
     {
       "name": "SetPerishTime",
-      "effect": "设置 perishtime 与 perishremainingtime 为给定值，若任务在进行则重启；重置时间并可能重启任务。"
+      "effect": "设置总腐烂时间与剩余时间，若正在腐烂则重启腐烂任务；修改字段并可能重启任务。"
     },
     {
       "name": "SetLocalMultiplier",
-      "effect": "设置 localPerishMultiplyer 值，影响后续腐烂速率计算，仅存储无其它副作用。"
+      "effect": "设置 localPerishMultiplyer 字段以调整局部腐烂速率乘数。"
     },
     {
       "name": "GetLocalMultiplier",
@@ -51,55 +51,55 @@
     },
     {
       "name": "SetNewMaxPerishTime",
-      "effect": "按当前腐烂百分比设置新的 perishtime 并相应调整 perishremainingtime；改变最大与剩余时间。"
+      "effect": "根据当前腐烂百分比设置新的总腐烂时间并保持百分比，调用 SetPercent 调整剩余时间；修改字段。"
     },
     {
       "name": "SetOnPerishFn",
-      "effect": "设置腐烂触发时的回调函数 perishfn，仅存储。"
+      "effect": "设置腐烂完成时的回调函数 perishfn。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回 perishremainingtime 与 perishtime 的比值（0~1），无时间则返回0，无副作用。"
+      "effect": "返回剩余时间与总时间的比值（0~1），若总时间无效则返回0，无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "若 perishtime 存在，限制百分比并设置剩余时间，推送 'perishchange'，若任务在进行则重启；修改时间、推送事件、重启任务。"
+      "effect": "按给定百分比设置剩余时间，推送 perishchange 事件，若正在腐烂则重启任务；修改剩余时间。"
     },
     {
       "name": "ReducePercent",
-      "effect": "获取当前百分比减去给定量后调用 SetPercent；间接修改剩余时间。"
+      "effect": "获取当前百分比减去指定量后调用 SetPercent，间接修改剩余时间并可能推送事件。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述腐烂状态、剩余时间、冻结火乘子的调试字符串，无副作用。"
+      "effect": "返回描述腐烂状态（是否进行中、剩余时间、冰冻火乘子）的调试字符串，无副作用。"
     },
     {
       "name": "LongUpdate",
-      "effect": "若腐烂任务存在，立即以 dt 调用 Update 推进腐烂计算并调整任务计时；立即更新腐烂状态。"
+      "effect": "若正在腐烂，立即执行一次 Update 并调整任务剩余时间；可能推进腐烂进度。"
     },
     {
       "name": "StartPerishing",
-      "effect": "取消原有任务并创建周期调用 Update 的任务；启动腐烂循环。"
+      "effect": "取消已有周期任务并创建新的随机延迟周期 Update 任务；启动或重启腐烂。"
     },
     {
       "name": "IsPerishing",
-      "effect": "返回 updatetask 是否非空（是否正在腐烂），无副作用。"
+      "effect": "返回是否已有周期任务（即正在腐烂），无副作用。"
     },
     {
       "name": "Perish",
-      "effect": "取消任务，调用 perishfn，推送 'perished' 事件；若设了 onperishreplacement 则生成替换物并转移堆叠与位置后移除原实体；触发腐烂终结并可能替换实体。"
+      "effect": "取消任务，调用 perishfn 回调，推送 'perished' 事件；若设置了 onperishreplacement 则生成替换物并转移堆叠与位置，可能移除原实体。多重副作用。"
     },
     {
       "name": "StopPerishing",
-      "effect": "取消 updatetask 停止腐烂周期，无其它副作用。"
+      "effect": "取消周期任务以停止腐烂，无其他副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含 paused 与 time 的表用于存档，无副作用。"
+      "effect": "返回包含 paused（任务是否空）和 time（剩余时间）的表，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据存档数据恢复 perishremainingtime，并按标记启动或停止腐烂任务；恢复状态并可能启停任务。"
+      "effect": "根据存档数据设置剩余时间，并按需启动或停止腐烂任务；修改状态。"
     }
   ],
   "events_published": [
@@ -112,22 +112,7 @@
     "perishtime",
     "perishremainingtime"
   ],
-  "tunables": [
-    "TUNING.PERISH_FRESH",
-    "TUNING.PERISH_STALE",
-    "TUNING.PERISH_COLD_FROZEN_MULT",
-    "TUNING.PERISH_FRIDGE_MULT",
-    "TUNING.PERISH_FOOD_PRESERVER_MULT",
-    "TUNING.PERISH_CAGE_MULT",
-    "TUNING.PERISH_GROUND_MULT",
-    "TUNING.ACIDRAIN_PERISHABLE_ROT_PERCENT",
-    "TUNING.PERISH_WET_MULT",
-    "TUNING.PERISH_WINTER_MULT",
-    "TUNING.PERISH_FROZEN_FIRE_MULT",
-    "TUNING.OVERHEAT_TEMP",
-    "TUNING.PERISH_SUMMER_MULT",
-    "TUNING.PERISH_GLOBAL_MULT"
-  ],
+  "tunables": [],
   "wiki": {
     "scanned_pageids": [
       19129,
@@ -141,41 +126,43 @@
     ],
     "aspects": [
       {
-        "aspect": "变质物品生成描述",
+        "aspect": "代码层新鲜度获取注释",
+        "evidence": [
+          {
+            "pageid": 19129,
+            "quote": "而是使用perishable:GetPercent()获取"
+          }
+        ]
+      },
+      {
+        "aspect": "保质期倍数设定",
+        "evidence": [
+          {
+            "pageid": 14579,
+            "quote": "巨型蔬果的保质期是对应作物的 4 倍"
+          }
+        ]
+      },
+      {
+        "aspect": "变质状态界定",
         "evidence": [
           {
             "pageid": 19723,
-            "quote": "由多种物品[[腐烂]]"
-          },
-          {
-            "pageid": 14579,
-            "quote": "腐烂后变为对应的巨型腐烂蔬果"
+            "quote": "变质（新鲜度低于20%）"
           }
         ]
       },
       {
-        "aspect": "新鲜度百分比变化描述",
+        "aspect": "新鲜度百分比流失描述",
         "evidence": [
           {
             "pageid": 19129,
-            "quote": "物品的新鲜度会随时间逐渐降低"
-          },
-          {
-            "pageid": 19129,
             "quote": "每秒失去 7% 的新鲜度"
-          },
-          {
-            "pageid": 13476,
-            "quote": "初始新鲜度为 1 - (1 - 食材新鲜度之和/具有新鲜度的食材数量) × 0.5"
-          },
-          {
-            "pageid": 13476,
-            "quote": "恢复一定的新鲜度"
           }
         ]
       },
       {
-        "aspect": "新鲜度阶段数值标注",
+        "aspect": "新鲜状态阈值标注",
         "evidence": [
           {
             "pageid": 19129,
@@ -184,46 +171,21 @@
         ]
       },
       {
-        "aspect": "腐烂开始与停止机制说明",
+        "aspect": "烹饪新鲜度稀释公式",
         "evidence": [
           {
             "pageid": 13476,
-            "quote": "烹饪料理从烹饪完成开始，新鲜度就开始下降"
-          },
-          {
-            "pageid": 16197,
-            "quote": "大部分热食[[腐烂#开始与停止|腐烂时]]，其会被环境冷却"
-          },
-          {
-            "pageid": 24540,
-            "quote": "烹饪完成后开始腐烂。在收集料理之前，其腐烂速率不受腐烂机制影响"
+            "quote": "产出的料理若具有新鲜度，则其初始新鲜度为"
           }
         ]
       },
       {
-        "aspect": "腐烂时间数值与倍率标注",
+        "aspect": "物品腐烂转化行为描述",
         "evidence": [
           {
             "pageid": 19129,
-            "quote": "大多数食物和少数非食物物品有腐烂时间"
+            "quote": "新鲜度归零后变成另一种物品或者完全消失"
           },
-          {
-            "pageid": 14579,
-            "quote": "巨型蔬果的保质期是对应作物的 4 倍"
-          },
-          {
-            "pageid": 19129,
-            "quote": "!腐烂倍率"
-          },
-          {
-            "pageid": 24540,
-            "quote": "腐烂时间（天）"
-          }
-        ]
-      },
-      {
-        "aspect": "腐烂转化行为描述",
-        "evidence": [
           {
             "pageid": 14579,
             "quote": "腐烂后变为对应的巨型腐烂蔬果"
@@ -231,6 +193,10 @@
           {
             "pageid": 24030,
             "quote": "由小鱼块和熟小鱼块腐烂后产"
+          },
+          {
+            "pageid": 19723,
+            "quote": "由多种物品腐烂"
           }
         ]
       }
@@ -253,27 +219,23 @@
     "note": "perishtime 秒 → 天/分钟换算显示;腐烂产物仅在 DST 版渲染。"
   },
   "search_terms": [
-    "腐烂",
-    "新鲜度",
+    "新鲜",
     "变质",
+    "腐烂",
+    "冷藏",
     "保鲜",
-    "食物腐坏",
-    "剩余时间",
-    "冰箱防腐",
-    "酸雨加速",
-    "堆叠混合",
-    "腐烂替换"
+    "过期",
+    "食物腐败",
+    "腐烂速度"
   ],
   "gameplay_tags": [
-    "生存",
-    "食物",
-    "保鲜"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
     "source_bytes": 10830,
     "model": "hy3-free",
-    "generated_at_ms": 1787896117681
+    "generated_at_ms": 1787931710223
   }
 }

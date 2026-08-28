@@ -1,45 +1,69 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/updatelooper.lua"
   },
   "category": "component",
   "display_name": "updatelooper",
-  "summary": "该组件管理实体的多种更新回调函数列表，包括每帧更新、长更新、墙体更新与后更新。它为实体提供了比 DoPeriodicTask(0) 更精确的逐帧逻辑触发机制，支撑各类需要持续运算的玩法逻辑。",
+  "summary": "该组件为实体管理多种通用更新循环函数列表，包括每帧更新、长更新、墙体更新与后更新。它解决了 DoPeriodicTask(0) 无法精确每帧触发的问题，允许实体安全地添加或移除持续回调。这些循环参与游戏底层逻辑驱动，支撑各类玩法的动态行为。",
   "api": [
     {
       "name": "AddOnUpdateFn",
-      "effect": "将函数 fn 插入 self.onupdatefns 列表；若原列表为空，则调用 self.inst:StartUpdatingComponent(self) 启动实体更新组件。"
+      "effect": "接收函数 fn 并将其加入 self.onupdatefns 数组；若加入前数组为空，则调用 self.inst:StartUpdatingComponent(self) 使实体开始每帧更新。副作用：可能启动组件更新循环。"
     },
     {
       "name": "RemoveOnUpdateFn",
-      "effect": "若当前 onupdatefns 非空，将 fn 记录到 self.OnUpdatesToRemove 列表中，延迟至下次 OnUpdate 时实际移除；不直接修改函数列表。"
+      "effect": "接收函数 fn；若 self.onupdatefns 非空，则将 fn 加入 self.OnUpdatesToRemove 待移除列表，实际移除推迟至下次 OnUpdate 执行。副作用：无立即移除，仅标记延迟移除。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "引擎每帧调用，参数 dt 为帧时间。首先处理 OnUpdatesToRemove 列表，将其中函数从 onupdatefns 移除，若移除后列表空则调用 self.inst:StopUpdatingComponent(self)；随后逆序遍历 onupdatefns 并以 (self.inst, dt) 调用每个函数。副作用：可能停止更新组件并执行用户回调。"
     },
     {
       "name": "AddLongUpdateFn",
-      "effect": "将函数 fn 插入 self.longupdatefns 列表，无其它副作用。"
+      "effect": "将函数 fn 直接插入 self.longupdatefns 数组，无启动副作用。行为：追加长更新回调。"
     },
     {
       "name": "RemoveLongUpdateFn",
-      "effect": "若当前 longupdatefns 非空，将 fn 记录到 self.OnLongUpdatesToRemove 列表中，延迟至下次 LongUpdate 时实际移除。"
+      "effect": "若 self.longupdatefns 非空，将 fn 加入 self.OnLongUpdatesToRemove 列表，实际移除在下次 LongUpdate 处理。副作用：延迟移除标记。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "引擎长更新时调用，参数 dt。先处理 OnLongUpdatesToRemove 列表移除对应函数，随后逆序调用 longupdatefns 中每个函数 (self.inst, dt)。副作用：执行用户长更新回调。"
     },
     {
       "name": "AddOnWallUpdateFn",
-      "effect": "将函数 fn 插入 self.onwallupdatefns 列表；若原列表为空，则调用 self.inst:StartWallUpdatingComponent(self) 启动墙体更新。"
+      "effect": "将 fn 加入 self.onwallupdatefns；若原数组为空，调用 self.inst:StartWallUpdatingComponent(self) 启动墙体更新。副作用：可能开启墙更新循环。"
     },
     {
       "name": "RemoveOnWallUpdateFn",
-      "effect": "若当前 onwallupdatefns 非空，将 fn 记录到 self.OnWallUpdatesToRemove 列表中，延迟至下次 OnWallUpdate 时实际移除。"
+      "effect": "若 onwallupdatefns 非空，将 fn 加入 self.OnWallUpdatesToRemove 延迟移除列表，在下次 OnWallUpdate 处理。副作用：仅标记。"
+    },
+    {
+      "name": "OnWallUpdate",
+      "effect": "引擎墙体更新调用，参数 dt。若 TheNet:IsServerPaused() 则直接返回；否则处理 OnWallUpdatesToRemove 移除函数，若列表空则 StopWallUpdatingComponent；然后正序调用 onwallupdatefns 中函数 (self.inst, dt)。副作用：可能停止墙更新并执行回调。"
     },
     {
       "name": "AddPostUpdateFn",
-      "effect": "将 fn 追加到 self.postupdatefns 列表；若原列表为空，则将 self.postupdatefns 注册到全局 _PostUpdates 表（键为 inst），以参与全局后更新循环。"
+      "effect": "将 fn 加入 self.postupdatefns；若原数组为空，设置模块局部表 _PostUpdates[self.inst] = self.postupdatefns 以注册到全局后更新循环。副作用：将实体加入全局后更新遍历。"
     },
     {
       "name": "RemovePostUpdateFn",
-      "effect": "在 postupdatefns 中查找 fn 并移除；若当前正处于后更新循环（_IsPostUpdating 为真）则仅置 nil 延迟清理，否则立即压缩数组，若列表空则从全局 _PostUpdates 注销。"
+      "effect": "在 postupdatefns 中查找 fn 并移除；若正处于全局后更新循环 (_IsPostUpdating 为真) 则仅置该位置为 nil，否则立即压缩数组；若数组空则清除 _PostUpdates[self.inst]。副作用：可能注销全局后更新注册。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "调用 self.inst:StopUpdatingComponent(self) 和 self.inst:StopWallUpdatingComponent(self)，并置 _PostUpdates[self.inst] = nil。副作用：停止所有相关更新并清理全局表。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "置 _PostUpdates[self.inst] = nil 清理后更新注册。副作用：仅清理全局表项。"
+    },
+    {
+      "name": "UpdateLooper_PostUpdate",
+      "effect": "全局函数，每帧后由游戏调用。遍历模块局部表 _PostUpdates，对每个实例的 postupdatefns 正序调用函数 (inst)（跳过 nil），若发现 nil 或移除则压缩数组，空则注销。副作用：驱动所有实体的后更新回调执行。"
     }
   ],
   "events_published": [],
@@ -59,16 +83,16 @@
     ],
     "aspects": [
       {
-        "aspect": "体节数动态浮动",
+        "aspect": "周期恢复生命值描述",
         "evidence": [
           {
-            "pageid": 28611,
-            "quote": "体节数会分别在 9 到 11 之间浮动"
+            "pageid": 22383,
+            "quote": "每秒恢复 25 {{生命值}}"
           }
         ]
       },
       {
-        "aspect": "周期性甩出寄生暗影",
+        "aspect": "定时甩落寄生暗影行为",
         "evidence": [
           {
             "pageid": 19110,
@@ -77,29 +101,20 @@
         ]
       },
       {
-        "aspect": "固定间隔触发技能",
-        "evidence": [
-          {
-            "pageid": 22383,
-            "quote": "生命值在 5000 ~ 7500 时，每隔 16 秒，就"
-          }
-        ]
-      },
-      {
-        "aspect": "每秒生命值恢复",
-        "evidence": [
-          {
-            "pageid": 22383,
-            "quote": "每秒恢复 25 生命值"
-          }
-        ]
-      },
-      {
-        "aspect": "短时持续后自动消失",
+        "aspect": "灵魂诱饵持续时间消失机制",
         "evidence": [
           {
             "pageid": 22181,
             "quote": "2 秒的持续时间结束后也会自动消失"
+          }
+        ]
+      },
+      {
+        "aspect": "间隔生命值阈值触发行为",
+        "evidence": [
+          {
+            "pageid": 22383,
+            "quote": "生命值在 5000 ~ 7500 时，每隔 16 秒，就"
           }
         ]
       }
@@ -108,23 +123,22 @@
   },
   "search_terms": [
     "每帧更新",
-    "长更新",
+    "持续回调",
+    "实体循环",
     "墙体更新",
+    "长更新",
     "后更新",
-    "更新回调",
-    "循环函数",
-    "帧逻辑",
-    "更新循环"
+    "更新函数",
+    "逻辑循环"
   ],
   "gameplay_tags": [
-    "更新机制",
-    "逻辑帧"
+    "通用"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
     "source_bytes": 5168,
     "model": "hy3-free",
-    "generated_at_ms": 1787896121919
+    "generated_at_ms": 1787931788970
   }
 }

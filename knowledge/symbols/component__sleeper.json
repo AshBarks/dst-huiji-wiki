@@ -1,109 +1,109 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/sleeper.lua"
   },
   "category": "component",
   "display_name": "sleeper",
-  "summary": "该组件管理生物的睡眠状态、嗜睡值与睡眠抵抗等数据，控制其在满足昼夜、光照或战斗条件时自动入睡或唤醒。它参与核心生存玩法，使生物在夜间或安全时休眠，并在受攻击、起火或获得战斗目标时惊醒。组件还支持通过增加嗜睡值实现催眠效果，并可为首领等提供递减抵抗机制。",
+  "summary": "该组件管理实体的睡眠与唤醒状态，记录嗜睡值、睡眠抵抗、测试周期及昼夜睡眠习惯等数据。它参与生物 AI 行为控制，使实体能在安全时入睡、受攻击或遇敌时醒来，并支持催眠与冬眠等玩法机制。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'sleeper' 标签；取消测试、嗜睡衰减和抵抗衰减的定时任务；移除对 onignite、firedamage、attacked、newcombattarget 事件的监听回调。"
+      "effect": "移除组件时清理：删除实体 'sleeper' 标签，取消测试任务、wearofftask 与 diminishingtask，并移除对 onignite、firedamage、attacked、newcombattarget 事件的监听。"
     },
     {
       "name": "SetDefaultTests",
-      "effect": "将睡眠检测函数 sleeptestfn 与唤醒检测函数 waketestfn 重置为默认逻辑（DefaultSleepTest/DefaultWakeTest），不立即重启测试任务。"
+      "effect": "将 sleeptestfn 与 waketestfn 重置为 DefaultSleepTest 与 DefaultWakeTest，改变后续睡眠与唤醒的判定逻辑。"
     },
     {
       "name": "StopTesting",
-      "effect": "若当前存在测试定时任务则取消并置空，停止周期性的睡眠/唤醒检测。"
+      "effect": "若存在周期性测试任务 testtask，则取消并置空，停止睡眠/唤醒测试。"
     },
     {
       "name": "SetNocturnal",
-      "effect": "根据参数布尔值设置夜行生物逻辑：为真时使用 NocturnalSleepTest/NocturnalWakeTest，否则恢复默认测试函数，修改对应函数引用。"
+      "effect": "参数为 true 时设置睡眠与唤醒测试函数为夜行生物逻辑（白天睡夜晚醒），否则恢复默认逻辑，改变实体的昼夜作息。"
     },
     {
       "name": "SetWakeTest",
-      "effect": "设置唤醒检测函数 waketestfn 为给定函数，并调用 StartTesting(time) 重启测试任务（依据当前睡眠状态决定检测唤醒或睡眠）。"
+      "effect": "设置 waketestfn 为指定函数，并调用 StartTesting(time) 重启唤醒测试计时，改变唤醒条件与测试周期。"
     },
     {
       "name": "SetSleepTest",
-      "effect": "设置睡眠检测函数 sleeptestfn 为给定函数，并调用 StartTesting() 重启测试任务。"
+      "effect": "设置 sleeptestfn 为指定函数，并调用 StartTesting() 重启睡眠测试，改变入睡条件。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "实体离开活动范围时由引擎调用，内部调用 StopTesting() 停止睡眠/唤醒检测。"
+      "effect": "实体进入休眠时调用，停止测试任务（StopTesting），暂停睡眠状态检测。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "实体进入活动范围时由引擎调用，内部调用 StartTesting() 恢复睡眠/唤醒检测。"
+      "effect": "实体唤醒时调用，启动测试任务（StartTesting），恢复睡眠状态检测。"
     },
     {
       "name": "SetResistance",
-      "effect": "设置睡眠抵抗值 self.resistance，影响 AddSleepiness 触发睡眠的阈值条件。"
+      "effect": "设置 resistance 值为传入参数，改变触发强制睡眠所需的嗜睡阈值。"
     },
     {
       "name": "StartTesting",
-      "effect": "根据当前是否处于睡眠状态，调用 SetTest 安排 ShouldWakeUp 或 ShouldSleep 周期性测试任务，可能取消原有任务。"
+      "effect": "根据当前是否已睡选择启动 ShouldWakeUp 或 ShouldSleep 周期测试任务，开始自动状态检测。"
     },
     {
       "name": "IsAsleep",
-      "effect": "返回 self.isasleep 布尔值，表示实体当前是否睡着，无副作用。"
+      "effect": "返回 isasleep 布尔值，表示实体当前是否处于睡眠状态，无副作用。"
     },
     {
       "name": "IsHibernating",
-      "effect": "返回 self.hibernate 布尔值，表示是否处于冬眠（hibernate）状态，无副作用。"
+      "effect": "返回 hibernate 布尔值，表示实体是否处于冬眠（强制不唤醒）状态，无副作用。"
     },
     {
       "name": "IsInDeepSleep",
-      "effect": "返回 self:IsAsleep() and self.sleepiness > 0 的结果，用于判断是否为被催眠的深度睡眠，无副作用。"
+      "effect": "返回是否处于深度睡眠（已睡且 sleepiness>0），无副作用。"
     },
     {
       "name": "GetTimeAwake",
-      "effect": "若未睡着返回当前时间距上次状态转换的时间差，否则返回0，无副作用。"
+      "effect": "若正在睡眠返回0，否则返回当前时间与上次状态切换时间之差，表示清醒时长，无副作用。"
     },
     {
       "name": "GetTimeAsleep",
-      "effect": "若睡着返回当前时间距上次状态转换的时间差，否则返回0，无副作用。"
+      "effect": "若正在睡眠返回当前时间与上次状态切换时间之差，否则返回0，表示睡眠时长，无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含睡眠状态、时长、嗜睡值、抵抗和乘数的调试字符串，无副作用。"
+      "effect": "返回格式化的调试信息字符串，包含睡眠状态、时长、嗜睡值、抵抗与乘数等，无副作用。"
     },
     {
       "name": "AddSleepiness",
-      "effect": "增加 self.sleepiness 值；若已睡或值超过抵抗则立即 GoToSleep(sleeptime)，若等于抵抗则延迟抵抗时间后 GoToSleep，若小于抵抗且无非衰减任务则启动周期任务递减嗜睡值。"
+      "effect": "增加 sleepiness 值；若已睡或值超过 resistance 立即入睡，若等于则延迟后入睡，若小于且未启动则启动周期磨损任务降低嗜睡；可能触发 GoToSleep 或 WearOff 任务。"
     },
     {
       "name": "SetExtraResist",
-      "effect": "设置额外抵抗 extraresist 并限制在 0 到 wearofftime 之间；若大于0且衰减任务不存在则创建周期衰减任务，若小于等于0且任务存在则取消。"
+      "effect": "设置 extraresist 并限制在 [0, wearofftime]；若大于0且未启动则启动周期衰减任务，若小于等于0且任务存在则取消；影响睡眠时长乘数。"
     },
     {
       "name": "GetSleepTimeMultiplier",
-      "effect": "返回基于 extraresist 计算的睡眠时长乘数（默认1），无副作用。"
+      "effect": "返回根据 extraresist 计算的睡眠时长乘数（默认1），无副作用。"
     },
     {
       "name": "GoToSleep",
-      "effect": "若实体可见且未死亡，设置 isasleep=true、记录时间、取消嗜睡衰减任务、停止大脑与移动、清除战斗目标；若原先清醒则推送 'gotosleep' 事件且可能累加 extraresist；最后设置带时长乘数的唤醒测试。"
+      "effect": "若实体可见且未死，标记入睡、记录时间、停止大脑与移动、清除战斗目标；首次睡时推送 'gotosleep' 事件且可能追加 extraresist；并按乘数设定唤醒测试。使实体进入睡眠状态。"
     },
     {
       "name": "SetTest",
-      "effect": "取消原有测试任务，若给定函数非 nil 则计算随机测试间隔并创建周期性任务调用该函数。"
+      "effect": "取消旧测试任务，若传入函数则计算随机测试间隔并启动周期任务执行该函数，设定状态检测节奏。"
     },
     {
       "name": "WakeUp",
-      "effect": "清除冬眠标志，若睡着且未死亡则设置 isasleep=false、sleepiness=0、重启大脑、推送 'onwakeup' 事件并重置睡眠测试函数。"
+      "effect": "取消冬眠标记；若睡眠且未死，标记清醒、清零嗜睡、重启大脑、推送 'onwakeup' 事件并重启睡眠测试。唤醒实体恢复 AI。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含 extraresist（若存在且>0）的存档表或 nil，无副作用。"
+      "effect": "若 extraresist 大于0则返回包含该值的表供存档，否则返回 nil，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "读取存档数据，若包含 extraresist 则调用 SetExtraResist 恢复额外抵抗值。"
+      "effect": "若存档数据含 extraresist 则调用 SetExtraResist 恢复，重建额外抵抗值。"
     }
   ],
   "events_published": [
@@ -120,27 +120,118 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      14938,
-      15832,
-      13897,
-      15238,
-      13823,
-      15601,
-      15651,
-      15642
+      14701,
+      15258,
+      15642,
+      51097,
+      13901,
+      14703,
+      24542,
+      70704
     ],
     "aspects": [
       {
-        "aspect": "睡眠状态行为描述",
+        "aspect": "催眠与睡意施加描述",
         "evidence": [
           {
-            "pageid": 15238,
-            "quote": "在睡觉时，可以用[[剃刀]]为皮弗娄牛剃毛"
+            "pageid": 15642,
+            "quote": "熊獾的哈欠有催眠效果，催眠周围25单位"
+          }
+        ]
+      },
+      {
+        "aspect": "实体入睡与睡眠状态描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "在夜晚则会睡觉"
+          },
+          {
+            "pageid": 15258,
+            "quote": "再重新入睡"
+          },
+          {
+            "pageid": 51097,
+            "quote": "在白天，舒适的兔人会在自己的枕头盔甲上睡觉"
+          },
+          {
+            "pageid": 51097,
+            "quote": "处于洞穴世界中时，它们将不会主动睡觉"
+          },
+          {
+            "pageid": 13901,
+            "quote": "若找不到则就地睡觉"
+          },
+          {
+            "pageid": 13901,
+            "quote": "夜间火鸡睡觉的时候"
+          },
+          {
+            "pageid": 24542,
+            "quote": "1只蜘蛛战士在地毯地板地块上睡觉"
+          },
+          {
+            "pageid": 70704,
+            "quote": "但在晚上会睡觉"
+          },
+          {
+            "pageid": 70704,
+            "quote": "白天不会睡觉"
+          },
+          {
+            "pageid": 15642,
+            "quote": "若熊獾睡觉时攻击它"
+          }
+        ]
+      },
+      {
+        "aspect": "实体唤醒条件与醒后行为描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "角色靠近它10单位会使它醒来并逃跑"
+          },
+          {
+            "pageid": 13901,
+            "quote": "睡眠中的火鸡在受到任何攻击后都会立刻醒来"
+          },
+          {
+            "pageid": 24542,
+            "quote": "所有的猎犬都将醒来"
+          },
+          {
+            "pageid": 15642,
+            "quote": "醒后熊獾会立即打一个哈欠"
+          },
+          {
+            "pageid": 15642,
+            "quote": "在醒来30秒后会主动攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "睡眠点使用条件限制描述",
+        "evidence": [
+          {
+            "pageid": 14701,
+            "quote": "在黄昏、夜晚或者在洞穴可以睡觉"
+          },
+          {
+            "pageid": 14701,
+            "quote": "如果猎犬袭击就无法睡觉"
+          },
+          {
+            "pageid": 14703,
+            "quote": "帐篷只能在黄昏、夜晚或者洞穴时使用"
+          },
+          {
+            "pageid": 14703,
+            "quote": "薇克巴顿无法睡觉"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -157,26 +248,25 @@
     "note": "sleeper_diminishingreturns 为布尔标记。"
   },
   "search_terms": [
-    "睡觉生物",
-    "唤醒条件",
-    "睡眠抵抗",
-    "嗜睡值",
-    "冬眠状态",
-    "夜间睡觉",
-    "被攻击醒",
+    "睡觉",
+    "醒来",
+    "嗜睡",
+    "冬眠",
+    "抵抗睡眠",
+    "受击唤醒",
     "战斗唤醒",
+    "停止思考",
     "深度睡眠"
   ],
   "gameplay_tags": [
-    "睡眠",
-    "战斗",
-    "生存"
+    "生存",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
     "source_bytes": 11323,
     "model": "hy3-free",
-    "generated_at_ms": 1787895954267
+    "generated_at_ms": 1787931504794
   }
 }

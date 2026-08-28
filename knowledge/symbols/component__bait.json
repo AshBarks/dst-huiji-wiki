@@ -1,25 +1,25 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/bait.lua"
   },
   "category": "component",
   "display_name": "bait",
-  "summary": "该组件管理诱饵实体对陷阱实体的引用（trap字段），并监听实体的移除、拾取、被吃、被偷事件以联动陷阱逻辑。它参与陷阱捕捉核心玩法，在诱饵状态变化时通知陷阱或处理物品转移。",
+  "summary": "该组件管理诱饵实体与陷阱实体的关联引用（trap字段）。它监听诱饵被吃、被偷、被捡起或移除等事件，并通知关联的陷阱做出响应，是陷阱捕猎玩法的核心环节。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上针对 'onremove'、'onpickup'、'oneaten'、'onstolen' 事件的监听回调，清理组件关联的事件订阅，无其他副作用。"
+      "effect": "移除该实体上针对 onremove、onpickup、oneaten、onstolen 事件的监听回调，清理组件状态，无数据副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回字符串 'Trap:' 拼接 trap 字段的 tostring 结果，用于调试信息显示，无副作用。"
+      "effect": "返回描述当前关联陷阱的调试字符串，格式为 'Trap:' 拼接 trap 字段的 tostring 结果，无副作用。"
     },
     {
       "name": "IsFree",
-      "effect": "返回布尔值，指示 self.trap 是否为 nil（即诱饵是否未被任何陷阱使用），无副作用。"
+      "effect": "返回 trap 字段是否为 nil 的布尔值，用于判断诱饵是否未被陷阱使用，无副作用。"
     }
   ],
   "events_published": [],
@@ -43,7 +43,7 @@
       15237
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录围绕诱饵实体或物品的生成、吸引、消失及互动机制，未以玩家语言体现component__bait的OnRemoveFromEntity、GetDebugString、IsFree等代码级能力表现。",
+    "no_evidence_reason": "页面摘录中多次提及各类诱饵实体或物品（如灵魂诱饵、食人花诱饵、捕鸟陷阱诱饵、诱饵物品等）的生成、放置、消失与被食用等宏观行为，但均未以玩家语言描述 component__bait 的特定代码能力 OnRemoveFromEntity、GetDebugString、IsFree（如从实体移除时的处理、调试字符串、空闲判定），因此判断页面根本不讨论该组件符号的这些能力。",
     "coverage_status": "no_wiki_mention"
   },
   "auto_maintained": {
@@ -62,20 +62,20 @@
     "陷阱饵",
     "饵被吃",
     "饵被偷",
-    "脱离陷阱",
-    "自由诱饵",
-    "绑陷阱",
-    "移除饵"
+    "放陷阱",
+    "诱饵消失",
+    "饵被捡",
+    "陷阱布置"
   ],
   "gameplay_tags": [
     "生存",
-    "陷阱"
+    "建造"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
     "source_bytes": 1220,
     "model": "hy3-free",
-    "generated_at_ms": 1787896614582
+    "generated_at_ms": 1787932339527
   }
 }

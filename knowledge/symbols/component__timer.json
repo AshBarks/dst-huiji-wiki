@@ -1,73 +1,73 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/timer.lua"
   },
   "category": "component",
   "display_name": "timer",
-  "summary": "组件 Timer 管理实体上多个命名定时器的数据，包括剩余时间、暂停状态和初始时间等。它通过 DoTaskInTime 调度回调，在计时结束时推送 timerdone 事件，并支持暂停、恢复、存档与长更新等，参与游戏中各类需要计时或冷却的核心玩法。",
+  "summary": "组件 timer 在实体上维护一组命名计时器，记录剩余时间、暂停状态与初始时长等数据。它通过安排定时任务在计时结束时推送 timerdone 事件，并支持暂停、恢复、修改剩余时间以及存读档与长更新，广泛参与技能冷却、状态持续等核心玩法机制。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历所有定时器，取消其关联的任务。副作用：所有未完成的定时任务被取消，不再触发 timerdone 事件。"
+      "effect": "遍历 self.timers，若条目中 timer 任务非 nil 则调用 Cancel() 取消。副作用：清除实体上所有挂起计时器任务，释放资源。"
     },
     {
       "name": "GetDebugString",
-      "effect": "生成包含各定时器名称、剩余时间和暂停状态的调试字符串。无副作用。"
+      "effect": "拼接并返回包含所有计时器名称、剩余时间（GetTimeLeft 或0）、暂停状态（tostring(IsPaused==true)）的多行字符串。无副作用。"
     },
     {
       "name": "TimerExists",
-      "effect": "检查指定名称的定时器是否存在并返回布尔值。无副作用。"
+      "effect": "返回 self.timers[name] ~= nil 的布尔结果。无副作用。"
     },
     {
       "name": "StartTimer",
-      "effect": "以给定名称、时长创建定时器，可选暂停和初始时间覆盖；若同名已存在则打印错误并跳过。副作用：注册新定时任务，时间到触发 OnTimerDone 推送事件；若 paused 则立即暂停任务。"
+      "effect": "若 TimerExists(name) 为真则打印警告并直接返回；否则在 self.timers[name] 创建记录，包含 timer=inst:DoTaskInTime(time, OnTimerDone, self, name) 任务、timeleft=time、end_time=GetTime()+time、initial_time=initialtime_override或time、paused=false。若 paused 参数真则调用 PauseTimer(name)。副作用：在实体上注册并启动一个定时任务，若同名已存在则拒绝并日志输出。"
     },
     {
       "name": "StopTimer",
-      "effect": "取消并删除指定定时器。副作用：任务取消，数据从 timers 表移除。"
+      "effect": "若计时器不存在返回；否则取消其 timer 任务（若有）并置 nil，并将 self.timers[name] 置 nil。副作用：移除该计时器，后续 TimerExists 为假。"
     },
     {
       "name": "IsPaused",
-      "effect": "返回定时器是否处于暂停状态（存在且 paused 为真）。无副作用。"
+      "effect": "返回 self:TimerExists(name) and self.timers[name].paused。无副作用。"
     },
     {
       "name": "PauseTimer",
-      "effect": "更新剩余时间并取消任务，标记暂停。副作用：定时器停止倒计时，任务被取消，timeleft 被刷新。"
+      "effect": "若计时器不存在或已暂停则返回；否则调用 GetTimeLeft(name) 更新剩余时间，设置 paused=true，取消 timer 任务并置 nil。副作用：计时器暂停倒计时但保留数据。"
     },
     {
       "name": "ResumeTimer",
-      "effect": "以剩余时间重新调度任务，标记恢复并返回 true。副作用：定时器继续倒计时，新任务创建，end_time 更新。"
+      "effect": "若计时器未暂停则返回；否则设置 paused=false，用 self.timers[name].timeleft 重新安排 DoTaskInTime 任务，更新 end_time=GetTime()+timeleft，返回 true。副作用：恢复倒计时任务。"
     },
     {
       "name": "GetTimeLeft",
-      "effect": "若未暂停则刷新剩余时间字段，返回剩余时间或 nil。副作用：可能更新内部 timeleft 与 end_time 计算。"
+      "effect": "若计时器不存在返回 nil；若未暂停则更新 self.timers[name].timeleft = end_time - GetTime() 并返回该值；若暂停直接返回存储的 timeleft。副作用：可能更新内部 timeleft 字段。"
     },
     {
       "name": "SetTimeLeft",
-      "effect": "设置定时器剩余时间为 max(0, time)，必要时暂停再恢复以重启任务。副作用：改变倒计时长度，可能取消并重建任务。"
+      "effect": "若计时器不存在返回；若暂停则设置 timeleft=max(0,time)；否则先 PauseTimer 再设 timeleft=max(0,time) 再 ResumeTimer。副作用：改变计时器剩余时间并可能触发内部暂停恢复。"
     },
     {
       "name": "GetTimeElapsed",
-      "effect": "返回初始时间减去剩余时间得到的已用时间或 nil。无直接副作用（内部调用 GetTimeLeft 可能刷新剩余时间）。"
+      "effect": "若计时器存在返回 (initial_time or 0) - GetTimeLeft(name)，否则 nil。无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "收集所有定时器状态（timeleft, paused, initial_time）用于存档，返回包含 timers 表的数据或 nil。无副作用。"
+      "effect": "遍历 self.timers 构建数据表，每项含 timeleft（调用GetTimeLeft）、paused、initial_time；若表非空返回 {timers=data} 否则 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据存档数据对每个定时器先停止再启动以恢复状态。副作用：重建定时器，创建新任务。"
+      "effect": "若 data.timers 非空，对每个键值先 StopTimer 再 StartTimer 以传入存储的 timeleft、paused、initial_time 重建计时器。副作用：还原计时器状态。"
     },
     {
       "name": "LongUpdate",
-      "effect": "对所有定时器减去 dt 时间以快进计时。副作用：可能使定时器剩余时间减少至触发完成并推送 timerdone 事件。"
+      "effect": "遍历所有计时器，调用 SetTimeLeft(k, GetTimeLeft(k)-dt) 快进时间。副作用：可能使计时器结束并触发 timerdone 事件。"
     },
     {
       "name": "TransferComponent",
-      "effect": "将当前所有定时器参数复制到新实体的 timer 组件上启动。副作用：新实体上创建相同定时器，原定时器保留。"
+      "effect": "获取 newinst.components.timer，遍历当前 timers，在新组件上以相同名称、剩余时间、暂停状态、初始时间调用 StartTimer。副作用：在新实体上创建对应计时器。"
     }
   ],
   "events_published": [
@@ -78,75 +78,61 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      13701,
       15922,
       15642,
+      18540,
+      18723,
       35001,
-      13701,
       65605,
-      15022,
-      16197,
-      18540
+      14938
     ],
     "aspects": [
       {
-        "aspect": "倒计时重置设置",
+        "aspect": "世界再生中计时暂停描述",
         "evidence": [
           {
             "pageid": 35001,
-            "quote": "则重置倒计时"
+            "quote": "在冬季和夜晚或有积雪时暂停计时"
           }
         ]
       },
       {
-        "aspect": "实体计时器存在说明",
+        "aspect": "巢穴生物再生与下蛋倒计时启动描述",
         "evidence": [
           {
-            "pageid": 35001,
-            "quote": "每棵树都有一个计时器"
+            "pageid": 18723,
+            "quote": "开始一个 5 天的再生倒计时"
+          },
+          {
+            "pageid": 18723,
+            "quote": "开始一个 3 ~ 5 天的下蛋倒计时"
           }
         ]
       },
       {
-        "aspect": "生成倒计时启动",
+        "aspect": "巨兽生成倒计时设置及剩余时间更新描述",
         "evidence": [
           {
             "pageid": 15642,
             "quote": "尝试为熊獾设置生成倒计时"
+          },
+          {
+            "pageid": 15642,
+            "quote": "当前计时剩余时间"
+          },
+          {
+            "pageid": 15642,
+            "quote": "更新计时剩余时间为 t 秒"
           }
         ]
       },
       {
-        "aspect": "计时剩余时间数值标注",
+        "aspect": "服务器重启倒计时剩余显示描述",
         "evidence": [
-          {
-            "pageid": 15642,
-            "quote": "计时剩余时间为 0 ~ 150 秒"
-          },
           {
             "pageid": 65605,
-            "quote": "在倒计时为 25 秒、20 秒、15 秒、10 秒时"
-          }
-        ]
-      },
-      {
-        "aspect": "计时器暂停条件描述",
-        "evidence": [
-          {
-            "pageid": 15642,
-            "quote": "入冬时计时器暂停"
-          },
-          {
-            "pageid": 35001,
-            "quote": "在[[冬季]]暂停计时。"
-          }
-        ]
-      },
-      {
-        "aspect": "计时更新重试周期",
-        "evidence": [
-          {
-            "pageid": 35001,
-            "quote": "下一次更新（29秒后）中重试"
+            "quote": "倒计时为 25 秒、20 秒、15 秒、10 秒"
           }
         ]
       }
@@ -154,14 +140,13 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "计时器",
     "倒计时",
-    "剩余时间",
-    "暂停计时",
     "冷却时间",
-    "定时完成",
-    "计时存档",
-    "计时转移"
+    "剩余时间",
+    "计时结束",
+    "暂停计时",
+    "技能冷却",
+    "状态持续"
   ],
   "gameplay_tags": [
     "生存",
@@ -172,6 +157,6 @@
     "source_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
     "source_bytes": 3867,
     "model": "hy3-free",
-    "generated_at_ms": 1787895617513
+    "generated_at_ms": 1787931134796
   }
 }

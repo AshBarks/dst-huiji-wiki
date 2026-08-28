@@ -1,49 +1,49 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/colouradder.lua"
   },
   "category": "component",
   "display_name": "colouradder",
-  "summary": "该组件管理一个颜色叠加栈（colourstack）与子实体列表（children），通过累加多个来源提供的附加颜色（RGBA）来统一计算实体及其子物体的最终附加色调。它参与游戏中的视觉状态反馈与装饰玩法，例如为角色或物体叠加冰冻、燃烧等特效颜色，并支持将颜色同步至子实体或网络同步组件。",
+  "summary": "组件 ColourAdder 管理一个颜色栈（colourstack）与子实体列表（children），通过叠加多个来源的颜色增量并计算钳制后的结果，控制实体及其子物体的附加颜色（AddColour）渲染。它参与核心玩法中的视觉状态表现，如冰冻、燃烧等着色效果，以及装饰性染色与父子颜色继承。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，遍历颜色栈和子实体表，移除所有已注册的 'onremove' 事件回调；并对子实体中拥有 colouradder 组件的调用 PopColour(self.inst) 以撤销颜色贡献。副作用：清除事件监听并可能触发子实体重新计算颜色。"
+      "effect": "当组件从实体移除时，清理所有颜色源监听和子实体关联。遍历 colourstack 移除实体源的 onremove 事件回调；遍历 children 移除事件回调并向子实体 colouradder 弹出自身颜色。副作用：解除事件监听，子实体颜色可能被修改。"
     },
     {
       "name": "AttachChild",
-      "effect": "若子实体尚未附加，则为其注册 'onremove' 事件监听，并立即将当前叠加颜色通过子实体的 colouradder 组件、colouraddersync 组件或 AnimState 的 SetAddColour 施加。副作用：建立子实体引用、添加事件监听并改变子实体渲染颜色。"
+      "effect": "将一个子实体加入颜色继承列表。若子实体未注册，则监听其子实体 onremove 事件，并立即根据子实体拥有的 colouradder、colouraddersync 或 AnimState 推送当前叠加颜色。副作用：建立父子颜色关联，子实体渲染颜色被设置。"
     },
     {
       "name": "DetachChild",
-      "effect": "若子实体已附加，则移除其 'onremove' 事件监听，并从子实体表中删除；若子实体拥有 colouradder 组件则调用其 PopColour(self.inst)。副作用：停止传递颜色并可能改变子实体颜色。"
+      "effect": "将子实体从颜色继承列表移除。若已注册，移除事件监听并向子实体 colouradder 弹出自身颜色源。副作用：解除关联，子实体对应颜色层移除。"
     },
     {
       "name": "GetCurrentColour",
-      "effect": "返回当前存储的叠加颜色分量 r, g, b, a（通过 unpack(self.colour)）。无副作用。"
+      "effect": "返回当前计算后的叠加颜色值（r,g,b,a）。无副作用。"
     },
     {
       "name": "CalculateCurrentColour",
-      "effect": "遍历 colourstack 中所有来源颜色向量求和，并将每个分量限制在 0~1 后返回。无副作用。"
+      "effect": "累加 colourstack 中所有颜色源的分量并限制在 [0,1] 范围内返回。无副作用。"
     },
     {
       "name": "OnSetColour",
-      "effect": "将内部颜色更新为给定值，若自身有 colouraddersync 组件则调用 SyncColour，否则若自身有 AnimState 则调用 SetAddColour；随后将颜色传递给所有子实体（依据其子组件或 AnimState）。副作用：改变自身及子实体的附加颜色渲染，可能触发网络同步。"
+      "effect": "设置自身当前颜色并应用到自身及所有子实体。更新 self.colour，若自身有 colouraddersync 则同步颜色，否则调用 AnimState:SetAddColour；遍历 children 做同样推送。副作用：改变自身及子实体渲染附加色。"
     },
     {
       "name": "PushColour",
-      "effect": "若来源和颜色参数有效且颜色非全零，将来源颜色存入或更新 colourstack；若来源是实体实例则监听其 'onremove' 事件；重新计算总颜色并在变化时调用 OnSetColour。若颜色全零则等效调用 PopColour。副作用：修改颜色栈、可能增加事件监听并改变实体颜色。"
+      "effect": "添加一个颜色源（source）及其颜色增量。若参数齐全且非零，存入或更新 colourstack，若为实体则监听其 onremove；重新计算颜色若变化则触发 OnSetColour。若传入全零则转为 PopColour。副作用：可能添加事件监听，改变实体及子实体颜色。"
     },
     {
       "name": "PopColour",
-      "effect": "若来源存在于颜色栈，移除该条目；若来源是实体实例则移除 'onremove' 监听；重新计算总颜色并在变化时调用 OnSetColour。副作用：修改颜色栈、移除事件监听并改变实体颜色。"
+      "effect": "移除指定颜色源。从 colourstack 删除源，若为实体移除监听，重新计算颜色若变化则触发 OnSetColour。副作用：可能移除监听，改变颜色。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述当前颜色及颜色栈中所有来源颜色的调试字符串。无副作用。"
+      "effect": "生成包含当前颜色及所有颜色栈条目的调试字符串。无副作用。"
     }
   ],
   "events_published": [],
@@ -63,46 +63,29 @@
       28179,
       13603
     ],
-    "aspects": [
-      {
-        "aspect": "动画颜色叠加描述",
-        "evidence": [
-          {
-            "pageid": 65505,
-            "quote": "实际使用的洞穴光照要经过光源相位调整，以便动画颜色叠加。"
-          }
-        ]
-      },
-      {
-        "aspect": "颜色通道与不透明度数值设置",
-        "evidence": [
-          {
-            "pageid": 65505,
-            "quote": "红、绿、蓝三色通道值要减半，并设置不透明度为 1。"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "所有给定页面摘录均未描述colouradder组件相关的颜色栈推送弹出、子对象附加分离、当前颜色获取计算、设置颜色或调试字符串等能力；页面65505仅提及洞穴光照红绿蓝通道值减半与颜色叠加，未对应清单中具体行为语义，其余页面讨论实体掉落与仇恨等行为，与该符号无关。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "颜色叠加",
     "附加颜色",
-    "子物体染色",
+    "实体染色",
+    "子物变色",
     "颜色栈",
     "移除变色",
-    "状态变色",
-    "同步颜色",
-    "叠加特效"
+    "颜色同步",
+    "调试着色"
   ],
   "gameplay_tags": [
-    "装饰"
+    "装饰",
+    "视觉"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
     "source_bytes": 4562,
     "model": "hy3-free",
-    "generated_at_ms": 1787896853425
+    "generated_at_ms": 1787932630406
   }
 }

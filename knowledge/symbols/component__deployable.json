@@ -1,56 +1,59 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/deployable.lua"
   },
   "category": "component",
   "display_name": "deployable",
-  "summary": "该组件管理物品的可部署数据，包括部署模式、间距、限制标签与网格放置标志等。它参与建造、种植、放墙及水面放置等核心部署玩法，通过地图检测与事件推送完成放置逻辑。",
+  "summary": "组件管理物品的可部署属性，包括部署模式、间距、限制标签与网格放置设置。它参与建造、种植、放墙、水面放置等核心玩法，通过地图查询与角色状态判定决定能否部署，并在部署时执行回调与推送事件。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时，将 replica.inventoryitem 的部署模式设为 DEPLOYMODE.NONE、限制标签设为 nil，并移除实体 'deployable' 标签。"
-    },
-    {
       "name": "SetDeployMode",
-      "effect": "设置 self.mode 并触发 onmode 回调，通过 replica.inventoryitem:SetDeployMode 同步客户端部署模式。"
+      "effect": "设置 self.mode 为传入的部署模式，并触发 onmode 回调，通过 self.inst.replica.inventoryitem:SetDeployMode 将模式同步到客户端物品副本。"
     },
     {
       "name": "GetDeployMode",
-      "effect": "返回 self.mode 当前值。"
+      "effect": "返回当前 self.mode 的值，无副作用。"
     },
     {
       "name": "SetDeploySpacing",
-      "effect": "设置 self.spacing 并触发 onspacing 回调，通过 replica.inventoryitem:SetDeploySpacing 同步客户端部署间距。"
+      "effect": "设置 self.spacing 为传入的间距枚举，并触发 onspacing 回调，通过 replica.inventoryitem:SetDeploySpacing 同步到客户端。"
     },
     {
       "name": "SetUseGridPlacer",
-      "effect": "设置 self.usegridplacer 为传入值或 nil，并触发 onusegridplacer 回调，通过 replica.inventoryitem:SetUseGridPlacer 同步网格放置器标志。"
+      "effect": "设置 self.usegridplacer（若为 falsy 则置 nil），并触发 onusegridplacer 回调，通过 replica.inventoryitem:SetUseGridPlacer 同步到客户端。"
     },
     {
       "name": "DeploySpacingRadius",
-      "effect": "返回 DEPLOYSPACING_RADIUS 表中以 self.spacing 为键的半径值，无副作用。"
+      "effect": "返回 DEPLOYSPACING_RADIUS 表中以 self.spacing 为键对应的半径值，无副作用。"
     },
     {
       "name": "SetDeployTossSymbolOverride",
-      "effect": "设置 self.deploytoss_symbol_override 为传入 data，用于部署投掷动画符号覆盖，无客户端同步。"
+      "effect": "设置 self.deploytoss_symbol_override 为传入的 data，用于在部署投掷动画前覆盖符号，无远程同步。"
     },
     {
       "name": "IsDeployable",
-      "effect": "根据 restrictedtag、deployer 骑乘状态或手持浮船器状态判断物品是否可部署，返回布尔值，无副作用。"
+      "effect": "检查 self.restrictedtag（若存在且非空则要求 deployer 拥有该标签）以及 deployer 的骑行/浮漂状态（骑行时仅可投掷复杂弹射物，浮漂持有时仅可部署船建造物），返回布尔值表示是否允许部署，无状态修改。"
     },
     {
       "name": "CanDeploy",
-      "effect": "先调用 IsDeployable 检查，再根据 self.mode 调用地图相应方法检测点位可否部署，返回布尔值及可选原因，无副作用。"
+      "effect": "先调用 IsDeployable 检查，再根据 self.mode 调用 TheWorld.Map 对应的点位可部署查询（如 ANYWHERE/TURF/PLANT/WALL/DEFAULT/WATER/CUSTOM），返回布尔值及可选原因，无副作用。"
     },
     {
       "name": "Deploy",
-      "effect": "调用 CanDeploy 检查点位，若不可部署则返回 false 及原因；若可部署则执行 self.ondeploy 回调（可能移除自身实体），令 deployer 推送 'deployitem' 事件，若原实体有 'deployedplant' 标签则令 TheWorld 推送 'itemplanted' 事件，返回 true。"
+      "effect": "调用 CanDeploy 检查，若失败返回 false 与原因；否则执行 self.ondeploy 回调（若存在），触发 deployer 的 'deployitem' 事件，若为植物标签则额外触发 TheWorld 的 'itemplanted' 事件，返回 true。注意 self.inst 可能在 ondeploy 中被移除。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件移除时，若存在 replica.inventoryitem 则重置其部署模式为 DEPLOYMODE.NONE 并清除限制标签，同时移除实体上的 'deployable' 标签。"
     }
   ],
-  "events_published": [],
+  "events_published": [
+    "deployitem",
+    "itemplanted"
+  ],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
@@ -66,30 +69,29 @@
       16118
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录中‘放置物品’指向存放物品至实体而非部署实体；建筑类仅称‘可制作建筑’未描述部署机制（模式/间距/网格等）；生物与药剂无关；全文本无deployable组件能力（OnRemoveFromEntity等）的玩家语言表达。",
+    "no_evidence_reason": "所有页面摘录均未体现 deployable 组件的能力或行为语义（如部署模式、间距、网格放置、可部署判断、部署动作等），仅出现“放置物品”台词标记，非组件能力表达。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "可部署",
-    "放置物品",
-    "部署模式",
-    "建造间距",
+    "放置物",
+    "种植点",
+    "建造模式",
     "网格放置",
-    "限制标签",
-    "种植地点",
-    "建墙地点",
-    "水面部署",
-    "自定义部署"
+    "部署限制",
+    "水上放置",
+    "墙放置"
   ],
   "gameplay_tags": [
     "建造",
-    "装饰"
+    "种植",
+    "放置"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
     "source_bytes": 4723,
     "model": "hy3-free",
-    "generated_at_ms": 1787896562861
+    "generated_at_ms": 1787932275532
   }
 }

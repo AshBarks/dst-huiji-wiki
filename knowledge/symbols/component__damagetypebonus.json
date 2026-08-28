@@ -1,37 +1,37 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/damagetypebonus.lua"
   },
   "category": "component",
   "display_name": "damagetypebonus",
-  "summary": "该组件管理基于目标标签的伤害加成乘数数据，包括标签对应的来源修饰列表与动态回调函数。它参与战斗伤害计算，根据目标实体所带标签和注册函数返回对特定目标的伤害倍率。",
+  "summary": "该组件管理实体针对特定伤害类型标签的加成修正数据与动态回调函数。它参与战斗中的伤害计算流程，通过匹配目标标签和调用回调来提供伤害乘数修正。外部可添加或移除基于来源的加成项以及返回乘数的回调函数来动态调整伤害。",
   "api": [
     {
-      "name": "AddBonus(tag, src, pct, key)",
-      "effect": "为指定标签 tag 获取或创建 SourceModifierList，并调用其 SetModifier 方法设置来源 src 的百分比加成 pct 与键 key。副作用：可能修改 self.tags 表，新增或更新修饰列表。"
+      "name": "AddBonus",
+      "effect": "为指定标签(tag)下的来源(src)设置百分比加成(pct)，使用key标识。行为：若标签不存在则创建SourceModifierList并存入self.tags，然后调用其SetModifier方法。副作用：修改self.tags表，可能新建修饰符列表并添加或覆盖修饰符。"
     },
     {
-      "name": "RemoveBonus(tag, src, key)",
-      "effect": "若指定标签 tag 存在修饰列表，则调用 RemoveModifier 移除对应来源与键的修饰符；若列表为空则将该标签置 nil。副作用：可能修改 self.tags 表。"
+      "name": "RemoveBonus",
+      "effect": "移除指定标签(tag)下来源(src)与key对应的修饰符。行为：若标签存在则调用RemoveModifier，若列表空则置self.tags[tag]为nil。副作用：可能修改或清除self.tags中的对应项。"
     },
     {
-      "name": "AddBonusCallback(fn)",
-      "effect": "确保 self.bonuscallbacks 表存在，先移除同名函数再插入回调 fn 用于返回乘数。副作用：修改 self.bonuscallbacks 表。"
+      "name": "AddBonusCallback",
+      "effect": "添加返回乘数的回调函数(fn)。行为：初始化self.bonuscallbacks表（如需），先移除同名函数避免重复，再插入新函数。副作用：修改self.bonuscallbacks数组，增加回调。"
     },
     {
-      "name": "RemoveBonusCallback(fn)",
-      "effect": "若 self.bonuscallbacks 表存在，则从数组中移除指定的回调函数 fn。副作用：可能修改 self.bonuscallbacks 表。"
+      "name": "RemoveBonusCallback",
+      "effect": "从回调列表中移除指定函数(fn)。行为：若self.bonuscallbacks非空，从数组中删除该函数。副作用：修改self.bonuscallbacks数组。"
     },
     {
-      "name": "GetBonus(target)",
-      "effect": "若 target 非 nil，遍历 self.tags 对目标拥有的标签乘上修饰列表值，并遍历 bonuscallbacks 乘上回调返回值（nil 则计 1），返回最终乘数（默认 1）。无副作用，仅读取数据。"
+      "name": "GetBonus",
+      "effect": "计算对目标(target)的总伤害乘数。行为：若target为nil则返回1；否则遍历self.tags，若目标拥有该标签则乘上修饰符值，再遍历bonuscallbacks，乘上各回调返回值（nil视为1）并返回乘积。副作用：无。"
     },
     {
-      "name": "GetDebugString()",
-      "effect": "遍历 self.tags 生成包含标签名与对应修饰值的调试字符串返回。无副作用，仅读取数据。"
+      "name": "GetDebugString",
+      "effect": "生成调试字符串，列出所有标签及其当前修正值。行为：拼接self.tags中各项的字符串。副作用：无。"
     }
   ],
   "events_published": [],
@@ -40,22 +40,46 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13556,
-      15922,
-      19749,
-      20058,
       20150,
-      13409,
-      14940,
-      15225
+      13156,
+      10374,
+      10355,
+      13437,
+      10379,
+      20058,
+      13268
     ],
     "aspects": [
       {
-        "aspect": "位面伤害加成赋予描述",
+        "aspect": "角色与装备伤害类型加成及倍率描述",
         "evidence": [
           {
-            "pageid": 19749,
-            "quote": "虚空风帽会给予对应位面伤害加成效果"
+            "pageid": 13156,
+            "quote": "沃尔夫冈获得暗影亲和，受到来自暗影阵营的伤害降低至0.9"
+          },
+          {
+            "pageid": 10374,
+            "quote": "伯尼变为暗影阵营、获得位面实体抵抗并增加5点位面伤害"
+          },
+          {
+            "pageid": 10355,
+            "quote": "威尔逊获得暗影亲和，受到来自暗影阵营的伤害降低至0.9"
+          },
+          {
+            "pageid": 13437,
+            "quote": "沃尔特获得暗影亲和，受到来自暗影阵营的伤害降低至0.9"
+          },
+          {
+            "pageid": 13268,
+            "quote": "沃特获得月亮亲和，受到来自月亮阵营的伤害降低至0.9"
+          },
+          {
+            "pageid": 10379,
+            "quote": "温蒂的进攻端物理伤害倍率为0.75"
+          },
+          {
+            "pageid": 20058,
+            "quote": "部分盔甲所具有的阵营减伤，能减免物理伤害和位面伤害"
           }
         ]
       }
@@ -64,12 +88,11 @@
   },
   "search_terms": [
     "伤害加成",
-    "标签克制",
-    "对敌倍率",
-    "伤害类型",
-    "加成回调",
-    "目标标签",
-    "战斗系数"
+    "类型克制",
+    "标签伤害",
+    "伤害倍率",
+    "攻击增益",
+    "伤害修正"
   ],
   "gameplay_tags": [
     "战斗"
@@ -79,6 +102,6 @@
     "source_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
     "source_bytes": 1631,
     "model": "hy3-free",
-    "generated_at_ms": 1787897341878
+    "generated_at_ms": 1787933145761
   }
 }

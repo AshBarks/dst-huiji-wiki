@@ -1,49 +1,49 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/debuff.lua"
   },
   "category": "component",
   "display_name": "debuff",
-  "summary": "Debuff组件用于管理实体上单个减益效果实例，存储其名称、目标与附加、脱离、延长、改变符号等回调引用。它通过被debuffable组件调用来参与减益状态的附加、刷新与移除等核心玩法。",
+  "summary": "组件 Debuff 管理实体上的减益效果实例，存储效果名称、目标及各类回调函数引用。它参与核心玩法中状态效果的附加、持续延长、跟随目标部位与移除分离逻辑，通常与 debuffable 组件协同工作。",
   "api": [
     {
       "name": "SetAttachedFn",
-      "effect": "将传入的函数保存为附加回调self.onattachedfn，供AttachTo调用时执行。无立即副作用。"
+      "effect": "设置附加回调函数 onattachedfn 的引用，仅存储函数，无其它副作用。"
     },
     {
       "name": "SetDetachedFn",
-      "effect": "将传入的函数保存为脱离回调self.ondetachedfn，供OnDetach调用时执行。无立即副作用。"
+      "effect": "设置分离回调函数 ondetachedfn 的引用，仅存储函数，无其它副作用。"
     },
     {
       "name": "SetExtendedFn",
-      "effect": "将传入的函数保存为延长回调self.onextendedfn，供Extend调用时执行。无立即副作用。"
+      "effect": "设置延长回调函数 onextendedfn 的引用，仅存储函数，无其它副作用。"
     },
     {
       "name": "SetChangeFollowSymbolFn",
-      "effect": "将传入的函数保存为改变跟随符号回调self.onchangefollowsymbolfn，供ChangeFollowSymbol调用时执行。无立即副作用。"
+      "effect": "设置改变跟随符号回调函数 onchangefollowsymbolfn 的引用，仅存储函数，无其它副作用。"
     },
     {
       "name": "Stop",
-      "effect": "若当前存在目标实体self.target，则调用其RemoveDebuff方法并传入self.name，请求移除本减益。副作用是触发目标移除流程。"
+      "effect": "若当前已关联目标(self.target)，则调用目标的 RemoveDebuff 方法以自身 name 移除该 debuff，间接触发分离流程。"
     },
     {
       "name": "AttachTo",
-      "effect": "由debuffable组件调用。设置内部name与target字段，若已设置附加回调则调用之，传入本实体、目标、跟随符号、偏移及数据。副作用为建立关联并执行回调可能产生的效果。"
+      "effect": "由 debuffable 组件调用。设置 name 与 target 属性，若存在 onattachedfn 则调用之，传入 inst、target、followsymbol、followoffset、data、buffer，完成效果附加。"
     },
     {
       "name": "OnDetach",
-      "effect": "由debuffable组件调用。清除内部name与target引用，若已设置脱离回调则调用之，传入本实体与原目标。副作用为断开关联并执行回调。"
+      "effect": "由 debuffable 组件调用。暂存当前 target，清空 name 与 target 属性，若存在 ondetachedfn 则调用之，传入 inst 与原 target，解除关联并执行分离逻辑。"
     },
     {
       "name": "Extend",
-      "effect": "若已设置延长回调，则调用之并传入本实体、当前目标、跟随符号、偏移及数据，用于刷新或延长减益。副作用取决于回调实现。"
+      "effect": "若存在 onextendedfn 则调用，传入 inst、self.target、followsymbol、followoffset、data、buffer，用于刷新或延长效果（具体逻辑由回调定义）。"
     },
     {
       "name": "ChangeFollowSymbol",
-      "effect": "由debuffable组件调用。若已设置对应回调，则调用之并传入本实体、目标、新跟随符号及偏移，用于更新减益的挂载位置。副作用取决于回调。"
+      "effect": "由 debuffable 组件调用。若存在 onchangefollowsymbolfn 则调用，传入 inst、self.target、followsymbol、followoffset，用于更新效果跟随目标部位的符号。"
     }
   ],
   "events_published": [],
@@ -52,26 +52,28 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      20714,
       13156,
+      15587,
       18838,
       15539
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录仅提及“减益效果”一词（如沃尔夫冈弱小状态、鬼魂理智减益），未描述减益效果的附加、分离、扩展、改变跟随符号等具体行为或机制，未体现 component__debuff 组件的任何代码能力表达。",
+    "no_evidence_reason": "页面摘录仅出现“减益效果”名词描述（如沃尔夫冈弱小状态、鬼魂全局减益），未体现 debuff 组件的附加、脱离、延长、停止、改变跟随等具体能力或行为语义。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "减益效果",
-    "附加减益",
-    "移除减益",
-    "延长减益",
-    "跟随符号",
-    "脱离减益",
     "负面状态",
-    "状态回调"
+    "状态附加",
+    "状态移除",
+    "效果延长",
+    "跟随符号",
+    "目标实体",
+    "回调配置"
   ],
   "gameplay_tags": [
-    "战斗",
+    "减益",
     "生存"
   ],
   "related_symbols": [],
@@ -79,6 +81,6 @@
     "source_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
     "source_bytes": 1753,
     "model": "hy3-free",
-    "generated_at_ms": 1787897441631
+    "generated_at_ms": 1787933354078
   }
 }

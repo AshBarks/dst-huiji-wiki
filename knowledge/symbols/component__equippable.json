@@ -1,85 +1,85 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/equippable.lua"
   },
   "category": "component",
   "display_name": "equippable",
-  "summary": "该组件管理物品的可装备数据，包括装备槽位、行走速度加成、精神值影响、绝缘与潮湿等状态。它参与装备核心玩法，处理装备、卸下与放入口袋的回调，并支持标签限制装备和阻止卸下等规则。",
+  "summary": "该组件管理物品的可装备状态，包括装备槽位、装备与卸下回调、步行速度加成、装备限制标签及防卸下等数据。它参与角色的装备系统，影响精神值、绝缘、潮湿与移动速度等核心生存玩法。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "清除防止卸下状态并移除监听；若存在 inventoryitem 副本则重置行走速度乘数为1、装备限制标签为nil。"
+      "effect": "实体移除组件时调用。调用 SetPreventUnequipping(false) 取消防卸下监听；若 replica.inventoryitem 存在，将其 WalkSpeedMult 重置为1、EquipRestrictedTag 重置为 nil。"
     },
     {
       "name": "IsInsulated",
-      "effect": "返回 self.insulated 布尔值，表示是否绝缘（防电），无副作用。"
+      "effect": "返回 self.insulated 布尔值，表示是否绝缘（防电）。无副作用。"
     },
     {
       "name": "SetOnEquip",
-      "effect": "设置装备时回调 onequipfn，无副作用。"
+      "effect": "设置装备时回调 self.onequipfn = fn。无副作用。"
     },
     {
       "name": "SetOnPocket",
-      "effect": "设置放入口袋时回调 onpocketfn，无副作用。"
+      "effect": "设置放入口袋时回调 self.onpocketfn = fn。无副作用。"
     },
     {
       "name": "SetOnUnequip",
-      "effect": "设置卸下时回调 onunequipfn，无副作用。"
+      "effect": "设置卸下时回调 self.onunequipfn = fn。无副作用。"
     },
     {
       "name": "SetDappernessFn",
-      "effect": "设置精神值计算回调 dapperfn，无副作用。"
+      "effect": "设置精神值计算回调 self.dapperfn = fn。无副作用。"
     },
     {
       "name": "SetOnEquipToModel",
-      "effect": "设置装备到模型时的回调 onequiptomodelfn，无副作用。"
+      "effect": "设置装备到模型时回调 self.onequiptomodelfn = fn。无副作用。"
     },
     {
       "name": "IsEquipped",
-      "effect": "返回 self.isequipped 布尔值，表示当前是否已装备。"
+      "effect": "返回 self.isequipped 布尔值，表示当前是否已装备。无副作用。"
     },
     {
       "name": "Equip",
-      "effect": "标记 isequipped 为 true；若存在 burnable 组件则停止阴燃；调用 onequipfn 回调；推送 equipped 事件；若 onequiptomodelfn 存在且 owner 有 equipmentmodel 标签则调用该回调。"
+      "effect": "将 isequipped 设为 true；若实体有 burnable 组件则停止阴燃；调用 onequipfn 回调；推送 'equipped' 事件；若 onequiptomodelfn 存在且 owner 有 'equipmentmodel' 标签则调用该回调。副作用：修改装备状态、可能停止燃烧、触发回调与事件。"
     },
     {
       "name": "ToPocket",
-      "effect": "若设置了 onpocketfn 则调用，传入 inst 与 owner。"
+      "effect": "若 onpocketfn 存在则调用之。副作用：可能执行用户回调。"
     },
     {
       "name": "Unequip",
-      "effect": "标记 isequipped 为 false；调用 onunequipfn 回调；推送 unequipped 事件。"
+      "effect": "将 isequipped 设为 false；调用 onunequipfn 回调；推送 'unequipped' 事件。副作用：修改状态、触发回调与事件。"
     },
     {
       "name": "GetWalkSpeedMult",
-      "effect": "计算并返回装备行走速度乘数，考虑基础值、owner 的 vigorbuff 标签加成及 owner 的自定义修正函数，无副作用。"
+      "effect": "计算并返回步行速度乘子：基础为 self.walkspeedmult 或1；若 owner 有 'vigorbuff' 标签且速度<1则加速0.25（最大1）；若 owner 有 inventory_EquippableWalkSpeedMultModifier 函数则应用之。无副作用。"
     },
     {
       "name": "IsRestricted",
-      "effect": "判断目标是否受限无法装备：非玩家类直接 false；检查 linkeditem 限制；检查 restrictedtag 标签限制。返回布尔，无副作用。"
+      "effect": "检查目标 target 是否受限：非玩家/possessedbody 返回 false；若 linkeditem 限制且用户ID不匹配返回 true；若 restrictedtag 非空且 target 无该标签返回 true。无副作用。"
     },
     {
       "name": "IsRestricted_FromLoad",
-      "effect": "在加载存档时判断目标是否受限，考虑技能树标签例外后调用 IsRestricted，返回布尔，无副作用。"
+      "effect": "从存档加载时检查限制，先处理技能树标签例外，再调用 IsRestricted。无副作用。"
     },
     {
       "name": "ShouldPreventUnequipping",
-      "effect": "返回 preventunequipping 是否为 true。"
+      "effect": "返回 self.preventunequipping == true。无副作用。"
     },
     {
       "name": "SetPreventUnequipping",
-      "effect": "根据参数添加或移除 onremove 事件监听以在实体移除时清理，并设置 preventunequipping 状态。"
+      "effect": "若 shouldprevent 为真且当前未设置，则监听 'onremove' 事件并设置 preventunequipping=true；若为假且已设置，则移除监听并置 nil。副作用：修改状态并增删事件监听。"
     },
     {
       "name": "GetDapperness",
-      "effect": "计算并返回精神值影响，考虑基础值、merm 反转、回调覆盖及潮湿惩罚（除非忽略），无副作用。"
+      "effect": "计算精神值影响：基础 self.dapperness；若 flipdapperonmerms 且 owner 为 merm 则取反；若 dapperfn 存在则覆盖；若未忽略潮湿且物品潮湿则加 TUNING.WET_ITEM_DAPPERNESS。返回数值。无副作用。"
     },
     {
       "name": "GetEquippedMoisture",
-      "effect": "返回包含 equippedmoisture 与 maxequippedmoisture 的表，无副作用。"
+      "effect": "返回包含 moisture 和 max 字段的表，对应 self.equippedmoisture 与 self.maxequippedmoisture。无副作用。"
     }
   ],
   "events_published": [
@@ -90,7 +90,9 @@
     "onremove"
   ],
   "netvars": [],
-  "tunables": [],
+  "tunables": [
+    "TUNING.WET_ITEM_DAPPERNESS"
+  ],
   "wiki": {
     "scanned_pageids": [
       20700,
@@ -104,63 +106,63 @@
     ],
     "aspects": [
       {
-        "aspect": "物品栏携带潮湿状态描述",
+        "aspect": "装备潮湿速率描述",
         "evidence": [
           {
-            "pageid": 70462,
-            "quote": "携带干燥剂时，若玩家潮湿度不为0，玩家携带的干燥剂会有一个“滴水”动画"
+            "pageid": 16598,
+            "quote": "提供每秒 1 潮湿度装备潮湿速率"
           },
           {
-            "pageid": 20704,
-            "quote": "一个物品是否潮湿能通过它在物品栏里是否有蓝色的边框看出来。"
+            "pageid": 20700,
+            "quote": "装备潮湿速率"
           }
         ]
       },
       {
-        "aspect": "绝缘状态影响伤害描述",
-        "evidence": [
-          {
-            "pageid": 20150,
-            "quote": "根据目标潮湿度和绝缘状态造成额外伤害"
-          }
-        ]
-      },
-      {
-        "aspect": "装备理智增减数值标注",
+        "aspect": "装备理智增减描述",
         "evidence": [
           {
             "pageid": 20704,
-            "quote": "佩戴潮湿装备带来的理智减益：-6点/分钟。"
+            "quote": "佩戴潮湿装备带来的理智减益：-6 点/分钟。"
           },
           {
             "pageid": 16598,
-            "quote": "承受50潮湿度带来的高额理智值损耗"
+            "quote": "承受 50 潮湿度带来的高额理智值损耗"
           }
         ]
       },
       {
-        "aspect": "装备穿戴防潮与潮湿速率描述",
+        "aspect": "装备穿戴行为描述",
+        "evidence": [
+          {
+            "pageid": 16598,
+            "quote": "冰帽装备时会提供 40 度的冷源"
+          },
+          {
+            "pageid": 20700,
+            "quote": "防水装备在穿戴时"
+          }
+        ]
+      },
+      {
+        "aspect": "装备防潮湿卸下描述",
+        "evidence": [
+          {
+            "pageid": 13268,
+            "quote": "其手部装备也不会因潮湿滑落"
+          }
+        ]
+      },
+      {
+        "aspect": "防水绝缘装备效果描述",
         "evidence": [
           {
             "pageid": 20700,
             "quote": "防水装备在穿戴时能为玩家提供防水效果。"
           },
           {
-            "pageid": 16598,
-            "quote": "若装备者为角色且潮湿度低于50，则提供每秒1潮湿度"
-          }
-        ]
-      },
-      {
-        "aspect": "装备防滑落与防缴械描述",
-        "evidence": [
-          {
-            "pageid": 13268,
-            "quote": "其手部装备也不会因潮湿滑落。麋鹿鹅的缴械技能和熊獾的普通攻击也不会使沃"
-          },
-          {
-            "pageid": 20704,
-            "quote": "以降低潮湿使工具或武器滑落的概率。"
+            "pageid": 20150,
+            "quote": "根据目标潮湿度和绝缘状态造成额外伤害"
           }
         ]
       }
@@ -193,13 +195,12 @@
     "装备槽",
     "穿戴",
     "卸下",
-    "行走速度",
-    "精神值",
+    "步行速度",
+    "限制标签",
     "绝缘",
+    "精神值",
     "潮湿",
-    "限制装备",
-    "防卸下",
-    "装备模型"
+    "防卸下"
   ],
   "gameplay_tags": [
     "生存",
@@ -210,6 +211,6 @@
     "source_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
     "source_bytes": 6262,
     "model": "hy3-free",
-    "generated_at_ms": 1787895734890
+    "generated_at_ms": 1787931240486
   }
 }

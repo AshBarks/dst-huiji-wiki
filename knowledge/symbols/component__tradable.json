@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/tradable.lua"
   },
   "category": "component",
   "display_name": "tradable",
-  "summary": "该组件管理实体的金币价值（goldvalue）数据，在初始化时将其设为0，并保存了所属实体的引用。作为名为 Tradable 的组件，它用于标记实体具有可交易属性，但源码中未实现任何对外方法，仅作为基础数据容器。",
+  "summary": "该组件管理实体的黄金价值（goldvalue）等交易相关数据，并预留了交易物与岩石祭品等字段。它参与游戏中物品交易的核心玩法，用于标识实体是否可交易及其价值。",
   "api": [],
   "api_note": "纯数据组件,无公开方法",
   "events_published": [],
@@ -25,9 +25,61 @@
       20681,
       22144
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的组件能力清单为空，未指定待检索能力，页面虽提及交易但无法对应具体能力条目，故返回空",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "交易价值与回报标注",
+        "evidence": [
+          {
+            "pageid": 18359,
+            "quote": "给予[[猪王]]能换来 4 个[[金块]]。"
+          },
+          {
+            "pageid": 20681,
+            "quote": "给予[[猪王]]能换来 8 个[[金块]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "交易对象与限制描述",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "在夜晚它会睡觉而无法进行交易"
+          },
+          {
+            "pageid": 20678,
+            "quote": "空瓶子可以在[[寄居蟹隐士]]处交易物品"
+          }
+        ]
+      },
+      {
+        "aspect": "交易物解锁条件",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "第 1 次解锁可交易物"
+          },
+          {
+            "pageid": 20678,
+            "quote": "每一样交易配方都需要达到特定的好感度才能解锁"
+          }
+        ]
+      },
+      {
+        "aspect": "可交易状态说明",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "可以用[[可交易]]且交易价值大于 0 的物品与它进行交易"
+          },
+          {
+            "pageid": 18359,
+            "quote": "熔化的弹珠能作为交易物品使用："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -43,13 +95,13 @@
     "note": "仅 goldvalue>0 时显示交易价值。"
   },
   "search_terms": [
-    "金币价值",
+    "黄金价值",
     "可交易",
     "交易物",
+    "岩石祭品",
     "换金子",
-    "易物",
-    "物品价值",
-    "交易属性"
+    "买卖",
+    "易物"
   ],
   "gameplay_tags": [
     "交易"
@@ -59,6 +111,6 @@
     "source_sha256": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
     "source_bytes": 185,
     "model": "hy3-free",
-    "generated_at_ms": 1787895646283
+    "generated_at_ms": 1787931195724
   }
 }

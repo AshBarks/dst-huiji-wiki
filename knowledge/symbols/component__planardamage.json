@@ -1,53 +1,53 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/planardamage.lua"
   },
   "category": "component",
   "display_name": "planardamage",
-  "summary": "该组件管理实体的平面伤害（PlanarDamage）基础值、外部倍率与加性加成数据。它参与战斗伤害计算流程，将基础伤害乘以倍率并加上额外加成得出最终伤害值，供其他系统查询。",
+  "summary": "该组件管理实体的位面伤害计算，存储基础伤害值并维护外部乘性修正与加性加成列表。它参与战斗系统中的伤害结算，提供独立于常规伤害的额外伤害层。",
   "api": [
     {
       "name": "SetBaseDamage",
-      "effect": "设置组件内部基础伤害值 self.basedamage 为传入的 damage。仅修改内部状态，无其它副作用。"
+      "effect": "将组件内部的基础伤害值设置为传入参数，仅修改自身状态，无其它副作用。"
     },
     {
       "name": "GetBaseDamage",
-      "effect": "返回当前 self.basedamage 基础伤害值。无副作用。"
+      "effect": "返回当前存储的基础伤害值，无副作用。"
     },
     {
       "name": "GetDamage",
-      "effect": "计算并返回最终伤害：self.basedamage 乘以外部倍率列表乘积再加上外部加成列表之和。无副作用。"
+      "effect": "计算并返回最终伤害值，公式为基于基础伤害乘以外部乘性列表结果再加上外部加性列表结果，无副作用。"
     },
     {
       "name": "AddMultiplier",
-      "effect": "在外部倍率 SourceModifierList 中为来源 src 设置修改器，值为 mult，键为 key。影响后续 GetDamage 与 GetMultiplier 的返回值。"
+      "effect": "为外部乘性修正列表添加来源、数值与键标识的修改器，副作用是改变后续伤害计算中的乘性因子。"
     },
     {
       "name": "RemoveMultiplier",
-      "effect": "从外部倍率 SourceModifierList 中移除来源 src 且键为 key 的修改器。影响后续伤害计算相关返回值。"
+      "effect": "从外部乘性修正列表移除指定来源与键的修改器，副作用是改变后续伤害计算中的乘性因子。"
     },
     {
       "name": "GetMultiplier",
-      "effect": "返回外部倍率列表的当前乘积结果。无副作用。"
+      "effect": "返回外部乘性修正列表的当前合算值，无副作用。"
     },
     {
       "name": "AddBonus",
-      "effect": "在外部加成（加性）SourceModifierList 中为来源 src 设置修改器，值为 bonus，键为 key。影响后续 GetDamage 与 GetBonus 的返回值。"
+      "effect": "为外部加性加成列表添加来源、数值与键标识的修改器，副作用是改变后续伤害计算中的加性部分。"
     },
     {
       "name": "RemoveBonus",
-      "effect": "从外部加成 SourceModifierList 中移除来源 src 且键为 key 的修改器。影响后续伤害计算相关返回值。"
+      "effect": "从外部加性加成列表移除指定来源与键的修改器，副作用是改变后续伤害计算中的加性部分。"
     },
     {
       "name": "GetBonus",
-      "effect": "返回外部加成列表的当前和。无副作用。"
+      "effect": "返回外部加性加成列表的当前合算值，无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回格式化字符串，展示最终伤害、基础伤害、倍率与加成的调试信息。无副作用。"
+      "effect": "返回展示当前伤害分解信息的格式化调试字符串，无副作用。"
     }
   ],
   "events_published": [],
@@ -59,24 +59,62 @@
       20150,
       20058,
       13156,
+      15539,
+      72238,
       10374,
       10379,
-      10355,
-      13437,
       13556
     ],
     "aspects": [
       {
-        "aspect": "位面伤害加成描述",
+        "aspect": "位面伤害倍率描述",
         "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "进攻端位面伤害倍率"
+          },
+          {
+            "pageid": 72238,
+            "quote": "位面伤害变为 0.5"
+          }
+        ]
+      },
+      {
+        "aspect": "位面伤害加成数值标注",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "进攻端位面伤害增加"
+          },
+          {
+            "pageid": 13156,
+            "quote": "造成的位面伤害+5"
+          },
           {
             "pageid": 10374,
             "quote": "增加 5 点位面伤害"
+          },
+          {
+            "pageid": 10379,
+            "quote": "获得 25 位面伤害"
+          },
+          {
+            "pageid": 13556,
+            "quote": "增加 100 点位面伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "位面伤害基础值公式描述",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "基础伤害 × 进攻端位面伤害倍率"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -93,13 +131,12 @@
     "note": "导出键为裸 planardamage = planardamage.basedamage;同一键既是生物位面伤害也是装备位面伤害(模块注释)。装备/位面伤害仅在同时有 equippable_equipslot 时显示。"
   },
   "search_terms": [
-    "基础伤害",
-    "伤害倍率",
+    "位面伤害",
     "伤害加成",
-    "额外伤害",
-    "平面伤害",
+    "伤害倍率",
+    "基础伤害",
     "最终伤害",
-    "伤害计算"
+    "额外加伤"
   ],
   "gameplay_tags": [
     "战斗"
@@ -109,6 +146,6 @@
     "source_sha256": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
     "source_bytes": 1609,
     "model": "hy3-free",
-    "generated_at_ms": 1787859814107
+    "generated_at_ms": 1787932252200
   }
 }

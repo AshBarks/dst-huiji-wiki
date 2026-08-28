@@ -1,49 +1,49 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/dryable.lua"
   },
   "category": "component",
   "display_name": "dryable",
-  "summary": "该组件用于标记实体可被干燥处理，并存储干燥后的产品、所需干燥时间以及相关的动画构建文件。它参与游戏的干燥与风干玩法，使生食或材料能通过干燥架等结构转化为耐久保存的干品。",
+  "summary": "该组件用于标记实体具有可干燥特性，并管理干燥后产物、干燥所需时间及对应的动画构建文件等数据。它参与游戏的晾晒与食物干燥保存玩法，使实体能够被干燥处理并转化为指定产品。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "从实体移除 'dryable' 标签（调用 inst:RemoveTag(\"dryable\")），副作用：实体失去该标签，可能不再被干燥系统识别。"
-    },
-    {
       "name": "SetProduct",
-      "effect": "将参数 product 赋值给内部字段 self.product，副作用：更新干燥后产出的产品标识。"
+      "effect": "设置干燥后产物的 prefab 名称（self.product），无返回值。"
     },
     {
       "name": "GetProduct",
-      "effect": "返回 self.product 的当前值，无副作用。"
+      "effect": "返回当前设置的干燥后产物（self.product）。"
     },
     {
       "name": "SetDryTime",
-      "effect": "将参数 time 赋值给 self.drytime，副作用：更新完成干燥所需的时间。"
+      "effect": "设置干燥所需时间（self.drytime），无返回值。"
     },
     {
       "name": "GetDryTime",
-      "effect": "返回 self.drytime 的当前值，无副作用。"
+      "effect": "返回当前设置的干燥所需时间（self.drytime）。"
     },
     {
       "name": "SetBuildFile",
-      "effect": "将参数 buildfile 赋值给 self.buildfile，副作用：更新基础动画构建文件名。"
+      "effect": "设置干燥相关动画构建文件名称（self.buildfile），无返回值。"
     },
     {
       "name": "GetBuildFile",
-      "effect": "返回 self.buildfile 的当前值，无副作用。"
+      "effect": "返回当前设置的动画构建文件（self.buildfile）。"
     },
     {
       "name": "SetDriedBuildFile",
-      "effect": "将参数 dried_buildfile 赋值给 self.dried_buildfile，副作用：更新干燥后使用的动画构建文件。"
+      "effect": "设置干燥完成后专用的动画构建文件（self.dried_buildfile），无返回值。"
     },
     {
       "name": "GetDriedBuildFile",
-      "effect": "返回 self.dried_buildfile，若其为 nil 则返回 self.buildfile，无副作用。"
+      "effect": "返回干燥完成后的动画构建文件；若未单独设置则返回普通构建文件（self.buildfile 或 nil）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用，移除实体的 \"dryable\" 标签。"
     }
   ],
   "events_published": [],
@@ -52,28 +52,28 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      70347,
-      24170,
-      24540,
       14484,
       17948,
       18077,
       18179,
-      20538
+      20538,
+      18031,
+      16643,
+      16638
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录中，仅页面70347提及晾肉巨架风干肉类/植物行为，但未体现dryable组件具体能力（如产品设置获取、风干时间、build文件等）；页面20538虽列怪物肉干但未说明风干产物或时间；其余页面讨论烹饪、杂草等无关内容。故无能力表达证据。",
+    "no_evidence_reason": "提供的页面摘录主要描述实体的烹饪属性、掉落、生长时间或兑换用途，未出现任何关于干燥时间、干燥产品、建造文件、干燥后建造文件或移除实体时行为的数值或描述，尽管部分实体名含'dried'或'干'但文本无对应组件能力表达。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "可干燥",
-    "晒干品",
+    "晒干",
+    "晾制",
     "干燥时间",
-    "风干",
-    "晾晒物",
-    "干后外观",
-    "干燥贴图",
-    "生变干"
+    "干燥产物",
+    "干制文件",
+    "晾晒标签",
+    "干燥动画"
   ],
   "gameplay_tags": [
     "生存"
@@ -83,6 +83,6 @@
     "source_sha256": "91f6430ae20b9466cf0c3a688f5be2923bef4d18c31423922ca650ed40ef24a2",
     "source_bytes": 911,
     "model": "hy3-free",
-    "generated_at_ms": 1787897169111
+    "generated_at_ms": 1787932972824
   }
 }

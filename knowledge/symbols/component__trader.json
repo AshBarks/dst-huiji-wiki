@@ -1,69 +1,69 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/trader.lua"
   },
   "category": "component",
   "display_name": "trader",
-  "summary": "该组件管理实体作为交易者的启用状态、接受物品规则及各类回调。它参与游戏中的礼物给予与交易核心玩法，处理实体能否及是否愿意接受物品，并在接受或拒绝时触发相应逻辑与事件。",
+  "summary": "组件管理交易者实体能否接受物品、是否启用交易、是否接受非可交易物与堆叠等状态，并提供接受礼物时的回调与测试函数。它参与玩家与实体间的给予/交易玩法，处理物品转移、消耗及拒绝逻辑，并发布交易事件。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "从实体移除 'trader' 和 'alltrader' 标签，无其它副作用。"
+      "effect": "当组件从实体移除时调用，移除实体的 'trader' 和 'alltrader' 标签。"
     },
     {
       "name": "IsTryingToTradeWithMe",
-      "effect": "检查传入 inst 的当前缓冲动作或远程交互是否为以本实体为目标的 GIVE/GIVEALLTOPLAYER/GIVETOPLAYER 动作，返回布尔值，无副作用。"
+      "effect": "检查给定实体是否正试图与当前实体交易（通过缓冲动作或远程交互判断目标与动作类型），返回布尔值，无副作用。"
     },
     {
       "name": "IsAcceptingStacks",
-      "effect": "返回 self.acceptstacks 的值（是否为 true），无副作用。"
+      "effect": "返回当前是否允许接受堆叠物品（self.acceptstacks），无副作用。"
     },
     {
       "name": "Enable",
-      "effect": "设置 self.enabled = true，触发属性回调为实体添加 'trader' 标签，若 acceptnontradable 为真则添加 'alltrader' 标签。"
+      "effect": "设置 enabled 为 true，触发标签更新，为实体添加 'trader' 标签，若 acceptnontradable 为真则添加 'alltrader' 标签。"
     },
     {
       "name": "Disable",
-      "effect": "设置 self.enabled = false，触发属性回调移除实体的 'trader' 标签，若 acceptnontradable 为真则移除 'alltrader' 标签。"
+      "effect": "设置 enabled 为 false，触发标签更新，移除实体的 'trader' 和 'alltrader' 标签。"
     },
     {
       "name": "SetAcceptTest",
-      "effect": "设置 self.test 为给定函数，用于 WantsToAccept 中的欲望测试，仅存储回调无其它副作用。"
+      "effect": "设置物品欲望测试函数 self.test，用于 WantsToAccept 判断，无立即副作用。"
     },
     {
       "name": "SetAbleToAcceptTest",
-      "effect": "设置 self.abletoaccepttest 为给定函数，用于覆盖 AbleToAccept 的物理能力测试，仅存储回调无其它副作用。"
+      "effect": "设置物理接受覆盖测试函数 self.abletoaccepttest，用于 AbleToAccept 自定义判定，无立即副作用。"
     },
     {
       "name": "SetOnAccept",
-      "effect": "设置 self.onaccept 回调，在成功接受礼物时调用，仅存储回调无其它副作用。"
+      "effect": "设置接受礼物时的回调函数 self.onaccept，无立即副作用。"
     },
     {
       "name": "SetOnRefuse",
-      "effect": "设置 self.onrefuse 回调，在拒绝礼物时调用，仅存储回调无其它副作用。"
+      "effect": "设置拒绝礼物时的回调函数 self.onrefuse，无立即副作用。"
     },
     {
       "name": "SetAcceptStacks",
-      "effect": "设置 self.acceptstacks = true，表示实体接受堆叠物品，修改状态无其它副作用。"
+      "effect": "设置 self.acceptstacks 为 true，允许该交易者接受堆叠物品，无立即副作用。"
     },
     {
       "name": "AbleToAccept",
-      "effect": "检查实体物理上能否接受物品，依据 enabled、item 是否存在、acceptsmimics、abletoaccepttest、死亡、睡眠、busy 等状态返回 true 或 false 及原因字符串（如 'DEAD','SLEEPING','BUSY','ITEMMIMIC'），无状态修改副作用。"
+      "effect": "判断实体物理上能否接受物品（检查启用、物品存在、非物品模仿、自定义测试、死亡、睡眠、忙碌等），返回布尔值及原因字符串，无副作用。"
     },
     {
       "name": "WantsToAccept",
-      "effect": "检查实体是否想要接受物品，基于 enabled 及 self.test 回调（若有）返回布尔值，无副作用。"
+      "effect": "判断实体是否想要接受物品（检查启用及自定义欲望测试），返回布尔值，无副作用。"
     },
     {
       "name": "AcceptGift",
-      "effect": "尝试接受礼物：若 AbleToAccept 否返回 false；若 WantsToAccept 真则处理物品（从原所有者移除或拆分堆叠，根据 deleteitemonaccept 删除或存入实体库存），调用 onaccept 回调，推送 'trade' 事件并返回 true；若不想接受则调用 onrefuse 回调并返回 false。副作用包括可能改变物品归属或销毁物品、调用回调、推送事件。"
+      "effect": "若 AbleToAccept 和 WantsToAccept 均通过，则处理物品（从给予者移除或拆分堆叠，根据 deleteitemonaccept 删除或存入库存），调用 onaccept 回调并推送 'trade' 事件；否则调用 onrefuse 并返回 false。副作用：可能消耗或转移物品，触发回调与事件。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回表示 enabled 状态的字符串 'true' 或 'false'，无副作用。"
+      "effect": "返回表示启用状态的字符串，无副作用。"
     }
   ],
   "events_published": [
@@ -74,45 +74,18 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15238,
-      15601,
-      13606,
-      51046,
-      15239,
-      15427,
+      18359,
       18521,
-      21432
+      13493,
+      46887,
+      13457,
+      21432,
+      33819,
+      18510
     ],
-    "aspects": [
-      {
-        "aspect": "交易回馈物品说明",
-        "evidence": [
-          {
-            "pageid": 18521,
-            "quote": "获得交易价值数量的[[金块]]"
-          }
-        ]
-      },
-      {
-        "aspect": "交易物品接受条件标注",
-        "evidence": [
-          {
-            "pageid": 18521,
-            "quote": "用[[可交易]]且交易价值大于 0 的物品与它进行交易"
-          }
-        ]
-      },
-      {
-        "aspect": "交易禁用时段描述",
-        "evidence": [
-          {
-            "pageid": 18521,
-            "quote": "在夜晚它会睡觉而无法进行交易。"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "well_documented"
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均为游戏内实体或物品的玩家向交易行为描述（如猪王昼夜交易限制、流浪商人存货机制等），未出现 trader 组件（component__trader）的任何代码能力或行为语义（如 OnRemoveFromEntity、IsTryingToTradeWithMe、Enable、Disable 等）的表达，也未提及组件本身，因此页面不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -126,14 +99,15 @@
     "note": "存在性键。"
   },
   "search_terms": [
-    "交易对象",
-    "接受礼物",
-    "拒绝交易",
-    "能否接受",
-    "堆叠交易",
-    "交易标签",
-    "给予动作",
-    "交易事件"
+    "交易",
+    "给予物",
+    "收礼物",
+    "拒收",
+    "可交易",
+    "全交易",
+    "堆叠收",
+    "睡眠中",
+    "忙碌中"
   ],
   "gameplay_tags": [
     "交易",
@@ -144,6 +118,6 @@
     "source_sha256": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
     "source_bytes": 4814,
     "model": "hy3-free",
-    "generated_at_ms": 1787896284551
+    "generated_at_ms": 1787931990372
   }
 }

@@ -1,77 +1,77 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/floater.lua"
   },
   "category": "component",
   "display_name": "floater",
-  "summary": "Floater 组件管理实体在水面漂浮时的状态数据，包括尺寸、偏移、缩放、动画替换配置及前后特效引用。核心玩法为当物品落入海洋非陆地时，通过主客同步显示漂浮特效与动画，施加潮湿与温度惩罚，并在离开水面时清理恢复。",
+  "summary": "该组件管理实体在水面漂浮时的状态与表现数据，包括特效缩放、偏移及动画替换配置。它参与物体落入海洋后的潮湿温度惩罚、水花生成及前后泡沫特效显示与侵蚀等核心玩法。",
   "api": [
     {
       "name": "SetIsObstacle",
-      "effect": "设置 self.is_obstable 字段（默认 true，传 false 则否），用于 ShouldShowEffect 判断海洋点是否作为障碍物，无其它副作用。"
+      "effect": "设置 self.is_obstable 标记（bool 参数非 false 即为真），影响后续 ShouldShowEffect 对海洋点是否作为障碍物的判断。"
     },
     {
       "name": "SetSize",
-      "effect": "设置 self.size 字段（如 small/med/large），决定后续客户端生成漂浮特效的动画名后缀，不立即更新已存在特效。"
+      "effect": "设置 self.size 字符串（如 small/med/large），决定客户端漂浮特效动画后缀。"
     },
     {
       "name": "SetVerticalOffset",
-      "effect": "设置 self.vert_offset；若偏移非 nil 且已存在 front_fx/back_fx，立即将其 Transform 的 Y 位置设为该值。"
+      "effect": "设置 self.vert_offset 数值；若偏移非 nil 且已存在 front_fx/back_fx，立即更新其位置。"
     },
     {
       "name": "SetScale",
-      "effect": "接受数字或表，设置 x/y/zscale 字段；若已存在 front_fx/back_fx，立即调用其 Transform:SetScale 更新缩放。"
+      "effect": "设置 x/y/z 缩放（支持数字或表）；若已存在特效则立即更新其 Transform 缩放。"
     },
     {
       "name": "SetBankSwapOnFloat",
-      "effect": "设置 do_bank_swap、float_index（默认1）、swap_data 字段，影响后续 SwitchToFloatAnim 与 SwitchToDefaultAnim 的动画替换行为。"
+      "effect": "设置 do_bank_swap 开关、float_index（默认1）及 swap_data 表，控制漂浮时动画银行替换行为。"
     },
     {
       "name": "SetSwapData",
-      "effect": "直接设置 self.swap_data 字段，供漂浮/默认动画的符号覆盖使用。"
+      "effect": "更新 self.swap_data 表，供动画与符号覆盖使用。"
     },
     {
       "name": "ShouldShowEffect",
-      "effect": "返回布尔值：根据实体世界坐标判断地图是否为海洋点且非视觉地面（考虑 is_obstable），无副作用。"
+      "effect": "返回实体世界坐标是否为海洋点且非视觉地面（考虑 is_obstable），无副作用。"
     },
     {
       "name": "AttachEffect",
-      "effect": "将传入特效实体父化到本实体（若 should_parent_effect）或设世界坐标，并应用当前缩放；副作用为修改传入实体的父级、位置与缩放。"
+      "effect": "将传入特效实体设为自身子节点或按世界坐标定位，并应用 vert_offset 与缩放；修改传入实体变换。"
     },
     {
       "name": "IsFloating",
-      "effect": "返回 self.showing_effect 布尔值，表示当前是否处于显示漂浮效果状态，无副作用。"
+      "effect": "返回 self.showing_effect 布尔值，表示是否正在显示漂浮特效。"
     },
     {
       "name": "SwitchToFloatAnim",
-      "effect": "若 do_bank_swap 为真，将本实体 AnimState 换 bank 为 floating_item 并播放左右动画、设帧暂停，若有 swap_data 则覆盖 swap_spear 符号；无网络或事件副作用。"
+      "effect": "若 do_bank_swap 为真，切换 AnimState 到 floating_item 银行并播放左/右动画、设定帧并暂停，按 swap_data 覆盖 swap_spear 符号。"
     },
     {
       "name": "OnLandedServer",
-      "effect": "主模拟端：若未显示效果且应显示，则对 inventoryitem 施加湿度与温度惩罚（可能生成 hot_splash/splash 水花），推送 floater_startfloating 事件，设网络变量 _is_landed 为 true，showing_effect 置真，并切换漂浮动画。副作用包括改物品属性、生成实体、推事件、改网络变量。"
+      "effect": "服务器落地处理：若应显示特效，给 inventoryitem 加潮湿与温度惩罚（非持有且无鸭背标签），生成水花 prefab，推送 floater_startfloating，设 _is_landed 为 true 并切换漂浮动画。"
     },
     {
       "name": "OnLandedClient",
-      "effect": "客户端：置 showing_effect 为真，生成 float_fx_front/back 特效并播放对应尺寸循环动画，设置 AnimState 浮动参数。副作用为生成特效实体与改动画参数。"
+      "effect": "客户端落地脏信号处理：生成 front_fx/back_fx 漂浮特效并附加，播放对应尺寸 idle 动画，设置 AnimState 浮动参数。"
     },
     {
       "name": "SwitchToDefaultAnim",
-      "effect": "若 do_bank_swap 或 force_switch 为真，将 AnimState 恢复为 swap_data 或 prefab 的 bank/anim，清除符号覆盖；无网络副作用。"
+      "effect": "若 do_bank_swap 或 force_switch 为真，恢复默认 bank/anim（来自 swap_data 或 prefab）并清除符号覆盖。"
     },
     {
       "name": "Erode",
-      "effect": "主模拟且 showing_effect 时，设置网络变量 _erode_time 为传入值，触发客户端腐蚀消失特效。副作用为改网络变量。"
+      "effect": "若为主模拟且正在漂浮，设置 _erode_time 网络变量以触发客户端特效侵蚀。"
     },
     {
       "name": "OnNoLongerLandedServer",
-      "effect": "主模拟：若 showing_effect 为真，推送 floater_stopfloating 事件，设 _is_landed 为 false，showing_effect 置假，恢复默认动画。副作用为推事件、改网络变量与状态。"
+      "effect": "服务器离地处理：若漂浮中，推送 floater_stopfloating，设 _is_landed 为 false 并恢复默认动画。"
     },
     {
       "name": "OnNoLongerLandedClient",
-      "effect": "客户端：置 showing_effect 为假，重置 AnimState 浮动参数，移除并清空 front_fx/back_fx 特效实体。副作用为移除实体与重置参数。"
+      "effect": "客户端离地脏信号处理：清除漂浮状态，重置浮动参数，移除 front_fx/back_fx 特效实体。"
     }
   ],
   "events_published": [
@@ -86,27 +86,27 @@
     "erodetimedirty"
   ],
   "netvars": [
-    "floater._is_landed",
-    "floater._erode_time"
+    "_is_landed",
+    "_erode_time"
   ],
   "tunables": [
-    "OCEAN_WETNESS",
-    "OCEAN_TEMPERATURE_PENALTY_PERCENT",
-    "FLOATER_HOT_SIZZLE_THRESHOLD"
+    "TUNING.OCEAN_WETNESS",
+    "TUNING.OCEAN_TEMPERATURE_PENALTY_PERCENT",
+    "TUNING.FLOATER_HOT_SIZZLE_THRESHOLD"
   ],
   "wiki": {
     "scanned_pageids": [
-      14485,
       15832,
       13606,
       14484,
       15551,
       13698,
       14099,
-      52631
+      52631,
+      16633
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录涉及浇水壶、双子魔眼、帝王蟹冰墙（仅提及浮冰地块生成消失而无漂浮属性描述）、杂草、蜂王、邪天翁、暗影秘典、雪球，均未包含 floater 组件相关能力如漂浮、大小、偏移、动画切换、着陆、侵蚀等的玩家语言表达。",
+    "no_evidence_reason": "提供的页面摘录中，无任意文本体现floater组件的SetIsObstacle、SetSize、SetVerticalOffset、SetScale、SetBankSwapOnFloat、SetSwapData、ShouldShowEffect、AttachEffect、IsFloating、SwitchToFloatAnim、OnLandedServer、OnLandedClient、SwitchToDefaultAnim、Erode、OnNoLongerLandedServer、OnNoLongerLandedClient等能力或行为，正文缺少手写数值与描述，故判断页面不讨论该符号能力。",
     "coverage_status": "no_wiki_mention"
   },
   "auto_maintained": {
@@ -123,24 +123,23 @@
   },
   "search_terms": [
     "水面漂浮",
-    "物品浮起",
-    "水花特效",
-    "潮湿物品",
-    "漂浮动画",
-    "浮标特效",
-    "海上湿透",
-    "浮物表现"
+    "泡沫特效",
+    "物品受潮",
+    "水花飞溅",
+    "漂浮姿态",
+    "侵蚀消失",
+    "海洋障碍",
+    "入水动画"
   ],
   "gameplay_tags": [
-    "海洋",
     "生存",
-    "漂浮"
+    "装饰"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
     "source_bytes": 8274,
     "model": "hy3-free",
-    "generated_at_ms": 1787895114758
+    "generated_at_ms": 1787930533652
   }
 }

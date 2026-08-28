@@ -1,45 +1,47 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p3",
+  "prompt_rev": "p4",
   "reference": {
     "kind": "component",
     "path": "components/entitytracker.lua"
   },
   "category": "component",
   "display_name": "entitytracker",
-  "summary": "该组件管理实体对其他具名实体的追踪引用，内部维护名称到实体及清理回调的映射表。它在被追踪实体销毁时自动解除引用，并借助存档系统持久化追踪关系。常用于需要长期持有特定目标或伙伴引用的游戏逻辑。",
+  "summary": "该组件管理一个以名称索引的实体引用表，记录本实体所追踪的其他实体及其移除回调。它参与需要跨实体关联的核心玩法，如自动追踪目标、维持依赖关系，并支持在目标销毁时自动清理及在存档中保存引用。",
   "api": [
     {
-      "name": "TrackEntity",
-      "effect": "将参数 name 与 inst 存入内部追踪表，并为 inst 的 'onremove' 事件注册回调；当 inst 被移除时自动将表中对应项清空。副作用：在 self.inst 上添加对 inst 的 'onremove' 事件监听。"
-    },
-    {
-      "name": "ForgetEntity",
-      "effect": "若内部表存在 name 项，则移除 self.inst 对该项实体 'onremove' 事件的监听回调，并将表项置为 nil。副作用：取消事件监听并清除记录。"
-    },
-    {
-      "name": "GetEntity",
-      "effect": "返回内部表中 name 对应的实体实例，若不存在则返回 nil。无副作用。"
-    },
-    {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历内部追踪表，移除 self.inst 对所有被追踪实体 'onremove' 事件的监听回调，用于组件卸载时清理。副作用：取消全部相关事件监听。"
+      "effect": "遍历当前追踪的所有实体，为本实体移除在每个追踪实体上监听的 'onremove' 事件回调。行为：清理事件监听，避免悬空引用；副作用：修改事件监听状态，但不修改 self.entities 表本身（条目仍保留直至被垃圾回收）。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含所有追踪项名称与实体描述的调试字符串。无副作用。"
+      "effect": "返回包含所有追踪实体名称与实例信息的多行调试字符串。行为：纯查询；副作用：无。"
+    },
+    {
+      "name": "TrackEntity",
+      "effect": "以给定名称 name 与实体 inst 建立追踪记录，存入 self.entities[name]，并监听 inst 的 'onremove' 事件以在目标移除时自动清空该条目。行为：若 name 已存在则直接覆盖旧记录（旧事件监听未被显式移除）；副作用：增加或替换 self.entities 条目，并在目标实体上注册事件监听。"
+    },
+    {
+      "name": "ForgetEntity",
+      "effect": "若名称 name 存在，移除该追踪实体上的 'onremove' 事件监听，并将 self.entities[name] 置为 nil。行为：显式取消追踪；副作用：减少 self.entities 条目并移除对应事件监听。"
+    },
+    {
+      "name": "GetEntity",
+      "effect": "返回名称 name 对应的追踪实体实例，若未追踪则返回 nil。行为：查询；副作用：无。"
     },
     {
       "name": "OnSave",
-      "effect": "若追踪表为空则无返回；否则返回包含各追踪项名称与实体 GUID 的数据表及引用 GUID 列表，供存档使用。无副作用。"
+      "effect": "若存在追踪实体，返回包含各实体名称与 GUID 的数据表及引用 GUID 列表供存档使用；若表为空则返回 nil。行为：收集存档信息；副作用：无状态修改。"
     },
     {
       "name": "LoadPostPass",
-      "effect": "根据读档数据中的 GUID 从 ents 映射获取实体，重新调用 TrackEntity 恢复追踪关系。副作用：重新建立追踪表项及事件监听。"
+      "effect": "根据存档数据中的实体 GUID 列表，从传入的 ents 映射获取实体实例，并调用 TrackEntity 重新建立追踪。行为：存档加载后恢复追踪关系；副作用：可能向 self.entities 添加条目并注册事件监听。"
     }
   ],
   "events_published": [],
-  "events_listened": [],
+  "events_listened": [
+    "onremove"
+  ],
   "netvars": [],
   "tunables": [],
   "wiki": {
@@ -53,54 +55,29 @@
       13698,
       19761
     ],
-    "aspects": [
-      {
-        "aspect": "主动仇恨实体目标锁定",
-        "evidence": [
-          {
-            "pageid": 13701,
-            "quote": "也会仇恨攻击他的实体"
-          },
-          {
-            "pageid": 22383,
-            "quote": "拾荒疯猪将会主动仇恨玩家"
-          },
-          {
-            "pageid": 19761,
-            "quote": "会主动仇恨玩家"
-          }
-        ]
-      },
-      {
-        "aspect": "仇恨目标离开丢失机制",
-        "evidence": [
-          {
-            "pageid": 13701,
-            "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，各实体页面仅描述生成、掉落、仇恨距离、生命值或离开范围消失等通用行为，未出现任何与追踪实体、忘记实体、获取实体、实体移除回调、调试字符串、保存、加载后处理等entitytracker组件能力对应的玩家语言表达或行为体现，故无证据。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "追踪实体",
+    "实体追踪",
     "记录目标",
-    "实体引用",
-    "自动遗忘",
-    "存档追踪",
-    "读取目标",
-    "名字查实体"
+    "忘记目标",
+    "获取实体",
+    "保存引用",
+    "加载实体",
+    "监听移除",
+    "清理追踪",
+    "调试信息"
   ],
   "gameplay_tags": [
-    "通用",
-    "机制"
+    "通用"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
     "source_bytes": 1689,
     "model": "hy3-free",
-    "generated_at_ms": 1787896473362
+    "generated_at_ms": 1787932188528
   }
 }

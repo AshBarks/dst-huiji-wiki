@@ -1,21 +1,22 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p4-brain",
+  "prompt_rev": "p5-brain",
   "reference": {
     "kind": "brain",
     "path": "brains/beefalobrain.lua"
   },
   "category": "brain",
   "display_name": "beefalobrain",
-  "summary": "牛牛大脑控制牛牛在野生或驯养状态下的行为。当有战斗目标时会攻击墙壁并追逐攻击，平时会跟随牛铃主人或领导者、面对附近玩家，并依据问候、闲荡、游荡状态循环。被拴住或正在写名时站立不动，靠近盐块会锚定，并依昼夜改变游荡距离。",
+  "summary": "牛大脑控制牛在多种情境下的行为。当牛有攻击目标时会攻墙并短暂追击，平时会跟随铃铛主人或领导者，未驯化时靠近玩家会面对他们。牛有问候、闲荡和游荡三种状态，会依驯化度和玩家距离进行问候、围绕锚点闲荡或自由游荡。",
   "api": [],
-  "api_note": "该大脑仅实现 OnStart 构建行为树，未定义额外对外方法，所有逻辑封装在本地函数与行为树节点中。",
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法。",
   "events_published": [],
   "events_listened": [],
   "netvars": [],
   "tunables": [
-    "STOP_RUN_DIST",
-    "SEE_PLAYER_DIST",
+    "GREETING",
+    "LOITERING",
+    "WANDERING",
     "WANDER_DIST_DAY",
     "WANDER_DIST_NIGHT",
     "START_FACE_DIST",
@@ -53,50 +54,67 @@
         "自身实体",
         "追击最长 6 秒"
       ],
-      "context": "默认追逐攻击"
+      "context": "默认追击"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "正在被写名字或已拴住无拴点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取拴牛动作的函数",
+        "动作名 hitchup",
+        "立即校验有效性"
+      ],
+      "context": "存在 hitchingspot 时"
     },
     {
       "ctor": "Follow",
       "args_semantic": [
         "自身实体",
-        "牛铃主人或领导者(有效地面)",
+        "返回铃铛主人或领导者的函数",
         "最小跟随距离 0",
         "期望跟随距离 4",
         "最大跟随距离 18",
-        "允许奔跑"
+        "允许奔跑 true"
       ],
-      "context": "铃铛或领导存在"
+      "context": "跟随伙伴"
     },
     {
       "ctor": "Follow",
       "args_semantic": [
         "自身实体",
-        "领导者(非铃铛)",
+        "返回领导者的函数",
         "最小跟随距离 1",
         "期望跟随距离 5",
         "最大跟随距离 5",
-        "仅步行"
+        "不允许奔跑 false"
       ],
-      "context": "普通领导存在"
+      "context": "跟随领导者"
     },
     {
       "ctor": "FaceEntity",
       "args_semantic": [
         "自身实体",
-        "获取近处玩家函数",
-        "保持面对条件函数"
+        "获取近处玩家目标的函数",
+        "保持面对直到超出距离或目标无效的函数"
       ],
-      "context": "默认面对玩家"
+      "context": "未驯化且非盐渴求时"
     },
     {
       "ctor": "Follow",
       "args_semantic": [
         "自身实体",
-        "问候目标(牛铃或玩家)",
+        "获取问候目标的函数",
         "最小问候距离 1",
         "期望问候距离 3",
         "最大问候距离 5",
-        "允许奔跑"
+        "允许奔跑 true"
       ],
       "context": "处于问候状态"
     },
@@ -104,20 +122,20 @@
       "ctor": "FaceEntity",
       "args_semantic": [
         "自身实体",
-        "获取等待负重者函数",
-        "保持等待负重者函数"
+        "获取等待负重者的函数",
+        "保持等待负重者的函数"
       ],
-      "context": "闲荡时附近有负重领导者"
+      "context": "闲荡时附近有玩家且对方负重走来"
     },
     {
       "ctor": "Follow",
       "args_semantic": [
         "自身实体",
-        "问候目标",
+        "获取问候目标的函数",
         "最小跟随距离 1",
         "期望跟随距离 5",
         "最大跟随距离 5",
-        "仅步行"
+        "不允许奔跑 false"
       ],
       "context": "闲荡时附近有玩家"
     },
@@ -125,7 +143,7 @@
       "ctor": "Wander",
       "args_semantic": [
         "自身实体",
-        "问候目标位置",
+        "返回问候目标位置的函数",
         "游荡半径 10"
       ],
       "context": "闲荡时附近有玩家"
@@ -134,91 +152,93 @@
       "ctor": "Wander",
       "args_semantic": [
         "自身实体",
-        "闲荡锚点(牛群或自身)",
-        "根据昼夜游荡距离函数"
+        "返回闲荡锚点的函数",
+        "返回昼夜游荡距离的函数"
       ],
-      "context": "闲荡时无人附近"
+      "context": "闲荡时附近无玩家"
     },
     {
       "ctor": "Wander",
       "args_semantic": [
         "自身实体",
-        "牛群位置",
-        "根据昼夜游荡距离函数"
+        "返回牛群位置的函数",
+        "返回昼夜游荡距离的函数"
       ],
-      "context": "默认游荡"
+      "context": "游荡状态或默认"
     }
   ],
   "context_branches": [
     {
-      "condition": "self.inst.components.combat.target ~= nil",
-      "semantic": "执行攻击墙壁而非直接追逐"
+      "condition": "inst.components.combat.target ~= nil",
+      "semantic": "执行攻击墙壁而非直接追击"
     },
     {
-      "condition": "writeable:IsBeingWritten()",
+      "condition": "inst.components.writeable:IsBeingWritten()",
+      "semantic": "站立不动等待命名"
+    },
+    {
+      "condition": "inst:HasTag('hitched') and not inst.hitchingspot",
       "semantic": "站立不动"
     },
     {
-      "condition": "HasTag('hitched') and not hitchingspot",
-      "semantic": "站立不动"
+      "condition": "inst.hitchingspot ~= nil",
+      "semantic": "执行前往拴牛点动作"
     },
     {
-      "condition": "hitchingspot ~= nil",
-      "semantic": "执行拴住动作"
+      "condition": "TryBeginGreetingState 成功 (驯化度>0且有问候目标)",
+      "semantic": "进入问候状态并跟随问候目标"
     },
     {
-      "condition": "InState(WANDERING) and TryBeginGreetingState",
-      "semantic": "尝试进入问候状态"
+      "condition": "InState(self.inst, GREETING)",
+      "semantic": "跟随问候目标保持近距离，结束后尝试转闲荡"
     },
     {
-      "condition": "InState(GREETING)",
-      "semantic": "跟随问候目标并随后尝试进入闲荡"
+      "condition": "InState(self.inst, LOITERING) 且附近有玩家",
+      "semantic": "等待负重者、跟随问候目标或围绕问候目标游荡"
     },
     {
-      "condition": "BrainCommon.AnchorToSaltlick 内部靠近盐块",
-      "semantic": "将游荡锚定到盐块"
+      "condition": "InState(self.inst, LOITERING) 且附近无玩家",
+      "semantic": "围绕闲荡锚点游荡"
     },
     {
-      "condition": "InState(LOITERING)",
-      "semantic": "若附近有玩家则跟随/面对负重者/在目标位置游荡，否则在闲荡锚点游荡"
+      "condition": "InState(self.inst, WANDERING)",
+      "semantic": "自由围绕牛群位置游荡"
     },
     {
-      "condition": "默认无状态匹配",
-      "semantic": "在牛群位置游荡"
+      "condition": "GetFaceTargetFn 条件满足 (未驯化非盐渴求且起点距离内有玩家)",
+      "semantic": "面对最近玩家"
     }
   ],
-  "bt_structure": "优先级节点：恐慌触发 -> 电篱恐慌 -> 吐根糖浆恐慌 -> 有目标攻击墙 -> 追逐攻击 -> 写名站立 -> 拴住站立 -> 拴住动作 -> 跟随铃铛/领导 -> 面对实体 -> 状态条件(问候触发) -> 问候状态跟随 -> 盐块锚定 -> 闲荡状态(附近有人则跟随/面对/游荡，否则锚点游荡) -> 牛群游荡",
+  "bt_structure": "优先级: 恐慌触发 > 有目标攻墙 > 追击 > 写名站立 > 拴住站立/动作 > 跟随铃铛伙伴 > 跟随领导者 > 面对玩家 > 状态条件(游荡转问候) > 问候状态跟随 > 盐块锚定 > 闲荡状态分支(有人则等待/跟随/游荡否则锚点游荡) > 牛群游荡",
   "wiki": {
     "scanned_pageids": [
-      15238
+      15526,
+      15238,
+      22145,
+      13409,
+      23933,
+      35286,
+      45250,
+      15022
     ],
-    "aspects": [
-      {
-        "aspect": "受击反击与追逐行为描述",
-        "evidence": [
-          {
-            "pageid": 15238,
-            "quote": "皮弗娄牛受到攻击后会反击，仇恨在持续追逐 30 单位后会取消"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及皮弗娄牛美妆台、皮弗娄牛基础信息、玩偶、角色、活动、神龛、雕塑及天体英雄等，但未包含任何关于 brain__beefalobrain 所定义的问候、闲荡、游荡、追击、跟随、面对等 AI 行为距离或函数的数值与描述，故无证据。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "牛牛大脑",
-    "跟随铃铛",
-    "问候玩家",
-    "闲荡游荡",
-    "攻击墙壁",
-    "面对玩家",
-    "拴住牛牛",
-    "盐块锚定"
+    "牛脑",
+    "beefalo",
+    "追击",
+    "跟随",
+    "问候",
+    "闲荡",
+    "游荡",
+    "拴牛",
+    "面对"
   ],
   "gameplay_tags": [
-    "驯养",
-    "跟随",
     "战斗",
+    "跟随",
     "游荡"
   ],
   "related_symbols": [],
@@ -226,6 +246,6 @@
     "source_sha256": "e714fc8b60987c0c90d469fb2dd0672c1db7fac2b02151bd831c01ca68ae1356",
     "source_bytes": 9362,
     "model": "hy3-free",
-    "generated_at_ms": 1787927643340
+    "generated_at_ms": 1787929840487
   }
 }

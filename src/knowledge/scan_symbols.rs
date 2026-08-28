@@ -1419,9 +1419,21 @@ async fn enrich_with_wiki(
             parts
         }
         "brain" => {
+            // 裸 ctor 名对不上页面语言;用 invocation 的参数语义文本作锚点
+            // (依赖 1a behaviour 词典,见行为链文档 §9.1)。
             let mut parts: Vec<String> = Vec::new();
             parts.extend(doc.tunables.iter().cloned());
-            parts.extend(doc.behaviour_invocations.iter().map(|b| b.ctor.clone()));
+            for b in &doc.behaviour_invocations {
+                let mut entry = b.ctor.clone();
+                if !b.args_semantic.is_empty() {
+                    entry.push_str(": ");
+                    entry.push_str(&b.args_semantic.join("; "));
+                }
+                if let Some(ctx) = &b.context {
+                    entry.push_str(&format!("({})", ctx));
+                }
+                parts.push(entry);
+            }
             parts
         }
         _ => doc.api.iter().map(|a| a.name.clone()).collect(),

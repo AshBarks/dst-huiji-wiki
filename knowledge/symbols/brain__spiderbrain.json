@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p4-brain",
+  "prompt_rev": "p5-brain",
   "reference": {
     "kind": "brain",
     "path": "brains/spiderbrain.lua"
   },
   "category": "brain",
   "display_name": "spiderbrain",
-  "summary": "蜘蛛大脑控制蜘蛛实体在多种情境下的行为。优先响应恐慌、受惊与电围栏以逃跑；白天或非召唤时尝试回家；隐藏者蜘蛛受伤后举盾缩避；攻击性蜘蛛会追击攻击、吃食并跟随领导者，酸性喷吐蜘蛛则保持距离逃跑与面对目标。",
+  "summary": "蜘蛛大脑控制蜘蛛实体在多种情境下的行为。优先处理恐慌与电击等紧急情况，白天或非召唤状态会尝试回家，有领袖时跟随并可能进食，作为隐藏者会举盾防御，平时会游荡、调查或面向交易者。",
   "api": [],
-  "api_note": "该大脑仅实现 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，无额外对外调用接口。",
+  "api_note": "SpiderBrain 仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 方法以构建行为树，未提供其他对外公开调用接口。",
   "events_published": [],
   "events_listened": [],
   "netvars": [],
@@ -21,18 +21,51 @@
     "DAMAGE_UNTIL_SHIELD",
     "SHIELD_TIME",
     "AVOID_PROJECTILE_ATTACKS",
-    "HIDE_WHEN_SCARED",
-    "EATFOOD_CANT_TAGS"
+    "HIDE_WHEN_SCARED"
   ],
   "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取调查动作的函数（返回 INVESTIGATE 缓冲动作）"
+      ],
+      "context": "post_nodes 中优先执行调查"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数（返回 GOHOME 缓冲动作）"
+      ],
+      "context": "白天或非地震且非召唤时执行回家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取交易者函数",
+        "保持交易者函数"
+      ],
+      "context": "post_nodes 中面向交易者"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家位置的函数",
+        "最大游荡距离 MAX_WANDER_DIST (32)"
+      ],
+      "context": "post_nodes 中无特定目标时游荡"
+    },
     {
       "ctor": "UseShield",
       "args_semantic": [
         "实体自身",
-        "触发举盾累计受伤阈值50",
-        "举盾保持3秒",
-        "不躲避弹道",
-        "被恐惧时举盾"
+        "举盾受伤阈值 DAMAGE_UNTIL_SHIELD (50)",
+        "举盾持续时间 SHIELD_TIME (3)",
+        "是否躲避弹道 AVOID_PROJECTILE_ATTACKS (false)",
+        "被恐惧时躲藏 HIDE_WHEN_SCARED (true)"
       ],
       "context": "实体有标签 spider_hider 时"
     },
@@ -41,117 +74,142 @@
       "args_semantic": [
         "实体自身"
       ],
-      "context": "实体未被迷惑且无领导者时"
+      "context": "实体非 bedazzled 且无领袖时"
     },
     {
       "ctor": "RunAway",
       "args_semantic": [
         "实体自身",
-        "应逃跑条件函数(仅酸性喷吐蜘蛛且目标为猎人且不在近战范围)",
-        "发现猎人距离(攻击范围减0.5)",
-        "脱离安全距离(攻击范围)"
+        "应逃跑条件过滤函数（酸液蜘蛛且目标为猎人且不在近战范围或冷却中）",
+        "发现猎人距离 SPITTER_SEE_DIST (攻击范围-0.5)",
+        "安全距离 SPITTER_SAFE_DIST (攻击范围)"
       ],
-      "context": "酸性喷吐蜘蛛战斗目标处理"
+      "context": "攻击节点中酸液蜘蛛逃离近战"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "酸液蜘蛛冷却时获取战斗目标函数",
+        "保持目标函数"
+      ],
+      "context": "攻击节点中酸液蜘蛛面向目标"
     },
     {
       "ctor": "ChaseAndAttack",
       "args_semantic": [
         "实体自身",
-        "最长追逐时间(春季修正的蜘蛛攻击性最大追逐时间)"
+        "最长追逐时间（春季修正的 TUNING.SPIDER_AGGRESSIVE_MAX_CHASE_TIME）"
       ],
-      "context": "默认攻击节点"
-    },
-    {
-      "ctor": "Wander",
-      "args_semantic": [
-        "实体自身",
-        "返回家位置的函数",
-        "最大游荡距离32"
-      ],
-      "context": "后置节点中游荡"
+      "context": "攻击节点中默认追击攻击"
     },
     {
       "ctor": "DoAction",
       "args_semantic": [
         "实体自身",
-        "获取调查动作的函数"
+        "获取吃食物动作的函数（返回 EAT 缓冲动作）"
       ],
-      "context": "后置节点优先调查"
+      "context": "有领袖且非防御状态时跟随并吃食物"
     },
     {
-      "ctor": "DoAction",
+      "ctor": "Follow",
       "args_semantic": [
         "实体自身",
-        "获取回家动作的函数"
+        "获取领袖函数",
+        "最小跟随距离 TUNING.SPIDER_AGGRESSIVE_MIN_FOLLOW",
+        "中等跟随距离 TUNING.SPIDER_AGGRESSIVE_MED_FOLLOW",
+        "最大跟随距离 TUNING.SPIDER_AGGRESSIVE_MAX_FOLLOW"
       ],
-      "context": "白天或地震且非召唤时"
+      "context": "有领袖且非防御状态时激进跟随"
     },
     {
-      "ctor": "DoAction",
+      "ctor": "Follow",
       "args_semantic": [
         "实体自身",
-        "获取吃食物动作的函数"
+        "获取领袖函数",
+        "最小跟随距离 TUNING.SPIDER_DEFENSIVE_MIN_FOLLOW",
+        "中等跟随距离 TUNING.SPIDER_DEFENSIVE_MED_FOLLOW",
+        "最大跟随距离 TUNING.SPIDER_DEFENSIVE_MAX_FOLLOW"
       ],
-      "context": "有领导者且攻击性跟随时"
+      "context": "有领袖且防御状态时防御跟随"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取领袖函数",
+        "保持领袖函数"
+      ],
+      "context": "有领袖时面向领袖"
     }
   ],
   "context_branches": [
     {
       "condition": "HasTag(\"spider_hider\")",
-      "semantic": "使用盾牌行为，受伤累计50后举盾3秒，被恐惧时举盾"
+      "semantic": "启用 UseShield 举盾防御行为"
     },
     {
-      "condition": "not bedazzled and GetLeader(self.inst) == nil",
-      "semantic": "攻击墙壁"
+      "condition": "not bedazzled and GetLeader == nil",
+      "semantic": "启用 AttackWall 攻击墙壁"
     },
     {
-      "condition": "self.inst.defensive",
-      "semantic": "防御性跟随领导者，使用防御跟随距离参数"
+      "condition": "defensive 为真",
+      "semantic": "采用防御跟随参数跟随领袖"
     },
     {
-      "condition": "not self.inst.defensive",
-      "semantic": "攻击性跟随领导者，先吃食物再跟随"
+      "condition": "defensive 为假",
+      "semantic": "采用激进跟随参数并吃食物"
     },
     {
-      "condition": "GetLeader(self.inst) ~= nil",
-      "semantic": "面对领导者"
+      "condition": "GetLeader ~= nil",
+      "semantic": "面向领袖"
     },
     {
-      "condition": "TheWorld.state.iscaveday or self.inst._quaking and not self.inst.summoned",
-      "semantic": "白天或地震且非召唤时尝试回家"
+      "condition": "(iscaveday or _quaking) and not summoned",
+      "semantic": "执行回家动作"
     },
     {
-      "condition": "Is_AcidInfusedSpitter(inst)",
-      "semantic": "作为酸性喷吐蜘蛛时，冷却期面对目标，且与近战猎人保持距离逃跑"
+      "condition": "Is_AcidInfusedSpitter(inst) (spider_spitter 且酸液注入)",
+      "semantic": "RunAway 与 FaceEntity 针对战斗目标冷却/距离的特殊处理生效"
     }
   ],
-  "bt_structure": "优先级节点树：前置恐慌/受惊/电围栏 -> 隐藏者举盾 -> 攻击(攻击墙/酸性蜘蛛逃跑与面对/追击) -> 跟随(防御/攻击性吃食跟随/面对领袖) -> 调查/白天回家/面对交易者/游荡",
+  "bt_structure": "根优先级节点顺序: pre_nodes(恐慌/电击触发) > hider_nodes(隐藏者举盾) > attack_nodes(攻击墙/酸液蜘蛛逃跑/追击) > follow_nodes(防御或激进跟随/面向领袖) > post_nodes(调查/白天回家/面向交易者/游荡)",
   "wiki": {
-    "scanned_pageids": [],
+    "scanned_pageids": [
+      15237,
+      13493,
+      13901,
+      15239,
+      15022,
+      15238,
+      15258,
+      15560
+    ],
     "aspects": [],
-    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "no_evidence_reason": "所给页面摘录实体为猪人、寄居蟹、火鸡、兔人、天体英雄、皮弗娄牛、草鳄鱼、穴居猴，均非蜘蛛或不包含 brain__spiderbrain 组件；文本中无任何清单所列蜘蛛大脑能力（如 SEE_FOOD_DIST、TRADE_DIST、MAX_WANDER_DIST=32、举盾受伤阈值、恐惧躲藏、调查/回家/吃食动作等）的玩家语言表达，页面根本不讨论该符号能力。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "蜘蛛大脑",
+    "蜘蛛AI",
+    "举盾",
     "追击攻击",
-    "举盾缩避",
-    "游荡行为",
-    "回家动作",
-    "吃食动作",
+    "游荡",
     "跟随领袖",
-    "恐慌逃跑"
+    "吃食物",
+    "回家",
+    "攻击墙壁",
+    "逃跑"
   ],
   "gameplay_tags": [
     "战斗",
-    "生存",
-    "跟随"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "dd6a2a00c60d843eca8203f70ca21ed05401f589dc6a5cb40d570641c4787191",
     "source_bytes": 7252,
     "model": "hy3-free",
-    "generated_at_ms": 1787927790391
+    "generated_at_ms": 1787929947901
   }
 }

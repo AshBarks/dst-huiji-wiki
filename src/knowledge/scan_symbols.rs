@@ -1664,7 +1664,7 @@ mod tests {
             &index,
             "brain",
             1,
-            Some(&["spiderbrain".to_string()].to_vec()),
+            Some(["spiderbrain".to_string()].as_slice()),
         );
         assert_eq!(picked.len(), 1);
         assert_eq!(picked[0].0.path, "brains/spiderbrain.lua");

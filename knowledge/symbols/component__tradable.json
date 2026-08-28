@@ -7,7 +7,7 @@
   },
   "category": "component",
   "display_name": "tradable",
-  "summary": "该组件为实体存储了黄金价值（goldvalue）数据，并在注释中预留了交易目标（tradefor）与岩石献祭（rocktribute）字段。它作为交易相关玩法的数据载体，目前仅初始化了基础数值。",
+  "summary": "该组件管理实体的黄金价值（goldvalue）数据，初始值为0。它用于支持游戏内的交易相关玩法。源码仅初始化了数据字段，未定义具体交互方法。",
   "api": [],
   "api_note": "纯数据组件,无公开方法",
   "events_published": [],
@@ -16,27 +16,26 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      14484,
-      52631,
-      15737,
-      20113,
-      14695,
-      15235,
-      15314,
-      19765
+      18359,
+      13493,
+      18521,
+      13199,
+      13457,
+      13642,
+      17984,
+      20092
     ],
     "aspects": [],
-    "no_evidence_reason": "组件能力清单未提供具体能力，且页面摘录文本中无交易、可交易、给予、交换等相关表达，故认为页面不讨论该组件能力。",
+    "no_evidence_reason": "组件能力清单为空，未提供需检索的具体能力，无法在页面中匹配对应表达",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "黄金价值",
-    "以物易物",
+    "可交易",
+    "交易物",
     "换金",
-    "交易用",
-    "物品价值",
-    "岩石祭",
-    "买卖"
+    "交易组件",
+    "物品价值"
   ],
   "gameplay_tags": [
     "交易"
@@ -46,6 +45,6 @@
     "source_sha256": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
     "source_bytes": 185,
     "model": "hy3-free",
-    "generated_at_ms": 1787853029652
+    "generated_at_ms": 1787858011996
   }
 }

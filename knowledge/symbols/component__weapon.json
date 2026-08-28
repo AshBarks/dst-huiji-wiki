@@ -7,75 +7,71 @@
   },
   "category": "component",
   "display_name": "weapon",
-  "summary": "Weapon 组件管理实体的武器属性，包括伤害、攻击范围、远程抛射物与攻击回调等数据。它参与核心战斗玩法，负责计算攻击伤害与特殊伤害，处理近战与远程攻击流程，并联动物品耐久消耗与事件推送。",
+  "summary": "Weapon 组件管理武器的伤害、攻击范围、抛射物与攻击回调等数据。它参与战斗玩法，负责计算攻击伤害（含特殊伤害与类型加成）、执行近战攻击的耐久消耗与事件推送，以及远程抛射物的生成与发射。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'weapon' 标签，若 replica.inventoryitem 存在则将其攻击范围设为 -1。"
-    },
-    {
       "name": "SetDamage",
-      "effect": "设置组件内部 damage 属性为传入的 dmg，影响后续 GetDamage 计算的基础伤害。"
+      "effect": "将组件内部基础伤害值 self.damage 设置为传入参数 dmg，直接覆盖原值，无其它副作用。"
     },
     {
       "name": "SetRange",
-      "effect": "设置 attackrange 为 attack，hitrange 为 hit 或默认 attack；因属性监听会同步更新 replica.inventoryitem 的攻击范围。"
+      "effect": "设置 self.attackrange 为 attack，self.hitrange 为 hit 或默认等于 attack；因 attackrange 属性设有 setter，变更时会同步更新 replica.inventoryitem 的攻击距离。"
     },
     {
       "name": "SetOnAttack",
-      "effect": "设置 onattack 回调函数，在 OnAttack 被调用时触发。"
+      "effect": "存储攻击回调函数到 self.onattack，该函数在 OnAttack 执行时被调用，用于自定义攻击逻辑。"
     },
     {
       "name": "SetOnProjectileLaunch",
-      "effect": "设置 onprojectilelaunch 回调函数，在 LaunchProjectile 生成抛射物前触发。"
+      "effect": "存储抛射物发射前回调函数到 self.onprojectilelaunch，在 LaunchProjectile 生成抛射物前调用。"
     },
     {
       "name": "SetOnProjectileLaunched",
-      "effect": "设置 onprojectilelaunched 回调函数，在 LaunchProjectile 生成抛射物后触发。"
+      "effect": "存储抛射物发射后回调函数到 self.onprojectilelaunched，在 LaunchProjectile 生成抛射物后调用，并接收生成的抛射物实例。"
     },
     {
       "name": "SetProjectile",
-      "effect": "设置 projectile 预制体名称，使 CanRangedAttack 返回 true 以启用远程攻击。"
+      "effect": "设置远程抛射物预制体名称 self.projectile，使 CanRangedAttack 返回 true 并允许发射对应抛射物。"
     },
     {
       "name": "SetProjectileOffset",
-      "effect": "设置 projectile_offset，影响远程抛射物生成时相对于攻击者的偏移坐标。"
+      "effect": "设置抛射物生成位置偏移向量 self.projectile_offset，影响 LaunchProjectile 中抛射物的初始坐标。"
     },
     {
       "name": "SetElectric",
-      "effect": "将 stimuli 设为 'electric'，并存储 electric_damage_mult 与 electric_wet_damage_mult 用于电击相关伤害修正。"
+      "effect": "将刺激类型 self.stimuli 设为 \"electric\"，并存储 electric_damage_mult 与 electric_wet_damage_mult 字段，标记武器具备电击属性与对应伤害乘数。"
     },
     {
       "name": "SetOverrideStimuliFn",
-      "effect": "设置 overridestimulifn 函数，用于外部覆盖 stimuli 判定逻辑。"
+      "effect": "存储覆盖刺激类型函数到 self.overridestimulifn，供外部可能调用以动态决定刺激类型。"
     },
     {
       "name": "CanRangedAttack",
-      "effect": "返回 projectile 是否非空，指示该武器能否进行远程攻击。"
+      "effect": "返回 self.projectile 是否非空的布尔值，用于判断武器能否进行远程攻击，无副作用。"
     },
     {
       "name": "SetAttackCallback",
-      "effect": "废弃方法，同 SetOnAttack，设置 onattack 回调函数。"
+      "effect": "已弃用方法，等效于 SetOnAttack，将 self.onattack 设为传入函数。"
     },
     {
       "name": "GetDamage",
-      "effect": "计算并返回基础伤害与特殊伤害表；会应用 damagetypebonus 组件的倍数修正（若存在），返回 dmg, spdmg。"
+      "effect": "计算并返回基础伤害 dmg 与特殊伤害表 spdmg。行为：解析 self.damage（支持函数或值），收集特殊伤害，若实体有 damagetypebonus 组件则乘对应加成。该方法为纯计算，不改变组件状态。"
     },
     {
       "name": "OnAttack",
-      "effect": "调用 onattack 回调（若有），推送 'weapononattack' 事件；若实体有 finiteuses 组件且未忽略战斗耐久损耗，且非弹射抛射物，则根据 attackwear 与攻击磨损乘数消耗耐久，攻击者高效用户乘数也生效。"
+      "effect": "执行攻击流程：调用 self.onattack 回调；向实体推送 \"weapononattack\" 事件；若实体有 finiteuses 组件且未忽略战斗耐久损失，且抛射物非弹射状态，则根据 attackwear 与效率乘数消耗耐久。副作用包括触发回调、推送事件及可能减少武器耐久。"
     },
     {
       "name": "LaunchProjectile",
-      "effect": "若 projectile 非空，先调用 onprojectilelaunch 回调，生成抛射物预制体并依据 projectile_offset 或攻击者位置设置坐标，通过 projectile 或 complexprojectile 组件投掷/发射（支持 projectiledelay 延迟可见），最后调用 onprojectilelaunched 回调。"
+      "effect": "若已设 projectile，则调用发射前回调，生成对应抛射物预制体，依据偏移或攻击者位置设置坐标，通过 projectile 或 complexprojectile 组件发射向目标，处理延迟可见，最后调用发射后回调。副作用为在游戏中创建抛射物实体并触发相关回调。"
     },
     {
       "name": "EnableToughFight",
-      "effect": "设置 tough 标志（默认 true），用于 CanDoToughFight 判定。"
+      "effect": "设置 self.tough 为参数 tough 不等于 false 的布尔值，标记武器是否参与硬仗逻辑。"
     },
     {
       "name": "CanDoToughFight",
-      "effect": "返回 tough 是否为 true，指示是否可进行坚韧战斗。"
+      "effect": "返回 self.tough 是否严格等于 true，用于判断武器是否可进行硬仗，无副作用。"
     }
   ],
   "events_published": [
@@ -86,77 +82,90 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      15903,
+      10355,
       20150,
-      15022,
-      15651,
-      13379,
-      13482,
-      13828,
-      65422,
-      13897
+      72238,
+      13409,
+      14660,
+      15238,
+      14816
     ],
     "aspects": [
       {
-        "aspect": "攻击范围数值标注",
+        "aspect": "伤害数值与倍率描述",
         "evidence": [
           {
-            "pageid": 15022,
-            "quote": "|攻击范围=3.5"
-          },
-          {
-            "pageid": 15651,
-            "quote": "|攻击范围 = 4（暴怒时6）"
-          },
-          {
-            "pageid": 13828,
-            "quote": "|攻击范围= 2.3 / 3.91 / 5.75"
-          },
-          {
-            "pageid": 13897,
-            "quote": "|攻击范围 = 3<br>4.2（狂暴）"
+            "pageid": 13409,
+            "quote": "战斗长矛则可造成 42.5 点伤害"
           },
           {
             "pageid": 20150,
-            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
-          },
-          {
-            "pageid": 65422,
-            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+            "quote": "特殊伤害倍率：旺达的物理伤害降低与暗影伤害提升"
           }
         ]
       },
       {
-        "aspect": "武器伤害概念提及",
+        "aspect": "攻击时属性回复联动",
         "evidence": [
           {
-            "pageid": 65422,
-            "quote": "基础伤害：实体自身的伤害或武器伤害或骑乘皮弗娄牛伤害"
+            "pageid": 13409,
+            "quote": "每次攻击回复的生命值和理智值为武器伤害×生物伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击距离标注",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "展示的攻击距离均为触发攻击距离"
+          },
+          {
+            "pageid": 72238,
+            "quote": "最大攻击距离与实际最大控制距离分开计算"
+          },
+          {
+            "pageid": 14816,
+            "quote": "触发距离 5 （2~5）"
+          }
+        ]
+      },
+      {
+        "aspect": "远程攻击与投射行为",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "能够使用远程攻击，这使得它在追击玩家时压制力很强"
+          },
+          {
+            "pageid": 14816,
+            "quote": "当目标在 2~5 距离内时，喷吐出"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "武器伤害",
-    "攻击范围",
-    "远程抛射",
-    "耐久损耗",
-    "电击加成",
+    "攻击距离",
+    "远程攻击",
+    "电击武器",
     "攻击回调",
-    "伤害类型",
-    "战斗标签",
-    "投掷物体",
-    "坚韧战斗"
+    "耐久消耗",
+    "发射弹体",
+    "特殊伤害"
   ],
   "gameplay_tags": [
-    "战斗"
+    "战斗",
+    "武器"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
     "source_bytes": 5049,
     "model": "hy3-free",
-    "generated_at_ms": 1787850169927
+    "generated_at_ms": 1787859544739
   }
 }

@@ -7,31 +7,31 @@
   },
   "category": "component",
   "display_name": "damagetypebonus",
-  "summary": "该组件管理实体基于目标标签和回调函数的伤害加成乘数数据。它参与战斗伤害计算流程，允许按目标标签叠加多个来源的增益百分比，并支持通过回调动态返回乘数，从而影响最终造成的伤害。",
+  "summary": "该组件管理实体针对特定目标标签的伤害加成数据与回调函数。它参与战斗伤害计算流程，通过 GetBonus 方法返回综合考虑标签修正与回调的总伤害乘率。外部可动态添加或移除基于来源与键的加成及回调，实现复杂的增伤逻辑。",
   "api": [
     {
       "name": "AddBonus",
-      "effect": "为指定标签创建或获取对应的来源修正列表，并设置来自 src 的加成百分比 pct（以 key 区分）。副作用：若标签不存在则初始化修正列表并存入 self.tags；修改内部修正列表的修饰符。"
+      "effect": "在 self.tags 中为指定标签 tag 获取或创建 SourceModifierList 实例，并调用其 SetModifier 方法以来源 src、百分比 pct 和键 key 设置修正值。副作用：可能初始化 self.tags[tag] 并永久持有修饰符列表，影响后续 GetBonus 计算。"
     },
     {
       "name": "RemoveBonus",
-      "effect": "从指定标签的修正列表中移除 src 的修饰符（按 key 定位）。副作用：若修正列表移除后为空，则将该标签从 self.tags 中清除。"
+      "effect": "若 self.tags[tag] 存在，调用其 RemoveModifier 方法移除对应 src 和 key 的修正；若移除后列表为空则将 self.tags[tag] 置 nil。副作用：减少对应标签的加成，可能清理标签条目。"
     },
     {
       "name": "AddBonusCallback",
-      "effect": "将回调函数 fn 加入 self.bonuscallbacks 列表，用于后续 GetBonus 计算动态乘数。副作用：懒初始化 self.bonuscallbacks 表；若已存在相同函数则先移除再添加，避免重复。"
+      "effect": "确保 self.bonuscallbacks 表存在，先移除可能重复的 fn 再将其插入回调列表。副作用：添加返回乘数的回调函数，该回调将在 GetBonus 中被调用以影响最终乘率。"
     },
     {
       "name": "RemoveBonusCallback",
-      "effect": "从 self.bonuscallbacks 数组中移除指定的回调函数 fn。副作用：若 self.bonuscallbacks 存在则修改该数组，否则无操作。"
+      "effect": "若 self.bonuscallbacks 存在，从数组中移除指定函数 fn。副作用：停止该回调对伤害乘率的影响。"
     },
     {
       "name": "GetBonus",
-      "effect": "计算对 target 的总伤害乘数。遍历 self.tags，若 target 拥有某标签则乘上该标签修正列表的合计值；再遍历 bonuscallbacks 调用 fn(inst, target) 并乘上返回值（nil 则视为 1）。返回最终乘数（默认 1）。无副作用。"
+      "effect": "若 target 非 nil，遍历 self.tags 检查目标是否具有对应标签，累乘各匹配标签的修正值；再遍历 self.bonuscallbacks 累乘各回调返回的乘率（空则返回1）。返回最终乘率 mult。无副作用，仅读取状态。"
     },
     {
       "name": "GetDebugString",
-      "effect": "生成并返回调试字符串，列出所有标签及其当前修正值。无副作用。"
+      "effect": "遍历 self.tags 拼接每个标签及其当前修正值的调试字符串，返回该字符串或 nil。无副作用。"
     }
   ],
   "events_published": [],
@@ -40,50 +40,38 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      20150,
       13156,
-      10374,
-      10379,
       10355,
+      10374,
       13437,
-      72238,
-      20058
+      20150,
+      10379,
+      13409,
+      10418
     ],
     "aspects": [
       {
-        "aspect": "伤害类型与阵营加成减伤描述",
+        "aspect": "暗影亲和伤害类型加成标注",
         "evidence": [
           {
             "pageid": 13156,
-            "quote": "沃尔夫冈获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+            "quote": "沃尔夫冈获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
           },
           {
             "pageid": 10355,
-            "quote": "威尔逊获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+            "quote": "威尔逊获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
           },
           {
             "pageid": 13437,
-            "quote": "沃尔特获得暗影亲和，受到来自暗影阵营的伤害降低至 0.9"
+            "quote": "沃尔特获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
           },
           {
-            "pageid": 10374,
-            "quote": "薇洛获得暗影亲和。伯尼！变为暗影阵营、增加5点位面伤害"
+            "pageid": 13409,
+            "quote": "薇格弗德获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
           },
           {
-            "pageid": 10379,
-            "quote": "温蒂的进攻端物理伤害倍率为 0.75"
-          },
-          {
-            "pageid": 20150,
-            "quote": "对玩家角色和龙蝇：伤害倍率为干燥伤害倍率，一般为 ×1.5"
-          },
-          {
-            "pageid": 72238,
-            "quote": "响应PVP伤害倍率。对玩家领袖攻击附身底盘随从的情况也有效"
-          },
-          {
-            "pageid": 20058,
-            "quote": "部分盔甲所具有的阵营减伤，能减免物理伤害和位面伤害"
+            "pageid": 10418,
+            "quote": "WX-78 获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
           }
         ]
       }
@@ -91,14 +79,14 @@
     "coverage_status": "partial"
   },
   "search_terms": [
-    "伤害倍率",
-    "标签克制",
-    "对怪增伤",
-    "伤害修正",
-    "战斗加成",
+    "伤害加成",
+    "类型增伤",
     "目标标签",
-    "来源增益",
-    "回调乘区"
+    "增伤倍率",
+    "加成回调",
+    "移除增伤",
+    "攻击倍率",
+    "标签伤害"
   ],
   "gameplay_tags": [
     "战斗"
@@ -108,6 +96,6 @@
     "source_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
     "source_bytes": 1631,
     "model": "hy3-free",
-    "generated_at_ms": 1787852251898
+    "generated_at_ms": 1787861349766
   }
 }

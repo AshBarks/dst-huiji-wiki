@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "floater",
-  "summary": "Floater 组件管理实体在水域漂浮时的特效、动画与网络状态数据。它参与物品落水后的漂浮表现、溅水生成及湿度温度影响等生存玩法，并通过客户端前后特效与浮动参数模拟水面浮动。",
+  "summary": "该组件管理实体在水面漂浮时的表现配置与状态，包括尺寸、垂直偏移、缩放及动画交换数据。它参与海洋生存玩法，在物体落水时生成前后漂浮特效、播放漂浮动画、溅起水花，并可能赋予物品湿度和温度惩罚，通过主客网络同步漂浮与腐蚀状态。",
   "api": [
     {
       "name": "SetIsObstacle",
-      "effect": "设置 self.is_obstable 标记（传入 false 时设为 nil，否则 true），用于后续 ShouldShowEffect 判断海洋点是否视为障碍。"
+      "effect": "设置 self.is_obstable 为传入参数不为 false 的结果（默认视为 true），用于后续 ShouldShowEffect 对海洋点的障碍物判定。无其它副作用。"
     },
     {
       "name": "SetSize",
-      "effect": "设置 self.size 字符串（如 small/med/large），影响后续客户端生成漂浮特效的动画名称后缀。"
+      "effect": "设置 self.size 为传入的 size 字符串（如 small/med/large），用于客户端生成漂浮特效时的动画后缀。无立即副作用。"
     },
     {
       "name": "SetVerticalOffset",
-      "effect": "设置 self.vert_offset；若偏移非 nil，立即将已存在的 front_fx 与 back_fx 特效的 Y 坐标设为该值。"
+      "effect": "设置 self.vert_offset；若偏移非 nil 且已存在 front_fx/back_fx 特效，立即将其 Transform 的 Y 位置设为该偏移。副作用：更新已有特效位置。"
     },
     {
       "name": "SetScale",
-      "effect": "接受数字或表，设置 self.xscale/yscale/zscale；若已有 front_fx/back_fx 立即更新其 Transform 缩放。"
+      "effect": "解析 scale（数字或含三元素的表）设置 x/y/zscale；若特效已存在，立即应用缩放到它们。副作用：更新已有特效缩放。"
     },
     {
       "name": "SetBankSwapOnFloat",
-      "effect": "设置 do_bank_swap 开关、float_index（默认1）与 swap_data 表，控制漂浮时是否切换动画银行及符号覆盖数据。"
+      "effect": "设置 do_bank_swap 为 should_bank_swap，float_index 为 float_index 或 1，swap_data 为传入数据。无立即副作用，但影响后续漂浮动画切换。"
     },
     {
       "name": "SetSwapData",
-      "effect": "设置 self.swap_data 表，更新银行切换与符号覆盖所用数据。"
+      "effect": "设置 self.swap_data 为传入数据，用于漂浮/默认动画的 bank/anim 及符号覆盖。无副作用。"
     },
     {
       "name": "ShouldShowEffect",
-      "effect": "返回布尔值：根据实体世界坐标判断地图是否为海洋点且非视觉地面点（考虑 is_obstable 障碍标记），无副作用。"
+      "effect": "返回布尔值：根据实体世界坐标，判断地图是否为海洋点（考虑 is_obstable）且非视觉地面点。只读，无副作用。"
     },
     {
       "name": "AttachEffect",
-      "effect": "将传入特效实体设为当前实体子节点（若 should_parent_effect）或世界坐标，并应用 vert_offset 位置与 x/y/zscale 缩放。"
+      "effect": "根据 should_parent_effect 将传入 effect 设为实体子物体或放置于实体世界坐标（加上 vert_offset），并设置其缩放。副作用：修改传入特效实体的父子关系与变换。"
     },
     {
       "name": "IsFloating",
-      "effect": "返回 self.showing_effect 布尔值，表示当前是否正在显示漂浮特效。"
+      "effect": "返回 self.showing_effect 当前值，表示是否正在显示漂浮特效。无副作用。"
     },
     {
       "name": "SwitchToFloatAnim",
-      "effect": "若 do_bank_swap 为真，根据 float_index 正负设置 AnimState 银行 floating_item 及左右动画、帧并暂停；若 swap_data 存在则覆盖 swap_spear 符号（支持皮肤）。"
+      "effect": "若 do_bank_swap 为真，将实体 AnimState 的 bank 设为 floating_item 并播放 left/right 动画（由 float_index 正负决定），设置帧并暂停；若 swap_data 存在则覆盖 swap_spear 符号（支持皮肤）。副作用：修改实体动画状态。"
     },
     {
       "name": "OnLandedServer",
-      "effect": "当实体落地且应显示特效时：若有 inventoryitem 且未持有且无避水标签，则增加湿度至 OCEAN_WETNESS、降低温度至 OCEAN_TEMPERATURE_PENALTY_PERCENT，温差超阈值则标记热溅水；若 splash 且未持有则生成 splash 或 hot_splash 预制体；推送 floater_startfloating 事件；设网络变量 _is_landed 为 true；标记 showing_effect 并切换漂浮动画。"
+      "effect": "当未显示特效且 ShouldShowEffect 为真时：若实体有 inventoryitem 且未被持有且无 likewateroffducksback 标签，则使其湿度至少 OCEAN_WETNESS、温度百分比降至最多 OCEAN_TEMPERATURE_PENALTY_PERCENT，温差超阈值则标记 hotsplash；若 splash 且（无 inventoryitem 或未被持有）则生成 hot_splash 或 splash 水花预制体；推送 floater_startfloating 事件；设 _is_landed 网络变量为 true、showing_effect 为 true；调用 SwitchToFloatAnim。副作用：可能改变物品温湿度、生成水花、推送事件、同步网络状态、切换动画。"
     },
     {
       "name": "OnLandedClient",
-      "effect": "标记 showing_effect 为真；若前后特效不存在则生成 float_fx_front/back 并附加、播放对应 size 空闲动画；设置 AnimState 浮动参数。"
+      "effect": "设置 showing_effect 为 true；若 front_fx/back_fx 不存在则生成 float_fx_front/float_fx_back 特效并 AttachEffect，播放对应尺寸 idle 循环动画；设置 AnimState 浮动参数。副作用：生成并管理客户端漂浮特效，修改动画浮动参数。"
     },
     {
       "name": "SwitchToDefaultAnim",
-      "effect": "若 do_bank_swap 或 force_switch 为真，将 AnimState 银行与动画恢复为 swap_data 或 prefab/idle，并清除符号覆盖。"
+      "effect": "若 do_bank_swap 或 force_switch 为真，将实体 AnimState 恢复为 swap_data 指定的 bank/anim 或 prefab/idle，并清除 swap_spear 覆盖符号。副作用：修改实体动画状态。"
     },
     {
       "name": "Erode",
-      "effect": "若为主模拟且正在显示特效，设置网络变量 _erode_time 为传入值，触发客户端侵蚀特效。"
+      "effect": "若为主模拟且正在显示特效，设置 _erode_time 网络变量为 erode_time，触发客户端 erodetimedirty 事件以腐蚀特效。副作用：同步腐蚀时间至客户端。"
     },
     {
       "name": "OnNoLongerLandedServer",
-      "effect": "若正在显示特效，推送 floater_stopfloating 事件；设网络变量 _is_landed 为 false；标记 showing_effect 为假并切换默认动画。"
+      "effect": "若正在显示特效，推送 floater_stopfloating 事件；设 _is_landed 网络变量为 false、showing_effect 为 false；调用 SwitchToDefaultAnim。副作用：推送事件、同步网络状态、恢复动画。"
     },
     {
       "name": "OnNoLongerLandedClient",
-      "effect": "标记 showing_effect 为假；重置 AnimState 浮动参数；移除已存在的 front_fx 与 back_fx 特效实体。"
+      "effect": "设置 showing_effect 为 false；AnimState 浮动参数归零；移除并置空 front_fx/back_fx 特效实体。副作用：清除客户端漂浮特效，修改动画参数。"
     }
   ],
   "events_published": [
@@ -86,58 +86,49 @@
     "erodetimedirty"
   ],
   "netvars": [
-    "floater._is_landed",
-    "floater._erode_time"
+    "_is_landed",
+    "_erode_time"
   ],
   "tunables": [
-    "TUNING.OCEAN_WETNESS",
-    "TUNING.OCEAN_TEMPERATURE_PENALTY_PERCENT",
-    "TUNING.FLOATER_HOT_SIZZLE_THRESHOLD"
+    "OCEAN_WETNESS",
+    "OCEAN_TEMPERATURE_PENALTY_PERCENT",
+    "FLOATER_HOT_SIZZLE_THRESHOLD"
   ],
   "wiki": {
     "scanned_pageids": [
-      70462,
       14485,
-      14688,
-      16185,
-      20704,
-      24674,
-      24902,
-      51698
+      15832,
+      13606,
+      14484,
+      15551,
+      13698,
+      14099,
+      52631
     ],
-    "aspects": [
-      {
-        "aspect": "物品漂浮特效消失修复",
-        "evidence": [
-          {
-            "pageid": 24902,
-            "quote": "修复了物品消失时，其漂浮特效不随之消失的问题。"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及浇水壶、恐怖之眼、帝王蟹、杂草、蜂后、邪天翁、暗影秘典、雪球等实体，文本内容主要描述浇水、冲撞、重生、生长、掉落、行为间隔与数量等，未出现任何与漂浮组件(floater)相关的漂浮、浮动、垂直偏移、缩放、着陆、侵蚀等能力表达，故页面不讨论该组件能力。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "漂浮特效",
-    "落水溅水",
-    "物品潮湿",
-    "水面浮动",
-    "浮物动画",
-    "侵蚀消失",
-    "垂直偏移",
-    "缩放设置",
-    "银行切换"
+    "水面漂浮",
+    "浮动物品",
+    "落水特效",
+    "水花溅起",
+    "潮湿物品",
+    "漂浮动画",
+    "浮标前后",
+    "离水消失"
   ],
   "gameplay_tags": [
     "生存",
-    "水域"
+    "海洋",
+    "装饰"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
     "source_bytes": 8274,
     "model": "hy3-free",
-    "generated_at_ms": 1787846118444
+    "generated_at_ms": 1787856799062
   }
 }

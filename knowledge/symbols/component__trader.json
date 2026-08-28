@@ -7,63 +7,63 @@
   },
   "category": "component",
   "display_name": "trader",
-  "summary": "该组件管理实体作为交易对象的状态，包括启用开关、是否接受非可交易物品与堆叠、以及接受测试与回调函数的引用。它参与玩家给予物品的核心玩法，判定实体能否及是否愿意接受礼物，并在接受或拒绝时触发相应回调与事件。",
+  "summary": "Trader 组件管理实体的交易状态（如启用、接受非交易物、删除物品等）与各类测试/回调，并维护 'trader' 与 'alltrader' 标签。它参与实体间给予物品的核心玩法，判定物理接受能力与主观接受意愿，执行礼物接收或拒绝并推送交易事件。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，移除实体上的 \"trader\" 和 \"alltrader\" 标签，无其他副作用。"
+      "effect": "从实体移除 'trader' 与 'alltrader' 标签，无其它副作用。"
     },
     {
       "name": "IsTryingToTradeWithMe",
-      "effect": "传入一个实体 inst，检查该实体是否正试图与本组件实体交易（其缓冲动作或远程交互的目标为本实体且动作为 GIVE、GIVEALLTOPLAYER 或 GIVETOPLAYER）。返回布尔值。"
+      "effect": "检查传入实体 inst 是否正通过 GIVE/GIVEALLTOPLAYER/GIVETOPLAYER 动作以本实体为目标进行交易，返回布尔值，无副作用。"
     },
     {
       "name": "IsAcceptingStacks",
-      "effect": "返回 self.acceptstacks 的值，指示实体是否被设置为接受堆叠物品。"
+      "effect": "返回 self.acceptstacks 的值，表示是否接受堆叠物品，无副作用。"
     },
     {
       "name": "Enable",
-      "effect": "设置 self.enabled 为 true，触发属性监听函数，为实体添加 \"trader\" 标签；若 acceptnontradable 为 true 则同时添加 \"alltrader\" 标签。"
+      "effect": "设置 enabled 为 true，触发属性回调为实体添加 'trader' 标签（若 acceptnontradable 为真则同时添加 'alltrader' 标签）。"
     },
     {
       "name": "Disable",
-      "effect": "设置 self.enabled 为 false，触发属性监听函数，为实体移除 \"trader\" 标签；若 acceptnontradable 为 true 则同时移除 \"alltrader\" 标签。"
+      "effect": "设置 enabled 为 false，触发属性回调从实体移除 'trader' 标签（若 acceptnontradable 为真则同时移除 'alltrader' 标签）。"
     },
     {
       "name": "SetAcceptTest",
-      "effect": "设置 self.test 为给定函数 fn，该函数将在 WantsToAccept 中用于判定实体是否愿意接受物品的意愿测试。"
+      "effect": "设置 self.test 为传入函数 fn，用于后续 WantsToAccept 的主观接受测试，无立即副作用。"
     },
     {
       "name": "SetAbleToAcceptTest",
-      "effect": "设置 self.abletoaccepttest 为给定函数 fn，用于覆盖 AbleToAccept 中的物理接受能力测试，可返回自定义失败原因字符串。"
+      "effect": "设置 self.abletoaccepttest 为传入函数 fn，用于覆盖后续 AbleToAccept 的物理接受能力测试，无立即副作用。"
     },
     {
       "name": "SetOnAccept",
-      "effect": "设置 self.onaccept 为给定回调函数 fn，在成功接受礼物后调用，传入本实体、给予者、物品和数量。"
+      "effect": "设置 self.onaccept 为传入函数 fn，在成功接受礼物后调用，无立即副作用。"
     },
     {
       "name": "SetOnRefuse",
-      "effect": "设置 self.onrefuse 为给定回调函数 fn，在拒绝礼物时调用，传入本实体、给予者和物品。"
+      "effect": "设置 self.onrefuse 为传入函数 fn，在拒绝礼物后调用，无立即副作用。"
     },
     {
       "name": "SetAcceptStacks",
-      "effect": "设置 self.acceptstacks 为 true，使实体能够接受堆叠物品（IsAcceptingStacks 将返回 true）。"
+      "effect": "设置 self.acceptstacks 为 true，使 IsAcceptingStacks 返回 true，表示本实体接受堆叠物品，无立即副作用。"
     },
     {
       "name": "AbleToAccept",
-      "effect": "判定实体物理上能否接受物品。检查 enabled、item 非 nil；若未设置 acceptsmimics 且物品为 itemmimic 则返回 false,\"ITEMMIMIC\"；若设置了 abletoaccepttest 则调用它；若实体死亡返回 false,\"DEAD\"；若实体睡眠或忙碌（且不在物品栏中）返回 false,\"SLEEPING\" 或 \"BUSY\"。成功返回 true，否则返回 false 及原因。"
+      "effect": "根据启用状态、物品有效性、物品模仿组件、自定义测试、实体死亡/睡眠/忙碌状态等判定物理上能否接受物品，返回布尔值及可选原因字符串（如 'DEAD'、'SLEEPING'、'BUSY'、'ITEMMIMIC'），无状态修改。"
     },
     {
       "name": "WantsToAccept",
-      "effect": "判定实体是否想要接受物品。要求 enabled 为 true 且（未设置 test 或 test 函数返回真）。返回布尔值，不触发回调。"
+      "effect": "根据启用状态及自定义 test 回调判定主观是否愿意接受物品，返回布尔值，无副作用。"
     },
     {
       "name": "AcceptGift",
-      "effect": "核心交易方法。若 AbleToAccept 失败直接返回 false；若 WantsToAccept 失败则调用 onrefuse 回调并返回 false。若成功：处理物品（堆叠超出则取部分，否则从原所有者移除），若 deleteitemonaccept 则删除物品否则放入实体背包；调用 onaccept 回调；推送 \"trade\" 事件（含 giver 和 item）；返回 true。"
+      "effect": "先调用 AbleToAccept 与 WantsToAccept 检查；若通过则处理物品（从原所有者移除或拆分堆叠，按 deleteitemonaccept 删除或存入实体库存），调用 onaccept 回调，推送 'trade' 事件并返回 true；若能力不允许返回 false；若意愿不接受则调用 onrefuse 回调并返回 false。副作用包括物品销毁/转移、库存变更、回调执行与事件发布。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回表示 enabled 状态的字符串 \"true\" 或 \"false\"。"
+      "effect": "返回表示 enabled 状态的字符串 'true' 或 'false'，无副作用。"
     }
   ],
   "events_published": [
@@ -74,70 +74,94 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15237,
-      34915,
-      34990,
-      39684,
-      39685,
-      51559,
-      53023,
-      65693
+      18359,
+      18521,
+      13493,
+      46887,
+      13457,
+      21432,
+      33819,
+      18510
     ],
     "aspects": [
       {
-        "aspect": "拒绝交易行为描述",
+        "aspect": "交易功能开启条件",
         "evidence": [
           {
-            "pageid": 34990,
-            "quote": "拒绝交易（给予错误的物品）"
-          },
-          {
-            "pageid": 39684,
-            "quote": "他们会拒绝交易"
-          },
-          {
-            "pageid": 39685,
-            "quote": "他们会拒绝交易"
+            "pageid": 13493,
+            "quote": "在好感度达到 1 级之后，靠近寄居蟹隐士能开启瓶罐交易"
           }
         ]
       },
       {
-        "aspect": "给予物品接受描述",
+        "aspect": "交易拒绝反馈提及",
         "evidence": [
           {
-            "pageid": 15237,
-            "quote": "给予物品时"
+            "pageid": 33819,
+            "quote": "被拒绝并说出台词也是效果"
+          }
+        ]
+      },
+      {
+        "aspect": "交易接受后产出描述",
+        "evidence": [
+          {
+            "pageid": 18359,
+            "quote": "给予[[猪王]]能换来 4 个[[金块]]"
           },
           {
-            "pageid": 34915,
-            "quote": "给予物品"
+            "pageid": 18510,
+            "quote": "每次交易能够减少 4 个诅咒饰品"
+          }
+        ]
+      },
+      {
+        "aspect": "可接受物品条件限制",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "可以用[[可交易]]且交易价"
           },
           {
-            "pageid": 51559,
-            "quote": "给予物品时"
+            "pageid": 33819,
+            "quote": "玩家可以将可交易的物品给予[[交易者]]"
+          }
+        ]
+      },
+      {
+        "aspect": "赠送礼物交好描述",
+        "evidence": [
+          {
+            "pageid": 18359,
+            "quote": "也可给予[[浣猫]]与之交好"
+          }
+        ]
+      },
+      {
+        "aspect": "靠近触发交易尝试",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "靠近流浪商人可以进行交易"
           },
           {
-            "pageid": 53023,
-            "quote": "给予物品"
-          },
-          {
-            "pageid": 65693,
-            "quote": "给予物品不会消失"
+            "pageid": 33819,
+            "quote": "玩家可以将可交易的物品给予[[交易者]]"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "交易对象",
+    "交易",
+    "商贩",
     "给予物品",
     "接受礼物",
+    "以物易物",
     "拒绝交易",
-    "交易标签",
-    "全交易",
-    "物品删除",
-    "交易回调"
+    "可交易",
+    "接受堆叠"
   ],
   "gameplay_tags": [
     "交易",
@@ -148,6 +172,6 @@
     "source_sha256": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
     "source_bytes": 4814,
     "model": "hy3-free",
-    "generated_at_ms": 1787850057519
+    "generated_at_ms": 1787859428042
   }
 }

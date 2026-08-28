@@ -7,39 +7,39 @@
   },
   "category": "component",
   "display_name": "knownlocations",
-  "summary": "该组件管理实体所知的命名位置集合（locations），支持记忆、查询与遗忘坐标点。它参与存档序列化与加载，使实体能够持久化重要地点信息，支撑依赖位置记忆的游戏逻辑。",
+  "summary": "该组件管理实体所知的地点信息，以名称与三维坐标的映射形式存储在 self.locations 中。它参与游戏存档、读档及调试，并提供记忆、查询和遗忘地点的接口，支撑AI或角色对关键位置的记忆玩法。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回所有已知位置名称与坐标拼接的字符串，不修改组件内部状态。"
+      "effect": "遍历 self.locations 拼接名称与坐标字符串返回，无副作用（源码中注释的调试器代码未执行）。"
     },
     {
       "name": "SerializeLocations",
-      "effect": "将内部 locations 表转换为包含 name,x,y,z 的数组，返回该数组或 nil，无副作用。"
+      "effect": "将 self.locations 转换为包含 name,x,y,z 字段的表数组，若无记录则返回 nil，无副作用。"
     },
     {
       "name": "DeserializeLocations",
-      "effect": "遍历输入数据表，对每个条目调用 RememberLocation 以恢复位置，从而修改内部 locations 数据。"
+      "effect": "接收数据数组，对每个元素调用 RememberLocation 以恢复位置，副作用为通过 RememberLocation 修改 self.locations 并可能触发错误。"
     },
     {
       "name": "OnSave",
-      "effect": "调用 SerializeLocations 获取序列化数据，返回 {locations=序列化数据} 或 nil 以供存档，不直接修改状态。"
+      "effect": "调用 SerializeLocations，若有数据则返回 {locations=序列化数据} 否则返回 nil，无直接副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若存档数据包含 locations 则调用 DeserializeLocations 加载，修改内部 locations 数据。"
+      "effect": "若传入数据包含 locations 则调用 DeserializeLocations 恢复，副作用同 DeserializeLocations。"
     },
     {
       "name": "RememberLocation",
-      "effect": "将指定名称与坐标位置存入 locations；若 dont_overwrite 为真且已存在同名则跳过；若坐标含非法数值则打印错误并抛出异常。修改内部 locations。"
+      "effect": "当 dont_overwrite 为假或该名称位置未记录时，将 name 与 pos 存入 self.locations；若 pos 含无效数字则打印并抛出错误。副作用：修改 self.locations，可能报错终止。"
     },
     {
       "name": "GetLocation",
-      "effect": "返回指定名称对应的位置 Vector3 或 nil，无副作用。"
+      "effect": "返回 self.locations[name] 存储的坐标或 nil，无副作用。"
     },
     {
       "name": "ForgetLocation",
-      "effect": "将指定名称的位置从 locations 中移除（置 nil），修改内部 locations。"
+      "effect": "将 self.locations[name] 设为 nil 以删除记录，副作用：修改 self.locations 表。"
     }
   ],
   "events_published": [],
@@ -57,19 +57,46 @@
       15651,
       13606
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面摘录内容均为实体掉落、攻击范围、生成间隔、重生时间等数值或行为，未包含任何关于已知位置组件能力如记住/获取/忘记位置、序列化/保存加载位置的表述，即便有“同一位置重生”也未明确体现记忆或存取位置能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "刷新点重生描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "龙蝇死亡后，20 天后在刷新点重新生"
+          }
+        ]
+      },
+      {
+        "aspect": "同一位置重生描述",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "帝王蟹死亡后会在 20 天后于同一位置重生"
+          }
+        ]
+      },
+      {
+        "aspect": "生成点位置引用",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "送到其生成点附近 8 单位内的随机位置"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "已知地点",
-    "记忆位置",
+    "记忆地点",
+    "已知位置",
     "记录坐标",
-    "遗忘地点",
-    "位置存档",
-    "地点查询",
-    "导航记忆",
-    "地点加载"
+    "遗忘位置",
+    "位置保存",
+    "地点读取",
+    "坐标存储",
+    "地点管理"
   ],
   "gameplay_tags": [
     "生存",
@@ -80,6 +107,6 @@
     "source_sha256": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
     "source_bytes": 2333,
     "model": "hy3-free",
-    "generated_at_ms": 1787848864871
+    "generated_at_ms": 1787858254518
   }
 }

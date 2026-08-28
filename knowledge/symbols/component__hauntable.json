@@ -7,79 +7,80 @@
   },
   "category": "component",
   "display_name": "hauntable",
-  "summary": "该组件管理实体被附身（haunt）的状态、冷却计时、恐慌与闪烁特效等数据。参与幽灵或玩家对实体进行附身互动的核心玩法，处理附身成功或失败的逻辑、幽灵复活、视觉着色与标签切换。",
+  "summary": "该组件管理实体被幽灵附身（haunt）时的状态数据，包括附身回调、冷却计时、恐慌状态与视觉特效参数。它参与幽灵玩家的附身互动玩法，处理附身成功或失败的逻辑、复活幽灵及触发闪烁与着色器效果。",
   "api": [
     {
       "name": "SetOnHauntFn",
-      "effect": "设置 self.onhaunt 为给定函数，该函数应返回 true 表示附身成功以触发附身者效果；替换原有回调，无其它副作用。"
+      "effect": "设置 self.onhaunt 为传入函数 fn；该函数应返回 true 表示成功附身，nil/false 表示失败。"
     },
     {
       "name": "SetOnUnHauntFn",
-      "effect": "设置 self.onunhaunt 回调，在附身结束（StopHaunt）时调用；仅存储函数。"
+      "effect": "设置 self.onunhaunt 为传入函数 fn，在停止附身时调用。"
     },
     {
       "name": "SetHauntValue",
-      "effect": "若 val 非 nil，设置 self.hauntvalue=val 且 self.no_wipe_value=true，使成功附身后不清除该值；修改附身值与标志。"
+      "effect": "若 val 为 nil 则直接返回；否则设置 self.hauntvalue = val 且 self.no_wipe_value = true。"
     },
     {
       "name": "Panic",
-      "effect": "强制进入被附身与恐慌状态：设置 haunted=true（触发添加 'haunted' 标签）、panic=true，计时器取最大值，并启动组件更新；副作用为添加标签与启动 OnUpdate 循环。"
+      "effect": "触发恐慌：设置 haunted=true, panic=true；panictime 默认 TUNING.HAUNT_PANIC_TIME_SMALL；更新 panictimer 和 cooldowntimer 为最大值；启动组件更新。"
     },
     {
       "name": "StartFX",
-      "effect": "若 noflicker 为假且 self.usefx 为真，则推进闪烁状态（AdvanceFlickerState）；可能改变 flicker 字段。"
+      "effect": "若 not noflicker 且 self.usefx 为真，则调用 AdvanceFlickerState 改变 flicker 状态。"
     },
     {
       "name": "AdvanceFlickerState",
-      "effect": "将 flicker 状态在 'off'->'on'->'fadeout'->'off' 间循环切换；修改 self.flicker。"
+      "effect": "根据当前 flicker 在 'off'->'on'->'fadeout'->'off' 间循环改变 self.flicker。"
     },
     {
       "name": "StopFX",
-      "effect": "强制 flicker 经 'fadeout' 转为 'off'；确保闪烁关闭。"
+      "effect": "设置 flicker='fadeout' 然后 AdvanceFlickerState 使其变为 'off' 以停止闪烁。"
     },
     {
       "name": "DoHaunt",
-      "effect": "执行附身逻辑：若存在 itemmimic 组件则使其邪恶化并返回；否则调用 onhaunt 回调，根据返回值设置 haunted 状态与后续冷却、特效、事件。若成功且 doer 为幽灵且 hauntvalue 为瞬间复活则推送复活事件；最后对 inst 推送 'haunted' 事件。副作用包括可能添加/移除标签、启动更新、改变着色器、推送事件、清除 hauntvalue 等。"
+      "effect": "执行附身：若 onhaunt 存在，有 itemmimic 则调用其 TurnEvil 并返回；否则调用 onhaunt(inst, doer) 结果赋给 haunted；成功时若 doer 为幽灵且 hauntvalue 为 TUNING.HAUNT_INSTANT_REZ 则 doer 推送 respawnfromghost 事件，并按 no_wipe_value 决定是否清空 hauntvalue；根据 cooldown_on_successful_haunt 或失败但有效时设置冷却并启动 FX、ShaderFx 及更新；最后 self.inst 推送 'haunted' 事件。"
     },
     {
       "name": "SetAnimStateGetterFn",
-      "effect": "设置 animstatefn 用于自定义获取 AnimState 的函数；存储函数。"
+      "effect": "设置 self.animstatefn 为传入函数 fn，用于获取 AnimState。"
     },
     {
       "name": "GetAnimState",
-      "effect": "返回 animstatefn(inst) 或 inst.AnimState；无副作用。"
+      "effect": "若 animstatefn 存在则返回其调用结果，否则返回 self.inst.AnimState。"
     },
     {
       "name": "StartShaderFx",
-      "effect": "获取 AnimState 并调用 SetHaunted(true) 开启着色特效；产生视觉变化。"
+      "effect": "获取 AnimState 并调用 SetHaunted(true) 开启附身着色器效果。"
     },
     {
       "name": "StopShaderFX",
-      "effect": "若 inst 有效，获取 AnimState 调用 SetHaunted(false) 关闭着色特效；产生视觉变化。"
+      "effect": "若 self.inst 有效，获取 AnimState 并调用 SetHaunted(false) 关闭附身着色器效果。"
     },
     {
       "name": "IsHaunted",
-      "effect": "返回 self.haunted 布尔值；无副作用。"
+      "effect": "返回 self.haunted 布尔值表示当前是否被附身。"
     },
     {
       "name": "StopHaunt",
-      "effect": "重置冷却、设置 haunted=false（移除标签），调用 onunhaunt，停止着色特效，并尝试停止更新；副作用为移除 'haunted' 标签与可能触发回调。"
+      "effect": "冷却置0，haunted=false，调用 onunhaunt（若有），停止着色器特效，并尝试停止组件更新。"
     },
     {
       "name": "TryStopUpdating",
-      "effect": "若非 haunted 且非 panic 则停止组件更新；可能停止 OnUpdate 调用。"
+      "effect": "若非 haunted 且非 panic 则停止组件更新（StopUpdatingComponent）。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧更新冷却与恐慌计时器；冷却结束则停止附身；处理闪烁状态切换；递减计时器并尝试停止更新；可能触发 StopHaunt、改变 flicker。"
+      "effect": "每帧更新：递减 cooldowntimer 和 panictimer；冷却结束时停止附身；冷却小于0.4且 self.flickering=='on' 时推进闪烁；恐慌计时结束则清除 panic；最后尝试停止更新。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "清理特效与标签：调用 StopFX、StopShaderFX，移除 'haunted' 标签；副作用为移除标签。"
+      "effect": "移除组件时：停止 FX 和 ShaderFX，并移除 self.inst 的 'haunted' 标签。"
     }
   ],
   "events_published": [
-    "haunted"
+    "haunted",
+    "respawnfromghost"
   ],
   "events_listened": [],
   "netvars": [],
@@ -94,35 +95,52 @@
       20162,
       72238,
       13701,
-      15922,
-      15022,
-      16197,
-      16419,
-      14938
+      18778,
+      18838,
+      10379,
+      35817,
+      13700
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面摘录仅提及'附身座狼'、'附身底盘'等实体名称及'巨兽恐慌效果'等无关技能，未描述hauntable组件能力（如附身函数、附身值、特效、闪烁、着色器、是否被附身等）的玩家表达，故无证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "作祟引发生物恐慌",
+        "evidence": [
+          {
+            "pageid": 18838,
+            "quote": "部分生物会在被作祟时恐慌"
+          }
+        ]
+      },
+      {
+        "aspect": "实体被作祟行为描述",
+        "evidence": [
+          {
+            "pageid": 18838,
+            "quote": "鬼魂可以作祟部分实体以复活"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "附身",
-    "闹鬼",
-    "幽灵复活",
+    "幽灵",
+    "惊吓",
     "恐慌",
-    "闪烁特效",
     "冷却",
-    "邪恶化",
-    "附身值"
+    "闪烁",
+    "复活",
+    "鬼魂"
   ],
   "gameplay_tags": [
-    "生存",
-    "装饰"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
     "source_bytes": 4770,
     "model": "hy3-free",
-    "generated_at_ms": 1787844517104
+    "generated_at_ms": 1787856432562
   }
 }

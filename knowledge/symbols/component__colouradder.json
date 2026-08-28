@@ -7,43 +7,43 @@
   },
   "category": "component",
   "display_name": "colouradder",
-  "summary": "该组件管理一个颜色来源栈与子实体列表，通过计算栈中所有来源颜色的累加值得到当前附加颜色。它参与实体视觉表现的核心玩法，将叠加后的颜色应用到自身动画状态或同步组件，并可传递给绑定的子物体实现统一染色。",
+  "summary": "组件管理一个颜色堆栈（colourstack）和子对象（children）列表，通过叠加多个来源推送的 RGBA 颜色值来计算实体最终的附加颜色。它参与的核心玩法是为实体及其子对象提供动态的视觉颜色叠加效果，常用于状态提示或环境交互的视觉表现，并能在来源移除时自动清理颜色贡献。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历 colourstack 与 children，移除所有相关的 'onremove' 事件监听，并对 children 中拥有 colouradder 组件的实体调用 PopColour 移除自身颜色贡献。副作用：清除事件回调，可能改变子实体颜色。"
+      "effect": "当组件从实体移除时调用。遍历 colourstack 和 children，移除所有监听的 onremove 事件回调；对于 children 中拥有 colouradder 组件的子对象，调用其 PopColour(self.inst) 以移除本实体作为来源的颜色贡献。无返回值，副作用是清理事件监听并可能改变子对象颜色。"
     },
     {
       "name": "AttachChild",
-      "effect": "若 child 不在 children 中，记录并监听其 'onremove' 事件，并立即将自身当前颜色推送给 child（根据其 colouradder/colouraddersync/AnimState 情况调用对应方法）。副作用：注册事件监听，立即改变 child 的附加颜色。"
+      "effect": "参数 child 为要附加的子对象。若 child 尚未在 children 表中，则为其注册 onremove 事件监听（回调会清空 children[child]），并立即根据当前计算颜色对 child 进行颜色推送：若 child 有 colouradder 组件则调用其 PushColour(self.inst, r,g,b,a)，若有 colouraddersync 则调用其 SyncColour，否则若 child 有 AnimState 则调用 SetAddColour。副作用：建立父子颜色关联，子对象立即获得当前附加颜色。"
     },
     {
       "name": "DetachChild",
-      "effect": "若 child 在 children 中，移除对其 'onremove' 事件的监听并从表移除，若 child 有 colouradder 则调用其 PopColour 撤销贡献。副作用：注销监听，可能改变 child 颜色。"
+      "effect": "参数 child 为要分离的子对象。若 children[child] 存在，则移除其 onremove 监听，置空表项；若 child 有 colouradder 组件则调用其 PopColour(self.inst) 以移除颜色贡献。副作用：解除关联并可能改变子对象颜色。"
     },
     {
       "name": "GetCurrentColour",
-      "effect": "返回 self.colour 中存储的当前四个颜色分量（r,g,b,a）。无副作用。"
+      "effect": "返回 self.colour 的四个分量（r, g, b, a），即当前已应用的计算颜色。无副作用。"
     },
     {
       "name": "CalculateCurrentColour",
-      "effect": "遍历 colourstack 中所有来源颜色累加，将每个分量 clamp 到 [0,1] 后返回。无副作用。"
+      "effect": "遍历 colourstack 中所有来源的颜色值并累加，使用 math.clamp 将每个分量限制在 0 到 1 范围内返回。纯计算，无副作用。"
     },
     {
       "name": "OnSetColour",
-      "effect": "更新 self.colour 为给定值，若自身有 colouraddersync 则 SyncColour 否则若自身 AnimState 则 SetAddColour，并遍历 children 传递颜色。副作用：改变自身及子实体的附加颜色表现。"
+      "effect": "参数 r,g,b,a。将 self.colour 更新为给定值；若自身有 colouraddersync 组件则调用其 SyncColour(r,g,b,a)，否则若自身有 AnimState 则调用 SetAddColour(r,g,b,a)；然后遍历 children 对每个子对象同样推送颜色（依据子对象拥有的组件或 AnimState）。副作用：改变实体及子对象的附加颜色表现。"
     },
     {
       "name": "PushColour",
-      "effect": "若参数有效，全零时转 PopColour；否则在 colourstack 新建或更新来源颜色，若来源是实体则监听其 'onremove'，重算颜色变化则调用 OnSetColour 应用。副作用：可能注册监听，改变自身及子实体颜色。"
+      "effect": "参数 source, r, g, b, a。若 source 及颜色参数均非 nil，且颜色全为 0 则等效于 PopColour(source) 并返回；否则在 colourstack 中创建或更新 source 对应的颜色条目，若 source 是实体实例则监听其 onremove 事件；随后重新计算总颜色，若与当前 self.colour 不同则调用 OnSetColour 更新。副作用：增加或修改颜色来源，可能改变实体及子对象颜色，并可能添加事件监听。"
     },
     {
       "name": "PopColour",
-      "effect": "移除指定来源的颜色贡献，若来源是实体则移除监听，重算颜色变化则调用 OnSetColour 应用。副作用：注销监听，改变颜色。"
+      "effect": "参数 source。若 source 非 nil 且在 colourstack 中有记录，则若 source 是实体实例则移除其 onremove 监听，清除该来源颜色记录，重新计算总颜色并在变化时调用 OnSetColour 更新。副作用：移除颜色来源，可能改变实体及子对象颜色，移除事件监听。"
     },
     {
       "name": "GetDebugString",
-      "effect": "格式化返回当前颜色及栈中所有来源颜色的字符串。无副作用。"
+      "effect": "返回描述当前颜色及 colourstack 中所有来源颜色的字符串，用于调试。无副作用。"
     }
   ],
   "events_published": [],
@@ -54,29 +54,30 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15526,
-      71461,
-      72299,
-      15169,
-      16250,
-      35409,
       65505,
-      70854
+      15238,
+      46847,
+      22383,
+      19761,
+      47010,
+      28179,
+      13603
     ],
     "aspects": [],
-    "no_evidence_reason": "所给页面摘录均讨论实体绑定解除或洞穴光照RGB减半，无任何与colouradder组件能力（子节点附加分离、推弹颜色、获取计算设置颜色、移除回调、调试字符串）相关的表述。",
+    "no_evidence_reason": "所有页面摘录均未提及colouradder组件及其能力（如颜色子级附加、推拉颜色、计算当前色等），仅65505页涉及光照颜色叠加但未对应组件方法，其余页讨论实体掉落与行为，无颜色组件证据。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "颜色叠加",
     "附加颜色",
+    "颜色叠加",
     "子物染色",
-    "解除绑定",
+    "实体变色",
+    "颜色堆栈",
     "当前色值",
-    "计算颜色",
-    "同步着色",
-    "动画染色",
-    "调试信息"
+    "调试色串",
+    "移除事件",
+    "颜色计算",
+    "视觉叠加"
   ],
   "gameplay_tags": [
     "装饰"
@@ -86,6 +87,6 @@
     "source_sha256": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
     "source_bytes": 4562,
     "model": "hy3-free",
-    "generated_at_ms": 1787851123623
+    "generated_at_ms": 1787860449565
   }
 }

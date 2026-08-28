@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "bloomer",
-  "summary": "该组件管理一个按优先级排序的泛光效果栈（bloomstack）以及附加的子实体映射（children），用于追踪不同来源请求的发光特效。它通过设置实体及子实体的AnimState泛光句柄，参与游戏内视觉装饰与状态高亮表现，支持动态叠加与移除效果。",
+  "summary": "该组件管理实体的发光（Bloom）特效栈，允许不同来源按优先级推送和弹出特效。它通过 AnimState 设置泛光效果，并能将特效传递给绑定的子实体，参与游戏的视觉装饰表现。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历bloomstack，若source为实体实例则移除其onremove事件监听；遍历children移除监听并对有bloomer组件的子实体调用PopBloom(self.inst)。清理自身事件回调，可能改变子实体泛光状态，但不显式清空自身bloomstack。"
+      "effect": "遍历 bloomstack 移除对各个 source 的 onremove 事件监听；遍历 children 移除监听并对有 bloomer 组件的子实体调用 PopBloom(self.inst)，清理所有关联。副作用：解除全部事件监听并可能清除子实体发光状态。"
     },
     {
       "name": "AttachChild",
-      "effect": "若child不在children中，记录并监听child的onremove事件；根据当前栈顶泛光状态对child施加或清除效果：有fx时子体有bloomer则PushBloom否则设AnimState，无fx时子体有bloomer则PopBloom否则清AnimState。副作用：添加事件监听并修改child渲染特效。"
+      "effect": "若 child 尚未绑定，则监听 child 的 onremove 事件，并根据当前栈顶特效立即对 child 设置发光（若 child 有 bloomer 则递归 PushBloom，否则直接设置 AnimState）。副作用：添加事件监听，可能立即改变 child 的发光表现。"
     },
     {
       "name": "DetachChild",
-      "effect": "若child在children中，移除其onremove监听并从表移除，若child有bloomer则调用其PopBloom(self.inst)。副作用：移除child的泛光效果与监听。"
+      "effect": "若 child 已绑定，则移除其 onremove 监听并从 children 表删除，若 child 有 bloomer 则调用其 PopBloom(self.inst)。副作用：停止管理该子实体并可能清除其发光。"
     },
     {
       "name": "GetCurrentFX",
-      "effect": "返回bloomstack栈顶元素的fx字段，栈空则返回nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶元素的 fx 字段，若栈为空则返回 nil。无副作用。"
     },
     {
       "name": "GetCurrentFxAndPriority",
-      "effect": "返回bloomstack栈顶元素的fx与priority，栈空则返回nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶元素的 fx 与 priority，若栈为空则隐式返回 nil。无副作用。"
     },
     {
       "name": "OnSetBloomEffectHandle",
-      "effect": "设置自身AnimState的BloomEffectHandle为fx，并遍历children：有bloomer组件的子体调用PushBloom(self.inst, fx, priority)，否则直接设置其AnimState。副作用：修改自身及子实体泛光渲染。"
+      "effect": "对自身 AnimState 调用 SetBloomEffectHandle(fx)，并遍历 children 对有 bloomer 的递归 PushBloom、否则直接设 AnimState。副作用：改变自身及子实体发光表现。"
     },
     {
       "name": "OnClearBloomEffectHandle",
-      "effect": "清除自身AnimState的BloomEffectHandle，并遍历children：有bloomer组件的子体调用PopBloom(self.inst)，否则清除其AnimState。副作用：修改自身及子实体泛光渲染。"
+      "effect": "对自身 AnimState 调用 ClearBloomEffectHandle()，并遍历 children 对有 bloomer 的递归 PopBloom、否则清除 AnimState 发光。副作用：清除自身及子实体发光。"
     },
     {
       "name": "PushBloom",
-      "effect": "若source和fx非nil，更新或新建对应bloom记录并按priority有序插入bloomstack（栈顶为最高优先级），若source是实体则监听其onremove；若栈顶变化则调用OnSetBloomEffectHandle更新效果。副作用：修改bloomstack、添加事件监听、更新自身及子体泛光。"
+      "effect": "若 source 与 fx 非 nil，更新或新建 bloomstack 中对应 source 的条目（默认 priority 为 0），并按优先级插入有序位置；若栈顶变化则调用 OnSetBloomEffectHandle 更新。若 source 是实体实例则监听其 onremove。副作用：可能添加事件监听并改变发光特效。"
     },
     {
       "name": "PopBloom",
-      "effect": "若source非nil，从bloomstack移除对应记录，若是实体则移除onremove监听；移除后若栈顶变为空则清除效果，否则若变化则更新效果。副作用：修改bloomstack、移除监听、更新泛光。"
+      "effect": "若 source 非 nil，从 bloomstack 移除该 source 条目并移除其 onremove 监听（若为实体），若栈顶变化则调用 OnSetBloomEffectHandle 或 OnClearBloomEffectHandle 更新。副作用：可能移除监听并改变发光。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回逆序列出bloomstack中priority、source、fx的调试字符串。无副作用。"
+      "effect": "返回描述 bloomstack 内各来源优先级与 fx 的字符串。无副作用。"
     }
   ],
   "events_published": [],
@@ -58,36 +58,38 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      24912,
-      34615,
-      52011,
       15238,
       22383,
       15239,
       13493,
-      15237
+      15237,
+      28751,
+      15421,
+      18522
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录中仅24912、34615、52011提及'泛光效果'，但均为物品或图案具有泛光效果的静态描述，未体现bloomer组件所列能力（如附加/移除子项、推送/弹出泛光、设置/清除句柄、获取特效或调试字符串）的任何玩家语言表达或行为数值。",
+    "no_evidence_reason": "提供的页面摘录均围绕实体掉落、生成、行为等，未出现任何与 bloomer 组件能力（如泛光特效、子节点挂载、推入弹出泛光等）相关的描述。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "泛光效果",
-    "发光叠加",
-    "子体附着",
-    "特效优先级",
-    "清除光晕",
-    "调试字符串",
-    "视觉特效栈"
+    "发光特效",
+    "泛光处理",
+    "子物绑定",
+    "优先级栈",
+    "清除发光",
+    "来源监听",
+    "视觉修饰",
+    "特效叠加"
   ],
   "gameplay_tags": [
-    "装饰"
+    "装饰",
+    "特效"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
     "source_bytes": 4799,
     "model": "hy3-free",
-    "generated_at_ms": 1787852411611
+    "generated_at_ms": 1787861488390
   }
 }

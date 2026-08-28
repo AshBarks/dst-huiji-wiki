@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "bait",
-  "summary": "组件 Bait 管理一个指向陷阱（trap）的引用，用于标记物品作为诱饵时的归属状态。它监听物品的移除、拾取、被吃和被偷事件，以通知关联陷阱更新诱饵状态或转移物品。该组件参与陷阱捕捉与诱饵管理的核心玩法。",
+  "summary": "该组件将实体标记为诱饵，并维护其与陷阱（trap）的关联引用（self.trap）。当诱饵被吃掉、被偷走、被捡起或移除时，组件会通知关联的陷阱进行移除或捕获处理，是陷阱捕捉玩法的组成部分。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "移除组件在实体上监听的 onremove、onpickup、oneaten、onstolen 事件回调，使后续相关事件不再触发与 trap 的交互逻辑。"
+      "name": "IsFree",
+      "effect": "返回布尔值，指示诱饵当前是否未被任何陷阱关联（即 self.trap == nil），无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含当前 trap 引用信息的调试字符串，无副作用。"
+      "effect": "返回调试字符串，格式为 'Trap:' 拼接 self.trap 的 tostring 结果，无副作用。"
     },
     {
-      "name": "IsFree",
-      "effect": "返回 trap 是否为 nil 的布尔值，表示诱饵是否未被陷阱引用，无副作用。"
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件在实体上监听的 'onremove'、'onpickup'、'oneaten'、'onstolen' 事件回调，清理资源，无其它副作用。"
     }
   ],
   "events_published": [],
@@ -33,28 +33,49 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      24751,
-      39622,
-      14674,
-      24542,
+      22181,
+      15722,
+      13260,
       14676,
-      15022,
-      35020,
-      15722
+      13761,
+      15327,
+      20832,
+      15237
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面文本仅讨论诱饵物品的玩法，未提及组件bait的代码能力OnRemoveFromEntity、GetDebugString、IsFree的玩家语言表达。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "无诱饵状态说明",
+        "evidence": [
+          {
+            "pageid": 15327,
+            "quote": "即使没有诱饵，也可能抓到一只鸟"
+          }
+        ]
+      },
+      {
+        "aspect": "诱饵移除触发行为",
+        "evidence": [
+          {
+            "pageid": 13761,
+            "quote": "一旦玩家采摘诱饵，它就会钻出并攻击玩家"
+          },
+          {
+            "pageid": 15722,
+            "quote": "诱饵保鲜时间耗尽后直接消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "诱饵",
-    "陷阱",
-    "捕捉",
-    "被吃",
-    "被偷",
-    "拾取",
-    "移除",
-    "钓饵"
+    "陷阱诱饵",
+    "诱饵空闲",
+    "诱饵被吃",
+    "诱饵被偷",
+    "诱饵移除",
+    "关联陷阱"
   ],
   "gameplay_tags": [
     "生存",
@@ -65,6 +86,6 @@
     "source_sha256": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
     "source_bytes": 1220,
     "model": "hy3-free",
-    "generated_at_ms": 1787850651608
+    "generated_at_ms": 1787859946338
   }
 }

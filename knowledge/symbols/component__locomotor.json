@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "locomotor",
-  "summary": "LocoMotor组件管理实体的移动相关数据，如步行与跑步速度、外部速度乘数、目的地与缓冲动作等。它参与核心移动玩法，包括走路跑步、路径寻找、平台间跳跃、地面速度修正及与动作系统的移动交互。",
+  "summary": "Locomotor 组件管理实体的移动速度、目的地、路径与平台跳跃等状态数据。它参与核心玩法中的行走、奔跑、地形速度修正、creep 触发及平台间跳跃移动，并区分服务端与客户端的预测逻辑以同步速度网络变量。",
   "api": [
     {
       "name": "EnableHopDelay",
-      "effect": "启用或禁用平台跳跃延迟结构；若enable为false则清空hop_delay，否则初始化hop_delay表。"
+      "effect": "启用或禁用平台跳跃延迟数据；禁用时置 hop_delay 为 nil，启用时初始化包含目标平台、起始 tick 等字段的表。"
     },
     {
       "name": "StartUpdatingInternal",
-      "effect": "标记isupdating并启动组件更新（若实体未睡眠）。"
+      "effect": "标记组件为更新中，若实体未睡眠则启动组件更新循环。"
     },
     {
       "name": "StopUpdatingInternal",
-      "effect": "清除isupdating并停止组件更新。"
+      "effect": "清除更新标记并停止组件更新循环。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "实体睡眠时调用，停止移动（Stop）。"
+      "effect": "实体睡眠时调用，停止实体移动（Stop）。"
     },
     {
       "name": "OnEntityWake",
@@ -31,223 +31,223 @@
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除组件时清理：主端移除locomotor标签与turfrunner标签，移除外部速度乘数监听，重置预测速度乘数。"
+      "effect": "组件移除时清理：服务端移除 locomotor 及 turfrunner 标签，移除外部速度乘数源的 onremove 监听，重置预测乘数。"
     },
     {
       "name": "GetTimeMoving",
-      "effect": "返回实体持续移动的时间，基于预测或实际移动计时器。"
+      "effect": "返回实体持续移动的时间，考虑预测计时与停止阈值。"
     },
     {
       "name": "StartMoveTimerInternal",
-      "effect": "若停止超时则重置移动开始时间为当前时间，清除停止时间。"
+      "effect": "若停止超阈值则重置移动开始时间为当前，清除停止时间。"
     },
     {
       "name": "StopMoveTimerInternal",
-      "effect": "若停止时间为空则记录当前为停止时间。"
+      "effect": "记录当前时间为移动停止时间。"
     },
     {
       "name": "OverrideMoveTimer",
-      "effect": "覆盖移动计时器，设定movestarttime为当前减movetime，客户端安排任务清除覆盖。"
+      "effect": "覆盖移动计时器为指定偏移，客户端创建延迟任务恢复；取消已有 override 任务。"
     },
     {
       "name": "PopOverrideTimeMoving",
-      "effect": "客户端专用，取消覆盖计时器并返回覆盖的移动时间。"
+      "effect": "客户端取出并取消 override 的移动时间值。"
     },
     {
       "name": "RestartPredictMoveTimer",
-      "effect": "设置predictmovestarttime为当前时间，重启预测移动计时。"
+      "effect": "设置预测移动开始时间为当前。"
     },
     {
       "name": "CancelPredictMoveTimer",
-      "effect": "清空predictmovestarttime，取消预测移动计时。"
+      "effect": "清除预测移动开始时间。"
     },
     {
       "name": "OverridePredictTimer",
-      "effect": "设置predictmovestarttime为给定时间t。"
+      "effect": "直接设置预测移动开始时间为给定值。"
     },
     {
       "name": "StopMoving",
-      "effect": "设置isrunning为false，调用物理停止，停止实体运动。"
+      "effect": "设置 isrunning 为 false 并停止物理引擎移动。"
     },
     {
       "name": "RecalculateExternalSpeedMultiplier",
-      "effect": "遍历所有源乘数重算总外部速度乘数并返回。"
+      "effect": "遍历所有外部源乘数重算总乘数并返回。"
     },
     {
       "name": "SetExternalSpeedMultiplier",
-      "effect": "为指定源和键设置外部速度乘数，更新总乘数并监听源移除事件；若m为1或nil则移除。"
+      "effect": "为源和键设置外部速度乘数，更新缓存并监听源移除事件；若为1或nil则移除。"
     },
     {
       "name": "RemoveExternalSpeedMultiplier",
-      "effect": "移除指定源或键的乘数，更新总乘数，若整源移除则取消事件监听。"
+      "effect": "移除指定源或键的乘数，可能移除整个源及事件监听，更新缓存。"
     },
     {
       "name": "GetExternalSpeedMultiplier",
-      "effect": "返回指定源或键的当前外部速度乘数，无则返回1。"
+      "effect": "返回指定源或键的乘数，无则返回1。"
     },
     {
       "name": "SetPredictExternalSpeedMultiplier",
-      "effect": "设置客户端预测用外部速度乘数，通过SourceModifierList管理。"
+      "effect": "设置客户端预测用外部速度乘数，惰性创建 SourceModifierList。"
     },
     {
       "name": "RemovePredictExternalSpeedMultiplier",
-      "effect": "移除预测用外部速度乘数修饰符。"
+      "effect": "移除预测外部速度乘数修饰符。"
     },
     {
       "name": "GetPredictExternalSpeedMultipler",
-      "effect": "返回预测用外部速度乘数总计，无则返回1。"
+      "effect": "返回预测外部速度乘数，默认1。"
     },
     {
       "name": "SetSlowMultiplier",
-      "effect": "设置slowmultiplier值，影响creep上减速程度。"
+      "effect": "设置踩 creep 时的慢速速度乘子。"
     },
     {
       "name": "SetTriggersCreep",
-      "effect": "设置triggerscreep布尔，决定是否触发creep事件与减速。"
+      "effect": "设置是否触发 creep 事件与减速。"
     },
     {
       "name": "SetFasterOnCreep",
-      "effect": "设置fasteroncreep布尔，允许在creep上加速。"
+      "effect": "设置是否在 creep 上获得加速。"
     },
     {
       "name": "EnableGroundSpeedMultiplier",
-      "effect": "启用/禁用地面速度乘数；禁用时重置相关乘数与临时值。"
+      "effect": "启用/禁用地面速度乘数；禁用时重置相关变量为1或nil。"
     },
     {
       "name": "GetWalkSpeed",
-      "effect": "返回walkspeed乘以总速度乘数。"
+      "effect": "返回走路速度乘以总速度乘数。"
     },
     {
       "name": "GetRunSpeed",
-      "effect": "返回RunSpeed()乘以总速度乘数。"
+      "effect": "返回 RunSpeed() 乘以总速度乘数。"
     },
     {
       "name": "SetFasterOnGroundTile",
-      "effect": "主端设置某地块类型是否加速，并添加/移除turfrunner标签。"
+      "effect": "服务端设置某地面瓦片更快并添加/移除 turfrunner_<tile> 标签。"
     },
     {
       "name": "UpdateGroundSpeedMultiplier",
-      "effect": "根据是否在creep、道路或加速地块更新groundspeedmultiplier，并推送walkoncreep/walkoffcreep事件。"
+      "effect": "根据 creep、道路、瓦片计算地面速度乘数，进出 creep 时推送 walkoncreep/walkoffcreep 事件。"
     },
     {
       "name": "PushTempGroundSpeedMultiplier",
-      "effect": "在启用时设置临时地面速度乘数及地块，短时覆盖。"
+      "effect": "设置短时有效的临时地面速度乘数及瓦片。"
     },
     {
       "name": "TempGroundSpeedMultiplier",
-      "effect": "若临时乘数未过期则返回它，否则清理并返回nil。"
+      "effect": "若临时乘数在有效期内则返回，否则清除并返回 nil。"
     },
     {
       "name": "TempGroundTile",
-      "effect": "若临时地块未过期返回它，否则清理返回nil。"
+      "effect": "返回临时地面瓦片（若未过期）。"
     },
     {
       "name": "SetTempGroundSpeedMultiplierModifier",
-      "effect": "设置临时地面速度乘数修改函数，需两端同步调用。"
+      "effect": "设置临时地面速度乘数的修正函数。"
     },
     {
       "name": "StartStrafing",
-      "effect": "主端若未strafing则设置并同步player_classified，推送startstrafing事件。"
+      "effect": "服务端启用横移：设置网络变量 isstrafing 并推送 startstrafing 事件。"
     },
     {
       "name": "StopStrafing",
-      "effect": "主端若strafing则取消并同步，推送stopstrafing事件。"
+      "effect": "服务端停止横移：清除网络变量并推送 stopstrafing 事件。"
     },
     {
       "name": "SetStrafing",
-      "effect": "设置strafedir为当前旋转或nil，控制侧向移动模式。"
+      "effect": "设置横移状态，初始化横移方向为当前旋转。"
     },
     {
       "name": "SetMoveDir",
-      "effect": "若strafing则设strafedir，否则设实体旋转方向。"
+      "effect": "横移时记录方向，否则设置实体旋转。"
     },
     {
       "name": "FaceMovePoint",
-      "effect": "非strafing时面向点；strafing且非busy时设strafedir为角度。"
+      "effect": "根据横移状态将实体转向给定点。"
     },
     {
       "name": "SetMotorSpeed",
-      "effect": "根据strafing与否设置物理马达速度（相对或绝对）。"
+      "effect": "根据横移设置物理马达速度（相对横移方向或绝对）。"
     },
     {
       "name": "OnStrafeFacingChanged",
-      "effect": "strafing时若朝向变化则更新旋转并调整马达速度矢量。"
+      "effect": "横移时更新实体旋转并调整马达速度向量。"
     },
     {
       "name": "WalkForward",
-      "effect": "设isrunning false，设马达为步行速度，启动更新。"
+      "effect": "以走路速度前进，设置 wantstomoveforward 并启动更新。"
     },
     {
       "name": "RunForward",
-      "effect": "设isrunning true，设马达为跑步速度，启动更新。"
+      "effect": "以跑步速度前进，设置 isrunning 并启动更新。"
     },
     {
       "name": "Clear",
-      "effect": "清空目的地、回调、前向意愿、缓冲动作，重置路径。"
+      "effect": "清除目的地、回调、缓冲动作等移动状态。"
     },
     {
       "name": "ResetPath",
-      "effect": "杀死路径搜索并清空path。"
+      "effect": "终止路径搜索并清除路径数据。"
     },
     {
       "name": "KillPathSearch",
-      "effect": "若等待路径搜索则通知世界寻路器杀死搜索。"
+      "effect": "若正在等待路径搜索则通知寻路器终止。"
     },
     {
       "name": "SetReachDestinationCallback",
-      "effect": "设置到达目的地回调函数atdestfn。"
+      "effect": "设置到达目的地时的回调函数 atdestfn。"
     },
     {
       "name": "PreviewAction",
-      "effect": "客户端预览缓冲动作，根据动作类型决定走向实体/点/停止或即时执行。"
+      "effect": "客户端预览缓冲动作，根据动作类型规划走向实体/点或直接预览，可能调用 GoToEntity/GoToPoint。"
     },
     {
       "name": "PushAction",
-      "effect": "服务端/客户端推送缓冲动作，测试开始条件，触发移动或即时动作，失败推actionfailed。"
+      "effect": "执行缓冲动作移动规划，测试动作开始条件，失败推 actionfailed，成功设目的地与缓冲动作。"
     },
     {
       "name": "GoToEntity",
-      "effect": "设目的地为实体，计算到达距离，启动路径查找或直驱，更新缓冲动作。"
+      "effect": "设置目的地为实体，计算到达距离，取消预测计时，启动移动与寻路。"
     },
     {
       "name": "GoToPoint",
-      "effect": "设目的地为点，计算到达距离，启动路径查找或直驱，更新缓冲动作。"
+      "effect": "设置目的地为点，计算到达距离，启动移动与寻路，支持覆盖目的地。"
     },
     {
       "name": "SetBufferedAction",
-      "effect": "失败旧动作，设新缓冲动作，若允许平台跳跃重置最后平台，通知玩家控制器。"
+      "effect": "设置当前缓冲动作，使旧动作失败并通知 playercontroller。"
     },
     {
       "name": "Stop",
-      "effect": "停止移动，清空目的地与路径，按需推locomote事件，停止更新。"
+      "effect": "停止移动，清除目的地与路径，推送 locomote 事件，可能软停止。"
     },
     {
       "name": "WalkInDirection",
-      "effect": "设方向移动，清空目的地，启动走路或直驱，推locomote事件。"
+      "effect": "指定方向行走或奔跑，清除目的地，推送 locomote 事件。"
     },
     {
       "name": "RunInDirection",
-      "effect": "设节流与方向，调用WalkInDirection并设wantstorun。"
+      "effect": "指定方向奔跑，设置 throttle 并调用 WalkInDirection。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回调试字符串含状态速度目的地等。"
+      "effect": "返回描述移动状态、速度、目的地等调试字符串。"
     },
     {
       "name": "HasDestination",
-      "effect": "返回是否有dest。"
+      "effect": "返回是否设置了目的地。"
     },
     {
       "name": "SetShouldRun",
-      "effect": "设置wantstorun布尔。"
+      "effect": "设置 wantstorun 标志。"
     },
     {
       "name": "WantsToRun",
-      "effect": "返回wantstorun是否为true。"
+      "effect": "返回是否想要奔跑。"
     },
     {
       "name": "WantsToMoveForward",
-      "effect": "返回wantstomoveforward是否为true。"
+      "effect": "返回是否想要前进。"
     },
     {
       "name": "WaitingForPathSearch",
@@ -255,51 +255,83 @@
     },
     {
       "name": "UpdateHopping",
-      "effect": "已废弃，空函数。"
+      "effect": "已废弃的平台跳跃更新函数，目前为空。"
     },
     {
       "name": "FinishHopping",
-      "effect": "结束跳跃状态，处理保留平台预约清理。"
+      "effect": "结束跳跃状态，处理预留平台的清除。"
     },
     {
       "name": "SetAllowPlatformHopping",
-      "effect": "设置允许平台跳跃并初始化最后访问平台。"
+      "effect": "设置允许平台跳跃并初始化最后访问平台记录。"
     },
     {
       "name": "CheckEdge",
-      "effect": "检测给定方向半径处是否为水且无平台或异平台。"
+      "effect": "检测给定方向一定半径处是否为水或无平台（边缘）。"
     },
     {
       "name": "IsAtEdge",
-      "effect": "检测实体在给定方向是否处于平台边缘。"
+      "effect": "通过多半径检测判断实体是否处于平台边缘。"
     },
     {
       "name": "GetHopDistance",
-      "effect": "返回跳跃距离，可经函数计算。"
+      "effect": "返回跳跃距离，支持自定义函数计算。"
     },
     {
       "name": "IsValidDestinationPlatform",
-      "effect": "检查目标平台是否为合法跳跃目的地（容量、标签等）。"
+      "effect": "判断目标平台是否可作为跳跃目的地（容量、玩家/坐骑限制）。"
     },
     {
       "name": "ScanForPlatformInDir_Internal",
-      "effect": "内部扫描方向寻找可跳跃平台，处理延迟与障碍。"
+      "effect": "内部扫描指定方向寻找可跳跃平台，处理延迟与阻挡。"
     },
     {
       "name": "ScanForPlatformInDir",
-      "effect": "若在边缘则调用内部扫描寻找方向平台。"
+      "effect": "从平台边缘扫描方向寻找可跳跃平台。"
     },
     {
       "name": "ScanForPlatformInDirFromFloating",
-      "effect": "从漂浮状态扫描方向寻找平台。"
+      "effect": "从漂浮状态扫描方向寻找可登陆平台。"
     },
     {
       "name": "TestForBlocked",
-      "effect": "检测给定方向路径上是否有blocker标签实体阻挡。"
+      "effect": "检测给定方向路径上是否存在阻挡物（blocker 标签）。"
     },
     {
       "name": "ScanForPlatform",
-      "effect": "截断未完整：基于目标点方向扫描平台跳跃可能（源码在此截断）。"
+      "effect": "朝目标点方向扫描可跳跃平台（源码截断前可见定义）。"
+    },
+    {
+      "name": "RunSpeed",
+      "effect": "返回当前运行速度：服务端取自身或坐骑 runspeed；客户端取网络变量或预测值。"
+    },
+    {
+      "name": "FasterOnRoad",
+      "effect": "返回是否在道路上更快：考虑骑乘坐骑属性。"
+    },
+    {
+      "name": "FasterOnCreep",
+      "effect": "返回是否在 creep 上更快：骑乘时强制 false。"
+    },
+    {
+      "name": "ExternalSpeedMultiplier",
+      "effect": "返回外部速度乘数：服务端取变量，客户端乘预测乘数。"
+    },
+    {
+      "name": "ExternalVelocityVectorX",
+      "effect": "返回外部速度向量 X 分量（网络同步或本地）。"
+    },
+    {
+      "name": "ExternalVelocityVectorZ",
+      "effect": "返回外部速度向量 Z 分量（网络同步或本地）。"
+    },
+    {
+      "name": "GetSpeedMultiplier",
+      "effect": "计算总速度乘数：综合外部乘数、装备、坐骑马鞍、地面乘数、节流等。"
+    },
+    {
+      "name": "IsFasterOnGroundTile",
+      "effect": "判断在特定地面瓦片是否更快，考虑幽灵模式与骑乘。"
     }
   ],
   "events_published": [
@@ -307,12 +339,21 @@
     "walkoffcreep",
     "startstrafing",
     "stopstrafing",
-    "locomote",
     "bufferedcastaoe",
-    "actionfailed"
+    "actionfailed",
+    "locomote"
   ],
-  "events_listened": [],
-  "netvars": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "player_classified.runspeed",
+    "player_classified.externalspeedmultiplier",
+    "player_classified.externalvelocityvectorx",
+    "player_classified.externalvelocityvectorz",
+    "player_classified.isstrafing",
+    "player_classified.isghostmode"
+  ],
   "tunables": [
     "TUNING.WILSON_WALK_SPEED",
     "TUNING.WILSON_RUN_SPEED",
@@ -322,122 +363,56 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      73514,
-      51287,
-      13406,
-      15922,
-      34285,
       16419,
-      20428,
-      13260
+      15022,
+      14938,
+      15832,
+      13897,
+      15238,
+      13823,
+      15651
     ],
     "aspects": [
       {
-        "aspect": "减速抵抗与移速降低说明",
+        "aspect": "速度数值与冲撞移动标注",
         "evidence": [
           {
-            "pageid": 16419,
-            "quote": "提供 1/4 的减速抵抗"
+            "pageid": 15832,
+            "quote": "速，且会连续冲撞 3 ~ 5 次"
           },
           {
-            "pageid": 15922,
-            "quote": "抵抗击飞效果。-15% 移动速度。"
-          }
-        ]
-      },
-      {
-        "aspect": "向前冲刺与定向位移行为",
-        "evidence": [
-          {
-            "pageid": 13406,
-            "quote": "以 12 [[速度]]向前冲刺一段距离"
-          }
-        ]
-      },
-      {
-        "aspect": "基础移动速度章节与表格标注",
-        "evidence": [
-          {
-            "pageid": 73514,
-            "quote": "===基础移动速度==="
-          },
-          {
-            "pageid": 51287,
-            "quote": "! 角色（能力） !! 移动速度"
-          }
-        ]
-      },
-      {
-        "aspect": "实体及灵魂移动速度数值与加速度",
-        "evidence": [
-          {
-            "pageid": 13260,
-            "quote": "所释放的灵魂会以 4 移动速度向治疗范围内"
-          },
-          {
-            "pageid": 13260,
-            "quote": "所释的放灵魂的最大移动速度增加至 8"
-          },
-          {
-            "pageid": 34285,
-            "quote": "加速度提升到 9速度单位/秒"
-          }
-        ]
-      },
-      {
-        "aspect": "移动速度加成与削减乘数描述",
-        "evidence": [
-          {
-            "pageid": 13406,
-            "quote": "移动速度增加 10%（6→6.6）"
-          },
-          {
-            "pageid": 15922,
-            "quote": "+20% 移动速度。"
-          },
-          {
-            "pageid": 34285,
-            "quote": "提高 20% 的移动速度"
-          },
-          {
-            "pageid": 16419,
-            "quote": "提升 25% 移动速度。"
-          },
-          {
-            "pageid": 20428,
-            "quote": "提升 10% 移动速度"
-          },
-          {
-            "pageid": 13260,
-            "quote": "×120%的移动速度加成"
+            "pageid": 15832,
+            "quote": "motor组件的-->实体 5 ~ 6"
           }
         ]
       }
     ],
-    "coverage_status": "well_documented"
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "移动速度",
-    "寻路目标",
-    "平台跳跃",
+    "走路速度",
+    "跑步速度",
     "地面减速",
-    "地皮触发",
-    "侧向行走",
-    "缓冲动作",
-    "跑步移动",
-    "跳跃延迟"
+    "平台跳跃",
+    "外部加速",
+    "匍匐加速",
+    "转向移动",
+    "寻路目标",
+    "延迟跳跃",
+    "踩黏减速"
   ],
   "gameplay_tags": [
     "移动",
+    "行走",
     "平台跳跃",
     "速度修正"
   ],
   "related_symbols": [],
-  "truncation_note": "源码在 LocoMotor:ScanForPlatform 函数体内被截断，该函数未完整定义，且其后可能还存在其他方法未包含。本知识文档仅基于可见代码片段标注。",
+  "truncation_note": "源码在 ScanForPlatform 函数中间被截断，本知识文档仅基于可见部分提取，后续可能存在的代码未分析。",
   "provenance": {
     "source_sha256": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
     "source_bytes": 70870,
     "model": "hy3-free",
-    "generated_at_ms": 1787848017815
+    "generated_at_ms": 1787857590664
   }
 }

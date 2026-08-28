@@ -7,231 +7,231 @@
   },
   "category": "component",
   "display_name": "inventory",
-  "summary": "Inventory 组件管理实体的物品栏槽位、装备槽位与手持物品，处理物品的存取、堆叠、装备与掉落。它参与核心生存玩法如死亡掉落、护甲伤害减免、背包溢出容器及专用口袋容器逻辑。",
+  "summary": "该组件管理实体的物品栏槽位、装备槽位、活跃物品（手持物）及溢出容器（如背包），负责物品的获取、丢弃、装备、卸下、堆叠与存档加载。它参与战斗中的伤害吸收（护甲与特殊防御）与绝缘判定，并在实体死亡或下线时触发物品掉落或事件通知。",
   "api": [
     {
       "name": "EnableDropOnDeath",
-      "effect": "若 dropondeath 为 false，则设为 true 并监听实体 death 事件以触发掉落所有物品。"
+      "effect": "设置 dropondeath 为 true 并监听实体 'death' 事件，使死亡时触发掉落。"
     },
     {
       "name": "DisableDropOnDeath",
-      "effect": "若 dropondeath 为 true，则设为 false 并移除 death 事件监听，阻止死亡掉落。"
+      "effect": "设置 dropondeath 为 false 并移除 'death' 事件监听，阻止死亡掉落。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时调用，等同于 DisableDropOnDeath 关闭死亡掉落。"
+      "effect": "组件从实体移除时调用，等价于 DisableDropOnDeath，移除死亡掉落监听。"
     },
     {
       "name": "NumItems",
-      "effect": "返回 itemslots 表中键值对数量，即非堆叠计数的物品格数。"
+      "effect": "返回 itemslots 表中槽位数量，不计算堆叠内物品数。"
     },
     {
       "name": "NumStackedItems",
-      "effect": "遍历 itemslots 累加每个物品的堆叠大小（无堆叠组件计1），返回总堆叠数。"
+      "effect": "返回 itemslots 中所有物品的总堆叠数量，考虑 stackable 组件。"
     },
     {
       "name": "TransferInventory",
-      "effect": "将自身物品栏、装备栏、手持中 persists 为 true 的物品转移给接收者 inventory；装备受限时改为给予物品，副作用是清空自身对应物品。"
+      "effect": "将自身物品栏、装备栏及活跃物品中 persists 为 true 的转移给接收者 inventory，处理装备限制与放回。"
     },
     {
       "name": "SwapEquipment",
-      "effect": "与另一实体交换全部或指定装备槽物品，受限装备放入对方物品栏；返回操作是否执行。"
+      "effect": "与另一实体交换指定或所有装备槽物品，检查限制并装备或给予，返回是否成功。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含 items/equip/activeitem 存档记录及引用的表，仅序列化 persists 为 true 的物品。"
+      "effect": "返回物品栏、装备、活跃物品的存档数据与引用列表，仅包含 persists 物品，无副作用。"
     },
     {
       "name": "CanTakeItemInSlot",
-      "effect": "检查物品是否满足入容器条件及指定槽位范围、锁定状态，返回布尔。"
+      "effect": "判断物品能否放入指定槽位，检查 cangoincontainer、游戏模式、槽位范围及锁定槽位等。"
     },
     {
       "name": "AcceptsStacks",
-      "effect": "返回 acceptsstacks 标志，表示是否接受堆叠物品。"
+      "effect": "返回 acceptsstacks 布尔值，表示是否接受堆叠。"
     },
     {
       "name": "IgnoresCanGoInContainer",
-      "effect": "返回 ignorescangoincontainer 标志。"
+      "effect": "返回 ignorescangoincontainer 布尔值，表示是否忽略容器限制。"
     },
     {
       "name": "IsThiefProof",
-      "effect": "返回 self.thiefproof 的值（源码中未初始化，可能为 nil）。"
+      "effect": "返回 self.thiefproof 字段（源码中未显式初始化，可能为 nil）。"
     },
     {
       "name": "OnLoad",
-      "effect": "从存档数据生成物品并调用 GiveItem/Equip 放入，处理迁移宠物；设置 isloading 标志。"
+      "effect": "从存档数据生成物品并放入物品栏或装备，处理迁移宠物，设置 isloading 标志。"
     },
     {
       "name": "DropActiveItem",
-      "effect": "掉落当前手持物品并置空手持，返回掉落的实体。"
+      "effect": "丢弃当前活跃物品并置空活跃物品，返回丢弃的物品实例。"
     },
     {
       "name": "ReturnActiveActionItem",
-      "effect": "将指定手持物品强制放回物品栏（忽略满格/溢出限制），并修正缓冲动作所有者信息。"
+      "effect": "将活跃物品放回物品栏，临时忽略满溢等标志，用于动作返还处理。"
     },
     {
       "name": "HasAnyEquipment",
-      "effect": "返回 equipslots 是否非空。"
+      "effect": "检查 equipslots 是否非空，返回布尔值。"
     },
     {
       "name": "IsWearingArmor",
-      "effect": "遍历装备栏，若存在带 armor 组件的物品则返回 true。"
+      "effect": "遍历装备槽，若存在带 armor 组件的物品则返回 true。"
     },
     {
       "name": "ArmorHasTag",
-      "effect": "遍历装备栏，若某装备有 armor 组件且实体含指定 tag 则返回 true。"
+      "effect": "遍历装备槽，若某装备有 armor 组件且具指定标签则返回 true。"
     },
     {
       "name": "EquipHasTag",
-      "effect": "遍历装备栏，若任意装备含指定 tag 则返回 true。"
+      "effect": "遍历装备槽，若某装备具指定标签则返回 true。"
     },
     {
       "name": "EquipHasSpDefenseForType",
-      "effect": "遍历装备栏，若任意装备对指定特殊伤害类型有防御值>0则返回 true。"
+      "effect": "遍历装备槽，若某装备对指定特殊伤害类型有防御值则返回 true。"
     },
     {
       "name": "IsHeavyLifting",
-      "effect": "返回 heavylifting 标志，表示是否装备重型身体物品。"
+      "effect": "返回 heavylifting 标志，表示是否负重搬运。"
     },
     {
       "name": "IsFloaterHeld",
-      "effect": "返回 floaterheld 或 false，表示手部是否持浮空物。"
+      "effect": "返回 floaterheld 字段或 false，表示手持浮空物。"
     },
     {
       "name": "ApplyDamage",
-      "effect": "计算装备抗性、护甲吸收比例与特殊伤害防御，对护甲调用 TakeDamage 损耗耐久，返回剩余普通伤害与剩余特殊伤害表。"
+      "effect": "计算护甲吸收、伤害类型抵抗与特殊伤害防御，对护甲造成耐久损耗，返回剩余普通伤害与特殊伤害表。"
     },
     {
       "name": "GetActiveItem",
-      "effect": "返回当前 activeitem 手持物品。"
+      "effect": "返回当前活跃物品引用，无则 nil。"
     },
     {
       "name": "IsItemEquipped",
-      "effect": "若物品在 equipslots 中则返回其槽位名，否则 nil。"
+      "effect": "若物品在装备槽中则返回其槽位名，否则 nil。"
     },
     {
       "name": "SelectActiveItemFromEquipSlot",
-      "effect": "卸下指定装备槽物品并设为手持，旧手持物品尝试放回物品栏。"
+      "effect": "从装备槽卸下物品设为活跃物品，原活跃物品放回槽位或物品栏。"
     },
     {
       "name": "CombineActiveStackWithSlot",
-      "effect": "将手持可堆叠物品与指定槽位物品合并，支持单件转移或整堆合并。"
+      "effect": "将活跃堆叠物品与指定槽位物品合并堆叠，可指定部分转移。"
     },
     {
       "name": "SelectActiveItemFromSlot",
-      "effect": "从物品槽取出物品设为手持，旧手持放回该槽（若未装备），锁定槽位物品忽略。"
+      "effect": "从物品栏槽位取出物品作为活跃物品，原活跃物品放入该槽位并推送事件。"
     },
     {
       "name": "ReturnActiveItem",
-      "effect": "将手持物品放回指定槽或物品栏，满则掉落；支持堆叠拆分返回。"
+      "effect": "将活跃物品放回物品栏指定槽位或丢弃，处理堆叠拆分，置空活跃物品。"
     },
     {
       "name": "GetNumSlots",
-      "effect": "返回 maxslots 物品栏总槽数。"
+      "effect": "返回 maxslots 物品栏总槽位数。"
     },
     {
       "name": "GetItemSlot",
-      "effect": "返回物品在 itemslots 中的槽位号，不存在则 nil。"
+      "effect": "返回指定物品所在的物品栏槽位号，未找到则 nil。"
     },
     {
       "name": "IsHolding",
-      "effect": "检查物品是否在手持、对应装备槽或物品槽中，可选递归检查容器内部。"
+      "effect": "检查物品是否为活跃物品、装备或物品栏内物品，可选递归容器检查。"
     },
     {
       "name": "FindItem",
-      "effect": "在物品栏、手持、溢出容器中查找首个满足条件的物品并返回。"
+      "effect": "在物品栏、活跃物品及溢出容器中查找首个满足条件函数的物品并返回。"
     },
     {
       "name": "FindItems",
-      "effect": "收集物品栏、装备、手持及溢出容器中满足条件的所有物品数组。"
+      "effect": "返回物品栏、装备、活跃物品及溢出容器中满足条件函数的所有物品列表。"
     },
     {
       "name": "ForEachItem",
-      "effect": "对物品栏、装备、手持及溢出容器每个物品执行回调。"
+      "effect": "对物品栏、装备、活跃物品及溢出容器中的每个物品执行给定函数。"
     },
     {
       "name": "ForEachWetableItem",
-      "effect": "对物品栏、装备、手持中可能淋湿的物品执行回调。"
+      "effect": "对物品栏、装备、活跃物品（可淋湿）中的每个物品执行给定函数。"
     },
     {
       "name": "ForEachEquipment",
-      "effect": "对每件装备物品执行回调。"
+      "effect": "对每个装备槽中的物品执行给定函数。"
     },
     {
       "name": "ForEachItemSlot",
-      "effect": "对每个物品槽中的物品执行回调。"
+      "effect": "对每个物品栏槽位中的物品执行给定函数。"
     },
     {
       "name": "RemoveItemBySlot",
-      "effect": "移除指定物品槽物品并返回该物品实体。"
+      "effect": "按槽位移除物品并调用 RemoveItem，返回被移除物品。"
     },
     {
       "name": "DropItem",
-      "effect": "将物品从所有者移除并生成到世界指定位置或实体位置，触发 dropitem 事件，返回掉落物。"
+      "effect": "从拥有者移除物品生成到世界位置，触发 'dropitem' 事件，返回掉落物。"
     },
     {
       "name": "ForceNoInsulated",
-      "effect": "设置 force_no_insulation 标志以覆盖电力绝缘判定。"
+      "effect": "设置 force_no_insulation 标志以强制否定电力绝缘判定。"
     },
     {
       "name": "IsInsulated",
-      "effect": "返回是否绝缘（电力），检查强制标志、装备绝缘组件及外部修饰列表。"
+      "effect": "检查装备或外部修饰是否提供电力绝缘，受 force_no_insulation 覆盖。"
     },
     {
       "name": "GetEquippedItem",
-      "effect": "返回指定装备槽当前物品。"
+      "effect": "返回指定装备槽当前物品，无则 nil。"
     },
     {
       "name": "GetItemInSlot",
-      "effect": "返回指定物品槽当前物品。"
+      "effect": "返回指定物品栏槽位物品，无则 nil。"
     },
     {
       "name": "GetFirstItemInAnySlot",
-      "effect": "返回第一个非空物品槽的物品，无则 nil。"
+      "effect": "返回第一个非空物品栏槽位的物品，全空则 nil。"
     },
     {
       "name": "IsFull",
-      "effect": "检查所有物品槽是否被占用，返回是否满。"
+      "effect": "检查所有物品栏槽位是否均被占据，返回布尔值。"
     },
     {
       "name": "GetNextAvailableSlot",
-      "effect": "计算物品可放入的下一个可用槽位及容器（考虑堆叠、溢出、专用容器），返回 slot, container。"
+      "effect": "计算物品可放入的下一个可用槽位及容器（自身/装备/溢出/专用），返回槽位与容器。"
     },
     {
       "name": "CanAcceptCount",
-      "effect": "计算物品栏及溢出容器能接受该物品的最大数量，考虑空格与堆叠余量。"
+      "effect": "计算物品栏及溢出容器能接受某物品的最大数量，考虑堆叠与空位。"
     },
     {
       "name": "GiveActiveItem",
-      "effect": "将物品设为手持，若原手持非空先返回；触发拾取与 itemget 事件，装备转口袋状态。"
+      "effect": "将物品设为活跃物品，处理拾取回调与事件，若已持有可能返还。"
     },
     {
       "name": "GiveItem",
-      "effect": "将物品放入物品栏或溢出/专用容器，处理堆叠、槽位建议、声音、满格事件；可能掉落或置为手持，返回槽位或布尔。"
+      "effect": "将物品放入物品栏/溢出/专用容器/装备堆叠，处理槽位建议、堆叠、满溢事件与声音，返回槽位或布尔。"
     },
     {
       "name": "Unequip",
-      "effect": "卸下指定装备槽物品，触发 unequip 事件，重置举重/浮空标志，返回物品。"
+      "effect": "卸下指定装备槽物品，触发 'unequip' 事件，更新重型/浮空标志，返回物品。"
     },
     {
       "name": "SetActiveItem",
-      "effect": "设置手持物品并推 newactiveitem 事件；若物品不可入容器则掉落。"
+      "effect": "设置活跃物品并推送 'newactiveitem' 事件，若物品不可入容器则丢弃。"
     },
     {
       "name": "Equip",
-      "effect": "将物品装备到对应槽，处理旧装备冲突、举重规则、堆叠拆分，触发 equip 与 setoverflow 事件。"
+      "effect": "将物品装备到对应槽位，处理旧物卸载、重型搬运、浮空、溢出容器与事件，可能丢弃冲突物品。"
     },
     {
       "name": "RemoveItem",
-      "effect": "从物品栏/手持/装备/溢出/打开容器移除物品，支持拆分堆叠，返回移除物品。"
+      "effect": "从物品栏/活跃/装备/溢出/打开容器移除物品，处理堆叠拆分，返回物品。"
     },
     {
       "name": "GetOverflowContainer",
-      "effect": "返回身体装备且可打开的容器组件作为溢出背包，受 ignoreoverflow 影响。"
+      "effect": "返回身体装备且可打开的容器组件，受 ignoreoverflow 影响，否则 nil。"
     },
     {
       "name": "GetSpecializedContainers",
-      "effect": "返回物品栏中标记为专用口袋容器的组件列表，受 ignorespoverflow 影响。"
+      "effect": "返回物品栏中标记为优先的专用容器组件列表，受 ignorespoverflow 影响。"
     },
     {
       "name": "IsSpecializedContainer",
@@ -239,22 +239,22 @@
     },
     {
       "name": "Has",
-      "effect": "统计物品栏、手持、溢出等中指定 prefab 数量是否达到 amount，返回布尔与计数。"
+      "effect": "统计物品栏、活跃、溢出及打开容器中指定 prefab 数量是否满足需求，返回布尔与计数。"
     },
     {
       "name": "HasItemThatMatches",
-      "effect": "遍历物品栏与手持统计满足条件函数的物品数量（源码截断，可见部分仅初始累加逻辑）。"
+      "effect": "基于可见部分：遍历物品栏与活跃物品，统计满足条件函数的物品堆叠数（代码截断未完成）。"
     }
   ],
   "events_published": [
     "itemlose",
     "dropitem",
-    "itemget",
     "gotnewitem",
+    "itemget",
     "newactiveitem",
     "unequip",
-    "equip",
     "setoverflow",
+    "equip",
     "inventoryfull"
   ],
   "events_listened": [
@@ -265,22 +265,40 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13698,
-      15225,
-      15235,
-      15239,
-      15560,
-      15718,
-      17929,
-      17994
+      14697,
+      19129,
+      18721,
+      14699,
+      27530,
+      15722,
+      72238,
+      13260
     ],
     "aspects": [
       {
-        "aspect": "物品堆叠至上限行为",
+        "aspect": "物品传入物品栏",
         "evidence": [
           {
-            "pageid": 15225,
-            "quote": "在捡起物品时会优先将物品堆叠至上限"
+            "pageid": 15722,
+            "quote": "眼球草会吞噬物品并传输到食人花的物品栏"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏内特定物品存在",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "当物品栏中存在处于“灵魂回声”的灵魂时"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏已满判定",
+        "evidence": [
+          {
+            "pageid": 15722,
+            "quote": "若食人花的物品栏已满"
           }
         ]
       },
@@ -288,17 +306,33 @@
         "aspect": "物品栏槽位数标注",
         "evidence": [
           {
-            "pageid": 15225,
-            "quote": "暗影仆从拥有 1 格[[物品栏]]"
+            "pageid": 14697,
+            "quote": "背包提供 8 个物品栏"
+          },
+          {
+            "pageid": 18721,
+            "quote": "坎普斯背包提供 14 个物品栏"
+          },
+          {
+            "pageid": 14699,
+            "quote": "保鲜背包提供 8 个物品栏"
+          },
+          {
+            "pageid": 15722,
+            "quote": "食人花具有 15 个物品栏"
+          },
+          {
+            "pageid": 27530,
+            "quote": "基本物品栏具有 15 个栏位"
           }
         ]
       },
       {
-        "aspect": "物品栏空位状态描述",
+        "aspect": "自动装备栏内武器",
         "evidence": [
           {
-            "pageid": 15225,
-            "quote": "如果召唤者物品栏有空位"
+            "pageid": 72238,
+            "quote": "附身底盘会尝试装备物品栏中的武器"
           }
         ]
       }
@@ -306,25 +340,27 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "背包物品",
-    "装备槽位",
-    "手持物品",
-    "死亡掉落",
-    "护甲吸收",
-    "溢出背包",
-    "物品堆叠",
-    "装备切换"
+    "物品栏",
+    "背包",
+    "装备槽",
+    "护甲",
+    "手持物",
+    "丢弃",
+    "堆叠",
+    "绝缘",
+    "伤害吸收"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗"
+    "战斗",
+    "物品管理"
   ],
   "related_symbols": [],
-  "truncation_note": "源码在 Inventory:HasItemThatMatches 函数中部截断，本文档仅基于可见部分标注，未包含可能后续定义的方法与完整 HasItemThatMatches 逻辑。",
+  "truncation_note": "源码在 HasItemThatMatches 函数定义中途截断（可见末行 'num_found = num' 未完成），后续代码及潜在方法未包含，本知识文档仅基于所提供的可见源码部分标注。",
   "provenance": {
     "source_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
     "source_bytes": 91041,
     "model": "hy3-free",
-    "generated_at_ms": 1787849943564
+    "generated_at_ms": 1787859339997
   }
 }

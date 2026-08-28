@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "talker",
-  "summary": "组件 Talker 管理实体说话时的跟随文本控件、忽略来源表、聊天网络变量及说话线程任务等数据。其核心玩法包括让实体通过头顶气泡显示对话文本并广播到网络，支持 Chatter 功能与战斗呼喊、ChattyNode 配合实现 NPC 台词。组件允许实体忽略交谈或强制静音，参与生存交流与社会互动。",
+  "summary": "组件管理实体的说话状态、忽略说话标记、对话气泡偏移及网络聊天数据（chatter），负责在实体头顶显示跟随对话文本并向其他玩家广播语音。它参与角色对话、NPC台词播放以及与战斗喊话联动的聊天同步核心玩法。",
   "api": [
     {
       "name": "SetOffsetFn",
-      "effect": "设置 self.offset_fn 为传入函数，用于动态计算说话气泡的偏移量，无副作用。"
+      "effect": "将传入函数 fn 赋值给 self.offset_fn，用于后续 Say 时动态计算跟随文本偏移；无立即副作用。"
     },
     {
       "name": "MakeChatter",
-      "effect": "若 self.chatter 为空，则创建包含多个网络变量的 chatter 表；在非主模拟时监听 'chatterdirty' 事件以触发本地文本显示。副作用：注册网络变量与事件监听。"
+      "effect": "若 self.chatter 为空，则创建网络变量（strtbl, strid, strtime, forcetext, echotochatpriority）用于 NPC 聊天同步；在非主机端监听 'chatterdirty' 事件以触发本地说话表现。副作用：分配网络变量并可能添加事件监听。"
     },
     {
       "name": "Chatter",
-      "effect": "仅在主模拟有效。设置 chatter 网络变量（字符串表、ID、时间、强制文本、聊天回显优先级），取消旧任务并安排新取消任务，立即调用 OnChatterDirty 触发说话与可能的聊天回显。副作用：修改网络变量，可能广播聊天消息。"
+      "effect": "仅主机有效。设置 chatter 网络变量并强制触发脏事件以立即显示对话，安排 1 秒后清除聊天字符串的任务；若 echotochatpriority 有效则同步到附近玩家聊天框。副作用：修改网络状态，触发客户端 OnChatterDirty，可能向聊天历史添加消息。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除 'chatterdirty' 事件监听，主模拟下移除 'ignoretalking' 标签，并调用 ShutUp 取消当前说话。副作用：清理事件与标签。"
+      "effect": "移除 'chatterdirty' 事件监听，主机移除 'ignoretalking' 标签，并调用 ShutUp 停止当前说话。副作用：清理组件关联状态。"
     },
     {
       "name": "IgnoreAll",
-      "effect": "将来源加入 ignoring 表，若表原为空则在主模拟下给实体添加 'ignoretalking' 标签。副作用：实体可能被标记为忽略交谈。"
+      "effect": "将 source（默认自身）加入忽略表 self.ignoring；若为主机，给实体添加 'ignoretalking' 标签，导致后续非强制 Say 被忽略。副作用：修改忽略状态与标签。"
     },
     {
       "name": "StopIgnoringAll",
-      "effect": "将来源从 ignoring 表移除，若表空则清除表并在主模拟移除 'ignoretalking' 标签。副作用：可能恢复交谈能力。"
+      "effect": "从忽略表移除 source；若表空则置 nil 并主机移除 'ignoretalking' 标签。副作用：恢复说话能力。"
     },
     {
       "name": "Say",
-      "effect": "核心说话方法。若世界禁用语音或实体处于忽略/死亡/睡眠（非强制）则返回；取消当前说话，将脚本转为行表并启动线程显示跟随文本、广播网络说话、触发 ontalk 事件与 donetalking 事件。副作用：创建 widget、调用 TheNet:Talker 广播、推送事件。"
+      "effect": "核心说话方法。若世界禁止语音或实体死亡/睡眠且非强制则取消；取消当前说话，将脚本转为行序列，启动线程逐行显示跟随文本、广播给网络、触发 'ontalk' 事件，结束后触发 'donetalking' 事件并调用回调。副作用：创建跟随文本 widget，网络广播，推送事件，占用任务线程。"
     },
     {
       "name": "ShutUp",
-      "effect": "取消当前说话（销毁 widget、杀线程、推事件），若主模拟且存在 chatter 则清空 strtbl 网络变量并取消 chatter 任务。副作用：停止所有说话表现。"
+      "effect": "取消当前说话表现（CancelSay），若为主机且存在 chatter 则清空 strtbl 网络变量并取消 chatter 任务。副作用：清除对话气泡与网络聊天状态。"
     },
     {
       "name": "IsTalking",
-      "effect": "返回 self.task 是否非空，指示实体当前是否正在说话线程中。"
+      "effect": "返回 self.task 是否非空，指示当前是否正在说话线程中。无副作用。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "等价于 CancelSay，移除 widget 并杀掉说话线程任务，触发 donetalking 事件。副作用：强制中断说话。"
+      "effect": "实体移除时调用 CancelSay，杀死跟随文本 widget 并取消任务，触发 'donetalking' 事件与 donetalkingfn 回调。副作用：强制结束说话表现。"
     }
   ],
   "events_published": [
@@ -70,52 +70,38 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      18790,
-      50964,
-      53085,
       45135,
       19110,
       22383,
       15239,
-      21432
+      21432,
+      13493,
+      15237,
+      46887
     ],
-    "aspects": [
-      {
-        "aspect": "与角色对话目的描述",
-        "evidence": [
-          {
-            "pageid": 50964,
-            "quote": "可能是用于在冒险模式与角色对话"
-          },
-          {
-            "pageid": 53085,
-            "quote": "可能是在冒险模式时与角色对话"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均描述实体生成、掉落、战斗、数值等行为，未出现任何与说话、对话、台词、聊天、闭嘴、忽略说话等 talker 组件能力相关的玩家语言表达；其中 hermitcrab 页面虽有‘台词’小节但摘录内容仅为好感度颜色区间标记，无实际说话或组件能力体现。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "说话气泡",
-    "角色对话",
-    "npc喊话",
+    "对话文本",
+    "喊话",
     "忽略说话",
-    "头顶文字",
+    "跟随文字",
+    "NPC台词",
     "战斗呼喊",
-    "聊天广播",
-    "跟随文本"
+    "对话屏蔽"
   ],
   "gameplay_tags": [
-    "生存",
     "战斗",
-    "社交"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
     "source_bytes": 11071,
     "model": "hy3-free",
-    "generated_at_ms": 1787850972918
+    "generated_at_ms": 1787860260354
   }
 }

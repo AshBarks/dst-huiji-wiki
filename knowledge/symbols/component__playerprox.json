@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "playerprox",
-  "summary": "该组件管理实体与玩家之间的距离检测数据（近/远阈值、目标模式、当前是否接近等），并周期性检查玩家位置。核心玩法是通过回调函数在玩家进入或离开指定范围时触发逻辑，支持全体/任意/特定/锁定玩家等多种追踪模式，常用于怪物觉醒、机关触发等依赖玩家临近的交互。",
+  "summary": "PlayerProx 组件管理实体与玩家之间的距离检测状态，支持全部玩家、任意玩家、特定玩家及锁定玩家等多种目标模式。它通过周期任务判断玩家进出近远阈值并触发相应回调，参与游戏中需要玩家邻近交互或触发的玩法逻辑。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回基于 self.isclose 的字符串 'NEAR' 或 'FAR'。"
+      "effect": "返回当前玩家靠近状态字符串（'NEAR' 或 'FAR'），无副作用。"
     },
     {
       "name": "SetOnPlayerNear",
-      "effect": "设置玩家靠近时的回调函数 self.onnear 为传入的 fn，覆盖原有值。"
+      "effect": "设置玩家进入近距范围时的回调函数 self.onnear 为传入函数 fn，无立即副作用。"
     },
     {
       "name": "SetOnPlayerFar",
-      "effect": "设置玩家远离时的回调函数 self.onfar 为传入的 fn，覆盖原有值。"
+      "effect": "设置玩家离开远距范围时的回调函数 self.onfar 为传入函数 fn，无立即副作用。"
     },
     {
       "name": "IsPlayerClose",
-      "effect": "返回 self.isclose 布尔值，表示当前是否有玩家在近距离内。"
+      "effect": "返回 self.isclose 布尔值，表示是否有玩家在近距离内，无副作用。"
     },
     {
       "name": "SetDist",
-      "effect": "设置 self.near 和 self.far 距离阈值，影响后续检测逻辑。"
+      "effect": "设置近距离阈值 self.near 与远距离阈值 self.far 为传入参数，无立即副作用，影响后续检测。"
     },
     {
       "name": "SetLostTargetFn",
-      "effect": "设置目标丢失时的回调函数 self.losttargetfn 为 func，覆盖原有值。"
+      "effect": "设置目标丢失时的回调函数 self.losttargetfn 为传入函数 func，无立即副作用。"
     },
     {
       "name": "SetPlayerAliveMode",
-      "effect": "设置 self.alivemode，指定检测时过滤玩家的存活状态（AliveOnly/DeadOnly/DeadOrAlive）。"
+      "effect": "设置检测玩家的存活模式 self.alivemode 为传入参数（如 AliveOnly/DeadOnly/DeadOrAlive），无立即副作用。"
     },
     {
       "name": "Schedule",
-      "effect": "若提供 new_period 则更新 self.period；停止现有周期任务并启动新的 DoPeriodicTask 以 self.targetmode 为周期函数，副作用是重启检测任务。"
+      "effect": "若传入 new_period 非 nil 则更新 self.period；停止现有周期任务并启动新周期为 self.period 的周期性任务执行 self.targetmode。副作用：取消旧任务并创建新任务。"
     },
     {
       "name": "ForceUpdate",
-      "effect": "若任务和目标模式存在，立即调用一次 self.targetmode(inst, self) 执行检测，可能触发 onnear/onfar 回调。"
+      "effect": "若 self.task 与 self.targetmode 均非 nil，立即调用一次 self.targetmode(self.inst, self) 执行距离检测。副作用：可能触发 onnear/onfar 回调。"
     },
     {
       "name": "Stop",
-      "effect": "取消当前周期任务 self.task 并置 nil，停止检测。"
+      "effect": "若 self.task 非 nil 则取消该任务并置 nil。副作用：停止周期检测。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "调用 Schedule() 启动周期任务，随后 ForceUpdate() 立即检测一次。"
+      "effect": "实体唤醒时调用，执行 Schedule() 重启周期任务并 ForceUpdate() 立即检测。副作用：启动任务并可能触发回调。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "调用 ForceUpdate() 立即检测一次，随后 Stop() 停止周期任务。"
+      "effect": "实体睡眠时调用，执行 ForceUpdate() 立即检测后 Stop() 停止任务。副作用：停止任务并可能触发回调。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "等同于 Stop()，移除组件时取消周期任务。"
+      "effect": "实体移除时调用，执行 Stop() 取消周期任务。副作用：停止任务。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "等同于 Stop()，从实体移除组件时取消周期任务。"
+      "effect": "组件从实体移除时调用，执行 Stop() 取消周期任务。副作用：停止任务。"
     },
     {
       "name": "SetTargetMode",
-      "effect": "若 not override 则记录 self.originaltargetmode = mode；设置 self.targetmode = mode；调用 SetTarget(target) 设置目标（若 mode 为 SpecificPlayer 则断言 target 非 nil）；调用 Schedule() 重启任务。副作用：切换检测模式并重启周期检测。"
+      "effect": "若 override 非真则记录初始目标模式；设置 self.targetmode 为传入 mode；调用 SetTarget(target) 设置目标；断言若 mode 为 SpecificPlayer 则 target 非空；调用 Schedule() 重启任务。副作用：改变检测模式与目标并重启任务。"
     },
     {
       "name": "SetTarget",
-      "effect": "若原有 self.target 非 nil 则移除其 'onremove' 事件监听；设置 self.target = target；若新 target 非 nil 则监听其 'onremove' 事件以触发 _ontargetleft 回调。副作用：切换目标并管理事件监听。"
+      "effect": "若原有 self.target 非空则移除对其 'onremove' 事件监听；设置新 target；若 target 非空则监听其 'onremove' 事件以触发内部丢失处理。副作用：更换事件监听。"
     }
   ],
   "events_published": [],
@@ -85,20 +85,72 @@
       13698,
       15054,
       15402,
+      15551,
       18232,
-      65697,
-      13874,
-      13897,
-      14344
+      18540,
+      18778,
+      23956
     ],
     "aspects": [
       {
-        "aspect": "玩家靠近触发实体行为描述",
+        "aspect": "实体与玩家间距离阈值标注",
         "evidence": [
           {
-            "pageid": 13698,
-            "quote": "邪天翁因玩家靠近而生成概率由 25% 提升至 50%"
+            "pageid": 18232,
+            "quote": "如果玩家靠近远古哨所 6 距离单位以内"
           },
+          {
+            "pageid": 15551,
+            "quote": "在玩家远离蜂王 15 距离单位前"
+          },
+          {
+            "pageid": 18540,
+            "quote": "若 35 单位内全部玩家的幸运值之和"
+          },
+          {
+            "pageid": 18778,
+            "quote": "中心点的 15 - 25 距离单位内"
+          }
+        ]
+      },
+      {
+        "aspect": "实体以玩家为目标进行跟踪",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "保持一定距离地跟踪玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "实体失去玩家目标或仇恨",
+        "evidence": [
+          {
+            "pageid": 23956,
+            "quote": "墨荒失去仇恨且持续 15 秒未受攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家远离引发实体状态改变",
+        "evidence": [
+          {
+            "pageid": 18778,
+            "quote": "玩家远离后又会重新回到墓碑里"
+          },
+          {
+            "pageid": 23956,
+            "quote": "如果玩家远离被控制的梦魇裂缝"
+          },
+          {
+            "pageid": 15551,
+            "quote": "在玩家远离蜂王 15 距离单位前"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家靠近触发实体行为或特效",
+        "evidence": [
           {
             "pageid": 15054,
             "quote": "升级前的天体宝球也会在玩家靠近时发出微弱的“光芒”"
@@ -109,47 +161,30 @@
           },
           {
             "pageid": 18232,
-            "quote": "如果玩家靠近远古哨所 6 距离单位以内，安保脉冲便离开哨所"
-          },
-          {
-            "pageid": 65697,
-            "quote": "当玩家靠近水晶冠秃鹫的“食物”时，水晶冠秃鹫会尝试攻击玩家"
-          },
-          {
-            "pageid": 13874,
-            "quote": "一旦玩家靠近，企鸥就会冲过去把蛋藏在自己身上"
-          },
-          {
-            "pageid": 14344,
-            "quote": "这些吊灯会在玩家靠近时发光"
-          }
-        ]
-      },
-      {
-        "aspect": "玩家靠近距离阈值数值标注",
-        "evidence": [
-          {
-            "pageid": 18232,
             "quote": "如果玩家靠近远古哨所 6 距离单位以内"
+          },
+          {
+            "pageid": 18778,
+            "quote": "只有在玩家靠近时才会从中出现"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "玩家靠近",
-    "远离触发",
+    "玩家远离",
     "范围检测",
-    "附近玩家",
     "锁定玩家",
-    "失去目标",
-    "周期检测",
-    "距离远近"
+    "特定玩家",
+    "全部玩家",
+    "距离判定",
+    "周期任务",
+    "目标丢失"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗",
     "建造"
   ],
   "related_symbols": [],
@@ -157,6 +192,6 @@
     "source_sha256": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
     "source_bytes": 6855,
     "model": "hy3-free",
-    "generated_at_ms": 1787851775816
+    "generated_at_ms": 1787860826445
   }
 }

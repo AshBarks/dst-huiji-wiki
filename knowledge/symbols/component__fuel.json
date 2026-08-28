@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "fuel",
-  "summary": "该组件管理实体的燃料值、燃料类型及被拿走时的回调，用于标识实体可作为燃料的属性。它通过动态添加与移除燃料类型标签参与燃料消耗核心玩法，并在燃料被取走时推送事件与执行回调。",
+  "summary": "该组件管理实体的燃料值（fuelvalue）、燃料类型（fueltype）及被取走时的回调（ontaken）。它参与燃料消耗核心玩法：当实体作为燃料被拿取时，组件推送事件并调用回调，同时根据燃料类型在实体上维护对应的'_fuel'标签以供其他系统识别。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，若当前 fueltype 不为 nil，则从实体移除形如 (fueltype..\"_fuel\") 的标签。副作用：实体丢失对应的燃料类型标签。"
+      "effect": "若 self.fueltype 不为 nil，移除实体上 self.fueltype..'_fuel' 标签。"
     },
     {
       "name": "SetOnTakenFn",
-      "effect": "接受函数 fn 并存储到 self.ontaken 中，作为燃料被拿走时的回调。效果：设置回调，无其它副作用。"
+      "effect": "将传入的函数 fn 保存为组件的 ontaken 回调（self.ontaken = fn），无其他副作用。"
     },
     {
       "name": "Taken",
-      "effect": "以 target 为参数调用时，向实体推送 \"fueltaken\" 事件（数据表含 taker 字段），若已设置 ontaken 回调则调用之（传入 self.inst 与 target）。副作用：触发事件及可能的外部回调。"
+      "effect": "推送事件 'fueltaken' 并携带 {taker = target}；若 ontaken 已设置则调用之，传入 self.inst 和 target。"
     }
   ],
   "events_published": [
@@ -31,29 +31,27 @@
   "wiki": {
     "scanned_pageids": [
       28610,
-      51836,
       18216,
       20061,
       21620,
       51388,
       10374,
-      14792
+      14792,
+      15170
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录仅描述燃料值、添加燃料、燃料上限及消耗等行为，未体现燃料组件移除(OnRemoveFromEntity)、燃料被取走(Taken)或设置取走回调(SetOnTakenFn)的玩家语言表达。",
+    "no_evidence_reason": "页面摘录均围绕燃料值、添加燃料、燃烧时长、燃料上限等概念展开，未出现燃料被取走(Taken)、从实体移除(OnRemoveFromEntity)或设置取走回调(SetOnTakenFn)等玩家可见行为或描述。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "燃料值",
     "燃料类型",
-    "可燃标签",
+    "燃料标签",
     "被取走",
     "燃料事件",
-    "燃烧材料",
-    "添加标签",
-    "移除标签",
-    "火堆燃料",
-    "补给燃料"
+    "燃料回调",
+    "设置回调",
+    "移除标签"
   ],
   "gameplay_tags": [
     "生存"
@@ -63,6 +61,6 @@
     "source_sha256": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
     "source_bytes": 783,
     "model": "hy3-free",
-    "generated_at_ms": 1787849447880
+    "generated_at_ms": 1787858751852
   }
 }

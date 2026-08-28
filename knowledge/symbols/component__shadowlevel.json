@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "shadowlevel",
-  "summary": "组件管理实体的阴影等级数据，支持设置默认等级或通过函数动态计算等级，并在实体上维护 'shadowlevel' 标签。该组件参与暗影相关核心玩法，供其他系统查询等级与标签进行交互。",
+  "summary": "该组件管理实体的暗影等级数据，默认等级为1且支持设置动态计算函数。它在实体上添加 'shadowlevel' 标签，为其他系统提供获取当前等级的接口，以参与游戏内的暗影相关玩法。",
   "api": [
     {
       "name": "SetDefaultLevel",
-      "effect": "将组件内部默认阴影等级 self.level 设为传入的 level 值；当未设置动态函数时 GetCurrentLevel 返回此值。仅修改内部状态，无其它副作用。"
+      "effect": "设置组件内部默认暗影等级 self.level 为传入的 level，仅更新数据，不改变实体标签等其他状态。"
     },
     {
       "name": "SetLevelFn",
-      "effect": "将动态等级计算函数 self.levelfn 设为传入的 fn；此后 GetCurrentLevel 将调用该函数。仅修改内部状态，无其它副作用。"
+      "effect": "设置动态等级计算函数 self.levelfn 为传入的 fn，后续 GetCurrentLevel 将优先调用该函数，仅存储函数引用无副作用。"
     },
     {
       "name": "GetCurrentLevel",
-      "effect": "返回当前阴影等级：若 self.levelfn 非空则调用 self.levelfn(self.inst) 并返回结果，否则返回 self.level。无副作用。"
+      "effect": "返回当前暗影等级：若 self.levelfn 不为 nil 则调用 self.levelfn(self.inst) 并返回其结果，否则返回 self.level。纯查询无副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时调用，移除实体上的 'shadowlevel' 标签。副作用是实体丢失该标签。"
+      "effect": "当组件从实体移除时由框架调用，移除实体上的 'shadowlevel' 标签，无其他副作用。"
     }
   ],
   "events_published": [],
@@ -41,29 +41,37 @@
       18790,
       16625
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录中，仅页面34037提及暗影武器“最多升级3次”及“升级的暗影槌具备500点饥饿值”，但未以任何方式体现component__shadowlevel的SetDefaultLevel、SetLevelFn、GetCurrentLevel、OnRemoveFromEntity等具体能力（如默认等级数值、等级决定函数、当前等级效果、移除时行为）。其余页面均讨论无关实体（盔甲、回旋镖、法杖、护符等），无暗影等级相关表述。故认为页面根本不讨论该组件能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "暗影槌升级条件描述",
+        "evidence": [
+          {
+            "pageid": 34037,
+            "quote": "可为暗影槌升级"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "阴影等级",
+    "暗影等级",
+    "影子等级",
     "暗影标签",
-    "默认等级",
+    "阴影级别",
+    "等级函数",
     "动态等级",
-    "实体标记",
-    "等级查询",
-    "标签移除",
-    "移除组件"
+    "实体暗影",
+    "默认等级"
   ],
   "gameplay_tags": [
-    "暗影",
-    "生存"
+    "暗影"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
     "source_bytes": 576,
     "model": "hy3-free",
-    "generated_at_ms": 1787852333663
+    "generated_at_ms": 1787861422462
   }
 }

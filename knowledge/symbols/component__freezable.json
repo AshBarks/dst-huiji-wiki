@@ -7,103 +7,103 @@
   },
   "category": "component",
   "display_name": "freezable",
-  "summary": "该组件管理实体的冰冻状态、寒冷度与抗冻性数据，控制实体被冻结、融化与解冻的过程。它参与战斗与生存玩法，使实体可被冰冻而停止行动，并通过受击或时间推移解除冰冻，支持碎裂特效与递减回报机制。",
+  "summary": "该组件管理实体的冻结状态、冷量与抗性数据，控制冰冻、融化与解除冰冻的状态机转换。它参与战斗与生存玩法，通过冻结使实体丧失行动能力，并受攻击伤害累计影响而提前破碎解冻，同时提供视觉着色与碎裂特效。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'attacked' 事件监听与 'freezable' 标签，取消递减任务与磨损任务。"
+      "effect": "移除实体时调用，取消'attacked'事件监听，移除'freezable'标签，并取消可能存在的衰减任务与磨损任务。"
     },
     {
       "name": "SetResistance",
-      "effect": "设置 self.resistance 为传入的 resist，影响冻结所需寒冷度阈值。"
+      "effect": "设置组件的冻结抗性基础值 self.resistance。"
     },
     {
       "name": "SetDefaultWearOffTime",
-      "effect": "设置 self.wearofftime 为传入的 wearofftime，作为默认冰冻磨损时间。"
+      "effect": "设置默认的冷量磨损时间 self.wearofftime。"
     },
     {
       "name": "AddShatterFX",
-      "effect": "将 prefab、偏移量与跟随符号数据插入 self.fxdata 表，用于后续生成碎裂特效。"
+      "effect": "将碎裂特效的预制体、偏移坐标与跟随符号记录到 self.fxdata 表中，供后续生成特效使用。"
     },
     {
       "name": "SetShatterFXLevel",
-      "effect": "设置 self.fxlevel 为 level（percent 参数未使用），影响后续特效等级。"
+      "effect": "设置碎裂特效等级 self.fxlevel（参数 percent 未被使用）。"
     },
     {
       "name": "SpawnShatterFX",
-      "effect": "遍历 fxdata 生成特效实体，根据数据选择跟随或作为子物体，并设置 shatterfx 等级为 fxlevel。"
+      "effect": "遍历 fxdata 生成碎裂特效预制体，根据配置添加为跟随实体或子节点，并对带有 shatterfx 组件的特效设置等级。"
     },
     {
       "name": "IsFrozen",
-      "effect": "返回 self.state 是否为 FROZEN 或 THAWING 的布尔值。"
+      "effect": "返回实体是否处于 FROZEN 或 THAWING 状态。"
     },
     {
       "name": "IsThawing",
-      "effect": "返回 self.state 是否为 THAWING 的布尔值。"
+      "effect": "返回实体是否处于 THAWING 状态。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含状态、寒冷度、抗冻、额外抗冻与递减任务剩余时间的调试字符串。"
+      "effect": "返回包含状态、冷量、抗性及衰减任务剩余时间的调试字符串。"
     },
     {
       "name": "SetRedirectFn",
-      "effect": "设置 self.redirectfn 为传入函数，用于 AddColdness 时重定向处理。"
+      "effect": "设置冷量添加的重定向函数 self.redirectfn，用于拦截 AddColdness 逻辑。"
     },
     {
       "name": "AddColdness",
-      "effect": "若 redirectfn 返回真则直接返回；否则增加 coldness，根据阈值可能触发 Freeze 或 StartWearingOff，并更新色调。"
+      "effect": "若重定向函数未拦截，则增加冷量值；根据当前状态与抗性可能触发冻结或启动磨损计时，并更新实体着色。行为副作用包括可能调用 Freeze 或 StartWearingOff。"
     },
     {
       "name": "StartWearingOff",
-      "effect": "取消已有磨损任务，启动新定时任务在指定时间后调用 WearOff 函数。"
+      "effect": "取消已有磨损任务，设定新定时任务在指定或默认磨损时间后执行冷量磨损（WearOff）。"
     },
     {
       "name": "GetTimeToWearOff",
-      "effect": "返回磨损任务剩余时间或 nil。"
+      "effect": "返回当前磨损任务的剩余时间，若无任务则返回 nil。"
     },
     {
       "name": "UpdateTint",
-      "effect": "根据冻结状态或寒冷度比例设置实体附加颜色（冰冻蓝），无寒冷时清除颜色。"
+      "effect": "根据冻结状态与冷量比例，通过 colouradder 或 AnimState 设置实体的附加颜色（冰冻蓝调）。"
     },
     {
       "name": "SetExtraResist",
-      "effect": "设置 self.extraresist（限制范围），大于0启动周期衰减任务，否则取消。"
+      "effect": "设置额外抗性 self.extraresist 并限制范围，若大于0则启动周期衰减任务，否则取消该任务。"
     },
     {
       "name": "ResolveResistance",
-      "effect": "返回考虑 extraresist 后的总抗冻值。"
+      "effect": "计算并返回考虑额外抗性后的有效总抗性值。"
     },
     {
       "name": "ResolveWearOffTime",
-      "effect": "返回考虑 extraresist 按比例缩减后的磨损时间。"
+      "effect": "根据额外抗性缩放给定的磨损时间并返回。"
     },
     {
       "name": "GetFreezePercent",
-      "effect": "返回 coldness 与总抗冻值之比的冻结百分比。"
+      "effect": "返回当前冷量占有效抗性的比例，即冻结百分比。"
     },
     {
       "name": "Freeze",
-      "effect": "若实体可见且未死，调用 onfreezefn，设状态为 FROZEN，停止大脑与移动，清除战斗目标，推送 'freeze' 事件，可能累加额外抗冻。"
+      "effect": "使实体进入 FROZEN 状态：调用冻结回调、重启衰减任务、启动磨损、更新着色、停止大脑与移动并清除战斗目标，推送'freeze'事件；若启用递减返回则增加额外抗性。要求实体可见且未死亡。"
     },
     {
       "name": "Unfreeze",
-      "effect": "若冻结中，重置状态与计数，生成碎裂特效，重启大脑，推送 'unfreeze' 事件，令战斗空白攻击0.3秒。"
+      "effect": "若处于冻结，重置为 NORMAL 状态并清零冷量与伤害累计，生成碎裂特效，更新着色；若未死亡则重启大脑、推送'unfreeze'事件并令战斗组件空白攻击0.3秒。"
     },
     {
       "name": "Thaw",
-      "effect": "若冻结中且未死，设状态为 THAWING，coldness 置0，推送 'onthaw' 事件，启动磨损。"
+      "effect": "若处于冻结且未死亡，转为 THAWING 状态，清零冷量，推送'onthaw'事件并启动缩放后的磨损计时。"
     },
     {
       "name": "Reset",
-      "effect": "将状态设为 NORMAL，coldness 置0，更新色调，不推送事件。"
+      "effect": "直接重置状态为 NORMAL 并清零冷量，更新着色，不推送任何事件。"
     },
     {
       "name": "OnSave",
-      "effect": "若 extraresist 存在且大于0，返回取整后的保存表，否则 nil。"
+      "effect": "若额外抗性大于0，返回保留一位小数的 extraresist 存档数据，否则返回 nil。"
     },
     {
       "name": "OnLoad",
-      "effect": "若数据含 extraresist，调用 SetExtraResist 加载。"
+      "effect": "从存档数据读取 extraresist 并调用 SetExtraResist 恢复。"
     }
   ],
   "events_published": [
@@ -119,89 +119,97 @@
   "wiki": {
     "scanned_pageids": [
       20511,
-      70340,
       13897,
-      21137,
+      15651,
       23924,
-      56946,
       13823,
-      15551
+      15551,
+      19808,
+      10374
     ],
     "aspects": [
       {
-        "aspect": "冰冻层数自然削减描述",
-        "evidence": [
-          {
-            "pageid": 15551,
-            "quote": "同时冰冻层数自然削减的速度会…"
-          }
-        ]
-      },
-      {
-        "aspect": "冰冻抗性标注",
-        "evidence": [
-          {
-            "pageid": 13897,
-            "quote": "目标冰冻抗性 + 1 层冰冻"
-          },
-          {
-            "pageid": 15551,
-            "quote": "蜂王拥有[[额外冰冻抗性]]"
-          },
-          {
-            "pageid": 23924,
-            "quote": "特殊互动/冰冻抗性={{tooltip|3|"
-          }
-        ]
-      },
-      {
-        "aspect": "冰冻施加与机制描述",
+        "aspect": "冰冻层数施加描述",
         "evidence": [
           {
             "pageid": 20511,
-            "quote": "有些道具能够对它们施加[[#冰冻抗性与冰冻层数|冰冻]]"
-          },
-          {
-            "pageid": 70340,
-            "quote": "有些道具能够对它们施加[[#冰冻抗性与冰冻层数|冰冻]]"
+            "quote": "次攻击为生物施加 1 层冰冻"
           },
           {
             "pageid": 13897,
             "quote": "爆发前每帧施加 0.1 层冰冻"
-          },
-          {
-            "pageid": 23924,
-            "quote": "他会施法降低附近的温度并[[冰冻]]附近的实体"
           }
         ]
       },
       {
-        "aspect": "生物被冰冻状态表述",
+        "aspect": "冰冻抗性数值与设定描述",
+        "evidence": [
+          {
+            "pageid": 20511,
+            "quote": "冰冻抗性决定了生物要受到多少层冰冻效果才会被冻结"
+          },
+          {
+            "pageid": 13897,
+            "quote": "爆发后每帧施加 目标冰冻抗性 + 1 层冰冻"
+          },
+          {
+            "pageid": 15651,
+            "quote": "暴怒时，龙蝇设置冰冻抗性至 12 点"
+          },
+          {
+            "pageid": 23924,
+            "quote": "帝王蟹的冰冻抗性会随蓝宝石的数量增加而增强"
+          },
+          {
+            "pageid": 10374,
+            "quote": "薇洛的冰冻抗性为 3，低于其他角色（4）"
+          }
+        ]
+      },
+      {
+        "aspect": "冰冻抗性阈值判定",
+        "evidence": [
+          {
+            "pageid": 20511,
+            "quote": "冰冻抗性决定了生物要受到多少层冰冻效果才会被冻结"
+          }
+        ]
+      },
+      {
+        "aspect": "冻结状态与行为描述",
         "evidence": [
           {
             "pageid": 13897,
-            "quote": "生物被冰冻之后仇恨会重置"
+            "quote": "如果将红宝石鹿冻结，蓝宝石鹿点燃"
+          },
+          {
+            "pageid": 15651,
+            "quote": "岩浆虫被冻结会立即被龙蝇视作死亡"
           },
           {
             "pageid": 15551,
-            "quote": "每次被[[冻结]]"
+            "quote": "每次被冻结，她的冰冻抗性都会提升 2 点"
           },
           {
-            "pageid": 23924,
-            "quote": "他会施法降低附近的温度并[[冰冻]]附近的实体"
+            "pageid": 20511,
+            "quote": "才会被冻结"
           }
         ]
       },
       {
-        "aspect": "融化状态标注",
+        "aspect": "解冻行为描述",
         "evidence": [
           {
-            "pageid": 21137,
-            "quote": "迷你冰川有高大、中等、矮小、融化和干涸五种状态。"
+            "pageid": 13897,
+            "quote": "红宝石鹿免疫火焰伤害且解冻速度翻倍"
           },
           {
-            "pageid": 56946,
-            "quote": "|图像4文字= 融化"
+            "pageid": 15651,
+            "quote": "尽管它们在解冻时才…"
+          },
+          {
+            "pageid": 19808,
+            "quote": "每当池塘解冻时，会再次生成植物"
           }
         ]
       },
@@ -210,7 +218,7 @@
         "evidence": [
           {
             "pageid": 15551,
-            "quote": "她的冰冻抗性都会提升 2 点，至多提升 12"
+            "quote": "蜂王拥有额外冰冻抗性，每次被冻结，她的冰冻抗性都会提升 2 点"
           }
         ]
       }
@@ -218,14 +226,16 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "冰冻",
-    "冻结",
-    "寒冷度",
+    "冰冻住",
     "解冻",
-    "融化",
-    "抗冻",
-    "碎冰",
-    "冻住"
+    "融化中",
+    "冻抗性",
+    "冷量值",
+    "碎冰特效",
+    "冻结状态",
+    "破冰伤害",
+    "磨损时间",
+    "附加颜色"
   ],
   "gameplay_tags": [
     "战斗",
@@ -236,6 +246,6 @@
     "source_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
     "source_bytes": 10247,
     "model": "hy3-free",
-    "generated_at_ms": 1787848657593
+    "generated_at_ms": 1787858170661
   }
 }

@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "sanityaura",
-  "summary": "该组件管理实体的精神光环数值与衰减参数，并为实体添加“sanityaura”标签。它根据观察者距离动态计算对玩家精神值的影响，参与生存玩法中的理智维持机制。",
+  "summary": "该组件为实体管理精神光环（sanity aura）相关数据，包括基础光环值、衰减函数及源名称，并在初始化时添加 'sanityaura' 标签。它参与生存玩法中的理智值影响机制，通过距离平方计算动态提供观察者所受的光环数值。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时调用，移除实体上的 'sanityaura' 标签，无返回值。"
+      "effect": "组件从实体移除时由引擎调用，移除实体上的 'sanityaura' 标签，无其他副作用。"
     },
     {
       "name": "GetBaseAura",
-      "effect": "返回无距离衰减的基础光环值：若 self.aurafn 为 nil 则返回 self.aura，否则返回 self.aurafn(self.inst, observer) 的调用结果。"
+      "effect": "返回不考虑距离衰减的基础光环值。若 self.aurafn 已设置则调用其并返回结果，否则返回数值字段 self.aura。"
     },
     {
       "name": "SetBaseAuraName",
-      "effect": "设置 self.baseauraname 字段，用于标记同源光环以便合并计算（假设同名光环量级相同）。"
+      "effect": "设置 self.baseauraname 为传入值，用于标识光环源名称，使外部系统将同名光环视为同一来源；不产生返回值。"
     },
     {
       "name": "GetAura",
-      "effect": "计算考虑距离与衰减后的光环值。获取观察者到实体的距离平方，若超过 self.max_distsq 或默认的 SANITY_EFFECT_RANGE_SQ 则返回 0；否则返回基础光环值除以衰减函数 self.fallofffn(self.inst, observer, distsq) 或 math.max(1, distsq) 的结果。"
+      "effect": "计算观察者受到的实际光环值。获取观察者到实体的距离平方，若超出 self.max_distsq 或默认的 SANITY_EFFECT_RANGE_SQ 则返回 0；否则以基础光环值除以衰减因子（self.fallofffn 结果或 math.max(1, distsq)）得出并返回光环值。"
     }
   ],
   "events_published": [],
@@ -32,35 +32,51 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      51775,
-      51639,
-      70494,
       13437,
-      51640,
-      65737,
-      13701,
-      18234
+      16419,
+      35217,
+      14938,
+      13379,
+      15022,
+      15183,
+      15237
     ],
     "aspects": [
       {
-        "aspect": "精神光环名称标注",
+        "aspect": "理智光环基础数值标注",
         "evidence": [
           {
-            "pageid": 65737,
-            "quote": "尸体的负面精神光环"
+            "pageid": 15237,
+            "quote": "|理智光环 = 被雇佣时：+25{{理智值}}/分钟"
+          },
+          {
+            "pageid": 15183,
+            "quote": "骨灰罐获得 +25{{理智值}}/分钟 的[[理智光环]]"
+          },
+          {
+            "pageid": 16419,
+            "quote": "产生 +4.44{{理智值}}/分钟的[[理智光环]]"
+          },
+          {
+            "pageid": 14938,
+            "quote": "|理智光环 = 孢子帽萌发时：<br>-400 {{理智值}}/分钟"
+          },
+          {
+            "pageid": 15022,
+            "quote": "|理智光环 = 100{{启蒙值}}/分钟"
           }
         ]
       },
       {
-        "aspect": "精神光环数值标注",
+        "aspect": "理智光环效果与衰减描述",
         "evidence": [
           {
-            "pageid": 65737,
-            "quote": "格罗姆的负面光环为大量"
+            "pageid": 35217,
+            "quote": "会对附近的玩家造成持续的理智值/启蒙值影响，效果一般随距离衰减"
           },
           {
-            "pageid": 13437,
-            "quote": "半径为 4、+10理智值"
+            "pageid": 13379,
+            "quote": "靠近触手会有理智光环效果"
           }
         ]
       }
@@ -69,22 +85,23 @@
   },
   "search_terms": [
     "精神光环",
-    "理智影响",
+    "理智光环",
+    "范围影响",
     "距离衰减",
-    "光环范围",
+    "光环命名",
     "基础光环",
-    "观察者",
-    "精神值",
-    "光环叠加"
+    "观察距离",
+    "精神影响"
   ],
   "gameplay_tags": [
-    "生存"
+    "生存",
+    "精神"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
     "source_bytes": 1141,
     "model": "hy3-free",
-    "generated_at_ms": 1787848932332
+    "generated_at_ms": 1787858332287
   }
 }

@@ -7,8 +7,8 @@ use crate::error::{Error, Result};
 use crate::knowledge::auto_infobox::AutoInfoboxIndex;
 use crate::knowledge::store::{doc_path, is_fresh, load_doc, sha256_hex, write_atomic};
 use crate::knowledge::types::{
-    assemble, SymbolDoc, SymbolDocLlm, SymbolRefKey, WikiAspect, WikiEvidence, WikiLinkLlm,
-    WikiSection, PROMPT_REV, SCHEMA_VERSION,
+    assemble, prompt_rev_for, SymbolDoc, SymbolDocLlm, SymbolRefKey, WikiAspect, WikiEvidence,
+    WikiLinkLlm, WikiSection, SCHEMA_VERSION,
 };
 use crate::llm::{LlmConfig, LlmStreamEvent};
 use crate::service::Reporter;
@@ -148,6 +148,8 @@ impl WikiTextCache {
 pub struct ScanSymbolsParams {
     pub scripts_root: String,
     pub knowledge_root: String,
+    /// 符号类别:component | brain | behaviour(默认 component)
+    pub category: String,
     /// wiki 语料 host 根目录;提供则启用 pass2 语料归因(link-wiki)
     pub corpus: Option<String>,
     /// pass2 每组件采样的页面数(默认 8,引用/fact 富裕页优先)
@@ -156,6 +158,8 @@ pub struct ScanSymbolsParams {
     pub force: bool,
     /// 并行处理的组件数;1 = 串行(默认)
     pub concurrency: usize,
+    /// 仅对指定文件名词干(fn stem)跑 pass2;None = 全部跑(component 兼容)
+    pub pass2_names: Option<Vec<String>>,
 }
 
 /// P1 选择:top_symbols(变体引用数降序)过滤出 component 文件型符号,
@@ -186,6 +190,103 @@ fn pick_components(
         .collect()
 }
 
+/// 按类别选择符号列表(component/brain/behaviour)。
+fn pick_symbols(
+    scripts_root: &Path,
+    index: &IndexArtifact,
+    category: &str,
+    limit: usize,
+) -> Vec<(SymbolRefKey, PathBuf, usize)> {
+    match category {
+        "behaviour" => pick_behaviours(scripts_root, index, limit),
+        "brain" => pick_brains(scripts_root, index, limit),
+        _ => pick_components(scripts_root, index, limit),
+    }
+}
+
+/// behaviour 词典层:直接扫 behaviours/ 目录,优先已被 behaviour_calls 调用的节点。
+fn pick_behaviours(
+    scripts_root: &Path,
+    index: &IndexArtifact,
+    limit: usize,
+) -> Vec<(SymbolRefKey, PathBuf, usize)> {
+    let mut call_counts: std::collections::HashMap<String, usize> = Default::default();
+    for call in &index.behaviour_calls {
+        *call_counts.entry(call.ctor.to_lowercase()).or_insert(0) += 1;
+    }
+    let dir = scripts_root.join("behaviours");
+    let mut entries: Vec<(usize, String, SymbolRefKey, PathBuf, usize)> = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("lua") {
+                continue;
+            }
+            let Some(name) = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(str::to_string)
+            else {
+                continue;
+            };
+            let rel = format!("behaviours/{name}.lua");
+            let full = scripts_root.join(&rel);
+            let bytes = std::fs::metadata(&full)
+                .map(|m| m.len() as usize)
+                .unwrap_or(0);
+            let count = call_counts.get(&name.to_lowercase()).copied().unwrap_or(0);
+            entries.push((
+                count,
+                name.clone(),
+                SymbolRefKey {
+                    kind: "behaviour".to_string(),
+                    path: rel,
+                },
+                full,
+                bytes,
+            ));
+        }
+    }
+    entries.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    entries
+        .into_iter()
+        .take(limit)
+        .map(|(_, _, key, full, bytes)| (key, full, bytes))
+        .collect()
+}
+
+/// brain 组合层:从 top_symbols(引用变体数降序)过滤 brains/ 文件,
+/// 排除 braincommon/beecommon 等共享 helper(源码不含 `Class(Brain`)。
+fn pick_brains(
+    scripts_root: &Path,
+    index: &IndexArtifact,
+    limit: usize,
+) -> Vec<(SymbolRefKey, PathBuf, usize)> {
+    top_symbols(index, limit.max(64) * 4)
+        .into_iter()
+        .filter_map(|sym| match sym {
+            crate::update::SymbolRef::File { path } if path.starts_with("brains/") => {
+                let full = scripts_root.join(&path);
+                let bytes = std::fs::metadata(&full).ok()?.len() as usize;
+                let source = std::fs::read(&full).ok()?;
+                if !source.windows(11).any(|w| w == b"Class(Brain") {
+                    return None;
+                }
+                Some((
+                    SymbolRefKey {
+                        kind: "brain".to_string(),
+                        path,
+                    },
+                    full,
+                    bytes,
+                ))
+            }
+            _ => None,
+        })
+        .take(limit)
+        .collect()
+}
+
 /// 单个组件处理结果统计。
 #[derive(Debug, Default, Clone, Copy)]
 struct ComponentOutcome {
@@ -196,9 +297,13 @@ struct ComponentOutcome {
     wiki_failed: u32,
 }
 
-/// 并行处理时在组件任务间共享的只读上下文。
+/// 并行处理时在符号任务间共享的只读上下文。
 struct ComponentShared<'a> {
     knowledge_root: &'a Path,
+    /// 当前符号类别:component / brain / behaviour。
+    category: &'a str,
+    /// 当前类别对应的 prompt_rev。
+    prompt_rev: &'static str,
     force: bool,
     has_corpus: bool,
     sample: usize,
@@ -209,6 +314,8 @@ struct ComponentShared<'a> {
     config: &'a LlmConfig,
     raw_dir: &'a Path,
     auto_infobox: &'a AutoInfoboxIndex,
+    /// 仅对指定文件名词干跑 pass2;None = 全部。
+    pass2_names: Option<&'a [String]>,
 }
 
 pub async fn run_scan_symbols(
@@ -222,10 +329,16 @@ pub async fn run_scan_symbols(
     let atlas = build_atlas_from_dir(scripts_root)?;
     let build_id = atlas.build_id.clone();
 
-    reporter.stage("选择 component 符号");
-    let picked = pick_components(scripts_root, &atlas.index, params.limit);
+    let category = if params.category.is_empty() {
+        "component"
+    } else {
+        params.category.as_str()
+    };
+    let prompt_rev = prompt_rev_for(category);
+    reporter.stage(&format!("选择 {category} 符号"));
+    let picked = pick_symbols(scripts_root, &atlas.index, category, params.limit);
     reporter.log(format!(
-        "候选 {} 个 component(按关联变体数降序;force={})",
+        "候选 {} 个 {category}(按关联引用降序;force={})",
         picked.len(),
         params.force
     ));
@@ -271,6 +384,8 @@ pub async fn run_scan_symbols(
         |(idx, (key, src_path, src_bytes))| {
             let shared = ComponentShared {
                 knowledge_root,
+                category,
+                prompt_rev,
                 force: params.force,
                 has_corpus: params.corpus.is_some(),
                 sample,
@@ -281,6 +396,7 @@ pub async fn run_scan_symbols(
                 config: &config,
                 raw_dir: &raw_dir,
                 auto_infobox: &auto_infobox,
+                pass2_names: params.pass2_names.as_deref(),
             };
             async move {
                 process_one_component(
@@ -313,14 +429,14 @@ pub async fn run_scan_symbols(
             }
             Err(e) => {
                 failed += 1;
-                reporter.log(format!("组件处理失败: {e}"));
+                reporter.log(format!("符号处理失败: {e}"));
             }
         }
     }
 
     Ok(serde_json::json!({
         "schema_version": SCHEMA_VERSION,
-        "prompt_rev": PROMPT_REV,
+        "prompt_rev": prompt_rev,
         "picked": total,
         "written": written,
         "skipped_fresh": skipped,
@@ -340,6 +456,20 @@ fn inject_auto_maintained(doc: &mut SymbolDoc, auto: &AutoInfoboxIndex) {
         .unwrap_or("")
         .trim_end_matches(".lua");
     doc.auto_maintained = auto.get(name).cloned();
+}
+
+/// 是否允许当前符号跑 pass2:未配置名单时全部允许;配置后仅白名单名称命中。
+fn allow_pass2(shared: &ComponentShared<'_>, key: &SymbolRefKey) -> bool {
+    let Some(names) = shared.pass2_names else {
+        return true;
+    };
+    let stem = key
+        .path
+        .rsplit('/')
+        .next()
+        .unwrap_or("")
+        .trim_end_matches(".lua");
+    names.iter().any(|n| n == stem)
 }
 
 async fn process_one_component(
@@ -365,7 +495,7 @@ async fn process_one_component(
 
     if !shared.force {
         if let Some(existing) = load_doc(&doc_path)? {
-            if is_fresh(&existing, &sha, PROMPT_REV) {
+            if is_fresh(&existing, &sha, shared.prompt_rev) {
                 match (&existing.wiki, shared.has_corpus) {
                     (Some(_), _) | (None, false) => {
                         reporter.log("源码与 prompt_rev 未变,跳过".to_string());
@@ -373,10 +503,17 @@ async fn process_one_component(
                         return Ok(outcome);
                     }
                     (None, true) => {
+                        if !allow_pass2(shared, key) {
+                            reporter.log("文档新鲜但未列入 pass2 名单,跳过".to_string());
+                            outcome.skipped += 1;
+                            return Ok(outcome);
+                        }
                         // 文档已是 v2 但缺 wiki 节点 → 只补 pass2
                         reporter.log("代码文档新鲜,仅补 pass2 语料归因".to_string());
                         let mut doc = existing;
-                        inject_auto_maintained(&mut doc, shared.auto_infobox);
+                        if shared.category == "component" {
+                            inject_auto_maintained(&mut doc, shared.auto_infobox);
+                        }
                         match enrich_with_wiki(
                             shared.config,
                             &mut doc,
@@ -385,6 +522,7 @@ async fn process_one_component(
                                 view: shared.view.expect("corpus loaded"),
                                 cache: shared.cache,
                                 sample: shared.sample,
+                                prompt_rev: shared.prompt_rev,
                             },
                             shared.raw_dir,
                             reporter,
@@ -421,6 +559,8 @@ async fn process_one_component(
         (String::from_utf8_lossy(&source).to_string(), false)
     };
 
+    let behaviour_context = build_behaviour_context(shared, key)?;
+
     let mut llm_outcome: Option<Result<SymbolDocLlm>> = None;
     for attempt in 1..=MAX_ATTEMPTS {
         if attempt > 1 {
@@ -433,6 +573,9 @@ async fn process_one_component(
             truncated,
             shared.raw_dir,
             reporter,
+            shared.category,
+            shared.prompt_rev,
+            behaviour_context.as_deref(),
         )
         .await
         {
@@ -458,33 +601,41 @@ async fn process_one_component(
                 source.len(),
                 shared.build_id.clone(),
                 &shared.config.model,
+                shared.prompt_rev,
             );
-            inject_auto_maintained(&mut doc, shared.auto_infobox);
+            if shared.category == "component" {
+                inject_auto_maintained(&mut doc, shared.auto_infobox);
+            }
             let body = serde_json::to_string_pretty(&doc)?;
             write_atomic(&doc_path, &body)?;
             if let Some(v) = shared.view {
-                match enrich_with_wiki(
-                    shared.config,
-                    &mut doc,
-                    WikiContext {
-                        index: shared.atlas,
-                        view: v,
-                        cache: shared.cache,
-                        sample: shared.sample,
-                    },
-                    shared.raw_dir,
-                    reporter,
-                )
-                .await
-                {
-                    Ok(()) => {
-                        write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
-                        outcome.wiki_written += 1;
+                if allow_pass2(shared, key) {
+                    match enrich_with_wiki(
+                        shared.config,
+                        &mut doc,
+                        WikiContext {
+                            index: shared.atlas,
+                            view: v,
+                            cache: shared.cache,
+                            sample: shared.sample,
+                            prompt_rev: shared.prompt_rev,
+                        },
+                        shared.raw_dir,
+                        reporter,
+                    )
+                    .await
+                    {
+                        Ok(()) => {
+                            write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
+                            outcome.wiki_written += 1;
+                        }
+                        Err(e) => {
+                            outcome.wiki_failed += 1;
+                            reporter.log(format!("pass2 失败,已保留 pass1 文档(可下次补跑): {e}"));
+                        }
                     }
-                    Err(e) => {
-                        outcome.wiki_failed += 1;
-                        reporter.log(format!("pass2 失败,已保留 pass1 文档(可下次补跑): {e}"));
-                    }
+                } else {
+                    reporter.log("未列入 pass2 名单,仅写 pass1 文档".to_string());
                 }
             }
             reporter.log(format!(
@@ -508,14 +659,116 @@ async fn process_one_component(
     Ok(outcome)
 }
 
-fn build_prompt(display: &str, source: &str, truncated: bool) -> String {
+/// brain 文档 pass1 的额外上下文:读取本 brain 已引用 behaviour 的 SymbolDoc,
+/// 把 ctor_params 摘要注入 prompt,避免 LLM 猜测位置参数语义。
+fn build_behaviour_context(
+    shared: &ComponentShared<'_>,
+    key: &SymbolRefKey,
+) -> Result<Option<String>> {
+    if shared.category != "brain" {
+        return Ok(None);
+    }
+    let mut seen = HashSet::new();
+    let mut summaries: Vec<String> = Vec::new();
+    for call in &shared.atlas.behaviour_calls {
+        if call.brain_file != key.path || !seen.insert(call.ctor.clone()) {
+            continue;
+        }
+        let file_name = call.ctor.to_lowercase();
+        let bkey = SymbolRefKey {
+            kind: "behaviour".to_string(),
+            path: format!("behaviours/{file_name}.lua"),
+        };
+        if let Ok(Some(doc)) = load_doc(&doc_path(shared.knowledge_root, &bkey)) {
+            let params = doc
+                .ctor_params
+                .iter()
+                .map(|p| {
+                    let default = p
+                        .default
+                        .as_deref()
+                        .map(|d| format!("(默认 {d})"))
+                        .unwrap_or_default();
+                    format!("  - {}: {}{}", p.name, p.semantic, default)
+                })
+                .collect::<Vec<_>>()
+                .join("\n");
+            summaries.push(format!(
+                "{}({})\n{}",
+                doc.display_name, doc.category, params
+            ));
+        }
+    }
+    if summaries.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(format!(
+        "该 brain 引用到的 behaviour 参数语义(来自现有 behaviour 文档):\n{}",
+        summaries.join("\n\n")
+    )))
+}
+
+fn build_prompt(
+    display: &str,
+    source: &str,
+    truncated: bool,
+    category: &str,
+    behaviour_context: Option<&str>,
+) -> String {
     let head = if truncated {
         "【注意】源码因长度被截断,仅基于可见部分标注,并在 truncation_note 中说明。\n\n"
     } else {
         ""
     };
-    format!(
-        "{head}以下是饥荒联机版(DST)组件 `{display}` 的 Lua 源码。\
+    let extra = behaviour_context
+        .map(|ctx| format!("\n{ctx}\n"))
+        .unwrap_or_default();
+    match category {
+        "behaviour" => format!(
+            "{head}以下是饥荒联机版(DST)行为节点 `{display}` 的 Lua 源码。\
+请通读后产出该行为节点的知识文档 JSON。
+
+要求:
+1. 全部用中文;不得编造源码中不存在的内容。
+2. summary:2~4 句,说明该行为节点驱动实体完成什么行为、在什么场景使用。
+3. api:覆盖对外暴露的方法;若确实没有对外方法,api 返回空数组,并必须用 api_note 说明原因;不得为了凑数编造方法。
+4. ctor_params:覆盖构造子中 `inst` 之外的全部位置参数;每项填写参数名、玩家语义(值变大/变小意味着什么)、默认值(如有)。
+5. effects:列出该节点对组件/SG 状态标签的作用(如 `locomotor:GoToPoint`、`combat:BattleCry`、检查 `sg:HasStateTag`)。
+6. success_fail_conditions:说明行为在何时 SUCCESS / FAILED / RUNNING。
+7. events_published / events_listened / netvars / tunables:严格取自源码标识符,可为空数组;tunables 放源码内的默认数值/配置(如 Wander 的 wander_dist)。
+8. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
+9. search_terms:5~10 个用于在维基全文中检索该行为玩家表达的词汇,以中文玩家语言为主(可混英文),每词 2~6 字。
+10. 只输出一个 JSON 对象,字段名与上述一致;api 确无方法时 api 为空数组,但必须提供 api_note。
+
+源码:
+```lua
+{source}
+```",
+        ),
+        "brain" => format!(
+            "{head}以下是饥荒联机版(DST)大脑 `{display}` 的 Lua 源码。\
+请通读后产出该大脑的知识文档 JSON。
+
+要求:
+1. 全部用中文;不得编造源码中不存在的内容。
+2. summary:2~4 句,说明该大脑让实体在什么情境下采取什么行为。
+3. tunables:文件级 local 常量(如 SEE_DIST、HOUSE_MAX_DIST),这些常量是页面“行为”章数值事实的主要锚点;名称/值严格取自源码。
+4. behaviour_invocations:列出本 brain 中实际调用的 behaviour 构造子及参数语义(数值事实),例如 `ChaseAndAttack(inst, 100)` → “追击最长 100 秒”;如有条件语境,填 context。
+5. context_branches:条件分支(如 `HasTag(\"clay\")`),对应页面分句枚举。
+6. bt_structure:优先级节点树的文字化摘要(意图粒度,不追求完整还原)。
+7. api:对外方法(通常少量);若没有,api 返回空数组,并必须用 api_note 说明原因。
+8. events_published / events_listened / netvars:严格取自源码标识符,可为空数组。
+9. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
+10. search_terms:5~10 个用于在维基全文中检索该大脑行为表达的词汇,以中文玩家语言为主(可混英文),每词 2~6 字。
+11. 只输出一个 JSON 对象,字段名与上述一致。
+
+{extra}源码:
+```lua
+{source}
+```",
+        ),
+        _ => format!(
+            "{head}以下是饥荒联机版(DST)组件 `{display}` 的 Lua 源码。\
 请通读后产出该组件的知识文档 JSON。
 
 要求:
@@ -531,10 +784,12 @@ fn build_prompt(display: &str, source: &str, truncated: bool) -> String {
 源码:
 ```lua
 {source}
-```"
-    )
+```",
+        ),
+    }
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn generate_one(
     config: &LlmConfig,
     key: &SymbolRefKey,
@@ -542,8 +797,17 @@ async fn generate_one(
     truncated: bool,
     raw_dir: &Path,
     reporter: &dyn Reporter,
+    category: &str,
+    prompt_rev: &str,
+    behaviour_context: Option<&str>,
 ) -> Result<SymbolDocLlm> {
-    let prompt = build_prompt(&key.doc_id(), visible_source, truncated);
+    let prompt = build_prompt(
+        &key.doc_id(),
+        visible_source,
+        truncated,
+        category,
+        behaviour_context,
+    );
     let system = "你是饥荒联机版(DST)的资深源码分析员,为中文维基产出结构化符号知识文档。\
 必须只输出一个合法 JSON 对象;除 JSON 外不得输出任何说明文字或代码围栏。";
 
@@ -568,7 +832,7 @@ async fn generate_one(
         })
         .await?;
 
-    let raw_path = raw_dir.join(format!("{}__{}.json", key.doc_id(), PROMPT_REV));
+    let raw_path = raw_dir.join(format!("{}__{}.json", key.doc_id(), prompt_rev));
     std::fs::write(&raw_path, &raw)?;
     reporter.log(format!("raw 已归档 {}", raw_path.display()));
 
@@ -895,12 +1159,13 @@ fn out_line(
     out.push('\n');
 }
 
-/// pass2 运行上下文:索引路由 + 语料视图 + 全文缓存 + 采样上限。
+/// pass2 运行上下文:索引路由 + 语料视图 + 全文缓存 + 采样上限 + prompt_rev。
 struct WikiContext<'a> {
     index: &'a IndexArtifact,
     view: &'a CorpusPageView,
     cache: Option<&'a WikiTextCache>,
     sample: usize,
+    prompt_rev: &'static str,
 }
 
 /// 单次 pass2 LLM 调用 + 容错解析;失败由调用方决定重试/降级。
@@ -910,6 +1175,7 @@ async fn generate_wiki_once(
     prompt: &str,
     raw_dir: &Path,
     reporter: &dyn Reporter,
+    prompt_rev: &str,
 ) -> Result<WikiLinkLlm> {
     let system = "你是维基语料分析员,任务是在真实页面文本中检索组件能力的表达证据。只输出一个合法 JSON 对象,除 JSON 外不得输出任何其他文字。";
     let raw = config
@@ -927,7 +1193,7 @@ async fn generate_wiki_once(
         })
         .await?;
 
-    let raw_path = raw_dir.join(format!("{}__wiki__{}.json", doc_id, PROMPT_REV));
+    let raw_path = raw_dir.join(format!("{}__wiki__{}.json", doc_id, prompt_rev));
     std::fs::write(&raw_path, &raw)?;
     reporter.log(format!("pass2 raw 已归档 {}", raw_path.display()));
 
@@ -1017,20 +1283,34 @@ async fn enrich_with_wiki(
             *pid,
         );
     }
-    let caps: Vec<String> = doc.api.iter().map(|a| a.name.clone()).collect();
+    let caps: Vec<String> = match doc.category.as_str() {
+        "behaviour" => {
+            let mut parts: Vec<String> = Vec::new();
+            parts.extend(doc.ctor_params.iter().map(|p| p.name.clone()));
+            parts.extend(doc.effects.clone());
+            parts
+        }
+        "brain" => {
+            let mut parts: Vec<String> = Vec::new();
+            parts.extend(doc.tunables.iter().cloned());
+            parts.extend(doc.behaviour_invocations.iter().map(|b| b.ctor.clone()));
+            parts
+        }
+        _ => doc.api.iter().map(|a| a.name.clone()).collect(),
+    };
 
     let prompt = format!(
-        "下面是 wiki 语料中与组件 `{name}` 相关联的实体页面摘录,以及该组件具备的代码能力清单。
+        "下面是 wiki 语料中与 `{name}` 相关联的实体页面摘录,以及该符号具备的代码能力/行为语义清单。
 
-任务:在页面文本中寻找这些能力的玩家语言表达。若某能力被页面以任何方式体现(数值、行为描述、策略段落),归入 aspects 并给出证据页;若扫描后认为页面根本不讨论该组件的能力,aspects 返回空数组并在 no_evidence_reason 写明判断依据。
+任务:在页面文本中寻找这些能力/行为的玩家语言表达。若某能力被页面以任何方式体现(数值、行为描述、策略段落),归入 aspects 并给出证据页;若扫描后认为页面根本不讨论该符号的能力,aspects 返回空数组并在 no_evidence_reason 写明判断依据。
 
 规则:
-1. aspect 用中文短语概括页面侧的写作方面(如“生命值数值标注”“死亡掉落联动”),不要照抄 API 名。
+1. aspect 用中文短语概括页面侧的写作方面(如“生命值数值标注”“死亡掉落联动”“仇恨距离描述”),不要照抄 API/常量名。
 2. evidence.pageid 必须来自下方给出的页面;quote 摘录原文短句(≤40 字),可省略。
 3. 不得凭空发明页面中不存在的能力表达;宁空勿造。
 4. 只输出一个 JSON 对象,形如:{{\"aspects\":[{{\"aspect\":\"…\",\"evidence\":[{{\"pageid\":123,\"quote\":\"…\"}}]}}],\"no_evidence_reason\":null}}
 
-组件能力清单:{caps}
+代码能力/行为语义清单:{caps}
 
 页面摘录:
 {excerpts}",
@@ -1044,7 +1324,16 @@ async fn enrich_with_wiki(
         if attempt > 1 {
             reporter.log("pass2 重试第 2 次…".to_string());
         }
-        match generate_wiki_once(config, &key.doc_id(), &prompt, raw_dir, reporter).await {
+        match generate_wiki_once(
+            config,
+            &key.doc_id(),
+            &prompt,
+            raw_dir,
+            reporter,
+            ctx.prompt_rev,
+        )
+        .await
+        {
             Ok(llm) => {
                 wiki_outcome = Some(Ok(llm));
                 break;
@@ -1122,4 +1411,111 @@ fn parse_wiki_tolerant(raw: &str) -> Result<WikiLinkLlm> {
         }
     }
     Err(Error::Llm(excerpt(trimmed)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::update::index::edges::BehaviourCallRecord;
+
+    fn temp_dir(tag: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("kn-scan-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn pick_behaviours_lists_all_files_and_prioritizes_called() {
+        let root = temp_dir("behaviours");
+        std::fs::create_dir_all(root.join("behaviours")).unwrap();
+        std::fs::write(
+            root.join("behaviours/wander.lua"),
+            "Wander = Class(BehaviourNode, function(self, inst) end)",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("behaviours/approach.lua"),
+            "Approach = Class(BehaviourNode, function(self, inst) end)",
+        )
+        .unwrap();
+
+        let mut index = IndexArtifact::default();
+        index.behaviour_calls.push(BehaviourCallRecord {
+            brain_file: "brains/houndbrain.lua".to_string(),
+            ctor: "Wander".to_string(),
+            line: 1,
+            args: Vec::new(),
+            prefab_variants: vec!["prefabs/hound.lua#hound".to_string()],
+        });
+
+        let picked = pick_behaviours(&root, &index, 10);
+        assert_eq!(picked.len(), 2);
+        assert_eq!(picked[0].0.kind, "behaviour");
+        assert_eq!(picked[0].0.path, "behaviours/wander.lua");
+        assert_eq!(picked[1].0.path, "behaviours/approach.lua");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn pick_brains_excludes_shared_helpers() {
+        let root = temp_dir("brains");
+        std::fs::create_dir_all(root.join("brains")).unwrap();
+        std::fs::write(
+            root.join("brains/houndbrain.lua"),
+            "local HoundBrain = Class(Brain, function(self, inst) end)",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("brains/braincommon.lua"),
+            "local BrainCommon = { PanicTrigger = function() end }",
+        )
+        .unwrap();
+
+        let mut index = IndexArtifact::default();
+        index.reverse.insert(
+            "brains/houndbrain.lua".to_string(),
+            vec!["prefabs/hound.lua#hound".to_string()],
+        );
+        index
+            .reverse
+            .insert("brains/braincommon.lua".to_string(), Vec::new());
+
+        let picked = pick_brains(&root, &index, 10);
+        assert_eq!(picked.len(), 1);
+        assert_eq!(picked[0].0.kind, "brain");
+        assert_eq!(picked[0].0.path, "brains/houndbrain.lua");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn build_prompt_switches_by_category() {
+        let brain = build_prompt("brain__houndbrain", "src", false, "brain", None);
+        assert!(brain.contains("大脑"));
+        assert!(brain.contains("behaviour_invocations"));
+        assert!(brain.contains("context_branches"));
+
+        let behaviour = build_prompt("behaviour__wander", "src", false, "behaviour", None);
+        assert!(behaviour.contains("行为节点"));
+        assert!(behaviour.contains("ctor_params"));
+        assert!(behaviour.contains("success_fail_conditions"));
+
+        let component = build_prompt("component__health", "src", false, "component", None);
+        assert!(component.contains("组件"));
+        assert!(component.contains("api"));
+    }
+
+    #[test]
+    fn pick_symbols_falls_back_to_component() {
+        // 未识别类别应安全回退到 component 选择逻辑。
+        let root = temp_dir("fallback");
+        std::fs::create_dir_all(root.join("components")).unwrap();
+        std::fs::write(root.join("components/health.lua"), "Health = Class").unwrap();
+        let index = IndexArtifact::default();
+        let picked = pick_symbols(&root, &index, "unknown", 10);
+        assert!(picked.is_empty()); // 无 reverse 边，component 也没有候选
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

@@ -183,9 +183,11 @@ pub enum JobKind {
         #[serde(default)]
         skip_no_fact_pages: bool,
     },
-    /// M1:LLM 阅读 component 源码生成 SymbolDoc 知识文档(本地,不写 wiki)
+    /// M1:LLM 阅读符号源码生成 SymbolDoc 知识文档(本地,不写 wiki)
     KnowledgeScanSymbols {
         root: String,
+        #[serde(default = "default_symbol_category")]
+        category: String,
         #[serde(default = "default_knowledge_dir")]
         knowledge_dir: String,
         /// 提供则启用 pass2 语料归因
@@ -200,7 +202,14 @@ pub enum JobKind {
         /// 并行处理的组件数;1 = 串行
         #[serde(default = "default_concurrency")]
         concurrency: usize,
+        /// 仅对指定文件名词干跑 pass2;None = 全部
+        #[serde(default)]
+        pass2_names: Option<Vec<String>>,
     },
+}
+
+fn default_symbol_category() -> String {
+    "component".to_string()
 }
 
 fn default_concurrency() -> usize {
@@ -393,22 +402,26 @@ async fn execute_job_inner(
         }
         JobKind::KnowledgeScanSymbols {
             root,
+            category,
             knowledge_dir,
             corpus,
             sample_pages,
             limit,
             force,
             concurrency,
+            pass2_names,
         } => {
             crate::knowledge::run_scan_symbols(
                 &crate::knowledge::ScanSymbolsParams {
                     scripts_root: root.clone(),
+                    category: category.clone(),
                     knowledge_root: knowledge_dir.clone(),
                     corpus: corpus.clone(),
                     sample_pages: *sample_pages,
                     limit: *limit,
                     force: *force,
                     concurrency: *concurrency,
+                    pass2_names: pass2_names.clone(),
                 },
                 reporter,
             )

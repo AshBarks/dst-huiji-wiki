@@ -227,22 +227,26 @@ pub async fn run(args: Commands) -> Result<()> {
         }
         Commands::KnowledgeScanSymbols {
             root,
+            category,
             knowledge_dir,
             corpus,
             sample_pages,
             limit,
             force,
             concurrency,
+            pass2_names,
         } => {
             execute(
                 JobKind::KnowledgeScanSymbols {
                     root: path_to_string(&root)?,
+                    category,
                     knowledge_dir: path_to_string(&knowledge_dir)?,
                     corpus: opt_path_to_string(&corpus)?,
                     sample_pages,
                     limit,
                     force,
                     concurrency,
+                    pass2_names,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

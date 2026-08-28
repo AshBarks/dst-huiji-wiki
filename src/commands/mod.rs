@@ -174,17 +174,20 @@ pub enum Commands {
         #[arg(long)]
         skip_no_fact_pages: bool,
     },
-    /// M1:LLM 阅读 component 源码,产出/更新 SymbolDoc 知识文档
+    /// M1:LLM 阅读符号源码,产出/更新 SymbolDoc 知识文档
     KnowledgeScanSymbols {
         /// 游戏脚本根目录(当前树或快照目录)
         root: PathBuf,
+        /// 符号类别:component | brain | behaviour(默认 component)
+        #[arg(long, default_value = "component")]
+        category: String,
         /// 知识文档根目录(默认 knowledge/)
         #[arg(long, default_value = "knowledge")]
         knowledge_dir: PathBuf,
         /// wiki 语料 host 根目录;提供则启用 pass2 语料归因(link-wiki)
         #[arg(long)]
         corpus: Option<PathBuf>,
-        /// pass2 每组件采样的页面数
+        /// pass2 每符号采样的页面数
         #[arg(long, default_value_t = 8)]
         sample_pages: usize,
         /// 只处理引用量最高的前 N 个 component
@@ -196,6 +199,9 @@ pub enum Commands {
         /// 并行处理的组件数(默认 1 = 串行)
         #[arg(long, default_value_t = 1)]
         concurrency: usize,
+        /// 仅对指定文件名词干跑 pass2(逗号分隔);默认全部跑
+        #[arg(long, value_delimiter = ',')]
+        pass2_names: Option<Vec<String>>,
     },
     /// 启动 WebUI 服务器
     Serve {
@@ -532,14 +538,17 @@ mod tests {
         match args.unwrap().command {
             Commands::KnowledgeScanSymbols {
                 root,
+                category,
                 knowledge_dir,
                 corpus,
                 sample_pages,
                 limit,
                 force,
                 concurrency,
+                pass2_names,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
+                assert_eq!(category, "component");
                 assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
                 assert_eq!(
                     corpus,
@@ -549,6 +558,34 @@ mod tests {
                 assert_eq!(limit, 3);
                 assert!(force);
                 assert_eq!(concurrency, 1);
+                assert_eq!(pass2_names, None);
+            }
+            _ => panic!("Expected KnowledgeScanSymbols command"),
+        }
+
+        // 新类别 flag 透传 + pass2 抽样名单
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "knowledge-scan-symbols",
+            "scripts",
+            "--category",
+            "brain",
+            "--limit",
+            "3",
+            "--pass2-names",
+            "wander,chaseandattack",
+        ]);
+        match args.unwrap().command {
+            Commands::KnowledgeScanSymbols {
+                category,
+                pass2_names,
+                ..
+            } => {
+                assert_eq!(category, "brain");
+                assert_eq!(
+                    pass2_names,
+                    Some(vec!["wander".to_string(), "chaseandattack".to_string()])
+                );
             }
             _ => panic!("Expected KnowledgeScanSymbols command"),
         }

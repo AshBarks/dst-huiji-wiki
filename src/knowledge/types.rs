@@ -7,6 +7,17 @@ use serde::{Deserialize, Serialize};
 
 pub const SCHEMA_VERSION: u32 = 2;
 pub const PROMPT_REV: &str = "p3";
+pub const PROMPT_REV_BEHAVIOUR: &str = "p4-behaviour";
+pub const PROMPT_REV_BRAIN: &str = "p4-brain";
+
+/// 按 SymbolDoc 类别返回当前 prompt 修订号;component 沿用 p3,新类别独立演进。
+pub fn prompt_rev_for(category: &str) -> &'static str {
+    match category {
+        "behaviour" => PROMPT_REV_BEHAVIOUR,
+        "brain" => PROMPT_REV_BRAIN,
+        _ => PROMPT_REV,
+    }
+}
 
 /// 一个符号的稳定标识(kind + path/name),决定文档文件名。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -113,6 +124,35 @@ pub struct Provenance {
     pub generated_at_ms: u64,
 }
 
+/// behaviour 构造子参数语义(词典层核心字段)。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CtorParam {
+    pub name: String,
+    pub semantic: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default: Option<String>,
+}
+
+/// brain 中一次 behaviour 实例化调用(组合层核心字段)。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BehaviourInvocation {
+    /// behaviour 构造子名，如 `ChaseAndAttack`。
+    pub ctor: String,
+    /// 调用点各参数字面量/表达式的玩家语义描述，顺序与构造子参数一致。
+    #[serde(default)]
+    pub args_semantic: Vec<String>,
+    /// 条件语境，如“完全野生”“有猎犬丘”“海象营地成员”。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<String>,
+}
+
+/// brain 中的条件分支语境(对应页面分句枚举)。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ContextBranch {
+    pub condition: String,
+    pub semantic: String,
+}
+
 /// 落盘的完整文档(管线回填元数据后)。
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SymbolDoc {
@@ -134,6 +174,24 @@ pub struct SymbolDoc {
     pub netvars: Vec<String>,
     #[serde(default)]
     pub tunables: Vec<String>,
+    /// behaviour 词典层:构造子参数语义。
+    #[serde(default)]
+    pub ctor_params: Vec<CtorParam>,
+    /// behaviour 词典层:对组件/SG 状态标签的作用。
+    #[serde(default)]
+    pub effects: Vec<String>,
+    /// behaviour 词典层:BT 成功/失败/运行中条件。
+    #[serde(default)]
+    pub success_fail_conditions: Vec<String>,
+    /// brain 组合层:实际调用的 behaviour 及实例化语义。
+    #[serde(default)]
+    pub behaviour_invocations: Vec<BehaviourInvocation>,
+    /// brain 组合层:条件语境分支。
+    #[serde(default)]
+    pub context_branches: Vec<ContextBranch>,
+    /// brain 组合层:BT 优先级结构摘要(意图粒度)。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bt_structure: Option<String>,
     /// pass2 语料归因结果;pass1 生成时为 None。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wiki: Option<WikiSection>,
@@ -173,6 +231,24 @@ pub struct SymbolDocLlm {
     pub netvars: Vec<String>,
     #[serde(default)]
     pub tunables: Vec<String>,
+    /// behaviour 词典层:构造子参数语义。
+    #[serde(default)]
+    pub ctor_params: Vec<CtorParam>,
+    /// behaviour 词典层:对组件/SG 状态标签的作用。
+    #[serde(default)]
+    pub effects: Vec<String>,
+    /// behaviour 词典层:BT 成功/失败/运行中条件。
+    #[serde(default)]
+    pub success_fail_conditions: Vec<String>,
+    /// brain 组合层:实际调用的 behaviour 及实例化语义。
+    #[serde(default)]
+    pub behaviour_invocations: Vec<BehaviourInvocation>,
+    /// brain 组合层:条件语境分支。
+    #[serde(default)]
+    pub context_branches: Vec<ContextBranch>,
+    /// brain 组合层:BT 优先级结构摘要(意图粒度)。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bt_structure: Option<String>,
     #[serde(default)]
     pub gameplay_tags: Vec<String>,
     /// 面向维基全文检索的玩家语言词汇(中文为主,可混英文);pass2 采样依据。
@@ -185,7 +261,7 @@ pub struct SymbolDocLlm {
 }
 
 impl SymbolDocLlm {
-    /// 硬校验:component 必有 summary 与 api。
+    /// 硬校验:summary 非空;api 为空时必须 api_note;behaviour 的 ctor_params 为空时也必须 api_note。
     pub fn validate(&self) -> Result<(), String> {
         if self.summary.trim().is_empty() {
             return Err("summary 为空".to_string());
@@ -200,6 +276,16 @@ impl SymbolDocLlm {
                 return Err("api 为空且未提供 api_note 说明".to_string());
             }
         }
+        if self.category == "behaviour" && self.ctor_params.is_empty() {
+            let has_note = self
+                .api_note
+                .as_deref()
+                .map(str::trim)
+                .is_some_and(|s| !s.is_empty());
+            if !has_note {
+                return Err("behaviour 的 ctor_params 为空且未提供 api_note 说明".to_string());
+            }
+        }
         Ok(())
     }
 }
@@ -212,10 +298,11 @@ pub fn assemble(
     source_bytes: usize,
     build_id: Option<String>,
     model: &str,
+    prompt_rev: &str,
 ) -> SymbolDoc {
     SymbolDoc {
         schema_version: SCHEMA_VERSION,
-        prompt_rev: PROMPT_REV.to_string(),
+        prompt_rev: prompt_rev.to_string(),
         reference: key.clone(),
         // 模型未回填时用管线推导值兜底(kind / 文件名词干)。
         category: if llm.category.is_empty() {
@@ -240,6 +327,12 @@ pub fn assemble(
         events_listened: llm.events_listened.clone(),
         netvars: llm.netvars.clone(),
         tunables: llm.tunables.clone(),
+        ctor_params: llm.ctor_params.clone(),
+        effects: llm.effects.clone(),
+        success_fail_conditions: llm.success_fail_conditions.clone(),
+        behaviour_invocations: llm.behaviour_invocations.clone(),
+        context_branches: llm.context_branches.clone(),
+        bt_structure: llm.bt_structure.clone(),
         wiki: None,
         auto_maintained: None,
         search_terms: llm.search_terms.clone(),
@@ -285,7 +378,15 @@ mod tests {
             kind: "component".into(),
             path: "components/health.lua".into(),
         };
-        let doc = crate::knowledge::types::assemble(&llm, &key, "sha", 1, None, "m");
+        let doc = crate::knowledge::types::assemble(
+            &llm,
+            &key,
+            "sha",
+            1,
+            None,
+            "m",
+            prompt_rev_for("component"),
+        );
         assert_eq!(doc.category, "component");
         assert_eq!(doc.display_name, "health");
     }
@@ -327,6 +428,7 @@ mod tests {
             22115,
             Some("62704002".to_string()),
             "hy3",
+            prompt_rev_for("component"),
         );
         assert_eq!(doc.schema_version, SCHEMA_VERSION);
         let txt = serde_json::to_string(&doc).unwrap();

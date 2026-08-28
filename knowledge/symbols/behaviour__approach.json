@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/approach.lua"
+  },
+  "category": "behaviour",
+  "display_name": "approach",
+  "summary": "该行为节点驱动实体向指定目标移动，直到与目标的距离小于设定阈值或处于不同平台时停止。常用于战斗、采集等需要靠近目标的交互场景，支持行走或奔跑靠近。",
+  "api": [],
+  "api_note": "该行为节点为行为树内部逻辑节点，其方法（如 Visit、GetTarget、EvaluateDistances、DBString、AreDifferentPlatforms）均由行为树系统调度或节点自身调用，未向外部（如组件接口）暴露可供玩家或模组直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "target",
+      "semantic": "要靠近的目标实体或返回实体的函数；值决定实体试图接近的对象"
+    },
+    {
+      "name": "dist",
+      "semantic": "停止靠近的距离阈值（或返回阈值的函数）；值变大意味着实体会在离目标更远的位置停止，值变小则更贴近目标"
+    },
+    {
+      "name": "canrun",
+      "semantic": "是否允许奔跑靠近；true 表示可奔跑移动，false 表示仅行走",
+      "default": "true"
+    }
+  ],
+  "effects": [
+    "locomotor:GoToPoint(target_pos) 驱动实体向目标点行走",
+    "locomotor:GoToPoint(target_pos, nil, true) 驱动实体向目标点奔跑（当 canrun 且条件满足）",
+    "locomotor:Stop() 在目标无效或死亡时停止移动",
+    "检查 inst.sg:HasStateTag(\"running\") 判断是否处于奔跑状态以选择移动方式",
+    "检查 currenttarget.components.health:IsDead() 判断目标死亡导致失败"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: READY 时若目标有效且（同平台且距离平方≤dist²）直接成功；RUNNING 时若同平台且距离平方<dist²则成功",
+    "FAILED: READY 时获取目标为 nil；RUNNING 时目标无效或目标组件 health 存在且 IsDead() 则失败并停止",
+    "RUNNING: READY 时目标有效但在不同平台或距离平方>dist²进入运行；RUNNING 时未满足成功条件则保持运行并移动"
+  ],
+  "search_terms": [
+    "靠近",
+    "接近目标",
+    "追击",
+    "走向",
+    "奔跑靠近",
+    "行为树",
+    "目标距离",
+    "自动靠近"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ed3a052f7e670bd03aa99377fdde965487449ed960e1ffcd64398acf5b106414",
+    "source_bytes": 3352,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927358386
+  }
+}

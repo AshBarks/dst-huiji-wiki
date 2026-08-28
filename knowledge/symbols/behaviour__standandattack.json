@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/standandattack.lua"
+  },
+  "category": "behaviour",
+  "display_name": "standandattack",
+  "summary": "该行为节点驱动实体在原地站立并攻击目标，不进行追击移动。它会在就绪时验证或寻找战斗目标，并发起战斗呐喊。常用于需要固定位置战斗的AI场景，如守卫或特定战斗逻辑。",
+  "api": [],
+  "api_note": "该行为节点未对外暴露任何方法，其方法（如 Visit、OnStop、OnAttackOther）均为行为树内部重写或私有回调，不提供给外部模块调用。",
+  "events_published": [],
+  "events_listened": [
+    "onattackother",
+    "onmissother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "findnewtargetfn",
+      "semantic": "用于寻找新目标的函数；若为 nil 则不会自动寻找新目标，仅攻击已有的 combat.target"
+    },
+    {
+      "name": "timeout",
+      "semantic": "攻击行为的最大持续时间（秒）；值变大允许攻击更久，值变小则更快超时失败；若为 nil 则无超时限制"
+    }
+  ],
+  "effects": [
+    "combat:ValidateTarget",
+    "combat:SetTarget",
+    "combat:BattleCry",
+    "combat:TryAttack",
+    "locomotor:Stop",
+    "inst:FacePoint (当 sg 有 canrotate 标签时)",
+    "检查 sg:HasStateTag(\"canrotate\")"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当 RUNNING 中 combat.target 存在且其 health 组件存在且 IsDead() 时",
+    "FAILED: READY 时无目标且 findnewtargetfn 返回 nil；或 RUNNING 中目标 nil/无效；或超时（timeout 非 nil 且 GetTime()-starttime > timeout）",
+    "RUNNING: READY 找到有效目标后进入，并在目标有效、未死亡且未超时时持续尝试攻击并 Sleep(.125)"
+  ],
+  "search_terms": [
+    "站立攻击",
+    "原地攻击",
+    "站桩输出",
+    "战斗行为",
+    "锁定目标",
+    "AI攻击",
+    "不移动攻击"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "995bf5ae03ba814828f14b2c671533a933e3fb355b5225d1418fea267ef1b8bf",
+    "source_bytes": 2584,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926050971
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/chaseandattackandavoid.lua"
+  },
+  "category": "behaviour",
+  "display_name": "chaseandattackandavoid",
+  "summary": "该行为节点驱动实体在追击并攻击目标的同时，避开指定的危险物体（如障碍物或其他实体）。常用于需要一边战斗一边绕开特定区域的怪物AI场景，例如某些会躲避火源或特定植物的生物。",
+  "api": [],
+  "api_note": "该节点仅重写了 BehaviourNode 的内部方法（Visit、OnStop、OnAttackOther、__tostring），没有对外暴露的公开调用方法，因此 api 为空。",
+  "events_published": [],
+  "events_listened": [
+    "onattackother",
+    "onmissother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "findavoidanceobjectfn",
+      "semantic": "寻找需躲避物体的函数，返回实体或nil；若返回nil则不进行躲避，值变化意味着躲避逻辑的不同"
+    },
+    {
+      "name": "avoid_dist",
+      "semantic": "绕开躲避物体的距离，值变大则实体离躲避物更远，值变小则绕开距离更近"
+    },
+    {
+      "name": "max_chase_time",
+      "semantic": "最长追击时间（秒），值变大实体追击更久，值变小则更快放弃"
+    },
+    {
+      "name": "give_up_dist",
+      "semantic": "放弃追击的线性距离，值变大允许离得更远才放弃，值变小则更易放弃"
+    },
+    {
+      "name": "max_attacks",
+      "semantic": "最大攻击次数，可为nil表示无限；值变大攻击次数更多，值变小则更少即停"
+    },
+    {
+      "name": "findnewtargetfn",
+      "semantic": "寻找新目标的函数，可为nil；若提供则在无目标时主动找敌，nil则不主动寻敌"
+    },
+    {
+      "name": "walk",
+      "semantic": "是否以走路方式移动（true走路false跑步）；值决定移动速度模式"
+    }
+  ],
+  "effects": [
+    "combat:ValidateTarget 验证当前目标",
+    "combat:SetTarget 设置或清除战斗目标",
+    "combat:BattleCry 发出战斗呐喊",
+    "locomotor:GoToPoint 前往计算点（可能绕开躲避物）",
+    "locomotor:Stop 停止移动",
+    "combat:TryAttack 尝试攻击目标",
+    "combat:GiveUp 放弃战斗",
+    "检查 sg:HasStateTag(\"attack\") 判断攻击中",
+    "检查 sg:HasStateTag(\"jumping\") 避免打断跳跃",
+    "检查 sg:HasStateTag(\"canrotate\") 后执行 inst:FacePoint 面向目标",
+    "监听 onattackother 与 onmissother 事件以计数攻击次数"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当目标生命组件存在且死亡，或攻击次数达到 max_attacks 限制时",
+    "FAILED: 当初始无目标且无法找到新目标，或运行中目标失效/为空，或距离超 give_up_dist、或追击时长超 max_chase_time 时",
+    "RUNNING: 当存在有效目标且未触发成功/失败条件时，持续移动/攻击并睡眠 .125 秒保持运行"
+  ],
+  "search_terms": [
+    "追击躲避",
+    "绕开目标",
+    "战斗行为",
+    "避障攻击",
+    "AI节点",
+    "寻敌追击",
+    "边打边躲"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ffd282283438265f75312970f688d060f8d07bb514f0f79862ae5063fc3a4553",
+    "source_bytes": 5661,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926182872
+  }
+}

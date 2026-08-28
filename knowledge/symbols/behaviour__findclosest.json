@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/findclosest.lua"
+  },
+  "category": "behaviour",
+  "display_name": "findclosest",
+  "summary": "该行为节点驱动实体在指定搜索半径内寻找符合标签条件的最近实体，并移动至其安全距离附近停下。常用于AI角色靠近特定物体或敌人，如动物跟随玩家、怪物逼近目标等场景。",
+  "api": [],
+  "api_note": "该行为节点仅由AI大脑在内部调用Visit、PickTarget等重写方法，未向外部模块暴露可主动调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CHECK_INTERVAL = 5"
+  ],
+  "ctor_params": [
+    {
+      "name": "see_dist",
+      "semantic": "搜索半径，值变大意味着实体能搜索到更远处的目标"
+    },
+    {
+      "name": "safe_dist",
+      "semantic": "停止移动的安全距离，值变大意味着实体会停在离目标更远的位置（保持更大间距）"
+    },
+    {
+      "name": "tags",
+      "semantic": "目标必须同时拥有的标签列表，用于严格筛选符合条件的实体"
+    },
+    {
+      "name": "exclude_tags",
+      "semantic": "目标必须排除的标签列表，拥有其中任一标签的实体将被忽略"
+    },
+    {
+      "name": "one_of_tags",
+      "semantic": "目标至少拥有其中一个的标签列表，用于宽松匹配"
+    }
+  ],
+  "effects": [
+    "locomotor:GoToPoint",
+    "locomotor:Stop"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当存在有效目标且实体已进入与目标的安全距离内时，停止移动并置为SUCCESS",
+    "FAILED: 当未找到有效目标或目标失效（为空或无效）时置为FAILED",
+    "RUNNING: 当存在有效目标但未达安全距离时，持续走向目标并保持RUNNING状态；初始READY时选目标后也置为RUNNING"
+  ],
+  "search_terms": [
+    "找最近",
+    "靠近目标",
+    "寻找实体",
+    "保持距离",
+    "跟随标签",
+    "最近实体",
+    "安全距离",
+    "筛选标签"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cc351d7a8bb03b92f55e8bbb968fb0b9e909cd4ecf596784b5ec1fc4a51e61ea",
+    "source_bytes": 2726,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926216687
+  }
+}

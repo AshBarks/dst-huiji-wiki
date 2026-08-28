@@ -130,8 +130,27 @@ pub struct CtorParam {
     #[serde(alias = "param_name", alias = "param")]
     pub name: String,
     pub semantic: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    // 模型会把默认值写成原生布尔/数字(如 run 的 false、timeout 的 100),
+    // 统一宽容为文本。
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_default_text"
+    )]
     pub default: Option<String>,
+}
+
+/// 接受字符串/布尔/数字,统一为 `Option<String>`;null 与缺省同义。
+fn deserialize_default_text<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value: Option<serde_json::Value> = Option::deserialize(deserializer)?;
+    Ok(match value {
+        None | Some(serde_json::Value::Null) => None,
+        Some(serde_json::Value::String(s)) => Some(s),
+        Some(other) => Some(other.to_string()),
+    })
 }
 
 /// brain 中一次 behaviour 实例化调用(组合层核心字段)。

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/runaway.lua"
+  },
+  "category": "behaviour",
+  "display_name": "runaway",
+  "summary": "该行为节点驱动实体在检测到威胁（猎人）时远离其位置或跑回家，直到达到安全距离或失去目标。常用于动物、怪物在玩家或特定实体靠近时逃跑的 AI 逻辑，支持配置检测距离、安全距离、过滤条件及移动方式。",
+  "api": [],
+  "api_note": "RunAway 行为节点仅由行为树内部调用 Visit 方法推进状态，其 GetRunAngle 等为自身辅助函数，无对外暴露供玩家或模组直接调用的独立公开方法（构造子配置见 ctor_params）。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "radius = 6",
+    "avoid_time_threshold = 1",
+    "sleep_duration = 0.25",
+    "slerp_alpha = 0.5",
+    "find_offset_tries = 8"
+  ],
+  "ctor_params": [
+    {
+      "name": "hunterparams",
+      "semantic": "指定威胁来源（猎人）的识别方式：可为字符串标签、包含 tags/fn/getfn 等的表或过滤函数；决定实体逃离什么目标",
+      "default": "nil"
+    },
+    {
+      "name": "see_dist",
+      "semantic": "实体能够发现猎人的距离半径；值变大意味着更早察觉威胁并开始逃跑，值变小则更迟钝",
+      "default": "nil"
+    },
+    {
+      "name": "safe_dist",
+      "semantic": "判定脱离危险的安全距离；值变大意味着需要逃离更远才停止，值变小则更容易满足安全",
+      "default": "nil"
+    },
+    {
+      "name": "fn",
+      "semantic": "额外的应逃跑条件过滤函数 shouldrunfn，接收猎人和自身返回布尔；若提供则只有返回真才跑，否则忽略猎人",
+      "default": "nil"
+    },
+    {
+      "name": "runhome",
+      "semantic": "是否在被追时跑回家（runshomewhenchased）；为真则优先触发 homeseeker:GoHome，否则计算方向逃离",
+      "default": "nil"
+    },
+    {
+      "name": "fix_overhang",
+      "semantic": "是否修正海洋悬垂地形导致的不当落点（fix_overhang）；为真则在悬垂处尝试将落点移回陆地/海洋",
+      "default": "nil"
+    },
+    {
+      "name": "walk_instead",
+      "semantic": "是否以走路代替奔跑（walk_instead）；为真则调用 WalkInDirection 而非 RunInDirection，移动更慢",
+      "default": "nil"
+    },
+    {
+      "name": "safe_point_fn",
+      "semantic": "提供参考安全点（safe_point_fn）的函数，返回坐标用于计算更合理的逃跑角度；不提供则仅远离猎人",
+      "default": "nil"
+    }
+  ],
+  "effects": [
+    "locomotor:RunInDirection",
+    "locomotor:WalkInDirection",
+    "locomotor:Stop",
+    "locomotor.dest = nil",
+    "homeseeker:GoHome",
+    "BehaviourNode:Sleep(0.25)"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 且未选择回家时，若自身与猎人的距离平方大于 safe_dist 平方，则停止移动并判定成功。",
+    "FAILED: READY 阶段未找到符合条件的猎人；或 RUNNING 中猎人实体失效；或无法计算出逃跑角度（result_angle 为 nil）。",
+    "RUNNING: READY 找到猎人后进入；RUNNING 中猎人有效且未达安全距离（或正执行回家逻辑）时保持，并睡眠 0.25 秒后继续检测。"
+  ],
+  "search_terms": [
+    "逃跑",
+    "逃离",
+    "跑开",
+    "躲避",
+    "RunAway",
+    "远离",
+    "惊吓",
+    "逃命"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+    "source_bytes": 7146,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925830440
+  }
+}

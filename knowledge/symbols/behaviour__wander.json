@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/wander.lua"
+  },
+  "category": "behaviour",
+  "display_name": "wander",
+  "summary": "Wander 行为节点驱动实体以指定位置为家或完全自由地在地图范围内随机游荡，周期性地选择方向行走或原地等待。常见于动物、怪物等生物的空闲巡逻、觅食或返回巢穴的 AI 场景。",
+  "api": [],
+  "api_note": "Wander 行为节点仅由行为树引擎在内部调用其 Visit 等方法，构造子用于创建节点，不存在专门对外暴露供玩家或模组直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "wander_dist=12",
+    "offest_attempts=8",
+    "minwalktime=2",
+    "randwalktime=3",
+    "minwaittime=1",
+    "randwaittime=3"
+  ],
+  "ctor_params": [
+    {
+      "name": "homelocation",
+      "semantic": "实体的家位置或返回位置的函数；若为 nil 则实体不会被拴在家附近，可自由游荡。提供时游荡以该点为中心，位置变化意味着中心改变。",
+      "default": "nil"
+    },
+    {
+      "name": "max_dist",
+      "semantic": "离家的最大距离（或返回距离的函数）；值变大允许实体游荡得更远，值变小则限制实体更靠近家。",
+      "default": "nil"
+    },
+    {
+      "name": "times",
+      "semantic": "包含最小行走时间、随机行走时间、最小等待时间、随机等待时间的表；各时间值变大意味着游荡或停顿时间更长，值变小则更短。",
+      "default": "nil（内部默认 minwalktime=2, randwalktime=3, minwaittime=1, randwaittime=3）"
+    },
+    {
+      "name": "getdirectionFn",
+      "semantic": "替代随机方向的函数，返回角度；若提供则优先使用其返回方向，否则随机选向。",
+      "default": "nil"
+    },
+    {
+      "name": "setdirectionFn",
+      "semantic": "用于存储随机选择方向的函数；若提供则在选定方向后调用它记录角度。",
+      "default": "nil"
+    },
+    {
+      "name": "checkpointFn",
+      "semantic": "用于 FindWalkableOffset/FindSwimmableOffset 的检验函数，以决定偏移点是否可行；若提供则影响寻路可行走点检测。",
+      "default": "nil"
+    },
+    {
+      "name": "data",
+      "semantic": "配置表，可包含 wander_dist（游荡半径）、ignore_walls（是否忽略墙壁）、offest_attempts（尝试偏移次数）、should_run（是否奔跑）、leashwhengoinghome（回家时是否拴住）等；各数值变大/变小相应改变游荡范围或尝试次数。",
+      "default": "nil（内部默认 wander_dist=12, offest_attempts=8，其余字段默认 nil/false）"
+    }
+  ],
+  "effects": [
+    "locomotor:Stop",
+    "locomotor:GoToPoint",
+    "locomotor:WalkInDirection",
+    "locomotor:WantsToMoveForward",
+    "locomotor:IsAquatic",
+    "locomotor:CanPathfindOnWater"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 该节点未设置 SUCCESS 状态，永远不会成功",
+    "FAILED: 该节点未设置 FAILED 状态，永远不会失败",
+    "RUNNING: 从 READY 进入 RUNNING 后持续运行，周期性选择方向行走或原地等待，直到被行为树中止"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      46887,
+      15237,
+      13493,
+      15238,
+      13857,
+      15022,
+      15680,
+      15729
+    ],
+    "aspects": [
+      {
+        "aspect": "游荡家园中心点描述",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "距离牛群 8 距离单位内游荡"
+          },
+          {
+            "pageid": 15729,
+            "quote": "距离羊群 20 距离单位内游荡"
+          },
+          {
+            "pageid": 15237,
+            "quote": "所属的猪屋附近 30 距离单位范围内活动"
+          }
+        ]
+      },
+      {
+        "aspect": "游荡最大距离数值标注",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "距离牛群 8 距离单位内游荡"
+          },
+          {
+            "pageid": 15729,
+            "quote": "距离羊群 20 距离单位内游荡，黄昏晚上5单位"
+          },
+          {
+            "pageid": 15237,
+            "quote": "猪屋附近 30 距离单位范围内活动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "游荡",
+    "闲逛",
+    "随机走",
+    "徘徊",
+    "回家",
+    "漫步",
+    "wander",
+    "游走"
+  ],
+  "gameplay_tags": [
+    "移动",
+    "AI",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+    "source_bytes": 7624,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925722917
+  }
+}

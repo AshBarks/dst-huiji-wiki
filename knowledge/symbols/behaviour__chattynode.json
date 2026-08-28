@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/chattynode.lua"
+  },
+  "category": "behaviour",
+  "display_name": "chattynode",
+  "summary": "ChattyNode 是一个行为树装饰节点，在子节点处于运行态时驱动实体通过 talker 或 npc_talker 组件周期性说话。常用于 Wander 等长时间持续行为中，让 NPC 或生物在游荡、巡逻时按设定延迟随机发表台词，增强表现力。其自身状态完全透传子节点状态。",
+  "api": [],
+  "api_note": "ChattyNode 仅通过构造函数初始化参数并重写 BehaviourNode 的 Visit 方法，未定义任何对外暴露的额外公共方法（如重置、停止等），所有逻辑封装在内部 Visit 中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "chatlines",
+      "semantic": "聊天内容来源，可为STRINGS键字符串、返回字符串的函数或字符串表（或带chatterparams的表）；决定实体说话的文本与方式，值类型不同则说话逻辑不同"
+    },
+    {
+      "name": "child",
+      "semantic": "子行为节点，其运行状态决定本节点状态，并在其RUNNING时触发周期性聊天；值即被包裹的行为树节点"
+    },
+    {
+      "name": "delay",
+      "semantic": "每次聊天后的基础等待时间（秒），值越大说话频率越低；源码Visit中若nil则取10"
+    },
+    {
+      "name": "rand_delay",
+      "semantic": "聊天间隔的随机附加时间上限（秒），值越大间隔随机波动越大；源码Visit中若nil则取10"
+    },
+    {
+      "name": "enter_delay",
+      "semantic": "进入RUNNING状态后的初始固定延迟（秒），值越大首次说话越晚；源码Visit中若nil则取0"
+    },
+    {
+      "name": "enter_delay_rand",
+      "semantic": "进入RUNNING状态后初始随机延迟上限（秒），值越大首次说话时间越不确定；源码Visit中若nil则取0"
+    }
+  ],
+  "effects": [
+    "talker:Say",
+    "talker:Chatter",
+    "npc_talker:Chatter",
+    "npc_talker:Say",
+    "BehaviourNode:Sleep"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当子节点 child 返回 SUCCESS 时，本节点状态设为 SUCCESS",
+    "FAILED: 当子节点 child 返回 FAILED 时，本节点状态设为 FAILED",
+    "RUNNING: 当子节点 child 返回 RUNNING 时，本节点状态设为 RUNNING 并周期性触发聊天与休眠"
+  ],
+  "search_terms": [
+    "聊天节点",
+    "说话行为",
+    "NPC对话",
+    "周期发言",
+    "游荡说话",
+    "闲聊节点",
+    "台词随机",
+    "生物说话"
+  ],
+  "gameplay_tags": [
+    "对话",
+    "AI行为",
+    "表现"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e424ac056fbea0f8c82a4f8b1986f0ce32cb659897ed529299852e312ed3ffc5",
+    "source_bytes": 3945,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925972683
+  }
+}

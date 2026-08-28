@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/findfarmplant.lua"
+  },
+  "category": "behaviour",
+  "display_name": "findfarmplant",
+  "summary": "该行为节点驱动实体在跟随点附近搜索符合状态条件的农场植物，并推送动作走向目标进行交互。常用于农场相关 AI 在需要寻找并处置受压或快乐农场植物时的行为树场景。",
+  "api": [],
+  "api_note": "该行为节点仅实现了 BehaviourNode 引擎调用的 Visit 方法以及内部辅助方法 PickTarget 和调试方法 DBString，未对外暴露供模组或玩家直接调用的公开方法（如设置器/获取器），因此无对外 API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST = 20",
+    "FARMPLANT_MUSTTAGS = {\"farmplantstress\"}",
+    "FARMPLANT_NOTAGS = {\"farm_plant_killjoy\"}"
+  ],
+  "ctor_params": [
+    {
+      "name": "action",
+      "semantic": "指定实体对找到的农场植物执行的动作（BufferedAction 使用的动作类型），必填，决定交互行为"
+    },
+    {
+      "name": "wantsstressed",
+      "semantic": "布尔值，为 true 时筛选处于压力(stress)状态的植物，为 false 时筛选快乐(happiness)状态的植物；切换改变搜寻目标的状态取向",
+      "default": "false"
+    },
+    {
+      "name": "getfollowposfn",
+      "semantic": "函数，返回搜索中心的基准坐标；默认使用实体自身位置，提供自定义函数可改变搜索跟随点",
+      "default": "genericfollowposfn (返回 inst:GetPosition())"
+    },
+    {
+      "name": "validplantfn",
+      "semantic": "可选的额外验证函数，传入后用于进一步筛选植物；为 nil 时不附加额外条件"
+    }
+  ],
+  "effects": [
+    "locomotor:PushAction (向选中的农场植物推送指定动作，驱动实体移动并执行)",
+    "inst.planttarget: 设置为 PickTarget 找到的植物实体，退出节点时置 nil"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 中，目标植物仍有效、靠近、通过验证且可修剪，但其 farmplantstress.stressors.happiness 不等于 wantsstressed（状态已变）时，清除目标并返回 SUCCESS。",
+    "FAILED: 在 READY 中未找到符合条件的植物；或在 RUNNING 中目标失效、不在跟随点附近、未通过 validplantfn 验证或不再可修剪（tendable）时，清除目标并返回 FAILED。",
+    "RUNNING: READY 中找到目标并推送动作后进入；RUNNING 中若目标仍有效、靠近、通过验证、可修剪且 happiness 等于 wantsstressed，则保持 RUNNING 等待状态变化或动作完成。"
+  ],
+  "search_terms": [
+    "农场植物",
+    "寻找农植",
+    "植物照料",
+    "受压植物",
+    "快乐农植",
+    "行为节点",
+    "农植目标",
+    "附近农植"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6ff129453c55e95ee57610b340c7e19397d0def619fed90df4b13ddf55d315ab",
+    "source_bytes": 2553,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927357098
+  }
+}

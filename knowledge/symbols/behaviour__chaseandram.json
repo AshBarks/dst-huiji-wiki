@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/chaseandram.lua"
+  },
+  "category": "behaviour",
+  "display_name": "chaseandram",
+  "summary": "该行为节点驱动实体（如发条犀牛）在锁定有效战斗目标后，通过对齐角度并定向奔跑来实现冲撞攻击行为。常用于怪物战斗 AI 中，节点会触发战斗呐喊并持续尝试攻击，直到目标死亡、攻击次数达标或超时超距后放弃。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树内部调度，其逻辑通过重写父类的 Visit、OnStop 等方法在节点更新时触发，未定义任何供外部脚本或玩家直接调用的公共函数。",
+  "events_published": [],
+  "events_listened": [
+    "onattackother",
+    "onmissother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "max_chase_time",
+      "semantic": "最大追逐时间（秒），值变大允许实体更久地追逐冲撞，值变小则更快因超时失败"
+    },
+    {
+      "name": "give_up_dist",
+      "semantic": "放弃距离阈值，当角度偏移大且距目标平方距离超此值平方时失败，值变大更不易放弃，值变小更易放弃"
+    },
+    {
+      "name": "max_charge_dist",
+      "semantic": "最大冲锋距离（从起点算），值变大允许冲锋更远，值变小则更近便失败"
+    },
+    {
+      "name": "max_attacks",
+      "semantic": "最大攻击次数，达到则判定成功，值变大允许更多次攻击，值变小则更少攻击即结束"
+    }
+  ],
+  "effects": [
+    "combat:BattleCry",
+    "locomotor:RunInDirection",
+    "locomotor:Stop",
+    "locomotor:GoToPoint",
+    "combat:SetTarget(nil)",
+    "combat:ForceAttack",
+    "combat:TryAttack",
+    "inst:AddTag('ChaseAndRam')",
+    "inst:RemoveTag('ChaseAndRam')",
+    "inst:FacePoint",
+    "sg:HasStateTag('canrotate')",
+    "sg:HasStateTag('running')",
+    "sg:HasStateTag('atk_pre')"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 目标 combat.target.components.health:IsDead() 时",
+    "SUCCESS: 攻击计数 self.numattacks >= self.max_attacks 时",
+    "FAILED: 初始 READY 状态无有效 combat.target",
+    "FAILED: 运行中 combat.target 无效或被清空",
+    "FAILED: 与目标处于不同平台且 SG 有 'running' 标签",
+    "FAILED: 角度偏移 >60 且距离平方 >= give_up_dist 平方或自身有当前平台",
+    "FAILED: 从 startloc 冲锋距离平方 >= max_charge_dist 平方",
+    "FAILED: 追逐时间 GetTime()-startruntime > max_chase_time",
+    "RUNNING: 存在有效目标且未满足上述成功/失败条件时持续运行并 Sleep(.125)"
+  ],
+  "search_terms": [
+    "冲撞行为",
+    "追逐攻击",
+    "犀牛冲锋",
+    "战斗AI",
+    "强制攻击",
+    "放弃追逐",
+    "冲锋距离",
+    "最大攻击"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ff84e7e0f2e40283098ce27bfc45febacb33a2870a891287716984b382fe56be",
+    "source_bytes": 6564,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926234919
+  }
+}

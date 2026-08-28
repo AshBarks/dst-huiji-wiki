@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/beargeroffscreen.lua"
+  },
+  "category": "behaviour",
+  "display_name": "beargeroffscreen",
+  "summary": "该行为节点驱动熊大（Bearger）在玩家屏幕外（offscreen）时于地图节点区域内漫游。它通过瞬移沿线段移动，破坏沿途的树木、岩石等可工作物体，并掉落 furtuft 物品作为足迹。此逻辑用于熊大脱离玩家视野时的自动破坏与游走。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树在内部调用 Visit 方法驱动，其自定义方法（如 Roam、SetupRoaming 等）均为内部辅助函数，无对外暴露的接口供其他系统直接调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "timePerStep = 3",
+    "scanAheadRadius = 15",
+    "moveRadius = 10",
+    "poundChance = 0",
+    "dropsPerMeterChance = 0.05",
+    "traildrop = \"furtuft\"",
+    "poundTrailDropBase = 3",
+    "poundTrailDropVariance = 3",
+    "poundTrailDropRadiusBase = 3",
+    "poundTrailDropRadiusVariance = 8",
+    "numNodesForInitialRoamingRegion = 8",
+    "numNodesForNewRoamingRegion = 4"
+  ],
+  "effects": [
+    "Transform:SetPosition 直接设置实体坐标实现瞬移式漫游",
+    "workable:Destroy 破坏沿线带有 running/tree 标签的可工作实体",
+    "lootdropper:SetLoot 清空树/石等实体的原本掉落物",
+    "SpawnPrefab 生成 traildrop (furtuft) 物品作为地面足迹"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 该节点在源码中从未调用 Succeed()，因此不会返回成功",
+    "FAILED: 该节点在源码中从未调用 Fail()，因此不会返回失败",
+    "RUNNING: 节点在 Visit 中将 status 设为 RUNNING 并持续 Sleep 循环，始终处于运行状态"
+  ],
+  "search_terms": [
+    "熊大离线",
+    "熊大破坏",
+    "熊大漫游",
+    "熊大足迹",
+    "离线行为",
+    "树石破坏",
+    "熊大ai"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1df0662d98d264f0b272b2418be1cd489152d5624b9011794f1a8c5d54294f41",
+    "source_bytes": 9514,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926602870
+  }
+}

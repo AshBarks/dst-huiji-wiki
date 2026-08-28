@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/controlminions.lua"
+  },
+  "category": "behaviour",
+  "display_name": "controlminions",
+  "summary": "该行为节点驱动拥有 minionspawner 组件的实体指挥其仆从在周围半径内自动采集成熟作物、可采摘物及地面物品。适用于行为树中 AI 控制召唤类仆从进行资源收集的场景。",
+  "api": [],
+  "api_note": "该行为节点类仅由行为树框架内部调用 Visit 方法，其 GetClosestMinion 为内部辅助函数，未对外暴露供其他模块调用的 API 方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "self.minionrange = 3.5",
+    "ba.distance = 4",
+    "v:GetTimeAlive() > 1",
+    "self.radius = rad + (rad * 0.1)"
+  ],
+  "effects": [
+    "minionspawner: 读取 numminions 判断仆从数量，读取 minionpositions 计算搜索半径，读取 minions 列表获取可用仆从",
+    "sg: 检查仆从 HasStateTag('busy') 以跳过正在忙的仆从",
+    "bufferedaction: 为仆从创建 BufferedAction 并设置 ba.distance = 4",
+    "minion: PushBufferedAction 使仆从执行 HARVEST/PICK/PICKUP 动作",
+    "minion: ForceFacePoint 使仆从面向目标点"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 状态下，于半径内找到至少一个有效实体（#ents>0）并为最近空闲仆从推送采集动作后",
+    "FAILED: READY 时仆从数量(self.ms.numminions)为0；或 RUNNING 时 minionpositions 为 nil 无法计算半径；或半径内无符合条件的实体(#ents==0)",
+    "RUNNING: 节点在 READY 且 numminions>0 时内部置为 RUNNING，但同一次 Visit 中随即判定为 SUCCESS/FAILED，不向外持续返回 RUNNING 状态"
+  ],
+  "search_terms": [
+    "控制仆从",
+    "仆从采集",
+    "自动收获",
+    "捡拾物品",
+    "行为节点",
+    "农场仆从",
+    "采集助手"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "采集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eff476bc4f71d7006999e3e3c5c440a5061062903767a4e3645c30fb9094bb95",
+    "source_bytes": 4074,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926353365
+  }
+}

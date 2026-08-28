@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/findlight.lua"
+  },
+  "category": "behaviour",
+  "display_name": "findlight",
+  "summary": "该行为节点驱动实体寻找并移动到最近的光源附近，以保持处于光照安全范围内。常用于害怕黑暗或需要光照的怪物或角色 AI，在夜间或黑暗环境中避免离开光照。实体会周期性检查光源有效性并调整移动。",
+  "api": [],
+  "api_note": "该节点仅重写 BehaviourNode 的 Visit 方法并实现内部 PickTarget 与 DBString 方法，无对外暴露的接口方法供其他模块或玩家调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CHECK_INTERVAL = 5",
+    "FOLLOW_CHECK_INTERVAL = 1"
+  ],
+  "ctor_params": [
+    {
+      "name": "see_dist",
+      "semantic": "搜索光源的最大半径；值变大意味着实体能发现更远处的光源，值变小则只能发现更近的光源"
+    },
+    {
+      "name": "safe_dist",
+      "semantic": "判定为安全的距离阈值；值变大意味着实体允许离光源更远即算安全并停止移动（目标停留点也更远），值变小则需更贴近光源"
+    }
+  ],
+  "effects": [
+    "locomotor:GoToPoint 驱动实体走向光源相邻的安全距离点（actual_safe_dist*0.98）",
+    "locomotor:Stop 到达安全点后停止移动"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 目标光源有效且含 lightsource 标签，且实体距离光源小于等于 actual_safe_dist 时，停止移动并成功",
+    "FAILED: 跟随检查间隔发现目标光源无效或失去 lightsource 标签时，状态变为失败",
+    "RUNNING: 初始 READY 转入后持续运行；或目标有效但未到达安全距时，走向目标并保持运行"
+  ],
+  "search_terms": [
+    "找光",
+    "靠近光源",
+    "寻光",
+    "光源跟随",
+    "怕黑",
+    "光照安全",
+    "光源距离",
+    "保持亮处"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a9918e4f52d358b00b298d6bfaba25f961632fb39893088204ba8dcdb7c589e7",
+    "source_bytes": 1673,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926391132
+  }
+}

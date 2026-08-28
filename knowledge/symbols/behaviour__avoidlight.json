@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/avoidlight.lua"
+  },
+  "category": "behaviour",
+  "display_name": "avoidlight",
+  "summary": "该行为节点驱动实体在光照环境中通过交替短暂停留与朝远离光源方向行走来躲避光线。常见于怕光生物（如蝙蝠、影怪等）在白天或靠近火把时的生存 AI 逻辑。",
+  "api": [],
+  "api_note": "该行为节点的 Wait 与 PickNewAngle 为内部辅助方法，仅由自身 Visit 调用，未对外暴露接口；外部仅通过行为树调用继承自基类的 Visit 等方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "effects": [
+    "`locomotor:Stop`",
+    "`locomotor:WalkInDirection`"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 源码中未将 status 设为 SUCCESS，该节点永不成功结束",
+    "FAILED: 源码中未将 status 设为 FAILED，该节点永不失败结束",
+    "RUNNING: 节点从 READY 进入后保持 RUNNING，循环根据光照切换等待与行走"
+  ],
+  "search_terms": [
+    "避光",
+    "躲光",
+    "怕光",
+    "光照回避",
+    "行为树避光",
+    "停走避光",
+    "朝暗处走",
+    "AI避光"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "避光"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "617bd1e4f73397b660b11b023b97bb14cc9aa245eed162ef0510dfc755f82c5d",
+    "source_bytes": 2079,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926476404
+  }
+}

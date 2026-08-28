@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/runtodist.lua"
+  },
+  "category": "behaviour",
+  "display_name": "runtodist",
+  "summary": "该行为节点驱动实体计算并移动至远离特定目标（hunter）的安全距离位置，以奔跑或走路方式逃离。目前源码注释指明仅用于 wx78_possessedbody（威克特被附身状态）等需要脱离追逐者的场景。",
+  "api": [],
+  "api_note": "该节点仅实现内部方法 Visit、GetRunPosition 和 __tostring，无对外暴露的公开方法供其他模块调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TOLERANCE_DIST = 0.4",
+    "TOLERANCE_DIST_SQ = 0.16"
+  ],
+  "ctor_params": [
+    {
+      "name": "hunterparams",
+      "semantic": "用于获取追逐者（hunter）的函数或包含 getfn 的表；若传入表则使用其 getfn 获取目标，非数值无大小变化"
+    },
+    {
+      "name": "safe_dist",
+      "semantic": "与 hunter 保持的安全距离数值，可为数值或返回数值的函数；值变大要求离 hunter 更远才停止，值变小则更近距离即可满足"
+    },
+    {
+      "name": "fn",
+      "semantic": "判断是否需要逃跑的函数 shouldrunfn，接收 hunter 和 inst 返回布尔；非数值无大小变化"
+    },
+    {
+      "name": "fix_overhang",
+      "semantic": "是否修正陆地/海洋悬垂边界寻路点的布尔；true 时若卡在悬垂处将目标点拉回正常地面/海洋，false 不修正"
+    },
+    {
+      "name": "walk_instead",
+      "semantic": "是否以走路代替奔跑的布尔；true 时移动更慢且不触发跑动状态，false 时奔跑"
+    },
+    {
+      "name": "allow_boats",
+      "semantic": "是否允许在水面使用船只寻路的布尔；true 时可在水域通过船移动，nil/false 时限制"
+    }
+  ],
+  "effects": [
+    "locomotor:GoToPoint(pos, nil, walk_instead and false or true) 驱动实体移向计算出的安全点",
+    "locomotor:Stop() 在成功或失败时停止移动",
+    "locomotor.dest = nil 当 walk_instead 为真时先清除原目的地"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当实体与 hunter 的距离平方同安全距平方之差绝对值小于 0.75 时，停止移动并返回成功",
+    "FAILED: 当 hunter 无效或死亡、无法计算出有效逃跑位置、或当前位置与计算位置距离平方小于等于 0.16 无移动空间时，停止并返回失败",
+    "RUNNING: 当 hunter 存在且 shouldrunfn 允许、尚未达到安全距离时，持续计算位置并移动，每次休眠 0.125 秒"
+  ],
+  "search_terms": [
+    "跑开",
+    "保持距离",
+    "逃离",
+    "安全距离",
+    "附身逃离",
+    "走路代替",
+    "允许船只",
+    "寻路偏移"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "逃脱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d61b9fb92552a964bb5a66b9531d23ed323bd1addf978e4d1cd4eab2dcbe6973",
+    "source_bytes": 5143,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926436372
+  }
+}

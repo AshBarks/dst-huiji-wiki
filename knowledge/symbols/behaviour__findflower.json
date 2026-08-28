@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/findflower.lua"
+  },
+  "category": "behaviour",
+  "display_name": "findflower",
+  "summary": "该行为节点驱动拥有 pollinator 组件的实体在周围搜索最近的花朵并前往授粉。适用于模拟授粉生物在游戏中寻找花丛进行授粉的 AI 场景。",
+  "api": [],
+  "api_note": "该行为节点仅重写/实现了 BehaviourNode 框架约定的 Visit、DBString 及内部 PickTarget 方法，无额外对外暴露的自定义 API 供外部模块直接调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST = 30"
+  ],
+  "effects": [
+    "locomotor:PushAction(ACTIONS.POLLINATE)",
+    "pollinator.target = closestFlower (PickTarget 成功时)",
+    "pollinator.target = nil (PickTarget 失败时)"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 源码中未显式将状态设为 SUCCESS（可能由 BufferedAction 完成或外部行为树逻辑判定）",
+    "FAILED: 当 READY 时 pollinator.target 为空，或 RUNNING 时目标丢失/不可授粉/被其他 pollinator 在2范围内占用",
+    "RUNNING: 当 READY 找到有效花朵目标并成功通过 locomotor 推送 POLLINATE 动作后"
+  ],
+  "search_terms": [
+    "找花",
+    "授粉",
+    "花朵",
+    "蜂类",
+    "寻花",
+    "花目标",
+    "授粉者",
+    "蜜蜂"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "46facba303415d96d1993e464876e2a77f5e16a2d8af369ed0f26bec6b63331f",
+    "source_bytes": 1834,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926327254
+  }
+}

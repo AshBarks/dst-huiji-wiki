@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/leashandavoid.lua"
+  },
+  "category": "behaviour",
+  "display_name": "leashandavoid",
+  "summary": "该行为节点驱动实体在指定家园位置周围活动，当离开返回距离时自动走回家，并可在移动过程中避开特定对象。常用于需要限制怪物或宠物活动范围、同时规避危险目标的 AI 场景。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树引擎在内部调用 Visit 方法驱动，其余方法（如 GetHomePos、IsInsideLeash 等）均为节点内部辅助计算，不对外暴露供外部模块或玩家调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "findavoidanceobjectfn",
+      "semantic": "返回需避开目标的函数；传入nil则不避开任何对象，有函数则每周期尝试获取避开目标"
+    },
+    {
+      "name": "avoid_dist",
+      "semantic": "与避开目标保持的距离；值变大意味着绕开目标的偏移半径更大，值变小则允许更靠近"
+    },
+    {
+      "name": "homelocation",
+      "semantic": "家园锚点位置或返回该位置的函数；位置变化意味着实体返回的中心点改变"
+    },
+    {
+      "name": "max_dist",
+      "semantic": "允许离家园的最大直线距离（内部取平方）；值变大意味着实体活动范围更广，值变小则更受限"
+    },
+    {
+      "name": "inner_return_dist",
+      "semantic": "触发返回家园的内部距离阈值；值变大意味着实体可离得更远才返回，值变小则更早启程回家"
+    },
+    {
+      "name": "running",
+      "semantic": "移动时是否奔跑的布尔或函数；为true时快速奔跑，false时步行",
+      "default": "false"
+    }
+  ],
+  "effects": [
+    "locomotor:Stop：在 READY 且不在拴绳范围内时停止实体当前移动",
+    "locomotor:GoToPoint：在 RUNNING 且超出返回距离时前往计算后的目标点（家或避开偏移点）"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当状态为 RUNNING 且 IsOutsideReturnDist 返回 false（即已回到返回距离内）时，状态置为 SUCCESS",
+    "FAILED: 当 GetHomePos 返回 nil（无家园位置）时，或状态为 READY 且 IsInsideLeash 为 true（已在拴绳最大范围内）时，状态置为 FAILED",
+    "RUNNING: 当状态为 READY 且不在拴绳范围内时进入 RUNNING 并停止移动；之后若仍超出返回距离则保持 RUNNING 并持续前往目标点"
+  ],
+  "search_terms": [
+    "拴绳",
+    "避开",
+    "回家",
+    "活动范围",
+    "距离限制",
+    "leash",
+    "avoid",
+    "返回距离"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "47f78b79f7b9f0e07d58a4ec89a6d6c07921558edab87d5293e39be542cccff0",
+    "source_bytes": 3731,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927283959
+  }
+}

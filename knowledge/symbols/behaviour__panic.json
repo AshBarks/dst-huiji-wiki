@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/panic.lua"
+  },
+  "category": "behaviour",
+  "display_name": "panic",
+  "summary": "该行为节点驱动实体进入恐慌状态，向随机方向奔跑以逃离威胁。它作为行为树节点在实体需要执行恐慌逃跑逻辑时被调用。实体会持续随机改变移动方向，节点始终保持 RUNNING 状态。",
+  "api": [],
+  "api_note": "Panic 类仅重写了 BehaviourNode 基类的 Visit 方法并实现内部辅助函数 PickNewDirection，未定义任何额外对外暴露的公开方法供外部调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "effects": [
+    "locomotor:RunInDirection(随机方向)"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 源码未设置，该节点永远不会返回成功状态",
+    "FAILED: 源码未设置，该节点永远不会返回失败状态",
+    "RUNNING: 节点首次访问后始终处于 RUNNING，周期性调用 PickNewDirection 随机跑动并通过 Sleep 等待"
+  ],
+  "search_terms": [
+    "恐慌",
+    "逃跑",
+    "乱跑",
+    "受惊",
+    "发疯",
+    "慌乱",
+    "Panic",
+    "惊吓",
+    "逃窜"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "56884d4d3f3014d08a2f6483e216a2d7f7eb44df8fe4578571a8452985a68696",
+    "source_bytes": 581,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926008372
+  }
+}

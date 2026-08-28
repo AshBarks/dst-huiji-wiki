@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/standstill.lua"
+  },
+  "category": "behaviour",
+  "display_name": "standstill",
+  "summary": "该行为节点驱动实体在原地站立不动，通过停止移动组件来中断任何移动行为。常用于AI在特定条件满足时保持静止，如等待指令、发呆或执行无需移动的动作。",
+  "api": [],
+  "api_note": "该行为节点仅重写了BehaviourNode内部的Visit方法，未定义任何供外部调用的公开方法（如启停控制函数），其构造子由行为树系统内部调用，因此无对外API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "startfn",
+      "semantic": "开始站立的条件函数；若传入函数（非nil）则增加启动限制（函数返回真才启动），若为nil（省略）则条件放宽，节点无条件进入站立状态"
+    },
+    {
+      "name": "keepfn",
+      "semantic": "保持站立的条件函数；若传入函数（非nil）则增加持续限制（函数返回真才继续站立），若为nil（省略）则限制变小，实体将无限期保持停止移动"
+    }
+  ],
+  "effects": [
+    "locomotor:Stop"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 源码中从未将状态设为SUCCESS，该节点永远不会返回成功",
+    "FAILED: 当startfn存在且返回假值时，或在RUNNING状态下keepfn存在且返回假值时",
+    "RUNNING: 当startfn不存在或返回真值时进入，并调用locomotor:Stop；之后若keepfn不存在或返回真值则保持RUNNING并睡眠0.5秒，持续停止移动"
+  ],
+  "search_terms": [
+    "站立不动",
+    "停步",
+    "发呆",
+    "站定",
+    "原地不动",
+    "停止移动",
+    "呆立"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "待机"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
+    "source_bytes": 762,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925973526
+  }
+}

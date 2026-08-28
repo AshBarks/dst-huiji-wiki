@@ -1,0 +1,216 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/chaseandattack.lua"
+  },
+  "category": "behaviour",
+  "display_name": "chaseandattack",
+  "summary": "该行为节点驱动实体追逐并攻击其战斗目标，常用于怪物或角色的战斗 AI 场景。实体会先呐喊并锁定目标，随后在最大追逐时间和放弃距离内持续靠近并攻击，直到目标死亡、达到最大攻击次数或放弃追逐。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树内部调用 Visit、OnStop、OnAttackOther 等生命周期方法，未提供供外部直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [
+    "onattackother",
+    "onmissother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "max_chase_time",
+      "semantic": "最长追逐时间（秒），值变大允许追更久，值变小更快放弃"
+    },
+    {
+      "name": "give_up_dist",
+      "semantic": "放弃距离（世界单位），值变大允许目标更远才放弃，值变小更近距离就放弃"
+    },
+    {
+      "name": "max_attacks",
+      "semantic": "最大攻击次数，值变大需要更多次攻击才成功，值变小更少次就成功"
+    },
+    {
+      "name": "findnewtargetfn",
+      "semantic": "寻找新目标的函数，传入则函数返回目标时锁定，为 nil 则不自动寻找新目标"
+    },
+    {
+      "name": "walk",
+      "semantic": "是否步行（非奔跑），true 则移动慢，false 则移动快"
+    },
+    {
+      "name": "distance_from_ocean_target",
+      "semantic": "当目标不在陆地时与目标保持的海洋距离，值变大离目标更远，值变小更近"
+    }
+  ],
+  "effects": [
+    "combat:ValidateTarget",
+    "combat:SetTarget",
+    "combat:BattleCry",
+    "combat:TryAttack",
+    "combat:GiveUp",
+    "locomotor:Stop",
+    "locomotor:GoToPoint",
+    "locomotor:WantsToRun",
+    "sg:HasStateTag (longattack/jumping/canrotate)",
+    "inst:FacePoint"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 目标生命组件存在且已死亡，或攻击次数达到 max_attacks 上限",
+    "FAILED: 初始无目标且 findnewtargetfn 未找到目标，或运行中目标消失/无效，或距离超 give_up_dist，或追逐时间超 max_chase_time",
+    "RUNNING: 存在有效目标且未死亡、未达攻击上限、未超距超时，期间周期性 Sleep(.125) 并移动/攻击"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      72981,
+      15022,
+      13874,
+      14816,
+      13156,
+      13701,
+      13857,
+      15386
+    ],
+    "aspects": [
+      {
+        "aspect": "丢失仇恨脱离战斗",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨"
+          }
+        ]
+      },
+      {
+        "aspect": "仇恨目标锁定描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "远古戍卫塔一旦锁定目标，至少3 ~ 5 秒之内会保持追击"
+          },
+          {
+            "pageid": 13701,
+            "quote": "织影者主动仇恨远古大门所在房间内距离织影者小于 9 单位"
+          },
+          {
+            "pageid": 15386,
+            "quote": "有仇恨目标时：高脚鸟会苏醒并持续追逐攻击仇恨目标"
+          }
+        ]
+      },
+      {
+        "aspect": "原地静止行为",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "会站在原地不动，不主动攻击任何目标"
+          },
+          {
+            "pageid": 72981,
+            "quote": "其余守卫在靠近到一定程度后会停在原地"
+          }
+        ]
+      },
+      {
+        "aspect": "寻找其他目标行为",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "转而寻找其他目标或举手注视最近的玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "尝试攻击造成伤害",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "喷吐出粘球追击目标，接触后造成 40 伤害"
+          },
+          {
+            "pageid": 13874,
+            "quote": "肚皮溜冰攻击，追击进攻者一段距离，迅速对攻击者造成大量伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "战斗咆哮发现玩家",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "发出咆哮表示发现玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "最大追逐时间描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "如果超过最大追逐时间，或与所属的高脚鸟巢"
+          },
+          {
+            "pageid": 13874,
+            "quote": "至多滑行 5 秒"
+          }
+        ]
+      },
+      {
+        "aspect": "追击攻击距离范围",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "主动仇恨并追击 20 距离单位内的拟角色"
+          },
+          {
+            "pageid": 14816,
+            "quote": "当目标在 2~5 距离内时，喷吐出粘球追击目标"
+          }
+        ]
+      },
+      {
+        "aspect": "靠近点位加入追击",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "慢慢靠近，直到进入攻击范围后加入追击"
+          }
+        ]
+      },
+      {
+        "aspect": "高速移动压制追击",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "移动速度较高，且能够使用远程攻击，这使得它在追击玩家时压制力很强"
+          },
+          {
+            "pageid": 13874,
+            "quote": "企鸥会发动移速很快的肚皮溜冰攻击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "追逐攻击",
+    "追打",
+    "怪物AI",
+    "战斗行为",
+    "追击",
+    "放弃距离",
+    "攻击上限",
+    "寻敌函数"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
+    "source_bytes": 5203,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925753817
+  }
+}

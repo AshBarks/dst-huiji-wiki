@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/follow.lua"
+  },
+  "category": "behaviour",
+  "display_name": "follow",
+  "summary": "该行为节点驱动实体动态跟随指定目标，根据与目标的距离自动选择靠近或后退以保持设定的目标距离。常见于宠物、同伴或敌人AI在移动、战斗或探索场景中维持合理站位，支持奔跑与跨平台判断。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树引擎在内部调用 Visit 及辅助方法（如 GetTarget、EvaluateDistances 等），未设计供外部 mod 直接调用的公开 API，因此无对外暴露方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "target",
+      "semantic": "跟随的目标实体或返回实体的函数；目标无效则行为失败"
+    },
+    {
+      "name": "min_dist",
+      "semantic": "最小允许距离；值变大则实体更早后退保持更远，值变小则允许更靠近"
+    },
+    {
+      "name": "target_dist",
+      "semantic": "期望保持的目标距离；值变大希望离目标更远，值变小希望更近"
+    },
+    {
+      "name": "max_dist",
+      "semantic": "最大允许距离；值变大允许离目标更远才靠近，值变小更严格保持近距"
+    },
+    {
+      "name": "canrun",
+      "semantic": "是否允许奔跑；true 可跑，false 只走",
+      "default": "true"
+    },
+    {
+      "name": "alwayseval",
+      "semantic": "是否每次都重新评估距离函数；true 动态评估，false 仅目标切换时评估",
+      "default": "true"
+    },
+    {
+      "name": "inlimbo_invalid",
+      "semantic": "目标进入limbo是否导致失效；true 时失效，nil/false 时不因limbo失效"
+    }
+  ],
+  "effects": [
+    "locomotor:GoToPoint(target_pos) 或 GoToPoint(target_pos, nil, true) 用于靠近目标",
+    "locomotor:RunInDirection(angle+180) 或 WalkInDirection(angle+180) 用于远离目标",
+    "locomotor:Stop() 在目标失效或到达合适距离时停止移动",
+    "检查 inst.sg:HasStateTag('running') 以判断是否正在奔跑从而决定移动方式",
+    "读取 locomotor.allow_platform_hopping 及 GetCurrentPlatform 判断不同平台"
+  ],
+  "success_fail_conditions": [
+    "RUNNING: 目标有效且需调整位置（过近需后退BACKOFF、过远或不同平台需靠近APPROACH）时持续运行，每次Sleep(.25)",
+    "SUCCESS: 靠近时进入目标距离(target_dist)内（且同平台），或后退时超出目标距离(target_dist)外",
+    "FAILED: 目标不存在/无效/死亡/在limbo(若inlimbo_invalid)、或初始距离已在[min_dist,max_dist]内且同平台、或运行中目标失效"
+  ],
+  "search_terms": [
+    "跟随",
+    "追随",
+    "跟随",
+    "保持距离",
+    "靠近目标",
+    "远离目标",
+    "Follow",
+    "行为节点",
+    "宠物跟随",
+    "跟随AI"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
+    "source_bytes": 5440,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927253817
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/minperiod.lua"
+  },
+  "category": "behaviour",
+  "display_name": "minperiod",
+  "summary": "该行为节点用于限制其子行为节点成功执行的最小时间间隔，避免AI过于频繁地重复某个动作。它常用于行为树中需要冷却时间的场景，如定期生成、攻击或检查。当immediate为false时，初始即开始计时，必须等待一个周期才能首次成功。",
+  "api": [],
+  "api_note": "该节点为行为树内部节点，其方法（如Visit、DBString）仅由行为树引擎在评估时调用，不对外暴露供其他模块调用的接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "minperiod",
+      "semantic": "子节点两次成功之间的最小时间间隔（秒），值变大意味着需要等待更久才能再次执行子节点，值变小意味着等待时间更短"
+    },
+    {
+      "name": "immediate",
+      "semantic": "是否跳过初始等待周期（布尔），为true时首次不检查周期直接执行子节点；为false/nil时初始即记录当前时间，需等待minperiod才能首次成功",
+      "default": "nil（等同于false）"
+    },
+    {
+      "name": "child",
+      "semantic": "被限制执行频率的子行为节点，该节点成功时才会更新周期计时"
+    }
+  ],
+  "effects": [
+    "无直接组件/SG状态标签修改，仅通过child:Visit()间接执行子节点效果并维护内部lastsuccesstime计时"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS:子节点返回SUCCESS且通过周期检查（或immediate为true导致lastsuccesstime为nil而跳过检查）时，更新lastsuccesstime并返回SUCCESS",
+    "FAILED:在READY状态且距上次成功时间小于minperiod时直接FAILED；或子节点返回FAILED时自身FAILED",
+    "RUNNING:子节点返回RUNNING时自身RUNNING"
+  ],
+  "search_terms": [
+    "最小周期",
+    "行为节点",
+    "频率限制",
+    "MinPeriod",
+    "冷却执行",
+    "AI周期",
+    "子节点冷却",
+    "行为树冷却"
+  ],
+  "gameplay_tags": [
+    "AI控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "33ad2ca95b8b08c0c5611bb65dd492c717af4c9dc4581104225e16db977efe6e",
+    "source_bytes": 1078,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926301629
+  }
+}

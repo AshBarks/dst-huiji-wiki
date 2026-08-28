@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/attackwall.lua"
+  },
+  "category": "behaviour",
+  "display_name": "attackwall",
+  "summary": "该行为节点驱动实体在就绪时寻找前方一定角度和距离内的墙壁实体并尝试攻击。常用于怪物或角色AI在路径阻挡或主动破墙时自动破坏墙体。节点通过战斗组件尝试攻击，并在未找到目标或攻击失败时停止移动。",
+  "api": [],
+  "api_note": "该行为节点仅内部实现 Visit 与 __tostring 方法，Visit 为行为树框架调用，__tostring 为调试打印，无对外暴露的可供其他模块调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ATTACKWALL_MUST_TAGS",
+    "1.5",
+    "30",
+    "1"
+  ],
+  "effects": [
+    "locomotor:Stop",
+    "combat:TryAttack",
+    "combat:CanTarget"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 状态下 combat:TryAttack(self.target) 返回 true 时",
+    "FAILED: READY 状态下未找到前方30度内距离1.5+物理半径内的墙实体；或 RUNNING 状态下目标无效/死亡；或 RUNNING 状态下 TryAttack 返回 false",
+    "RUNNING: READY 状态下找到符合条件的墙实体后设置，并在同次 Visit 中立即处理攻击逻辑（可能瞬时转为 SUCCESS/FAILED）"
+  ],
+  "search_terms": [
+    "攻击墙",
+    "打墙",
+    "拆墙",
+    "破墙",
+    "墙AI",
+    "行为树",
+    "攻墙",
+    "墙战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "11117c991f1fafc6dde589e9cb0aba0a78998e7608139bf1a746ac36280f34bc",
+    "source_bytes": 1448,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926017481
+  }
+}

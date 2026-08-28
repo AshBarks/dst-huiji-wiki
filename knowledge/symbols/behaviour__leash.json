@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/leash.lua"
+  },
+  "category": "behaviour",
+  "display_name": "leash",
+  "summary": "该行为节点驱动实体在远离指定中心位置（家）超过最大距离后，自动返回至内部返回距离以内的范围。常用于限制怪物或宠物的活动区域，防止其无限游荡或跟随过远。若无法获取家位置或实体已在拴绳范围内，节点直接失败交由其他行为处理。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树内部调用 Visit 及辅助方法，未对外暴露可供外部模块或玩家直接调用的公开方法；其构造函数仅在行为树构建时由内部调用，不属于运行时 API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "homelocation",
+      "semantic": "拴绳锚点（家位置），可为 Vector3 坐标或返回坐标的函数；若坐标分量变大则锚点向对应轴正方向移动，实体返回目标点随之偏移"
+    },
+    {
+      "name": "max_dist",
+      "semantic": "拴绳最大半径，实体距离家超过此值才触发返回；值变大意味着允许离家的范围更大，值变小则范围更受限"
+    },
+    {
+      "name": "inner_return_dist",
+      "semantic": "内部返回距离，实体距离家小于此值即判定返回成功；值变大意味着实体在更远处便停止返回，值变小需更靠近家才成功"
+    },
+    {
+      "name": "running",
+      "semantic": "是否以跑步速度返回，true 为跑 false 为走；切换布尔值改变移动方式，无标量大小概念",
+      "default": "false"
+    }
+  ],
+  "effects": [
+    "locomotor:Stop",
+    "locomotor:GoToPoint"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 状态下，实体与家位置距离平方小于等于 inner_return_dist 平方（即不在返回距离外）时，状态置为 SUCCESS。",
+    "FAILED: 无法获取家位置（GetHomePos 返回 nil/false），或在 READY 状态下实体已在 leash 范围内（距离平方小于 max_dist 平方）时，状态置为 FAILED。",
+    "RUNNING: 在 READY 状态下实体不在 leash 内时进入 RUNNING 并停止当前移动；在 RUNNING 状态下若实体距离家位置大于 inner_return_dist 则保持 RUNNING 并命令 locomotor 走向家。"
+  ],
+  "search_terms": [
+    "拴绳",
+    "返回家",
+    "巡逻范围",
+    "离家返回",
+    "生物归位",
+    "leash",
+    "返回巢穴"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
+    "source_bytes": 1853,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927238443
+  }
+}

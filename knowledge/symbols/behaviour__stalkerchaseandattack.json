@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/stalkerchaseandattack.lua"
+  },
+  "category": "behaviour",
+  "display_name": "stalkerchaseandattack",
+  "summary": "该行为节点是已弃用的潜行者（Stalker）专属追逐攻击AI，仅为了Mod向后兼容而保留。它驱动实体在躲避星门等障碍物的同时追逐并攻击目标，硬编码了6单位的躲避距离。实际逻辑完全委托给父类 ChaseAndAttackAndAvoid，新开发应使用后者。",
+  "api": [],
+  "api_note": "该节点仅重写构造子以硬编码 avoid_dist 参数，未暴露任何新方法，所有行为由父类 ChaseAndAttackAndAvoid 提供。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "avoid_dist: 6"
+  ],
+  "ctor_params": [
+    {
+      "name": "findavoidanceobjectfn",
+      "semantic": "函数，用于查找需要躲避的物体（如星门）；非数值参数，指定躲避目标获取逻辑"
+    },
+    {
+      "name": "max_chase_time",
+      "semantic": "最大追逐时长（秒）；值变大则实体追逐目标的时间上限更长，值变小则更短"
+    },
+    {
+      "name": "give_up_dist",
+      "semantic": "放弃追逐的距离阈值；值变大则允许离目标更远才放弃，值变小则更近就放弃"
+    },
+    {
+      "name": "max_attacks",
+      "semantic": "放弃前最大攻击次数；值变大则可攻击更多次，值变小则更少"
+    },
+    {
+      "name": "findnewtargetfn",
+      "semantic": "函数，用于寻找新攻击目标；非数值参数，指定目标选取逻辑"
+    },
+    {
+      "name": "walk",
+      "semantic": "布尔值，是否以步行速度移动；true表示步行，false表示奔跑，非数值参数"
+    }
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 由父类 ChaseAndAttackAndAvoid 判定，源码未直接定义",
+    "FAILED: 由父类 ChaseAndAttackAndAvoid 判定，源码未直接定义",
+    "RUNNING: 由父类 ChaseAndAttackAndAvoid 判定，源码未直接定义"
+  ],
+  "search_terms": [
+    "潜行者",
+    "追逐攻击",
+    "躲避星门",
+    "弃用AI",
+    "兼容节点",
+    "stalker",
+    "攻击行为",
+    "怪物追逐"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "75ee403c345cf6cbad845b298e8784dbdb30225b6ff317def494bf8d79f013bc",
+    "source_bytes": 556,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926554137
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/useshield.lua"
+  },
+  "category": "behaviour",
+  "display_name": "useshield",
+  "summary": "该行为节点驱动实体在累计受伤超过阈值、遭遇敌对弹道、受到火焰伤害或史诗恐惧时进入举盾（shield）隐藏状态以规避进一步伤害。它常用于怪物或角色 AI 在战斗或危险环境中进行自我保护，举盾持续一段时间后自动退出并返回行为树。",
+  "api": [],
+  "api_note": "该行为节点仅由行为树框架调用 Visit、OnStop 等生命周期方法，未定义供外部模块直接调用的公开方法；内部辅助方法（如 ShouldShield、OnAttacked）仅服务于节点自身逻辑。",
+  "events_published": [
+    "entershield",
+    "exitshield"
+  ],
+  "events_listened": [
+    "epicscare",
+    "attacked",
+    "hostileprojectile",
+    "firedamage",
+    "startfiredamage",
+    "startelectrocute"
+  ],
+  "netvars": [],
+  "tunables": [
+    "damageforshield=100",
+    "shieldtime=2",
+    "hidefromprojectiles=false"
+  ],
+  "ctor_params": [
+    {
+      "name": "damageforshield",
+      "semantic": "触发举盾所需的累计受伤阈值；值变大意味着需要承受更多伤害才会举盾，值变小则更容易举盾",
+      "default": "100"
+    },
+    {
+      "name": "shieldtime",
+      "semantic": "举盾后保持缩避状态的持续时间（秒）；值变大意味着盾态维持更久才退出，值变小则更快出来",
+      "default": "2"
+    },
+    {
+      "name": "hidefromprojectiles",
+      "semantic": "是否因来袭敌对弹道而进入盾态的开关；为 true 时启用弹道躲避，false 时禁用，无大小变化仅开关",
+      "default": "false"
+    },
+    {
+      "name": "hidewhenscared",
+      "semantic": "是否在被史诗级恐惧（epicscare）时举盾的开关；为 true 时监听并延长盾态，nil/false 时不响应"
+    },
+    {
+      "name": "data",
+      "semantic": "自定义配置表，可包含 dontupdatetimeonattack、usecustomanims、dontshieldforfire、checkstategraph、shouldshieldfn 等字段，用于控制细节行为与回调；提供则启用对应逻辑，否则按默认"
+    }
+  ],
+  "effects": [
+    "sg:PushEvent(\"entershield\") 使实体进入举盾隐藏状态",
+    "sg:PushEvent(\"exitshield\") 使实体退出举盾状态",
+    "sg:HasStateTag(\"busy\"/\"caninterrupt\"/\"shield\"/\"frozen\"/\"electrocute\"/\"shield_end\") 检查以决策举盾与退出",
+    "health:IsDead() 与 health.takingfiredamage 检查影响举盾逻辑",
+    "监听 attacked/hostileprojectile/firedamage/startfiredamage/startelectrocute/epicscare 事件更新内部受击与恐惧计时"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 在 RUNNING 状态下，TimeToEmerge 返回 true（已超出 shieldtime 且过恐惧/自定义盾结束时间）且未受火焰伤害且未处 electrocute 状态时，推送 exitshield 并置 SUCCESS",
+    "FAILED: READY 时不应举盾且未处于 shield 状态，或 RUNNING 中 sg 出现 electrocute 状态时置 FAILED",
+    "RUNNING: READY 时判定应举盾（或已在 shield 状态）且未处禁止状态则进入 RUNNING；或 RUNNING 中尚未到 emerge 时间或仍在受火焰伤害时保持 RUNNING"
+  ],
+  "search_terms": [
+    "举盾",
+    "躲伤害",
+    "防弹道",
+    "受击隐藏",
+    "盾状态",
+    "火伤举盾",
+    "恐惧缩避",
+    "电击更新"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0d865efee99ded59b4a8214f70ab865ba1aacc8872ba3ff7a45a6b6414b72554",
+    "source_bytes": 5406,
+    "model": "hy3-free",
+    "generated_at_ms": 1787927304398
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/faceentity.lua"
+  },
+  "category": "behaviour",
+  "display_name": "faceentity",
+  "summary": "该行为节点驱动实体停止移动并转向（面对）由 getfn 指定的目标实体，常用于生物察觉威胁或关注某对象时的警觉表现。节点在目标有效且未超时时持续运行，可配置超时成功或条件失败，适用于战斗对峙、观察物体等 AI 场景。",
+  "api": [],
+  "api_note": "该行为节点仅重写了内部的 Visit 方法与辅助方法 HasLocomotor，未提供供外部主动调用的公开方法（如设置器），其逻辑完全通过构造参数注入函数与数值实现。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "getfn",
+      "semantic": "获取目标实体的函数，接收 inst 并返回要面对的实体；返回 nil 则节点失败。函数返回目标的条件变宽松则更容易触发面对行为，变严格则更难。"
+    },
+    {
+      "name": "keepfn",
+      "semantic": "保持面对的函数，接收 (inst, target) 返回布尔值；返回 false 则节点失败。条件变宽松则面对持续时间更长，变严格则更容易中断。"
+    },
+    {
+      "name": "timeout",
+      "semantic": "面对行为的超时时间（秒），非 nil 时超过该时间节点成功；值变大允许面对更久，变小则更快成功退出。",
+      "default": "nil"
+    },
+    {
+      "name": "customalert",
+      "semantic": "自定义的 SG 警觉状态名，若提供且存在则进入该状态而非默认 'alert'；指定特定动画表现。",
+      "default": "nil"
+    }
+  ],
+  "effects": [
+    "locomotor:Stop：若实体拥有 locomotor 组件，进入 RUNNING 时停止移动",
+    "sg:GoToState：当实体 SG 处于 idle 且无 alert 标签且有 alert 状态时，切换到 'alert' 或 customalert 状态",
+    "inst:FacePoint：当 SG 有 canrotate 标签时，将实体朝向目标世界坐标"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当设置了 timeout 且当前时间距开始时间超过 timeout 时，节点成功结束。",
+    "FAILED: 1) 初始 getfn 返回 nil；2) 运行中目标无效或 keepfn(inst, target) 返回 false。",
+    "RUNNING: 获取到有效目标后，在超时前且目标保持有效期间，节点保持运行并周期性转向目标（每 0.5 秒）。"
+  ],
+  "search_terms": [
+    "面对实体",
+    "注视目标",
+    "转向目标",
+    "警觉状态",
+    "停止移动",
+    "战斗对峙",
+    "怪物注视"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "87a6d3ae64d036056a0afd5848658c0fa31c0a1e854785e959d91cd5928789d6",
+    "source_bytes": 1739,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925712368
+  }
+}

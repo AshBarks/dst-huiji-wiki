@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/avoidelectricfence.lua"
+  },
+  "category": "behaviour",
+  "display_name": "avoidelectricfence",
+  "summary": "该行为节点驱动实体在受到电网电击时，计算远离电场的方向并奔跑逃离。它监听触电与新增电场事件，强制大脑更新并丢弃战斗目标，适用于生物在带电围栏场景中的生存避险。",
+  "api": [],
+  "api_note": "该行为节点仅由大脑系统内部调用，未提供对外暴露的公开方法（如设置参数或状态查询接口），其逻辑通过事件监听和 Visit 自动驱动，故无对外 API。",
+  "events_published": [],
+  "events_listened": [
+    "startelectrocute",
+    "shocked_by_new_field"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "effects": [
+    "inst._has_electric_fence_panic_trigger = true",
+    "locomotor:RunInDirection(run_angle)",
+    "combat:DropTarget()",
+    "brain:ForceUpdate()"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 源码未显式设置 SUCCESS 状态，节点可能持续运行直至被行为树父节点切换或停止",
+    "FAILED: 源码未显式设置 FAILED 状态",
+    "RUNNING: 当 status 为 READY 且 self.run_angle 非空时进入 RUNNING，并在 RUNNING 状态下持续驱动 locomotor 沿计算角度奔跑"
+  ],
+  "search_terms": [
+    "电网躲避",
+    "触电逃跑",
+    "逃离电场",
+    "防电围栏",
+    "电击恐慌",
+    "电篱回避"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "避险"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67eda0dd991210814eb38bf7be1956e4df9fdabdd024073827ca7a3bd7a3e962",
+    "source_bytes": 2341,
+    "model": "hy3-free",
+    "generated_at_ms": 1787926259877
+  }
+}

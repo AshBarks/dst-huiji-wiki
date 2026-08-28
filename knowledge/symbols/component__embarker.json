@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "embarker",
-  "summary": "组件管理实体登船与下船的目标位置、速度及移动状态数据，用于角色在可行走平台（如船只）与地面间的过渡。核心玩法涉及通过物理马达或传送将实体送往登船点 or 下船点，并受最大跳跃距离限制。该组件实现了航行中上下船的交互逻辑。",
+  "summary": "Embarker 组件管理实体登船或离船的目标实体、目标坐标、速度及跳跃起点等数据。它参与核心玩法为控制实体从水中跳到可行走平台（船）或跳离至陆地的移动插值、传送与物理马达驱动，并协同 locomotor 完成跳跃动作。",
   "api": [
     {
       "name": "UpdateEmbarkingPos",
-      "effect": "计算当前目标登船或下船位置并更新 last_embark_x/z。若剩余距离小于等于本帧移动距离则传送实体到目标点并推送 done_embark_movement 事件；否则检查已移动距离是否超上限，超则取消并推送事件，否则设置朝向并启动物理马达速度。"
+      "effect": "计算当前登船目标位置并存入 last_embark_x/z；若剩余距离小于等于本帧移动距离则传送至目标并推送 'done_embark_movement' 事件；否则若已跳跃距离超阈值则调用 Cancel 并推送事件，否则设置实体朝向目标并启动物理马达速度。副作用：修改坐标缓存、可能传送、推送事件、可能取消、设置旋转与速度。"
     },
     {
       "name": "SetEmbarkable",
-      "effect": "设置目标可登船物体 embarkable，更新 last_embark 坐标为登船位置，强制实体面朝该点，并清除 disembark 坐标。"
+      "effect": "设置 self.embarkable 为目标，更新 last_embark_x/z 为登船位置，强制面朝该点，清空 disembark_x/z。副作用：数据变更与转向。"
     },
     {
       "name": "SetDisembarkPos",
-      "effect": "设置下船坐标 disembark_x/z，强制实体面朝该点，清除 embarkable 及 last_embark 坐标。"
+      "effect": "设置 disembark_x/z 为指定坐标，强制面朝该点，清空 embarkable 与 last_embark 坐标。副作用：数据变更与转向。"
     },
     {
       "name": "SetDisembarkActionPos",
-      "effect": "调用全局函数 GetDisembarkPosAndDistance 计算合适下船位置并赋值给 disembark_x/z。"
+      "effect": "调用辅助函数 GetDisembarkPosAndDistance 计算离船位置并赋值给 disembark_x/z。副作用：仅数据变更。"
     },
     {
       "name": "StartMoving",
-      "effect": "若未初始化跳跃限制，则停止物理、启动组件更新，基于 locomotor 跳跃距离计算最大跳跃距离平方并记录起点，推送 start_embark_movement 事件。"
+      "effect": "若未初始化跳跃距离，停止物理，启动组件更新，计算 max_hop_dist_sq 与 hop_start_pt，并推送 'start_embark_movement' 事件。副作用：启动更新循环、停止物理、推送事件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧调用 UpdateEmbarkingPos 推进登船或下船移动逻辑。"
+      "effect": "调用 UpdateEmbarkingPos(dt)。副作用同 UpdateEmbarkingPos。"
     },
     {
       "name": "HasDestination",
-      "effect": "返回是否存在有效目的地（embarkable 有效或 disembark_x 不为 nil），无状态修改。"
+      "effect": "返回 (self.embarkable 有效) 或 (self.disembark_x 不为 nil)。无副作用。"
     },
     {
       "name": "GetEmbarkPosition",
-      "effect": "若 embarkable 有效则返回平台组件的登船位置，否则返回 disembark 或 last_embark 或实体自身坐标，无状态修改。"
+      "effect": "返回登船坐标：若 embarkable 有效则从平台组件获取，否则用 disembark 或 last_embark 或当前坐标。无副作用。"
     },
     {
       "name": "Embark",
-      "effect": "停止物理，直接将实体位置设为登船点，清除所有登船或下船状态，停止组件更新并调用 locomotor:FinishHopping。"
+      "effect": "停止物理，将实体传送到登船位置，清空所有状态数据，停止组件更新，并调用 locomotor:FinishHopping()。副作用：传送、状态清除、停止更新、结束跳跃。"
     },
     {
       "name": "Cancel",
-      "effect": "停止物理，清除所有登船或下船状态，停止组件更新并调用 locomotor:FinishHopping。"
+      "effect": "停止物理，清空状态数据，停止组件更新，调用 locomotor:FinishHopping()。副作用：状态清除、停止更新、结束跳跃。"
     }
   ],
   "events_published": [
@@ -59,59 +59,39 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13602,
-      65881,
-      15746,
-      18504,
+      18503,
+      18510,
+      20156,
+      20293,
+      45525,
       18540,
-      19287,
-      51136,
-      15239
+      20117,
+      20180
     ],
-    "aspects": [
-      {
-        "aspect": "上船行为及时机描述",
-        "evidence": [
-          {
-            "pageid": 13602,
-            "quote": "可以在它刚上船和攻击完毕后上前攻击。"
-          },
-          {
-            "pageid": 15746,
-            "quote": "到船上啃噬，累计 3 秒后在船上咬出来一"
-          },
-          {
-            "pageid": 18540,
-            "quote": "火药猴就会跳上船去放下[[锚]]，摧毁任何张开的"
-          },
-          {
-            "pageid": 51136,
-            "quote": "濒临溺水时，伍迪的变身会被延后至上岸或上船时"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均围绕月亮码头布景、女王、码头套装、自动航行仪、海盗袭击、地皮、码头桩等实体，未提及任何与登船(embark)、下船(disembark)、登船位置设置、移动目的地等组件能力相关的玩家语言描述或数值行为。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "登船",
-    "下船",
-    "上船",
-    "船只平台",
-    "登船点",
-    "下船点",
-    "航行移动",
-    "靠岸"
+    "离船",
+    "跳上船",
+    "下平台",
+    "登陆点",
+    "乘船",
+    "航行",
+    "码头"
   ],
   "gameplay_tags": [
     "航行",
-    "建造"
+    "登船",
+    "移动"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
     "source_bytes": 5385,
     "model": "hy3-free",
-    "generated_at_ms": 1787860513140
+    "generated_at_ms": 1787893471823
   }
 }

@@ -7,111 +7,111 @@
   },
   "category": "component",
   "display_name": "follower",
-  "summary": "该组件管理实体对领袖（玩家或物品）的跟随关系，记录忠诚持续时间、牵引状态与缓存领袖信息。它参与随从跟随移动、远距离传送归队、被攻击脱离领袖以及玩家重连后恢复跟随等核心玩法。",
+  "summary": "Follower组件管理实体（如宠物或生物）的领导者、物品所有者及忠诚时间等数据，处理跟随、牵引回位、忠诚度衰减与脱离等逻辑。它参与核心玩法包括生物跟随玩家或物品、被攻击脱离、远距离传送至领导者附近以及玩家重连后恢复跟随。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回描述当前跟随状态的字符串，包含领袖、物品拥有者及剩余忠诚时间等信息，无副作用。"
+      "effect": "返回描述当前跟随状态（领导者、物品所有者、剩余忠诚时间）的字符串，无副作用。"
     },
     {
       "name": "GetLeader",
-      "effect": "返回 itemowner 或 leader（itemowner 优先），无副作用。"
+      "effect": "返回物品所有者或领导者（优先物品所有者），无副作用。"
     },
     {
       "name": "StartLeashing",
-      "effect": "若 noleashing 标志为真则直接返回；否则为领袖的 entitywake 与自身的 entitysleep 事件添加监听，并推送 startleashing 事件。副作用：添加事件监听并推送事件。"
+      "effect": "若未禁用牵引且存在领导者，则监听领导者唤醒与自身睡眠事件以进行远距离传送，并推送“startleashing”事件。"
     },
     {
       "name": "StopLeashing",
-      "effect": "移除 entitysleep 与 entitywake 监听，取消传送任务 porttask，若非 noleashing 则推送 stopleashing 事件。副作用：移除监听、取消任务、推送事件。"
+      "effect": "移除牵引相关事件监听与传送任务，若未禁用牵引则推送“stopleashing”事件。"
     },
     {
       "name": "DisableLeashing",
-      "effect": "若当前未禁用牵引，则设置 noleashing 为真并调用 StopLeashing。副作用：改变状态并停止牵引。"
+      "effect": "永久禁用牵引（设置noleashing标志）并停止当前牵引。"
     },
     {
       "name": "EnableLeashing",
-      "effect": "若当前禁用了牵引，则清除 noleashing 标志；若领袖为玩家或物品则开始牵引，若自身处于睡眠则触发 OnEntitySleep。副作用：可能开始牵引与传送检查。"
+      "effect": "重新启用牵引，若领导者为玩家或物品则开始牵引并在自身睡眠时尝试传送。"
     },
     {
       "name": "SetCanBeRollCalledFn",
-      "effect": "将传入的函数存储到 self.canberollcalledfn 作为点名召集判定回调。副作用：更新回调函数。"
+      "effect": "设置判断可否被点名召集的函数，无副作用。"
     },
     {
       "name": "CanBeRollCalled",
-      "effect": "检查给定领袖的 leaderrollcall 组件是否禁用，否则调用 canberollcalledfn 判定，返回布尔值。无副作用（除调用回调）。"
+      "effect": "检查领导者点名组件是否启用及自定义函数，返回布尔值，无副作用。"
     },
     {
       "name": "CachePlayerLeader",
-      "effect": "缓存玩家领袖的 userid 与剩余时间，设置定时清除任务，并监听 ms_playerjoined 与 ms_newplayerspawned 事件。副作用：设置缓存字段、启动任务、添加世界事件监听。"
+      "effect": "缓存玩家领导者ID与剩余时间，监听玩家加入与新玩家生成事件以便重连，可能启动缓存任务。"
     },
     {
       "name": "ClearCachedPlayerLeader",
-      "effect": "移除相关世界事件监听，取消缓存任务，清空缓存的用户ID与剩余时间字段。副作用：移除监听与任务。"
+      "effect": "清除缓存的玩家领导者信息并移除相关世界事件监听与任务。"
     },
     {
       "name": "OnItemSourceNewOwner",
-      "effect": "设置 itemowner 为新的拥有者，若拥有者含 leader 组件则将其添加为物品跟随者。副作用：改变 itemowner 并通知 leader 组件。"
+      "effect": "设置物品所有者并通知领导者组件添加物品跟随者。"
     },
     {
       "name": "OnItemSourceRemoved",
-      "effect": "将 itemowner 置空，若原拥有者含 leader 组件则移除物品跟随者。副作用：改变 itemowner 并通知 leader 组件。"
+      "effect": "清除物品所有者并通知领导者组件移除物品跟随者。"
     },
     {
       "name": "SetLeader",
-      "effect": "处理新旧领袖切换：移除旧领袖关联（leader组件移除、停止牵引、取消忠诚任务、移除物品源等），建立新领袖关联（添加 follower、监听移除事件、条件触发牵引等）。若领袖改变则触发回调、丢弃战斗目标并推送 leaderchanged 事件。副作用：大量状态变更与事件推送。"
+      "effect": "变更领导者：移除旧领导者关系与监听、可能停止牵引，建立新领导者关系、添加监听、根据情况开始牵引，推送“leaderchanged”事件并可能丢弃战斗目标。"
     },
     {
       "name": "GetLoyaltyPercent",
-      "effect": "根据 targettime 与 maxfollowtime 计算剩余忠诚时间比例，返回 0 到 1 之间的数值或 0。无副作用。"
+      "effect": "返回当前忠诚时间剩余比例（0~1），无副作用。"
     },
     {
       "name": "AddLoyaltyTime",
-      "effect": "若 neverexpire 则返回；否则增加忠诚时间（受领袖忠诚效率影响），更新 targettime，推送 gainloyalty 事件并启动到期停止跟随的任务。副作用：更新时间、推送事件、启动任务。"
+      "effect": "增加忠诚持续时间（受领导者效率影响），更新目标时间，推送“gainloyalty”事件并安排到期停止跟随任务。"
     },
     {
       "name": "CancelLoyaltyTask",
-      "effect": "清空 targettime 并取消忠诚定时任务。副作用：取消任务。"
+      "effect": "清除目标时间与取消忠诚到期任务。"
     },
     {
       "name": "StopFollowing",
-      "effect": "若 neverexpire 则返回；否则清空 targettime，推送 loseloyalty 事件并调用 SetLeader(nil) 解除跟随。副作用：停止跟随与事件推送。"
+      "effect": "若非永不失效，则清除忠诚时间、推送“loseloyalty”事件并设领导者为nil以脱离。"
     },
     {
       "name": "IsNearLeader",
-      "effect": "检查 leader 是否存在且与自身距离小于给定值，返回布尔。无副作用。"
+      "effect": "检查领导者是否存在且在指定距离内，无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含剩余忠诚时间与缓存玩家领袖信息的存档数据表或 nil。无副作用。"
+      "effect": "返回包含剩余忠诚时间与缓存玩家领导者信息的存档表，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "根据载入数据恢复忠诚时间并缓存玩家领袖。副作用：恢复跟随状态。"
+      "effect": "根据存档数据恢复忠诚时间与缓存玩家领导者，副作用为调用AddLoyaltyTime与CachePlayerLeader。"
     },
     {
       "name": "IsLeaderSame",
-      "effect": "比较自身与另一实体的领袖是否相同，返回布尔。无副作用。"
+      "effect": "比较目标实体与自身是否具有相同领导者，无副作用。"
     },
     {
       "name": "KeepLeaderOnAttacked",
-      "effect": "若未设置保持标志，则标记 keepleaderonattacked 并移除 attacked 事件监听，使被攻击时不脱离领袖。副作用：改变标志与移除监听。"
+      "effect": "设置标志使被攻击时不脱离领导者，并移除“attacked”事件监听。"
     },
     {
       "name": "LoseLeaderOnAttacked",
-      "effect": "若已设置保持标志，则清除标志并重新监听 attacked 事件。副作用：改变标志与添加监听。"
+      "effect": "清除上述标志并恢复“attacked”事件监听以在被攻击者攻击时脱离。"
     },
     {
       "name": "LongUpdate",
-      "effect": "处理长时间跳过：调整忠诚任务与缓存领袖任务的剩余时间，可能直接解除领袖或清除缓存。副作用：可能取消任务、改变 targettime 或调用 SetLeader/ClearCachedPlayerLeader。"
+      "effect": "长时间更新时调整忠诚任务与缓存任务剩余时间，可能立即脱离或清除缓存。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "实体移除组件时清理：停止牵引、取消所有任务、移除全部相关事件监听、处理物品源。副作用：彻底清理状态。"
+      "effect": "清理所有监听、任务、牵引及物品源关联。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "实体移除时若含物品源则清除物品源关联。副作用：清理 itemowner。"
+      "effect": "若作为物品源则移除物品源关联以清除itemowner。"
     }
   ],
   "events_published": [
@@ -123,75 +123,43 @@
   ],
   "events_listened": [
     "attacked",
-    "entitywake",
     "entitysleep",
-    "onremove",
+    "entitywake",
     "ms_playerjoined",
-    "ms_newplayerspawned"
+    "ms_newplayerspawned",
+    "onremove"
   ],
   "netvars": [],
   "tunables": [
-    "TUNING.FOLLOWER_REFOLLOW_DIST_SQ"
+    "FOLLOWER_REFOLLOW_DIST_SQ"
   ],
   "wiki": {
     "scanned_pageids": [
-      17998,
-      15238,
-      52773,
-      15239,
-      15427,
-      13857,
-      13556,
-      15237
+      18057,
+      57263,
+      18001,
+      16641,
+      17930,
+      24578,
+      39366,
+      19693
     ],
-    "aspects": [
-      {
-        "aspect": "忠诚时间数值标注",
-        "evidence": [
-          {
-            "pageid": 17998,
-            "quote": "获得对使用牛角的玩家 30 秒的忠诚时间"
-          },
-          {
-            "pageid": 15237,
-            "quote": "最大追随时间 2.5 天"
-          }
-        ]
-      },
-      {
-        "aspect": "近领导者距离描述",
-        "evidence": [
-          {
-            "pageid": 13556,
-            "quote": "保持在温蒂附近 1 ~ 5 距离单位"
-          }
-        ]
-      },
-      {
-        "aspect": "领导者指定描述",
-        "evidence": [
-          {
-            "pageid": 17998,
-            "quote": "获得对使用牛角的玩家 30 秒的忠诚时间"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "well_documented"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，仅页面18057描述宠物“跟随玩家”和“被遗弃”行为，但未体现领导者、拴绳、忠诚度、点名、保存加载等follower组件具体能力；其余页面涉及传送实体或区域，无相关表达。故认为页面根本不讨论该组件能力。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "跟随领袖",
-    "忠诚时间",
-    "牵引归队",
-    "点名召集",
-    "攻击脱离",
+    "跟随",
+    "忠诚度",
+    "领导者",
+    "牵引",
+    "传送",
+    "宠物",
     "物品跟随",
-    "重连恢复",
-    "随从宠物"
+    "点名",
+    "脱离"
   ],
   "gameplay_tags": [
-    "跟随",
-    "宠物",
     "生存",
     "战斗"
   ],
@@ -200,6 +168,6 @@
     "source_sha256": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
     "source_bytes": 16653,
     "model": "hy3-free",
-    "generated_at_ms": 1787860049269
+    "generated_at_ms": 1787893221150
   }
 }

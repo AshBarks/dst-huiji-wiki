@@ -7,85 +7,74 @@
   },
   "category": "component",
   "display_name": "entitytracker",
-  "summary": "EntityTracker 组件维护一个从名称到实体实例的映射表，用于让拥有该组件的实体追踪其他实体的存在。它在被追踪实体移除时自动清理记录，并支持在游戏存读档时保存和恢复这些实体引用。",
+  "summary": "组件维护一个以名称索引的实体引用表，并在被追踪实体销毁时自动清除对应记录。它支持按名称查询、遗忘实体，并参与游戏存档与读档时的实体引用保存与恢复。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，遍历当前追踪的所有实体，移除本实体对它们 'onremove' 事件的监听回调，防止悬空引用。"
+      "effect": "遍历当前追踪的所有实体，从被追踪实体上移除之前注册的 onremove 事件回调，清理监听关系。无数据残留副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含所有被追踪实体名称与实例信息的调试字符串，无副作用。"
+      "effect": "返回包含所有追踪实体名称与实例信息的多行调试字符串，无副作用。"
     },
     {
       "name": "TrackEntity",
-      "effect": "将指定名称与实体加入追踪表，并让本实体监听该实体的 'onremove' 事件以自动清除记录；修改内部追踪数据并添加事件监听。"
+      "effect": "以给定名称作为键将目标实体存入追踪表，并为该实体注册 onremove 事件监听；当目标实体移除时自动将表中对应项置空。副作用：增加事件回调。"
     },
     {
       "name": "ForgetEntity",
-      "effect": "停止追踪指定名称的实体，移除对应的事件监听并将表中项置空；修改内部追踪数据并移除事件监听。"
+      "effect": "若指定名称存在追踪记录，则移除该实体上的 onremove 事件回调并将表中对应项清除。副作用：移除事件回调并释放引用。"
     },
     {
       "name": "GetEntity",
-      "effect": "返回追踪表中对应名称的实体实例，若不存在则返回 nil，无副作用。"
+      "effect": "返回指定名称对应的被追踪实体实例，若不存在则返回 nil。无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "若存在追踪实体，返回包含名称与 GUID 映射的存档数据及引用 GUID 列表；若无追踪则返回 nil，无副作用。"
+      "effect": "若存在追踪实体，返回包含实体名称与 GUID 的保存数据表以及 GUID 引用列表供存档系统使用；若无追踪则返回空。无副作用。"
     },
     {
       "name": "LoadPostPass",
-      "effect": "根据存档数据中的 GUID 从传入实体表解析实体，并重新调用追踪方法恢复追踪；副作用为重建追踪表与事件监听。"
+      "effect": "在存档加载后，根据传入的 GUID 映射重新获取实体实例，并调用 TrackEntity 恢复追踪关系。副作用：重新建立追踪与事件监听。"
     }
   ],
-  "api_note": "",
   "events_published": [],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      34794,
       13701,
       19832,
       13606,
       19110,
       22249,
       22383,
-      13698
+      13698,
+      19761
     ],
-    "aspects": [
-      {
-        "aspect": "地图记录实体非实时描述",
-        "evidence": [
-          {
-            "pageid": 34794,
-            "quote": "地图上所记录实体不是实时更新的"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均围绕实体的掉落、生成时间、战斗数值与仇恨范围等行为，未包含与 entitytracker 组件相关的追踪、忘记、获取、保存、加载或移除等任何能力描述。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "实体追踪",
-    "记录实体",
-    "遗忘实体",
-    "自动清理",
-    "保存引用",
-    "读取实体",
+    "追踪实体",
+    "实体引用",
+    "自动遗忘",
+    "存档指引",
+    "按名查找",
     "移除监听",
-    "引用管理"
+    "调试列表"
   ],
   "gameplay_tags": [
-    "通用",
-    "数据"
+    "系统",
+    "存档"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
     "source_bytes": 1689,
     "model": "hy3-free",
-    "generated_at_ms": 1787859740395
+    "generated_at_ms": 1787893022330
   }
 }

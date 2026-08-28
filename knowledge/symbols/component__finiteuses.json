@@ -7,83 +7,83 @@
   },
   "category": "component",
   "display_name": "finiteuses",
-  "summary": "该组件管理实体的有限使用次数（耐久度），维护总次数、当前次数及按动作类型的消耗配置。它参与工具消耗、战斗耐久损失豁免、修理与存档等核心玩法，并在次数耗尽时推送事件、添加标签并触发完成回调。",
+  "summary": "该组件管理实体的有限使用次数（耐久），维护当前值、最大值及按动作类型的消耗量。它参与物品在使用、战斗、采集等玩法中的耐久损耗与修理恢复。耐久耗尽时会标记实体并触发完成回调，同时向修复类组件同步可修复状态。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "从实体移除组件时，移除实体上的 'usesdepleted' 标签，无其他副作用。"
+      "effect": "组件从实体移除时调用，移除实体上的 'usesdepleted' 标签。"
     },
     {
       "name": "SetConsumption",
-      "effect": "设置指定动作的单次使用消耗次数至 consumption 表；若动作为 ACTIONS.MINE，则同时设置 ACTIONS.REMOVELUNARBUILDUP 动作的同值消耗。仅修改内部数据。"
+      "effect": "设置指定动作（action）的每次使用消耗次数（uses）。若动作为 ACTIONS.MINE，则同时设置 ACTIONS.REMOVELUNARBUILDUP 的消耗为相同值。"
     },
     {
       "name": "ClearAllConsumptions",
-      "effect": "将 consumption 表清空为 {}，移除所有动作消耗配置。"
+      "effect": "清空所有动作消耗记录，将 consumption 表重置为空表。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回格式化字符串如 '当前/总' 用于调试，无状态修改。"
+      "effect": "返回当前耐久与最大耐久的格式化字符串（如 '100.00/100'），无副作用。"
     },
     {
       "name": "SetDoesNotStartFull",
-      "effect": "设置 doesnotstartfull 标记，改变 OnSave 的存档条件（不再默认假设满耐久无需存档）。"
+      "effect": "设置 doesnotstartfull 标记，改变存档逻辑（不再默认假设满耐久保存），无直接副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "若当前次数不等于总次数或 doesnotstartfull 为真，返回 {uses = current} 表供序列化；否则返回 nil。无副作用。"
+      "effect": "当 current 不等于 total 或 doesnotstartfull 为真时，返回包含当前使用次数 {uses = self.current} 的表供存档，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若读档数据包含 uses 字段，调用 SetUses 应用该值，可能触发事件、标签与回调副作用。"
+      "effect": "从存档数据加载，若 data.uses 存在则调用 SetUses 设置使用次数，引发 SetUses 的事件、标签及修复组件同步等副作用。"
     },
     {
       "name": "SetMaxUses",
-      "effect": "设置 total 值；因 total 属性监听，会联动更新 repairable 或 forgerepairable 组件的修复可用状态。"
+      "effect": "设置最大使用次数 total 为指定值，因 total 属性变更触发 onfiniteuses 回调以更新 repairable/forgerepairable 组件的可修复状态。"
     },
     {
       "name": "SetUses",
-      "effect": "设置 current 值并推送 'percentusedchange' 事件（带百分比）；若减至≤0则置0，若此前>0则添加 'usesdepleted' 标签并调用 onfinished 回调；若从非正变为正则移除该标签。"
+      "effect": "设置当前使用次数 current 为 val，因 current 属性变更触发 onfiniteuses 回调更新修复组件可修复状态，并推送 'percentusedchange' 事件（带 percent 参数）。若 val<=0 则置0，若之前>0则添加 'usesdepleted' 标签并调用 onfinished 回调；若 val>0 且之前<=0 则移除该标签。"
     },
     {
       "name": "GetUses",
-      "effect": "返回当前次数 current，无副作用。"
+      "effect": "返回当前使用次数 current，无副作用。"
     },
     {
       "name": "Use",
-      "effect": "以默认1或指定 num 减少当前次数调用 SetUses，继承其事件、标签与回调副作用。"
+      "effect": "减少当前使用次数（默认1，可指定 num），调用 SetUses 并继承其所有副作用。"
     },
     {
       "name": "IgnoresCombatDurabilityLoss",
-      "effect": "返回 ignorecombatdurabilityloss 布尔值，表示是否忽略战斗耐久损失。"
+      "effect": "返回 ignorecombatdurabilityloss 标记值，无副作用。"
     },
     {
       "name": "SetIgnoreCombatDurabilityLoss",
-      "effect": "设置 ignorecombatdurabilityloss 值，影响外部战斗耐久逻辑判断。"
+      "effect": "设置 ignorecombatdurabilityloss 标记值，无副作用。"
     },
     {
       "name": "SetModifyUseConsumption",
-      "effect": "注册 modifyuseconsumption 函数，供 OnUsedAsItem 在计算消耗时调用修改。"
+      "effect": "设置修改使用消耗的回调函数 modifyuseconsumption，无副作用。"
     },
     {
       "name": "OnUsedAsItem",
-      "effect": "根据动作查 consumption，结合 efficientuser 倍数与 modifyuseconsumption 回调计算最终消耗，并调用 Use 扣除；继承 Use 副作用。"
+      "effect": "根据 consumption 表获取动作消耗，若 doer 拥有 efficientuser 组件则乘其乘数，若设置了 modifyuseconsumption 则调用其调整，最后调用 Use 消耗耐久；doer 无效时忽略其乘数。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回 current/total 比率，无副作用。"
+      "effect": "返回 current/total 的耐久比例，无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "按给定比例乘 total 调用 SetUses，继承其副作用。"
+      "effect": "按给定比例 amount 设置当前耐久（total*amount），调用 SetUses 并继承其副作用。"
     },
     {
       "name": "SetOnFinished",
-      "effect": "设置 onfinished 回调函数，在 SetUses 检测到耗尽且此前为正时调用。"
+      "effect": "设置耐久耗尽时的回调 onfinished，无副作用。"
     },
     {
       "name": "Repair",
-      "effect": "将当前次数增加 repairvalue 但不超过 total，调用 SetUses，继承其副作用。"
+      "effect": "增加当前耐久，不超过最大 total，调用 SetUses 并继承其副作用。"
     }
   ],
   "events_published": [
@@ -100,12 +100,12 @@
       15295,
       15915,
       19954,
-      13156,
-      13457
+      13457,
+      22383
     ],
     "aspects": [
       {
-        "aspect": "耐久修补描述",
+        "aspect": "伯尼修补方法说明",
         "evidence": [
           {
             "pageid": 15915,
@@ -114,16 +114,16 @@
         ]
       },
       {
-        "aspect": "耐久度百分比转化生命值",
+        "aspect": "伯尼耐久度百分比标注",
         "evidence": [
           {
             "pageid": 15915,
-            "quote": "按照耐久度百分比转化拥有最高 1000 生命值"
+            "quote": "按照耐久度百分比转化拥有最高 1000"
           }
         ]
       },
       {
-        "aspect": "耐久耗尽后状态描述",
+        "aspect": "伯尼耐久耗尽行为描述",
         "evidence": [
           {
             "pageid": 15915,
@@ -139,10 +139,10 @@
     "使用次数",
     "修理",
     "耗尽",
-    "损耗",
-    "免战损",
-    "百分比",
-    "消耗动作"
+    "磨损",
+    "工具消耗",
+    "武器耐久",
+    "百分比"
   ],
   "gameplay_tags": [
     "生存",
@@ -154,6 +154,6 @@
     "source_sha256": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
     "source_bytes": 3243,
     "model": "hy3-free",
-    "generated_at_ms": 1787859631576
+    "generated_at_ms": 1787893008983
   }
 }

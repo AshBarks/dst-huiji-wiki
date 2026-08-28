@@ -7,79 +7,79 @@
   },
   "category": "component",
   "display_name": "equippable",
-  "summary": "equippable 组件管理物品的可装备状态、装备槽位、装备与卸下回调、移动速度加成、精神值、绝缘、限制标签及防卸下等数据。它参与核心玩法中的装备系统，处理实体装备到玩家或模型时的逻辑，并影响移动速度、精神值和潮湿等相关生存机制。",
+  "summary": "该组件管理物品的可装备状态、装备槽位及装备/卸下回调，并存储步行速度、精神值、防潮等装备效果数据。它参与角色穿戴与卸下装备的核心玩法，通过副本同步实现装备限制与属性加成。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "调用 SetPreventUnequipping(false) 取消防卸下状态；若实体 replica.inventoryitem 存在，将其 WalkSpeedMult 重置为 1，EquipRestrictedTag 重置为 nil。修改 replica 网络状态。"
+      "effect": "调用SetPreventUnequipping(false)取消防卸下；若实体副本inventoryitem存在，将其步行速度倍率重置为1、装备限制标签重置为nil。副作用：清除防止卸下状态并同步副本数据。"
     },
     {
       "name": "IsInsulated",
-      "effect": "返回 self.insulated 布尔值，表示是否绝缘电击（非温度）。无副作用。"
+      "effect": "返回self.insulated，表示是否绝缘电力（非温度）。无副作用。"
     },
     {
       "name": "SetOnEquip",
-      "effect": "设置 self.onequipfn 为传入函数 fn，用于装备时回调。仅存储数据。"
+      "effect": "设置self.onequipfn为传入函数，用于装备时回调。无副作用。"
     },
     {
       "name": "SetOnPocket",
-      "effect": "设置 self.onpocketfn 为传入函数 fn，用于放入口袋时回调。仅存储数据。"
+      "effect": "设置self.onpocketfn为传入函数，用于放入口袋时回调。无副作用。"
     },
     {
       "name": "SetOnUnequip",
-      "effect": "设置 self.onunequipfn 为传入函数 fn，用于卸下时回调。仅存储数据。"
+      "effect": "设置self.onunequipfn为传入函数，用于卸下时回调。无副作用。"
     },
     {
       "name": "SetDappernessFn",
-      "effect": "设置 self.dapperfn 为传入函数 fn，用于动态计算精神值。仅存储数据。"
+      "effect": "设置self.dapperfn为传入函数，用于动态计算精神值。无副作用。"
     },
     {
       "name": "SetOnEquipToModel",
-      "effect": "设置 self.onequiptomodelfn 为传入函数 fn，当装备到带有 equipmentmodel 标签的实体时调用。仅存储数据。"
+      "effect": "设置self.onequiptomodelfn为传入函数，用于在装备到模型时回调。无副作用。"
     },
     {
       "name": "IsEquipped",
-      "effect": "返回 self.isequipped 布尔值，表示当前是否已装备。无副作用。"
+      "effect": "返回self.isequipped，表示当前是否已装备。无副作用。"
     },
     {
       "name": "Equip",
-      "effect": "将 isequipped 设为 true；若组件有 burnable 则停止阴燃；调用 onequipfn(inst, owner, from_ground)；推送 equipped 事件；若 onequiptomodelfn 存在且 owner 有 equipmentmodel 标签则调用该回调。修改状态、停止燃烧、触发事件与回调。"
+      "effect": "将isequipped设为true；若自身有burnable组件则停止阴燃；调用onequipfn(inst,owner,from_ground)；推送\"equipped\"事件；若owner有\"equipmentmodel\"标签且onequiptomodelfn存在则调用之。副作用：改变装备状态，可能灭火，触发回调与事件。"
     },
     {
       "name": "ToPocket",
-      "effect": "若 onpocketfn 存在则调用之，传入 inst 与 owner。无其他副作用。"
+      "effect": "若onpocketfn存在则调用onpocketfn(inst,owner)。副作用：触发回调。"
     },
     {
       "name": "Unequip",
-      "effect": "将 isequipped 设为 false；调用 onunequipfn(inst, owner)；推送 unequipped 事件。修改状态、事件推送。"
+      "effect": "将isequipped设为false；调用onunequipfn(inst,owner)；推送\"unequipped\"事件。副作用：改变装备状态，触发回调与事件。"
     },
     {
       "name": "GetWalkSpeedMult",
-      "effect": "计算并返回步行速度乘数：基础为 self.walkspeedmult 或 1.0；若 owner 存在、已装备、速度<1且 owner 有 vigorbuff 标签则速度+0.25上限1；若 owner 有 inventory_EquippableWalkSpeedMultModifier 函数则应用之。无副作用。"
+      "effect": "计算并返回步行速度倍率：基于self.walkspeedmult或1.0，若已装备且owner有\"vigorbuff\"标签则速度至少提升0.25至1，若owner有inventory_EquippableWalkSpeedMultModifier函数则应用之。无副作用。"
     },
     {
       "name": "IsRestricted",
-      "effect": "检查目标是否受限不能装备：若目标无 player 或 possessedbody 标签则返回 false；若 linkeditem 组件限制且用户ID不匹配则返回 true；否则若 restrictedtag 非空且目标无此标签则返回 true。无副作用。"
+      "effect": "判断目标能否装备：若target无\"player\"或\"possessedbody\"标签返回false；若linkeditem限制所有者且用户ID不匹配返回true；否则若restrictedtag非空且target无此标签返回true。无副作用。"
     },
     {
       "name": "IsRestricted_FromLoad",
-      "effect": "从加载角度检查受限：若 restrictedtag 在 SKILLTREE_EQUIPPABLE_RESTRICTED_TAGS 中且目标 prefab 匹配则视为不限制，再调用 IsRestricted。无副作用。"
+      "effect": "加载时判断限制：先查SKILLTREE_EQUIPPABLE_RESTRICTED_TAGS豁免目标prefab，再调用IsRestricted。无副作用。"
     },
     {
       "name": "ShouldPreventUnequipping",
-      "effect": "返回 self.preventunequipping == true。无副作用。"
+      "effect": "返回self.preventunequipping == true。无副作用。"
     },
     {
       "name": "SetPreventUnequipping",
-      "effect": "若 shouldprevent 为真且当前未设置，则监听 onremove 事件并设 preventunequipping=true；若为假且已设置，则移除监听并设 nil。副作用：事件监听注册/注销。"
+      "effect": "若shouldprevent为真且未设置，则监听实体\"onremove\"事件并置preventunequipping=true；若为假且已设置，则移除监听并置nil。副作用：改变监听与标志状态。"
     },
     {
       "name": "GetDapperness",
-      "effect": "计算精神值：基础 self.dapperness；若 flipdapperonmerms 且 owner 是 merm 则取负；若 dapperfn 存在则调用覆盖；若非忽略潮湿且物品潮湿则加 TUNING.WET_ITEM_DAPPERNESS。返回数值。"
+      "effect": "计算返回精神值：若flipdapperonmerms且owner为merm则取反；若dapperfn存在则调用覆盖；若未忽略潮湿且物品潮湿则加TUNING.WET_ITEM_DAPPERNESS。无副作用。"
     },
     {
       "name": "GetEquippedMoisture",
-      "effect": "返回包含 moisture 和 max 字段的表，来自 self.equippedmoisture 和 self.maxequippedmoisture。"
+      "effect": "返回包含moisture和max字段的表，值为self.equippedmoisture与self.maxequippedmoisture。无副作用。"
     }
   ],
   "events_published": [
@@ -95,67 +95,72 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      20714,
+      14697,
       20700,
-      20704,
-      13268,
-      70462,
-      16598,
-      19755,
-      18572,
-      20150
+      22459,
+      71461,
+      28457,
+      14812,
+      15567
     ],
     "aspects": [
       {
-        "aspect": "佩戴装备理智减益数值标注",
+        "aspect": "卸下及宿主死亡移除表述",
         "evidence": [
           {
-            "pageid": 20704,
-            "quote": "佩戴潮湿装备带来的理智减益：-6 点/分钟。"
+            "pageid": 15567,
+            "quote": "啜食者被卸下后（包括宿主死亡等）"
           }
         ]
       },
       {
-        "aspect": "手部装备防潮防脱落描述",
+        "aspect": "装备与穿戴动作描述",
         "evidence": [
           {
-            "pageid": 13268,
-            "quote": "其手部装备也不会因潮湿滑落。"
+            "pageid": 20714,
+            "quote": "给玩家穿戴指定服装"
+          },
+          {
+            "pageid": 20714,
+            "quote": "生成假人并穿戴所有盔甲"
+          },
+          {
+            "pageid": 22459,
+            "quote": "装备月亮蘑菇帽具有如下特殊效果"
+          },
+          {
+            "pageid": 14812,
+            "quote": "鳞甲装备后可以使玩家免疫"
+          },
+          {
+            "pageid": 71461,
+            "quote": "并且它也穿戴着原本的头部装备、手部装备和身体装备"
           }
         ]
       },
       {
-        "aspect": "穿戴装备提供防水效果描述",
+        "aspect": "装备触发状态与数值影响",
         "evidence": [
+          {
+            "pageid": 14697,
+            "quote": "装备时，背包的物品栏会显示在屏幕右侧"
+          },
+          {
+            "pageid": 22459,
+            "quote": "穿戴者饥饿值消耗速度降低25%"
+          },
+          {
+            "pageid": 22459,
+            "quote": "穿戴者将不会受到月亮孢子爆炸的伤害"
+          },
+          {
+            "pageid": 14812,
+            "quote": "穿戴鳞甲扑灭闷烧的物品不会扣除生命值"
+          },
           {
             "pageid": 20700,
-            "quote": "防水装备在穿戴时能为玩家提供防水效果。"
-          }
-        ]
-      },
-      {
-        "aspect": "绝缘状态影响伤害判定提及",
-        "evidence": [
-          {
-            "pageid": 20150,
-            "quote": "根据目标潮湿度和绝缘状态造成额外伤害"
-          }
-        ]
-      },
-      {
-        "aspect": "装备时过热与理智损耗描述",
-        "evidence": [
-          {
-            "pageid": 16598,
-            "quote": "装备时，玩家将几乎不会过热，但也会承受50潮湿度带来的高额理智值损耗"
-          }
-        ]
-      },
-      {
-        "aspect": "装备潮湿度速率关联描述",
-        "evidence": [
-          {
-            "pageid": 16598,
-            "quote": "若装备者为角色且潮湿度低于50，则提供每秒1潮湿度装备潮湿速率"
+            "quote": "防水装备在穿戴时能为玩家提供防水效果"
           }
         ]
       }
@@ -163,26 +168,25 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "装备槽",
     "穿戴",
     "卸下",
-    "移速加成",
+    "装备槽",
+    "步行速度",
     "精神值",
-    "绝缘",
+    "防潮",
     "限制装备",
-    "防卸下",
-    "潮湿",
-    "装备假人"
+    "防卸下"
   ],
   "gameplay_tags": [
     "装备",
-    "生存"
+    "生存",
+    "移动"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
     "source_bytes": 6262,
     "model": "hy3-free",
-    "generated_at_ms": 1787858081436
+    "generated_at_ms": 1787892252436
   }
 }

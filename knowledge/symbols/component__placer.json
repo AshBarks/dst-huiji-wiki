@@ -7,59 +7,63 @@
   },
   "category": "component",
   "display_name": "placer",
-  "summary": "该组件管理放置预览实体（placer）的状态数据，包括能否建造、鼠标阻挡、测试函数与轴对齐放置辅助等。它参与建造核心玩法，负责在玩家放置物品或建筑时根据输入更新预览位置、旋转与视觉效果，并触发部署辅助提示。",
+  "summary": "Placer 组件管理放置物虚影的位置、旋转、建造测试与轴对齐辅助等数据。它参与建造与部署核心玩法，在玩家操作时实时更新预览并反馈可否建造，同时联动物品栏图标与部署辅助特效。",
   "api": [
     {
       "name": "OnRemoveEntity",
-      "effect": "若 builder 存在且 hide_inv_icon 为真，向 builder 推送 'onplacerhidden' 事件；若 axisalignedhelpers 存在且其 parent 有效，移除 parent 实体并置 nil。作为 OnRemoveFromEntity 别名具有相同行为。"
+      "effect": "实体移除时调用。若 self.builder 存在且 self.hide_inv_icon 为真，向 builder 推送事件 'onplacerhidden'；若 self.axisalignedhelpers 存在且其 parent 有效，移除该 parent 实体并将 self.axisalignedhelpers 置 nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "同 OnRemoveEntity，源码中直接赋值引用。"
     },
     {
       "name": "InitializeAxisAlignedHelpers",
-      "effect": "若已有 axisalignedhelpers 且 parent 有效则移除之；使用 TUNING.AXISALIGNEDPLACEMENT_INTERVALS 与 TUNING.AXISALIGNEDPLACEMENT_CIRCLESIZE 创建偏移缓存（生成 floor decal 实体），并监听 ThePlayer 的 'refreshaxisalignedplacementintervals' 事件以重新初始化。"
+      "effect": "初始化轴对齐放置辅助缓存。若已有 axisalignedhelpers 且 parent 有效则先移除；创建基于 TUNING.AXISALIGNEDPLACEMENT_INTERVALS 与 CIRCLESIZE 的偏移缓存，并使其 parent 监听 ThePlayer 的 'refreshaxisalignedplacementintervals' 事件以重新初始化。"
     },
     {
       "name": "CanStartAxisAlignedPlacementForItem",
-      "effect": "检查全局 mod 启用状态缓存（可能设置全局变量 HAS_AXISALIGNED_MOD_ENABLED），并根据物品部署模式、可部署性与标签判断该物品是否允许轴对齐放置，返回布尔值。无实体状态修改副作用。"
+      "effect": "判断物品能否启用轴对齐放置。检查已知轴对齐模组与物品部署标签；首次调用可能设置全局变量 HAS_AXISALIGNED_MOD_ENABLED；返回布尔值，无其它副作用。"
     },
     {
       "name": "SetBuilder",
-      "effect": "设置 builder、recipe、invobject 属性；若 builder 为 ThePlayer，计算 axisalignedplacementallowedbyitem 与 axisalignedplacement（读取 Profile），并可能调用 InitializeAxisAlignedHelpers；若设置了 onbuilderset 回调则调用之；启动 WallUpdatingComponent 使组件开始更新。修改组件内部状态并可能生成辅助实体。"
+      "effect": "设置建造者、配方与物品实体。若建造者为 ThePlayer 则计算轴对齐允许标志与当前状态并可能初始化辅助；若存在 onbuilderset 回调则调用；启动 WallUpdatingComponent 使放置器开始每帧更新。"
     },
     {
       "name": "LinkEntity",
-      "effect": "将传入实体插入 linked 数组；若 lightoverride 为 nil 或大于0，对该实体 AnimState 调用 SetLightOverride(lightoverride or 1)。副作用为修改链接列表与实体光照覆盖。"
+      "effect": "将指定实体链接到放置器。插入 self.linked 列表，若 lightoverride 为 nil 或大于0则设置该实体 AnimState 的光照覆盖值。"
     },
     {
       "name": "GetDeployAction",
-      "effect": "若 invobject 非 nil，将 selected_pos 设为 inst 当前位置，根据 invobject 是否含 'boatbuilder' 标签及玩家是否持浮具决定动作类型（DEPLOY 或 DEPLOY_FLOATING），构造 BufferedAction 并添加成功回调清空 selected_pos，返回该动作。副作用为修改 selected_pos。"
+      "effect": "若 self.invobject 存在，构造并返回部署用 BufferedAction（可能为 DEPLOY 或 DEPLOY_FLOATING）。设置 self.selected_pos 为当前位置，并向动作成功回调中插入清空 selected_pos 的函数。"
     },
     {
       "name": "TestCanBuild",
-      "effect": "依次尝试 override_testfn、testfn 或默认逻辑来测试当前 inst 位置能否建造，返回 can_build 与 mouse_blocked 两个布尔值。无组件状态修改。"
+      "effect": "测试当前放置器位置能否建造。依次调用 override_testfn 或 testfn 或默认返回 true 与 false；返回 can_build 与 mouse_blocked 两个值，无副作用。"
     },
     {
       "name": "ToggleHideInvIcon",
-      "effect": "根据 hide 参数切换 hide_inv_icon 属性；当状态改变且 builder 存在且当前未鼠标阻挡时，向 builder 推送 'onplacershown' 或 'onplacerhidden' 事件。副作用为修改属性并可能推送事件。"
+      "effect": "根据参数切换 self.hide_inv_icon 状态。状态变化时若 builder 存在且 mouse_blocked 为假，向 builder 推送 'onplacershown' 或 'onplacerhidden' 事件。"
     },
     {
       "name": "IsAxisAlignedPlacement",
-      "effect": "返回 axisalignedplacement 不等于 axisalignedplacementtoggle 的布尔结果。无副作用。"
+      "effect": "返回当前是否处于轴对齐放置模式（比较 self.axisalignedplacement 与 self.axisalignedplacementtoggle），无副作用。"
     },
     {
       "name": "GetAxisAlignedPlacementTransform",
-      "effect": "根据 axisalignedhelpers 的 intervals 与 worldoffset 计算给定坐标的轴对齐网格吸附位置，返回变换后的 x, y, z。ignorescale 为 true 时返回未缩放网格坐标。无副作用。"
+      "effect": "根据传入坐标与辅助缓存的 intervals 计算轴对齐后的世界坐标；ignorescale 控制是否缩放，返回 x,y,z，无副作用。"
     },
     {
       "name": "UpdateAxisAlignedHelpers",
-      "effect": "根据 dt 与可见性状态更新轴对齐辅助缓存：移动 parent 实体、滑动已知碰撞测试、逐步更新辅助实体可见度与碰撞检测、播放动画与设置颜色。修改 axisalignedhelpers 内部累加器、索引与实体变换及动画状态。"
+      "effect": "更新轴对齐辅助显示的可见度与逐格建造测试结果。修改辅助缓存的 visibility、累加器与索引；移动 parent 实体、重算部分格子的 canbuild 并播放对应动画与颜色；无外部事件推送。"
     },
     {
       "name": "OnUpdate",
-      "effect": "核心更新：依据输入设备（控制器/鼠标）与 snap 相关属性更新 inst 位置旋转；调用 TestCanBuild 得到 can_build 与 mouse_blocked；状态改变且 hide_inv_icon 时向 builder 推送事件；调用 TriggerDeployHelpers 触发部署辅助；根据建造可行性设置 inst 与 linked 实体的颜色与显隐；更新 axisalignedhelpers 可见性并调用 UpdateAxisAlignedHelpers。大幅修改组件运行时状态与实体表现。"
+      "effect": "每帧更新放置器。根据输入或玩家位置设置虚影坐标（处理多种吸附模式）、旋转；调用 TestCanBuild 更新状态；可能推送 'onplacerhidden'/'onplacershown'；触发部署辅助 TriggerDeployHelpers；根据能否建造显示/隐藏实体及链接实体并着色；更新轴对齐辅助。"
     },
     {
       "name": "OnWallUpdate",
-      "effect": "直接调用 OnUpdate(dt)，行为与 OnUpdate 完全相同，用于兼容旧 mod 覆盖。"
+      "effect": "直接调用 OnUpdate，用于墙体更新循环。"
     }
   ],
   "events_published": [
@@ -70,40 +74,31 @@
     "refreshaxisalignedplacementintervals"
   ],
   "netvars": [],
-  "tunables": [
-    "TUNING.AXISALIGNEDPLACEMENT_INTERVALS",
-    "TUNING.AXISALIGNEDPLACEMENT_CIRCLESIZE",
-    "TUNING.AXISALIGNEDPLACEMENT_HELPERS_TIMETOSHOW",
-    "TUNING.AXISALIGNEDPLACEMENT_HELPERS_TIMETOHIDE",
-    "TUNING.AXISALIGNEDPLACEMENT_HELPERS_UPDATEPERIOD",
-    "TUNING.AXISALIGNEDPLACEMENT_HELPERS_UPDATEAMOUNT",
-    "TUNING.MAX_WALKABLE_PLATFORM_RADIUS"
-  ],
+  "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      16419,
+      19703,
+      19704,
+      24927,
+      35609,
       21620,
       18216,
-      18843,
-      24028,
-      20113,
-      24589,
-      13707,
-      14659
+      18843
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面文本均讨论实体自身的数值、掉落或行为，未提及任何与放置组件相关的建造、部署、轴对齐、链接等能力描述。",
+    "no_evidence_reason": "提供的页面摘录涉及电路板、铥矿、耐久机制、红包、发电机与投石机等实体，内容主要描述物品属性、电荷、耐久、电力储存、伤害恢复等，未出现任何与放置组件（placer）能力相关的玩家语言表达，如轴对齐放置、部署动作、建造测试、隐藏物品栏图标、墙壁更新或链接实体等。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "放置预览",
     "建造辅助",
     "轴对齐",
-    "能否建造",
-    "鼠标阻挡",
-    "部署提示",
-    "放置旋转",
-    "隐藏图标",
-    "网格对齐"
+    "部署动作",
+    "物品栏图标",
+    "网格吸附",
+    "船边吸附",
+    "地形中心"
   ],
   "gameplay_tags": [
     "建造"
@@ -113,6 +108,6 @@
     "source_sha256": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
     "source_bytes": 22544,
     "model": "hy3-free",
-    "generated_at_ms": 1787846767288
+    "generated_at_ms": 1787891784771
   }
 }

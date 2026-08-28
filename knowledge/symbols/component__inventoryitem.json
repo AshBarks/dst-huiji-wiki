@@ -7,232 +7,236 @@
   },
   "category": "component",
   "display_name": "inventoryitem",
-  "summary": "该组件管理实体作为库存物品的状态数据，如持有者、可否拾取、图像与容器限制等。它参与物品拾取、丢弃、堆叠变化以及湿度与温度模拟等核心玩法，并处理物品落地、沉没与世界状态同步。",
+  "summary": "该组件管理实体作为库存物品的状态数据，包括所有者、可拾取性、容器限制、图标与图集、湿度与温度模拟等。它参与物品拾取、丢弃、放入容器或库存、堆叠变化、落地与沉没等核心生存玩法逻辑。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除组件时调用，禁用湿度组件并取消对 stacksizechange、enterlimbo、exitlimbo 事件的监听。副作用：移除 inventoryitemmoisture 子组件及事件回调。"
+      "effect": "实体移除组件时调用，禁用湿度组件并移除对 stacksizechange、enterlimbo、exitlimbo 事件的监听。"
     },
     {
       "name": "EnableMoisture",
-      "effect": "根据 enable 布尔值添加或移除 inventoryitemmoisture 子组件；添加时会将其 replica 附加到 inventoryitem replica 上。副作用：修改实体组件结构。"
+      "effect": "启用或禁用湿度组件；禁用则移除 inventoryitemmoisture 组件，启用且缺失时添加并附加 replica。"
     },
     {
       "name": "GetMoisture",
-      "effect": "返回 inventoryitemmoisture 组件的 moisture 值，若组件不存在则返回 0。无副作用。"
+      "effect": "返回当前湿度值，无湿度组件则返回0。"
     },
     {
       "name": "GetMoisturePercent",
-      "effect": "返回当前湿度占 TUNING.MAX_WETNESS 的百分比，无 moisture 组件时返回 0。无副作用。"
+      "effect": "返回湿度占最大湿度百分比，无湿度组件返回0。"
     },
     {
       "name": "IsWet",
-      "effect": "返回 inventoryitemmoisture 组件的 iswet 状态，无组件时返回 false。无副作用。"
+      "effect": "返回是否潮湿，无湿度组件返回 false。"
     },
     {
       "name": "IsAcidSizzling",
-      "effect": "返回 self.isacidsizzling 字段值，表示是否酸液冒泡。无副作用。"
+      "effect": "返回属性 isacidsizzling 的值。"
     },
     {
       "name": "InheritMoisture",
-      "effect": "若 moisture 组件存在，调用其 InheritMoisture 方法继承指定湿度和湿润状态。无直接副作用。"
+      "effect": "若湿度组件存在，继承指定湿度和潮湿状态，改变湿度数据。"
     },
     {
       "name": "InheritWorldWetnessAtXZ",
-      "effect": "在指定坐标不在防雨穹顶下时，若 moisture 组件存在则继承世界湿度状态。副作用：可能改变物品湿度。"
+      "effect": "若不在雨罩下且湿度组件存在，继承世界湿度与潮湿状态，可能改变湿度。"
     },
     {
       "name": "InheritWorldWetnessAtTarget",
-      "effect": "若目标无 rainimmunity 组件且 moisture 组件存在，继承世界湿度状态。副作用：可能改变物品湿度。"
+      "effect": "若目标无雨免疫且湿度组件存在，继承世界湿度，可能改变湿度。"
     },
     {
       "name": "DiluteMoisture",
-      "effect": "若 moisture 组件存在，调用其 DiluteMoisture 混合湿度。副作用：改变物品湿度。"
+      "effect": "若湿度组件存在，稀释湿度（合并物品时），改变湿度。"
     },
     {
       "name": "AddMoisture",
-      "effect": "若 moisture 组件存在，调用其 DoDelta 增加湿度。副作用：改变物品湿度。"
+      "effect": "若湿度组件存在，增加湿度增量，改变湿度。"
     },
     {
       "name": "MakeMoistureAtLeast",
-      "effect": "若 moisture 组件存在，调用其 MakeMoistureAtLeast 确保最低湿度。副作用：可能改变物品湿度。"
+      "effect": "若湿度组件存在，确保湿度至少给定值，可能提升湿度。"
     },
     {
       "name": "DryMoisture",
-      "effect": "若 moisture 组件存在，将其 moisture 设为 0。副作用：物品变干。"
+      "effect": "若湿度组件存在，将湿度设为0，物品变干。"
     },
     {
       "name": "EnableTemperature",
-      "effect": "根据 enable 添加或移除 inventoryitemtemperature 子组件并附加 replica。副作用：修改组件结构。"
+      "effect": "启用或禁用温度组件；禁用则移除 inventoryitemtemperature 组件，启用且缺失时添加并附加 replica。"
     },
     {
       "name": "GetTemperature",
-      "effect": "返回 temperature 组件的温度值或 0。无副作用。"
+      "effect": "返回温度值或0。"
     },
     {
       "name": "GetTemperaturePercent",
-      "effect": "返回 temperature 组件的温度百分比或 0。无副作用。"
+      "effect": "返回温度百分比或0。"
     },
     {
       "name": "GetMinTemperature",
-      "effect": "返回 temperature 组件的最低温度或 0。无副作用。"
+      "effect": "返回最小温度或0。"
     },
     {
       "name": "GetMaxTemperature",
-      "effect": "返回 temperature 组件的最高温度或 0。无副作用。"
+      "effect": "返回最大温度或0。"
     },
     {
       "name": "SetTemperature",
-      "effect": "若 temperature 组件存在则设置其温度。副作用：改变物品温度。"
+      "effect": "若温度组件存在，设置温度，改变温度数据。"
     },
     {
       "name": "SetMinTemperature",
-      "effect": "若 temperature 组件存在则设置最低温度。副作用：改变温度范围。"
+      "effect": "若温度组件存在，设置最小温度限制。"
     },
     {
       "name": "SetMaxTemperature",
-      "effect": "若 temperature 组件存在则设置最高温度。副作用：改变温度范围。"
+      "effect": "若温度组件存在，设置最大温度限制。"
     },
     {
       "name": "SetTemperatureModifier",
-      "effect": "若 temperature 组件存在则设置命名修正值。副作用：影响温度计算。"
+      "effect": "若温度组件存在，设置命名温度修正值，改变温度计算。"
     },
     {
       "name": "RemoveTemperatureModifier",
-      "effect": "若 temperature 组件存在则移除命名修正。副作用：影响温度计算。"
+      "effect": "若温度组件存在，移除命名修正，改变温度计算。"
     },
     {
       "name": "DiluteTemperature",
-      "effect": "若 temperature 组件存在则混合温度。副作用：改变物品温度。"
+      "effect": "若温度组件存在，稀释温度，改变温度。"
     },
     {
       "name": "AddTemperature",
-      "effect": "若 temperature 组件存在则调用 DoDelta 改变温度。副作用：改变物品温度。"
+      "effect": "若温度组件存在，增加温度增量，改变温度。"
     },
     {
       "name": "SetTemperatureMaxMoisturePenalty",
-      "effect": "若 temperature 组件存在则设置最大湿度惩罚。副作用：影响湿度相关惩罚。"
+      "effect": "若温度组件存在，设置最大湿度惩罚参数。"
     },
     {
       "name": "SetTemperaturePercentAtMost",
-      "effect": "若 temperature 组件存在则设置至多百分比温度。副作用：改变物品温度。"
+      "effect": "若温度组件存在，设置温度百分比上限，可能降低温度。"
     },
     {
       "name": "SetOwner",
-      "effect": "直接设置 self.owner 为指定实体。副作用：改变物品持有者引用。"
+      "effect": "直接设置 owner 属性为给定实体，改变所有者引用。"
     },
     {
       "name": "ClearOwner",
-      "effect": "将 self.owner 设为 nil。副作用：清除持有者引用。"
+      "effect": "将 owner 属性置 nil，清除引用。"
     },
     {
       "name": "SetOnDroppedFn",
-      "effect": "设置 self.ondropfn 回调函数，在物品掉落时调用。无即时副作用。"
+      "effect": "设置丢弃时回调函数 ondropfn。"
     },
     {
       "name": "SetOnActiveItemFn",
-      "effect": "废弃方法，设置 self.onactiveitemfn 回调。无即时副作用。"
+      "effect": "弃用方法，设置激活物品回调 onactiveitemfn。"
     },
     {
       "name": "SetOnPickupFn",
-      "effect": "设置 self.onpickupfn 回调，在拾取时调用。无即时副作用。"
+      "effect": "设置拾取时回调函数 onpickupfn。"
     },
     {
       "name": "SetOnPutInInventoryFn",
-      "effect": "设置 self.onputininventoryfn 回调，在放入库存时调用。无即时副作用。"
+      "effect": "设置放入库存回调函数 onputininventoryfn。"
     },
     {
       "name": "SetSinks",
-      "effect": "设置 self.sinks 布尔值；若已落地则立即尝试沉没。副作用：可能触发沉没。"
+      "effect": "设置 sinks 属性，若已落地则尝试触发沉没任务。"
     },
     {
       "name": "GetSlotNum",
-      "effect": "若持有者存在，返回其在容器或库存中的槽位号，否则 nil。无副作用。"
+      "effect": "返回物品在所有者容器或库存中的槽位号，无则返回 nil。"
     },
     {
       "name": "GetContainer",
-      "effect": "返回持有者的 container 或 inventory 组件引用，无持有者则返回 nil。无副作用。"
+      "effect": "返回所有者的容器或库存组件实例，无则返回 nil。"
     },
     {
       "name": "HibernateLivingItem",
-      "effect": "若实体有 brain 组件则休眠大脑，并杀死所有声音。副作用：生物停止思考与发声。"
+      "effect": "若实体有 brain 组件则通过 BrainManager 休眠，并杀死所有声音。"
     },
     {
       "name": "WakeLivingItem",
-      "effect": "若实体有 brain 组件则唤醒大脑。副作用：生物恢复思考。"
+      "effect": "若实体有 brain 组件则唤醒。"
     },
     {
       "name": "OnPutInInventory",
-      "effect": "设置持有者、将实体作为子物体移除场景并休眠，触发回调与推送 onputininventory 事件；若自身有容器则对其槽内物品推送 onownerputininventory。副作用：实体离开场景、事件发布。"
+      "effect": "处理放入所有者库存：设置所有者、成为子物体、移出场景、休眠、调用回调并推送 onputininventory 事件；若自身有容器则对其内含物推送 onownerputininventory。"
     },
     {
       "name": "OnRemoved",
-      "effect": "从持有者移除子物体、清除持有者、返回场景并唤醒生物。副作用：实体重新出现在场景。"
+      "effect": "从所有者移除子物体关系，清除所有者，返回场景，唤醒生物。"
     },
     {
       "name": "OnDropped",
-      "effect": "从持有者移除并做掉落物理，触发掉落回调与 ondropped 事件；若自身有容器则对槽内物品推送 onownerdropped；若有 propagator 则延迟传播。副作用：实体掉落世界、事件发布。"
+      "effect": "处理丢弃：移除、应用物理抛落、调用丢弃回调、推送 ondropped；若自身有容器则对内含物推送 onownerdropped；若有传播器则延迟。"
     },
     {
       "name": "DoDropPhysics",
-      "effect": "设置落地状态并根据随机方向或定点进行物理位移或瞬移。副作用：改变实体位置与速度。"
+      "effect": "执行丢弃物理：设置落地状态，根据随机方向计算速度并传送、设置物理速度或直接设置位置。"
     },
     {
       "name": "OnPickup",
-      "effect": "取消落地状态，处理新物品统计、熄灭闷烧并对拾取者造成火灾伤害，推送 onpickup 事件并返回回调结果。副作用：可能伤害拾取者、改变物品状态与事件发布。"
+      "effect": "处理拾取：取消落地、统计新物品、熄灭阴燃、推送 onpickup 事件，调用拾取回调；返回回调返回值（可能指示销毁）。"
     },
     {
       "name": "IsHeld",
-      "effect": "返回 self.owner 是否非 nil。无副作用。"
+      "effect": "返回 owner 是否非空，即是否被持有。"
     },
     {
       "name": "IsHeldBy",
-      "effect": "返回 self.owner 是否等于指定实体。无副作用。"
+      "effect": "返回 owner 是否等于给定实体。"
     },
     {
       "name": "ChangeImageName",
-      "effect": "设置 imagename 并推送 imagechange 事件。副作用：改变物品图像与事件发布。"
+      "effect": "改变 imagename 属性并推送 imagechange 事件，更新图标。"
     },
     {
       "name": "RemoveFromOwner",
-      "effect": "从持有者的库存或容器中移除该物品并返回。副作用：物品脱离持有者。"
+      "effect": "从所有者的库存或容器中移除该物品，返回被移除物品，改变所有者库存。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "从持有者库存或容器移除物品，并向世界推送 forgetinventoryitem 事件。副作用：物品被移除、世界事件发布。"
+      "effect": "从所有者移除物品（处理库存或容器），并向世界推送 forgetinventoryitem 事件，清理引用。"
     },
     {
       "name": "GetGrandOwner",
-      "effect": "递归查找最终持有者（非库存物品）并返回。无副作用。"
+      "effect": "递归获取最终所有者（若所有者也是库存物品则继续向上），无则返回 nil。"
     },
     {
       "name": "IsSheltered",
-      "effect": "若被持有且持有者容器或防水库存则返回 true。无副作用。"
+      "effect": "返回是否持有且在防水容器或防水库存中。"
     },
     {
       "name": "SetLanded",
-      "effect": "设置落地状态，控制组件更新与推送 on_landed / on_no_longer_landed 事件，落地时尝试沉没。副作用：事件发布、可能沉没、更新组件开关。"
+      "effect": "设置落地状态，控制组件更新轮询，状态转变时推送 on_landed 或 on_no_longer_landed 事件，落地时尝试沉没。"
     },
     {
       "name": "ShouldSink",
-      "effect": "若未被持有且不在 limbo，检查地图点可否通行以决定是否应沉没。无副作用。"
+      "effect": "判断未持有且不在 limbo 时位置是否不可通行（根据 sinks）以决定是否沉没。"
     },
     {
       "name": "TryToSink",
-      "effect": "若 ShouldEntitySink 判定为真，则延迟任务沉没实体。副作用：可能安排实体沉没。"
+      "effect": "若判定应沉没，则安排任务沉没实体，可能延迟销毁。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧检测物理速度与高度以判定落地状态。副作用：可能调用 SetLanded 改变状态。"
+      "effect": "组件更新时检测物理速度和高度以判定落地，调用 SetLanded 改变落地状态。"
     }
   ],
   "events_published": [
+    "stacksizechange",
     "onputininventory",
+    "onownerputininventory",
     "ondropped",
+    "onownerdropped",
     "onpickup",
     "imagechange",
     "on_no_longer_landed",
-    "on_landed"
+    "on_landed",
+    "forgetinventoryitem"
   ],
   "events_listened": [
     "stacksizechange",
@@ -240,99 +244,59 @@
     "exitlimbo"
   ],
   "netvars": [],
-  "tunables": [],
+  "tunables": [
+    "TUNING.MAX_WETNESS",
+    "TUNING.SMOTHER_DAMAGE"
+  ],
   "wiki": {
     "scanned_pageids": [
-      53270,
-      70462,
-      73231,
-      14485,
-      14688,
-      16185,
-      18504,
-      18525
+      18572,
+      23187,
+      18219,
+      15922,
+      35609,
+      19952,
+      34314,
+      14695
     ],
     "aspects": [
       {
-        "aspect": "物品携带与拾取掉落联动",
+        "aspect": "暖石自身温度及范围标注",
         "evidence": [
           {
-            "pageid": 53270,
-            "quote": "配合薇机人或瓦器人自动拾取掉落物"
+            "pageid": 18572,
+            "quote": "暖石自身具有的温度，初始为 35 度，上限为 90 度，下限为 -20 度"
           },
           {
-            "pageid": 70462,
-            "quote": "玩家携带的干燥剂会有一个“滴水”动画"
-          },
-          {
-            "pageid": 18504,
-            "quote": "不会去拾取掉落于地上的露西斧"
-          }
-        ]
-      },
-      {
-        "aspect": "物品沉水行为",
-        "evidence": [
-          {
-            "pageid": 18525,
-            "quote": "使其沉入水中"
-          }
-        ]
-      },
-      {
-        "aspect": "物品温度数值与升降标注",
-        "evidence": [
-          {
-            "pageid": 73231,
-            "quote": "具有物品温度，最高90度，最低0度，初始为90度"
-          },
-          {
-            "pageid": 14688,
-            "quote": "增加20点潮湿度或物品潮湿度，降低5点温度"
-          }
-        ]
-      },
-      {
-        "aspect": "物品潮湿度数值标注",
-        "evidence": [
-          {
-            "pageid": 14688,
-            "quote": "增加20点潮湿度或物品潮湿度，降低5点温度"
-          },
-          {
-            "pageid": 16185,
-            "quote": "实体会每秒增加1点潮湿度（或5物品潮湿度）"
-          },
-          {
-            "pageid": 14485,
-            "quote": "浇水位置2.25距离单位内的所有可潮湿物"
+            "pageid": 14695,
+            "quote": "类似于玩家，暖石自身具有温度，其温度的变化规律与玩家温度类似。"
           }
         ]
       }
     ],
-    "coverage_status": "well_documented"
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "拾取掉落",
-    "物品潮湿",
-    "物品温度",
-    "沉入水中",
-    "堆叠变更",
-    "容器限制",
-    "锁定槽位",
-    "酸蚀状态",
-    "图像替换"
+    "捡起",
+    "扔下",
+    "淋湿",
+    "温度",
+    "沉底",
+    "堆叠",
+    "背包",
+    "口袋",
+    "图标",
+    "归属"
   ],
   "gameplay_tags": [
-    "物品管理",
     "生存",
-    "环境交互"
+    "物品"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
     "source_bytes": 17987,
     "model": "hy3-free",
-    "generated_at_ms": 1787856553849
+    "generated_at_ms": 1787891529134
   }
 }

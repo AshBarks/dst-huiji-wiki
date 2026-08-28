@@ -7,19 +7,15 @@
   },
   "category": "component",
   "display_name": "fuel",
-  "summary": "该组件管理实体的燃料值（fuelvalue）、燃料类型（fueltype）及被取走时的回调（ontaken）。它参与燃料消耗核心玩法：当实体作为燃料被拿取时，组件推送事件并调用回调，同时根据燃料类型在实体上维护对应的'_fuel'标签以供其他系统识别。",
+  "summary": "该组件管理实体的燃料值与燃料类型，并依据类型为实体添加对应的燃料标签。当燃料被其他实体拿走时，组件会推送 fueltaken 事件并执行预设回调，参与生存玩法中的燃烧与能量供给。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "若 self.fueltype 不为 nil，移除实体上 self.fueltype..'_fuel' 标签。"
-    },
-    {
       "name": "SetOnTakenFn",
-      "effect": "将传入的函数 fn 保存为组件的 ontaken 回调（self.ontaken = fn），无其他副作用。"
+      "effect": "将组件实例的 ontaken 字段设为传入函数 fn，用于燃料被拿走时调用。仅存储回调，无立即副作用。"
     },
     {
       "name": "Taken",
-      "effect": "推送事件 'fueltaken' 并携带 {taker = target}；若 ontaken 已设置则调用之，传入 self.inst 和 target。"
+      "effect": "向实体推送事件 \"fueltaken\"（参数 {taker = target}），若已设置 ontaken 回调则调用之（传入 self.inst 与 target）。副作用：触发事件监听者与回调逻辑。"
     }
   ],
   "events_published": [
@@ -30,28 +26,65 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      28610,
       18216,
-      20061,
+      28610,
       21620,
-      51388,
+      20061,
       10374,
-      14792,
-      15170
+      51388,
+      10413,
+      14792
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面摘录均围绕燃料值、添加燃料、燃烧时长、燃料上限等概念展开，未出现燃料被取走(Taken)、从实体移除(OnRemoveFromEntity)或设置取走回调(SetOnTakenFn)等玩家可见行为或描述。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "宝石燃料消耗顺序与剩余掉落",
+        "evidence": [
+          {
+            "pageid": 21620,
+            "quote": "随着使用，宝石发电机会以由上至下的顺序消耗其中的宝石"
+          },
+          {
+            "pageid": 21620,
+            "quote": "宝石发电机被摧毁时会掉落其中消耗不足 1 单位电力的宝石"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料燃尽阈值掉落联动",
+        "evidence": [
+          {
+            "pageid": 20061,
+            "quote": "单次燃尽前燃料值达到过上限的75%以上时会掉落一个木炭"
+          },
+          {
+            "pageid": 51388,
+            "quote": "如果兔灯曾有过 75% 以上的燃料，还会在熄灭时产生一"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料空转消耗速率标注",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "空转消耗速度0.1/s"
+          },
+          {
+            "pageid": 14792,
+            "quote": "燃料填满的情况下能够使用 5 天"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "燃料值",
     "燃料类型",
     "燃料标签",
     "被取走",
-    "燃料事件",
     "燃料回调",
-    "设置回调",
-    "移除标签"
+    "添加燃料"
   ],
   "gameplay_tags": [
     "生存"
@@ -61,6 +94,6 @@
     "source_sha256": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
     "source_bytes": 783,
     "model": "hy3-free",
-    "generated_at_ms": 1787858751852
+    "generated_at_ms": 1787892566778
   }
 }

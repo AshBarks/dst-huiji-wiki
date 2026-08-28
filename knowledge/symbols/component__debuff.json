@@ -7,43 +7,43 @@
   },
   "category": "component",
   "display_name": "debuff",
-  "summary": "该组件管理实体所承载的减益效果实例，存储减益名称、目标及多种生命周期回调函数。它通过预设回调与 debuffable 组件配合，参与减益的附加、延长、视觉跟随与解除等核心玩法逻辑。",
+  "summary": "Debuff组件管理实体作为减益效果时的名称、目标及附着、脱离、延长、变更跟随符号的回调函数。它参与减益状态的生命周期控制，通过与debuffable组件协同实现减益的附加与移除等核心玩法。",
   "api": [
     {
       "name": "SetAttachedFn",
-      "effect": "将传入的函数赋值给内部回调字段 onattachedfn，用于附加时调用。仅修改组件内部状态，无其它副作用。"
+      "effect": "将传入函数赋值给内部字段 onattachedfn，用于设置减益附着时的回调，无额外副作用。"
     },
     {
       "name": "SetDetachedFn",
-      "effect": "将传入的函数赋值给内部回调字段 ondetachedfn，用于分离时调用。仅存储函数引用。"
+      "effect": "将传入函数赋值给内部字段 ondetachedfn，用于设置减益脱离时的回调，无额外副作用。"
     },
     {
       "name": "SetExtendedFn",
-      "effect": "将传入的函数赋值给内部回调字段 onextendedfn，用于延长时调用。仅存储函数引用。"
+      "effect": "将传入函数赋值给内部字段 onextendedfn，用于设置减益延长时的回调，无额外副作用。"
     },
     {
       "name": "SetChangeFollowSymbolFn",
-      "effect": "将传入的函数赋值给内部回调字段 onchangefollowsymbolfn，用于跟随符号变更时调用。仅存储函数引用。"
+      "effect": "将传入函数赋值给内部字段 onchangefollowsymbolfn，用于设置跟随符号变更时的回调，无额外副作用。"
     },
     {
       "name": "Stop",
-      "effect": "若 self.target 存在，则调用 self.target:RemoveDebuff(self.name) 请求移除该减益；否则无操作。副作用：触发目标实体的减益移除流程。"
+      "effect": "若当前存在目标 target，则调用目标的 RemoveDebuff 方法并传入减益名称 name，从而请求移除该减益，产生移除副作用。"
     },
     {
       "name": "AttachTo",
-      "effect": "仅应由 debuffable 组件调用。设置 self.name 与 self.target，若 onattachedfn 不为空则调用之，传入实例、目标、跟随符号、偏移、数据与缓冲。副作用：建立减益关联并执行附加回调。"
+      "effect": "仅应由 debuffable 组件调用。记录减益名称与目标实体，若已设置 onattachedfn 则调用之，传入自身实例、目标及跟随符号等参数，完成附着初始化。"
     },
     {
       "name": "OnDetach",
-      "effect": "仅应由 debuffable 组件调用。保存当前目标引用，清空 self.name 与 self.target，若 ondetachedfn 不为空则调用并传入实例与原目标。副作用：解除减益关联并执行分离回调。"
+      "effect": "仅应由 debuffable 组件调用。清除内部 name 与 target 引用，若已设置 ondetachedfn 则调用之，传入自身实例与原目标，完成脱离清理。"
     },
     {
       "name": "Extend",
-      "effect": "若 onextendedfn 不为空，则调用之并传入实例、self.target 及跟随符号、偏移、数据与缓冲。用于延长减益或更新信息，无直接状态修改仅触发回调。"
+      "effect": "若已设置 onextendedfn 则调用之，传入自身实例、当前目标及跟随符号等参数，用于触发减益延长逻辑，无直接移除行为。"
     },
     {
       "name": "ChangeFollowSymbol",
-      "effect": "仅应由 debuffable 组件调用。若 onchangefollowsymbolfn 不为空，则调用并传入实例、self.target 及新跟随符号与偏移。副作用：触发跟随符号变更回调。"
+      "effect": "仅应由 debuffable 组件调用。若已设置 onchangefollowsymbolfn 则调用之，传入自身实例、当前目标及新跟随符号参数，用于更新减益视觉跟随位置。"
     }
   ],
   "events_published": [],
@@ -52,23 +52,57 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      16197,
+      13570,
+      20700,
       13156,
-      18838,
-      15539
+      19129,
+      20704,
+      72238,
+      10418
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面摘录仅提及“减益效果”一词描述角色状态或伤害数值，未体现 debuff 组件的附加、分离、扩展、改变跟随符号等具体能力（如 SetAttachedFn、AttachTo、Extend 等）对应的玩家语言行为，故无证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "减益施加于实体描述",
+        "evidence": [
+          {
+            "pageid": 13570,
+            "quote": "受到 -5理智值/分钟的理智值减益"
+          },
+          {
+            "pageid": 13156,
+            "quote": "获得巨大的减益效果"
+          },
+          {
+            "pageid": 20700,
+            "quote": "潮湿度本身导致的理智值减益"
+          },
+          {
+            "pageid": 20704,
+            "quote": "佩戴潮湿装备带来的理智减益：-6 点/分钟"
+          },
+          {
+            "pageid": 72238,
+            "quote": "获得满额的增益与减益"
+          },
+          {
+            "pageid": 10418,
+            "quote": "获得满额的增益与减益"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "减益效果",
+    "减益",
     "负面状态",
-    "附加减益",
-    "解除减益",
+    "状态附着",
+    "移除减益",
     "延长减益",
     "跟随符号",
-    "停止减益",
-    "清除减益"
+    "目标移除",
+    "组件回调"
   ],
   "gameplay_tags": [
     "战斗",
@@ -79,6 +113,6 @@
     "source_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
     "source_bytes": 1753,
     "model": "hy3-free",
-    "generated_at_ms": 1787861543959
+    "generated_at_ms": 1787893991811
   }
 }

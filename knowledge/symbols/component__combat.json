@@ -7,151 +7,151 @@
   },
   "category": "component",
   "display_name": "combat",
-  "summary": "Combat组件管理实体的战斗状态数据，包括攻击范围、冷却时间、当前目标、伤害倍率与各类攻击回调。它参与核心战斗玩法，处理目标选取、伤害计算、攻击执行、受击响应、仇恨共享与范围攻击等逻辑。",
+  "summary": "战斗组件管理实体的攻击范围、伤害、冷却、当前目标及仇恨规则等数据。它参与核心战斗玩法，处理攻击发起、伤害计算、被击反馈、目标追踪与丢失、范围攻击及仇恨共享等。",
   "api": [
     {
       "name": "SetLastTarget",
-      "effect": "设置最后攻击目标GUID并通过replica同步最后目标网络数据。"
+      "effect": "设置最后攻击目标，更新 lasttargetGUID 并通知 replica 记录最后目标。"
     },
     {
       "name": "SetAttackPeriod",
-      "effect": "设置最小攻击间隔min_attack_period。"
+      "effect": "设置最小攻击间隔 min_attack_period。"
     },
     {
       "name": "TargetIs",
-      "effect": "返回传入目标是否为当前战斗目标。"
+      "effect": "返回给定目标是否为当前目标。"
     },
     {
       "name": "InCooldown",
-      "effect": "返回当前是否处于攻击冷却中。"
+      "effect": "根据上次攻击时间与间隔返回是否处于冷却。"
     },
     {
       "name": "GetCooldown",
-      "effect": "返回剩余冷却时间，无则返回0。"
+      "effect": "返回剩余冷却时间，若未攻击过则返回0。"
     },
     {
       "name": "ResetCooldown",
-      "effect": "将最后攻击开始时间置空，清除冷却状态。"
+      "effect": "清空上次攻击时间以重置冷却（亦为 CancelAttack 别名）。"
     },
     {
       "name": "RestartCooldown",
-      "effect": "将最后攻击开始时间设为当前时间，重启冷却。"
+      "effect": "将上次攻击时间设为当前以重启冷却。"
     },
     {
       "name": "OverrideCooldown",
-      "effect": "根据传入冷却值调整最后攻击开始时间以覆盖剩余冷却。"
+      "effect": "按给定值覆盖冷却计算基准。"
     },
     {
       "name": "SetRange",
-      "effect": "设置攻击与命中范围，触发回调同步攻击范围至客户端。"
+      "effect": "设置攻击范围与命中范围（命中范围默认同攻击范围）。"
     },
     {
       "name": "SetHitArc",
-      "effect": "设置命中弧线角度参数hitarc。"
+      "effect": "设置命中弧度参数 hitarc。"
     },
     {
       "name": "SetPlayerStunlock",
-      "effect": "设置玩家击晕锁定参数playerstunlock。"
+      "effect": "设置 playerstunlock 字段。"
     },
     {
       "name": "SetAreaDamage",
-      "effect": "配置范围伤害的距离、比例与检查函数；距离空则禁用。"
+      "effect": "设置范围伤害的距离、比例及检查函数，更新相关字段。"
     },
     {
       "name": "EnableAreaDamage",
-      "effect": "根据传入参数启用或禁用范围伤害(设置areahitdisabled)。"
+      "effect": "根据传入值取反设置 areahitdisabled 开关。"
     },
     {
       "name": "BlankOutAttacks",
-      "effect": "临时禁止攻击并设定定时任务在指定时间后恢复。"
+      "effect": "临时禁止攻击并定时恢复，期间 canattack 为 false。"
     },
     {
       "name": "ShareTarget",
-      "effect": "在范围内寻找其他战斗实体并建议它们将目标设为传入目标，实现仇恨共享。"
+      "effect": "在范围内寻找战斗实体并建议它们以指定目标为目标，实现仇恨共享。"
     },
     {
       "name": "SetDefaultDamage",
-      "effect": "设置基础伤害值defaultdamage。"
+      "effect": "设置默认伤害值 defaultdamage。"
     },
     {
       "name": "SetOnHit",
-      "effect": "设置受击回调函数onhitfn。"
+      "effect": "设置被攻击时的回调函数 onhitfn。"
     },
     {
       "name": "SetCanSuggestTargetFn",
-      "effect": "设置能否建议目标的函数cansuggesttargetfn。"
+      "effect": "设置可否被建议目标的函数。"
     },
     {
       "name": "SuggestTarget",
-      "effect": "若当前无目标且通过检查，则设定目标并返回true。"
+      "effect": "若当前无目标且通过检查，则设置目标并返回 true。"
     },
     {
       "name": "SetKeepTargetFunction",
-      "effect": "设置保持目标的函数keeptargetfn。"
+      "effect": "设置保持目标条件函数 keeptargetfn。"
     },
     {
       "name": "TryRetarget",
-      "effect": "根据重试目标函数尝试更换战斗目标，可能改变当前目标。"
+      "effect": "根据 targetfn 尝试重新选择目标并可能切换。"
     },
     {
       "name": "SetRetargetFunction",
-      "effect": "设置重试目标函数与周期，并创建周期任务（若实体清醒）。"
+      "effect": "设置周期性重新选标函数及任务，管理 retargettask。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "实体睡眠时取消重试目标周期任务。"
+      "effect": "实体睡眠时取消重新选标任务。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "实体唤醒时重建重试目标任务，必要时启动目标更新。"
+      "effect": "实体唤醒时恢复重新选标任务及更新组件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧更新，若目标失效或保持目标检查失败则丢弃目标。"
+      "effect": "组件更新时检查保持目标条件，失败则推送丢失目标并丢弃。"
     },
     {
       "name": "IsRecentTarget",
-      "effect": "检查传入目标是否为当前或最近目标。"
+      "effect": "判断目标是否为当前或最近目标。"
     },
     {
       "name": "StartTrackingTarget",
-      "effect": "为目标添加丢失/移除/转移等事件监听以管理目标。"
+      "effect": "开始监听目标的进入遗忘、移除、转移目标、领袖变更事件。"
     },
     {
       "name": "StopTrackingTarget",
-      "effect": "移除对目标的相关事件监听。"
+      "effect": "停止监听上述目标事件。"
     },
     {
       "name": "DropTarget",
-      "effect": "清除当前目标，记录最后目标，停止追踪与更新，可能推送droppedtarget事件。"
+      "effect": "丢弃当前目标，记录最后目标并停止追踪，推送 droppedtarget 事件。"
     },
     {
       "name": "EngageTarget",
-      "effect": "设定新目标，推送newcombattarget事件，开始追踪，可能解除跟随关系。"
+      "effect": "设置新目标，推送 newcombattarget 事件并开始追踪，可能解除跟随。"
     },
     {
       "name": "SetShouldAggroFn",
-      "effect": "设置判断应否产生仇恨的函数shouldaggrofn。"
+      "effect": "设置自定义仇恨判定函数 shouldaggrofn。"
     },
     {
       "name": "SetShouldAvoidAggro",
-      "effect": "增加特定目标在避免仇恨表中的计数。"
+      "effect": "在临时避免仇恨表中增加目标计数。"
     },
     {
       "name": "RemoveShouldAvoidAggro",
-      "effect": "减少避免仇恨表计数，归零则移除。"
+      "effect": "减少避免仇恨计数，归零则移除。"
     },
     {
       "name": "ShouldAggro",
-      "effect": "综合回调、避免表、禁止标签等判断能否对目标产生仇恨。"
+      "effect": "综合自定义函数、避免表、禁止标签等判定是否应对目标仇恨。"
     },
     {
       "name": "AddNoAggroTag",
-      "effect": "向禁止仇恨标签表forbiddenaggrotags添加标签。"
+      "effect": "添加禁止仇恨标签至 forbiddenaggrotags。"
     },
     {
       "name": "RemoveNoAggroTag",
-      "effect": "从禁止仇恨标签表移除标签。"
+      "effect": "从禁止仇恨标签表中移除标签。"
     },
     {
       "name": "SetNoAggroTags",
@@ -159,51 +159,51 @@
     },
     {
       "name": "SetTarget",
-      "effect": "验证后丢弃旧目标并 engagement 新目标，可能推送相关事件。"
+      "effect": "验证后设置新目标，丢弃旧目标并触发交战。"
     },
     {
       "name": "IsValidTarget",
-      "effect": "通过replica检查目标是否为有效攻击目标。"
+      "effect": "通过 replica 检查目标是否有效。"
     },
     {
       "name": "ValidateTarget",
-      "effect": "若当前目标无效则丢弃目标。"
+      "effect": "验证当前目标有效性，无效则丢弃。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回战斗相关调试信息字符串。"
+      "effect": "返回包含目标、伤害、距离等调试信息字符串。"
     },
     {
       "name": "GetGiveUpString",
-      "effect": "返回放弃目标的台词（默认nil，可重载）。"
+      "effect": "返回放弃目标语音字符串（默认 nil）。"
     },
     {
       "name": "GiveUp",
-      "effect": "推送giveuptarget事件并丢弃目标，可能通过talker说话。"
+      "effect": "推送 giveuptarget 事件并丢弃目标，可能通过 talker 说话。"
     },
     {
       "name": "GetBattleCryString",
-      "effect": "返回战斗呐喊台词（默认nil，可重载）。"
+      "effect": "返回战吼字符串（默认 nil）。"
     },
     {
       "name": "ResetBattleCryCooldown",
-      "effect": "设置下次战斗呐喊的时间。"
+      "effect": "设置下次战吼时间。"
     },
     {
       "name": "BattleCry",
-      "effect": "若启用且冷却结束，重置冷却并说话或播放taunt动画。"
+      "effect": "若冷却已过且启用，触发说话或 taunt 状态。"
     },
     {
       "name": "SetHurtSound",
-      "effect": "设置受击声音hurtsound。"
+      "effect": "设置受伤音效 hurtsound。"
     },
     {
       "name": "GetAttacked",
-      "effect": "处理实体受击：计算伤害减免、反射、应用生命变化，推送attacked或blocked事件，触发回调与声音。"
+      "effect": "处理被攻击：计算伤害、护甲、反射、推送 attacked/blocked 等事件，返回是否未被阻挡。"
     },
     {
       "name": "GetImpactSound",
-      "effect": "根据目标与武器标签返回撞击音效事件名。"
+      "effect": "根据目标与武器返回对应命中音效标识符。"
     },
     {
       "name": "StartAttack",
@@ -211,47 +211,47 @@
     },
     {
       "name": "CancelAttack",
-      "effect": "别名ResetCooldown，清除冷却起始时间。"
+      "effect": "同 ResetCooldown，取消攻击冷却。"
     },
     {
       "name": "CanTarget",
-      "effect": "通过replica检查能否将某实体设为攻击目标。"
+      "effect": "通过 replica 判断给定目标能否被设为攻击目标。"
     },
     {
       "name": "HasTarget",
-      "effect": "返回当前是否有战斗目标。"
+      "effect": "返回当前是否有目标。"
     },
     {
       "name": "CanAttack",
-      "effect": "检查目标有效、可攻击、不在冷却、状态允许且距离范围内。"
+      "effect": "检查目标有效性、许可、冷却及距离判断能否攻击。"
     },
     {
       "name": "LocomotorCanAttack",
-      "effect": "类似CanAttack但考虑移动器与地形空隙，返回可达与有效信息。"
+      "effect": "结合移动到达状态与距离等判断能否攻击。"
     },
     {
       "name": "TryAttack",
-      "effect": "若可攻击则推送doattack事件并返回true，否则false。"
+      "effect": "尝试发起攻击，若可攻击则推送 doattack 事件并返回 true。"
     },
     {
       "name": "ForceAttack",
-      "effect": "尝试攻击或强制推送doattack事件。"
+      "effect": "强制尝试攻击或推送 doattack 事件。"
     },
     {
       "name": "GetWeapon",
-      "effect": "返回手中符合条件的武器实体或nil。"
+      "effect": "返回手中装备的适用武器实体或 nil。"
     },
     {
       "name": "GetLastAttackedTime",
-      "effect": "返回最后一次被攻击的时间戳。"
+      "effect": "返回最后被攻击的时间戳。"
     },
     {
       "name": "CalcDamage",
-      "effect": "计算对目标的基础与特殊伤害，考虑武器、坐骑、buff等乘子。"
+      "effect": "计算对目标的基础伤害与特殊伤害，考虑武器、乘数、骑乘等。"
     },
     {
       "name": "CalcReflectedDamage",
-      "effect": "计算目标反射回自身的伤害并填充反射列表。"
+      "effect": "计算目标反射给自身的伤害与特殊伤害，填充反射列表。"
     },
     {
       "name": "GetAttackRange",
@@ -259,7 +259,7 @@
     },
     {
       "name": "CalcAttackRangeSq",
-      "effect": "返回攻击范围平方（含目标物理半径）。"
+      "effect": "计算含目标物理半径的攻击范围平方。"
     },
     {
       "name": "GetHitRange",
@@ -267,19 +267,19 @@
     },
     {
       "name": "CalcHitRangeSq",
-      "effect": "返回命中范围平方。"
+      "effect": "计算含目标物理半径的命中范围平方。"
     },
     {
       "name": "CanExtinguishTarget",
-      "effect": "检查目标是否可被武器或自身熄灭。"
+      "effect": "判断目标可否被熄灭（燃烧状态与灭火器标签）。"
     },
     {
       "name": "CanLightTarget",
-      "effect": "检查目标是否可被点燃。"
+      "effect": "判断目标可否被武器点燃。"
     },
     {
       "name": "CanHitTarget",
-      "effect": "综合范围、弧线、投射物等检查能否命中目标。"
+      "effect": "判断能否命中目标（距离、弧度、特殊条件）。"
     },
     {
       "name": "ClearAttackTemps",
@@ -287,185 +287,177 @@
     },
     {
       "name": "DoAttack",
-      "effect": "执行攻击：验证命中、处理投射物、造成伤害、触发范围攻击与反射伤害，推送相关事件。"
+      "effect": "执行攻击：验证命中、处理抛射物、计算伤害与反射、范围攻击、推送事件。"
     },
     {
       "name": "SetRequiresToughCombat",
-      "effect": "设置tough字段以要求强硬战斗。"
+      "effect": "设置 tough 字段标记需要强力战斗。"
     },
     {
       "name": "SetShouldRecoilFn",
-      "effect": "设置反击判断函数shouldrecoilfn。"
+      "effect": "设置反击判定函数 shouldrecoilfn。"
     },
     {
       "name": "ShouldRecoil",
-      "effect": "根据回调或tough判断反击与剩余伤害。"
+      "effect": "判定是否反击及返回剩余伤害。"
     },
     {
       "name": "AddConditionExternalDamageTakenMultiplier",
-      "effect": "添加条件性额外受伤乘子函数。"
+      "effect": "添加条件外部受伤乘数函数。"
     },
     {
       "name": "RemoveConditionExternalDamageTakenMultiplier",
-      "effect": "移除条件性额外受伤乘子函数。"
+      "effect": "移除条件外部受伤乘数函数。"
     },
     {
       "name": "ApplyConditionExternalDamageTakenMultiplier",
-      "effect": "应用条件乘子计算受伤伤害。"
+      "effect": "应用条件乘数计算受伤伤害。"
     },
     {
       "name": "GetDamageReflect",
-      "effect": "已弃用未使用，调用伤害反射组件逻辑。"
+      "effect": "触发目标伤害反射（源码注释未使用）。"
     },
     {
       "name": "DoAreaAttack",
-      "effect": "对范围内有效目标造成区域伤害，调用其GetAttacked。"
+      "effect": "对范围内有效目标执行范围伤害，推送 onareaattackother 事件。"
     },
     {
       "name": "CanBeAlly",
-      "effect": "通过replica检查某实体能否视为盟友。"
+      "effect": "通过 replica 判断给定实体是否为盟友。"
     },
     {
       "name": "IsAlly",
-      "effect": "通过replica检查某实体是否为盟友。"
+      "effect": "通过 replica 判断给定实体是否为盟友。"
     },
     {
       "name": "TargetHasFriendlyLeader",
-      "effect": "已弃用，通过replica检查目标是否有友好领导者。"
+      "effect": "废弃方法，通过 replica 判断目标是否有友好领袖。"
     },
     {
       "name": "CanBeAttacked",
-      "effect": "通过replica检查自身能否被某攻击者攻击。"
+      "effect": "通过 replica 判断自身能否被给定攻击者攻击。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件移除时清理目标追踪、定时任务与事件监听。"
+      "effect": "组件移除时清理目标追踪、任务及事件监听。"
     }
   ],
   "events_published": [
-    "newcombattarget",
     "droppedtarget",
-    "losttarget",
+    "newcombattarget",
     "giveuptarget",
     "attacked",
     "blocked",
     "onhitother",
+    "doattack",
     "onmissother",
     "onattackother",
-    "onareaattackother",
     "recoil_off",
     "weapontooweak",
+    "onareaattackother",
+    "losttarget",
     "killed",
-    "doattack",
     "onreflectdamage"
   ],
   "events_listened": [
-    "knockback"
+    "knockback",
+    "enterlimbo",
+    "onremove",
+    "transfercombattarget",
+    "leaderchanged"
   ],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15022,
       20150,
-      15922,
-      13701,
+      18219,
+      15551,
+      15022,
+      13828,
+      14907,
       15651,
-      15832,
-      51046,
-      14936
+      20058
     ],
     "aspects": [
       {
-        "aspect": "击退与硬直效果标注",
+        "aspect": "仇恨目标选择描述",
         "evidence": [
           {
-            "pageid": 14936,
-            "quote": "附带'击退'"
-          },
-          {
-            "pageid": 14936,
-            "quote": "立刻获得 1 秒硬直保护"
-          },
-          {
-            "pageid": 51046,
-            "quote": "造成 50 物理和 10 位面伤害并击退"
-          }
-        ]
-      },
-      {
-        "aspect": "扇形与区域命中描述",
-        "evidence": [
-          {
-            "pageid": 14936,
-            "quote": "对面前扇形范围所有敌人造成 150 伤害"
-          },
-          {
-            "pageid": 51046,
-            "quote": "对附近 3.3 单位的实体造成 50 物理"
-          }
-        ]
-      },
-      {
-        "aspect": "技能冷却时间标注",
-        "evidence": [
-          {
-            "pageid": 15832,
-            "quote": "冷却时间 18 秒"
-          },
-          {
-            "pageid": 15832,
-            "quote": "技能冷却时间为 5.4 秒"
-          },
-          {
-            "pageid": 51046,
-            "quote": "攻击方式释放后有 7 ~ 11 秒冷却时间"
-          },
-          {
-            "pageid": 14936,
-            "quote": "冷却时间 8"
-          }
-        ]
-      },
-      {
-        "aspect": "攻击伤害数值标注",
-        "evidence": [
-          {
-            "pageid": 15922,
-            "quote": "每发吹箭命中时造成 20 点物理伤害"
-          },
-          {
-            "pageid": 15922,
-            "quote": "造成 50 点火属性物理伤害"
+            "pageid": 15651,
+            "quote": "龙蝇主动仇恨 15 距离单位内的玩家，也会仇恨攻击她的实体"
           },
           {
             "pageid": 15651,
-            "quote": "造成火焰固定伤害"
+            "quote": "龙蝇也会在短暂延迟后将仇恨目标转为玩家"
           },
           {
-            "pageid": 51046,
-            "quote": "造成 50 物理和 10 位面伤害并击退"
+            "pageid": 15551,
+            "quote": "若蜂王正在仇恨玩家，则在玩家远离蜂王 15 距离单位前蜂王优先仇恨玩家"
           },
           {
-            "pageid": 14936,
-            "quote": "造成 150 伤害"
+            "pageid": 15022,
+            "quote": "第一形态的天体英雄会主动仇恨并追击 20 距离单位内的拟角色"
           }
         ]
       },
       {
-        "aspect": "攻击动作行为描述",
+        "aspect": "伤害数值与计算标注",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "==伤害计算=="
+          },
+          {
+            "pageid": 15551,
+            "quote": "蜂王的攻击造成 120 点伤害（对玩家 50%）"
+          },
+          {
+            "pageid": 14907,
+            "quote": "|伤害 = 200（战吼buff期间250）"
+          },
+          {
+            "pageid": 20058,
+            "quote": "伤害（Damage）是DST中的一项基础游戏机制"
+          }
+        ]
+      },
+      {
+        "aspect": "实际攻击范围描述",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "实际攻击范围（Hit Range）是实体实际可以攻击到的最大距离"
+          }
+        ]
+      },
+      {
+        "aspect": "战吼技能标注",
+        "evidence": [
+          {
+            "pageid": 18219,
+            "quote": "战吼需要消耗一定数量的激励值来吟唱，产生一次性效果"
+          },
+          {
+            "pageid": 15551,
+            "quote": "尖嚎技能期间蜂王会在原地战吼，战吼期间蜂王拥有"
+          },
+          {
+            "pageid": 14907,
+            "quote": "战吼：当受到爆炸类伤害后，双拳捶击胸口发出战吼"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击冷却状态描述",
         "evidence": [
           {
             "pageid": 15022,
-            "quote": "攻击该目标一次"
+            "quote": "如果翻滚攻击处于冷却中，就会使用盾牌攻击"
           },
           {
-            "pageid": 15651,
-            "quote": "进行了普通攻击"
-          },
-          {
-            "pageid": 14936,
-            "quote": "挥出上勾拳攻击目标"
+            "pageid": 14907,
+            "quote": "冷却时间 10"
           }
         ]
       },
@@ -473,41 +465,33 @@
         "aspect": "攻击范围数值标注",
         "evidence": [
           {
+            "pageid": 20150,
+            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+          },
+          {
             "pageid": 15022,
-            "quote": "攻击范围=3.5"
+            "quote": "|攻击范围=3.5"
+          },
+          {
+            "pageid": 13828,
+            "quote": "|攻击范围= 2.3 / 3.91 / 5.75"
+          },
+          {
+            "pageid": 14907,
+            "quote": "|攻击范围 = 3"
           },
           {
             "pageid": 15651,
-            "quote": "攻击范围 = 4（暴怒时6）"
-          },
-          {
-            "pageid": 51046,
-            "quote": "攻击范围=3"
-          },
-          {
-            "pageid": 14936,
-            "quote": "攻击范围 = 3"
+            "quote": "|攻击范围 = 4（暴怒时6）"
           }
         ]
       },
       {
-        "aspect": "目标判定与追踪行为",
+        "aspect": "攻击间隔数值标注",
         "evidence": [
           {
-            "pageid": 15022,
-            "quote": "不会锁定目标，触碰到第一个可攻击目标就攻击"
-          },
-          {
-            "pageid": 51046,
-            "quote": "浮空时会对目标进行追踪"
-          },
-          {
-            "pageid": 13701,
-            "quote": "附近 8 单位内存在目标时"
-          },
-          {
-            "pageid": 15832,
-            "quote": "当目标处于其近战范围内"
+            "pageid": 20150,
+            "quote": "攻击间隔（Attack Period）是实体两次攻击之间的最小时间"
           }
         ]
       }
@@ -515,14 +499,14 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "攻击目标",
-    "伤害计算",
-    "冷却时间",
-    "仇恨共享",
-    "范围攻击",
-    "反射伤害",
     "攻击范围",
-    "可攻击性"
+    "仇恨共享",
+    "伤害计算",
+    "攻击冷却",
+    "范围打击",
+    "目标丢失",
+    "反射伤害",
+    "战吼"
   ],
   "gameplay_tags": [
     "战斗",
@@ -533,6 +517,6 @@
     "source_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
     "source_bytes": 47678,
     "model": "hy3-free",
-    "generated_at_ms": 1787857411806
+    "generated_at_ms": 1787892020894
   }
 }

@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "playerprox",
-  "summary": "PlayerProx 组件管理实体与玩家之间的距离检测状态，支持全部玩家、任意玩家、特定玩家及锁定玩家等多种目标模式。它通过周期任务判断玩家进出近远阈值并触发相应回调，参与游戏中需要玩家邻近交互或触发的玩法逻辑。",
+  "summary": "组件管理实体与玩家间的距离检测数据（近距、远距、目标模式、当前是否靠近等），并通过周期任务执行多种目标追踪逻辑（任意玩家、指定玩家、锁定玩家等）。它参与核心玩法中基于玩家位置的触发机制，如怪物仇恨、道具激活、建筑交互等，通过回调通知附近或远离事件。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回当前玩家靠近状态字符串（'NEAR' 或 'FAR'），无副作用。"
+      "effect": "返回当前玩家靠近状态字符串（'NEAR'或'FAR'），无副作用。"
     },
     {
       "name": "SetOnPlayerNear",
-      "effect": "设置玩家进入近距范围时的回调函数 self.onnear 为传入函数 fn，无立即副作用。"
+      "effect": "设置玩家进入近距时的回调函数 self.onnear，替换原有回调。"
     },
     {
       "name": "SetOnPlayerFar",
-      "effect": "设置玩家离开远距范围时的回调函数 self.onfar 为传入函数 fn，无立即副作用。"
+      "effect": "设置玩家离开远距时的回调函数 self.onfar，替换原有回调。"
     },
     {
       "name": "IsPlayerClose",
-      "effect": "返回 self.isclose 布尔值，表示是否有玩家在近距离内，无副作用。"
+      "effect": "返回 self.isclose 布尔值表示当前是否有玩家在范围内，无副作用。"
     },
     {
       "name": "SetDist",
-      "effect": "设置近距离阈值 self.near 与远距离阈值 self.far 为传入参数，无立即副作用，影响后续检测。"
+      "effect": "设置近距阈值 self.near 与远距阈值 self.far，更新距离参数。"
     },
     {
       "name": "SetLostTargetFn",
-      "effect": "设置目标丢失时的回调函数 self.losttargetfn 为传入函数 func，无立即副作用。"
+      "effect": "设置目标丢失时的回调函数 self.losttargetfn，替换原有回调。"
     },
     {
       "name": "SetPlayerAliveMode",
-      "effect": "设置检测玩家的存活模式 self.alivemode 为传入参数（如 AliveOnly/DeadOnly/DeadOrAlive），无立即副作用。"
+      "effect": "设置 alivemode 参数，影响查找玩家时对存活或死亡状态的筛选条件。"
     },
     {
       "name": "Schedule",
-      "effect": "若传入 new_period 非 nil 则更新 self.period；停止现有周期任务并启动新周期为 self.period 的周期性任务执行 self.targetmode。副作用：取消旧任务并创建新任务。"
+      "effect": "若传入 new_period 则更新 self.period；停止现有周期任务并启动一个新的周期任务以 targetmode 函数定期检测。副作用：取消旧任务并创建新任务。"
     },
     {
       "name": "ForceUpdate",
-      "effect": "若 self.task 与 self.targetmode 均非 nil，立即调用一次 self.targetmode(self.inst, self) 执行距离检测。副作用：可能触发 onnear/onfar 回调。"
+      "effect": "若任务与 targetmode 存在，立即调用一次 targetmode 检测函数，可能触发 onnear 或 onfar 回调。"
     },
     {
       "name": "Stop",
-      "effect": "若 self.task 非 nil 则取消该任务并置 nil。副作用：停止周期检测。"
+      "effect": "取消当前周期任务并置 self.task 为 nil，停止距离检测。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "实体唤醒时调用，执行 Schedule() 重启周期任务并 ForceUpdate() 立即检测。副作用：启动任务并可能触发回调。"
+      "effect": "调用 Schedule 重启周期任务，并立即 ForceUpdate 一次，开始检测并刷新状态。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "实体睡眠时调用，执行 ForceUpdate() 立即检测后 Stop() 停止任务。副作用：停止任务并可能触发回调。"
-    },
-    {
-      "name": "OnRemoveEntity",
-      "effect": "实体移除时调用，执行 Stop() 取消周期任务。副作用：停止任务。"
-    },
-    {
-      "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时调用，执行 Stop() 取消周期任务。副作用：停止任务。"
+      "effect": "立即 ForceUpdate 一次刷新状态，然后调用 Stop 停止周期任务。"
     },
     {
       "name": "SetTargetMode",
-      "effect": "若 override 非真则记录初始目标模式；设置 self.targetmode 为传入 mode；调用 SetTarget(target) 设置目标；断言若 mode 为 SpecificPlayer 则 target 非空；调用 Schedule() 重启任务。副作用：改变检测模式与目标并重启任务。"
+      "effect": "若非 override 则记录 originaltargetmode；设置 self.targetmode 为目标模式函数；调用 SetTarget 设置目标；断言 SpecificPlayer 模式时目标非空；调用 Schedule 重启任务。副作用：改变检测模式并重启周期检测、切换目标监听。"
     },
     {
       "name": "SetTarget",
-      "effect": "若原有 self.target 非空则移除对其 'onremove' 事件监听；设置新 target；若 target 非空则监听其 'onremove' 事件以触发内部丢失处理。副作用：更换事件监听。"
+      "effect": "若原有 target 则移除其实体 'onremove' 事件监听；设置新 target；若新 target 非空则监听其 'onremove' 事件以触发目标丢失处理。副作用：切换目标实体及事件监听。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "等同于 Stop，取消周期任务，在实体移除时由引擎调用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "等同于 Stop，取消周期任务，在实体移除时由引擎调用。"
     }
   ],
   "events_published": [],
@@ -82,90 +82,123 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13698,
-      15054,
-      15402,
-      15551,
-      18232,
-      18540,
-      18778,
-      23956
+      13897,
+      13216,
+      13761,
+      13779,
+      13828,
+      15246,
+      19167,
+      19266
     ],
     "aspects": [
       {
-        "aspect": "实体与玩家间距离阈值标注",
+        "aspect": "仇恨目标选取与切换描述",
         "evidence": [
           {
-            "pageid": 18232,
-            "quote": "如果玩家靠近远古哨所 6 距离单位以内"
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标，也会仇恨攻击它的实体"
           },
           {
-            "pageid": 15551,
-            "quote": "在玩家远离蜂王 15 距离单位前"
-          },
-          {
-            "pageid": 18540,
-            "quote": "若 35 单位内全部玩家的幸运值之和"
-          },
-          {
-            "pageid": 18778,
-            "quote": "中心点的 15 - 25 距离单位内"
+            "pageid": 13828,
+            "quote": "暗影棋子也会在短暂延迟后将仇恨目标转为玩家"
           }
         ]
       },
       {
-        "aspect": "实体以玩家为目标进行跟踪",
+        "aspect": "延迟与周期计时描述",
         "evidence": [
           {
-            "pageid": 15402,
-            "quote": "保持一定距离地跟踪玩家"
+            "pageid": 13761,
+            "quote": "则会在 2 ~ 5 秒后攻击玩家"
+          },
+          {
+            "pageid": 13779,
+            "quote": "每隔 15 ~ 60 秒就会有一群新的海鱼出现在玩家附近"
+          },
+          {
+            "pageid": 19167,
+            "quote": "若不满则每 27 ~ 33 秒（春天约为 20.3 ~ 24.8 秒）再生 1 只蜜蜂"
+          },
+          {
+            "pageid": 13828,
+            "quote": "持续无目标或脱离加载范围 30 秒后就会消失"
           }
         ]
       },
       {
-        "aspect": "实体失去玩家目标或仇恨",
+        "aspect": "玩家邻近状态判定描述",
         "evidence": [
           {
-            "pageid": 23956,
-            "quote": "墨荒失去仇恨且持续 15 秒未受攻击"
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标"
+          },
+          {
+            "pageid": 13828,
+            "quote": "三种暗影棋子主动仇恨 20 单位内的玩家"
           }
         ]
       },
       {
-        "aspect": "玩家远离引发实体状态改变",
+        "aspect": "玩家邻近距离阈值数值标注",
         "evidence": [
           {
-            "pageid": 18778,
-            "quote": "玩家远离后又会重新回到墓碑里"
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标"
           },
           {
-            "pageid": 23956,
-            "quote": "如果玩家远离被控制的梦魇裂缝"
+            "pageid": 13828,
+            "quote": "三种暗影棋子主动仇恨 20 单位内的玩家"
           },
           {
-            "pageid": 15551,
-            "quote": "在玩家远离蜂王 15 距离单位前"
+            "pageid": 13761,
+            "quote": "玩家接近它 2 ~ 5 距离单位时"
+          },
+          {
+            "pageid": 15246,
+            "quote": "蜘蛛在黄昏和夜晚会从蜘蛛巢中出来并在 32 距离单位内游荡"
+          },
+          {
+            "pageid": 19266,
+            "quote": "火鸡神龛会吸引附近 30 距离单位内的火鸡"
           }
         ]
       },
       {
-        "aspect": "玩家靠近触发实体行为或特效",
+        "aspect": "玩家靠近实体触发反应描述",
         "evidence": [
           {
-            "pageid": 15054,
-            "quote": "升级前的天体宝球也会在玩家靠近时发出微弱的“光芒”"
+            "pageid": 13761,
+            "quote": "但玩家接近它 2 ~ 5 距离单位时，则会在 2 ~ 5 秒后攻击玩家"
           },
           {
-            "pageid": 15402,
-            "quote": "玩家靠近时，海象会站在玩家一定距离处看着玩家"
+            "pageid": 15246,
+            "quote": "睡觉的蜘蛛会在玩家接近后醒来并仇恨玩家"
           },
           {
-            "pageid": 18232,
-            "quote": "如果玩家靠近远古哨所 6 距离单位以内"
+            "pageid": 19167,
+            "quote": "在玩家接近杀人蜂蜂窝、攻击隶属蜂窝的杀人蜂或攻击蜂窝本身的情况下，窝内杀人蜂会出来"
           },
           {
-            "pageid": 18778,
-            "quote": "只有在玩家靠近时才会从中出现"
+            "pageid": 13828,
+            "quote": "若玩家接近暗影棋子至15单位范围内，暗影棋子也会在短暂延迟后将仇恨目标转为玩家"
+          },
+          {
+            "pageid": 13779,
+            "quote": "当玩家接近或试图捕捉它们时，这些刷新点会生成邪天翁"
+          }
+        ]
+      },
+      {
+        "aspect": "目标丢失后行为描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "丢失目标后克劳斯会返回赃物袋守卫、探查"
+          },
+          {
+            "pageid": 15246,
+            "quote": "若仇恨目标离开 7 单位外并且超过 8 秒时"
           }
         ]
       }
@@ -173,18 +206,18 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "玩家靠近",
-    "玩家远离",
-    "范围检测",
-    "锁定玩家",
-    "特定玩家",
-    "全部玩家",
-    "距离判定",
-    "周期任务",
-    "目标丢失"
+    "玩家接近",
+    "远离判断",
+    "范围触发",
+    "追踪目标",
+    "存活筛选",
+    "周期检测",
+    "丢失目标",
+    "距离设定"
   ],
   "gameplay_tags": [
     "生存",
+    "战斗",
     "建造"
   ],
   "related_symbols": [],
@@ -192,6 +225,6 @@
     "source_sha256": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
     "source_bytes": 6855,
     "model": "hy3-free",
-    "generated_at_ms": 1787860826445
+    "generated_at_ms": 1787893585182
   }
 }

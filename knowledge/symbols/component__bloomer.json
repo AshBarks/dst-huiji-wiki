@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "bloomer",
-  "summary": "该组件管理实体的发光（Bloom）特效栈，允许不同来源按优先级推送和弹出特效。它通过 AnimState 设置泛光效果，并能将特效传递给绑定的子实体，参与游戏的视觉装饰表现。",
+  "summary": "本组件管理实体的泛光（Bloom）特效栈与子实体关联，通过优先级系统决定当前生效的发光效果。它参与游戏内的视觉装饰玩法，允许不同来源动态叠加或移除发光特效，并自动将效果传递给附属的子物体。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历 bloomstack 移除对各个 source 的 onremove 事件监听；遍历 children 移除监听并对有 bloomer 组件的子实体调用 PopBloom(self.inst)，清理所有关联。副作用：解除全部事件监听并可能清除子实体发光状态。"
+      "effect": "遍历 bloomstack，若来源是实体实例则移除其 'onremove' 事件监听；遍历 children，移除子实体的 'onremove' 监听，若子实体有 bloomer 组件则调用其 PopBloom 移除自身添加的泛光。副作用：清理所有事件监听并可能递归清除子实体泛光。"
     },
     {
       "name": "AttachChild",
-      "effect": "若 child 尚未绑定，则监听 child 的 onremove 事件，并根据当前栈顶特效立即对 child 设置发光（若 child 有 bloomer 则递归 PushBloom，否则直接设置 AnimState）。副作用：添加事件监听，可能立即改变 child 的发光表现。"
+      "effect": "若子实体未关联，则记录其移除回调并监听 'onremove' 事件；根据当前泛光状态，对子实体调用 PushBloom 或直接设置 AnimState 的 BloomEffectHandle，若无泛光则清除。副作用：建立父子泛光传递关系，将当前特效应用于子实体。"
     },
     {
       "name": "DetachChild",
-      "effect": "若 child 已绑定，则移除其 onremove 监听并从 children 表删除，若 child 有 bloomer 则调用其 PopBloom(self.inst)。副作用：停止管理该子实体并可能清除其发光。"
+      "effect": "若子实体已关联，移除其 'onremove' 监听，并调用子实体 bloomer 组件的 PopBloom 移除自身添加的泛光。副作用：解除父子关系并移除子实体上对应的泛光效果。"
     },
     {
       "name": "GetCurrentFX",
-      "effect": "返回 bloomstack 栈顶元素的 fx 字段，若栈为空则返回 nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶的 fx 字符串，栈空则返回 nil。无副作用。"
     },
     {
       "name": "GetCurrentFxAndPriority",
-      "effect": "返回 bloomstack 栈顶元素的 fx 与 priority，若栈为空则隐式返回 nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶的 fx 与 priority，栈空则返回 nil。无副作用。"
     },
     {
       "name": "OnSetBloomEffectHandle",
-      "effect": "对自身 AnimState 调用 SetBloomEffectHandle(fx)，并遍历 children 对有 bloomer 的递归 PushBloom、否则直接设 AnimState。副作用：改变自身及子实体发光表现。"
+      "effect": "对本实体 AnimState 设置指定 fx 泛光，并遍历 children：若子实体有 bloomer 组件则调用其 PushBloom 传递 fx 与 priority，否则直接设置子实体 AnimState 的 BloomEffectHandle。副作用：应用泛光特效到实体及子实体。"
     },
     {
       "name": "OnClearBloomEffectHandle",
-      "effect": "对自身 AnimState 调用 ClearBloomEffectHandle()，并遍历 children 对有 bloomer 的递归 PopBloom、否则清除 AnimState 发光。副作用：清除自身及子实体发光。"
+      "effect": "清除本实体 AnimState 的泛光，并遍历 children：若子实体有 bloomer 组件则调用其 PopBloom，否则清除子实体 AnimState 泛光。副作用：移除实体及子实体的泛光特效。"
     },
     {
       "name": "PushBloom",
-      "effect": "若 source 与 fx 非 nil，更新或新建 bloomstack 中对应 source 的条目（默认 priority 为 0），并按优先级插入有序位置；若栈顶变化则调用 OnSetBloomEffectHandle 更新。若 source 是实体实例则监听其 onremove。副作用：可能添加事件监听并改变发光特效。"
+      "effect": "以 source 和 fx 为参数，更新或新建 bloomstack 中的条目并按 priority 插入有序栈；若 source 是实体实例则监听其 'onremove'；若栈顶特效变更则调用 OnSetBloomEffectHandle 应用。副作用：修改特效栈，可能添加事件监听并改变实体及子实体泛光表现。"
     },
     {
       "name": "PopBloom",
-      "effect": "若 source 非 nil，从 bloomstack 移除该 source 条目并移除其 onremove 监听（若为实体），若栈顶变化则调用 OnSetBloomEffectHandle 或 OnClearBloomEffectHandle 更新。副作用：可能移除监听并改变发光。"
+      "effect": "从 bloomstack 移除指定 source 的条目，若 source 是实体实例则移除其 'onremove' 监听；若栈顶变更则应用新特效或清除。副作用：修改特效栈，可能移除事件监听并改变或清除泛光表现。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述 bloomstack 内各来源优先级与 fx 的字符串。无副作用。"
+      "effect": "返回描述 bloomstack 内容（优先级、来源、fx）的调试字符串。无副作用。"
     }
   ],
   "events_published": [],
@@ -58,38 +58,37 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      15259,
       15238,
       22383,
       15239,
       13493,
       15237,
       28751,
-      15421,
-      18522
+      15421
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录均围绕实体掉落、生成、行为等，未出现任何与 bloomer 组件能力（如泛光特效、子节点挂载、推入弹出泛光等）相关的描述。",
+    "no_evidence_reason": "所给页面摘录涉及水中木、皮弗娄牛、拾荒疯猪、兔人、寄居蟹隐士、猪人、狞笑、疯猪，内容均为生成、掉落、行为、数值等，无任何与bloomer组件相关的视觉特效、开花、子节点挂载或bloom栈操作的描述",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "发光特效",
-    "泛光处理",
-    "子物绑定",
-    "优先级栈",
-    "清除发光",
-    "来源监听",
-    "视觉修饰",
-    "特效叠加"
+    "泛光特效",
+    "发光叠加",
+    "光效栈",
+    "子体发光",
+    "优先级光",
+    "清除泛光",
+    "视觉装饰",
+    "光晕管理"
   ],
   "gameplay_tags": [
-    "装饰",
-    "特效"
+    "装饰"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
     "source_bytes": 4799,
     "model": "hy3-free",
-    "generated_at_ms": 1787861488390
+    "generated_at_ms": 1787894005922
   }
 }

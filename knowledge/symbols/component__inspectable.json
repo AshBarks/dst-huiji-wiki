@@ -7,31 +7,31 @@
   },
   "category": "component",
   "display_name": "inspectable",
-  "summary": "该组件管理实体的检查描述、名称覆盖及查看记录等数据，并提供了获取实体状态与描述文本的接口。它参与核心的检视玩法，使玩家能够查看物体信息、状态提示（如燃烧、枯萎、死亡等），是生存探索中了解世界的主要途径。",
+  "summary": "该组件管理实体的可检查数据，包括描述文本、名称覆盖及状态查询逻辑。它参与游戏中的观察与交互核心玩法，使玩家能够查看物体描述与实时状态（如死亡、睡眠、燃烧、枯萎等），并可选记录查看统计。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "从实体移除 'inspectable' 标签，清理组件关联状态。"
+      "effect": "从所属实体移除 'inspectable' 标签，副作用是实体不再被系统视为可检查对象。"
     },
     {
       "name": "SetDescription",
-      "effect": "设置组件的内部描述数据 self.description，可接受字符串、字符串表或函数，供后续获取描述时使用。"
+      "effect": "将传入的 desc（字符串、字符串表或函数）赋值给 self.description，供 GetDescription 使用，无其它副作用。"
     },
     {
       "name": "SetNameOverride",
-      "effect": "设置 self.nameoverride，覆盖实体在检查时的字符串名称（非显示名）。"
+      "effect": "设置 self.nameoverride 字段，根据注释该字段用于覆盖检查时的字符串名称（非显示名），可能影响后续检查文本生成，无直接副作用。"
     },
     {
       "name": "RecordViews",
-      "effect": "根据传入 state 设置 self.recordview 标志（state 不为 false 时为真），决定是否在查看时记录统计数据。"
+      "effect": "设置 self.recordview 为 state ~= false（即非 false 即为真）。当为真时，GetStatus 被调用会触发 ProfileStatsSet 记录该 prefab 被检查的统计信息。"
     },
     {
       "name": "GetStatus",
-      "effect": "返回实体当前的状态字符串（如 DEAD, SLEEPING, BURNING 等）或 nil；若定义了 self.getstatus 则优先调用它；若开启记录查看，会调用 ProfileStatsSet 记录该 prefab 被检查。当查看者为实体自身时返回 nil。"
+      "effect": "返回实体状态字符串或 nil。若查看者为实体自身则返回 nil；若 recordview 为真，则调用 ProfileStatsSet 写入玩家档案统计；随后按优先级检测组件状态（如死亡、睡眠、燃烧、疾病、枯萎、持有等）或标签返回对应字符串，否则 nil。无修改实体状态副作用。"
     },
     {
       "name": "GetDescription",
-      "effect": "返回实体的描述文本及可能的过滤上下文与作者；处理查看者不可见、幽灵/哑剧强制状态描述、闷烧等特殊情形，优先使用 getspecialdescription、descriptionfn 或 description 字段。"
+      "effect": "返回实体描述文本及可能的 filter_context、author。若查看者为自身返回 nil；若查看者不可见目标且不在特定口袋维度容器中打开，返回太暗提示字符串；优先调用 getspecialdescription 或 descriptionfn 获取描述，否则用 self.description；若描述缺失或查看者为幽灵/哑剧则强制调用通用 GetDescription 并附状态；若实体阴燃返回阴燃提示。纯查询无副作用。"
     }
   ],
   "events_published": [],
@@ -40,46 +40,38 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      28734,
-      65737,
+      20496,
+      10374,
+      15596,
+      21291,
       15022,
       14938,
       15327,
-      15832,
-      13897,
-      19832
+      15832
     ],
-    "aspects": [
-      {
-        "aspect": "死亡状态名称词缀覆盖",
-        "evidence": [
-          {
-            "pageid": 28734,
-            "quote": "死亡状态的牛也会拥有 “死掉了” 这个名称词缀。"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的所有页面摘录均围绕实体的燃烧、技能、掉落、生成与行为展开，无任何涉及检查（inspectable）组件的描述设置、名称覆盖、查看记录或状态获取等能力表达。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "检查物体",
     "查看描述",
     "物体状态",
-    "检视信息",
-    "燃烧提示",
-    "枯萎显示",
-    "死亡状态",
-    "睡觉状态"
+    "太暗提示",
+    "燃烧状态",
+    "名称覆盖",
+    "可检查",
+    "记录查看"
   ],
   "gameplay_tags": [
-    "生存"
+    "生存",
+    "探索"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
     "source_bytes": 3470,
     "model": "hy3-free",
-    "generated_at_ms": 1787856352382
+    "generated_at_ms": 1787891427449
   }
 }

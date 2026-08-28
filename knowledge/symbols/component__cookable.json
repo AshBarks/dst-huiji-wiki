@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "cookable",
-  "summary": "该组件管理实体的烹饪产物（product）与烹饪完成回调（oncooked），并为实体添加 'cookable' 标签以标识可烹饪属性。其核心玩法是在被烹饪时调用回调并生成对应的预制体，且能根据原实体的易腐坏程度部分继承新鲜度。",
+  "summary": "该组件管理实体的烹饪产物（product）与烹饪完成回调（oncooked），并为实体添加“cookable”标签。它参与烹饪核心玩法，在调用 Cook 时生成对应食物产物，并按比例继承原实体的易腐度，支撑生存中的食物制作系统。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，移除实体上的 'cookable' 标签。"
+      "effect": "从实体移除 'cookable' 标签，无返回值。"
     },
     {
       "name": "SetOnCookedFn",
-      "effect": "将内部回调字段 oncooked 设置为传入的函数 fn，用于烹饪完成时调用。"
+      "effect": "将传入函数 fn 存储至 self.oncooked，作为烹饪完成时调用的回调，无额外副作用。"
     },
     {
       "name": "Cook",
-      "effect": "执行烹饪逻辑：若 oncooked 不为 nil 则调用 oncooked(inst, cooker, chef)；若 product 不为 nil 则生成对应预制体（支持函数动态决定名称），若生成成功且原实体与产物均有 perishable 组件且原实体无 'smallcreature' 标签，则按 1 - (1 - 原新鲜度百分比) * 0.5 设置产物新鲜度；最终返回生成的产物或 nil。"
+      "effect": "若 self.oncooked 非空则调用之（参数：inst, cooker, chef）；若 self.product 非空则生成对应 prefab（若为函数则调用得到名称），生成成功后若原实体与产物均有 perishable 组件且原实体无 'smallcreature' 标签，则按 1 - (1 - 原易腐百分比)*0.5 设置产物易腐百分比；返回生成的产物实体或 nil。"
     }
   ],
   "events_published": [],
@@ -28,39 +28,43 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      24540,
       13476,
+      24540,
       65872,
-      13779,
-      20789,
-      13477,
-      17816,
-      13153
+      15737,
+      15235,
+      19765,
+      17997,
+      15715
     ],
     "aspects": [
       {
-        "aspect": "烤熟后物品形态变化",
+        "aspect": "烹饪后产物描述",
         "evidence": [
           {
-            "pageid": 24540,
-            "quote": "烤熟后会变成熟小鱼块"
+            "pageid": 15235,
+            "quote": "烹饪兔子会获得 1 个烤小肉"
           }
         ]
       },
       {
-        "aspect": "烹饪操作与耗时描述",
+        "aspect": "食材可烹饪标注",
         "evidence": [
           {
-            "pageid": 20789,
-            "quote": "可以使用火坑等火源进行烹饪"
+            "pageid": 19765,
+            "quote": "均可作为食材放入锅中烹饪"
           },
           {
-            "pageid": 20789,
-            "quote": "烹饪食物需要花费 1 秒"
+            "pageid": 17997,
+            "quote": "可作为食材放入锅中烹饪"
           },
           {
-            "pageid": 17816,
-            "quote": "使用便携烹饪锅烹饪"
+            "pageid": 15715,
+            "quote": "可作为食材放入锅中烹饪"
+          },
+          {
+            "pageid": 15235,
+            "quote": "烹饪兔子会获得 1 个烤小肉"
           }
         ]
       }
@@ -69,23 +73,23 @@
   },
   "search_terms": [
     "可烹饪",
-    "烹饪",
-    "烤食物",
-    "熟食",
-    "食材",
-    "产物",
-    "炊具",
-    "烹饪后"
+    "烹饪产物",
+    "烤熟食物",
+    "煮食",
+    "食物转化",
+    "易腐继承",
+    "烹饪标签",
+    "熟食制作"
   ],
   "gameplay_tags": [
-    "生存",
-    "烹饪"
+    "烹饪",
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "2ae9fb18536e93105b0c0da2376d90c401806ca79d2a6fda87c349af5aec40ed",
     "source_bytes": 1132,
     "model": "hy3-free",
-    "generated_at_ms": 1787860311088
+    "generated_at_ms": 1787893341919
   }
 }

@@ -7,39 +7,39 @@
   },
   "category": "component",
   "display_name": "knownlocations",
-  "summary": "该组件管理实体所知的地点信息，以名称与三维坐标的映射形式存储在 self.locations 中。它参与游戏存档、读档及调试，并提供记忆、查询和遗忘地点的接口，支撑AI或角色对关键位置的记忆玩法。",
+  "summary": "该组件管理实体所记忆的命名位置集合（locations），提供记录、查询、遗忘及序列化这些坐标的能力。它参与生存探索中生物对重要地点的坐标记忆，并支持通过存档系统保存与加载已知位置信息。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "遍历 self.locations 拼接名称与坐标字符串返回，无副作用（源码中注释的调试器代码未执行）。"
+      "effect": "遍历 self.locations，将每个键值对格式化为字符串并拼接返回。无副作用。"
     },
     {
       "name": "SerializeLocations",
-      "effect": "将 self.locations 转换为包含 name,x,y,z 字段的表数组，若无记录则返回 nil，无副作用。"
+      "effect": "遍历 self.locations，构建包含 name 与 x,y,z 坐标的表，返回该表；若无位置则返回 nil。无副作用。"
     },
     {
       "name": "DeserializeLocations",
-      "effect": "接收数据数组，对每个元素调用 RememberLocation 以恢复位置，副作用为通过 RememberLocation 修改 self.locations 并可能触发错误。"
+      "effect": "接收数据表 data，遍历其中每个元素，调用 RememberLocation 以元素 name 和 Vector3(x,y,z) 恢复位置。副作用：通过调用 RememberLocation 修改 self.locations 表。"
     },
     {
       "name": "OnSave",
-      "effect": "调用 SerializeLocations，若有数据则返回 {locations=序列化数据} 否则返回 nil，无直接副作用。"
+      "effect": "调用 SerializeLocations 获取序列化位置，若结果非 nil 则返回 {locations = 序列化表} 否则返回 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若传入数据包含 locations 则调用 DeserializeLocations 恢复，副作用同 DeserializeLocations。"
+      "effect": "若 data 存在且含 locations 字段，调用 DeserializeLocations 加载。副作用：修改 self.locations 表。"
     },
     {
       "name": "RememberLocation",
-      "effect": "当 dont_overwrite 为假或该名称位置未记录时，将 name 与 pos 存入 self.locations；若 pos 含无效数字则打印并抛出错误。副作用：修改 self.locations，可能报错终止。"
+      "effect": "若 dont_overwrite 为假或 self.locations[name] 为 nil，则将 self.locations[name] 设为 pos。若 pos 非 nil 且包含无效数字则打印错误并抛出 Lua error。副作用：修改内部 locations 表，可能触发 error 中断。"
     },
     {
       "name": "GetLocation",
-      "effect": "返回 self.locations[name] 存储的坐标或 nil，无副作用。"
+      "effect": "返回 self.locations[name] 的当前值（可能为 nil）。无副作用。"
     },
     {
       "name": "ForgetLocation",
-      "effect": "将 self.locations[name] 设为 nil 以删除记录，副作用：修改 self.locations 表。"
+      "effect": "将 self.locations[name] 设为 nil 以删除该已知位置。副作用：修改内部 locations 表。"
     }
   ],
   "events_published": [],
@@ -48,40 +48,44 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      65605,
+      24196,
+      61869,
       15022,
       14938,
       15832,
       13897,
-      15238,
-      13823,
-      15651,
-      13606
+      15238
     ],
     "aspects": [
       {
-        "aspect": "刷新点重生描述",
+        "aspect": "X标记点存在记忆与防重复生成",
         "evidence": [
           {
-            "pageid": 15651,
-            "quote": "龙蝇死亡后，20 天后在刷新点重新生"
+            "pageid": 24196,
+            "quote": "若世界上已存在X，则不会生成新的。"
           }
         ]
       },
       {
-        "aspect": "同一位置重生描述",
+        "aspect": "垃圾标记点缺失检测与生成",
         "evidence": [
           {
-            "pageid": 13606,
-            "quote": "帝王蟹死亡后会在 20 天后于同一位置重生"
+            "pageid": 65605,
+            "quote": "如果检测到世界缺失[[被丢弃的垃圾]]标记点"
+          },
+          {
+            "pageid": 65605,
+            "quote": "会在摇摇欲坠的垃圾堆为中心，在附近生成一个标记点"
           }
         ]
       },
       {
-        "aspect": "生成点位置引用",
+        "aspect": "标记点位置用于生成空间约束",
         "evidence": [
           {
-            "pageid": 13606,
-            "quote": "送到其生成点附近 8 单位内的随机位置"
+            "pageid": 65605,
+            "quote": "中心与标记点之间无墙体阻挡"
           }
         ]
       }
@@ -89,14 +93,14 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "记忆地点",
-    "已知位置",
-    "记录坐标",
-    "遗忘位置",
-    "位置保存",
-    "地点读取",
-    "坐标存储",
-    "地点管理"
+    "已知地点",
+    "记录位置",
+    "记忆坐标",
+    "忘记地点",
+    "保存位置",
+    "加载位置",
+    "导航点",
+    "标记点"
   ],
   "gameplay_tags": [
     "生存",
@@ -107,6 +111,6 @@
     "source_sha256": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
     "source_bytes": 2333,
     "model": "hy3-free",
-    "generated_at_ms": 1787858254518
+    "generated_at_ms": 1787892351923
   }
 }

@@ -7,86 +7,110 @@
   },
   "category": "component",
   "display_name": "damagetypebonus",
-  "summary": "该组件管理实体针对特定目标标签的伤害加成数据与回调函数。它参与战斗伤害计算流程，通过 GetBonus 方法返回综合考虑标签修正与回调的总伤害乘率。外部可动态添加或移除基于来源与键的加成及回调，实现复杂的增伤逻辑。",
+  "summary": "该组件管理实体对特定标签目标的伤害加成数据，包括标签对应的来源修饰符列表与可选的加成回调函数。在战斗伤害结算时，通过 GetBonus 针对目标实体计算综合伤害乘区倍率，实现类型克制或条件增伤等玩法。",
   "api": [
     {
       "name": "AddBonus",
-      "effect": "在 self.tags 中为指定标签 tag 获取或创建 SourceModifierList 实例，并调用其 SetModifier 方法以来源 src、百分比 pct 和键 key 设置修正值。副作用：可能初始化 self.tags[tag] 并永久持有修饰符列表，影响后续 GetBonus 计算。"
+      "effect": "若 self.tags[tag] 不存在则新建 SourceModifierList 实例并存入；调用该列表的 SetModifier(src, pct, key) 设置修正。副作用：可能新增或更新 self.tags 中的修饰符列表。"
     },
     {
       "name": "RemoveBonus",
-      "effect": "若 self.tags[tag] 存在，调用其 RemoveModifier 方法移除对应 src 和 key 的修正；若移除后列表为空则将 self.tags[tag] 置 nil。副作用：减少对应标签的加成，可能清理标签条目。"
+      "effect": "若 self.tags[tag] 存在，调用其 RemoveModifier(src, key)；若列表变空则置 self.tags[tag] 为 nil。副作用：可能移除标签映射。"
     },
     {
       "name": "AddBonusCallback",
-      "effect": "确保 self.bonuscallbacks 表存在，先移除可能重复的 fn 再将其插入回调列表。副作用：添加返回乘数的回调函数，该回调将在 GetBonus 中被调用以影响最终乘率。"
+      "effect": "确保 self.bonuscallbacks 表存在，先移除同名函数避免重复，再插入 fn。副作用：修改 bonuscallbacks 列表。"
     },
     {
       "name": "RemoveBonusCallback",
-      "effect": "若 self.bonuscallbacks 存在，从数组中移除指定函数 fn。副作用：停止该回调对伤害乘率的影响。"
+      "effect": "若 self.bonuscallbacks 存在，从中移除 fn。副作用：可能缩短 bonuscallbacks 列表。"
     },
     {
       "name": "GetBonus",
-      "effect": "若 target 非 nil，遍历 self.tags 检查目标是否具有对应标签，累乘各匹配标签的修正值；再遍历 self.bonuscallbacks 累乘各回调返回的乘率（空则返回1）。返回最终乘率 mult。无副作用，仅读取状态。"
+      "effect": "遍历 self.tags，若目标具有对应标签则乘上该列表的 Get() 值；再遍历 bonuscallbacks 调用 fn(inst, target) 并将返回值（nil 则视作1）乘入。返回最终倍率。无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "遍历 self.tags 拼接每个标签及其当前修正值的调试字符串，返回该字符串或 nil。无副作用。"
+      "effect": "拼接所有标签及其当前修正值生成调试字符串并返回；若无可输出则返回 nil。无副作用。"
     }
   ],
+  "api_note": "",
   "events_published": [],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13156,
-      10355,
-      10374,
-      13437,
       20150,
+      13156,
       10379,
-      13409,
-      10418
+      10374,
+      10355,
+      13437,
+      72238,
+      13556
     ],
     "aspects": [
       {
-        "aspect": "暗影亲和伤害类型加成标注",
+        "aspect": "脆弱诅咒物理伤害加成描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "使该目标的受到的物理伤害增加到 1.1 防御端物理伤害倍率"
+          }
+        ]
+      },
+      {
+        "aspect": "角色基础物理伤害倍率标注",
+        "evidence": [
+          {
+            "pageid": 10379,
+            "quote": "温蒂的进攻端物理伤害倍率为 0.75"
+          }
+        ]
+      },
+      {
+        "aspect": "进攻端标签伤害倍率标注",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "最终进攻端伤害 = 基础伤害 × 进攻端物理伤害倍率 × 进攻端标签伤害倍率"
+          },
+          {
+            "pageid": 72238,
+            "quote": "响应进攻端标签伤害倍率"
+          }
+        ]
+      },
+      {
+        "aspect": "防御端标签伤害倍率标注",
         "evidence": [
           {
             "pageid": 13156,
-            "quote": "沃尔夫冈获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
+            "quote": "受到来自暗影阵营的伤害降低至 0.9 防御端标签伤害倍率"
           },
           {
             "pageid": 10355,
-            "quote": "威尔逊获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
+            "quote": "受到来自暗影阵营的伤害降低至 0.9 防御端标签伤害倍率"
           },
           {
             "pageid": 13437,
-            "quote": "沃尔特获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
-          },
-          {
-            "pageid": 13409,
-            "quote": "薇格弗德获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
-          },
-          {
-            "pageid": 10418,
-            "quote": "WX-78 获得[[暗影亲和]]，受到来自[[暗影阵营]]的伤害降低至 0.9"
+            "quote": "受到来自暗影阵营的伤害降低至 0.9 防御端标签伤害倍率"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "伤害加成",
-    "类型增伤",
-    "目标标签",
-    "增伤倍率",
-    "加成回调",
-    "移除增伤",
+    "类型克制",
+    "标签增益",
     "攻击倍率",
-    "标签伤害"
+    "对怪加成",
+    "伤害倍率",
+    "加成回调",
+    "目标标签"
   ],
   "gameplay_tags": [
     "战斗"
@@ -96,6 +120,6 @@
     "source_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
     "source_bytes": 1631,
     "model": "hy3-free",
-    "generated_at_ms": 1787861349766
+    "generated_at_ms": 1787893914188
   }
 }

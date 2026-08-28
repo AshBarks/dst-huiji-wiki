@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "floater",
-  "summary": "该组件管理实体在水面漂浮时的表现配置与状态，包括尺寸、垂直偏移、缩放及动画交换数据。它参与海洋生存玩法，在物体落水时生成前后漂浮特效、播放漂浮动画、溅起水花，并可能赋予物品湿度和温度惩罚，通过主客网络同步漂浮与腐蚀状态。",
+  "summary": "该组件管理实体在水面漂浮时的视觉特效、动画替换与物品潮湿状态等数据。核心玩法包括物品落入海洋时生成前后漂浮特效、施加潮湿与温度惩罚、播放漂浮动画，以及离开水面时清理恢复默认状态。",
   "api": [
     {
       "name": "SetIsObstacle",
-      "effect": "设置 self.is_obstable 为传入参数不为 false 的结果（默认视为 true），用于后续 ShouldShowEffect 对海洋点的障碍物判定。无其它副作用。"
+      "effect": "设置内部字段 is_obstable（源码拼写如此），用于 ShouldShowEffect 判断地图海洋点时是否作为障碍物参考。无其它副作用。"
     },
     {
       "name": "SetSize",
-      "effect": "设置 self.size 为传入的 size 字符串（如 small/med/large），用于客户端生成漂浮特效时的动画后缀。无立即副作用。"
+      "effect": "设置 self.size 字符串（small/med/large），决定后续客户端生成漂浮特效的动画后缀。"
     },
     {
       "name": "SetVerticalOffset",
-      "effect": "设置 self.vert_offset；若偏移非 nil 且已存在 front_fx/back_fx 特效，立即将其 Transform 的 Y 位置设为该偏移。副作用：更新已有特效位置。"
+      "effect": "设置 self.vert_offset；若偏移非 nil 且已存在前后特效实体，立即更新它们的 Y 轴位置。"
     },
     {
       "name": "SetScale",
-      "effect": "解析 scale（数字或含三元素的表）设置 x/y/zscale；若特效已存在，立即应用缩放到它们。副作用：更新已有特效缩放。"
+      "effect": "接受数字或表，设置 x/y/zscale 字段；若已存在前后特效实体，立即应用缩放。"
     },
     {
       "name": "SetBankSwapOnFloat",
-      "effect": "设置 do_bank_swap 为 should_bank_swap，float_index 为 float_index 或 1，swap_data 为传入数据。无立即副作用，但影响后续漂浮动画切换。"
+      "effect": "设置 do_bank_swap 布尔、float_index（默认1）及 swap_data 表，配置漂浮时是否切换动画 bank 及皮肤覆盖数据。"
     },
     {
       "name": "SetSwapData",
-      "effect": "设置 self.swap_data 为传入数据，用于漂浮/默认动画的 bank/anim 及符号覆盖。无副作用。"
+      "effect": "直接更新 self.swap_data 字段，供漂浮/恢复动画时覆盖符号使用。"
     },
     {
       "name": "ShouldShowEffect",
-      "effect": "返回布尔值：根据实体世界坐标，判断地图是否为海洋点（考虑 is_obstable）且非视觉地面点。只读，无副作用。"
+      "effect": "查询世界地图在实体位置是否为海洋且非视觉地面，返回布尔；无状态修改。"
     },
     {
       "name": "AttachEffect",
-      "effect": "根据 should_parent_effect 将传入 effect 设为实体子物体或放置于实体世界坐标（加上 vert_offset），并设置其缩放。副作用：修改传入特效实体的父子关系与变换。"
+      "effect": "根据 should_parent_effect 将特效实体设为 inst 子级或世界坐标定位，并应用垂直偏移与缩放。"
     },
     {
       "name": "IsFloating",
-      "effect": "返回 self.showing_effect 当前值，表示是否正在显示漂浮特效。无副作用。"
+      "effect": "返回 self.showing_effect 布尔，表示当前是否正处于显示漂浮特效状态。"
     },
     {
       "name": "SwitchToFloatAnim",
-      "effect": "若 do_bank_swap 为真，将实体 AnimState 的 bank 设为 floating_item 并播放 left/right 动画（由 float_index 正负决定），设置帧并暂停；若 swap_data 存在则覆盖 swap_spear 符号（支持皮肤）。副作用：修改实体动画状态。"
+      "effect": "若 do_bank_swap 为真，将 inst 的 AnimState 切换至 floating_item bank 并播放左右动画、设帧暂停，并根据 swap_data 覆盖 swap_spear 符号；修改动画状态。"
     },
     {
       "name": "OnLandedServer",
-      "effect": "当未显示特效且 ShouldShowEffect 为真时：若实体有 inventoryitem 且未被持有且无 likewateroffducksback 标签，则使其湿度至少 OCEAN_WETNESS、温度百分比降至最多 OCEAN_TEMPERATURE_PENALTY_PERCENT，温差超阈值则标记 hotsplash；若 splash 且（无 inventoryitem 或未被持有）则生成 hot_splash 或 splash 水花预制体；推送 floater_startfloating 事件；设 _is_landed 网络变量为 true、showing_effect 为 true；调用 SwitchToFloatAnim。副作用：可能改变物品温湿度、生成水花、推送事件、同步网络状态、切换动画。"
+      "effect": "服务器上若未显示特效且应显示，则给 inventoryitem 加潮湿与温度惩罚（若非持有且无鸭背标签），生成 splash 或 hot_splash 预制体，推送 floater_startfloating 事件，设 _is_landed 网络变量为真，showing_effect 为真，并切换漂浮动画。有生成实体、修改物品状态等副作用。"
     },
     {
       "name": "OnLandedClient",
-      "effect": "设置 showing_effect 为 true；若 front_fx/back_fx 不存在则生成 float_fx_front/float_fx_back 特效并 AttachEffect，播放对应尺寸 idle 循环动画；设置 AnimState 浮动参数。副作用：生成并管理客户端漂浮特效，修改动画浮动参数。"
+      "effect": "客户端设 showing_effect 为真，若缺失则生成 float_fx_front/float_fx_back 特效实体并播放对应尺寸 idle 动画，设置 AnimState 浮参数。生成特效实体。"
     },
     {
       "name": "SwitchToDefaultAnim",
-      "effect": "若 do_bank_swap 或 force_switch 为真，将实体 AnimState 恢复为 swap_data 指定的 bank/anim 或 prefab/idle，并清除 swap_spear 覆盖符号。副作用：修改实体动画状态。"
+      "effect": "若 do_bank_swap 或 force_switch 为真，恢复 inst 的 bank/anim 为 swap_data 或 prefab 默认，清除符号覆盖；修改动画状态。"
     },
     {
       "name": "Erode",
-      "effect": "若为主模拟且正在显示特效，设置 _erode_time 网络变量为 erode_time，触发客户端 erodetimedirty 事件以腐蚀特效。副作用：同步腐蚀时间至客户端。"
+      "effect": "仅主模拟且正在显示特效时，设置 _erode_time 网络变量，触发客户端腐蚀特效。有网络同步副作用。"
     },
     {
       "name": "OnNoLongerLandedServer",
-      "effect": "若正在显示特效，推送 floater_stopfloating 事件；设 _is_landed 网络变量为 false、showing_effect 为 false；调用 SwitchToDefaultAnim。副作用：推送事件、同步网络状态、恢复动画。"
+      "effect": "若正在显示特效，推送 floater_stopfloating 事件，设 _is_landed 网络变量为假，showing_effect 为假，切换回默认动画。修改状态与动画。"
     },
     {
       "name": "OnNoLongerLandedClient",
-      "effect": "设置 showing_effect 为 false；AnimState 浮动参数归零；移除并置空 front_fx/back_fx 特效实体。副作用：清除客户端漂浮特效，修改动画参数。"
+      "effect": "设 showing_effect 为假，清除 AnimState 浮参数，移除并置空前后特效实体。销毁特效实体。"
     }
   ],
   "events_published": [
@@ -86,49 +86,48 @@
     "erodetimedirty"
   ],
   "netvars": [
-    "_is_landed",
-    "_erode_time"
+    "floater._is_landed",
+    "floater._erode_time"
   ],
   "tunables": [
-    "OCEAN_WETNESS",
-    "OCEAN_TEMPERATURE_PENALTY_PERCENT",
-    "FLOATER_HOT_SIZZLE_THRESHOLD"
+    "TUNING.OCEAN_WETNESS",
+    "TUNING.OCEAN_TEMPERATURE_PENALTY_PERCENT",
+    "TUNING.FLOATER_HOT_SIZZLE_THRESHOLD"
   ],
   "wiki": {
     "scanned_pageids": [
+      70462,
       14485,
+      14688,
+      16185,
+      20704,
+      24674,
       15832,
-      13606,
-      14484,
-      15551,
-      13698,
-      14099,
-      52631
+      13606
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录涉及浇水壶、恐怖之眼、帝王蟹、杂草、蜂后、邪天翁、暗影秘典、雪球等实体，文本内容主要描述浇水、冲撞、重生、生长、掉落、行为间隔与数量等，未出现任何与漂浮组件(floater)相关的漂浮、浮动、垂直偏移、缩放、着陆、侵蚀等能力表达，故页面不讨论该组件能力。",
+    "no_evidence_reason": "提供的页面摘录涉及干燥剂、浇水壶、水球、漂浮平台、潮湿机制、双子魔眼、帝王蟹等实体，但未发现任何关于 floater 组件能力（如设置障碍物、尺寸、垂直偏移、缩放、漂浮动画、着陆回调、侵蚀等）的玩家语言表达。页面中“漂浮平台”指海上交通工具而非组件能力，水球等未提及漂浮行为细节，故无证据。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "水面漂浮",
-    "浮动物品",
-    "落水特效",
-    "水花溅起",
-    "潮湿物品",
+    "物品潮湿",
+    "溅水特效",
     "漂浮动画",
-    "浮标前后",
-    "离水消失"
+    "入水湿透",
+    "浮起视觉",
+    "海洋物品",
+    "浮沫前后"
   ],
   "gameplay_tags": [
     "生存",
-    "海洋",
-    "装饰"
+    "海洋"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
     "source_bytes": 8274,
     "model": "hy3-free",
-    "generated_at_ms": 1787856799062
+    "generated_at_ms": 1787891646810
   }
 }

@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "shadowlevel",
-  "summary": "该组件管理实体的暗影等级数据，默认等级为1且支持设置动态计算函数。它在实体上添加 'shadowlevel' 标签，为其他系统提供获取当前等级的接口，以参与游戏内的暗影相关玩法。",
+  "summary": "该组件管理实体的暗影等级数据，支持静态默认等级与动态计算函数。它在实体上添加 'shadowlevel' 标签，供其他系统查询当前暗影等级以参与暗影相关玩法逻辑。",
   "api": [
     {
       "name": "SetDefaultLevel",
-      "effect": "设置组件内部默认暗影等级 self.level 为传入的 level，仅更新数据，不改变实体标签等其他状态。"
+      "effect": "接收参数 level 并赋值给组件实例的 self.level 字段，作为默认暗影等级；无返回值，直接修改内部状态。"
     },
     {
       "name": "SetLevelFn",
-      "effect": "设置动态等级计算函数 self.levelfn 为传入的 fn，后续 GetCurrentLevel 将优先调用该函数，仅存储函数引用无副作用。"
+      "effect": "接收函数 fn 并赋值给组件实例的 self.levelfn 字段，用于动态计算等级；无返回值，直接修改内部状态。"
     },
     {
       "name": "GetCurrentLevel",
-      "effect": "返回当前暗影等级：若 self.levelfn 不为 nil 则调用 self.levelfn(self.inst) 并返回其结果，否则返回 self.level。纯查询无副作用。"
+      "effect": "返回当前暗影等级：若 self.levelfn 已设置则调用其并传入实体返回结果，否则返回 self.level；无副作用，仅读取状态。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时由框架调用，移除实体上的 'shadowlevel' 标签，无其他副作用。"
+      "effect": "当组件从实体移除时调用，移除实体上的 'shadowlevel' 标签；无返回值，修改实体标签状态。"
     }
   ],
   "events_published": [],
@@ -43,11 +43,20 @@
     ],
     "aspects": [
       {
-        "aspect": "暗影槌升级条件描述",
+        "aspect": "升级条件描述",
         "evidence": [
           {
             "pageid": 34037,
             "quote": "可为暗影槌升级"
+          }
+        ]
+      },
+      {
+        "aspect": "等级重置标注",
+        "evidence": [
+          {
+            "pageid": 34037,
+            "quote": "等级回退到 0 级"
           }
         ]
       }
@@ -58,11 +67,11 @@
     "暗影等级",
     "影子等级",
     "暗影标签",
-    "阴影级别",
+    "当前影级",
     "等级函数",
+    "暗影实体",
     "动态等级",
-    "实体暗影",
-    "默认等级"
+    "影级查询"
   ],
   "gameplay_tags": [
     "暗影"
@@ -72,6 +81,6 @@
     "source_sha256": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
     "source_bytes": 576,
     "model": "hy3-free",
-    "generated_at_ms": 1787861422462
+    "generated_at_ms": 1787893927000
   }
 }

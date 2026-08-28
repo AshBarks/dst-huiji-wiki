@@ -7,235 +7,235 @@
   },
   "category": "component",
   "display_name": "childspawner",
-  "summary": "ChildSpawner 组件负责管理世界中子实体的生成、追踪与回收，包括普通子实体与紧急子实体（根据附近玩家数量动态生成）。它参与的核心玩法包括巢穴或建筑物的怪物孵化、死亡再生机制，以及子实体回家与占用状态切换等逻辑。",
+  "summary": "该组件管理实体内部与外部的子实体数量，负责按设定周期生成与再生子实体（包括普通与紧急模式）。它通过回调函数响应占用、生成、回家、死亡等事件，常用于怪物巢穴或生成器类预制体。",
   "api": [
     {
       "name": "GetTimeToNextSpawn",
-      "effect": "返回基于 spawnperiod 与 spawnvariance 随机计算的下一次生成间隔时间，无副作用。"
+      "effect": "返回基于 spawnperiod 与 spawnvariance 计算的随机时间，用于下一次生成计时，无副作用。"
     },
     {
       "name": "GetTimeToNextRegen",
-      "effect": "返回基于 regenperiod 与 regenvariance 随机计算的下一次再生间隔时间，无副作用。"
+      "effect": "返回基于 regenperiod 与 regenvariance 计算的随机时间，用于下一次再生计时，无副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除所有外部普通与紧急子实体的事件监听，并取消周期更新任务。副作用：清除监听与 task。"
+      "effect": "组件移除时，清除所有外部子实体的事件监听并取消周期任务，释放资源。"
     },
     {
       "name": "StartRegen",
-      "effect": "设置 regening 为 true，若未达满员则设定再生计时并启动更新。副作用：修改状态并可能启动任务。"
+      "effect": "设置 regening 为 true，若未满则重置再生计时并启动更新任务，可能开始再生。"
     },
     {
       "name": "SetRareChild",
-      "effect": "设置 rarechild 与 rarechildchance 字段。副作用：覆盖稀有子实体配置。"
+      "effect": "设置稀有子实体 prefab 名与出现几率，修改 rarechild 与 rarechildchance 字段。"
     },
     {
       "name": "StopRegen",
-      "effect": "设置 regening 为 false 并停止更新。副作用：停用再生并可能取消任务。"
+      "effect": "设置 regening 为 false 并尝试停止更新任务，停止再生行为。"
     },
     {
       "name": "SetSpawnPeriod",
-      "effect": "设置 spawnperiod 与 spawnvariance（未提供则用比例），重置 timetonextspawn。副作用：修改生成周期参数。"
+      "effect": "设置生成周期与方差，重置下一次生成计时，修改相关字段。"
     },
     {
       "name": "SetRegenPeriod",
-      "effect": "设置 regenperiod 与 regenvariance（未提供则用比例），重置 timetonextregen。副作用：修改再生周期参数。"
+      "effect": "设置再生周期与方差，重置下一次再生计时，修改相关字段。"
     },
     {
       "name": "SetEmergencyRadius",
-      "effect": "设置 emergencydetectionradius 值。副作用：改变紧急检测半径。"
+      "effect": "设置紧急子实体检测半径，修改 emergencydetectionradius 字段。"
     },
     {
       "name": "IsFull",
-      "effect": "返回 NumChildren() >= maxchildren 的布尔值，无副作用。"
+      "effect": "返回普通子实体总数是否达到 maxchildren 限制，无副作用。"
     },
     {
       "name": "NumChildren",
-      "effect": "返回 numchildrenoutside 与 childreninside 之和，无副作用。"
+      "effect": "返回普通子实体内部与外部数量之和，无副作用。"
     },
     {
       "name": "IsEmergencyFull",
-      "effect": "返回 NumEmergencyChildren() >= maxemergencychildren 的布尔值，无副作用。"
+      "effect": "返回紧急子实体总数是否达到 maxemergencychildren 限制，无副作用。"
     },
     {
       "name": "NumEmergencyChildren",
-      "effect": "返回 numemergencychildrenoutside 与 emergencychildreninside 之和，无副作用。"
+      "effect": "返回紧急子实体内部与外部数量之和，无副作用。"
     },
     {
       "name": "DoRegen",
-      "effect": "若 regening 且未满，则 AddChildrenInside(1) 与 AddEmergencyChildrenInside(1)。副作用：增加内部计数。"
+      "effect": "若 regening 为真，则普通与紧急内部子实体各增加1（若未达上限），修改内部计数。"
     },
     {
       "name": "OnUpdate",
-      "effect": "根据 dt 递减再生与生成计时，触发 DoRegen 或 SpawnChild/QueueSpawnChild，并调整更新任务。副作用：可能生成实体、修改计时与任务。"
+      "effect": "周期更新函数，递减再生与生成计时，触发 DoRegen 或直接/队列生成子实体，并停止不必要的更新。"
     },
     {
       "name": "ShouldUpdate",
-      "effect": "返回是否需要更新任务的布尔值，基于 spawning/regening 与内部计数，无副作用。"
+      "effect": "根据生成与再生状态判断是否需要继续更新任务，返回布尔值，无副作用。"
     },
     {
       "name": "StartUpdate",
-      "effect": "根据 useexternaltimer 启动外部计时器或创建周期任务。副作用：可能创建 task 或调用外部函数。"
+      "effect": "根据 useexternaltimer 启动外部计时器或内部周期任务，可能创建 task 或调用外部函数。"
     },
     {
       "name": "TryStopUpdate",
-      "effect": "根据条件停止更新任务或外部计时器。副作用：可能取消 task 或调用外部停止函数。"
+      "effect": "根据条件取消内部周期任务或调用外部计时停止函数，释放更新。"
     },
     {
       "name": "StartSpawning",
-      "effect": "设置 spawning=true，timetonextspawn=0，启动更新，若外部计时器则设置。副作用：启用生成并可能启动任务。"
+      "effect": "设置 spawning 为 true，生成计时置零并启动更新，开始主动生成子实体。"
     },
     {
       "name": "StopSpawning",
-      "effect": "设置 spawning=false 并停止更新。副作用：停用生成并可能取消任务。"
+      "effect": "设置 spawning 为 false 并尝试停止更新，停止主动生成。"
     },
     {
       "name": "SetOccupiedFn",
-      "effect": "设置 onoccupied 回调函数，无副作用（仅存储）。"
+      "effect": "设置 onoccupied 回调函数，当子实体进入内部时可能调用。"
     },
     {
       "name": "SetSpawnedFn",
-      "effect": "设置 onspawned 回调函数，无副作用（仅存储）。"
+      "effect": "设置 onspawned 回调函数，生成子实体后调用。"
     },
     {
       "name": "SetOnTakeOwnershipFn",
-      "effect": "设置 ontakeownership 回调函数，无副作用（仅存储）。"
+      "effect": "设置 ontakeownership 回调函数，接管子实体所有权时调用。"
     },
     {
       "name": "SetGoHomeFn",
-      "effect": "设置 ongohome 回调函数，无副作用（仅存储）。"
+      "effect": "设置 ongohome 回调函数，子实体回家时调用。"
     },
     {
       "name": "SetVacateFn",
-      "effect": "设置 onvacate 回调函数，无副作用（仅存储）。"
+      "effect": "设置 onvacate 回调函数，内部子实体清空时调用。"
     },
     {
       "name": "SetOnChildKilledFn",
-      "effect": "设置 onchildkilledfn 回调函数，无副作用（仅存储）。"
+      "effect": "设置 onchildkilledfn 回调函数，子实体被杀死或移除时调用。"
     },
     {
       "name": "SetOnAddChildFn",
-      "effect": "设置 onaddchild 回调函数，无副作用（仅存储）。"
+      "effect": "设置 onaddchild 回调函数，内部子实体增加时调用。"
     },
     {
       "name": "CountChildrenOutside",
-      "effect": "遍历 childrenoutside 统计有效且通过过滤函数的子实体数量，无副作用。"
+      "effect": "统计外部有效子实体数量，可传入过滤函数，无副作用。"
     },
     {
       "name": "SetMaxChildren",
-      "effect": "设置 maxchildren 并重新计算 childreninside，重启更新。副作用：修改最大与内部计数，可能启停任务。"
+      "effect": "设置最大普通子实体数，调整内部计数并重启更新任务，可能改变再生/生成状态。"
     },
     {
       "name": "SetMaxEmergencyChildren",
-      "effect": "设置 maxemergencychildren 并重新计算 emergencychildreninside，重启更新。副作用：修改紧急最大与内部计数。"
+      "effect": "设置最大紧急子实体数，调整内部紧急计数并重启更新任务。"
     },
     {
       "name": "OnSave",
-      "effect": "返回包含内外部子实体 GUID、计数、标志与计时的数据表及引用列表，无副作用。"
+      "effect": "返回包含子实体 GUID、内部计数、状态等保存数据及引用列表，无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述子实体数量、再生/生成计时与状态的字符串，无副作用。"
+      "effect": "返回描述内部/外部数量、再生/生成计时的调试字符串，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "从数据恢复内部计数、标志、计时，触发占用/空置回调。副作用：修改状态并可能调用回调。"
+      "effect": "从存档数据恢复子实体内部计数、生成/再生状态等，可能触发 onoccupied 或 onvacate 回调。"
     },
     {
       "name": "DoTakeOwnership",
-      "effect": "为子实体设置 home 位置与 homeseeker 组件，添加监听并调用 ontakeownership。副作用：修改子实体，添加事件监听。"
+      "effect": "为子实体设置 home 位置与 homeseeker 组件，添加事件监听并调用 ontakeownership 回调，修改子实体。"
     },
     {
       "name": "TakeOwnership",
-      "effect": "调用 DoTakeOwnership 并将子实体加入 childrenoutside，停止更新。副作用：记录外部子实体，修改监听与任务。"
+      "effect": "接管普通子实体所有权，加入外部子实体表并停止更新，建立父子关系。"
     },
     {
       "name": "TakeEmergencyOwnership",
-      "effect": "调用 DoTakeOwnership 并将子实体加入 emergencychildrenoutside，停止更新。副作用：记录紧急外部子实体。"
+      "effect": "接管紧急子实体所有权，加入紧急外部子实体表并停止更新。"
     },
     {
       "name": "LoadPostPass",
-      "effect": "根据保存的 GUID 调用 TakeOwnership/TakeEmergencyOwnership 恢复外部子实体，重启更新。副作用：重建外部子实体关联。"
+      "effect": "加载后根据保存的 GUID 重新接管子实体所有权，并启动/停止更新。"
     },
     {
       "name": "GetChildPrefab",
-      "effect": "根据稀有概率或异种权重返回待生成 prefab 名，可能减少 otherchildreninside 计数。副作用：可能修改异种权重表。"
+      "effect": "根据稀有几率或异种子实体权重决定并返回要生成的 prefab 名，可能减少 otherchildreninside 计数。"
     },
     {
       "name": "DoSpawnChild",
-      "effect": "计算生成位置并 SpawnPrefab，设置位置、潮湿、目标，触发 onspawned，返回子实体或 nil。副作用：创建实体，可能调用回调。"
+      "effect": "内部方法：计算生成位置，生成指定 prefab 子实体，设置位置/目标并调用 onspawned 回调，创建新实体。"
     },
     {
       "name": "QueueSpawnChild",
-      "effect": "设置 queued_spawn=true 并停止更新。副作用：标记排队生成，可能取消任务。"
+      "effect": "设置 queued_spawn 标记并停止更新，等待实体唤醒后生成。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "若 queued_spawn 则延迟调用 DoQueuedSpawn。副作用：可能触发生成任务。"
+      "effect": "实体唤醒时若存在队列生成，则延迟执行 DoQueuedSpawn 生成子实体。"
     },
     {
       "name": "DoQueuedSpawn",
-      "effect": "清除 queued_spawn，若 spawning 则 SpawnChild 并启动更新。副作用：可能生成子实体并重启任务。"
+      "effect": "清除队列标记，若正在生成则调用 SpawnChild 并启动更新，可能生成子实体。"
     },
     {
       "name": "ProcessOtherChildren",
-      "effect": "调整 otherchildreninside 或 otheremergencychildreninside 以匹配内部计数。副作用：修改异种计数表。"
+      "effect": "调整 otherchildreninside 权重表以匹配内部子实体数量，可能减少异种子实体计数。"
     },
     {
       "name": "SpawnChild",
-      "effect": "条件满足时调用 DoSpawnChild 生成普通子实体，减少 childreninside，接管并可能触发 onvacate。副作用：生成实体，修改计数与表。"
+      "effect": "生成普通子实体，减少内部计数，接管所有权，若清空则触发 onvacate，返回子实体或 nil。"
     },
     {
       "name": "SpawnEmergencyChild",
-      "effect": "条件满足时生成紧急子实体，减少 emergencychildreninside 并接管。副作用：生成实体，修改紧急计数与表。"
+      "effect": "生成紧急子实体，减少紧急内部计数并接管紧急所有权，返回子实体或 nil。"
     },
     {
       "name": "UpdateMaxEmergencyCommit",
-      "effect": "统计半径内玩家数计算 maxemergencycommit。副作用：修改最大紧急提交数。"
+      "effect": "根据检测半径内玩家数计算最大紧急提交数，修改 maxemergencycommit 字段。"
     },
     {
       "name": "TrySpawnEmergencyChild",
-      "effect": "调用 UpdateMaxEmergencyCommit 后尝试 SpawnEmergencyChild。副作用：可能生成紧急子实体。"
+      "effect": "更新紧急提交数并尝试生成紧急子实体，返回生成的子实体。"
     },
     {
       "name": "TakeInChild",
-      "effect": "让子实体回家：推送事件，调用 ongohome，移除外部记录并删除实体，增加内部计数，可能记录异种。副作用：移除实体，修改计数与表。"
+      "effect": "子实体回家：推送事件，移除外部记录，删除子实体并增加内部计数，可能记录异种子实体偏好。"
     },
     {
       "name": "GoHome",
-      "effect": "若子实体在外部表中则调用 TakeInChild 并返回 true，否则 false。副作用：可能触发回家流程。"
+      "effect": "验证后让指定子实体（普通或紧急）回家，调用 TakeInChild 移除子实体。"
     },
     {
       "name": "CanSpawnOffscreenOrAwake",
-      "effect": "返回 spawnoffscreen 或实体非睡眠的布尔值，无副作用。"
+      "effect": "返回是否允许离屏生成或实体处于唤醒状态，无副作用。"
     },
     {
       "name": "CanSpawn",
-      "effect": "返回普通生成条件（有效、有内部数、可生成、健康、canspawnfn）是否满足，无副作用。"
+      "effect": "综合实体有效、内部计数、屏外规则、健康与自定义函数判断能否生成普通子实体。"
     },
     {
       "name": "CanEmergencySpawn",
-      "effect": "返回紧急生成条件（有效、启用、有内部数、提交未满等）是否满足，无副作用。"
+      "effect": "判断是否满足紧急子实体生成条件，包括有效、允许标志、提交数限制等。"
     },
     {
       "name": "OnChildKilled",
-      "effect": "清理子实体监听与外部记录，调用 onchildkilledfn 并启动更新。副作用：移除监听与记录，可能调用回调。"
+      "effect": "子实体死亡/移除时移除监听与外部记录，调用 onchildkilledfn 并启动更新。"
     },
     {
       "name": "ReleaseAllChildren",
-      "effect": "循环释放所有可生成的普通与紧急子实体直到失败或上限，返回列表。副作用：可能大量生成实体。"
+      "effect": "循环释放所有可生成的普通与紧急子实体直到条件不满足或失败，返回释放列表。"
     },
     {
       "name": "AddChildrenInside",
-      "effect": "增加 childreninside（限最大值），触发 onoccupied 与 onaddchild，重启更新。副作用：修改计数与可能调用回调。"
+      "effect": "增加普通内部子实体数（限最大），触发 onoccupied/onaddchild 回调并重启更新。"
     },
     {
       "name": "AddEmergencyChildrenInside",
-      "effect": "增加 emergencychildreninside（限最大值）并重启更新。副作用：修改紧急内部计数。"
+      "effect": "增加紧急内部子实体数（限最大）并重启更新。"
     },
     {
       "name": "LongUpdate",
-      "effect": "调用 OnUpdate(dt) 处理长时间模拟。副作用：同 OnUpdate。"
+      "effect": "调用 OnUpdate 进行长时间更新，处理计时与生成/再生。"
     }
   ],
   "events_published": [
@@ -252,65 +252,83 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      34314,
+      35001,
       16419,
-      15415,
-      22638,
+      70704,
       15434,
-      28181,
+      15237,
       13493,
-      15314,
-      15663
+      15015
     ],
     "aspects": [
       {
-        "aspect": "子实体回巢与离巢行为描述",
+        "aspect": "停止巢内子实体再生情形",
         "evidence": [
           {
-            "pageid": 15314,
-            "quote": "有巢穴的蜜蜂会在黄昏时或授粉 6 朵花之后回巢"
-          },
-          {
-            "pageid": 15314,
-            "quote": "冬季时，蜜蜂不会离开巢穴"
+            "pageid": 70704,
+            "quote": "不会再生里面的蜘蛛"
           }
         ]
       },
       {
-        "aspect": "子实体生成周期与再生描述",
+        "aspect": "巢穴进入就绪状态耗时",
         "evidence": [
           {
-            "pageid": 22638,
-            "quote": "每 2 分钟生成一只海黾"
+            "pageid": 15434,
+            "quote": "三级蜘蛛巢在经过 12.5 ~ 25 天后会进入就绪状态"
           },
           {
-            "pageid": 15663,
-            "quote": "一旦这只草鳄鱼死亡，大树干会在大约 2 分钟后会生成一"
+            "pageid": 70704,
+            "quote": "未装饰的）在经过 12.5 ~ 25 天后会进入就绪状态"
           }
         ]
       },
       {
-        "aspect": "子实体生成来源与巢穴绑定",
+        "aspect": "猪屋生成及重生成猪人周期",
         "evidence": [
           {
-            "pageid": 15415,
-            "quote": "由特定的生物巢穴处生成"
+            "pageid": 15237,
+            "quote": "猪人通常由猪屋生成"
           },
           {
-            "pageid": 15663,
-            "quote": "大树干也是草鳄鱼的巢穴，每个对应一只草鳄鱼"
+            "pageid": 15237,
+            "quote": "猪人死亡 4 天后猪屋会重新生成新的猪人"
           }
         ]
       },
       {
-        "aspect": "巢穴最大容纳数标注",
+        "aspect": "生成前玩家邻近与间隔检查",
         "evidence": [
           {
-            "pageid": 22638,
-            "quote": "最多在内部容纳 2~3 只海黾"
+            "pageid": 15434,
+            "quote": "每 60 ~ 120 秒检查一次是否有玩家在其周围 30 距离单位内"
+          }
+        ]
+      },
+      {
+        "aspect": "蜘蛛子实体再生频率描述",
+        "evidence": [
+          {
+            "pageid": 70704,
+            "quote": "平均一天可以再生4~8次"
+          },
+          {
+            "pageid": 70704,
+            "quote": "通过蜘蛛巢再生普通黑蜘蛛"
+          }
+        ]
+      },
+      {
+        "aspect": "蜘蛛巢最大子实体数量标注",
+        "evidence": [
+          {
+            "pageid": 15434,
+            "quote": "!蜘蛛最大数量"
           },
           {
             "pageid": 15434,
-            "quote": "二级蜘蛛巢额外容纳 1 只蜘蛛，三级蜘蛛巢额外容纳 2 只蜘蛛"
+            "quote": "!蜘蛛战士最大数量"
           }
         ]
       }
@@ -318,26 +336,27 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "刷怪",
-    "巢穴",
-    "怪物再生",
-    "紧急怪",
+    "子实体",
+    "怪物巢",
+    "刷新怪",
+    "紧急生成",
     "回家",
     "占用",
-    "空置",
+    "再生",
     "稀有怪",
-    "最大数量"
+    "最大数",
+    "外部子"
   ],
   "gameplay_tags": [
-    "战斗",
-    "生存",
-    "生成"
+    "生成",
+    "生物",
+    "巢穴"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
     "source_bytes": 27213,
     "model": "hy3-free",
-    "generated_at_ms": 1787861128272
+    "generated_at_ms": 1787893826310
   }
 }

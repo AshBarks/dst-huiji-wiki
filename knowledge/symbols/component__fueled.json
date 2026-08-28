@@ -7,131 +7,131 @@
   },
   "category": "component",
   "display_name": "fueled",
-  "summary": "该组件管理实体的燃料储量、燃料类型、消耗速率与分段显示等数据。它参与营火、灯笼等可燃料物体的核心玩法，处理燃料添加、持续消耗、耗尽回调以及缝补需求标签的逻辑。",
+  "summary": "该组件管理实体的燃料储量（currentfuel、maxfuel）与消耗速率，支持主要和次要燃料类型（含缝补用途 USAGE）。它参与饥荒核心生存玩法，处理燃料的持续消耗与添加维持运作，并模拟装备需缝补的状态标签。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "停止燃料消耗，移除实体上由本组件添加的燃料类型标签、needssewing标签及fueldepleted标签。"
+      "effect": "停止燃料消耗（调用 StopConsuming），并移除实体上与 fueltype、secondaryfueltype 对应的 '_fueled' 或 'needssewing' 标签，以及 'fueldepleted' 标签。"
     },
     {
       "name": "MakeEmpty",
-      "effect": "若当前燃料大于0，通过DoDelta将当前燃料清零，触发分段变化与事件。"
+      "effect": "若当前燃料大于0，则通过 DoDelta 减去全部当前燃料使燃料归零，可能触发段落变更与事件。"
     },
     {
       "name": "OnSave",
-      "effect": "当currentfuel不等于maxfuel时返回包含fuel字段的表用于存档，否则返回nil。"
+      "effect": "当 currentfuel 不等于 maxfuel 时返回包含燃料量的表 {fuel = currentfuel} 以供存档，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若读取数据中包含fuel，则调用InitializeFuelLevel设置燃料水平。"
+      "effect": "若读取数据中包含 fuel 字段，则调用 InitializeFuelLevel 以非负燃料值初始化燃料等级，改变当前燃料。"
     },
     {
       "name": "SetSectionCallback",
-      "effect": "设置分段变化时的回调函数self.sectionfn。"
+      "effect": "设置段落变更回调函数 self.sectionfn，无其它副作用。"
     },
     {
       "name": "SetDepletedFn",
-      "effect": "设置燃料耗尽时的回调函数self.depleted。"
+      "effect": "设置燃料耗尽时的回调函数 self.depleted。"
     },
     {
       "name": "IsEmpty",
-      "effect": "返回currentfuel是否小于等于0。"
+      "effect": "返回当前燃料是否小于等于0的布尔值，无副作用。"
     },
     {
       "name": "IsFull",
-      "effect": "返回maxfuel大于0且currentfuel大于等于maxfuel。"
+      "effect": "返回最大燃料大于0且当前燃料大于等于最大燃料的布尔值，无副作用。"
     },
     {
       "name": "SetSections",
-      "effect": "设置分段数量self.sections。"
+      "effect": "设置燃料分段数量 self.sections。"
     },
     {
       "name": "SetMultiplierFn",
-      "effect": "设置燃料乘数函数self.multfn，供TakeFuelItem计算燃料值时使用。"
+      "effect": "设置燃料加成计算函数 self.multfn，供添加燃料时调用。"
     },
     {
       "name": "CanAcceptFuelItem",
-      "effect": "检查本组件是否接受给定物品作为燃料：需accepting为真且物品的fuel/fueler组件燃料类型匹配主或副燃料类型。"
+      "effect": "检查组件是否接受燃料且物品具有匹配燃料类型的 fuel/fueler 组件，返回布尔值，无副作用。"
     },
     {
       "name": "GetCurrentSection",
-      "effect": "计算并返回当前燃料所在分段索引（空为0，否则根据百分比与sections计算）。"
+      "effect": "根据燃料百分比与分段数计算并返回当前段落索引（空时返回0），无副作用。"
     },
     {
       "name": "ChangeSection",
-      "effect": "根据给定分段变化量，通过DoDelta调整燃料值（amount * maxfuel / sections - 1）。"
+      "effect": "根据传入段落变化量计算燃料差值并调用 DoDelta，改变当前燃料。"
     },
     {
       "name": "SetCanTakeFuelItemFn",
-      "effect": "设置自定义可接受燃料物品判断函数self.cantakefuelitemfn。"
+      "effect": "设置接受燃料物品前的额外条件检查回调 self.cantakefuelitemfn。"
     },
     {
       "name": "SetTakeFuelItemFn",
-      "effect": "设置成功接受燃料物品后的回调函数self.ontakefuelitemfn。"
+      "effect": "设置成功拿走燃料物品后的回调 self.ontakefuelitemfn。"
     },
     {
       "name": "SetTakeFuelFn",
-      "effect": "设置添加燃料值后的回调函数self.ontakefuelfn。"
+      "effect": "设置成功添加燃料后的回调 self.ontakefuelfn。"
     },
     {
       "name": "TakeFuelItem",
-      "effect": "验证后可添加燃料：计算含奖励与惩罚的燃料值，调用DoDelta增加燃料，触发燃料物品移除与各类回调，推送takefuel事件，返回true。"
+      "effect": "验证后可计算燃料值（含加成、潮湿惩罚、燃料大师奖励）并通过 DoDelta 增加燃料，标记燃料物为已取走，移除物品（若提供），调用相关回调并推送 'takefuel' 事件；返回 true 表示成功。"
     },
     {
       "name": "SetUpdateFn",
-      "effect": "设置每次更新时的回调函数self.updatefn。"
+      "effect": "设置每次更新（DoUpdate）时调用的回调 self.updatefn。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含消耗状态、燃料数值、速率与分段信息的调试字符串。"
+      "effect": "返回描述消耗状态、燃料量、速率与段落的调试字符串，无副作用。"
     },
     {
       "name": "AddThreshold",
-      "effect": "将给定百分比与回调函数插入self.thresholds表（源码中未显式初始化该表）。"
+      "effect": "将百分比阈值与对应函数插入 self.thresholds 表（源码中未显式初始化该表）。"
     },
     {
       "name": "GetSectionPercent",
-      "effect": "返回当前分段内的局部百分比。"
+      "effect": "返回当前段落内的百分比进度，无副作用。"
     },
     {
       "name": "GetPercent",
-      "effect": "返回当前燃料占最大燃料的百分比（钳制0-1，maxfuel<=0时为0）。"
+      "effect": "返回当前燃料占最大燃料的比例（钳制在0~1），无副作用。"
     },
     {
       "name": "SetPercent",
-      "effect": "根据给定比例计算目标燃料并调用DoDelta调整。"
+      "effect": "根据目标比例计算差值并调用 DoDelta 设置燃料，改变当前燃料。"
     },
     {
       "name": "SetFirstPeriod",
-      "effect": "设置首次消耗周期时长self.firstperiod及可选的满燃料时首次周期self.firstperiodfull。"
+      "effect": "设置首次消耗周期时长 self.firstperiod 与满燃料时的首次周期 self.firstperiodfull。"
     },
     {
       "name": "StartConsuming",
-      "effect": "标记consuming为真，启动周期任务调用DoUpdate；若设了firstperiod则启动墙更新以处理首周期。"
+      "effect": "标记开始消耗，启动周期任务按 period 调用 DoUpdate；若设了 firstperiod 则启动墙更新以应用首次周期，开始持续减少燃料。"
     },
     {
       "name": "OnWallUpdate",
-      "effect": "墙更新回调：若服务器未暂停，使用首周期时长作为dt调用DoUpdate并停止墙更新。"
+      "effect": "若服务器未暂停，使用预设的 firstperioddt 作为时间步调用 DoUpdate 消耗燃料，并停止墙更新。"
     },
     {
       "name": "InitializeFuelLevel",
-      "effect": "初始化燃料水平：必要时扩充maxfuel，设置currentfuel，若分段变化则触发回调与onfueldsectionchanged事件。"
+      "effect": "设置或扩展最大燃料并设定当前燃料，若段落变化则调用段落回调并推送 'onfueldsectionchanged' 事件。"
     },
     {
       "name": "DoDelta",
-      "effect": "按给定量改变currentfuel并钳制，分段变化时触发sectionfn、onfueldsectionchanged与percentusedchange事件，耗尽时调用depleted。"
+      "effect": "按差值修改当前燃料并钳制范围，段落变化时调用段落回调、推送 'onfueldsectionchanged' 与 'percentusedchange' 事件，耗尽且设了 depleted 回调时调用之。"
     },
     {
       "name": "DoUpdate",
-      "effect": "若正在消耗则按速率减少燃料，空则停止消耗，最后调用updatefn（若有）。"
+      "effect": "若处于消耗状态则按时间步与速率减少燃料；空则停止消耗；最后调用 updatefn 回调。"
     },
     {
       "name": "StopConsuming",
-      "effect": "标记consuming为假，取消周期任务与墙更新。"
+      "effect": "标记停止消耗，取消周期任务与墙更新，终止燃料减少。"
     },
     {
       "name": "LongUpdate",
-      "effect": "等同于DoUpdate，用于长时更新推进。"
+      "effect": "等价于 DoUpdate 的别名，用于长周期更新（如存档加载后）以推进燃料消耗。"
     }
   ],
   "events_published": [
@@ -147,97 +147,162 @@
   "wiki": {
     "scanned_pageids": [
       18216,
-      10374,
-      10413,
-      15170,
-      15172,
-      15418,
+      28610,
       21620,
-      28610
+      20061,
+      15341,
+      10374,
+      13457,
+      51388
     ],
     "aspects": [
       {
-        "aspect": "初始燃料量描述",
+        "aspect": "初始燃料量标注",
         "evidence": [
           {
             "pageid": 18216,
-            "quote": "刚制作出来的发电机拥有 10 单位的电力"
+            "quote": "刚制作出来的薇诺娜的发电机拥有 10 单位的电力"
           },
           {
-            "pageid": 15170,
-            "quote": "火坑放置时带有可以燃烧 4.5 分钟的燃料"
-          },
-          {
-            "pageid": 15172,
-            "quote": "吸热火坑放置时带有可以燃烧 4.5 分钟的燃料"
+            "pageid": 51388,
+            "quote": "兔灯放置时带有可以燃烧 3 分钟的燃料"
           }
         ]
       },
       {
-        "aspect": "可接受燃料物品说明",
-        "evidence": [
-          {
-            "pageid": 10413,
-            "quote": "薇诺娜可以用[[噩梦燃料]]为[[薇诺娜的发电机]]添加燃料。"
-          },
-          {
-            "pageid": 10413,
-            "quote": "薇诺娜可以用[[纯粹恐惧]]为[[薇诺娜的发电机]]添加燃料。"
-          },
-          {
-            "pageid": 15170,
-            "quote": "可以通过添加[[火焰燃料]]来使其燃烧更久"
-          },
-          {
-            "pageid": 15172,
-            "quote": "可以通过添加[[火焰燃料]]或[[硝石]]来使其燃烧更久"
-          }
-        ]
-      },
-      {
-        "aspect": "燃料值乘数加成描述",
-        "evidence": [
-          {
-            "pageid": 10374,
-            "quote": "薇洛为营地火源添加燃料时，燃料值提高了 50%"
-          }
-        ]
-      },
-      {
-        "aspect": "燃料增量数值标注",
+        "aspect": "可接受燃料物品类型标注",
         "evidence": [
           {
             "pageid": 18216,
-            "quote": "加燃料，每个提供 5 单位的电力"
+            "quote": "可以用硝石来添加燃料"
           },
           {
-            "pageid": 15170,
-            "quote": "每个燃料会提供双倍于其燃料值的"
+            "pageid": 28610,
+            "quote": "每种燃料都有自己的燃料类型和燃料值"
           },
           {
             "pageid": 21620,
-            "quote": "每个宝石提供 20 单位的电力"
+            "quote": "放置最多 3 个宝石作为燃料"
+          },
+          {
+            "pageid": 15341,
+            "quote": "警钟可使用噩梦燃料或纯粹恐惧为其添加燃料"
+          },
+          {
+            "pageid": 51388,
+            "quote": "可以通过添加火焰燃料来使其燃烧更久"
           }
         ]
       },
       {
-        "aspect": "燃料容量与满载描述",
+        "aspect": "多段落燃料槽位描述",
+        "evidence": [
+          {
+            "pageid": 21620,
+            "quote": "可以放置最多 3 个宝石作为燃料"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料值/消耗速度倍率标注",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "空转消耗速度0.1/s * 消耗速度倍率0.375"
+          },
+          {
+            "pageid": 10374,
+            "quote": "燃料值提高了 50%"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料值上限标注",
         "evidence": [
           {
             "pageid": 18216,
             "quote": "拥有 10 单位的电力，也是它最多储存的电力"
           },
           {
-            "pageid": 15170,
-            "quote": "满以后可持续燃烧 6 分钟"
+            "pageid": 21620,
+            "quote": "最多储存 60 单位的电力"
           },
           {
-            "pageid": 15172,
-            "quote": "满以后可持续燃烧 6 分钟"
+            "pageid": 20061,
+            "quote": "只有120燃料值上限"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料值增减数值标注",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "每个提供 5 单位的电力"
           },
           {
             "pageid": 21620,
-            "quote": "储存电力的上限为 4 单位"
+            "quote": "每个宝石提供 20 单位的电力"
+          },
+          {
+            "pageid": 20061,
+            "quote": "添加燃料时不会提供额外的燃料值"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料消耗速率与持续时间描述",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "空转消耗速度0.1/s"
+          },
+          {
+            "pageid": 21620,
+            "quote": "消耗速度是0.1/s"
+          },
+          {
+            "pageid": 51388,
+            "quote": "兔灯放置时带有可以燃烧 3 分钟的燃料"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料百分比恢复标注",
+        "evidence": [
+          {
+            "pageid": 15341,
+            "quote": "每个噩梦燃料恢复 25% 耐久"
+          },
+          {
+            "pageid": 15341,
+            "quote": "每个纯粹恐惧恢复 50% 耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料耗尽行为描述",
+        "evidence": [
+          {
+            "pageid": 15341,
+            "quote": "警钟不会在耐久耗尽时损毁，但不再属于暗影物品"
+          },
+          {
+            "pageid": 51388,
+            "quote": "兔灯在火焰熄灭后依然会存在，只要往里面添加燃料就可以复燃"
+          }
+        ]
+      },
+      {
+        "aspect": "燃料阈值触发效果描述",
+        "evidence": [
+          {
+            "pageid": 20061,
+            "quote": "燃料值达到过上限的75%以上时会掉落一个木炭"
+          },
+          {
+            "pageid": 51388,
+            "quote": "曾有过 75% 以上的燃料，还会在熄灭时产生"
           }
         ]
       }
@@ -245,13 +310,14 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "燃料量",
-    "加燃料",
-    "烧燃料",
-    "燃料空",
-    "需缝补",
+    "燃料值",
+    "耗尽",
+    "添加燃料",
+    "燃烧消耗",
+    "缝补需求",
     "燃料段",
-    "可燃物品",
+    "潮湿燃料",
+    "接受燃料",
     "燃料类型"
   ],
   "gameplay_tags": [
@@ -263,6 +329,6 @@
     "source_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
     "source_bytes": 10455,
     "model": "hy3-free",
-    "generated_at_ms": 1787860158387
+    "generated_at_ms": 1787893245050
   }
 }

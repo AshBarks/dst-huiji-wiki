@@ -7,279 +7,291 @@
   },
   "category": "component",
   "display_name": "container",
-  "summary": "容器组件管理实体的物品槽位（slots）与开启状态，参与物品存储、堆叠、丢弃及容器开合等核心玩法。它提供放入、取出、丢弃、查询物品以及打开关闭容器等接口，支持背包与专用容器逻辑，并与库存系统交互。",
+  "summary": "容器组件管理实体的物品槽位、堆叠与开启状态数据，支持物品的存入、取出、掉落与销毁。它参与核心生存玩法中的物品存储、背包交互及合成材料管理，并支持多人同时开启与界面同步。",
   "api": [
     {
       "name": "WidgetSetup",
-      "effect": "移除部件相关属性的setter，调用全局widgetsetup初始化并同步到replica，然后将属性设为只读；副作用：改变并锁定numslots、widget等显示属性。"
+      "effect": "移除部件属性 setter 后调用 containers.widgetsetup 初始化，同步至 replica.container，再将属性设为只读。"
     },
     {
       "name": "GetWidget",
-      "effect": "返回self.widget。"
+      "effect": "返回 self.widget 部件配置。"
     },
     {
       "name": "NumItems",
-      "effect": "返回slots表中物品数量。"
+      "effect": "返回容器中当前物品数量。"
     },
     {
       "name": "IsFull",
-      "effect": "当物品数大于等于槽位数时返回true。"
+      "effect": "当物品数大于等于槽位数时返回 true。"
     },
     {
       "name": "IsEmpty",
-      "effect": "当slots为空时返回true。"
+      "effect": "当容器无任何物品时返回 true。"
     },
     {
       "name": "SetNumSlots",
-      "effect": "断言新槽位数不少于当前，更新self.numslots；副作用：增加容器槽位容量。"
+      "effect": "断言新槽位数不小于当前并设入 self.numslots，扩展容器容量。"
     },
     {
       "name": "DropItemBySlot",
-      "effect": "从指定槽位移除物品并掉落至给定位置，触发物品OnDropped及推送dropitem事件；副作用：物品离开容器并在世界生成掉落物。"
+      "effect": "移除指定槽位物品并掉落至给定位置，触发物品 OnDropped 与容器 'dropitem' 事件。"
     },
     {
       "name": "DropEverythingWithTag",
-      "effect": "遍历槽位丢弃带指定标签物品，并递归处理内部容器；副作用：符合条件的物品被丢弃。"
+      "effect": "遍历槽位掉落带指定标签物品，并递归处理内部容器中的子容器。"
     },
     {
       "name": "DropEverythingByFilter",
-      "effect": "使用过滤函数决定丢弃物品，递归内部容器；副作用：符合条件的物品掉落。"
+      "effect": "使用过滤函数决定掉落物品，并递归处理内部容器。"
     },
     {
       "name": "DropEverything",
-      "effect": "丢弃所有非锁定槽物品，递归内部容器；副作用：容器清空并掉落物品。"
+      "effect": "掉落所有非锁定槽物品，并递归处理内部容器。"
     },
     {
       "name": "DropEverythingUpToMaxStacks",
-      "effect": "循环丢弃物品直到达到最大堆叠数限制；副作用：部分物品掉落。"
+      "effect": "循环掉落物品直到达到最大堆叠数限制。"
     },
     {
       "name": "DropItem",
-      "effect": "在容器世界坐标处丢弃指定物品；副作用：物品掉落。"
+      "effect": "在容器世界坐标处掉落指定物品，物品离开容器。"
     },
     {
       "name": "DropOverstackedExcess",
-      "effect": "若物品堆叠超出原始最大尺寸，将多余部分在容器位置掉落；副作用：可能产生掉落物。"
+      "effect": "将物品超出原始最大堆叠的部分拆分并掉落于容器位置。"
     },
     {
       "name": "DropItemAt",
-      "effect": "将指定物品移除并掉落至给定坐标，推送dropitem；副作用：物品掉落。"
+      "effect": "在指定坐标掉落物品，移除并推送 'dropitem' 事件。"
     },
     {
       "name": "CanTakeItemInSlot",
-      "effect": "检查物品能否放入指定槽位（考虑只读、标签、堆叠锁定及itemtestfn），返回布尔值。"
+      "effect": "检查物品能否放入指定槽位，考虑锁定、只读、标签及 itemtestfn 限制，返回布尔。"
     },
     {
       "name": "GetSpecificSlotForItem",
-      "effect": "若启用专用槽位且通过itemtestfn找到合适槽位则返回索引，否则nil。"
+      "effect": "若启用专属槽位且通过测试，返回物品的合适槽位索引。"
     },
     {
       "name": "ShouldPrioritizeContainer",
-      "effect": "基于priorityfn判断该容器是否应优先接收物品，返回布尔。"
+      "effect": "根据 priorityfn 判断物品是否优先放入此容器，返回布尔。"
     },
     {
       "name": "AcceptsStacks",
-      "effect": "返回self.acceptsstacks。"
+      "effect": "返回容器是否接受堆叠物品。"
     },
     {
       "name": "IsSideWidget",
-      "effect": "返回self.issidewidget。"
+      "effect": "返回是否为侧边界面部件。"
     },
     {
       "name": "DestroyContents",
-      "effect": "移除并销毁所有槽位物品，可调用回调；副作用：物品被删除。"
+      "effect": "移除并删除所有槽位物品，删除前可触发回调，物品被销毁。"
     },
     {
       "name": "DestroyContentsConditionally",
-      "effect": "按条件销毁物品，无过滤函数时等同DestroyContents；副作用：符合条件的物品删除。"
+      "effect": "按过滤函数条件销毁物品，不符合则保留。"
     },
     {
       "name": "CanAcceptCount",
-      "effect": "计算容器（含专用子容器）能接收的物品数量，返回可接收数。"
+      "effect": "计算容器及专属溢出容器能接受物品的最大数量，返回整数。"
     },
     {
       "name": "GiveItem",
-      "effect": "将物品放入容器指定或合适槽位，处理堆叠与专用容器转发，失败可掉落；副作用：物品进入容器，推送itemget，可能触发声音与owner事件。"
+      "effect": "将物品放入容器，处理堆叠合并、专属容器转发、失败掉落，推送 'itemget' 等事件，可能生成关闭接收分类实体。"
     },
     {
       "name": "RemoveItemBySlot",
-      "effect": "从槽位移除物品并返回；副作用：物品离开容器。"
+      "effect": "移除指定槽位物品并返回，物品离开容器。"
     },
     {
       "name": "RemoveAllItems",
-      "effect": "移除所有槽位物品并返回列表；副作用：容器清空。"
+      "effect": "移除所有槽位物品并返回物品列表。"
     },
     {
       "name": "GetNumSlots",
-      "effect": "返回槽位数。"
+      "effect": "返回容器槽位总数。"
     },
     {
       "name": "GetItemInSlot",
-      "effect": "返回指定槽位物品或nil。"
+      "effect": "返回指定槽位中的物品或 nil。"
     },
     {
       "name": "GetItemSlot",
-      "effect": "返回物品所在槽位索引。"
+      "effect": "返回物品所在的槽位索引。"
     },
     {
       "name": "GetAllItems",
-      "effect": "返回所有物品列表。"
+      "effect": "返回容器中所有物品的列表。"
     },
     {
       "name": "Open",
-      "effect": "为doer打开容器，处理音效、HUD、库存关联及事件推送；副作用：opencount增加，doer可查看容器，推送onopen等。"
+      "effect": "为开启者打开容器界面，关联库存、播放声音、推送 'onopen' 事件，增加开启计数。"
     },
     {
       "name": "Close",
-      "effect": "关闭容器，递归关闭内部物品容器，处理HUD与事件；副作用：opencount减少，推送onclose。"
+      "effect": "关闭容器，递归关闭内部容器，取消库存关联、播放声音、推送 'onclose' 事件，减少开启计数。"
     },
     {
       "name": "IsOpen",
-      "effect": "返回是否开启中（opencount>0）。"
+      "effect": "返回容器当前是否被开启。"
     },
     {
       "name": "IsOpenedBy",
-      "effect": "返回指定实体是否打开了容器。"
+      "effect": "返回给定实体是否在开启者列表中。"
     },
     {
       "name": "IsOpenedByOthers",
-      "effect": "返回是否有其他实体打开容器。"
+      "effect": "返回除给定实体外是否还有其他开启者。"
     },
     {
       "name": "CanOpen",
-      "effect": "根据openlimit检查能否打开。"
+      "effect": "根据开启限制 openlimit 返回能否打开。"
     },
     {
       "name": "GetOpeners",
-      "effect": "返回当前开启者列表。"
+      "effect": "返回当前所有开启者的列表。"
     },
     {
       "name": "IsHolding",
-      "effect": "检查是否持有物品，可递归检查子容器，返回布尔。"
+      "effect": "检查容器是否持有某物品，可选递归检查内部容器。"
     },
     {
       "name": "FindItem",
-      "effect": "返回首个满足条件的物品。"
+      "effect": "返回首个满足函数的物品。"
     },
     {
       "name": "FindItems",
-      "effect": "返回所有满足条件的物品列表。"
+      "effect": "返回所有满足函数的物品列表。"
     },
     {
       "name": "ForEachItem",
-      "effect": "对每件物品调用给定函数。"
+      "effect": "对容器中每件物品执行给定函数。"
     },
     {
       "name": "GetSpecializedContainers",
-      "effect": "返回槽内可作为专用溢出容器的子容器列表。"
+      "effect": "返回已验证的专属溢出容器列表，忽略自身忽略标志。"
     },
     {
       "name": "IsSpecializedContainer",
-      "effect": "检查给定容器是否为本容器内的专用容器。"
+      "effect": "检查给定容器是否为本容器的专属容器并验证。"
     },
     {
       "name": "Has",
-      "effect": "检查是否有足够数量指定prefab物品（可排除制作标签）。"
+      "effect": "检查是否有至少指定数量的特定 prefab 物品，可排除合成禁用标签。"
     },
     {
       "name": "HasItemThatMatches",
-      "effect": "按函数检查物品数量是否足够。"
+      "effect": "按函数检查物品累计数量是否足够。"
     },
     {
       "name": "HasItemWithTag",
-      "effect": "按标签检查物品数量是否足够。"
+      "effect": "按标签检查物品累计数量是否足够。"
     },
     {
       "name": "GetItemsWithTag",
-      "effect": "返回带标签物品列表。"
+      "effect": "返回带指定标签的所有物品列表。"
     },
     {
       "name": "GetItemByName",
-      "effect": "返回按名称找到的物品及数量表。"
+      "effect": "返回指定 prefab 物品及其所需数量的表。"
     },
     {
       "name": "GetCraftingIngredient",
-      "effect": "返回用于制作的材料物品及数量（按堆叠排序）。"
+      "effect": "返回用于合成的物品及数量，按堆叠大小排序以优先小堆。"
     },
     {
       "name": "ConsumeByName",
-      "effect": "按名称消耗指定数量物品；副作用：物品被移除或堆叠减少。"
+      "effect": "消耗指定名称的物品，移除并销毁，只读容器无效。"
     },
     {
       "name": "OnSave",
-      "effect": "返回物品存档数据与引用，供序列化。"
+      "effect": "返回物品存档记录及引用，用于序列化。"
     },
     {
       "name": "OnLoad",
-      "effect": "从存档生成物品并放入槽位；副作用：重建容器内物品。"
+      "effect": "从存档数据生成物品并放入对应槽位，重新填充容器。"
     },
     {
       "name": "RemoveItem",
-      "effect": "从容器移除指定物品（整体或单件）；副作用：物品离开。"
+      "effect": "根据物品引用移除之，可整堆或单个，返回物品。"
     },
     {
       "name": "RemoveItem_Internal",
-      "effect": "内部移除逻辑，处理堆叠拆分、事件推送；副作用：推送itemlose，物品离开。"
+      "effect": "内部移除逻辑，处理堆叠拆分、推送 'itemlose' 事件、清除无限堆叠标志，物品离开容器。"
     },
     {
       "name": "OnUpdate",
-      "effect": "自动关闭检测，对不满足距离/状态条件的开启者关闭容器；副作用：可能触发Close。"
+      "effect": "自动关闭检测，对距离过远或条件不符的开启者调用 Close。"
     },
     {
       "name": "PutOneOfActiveItemInSlot",
-      "effect": "将opener活动物品的一件放入槽位；副作用：活动物品减少，容器获得物品。"
+      "effect": "将开启者活动物品的一个放入空槽，活动物品减少。"
     },
     {
       "name": "PutAllOfActiveItemInSlot",
-      "effect": "将活动物品全部放入空槽或交换；副作用：物品移动。"
+      "effect": "将活动物品全部放入槽位或与之交换，处理库存移动。"
     },
     {
       "name": "TakeActiveItemFromHalfOfSlot",
-      "effect": "从槽位取一半物品为活动物品；副作用：槽位物品减少。"
+      "effect": "从槽位取一半物品作为活动物品，槽位剩余减半。"
     },
     {
       "name": "TakeActiveItemFromCountOfSlot",
-      "effect": "从槽位取指定数量物品为活动物品；副作用：槽位物品减少。"
+      "effect": "从槽位取指定数量物品作为活动物品。"
     },
     {
       "name": "TakeActiveItemFromAllOfSlot",
-      "effect": "从槽位取全部物品为活动物品；副作用：槽位清空。"
+      "effect": "从槽位取全部物品作为活动物品，处理溢出堆叠拆分。"
     },
     {
       "name": "AddOneOfActiveItemToSlot",
-      "effect": "将活动物品一件叠加到槽位；副作用：堆叠增加。"
+      "effect": "将活动物品一个叠加到槽位堆叠上。"
     },
     {
       "name": "AddAllOfActiveItemToSlot",
-      "effect": "将活动物品全部叠加到槽位；副作用：活动物品可能剩余。"
+      "effect": "将活动物品全部叠加到槽位，剩余返还活动物品。"
     },
     {
       "name": "SwapActiveItemWithSlot",
-      "effect": "活动物品与槽位物品交换；副作用：双方互换。"
+      "effect": "活动物品与槽位物品交换，条件不符则忽略。"
     },
     {
       "name": "SwapOneOfActiveItemWithSlot",
-      "effect": "用活动物品一件交换槽位物品；副作用：互换。"
+      "effect": "交换一个活动物品与槽位物品，处理库存移动。"
     },
     {
       "name": "MoveItemFromAllOfSlot",
-      "effect": "将槽位全部物品移至另一容器；副作用：物品移动。"
+      "effect": "将槽位全部物品移至另一容器，处理跨容器转移与堆叠。"
     },
     {
       "name": "MoveItemFromHalfOfSlot",
-      "effect": "将槽位一半物品移至另一容器；副作用：物品移动。"
+      "effect": "将槽位一半物品移至另一容器。"
     },
     {
       "name": "MoveItemFromCountOfSlot",
-      "effect": "基于可见代码：检查自身非只读、目标容器有效且由opener打开，获取槽位，若目标容器可接收该物品，则准备移动指定数量物品；源码在此处截断，后续行为未见于片段。副作用：预计物品移动。"
+      "effect": "将槽位指定数量物品移至另一容器。"
     },
     {
-      "name": "OnRemoveEntity",
-      "effect": "等同于Close，在实体移除时关闭容器。"
+      "name": "ReferenceAllItems",
+      "effect": "返回按槽位顺序的物品数组。"
     },
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "等同于Close，在组件从实体移除时关闭容器。"
+      "name": "EnableInfiniteStackSize",
+      "effect": "启用或禁用无限堆叠大小，修改物品忽略最大尺寸标志，禁用时掉落溢出。"
+    },
+    {
+      "name": "EnableReadOnlyContainer",
+      "effect": "启用或禁用只读模式，添加 preserver 组件并监听 itemget/itemlose 以断言防篡改。"
+    },
+    {
+      "name": "IsRestricted",
+      "effect": "检查目标玩家是否因 restrictedtag 被限制使用。"
+    },
+    {
+      "name": "IsThiefProof",
+      "effect": "返回容器是否防偷。"
     }
   ],
   "events_published": [
@@ -290,7 +302,9 @@
     "onclose"
   ],
   "events_listened": [
-    "player_despawn"
+    "player_despawn",
+    "itemget",
+    "itemlose"
   ],
   "netvars": [],
   "tunables": [
@@ -298,87 +312,74 @@
   ],
   "wiki": {
     "scanned_pageids": [
-      14697,
-      18721,
-      14699,
-      27530,
-      13437,
-      22465,
-      17830,
-      15642
+      14794,
+      15713,
+      17994,
+      18493,
+      19785,
+      34109,
+      13271,
+      13455
     ],
     "aspects": [
       {
-        "aspect": "专门容器收纳限制描述",
+        "aspect": "容器打开触发显形",
         "evidence": [
           {
-            "pageid": 17830,
-            "quote": "只能收纳[[浮标]]类物品和[[鱼饵]]类物品"
+            "pageid": 34109,
+            "quote": "一旦暴躁箱子被打开，它就会在 2.5 秒后显形"
           }
         ]
       },
       {
-        "aspect": "容器剩余空间判定描述",
+        "aspect": "栏位满载替换策略",
         "evidence": [
           {
-            "pageid": 22465,
-            "quote": "该容器尚有空间"
+            "pageid": 15713,
+            "quote": "如果栏位已满，则会替换存放时间最早的栏位"
           }
         ]
       },
       {
-        "aspect": "容器受击物品掉落描述",
+        "aspect": "物品存放行为描述",
         "evidence": [
           {
-            "pageid": 15642,
-            "quote": "打落所有物品"
+            "pageid": 15713,
+            "quote": "浣猫会将偷来的物品存放其中"
           },
           {
-            "pageid": 15642,
-            "quote": "一次背包只能打落 1 个物品"
+            "pageid": 34109,
+            "quote": "暴躁箱子拥有 9 个物品栏可以存放[[物"
+          },
+          {
+            "pageid": 13455,
+            "quote": "种形态皆可以提供 9 个物品栏供玩家存放"
           }
         ]
       },
       {
-        "aspect": "容器可打开状态描述",
+        "aspect": "物品栏数量标注",
         "evidence": [
           {
-            "pageid": 27530,
-            "quote": "身体装备是容器且可被打开"
+            "pageid": 34109,
+            "quote": "暴躁箱子拥有 9 个物品栏可以存放[[物"
+          },
+          {
+            "pageid": 13271,
+            "quote": "切斯特提供 9 个物品栏，让玩家能"
+          },
+          {
+            "pageid": 13455,
+            "quote": "种形态皆可以提供 9 个物品栏供玩家存放"
           }
         ]
       },
       {
-        "aspect": "容器持有物品判定描述",
+        "aspect": "附加晾干物品栏",
         "evidence": [
           {
-            "pageid": 22465,
-            "quote": "某种物品在容器中有相同物品"
-          }
-        ]
-      },
-      {
-        "aspect": "容器槽位数量说明",
-        "evidence": [
-          {
-            "pageid": 14697,
-            "quote": "背包提供 8 个[[物品栏]]"
-          },
-          {
-            "pageid": 18721,
-            "quote": "坎普斯背包提供 14 个[[物品栏]]"
-          },
-          {
-            "pageid": 14699,
-            "quote": "保鲜背包提供 8 个[[物品栏]]"
-          },
-          {
-            "pageid": 17830,
-            "quote": "钓具箱拥有 6 个物品栏"
-          },
-          {
-            "pageid": 27530,
-            "quote": "基本物品栏具有 15 个栏位"
+            "pageid": 13455,
+            "quote": "沃比获得3个用于晾干的物品栏"
           }
         ]
       }
@@ -386,26 +387,26 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "容器",
-    "背包",
+    "背包格子",
     "物品存放",
-    "开箱",
-    "丢物品",
-    "槽位",
-    "堆叠",
-    "放入",
-    "取出"
+    "容器打开",
+    "丢弃物品",
+    "堆叠收纳",
+    "专属槽位",
+    "只读容器",
+    "快速转移",
+    "合成材料"
   ],
   "gameplay_tags": [
+    "存储",
     "生存",
-    "建造"
+    "合成"
   ],
   "related_symbols": [],
-  "truncation_note": "源码在 MoveItemFromCountOfSlot 函数体中间被截断（止于 count = math.clamp(count, 1, full），后续逻辑未提供。本文档仅基于可见代码片段描述。",
   "provenance": {
     "source_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
     "source_bytes": 54269,
     "model": "hy3-free",
-    "generated_at_ms": 1787860739141
+    "generated_at_ms": 1787893692399
   }
 }

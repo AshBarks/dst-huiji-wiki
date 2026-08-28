@@ -7,63 +7,63 @@
   },
   "category": "component",
   "display_name": "updatelooper",
-  "summary": "该组件为实体提供通用的更新循环管理机制，管理每帧更新、长更新、墙体更新及后置更新的回调函数列表。它解决了 DoPeriodicTask(0) 无法精确每帧触发的问题，使实体能够稳定挂载多种周期性逻辑，支撑游戏内各类需要持续运算的玩法机制。",
+  "summary": "该组件为实体提供通用的每帧、长周期、墙体及后置更新循环注册机制，解决了 DoPeriodicTask(0) 无法精确每帧触发的问题。它管理多组更新函数列表（onupdatefns、longupdatefns、onwallupdatefns、postupdatefns），并在实体移除时清理相关更新状态与全局后置更新表。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "停止实体对本组件的更新和墙体更新，并清除全局后置更新表中该实体的记录。副作用：调用 inst:StopUpdatingComponent 与 inst:StopWallUpdatingComponent，并设置 _PostUpdates[self.inst] = nil。"
-    },
-    {
-      "name": "OnRemoveEntity",
-      "effect": "清除全局后置更新表中该实体的记录。副作用：设置 _PostUpdates[self.inst] = nil。"
-    },
-    {
       "name": "AddOnUpdateFn",
-      "effect": "若当前 onupdatefns 为空则启动实体更新组件（inst:StartUpdatingComponent），随后将传入函数插入 onupdatefns 列表。副作用：可能开启每帧更新，修改组件内部函数列表。"
+      "effect": "将函数 fn 加入 onupdatefns 列表；若加入前列表长度为0，则调用 inst:StartUpdatingComponent(self) 使实体开始每帧更新。副作用：可能启动组件的每帧更新循环。"
     },
     {
       "name": "RemoveOnUpdateFn",
-      "effect": "若 onupdatefns 非空，将目标函数记录到延迟移除表 OnUpdatesToRemove 中，不在立即移除。副作用：可能创建 self.OnUpdatesToRemove 表并追加函数引用。"
-    },
-    {
-      "name": "AddLongUpdateFn",
-      "effect": "将传入函数直接插入 longupdatefns 列表。副作用：修改组件内部长更新函数列表。"
-    },
-    {
-      "name": "RemoveLongUpdateFn",
-      "effect": "若 longupdatefns 非空，将目标函数记录到延迟移除表 OnLongUpdatesToRemove 中。副作用：可能创建 self.OnLongUpdatesToRemove 表并追加引用。"
+      "effect": "若当前 onupdatefns 非空，将 fn 记录到 self.OnUpdatesToRemove 列表中，延迟至下次 OnUpdate 时实际移除。副作用：不会立即移除函数，仅标记待删除。"
     },
     {
       "name": "OnUpdate",
-      "effect": "先处理延迟移除表，将对应函数从 onupdatefns 中删除，若列表空则停止更新组件；随后倒序遍历 onupdatefns 并以 (inst, dt) 调用每个函数。副作用：可能停止更新，触发所有注册的每帧逻辑。"
+      "effect": "引擎每帧调用。先处理 OnUpdatesToRemove 列表，从中移除待删函数，若移除后列表空则调用 inst:StopUpdatingComponent(self)；随后逆序遍历 onupdatefns，以 (inst, dt) 调用每个函数。副作用：执行所有注册的每帧更新逻辑。"
+    },
+    {
+      "name": "AddLongUpdateFn",
+      "effect": "将函数 fn 插入 longupdatefns 列表，无组件启动副作用。副作用：仅存储函数供长更新使用。"
+    },
+    {
+      "name": "RemoveLongUpdateFn",
+      "effect": "若 longupdatefns 非空，将 fn 加入 self.OnLongUpdatesToRemove 列表，延迟至下次 LongUpdate 时移除。副作用：延迟移除标记。"
     },
     {
       "name": "LongUpdate",
-      "effect": "先处理延迟移除表，将对应函数从 longupdatefns 中删除；随后倒序遍历并以 (inst, dt) 调用每个函数。副作用：触发所有注册的长周期更新逻辑。"
+      "effect": "引擎长更新时调用。处理 OnLongUpdatesToRemove 并移除对应函数，然后逆序遍历 longupdatefns 以 (inst, dt) 调用。副作用：执行长更新逻辑。"
     },
     {
       "name": "AddOnWallUpdateFn",
-      "effect": "若 onwallupdatefns 为空则启动实体墙体更新组件（inst:StartWallUpdatingComponent），随后插入传入函数。副作用：可能开启墙体更新，修改内部列表。"
+      "effect": "将 fn 加入 onwallupdatefns；若原列表空，则调用 inst:StartWallUpdatingComponent(self) 启动墙体更新。副作用：可能启动墙体更新循环。"
     },
     {
       "name": "RemoveOnWallUpdateFn",
-      "effect": "若 onwallupdatefns 非空，将目标函数记录到延迟移除表 OnWallUpdatesToRemove 中。副作用：可能创建 self.OnWallUpdatesToRemove 表并追加引用。"
+      "effect": "若 onwallupdatefns 非空，将 fn 加入 self.OnWallUpdatesToRemove，延迟至 OnWallUpdate 移除。副作用：延迟标记。"
     },
     {
       "name": "OnWallUpdate",
-      "effect": "若服务器暂停则直接返回；否则处理延迟移除表并遍历 onwallupdatefns 以 (inst, dt) 调用函数。副作用：在服务器未暂停时触发墙体相关更新逻辑，可能停止墙体更新。"
+      "effect": "若 TheNet:IsServerPaused() 为真则直接返回；否则处理待移除函数（若列表空则停止墙体更新），然后正序调用 onwallupdatefns 每个函数 (inst, dt)。副作用：执行墙体更新逻辑，服务器暂停时跳过。"
     },
     {
       "name": "AddPostUpdateFn",
-      "effect": "若 postupdatefns 为空则将自身函数列表注册到全局 _PostUpdates 表；随后将传入函数追加到 postupdatefns。副作用：可能向全局表注册实体，修改后置更新函数列表。"
+      "effect": "若 postupdatefns 为空，则设置全局表 _PostUpdates[inst] = self.postupdatefns；然后将 fn 追加到 postupdatefns。副作用：将实体注册到全局后置更新系统。"
     },
     {
       "name": "RemovePostUpdateFn",
-      "effect": "在 postupdatefns 中查找目标函数，若正处于后置更新循环中则仅置 nil，否则立即压缩列表移除；若列表空则清除全局 _PostUpdates 中该实体记录。副作用：修改函数列表或全局表。"
+      "effect": "在 postupdatefns 中查找 fn：若当前正处于后置更新循环 (_IsPostUpdating) 则仅将该位置置 nil，否则立即压缩数组移除；若移除后列表空则清除 _PostUpdates[inst]。副作用：根据时机安全移除后置更新函数。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "调用 inst:StopUpdatingComponent(self) 和 inst:StopWallUpdatingComponent(self)，并清除 _PostUpdates[inst]。副作用：停止所有该组件关联的更新并清理全局表。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清除 _PostUpdates[inst]。副作用：清理全局后置更新表中该实体的记录。"
     },
     {
       "name": "UpdateLooper_PostUpdate",
-      "effect": "全局函数：置 _IsPostUpdating 为真，遍历 _PostUpdates 对所有实体的后置更新函数以 fn(inst) 调用，循环后压缩移除 nil 项；结束重置标志。副作用：执行全游戏注册的后置更新逻辑，可能修改全局表与实体列表。"
+      "effect": "全局函数，遍历 _PostUpdates 表，对每个实体的 postupdatefns 在 _IsPostUpdating=true 期间 while 循环调用存在的 fn(inst)，调用后压缩移除 nil 项；结束后复位 _IsPostUpdating。副作用：执行所有实体注册的后置更新函数，并安全压缩列表。"
     }
   ],
   "events_published": [],
@@ -81,31 +81,9 @@
       28611,
       22181
     ],
-    "aspects": [
-      {
-        "aspect": "周期行为间隔标注",
-        "evidence": [
-          {
-            "pageid": 22383,
-            "quote": "生命值在 5000 ~ 7500 时，每隔 16 秒，就"
-          },
-          {
-            "pageid": 28611,
-            "quote": "每 0.2 ~ 0.33 保持地面上至多有 4 个体段"
-          }
-        ]
-      },
-      {
-        "aspect": "实体消亡触发效果描述",
-        "evidence": [
-          {
-            "pageid": 22181,
-            "quote": "实体死亡都会生成 1 个灵魂"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "partial"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均为游戏实体（圣殿、弹药、Boss等）的玩法描述，文本仅含伤害数值、掉落、生成与行为段落，未以任何形式提及更新循环器组件及其添加/移除更新函数、各类更新事件等代码能力，无对应玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "每帧更新",
@@ -113,17 +91,18 @@
     "墙体更新",
     "后置更新",
     "长更新",
+    "通用循环",
     "实体更新",
-    "函数注册"
+    "服务器暂停"
   ],
   "gameplay_tags": [
-    "机制"
+    "通用"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
     "source_bytes": 5168,
     "model": "hy3-free",
-    "generated_at_ms": 1787858965653
+    "generated_at_ms": 1787892678983
   }
 }

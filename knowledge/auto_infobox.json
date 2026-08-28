@@ -1,134 +1,510 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": "Module:AutoInfobox",
-  "generated_at_ms": 1787894571618,
+  "generated_at_ms": 1787921786222,
+  "usage_note": "全部条目于 2026-08-28 对照 Module:AutoInfobox(pageid 24805)、Module:AutoInfobox/Data(pageid 24909)、Data/doc(pageid 27742) 与 帮助:维基实体数据更新(pageid 23936) 的游戏内导出脚本逐键核实。code_fields 为数据导出键(DST_Prefab/<prefab>.json,组件_字段 风格或裸组件名/实体标记);fields 为实体信息框参数名或自动添加的分类名。机制:页面手写参数优先、写 n/a 清除自动值,故 overridable_fields 仅列常被手写的字段。",
   "components": {
-    "health": {
+    "armor": {
       "fields": [
-        "生命值",
-        "最大生命值"
+        "装备/防御",
+        "耐久(护甲型)",
+        "分类:盔甲"
       ],
       "code_fields": [
-        "health",
-        "health.max",
-        "health.current"
+        "armor_absorb_percent",
+        "armor_maxcondition"
       ],
-      "overridable_fields": [
-        "生命值"
+      "overridable_fields": [],
+      "note": "absorb_percent 显示为百分比;maxcondition 作为「耐久」的护甲兜底分支。"
+    },
+    "bait": {
+      "fields": [
+        "分类:诱饵物品"
       ],
-      "note": "生命值由 AutoInfobox 自动渲染，但实体页可能手写覆盖具体数值。"
+      "code_fields": [
+        "bait"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键:组件存在即导出,仅影响自动分类。"
+    },
+    "battery": {
+      "fields": [
+        "分类:蓄电池"
+      ],
+      "code_fields": [
+        "battery"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "batteryuser": {
+      "fields": [
+        "分类:可充电"
+      ],
+      "code_fields": [
+        "batteryuser"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "burnable": {
+      "fields": [
+        "特殊互动/燃烧时间",
+        "特殊互动/生物燃烧时间",
+        "分类:可燃物"
+      ],
+      "code_fields": [
+        "burnable_burntime",
+        "burnable_character"
+      ],
+      "overridable_fields": [],
+      "note": "burnable_character 来自实体标记 isburnablecharacter(非组件字段),用于区分「生物燃烧时间」;无该标记时显示普通「燃烧时间」。"
+    },
+    "childspawner": {
+      "fields": [
+        "分类:生物巢穴"
+      ],
+      "code_fields": [
+        "spawner"
+      ],
+      "overridable_fields": [],
+      "note": "导出键为 spawner,同时覆盖 spawner 与 childspawner 两个组件(任一存在即导出)。"
     },
     "combat": {
       "fields": [
         "伤害",
+        "对玩家伤害倍率",
         "攻击间隔",
         "攻击范围"
       ],
       "code_fields": [
-        "combat.damage",
-        "combat.attackperiod",
-        "combat.attackrange"
+        "combat_damage",
+        "combat_playerdamagepercent",
+        "combat_attack_period",
+        "combat_attack_range",
+        "combat_hit_range"
       ],
       "overridable_fields": [
         "伤害"
       ],
-      "note": "攻击数值大多自动，部分 Boss 页会手写公式化伤害。"
+      "note": "combat_damage 取 combat.defaultdamage(区间型写 min-max),仅在 >0 时导出;攻击间隔 = min_attack_period。伤害常与 planardamage 合并显示;Boss 页公式化伤害常手写覆盖。"
+    },
+    "container": {
+      "fields": [
+        "分类:容器"
+      ],
+      "code_fields": [
+        "container"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "equippable": {
+      "fields": [
+        "装备/装备栏",
+        "装备/速度",
+        "装备/理智",
+        "装备/魔法理智影响",
+        "分类:装备",
+        "分类:绝缘"
+      ],
+      "code_fields": [
+        "equippable",
+        "equippable_equipslot",
+        "equippable_walkspeedmult",
+        "equippable_dapperness",
+        "equippable_is_magic_dapperness",
+        "equippable_insulated",
+        "equippable_restrictedtag"
+      ],
+      "overridable_fields": [],
+      "note": "dapperness ×60 → 每分钟;walkspeedmult 仅在 ≠1 时导出。"
+    },
+    "epicscare": {
+      "fields": [
+        "分类:巨兽恐慌"
+      ],
+      "code_fields": [
+        "epicscare_range"
+      ],
+      "overridable_fields": [],
+      "note": "导出键 epicscare_range = epicscare.range。"
+    },
+    "explosiveresist": {
+      "fields": [
+        "分类:爆炸抗性"
+      ],
+      "code_fields": [
+        "explosiveresist"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "finiteuses": {
+      "fields": [
+        "耐久(次数型)"
+      ],
+      "code_fields": [
+        "finiteuses"
+      ],
+      "overridable_fields": [
+        "耐久"
+      ],
+      "note": "导出键为裸 finiteuses(= total/消耗率);多消耗类型时导出为表,模块只处理数字型,表型页面需手写(模块注释:多用的情况暂且手填)。"
+    },
+    "floater": {
+      "fields": [
+        "漂浮",
+        "分类:漂浮"
+      ],
+      "code_fields": [
+        "floater"
+      ],
+      "overridable_fields": [],
+      "note": "纯存在性键:有 floater → 是;无 floater 但有 inventoryitem → 否。页面正文几乎不描述,是典型的「自动维护导致正文无文本」组件。"
+    },
+    "freezable": {
+      "fields": [
+        "特殊互动/冰冻抗性",
+        "分类:可冰冻",
+        "分类:额外冰冻抗性"
+      ],
+      "code_fields": [
+        "freezable_resistance",
+        "freezable_diminishingreturns"
+      ],
+      "overridable_fields": [],
+      "note": "freezable_diminishingreturns 为布尔标记(有递减收益时导出)。"
+    },
+    "fueled": {
+      "fields": [
+        "耐久(次数/时长型)",
+        "可修复(缝补百分比)",
+        "分类:可缝补"
+      ],
+      "code_fields": [
+        "fueled_maxuses",
+        "fueled_maxseconds",
+        "fueled_fueltype",
+        "fueled_fueltype2",
+        "fueled_bonusmult",
+        "fueled_no_sewing"
+      ],
+      "overridable_fields": [
+        "耐久"
+      ],
+      "note": "按 scrapbook_fueled_uses 分流 maxuses(次数)或 maxseconds(时长);USAGE 型且未禁缝补(no_sewing)时自动计算缝补百分比并加「可缝补」分类。"
+    },
+    "fuel": {
+      "fields": [
+        "燃料/类型",
+        "燃料/燃料值",
+        "分类:燃料"
+      ],
+      "code_fields": [
+        "fuel_fueltype",
+        "fuel_fuelvalue"
+      ],
+      "overridable_fields": [],
+      "note": "导出脚本仅在同时含 inventoryitem 时导出;燃料类型还会生成「<类型>消耗者」分类。"
+    },
+    "hauntable": {
+      "fields": [
+        "特殊互动/可作祟",
+        "特殊互动/作祟造成恐慌",
+        "分类:可作祟",
+        "分类:可恐慌"
+      ],
+      "code_fields": [
+        "hauntable",
+        "hauntable_panicable"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键 + panicable 布尔。"
+    },
+    "health": {
+      "fields": [
+        "生命值"
+      ],
+      "code_fields": [
+        "health",
+        "health_noheal",
+        "health_murder"
+      ],
+      "overridable_fields": [
+        "生命值"
+      ],
+      "note": "health 键 = health.maxhealth(或 scrapbook_maxhealth),区间型写 min-max;船页由 boathealth_maxhealth 兜底。health_noheal = canheal 为 false 时导出(加「无法治疗」分类),health_murder = canmurder 且有 inventoryitem;Boss 页可能手写或用 n/a 清除。"
+    },
+    "heater": {
+      "fields": [
+        "分类:冷源",
+        "分类:热源"
+      ],
+      "code_fields": [
+        "heater_endothermic",
+        "heater_exothermic"
+      ],
+      "overridable_fields": [],
+      "note": "布尔标记键。"
+    },
+    "harvestable": {
+      "fields": [
+        "分类:可收获"
+      ],
+      "code_fields": [
+        "harvestable"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "insulator": {
+      "fields": [
+        "装备/隔热",
+        "装备/保暖",
+        "分类:隔热装备",
+        "分类:保暖装备"
+      ],
+      "code_fields": [
+        "insulator_type",
+        "insulator_insulation"
+      ],
+      "overridable_fields": [],
+      "note": "type=summer 显示隔热、winter 显示保暖。"
+    },
+    "inventoryitem": {
+      "fields": [
+        "图像(掉落态 _Dropped 后缀)",
+        "图标",
+        "堆叠(不可堆叠提示)",
+        "漂浮(否提示)",
+        "分类:物品"
+      ],
+      "code_fields": [
+        "inventoryitem"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键:驱动图像/图标切换、不可堆叠与漂浮「否」提示;oceanfishableflotsam 例外(有 inventoryitem 但不出图标)。"
+    },
+    "inventoryitemtemperature": {
+      "fields": [
+        "分类:物品温度"
+      ],
+      "code_fields": [
+        "inventoryitemtemperature"
+      ],
+      "overridable_fields": [],
+      "note": "目前只能随 inventoryitem 添加(导出脚本注释)。"
     },
     "locomotor": {
       "fields": [
         "行走速度",
-        "奔跑速度",
-        "移动速度"
+        "奔跑速度"
       ],
       "code_fields": [
-        "locomotor.walkspeed",
-        "locomotor.runspeed"
+        "locomotor_walkspeed",
+        "locomotor_runspeed"
       ],
       "overridable_fields": [],
-      "note": "速度相关由 AutoInfobox 自动渲染。"
+      "note": "同时含 complexprojectile 的实体不导出速度。"
+    },
+    "lunarhailbuildup": {
+      "fields": [
+        "特殊互动/月亮碎片附着/工作次数",
+        "特殊互动/月亮碎片附着/掉落数量",
+        "分类:月亮碎片附着"
+      ],
+      "code_fields": [
+        "lunarhailbuildup_totalworkamount",
+        "lunarhailbuildup_moonglassamount"
+      ],
+      "overridable_fields": [],
+      "note": "月亮碎片附着清除工作量与月璃掉落数。"
     },
     "perishable": {
       "fields": [
-        "腐烂时间"
+        "保质期",
+        "腐烂产物"
       ],
       "code_fields": [
-        "perishable.perishtime"
+        "perishable_perishtime",
+        "perishable_onperishreplacement"
       ],
       "overridable_fields": [
-        "腐烂时间"
+        "保质期"
       ],
-      "note": "腐烂时间通常自动，但特殊物品可能手写。"
+      "note": "perishtime 秒 → 天/分钟换算显示;腐烂产物仅在 DST 版渲染。"
     },
-    "edible": {
+    "pickable": {
       "fields": [
-        "饥饿恢复",
-        "生命恢复",
-        "理智恢复"
+        "分类:可采集"
       ],
       "code_fields": [
-        "edible.hunger",
-        "edible.health",
-        "edible.sanity"
+        "pickable"
       ],
       "overridable_fields": [],
-      "note": "食物三围恢复由 AutoInfobox 自动渲染。"
+      "note": "存在性键。"
     },
-    "equippable": {
+    "planardamage": {
       "fields": [
-        "装备栏位"
+        "伤害(位面附注)",
+        "装备/位面伤害",
+        "分类:位面伤害",
+        "分类:位面武器"
       ],
       "code_fields": [
-        "equippable.equipslot"
+        "planardamage"
       ],
       "overridable_fields": [],
-      "note": "装备槽位由 AutoInfobox 自动渲染。"
+      "note": "导出键为裸 planardamage = planardamage.basedamage;同一键既是生物位面伤害也是装备位面伤害(模块注释)。装备/位面伤害仅在同时有 equippable_equipslot 时显示。"
     },
-    "fuel": {
+    "planarentity": {
       "fields": [
-        "燃料值"
+        "分类:位面实体抵抗"
       ],
       "code_fields": [
-        "fuel.fuelvalue"
+        "planarentity"
       ],
       "overridable_fields": [],
-      "note": "燃料值由 AutoInfobox 自动渲染。"
+      "note": "存在性键。"
     },
-    "finiteuses": {
+    "prototyper": {
       "fields": [
-        "使用次数",
-        "耐久"
+        "分类:原型工具",
+        "分类:制作站"
       ],
       "code_fields": [
-        "finiteuses.maxuses",
-        "finiteuses.uses"
+        "prototyper",
+        "crafting_station"
       ],
-      "overridable_fields": [
-        "使用次数",
-        "耐久"
+      "overridable_fields": [],
+      "note": "按 PROTOTYPER_DEFS 的 is_crafting_station 分流为 prototyper 或 crafting_station 键。"
+    },
+    "repairable": {
+      "fields": [
+        "可修复"
       ],
-      "note": "耐久/使用次数可能由自动层或手写覆盖，需结合页面确认。"
+      "code_fields": [
+        "repairable_repairmaterial"
+      ],
+      "overridable_fields": [],
+      "note": "材料→修复量对照来自 Module:AutoInfobox/Data 的 repairmaterial 表(游戏内脚本导出,见 Data/doc)。"
+    },
+    "sanityaura": {
+      "fields": [
+        "理智光环",
+        "分类:理智光环"
+      ],
+      "code_fields": [
+        "sanityaura"
+      ],
+      "overridable_fields": [],
+      "note": "裸键 = aura×60(每分钟);aurafn 会被调用取值;为 0 不导出。"
+    },
+    "saddler": {
+      "fields": [
+        "分类:鞍具"
+      ],
+      "code_fields": [
+        "saddler"
+      ],
+      "overridable_fields": [],
+      "note": "saddler 组件同时向 weapon_damage / armor_absorb_percent / planardefense 写入鞍具加成值。"
+    },
+    "sleeper": {
+      "fields": [
+        "特殊互动/催眠抗性",
+        "分类:可催眠",
+        "分类:额外催眠抗性"
+      ],
+      "code_fields": [
+        "sleeper_resistance",
+        "sleeper_diminishingreturns"
+      ],
+      "overridable_fields": [],
+      "note": "sleeper_diminishingreturns 为布尔标记。"
+    },
+    "spawner": {
+      "fields": [
+        "分类:生物巢穴"
+      ],
+      "code_fields": [
+        "spawner"
+      ],
+      "overridable_fields": [],
+      "note": "导出键为 spawner,同时覆盖 spawner 与 childspawner 两个组件(任一存在即导出)。"
     },
     "stackable": {
       "fields": [
-        "堆叠上限"
+        "堆叠"
       ],
       "code_fields": [
-        "stackable.stacksize"
+        "stackable_maxsize"
       ],
       "overridable_fields": [],
-      "note": "堆叠上限由 AutoInfobox 自动渲染。"
+      "note": "无 stackable 但有 inventoryitem 时显示「不可堆叠」。"
+    },
+    "tradable": {
+      "fields": [
+        "交易价值",
+        "分类:可交易"
+      ],
+      "code_fields": [
+        "tradable",
+        "tradable_goldvalue"
+      ],
+      "overridable_fields": [],
+      "note": "仅 goldvalue>0 时显示交易价值。"
+    },
+    "trader": {
+      "fields": [
+        "分类:交易者"
+      ],
+      "code_fields": [
+        "trader"
+      ],
+      "overridable_fields": [],
+      "note": "存在性键。"
+    },
+    "waterproofer": {
+      "fields": [
+        "装备/防水",
+        "分类:防水物品"
+      ],
+      "code_fields": [
+        "waterproofer"
+      ],
+      "overridable_fields": [],
+      "note": "GetEffectiveness() 百分比;仅在同时有 equippable_equipslot 时显示(该组件也用于让物品自身不可潮湿,如噩梦燃料、冰帽)。"
+    },
+    "weapon": {
+      "fields": [
+        "装备/伤害",
+        "装备/攻击范围"
+      ],
+      "code_fields": [
+        "weapon_damage",
+        "weapon_attackrange"
+      ],
+      "overridable_fields": [
+        "装备/伤害"
+      ],
+      "note": "damage 为函数型时导不出,页面需手写;注意 weapon_attackrange 无下划线,与 combat_attack_range 拼写不同(模块注释也提到)。"
     },
     "workable": {
       "fields": [
-        "工作量",
-        "工作类型"
+        "可作业/工具",
+        "可作业/次数",
+        "可作业/强力开采",
+        "分类:可作业"
       ],
       "code_fields": [
-        "workable.workleft",
-        "workable.workaction"
+        "workable_action",
+        "workable_workleft",
+        "workable_tough"
       ],
       "overridable_fields": [],
-      "note": "初始版本仅少量重点组件，待后续从 AutoInfobox/Data doc 校准扩充。"
+      "note": "仅当 workleft>0 导出;工具分类 CHOP/DIG/HAMMER/MINE/NET → 可砍伐/可挖掘/可锤击/可开采/可网捕(HACK 劈砍属 hackable 键)。"
     }
   }
 }

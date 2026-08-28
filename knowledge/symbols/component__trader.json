@@ -114,6 +114,17 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:交易者"
+    ],
+    "code_fields": [
+      "trader"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
   "search_terms": [
     "交易对象",
     "接受礼物",

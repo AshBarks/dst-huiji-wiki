@@ -142,6 +142,20 @@
     ],
     "coverage_status": "partial"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "特殊互动/催眠抗性",
+      "分类:可催眠",
+      "分类:额外催眠抗性"
+    ],
+    "code_fields": [
+      "sleeper_resistance",
+      "sleeper_diminishingreturns"
+    ],
+    "overridable_fields": [],
+    "note": "sleeper_diminishingreturns 为布尔标记。"
+  },
   "search_terms": [
     "睡觉生物",
     "唤醒条件",

@@ -124,6 +124,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | M1 章节过滤 | 提交 LLM 前按章节优先级过滤,低优先级完全排除;高优先级关键词扩展 + 高优先级区域增加上下文行 | 8 组件对照见 8.2 v4 |
 | M1 源码上限 | `SOURCE_BYTES_CAP` 提升至 128KB,超限采用头尾截断 | 当前仅 `playercontroller.lua` 超限 |
 | M1 AutoInfobox | 新增 `knowledge/auto_infobox.json` 冷数据 + post-action 注入 `auto_maintained` | 初始覆盖 health/combat/locomotor/perishable/edible/equippable/fuel/finiteuses/stackable/workable |
+| M1 AutoInfobox v2 | 冷数据对照 Module:AutoInfobox(pageid 24805)/Data(24909)/Data/doc(27742)/帮助:维基实体数据更新(23936) 逐键核实重写:10 → 41 组件,修正错误导出键(combat_attack_period、stackable_maxsize、裸 finiteuses 等);code_fields 语义定为「数据导出键(DST_Prefab/<prefab>.json)」;pass2 注入字段级轻量提示(`pass2_hint`);新增 `--refresh-auto` 不调 LLM 重放注入;component prompt_rev p3 → p4 | 41 条目全部有模块源码/导出脚本依据;主库经 --refresh-auto 同步 |
 
 ### 8.2 Pilot 三轮演进(关键教训)
 
@@ -145,11 +146,12 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 
 ## 9. 后续计划
 
-### M1 收尾(当前)
-1. **全量刷新主库**:用新逻辑 `--limit 50 --force` 重跑 `knowledge/symbols/`,将当前仍含旧 ds 证据的 50 份文档替换为纯联机版+章节过滤版本
-2. **人工 review 重点 diff**:inventoryitem / lootdropper / workable / floater / inspectable / hauntable,确认新 aspects 更符合联机版页面
-3. **search_terms 质量杠杆**(可选):每个 API 条目强制 1~2 个词;对 0 命中组件允许模型二次修正检索词重试一次
-4. **二次确认**(可选):pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
+### M1 收尾(剩余项)
+1. ~~**全量刷新主库**~~:已用版本过滤+章节过滤+并行逻辑完成,`auto_maintained` 已注入并经 v2 冷数据 `--refresh-auto` 同步
+2. ~~**人工 review 重点 diff**~~:inventoryitem / lootdropper / workable / floater / inspectable / hauntable 的 ds 证据清除已确认
+3. **全量重扫(prompt_rev p4)**:pass2 新增 AutoInfobox 字段级轻量提示后,主库文档仍为 p3 生成;待择机 `--limit 50 --force` 重扫,重点观察 floater / lootdropper 等 AutoInfobox 组件的 aspects/no_evidence_reason 变化
+4. **search_terms 质量杠杆**(可选):每个 API 条目强制 1~2 个词;对 0 命中组件允许模型二次修正检索词重试一次
+5. **二次确认**(可选):pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
 
 > 当前 `output/knowledge_compare/` 为 8 组件对照临时产物,不入库;确认后可用它作为全量刷新前的预期样本。
 

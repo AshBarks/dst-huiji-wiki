@@ -323,18 +323,17 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "生命值",
-      "最大生命值"
+      "生命值"
     ],
     "code_fields": [
       "health",
-      "health.max",
-      "health.current"
+      "health_noheal",
+      "health_murder"
     ],
     "overridable_fields": [
       "生命值"
     ],
-    "note": "生命值由 AutoInfobox 自动渲染，但实体页可能手写覆盖具体数值。"
+    "note": "health 键 = health.maxhealth(或 scrapbook_maxhealth),区间型写 min-max;船页由 boathealth_maxhealth 兜底。health_noheal = canheal 为 false 时导出(加「无法治疗」分类),health_murder = canmurder 且有 inventoryitem;Boss 页可能手写或用 n/a 清除。"
   },
   "search_terms": [
     "生命值",

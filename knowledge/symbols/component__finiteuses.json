@@ -179,18 +179,15 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "使用次数",
-      "耐久"
+      "耐久(次数型)"
     ],
     "code_fields": [
-      "finiteuses.maxuses",
-      "finiteuses.uses"
+      "finiteuses"
     ],
     "overridable_fields": [
-      "使用次数",
       "耐久"
     ],
-    "note": "耐久/使用次数可能由自动层或手写覆盖，需结合页面确认。"
+    "note": "导出键为裸 finiteuses(= total/消耗率);多消耗类型时导出为表,模块只处理数字型,表型页面需手写(模块注释:多用的情况暂且手填)。"
   },
   "search_terms": [
     "耐久度",

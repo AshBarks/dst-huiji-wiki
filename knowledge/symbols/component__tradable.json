@@ -29,6 +29,19 @@
     "no_evidence_reason": "提供的组件能力清单为空，未指定待检索能力，页面虽提及交易但无法对应具体能力条目，故返回空",
     "coverage_status": "no_wiki_mention"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "交易价值",
+      "分类:可交易"
+    ],
+    "code_fields": [
+      "tradable",
+      "tradable_goldvalue"
+    ],
+    "overridable_fields": [],
+    "note": "仅 goldvalue>0 时显示交易价值。"
+  },
   "search_terms": [
     "金币价值",
     "可交易",

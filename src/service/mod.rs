@@ -205,6 +205,9 @@ pub enum JobKind {
         /// 仅对指定文件名词干跑 pass2;None = 全部
         #[serde(default)]
         pass2_names: Option<Vec<String>>,
+        /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有文档的 auto_maintained
+        #[serde(default)]
+        refresh_auto: bool,
     },
 }
 
@@ -410,6 +413,7 @@ async fn execute_job_inner(
             force,
             concurrency,
             pass2_names,
+            refresh_auto,
         } => {
             crate::knowledge::run_scan_symbols(
                 &crate::knowledge::ScanSymbolsParams {
@@ -422,6 +426,7 @@ async fn execute_job_inner(
                     force: *force,
                     concurrency: *concurrency,
                     pass2_names: pass2_names.clone(),
+                    refresh_auto: *refresh_auto,
                 },
                 reporter,
             )

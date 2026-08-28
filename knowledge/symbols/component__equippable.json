@@ -170,13 +170,24 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "装备栏位"
+      "装备/装备栏",
+      "装备/速度",
+      "装备/理智",
+      "装备/魔法理智影响",
+      "分类:装备",
+      "分类:绝缘"
     ],
     "code_fields": [
-      "equippable.equipslot"
+      "equippable",
+      "equippable_equipslot",
+      "equippable_walkspeedmult",
+      "equippable_dapperness",
+      "equippable_is_magic_dapperness",
+      "equippable_insulated",
+      "equippable_restrictedtag"
     ],
     "overridable_fields": [],
-    "note": "装备槽位由 AutoInfobox 自动渲染。"
+    "note": "dapperness ×60 → 每分钟;walkspeedmult 仅在 ≠1 时导出。"
   },
   "search_terms": [
     "装备槽",

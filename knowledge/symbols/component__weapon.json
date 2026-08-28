@@ -191,6 +191,21 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "装备/伤害",
+      "装备/攻击范围"
+    ],
+    "code_fields": [
+      "weapon_damage",
+      "weapon_attackrange"
+    ],
+    "overridable_fields": [
+      "装备/伤害"
+    ],
+    "note": "damage 为函数型时导不出,页面需手写;注意 weapon_attackrange 无下划线,与 combat_attack_range 拼写不同(模块注释也提到)。"
+  },
   "search_terms": [
     "武器伤害",
     "攻击范围",

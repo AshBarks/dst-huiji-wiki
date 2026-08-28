@@ -64,13 +64,16 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "燃料值"
+      "燃料/类型",
+      "燃料/燃料值",
+      "分类:燃料"
     ],
     "code_fields": [
-      "fuel.fuelvalue"
+      "fuel_fueltype",
+      "fuel_fuelvalue"
     ],
     "overridable_fields": [],
-    "note": "燃料值由 AutoInfobox 自动渲染。"
+    "note": "导出脚本仅在同时含 inventoryitem 时导出;燃料类型还会生成「<类型>消耗者」分类。"
   },
   "search_terms": [
     "燃料值",

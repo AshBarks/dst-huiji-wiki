@@ -78,6 +78,20 @@
     ],
     "coverage_status": "partial"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "伤害(位面附注)",
+      "装备/位面伤害",
+      "分类:位面伤害",
+      "分类:位面武器"
+    ],
+    "code_fields": [
+      "planardamage"
+    ],
+    "overridable_fields": [],
+    "note": "导出键为裸 planardamage = planardamage.basedamage;同一键既是生物位面伤害也是装备位面伤害(模块注释)。装备/位面伤害仅在同时有 equippable_equipslot 时显示。"
+  },
   "search_terms": [
     "基础伤害",
     "伤害倍率",

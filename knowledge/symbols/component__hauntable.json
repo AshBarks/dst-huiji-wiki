@@ -104,6 +104,21 @@
     "no_evidence_reason": "所给页面中的“附身”均指possessed类实体（如附身座狼、附身底盘等），而非hauntable组件的闹鬼/鬼魂附身机制；全文未以任何方式体现能力清单中的设置附身函数、附身值、恐慌、特效、动画状态、更新等行为描述，故页面根本不讨论该组件能力。",
     "coverage_status": "no_wiki_mention"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "特殊互动/可作祟",
+      "特殊互动/作祟造成恐慌",
+      "分类:可作祟",
+      "分类:可恐慌"
+    ],
+    "code_fields": [
+      "hauntable",
+      "hauntable_panicable"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键 + panicable 布尔。"
+  },
   "search_terms": [
     "附身",
     "闹鬼",

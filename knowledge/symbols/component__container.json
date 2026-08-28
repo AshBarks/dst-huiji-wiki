@@ -351,6 +351,17 @@
     ],
     "coverage_status": "partial"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:容器"
+    ],
+    "code_fields": [
+      "container"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
   "search_terms": [
     "物品槽位",
     "容器打开",

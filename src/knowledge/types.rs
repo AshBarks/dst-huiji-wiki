@@ -1,4 +1,4 @@
-//! SymbolDoc schema (v1, prompt_rev p1) — 见 docs/KNOWLEDGE_PIPELINE.md §3。
+//! SymbolDoc schema — 见 docs/KNOWLEDGE_PIPELINE.md §3(版本号以常量为准)。
 //!
 //! LLM 只产出 [`SymbolDocLlm`](inner payload);`reference`/`schema_version`/
 //! `prompt_rev`/`provenance` 由管线回填后落盘为 [`SymbolDoc`]。
@@ -6,11 +6,11 @@
 use serde::{Deserialize, Serialize};
 
 pub const SCHEMA_VERSION: u32 = 2;
-pub const PROMPT_REV: &str = "p3";
+pub const PROMPT_REV: &str = "p4";
 pub const PROMPT_REV_BEHAVIOUR: &str = "p4-behaviour";
 pub const PROMPT_REV_BRAIN: &str = "p4-brain";
 
-/// 按 SymbolDoc 类别返回当前 prompt 修订号;component 沿用 p3,新类别独立演进。
+/// 按 SymbolDoc 类别返回当前 prompt 修订号;component 沿用全局版本,新类别独立演进。
 pub fn prompt_rev_for(category: &str) -> &'static str {
     match category {
         "behaviour" => PROMPT_REV_BEHAVIOUR,
@@ -104,7 +104,7 @@ pub struct AutoMaintainedInfo {
     /// wiki 页面字段名/展示名，如“生命值”
     #[serde(default)]
     pub fields: Vec<String>,
-    /// 代码侧字段/组件数据路径，如 `health.max`
+    /// AutoInfobox 数据导出键（`DST_Prefab/<prefab>.json`），如 `combat_attack_period`
     #[serde(default)]
     pub code_fields: Vec<String>,
     /// 即使自动渲染也仍可能在实体页手写覆盖的字段
@@ -175,19 +175,19 @@ pub struct SymbolDoc {
     #[serde(default)]
     pub tunables: Vec<String>,
     /// behaviour 词典层:构造子参数语义。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ctor_params: Vec<CtorParam>,
     /// behaviour 词典层:对组件/SG 状态标签的作用。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub effects: Vec<String>,
     /// behaviour 词典层:BT 成功/失败/运行中条件。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub success_fail_conditions: Vec<String>,
     /// brain 组合层:实际调用的 behaviour 及实例化语义。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub behaviour_invocations: Vec<BehaviourInvocation>,
     /// brain 组合层:条件语境分支。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub context_branches: Vec<ContextBranch>,
     /// brain 组合层:BT 优先级结构摘要(意图粒度)。
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -232,19 +232,19 @@ pub struct SymbolDocLlm {
     #[serde(default)]
     pub tunables: Vec<String>,
     /// behaviour 词典层:构造子参数语义。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ctor_params: Vec<CtorParam>,
     /// behaviour 词典层:对组件/SG 状态标签的作用。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub effects: Vec<String>,
     /// behaviour 词典层:BT 成功/失败/运行中条件。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub success_fail_conditions: Vec<String>,
     /// brain 组合层:实际调用的 behaviour 及实例化语义。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub behaviour_invocations: Vec<BehaviourInvocation>,
     /// brain 组合层:条件语境分支。
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub context_branches: Vec<ContextBranch>,
     /// brain 组合层:BT 优先级结构摘要(意图粒度)。
     #[serde(default, skip_serializing_if = "Option::is_none")]

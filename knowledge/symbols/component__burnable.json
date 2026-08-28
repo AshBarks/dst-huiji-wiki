@@ -286,6 +286,20 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "特殊互动/燃烧时间",
+      "特殊互动/生物燃烧时间",
+      "分类:可燃物"
+    ],
+    "code_fields": [
+      "burnable_burntime",
+      "burnable_character"
+    ],
+    "overridable_fields": [],
+    "note": "burnable_character 来自实体标记 isburnablecharacter(非组件字段),用于区分「生物燃烧时间」;无该标记时显示普通「燃烧时间」。"
+  },
   "search_terms": [
     "着火",
     "阴燃",

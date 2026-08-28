@@ -153,21 +153,6 @@
     ],
     "coverage_status": "well_documented"
   },
-  "auto_maintained": {
-    "source": "Module:AutoInfobox",
-    "fields": [
-      "饥饿恢复",
-      "生命恢复",
-      "理智恢复"
-    ],
-    "code_fields": [
-      "edible.hunger",
-      "edible.health",
-      "edible.sanity"
-    ],
-    "overridable_fields": [],
-    "note": "食物三围恢复由 AutoInfobox 自动渲染。"
-  },
   "search_terms": [
     "食物类型",
     "变质惩罚",

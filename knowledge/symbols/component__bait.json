@@ -46,6 +46,17 @@
     "no_evidence_reason": "页面摘录围绕诱饵实体或物品的生成、吸引、消失及互动机制，未以玩家语言体现component__bait的OnRemoveFromEntity、GetDebugString、IsFree等代码级能力表现。",
     "coverage_status": "no_wiki_mention"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:诱饵物品"
+    ],
+    "code_fields": [
+      "bait"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键:组件存在即导出,仅影响自动分类。"
+  },
   "search_terms": [
     "诱饵",
     "陷阱饵",

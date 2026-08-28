@@ -109,6 +109,18 @@
     "no_evidence_reason": "提供的页面摘录涉及浇水壶、双子魔眼、帝王蟹冰墙（仅提及浮冰地块生成消失而无漂浮属性描述）、杂草、蜂王、邪天翁、暗影秘典、雪球，均未包含 floater 组件相关能力如漂浮、大小、偏移、动画切换、着陆、侵蚀等的玩家语言表达。",
     "coverage_status": "no_wiki_mention"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "漂浮",
+      "分类:漂浮"
+    ],
+    "code_fields": [
+      "floater"
+    ],
+    "overridable_fields": [],
+    "note": "纯存在性键:有 floater → 是;无 floater 但有 inventoryitem → 否。页面正文几乎不描述,是典型的「自动维护导致正文无文本」组件。"
+  },
   "search_terms": [
     "水面漂浮",
     "物品浮起",

@@ -507,15 +507,14 @@
     "source": "Module:AutoInfobox",
     "fields": [
       "行走速度",
-      "奔跑速度",
-      "移动速度"
+      "奔跑速度"
     ],
     "code_fields": [
-      "locomotor.walkspeed",
-      "locomotor.runspeed"
+      "locomotor_walkspeed",
+      "locomotor_runspeed"
     ],
     "overridable_fields": [],
-    "note": "速度相关由 AutoInfobox 自动渲染。"
+    "note": "同时含 complexprojectile 的实体不导出速度。"
   },
   "search_terms": [
     "移动速度",

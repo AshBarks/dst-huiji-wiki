@@ -299,6 +299,21 @@
     ],
     "coverage_status": "partial"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "图像(掉落态 _Dropped 后缀)",
+      "图标",
+      "堆叠(不可堆叠提示)",
+      "漂浮(否提示)",
+      "分类:物品"
+    ],
+    "code_fields": [
+      "inventoryitem"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键:驱动图像/图标切换、不可堆叠与漂浮「否」提示;oceanfishableflotsam 例外(有 inventoryitem 但不出图标)。"
+  },
   "search_terms": [
     "拾取掉落",
     "物品湿度",

@@ -240,15 +240,17 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "腐烂时间"
+      "保质期",
+      "腐烂产物"
     ],
     "code_fields": [
-      "perishable.perishtime"
+      "perishable_perishtime",
+      "perishable_onperishreplacement"
     ],
     "overridable_fields": [
-      "腐烂时间"
+      "保质期"
     ],
-    "note": "腐烂时间通常自动，但特殊物品可能手写。"
+    "note": "perishtime 秒 → 天/分钟换算显示;腐烂产物仅在 DST 版渲染。"
   },
   "search_terms": [
     "腐烂",

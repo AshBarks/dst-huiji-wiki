@@ -349,6 +349,17 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:生物巢穴"
+    ],
+    "code_fields": [
+      "spawner"
+    ],
+    "overridable_fields": [],
+    "note": "导出键为 spawner,同时覆盖 spawner 与 childspawner 两个组件(任一存在即导出)。"
+  },
   "search_terms": [
     "幼体生成",
     "巢穴再生",

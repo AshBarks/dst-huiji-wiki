@@ -501,18 +501,21 @@
     "source": "Module:AutoInfobox",
     "fields": [
       "伤害",
+      "对玩家伤害倍率",
       "攻击间隔",
       "攻击范围"
     ],
     "code_fields": [
-      "combat.damage",
-      "combat.attackperiod",
-      "combat.attackrange"
+      "combat_damage",
+      "combat_playerdamagepercent",
+      "combat_attack_period",
+      "combat_attack_range",
+      "combat_hit_range"
     ],
     "overridable_fields": [
       "伤害"
     ],
-    "note": "攻击数值大多自动，部分 Boss 页会手写公式化伤害。"
+    "note": "combat_damage 取 combat.defaultdamage(区间型写 min-max),仅在 >0 时导出;攻击间隔 = min_attack_period。伤害常与 planardamage 合并显示;Boss 页公式化伤害常手写覆盖。"
   },
   "search_terms": [
     "攻击冷却",

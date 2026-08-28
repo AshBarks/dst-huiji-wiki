@@ -110,6 +110,18 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "理智光环",
+      "分类:理智光环"
+    ],
+    "code_fields": [
+      "sanityaura"
+    ],
+    "overridable_fields": [],
+    "note": "裸键 = aura×60(每分钟);aurafn 会被调用取值;为 0 不导出。"
+  },
   "search_terms": [
     "精神光环",
     "理智光环",

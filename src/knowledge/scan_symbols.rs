@@ -160,6 +160,8 @@ pub struct ScanSymbolsParams {
     pub concurrency: usize,
     /// 仅对指定文件名词干(fn stem)跑 pass2;None = 全部跑(component 兼容)
     pub pass2_names: Option<Vec<String>>,
+    /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
+    pub refresh_auto: bool,
 }
 
 /// P1 选择:top_symbols(变体引用数降序)过滤出 component 文件型符号,
@@ -325,6 +327,17 @@ pub async fn run_scan_symbols(
     let scripts_root = Path::new(&params.scripts_root);
     let knowledge_root = Path::new(&params.knowledge_root);
 
+    let auto_infobox = AutoInfoboxIndex::load(knowledge_root)?;
+    if params.refresh_auto {
+        return refresh_auto_maintained(knowledge_root, &auto_infobox, reporter);
+    }
+    if !auto_infobox.components.is_empty() {
+        reporter.log(format!(
+            "AutoInfobox 冷数据已加载: {} 个组件",
+            auto_infobox.components.len()
+        ));
+    }
+
     reporter.stage("构建代码关联索引");
     let atlas = build_atlas_from_dir(scripts_root)?;
     let build_id = atlas.build_id.clone();
@@ -367,13 +380,6 @@ pub async fn run_scan_symbols(
         }
         None => (None, None, 0),
     };
-    let auto_infobox = AutoInfoboxIndex::load(knowledge_root)?;
-    if !auto_infobox.components.is_empty() {
-        reporter.log(format!(
-            "AutoInfobox 冷数据已加载: {} 个组件",
-            auto_infobox.components.len()
-        ));
-    }
     let concurrency = params.concurrency.max(1);
     if concurrency > 1 {
         reporter.log(format!("并行处理: concurrency={}", concurrency));
@@ -456,6 +462,70 @@ fn inject_auto_maintained(doc: &mut SymbolDoc, auto: &AutoInfoboxIndex) {
         .unwrap_or("")
         .trim_end_matches(".lua");
     doc.auto_maintained = auto.get(name).cloned();
+}
+
+/// 不调 LLM 的 post-action 重放:把冷数据中的 auto_maintained 刷进现有
+/// component 文档(冷数据修订后无需整批重扫即可同步)。仅触碰内容有变化的文档。
+fn refresh_auto_maintained(
+    knowledge_root: &Path,
+    auto: &AutoInfoboxIndex,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let symbols_dir = knowledge_root.join("symbols");
+    let mut paths: Vec<PathBuf> = std::fs::read_dir(&symbols_dir)?
+        .collect::<std::io::Result<Vec<std::fs::DirEntry>>>()?
+        .into_iter()
+        .map(|e| e.path())
+        .filter(|p| {
+            p.file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.starts_with("component__") && n.ends_with(".json"))
+                .unwrap_or(false)
+        })
+        .collect();
+    paths.sort();
+
+    let mut updated = 0usize;
+    let mut unchanged = 0usize;
+    for path in &paths {
+        let Some(mut doc) = load_doc(path)? else {
+            continue;
+        };
+        let name = doc
+            .reference
+            .path
+            .rsplit('/')
+            .next()
+            .unwrap_or("")
+            .trim_end_matches(".lua");
+        let fresh = auto.get(name).cloned();
+        if doc.auto_maintained == fresh {
+            unchanged += 1;
+            continue;
+        }
+        let before = doc.auto_maintained.is_some();
+        doc.auto_maintained = fresh;
+        write_atomic(path, &serde_json::to_string_pretty(&doc)?)?;
+        updated += 1;
+        reporter.log(format!(
+            "auto_maintained 已刷新: {}({})",
+            name,
+            if before { "更新" } else { "新增" }
+        ));
+    }
+    reporter.log(format!(
+        "AutoInfobox 注入刷新完成: 共 {} 份 component 文档,更新 {} / 无变化 {}",
+        paths.len(),
+        updated,
+        unchanged
+    ));
+    Ok(serde_json::json!({
+        "mode": "refresh_auto",
+        "scanned": paths.len(),
+        "updated": updated,
+        "unchanged": unchanged,
+        "cold_data_components": auto.components.len(),
+    }))
 }
 
 /// 是否允许当前符号跑 pass2:未配置名单时全部允许;配置后仅白名单名称命中。
@@ -1299,11 +1369,20 @@ async fn enrich_with_wiki(
         _ => doc.api.iter().map(|a| a.name.clone()).collect(),
     };
 
+    // AutoInfobox 冷数据组件:注入字段级轻量提示,避免把“自动渲染导致正文无文本”
+    // 误判为页面不讨论该组件(仅 component 线注入 auto_maintained,其他类别为空)。
+    let auto_hint = doc
+        .auto_maintained
+        .as_ref()
+        .map(|info| format!("{}\n", info.pass2_hint()))
+        .unwrap_or_default();
+
     let prompt = format!(
         "下面是 wiki 语料中与 `{name}` 相关联的实体页面摘录,以及该符号具备的代码能力/行为语义清单。
 
 任务:在页面文本中寻找这些能力/行为的玩家语言表达。若某能力被页面以任何方式体现(数值、行为描述、策略段落),归入 aspects 并给出证据页;若扫描后认为页面根本不讨论该符号的能力,aspects 返回空数组并在 no_evidence_reason 写明判断依据。
 
+{auto_hint}
 规则:
 1. aspect 用中文短语概括页面侧的写作方面(如“生命值数值标注”“死亡掉落联动”“仇恨距离描述”),不要照抄 API/常量名。
 2. evidence.pageid 必须来自下方给出的页面;quote 摘录原文短句(≤40 字),可省略。
@@ -1315,6 +1394,7 @@ async fn enrich_with_wiki(
 页面摘录:
 {excerpts}",
         name = key.doc_id(),
+        auto_hint = auto_hint,
         caps = caps.join(", "),
         excerpts = excerpts,
     );
@@ -1516,6 +1596,89 @@ mod tests {
         let index = IndexArtifact::default();
         let picked = pick_symbols(&root, &index, "unknown", 10);
         assert!(picked.is_empty()); // 无 reverse 边，component 也没有候选
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    fn write_component_doc(root: &Path, name: &str, auto_maintained: bool) {
+        let symbols = root.join("symbols");
+        std::fs::create_dir_all(&symbols).unwrap();
+        let auto = if auto_maintained {
+            r#","auto_maintained":{"fields":["旧字段"],"code_fields":["health.max"],"overridable_fields":[]}"#
+        } else {
+            ""
+        };
+        let body = format!(
+            r#"{{
+                "schema_version": 2,
+                "prompt_rev": "p4",
+                "reference": {{"kind":"component","path":"components/{name}.lua"}},
+                "category": "component",
+                "display_name": "{name}",
+                "summary": "测试文档",
+                "api": [],
+                "api_note": "纯数据组件,无公开方法"{auto},
+                "provenance": {{"source_sha256":"abc","source_bytes":1,"model":"m","generated_at_ms":1}}
+            }}"#
+        );
+        let key = SymbolRefKey {
+            kind: "component".to_string(),
+            path: format!("components/{name}.lua"),
+        };
+        write_atomic(&doc_path(root, &key), &body).unwrap();
+    }
+
+    #[test]
+    fn refresh_auto_updates_only_changed_docs() {
+        let root = temp_dir("refresh-auto");
+        std::fs::create_dir_all(root.join("symbols")).unwrap();
+        std::fs::write(
+            root.join("auto_infobox.json"),
+            r#"{
+                "schema_version": 2,
+                "source": "Module:AutoInfobox",
+                "components": {
+                    "health": {
+                        "fields": ["生命值"],
+                        "code_fields": ["health"],
+                        "overridable_fields": ["生命值"]
+                    }
+                }
+            }"#,
+        )
+        .unwrap();
+        write_component_doc(&root, "health", true); // 带旧 auto_maintained → 应更新
+        write_component_doc(&root, "bait", false); // 冷数据无 bait → 保持 None
+
+        let idx = AutoInfoboxIndex::load(&root).unwrap();
+        let reporter = crate::service::progress::CaptureReporter::new(true);
+        let out = refresh_auto_maintained(&root, &idx, &reporter).unwrap();
+        assert_eq!(out["updated"], 1);
+        assert_eq!(out["unchanged"], 1);
+
+        let key = SymbolRefKey {
+            kind: "component".to_string(),
+            path: "components/health.lua".to_string(),
+        };
+        let doc = load_doc(&doc_path(&root, &key)).unwrap().unwrap();
+        let info = doc.auto_maintained.expect("health 应注入冷数据");
+        assert_eq!(info.fields, vec!["生命值"]);
+        assert_eq!(info.code_fields, vec!["health"]);
+
+        let bait = load_doc(&doc_path(
+            &root,
+            &SymbolRefKey {
+                kind: "component".to_string(),
+                path: "components/bait.lua".to_string(),
+            },
+        ))
+        .unwrap()
+        .unwrap();
+        assert!(bait.auto_maintained.is_none());
+
+        // 二次执行:全部无变化
+        let out = refresh_auto_maintained(&root, &idx, &reporter).unwrap();
+        assert_eq!(out["updated"], 0);
+        assert_eq!(out["unchanged"], 2);
         let _ = std::fs::remove_dir_all(&root);
     }
 }

@@ -139,13 +139,13 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "堆叠上限"
+      "堆叠"
     ],
     "code_fields": [
-      "stackable.stacksize"
+      "stackable_maxsize"
     ],
     "overridable_fields": [],
-    "note": "堆叠上限由 AutoInfobox 自动渲染。"
+    "note": "无 stackable 但有 inventoryitem 时显示「不可堆叠」。"
   },
   "search_terms": [
     "物品堆叠",

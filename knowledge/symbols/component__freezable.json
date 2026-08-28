@@ -233,6 +233,20 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "特殊互动/冰冻抗性",
+      "分类:可冰冻",
+      "分类:额外冰冻抗性"
+    ],
+    "code_fields": [
+      "freezable_resistance",
+      "freezable_diminishingreturns"
+    ],
+    "overridable_fields": [],
+    "note": "freezable_diminishingreturns 为布尔标记(有递减收益时导出)。"
+  },
   "search_terms": [
     "冰冻",
     "冻住",

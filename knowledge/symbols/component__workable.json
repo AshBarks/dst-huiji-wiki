@@ -122,15 +122,18 @@
   "auto_maintained": {
     "source": "Module:AutoInfobox",
     "fields": [
-      "工作量",
-      "工作类型"
+      "可作业/工具",
+      "可作业/次数",
+      "可作业/强力开采",
+      "分类:可作业"
     ],
     "code_fields": [
-      "workable.workleft",
-      "workable.workaction"
+      "workable_action",
+      "workable_workleft",
+      "workable_tough"
     ],
     "overridable_fields": [],
-    "note": "初始版本仅少量重点组件，待后续从 AutoInfobox/Data doc 校准扩充。"
+    "note": "仅当 workleft>0 导出;工具分类 CHOP/DIG/HAMMER/MINE/NET → 可砍伐/可挖掘/可锤击/可开采/可网捕(HACK 劈砍属 hackable 键)。"
   },
   "search_terms": [
     "可工作",

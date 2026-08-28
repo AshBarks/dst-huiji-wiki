@@ -257,6 +257,26 @@
     ],
     "coverage_status": "well_documented"
   },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "耐久(次数/时长型)",
+      "可修复(缝补百分比)",
+      "分类:可缝补"
+    ],
+    "code_fields": [
+      "fueled_maxuses",
+      "fueled_maxseconds",
+      "fueled_fueltype",
+      "fueled_fueltype2",
+      "fueled_bonusmult",
+      "fueled_no_sewing"
+    ],
+    "overridable_fields": [
+      "耐久"
+    ],
+    "note": "按 scrapbook_fueled_uses 分流 maxuses(次数)或 maxseconds(时长);USAGE 型且未禁缝补(no_sewing)时自动计算缝补百分比并加「可缝补」分类。"
+  },
   "search_terms": [
     "燃料量",
     "燃烧中",

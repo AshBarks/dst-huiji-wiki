@@ -127,6 +127,7 @@ pub struct Provenance {
 /// behaviour 构造子参数语义(词典层核心字段)。
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CtorParam {
+    #[serde(alias = "param_name", alias = "param")]
     pub name: String,
     pub semantic: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]

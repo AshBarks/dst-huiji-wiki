@@ -860,10 +860,10 @@ fn build_prompt(
 1. 全部用中文;不得编造源码中不存在的内容。
 2. summary:2~4 句,说明该行为节点驱动实体完成什么行为、在什么场景使用。
 3. api:覆盖对外暴露的方法;若确实没有对外方法,api 返回空数组,并必须用 api_note 说明原因;不得为了凑数编造方法。
-4. ctor_params:覆盖构造子中 `inst` 之外的全部位置参数;每项填写参数名、玩家语义(值变大/变小意味着什么)、默认值(如有)。
-5. effects:列出该节点对组件/SG 状态标签的作用(如 `locomotor:GoToPoint`、`combat:BattleCry`、检查 `sg:HasStateTag`)。
-6. success_fail_conditions:说明行为在何时 SUCCESS / FAILED / RUNNING。
-7. events_published / events_listened / netvars / tunables:严格取自源码标识符,可为空数组;tunables 放源码内的默认数值/配置(如 Wander 的 wander_dist)。
+4. ctor_params:覆盖构造子中 `inst` 之外的全部位置参数;每项为对象 {{\"name\":参数名,\"semantic\":玩家语义,\"default\":默认值或省略}},语义要写清值变大/变小意味着什么。
+5. effects:字符串数组,每项一条该节点对组件/SG 状态标签的作用(如 `locomotor:GoToPoint`、`combat:BattleCry`、检查 `sg:HasStateTag`)。
+6. success_fail_conditions:字符串数组,分别说明何时 SUCCESS / FAILED / RUNNING,如 [\"SUCCESS:…\",\"FAILED:…\",\"RUNNING:…\"]。
+7. events_published / events_listened / netvars / tunables:字符串数组,严格取自源码标识符,可为空数组;tunables 放源码内的默认数值/配置(如 Wander 的 wander_dist)。
 8. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。
 9. search_terms:5~10 个用于在维基全文中检索该行为玩家表达的词汇,以中文玩家语言为主(可混英文),每词 2~6 字。
 10. 只输出一个 JSON 对象,字段名与上述一致;api 确无方法时 api 为空数组,但必须提供 api_note。
@@ -880,10 +880,10 @@ fn build_prompt(
 要求:
 1. 全部用中文;不得编造源码中不存在的内容。
 2. summary:2~4 句,说明该大脑让实体在什么情境下采取什么行为。
-3. tunables:文件级 local 常量(如 SEE_DIST、HOUSE_MAX_DIST),这些常量是页面“行为”章数值事实的主要锚点;名称/值严格取自源码。
-4. behaviour_invocations:列出本 brain 中实际调用的 behaviour 构造子及参数语义(数值事实),例如 `ChaseAndAttack(inst, 100)` → “追击最长 100 秒”;如有条件语境,填 context。
-5. context_branches:条件分支(如 `HasTag(\"clay\")`),对应页面分句枚举。
-6. bt_structure:优先级节点树的文字化摘要(意图粒度,不追求完整还原)。
+3. tunables:字符串数组,文件级 local 常量名(如 SEE_DIST、HOUSE_MAX_DIST),这些常量是页面“行为”章数值事实的主要锚点;名称/值严格取自源码。
+4. behaviour_invocations:对象数组,每项 {{\"ctor\":构造子名,\"args_semantic\":[各位置参数的玩家语义,顺序与构造子一致],\"context\":条件语境或省略}};如 `ChaseAndAttack(inst, 100)` → args_semantic 里写“追击最长 100 秒”。
+5. context_branches:对象数组,每项 {{\"condition\":条件如 HasTag(\"clay\"),\"semantic\":该分支下行为的差异}},对应页面分句枚举。
+6. bt_structure:单个字符串,优先级节点树的文字化摘要(意图粒度,不追求完整还原)。
 7. api:对外方法(通常少量);若没有,api 返回空数组,并必须用 api_note 说明原因。
 8. events_published / events_listened / netvars:严格取自源码标识符,可为空数组。
 9. gameplay_tags:1~4 个玩法标签(如 生存/战斗/建造/装饰)。

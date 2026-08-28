@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4-behaviour",
+  "reference": {
+    "kind": "behaviour",
+    "path": "behaviours/doaction.lua"
+  },
+  "category": "behaviour",
+  "display_name": "doaction",
+  "summary": "该行为节点驱动实体通过 locomotor 组件执行一个由函数提供的特定动作（如攻击、采集等）。它常用于行为树中让 AI 实体自动进行交互或移动相关的行动，当动作成功、失败、超时或无效时节点相应结束。",
+  "api": [],
+  "api_note": "该节点仅实现 BehaviourNode 的内部方法（如 Visit、OnFail、OnSucceed），由行为树引擎调用，不对外暴露供玩家或外部代码直接调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "ctor_params": [
+    {
+      "name": "getactionfn",
+      "semantic": "获取动作的函数（非数值，无变大变小概念），接收实体并返回动作对象；函数返回有效动作则节点执行该动作，返回 nil 则节点立即失败，函数逻辑改变意味着实体尝试不同行为"
+    },
+    {
+      "name": "name",
+      "semantic": "节点调试名称字符串（非数值，无变大变小概念）；值变化仅影响标识与日志，不影响实际行为逻辑",
+      "default": "DoAction"
+    },
+    {
+      "name": "run",
+      "semantic": "布尔值或函数，决定是否以跑动方式执行动作；值由 false 变 true 意味着以跑动方式（移动更快）执行，由 true 变 false 意味着行走"
+    },
+    {
+      "name": "timeout",
+      "semantic": "数字，动作执行超时时间（秒）；值变大允许动作运行更久才判定超时失败，变小则更快触发超时失败"
+    }
+  ],
+  "effects": [
+    "locomotor:PushAction"
+  ],
+  "success_fail_conditions": [
+    "SUCCESS: 当 getactionfn 返回的动作成功完成时（动作成功回调触发，pendingstatus 设为 SUCCESS）",
+    "FAILED: 1) getactionfn 返回 nil；2) 动作执行超时（当前时间-开始时间 > timeout）；3) 动作失败回调触发；4) 动作在执行中变为无效（action:IsValid() 为 false）",
+    "RUNNING: 动作已被推送到 locomotor 且尚未成功、失败、超时或无效，处于等待动作完成的状态"
+  ],
+  "search_terms": [
+    "执行动作",
+    "做动作",
+    "行为节点",
+    "动作节点",
+    "AI执行",
+    "自动行为",
+    "实体动作",
+    "行动节点"
+  ],
+  "gameplay_tags": [
+    "动作执行"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
+    "source_bytes": 1470,
+    "model": "hy3-free",
+    "generated_at_ms": 1787925487350
+  }
+}

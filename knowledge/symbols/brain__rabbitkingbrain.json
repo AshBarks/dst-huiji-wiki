@@ -1,0 +1,240 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/rabbitkingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "rabbitkingbrain",
+  "summary": "兔王大脑根据实体类型（被动、攻击、幸运）驱动不同行为。被动时交易面对玩家、吃食物并游荡；攻击时触发技能、逃离其他攻击者并与目标保持距离追击；幸运时胆小逃跑、特定条件回家并游荡。",
+  "api": [],
+  "api_note": "该大脑仅覆盖 Brain 基类的 OnStart 方法以根据 rabbitking_kind 构建行为树，并包含内部 Create_* 方法，未对外暴露额外可调用接口。",
+  "events_published": [
+    "ability_summon",
+    "ability_dropkick"
+  ],
+  "events_listened": [
+    "gohome"
+  ],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "SEE_BAIT_DIST",
+    "MAX_WANDER_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "FACE_DIST",
+    "IDEAL_TARGET_DISTANCE",
+    "IDEAL_TARGET_DISTANCESQ",
+    "DROPKICKDIST",
+    "DROPKICKDISTSQ",
+    "SUMMONDISTSQ",
+    "LUCKY_AVOID_PLAYER_DIST",
+    "LUCKY_AVOID_PLAYER_STOP",
+    "LUCKY_STOP_RUN_DIST",
+    "LUCKY_PLAYER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取面对目标函数(找FACE_DIST内最近玩家)",
+        "保持面对函数(玩家在FACE_DIST内)"
+      ],
+      "context": "交易状态(sg.mem.trading)下"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取吃食物动作函数(SEE_BAIT_DIST内可吃诱饵)"
+      ],
+      "context": "被动状态"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "家位置函数(knownlocations取home)",
+        "最大游荡距离 MAX_WANDER_DIST(20)"
+      ],
+      "context": "被动状态"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "猎人参数表(标签_combat且攻击自己非互攻的实体)",
+        "发现距离 IDEAL_TARGET_DISTANCE+2=10",
+        "安全距离 IDEAL_TARGET_DISTANCE-2=6"
+      ],
+      "context": "攻击状态远离其他攻击者"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实例",
+        "锚点函数(目标玩家外推理想距离点)",
+        "最大距离 2",
+        "内部返回距离 0.5",
+        "跑步 true"
+      ],
+      "context": "攻击状态保持距离(装饰器内)"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实例",
+        "锚点函数(目标玩家位置)",
+        "最大距离 10",
+        "内部返回距离 6",
+        "跑步 true"
+      ],
+      "context": "攻击状态追击但保持距离(装饰器内)"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取战斗目标玩家函数",
+        "保持目标不变函数"
+      ],
+      "context": "攻击状态"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "家位置函数(knownlocations取home)",
+        "最大游荡距离 20"
+      ],
+      "context": "攻击状态"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "猎人标签 scarytoprey",
+        "发现距离 6",
+        "安全距离 9"
+      ],
+      "context": "幸运状态逃跑"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "猎人标签 scarytoprey",
+        "发现距离 8",
+        "安全距离 13",
+        "无过滤函数",
+        "跑回家 true"
+      ],
+      "context": "幸运状态逃跑(跑回家)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作函数",
+        "节点名 go home",
+        "跑动 true"
+      ],
+      "context": "收到gohome事件"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作函数",
+        "节点名 go home",
+        "跑动 true"
+      ],
+      "context": "夜晚"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作函数",
+        "节点名 go home",
+        "跑动 true"
+      ],
+      "context": "春天"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取吃食物动作函数"
+      ],
+      "context": "幸运状态"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "家位置函数(knownlocations取home)",
+        "最大游荡距离 20"
+      ],
+      "context": "幸运状态"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "rabbitking_kind == 'passive'",
+      "semantic": "被动兔王：交易时面对玩家，吃诱饵，在家周围游荡，不逃跑"
+    },
+    {
+      "condition": "rabbitking_kind == 'aggressive'",
+      "semantic": "攻击兔王：触发技能（召唤/踢击），逃离其他攻击者，与目标保持理想距离并追击，面对目标，游荡"
+    },
+    {
+      "condition": "rabbitking_kind == 'lucky'",
+      "semantic": "幸运兔王：害怕scarytoprey而逃跑，夜晚/春天/收到gohome事件时回家，吃食物，游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树(.25)：被动[恐慌触发,电篱恐慌,交易面对玩家,吃食物,游荡]；攻击[恐慌触发,电篱恐慌,技能触发,逃离其他攻击者,保持距离拴绳,追击拴绳,面对目标,游荡]；幸运[恐慌触发,电篱恐慌,逃离scarytopreyx2,事件/夜晚/春天回家,吃食物,游荡]。",
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13493,
+      15022,
+      15238,
+      51046,
+      13701,
+      13857,
+      15246
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为 pigman、hermitcrab、alterguardian_phase1、beefalo、wagboss_robot、stalker_atrium、icehound、spider，均未提及 rabbitking 或兔王，文本中的距离与行为描述均属于其他实体，未体现 brain__rabbitkingbrain 的能力清单（如 STOP_RUN_DIST、MAX_WANDER_DIST 等），故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "兔王大脑",
+    "被动兔王",
+    "攻击兔王",
+    "幸运兔王",
+    "逃跑行为",
+    "面对玩家",
+    "吃诱饵",
+    "游荡",
+    "召唤技能",
+    "回家"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c09325a2a0671a4b4153667568f9beb2d9fe392af33b1902241700f05f99df8",
+    "source_bytes": 8764,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935249637
+  }
+}

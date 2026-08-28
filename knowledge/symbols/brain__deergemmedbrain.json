@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/deergemmedbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "deergemmedbrain",
+  "summary": "该大脑控制宝石鹿类实体在拥有主人（keeper）时通过拴绳跟随主人偏移位置，远离时跑回；若主人不存在（未被奴役）则限时追击攻击目标。遇到魔法或电栅栏时恐慌跑回，并在主人死亡或失去联系后解除束缚、重置战斗状态。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 构建行为树，未定义其他对外方法。",
+  "events_published": [
+    "unshackle"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FAR_DIST_SQ",
+    "RESET_COMBAT_DELAY",
+    "LOST_KEEPER_MIN_DELAY",
+    "LOST_KEEPER_MAX_DELAY",
+    "MAX_CHASE_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取奴隶位置（主人偏移）函数",
+        "最大半径15",
+        "内部返回距离5",
+        "跑步返回"
+      ],
+      "context": "恐慌或避开电栅栏时"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "恐慌时"
+    },
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "避开电栅栏时"
+    },
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "无条件（优先级中直接）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长6秒"
+      ],
+      "context": "无主人（未被奴役）时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "应追逐时（主人在附近死亡或目标在攻击范围内）"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取奴隶位置（主人偏移）函数",
+        "最大半径1",
+        "内部返回距离1",
+        "跑步返回"
+      ],
+      "context": "远离主人时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取奴隶位置（主人偏移）函数",
+        "最大半径0.5",
+        "内部返回距离0.5",
+        "走路返回"
+      ],
+      "context": "默认跟随主人"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗目标函数",
+        "保持战斗目标函数"
+      ],
+      "context": "默认面对目标"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "兜底站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldPanic(self)",
+      "semantic": "实体恐慌时，使用拴绳跑回主位置并触发恐慌行为"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence(self.inst)",
+      "semantic": "实体需避开电栅栏时，拴绳跑回并避开电栅栏"
+    },
+    {
+      "condition": "GetKeeper(self.inst) == nil",
+      "semantic": "无主人（未被奴役）时，限时6秒追击攻击"
+    },
+    {
+      "condition": "ShouldChase(self)",
+      "semantic": "主人死亡或目标在攻击范围内时，无限时追击攻击"
+    },
+    {
+      "condition": "IsFarFromKeeper(self)",
+      "semantic": "离主人距离平方>=49时，紧密拴绳（半径1）跑回"
+    },
+    {
+      "condition": "ShouldResetCombat(self)",
+      "semantic": "有主人且失去计时未到时，等待10秒后设未交战"
+    },
+    {
+      "condition": "ShouldUnshackle(self)",
+      "semantic": "失去主人超过随机延迟后，设未交战并推送unshackle事件"
+    }
+  ],
+  "bt_structure": "优先级树：恐慌/避电栅栏分支（跑回+恐慌/避栅栏） > 攻击墙 > 无主人限时追击 > 应追逐无限追击 > 远离主人紧绳跑回 > 重置远离标志 > 默认慢速拴绳跟随 > 面对战斗目标 > 重置战斗计时 > 解除束缚 > 站立。",
+  "wiki": {
+    "scanned_pageids": [
+      13897,
+      13701,
+      45173,
+      72981,
+      15022,
+      15551,
+      15812,
+      13857
+    ],
+    "aspects": [
+      {
+        "aspect": "近战范围攻击目标",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "宝石鹿会顶撞攻击进入其近战范围的目标。"
+          }
+        ]
+      },
+      {
+        "aspect": "默认跟随主人移动",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "两只宝石无眼鹿总是跟随在克劳斯两侧。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "宝石鹿",
+    "拴绳",
+    "主人",
+    "恐慌",
+    "追击",
+    "攻击墙",
+    "解除束缚",
+    "电栅栏"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "恐慌"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3530312d15d941eb71cf2f6dc6e206aaede1fe5a4a1534514310662a61dbaacd",
+    "source_bytes": 4709,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935131669
+  }
+}

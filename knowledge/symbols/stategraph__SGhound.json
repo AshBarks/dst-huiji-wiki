@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGhound.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGhound",
+  "summary": "该状态图驱动猎犬(hound)及小座狼(warglet)等实体的行为逻辑。整体通过显式定义攻击、进食、咆哮、石像等状态，并借助通用状态库扩展睡眠、奔跑、冰冻、触电及尸体等状态来组织。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和状态跳转驱动实体，未定义对外调用的独立方法。",
+  "events_published": [
+    "chomped"
+  ],
+  "events_listened": [
+    "attacked",
+    "death",
+    "doattack",
+    "dohowl",
+    "startle",
+    "heardwhistle",
+    "chomp",
+    "workmoonbase",
+    "becomestatue",
+    "reanimate"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SANITYAURA_MED",
+    "TUNING.GARGOYLE_REANIMATE_DELAY"
+  ],
+  "states": [
+    "idle",
+    "attack",
+    "eat",
+    "eat_from_loop",
+    "eat_timeline_from_frame6",
+    "eat_chewing",
+    "eat_pst",
+    "chomp_pre",
+    "chomp_pre_from_loop",
+    "chomp_pre_timeline_from_frame6",
+    "chomp_loop",
+    "chomp_pst",
+    "hit",
+    "startle",
+    "taunt",
+    "howl",
+    "death",
+    "forcesleep",
+    "workmoonbase",
+    "reanimate",
+    "statue",
+    "reanimatestatue",
+    "transformstatue",
+    "mutated_spawn",
+    "surprise_spawn"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "猎犬攻击状态，动画第16帧执行伤害判定；结束后有概率挑衅或回到待机，带有attack和busy标签。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放受击动画并停止移动，具有hit和busy标签，动画结束后返回待机。"
+    },
+    {
+      "state": "howl",
+      "note": "咆哮状态，可由事件触发生成猎犬或响应哨声；第10帧生成猎犬，期间有howling标签。"
+    },
+    {
+      "state": "eat_chewing",
+      "note": "进食咀嚼状态，带chewing和caninterrupt标签，第7帧后可被中断，循环播放咀嚼动画与音效。"
+    },
+    {
+      "state": "statue",
+      "note": "陶土猎犬石像状态，变为障碍物且无敌、不可作为目标，隐藏眼部特效并停止理智光环。"
+    },
+    {
+      "state": "transformstatue",
+      "note": "陶土猎犬转变为石像的过渡状态，播放变身动画并锁定六面朝向，结束时进入statue。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，移除物理碰撞并播放死亡动画，陶土猎犬会碎裂，延迟后可重新播放动画。"
+    },
+    {
+      "state": "workmoonbase",
+      "note": "月亮猎犬敲击月亮基地状态，第16帧对月亮基地进行1次工作并生成采矿特效。"
+    },
+    {
+      "state": "startle",
+      "note": "惊吓状态，由startle事件触发，清除战斗目标并播放害怕动画，约0.8-1.1秒后结束。"
+    },
+    {
+      "state": "taunt",
+      "note": "挑衅或吠叫状态，攻击或进食后可能进入，播放taunt动画并发声，有概率循环挑衅。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      24748,
+      15022,
+      16419,
+      19344,
+      24875,
+      13406,
+      13551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及熔炉装备、暗影鱼人、天体英雄、WX-78电路板、三尾猫鞭、变异鱼人、伍迪、虚影等实体，未包含任何与stategraph__SGhound（猎犬状态图）相关的描述，且代码能力/行为语义清单为空，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猎犬状态",
+    "咆哮生成",
+    "进食咀嚼",
+    "陶土石像",
+    "月亮基地",
+    "受击硬直",
+    "惊吓反应",
+    "死亡碎裂"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0409b9732e5d06778af2d86706ee3b27786f771b0a31b458f58867cef262a259",
+    "source_bytes": 32528,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935639815
+  }
+}

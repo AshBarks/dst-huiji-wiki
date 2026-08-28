@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/beargerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "beargerbrain",
+  "summary": "熊獾大脑在实体未处于跳跃或踉跄状态时，按优先级决策行为。当存在合适战斗目标时会冲锋或追击，靠近玩家基地时会偷吃食物和破坏容器，无目标时按季节在出生点附近游荡。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    },
+    {
+      "name": "OnInitializationComplete",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "GIVE_UP_DIST",
+    "MAX_CHARGE_DIST",
+    "SEE_FOOD_DIST",
+    "SEE_STRUCTURE_DIST",
+    "BASE_TAGS",
+    "NO_TAGS",
+    "PICKABLE_FOODS",
+    "BEEHIVE_TAGS",
+    "OUTSIDE_CATAPULT_RANGE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndRam",
+      "args_semantic": [
+        "实体自身",
+        "最大追逐时间 8 秒",
+        "放弃距离阈值 20",
+        "最大冲锋距离 60"
+      ],
+      "context": "WhileNode 'Charge Behaviours': 战斗目标存在且非蜂巢且(正在奔跑或处于 InRamDistance 判定距离)"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐时间 TUNING.BEARGER_MAX_CHASE_TIME",
+        "放弃距离 60 世界单位",
+        "最大攻击次数 nil",
+        "寻找新目标函数 nil",
+        "步行 true(移动慢)",
+        "海洋距离测试函数 OceanDistanceTest"
+      ],
+      "context": "根优先级节点中，冲锋行为之后"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作函数 EatFoodAction"
+      ],
+      "context": "WhileNode 'At Base' 内优先执行，以及其后再次执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取偷取食物动作函数 StealFoodAction"
+      ],
+      "context": "WhileNode 'At Base' 内优先执行，以及其后再次执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取攻击蜂巢动作函数 AttackHiveAction",
+        "节点调试名 'AttackHive'",
+        "跑动方式 nil",
+        "超时 7 秒"
+      ],
+      "context": "根优先级中，偷食物之后"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置函数 GetHome(夏天返回 spawnpoint 否则 nil)",
+        "最大距离函数 GetTargetDistance(按季节返回不同游荡距离)",
+        "游荡时间配置表{minwalktime=2,randwalktime=3,minwaittime=.1,randwaittime=.6}",
+        "方向获取函数 GetWanderDirection",
+        "方向设置函数 SetWanderDirection"
+      ],
+      "context": "根优先级中，偷食物之后、StandStill 之前"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "根优先级末尾"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HasTag('lunar_aligned') 为假 (非变异)",
+      "semantic": "执行 BrainCommon.PanicTrigger 恐慌触发节点"
+    },
+    {
+      "condition": "combat.target 存在且非 beehive 且 (sg 有 running 或 InRamDistance 为真)",
+      "semantic": "进入 ChaseAndRam 冲锋撞击行为而非普通追击"
+    },
+    {
+      "condition": "ShouldEatFoodFn 为真 (附近至少2个 structure 即 seenbase)",
+      "semantic": "优先执行 EatFoodAction 和 StealFoodAction 进食偷食"
+    },
+    {
+      "condition": "季节为 summer",
+      "semantic": "GetHome 返回 spawnpoint，GetTargetDistance 返回 BEARGER_SHORT_TRAVEL 短途游荡"
+    },
+    {
+      "condition": "季节为 autumn",
+      "semantic": "GetTargetDistance 返回 BEARGER_LONG_TRAVEL 长途游荡"
+    },
+    {
+      "condition": "目标不在陆地时",
+      "semantic": "ChaseAndAttack 使用 OceanDistanceTest 函数计算保持的海洋距离"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25) -> 忙碌状态守卫WhileNode(非跳跃/踉跄) -> 内部优先级节点(0.25): [IfNode(非变异)恐慌, WhileNode(冲锋条件)ChaseAndRam, ChaseAndAttack, WhileNode(在基地)优先级[吃,偷], 吃, 偷, 攻蜂巢DoAction, Wander, StandStill]",
+  "wiki": {
+    "scanned_pageids": [
+      15642,
+      20154,
+      13569,
+      13570,
+      21137,
+      18410,
+      13823,
+      20192
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面15642(bearger)仅含生成机制、掉落与外观，未描述brain的追逐/攻击/进食/偷窃/游荡等行为；页面20154(mutatedbearger)行为如随机前进、攻击蜂窝但不匹配beargerbrain清单具体语义；其余页面讨论季节、昼夜、冰川、降水、deerclops、物品等，均未体现beargerbrain能力，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "熊獾",
+    "冲锋",
+    "吃食物",
+    "偷食物",
+    "砸蜂巢",
+    "游荡",
+    "恐慌",
+    "基地",
+    "季节"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "752df336e1a779ba9f525d56e102b022b711aea919c80f1104f7132e2e84b523",
+    "source_bytes": 12354,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935250494
+  }
+}

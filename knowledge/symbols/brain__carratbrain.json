@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/carratbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "carratbrain",
+  "summary": "该大脑控制卡瑞特（carrat）在常规情境下逃离威胁标签实体、寻找食物、返回牛群并自由游荡。当实体成为比赛竞争者时，依据赛前、赛中、赛后、赛结束等状态切换为拴向检查点、面对训练师、定向游荡或起跑延迟恐慌。若着火、被闹鬼或需避电栅栏则触发对应恐慌或回避行为。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_DIST_SQ",
+    "AVOID_PLAYER_STOP",
+    "SEE_BAIT_DIST",
+    "MAX_WANDER_DIST",
+    "RACE_WANDER_DURATION",
+    "RACE_WANDER_MAX_DIST",
+    "RACE_WANDER_TIMES",
+    "RACE_WANDER_DATA"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "猎人参数: 标签scarytoprey且非character的实体",
+        "发现距离AVOID_PLAYER_DIST(3)",
+        "安全距离AVOID_PLAYER_STOP(5)",
+        "无额外条件函数",
+        "不跑回家",
+        "修正悬垂地形为真"
+      ],
+      "context": "比赛竞争者状态下优先级最高节点"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置函数racing_get_checkpoint_pt返回检查点坐标",
+        "最大拴绳距离2.5",
+        "内部返回距离1.5",
+        "以跑步速度返回为真"
+      ],
+      "context": "比赛前(prerace)状态"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取检查点实体函数racing_get_checkpoint",
+        "保持面对检查点实体函数racing_get_checkpoint"
+      ],
+      "context": "比赛前(prerace)状态"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置函数racing_get_checkpoint_pt返回检查点坐标",
+        "最大拴绳距离2.5",
+        "内部返回距离1.25",
+        "以跑步速度返回为真"
+      ],
+      "context": "比赛后(postrace)状态"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取训练师实体函数get_trainer",
+        "保持面对训练师实体函数get_trainer"
+      ],
+      "context": "比赛后(postrace)状态"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置函数get_nearby_trainer_pt返回附近训练师坐标",
+        "最大拴绳距离2.5",
+        "内部返回距离1.25",
+        "以跑步速度返回为真"
+      ],
+      "context": "比赛结束(raceover)且训练师在附近"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置函数racing_get_checkpoint_pt返回检查点坐标",
+        "最大拴绳距离2.5",
+        "内部返回距离1.25",
+        "以跑步速度返回为真"
+      ],
+      "context": "比赛结束(raceover)且训练师不在附近(IfNode内)"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [],
+      "context": "比赛中起跑延迟(IsStartingLate)恐慌"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "家位置函数返回检查点坐标",
+        "最大游荡距离RACE_WANDER_MAX_DIST(50)",
+        "游荡时间参数RACE_WANDER_TIMES",
+        "方向函数get_race_direction",
+        "无设置方向函数",
+        "无检查点函数",
+        "数据表RACE_WANDER_DATA含should_run与wander_dist"
+      ],
+      "context": "比赛中(racing)状态"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [],
+      "context": "着火或受火烧伤害(OnFire)"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [],
+      "context": "被闹鬼恐慌(PanicHaunted)"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "猎人标签字符串scarytoprey",
+        "发现距离AVOID_PLAYER_DIST(3)",
+        "安全距离AVOID_PLAYER_STOP(5)"
+      ],
+      "context": "常规非比赛状态逃离威胁"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取进食动作函数eat_food_action",
+        "节点名'eat food'"
+      ],
+      "context": "常规状态尝试吃食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取回牛群动作函数returntobeefalo",
+        "节点名'go home'"
+      ],
+      "context": "常规状态尝试返回牛群"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置(nil)",
+        "最大游荡距离MAX_WANDER_DIST(20)"
+      ],
+      "context": "常规状态自由游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "is_racecompetitor(inst) 为真（有 yotc_racecompetitor 组件）",
+      "semantic": "进入比赛行为树：优先逃离威胁，并按比赛子状态执行拴点、面对、站立或定向游荡"
+    },
+    {
+      "condition": "is_waiting_for_race_to_start(inst) (racestate=='prerace')",
+      "semantic": "赛前：拴向检查点(2.5/1.5)，面对检查点，然后站立"
+    },
+    {
+      "condition": "racestate == 'postrace'",
+      "semantic": "赛后：拴向检查点(2.5/1.25)，面对训练师，站立"
+    },
+    {
+      "condition": "racestate == 'raceover'",
+      "semantic": "比赛结束：若训练师近则拴向训练师否则拴向检查点，面对训练师，站立"
+    },
+    {
+      "condition": "racestate == 'racing'",
+      "semantic": "比赛中：若起跑延迟则恐慌，否则以检查点为家、最大距离50、特定时间方向游荡"
+    },
+    {
+      "condition": "健康受火烧或燃烧中",
+      "semantic": "恐慌"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence",
+      "semantic": "避开电栅栏"
+    },
+    {
+      "condition": "被闹鬼(hauntable.panic)",
+      "semantic": "恐慌"
+    },
+    {
+      "condition": "非比赛竞争者(常规状态)",
+      "semantic": "逃离scarytoprey(3/5)，尝试吃食物，尝试回牛群，自由游荡(最大20)"
+    }
+  ],
+  "bt_structure": "根优先级节点: [着火恐慌] > [避电栅栏] > [比赛大脑(若竞争者): [逃跑威胁] > [赛前:拴+面对+站] / [赛后:拴+面对+站] / [赛结束:拴训练师/检查点+面对+站] / [比赛中:迟则恐慌否则定向游荡]] > [闹鬼恐慌] > [常规:逃跑>吃食>回牛>游荡]",
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15737,
+      33950
+    ],
+    "aspects": [
+      {
+        "aspect": "主动远离玩家行为描述",
+        "evidence": [
+          {
+            "pageid": 15737,
+            "quote": "以生物形态逃跑，主动远离玩家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "卡瑞特脑",
+    "比赛状态",
+    "逃离威胁",
+    "进食动作",
+    "返回牛群",
+    "自由游荡",
+    "拴向检查",
+    "面对训练",
+    "着火恐慌"
+  ],
+  "gameplay_tags": [
+    "比赛",
+    "生存",
+    "饲养"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db5f55272368b7c23bd06dbb248718d73c9e023e52522fd623356243a046c920",
+    "source_bytes": 9217,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935348576
+  }
+}

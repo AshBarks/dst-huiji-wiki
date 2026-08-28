@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/deerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "deerbrain",
+  "summary": "该大脑控制鹿实体在独处或群居等不同情境下的行为。当被附身或拥有战斗目标时，鹿会恐慌或逃离玩家并可能攻击墙壁；在鹿群中时，鹿会跟随群体位置、响应警报注视目标并在吃草时游荡；无特殊状态时则自由游荡或站立。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 以构建行为树，未定义其他对外方法或可被外部调用的接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_DIST_DAY",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "SOLO_START_FACE_DIST",
+    "SOLO_KEEP_FACE_DIST",
+    "HERD_KEEPUP_DIST",
+    "START_ALERT_DIST",
+    "KEEP_ALERT_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "鹿实体自身"
+      ],
+      "context": "当实体被附身且处于恐慌状态（hauntable.panic）时，在 PanicHaunted 节点下"
+    },
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "鹿实体自身"
+      ],
+      "context": "当实体有战斗目标（Flee 分支）时优先执行"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "鹿实体自身",
+        "威胁来源为战斗目标中的玩家（通过 getfn 表获取）",
+        "发现猎人距离（TUNING.DEER_ATTACKER_REMEMBER_DIST）",
+        "安全距离（TUNING.DEER_ATTACKER_REMEMBER_DIST）"
+      ],
+      "context": "当实体有战斗目标时，紧随 AttackWall 执行"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "鹿实体自身",
+        "寻找最近玩家（SOLO_START_FACE_DIST 内）作为注视目标",
+        "保持注视条件：目标无 notarget 标签且在 SOLO_KEEP_FACE_DIST 内"
+      ],
+      "context": "独处心态下（solomentality）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "鹿实体自身",
+        "获取鹿群警报目标（GetAlertTargetFn）",
+        "保持条件：鹿群仍有警报目标（KeepAlertTargetFn）",
+        "转向时长 0.25"
+      ],
+      "context": "群居心态下（herdmentality）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "鹿实体自身（无家无参数自由游荡）"
+      ],
+      "context": "独处心态下（solomentality）末尾"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "鹿实体自身",
+        "吃草位置函数（鹿群位置+偏移*2）",
+        "最大游荡距离 2",
+        "无时间参数（nil）",
+        "游荡方向角度函数（基于偏移随机方差）"
+      ],
+      "context": "群居心态下且鹿群正在吃草（Grazing 分支）"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "鹿实体自身",
+        "鹿群中的位置函数（GetLocationInHerd）",
+        "拴绳最大半径 HERD_KEEPUP_DIST(18)",
+        "内部返回距离 5",
+        "跑步速度返回 true"
+      ],
+      "context": "群居心态下首要行为"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "鹿实体自身",
+        "鹿群中的位置函数（GetLocationInHerd）",
+        "拴绳最大半径 2",
+        "内部返回距离 2",
+        "走路速度返回 false"
+      ],
+      "context": "群居心态下当未吃草时的兜底拴系"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "鹿实体自身（无起止条件，无限期站立）"
+      ],
+      "context": "根节点最后默认行为"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.components.hauntable and inst.components.hauntable.panic",
+      "semantic": "触发 Panic 行为使实体恐慌逃跑"
+    },
+    {
+      "condition": "inst.components.combat:HasTarget()",
+      "semantic": "有战斗目标时攻击墙壁并远离玩家（AttackWall, RunAway）"
+    },
+    {
+      "condition": "TheWorld.components.deerherding:IsActiveInHerd(inst)",
+      "semantic": "群居心态：拴系鹿群位置、注视警报目标、吃草时游荡、近距离拴系"
+    },
+    {
+      "condition": "IsHerdGrazing(self)",
+      "semantic": "鹿群吃草时等待2秒后以小范围游荡"
+    },
+    {
+      "condition": "非鹿群活跃（solomentality）",
+      "semantic": "独处：受惊恐慌、战斗逃离、注视玩家、盐块锚定、自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点：先尝试重置数据（失败才继续）；若活跃于鹿群则执行群居分支（优先跑步拴系鹿群位置、注视警报目标、吃草时等待后游荡、走路近距拴系），否则执行独处分支（附身恐慌、战斗时攻击墙并逃跑、通用恐慌触发、电击栅栏恐慌、注视玩家、盐块锚定、自由游荡）；最终默认站立不动。",
+  "wiki": {
+    "scanned_pageids": [
+      15812
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面15812仅描述无眼鹿的生成时间、群居特性、迁徙、长角及消失条件等宏观生态信息，未提及任何与brain__deerbrain相关的游荡、逃跑、注视、警报、恐慌、攻击、拴系等行为语义或数值表达",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鹿大脑",
+    "鹿群心态",
+    "逃跑玩家",
+    "吃草游荡",
+    "拴系鹿群",
+    "附身恐慌",
+    "注视玩家",
+    "盐块锚定"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "群居"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1e7c7a3c35119b2464cf6dcad824c72d13425e13cc3497d799e4ed34d7fa1f5f",
+    "source_bytes": 4788,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935162311
+  }
+}

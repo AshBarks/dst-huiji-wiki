@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/pollyrogerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "pollyrogerbrain",
+  "summary": "该大脑控制 Polly Rogers 及 Salty Dog 等跟随玩家的鸟类实体。在非忙碌状态下，实体会优先逃离敌对生物、协助领袖捡拾物品、跟随领袖移动。Salty Dog 变体还会在陆地盐分满时触发抖动事件，并以附近海洋点为中心游荡，否则静止。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "saltshake"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_SALT_IDLE_DIST_SQ",
+    "WANDER_TIMING",
+    "WANDER_DATA",
+    "MAX_WANDER",
+    "STOP_RUN_DIST",
+    "SEE_MONSTER_DIST",
+    "AVOID_MONSTER_DIST",
+    "AVOID_MONSTER_STOP"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离条件表 ShouldRunAway（带 hostile 标签且非玩家领导的跟随者）",
+        "开始逃离距离 3 (AVOID_MONSTER_DIST)",
+        "停止逃离距离 6 (AVOID_MONSTER_STOP)"
+      ],
+      "context": "非忙碌时优先执行，逃离近处敌对"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离条件表 ShouldRunAway",
+        "察觉距离 5 (SEE_MONSTER_DIST)",
+        "停止奔跑距离 10 (STOP_RUN_DIST)"
+      ],
+      "context": "紧接着前一条，处理较远处敌对"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回跟随目标 leader 的函数；若 prefab 为 salty_dog 且附近海洋点离 leader 近则返回 nil",
+        "最小允许距离 0 (MIN_FOLLOW_DIST)",
+        "期望保持距离 6 (TARGET_FOLLOW_DIST)",
+        "最大允许距离 8 (MAX_FOLLOW_DIST)"
+      ],
+      "context": "在协助捡拾分支之后、salty_dog 游荡之前无条件执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回附近海洋点的函数（作为家位置）",
+        "最大游荡距离 6 (MAX_WANDER)",
+        "游荡时间配置表 WANDER_TIMING（最短走0.25等）",
+        "无方向函数(nil)",
+        "无设置方向函数(nil)",
+        "检查点函数 IsWanderOcean（要求海洋点）",
+        "配置表 WANDER_DATA（回家时拴住）"
+      ],
+      "context": "仅当 prefab 为 salty_dog 时执行"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "上述节点均未触发时的默认静止"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "prefab == 'salty_dog' 且在陆地且盐分计数 >= TUNING.SALTY_DOG_MAX_SALT_COUNT",
+      "semantic": "通过 ActionNode 推送 'saltshake' 事件"
+    },
+    {
+      "condition": "not busy 且 leader 距离平方 < POLLY_ROGERS_RANGE^2 (函数 closetoleader)",
+      "semantic": "执行 BrainCommon.NodeAssistLeaderPickUps 协助领袖捡拾物品"
+    },
+    {
+      "condition": "prefab == 'salty_dog'",
+      "semantic": "执行 Wander 以动态附近海洋点为中心游荡；且在 Follow 中若 leader 靠近海洋点则取消跟随"
+    },
+    {
+      "condition": "ShouldRunAway.fn 中 thing 的 follower leader 是 player",
+      "semantic": "返回 false，不将该实体视为威胁，故不逃离"
+    }
+  ],
+  "bt_structure": "根 PriorityNode(.25) 判断忙碌则跳过；否则内部 PriorityNode(.25) 按序：PanicTrigger、ElectricFencePanicTrigger、两次 RunAway 逃离敌对、IfNode(salty_dog陆地盐分满→saltshake)、WhileNode(靠近领袖→协助捡拾)、Follow(领袖)、IfNode(salty_dog→Wander海洋)、StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      70482,
+      70481,
+      66546,
+      18539
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随行为描述",
+        "evidence": [
+          {
+            "pageid": 70482,
+            "quote": "它会跟随戴着[[咸狗帽]]的生物"
+          },
+          {
+            "pageid": 70481,
+            "quote": "会出现一只名叫[[咸狗]]的生物跟随装备者"
+          },
+          {
+            "pageid": 18539,
+            "quote": "它会飞向戴着[[波莉·罗杰的帽子]]的生物"
+          }
+        ]
+      },
+      {
+        "aspect": "躲避敌对生物描述",
+        "evidence": [
+          {
+            "pageid": 70482,
+            "quote": "它会主动避开敌对生物甚至是[[饼干切割机]]"
+          },
+          {
+            "pageid": 18539,
+            "quote": "它会主动避开敌对生物甚至是[[饼干切割机]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "波利罗杰",
+    "咸狗",
+    "跟随领袖",
+    "协助捡物",
+    "逃离怪物",
+    "盐分抖动",
+    "海洋游荡",
+    "宠物AI"
+  ],
+  "gameplay_tags": [
+    "跟随",
+    "辅助拾取",
+    "逃避",
+    "海洋游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f5507a4019660432455edf709cfa317a607112e9349bb96d2567a32996615352",
+    "source_bytes": 5675,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935452313
+  }
+}

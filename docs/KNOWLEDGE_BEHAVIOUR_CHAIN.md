@@ -158,6 +158,20 @@ prompt 注入:brain pass1 附带**本 brain 实际调用的** behaviour 构造�
 - **brain pass2 偏保守**:houndbrain 采样 8 页(含猎犬相关页)返回 no_wiki_mention,而猎犬页"行为"章确有数值事实;疑因 caps 清单只有 tunables 名与裸 ctor 名(如 `ChaseAndAttack`),页面语言无法对上。候选改进:brain pass2 的语义清单改用 behaviour_invocations 的 args_semantic 文本(需先有 1a 词典,现已具备)。
 - **spiderbrain/beefalobrain 路由弱**:spiderbrain 路由 0 页(负结果),beefalobrain 仅 1 页——这两个 brain 的 SetBrain 不走 atlas 可追踪路径,pass2 依赖 search_terms 全文检索兜底,符合设计但印证 §1.2"二跳路由免费"只对被 atlas 记录的 brain 成立。
 
+### 9.2 第二批与 SG 冒烟(2026-08-29)
+
+- **brains 第二批**(`--limit 10`,引用数排序):deerbrain / deergemmedbrain / rabbitkingbrain / beargerbrain / buzzardbrain / carratbrain / fruitflybrain / pollyrogerbrain / toadstoolbrain 共 9 份入库,零失败;现累计 12 份 brain 文档。fruitflybrain well_documented(4),carrat/deergemmed/pollyroger partial(1~2),其余判空。判空偏多的主因仍是页面行为章与 brain 语义清单的对齐缺口,改善方向同 §9.1(brain pass2 语义清单已改用 args_semantic,后续可再叠加 tunables 数值语义)。
+- **SGhound 冒烟**(`--category stategraph --pick-names SGhound`):25 个 states 全部取自源码(含 timeline 生成态),state_notes 10 条精确到帧级语义(attack 第 16 帧伤害判定 / statue 无敌 / startle 0.8~1.1s),api 空数组 + api_note 正确;pass2 no_wiki_mention(8 页)符合"SG 弱事实"预判。**stategraph 类别管线验证通过,可按引用数排序分批推广**(建议排除玩家侧后从高页面价值 SG 开始,如 SGhound/SGspider/SGbeefalo 量级)。
+
+**pass2 全量重估(2026-08-29)**:1a 抽样的正结果促使对 29 份 behaviour 全量补跑 pass2——**well_documented 10 / partial 8 / no_wiki_mention 11,18/29 有真实页面证据**,推翻"词典层无页面价值"的原判;movement 类(follow 6 / leash 6 / leashandavoid 7 条 aspects)最丰富。后续 behaviour 新增/重扫时 pass2 应默认开启,`--pass2-names` 仅作为省预算手段。
+
+**stategraph 重开(2026-08-29)**:重开条件(brains pilot 完成)已满足,按 §7 决策落地代码:
+- `--category stategraph`:pick_stategraphs 目录扫描,排除 SGwilson* / *_client / commonstates,要求源码含 `StateGraph(` 标记;反向边仅作排序信号;
+- schema:`states`(全部状态名,严格取自源码)+ `state_notes`(≤10 个关键状态的玩家语义);validate:states 空 → 必须 api_note;prompt_rev p5-stategraph;
+- **doc_id 命名定案(§10 开放问题 4)**:沿用文件词干(如 `stategraph__SGhound`),不做 SG 前缀剥离——path ↔ doc_id 保持 1:1,避免特例;
+- 粒度定案:per-file + 截断声明(沿用管线 SOURCE_BYTES_CAP 头尾策略),不做 per-State 拆分;
+- SGhound 冒烟结果见 §9.2。
+
 **过程修复**(已入库)
 
 - `CtorParam.name` 别名(param_name/param)、`default` 原生布尔/数字→文本、`ApiEntry` 裸字符串→{name, effect:""};prompt 逐字段写明 JSON 形状。

@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/toadstoolbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "toadstoolbrain",
+  "summary": "该大脑控制蟾蜍菌兽（Toadstool）在存在channel计时器或战斗engagement且等级低于3时进入施法（channel）状态，优先返回出生点再开始施法。非施法状态下它会限制自身离家距离、追击攻击目标，并在延迟后触发逃跑警告与自由游荡。出生点由初始化时记录的spawnpoint位置决定。",
+  "api": [],
+  "api_note": "该大脑仅重写了Brain基类的OnStart与OnInitializationComplete生命周期方法以构建行为树和记录出生点，未定义额外的对外调用接口。",
+  "events_published": [
+    "startchanneling",
+    "fleewarning",
+    "flee"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHANNEL_LEASH_TIME",
+    "FLEE_WARNING_DELAY",
+    "FLEE_DELAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置取GetHomePos返回的spawnpoint",
+        "拴绳最大半径8",
+        "内部返回距离6"
+      ],
+      "context": "ShouldChannel且ShouldTryReturningToHole为真时（Channel分支内ReturnToHole）"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "家位置取GetHomePos返回的spawnpoint",
+        "拴绳最大半径30",
+        "内部返回距离25"
+      ],
+      "context": "ShouldChannel为假时的顶层第二优先级"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [],
+      "context": "顶层第三优先级（使用默认参数）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "游荡中心为GetHomePos返回的spawnpoint",
+        "离家最大距离5"
+      ],
+      "context": "与逃跑序列并行的ParallelNode中"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldChannel(self)",
+      "semantic": "进入Channel优先节点：内部先判断ShouldTryReturningToHole，真则Leash(8,6)返回家，假则推送startchanneling事件"
+    },
+    {
+      "condition": "ShouldTryReturningToHole(self)",
+      "semantic": "在Channel内执行Leash(8,6)返回家位置锚点"
+    },
+    {
+      "condition": "非ShouldChannel(self)",
+      "semantic": "依次执行Leash(30,25)限制离家、ChaseAndAttack追击攻击、并行SequenceNode(等待后推送fleewarning与flee)与Wander(5)"
+    }
+  ],
+  "bt_structure": "根优先节点: 1.WhileNode(ShouldChannel)->优先[WhileNode(ShouldTryReturningToHole)->Leash(8,6); ActionNode(startchanneling)]; 2.Leash(30,25); 3.ChaseAndAttack; 4.ParallelNode[SequenceNode(WaitNode->fleewarning->WaitNode->flee), Wander(5)]",
+  "wiki": {
+    "scanned_pageids": [
+      28621,
+      22707,
+      15022,
+      23924,
+      13701,
+      15225,
+      72981,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及洞穴蠕虫袭击(28621)、猎犬袭击(22707)、天体英雄(15022)、帝王蟹(23924)、远古织影者(13701)、暗影傀儡(15225)、远古戍卫塔(72981)、克劳斯(13897)等实体或机制，无任何页面讨论 brain__toadstoolbrain（毒菌蟾蜍大脑）的拴绳回家、返回洞、追击、游荡等行为语义，故无能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蘑菇老板",
+    "拴绳",
+    "返回洞",
+    "channel",
+    "追击",
+    "游荡",
+    "逃跑",
+    "警告",
+    "施法"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战",
+    "移动控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3dc3b56252aecbc0d5c0576684df1536b08d6af3f7f96fc7aa43a9776234a11b",
+    "source_bytes": 2305,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935538858
+  }
+}

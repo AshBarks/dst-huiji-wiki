@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/buzzardbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "buzzardbrain",
+  "summary": "秃鹫大脑控制实体在地面有食物或尸体时前往进食，平时以出生点为中心自由游荡。普通秃鹫受火焰伤害会恐慌飞回家，受威胁时若带有食物则防御攻击否则逃离。变异秃鹫只吃尸体，无尸体20秒后飞走，受威胁时更自信地建议攻击。",
+  "api": [
+    {
+      "name": "OwnCorpse",
+      "effect": ""
+    },
+    {
+      "name": "LoseCorpseOwnership",
+      "effect": ""
+    },
+    {
+      "name": "ShouldIgnoreCorpse",
+      "effect": ""
+    },
+    {
+      "name": "FindCorpse",
+      "effect": ""
+    },
+    {
+      "name": "IsCorpseValid",
+      "effect": ""
+    },
+    {
+      "name": "GetCorpsePosition",
+      "effect": ""
+    },
+    {
+      "name": "FindThreat",
+      "effect": ""
+    },
+    {
+      "name": "IsThreatened",
+      "effect": ""
+    },
+    {
+      "name": "DealWithThreat",
+      "effect": ""
+    },
+    {
+      "name": "DoUpdate",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    },
+    {
+      "name": "OnStop",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onignite",
+    "chomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FLY_AWAY_AFTER_NO_CORPSE_TIME",
+    "SEE_FOOD_DIST",
+    "SEE_THREAT_DIST",
+    "MUTATED_SEE_THREAT_DIST",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "秃鹫实例",
+        "不自动寻找新目标(nil)",
+        "无超时限制(nil)"
+      ],
+      "context": "威胁处理后尝试攻击已有战斗目标"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "秃鹫实例",
+        "家位置函数(返回当前坐标)",
+        "最大游荡距离5"
+      ],
+      "context": "无食物威胁时以家为中心游荡"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "秃鹫实例",
+        "尸体位置函数",
+        "最小距离函数(攻击范围+尸体半径-1)",
+        "最大距离函数(攻击范围+尸体半径-1.5)",
+        "允许奔跑(true)"
+      ],
+      "context": "变异秃鹫吃尸体时拴在尸体旁"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "秃鹫实例",
+        "尸体目标函数",
+        "尸体有效性检查函数"
+      ],
+      "context": "面向尸体准备啃食"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HasTag(\"lunar_aligned\")",
+      "semantic": "变异秃鹫：不食地面食物，只吃尸体；威胁感知距离3；无尸体20秒后飞走；不避火；受威胁时若附近有尸体则建议攻击目标否则飞走"
+    },
+    {
+      "condition": "not inst:HasTag(\"lunar_aligned\")",
+      "semantic": "普通秃鹫：觅食地面食物；威胁感知距离7.5；受火伤恐慌回家；受威胁时若身边有食物则攻击威胁否则飞走"
+    },
+    {
+      "condition": "self.inst.shouldGoAway",
+      "semantic": "标记离开时执行回家动作飞离"
+    },
+    {
+      "condition": "self:IsThreatened()",
+      "semantic": "附近有威胁时根据是否有食物决定防御或逃离"
+    }
+  ],
+  "bt_structure": "根优先级节点(更新率0.5)：非飞行/喷火下，依次：普通秃鹫避火恐慌->变异无尸体飞走->标记离开回家->站立攻击->受威胁处理->变异秃鹫吃尸体(拴住面向啃食)->吃地面食物->以家为中心游荡",
+  "wiki": {
+    "scanned_pageids": [
+      52138,
+      15724,
+      65737,
+      65456,
+      14684,
+      15539,
+      20113,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录仅描述秃鹫及变异秃鹫的生成、掉落、秒杀攻击、啄食尸体等表面行为，未涉及 brain__buzzardbrain 清单中的感知距离、更新速率、游荡、战斗目标、拴尸面向等具体 AI 能力语义，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "秃鹫大脑",
+    "变异秃鹫",
+    "吃尸体",
+    "找食物",
+    "遇威胁",
+    "飞回家",
+    "游荡",
+    "秃鹫"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "生物AI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "349de2740d61d53606a8e7a941b37d942f4044c2f41d7806d129dc8ee4ba804a",
+    "source_bytes": 13791,
+    "model": "hy3-free",
+    "generated_at_ms": 1787935336047
+  }
+}

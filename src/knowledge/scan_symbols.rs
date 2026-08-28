@@ -13,6 +13,7 @@ use crate::llm::{LlmConfig, LlmStreamEvent};
 use crate::service::Reporter;
 use crate::update::CorpusPageView;
 use crate::update::{build_atlas_from_dir, top_symbols, IndexArtifact};
+use futures_util::StreamExt;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
@@ -152,6 +153,8 @@ pub struct ScanSymbolsParams {
     pub sample_pages: usize,
     pub limit: usize,
     pub force: bool,
+    /// 并行处理的组件数;1 = 串行(默认)
+    pub concurrency: usize,
 }
 
 /// P1 选择:top_symbols(变体引用数降序)过滤出 component 文件型符号,
@@ -180,6 +183,30 @@ fn pick_components(
         })
         .take(limit)
         .collect()
+}
+
+/// 单个组件处理结果统计。
+#[derive(Debug, Default, Clone, Copy)]
+struct ComponentOutcome {
+    written: u32,
+    skipped: u32,
+    failed: u32,
+    wiki_written: u32,
+    wiki_failed: u32,
+}
+
+/// 并行处理时在组件任务间共享的只读上下文。
+struct ComponentShared<'a> {
+    knowledge_root: &'a Path,
+    force: bool,
+    has_corpus: bool,
+    sample: usize,
+    atlas: &'a IndexArtifact,
+    build_id: &'a Option<String>,
+    view: Option<&'a CorpusPageView>,
+    cache: Option<&'a WikiTextCache>,
+    config: &'a LlmConfig,
+    raw_dir: &'a Path,
 }
 
 pub async fn run_scan_symbols(
@@ -225,152 +252,58 @@ pub async fn run_scan_symbols(
         }
         None => (None, None, 0),
     };
-    let mut wiki_written = 0u32;
-    let mut wiki_failed = 0u32;
+    let concurrency = params.concurrency.max(1);
+    if concurrency > 1 {
+        reporter.log(format!("并行处理: concurrency={}", concurrency));
+    }
+    let total = picked.len();
 
-    let (mut written, mut skipped, mut failed) = (0u32, 0u32, 0u32);
-    for (idx, (key, src_path, src_bytes)) in picked.iter().enumerate() {
-        reporter.stage(&format!(
-            "[{}/{}] {}({}B)",
-            idx + 1,
-            picked.len(),
-            key.doc_id(),
-            src_bytes
-        ));
-        let doc_path = doc_path(knowledge_root, key);
-
-        let source = std::fs::read(src_path)?;
-        let sha = sha256_hex(&source);
-        if !params.force {
-            if let Some(existing) = load_doc(&doc_path)? {
-                if is_fresh(&existing, &sha, PROMPT_REV) {
-                    match (&existing.wiki, &params.corpus) {
-                        (Some(_), _) | (None, None) => {
-                            reporter.log("源码与 prompt_rev 未变,跳过".to_string());
-                            skipped += 1;
-                            continue;
-                        }
-                        (None, Some(_)) => {
-                            // 文档已是 v2 但缺 wiki 节点 → 只补 pass2
-                            reporter.log("代码文档新鲜,仅补 pass2 语料归因".to_string());
-                            let mut doc = existing;
-                            match enrich_with_wiki(
-                                &config,
-                                &mut doc,
-                                WikiContext {
-                                    index: &atlas.index,
-                                    view: view.as_ref().expect("corpus loaded"),
-                                    cache: cache.as_ref(),
-                                    sample,
-                                },
-                                &raw_dir,
-                                reporter,
-                            )
-                            .await
-                            {
-                                Ok(()) => {
-                                    write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
-                                    wiki_written += 1;
-                                }
-                                Err(e) => {
-                                    wiki_failed += 1;
-                                    reporter.log(format!(
-                                        "pass2 失败,保留 pass1 文档(可下次补跑): {e}"
-                                    ));
-                                }
-                            }
-                            continue;
-                        }
-                    }
-                }
-                reporter.log("源码或 prompt_rev 已变化,重扫".to_string());
+    let outcomes = futures_util::stream::iter(picked.into_iter().enumerate().map(
+        |(idx, (key, src_path, src_bytes))| {
+            let shared = ComponentShared {
+                knowledge_root,
+                force: params.force,
+                has_corpus: params.corpus.is_some(),
+                sample,
+                atlas: &atlas.index,
+                build_id: &build_id,
+                view: view.as_ref(),
+                cache: cache.as_ref(),
+                config: &config,
+                raw_dir: &raw_dir,
+            };
+            async move {
+                process_one_component(
+                    idx + 1,
+                    total,
+                    &key,
+                    &src_path,
+                    src_bytes,
+                    &shared,
+                    reporter,
+                )
+                .await
             }
-        }
+        },
+    ))
+    .buffer_unordered(concurrency)
+    .collect::<Vec<_>>()
+    .await;
 
-        let (visible, truncated) = if source.len() > SOURCE_BYTES_CAP {
-            let head = &source[..SOURCE_HEAD_BYTES];
-            let tail_start = source.len().saturating_sub(SOURCE_TAIL_BYTES);
-            let mut body = Vec::with_capacity(source.len());
-            body.extend_from_slice(head);
-            body.extend_from_slice(b"\n-- ...(middle omitted)...\n");
-            body.extend_from_slice(&source[tail_start..]);
-            (String::from_utf8_lossy(&body).to_string(), true)
-        } else {
-            (String::from_utf8_lossy(&source).to_string(), false)
-        };
-
-        let mut outcome: Option<Result<SymbolDocLlm>> = None;
-        for attempt in 1..=MAX_ATTEMPTS {
-            if attempt > 1 {
-                reporter.log("重试第 2 次…".to_string());
-            }
-            match generate_one(&config, key, &visible, truncated, &raw_dir, reporter).await {
-                Ok(doc) => {
-                    outcome = Some(Ok(doc));
-                    break;
-                }
-                Err(e) => outcome = Some(Err(e)),
-            }
-        }
-
-        match outcome.expect("at least one attempt") {
-            Ok(llm_doc) => {
-                if let Err(e) = llm_doc.validate() {
-                    failed += 1;
-                    reporter.log(format!("schema 校验失败,已记为失败:{e}"));
-                    continue;
-                }
-                let doc = assemble(
-                    &llm_doc,
-                    key,
-                    &sha,
-                    source.len(),
-                    build_id.clone(),
-                    &config.model,
-                );
-                let body = serde_json::to_string_pretty(&doc)?;
-                write_atomic(&doc_path, &body)?;
-                let mut doc = doc;
-                if let Some(v) = &view {
-                    match enrich_with_wiki(
-                        &config,
-                        &mut doc,
-                        WikiContext {
-                            index: &atlas.index,
-                            view: v,
-                            cache: cache.as_ref(),
-                            sample,
-                        },
-                        &raw_dir,
-                        reporter,
-                    )
-                    .await
-                    {
-                        Ok(()) => {
-                            write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
-                            wiki_written += 1;
-                        }
-                        Err(e) => {
-                            wiki_failed += 1;
-                            reporter.log(format!("pass2 失败,已保留 pass1 文档(可下次补跑): {e}"));
-                        }
-                    }
-                }
-                reporter.log(format!(
-                    "文档已写入 {}(api {} 条 / wiki 节点 {})",
-                    doc_path.display(),
-                    doc.api.len(),
-                    if doc.wiki.is_some() {
-                        "已归因"
-                    } else {
-                        "未生成"
-                    }
-                ));
-                written += 1;
+    let (mut written, mut skipped, mut failed, mut wiki_written, mut wiki_failed) =
+        (0u32, 0u32, 0u32, 0u32, 0u32);
+    for outcome in outcomes {
+        match outcome {
+            Ok(o) => {
+                written += o.written;
+                skipped += o.skipped;
+                failed += o.failed;
+                wiki_written += o.wiki_written;
+                wiki_failed += o.wiki_failed;
             }
             Err(e) => {
                 failed += 1;
-                reporter.log(format!("生成失败(raw 已归档):{e}"));
+                reporter.log(format!("组件处理失败: {e}"));
             }
         }
     }
@@ -378,13 +311,178 @@ pub async fn run_scan_symbols(
     Ok(serde_json::json!({
         "schema_version": SCHEMA_VERSION,
         "prompt_rev": PROMPT_REV,
-        "picked": picked.len(),
+        "picked": total,
         "written": written,
         "skipped_fresh": skipped,
         "failed": failed,
         "wiki_enriched": wiki_written,
         "wiki_failed": wiki_failed,
     }))
+}
+
+async fn process_one_component(
+    idx: usize,
+    total: usize,
+    key: &SymbolRefKey,
+    src_path: &Path,
+    src_bytes: usize,
+    shared: &ComponentShared<'_>,
+    reporter: &dyn Reporter,
+) -> Result<ComponentOutcome> {
+    reporter.stage(&format!(
+        "[{}/{}] {}({}B)",
+        idx,
+        total,
+        key.doc_id(),
+        src_bytes
+    ));
+    let doc_path = doc_path(shared.knowledge_root, key);
+    let source = std::fs::read(src_path)?;
+    let sha = sha256_hex(&source);
+    let mut outcome = ComponentOutcome::default();
+
+    if !shared.force {
+        if let Some(existing) = load_doc(&doc_path)? {
+            if is_fresh(&existing, &sha, PROMPT_REV) {
+                match (&existing.wiki, shared.has_corpus) {
+                    (Some(_), _) | (None, false) => {
+                        reporter.log("源码与 prompt_rev 未变,跳过".to_string());
+                        outcome.skipped += 1;
+                        return Ok(outcome);
+                    }
+                    (None, true) => {
+                        // 文档已是 v2 但缺 wiki 节点 → 只补 pass2
+                        reporter.log("代码文档新鲜,仅补 pass2 语料归因".to_string());
+                        let mut doc = existing;
+                        match enrich_with_wiki(
+                            shared.config,
+                            &mut doc,
+                            WikiContext {
+                                index: shared.atlas,
+                                view: shared.view.expect("corpus loaded"),
+                                cache: shared.cache,
+                                sample: shared.sample,
+                            },
+                            shared.raw_dir,
+                            reporter,
+                        )
+                        .await
+                        {
+                            Ok(()) => {
+                                write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
+                                outcome.wiki_written += 1;
+                            }
+                            Err(e) => {
+                                outcome.wiki_failed += 1;
+                                reporter
+                                    .log(format!("pass2 失败,保留 pass1 文档(可下次补跑): {e}"));
+                            }
+                        }
+                        return Ok(outcome);
+                    }
+                }
+            }
+            reporter.log("源码或 prompt_rev 已变化,重扫".to_string());
+        }
+    }
+
+    let (visible, truncated) = if source.len() > SOURCE_BYTES_CAP {
+        let head = &source[..SOURCE_HEAD_BYTES];
+        let tail_start = source.len().saturating_sub(SOURCE_TAIL_BYTES);
+        let mut body = Vec::with_capacity(source.len());
+        body.extend_from_slice(head);
+        body.extend_from_slice(b"\n-- ...(middle omitted)...\n");
+        body.extend_from_slice(&source[tail_start..]);
+        (String::from_utf8_lossy(&body).to_string(), true)
+    } else {
+        (String::from_utf8_lossy(&source).to_string(), false)
+    };
+
+    let mut llm_outcome: Option<Result<SymbolDocLlm>> = None;
+    for attempt in 1..=MAX_ATTEMPTS {
+        if attempt > 1 {
+            reporter.log("重试第 2 次…".to_string());
+        }
+        match generate_one(
+            shared.config,
+            key,
+            &visible,
+            truncated,
+            shared.raw_dir,
+            reporter,
+        )
+        .await
+        {
+            Ok(doc) => {
+                llm_outcome = Some(Ok(doc));
+                break;
+            }
+            Err(e) => llm_outcome = Some(Err(e)),
+        }
+    }
+
+    match llm_outcome.expect("at least one attempt") {
+        Ok(llm_doc) => {
+            if let Err(e) = llm_doc.validate() {
+                outcome.failed += 1;
+                reporter.log(format!("schema 校验失败,已记为失败:{e}"));
+                return Ok(outcome);
+            }
+            let doc = assemble(
+                &llm_doc,
+                key,
+                &sha,
+                source.len(),
+                shared.build_id.clone(),
+                &shared.config.model,
+            );
+            let body = serde_json::to_string_pretty(&doc)?;
+            write_atomic(&doc_path, &body)?;
+            let mut doc = doc;
+            if let Some(v) = shared.view {
+                match enrich_with_wiki(
+                    shared.config,
+                    &mut doc,
+                    WikiContext {
+                        index: shared.atlas,
+                        view: v,
+                        cache: shared.cache,
+                        sample: shared.sample,
+                    },
+                    shared.raw_dir,
+                    reporter,
+                )
+                .await
+                {
+                    Ok(()) => {
+                        write_atomic(&doc_path, &serde_json::to_string_pretty(&doc)?)?;
+                        outcome.wiki_written += 1;
+                    }
+                    Err(e) => {
+                        outcome.wiki_failed += 1;
+                        reporter.log(format!("pass2 失败,已保留 pass1 文档(可下次补跑): {e}"));
+                    }
+                }
+            }
+            reporter.log(format!(
+                "文档已写入 {}(api {} 条 / wiki 节点 {})",
+                doc_path.display(),
+                doc.api.len(),
+                if doc.wiki.is_some() {
+                    "已归因"
+                } else {
+                    "未生成"
+                }
+            ));
+            outcome.written += 1;
+        }
+        Err(e) => {
+            outcome.failed += 1;
+            reporter.log(format!("生成失败(raw 已归档):{e}"));
+        }
+    }
+
+    Ok(outcome)
 }
 
 fn build_prompt(display: &str, source: &str, truncated: bool) -> String {

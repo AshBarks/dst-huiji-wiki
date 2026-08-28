@@ -193,6 +193,9 @@ pub enum Commands {
         /// 忽略 sha/prompt_rev 一致性,强制重扫
         #[arg(long)]
         force: bool,
+        /// 并行处理的组件数(默认 1 = 串行)
+        #[arg(long, default_value_t = 1)]
+        concurrency: usize,
     },
     /// 启动 WebUI 服务器
     Serve {
@@ -534,6 +537,7 @@ mod tests {
                 sample_pages,
                 limit,
                 force,
+                concurrency,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
                 assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
@@ -544,6 +548,7 @@ mod tests {
                 assert_eq!(sample_pages, 12);
                 assert_eq!(limit, 3);
                 assert!(force);
+                assert_eq!(concurrency, 1);
             }
             _ => panic!("Expected KnowledgeScanSymbols command"),
         }

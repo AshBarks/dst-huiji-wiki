@@ -197,7 +197,14 @@ pub enum JobKind {
         limit: usize,
         #[serde(default)]
         force: bool,
+        /// 并行处理的组件数;1 = 串行
+        #[serde(default = "default_concurrency")]
+        concurrency: usize,
     },
+}
+
+fn default_concurrency() -> usize {
+    1
 }
 
 fn default_knowledge_dir() -> String {
@@ -391,6 +398,7 @@ async fn execute_job_inner(
             sample_pages,
             limit,
             force,
+            concurrency,
         } => {
             crate::knowledge::run_scan_symbols(
                 &crate::knowledge::ScanSymbolsParams {
@@ -400,6 +408,7 @@ async fn execute_job_inner(
                     sample_pages: *sample_pages,
                     limit: *limit,
                     force: *force,
+                    concurrency: *concurrency,
                 },
                 reporter,
             )

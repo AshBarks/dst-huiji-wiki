@@ -232,6 +232,7 @@ pub async fn run(args: Commands) -> Result<()> {
             sample_pages,
             limit,
             force,
+            concurrency,
         } => {
             execute(
                 JobKind::KnowledgeScanSymbols {
@@ -241,6 +242,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     sample_pages,
                     limit,
                     force,
+                    concurrency,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

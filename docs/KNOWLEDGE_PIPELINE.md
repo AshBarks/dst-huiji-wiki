@@ -82,6 +82,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - 候选排序:复用 `top_symbols`(变体引用数降序),过滤 `kind=File ∧ path 以 components/ 开头`,取 `--limit`。
 - 跳过条件:已有文档且 `source_sha256` 相同且 `prompt_rev` 相同 → skip(日志可见)。`--force` 可重扫。
 - 文档新鲜但缺 `wiki` 节点且提供了 `--corpus` → 仅补跑 pass2,不重读源码。
+- 并发:支持 `--concurrency N`(默认 1=串行);>1 时多个组件并行调用 LLM,注意 API 限流;组件间文件写入互不冲突。
 
 ## 5. 提示词契约(p1, component)
 

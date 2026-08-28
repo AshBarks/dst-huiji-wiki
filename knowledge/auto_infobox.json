@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "source": "Module:AutoInfobox",
+  "generated_at_ms": 1787894571618,
+  "components": {
+    "health": {
+      "fields": [
+        "生命值",
+        "最大生命值"
+      ],
+      "code_fields": [
+        "health",
+        "health.max",
+        "health.current"
+      ],
+      "overridable_fields": [
+        "生命值"
+      ],
+      "note": "生命值由 AutoInfobox 自动渲染，但实体页可能手写覆盖具体数值。"
+    },
+    "combat": {
+      "fields": [
+        "伤害",
+        "攻击间隔",
+        "攻击范围"
+      ],
+      "code_fields": [
+        "combat.damage",
+        "combat.attackperiod",
+        "combat.attackrange"
+      ],
+      "overridable_fields": [
+        "伤害"
+      ],
+      "note": "攻击数值大多自动，部分 Boss 页会手写公式化伤害。"
+    },
+    "locomotor": {
+      "fields": [
+        "行走速度",
+        "奔跑速度",
+        "移动速度"
+      ],
+      "code_fields": [
+        "locomotor.walkspeed",
+        "locomotor.runspeed"
+      ],
+      "overridable_fields": [],
+      "note": "速度相关由 AutoInfobox 自动渲染。"
+    },
+    "perishable": {
+      "fields": [
+        "腐烂时间"
+      ],
+      "code_fields": [
+        "perishable.perishtime"
+      ],
+      "overridable_fields": [
+        "腐烂时间"
+      ],
+      "note": "腐烂时间通常自动，但特殊物品可能手写。"
+    },
+    "edible": {
+      "fields": [
+        "饥饿恢复",
+        "生命恢复",
+        "理智恢复"
+      ],
+      "code_fields": [
+        "edible.hunger",
+        "edible.health",
+        "edible.sanity"
+      ],
+      "overridable_fields": [],
+      "note": "食物三围恢复由 AutoInfobox 自动渲染。"
+    },
+    "equippable": {
+      "fields": [
+        "装备栏位"
+      ],
+      "code_fields": [
+        "equippable.equipslot"
+      ],
+      "overridable_fields": [],
+      "note": "装备槽位由 AutoInfobox 自动渲染。"
+    },
+    "fuel": {
+      "fields": [
+        "燃料值"
+      ],
+      "code_fields": [
+        "fuel.fuelvalue"
+      ],
+      "overridable_fields": [],
+      "note": "燃料值由 AutoInfobox 自动渲染。"
+    },
+    "finiteuses": {
+      "fields": [
+        "使用次数",
+        "耐久"
+      ],
+      "code_fields": [
+        "finiteuses.maxuses",
+        "finiteuses.uses"
+      ],
+      "overridable_fields": [
+        "使用次数",
+        "耐久"
+      ],
+      "note": "耐久/使用次数可能由自动层或手写覆盖，需结合页面确认。"
+    },
+    "stackable": {
+      "fields": [
+        "堆叠上限"
+      ],
+      "code_fields": [
+        "stackable.stacksize"
+      ],
+      "overridable_fields": [],
+      "note": "堆叠上限由 AutoInfobox 自动渲染。"
+    },
+    "workable": {
+      "fields": [
+        "工作量",
+        "工作类型"
+      ],
+      "code_fields": [
+        "workable.workleft",
+        "workable.workaction"
+      ],
+      "overridable_fields": [],
+      "note": "初始版本仅少量重点组件，待后续从 AutoInfobox/Data doc 校准扩充。"
+    }
+  }
+}

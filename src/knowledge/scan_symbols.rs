@@ -4,6 +4,7 @@
 //! 纪律:流式进度(Reporter)、raw 归档、失败重试 1 次、sha 增量跳过、原子落盘。
 
 use crate::error::{Error, Result};
+use crate::knowledge::auto_infobox::AutoInfoboxIndex;
 use crate::knowledge::store::{doc_path, is_fresh, load_doc, sha256_hex, write_atomic};
 use crate::knowledge::types::{
     assemble, SymbolDoc, SymbolDocLlm, SymbolRefKey, WikiAspect, WikiEvidence, WikiLinkLlm,
@@ -207,6 +208,7 @@ struct ComponentShared<'a> {
     cache: Option<&'a WikiTextCache>,
     config: &'a LlmConfig,
     raw_dir: &'a Path,
+    auto_infobox: &'a AutoInfoboxIndex,
 }
 
 pub async fn run_scan_symbols(
@@ -252,6 +254,13 @@ pub async fn run_scan_symbols(
         }
         None => (None, None, 0),
     };
+    let auto_infobox = AutoInfoboxIndex::load(knowledge_root)?;
+    if !auto_infobox.components.is_empty() {
+        reporter.log(format!(
+            "AutoInfobox 冷数据已加载: {} 个组件",
+            auto_infobox.components.len()
+        ));
+    }
     let concurrency = params.concurrency.max(1);
     if concurrency > 1 {
         reporter.log(format!("并行处理: concurrency={}", concurrency));
@@ -271,6 +280,7 @@ pub async fn run_scan_symbols(
                 cache: cache.as_ref(),
                 config: &config,
                 raw_dir: &raw_dir,
+                auto_infobox: &auto_infobox,
             };
             async move {
                 process_one_component(
@@ -320,6 +330,18 @@ pub async fn run_scan_symbols(
     }))
 }
 
+/// 根据 AutoInfobox 冷数据注入/刷新 `auto_maintained` 字段。
+fn inject_auto_maintained(doc: &mut SymbolDoc, auto: &AutoInfoboxIndex) {
+    let name = doc
+        .reference
+        .path
+        .rsplit('/')
+        .next()
+        .unwrap_or("")
+        .trim_end_matches(".lua");
+    doc.auto_maintained = auto.get(name).cloned();
+}
+
 async fn process_one_component(
     idx: usize,
     total: usize,
@@ -354,6 +376,7 @@ async fn process_one_component(
                         // 文档已是 v2 但缺 wiki 节点 → 只补 pass2
                         reporter.log("代码文档新鲜,仅补 pass2 语料归因".to_string());
                         let mut doc = existing;
+                        inject_auto_maintained(&mut doc, shared.auto_infobox);
                         match enrich_with_wiki(
                             shared.config,
                             &mut doc,
@@ -428,7 +451,7 @@ async fn process_one_component(
                 reporter.log(format!("schema 校验失败,已记为失败:{e}"));
                 return Ok(outcome);
             }
-            let doc = assemble(
+            let mut doc = assemble(
                 &llm_doc,
                 key,
                 &sha,
@@ -436,9 +459,9 @@ async fn process_one_component(
                 shared.build_id.clone(),
                 &shared.config.model,
             );
+            inject_auto_maintained(&mut doc, shared.auto_infobox);
             let body = serde_json::to_string_pretty(&doc)?;
             write_atomic(&doc_path, &body)?;
-            let mut doc = doc;
             if let Some(v) = shared.view {
                 match enrich_with_wiki(
                     shared.config,

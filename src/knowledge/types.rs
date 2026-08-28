@@ -80,6 +80,29 @@ pub struct RelatedRef {
     pub relation: Option<String>,
 }
 
+fn default_auto_source() -> String {
+    "Module:AutoInfobox".to_string()
+}
+
+/// AutoInfobox 自动维护信息（post-action 注入，非 LLM 生成）。
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AutoMaintainedInfo {
+    /// 数据来源，通常为 `Module:AutoInfobox`
+    #[serde(default = "default_auto_source")]
+    pub source: String,
+    /// wiki 页面字段名/展示名，如“生命值”
+    #[serde(default)]
+    pub fields: Vec<String>,
+    /// 代码侧字段/组件数据路径，如 `health.max`
+    #[serde(default)]
+    pub code_fields: Vec<String>,
+    /// 即使自动渲染也仍可能在实体页手写覆盖的字段
+    #[serde(default)]
+    pub overridable_fields: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Provenance {
     pub source_sha256: String,
@@ -114,6 +137,9 @@ pub struct SymbolDoc {
     /// pass2 语料归因结果;pass1 生成时为 None。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wiki: Option<WikiSection>,
+    /// AutoInfobox 自动维护信息;post-action 注入,非 LLM 生成。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_maintained: Option<AutoMaintainedInfo>,
     #[serde(default)]
     pub search_terms: Vec<String>,
     #[serde(default)]
@@ -215,6 +241,7 @@ pub fn assemble(
         netvars: llm.netvars.clone(),
         tunables: llm.tunables.clone(),
         wiki: None,
+        auto_maintained: None,
         search_terms: llm.search_terms.clone(),
         gameplay_tags: llm.gameplay_tags.clone(),
         related_symbols: llm.related_symbols.clone(),

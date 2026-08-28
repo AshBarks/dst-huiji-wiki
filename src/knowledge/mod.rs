@@ -4,6 +4,7 @@
 //! - [`store`]:knowledge/ 目录读写、sha 增量判据
 //! - [`scan_symbols`]:M1 — LLM 阅读源码产出 component 知识文档
 
+pub mod auto_infobox;
 pub mod scan_symbols;
 pub mod store;
 pub mod types;

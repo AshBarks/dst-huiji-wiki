@@ -54,6 +54,13 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
     "no_evidence_reason": null,      // 空结果时必填,声明判断依据
     "coverage_status": "partial"     // no_wiki_mention | partial | well_documented
   },
+  "auto_maintained": {               // post-action 注入,非 LLM 生成
+    "source": "Module:AutoInfobox",
+    "fields": ["生命值", "最大生命值"],
+    "code_fields": ["health", "health.max"],
+    "overridable_fields": ["生命值"],
+    "note": "生命值由 AutoInfobox 自动渲染，但实体页可能手写覆盖。"
+  },
   "related_symbols": [{"kind": "file", "path": "prefabs/...", "relation": "consumer"}],
   "truncation_note": null,            // 源码超长被截断时说明
   "provenance": {"source_sha256": "…", "source_bytes": 22115,
@@ -65,6 +72,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 - LLM 只产出 knowledge 部分;`reference/schema_version/prompt_rev/provenance` 由管线回填。
 - 解析走容错链(围栏/散文剥离/尾逗号/残缺元素),复用 symbol_page 既有工具。
 - 硬校验:`summary` 非空;`api` 为空时必须提供 `api_note` 说明(允许纯数据组件);失败 → raw 已归档,报错含定位。
+- `auto_maintained` 由 post-action 从 `knowledge/auto_infobox.json` 冷数据注入,不参与 LLM 生成与硬校验;字段同时保留 wiki 展示名与代码侧字段名。
 - envelope 字段(reference/category/summary/wiki/related_symbols/provenance 等)类别无关;类别专属载荷(behaviour 的 ctor_params、brain 的 behaviour_invocations/context_branches 等)为可选字段,component 文档不受影响——细化见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md) §4。
 
 ### pass2(link-wiki)契约
@@ -115,6 +123,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | M1 版本过滤 | 只保留 dst/mixed 页面,排除 ds/unknown/redirect/disambig | 全文页 6891→1849;facts 页 1881→1051 |
 | M1 章节过滤 | 提交 LLM 前按章节优先级过滤,低优先级完全排除;高优先级关键词扩展 + 高优先级区域增加上下文行 | 8 组件对照见 8.2 v4 |
 | M1 源码上限 | `SOURCE_BYTES_CAP` 提升至 128KB,超限采用头尾截断 | 当前仅 `playercontroller.lua` 超限 |
+| M1 AutoInfobox | 新增 `knowledge/auto_infobox.json` 冷数据 + post-action 注入 `auto_maintained` | 初始覆盖 health/combat/locomotor/perishable/edible/equippable/fuel/finiteuses/stackable/workable |
 
 ### 8.2 Pilot 三轮演进(关键教训)
 

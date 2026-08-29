@@ -525,10 +525,15 @@ async fn run_audit(
         .collect();
 
     // 每符号收集 stub 页(有 aspects 的),按 facts 富裕度排序后截断
+    // 已有 llm_verdict 的对视为已审计(mentions=false 的判定同样有效),
+    // 多次运行接力时不会重复送审。
     let mut stub_pages: BTreeMap<String, Vec<i64>> = BTreeMap::new();
     for map in maps.iter() {
         for (path, entry) in &map.symbols {
-            if entry.detail_level == "stub" && !entry.aspects_ignored.is_empty() {
+            if entry.detail_level == "stub"
+                && !entry.aspects_ignored.is_empty()
+                && entry.llm_verdict.is_none()
+            {
                 stub_pages.entry(path.clone()).or_default().push(map.pageid);
             }
         }

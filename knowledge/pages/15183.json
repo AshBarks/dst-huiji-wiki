@@ -27,9 +27,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/container.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "侧边物品栏显示",
         "存放特定物品能力",
@@ -41,7 +43,10 @@
         "翻找拿回物品"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "内有 1~3 片花瓣"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -49,7 +54,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -57,7 +63,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -68,7 +75,8 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/placer.lua": {
       "route": "direct",
@@ -81,7 +89,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -89,7 +98,8 @@
         "理智光环持续影响与衰减描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -98,8 +108,11 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "推测为祭祀坛(sisturn)，受影响但未提及"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

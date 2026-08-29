@@ -36,16 +36,21 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/eater.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可怕食物喂食雇佣描述",
         "可食用食物分类标注",
         "捡食地上食物行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/follower.lua": {
       "aspects_ignored": [
@@ -56,9 +61,11 @@
         "跟随距离保持描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "冰冻/冻结状态判定描述",
         "冰冻抗性数值与机制描述",
@@ -68,7 +75,11 @@
         "额外冰冻抗性累积描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "冰魔杖需要 3 次攻击才能冻结超级",
+        "semantic_consistent": true
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -81,7 +92,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -89,7 +101,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -104,7 +117,8 @@
         "装备背包合并至玩家物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -123,9 +137,13 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "实体不在受影响变体列表"
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -134,7 +152,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -154,12 +175,13 @@
         "睡眠点使用条件限制描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/trader.lua": {
       "route": "direct",
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

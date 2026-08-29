@@ -20,9 +20,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -31,16 +33,24 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "王将随机赠送下列5个配方之一的稀有蓝",
+        "semantic_consistent": true
+      }
     },
     "components/talker.lua": {
       "aspects_ignored": [
         "说话行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "交易诅咒饰品，疑似mermking/prime_mate，无说话"
+      }
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -48,7 +58,11 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "通行权时间重置为 4 分钟",
+        "semantic_consistent": true
+      }
     },
     "components/trader.lua": {
       "route": "direct",
@@ -62,8 +76,9 @@
         "间隔生命值阈值触发行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -17,6 +17,7 @@
   },
   "symbols": {
     "components/combat.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -31,7 +32,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "攻击半径2.5单位，攻击间隔1.2秒",
+        "semantic_consistent": true
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -44,7 +49,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -52,7 +58,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -71,7 +78,8 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -79,9 +87,11 @@
         "理智光环持续影响与衰减描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -89,12 +99,16 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "大惊吓约30秒后重新生成；攻击间隔1.2秒",
+        "semantic_consistent": true
+      }
     },
     "components/trader.lua": {
       "route": "direct",
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

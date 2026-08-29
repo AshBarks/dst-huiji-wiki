@@ -26,7 +26,8 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -34,7 +35,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -42,9 +44,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -53,7 +57,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/placer.lua": {
       "route": "direct",
@@ -66,9 +73,11 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -76,7 +85,11 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "石果苗会在 25 分钟后成长为[[石果灌木",
+        "semantic_consistent": true
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -85,8 +98,11 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面提及石果生长与掉落，未提及敲击次数或工作动作"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

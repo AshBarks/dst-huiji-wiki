@@ -30,13 +30,15 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/entitytracker.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/health.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "制作消耗生命值描述",
         "医疗与食物回复生命值描述",
@@ -47,7 +49,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "每秒回复 80 点生命值",
+        "semantic_consistent": true
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -55,7 +61,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -74,7 +81,10 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "实体可能不在受影响变体列表"
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
@@ -83,8 +93,9 @@
         "位面伤害基础值公式描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

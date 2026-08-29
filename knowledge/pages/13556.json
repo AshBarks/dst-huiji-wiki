@@ -48,7 +48,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/abigailbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -91,6 +92,7 @@
       "detail_level": "detailed"
     },
     "components/combat.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -105,7 +107,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "每秒攻击周围4距离单位目标，伤害倍率描述",
+        "semantic_consistent": true
+      }
     },
     "components/damagetypebonus.lua": {
       "aspects_ignored": [
@@ -115,6 +121,7 @@
       "detail_level": "stub"
     },
     "components/follower.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止跟随行为描述",
         "忠诚度百分比标注",
@@ -123,7 +130,11 @@
         "跟随距离保持描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "保持在[[温蒂]]附近 1 ~ 5 距离单位，激怒状态下则是 3 ~ 10 单位",
+        "semantic_consistent": true
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -192,7 +203,10 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/trader.lua": {
       "route": "direct",

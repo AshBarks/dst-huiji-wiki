@@ -20,7 +20,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -28,7 +29,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/leader.lua": {
       "aspects_ignored": [
@@ -36,9 +38,11 @@
         "领袖锁定新目标联动随从仇恨"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -47,7 +51,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "[22307:infobox:1] ned.png|100px]] |掉落={{Pic|32|大理石}}×3 |生成={{Pic|32|格罗",
+        "semantic_consistent": true
+      }
     },
     "components/pickable.lua": {
       "aspects_ignored": [
@@ -59,7 +67,10 @@
         "采集次数消耗限制"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "掉落大理石生成格罗姆，未提pickable语义"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -68,8 +79,11 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "格罗姆雕像(statueglommer)，受影响未提及"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

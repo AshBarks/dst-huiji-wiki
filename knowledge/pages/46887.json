@@ -42,7 +42,10 @@
         "说话行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "仅季节表格，未对应受影响实体"
+      }
     },
     "components/timer.lua": {
       "aspects_ignored": [
@@ -52,7 +55,8 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "stub"

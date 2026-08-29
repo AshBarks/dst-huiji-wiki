@@ -17,7 +17,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/pickable.lua": {
       "aspects_ignored": [
@@ -29,7 +30,8 @@
         "采集次数消耗限制"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/trader.lua": {
       "route": "direct",

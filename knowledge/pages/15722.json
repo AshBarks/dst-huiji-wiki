@@ -47,16 +47,22 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/eater.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可怕食物喂食雇佣描述",
         "可食用食物分类标注",
         "捡食地上食物行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "眼球草会吞噬",
+        "semantic_consistent": true
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

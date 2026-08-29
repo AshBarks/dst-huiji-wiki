@@ -78,7 +78,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -86,9 +87,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品丢弃与放置描述",
         "物品持有状态描述",
@@ -98,7 +101,11 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "一个[[容器]]，提供 1 个物品栏。当空间扩",
+        "semantic_consistent": true
+      }
     },
     "components/pickable.lua": {
       "aspects_ignored": [
@@ -110,7 +117,10 @@
         "采集次数消耗限制"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "容器描述，未提pickable语义"
+      }
     },
     "components/updatelooper.lua": {
       "aspects_ignored": [
@@ -120,7 +130,8 @@
         "间隔生命值阈值触发行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "detailed"

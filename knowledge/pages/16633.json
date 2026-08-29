@@ -40,7 +40,8 @@
         "食用特殊效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -51,9 +52,11 @@
         "防水绝缘装备效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/finiteuses.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用次数消耗描述",
         "修补与回复耐久描述",
@@ -63,7 +66,8 @@
         "耐久百分比读取描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -115,6 +119,7 @@
       "llm_verdict": {}
     },
     "components/weapon.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "伤害数值标注",
         "攻击范围数值标注",
@@ -122,8 +127,12 @@
         "特殊伤害倍率说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "每次造成伤害会损失 25 次耐久",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

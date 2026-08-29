@@ -17,9 +17,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动靠近目标描述",
         "冲刺速度描述",
@@ -32,7 +34,11 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "移动点位，半径在 4 ~ 12 距离单位之间变化，每隔 4",
+        "semantic_consistent": true
+      }
     },
     "components/updatelooper.lua": {
       "aspects_ignored": [
@@ -42,8 +48,9 @@
         "间隔生命值阈值触发行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

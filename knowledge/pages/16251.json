@@ -16,6 +16,7 @@
   },
   "symbols": {
     "components/equippable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "装备潮湿速率描述",
         "装备理智增减描述",
@@ -24,7 +25,11 @@
         "防水绝缘装备效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "所有玩家缓慢回复 5 点理智",
+        "semantic_consistent": true
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -40,7 +45,8 @@
         "燃料耗尽状态描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -48,7 +54,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -56,7 +63,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "mention_source": "llm_verdict",
@@ -84,7 +92,8 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "summary"

@@ -67,7 +67,8 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/entitytracker.lua": {
       "route": "direct",
@@ -93,7 +94,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -101,7 +103,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -116,9 +119,11 @@
         "装备背包合并至玩家物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -127,13 +132,18 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "掉落=海带叶×6；海带叶×2+海带叶(75%)，海带补丁(75%)，藤壶(50%)",
+        "semantic_consistent": true
+      }
     },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -141,7 +151,11 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "窝点需要6天再生下一只",
+        "semantic_consistent": true
+      }
     },
     "stategraphs/SGboat.lua": {
       "aspects_ignored": [
@@ -151,5 +165,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

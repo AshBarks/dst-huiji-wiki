@@ -25,9 +25,11 @@
         "防水绝缘装备效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/finiteuses.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用次数消耗描述",
         "修补与回复耐久描述",
@@ -37,7 +39,8 @@
         "耐久百分比读取描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -49,7 +52,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -57,7 +61,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -69,18 +74,24 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/planardamage.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "位面伤害倍率描述",
         "位面伤害加成数值标注",
         "位面伤害基础值公式描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/weapon.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "伤害数值标注",
         "攻击范围数值标注",
@@ -88,8 +99,12 @@
         "特殊伤害倍率说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "位面伤害，增加了50次耐久，冲刺冷却",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

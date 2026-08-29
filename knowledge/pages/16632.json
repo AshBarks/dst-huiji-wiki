@@ -17,6 +17,7 @@
   },
   "symbols": {
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -26,9 +27,14 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "置时带有可以燃烧 3 分钟的燃料，可以通过...满以后可持续燃烧 9 分钟",
+        "semantic_consistent": true
+      }
     },
     "components/fueled.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "摧毁时剩余燃料掉落描述",
         "最大燃料储量标注",
@@ -38,7 +44,10 @@
         "燃料耗尽状态描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -46,7 +55,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "mention_source": "pass2_evidence",
@@ -76,7 +86,8 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/placer.lua": {
       "route": "direct",
@@ -88,7 +99,8 @@
         "理智光环持续影响与衰减描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -97,8 +109,9 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

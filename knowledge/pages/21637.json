@@ -15,6 +15,7 @@
   },
   "symbols": {
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -24,7 +25,12 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "若被烧毁，只需 1 次即可砍倒，掉落 1 个[[木炭]]，不留下树",
+        "semantic_consistent": true,
+        "note": "实体不在受影响变体列表但提及烧毁结果"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -32,9 +38,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -43,9 +51,14 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "infobox掉落:木头×2,树枝×1;烧毁掉落木炭",
+        "semantic_consistent": true
+      }
     },
     "components/pickable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "再生与重新生长计时",
         "施肥恢复与促生长",
@@ -55,7 +68,10 @@
         "采集次数消耗限制"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -78,5 +94,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

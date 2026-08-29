@@ -32,7 +32,8 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/combat.lua": {
       "aspects_ignored": [
@@ -49,7 +50,8 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -74,7 +76,8 @@
         "额外冰冻抗性累积描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -82,7 +85,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -95,7 +99,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -103,7 +108,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -115,13 +121,15 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/locomotor.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动靠近目标描述",
         "冲刺速度描述",
@@ -134,9 +142,14 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "群迁徙机制|亮喙鸟|30 ~ 45 秒",
+        "semantic_consistent": true
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -145,7 +158,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "|掉落 = {{Pic|32|腐烂物}}×1 |生成自={{pic|32|乌",
+        "semantic_consistent": true
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
@@ -154,9 +171,11 @@
         "位面伤害基础值公式描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -164,8 +183,12 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "群迁徙机制|亮喙鸟|30 ~ 45 秒",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

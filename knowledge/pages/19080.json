@@ -22,11 +22,16 @@
       "detail_level": "stub"
     },
     "components/cookable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "烹饪产物描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "活鳗鱼/鳗鱼/熟鳗鱼",
+        "semantic_consistent": true
+      }
     },
     "components/edible.lua": {
       "aspects_ignored": [
@@ -36,7 +41,8 @@
         "食用特殊效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -44,7 +50,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -52,7 +59,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -64,7 +72,8 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -75,7 +84,8 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/perishable.lua": {
       "aspects_ignored": [
@@ -88,9 +98,11 @@
         "物品腐烂转化行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/tradable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易价值与回报标注",
         "交易对象与限制描述",
@@ -98,8 +110,9 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

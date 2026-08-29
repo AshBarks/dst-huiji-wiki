@@ -30,13 +30,15 @@
         "防水绝缘装备效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/fueled.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "摧毁时剩余燃料掉落描述",
         "最大燃料储量标注",
@@ -46,7 +48,11 @@
         "燃料耗尽状态描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "秒15燃料，每天消耗 1 单位的电力",
+        "semantic_consistent": true
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -54,7 +60,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -62,7 +69,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -85,7 +93,8 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/updatelooper.lua": {
       "aspects_ignored": [
@@ -95,8 +104,9 @@
         "间隔生命值阈值触发行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

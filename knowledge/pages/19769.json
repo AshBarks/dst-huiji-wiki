@@ -19,6 +19,7 @@
   },
   "symbols": {
     "components/combat.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -33,7 +34,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "追逐击杀者，0.75距离范围爆炸，1.17秒后爆炸",
+        "semantic_consistent": true
+      }
     },
     "components/entitytracker.lua": {
       "route": "direct",
@@ -50,7 +55,10 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "fused_shadeling在列表，证据无生命值提及"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -58,13 +66,15 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/locomotor.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动靠近目标描述",
         "冲刺速度描述",
@@ -77,9 +87,14 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "起身追逐击杀者，4 秒后自爆",
+        "semantic_consistent": true
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -88,7 +103,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "infobox掉落:纯粹恐惧×2,×1(75%),×1(50%)",
+        "semantic_consistent": true
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
@@ -97,7 +116,8 @@
         "位面伤害基础值公式描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -105,9 +125,11 @@
         "理智光环持续影响与衰减描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/timer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "世界再生中计时暂停描述",
         "巢穴生物再生与下蛋倒计时启动描述",
@@ -115,8 +137,12 @@
         "服务器重启倒计时剩余显示描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "速爆炸弹生成1.17秒后爆炸；4秒后自爆",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

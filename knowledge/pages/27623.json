@@ -10,6 +10,7 @@
   },
   "symbols": {
     "components/edible.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "食物理智值数值标注",
         "食物生命值数值标注",
@@ -17,8 +18,12 @@
         "食用特殊效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "大幅度降低，且每 2 秒损失 2 {{生命值}}。",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

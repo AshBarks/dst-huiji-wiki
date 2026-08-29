@@ -15,6 +15,7 @@
   },
   "symbols": {
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -24,7 +25,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "[[火|点燃]]，点燃 2 秒后开始爆炸",
+        "semantic_consistent": true
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -36,7 +41,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -44,9 +50,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品丢弃与放置描述",
         "物品持有状态描述",
@@ -56,9 +64,14 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "爆炸将持续 2.4-97.8 秒（取决于堆叠数量",
+        "semantic_consistent": true
+      }
     },
     "components/stackable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "不可堆叠说明",
         "优先堆叠至上限行为",
@@ -67,8 +80,13 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "取决于堆叠数量",
+        "semantic_consistent": true,
+        "note": "鞭炮(firecrackers)爆炸时长取决于堆叠数量，与组件管理堆叠数量一致"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

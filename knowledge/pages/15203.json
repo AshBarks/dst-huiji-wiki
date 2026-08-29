@@ -29,7 +29,8 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/deployable.lua": {
       "route": "direct",
@@ -45,7 +46,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -53,9 +55,13 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "小木牌(minisign)属受影响变体，候选证据未提及检视描述"
+      }
     },
     "components/inventoryitem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品丢弃与放置描述",
         "物品持有状态描述",
@@ -65,9 +71,14 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "g|128px|link=]] |掉落={{Pic|32|小木牌}}×1 }}",
+        "semantic_consistent": true
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -76,7 +87,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "掉落={{Pic|32|小木牌}}×1",
+        "semantic_consistent": true
+      }
     },
     "components/placer.lua": {
       "route": "direct",
@@ -89,7 +104,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/stackable.lua": {
       "aspects_ignored": [
@@ -100,7 +116,10 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "掉落小木牌，非小木牌页面本身，未提堆叠"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -109,8 +128,11 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "推测为小木牌(minisign)，受影响但未提及"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -25,7 +25,8 @@
         "翻找拿回物品"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -33,7 +34,10 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "推测为盐箱/冰箱受影响，未提及检视"
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -44,7 +48,8 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/placer.lua": {
       "route": "direct",
@@ -57,7 +62,10 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "推测为稻草人(scarecrow)，生长加速描述，受影响未提及"
+      }
     }
   },
   "page_detail_level": "stub"

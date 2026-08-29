@@ -14,6 +14,7 @@
   },
   "symbols": {
     "components/childspawner.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止再生描述",
         "再生周期数值标注",
@@ -22,7 +23,10 @@
         "生成速度及数量上限规则描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -34,9 +38,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -45,7 +51,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "infobox掉落:月亮碎片×3,石头×2,月光龙虾×2等",
+        "semantic_consistent": true
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -60,5 +70,5 @@
       }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

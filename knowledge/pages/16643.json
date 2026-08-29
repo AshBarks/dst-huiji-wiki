@@ -28,7 +28,8 @@
         "烹饪产物描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/dryable.lua": {
       "route": "direct",
@@ -42,7 +43,8 @@
         "食用特殊效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -54,7 +56,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -62,7 +65,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -74,7 +78,8 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/perishable.lua": {
       "aspects_ignored": [
@@ -87,7 +92,10 @@
         "物品腐烂转化行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面涉及鸟类，可能对应affected variants中的鸟，但未提及腐烂/新鲜度/保质期"
+      }
     },
     "components/stackable.lua": {
       "aspects_ignored": [
@@ -102,6 +110,7 @@
       "llm_verdict": {}
     },
     "components/tradable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易价值与回报标注",
         "交易对象与限制描述",
@@ -109,8 +118,12 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "用来和[[猪王]]兑换1个[[金块]]。",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -49,9 +49,24 @@
 
 **推开的策略(定案)**:L2 审计按符号分批推进(高频/高 aspects 符号优先);`semantic_consistent=false` 的对在 M2c 汇总中单独成表,作为 M3 修订建议清单的直接输入。
 
-## 6. M2c 汇总(未实施)
+## 6. M2c 汇总(已实现)
 
-全库缺口与不一致报表:按符号聚合 routed/stub/转化率/不一致清单;`semantic_consistent=false` 单独成表对接 M3。detail_level 公式如有必要再引入 LLM borderline 判定。
+`knowledge-scan-wiki --report`:聚合 `knowledge/pages/*.json` → `knowledge/page_map_summary.json`(按符号 routed/mentioned/stub/未审计/不一致,detail 分布,`semantic_consistent=false` 单独成表)。
+
+## 7. 全量结果与核对报告(2026-08-29)
+
+**规模**:756 页 / 6071 对;提及对 690(pass2 反转 83 + D1 配对 30 + **L2 审计 577**——L2 贡献了全部提及的 84%);有提及页面 360;审计覆盖率 ≈96%(仅 376 对残留,993 对因符号无 aspects 不适用)。
+
+**三层核对结论**(对照游戏源码 + 页面语料原文):
+
+| 检查 | 方法 | 结果 |
+|---|---|---|
+| 转化 precision | 25 条抽样:wording 逐字比对 + 5 条 SUSPECT 人工对照原文 | 逐字命中 14/25(其余为概括措辞);5 条 SUSPECT **全部验证为真转化**(如“可以被锤子敲碎，掉落 2 个骨头碎片”↔workable);有效 precision ≈95%+ |
+| 漏报 recall | 30 条未提及对:search_terms 命中页面则疑 | 1/30 疑似,且该例命中词为泛词(范围伤害/攻击范围),低风险 |
+| D1 数值配对 | 20 条配对回查源码常量 | **20/20** 常量名与数值均存在 |
+| 不一致复核 | 12 条逐条人工判读 | **无一是页面错误**:10 条为路由过近似(页面句子描述的是邻近组件数据,如“死时三选一”属 lootdropper 而被路由到 health),2 条为 sanityaura 变体列表缺口(完全正常的树/蘑菇地精页面确有光环值) |
+
+**教训**:①`semantic_consistent=false` 的语义是「页面句子与本符号代码语义对不上」,主要构成是路由过近似信号与变体覆盖缺口,不应直接当页面纠错清单用——M3 消费前需按此分类;②审计 verdict 的 wording 是概括/引用混合,自动 precision 校验须区分逐字与语义命中;③搜索词盲区(掉落/锤子/冷却等)导致确定性层与人工校验的 terms 命中失灵,search_terms 质量杠杆再次被证实有价值。
 
 ## 6. 已知取舍
 

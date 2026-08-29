@@ -16,6 +16,7 @@
   },
   "symbols": {
     "components/equippable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "装备潮湿速率描述",
         "装备理智增减描述",
@@ -24,7 +25,11 @@
         "防水绝缘装备效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "装备时每0.33秒自动拾取",
+        "semantic_consistent": true
+      }
     },
     "components/finiteuses.lua": {
       "aspects_ignored": [
@@ -36,7 +41,8 @@
         "耐久百分比读取描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -48,7 +54,8 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -56,7 +63,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -68,15 +76,17 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/shadowlevel.lua": {
       "aspects_ignored": [
         "等级回退至0级标注"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

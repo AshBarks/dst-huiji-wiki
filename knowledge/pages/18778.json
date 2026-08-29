@@ -101,14 +101,18 @@
         "理智光环持续影响与衰减描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/talker.lua": {
       "aspects_ignored": [
         "说话行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "lost_toy页面，未提及说话"
+      }
     },
     "components/trader.lua": {
       "route": "direct",

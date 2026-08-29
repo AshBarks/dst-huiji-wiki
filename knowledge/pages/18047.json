@@ -24,6 +24,7 @@
       "detail_level": "stub"
     },
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -33,7 +34,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "熄灭或扑灭时掉落 1 个木炭",
+        "semantic_consistent": true
+      }
     },
     "components/edible.lua": {
       "aspects_ignored": [
@@ -43,7 +48,8 @@
         "食用特殊效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -59,7 +65,10 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "片段描述熄灭掉落木炭等特征匹配 campfire（营火），该实体在受影响变体中，但证据未提及作祟/附身互动"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -67,7 +76,8 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -79,16 +89,22 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/propagator.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧不引燃描述",
         "引燃附近可燃物描述",
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "熄灭或扑灭时掉落 1 个木炭。",
+        "semantic_consistent": true
+      }
     },
     "components/stackable.lua": {
       "aspects_ignored": [
@@ -99,7 +115,10 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "木炭(charcoal)页面，片段未提堆叠"
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -109,8 +128,9 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

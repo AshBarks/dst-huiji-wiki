@@ -72,7 +72,8 @@
         "角色与装备伤害类型加成及倍率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -93,7 +94,8 @@
         "捡食地上食物行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/embarker.lua": {
       "route": "direct",

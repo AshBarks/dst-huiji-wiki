@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/eyeofterror_minibrain.lua"
+  },
+  "category": "brain",
+  "display_name": "eyeofterror_minibrain",
+  "summary": "该大脑让实体在自身未处于冲锋（charge）状态时，按优先级执行恐慌触发、攻击墙壁、追击攻击、寻找食物进食以及在出生点附近游荡。实体初始化时会被记录当前位置作为游荡锚点（出生点）。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的可供外部调用的公开方法或字段。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FOOD_DISTANCE",
+    "EATFOOD_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "实体未处于冲锋状态时（WhileNode Not Attacking 内）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "实体未处于冲锋状态时（WhileNode Not Attacking 内）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取吃食物动作的函数",
+        "节点调试名称“Find And Eat Food”"
+      ],
+      "context": "实体未处于冲锋状态时（WhileNode Not Attacking 内）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回出生点位置的函数",
+        "离家最大距离 25"
+      ],
+      "context": "实体未处于冲锋状态时（WhileNode Not Attacking 内）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"charge\")",
+      "semantic": "执行恐慌触发、攻击墙、追击、吃食、游荡等优先级行为；若处于冲锋状态则跳过所有这些行为（根节点仅此分支，故冲锋时无所作为）"
+    },
+    {
+      "condition": "inst.sg:HasStateTag(\"busy\")",
+      "semantic": "在 EatFoodAction 函数中，若实体处于 busy 状态则直接返回 nil，放弃寻找并吃食物的动作"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重0.5)包含 WhileNode(条件:实体无charge状态标签，名'Not Attacking')，其内为优先级节点(权重0.5)：依次尝试 BrainCommon.PanicTrigger、BrainCommon.ElectricFencePanicTrigger、AttackWall、ChaseAndAttack、DoAction(觅食)、Wander(以出生点为家游荡半径25)。若处于冲锋状态则跳过全部子节点。",
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      13701,
+      15022,
+      15941,
+      45173,
+      72981,
+      15246,
+      65881
+    ],
+    "aspects": [
+      {
+        "aspect": "吃食物距离与行为描述",
+        "evidence": [
+          {
+            "pageid": 15246,
+            "quote": "蜘蛛会主动寻找并吃掉 10 单位内的地上的肉类食物"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击墙体行为描述",
+        "evidence": [
+          {
+            "pageid": 15246,
+            "quote": "在黄昏和夜晚，蜘蛛会主动攻击墙体"
+          }
+        ]
+      },
+      {
+        "aspect": "追击攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "只有距离目标最近的那个戍卫塔会主动追击并攻击"
+          },
+          {
+            "pageid": 15022,
+            "quote": "第一形态的天体英雄会主动仇恨并追击 20 距离单位内"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "小眼睛",
+    "吃食物",
+    "攻击墙",
+    "追击",
+    "游荡",
+    "冲锋",
+    "出生点",
+    "恐慌",
+    "电网",
+    "觅食"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c29a1b22a01815a225e8fe79a253adf980bd36d157a993f1537cb5aa4005174b",
+    "source_bytes": 1718,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017901910
+  }
+}

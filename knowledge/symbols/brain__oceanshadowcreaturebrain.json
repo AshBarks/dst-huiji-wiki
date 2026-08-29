@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/oceanshadowcreaturebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "oceanshadowcreaturebrain",
+  "summary": "该大脑控制海洋阴影生物在未被传送状态阻塞时的行为。在船上时，若攻击目标位于陆地则触发传送，否则循环执行骚扰呐喊、范围内站立攻击、定时船上传送或静止；不在船上时则围绕目标平台严格游荡（最大距离0）。全程包含恐慌触发逻辑。",
+  "api": [
+    {
+      "name": "SetTarget",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "teleport_to_land",
+    "boatteleport"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TELEPORT_FREQUENCY",
+    "HARASS_MIN",
+    "HARASS_MED",
+    "HARASS_MAX"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回目标平台位置的函数（若mytarget有效且在平台上则返回其位置，否则nil）",
+        "离家最大距离0（严格拴在home点）"
+      ],
+      "context": "非传送状态且不在船上时（TeleportBlock优先级内、OnBoat分支之后）"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体（未传startfn/keepfn，无条件进入并无限期保持站立）"
+      ],
+      "context": "在船上时且不满足骚扰/攻击/传送条件（OnBoat优先级内末位）"
+    },
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "自身实体（findnewtargetfn省略为nil即不自动寻敌，timeout省略为nil即无超时限制）"
+      ],
+      "context": "在船上且ShouldAttack条件满足（目标有效在攻击范围内且不应提交）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"teleporting\")",
+      "semantic": "实体未处于传送状态时运行内部优先级行为树，否则整体阻塞"
+    },
+    {
+      "condition": "targetonland(self.inst)（战斗目标存在于陆地）",
+      "semantic": "若目标在陆地，立即推送teleport_to_land事件尝试传送"
+    },
+    {
+      "condition": "self.inst.entity:GetParent() ~= nil（实体在船上）",
+      "semantic": "在船上时进入子优先级：依次判断骚扰、攻击、定时传送、站立"
+    },
+    {
+      "condition": "ShouldHarass(self)（存在有效骚扰目标且战斗呐喊冷却就绪）",
+      "semantic": "发出BattleCry战斗呐喊并强制面向目标"
+    },
+    {
+      "condition": "ShouldAttack(self)（目标有效且在攻击范围内且非臣服）",
+      "semantic": "调用StandAndAttack进行站立攻击"
+    },
+    {
+      "condition": "GetTime() - self.inst._should_teleport_time >= TELEPORT_FREQUENCY（距上次传送≥3秒）",
+      "semantic": "推送boatteleport事件并刷新时间戳"
+    },
+    {
+      "condition": "不在船上（即GetParent()为nil）",
+      "semantic": "以目标平台位置为home点（最大距离0）执行Wander游荡"
+    }
+  ],
+  "bt_structure": "根优先级(0.25) -> 非传送阻塞节点 -> 优先级(0.25)[恐慌触发, 若目标在陆地则传送, 若在船上->优先级(0.25)[骚扰呐喊, 攻击, 定时传送, 站立], 否则以目标为家游荡(距0)]",
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      17930,
+      24578,
+      39366,
+      19693,
+      20842
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录（页ID：57263、18001、16641、17930、24578、39366、19693、20842）均描述传送类实体或区域（圣殿、宝石底座、传送魔杖、懒人传送塔、传送伞、传送装置、天体传送门、出逃腿靴），未提及 brain__oceanshadowcreaturebrain 或其代码能力（TELEPORT_FREQUENCY、HARASS_MIN/MED/MAX、Wander 返回平台位置、StandStill、StandAndAttack）的任何玩家语言表达、数值或行为描述，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "海洋阴影",
+    "阴影生物",
+    "传送",
+    "骚扰",
+    "陆地",
+    "战斗呐喊",
+    "游荡",
+    "站立攻击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8b620a39d78af90aff6879e9f1a7f470f0c19f93e044eefa5d6c4b69ecf0655b",
+    "source_bytes": 4650,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019036220
+  }
+}

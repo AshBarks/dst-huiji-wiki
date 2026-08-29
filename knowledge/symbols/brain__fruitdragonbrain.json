@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/fruitdragonbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "fruitdragonbrain",
+  "summary": "该大脑控制水果龙（fruitdragon）的 AI 行为。在恐慌或失去挑战时它会逃离同类，平时会追击并攻击目标；若被设置了家实体，则会跟随或在家附近游荡（夜晚靠近家，白天稍远），无家时则自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅覆盖 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外可调用的自定义方法或属性。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CHALLENGE_LOST_RUN_AWAY_DIST",
+    "CHALLENGE_LOST_STOP_RUN_AWAY_DIST",
+    "MAX_HOME_WANDER_DIST",
+    "MAX_CHASE_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "wander_timing"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "最高优先级通用恐慌触发"
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "电栅栏恐慌触发"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "逃离标签为 fruitdragon 的实体",
+        "发现距离 10",
+        "安全距离 15"
+      ],
+      "context": "当计时器 'panicing' 存在时 (LostChallenge)"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实例",
+        "追击时长无限制(nil)",
+        "最大追击距离 12"
+      ],
+      "context": "常规战斗行为"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "获取家实体的函数",
+        "最小跟随距离 0",
+        "目标跟随距离 4",
+        "最大跟随距离 4.5"
+      ],
+      "context": "当家实体可移动时 (MoveableHome)"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取家实体函数 GetHome",
+        "保持面对家实体函数 KeepFaceTargetFn"
+      ],
+      "context": "当家实体可移动时 (MoveableHome)"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "获取家位置函数 GetHomePos",
+        "游荡半径 TUNING.FRUITDRAGON.NAP_DIST_FROM_HOME",
+        "游荡时间配置 wander_timing"
+      ],
+      "context": "有家且夜晚 (IsNight)"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "获取家位置函数 GetHomePos",
+        "游荡半径 MAX_HOME_WANDER_DIST",
+        "游荡时间配置 wander_timing"
+      ],
+      "context": "有家且非夜晚"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "无家位置(nil)",
+        "无最大距离(nil)",
+        "游荡时间配置 wander_timing"
+      ],
+      "context": "无家时自由游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "计时器存在 'panicing' (LostChallenge)",
+      "semantic": "使用 RunAway 逃离标签为 fruitdragon 的实体，发现距10安全距15"
+    },
+    {
+      "condition": "有家且家可移动 (MoveableHome)",
+      "semantic": "使用 Follow 与 FaceEntity 持续跟随并面向家实体"
+    },
+    {
+      "condition": "有家且夜晚 (IsNight)",
+      "semantic": "使用 Wander 以家为中心、NAP_DIST_FROM_HOME 为半径游荡"
+    },
+    {
+      "condition": "有家且非夜晚",
+      "semantic": "使用 Wander 以家为中心、MAX_HOME_WANDER_DIST 为半径游荡"
+    },
+    {
+      "condition": "无家",
+      "semantic": "使用 Wander 无中心自由游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树：1) 通用恐慌触发；2) 电栅栏恐慌触发；3) 若失去挑战恐慌则逃离同类；4) 追击攻击；5) 若有家：可移动则跟随面对，否则按夜晚/白天在家附近游荡；6) 无家则自由游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      13570,
+      51046,
+      13701,
+      13901,
+      15022,
+      15237,
+      13897,
+      15238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及昼夜循环、战争瓦器人、远古织影者、火鸡、天体英雄、猪人、克劳斯、皮弗娄牛等实体或机制，全文未提及 fruitdragon（果龙）或其 brain 组件的行为（如逃离 fruitdragon 标签、跟随家实体、游荡距离等），故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水果龙",
+    "龙脑",
+    "逃跑",
+    "追击",
+    "跟随",
+    "游荡",
+    "家园",
+    "恐慌",
+    "夜晚",
+    "挑战"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "游荡",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d819d065c8695f771a3103b91403f75def0c224eadc348f6f49f86831a658d2",
+    "source_bytes": 2632,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018034651
+  }
+}

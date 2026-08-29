@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/grassgekkobrain.lua"
+  },
+  "category": "brain",
+  "display_name": "grassgekkobrain",
+  "summary": "草壁虎大脑在实体陷入恐慌或接触电围栏时优先触发逃跑行为。当附近出现带有 'scarytoprey' 或 'player' 标签的实体时，草壁虎会在察觉距离7内开始逃离，直到安全距离12外才停止。无威胁时，草壁虎会在已知的 'herd' 群体位置附近游荡，最大半径8。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 生命周期方法以构建行为树，未定义其他对外调用方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_WANDER_DIST",
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST",
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "AVOID_DIST",
+    "AVOID_STOP",
+    "NO_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃离带有 'scarytoprey' 标签的威胁源",
+        "发现威胁距离半径 7 (AVOID_PLAYER_DIST)",
+        "脱离危险安全距离 12 (AVOID_PLAYER_STOP)",
+        "逃跑过滤函数始终返回真"
+      ],
+      "context": "附近存在 scarytoprey 实体时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃离带有 'player' 标签的实体",
+        "发现威胁距离半径 7 (AVOID_DIST)",
+        "脱离危险安全距离 12 (AVOID_STOP)",
+        "无额外过滤函数 (nil)",
+        "不跑回家 (nil)",
+        "传入 NO_TAGS 表忽略特定标签实体"
+      ],
+      "context": "附近存在 player 实体时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "以函数返回已知位置 'herd' 为家",
+        "最大游荡距离由 GetWanderDistFn 返回 8 (MAX_WANDER_DIST)"
+      ],
+      "context": "无上述威胁时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "BrainCommon.PanicTrigger 触发（如生命危急）",
+      "semantic": "执行内部恐慌逃跑行为，高优先级阻断后续"
+    },
+    {
+      "condition": "BrainCommon.ElectricFencePanicTrigger 触发（接触电围栏）",
+      "semantic": "执行电围栏恐慌逃跑"
+    },
+    {
+      "condition": "附近有 'scarytoprey' 标签实体在 7 距离内",
+      "semantic": "按 RunAway 逃离直至 12 距离外"
+    },
+    {
+      "condition": "附近有 'player' 标签实体在 7 距离内（忽略 NO_TAGS 标签）",
+      "semantic": "按 RunAway 逃离直至 12 距离外"
+    },
+    {
+      "condition": "无上述紧急情况",
+      "semantic": "在 'herd' 已知位置周围按 Wander 游荡，最大半径 8"
+    }
+  ],
+  "bt_structure": "优先级节点树(PriorityNode, 权重.25)：依次子节点 1) BrainCommon.PanicTrigger 2) BrainCommon.ElectricFencePanicTrigger 3) RunAway(scarytoprey) 4) RunAway(player) 5) Wander(herd)；高优先级满足则低优先级不执行。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      20714,
+      13701,
+      28179,
+      13493,
+      15753,
+      16419,
+      15238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅15753号页面涉及草壁虎实体，但其行为描述仅提及群居、壁虎群位置调整(每次最多移动20距离单位)及新草壁虎加入壁虎群距离(40单位)，未体现grassgekkobrain的MIN/MAX_FOLLOW_DIST、AVOID_PLAYER_DIST(7)、AVOID_PLAYER_STOP(12)、AVOID_DIST(7)、AVOID_STOP(12)、MAX_WANDER_DIST(8)等数值或RunAway/Wander行为语义；其余页面实体均非草壁虎，不讨论该brain能力，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "草壁虎",
+    "大脑",
+    "逃跑",
+    "玩家",
+    "游荡",
+    "恐慌",
+    "电围栏",
+    "安全距离",
+    "惊吓物",
+    "群体点"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c0da4c4235ab8e4e55b71fa8f540c8910d32ce27bb4f974f9144e27c2a9d45e8",
+    "source_bytes": 1322,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018241151
+  }
+}

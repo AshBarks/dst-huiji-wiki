@@ -29,6 +29,7 @@
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -42,7 +43,11 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "伯尼！追随距离在 0~24 单位内…如果距离超过 24 单位，伯尼！会停止攻…同时伯尼！ 16 秒内没有进行战斗",
+        "semantic_consistent": true
+      }
     },
     "behaviours/faceentity.lua": {
       "aspects_ignored": [
@@ -50,9 +55,11 @@
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/follow.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动远离目标描述",
         "解除追随停止移动描述",
@@ -62,7 +69,11 @@
         "靠近追随目标行为"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "伯尼！追随距离在 0~24 {{解释|距离单位}}内",
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -168,7 +179,8 @@
         "角色与装备伤害类型加成及倍率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/drownable.lua": {
       "aspects_ignored": [

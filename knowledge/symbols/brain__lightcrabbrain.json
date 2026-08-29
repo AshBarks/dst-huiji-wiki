@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lightcrabbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "lightcrabbrain",
+  "summary": "光蟹大脑控制光蟹在游戏中的行为逻辑。当实体处于跳跃状态时优先待机不动；遇到带有“scarytoprey”标签的威胁目标时会保持距离逃离，发现附近可食用诱饵则进食，无威胁时自由游荡。行为树还集成了通用恐慌与电栅栏恐慌触发逻辑。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他供外部模块调用的公开方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "SEE_BAIT_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "WANDER_TIMING"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "光蟹实体自身",
+        "逃离带有 scarytoprey 标签的威胁目标",
+        "察觉威胁距离半径 5",
+        "脱离危险安全距离 9"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "光蟹实体自身",
+        "获取进食诱饵动作的函数 EatFoodAction"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "光蟹实体自身",
+        "无绑定家位置(自由游荡)",
+        "无最大距离限制",
+        "等待时间配置(最小10秒随机10秒)"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg:HasStateTag(\"jumping\")",
+      "semantic": "当实体状态标签包含 jumping 时，进入 Standby 分支执行空操作节点，优先占用行为树使其待机"
+    }
+  ],
+  "bt_structure": "优先级节点树：1.跳跃中待机(空操作) 2.通用恐慌触发 3.电栅栏恐慌触发 4.逃离scarytoprey威胁 5.进食诱饵动作 6.自由游荡",
+  "wiki": {
+    "scanned_pageids": [
+      18483,
+      14674,
+      15560,
+      15651,
+      18183,
+      18229,
+      18503,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "地区内游荡习性描述",
+        "evidence": [
+          {
+            "pageid": 18503,
+            "quote": "发光蟹是一种在该地区游荡并在夜间提供光线的动物。"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家靠近逃跑行为描述",
+        "evidence": [
+          {
+            "pageid": 18483,
+            "quote": "当玩家靠近时会快速跑开"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "自由游荡",
+    "光蟹",
+    "行为树",
+    "跳跃状态",
+    "威胁目标",
+    "可食用诱饵",
+    "通用恐慌",
+    "电栅栏恐慌",
+    "保持距离"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "生存",
+    "觅食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e8da063ebf6fc85f2858684c6b026d50386cfba978f79164639c3ea8afaee4e0",
+    "source_bytes": 1946,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018492026
+  }
+}

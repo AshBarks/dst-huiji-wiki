@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/friendlyfruitflybrain.lua"
+  },
+  "category": "brain",
+  "display_name": "friendlyfruitflybrain",
+  "summary": "该大脑让实体在恐慌时优先逃离危险，平时若有所跟随的领导者则靠近并面对领导者，同时在领导者附近寻找受压农场植物进行交互。若没有领导者或无需交互时，实体会在最后已知位置或自身周围自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外方法或可被外部调用的自定义函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "触发恐慌的实体自身"
+      ]
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "触发电网恐慌的实体自身"
+      ]
+    },
+    {
+      "ctor": "FindFarmPlant",
+      "args_semantic": [
+        "实体自身",
+        "指定动作为交互(INTERACT_WITH)",
+        "筛选受压状态植物(true)",
+        "搜索中心函数(返回领导者或自身位置)"
+      ]
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "跟随目标为领导者(通过函数获取)",
+        "最小允许距离0(MIN_FOLLOW_DIST)",
+        "期望保持距离5(TARGET_FOLLOW_DIST)",
+        "最大允许距离10(MAX_FOLLOW_DIST)"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取面对目标函数(返回领导者)",
+        "保持面对函数(领导者未变则保持)"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "游荡中心函数(返回领导者或自身位置)",
+        "最大游荡距离20(MAX_WANDER_DIST)"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetLeader(inst) ~= nil",
+      "semantic": "FindFarmPlant以领导者位置搜索受压植物；Follow跟随领导者(距离0-10，目标5)；FaceEntity面对领导者"
+    },
+    {
+      "condition": "GetLeader(inst) == nil",
+      "semantic": "Follow与FaceEntity因目标空而失败；FindFarmPlant以自身位置搜索受压植物；Wander以自身位置游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树：1.通用恐慌触发 2.电网恐慌触发 3.寻找受压农场植物交互 4.跟随领导者 5.面对领导者 6.游荡(以跟随点或自身为中心)",
+  "wiki": {
+    "scanned_pageids": [
+      19695,
+      22521,
+      15797,
+      15386,
+      17998,
+      13898,
+      15238,
+      21485
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随友好果蝇果描述",
+        "evidence": [
+          {
+            "pageid": 19695,
+            "quote": "友好果蝇会跟随友好果蝇果。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "友好果蝇",
+    "自由游荡",
+    "逃离危险",
+    "跟随玩家",
+    "面对玩家",
+    "农场植物",
+    "植物交互"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 3/7)",
+  "gameplay_tags": [
+    "生存/跟随",
+    "建造/农场",
+    "移动/游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "47dd560d2497476e7d2fd25df6bdb164b05f4ee7ee938a3258429950b14a213b",
+    "source_bytes": 1384,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017979398
+  }
+}

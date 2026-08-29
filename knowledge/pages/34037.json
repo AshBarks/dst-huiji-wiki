@@ -20,11 +20,16 @@
   },
   "symbols": {
     "components/damagetypebonus.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "角色与装备伤害类型加成及倍率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "位面伤害提升 5 点",
+        "semantic_consistent": true
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [

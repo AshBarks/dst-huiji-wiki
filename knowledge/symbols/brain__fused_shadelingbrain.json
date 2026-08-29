@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/fused_shadelingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "fused_shadelingbrain",
+  "summary": "融合影怪大脑控制实体在战斗时根据距离与生成点关系决定是否跳跃攻击；平时优先追击攻击目标，若离生成点过远则跑回生成点，否则在生成点附近游荡。实体处于跳跃状态时阻塞其他行为。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "try_jump"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "PRIORITY_NODE_RATE",
+    "MAX_CHASE_TIME",
+    "CHASE_GIVEUP_DISTANCE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长20秒",
+        "放弃距离25世界单位",
+        "最大攻击次数2次"
+      ],
+      "context": "默认战斗行为"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "拴绳锚点为获取生成点的函数",
+        "拴绳最大半径20",
+        "内部返回距离3",
+        "以跑步速度返回"
+      ],
+      "context": "脱离攻击范围后返回"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置为获取生成点的函数",
+        "离家最大距离20"
+      ],
+      "context": "无目标时游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg:HasStateTag('jumping')",
+      "semantic": "通过FailIfSuccessDecorator与ConditionWaitNode阻塞后续所有节点，直到跳跃状态结束"
+    },
+    {
+      "condition": "should_combat_jump(inst) 返回真（有目标、无冷却、在生成点范围内、距离适合跳跃）",
+      "semantic": "通过WhileNode触发ActionNode推送'try_jump'事件尝试跳跃"
+    },
+    {
+      "condition": "无特殊条件（优先级较低分支）",
+      "semantic": "依次执行追击攻击、拴回生成点、游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树(速率0.5)：根节点包含[阻塞跳跃中装饰器, 条件跳跃动作, 追击攻击, 拴回生成点, 游荡生成点]依次优先级下降。",
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      15724,
+      73427,
+      15022,
+      34523,
+      72981,
+      57310,
+      15530
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及 buzzard、天体英雄、远古戍卫塔、地热螨、蜘蛛战士、玩家生成点、固定布景、世界翻新等，未提及 brain__fused_shadelingbrain 或清单中具体数值（追击最长20秒、放弃距离25、最大攻击2次、拴绳半径20、返回距离3、跑步返回、游荡离家20），相似描述如生成点返回或游荡属于其他实体且数值不匹配，故无该符号能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "融合小影怪",
+    "小影怪脑",
+    "追击",
+    "跑回生成点",
+    "战斗行为",
+    "跳跃攻击",
+    "游荡",
+    "生成点"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "64c8a67a55e02d3e8a223afc151dc63177bf8a60b8754177f26f4c9788713464",
+    "source_bytes": 2261,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018082914
+  }
+}

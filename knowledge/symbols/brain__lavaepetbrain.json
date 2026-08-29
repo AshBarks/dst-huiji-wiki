@@ -1,0 +1,197 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lavaepetbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "lavaepetbrain",
+  "summary": "该大脑控制熔岩虫宠物（Lavae Pet）的决策。当宠物饥饿值极低（低于5%）时，优先吃背包食物、寻找地上食物或制造食物；平时跟随主人保持距离，并尝试面对主人，主人靠近且宠物不饿时等待后示爱。",
+  "api": [],
+  "api_note": "大脑仅实现 OnStart 构建行为树，无额外对外方法或接口供其他模块调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_WANDER_DIST",
+    "FIND_FOOD_ACTION_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "最高优先级恐慌检测"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件:饥饿<0.05",
+        "节点标签",
+        "子优先级节点"
+      ],
+      "context": "极度饥饿分支"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "EatFoodAction函数"
+      ],
+      "context": "吃背包食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "FindFoodAction函数"
+      ],
+      "context": "寻找地上食物"
+    },
+    {
+      "ctor": "SequenceNode",
+      "args_semantic": [
+        "子节点列表"
+      ],
+      "context": "制造食物后等待序列"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "MakeFoodAction函数"
+      ],
+      "context": "制造食物(点燃)"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "10秒"
+      ],
+      "context": "制造后等待"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "返回主人的函数",
+        "最小距离0",
+        "目标距离5",
+        "最大距离8"
+      ],
+      "context": "常规跟随主人"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "EatFoodAction函数"
+      ],
+      "context": "非饥饿时吃背包食物"
+    },
+    {
+      "ctor": "FailIfRunningDecorator",
+      "args_semantic": [
+        "FaceEntity节点"
+      ],
+      "context": "避免打断运行"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "GetFaceTargetFn",
+        "KeepFaceTargetFn"
+      ],
+      "context": "面对主人"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件:主人靠近2.5内",
+        "节点标签",
+        "子序列节点"
+      ],
+      "context": "主人靠近分支"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "4秒"
+      ],
+      "context": "靠近后等待"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "LoveOwner函数"
+      ],
+      "context": "示爱主人"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.hunger:GetPercent() < 0.05",
+      "semantic": "触发饥饿警报，优先吃背包食物、寻找食物、制造食物并等待10秒"
+    },
+    {
+      "condition": "OwnerIsClose(self.inst) (owner:IsNear(inst, 2.5))",
+      "semantic": "等待4秒后若主人是玩家且饥饿>0.5则NUZZLE示爱"
+    }
+  ],
+  "bt_structure": "优先级树：恐慌触发 > 饥饿<5%时吃/找/造食物 > 跟随主人(距离0-5-8) > 吃背包食物 > 面对主人 > 主人靠近等待4秒后示爱",
+  "wiki": {
+    "scanned_pageids": [
+      13456,
+      15975,
+      13455,
+      34037,
+      13437,
+      15817,
+      13156,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随主人行为描述",
+        "evidence": [
+          {
+            "pageid": 15817,
+            "quote": "超级可爱岩浆虫可以跟随玩家进出[[洞穴]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "进食行为",
+    "寻找食物",
+    "行为树",
+    "熔岩虫",
+    "跟随玩家",
+    "生成食物",
+    "示爱",
+    "饥饿值",
+    "面对玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "生存",
+    "跟随",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6da64eb548de1435f3a99af9985fcc380088361d4714948933145197e6f35fef",
+    "source_bytes": 3981,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018491378
+  }
+}

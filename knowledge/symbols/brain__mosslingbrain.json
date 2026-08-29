@@ -1,0 +1,210 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/mosslingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "mosslingbrain",
+  "summary": "该大脑控制苔藓幼崽（Mossling）的行为。当母亲死亡时，它会追击攻击敌人。当有战斗目标或拥有守护者时，它会逃离威胁、靠近守护者并召唤援助。当已知群落位置时，它会偷取并进食食物、在基地附近游荡；当需要离开时会返回出生点。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    },
+    {
+      "name": "OnInitializationComplete",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TIME_BETWEEN_EATING",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "SEE_FOOD_DIST",
+    "SEE_STRUCTURE_DIST",
+    "BASE_TAGS",
+    "STEAL_TAGS",
+    "NO_TAGS",
+    "PICKABLE_FOODS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 60 秒",
+        "放弃距离 500 世界单位"
+      ],
+      "context": "当 mother_dead 为真时（Attack! 分支）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃离标签为 scarytoprey 的实体",
+        "发现距离 6",
+        "安全距离 10",
+        "额外过滤函数恒真",
+        "不跑回家"
+      ],
+      "context": "受威胁分支（有战斗目标或守护者）"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "获取守护者位置的函数",
+        "拴住距离 5",
+        "停止距离 6"
+      ],
+      "context": "受威胁分支内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行回家动作函数 GoHome"
+      ],
+      "context": "shouldGoAway 为真时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行偷取食物函数 StealFoodAction"
+      ],
+      "context": "基地分支内的 eatnode 优先级"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行吃食物函数 EatFoodAction"
+      ],
+      "context": "基地分支内"
+    },
+    {
+      "ctor": "MinPeriod",
+      "args_semantic": [
+        "最小间隔随机 4~6 秒",
+        "跳过初始等待周期",
+        "子节点 eatnode"
+      ],
+      "context": "基地分支内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "家位置为 herd 标记点函数",
+        "最大游荡距离 15"
+      ],
+      "context": "基地分支内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行召唤守护者函数 SummonGuardian"
+      ],
+      "context": "受威胁分支内"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "面向战斗目标的函数",
+        "条件为拥有守护者的检测函数"
+      ],
+      "context": "受威胁分支内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "shouldGoAway 为真",
+      "semantic": "执行回家动作（GOHOME）"
+    },
+    {
+      "condition": "mother_dead 为真",
+      "semantic": "追击并攻击目标，最长60秒，放弃距离500"
+    },
+    {
+      "condition": "components.combat.target ~= nil 或 HasGuardian()",
+      "semantic": "优先逃离 scarytoprey 标签实体，否则拴在守护者旁，召唤守护者，面向目标"
+    },
+    {
+      "condition": "knownlocations 存在 herd 位置",
+      "semantic": "偷取食物、吃食物（周期4~6秒）、以 herd 为中心游荡半径15"
+    }
+  ],
+  "bt_structure": "根优先级节点: 恐慌触发 -> 电击围栏恐慌触发 -> [shouldGoAway:回家] -> [mother_dead:追击攻击] -> [有战斗目标或守护者:受威胁分支(逃跑/拴住/召唤/面向)] -> [有herd:基地分支(偷食/吃食/周期/游荡)]",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15240,
+      15246,
+      16600,
+      18504,
+      18589,
+      15596
+    ],
+    "aspects": [
+      {
+        "aspect": "以巢为中心游荡描述",
+        "evidence": [
+          {
+            "pageid": 15596,
+            "quote": "以[[麋鹿鹅巢]]为中心成群结队活动"
+          }
+        ]
+      },
+      {
+        "aspect": "偷取结构食物描述",
+        "evidence": [
+          {
+            "pageid": 15596,
+            "quote": "甚至是烹饪锅煮好但未采集的食物，以及晾肉架上晾好的食物"
+          }
+        ]
+      },
+      {
+        "aspect": "可食用食物分类标注",
+        "evidence": [
+          {
+            "pageid": 15596,
+            "quote": "可以食用{{分类|肉类食物}}、{{分类|素食食物}}、{{分类|种子食物}}"
+          }
+        ]
+      },
+      {
+        "aspect": "吃食物行为描述",
+        "evidence": [
+          {
+            "pageid": 15596,
+            "quote": "会吃掉浆果丛的浆果、地里的胡萝卜等任何食物"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "吃食物",
+    "小苔藓",
+    "偷食物",
+    "逃离威胁",
+    "追击敌人",
+    "召唤援助",
+    "基地附近",
+    "返回出生点"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "觅食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d529565d463135c8d0d4f9a689ace9693b348ea18e84e8f815a7d8ae2a4e8835",
+    "source_bytes": 6172,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018980014
+  }
+}

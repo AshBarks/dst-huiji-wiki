@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lightninggoatbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "lightninggoatbrain",
+  "summary": "闪电山羊大脑在实体拥有战斗目标时会优先攻击墙壁，否则会追击并攻击敌人。当发现附近有角色时，它会先注视对方然后逃离一定距离，平时则以羊群位置为家进行昼夜不同范围的游荡，并在需要寻找盐砖时锚定盐砖。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 方法以构建行为树和记录出生点，未定义其他可供外部模块调用的公开函数或方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "WANDER_DIST_DAY",
+    "WANDER_DIST_NIGHT",
+    "MAX_CHASE_TIME",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "HUNTER_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "当 inst.components.combat.target ~= nil 时（IfNode hastarget）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "最长追逐时间 6 秒（MAX_CHASE_TIME）"
+      ],
+      "context": "优先级节点中默认执行（无显式条件）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "猎人参数表 HUNTER_PARAMS（标签 character 且非 notarget）",
+        "发现猎人距离 8（RUN_AWAY_DIST）",
+        "脱离危险安全距离 12（STOP_RUN_AWAY_DIST）"
+      ],
+      "context": "在 SequenceNode 中与 FaceEntity 组合执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "家位置函数：返回 knownlocations 中 'herd' 位置",
+        "游荡最大距离函数 GetWanderDistFn：白天 20 夜晚 5"
+      ],
+      "context": "优先级节点末尾默认执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.combat.target ~= nil",
+      "semantic": "执行 AttackWall(self.inst) 攻击墙壁行为"
+    },
+    {
+      "condition": "TheWorld.state.isday",
+      "semantic": "GetWanderDistFn 返回 WANDER_DIST_DAY (20)，否则返回 WANDER_DIST_NIGHT (5)"
+    },
+    {
+      "condition": "not BrainCommon.ShouldSeekSalt(inst)",
+      "semantic": "GetFaceTargetFn 和 KeepFaceTargetFn 中允许寻找/保持玩家注视目标，否则不返回或不保持"
+    }
+  ],
+  "bt_structure": "PriorityNode(更新周期0.25) 依次包含: BrainCommon.PanicTrigger 恐慌触发, IfNode(有战斗目标则 AttackWall), ChaseAndAttack 追击攻击, SequenceNode( FaceEntity 注视实体 + RunAway 逃跑 ), FaceEntity 注视实体, BrainCommon.AnchorToSaltlick 锚定盐砖, Wander 以 herd 为中心游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15729,
+      15022,
+      72981,
+      15239,
+      13901,
+      70704,
+      15238,
+      15246
+    ],
+    "aspects": [
+      {
+        "aspect": "羊群游荡距离标注",
+        "evidence": [
+          {
+            "pageid": 15729,
+            "quote": "在白天，伏特羊会在距离羊群 20 距离单位内游荡，在黄昏和晚上则是 5 单位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "闪电羊",
+    "山羊脑",
+    "追击",
+    "逃跑",
+    "游荡",
+    "攻击墙",
+    "注视",
+    "盐砖",
+    "羊群"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0f9666c9738751776b5dd35dabf0944ca858211422ca746ba5e711a41ec4adf6",
+    "source_bytes": 2145,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018601065
+  }
+}

@@ -33,6 +33,7 @@
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -46,7 +47,11 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "蜜蜂会主动仇恨 4 单位内的",
+        "semantic_consistent": true
+      }
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -55,7 +60,8 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/findflower.lua": {
       "mention_source": "fact_match",

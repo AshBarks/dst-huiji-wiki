@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/mosquitobrain.lua"
+  },
+  "category": "brain",
+  "display_name": "mosquitobrain",
+  "summary": "该大脑控制蚊子实体根据情境采取行为。有领导者时跟随，无领导者时拴在家附近；依据战斗状态追击、攻击或逃离；冬季或白天回家，否则自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅继承 Brain 基类并在 OnStart 中构建行为树，未定义额外的对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "MAX_LEASH_DIST",
+    "MAX_WANDER_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "MAX_CHASE_DIST",
+    "MAX_CHASE_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随目标为领导者获取函数GetLeader",
+        "最小允许距离3",
+        "期望保持距离8",
+        "最大允许距离12"
+      ]
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "拴绳锚点为无领导者时家位置函数GetNoLeaderHomePos",
+        "拴绳最大半径20",
+        "内部返回距离6"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 SpringCombatMod(MAX_CHASE_TIME) 秒",
+        "放弃距离 SpringCombatMod(MAX_CHASE_DIST) 世界单位"
+      ],
+      "context": "当 ShouldChaseAndAttack 条件满足（无战斗目标或不在攻击冷却）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取动作为GoHomeAction函数",
+        "节点调试名称\"go home\"",
+        "以跑动方式执行动作"
+      ],
+      "context": "当 ShouldGoHome 条件满足（冬季或白天且未覆盖停留）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "威胁来源为通过GetRunawayTarget函数获取的目标",
+        "发现猎人距离4",
+        "安全距离8"
+      ],
+      "context": "当 ShouldRunAway 条件满足（有战斗目标且在攻击冷却）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "游荡中心为WanderTarget函数返回位置",
+        "最大游荡距离6",
+        "游荡时间配置WANDERTIMES"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.components.combat.target == nil 或 not inst.components.combat:InCooldown()",
+      "semantic": "执行 ChaseAndAttack 追击攻击行为"
+    },
+    {
+      "condition": "TheWorld.state.iswinter 或 (TheWorld.state.isday 且 not inst.override_stay_out)",
+      "semantic": "执行 DoAction 回家行为"
+    },
+    {
+      "condition": "inst.components.combat.target ~= nil 且 inst.components.combat:InCooldown()",
+      "semantic": "执行 RunAway 逃离战斗目标行为"
+    },
+    {
+      "condition": "GetLeader(inst) 存在",
+      "semantic": "Leash锚点返回nil不拴家，Follow跟随领导者；否则Leash拴家"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电篱恐慌触发 > 跟随领导者 > 无领导者拴家 > 条件追击攻击 > 条件回家 > 条件逃离 > 自由游荡",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13409,
+      13897,
+      51046,
+      15225,
+      15551,
+      15651,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给定页面摘录实体（天体英雄、薇格弗德、克劳斯、战争瓦器人、暗影傀儡、蜂王、龙蝇、暗影骑士）文本中未出现 brain__mosquitobrain 的跟随/拴绳/游荡/跑开等距离参数（3,8,12,20,6,4,8）或对应行为描述，仅讨论各自攻击、仇恨、掉落等，未体现该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蚊子",
+    "跟随",
+    "回巢",
+    "攻击",
+    "追击",
+    "逃离目标",
+    "自由游荡",
+    "战斗"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 0/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f68579064137c6c048a894f48b9eba03c00eca482e8dc17b2ecece337ec13b2b",
+    "source_bytes": 3605,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018926899
+  }
+}

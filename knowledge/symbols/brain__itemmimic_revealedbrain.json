@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/itemmimic_revealedbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "itemmimic_revealedbrain",
+  "summary": "该大脑控制揭示后的物品伪装实体（itemmimic_revealed）的 AI 行为。当实体未处于跳跃状态时，它会尝试保持在拴绳范围内，刚生成时恐慌躲避玩家，平时逃离靠近的玩家，并寻找可伪装物品进行 NUZZLE 伪装，否则游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [
+    "eye_up",
+    "eye_down"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "UPDATE_RATE",
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "LEASH_RANGE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取拴绳位置的函数 GetLeashPos",
+        "拴绳最大范围 LEASH_RANGE",
+        "拴绳最大范围 LEASH_RANGE"
+      ],
+      "context": "非跳跃状态下优先执行"
+    },
+    {
+      "ctor": "PanicAndAvoid",
+      "args_semantic": [
+        "实体自身",
+        "获取最近玩家的函数 GetClosestPlayer",
+        "停止躲避距离 AVOID_PLAYER_STOP"
+      ],
+      "context": "计时器 recently_spawned 存在时（刚生成）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁来源标签 'player'",
+        "察觉威胁距离 AVOID_PLAYER_DIST",
+        "脱离安全距离 AVOID_PLAYER_STOP"
+      ],
+      "context": "非跳跃且非刚生成时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取拴绳位置的函数 GetLeashPos",
+        "游荡范围 LEASH_RANGE"
+      ],
+      "context": "上述行为均未执行时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not inst.sg:HasStateTag('jumping')",
+      "semantic": "进入内部优先级节点，依次尝试拴绳、刚生成恐慌躲避、逃离玩家、寻找伪装、游荡"
+    },
+    {
+      "condition": "inst.components.timer:TimerExists('recently_spawned')",
+      "semantic": "执行 PanicAndAvoid 躲避最近玩家至 AVOID_PLAYER_STOP 距离"
+    },
+    {
+      "condition": "not TimerExists('recently_spawned')",
+      "semantic": "执行 RunAway 逃离标签为 player 的实体，察觉距 AVOID_PLAYER_DIST，安全距 AVOID_PLAYER_STOP"
+    },
+    {
+      "condition": "not _try_mimic_task and not TimerExists('mimic_blocker') and IsInLeashRange",
+      "semantic": "搜索附近可伪装实体，找到后延迟发起 NUZZLE 动作并触发 eye_up 事件"
+    }
+  ],
+  "bt_structure": "根优先级节点(UPDATE_RATE=0.5)：WhileNode(非跳跃) -> 优先级节点[Leash(GetLeashPos, LEASH_RANGE), WhileNode(刚生成)->PanicAndAvoid, RunAway(player, AVOID_PLAYER_DIST, AVOID_PLAYER_STOP), FailIfSuccessDecorator(ActionNode(LookForMimicAction)), FailIfSuccessDecorator(ConditionWaitNode(非_mimicry_queued)), Wander(GetLeashPos, LEASH_RANGE)]",
+  "wiki": {
+    "scanned_pageids": [
+      28744,
+      71461,
+      16057,
+      34109,
+      34314,
+      15022,
+      15238,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "刚生成恐慌乱跑描述",
+        "evidence": [
+          {
+            "pageid": 28744,
+            "quote": "当拟态蠕虫刚从拟态物品中显形时，它会恐慌地乱跑 5 秒钟。"
+          }
+        ]
+      },
+      {
+        "aspect": "察觉威胁与脱离安全距离标注",
+        "evidence": [
+          {
+            "pageid": 28744,
+            "quote": "当有玩家进入拟态蠕虫 4 {{解释|距离单位}}内范围内时，它们将会向反方向逃跑直到距离拉开到 6 单位。"
+          }
+        ]
+      },
+      {
+        "aspect": "拴绳游荡范围标注",
+        "evidence": [
+          {
+            "pageid": 28744,
+            "quote": "由[[备份底盘]]生成的拟态蠕虫只会在生成它的备份底盘附近 4 {{解释|距离单位}}内游荡"
+          },
+          {
+            "pageid": 71461,
+            "quote": "这种特殊的拟态蠕虫只会在生成它的备份底盘附近 4 {{解释|距离单位}}内游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "随机游荡行为描述",
+        "evidence": [
+          {
+            "pageid": 28744,
+            "quote": "拟态蠕虫会随机地游荡，如果周围有符合其[[#拟态条件|拟态条件]]的物品"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "逃离玩家",
+    "刚生成",
+    "游荡",
+    "拟态实体",
+    "行为逻辑",
+    "牵引范围",
+    "惊慌逃跑",
+    "不跳跃",
+    "拟态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "生存",
+    "伪装"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c095baaebcc04edd396bc97cac9edaee88fb9b6fc3b6ad9bcc139edc243ca93",
+    "source_bytes": 3872,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018331179
+  }
+}

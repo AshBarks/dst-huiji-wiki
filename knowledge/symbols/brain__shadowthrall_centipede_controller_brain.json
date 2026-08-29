@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowthrall_centipede_controller_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowthrall_centipede_controller_brain",
+  "summary": "该大脑作为暗影蜈蚣身体的控制器，在控制头部不存在或当前控制头未处于挣扎状态时，周期性评估各个头部的控制优先级。当发现更高优先级的头部时立即移交控制，若两头部优先级相同则按递增几率随机切换控制头，以实现攻击或漫游等行为多样性。",
+  "api": [
+    {
+      "name": "IncreaseSwitchChance",
+      "effect": ""
+    },
+    {
+      "name": "ResetSwitchChance",
+      "effect": ""
+    },
+    {
+      "name": "RollSwitchChance",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SWITCH_CHANCES",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ShadowThrallCentipedeControllerBrain",
+      "args_semantic": [
+        "被控制的蜈蚣身体实体实例(inst)"
+      ]
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "包含WhileNode的子节点表",
+        "每3秒更新一次(UPDATE_RATE)"
+      ],
+      "context": "OnStart中构建行为树根"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件：无控制头或控制头未处于挣扎状态",
+        "调试标签'<busy state guard>'",
+        "子条件节点"
+      ],
+      "context": "作为PriorityNode的唯一子节点"
+    },
+    {
+      "ctor": "ConditionNode",
+      "args_semantic": [
+        "遍历头部并按优先级移交控制或掷骰切换的函数"
+      ],
+      "context": "作为WhileNode的子节点"
+    },
+    {
+      "ctor": "BT",
+      "args_semantic": [
+        "实体实例(inst)",
+        "根节点root"
+      ],
+      "context": "构建最终行为树"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "controller_head ~= nil and controller_head ~= centipedebody.head_in_control",
+      "semantic": "调用 centipedebody:GiveControlToHead(controller_head) 移交控制并重置切换几率"
+    },
+    {
+      "condition": "centipedebody.heads[1] and centipedebody.heads[2] and centipedebody.heads[1].control_priority == centipedebody.heads[2].control_priority",
+      "semantic": "调用 self:IncreaseSwitchChance() 与 self:RollSwitchChance() 按 SWITCH_CHANCES 几率切换控制头"
+    }
+  ],
+  "bt_structure": "优先级节点(PriorityNode, 更新率3)包裹一个循环节点(WhileNode, 条件为无控制头或控制头未挣扎)，循环体内为条件节点(ConditionNode)，该节点遍历所有头部依据 control_priority 选定最高优先级控制头并移交，或当两头部优先级相等时递增切换几率并随机切换。",
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      71461,
+      10418,
+      14683,
+      28752,
+      34557,
+      72314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体包括 shadowprotector、wx78_backupbody、wx78、oceanfishingrod、暗影仆从标签、shadow_thrall_parasitehat、wx78_drone_zap，均未提及 shadowthrall_centipede_controller_brain 或相关蜈蚣控制、行为树更新、控制头挣扎状态、掷骰切换等能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "挣扎状态",
+    "控制头部",
+    "控制优先级",
+    "随机切换",
+    "漫游行为",
+    "暗影仆从",
+    "控制大脑",
+    "移交控制"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "战斗",
+    "暗影生物",
+    "AI控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d253cc0c401ae02fd1d292405c0b4c539a09b7750cc146881257fcfabd0e212e",
+    "source_bytes": 2506,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019422892
+  }
+}

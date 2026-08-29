@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/rabbitbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "rabbitbrain",
+  "summary": "兔子大脑使实体在感知到带有“scarytoprey”标签的威胁时优先逃跑。其在夜晚、春天或收到“gohome”事件时会返回家园，平时则寻找可食用诱饵进食，无事务时在家附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法以构建行为树，未定义其他可供外部调用的公开方法。",
+  "events_published": [],
+  "events_listened": [
+    "gohome"
+  ],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "SEE_BAIT_DIST",
+    "MAX_WANDER_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "HunterParams"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(inst)",
+        "威胁标识表:标签含scarytoprey且排除INLIMBO/NOCLICK/rabbitdisguise",
+        "察觉威胁距离半径3(AVOID_PLAYER_DIST)",
+        "脱离安全距离6(AVOID_PLAYER_STOP)"
+      ],
+      "context": "无"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(inst)",
+        "威胁标识表:标签含scarytoprey且排除INLIMBO/NOCLICK/rabbitdisguise",
+        "察觉威胁距离半径5(SEE_PLAYER_DIST)",
+        "脱离安全距离10(STOP_RUN_DIST)",
+        "无额外过滤函数(nil)",
+        "被追时跑回家(true)"
+      ],
+      "context": "无"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取回家动作函数GoHomeAction",
+        "节点调试名'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "收到'gohome'事件时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取回家动作函数GoHomeAction",
+        "节点调试名'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "非白天(夜晚)时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取回家动作函数GoHomeAction",
+        "节点调试名'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "春天时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取吃食物动作函数EatFoodAction"
+      ],
+      "context": "无"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "家位置函数:返回knownlocations中'home'点",
+        "最大游荡距离20(MAX_WANDER_DIST)"
+      ],
+      "context": "无"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "事件 'gohome'",
+      "semantic": "执行回家动作（跑动方式）"
+    },
+    {
+      "condition": "非白天（夜晚）",
+      "semantic": "执行回家动作（跑动方式）"
+    },
+    {
+      "condition": "春天",
+      "semantic": "执行回家动作（跑动方式）"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电栅栏恐慌触发 > 逃离猎人(距3安6) > 逃离猎人(距5安10跑回家) > 事件回家 > 夜晚回家 > 春天回家 > 吃食物 > 以家为中心游荡(最大20)",
+  "wiki": {
+    "scanned_pageids": [
+      14589,
+      15239,
+      15682,
+      19769,
+      22383,
+      46847,
+      57310,
+      15235
+    ],
+    "aspects": [
+      {
+        "aspect": "惊吓逃离行为描述",
+        "evidence": [
+          {
+            "pageid": 15235,
+            "quote": "兔子会逃离{{分类|猎物惊吓者}}（除非它们装备了[[洞穴花环]]）"
+          }
+        ]
+      },
+      {
+        "aspect": "诱饵距离数值标注",
+        "evidence": [
+          {
+            "pageid": 15235,
+            "quote": "兔子会靠近 20 {{解释|距离单位}}内的可以作为[[诱饵物品]]"
+          }
+        ]
+      },
+      {
+        "aspect": "黄昏归巢行为描述",
+        "evidence": [
+          {
+            "pageid": 15235,
+            "quote": "[[黄昏]]时，或者附近有兔子死亡时，它们都会径直跑向[[兔洞]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "受惊逃跑",
+    "兔子回洞",
+    "寻找诱饵",
+    "附近游荡",
+    "夜回兔洞",
+    "春回兔洞",
+    "感知威胁",
+    "电篱受惊"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "逃跑",
+    "觅食",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "279194ebca126064a59a14d15886f05a551c23692d82fcaa28d81090c2607546",
+    "source_bytes": 2460,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019115575
+  }
+}

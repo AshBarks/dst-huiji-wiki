@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/chest_mimicbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "chest_mimicbrain",
+  "summary": "该大脑控制宝箱伪装怪（chest mimic）的 AI 行为。当实体物品栏已满时，它会寻找附近可行走位置并尝试钻地伪装变回宝箱；当未处于跳跃状态且未进入愤怒时，它会搜寻并拾取或吞噬地面上的物品，若愤怒则追击攻击附近玩家，否则在玩家或出生点附近游荡。此外行为树根部包含通用的恐慌触发逻辑。",
+  "api": [],
+  "api_note": "源码中仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义其他供外部直接调用的自定义公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "INTERACT_COOLDOWN_NAME",
+    "SEE_DIST",
+    "FINDITEMS_MUST_TAGS",
+    "FINDITEMS_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ]
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件：物品栏已满",
+        "节点标签：Inventory Full",
+        "子行为：执行尝试隐藏"
+      ],
+      "context": "物品栏满时触发"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "尝试隐藏函数 TryToHide",
+        "行为标签：Try To Transform Back"
+      ],
+      "context": "在物品栏满的 WhileNode 内"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件：未处于跳跃状态",
+        "节点标签：NotJumpingBehaviour",
+        "子优先级节点"
+      ],
+      "context": "未跳跃时执行"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "条件：不存在 angry 计时器",
+        "节点标签：Not Angry",
+        "子行为：执行寻找物品"
+      ],
+      "context": "在未跳跃节点内的优先级中"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "寻找地面物品函数 FindGroundItemAction",
+        "行为标签：Find Things To Gobble Up",
+        "无额外参数",
+        "超时 10 秒"
+      ],
+      "context": "在 IfNode 内，未愤怒时执行"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击攻击最长 100 秒"
+      ],
+      "context": "在未跳跃节点内的优先级中，若愤怒或前述未执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "游荡点获取函数 GetWanderPoint",
+        "游荡最大距离 20"
+      ],
+      "context": "在未跳跃节点内的优先级中，前述失败后"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点列表",
+        "优先级切换间隔 0.25"
+      ],
+      "context": "根节点及未跳跃分支内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "物品栏已满 (inventory:IsFull())",
+      "semantic": "执行 TryToHide 移动到附近可行走位置并触发 MOLEPEEK 动作伪装变回宝箱"
+    },
+    {
+      "condition": "未处于跳跃状态且未愤怒 (not jumping and not angry timer)",
+      "semantic": "执行 FindGroundItemAction 搜寻地面物品进行拾取或吞噬，带交互冷却"
+    },
+    {
+      "condition": "未处于跳跃状态但已愤怒 (not jumping and angry timer exists)",
+      "semantic": "执行 ChaseAndAttack 追击攻击最近玩家最长 100 秒"
+    },
+    {
+      "condition": "未处于跳跃状态且前述行为未执行",
+      "semantic": "执行 Wander 在最近玩家或出生点周围 20 距离内游荡"
+    },
+    {
+      "condition": "处于跳跃状态",
+      "semantic": "跳过上述所有非恐慌分支（WhileNode 条件不满足），仅可能触发恐慌"
+    }
+  ],
+  "bt_structure": "根优先级节点: [BrainCommon.PanicTrigger, WhileNode(物品栏满→DoAction隐藏), WhileNode(未跳跃→优先级节点[IfNode(未愤怒→DoAction找物品), ChaseAndAttack, Wander])]，各优先级间隔 0.25。",
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      19287,
+      35615,
+      15022,
+      34109,
+      15737,
+      16610,
+      13761
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，仅页面34109涉及暴躁箱子(CHEST_MIMIC_REVEALED)实体，提及9个物品栏、伪装形态与生成替换，但未描述brain__chest_mimicbrain的视觉距离、物品栏满隐藏、未跳跃、愤怒计时器、寻找物品、追击攻击、游荡等AI行为语义；其余页面实体均非暴躁箱子相关，未讨论该大脑组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "拾取物品",
+    "游荡",
+    "愤怒",
+    "物品栏满",
+    "地面物品",
+    "宝箱伪装怪",
+    "伪装",
+    "追击",
+    "变成宝箱",
+    "钻地"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "伪装"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f0439ea4585b5f782d52a8284f166ee336f1ec7c26b9f617970ec892fc7c6c30",
+    "source_bytes": 3451,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017619038
+  }
+}

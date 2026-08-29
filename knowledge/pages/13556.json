@@ -28,9 +28,11 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/follow.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动远离目标描述",
         "解除追随停止移动描述",
@@ -40,7 +42,11 @@
         "靠近追随目标行为"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "保持在[[温蒂]]附近 1 ~ 5 {{解释|距离单位}}的，激怒状态下则是 3 ~ 10 单位。",
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -114,11 +120,16 @@
       }
     },
     "components/damagetypebonus.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "角色与装备伤害类型加成及倍率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "伤害倍率",
+        "semantic_consistent": true
+      }
     },
     "components/follower.lua": {
       "mention_source": "llm_verdict",

@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/dragonflybrain.lua"
+  },
+  "category": "brain",
+  "display_name": "dragonflybrain",
+  "summary": "龙蝇大脑在实体远离出生点或被水包围时触发战斗重置并强制返回出生点。当生成岩浆虫波次激活时，会飞向岩浆池或自身位置生成岩浆虫并循环尝试攻击或脱卡。默认情境下追击攻击目标，失败则拴回出生点附近。",
+  "api": [
+    {
+      "name": "OnSpawnLavae",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "spawnlavae"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "默认战斗分支（无特殊条件时）"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回生成点坐标的函数",
+        "拴绳最大半径5",
+        "内部返回距离5"
+      ],
+      "context": "ShouldSpawnFn为真时的生成岩浆虫并行节点中"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回家的函数(HomePoint)",
+        "拴绳最大半径20",
+        "内部返回距离10"
+      ],
+      "context": "追击攻击失败后的默认拴回家"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数(GoHome)"
+      ],
+      "context": "ShouldResetFight为真时的重置战斗分支内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldResetFight (离出生点距离平方>=DRAGONFLY_RESET_DIST^2 或 被水包围4格)",
+      "semantic": "触发重置标记，优先级执行重试重置空节点或执行回家缓冲动作(DoAction GoHome)"
+    },
+    {
+      "condition": "ShouldSpawnFn (rampingspawner当前波次>0且已选定生成点)",
+      "semantic": "并行执行拴向生成点(Leash 5,5)与推送spawnlavae事件，并循环检测卡住时攻击或重置脱卡"
+    },
+    {
+      "condition": "默认(上述条件均不满足)",
+      "semantic": "执行追击攻击(ChaseAndAttack)，失败后拴回家(Leash 20,10)"
+    }
+  ],
+  "bt_structure": "根优先级节点: [重置战斗分支(While ShouldResetFight) -> 内部优先级: 重试重置空节点 / 执行回家动作] > [生成岩浆虫分支(While ShouldSpawnFn) -> 并行: 拴向生成点+触发事件 / 循环卡住攻击] > [追击攻击] > [拴回家(Leash 20,10)]",
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      21278,
+      15022,
+      22465,
+      34314,
+      34523,
+      71944,
+      35327
+    ],
+    "aspects": [
+      {
+        "aspect": "主动仇恨与攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "龙蝇主动仇恨 15 距离单位内的玩家，也会仇恨攻击她的实体"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "出生点",
+    "岩浆池",
+    "战斗重置",
+    "返回出生点",
+    "召唤岩浆虫",
+    "拴回出生点",
+    "追击目标",
+    "脱卡"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "49cccd7836c2ea9f5ae90b39f15d7525d1d90eed9c3d758c1137385d4048a930",
+    "source_bytes": 3660,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017855786
+  }
+}

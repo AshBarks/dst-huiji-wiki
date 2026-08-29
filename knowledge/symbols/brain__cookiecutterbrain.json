@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/cookiecutterbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "cookiecutterbrain",
+  "summary": "该大脑控制饼干 cutter 实体在海洋中的行为逻辑。它在钻孔时静止，遇威胁逃离，过远回家，近船跳船，有木头则吃，否则在家园附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的对外调用接口供游戏逻辑使用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "BOARD_BOAT_TIMEOUT",
+    "SCATTER_DIST",
+    "SCATTER_STOP",
+    "FLEE_DIST",
+    "FLEE_STOP",
+    "WANDER_DIST",
+    "WANDER_TIMES"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "当实体状态标签包含 drilling 时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁标识表{tags={\"scarytocookiecutters\"}}",
+        "发现距离 SCATTER_DIST(3)",
+        "安全距离 SCATTER_STOP(5)"
+      ],
+      "context": "默认优先级中直接评估（无显式条件节点包围）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁标签字符串 \"scarytoprey\"",
+        "发现距离 FLEE_DIST(15.5)",
+        "安全距离 FLEE_STOP(14.5)"
+      ],
+      "context": "当 self.inst.is_fleeing 为真时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取吃木头动作函数 EatFoodAction",
+        "节点名 \"Eat Floating\"",
+        "以行走方式执行(false)"
+      ],
+      "context": "在逃跑等行为之后评估"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "目标木头位置函数 GetTargetPosition",
+        "最大拴绳距离 0.1",
+        "内部返回距离 0.1",
+        "行走返回(false)"
+      ],
+      "context": "当存在目标木头坐标时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家园位置获取函数",
+        "最大游荡距离 WANDER_DIST",
+        "游荡时间配置 WANDER_TIMES",
+        "方向计算函数 CalcWanderDir"
+      ],
+      "context": "默认最低优先级游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag(\"drilling\")",
+      "semantic": "执行 StandStill 站立不动"
+    },
+    {
+      "condition": "存在 tags=\"scarytocookiecutters\" 的猎人于 SCATTER_DIST 内",
+      "semantic": "以 SCATTER_STOP 为安全距离逃离 (RunAway)"
+    },
+    {
+      "condition": "inst.is_fleeing == true",
+      "semantic": "以 FLEE_DIST/FLEE_STOP 逃离标签 scarytoprey 目标 (RunAway)"
+    },
+    {
+      "condition": "IsTooFarFromHome(inst)",
+      "semantic": "推送 \"gohome\" 事件并 ConditionWaitNode(false) 挂起尝试回家"
+    },
+    {
+      "condition": "BoatInRange(inst)",
+      "semantic": "尝试跳上船 (TryToBoardBoat) 并等待 BOARD_BOAT_TIMEOUT 秒"
+    },
+    {
+      "condition": "EatFoodAction(inst) ~= nil",
+      "semantic": "以行走方式执行吃木头动作 (DoAction)"
+    },
+    {
+      "condition": "GetTargetPosition(inst) ~= nil",
+      "semantic": "以 Leash 极短距离靠近目标木头"
+    },
+    {
+      "condition": "始终（最低优先级）",
+      "semantic": "在家园附近游荡 (Wander)"
+    }
+  ],
+  "bt_structure": "根 PriorityNode(权重.25) 包含 WhileNode(非跳跃状态) 内嵌 PriorityNode(权重.25)：依次评估 [WhileNode(drilling)->StandStill], [RunAway(scarytocookiecutters)], [WhileNode(is_fleeing)->RunAway(scarytoprey)], [WhileNode(IsTooFarFromHome)->Sequence(PushEvent gohome, Wait false)], [WhileNode(BoatInRange)->Sequence(TryToBoardBoat, Wait BOARD_BOAT_TIMEOUT)], [DoAction(EatFoodAction)], [Leash(GetTargetPosition)], [Wander(home)]。",
+  "wiki": {
+    "scanned_pageids": [
+      22181,
+      13260,
+      72981,
+      15022,
+      15530,
+      51046,
+      10379,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给出的页面摘录涉及 wortox_soul、wortox、vault_pillar_guard、alterguardian_phase3trap、spider_warrior、wagboss_robot、wendy、pigman 等实体，文本中未提及 cookiecutter 实体的吃木头(Eat Floating)、逃离威胁标签(scarytocookiecutters/scarytoprey)及对应距离、drilling 静止、木头拴绳(Leash)、游荡距离配置等行为或数值，因此页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "饼干怪",
+    "吃木头",
+    "逃离",
+    "上船",
+    "游荡",
+    "拴绳",
+    "钻孔",
+    "害怕",
+    "家园",
+    "跳跃"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "71080059313f6e38ed934862cf45412f2fdbbfab0039d83376116ed8d251b590",
+    "source_bytes": 3737,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017630244
+  }
+}

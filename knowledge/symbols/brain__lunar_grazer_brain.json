@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lunar_grazer_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "lunar_grazer_brain",
+  "summary": "该大脑控制月球掠食实体在清醒且非碎片或隐形状态时，根据战斗目标状态进行追击或环绕走位攻击；若目标非睡眠则直接追击攻击，若目标睡眠则在环绕走位等待后攻击。无战斗目标时实体在家附近游荡，长时间无目标且靠近家会消失；处于碎片或隐形状态时触发重生事件。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "lunar_grazer_respawn",
+    "lunar_grazer_despawn"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STRAFE_INNER_DIST",
+    "STRAFE_OUTER_DIST",
+    "WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "目标存在且非睡眠者时直接追击攻击"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "目标睡眠时，在并行环绕走位等待后追击攻击"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "动态锚点函数(围绕目标偏移DoStalking)",
+        "拴绳最大半径0",
+        "内部返回距离0"
+      ],
+      "context": "目标睡眠时并行执行环绕走位"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "动态锚点函数(围绕目标偏移DoStalking)",
+        "拴绳最大半径0",
+        "内部返回距离0"
+      ],
+      "context": "无即时交战条件时执行环绕走位"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回家的函数GetHome",
+        "游荡最大距离4"
+      ],
+      "context": "无战斗目标时并行游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "sg有'debris'标签且战斗有目标且未受伤，或sg有'invisible'标签",
+      "semantic": "推送'lunar_grazer_respawn'事件尝试重生"
+    },
+    {
+      "condition": "sg无'debris'且无'invisible'（清醒）",
+      "semantic": "进入交战或走位或游荡逻辑"
+    },
+    {
+      "condition": "战斗未冷却且有目标",
+      "semantic": "根据目标是否睡眠分支处理"
+    },
+    {
+      "condition": "目标非睡眠者",
+      "semantic": "直接调用追击攻击行为"
+    },
+    {
+      "condition": "目标睡眠中",
+      "semantic": "并行执行环绕拴绳与等待，然后追击攻击"
+    },
+    {
+      "condition": "无战斗目标",
+      "semantic": "在家附近游荡，若靠近家且等待后推送'lunar_grazer_despawn'消失"
+    }
+  ],
+  "bt_structure": "根优先级节点：分支1若处于碎片/隐形状态则触发重生事件；分支2若清醒则内部优先级节点[若可交战则按目标睡眠与否选择直接追击或环绕等待后追击；否则执行环绕走位；并并行执行无目标时游荡与靠近家消失检查]。",
+  "wiki": {
+    "scanned_pageids": [
+      28751,
+      14803,
+      14935,
+      19306
+    ],
+    "aspects": [
+      {
+        "aspect": "睡眠目标攻击条件描述",
+        "evidence": [
+          {
+            "pageid": 19306,
+            "quote": "只会在目标睡觉时攻击目标"
+          }
+        ]
+      },
+      {
+        "aspect": "非催眠目标醒时攻击描述",
+        "evidence": [
+          {
+            "pageid": 19306,
+            "quote": "牧者也会在它们醒着的时候攻击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月球掠食者",
+    "环绕走位",
+    "追击攻击",
+    "目标睡眠",
+    "碎片状态",
+    "隐形状态",
+    "无目标游荡",
+    "触发重生",
+    "战斗目标"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "战斗",
+    "游荡",
+    "状态切换",
+    "召唤消失"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f5d1881f169c0b670cf281c89d2783a94a8daa45257555c9a69ab696c0106e4d",
+    "source_bytes": 3844,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018623223
+  }
+}

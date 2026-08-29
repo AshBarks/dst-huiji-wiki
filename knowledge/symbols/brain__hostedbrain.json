@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/hostedbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "hostedbrain",
+  "summary": "该大脑用于被寄生宿主（如蜘蛛）的 AI 控制。当存在战斗目标且附近预留该目标的寄生体少于2并随机选中时，实体会追击并攻击目标。否则实体会返回围绕目标的阵型位置，清除预留状态，面对目标，并在无指令时游荡或站立。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnStop 生命周期方法以构建和清理行为树，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST",
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "FORMATION_DIST_FROM_TARGET",
+    "FORMATION_SIMULTANEOUS_ATTACKS",
+    "HOSTED_MUST_TAGS",
+    "HOSTED_CANT_TAGS",
+    "FIND_PARASITES_DIST_SQ"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 100 秒",
+        "放弃距离 30 世界单位"
+      ],
+      "context": "CanAttackTarget 返回 true 时由 WhileNode 调用"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "拴绳锚点为阵型位置函数",
+        "拴绳最大半径 4 世界单位",
+        "内部返回距离 2 世界单位",
+        "以跑步速度返回"
+      ],
+      "context": "非攻击状态下返回阵型"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行清除预留目标动作",
+        "节点调试名为“Clear target?”"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取战斗目标为面对对象",
+        "以战斗目标为保持面对条件"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置限制（自由游荡）",
+        "最大游荡距离 3 世界单位",
+        "游荡时间配置:最小走1随机走3最小停3随机停8"
+      ]
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": []
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "CanAttackTarget(inst) 返回 true（有战斗目标、不在冷却、附近预留同目标寄生体少于2且随机选中）",
+      "semantic": "通过 WhileNode 执行 ChaseAndAttack 追击攻击目标（最长100秒，放弃距离30）"
+    },
+    {
+      "condition": "CanAttackTarget(inst) 返回 false",
+      "semantic": "依次执行 Leash 回阵型、DoAction 清预留、FaceEntity 面对、Wander 游荡、StandStill 站立"
+    }
+  ],
+  "bt_structure": "优先级节点树: 根(PriorityNode) -> 1. WhileNode(CanAttackTarget? -> ChaseAndAttack(100,30)); 2. Leash(GetFormationPos,4,2,跑); 3. DoAction(ClearReservedTarget); 4. FaceEntity(GetTarget); 5. Wander(nil,3,times); 6. StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      15434,
+      15246,
+      70704,
+      15247,
+      13408,
+      34314,
+      19061,
+      15530
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录描述了蜘蛛、蜘蛛女王等实体的掉落、生成及一般行为（如普通蜘蛛游荡32单位、放弃仇恨7单位外8秒，女王最多16只蜘蛛跟随获取仇恨），但未体现 brain__hostedbrain 清单中的特定能力（如拴绳半径4、返回距离2、自由游荡最大3、追击100秒放弃30、阵型参数、清除目标等），页面未讨论该符号的 AI 行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宿主",
+    "蜘蛛",
+    "阵型",
+    "追击",
+    "返回",
+    "清除预留",
+    "面对",
+    "游荡",
+    "站立",
+    "同时攻击"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "997f35a76b1d176efcdd376891a01d35e9bc524a7ae32c8c173f937ca7c187f5",
+    "source_bytes": 4611,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018224511
+  }
+}

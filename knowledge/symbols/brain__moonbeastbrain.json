@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/moonbeastbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "moonbeastbrain",
+  "summary": "月亮兽大脑在实体脱离月亮基地过远或基地消失时令其自杀，在月亮充能结束时触发石化。平时会破坏骨架、攻击墙壁，若有可充能的月亮基地则前往工作，否则追击攻击玩家，未追击时返回基地，危急时恐慌。",
+  "api": [
+    {
+      "name": "ForcePetrify",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "workmoonbase",
+    "moonpetrify"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WORK_DIST",
+    "LOST_DIST",
+    "RETURN_DIST",
+    "BASE_DIST",
+    "LOST_TIME",
+    "AGGRO_TIME",
+    "PETRIFY_TIME",
+    "PETRIFY_TIME_VAR"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 100 秒"
+      ],
+      "context": "根节点默认"
+    },
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [],
+      "context": "根节点序列中"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "拴绳锚点为月亮基地位置函数",
+        "最大半径 WORK_DIST(3)",
+        "内部返回距离 WORK_DIST(3)"
+      ],
+      "context": "ShouldTargetMoonBase 分支内"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "拴绳锚点为获取月亮基地位置函数",
+        "最大半径 RETURN_DIST(15)",
+        "内部返回距离 BASE_DIST(6)"
+      ],
+      "context": "根节点默认"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "启动与保持均无额外条件函数"
+      ],
+      "context": "ShouldTargetMoonBase 分支内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "LostMoonBase(self) 返回真（离开基地>LOST_DIST或基地消失超过LOST_TIME）",
+      "semantic": "执行 health:Kill() 自杀"
+    },
+    {
+      "condition": "LostMoonCharge(self) 返回真（月亮充能结束且石化计时到达）",
+      "semantic": "推送 moonpetrify 事件使实体石化"
+    },
+    {
+      "condition": "ShouldTargetMoonBase(inst) 返回真（有可工作月亮基地且处于充能计时且近期未被攻击）",
+      "semantic": "优先 Leash 至 WORK_DIST 内并 WorkMoonBase，然后 StandStill"
+    },
+    {
+      "condition": "默认（上述条件均不满足）",
+      "semantic": "先 BreakSkeletons+AttackWall 序列，然后 ChaseAndAttack(100)，Leash 回基地，Panic"
+    }
+  ],
+  "bt_structure": "根优先级节点(.25)：BrainCommon恐慌触发 -> 丢失月亮基地则自杀 -> 丢失充能则石化 -> 破坏骨架并攻击墙序列 -> 应攻击基地则靠近工作并站立 -> 追击攻击玩家(100秒) -> 拴回月亮基地 -> 恐慌",
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      18487,
+      45173,
+      13701,
+      15941,
+      15938,
+      34314,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及熔炉装备、石化树、巨兽恐慌、远古织影者、犀牛兄弟、大熔炉猪战士、世界生成、克劳斯等实体，未包含月亮巨兽（Moonbeast）或其大脑 moonbeastbrain 的相关行为描述（如拴绳至月亮基地、追击、攻击墙、WORK_DIST/LOST_DIST/RETURN_DIST/BASE_DIST 等），其中提及的石化时间属于其他实体或装备而非本符号，故无对应能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月兽",
+    "月兽脑",
+    "石化",
+    "月亮充能",
+    "攻击墙",
+    "破坏骨骼",
+    "返回基地",
+    "恐慌",
+    "追击玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1e9919fcbe00f238c096865549dbbd254fb2cd2e672e8d9063a5ccfe71180418",
+    "source_bytes": 4006,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018766692
+  }
+}

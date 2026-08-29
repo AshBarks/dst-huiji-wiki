@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/moonstormstaticbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "moonstormstaticbrain",
+  "summary": "该大脑让实体以自身当前位置为锚点在附近游荡。游荡最大距离为8，且通过检查函数确保游荡点必须是陆地，并在存在月风暴组件时进一步限制在点位于月风暴内。实体没有攻击或复杂逻辑，仅执行基础的游荡行为。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 以构建行为树，未定义任何额外的公开方法（除 Brain 基类提供的方法外）。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "WanderTimes"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回实体当前位置作为家位置的函数",
+        "最大游荡距离 8",
+        "游荡时间配置表(最小行走3秒,随机行走1秒,最小等待0.5秒,随机等待1秒)",
+        "无自定义获取方向函数",
+        "无设置方向函数",
+        "检查点函数(要求陆地，若世界有月风暴组件则额外要求位于月风暴内)"
+      ]
+    }
+  ],
+  "bt_structure": "优先级节点(优先级1)下仅包含游荡行为：实体以自身位置为锚点，在最大距离8内游荡，使用特定时间参数并通过检查点函数限制游荡点为陆地且位于月风暴内。",
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      14589,
+      15239,
+      15682,
+      19769,
+      22383,
+      46847,
+      57310
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及攻击机制及尘蛾、兔人、球状光虫、熔合暗影、拾荒疯猪、天体后裔、地热螨等实体，其中虽有多处“游荡”描述，但均指定固定家园（整洁洞穴、兔屋、荧光花、裂隙、垃圾堆、竞技场中央、生成点）而非实体当前位置为家；未出现最大游荡距离8、游荡时间配置（最小行走3秒/随机1秒/最小等待0.5秒/随机1秒）、检查点要求陆地或位于月风暴内等数值或条件；全文无“月风暴”或静态大脑相关表达，故页面未讨论 brain__moonstormstaticbrain 的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "最大距离",
+    "月风暴大脑",
+    "附近游荡",
+    "必须陆地",
+    "月风暴内",
+    "自身锚点",
+    "基础游荡",
+    "无攻击",
+    "游荡点"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "月风暴",
+    "游荡",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bba1f216c5390daa8b39f417797816b4497fcdf47b5f79b682e1286bfe20a676",
+    "source_bytes": 916,
+    "model": "hy3-free",
+    "generated_at_ms": 1788018815832
+  }
+}

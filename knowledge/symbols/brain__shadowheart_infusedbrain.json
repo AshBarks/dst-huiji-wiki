@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowheart_infusedbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowheart_infusedbrain",
+  "summary": "该大脑控制实体在察觉到附近玩家时优先逃离，直至拉开安全距离后停止。若周围没有玩家威胁，实体将无条件原地静止不动。行为树以0.25秒的速率更新决策。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法用于构建行为树，未自定义其他可供外部调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "逃离带有 player 标签的实体（玩家）",
+        "发现玩家距离半径 4.0",
+        "判定脱离危险的安全距离 6.0"
+      ],
+      "context": "优先级节点首选行为"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "前述行为不满足条件时执行"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. 逃离玩家（察觉距 AVOID_PLAYER_DIST=4，安全距 AVOID_PLAYER_STOP=6）；2. 原地静止；整体以 UPDATE_RATE=0.25 秒间隔更新。",
+  "wiki": {
+    "scanned_pageids": [
+      15973,
+      13476,
+      17816,
+      22516,
+      24540,
+      15651,
+      65872,
+      15415
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及实体mermguard、merm、dragonfly及料理烹饪、地块等，未提及brain__shadowheart_infusedbrain或相关实体，且无任何关于逃离玩家（发现半径4.0/安全距离6.0）、原地静止、更新速率、避免玩家距离/停止等行为描述，故页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "逃离玩家",
+    "行为树",
+    "优先级",
+    "安全距离",
+    "暗影之心",
+    "原地不动",
+    "察觉范围",
+    "更新速率"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "33b89d025ee7d4740d4acdb780d7f3e9612d920cd1d44c800e5a14988c20bce7",
+    "source_bytes": 540,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019330657
+  }
+}

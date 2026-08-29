@@ -1,0 +1,316 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/cozy_bunnymanbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "cozy_bunnymanbrain",
+  "summary": "舒适兔人大脑控制兔人在多种情境下的行为，包括日常闲逛、与玩家互动、种植或捡回枕头、参与枕头大战与胡萝卜小游戏等。它会根据是否处于小游戏、是否有枕头、是否被惊吓等条件动态切换优先级行为树节点，实现从平静社交到战斗竞技的过渡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法，行为逻辑全在内部函数与节点中。",
+  "events_published": [
+    "gobacktocave",
+    "question",
+    "dance",
+    "cheer",
+    "hide",
+    "disappoint",
+    "setupprizes",
+    "digtolocation",
+    "raiseobject"
+  ],
+  "events_listened": [
+    "onpickup",
+    "oneaten"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "MAX_ARENA_WANDER_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "GAMERANGE",
+    "PRIORITY_NODE_RATE",
+    "MINIGAME_WANDER_DATA",
+    "ARENA_WANDER_DATA",
+    "WANDER_DATA"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长0.5秒",
+        "放弃距离2倍兔人圆环竞技场半径",
+        "最大攻击1次"
+      ],
+      "context": "枕头大战中举起枕头后准备挥击时追击"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回竞技场外相邻位置的函数",
+        "最大距离0.1",
+        "内部返回距离0.1",
+        "跑步true"
+      ],
+      "context": "非竞赛者观看枕头大战位置"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取目标函数(返回小游戏实体)",
+        "保持面对函数(非竞赛者判断)"
+      ],
+      "context": "非竞赛者面对竞技场"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回小游戏起始位置的函数",
+        "最大距离0.2",
+        "内部返回距离0.2",
+        "跑步true"
+      ],
+      "context": "小游戏开场走向起始位置"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回竞技场中心的函数",
+        "最大距离0.6倍竞技场半径",
+        "内部返回距离0.4倍竞技场半径"
+      ],
+      "context": "枕头大战中拴在竞技场范围"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回竞技场中心的函数",
+        "最大游荡距离MAX_ARENA_WANDER_DIST",
+        "游荡数据MINIGAME_WANDER_DATA"
+      ],
+      "context": "枕头大战中并行游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回无领袖家位置的函数",
+        "最大游荡距离MAX_WANDER_DIST",
+        "游荡数据WANDER_DATA"
+      ],
+      "context": "平时在家附近游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回竞技场中心的函数",
+        "最大游荡距离MAX_ARENA_WANDER_DIST",
+        "游荡数据ARENA_WANDER_DATA"
+      ],
+      "context": "有竞技场时游荡"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数(吃胶状物)",
+        "节点名'eat goop'",
+        "跑动true"
+      ],
+      "context": "胡萝卜游戏中吃掉落胶状物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数(参与胡萝卜游戏)",
+        "节点名'play carrot game'",
+        "跑动true"
+      ],
+      "context": "非主持兔参与胡萝卜游戏"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数(管理胡萝卜游戏)",
+        "节点名'manage carrot game'",
+        "跑动true"
+      ],
+      "context": "主持兔管理胡萝卜游戏"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "胡萝卜游戏无动作时站立"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "恐慌聊天内容函数PanicChat",
+        "子节点Panic(恐慌行为)"
+      ],
+      "context": "被惊吓/着火/需隐藏时恐慌并说话"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "被惊吓/着火/需隐藏时恐慌(在ChattyNode内)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数(离开洞穴)",
+        "节点名'should leave'",
+        "跑动true"
+      ],
+      "context": "特殊事件结束或需返回洞穴"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数(种枕头)",
+        "节点名'plant pillow'",
+        "跑动true"
+      ],
+      "context": "无竞技场时种植枕头(包裹ChattyNode)"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天键'COZY_RABBIT_GETTOKEN'",
+        "子节点Leash(拴在战斗位置)",
+        "延迟nil",
+        "随机延迟nil",
+        "进入延迟0.5",
+        "进入随机延迟0.5"
+      ],
+      "context": "在竞技场战斗位置附近拴住"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回枕头战斗位置的函数",
+        "最大距离0.5",
+        "内部返回距离0.5"
+      ],
+      "context": "竞技场战斗位置拴住(在ChattyNode内)"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天键'COZY_RABBIT_GREET'",
+        "子节点FaceEntity(面对玩家)"
+      ],
+      "context": "平时问候玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取最近玩家目标函数",
+        "保持面对条件函数",
+        "面对超时3秒"
+      ],
+      "context": "平时面对玩家打招呼"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "panic_test (被惊吓/着火/需隐藏计时)",
+      "semantic": "进入恐慌节点，边聊天边逃跑"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence",
+      "semantic": "避开电网并说话"
+    },
+    {
+      "condition": "参与枕头大战小游戏(minigame_participator类型bunnyman_pillowfighting)",
+      "semantic": "执行枕头大战专属行为树：非竞赛者观看、开场走位、挥枕攻击、竞技场游荡"
+    },
+    {
+      "condition": "持有战斗奖品(fightprizes>0)",
+      "semantic": "掉落奖品给玩家"
+    },
+    {
+      "condition": "无竞技场实体(entitytracker无arena)",
+      "semantic": "尝试种植枕头或返回枕头点"
+    },
+    {
+      "condition": "胡萝卜游戏进行中(checkforcarrotgame)",
+      "semantic": "主持兔管理游戏或参与兔玩游戏，吃胶状物、吃胡萝卜等"
+    },
+    {
+      "condition": "已知枕头战斗位置(knownlocations有pillowfightlocation)",
+      "semantic": "在竞技场战斗位置附近拴住并游荡"
+    },
+    {
+      "condition": "有竞技场实体(entitytracker有arena)",
+      "semantic": "在竞技场周围游荡"
+    },
+    {
+      "condition": "平时(无特殊状态)",
+      "semantic": "问候玩家、随机挥枕、闲逛"
+    }
+  ],
+  "bt_structure": "根优先级节点：恐慌/避电 -> 离开洞穴 -> 隐藏/睡觉 -> 枕头大战 -> 奖品/枕头/竞技场 -> 胡萝卜游戏 -> 欢呼/随机挥枕 -> 竞技场拴住/返回 -> 问候 -> 游荡。枕头大战子树：非竞赛者观看/开场走位/挥击追击/并行游荡/拴住。胡萝卜游戏子树：吃胶/玩家玩/主持管理/站立。",
+  "wiki": {
+    "scanned_pageids": [
+      51949,
+      46847,
+      51046,
+      51626,
+      51097,
+      51094,
+      34523,
+      51624
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，仅页面51097等提及舒适的兔人实体，但仅描述其生成、作息及参与枕头大战的概况，未涉及大脑AI的具体行为逻辑（如游荡距离、追击、拴住、动作节点等）；其他页面关于竞技场、其他实体或布景，与cozy_bunnymanbrain能力无关，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "舒适兔人",
+    "枕头大战",
+    "胡萝卜游戏",
+    "种枕头",
+    "回洞穴",
+    "恐慌逃跑",
+    "闲逛",
+    "问候玩家",
+    "掉落奖品",
+    "竞技场"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "活动",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "054542c28b7a65712c4abd357ecf86a30d398c51ac3dafd5199cc758d6b5c485",
+    "source_bytes": 34880,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017746011
+  }
+}

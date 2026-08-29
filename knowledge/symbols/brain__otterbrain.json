@@ -1,0 +1,244 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/otterbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "otterbrain",
+  "summary": "水獭大脑让实体在饥饿时寻找并食用地面食物、从容器或角色处偷取食物或丢弃背包食物；在收集足够物品后回家储藏；在夜晚或冬天回家睡觉；平时在巢穴附近游荡、捡拾物品、采摘海带、尝试捕鱼；受到攻击时会追击反击；恐慌时逃跑。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnStop 生命周期方法，未定义额外的对外调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "onreachdestination"
+  ],
+  "netvars": [],
+  "tunables": [
+    "INTERACT_COOLDOWN_NAME",
+    "FINDITEMS_CANT_TAGS",
+    "SEE_ITEM_DISTANCE",
+    "BOAT_SIZE_SQ",
+    "ISNT_HUNGRY_NAME",
+    "CONTAINER_MUST_TAGS",
+    "CONTAINER_CANT_TAGS",
+    "STEAL_COOLDOWN_NAME",
+    "CHARACTER_MUST_TAGS",
+    "CHARACTER_CANT_TAGS",
+    "CHARACTER_ONEOF_TAGS",
+    "PICKABLE_MUST_TAGS",
+    "PICKABLE_CANT_TAGS",
+    "PICKABLE_ONEOF_TAGS",
+    "MUST_TOSSABLE_TAGS",
+    "NOT_TOSSABLE_TAGS",
+    "UPDATE_RATE",
+    "ACTION_TIMEOUT_TIME",
+    "STEAL_CHASE_TIMEOUT_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 4 秒",
+        "放弃距离 1.5倍最大游荡距离(约45世界单位)"
+      ],
+      "context": "常态下反击或追击目标"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取吃地面食物动作的函数",
+        "节点名“Look For Ground Food”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "饥饿时优先吃地面食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取丢弃背包食物动作的函数",
+        "节点名“Drop Food From Pockets”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "饥饿时若背包有食物则丢弃"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取搜容器食物动作的函数",
+        "节点名“Look For Container Food”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "饥饿时搜容器食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取偷角色食物动作的函数",
+        "节点名“Look For Character Food”",
+        "不指定跑动(nil)",
+        "动作超时 4 秒"
+      ],
+      "context": "饥饿时偷角色食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取回家动作的函数",
+        "节点名“Sleep At Home”",
+        "以跑动方式执行(true)",
+        "动作超时 10 秒"
+      ],
+      "context": "夜晚或冬天回家睡觉"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取回家动作的函数",
+        "节点名“Stash Items At Home”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "收集足够物品后回家储藏"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取捡地面物品动作的函数",
+        "节点名“Look For Ground Edibles”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "物品不足时捡地面可食物品"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取搜容器食物动作的函数",
+        "节点名“Look For Container Food”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "物品不足时搜容器食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取偷角色食物动作的函数",
+        "节点名“Look For Character Food”",
+        "不指定跑动(nil)",
+        "动作超时 4 秒"
+      ],
+      "context": "物品不足时偷角色食物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取采摘海带动作的函数",
+        "节点名“Harvest Kelp”",
+        "不指定跑动(nil)",
+        "动作超时 10 秒"
+      ],
+      "context": "物品不足时采摘海带"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置的函数",
+        "最大游荡距离 30 世界单位"
+      ],
+      "context": "物品不足分支末尾游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置的函数",
+        "最大游荡距离 30 世界单位"
+      ],
+      "context": "默认游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.components.timer:TimerExists('ate_recently') (IsHungry_Redirect)",
+      "semantic": "饥饿时优先执行吃地面食物、丢弃背包食物、搜容器食物、偷角色食物"
+    },
+    {
+      "condition": "TheWorld.state.iswinter or (TheWorld.state.isnight and (TheWorld.state.iscavenight or not self.inst:IsInLight()))",
+      "semantic": "夜晚或冬天时跑动回家睡觉"
+    },
+    {
+      "condition": "HasEnoughItems(self.inst) and not self.inst.components.timer:TimerExists('dump_loot_at_home')",
+      "semantic": "携带物品达到上限且未处于倾倒冷却时回家储藏物品"
+    },
+    {
+      "condition": "not HasEnoughItems(self.inst) (DoesntHaveEnoughItems_Redirect)",
+      "semantic": "物品不足时寻找地面可食物品、搜容器、偷食物、尝试捕鱼、采摘海带、否则在家附近游荡"
+    },
+    {
+      "condition": "GetNearbyFishTarget(self.inst) ~= nil (within Not Enough Items)",
+      "semantic": "附近有可投掷海鱼时走向鱼尝试捕鱼"
+    },
+    {
+      "condition": "not self.inst.sg:HasStateTag('jumping') (FailIfSuccessDecorator ConditionWaitNode)",
+      "semantic": "跳跃状态下阻塞大脑逻辑直至落地"
+    }
+  ],
+  "bt_structure": "根优先级节点依次包含：跳跃阻塞等待 -> 恐慌触发 -> 电击栅栏恐慌 -> 追击攻击(4秒/45单位) -> 饥饿觅食分支(吃/丢/搜/偷) -> 夜冬回家睡觉 -> 满物品回家储藏 -> 物品不足收集游荡分支(捡/搜/偷/捕鱼/摘海带/游荡) -> 默认游荡",
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      13701,
+      15022,
+      45173,
+      15237,
+      51046,
+      72981,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面实体为海洋拖网捕鱼器套装、远古织影者、天体英雄、巨兽恐慌、猪人、战争瓦器人、远古戍卫塔、寄居蟹隐士，文本中均未提及水獭(otter)相关行为，无任何与otterbrain能力清单（如吃地面食物、偷角色食物、搜容器、回家睡觉、采摘海带、游荡距离30、追击4秒等）对应的玩家语言表达，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水獭大脑",
+    "觅食",
+    "偷食物",
+    "回家",
+    "追击",
+    "摘海带",
+    "捕鱼",
+    "储藏",
+    "恐慌",
+    "游荡"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "采集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ea46e77a9160a1564bdd2b1f7b3f8a30ae607d6edb4bb7c34247d89c3b1a11ec",
+    "source_bytes": 15360,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019123662
+  }
+}

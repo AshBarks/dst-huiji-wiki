@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/daywalkerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "daywalkerbrain",
+  "summary": "该大脑控制 Daywalker 在拥有战斗目标时，依据冷却与潜行状态切换躲避、潜行绕圈或追逐攻击行为。无目标时它会面对目标、延迟脱离战斗并返回监狱位置或四处游荡。整体行为通过优先级节点树实现，包含风筝、潜行接近与回家等战术。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart构建行为树，未定义额外公开方法，行为逻辑全部封装在本地函数与行为树节点中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RESET_COMBAT_DELAY",
+    "MIN_STALKING_TIME",
+    "MAX_STALKING_CHASE_TIME",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "HUNTER_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "猎人参数表(标签过滤)",
+        "发现猎人距离8",
+        "脱离危险距离13"
+      ],
+      "context": "Kiting分支(ShouldDodge)"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "潜行移动点函数DoStalking",
+        "最大距离0",
+        "内部返回距离0",
+        "步行(false)"
+      ],
+      "context": "Stalking分支并行"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "最长追逐时间无",
+        "放弃距离无",
+        "最大攻击次数无",
+        "寻找新目标无",
+        "步行(true)"
+      ],
+      "context": "Stalking Chase内"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "Chase分支内"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取目标函数(返回战斗目标)",
+        "保持目标函数(目标仍是战斗目标)"
+      ],
+      "context": "主要分支之后"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "家位置函数GetHomePos(监狱)",
+        "最大距离16",
+        "内部返回距离2",
+        "跑步(true)"
+      ],
+      "context": "并行节点中优先返回家"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "无家位置",
+        "最大距离无",
+        "时间无",
+        "方向函数无",
+        "设置方向无",
+        "检验函数无",
+        "数据表(奔跑为真)"
+      ],
+      "context": "Leash回家失败后的游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldDodge(self.inst)",
+      "semantic": "有战斗目标且冷却中且非潜行时，执行RunAway逃离猎人，并可能设置潜行与攻击冷却"
+    },
+    {
+      "condition": "ShouldStalk(self.inst)",
+      "semantic": "处于潜行状态且(冷却中或无目标)时，并行潜行绕圈移动与等待计时，接近后重置冷却"
+    },
+    {
+      "condition": "ShouldChase(self.inst)",
+      "semantic": "有战斗目标且不在冷却时，若潜行则限时潜行追逐(步行攻击)后取消潜行，否则直接追逐攻击"
+    },
+    {
+      "condition": "默认(无上述条件)",
+      "semantic": "面对战斗目标，延迟重置战斗状态，并优先返回监狱否则奔跑游荡"
+    }
+  ],
+  "bt_structure": "PriorityNode(忙碌状态守卫) -> PriorityNode: [WhileNode(Kiting): RunAway; WhileNode(Stalking): Parallel(Leash绕圈, 等待重置); WhileNode(Chase): Priority(潜行追逐步行/普通追逐); FaceEntity; Parallel(延迟重置, Priority(Leash回家, Wander游荡))]",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      15551,
+      15386,
+      20154,
+      13551,
+      13761,
+      14936
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为alterguardian_phase3trap、wagboss_robot、beequeen、teenbird、mutatedbearger、gestalt、worm、trails，均非daywalker相关实体；文本中未体现潜行移动(DoStalking)、猎人参数(发现距离8/脱离13)、监狱回家(最大16内部2)、无家游荡或对应追逐/逃跑数值等行为描述，页面根本不讨论brain__daywalkerbrain的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "日行者",
+    "潜行",
+    "躲避",
+    "追逐",
+    "返回监狱",
+    "游荡",
+    "战斗冷却",
+    "风筝",
+    "绕圈"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9d53011a181a49cf0891e1ff043ee492dc275d1856adcba6da916341b074166e",
+    "source_bytes": 5398,
+    "model": "hy3-free",
+    "generated_at_ms": 1788017824244
+  }
+}

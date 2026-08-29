@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_ms": 1788005148372,
+  "generated_at_ms": 1788019601209,
   "totals": {
     "pages": 756,
     "pages_with_mention": 360,
@@ -8,10 +8,10 @@
     "mentioned_by_source": {
       "pass2_evidence": 83,
       "fact_match": 30,
-      "llm_verdict": 577
+      "llm_verdict": 588
     },
-    "stub_pairs": 5381,
-    "stub_unaudited": 376
+    "stub_pairs": 5370,
+    "stub_unaudited": 187
   },
   "symbols": {
     "behaviours/attackwall.lua": {
@@ -25,12 +25,12 @@
     },
     "behaviours/chaseandattack.lua": {
       "routed": 16,
-      "mentioned": 0,
-      "stub": 16,
-      "stub_unaudited": 16,
+      "mentioned": 4,
+      "stub": 12,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 4
     },
     "behaviours/chaseandram.lua": {
       "routed": 2,
@@ -54,7 +54,7 @@
       "routed": 11,
       "mentioned": 0,
       "stub": 11,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -63,7 +63,7 @@
       "routed": 11,
       "mentioned": 0,
       "stub": 11,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -79,12 +79,12 @@
     },
     "behaviours/follow.lua": {
       "routed": 7,
-      "mentioned": 0,
-      "stub": 7,
-      "stub_unaudited": 7,
+      "mentioned": 3,
+      "stub": 4,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 3
     },
     "behaviours/leash.lua": {
       "routed": 13,
@@ -126,7 +126,7 @@
       "routed": 9,
       "mentioned": 0,
       "stub": 9,
-      "stub_unaudited": 9,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -412,12 +412,12 @@
     },
     "components/damagetypebonus.lua": {
       "routed": 13,
-      "mentioned": 0,
-      "stub": 13,
-      "stub_unaudited": 13,
+      "mentioned": 4,
+      "stub": 9,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 4
     },
     "components/debuff.lua": {
       "routed": 1,
@@ -459,7 +459,7 @@
       "routed": 69,
       "mentioned": 14,
       "stub": 55,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
       "summary": 13
@@ -558,7 +558,7 @@
       "routed": 584,
       "mentioned": 6,
       "stub": 578,
-      "stub_unaudited": 44,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 6
@@ -576,7 +576,7 @@
       "routed": 735,
       "mentioned": 8,
       "stub": 727,
-      "stub_unaudited": 190,
+      "stub_unaudited": 130,
       "inconsistent": 0,
       "detailed": 1,
       "summary": 7
@@ -630,7 +630,7 @@
       "routed": 312,
       "mentioned": 121,
       "stub": 191,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 121

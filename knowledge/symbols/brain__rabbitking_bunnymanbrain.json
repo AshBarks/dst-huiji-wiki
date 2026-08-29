@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/rabbitking_bunnymanbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "rabbitking_bunnymanbrain",
+  "summary": "该大脑控制兔王旗下的兔人实体，在受惊、被闹鬼、着火或遇电栅栏时触发对应的恐慌或躲避行为并播放特定喊话。平静状态下优先追击攻击敌人，随后跟随领导者（兔王）保持适当距离，无领导者时则在领导者附近游荡并定期检查，失去领导者后挖洞逃离。",
+  "api": [],
+  "api_note": "该大脑类仅重写了 Brain 的 OnStart 方法以构建行为树，未定义其他供外部调用的自定义方法。",
+  "events_published": [
+    "burrowaway"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicWhenScared",
+      "args_semantic": [
+        "实体自身",
+        "恐惧阈值 0.25",
+        "聊天字符串键 RABBIT_PANICBOSS"
+      ],
+      "context": "优先级最高分支"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天字符串键 RABBIT_PANICHAUNT",
+        "子行为 Panic 节点"
+      ],
+      "context": "WhileNode 被闹鬼恐慌时"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天字符串键 RABBIT_PANICFIRE",
+        "子行为 Panic 节点"
+      ],
+      "context": "WhileNode 着火时"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天字符串键 RABBIT_PANICELECTRICITY",
+        "子行为 AvoidElectricFence 节点"
+      ],
+      "context": "WhileNode 需避开电栅栏时"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "作为 ChattyNode 子节点（闹鬼/着火）"
+    },
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "作为 ChattyNode 子节点（避电栅栏）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 10 秒",
+        "放弃距离 30 世界单位"
+      ],
+      "context": "默认战斗分支"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "获取领导者函数 GetLeader",
+        "最小跟随距离 2",
+        "期望跟随距离 5",
+        "最大跟随距离 9"
+      ],
+      "context": "无战斗时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取领导者位置函数 GetLeaderPos",
+        "最大游荡距离 8"
+      ],
+      "context": "并行节点中游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.hauntable and self.inst.components.hauntable.panic",
+      "semantic": "被闹鬼触发恐慌时，边播放 RABBIT_PANICHAUNT 喊话边执行 Panic 行为"
+    },
+    {
+      "condition": "self.inst.components.health.takingfiredamage",
+      "semantic": "着火受火伤时，边播放 RABBIT_PANICFIRE 喊话边执行 Panic 行为"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence(self.inst)",
+      "semantic": "需要避开电栅栏时，边播放 RABBIT_PANICELECTRICITY 喊话边执行 AvoidElectricFence 行为"
+    },
+    {
+      "condition": "BrainCommon.PanicWhenScared 内部判定恐惧超阈值",
+      "semantic": "被吓坏时执行恐慌并播放 RABBIT_PANICBOSS 喊话"
+    }
+  ],
+  "bt_structure": "优先级节点(权重0.5): 1.受惊恐慌(PanicWhenScared); 2.被闹鬼时聊天恐慌; 3.着火时聊天恐慌; 4.避电栅栏时聊天躲避; 5.追击攻击(最长10秒/弃距30); 6.跟随领导者(距2~9); 7.并行:以领导者位置游荡(最大8)与每秒检查无领导者则推送burrowaway事件。",
+  "wiki": {
+    "scanned_pageids": [
+      28179,
+      15239,
+      51097,
+      34523,
+      51626,
+      28183,
+      28181,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随领导者行为描述",
+        "evidence": [
+          {
+            "pageid": 28183,
+            "quote": "没有皇家兔子警卫跟随自己时就会召唤"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "兔王",
+    "兔人",
+    "游荡",
+    "恐慌",
+    "行为树",
+    "追击",
+    "跟随",
+    "电栅栏",
+    "着火",
+    "挖洞"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 1/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f148b16f84d834390166a1a3939af8c06ff5747a11e402c47071e4fad42b3175",
+    "source_bytes": 2310,
+    "model": "hy3-free",
+    "generated_at_ms": 1788019206221
+  }
+}

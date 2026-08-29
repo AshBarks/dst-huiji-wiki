@@ -52,7 +52,8 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -61,7 +62,8 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/faceentity.lua": {
       "aspects_ignored": [
@@ -69,7 +71,8 @@
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/leash.lua": {
       "aspects_ignored": [
@@ -89,7 +92,8 @@
         "实体静止与停止移动描写"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

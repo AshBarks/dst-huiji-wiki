@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwerepig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwerepig",
+  "summary": "该状态图驱动猪人变身后的狼人猪（werepig）实体，管理其从变身、待机、移动、攻击到死亡等一系列行为。状态组织上除自定义核心状态外，还借助 CommonStates 批量添加了睡眠、冰冻、触电、跳跃、下沉等通用状态，并通过事件监听实现战斗与目标切换响应。",
+  "api": [],
+  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未对外暴露任何方法或接口。",
+  "events_published": [],
+  "events_listened": [
+    "transformwere",
+    "giveuptarget",
+    "newcombattarget",
+    "attacked",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.PIG_MAX_STUN_LOCKS"
+  ],
+  "states": [
+    "death",
+    "howl",
+    "transformWere",
+    "idle",
+    "attack",
+    "run_start",
+    "run",
+    "run_stop",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "eat",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "transformWere",
+      "note": "由 transformwere 事件触发（实体未死亡时），播放变身动画并添加 hostile 标签，变身结束后进入 howl 状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，第16帧执行 DoAttack 造成伤害，动画结束后若无目标有概率咆哮否则待机。"
+    },
+    {
+      "state": "howl",
+      "note": "咆哮状态，标签 busy，常用于获得新目标或放弃目标时触发，第20帧播放嚎叫音效。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放受伤音效与 hit 动画，结束后回到 idle。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，停止移动并移除物理碰撞，掉落死亡战利品后播放死亡动画。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，第20帧执行缓冲的进食动作，结束后可能咆哮或待机。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      24748,
+      15022,
+      15421,
+      16419,
+      19344,
+      24875,
+      13406
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定需检索的 SGwerepig 能力方面，页面15421虽描述疯猪但无待查清单匹配，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "狼人猪",
+    "猪人变身",
+    "狼人咆哮",
+    "狼人攻击",
+    "狼人进食",
+    "受击硬直",
+    "变身动画"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5f85b6bab91ae9bdf5a61dd807a1628d9544bb61e8148a259dceee96c561db19",
+    "source_bytes": 9339,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968412200
+  }
+}

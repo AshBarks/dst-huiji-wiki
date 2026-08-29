@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGeyeofterror.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGeyeofterror",
+  "summary": "该状态图驱动恐怖之眼（eyeofterror）实体，涵盖普通眼与嘴形态的行为逻辑。状态组织以事件监听（如攻击、冲锋、生成小眼、变形、离开）触发，结合带无敌帧和硬直标签的动画状态，实现Boss战中的移动、AOE攻击与召唤等机制。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和状态标签驱动实体行为，未定义任何对外调用的方法。",
+  "events_published": [
+    "on_landed",
+    "on_no_longer_landed",
+    "arrive",
+    "forgetme",
+    "turnoff_terrarium",
+    "finished_leaving",
+    "flyback",
+    "docollapse",
+    "spawnnewboatleak"
+  ],
+  "events_listened": [
+    "doattack",
+    "spawnminieyes",
+    "chomp",
+    "charge",
+    "focustarget",
+    "health_transform",
+    "leave",
+    "arrive",
+    "flyback",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.EYEOFTERROR_CHARGE_AOERANGE",
+    "TUNING.EYEOFTERROR_AOE_DAMAGE",
+    "TUNING.EYEOFTERROR_AOERANGE"
+  ],
+  "states": [
+    "standby",
+    "idle",
+    "taunt",
+    "charge_pre",
+    "charge_loop",
+    "charge_pst",
+    "mouthcharge_loop",
+    "spawnminieyes",
+    "spawnminieyes_mouth",
+    "spawnminieyes_mouth_loop",
+    "spawnminieyes_mouth_pst",
+    "focustarget",
+    "transform",
+    "arrive_delay",
+    "arrive",
+    "chomp",
+    "death",
+    "flyaway",
+    "flyback_delay",
+    "flyback"
+  ],
+  "state_notes": [
+    {
+      "state": "charge_pre",
+      "note": "冲锋前摇状态，锁定目标并启动冲锋冷却，变形后转为嘴冲锋循环；期间可追踪转向目标。"
+    },
+    {
+      "state": "charge_loop",
+      "note": "普通眼高速冲锋状态，以固定速度移动并周期性进行AOE碰撞检测，对范围内实体触发OnCollide伤害。"
+    },
+    {
+      "state": "chomp",
+      "note": "啃咬攻击，在动画特定帧进行范围AOE伤害并生成地裂或水花，附带镜头震动，之后解除硬直。"
+    },
+    {
+      "state": "spawnminieyes",
+      "note": "生成地面小眼状态，落地后产出eyeofterror_mini_grounded并加入指挥官系统，期间免疫睡眠/冰冻/触电。"
+    },
+    {
+      "state": "transform",
+      "note": "恐怖之眼变形为嘴形态的状态，播放变形动画并触发史诗恐惧，完成后切换形态标签。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽咆哮状态，播放音效并触发短时长史诗恐惧，常用于攻击前或冲锋后切换目标。"
+    },
+    {
+      "state": "arrive",
+      "note": "降临状态，播放到达动画，前期处于无敌且带flight标签，后期解除无敌并允许攻击。"
+    },
+    {
+      "state": "flyaway",
+      "note": "离开状态，播放飞走动画，在特定帧变为无敌并添加flight标签，结束后推送finished_leaving事件。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，移除物理碰撞与点击，播放死亡动画并掉落战利品，触发史诗恐惧后进入尸体状态。"
+    },
+    {
+      "state": "focustarget",
+      "note": "指挥状态，咆哮并命令所有小眼聚焦当前战斗目标，期间免疫睡眠/冰冻/触电。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15832,
+      13897,
+      14816,
+      15941,
+      14710,
+      13406,
+      13606,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，未列出任何能力语义，无法在页面中找到对应表达",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "恐怖之眼",
+    "冲锋",
+    "啃咬",
+    "变形",
+    "小眼",
+    "飞走",
+    "降临",
+    "嘲讽",
+    "死亡",
+    "指挥"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c5bca42a1e460b9c3e7886f97449d183b7921dd763cdd3e2df4f3276c0c1afc9",
+    "source_bytes": 37892,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968348612
+  }
+}

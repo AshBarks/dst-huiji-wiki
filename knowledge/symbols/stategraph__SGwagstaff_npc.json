@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwagstaff_npc.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwagstaff_npc",
+  "summary": "该状态图驱动饥荒联机版中的沃斯汤夫NPC（wagstaff_npc）实体。整体以空闲状态为基底，通过监听多种事件切换至对话、实验、竞技场闲置、捕捉工作、分析笔记及受惊等丰富行为状态，并借助通用状态库扩展行走与奔跑等动作。",
+  "api": [],
+  "api_note": "状态图本身未定义任何对外方法，仅通过状态与事件驱动实体行为，实体相关方法在组件或实体脚本中定义。",
+  "events_published": [
+    "orbtaken",
+    "docollect",
+    "doerode"
+  ],
+  "events_listened": [
+    "waitfortool",
+    "doexperiment",
+    "doneexperiment",
+    "talk",
+    "talk_experiment",
+    "startwork",
+    "continuework",
+    "tossitem",
+    "startled",
+    "animover",
+    "donetalking",
+    "ontalk",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SPAWN_RIFTS"
+  ],
+  "states": [
+    "idle",
+    "talk",
+    "idle_experiment",
+    "idle_wagpunk_arena",
+    "idle_wagpunk_arena_pst",
+    "startled",
+    "death",
+    "hit",
+    "dropitem",
+    "cheer",
+    "win_yotb",
+    "wait_search",
+    "capture_appearandwork",
+    "capture_pst",
+    "capture_emotebuffer_bonus",
+    "capture_emotebuffer",
+    "capture_emote",
+    "analyzing_pre",
+    "analyzing",
+    "analyzing_pst_buffer",
+    "analyzing_pst",
+    "tossitem"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_experiment",
+      "note": "进入实验闲置状态，播放建造循环动画，可设置实验超时时间并在超时后执行回调回到空闲。"
+    },
+    {
+      "state": "capture_appearandwork",
+      "note": "沃斯汤夫出现并工作捕捉状态，根据月球裂隙是否开启设置119秒或4秒超时，期间启用交易与建造组件并周期请求玩家。"
+    },
+    {
+      "state": "capture_emote",
+      "note": "捕捉后表情状态，播放研究动画，1秒时触发侵蚀消失事件，15秒后移除实体。"
+    },
+    {
+      "state": "analyzing_pst",
+      "note": "分析结束状态，播放空闲循环，1.5秒时若未睡眠则触发侵蚀消失，10秒后移除实体。"
+    },
+    {
+      "state": "tossitem",
+      "note": "扔物品状态，面向最近玩家，在第12帧将携带物品弹射给玩家，之后可能进入对话。"
+    },
+    {
+      "state": "talk",
+      "note": "对话状态，播放循环说话动画与音效，超时或完成说话后根据设定返回原状态或空闲。"
+    },
+    {
+      "state": "startled",
+      "note": "受惊状态，播放惊恐动画，第15帧解除硬直标签并允许旋转，动画结束后回空闲。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，停止物理与碰撞，播放死亡动画并掉落战利品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51494,
+      51498,
+      10418,
+      51046,
+      15031,
+      21333,
+      46847,
+      47058
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给定的代码能力/行为语义清单内容为空，未列出SGwagstaff_npc任何能力/行为，因此无法在页面文本中寻找对应表达；页面虽涉及瓦格斯塔夫NPC描述，但无清单条目可映射，故返回空。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "沃斯汤夫",
+    "瓦格斯塔夫",
+    "实验NPC",
+    "捕捉工作",
+    "分析笔记",
+    "扔物品",
+    "受惊",
+    "对话状态"
+  ],
+  "gameplay_tags": [
+    "NPC交互",
+    "实验",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d9e094deddfff319a69cdd58c1c5793866b602ae3d96ae066d3f492c6244661e",
+    "source_bytes": 20722,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968280483
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGLeif.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGLeif",
+  "summary": "该状态图驱动饥荒联机版中的树精（Leif）实体，包含普通与冬树变体。状态组织涵盖伪装沉睡、唤醒变身、行走攻击、受击硬直、着火恐慌及死亡掉落，通过监听 attacked、doattack、gotosleep 等事件实现转换，通用状态由 commonstates 附加。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听驱动状态转换，未定义对外调用的方法或接口。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death",
+    "doattack",
+    "death",
+    "gotosleep",
+    "onwakeup"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LEIF_HIT_RECOVERY"
+  ],
+  "states": [
+    "death",
+    "tree",
+    "panic",
+    "attack",
+    "hit",
+    "sleeping",
+    "spawn_from_wintertree",
+    "idle_nofaced",
+    "spawn",
+    "wake"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "死亡时停止物理并移除碰撞，播放倒下动画与树木倒塌音效，同时掉落战利品。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击时停止移动并播放挥击动画，在第25帧造成实际伤害，第26帧解除攻击标签。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放受击动画并更新受击恢复延迟（TUNING.LEIF_HIT_RECOVERY），期间可被特定条件打断。"
+    },
+    {
+      "state": "sleeping",
+      "note": "睡眠变身树状态，带有 sleeping 标签，受到攻击会唤醒并转入 wake 状态。"
+    },
+    {
+      "state": "spawn_from_wintertree",
+      "note": "从冬树生成的无面变身状态，逐渐启用动态阴影并覆盖 planter 符号，结束后进入无面闲置。"
+    },
+    {
+      "state": "spawn",
+      "note": "普通生成变身状态，播放 transform_ent 动画完成苏醒。"
+    },
+    {
+      "state": "wake",
+      "note": "被唤醒的愤怒变身状态，播放 transform_ent_mad 动画并伴随时效音效。"
+    },
+    {
+      "state": "panic",
+      "note": "着火恐慌状态，循环恐慌动画，当火灭且状态时间超过0.3秒后返回闲置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15680,
+      13406,
+      21416,
+      15922,
+      20042,
+      24544,
+      34314,
+      24748
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，未指定任何SGLeif相关能力或行为语义，无法在页面中检索对应证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "树精",
+    "树怪",
+    "Leif",
+    "树精攻击",
+    "树精沉睡",
+    "变身树",
+    "受击硬直",
+    "冬树生成"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "伪装"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4f4359c4a624a6f0e1602c7bfacb47769a64b21bd7091b28209aa2f9e6311c3",
+    "source_bytes": 9852,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968489294
+  }
+}

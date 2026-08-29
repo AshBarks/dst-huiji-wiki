@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarrat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarrat",
+  "summary": "该状态图驱动饥荒联机版中的 Carrat（胡萝卜鼠）实体，涵盖其日常行为、钻地潜伏、进食拾取及赛跑活动相关状态。状态组织以空闲和钻地循环为基础，并大量集成通用状态（睡眠、冻结、行走、奔跑等）以及 YOTC 赛跑专属的警觉、力竭和颁奖逻辑。",
+  "api": [],
+  "api_note": "该状态图仅通过事件和动作处理器驱动状态机，未定义任何对外调用的方法。",
+  "events_published": [
+    "carrat_error_sleeping"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.CARRAT.EMERGED_TIME_LIMIT",
+    "TUNING.YOTC_RACER_STAMINA_SLEEP_CHANCE",
+    "TUNING.YOTC_RACER_STAMINA_SLEEP_TIME",
+    "TUNING.YOTC_RACER_STAMINA_SLEEP_TIME_VAR"
+  ],
+  "states": [
+    "idle",
+    "idle2",
+    "submerge",
+    "submerged",
+    "emerge_fast",
+    "eat",
+    "pickup",
+    "stunned",
+    "trapped",
+    "dug_up",
+    "death",
+    "alert",
+    "endofrace_rewardlarge",
+    "endofrace_rewardsmall",
+    "endofrace_firstplace",
+    "endofrace_notfirstplace",
+    "alert_speed",
+    "alert_direction",
+    "alert_reaction",
+    "alert_stamina",
+    "exhausted",
+    "exhausted_loop",
+    "exhausted_pst",
+    "race_start_startle",
+    "race_start_stunned",
+    "race_startstunned_loop",
+    "race_startstunned_pst",
+    "gohome",
+    "fall"
+  ],
+  "state_notes": [
+    {
+      "state": "submerge",
+      "note": "空闲超时且附近无牛时钻入地下，关闭物理与阴影并设为不可攻击状态，随后转为种植态。"
+    },
+    {
+      "state": "emerge_fast",
+      "note": "快速钻出地面，播放钻出动画并启用阴影，记录钻出时间用于后续潜伏计时。"
+    },
+    {
+      "state": "eat",
+      "note": "响应进食动作，动画第25帧执行缓冲动作完成进食，结束后可能潜地或返回空闲。"
+    },
+    {
+      "state": "stunned",
+      "note": "被击晕炸弹等触发，持续6±2秒硬直，期间允许被玩家捡起（canbepickedup=true）。"
+    },
+    {
+      "state": "trapped",
+      "note": "触发陷阱事件后被困1秒，标签禁止触电，之后自动返回空闲状态。"
+    },
+    {
+      "state": "exhausted",
+      "note": "赛跑中收到力竭事件进入，循环播放喘息动画直至组件判断不再力竭，可能转睡眠。"
+    },
+    {
+      "state": "alert",
+      "note": "赛跑空闲时根据最佳属性随机播放速度/方向/反应/耐力展示动画，用于赛前炫耀。"
+    },
+    {
+      "state": "race_start_stunned",
+      "note": "赛跑起步被惊吓击晕，根据传入循环次数重复硬直动画后恢复。"
+    },
+    {
+      "state": "fall",
+      "note": "从高处坠落做抛物线运动，落地后转为被击晕状态。"
+    },
+    {
+      "state": "gohome",
+      "note": "响应回家动作，若目标无HasCarrat标签则执行缓冲动作否则取消并空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      33991,
+      33950,
+      23932,
+      24542,
+      14674,
+      15022,
+      19287
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，页面摘录仅涉及胡萝卜鼠等相关实体的生成、掉落、训练与比赛等玩法描述，未提及状态图符号stategraph__SGcarrat的能力表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "胡萝卜鼠",
+    "carrat",
+    "钻地",
+    "力竭",
+    "赛跑",
+    "击晕",
+    "陷阱",
+    "进食",
+    "回家"
+  ],
+  "gameplay_tags": [
+    "赛跑",
+    "生存",
+    "养殖"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3aee486429c4d79298d153052822a139204749526f39b419bc2d5ccab5c3262d",
+    "source_bytes": 29253,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968797333
+  }
+}

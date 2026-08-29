@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbearger.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbearger",
+  "summary": "该状态图驱动饥荒联机版中的熊獾（Bearger）实体，涵盖其战斗、移动、进食与冬眠等行为。状态组织以双足（bi）与四足（quad）姿态切换为基础，结合通用状态（冻结、触电、死亡、变异等）与丰富的自定义攻击状态（连击、重踏、屁股撞击、打哈欠）实现完整AI逻辑。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外暴露的方法，仅通过事件监听（如doattack、attacked）与内部状态跳转驱动熊獾行为。",
+  "events_published": [
+    "ridersleep",
+    "yawn",
+    "knockedout",
+    "onmissother",
+    "knockback",
+    "docollapse"
+  ],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "animover",
+    "animqueueover",
+    "stagger",
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BEARGER_YAWN_RANGE",
+    "TUNING.BEARGER_YAWN_SLEEPTIME",
+    "TUNING.BEARGER_YAWN_COOLDOWN",
+    "TUNING.BEARGER_MELEE_RANGE",
+    "TUNING.BEARGER_NORMAL_GROUNDPOUND_COOLDOWN",
+    "TUNING.BEARGER_ANGRY_WALK_SPEED",
+    "TUNING.BEARGER_CALM_WALK_SPEED",
+    "TUNING.BEARGER_RUN_SPEED",
+    "TUNING.MUTATED_BEARGER_STAGGER_TIME"
+  ],
+  "states": [
+    "bi",
+    "quad",
+    "idle",
+    "targetstolen",
+    "hit",
+    "standing_hit",
+    "yawn",
+    "attack_action",
+    "attack",
+    "attack_combo1",
+    "attack_combo2",
+    "attack_combo1a",
+    "pound",
+    "butt_pre",
+    "running_butt_pre",
+    "butt",
+    "butt_pst",
+    "butt_face_hit",
+    "death",
+    "action",
+    "eat_loop",
+    "eat_pst",
+    "steal",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "sleep",
+    "sleeping",
+    "wake",
+    "stagger_pre",
+    "stagger_pre_timeline_from_frame3",
+    "stagger_idle",
+    "stagger_hit",
+    "stagger_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "yawn",
+      "note": "熊獾打哈欠使周围玩家与睡眠者陷入睡眠，帧50触发范围睡眠效果，并启动Yawn冷却计时器。"
+    },
+    {
+      "state": "attack",
+      "note": "普通弧形攻击，帧32-33进行AOE伤害判定并破坏场景物品，未命中目标时推送onmissother事件。"
+    },
+    {
+      "state": "pound",
+      "note": "地面重击状态，帧20触发GroundPound造成范围震动与伤害，冷却由BEARGER_NORMAL_GROUNDPOUND_COOLDOWN控制。"
+    },
+    {
+      "state": "butt",
+      "note": "屁股向后撞击，造成范围伤害与击退并生成bearger_sinkhole，期间关闭角色碰撞且不可中断。"
+    },
+    {
+      "state": "hit",
+      "note": "四足姿态受击硬直，结束后可转入反击或踉跄，具有受击恢复延迟与可中断窗口。"
+    },
+    {
+      "state": "sleep",
+      "note": "进入睡眠前置，清除进食计时与踉跄标记，根据当前姿态播放睡眠动画并可能持续睡眠。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，高速移动并破坏沿途物品，同时循环播放咆哮音效与脚步震动。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "进食循环状态，执行缓冲的进食动作并随机超时，咀嚼音效与蜂蜜标签影响时长。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并在帧48掉落战利品，之后由通用尸体状态处理。"
+    },
+    {
+      "state": "stagger_pst",
+      "note": "踉跄结束状态，恢复后可进行屁股撞击冷却，帧67移除忙碌标签并允许旋转。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15642,
+      20154,
+      20192,
+      72981,
+      14907,
+      45249,
+      13437,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单为空，且页面文本仅描述关联实体bearger等的外观、生成与战斗行为，未明确表述stategraph__SGbearger组件能力，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "熊獾",
+    "打哈欠",
+    "重击",
+    "屁股撞",
+    "踉跄",
+    "连击",
+    "冬眠",
+    "进食",
+    "奔跑"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8a086f8e324b0e27bad57b536be7d842303000417ee2c635efd0c98a1e765700",
+    "source_bytes": 65562,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968617824
+  }
+}

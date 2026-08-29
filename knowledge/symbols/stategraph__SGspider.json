@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGspider.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGspider",
+  "summary": "该状态图驱动游戏中的各类蜘蛛实体（包括普通蜘蛛、战士蛛、吐丝蛛、月蛛、治疗蛛、隐藏蛛等）。状态组织上通过标签区分不同蜘蛛的攻击与受击行为，并借助 CommonStates 混入睡眠、冰冻、触电、跳跃、沉没、尸体及月球变异等通用状态。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和动作处理器驱动实体状态切换，未定义可供外部直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "locomote",
+    "trapped",
+    "mutate",
+    "entershield",
+    "exitshield"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SPIDER_WARRIOR_MELEE_RANGE",
+    "TUNING.SPIDER_SPITTER_MELEE_RANGE",
+    "TUNING.SPIDER_HEALING_COOLDOWN",
+    "TUNING.SPIDER_HIDER_SHELL_ABSORB"
+  ],
+  "states": [
+    "death",
+    "premoving",
+    "moving",
+    "idle",
+    "eat",
+    "eat_loop",
+    "born",
+    "taunt",
+    "investigate",
+    "attack",
+    "warrior_attack",
+    "spitter_attack",
+    "spike_attack",
+    "spike_attack_pst",
+    "heal",
+    "hit",
+    "hit_stunlock",
+    "shield",
+    "shield_end",
+    "dropper_enter",
+    "trapped",
+    "mutate",
+    "mutate_pst",
+    "parasite_revive"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "普通蜘蛛近战攻击状态，动画第25帧通过 DoAttack 对目标造成伤害。"
+    },
+    {
+      "state": "warrior_attack",
+      "note": "蜘蛛战士的跳跃突进攻击，设置移动速度覆盖并第19帧造成伤害，结束后进入威吓。"
+    },
+    {
+      "state": "spitter_attack",
+      "note": "吐丝蜘蛛远程攻击，装备武器并持续朝向目标，第21帧发射攻击。"
+    },
+    {
+      "state": "spike_attack",
+      "note": "月蛛缩壳后释放尖刺攻击，第14帧执行 DoSpikeAttack 对记录位置造成伤害。"
+    },
+    {
+      "state": "heal",
+      "note": "治疗蛛治疗友方状态，第30帧调用 DoHeal 执行治疗，有冷却限制。"
+    },
+    {
+      "state": "shield",
+      "note": "隐藏蛛缩壳防御状态，设置伤害吸收值 TUNING.SPIDER_HIDER_SHELL_ABSORB 直至退出。"
+    },
+    {
+      "state": "hit_stunlock",
+      "note": "普通蜘蛛受击硬直，播放受击动画且期间无法攻击，区别于战士等的可攻击受击。"
+    },
+    {
+      "state": "mutate",
+      "note": "蜘蛛食用变异物后进入变异，动画结束后生成新蜘蛛并移除自身，转移跟随关系。"
+    },
+    {
+      "state": "trapped",
+      "note": "蜘蛛触发陷阱后蜷缩被困，标签含 trapped 且1秒后自动回到 idle。"
+    },
+    {
+      "state": "eat",
+      "note": "蜘蛛执行进食动作，播放吃动画并触发缓冲行为，可循环进食。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15246,
+      15530,
+      15965,
+      15744,
+      15269,
+      15532,
+      15555,
+      13762
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单为空，页面摘录仅描述各蜘蛛实体玩法行为，未提及stategraph__SGspider符号及其代码能力，无法检索对应表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜘蛛状态",
+    "战士跳跃",
+    "吐丝攻击",
+    "月蛛尖刺",
+    "治疗蜘蛛",
+    "缩壳防御",
+    "蜘蛛变异",
+    "陷阱困住",
+    "蜘蛛进食"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0de56046bf0501f25e25e1eb7523b2a1accfbdd8fcc18feb4c9e7a838179bfdf",
+    "source_bytes": 26875,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968215257
+  }
+}

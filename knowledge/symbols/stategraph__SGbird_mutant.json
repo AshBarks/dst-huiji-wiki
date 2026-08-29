@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbird_mutant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbird_mutant",
+  "summary": "该状态图驱动突变鸟实体，管理其从滑翔降临、闲置鸣叫、移动跳跃到攻击与射击等行为。状态以 idle 为初始，通过事件与动作处理器切换，并包含睡眠、冰冻、触电及月变等通用状态扩展。",
+  "api": [],
+  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未向实体暴露任何对外方法或函数。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "arrive",
+    "doattack",
+    "trapped",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_taunt",
+    "emerge",
+    "death",
+    "attack",
+    "shoot",
+    "walk",
+    "walk_wait",
+    "walk_wait_caw",
+    "walk_stop",
+    "glide",
+    "land",
+    "trapped",
+    "stunned"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "近战攻击状态，标签为 busy/attack；动画第8帧执行 DoAttack 造成伤害并丢弃当前目标。"
+    },
+    {
+      "state": "shoot",
+      "note": "远程射击状态，第14帧向记忆目标发射抛射物，并启动 spit_cooldown 计时器（3~6秒随机冷却）。"
+    },
+    {
+      "state": "glide",
+      "note": "从空中滑翔降落，仅与地面碰撞；高度低于2时减速，低于0.1传送到地面并进入 idle。"
+    },
+    {
+      "state": "trapped",
+      "note": "被陷阱捕获硬直状态，播放眩晕循环动画，1秒后恢复 idle。"
+    },
+    {
+      "state": "stunned",
+      "note": "被击晕硬直状态，持续 6±2 秒，期间实体可被拾取，结束恢复不可拾取。"
+    },
+    {
+      "state": "emerge",
+      "note": "出现状态，带 noattack/noelectrocute 标签，播放 land 动画后回 idle。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，移除物理碰撞器并播放死亡动画，实体不再持久化。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24542,
+      14674,
+      15022,
+      14676,
+      15235,
+      19905,
+      14099,
+      14809
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录包含陷阱布景、trap、alterguardian_phase1、birdtrap、rabbit、pandoraschest、waxwelljournal、trap_teeth等实体，全文未提及stategraph__SGbird_mutant或变异鸟状态图的能力或行为描述，因此页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "突变鸟",
+    "滑翔",
+    "吐射",
+    "近战",
+    "陷阱",
+    "击晕",
+    "月变",
+    "鸟状态",
+    "射击冷却"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b02d0e3db1c32360553847ab3f94d617ece0b262e47aba0b134db6af81b346d4",
+    "source_bytes": 10055,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968684786
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdeer.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdeer",
+  "summary": "该状态图驱动游戏中的鹿（deer）实体，包含普通鹿与携带宝石的魔法鹿。状态组织以空闲、行走、奔跑、战斗等基础行为为核心，并扩展了长角、施法、解链等专属交互状态，通过事件监听实现宝石魔法与鹿角生长逻辑。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和内部状态转移驱动实体，未定义或暴露任何对外调用的方法接口。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "deercast",
+    "growantler",
+    "unshackle"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.DEER_HIT_RECOVERY",
+    "TUNING.DEER_MAX_STUN_LOCKS"
+  ],
+  "states": [
+    "idle",
+    "alert",
+    "idle_grazing",
+    "growantler",
+    "knockoffantler",
+    "magic_pre",
+    "magic_loop",
+    "magic_pst",
+    "unshackle",
+    "unshackle_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，检查记忆中的施法/长角/解锁请求，或25%概率进入吃草；带 idle 和 canrotate 标签。"
+    },
+    {
+      "state": "growantler",
+      "note": "长鹿角状态，标签 busy 硬直，播放动画后显示鹿角并生成生长特效。"
+    },
+    {
+      "state": "knockoffantler",
+      "note": "鹿角被击落状态，标签 busy，播放受击动画 hit_2 并发声。"
+    },
+    {
+      "state": "magic_pre",
+      "note": "宝石鹿魔法准备，标签 attack/busy/casting；冰鹿在此时段末执行 DoCast，红鹿生成充能特效。"
+    },
+    {
+      "state": "magic_pst",
+      "note": "魔法结束阶段，触发法术特效（红鹿此时施法），随后移除 casting 与 busy 标签恢复行动。"
+    },
+    {
+      "state": "unshackle",
+      "note": "解除锁链状态，标签 busy；结束后若带宝石则发射宝石给最近玩家，自身移除并生成新鹿及特效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13897,
+      13823,
+      20152,
+      15594,
+      15812,
+      15596,
+      15022,
+      51046
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定任何能力，无法在页面中找到对应表达",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鹿",
+    "宝石鹿",
+    "鹿角",
+    "施法",
+    "解链",
+    "长角",
+    "冰鹿",
+    "红鹿",
+    "攻击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fef913f55123779d8111857839adb50a5b254122aefd053021b811de61c52f2d",
+    "source_bytes": 23083,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968273686
+  }
+}

@@ -10,7 +10,8 @@ pub const PROMPT_REV: &str = "p4";
 pub const PROMPT_REV_BEHAVIOUR: &str = "p4-behaviour";
 /// p5-brain:pass2 语义清单改用 behaviour_invocations 参数语义文本(§9.1)。
 pub const PROMPT_REV_BRAIN: &str = "p5-brain";
-pub const PROMPT_REV_STATEGRAPH: &str = "p5-stategraph";
+/// p6-stategraph:pass2 语义清单改用 state_notes 玩家语义(SG 的 api 基本为空)。
+pub const PROMPT_REV_STATEGRAPH: &str = "p6-stategraph";
 
 /// 按 SymbolDoc 类别返回当前 prompt 修订号;component 沿用全局版本,新类别独立演进。
 pub fn prompt_rev_for(category: &str) -> &'static str {

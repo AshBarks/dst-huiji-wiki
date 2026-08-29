@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbutterfly.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbutterfly",
+  "summary": "该状态图驱动游戏中的蝴蝶实体，管理其飞行、着陆、授粉与死亡等行为。状态以飞行移动/闲置与落地着陆/授粉/起飞两大类组织，并通过动作处理器响应归巢与授粉指令。",
+  "api": [],
+  "api_note": "该状态图仅通过StateGraph返回状态机定义，未向实体暴露任何对外调用方法，所有逻辑均在状态内部处理。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "death",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "moving",
+    "death",
+    "idle",
+    "land",
+    "land_idle",
+    "pollinate",
+    "takeoff"
+  ],
+  "state_notes": [
+    {
+      "state": "moving",
+      "note": "由locomote事件且渴望移动时进入，向前飞行并循环播放flight_cycle动画，可旋转。"
+    },
+    {
+      "state": "death",
+      "note": "由death事件进入，停止物理并移除碰撞，播放死亡动画并掉落战利品，10帧后落地。"
+    },
+    {
+      "state": "land",
+      "note": "由GOHOME/POLLINATE动作或land事件进入，播放land动画并落地；动画结束后依缓冲动作转授粉、归巢移除或着陆闲置。"
+    },
+    {
+      "state": "pollinate",
+      "note": "着陆后缓冲动作为授粉时进入，执行授粉动作并随机停留3±1秒，超时后起飞，期间保持落地。"
+    },
+    {
+      "state": "takeoff",
+      "note": "由授粉超时等进入，播放take_off动画，结束后回到飞行闲置状态。"
+    },
+    {
+      "state": "idle",
+      "note": "飞行悬停状态，循环idle_flight_loop动画，超时后根据是否渴望移动转移动或继续闲置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20511,
+      70763,
+      13707,
+      53270,
+      15651,
+      23924,
+      13897,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，未指定stategraph__SGbutterfly的任何能力，页面摘录虽含蝴蝶实体页面但无对应符号能力表达可检索。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蝴蝶",
+    "飞行",
+    "着陆",
+    "授粉",
+    "死亡",
+    "起飞",
+    "冰冻",
+    "触电"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bbb1350de836398310dddc73a86514c9d0666ebf1bc41eb7cfaa5cd0f820d7e6",
+    "source_bytes": 4036,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968743737
+  }
+}

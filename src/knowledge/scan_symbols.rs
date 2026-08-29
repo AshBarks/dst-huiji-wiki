@@ -1523,6 +1523,14 @@ async fn enrich_with_wiki(
             }
             parts
         }
+        "stategraph" => {
+            // SG 的 api 基本为空,裸状态名也不是页面语言;
+            // 用 state_notes 的玩家语义作锚点(受击硬直/惊吓/变身等)。
+            doc.state_notes
+                .iter()
+                .map(|sn| format!("{}: {}", sn.state, sn.note))
+                .collect()
+        }
         _ => doc.api.iter().map(|a| a.name.clone()).collect(),
     };
 

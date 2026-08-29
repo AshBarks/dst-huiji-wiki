@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGalterguardian_phase1.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGalterguardian_phase1",
+  "summary": "该状态图驱动天体守护者第一阶段（alterguardian_phase1）实体，涵盖生成、待机、行走、翻滚与暴怒攻击、举盾防御、普通死亡与月隙重生及被捕获等状态。状态组织以事件监听（如doattack、attacked）触发攻击选择，并通过标签控制行为逻辑。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和状态跳转驱动实体，未定义任何对外调用的方法或接口。",
+  "events_published": [
+    "attackstart",
+    "phasetransition",
+    "ms_alterguardian_phase1_lunarrift_capturable"
+  ],
+  "events_listened": [
+    "locomote",
+    "doattack",
+    "attacked",
+    "entershield",
+    "exitshield",
+    "minhealth",
+    "startspawnanim",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ALTERGUARDIAN_PHASE1_AOERANGE",
+    "TUNING.ALTERGUARDIAN_PHASE1_AOEDAMAGE",
+    "TUNING.ALTERGUARDIAN_PHASE1_ROLLDAMAGE",
+    "TUNING.ALTERGUARDIAN_PHASE1_ROLLRANGE",
+    "TUNING.ALTERGUARDIAN_PHASE1_WALK_SPEED",
+    "TUNING.ALTERGUARDIAN_PHASE1_MINROLLCOUNT",
+    "TUNING.ALTERGUARDIAN_PHASE1_ROLLCOOLDOWN",
+    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_TIME",
+    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_HP",
+    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_AMOUNT",
+    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_PERIOD"
+  ],
+  "states": [
+    "prespawn_idle",
+    "spawn",
+    "idle",
+    "roll_start",
+    "roll",
+    "roll_stop",
+    "tantrum_pre",
+    "tantrum",
+    "tantrum_pst",
+    "shield_pre",
+    "shield",
+    "shield_hit",
+    "shield_end",
+    "death",
+    "death_lunar",
+    "death_lunar_loop",
+    "regenerate_lunar",
+    "captured",
+    "spawn_lunar"
+  ],
+  "state_notes": [
+    {
+      "state": "prespawn_idle",
+      "note": "实体初始等待状态，启动6秒 gotospawn 计时或监听 startspawnanim 事件后进入 spawn；期间无敌且禁用音乐。"
+    },
+    {
+      "state": "roll",
+      "note": "翻滚攻击状态，以速度10向前滚动并每帧检测碰撞造成滚动伤害；翻滚次数随机，命中玩家会标记以可能提前停止。"
+    },
+    {
+      "state": "roll_stop",
+      "note": "翻滚停止状态，结束动画中触发一次范围AOE攻击，并启动 roll_cooldown 冷却计时器（时长由TUNING设定）。"
+    },
+    {
+      "state": "tantrum",
+      "note": "原地暴怒状态，循环播放动画并进行3-5次范围AOE攻击，伤害值为 TUNING.ALTERGUARDIAN_PHASE1_AOEDAMAGE。"
+    },
+    {
+      "state": "shield",
+      "note": "举盾防御状态，带 shield 标签使受击转入 shield_hit 而非硬直，调用 EnterShield 提供防御。"
+    },
+    {
+      "state": "death",
+      "note": "普通死亡状态，播放死亡动画并掉落战利品，超时后推送 phasetransition 事件以触发阶段转换。"
+    },
+    {
+      "state": "death_lunar",
+      "note": "月隙死亡状态，生成可捕获的 gestalt 分身，本体暂时失效并等待重生或捕获事件。"
+    },
+    {
+      "state": "spawn_lunar",
+      "note": "月体降临状态，播放生成动画并动态调制光照，震屏并通知范围内玩家天体守护者来袭。"
+    },
+    {
+      "state": "captured",
+      "note": "被捕获状态，实体失效并掉落战利品后侵蚀消失，对应月隙分身被成功捕获后的处理。"
+    },
+    {
+      "state": "regenerate_lunar",
+      "note": "月隙重生状态，恢复血量并播放重建动画，之后转入 tantrum_pre 继续战斗。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      52788,
+      65605,
+      20714,
+      34523,
+      14579,
+      24544,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，且所有页面摘录均未提及 SGalterguardian_phase1 或 alterguardian 相关实体与能力，文本内容涉及世界生成、布景、控制台等无关主题。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "天体守护者",
+    "第一阶段",
+    "翻滚",
+    "暴怒",
+    "举盾",
+    "月隙",
+    "重生",
+    "被捕获",
+    "生成"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c0d0a544fe810f8467422fb4f719448cf8a5a6d7b49ca01d19f887914d2bfc2a",
+    "source_bytes": 35006,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968576294
+  }
+}

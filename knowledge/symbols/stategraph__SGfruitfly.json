@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfruitfly.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfruitfly",
+  "summary": "该状态图驱动果蝇（fruitfly）及其变种（包括首领果蝇、友好果蝇与随从）的行为逻辑。整体以空闲、植物互动（跳舞或攻击）、着陆、召唤与嘲讽等显式状态为主，并借助通用模块扩展了战斗、行走、睡眠、冻结与电击状态。",
+  "api": [],
+  "api_note": "源码仅构建并返回 StateGraph 对象，未定义任何暴露给外部实体的方法或函数，所有行为均通过状态与事件处理器内部实现。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "bored",
+    "plant_dance",
+    "plant_dance_pst",
+    "plant_attack",
+    "plant_attack_minion",
+    "plant_attack_pst",
+    "land",
+    "buzz",
+    "taunt"
+  ],
+  "state_notes": [
+    {
+      "state": "plant_dance",
+      "note": "友好果蝇专属，对植物执行互动时进入，播放跳舞动画，第77帧执行缓冲动作后结束。"
+    },
+    {
+      "state": "plant_attack",
+      "note": "首领果蝇攻击植物时进入，第37帧执行破坏动作并标记havoc，随后进入收招状态。"
+    },
+    {
+      "state": "plant_attack_minion",
+      "note": "随从果蝇攻击植物时进入，动画时序更长，第63帧才执行攻击并标记havoc。"
+    },
+    {
+      "state": "land",
+      "note": "果蝇从空中降落时进入，以固定速度下落，触地后转空闲，状态带noelectrocute免疫电击。"
+    },
+    {
+      "state": "buzz",
+      "note": "首领果蝇召唤援军状态，播放动画并在第32帧生成若干跟随自己的果蝇小弟。"
+    },
+    {
+      "state": "taunt",
+      "note": "状态图默认初始状态，播放三段类跳舞动画并蜂鸣，常用于出场后回归空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15797,
+      14486,
+      19695,
+      18545,
+      14579,
+      22521,
+      34314,
+      13567
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单为空，页面摘录仅涉及果蝇王、友好果蝇及果蝇掉落物等实体，未提及状态图组件SGfruitfly的能力表达",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "果蝇",
+    "植物跳舞",
+    "攻击植物",
+    "果蝇着陆",
+    "召唤果蝇",
+    "果蝇嘲讽",
+    "扇翅膀",
+    "无聊自旋"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b56b585b169233e2859467232f29d17605107f20333918d3148d798b0a7808eb",
+    "source_bytes": 9276,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968344425
+  }
+}

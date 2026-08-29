@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGBeefalo.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGBeefalo",
+  "summary": "该状态图驱动游戏中的牛（Beefalo）及小牛（Baby Beefalo）实体，控制其空闲、移动、攻击、进食、驯化、繁殖及死亡等丰富行为。状态通过事件监听与通用状态处理器组织，并包含骑乘、拴绑和毛发生长等专属逻辑。",
+  "api": [],
+  "api_note": "该状态图仅通过事件监听和状态机内部逻辑驱动实体，未定义任何对外暴露的方法或接口。",
+  "events_published": [],
+  "events_listened": [
+    "onsink",
+    "doattack",
+    "death",
+    "attacked",
+    "heardhorn",
+    "loseloyalty",
+    "eat",
+    "refusedrider",
+    "brushed",
+    "carratboarded",
+    "unhitch",
+    "hitch",
+    "despawn"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "shake",
+    "badfood",
+    "shake_off_saddle",
+    "skin_change",
+    "regurgitate",
+    "pleased",
+    "meh",
+    "beg",
+    "bellow",
+    "matingcall",
+    "tailswish",
+    "idle_carrat",
+    "graze",
+    "graze_empty",
+    "eat",
+    "flatulate",
+    "alert",
+    "actual_alert",
+    "attack",
+    "death",
+    "revive",
+    "become_domesticated",
+    "grow_up",
+    "grow_up_pop",
+    "hair_growth",
+    "hair_growth_pop",
+    "shaved",
+    "refuse",
+    "run_start",
+    "run",
+    "run_stop",
+    "hitch",
+    "unhitch",
+    "despawn"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "标签为 attack 和 busy，在动画第15帧通过 DoAttack 对目标造成伤害，用于牛的近战攻击。"
+    },
+    {
+      "state": "death",
+      "note": "播放死亡动画，非加载存档时移除碰撞并掉落战利品，2秒后腐蚀消失；若被骑乘则延迟死亡。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，根据食物饥饿值映射进食时长（0.4~8秒），结束后可能反刍、进入坏食物状态或放屁。"
+    },
+    {
+      "state": "hitch",
+      "note": "响应拴住事件，播放动画后执行缓冲的拴牛动作并返回空闲，标签含 busy。"
+    },
+    {
+      "state": "become_domesticated",
+      "note": "驯化变形状态，更新驯化属性并授予玩家成就，期间停止移动且不可打断。"
+    },
+    {
+      "state": "revive",
+      "note": "复活状态，开启无敌帧（SetInvincible），移除死亡标签并恢复生理组件，用于暗影复活机制。"
+    },
+    {
+      "state": "hair_growth_pop",
+      "note": "长毛完成状态，恢复毛发位数与可刷状态，应用外观覆盖，标志牛毛生长完毕。"
+    },
+    {
+      "state": "idle_carrat",
+      "note": "携带胡萝卜时的空闲状态，覆盖胡萝卜建造并播放专属待机动画，由事件 carratboarded 触发。"
+    },
+    {
+      "state": "graze",
+      "note": "吃草空闲状态，随机持续1~5秒后返回空闲，体现牛的自然进食行为。"
+    },
+    {
+      "state": "shake_off_saddle",
+      "note": "当服从度过低时自动抖落马鞍，第24帧调用 SetSaddle(nil) 移除鞍具。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      13156,
+      15169,
+      15380,
+      28734,
+      14653,
+      14654,
+      14655
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定任何SGBeefalo能力或行为语义，无目标可在页面文本中检索，故判定页面未讨论该符号的特定能力",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "牛类",
+    "牛状态",
+    "拴牛",
+    "驯化牛",
+    "牛攻击",
+    "牛进食",
+    "牛死亡",
+    "牛复活",
+    "牛长毛",
+    "骑牛"
+  ],
+  "gameplay_tags": [
+    "养殖",
+    "战斗",
+    "坐骑"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38d3c1397f5ec1be51438377f487a2ba0de74b39edf6b3725ce68d120136def1",
+    "source_bytes": 32405,
+    "model": "hy3-free",
+    "generated_at_ms": 1787968494836
+  }
+}

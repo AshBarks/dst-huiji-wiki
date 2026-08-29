@@ -32,7 +32,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/follower.lua": {
       "mention_source": "pass2_evidence",
@@ -67,7 +71,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -75,7 +83,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -90,7 +102,11 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -101,7 +117,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [

@@ -91,6 +91,7 @@
       "detail_level": "stub"
     },
     "components/tradable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易价值与回报标注",
         "交易对象与限制描述",
@@ -98,8 +99,13 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "可以跟猪王换到 5 个金块。",
+        "semantic_consistent": null,
+        "note": "页面提及与猪王交易，但实体不在受影响变体列表"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -119,7 +119,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/combat.lua": {
       "aspects_ignored": [
@@ -202,7 +206,11 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -253,7 +261,11 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -263,7 +275,11 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

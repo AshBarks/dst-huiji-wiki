@@ -34,7 +34,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -59,7 +63,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -67,7 +75,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -82,7 +94,12 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "实体sharkboi在affected中，片段无移动描述"
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -93,7 +110,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": true
+      }
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

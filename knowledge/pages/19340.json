@@ -62,7 +62,11 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -74,6 +78,7 @@
       "detail_level": "stub"
     },
     "components/stackable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "不可堆叠说明",
         "优先堆叠至上限行为",
@@ -82,8 +87,12 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "可以打开 20 组每组 10 个石果即 200 个石果，此次更新前可以打开每组1个石果，组无上限。",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

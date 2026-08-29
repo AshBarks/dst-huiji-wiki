@@ -68,7 +68,11 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -76,7 +80,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -114,7 +122,12 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "实体蟹隐士不在affected variants"
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -125,7 +138,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": false
+      }
     },
     "components/talker.lua": {
       "mention_source": "pass2_evidence",

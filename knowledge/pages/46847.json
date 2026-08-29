@@ -50,7 +50,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -63,7 +67,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -71,7 +79,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -86,9 +98,14 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -97,7 +114,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "掉落={{Pic|32|id=lunar_seed}}×5，{{Pic|32|id=purebrilliance}}×5",
+        "semantic_consistent": true
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
@@ -127,5 +148,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

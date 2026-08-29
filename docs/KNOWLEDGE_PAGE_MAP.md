@@ -36,10 +36,22 @@
 - 增量键:`inputs.wikitext_sha256` + `inputs.symbol_doc_shas`(本页引用到的每份 SymbolDoc 的 provenance sha);消费方据此判断刷新。
 - CLI:`knowledge-scan-wiki <scripts> --corpus wikis/…`(全确定性,秒级~分钟级,无 LLM 配置要求)。
 
-## 5. M2b / M2c(未实施)
+## 5. M2b L2 审计(已实现,试点完成)
 
-- **M2b L2 审计**:对「routed 但 D0/D1 零证据」的缺口对,收编 symbol-annotate 的分页批处理 verdict(每 symbol 1~3 次调用覆盖其全部命中页),补 `mention_source=llm_verdict`;范围用 M2a 的缺口统计数据定。
-- **M2c 汇总**:全库缺口报表(按符号聚合:哪些符号被大量页面 routed 却普遍 stub → 文档或页面侧行动项);detail_level 公式如有必要再引入 LLM borderline 判定。
+`knowledge-scan-wiki --audit [--audit-symbols a,b,…] [--audit-max-pages 60] [--audit-batch-pages 20] [--audit-batch-max-chars 24000]`:对「stub 且符号有 aspects」的对,收编 symbol-annotate 的分页批处理 verdict(每 symbol 1~3 批,按 facts 富裕度选页),mentions=true 转为 `mention_source=llm_verdict + summary`,verdict 细节(wording/semantic_consistent/note)快照进 `llm_verdict` 字段;raw 归档 `output/knowledge/raw/page_map/`。
+
+**试点结果(2026-08-29,10 个高频组件符号,各 60 页,共 600 页 / 30 批)**:
+
+- stub→提及转化 **64 对(约 11%)**:combat 23、health 17、lootdropper 11、locomotor 5、burnable 4…;
+- 转化案例验证了 L2 的必要性:洞穴蠕虫页“玩家接近它 2~5 距离单位时…攻击”——区间表述与常量精确匹配天然不兼容,只有 LLM 能归因;
+- **语义不一致 2 对**(寄居蟹隐士/雪球 × lootdropper)——这正是 M3 页面修订建议的原始信号;
+- 0 失败批次;30 批 ≈ 23 分钟(串行),换算全量成本:剩余 ~4900 个有 aspects 的 stub 对 ≈ 3~4 小时。
+
+**推开的策略(定案)**:L2 审计按符号分批推进(高频/高 aspects 符号优先);`semantic_consistent=false` 的对在 M2c 汇总中单独成表,作为 M3 修订建议清单的直接输入。
+
+## 6. M2c 汇总(未实施)
+
+全库缺口与不一致报表:按符号聚合 routed/stub/转化率/不一致清单;`semantic_consistent=false` 单独成表对接 M3。detail_level 公式如有必要再引入 LLM borderline 判定。
 
 ## 6. 已知取舍
 

@@ -57,7 +57,11 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -83,7 +87,11 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/weapon.lua": {
       "aspects_ignored": [

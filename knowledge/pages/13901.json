@@ -30,7 +30,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/combat.lua": {
       "aspects_ignored": [
@@ -47,7 +51,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -76,7 +84,11 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -89,7 +101,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -127,7 +143,11 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -138,7 +158,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/sleeper.lua": {
       "mention_source": "pass2_evidence",

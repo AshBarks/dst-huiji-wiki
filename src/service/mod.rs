@@ -218,7 +218,29 @@ pub enum JobKind {
         #[serde(default = "default_knowledge_dir")]
         knowledge_dir: String,
         corpus: String,
+        #[serde(default)]
+        audit: bool,
+        #[serde(default)]
+        audit_symbols: Option<Vec<String>>,
+        #[serde(default = "default_audit_max_pages")]
+        audit_max_pages: usize,
+        #[serde(default = "default_audit_batch_pages")]
+        audit_batch_pages: usize,
+        #[serde(default = "default_audit_batch_max_chars")]
+        audit_batch_max_chars: usize,
     },
+}
+
+fn default_audit_max_pages() -> usize {
+    60
+}
+
+fn default_audit_batch_pages() -> usize {
+    20
+}
+
+fn default_audit_batch_max_chars() -> usize {
+    24_000
 }
 
 fn default_symbol_category() -> String {
@@ -449,12 +471,22 @@ async fn execute_job_inner(
             root,
             knowledge_dir,
             corpus,
+            audit,
+            audit_symbols,
+            audit_max_pages,
+            audit_batch_pages,
+            audit_batch_max_chars,
         } => {
             crate::knowledge::run_scan_wiki(
                 &crate::knowledge::ScanWikiParams {
                     scripts_root: root.clone(),
                     knowledge_dir: knowledge_dir.clone(),
                     corpus: corpus.clone(),
+                    audit: *audit,
+                    audit_symbols: audit_symbols.clone(),
+                    audit_max_pages: *audit_max_pages,
+                    audit_batch_pages: *audit_batch_pages,
+                    audit_batch_max_chars: *audit_batch_max_chars,
                 },
                 reporter,
             )

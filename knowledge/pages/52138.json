@@ -48,6 +48,7 @@
       "detail_level": "stub"
     },
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -57,7 +58,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "冷火、火焰墙",
+        "semantic_consistent": true
+      }
     },
     "components/combat.lua": {
       "aspects_ignored": [

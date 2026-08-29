@@ -20,6 +20,7 @@
       "detail_level": "stub"
     },
     "components/burnable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧机制与视觉效果",
         "可燃物分类标注",
@@ -29,7 +30,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "燃烧时间=3 ~ 6",
+        "semantic_consistent": true
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -57,7 +62,11 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -69,6 +78,7 @@
       "detail_level": "stub"
     },
     "components/stackable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "不可堆叠说明",
         "优先堆叠至上限行为",
@@ -77,8 +87,12 @@
         "无限堆叠描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "最多一组 40 个火药能够造成 8000 点伤害和 8000 次作业",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

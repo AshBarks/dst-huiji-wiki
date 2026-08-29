@@ -30,7 +30,11 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/childspawner.lua": {
       "mention_source": "fact_match",
@@ -78,7 +82,11 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [

@@ -34,7 +34,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -62,7 +66,11 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -75,7 +83,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -83,7 +95,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -98,7 +114,11 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -109,7 +129,12 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "页面描述体节掉落绝望石/纯粹恐惧等，疑似 eyeofterror 受影响变体"
+      }
     },
     "components/planardamage.lua": {
       "aspects_ignored": [

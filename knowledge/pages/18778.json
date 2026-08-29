@@ -44,7 +44,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -63,7 +67,12 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "小惊吓不在affected"
+      }
     },
     "components/playerprox.lua": {
       "mention_source": "pass2_evidence",

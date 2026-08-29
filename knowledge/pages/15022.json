@@ -97,7 +97,11 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
       "mention_source": "pass2_evidence",
@@ -129,7 +133,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -170,6 +178,7 @@
       "detail_level": "detailed"
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -178,7 +187,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "|掉落 = {{Pic|32|月岩}}×5，<br>{{Pic|32|月岩}}",
+        "semantic_consistent": true
+      }
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [

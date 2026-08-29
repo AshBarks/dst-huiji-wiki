@@ -262,12 +262,22 @@ pub async fn run(args: Commands) -> Result<()> {
             root,
             knowledge_dir,
             corpus,
+            audit,
+            audit_symbols,
+            audit_max_pages,
+            audit_batch_pages,
+            audit_batch_max_chars,
         } => {
             execute(
                 JobKind::KnowledgeScanWiki {
                     root: path_to_string(&root)?,
                     knowledge_dir: path_to_string(&knowledge_dir)?,
                     corpus: path_to_string(&corpus)?,
+                    audit,
+                    audit_symbols,
+                    audit_max_pages,
+                    audit_batch_pages,
+                    audit_batch_max_chars,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

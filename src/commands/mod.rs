@@ -219,6 +219,21 @@ pub enum Commands {
         /// wiki 语料 host 根目录
         #[arg(long)]
         corpus: PathBuf,
+        /// M2b:对确定性零证据对跑 LLM 审计(收编 symbol-annotate verdict)
+        #[arg(long)]
+        audit: bool,
+        /// 审计符号词干(逗号分隔,如 inspectable,hauntable);默认按缺口取前 10
+        #[arg(long, value_delimiter = ',')]
+        audit_symbols: Option<Vec<String>>,
+        /// 每符号送审页数上限(按 facts 富裕度排序)
+        #[arg(long, default_value_t = 60)]
+        audit_max_pages: usize,
+        /// LLM 每批页数上限
+        #[arg(long, default_value_t = 20)]
+        audit_batch_pages: usize,
+        /// LLM 每批字符数上限
+        #[arg(long, default_value_t = 24_000)]
+        audit_batch_max_chars: usize,
     },
     /// 启动 WebUI 服务器
     Serve {
@@ -598,6 +613,7 @@ mod tests {
                 root,
                 knowledge_dir,
                 corpus,
+                ..
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
                 assert_eq!(knowledge_dir, PathBuf::from("knowledge"));

@@ -34,7 +34,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -49,6 +53,7 @@
       "detail_level": "stub"
     },
     "components/health.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "制作消耗生命值描述",
         "医疗与食物回复生命值描述",
@@ -59,7 +64,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "龙蝇死亡后，20天后在刷新点重新生",
+        "semantic_consistent": true
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -67,7 +76,11 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -101,9 +114,14 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -112,7 +130,11 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "{{Pic|32|金块}} 4个<br/>额外4个（每个50%）",
+        "semantic_consistent": true
+      }
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -144,5 +166,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

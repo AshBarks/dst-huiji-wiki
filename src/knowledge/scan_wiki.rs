@@ -12,9 +12,15 @@ use crate::corpus::model::PageMeta;
 use crate::error::{Error, Result};
 use crate::knowledge::store::sha256_hex;
 use crate::knowledge::types::SymbolDoc;
+use crate::llm::{LlmConfig, LlmStreamEvent};
 use crate::service::Reporter;
 use crate::update::grade::CorpusPageView;
 use crate::update::index::build_atlas_from_dir;
+use crate::update::symbol_page::{
+    paginate_affected_pages, parse_symbol_annotation_response,
+    render_symbol_annotation_prompt_for_pages, PageEvidence, SymbolKind, SymbolPageAnnotation,
+    SymbolPageVisibility, SymbolRef,
+};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
@@ -25,6 +31,17 @@ pub struct ScanWikiParams {
     pub knowledge_dir: String,
     /// wiki 语料 host 根目录
     pub corpus: String,
+    /// M2b:对「routed 但确定性零证据」的页符号对跑 LLM 审计(收编
+    /// symbol-annotate 的分页批处理 verdict)
+    pub audit: bool,
+    /// 审计符号的文件名词干(如 inspectable);None = 按缺口规模取前 10
+    pub audit_symbols: Option<Vec<String>>,
+    /// 每符号送审页数上限(按 facts 富裕度排序取前 N)
+    pub audit_max_pages: usize,
+    /// LLM 每批页数上限
+    pub audit_batch_pages: usize,
+    /// LLM 每批字符数上限
+    pub audit_batch_max_chars: usize,
 }
 
 /// 单个 (page, symbol) 对的归因条目(落盘 schema v1)。
@@ -46,6 +63,18 @@ pub struct PageSymbolEntry {
     pub route: String,
     /// stub < summary < detailed;二跳封顶 summary
     pub detail_level: String,
+    /// L2 审计产物(仅被 --audit 审计过的对携带)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub llm_verdict: Option<LlmVerdict>,
+}
+
+/// symbol-annotate verdict 的快照(mentions=true 的转换依据 + 不一致记录)。
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct LlmVerdict {
+    pub wording: Option<String>,
+    pub semantic_consistent: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -244,16 +273,12 @@ pub async fn run_scan_wiki(
     let out_dir = knowledge_root.join("pages");
     std::fs::create_dir_all(&out_dir)?;
 
-    let mut written = 0usize;
-    let mut unchanged = 0usize;
-    let mut pages_with_mention = 0usize;
-    let mut direct_mentioned = 0usize;
-    let mut two_hop_mentioned = 0usize;
-    let mut stub_pairs = 0usize;
     let doc_shas: HashMap<String, String> = docs
         .iter()
         .map(|d| (d.reference.path.clone(), d.provenance.source_sha256.clone()))
         .collect();
+
+    let mut maps: Vec<PageSymbolMap> = Vec::new();
 
     reporter.stage("逐页归因");
     for pageid in &pageids {
@@ -361,13 +386,6 @@ pub async fn run_scan_wiki(
             if route == "two_hop" && detail == "detailed" {
                 detail = "summary";
             }
-            if mention_source.is_none() {
-                stub_pairs += 1;
-            } else if route == "direct" {
-                direct_mentioned += 1;
-            } else {
-                two_hop_mentioned += 1;
-            }
             symbols.insert(
                 path.clone(),
                 PageSymbolEntry {
@@ -377,14 +395,9 @@ pub async fn run_scan_wiki(
                     fact_matches,
                     route: route.to_string(),
                     detail_level: detail.to_string(),
+                    llm_verdict: None,
                 },
             );
-        }
-
-        // 页面级汇总:只看直连符号
-        let page_detail = direct_detail(&symbols);
-        if symbols.values().any(|e| e.mention_source.is_some()) {
-            pages_with_mention += 1;
         }
 
         let map = PageSymbolMap {
@@ -396,10 +409,72 @@ pub async fn run_scan_wiki(
                 symbol_doc_shas: used_doc_shas,
             },
             symbols,
-            page_detail_level: page_detail,
+            page_detail_level: None,
         };
-        let body = serde_json::to_string_pretty(&map)?;
-        let out_path = out_dir.join(format!("{pageid}.json"));
+        maps.push(map);
+    }
+
+    // M2b L2 审计:对确定性零证据(stub)对跑收编版 verdict,改写内存图
+    let audit_summary = if params.audit {
+        reporter.stage("M2b L2 审计");
+        let config = LlmConfig::from_env()
+            .ok_or_else(|| Error::Config("审计模式需要 LLM 配置(LLM__API_KEY)".to_string()))?;
+        Some(
+            run_audit(
+                &mut maps,
+                &docs,
+                &view,
+                &config,
+                params,
+                scripts_root,
+                reporter,
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
+
+    // 汇总 + 落盘(page_detail 在审计改写后统一计算)
+    let out_dir = knowledge_root.join("pages");
+    std::fs::create_dir_all(&out_dir)?;
+    let mut written = 0usize;
+    let mut unchanged = 0usize;
+    let mut pages_with_mention = 0usize;
+    let mut direct_mentioned = 0usize;
+    let mut two_hop_mentioned = 0usize;
+    let mut stub_pairs = 0usize;
+    let mut llm_converted = 0usize;
+    let mut llm_inconsistent = 0usize;
+    for map in &mut maps {
+        let mut page_mentioned = false;
+        for (path, entry) in map.symbols.iter_mut() {
+            if let Some(v) = &entry.llm_verdict {
+                if v.semantic_consistent == Some(false) {
+                    llm_inconsistent += 1;
+                }
+            }
+            if entry.mention_source.is_none() {
+                stub_pairs += 1;
+                continue;
+            }
+            page_mentioned = true;
+            if entry.mention_source.as_deref() == Some("llm_verdict") {
+                llm_converted += 1;
+            }
+            if entry.route == "direct" {
+                direct_mentioned += 1;
+            } else {
+                two_hop_mentioned += 1;
+            }
+            let _ = path;
+        }
+        if page_mentioned {
+            pages_with_mention += 1;
+        }
+        map.page_detail_level = direct_detail(&map.symbols);
+        let body = serde_json::to_string_pretty(map)?;
+        let out_path = out_dir.join(format!("{}.json", map.pageid));
         let changed = match std::fs::read_to_string(&out_path) {
             Ok(existing) => existing != body,
             Err(_) => true,
@@ -414,17 +489,258 @@ pub async fn run_scan_wiki(
 
     reporter.log(format!(
         "PageSymbolMap 完成: 页面 {} 个(有提及 {pages_with_mention}),直连提及对 {direct_mentioned},二跳提及对 {two_hop_mentioned},stub 对 {stub_pairs}",
-        pageids.len()
+        maps.len()
     ));
     Ok(serde_json::json!({
-        "mode": "scan_wiki_m2a",
-        "pages_total": pageids.len(),
+        "mode": if params.audit { "scan_wiki_m2b" } else { "scan_wiki_m2a" },
+        "pages_total": maps.len(),
         "pages_written": written,
         "pages_unchanged": unchanged,
         "pages_with_mention": pages_with_mention,
         "direct_mentioned_pairs": direct_mentioned,
         "two_hop_mentioned_pairs": two_hop_mentioned,
         "stub_pairs": stub_pairs,
+        "llm_converted_pairs": llm_converted,
+        "llm_inconsistent_pairs": llm_inconsistent,
+        "audit": audit_summary,
+    }))
+}
+
+/// M2b L2 审计:复用 symbol-annotate 的分页批处理与 verdict 契约。
+/// 只处理「stub 且符号有 aspects」的对;mentions=true 的对转为
+/// mention_source=llm_verdict + summary,verdict 细节快照进图。
+#[allow(clippy::too_many_arguments)]
+async fn run_audit(
+    maps: &mut [PageSymbolMap],
+    docs: &[SymbolDoc],
+    view: &CorpusPageView,
+    config: &LlmConfig,
+    params: &ScanWikiParams,
+    scripts_root: &Path,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let doc_by_path: HashMap<&str, &SymbolDoc> = docs
+        .iter()
+        .map(|d| (d.reference.path.as_str(), d))
+        .collect();
+
+    // 每符号收集 stub 页(有 aspects 的),按 facts 富裕度排序后截断
+    let mut stub_pages: BTreeMap<String, Vec<i64>> = BTreeMap::new();
+    for map in maps.iter() {
+        for (path, entry) in &map.symbols {
+            if entry.detail_level == "stub" && !entry.aspects_ignored.is_empty() {
+                stub_pages.entry(path.clone()).or_default().push(map.pageid);
+            }
+        }
+    }
+    let selected: Vec<String> = match &params.audit_symbols {
+        Some(stems) => {
+            let wanted: BTreeSet<String> = stems
+                .iter()
+                .map(|s| format!("{}.lua", s.trim().to_lowercase()))
+                .collect();
+            let mut hit = Vec::new();
+            for prefix in ["components/", "brains/", "stategraphs/", "behaviours/"] {
+                for stem in &wanted {
+                    let p = format!("{prefix}{stem}");
+                    if stub_pages.contains_key(p.as_str()) {
+                        hit.push(p);
+                    }
+                }
+            }
+            hit
+        }
+        None => {
+            let mut ranked: Vec<(&String, usize)> =
+                stub_pages.iter().map(|(p, ids)| (p, ids.len())).collect();
+            ranked.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(b.0)));
+            ranked
+                .into_iter()
+                .take(10)
+                .map(|(p, _)| p.clone())
+                .collect()
+        }
+    };
+    if selected.is_empty() {
+        return Ok(serde_json::json!({"symbols_audited": 0, "note": "无匹配的审计符号"}));
+    }
+
+    let raw_dir = PathBuf::from("output/knowledge/raw/page_map");
+    std::fs::create_dir_all(&raw_dir)?;
+
+    let mut pages_sent = 0usize;
+    let mut batches_failed = 0usize;
+    let mut converted = 0usize;
+    let mut inconsistent = 0usize;
+    let system = "你是 DST Huiji Wiki 的代码符号页面影响标注助手。必须严格按用户要求输出 JSON。";
+
+    for sym_path in &selected {
+        let Some(doc) = doc_by_path.get(sym_path.as_str()) else {
+            continue;
+        };
+        let Some((_, mut pids)) = stub_pages.remove_entry(sym_path.as_str()) else {
+            continue;
+        };
+        pids.sort_by_key(|pid| std::cmp::Reverse(view.facts.get(pid).map_or(0, Vec::len)));
+        pids.truncate(params.audit_max_pages);
+        if pids.is_empty() {
+            continue;
+        }
+
+        let variants: Vec<String> = pids
+            .iter()
+            .flat_map(|pid| {
+                view.pages
+                    .iter()
+                    .filter(|(_, ids)| ids.contains(pid))
+                    .map(|(v, _)| v.clone())
+                    .collect::<Vec<_>>()
+            })
+            .take(40)
+            .collect();
+        let mut evidence = Vec::new();
+        for pid in &pids {
+            if let Some(facts) = view.facts.get(pid) {
+                for f in facts.iter().take(8) {
+                    evidence.push(PageEvidence {
+                        pageid: *pid,
+                        region_id: f.region_id.clone(),
+                        raw: f.raw.clone(),
+                        snippet: f.snippet.clone(),
+                        matched_by: "candidate",
+                    });
+                }
+            }
+        }
+        let ann = SymbolPageAnnotation {
+            symbol: SymbolRef::File {
+                path: (*sym_path).to_string(),
+            },
+            kind: SymbolKind::File,
+            affected_variants: variants,
+            affected_pageids: pids.clone(),
+            visibility: SymbolPageVisibility::PageVisible,
+            page_evidence: evidence,
+        };
+        let mut semantics = doc.summary.clone();
+        let aspect_names: Vec<String> = doc
+            .wiki
+            .as_ref()
+            .map(|w| w.aspects.iter().map(|a| a.aspect.clone()).collect())
+            .unwrap_or_default();
+        if !aspect_names.is_empty() {
+            semantics.push_str(&format!(
+                "\n代码侧可证实的关键 aspects:{}",
+                aspect_names.join("、")
+            ));
+        }
+
+        let working_pids = pids.clone();
+        let mut working = ann.clone();
+        working.affected_pageids = working_pids;
+        let batches = paginate_affected_pages(
+            &working,
+            params.audit_batch_pages,
+            params.audit_batch_max_chars,
+        );
+        reporter.log(format!(
+            "审计 {}:送审 {} 页 / {} 批",
+            sym_path,
+            pids.len(),
+            batches.len()
+        ));
+        pages_sent += pids.len();
+
+        for (bi, batch) in batches.iter().enumerate() {
+            let prompt = render_symbol_annotation_prompt_for_pages(&ann, &semantics, batch);
+            let raw_file = raw_dir.join(format!(
+                "{}_b{:02}.json",
+                sym_path.replace('/', "_"),
+                bi + 1
+            ));
+            let mut outcome = None;
+            for attempt in 1..=2 {
+                if attempt > 1 {
+                    reporter.log("审计批次重试第 2 次…".to_string());
+                }
+                let raw = config
+                    .complete_streaming(system, &prompt, |ev| match ev {
+                        LlmStreamEvent::FirstToken { elapsed_secs } => {
+                            reporter.log(format!("首个输出分片({elapsed_secs}s)"));
+                        }
+                        LlmStreamEvent::Tick { chars } => {
+                            let _ = chars;
+                        }
+                        LlmStreamEvent::Done {
+                            chars,
+                            elapsed_secs,
+                        } => {
+                            reporter.log(format!("输出完成:{chars} 字符 / {elapsed_secs}s"));
+                        }
+                    })
+                    .await;
+                match raw {
+                    Ok(text) => {
+                        let _ = std::fs::write(&raw_file, &text);
+                        outcome = Some(Ok(text));
+                        break;
+                    }
+                    Err(e) => outcome = Some(Err(e)),
+                }
+            }
+            let raw = match outcome.expect("至少一次尝试") {
+                Ok(t) => t,
+                Err(e) => {
+                    batches_failed += 1;
+                    reporter.log(format!("审计批次失败,跳过:{e}"));
+                    continue;
+                }
+            };
+            let verdicts = match parse_symbol_annotation_response(&raw) {
+                Ok(v) => v,
+                Err(e) => {
+                    batches_failed += 1;
+                    reporter.log(format!("verdict 解析失败,跳过:{e}"));
+                    continue;
+                }
+            };
+            for v in verdicts {
+                let Some(map) = maps.iter_mut().find(|m| m.pageid == v.pageid) else {
+                    continue;
+                };
+                let Some(entry) = map.symbols.get_mut(sym_path.as_str()) else {
+                    continue;
+                };
+                if entry.mention_source.is_some() {
+                    continue; // 只改写 stub 对
+                }
+                if v.mentions {
+                    entry.mention_source = Some("llm_verdict".to_string());
+                    entry.detail_level = "summary".to_string();
+                    converted += 1;
+                }
+                if v.semantic_consistent == Some(false) {
+                    inconsistent += 1;
+                }
+                entry.llm_verdict = Some(LlmVerdict {
+                    wording: v.wording,
+                    semantic_consistent: v.semantic_consistent,
+                    note: v.note,
+                });
+            }
+        }
+        let _ = scripts_root;
+    }
+
+    reporter.log(format!(
+        "审计完成:转换 {converted} 对为提及,语义不一致 {inconsistent} 对,失败批次 {batches_failed}"
+    ));
+    Ok(serde_json::json!({
+        "symbols_audited": selected.len(),
+        "pages_sent": pages_sent,
+        "converted_to_mention": converted,
+        "semantic_inconsistent": inconsistent,
+        "batches_failed": batches_failed,
     }))
 }
 

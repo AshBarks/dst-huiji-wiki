@@ -31,9 +31,14 @@
         "闷烧状态与扑灭行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/combat.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -48,7 +53,11 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": true
+      }
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -83,9 +92,14 @@
         "实体被作祟互动描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null
+      }
     },
     "components/health.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "制作消耗生命值描述",
         "医疗与食物回复生命值描述",
@@ -96,7 +110,11 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": true
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -104,13 +122,19 @@
         "检视状态区分描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "页面描述加农炮塔，推测为crabking_cannontower，在受影响变体中，未提及inspectable"
+      }
     },
     "components/knownlocations.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/locomotor.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动靠近目标描述",
         "冲刺速度描述",
@@ -123,7 +147,11 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "行走速度=4 |奔跑速",
+        "semantic_consistent": true
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -134,7 +162,12 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "wording": null,
+        "semantic_consistent": null,
+        "note": "页面提及加农炮塔及掉落，推测对应受影响变体 crabking_cannontower"
+      }
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -155,5 +188,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

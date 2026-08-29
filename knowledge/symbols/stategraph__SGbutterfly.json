@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbutterfly.lua"
   },
   "category": "stategraph",
   "display_name": "SGbutterfly",
-  "summary": "该状态图驱动游戏中的蝴蝶实体，管理其飞行、着陆、授粉与死亡等行为。状态以飞行移动/闲置与落地着陆/授粉/起飞两大类组织，并通过动作处理器响应归巢与授粉指令。",
+  "summary": "该状态图驱动游戏中的蝴蝶实体，管理其飞行、着陆、授粉与死亡等行为。状态以 takeoff 为初始状态，通过 locomote 事件切换移动与闲置，并借助动作处理器响应回家与授粉指令。",
   "api": [],
-  "api_note": "该状态图仅通过StateGraph返回状态机定义，未向实体暴露任何对外调用方法，所有逻辑均在状态内部处理。",
+  "api_note": "该状态图未定义任何对外方法，仅通过事件监听和动作处理器驱动内部状态切换。",
   "events_published": [],
   "events_listened": [
     "locomote",
@@ -30,27 +30,31 @@
   "state_notes": [
     {
       "state": "moving",
-      "note": "由locomote事件且渴望移动时进入，向前飞行并循环播放flight_cycle动画，可旋转。"
+      "note": "蝴蝶以速度5向前行走并循环播放飞行动画，具有 moving 与 canrotate 标签。"
     },
     {
       "state": "death",
-      "note": "由death事件进入，停止物理并移除碰撞，播放死亡动画并掉落战利品，10帧后落地。"
-    },
-    {
-      "state": "land",
-      "note": "由GOHOME/POLLINATE动作或land事件进入，播放land动画并落地；动画结束后依缓冲动作转授粉、归巢移除或着陆闲置。"
-    },
-    {
-      "state": "pollinate",
-      "note": "着陆后缓冲动作为授粉时进入，执行授粉动作并随机停留3±1秒，超时后起飞，期间保持落地。"
-    },
-    {
-      "state": "takeoff",
-      "note": "由授粉超时等进入，播放take_off动画，结束后回到飞行闲置状态。"
+      "note": "蝴蝶死亡时停止物理并移除碰撞器，掉落战利品，10帧后落地。"
     },
     {
       "state": "idle",
-      "note": "飞行悬停状态，循环idle_flight_loop动画，超时后根据是否渴望移动转移动或继续闲置。"
+      "note": "蝴蝶空中悬停播放循环动画，超时后根据移动意图切回移动或保持闲置。"
+    },
+    {
+      "state": "land",
+      "note": "蝴蝶着陆播放动画，根据缓冲动作决定授粉、回家移除或进入 land_idle。"
+    },
+    {
+      "state": "land_idle",
+      "note": "蝴蝶已着陆停留，带 landed 标签，退出时重新升起飞行高度。"
+    },
+    {
+      "state": "pollinate",
+      "note": "蝴蝶执行授粉缓冲动作，停留随机约3秒后自动起飞。"
+    },
+    {
+      "state": "takeoff",
+      "note": "蝴蝶播放起飞动画后回到 idle，是状态图初始状态。"
     }
   ],
   "wiki": {
@@ -64,9 +68,22 @@
       13897,
       15539
     ],
-    "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单为空，未指定stategraph__SGbutterfly的任何能力，页面摘录虽含蝴蝶实体页面但无对应符号能力表达可检索。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "死亡掉落联动",
+        "evidence": [
+          {
+            "pageid": 13707,
+            "quote": "掉落 = 二选一：蝴蝶翅膀（98%）黄油（2%）"
+          },
+          {
+            "pageid": 53270,
+            "quote": "击杀蝴蝶以约2%概率掉落黄油"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "蝴蝶",
@@ -80,14 +97,13 @@
   ],
   "gameplay_tags": [
     "装饰",
-    "生存",
-    "农业"
+    "生存"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "bbb1350de836398310dddc73a86514c9d0666ebf1bc41eb7cfaa5cd0f820d7e6",
     "source_bytes": 4036,
     "model": "hy3-free",
-    "generated_at_ms": 1787968743737
+    "generated_at_ms": 1787969794775
   }
 }

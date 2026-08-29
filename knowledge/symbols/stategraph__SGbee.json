@@ -1,21 +1,20 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbee.lua"
   },
   "category": "stategraph",
   "display_name": "SGbee",
-  "summary": "该状态图驱动游戏中的蜜蜂（bee）实体，涵盖其飞行、着陆、授粉、攻击、受击及死亡等行为的状态切换。状态组织以显式 State 定义为基础，并借助 CommonStates 扩展睡眠、冰冻、触电及尸体等通用状态，通过事件与动作处理器联动 AI 逻辑。",
+  "summary": "该状态图驱动游戏中的蜜蜂实体（包括普通蜜蜂与杀手蜜蜂等）。整体以飞行移动、着陆授粉、攻击与受击等状态为核心，通过事件与动作处理器切换，并借助通用状态库扩展睡眠、冰冻、触电与尸体等状态。",
   "api": [],
-  "api_note": "该状态图仅通过 StateGraph 返回标准状态机，未定义额外的对外调用方法。",
+  "api_note": "该状态图仅通过事件监听和动作处理器驱动状态切换，未定义任何对外暴露的自定义方法。",
   "events_published": [],
   "events_listened": [
     "attacked",
     "doattack",
-    "locomote",
-    "animover"
+    "locomote"
   ],
   "netvars": [],
   "tunables": [],
@@ -37,72 +36,95 @@
   "state_notes": [
     {
       "state": "death",
-      "note": "死亡状态：停止嗡嗡声并播放死亡动画，移除物理碰撞并掉落死亡战利品，12帧后落地。"
-    },
-    {
-      "state": "action",
-      "note": "执行缓冲动作（如回家）状态：停止移动并播放 idle 循环，完成后回到 idle。"
-    },
-    {
-      "state": "moving",
-      "note": "移动状态：向前行走并循环 walk_loop 动画，超时 2.5+随机秒后若符合条件则转入 catchbreath 休息。"
-    },
-    {
-      "state": "catchbreath",
-      "note": "落地休息状态：标签为 landed 且 busy，随机 4±2 秒后若满足采蜜条件会创建花朵，然后起飞。"
-    },
-    {
-      "state": "land",
-      "note": "着陆状态：播放 land 动画并落地，结束后根据缓冲动作决定进入授粉或 land_idle。"
-    },
-    {
-      "state": "pollinate",
-      "note": "授粉状态：落地并执行缓冲的授粉动作，随机 3±1 秒后完成并起飞。"
-    },
-    {
-      "state": "takeoff",
-      "note": "起飞状态：播放 takeoff 动画与音效，结束后回到 idle 并恢复嗡嗡声。"
+      "note": "死亡状态，停止嗡嗡声并播放死亡动画，移除物理碰撞并掉落死亡战利品。"
     },
     {
       "state": "attack",
-      "note": "攻击状态：播放 atk 动画，第15帧调用 DoAttack 造成战斗伤害，无显式无敌帧。"
+      "note": "攻击状态，第15帧执行战斗伤害（DoAttack），第10帧播放攻击音效，结束后返回空闲。"
     },
     {
       "state": "hit",
-      "note": "受击硬直状态：播放 hit 动画并停止移动，受击后短暂硬直然后回到 idle。"
+      "note": "受击硬直状态，播放受击动画并停止移动，结束后回空闲。"
+    },
+    {
+      "state": "catchbreath",
+      "note": "落地休息状态（标签landed/busy），超时后若满足条件会创建花朵然后起飞；中断则恢复嗡嗡声。"
+    },
+    {
+      "state": "pollinate",
+      "note": "授粉状态，落地执行缓冲的授粉动作，超时后起飞；中断则恢复飞行与嗡嗡声。"
+    },
+    {
+      "state": "land",
+      "note": "着陆状态，播放着陆动画，结束后根据缓冲动作转授粉或落地空闲。"
+    },
+    {
+      "state": "takeoff",
+      "note": "起飞状态，播放起飞动画与音效，结束后回空闲并恢复嗡嗡声。"
+    },
+    {
+      "state": "moving",
+      "note": "移动状态，行走循环动画，超时后若为无目标工蜂则转休息（catchbreath）。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，根据是否有战斗目标或killer标签播放不同 idle 动画。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
-      22066,
-      15314,
       15551,
-      15818
+      15922,
+      15022,
+      15314,
+      13897,
+      15651,
+      51046,
+      15225
     ],
-    "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单未提供任何条目，无法在页面中检索对应能力表达，故无证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15551,
+            "quote": "嗡嗡蜜蜂会与蜂王一起攻击、追逐目标"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落物标注",
+        "evidence": [
+          {
+            "pageid": 15314,
+            "quote": "针刺（83.3%）蜂蜜（16.7%）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "蜜蜂状态",
-    "蜜蜂攻击",
-    "蜜蜂授粉",
-    "蜜蜂落地",
-    "蜜蜂起飞",
-    "蜜蜂死亡",
-    "蜜蜂硬直",
-    "蜜蜂移动"
+    "蜜蜂",
+    "杀手蜜蜂",
+    "授粉",
+    "攻击",
+    "硬直",
+    "着陆",
+    "起飞",
+    "造花",
+    "死亡"
   ],
   "gameplay_tags": [
     "战斗",
     "生存",
-    "建造"
+    "授粉"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "89ed3db5f213d41371392889028c138e47599a78d0b103c97d56d086a99f77f6",
     "source_bytes": 10123,
     "model": "hy3-free",
-    "generated_at_ms": 1787968630325
+    "generated_at_ms": 1787969656431
   }
 }

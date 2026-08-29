@@ -1,27 +1,27 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGLeif.lua"
   },
   "category": "stategraph",
   "display_name": "SGLeif",
-  "summary": "该状态图驱动饥荒联机版中的树精（Leif）实体，包含普通与冬树变体。状态组织涵盖伪装沉睡、唤醒变身、行走攻击、受击硬直、着火恐慌及死亡掉落，通过监听 attacked、doattack、gotosleep 等事件实现转换，通用状态由 commonstates 附加。",
+  "summary": "该状态图驱动饥荒联机版中的树精（Leif）实体，涵盖其生成、伪装成树、睡眠、唤醒、攻击与受击等核心行为。状态组织以事件监听（如 attacked、doattack、gotosleep）触发对应状态跳转，并借助通用状态函数添加行走、冰冻等逻辑，实现了从树木到战斗生物的完整转换。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听驱动状态转换，未定义对外调用的方法或接口。",
+  "api_note": "该状态图仅通过事件监听与状态跳转驱动树精实体，未定义或暴露任何对外调用的方法或接口。",
   "events_published": [],
   "events_listened": [
     "attacked",
     "death",
     "doattack",
-    "death",
     "gotosleep",
-    "onwakeup"
+    "onwakeup",
+    "animover"
   ],
   "netvars": [],
   "tunables": [
-    "LEIF_HIT_RECOVERY"
+    "TUNING.LEIF_HIT_RECOVERY"
   ],
   "states": [
     "death",
@@ -38,35 +38,31 @@
   "state_notes": [
     {
       "state": "death",
-      "note": "死亡时停止物理并移除碰撞，播放倒下动画与树木倒塌音效，同时掉落战利品。"
+      "note": "实体死亡时进入，停止移动并移除物理碰撞，播放倒树音效并掉落战利品。"
     },
     {
       "state": "attack",
-      "note": "攻击时停止移动并播放挥击动画，在第25帧造成实际伤害，第26帧解除攻击标签。"
+      "note": "执行攻击动作，第25帧造成战斗伤害，状态期间带有 attack 与 busy 标签阻止其他行为。"
     },
     {
       "state": "hit",
-      "note": "受击硬直状态，播放受击动画并更新受击恢复延迟（TUNING.LEIF_HIT_RECOVERY），期间可被特定条件打断。"
+      "note": "受击硬直状态，播放受击动画并调用受击恢复延迟（关联 TUNING.LEIF_HIT_RECOVERY），期间不会被重复打断。"
     },
     {
       "state": "sleeping",
-      "note": "睡眠变身树状态，带有 sleeping 标签，受到攻击会唤醒并转入 wake 状态。"
+      "note": "睡眠并伪装成树木，播放变形动画；若被攻击则立即唤醒进入 wake 状态。"
     },
     {
       "state": "spawn_from_wintertree",
-      "note": "从冬树生成的无面变身状态，逐渐启用动态阴影并覆盖 planter 符号，结束后进入无面闲置。"
-    },
-    {
-      "state": "spawn",
-      "note": "普通生成变身状态，播放 transform_ent 动画完成苏醒。"
+      "note": "从冬季树特殊生成的唤醒过程，无朝向并逐渐显现阴影，结束后转入无面 idle 状态。"
     },
     {
       "state": "wake",
-      "note": "被唤醒的愤怒变身状态，播放 transform_ent_mad 动画并伴随时效音效。"
+      "note": "从睡眠或被激怒后唤醒，播放 transform_ent_mad 动画并带有 waking 与 busy 标签。"
     },
     {
       "state": "panic",
-      "note": "着火恐慌状态，循环恐慌动画，当火灭且状态时间超过0.3秒后返回闲置。"
+      "note": "燃烧恐慌状态，燃烧时循环恐慌动画，火灭且状态时间大于0.3秒后恢复 idle。"
     }
   ],
   "wiki": {
@@ -80,30 +76,48 @@
       34314,
       24748
     ],
-    "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单为空，未指定任何SGLeif相关能力或行为语义，无法在页面中检索对应证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "死亡掉落战利品标注",
+        "evidence": [
+          {
+            "pageid": 15680,
+            "quote": "{{Pic|32|怪物肉}}×1，{{Pic|32|活木头}}×6"
+          }
+        ]
+      },
+      {
+        "aspect": "睡眠树精守卫存在标注",
+        "evidence": [
+          {
+            "pageid": 24544,
+            "quote": "10 个睡眠的树精守卫"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "树精",
-    "树怪",
-    "Leif",
+    "树人",
+    "leif",
     "树精攻击",
-    "树精沉睡",
-    "变身树",
+    "树精睡眠",
+    "冬季树精",
     "受击硬直",
-    "冬树生成"
+    "死亡掉落"
   ],
   "gameplay_tags": [
     "战斗",
     "生存",
-    "伪装"
+    "敌对生物"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "c4f4359c4a624a6f0e1602c7bfacb47769a64b21bd7091b28209aa2f9e6311c3",
     "source_bytes": 9852,
     "model": "hy3-free",
-    "generated_at_ms": 1787968489294
+    "generated_at_ms": 1787969484702
   }
 }

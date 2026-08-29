@@ -1,18 +1,16 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGrabbitking.lua"
   },
   "category": "stategraph",
   "display_name": "SGrabbitking",
-  "summary": "该状态图驱动饥荒联机版中的兔王（rabbitking）实体，涵盖其待机、移动、攻击、召唤、钻地、交易及狂暴化等行为。状态组织上结合了通用状态（睡眠、冻结、触电、死亡等）与兔王特有的能力状态，通过事件监听切换状态并实现玩法逻辑。",
+  "summary": "该状态图驱动兔王（rabbitking）实体，支持被动与攻击性两种形态的行为逻辑。状态组织涵盖待机、移动、技能释放（召唤与俯冲踢）、钻地传送、受击硬直、死亡等，并通过监听攻击、陷阱、交易等事件响应交互。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和状态定义驱动实体，未向外暴露自定义函数接口。",
-  "events_published": [
-    "knockback"
-  ],
+  "api_note": "该状态图仅通过事件监听和内部状态转移驱动兔王实体，不对外暴露任何方法或函数接口。",
+  "events_published": [],
   "events_listened": [
     "attacked",
     "trapped",
@@ -68,82 +66,91 @@
   "state_notes": [
     {
       "state": "ability_summon",
-      "note": "播放thump动画后召唤随从，状态标签为busy/ability，期间不可被普通攻击打断。"
+      "note": "兔王播放捶地动画后召唤随从（SummonMinions），状态标签为 busy 和 ability，期间无法被普通移动打断。"
     },
     {
       "state": "ability_dropkick",
-      "note": "兔王向目标俯冲，期间附加flying标签，对范围内实体造成击退和攻击，速度与时间由TUNING配置。"
+      "note": "兔王向目标发起俯冲踢，设置飞行标签与速度，期间检测范围内实体进行击退和攻击，并启动冷却计时器。"
     },
     {
       "state": "ability_dropkick_miss_stuck_loop",
-      "note": "俯冲未命中后卡住硬直，时长基于TUNING.RABBITKING_STUN_DURATION，可被触电等中断但保留卡住计时。"
+      "note": "俯冲踢落空后兔王卡住硬直，持续 TUNING.RABBITKING_STUN_DURATION，可被电击等中断处理并恢复。"
     },
     {
       "state": "burrowaway",
-      "note": "播放消失动画后移除实体，动画后段附加无敌和不可攻击标签，用于删除实体表现。"
+      "note": "兔王钻地消失并移除实体，动画后期获得临时无敌与不可攻击标签，用于脱离场景。"
     },
     {
       "state": "burrowto",
-      "note": "播放消失动画后传送到目标点并进入出现状态，动画后段同样有无敌保护。"
+      "note": "兔王钻地传送到指定目的地，类似 burrowaway 但结束后触发到达状态，有无敌帧。"
     },
     {
       "state": "burrowarrive",
-      "note": "从地下钻出，随机循环spawn动画，完成后恢复可拾取与交互，结束前带nointerrupt标签。"
+      "note": "兔王从地下钻出，随机循环出生动画，带有 nointerrupt 标签防止被打断。"
     },
     {
       "state": "becameaggressive",
-      "note": "被动兔王切换为狂暴形态，更换build并播放过渡动画，之后进入狂暴外观。"
-    },
-    {
-      "state": "dotrade",
-      "note": "响应交易事件播放trade动画，完成后回到idle，用于兔王与玩家交易行为。"
+      "note": "兔王切换为攻击性形态，更换建造与动画，播放过渡动画。"
     },
     {
       "state": "stunned",
-      "note": "被眩晕（如stunbomb）后硬直，持续TUNING.RABBITKING_STUN_DURATION后恢复。"
+      "note": "兔王被击晕后硬直，持续 TUNING.RABBITKING_STUN_DURATION 后回到待机。"
     },
     {
       "state": "hit",
-      "note": "受击后播放hit动画硬直，无无敌帧，结束后回到idle。"
+      "note": "兔王受击后播放受击动画硬直，随后返回待机。"
+    },
+    {
+      "state": "death",
+      "note": "兔王死亡，停止物理碰撞并掉落死亡战利品。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
-      15922,
       28179,
+      15922,
       18359,
-      19287,
       46887,
       18521,
+      19287,
       13493,
-      14936
+      16419
     ],
-    "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单未提供具体内容，无法在页面中检索对应能力表达；页面虽含兔王相关页面但未获知需匹配的能力项",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "死亡掉落战利品标注",
+        "evidence": [
+          {
+            "pageid": 28179,
+            "quote": "|掉落 = {{Pic|32|小肉}}×1"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "兔王",
     "俯冲踢",
-    "钻地",
     "召唤随从",
+    "钻地",
     "变狂暴",
-    "交易",
-    "击退",
     "硬直",
     "受击",
-    "眩晕"
+    "交易",
+    "兔王形态"
   ],
   "gameplay_tags": [
     "战斗",
     "召唤",
-    "交易"
+    "钻地",
+    "形态切换"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "05d711c2c89b6c77c5158f2b1626d2c1dc53a05b717870d3b3c26acebac35bf7",
     "source_bytes": 30949,
     "model": "hy3-free",
-    "generated_at_ms": 1787968417937
+    "generated_at_ms": 1787969399841
   }
 }

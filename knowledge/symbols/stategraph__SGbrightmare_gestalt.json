@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbrightmare_gestalt.lua"
   },
   "category": "stategraph",
   "display_name": "SGbrightmare_gestalt",
-  "summary": "该状态图驱动亮莓魅影（brightmare_gestalt）实体，包含普通与守卫形态。状态以 idle 为起点，组织了对移动、攻击玩家（削减精神与施加昏睡）、被捕捉、迁移重生及死亡消失等行为的处理，并借助通用接口扩展行走与附身状态。",
+  "summary": "该状态图驱动亮莓魅影（brightmare_gestalt）实体，包含普通与守卫两种形态。状态以 idle 为起点，通过 locomote 事件行走，doattack 触发攻击，并涵盖出现、死亡、重新定位、被捕捉及攻击后变异消失等流程，由事件与计时器驱动状态切换。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和状态机内部逻辑驱动实体，未向外部暴露任何可调用的方法或接口。",
+  "api_note": "状态图未定义任何对外方法，仅通过事件监听与状态内部逻辑驱动实体行为。",
   "events_published": [],
   "events_listened": [
     "locomote",
@@ -21,10 +21,10 @@
   ],
   "netvars": [],
   "tunables": [
-    "TUNING.GESTALT_ATTACK_HIT_RANGE_SQ",
-    "TUNING.GESTALT_ATTACK_DAMAGE_SANITY",
-    "TUNING.GESTALT_ATTACK_DAMAGE_GROGGINESS",
-    "TUNING.GESTALT_ATTACK_DAMAGE_KO_TIME"
+    "GESTALT_ATTACK_HIT_RANGE_SQ",
+    "GESTALT_ATTACK_DAMAGE_SANITY",
+    "GESTALT_ATTACK_DAMAGE_GROGGINESS",
+    "GESTALT_ATTACK_DAMAGE_KO_TIME"
   ],
   "states": [
     "idle",
@@ -40,96 +40,71 @@
   "state_notes": [
     {
       "state": "emerge",
-      "note": "从隐藏中出现的状态，播放出现动画且期间禁止被捕捉，结束后恢复可捕捉。"
-    },
-    {
-      "state": "relocate",
-      "note": "迁移准备状态，播放融化动画后进入隐藏迁移，期间不可被捕捉。"
-    },
-    {
-      "state": "relocating",
-      "note": "隐藏且隐形的迁移状态，短暂停留后寻找新位置重现或移除，实现位置重置。"
-    },
-    {
-      "state": "attack",
-      "note": "普通攻击状态，实体跳跃冲向玩家，在15-25帧间可命中，造成精神削减与昏睡叠加，命中后变异消失。"
-    },
-    {
-      "state": "guardattack",
-      "note": "守卫形态攻击，更快起跳与更高速度，直接造成战斗伤害并可能使目标变异。"
-    },
-    {
-      "state": "captured",
-      "note": "被捕捉状态，可中断任意状态，播放加速融化动画并禁止点击，最终由外部逻辑移除。"
+      "note": "实体出现动画，期间禁用 gestaltcapturable 组件防止被捕捉，动画结束后启用并回到 idle。"
     },
     {
       "state": "death",
-      "note": "死亡状态，播放融化动画后移除实体，若处于睡眠则直接移除。"
+      "note": "播放融化动画后移除实体，若实体睡眠则直接移除；期间禁止被捕捉。"
+    },
+    {
+      "state": "relocating",
+      "note": "实体隐藏并随机延时0.25~0.75秒，之后寻找新点出现或根据标记移除，实现重新定位。"
+    },
+    {
+      "state": "attack",
+      "note": "普通攻击：跳跃并检测范围内玩家，造成精神值与昏睡伤害，命中后进入变异消失状态。"
+    },
+    {
+      "state": "guardattack",
+      "note": "守卫攻击：更快起跳冲刺，对目标直接进行战斗攻击，命中后变异消失。"
+    },
+    {
+      "state": "captured",
+      "note": "被捕捉强制状态，加速播放融化动画且不可中断、不可点击，最终由外部移除实体。"
     },
     {
       "state": "mutate_pre",
-      "note": "攻击命中后的变异消失状态，以一定速度冲出并移除自身。"
+      "note": "攻击命中后的变异消失状态，设置移动速度覆盖并播放变异动画后移除实体。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
-      15530,
-      13933,
-      15240,
-      15555,
-      22503,
-      22514,
-      72981,
-      13551
+      15566,
+      15737,
+      65605,
+      13551,
+      14465
     ],
     "aspects": [
       {
-        "aspect": "冲刺攻击类比描述",
+        "aspect": "攻击仇恨距离描述",
         "evidence": [
           {
             "pageid": 13551,
-            "quote": "虚影会朝着玩家的方向发动一次冲刺，类似于蜘蛛战士"
+            "quote": "在启蒙值高于 80% 时，虚影将在 6 距离单位内追逐并攻击玩家"
           }
         ]
       },
       {
-        "aspect": "启蒙值阈值行为描述",
+        "aspect": "攻击造成精神值与昏睡伤害标注",
         "evidence": [
           {
             "pageid": 13551,
-            "quote": "在启蒙值高于 50% 时，虚影不再躲避玩家，并将发起攻击"
-          }
-        ]
-      },
-      {
-        "aspect": "攻击附加数值标注",
-        "evidence": [
-          {
-            "pageid": 13551,
-            "quote": "击中会使启蒙值提高 10 点，并施加 2 层催眠，被虚影催眠会睡觉6秒"
-          }
-        ]
-      },
-      {
-        "aspect": "特定装备免伤标注",
-        "evidence": [
-          {
-            "pageid": 13551,
-            "quote": "装备亮茄头盔不会受到它的主动攻击"
+            "quote": "击中会使启蒙值提高 10 点，并施加 2 层[[催眠]]"
           }
         ]
       }
     ],
-    "coverage_status": "well_documented"
+    "coverage_status": "partial"
   },
   "search_terms": [
     "亮莓魅影",
-    "精神攻击",
-    "昏睡效果",
-    "可被捕捉",
-    "位置迁移",
-    "守卫形态",
-    "跳跃攻击"
+    "魅影攻击",
+    "精神伤害",
+    "昏睡攻击",
+    "重新定位",
+    "被捕捉",
+    "变异消失"
   ],
   "gameplay_tags": [
     "战斗",
@@ -140,6 +115,6 @@
     "source_sha256": "79e3e20fb28fda0aa5aeb9ecce6f319974aadff7f1e711e6c93935e180bc3531",
     "source_bytes": 10678,
     "model": "hy3-free",
-    "generated_at_ms": 1787968678326
+    "generated_at_ms": 1787969740340
   }
 }

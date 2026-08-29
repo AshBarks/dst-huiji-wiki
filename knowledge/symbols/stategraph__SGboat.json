@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGboat.lua"
   },
   "category": "stategraph",
   "display_name": "SGboat",
-  "summary": "该状态图驱动饥荒联机版中的船只实体（boat），管理其从放置、空闲到断裂沉没的生命周期。整体以线性状态链组织，响应建造阶段受损或死亡事件进入断裂流程，最终移除实体。",
+  "summary": "该状态图驱动游戏中的船只（boat）实体，管理其从放置、闲置到断裂沉没的完整生命周期。状态以线性阶段组织：放置后进入闲置，若死亡则依次经过准备断裂、断裂动画，最终破碎移除并掉落战利品。",
   "api": [],
-  "api_note": "该状态图仅返回标准 StateGraph 对象，未定义任何对外暴露的方法或接口函数供外部调用。",
+  "api_note": "源码中未定义任何对外暴露的方法，状态图仅通过内部状态机和事件监听驱动船只行为，无外部调用接口。",
   "events_published": [
     "abandon_ship",
     "onpresink"
@@ -30,23 +30,23 @@
   "state_notes": [
     {
       "state": "place",
-      "note": "船只放置建造状态，播放放置与溅水动画；若建造阶段生命值耗尽则直接进入断裂准备，否则转入空闲。"
+      "note": "船被放置时播放放置动画与音效；若放置阶段船已损坏死亡，则进入准备断裂状态，否则进入闲置。"
     },
     {
       "state": "idle",
-      "note": "船只正常存活时的空闲状态，循环播放满载空闲动画，并监听死亡事件以触发断裂流程。"
+      "note": "船闲置时循环播放满载 idle 动画；若收到 death 事件则进入准备断裂状态。"
     },
     {
       "state": "ready_to_snap",
-      "note": "船只进入断裂准备，向平台上所有实体推送弃船事件，0.75秒后开始断裂动画。"
+      "note": "船准备断裂时，向平台上所有实体推送 abandon_ship 事件（迫使离开），0.75秒后进入断裂状态。"
     },
     {
       "state": "snapping",
-      "note": "船只断裂前摇，生成裂痕特效并向玩家推送预下沉事件，伴随渐进损伤音效，动画结束即消失。"
+      "note": "船断裂时生成裂纹特效，播放1秒 crack 动画，向平台上玩家推送 onpresink 事件，并随时间播放渐强损伤音效。"
     },
     {
       "state": "popping",
-      "note": "船只最终沉没状态，执行掉落战利品并移除自身实体，船从世界中彻底消失。"
+      "note": "船破碎时调用 sinkloot 掉落战利品并执行 postsinkfn，随后移除实体。"
     }
   ],
   "wiki": {
@@ -60,19 +60,32 @@
       20291,
       20315
     ],
-    "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单未提供，无法在页面中匹配SGboat具体能力表达；页面摘录涉及布景、生物与船只物品，但未明确描述stategraph__SGboat状态图能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "船体崩溃掉落物标注",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "崩溃掉落 3 个[[木板]]"
+          },
+          {
+            "pageid": 20291,
+            "quote": "崩溃掉落 6 个[[采下的草]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "船只放置",
-    "船空闲",
+    "船放置",
+    "船闲置",
     "船断裂",
+    "船破碎",
     "弃船",
-    "预下沉",
+    "沉船",
     "船沉没",
-    "船消失",
-    "建船动画"
+    "船平台"
   ],
   "gameplay_tags": [
     "建造",
@@ -83,6 +96,6 @@
     "source_sha256": "51fffde5a39ef3f5172094a53ee60bbbe71e8249828723fedd793bc478ad949e",
     "source_bytes": 4895,
     "model": "hy3-free",
-    "generated_at_ms": 1787968211801
+    "generated_at_ms": 1787969103955
   }
 }

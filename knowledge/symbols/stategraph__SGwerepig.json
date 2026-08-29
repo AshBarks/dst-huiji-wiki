@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGwerepig.lua"
   },
   "category": "stategraph",
   "display_name": "SGwerepig",
-  "summary": "该状态图驱动猪人变身后的狼人猪（werepig）实体，管理其从变身、待机、移动、攻击到死亡等一系列行为。状态组织上除自定义核心状态外，还借助 CommonStates 批量添加了睡眠、冰冻、触电、跳跃、下沉等通用状态，并通过事件监听实现战斗与目标切换响应。",
+  "summary": "该状态图驱动狼人猪（werepig）实体，管理其从变身、空闲、移动、攻击、进食到死亡的全生命周期行为。状态组织以显式定义的核心状态结合 CommonStates 添加的通用状态（睡眠、冰冻、触电等）构成，通过事件监听实现战斗目标变更与变身触发。",
   "api": [],
-  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未对外暴露任何方法或接口。",
+  "api_note": "该状态图仅通过标准 StateGraph 接口驱动实体，源码中未定义额外的对外调用方法。",
   "events_published": [],
   "events_listened": [
     "transformwere",
@@ -40,28 +40,28 @@
   ],
   "state_notes": [
     {
+      "state": "death",
+      "note": "进入死亡时停止移动、移除物理碰撞并掉落战利品，播放死亡动画与叫声。"
+    },
+    {
       "state": "transformWere",
-      "note": "由 transformwere 事件触发（实体未死亡时），播放变身动画并添加 hostile 标签，变身结束后进入 howl 状态。"
+      "note": "响应变身事件，播放变身动画与音效，添加 hostile 标签并切换外观，结束后进入嚎叫状态。"
     },
     {
       "state": "attack",
-      "note": "攻击状态，第16帧执行 DoAttack 造成伤害，动画结束后若无目标有概率咆哮否则待机。"
-    },
-    {
-      "state": "howl",
-      "note": "咆哮状态，标签 busy，常用于获得新目标或放弃目标时触发，第20帧播放嚎叫音效。"
-    },
-    {
-      "state": "hit",
-      "note": "受击硬直状态，播放受伤音效与 hit 动画，结束后回到 idle。"
-    },
-    {
-      "state": "death",
-      "note": "死亡状态，停止移动并移除物理碰撞，掉落死亡战利品后播放死亡动画。"
+      "note": "攻击前摇后于第16帧执行实际伤害（DoAttack），攻击后可能概率嚎叫或回到空闲。"
     },
     {
       "state": "eat",
-      "note": "进食状态，第20帧执行缓冲的进食动作，结束后可能咆哮或待机。"
+      "note": "执行进食动作，第20帧调用 PerformBufferedAction 完成拾取或进食逻辑。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放受伤音效与动画，期间无法行动，结束后返回空闲。"
+    },
+    {
+      "state": "howl",
+      "note": "忙碌的嚎叫状态，第20帧播放嚎叫声，常用于获得新目标或放弃目标后的威慑表现。"
     }
   ],
   "wiki": {
@@ -75,18 +75,63 @@
       24875,
       13406
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定需检索的 SGwerepig 能力方面，页面15421虽描述疯猪但无待查清单匹配，故无证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "受击硬直描述",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "绝大多数武器能使疯猪无限硬直"
+          }
+        ]
+      },
+      {
+        "aspect": "变身行为描述",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "变身为疯猪"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "连续攻击它 2 次就不会触发它的攻"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落标注",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "掉落 = {{Pic|32|肉}}×2，{{Pic|32|猪皮}}×1"
+          }
+        ]
+      },
+      {
+        "aspect": "进食动作描述",
+        "evidence": [
+          {
+            "pageid": 15421,
+            "quote": "在它进食时，玩家只要不在它进食动画间隔时攻击它"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "狼人猪",
     "猪人变身",
-    "狼人咆哮",
+    "狼人嚎叫",
     "狼人攻击",
     "狼人进食",
-    "受击硬直",
-    "变身动画"
+    "变身动画",
+    "受击硬直"
   ],
   "gameplay_tags": [
     "战斗",
@@ -97,6 +142,6 @@
     "source_sha256": "5f85b6bab91ae9bdf5a61dd807a1628d9544bb61e8148a259dceee96c561db19",
     "source_bytes": 9339,
     "model": "hy3-free",
-    "generated_at_ms": 1787968412200
+    "generated_at_ms": 1787969403803
   }
 }

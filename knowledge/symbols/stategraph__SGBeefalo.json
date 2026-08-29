@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGBeefalo.lua"
   },
   "category": "stategraph",
   "display_name": "SGBeefalo",
-  "summary": "该状态图驱动游戏中的牛（Beefalo）及小牛（Baby Beefalo）实体，控制其空闲、移动、攻击、进食、驯化、繁殖及死亡等丰富行为。状态通过事件监听与通用状态处理器组织，并包含骑乘、拴绑和毛发生长等专属逻辑。",
+  "summary": "该状态图驱动成年牛(beefalo)及幼牛(babybeefalo)实体的行为逻辑。整体通过显式定义待机、攻击、进食、驯化等状态，并借助CommonStates添加行走、受击、冰冻等通用状态，依靠事件监听与标签进行状态切换与行为组织。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和状态机内部逻辑驱动实体，未定义任何对外暴露的方法或接口。",
+  "api_note": "该状态图源码未定义任何对外调用的方法，仅通过事件监听和状态机内部切换驱动实体行为。",
   "events_published": [],
   "events_listened": [
     "onsink",
@@ -24,10 +24,17 @@
     "carratboarded",
     "unhitch",
     "hitch",
-    "despawn"
+    "despawn",
+    "animover",
+    "animqueueover"
   ],
   "netvars": [],
-  "tunables": [],
+  "tunables": [
+    "TUNING.BEEFALO_KEEP_SADDLE_OBEDIENCE",
+    "TUNING.CALORIES_TINY",
+    "TUNING.CALORIES_SUPERHUGE",
+    "TUNING.BEEFALO_BEARD_BITS"
+  ],
   "states": [
     "idle",
     "shake",
@@ -67,83 +74,124 @@
   ],
   "state_notes": [
     {
+      "state": "idle",
+      "note": "基础待机状态，根据饥饿度、鞍具、情绪等随机切换吃草/叫唤/摇尾等子状态，竞赛期间延长超时时间。"
+    },
+    {
       "state": "attack",
-      "note": "标签为 attack 和 busy，在动画第15帧通过 DoAttack 对目标造成伤害，用于牛的近战攻击。"
+      "note": "攻击状态带busy/attack标签，在动画第15帧通过DoAttack对目标造成伤害。"
     },
     {
       "state": "death",
-      "note": "播放死亡动画，非加载存档时移除碰撞并掉落战利品，2秒后腐蚀消失；若被骑乘则延迟死亡。"
-    },
-    {
-      "state": "eat",
-      "note": "进食状态，根据食物饥饿值映射进食时长（0.4~8秒），结束后可能反刍、进入坏食物状态或放屁。"
-    },
-    {
-      "state": "hitch",
-      "note": "响应拴住事件，播放动画后执行缓冲的拴牛动作并返回空闲，标签含 busy。"
-    },
-    {
-      "state": "become_domesticated",
-      "note": "驯化变形状态，更新驯化属性并授予玩家成就，期间停止移动且不可打断。"
+      "note": "死亡状态带busy/nointerrupt标签，非加载时移除碰撞体并掉落战利品后腐蚀消失，否则直接置死亡百分比。"
     },
     {
       "state": "revive",
-      "note": "复活状态，开启无敌帧（SetInvincible），移除死亡标签并恢复生理组件，用于暗影复活机制。"
+      "note": "复活状态初期生命无敌，第133帧取消无敌并移除死亡标签，期间播放复活特效与动画。"
     },
     {
-      "state": "hair_growth_pop",
-      "note": "长毛完成状态，恢复毛发位数与可刷状态，应用外观覆盖，标志牛毛生长完毕。"
+      "state": "eat",
+      "note": "进食状态时长由食物饥饿值映射(0.4~8秒)，吃完可能根据饱食度触发呕吐、放屁或坏食物反应。"
     },
     {
-      "state": "idle_carrat",
-      "note": "携带胡萝卜时的空闲状态，覆盖胡萝卜建造并播放专属待机动画，由事件 carratboarded 触发。"
+      "state": "become_domesticated",
+      "note": "驯化变形状态，播放transform动画并更新驯化属性，结束时授予玩家驯牛成就。"
     },
     {
-      "state": "graze",
-      "note": "吃草空闲状态，随机持续1~5秒后返回空闲，体现牛的自然进食行为。"
+      "state": "hair_growth",
+      "note": "长毛状态恢复毛发位并允许刷毛，设置毛发数量及外观覆盖。"
     },
     {
       "state": "shake_off_saddle",
-      "note": "当服从度过低时自动抖落马鞍，第24帧调用 SetSaddle(nil) 移除鞍具。"
+      "note": "当服从度低于阈值时触发，动画第24帧移除鞍具并播放甩鞍音效。"
+    },
+    {
+      "state": "hitch",
+      "note": "拴牛状态，播放抖动动画后执行缓冲的拴绳动作并返回待机。"
+    },
+    {
+      "state": "graze",
+      "note": "吃草状态循环播放graze_loop动画，超时后自动返回待机。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
       15238,
       13156,
-      15169,
-      15380,
-      28734,
-      14653,
-      14654,
-      14655
+      13785,
+      18553,
+      18849,
+      72393
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定任何SGBeefalo能力或行为语义，无目标可在页面文本中检索，故判定页面未讨论该符号的特定能力",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "皮弗娄牛受到攻击后会反击"
+          },
+          {
+            "pageid": 15238,
+            "quote": "皮弗娄牛攻击会重置仇恨时间"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落物标注",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "掉落 = 牛毛×3，肉×4"
+          }
+        ]
+      },
+      {
+        "aspect": "毛发再生周期标注",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "被剃毛的牛会在 3 天后再长出来毛"
+          }
+        ]
+      },
+      {
+        "aspect": "驯化行为提及",
+        "evidence": [
+          {
+            "pageid": 13785,
+            "quote": "皮弗娄牛驯化"
+          },
+          {
+            "pageid": 18553,
+            "quote": "自己正在驯化的牛"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "牛类",
-    "牛状态",
-    "拴牛",
-    "驯化牛",
+    "牛状态图",
     "牛攻击",
+    "牛驯化",
     "牛进食",
-    "牛死亡",
+    "牛拴绳",
     "牛复活",
     "牛长毛",
-    "骑牛"
+    "牛待机"
   ],
   "gameplay_tags": [
-    "养殖",
+    "驯养",
     "战斗",
-    "坐骑"
+    "进食",
+    "移动"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "38d3c1397f5ec1be51438377f487a2ba0de74b39edf6b3725ce68d120136def1",
     "source_bytes": 32405,
     "model": "hy3-free",
-    "generated_at_ms": 1787968494836
+    "generated_at_ms": 1787969482830
   }
 }

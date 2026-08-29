@@ -1,21 +1,22 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGdeer.lua"
   },
   "category": "stategraph",
   "display_name": "SGdeer",
-  "summary": "该状态图驱动游戏中的鹿（deer）实体，包含普通鹿与携带宝石的魔法鹿。状态组织以空闲、行走、奔跑、战斗等基础行为为核心，并扩展了长角、施法、解链等专属交互状态，通过事件监听实现宝石魔法与鹿角生长逻辑。",
+  "summary": "该状态图驱动饥荒联机版中的鹿（deer）实体，包括普通鹿、宝石鹿及被锁链束缚的鹿。其状态组织在显式定义待机、吃草、长角、施法、解缚等玩法状态的同时，复用通用状态库扩展了移动、战斗、冰冻与尸体等常规行为，形成完整 AI。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和内部状态转移驱动实体，未定义或暴露任何对外调用的方法接口。",
+  "api_note": "该状态图文件仅构造并返回 StateGraph 实例，所有行为均通过事件监听与状态机内部转移实现，未向外暴露任何函数或方法接口。",
   "events_published": [],
   "events_listened": [
     "doattack",
     "deercast",
     "growantler",
-    "unshackle"
+    "unshackle",
+    "animover"
   ],
   "netvars": [],
   "tunables": [
@@ -37,54 +38,66 @@
   "state_notes": [
     {
       "state": "idle",
-      "note": "空闲状态，检查记忆中的施法/长角/解锁请求，或25%概率进入吃草；带 idle 和 canrotate 标签。"
+      "note": "基础待机状态，会检查记忆中的施法、长角或解缚请求并转移；无宝石时概率进入吃草；播放铃铛与锁链音效。"
+    },
+    {
+      "state": "idle_grazing",
+      "note": "无宝石鹿概率触发的吃草动画状态，仅播放吃草与锁链音效，结束后回到待机。"
     },
     {
       "state": "growantler",
-      "note": "长鹿角状态，标签 busy 硬直，播放动画后显示鹿角并生成生长特效。"
+      "note": "长鹿角状态（忙碌），播放解缚动画并生成生长特效，退出时显示鹿角。"
     },
     {
       "state": "knockoffantler",
-      "note": "鹿角被击落状态，标签 busy，播放受击动画 hit_2 并发声。"
+      "note": "鹿角被击落时的硬直状态（忙碌），播放受击动画与音效，结束后回待机。"
     },
     {
       "state": "magic_pre",
-      "note": "宝石鹿魔法准备，标签 attack/busy/casting；冰鹿在此时段末执行 DoCast，红鹿生成充能特效。"
+      "note": "宝石鹿施法前摇（攻击、忙碌、施法标签），生成红或蓝充能特效，红宝石在结束态才施放，蓝宝石在前摇末段已执行施法。"
+    },
+    {
+      "state": "magic_loop",
+      "note": "蓝宝石鹿施法循环状态，最多循环 3 次，期间播放动画与音效，保持施法标签。"
     },
     {
       "state": "magic_pst",
-      "note": "魔法结束阶段，触发法术特效（红鹿此时施法），随后移除 casting 与 busy 标签恢复行动。"
+      "note": "施法结束状态，触发法术效果，第25帧移除施法标签、第47帧移除忙碌标签。"
     },
     {
       "state": "unshackle",
-      "note": "解除锁链状态，标签 busy；结束后若带宝石则发射宝石给最近玩家，自身移除并生成新鹿及特效。"
+      "note": "解除锁链状态（忙碌），动画结束后移除原实体并生成新鹿与宝石投射物，同时生成解缚特效。"
+    },
+    {
+      "state": "unshackle_pst",
+      "note": "解缚后新鹿现身动画（忙碌），第30帧后移除忙碌标签并转待机。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
       13897,
-      13823,
-      20152,
-      15594,
-      15812,
-      15596,
+      20511,
       15022,
-      51046
+      51046,
+      13823,
+      15651,
+      15551,
+      15225
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，未指定任何能力，无法在页面中找到对应表达",
+    "no_evidence_reason": "页面摘录中仅13897与20511提及宝石鹿伴随、顶撞及召唤法阵，未体现SGdeer状态图清单中idle/idle_grazing/growantler/knockoffantler/magic_pre/magic_loop/magic_pst/unshackle/unshackle_pst任一具体状态行为的玩家语言表达，其他页面无关，故无证据。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "鹿",
+    "小鹿",
     "宝石鹿",
-    "鹿角",
+    "长鹿角",
     "施法",
-    "解链",
-    "长角",
-    "冰鹿",
-    "红鹿",
-    "攻击"
+    "锁链",
+    "解束缚",
+    "吃草",
+    "攻击",
+    "冰冻"
   ],
   "gameplay_tags": [
     "战斗",
@@ -96,6 +109,6 @@
     "source_sha256": "fef913f55123779d8111857839adb50a5b254122aefd053021b811de61c52f2d",
     "source_bytes": 23083,
     "model": "hy3-free",
-    "generated_at_ms": 1787968273686
+    "generated_at_ms": 1787969282048
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbearger.lua"
   },
   "category": "stategraph",
   "display_name": "SGbearger",
-  "summary": "该状态图驱动饥荒联机版中的熊獾（Bearger）实体，涵盖其战斗、移动、进食与冬眠等行为。状态组织以双足（bi）与四足（quad）姿态切换为基础，结合通用状态（冻结、触电、死亡、变异等）与丰富的自定义攻击状态（连击、重踏、屁股撞击、打哈欠）实现完整AI逻辑。",
+  "summary": "该状态图驱动熊獾（Bearger）实体，涵盖其双足与四足姿态切换、攻击连段、地面重击、打哈欠、屁股撞击及硬直等战斗与行为逻辑。状态组织以 StandState 姿态切换为基础，结合事件监听与计时器实现 AI 行为调用。",
   "api": [],
-  "api_note": "该状态图未定义任何对外暴露的方法，仅通过事件监听（如doattack、attacked）与内部状态跳转驱动熊獾行为。",
+  "api_note": "该状态图未定义对外调用方法，仅通过事件与状态机内部切换驱动实体行为。",
   "events_published": [
     "ridersleep",
     "yawn",
     "knockedout",
-    "onmissother",
     "knockback",
+    "onmissother",
     "docollapse"
   ],
   "events_listened": [
@@ -28,15 +28,15 @@
   ],
   "netvars": [],
   "tunables": [
-    "TUNING.BEARGER_YAWN_RANGE",
-    "TUNING.BEARGER_YAWN_SLEEPTIME",
-    "TUNING.BEARGER_YAWN_COOLDOWN",
-    "TUNING.BEARGER_MELEE_RANGE",
-    "TUNING.BEARGER_NORMAL_GROUNDPOUND_COOLDOWN",
-    "TUNING.BEARGER_ANGRY_WALK_SPEED",
-    "TUNING.BEARGER_CALM_WALK_SPEED",
-    "TUNING.BEARGER_RUN_SPEED",
-    "TUNING.MUTATED_BEARGER_STAGGER_TIME"
+    "BEARGER_YAWN_RANGE",
+    "BEARGER_YAWN_SLEEPTIME",
+    "BEARGER_YAWN_COOLDOWN",
+    "BEARGER_MELEE_RANGE",
+    "BEARGER_NORMAL_GROUNDPOUND_COOLDOWN",
+    "BEARGER_ANGRY_WALK_SPEED",
+    "BEARGER_CALM_WALK_SPEED",
+    "BEARGER_RUN_SPEED",
+    "MUTATED_BEARGER_STAGGER_TIME"
   ],
   "states": [
     "bi",
@@ -79,44 +79,44 @@
   ],
   "state_notes": [
     {
-      "state": "yawn",
-      "note": "熊獾打哈欠使周围玩家与睡眠者陷入睡眠，帧50触发范围睡眠效果，并启动Yawn冷却计时器。"
-    },
-    {
       "state": "attack",
-      "note": "普通弧形攻击，帧32-33进行AOE伤害判定并破坏场景物品，未命中目标时推送onmissother事件。"
+      "note": "熊獾双足姿态挥击，第32帧发起弧形AOE攻击并破坏可破坏物，未命中推送 onmissother 事件。"
     },
     {
       "state": "pound",
-      "note": "地面重击状态，帧20触发GroundPound造成范围震动与伤害，冷却由BEARGER_NORMAL_GROUNDPOUND_COOLDOWN控制。"
+      "note": "地面重击，第20帧触发 GroundPounder 并启动 TUNING.BEARGER_NORMAL_GROUNDPOUND_COOLDOWN 冷却。"
+    },
+    {
+      "state": "yawn",
+      "note": "满足冬眠标签且 Yawn 计时器不存在时进入，第50帧使范围内玩家与睡眠者陷入睡眠。"
     },
     {
       "state": "butt",
-      "note": "屁股向后撞击，造成范围伤害与击退并生成bearger_sinkhole，期间关闭角色碰撞且不可中断。"
-    },
-    {
-      "state": "hit",
-      "note": "四足姿态受击硬直，结束后可转入反击或踉跄，具有受击恢复延迟与可中断窗口。"
-    },
-    {
-      "state": "sleep",
-      "note": "进入睡眠前置，清除进食计时与踉跄标记，根据当前姿态播放睡眠动画并可能持续睡眠。"
-    },
-    {
-      "state": "run",
-      "note": "奔跑状态，高速移动并破坏沿途物品，同时循环播放咆哮音效与脚步震动。"
-    },
-    {
-      "state": "eat_loop",
-      "note": "进食循环状态，执行缓冲的进食动作并随机超时，咀嚼音效与蜂蜜标签影响时长。"
-    },
-    {
-      "state": "death",
-      "note": "死亡状态，播放死亡动画并在帧48掉落战利品，之后由通用尸体状态处理。"
+      "note": "屁股撞击，带 nointerrupt 标签，第8-9帧造成范围伤害并生成 bearger_sinkhole 地形效果。"
     },
     {
       "state": "stagger_pst",
-      "note": "踉跄结束状态，恢复后可进行屁股撞击冷却，帧67移除忙碌标签并允许旋转。"
+      "note": "硬直结束恢复状态，第67帧开始屁股攻击恢复并可被中断。"
+    },
+    {
+      "state": "hit",
+      "note": "四足姿态受击硬直，动画结束后可衔接攻击或进入 idle，支持 doattack 缓冲。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，循环 charge_roar_loop 并每8帧破坏周围物体，速度由 TUNING 配置。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠前置，清除进食计时与硬直记忆，转换到四足睡眠姿态。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "进食循环，执行缓冲动作并随机超时后进入 eat_pst，咀嚼音效多次播放。"
+    },
+    {
+      "state": "death",
+      "note": "死亡动画，第48帧掉落死亡战利品(DropDeathLoot)并触发尸体状态。"
     }
   ],
   "wiki": {
@@ -124,36 +124,49 @@
       15642,
       20154,
       20192,
-      72981,
-      14907,
       45249,
-      13437,
-      15237
+      16623,
+      23187,
+      34314,
+      51221
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，且页面文本仅描述关联实体bearger等的外观、生成与战斗行为，未明确表述stategraph__SGbearger组件能力，故无证据。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "死亡掉落联动与尸体状态描述",
+        "evidence": [
+          {
+            "pageid": 15642,
+            "quote": "掉落 = 肉×8，熊皮×1，熊獾雕塑草图×1"
+          },
+          {
+            "pageid": 51221,
+            "quote": "它们死亡时会留下尸体"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "熊獾",
+    "突变熊獾",
     "打哈欠",
-    "重击",
-    "屁股撞",
-    "踉跄",
-    "连击",
-    "冬眠",
-    "进食",
-    "奔跑"
+    "地面重击",
+    "屁股撞击",
+    "攻击连段",
+    "眩晕硬直",
+    "冬眠"
   ],
   "gameplay_tags": [
     "战斗",
-    "生存"
+    "生存",
+    "冬眠"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "8a086f8e324b0e27bad57b536be7d842303000417ee2c635efd0c98a1e765700",
     "source_bytes": 65562,
     "model": "hy3-free",
-    "generated_at_ms": 1787968617824
+    "generated_at_ms": 1787969651497
   }
 }

@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbird_mutant.lua"
   },
   "category": "stategraph",
   "display_name": "SGbird_mutant",
-  "summary": "该状态图驱动突变鸟实体，管理其从滑翔降临、闲置鸣叫、移动跳跃到攻击与射击等行为。状态以 idle 为初始，通过事件与动作处理器切换，并包含睡眠、冰冻、触电及月变等通用状态扩展。",
+  "summary": "该状态图驱动变异鸟（mutant bird）实体，管理其待机、移动、攻击、滑翔降落及死亡等行为。状态组织上除显式定义的基础状态外，还借助 CommonStates 添加了睡眠、冰冻、电击及月裂变异等通用状态，并通过事件监听实现攻击、陷阱等触发。",
   "api": [],
-  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未向实体暴露任何对外方法或函数。",
+  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未向外部暴露任何自定义方法或接口。",
   "events_published": [],
   "events_listened": [
     "death",
@@ -39,61 +39,80 @@
   "state_notes": [
     {
       "state": "attack",
-      "note": "近战攻击状态，标签为 busy/attack；动画第8帧执行 DoAttack 造成伤害并丢弃当前目标。"
+      "note": "近战攻击状态，动画第8帧执行 DoAttack 造成伤害并丢弃目标，期间带有 busy 和 attack 标签。"
     },
     {
       "state": "shoot",
-      "note": "远程射击状态，第14帧向记忆目标发射抛射物，并启动 spit_cooldown 计时器（3~6秒随机冷却）。"
-    },
-    {
-      "state": "glide",
-      "note": "从空中滑翔降落，仅与地面碰撞；高度低于2时减速，低于0.1传送到地面并进入 idle。"
-    },
-    {
-      "state": "trapped",
-      "note": "被陷阱捕获硬直状态，播放眩晕循环动画，1秒后恢复 idle。"
-    },
-    {
-      "state": "stunned",
-      "note": "被击晕硬直状态，持续 6±2 秒，期间实体可被拾取，结束恢复不可拾取。"
-    },
-    {
-      "state": "emerge",
-      "note": "出现状态，带 noattack/noelectrocute 标签，播放 land 动画后回 idle。"
+      "note": "远程吐射状态，第14帧向目标位置发射投射物，并启动 spit_cooldown 计时器（3~6秒随机冷却）。"
     },
     {
       "state": "death",
-      "note": "死亡状态，移除物理碰撞器并播放死亡动画，实体不再持久化。"
+      "note": "死亡状态，移除物理碰撞器并播放死亡动画，实体不持久化（persists=false）。"
+    },
+    {
+      "state": "glide",
+      "note": "滑翔降落状态，从空中设置垂直速度下落，仅与地面碰撞，高度低于0.1时传送至地面并转 idle。"
+    },
+    {
+      "state": "trapped",
+      "note": "被陷阱捕获状态，硬直1秒播放眩晕循环动画，带 noelectrocute 标签。"
+    },
+    {
+      "state": "stunned",
+      "note": "被击晕状态，硬直随机4~8秒，期间允许被拾取（inventoryitem.canbepickedup=true）。"
+    },
+    {
+      "state": "emerge",
+      "note": "出土状态，带 noattack 和 noelectrocute 标签，播放 land 动画后转 idle。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
-      24542,
-      14674,
-      15022,
-      14676,
-      15235,
-      19905,
-      14099,
-      14809
+      15977,
+      15225,
+      15651,
+      50903,
+      13606,
+      15303,
+      28734,
+      18532
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录包含陷阱布景、trap、alterguardian_phase1、birdtrap、rabbit、pandoraschest、waxwelljournal、trap_teeth等实体，全文未提及stategraph__SGbird_mutant或变异鸟状态图的能力或行为描述，因此页面根本不讨论该符号的能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15977,
+            "quote": "慢慢地向能量静电靠近并试图攻击它"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落联动",
+        "evidence": [
+          {
+            "pageid": 15977,
+            "quote": "谋杀：腐烂物×1"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "突变鸟",
+    "变异鸟",
     "滑翔",
     "吐射",
-    "近战",
-    "陷阱",
+    "近战攻击",
+    "陷阱困住",
     "击晕",
-    "月变",
-    "鸟状态",
-    "射击冷却"
+    "死亡",
+    "跳跃移动",
+    "出土"
   ],
   "gameplay_tags": [
     "战斗",
+    "移动",
     "生存"
   ],
   "related_symbols": [],
@@ -101,6 +120,6 @@
     "source_sha256": "b02d0e3db1c32360553847ab3f94d617ece0b262e47aba0b134db6af81b346d4",
     "source_bytes": 10055,
     "model": "hy3-free",
-    "generated_at_ms": 1787968684786
+    "generated_at_ms": 1787969734748
   }
 }

@@ -1,18 +1,16 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGbuzzard.lua"
   },
   "category": "stategraph",
   "display_name": "SGbuzzard",
-  "summary": "该状态图驱动秃鹫（buzzard）及月变体（lunar_aligned mutated buzzard）实体，涵盖基础行为、突变喷火攻击、吃尸体、击晕坠落等状态。状态通过事件监听（如attacked、doattack、flyaway）和动作处理器（EAT、GOHOME）进行转移，并集成通用睡眠、冰冻、电击、月变等状态。",
+  "summary": "该状态图驱动饥荒联机版中的秃鹫（buzzard）实体，包含普通秃鹫、突变（月亮对齐）秃鹫及尸骸行为。状态组织以自定义状态处理 idle、攻击、喷火、吃尸、飞离等核心玩法，并调用 CommonStates 扩展睡眠、冻结、触电、突变与沉没等通用状态，通过事件监听衔接 AI 与动画表现。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和动作处理器驱动状态转移，未定义任何对外暴露的自定义方法。",
-  "events_published": [
-    "chomped"
-  ],
+  "api_note": "该状态图仅通过事件监听与内部状态跳转驱动实体，未定义额外的对外调用方法，所有逻辑封装在状态与事件处理函数中。",
+  "events_published": [],
   "events_listened": [
     "attacked",
     "doattack",
@@ -20,6 +18,8 @@
     "onignite",
     "locomote",
     "corpse_eat",
+    "animqueueover",
+    "animover",
     "stop_honey_ammo_afflicted",
     "stop_gelblob_ammo_afflicted",
     "onextinguish"
@@ -63,80 +63,89 @@
   "state_notes": [
     {
       "state": "attack",
-      "note": "普通秃鹫近战攻击，第13帧执行DoAttack造成伤害，第20帧移除attack标签结束硬直。"
-    },
-    {
-      "state": "flamethrower_pre",
-      "note": "突变秃鹫喷火准备，切换飞行物理并面向目标，设置火焰伤害为TUNING.MUTATEDBUZZARD_FLAMETHROWER_DAMAGE。"
+      "note": "普通秃鹫近战攻击状态，动画第13帧通过 combat:DoAttack 发动攻击并播放音效，第20帧移除攻击标签后回 idle。"
     },
     {
       "state": "flamethrower_loop",
-      "note": "突变秃鹫持续喷火，每几帧生成火焰FX，通过SetFlameThrowerOnCd设置冷却避免集中攻击同一目标。"
+      "note": "突变秃鹫喷火持续状态，飞行中每隔几帧生成火焰FX，伤害设为 TUNING.MUTATEDBUZZARD_FLAMETHROWER_DAMAGE 及 planar 伤害，并启动冷却。"
     },
     {
       "state": "flyaway",
-      "note": "秃鹫起飞逃离，垂直或对角飞行，2秒后触发回家或移除，有概率掉落鸟粪（CROW_LEAVINGS_CHANCE）。"
+      "note": "秃鹫起飞离开状态，随机垂直或对角起飞，2秒后调用 FlyAwayToSky 回家或移除；若被卡住则转 distress。"
     },
     {
       "state": "distress",
-      "note": "普通秃鹫着火时恐慌拍翅，月变体不触发；熄灭或脱困后飞走或回idle。"
+      "note": "非突变秃鹫着火或受黏着影响时拍翅挣扎，直到熄灭或卡住解除后飞走或回 idle，突变体不触发。"
     },
     {
       "state": "corpse_eat_loop",
-      "note": "秃鹫啃食尸体，对尸体推送chomped事件，可能触发尸体月变或复活突变计时。"
-    },
-    {
-      "state": "stun_loop",
-      "note": "被击晕后循环硬直，持续8-13秒（stun_endtime），带有caninterrupt标签可被中断。"
+      "note": "秃鹫啃食尸体状态，可触发尸体熄灭或突变计时，循环播放进食音效直至尸体无效后结束。"
     },
     {
       "state": "hit",
-      "note": "受击硬直状态，播放hit动画并调用UpdateHitRecoveryDelay设置恢复延迟。"
+      "note": "受击硬直状态，停止移动播放 hit 动画并设置受击恢复延迟，结束后返回 idle。"
     },
     {
-      "state": "glide",
-      "note": "从空中滑翔下落，禁用阴影并以垂直速度-15下降，落地后转idle或kill攻击猎物。"
+      "state": "stun_loop",
+      "note": "秃鹫被击晕后循环硬直状态，依据 stun_endtime 计时，带 caninterrupt 可被攻击打断，结束转 stun_pst。"
     },
     {
       "state": "kill",
-      "note": "滑翔落地后处决猎物，第27帧若目标在BUZZARD_ATTACK_RANGE内直接杀死（health:Kill）。"
+      "note": "滑翔落地后处决状态，对范围内带 prey 标签目标直接杀死（距离 TUNING.BUZZARD_ATTACK_RANGE）。"
+    },
+    {
+      "state": "fall_to_stun",
+      "note": "从天空掉落后着地眩晕状态，播放 fall_to_stun 动画，初期免电免睡，约10+秒后转 stun_loop。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
       52138,
       15724,
+      15651,
+      15922,
       65737,
-      15903,
+      16419,
       15327,
-      15380,
-      15539,
-      65456
+      15539
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，无具体能力需匹配；页面文本未提及stategraph__SGbuzzard组件能力，仅含秃鹫实体玩家侧描述，故认为不讨论该符号能力。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "秒杀猎物能力描述",
+        "evidence": [
+          {
+            "pageid": 15724,
+            "quote": "秃鹫的攻击能够秒杀猎物，无论它们有多少生命值。"
+          },
+          {
+            "pageid": 52138,
+            "quote": "水晶冠秃鹫的攻击能够秒杀猎物，无论它们有多少生命值。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
     "秃鹫",
-    "月变秃鹫",
+    "突变秃鹫",
     "喷火攻击",
     "吃尸体",
-    "击晕硬直",
     "飞走",
-    "滑翔",
-    "近战攻击"
+    "眩晕",
+    "受击硬直",
+    "滑翔落地"
   ],
   "gameplay_tags": [
-    "战斗",
     "生存",
-    "飞行"
+    "战斗",
+    "变异"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "73d92e9bd4f3d300850fbdf16c5c5b6b754511d39b6fee8d8d56901573e27be2",
     "source_bytes": 36238,
     "model": "hy3-free",
-    "generated_at_ms": 1787968778546
+    "generated_at_ms": 1787969821305
   }
 }

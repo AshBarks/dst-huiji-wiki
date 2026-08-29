@@ -1,30 +1,20 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGanchor.lua"
   },
   "category": "stategraph",
   "display_name": "SGanchor",
-  "summary": "该状态图驱动游戏中的锚（anchor）实体，管理其升起、降下（水中或陆地）及升降过渡的表现。状态根据锚组件中的深度值与是否有船附着，播放不同层级的动画并控制系泊音效，整体以事件触发状态迁移。",
+  "summary": "该状态图驱动船锚（anchor）实体，管理锚的升起、放下及陆地状态间的切换。状态组织以锚是否放下（raised/lowered）及所处环境（水中/陆地）为核心，并通过深度数值动态选择动画表现。",
   "api": [],
-  "api_note": "该状态图未定义任何对外方法，仅通过内部事件监听与状态机转换驱动锚实体的动画与音效表现。",
+  "api_note": "该状态图仅通过内部事件（如 lowering_anchor、raising_anchor、workinghit）驱动状态转移，未在源码中定义任何对外暴露的方法或函数。",
   "events_published": [],
-  "events_listened": [
-    "lowering_anchor",
-    "workinghit",
-    "raising_anchor",
-    "animqueueover",
-    "animover"
-  ],
+  "events_listened": [],
   "netvars": [],
   "tunables": [
-    "TUNING.ANCHOR_DEPTH_TIMES.DEEP",
-    "TUNING.ANCHOR_DEPTH_TIMES.BASIC",
-    "TUNING.ANCHOR_DEPTH_TIMES.SHALLOW",
-    "TUNING.ANCHOR_DEPTH_TIMES.VERY_DEEP",
-    "TUNING.ANCHOR_DEPTH_TIMES.LAND"
+    "ANCHOR_DEPTH_TIMES"
   ],
   "states": [
     "raised",
@@ -40,51 +30,106 @@
   "state_notes": [
     {
       "state": "raised",
-      "note": "锚未降下的空闲状态，循环播放未系泊动画；收到 lowering_anchor 事件时若有船则进入 lowering 否则进入 lowering_land，受击播放 hit 动画。"
+      "note": "锚升起状态，播放未系泊闲置循环动画并设置锚为升起；监听 lowering_anchor 与 workinghit 事件以响应操作或受击。"
     },
     {
       "state": "lowered",
-      "note": "锚在水中降下的系泊状态，根据 anchor.raiseunits 深度播放 empty/low/med/full 四种空闲动画之一，可响应 raising_anchor 收锚。"
+      "note": "锚在水中放下状态，根据组件深度 raiseunits 播放不同系泊闲置动画并设置锚为放下；可响应再次降下、升起或受击。"
     },
     {
       "state": "lowered_land",
-      "note": "锚在陆地降下的状态，播放陆地系泊空闲动画，响应 raising_anchor 进入 raising_land 收锚。"
-    },
-    {
-      "state": "raising",
-      "note": "收锚过程状态，根据深度动态切换解系泊循环动画并播放 mooring 音效；当锚停止过渡且深度为0时完成收锚，否则回到降下后处理。"
+      "note": "锚在陆地放下状态，播放陆地系泊闲置动画并设置锚为放下；仅响应升起或受击事件。"
     },
     {
       "state": "lowering",
-      "note": "放锚过程状态，根据深度动态切换系泊循环动画并播放 down 与 mooring 音效；停止过渡后根据深度决定进入收锚完成或降下后处理。"
+      "note": "锚在水中主动降下过程，根据实时深度切换不同系泊循环动画并播放锚链音效；深度归零或未完成时转入对应后处理状态。"
+    },
+    {
+      "state": "raising",
+      "note": "锚在水中主动升起过程，根据实时深度反向切换解系泊循环动画并管理锚链音效；逻辑与 lowering 对称。"
+    },
+    {
+      "state": "lowering_land",
+      "note": "锚在陆地降下的前奏状态，播放落地系泊动画后自动进入 lowered_land。"
+    },
+    {
+      "state": "raising_land",
+      "note": "锚在陆地升起状态，播放解除陆地系泊动画后返回 raised。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
+      16596,
       51427,
+      20315,
       27603,
       13698,
-      16596,
       35670,
       45248,
       72238
     ],
-    "aspects": [],
-    "no_evidence_reason": "给定的代码能力/行为语义清单为空，未指定任何 SGanchor 能力，因此页面摘录中无相应能力表达可检索。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "下锚耗时随深度标注",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "在[[中层海]]起锚的时间为 6 秒，下锚 2 秒。"
+          },
+          {
+            "pageid": 16596,
+            "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "抛锚放下状态及策略描述",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "建在[[漂浮平台]]上的锚可以为抛锚以使其大幅减速。"
+          },
+          {
+            "pageid": 13698,
+            "quote": "将船锚放下能够有效避免邪天翁的攻击将船推开。"
+          }
+        ]
+      },
+      {
+        "aspect": "起锚耗时标注",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+          },
+          {
+            "pageid": 20315,
+            "quote": "*起锚需要 6 秒。"
+          },
+          {
+            "pageid": 20315,
+            "quote": "*起锚需要 8 秒。"
+          },
+          {
+            "pageid": 72238,
+            "quote": "升起船锚"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
     "船锚",
-    "升降锚",
-    "放锚",
-    "收锚",
-    "系泊",
+    "下锚",
+    "起锚",
     "锚深度",
-    "锚状态",
-    "锚实体"
+    "陆地锚",
+    "系泊",
+    "锚状态"
   ],
   "gameplay_tags": [
-    "航海",
+    "航行",
     "建造"
   ],
   "related_symbols": [],
@@ -92,6 +137,6 @@
     "source_sha256": "6d406336841dcd443def5c59699a8ce3c13d997f07b220ada6d712c21d50cc3b",
     "source_bytes": 13113,
     "model": "hy3-free",
-    "generated_at_ms": 1787968552901
+    "generated_at_ms": 1787969562229
   }
 }

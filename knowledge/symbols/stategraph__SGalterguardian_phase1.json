@@ -1,21 +1,24 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGalterguardian_phase1.lua"
   },
   "category": "stategraph",
   "display_name": "SGalterguardian_phase1",
-  "summary": "该状态图驱动天体守护者第一阶段（alterguardian_phase1）实体，涵盖生成、待机、行走、翻滚与暴怒攻击、举盾防御、普通死亡与月隙重生及被捕获等状态。状态组织以事件监听（如doattack、attacked）触发攻击选择，并通过标签控制行为逻辑。",
+  "summary": "该状态图驱动天体守护者第一阶段（alterguardian_phase1）实体，管理其从预设空闲、生成到战斗攻击、防御护盾及特殊月化死亡重生的完整行为。状态组织以空闲为基准，通过事件监听切换至滚动冲刺、暴怒范围攻击、护盾防御等战斗状态，并包含独特的月裂重生与被捕获机制。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和状态跳转驱动实体，未定义任何对外调用的方法或接口。",
+  "api_note": "该状态图未定义任何对外暴露的方法，仅通过内部事件监听与状态机逻辑驱动alterguardian_phase1实体的行为。",
   "events_published": [
     "attackstart",
     "phasetransition",
     "ms_alterguardian_phase1_lunarrift_capturable"
   ],
   "events_listened": [
+    "death",
+    "onsink",
+    "fallinvoid",
     "locomote",
     "doattack",
     "attacked",
@@ -27,17 +30,17 @@
   ],
   "netvars": [],
   "tunables": [
-    "TUNING.ALTERGUARDIAN_PHASE1_AOERANGE",
-    "TUNING.ALTERGUARDIAN_PHASE1_AOEDAMAGE",
-    "TUNING.ALTERGUARDIAN_PHASE1_ROLLDAMAGE",
-    "TUNING.ALTERGUARDIAN_PHASE1_ROLLRANGE",
-    "TUNING.ALTERGUARDIAN_PHASE1_WALK_SPEED",
-    "TUNING.ALTERGUARDIAN_PHASE1_MINROLLCOUNT",
-    "TUNING.ALTERGUARDIAN_PHASE1_ROLLCOOLDOWN",
-    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_TIME",
-    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_HP",
-    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_AMOUNT",
-    "TUNING.ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_PERIOD"
+    "ALTERGUARDIAN_PHASE1_AOERANGE",
+    "ALTERGUARDIAN_PHASE1_AOEDAMAGE",
+    "ALTERGUARDIAN_PHASE1_ROLLDAMAGE",
+    "ALTERGUARDIAN_PHASE1_ROLLRANGE",
+    "ALTERGUARDIAN_PHASE1_WALK_SPEED",
+    "ALTERGUARDIAN_PHASE1_MINROLLCOUNT",
+    "ALTERGUARDIAN_PHASE1_ROLLCOOLDOWN",
+    "ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_TIME",
+    "ALTERGUARDIAN_PHASE1_LUNARRIFT_REVIVE_HP",
+    "ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_AMOUNT",
+    "ALTERGUARDIAN_PHASE1_LUNARRIFT_REGEN_PERIOD"
   ],
   "states": [
     "prespawn_idle",
@@ -63,80 +66,68 @@
   "state_notes": [
     {
       "state": "prespawn_idle",
-      "note": "实体初始等待状态，启动6秒 gotospawn 计时或监听 startspawnanim 事件后进入 spawn；期间无敌且禁用音乐。"
+      "note": "生成前空闲状态，实体无敌且启动6秒gotospawn计时器，等待startspawnanim事件后进入生成；期间禁用音乐与攻击。"
     },
     {
       "state": "roll",
-      "note": "翻滚攻击状态，以速度10向前滚动并每帧检测碰撞造成滚动伤害；翻滚次数随机，命中玩家会标记以可能提前停止。"
-    },
-    {
-      "state": "roll_stop",
-      "note": "翻滚停止状态，结束动画中触发一次范围AOE攻击，并启动 roll_cooldown 冷却计时器（时长由TUNING设定）。"
+      "note": "滚动攻击状态，实体开启滚动碰撞并持续向前冲撞，通过OnUpdateRollAttack对范围内目标造成伤害；可基于随机次数多次转向追踪目标。"
     },
     {
       "state": "tantrum",
-      "note": "原地暴怒状态，循环播放动画并进行3-5次范围AOE攻击，伤害值为 TUNING.ALTERGUARDIAN_PHASE1_AOEDAMAGE。"
+      "note": "暴怒范围攻击状态，播放顿足动画并对周围实施3-5次AOE伤害（数值取自ALTERGUARDIAN_PHASE1_AOEDAMAGE），伴随屏幕震动与落地特效。"
     },
     {
       "state": "shield",
-      "note": "举盾防御状态，带 shield 标签使受击转入 shield_hit 而非硬直，调用 EnterShield 提供防御。"
-    },
-    {
-      "state": "death",
-      "note": "普通死亡状态，播放死亡动画并掉落战利品，超时后推送 phasetransition 事件以触发阶段转换。"
+      "note": "护盾防御状态，调用EnterShield使实体获得shield标签，被攻击时触发shield_hit而非普通硬直，实现攻击免疫反馈。"
     },
     {
       "state": "death_lunar",
-      "note": "月隙死亡状态，生成可捕获的 gestalt 分身，本体暂时失效并等待重生或捕获事件。"
+      "note": "月化裂隙死亡状态，生成可捕获的gestalt幻影并临时无敌，随后进入死亡循环等待重生或被玩家捕获。"
     },
     {
       "state": "spawn_lunar",
-      "note": "月体降临状态，播放生成动画并动态调制光照，震屏并通知范围内玩家天体守护者来袭。"
+      "note": "月光生成状态，实体无敌并动态调整光照强度，向范围内玩家发送即将到来的提示语音（ANNOUNCE_LUNARGUARDIAN_INCOMING）。"
     },
     {
       "state": "captured",
-      "note": "被捕获状态，实体失效并掉落战利品后侵蚀消失，对应月隙分身被成功捕获后的处理。"
-    },
-    {
-      "state": "regenerate_lunar",
-      "note": "月隙重生状态，恢复血量并播放重建动画，之后转入 tantrum_pre 继续战斗。"
+      "note": "被捕获状态，实体失去碰撞与点击并直接掉落战利品，随后侵蚀消失（ErodeAway），用于月化重生失败或被收容。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
-      34314,
-      52788,
-      65605,
-      20714,
-      34523,
-      14579,
-      24544,
-      15651
+      14322,
+      13603,
+      13701,
+      13897,
+      14676,
+      15303,
+      15327,
+      15357
     ],
     "aspects": [],
-    "no_evidence_reason": "代码能力/行为语义清单为空，且所有页面摘录均未提及 SGalterguardian_phase1 或 alterguardian 相关实体与能力，文本内容涉及世界生成、布景、控制台等无关主题。",
+    "no_evidence_reason": "提供的页面摘录涉及 archive_centipede、waterplant、shadowchanneler、klaus、birdtrap、wanda、robin_winter、frog 等实体，文本中均未提及 statagraph__SGalterguardian_phase1 及其 prespawn_idle、roll、tantrum、shield、death_lunar、spawn_lunar、captured 能力，其中页面14322的滚动攻击描述属于远古哨兵蜈蚣而非该符号，故无该符号能力表达证据。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "天体守护者",
-    "第一阶段",
-    "翻滚",
-    "暴怒",
-    "举盾",
-    "月隙",
-    "重生",
+    "滚动攻击",
+    "暴怒AOE",
+    "护盾状态",
+    "月化重生",
     "被捕获",
-    "生成"
+    "月亮生成",
+    "无敌帧"
   ],
   "gameplay_tags": [
     "战斗",
-    "生存"
+    "生存",
+    "Boss"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "c0d0a544fe810f8467422fb4f719448cf8a5a6d7b49ca01d19f887914d2bfc2a",
     "source_bytes": 35006,
     "model": "hy3-free",
-    "generated_at_ms": 1787968576294
+    "generated_at_ms": 1787969581471
   }
 }

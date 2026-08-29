@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "prompt_rev": "p5-stategraph",
+  "prompt_rev": "p6-stategraph",
   "reference": {
     "kind": "stategraph",
     "path": "stategraphs/SGspider.lua"
   },
   "category": "stategraph",
   "display_name": "SGspider",
-  "summary": "该状态图驱动游戏中的各类蜘蛛实体（包括普通蜘蛛、战士蛛、吐丝蛛、月蛛、治疗蛛、隐藏蛛等）。状态组织上通过标签区分不同蜘蛛的攻击与受击行为，并借助 CommonStates 混入睡眠、冰冻、触电、跳跃、沉没、尸体及月球变异等通用状态。",
+  "summary": "该状态图驱动饥荒联机版中的蜘蛛类实体（包括普通蜘蛛及战士、吐丝者、月光、治疗等多种变种）。整体由自定义状态与 CommonStates 添加的通用状态（睡眠、冰冻、触电、跳跃、沉没、尸体、月球变异等）组合而成，覆盖移动、攻击、防御、进食、变异等完整行为。状态逻辑根据实体标签区分攻击方式与受击反应。",
   "api": [],
-  "api_note": "该状态图仅通过事件监听和动作处理器驱动实体状态切换，未定义可供外部直接调用的公开方法。",
+  "api_note": "该状态图仅通过 StateGraph 返回状态机定义，未向外部暴露任何直接调用的方法或接口。",
   "events_published": [],
   "events_listened": [
     "attacked",
@@ -56,80 +56,80 @@
   "state_notes": [
     {
       "state": "attack",
-      "note": "普通蜘蛛近战攻击状态，动画第25帧通过 DoAttack 对目标造成伤害。"
+      "note": "普通蜘蛛近战攻击状态，在动画第25帧通过 DoAttack 对目标造成伤害，期间标签为 busy 不可移动。"
     },
     {
       "state": "warrior_attack",
-      "note": "蜘蛛战士的跳跃突进攻击，设置移动速度覆盖并第19帧造成伤害，结束后进入威吓。"
+      "note": "蜘蛛战士的跳跃攻击，第8帧设置移动速度覆盖实现突进，第19帧造成伤害，结束后进入 taunt。"
     },
     {
       "state": "spitter_attack",
-      "note": "吐丝蜘蛛远程攻击，装备武器并持续朝向目标，第21帧发射攻击。"
+      "note": "蜘蛛吐丝者远程攻击，装备武器并朝向目标，第21帧进行 DoAttack 发射蛛网等。"
     },
     {
       "state": "spike_attack",
-      "note": "月蛛缩壳后释放尖刺攻击，第14帧执行 DoSpikeAttack 对记录位置造成伤害。"
+      "note": "月光蜘蛛地刺攻击，第14帧调用 DoSpikeAttack 在目标位置生成地刺造成伤害。"
     },
     {
       "state": "heal",
-      "note": "治疗蛛治疗友方状态，第30帧调用 DoHeal 执行治疗，有冷却限制。"
+      "note": "治疗蜘蛛的治疗动作，第30帧执行 DoHeal 治疗目标，有冷却限制（TUNING.SPIDER_HEALING_COOLDOWN）。"
     },
     {
       "state": "shield",
-      "note": "隐藏蛛缩壳防御状态，设置伤害吸收值 TUNING.SPIDER_HIDER_SHELL_ABSORB 直至退出。"
+      "note": "蜘蛛缩壳防御状态，设置伤害吸收量为 TUNING.SPIDER_HIDER_SHELL_ABSORB，退出时清零。"
+    },
+    {
+      "state": "hit",
+      "note": "战士/吐丝者/月光蜘蛛受击时进入，轻硬直且仍可攻击（不中断攻击），无 stunlock。"
     },
     {
       "state": "hit_stunlock",
-      "note": "普通蜘蛛受击硬直，播放受击动画且期间无法攻击，区别于战士等的可攻击受击。"
+      "note": "普通蜘蛛受击硬直，标签 busy 且不能攻击，播放受击动画后回 idle。"
     },
     {
       "state": "mutate",
-      "note": "蜘蛛食用变异物后进入变异，动画结束后生成新蜘蛛并移除自身，转移跟随关系。"
+      "note": "蜘蛛吃下变异物后触发，播放变异动画并生成新蜘蛛实体，原蜘蛛移除。"
     },
     {
       "state": "trapped",
-      "note": "蜘蛛触发陷阱后蜷缩被困，标签含 trapped 且1秒后自动回到 idle。"
-    },
-    {
-      "state": "eat",
-      "note": "蜘蛛执行进食动作，播放吃动画并触发缓冲行为，可循环进食。"
+      "note": "被陷阱困住时进入，标签 trapped 且清除动作，1秒后回 idle。"
     }
   ],
   "wiki": {
     "scanned_pageids": [
+      34314,
+      15434,
+      65456,
+      70704,
       15246,
-      15530,
-      15965,
-      15744,
-      15269,
-      15532,
-      15555,
-      13762
+      15247,
+      13408,
+      24875
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的代码能力/行为语义清单为空，页面摘录仅描述各蜘蛛实体玩法行为，未提及stategraph__SGspider符号及其代码能力，无法检索对应表达。",
+    "no_evidence_reason": "页面摘录主要讨论蜘蛛的世界生成规则、巢穴掉落与生成、月亮变异（尸体转化）、蜘蛛工厂、韦伯关系等，未提及 SGspider 状态图中的近战攻击、跳跃攻击、远程攻击、地刺攻击、治疗、缩壳、受击硬直、吃变异物变异或陷阱困住等行为状态。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "蜘蛛状态",
-    "战士跳跃",
-    "吐丝攻击",
-    "月蛛尖刺",
+    "蜘蛛",
+    "蜘蛛战士",
+    "吐丝蜘蛛",
+    "月光蜘蛛",
     "治疗蜘蛛",
-    "缩壳防御",
-    "蜘蛛变异",
-    "陷阱困住",
-    "蜘蛛进食"
+    "变异",
+    "缩壳",
+    "硬直"
   ],
   "gameplay_tags": [
     "战斗",
-    "生存"
+    "生存",
+    "变异"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "0de56046bf0501f25e25e1eb7523b2a1accfbdd8fcc18feb4c9e7a838179bfdf",
     "source_bytes": 26875,
     "model": "hy3-free",
-    "generated_at_ms": 1787968215257
+    "generated_at_ms": 1787969194955
   }
 }

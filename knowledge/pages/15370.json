@@ -30,13 +30,9 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -51,11 +47,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "仇恨在持续追逐 30 单位后会取消",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -85,10 +77,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -103,8 +92,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "考拉象页面，未提及"
       }
     },
     "components/inspectable.lua": {
@@ -129,10 +117,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -166,5 +151,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "stub"
 }

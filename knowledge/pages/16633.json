@@ -30,10 +30,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/edible.lua": {
       "aspects_ignored": [
@@ -83,10 +80,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -95,10 +89,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -111,10 +102,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/propagator.lua": {
       "aspects_ignored": [
@@ -123,7 +111,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/weapon.lua": {
       "aspects_ignored": [

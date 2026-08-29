@@ -42,10 +42,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -54,10 +51,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -70,10 +64,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -85,10 +76,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": false
-      }
+      "llm_verdict": {}
     },
     "components/perishable.lua": {
       "mention_source": "fact_match",
@@ -121,10 +109,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -134,11 +119,7 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/updatelooper.lua": {
       "aspects_ignored": [
@@ -167,7 +148,8 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "summary"

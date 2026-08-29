@@ -163,7 +163,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/stackable.lua": {
       "aspects_ignored": [
@@ -175,10 +176,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -188,11 +186,7 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

@@ -34,11 +34,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -67,10 +63,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -85,8 +78,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "eyeofterror/twinofterror 受影响，证据未提及生命值等"
       }
     },
     "components/inspectable.lua": {
@@ -96,10 +88,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -115,12 +104,10 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -129,11 +116,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null,
-        "note": "页面描述体节掉落绝望石/纯粹恐惧等，疑似 eyeofterror 受影响变体"
+        "wording": "掉落=每个体节：{{Pic|32|绝望石}}×1，{{Pic|32|纯粹恐惧}}×2，{{Pic|32|噩梦燃料}}×2",
+        "semantic_consistent": true
       }
     },
     "components/planardamage.lua": {
@@ -164,5 +150,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

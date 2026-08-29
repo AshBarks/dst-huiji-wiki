@@ -21,7 +21,7 @@ use crate::update::symbol_page::{
     render_symbol_annotation_prompt_for_pages, PageEvidence, SymbolKind, SymbolPageAnnotation,
     SymbolPageVisibility, SymbolRef,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
 
@@ -42,13 +42,15 @@ pub struct ScanWikiParams {
     pub audit_batch_pages: usize,
     /// LLM 每批字符数上限
     pub audit_batch_max_chars: usize,
+    /// M2c:不重建地图,直接聚合 knowledge/pages/*.json 出报表
+    pub report: bool,
 }
 
 /// 单个 (page, symbol) 对的归因条目(落盘 schema v1)。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PageSymbolEntry {
     /// pass2_evidence | fact_match;stub 对为 null
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mention_source: Option<String>,
     /// D0 命中的 aspects 快照副本(SymbolDoc 重扫不回写本图,靠 inputs.sha 刷新)
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -69,29 +71,31 @@ pub struct PageSymbolEntry {
 }
 
 /// symbol-annotate verdict 的快照(mentions=true 的转换依据 + 不一致记录)。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LlmVerdict {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wording: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_consistent: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AspectSnapshot {
     pub aspect: String,
     /// (pageid, quote)——快照时只保留本页的证据
     pub evidence: Vec<AspectEvidence>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AspectEvidence {
     pub pageid: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quote: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FactMatch {
     pub raw: String,
     pub region_id: String,
@@ -100,7 +104,7 @@ pub struct FactMatch {
 }
 
 /// 每页的落盘文档。
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PageSymbolMap {
     pub schema_version: u32,
     pub pageid: i64,
@@ -112,7 +116,7 @@ pub struct PageSymbolMap {
     pub page_detail_level: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapInputs {
     pub wikitext_sha256: String,
     /// 本页条目引用到的 SymbolDoc 的 provenance.source_sha256
@@ -178,6 +182,10 @@ pub async fn run_scan_wiki(
     let scripts_root = Path::new(&params.scripts_root);
     let knowledge_root = Path::new(&params.knowledge_dir);
     let corpus_root = Path::new(&params.corpus);
+
+    if params.report {
+        return run_page_map_report(knowledge_root, reporter);
+    }
 
     reporter.stage("构建代码关联索引");
     let atlas = build_atlas_from_dir(scripts_root)?;
@@ -280,6 +288,24 @@ pub async fn run_scan_wiki(
 
     let mut maps: Vec<PageSymbolMap> = Vec::new();
 
+    // 既有审计结果回填:重建会重算全部确定性条目,磁盘图里的
+    // llm_verdict(L2 审计产物)必须继承,否则多次运行互相抹除。
+    let mut prior_maps: HashMap<i64, PageSymbolMap> = HashMap::new();
+    let prior_dir = knowledge_root.join("pages");
+    if let Ok(rd) = std::fs::read_dir(&prior_dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("json") {
+                continue;
+            }
+            if let Ok(m) = serde_json::from_str::<PageSymbolMap>(
+                &std::fs::read_to_string(&path).unwrap_or_default(),
+            ) {
+                prior_maps.insert(m.pageid, m);
+            }
+        }
+    }
+
     reporter.stage("逐页归因");
     for pageid in &pageids {
         let variants = &page_variants[pageid];
@@ -370,10 +396,10 @@ pub async fn run_scan_wiki(
                 .cloned()
                 .collect();
 
-            let mention_source = if !covered.is_empty() {
-                Some("pass2_evidence")
+            let mut mention_source: Option<String> = if !covered.is_empty() {
+                Some("pass2_evidence".to_string())
             } else if !fact_matches.is_empty() {
-                Some("fact_match")
+                Some("fact_match".to_string())
             } else {
                 None
             };
@@ -386,16 +412,35 @@ pub async fn run_scan_wiki(
             if route == "two_hop" && detail == "detailed" {
                 detail = "summary";
             }
+            // 审计结果继承:llm_verdict 始终回填;若确定性层仍无证据
+            // 且先前的 L2 判定为提及,则提及状态一并继承。
+            let mut llm_verdict = None;
+            if let Some(prior_entry) = prior_maps
+                .get(pageid)
+                .and_then(|m| m.symbols.get(path.as_str()))
+            {
+                if let Some(v) = &prior_entry.llm_verdict {
+                    llm_verdict = Some(v.clone());
+                    if mention_source.is_none()
+                        && prior_entry.mention_source.as_deref() == Some("llm_verdict")
+                    {
+                        mention_source = Some("llm_verdict".to_string());
+                        if detail == "stub" {
+                            detail = "summary";
+                        }
+                    }
+                }
+            }
             symbols.insert(
                 path.clone(),
                 PageSymbolEntry {
-                    mention_source: mention_source.map(str::to_string),
+                    mention_source,
                     aspects_covered: covered,
                     aspects_ignored: ignored,
                     fact_matches,
                     route: route.to_string(),
                     detail_level: detail.to_string(),
-                    llm_verdict: None,
+                    llm_verdict,
                 },
             );
         }
@@ -804,6 +849,142 @@ fn load_symbol_docs(knowledge_root: &Path) -> Result<Vec<SymbolDoc>> {
         }
     }
     Ok(docs)
+}
+
+/// M2c:聚合 `knowledge/pages/*.json` 产出 `knowledge/page_map_summary.json`。
+/// 按符号聚合 routed/mentioned/stub/不一致,detail_level 分布,
+/// 并单独列出 semantic_consistent=false 的对(M3 修订建议输入)。
+pub fn run_page_map_report(
+    knowledge_root: &Path,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let dir = knowledge_root.join("pages");
+    let mut maps = Vec::new();
+    for entry in std::fs::read_dir(&dir)?.collect::<std::io::Result<Vec<std::fs::DirEntry>>>()? {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        let raw = std::fs::read_to_string(&path)?;
+        match serde_json::from_str::<PageSymbolMap>(&raw) {
+            Ok(m) => maps.push(m),
+            Err(e) => reporter.log(format!("跳过无法解析的地图文件 {}: {e}", path.display())),
+        }
+    }
+    maps.sort_by_key(|m| m.pageid);
+
+    #[derive(serde::Serialize)]
+    struct SymRow {
+        routed: usize,
+        mentioned: usize,
+        stub: usize,
+        stub_unaudited: usize,
+        inconsistent: usize,
+        detailed: usize,
+        summary: usize,
+    }
+    let mut sym_rows: BTreeMap<String, SymRow> = BTreeMap::new();
+    let mut inconsistencies: Vec<serde_json::Value> = Vec::new();
+    let mut totals = serde_json::json!({
+        "pass2_evidence": 0usize, "fact_match": 0usize, "llm_verdict": 0usize
+    });
+    let mut pairs = 0usize;
+    let mut stub_pairs = 0usize;
+    let mut stub_unaudited = 0usize;
+    let mut pages_with_mention = 0usize;
+
+    for map in &maps {
+        let mut page_mentioned = false;
+        for (path, e) in &map.symbols {
+            pairs += 1;
+            let row = sym_rows.entry(path.clone()).or_insert(SymRow {
+                routed: 0,
+                mentioned: 0,
+                stub: 0,
+                stub_unaudited: 0,
+                inconsistent: 0,
+                detailed: 0,
+                summary: 0,
+            });
+            row.routed += 1;
+            match e.detail_level.as_str() {
+                "detailed" => row.detailed += 1,
+                "summary" => row.summary += 1,
+                _ => {}
+            }
+            if e.detail_level == "stub" {
+                row.stub += 1;
+                stub_pairs += 1;
+                if !e.aspects_ignored.is_empty() && e.llm_verdict.is_none() {
+                    row.stub_unaudited += 1;
+                    stub_unaudited += 1;
+                }
+            } else {
+                row.mentioned += 1;
+                page_mentioned = true;
+                if let Some(src) = &e.mention_source {
+                    if let Some(slot) = totals.get_mut(src.as_str()) {
+                        let next = slot.as_u64().unwrap_or(0) + 1;
+                        *slot = serde_json::Value::from(next);
+                    }
+                }
+            }
+            if let Some(v) = &e.llm_verdict {
+                if v.semantic_consistent == Some(false) {
+                    row.inconsistent += 1;
+                    inconsistencies.push(serde_json::json!({
+                        "pageid": map.pageid,
+                        "title": map.title,
+                        "symbol": path,
+                        "wording": v.wording,
+                        "note": v.note,
+                    }));
+                }
+            }
+        }
+        if page_mentioned {
+            pages_with_mention += 1;
+        }
+    }
+
+    let mut symbols: BTreeMap<String, serde_json::Value> = BTreeMap::new();
+    for (path, row) in sym_rows {
+        symbols.insert(
+            path,
+            serde_json::to_value(row).unwrap_or(serde_json::Value::Null),
+        );
+    }
+    let summary = serde_json::json!({
+        "schema_version": 1,
+        "generated_at_ms": std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(0),
+        "totals": {
+            "pages": maps.len(),
+            "pages_with_mention": pages_with_mention,
+            "pairs": pairs,
+            "mentioned_by_source": totals,
+            "stub_pairs": stub_pairs,
+            "stub_unaudited": stub_unaudited,
+        },
+        "symbols": symbols,
+        "inconsistencies": inconsistencies,
+    });
+    let out_path = knowledge_root.join("page_map_summary.json");
+    let body = serde_json::to_string_pretty(&summary)?;
+    if std::fs::read_to_string(&out_path)
+        .map(|e| e != body)
+        .unwrap_or(true)
+    {
+        std::fs::write(&out_path, body)?;
+    }
+    reporter.log(format!(
+        "PageSymbolMap 报表: 页面 {} / 提及对页面 {pages_with_mention},对 {pairs}(stub {stub_pairs},未审计 stub {stub_unaudited}),语义不一致 {}",
+        maps.len(),
+        inconsistencies.len()
+    ));
+    Ok(summary)
 }
 
 #[cfg(test)]

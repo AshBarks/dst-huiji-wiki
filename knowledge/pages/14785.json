@@ -32,7 +32,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": "燃烧时间=3 ~ 6",
+        "wording": "特殊互动/燃烧时间=3 ~ 6",
         "semantic_consistent": true
       }
     },
@@ -63,19 +63,21 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/propagator.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "可控燃烧不引燃描述",
         "引燃附近可燃物描述",
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "特殊互动/燃烧时间=3 ~ 6",
+        "semantic_consistent": false
+      }
     },
     "components/stackable.lua": {
       "mention_source": "llm_verdict",
@@ -94,5 +96,5 @@
       }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

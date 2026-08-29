@@ -19,10 +19,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -38,11 +35,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null,
-        "note": "页面实体不明，无移动提及，假设非affected"
-      }
+      "llm_verdict": {}
     },
     "components/talker.lua": {
       "aspects_ignored": [

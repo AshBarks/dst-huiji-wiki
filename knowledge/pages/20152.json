@@ -30,10 +30,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/combat.lua": {
       "aspects_ignored": [
@@ -50,11 +47,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -81,8 +74,8 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
+        "wording": "在死亡时额外掉落 1 个[[核化液]]",
+        "note": "deerclops 受影响，证据缺生命值标注"
       }
     },
     "components/inspectable.lua": {
@@ -93,8 +86,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "页面描述独眼巨鹿/晶体独眼相关，可能对应deerclops变体，受影响但未提及检视描述信息"
       }
     },
     "components/knownlocations.lua": {
@@ -115,10 +107,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -131,7 +120,6 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
         "semantic_consistent": true
       }
     },

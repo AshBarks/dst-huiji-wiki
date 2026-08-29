@@ -53,12 +53,7 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null,
-        "note": "twigs在受影响变体列表中，但给定片段未提及交易/黄金价值"
-      }
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

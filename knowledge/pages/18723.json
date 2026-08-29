@@ -80,7 +80,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "summary"

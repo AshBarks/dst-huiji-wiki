@@ -228,6 +228,8 @@ pub enum JobKind {
         audit_batch_pages: usize,
         #[serde(default = "default_audit_batch_max_chars")]
         audit_batch_max_chars: usize,
+        #[serde(default)]
+        report: bool,
     },
 }
 
@@ -476,6 +478,7 @@ async fn execute_job_inner(
             audit_max_pages,
             audit_batch_pages,
             audit_batch_max_chars,
+            report,
         } => {
             crate::knowledge::run_scan_wiki(
                 &crate::knowledge::ScanWikiParams {
@@ -487,6 +490,7 @@ async fn execute_job_inner(
                     audit_max_pages: *audit_max_pages,
                     audit_batch_pages: *audit_batch_pages,
                     audit_batch_max_chars: *audit_batch_max_chars,
+                    report: *report,
                 },
                 reporter,
             )

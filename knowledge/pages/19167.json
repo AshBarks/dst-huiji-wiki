@@ -31,7 +31,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": "烧毁的蜂窝只掉落4个灰烬",
+        "wording": "烧毁的蜂窝只掉落 4 个灰烬",
         "semantic_consistent": true
       }
     },
@@ -80,11 +80,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -105,10 +101,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -122,10 +115,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -134,12 +124,10 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -148,10 +136,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "wording": "{{Pic|32|蜜脾}}×1，{{Pic|32|蜂蜜}}×3",
+        "semantic_consistent": true
       }
     },
     "components/playerprox.lua": {
@@ -170,7 +158,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "detailed"

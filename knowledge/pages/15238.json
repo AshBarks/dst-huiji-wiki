@@ -311,10 +311,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/colouradder.lua": {
       "route": "direct",
@@ -335,11 +332,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -391,10 +384,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -408,10 +398,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -420,10 +407,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -451,10 +435,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
@@ -468,7 +449,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": "掉落 = {{Pic|32|牛毛}}×3，{{Pic|32|肉}}×4<br/>{{Pic|32|牛角}}×1（33%）",
+        "wording": "|掉落 = {{Pic|32|牛毛}}×3，{{Pic|32|肉}}×4<br/>{{Pic|32|牛角}}×1（33%）",
         "semantic_consistent": true
       }
     },

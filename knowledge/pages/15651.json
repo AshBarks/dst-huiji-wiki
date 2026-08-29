@@ -34,11 +34,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -53,7 +49,6 @@
       "detail_level": "stub"
     },
     "components/health.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "制作消耗生命值描述",
         "医疗与食物回复生命值描述",
@@ -64,11 +59,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "龙蝇死亡后，20天后在刷新点重新生",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -77,10 +69,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -115,10 +104,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
@@ -132,7 +118,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": "{{Pic|32|金块}} 4个<br/>额外4个（每个50%）",
+        "wording": "| {{Pic|32|金块}} | 4 个<br/>额外 4 个（每个 50%）",
         "semantic_consistent": true
       }
     },
@@ -143,7 +129,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

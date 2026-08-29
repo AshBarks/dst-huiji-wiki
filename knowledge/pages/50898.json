@@ -76,11 +76,7 @@
         "可交易状态说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

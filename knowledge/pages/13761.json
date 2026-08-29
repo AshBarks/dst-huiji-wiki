@@ -73,7 +73,6 @@
       "detail_level": "stub"
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -88,11 +87,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "玩家接近它 2 ~ 5 距离单位时，则会在 2 ~ 5 秒后攻击玩家。冷却",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -127,8 +122,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "洞穴蠕虫页面，未提及健康数值"
       }
     },
     "components/inspectable.lua": {
@@ -172,10 +166,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -218,5 +209,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "stub"
 }

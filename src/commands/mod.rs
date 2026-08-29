@@ -234,6 +234,9 @@ pub enum Commands {
         /// LLM 每批字符数上限
         #[arg(long, default_value_t = 24_000)]
         audit_batch_max_chars: usize,
+        /// M2c:不重建地图,聚合现有 knowledge/pages 出报表(summary.json)
+        #[arg(long)]
+        report: bool,
     },
     /// 启动 WebUI 服务器
     Serve {

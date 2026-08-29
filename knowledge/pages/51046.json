@@ -18,7 +18,6 @@
   },
   "symbols": {
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -33,11 +32,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "争瓦器人原地跳跃 2 ~ 3 次，每次对附近 3.",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -51,10 +46,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -64,12 +56,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "页面描述战争瓦器人相关，可能对应alterguardian系列变体，受影响但未提及检视描述信息"
       }
     },
     "components/locomotor.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "主动靠近目标描述",
         "冲刺速度描述",
@@ -82,11 +72,8 @@
         "随机游荡行为描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "争瓦器人原地跳跃 2 ~ 3 次",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -98,10 +85,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
@@ -137,5 +121,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "stub"
 }

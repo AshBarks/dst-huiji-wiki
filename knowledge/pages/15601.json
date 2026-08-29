@@ -57,13 +57,9 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -78,11 +74,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "攻击间隔 = 2 ~ 4",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -108,10 +100,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -120,10 +109,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
@@ -137,7 +123,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": "掉落 = {{Pic|32|沙之石}}×6，{{Pic|32|肉}}×4，{{Pic|32|石头}}×2",
+        "wording": "|掉落 = {{Pic|32|沙之石}}×6，{{Pic|32|肉}}×4，{{Pic|32|石头}}×2<br>{{Pic|32|懒人传送塔}}的{{Pic|32|稀有蓝图}}×1",
         "semantic_consistent": true
       }
     },
@@ -174,5 +160,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "detailed"
+  "page_detail_level": "summary"
 }

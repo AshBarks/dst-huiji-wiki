@@ -62,11 +62,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null,
-        "note": "页面描述Winona电池物品，属于受影响变体，但候选证据未提及inventoryitem组件管理物品状态"
-      }
+      "llm_verdict": {}
     },
     "components/updatelooper.lua": {
       "aspects_ignored": [

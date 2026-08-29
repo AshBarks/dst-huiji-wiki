@@ -30,13 +30,9 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -51,11 +47,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -94,7 +86,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
+        "wording": "生命值 = 10000 ~ 6000（一阶段）<br>6000 ~ 0（二阶段）",
         "semantic_consistent": true
       }
     },
@@ -105,10 +97,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/knownlocations.lua": {
       "route": "direct",
@@ -128,10 +117,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -144,7 +130,6 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
         "semantic_consistent": true
       }
     },

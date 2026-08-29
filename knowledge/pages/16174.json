@@ -113,17 +113,23 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "工作次数（敲击次数）标注",
         "敲击工作动作描述",
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "锤击间隔不能多于15秒，否则其剩余工作；用锤子摧毁掉落",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

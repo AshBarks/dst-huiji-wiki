@@ -54,7 +54,10 @@
         "敲击触发掉落联动"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "推测实体为 moonbase (月光玻璃窝)，属于 affected variants，候选证据未提及 workable 组件信息，缺失影响标注。"
+      }
     }
   },
   "page_detail_level": "stub"

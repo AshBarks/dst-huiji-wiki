@@ -33,13 +33,9 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -54,11 +50,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": "高脚鸟每隔 0 ~ 3 秒会主动仇恨'''非高...攻击间隔小于 2 秒，那么会'''锁定仇",
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -99,10 +91,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -117,8 +106,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "高脚鸟页面，未提及"
       }
     },
     "components/inspectable.lua": {
@@ -155,12 +143,10 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -169,10 +155,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "wording": "掉落 = {{Pic|32|肉}}×2",
+        "semantic_consistent": true
       }
     },
     "components/sleeper.lua": {

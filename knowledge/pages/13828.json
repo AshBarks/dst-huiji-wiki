@@ -73,10 +73,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
       "mention_source": "pass2_evidence",
@@ -105,6 +102,7 @@
       "detail_level": "summary"
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -113,9 +111,9 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
+        "wording": "SetSharedLootTable",
         "semantic_consistent": true
       }
     },
@@ -128,5 +126,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

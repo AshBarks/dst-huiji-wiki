@@ -35,10 +35,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/childspawner.lua": {
       "aspects_ignored": [
@@ -70,11 +67,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -116,8 +109,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "海草页面，未提及"
       }
     },
     "components/inspectable.lua": {
@@ -154,12 +146,10 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -168,10 +158,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "wording": "掉落= {{Pic|32|种壳}}×2-3（黄色3-5）",
+        "semantic_consistent": true
       }
     },
     "components/propagator.lua": {
@@ -181,7 +171,8 @@
         "灼烧周围实体描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
@@ -214,5 +205,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

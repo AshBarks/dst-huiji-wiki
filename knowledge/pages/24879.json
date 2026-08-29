@@ -26,10 +26,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/childspawner.lua": {
       "aspects_ignored": [
@@ -43,7 +40,6 @@
       "detail_level": "stub"
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -58,11 +54,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -71,10 +63,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "mention_source": "llm_verdict",
@@ -90,8 +79,7 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
+        "wording": "对所有实体造成 50 点伤害"
       }
     },
     "components/inspectable.lua": {
@@ -101,12 +89,10 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "地震掉落物生成描述",
         "巨兽击杀额外掉落标注",
@@ -115,10 +101,10 @@
         "蜘蛛击杀掉落物说明"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "wording": "掉落 = {{Pic|32|蛞蝓龟黏液}}×3，{{Pic|32|外壳碎片}}×1",
+        "semantic_consistent": true
       }
     }
   },

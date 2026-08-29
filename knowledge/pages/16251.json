@@ -59,6 +59,7 @@
       "detail_level": "stub"
     },
     "components/inventoryitem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品丢弃与放置描述",
         "物品持有状态描述",
@@ -68,10 +69,10 @@
         "物品被拾取与放入物品栏描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "wording": "放置、落地",
+        "semantic_consistent": true
       }
     },
     "components/lootdropper.lua": {
@@ -86,5 +87,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

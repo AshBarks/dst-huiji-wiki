@@ -28,11 +28,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -47,8 +43,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "螨地爬相关，未提及"
       }
     },
     "components/inspectable.lua": {
@@ -74,8 +69,7 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
+        "note": "对应 wagboss_robot，属受影响变体，候选证据未提及 locomotor 相关移动信息"
       }
     },
     "components/updatelooper.lua": {

@@ -91,7 +91,6 @@
       "detail_level": "detailed"
     },
     "components/combat.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨与脱离战斗",
         "仇恨目标距离与追击",
@@ -106,11 +105,7 @@
         "范围伤害技能描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
-      }
+      "detail_level": "stub"
     },
     "components/damagetypebonus.lua": {
       "aspects_ignored": [
@@ -131,7 +126,6 @@
       "detail_level": "stub"
     },
     "components/health.lua": {
-      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "制作消耗生命值描述",
         "医疗与食物回复生命值描述",
@@ -142,11 +136,8 @@
         "生命值归零导致死亡描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": true
-      }
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -155,10 +146,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null
-      }
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -174,11 +162,7 @@
       ],
       "route": "direct",
       "detail_level": "stub",
-      "llm_verdict": {
-        "wording": null,
-        "semantic_consistent": null,
-        "note": "阿比盖尔不在affected"
-      }
+      "llm_verdict": {}
     },
     "components/planardamage.lua": {
       "mention_source": "pass2_evidence",

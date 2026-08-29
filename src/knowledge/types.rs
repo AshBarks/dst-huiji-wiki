@@ -285,6 +285,9 @@ pub struct SymbolDoc {
     pub auto_maintained: Option<AutoMaintainedInfo>,
     #[serde(default)]
     pub search_terms: Vec<String>,
+    /// search_terms 质量杠杆溯源:pass1 后语料零命中触发的二次修正记录
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_terms_note: Option<String>,
     #[serde(default)]
     pub gameplay_tags: Vec<String>,
     #[serde(default)]
@@ -439,6 +442,7 @@ pub fn assemble(
         wiki: None,
         auto_maintained: None,
         search_terms: llm.search_terms.clone(),
+        search_terms_note: None,
         gameplay_tags: llm.gameplay_tags.clone(),
         related_symbols: llm.related_symbols.clone(),
         truncation_note: llm.truncation_note.clone(),

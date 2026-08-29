@@ -801,6 +801,17 @@ async fn process_one_component(
             if shared.category == "component" {
                 inject_auto_maintained(&mut doc, shared.auto_infobox);
             }
+            // search_terms 质量杠杆:语料零命中过半时单次改写
+            if let Some(cache) = shared.cache {
+                apply_search_terms_leverage(
+                    cache,
+                    shared.config,
+                    &mut doc,
+                    shared.raw_dir,
+                    reporter,
+                )
+                .await;
+            }
             let body = serde_json::to_string_pretty(&doc)?;
             write_atomic(&doc_path, &body)?;
             if let Some(v) = shared.view {
@@ -1420,6 +1431,150 @@ async fn generate_wiki_once(
     })
 }
 
+/// 零命中检索词列表(大小写不敏感子串检索,与 pass2 采样同口径)。
+fn zero_hit_terms(cache: &WikiTextCache, terms: &[String]) -> Vec<String> {
+    terms
+        .iter()
+        .filter(|t| !t.trim().is_empty() && cache.score(std::slice::from_ref(*t), 1).is_empty())
+        .cloned()
+        .collect()
+}
+
+/// search_terms 质量杠杆:零命中 ≥2 且过半时,单次 LLM 改写并记录溯源。
+async fn apply_search_terms_leverage(
+    cache: &WikiTextCache,
+    config: &LlmConfig,
+    doc: &mut SymbolDoc,
+    raw_dir: &Path,
+    reporter: &dyn Reporter,
+) {
+    let misses = zero_hit_terms(cache, &doc.search_terms);
+    let total = doc.search_terms.len();
+    if total == 0 || misses.len() < 2 || misses.len() * 2 < total {
+        return;
+    }
+    reporter.log(format!(
+        "search_terms 零命中 {}/{} ,尝试单次二次修正",
+        misses.len(),
+        total
+    ));
+    let aspect_names: Vec<String> = doc
+        .wiki
+        .as_ref()
+        .map(|w| w.aspects.iter().map(|a| a.aspect.clone()).collect())
+        .unwrap_or_default();
+    let prompt = format!(
+        "以下是符号 `{name}` 的知识文档摘要、页面侧 aspects 与一组维基检索词。其中这些检索词在维基(饥荒联机版页面)全文检索中零命中:{misses:?}。
+
+请改写一组检索词:5~10 个,中文玩家语言为主(可混英文),每词 2~6 字,优先使用维基页面实际使用的表述;未被点名的词若仍然有效可保留。不得输出英文 API 名或源码标识符。
+
+只输出一个 JSON 对象:{{\"search_terms\":[\"…\"]}}
+
+摘要:{summary}
+aspects:{aspects}
+现有检索词:{terms:?}",
+        name = doc.reference.doc_id(),
+        misses = misses,
+        summary = doc.summary,
+        aspects = aspect_names.join("、"),
+        terms = doc.search_terms,
+    );
+    let system = "你是饥荒联机版维基的检索词优化助手。必须只输出一个合法 JSON 对象。";
+    let raw = match config
+        .complete_streaming(system, &prompt, |ev| match ev {
+            LlmStreamEvent::FirstToken { elapsed_secs } => {
+                reporter.log(format!("改写首片({elapsed_secs}s)"));
+            }
+            LlmStreamEvent::Tick { chars } => {
+                let _ = chars;
+            }
+            LlmStreamEvent::Done {
+                chars,
+                elapsed_secs,
+            } => {
+                reporter.log(format!("改写完成:{chars} 字符 / {elapsed_secs}s"));
+            }
+        })
+        .await
+    {
+        Ok(t) => t,
+        Err(e) => {
+            reporter.log(format!("search_terms 二次修正失败,保留原词:{e}"));
+            return;
+        }
+    };
+    let raw_path = raw_dir.join(format!(
+        "{}__terms__{}.json",
+        doc.reference.doc_id(),
+        doc.prompt_rev
+    ));
+    let _ = std::fs::write(&raw_path, &raw);
+    let Some(revised) = parse_search_terms_payload(&raw) else {
+        reporter.log("search_terms 改写输出无法解析,保留原词".to_string());
+        return;
+    };
+    if revised.is_empty() || revised.len() > 15 {
+        reporter.log("search_terms 改写结果数量越界,保留原词".to_string());
+        return;
+    }
+    let still = zero_hit_terms(cache, &revised);
+    reporter.log(format!(
+        "search_terms 已修正:零命中 {} / {} → {} / {}",
+        misses.len(),
+        total,
+        still.len(),
+        revised.len()
+    ));
+    doc.search_terms = revised;
+    doc.search_terms_note = Some(format!(
+        "pass1 后零命中 {}/{},已二次修正(修正后 {}/{})",
+        misses.len(),
+        total,
+        still.len(),
+        doc.search_terms.len()
+    ));
+}
+
+/// 容错解析改写输出:围栏剥离 → 最外层对象 → 尾逗号修复。
+fn parse_search_terms_payload(raw: &str) -> Option<Vec<String>> {
+    use crate::update::symbol_page::{remove_trailing_commas, strip_code_fence};
+    let trimmed = strip_code_fence(raw.trim());
+    let sliced = match (trimmed.find('{'), trimmed.rfind('}')) {
+        (Some(a), Some(b)) if a < b => Some(&trimmed[a..=b]),
+        _ => None,
+    };
+    let fixed_all = remove_trailing_commas(trimmed);
+    let candidates: Vec<String> = Vec::from_iter(
+        [
+            Some(trimmed.to_string()),
+            sliced.map(str::to_string),
+            Some(fixed_all),
+            sliced.map(remove_trailing_commas),
+        ]
+        .into_iter()
+        .flatten(),
+    );
+    #[derive(serde::Deserialize)]
+    struct Payload {
+        #[serde(default, alias = "terms", alias = "searchTerms")]
+        search_terms: Vec<String>,
+    }
+    for cand in &candidates {
+        if let Ok(p) = serde_json::from_str::<Payload>(cand) {
+            let terms: Vec<String> = p
+                .search_terms
+                .into_iter()
+                .map(|t| t.trim().to_string())
+                .filter(|t| !t.is_empty())
+                .collect();
+            if !terms.is_empty() {
+                return Some(terms);
+            }
+        }
+    }
+    None
+}
+
 async fn enrich_with_wiki(
     config: &LlmConfig,
     doc: &mut SymbolDoc,
@@ -1668,6 +1823,38 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir
+    }
+
+    #[test]
+    fn zero_hit_terms_filters_against_corpus() {
+        let dir = temp_dir("terms-corpus");
+        std::fs::create_dir_all(dir.join("pages")).unwrap();
+        std::fs::write(
+            dir.join("meta.jsonl"),
+            r#"{"pageid":100,"title":"猎犬","touched":null,"len":10,"redirect":false,"rev_sha1":null,"categories":[],"game_class":"dst","class_signals":[],"class_confidence":"high"}
+"#,
+        )
+        .unwrap();
+        std::fs::write(dir.join("pages/100.wikitext"), "猎犬会主动追击玩家。").unwrap();
+        let cache = WikiTextCache::load(&dir).unwrap();
+        let misses = zero_hit_terms(&cache, &["追击".to_string(), "不存在的词".to_string()]);
+        assert_eq!(misses, vec!["不存在的词".to_string()]);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn parse_search_terms_payload_tolerant() {
+        let bare = r#"{"search_terms":["掉落","锤子敲碎"]}"#;
+        assert_eq!(
+            parse_search_terms_payload(bare),
+            Some(vec!["掉落".to_string(), "锤子敲碎".to_string()])
+        );
+        let fenced = "```json\n{\"terms\": [\"游荡\", ]}\n```";
+        assert_eq!(
+            parse_search_terms_payload(fenced),
+            Some(vec!["游荡".to_string()])
+        );
+        assert_eq!(parse_search_terms_payload("不是 JSON"), None);
     }
 
     #[test]

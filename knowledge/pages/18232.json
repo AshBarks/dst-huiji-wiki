@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "pageid": 18232,
+  "title": "远古哨所",
+  "inputs": {
+    "wikitext_sha256": "4eaa9da43eb69fec3808a742eed74831e2092c4d7de0b0dab6f2bc4684ce0ff2",
+    "symbol_doc_shas": {
+      "behaviours/follow.lua": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
+      "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
+      "brains/archive_securitypulsebrain.lua": "afadf3e17466dbb0eb8b50e187a4d9b3ff4a410e2bed37cf61f23959a35a3874",
+      "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "behaviours/follow.lua": {
+      "aspects_ignored": [
+        "主动远离目标描述",
+        "解除追随停止移动描述",
+        "跨平台跳跃能力说明",
+        "追随保持距离范围标注",
+        "追随目标对象描述",
+        "靠近追随目标行为"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/standstill.lua": {
+      "aspects_ignored": [
+        "实体静止与停止移动描写"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/archive_securitypulsebrain.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/childspawner.lua": {
+      "aspects_ignored": [
+        "停止再生描述",
+        "再生周期数值标注",
+        "子代死亡后重生行为描述",
+        "最大子数量标注",
+        "生成速度及数量上限规则描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/playerprox.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "玩家接近距离阈值标注",
+          "evidence": [
+            {
+              "pageid": 18232,
+              "quote": "玩家靠近远古哨所 6 距离单位以内"
+            }
+          ]
+        },
+        {
+          "aspect": "玩家靠近触发行为描述",
+          "evidence": [
+            {
+              "pageid": 18232,
+              "quote": "玩家靠近远古哨所 6 距离单位以内"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "玩家远离回归行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "detailed"
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "pageid": 24074,
+  "title": "冰船",
+  "inputs": {
+    "wikitext_sha256": "5f0f0760174d988ac9ada54c32062ebe735cd0bfd17980ba69c71dd80c886d6f",
+    "symbol_doc_shas": {
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "stategraphs/SGboat.lua": "51fffde5a39ef3f5172094a53ee60bbbe71e8249828723fedd793bc478ad949e"
+    }
+  },
+  "symbols": {
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGboat.lua": {
+      "aspects_ignored": [
+        "船体崩溃掉落物标注"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

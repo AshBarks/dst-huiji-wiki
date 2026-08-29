@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "pageid": 35097,
+  "title": "麋鹿鹅筑巢地",
+  "inputs": {
+    "wikitext_sha256": "20304780446f99c3587c7739c28103bbfa1afcba3c07b84046da1a5092895612",
+    "symbol_doc_shas": {
+      "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+    }
+  },
+  "symbols": {
+    "components/playerprox.lua": {
+      "aspects_ignored": [
+        "玩家接近距离阈值标注",
+        "玩家远离回归行为描述",
+        "玩家靠近触发行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "pageid": 51497,
+  "title": "颗粒状传输（变异生物）",
+  "inputs": {
+    "wikitext_sha256": "6ba0be6307d0083f11e7db53efadf54abc7058784a9906f839f5361f01e10c16",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "stategraphs/SGwagstaff_npc.lua": "d9e094deddfff319a69cdd58c1c5793866b602ae3d96ae066d3f492c6244661e"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/talker.lua": {
+      "aspects_ignored": [
+        "说话行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGwagstaff_npc.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

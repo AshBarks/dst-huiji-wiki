@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "pageid": 14807,
+  "title": "回旋镖",
+  "inputs": {
+    "wikitext_sha256": "1591f94a433d85e9adcac095a0bf83469f35e13700b75451430634e2aa53dfed",
+    "symbol_doc_shas": {
+      "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
+    }
+  },
+  "symbols": {
+    "components/equippable.lua": {
+      "aspects_ignored": [
+        "装备潮湿速率描述",
+        "装备理智增减描述",
+        "装备穿戴行为描述",
+        "装备防潮湿卸下描述",
+        "防水绝缘装备效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/finiteuses.lua": {
+      "aspects_ignored": [
+        "使用次数消耗描述",
+        "修补与回复耐久描述",
+        "耐久归零触发行为描述",
+        "耐久消耗速度修改描述",
+        "耐久百分比回复描述",
+        "耐久百分比读取描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/weapon.lua": {
+      "aspects_ignored": [
+        "伤害数值标注",
+        "攻击范围数值标注",
+        "攻击行为描述",
+        "特殊伤害倍率说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

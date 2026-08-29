@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "pageid": 22249,
+  "title": "岩石",
+  "inputs": {
+    "wikitext_sha256": "cd033745bfdf29bac6588b8b13b8b652e44eb8cc90330b169a6bf5480d64dd53",
+    "symbol_doc_shas": {
+      "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/entitytracker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/equippable.lua": {
+      "aspects_ignored": [
+        "装备潮湿速率描述",
+        "装备理智增减描述",
+        "装备穿戴行为描述",
+        "装备防潮湿卸下描述",
+        "防水绝缘装备效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "pageid": 72353,
+  "title": "旋翼测绘机",
+  "inputs": {
+    "wikitext_sha256": "81129fe02e6f67e82d6bccf6904f1db7fbca9d374e57f05033d86ff65bfe920f",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

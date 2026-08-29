@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "pageid": 19576,
+  "title": "拳击袋",
+  "inputs": {
+    "wikitext_sha256": "f600273f1be430b06d68ab62ed2f489386f852ec97273068bf947481ca362dee",
+    "symbol_doc_shas": {
+      "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/bloomer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/colouradder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventory.lua": {
+      "aspects_ignored": [
+        "检查物品栏含特定条件食物描述",
+        "溺水掉落物品机制类比玩家描述",
+        "物品传输至生物物品栏描述",
+        "物品栏槽位数量标注",
+        "物品栏满载导致新物品销毁描述",
+        "物品栏防水倍率影响新鲜度描述",
+        "生物从自身物品栏装备武器描述",
+        "背包内物品腐烂减速描述",
+        "装备背包合并至玩家物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/propagator.lua": {
+      "aspects_ignored": [
+        "可控燃烧不引燃描述",
+        "引燃附近可燃物描述",
+        "灼烧周围实体描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/trader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

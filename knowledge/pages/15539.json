@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "pageid": 15539,
+  "title": "弹弓弹药",
+  "inputs": {
+    "wikitext_sha256": "825652c6a52e99747264d2c32de8b6fc73438b23506ff049930f8326849cccfd",
+    "symbol_doc_shas": {
+      "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+      "components/debuff.lua": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/damagetypebonus.lua": {
+      "aspects_ignored": [
+        "角色与装备伤害类型加成及倍率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/debuff.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planardamage.lua": {
+      "aspects_ignored": [
+        "位面伤害倍率描述",
+        "位面伤害加成数值标注",
+        "位面伤害基础值公式描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

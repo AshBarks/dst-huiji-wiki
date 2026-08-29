@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "pageid": 18301,
+  "title": "梦魇城墙",
+  "inputs": {
+    "wikitext_sha256": "34dc88fbe709b256ab40bac6d7e752d57ee0f3338003d0ec999f2269b4a6a305",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sanityaura.lua": {
+      "aspects_ignored": [
+        "基础光环回复效果标注",
+        "理智光环持续影响与衰减描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

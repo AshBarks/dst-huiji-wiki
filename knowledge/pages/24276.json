@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "pageid": 24276,
+  "title": "龙卷风",
+  "inputs": {
+    "wikitext_sha256": "53bf480e50b7029d0bcd2b684e698ce5545ae8e7460407bfb46791da4b4213d8",
+    "symbol_doc_shas": {
+      "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7"
+    }
+  },
+  "symbols": {
+    "components/knownlocations.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

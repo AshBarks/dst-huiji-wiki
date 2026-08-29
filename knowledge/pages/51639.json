@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "pageid": 51639,
+  "title": "幻觉",
+  "inputs": {
+    "wikitext_sha256": "74cb6051ca55f8308ec3f57d8daf4d3a1dc68fba0b45ce71f888972e87f39e0d",
+    "symbol_doc_shas": {
+      "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3"
+    }
+  },
+  "symbols": {
+    "components/playerprox.lua": {
+      "aspects_ignored": [
+        "玩家接近距离阈值标注",
+        "玩家远离回归行为描述",
+        "玩家靠近触发行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

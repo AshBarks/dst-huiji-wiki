@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "pageid": 15823,
+  "title": "薇洛的打火机",
+  "inputs": {
+    "wikitext_sha256": "0642e753d56bb3aa39ffc2f1274b5cdedd3c83a928c60bffc3c8a505d29b63c8",
+    "symbol_doc_shas": {
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
+    }
+  },
+  "symbols": {
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/equippable.lua": {
+      "aspects_ignored": [
+        "装备潮湿速率描述",
+        "装备理智增减描述",
+        "装备穿戴行为描述",
+        "装备防潮湿卸下描述",
+        "防水绝缘装备效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fueled.lua": {
+      "aspects_ignored": [
+        "摧毁时剩余燃料掉落描述",
+        "最大燃料储量标注",
+        "添加燃料数值加成描述",
+        "添加燃料行为描述",
+        "燃料消耗与补满机制描述",
+        "燃料耗尽状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/weapon.lua": {
+      "aspects_ignored": [
+        "伤害数值标注",
+        "攻击范围数值标注",
+        "攻击行为描述",
+        "特殊伤害倍率说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "pageid": 14703,
+  "title": "帐篷",
+  "inputs": {
+    "wikitext_sha256": "e119109b5a9d88913cb7ca1e287bc34863a008de9b83b0f429e53316f9631d6b",
+    "symbol_doc_shas": {
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/finiteuses.lua": {
+      "aspects_ignored": [
+        "使用次数消耗描述",
+        "修补与回复耐久描述",
+        "耐久归零触发行为描述",
+        "耐久消耗速度修改描述",
+        "耐久百分比回复描述",
+        "耐久百分比读取描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/propagator.lua": {
+      "aspects_ignored": [
+        "可控燃烧不引燃描述",
+        "引燃附近可燃物描述",
+        "灼烧周围实体描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

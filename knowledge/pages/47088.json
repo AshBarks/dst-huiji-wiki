@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "pageid": 47088,
+  "title": "概念制造器",
+  "inputs": {
+    "wikitext_sha256": "cd77aa317a1699fd8f73df4bcdf6f99278ee8a8d5b809b725a268651ba741293",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

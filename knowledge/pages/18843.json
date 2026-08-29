@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "pageid": 18843,
+  "title": "薇诺娜的投石机",
+  "inputs": {
+    "wikitext_sha256": "f4d44200391e5cc15b33207f051cfcecefc4ccf01c4a8979f49515f5f41a4abd",
+    "symbol_doc_shas": {
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+      "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/colouradder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/damagetypebonus.lua": {
+      "aspects_ignored": [
+        "角色与装备伤害类型加成及倍率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/deployable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planardamage.lua": {
+      "aspects_ignored": [
+        "位面伤害倍率描述",
+        "位面伤害加成数值标注",
+        "位面伤害基础值公式描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/propagator.lua": {
+      "aspects_ignored": [
+        "可控燃烧不引燃描述",
+        "引燃附近可燃物描述",
+        "灼烧周围实体描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

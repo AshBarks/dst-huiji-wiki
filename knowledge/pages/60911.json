@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "pageid": 60911,
+  "title": "巨型漩涡",
+  "inputs": {
+    "wikitext_sha256": "b83fc80159809e9a70927e151e2c0c46d4db527d9b833a2388656591f792d748",
+    "symbol_doc_shas": {
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

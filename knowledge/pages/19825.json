@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "pageid": 19825,
+  "title": "巨大蜂窝",
+  "inputs": {
+    "wikitext_sha256": "d0d7119091bb0593669358e1bcc4c4db2a58086be9e1ad144c160f1f83fba83a",
+    "symbol_doc_shas": {
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "工作次数（敲击次数）标注",
+          "evidence": [
+            {
+              "pageid": 19825,
+              "quote": "玩家每敲击 2 次都会使其外观上的"
+            }
+          ]
+        },
+        {
+          "aspect": "敲击工作动作描述",
+          "evidence": [
+            {
+              "pageid": 19825,
+              "quote": "每次敲击巨大蜂窝有约一半概率掉落"
+            }
+          ]
+        },
+        {
+          "aspect": "敲击触发掉落联动",
+          "evidence": [
+            {
+              "pageid": 19825,
+              "quote": "每次敲击巨大蜂窝有约一半概率掉落 1 个蜂蜜"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    }
+  },
+  "page_detail_level": "detailed"
+}

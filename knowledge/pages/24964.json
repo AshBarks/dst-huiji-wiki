@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "pageid": 24964,
+  "title": "藏物箱",
+  "inputs": {
+    "wikitext_sha256": "4f39607d85865c5330bed18316bde911871f956985beb876246a8dc88873ee6a",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

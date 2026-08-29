@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "pageid": 51136,
+  "title": "个人漂浮装置",
+  "inputs": {
+    "wikitext_sha256": "242a5b42a49e2382237b5b0148035fec7bb5a936f59a1999fb0a3a6223b87d34",
+    "symbol_doc_shas": {
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+    }
+  },
+  "symbols": {
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

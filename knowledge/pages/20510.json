@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "pageid": 20510,
+  "title": "海象营地",
+  "inputs": {
+    "wikitext_sha256": "2f7749ff2115d2db4875261d8b1be029299be01097c5af267f642cc7f3871989",
+    "symbol_doc_shas": {
+      "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+    }
+  },
+  "symbols": {
+    "components/follower.lua": {
+      "aspects_ignored": [
+        "停止跟随行为描述",
+        "忠诚度百分比标注",
+        "忠诚时间获取描述",
+        "绑定玩家跟随描述",
+        "跟随距离保持描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

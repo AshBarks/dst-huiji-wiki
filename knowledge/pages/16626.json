@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "pageid": 16626,
+  "title": "胡萝卜",
+  "inputs": {
+    "wikitext_sha256": "6e9961de6c18646b24ea0b7477a2fc2705f86ee241561f7119672e9a3e12d28b",
+    "symbol_doc_shas": {
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a"
+    }
+  },
+  "symbols": {
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pickable.lua": {
+      "aspects_ignored": [
+        "再生与重新生长计时",
+        "施肥恢复与促生长",
+        "移植后状态变化",
+        "荒芜枯萎状态描述",
+        "采集与收获行为",
+        "采集次数消耗限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/propagator.lua": {
+      "aspects_ignored": [
+        "可控燃烧不引燃描述",
+        "引燃附近可燃物描述",
+        "灼烧周围实体描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

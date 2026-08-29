@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "pageid": 22638,
+  "title": "海黾巢穴",
+  "inputs": {
+    "wikitext_sha256": "5a9a4d9a6eb8f7670cbe23ee3973db5becc93463f96f55588c39ce8fa5e904eb",
+    "symbol_doc_shas": {
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+    }
+  },
+  "symbols": {
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/childspawner.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "停止再生描述",
+        "再生周期数值标注",
+        "子代死亡后重生行为描述",
+        "最大子数量标注",
+        "生成速度及数量上限规则描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "5 天",
+          "region_id": "22638:intro:3",
+          "matched": "components/childspawner.lua: dt=5"
+        },
+        {
+          "raw": "5 天",
+          "region_id": "22638:section:1",
+          "matched": "components/childspawner.lua: dt=5"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/freezable.lua": {
+      "aspects_ignored": [
+        "冰冻/冻结状态判定描述",
+        "冰冻抗性数值与机制描述",
+        "冻结实体行为描述",
+        "增加冰冻层数行为描述",
+        "解冻与自然解冻行为描述",
+        "额外冰冻抗性累积描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/propagator.lua": {
+      "aspects_ignored": [
+        "可控燃烧不引燃描述",
+        "引燃附近可燃物描述",
+        "灼烧周围实体描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "detailed"
+}

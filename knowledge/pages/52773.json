@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "pageid": 52773,
+  "title": "敌意虚影",
+  "inputs": {
+    "wikitext_sha256": "f40a6ac3c6e419cbbef0bceb65f5569cba664323e3929ae27ebfb4f1ecff026f",
+    "symbol_doc_shas": {
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+    }
+  },
+  "symbols": {
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/follower.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "绑定玩家跟随描述",
+          "evidence": [
+            {
+              "pageid": 52773,
+              "quote": "生成一个绑定该玩家的敌意虚影"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "停止跟随行为描述",
+        "忠诚度百分比标注",
+        "忠诚时间获取描述",
+        "跟随距离保持描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planardamage.lua": {
+      "aspects_ignored": [
+        "位面伤害倍率描述",
+        "位面伤害加成数值标注",
+        "位面伤害基础值公式描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sanityaura.lua": {
+      "aspects_ignored": [
+        "基础光环回复效果标注",
+        "理智光环持续影响与衰减描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "summary"
+}

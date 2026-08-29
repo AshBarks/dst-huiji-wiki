@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "pageid": 28180,
+  "title": "胡萝卜外套",
+  "inputs": {
+    "wikitext_sha256": "1073e85938f5166440a5b4812beefadc5aba693a2626ed2c266d1b71e9e634f4",
+    "symbol_doc_shas": {
+      "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
+      "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658"
+    }
+  },
+  "symbols": {
+    "components/equippable.lua": {
+      "aspects_ignored": [
+        "装备潮湿速率描述",
+        "装备理智增减描述",
+        "装备穿戴行为描述",
+        "装备防潮湿卸下描述",
+        "防水绝缘装备效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/leader.lua": {
+      "aspects_ignored": [
+        "领袖受击联动随从仇恨",
+        "领袖锁定新目标联动随从仇恨"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/perishable.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "代码层新鲜度获取注释",
+        "保质期倍数设定",
+        "变质状态界定",
+        "新鲜度百分比流失描述",
+        "新鲜状态阈值标注",
+        "烹饪新鲜度稀释公式",
+        "物品腐烂转化行为描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "10 个",
+          "region_id": "28180:intro:1",
+          "matched": "components/perishable.lua: dt=10"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    }
+  },
+  "page_detail_level": "summary"
+}

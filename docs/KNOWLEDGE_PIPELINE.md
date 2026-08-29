@@ -167,7 +167,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 6. pilot 实测(2026-08-28):1a 29/29、1b 3/3 入库;chaseandattack 页面证据丰富(well_documented)优于预期;brain pass2 语义清单偏代码标识符导致保守判空,改进项见行为链文档 §9.1。
 
 ### M2(构想 b 完整版)
-1. `knowledge scan-wiki`:对 2268 页 × 已有 SymbolDoc 的组件做 (page,symbol) 归因,产出 PageSymbolMap(aspects_covered/aspects_ignored/detail_level)
+1. `knowledge scan-wiki`:对 1170 实体页 × 已有 SymbolDoc 做 (page,symbol) 归因,产出 PageSymbolMap(aspects_covered/aspects_ignored/detail_level)——**M2a 确定性骨架已落地**(方案 C,详见 [KNOWLEDGE_PAGE_MAP.md](KNOWLEDGE_PAGE_MAP.md));首轮全量:1170 页 / 直连提及对 110 / 二跳 3 / stub 5958,缺口数据待 M2b L2 审计消化
 2. 旧 verdict 审计管线收编为 `--audit` 校验子模式
 3. 系统机制页(蜘蛛/冬季等专题)是否纳入 → 待解禁后评估路由扩展
 

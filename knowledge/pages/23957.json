@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "pageid": 23957,
+  "title": "月亮裂隙循环",
+  "inputs": {
+    "wikitext_sha256": "0edeafc9a7e545801e804bfddf2e5d40d51e6396771be69986e1f54bb56e288a",
+    "symbol_doc_shas": {
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+    }
+  },
+  "symbols": {
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/timer.lua": {
+      "aspects_ignored": [
+        "世界再生中计时暂停描述",
+        "巢穴生物再生与下蛋倒计时启动描述",
+        "巨兽生成倒计时设置及剩余时间更新描述",
+        "服务器重启倒计时剩余显示描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

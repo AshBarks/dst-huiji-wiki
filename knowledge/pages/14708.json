@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "pageid": 14708,
+  "title": "冰箱",
+  "inputs": {
+    "wikitext_sha256": "c1cf62f427af08591fe9ce251efb23c1fec16971601bd090a8f4a20ec664caab",
+    "symbol_doc_shas": {
+      "components/container.lua": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/container.lua": {
+      "aspects_ignored": [
+        "侧边物品栏显示",
+        "存放特定物品能力",
+        "容器内特定物品状态影响",
+        "打开后物品掉落",
+        "打开状态限制使用",
+        "无限堆叠允许",
+        "物品栏槽位数量标注",
+        "翻找拿回物品"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

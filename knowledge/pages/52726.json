@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "pageid": 52726,
+  "title": "热追踪导弹",
+  "inputs": {
+    "wikitext_sha256": "cfd4066aa502469ca5ffe377ebd542172aac91478ffb4377f51c584bd0b35ae0",
+    "symbol_doc_shas": {
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planardamage.lua": {
+      "aspects_ignored": [
+        "位面伤害倍率描述",
+        "位面伤害加成数值标注",
+        "位面伤害基础值公式描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

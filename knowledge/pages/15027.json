@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "pageid": 15027,
+  "title": "神秘能量",
+  "inputs": {
+    "wikitext_sha256": "c1301bda58196d0a10e05b583bb70eba99cdc7976a4eb6c1bca63619c89baddc",
+    "symbol_doc_shas": {
+      "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+    }
+  },
+  "symbols": {
+    "components/entitytracker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

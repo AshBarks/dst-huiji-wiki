@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "pageid": 28623,
+  "title": "附身暗影心房",
+  "inputs": {
+    "wikitext_sha256": "7cfee197d07f1bc534bcc13ce7ea6b3d55e2ebd1c4db03b600bcfdf8b5a48166",
+    "symbol_doc_shas": {
+      "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+    }
+  },
+  "symbols": {
+    "components/drownable.lua": {
+      "aspects_ignored": [
+        "海洋地块溺水位置判定",
+        "溺水潮湿度惩罚标注",
+        "溺水物品掉落联动",
+        "溺水触发条件描述",
+        "虚空地块溺水判定描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sanityaura.lua": {
+      "aspects_ignored": [
+        "基础光环回复效果标注",
+        "理智光环持续影响与衰减描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/tradable.lua": {
+      "aspects_ignored": [
+        "交易价值与回报标注",
+        "交易对象与限制描述",
+        "交易物解锁条件",
+        "可交易状态说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

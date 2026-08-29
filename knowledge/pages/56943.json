@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "pageid": 56943,
+  "title": "圣殿雕像",
+  "inputs": {
+    "wikitext_sha256": "f3f7730d0b2c6fa2e95c1fea4f1fec36c9e6132c93ca75412b64d1215caf4d1e",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

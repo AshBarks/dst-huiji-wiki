@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "pageid": 22181,
+  "title": "灵魂",
+  "inputs": {
+    "wikitext_sha256": "d4d2e764a8342663f46d21fc7f938a0ee4eff40e0a898de63356877a1a0a2976",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/stackable.lua": {
+      "aspects_ignored": [
+        "不可堆叠说明",
+        "优先堆叠至上限行为",
+        "堆叠上限数值标注",
+        "拿取受堆叠上限限制",
+        "无限堆叠描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "灵魂诱饵持续时间消失机制",
+          "evidence": [
+            {
+              "pageid": 22181,
+              "quote": "2 秒的持续时间结束后也会自动消失"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    }
+  },
+  "page_detail_level": "summary"
+}

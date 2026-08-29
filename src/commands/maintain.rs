@@ -258,6 +258,23 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::KnowledgeScanWiki {
+            root,
+            knowledge_dir,
+            corpus,
+        } => {
+            execute(
+                JobKind::KnowledgeScanWiki {
+                    root: path_to_string(&root)?,
+                    knowledge_dir: path_to_string(&knowledge_dir)?,
+                    corpus: path_to_string(&corpus)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
         Commands::Serve { host, port } => {
             crate::web::serve(host, port).await?;
         }

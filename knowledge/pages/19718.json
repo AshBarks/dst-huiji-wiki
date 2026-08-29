@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "pageid": 19718,
+  "title": "虫洞",
+  "inputs": {
+    "wikitext_sha256": "c2ff481e277afabe2b7300799321dce1f8ecc6e7170e650ea15013060fbe74d6",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventory.lua": {
+      "aspects_ignored": [
+        "检查物品栏含特定条件食物描述",
+        "溺水掉落物品机制类比玩家描述",
+        "物品传输至生物物品栏描述",
+        "物品栏槽位数量标注",
+        "物品栏满载导致新物品销毁描述",
+        "物品栏防水倍率影响新鲜度描述",
+        "生物从自身物品栏装备武器描述",
+        "背包内物品腐烂减速描述",
+        "装备背包合并至玩家物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/playerprox.lua": {
+      "aspects_ignored": [
+        "玩家接近距离阈值标注",
+        "玩家远离回归行为描述",
+        "玩家靠近触发行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/trader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

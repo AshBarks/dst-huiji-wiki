@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "pageid": 27623,
+  "title": "瘴气",
+  "inputs": {
+    "wikitext_sha256": "04a95ff3d2076a543b13eca3505c306a4337f739040c4a575e4b75ae245a95f5",
+    "symbol_doc_shas": {
+      "components/edible.lua": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6"
+    }
+  },
+  "symbols": {
+    "components/edible.lua": {
+      "aspects_ignored": [
+        "食物理智值数值标注",
+        "食物生命值数值标注",
+        "食物饥饿值数值标注",
+        "食用特殊效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

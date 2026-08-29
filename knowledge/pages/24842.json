@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "pageid": 24842,
+  "title": "薇机人",
+  "inputs": {
+    "wikitext_sha256": "a605eadcabf16aa093c7825bc304e18cc9c1514492807f59e45b22ac5eafcbd3",
+    "symbol_doc_shas": {
+      "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
+      "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+    }
+  },
+  "symbols": {
+    "components/colouradder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/deployable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fueled.lua": {
+      "aspects_ignored": [
+        "摧毁时剩余燃料掉落描述",
+        "最大燃料储量标注",
+        "添加燃料数值加成描述",
+        "添加燃料行为描述",
+        "燃料消耗与补满机制描述",
+        "燃料耗尽状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventory.lua": {
+      "aspects_ignored": [
+        "检查物品栏含特定条件食物描述",
+        "溺水掉落物品机制类比玩家描述",
+        "物品传输至生物物品栏描述",
+        "物品栏槽位数量标注",
+        "物品栏满载导致新物品销毁描述",
+        "物品栏防水倍率影响新鲜度描述",
+        "生物从自身物品栏装备武器描述",
+        "背包内物品腐烂减速描述",
+        "装备背包合并至玩家物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/knownlocations.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/updatelooper.lua": {
+      "aspects_ignored": [
+        "周期恢复生命值描述",
+        "定时甩落寄生暗影行为",
+        "灵魂诱饵持续时间消失机制",
+        "间隔生命值阈值触发行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "pageid": 15337,
+  "title": "溯源表",
+  "inputs": {
+    "wikitext_sha256": "8acc602a335f29a68e4484341fb3dadea941127a02a8e0b2c849d2c39af5a7fa",
+    "symbol_doc_shas": {
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+    }
+  },
+  "symbols": {
+    "components/trader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

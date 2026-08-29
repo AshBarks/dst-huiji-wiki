@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "pageid": 21063,
+  "title": "冰钓洞",
+  "inputs": {
+    "wikitext_sha256": "49e17062db775e5b5edf7b2812be68faf09ff6257d9f8004ca8133393e9f9d04",
+    "symbol_doc_shas": {
+      "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3"
+    }
+  },
+  "symbols": {
+    "components/playerprox.lua": {
+      "aspects_ignored": [
+        "玩家接近距离阈值标注",
+        "玩家远离回归行为描述",
+        "玩家靠近触发行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

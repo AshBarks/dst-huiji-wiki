@@ -209,6 +209,17 @@ pub enum Commands {
         #[arg(long)]
         refresh_auto: bool,
     },
+    /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
+    KnowledgeScanWiki {
+        /// 游戏脚本根目录(当前树或快照目录)
+        root: PathBuf,
+        /// 知识文档根目录(默认 knowledge/)
+        #[arg(long, default_value = "knowledge")]
+        knowledge_dir: PathBuf,
+        /// wiki 语料 host 根目录
+        #[arg(long)]
+        corpus: PathBuf,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -237,6 +248,7 @@ impl Commands {
             Commands::CorpusIndex { .. } => "corpus-index",
             Commands::SymbolAnnotate { .. } => "symbol-annotate",
             Commands::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            Commands::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             Commands::Serve { .. } => "serve",
         }
     }
@@ -571,6 +583,27 @@ mod tests {
                 assert!(!refresh_auto);
             }
             _ => panic!("Expected KnowledgeScanSymbols command"),
+        }
+
+        // M2a 命令解析
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "knowledge-scan-wiki",
+            "scripts",
+            "--corpus",
+            "wikis/dontstarve.huijiwiki.com",
+        ]);
+        match args.unwrap().command {
+            Commands::KnowledgeScanWiki {
+                root,
+                knowledge_dir,
+                corpus,
+            } => {
+                assert_eq!(root, PathBuf::from("scripts"));
+                assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
+                assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
+            }
+            _ => panic!("Expected KnowledgeScanWiki command"),
         }
 
         // 新类别 flag 透传 + pass2 抽样名单

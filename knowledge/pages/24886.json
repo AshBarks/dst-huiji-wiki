@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "pageid": 24886,
+  "title": "方尖碑",
+  "inputs": {
+    "wikitext_sha256": "3035d079b90e0dddeeb7d32c90d359e17ee27c8f9300dec6dca19329179217e4",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

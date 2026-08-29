@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "pageid": 15314,
+  "title": "蜜蜂",
+  "inputs": {
+    "wikitext_sha256": "c1d90605754b8ea796934127fd5b7b582c395e8e32131e0356d83788b4f04fb2",
+    "symbol_doc_shas": {
+      "behaviours/chaseandattack.lua": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
+      "behaviours/doaction.lua": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
+      "behaviours/findflower.lua": "46facba303415d96d1993e464876e2a77f5e16a2d8af369ed0f26bec6b63331f",
+      "behaviours/panic.lua": "56884d4d3f3014d08a2f6483e216a2d7f7eb44df8fe4578571a8452985a68696",
+      "behaviours/runaway.lua": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/beebrain.lua": "52f88ac98ed95cd49b8d6712ec471357f827d98eb9e3f539ba322a9bb2088495",
+      "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGbee.lua": "89ed3db5f213d41371392889028c138e47599a78d0b103c97d56d086a99f77f6"
+    }
+  },
+  "symbols": {
+    "behaviours/chaseandattack.lua": {
+      "aspects_ignored": [
+        "丢失仇恨脱离战斗",
+        "仇恨目标锁定描述",
+        "原地静止行为",
+        "寻找其他目标行为",
+        "尝试攻击造成伤害",
+        "战斗咆哮发现玩家",
+        "最大追逐时间描述",
+        "追击攻击距离范围",
+        "靠近点位加入追击",
+        "高速移动压制追击"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/doaction.lua": {
+      "aspects_ignored": [
+        "抛锚减速行为描述",
+        "起锚下锚时长标注",
+        "锚定动作名称标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/findflower.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "花朵吸引蜜蜂授粉表述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "30 单位",
+          "region_id": "15314:section:1",
+          "matched": "behaviours/findflower.lua: SEE_DIST=30"
+        }
+      ],
+      "route": "two_hop",
+      "detail_level": "summary"
+    },
+    "behaviours/panic.lua": {
+      "aspects_ignored": [
+        "慌张乱跑行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/runaway.lua": {
+      "aspects_ignored": [
+        "受击逃离奔跑方向描述",
+        "感知与仇恨距离描述",
+        "角色发出逃离指令描述",
+        "返回驻点行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/beebrain.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "10 个",
+          "region_id": "15314:section:1",
+          "matched": "brains/beebrain.lua: STOP_RUN_AWAY_DIST=10"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/burnable.lua": {
+      "aspects_ignored": [
+        "可控燃烧机制与视觉效果",
+        "可燃物分类标注",
+        "灭火与消防机制",
+        "燃烧时间与烧毁结果",
+        "燃烧状态与引燃野火",
+        "闷烧状态与扑灭行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/combat.lua": {
+      "aspects_ignored": [
+        "丢失仇恨与脱离战斗",
+        "仇恨目标距离与追击",
+        "伤害数值标注",
+        "召唤物协同攻击目标",
+        "对玩家伤害倍率描述",
+        "战吼行为描述",
+        "攻击冷却时间描述",
+        "攻击范围数值标注",
+        "睡眠状态触发",
+        "脱战重定目标",
+        "范围伤害技能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/eater.lua": {
+      "aspects_ignored": [
+        "可怕食物喂食雇佣描述",
+        "可食用食物分类标注",
+        "捡食地上食物行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/freezable.lua": {
+      "aspects_ignored": [
+        "冰冻/冻结状态判定描述",
+        "冰冻抗性数值与机制描述",
+        "冻结实体行为描述",
+        "增加冰冻层数行为描述",
+        "解冻与自然解冻行为描述",
+        "额外冰冻抗性累积描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/health.lua": {
+      "aspects_ignored": [
+        "制作消耗生命值描述",
+        "医疗与食物回复生命值描述",
+        "单次承伤上限标注",
+        "实体最大生命值标注",
+        "持续回复与自我治疗描述",
+        "火焰伤害减半描述",
+        "生命值归零导致死亡描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inventoryitem.lua": {
+      "aspects_ignored": [
+        "物品丢弃与放置描述",
+        "物品持有状态描述",
+        "物品温度范围与初始值标注",
+        "物品温度降低描述",
+        "物品潮湿度增加描述",
+        "物品被拾取与放入物品栏描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/knownlocations.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/locomotor.lua": {
+      "aspects_ignored": [
+        "主动靠近目标描述",
+        "冲刺速度描述",
+        "减速抵抗描述",
+        "奔跑速度数值标注",
+        "奔跑速度禁用标注（手写n/a）",
+        "旋转攻击移速描述",
+        "水陆自由移动描述",
+        "疾跑状态触发描述",
+        "随机游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sleeper.lua": {
+      "aspects_ignored": [
+        "催眠与睡意施加描述",
+        "实体入睡与睡眠状态描述",
+        "实体唤醒条件与醒后行为描述",
+        "睡眠点使用条件限制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/stackable.lua": {
+      "aspects_ignored": [
+        "不可堆叠说明",
+        "优先堆叠至上限行为",
+        "堆叠上限数值标注",
+        "拿取受堆叠上限限制",
+        "无限堆叠描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/tradable.lua": {
+      "aspects_ignored": [
+        "交易价值与回报标注",
+        "交易对象与限制描述",
+        "交易物解锁条件",
+        "可交易状态说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGbee.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "死亡掉落物标注",
+          "evidence": [
+            {
+              "pageid": 15314,
+              "quote": "针刺（83.3%）蜂蜜（16.7%）"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "攻击行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    }
+  },
+  "page_detail_level": "summary"
+}

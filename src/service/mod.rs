@@ -212,6 +212,13 @@ pub enum JobKind {
         #[serde(default)]
         refresh_auto: bool,
     },
+    /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
+    KnowledgeScanWiki {
+        root: String,
+        #[serde(default = "default_knowledge_dir")]
+        knowledge_dir: String,
+        corpus: String,
+    },
 }
 
 fn default_symbol_category() -> String {
@@ -258,6 +265,7 @@ impl JobKind {
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
             JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             JobKind::SymbolAnnotate { .. } => "symbol-annotate",
         }
     }
@@ -432,6 +440,21 @@ async fn execute_job_inner(
                     pass2_names: pass2_names.clone(),
                     pick_names: pick_names.clone(),
                     refresh_auto: *refresh_auto,
+                },
+                reporter,
+            )
+            .await
+        }
+        JobKind::KnowledgeScanWiki {
+            root,
+            knowledge_dir,
+            corpus,
+        } => {
+            crate::knowledge::run_scan_wiki(
+                &crate::knowledge::ScanWikiParams {
+                    scripts_root: root.clone(),
+                    knowledge_dir: knowledge_dir.clone(),
+                    corpus: corpus.clone(),
                 },
                 reporter,
             )

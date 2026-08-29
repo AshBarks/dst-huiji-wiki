@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "pageid": 19808,
+  "title": "池塘",
+  "inputs": {
+    "wikitext_sha256": "6574b296bd6755db47b025061d578603e7ea36ae087492b66c18f898fd1abc6d",
+    "symbol_doc_shas": {
+      "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+    }
+  },
+  "symbols": {
+    "components/childspawner.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "再生周期数值标注",
+          "evidence": [
+            {
+              "pageid": 19808,
+              "quote": "数量不满时每 150 秒"
+            }
+          ]
+        },
+        {
+          "aspect": "最大子数量标注",
+          "evidence": [
+            {
+              "pageid": 19808,
+              "quote": "每个池塘至多容纳 3 ~ 4 只青蛙/蚊子"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "停止再生描述",
+        "子代死亡后重生行为描述",
+        "生成速度及数量上限规则描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/hauntable.lua": {
+      "aspects_ignored": [
+        "作祟引发生物恐慌描述",
+        "实体被作祟互动描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/lootdropper.lua": {
+      "aspects_ignored": [
+        "地震掉落物生成描述",
+        "巨兽击杀额外掉落标注",
+        "怪物死亡几率掉落描述",
+        "树木破坏烧毁掉落标注",
+        "蜘蛛击杀掉落物说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/workable.lua": {
+      "aspects_ignored": [
+        "工作次数（敲击次数）标注",
+        "敲击工作动作描述",
+        "敲击触发掉落联动"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "detailed"
+}

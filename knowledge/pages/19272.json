@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "pageid": 19272,
+  "title": "华丽基座",
+  "inputs": {
+    "wikitext_sha256": "9eadafe4616e14b2b6bb3596d43f4ee15e91024e0aa738f8b778f0b908c36a8a",
+    "symbol_doc_shas": {
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+    }
+  },
+  "symbols": {
+    "components/inspectable.lua": {
+      "aspects_ignored": [
+        "检视描述台词标注",
+        "检视状态区分描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pickable.lua": {
+      "aspects_ignored": [
+        "再生与重新生长计时",
+        "施肥恢复与促生长",
+        "移植后状态变化",
+        "荒芜枯萎状态描述",
+        "采集与收获行为",
+        "采集次数消耗限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/trader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

@@ -209,6 +209,17 @@ pub enum Commands {
         #[arg(long)]
         refresh_auto: bool,
     },
+    /// page-assist:给定页面输出覆盖缺口建议清单(读 PageSymbolMap,不调 LLM)
+    PageAssist {
+        /// 知识文档根目录(默认 knowledge/)
+        #[arg(long, default_value = "knowledge")]
+        knowledge_dir: PathBuf,
+        /// 页面 id(纯数字)或标题(精确匹配)
+        page: String,
+        /// 输出 JSON 而非 Markdown
+        #[arg(long)]
+        json: bool,
+    },
     /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
     KnowledgeScanWiki {
         /// 游戏脚本根目录(当前树或快照目录)
@@ -266,6 +277,7 @@ impl Commands {
             Commands::CorpusIndex { .. } => "corpus-index",
             Commands::SymbolAnnotate { .. } => "symbol-annotate",
             Commands::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            Commands::PageAssist { .. } => "page-assist",
             Commands::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             Commands::Serve { .. } => "serve",
         }

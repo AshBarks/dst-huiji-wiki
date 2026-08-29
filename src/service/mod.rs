@@ -212,6 +212,14 @@ pub enum JobKind {
         #[serde(default)]
         refresh_auto: bool,
     },
+    /// page-assist:给定页面输出覆盖缺口建议清单(本地,不调 LLM)
+    PageAssist {
+        #[serde(default = "default_knowledge_dir")]
+        knowledge_dir: String,
+        page: String,
+        #[serde(default)]
+        json: bool,
+    },
     /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
     KnowledgeScanWiki {
         root: String,
@@ -289,6 +297,7 @@ impl JobKind {
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
             JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            JobKind::PageAssist { .. } => "page-assist",
             JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             JobKind::SymbolAnnotate { .. } => "symbol-annotate",
         }
@@ -464,6 +473,21 @@ async fn execute_job_inner(
                     pass2_names: pass2_names.clone(),
                     pick_names: pick_names.clone(),
                     refresh_auto: *refresh_auto,
+                },
+                reporter,
+            )
+            .await
+        }
+        JobKind::PageAssist {
+            knowledge_dir,
+            page,
+            json,
+        } => {
+            crate::knowledge::run_page_assist(
+                &crate::knowledge::PageAssistParams {
+                    knowledge_dir: knowledge_dir.clone(),
+                    page: page.clone(),
+                    json: *json,
                 },
                 reporter,
             )

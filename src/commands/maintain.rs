@@ -258,6 +258,23 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::PageAssist {
+            knowledge_dir,
+            page,
+            json,
+        } => {
+            execute(
+                JobKind::PageAssist {
+                    knowledge_dir: path_to_string(&knowledge_dir)?,
+                    page: page.clone(),
+                    json,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
         Commands::KnowledgeScanWiki {
             root,
             knowledge_dir,

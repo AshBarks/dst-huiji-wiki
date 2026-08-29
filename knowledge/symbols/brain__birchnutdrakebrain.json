@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/birchnutdrakebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "birchnutdrakebrain",
+  "summary": "该大脑驱动桦树果蜻蜓的 AI 行为。实体优先响应恐慌与电栅栏恐慌，随后在出生点附近拴绳活动，发现目标则追击攻击，最终执行退出事件消失。",
+  "api": [],
+  "api_note": "该大脑仅覆写 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的对外公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "返回家位置(spawnpoint)的函数作为拴绳锚点",
+        "拴绳最大半径 20",
+        "内部返回距离 5"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "最长追逐时间 12 秒",
+        "放弃距离 21"
+      ]
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 -> 电栅栏恐慌触发 -> 拴绳返回家(锚点函数,最大20,返回5) -> 追击攻击(最长12,放弃21) -> 推送退出事件动作",
+  "wiki": {
+    "scanned_pageids": [
+      19075
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面仅描述桦栗果精的攻击对象、啃咬方式及失去目标或催眠时钻地消失，未提及游荡距离、拴绳锚点/半径、追逐时长或放弃距离等数值或行为，与所给代码能力清单无对应表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "桦树果蜻蜓",
+    "大脑AI",
+    "拴绳回家",
+    "追击攻击",
+    "恐慌触发",
+    "电栅栏",
+    "退出事件",
+    "已知位置"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b137fe2425a7f486d2874256c0ee160213f591250dd540e664673b512a7bdb54",
+    "source_bytes": 934,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970418450
+  }
+}

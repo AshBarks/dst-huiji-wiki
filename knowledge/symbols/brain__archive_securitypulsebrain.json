@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/archive_securitypulsebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "archive_securitypulsebrain",
+  "summary": "该大脑控制档案馆安全脉冲实体在开启巡逻(patrol)时，优先跟随可用的电力点(security_powerpoint)，否则跟随档案馆路点(archive_waypoint)进行巡逻移动；两种跟随均只步行且保持近距离。当未开启巡逻或无可跟随目标时，实体无条件站立静止不动。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW",
+    "MAX_FOLLOW",
+    "TARGET_FOLLOW",
+    "WAYPOINT_RANGE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "寻找电力点函数(FindPowerPoint)",
+        "最小跟随距离=自身possession_range",
+        "目标跟随距离=自身possession_range",
+        "最大跟随距离=文件常量MAX_FOLLOW(2)",
+        "不可奔跑(canrun=false,只走)",
+        "alwayseval省略(nil,默认动态评估)",
+        "目标进入limbo失效(inlimbo_invalid=true)"
+      ],
+      "context": "inst.patrol == true 时尝试跟随电力点"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "寻找路点函数(findwaypoint)",
+        "最小跟随距离=文件常量MIN_FOLLOW(1)",
+        "目标跟随距离=文件常量TARGET_FOLLOW(1)",
+        "最大跟随距离=文件常量MAX_FOLLOW(2)",
+        "不可奔跑(canrun=false,只走)"
+      ],
+      "context": "inst.patrol == true 且无电力点可跟随时跟随路点"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体(inst)"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.patrol == true 且 FindPowerPoint 返回有效实体",
+      "semantic": "以 possession_range 为最小/目标距离、MAX_FOLLOW(2)为最大距离、只走、目标limbo失效的方式跟随电力点"
+    },
+    {
+      "condition": "inst.patrol == true 且 FindPowerPoint 返回 nil",
+      "semantic": "以 MIN_FOLLOW(1)最小、TARGET_FOLLOW(1)目标、MAX_FOLLOW(2)最大、只走的方式跟随档案馆路点巡逻"
+    },
+    {
+      "condition": "inst.patrol ~= true 或前述跟随无目标",
+      "semantic": "无条件进入并无限期保持站立静止(StandStill无startfn/keepfn)"
+    }
+  ],
+  "bt_structure": "PriorityNode(权重.25): [ WhileNode(patrol==true -> Follow PowerPoint), WhileNode(patrol==true -> Follow Waypoint), StandStill ]",
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      13857,
+      47009,
+      18232
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面13406、13857、47009分别描述woodie、firehound、wagdrone_rolling，未涉及archive_securitypulsebrain能力；页面18232提及archive_security_desk与安保脉冲，但仅说明'每个最多有4个安保脉冲跟随'玩家及数量限制，未体现清单中的最小/目标/最大跟随距离、寻找电力点/路点、不可奔跑、limbo失效或StandStill等任何具体能力表达，故认为页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "安全脉冲",
+    "档案馆巡逻",
+    "跟随电力点",
+    "路点巡逻",
+    "站立不动",
+    "巡逻标志",
+    "脉冲大脑"
+  ],
+  "gameplay_tags": [
+    "档案馆",
+    "巡逻",
+    "跟随",
+    "静止"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "afadf3e17466dbb0eb8b50e187a4d9b3ff4a410e2bed37cf61f23959a35a3874",
+    "source_bytes": 3725,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970187270
+  }
+}

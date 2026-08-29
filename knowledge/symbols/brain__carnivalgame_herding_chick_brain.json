@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/carnivalgame_herding_chick_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "carnivalgame_herding_chick_brain",
+  "summary": "该大脑控制嘉年华赶小鸡迷你游戏中的小鸡实体行为。当实体具有 locomotor 组件（已着陆）时，会优先逃离附近的游戏参与者或观众，其次逃离饲养站，否则围绕家位置游荡。",
+  "api": [],
+  "api_note": "该大脑类仅重写 OnStart 方法以构建行为树，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "GOHOME_SEE_SCARY_DIST",
+    "GOHOME_STOP_SCARY_DIST",
+    "SEE_HOME_DIST",
+    "STOP_HOME_DIST",
+    "MAX_WANDER_DIST",
+    "RUNAWAY_PARAMS",
+    "AVOID_HOME_TAG"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "猎人参数: 表{oneoftags={\"minigame_participator\",\"minigame_spectator\"}}，即带这些标签的实体",
+        "发现猎人距离半径 2 (GOHOME_SEE_SCARY_DIST)",
+        "脱离危险安全距离 4 (GOHOME_STOP_SCARY_DIST)",
+        "额外逃跑条件过滤函数 nil",
+        "被追时跑回家 nil",
+        "修正悬垂地形 true",
+        "走路代替奔跑 nil",
+        "安全点函数: 返回 knownlocations 中 home 位置"
+      ],
+      "context": "优先级最高，位于 WhileNode 内"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "猎人参数: 字符串标签 \"carnivalgame_herding_station\"",
+        "发现猎人距离半径 4 (SEE_HOME_DIST)",
+        "脱离危险安全距离 6 (STOP_HOME_DIST)",
+        "额外逃跑条件过滤函数 nil",
+        "被追时跑回家 nil",
+        "修正悬垂地形 true",
+        "走路代替奔跑 true"
+      ],
+      "context": "优先级次之，位于 WhileNode 内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "家位置函数: 返回 knownlocations 中 home 位置",
+        "离家最大距离 12 (MAX_WANDER_DIST)",
+        "时间参数表: 最小行走1.5, 随机行走1, 最小等待0.5, 随机等待1.5"
+      ],
+      "context": "优先级最低，位于 WhileNode 内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.locomotor ~= nil",
+      "semantic": "执行内部优先级节点：依次尝试 RunAway 逃离参与者/观众标签实体、RunAway 逃离饲养站标签实体、Wander 围绕家游荡"
+    },
+    {
+      "condition": "self.inst.components.locomotor == nil",
+      "semantic": "不执行任何行为（行为树为空）"
+    }
+  ],
+  "bt_structure": "根优先级节点 -> WhileNode(条件: inst.components.locomotor ~= nil, 标签'landed') -> 优先级节点[1.RunAway(逃离玩家与观众, 跑向home) 2.RunAway(逃离饲养站, 走路) 3.Wander(围绕home游荡)]",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15238,
+      51046,
+      13701,
+      15091,
+      15246,
+      15434,
+      15560
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均为其他实体（天体英雄、皮弗娄牛、战争瓦器人、远古织影者、蜘蛛、穴居猴等）及盛夏鸦年华活动简介，未提及 carnivalgame_herding_chick_brain 或其相关标签（如 minigame_participator、carnivalgame_herding_station）、发现/脱离距离、回家游荡等能力表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "赶小鸡",
+    "小鸡脑",
+    "逃离玩家",
+    "游荡",
+    "嘉年华",
+    "饲养站",
+    "参与者",
+    "观众",
+    "着陆"
+  ],
+  "gameplay_tags": [
+    "嘉年华活动",
+    "赶小鸡",
+    "生物AI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b439447a60d7e66382cbf25cdf57e8df0f5bbd5c66405058ec7cf7e0918d4b5e",
+    "source_bytes": 1257,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970502310
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/abigailbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "abigailbrain",
+  "summary": "阿比盖尔大脑控制幽灵阿比盖尔在多种情境下的行为。当领导者跳舞或参与小游戏时，她会跟随并做出相应互动；透明或存在惊吓目标时执行特定动作；在防御或攻击模式下，她会依据距离与战斗规则追击敌人、跟随领导者、在保姆附近游荡或与其它幽灵玩耍。",
+  "api": [],
+  "api_note": "该大脑文件仅实现 OnStart 构建行为树，未定义额外对外方法，行为逻辑通过内部函数与节点条件闭包实现。",
+  "events_published": [
+    "dance",
+    "start_playwithghost"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_TIMING",
+    "MAX_BABYSIT_WANDER",
+    "PLAYFUL_OFFSET",
+    "PLAYMATE_NO_TAGS",
+    "PLAYMATE_ONEOF_TAGS",
+    "PRIORITY_NODE_RATE",
+    "MAX_AGGRESSIVE_FIGHT_DSQ"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取目标函数 WatchingMinigame",
+        "最小距离 TUNING.MINIGAME_CROWD_DIST_MIN",
+        "期望距离 TUNING.MINIGAME_CROWD_DIST_TARGET",
+        "最大距离 TUNING.MINIGAME_CROWD_DIST_MAX"
+      ],
+      "context": "观看小游戏节点内"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "标签字符串 'minigame_participator'",
+        "触发远离距离 5",
+        "安全远离距离 7"
+      ],
+      "context": "观看小游戏节点内"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取目标函数 WatchingMinigame",
+        "保持目标函数 WatchingMinigame"
+      ],
+      "context": "观看小游戏节点内"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取位置函数 GetLeaderPos",
+        "最小拴住距离 TUNING.ABIGAIL_DEFENSIVE_MED_FOLLOW",
+        "最大拴住距离 TUNING.ABIGAIL_DEFENSIVE_MED_FOLLOW"
+      ],
+      "context": "跳舞派对节点内"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行函数 function() DanceParty(self.inst) end"
+      ],
+      "context": "跳舞派对节点内"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取位置函数 GetLeaderPos",
+        "最小拴住距离 TUNING.ABIGAIL_DEFENSIVE_MED_FOLLOW",
+        "最大拴住距离 TUNING.ABIGAIL_DEFENSIVE_MED_FOLLOW",
+        "瞬移参数 true"
+      ],
+      "context": "透明状态节点内"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身(self.inst)"
+      ],
+      "context": "透明状态节点内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取动作函数 HauntAction",
+        "节点名称 nil",
+        "是否跑动 true",
+        "超时时间 TUNING.WENDYSKILL_COMMAND_COOLDOWN"
+      ],
+      "context": "惊吓目标节点内"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待时间 6 秒"
+      ],
+      "context": "玩耍幽灵节点内"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取位置函数 (返回玩伴相邻点)",
+        "最小拴住距离 PLAYFUL_OFFSET(2)",
+        "最大拴住距离 PLAYFUL_OFFSET(2)"
+      ],
+      "context": "玩耍幽灵节点内"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行函数 function() PlayWithPlaymate(self) end"
+      ],
+      "context": "玩耍幽灵节点内"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身(self.inst)"
+      ],
+      "context": "玩耍幽灵节点内"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "函数表 { getfn = GetRunAwayTarget }",
+        "触发远离距离 7",
+        "安全远离距离 9"
+      ],
+      "context": "防御/攻击模式幻影逃避节点内"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "追击最长 TUNING.ABIGAIL_DEFENSIVE_MAX_CHASE_TIME 秒"
+      ],
+      "context": "防御模式可战斗节点内"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取交易者函数 GetTraderFn",
+        "保持交易者函数 KeepTraderFn"
+      ],
+      "context": "防御/攻击模式内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取家位置函数 GetBabysitterPos",
+        "最大游荡距离 MAX_BABYSIT_WANDER(6)",
+        "游荡时间配置 WANDER_TIMING"
+      ],
+      "context": "防御/攻击模式保姆节点内"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取领导者函数 GetLeader",
+        "最小跟随距离 TUNING.ABIGAIL_DEFENSIVE_MIN_FOLLOW",
+        "期望跟随距离 TUNING.ABIGAIL_DEFENSIVE_MED_FOLLOW",
+        "最大跟随距离 TUNING.ABIGAIL_DEFENSIVE_MAX_FOLLOW",
+        "可奔跑 true"
+      ],
+      "context": "防御模式跟随节点内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "无家 nil",
+        "无最大距离 nil",
+        "游荡时间配置 WANDER_TIMING"
+      ],
+      "context": "防御模式自由游荡节点内"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "追击最长 TUNING.ABIGAIL_AGGRESSIVE_MAX_CHASE_TIME 秒"
+      ],
+      "context": "攻击模式可战斗节点内"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取领导者函数 GetLeader",
+        "最小跟随距离 TUNING.ABIGAIL_AGGRESSIVE_MIN_FOLLOW",
+        "期望跟随距离 TUNING.ABIGAIL_AGGRESSIVE_MED_FOLLOW",
+        "最大跟随距离 TUNING.ABIGAIL_AGGRESSIVE_MAX_FOLLOW",
+        "可奔跑 true"
+      ],
+      "context": "攻击模式跟随节点内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(self.inst)"
+      ],
+      "context": "攻击模式自由游荡节点内"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"swoop\")",
+      "semantic": "根守卫：仅非俯冲状态时评估后续所有行为分支"
+    },
+    {
+      "condition": "ShouldWatchMinigame(inst) (领导者参与小游戏)",
+      "semantic": "观看小游戏：跟随小游戏实体、远离参与者、面向小游戏"
+    },
+    {
+      "condition": "ShouldDanceParty(inst) (领导者跳舞)",
+      "semantic": "跳舞派对：拴在领导者位置并触发跳舞事件"
+    },
+    {
+      "condition": "self.inst._is_transparent",
+      "semantic": "透明行为：拴在领导者位置并站立不动"
+    },
+    {
+      "condition": "self.inst._haunt_target ~= nil",
+      "semantic": "惊吓行为：跑向目标执行惊吓动作"
+    },
+    {
+      "condition": "not self.inst:IsInLimbo() and FindPlaymate(self)",
+      "semantic": "玩耍行为：等待后靠近玩伴并玩耍"
+    },
+    {
+      "condition": "self.inst.is_defensive",
+      "semantic": "防御模式：幻影冷却逃避、防御范围内战斗、面向交易者、保姆游荡、玩耍、跟随领导者(防御距离)、自由游荡"
+    },
+    {
+      "condition": "否则(攻击模式)",
+      "semantic": "攻击模式：幻影冷却逃避、攻击范围内战斗、面向交易者、保姆游荡、玩耍、跟随领导者(攻击距离)、自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(非俯冲守卫)依次包含: 跳舞派对 > 观看小游戏 > 透明行为 > 惊吓行为 > 防御模式 > 攻击模式。防御/攻击模式内部优先级: 幻影逃避 > 战斗(ChaseAndAttack) > 面向交易者 > 保姆游荡 > 玩耍 > 跟随领导者 > 自由游荡。观看小游戏内部: 跟随 > 远离 > 面向。跳舞内部: 拴住 > 跳舞。透明内部: 拴住 > 站立。玩耍内部: 等待 > (拴住 > 玩耍 > 站立)。",
+  "wiki": {
+    "scanned_pageids": [
+      13556,
+      10379,
+      18050,
+      15186,
+      35821,
+      15183,
+      15137,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击模式跟随距离描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "激怒状态下则是 3 ~ 10 单位"
+          }
+        ]
+      },
+      {
+        "aspect": "虚影形态（透明状态）转变描述",
+        "evidence": [
+          {
+            "pageid": 15137,
+            "quote": "能使阿比盖尔转变为虚影形态"
+          }
+        ]
+      },
+      {
+        "aspect": "防御模式跟随距离描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "平静状态下，阿比盖尔会试图保持在温蒂附近 1 ~ 5 距离单位的位置"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "阿比盖尔",
+    "幽灵大脑",
+    "防御模式",
+    "攻击模式",
+    "跳舞跟随",
+    "惊吓行为",
+    "玩耍幽灵",
+    "保姆游荡",
+    "小游戏看",
+    "跟随领导"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "幽灵",
+    "玩耍"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8f768e42ec18dc344a92ea9e260a36667574acf1481277ab1875c476dfe6f8b2",
+    "source_bytes": 9621,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970064761
+  }
+}

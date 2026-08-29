@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/antlionbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "antlionbrain",
+  "summary": "该大脑控制蚁狮在战斗中的行为逻辑。当蚁狮受伤且满足墙壁冷却与受击时间间隔时，高优先级触发吃石头事件；平时会站立攻击目标，受伤时低优先级也会吃石头。若所有攻击与吃石头条件均不满足，则设置攻击周期并等待一段时间后停止战斗。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他供外部调用的自定义方法或接口。",
+  "events_published": [
+    "eatrocks",
+    "antlionstopfighting"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CALM_DELAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "省略"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldEatRocksHighPrio: inst.components.health:IsHurt() 且 worldsettingstimer 存在 'wall_cd' 且 GetLastAttackedTime()+6 < GetTime()",
+      "semantic": "高优先级通过 ActionNode 推送 'eatrocks' 事件吃石头"
+    },
+    {
+      "condition": "无（优先级第二节点常驻）",
+      "semantic": "执行 StandAndAttack 站立攻击行为"
+    },
+    {
+      "condition": "ShouldEatRocksLowPrio: inst.components.health:IsHurt()",
+      "semantic": "低优先级通过 ActionNode 推送 'eatrocks' 事件吃石头"
+    },
+    {
+      "condition": "无（优先级最末序列节点）",
+      "semantic": "依次执行：设置攻击周期为 TUNING.ANTLION_MAX_ATTACK_PERIOD、等待 CALM_DELAY 秒、推送 'antlionstopfighting' 事件"
+    }
+  ],
+  "bt_structure": "优先级节点(权重0.5)：WhileNode(高优先吃石) > StandAndAttack > WhileNode(低优先吃石) > SequenceNode(设攻击周期->等待->停战)",
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      15601
+    ],
+    "aspects": [
+      {
+        "aspect": "基础延缓时间标注",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "基础延缓时间会从 0.33 天增加至 0.5 天。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蚁狮大脑",
+    "站立攻击",
+    "吃石头",
+    "停战事件",
+    "受伤吃石",
+    "优先级节点",
+    "行为树",
+    "战斗AI"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "187b6ce2a0784678348648b3ae5f528a46cbad14a366f0e1cd0c932d2812f603",
+    "source_bytes": 1301,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970163488
+  }
+}

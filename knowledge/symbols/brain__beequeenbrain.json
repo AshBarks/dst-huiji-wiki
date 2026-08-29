@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/beequeenbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "beequeenbrain",
+  "summary": "该大脑控制蜂后（BeeQueen）在战斗或和平状态下的行为。当受到攻击并度过延迟后会寻找低危险点进行躲避冲锋，并可能触发尖叫、召唤守卫或聚焦目标等特殊动作。有有效目标时追击攻击，无目标时面对目标并在巢穴附近游荡，长时间无威胁则触发逃跑。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart、OnStop、OnInitializationComplete 生命周期方法，无额外供外部调用的自定义方法。",
+  "events_published": [
+    "screech",
+    "spawnguards",
+    "focustarget",
+    "flee"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FLEE_DELAY",
+    "DODGE_DELAY",
+    "MAX_DODGE_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "动态躲避点（self._dodgedest）",
+        "最大距离 2",
+        "内部返回距离 2"
+      ],
+      "context": "在 ShouldDodge 分支的序列中，并行等待期间执行拴绳移动"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [],
+      "context": "在 ShouldChase 分支下追击攻击（使用默认参数）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取战斗目标为面对目标",
+        "保持面对当前战斗目标"
+      ],
+      "context": "优先级中位于追击之后，无追击时面对目标"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "家位置为 spawnpoint",
+        "最大游荡距离 5"
+      ],
+      "context": "与等待逃跑并行，无目标时游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldDodge(self) 为真（受击后延迟且找到躲避点）",
+      "semantic": "执行躲避：在 MAX_DODGE_TIME 内冲向动态躲避点（Leash 2,2），结束后调用 OnStop 重置速度"
+    },
+    {
+      "condition": "ShouldUseSpecialMove(self) 为真（TryScreech/TrySpawnGuards/TryFocusTarget 返回动作）",
+      "semantic": "推送对应事件（screech/spawnguards/focustarget）以执行特殊动作"
+    },
+    {
+      "condition": "ShouldChase(self) 为真（有目标且不在攻击范围内或冷却结束）",
+      "semantic": "使用 ChaseAndAttack 默认参数追击攻击目标"
+    },
+    {
+      "condition": "上述条件均不满足（通常无目标或已贴近）",
+      "semantic": "FaceEntity 面对战斗目标；并行等待 FLEE_DELAY 后推送 flee 事件，同时以家为中心半径5游荡"
+    }
+  ],
+  "bt_structure": "优先级节点：1.Dodge(While:序列[并行{等待,拴绳},停止]) 2.SpecialMoves(While:推送事件) 3.Chase(While:追击攻击) 4.FaceEntity(面对) 5.Parallel(序列[等待逃跑,游荡])",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      19761,
+      72981,
+      13897,
+      13901,
+      15239,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为 alterguardian_phase1、wagboss_robot、shadowthrall_wings、vault_pillar_guard_dormant、klaus、perd、bunnyman、dragonfly 等其它生物，全文未提及 beequeenbrain 或蜂后，也未体现其专属能力参数（如动态躲避点最大距离2、游荡距离5、逃跑/躲避延迟等），故页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜂后大脑",
+    "尖叫",
+    "召唤守卫",
+    "躲避",
+    "追击",
+    "游荡",
+    "逃跑",
+    "聚焦目标",
+    "蜂后AI"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e6492acee0064ca0a25212983e0681d4e97c9a03a2ec64e6ec7707c42e0576e7",
+    "source_bytes": 8726,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970293218
+  }
+}

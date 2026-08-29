@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/berniebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "berniebrain",
+  "summary": "伯尼大脑控制伯尼玩偶在游戏中根据情境行动。当附近有处于疯狂或热血状态的玩家且不在变形冷却时，伯尼会变身为大伯尼；当附近存在可嘲讽的暗影生物时，伯尼会嘲讽它们以吸引仇恨。若无有效领导者则伯尼进入停用状态，否则它会跟随领导者并在一定距离内游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法或可被外部调用的自定义函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "TAUNT_DIST",
+    "LOSE_LEADER_DIST_SQ",
+    "BIG_LEADER_DIST_SQ",
+    "wander_times",
+    "SHADOWCREATURE_MUST_TAGS",
+    "SHADOWCREATURE_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "返回当前领导者的函数",
+        "最小允许距离0",
+        "期望保持距离6",
+        "最大允许距离12"
+      ],
+      "context": "有领导者时跟随"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置(nil)",
+        "无最大距离限制(nil)",
+        "游荡时间配置表(最小走1,最小等1)"
+      ],
+      "context": "无特定家点时自由游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag('busy') and not self.inst.components.timer:TimerExists('transform_cd') and ShouldGoBig(self)",
+      "semantic": "执行 DoGoBig 变身为大伯尼"
+    },
+    {
+      "condition": "not self.inst.sg:HasStateTag('busy') and not self.inst.components.timer:TimerExists('taunt_cd') and FindShadowCreatures(self.inst) ~= nil",
+      "semantic": "执行 TauntCreatures 嘲讽附近暗影生物"
+    },
+    {
+      "condition": "not self.inst.sg:HasStateTag('busy') and FindLeader(self) == nil",
+      "semantic": "进入 deactivate 状态停用"
+    },
+    {
+      "condition": "默认（有领导者且不满足上述分支）",
+      "semantic": "跟随领导者并保持距离，否则自由游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树：1)若未忙碌且不在变形冷却且应变大则变身大伯尼；2)当未忙碌且不在嘲讽冷却且发现暗影生物则嘲讽；3)若未忙碌且无领导者则停用；4)跟随领导者；5)自由游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      72981,
+      24892,
+      24896,
+      16057,
+      13701,
+      13847,
+      15386,
+      15935
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容均为远古戍卫塔、梦魇灯座、梦魇裂缝、噩梦燃料、远古织影者、遗迹、高脚鸟、恐怖利爪等实体的描述，未提及伯尼(Bernie)或 brain__berniebrain 的跟随距离、嘲讽距离、游荡时间及暗影生物标签等能力参数，无相关玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "伯尼大脑",
+    "大伯尼",
+    "暗影嘲讽",
+    "跟随玩家",
+    "自由游荡",
+    "伯尼停用",
+    "变身条件",
+    "暗影生物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b68b5209db936abf6f16e6e1093dd9209ca5c6b80214c1f75aa7cc870f3d4314",
+    "source_bytes": 5286,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970351397
+  }
+}

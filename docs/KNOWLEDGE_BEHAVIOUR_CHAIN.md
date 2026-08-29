@@ -158,7 +158,11 @@ prompt 注入:brain pass1 附带**本 brain 实际调用的** behaviour 构造�
 - **brain pass2 偏保守**:houndbrain 采样 8 页(含猎犬相关页)返回 no_wiki_mention,而猎犬页"行为"章确有数值事实;疑因 caps 清单只有 tunables 名与裸 ctor 名(如 `ChaseAndAttack`),页面语言无法对上。候选改进:brain pass2 的语义清单改用 behaviour_invocations 的 args_semantic 文本(需先有 1a 词典,现已具备)。
 - **spiderbrain/beefalobrain 路由弱**:spiderbrain 路由 0 页(负结果),beefalobrain 仅 1 页——这两个 brain 的 SetBrain 不走 atlas 可追踪路径,pass2 依赖 search_terms 全文检索兜底,符合设计但印证 §1.2"二跳路由免费"只对被 atlas 记录的 brain 成立。
 
-### 9.2 第二批与 SG 冒烟(2026-08-29)
+### 9.2 第二批与 SG 推广(2026-08-29)
+
+- **SG 批次 1**(20 份,引用数排序,含 SGhound):states/state_notes 全部达标(逐文件 5~37 个 states,notes ≤10 条);**pass2 教训两轮**——第一轮 caps 误用 api 分支(SG 的 api 基本为空 → 空清单,19/20 判空),改用 state_notes 玩家语义(p6-stategraph)后 **14/20 有 aspects**(well 3 / partial 11:SGwerepig 5、SGBeefalo 4、SGanchor 3)。三类符号的 pass2 caps 差异已全部对齐为"玩家语义文本"模式。
+- **pass2 策略对比(定案)**:behaviour 高价值(18/29)默认开;stategraph 修复 caps 后中等价值(14/20)默认开;brain 中等(部分判空系页面行为章缺口)默认开。`--pass2-names` 统一降级为省预算手段。
+- **brains 第二批**:9 份(累计 12),零失败;第三批见 git log。
 
 - **brains 第二批**(`--limit 10`,引用数排序):deerbrain / deergemmedbrain / rabbitkingbrain / beargerbrain / buzzardbrain / carratbrain / fruitflybrain / pollyrogerbrain / toadstoolbrain 共 9 份入库,零失败;现累计 12 份 brain 文档。fruitflybrain well_documented(4),carrat/deergemmed/pollyroger partial(1~2),其余判空。判空偏多的主因仍是页面行为章与 brain 语义清单的对齐缺口,改善方向同 §9.1(brain pass2 语义清单已改用 args_semantic,后续可再叠加 tunables 数值语义)。
 - **SGhound 冒烟**(`--category stategraph --pick-names SGhound`):25 个 states 全部取自源码(含 timeline 生成态),state_notes 10 条精确到帧级语义(attack 第 16 帧伤害判定 / statue 无敌 / startle 0.8~1.1s),api 空数组 + api_note 正确;pass2 no_wiki_mention(8 页)符合"SG 弱事实"预判。**stategraph 类别管线验证通过,可按引用数排序分批推广**(建议排除玩家侧后从高页面价值 SG 开始,如 SGhound/SGspider/SGbeefalo 量级)。

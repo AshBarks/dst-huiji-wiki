@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/bunnymanbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "bunnymanbrain",
+  "summary": "兔人(Bunnyman)大脑在遭遇威胁(如低血量、着火、电栅栏、兔王权杖)时优先恐慌或逃跑，并伴随特定喊话。平时会追击攻击敌人、与玩家交易、寻找食物、跟随领导者，无领导者时白天回家否则拴绳游荡。",
+  "api": [],
+  "api_note": "该大脑仅继承自 Brain 并实现 OnStart 方法以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "MAX_WANDER_DIST",
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST",
+    "STOP_RUN_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "TRADE_DIST",
+    "TRADE_DIST_SQ",
+    "SEE_FOOD_DIST",
+    "SEE_BURNING_HOME_DIST_SQ",
+    "SEE_PLAYER_DIST",
+    "SCARER_MUST_TAGS",
+    "SEE_SCARER_DIST",
+    "STOP_SCARER_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "hunterparams_scarer"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐 10 秒 (MAX_CHASE_TIME)",
+        "放弃距离 30 (MAX_CHASE_DIST)"
+      ],
+      "context": "常态优先尝试攻击"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离带标签 scarytoprey 的目标",
+        "发现猎人距离 SEE_PLAYER_DIST(6)",
+        "安全距离 STOP_RUN_DIST(30)"
+      ],
+      "context": "血量低于阈值时由 WhileNode 触发"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离带 manrabbitscarer 标签的装备实体 (hunterparams_scarer)",
+        "发现距离 SEE_SCARER_DIST",
+        "安全距离 STOP_SCARER_DIST"
+      ],
+      "context": "常态下害怕兔王权杖等恐吓物"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作函数 GoHomeAction",
+        "节点名 'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "酸雨或洞穴白天且无领导者时回家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取交易玩家函数 GetTraderFn",
+        "保持交易函数 KeepTraderFn"
+      ],
+      "context": "面对正在与之交易的玩家"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作函数 FindFoodAction"
+      ],
+      "context": "寻找并吃食物"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "获取领导者函数 GetLeader",
+        "最小距离 2 (MIN_FOLLOW_DIST)",
+        "目标距离 5 (TARGET_FOLLOW_DIST)",
+        "最大距离 9 (MAX_FOLLOW_DIST)"
+      ],
+      "context": "跟随领导者"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取无领导者家位置函数 GetNoLeaderHomePos",
+        "最大拴绳半径 30 (LEASH_MAX_DIST)",
+        "内部返回距离 10 (LEASH_RETURN_DIST)"
+      ],
+      "context": "无领导者时限制在家的附近"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取无领导者家位置函数 GetNoLeaderHomePos",
+        "最大游荡距离 20 (MAX_WANDER_DIST)"
+      ],
+      "context": "无领导者时在家附近游荡"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "被附身/着火/家着火时由 ChattyNode 包裹触发"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天内容字符串键 (如 RABBIT_RETREAT)",
+        "子行为节点 (Panic/RunAway)"
+      ],
+      "context": "包裹恐慌或逃跑行为并周期性说话"
+    },
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "应躲避电栅栏时由 ChattyNode 包裹"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.hauntable and self.inst.components.hauntable.panic",
+      "semantic": "被附身恐慌，触发 ChattyNode 包裹 Panic 并说 RABBIT_PANICHAUNT"
+    },
+    {
+      "condition": "self.inst.components.health.takingfiredamage",
+      "semantic": "自身着火受伤，触发 Panic 说 RABBIT_PANICFIRE"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence(self.inst)",
+      "semantic": "附近有电栅栏，触发 AvoidElectricFence 说 RABBIT_PANICELECTRICITY"
+    },
+    {
+      "condition": "self.inst.components.health:GetPercent() < TUNING.BUNNYMAN_PANIC_THRESH",
+      "semantic": "低血量，逃离 scarytoprey 标签目标说 RABBIT_RETREAT"
+    },
+    {
+      "condition": "IsHomeOnFire(self.inst)",
+      "semantic": "家着火且在范围内，触发 Panic 说 RABBIT_PANICHOUSEFIRE"
+    },
+    {
+      "condition": "TheWorld.state.isacidraining",
+      "semantic": "酸雨天气，跑动回家 GoHomeAction"
+    },
+    {
+      "condition": "not self.inst.beardlord and TheWorld.state.iscaveday",
+      "semantic": "非胡须领主且洞穴白天，跑动回家"
+    }
+  ],
+  "bt_structure": "优先级节点树：最优先 PanicWhenScared 与各类 WhileNode 恐慌/逃跑(附身、着火、电栅栏、低血、家火) > 常态 ChaseAndAttack > 常态 RunAway(兔王权杖) > 酸雨回家 > FaceEntity(交易) > DoAction(找食) > Follow(领袖) > 白天回家 > Leash(无领袖拴家) > Wander(无领袖游荡)。",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      45173,
+      15237,
+      13493,
+      51046,
+      13857,
+      13897,
+      14099
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为 stalker_atrium、pigman、hermitcrab、wagboss_robot、firehound、klaus、waxwelljournal 及巨兽恐慌机制页，均未提及 bunnyman 或 bunnymanbrain 及其相关跟随、逃离、回家、交易、进食等行为常数，页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "兔人脑",
+    "兔人行为",
+    "逃跑恐惧",
+    "跟随领袖",
+    "找食物",
+    "回家",
+    "追击攻击",
+    "恐慌",
+    "拴绳",
+    "游荡"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2de494a99e243f24d9621121ea45f2778f500862e0af72909df92950e7b759b8",
+    "source_bytes": 7306,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970447660
+  }
+}

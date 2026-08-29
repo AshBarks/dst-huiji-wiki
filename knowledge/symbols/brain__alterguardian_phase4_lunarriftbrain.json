@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/alterguardian_phase4_lunarriftbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "alterguardian_phase4_lunarriftbrain",
+  "summary": "该大脑控制月蚀裂隙第四阶段守护者在未处于跳跃或死亡状态时，并行尝试远程攻击与近战追击玩家。若无战斗行为触发，则实体以 WagPunk 竞技场中心为家（若在场内）进行短距离游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义任何供外部实体调用的自定义方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "在并行节点中由 FailIfSuccessDecorator 装饰，作为高优先级战斗行为"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家的函数（在 WagPunk 竞技场内返回中心坐标，否则 nil）",
+        "离家最大距离 4"
+      ],
+      "context": "作为低优先级行为，当攻击/追击未执行时"
+    },
+    {
+      "ctor": "ConditionWaitNode",
+      "args_semantic": [
+        "条件函数（有战斗目标且不在冷却时忽略命中范围尝试攻击，永远返回 false 保持运行）",
+        "节点名 'TryRangedAttack'"
+      ],
+      "context": "并行节点中与追击同时运行，实现远程攻击逻辑"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasAnyStateTag(\"jumping\", \"dead\")",
+      "semantic": "实体未处于跳跃或死亡状态时，才执行内部攻击与游荡行为；否则大脑暂停所有行为。"
+    },
+    {
+      "condition": "self.inst.components.combat:HasTarget() and not self.inst.components.combat:InCooldown()",
+      "semantic": "在并行条件等待节点中，若战斗组件有目标且不在冷却，则临时将 ignorehitrange 置真并尝试远程攻击。"
+    },
+    {
+      "condition": "TheWorld.Map:IsPointInWagPunkArena(inst.Transform:GetWorldPosition())",
+      "semantic": "游荡行为获取家位置时，若实体位于 WagPunk 竞技场内则返回中心坐标作为家，否则返回 nil 使实体自由游荡。"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.5) → WhileNode(非跳跃/死亡) → 内部优先级节点(0.5) → [并行节点(远程攻击条件等待 + 失败装饰追击) , 游荡(家函数, 距离4)]",
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      14816,
+      15532,
+      15977,
+      17836,
+      10413,
+      13421,
+      13602
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给出的页面摘录描述的实体为 beefalo、鳄鱼指挥官、spider_spitter、bird_mutant、hermithouse_construction3、winona、bishop_nightmare、shark，均未提及符号 brain__alterguardian_phase4_lunarriftbrain 及其专属的追击攻击并行节点、WagPunk竞技场回家函数、离家距离4、远程攻击并行节点等能力，页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月蚀守护者",
+    "第四阶段",
+    "远程攻击",
+    "追击攻击",
+    "游荡行为",
+    "竞技场中心",
+    "战斗大脑",
+    "跳跃状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "47a55773c4642e13cab2f6392cdb3ebda9cf9d133e62223376575a9b2da71309",
+    "source_bytes": 1277,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970125669
+  }
+}

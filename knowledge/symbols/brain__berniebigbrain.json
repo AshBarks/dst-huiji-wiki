@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/berniebigbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "berniebigbrain",
+  "summary": "该大脑控制大型伯尼（Big Bernie）在玩家精神值过低或处于狂暴状态时激活并跟随玩家，根据距离步行或奔跑保持适当间距。当附近存在有效战斗目标时，它会步行追击并攻击目标；若失去领导者且脱离战斗一段时间后，它会解除激活缩小回普通伯尼。无领导者时则自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart与OnStop生命周期方法，未定义额外的对外调用接口，领导者管理与查找均为文件内局部函数。",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "WALK_FOLLOW_THRESHOLD",
+    "RUN_FOLLOW_THRESHOLD",
+    "MIN_COMBAT_TARGET_DIST",
+    "MAX_COMBAT_TARGET_DIST",
+    "FIND_LEADER_DIST_SQ",
+    "LOSE_LEADER_DIST",
+    "LOSE_LEADER_DIST_SQ",
+    "MIN_ACTIVE_TIME",
+    "DEACTIVATE_DELAY",
+    "FOLLOWER_SANITY_THRESHOLD"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体(inst)",
+        "追击最长时间无限制(nil)",
+        "放弃距离无限制(nil)",
+        "最大攻击次数无限制(nil)",
+        "不自动寻找新目标(nil)",
+        "步行移动(慢)"
+      ],
+      "context": "战斗WhileNode：当领导者为空或领导者在战斗目标附近距离内(_isincombat为真)时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "返回当前领导者(self._leader)的函数",
+        "最小允许距离1",
+        "期望保持距离5",
+        "最大允许距离8",
+        "只步行不奔跑(false)"
+      ],
+      "context": "Walk Follow WhileNode：ShouldWalkToLeader为真(未跑步且领导者在11单位内)"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "返回当前领导者(self._leader)的函数",
+        "最小允许距离1",
+        "期望保持距离5",
+        "最大允许距离8",
+        "允许奔跑(true)"
+      ],
+      "context": "Run Follow WhileNode：ShouldRunToLeader为真(领导者存在且未满足近距离且移动条件)"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "获取领导者(GetLeader)的函数",
+        "最小允许距离1",
+        "期望保持距离5",
+        "最大允许距离5(收紧)",
+        "只步行不奔跑(false)"
+      ],
+      "context": "Continue Walk Follow IfNode：当前sg有running标签时平滑过渡"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体(inst)",
+        "获取领导者(GetLeader)的函数",
+        "保持面对条件函数(领导者有效可见或快速传送且精神低或hotheaded)"
+      ],
+      "context": "跟随节点之后默认面对领导者"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体(inst)"
+      ],
+      "context": "默认无领导者时自由游荡(无家无限制)"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldDeactivate(self)返回true（无领导者且未战斗且存活足够或应缩小）",
+      "semantic": "执行sg:GoToState('deactivate')，伯尼缩小解除"
+    },
+    {
+      "condition": "战斗节点中_isincombat为真（无领导者或领导者在战斗目标附近）",
+      "semantic": "以步行方式追击攻击目标(ChaseAndAttack walk=true)"
+    },
+    {
+      "condition": "ShouldWalkToLeader为真（未跑步且领导者在WALK_FOLLOW_THRESHOLD=11内）",
+      "semantic": "步行跟随领导者，距离1~8目标5(Follow canrun=false)"
+    },
+    {
+      "condition": "ShouldRunToLeader为真（领导者存在且未同时满足近距与移动）",
+      "semantic": "奔跑跟随领导者，距离1~8目标5(Follow canrun=true)"
+    },
+    {
+      "condition": "inst.sg:HasStateTag('running')",
+      "semantic": "继续步行跟随且最大距离设为5，避免停顿平滑过渡"
+    },
+    {
+      "condition": "存在领导者且上述未覆盖",
+      "semantic": "面对领导者(FaceEntity)"
+    },
+    {
+      "condition": "默认（无领导者等）",
+      "semantic": "自由游荡(Wander)"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.2)：①若ShouldDeactivate则动作deactivate；②WhileNode战斗则步行ChaseAndAttack；③NotDecorator重置战斗标志；④WhileNode步行跟随；⑤WhileNode奔跑跟随；⑥IfNode跑步中继续步行跟随；⑦FaceEntity面对领导者；⑧Wander游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      17998,
+      15915
+    ],
+    "aspects": [
+      {
+        "aspect": "嘲讽半径行为描述",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "半径距离小于等于 12 单位时伯尼会嘲讽附近"
+          }
+        ]
+      },
+      {
+        "aspect": "追随距离范围描述",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "伯尼！追随距离在 0~24 距离单位内"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "大型伯尼",
+    "伯尼跟随",
+    "战斗追击",
+    "步行跟随",
+    "奔跑跟随",
+    "精神狂暴",
+    "游荡行为",
+    "缩小失效"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1b67e3582007c963a4b1f56d74c179124f4ea2f840ff9ff6453aa59d25ceff2c",
+    "source_bytes": 7596,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970331580
+  }
+}

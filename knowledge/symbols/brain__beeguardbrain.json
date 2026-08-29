@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/beeguardbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "beeguardbrain",
+  "summary": "蜂卫(BeeGuard)大脑在实体恐慌或需避开电栅栏时分别触发 Panic 与 AvoidElectricFence 行为并取消追击。当女王缺失、存在聚焦目标或敌人靠近女王时，蜂卫脱离编队进行追击或闪避；若女王与偏移点存在则保持编队背对女王站位；否则在守卫点附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅覆盖 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外可调用的公开方法或全局接口，所有逻辑封装在文件内部函数中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RUN_AWAY_PARAMS",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "ShouldPanic 返回真时"
+    },
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "ShouldAvoidElectricFence 返回真时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃跑参数表(标签_combat/_health, 非bee/playerghost/INLIMBO, 且非死亡且为玩家或目标为bee)",
+        "发现威胁距离3",
+        "安全距离6"
+      ],
+      "context": "ShouldChase 内 ShouldDodge 返回真时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "ShouldChase 内且非 ShouldDodge 时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "守卫位置函数(女王位置+偏移)",
+        "最大半径0.5",
+        "内部返回距离0.5"
+      ],
+      "context": "ShouldHoldFormation 时优先"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "守卫位置函数",
+        "最大游荡距离8"
+      ],
+      "context": "默认兜底"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldPanic(self)",
+      "semantic": "执行 Panic 行为，并将 _shouldchase 置 false"
+    },
+    {
+      "condition": "ShouldAvoidElectricFence(self)",
+      "semantic": "执行 AvoidElectricFence 行为，并将 _shouldchase 置 false"
+    },
+    {
+      "condition": "ShouldChase(self)",
+      "semantic": "脱离编队(BreakFormation)：若 ShouldDodge 则 RunAway 闪避，否则 ChaseAndAttack 追击"
+    },
+    {
+      "condition": "ShouldHoldFormation(self.inst)",
+      "semantic": "保持编队(HoldFormation)：Leash 至守卫点，并背对女王"
+    },
+    {
+      "condition": "默认（上述条件皆否）",
+      "semantic": "以守卫点为中心 Wander 游荡，最大距离8"
+    }
+  ],
+  "bt_structure": "优先级节点树：1.恐慌则Panic；2.避电栅栏则AvoidElectricFence；3.脱离编队则(闪避则RunAway否则ChaseAndAttack)；4.保持编队则(Leash至守卫点并背对女王)；5.默认Wander于守卫点半径8",
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜂卫大脑",
+    "脱离编队",
+    "保持编队",
+    "闪避攻击",
+    "游荡守卫",
+    "蜂卫AI",
+    "追击蜂后",
+    "避电栅栏"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生物AI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "47bd82b47e6cad0aaaf76a6046dae1a5c28b949525ceaec7a7daa175f9b73527",
+    "source_bytes": 3730,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970250411
+  }
+}

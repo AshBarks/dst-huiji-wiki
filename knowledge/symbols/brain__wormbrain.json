@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wormbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wormbrain",
+  "summary": "该大脑控制蠕虫（worm）实体的行为逻辑。当实体处于 lure（诱饵）状态时，它完全静止如同植物。若已知家位置，则在拴绳限制范围内优先处理恐慌、追击、回家设置诱饵、进食，否则以家为中心游荡；若无家则直接追击并以当前位置游荡，最终站立。",
+  "api": [],
+  "api_note": "WormBrain 类仅通过 OnStart 构建行为树，未定义额外的对外方法或字段，逻辑全部封装在行为树节点与局部函数（LayInWait、GoHomeAction、EatFoodAction）中，故无对外 API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "处于 lure 状态标签时，完全静止"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "拴绳锚点为家位置坐标",
+        "最大半径 TUNING.WORM_CHASE_DIST",
+        "内部返回距离 TUNING.WORM_CHASE_DIST-15"
+      ],
+      "context": "有家位置时限制离家的范围（不远离狩猎场）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 TUNING.WORM_CHASE_TIME 秒",
+        "放弃距离 TUNING.WORM_CHASE_DIST 世界单位"
+      ],
+      "context": "有家位置时优先追击目标"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "游荡中心为返回家位置的函数",
+        "最大距离 TUNING.WORM_WANDER_DIST"
+      ],
+      "context": "有家位置时其他行为后的游荡"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "有家位置时最终 fallback 站立"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 TUNING.WORM_CHASE_TIME 秒",
+        "放弃距离 TUNING.WORM_CHASE_DIST 世界单位"
+      ],
+      "context": "无家位置时直接追击"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "游荡中心为返回当前位置的函数",
+        "最大距离 TUNING.WORM_WANDER_DIST"
+      ],
+      "context": "无家位置时游荡"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "无家位置时最终 fallback 站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag(\"lure\")",
+      "semantic": "实体进入 lure 状态标签时，完全静止如同植物，不执行其他行为"
+    },
+    {
+      "condition": "inst.components.knownlocations:GetLocation(\"home\") ~= nil",
+      "semantic": "有家位置时，子优先级节点依次尝试恐慌触发、电场恐慌、拴绳限制、追击、回家设诱饵、吃食物、以家为中心游荡、站立"
+    },
+    {
+      "condition": "knownlocations 无 home（上述 WhileNode 不成立）",
+      "semantic": "无家时直接追击、以当前位置为中心游荡、站立"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重.25)：1) WhileNode(lure状态)->StandStill；2) WhileNode(有家)->子优先级(恐慌触发、电场恐慌、Leash、ChaseAndAttack、DoAction回家、DoAction吃、Wander、StandStill)；3) ChaseAndAttack(无家)；4) Wander(当前位置)；5) StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      13857,
+      18838,
+      47009,
+      13761,
+      35615
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，实体worm(13761)行为描述有寻找家和玩家接近攻击，yots_worm(35615)称特性一致，18838提到洞穴蠕虫诱饵状态变游荡，47009提螨地爬站立不动，但均未体现brain__wormbrain的StandStill(lure静止/有家无家fallback)、Leash(拴绳锚点家位置及半径)、ChaseAndAttack(追击时长与放弃距离)、Wander(游荡中心与最大距离)等能力参数或对应行为描述，因此认为页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蠕虫大脑",
+    "诱饵状态",
+    "回家设饵",
+    "吃食行为",
+    "拴绳回家",
+    "追击距离",
+    "游荡范围",
+    "站立不动",
+    "恐慌触发",
+    "无家游荡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "05c418c1b5b24e79edd3108718ba1f00e42a03424e5721521c6b62c8f5b73503",
+    "source_bytes": 4567,
+    "model": "hy3-free",
+    "generated_at_ms": 1787970045083
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGghost.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGghost",
+  "summary": "该状态图驱动DST中的幽灵(Ghost)实体，组织其待机、出场、受击、被吓、消散、击退、升级和互动跳舞等行为。初始状态为appear，通过事件驱动战斗反应与宠物升级机制。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，所有行为通过状态切换和事件推送实现。",
+  "events_published": [
+    "detachchild",
+    "petbuff_dolevelchange"
+  ],
+  "events_listened": [
+    "startaura",
+    "stopaura",
+    "attacked",
+    "knockback",
+    "updatepetmastery",
+    "death",
+    "start_playwithghost",
+    "ghostplaywithme"
+  ],
+  "netvars": [],
+  "tunables": [
+    "GHOSTGUARD_PLAYFUL_DELAY"
+  ],
+  "states": [
+    "idle",
+    "appear",
+    "hit",
+    "haunted",
+    "dissipate",
+    "knockback",
+    "levelup",
+    "play"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "待机循环，根据是否持有目标或aura是否施加切换为angry动画，低血量(<25%)切shy动画，否则默认idle。"
+    },
+    {
+      "state": "appear",
+      "note": "出场动画，播放后进入idle，退出时启用aura组件。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放hit动画后回到idle，期间物理停止。"
+    },
+    {
+      "state": "haunted",
+      "note": "被吓到的忙碌状态，播放angry动画并停止物理，退出时停止haunted音效。"
+    },
+    {
+      "state": "dissipate",
+      "note": "死亡消散状态，播放dissipate动画，结束后掉落战利品并移除实体。"
+    },
+    {
+      "state": "knockback",
+      "note": "被击退状态，基于knocker位置与半径计算速度，具有跳跃标签，动画结束后转入hit。"
+    },
+    {
+      "state": "levelup",
+      "note": "宠物升级状态，播放dissipate动画，期间无敌，结束后进入appear并触发petbuff_dolevelchange事件。"
+    },
+    {
+      "state": "play",
+      "note": "与玩家互动跳舞状态，面向目标播放dance_bop动画，结束后回到idle。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      19719,
+      24028,
+      10379,
+      34037,
+      34988,
+      14936,
+      22094
+    ],
+    "aspects": [
+      {
+        "aspect": "aura伤害与愤怒状态切换",
+        "evidence": [
+          {
+            "pageid": 19719,
+            "quote": "幽灵不会攻击，但它会每隔 1.2 秒对周围 1.5 {{解释|距离单位}}以内除幽灵以外的所有[[生物]]造成伤害。此时它会变成红色来显示危险。"
+          },
+          {
+            "pageid": 19719,
+            "quote": "<!--我还是头一次知道有aura这么个组件-->"
+          }
+        ]
+      },
+      {
+        "aspect": "击退机制中的幽灵实体",
+        "evidence": [
+          {
+            "pageid": 34988,
+            "quote": "只有玩家角色、[[附身底盘]]、[[幽灵]]、[[大惊吓]]、[[精英猪]]、[[舒适的兔人]]、[[哈奇]]与[[切斯特]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "幽灵",
+    "消散",
+    "升级",
+    "跳舞",
+    "受击",
+    "被吓",
+    "击退",
+    "出场",
+    "无敌",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d5f3683466a4de962152e5c74e43354d0af747c61490a3b6e32ad30f1850820d",
+    "source_bytes": 10901,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080855564
+  }
+}

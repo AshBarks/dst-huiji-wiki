@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGkitcoon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGkitcoon",
+  "summary": "该状态图驱动猫崽（Kitcoon）实体的行为表现。整体状态组织以待机和互动为核心，涵盖基础动画、蹭蹭互动、玩耍动作以及躲藏跳跃等多种行为模式。通过事件监听和时间轴控制音效与动画的同步，实现了丰富的玩家社交与战斗回避机制。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，仅通过内部状态切换和事件驱动行为。",
+  "events_published": [
+    "kitcoonplaywithme"
+  ],
+  "events_listened": [
+    "critterplaywithme",
+    "kitcoonplaywithme",
+    "start_playwithplaymate",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.KITCOON_LOYALTY_EMOTE_CHANCE",
+    "TUNING.KITCOON_PLAYFUL_DELAY",
+    "TUNING.KITCOON_PLAYFUL_DELAY_RAND"
+  ],
+  "states": [
+    "idle",
+    "nuzzle",
+    "found",
+    "evicted",
+    "catplayground",
+    "catplayair",
+    "endofhiding_jump"
+  ],
+  "state_notes": [
+    {
+      "state": "nuzzle",
+      "note": "进入后停止移动并执行缓冲动作，设定特定游玩延迟时间；在YOT猫科特殊事件期间首次蹭蹭会掉落幸运金块。"
+    },
+    {
+      "state": "catplayair",
+      "note": "空中玩耍状态，禁用地面速度乘数并在第24帧设置物理马达速度覆盖，退出时恢复地面移动能力。"
+    },
+    {
+      "state": "evicted",
+      "note": "被驱逐状态，播放跳出动画后设置12帧超时，超时后自动返回待机状态。"
+    },
+    {
+      "state": "endofhiding_jump",
+      "note": "躲藏结束跳跃状态，播放战斗预备与循环动画，动画队列结束后返回待机，用于躲藏跳出瞬间。"
+    },
+    {
+      "state": "idle",
+      "note": "基础待机状态，动画结束时按概率触发舔舐或拉伸表情，否则保持待机。"
+    }
+  ],
+  "search_terms": [
+    "蹭蹭",
+    "玩耍",
+    "躲藏",
+    "跳跃",
+    "待机",
+    "驱逐",
+    "猫崽",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "社交",
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "776187e142193fbd1c541db947b815d41cd230f376476d4f5a3af845f8790b78",
+    "source_bytes": 12508,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080886748
+  }
+}

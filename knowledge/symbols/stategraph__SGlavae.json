@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlavae.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlavae",
+  "summary": "该状态图驱动 DST 联机版中的熔岩怪（Lavae）实体，管理其从待机、进食、攻击到冻结/解冻/死亡的全部行为循环。状态组织以 idle 为根节点，按饥饿度、战斗、互动和环境冻结等条件分支到多个子状态，整体围绕生存互动与战斗表现展开。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外方法，所有行为均通过状态机内部转换和事件驱动完成，无自定义API暴露。",
+  "events_published": [
+    "inevitabledeath"
+  ],
+  "events_listened": [
+    "attacked",
+    "death",
+    "animqueueover",
+    "animover",
+    "unfreeze",
+    "onthaw"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "gohome",
+    "taunt",
+    "hit",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "death",
+    "frozen",
+    "thaw",
+    "thaw_break",
+    "nuzzle",
+    "hungry",
+    "peckish",
+    "idle_hop",
+    "idle_spin",
+    "eat",
+    "pickup"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础待机状态，随机超时（2~4秒）后根据饥饿度百分比切换至饥饿/啄食/旋转/跳跃等子动画状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态含跳跃时间线（第16帧起跳、第21帧攻击、第23帧落地），标签含busy与jumping，动画结束后转入taunt。"
+    },
+    {
+      "state": "frozen",
+      "note": "被冻结时视为死亡（SetIsDead true）并触发不可战胜的inevitabledeath事件，客户端将不再锁定该实体。"
+    },
+    {
+      "state": "thaw_break",
+      "note": "冻结破碎死亡状态，播放shatter碎裂动画，掉落冰冻专属战利品表（lavae_frozen）。"
+    },
+    {
+      "state": "death",
+      "note": "普通死亡状态，播放death动画，掉落战利品表（lavae_lava），并移除物理碰撞体。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态周期性（每3秒）生成岩浆移动特效（lavae_move_fx），环境雪量或湿度达标时额外播放嘶嘶声。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态通过动作处理器执行，含eat_pre/eat_loop/eat_pst三段动画，第20帧和第35帧分别播放进食与快乐音效。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "蹭蹭互动动作状态，播放nuzzle动画及音效后执行缓冲动作并回到idle。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿度≤25%时由idle超时进入，播放hungry动画和beg乞食音效，动画结束后回idle。"
+    },
+    {
+      "state": "gohome",
+      "note": "回家动作状态，播放taunt动画，第6帧播放跳跃与taunt音效，第17帧播放落地音效，动画结束后执行缓冲动作。"
+    }
+  ],
+  "search_terms": [
+    "熔岩怪",
+    "冻结",
+    "碎裂",
+    "乞食",
+    "蹭蹭",
+    "进食",
+    "待机",
+    "战斗",
+    "岩浆",
+    "解冻"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "互动",
+    "冰冻"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f8c4ec0bc6cfb4bdc107b0834c48d0d4c02ffbfb1b5e751a993a93bf45a720b",
+    "source_bytes": 14852,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080956095
+  }
+}

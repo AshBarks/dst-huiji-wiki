@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGkoalefant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGkoalefant",
+  "summary": "该状态图驱动考拉象(Koalefant)实体的行为切换，整体以待机和行动为核心组织方式。实体在待机状态下随机进入啃食、吼叫或颤抖动画，受到攻击或死亡时转入对应状态。通过通用状态模块扩展了行走、奔跑、受击、睡眠、冰冻和触电等基础行为。",
+  "api": [],
+  "api_note": "该状态图未定义任何自定义对外方法，完全依赖引擎内置的StateGraph框架进行状态切换与事件分发。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "animover",
+    "animqueueover",
+    "step",
+    "locomote",
+    "sleep",
+    "freeze",
+    "electrocute",
+    "death",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "shake",
+    "bellow",
+    "graze",
+    "alert",
+    "attack",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认待机状态，随机2-4秒超时后切换至啃食、吼叫或颤抖动画"
+    },
+    {
+      "state": "graze",
+      "note": "啃食状态，持续5-10秒，播放咀嚼动画与音效，超时后返回待机"
+    },
+    {
+      "state": "alert",
+      "note": "警戒状态，播放警戒前缀动画后转入待机循环"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，15帧时触发战斗判定，动画队列结束后返回待机"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画、掉落战利品并移除物理碰撞体"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态（通用模块添加），被攻击时进入并播放受击硬直动画"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态（通用模块添加），包含脚步声时间轴"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态（通用模块添加），包含特定时间点的音效触发"
+    },
+    {
+      "state": "frozen",
+      "note": "冰冻状态（通用模块添加），被冰冻时进入并播放冻结动画"
+    },
+    {
+      "state": "electrocute",
+      "note": "触电状态（通用模块添加），被闪电击中时进入"
+    }
+  ],
+  "search_terms": [
+    "考拉象",
+    "攻击",
+    "受击",
+    "啃食",
+    "吼叫",
+    "颤抖",
+    "警戒",
+    "死亡",
+    "冰冻",
+    "触电"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b7dc7c7e26a2c60ad2952a16bce2f122387b18f2fab33756dd63246eb21b4c81",
+    "source_bytes": 5676,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080945621
+  }
+}

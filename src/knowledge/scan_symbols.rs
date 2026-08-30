@@ -166,7 +166,7 @@ pub struct ScanSymbolsParams {
     pub refresh_auto: bool,
 }
 
-/// P1 选择:top_symbols(变体引用数降序)过滤出 component 文件型符号,
+/// P1 选择:目录扫描(反向边仅作排序信号),覆盖全部 component 文件,
 /// 附带磁盘源码路径与字节数。
 /// component 直接扫 components/ 目录(与 brain/behaviour 同模式):
 /// 314 个从未被 prefab 引用的组件(管理器/子组件)不在反向边里,

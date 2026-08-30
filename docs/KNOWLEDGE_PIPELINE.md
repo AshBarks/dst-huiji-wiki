@@ -118,6 +118,7 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 | M1 pass1 | `knowledge-scan-symbols`:component 源码 → SymbolDoc(纯代码事实通道) | pilot 3/3 文档,schema 合格率 100% |
 | M1 pass2 | link-wiki 语料归因:search_terms 全文检索采样 → 带证据 aspects / 负结果声明 | 见 8.2 |
 | M1 扩量 | `--limit 50` 生成 50 份 component SymbolDoc(含 tradable) | schema 合格率 49/50(首轮 tradable 因空 api 失败,补 api_note 后通过) |
+| M1 全量 | **815/815 组件 SymbolDoc 全覆盖**(目录扫描含 314 个无引用组件;模型 mimo-v2.5;报告见 [COMPONENT_FULL_SCAN_REPORT.md](COMPONENT_FULL_SCAN_REPORT.md)) | api 抽验 223/223;引文逐字 88%;杠杆触发 393 份 |
 | M1 pass2 健壮性 | pass2 LLM 重试 1 次;连续失败不中断整批,保留 pass1 文档待补跑 | 长跑未因单次流式错误中断 |
 | M1 纯数据组件 | `api` 允许为空,但必须填 `api_note` 说明 | tradable 成功入库 |
 | M1 版本过滤 | 只保留 dst/mixed 页面,排除 ds/unknown/redirect/disambig | 全文页 6891→1849;facts 页 1881→1051 |

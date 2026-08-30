@@ -124,7 +124,7 @@ pub struct MapInputs {
 }
 
 /// 源码里的命名数值常量(D1 配对依据)。
-fn extract_named_constants(source: &str) -> Vec<(String, f64)> {
+pub(crate) fn extract_named_constants(source: &str) -> Vec<(String, f64)> {
     let mut out = Vec::new();
     for line in source.lines() {
         let line = line.trim();
@@ -814,7 +814,7 @@ fn direct_detail(symbols: &BTreeMap<String, PageSymbolEntry>) -> Option<String> 
     }
 }
 
-fn trim_num(v: f64) -> String {
+pub(crate) fn trim_num(v: f64) -> String {
     if v.fract() == 0.0 {
         format!("{}", v as i64)
     } else {

@@ -220,6 +220,20 @@ pub enum JobKind {
         #[serde(default)]
         json: bool,
     },
+    /// M3:代码变更 → 脏文档 → 页面锚点交叉(确定性;--rescan 级联 LLM 重扫)
+    KnowledgeSync {
+        /// 旧快照(时间戳或目录名)
+        old: String,
+        /// 新快照(时间戳、目录名或 "current",默认 current)
+        #[serde(default = "default_sync_new")]
+        new: String,
+        #[serde(default = "default_knowledge_dir")]
+        knowledge_dir: String,
+        #[serde(default)]
+        rescan: bool,
+        #[serde(default = "default_sync_limit")]
+        limit: usize,
+    },
     /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
     KnowledgeScanWiki {
         root: String,
@@ -239,6 +253,14 @@ pub enum JobKind {
         #[serde(default)]
         report: bool,
     },
+}
+
+fn default_sync_new() -> String {
+    "current".to_string()
+}
+
+fn default_sync_limit() -> usize {
+    20
 }
 
 fn default_audit_max_pages() -> usize {
@@ -297,6 +319,7 @@ impl JobKind {
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
             JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            JobKind::KnowledgeSync { .. } => "knowledge-sync",
             JobKind::PageAssist { .. } => "page-assist",
             JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             JobKind::SymbolAnnotate { .. } => "symbol-annotate",
@@ -473,6 +496,25 @@ async fn execute_job_inner(
                     pass2_names: pass2_names.clone(),
                     pick_names: pick_names.clone(),
                     refresh_auto: *refresh_auto,
+                },
+                reporter,
+            )
+            .await
+        }
+        JobKind::KnowledgeSync {
+            old,
+            new,
+            knowledge_dir,
+            rescan,
+            limit,
+        } => {
+            crate::knowledge::run_knowledge_sync(
+                &crate::knowledge::SyncParams {
+                    old: old.clone(),
+                    new: new.clone(),
+                    knowledge_dir: knowledge_dir.clone(),
+                    rescan: *rescan,
+                    limit: *limit,
                 },
                 reporter,
             )

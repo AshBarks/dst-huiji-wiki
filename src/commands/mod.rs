@@ -220,6 +220,23 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)
+    KnowledgeSync {
+        /// 旧快照(时间戳或目录名,SnapshotStore 口径)
+        old: String,
+        /// 新快照(时间戳、目录名,或 "current" 表示当前 scripts 树)
+        #[arg(default_value = "current")]
+        new: String,
+        /// 知识文档根目录(默认 knowledge/)
+        #[arg(long, default_value = "knowledge")]
+        knowledge_dir: PathBuf,
+        /// 级联重扫脏文档(调 LLM;默认仅输出清单)
+        #[arg(long)]
+        rescan: bool,
+        /// 详列的脏文档数上限
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+    },
     /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
     KnowledgeScanWiki {
         /// 游戏脚本根目录(当前树或快照目录)
@@ -278,6 +295,7 @@ impl Commands {
             Commands::SymbolAnnotate { .. } => "symbol-annotate",
             Commands::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
             Commands::PageAssist { .. } => "page-assist",
+            Commands::KnowledgeSync { .. } => "knowledge-sync",
             Commands::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             Commands::Serve { .. } => "serve",
         }

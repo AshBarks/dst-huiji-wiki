@@ -10,9 +10,11 @@ pub mod page_assist;
 pub mod scan_symbols;
 pub mod scan_wiki;
 pub mod store;
+pub mod sync;
 pub mod types;
 
 pub use page_assist::{run_page_assist, PageAssistParams};
 pub use scan_symbols::{run_scan_symbols, ScanSymbolsParams};
 pub use scan_wiki::{run_scan_wiki, ScanWikiParams};
+pub use sync::{run_knowledge_sync, SyncParams};
 pub use types::{SymbolDoc, SymbolDocLlm, SymbolRefKey, PROMPT_REV, SCHEMA_VERSION};

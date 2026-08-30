@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ambientsound.lua"
+  },
+  "category": "component",
+  "display_name": "ambientsound",
+  "summary": "AmbientSound 组件是游戏环境音效系统的核心控制器，负责管理和动态混合基于玩家位置、地皮类型、季节、天气（雨）及昼夜阶段的背景环境音效。它监听世界状态变化与特定事件，通过复杂的音量混合与淡入淡出机制，动态更新并播放相应的环境音（如森林、沼泽、洞穴、海洋）以及特殊的理智/觉醒状态音效，从而营造沉浸式的游戏氛围。",
+  "api": [
+    {
+      "name": "SetReverbPreset",
+      "effect": "设置全局混响预设。内部调用 TheSim:SetReverbPreset(preset)。"
+    },
+    {
+      "name": "SetWavesEnabled",
+      "effect": "启用或禁用根据玩家周围不可通行地皮数量而播放的海浪音效。参数 enabled 为 true 时启用，false 时禁用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "overrideambientsound",
+    "setambientsounddaytime",
+    "seasontick",
+    "weathertick",
+    "precipitationchanged",
+    "updateambientsoundparams"
+  ],
+  "netvars": [],
+  "tunables": [
+    "HALF_TILES",
+    "MAX_MIX_SOUNDS",
+    "WAVE_VOLUME_SCALE"
+  ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "环境音效系统",
+    "地皮音效",
+    "季节环境音",
+    "天气环境音",
+    "昼夜环境音",
+    "森林环境音",
+    "沼泽环境音",
+    "洞穴环境音",
+    "海洋环境音",
+    "理智状态音"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 10/10)",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "氛围"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "977b47489c0b679601833275369cf94b042dcb5b15ca45877a1f77ba49a5b881",
+    "source_bytes": 23676,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085002621
+  }
+}

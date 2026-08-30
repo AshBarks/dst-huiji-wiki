@@ -1550,6 +1550,22 @@ aspects:{aspects}
         return;
     }
     let still = zero_hit_terms(cache, &revised);
+    if still.len() > misses.len() {
+        // 改写把仍然有效的词也换掉了,零命中不降反升 → 回退原词
+        reporter.log(format!(
+            "search_terms 改写更差({}/{} vs 原词 {} / {}),保留原词",
+            still.len(),
+            revised.len(),
+            misses.len(),
+            total
+        ));
+        doc.search_terms_note = Some(format!(
+            "pass1 后零命中 {}/{},改写尝试更差已回退",
+            misses.len(),
+            total
+        ));
+        return;
+    }
     reporter.log(format!(
         "search_terms 已修正:零命中 {} / {} → {} / {}",
         misses.len(),

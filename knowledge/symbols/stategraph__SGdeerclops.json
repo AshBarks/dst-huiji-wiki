@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdeerclops.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdeerclops",
+  "summary": "该状态图驱动鹿角兽（deerclops）实体的全部行为，包括闲置、行走、攻击、冰冻生长、激光与冰矛技能以及受击/眩晕等战斗状态。整体以空闲为根状态，通过事件驱动在移动、攻击与特殊技能间切换，并依赖mutated扩展包中的冰成长与眩晕子系统。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，所有行为均通过状态机内部onenter/onexit/timeline/events及外部PushEvent驱动。",
+  "events_published": [
+    "onmissother",
+    "knockback"
+  ],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "doicegrow",
+    "onignite",
+    "animover",
+    "timerdone",
+    "oncorpsechomped",
+    "oncorpsedeathanimover",
+    "onnosleepframeevent"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DEERCLOPS_ATTACK_RANGE",
+    "DEERCLOPS_ATTACK_PERIOD",
+    "DEERCLOPS_COMBO_ATTACK_PERIOD",
+    "DEERCLOPS_DAMAGE",
+    "MUTATED_DEERCLOPS_ICELANCE_RANGE",
+    "MUTATED_DEERCLOPS_ICELANCE_DAMAGE",
+    "MUTATED_DEERCLOPS_STAGGER_TIME",
+    "SHAKE_DIST"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "gohome",
+    "taunt",
+    "hit",
+    "death",
+    "attack",
+    "laserbeam",
+    "icelance",
+    "icegrow",
+    "icegrow2",
+    "icegrow_pst",
+    "struggle_pre",
+    "struggle_loop",
+    "struggle_pst",
+    "stagger_pre",
+    "stagger_idle",
+    "stagger_hit",
+    "stagger_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "基础冰刺攻击，播放atk动画并在第31帧生成冰刺AOE，第34帧播放swipe音效并震屏；支持锤子动作处理器直接摧毁可工作物体。"
+    },
+    {
+      "state": "laserbeam",
+      "note": "激光技能，播放atk2并切换到八向朝向；激光束沿前方10步发射，伴随多次震屏和光照强度变化，结束后自动切回四向。"
+    },
+    {
+      "state": "icelance",
+      "note": "变异冰矛技能，播放throw/throw_2动画，在第60-62帧对目标位置发起三段冰矛AOE（ICE_LANCE_RADIUS=5.5），未命中时推送onmissother事件。"
+    },
+    {
+      "state": "icegrow",
+      "note": "冰刺再生状态，播放ice_grow动画并恢复ice_0/ice_1；满足条件时生成deerclops_aura_circle_fx光环，第9帧尝试生成新光环并进入icegrow2。"
+    },
+    {
+      "state": "icegrow2",
+      "note": "冰刺再生第二阶段，播放ice_grow_2并播放taunt_howl；第3帧清除noeyeice并停止狂暴，结束后进入icegrow_pst。"
+    },
+    {
+      "state": "stagger_pre",
+      "note": "眩晕前摇，播放stagger_pre并启动STAGGER_TIME计时器；第8帧熄灭火焰并设置noeyeice，第44帧播放bodyfall音效并全屏震动。"
+    },
+    {
+      "state": "stagger_idle",
+      "note": "眩晕待机，播放stagger循环动画并隐藏冰层显示gestalt_eye；stagger计时器结束后进入stagger_pst。"
+    },
+    {
+      "state": "stagger_pst",
+      "note": "眩晕收尾，播放stagger_pst并显示ice_0/ice_1；第100帧移除busy并可能启动Frenzy；全程隐藏ice_2并显示gestalt_eye。"
+    },
+    {
+      "state": "hit",
+      "note": "受击反应，播放hit音效并在第8/10帧根据dostagger决定是否进入眩晕或直接攻击；非busy时可立即发起ChooseAttack。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放death动画并掉落战利品；第3帧起逐步提升光照，第48帧后光照周期性衰减至熄灭，播放bodyfall音效并震屏。"
+    }
+  ],
+  "search_terms": [
+    "激光",
+    "眩晕",
+    "狂暴",
+    "combat",
+    "冰冻生长",
+    "受击",
+    "空闲",
+    "行走",
+    "攻击",
+    "冰成长"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "de3c0b610ae23cd372aee9f22f3c11f9f39096802eaaaa2fdc91b12e66a99c22",
+    "source_bytes": 60263,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080792250
+  }
+}

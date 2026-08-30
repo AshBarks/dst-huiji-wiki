@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoecharging.lua"
+  },
+  "category": "component",
+  "display_name": "aoecharging",
+  "summary": "管理 AOE 蓄力攻击的状态与进度，包括是否启用、当前是否正在蓄力、蓄力的 tick 数，以及与玩家 HUD 上的蓄力目标标记(reticule)和 ping 特效相关的同步逻辑。核心玩法为玩家按住技能键进行蓄力，松开时释放蓄力攻击并触发回调函数。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "signature": "AOECharging:OnRemoveEntity()",
+      "effect": "实体移除时调用，清除当前的蓄力拥有者，移除 reticule 并停止组件更新。"
+    },
+    {
+      "name": "SetAllowRiding",
+      "signature": "AOECharging:SetAllowRiding(val)",
+      "effect": "设置是否允许骑乘状态下进行蓄力，默认为 true。传入 false 会禁用骑乘时的蓄力行为。"
+    },
+    {
+      "name": "IsEnabled",
+      "signature": "AOECharging:IsEnabled()",
+      "effect": "返回当前组件是否启用的布尔值（来自 net_bool 'enabled'）。"
+    },
+    {
+      "name": "GetChargeTicks",
+      "signature": "AOECharging:GetChargeTicks()",
+      "effect": "返回当前蓄力的 tick 数值（来自 net_byte 'chargeticks'）。"
+    },
+    {
+      "name": "SetRefreshChargeTicksFn",
+      "signature": "AOECharging:SetRefreshChargeTicksFn(fn)",
+      "effect": "设置蓄力 tick 刷新时的回调函数 refreshchargeticksfn，用于更新 reticule 或 ping 特效的显示。"
+    },
+    {
+      "name": "OnRefreshChargeTicks",
+      "signature": "AOECharging:OnRefreshChargeTicks(reticule)",
+      "effect": "调用 refreshchargeticksfn 回调函数，刷新指定 reticule 的蓄力 tick 显示。"
+    },
+    {
+      "name": "SetChargingOwner",
+      "signature": "AOECharging:SetChargingOwner(owner)",
+      "effect": "设置当前蓄力的拥有者。若传入 nil，则移除已有 reticule，停止更新并重置 ischarging 与 chargeticks。若传入有效 owner，则生成 reticule、设置 ischarging 为 true、重置 chargeticks，并开始组件更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "signature": "AOECharging:OnUpdate(dt)",
+      "effect": "每帧更新蓄力状态。检查拥有者是否仍拥有物品、是否装备、是否在攻击动作或正在蓄力。服务器端递增 chargeticks（带同步延迟），客户端直接递增。当玩家松开按键时，生成 ping 特效、触发 chargingreticulereleased 事件并清除拥有者。"
+    },
+    {
+      "name": "UpdateRotation",
+      "signature": "AOECharging:UpdateRotation()",
+      "effect": "根据 reticule 的旋转角度更新拥有者的朝向。客户端会调用 playercontroller:RemoteAOEChargingDir 同步旋转。"
+    },
+    {
+      "name": "SetEnabled",
+      "signature": "AOECharging:SetEnabled(enabled)",
+      "effect": "仅服务器端生效，设置 enabled 状态并立即触发 OnEnabledDirty 回调。"
+    },
+    {
+      "name": "SetChargeTicks",
+      "signature": "AOECharging:SetChargeTicks(ticks)",
+      "effect": "仅服务器端生效，强制设置当前蓄力 tick 数值，并刷新 reticule 显示。"
+    },
+    {
+      "name": "SetOnChargedAttackFn",
+      "signature": "AOECharging:SetOnChargedAttackFn(fn)",
+      "effect": "仅服务器端生效，设置蓄力攻击释放时的回调函数 onchargedattackfn。"
+    },
+    {
+      "name": "ReleaseChargedAttack",
+      "signature": "AOECharging:ReleaseChargedAttack(doer, chargeticks)",
+      "effect": "仅服务器端生效，调用 onchargedattackfn 回调函数，执行蓄力攻击的具体逻辑。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "enableddirty",
+    "ischargingdirty",
+    "chargeticksdirty"
+  ],
+  "netvars": [
+    "enabled",
+    "ischarging",
+    "chargeticks"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      35790,
+      13437
+    ],
+    "aspects": [],
+    "no_evidence_reason": "扫描了提供的两个页面（35790 弹弓零件与 13437 沃尔特），均未提及 component__aoecharging 的任何能力或行为语义（如 OnRemoveEntity、SetAllowRiding、IsEnabled、GetChargeTicks、SetRefreshChargeTicksFn、OnRefreshChargeTicks、SetChargingOwner、OnUpdate、UpdateRotation、SetEnabled、SetChargeTicks、SetOnChargedAttackFn、ReleaseChargedAttack）。页面仅讨论弹弓蓄力攻击、攻速及沃尔特角色技能，与该组件无关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "AOE蓄力",
+    "蓄力攻击",
+    "蓄力进度",
+    "技能按住",
+    "释放技能",
+    "目标标记",
+    "reticule",
+    "ping特效",
+    "蓄力状态",
+    "攻击同步"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 9/10)",
+  "gameplay_tags": [
+    "战斗",
+    "技能",
+    "UI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a691e09d198f254f54f8ce8e7b0abf11a66d9123e9e08fe4a515cbfb300d402c",
+    "source_bytes": 6612,
+    "model": "laguna-s-2.1-free",
+    "generated_at_ms": 1788080607806
+  }
+}

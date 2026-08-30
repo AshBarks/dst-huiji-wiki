@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcrabking_mob.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcrabking_mob",
+  "summary": "该状态图驱动蟹王（crabking_mob）这一首领怪物的全部行为表现。整体状态组织以空闲待机、战斗攻击、环境互动（潜水/破坏/飞行）和死亡为核心模块，通过事件驱动实现状态间的流畅切换。",
+  "api": [],
+  "api_note": "状态图文件本身不暴露对外方法，所有状态转换由实体内部的sg（stategraph）组件通过事件和条件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "animover",
+    "attacked",
+    "death",
+    "doattack",
+    "hit_ground",
+    "locomote",
+    "onsink"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "death",
+    "premoving",
+    "moving",
+    "idle",
+    "taunt",
+    "attack",
+    "spin_attack",
+    "spin_attack_loop",
+    "spin_attack_pst",
+    "hit",
+    "break",
+    "break_water",
+    "break_land",
+    "dive",
+    "dive_pst_land",
+    "dive_pst_water",
+    "sink",
+    "flying",
+    "flying_pst_land",
+    "flying_pst_water"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品，实体最终被移除。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，随机超时后进入嘲讽动画，或根据移动意愿切换至移动状态。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，播放嘲讽动画并在第14帧触发特定音效。"
+    },
+    {
+      "state": "attack",
+      "note": "普通近战攻击，播放atk1动画并在第18帧对目标造成伤害。"
+    },
+    {
+      "state": "spin_attack",
+      "note": "旋转攻击起始状态，进入时禁用地面速度倍率并准备旋转冲锋。"
+    },
+    {
+      "state": "spin_attack_loop",
+      "note": "旋转攻击循环状态，每帧调用AOEAttack进行范围伤害，具有无敌帧和跳跃标签。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，播放受击动画并带有短暂硬直，无法被其他攻击打断。"
+    },
+    {
+      "state": "break",
+      "note": "破坏状态，根据所处环境（海洋或陆地）进入不同的破坏后续动画。"
+    },
+    {
+      "state": "dive",
+      "note": "潜水状态，改变碰撞掩码并下潜，根据水面情况进入陆地或水中着陆状态。"
+    },
+    {
+      "state": "flying",
+      "note": "船跳跃飞行状态，落地后根据地形进入陆地或水中着陆状态。"
+    }
+  ],
+  "search_terms": [
+    "蟹王",
+    "旋转攻击",
+    "潜水",
+    "嘲讽",
+    "受击",
+    "死亡",
+    "破坏",
+    "AOE"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "首领",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ec0502ffacf7fc7d3c0e0ad601bfcfec36173c4dfdfa00fe6920f03c4e34d0c0",
+    "source_bytes": 18530,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080773510
+  }
+}

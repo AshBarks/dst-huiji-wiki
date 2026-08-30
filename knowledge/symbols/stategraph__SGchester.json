@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGchester.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGchester",
+  "summary": "该状态图驱动 Chester（猪猪 Chester）这一可交互宠物实体，整体以 idle 为基础循环，围绕容器开关（open/close）、变形（transition/morph）、被击退（knockbacklanded）与被吞噬（devoured）等核心玩法组织状态机，并复用通用行走、跳跃、睡眠、溺水、虚空坠落与触电等公共状态。",
+  "api": [],
+  "api_note": "该状态图未定义自定义对外方法，所有行为均通过事件（EventHandler/PushEvent）与状态机内部函数驱动。",
+  "events_published": [
+    "attacked",
+    "morph",
+    "knockback",
+    "devoured",
+    "spitout",
+    "animover",
+    "animqueueover",
+    "OnStep",
+    "OnSleep",
+    "OnElectrocute",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid",
+    "OnDeath",
+    "OnCorpseChomped"
+  ],
+  "events_listened": [
+    "attacked",
+    "morph",
+    "knockback",
+    "devoured",
+    "spitout",
+    "animover",
+    "animqueueover",
+    "OnStep",
+    "OnSleep",
+    "OnElectrocute",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid",
+    "OnDeath",
+    "OnCorpseChomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "open",
+    "open_idle",
+    "close",
+    "transition",
+    "morph",
+    "knockbacklanded",
+    "devoured"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础待机循环，播放 idle_loop 并伴随 pant 音效，pant_ducking 音量在 0.35~1 间衰减。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放 death 动画并停止物理、移除碰撞体，容器会 DropEverything，动画结束后触发尸体事件。"
+    },
+    {
+      "state": "open",
+      "note": "打开容器，播放 open 动画并唤醒睡眠者，若为 shadow 形态则生成 shadow_chester_swirl_fx 并循环播放存储音效，动画结束后转入 open_idle。"
+    },
+    {
+      "state": "open_idle",
+      "note": "打开后的待机状态，播放 idle_loop_open 并维持 pant 音效与 swirl 特效。"
+    },
+    {
+      "state": "close",
+      "note": "关闭容器，播放 closed 动画并在 4 帧后将 hutchMusic 音量归零并停止 loop 音效，动画结束回到 idle。"
+    },
+    {
+      "state": "transition",
+      "note": "变形准备状态，播放三段 idle_loop 后接 transition 动画，56 帧生成 chesterlight 光柱，60 帧播放 pop 音效并调用 MorphChester，标签含 noelectrocute。"
+    },
+    {
+      "state": "morph",
+      "note": "变形执行状态，播放 transition 动画并在 1/22/27/32/37 帧播放 bounce/clap 音效，36 帧生成变形特效，40 帧执行 morphfn，标签含 noelectrocute。"
+    },
+    {
+      "state": "knockbacklanded",
+      "note": "被击退落地状态，根据 knocker 距离与角度计算速度（最大 8 倍 strengthmult），10 帧后 landed 标签生效并解除 nointerrupt/jumping，超时 11 帧后回 idle。"
+    },
+    {
+      "state": "devoured",
+      "note": "被吞噬状态，播放 empty 动画、隐藏实体、关闭物理并跟随攻击者，收到 spitout 事件时以攻击者为中心击退并触发 knockback，标签含 invisible/noattack/nointerrupt/silentmorph。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34988,
+      13271,
+      14936,
+      15922,
+      39296,
+      15938,
+      22465,
+      15885
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，页面13271虽为切斯特(Chester)实体页，但仅描述了其基础设定（跟随眼骨、提供物品栏、回复生命值），未涉及idle、death、open、close、transition、morph、knockbacklanded、devoured等状态图行为的具体描述；其余页面（击退机制、野猪猩、大熔炉猪战士、瓦器人、钓具容器、灵魂容器等）均与Chester的状态图能力无关。因此扫描后认为页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Chester",
+    "猪猪",
+    "变形",
+    "morph",
+    "被吞噬",
+    "devoured",
+    "击退",
+    "knockback",
+    "容器",
+    "open"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "59d617340acb1a132259870db64d4a32e728e9d7213065f082859c0ea48c1dd0",
+    "source_bytes": 25496,
+    "model": "ling-3.0-flash-fin-free",
+    "generated_at_ms": 1788080752857
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wx78_shadowdrone_harvesterbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wx78_shadowdrone_harvesterbrain",
+  "summary": "该大脑驱动WX78的暗影收割无人机，在实体未处于消失(despawn)状态时优先辅助领导者拾取指定范围内的物品。若无需拾取则依次尝试跟随编队与随机游荡，拾取目标由领导者的暗影收割组件动态提供。",
+  "api": [],
+  "api_note": "该大脑仅通过OnStart构建行为树，未定义其他可供外部调用的自定义方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "HARVEST_RADIUS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.NodeAssistLeaderPickUps",
+      "args_semantic": [
+        "大脑实例自身",
+        "拾取参数表(范围=HARVEST_RADIUS、最远优先、允许可拾取、物品由领导者socket_shadow_harvester组件提供)"
+      ]
+    },
+    {
+      "ctor": "WX78_ShadowDrone_BrainCommon.FollowFormationNode",
+      "args_semantic": [
+        "无人机实体实例"
+      ]
+    },
+    {
+      "ctor": "WX78_ShadowDrone_BrainCommon.WanderNode",
+      "args_semantic": [
+        "无人机实体实例"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "sg:HasStateTag('despawn')",
+      "semantic": "WhileNode拦截，不执行任何内部优先级行为，大脑暂停"
+    },
+    {
+      "condition": "leader无socket_shadow_harvester组件",
+      "semantic": "辅助拾取的物品覆盖函数返回nil，无法获得特定拾取目标"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重0.25)包含WhileNode(条件：实体未处于despawn状态标签)，其内为次级优先级节点(权重0.25)按顺序尝试：1.辅助领导拾取物品 2.跟随编队 3.游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      20719,
+      15022,
+      13701,
+      15225,
+      70704,
+      65881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录未讨论wx78_shadowdrone_harvesterbrain及其HARVEST_RADIUS、拾取参数、跟随编队或游荡节点等能力；页面10418虽提WX-78自动抓取机范围提升，但非该大脑组件证据；其余页面无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影收割无人机",
+    "游荡",
+    "技能召唤",
+    "拾取",
+    "范围",
+    "跟随",
+    "消失",
+    "WX78"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4db05a88da4352d8846959a2bc3187c56705f766a76cc438b6f4e1efc4a029c8",
+    "source_bytes": 1427,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057597391
+  }
+}

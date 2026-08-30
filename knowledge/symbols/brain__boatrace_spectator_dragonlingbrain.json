@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/boatrace_spectator_dragonlingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "boatrace_spectator_dragonlingbrain",
+  "summary": "该大脑用于控制龙舟比赛中的观众龙崽实体。当实体未处于飞行状态时，它会跟随实体追踪器中标记为'indicator'的目标并保持配置距离，同时面向该目标；若正在飞行则行为树阻塞等待直至落地。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart生命周期方法并调用Brain构造函数，未定义其他对外可调用的自定义方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体(inst)",
+        "返回追踪器'indicator'实体的函数作为跟随目标",
+        "最小允许距离(TUNING.BOATRACE_SPECTATOR_TARGET_DISTANCE)",
+        "期望保持的目标距离(TUNING.BOATRACE_SPECTATOR_MAX_DISTANCE)",
+        "最大允许距离(TUNING.BOATRACE_SPECTATOR_MAX_DISTANCE)"
+      ],
+      "context": "实体非飞行状态且优先级节点放行时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体(inst)",
+        "获取面向目标的函数(返回'indicator'实体)",
+        "验证目标的函数(同返回'indicator'实体)"
+      ],
+      "context": "实体非飞行状态且跟随行为之后"
+    },
+    {
+      "ctor": "ConditionWaitNode",
+      "args_semantic": [
+        "检测实体是否非飞行的函数(is_not_flying)",
+        "等待时的描述文本'Block While Flying'"
+      ],
+      "context": "被FailIfSuccessDecorator包裹作为根首节点"
+    },
+    {
+      "ctor": "FailIfSuccessDecorator",
+      "args_semantic": [
+        "内部条件等待节点(非飞行时成功进而被装饰为失败以放行后续)"
+      ],
+      "context": "根优先级节点首位，用于飞行时阻塞"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "包含装饰等待节点、跟随节点、面向节点的子节点列表",
+        "行为树更新频率(UPDATE_RATE=0.25)"
+      ],
+      "context": "作为行为树根"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag('flight') 为真(飞行中)",
+      "semantic": "ConditionWaitNode处于RUNNING，FailIfSuccessDecorator不改变，整体阻塞，不执行跟随与面向"
+    },
+    {
+      "condition": "inst.sg:HasStateTag('flight') 为假(非飞行)",
+      "semantic": "ConditionWaitNode成功被装饰为失败，优先级节点继续执行Follow与FaceEntity，跟随并面向indicator"
+    }
+  ],
+  "bt_structure": "优先级节点(更新率0.25)：首节点为FailIfSuccessDecorator包裹ConditionWaitNode(非飞行则失败放行，飞行则等待)；随后Follow跟随追踪器indicator实体(距离参数来自TUNING)；最后FaceEntity面向该实体。",
+  "wiki": {
+    "scanned_pageids": [
+      15560,
+      15651,
+      13556,
+      13828,
+      15237,
+      15380,
+      15408,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及穴居猴、龙蝇、阿比盖尔、暗影棋子、猪人、钢羊、小海象、弹弓弹药等实体，文本中未出现与 brain__boatrace_spectator_dragonlingbrain 行为树相关的术语（如 indicator 实体、BOATRACE_SPECTATOR 距离常量、非飞行阻塞、更新频率 0.25 等），其中的跟随或保持距离描述均针对玩家而非 indicator，故无对应能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "保持距离",
+    "龙舟比赛",
+    "观众龙崽",
+    "跟随目标",
+    "等待落地",
+    "面向目标",
+    "标记目标",
+    "行为树",
+    "飞行中"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "龙舟赛",
+    "跟随",
+    "观众"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "58512222774905efbd9866611e699b90405b296549864d7030f6915ddc13e41c",
+    "source_bytes": 1083,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058128851
+  }
+}

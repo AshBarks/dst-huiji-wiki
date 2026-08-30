@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/babybeefalobrain.lua"
+  },
+  "category": "brain",
+  "display_name": "babybeefalobrain",
+  "summary": "该大脑控制小牛（BabyBeefalo）的行为。当小牛恐慌或触碰电栅栏时触发逃跑，当附近出现未骑乘牛的玩家时主动逃离，当存在同平台的领导者时跟随其保持距离，否则在已知的牛群（herd）位置周围游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法用于构建行为树，未定义其他对外调用的方法或字段。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "WANDER_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "实体自身"
+      ]
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "实体自身"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "猎人为带 character 标签且未骑乘牛的玩家（NonMountedPlayer 过滤）",
+        "发现猎人距离半径 5",
+        "脱离危险安全距离 10"
+      ]
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "跟随目标为同平台的领导者（follower:GetLeader 且同平台）",
+        "最小允许距离 2",
+        "期望保持距离 3",
+        "最大允许距离 8"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置为 knownlocations 中的 herd 点",
+        "离家最大距离 8"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "BrainCommon.PanicTrigger 内部恐慌条件",
+      "semantic": "执行恐慌逃跑行为"
+    },
+    {
+      "condition": "BrainCommon.ElectricFencePanicTrigger 内部电栅栏条件",
+      "semantic": "执行电栅栏恐慌逃跑"
+    },
+    {
+      "condition": "附近存在带 character 标签且 NonMountedPlayer 为真的玩家（距离内）",
+      "semantic": "RunAway 逃离该玩家直至安全距离"
+    },
+    {
+      "condition": "存在与自身同平台的领导者（follower:GetLeader）",
+      "semantic": "Follow 跟随领导者并保持 2~8 距离"
+    },
+    {
+      "condition": "默认（上述均不满足）",
+      "semantic": "Wander 以 herd 点为家游荡，最大距离 8"
+    }
+  ],
+  "bt_structure": "PriorityNode(权重0.25) 顶层优先级: 1) PanicTrigger 恐慌, 2) ElectricFencePanicTrigger 电栅栏恐慌, 3) RunAway 逃离未骑牛玩家(见距5逃距10), 4) Follow 跟随同平台领导(2/3/8), 5) Wander 在 herd 点周围游荡(距8)。",
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15247,
+      15596,
+      15169,
+      15402,
+      15594,
+      15737,
+      15812
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随父母行为描述",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "小皮弗娄牛会始终追随它的父母"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小牛",
+    "牛群",
+    "电篱笆",
+    "受惊逃离",
+    "逃离玩家",
+    "跟随首领",
+    "牧群游荡",
+    "小牛行为",
+    "无牛玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "跟随",
+    "逃跑"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4045a4032efb168cd782fbe945bfa539e93c442d25f748827c236a77e2a14f03",
+    "source_bytes": 1430,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057780688
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/bishopbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "bishopbrain",
+  "summary": "该大脑控制发条主教在战斗中步行追击目标，并在无战斗时返回出生点。实体会跟随领袖并面向领袖，否则寻找附近玩家并面向之，无目标时站立不动。同时包含恐慌触发与等待交易者等通用反应。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 构建行为树，未定义其他对外方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "GO_HOME_DIST_SQ",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 60 秒",
+        "放弃距离 40 单位",
+        "最大攻击次数无(默认)",
+        "不自动寻找新目标",
+        "步行(移动慢)"
+      ],
+      "context": "优先级直接执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取回家动作的函数 GoHomeAction",
+        "节点调试名称 'Go Home'",
+        "以跑动方式执行动作"
+      ],
+      "context": "当 ShouldGoHome(self.inst) 条件满足时（在 WhileNode 内）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "返回领袖实体的函数 GetLeader",
+        "最小允许距离 5",
+        "期望保持距离 7",
+        "最大允许距离 12"
+      ],
+      "context": "优先级直接执行"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "优先级末尾默认执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGoHome(self.inst)",
+      "semantic": "执行回家动作（走回家园位置）而非其他低级行为"
+    },
+    {
+      "condition": "GetLeader(self.inst)",
+      "semantic": "在跟随领袖基础上，额外面向领袖并保持面对"
+    },
+    {
+      "condition": "默认（无上述特定条件）",
+      "semantic": "面向最近玩家（14距离内）并保持（16距离内），否则站立不动"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电篱恐慌 > 等待交易者 > 步行追击攻击 > 若离家则回家 > 跟随领袖 > 若有领袖则面向领袖 > 面向玩家 > 站立不动",
+  "wiki": {
+    "scanned_pageids": [
+      13421,
+      15237,
+      13493,
+      45248,
+      13406,
+      13857,
+      15764,
+      16591
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，涉及发条主教（bishop_nightmare、损坏的发条主教）的页面（13421、45248、15764、16591）仅包含实体名称、掉落物、雕塑或生成信息，未描述其 AI 行为（如追击距离、回家距离、跟随领袖等）；其他页面（猪人、寄居蟹、伍迪、猎犬、紫宝石）描述无关实体，未提及 brain__bishopbrain 的能力语义。故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发条主教",
+    "步行追击",
+    "回家",
+    "跟随领袖",
+    "面向玩家",
+    "站立不动",
+    "恐慌触发"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "巡逻"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67b05e0f5af589aae04effd739faab4f72500dcce2aa95944f01935dbec67cc3",
+    "source_bytes": 2365,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058046222
+  }
+}

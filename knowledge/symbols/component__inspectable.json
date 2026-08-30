@@ -7,31 +7,31 @@
   },
   "category": "component",
   "display_name": "inspectable",
-  "summary": "该组件为实体添加 'inspectable' 标签，使其可被玩家检查并获取描述与状态。它管理描述文本、名称覆盖及状态判定逻辑，参与生存探索中玩家感知物体信息的核心交互。",
+  "summary": "该组件管理实体可被检查时的描述文本、名称覆盖与查看记录等数据，并整合健康、燃烧等其他组件状态。核心玩法中，玩家通过检查操作获取实体信息与生存状态提示，辅助探索与决策。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时调用，移除实体的 'inspectable' 标签。无其它副作用。"
+      "effect": "从实体移除 'inspectable' 标签，无其他副作用。"
     },
     {
       "name": "SetDescription",
-      "effect": "将传入的 desc（可以是字符串、字符串表或函数）保存到 self.description，供 GetDescription 使用。无副作用。"
+      "effect": "将传入的 desc（字符串、字符串表或函数）存入 self.description，供 GetDescription 使用；无副作用。"
     },
     {
       "name": "SetNameOverride",
-      "effect": "设置 self.nameoverride，用于覆盖检查时的名称字符串（非显示名）。无副作用。"
+      "effect": "设置 self.nameoverride 字段，用于覆盖检查时的字符串名称（非显示名）；无副作用。"
     },
     {
       "name": "RecordViews",
-      "effect": "设置 self.recordview 为 state ~= false（即除 false 外均视为 true）。影响 GetStatus 是否记录查看统计。"
+      "effect": "根据 state 参数（非 false 即启用）设置 self.recordview，影响 GetStatus 是否记录查看统计；无直接副作用。"
     },
     {
       "name": "GetStatus",
-      "effect": "若 viewer 是自身则返回 nil；若 recordview 为真，则通过 ProfileStatsSet 记录该 prefab 被检查。随后按优先级返回状态字符串：自定义 getstatus 函数结果，或根据 health/sleeper/burnable/diseaseable/pickable/witherable/inventoryitem/occupiable 组件及 'burnt' 标签返回对应状态（如 DEAD, SLEEPING, BURNING, DISEASED, DISEASING, WITHERED, BARREN, PICKED, HELD, OCCUPIED, BURNT），无匹配则返回 nil。不修改实体状态。"
+      "effect": "若 viewer 为自身则返回 nil；若启用记录则调用 ProfileStatsSet 标记已检查；依次检查健康、睡眠、燃烧等组件及标签返回对应状态字符串（如 'DEAD'）或 nil。副作用：可能写入 Profile 统计。"
     },
     {
       "name": "GetDescription",
-      "effect": "返回实体对 viewer 的描述文本。若 viewer 是自身返回 nil；若 viewer 无法看见目标且不在特定口袋维度容器中打开，返回 'DESCRIBE_TOODARK' 字符串。否则依次尝试 getspecialdescription、descriptionfn、description 获取描述；若结果为 nil 或 viewer 是 ghost/mime，则调用全局 GetDescription 结合 GetStatus 返回默认描述；若实体闷烧中返回 'DESCRIBE_SMOLDERING'。最终返回 desc 及可能的 filter_context、author。无状态修改副作用。"
+      "effect": "若 viewer 为自身返回 nil；若 viewer 不可见且不在口袋维度容器中则返回太暗文本；按优先级（特殊描述函数、描述函数、描述字段）获取描述，若空或 viewer 为幽灵/默剧则强制调用全局 GetDescription 带状态，若闷烧返回闷烧文本；返回描述及可能的上下文。无状态修改。"
     }
   ],
   "events_published": [],
@@ -40,68 +40,57 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13874,
-      14669,
-      15246,
-      15247,
-      15301,
-      16632,
-      17920,
-      17999
+      10374,
+      15677,
+      20496,
+      21485,
+      21683,
+      22464,
+      24836,
+      15022
     ],
     "aspects": [
       {
-        "aspect": "检视描述台词标注",
+        "aspect": "图鉴条目检查状态标注",
         "evidence": [
           {
-            "pageid": 17920,
-            "quote": "命中:|燃烧中|{{全角色台词|dst|log.BURNING}}"
-          },
-          {
-            "pageid": 17920,
-            "quote": "|默认|{{全角色台词|dst|log.generic}}"
-          },
-          {
-            "pageid": 15247,
-            "quote": "命中:|尸体燃烧中|{{全角色台词|dst|SPIDERQUEENCORPSE.BURNING"
-          },
-          {
-            "pageid": 17999,
-            "quote": "命中:|燃烧中|{{全角色台词|dst|marsh_tree.BURNING"
+            "pageid": 24836,
+            "quote": "未知状态的条目变为待检查状态"
           }
         ]
       },
       {
-        "aspect": "检视状态区分描述",
+        "aspect": "打蜡后显示名称前缀",
         "evidence": [
           {
-            "pageid": 16632,
-            "quote": "命中:燃烧中的暗夜灯具有 -3{{理智值}}/分钟 的[[疯狂光环]]"
-          },
+            "pageid": 22464,
+            "quote": "打蜡后的实体的显示名称会带上“被吓得一动不动”前缀"
+          }
+        ]
+      },
+      {
+        "aspect": "检查后显示详细特性",
+        "evidence": [
           {
-            "pageid": 15246,
-            "quote": "命中:|尸体燃烧中|{{全角色台词|dst|SPIDERCORPSE.BURNING"
-          },
-          {
-            "pageid": 17920,
-            "quote": "命中:|燃烧中|{{全角色台词|dst|log.BURNING}}"
+            "pageid": 24836,
+            "quote": "检查对应实体后，该条目才会显示详细特性"
           }
         ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "可检查",
-    "查看描述",
     "检查状态",
-    "燃烧中",
-    "枯萎了",
-    "被占用",
-    "已死亡",
-    "沉睡中",
-    "太暗了"
+    "闷烧状态",
+    "检查描述",
+    "物品信息",
+    "显示名称",
+    "检查记录",
+    "太暗了",
+    "幽灵检查"
   ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/8)",
   "gameplay_tags": [
     "生存",
     "探索"
@@ -111,6 +100,6 @@
     "source_sha256": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
     "source_bytes": 3470,
     "model": "hy3-free",
-    "generated_at_ms": 1787930279511
+    "generated_at_ms": 1788057722569
   }
 }

@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/brightmare_gestaltbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "brightmare_gestaltbrain",
+  "summary": "该大脑控制亮梦盖斯特实体根据行为等级与周围环境采取不同行动。低等级时躲避玩家与阴影生物，较高等级时附身载具、站立攻击或追击玩家，并在远离玩家时重定位，无目标时自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅覆盖 Brain 基类的 OnStart 方法以构建行为树，未定义其他可供外部调用的公开方法或字段。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "BRIGHTMARE_AVOID_DIST",
+    "BRIGHTMARE_AVOID_STOP",
+    "AVOID_SHADOW_DIST",
+    "AVOID_SHADOW_STOP",
+    "L1_AVOID_PLAYER_DIST",
+    "L1_AVOID_PLAYER_STOP",
+    "L2_FACE_PLAYER_DIST",
+    "L2_FACE_PLAYER_DURATION",
+    "L2_AVOID_PLAYER_DIST",
+    "L2_AVOID_PLAYER_STOP",
+    "L3_ATTACK_CHASE_START_DIST",
+    "L3_ATTACK_CHASE_DIST",
+    "L3_ATTACK_CHASE_TIME",
+    "L3_AVOID_PLAYER_DIST",
+    "L3_AVOID_PLAYER_STOP",
+    "SHADOW_TAGS",
+    "WANDER_TIMES",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "ShouldRelocate 条件满足时的序列中"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "阴影相关标签表",
+        "开始躲避距离5",
+        "停止躲避距离8",
+        "逃跑时放弃战斗目标函数"
+      ],
+      "context": "无特定等级条件"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "玩家标签",
+        "开始躲避距离3",
+        "停止躲避距离6"
+      ],
+      "context": "behaviour_level == 1"
+    },
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "无特定目标(nil)",
+        "站立攻击最长5秒"
+      ],
+      "context": "behaviour_level == 2 且 combat.target ~= nil"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "玩家标签",
+        "开始躲避距离6.1",
+        "停止躲避距离8"
+      ],
+      "context": "behaviour_level == 2 或 3 且 combat:InCooldown()"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长5秒",
+        "追击启动距离9",
+        "无",
+        "无",
+        "真(允许远程)"
+      ],
+      "context": "behaviour_level == 3"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "无家位置(nil)",
+        "无最大距离(nil)",
+        "游荡等待时间配置(最小0随机0)"
+      ],
+      "context": "默认 fallback"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行重定位状态的函数"
+      ],
+      "context": "ShouldRelocate 条件满足时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not sg:HasStateTag('jumping')",
+      "semantic": "整体攻击与游荡逻辑的前提，跳跃时跳过整个行为树"
+    },
+    {
+      "condition": "ShouldRelocate(inst)",
+      "semantic": "执行 relocate 状态并站立，优先于其他行为"
+    },
+    {
+      "condition": "behaviour_level == 1",
+      "semantic": "仅躲避玩家，不攻击或附身"
+    },
+    {
+      "condition": "behaviour_level == 2",
+      "semantic": "尝试附身 chassis；有战斗目标则站立攻击；战斗冷却时躲避玩家"
+    },
+    {
+      "condition": "behaviour_level == 3",
+      "semantic": "尝试附身 chassis；主动追击攻击玩家；战斗冷却时躲避玩家"
+    },
+    {
+      "condition": "combat.target ~= nil (在等级2内)",
+      "semantic": "站立攻击而非仅附身或逃跑"
+    },
+    {
+      "condition": "combat:InCooldown()",
+      "semantic": "在等级2/3下中断攻击改为躲避玩家"
+    }
+  ],
+  "bt_structure": "根优先级节点(非跳跃时)：[1]重定位条件满足则序列(重定位动作+站立)；[2]躲避阴影生物；[3]等级1躲避玩家；[4]等级2(附身节点>有目标站立攻击>冷却躲玩家)；[5]等级3(附身节点>追击攻击>冷却躲玩家)；[6]躲避亮梦同类；[7]默认游荡。",
+  "search_terms": [
+    "亮梦生物",
+    "行为状态",
+    "躲阴影生物",
+    "追击玩家",
+    "原地攻击",
+    "冷却",
+    "附身载具",
+    "重定位",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "53d36ecaeeab01cf108c1a6c8570395ebf3ba5ee9427e8a326a989332a8d09b7",
+    "source_bytes": 3521,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058181240
+  }
+}

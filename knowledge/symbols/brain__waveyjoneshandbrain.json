@@ -90,6 +90,21 @@
     }
   ],
   "bt_structure": "根 PriorityNode(权重0.25) 包含 IfNode(未trapped) 其内 PriorityNode(权重0.25) 按顺序尝试 DoAction(Dotinker) 与 StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      16596,
+      16185,
+      16612,
+      24816,
+      20315,
+      34093,
+      15915,
+      10355
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面文本中，waveyjones_hand 相关描述仅涉及出现条件、附着船只及揭开补丁等玩家可见行为，未以任何方式体现 MAX_WANDER_DIST、DOTINKER_CAN_HAVE、wandertimes、行为树节点（PriorityNode/IfNode）、not trapped 状态、DoAction tinker 处理船只部件、StandStill 等代码级能力或行为树语义的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
   "search_terms": [
     "升帆",
     "转船",

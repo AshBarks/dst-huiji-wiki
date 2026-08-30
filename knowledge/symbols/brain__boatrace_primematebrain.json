@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/boatrace_primematebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "boatrace_primematebrain",
+  "summary": "该大脑控制划船比赛中的猴船员（primemate）在船上的行为逻辑。它优先处理投掷浮标、修补船漏、扑灭船火，然后执行划船动作，否则跟随船只并在船上或附近游荡；在欢呼状态下会阻塞所有行为。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未在原型上定义任何额外的对外方法或可供外部调用的自定义函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DISTANCE",
+    "PRIORITY_UPDATE_RATE",
+    "WANDER_DATA",
+    "BOATFIRE_ONEOF_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取投掷浮标动作的函数",
+        "调试名称'toss buoy'"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取修补船漏动作的函数",
+        "调试名称'patch boat'"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取扑灭船火动作的函数",
+        "调试名称'put out fire'"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取划船动作的函数",
+        "调试名称'rowing'",
+        "跑动方式未指定(nil)",
+        "动作超时1.0秒"
+      ]
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "获取当前所站船的函数",
+        "最小允许距离0",
+        "期望保持距离1",
+        "最大允许距离1.75"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回游荡中心点(船或家)的函数",
+        "返回最大游荡距离的函数",
+        "游荡时间配置表WANDER_DATA"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "背包中有浮标且未处于投掷冷却",
+      "semantic": "向最近玩家方向计算投掷点并投掷浮标（TOSS）"
+    },
+    {
+      "condition": "背包无浮标但船上有浮标实体",
+      "semantic": "捡起船上的浮标（PICKUP）"
+    },
+    {
+      "condition": "船有未修复漏洞且未处于修补冷却",
+      "semantic": "使用船补丁修复漏洞（无补丁则生成树液溶液），执行 REPAIR_LEAK"
+    },
+    {
+      "condition": "船上有燃烧或阴燃实体且未处于水球冷却",
+      "semantic": "向火投掷水球（无水球则生成），执行 TOSS 灭火"
+    },
+    {
+      "condition": "是船员且应划船且未处于划船冷却",
+      "semantic": "在船上寻找可行走偏移点并执行划船动作 ROW"
+    },
+    {
+      "condition": "实体处于欢呼状态标签",
+      "semantic": "通过 ConditionWaitNode 阻塞后续所有行为直到欢呼结束"
+    }
+  ],
+  "bt_structure": "优先级节点树(更新率0.25)：首节点为欢呼时阻塞装饰器；随后顺序优先级：投掷浮标(DoAction) > 修船补漏(DoAction) > 灭火(DoAction) > 划船(DoAction) > 跟随船(Follow) > 游荡(Wander)。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15238,
+      51046,
+      13139,
+      13156,
+      13701,
+      15246,
+      15258
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面实体为天体英雄、皮弗娄牛、战争瓦器人、麦斯威尔、沃尔夫冈、远古织影者、蜘蛛、草鳄鱼，均非 brain__boatrace_primematebrain；全文未出现投掷浮标、修补船漏、扑灭船火、实体划船动作、跟随船函数、以船或家为游荡中心等该符号能力表达，仅含其他实体游荡距离或玩家划船等无关内容，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "划船比赛",
+    "划船猴",
+    "投掷浮标",
+    "修补船漏",
+    "扑灭船火",
+    "划船",
+    "跟随船",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "划船比赛",
+    "船只维修",
+    "灭火",
+    "投掷浮标"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dcdb39ba60ce8554c5a0e5254732671fee69ae22e307944e30489c38047bb805",
+    "source_bytes": 9556,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058075781
+  }
+}

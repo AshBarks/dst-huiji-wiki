@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/alterguardian_phase1brain.lua"
+  },
+  "category": "brain",
+  "display_name": "alterguardian_phase1brain",
+  "summary": "该大脑控制远古守护者第一阶段实体在非冲锋状态下的行为。优先级为：尝试举盾防御，若附近有可攻击目标则进行短促站立攻击，否则以出生点为中心游荡。实体在冲锋状态标签下会暂停所有基础行为。",
+  "api": [],
+  "api_note": "该类仅重写了Brain基类的OnStart与OnInitializationComplete生命周期方法，未定义额外的对外调用接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_DIST",
+    "wander_times",
+    "wander_data",
+    "use_shield_data"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "UseShield",
+      "args_semantic": [
+        "自身实体",
+        "触发举盾累计受伤阈值(来自TUNING)",
+        "举盾保持8.5秒",
+        "不启用弹道躲避",
+        "不响应史诗恐惧",
+        "自定义盾态配置表(禁攻击更新时间等)"
+      ],
+      "context": "始终作为行为树最高优先级尝试"
+    },
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "不自动寻找新目标(仅攻击已有)",
+        "攻击最大持续1秒"
+      ],
+      "context": "当存在可攻击目标且不在攻击冷却时(AttackIfNearby)"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回家位置函数(有目标时nil)",
+        "离家最大距离60",
+        "游荡时间配置表",
+        "有目标时朝向目标偏移方向函数"
+      ],
+      "context": "当无盾无攻击时作为低优先级游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"charge\")",
+      "semantic": "仅当实体不处于冲锋状态时执行举盾/攻击/游荡基础行为树，冲锋时跳过"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.components.combat:CanAttack(self.inst.components.combat.target) and not self.inst.components.combat:InCooldown()",
+      "semantic": "满足时执行站立攻击(最大1秒)，否则跳过攻击节点"
+    },
+    {
+      "condition": "inst.components.combat.target ~= nil (于GetWanderHome)",
+      "semantic": "有战斗目标时游荡家位置返回nil(自由游荡)，无目标时返回spawnpoint作为家"
+    },
+    {
+      "condition": "inst.components.combat.target ~= nil (于GetWanderDir)",
+      "semantic": "有目标时游荡方向为朝向目标加随机方差角度，无目标时返回nil(随机方向)"
+    }
+  ],
+  "bt_structure": "根节点charging_barrier(PriorityNode)包裹WhileNode(非charge状态)执行behaviour_root(PriorityNode)。behaviour_root优先级：1.UseShield举盾；2.WhileNode(有可攻击目标且非冷却)内StandAndAttack攻击；3.Wander按家点与方向函数游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      15922,
+      51046,
+      15248,
+      13701,
+      13828,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "主动仇恨并追击 20 距离单位内"
+          }
+        ]
+      },
+      {
+        "aspect": "盾牌支撑描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "第一形态的天体英雄，以三面盾牌作为支撑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "远古守护者",
+    "举盾防御",
+    "攻击",
+    "游荡",
+    "冲锋",
+    "冷却",
+    "第一阶段",
+    "大脑"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "Boss"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "424d15379985ce0d90590b59c69a3efe9c11d7598f8a3f762bf4a71bd91808d6",
+    "source_bytes": 2573,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057627809
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wormwood_fruitdragonbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wormwood_fruitdragonbrain",
+  "summary": "该大脑控制果龙实体在游戏中根据情境做出行为。实体在恐慌或触电时优先逃跑，有领导者时跟随保持距离，无领导者时追击攻击或游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 方法构建行为树，未定义其他对外方法（如 OnStop 等），故无额外 API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_DIST",
+    "MAX_WANDER_DIST",
+    "FOLLOW_DISTANCE_MIN",
+    "FOLLOW_DISTANCE_TARGET",
+    "FOLLOW_DISTANCE_MAX",
+    "wander_timing"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ]
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ]
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者的函数",
+        "最小允许距离0",
+        "期望保持距离8",
+        "最大允许距离15"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击时长限制为nil（默认）",
+        "最大追击距离12"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者位置的函数（无领导者则nil）",
+        "离家最大距离8",
+        "游荡时间配置表{minwalktime=4,randwalktime=4,randwaittime=1}"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetLeader(inst) ~= nil",
+      "semantic": "跟随领导者并保持距离（最小0，目标8，最大15），游荡以领导者位置为中心半径8"
+    },
+    {
+      "condition": "GetLeader(inst) == nil",
+      "semantic": "跟随行为失败，转而追击攻击附近敌人（最大距离12），否则自由游荡（无家中心）"
+    },
+    {
+      "condition": "恐慌或电栅栏触发",
+      "semantic": "优先级最高，执行恐慌逃跑行为，覆盖其他行为"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. BrainCommon.PanicTrigger 恐慌触发 2. BrainCommon.ElectricFencePanicTrigger 电栅栏恐慌 3. Follow 跟随领导者 4. ChaseAndAttack 追击攻击 5. Wander 游荡（以领导者位置或自由）",
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      13897,
+      15022,
+      51046,
+      15651,
+      13828,
+      15551,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给出的页面摘录均描述触电机制、克劳斯、天体英雄、战争瓦器人、龙蝇、暗影骑士、蜂王、暗影傀儡等其他实体，未提及 brain__wormwood_fruitdragonbrain 或其关联实体的跟随（最小0/期望8/最大15）、追击（最大12）、游荡（离家8及minwalktime=4等配置）或恐慌触发等行为与数值，页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "果龙",
+    "跟随",
+    "领导者",
+    "攻击",
+    "逃跑",
+    "恐慌",
+    "触电",
+    "优先级",
+    "自由游荡",
+    "行为树"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 0/10)",
+  "gameplay_tags": [
+    "跟随",
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bb4d8411982bcc814993b2950f5e8c30de464d425cefc32d8c4b336375dd502c",
+    "source_bytes": 1233,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057413634
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/bird_mutant_rift_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "bird_mutant_rift_brain",
+  "summary": "该大脑控制裂隙变异鸟（MutatedBird）的决策。当处于夜晚特定月相、受到火焰伤害、附近出现威胁实体或接收到惊吓事件时，变异鸟会飞走逃离；当处于空闲未忙碌状态时，它会寻找可食用物品进食或清除附近的月辉堆积物。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart方法以构建行为树，未定义任何供外部调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SHOULDFLYAWAY_CANT_TAGS",
+    "SHOULDFLYAWAY_ONEOF_TAGS",
+    "SEE_FOOD_DIST",
+    "FOOD_CANT_TAGS",
+    "SEE_HAIL_BUILDUP_DIST",
+    "LUNARHAIL_BUILDUP_MUST_TAGS",
+    "DISLIKES_MOON_PHASES"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "行为节点列表",
+        "更新间隔0.25秒"
+      ],
+      "context": "构建根行为树"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "被附身恐慌条件函数",
+        "节点名PanicHaunted",
+        "子动作节点"
+      ],
+      "context": "当被haunt恐慌时循环"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "ShouldFlyAway条件函数",
+        "节点名Threat Near",
+        "子动作节点"
+      ],
+      "context": "夜晚讨厌月相或受火伤"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "ShouldFlyAwayFromThreat条件函数",
+        "节点名Living threat Near",
+        "子动作节点"
+      ],
+      "context": "附近有威胁实体"
+    },
+    {
+      "ctor": "EventNode",
+      "args_semantic": [
+        "实体self.inst",
+        "事件名threatnear",
+        "子动作节点"
+      ],
+      "context": "监听威胁靠近事件"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "飞走函数fly_away_fn"
+      ],
+      "context": "执行飞走"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "非忙碌且无缓冲动作条件",
+        "节点名NotFlying",
+        "子DoAction节点"
+      ],
+      "context": "空闲时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体self.inst",
+        "找食物函数FindFoodAction",
+        "名称EatGlass"
+      ],
+      "context": "尝试进食"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体self.inst",
+        "找月辉堆积函数FindAndMineLunarHailBuildup",
+        "名称MineGlass"
+      ],
+      "context": "尝试清除月辉堆积"
+    },
+    {
+      "ctor": "EventNode",
+      "args_semantic": [
+        "实体self.inst",
+        "事件名gohome",
+        "子动作节点"
+      ],
+      "context": "监听回家事件"
+    },
+    {
+      "ctor": "BufferedAction",
+      "args_semantic": [
+        "实体inst",
+        "目标食物target",
+        "动作ACTIONS.EAT"
+      ],
+      "context": "生成进食行为"
+    },
+    {
+      "ctor": "BufferedAction",
+      "args_semantic": [
+        "实体inst",
+        "目标月辉堆积target",
+        "动作ACTIONS.REMOVELUNARBUILDUP"
+      ],
+      "context": "生成清除月辉堆积行为"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.components.hauntable ~= nil and panic",
+      "semantic": "被附身恐慌时直接飞走"
+    },
+    {
+      "condition": "ShouldFlyAway(inst)",
+      "semantic": "夜晚且讨厌月相(new/quarter)或受火伤未燃烧时飞走"
+    },
+    {
+      "condition": "ShouldFlyAwayFromThreat(inst)",
+      "semantic": "附近有玩家/怪物/吓唬猎物标签实体时飞走"
+    },
+    {
+      "condition": "事件threatnear触发",
+      "semantic": "收到威胁靠近事件时飞走"
+    },
+    {
+      "condition": "not IsSgBusy and 无缓冲动作",
+      "semantic": "优先寻找食物执行进食(EatGlass)"
+    },
+    {
+      "condition": "not IsSgBusy and 无缓冲动作(继上)",
+      "semantic": "寻找月辉堆积执行清除(MineGlass)"
+    },
+    {
+      "condition": "事件gohome触发",
+      "semantic": "收到回家事件时飞走"
+    }
+  ],
+  "bt_structure": "优先级节点树：1.被附身恐慌则飞走；2.应飞走条件(夜讨厌月相/受火伤)则飞走；3.附近有威胁实体则飞走；4.监听threatnear事件飞走；5.空闲时找食物吃；6.空闲时找月辉堆积清除；7.监听gohome事件飞走。各节点间按优先级顺序执行。",
+  "wiki": {
+    "scanned_pageids": [
+      22522,
+      15977,
+      15327,
+      15137,
+      15022,
+      22611,
+      45248,
+      65881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要描述变异鸟的生成、掉落、攻击能量静电等行为，以及月相、月雹、普通鸟机制，但未提及变异鸟AI的飞走条件（威胁/恐慌/月相）、进食玻璃、清除月辉堆积、监听事件等行为树能力；普通鸟的飞走描述明确排除变异鸟，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "变异鸟",
+    "飞走",
+    "觅食",
+    "月相",
+    "月辉",
+    "受惊",
+    "吃玻璃",
+    "挖月岩",
+    "逃离威胁"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "觅食",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "91491fa79d076dc8d9967126df26a017e4aa28ba14fba4503d878429f9cac5a2",
+    "source_bytes": 3429,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057979897
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wx78_possessedbodybrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wx78_possessedbodybrain",
+  "summary": "该大脑控制 WX78 的被附身身体，在领导者（玩家）附近时根据领导者的行为做出响应。当领导者攻击时它会追击或远程无人机攻击目标，领导者移动时它会保持距离跟随或风筝，并辅助领导者进行砍树、挖矿、划船等动作，同时会自动进食、修复装备和升级模块。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外调用接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "TRADE_DIST",
+    "FOLLOW_MIN_DIST",
+    "FOLLOW_TARGET_DIST",
+    "FOLLOW_MAX_DIST",
+    "KEEP_LAST_TARGET_TIME",
+    "DROP_TARGET_KITE_DIST_SQ",
+    "MAX_KITE_DIST",
+    "TOLERANCE_DIST",
+    "UPDATE_RATE",
+    "STOP_USING_DRONE_DELAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取正在尝试交易/喂食/打开容器的玩家函数",
+        "保持该交互玩家函数"
+      ],
+      "context": "优先级最高，无特殊条件"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取救援领导者(UNPIN)动作函数",
+        "调试名'Rescue Leader'",
+        "以跑动方式执行"
+      ],
+      "context": "领导者被固定(pinnable stuck)时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 10 秒",
+        "放弃距离 50 世界单位"
+      ],
+      "context": "领导者攻击且自身不需要移动风筝时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取使用无人机遥控器攻击动作函数",
+        "无调试名",
+        "以跑动方式执行"
+      ],
+      "context": "领导者攻击且装备无人机遥控器时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取升级模块动作函数",
+        "无调试名",
+        "以跑动方式执行"
+      ],
+      "context": "常规每帧更新中尝试"
+    },
+    {
+      "ctor": "RunToDist",
+      "args_semantic": [
+        "获取目标函数表(getfn=GetTarget)",
+        "动态安全距离函数 GetRunDist",
+        "无额外条件函数",
+        "不修正悬垂边界",
+        "不步行代替奔跑",
+        "允许水面用船寻路"
+      ],
+      "context": "领导者未攻击但移动，或需要风筝时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取领导者函数",
+        "保持领导者函数"
+      ],
+      "context": "默认情况下面对领导者"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "无条件进入站立状态",
+        "无限期保持停止移动"
+      ],
+      "context": "默认情况下静止"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取进食动作函数",
+        "无调试名",
+        "以跑动方式执行"
+      ],
+      "context": "常规尝试进食恢复属性"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取锻造修复动作函数",
+        "无调试名",
+        "以跑动方式执行"
+      ],
+      "context": "常规尝试修复破损装备"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "leader and leader.components.pinnable and leader.components.pinnable:IsStuck()",
+      "semantic": "执行救援领导者动作(UNPIN)，解除其被困状态"
+    },
+    {
+      "condition": "IsLeaderAttacking(inst) and not ShouldMoveAnyways(inst) and LeaderInRangeOfTarget(inst)",
+      "semantic": "并行节点：持续设置领导者攻击目标并追击(ChaseAndAttack)或使用无人机远程攻击，停止攻击后延迟3秒停止使用无人机"
+    },
+    {
+      "condition": "ShouldMoveAnyways(inst) or (not IsLeaderAttacking(inst) and IsLeaderMoving(inst)) and LeaderInRangeOfTarget(inst)",
+      "semantic": "通过 RunToDist 保持与目标的动态安全距离(风筝)或跟随领导者移动"
+    },
+    {
+      "condition": "HasToolForAction(inst, ACTIONS.CHOP) 等工具条件",
+      "semantic": "辅助领导者执行对应工具动作(砍/挖/锤/掘/耕/划船)，通过 BrainCommon.NodeAssistLeaderDoAction 实现"
+    },
+    {
+      "condition": "ShouldEmote(inst)",
+      "semantic": "播放与领导者同步的表情动作"
+    },
+    {
+      "condition": "默认（无上述条件满足）",
+      "semantic": "面对领导者(FaceEntity)并站立静止(StandStill)"
+    }
+  ],
+  "bt_structure": "根优先级节点(受跳跃状态保护)包含：1.面对交互玩家；2.领导者被困则救援；3.领导者攻击则并行设目标与追击/无人机；4.升级模块；5.领导者移动则风筝/跟随；6.辅助泡澡/升锚/降帆/工具动作；7.等待后跟随领导；8.表情；9.进食/修复；10.面对领导并站立。",
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      51046,
+      72238,
+      72323,
+      14936,
+      71461,
+      14907,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "收回电刑机延迟描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "还会再操控电刑机 3 秒才收回电刑机"
+          }
+        ]
+      },
+      {
+        "aspect": "无人机遥控器协同攻击描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘会尝试装备物品栏中的武器，优先装备有耐久的电刑机控制器"
+          }
+        ]
+      },
+      {
+        "aspect": "破损装备修复行为描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "其会在空闲时使用修补套件修复装备"
+          }
+        ]
+      },
+      {
+        "aspect": "风筝战术响应行为描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘在协同玩家攻击时会响应玩家的风筝战术"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "被附身身体",
+    "风筝",
+    "无人机",
+    "跟随领导者",
+    "修复装备",
+    "模块",
+    "辅助攻击",
+    "吃食物"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "战斗",
+    "采集辅助",
+    "生存",
+    "跟随控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f81432364ec76e1e49aea1ae54c252eda475e7002071aff64356b0839fee13cf",
+    "source_bytes": 32823,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057508131
+  }
+}

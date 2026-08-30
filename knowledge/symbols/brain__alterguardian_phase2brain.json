@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/alterguardian_phase2brain.lua"
+  },
+  "category": "brain",
+  "display_name": "alterguardian_phase2brain",
+  "summary": "该大脑控制远古守卫者第二阶段实体在非旋转状态下的行为。优先追击并攻击附近玩家，若无可追则面向最近玩家，否则在出生点附近游荡。当实体处于旋转状态标签时，跳过上述行为交由状态机处理。",
+  "api": [],
+  "api_note": "该类仅重写了Brain基类的OnStart与OnInitializationComplete方法以构建行为树和记录出生点，未定义其他对外调用的自定义方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "MAX_CHASE_TIME",
+    "GIVE_UP_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实例",
+        "追击最长 60 秒",
+        "放弃距离 40 世界单位"
+      ],
+      "context": "未处于旋转状态时最高优先级"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取最近非notarget玩家",
+        "保持面向需目标非notarget且在KEEP_FACE_DIST内"
+      ],
+      "context": "追击失败后次优先级"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "获取出生点位置",
+        "游荡半径相关为2倍ALTERGUARDIAN_PHASE2_TARGET_DIST"
+      ],
+      "context": "无面向目标时最低优先级"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"spin\")",
+      "semantic": "执行主行为树(优先级:追击攻击->面向玩家->游荡)；若处于spin状态则整个主行为树被跳过，实体行为由状态机控制"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25)下通过WhileNode判断非旋转状态，内部主优先级节点(0.25)依次排列ChaseAndAttack、FaceEntity、Wander三种行为。",
+  "wiki": {
+    "scanned_pageids": [
+      15832,
+      13897,
+      15022,
+      72981,
+      13701,
+      14929,
+      15248,
+      15182
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅15022涉及天体英雄第二形态，但仅描述旋转追逐攻击，未提及追击60秒上限、40单位放弃距离、面向距离、出生点游荡半径等清单能力；其他页面实体均无关，故无该符号能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "远古守卫者",
+    "面向玩家",
+    "附近游荡",
+    "二阶段",
+    "旋转攻击",
+    "追击",
+    "脱战距离",
+    "出生点"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8577e97870d69192dd2f9a55c90f738667edf25f3b27e42fa1ee7f60a219f713",
+    "source_bytes": 1583,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057690224
+  }
+}

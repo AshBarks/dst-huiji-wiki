@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wormwood_carratbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wormwood_carratbrain",
+  "summary": "该大脑控制胡萝卜鼠（carrat）在拥有领导者时跟随其并保持中等距离，同时协助拾取可食用物品；当检测到带有“scarytoprey”标签且在PVP模式下的玩家或其宠物时，实体会逃离至安全距离；若无领导者则在附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法以构建行为树，未定义额外的对外方法，所有逻辑封装在本地函数与基类 Brain 中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_DIST_SQ",
+    "AVOID_PLAYER_STOP",
+    "FOLLOW_DISTANCE_MIN",
+    "FOLLOW_DISTANCE_TARGET",
+    "FOLLOW_DISTANCE_MAX",
+    "SEE_BAIT_MAXDIST",
+    "MAX_WANDER_DIST",
+    "NORMAL_RUNAWAY_DATA"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "始终（最高优先级）"
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "始终"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃离目标为带scarytoprey标签且经ShouldRunFromScary确认的威胁（PVP下玩家或其宠物，非领导者）",
+        "发现猎人距离半径3",
+        "脱离危险安全距离5"
+      ],
+      "context": "始终（在恐慌之后）"
+    },
+    {
+      "ctor": "BrainCommon.NodeAssistLeaderPickUps",
+      "args_semantic": [
+        "大脑自身",
+        "拾取参数表（范围20，自定义过滤PickUpFilter，忽略列表）"
+      ],
+      "context": "有领导者时（GetLeader ~= nil）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "跟随目标为领导者（GetLeader函数）",
+        "最小允许距离0",
+        "期望保持距离8",
+        "最大允许距离15"
+      ],
+      "context": "无特定条件（目标无效则失败）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "家位置为领导者位置（无领导者则nil）",
+        "离家最大距离8"
+      ],
+      "context": "无特定条件"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetLeader(inst) ~= nil",
+      "semantic": "执行 NodeAssistLeaderPickUps 协助领导者拾取范围内可食用物品，使用 SEE_BAIT_MAXDIST 作为搜索范围，PickUpFilter 确保物品对领导者可食用"
+    },
+    {
+      "condition": "ShouldRunFromScary 内: other.isplayer and GetLeader(inst) == other",
+      "semantic": "不将该玩家视为威胁，不逃跑"
+    },
+    {
+      "condition": "ShouldRunFromScary 内: (isplayer or isplayerpet) and TheNet:GetPVPEnabled()",
+      "semantic": "将玩家或其宠物视为威胁，触发 RunAway 逃离"
+    }
+  ],
+  "bt_structure": "优先级节点树：1) 恐慌触发；2) 电栅栏恐慌；3) 逃离 scarytoprey/PVP威胁（距离3察觉，5安全距离）；4) 若有领导者则协助拾取；5) 跟随领导者（距离0~15，目标8）；6) 以领导者位置为中心游荡（最大半径8）。",
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      13261,
+      33950,
+      23932,
+      33991,
+      33823,
+      22435,
+      14484
+    ],
+    "aspects": [
+      {
+        "aspect": "主动远离玩家行为描述",
+        "evidence": [
+          {
+            "pageid": 15737,
+            "quote": "主动远离玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "采摘后逃跑行为描述",
+        "evidence": [
+          {
+            "pageid": 15737,
+            "quote": "以生物形态逃跑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "胡萝卜鼠",
+    "跟随领导者",
+    "帮助拾取",
+    "逃离危险",
+    "自由游荡",
+    "惊吓猎物",
+    "PVP逃离",
+    "行为树",
+    "沃姆伍德"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "跟随",
+    "拾取",
+    "逃跑",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1a31fa5004913381d26f4c725cd048ca3b4011b32bfdc8930efa6544ed0121bd",
+    "source_bytes": 2753,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057385554
+  }
+}

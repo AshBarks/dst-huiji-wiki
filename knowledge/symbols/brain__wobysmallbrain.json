@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wobysmallbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wobysmallbrain",
+  "summary": "该大脑控制小型沃比（沃尔特的小狗）的行为。在有主人时，它会跟随主人、回避战斗、与玩伴玩耍、表达亲昵，并在主人打开轮子或战斗附近时面对主人；无主时静止。",
+  "api": [],
+  "api_note": "该大脑类仅重写 OnStart 方法以构建行为树，未定义其他对外接口方法。",
+  "events_published": [
+    "start_playwithplaymate",
+    "critter_avoidcombat"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "COMBAT_TOO_CLOSE_DIST",
+    "COMBAT_TOO_CLOSE_DIST_SQ",
+    "COMBAT_SAFE_TO_WATCH_FROM_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST_SQ",
+    "COMBAT_TIMEOUT",
+    "MAX_PLAYFUL_FIND_DIST",
+    "MAX_PLAYFUL_KEEP_DIST_FROM_OWNER",
+    "MAX_DOMINANTTRAIT_PLAYFUL_FIND_DIST",
+    "MAX_DOMINANTTRAIT_PLAYFUL_KEEP_DIST_FROM_OWNER",
+    "PLAYFUL_OFFSET"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "查找标签表(含_combat,_health,排除wall,INLIMBO)及自定义检测函数",
+        "过近距离 5",
+        "安全距离 8"
+      ],
+      "context": "轮子未打开时的战斗回避分支"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取目标函数(返回主人)",
+        "保持面对函数(主人为目标时保持)"
+      ],
+      "context": "验证战斗回避有效时或轮子打开时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "WobyBrainCommon.GetWalterInteractionFn",
+        "WobyBrainCommon.KeepGenericInteractionFn"
+      ],
+      "context": "常规面对沃尔特交互"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回跟随目标(领袖)的函数",
+        "最小允许距离 0",
+        "期望保持距离 4",
+        "最大允许距离 4.5"
+      ],
+      "context": "召回节点内临时跟随或主节点中跟随主人"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回玩伴位置的函数",
+        "最大拴绳半径 2",
+        "内部返回距离 2"
+      ],
+      "context": "找到玩伴后拴向玩伴"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "玩耍序列中、根无主时或末尾静止"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待 6 秒"
+      ],
+      "context": "玩耍序列开始前"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待 4 秒"
+      ],
+      "context": "亲昵序列开始前"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "LoveOwner亲昵动作函数"
+      ],
+      "context": "主人靠近且亲切时"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "播放与玩伴玩耍事件的动作函数"
+      ],
+      "context": "玩耍序列中"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not WobyBrainCommon.IsWheelOpen(self.inst)",
+      "semantic": "执行战斗回避：逃离战斗实体，若验证有效则捡弹药并面对主人"
+    },
+    {
+      "condition": "ValidateCombatAvoidance(self)",
+      "semantic": "在战斗附近时优先捡弹药然后面对主人"
+    },
+    {
+      "condition": "WobyBrainCommon.IsWheelOpen(self.inst) and ValidateCombatAvoidance(self)",
+      "semantic": "轮子打开且战斗附近时仅面对主人"
+    },
+    {
+      "condition": "WobyBrainCommon.IsWheelOpen(self.inst)",
+      "semantic": "轮子打开时面对主人"
+    },
+    {
+      "condition": "FindPlaymate(self)",
+      "semantic": "找到玩伴后等待并拴向玩伴位置玩耍"
+    },
+    {
+      "condition": "OwnerIsClose(self.inst) and self.inst:IsAffectionate()",
+      "semantic": "主人靠近且自身亲切时等待后执行亲昵动作"
+    },
+    {
+      "condition": "GetOwner(self.inst) ~= nil",
+      "semantic": "有主人则运行主要行为节点，否则站立"
+    },
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"jumping\") and (self.inst.sg.currentstate == nil or self.inst.sg.currentstate.name ~= \"transform\")",
+      "semantic": "非跳跃且非变形状态时才执行上述逻辑"
+    }
+  ],
+  "bt_structure": "根优先级节点(状态保护:非跳跃非变形) -> 优先级[有主人则主节点序列, 否则站立]。主节点序列优先级: 快递/静坐/观战 -> 战斗回避(轮子关:逃跑与面对) -> 轮子开战斗面对 -> 面对沃尔特交互 -> 轮子开面对主人 -> 召回跟随 -> 觅食/取弹药/抓取 -> 玩耍(条件:找到玩伴) -> 跟随主人 -> 面对主人 -> 亲昵(条件:主人近且亲切) -> 站立",
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      13455,
+      35371,
+      39297,
+      13898,
+      17998,
+      18303,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随主人行为描述",
+        "evidence": [
+          {
+            "pageid": 13455,
+            "quote": "她只会跟随沃尔特行动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "沃比",
+    "跟随",
+    "避免战斗",
+    "玩伴",
+    "撒娇",
+    "旋转木马",
+    "召回",
+    "取弹药"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗回避",
+    "跟随陪伴",
+    "互动玩耍"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "87a18a05cf1397a1e3f996beeb50ae5857a0d75dda0acc5dd9e9b3afdfa4ccbb",
+    "source_bytes": 9458,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057280504
+  }
+}

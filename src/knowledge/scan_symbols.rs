@@ -1705,7 +1705,7 @@ async fn enrich_with_wiki(
 {auto_hint}
 规则:
 1. aspect 用中文短语概括页面侧的写作方面(如“生命值数值标注”“死亡掉落联动”“仇恨距离描述”),不要照抄 API/常量名。
-2. evidence.pageid 必须来自下方给出的页面;quote 摘录原文短句(≤40 字),可省略。
+2. evidence.pageid 必须来自下方给出的页面;quote 必须逐字摘自页面原文(保留原有标点与模板标记,可截取片段但不得改写、概括或拼接不同位置),≤40 字,可省略。
 3. 不得凭空发明页面中不存在的能力表达;宁空勿造。
 4. 只输出一个 JSON 对象,形如:{{\"aspects\":[{{\"aspect\":\"…\",\"evidence\":[{{\"pageid\":123,\"quote\":\"…\"}}]}}],\"no_evidence_reason\":null}}
 

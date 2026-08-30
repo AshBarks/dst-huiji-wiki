@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wx78_shadowdrone_debufferbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wx78_shadowdrone_debufferbrain",
+  "summary": "该大脑控制 WX78 影子减益无人机的行为。当玩家领导者攻击或接近敌人且在减益范围内时，无人机会跑步移动至敌人附近的扫描位置并执行扫描减益；若领导者短暂停止攻击或目标仍在战斗，则保持扫描。否则无人机执行编队跟随或游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义额外对外方法，所有逻辑封装在本地函数与行为树节点中。",
+  "events_published": [
+    "ms_wx_shadowdrone_scan"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "DEBUFF_RANGE_FROM_LEADER",
+    "STOP_DEBUFF_DELAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "无人机自身实例",
+        "拴绳锚点取扫描目标附近的扫描位置函数（基于编队偏移与45度吸附）",
+        "拴绳最大半径函数（扫描状态下取较大值否则0.65）",
+        "内部返回距离函数（同最大半径）",
+        "true 表示以跑步速度返回"
+      ],
+      "context": "在 ShouldScan 判定为真的扫描分支下执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldScan(self) 返回 true",
+      "semantic": "无人机通过 Leash 拴绳至扫描位置并立即推送 ms_wx_shadowdrone_scan 事件进行减益"
+    },
+    {
+      "condition": "ShouldScan(self) 返回 false",
+      "semantic": "无人机退而执行通用编队跟随（FollowFormationNode）或游荡（WanderNode）"
+    },
+    {
+      "condition": "inst.sg:HasStateTag(\"scanning\")",
+      "semantic": "MinMaxLeashDist 返回较宽阈值（maxrange-range-0.1 与0.65取大），否则固定0.65"
+    },
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"despawn\")",
+      "semantic": "整体行为树生效，否则大脑不驱动任何行为"
+    }
+  ],
+  "bt_structure": "根优先级节点守卫非 despawn 状态，其下优先级：1) 若应扫描则拴绳至扫描点并触发扫描事件；2) 编队跟随；3) 游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      16419,
+      20719,
+      16615,
+      72141,
+      72314,
+      72441,
+      72359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面文本均围绕WX-78角色、电路板、扫描仪、食物砖、电刑机、容器、配送无人机等，无任何关于shadowdrone_debufferbrain及其减益范围、停止延迟、拴绳返回等行为的描述，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "WX78",
+    "游荡",
+    "攻击跟随",
+    "暗影无人机",
+    "减益扫描",
+    "扫描位置",
+    "列队跟随",
+    "暗影减益"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bc7a2210a43f24eaf515ba244fb7805bf000293417eb09a8b44c93d1b74ce1f9",
+    "source_bytes": 5080,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057507943
+  }
+}

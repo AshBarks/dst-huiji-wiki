@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/bird_mutant_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "bird_mutant_brain",
+  "summary": "该大脑控制变异鸟（包括喷吐变异鸟）的AI行为。平时会尝试破坏骨架、攻击墙壁、攻击范围内玩家或跟随者，并朝蜂群目标移动或站立；当具备喷吐条件时喷吐变异鸟会喷吐或等待喷吐。遇到危险或电篱时会触发恐慌，最坏情况下进入普通恐慌状态。",
+  "api": [],
+  "api_note": "该大脑仅重写基类的 OnStart 方法以构建行为树，未定义其他对外方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RETURN_DIST",
+    "BASE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "在破坏骨架序列中执行"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实例",
+        "获取 swarm 目标位置的函数",
+        "拴绳最大半径 15",
+        "内部返回距离 6"
+      ],
+      "context": "当存在 swarm 目标位置时移动至目标"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "当存在 swarm 目标位置时站立靠近目标"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "当为喷吐变异鸟且应等待喷吐时站立"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "默认恐慌（优先级最低）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "执行喷吐动作的函数"
+      ],
+      "context": "当为喷吐变异鸟且应喷吐时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "HasTag(\"bird_mutant_spitter\")",
+      "semantic": "在行为树中插入喷吐与等待喷吐节点"
+    },
+    {
+      "condition": "CanBirdAttack(inst) (不在攻击冷却、非忙碌且目标在攻击范围内或有附近玩家/玩家跟随者)",
+      "semantic": "执行攻击目标动作"
+    },
+    {
+      "condition": "GetSwarmTargetPos(inst) 存在",
+      "semantic": "拴绳移动至目标位置"
+    },
+    {
+      "condition": "GetSwarmTargetPos(inst) 存在",
+      "semantic": "在目标附近站立"
+    },
+    {
+      "condition": "shouldspit(inst) (喷吐鸟且不在冷却、目标有效且在喷吐范围内)",
+      "semantic": "执行喷吐动作"
+    },
+    {
+      "condition": "shouldwaittospit(inst) (喷吐鸟且目标有效且在4距离内)",
+      "semantic": "站立等待喷吐"
+    }
+  ],
+  "bt_structure": "优先级节点(0.25): 恐慌触发 -> 电篱恐慌触发 -> [喷吐鸟]喷吐While -> [喷吐鸟]等待喷吐If -> 序列(破坏骨架->攻击墙->重置冷却) -> 可攻击则攻击If -> 有蜂群目标则拴绳移动If -> 有蜂群目标则站立If -> 恐慌",
+  "wiki": {
+    "scanned_pageids": [
+      13700,
+      18474,
+      15977,
+      13701,
+      18078,
+      19801,
+      13455,
+      15327
+    ],
+    "aspects": [
+      {
+        "aspect": "向能量静电靠近行为描述",
+        "evidence": [
+          {
+            "pageid": 15977,
+            "quote": "慢慢地向能量静电靠近"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "变异鸟",
+    "喷吐变异鸟",
+    "跟随者",
+    "骨架",
+    "触发恐慌",
+    "蜂群",
+    "站立",
+    "攻击墙体"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dceb5d8e9525164f539e26d9c73880e9f60f5fe9a11a65baa0a16783b93d59ea",
+    "source_bytes": 4105,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057899823
+  }
+}

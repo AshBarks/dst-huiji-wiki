@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/batbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "batbrain",
+  "summary": "蝙蝠大脑控制蝙蝠在多种情境下的行为。无队长时会在家附近游荡、进食或周期性逃离。被酸液强化时根据队伍指令进食或偷硝石。白天或收到恐慌时回家或逃跑，发现目标则追击攻击。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 与 OnInitializationComplete 以构建行为树，未定义额外对外调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "panic"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "SEE_FOOD_DIST",
+    "MAX_WANDER_DIST",
+    "NO_TAGS",
+    "BATDESTINATION_TAG",
+    "STEALFOOD_CANT_TAGS",
+    "STEALFOOD_ONEOF_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "收到 panic 事件时"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "BrainCommon.ShouldTriggerPanic 满足时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取酸液蝙蝠动作（进食或偷硝石）的函数"
+      ],
+      "context": "蝙蝠被酸液强化时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追击60秒",
+        "放弃距离40单位"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数"
+      ],
+      "context": "处于白天时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作（吃或捡食物）的函数"
+      ],
+      "context": "无队长时优先"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取逃离动作（回家或找出口）的函数"
+      ],
+      "context": "无队长时周期性尝试"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取游荡中心位置的函数",
+        "最大游荡距离40单位"
+      ],
+      "context": "无队长时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "收到 panic 事件",
+      "semantic": "并行执行恐慌逃跑、离开队伍、等待6秒"
+    },
+    {
+      "condition": "BrainCommon.ShouldTriggerPanic 为真",
+      "semantic": "并行执行恐慌逃跑与离开队伍"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence 为真",
+      "semantic": "并行执行躲避电栅栏与离开队伍"
+    },
+    {
+      "condition": "蝙蝠被酸液强化",
+      "semantic": "根据队伍指令执行进食或偷硝石并离开编队"
+    },
+    {
+      "condition": "处于白天",
+      "semantic": "执行回家动作"
+    },
+    {
+      "condition": "没有队长",
+      "semantic": "优先进食，周期性尝试逃离，否则在家的附近游荡"
+    },
+    {
+      "condition": "酸液蝙蝠指令为 HOLD",
+      "semantic": "尝试进食"
+    },
+    {
+      "condition": "酸液蝙蝠指令为 ATTACK",
+      "semantic": "尝试偷取硝石"
+    },
+    {
+      "condition": "酸液蝙蝠无指令",
+      "semantic": "尝试进食或偷硝石"
+    }
+  ],
+  "bt_structure": "根优先级节点：panic事件响应 > 条件恐慌 > 避电栅栏 > 攻击墙壁 > 酸液强化判断 > 追击攻击 > 白天回家 > 无队长时(进食 > 周期逃离 > 游荡)",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      15566,
+      13828,
+      15551,
+      15922,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "白天返回洞穴行为",
+        "evidence": [
+          {
+            "pageid": 15566,
+            "quote": "蝙蝠会在白天来临时飞回洞穴入口并消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蝙蝠",
+    "攻击",
+    "硝石",
+    "酸液",
+    "队伍",
+    "进食",
+    "回家",
+    "游荡",
+    "恐慌"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d082939664feb488ada0b2317b2a2257e34ca502bdeea2a0c10882708b9fa87",
+    "source_bytes": 8338,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057818519
+  }
+}

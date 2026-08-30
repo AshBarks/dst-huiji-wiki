@@ -23,6 +23,27 @@
     }
   ],
   "bt_structure": "根优先级节点（权重0.1）下仅挂载 StandAndAttack 节点，使实体始终执行站立攻击。",
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      15245,
+      15326,
+      15718,
+      18843
+    ],
+    "aspects": [
+      {
+        "aspect": "自动攻击距离描述",
+        "evidence": [
+          {
+            "pageid": 18843,
+            "quote": "处于激活状态的投石机会自动攻击距离自身 5.5 到 15 距离单位范围内"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "自动攻击",
     "温诺娜弹射器",

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/alterguardian_phase3brain.lua"
+  },
+  "category": "brain",
+  "display_name": "alterguardian_phase3brain",
+  "summary": "该大脑控制阿尔特修斯第三阶段实体在拥有可攻击目标时进行站立攻击；当远离出生点时会返回出生点；当未被阻挡计时器限制时会躲避附近的玩家或怪物；否则会面向附近目标或站立不动。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 的 OnStart 与 OnInitializationComplete 方法以构建行为树和记录出生点，未定义其他对外调用接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "PHASE3_HUNTERPARAMS",
+    "AVOID_PLAYER_DIST",
+    "AVOID_PLAYER_STOP"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "不自动寻找新目标，仅攻击已有combat.target",
+        "攻击行为最大持续1秒"
+      ],
+      "context": "WhileNode ShouldAttack 条件下执行 DoAttack"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取回家动作的函数 GoHomeAction"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "躲避目标参数表(含_战斗等标签)",
+        "开始躲避距离3",
+        "停止躲避距离5"
+      ],
+      "context": "WhileNode ShouldDodge 条件下执行 Run Away"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取面向目标函数 GetFaceTargetFn",
+        "保持面向目标函数 KeepFaceTargetFn"
+      ]
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": []
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldAttack(inst) 返回真 (有战斗目标且可攻击且不在冷却)",
+      "semantic": "执行 StandAndAttack 攻击现有目标"
+    },
+    {
+      "condition": "GoHomeAction 中离出生点距离平方 >= TUNING.ALTERGUARDIAN_PHASE3_GOHOMEDSQ",
+      "semantic": "执行 BufferedAction WALKTO 返回出生点"
+    },
+    {
+      "condition": "ShouldDodge(inst) 返回真 (无 runaway_blocker 计时器)",
+      "semantic": "执行 RunAway 躲避符合标签的实体"
+    },
+    {
+      "condition": "GetFaceTargetFn 找到非 notarget 目标",
+      "semantic": "执行 FaceEntity 面向该目标"
+    },
+    {
+      "condition": "上述均未触发",
+      "semantic": "StandStill 无条件站立不动"
+    }
+  ],
+  "bt_structure": "PriorityNode(权重.25): [WhileNode(ShouldAttack)->StandAndAttack, DoAction(GoHomeAction), WhileNode(ShouldDodge)->RunAway, FaceEntity, StandStill]",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13857,
+      20426,
+      15225,
+      20428,
+      13551,
+      13761,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，页面15022虽涉及天体英雄（可能关联alterguardian）但仅描述形态、攻击方式与掉落，未提及面向距离、躲避玩家距离、站立攻击时长、回家动作或不自动寻敌等相位3大脑行为；其余页面实体为猎犬、装备、暗影傀儡、虚影、洞穴蠕虫、独眼巨鹿，均非alterguardian_phase3brain且未描述对应代码能力，故无相关表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "阿尔特修斯",
+    "第三阶段脑",
+    "攻击目标",
+    "返回出生",
+    "躲避玩家",
+    "面向玩家",
+    "站立不动",
+    "战斗行为"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c9734d292ffc783a6aae2d98bb2e400daffa00231b8d869e94549bc37992e11",
+    "source_bytes": 2695,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057749995
+  }
+}

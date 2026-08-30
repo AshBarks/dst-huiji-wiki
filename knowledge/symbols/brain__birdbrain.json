@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/birdbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "birdbrain",
+  "summary": "鸟脑控制鸟类实体在遭遇威胁或特定环境时飞走。当实体被闹鬼恐慌、处于夜晚或月雨、受到火灾伤害、附近出现威胁，或收到威胁/回家事件时，会触发飞走行为。大脑通过优先级行为树推送 flyaway 事件让鸟逃离。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法以构建行为树，未定义其他对外方法或接口。",
+  "events_published": [
+    "flyaway"
+  ],
+  "events_listened": [
+    "threatnear",
+    "gohome"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SHOULDFLYAWAY_MUST_TAGS",
+    "SHOULDFLYAWAY_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行飞走动作的函数（推送 flyaway 事件）"
+      ],
+      "context": "被 WhileNode/IfNode/EventNode 包裹以响应恐慌、威胁、事件"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "components.hauntable ~= nil and components.hauntable.panic",
+      "semantic": "持续执行飞走动作（PanicHaunted）"
+    },
+    {
+      "condition": "ShouldFlyAway(inst) 为真（非睡眠/忙碌/飞行且夜晚或月雨或受火伤或附近有威胁实体）",
+      "semantic": "执行飞走动作（Threat Near）"
+    },
+    {
+      "condition": "收到事件 threatnear",
+      "semantic": "执行飞走动作"
+    },
+    {
+      "condition": "收到事件 gohome",
+      "semantic": "执行飞走动作"
+    }
+  ],
+  "bt_structure": "根优先级节点（周期0.25）依次包含：1. WhileNode 闹鬼恐慌时飞走；2. IfNode 应飞走时飞走；3. EventNode 监听 threatnear 飞走；4. EventNode 监听 gohome 飞走。所有分支均调用同一飞走函数。",
+  "wiki": {
+    "scanned_pageids": [
+      13570,
+      15237,
+      13493,
+      51046,
+      15327,
+      10379,
+      13556,
+      18502
+    ],
+    "aspects": [
+      {
+        "aspect": "鸟类飞走行为描述",
+        "evidence": [
+          {
+            "pageid": 15327,
+            "quote": "在地面上啄一会儿就会飞走"
+          },
+          {
+            "pageid": 15327,
+            "quote": "它会恢复健康并飞走"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鸟脑",
+    "飞走",
+    "惊飞",
+    "夜晚",
+    "月雨",
+    "闹鬼",
+    "威胁",
+    "回家",
+    "鸟AI"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "生物行为"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cbdc0567a4f49b587f93e07c36286e03dafcb9c9763f08ba9fd210c5ded65e8c",
+    "source_bytes": 1675,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057999590
+  }
+}

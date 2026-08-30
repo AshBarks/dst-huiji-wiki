@@ -7,75 +7,75 @@
   },
   "category": "component",
   "display_name": "hauntable",
-  "summary": "Hauntable 组件管理实体的被幽灵附身状态、冷却计时、恐慌状态及视觉闪烁与着色器特效。它参与幽灵玩家与实体互动的核心玩法，处理附身成功或失败的逻辑、鬼魂复活、触发恐慌，并通过标签和事件向外同步状态。",
+  "summary": "该组件管理实体的被附身（haunt）状态、冷却计时、恐慌状态及视觉特效（闪烁与着色器）。核心玩法为允许幽灵玩家或其他来源对实体执行附身操作，触发自定义回调并可能产生复活幽灵、引发恐慌等效果。",
   "api": [
     {
       "name": "SetOnHauntFn",
-      "effect": "设置 self.onhaunt 为传入函数 fn，该函数应返回 true 表示附身成功，nil/false 表示失败，无其它副作用。"
+      "effect": "设置 self.onhaunt 回调函数为给定 fn，该函数应返回 true 表示附身成功，nil/false 表示失败；替换原有回调，影响后续 DoHaunt 行为。"
     },
     {
       "name": "SetOnUnHauntFn",
-      "effect": "设置 self.onunhaunt 为传入函数 fn，在停止附身时调用。"
+      "effect": "设置 self.onunhaunt 回调函数为给定 fn；在 StopHaunt 时会被调用，用于清理或触发停止附身逻辑。"
     },
     {
       "name": "SetHauntValue",
-      "effect": "若 val 为 nil 则直接返回；否则设置 self.hauntvalue = val 且 self.no_wipe_value = true，使该值在成功附身后不被清除。"
+      "effect": "若 val 非 nil，设置 self.hauntvalue = val 且 self.no_wipe_value = true；副作用为防止成功附身后 hauntvalue 被清空。"
     },
     {
       "name": "Panic",
-      "effect": "强制进入恐慌与被附身状态：设置 haunted=true, panic=true，延长 panictimer 与 cooldowntimer 至至少给定时间或默认 TUNING.HAUNT_PANIC_TIME_SMALL，并启动组件更新循环。"
+      "effect": "强制设置 haunted=true, panic=true，设定 panictimer 和 cooldowntimer 为 max(当前值, 给定 panictime 或 TUNING.HAUNT_PANIC_TIME_SMALL)，并启动组件更新；使实体进入恐慌且带附身标签。"
     },
     {
       "name": "StartFX",
-      "effect": "若 noflicker 为假且 self.usefx 为真，则推进闪烁状态机以开启视觉闪烁特效。"
+      "effect": "若参数 noflicker 为假且 self.usefx 为真，调用 AdvanceFlickerState 改变闪烁状态；否则不修改闪烁状态。"
     },
     {
       "name": "AdvanceFlickerState",
-      "effect": "将 self.flicker 在 \"off\"->\"on\"->\"fadeout\"->\"off\" 之间循环切换，控制闪烁特效阶段。"
+      "effect": "按 off->on->fadeout->off 循环修改 self.flicker 字段，推进闪烁状态机。"
     },
     {
       "name": "StopFX",
-      "effect": "强制将 flicker 设为 \"fadeout\" 并推进一次至 \"off\"，保证闪烁特效关闭。"
+      "effect": "设置 self.flicker='fadeout' 然后调用 AdvanceFlickerState 使其变为 'off'，结束闪烁特效。"
     },
     {
       "name": "DoHaunt",
-      "effect": "执行附身逻辑：若存在 itemmimic 组件则调用其 TurnEvil 并返回；否则调用 onhaunt(inst, doer) 结果赋给 haunted。成功时可能触发 doer 的 respawnfromghost 事件（若鬼魂且 hauntvalue 匹配）、清除 hauntvalue（除非 no_wipe_value）、启动冷却与特效；失败时若实体有效也设置 haunted 与冷却并启动特效。最后向本实体推送 \"haunted\" 事件。"
+      "effect": "执行附身：若实体有 itemmimic 组件则调用其 TurnEvil 并返回；否则调用 onhaunt 回调，根据返回值设置 haunted。成功时若 doer 是 ghost 且 hauntvalue 为 TUNING.HAUNT_INSTANT_REZ 则对 doer 推送 respawnfromghost 事件，并按 no_wipe_value 决定是否清空 hauntvalue，设置冷却并启动 FX、ShaderFx 与组件更新；失败时若实体有效也设置 haunted 和短冷却并启动 FX；最后对 self.inst 推送 'haunted' 事件。"
     },
     {
       "name": "SetAnimStateGetterFn",
-      "effect": "设置 self.animstatefn 用于自定义获取 AnimState 的函数。"
+      "effect": "设置 self.animstatefn 为给定 fn，用于后续 GetAnimState 和 ShaderFx 获取自定义的 AnimState 对象。"
     },
     {
       "name": "GetAnimState",
-      "effect": "返回 animstatefn(inst) 或默认的 inst.AnimState。"
+      "effect": "返回 self.animstatefn(self.inst) 的结果，若未设置 animstatefn 则返回 self.inst.AnimState；无状态修改。"
     },
     {
       "name": "StartShaderFx",
-      "effect": "获取 AnimState 并调用 SetHaunted(true) 开启着色器附身特效。"
+      "effect": "获取 AnimState（通过 GetAnimState）并调用其 SetHaunted(true)，开启着色器附身视觉效果。"
     },
     {
       "name": "StopShaderFX",
-      "effect": "若实体有效，获取 AnimState 并调用 SetHaunted(false) 关闭着色器特效。"
+      "effect": "若 self.inst 有效，获取 AnimState 并调用 SetHaunted(false)，关闭着色器视觉效果。"
     },
     {
       "name": "IsHaunted",
-      "effect": "返回 self.haunted 布尔值，表示当前是否被附身。"
+      "effect": "返回 self.haunted 布尔值，表示当前是否处于被附身状态；无副作用。"
     },
     {
       "name": "StopHaunt",
-      "effect": "重置 cooldowntimer=0、haunted=false，调用 onunhaunt（若有），停止着色器特效，并尝试停止组件更新。"
+      "effect": "重置 cooldowntimer=0, haunted=false，若 onunhaunt 存在则调用之，停止 ShaderFX，并尝试停止组件更新；结束附身状态。"
     },
     {
       "name": "TryStopUpdating",
-      "effect": "若 haunted 与 panic 均为假，则停止组件更新循环。"
+      "effect": "若 self.haunted 与 self.panic 均为假，则停止组件更新（StopUpdatingComponent）；可能终止 OnUpdate 循环。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧更新：递减 cooldowntimer，若耗尽则 StopHaunt；递减 panictimer，耗尽则 panic=false；冷却末尾处理 flicker 切换；最后尝试停止更新。"
+      "effect": "每帧调用：递减 cooldowntimer，若 <=0 则 StopHaunt；若 cooldowntimer<0.4 且 self.flickering=='on' 则推进闪烁；递减 panictimer，<=0 时复位 panic=false；最后调用 TryStopUpdating。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件移除时清理：调用 StopFX、StopShaderFX 并移除实体 \"haunted\" 标签。"
+      "effect": "组件移除时调用：停止 FX、停止 ShaderFX，并移除实体的 'haunted' 标签，清理相关状态。"
     }
   ],
   "events_published": [
@@ -83,39 +83,46 @@
   ],
   "events_listened": [],
   "netvars": [],
-  "tunables": [
-    "TUNING.HAUNT_PANIC_TIME_SMALL",
-    "TUNING.HAUNT_COOLDOWN_MEDIUM",
-    "TUNING.HAUNT_COOLDOWN_SMALL",
-    "TUNING.HAUNT_INSTANT_REZ"
-  ],
+  "tunables": [],
   "wiki": {
     "scanned_pageids": [
       20162,
       72238,
-      13701,
       18838,
-      13700,
-      15922,
-      10379,
-      19719
+      28623,
+      71461,
+      13857,
+      18830,
+      28744
     ],
     "aspects": [
       {
-        "aspect": "作祟引发生物恐慌描述",
+        "aspect": "作祟交互与能力描述",
         "evidence": [
           {
             "pageid": 18838,
-            "quote": "部分生物会在被作祟时恐慌"
+            "quote": "鬼魂拥有作祟能力。"
+          },
+          {
+            "pageid": 71461,
+            "quote": "作祟一个已绑定的备份底盘可以进行通过它复活"
+          },
+          {
+            "pageid": 18830,
+            "quote": "作祟蓝图会使蓝图所记载的配方随机改变。"
+          },
+          {
+            "pageid": 28744,
+            "quote": "被[[作祟]]。"
           }
         ]
       },
       {
-        "aspect": "实体被作祟互动描述",
+        "aspect": "恐慌行为描述",
         "evidence": [
           {
-            "pageid": 18838,
-            "quote": "鬼魂可以作祟部分实体以复活"
+            "pageid": 28744,
+            "quote": "它会恐慌地乱跑 5 秒钟。"
           }
         ]
       }
@@ -138,24 +145,25 @@
     "note": "存在性键 + panicable 布尔。"
   },
   "search_terms": [
-    "闹鬼",
+    "作祟",
     "附身",
-    "幽灵",
-    "恐慌",
-    "冷却",
-    "复活",
+    "恐慌状态",
+    "作祟冷却",
     "闪烁",
-    "特效",
-    "鬼魂"
+    "复活幽灵",
+    "停止作祟",
+    "恶搞"
   ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 2/8)",
   "gameplay_tags": [
-    "生存"
+    "附身",
+    "幽灵"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
     "source_bytes": 4770,
     "model": "hy3-free",
-    "generated_at_ms": 1787930299757
+    "generated_at_ms": 1788057837179
   }
 }

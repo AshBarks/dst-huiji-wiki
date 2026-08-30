@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wagdrone_rollingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wagdrone_rollingbrain",
+  "summary": "该大脑控制滚动无人机（wagdrone_rolling）在未被关闭且非等待捡起时，根据是否有部署点寻找可砍伐、采矿目标或友方无人机并滚动前往。若玩家尝试捡起则静止站立；目标失效则取消并停留。移动过程中会响应后坐力事件临时偏移路径并减速再加速。",
+  "api": [
+    {
+      "name": "SetRecoilAngle",
+      "effect": ""
+    },
+    {
+      "name": "UpdateTargetDest",
+      "effect": ""
+    },
+    {
+      "name": "ResetTargets",
+      "effect": ""
+    },
+    {
+      "name": "AccelAfterRecoil",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    },
+    {
+      "name": "OnStop",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "spinning_recoil"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DEBUG_MODE",
+    "RECOIL_DURATION",
+    "RECOIL_DECEL_DURATION",
+    "RECOIL_ACCEL_DURATION",
+    "RECOIL_MAX_DECEL"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身(inst)，省略startfn/keepfn即无条件进入并无限期保持停止移动"
+      ],
+      "context": "玩家尝试捡起时或目标取消后默认"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回动态目标点的函数(作为拴绳锚点)",
+        "拴绳最大半径1(超过才触发返回)",
+        "内部返回距离0.6(小于即判定返回成功)",
+        "以跑步速度返回(true)"
+      ],
+      "context": "存在有效目标时移动向目标"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "存在部署点(deploypoint)",
+      "semantic": "在部署点半径(TUNING.WAGDRONE_ROLLING_WORK_RADIUS)内优先寻找可砍/矿目标，否则寻找友方无人机，锚点使用部署点位置并忽略通常距离限制"
+    },
+    {
+      "condition": "不存在部署点",
+      "semantic": "在自身周围16范围内寻找友方无人机作为目标，或使用自身dest"
+    },
+    {
+      "condition": "玩家尝试捡起(IsPlayerTryingToPickup)",
+      "semantic": "优先进入站立状态，不移动"
+    },
+    {
+      "condition": "后坐力事件触发且未结束(recoiltime)",
+      "semantic": "计算偏移后的回收目的地并应用减速/加速乘数，临时改变移动路径"
+    },
+    {
+      "condition": "实体被关闭或persists为假",
+      "semantic": "大脑根节点不执行任何子节点，实体静止"
+    }
+  ],
+  "bt_structure": "根优先级节点包含持久化且未关闭的状态守卫WhileNode，其下优先级节点依次为：玩家尝试捡起时站立、向动态目标跑步拴绳移动、失败则重置目标、默认站立。",
+  "wiki": {
+    "scanned_pageids": [
+      47009,
+      13406,
+      13857,
+      18188
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，47009描述wagdrone_rolling实体的旋转与间歇停止等行为，未提及brain组件的后坐力参数、调试模式、拴绳返回等能力；13406（woodie）、13857（hound）、18188（boat_cannon_kit）均不涉及wagdrone_rollingbrain的能力表达，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "后坐力",
+    "部署点",
+    "站立不动",
+    "滚动前往",
+    "偏移路径",
+    "砍伐采矿",
+    "友军无人机",
+    "大脑控制"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "采集",
+    "建造",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab84965ea8adccad36e12b1456d65be0870e3c8bea603d7d79db9426f8da796e",
+    "source_bytes": 10178,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056939827
+  }
+}

@@ -52,6 +52,39 @@
     }
   ],
   "bt_structure": "优先级节点(权重1)包含：1) 通用恐慌触发节点；2) 夜晚且能站立时寻找最近光源的 WhileNode 分支（内含 FindClosest）；3) 默认静止节点 StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      16174,
+      15351,
+      16172,
+      46527,
+      34523,
+      15651,
+      18830,
+      13570
+    ],
+    "aspects": [
+      {
+        "aspect": "夜晚站立行为描述",
+        "evidence": [
+          {
+            "pageid": 16174,
+            "quote": "在夜晚舞台之手底部会伸出四条黑色的腿站立起来。"
+          }
+        ]
+      },
+      {
+        "aspect": "寻光半径与目标描述",
+        "evidence": [
+          {
+            "pageid": 16174,
+            "quote": "如果 50 范围内有火把或营火就会试图到达其照明范围。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
   "search_terms": [
     "舞台之手",
     "找光源",

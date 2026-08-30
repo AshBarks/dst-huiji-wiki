@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wanderingtraderbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wanderingtraderbrain",
+  "summary": "该大脑控制游荡商人在有库存或正在交易时面对最近的玩家；若无库存且可交谈则播放缺货语音并短暂面对玩家；否则沿世界路线目的地返回或在其当前位置附近小范围游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取最近玩家为目标",
+        "保持面对当玩家在距离内"
+      ],
+      "context": "交易状态或仍有库存时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取最近玩家为目标",
+        "保持面对当玩家在距离内",
+        "面对超时2秒"
+      ],
+      "context": "无库存且可聊天时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "获取路线目的地函数",
+        "最大拴绳距离2",
+        "内部返回距离2"
+      ],
+      "context": "前置条件不满足时尝试路线返回"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "以当前位置为家",
+        "最大游荡距离4"
+      ],
+      "context": "最低优先级自由游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg.mem.trading or self.inst:HasStock()",
+      "semantic": "持续面对最近玩家（无超时）"
+    },
+    {
+      "condition": "not self.inst:HasStock() and self.inst:CanChatter()",
+      "semantic": "播放缺货聊天并面对玩家2秒"
+    },
+    {
+      "condition": "默认（前述未满足）",
+      "semantic": "拴绳至路线目的地(距离2)，失败则在当前位置游荡(距离4)"
+    }
+  ],
+  "bt_structure": "PriorityNode(0.25): WhileNode(交易/库存 -> FaceEntity) > IfNode(无库存可聊 -> Sequence[ActionNode聊天, FaceEntity超时2]) > Leash(路线目的地,2,2) > Wander(当前位置, MAX_WANDER_DIST=4)",
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      46887,
+      52019,
+      13642,
+      34314,
+      13199,
+      18435,
+      19595
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，涉及流浪商人的页面（如46887）仅描述其实体交易机制、固定旅行路径、生成规则及作为交易来源，未出现任何关于wanderingtraderbrain组件的面对玩家、游荡距离、拴绳距离等行为语义（MAX_WANDER_DIST、FACE_DIST、FaceEntity、Leash、Wander）的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "流浪商人",
+    "面向玩家",
+    "缺货语音",
+    "目的地返回",
+    "小范围游荡",
+    "交易物品",
+    "有库存",
+    "正在交易",
+    "世界路线"
+  ],
+  "search_terms_note": "pass1 后零命中 7/7,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "交易",
+    "游荡",
+    "NPC"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b1a57f2c2fcad701b1aa8fa247a6dddec6ef58bdf55ab0c87860352a6392c55b",
+    "source_bytes": 1628,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056947149
+  }
+}

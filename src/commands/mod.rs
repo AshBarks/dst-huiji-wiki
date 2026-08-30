@@ -215,7 +215,10 @@ pub enum Commands {
         #[arg(long, default_value = "knowledge")]
         knowledge_dir: PathBuf,
         /// 页面 id(纯数字)或标题(精确匹配)
-        page: String,
+        page: Option<String>,
+        /// 全库缺口榜(忽略 page 参数)
+        #[arg(long)]
+        all: bool,
         /// 输出 JSON 而非 Markdown
         #[arg(long)]
         json: bool,
@@ -239,6 +242,9 @@ pub enum Commands {
         /// wiki 语料根目录;提供则启用 prefab→页面交叉
         #[arg(long)]
         corpus: Option<PathBuf>,
+        /// Tier2:起草页面修订建议(需 --corpus 与 LLM 配置)
+        #[arg(long)]
+        draft: bool,
     },
     /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
     KnowledgeScanWiki {

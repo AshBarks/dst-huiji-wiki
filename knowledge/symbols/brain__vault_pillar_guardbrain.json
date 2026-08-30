@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/vault_pillar_guardbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "vault_pillar_guardbrain",
+  "summary": "该大脑控制遗迹支柱守卫在未被跳跃状态占用时，优先在出生点与目标间拴住或追击攻击战斗目标。当拥有战斗目标且满足追击条件时，守卫会并行执行追击攻击与等待后触发快速跳跃；无目标时则面向目标或在家附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义其他可供外部直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "守卫实体自身"
+      ],
+      "context": "在 ShouldChase 条件满足时通过并行节点执行，追击并攻击战斗目标"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "守卫实体自身",
+        "获取当前战斗目标作为面对对象",
+        "保持面对条件：目标仍为战斗目标且距离不小于4单位"
+      ],
+      "context": "在追击节点之后执行，当存在战斗目标且不在近身范围时面对目标"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "守卫实体自身",
+        "返回出生点位置的函数",
+        "离家最大距离4世界单位",
+        "游荡时间配置：最小走2.5秒、随机走1.5秒、最小等4秒、随机等2秒"
+      ],
+      "context": "无战斗目标或前述节点失败时，以出生点为中心有限游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag('jumping')",
+      "semantic": "仅当实体不处于跳跃状态标签时，才运行下方优先级行为树，防止跳跃中逻辑干扰"
+    },
+    {
+      "condition": "GetHomeBetweenTargetPos 返回有效位置（有出生点、有战斗目标、离目标距离平方≥64、出生点比目标更近且夹角小于HALFPI）",
+      "semantic": "使用 Leash 将实体以距离1拴在出生点位置，限制其走向目标时不超过家点"
+    },
+    {
+      "condition": "ShouldChase(inst) 返回 true（有试炼且家存在时：目标在攻击范围内或离家的距离小于离目标距离且无更近同伴守卫；否则直接true）",
+      "semantic": "并行执行 ChaseAndAttack 与等待4秒后条件触发快速跳跃事件（ms_pillarguard_quickjump）"
+    },
+    {
+      "condition": "FaceEntity 的 getfn 返回战斗目标且 keepfn 满足（目标是战斗目标且不在4单位内）",
+      "semantic": "守卫原地面对战斗目标"
+    },
+    {
+      "condition": "前述节点均未触发（无战斗目标等）",
+      "semantic": "以出生点为家、最大半径4游荡，游荡节奏为较长等待短行走"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重0.25) -> 非跳跃状态守卫 WhileNode -> 内部优先级节点(权重0.25)：1.家与目标间拴住 Leash；2.应追击时 WhileNode 并行(追击攻击 + 等待触发快速跳跃)；3.面对实体；4.以家为中心游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      13701,
+      13823,
+      16419,
+      13897,
+      15551,
+      15938
+    ],
+    "aspects": [
+      {
+        "aspect": "主动仇恨追击攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "第一形态的天体英雄会主动仇恨并追击 20 距离单位内的拟角色"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离内的玩家目标，发现玩家目标后会试图接近发动攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "无战斗目标后游荡行为描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "在远古大门范围内没有仇恨目标后，远古织影者会游荡一小段时间"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "快速跳跃",
+    "出生点",
+    "追击",
+    "游荡",
+    "拴住",
+    "目标",
+    "遗迹支柱",
+    "大脑",
+    "面向目标"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "守卫"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9786670019a978ee3f4801fa163935b85850037f41e9a553275cce0574476082",
+    "source_bytes": 3569,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056779318
+  }
+}

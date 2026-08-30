@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/ticoonbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "ticoonbrain",
+  "summary": "该大脑控制 Ticoon 实体在非跳跃状态下优先处理恐慌与追击。当存在追踪实体时，若正在执行搜寻任务则拴住领导者并走向目标完成任务，否则在目标附近游荡；无追踪目标时则跟随并面对领导者，最终静止。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 以构建行为树，未定义其他对外调用方法。",
+  "events_published": [
+    "ticoon_getattention"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "TRACKING_MAX_WANDER_DIST",
+    "TRACKING_ACTION_DIST",
+    "TRACKING_LEADER_START_WAITING_DIST",
+    "TRACKING_LEADER_LEASH_DIST",
+    "TRACKING_LEADER_RETURN_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实例",
+        "追击最长 4 秒",
+        "追击最远 12 距离"
+      ]
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实例",
+        "获取领导者位置的函数",
+        "拴绳最大半径 14",
+        "内部返回距离 4",
+        "以跑步速度返回 true"
+      ],
+      "context": "questowner.questing 为真时的搜索序列中"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实例",
+        "开始站立条件：无领导者或离领导者超 6 距离",
+        "保持站立条件：无领导者或离领导者超 6 距离"
+      ],
+      "context": "questowner.questing 为真时等待领导者"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "追踪目标位置函数",
+        "最大游荡距离 5",
+        "游荡时间配置:最小走2.5,随机走1,最小等1,随机等1"
+      ],
+      "context": "存在追踪实体但非任务中"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "获取领导者函数",
+        "最小距离 0",
+        "目标距离 2",
+        "最大距离 4"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取领导者函数",
+        "保持面对条件：领导者是目标"
+      ]
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实例"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"jumping\")",
+      "semantic": "执行全部优先级行为树，跳跃时暂停"
+    },
+    {
+      "condition": "self.inst.components.entitytracker:GetEntity(\"tracking\") ~= nil",
+      "semantic": "进入追踪 Kitcoon 分支：任务中执行搜索序列，否则在追踪点游荡"
+    },
+    {
+      "condition": "self.inst.components.questowner.questing",
+      "semantic": "搜索模式：拴住领导者并触发注意、等待领导者、走向追踪目标完成任务"
+    },
+    {
+      "condition": "self.inst.components.entitytracker:GetEntity(\"tracking\") == nil",
+      "semantic": "无追踪目标时跟随领导者、面对领导者并站立"
+    }
+  ],
+  "bt_structure": "PriorityNode(非跳跃): [BrainCommon恐慌组, ChaseAndAttack, WhileNode(tracking存在): [WhileNode(questing): [Leash+GetAttention序列, StandStill等待, GoToTracking+CompleteQuest序列], Wander], Follow, FaceEntity, StandStill]",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15022,
+      45173,
+      13897,
+      51046,
+      15238,
+      16023,
+      72981
+    ],
+    "aspects": [],
+    "no_evidence_reason": "仅页面16023涉及ticoon实体，但其行为描述仅泛化提及“带领玩家寻找小浣猫”“永久地跟随玩家行动”，未出现清单中跟随距离、追击时间/距离、拴绳半径、站立条件等具体数值或行为语义表达；其他页面均不相关，故认为页面根本不讨论brain__ticoonbrain的具体能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Ticoon",
+    "追踪目标",
+    "跟随",
+    "拴绳",
+    "游荡",
+    "恐慌",
+    "追击",
+    "静止",
+    "领导者"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "追踪",
+    "跟随",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "646081994a5be2a93e2d1af3cc1d8c8b950c67ac788378539fc96aa45ebb3972",
+    "source_bytes": 3359,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056644053
+  }
+}

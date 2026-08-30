@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/tornadobrain.lua"
+  },
+  "category": "brain",
+  "display_name": "tornadobrain",
+  "summary": "该大脑控制龙卷风实体以已知位置'target'为锚点活动。优先当离锚点超过3单位时以跑步速度返回至1单位内，否则在锚点2单位范围内按固定短时间节奏游荡。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "wanderTimes"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回已知位置'target'作为拴绳锚点的函数",
+        "拴绳最大半径3",
+        "内部返回距离1",
+        "以跑步速度返回(true)"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回已知位置'target'作为游荡中心的函数",
+        "离家最大距离2",
+        "游荡时间配置表wanderTimes(各时间.25)"
+      ]
+    }
+  ],
+  "bt_structure": "优先级节点(权重.25)：优先执行 Leash 返回已知位置'target'（最大距离3，内部返回1，跑步），否则 Wander 以'target'为中心游荡（最大距离2，游荡时间各.25）",
+  "wiki": {
+    "scanned_pageids": [
+      15337,
+      24276,
+      14813,
+      15303,
+      51046,
+      15022,
+      15238,
+      15737
+    ],
+    "aspects": [
+      {
+        "aspect": "到达目标后随机移动说明",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "到达目标位置后转为随机移动"
+          }
+        ]
+      },
+      {
+        "aspect": "径直移动前往目标位置说明",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "龙卷风会径直移动前往目标位置"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "目标位置",
+    "龙卷风",
+    "锚点",
+    "游荡",
+    "跑步返回",
+    "优先返回",
+    "已知位置"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 2/7)",
+  "gameplay_tags": [
+    "移动",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ad37baebc7db73ad120574f390fa1f6f7b78c4f0d01a4723c83c77849d44db99",
+    "source_bytes": 650,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056663425
+  }
+}

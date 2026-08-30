@@ -261,12 +261,14 @@ pub async fn run(args: Commands) -> Result<()> {
         Commands::PageAssist {
             knowledge_dir,
             page,
+            all,
             json,
         } => {
             execute(
                 JobKind::PageAssist {
                     knowledge_dir: path_to_string(&knowledge_dir)?,
                     page: page.clone(),
+                    all,
                     json,
                 },
                 // Local-only job: never touches the wiki.
@@ -282,6 +284,7 @@ pub async fn run(args: Commands) -> Result<()> {
             rescan,
             limit,
             corpus,
+            draft,
         } => {
             execute(
                 JobKind::KnowledgeSync {
@@ -291,6 +294,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     rescan,
                     limit,
                     corpus: opt_path_to_string(&corpus)?,
+                    draft,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

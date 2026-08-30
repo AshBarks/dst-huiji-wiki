@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/waterplantbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "waterplantbrain",
+  "summary": "该大脑让水植物在燃烧或阴燃的紧急状态下立即喷射花粉云。当生长阶段为3（开放）时，它会优先原地攻击玩家，否则面对附近玩家；若具备喷云能力且未睡眠或死亡，则定时喷射花粉云。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义额外的对外调用方法。",
+  "events_published": [
+    "spray_cloud"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "CLOUD_HASTAGS",
+    "CLOUD_NOTAGS",
+    "CLOUD_DISTANCE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "实体阶段 _stage == 3 时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取10范围内无notarget标签的最近玩家",
+        "保持目标无notarget标签且在15范围内"
+      ],
+      "context": "实体阶段 _stage == 3 时，作为攻击之后的次选"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "should_emergency_pollen(inst)",
+      "semantic": "立即通过 ActionNode 调用 spray_cloud 喷射花粉云"
+    },
+    {
+      "condition": "self.inst._stage == 3",
+      "semantic": "进入子优先级节点：先 StandAndAttack 自身，再 FaceEntity 最近玩家"
+    },
+    {
+      "condition": "should_spray_cloud(inst)",
+      "semantic": "通过 ActionNode 调用 spray_cloud 喷射花粉云"
+    }
+  ],
+  "bt_structure": "根优先级节点(.25)：若紧急花粉条件满足则喷射云；若阶段为3则子优先级(.25)执行攻击然后面对玩家；若应喷射云条件满足则喷射云",
+  "wiki": {
+    "scanned_pageids": [
+      13268,
+      13567,
+      14697,
+      18729,
+      19140,
+      19595,
+      23965,
+      24364
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录实体为 wurt、旧神归来、backpack、pigtorch、花沙拉、来自域外、技能聚点、otter 等，均未提及 waterplant 或 waterplantbrain，文本中缺乏云标签、阶段3攻击、notarget标签、面对距离等对应行为描述，仅有的距离数值属于其他实体，无该符号能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水植物",
+    "花粉云",
+    "阴燃",
+    "附近玩家",
+    "原地打",
+    "开放",
+    "未睡眠",
+    "喷云",
+    "定时喷",
+    "紧急喷粉"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "装饰",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a4eade1313417ceaf72d0c339240d5bb016ac07b15ad642f4a6531666f32c4db",
+    "source_bytes": 2207,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057046918
+  }
+}

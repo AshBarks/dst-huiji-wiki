@@ -15,7 +15,7 @@ use crate::update::diffdata::{DiffStatus, TreeDiff};
 use crate::update::snapshot::SnapshotStore;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct SyncParams {
     /// 旧快照(时间戳或目录名,SnapshotStore 口径)
@@ -29,6 +29,8 @@ pub struct SyncParams {
     pub limit: usize,
     /// wiki 语料根目录;提供则启用 prefab→页面交叉与标题解析
     pub corpus: Option<String>,
+    /// Tier2:按常量差异与旧值锚点起草页面修订建议(需 corpus + LLM)
+    pub draft: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -99,7 +101,20 @@ pub struct SyncReport {
     pub tuning_changes: Vec<TuningChange>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub prefab_changes: Vec<PrefabChange>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub drafts: Vec<DraftSuggestion>,
     pub rescan: Option<serde_json::Value>,
+}
+
+/// Tier2 起草产物:一条页面修订建议(仅建议,人工审阅)。
+#[derive(Debug, Clone, Serialize)]
+pub struct DraftSuggestion {
+    pub path: String,
+    pub pageid: i64,
+    pub title: String,
+    pub old_sentence: String,
+    pub new_sentence: String,
+    pub reason: String,
 }
 
 fn category_of(path: &str) -> Option<&'static str> {
@@ -398,6 +413,27 @@ pub async fn run_knowledge_sync(
         }
     }
 
+    // Tier2 起草:precise 锚点 + 常量差异 → 页面修订建议(仅建议,人工审阅)
+    let mut drafts: Vec<DraftSuggestion> = Vec::new();
+    if params.draft {
+        let Some(corpus) = &params.corpus else {
+            return Err(Error::Config(
+                "--draft 需要 --corpus 提供页面原文".to_string(),
+            ));
+        };
+        let config = crate::llm::LlmConfig::from_env()
+            .ok_or_else(|| Error::Config("--draft 需要 LLM 配置(LLM__API_KEY)".to_string()))?;
+        reporter.stage("Tier2 起草修订建议");
+        drafts = draft_revision_suggestions(
+            &dirty_docs,
+            Path::new(corpus),
+            &config,
+            params.limit,
+            reporter,
+        )
+        .await;
+    }
+
     let mut rescan_summary = None;
     if params.rescan {
         reporter.stage("级联重扫脏文档");
@@ -446,6 +482,7 @@ pub async fn run_knowledge_sync(
         other_files: other.clone(),
         tuning_changes,
         prefab_changes,
+        drafts: drafts.clone(),
         rescan: rescan_summary,
     };
     let out_path = Path::new("output/knowledge/sync_report.json");
@@ -454,6 +491,9 @@ pub async fn run_knowledge_sync(
     }
     std::fs::write(out_path, serde_json::to_string_pretty(&report)?)?;
 
+    if !drafts.is_empty() {
+        reporter.log(format!("Tier2 起草 {} 条修订建议(人工审阅)", drafts.len()));
+    }
     reporter.log(format!(
         "sync 完成: 脏文档 {} 个(新增符号 {} / 移除 {} / 其他文件变更 {}),报告 {}",
         dirty_docs.len(),
@@ -463,6 +503,132 @@ pub async fn run_knowledge_sync(
         out_path.display()
     ));
     Ok(serde_json::to_value(&report)?)
+}
+
+/// Tier2:对带 precise 锚点的脏文档,按常量差异起草页面修订建议。
+/// 每文档一次 LLM 调用;页面原文行作为 grounding,输出仅入报告不写 wiki。
+const DRAFT_EXAMPLE: &str = r#"{"suggestions":[{"pageid":123,"old_sentence":"原句","new_sentence":"改后的句子","reason":"理由"}]}"#;
+
+async fn draft_revision_suggestions(
+    dirty_docs: &[DirtyDoc],
+    corpus_root: &Path,
+    config: &crate::llm::LlmConfig,
+    limit: usize,
+    reporter: &dyn Reporter,
+) -> Vec<DraftSuggestion> {
+    let mut drafts = Vec::new();
+    let targets: Vec<&DirtyDoc> = dirty_docs
+        .iter()
+        .filter(|d| d.mentioned_pages.iter().any(|p| p.kind == "precise"))
+        .take(limit)
+        .collect();
+    let system = "你是饥荒联机版中文维基的页面修订起草助手。必须只输出一个合法 JSON 对象。";
+    for doc in targets {
+        let mut grounding = String::new();
+        let mut titles: BTreeMap<i64, String> = BTreeMap::new();
+        for p in &doc.mentioned_pages {
+            titles.insert(p.pageid, p.title.clone());
+            let Some(first) = p.anchors.first().map(|a| a.raw.clone()) else {
+                continue;
+            };
+            let text =
+                std::fs::read_to_string(corpus_root.join(format!("pages/{}.wikitext", p.pageid)))
+                    .unwrap_or_default();
+            let lines: Vec<&str> = text
+                .lines()
+                .filter(|l| l.contains(&first))
+                .take(2)
+                .collect();
+            for l in lines {
+                grounding.push_str(&format!(
+                    "- 页面《{}》(pageid {})含句:`{}`(关联锚点 {})\n",
+                    p.title,
+                    p.pageid,
+                    l.trim(),
+                    p.anchors.first().map(|a| a.matched.as_str()).unwrap_or("-")
+                ));
+            }
+        }
+        if grounding.is_empty() {
+            continue;
+        }
+        let consts: Vec<String> = doc
+            .constant_changes
+            .iter()
+            .map(|c| format!("{}: {} → {}", c.name, c.old, c.new))
+            .collect();
+        let prompt = format!(
+            "代码更新导致以下常量变化:\n{}\n\n受影响页面的相关原文:\n{grounding}\n请为每条原文起草修订后的句子(数值/表述与新代码一致,保持页面行文风格)。只输出一个 JSON 对象,形如:{example}\n只覆盖上面列出的页面。",
+            consts.join(";"),
+            example = DRAFT_EXAMPLE,
+        );
+        reporter.log(format!("起草 {}:{}", doc.path, doc.mentioned_pages.len()));
+        let raw = match config.complete_streaming(system, &prompt, |_| {}).await {
+            Ok(t) => t,
+            Err(e) => {
+                reporter.log(format!("起草失败 {}:{}", doc.path, e));
+                continue;
+            }
+        };
+        let raw_path = PathBuf::from(format!(
+            "output/knowledge/raw/page_map/draft_{}_{}.json",
+            doc.path.replace('/', "_"),
+            chrono_free_stamp(),
+        ));
+        let _ = std::fs::write(&raw_path, &raw);
+        let trimmed = raw.trim();
+        let (Some(a), Some(b)) = (trimmed.find('{'), trimmed.rfind('}')) else {
+            reporter.log(format!("起草输出无 JSON:{}", doc.path));
+            continue;
+        };
+        if a >= b {
+            continue;
+        }
+        #[derive(serde::Deserialize)]
+        struct Payload {
+            #[serde(default)]
+            suggestions: Vec<serde_json::Value>,
+        }
+        let Ok(p) = serde_json::from_str::<Payload>(&trimmed[a..=b]) else {
+            reporter.log(format!("起草输出无法解析:{}", doc.path));
+            continue;
+        };
+        for sg in p.suggestions {
+            let pageid = sg.get("pageid").and_then(|x| x.as_i64()).unwrap_or(0);
+            let new_sentence = sg
+                .get("new_sentence")
+                .and_then(|x| x.as_str())
+                .unwrap_or_default()
+                .to_string();
+            if pageid == 0 || new_sentence.is_empty() {
+                continue;
+            }
+            drafts.push(DraftSuggestion {
+                path: doc.path.clone(),
+                pageid,
+                title: titles.get(&pageid).cloned().unwrap_or_default(),
+                old_sentence: sg
+                    .get("old_sentence")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or_default()
+                    .to_string(),
+                new_sentence,
+                reason: sg
+                    .get("reason")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or_default()
+                    .to_string(),
+            });
+        }
+    }
+    drafts
+}
+
+fn chrono_free_stamp() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
 }
 
 fn tuning_val_text(v: &crate::update::index::tuning::TuningVal) -> String {

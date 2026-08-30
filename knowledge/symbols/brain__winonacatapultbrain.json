@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/winonacatapultbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "winonacatapultbrain",
+  "summary": "该大脑用于控制温诺娜弹射器（炮台）实体。它通过单一的站立攻击行为节点，使炮台在已有战斗目标时原地攻击，不主动追击或搜寻新目标。大脑行为树极其简单，无额外条件分支与可调常量。",
+  "api": [],
+  "api_note": "源码中仅重写构造函数与 OnStart 方法，未定义额外对外方法，大脑构建由引擎调用 OnStart 完成。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "温诺娜弹射器实体自身"
+      ]
+    }
+  ],
+  "bt_structure": "根优先级节点（权重0.1）下仅挂载 StandAndAttack 节点，使实体始终执行站立攻击。",
+  "search_terms": [
+    "自动攻击",
+    "温诺娜弹射器",
+    "大脑",
+    "原地攻击",
+    "行为树",
+    "战斗目标",
+    "防御建筑",
+    "弹射器"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0e5d5c74900118af3330bf3cc7e027076a87cddded7dda70c035c194566ca74e",
+    "source_bytes": 337,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057150946
+  }
+}

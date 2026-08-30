@@ -26,6 +26,12 @@ knowledge sync --old 202604271353 [--new current] [--rescan] [--limit 20]
 
 脏文档按类别分组,调用 `knowledge-scan-symbols --category X --pick-names … --force`(并发 2,LLM);重扫后页面图的刷新由下一次 `knowledge-scan-wiki` 运行完成(两段式约定)。Tier2(按常量差异起草页面表述修订)在 Tier3 报告被人工验证后实施。
 
+## 3.1 v1.1 与 Tier2 实测(2026-08-30)
+
+- **v1.1 已落地**:tuning.lua 新旧树对比(49 项真实变更,如 FUMAROLE 工具组)+ prefab→atlas 变体→pages_by_prefab 页面交叉(166 prefab → 124 页面);`--corpus` 参数启用;
+- **Tier2 `--draft` 已落地**:每带 precise 锚点的脏文档一次 LLM 调用,以页面原文行为 grounding,产出 old/new 句对 + 理由(仅入报告,不写 wiki);
+- **实测发现的重要 caveat**:D1 锚点按数值精确匹配,同值异义常量会造成错锚——模拟 SEE_DIST 30→33 的起草中,猎犬页"群体仇恨 30 单位"实际来自 `prefabs/hound.lua: SHARE_TARGET_DIST=30`(未变更),而真正的 SEE_DIST 锚点句("主动寻找 30 距离单位内的肉类食物")反而可能漏掉。**Tier2 输出必须人工审阅**;改进方向 = 起草 prompt 注入常量的使用上下文(代码引用行)与同值竞争常量提示。
+
 ## 4. 边界与取舍
 
 - tuning.lua / prefab 变更 → 页面的交叉在 v1.1 接入(需要 tuning 表对比与 variant 路由);

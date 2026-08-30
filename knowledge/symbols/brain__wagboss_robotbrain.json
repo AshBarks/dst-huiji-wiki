@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wagboss_robotbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wagboss_robotbrain",
+  "summary": "该大脑控制 Wagboss 机器人在 WagPunk 竞技场中的行为，根据实体是否敌对(hostile)切换不同逻辑。敌对时，若需重置则瞬移回家并停用，否则持续尝试远程攻击与追击，并辅以拴绳与游荡；友好时则自由游荡，并在满足条件后失去控制。",
+  "api": [],
+  "api_note": "该大脑仅通过构造函数调用 Brain._ctor 并复写 OnStart 方法以构建行为树，未定义其他对外调用方法，故无额外 API。",
+  "events_published": [
+    "deactivate",
+    "losecontrol"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置函数(GetHome)",
+        "拴绳最大半径0.2",
+        "内部返回距离0.2"
+      ],
+      "context": "敌对且应重置时(reset分支)"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置函数(GetHome)",
+        "拴绳最大半径6",
+        "内部返回距离2"
+      ],
+      "context": "敌对且非跳跃状态时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "敌对且非跳跃状态时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置函数(GetHome)",
+        "最大游荡距离4",
+        "时间配置(最小走3,随机走0,最小等2.5,随机等0)"
+      ],
+      "context": "敌对且非跳跃状态时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "获取家位置函数(GetHome)",
+        "最大游荡距离6",
+        "时间配置(最小走3,随机走0,最小等2.5,随机等0)"
+      ],
+      "context": "友好状态时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.hostile 为 true",
+      "semantic": "构建敌对行为树：优先处理重置(短拴绳+传送停用)，否则非跳跃时并行远程攻击与追击、中等拴绳、短游荡"
+    },
+    {
+      "condition": "self.inst.hostile 为 false",
+      "semantic": "构建友好行为树：并行执行序列(等待非忙且条件满足后失去控制)与自由游荡"
+    },
+    {
+      "condition": "敌对且 self.inst.shouldreset",
+      "semantic": "使用极短拴绳(0.2,0.2)回家并传送后推送deactivate事件"
+    },
+    {
+      "condition": "敌对且 not self.inst.sg:HasStateTag('jumping')",
+      "semantic": "并行持续尝试远程攻击与追击，失败则Leash(6,2)回家，再失败则Wander(4)"
+    }
+  ],
+  "bt_structure": "敌对根优先节点: [While(shouldreset): 短拴绳+传送停用 > While(非跳跃): 优先[并行(持续远程攻击, 追击失败即止) > 中拴绳(6,2) > 游荡(4)]]; 友好根优先节点: [并行(序列(非忙等待 > (boss败或屏障落或等14秒) > 失控制) , 游荡(6))]",
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      46847,
+      51949,
+      20092,
+      15238,
+      21253,
+      13406,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "友好状态游荡描述",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "战争瓦器人会被激活并四处游荡。"
+          }
+        ]
+      },
+      {
+        "aspect": "敌对状态仇恨与攻击描述",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "启迪战争瓦器人只会主动仇恨竞技场内距其15距离单位内的玩家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "瓦格boss",
+    "机器人脑",
+    "竞技场",
+    "拴绳回家",
+    "远程攻击",
+    "游荡",
+    "重置",
+    "友好状态",
+    "敌对状态",
+    "失控制"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "boss",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8c5a6f4f5206c9c01a019a6a136e7427a7e900ff941a731ccb99859aadf6e7e1",
+    "source_bytes": 2641,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056862514
+  }
+}

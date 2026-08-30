@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/storage_robotbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "storage_robotbrain",
+  "summary": "该大脑用于驱动存储机器人（如温娜存储机器人）在未被占用或破损时自动拾取地面物品并存入合适容器。当电量过低且设有回家模式时，机器人会放弃任务返回出生点待机，并在空闲一段时间后进入睡眠模式。机器人通过共享忽略表避免重复拾取同一物品。",
+  "api": [
+    {
+      "name": "IgnoreItem",
+      "effect": ""
+    },
+    {
+      "name": "UnignoreItem",
+      "effect": ""
+    },
+    {
+      "name": "ShouldIgnoreItem",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "站立的实体(inst)"
+      ],
+      "context": "在空闲并行节点中与等待睡眠序列同时执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "捡取物品动作函数PickUpAction",
+        "动作名\"Pick Up Item\"",
+        "超时参数(true)"
+      ],
+      "context": "最高优先级尝试捡物品"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "存储物品动作函数StoreItemAction",
+        "动作名\"Store Item\"",
+        "超时参数(true)"
+      ],
+      "context": "次优先级尝试存物品"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "回家动作函数GoHomeAction",
+        "动作名\"Return to spawn\"",
+        "超时参数(true)"
+      ],
+      "context": "再次优先级尝试返回出生点"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasAnyStateTag(\"busy\", \"broken\")",
+      "semantic": "大脑运行内部行为树，否则完全无操作"
+    },
+    {
+      "condition": "inst.LOW_BATTERY_GOHOME and inst.components.fueled:GetPercent() < TUNING.WINONA_STORAGE_ROBOT_LOW_FUEL_PCT and StorageRobotCommon.GetSpawnPoint(inst)",
+      "semantic": "PickUpAction/StoreItemAction/GoHomeAction 直接返回nil，暂停对应任务并倾向回家"
+    },
+    {
+      "condition": "item ~= nil and (item.components.stackable == nil or item.components.stackable:IsFull())",
+      "semantic": "PickUpAction 不再寻找新物品拾取"
+    },
+    {
+      "condition": "ParallelNodeAny{ WaitNode(6), ConditionWaitNode(LOW_BATTERY_GOHOME且燃料低于阈值) }",
+      "semantic": "满足后执行ActionNode推送\"sleepmode\"事件使实体睡眠"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25) -> WhileNode(非busy/broken) -> 优先级节点(0.25)[ DoAction(捡物), DoAction(存物), DoAction(回家), ParallelNode( StandStill 并行 SequenceNode( ParallelNodeAny( WaitNode(6), ConditionWaitNode(低电量) ) -> ActionNode(推送sleepmode) ) ) ]",
+  "wiki": {
+    "scanned_pageids": [
+      72392,
+      10418,
+      13437,
+      15022,
+      15737,
+      16637,
+      19097,
+      24364
+    ],
+    "aspects": [
+      {
+        "aspect": "存储物品行为描述",
+        "evidence": [
+          {
+            "pageid": 24364,
+            "quote": "水獭掠夺者会回到窝点储存物品"
+          }
+        ]
+      },
+      {
+        "aspect": "捡取物品行为描述",
+        "evidence": [
+          {
+            "pageid": 72392,
+            "quote": "帮忙捡物品/采集并递给玩家"
+          },
+          {
+            "pageid": 24364,
+            "quote": "当捡起的物品多于 3 个"
+          },
+          {
+            "pageid": 16637,
+            "quote": "自动拾取角色周围 4 距离单位内的一个可堆叠的物品"
+          },
+          {
+            "pageid": 15737,
+            "quote": "自动拾取附近的食物并交给召唤者"
+          }
+        ]
+      },
+      {
+        "aspect": "返回出生点行为描述",
+        "evidence": [
+          {
+            "pageid": 24364,
+            "quote": "水獭掠夺者会回到窝点储存物品"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "捡物品",
+    "存物品",
+    "回出生点",
+    "电量过低",
+    "睡眠模式",
+    "忽略表",
+    "自动拾取",
+    "温娜存储",
+    "回家模式"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5090d960cbc2f89fec434e96c3eba7d6cf41b0a1c9cc26e411af53b541ee644c",
+    "source_bytes": 5430,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056570562
+  }
+}

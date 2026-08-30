@@ -4,12 +4,15 @@
 use crate::error::{Error, Result};
 use crate::knowledge::scan_wiki::PageSymbolMap;
 use crate::service::Reporter;
+use std::collections::BTreeMap;
 use std::path::Path;
 
 pub struct PageAssistParams {
     pub knowledge_dir: String,
-    /// 页面 id(纯数字)或标题(精确匹配)
-    pub page: String,
+    /// 页面 id(纯数字)或标题(精确匹配);--all 时忽略
+    pub page: Option<String>,
+    /// 全库缺口榜:按符号与页面聚合 stub/aspects_ignored,输出 Markdown
+    pub all: bool,
     /// 输出 JSON 而非 Markdown
     pub json: bool,
 }
@@ -19,9 +22,18 @@ pub async fn run_page_assist(
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     let pages_dir = Path::new(&params.knowledge_dir).join("pages");
-    let map = find_map(&pages_dir, &params.page)?
-        .ok_or_else(|| Error::Config(format!("未找到页面 {} 的归因图", params.page)))?;
     let _ = reporter;
+
+    if params.all {
+        print!("{}", render_all_gaps(&pages_dir)?);
+        return Ok(serde_json::json!({ "mode": "page_assist_all" }));
+    }
+
+    let Some(page) = &params.page else {
+        return Err(Error::Config("需要 <page> 参数或 --all".to_string()));
+    };
+    let map = find_map(&pages_dir, page)?
+        .ok_or_else(|| Error::Config(format!("未找到页面 {page} 的归因图")))?;
 
     if params.json {
         let body = serde_json::to_string_pretty(&map)?;
@@ -31,6 +43,79 @@ pub async fn run_page_assist(
 
     print!("{}", render_markdown(&map));
     Ok(serde_json::json!({ "mode": "page_assist", "pageid": map.pageid }))
+}
+
+/// 全库缺口榜:按符号聚合 stub/未覆盖 aspects,按页面聚合缺口规模。
+fn render_all_gaps(pages_dir: &Path) -> Result<String> {
+    #[derive(Default)]
+    struct SymAgg {
+        routed: usize,
+        mentioned: usize,
+        stub: usize,
+        ignored_aspects: usize,
+    }
+    let mut syms: BTreeMap<String, SymAgg> = BTreeMap::new();
+    let mut page_rows: Vec<(i64, String, usize, usize)> = Vec::new();
+    for entry in
+        std::fs::read_dir(pages_dir)?.collect::<std::io::Result<Vec<std::fs::DirEntry>>>()?
+    {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        let Ok(m) = serde_json::from_str::<PageSymbolMap>(
+            &std::fs::read_to_string(&path).unwrap_or_default(),
+        ) else {
+            continue;
+        };
+        let mut page_gaps = 0usize;
+        let mut page_stub = 0usize;
+        for (sym, e) in &m.symbols {
+            let agg = syms.entry(sym.clone()).or_default();
+            agg.routed += 1;
+            if e.mention_source.is_some() {
+                agg.mentioned += 1;
+            } else {
+                if e.detail_level == "stub" {
+                    page_stub += 1;
+                }
+                page_gaps += e.aspects_ignored.len();
+                agg.stub += 1;
+                agg.ignored_aspects += e.aspects_ignored.len();
+            }
+        }
+        page_rows.push((m.pageid, m.title, page_stub, page_gaps));
+    }
+
+    let mut out = String::new();
+    let total_stub: usize = syms.values().map(|a| a.stub).sum();
+    let total_gaps: usize = syms.values().map(|a| a.ignored_aspects).sum();
+    out.push_str("# 全库覆盖缺口榜\n\n");
+    out.push_str(&format!(
+        "页面 {} 个;归因对中 stub {} 个,未覆盖 aspects {} 条。\n\n",
+        page_rows.len(),
+        total_stub,
+        total_gaps
+    ));
+
+    out.push_str("## 符号缺口榜(按未覆盖 aspects 降序,前 20)\n\n");
+    out.push_str("| 符号 | routed | 提及 | stub | 未覆盖 aspects |\n|---|---:|---:|---:|---:|\n");
+    let mut sym_rows: Vec<_> = syms.iter().collect();
+    sym_rows.sort_by_key(|(_, a)| std::cmp::Reverse(a.ignored_aspects));
+    for (sym, a) in sym_rows.iter().take(20) {
+        out.push_str(&format!(
+            "| `{sym}` | {} | {} | {} | {} |\n",
+            a.routed, a.mentioned, a.stub, a.ignored_aspects
+        ));
+    }
+
+    out.push_str("\n## 页面缺口榜(按未覆盖 aspects 降序,前 20)\n\n");
+    out.push_str("| 页面 | pageid | stub 符号 | 未覆盖 aspects |\n|---|---:|---:|---:|\n");
+    page_rows.sort_by_key(|r| std::cmp::Reverse(r.3));
+    for (pid, title, stub, gaps) in page_rows.iter().take(20) {
+        out.push_str(&format!("| {title} | {pid} | {stub} | {gaps} |\n"));
+    }
+    Ok(out)
 }
 
 fn find_map(pages_dir: &Path, page: &str) -> Result<Option<PageSymbolMap>> {

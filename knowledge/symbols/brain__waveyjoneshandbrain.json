@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/waveyjoneshandbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "waveyjoneshandbrain",
+  "summary": "该大脑控制波浪琼斯之手实体在所属船只平台上寻找需要维护的部件。当实体未陷入陷阱状态时，它会优先通过 Dotinker 函数对船帆、锚、补丁、旋转器或火焰进行处理，否则保持静止。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "DOTINKER_CAN_HAVE",
+    "wandertimes"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "根子节点表包含 IfNode",
+        "优先级权重 0.25"
+      ],
+      "context": "行为树根节点"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "实体未处于 trapped 状态标签",
+        "条件标识 not trapped",
+        "子优先级节点"
+      ],
+      "context": "根节点下条件判断"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点表包含 DoAction 与 StandStill",
+        "优先级权重 0.25"
+      ],
+      "context": "not trapped 分支内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行 Dotinker 函数寻找并处理船只部件",
+        "行为标识 tinker",
+        "允许立即更新"
+      ],
+      "context": "实体未处于 trapped 状态时"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "Dotinker 未返回动作时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.components.timer 存在 reactiondelay 计时器",
+      "semantic": "Dotinker 函数直接返回 nil，不寻找目标"
+    },
+    {
+      "condition": "未处于 trapped 状态标签 (sg:HasStateTag)",
+      "semantic": "执行 Dotinker 或 StandStill 分支"
+    },
+    {
+      "condition": "patchcheck(target) 且船上玩家最低 sanity <= 0.25",
+      "semantic": "返回 UNPATCH 动作移除船只补丁"
+    },
+    {
+      "condition": "anchorcheck(target) 为真",
+      "semantic": "返回 RAISE_ANCHOR 动作升起船锚"
+    },
+    {
+      "condition": "rotatorcheck(target) 为真",
+      "semantic": "随机返回 ROTATE_BOAT_CLOCKWISE 或 ROTATE_BOAT_COUNTERCLOCKWISE 旋转船只"
+    },
+    {
+      "condition": "mastcheck(target) 为真",
+      "semantic": "返回 RAISE_SAIL 动作升起船帆"
+    },
+    {
+      "condition": "firecheck(target) 为真 或 (fuelcheck(target) 且 sanity <= 0.5)",
+      "semantic": "返回 EXTINGUISH 动作灭火"
+    }
+  ],
+  "bt_structure": "根 PriorityNode(权重0.25) 包含 IfNode(未trapped) 其内 PriorityNode(权重0.25) 按顺序尝试 DoAction(Dotinker) 与 StandStill。",
+  "search_terms": [
+    "升帆",
+    "转船",
+    "灭火",
+    "波浪琼斯之手",
+    "修船",
+    "起锚",
+    "补丁"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 1/7)",
+  "gameplay_tags": [
+    "建造",
+    "生存",
+    "航海"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37b22fcc90d9dc2568c1e23cceea19abc61c35d227dd814d971f0ad5ccfddeaa",
+    "source_bytes": 4900,
+    "model": "hy3-free",
+    "generated_at_ms": 1788057165946
+  }
+}

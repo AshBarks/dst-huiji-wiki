@@ -216,7 +216,9 @@ pub enum JobKind {
     PageAssist {
         #[serde(default = "default_knowledge_dir")]
         knowledge_dir: String,
-        page: String,
+        page: Option<String>,
+        #[serde(default)]
+        all: bool,
         #[serde(default)]
         json: bool,
     },
@@ -236,6 +238,9 @@ pub enum JobKind {
         /// 语料根目录;提供则启用 prefab→页面交叉
         #[serde(default)]
         corpus: Option<String>,
+        /// Tier2:起草页面修订建议(需 corpus + LLM)
+        #[serde(default)]
+        draft: bool,
     },
     /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
     KnowledgeScanWiki {
@@ -511,6 +516,7 @@ async fn execute_job_inner(
             rescan,
             limit,
             corpus,
+            draft,
         } => {
             crate::knowledge::run_knowledge_sync(
                 &crate::knowledge::SyncParams {
@@ -520,6 +526,7 @@ async fn execute_job_inner(
                     rescan: *rescan,
                     limit: *limit,
                     corpus: corpus.clone(),
+                    draft: *draft,
                 },
                 reporter,
             )
@@ -528,12 +535,14 @@ async fn execute_job_inner(
         JobKind::PageAssist {
             knowledge_dir,
             page,
+            all,
             json,
         } => {
             crate::knowledge::run_page_assist(
                 &crate::knowledge::PageAssistParams {
                     knowledge_dir: knowledge_dir.clone(),
                     page: page.clone(),
+                    all: *all,
                     json: *json,
                 },
                 reporter,

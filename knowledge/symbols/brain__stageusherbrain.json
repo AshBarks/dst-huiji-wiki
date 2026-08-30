@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/stageusherbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "stageusherbrain",
+  "summary": "该大脑控制舞台引座员在站立状态下进行战斗、返回出生点或游荡。当实体生命过低时放弃战斗，无战斗目标时尝试走回出生点并在超时后坐下，否则自由游荡。非站立状态时则保持静止不动。",
+  "api": [],
+  "api_note": "该大脑仅重写了Brain的OnInitializationComplete与OnStart生命周期方法，未定义可供外部组件或玩家调用的公开方法。",
+  "events_published": [
+    "sitdown"
+  ],
+  "events_listened": [
+    "minhealth"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PRIORITY_NODE_RATE",
+    "MAX_CHASE_DIST",
+    "RETURN_TO_SPAWN_TIMEOUT"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长时间无限制（nil）",
+        "放弃距离为 MAX_CHASE_DIST（3*攻击范围）"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取动作为 WalkHomeAction（走回出生点）",
+        "节点调试名称为 Return To Spawn",
+        "以步行（非奔跑）方式执行动作",
+        "动作超时时间为 RETURN_TO_SPAWN_TIMEOUT+2 秒（17秒）"
+      ],
+      "context": "无战斗目标时并行执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "无家位置限制（nil）",
+        "离家最大距离无限制（nil）"
+      ]
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "当实体不在站立状态时执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst:IsStanding()",
+      "semantic": "执行站立子树：包含低血量事件处理、追击、无目标回家/坐下、游荡"
+    },
+    {
+      "condition": "not self.inst.components.combat:HasTarget()",
+      "semantic": "无战斗目标时，并行尝试走回出生点或等待超时后坐下，并自由游荡"
+    },
+    {
+      "condition": "事件 minhealth",
+      "semantic": "生命过低时并行执行放弃战斗与等待3秒"
+    },
+    {
+      "condition": "inst.sg:HasStateTag(\"busy\")",
+      "semantic": "状态繁忙时不返回走回家动作，导致回家行为跳过"
+    }
+  ],
+  "bt_structure": "根优先级节点：若实体处于站立状态(IsStanding)则进入站立子树（优先级：监听minhealth事件放弃战斗并等待 -> 追击(放弃距离MAX_CHASE_DIST) -> 无目标时并行回家动作或超时坐下 -> 自由游荡）；否则执行StandStill保持静止。",
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      15022,
+      15238,
+      16174
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面中仅16174实体为stageusher，但其摘录仅含intro及掉落/锤击间隔碎片，未描述追击、走回出生点、游荡或站立等行为；15022、15238、18572页面实体分别为天体英雄、皮弗娄牛、温度机制，未体现stageusherbrain代码清单中的MAX_CHASE_DIST、RETURN_TO_SPAWN_TIMEOUT、ChaseAndAttack、WalkHomeAction、Wander、StandStill等语义，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "引座员",
+    "生命过低",
+    "放弃战斗",
+    "返回出生点",
+    "超时坐下",
+    "自由游荡",
+    "静止不动",
+    "站立状态"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "巡逻",
+    "舞台NPC"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c3bd985061cac029c36347213819ffa5355bf84e2279972664176d338ec7ef23",
+    "source_bytes": 2308,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056494898
+  }
+}

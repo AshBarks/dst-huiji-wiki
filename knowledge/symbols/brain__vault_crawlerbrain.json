@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/vault_crawlerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "vault_crawlerbrain",
+  "summary": "该大脑控制 Vault Crawler 实体在未被标记为隐藏状态时，优先追击并攻击目标，若无目标则在记录的出生点附近游荡。实体初始化时将当前位置记为出生点（spawnpoint），作为游荡中心。处于隐藏状态时行为树不执行任何子节点。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 方法以构建行为树和记录出生点，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "当实体未处于'hiding'状态标签时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家位置函数（返回已知位置'spawnpoint'）",
+        "离家最大距离8",
+        "游荡时间配置表（最小行走2秒，随机行走1.5秒，最小等待2.5秒，随机等待2秒）"
+      ],
+      "context": "当实体未处于'hiding'状态标签时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg and not self.inst.sg:HasStateTag('hiding')",
+      "semantic": "执行内部优先级节点：先尝试 ChaseAndAttack，失败则 Wander 于出生点周围"
+    },
+    {
+      "condition": "HasStateTag('hiding') 或 sg 不存在",
+      "semantic": "WhileNode 条件不满足，内部行为不执行，实体无大脑驱动动作"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.5) -> WhileNode(条件:非隐藏状态) -> 优先级节点(0.5) [ ChaseAndAttack, Wander(家位置,最大距离8,时间参数) ]",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15973,
+      72981,
+      13476,
+      13701,
+      17816,
+      22516,
+      24540
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录（页15022、15973、72981、13476、13701、17816、22516、24540）涉及的实体与机制均未提及'hiding'状态、'spawnpoint'家位置、离家最大距离8、游荡时间配置或条件追击等 vault_crawlerbrain 能力表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "爬行者",
+    "大脑",
+    "追击",
+    "出生点",
+    "游荡",
+    "隐藏",
+    "行为树",
+    "优先级",
+    "状态标签"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4990fe850b797331fc85fa67866b487eea602a4d8d9a119524583d6aaee401e5",
+    "source_bytes": 917,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056751791
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/savedrotation.lua"
+  },
+  "category": "component",
+  "display_name": "savedrotation",
+  "summary": "SavedRotation组件用于管理实体的旋转角度数据，以确保在游戏保存和加载过程中实体朝向正确。它主要参与实体的保存和加载流程，特别适用于在旋转平台（如船）上放置物体时保持其正确朝向。组件通过延迟任务处理确保加载后旋转被正确应用。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "获取实体当前旋转角度，如果角度不为0，则返回一个包含rotation字段的表；否则返回nil。无副作用。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "从data参数中读取rotation值（默认为0），并直接设置实体旋转。如果self.dodelayedpostpassapply为true，则调用ApplyPostPassRotation方法延迟设置旋转。副作用：直接改变实体旋转。"
+    },
+    {
+      "name": "ApplyPostPassRotation",
+      "effect": "延迟0秒后设置实体旋转为指定角度。副作用：延迟改变实体旋转。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      13606,
+      21432,
+      18843,
+      24589,
+      18001,
+      15015,
+      24090
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未提及与旋转保存、加载或应用相关的任何能力描述；所有摘录集中于实体行为、掉落和生成等游戏玩法方面，无涉及底层代码组件的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "旋转角度保存",
+    "实体朝向加载",
+    "船载物体旋转",
+    "放置旋转保存",
+    "延迟旋转加载",
+    "游戏保存朝向",
+    "实体旋转数据",
+    "旋转应用延迟"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "建造",
+    "放置"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
+    "source_bytes": 885,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086474127
+  }
+}

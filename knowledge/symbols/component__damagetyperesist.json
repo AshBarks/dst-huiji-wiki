@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/damagetyperesist.lua"
+  },
+  "category": "component",
+  "display_name": "damagetyperesist",
+  "summary": "该组件管理基于标签的伤害抗性数据，通过SourceModifierList存储每个标签的抗性修改器。它允许为不同伤害类型添加或移除抗性，并在战斗中根据攻击者或武器的标签计算总抗性乘数，从而影响实体受到的伤害值。",
+  "api": [
+    {
+      "name": "AddResist",
+      "effect": "添加指定标签的抗性修改器。如果标签不存在，则创建新的SourceModifierList。参数tag为伤害类型标签，src为来源，pct为抗性百分比乘数，key为标识符。副作用：可能创建新的标签条目或更新现有修改器。"
+    },
+    {
+      "name": "RemoveResist",
+      "effect": "移除指定标签的抗性修改器。参数tag为伤害类型标签，src为来源，key为标识符。副作用：如果修改器变空，则删除该标签条目。"
+    },
+    {
+      "name": "GetResistForTag",
+      "effect": "查询指定标签的当前抗性值。参数tag为伤害类型标签，返回抗性乘数，如果标签不存在则返回默认值1。无副作用。"
+    },
+    {
+      "name": "GetResist",
+      "effect": "根据攻击者或武器的标签计算总抗性乘数。参数attacker为攻击者实体，weapon为武器实体。如果攻击者为nil，则返回1。遍历所有标签，若攻击者或武器具有该标签，则乘上对应抗性值。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "生成调试信息字符串，显示所有标签及其当前抗性值。无副作用。"
+    }
+  ],
+  "api_note": "该组件提供公开的抗性管理方法，用于战斗系统中的伤害计算。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      20150,
+      13409,
+      16419,
+      15022,
+      15922,
+      20719,
+      24866
+    ],
+    "aspects": [
+      {
+        "aspect": "电路板技能物理伤害减免效果",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "每激活一个，都会提供 2.5% 的物理伤害减免"
+          },
+          {
+            "pageid": 20719,
+            "quote": "提供少量物理伤害减免"
+          }
+        ]
+      },
+      {
+        "aspect": "装备伤害减免能力",
+        "evidence": [
+          {
+            "pageid": 13409,
+            "quote": "战斗头盔可以提供 80% 的伤害减免"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "伤害抗性",
+    "伤害减免",
+    "伤害类型",
+    "伤害标签",
+    "伤害计算",
+    "敌人标签",
+    "武器伤害",
+    "抗性系数"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+    "source_bytes": 1226,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085937489
+  }
+}

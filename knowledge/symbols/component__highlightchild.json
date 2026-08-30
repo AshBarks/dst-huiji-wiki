@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/highlightchild.lua"
+  },
+  "category": "component",
+  "display_name": "highlightchild",
+  "summary": "该组件用于管理实体的高亮显示子组件，通过与拥有者关联来同步高亮状态。它处理网络同步，并维护一个高亮子组件列表，以提供视觉反馈。核心玩法涉及在客户端显示实体的选中或目标高亮效果，常用于战斗或交互指示。",
+  "api": [
+    {
+      "name": "SetOwner",
+      "effect": "设置实体的拥有者。如果网络存在，同步拥有者；在非专用服务器上，更新实体的高亮颜色和拥有者的高亮子组件列表；调用设置的回调函数（如果有）。"
+    },
+    {
+      "name": "SetOnChangeOwnerFn",
+      "effect": "设置一个回调函数，当拥有者变化时调用。"
+    },
+    {
+      "name": "OnChangeOwner",
+      "effect": "处理拥有者变化。在非专用服务器上，清除旧拥有者的高亮并更新列表；设置新拥有者并添加到列表；调用回调函数。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，从拥有者的高亮子组件列表中移除自己。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "syncownerdirty"
+  ],
+  "netvars": [
+    "syncowner"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      13823,
+      20714,
+      16419,
+      13897,
+      19297,
+      19761
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏物品、生物行为、伤害数值和控制台命令，未提及组件系统中的所有者设置、所有者更改函数或实体移除事件，与代码能力清单无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "高亮",
+    "子组件",
+    "拥有者",
+    "同步",
+    "视觉效果",
+    "选中",
+    "目标",
+    "网络"
+  ],
+  "gameplay_tags": [
+    "视觉效果",
+    "网络同步",
+    "实体管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "151e60b6a21f45cd11aef0db4be7aeb52505c8929a8464b21105f232fdad440b",
+    "source_bytes": 1475,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086716250
+  }
+}

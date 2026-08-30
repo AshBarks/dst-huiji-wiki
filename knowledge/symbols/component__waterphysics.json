@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/waterphysics.lua"
+  },
+  "category": "component",
+  "display_name": "waterphysics",
+  "summary": "WaterPhysics 组件管理实体在水中的物理属性，主要存储反弹系数等数据，用于水体交互相关的游戏机制。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16185,
+      51136,
+      13779,
+      13606,
+      19222,
+      20842,
+      65605,
+      51524
+    ],
+    "aspects": [
+      {
+        "aspect": "平台移动与登台机制",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "当在漂浮平台附近时，玩家可以通过直接地移动来跳过水面，登上或离开漂浮平台。"
+          }
+        ]
+      },
+      {
+        "aspect": "溺水时浮动装置保护",
+        "evidence": [
+          {
+            "pageid": 51136,
+            "quote": "溺水时，若物品栏中有个人漂浮装置...则玩家强制掉落手部装备，将个人漂浮装置装备于手部"
+          }
+        ]
+      },
+      {
+        "aspect": "漩涡传送平台能力",
+        "evidence": [
+          {
+            "pageid": 20842,
+            "quote": "玩家可以通过投掷出逃腿靴来产生一对可以传送漂浮平台的漩涡。"
+          }
+        ]
+      },
+      {
+        "aspect": "生成空间限制规则",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "若生成点被漂浮平台阻挡，则不会生成。"
+          }
+        ]
+      },
+      {
+        "aspect": "碰撞伤害吸收功能",
+        "evidence": [
+          {
+            "pageid": 19222,
+            "quote": "保险杠是能替漂浮平台受到碰撞伤害从而保护漂浮平台本身。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "游泳",
+    "漂浮",
+    "浮力",
+    "水中移动",
+    "水交互",
+    "水中物理",
+    "物理属性"
+  ],
+  "search_terms_note": "pass1 后零命中 5/7,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "物理",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
+    "source_bytes": 128,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086133882
+  }
+}

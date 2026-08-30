@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/reticule.lua"
+  },
+  "category": "component",
+  "display_name": "reticule",
+  "summary": "Reticule组件管理游戏中目标选择时的瞄准圈，包括创建、销毁、位置更新和颜色变化。它处理鼠标和控制器输入，支持双摇杆模式，并提供闪烁效果以指示瞄准状态。核心玩法涉及玩家使用控制器或鼠标进行精确目标选择，如攻击敌人或放置建筑。",
+  "api": [
+    {
+      "name": "CreateReticule",
+      "effect": "创建瞄准圈实体并设置输入监听。如果启用鼠标且未连接控制器，监听鼠标移动更新目标位置；否则使用目标函数。初始化颜色为无效状态，重置闪烁，并监听相机更新以持续调整位置。"
+    },
+    {
+      "name": "DestroyReticule",
+      "effect": "销毁瞄准圈实体，移除输入监听，重置闪烁状态，并停止监听相机更新。"
+    },
+    {
+      "name": "PingReticuleAt",
+      "effect": "在指定位置生成一个ping效果实体（使用预设prefab）。如果位置是动态位置，处理平台父子关系。设置ping实体的颜色和位置，支持自定义位置更新函数。"
+    },
+    {
+      "name": "Blip",
+      "effect": "使瞄准圈闪烁：将闪烁透明度重置为0并启动组件更新，逐渐恢复透明度以产生闪烁视觉效果。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新闪烁效果：增加闪烁透明度直到达到最大值，然后停止更新。同时更新瞄准圈颜色以反映透明度变化。"
+    },
+    {
+      "name": "UpdateColour",
+      "effect": "更新瞄准圈颜色：根据当前颜色、淡入淡出透明度和闪烁透明度计算最终颜色，并应用到瞄准圈及其子实体。"
+    },
+    {
+      "name": "UpdatePosition",
+      "effect": "更新瞄准圈位置：根据目标位置、可通行性检查（参考aoetargeting组件）和有效性函数确定颜色（有效为橙色，无效为红色）。支持平滑移动（缓动），并应用自定义位置更新函数。同时更新颜色。"
+    },
+    {
+      "name": "OnCameraUpdate",
+      "effect": "处理相机更新时的位置调整：如果启用鼠标，更新目标位置并淡入淡出瞄准圈；如果启用双摇杆模式，根据模式更新目标位置；否则使用目标函数更新。始终调用UpdatePosition进行位置更新。"
+    },
+    {
+      "name": "IsTwinStickAiming",
+      "effect": "返回是否处于双摇杆瞄准模式：检查twinstickmode是否设置、无鼠标监听、有目标函数且瞄准圈存在。"
+    },
+    {
+      "name": "UpdateTwinStickMode1",
+      "effect": "更新双摇杆模式1：根据控制器摇杆输入计算偏移量，相对于屏幕旋转并限制在范围内。当偏移超过死区时启用覆盖，并应用自定义目标函数。"
+    },
+    {
+      "name": "UpdateTwinStickMode2",
+      "effect": "更新双摇杆模式2：根据控制器摇杆输入计算方向，归一化并旋转到屏幕坐标，从自动目标点线性插值到范围边缘。当摇杆超过死区时启用覆盖，并应用自定义目标函数。"
+    },
+    {
+      "name": "ClearTwinStickOverrides",
+      "effect": "清除双摇杆覆盖状态：重置覆盖标志和偏移变量，恢复默认目标位置。"
+    },
+    {
+      "name": "ShouldHide",
+      "effect": "返回是否应隐藏瞄准圈：通过自定义shouldhide函数判断，如果函数未定义则返回false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      10374,
+      21291,
+      24196,
+      61869,
+      24589,
+      14814,
+      24881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有涉及 component__reticule 的任何能力表达，所有内容都与 reticule 组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "瞄准圈",
+    "目标选取",
+    "控制器操作",
+    "鼠标指向",
+    "有效区域",
+    "闪烁状态",
+    "双摇杆",
+    "镜头跟随",
+    "标记点"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "战斗",
+    "建造",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "388e612488b82e7fb0d430aab94edf25e4f305cd610f7cc5d5fbc040dbb0ce01",
+    "source_bytes": 12244,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086593078
+  }
+}

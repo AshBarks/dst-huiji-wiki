@@ -1,0 +1,161 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/complexprojectile.lua"
+  },
+  "category": "component",
+  "display_name": "complexprojectile",
+  "summary": "该组件管理具有复杂抛物线轨迹的投射物（如投掷武器、魔法弹）的飞行数据与物理行为。它负责计算发射角度、模拟飞行中的重力影响，并处理命中或落地后的逻辑。组件通过标签`complexprojectile`与`projectile`标识，且与`projectile`组件互斥。",
+  "api": [
+    {
+      "name": "SetHorizontalSpeed",
+      "effect": "设置投射物飞行的水平方向恒定速度。"
+    },
+    {
+      "name": "SetHorizontalSpeedForDistance",
+      "effect": "根据期望的水平飞行距离，自动计算并设置能满足该距离的最小水平速度（若无法达到则使用回退值）。"
+    },
+    {
+      "name": "SetGravity",
+      "effect": "设置投射物飞行时受到的重力加速度（通常为负值）。"
+    },
+    {
+      "name": "SetLaunchOffset",
+      "effect": "设置发射点相对于实体自身位置的偏移量（X轴为朝向，Y轴为高度）。"
+    },
+    {
+      "name": "SetTargetOffset",
+      "effect": "设置目标点（或最终着陆点）相对于地面（Y=0）的高度偏移。"
+    },
+    {
+      "name": "SetOnLaunch",
+      "effect": "设置发射时的回调函数，函数在轨迹计算完成后、飞行开始前被调用。"
+    },
+    {
+      "name": "SetOnHit",
+      "effect": "设置命中目标或落地时的回调函数，函数在飞行被取消后调用。"
+    },
+    {
+      "name": "SetOnUpdate",
+      "effect": "设置每帧更新的回调函数，若返回`true`则本次更新跳过默认物理逻辑。"
+    },
+    {
+      "name": "CalculateMinimumSpeedForDistance",
+      "effect": "根据发射和目标高度偏移，计算以当前重力达到指定水平距离所需的最小初始速度。若无法达到则返回`nil`。"
+    },
+    {
+      "name": "Launch",
+      "effect": "核心方法：启动投射物的抛物线飞行。计算从当前发射位置到目标位置的轨迹，并设置初始速度向量。会考虑攻击者所在移动平台的继承速度。添加`activeprojectile`标签并开始更新。"
+    },
+    {
+      "name": "Hit",
+      "effect": "处理命中事件：停止飞行，移除`activeprojectile`标签，重置物理状态，并调用`onhitfn`回调。若无目标则视为落地。"
+    },
+    {
+      "name": "Cancel",
+      "effect": "立即取消飞行：移除`activeprojectile`标签，停止组件更新，将速度和物理速度归零并停止物理模拟。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      14792,
+      18188,
+      15903,
+      15922,
+      35790,
+      15022,
+      18211
+    ],
+    "aspects": [
+      {
+        "aspect": "大炮射程与发射后坐力效果",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "大炮的射程为 11 距离单位"
+          },
+          {
+            "pageid": 18188,
+            "quote": "大炮发射后会提供与发射方向相反的后坐力使船移动。"
+          }
+        ]
+      },
+      {
+        "aspect": "弹弓弹药飞行速度与最大距离标注",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "所有发射的弹弓弹药的基础飞行速度为 25，在消失前最远可飞行 30 距离单位。"
+          }
+        ]
+      },
+      {
+        "aspect": "弹弓皮筋对飞行速度的倍率调整",
+        "evidence": [
+          {
+            "pageid": 35790,
+            "quote": "发射出的子弹飞行速度×1.1"
+          }
+        ]
+      },
+      {
+        "aspect": "投掷技能发射与命中伤害",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "投掷：右键选定方向施放，将露西斧扔出去。对命中的敌人造成 30 点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "炮弹伤害类型说明",
+        "evidence": [
+          {
+            "pageid": 18211,
+            "quote": "炮弹本身没有伤害，但是由大炮发射的发射的炮弹具有两种伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "雪球发射器发射与作用范围描述",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "开启的雪球发射器能够发射雪球扑灭 15 距离单位内所有火焰和闷烧的实体"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "抛物线",
+    "弹道",
+    "飞行物",
+    "投掷",
+    "投射物",
+    "重力",
+    "发射",
+    "命中",
+    "projectile",
+    "complex"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
+    "source_bytes": 6326,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085792761
+  }
+}

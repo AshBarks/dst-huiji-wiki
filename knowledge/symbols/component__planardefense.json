@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/planardefense.lua"
+  },
+  "category": "component",
+  "display_name": "planardefense",
+  "summary": "planardefense组件用于管理实体的防御值，支持基础防御和外部修饰符。它通过乘法和加法修饰符调整最终防御，参与游戏的战斗系统，影响实体受到的平面伤害减免。",
+  "api": [
+    {
+      "name": "SetBaseDefense",
+      "effect": "设置组件的基础防御值。"
+    },
+    {
+      "name": "GetBaseDefense",
+      "effect": "返回当前的基础防御值。"
+    },
+    {
+      "name": "GetDefense",
+      "effect": "根据基础防御和外部修饰符计算并返回总防御值。"
+    },
+    {
+      "name": "AddMultiplier",
+      "effect": "添加或设置乘法修饰符，影响总防御的乘数部分。"
+    },
+    {
+      "name": "RemoveMultiplier",
+      "effect": "移除指定的乘法修饰符。"
+    },
+    {
+      "name": "GetMultiplier",
+      "effect": "返回当前所有乘法修饰符的总乘数值。"
+    },
+    {
+      "name": "AddBonus",
+      "effect": "添加或设置加法修饰符，影响总防御的加成部分。"
+    },
+    {
+      "name": "RemoveBonus",
+      "effect": "移除指定的加法修饰符。"
+    },
+    {
+      "name": "GetBonus",
+      "effect": "返回当前所有加法修饰符的总加成值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，包含基础防御、乘数和加成的详细信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      17980,
+      14907,
+      14936,
+      14710,
+      14799,
+      15587,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害减免描述",
+        "evidence": [
+          {
+            "pageid": 14907,
+            "quote": "伤害减免 50%"
+          }
+        ]
+      },
+      {
+        "aspect": "减伤百分比",
+        "evidence": [
+          {
+            "pageid": 15587,
+            "quote": "获得 95% 的减伤"
+          }
+        ]
+      },
+      {
+        "aspect": "击飞抵御行为",
+        "evidence": [
+          {
+            "pageid": 14799,
+            "quote": "可以抵御击飞，将其变为击退"
+          }
+        ]
+      },
+      {
+        "aspect": "基础防御增加",
+        "evidence": [
+          {
+            "pageid": 14936,
+            "quote": "+100%基础防御"
+          }
+        ]
+      },
+      {
+        "aspect": "物理伤害减免",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "每激活一个，都会提供 2.5% 的物理伤害减免"
+          }
+        ]
+      },
+      {
+        "aspect": "防御百分比提供",
+        "evidence": [
+          {
+            "pageid": 17980,
+            "quote": "缩壳时，蜗壳护甲会提供 100% 的防御"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "护甲",
+    "伤害减免",
+    "防御力",
+    "基础防御",
+    "外部加成",
+    "百分比加成",
+    "固定加成",
+    "战斗机制",
+    "特殊防御",
+    "平面伤害"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "战斗",
+    "防御"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ce1136a734d94897c73a3b2d89ccafacbe87662d3b37d9bbf568fe7a68fc4dee",
+    "source_bytes": 1633,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086303591
+  }
+}

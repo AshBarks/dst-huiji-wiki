@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/snowmandecor.lua"
+  },
+  "category": "component",
+  "display_name": "snowmandecor",
+  "summary": "SnowmanDecor 组件仅持有实体实例的引用，未定义任何数据或行为。可能在外部系统（如 componentactions.lua）中注册动作以实现装饰功能，但组件本身无具体逻辑。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      13493,
+      20438,
+      10355,
+      13437,
+      13779,
+      14579,
+      15295
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及component__snowmandecor或与之直接相关的雪人装饰能力表达，页面内容主要涉及其他冬季装饰品、角色、生物和实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "雪人",
+    "装饰",
+    "组件",
+    "雪人装饰",
+    "装饰物",
+    "snowman",
+    "decor",
+    "标记",
+    "装饰组件",
+    "DST"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2ce33cc33d748750ad7ba32b6fcc29afe81f23abef76f901a731621a079a8999",
+    "source_bytes": 145,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086109117
+  }
+}

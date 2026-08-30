@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/waterproofer.lua"
+  },
+  "category": "component",
+  "display_name": "waterproofer",
+  "summary": "该组件管理实体的防水能力数据，核心是 effectiveness 属性控制防水强度。它通过添加 waterproofer 标签标识实体，并调整库存物品的湿度状态。参与防雨、物品保护等生存玩法。",
+  "api": [
+    {
+      "name": "GetEffectiveness",
+      "effect": "返回当前的防水效果值，无副作用。"
+    },
+    {
+      "name": "SetEffectiveness",
+      "effect": "设置防水效果值为 val，无其他副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除 waterproofer 标签并启用库存物品的湿度。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      16419,
+      19129,
+      20704,
+      15539,
+      13268,
+      28744,
+      18359
+    ],
+    "aspects": [
+      {
+        "aspect": "防水效果对潮湿速率的影响",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "天气潮湿速率：下雨导致的潮湿度上升速率，受[[#防水和防雨|防雨效果]]影响。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "装备/防水",
+      "分类:防水物品"
+    ],
+    "code_fields": [
+      "waterproofer"
+    ],
+    "overridable_fields": [],
+    "note": "GetEffectiveness() 百分比;仅在同时有 equippable_equipslot 时显示(该组件也用于让物品自身不可潮湿,如噩梦燃料、冰帽)。"
+  },
+  "search_terms": [
+    "防水",
+    "干燥",
+    "湿度",
+    "保护",
+    "雨水",
+    "物品",
+    "效果",
+    "组件",
+    "标签"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "防护"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46",
+    "source_bytes": 713,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086045014
+  }
+}

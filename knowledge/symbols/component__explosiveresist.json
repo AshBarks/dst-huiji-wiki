@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/explosiveresist.lua"
+  },
+  "category": "component",
+  "display_name": "explosiveresist",
+  "summary": "该组件管理实体的爆炸抗性，抗性值在0到1之间。当实体受到爆炸伤害时，抗性会增加，并随时间逐渐衰减，从而提供对后续爆炸伤害的抵抗能力。",
+  "api": [
+    {
+      "name": "OnExplosiveDamage",
+      "effect": "如果伤害值大于0，重置衰减延迟为decaydelay，并增加抗性，增加量为damage除以maxresistdamage，可能导致抗性超过0后启动组件更新。"
+    },
+    {
+      "name": "GetResistance",
+      "effect": "返回self.resistance的值，无副作用。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "调用SetResistance设置新的抗性值为当前抗性加delta，可能触发更新或停止。"
+    },
+    {
+      "name": "SetResistance",
+      "effect": "将抗性值限制在0到1之间，如果抗性大于0则启动组件更新，否则停止更新并重置延迟。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "如果dt小于delayremaining，则减少延迟；否则抗性衰减dt除以decaytime，可能改变抗性值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "如果抗性大于等于0.01，返回包含resistance（整数形式）的表，否则返回nil，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "如果data和data.resistance存在，设置抗性值为data.resistance乘以0.01。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的字符串显示当前抗性值，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "EXPLOSIVE_MAX_RESIST_DAMAGE",
+    "EXPLOSIVE_RESIST_DECAY_TIME",
+    "EXPLOSIVE_RESIST_DECAY_DELAY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      35216,
+      13260,
+      22181,
+      23924,
+      51046,
+      13606,
+      13698,
+      13700
+    ],
+    "aspects": [
+      {
+        "aspect": "爆炸抗性的触发机制描述",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "灵魂诱饵的伤害会触发并应用[[爆炸抗性]]。"
+          },
+          {
+            "pageid": 22181,
+            "quote": "尽管灵魂穿刺伤害不属于[[爆炸|爆炸伤害]]，但依旧会触发并应用爆炸抗性。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:爆炸抗性"
+    ],
+    "code_fields": [
+      "explosiveresist"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
+  "search_terms": [
+    "爆炸抗性",
+    "抗性衰减",
+    "爆炸伤害",
+    "抗性提升",
+    "爆炸抗性值",
+    "伤害抵御",
+    "爆炸减伤",
+    "抗性控制"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
+    "source_bytes": 1632,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086814960
+  }
+}

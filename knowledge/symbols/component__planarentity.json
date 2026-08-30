@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/planarentity.lua"
+  },
+  "category": "component",
+  "display_name": "planarentity",
+  "summary": "PlanarEntity组件管理实体的平面伤害机制，包括伤害吸收计算和攻击抵抗时的视觉效果生成。它参与战斗系统，为具有平面属性的攻击提供特殊处理，增强游戏中的伤害抵抗体验。",
+  "api": [
+    {
+      "name": "AbsorbDamage",
+      "effect": "接收伤害、攻击者、武器和伤害详情(spdmg)，将伤害值调整为(sqrt(damage*4+64)-8)*4。如果spdmg为nil或无planar属性，则调用OnResistNonPlanarAttack生成抵抗视觉效果。返回调整后的伤害值和spdmg。"
+    },
+    {
+      "name": "OnResistNonPlanarAttack",
+      "effect": "当抵抗非平面攻击时触发，生成'planar_resist_fx'视觉效果。效果位置基于攻击者位置和实体半径随机计算，在实体周围设置。"
+    },
+    {
+      "name": "OnPlanarAttackUndefended",
+      "effect": "当平面攻击未被防御时触发，生成'planar_hit_fx'视觉效果并设置为目标(target)的子实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      20150,
+      15022,
+      16419,
+      47010,
+      65881,
+      14688,
+      15054
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，没有文本直接或间接描述位面实体组件的能力（如吸收伤害、抵抗非位面攻击、未防御的位面攻击）。页面主要讨论伤害计算机制、盔甲防御、其他物品或无关内容，未涉及位面实体的行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:位面实体抵抗"
+    ],
+    "code_fields": [
+      "planarentity"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
+  "search_terms": [
+    "平面伤害机制",
+    "伤害吸收",
+    "攻击抵抗",
+    "视觉效果",
+    "战斗系统",
+    "平面属性",
+    "伤害抵抗",
+    "抵抗特效",
+    "平面攻击",
+    "伤害计算"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 7/10)",
+  "gameplay_tags": [
+    "战斗",
+    "伤害抵抗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
+    "source_bytes": 1229,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085692617
+  }
+}

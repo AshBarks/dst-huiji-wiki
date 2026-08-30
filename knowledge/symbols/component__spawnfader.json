@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spawnfader.lua"
+  },
+  "category": "component",
+  "display_name": "spawnfader",
+  "summary": "SpawnFader 组件管理实体生成时的淡入淡出视觉效果，通过网络变量同步客户端与服务器的动画状态。它在动画过程中添加 NOCLICK 标签防止玩家交互，并在淡入或淡出完成时发布相应事件，用于生成过程的平滑过渡。",
+  "api": [
+    {
+      "name": "FadeIn",
+      "effect": "启动淡入动画：在主服务器同步网络变量设置淡入状态，本地设置动画值为1，添加NOCLICK标签禁止点击，并开始更新动画使实体逐渐显示。动画完成时发布'spawnfaderin'事件。"
+    },
+    {
+      "name": "FadeOut",
+      "effect": "启动淡出动画：在主服务器同步网络变量设置淡出状态，本地设置动画值为1，添加NOCLICK标签禁止点击，并开始更新动画使实体逐渐消失。动画完成时发布'spawnfaderout'事件。"
+    },
+    {
+      "name": "Cancel",
+      "effect": "取消当前淡入淡出动画：如果正在更新，则重置动画值为0并立即调用更新函数以停止动画和移除相关标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "spawnfaderin",
+    "spawnfaderout"
+  ],
+  "events_listened": [
+    "fadedirty",
+    "death"
+  ],
+  "netvars": [
+    "spawnfader._fade",
+    "spawnfader._fadeout"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65505,
+      20315,
+      65881,
+      13570,
+      14484,
+      14688,
+      15054,
+      19296
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及组件'spawnfader'或其能力FadeIn、FadeOut、Cancel的任何玩家语言表达。内容主要涉及游戏实体、区域、物品、机制等，无相关动画或过渡描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "淡入",
+    "淡出",
+    "生成动画",
+    "视觉效果",
+    "透明度",
+    "过渡",
+    "NOCLICK",
+    "生成过程"
+  ],
+  "gameplay_tags": [
+    "生成",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
+    "source_bytes": 3000,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085917891
+  }
+}

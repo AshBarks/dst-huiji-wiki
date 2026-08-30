@@ -39,6 +39,9 @@ pub struct LlmConfig {
     pub api_key: String,
     pub base_url: String,
     pub model: String,
+    /// 推理模型需要足够的输出预算(reasoning 会消耗 token),
+    /// 未设置时不随请求发送(用服务商默认)。
+    pub max_tokens: Option<u32>,
 }
 
 /// Observability hooks emitted while [`LlmConfig::complete_streaming`] runs.
@@ -71,10 +74,14 @@ impl LlmConfig {
             .ok()
             .filter(|s| !s.trim().is_empty())
             .unwrap_or_else(|| DEFAULT_MODEL.to_string());
+        let max_tokens = std::env::var("LLM__MAX_TOKENS")
+            .ok()
+            .and_then(|v| v.trim().parse::<u32>().ok());
         Some(Self {
             api_key,
             base_url: base_url.trim_end_matches('/').to_string(),
             model,
+            max_tokens,
         })
     }
 
@@ -136,6 +143,9 @@ impl LlmConfig {
             .model(&self.model)
             .temperature(0.2_f32)
             .messages(vec![system_msg, user_msg]);
+        if let Some(mt) = self.max_tokens {
+            request.max_tokens(mt);
+        }
         let request = request
             .build()
             .map_err(|e| Error::Llm(format!("构建请求失败：{e}")))?;
@@ -224,6 +234,7 @@ mod tests {
             api_key: "k".into(),
             base_url: "http://127.0.0.1:9/v1".into(), // discard port → refused fast
             model: "test-model".into(),
+            max_tokens: None,
         };
         let err = cfg.complete("sys", "user").await.unwrap_err().to_string();
         assert!(!err.is_empty());

@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/prototyper.lua"
+  },
+  "category": "component",
+  "display_name": "prototyper",
+  "summary": "该组件管理原型制作者的技术树、开启状态和使用者列表。它允许玩家通过使用原型制作者来解锁和制作物品，参与游戏的制作系统。",
+  "api": [
+    {
+      "name": "TurnOn",
+      "effect": "开启原型制作者，将使用者添加到列表，并监听使用者的 onremove 事件；如果首次开启，触发 onturnon 和 onturnonfordoer 回调。"
+    },
+    {
+      "name": "TurnOff",
+      "effect": "关闭原型制作者，从列表中移除使用者，移除事件监听；如果列表为空，触发 onturnoff 和 onturnofffordoer 回调。"
+    },
+    {
+      "name": "GetTechTrees",
+      "effect": "返回当前技术树的深度拷贝，供外部读取。"
+    },
+    {
+      "name": "Activate",
+      "effect": "激活指定配方的制作；如果实体有 craftingstation 组件，则调用其 RecipeCrafted 方法；触发 onactivate 回调。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理状态：移除 prototyper 标签，关闭所有使用者，触发 onturnoff 和 onturnofffordoer 回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      18830,
+      15022,
+      15245,
+      16686,
+      17826,
+      17943,
+      18234
+    ],
+    "aspects": [
+      {
+        "aspect": "原型工具激活行为",
+        "evidence": [
+          {
+            "pageid": 17943,
+            "quote": "玩家只要在它附近制作一次相应配方的原型体，即可以解锁该配方。"
+          }
+        ]
+      },
+      {
+        "aspect": "技术树获取能力",
+        "evidence": [
+          {
+            "pageid": 17943,
+            "quote": "灵子分解器是一个[[原型工具]]，能够允许玩家解锁[[:分类:一级魔法解锁|一级魔法]]的制作配方。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:原型工具",
+      "分类:制作站"
+    ],
+    "code_fields": [
+      "prototyper",
+      "crafting_station"
+    ],
+    "overridable_fields": [],
+    "note": "按 PROTOTYPER_DEFS 的 is_crafting_station 分流为 prototyper 或 crafting_station 键。"
+  },
+  "search_terms": [
+    "原型制作者",
+    "制作系统",
+    "解锁配方",
+    "制作台",
+    "科技树",
+    "原型机",
+    "升级树",
+    "工艺制作"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "制作",
+    "科技",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
+    "source_bytes": 2245,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788085771195
+  }
+}

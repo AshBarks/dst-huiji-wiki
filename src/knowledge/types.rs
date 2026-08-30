@@ -72,6 +72,8 @@ impl<'de> Deserialize<'de> for ApiEntry {
     {
         #[derive(Deserialize)]
         struct Raw {
+            // 部分模型把方法名写成 method/function(mimo-v2.5 实测)
+            #[serde(alias = "method", alias = "function")]
             name: String,
             #[serde(default)]
             signature: Option<String>,

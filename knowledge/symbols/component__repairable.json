@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/repairable.lua"
+  },
+  "category": "component",
+  "display_name": "repairable",
+  "summary": "repairable组件管理实体的可修复属性，包括指定修复材料、生命值修复、工作修复和有限使用次数修复。它通过标签系统允许其他系统识别可修复实体，并在修复时恢复实体的损坏状态。核心玩法涉及使用正确的修复物品来修复建筑、工具或其他可修复对象，延长其使用寿命。",
+  "api": [
+    {
+      "name": "SetHealthRepairable",
+      "effect": "设置实体是否可进行生命值修复。如果repairable为true，则添加标签'healthrepairable'；否则移除该标签。"
+    },
+    {
+      "name": "SetWorkRepairable",
+      "effect": "设置实体是否可进行工作修复（如工具耐久）。如果repairable为true，则添加标签'workrepairable'；否则移除该标签。"
+    },
+    {
+      "name": "SetFiniteUsesRepairable",
+      "effect": "设置实体是否可进行有限使用次数修复。如果repairable为true，则添加标签'finiteusesrepairable'；否则移除该标签。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理所有已添加的标签：移除'repairable_'前缀的标签（如果repairmaterial不为nil）、'healthrepairable'、'workrepairable'和'finiteusesrepairable'。"
+    },
+    {
+      "name": "NeedsRepairs",
+      "effect": "检查实体是否需要修复。基于实体的health、workable、perishable或finiteuses组件的当前值与最大值的比率，如果比率小于阈值0.95则返回true，否则返回false。无其他副作用。"
+    },
+    {
+      "name": "Repair",
+      "effect": "执行修复操作。首先调用testvalidrepairfn检查修复物品是否有效（如果定义）；然后检查repair_item的repairer组件，确保repairmaterial匹配；接着调用address_repair_amount恢复实体的health、workable、perishable或finiteuses；之后如果修复物品有boatrepairsound则播放音效；然后移除修复物品（堆叠物品移除一个，否则整个移除）；最后触发onrepaired回调（如果定义）。返回true如果成功修复，false否则。副作用包括修改实体状态、移除物品和播放音效。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      19940,
+      16185,
+      19118,
+      47009,
+      15903,
+      19119,
+      19830
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍耐久自动回复",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "放入书柜的书籍会以每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      },
+      {
+        "aspect": "发条装置修复方法",
+        "evidence": [
+          {
+            "pageid": 19830,
+            "quote": "玩家可以使用齿轮或废料右键损坏的发条装置将其修复"
+          }
+        ]
+      },
+      {
+        "aspect": "支柱修复可能性",
+        "evidence": [
+          {
+            "pageid": 19940,
+            "quote": "耐久为 1~39 时，为‘支柱’，外观破损，可以修复。"
+          }
+        ]
+      },
+      {
+        "aspect": "漂浮平台漏洞修复",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "部分漂浮平台可以用特定物品修复以恢复耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "绝望石装备耐久恢复",
+        "evidence": [
+          {
+            "pageid": 19118,
+            "quote": "在耐久少于 100%，被具有[[理智值]]的实体装备，且不处于[[启蒙值]]状态时：绝望石盔甲会缓慢恢复耐久"
+          },
+          {
+            "pageid": 19119,
+            "quote": "在耐久少于 100%，被具有[[理智值]]的实体装备，且不处于[[启蒙值]]状态时：绝望石头盔会缓慢恢复耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "螨地爬修复状态转换",
+        "evidence": [
+          {
+            "pageid": 47009,
+            "quote": "损坏状态下可用陀螺传导核心修复，修复后变为友好状态。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "可修复"
+    ],
+    "code_fields": [
+      "repairable_repairmaterial"
+    ],
+    "overridable_fields": [],
+    "note": "材料→修复量对照来自 Module:AutoInfobox/Data 的 repairmaterial 表(游戏内脚本导出,见 Data/doc)。"
+  },
+  "search_terms": [
+    "修复",
+    "可修复",
+    "修理",
+    "耐久",
+    "生命值修复",
+    "工作修复",
+    "材料修复",
+    "损坏",
+    "恢复",
+    "修复物品"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "维修"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+    "source_bytes": 6234,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086866594
+  }
+}

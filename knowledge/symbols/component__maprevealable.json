@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/maprevealable.lua"
+  },
+  "category": "component",
+  "display_name": "maprevealable",
+  "summary": "MapRevealable组件管理实体在小地图上的图标显示，处理公共和私有揭示源以控制地图信息的可见性。它通过周期性刷新检测附近的地图揭示者，动态更新图标以响应游戏中的探索和共享机制。",
+  "api": [
+    {
+      "name": "SetIcon",
+      "effect": "设置图标的显示名称，如果图标已存在则更新小地图图标的名称。"
+    },
+    {
+      "name": "SetIconPriority",
+      "effect": "设置图标在小地图上的优先级，如果图标已存在则更新优先级。"
+    },
+    {
+      "name": "SetIconPrefab",
+      "effect": "设置用于生成图标的预制体，更改后会停止当前揭示并刷新所有揭示源。"
+    },
+    {
+      "name": "SetIconTag",
+      "effect": "设置图标的标签，如果图标已存在则添加或移除指定标签。"
+    },
+    {
+      "name": "SetOnIconCreatedFn",
+      "effect": "设置图标创建后的回调函数，用于在图标生成时进行自定义设置。"
+    },
+    {
+      "name": "AddRevealSource",
+      "effect": "添加一个揭示源（字符串或实体），如果是实体则监听其移除事件，然后刷新揭示源列表以更新图标显示。"
+    },
+    {
+      "name": "RemoveRevealSource",
+      "effect": "移除一个揭示源，如果是实体则取消事件监听，然后刷新揭示源列表以更新图标显示。"
+    },
+    {
+      "name": "AddPrivateSource",
+      "effect": "添加一个私有揭示源（玩家实体），监听其移除事件，然后刷新以开始私有揭示。"
+    },
+    {
+      "name": "RemovePrivateSource",
+      "effect": "移除私有揭示源，移除对应的图标并刷新以停止私有揭示。"
+    },
+    {
+      "name": "RefreshRevealSources",
+      "effect": "根据揭示源列表决定是否开始或停止公共揭示，并处理私有揭示的启停。"
+    },
+    {
+      "name": "StartRevealing",
+      "effect": "开始公共揭示，生成图标实体并跟踪当前实体，设置限制和优先级；如果图标已存在则更新限制。"
+    },
+    {
+      "name": "StopRevealing",
+      "effect": "停止公共揭示，移除图标实体。"
+    },
+    {
+      "name": "StartPrivateRevealing",
+      "effect": "为每个私有源生成独立图标实体，设置为该玩家可见并跟踪当前实体。"
+    },
+    {
+      "name": "StopPrivateRevealing",
+      "effect": "停止所有私有揭示，移除所有私有图标实体。"
+    },
+    {
+      "name": "Refresh",
+      "effect": "检查附近带有'maprevealer'标签的实体，根据其私有所有者更新揭示源，并调用刷新回调函数。"
+    },
+    {
+      "name": "SetOnRefreshFn",
+      "effect": "设置刷新回调函数，在每次刷新时调用。"
+    },
+    {
+      "name": "Start",
+      "effect": "开始周期性刷新任务，以指定延迟启动，定期调用Refresh方法。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止周期性刷新任务，清理所有私有揭示源和公共揭示源。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，停止任务并清理所有揭示源。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "等同于OnRemoveFromEntity，用于实体移除时的清理。"
+    }
+  ],
+  "api_note": "该组件提供多个公开方法用于管理地图揭示图标和揭示源，支持公共和私有模式。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21499,
+      34794,
+      13698,
+      13779,
+      24896,
+      15248,
+      72392,
+      13271
+    ],
+    "aspects": [
+      {
+        "aspect": "全局地图图标设置",
+        "evidence": [
+          {
+            "pageid": 34794,
+            "quote": "有些物品具有全局地图图标，所有玩家都能看到，即使是在尚未探索的区域"
+          }
+        ]
+      },
+      {
+        "aspect": "放置物品标记地图位置",
+        "evidence": [
+          {
+            "pageid": 24896,
+            "quote": "可以在这些裂缝附近放置一个标志或其他带有地图图标的物品，以标记它们的…"
+          }
+        ]
+      },
+      {
+        "aspect": "生物刷新点地图标识",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "固定斑鱼鱼群的地图图标"
+          },
+          {
+            "pageid": 13779,
+            "quote": "这些刷新点也是唯一带有地图图标…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "地图图标",
+    "揭示类型",
+    "共享视野",
+    "资源标记",
+    "动态更新",
+    "刷新检测",
+    "可见性控制"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "探索",
+    "地图",
+    "共享"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
+    "source_bytes": 7936,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086973294
+  }
+}

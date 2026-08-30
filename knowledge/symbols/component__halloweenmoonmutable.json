@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/halloweenmoonmutable.lua"
+  },
+  "category": "component",
+  "display_name": "halloweenmoonmutable",
+  "summary": "该组件管理实体的变异配置，包括目标预制体和回调函数。它允许实体在万圣节月光下变异成另一个实体，处理生命值转移和容器操作。核心玩法是节日事件中的实体转换。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，移除' halloweenmoonmutable'标签。"
+    },
+    {
+      "name": "SetPrefabMutated",
+      "effect": "设置变异后生成的预制体名称，用于默认变异逻辑。"
+    },
+    {
+      "name": "SetOnMutateFn",
+      "effect": "设置变异发生时调用的回调函数，参数为原实体和新实体。"
+    },
+    {
+      "name": "SetConversionOverrideFn",
+      "effect": "设置自定义转换函数，覆盖默认的预制体变异逻辑；该函数应返回新实体和容器。"
+    },
+    {
+      "name": "Mutate",
+      "effect": "尝试变异实体：如果实体已死则返回nil；否则生成新实体，转移健康值，调用回调函数，推送' onhalloweenmoonmutate'事件，移除原实体并处理容器，返回新实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onhalloweenmoonmutate"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65456,
+      24875,
+      34314,
+      15977,
+      18530,
+      13268,
+      15022,
+      16400
+    ],
+    "aspects": [
+      {
+        "aspect": "月亮变异转化机制描述",
+        "evidence": [
+          {
+            "pageid": 65456,
+            "quote": "该机制能将部分生物的尸体在[[化]]的影响下转化为另一种生物。"
+          },
+          {
+            "pageid": 24875,
+            "quote": "沃特将[[月亮碎片]]或[[注能月亮碎片]]给予追随它的[[鱼人]]后，该鱼人会原地转化为变异鱼人。"
+          },
+          {
+            "pageid": 13268,
+            "quote": "包括变身为[[变异鱼人]]或[[变异鱼人|变异鱼人守卫]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "万圣节",
+    "变异",
+    "月光",
+    "实体生成",
+    "健康值",
+    "容器",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bf53efa7e2c2e223ceb8439da228c2eeb3f786edcf9ae31d363ba7f3a85a28fd",
+    "source_bytes": 2587,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086582471
+  }
+}

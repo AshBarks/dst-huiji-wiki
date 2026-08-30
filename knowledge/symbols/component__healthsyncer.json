@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/healthsyncer.lua"
+  },
+  "category": "component",
+  "display_name": "healthsyncer",
+  "summary": "HealthSyncer组件用于在服务器与客户端之间同步玩家的生命值百分比，并计算当前生命值的变化趋势（如中毒、饥饿、燃烧等扣血效果，或睡眠、食物、装备等回血效果）。该组件管理着健康状态的网络变量，以支持客户端渲染生命值相关的状态指示图标。",
+  "api": [
+    {
+      "name": "GetPercent",
+      "effect": "返回当前实体的生命值百分比（0到1之间）。此方法在客户端和服务器端均可调用，通过读取网络变量_healthpct获取值。"
+    },
+    {
+      "name": "GetOverTime",
+      "effect": "返回一个整数，表示当前生命值的实时变化趋势。0表示无趋势，-2表示大幅下降，-1表示小幅下降，1表示小幅上升，2表示大幅上升。此方法在客户端和服务器端均可调用。"
+    }
+  ],
+  "events_published": [
+    "clienthealthstatusdirty",
+    "clienthealthdirty"
+  ],
+  "events_listened": [
+    "healthdelta",
+    "startcorrosivedebuff",
+    "starthealthregen",
+    "startsmallhealthregen",
+    "stopsmallhealthregen",
+    "healthstatusdirty",
+    "healthpctdirty"
+  ],
+  "netvars": [
+    "healthsyncer._status",
+    "healthsyncer._healthpct"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15415,
+      22611,
+      15295,
+      13261,
+      15973,
+      24875,
+      19222
+    ],
+    "aspects": [
+      {
+        "aspect": "生命值百分比在游戏机制中的应用",
+        "evidence": [
+          {
+            "pageid": 15295,
+            "quote": "掉落的个数为 2 × 生命值百分比"
+          },
+          {
+            "pageid": 19222,
+            "quote": "掉落的个数为 2 × 生命值百分比"
+          },
+          {
+            "pageid": 24875,
+            "quote": "变异鱼人会继承原鱼人的生命值百分比"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值随时间恢复的描述",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "每隔3秒恢复玩家的生命值"
+          },
+          {
+            "pageid": 13261,
+            "quote": "缓慢回血(2点/2秒)"
+          },
+          {
+            "pageid": 15973,
+            "quote": "自然 + {{tooltip|5.2|实为 125/24}} {{生命值}}/ 10 秒。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "回血",
+    "扣血",
+    "百分比",
+    "血量同步",
+    "血量变化",
+    "健康状态",
+    "状态指示",
+    "同步机制"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8342f5e9968eab4bd293dd0f2abcebe3b2758e1fd68852960257525eed2642fc",
+    "source_bytes": 4604,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086711044
+  }
+}

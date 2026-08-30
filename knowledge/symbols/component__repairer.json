@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/repairer.lua"
+  },
+  "category": "component",
+  "display_name": "repairer",
+  "summary": "repairer组件管理修复相关的数值和材料，定义物品被修复时增加的工作量、生命值、新鲜度、耐久度以及所需的修复材料。它通过标签系统标识物品可被特定材料修复，支持游戏中的物品修复玩法。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法;仅通过内部属性变化和标签更新影响游戏行为",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15244,
+      19940,
+      19129,
+      13261,
+      16185,
+      18234,
+      15303,
+      16197
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍耐久自动回复机制",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "放入[[书柜]]的书籍会以每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      },
+      {
+        "aspect": "支柱修复耐久描述",
+        "evidence": [
+          {
+            "pageid": 19940,
+            "quote": "耐久为 1~39 时，为“支柱”，外观破损，可以修复。"
+          }
+        ]
+      },
+      {
+        "aspect": "漏洞修复方法描述",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "漏洞可以使用[[船补丁]]、[[可靠的胶布]]、[[树果酱]]或[[海带补丁]]来修复"
+          }
+        ]
+      },
+      {
+        "aspect": "物品修复功能描述",
+        "evidence": [
+          {
+            "pageid": 19129,
+            "quote": "* 修复部分实体。\n** 用{{item|冰}}修复{{item|冰帽}}。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "修复",
+    "材料",
+    "耐久",
+    "新鲜度",
+    "生命值",
+    "修复值",
+    "工作量",
+    "修复材料"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+    "source_bytes": 1829,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086321076
+  }
+}

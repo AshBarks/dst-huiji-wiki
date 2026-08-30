@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/named.lua"
+  },
+  "category": "component",
+  "display_name": "named",
+  "summary": "该组件用于管理实体的名称，支持从预设列表中随机命名和通过API自定义设置。它确保名称在游戏会话间持久化保存，并通过副本同步实现实时显示。参与的核心玩法是实体个性化命名，增强游戏自定义和社交互动体验。",
+  "api": [
+    {
+      "name": "PickNewName",
+      "effect": "从预设的名称列表（possiblenames）中随机选择一个新名字并应用。如果列表为空或不存在，则不执行操作。副作用：更新实体的显示名称和副本同步。"
+    },
+    {
+      "name": "SetName",
+      "effect": "设置实体的名称为指定字符串，并可选设置作者（通过用户名转换为网络ID）。如果名称为nil，则重置为实体默认名称（从STRINGS.NAMES获取）。副作用：更新实体的显示名称、作者网络ID和副本同步。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含名称数据的表，用于游戏保存。数据包括名称、格式和作者网络ID。如果无名称，则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载名称信息（包括名称、格式和作者网络ID），并应用到实体。副作用：更新显示名称和副本同步。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      70704,
+      20714,
+      15237,
+      34557,
+      13409,
+      23203,
+      15169
+    ],
+    "aspects": [
+      {
+        "aspect": "名称设置",
+        "evidence": [
+          {
+            "pageid": 23203,
+            "quote": "点击''命名''即可给小浣猫命名"
+          },
+          {
+            "pageid": 15169,
+            "quote": "绑定时玩家可以为它命名"
+          }
+        ]
+      },
+      {
+        "aspect": "随机名称生成",
+        "evidence": [
+          {
+            "pageid": 23203,
+            "quote": "玩家可以手动键入小浣猫的名字或点击''随机''选取一个"
+          },
+          {
+            "pageid": 15169,
+            "quote": "也可以使用游戏提供的随机名字或默认名字“[玩家名]的皮弗娄牛”"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "命名",
+    "名字",
+    "自定义名称",
+    "随机名字",
+    "作者",
+    "保存",
+    "加载",
+    "副本同步",
+    "实体名称"
+  ],
+  "gameplay_tags": [
+    "自定义",
+    "装饰",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
+    "source_bytes": 1545,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086853544
+  }
+}

@@ -1,0 +1,224 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hunger.lua"
+  },
+  "category": "component",
+  "display_name": "hunger",
+  "summary": "hunger组件负责管理实体的饥饿值数据，包括最大值、当前值以及饥饿值的消耗与恢复速率。该组件通过周期性任务自动减少饥饿值，饥饿值为0时会对实体生命值造成伤害，是游戏核心生存机制的关键部分。",
+  "api": [
+    {
+      "name": "SetMax",
+      "effect": "设置饥饿值的最大值和当前值。"
+    },
+    {
+      "name": "SetRate",
+      "effect": "设置饥饿值的消耗速率 (hungerrate)。"
+    },
+    {
+      "name": "SetKillRate",
+      "effect": "设置饥饿值为0时对生命值的伤害速率 (hurtrate)。"
+    },
+    {
+      "name": "SetOverrideStarveFn",
+      "effect": "设置一个自定义函数，在饥饿值为0时替代默认的饥饿伤害逻辑。"
+    },
+    {
+      "name": "IsPaused",
+      "effect": "检查饥饿系统是否处于暂停状态。返回 `self.burning` 的布尔值，为 `false` 时表示暂停。"
+    },
+    {
+      "name": "IsStarving",
+      "effect": "检查实体是否处于饥饿状态（饥饿值 ≤ 0）。"
+    },
+    {
+      "name": "Pause",
+      "effect": "暂停饥饿系统，停止饥饿值的自动消耗。取消并清空用于周期性减少饥饿值的计时器任务 (`updatetask`)，并将 `burning` 标志设为 `false`。"
+    },
+    {
+      "name": "Resume",
+      "effect": "恢复饥饿系统。将 `burning` 标志设为 `true`，并重新创建用于周期性减少饥饿值的计时器任务。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "获取当前饥饿值相对于最大值的百分比。返回 `self.current / self.max`。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "根据给定的百分比 (p) 设置当前饥饿值。内部调用 `SetCurrent`，并传入 `overtime` 参数。"
+    },
+    {
+      "name": "SetCurrent",
+      "effect": "直接设置当前的饥饿值。将值钳制在 [0, self.max] 范围内。推送 `hungerdelta` 事件，并根据饥饿值从正变为0或从0变为正，分别推送 `startstarving` 或 `stopstarving` 事件，并更新相应的统计。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "对饥饿值进行增减。如果存在 `redirect` 函数，则使用它进行重定向处理。否则，在非无敌且非传送状态下，通过 `SetCurrent` 执行实际数值变化。参数 `ignore_invincible` 可忽略无敌状态检查。"
+    },
+    {
+      "name": "DoDec",
+      "effect": "执行一次饥饿值的自动衰减（每秒调用）。若系统暂停则直接返回。饥饿值大于0时，根据 `hungerrate`、时间间隔 `dt`、`burnrate` 和 `burnratemodifiers` 计算减少量。饥饿值为0且未忽略伤害时，调用 `overridestarvefn` 或默认对生命值造成 `hurtrate * dt` 的伤害。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "用于长时间更新（如离线期间）。调用 `DoDec` 并传入 `ignore_damage` 为 `true`，仅计算饥饿值变化但不造成饥饿伤害。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件状态转移到新实体的对应组件上。将当前饥饿百分比设置到新实例的 hunger 组件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含当前饥饿值的表，用于存档。如果当前值等于最大值，则返回 `nil`（无须存档）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中加载饥饿值，并触发一次空的 `DoDelta` 以同步状态和推送事件。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除此组件时调用。取消并清空周期性任务计时器 (`updatetask`)。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个格式化的字符串，显示当前饥饿值/最大值、实际衰减速率及暂停状态，用于调试信息输出。"
+    }
+  ],
+  "events_published": [
+    "hungerdelta",
+    "startstarving",
+    "stopstarving"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "UPDATE_PERIOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13456,
+      15975,
+      34037,
+      13455,
+      13437,
+      15817,
+      13156,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "饥饿值上限数值描述",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "鱼人之王具有饥饿值，上限为 200{{饥饿值}}"
+          },
+          {
+            "pageid": 34037,
+            "quote": "升级的暗影槌具备 500 点[[饥饿值]]"
+          },
+          {
+            "pageid": 13455,
+            "quote": "沃比有 50{{饥饿值}} [[饥饿值]]上限"
+          },
+          {
+            "pageid": 15238,
+            "quote": "皮弗娄牛拥有自己的[[饥饿值]]，上限为 375"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值下降速率描述",
+        "evidence": [
+          {
+            "pageid": 13456,
+            "quote": "角色的饥饿值会以 9.375{{饥饿值}}/分钟（75{{饥饿值}}/天）的速度下降"
+          },
+          {
+            "pageid": 15975,
+            "quote": "饥饿值会以 25{{饥饿值}}/天 的速度下降"
+          },
+          {
+            "pageid": 13455,
+            "quote": "饥饿值以每天 20 {{饥饿值}}的速度下降"
+          },
+          {
+            "pageid": 15238,
+            "quote": "每天会损失 300 饥饿"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值初始值设定",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "刚生成时候具有 50{{饥饿值}} 饥饿值"
+          },
+          {
+            "pageid": 13455,
+            "quote": "初始为 0"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值归零时生命值影响",
+        "evidence": [
+          {
+            "pageid": 13456,
+            "quote": "在饥饿值降至 0 时，角色每秒损失 1.25 {{生命值}}。"
+          },
+          {
+            "pageid": 15238,
+            "quote": "饥饿值为 0 时不扣除生命值"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值特殊行为覆盖描述",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "沃尔特睡觉时只消耗一半的[[饥饿值]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值状态触发语音台词",
+        "evidence": [
+          {
+            "pageid": 15817,
+            "quote": "|饥饿值 ≤ 25|{{全角色台词|DST|lavae_pet.STARVING|首选=wx78}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "饥饿值",
+    "饱食度",
+    "吃东西",
+    "饿死",
+    "回饥饿",
+    "血量伤害",
+    "暂停饥饿",
+    "饥饿上限",
+    "饥饿状态",
+    "饥饿速率"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源管理",
+    "状态效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6eb4e59a49fca0a8018c66497d0dfbab4ddcbd23ec2408aa7c8afcf29439a36f",
+    "source_bytes": 5347,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788086416600
+  }
+}

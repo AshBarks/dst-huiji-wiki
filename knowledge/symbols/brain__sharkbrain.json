@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/sharkbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "sharkbrain",
+  "summary": "该大脑控制鲨鱼实体在非跳跃状态下行动。当鲨鱼不在水中且未触发距离计时时，它会直接发动攻击；当处于水中时，它会依次尝试恐慌逃离、追击攻击、寻找并吃掉食物或鱼类，最后在玩家附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以组装行为树，未定义其他对外暴露的函数或方法供外部模块直接调用。",
+  "events_published": [
+    "dobite"
+  ],
+  "events_listened": [
+    "onremove",
+    "onpickup"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "HOUSE_MAX_DIST",
+    "HOUSE_RETURN_DIST",
+    "SEE_FOOD_DIST",
+    "WANDER_TIMES",
+    "SHARK_WALK_SQ",
+    "MUST_BOAT",
+    "FINDFOOD_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "攻击函数（推送 dobite 事件）",
+        "节点调试名称 'attack'",
+        "以跑动方式执行"
+      ],
+      "context": "不在水上且未处于 getdistance 计时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "获取逃跑目标的函数表（存在 getdistance 计时时返回战斗目标）",
+        "逃跑触发距离 10",
+        "安全距离 20"
+      ],
+      "context": "在水上"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 100 秒"
+      ],
+      "context": "在水上"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "寻找附近水上食物函数（返回吃动作）",
+        "节点调试名称 'gotofood'",
+        "以跑动方式执行"
+      ],
+      "context": "在水上"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "吃海洋鱼函数（返回吃动作）",
+        "节点调试名称 'eat fish'",
+        "以跑动方式执行"
+      ],
+      "context": "在水上"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "游荡中心点函数（返回最近玩家位置）",
+        "最大游荡距离 40",
+        "游荡时间配置 WANDER_TIMES",
+        "方向选择函数 getdirectionFn"
+      ],
+      "context": "在水上"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"jumping\")",
+      "semantic": "整体行为树仅在实体未处于跳跃状态标签时执行，内部再区分水上与非水情形"
+    },
+    {
+      "condition": "not isOnWater(self.inst) and not self.inst.components.timer:TimerExists(\"getdistance\")",
+      "semantic": "实体不在水上且不存在 getdistance 计时器时，仅执行一次攻击动作（DoAction Attack）"
+    },
+    {
+      "condition": "isOnWater(self.inst)",
+      "semantic": "实体在水上时，按优先级执行恐慌触发、电击栅栏恐慌、逃离目标、追击攻击、寻找食物、吃鱼、围绕玩家游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重0.25, 条件:非跳跃) 包含 子优先级节点(权重0.25) 分两支: WhileNode(非水上且非getdistance)->DoAction(attack); WhileNode(水上)->优先级节点(恐慌触发, 电击恐慌, RunAway, ChaseAndAttack, DoAction找食, DoAction吃鱼, Wander)",
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      13779,
+      15237,
+      15642,
+      15415,
+      20789,
+      24364,
+      72141
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及食物、海鱼、猪人、熊獾、鱼人、烹饪、水獭掠夺者、wx78_foodbrick等实体，全文未提及鲨鱼(shark)或brain__sharkbrain组件的能力如水上攻击、逃跑、吃海洋鱼、必须乘船、游荡中心点等玩家语言表达，无对应证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鲨鱼",
+    "非跳跃",
+    "水中追击",
+    "岸上攻击",
+    "吃鱼",
+    "游荡",
+    "恐慌",
+    "距离计时",
+    "食物"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e6f84cee9680fbbff88359f0e881a759bc726057541a95d0aa30ca7678421dab",
+    "source_bytes": 7392,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056261479
+  }
+}

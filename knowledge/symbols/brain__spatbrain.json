@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/spatbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "spatbrain",
+  "summary": "该大脑控制 Spat 类实体在战斗中根据目标状态切换近战或吐痰武器并追击威胁。当遭遇带角色或怪物标签的威胁时会逃离，平时会面向附近玩家并在无约束下随机游荡，同时包含恐慌与电篱恐慌触发逻辑。",
+  "api": [],
+  "api_note": "该大脑仅通过 OnStart 方法构建行为树，未定义其他对外调用的方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "WANDER_DIST_DAY",
+    "WANDER_DIST_NIGHT",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "FORCE_MELEE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 6 秒"
+      ],
+      "context": "CanMeleeNow 条件满足时（可近战攻击）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 6 秒"
+      ],
+      "context": "CanPhlegmNow 条件满足时（可发射吐痰）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁来源为带 character 或 monster 标签且非 notarget/playerghost 的目标",
+        "发现猎人距离 6",
+        "脱离危险安全距离 9"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取最近 14 范围内玩家为目标",
+        "保持面对条件：目标有效且非鬼魂/无目标且距离不超过 20"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "CanMeleeNow(inst) 返回真（目标存在、不在攻击冷却、且若为可钉住目标则非有效钉住目标、且实体靠近目标不超过 FORCE_MELEE_DIST=4）",
+      "semantic": "执行装备近战武器并重置冷却的动作节点，随后进行最长 6 秒的追击攻击"
+    },
+    {
+      "condition": "CanPhlegmNow(inst) 返回真（目标存在、为可钉住有效目标且不在攻击冷却）",
+      "semantic": "执行装备鼻涕炸弹武器的动作节点，随后进行最长 6 秒的追击攻击"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电篱恐慌触发 > 近战条件分支(装备近战+追击) > 吐痰条件分支(装备吐痰+追击) > 逃离威胁(基于标签) > 面对实体(玩家) > 自由游荡",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13701,
+      15551,
+      15922,
+      45173,
+      15532,
+      15903,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "近战范围内强制近战描述",
+        "evidence": [
+          {
+            "pageid": 15532,
+            "quote": "目标在近战范围内时，不会发动远程攻击而只能近战攻击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "随机游荡",
+    "Spat大脑",
+    "近战",
+    "追击",
+    "吐痰",
+    "逃离",
+    "面向玩家",
+    "恐慌",
+    "电栅栏恐慌"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "60fe89243f125de9426cefdb404f2343e710726a687d76d93aa4fa2dc1e58df1",
+    "source_bytes": 3473,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056343456
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowthrall_horns_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowthrall_horns_brain",
+  "summary": "该大脑控制暗影角魔在战斗中依据团队攻击回合分配行为。非其攻击回合时，它会移动到阵型位置或目标攻击距离附近并保持面对目标。轮到攻击时并行追击并强制触发攻击事件，无目标时在出生点附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外方法或可被外部调用的自定义函数。",
+  "events_published": [
+    "doattack"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_DIST",
+    "FORMATION_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取阵型偏移位置的函数",
+        "最大拴住距离2",
+        "最小缓冲距离0.5"
+      ],
+      "context": "等待攻击回合时优先尝试拴在阵型位置"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取目标当前位置的函数",
+        "最大拴住距离为攻击范围+2",
+        "最小拴住距离为攻击范围-2"
+      ],
+      "context": "等待攻击回合时若阵型拴住失败则拴在目标附近"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗目标的函数",
+        "判断是否为当前目标的函数"
+      ],
+      "context": "等待攻击回合时若上述拴住均失败则面对目标"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "轮到攻击回合时并行执行追击攻击（使用默认参数）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取出生点位置的函数",
+        "最大游荡距离6"
+      ],
+      "context": "无目标或前述行为失败时的兜底游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"jumping\")",
+      "semantic": "非跳跃忙碌状态守卫，内部行为树才运行"
+    },
+    {
+      "condition": "not IsMyTurnToAttack(self.inst)",
+      "semantic": "等待攻击回合：依次尝试阵型Leash、目标Leash、FaceEntity"
+    },
+    {
+      "condition": "IsMyTurnToAttack(self.inst)",
+      "semantic": "攻击回合：并行执行ChaseAndAttack与等待1秒后强制推送doattack事件"
+    },
+    {
+      "condition": "默认兜底（无战斗目标或节点失败）",
+      "semantic": "以出生点为中心半径6游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(条件:非跳跃状态)包含内层优先级节点: 1. WhileNode(非攻击回合)->优先级{阵型Leash->目标Leash->FaceEntity}; 2. ParallelNode{ChaseAndAttack, Sequence{Wait1s->ConditionWait强制攻击}}; 3. Wander(家,6)。",
+  "wiki": {
+    "scanned_pageids": [
+      22465,
+      34314,
+      71944,
+      15022,
+      34523,
+      35327,
+      72981,
+      73427
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均为其他实体（如 storage_robot、天体英雄、远古戍卫塔等）或出生点设置，未包含任何与 brain__shadowthrall_horns_brain 相关的阵型拴住、目标拴住、面对目标、追击攻击或游荡距离等能力描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "强制攻击",
+    "附近游荡",
+    "攻击回合",
+    "阵型位置",
+    "并行追击",
+    "面对目标",
+    "出生点",
+    "非攻击回合"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "怪物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b0c54fa4357da9dfd237b4e99fa5337180c348493563ff88fdf1c77e5b93cd2a",
+    "source_bytes": 2775,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056000658
+  }
+}

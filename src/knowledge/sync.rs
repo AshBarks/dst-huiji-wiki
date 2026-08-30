@@ -10,10 +10,11 @@ use crate::knowledge::scan_wiki::{extract_named_constants, trim_num, PageSymbolM
 use crate::knowledge::store::sha256_hex;
 use crate::knowledge::types::SymbolDoc;
 use crate::service::Reporter;
+use crate::update::build_atlas_from_dir;
 use crate::update::diffdata::{DiffStatus, TreeDiff};
 use crate::update::snapshot::SnapshotStore;
 use serde::Serialize;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 pub struct SyncParams {
@@ -26,6 +27,8 @@ pub struct SyncParams {
     pub rescan: bool,
     /// 详列的脏文档数上限(按受影响页面数排序取前 N)
     pub limit: usize,
+    /// wiki 语料根目录;提供则启用 prefab→页面交叉与标题解析
+    pub corpus: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -62,6 +65,26 @@ pub struct DirtyDoc {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct TuningChange {
+    pub key: String,
+    pub old: String,
+    pub new: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PrefabChange {
+    pub path: String,
+    pub variants: Vec<String>,
+    pub pages: Vec<PageBrief>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PageBrief {
+    pub pageid: i64,
+    pub title: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct SyncReport {
     pub old: String,
     pub new: String,
@@ -72,6 +95,10 @@ pub struct SyncReport {
     pub added_symbols: Vec<String>,
     pub removed_symbols: Vec<String>,
     pub other_files: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub tuning_changes: Vec<TuningChange>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub prefab_changes: Vec<PrefabChange>,
     pub rescan: Option<serde_json::Value>,
 }
 
@@ -287,10 +314,94 @@ pub async fn run_knowledge_sync(
         )
     });
 
+    // v1.1:tuning.lua 数值差异(独立于符号文件,确定性)
+    let mut tuning_changes: Vec<TuningChange> = Vec::new();
+    if let (Ok(old_t), Ok(new_t)) = (
+        std::fs::read_to_string(old_root.join("tuning.lua")),
+        std::fs::read_to_string(new_root.join("tuning.lua")),
+    ) {
+        if let (Ok(a), Ok(b)) = (
+            crate::update::index::tuning::build_tuning(&old_t),
+            crate::update::index::tuning::build_tuning(&new_t),
+        ) {
+            for (key, new_v) in &b.values {
+                match a.values.get(key) {
+                    Some(old_v) if old_v == new_v => {}
+                    _ => tuning_changes.push(TuningChange {
+                        key: format!("TUNING.{key}"),
+                        old: a
+                            .values
+                            .get(key)
+                            .map(tuning_val_text)
+                            .unwrap_or_else(|| "(缺失)".to_string()),
+                        new: tuning_val_text(new_v),
+                    }),
+                }
+            }
+        }
+    }
+    if !tuning_changes.is_empty() {
+        reporter.log(format!("tuning 变更 {} 项", tuning_changes.len()));
+    }
+
+    // v1.1:prefab 变更 → 变体 → 页面交叉(需要语料索引;atlas 按需构建)
+    let mut prefab_changes: Vec<PrefabChange> = Vec::new();
+    let prefab_files: Vec<&crate::update::diffdata::FileDiff> = diff
+        .files
+        .iter()
+        .filter(|f| f.path.starts_with("prefabs/") && f.status != DiffStatus::Removed)
+        .collect();
+    if !prefab_files.is_empty() {
+        if let Some(corpus) = &params.corpus {
+            reporter.stage("构建关联索引(prefab 交叉)");
+            let atlas = build_atlas_from_dir(&new_root)?;
+            let variant_pages = load_variant_pages(Path::new(corpus))?;
+            let titles = load_titles_meta(Path::new(corpus))?;
+            for f in &prefab_files {
+                let mut variants: BTreeSet<String> = BTreeSet::new();
+                for e in &atlas.index.edges {
+                    if e.prefab_file == f.path {
+                        variants.insert(e.prefab_variant.clone());
+                    }
+                }
+                let mut pages: Vec<PageBrief> = Vec::new();
+                let mut seen = BTreeSet::new();
+                for v in &variants {
+                    for key in [v.as_str(), &v.to_lowercase()] {
+                        if let Some(ids) = variant_pages.get(key) {
+                            for pid in ids {
+                                if seen.insert(*pid) {
+                                    if let Some(t) = titles.get(pid) {
+                                        pages.push(PageBrief {
+                                            pageid: *pid,
+                                            title: t.clone(),
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                pages.sort_by_key(|p| p.pageid);
+                prefab_changes.push(PrefabChange {
+                    path: f.path.clone(),
+                    variants: variants.into_iter().collect(),
+                    pages,
+                });
+            }
+            prefab_changes.sort_by_key(|p| std::cmp::Reverse(p.pages.len()));
+            reporter.log(format!(
+                "prefab 变更 {} 个,涉及页面交叉 {} 条",
+                prefab_changes.len(),
+                prefab_changes.iter().map(|p| p.pages.len()).sum::<usize>()
+            ));
+        }
+    }
+
     let mut rescan_summary = None;
     if params.rescan {
         reporter.stage("级联重扫脏文档");
-        let corpus = None; // 重扫后页面图刷新由 knowledge-scan-wiki 下一次运行完成
+        let corpus: Option<&str> = params.corpus.as_deref();
         let mut by_category: BTreeMap<&str, Vec<String>> = BTreeMap::new();
         for d in &dirty_docs {
             by_category.entry(d.category.as_str()).or_default().push(
@@ -333,6 +444,8 @@ pub async fn run_knowledge_sync(
         added_symbols,
         removed_symbols,
         other_files: other.clone(),
+        tuning_changes,
+        prefab_changes,
         rescan: rescan_summary,
     };
     let out_path = Path::new("output/knowledge/sync_report.json");
@@ -350,6 +463,46 @@ pub async fn run_knowledge_sync(
         out_path.display()
     ));
     Ok(serde_json::to_value(&report)?)
+}
+
+fn tuning_val_text(v: &crate::update::index::tuning::TuningVal) -> String {
+    match v {
+        crate::update::index::tuning::TuningVal::Num(n) => trim_num(*n),
+        crate::update::index::tuning::TuningVal::Str(s) => s.clone(),
+    }
+}
+
+/// variant(含大小写别名)→ pageids,来自语料索引 pages_by_prefab.json。
+fn load_variant_pages(corpus_root: &Path) -> Result<BTreeMap<String, Vec<i64>>> {
+    #[derive(serde::Deserialize)]
+    struct Idx {
+        prefabs: BTreeMap<String, Vec<i64>>,
+    }
+    let raw = std::fs::read_to_string(corpus_root.join("index/pages_by_prefab.json"))?;
+    let idx: Idx = serde_json::from_str(&raw)?;
+    let mut out = BTreeMap::new();
+    for (variant, ids) in idx.prefabs {
+        out.insert(variant.clone(), ids.clone());
+        out.entry(variant.to_lowercase())
+            .or_insert_with(|| ids.clone());
+    }
+    Ok(out)
+}
+
+fn load_titles_meta(corpus_root: &Path) -> Result<BTreeMap<i64, String>> {
+    use crate::corpus::model::{GameClass, PageMeta};
+    let mut out = BTreeMap::new();
+    for line in std::fs::read_to_string(corpus_root.join("meta.jsonl"))?.lines() {
+        if line.is_empty() {
+            continue;
+        }
+        if let Ok(m) = serde_json::from_str::<PageMeta>(line) {
+            if matches!(m.game_class, GameClass::Dst | GameClass::Mixed) {
+                out.insert(m.pageid, m.title);
+            }
+        }
+    }
+    Ok(out)
 }
 
 #[cfg(test)]

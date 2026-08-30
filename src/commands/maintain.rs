@@ -281,6 +281,7 @@ pub async fn run(args: Commands) -> Result<()> {
             knowledge_dir,
             rescan,
             limit,
+            corpus,
         } => {
             execute(
                 JobKind::KnowledgeSync {
@@ -289,6 +290,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     knowledge_dir: path_to_string(&knowledge_dir)?,
                     rescan,
                     limit,
+                    corpus: opt_path_to_string(&corpus)?,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

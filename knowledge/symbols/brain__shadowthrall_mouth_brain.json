@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowthrall_mouth_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowthrall_mouth_brain",
+  "summary": "该大脑控制暗影傀儡之口在拥有战斗目标时发动追击，若长时间未被攻击则进入潜行状态。当无目标且未潜行时，单位在等待潜行就绪的同时以出生点为中心小幅游荡，否则也进行游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写Brain基类的OnStart方法以构建行为树，未定义额外的对外公开方法。",
+  "events_published": [
+    "enterstealth"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_DIST",
+    "COMBAT_STEALTH_DELAY",
+    "IDLE_STEALTH_DELAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家位置函数(GetHome)",
+        "最大游荡距离(WANDER_DIST=6)",
+        "最小等待时间4的times表"
+      ],
+      "context": "在idlestealth并行节点中与等待进入潜行同时执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家位置函数(GetHome)",
+        "最大游荡距离(WANDER_DIST=6)",
+        "最小等待时间4的times表"
+      ],
+      "context": "优先级最后的兜底游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst._stealth and self.inst.components.combat:HasTarget() and GetTime() - self.inst.components.combat:GetLastAttackedTime() > COMBAT_STEALTH_DELAY",
+      "semantic": "通过ActionNode推送enterstealth事件使实体进入潜行"
+    },
+    {
+      "condition": "not (self.inst._stealth or self.inst.components.combat:HasTarget())",
+      "semantic": "并行执行：SequenceNode等待IDLE_STEALTH_DELAY秒后推送enterstealth，以及Wander以家为中心半径WANDER_DIST游荡(最小等待4)"
+    },
+    {
+      "condition": "self.inst.components.combat:HasTarget() (隐含于ChaseAndAttack优先级)",
+      "semantic": "执行ChaseAndAttack默认追击攻击行为"
+    },
+    {
+      "condition": "其他情况(无上述分支命中)",
+      "semantic": "执行Wander以家为中心半径WANDER_DIST游荡(最小等待4)"
+    }
+  ],
+  "bt_structure": "优先级节点(权重0.5)依次包含: 1.条件节点(未潜行&有目标&战斗静默延迟>20)触发进入潜行事件; 2.追击攻击行为; 3.循环条件节点(未潜行&无目标)内并行执行等待6秒触发潜行与以家游荡; 4.兜底以家游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15022,
+      15601,
+      13701,
+      18219,
+      14815,
+      14938,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录涵盖薇格弗德、天体英雄、蚁狮、远古织影者、战斗号子、普格纳、毒菌蟾蜍、暗影傀儡等实体，文本描述其属性、掉落、技能及部分游荡/追击行为，但均未体现 brain__shadowthrall_mouth_brain 的 WANDER_DIST=6、COMBAT/IDLE_STEALTH_DELAY、自身ChaseAndAttack、GetHome、最小等待时间4的times表等能力语义，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影口",
+    "潜行",
+    "追击",
+    "游荡",
+    "静默",
+    "老家",
+    "战斗",
+    "大脑"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "潜行",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d4718d921034172b644c2fc87be3e26d9f0919f30074eed85c5ea684db5f5e8f",
+    "source_bytes": 1231,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056084231
+  }
+}

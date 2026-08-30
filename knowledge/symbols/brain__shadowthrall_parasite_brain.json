@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowthrall_parasite_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowthrall_parasite_brain",
+  "summary": "该大脑控制暗影寄生虫实体在没有任何玩家处于相机可见距离内时自我移除。当存在附近玩家或阴影裂隙时，实体会逃离找到的目标（优先玩家，其次裂隙）。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法构建行为树，未定义其他对外公开方法或可被外部调用的函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ATTACH_DIST",
+    "CLOSE_DIST",
+    "SHADOW_RIFT_PORTAL_MUST_TAGS",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "检测玩家范围并移除的函数",
+        "行为名\"Remove?\"",
+        "立即执行"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "提供逃离目标的函数表(含getfn)",
+        "开始逃离距离15",
+        "停止逃离距离30"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "IsAnyPlayerInRange(PLAYER_CAMERA_SEE_DISTANCE) 为假",
+      "semantic": "执行 inst:Remove() 将实体从世界移除"
+    },
+    {
+      "condition": "GetRunAwayTarget 找到范围内玩家",
+      "semantic": "RunAway 以该玩家为逃离目标"
+    },
+    {
+      "condition": "GetRunAwayTarget 未找到玩家但找到 shadowrift_portal",
+      "semantic": "RunAway 以该裂隙为逃离目标"
+    }
+  ],
+  "bt_structure": "优先级节点(权重0.25)依次包含: 1. DoAction(TestForRemove) 测试并可能移除实体; 2. RunAway(GetRunAwayTarget, RUN_AWAY_DIST=15, STOP_RUN_AWAY_DIST=30) 逃离目标。",
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      19595,
+      15651,
+      22703,
+      13701,
+      15022,
+      15402,
+      15812
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录（pageid 23956,19595,15651,22703,13701,15022,15402,15812）均描述暗影裂隙机制或其他生物行为，未提及 brain__shadowthrall_parasite_brain 的 ATTACH_DIST、CLOSE_DIST、SHADOW_RIFT_PORTAL_MUST_TAGS、RUN_AWAY_DIST、STOP_RUN_AWAY_DIST、DoAction 移除玩家或 RunAway 距离15/30 等能力，无对应表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "逃离玩家",
+    "行为树",
+    "暗影裂隙",
+    "可见距离",
+    "自我移除",
+    "优先玩家",
+    "附近玩家",
+    "暗影追随者"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8805890f4822ead6b04643596a7e716ae59567d13e19e1036f01677d5d352ead",
+    "source_bytes": 1426,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056088851
+  }
+}

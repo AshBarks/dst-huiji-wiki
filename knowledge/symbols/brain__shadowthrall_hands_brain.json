@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowthrall_hands_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowthrall_hands_brain",
+  "summary": "影子仆从之手在战斗中依据攻击回合分配行为：非自身攻击回合时靠近阵型或目标并面对等待；自身回合时并行追击攻击并强制触发攻击事件；无战斗目标则围绕出生点游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 方法以构建行为树，未定义其他对外接口方法。",
+  "events_published": [
+    "doattack"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_DIST",
+    "FORMATION_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "在自身攻击回合时，与强制攻击节点并行执行"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗或吞噬目标的函数",
+        "确认目标有效的函数"
+      ],
+      "context": "在非自身攻击回合的等待分支内执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回出生点位置的函数",
+        "离家最大距离 6"
+      ],
+      "context": "前述战斗相关节点均未激活时执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not IsMyTurnToAttack(inst)",
+      "semantic": "实体尝试拴在阵型位置或目标攻击距离外，并面对目标，等待攻击回合"
+    },
+    {
+      "condition": "IsMyTurnToAttack(inst)（前序节点失败）",
+      "semantic": "并行执行追击攻击与每秒检查强制推送 doattack 事件，积极攻击目标"
+    },
+    {
+      "condition": "无有效战斗目标（优先级节点均失败）",
+      "semantic": "以出生点为中心半径 6 游荡"
+    }
+  ],
+  "bt_structure": "优先级节点：1) 当非自己攻击回合时，失败则成功装饰下拴住阵型/目标位置并面对目标；2) 并行追击攻击与条件等待强制攻击事件；3) 否则以家为中心游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      72981,
+      22465,
+      34314,
+      51046,
+      13701,
+      15238,
+      71944
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及 smallguard_alterguardian_projectile、vault_pillar_guard_dormant、storage_robot、wagboss_robot、stalker_atrium、babybeefalo 及出生点设置等实体/概念，全文未提及 brain__shadowthrall_hands_brain 或暗影傀儡之手大脑，也未体现其专属的 WANDER_DIST、FORMATION_DIST、ChaseAndAttack、FaceEntity、Wander(返回出生点且离家最大距离6) 等行为语义，仅页15022将暗影傀儡列为仇恨目标但无大脑能力描述，故页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影仆从之手",
+    "攻击周期",
+    "阵型",
+    "追击",
+    "面向目标",
+    "游荡",
+    "强制攻击",
+    "出生点"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "敌对生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ca3de3a651e403b87ff05810f46d15803c7dba3716b609a38707594930603bd1",
+    "source_bytes": 3078,
+    "model": "hy3-free",
+    "generated_at_ms": 1788055995025
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/stagehandbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "stagehandbrain",
+  "summary": "舞台之手大脑在实体能够站立且处于夜晚时，会寻找附近带有“fire”标签且至少带有“campfire”或“lighter”标签之一的光源，并与之保持由SafeLightDist计算的安全距离。若不满足夜晚条件或无法站立，则保持静止。大脑最高优先级包含通用的恐慌触发逻辑以应对危险。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他对外方法，所有逻辑封装在行为树节点中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_LIGHT_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FindClosest",
+      "args_semantic": [
+        "实体自身",
+        "搜索半径50（SEE_LIGHT_DIST）",
+        "根据目标类型计算的安全距离函数（SafeLightDist）",
+        "目标必须拥有标签\"fire\"",
+        "无排除标签（nil）",
+        "目标至少拥有\"campfire\"或\"lighter\"标签之一"
+      ],
+      "context": "在 WhileNode 判断实体能站立且为夜晚时（IsNight）"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "当优先级更高的节点未执行时（如非夜晚、不能站立或恐慌未触发）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "BrainCommon.PanicTrigger 内部触发条件（源码未在此展示）",
+      "semantic": "执行通用恐慌触发行为（优先级最高）"
+    },
+    {
+      "condition": "self.inst:CanStandUp() and TheWorld.state.isnight",
+      "semantic": "使用 FindClosest 在半径50内寻找带 fire 标签且至少带 campfire 或 lighter 之一的光源，按 SafeLightDist 保持距离移动"
+    },
+    {
+      "condition": "上述条件不满足时",
+      "semantic": "StandStill 使实体无条件进入并无限期保持静止"
+    }
+  ],
+  "bt_structure": "优先级节点(权重1)包含：1) 通用恐慌触发节点；2) 夜晚且能站立时寻找最近光源的 WhileNode 分支（内含 FindClosest）；3) 默认静止节点 StandStill。",
+  "search_terms": [
+    "舞台之手",
+    "找光源",
+    "夜晚静止",
+    "安全距离",
+    "火源标签",
+    "行为树",
+    "恐慌触发",
+    "装饰实体"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "265b256ee71b9fbb387fff33a220934b8b54168e659943f55c8c944776957e43",
+    "source_bytes": 1115,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056482061
+  }
+}

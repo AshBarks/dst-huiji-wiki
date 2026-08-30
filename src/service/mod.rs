@@ -233,6 +233,9 @@ pub enum JobKind {
         rescan: bool,
         #[serde(default = "default_sync_limit")]
         limit: usize,
+        /// 语料根目录;提供则启用 prefab→页面交叉
+        #[serde(default)]
+        corpus: Option<String>,
     },
     /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
     KnowledgeScanWiki {
@@ -507,6 +510,7 @@ async fn execute_job_inner(
             knowledge_dir,
             rescan,
             limit,
+            corpus,
         } => {
             crate::knowledge::run_knowledge_sync(
                 &crate::knowledge::SyncParams {
@@ -515,6 +519,7 @@ async fn execute_job_inner(
                     knowledge_dir: knowledge_dir.clone(),
                     rescan: *rescan,
                     limit: *limit,
+                    corpus: corpus.clone(),
                 },
                 reporter,
             )

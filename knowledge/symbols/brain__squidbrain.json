@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/squidbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "squidbrain",
+  "summary": "该大脑控制鱿鱼实体在未被钩住且无战斗时寻找并吃鱼或跟随食物游荡，有家则在家附近游荡，否则在群体附近游荡。被鱼钩钩住时会锁定钓鱼者并依据挣扎或疲惫状态以不同方式游荡，有战斗目标时会喷墨并追击攻击，附近有墙则会攻击墙壁。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 构建行为树，未定义额外对外方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "MIN_FOLLOW_FOOD",
+    "MAX_FOLLOW_FOOD",
+    "TARGET_FOLLOW_FOOD",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "WANDER_DIST",
+    "SEE_FOOD_DIST",
+    "MAX_FISER_DIST",
+    "STRUGGLE_WANDER_TIMES",
+    "STRUGGLE_WANDER_DATA",
+    "TIREDOUT_WANDER_TIMES",
+    "TIREDOUT_WANDER_DATA",
+    "FISHING_COMBAT_DIST",
+    "FINDFOOD_CANT_TAGS",
+    "OCEANFISH_TAGS",
+    "FIND_WALL_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [],
+      "context": "IfNode 附近有墙"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "锁定钓鱼者的动作函数"
+      ],
+      "context": "被钩住时优先"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "获取钓鱼者位置函数",
+        "最大钓鱼距离(海洋鱼钩距离)",
+        "挣扎游荡时间配置",
+        "获取挣扎方向函数",
+        "无(setdirectionFn)",
+        "无(checkpointFn)",
+        "挣扎游荡数据(半径6奔跑)"
+      ],
+      "context": "被钩住且挣扎"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "获取钓鱼者位置函数",
+        "最大钓鱼距离",
+        "疲惫游荡时间配置",
+        "获取疲惫方向函数",
+        "无",
+        "无",
+        "疲惫游荡数据(半径6行走)"
+      ],
+      "context": "被钩住且非挣扎"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "喷射墨汁动作函数(有战斗目标且无冷却)"
+      ],
+      "context": "有战斗目标时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "最长追逐10秒",
+        "放弃距离30"
+      ],
+      "context": "有战斗目标时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "吃鱼动作函数"
+      ],
+      "context": "无战斗等默认"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "获取食物目标函数",
+        "最小跟随距离2",
+        "目标跟随距离4",
+        "最大跟随距离6"
+      ],
+      "context": "无战斗等默认"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "获取家位置函数",
+        "离家最大距离8"
+      ],
+      "context": "有家时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "获取群体偏移或群体位置函数",
+        "游荡距离15",
+        "游荡时间配置(走1+0.5随机,等2+2随机)",
+        "获取随机方向函数"
+      ],
+      "context": "默认无家等"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "附近有墙(findwall)",
+      "semantic": "攻击墙壁"
+    },
+    {
+      "condition": "被鱼钩钩住(oceanfishable有Rod)",
+      "semantic": "优先锁定钓鱼者，并根据挣扎或疲惫状态以不同参数游荡"
+    },
+    {
+      "condition": "正在挣扎(IsStruggling)",
+      "semantic": "以奔跑方式小范围快速游荡"
+    },
+    {
+      "condition": "非挣扎(疲惫)",
+      "semantic": "以行走方式小范围游荡"
+    },
+    {
+      "condition": "有战斗目标(combat.target)",
+      "semantic": "先尝试喷墨，然后追击攻击"
+    },
+    {
+      "condition": "有家(homeseeker)",
+      "semantic": "在家附近游荡(距离8)"
+    },
+    {
+      "condition": "默认",
+      "semantic": "吃鱼、跟随食物或在群体位置附近游荡(距离15)"
+    }
+  ],
+  "bt_structure": "根优先级节点(非跳跃状态): 恐慌触发 > 电篱恐慌 > 近墙攻击 > 被钩住处理(锁定钓鱼者,挣扎/疲惫游荡) > 战斗(喷墨,追击) > 吃鱼 > 跟随食物 > 有家游荡 > 默认群体游荡",
+  "wiki": {
+    "scanned_pageids": [
+      13641,
+      13779,
+      15022,
+      15246,
+      15729,
+      13567,
+      13828,
+      14683
+    ],
+    "aspects": [
+      {
+        "aspect": "受击接近攻击描述",
+        "evidence": [
+          {
+            "pageid": 13641,
+            "quote": "然后接近并旋转身体造成连续三次伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "喷射墨汁行为描述",
+        "evidence": [
+          {
+            "pageid": 13641,
+            "quote": "当受到攻击时，鱿鱼会发射墨汁来遮挡玩家的视野"
+          }
+        ]
+      },
+      {
+        "aspect": "捕食海鱼行为描述",
+        "evidence": [
+          {
+            "pageid": 13641,
+            "quote": "沿途捕食[[海鱼]]"
+          }
+        ]
+      },
+      {
+        "aspect": "群体迁移游荡描述",
+        "evidence": [
+          {
+            "pageid": 13641,
+            "quote": "成群迁移到另一个位置"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鱿鱼",
+    "喷墨",
+    "鱼钩",
+    "挣扎",
+    "追击",
+    "吃鱼",
+    "攻击墙",
+    "群体",
+    "家园",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 1/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "生物AI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b0929e39a8357690497de0be5ea599ab5648ac63f63a3ccc69765d3f9946055b",
+    "source_bytes": 8874,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056386253
+  }
+}

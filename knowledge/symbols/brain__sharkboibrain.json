@@ -1,0 +1,219 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/sharkboibrain.lua"
+  },
+  "category": "brain",
+  "display_name": "sharkboibrain",
+  "summary": "鲨鱼仔大脑在实体未处于跳跃、被击败或睡眠状态时运行行为树。战斗冷却中尝试拴住并面对目标，战斗中并行播放台词与追击攻击；胜利后炫耀并围绕洞穴游荡。有交易者组件时根据库存进行面对交易者或友好互动，初始生成时空闲对话并游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart以构建行为树，未定义其他对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FAR_TRADE_DIST_SQ",
+    "NEAR_TRADE_DIST_SQ",
+    "WANDER_DATA",
+    "CHATTERPARAMS_LOW",
+    "CHATTERPARAMS_HIGH"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗目标位置的函数",
+        "最大拴绳距离(近战范围 TUNING.SHARKBOI_MELEE_RANGE)",
+        "内部返回距离 3",
+        "以跑步速度返回 true"
+      ],
+      "context": "战斗冷却中且未忙碌时，失败若成功装饰内尝试拴住目标"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗目标的函数",
+        "确认目标为当前战斗目标的函数"
+      ],
+      "context": "战斗冷却中拴绳失败后面对目标"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "战斗聊天文本配置(低优先级)",
+        "并行子节点(条件等待攻击与追击)"
+      ],
+      "context": "非忙碌状态主循环中的战斗行为"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "与战斗聊天节点并行执行追击攻击"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "胜利炫耀聊天配置(低优先级)",
+        "围绕洞穴游荡行为"
+      ],
+      "context": "具有hostile标签时(Gloating)"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取范围内交易者函数",
+        "保持交易者函数"
+      ],
+      "context": "库存<=0(Out of stock)时优先面对交易者"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "尝试交易聊天配置(高优先级)",
+        "面对远距离交易者行为"
+      ],
+      "context": "库存>0且友好(Friendly)时优先"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取近距离交易者函数",
+        "保持交易者函数"
+      ],
+      "context": "库存>0友好时，尝试远交易后面对近交易者"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "友好聊天配置(高优先级)",
+        "面对附近玩家节点(超时6秒)"
+      ],
+      "context": "库存>0友好时，序列中面对附近玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取附近玩家函数",
+        "保持附近玩家函数",
+        "面对超时6秒"
+      ],
+      "context": "库存>0友好时，序列中面对附近玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取附近玩家函数",
+        "保持附近玩家函数",
+        "面对超时4秒"
+      ],
+      "context": "初始生成序列中空闲面对玩家"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "空闲聊天配置(低优先级)",
+        "面对附近玩家节点(超时4秒)"
+      ],
+      "context": "初始生成序列中空闲对话"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "无家位置(自由游荡)",
+        "无最大距离限制",
+        "无时间配置",
+        "获取游荡方向函数(基于洞穴)",
+        "无设置方向函数",
+        "无检查点函数",
+        "游荡数据(半径5.5)"
+      ],
+      "context": "多处调用(WanderAroundHole)围绕洞穴游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not inst.sg:HasAnyStateTag(\"jumping\", \"defeated\", \"sleeping\")",
+      "semantic": "非跳跃/被击败/睡眠状态时才运行内部行为树"
+    },
+    {
+      "condition": "inst.components.combat:InCooldown()",
+      "semantic": "战斗冷却中：尝试拴住目标位置并面对目标"
+    },
+    {
+      "condition": "inst:HasTag(\"hostile\")",
+      "semantic": "仍具敌意(战斗胜利)：说炫耀话并围绕洞穴游荡"
+    },
+    {
+      "condition": "inst.components.trader and inst.stock <= 0",
+      "semantic": "有交易者组件且库存<=0：面对交易者或围绕洞穴游荡"
+    },
+    {
+      "condition": "inst.components.trader and inst.stock > 0",
+      "semantic": "有交易者组件且库存>0：尝试远交易对话、近交易面对、友好对话面对玩家并游荡、默认游荡"
+    },
+    {
+      "condition": "首次生成(序列节点无额外条件)",
+      "semantic": "初始生成时：空闲对话面对附近玩家，然后并行游荡与等待"
+    },
+    {
+      "condition": "默认",
+      "semantic": "围绕洞穴游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.5)包含忙碌状态守卫WhileNode，其下优先级节点按序：战斗冷却中拴住面对 -> 战斗聊天并行追击 -> 敌意炫耀游荡 -> 缺货面对游荡 -> 有货友好交易面对 -> 初始空闲面对游荡 -> 默认围绕洞穴游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      28611,
+      13761,
+      19740,
+      34523,
+      34314,
+      28621,
+      34272,
+      73480
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录内容均为洞穴蠕虫(worm/worm_boss)、洞穴世界、洞穴入口、固定布景、生物群系连接及洞穴蠕虫袭击机制，未提及 sharkboi 实体或 brain__sharkboibrain 相关的战斗拴绳、交易聊天、围绕洞穴游荡等能力行为，页面中不存在该符号的能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小鲨鱼",
+    "攻击冷却",
+    "面对交易者",
+    "洞穴",
+    "游荡",
+    "炫耀",
+    "闲置对话",
+    "面对目标",
+    "拴住"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "交易",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c4de9ccd13b2322239d117f919940079fe1c600a81e67dfc4cfbd3b6d6ea4d3",
+    "source_bytes": 6332,
+    "model": "hy3-free",
+    "generated_at_ms": 1788056264282
+  }
+}

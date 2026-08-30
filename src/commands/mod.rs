@@ -236,6 +236,9 @@ pub enum Commands {
         /// 详列的脏文档数上限
         #[arg(long, default_value_t = 20)]
         limit: usize,
+        /// wiki 语料根目录;提供则启用 prefab→页面交叉
+        #[arg(long)]
+        corpus: Option<PathBuf>,
     },
     /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
     KnowledgeScanWiki {

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spdamageutil.lua"
+  },
+  "category": "component",
+  "display_name": "spdamageutil",
+  "summary": "该组件管理饥荒联机版中的特殊伤害类型（如平面伤害）的数据定义与计算。它参与战斗系统的核心伤害和防御计算，支持通过 mod 扩展新的伤害类型。组件提供方法用于获取、收集、合并和应用伤害值，以处理特殊战斗机制。",
+  "api": [
+    {
+      "name": "DefineSpType",
+      "effect": "定义一个新的特殊伤害类型。参数 sptype 为类型名，spdata 为包含 GetDamage 和 GetDefense 函数的数据表。若类型名已存在则断言失败；否则将类型数据添加到内部映射 SpTypeMap 中，供后续伤害计算使用。"
+    },
+    {
+      "name": "GetSpDamageForType",
+      "effect": "获取实体 ent 在指定类型 sptype 下的特殊伤害值。若类型不存在或实体无对应组件，则返回 0。无副作用。"
+    },
+    {
+      "name": "GetSpDefenseForType",
+      "effect": "获取实体 ent 在指定类型 sptype 下的特殊防御值。若类型不存在或实体无对应组件，则返回 0。无副作用。"
+    },
+    {
+      "name": "CollectSpDamage",
+      "effect": "收集实体 ent 所有已定义类型的特殊伤害值到表 tbl 中。若 tbl 为 nil 则创建新表；对于每个类型，将伤害值累加到 tbl 对应键。返回更新后的 tbl。"
+    },
+    {
+      "name": "MergeSpDamage",
+      "effect": "合并两个伤害表 tbl1 和 tbl2。将 tbl2 中每个键的值加到 tbl1 对应键上。返回 tbl1 或 tbl2（若其中一个为 nil）。"
+    },
+    {
+      "name": "CalcTotalDamage",
+      "effect": "计算伤害表 tbl 中所有值的总和。若 tbl 为 nil 则返回 0。无副作用。"
+    },
+    {
+      "name": "ApplyMult",
+      "effect": "对伤害表 tbl 中每个值应用乘数 mult。若 mult 为 0 则移除该项；若结果表为空则设为 nil。返回更新后的 tbl。"
+    },
+    {
+      "name": "ApplySpDefense",
+      "effect": "应用实体 ent 的特殊防御到伤害表 tbl。对于 tbl 中每个键，获取实体对应类型的防御值；若防御值大于 0 且伤害值大于防御值，则减少伤害值，否则移除该项。若结果表为空则设为 nil。返回更新后的 tbl。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      20150,
+      13556,
+      15022,
+      15922,
+      16419,
+      47010,
+      15354
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害乘数应用描述",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "旺达的物理伤害降低与暗影伤害提升，阿比盖尔对温蒂 1.4 倍物理增伤"
+          }
+        ]
+      },
+      {
+        "aspect": "特殊伤害类型定义",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "位面伤害（{{en|Planar Damage}}）'''是一种特殊的伤害类型。"
+          }
+        ]
+      },
+      {
+        "aspect": "特殊防御数值描述",
+        "evidence": [
+          {
+            "pageid": 20058,
+            "quote": "部分盔甲具有'''位面防御'''。这是盔甲吸收[[位面伤害]]的数值"
+          },
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔会获得 15 点[[位面防御]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "特殊伤害",
+    "伤害类型",
+    "防御计算",
+    "伤害乘数",
+    "战斗伤害",
+    "模组扩展",
+    "伤害机制",
+    "伤害数据",
+    "伤害计算"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4ee8559e0fcc3caf632eb439acc4a8ac82f3fa601647d686205368020788925b",
+    "source_bytes": 2673,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112911067
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/murderable.lua"
+  },
+  "category": "component",
+  "display_name": "murderable",
+  "summary": "此组件为实体添加'谋杀者'标签，表明该实体可以被谋杀。它管理一个谋杀声音属性，但未实现具体谋杀行为。组件在实体移除时清理标签。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      34557,
+      10374,
+      52788,
+      16419,
+      13847,
+      13779,
+      16615
+    ],
+    "aspects": [
+      {
+        "aspect": "谋杀掉落物差异描述",
+        "evidence": [
+          {
+            "pageid": 13779,
+            "quote": "谋杀海鱼时的掉落物会根据其重量而有所不同"
+          },
+          {
+            "pageid": 13779,
+            "quote": "在春节活动期间时，谋杀花锦鲤将在掉落一个[[生鱼肉]]之外再掉落两个[[幸运金块]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "谋杀",
+    "murderable",
+    "可杀死",
+    "标签",
+    "生物",
+    "死亡",
+    "战斗",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3d10e252a3cb892dbd2b4b5892f4ed70b04d6b341ff6e9838efdf99fced92003",
+    "source_bytes": 246,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094875016
+  }
+}

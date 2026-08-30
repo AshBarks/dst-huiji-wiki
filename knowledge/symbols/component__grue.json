@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grue.lua"
+  },
+  "category": "component",
+  "display_name": "grue",
+  "summary": "Grue组件管理实体在黑暗环境中的免疫与攻击机制。当实体处于黑暗且无免疫状态时，组件会定期触发Grue攻击，造成生命伤害并降低理智。免疫来源包括光照、夜视、无敌状态等，可通过添加或移除免疫来控制攻击的触发。",
+  "api": [
+    {
+      "name": "CheckForStart",
+      "effect": "检查实体是否应该开始受到Grue攻击。返回布尔值，基于无敌、光照、死亡和夜视条件判断。"
+    },
+    {
+      "name": "Start",
+      "effect": "启动Grue攻击计时。如果当前没有活跃攻击且满足条件，设置初始计时器并开始更新组件。"
+    },
+    {
+      "name": "SetSounds",
+      "effect": "设置警告和攻击音效。参数warn为警告声音事件，attack为攻击声音事件。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止Grue攻击计时。清除攻击级别并停止更新组件。"
+    },
+    {
+      "name": "SetResistance",
+      "effect": "设置实体对Grue攻击的抵抗力。抵抗力值决定攻击是否被抵抗。"
+    },
+    {
+      "name": "AddImmunity",
+      "effect": "添加免疫来源。参数source为免疫标识，添加后立即停止攻击。"
+    },
+    {
+      "name": "RemoveImmunity",
+      "effect": "移除免疫来源。参数source为免疫标识，如果移除后无其他免疫，则重新开始攻击。"
+    },
+    {
+      "name": "SetSleeping",
+      "effect": "已弃用方法。根据asleep参数添加或移除睡眠免疫，用于向后兼容。"
+    },
+    {
+      "name": "Attack",
+      "effect": "执行一次Grue攻击。根据伤害值和非致死设置计算实际伤害，并应用到实体，同时降低理智。"
+    }
+  ],
+  "api_note": "有公开方法。",
+  "events_published": [
+    "heargrue",
+    "attackedbygrue",
+    "resistedgrue"
+  ],
+  "events_listened": [
+    "enterdark",
+    "enterlight",
+    "nightvision",
+    "invincibletoggle",
+    "grueimmunearea",
+    "death",
+    "ms_respawnedfromghost"
+  ],
+  "netvars": [],
+  "tunables": [
+    "NONLETHAL_DARKNESS",
+    "NONLETHAL_PERCENT",
+    "GRUEDAMAGE",
+    "SANITY_MEDLARGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13156,
+      10374,
+      20150,
+      13437,
+      10379,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 'grue' 或 'component__grue'，所有内容涉及其他实体（如天体英雄、沃尔夫冈、薇洛等），与清单中的能力（CheckForStart, Start, SetSounds, Stop, SetResistance, AddImmunity, RemoveImmunity, SetSleeping, Attack）无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "黑暗",
+    "Grue",
+    "攻击",
+    "免疫",
+    "夜视",
+    "无敌",
+    "理智",
+    "睡眠",
+    "伤害"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9ea3bb21e356acd87490b2aa881a7ec4b87693f5dd7142f03bd6225611f4004d",
+    "source_bytes": 6384,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091307521
+  }
+}

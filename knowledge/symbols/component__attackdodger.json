@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/attackdodger.lua"
+  },
+  "category": "component",
+  "display_name": "attackdodger",
+  "summary": "该组件管理实体的攻击躲避功能，包括判断是否可以躲避的条件、执行躲避的回调以及躲避后的冷却机制。它主要用于战斗系统中，使实体能够响应攻击并避免伤害。",
+  "api": [
+    {
+      "name": "SetOnDodgeFn",
+      "effect": "设置躲避回调函数。当实体成功躲避攻击时，该函数被调用，传入实体实例和攻击者实例作为参数。"
+    },
+    {
+      "name": "SetCanDodgeFn",
+      "effect": "设置是否可以躲避的判断函数。该函数在调用CanDodge时被调用，用于确定实体在当前状态下是否能够躲避攻击。"
+    },
+    {
+      "name": "SetCooldownTime",
+      "effect": "设置躲避后的冷却时间（秒）。在躲避操作后，实体在此时间内无法再次躲避。"
+    },
+    {
+      "name": "CanDodge",
+      "effect": "判断实体是否可以躲避指定攻击。返回布尔值，基于自定义函数和冷却状态。"
+    },
+    {
+      "name": "Dodge",
+      "effect": "执行躲避操作。调用躲避回调函数（如果设置），并启动冷却计时器。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用，清理冷却计时器任务。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      13409,
+      15186,
+      10413,
+      15022,
+      16419,
+      15922,
+      23965
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与攻击闪避相关的能力表达，如闪避行为、闪避条件、冷却时间或相关机制描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "躲避",
+    "闪避",
+    "冷却",
+    "战斗",
+    "技能",
+    "攻击闪避",
+    "回避伤害"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/7)",
+  "gameplay_tags": [
+    "战斗",
+    "躲避",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c48e861d6e3b8f29021e33f3e06c731aac3db80da2f43ea5ce2468e58640adc",
+    "source_bytes": 1457,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105394710
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mutatedbirdmanager.lua"
+  },
+  "category": "component",
+  "display_name": "mutatedbirdmanager",
+  "summary": "MutatedBirdManager 是一个已弃用的组件，在饥荒联机版中曾经用于管理变异鸟的迁移和秃鹰行为，但当前类体为空，内容已被裁剪。它可能与未来裂隙鸟的群集逻辑相关，但目前不参与任何核心玩法。",
+  "api": [],
+  "api_note": "源码类体为空，无定义任何对外方法，因此 api 返回空数组。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      15977,
+      52631,
+      15258,
+      15327,
+      22611,
+      15729,
+      15851
+    ],
+    "aspects": [
+      {
+        "aspect": "变异鸟攻击移动行为",
+        "evidence": [
+          {
+            "pageid": 15977,
+            "quote": "慢慢地向能量静电靠近并试图攻击它"
+          }
+        ]
+      },
+      {
+        "aspect": "变异鸟生成触发条件",
+        "evidence": [
+          {
+            "pageid": 65881,
+            "quote": "鸟死亡会招引[[入侵型虚影]]变为[[变异鸟]]攻击玩家"
+          },
+          {
+            "pageid": 15977,
+            "quote": "当能量静电激活时，变异鸟会成群结队地一波波地降落在附近"
+          },
+          {
+            "pageid": 22611,
+            "quote": "鸟类尸体有 25% 概率在 4 ~ 5 秒内变为[[变异鸟]]"
+          }
+        ]
+      },
+      {
+        "aspect": "变异鸟转化方式",
+        "evidence": [
+          {
+            "pageid": 15977,
+            "quote": "对鸟使用月亮精华液可以使它们变成变异鸟"
+          }
+        ]
+      },
+      {
+        "aspect": "变异鸟鸟笼产出差异",
+        "evidence": [
+          {
+            "pageid": 15851,
+            "quote": "如果鸟笼中的鸟是变异鸟，那么给予肉类食物时会产出[[腐烂鸟蛋]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "变异鸟",
+    "迁移",
+    "秃鹰",
+    "裂隙鸟",
+    "鸟群",
+    "群集",
+    "管理器",
+    "逻辑"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e0d4c647995fee248bf60c19a526487c5da44d325857b9a7e69ed2853d669f1e",
+    "source_bytes": 387,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110191315
+  }
+}

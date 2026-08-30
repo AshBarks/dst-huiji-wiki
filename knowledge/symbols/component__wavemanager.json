@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wavemanager.lua"
+  },
+  "category": "component",
+  "display_name": "wavemanager",
+  "summary": "该组件管理游戏中海洋波浪的生成与动态调整。它根据玩家位置和摄像机距离，在不同海洋瓦片类型上生成海岸波、浅海闪光波和深海闪光波。通过阻挡器机制避免在特定区域生成波浪，参与海洋环境的视觉效果核心玩法。",
+  "api": [
+    {
+      "name": "RegisterBlocker",
+      "effect": "注册一个实体作为阻挡器，使其在指定距离内阻止波浪生成。"
+    },
+    {
+      "name": "UnregisterBlocker",
+      "effect": "取消注册一个阻挡器实体。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新，根据摄像机距离和玩家位置，在海洋瓦片上动态生成波浪，可能生成或停止生成。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前生成半径和倍率的调试字符串。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34093,
+      20706,
+      13698,
+      20842,
+      17996,
+      20700,
+      65881,
+      13567
+    ],
+    "aspects": [
+      {
+        "aspect": "波浪推动与潮湿效果描述",
+        "evidence": [
+          {
+            "pageid": 20706,
+            "quote": "波浪可以推开水面上的物体（包括[[漂浮平台]]）。玩家被波浪击中时会增加9{{潮湿度}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "波浪",
+    "生成波浪",
+    "海岸浪",
+    "浪花",
+    "深海浪",
+    "阻挡机制",
+    "视角距离",
+    "动态生成",
+    "地形类型",
+    "视觉效果"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "装饰",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "42629cf749d6c3f81cef08e4b8856abc58b3efbf1c90787c4147f50bb3728c03",
+    "source_bytes": 5975,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113966388
+  }
+}

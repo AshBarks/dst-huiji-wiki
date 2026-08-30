@@ -1,0 +1,229 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wagpunk_arena_manager.lua"
+  },
+  "category": "component",
+  "display_name": "wagpunk_arena_manager",
+  "summary": "wagpunk_arena_manager 组件管理Wagpunk竞技场的状态机，控制从激活Spark Ark到最终机器人Boss战斗的完整任务流程。它涉及生成和跟踪Wagstaff NPC、处理珍珠移动、铺设特定地板、放置机器人部件、激活杠杆以及管理玩家锁定和Boss战状态。组件确保任务步骤按顺序推进，并处理玩家互动和状态持久化。",
+  "api": [
+    {
+      "name": "GetStateString",
+      "effect": "返回当前竞技场任务状态的字符串标识，如 'SPARKARK' 或 'BOSS'。"
+    },
+    {
+      "name": "SparkArkCompleted",
+      "effect": "标记Spark Ark任务完成，触发状态机推进到珍珠地图阶段。"
+    },
+    {
+      "name": "PearlMapCompleted",
+      "effect": "标记珍珠地图任务完成，触发珍珠移动事件并推进状态。"
+    },
+    {
+      "name": "PearlMoveCompleted",
+      "effect": "标记珍珠移动完成，推进到地板铺设阶段。"
+    },
+    {
+      "name": "TurfCompleted",
+      "effect": "标记地板铺设完成，推进到建造阶段。"
+    },
+    {
+      "name": "ConstructCompleted",
+      "effect": "标记建造阶段完成，推进到杠杆阶段。"
+    },
+    {
+      "name": "LeverCompleted",
+      "effect": "标记杠杆激活完成，推进到Boss战阶段并触发Wagstaff对话。"
+    },
+    {
+      "name": "BossCompleted",
+      "effect": "标记Boss战完成，处理冷却期、重置状态并解除玩家锁定。"
+    },
+    {
+      "name": "BossCooldownFinished",
+      "effect": "处理Boss冷却期结束，重置状态机回到建造阶段。"
+    },
+    {
+      "name": "ShouldWagstaffAcceptItem",
+      "effect": "判断Wagstaff NPC是否接受给定物品，用于任务验证（如地图或充能笼）。"
+    },
+    {
+      "name": "NeedsMoreWagdrones",
+      "effect": "检查是否需要更多Wagdrones（飞行/滚动机器人）来继续建造阶段。"
+    },
+    {
+      "name": "HasArenaEntity",
+      "effect": "检查竞技场中是否存在指定预制件的实体，用于任务条件判断。"
+    },
+    {
+      "name": "GetArenaSocketingInstFor",
+      "effect": "获取用于插槽的竞技场实体（如机器人或笼子标记），基于物品类型。"
+    },
+    {
+      "name": "TryToSpawnWagstaff",
+      "effect": "尝试生成Wagstaff NPC，如果不存在则生成并跟踪；用于任务触发。"
+    },
+    {
+      "name": "WorkstationToggled",
+      "effect": "处理工作站实体切换事件，根据当前状态触发Wagstaff生成或对话。"
+    },
+    {
+      "name": "LeverToggled",
+      "effect": "处理杠杆实体切换事件，根据当前状态触发Wagstaff生成或对话。"
+    },
+    {
+      "name": "LockPlayersIn",
+      "effect": "将区域内的玩家锁定，启用月亮疯狂（Lunacy）并开始跟踪玩家状态。"
+    },
+    {
+      "name": "UnlockPlayers",
+      "effect": "解除玩家锁定，停止月亮疯狂并清除玩家跟踪数据。"
+    },
+    {
+      "name": "ResetRobotBoss",
+      "effect": "重置机器人Boss状态，处理玩家离开情况并可能触发Boss重置事件。"
+    },
+    {
+      "name": "RegisterHermitCrabMarker",
+      "effect": "注册HermitCrab标记实体，用于计算竞技场旋转变换。"
+    },
+    {
+      "name": "RegisterBeeBoxHermit",
+      "effect": "注册BeeBox Hermit实体，用于计算竞技场旋转变换。"
+    },
+    {
+      "name": "RegisterMonkeyPortal",
+      "effect": "注册Monkey Island传送门实体，用于计算竞技场旋转变换。"
+    },
+    {
+      "name": "RegisterMonkeyQueen",
+      "effect": "注册Monkey Queen实体，用于计算竞技场旋转变换。"
+    },
+    {
+      "name": "RegisterLunacyCreator",
+      "effect": "注册月亮疯狂创建实体，启动竞技场的月亮疯狂模式。"
+    },
+    {
+      "name": "TryToApplyRotationTransformation",
+      "effect": "尝试应用旋转变换以适配世界布局，基于已注册实体计算角度并更新所有位置数据。"
+    },
+    {
+      "name": "TryToSpawnArenaEntities",
+      "effect": "尝试生成指定预制件的竞技场实体，使用验证函数检查位置并跟踪实体。"
+    },
+    {
+      "name": "SpawnWagstaffSetPiece",
+      "effect": "生成Wagstaff场景实体，包括工作站、杠杆和环境物体。"
+    },
+    {
+      "name": "DoWagstaffOneshotAtXZ",
+      "effect": "生成或移动Wagstaff到指定坐标并播放一次性对话。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_wagpunk_barrier_playerleft",
+    "ms_wagpunk_barrier_playerentered",
+    "ms_wagpunk_barrier_isactive"
+  ],
+  "events_listened": [
+    "ms_register_hermitcrab_marker",
+    "ms_register_beebox_hermit",
+    "ms_register_hermitcrab",
+    "ms_register_pearl_entity",
+    "ms_register_monkeyisland_portal",
+    "ms_register_monkeyqueen",
+    "ms_register_wagpunk_arena_lunacycreator",
+    "ms_lunarriftmutationsmanager_taskcompleted",
+    "ms_hermitcrab_relocated",
+    "ms_wagpunk_floor_kit_deployed",
+    "ms_wagpunk_constructrobot",
+    "ms_wagpunk_lever_activated",
+    "ms_wagboss_robot_losecontrol",
+    "ms_wagboss_alter_defeated",
+    "ms_alterguardian_phase1_lunarrift_capturable",
+    "ms_wagboss_robot_turnoff",
+    "ms_wagboss_robot_constructed",
+    "ms_wagstaff_arena_oneshot",
+    "ms_wagboss_snatched_wagstaff"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51494,
+      51498,
+      13606,
+      34794,
+      51495,
+      51497,
+      18509
+    ],
+    "aspects": [
+      {
+        "aspect": "力场封锁锁定玩家",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "开启[[瓦格斯塔夫的竞技场]]的力场封锁"
+          }
+        ]
+      },
+      {
+        "aspect": "战争瓦器人实体启动",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "拉下杠杆选择器后就会开启[[瓦格斯塔夫的竞技场]]的力场封锁，并且启动战争瓦器人"
+          }
+        ]
+      },
+      {
+        "aspect": "杠杆切换触发竞技场封锁",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "拉下杠杆选择器后就会开启[[瓦格斯塔夫的竞技场]]的力场封锁"
+          }
+        ]
+      },
+      {
+        "aspect": "瓦格斯塔夫底座套装放置",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "战争瓦器人底座套装仅可以放置在[[瓦格斯塔夫的竞技场]]中心"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Wagstaff",
+    "竞技场",
+    "机器人Boss",
+    "珍珠",
+    "地图",
+    "杠杆",
+    "地板",
+    "Spark Ark",
+    "笼子墙",
+    "任务"
+  ],
+  "gameplay_tags": [
+    "Boss战",
+    "竞技场",
+    "任务"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1638cd0333ad3545e773d67ce59d97f1215ad146b9a976294bc0d26a9922d9e0",
+    "source_bytes": 77942,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113781857
+  }
+}

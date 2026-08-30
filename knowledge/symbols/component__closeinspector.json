@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/closeinspector.lua"
+  },
+  "category": "component",
+  "display_name": "closeinspector",
+  "summary": "CloseInspector组件用于管理实体的近距离检查功能。它允许设置自定义函数来处理检查目标和检查点的行为，并通过添加和移除标签'closeinspector'来标识实体支持此功能。核心玩法涉及玩家与物体或环境点的交互检查。",
+  "api": [
+    {
+      "name": "SetInspectTargetFn",
+      "effect": "设置一个回调函数，用于在检查目标时调用。函数应返回行动结果：成功状态和原因。无副作用。"
+    },
+    {
+      "name": "SetInspectPointFn",
+      "effect": "设置一个回调函数，用于在检查点时调用。函数应返回行动结果：成功状态和原因。无副作用。"
+    },
+    {
+      "name": "CloseInspectTarget",
+      "effect": "执行检查目标操作。如果已设置检查目标函数，则调用该函数并传入组件实例、执行者和目标，返回其结果；否则返回nil。无固有副作用。"
+    },
+    {
+      "name": "CloseInspectPoint",
+      "effect": "执行检查点操作。如果已设置检查点函数，则调用该函数并传入组件实例、执行者和点，返回其结果；否则返回nil。无固有副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      33950,
+      51489,
+      51524,
+      15244,
+      15973,
+      18216,
+      21063,
+      21620
+    ],
+    "aspects": [
+      {
+        "aspect": "检查点生成机制",
+        "evidence": [
+          {
+            "pageid": 33950,
+            "quote": "由'''检查点套装'''放置后生成。"
+          },
+          {
+            "pageid": 51489,
+            "quote": "比赛检查点由玩家或起点塔投掷[[比赛检查点套装]]生成。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "近距离检查",
+    "检查目标",
+    "检查点",
+    "自定义检查",
+    "close inspector",
+    "组件",
+    "回调函数",
+    "实体标签",
+    "行为设置"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "探索",
+    "交互",
+    "自定义"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "543ad08fcf0cfe10f1cf682b361c2c6436c231b8610be7071b61ef03ba249ce8",
+    "source_bytes": 934,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095399731
+  }
+}

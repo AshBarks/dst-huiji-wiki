@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moistureabsorberuser.lua"
+  },
+  "category": "component",
+  "display_name": "moistureabsorberuser",
+  "summary": "moistureabsorberuser组件用于管理实体的水分吸收来源，通过SourceModifierList跟踪活动来源。它允许从库存中查找最佳吸收器并应用干燥效果，参与饥荒中的潮湿与干燥机制，帮助减少实体的潮湿状态。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": "添加一个来源（src）和键（key）到来源列表。行为：将来源设置为活动状态，影响干燥计算。副作用：如果来源已存在，可能更新列表。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "移除指定来源和键。行为：从列表中移除来源，如果列表为空，则自动移除整个moistureabsorberuser组件。副作用：组件可能被销毁，中断后续干燥效果。"
+    },
+    {
+      "name": "GetBestAbsorberRate",
+      "effect": "遍历实体库存，找到最高干燥速率的吸收器物品。行为：调用每个吸收器的GetDryingRate方法，应用最佳吸收器的ApplyDrying方法，返回该速率。副作用：实际改变库存物品的干燥状态，可能消耗物品耐久。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      17812
+    ],
+    "aspects": [
+      {
+        "aspect": "潮湿度清空效果",
+        "evidence": [
+          {
+            "pageid": 17812,
+            "quote": "食用蓝带鱼排会立刻清空玩家的潮湿度"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "干燥效果",
+    "潮湿机制",
+    "干燥机制",
+    "库存吸湿",
+    "来源跟踪",
+    "吸湿源",
+    "防潮",
+    "水分管理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "干燥",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "535088cea964e441497af2ca49a59f7209fcafdc97bcb48d568850b7f86124f1",
+    "source_bytes": 1414,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109929430
+  }
+}

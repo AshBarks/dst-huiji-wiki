@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rampingspawner.lua"
+  },
+  "category": "component",
+  "display_name": "rampingspawner",
+  "summary": "该组件管理波次生成系统，用于动态生成敌人实体，波次大小随时间或事件逐步增加。它跟踪生成实体的状态，并在实体死亡或移除时推送事件，常见于 Boss 战等场景。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，取消生成任务并重置组件状态。"
+    },
+    {
+      "name": "StopTrackingSpawn",
+      "effect": "停止跟踪指定生成实体，移除相关事件监听并减少生成计数。"
+    },
+    {
+      "name": "OnSpawnDeath",
+      "effect": "处理生成实体的死亡，停止跟踪并推送'rampingspawner_death'事件，包含剩余生成数量。"
+    },
+    {
+      "name": "TrackSpawn",
+      "effect": "开始跟踪生成实体，添加事件监听（inevitabledeath、death、onremove）并增加生成计数。"
+    },
+    {
+      "name": "GetCurrentWave",
+      "effect": "返回当前波次计数。"
+    },
+    {
+      "name": "GetWaveSize",
+      "effect": "根据当前波次编号计算波次大小，使用线性插值在最小和最大波次之间。"
+    },
+    {
+      "name": "DoWave",
+      "effect": "执行波次，增加波次编号和当前波次计数，当前波次增加 GetWaveSize() 的值。"
+    },
+    {
+      "name": "GetSpawnPos",
+      "effect": "返回生成位置，优先使用 getspawnposfn 回调，否则返回实体位置。"
+    },
+    {
+      "name": "GetSpawnRot",
+      "effect": "返回生成旋转，优先使用 getspawnrotfn 回调，否则返回实体旋转。"
+    },
+    {
+      "name": "SpawnEntity",
+      "effect": "生成一个预制体实体，设置位置和旋转，跟踪实体，推送'rampingspawner_spawn'事件，并在当前波次为零时安排下一个波次任务。"
+    },
+    {
+      "name": "IsActive",
+      "effect": "返回组件是否激活（spawning_on 状态）。"
+    },
+    {
+      "name": "Start",
+      "effect": "如果未激活，执行波次并设置为激活状态，调用 onstartfn 回调。"
+    },
+    {
+      "name": "Stop",
+      "effect": "如果已激活，设置为非激活状态，取消生成任务并调用 onstopfn 回调。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置当前波次为零，停止所有跟踪实体的事件监听。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前波次、波次编号、激活状态和生成实体的 GUID 列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据（当前波次、波次编号），如果激活状态为真则调用 Start()。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据保存的 GUID 重新跟踪生成实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "rampingspawner_death",
+    "rampingspawner_spawn"
+  ],
+  "events_listened": [
+    "inevitabledeath",
+    "death",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      13409,
+      20538,
+      17816,
+      35670,
+      13476,
+      24540,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及实体生成、行为、掉落和烹饪机制，但未以玩家语言表达rampingspawner组件的能力，如波浪生成、追踪、当前波次等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "波次生成",
+    "敌人刷新",
+    "龙蝇",
+    "战斗",
+    "生成器",
+    "逐渐增加",
+    "怪物",
+    "事件",
+    "Ramping"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c72fcf8452e323fd7ca476d034287281610e29058bcdb52da20d23b43aa8fa5",
+    "source_bytes": 4735,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103052617
+  }
+}

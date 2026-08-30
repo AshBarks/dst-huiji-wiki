@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pumpkinhatcarvable.lua"
+  },
+  "category": "component",
+  "display_name": "pumpkinhatcarvable",
+  "summary": "该组件管理南瓜帽的面部雕刻数据，允许玩家使用雕刻工具自定义帽子的外观。它处理雕刻的开始、验证和结束过程，确保工具匹配并更新视觉效果，参与装饰性玩法。",
+  "api": [
+    {
+      "name": "GetFaceData",
+      "effect": "返回当前面部数据，包含各部件（如眼睛、嘴巴）的雕刻变体，数据来自 collectfacedatafn 回调。"
+    },
+    {
+      "name": "CanBeginCarving",
+      "effect": "检查是否可以开始雕刻。参数: doer（玩家实体）。返回 true 或 false 及原因代码（如 'BURNING' 或 'INUSE'）。副作用: 无。"
+    },
+    {
+      "name": "BeginCarving",
+      "effect": "开始雕刻过程。参数: doer。副作用: 禁用物品拾取，添加 onremove 和 ms_closepopup 事件监听，触发玩家 pumpkincarving 状态，启动组件更新，调用 onopenfn 回调。"
+    },
+    {
+      "name": "EndCarving",
+      "effect": "结束雕刻过程。参数: doer。副作用: 恢复物品拾取，移除事件监听，推送 ms_endpumpkincarving 事件给玩家，停止组件更新，调用 onclosefn 回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_endpumpkincarving"
+  ],
+  "events_listened": [
+    "onputininventory",
+    "floater_startfloating",
+    "onremove",
+    "ms_closepopup"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      34615,
+      18530,
+      70704,
+      13493,
+      52634,
+      34523,
+      18231
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件pumpkinhatcarvable相关的代码能力GetFaceData、CanBeginCarving、BeginCarving、EndCarving的任何表达证据；页面内容主要涉及南瓜雕刻工具、活动布景等，但未讨论该组件的具体能力语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "南瓜帽",
+    "雕刻",
+    "雕刻工具",
+    "面部数据",
+    "装饰",
+    "万圣节",
+    "可雕刻",
+    "帽子自定义",
+    "pumpkin carving"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "节日"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "06ed0026a841c81c129d7ecc6cc9e6f3850cd1fa5c7538772d0b677f1d5453c9",
+    "source_bytes": 5481,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095807106
+  }
+}

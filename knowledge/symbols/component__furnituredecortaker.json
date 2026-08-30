@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/furnituredecortaker.lua"
+  },
+  "category": "component",
+  "display_name": "furnituredecortaker",
+  "summary": "组件 `furnituredecortaker` 管理实体是否能接受装饰物品以及当前持有的装饰物品。它参与装饰玩法，允许玩家通过交互将装饰物品放置在家具或可装饰实体上，影响外观或提供装饰功能。",
+  "api": [
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件是否启用。启用时实体添加标签 'furnituredecortaker'，禁用时移除标签。"
+    },
+    {
+      "name": "AbleToAcceptDecor",
+      "effect": "检查实体是否能接受指定装饰物品。如果组件禁用或物品为空则返回 false；若定义了 abletoaccepttest 回调则调用该回调；否则返回 true。"
+    },
+    {
+      "name": "AcceptDecor",
+      "effect": "接受装饰物品。从给予者库存移除物品（如堆叠则取单个），设置为当前装饰物品，禁用组件，监听物品的 'onremove' 和 'onpickup' 事件，并调用物品的 furnituredecor 组件执行 PutOnFurniture。"
+    },
+    {
+      "name": "TakeItem",
+      "effect": "取下当前装饰物品。清空装饰物品，启用组件，移除事件监听，调用物品的 furnituredecor 组件执行 TakeOffFurniture（若物品有效），并返回该物品。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时，清除标签 'furnituredecortaker'。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。若有装饰物品则返回包含物品 GUID 的数据表，否则返回 nil。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理。根据保存的 GUID 查找实体，调用 AcceptDecor 恢复装饰物品。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示组件启用状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "onpickup"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20438,
+      28738,
+      13493,
+      22631,
+      71471,
+      71571
+    ],
+    "aspects": [
+      {
+        "aspect": "桌子接受装饰的能力描述",
+        "evidence": [
+          {
+            "pageid": 28738,
+            "quote": "木圆桌上可以放置[[家具装饰]]。"
+          },
+          {
+            "pageid": 71571,
+            "quote": "属于‘家具装饰（furnituredecor）’类别的物品都能放置在[[桌子]]上。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "装饰物品",
+    "家具装饰",
+    "放置装饰",
+    "取下装饰",
+    "装饰系统",
+    "家具个性化",
+    "装饰组件",
+    "装饰管理"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "装饰",
+    "家具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ed10b9e0024e028141995849264640de47ebdcabbfc3f2a6bc247498dd191a67",
+    "source_bytes": 4065,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100250757
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ghostbabysitter.lua"
+  },
+  "category": "component",
+  "display_name": "ghostbabysitter",
+  "summary": "该组件用于管理实体对幽灵的照顾状态。它通过一个字典跟踪当前被照顾的幽灵列表，并控制 inactive 和 activatable_forceright 标签以影响交互行为。组件支持保存和加载照顾关系，确保在游戏重启后幽灵照顾状态得以恢复。",
+  "api": [
+    {
+      "name": "IsBabysittingGhost",
+      "effect": "检查传入的幽灵实体是否在照顾列表中。返回 true 如果存在，否则返回 nil 或 false。无副作用。"
+    },
+    {
+      "name": "AddGhost",
+      "effect": "将幽灵实体添加到照顾列表，并启动组件的更新函数。如果组件已在更新，则无额外操作。"
+    },
+    {
+      "name": "RemoveGhost",
+      "effect": "从照顾列表移除指定幽灵。如果列表为空，则停止组件的更新函数。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前 inactive 状态的字符串表示，用于调试。无副作用。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "在每次游戏更新时调用，如果组件定义了 updatefn 函数，则执行它并传入 dt 参数。无其他副作用。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载存档后处理，遍历保存的幽灵 GUID 列表，向对应的幽灵实体推送 'set_babysitter' 事件以恢复照顾关系。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存照顾列表中所有幽灵的 GUID 到数据表，并返回数据表和实体 GUID 列表。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据，但当前实现为空，未执行任何操作。无副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除 inactive 和 activatable_forceright 标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10374
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容聚焦于薇洛的角色背景、特殊能力和技能树，未提及幽灵相关机制或组件能力的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鬼魂守护",
+    "看护者",
+    "不活跃",
+    "强制右键",
+    "幽灵名单",
+    "保存与加载",
+    "调试文本",
+    "组件刷新"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "幽灵互动",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3934fbe3bef6767f5453ed3e63ca64d522f435e949e92785152f50169229b70f",
+    "source_bytes": 2068,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108054605
+  }
+}

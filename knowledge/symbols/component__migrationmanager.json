@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/migrationmanager.lua"
+  },
+  "category": "component",
+  "display_name": "migrationmanager",
+  "summary": "MigrationManager组件管理游戏世界中特定生物种群（如水晶冠秃鹫）的创建、追踪与周期性迁移行为。它构建并维护一张基于地图拓扑结构的迁移网络，并控制种群组在预定义或随机生成的节点路径间移动。",
+  "api": [
+    {
+      "name": "CreateMigrationType",
+      "effect": "注册一种新的可迁移生物类型及其迁移规则（如最大组数量、迁移时间等），并为其初始化种群数据表。"
+    },
+    {
+      "name": "GetMigrationNodeAtPoint",
+      "effect": "根据给定的世界坐标（x, y, z）查询并返回该位置所在的迁移地图节点名称（字符串），返回nil则表示不在任何有效节点内。"
+    },
+    {
+      "name": "GetMigrationNodeAtInst",
+      "effect": "根据传入实体的当前位置，查询并返回该实体所在的迁移地图节点名称。"
+    },
+    {
+      "name": "GetDistanceNodeToNode",
+      "effect": "返回两个迁移地图节点之间的距离（以节点跳数为单位），距离信息缓存于内部。"
+    },
+    {
+      "name": "GetPopulationGroup",
+      "effect": "通过种群组唯一标识符(uid)查找并返回对应的种群组数据表和其所属的迁移类型名。"
+    },
+    {
+      "name": "GetFirstPopulationGroupInNode",
+      "effect": "查找指定迁移类型中、位于指定节点且满足过滤函数条件的第一个种群组uid。"
+    },
+    {
+      "name": "GetEntityFromMigrationNode",
+      "effect": "从指定迁移类型在特定节点上的所有种群组中，移除并返回一个实体。"
+    },
+    {
+      "name": "ForEachEntityInMigration",
+      "effect": "遍历指定迁移类型的所有种群组中的每一个实体，对每个实体执行回调函数(cb)。若回调函数返回true则停止遍历。"
+    },
+    {
+      "name": "GetPopulationForNodeAtPoint",
+      "effect": "计算并返回指定迁移类型在某个坐标点所在节点内的所有种群组实体总数。"
+    },
+    {
+      "name": "GetPopulationForNodeAtInst",
+      "effect": "计算并返回指定迁移类型在某个实体所在节点内的所有种群组实体总数。"
+    },
+    {
+      "name": "ShouldPopulationGroupMigrate",
+      "effect": "根据迁移规则判断一个种群组当前是否应当进行迁移。默认在组内实体数量大于0时返回true，可通过迁移规则自定义。"
+    },
+    {
+      "name": "CreatePopulationGroup",
+      "effect": "为指定的迁移类型在指定节点创建一个新的种群组，初始化其数据（包括设置初始迁移计时器），并返回其uid。"
+    },
+    {
+      "name": "ClearPopulationGroup",
+      "effect": "根据迁移类型和uid删除一个种群组数据。"
+    },
+    {
+      "name": "RemoveEntityFromPopulationGroup",
+      "effect": "将实体从其当前所属的种群组中移除。若组内无实体，则自动清除该种群组。返回操作是否成功。"
+    },
+    {
+      "name": "AddEntityToPopulationGroup",
+      "effect": "将实体添加到指定uid的种群组中，并关联实体的onremove事件以在实体被移除时自动从组中注销。返回操作是否成功。"
+    },
+    {
+      "name": "EnterMigrationInNode",
+      "effect": "使实体进入指定迁移类型在指定节点的迁移系统：优先加入该节点未满的现有种群组，否则创建新组并加入。"
+    },
+    {
+      "name": "EnterMigration",
+      "effect": "使实体进入迁移系统：自动判断其当前位置所属节点，并尝试加入该节点的现有种群组或创建新组。若无法定位节点，实体将被移除。"
+    },
+    {
+      "name": "ClearAllPopulationGroupMigrationPaths",
+      "effect": "清空指定迁移类型所有种群组的当前计划迁移路径，使其重新规划。"
+    },
+    {
+      "name": "MigratePopulationToNode",
+      "effect": "将指定种群组立即迁移到目标节点（更新当前节点、重置迁移计时器、清空路径）。若目标节点不是路径的下一个，则重置路径。"
+    },
+    {
+      "name": "MigratePopulationToNextNode",
+      "effect": "将指定种群组按其当前迁移路径移动到下一个节点，并更新状态（当前节点、计时器、最近访问节点列表）。若路径为空，则仅重置计时器。"
+    },
+    {
+      "name": "UpdatePopulationMigrationPath",
+      "effect": "更新指定种群组的迁移路径。若迁移规则定义了自定义路径更新函数则调用之，否则默认向当前路径末尾节点的随机邻居添加一个新节点。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      52138,
+      15724,
+      65737,
+      65456,
+      14684,
+      15539,
+      20113,
+      65881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述水晶冠秃鹫和秃鹫的生物行为、种群迁徙机制、生成点、变异等，未涉及 `migrationmanager` 组件的具体能力如迁移类型创建、迁移节点获取、种群组管理等的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "生物迁移",
+    "种群管理",
+    "地图节点",
+    "路径规划",
+    "秃鹫",
+    "水晶冠",
+    "迁移系统",
+    "种群组"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "环境",
+    "生态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9fe46937bf98d614dcfb16e0ac0f27b2e8beb94a659f75d9793a273ebe9e5f71",
+    "source_bytes": 20558,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109816782
+  }
+}

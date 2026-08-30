@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/upgrademoduleremover.lua"
+  },
+  "category": "component",
+  "display_name": "upgrademoduleremover",
+  "summary": "组件 UpgradeModuleRemover 用于管理升级模块的移除功能，但具体移除逻辑未在源码中实现。它注册在动作系统中，允许玩家或实体通过交互动作移除实体上的升级模块。该组件涉及游戏内的建造和升级管理玩法。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；源码仅包含构造函数，未定义任何对外暴露的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16438
+    ],
+    "aspects": [
+      {
+        "aspect": "使用电路提取器拔电路板",
+        "evidence": [
+          {
+            "pageid": 16438,
+            "quote": "WX-78可以使用电路提取器，以从高到低的顺序依次拔下自身底盘上的电路板。"
+          }
+        ]
+      },
+      {
+        "aspect": "技能树对拔电路板行为的修改",
+        "evidence": [
+          {
+            "pageid": 16438,
+            "quote": "已学习“改装权”技能的WX-78，可以随意拔下任意一种电路板中最上方的一个，电路板被拔下后损失 12.5% 耐久（即每个电路板一共能拔下 8 次）。"
+          }
+        ]
+      },
+      {
+        "aspect": "激活状态下的电荷损失",
+        "evidence": [
+          {
+            "pageid": 16438,
+            "quote": "如果这个电路板处于激活状态，还会损失等量于电路板插脚数量的电荷。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "升级模块移除",
+    "移除升级模块",
+    "动作注册",
+    "交互移除",
+    "建造升级",
+    "升级功能",
+    "模块组件",
+    "移除功能"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "建造",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dbbdad64498e4dd5348fa8b60d4f06783a182bbb5da7026120da70294370ad7a",
+    "source_bytes": 162,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104475633
+  }
+}

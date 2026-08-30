@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moontrader.lua"
+  },
+  "category": "component",
+  "display_name": "moontrader",
+  "summary": "MoonTrader 组件用于管理月亮交易逻辑，通过设置回调函数来控制物品接受的条件和后续处理。组件在实体初始化时添加 'moontrader' 标签，是游戏中交易系统的一部分。",
+  "api": [
+    {
+      "name": "SetCanAcceptFn",
+      "effect": "设置一个函数，用于决定实体是否接受给予者提供的物品。该函数在 AcceptOffering 被调用时执行，参数为实体、物品和给予者，返回成功标志和原因；副作用是影响交易判断逻辑。"
+    },
+    {
+      "name": "SetOnAcceptFn",
+      "effect": "设置一个函数，在物品被成功接受后执行。该函数在 AcceptOffering 被调用时执行，参数为实体、给予者和物品；副作用是允许在交易后添加自定义处理逻辑。"
+    },
+    {
+      "name": "AcceptOffering",
+      "effect": "尝试接受给予者提供的物品。首先检查 canaccept 函数是否允许；然后处理物品（如果堆叠则获取一个，否则从所有者移除）；接着执行 onaccept 函数；最后移除物品。成功返回 true，否则返回 false 和原因；副作用是物品被移除，给予者失去物品，onaccept 函数被调用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      13493,
+      20714,
+      46887,
+      15133,
+      13457,
+      18521,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "猪王交易接受与拒绝条件描述",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "玩家（[[沃特]]除外）可以用[[可交易]]且交易价值大于 0 的物品与它进行交易，获得交易价值数量的[[金块]]。"
+          },
+          {
+            "pageid": 18521,
+            "quote": "[[可交易]]但交易价值等于 0 的物品也可给予猪王，但会被拒绝"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月亮商人",
+    "月交易",
+    "交易机制",
+    "物品交换",
+    "事件处理",
+    "组件标签",
+    "月亮祭坛",
+    "商人",
+    "给予"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "交易"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "339dd20d1efac68a9d0f72b3c1ffe740210670a972893f7235c4f81b85be4208",
+    "source_bytes": 989,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110178983
+  }
+}

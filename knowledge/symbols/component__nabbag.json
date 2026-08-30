@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nabbag.lua"
+  },
+  "category": "component",
+  "display_name": "nabbag",
+  "summary": "组件 Nabbag 管理一种区域拾取能力，允许玩家通过锥形范围快速收集或复制物品。它参与 Wortox 的技能系统，用于提升资源收集效率。核心玩法涉及生存和资源管理。",
+  "api": [
+    {
+      "name": "ReplicateNetFromAct",
+      "effect": "从给定动作中复制网络效果到玩家前方锥形区域内的所有有效实体。行为：临时修改动作目标为锥形区域内的实体，调用网络动作并触发物品使用。副作用：可能消耗物品耐久度，并仅在首次调用时执行。"
+    },
+    {
+      "name": "DoNabFromAct",
+      "effect": "执行拾取动作，并扩展拾取范围到锥形区域，允许一次拾取多个物品。行为：拾取目标物品后，扫描锥形区域内所有可拾取实体并逐个拾取，优化库存堆叠。副作用：修改玩家库存处理函数以临时支持物品堆叠，消耗有限耐久，并在耐久或拾取上限用尽时停止。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "NABBAG_CONEANGLE",
+    "NABBAG_MAX_RADIUS",
+    "NABBAG_CIRCLE_RADIUS",
+    "NABBAG_MAX_USES_PER_NAB_PERCENT",
+    "NABBAG_MAX_ITEMS_PER_NAB"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      18234,
+      19940,
+      15022,
+      16185,
+      65881,
+      13701,
+      15903
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有讨论component__nabbag或其能力ReplicateNetFromAct和DoNabFromAct。所有页面均涉及其他实体（如wortox、book_sleep等），未包含与nabbag相关的任何能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "拾取",
+    "范围",
+    "Wortox",
+    "网络复制",
+    "物品收集",
+    "锥形区域",
+    "耐久",
+    "背包",
+    "生存技能",
+    "资源管理"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "技能",
+    "资源收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "13707326a0f747cbe3c8f5c4eba38023c3025864192564622511b7166275962b",
+    "source_bytes": 6089,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102060723
+  }
+}

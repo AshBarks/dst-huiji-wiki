@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/writeable_replica.lua"
+  },
+  "category": "component",
+  "display_name": "writeable_replica",
+  "summary": "Writeable组件管理可写实体（如标牌、地图等）的文本数据，支持玩家在客户端输入文本并通过分类实体进行网络同步。它处理文本的输入、验证和传输，确保多人游戏中文本内容一致显示。组件参与核心玩法中的信息共享和世界标记。",
+  "api": [
+    {
+      "name": "AttachClassified",
+      "effect": "连接分类实体到当前组件，设置事件监听器以在实体移除时断开，并启动一个任务在下一帧自动开始写入过程。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "断开分类实体，取消打开任务，清除相关引用，并结束当前写入状态。"
+    },
+    {
+      "name": "BeginWriting",
+      "effect": "开始写入过程；如果实体有本地写入组件则调用其BeginWriting方法，否则如果客户端且分类实体存在且玩家是ThePlayer则打开写入界面。"
+    },
+    {
+      "name": "Write",
+      "effect": "写入文本；如果实体有本地写入组件则调用其Write方法，否则如果客户端且分类实体存在且文本长度符合布局限制则通过RPC发送文本到服务器。"
+    },
+    {
+      "name": "EndWriting",
+      "effect": "结束写入，取消任何待执行的打开任务，如果实体有本地写入组件则调用其EndWriting方法，否则关闭写入界面并清理屏幕引用。"
+    },
+    {
+      "name": "SetWriter",
+      "effect": "设置分类实体的网络目标为指定写入者或当前实体，用于同步写入权限；如果无本地写入组件则断言写入者为nil。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，如果当前是主机模拟且分类实体存在则移除分类实体并清空引用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "可书写组件",
+    "文本输入管理",
+    "玩家书写",
+    "联机同步",
+    "标牌文本",
+    "地图文字",
+    "世界信息",
+    "实体编辑"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "建造",
+    "装饰",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9e0e0f68c01b9764345dde70537c7ecd723ed6e4c4e9b2ea26f74072eee1fb40",
+    "source_bytes": 4156,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114499754
+  }
+}

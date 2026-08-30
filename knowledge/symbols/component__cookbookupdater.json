@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cookbookupdater.lua"
+  },
+  "category": "component",
+  "display_name": "cookbookupdater",
+  "summary": "CookbookUpdater 组件管理玩家的烹饪书数据，负责学习和更新食谱及食物统计信息。它通过RPC在服务器与客户端之间同步新发现的食谱，确保玩家烹饪记录的连贯性。核心玩法涉及烹饪系统的食谱发现与记录机制。",
+  "api": [
+    {
+      "name": "LearnRecipe",
+      "effect": "尝试学习一个食谱，调用烹饪书数据添加食谱。如果食谱更新成功且满足条件（如服务器端或主机且非玩家自身），则通过RPC将食谱发送给客户端。副作用：修改烹饪书数据并可能触发网络消息。"
+    },
+    {
+      "name": "LearnFoodStats",
+      "effect": "尝试学习一个食物的统计信息，调用烹饪书数据更新食物数据。如果更新成功且满足条件（如服务器端或主机且非玩家自身），则通过RPC将食物统计信息发送给客户端。副作用：修改烹饪书数据并可能触发网络消息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "playeractivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13934
+    ],
+    "aspects": [
+      {
+        "aspect": "烹饪料理属性记录",
+        "evidence": [
+          {
+            "pageid": 13934,
+            "quote": "当玩家烹饪并亲自采收烹饪料理时，其{{Tooltip|种类|[[食物类型]]}}、{{Tooltip|变质速度|[[保质期]]，并非[[腐烂速度]]}}"
+          }
+        ]
+      },
+      {
+        "aspect": "食谱记录上限",
+        "evidence": [
+          {
+            "pageid": 13934,
+            "quote": "一道料理最多记录 6 个不同的食谱"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "菜谱学习",
+    "做饭记录",
+    "联机同步",
+    "烹饪手册",
+    "食谱更新",
+    "美食发现",
+    "烹饪系统",
+    "玩家烹饪"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "烹饪",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8f407834cca6853ec1b54c875789d757026ac1982bb7fe5e985262720e973edf",
+    "source_bytes": 1796,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090916830
+  }
+}

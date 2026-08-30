@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarhailbirdsoundmanager.lua"
+  },
+  "category": "component",
+  "display_name": "lunarhailbirdsoundmanager",
+  "summary": "该组件管理月圆鸟灾事件中的声音级别，控制背景音效的变化，如同步鸟叫的消失或战斗声音，以增强游戏事件的氛围。它通过网络变量将声音级别同步到客户端，并根据级别播放或停止相应的环境音效。",
+  "api": [
+    {
+      "name": "GetIsBirdlessAmbience",
+      "effect": "返回布尔值，检查声音级别是否大于0（即HAIL_SOUND_LEVELS.NONE），表示鸟灾声音是否活跃。无副作用。"
+    },
+    {
+      "name": "SetLevel",
+      "effect": "设置声音级别，同步到客户端。行为：更新内部sound_level属性和网络变量birds_dropping_param；在非专用服务器上，调用PlaySoundLevel函数播放或停止背景音效。副作用：可能触发TheWorld推送'updateambientsoundparams'事件，改变环境音效。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "hailbirddirty"
+  ],
+  "netvars": [
+    "lunarhailbirdsoundmanager.birds_dropping"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19802,
+      16165
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未提及lunarhailbirdsoundmanager组件的GetIsBirdlessAmbience或SetLevel能力表达，内容仅涉及梦魇循环环境音效阶段描述和贝壳海滩地皮的海浪音效。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月圆事件",
+    "鸟叫音效",
+    "环境音效",
+    "声音管理",
+    "事件音效控制",
+    "同步音效",
+    "氛围营造",
+    "鸟灾声音管理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "事件",
+    "声音",
+    "氛围"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d772e6fc52b2c1d9ce121860a64880aa245c06c952db5c774d0572a5491acc1a",
+    "source_bytes": 2421,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109276687
+  }
+}

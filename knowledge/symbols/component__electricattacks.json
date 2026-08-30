@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/electricattacks.lua"
+  },
+  "category": "component",
+  "display_name": "electricattacks",
+  "summary": "该组件用于管理实体的电击攻击状态，使用SourceModifierList跟踪多个电击来源。当有来源激活时，实体获得电击效果；当所有来源移除后，组件自动从实体中删除。此机制常用于武器或技能赋予电击伤害，参与战斗系统。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": "添加一个电击攻击来源，将对应修改器设置为真，激活电击状态。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "移除一个电击攻击来源；如果移除后无任何来源，组件自动从实体中移除。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      70763,
+      51046,
+      13897,
+      13828,
+      15651,
+      15551,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "电击传播机制描述",
+        "evidence": [
+          {
+            "pageid": 70763,
+            "quote": "在一个实体（称为触电者）触发触电的 {{Tooltip|0.37|实为 11/30}} 秒后，周围 4 ~ 6 {{解释|距离单位}}"
+          }
+        ]
+      },
+      {
+        "aspect": "电击触发机制描述",
+        "evidence": [
+          {
+            "pageid": 70763,
+            "quote": "如果不绝缘的可触电生物或玩家受到电击，就可能会进入触电状态。"
+          }
+        ]
+      },
+      {
+        "aspect": "触电抗性初始值描述",
+        "evidence": [
+          {
+            "pageid": 70763,
+            "quote": "具体来说，除巨兽以外的实体初始触电抗性默认为 0，巨兽为 1。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "电击",
+    "攻击",
+    "电击攻击",
+    "武器效果",
+    "状态管理",
+    "来源修改",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "状态效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a9e09b1c689954a04e6ad8f7fcb041d8d1d1b70ae5fb3f6d54b2b03083fa251d",
+    "source_bytes": 544,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096604360
+  }
+}

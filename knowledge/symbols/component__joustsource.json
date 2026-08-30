@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/joustsource.lua"
+  },
+  "category": "component",
+  "display_name": "joustsource",
+  "summary": "该组件管理速度、长矛长度、跑步动画循环次数和碰撞检测标签等数据。它参与饥荒联机版中的冲撞攻击核心玩法，通过 CheckCollision 方法检测与敌对实体的碰撞，造成伤害和击退效果，并可能触发冲撞事件。",
+  "api": [
+    {
+      "name": "SetSpeed",
+      "effect": "设置组件的速度值。"
+    },
+    {
+      "name": "GetSpeed",
+      "effect": "返回组件当前的速度值。"
+    },
+    {
+      "name": "SetRunAnimLoopCount",
+      "effect": "设置跑步动画的循环次数。"
+    },
+    {
+      "name": "GetRunAnimLoopCount",
+      "effect": "返回跑步动画的循环次数。"
+    },
+    {
+      "name": "SetLanceLength",
+      "effect": "设置长矛的长度值。"
+    },
+    {
+      "name": "GetLanceLength",
+      "effect": "返回长矛的长度值。"
+    },
+    {
+      "name": "SetOnHitOtherFn",
+      "effect": "设置击中其他实体时执行的回调函数。"
+    },
+    {
+      "name": "CheckCollision",
+      "effect": "检查指定实体与周围实体的碰撞。如果实体有'jousting'标签且满足角度条件，推送'joust_collide'事件；否则对非盟友敌对实体进行攻击并推送'knockback'事件。返回是否发生碰撞。"
+    }
+  ],
+  "events_published": [
+    "joust_collide",
+    "knockback"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WILSON_RUN_SPEED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13897,
+      51046,
+      19110,
+      13828,
+      15832,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离检测",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 {{解释|距离单位}}内的玩家目标"
+          }
+        ]
+      },
+      {
+        "aspect": "命中效果描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "击中目标提高 10 点[[启蒙值]]"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击范围数值",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "|攻击范围 = 3<br>4.2（狂暴）"
+          }
+        ]
+      },
+      {
+        "aspect": "移动速度描述",
+        "evidence": [
+          {
+            "pageid": 15832,
+            "quote": "激光眼行动速度较慢"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "冲撞",
+    "长矛",
+    "攻击",
+    "碰撞检测",
+    "jousting",
+    "骑乘",
+    "击退",
+    "速度设置",
+    "动画循环"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "冲撞"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "267eae918bbeab975c02d87ef873fd8a3e07ba669510aedade5604fcc98b0e76",
+    "source_bytes": 4428,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100835337
+  }
+}

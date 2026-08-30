@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lock.lua"
+  },
+  "category": "component",
+  "display_name": "lock",
+  "summary": "lock组件管理实体的锁定状态，包括是否锁定、是否卡住以及关联的钥匙实体。它参与核心玩法如门锁、箱子等需要钥匙解锁的交互，通过标签系统影响游戏逻辑。",
+  "api": [
+    {
+      "name": "SetOnUnlockedFn",
+      "effect": "设置解锁时的回调函数，用于自定义解锁行为；接收一个函数fn，存储在onunlocked中。"
+    },
+    {
+      "name": "SetOnLockedFn",
+      "effect": "设置锁定时的回调函数，用于自定义锁定行为；接收一个函数fn，存储在onlocked中。"
+    },
+    {
+      "name": "CompatableKey",
+      "effect": "检查给定钥匙类型是否与锁兼容；接收keytype参数，返回布尔值，仅当未卡住且keytype等于locktype时返回true。"
+    },
+    {
+      "name": "IsStuck",
+      "effect": "返回布尔值，指示锁是否卡住；读取isstuck属性。"
+    },
+    {
+      "name": "IsLocked",
+      "effect": "返回布尔值，指示锁是否锁定；读取islocked属性。"
+    },
+    {
+      "name": "Unlock",
+      "effect": "解锁操作；接收key和doer参数，如果未卡住且锁定，则设置islocked为false，触发onunlocked回调，处理钥匙的消耗（如stackable组件）并调用SetKey设置钥匙。"
+    },
+    {
+      "name": "Lock",
+      "effect": "锁定操作；接收doer参数，如果未卡住且未锁定，则设置islocked为true，触发onlocked回调，归还钥匙给doer的inventory组件，并调用SetKey设置钥匙为nil。"
+    },
+    {
+      "name": "SetKey",
+      "effect": "设置锁关联的钥匙实体；接收key参数，如果存在旧钥匙则移除子实体并返回场景，新钥匙则作为子实体隐藏。"
+    },
+    {
+      "name": "TestForUnlock",
+      "effect": "测试解锁；接收key参数，如果卡住则返回false；否则执行自定义unlocktest函数（如果存在）或直接调用Unlock。"
+    },
+    {
+      "name": "SetLocked",
+      "effect": "直接设置锁定状态；接收locked布尔值，如果状态改变则触发相应回调（onlocked或onunlocked），并更新islocked属性。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存的数据字典，包括locked、isstuck和key的GUID，以及需要加载的实体列表（如果key存在）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据；接收data字典，设置isstuck和调用SetLocked设置锁定状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理；接收newents和data，如果data包含key的GUID，则从newents中恢复钥匙实体并调用SetKey。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件移除时清理；移除实体上的locktype标签和unlockable标签。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，格式包含locktype、islocked、isstuck和key的状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      16419,
+      13156,
+      51951,
+      47009,
+      18271,
+      13493,
+      13642
+    ],
+    "aspects": [
+      {
+        "aspect": "解锁机制描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "所有的电路板都无法通过原型工具解锁，只能由使用生物扫描分析仪扫描特定生物来解锁。"
+          },
+          {
+            "pageid": 18271,
+            "quote": "书架也是一个原型工具，相当于一个炼金引擎，能够允许所有角色解锁二级科学的制作配方"
+          },
+          {
+            "pageid": 13493,
+            "quote": "在好感度达到 1 级之后，靠近寄居蟹隐士能开启瓶罐交易。更多的交易项在好感度达到 3、6、8、9 级时解锁"
+          },
+          {
+            "pageid": 13642,
+            "quote": "有些配方只能在特定活动期间才能制作，制作第一次后就会解锁"
+          }
+        ]
+      },
+      {
+        "aspect": "锁与钥匙的初始设置和状态检查",
+        "evidence": [
+          {
+            "pageid": 73480,
+            "quote": "每个生物群系都有一个锁列表与一个钥匙列表作为其初始属性"
+          },
+          {
+            "pageid": 73480,
+            "quote": "当群系的锁列表为空或锁列表第一个元素为 LOCKS.NONE 时"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "锁",
+    "钥匙",
+    "解锁",
+    "锁定",
+    "门锁",
+    "卡住",
+    "兼容",
+    "保存",
+    "加载",
+    "状态"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "探险"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "598bb62eb4d02634d1875d82c633a54ba8fc56c57a4ff9ed819260e9a9b06946",
+    "source_bytes": 4312,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101334169
+  }
+}

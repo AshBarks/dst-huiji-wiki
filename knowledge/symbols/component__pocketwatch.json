@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pocketwatch.lua"
+  },
+  "category": "component",
+  "display_name": "pocketwatch",
+  "summary": "PocketWatch组件管理怀表的'非激活'状态，用于控制法术施放条件。它通过标签'pocketwatch_inactive'标记实体状态，并提供方法检查施放资格和执行施放。该组件参与怀表类道具的核心法术系统，涉及时间相关能力。",
+  "api": [
+    {
+      "name": "CanCast",
+      "effect": "检查self.inactive是否为真，并调用可选的self.CanCastFn函数；返回布尔值表示是否可以施放法术。无直接副作用，仅状态检查。"
+    },
+    {
+      "name": "CastSpell",
+      "effect": "在self.inactive为真且self.DoCastSpell函数存在时，调用该函数执行施放；返回成功状态和原因。副作用取决于DoCastSpell的具体实现，可能改变游戏状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，调用self.inst:RemoveTag('pocketwatch_inactive')移除标签，清理状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15303,
+      15922,
+      57263,
+      18001,
+      16641,
+      34314,
+      17930,
+      24578
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有找到与 component__pocketwatch 相关的 CanCast、CastSpell 或 OnRemoveFromEntity 能力的玩家语言表达。内容涉及角色时间管理、熔炉技能、区域机制、传送物品等，但未描述口袋表组件的具体施法或移除行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "怀表",
+    "法术",
+    "施放",
+    "非激活",
+    "时间",
+    "传送",
+    "咒语",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "魔法",
+    "道具",
+    "时间控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f93dd1eb9976a525b2ddb655871f5ceafc507dab8562646912e5c0381275b037",
+    "source_bytes": 802,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111311244
+  }
+}

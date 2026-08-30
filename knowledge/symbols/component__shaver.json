@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shaver.lua"
+  },
+  "category": "component",
+  "display_name": "shaver",
+  "summary": "该组件是饥荒联机版中的一个简单组件，用于注册剃须相关动作。它不管理任何数据，也不暴露公共方法，主要在其他地方（如 componentactions.lua）定义行为。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，组件仅作为数据容器或动作注册点。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24866,
+      24862,
+      51494,
+      10355,
+      73231,
+      13642,
+      14649,
+      18075
+    ],
+    "aspects": [
+      {
+        "aspect": "交互方式限制",
+        "evidence": [
+          {
+            "pageid": 14649,
+            "quote": "无法被装备，使用时只能拿起来然后左键点击互动对象。"
+          }
+        ]
+      },
+      {
+        "aspect": "刮牛毛功能",
+        "evidence": [
+          {
+            "pageid": 14649,
+            "quote": "剃刀可以为[[皮弗娄牛]]刮毛。"
+          }
+        ]
+      },
+      {
+        "aspect": "剃须效果",
+        "evidence": [
+          {
+            "pageid": 10355,
+            "quote": "可以用[[剃刀]]剃须，使胡须长度降低一个阶段，掉落一定数量的[[胡须]]，同时回复 10 {{理智值}}。"
+          }
+        ]
+      },
+      {
+        "aspect": "效率策略提示",
+        "evidence": [
+          {
+            "pageid": 14649,
+            "quote": "使用剃刀获取牛毛比直接杀死皮弗娄牛更有效率"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "剃须",
+    "剃刀",
+    "胡子",
+    "清洁",
+    "剃毛",
+    "美观",
+    "卫生",
+    "工具",
+    "动作注册"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6fccc235276e09f1efe225b36e25259ea23cf6c2348b17825eca4fd792670d3b",
+    "source_bytes": 128,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103679237
+  }
+}

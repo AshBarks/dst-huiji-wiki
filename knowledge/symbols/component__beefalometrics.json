@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/beefalometrics.lua"
+  },
+  "category": "component",
+  "display_name": "beefalometrics",
+  "summary": "这个组件负责管理与牛驯化相关的指标数据，监听并记录玩家对牛的交互行为，如进食、刷毛、骑乘和死亡。它通过推送统计事件来收集数据，用于游戏内的统计分析功能。组件还保存和加载最后驯化者的信息，以维持数据追踪的连续性。",
+  "api": [
+    {
+      "name": "SetLastDomesticator",
+      "effect": "将最后驯化者设置为指定玩家对象，并清除之前的用户ID记录。"
+    },
+    {
+      "name": "GetLastDomesticator",
+      "effect": "返回最后驯化者：优先返回玩家对象，若不存在则尝试从用户ID恢复玩家，或返回nil。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存最后驯化者的用户ID到表中并返回，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据表中加载最后驯化者的用户ID，恢复组件状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "domesticationdelta",
+    "oneat",
+    "brushed",
+    "domesticated",
+    "goneferal",
+    "death",
+    "riderchanged",
+    "attacked",
+    "riderdoattackother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      13409,
+      15526,
+      15169,
+      52019,
+      15225,
+      28734,
+      15941
+    ],
+    "aspects": [
+      {
+        "aspect": "皮弗娄牛绑定与驯化管理",
+        "evidence": [
+          {
+            "pageid": 15169,
+            "quote": "皮弗娄牛铃能让玩家更轻松的管理皮弗娄牛。将皮弗娄牛铃对着一头皮弗娄牛左键可以进行绑定"
+          },
+          {
+            "pageid": 15169,
+            "quote": "可以将绑定的皮弗娄牛铃放在营地中，这样可以让牛在不被玩家骑行时自行返回营地。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "牛",
+    "驯化",
+    "骑乘",
+    "刷毛",
+    "死亡",
+    "战斗",
+    "指标",
+    "统计"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "骑乘"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2e51d4ab7da4e29e4530cb00556e3bbe04af16024f4448ae2d22b1bf198ff1c8",
+    "source_bytes": 6415,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098236521
+  }
+}

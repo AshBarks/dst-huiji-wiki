@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playingcard.lua"
+  },
+  "category": "component",
+  "display_name": "playingcard",
+  "summary": "该组件管理扑克牌实体的唯一标识ID、花色和点数属性，用于支持游戏中扑克牌相关玩法，如卡牌识别、游戏逻辑处理和数据存档。",
+  "api": [
+    {
+      "name": "SetID",
+      "effect": ""
+    },
+    {
+      "name": "GetID",
+      "effect": ""
+    },
+    {
+      "name": "GetSuit",
+      "effect": ""
+    },
+    {
+      "name": "GetPips",
+      "effect": ""
+    },
+    {
+      "name": "GetSuitAndPip",
+      "effect": ""
+    },
+    {
+      "name": "OnSave",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      45154,
+      45135,
+      35007,
+      65881,
+      70704,
+      13281,
+      15734,
+      61804
+    ],
+    "aspects": [
+      {
+        "aspect": "花色与点数属性描述",
+        "evidence": [
+          {
+            "pageid": 45154,
+            "quote": "每张扑克牌都有自己的花色和点数，一共有4种花色和13种点数组合的52种扑克牌"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "扑克牌",
+    "卡牌",
+    "花色",
+    "点数",
+    "设置ID",
+    "获取花色",
+    "存档",
+    "加载",
+    "扑克",
+    "纸牌"
+  ],
+  "gameplay_tags": [
+    "游戏",
+    "卡牌"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e22399f8c97aa637c2e46cb968c7df1a4ad43ede0731c31e464d6d6e91e4833f",
+    "source_bytes": 1675,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102621187
+  }
+}

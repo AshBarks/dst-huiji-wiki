@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worlddeciduoustreeupdater.lua"
+  },
+  "category": "component",
+  "display_name": "worlddeciduoustreeupdater",
+  "summary": "这是一个过时的组件，原本用于更新世界中的落叶树木。它存储实例引用，但当前版本中未实现任何实际更新逻辑。主要为了向后兼容旧 mod，保留结构但无功能。",
+  "api": [
+    {
+      "name": "update",
+      "effect": "当前为空，不执行任何操作，无副作用"
+    }
+  ],
+  "api_note": "update 方法已定义但为空，无公开行为。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      13199,
+      14710,
+      47057,
+      61804
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件 worlddeciduoustreeupdater 或其更新能力相关的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "落叶树",
+    "世界维护",
+    "树木更新",
+    "组件机制",
+    "过时组件",
+    "模组兼容",
+    "环境系统",
+    "游戏更新"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0630047588a0f17bfa61f4e508c13022bd3d91bd925ca0a7b24e59ad069413bc",
+    "source_bytes": 229,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114222798
+  }
+}

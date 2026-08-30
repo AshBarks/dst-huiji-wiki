@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/decay.lua"
+  },
+  "category": "component",
+  "display_name": "decay",
+  "summary": "该组件用于管理实体的燃料或健康值，跟踪当前值与最大值的变化。通过DoDelta方法调整数值，并在数值降至0或超过最大值时触发相应事件。支持定时变化功能，用于模拟持续衰减或增长，参与游戏中燃料消耗与补充的核心机制。",
+  "api": [
+    {
+      "name": "DoDelta",
+      "effect": "改变实体的当前健康值，增加或减少amount。如果当前值降至0且之前大于0，推' spentfuel'事件；如果当前值超过最大值，推'addfuel'事件。"
+    },
+    {
+      "name": "SetTimeDelta",
+      "effect": "设置定时任务来定期调用DoDelta方法。amount是每次变化的量，pause是间隔时间（秒），num是变化次数。如果已有定时任务，先终止。如果pause大于0，启动一个新线程执行定时变化。"
+    }
+  ],
+  "events_published": [
+    "spentfuel",
+    "addfuel"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      18216,
+      18234,
+      21620,
+      15903,
+      16057,
+      20061,
+      15170
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍耐久度自动回复机制",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "放入[[书柜]]的书籍会以每 30 秒 1% 的速度自动回复耐久度"
+          }
+        ]
+      },
+      {
+        "aspect": "发电机空转消耗速率描述",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "空转消耗速度0.1/s"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "衰减",
+    "燃料",
+    "消耗",
+    "添加",
+    "定时",
+    "暂停",
+    "事件",
+    "变化",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "维护"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4236425a86ec551d3c634e7d04e92355f6ffb5ecf47ed65232d18026a89102b9",
+    "source_bytes": 1365,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106651704
+  }
+}

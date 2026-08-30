@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstormlightningmanager.lua"
+  },
+  "category": "component",
+  "display_name": "moonstormlightningmanager",
+  "summary": "该组件管理月亮风暴期间的闪电地面特效生成，根据玩家位置和地图上的月亮风暴节点，以可调节的速率在可视半径内生成闪电。它通过监听月亮风暴节点更新事件来控制生成的启停，并在每次更新时计算生成位置和频率。参与的核心玩法是增加月亮风暴环境下的视觉效果和生存挑战。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [
+    "moonstorm_nodes_dirty_relay"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      51494,
+      51221,
+      27531,
+      22522,
+      22491,
+      15031,
+      16570
+    ],
+    "aspects": [
+      {
+        "aspect": "闪电击中生成实体与效果",
+        "evidence": [
+          {
+            "pageid": 22491,
+            "quote": "由[[月亮风暴]]内的“月亮风暴闪电”击中地面后生成。"
+          },
+          {
+            "pageid": 22491,
+            "quote": "如果“月亮风暴闪电”击中的位置 4 {{解释|距离单位}}内已经有一个充能玻璃石，则不会生成新的充能玻璃石，而是生成一个注能月亮碎片。"
+          },
+          {
+            "pageid": 22491,
+            "quote": "充能玻璃石生成 20 秒后会碎裂消失，对 4 单位内的实体造成 30 点伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "风暴区域闪电生成频率与位置",
+        "evidence": [
+          {
+            "pageid": 15234,
+            "quote": "每 10 ~ 40 秒，风暴内的随机一个玩家周围 5 ~ 15 {{解释|距离单位}}会产生一种特殊的“月亮风暴闪电”"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月亮风暴",
+    "闪电特效",
+    "玩家周围生成",
+    "生存挑战",
+    "闪电生成",
+    "月亮风暴节点",
+    "生成速率",
+    "生成范围",
+    "月亮风暴事件",
+    "事件监听"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "生存",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dd21899651f3dfe666c220d8a9258af4c040b895216ae79a039bc2b71164376f",
+    "source_bytes": 2333,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109996402
+  }
+}

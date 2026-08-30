@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonbeastspawner.lua"
+  },
+  "category": "component",
+  "display_name": "moonbeastspawner",
+  "summary": "该组件管理月基周围的月兽生成与转换。它控制将野猪和猎犬转换为月兽，周期性生成新月兽，并管理石化状态。核心玩法涉及激活月基后生成敌人，影响战斗挑战。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，取消周期任务并设置self.task为nil，停止生成过程。"
+    },
+    {
+      "name": "ForcePetrify",
+      "effect": "强制石化范围内的所有月兽（标签为'moonbeast'的实体），调用它们的大脑强制石化，并推送'moonpetrify'事件。"
+    },
+    {
+      "name": "Start",
+      "effect": "开始生成过程：设置started为true，激活范围内的雕像（gargoyle），开始周期性生成任务，初始化cc表。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止生成过程：设置started为false，取消周期任务，并可能在实体休眠时强制石化。"
+    }
+  ],
+  "events_published": [
+    "moontransformed",
+    "moonpetrify"
+  ],
+  "events_listened": [
+    "newstate"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      34314,
+      34523,
+      13857,
+      20714,
+      20560,
+      52788,
+      24542
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及与'moonbeastspawner'组件相关的任何能力或行为表达。内容涉及世界翻新、布景生成、猎犬、控制台命令等其他游戏机制，无月兽生成器相关讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月兽",
+    "生成",
+    "石化",
+    "月基",
+    "野猪",
+    "猎犬",
+    "转换",
+    "周期生成",
+    "范围",
+    "雕像"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bcd140df8a8118b1743785afe36b66a6e999911cf9319db45d898cbd9e8bc4e9",
+    "source_bytes": 8138,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101806933
+  }
+}

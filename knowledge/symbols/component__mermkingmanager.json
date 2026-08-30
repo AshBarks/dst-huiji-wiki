@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mermkingmanager.lua"
+  },
+  "category": "component",
+  "display_name": "mermkingmanager",
+  "summary": "该组件管理鱼人王系统的核心数据，包括主王座、所有王座列表、当前鱼人王及候选鱼人字典。它监听王座建造和摧毁事件，自动寻找附近的鱼人作为王位候选，并在候选到达王座时触发变身逻辑将其转化为鱼人王。鱼人王的存在会影响鱼人群体行为，为玩家提供沼泽区域的生存与战斗支持。",
+  "api": [
+    {
+      "name": "OnThroneDestroyed",
+      "effect": "处理指定王座被摧毁：从王座列表中移除该王座；清理与该王座关联的候选鱼人，移除其'Prince'标签和事件监听；如果该王座是主王座且鱼人王存活，则杀死鱼人王并清空主王座。"
+    },
+    {
+      "name": "CreateMermKing",
+      "effect": "将指定候选鱼人替换为鱼人王实体：丢弃候选鱼人的物品，移除其事件监听，替换为'鱼人王'预设体并触发创建事件；设置该王座为主王座，从王座列表中移除该王座；重置所有候选鱼人的状态并清空候选字典；推送'鱼人王已创建'世界事件。"
+    },
+    {
+      "name": "FindMermCandidate",
+      "effect": "在指定王座附近（50单位距离）搜索符合条件的鱼人（健康未死亡且非玩家/鱼人王/守卫），若找到则调用ShouldGoToThrone使其成为候选。"
+    },
+    {
+      "name": "ShouldGoToThrone",
+      "effect": "让指定鱼人成为指定王座的候选：若无王且该王座无候选，则设置鱼人为候选，添加'Prince'标签并覆盖其可检查名称为'MERM_PRINCE'，监听其移除和死亡事件；若已是该王座候选则直接返回true。"
+    },
+    {
+      "name": "IsCandidateAtThrone",
+      "effect": "检查指定候选鱼人是否位于指定王座附近（0.5单位距离内）。"
+    },
+    {
+      "name": "ShouldTransform",
+      "effect": "检查指定鱼人是否应变形为鱼人王：需满足鱼人有效、有王座、在王座附近、其'mermcandidate'组件条件满足，且无其他鱼人正在变形或变形对象为自身；若满足则设置其为正在变形的候选鱼人。"
+    },
+    {
+      "name": "IsThroneValid",
+      "effect": "检查指定王座是否有效：王座必须存在、未燃烧、未被标记为烧毁，且附近无鱼人王尸体。"
+    },
+    {
+      "name": "GetKing",
+      "effect": "返回当前鱼人王实体，若无则返回nil。"
+    },
+    {
+      "name": "GetCandidate",
+      "effect": "返回指定王座对应的候选鱼人实体，若无则返回nil。"
+    },
+    {
+      "name": "IsThroneCandidate",
+      "effect": "检查指定鱼人是否为指定王座的候选鱼人。"
+    },
+    {
+      "name": "IsCandidate",
+      "effect": "检查指定鱼人是否为任何王座的候选鱼人。"
+    },
+    {
+      "name": "GetThrone",
+      "effect": "返回指定候选鱼人对应的王座实体，若无则返回nil。"
+    },
+    {
+      "name": "GetMainThrone",
+      "effect": "返回主王座实体，若无则返回nil。"
+    },
+    {
+      "name": "IsThrone",
+      "effect": "检查指定实体是否是系统中的王座（主王座或普通王座）。"
+    },
+    {
+      "name": "HasKingLocal",
+      "effect": "检查本地世界是否有活着的鱼人王（实体存在且健康未死亡）。"
+    },
+    {
+      "name": "HasKingAnywhere",
+      "effect": "检查任何分片（包括本地）是否有鱼人王，通过本地检查和分片监视器组件。"
+    },
+    {
+      "name": "HasKing",
+      "effect": "已弃用的方法，行为同HasKingAnywhere，用于兼容模组。"
+    },
+    {
+      "name": "HasTridentLocal",
+      "effect": "检查本地鱼人王是否持有三叉戟物品。"
+    },
+    {
+      "name": "HasTridentAnywhere",
+      "effect": "检查任何分片鱼人王是否持有三叉戟，通过本地检查和分片监视器组件。"
+    },
+    {
+      "name": "HasCrownLocal",
+      "effect": "检查本地鱼人王是否持有王冠物品。"
+    },
+    {
+      "name": "HasCrownAnywhere",
+      "effect": "检查任何分片鱼人王是否持有王冠，通过本地检查和分片监视器组件。"
+    },
+    {
+      "name": "HasPauldronLocal",
+      "effect": "检查本地鱼人王是否持有肩甲物品。"
+    },
+    {
+      "name": "HasPauldronAnywhere",
+      "effect": "检查任何分片鱼人王是否持有肩甲，通过本地检查和分片监视器组件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态数据，包括候选鱼人字典、鱼人王、正在变形的候选鱼人、主王座及普通王座列表，并返回相关实体GUID列表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载保存的数据后处理：恢复主王座、候选鱼人字典（并设置标签和事件监听）、鱼人王（并触发创建事件）、正在变形的候选鱼人、普通王座列表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onmermkingcreated",
+    "onmermkingdestroyed"
+  ],
+  "events_listened": [
+    "oncandidatekingarrived",
+    "onthronebuilt",
+    "onthronedestroyed",
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13268,
+      15415,
+      15975,
+      24875,
+      15973,
+      24748,
+      18359,
+      28744
+    ],
+    "aspects": [
+      {
+        "aspect": "鱼人之王存在时属性加成",
+        "evidence": [
+          {
+            "pageid": 24875,
+            "quote": "生命值 = 540（600{{Pic|32|鱼人之王}}）"
+          },
+          {
+            "pageid": 15973,
+            "quote": "生命值 = 200（660{{Pic|32|鱼人之王}}）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鱼人王",
+    "王座",
+    "候选",
+    "变形",
+    "建造",
+    "死亡",
+    "物品",
+    "光环",
+    "鱼人",
+    "王子"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0d35a5b7382b759db76f5077e80395b40d72460b75725c223676b25fe7852eff",
+    "source_bytes": 12491,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109730244
+  }
+}

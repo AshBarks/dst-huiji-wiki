@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sharkboimanagerhelper.lua"
+  },
+  "category": "component",
+  "display_name": "sharkboimanagerhelper",
+  "summary": "该组件管理鲨鱼BOSS竞技场的原点坐标和半径数据，通过网络变量同步至客户端。它提供方法判断一个点是否在竞技场区域内，参与核心战斗玩法中的场地判定与事件管理。",
+  "api": [
+    {
+      "name": "IsPointInArena",
+      "effect": "检查给定坐标 (x, y, z) 是否在竞技场内。行为包括：若竞技场半径小于等于0则返回false；否则计算点到原点的距离平方，并与调整后的半径（基于瓷砖缩放计算）比较，同时验证点是否在可视地面上。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "arena_origin_x",
+    "arena_origin_z",
+    "arena_radius"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      51949,
+      46847,
+      65605,
+      65881,
+      21063,
+      14099,
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "竞技场内仇恨触发与位置边界判断",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "启迪战争瓦器人只会主动仇恨[[瓦格斯塔夫的竞技场]]内距其 15 {{解释|距离单位}}内的玩家"
+          },
+          {
+            "pageid": 46847,
+            "quote": "天体后裔只会主动仇恨[[瓦格斯塔夫的竞技场]]内的玩家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鲨鱼BOSS",
+    "竞技场",
+    "区域判定",
+    "战斗场地",
+    "原点",
+    "半径",
+    "位置检测",
+    "场地管理",
+    "BOSS区域"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "30187a8d7c06a076d2f29fbdea3918dfe59cb6ec0094ab6b98f20506b28eea06",
+    "source_bytes": 1108,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112448510
+  }
+}

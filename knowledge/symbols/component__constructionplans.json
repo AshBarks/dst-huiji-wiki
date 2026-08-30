@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/constructionplans.lua"
+  },
+  "category": "component",
+  "display_name": "constructionplans",
+  "summary": "该组件管理目标预制件到建筑预制件的映射关系，用于在建造过程中将目标实体替换为建筑产品。它通过动态添加和移除标签来标记实体支持的建筑计划，并提供开始建造的核心接口，是饥荒联机版建筑系统的一部分。",
+  "api": [
+    {
+      "name": "AddTargetPrefab",
+      "effect": "向组件添加一个目标预制件与其对应建筑预制件的映射。如果映射不存在，则为实体添加标签 'prefab.._plans'（例如 'wall_stone_plans'）。副作用是修改实体标签集合，可能影响其他依赖标签的系统。"
+    },
+    {
+      "name": "RemoveTargetPrefab",
+      "effect": "从组件移除指定目标预制件的映射。如果映射存在，则同时移除实体上的对应标签 'prefab.._plans'。副作用是减少实体标签，可能禁用依赖该标签的功能。"
+    },
+    {
+      "name": "StartConstruction",
+      "effect": "尝试对目标实体开始建造。首先检查目标是否为 nil 或已有 constructionsite 组件（表示已在建造中），若是则不执行操作。然后根据目标 prefab 查找建筑预制件映射：若无匹配，返回 nil 和错误 'MISMATCH'；若有匹配，则生成建筑预制件、设置位置、移除目标实体，并推送 'onstartconstruction' 事件给产品实体。返回生成的产品实体，若生成失败则返回 nil。副作用是可能销毁目标实体并创建新实体，改变游戏世界状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，遍历所有映射并移除实体上对应的 'prefab.._plans' 标签。副作用是清理所有标签，确保实体状态恢复。"
+    }
+  ],
+  "api_note": "组件有公开方法，如上列出。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18474
+    ],
+    "aspects": [
+      {
+        "aspect": "建造过程描述",
+        "evidence": [
+          {
+            "pageid": 18474,
+            "quote": "建造过程需要将 1 个化石右键栽种在地上，然后用剩余的化石对其右键进行修理拼接…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "建筑系统",
+    "预制件映射",
+    "建造过程",
+    "标签管理",
+    "实体替换",
+    "建造接口",
+    "系统组件"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "建造",
+    "建筑"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "17b8dcf1dae9d5d752e48db7d437ddcaaf9a5934b31e680684c408bf3e406a45",
+    "source_bytes": 1295,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106175291
+  }
+}

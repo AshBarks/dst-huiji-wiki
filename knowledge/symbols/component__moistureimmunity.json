@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moistureimmunity.lua"
+  },
+  "category": "component",
+  "display_name": "moistureimmunity",
+  "summary": "该组件用于管理实体的湿度免疫状态，通过维护一个来源列表来控制实体是否受到湿度影响。当添加来源时，实体获得湿度免疫并强制保持干燥；移除所有来源后，组件自动从实体移除。它与moisture组件交互，影响实体的湿度计算和干燥状态。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": "添加湿度免疫来源。行为：将来源添加到内部列表；如果列表原本为空，则为实体添加'moistureimmunity'标签；若来源不是实体本身，则监听其'onremove'事件；如果实体拥有moisture组件，调用moisture:ForceDry(true, src)强制实体干燥。副作用：来源被记录，实体获得湿度免疫效果。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "移除湿度免疫来源。行为：如果来源存在于列表中，调用RemoveSource_Internal清理内部状态（包括调用moisture:ForceDry(false, src)和移除事件监听），然后触发内部清理函数；若列表变空，组件将从实体移除。副作用：来源免疫被撤销，实体可能恢复受湿度影响。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时由系统调用。行为：为实体移除'moistureimmunity'标签；遍历所有来源，调用RemoveSource_Internal清理每个来源的免疫状态。副作用：组件完全卸载，实体湿度免疫效果终止。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      18410,
+      70462,
+      20704,
+      22418,
+      13268,
+      15055,
+      21485
+    ],
+    "aspects": [
+      {
+        "aspect": "潮湿速率计算公式体现湿度源控制",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "潮湿速率 = 天气潮湿速率 + 装备潮湿速率 - 干燥速率"
+          }
+        ]
+      },
+      {
+        "aspect": "防水物品的潮湿免疫描述",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "[[防水物品]]不会潮湿。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "干燥",
+    "水分",
+    "天气",
+    "雨",
+    "保持干燥",
+    "湿度",
+    "免疫状态",
+    "来源列表",
+    "干燥效果",
+    "湿度管理"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6dbb583c9469f86c431816b898ff6e3c64475bb10eeaab3ac668c62766535b6d",
+    "source_bytes": 1457,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109981060
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/attunable.lua"
+  },
+  "category": "component",
+  "display_name": "attunable",
+  "summary": "Attunable组件管理玩家与实体之间的持久链接数据，允许玩家在离线和在线状态之间保持绑定。它通过标签系统限制每个组只能链接一个实体，支持远程交互玩法如远程重生。组件处理链接成本、链接和取消链接的回调，并集成数据保存和加载以维持跨会话的绑定状态。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清理组件，移除实体上的ATTUNABLE_ID标签，取消对ms_playerjoined事件的监听，并断开与所有已链接玩家的连接。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "等同于OnRemoveEntity，清理组件并断开所有玩家链接。"
+    },
+    {
+      "name": "GetAttunableTag",
+      "effect": "返回组件的attunable_tag值，用于指定链接组。"
+    },
+    {
+      "name": "SetAttunableTag",
+      "effect": "设置组件的attunable_tag值，影响玩家链接的组限制。"
+    },
+    {
+      "name": "SetOnAttuneCostFn",
+      "effect": "设置链接成本函数，该函数在玩家尝试链接时被调用，可用于实施链接代价。"
+    },
+    {
+      "name": "SetOnLinkFn",
+      "effect": "设置链接回调函数，该函数在玩家成功链接后被调用，用于执行链接后的逻辑。"
+    },
+    {
+      "name": "SetOnUnlinkFn",
+      "effect": "设置取消链接回调函数，该函数在玩家取消链接后被调用，用于执行取消链接后的逻辑。"
+    },
+    {
+      "name": "IsAttuned",
+      "effect": "检查指定玩家是否已与实体链接，返回布尔值。"
+    },
+    {
+      "name": "CanAttune",
+      "effect": "检查玩家是否可以链接，要求玩家有有效用户ID、有attuner组件且未链接，返回布尔值。"
+    },
+    {
+      "name": "LinkToPlayer",
+      "effect": "尝试链接玩家到实体，执行成本检查（除非加载状态），创建attunable_classified实体附加到玩家，推送attuned事件并设置事件监听；返回成功状态和可选原因。"
+    },
+    {
+      "name": "UnlinkFromPlayer",
+      "effect": "断开玩家与实体的链接，移除attunable_classified实体并清除事件监听，调用取消链接回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存已链接和离线玩家的用户ID列表，返回包含links字段的表或nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存数据，恢复在线玩家的链接或标记离线玩家为attuned_userids。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "生成调试字符串，列出当前在线和离线的链接玩家信息。"
+    }
+  ],
+  "events_published": [
+    "attuned"
+  ],
+  "events_listened": [
+    "ms_playerjoined",
+    "onremove",
+    "attuned"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      28179,
+      16419,
+      15922,
+      23187,
+      13493,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及component__attunable相关的代码能力或行为语义表达，如附着、链接、保存/加载等关键词，内容焦点在控制台、巨兽行为、物品描述等无关主题。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "绑定",
+    "链接",
+    "远程",
+    "玩家",
+    "实体",
+    "同步",
+    "离线",
+    "在线",
+    "重生"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "远程交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d1c253a6f763aa0c4fc597444a8ef4a6774ce196227528105eb672b76c5cca40",
+    "source_bytes": 5411,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096146069
+  }
+}

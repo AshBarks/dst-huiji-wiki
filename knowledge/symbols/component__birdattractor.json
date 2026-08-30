@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/birdattractor.lua"
+  },
+  "category": "component",
+  "display_name": "birdattractor",
+  "summary": "该组件管理鸟类生成的修改器数据，支持通过加性方式调整最大鸟数、最小延迟和最大延迟。它参与鸟类生成的核心玩法，允许其他系统修改生成参数以影响环境中的鸟类活动。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个格式化的调试字符串，显示当前最大鸟数、最小延迟和最大延迟的值，基于SourceModifierList计算得出。副作用：无，仅计算并返回字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19832,
+      34314,
+      65456,
+      13874,
+      15327,
+      15722,
+      20111,
+      22611
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未出现与 GetDebugString 调试字符串获取功能相关的任何玩家语言表达，所有页面内容均聚焦于游戏机制、生成规则或行为描述，未涉及调试字符串的讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鸟类吸引器",
+    "鸟类生成",
+    "最大鸟类数量",
+    "生成间隔",
+    "环境设置",
+    "修改工具",
+    "鸟类活动",
+    "动物行为",
+    "游戏参数"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a0ae0eb5b855190e913d41594b5d0860d115182e1b63415606623ab864b27ade",
+    "source_bytes": 684,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090571088
+  }
+}

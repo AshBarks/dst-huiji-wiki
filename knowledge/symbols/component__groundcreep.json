@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/groundcreep.lua"
+  },
+  "category": "component",
+  "display_name": "groundcreep",
+  "summary": "该组件专门用于管理地面蔓延数据的序列化，确保游戏地图状态的合理保存与加载。当玩家激活时，它会快进地面蔓延效果以同步当前状态，以支持游戏环境变化的持久化。",
+  "api": [],
+  "api_note": "该组件无对外暴露的方法，仅作为内部数据处理组件，用于序列化地面蔓延信息，依赖 inst.GroundCreep 系统进行实际操作。",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      70704,
+      20714,
+      15734,
+      35007,
+      61804,
+      15386,
+      28179
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及'groundcreep'或相关地面蔓延能力描述，所有内容聚焦于其他游戏机制和实体行为，如工厂范围、距离单位、加载范围等，无直接证据表明讨论该组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "地面蔓延",
+    "序列化",
+    "玩家激活",
+    "保存",
+    "加载",
+    "地图数据",
+    "环境效果",
+    "快进"
+  ],
+  "gameplay_tags": [
+    "环境",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d707d36042b93efc9f46561acf18762a161b4251393740ef103a5a40bc897289",
+    "source_bytes": 1612,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108305231
+  }
+}

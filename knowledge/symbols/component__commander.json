@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/commander.lua"
+  },
+  "category": "component",
+  "display_name": "commander",
+  "summary": "Commander组件管理一组士兵实体的集合，支持添加、移除和查询士兵。它提供战斗协同功能，如共享目标和唤醒士兵，并实现距离追踪以自动移除过远的士兵。该组件用于指挥单位或宠物，增强战斗中的协调与管理能力。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清除所有士兵。遍历并调用RemoveSoldier移除每个士兵。"
+    },
+    {
+      "name": "GetNumSoldiers",
+      "effect": "获取士兵数量。可选参数prefab用于按预制体过滤，返回指定类型士兵数量；否则返回总士兵数。"
+    },
+    {
+      "name": "CollectSoldiers",
+      "effect": "将士兵收集到指定表中。可选参数prefab用于过滤，将符合的士兵添加到传入的表tbl中。"
+    },
+    {
+      "name": "GetAllSoldiers",
+      "effect": "返回所有士兵的新列表。可选参数prefab用于过滤，返回包含指定类型士兵的数组。"
+    },
+    {
+      "name": "IsSoldier",
+      "effect": "检查实体是否为士兵。返回布尔值，表示传入实体是否在士兵集合中。"
+    },
+    {
+      "name": "ForEachSoldier",
+      "effect": "对每个士兵执行传入的函数fn。函数fn接收指挥官实体和额外参数作为参数。"
+    },
+    {
+      "name": "ShareTargetToAllSoldiers",
+      "effect": "为所有士兵设置攻击目标。遍历士兵，如果士兵有combat组件，则调用其SuggestTarget方法设置目标。"
+    },
+    {
+      "name": "DropAllSoldierTargets",
+      "effect": "清除所有士兵的攻击目标。遍历士兵，如果士兵有combat组件，则将其目标设置为nil。"
+    },
+    {
+      "name": "IsAnySoldierNotAlert",
+      "effect": "检查是否有士兵未处于警觉状态。如果任何士兵处于睡眠或冻结状态，返回true。"
+    },
+    {
+      "name": "AlertAllSoldiers",
+      "effect": "唤醒所有士兵。遍历士兵，如果冻结则解冻，如果睡眠则唤醒。"
+    },
+    {
+      "name": "PushEventToAllSoldiers",
+      "effect": "向所有士兵推送事件。调用每个士兵的PushEvent方法，传入事件名ev和数据data。"
+    },
+    {
+      "name": "AddSoldier",
+      "effect": "添加实体为士兵。验证实体非死亡后，加入士兵集合，监听其onremove和death事件，增加计数，启动距离追踪，向指挥官推送soldierschanged事件，向士兵推送gotcommander事件。"
+    },
+    {
+      "name": "RemoveSoldier",
+      "effect": "移除士兵。从集合中移除实体，移除事件监听，减少计数，如果士兵数为0则停止追踪，向指挥官推送soldierschanged事件，向士兵推送lostcommander事件。"
+    },
+    {
+      "name": "SetTrackingDistance",
+      "effect": "设置距离追踪范围。更新trackingdist，如果距离大于0则启动追踪，否则停止追踪。"
+    },
+    {
+      "name": "StartTrackingDistance",
+      "effect": "开始距离追踪。如果追踪距离大于0、士兵数大于0且未运行任务，则创建周期任务调用CheckDistance检查士兵距离。"
+    },
+    {
+      "name": "StopTrackingDistance",
+      "effect": "停止距离追踪。取消周期任务并重置_task为nil。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用StartTrackingDistance，启动距离追踪。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体睡眠时调用StopTrackingDistance，停止距离追踪。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含士兵数、追踪距离、追踪周期和任务状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "soldierschanged",
+    "gotcommander",
+    "lostcommander"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      14816,
+      14710,
+      13493,
+      14820,
+      13156,
+      14811,
+      13437
+    ],
+    "aspects": [
+      {
+        "aspect": "处理沉睡状态",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "当受到催眠效果时，播放沉睡动画，并进入睡眠状态。"
+          }
+        ]
+      },
+      {
+        "aspect": "将目标共享给所有士兵",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "跟随鳄鱼指挥官的[[战猪]]会频繁的将鳄鱼指挥官的目标设为目标"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "指挥官",
+    "士兵",
+    "宠物",
+    "军队",
+    "协同战斗",
+    "自动移除",
+    "唤醒士兵",
+    "目标分配"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "协同",
+    "指挥"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3aded4fd8f830889ee9600dfc0d82a4cdc1f559fc1ccee572f3def729f86e047",
+    "source_bytes": 4948,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093974244
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/growable.lua"
+  },
+  "category": "component",
+  "display_name": "growable",
+  "summary": "growable组件管理实体按阶段进行定时生长的逻辑。它维护当前阶段、阶段配置表、生长计时器以及暂停/唤醒状态。该组件是实现植物成熟、建筑物升级、某些物体状态变化等阶段性定时生长玩法的核心机制。",
+  "api": [
+    {
+      "name": "StartGrowing",
+      "signature": "StartGrowing(self, time)",
+      "effect": "启动或重置生长计时器。若未指定时间，则从当前阶段配置表中获取生长函数计算时间，若无则使用默认时间。支持春季生长加速。最终调用 StartGrowingTask 来设置定时任务。"
+    },
+    {
+      "name": "StartGrowingTask",
+      "signature": "StartGrowingTask(self, time)",
+      "effect": "根据给定的剩余生长时间，设置或重置一个定时任务 OnGrow。如果实体处于离屏状态且未开启离屏生长，则不会创建任务。"
+    },
+    {
+      "name": "StopGrowing",
+      "signature": "StopGrowing(self)",
+      "effect": "停止生长。清除目标时间和暂停剩余时间，并取消生长定时任务。"
+    },
+    {
+      "name": "DoGrowth",
+      "signature": "DoGrowth(self, skipgrownfn)",
+      "effect": "执行一次生长，推进到下一阶段。会依次调用当前阶段的 pregrowfn、设置阶段（触发阶段配置表中的 fn），以及下一阶段的 growfn（除非 skipgrownfn 为 true）。如果未达到最终阶段或允许循环，则会重新启动生长计时器。"
+    },
+    {
+      "name": "SetStage",
+      "signature": "SetStage(self, stage)",
+      "effect": "直接设置实体的当前生长阶段，并立即执行该阶段配置表中对应的 fn 回调。阶段值会被限制在配置表的范围内。"
+    },
+    {
+      "name": "Pause",
+      "signature": "Pause(self, reason)",
+      "effect": "根据原因暂停生长。记录暂停剩余时间，并取消当前生长任务。支持多个暂停原因，只有所有原因都被解除后才会恢复生长。"
+    },
+    {
+      "name": "Resume",
+      "signature": "Resume(self, reason)",
+      "effect": "解除指定的暂停原因。如果所有暂停原因都被解除，则根据剩余时间恢复生长计时器。"
+    },
+    {
+      "name": "IsPaused",
+      "signature": "IsPaused(self)",
+      "effect": "返回组件当前是否处于暂停状态。"
+    },
+    {
+      "name": "IsGrowing",
+      "signature": "IsGrowing(self)",
+      "effect": "返回组件当前是否正在生长（即有目标时间或处于暂停状态）。"
+    },
+    {
+      "name": "GetStage",
+      "signature": "GetStage(self)",
+      "effect": "返回当前的生长阶段数值。"
+    },
+    {
+      "name": "GetNextStage",
+      "signature": "GetNextStage(self)",
+      "effect": "返回下一个阶段的数值。如果当前已是最终阶段且允许循环，则返回循环起始阶段。"
+    },
+    {
+      "name": "GetCurrentStageData",
+      "signature": "GetCurrentStageData(self)",
+      "effect": "返回当前阶段对应的配置表数据。"
+    },
+    {
+      "name": "DoMagicGrowth",
+      "signature": "DoMagicGrowth(self, doer)",
+      "effect": "尝试执行一次由外部注入的魔法生长函数 (domagicgrowthfn)。如果该函数存在，则调用它并返回其返回值。"
+    },
+    {
+      "name": "ExtendGrowTime",
+      "signature": "ExtendGrowTime(self, extra_time)",
+      "effect": "延长当前生长阶段的剩余时间。如果处于暂停状态，则增加暂停剩余时间；如果正在生长，则重置定时任务的时间。"
+    },
+    {
+      "name": "OnSave",
+      "signature": "OnSave(self)",
+      "effect": "序列化组件状态用于存档，包括当前阶段、剩余生长时间（可能应用时间乘数）、以及离屏睡眠时间。"
+    },
+    {
+      "name": "OnLoad",
+      "signature": "OnLoad(self, data)",
+      "effect": "从存档数据中恢复组件状态。设置阶段，并根据保存的剩余时间和睡眠时间恢复生长计时器。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "signature": "OnEntitySleep(self)",
+      "effect": "当实体进入睡眠（离屏）时被调用。如果未开启离屏生长，则取消生长任务并记录睡眠开始时间。"
+    },
+    {
+      "name": "OnEntityWake",
+      "signature": "OnEntityWake(self)",
+      "effect": "当实体醒来（靠近屏幕）时被调用。如果正在生长且未开启离屏生长，则根据睡眠时长调用 LongUpdate 来追赶生长进度。"
+    },
+    {
+      "name": "LongUpdate",
+      "signature": "LongUpdate(self, dt)",
+      "effect": "用于处理离线时间或大量时间流逝。在生长时间内循环执行 DoGrowth(true) 来追赶进度。"
+    },
+    {
+      "name": "GetDebugString",
+      "signature": "GetDebugString(self)",
+      "effect": "返回组件的调试信息字符串，显示当前生长状态、剩余时间等。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      13261,
+      14484,
+      18234,
+      10355,
+      14486,
+      19802,
+      19729
+    ],
+    "aspects": [
+      {
+        "aspect": "生长启动描述",
+        "evidence": [
+          {
+            "pageid": 19729,
+            "quote": "重新开始生长的植株"
+          }
+        ]
+      },
+      {
+        "aspect": "生长速度与持续时间描述",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "处于前四个阶段的农作物生长到下一阶段速度取决于其前一个阶段生长跨越至本阶段时所积累的压力值和当时所受到的压力源个数"
+          },
+          {
+            "pageid": 19729,
+            "quote": "该阶段会持续 9 ~ 11 分钟，之后植株成长至预备阶段。"
+          }
+        ]
+      },
+      {
+        "aspect": "生长阶段列举与描述",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "每种农作物都有以下生长阶段：种子，萌芽，小，中，已长成，巨大，腐烂，腐烂巨大。"
+          },
+          {
+            "pageid": 19729,
+            "quote": "石果灌木丛的生长存在下列几个阶段：<br>初生阶段→预备阶段→成熟阶段→过熟阶段"
+          }
+        ]
+      },
+      {
+        "aspect": "魔法催熟效果描述",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "使角色附近至多 10 棵未长成的食用类作物瞬间生长成熟。"
+          },
+          {
+            "pageid": 18234,
+            "quote": "使角色周围 30 范围内的所有非食用类作物以及树瞬间生长到最大阶段。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "生长",
+    "成熟",
+    "阶段",
+    "定时",
+    "植物",
+    "农作物",
+    "暂停",
+    "恢复"
+  ],
+  "gameplay_tags": [
+    "生长/成熟",
+    "自然/农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+    "source_bytes": 10019,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093608079
+  }
+}

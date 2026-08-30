@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldmeteorshower.lua"
+  },
+  "category": "component",
+  "display_name": "worldmeteorshower",
+  "summary": "worldmeteorshower组件管理月石壳的生成概率。它处理流星雨掉落的月石相关物品，根据概率和世界状态返回修改后的预制体。核心玩法涉及随机事件和资源生成，影响月石壳的出现。",
+  "api": [
+    {
+      "name": "GetRockMoonShellWaveOdds",
+      "effect": ""
+    },
+    {
+      "name": "GetMeteorLootPrefab",
+      "effect": ""
+    },
+    {
+      "name": "SpawnMeteorLoot",
+      "effect": ""
+    },
+    {
+      "name": "OnSave",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MOONROCKSHELL_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      14579,
+      52788,
+      34314,
+      18359,
+      24544,
+      14938,
+      14486
+    ],
+    "aspects": [
+      {
+        "aspect": "流星雨行为参数描述",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响所有等级[[流星雨]]的持续时间、生成速率、中流星和大流星数量以及冷却时间。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "流星雨",
+    "概率",
+    "生成",
+    "掉落",
+    "事件",
+    "月壳",
+    "状态",
+    "预制体"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "随机事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d1b567e56993b861b7f12e95c8e62e0effe04e1933df82620cd35dc6960e9ed0",
+    "source_bytes": 2441,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114298870
+  }
+}

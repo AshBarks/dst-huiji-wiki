@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatmagnetbeacon.lua"
+  },
+  "category": "component",
+  "display_name": "boatmagnetbeacon",
+  "summary": "boatmagnetbeacon 组件管理船磁铁信标的开关状态、拾取状态，以及与船和磁铁的关联数据。它参与航海玩法，允许信标与船磁铁配对以控制船的移动方向，并处理拾取、丢弃等事件来维护状态。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含当前信标的开关状态、拾取状态和磁铁引用，用于存档系统保存数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中恢复信标的开关状态、拾取状态和磁铁引用，并更新外观图像以反映状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，取消延迟设置任务并移除对“onpickup”和“ondropped”事件的监听，进行清理。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，调用 SetBoat(nil) 来断开与船的关联，防止内存泄漏。"
+    },
+    {
+      "name": "GetBoat",
+      "effect": "获取当前信标所在的船实体（基于父实体或当前平台），如果实体有船标签则返回船，否则返回 nil。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置信标关联的船实体，更新对船“onremove”和“death”事件的监听，并调整状态。"
+    },
+    {
+      "name": "OnDeath",
+      "effect": "处理船死亡事件，当船死亡时调用 SetBoat(nil) 来断开关联。"
+    },
+    {
+      "name": "PairedMagnet",
+      "effect": "返回当前与信标配对的磁铁实体，如果没有配对则返回 nil。"
+    },
+    {
+      "name": "PairWithMagnet",
+      "effect": "将信标与指定磁铁配对，更新内部引用和事件监听，打开信标并添加“paired”标签。"
+    },
+    {
+      "name": "UnpairWithMagnet",
+      "effect": "取消信标与当前磁铁的配对，移除事件监听，关闭信标并移除“paired”标签。"
+    },
+    {
+      "name": "IsTurnedOff",
+      "effect": "返回信标的开关状态，true 表示关闭，false 表示开启。"
+    },
+    {
+      "name": "TurnOnBeacon",
+      "effect": "打开信标，将内部状态设为未关闭，更新外观图像为开启状态，播放激活动画并发布“onturnon”事件。"
+    },
+    {
+      "name": "TurnOffBeacon",
+      "effect": "关闭信标，将内部状态设为关闭，更新外观图像为关闭状态，播放停用动画并发布“onturnoff”事件。"
+    },
+    {
+      "name": "IsPickedUp",
+      "effect": "返回信标的拾取状态，true 表示被拾取（在库存中），false 表示未被拾取（在世界中）。"
+    },
+    {
+      "name": "SetIsPickedUp",
+      "effect": "设置信标的拾取状态，如果被拾取则清空船引用，否则尝试获取当前船引用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前配对的磁铁信息，用于调试控制台输出。"
+    }
+  ],
+  "events_published": [
+    "onturnon",
+    "onturnoff"
+  ],
+  "events_listened": [
+    "onpickup",
+    "ondropped",
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.BOAT_MAGNET.MAX_DISTANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      47009,
+      51951,
+      21137,
+      72314,
+      13701,
+      20714,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及或讨论与 boatmagnetbeacon 相关的能力或行为。所有页面内容涉及其他实体（如沃尔夫冈、螨地爬、枯萎机制、迷你冰川、电刑机控制器、远古织影者、控制台、熔炉装备），与船磁铁信标组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船磁铁",
+    "信标",
+    "配对",
+    "开关",
+    "拾取",
+    "引导",
+    "航海",
+    "控制",
+    "状态",
+    "磁铁"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "976abebf61658dbebf534149f1f710211fab9ffdea17a68867c591786ce0f72c",
+    "source_bytes": 6385,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098469074
+  }
+}

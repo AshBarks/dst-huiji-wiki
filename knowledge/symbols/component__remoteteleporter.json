@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/remoteteleporter.lua"
+  },
+  "category": "component",
+  "display_name": "remoteteleporter",
+  "summary": "该组件管理远程传送的可激活条件、目的地检查、传送回调以及物品传送半径等数据。核心玩法涉及玩家或实体通过传送器传送到游戏世界中的其他位置，支持物品的跟随传送，用于快速旅行和战略部署。",
+  "api": [
+    {
+      "name": "SetCanActivateFn",
+      "effect": "设置一个函数，用于判断传送是否可以被激活。存储为 canactivatefn。"
+    },
+    {
+      "name": "SetCheckDestinationFn",
+      "effect": "设置一个函数，用于检查目标传送点是否有效。存储为 checkdestinationfn。"
+    },
+    {
+      "name": "SetOnStartTeleportFn",
+      "effect": "设置传送开始时的回调函数。存储为 onstartteleportfn。"
+    },
+    {
+      "name": "SetOnTeleportedFn",
+      "effect": "设置传送完成时的回调函数。存储为 onteleportedfn。"
+    },
+    {
+      "name": "SetOnStopTeleportFn",
+      "effect": "设置传送停止时的回调函数。存储为 onstopteleportfn。"
+    },
+    {
+      "name": "SetItemTeleportRadius",
+      "effect": "设置物品传送的半径。存储为 itemteleportradius。"
+    },
+    {
+      "name": "CanActivate",
+      "effect": "检查对于给定的执行者，传送是否可以被激活。如果设置了 canactivatefn，则调用它；否则返回 true。"
+    },
+    {
+      "name": "Teleport_GetNearbyItems",
+      "effect": "获取执行者附近的物品列表。根据 itemteleportradius 查找物品，过滤掉不可拾取的物品，返回物品列表。"
+    },
+    {
+      "name": "SetNearbyItems",
+      "effect": "设置要传送的物品列表。存储为 nearbyitems。"
+    },
+    {
+      "name": "Teleport_Internal",
+      "effect": "执行内部传送。传送附近的物品和执行者到目标位置，触发 'teleported' 事件，并调用 onteleportedfn 回调。"
+    },
+    {
+      "name": "Teleport",
+      "effect": "主传送方法。尝试传送执行者到最近的传送垫，优先选择镜头外的目标；如果成功，调用 Teleport_Internal 并返回 true；否则调用 onteleportedfn 并返回 false, 'NODEST'。"
+    },
+    {
+      "name": "OnStartTeleport",
+      "effect": "触发传送开始的回调。如果设置了 onstartteleportfn，则调用它。"
+    },
+    {
+      "name": "OnStopTeleport",
+      "effect": "触发传送停止的回调。如果设置了 onstopteleportfn，则调用它。"
+    }
+  ],
+  "events_published": [
+    "teleported",
+    "remoteteleportreceived"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WINONA.TELEPAD_DETECTION_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      17930,
+      24578,
+      39366,
+      19693,
+      20842
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与component__remoteteleporter代码能力/行为语义清单直接相关的表达，所有页面讨论的是其他传送实体（如圣殿、传送焦点、传送魔杖等），而非该组件的具体能力（如SetCanActivateFn、Teleport等函数或行为描述）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送",
+    "物品传送",
+    "传送器",
+    "传送范围",
+    "传送事件",
+    "传送条件",
+    "快速旅行",
+    "传送点"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "探索",
+    "旅行",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "59ac2441edaf6d75cf3b2b905d428849542ebb0ce3cc0848189a79a0dcfcb58c",
+    "source_bytes": 5491,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103092488
+  }
+}

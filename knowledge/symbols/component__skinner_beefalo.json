@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/skinner_beefalo.lua"
+  },
+  "category": "component",
+  "display_name": "skinner_beefalo",
+  "summary": "组件 Skinner_Beefalo 管理牛的服装数据，包括身体、角、头、脚和尾部的皮肤外观。它允许玩家通过应用不同皮肤来自定义牛的视觉表现，核心玩法涉及装饰和个性化定制，不影响牛的生存或战斗属性。",
+  "api": [
+    {
+      "name": "SetClothing",
+      "effect": "设置指定类型的服装名称，验证服装有效性后更新数据，触发 onclothingchanged 事件并应用构建覆盖到牛的动画状态。"
+    },
+    {
+      "name": "GetClothing",
+      "effect": "返回一个表，包含牛当前所有类型的服装名称。"
+    },
+    {
+      "name": "IsClothingDifferent",
+      "effect": "比较新服装与当前服装，如果任一类型名称不同则返回 true，否则返回 false。"
+    },
+    {
+      "name": "HideAllClothing",
+      "effect": "在给定的动画状态上清除所有服装覆盖符号，隐藏服装视觉效果。"
+    },
+    {
+      "name": "ClearAllClothing",
+      "effect": "清除所有类型的服装，重置为空字符串，触发 onclothingchanged 事件并应用构建覆盖。"
+    },
+    {
+      "name": "ClearClothing",
+      "effect": "清除指定类型的服装，重置为空字符串，触发 onclothingchanged 事件。"
+    },
+    {
+      "name": "ApplyTargetSkins",
+      "effect": "接受玩家皮肤表和玩家对象，先分配物品皮肤到牛的动画状态，然后清除并重新设置所有服装，触发事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回服装数据表，用于游戏保存和持久化。"
+    },
+    {
+      "name": "reloadclothing",
+      "effect": "重新加载服装数据，更新内部状态并触发 onclothingchanged 事件，应用构建覆盖，用于游戏加载或恢复。"
+    }
+  ],
+  "events_published": [
+    "onclothingchanged"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15526,
+      18075,
+      23933,
+      56980,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "成就中的皮肤装备描述",
+        "evidence": [
+          {
+            "pageid": 56980,
+            "quote": "装备角色皮肤外观"
+          }
+        ]
+      },
+      {
+        "aspect": "清洁扫把外观更换机制",
+        "evidence": [
+          {
+            "pageid": 18075,
+            "quote": "更换了一个实体的外观，对另一个相同种类的实体使用，会将其外观更换。"
+          }
+        ]
+      },
+      {
+        "aspect": "皮肤解锁条件描述",
+        "evidence": [
+          {
+            "pageid": 23933,
+            "quote": "[[皮弗娄牛美妆台]]中的免费皮弗娄牛皮肤需要通过从缝纫机获取礼服款式且学习后解锁。"
+          }
+        ]
+      },
+      {
+        "aspect": "美妆台更换皮肤功能",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "可以使用美妆台，打开一个类似衣柜的皮肤界面为牛更换皮肤。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "牛皮肤",
+    "牛服装",
+    "皮肤外观",
+    "自定义外观",
+    "装饰牛",
+    "个性化皮肤",
+    "皮肤数据",
+    "视觉表现"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "be359c0aa469843f986f36f5bacc00997949c38447dea3ef5af9bbf18d036d55",
+    "source_bytes": 6558,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103876584
+  }
+}

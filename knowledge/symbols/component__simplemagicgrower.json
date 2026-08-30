@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/simplemagicgrower.lua"
+  },
+  "category": "component",
+  "display_name": "simplemagicgrower",
+  "summary": "simplemagicgrower组件管理实体的最后生长阶段数据，参与魔法生长玩法。它通过设置目标阶段并递归调用生长逻辑，使实体快速达到指定阶段，常用于植物或需要加速生长的物体。核心机制是触发自动增长直到阶段完成。",
+  "api": [
+    {
+      "name": "SetLastStage",
+      "effect": ""
+    },
+    {
+      "name": "Grow",
+      "effect": ""
+    },
+    {
+      "name": "StartGrowing",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19729,
+      19813
+    ],
+    "aspects": [
+      {
+        "aspect": "生长阶段描述",
+        "evidence": [
+          {
+            "pageid": 19729,
+            "quote": "植株成长至预备阶段"
+          },
+          {
+            "pageid": 19813,
+            "quote": "然生长的香蕉丛有 4 个阶段，依次是无、"
+          }
+        ]
+      },
+      {
+        "aspect": "重新生长描述",
+        "evidence": [
+          {
+            "pageid": 19729,
+            "quote": "重新开始生长的植株"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "生长阶段管理",
+    "魔法生长玩法",
+    "快速成长植物",
+    "自动增长机制",
+    "阶段设置目标",
+    "递归生长逻辑",
+    "植物加速生长",
+    "魔法促进成长"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "生长",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d519b151572cfdda650c3ba47a212387ad4d08cb6badc6b8ff6b3abd122ee9c",
+    "source_bytes": 708,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097499181
+  }
+}

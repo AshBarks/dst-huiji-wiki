@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hideandseekgame.lua"
+  },
+  "category": "component",
+  "display_name": "hideandseekgame",
+  "summary": "该组件管理饥荒联机版中捉迷藏游戏的核心数据，包括躲藏点列表、寻找者列表、躲藏范围和已找到的躲藏点数量。它参与的玩法是玩家可以进行躲藏和寻找，组件负责注册和移除躲藏点、添加寻找者、通过脉冲检测附近玩家并自动添加为寻找者，以及在所有躲藏点被移除或游戏结束时清理状态。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": "移除组件时，遍历所有已注册的躲藏点，调用每个躲藏点的hideandseekhidingspot组件的Abort方法以中止躲藏行为。"
+    },
+    {
+      "name": "IsActive",
+      "effect": "返回布尔值，检查是否有躲藏点注册；如果hiding_spots表不为空则返回true，否则返回false。"
+    },
+    {
+      "name": "Abort",
+      "effect": "中止游戏，遍历所有已注册的躲藏点，调用UnregisterHidingSpot取消注册并移除事件监听，同时调用每个躲藏点的hideandseekhidingspot组件的Abort方法。"
+    },
+    {
+      "name": "_HideAndSeekOver",
+      "effect": "内部方法，游戏结束时调用：取消周期性脉冲任务，调用OnHideAndSeekOver回调（若设置），移除所有寻找者的事件监听，重置seekers表和num_hiders_found为0。"
+    },
+    {
+      "name": "AddSeeker",
+      "effect": "添加寻找者：如果seeker实体没有hideandseeker组件，则添加该组件并设置游戏为当前实例；将seeker添加到seekers表，监听其onremove事件，并调用OnAddSeeker回调（若设置，传入seeker和started_game参数）。"
+    },
+    {
+      "name": "pulse",
+      "effect": "周期性脉冲任务：调用OnHideAndSeekPulse回调（若设置），然后遍历AllPlayers列表，将不在hiding_range范围内的、未死亡或幽灵状态的玩家且没有hideandseeker组件的，调用AddSeeker添加为寻找者（started_game为false）。"
+    },
+    {
+      "name": "RegisterHidingSpot",
+      "effect": "注册躲藏点：重置num_hiders_found为0，如果躲藏点未注册，则添加到hiding_spots表，监听其onremove和onhidingspotremoved事件；如果脉冲任务未启动，则启动周期性任务（每1秒调用pulse）。"
+    },
+    {
+      "name": "UnregisterHidingSpot",
+      "effect": "取消注册躲藏点：如果躲藏点已注册，则从hiding_spots表中移除，移除其onremove和onhidingspotremoved事件的监听；如果hiding_spots表为空，则调用_HideAndSeekOver结束游戏。"
+    },
+    {
+      "name": "GetNumHiding",
+      "effect": "返回当前注册的躲藏点数量（hiding_spots表的大小）。"
+    },
+    {
+      "name": "GetNumSeekers",
+      "effect": "返回当前寻找者的数量（seekers表的大小）。"
+    },
+    {
+      "name": "GetNumFound",
+      "effect": "返回已找到的躲藏点数量（num_hiders_found变量的值）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存游戏数据：如果hiding_spots表为空则返回nil；否则返回一个表包含hiding_spots（躲藏点实体GUID列表）和num_hiders_found，以及引用表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理：从data中读取hiding_spots（GUID列表）和num_hiders_found，使用newents表恢复躲藏点实体，并调用RegisterHidingSpot重新注册。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，格式为\"Hiders: [躲藏点数量], Found: [已找到数量]\"。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "onhidingspotremoved"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      28179,
+      13493,
+      13701,
+      16419,
+      15238,
+      18232
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有讨论与捉迷藏游戏组件（component__hideandseekgame）相关的能力或行为。所有页面都涉及其他游戏机制，如控制台、实体行为、物品系统等，未提及躲藏、寻找者、游戏状态管理等关键词。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "捉迷藏",
+    "躲藏",
+    "寻找",
+    "躲藏点",
+    "玩家",
+    "脉冲",
+    "游戏结束",
+    "注册",
+    "取消"
+  ],
+  "gameplay_tags": [
+    "游戏",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e463a64ccc447b2ff91d9a2ece5b3386b4a314fb1ce38920469444c7571d8c2e",
+    "source_bytes": 5101,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100667633
+  }
+}

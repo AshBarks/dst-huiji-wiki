@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/undertile.lua"
+  },
+  "category": "component",
+  "display_name": "undertile",
+  "summary": "undertile组件管理一个二维数据网格，用于存储世界中每个坐标的地砖下方瓦片数据。它支持获取、设置和清除这些数据，参与核心玩法中的地形管理和持久化保存。该组件仅存在于服务器端，通过监听世界地图大小事件初始化数据网格。",
+  "api": [
+    {
+      "name": "GetTileUnderneath",
+      "effect": "从内部数据网格检索指定坐标(x, y)的地砖下方瓦片数据。"
+    },
+    {
+      "name": "SetTileUnderneath",
+      "effect": "将指定坐标(x, y)的地砖下方瓦片数据设置为给定值(tile)，修改内部数据网格。"
+    },
+    {
+      "name": "ClearTileUnderneath",
+      "effect": "将指定坐标(x, y)的地砖下方瓦片数据清除（设置为nil），从内部数据网格中移除。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "worldmapsetsize"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      20714,
+      34794,
+      18509,
+      73235,
+      65881,
+      21063,
+      24194
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及与GetTileUnderneath、SetTileUnderneath或ClearTileUnderneath相关的玩家语言表达；页面内容聚焦于世界翻新、控制台命令、地图探索、物品描述、工厂布局和地图生成机制，未涉及具体地块获取、设置或清除行为的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "坐标",
+    "地图",
+    "地形",
+    "保存",
+    "服务器",
+    "网格",
+    "瓦片",
+    "地下",
+    "数据管理"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "地形",
+    "建造",
+    "持久化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2fedc0e0d1db0a8bc1fc5c110e196fc97817075992c4ab454f732d1ada420084",
+    "source_bytes": 2460,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113405570
+  }
+}

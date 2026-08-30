@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spectatorcorpse.lua"
+  },
+  "category": "component",
+  "display_name": "spectatorcorpse",
+  "summary": "此组件在玩家角色死亡时启动，管理其尸体实体对其他玩家的“观战摄像机”功能。当玩家变为尸体后，摄像机焦点会自动切换至附近活着的玩家，并随着距离拉近而增强聚焦强度。玩家复活后摄像机功能关闭。",
+  "api": [],
+  "api_note": "纯数据与行为组件，无直接对外暴露的API方法。其核心功能（摄像机焦点切换）通过内部的更新函数（OnUpdate）自动实现，由系统事件和状态驱动。",
+  "events_published": [
+    "isspectatingdirty"
+  ],
+  "events_listened": [
+    "ms_becameghost",
+    "ms_respawnedfromghost",
+    "playeractivated",
+    "playerdeactivated"
+  ],
+  "netvars": [
+    "_isspectating"
+  ],
+  "tunables": [
+    "maxrange",
+    "startspeed",
+    "priority"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65737,
+      18001,
+      52138,
+      10379,
+      13700,
+      15186,
+      65456,
+      20288
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__spectatorcorpse 或其相关能力的玩家语言表达，内容聚焦于其他实体（如尸体、水晶冠秃鹫、月亮变异等）的一般机制，但未涉及该特定组件的行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "观战",
+    "尸体",
+    "摄像机",
+    "死亡后",
+    "观察者",
+    "镜头",
+    "焦点",
+    "复活",
+    "ghost"
+  ],
+  "gameplay_tags": [
+    "死亡",
+    "观察",
+    "摄像机"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6cbeec62daeb5ffdf18ea2c8d2c900165c083b7ceb1ebf277311bbf29d651210",
+    "source_bytes": 3952,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091810784
+  }
+}

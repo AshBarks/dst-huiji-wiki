@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/singinginspiration.lua"
+  },
+  "category": "component",
+  "display_name": "singinginspiration",
+  "summary": "该组件管理玩家的灵感值系统，灵感值通过攻击和被攻击行为获取，并用于激活和维持战斗歌曲。战斗歌曲效果可以鼓舞友方单位（包括玩家和随从）提供增益，或对敌方施加即时效果。组件处理灵感值的动态增减、歌曲的添加与移除，并在灵感值耗尽时停止更新。",
+  "api": [
+    {
+      "name": "SetCalcAvailableSlotsForInspirationFn",
+      "effect": "设置计算灵感值可用歌曲槽位的自定义函数。"
+    },
+    {
+      "name": "SetMaxInspiration",
+      "effect": "设置灵感值的最大值。"
+    },
+    {
+      "name": "GetMaxInspiration",
+      "effect": "返回当前灵感值的最大值。"
+    },
+    {
+      "name": "SetInspiration",
+      "effect": "设置当前灵感值，更新最后攻击时间，并强制触发灵感值变化逻辑（包括槽位计算和事件推送）。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前灵感值占最大值的百分比（0到1）。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "按百分比设置当前灵感值，更新最后攻击时间，并强制触发灵感值变化逻辑。"
+    },
+    {
+      "name": "GetDetachRadius",
+      "effect": "返回歌曲效果的脱离半径。"
+    },
+    {
+      "name": "IsSongActive",
+      "effect": "检查指定歌曲数据是否在活跃歌曲列表中。"
+    },
+    {
+      "name": "GetActiveSong",
+      "effect": "返回指定槽位号的活跃歌曲数据。"
+    },
+    {
+      "name": "IsSinging",
+      "effect": "检查是否有任何活跃歌曲（即歌手是否在唱歌）。"
+    },
+    {
+      "name": "OnAttacked",
+      "effect": "处理被攻击事件：停止灵感衰减，更新最后攻击时间，并根据受到伤害计算灵感值增量。"
+    },
+    {
+      "name": "OnHitOther",
+      "effect": "处理攻击其他实体事件：停止灵感衰减，更新最后攻击时间，并根据造成伤害计算灵感值增量，史诗敌人有额外加成。"
+    },
+    {
+      "name": "OnRidingTick",
+      "effect": "处理骑乘时的时间tick：停止灵感衰减，并按骑乘速率增加灵感值，不超过骑乘最大值。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "调整灵感值增量，确保在0和最大值之间，更新可用槽位，如果槽位减少则移除多余活跃歌曲，并根据灵感值变化启动或停止组件更新。推送灵感值变化事件。"
+    },
+    {
+      "name": "CanAddSong",
+      "effect": "检查是否可以添加指定歌曲：对于即时歌曲，检查灵感值足够且物品充能完成；对于持续歌曲，检查活跃歌曲数未超过可用槽位。还需检查技能树要求。"
+    },
+    {
+      "name": "DisplayFx",
+      "effect": "显示活跃歌曲的视觉效果：循环为每个歌曲生成特效，调整位置和缩放，骑乘时偏移位置。"
+    },
+    {
+      "name": "OnAddInstantSong",
+      "effect": "处理添加即时歌曲：如果未解锁技能，则消耗灵感值并计数；否则触发物品充能。然后调用即时鼓舞。"
+    },
+    {
+      "name": "AddSong",
+      "effect": "添加歌曲：如果是即时歌曲，调用OnAddInstantSong；否则添加到活跃列表，触发鼓舞，设置周期性刷新任务，启动视觉效果，更新网络变量，并推送歌曲变化事件。"
+    },
+    {
+      "name": "PopSong",
+      "effect": "移除最后一个活跃歌曲：从列表中移除，取消刷新和效果任务（如果没有歌曲了），推送歌曲变化事件，并更新网络变量。"
+    },
+    {
+      "name": "FindFriendlyTargetsToInspire",
+      "effect": "查找附近可鼓舞的友方目标：包括玩家自身（如果PVP关闭）、所有玩家，以及玩家的随从和跟随物品的生物，筛选条件包括非宠物、存活、非攻击玩家、在附加半径内。"
+    },
+    {
+      "name": "InstantInspire",
+      "effect": "对附近敌方实体施加即时歌曲效果：使用自定义目标函数或查找附近实体（有战斗和健康标签，排除特定标签），检查目标有效性后调用歌曲效果函数。"
+    },
+    {
+      "name": "Inspire",
+      "effect": "鼓舞所有友方目标：为每个目标添加所有活跃歌曲的增益效果。"
+    },
+    {
+      "name": "SetValidVictimFn",
+      "effect": "设置用于检查有效受害者的自定义函数。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新逻辑：如果超过灵感衰减缓冲时间，则开始衰减灵感值；否则停止衰减。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据：返回当前灵感值和活跃歌曲的物品名称列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据：设置灵感值并重新添加保存的歌曲（跳过鼓舞）。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前灵感值、活跃歌曲数和可用槽位数。"
+    }
+  ],
+  "events_published": [
+    "inspirationdelta",
+    "inspirationsongchanged"
+  ],
+  "events_listened": [
+    "onhitother",
+    "attacked",
+    "death"
+  ],
+  "netvars": [
+    "currentinspiration",
+    "inspirationdraining",
+    "inspirationsongs"
+  ],
+  "tunables": [
+    "INSPIRATION_MAX",
+    "INSPIRATION_DRAIN_BUFFER_TIME",
+    "INSPIRATION_DRAIN_RATE",
+    "INSPIRATION_GAIN_RATE",
+    "INSPIRATION_GAIN_EPIC_BONUS",
+    "INSPIRATION_RIDING_GAIN_MAX",
+    "INSPIRATION_RIDING_GAIN_RATE",
+    "BATTLESONG_ATTACH_RADIUS",
+    "BATTLESONG_DETACH_RADIUS",
+    "SONG_REAPPLY_PERIOD",
+    "SKILLS.WATHGRITHR.INSTANTSONG_CD_UNLOCK_COUNT",
+    "SKILLS.WATHGRITHR.BATTLESONG_INSTANT_COOLDOWN"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      13606,
+      10418,
+      15186,
+      21285,
+      13268,
+      15941,
+      16645
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及唱歌、歌曲或灵感相关能力；页面15941的'鼓舞'行为与组件'singinginspiration'的唱歌主题不匹配。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "灵感",
+    "歌曲",
+    "鼓舞",
+    "增益",
+    "衰减",
+    "攻击奖励",
+    "随从增益",
+    "精英怪",
+    "即时效果"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "音乐",
+    "团队合作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2e52ce6aba37acb6b4e81e0193f2a7b09fb6f4aa0aaf1e3e785345933ac19506",
+    "source_bytes": 14489,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112609432
+  }
+}

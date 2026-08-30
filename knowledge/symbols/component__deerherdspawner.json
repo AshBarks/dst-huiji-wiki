@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deerherdspawner.lua"
+  },
+  "category": "component",
+  "display_name": "deerherdspawner",
+  "summary": "该组件管理鹿群的生成与迁移，跟踪活跃的鹿和生成点。在秋季触发鹿群生成，冬季触发迁移，影响世界状态和鹿的行为。核心玩法涉及季节性事件和动物管理。",
+  "api": [
+    {
+      "name": "GetDeer",
+      "effect": "返回所有活跃鹿的字典表，用于外部系统查询鹿群状态。"
+    },
+    {
+      "name": "SpawnDeer",
+      "effect": "在指定位置生成一只鹿，记录其位置偏移并添加到活跃列表；副作用：创建新实体并监听其移除和死亡事件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新内部计时器，当生成计时器到期时召唤鹿群，或迁移计时器到期时触发迁移；如果无计时器则停止更新组件。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "与OnUpdate功能相同，用于处理长时间间隔的更新。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括生成计时器、上一次召唤天数、迁移计时器以及活跃鹿的GUID列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据，恢复计时器和上一次召唤天数状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据GUID重建活跃鹿列表，并启动更新组件如果存在活动计时器。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前状态信息，如迁移倒计时、鹿群数量或休眠状态。"
+    },
+    {
+      "name": "DebugSummonHerd",
+      "effect": "调试方法，设置生成计时器以强制召唤鹿群，重置上一次召唤天数并启动更新组件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_registerdeerspawningground",
+    "onremove",
+    "death",
+    "isautumn",
+    "iswinter"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      34314,
+      34523,
+      20714,
+      52788,
+      14579,
+      22094,
+      19832
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未直接描述 deerherdspawner 组件的生成鹿、更新、保存等能力；仅提及无眼鹿生成地作为赃物袋生成点，未涉及鹿群生成行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鹿群",
+    "生成",
+    "迁移",
+    "秋季",
+    "冬季",
+    "繁殖",
+    "动物",
+    "季节事件",
+    "生成点",
+    "计时器"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "季节",
+    "动物管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c966358a4fa6255197f7f6719ef1fbf906a7a9e68086c2cee311cc012092752",
+    "source_bytes": 11694,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106816483
+  }
+}

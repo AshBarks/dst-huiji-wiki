@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hunter.lua"
+  },
+  "category": "component",
+  "display_name": "hunter",
+  "summary": "该组件管理饥荒联机版中的猎人追踪系统，负责在玩家周围生成追踪足迹和土堆，并最终生成猎物（如大象或怪物）。核心玩法是玩家跟随足迹调查土堆，根据表现评分并触发不同事件，影响猎物生成和战斗结果。",
+  "api": [
+    {
+      "name": "OnDirtInvestigated",
+      "effect": "当玩家调查土堆时调用，生成下一个追踪点或猎物，并推送 huntstartfork 等事件；副作用包括生成动物足迹、猎物，并可能重置猎人活动。"
+    },
+    {
+      "name": "IsWargShrineActive",
+      "effect": "检查狼人神龛是否激活，返回布尔值；用于决定是否生成特定怪物。"
+    },
+    {
+      "name": "IsSnakeShrineActive",
+      "effect": "检查蛇神龛是否激活，返回布尔值；用于决定是否生成特定怪物。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理时间流逝，调整所有猎人活动的冷却时间；副作用是更新猎人任务计时器。"
+    },
+    {
+      "name": "DebugForceHunt",
+      "effect": "调试方法，强制开始一个新的猎人活动；可能移除现有活动并立即启动新追踪。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示当前猎人活动状态，如冷却时间、追踪数量等；无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "wargshrineactivated",
+    "wargshrinedeactivated",
+    "ms_snakeshrineactivated",
+    "ms_snakeshrinedeactivated"
+  ],
+  "netvars": [],
+  "tunables": [
+    "HUNT_ALTERNATE_BEAST_CHANCE_MIN",
+    "HUNT_ALTERNATE_BEAST_CHANCE_MAX",
+    "HUNT_COOLDOWN",
+    "HUNT_COOLDOWNDEVIATION",
+    "HUNT_SPAWN_DIST",
+    "SEG_TIME",
+    "MIN_JOINED_HUNT_DISTANCE",
+    "MAX_DIRT_DISTANCE",
+    "TRACK_ANGLE_DEVIATION",
+    "HUNT_RESET_TIME",
+    "HUNT_SCORE_TIME_PER_NODE_MAX",
+    "HUNT_SCORE_TIME_PER_NODE",
+    "HUNT_SCORE_PROP_RATIO",
+    "HUNT_SCORE_SLEEP_RATIO"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20287,
+      20538,
+      17816,
+      15922,
+      51046,
+      13701,
+      70633,
+      13476
+    ],
+    "aspects": [
+      {
+        "aspect": "调查土堆机制描述",
+        "evidence": [
+          {
+            "pageid": 20287,
+            "quote": "玩家可以调查可疑的土堆，将其揭开变为指向大致方向的动物足迹"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "猎人",
+    "追踪",
+    "足迹",
+    "土堆",
+    "猎物",
+    "大象",
+    "怪物",
+    "评分",
+    "冷却",
+    "神龛"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db2fdbddcebeabc0bc6ab5e4e9a61c8454d29187aacda9fc048dc4d249e733ac",
+    "source_bytes": 22053,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108744641
+  }
+}

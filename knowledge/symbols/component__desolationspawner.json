@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/desolationspawner.lua"
+  },
+  "category": "component",
+  "display_name": "desolationspawner",
+  "summary": "DesolationSpawner 组件管理地图上特定植物（如树木）的荒芜再生机制。它跟踪每个区域内指定植物的再生时间和密度，并在条件满足时自动在地图上生成新的植物实例。该组件参与了游戏中的资源再生和生态维护玩法，确保植被在砍伐后能逐渐恢复。",
+  "api": [
+    {
+      "name": "SetSpawningForType",
+      "effect": "设置一种预制物的再生配置，包括产品预制物、再生时间、搜索标签和时间乘数。更新内部数据并初始化该预制物在所有区域的再生计时器。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "根据传入的时间增量推进内部时间，检查每个区域的再生计时器，并在条件满足时调用 DoRegrowth 在随机位置生成新植物。如果成功生成则返回，否则继续检查。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含所有区域和预制物的密度与剩余再生时间，用于保存游戏状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从传入的保存数据中恢复区域和预制物的密度与再生时间状态，以加载游戏。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个字符串，显示每个预制物的当前内部时间和下次再生时间，用于调试目的。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      35001,
+      34314,
+      18441,
+      21416,
+      21675,
+      73427,
+      15352,
+      16577
+    ],
+    "aspects": [
+      {
+        "aspect": "世界规则调整再生速率",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[世界再生]]中，[[再生]]、[[后代再生]]和[[荒芜再生]]的速率。"
+          }
+        ]
+      },
+      {
+        "aspect": "荒芜再生时间计时",
+        "evidence": [
+          {
+            "pageid": 35001,
+            "quote": "荒芜再生时间是50天，只在[[冬季]]计时"
+          }
+        ]
+      },
+      {
+        "aspect": "荒芜再生距离条件",
+        "evidence": [
+          {
+            "pageid": 35001,
+            "quote": "如果在 50 {{解释|距离单位}}以内有任何相同类型的树"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "荒芜再生",
+    "植物生长",
+    "树木再生",
+    "再生机制",
+    "密度管理",
+    "自动生长",
+    "资源再生",
+    "生态平衡"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "自然",
+    "再生"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9291e6a84bddd8c24c7598e990d8a195a548a7108d30eb17cac0d4827798cdfd",
+    "source_bytes": 11600,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106815078
+  }
+}

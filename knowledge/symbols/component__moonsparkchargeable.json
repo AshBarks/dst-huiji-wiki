@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonsparkchargeable.lua"
+  },
+  "category": "component",
+  "display_name": "moonsparkchargeable",
+  "summary": "该组件管理一个燃料百分比值，用于月圆火花充电机制。当执行火花效果时，它会增加实体的燃料百分比，前提是组件有非零值且实体拥有燃料组件。组件在移除时会自动清理相关标签。",
+  "api": [
+    {
+      "name": "SetFueledPercent",
+      "effect": "设置组件的燃料百分比为传入的 amount 值。副作用：更新内部状态 self.fueled_percent。"
+    },
+    {
+      "name": "DoSpark",
+      "effect": "如果 self.fueled_percent 不为 0 且实体有 fueled 组件，则计算新燃料百分比并设置为原值加上 self.fueled_percent，并限制在 0 到 1 之间。参数 doer 未在代码中使用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，从实体移除 'moonsparkchargeable' 标签。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MOONSTORM_SPARKCHARGE_DEFAULT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      18216,
+      15729,
+      16057,
+      21620,
+      20193,
+      10418,
+      15170
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有直接讨论组件 moonsparkchargeable 的能力表达。提供的页面涉及燃料、发电机、伏特羊充电、火花柜等，但未提及月亮火花或相关组件的具体能力，如 SetFueledPercent、DoSpark、OnRemoveFromEntity 的玩家语言描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月圆",
+    "火花",
+    "充电",
+    "燃料",
+    "充能",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "充能",
+    "月圆"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "93d2c2f9f4b9f3c3f2bdd3656b015dba34649c8aef255e28d626731fc5c24a92",
+    "source_bytes": 794,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095739294
+  }
+}

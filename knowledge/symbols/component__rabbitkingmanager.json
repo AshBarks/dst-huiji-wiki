@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rabbitkingmanager.lua"
+  },
+  "category": "component",
+  "display_name": "rabbitkingmanager",
+  "summary": "该组件管理兔子国王（Rabbit King）事件系统，负责跟踪并维护世界中的单个兔子国王实例。其核心玩法围绕着通过收集胡萝卜或击杀小兔/兔人来累积计数，达到随机阈值后生成并切换兔子国王的不同形态（被动、激进、幸运），并管理其与玩家的追逐和仇恨机制。",
+  "api": [
+    {
+      "name": "CanFeedCarrot(player)",
+      "effect": "检查是否允许玩家继续喂食胡萝卜。返回`false`的情况包括：已经存在活跃的兔子国王事件、有挂起的玩家加载操作或处于冷却期；或玩家已喂食的胡萝卜数量已达到或超过本次触发所需的上限。"
+    },
+    {
+      "name": "AddCarrotFromPlayer(player, receiver)",
+      "effect": "玩家成功喂食一个胡萝卜时调用。将喂食计数加1，若达到阈值则调用`CreateRabbitKingForPlayer`生成被动兔子国王。同时播放一次胡萝卜喂食音效。"
+    },
+    {
+      "name": "AddNaughtinessFromPlayer(player, naughtiness)",
+      "effect": "玩家击杀兔子或兔人时调用。根据击杀目标的淘气值增加累积值，若达到阈值则立即为玩家生成一个激进的兔子国王。同时播放一次淘气值音效。"
+    },
+    {
+      "name": "CreateRabbitKingForPlayer(player, pt_override, forcedstate_string, params)",
+      "effect": "为玩家生成一个兔子国王。若存在活跃事件或冷却中则失败。成功时会在玩家附近（或指定点）生成对应状态（根据玩家背包物品或强制指定）的兔子国王，并开始跟踪该事件。参数`params`可控制是否从物品栏跳出或跳过登场动画。返回生成是否成功及失败原因。"
+    },
+    {
+      "name": "RemoveRabbitKing(rabbitking)",
+      "effect": "移除当前跟踪的兔子国王。如果兔子国王尚未完成登场动画，则直接移除；否则触发其“钻地离开”的演出事件。若兔子国王处于睡眠状态，则直接移除。"
+    },
+    {
+      "name": "GetRabbitKing()",
+      "effect": "返回当前被跟踪的兔子国王实体，若无则返回`nil`。"
+    },
+    {
+      "name": "GetTargetPlayer()",
+      "effect": "返回当前被兔子国王追逐的玩家实体，若无则返回`nil`。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "killed",
+    "onremove",
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.RABBITKING_CARROTS_NEEDED",
+    "TUNING.RABBITKING_CARROTS_NEEDED_VARIANCE",
+    "TUNING.RABBITKING_NAUGHTINESS_NEEDED",
+    "TUNING.RABBITKING_NAUGHTINESS_NEEDED_VARIANCE",
+    "TUNING.RABBITKING_COOLDOWN",
+    "TUNING.RABBITKING_MEATCHECK_DISTANCE_SQ",
+    "TUNING.RABBITKING_TELEPORT_DISTANCE_SQ",
+    "TUNING.RABBITKING_SPAWN_DISTANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15239,
+      14486,
+      18001,
+      57263,
+      16641,
+      34523,
+      51097,
+      18521
+    ],
+    "aspects": [
+      {
+        "aspect": "兔王淘气值增加机制",
+        "evidence": [
+          {
+            "pageid": 15239,
+            "quote": "击杀兔人会为玩家增加 3 点[[淘气值]]；还会为当前世界增加等量的[[兔王淘气值]]"
+          },
+          {
+            "pageid": 51097,
+            "quote": "会为当前世界增加 1 点[[兔王淘气值]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "兔子国王",
+    "喂胡萝卜",
+    "淘气值",
+    "兔人",
+    "激进",
+    "幸运",
+    "传送",
+    "仇恨",
+    "生成生物"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "39c32bc6e81253f5827e02f79e0805e896e495e60bca2bbb4fbf48c69995c7cd",
+    "source_bytes": 23707,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111585121
+  }
+}

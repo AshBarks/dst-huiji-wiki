@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/upgrader.lua"
+  },
+  "category": "component",
+  "display_name": "upgrader",
+  "summary": "该组件管理升级类型和升级值数据，用于处理实体的升级逻辑。它通过检查升级类型匹配和玩家标签来判断是否可以执行升级操作，并动态更新实体的标签以支持游戏内的升级系统。",
+  "api": [
+    {
+      "name": "CanUpgrade",
+      "effect": "检查当前组件的升级类型是否与目标的可升级组件类型匹配，且执行者是否具有对应类型的升级用户标签。返回 true 如果可以升级，否则 false；无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      13493,
+      34314,
+      28179,
+      16419,
+      13701,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "电路板改装技能升级能力",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "如果玩家学习了“二级阿尔法电路改装”技能，每激活一个，都会提供 2.5% 的物理伤害减免"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "升级",
+    "类型",
+    "检查",
+    "标签",
+    "玩家",
+    "升级者",
+    "升级用户",
+    "可升级",
+    "装备升级"
+  ],
+  "gameplay_tags": [
+    "升级",
+    "标签管理",
+    "玩家互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "481e37e4d96a7cceda274a0c53d417dcc12e44eff90da2039732083e65144f48",
+    "source_bytes": 605,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093420695
+  }
+}

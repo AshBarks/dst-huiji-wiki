@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/followermemory.lua"
+  },
+  "category": "component",
+  "display_name": "followermemory",
+  "summary": "FollowerMemory 组件管理实体对领袖玩家的记忆数据，包括领袖的用户 ID、角色预制体和重聚范围。它通过定期检查跟踪领袖玩家，并在重聚或丢失时触发回调函数，参与随从跟随和社交关系维护的核心玩法。",
+  "api": [
+    {
+      "name": "SetReuniteRange(dist)",
+      "effect": "设置实体与领袖重聚的最大距离，更新内部 reuniterange 变量。"
+    },
+    {
+      "name": "SetOnReuniteLeaderFn(fn)",
+      "effect": "设置一个回调函数，当实体与领袖重聚时调用，更新内部 onreuniteleaderfn 变量。"
+    },
+    {
+      "name": "SetOnLeaderLostFn(fn)",
+      "effect": "设置一个回调函数，当领袖丢失时调用，更新内部 onleaderlostfn 变量。"
+    },
+    {
+      "name": "RememberAndSetLeader(player)",
+      "effect": "记住玩家作为领袖并设置领袖关系，如果实体有 follower 组件则设置领袖，否则根据记忆开始或停止观察领袖，更新领袖记忆并可能启动跟踪任务。"
+    },
+    {
+      "name": "RememberLeaderDetails(id, prefab)",
+      "effect": "记住领袖的 ID 和角色，如果当前没有领袖则设置记忆并开始观察，如果领袖匹配则更新记忆。"
+    },
+    {
+      "name": "ForgetLeader()",
+      "effect": "清除领袖记忆，停止观察领袖，移除相关事件监听，更新内部 leaderid 和 leaderchar 为 nil。"
+    },
+    {
+      "name": "HasRememberedLeader()",
+      "effect": "返回布尔值，指示实体是否记住了领袖，无副作用。"
+    },
+    {
+      "name": "IsRememberedLeader(target)",
+      "effect": "检查目标实体是否是记住的领袖，返回布尔值，无副作用。"
+    },
+    {
+      "name": "GetTrackingPlayer()",
+      "effect": "返回当前正在跟踪的玩家对象，如果没有则返回 nil，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "ms_playerjoined"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      72299,
+      16630,
+      72238,
+      20162,
+      24875,
+      13898,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述随从的一般行为如跟随、仇恨、传送等，未涉及 followermemory 组件的具体能力（如记忆领袖、遗忘领袖、追踪玩家、重聚范围等）。代码能力清单中的函数在页面中没有对应的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "领袖记忆",
+    "跟随",
+    "重聚",
+    "宠物",
+    "随从",
+    "玩家跟踪",
+    "关系",
+    "丢失领袖",
+    "记忆"
+  ],
+  "gameplay_tags": [
+    "社交",
+    "跟随",
+    "宠物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b8959e19a79d36d7bcbcfe81b5d2dad5c6a4e7bf574bebcd787c77d72c9200ea",
+    "source_bytes": 6180,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107568550
+  }
+}

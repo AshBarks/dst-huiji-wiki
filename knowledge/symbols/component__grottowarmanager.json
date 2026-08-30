@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grottowarmanager.lua"
+  },
+  "category": "component",
+  "display_name": "grottowarmanager",
+  "summary": "grottowarmanager 组件管理洞穴战争的核心逻辑，负责在月岛区域（lunacyarea）根据玩家位置动态生成噩梦（nightmare）和光明（brightmare）怪物。当战争启动后，它定期更新怪物种群以维持战斗平衡，并处理旧世界的前线结构生成。组件还通过监听玩家进出区域事件来追踪参与玩家，并保存/加载战争状态。",
+  "api": [
+    {
+      "name": "RetrofittedSpawnFrontLines",
+      "effect": "为适应旧世界，移除预设生成点和家点，并在原位生成新的前线物体（如噩梦生长点 nightmaregrowth_spawner 或裂缝 fissure_grottowar），播放过渡特效和音效。如果成功生成，返回 true；否则返回 false。"
+    },
+    {
+      "name": "SpawnFrontLines",
+      "effect": "在地图上查找标记为 'GrottoWarEntrance' 的节点，根据其边缘生成前线物体（噩梦生长点或裂缝），建立战斗区域。如果世界已适应（即有预设生成点），则调用 RetrofittedSpawnFrontLines；否则直接生成。"
+    },
+    {
+      "name": "IsWarStarted",
+      "effect": "返回布尔值，指示战争是否已启动（_enabled 状态）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回一个包含 _enabled2 键的表，用于持久化战争是否启动。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果输入数据中 _enabled2 为真，则设置 _enabled 为 true 以恢复战争启动状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前追踪的玩家数量字符串，用于调试输出。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "nightmarephasechanged",
+    "ms_archivesbreached",
+    "ms_register_retrofitted_grotterwar_spawnpoint",
+    "ms_register_retrofitted_grotterwar_homepoint"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GROTTOWAR_POPULATION_DIST",
+    "TUNING.GROTTOWAR_MAX_NIGHTMARES",
+    "TUNING.GROTTOWAR_NUM_BRIGHTMARES_PRE_NIGHTMARE",
+    "TUNING.GROTTOWAR_NUM_AMBIENT_BRIGHTMARES",
+    "TUNING.GROTTOWAR_NIGHTMARE_TARGET_PLAYER_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15337,
+      23956,
+      24896,
+      46847,
+      15133,
+      65605,
+      18254,
+      34523
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论溯源表、暗影裂隙、天体后裔、世界翻新等实体和机制，未提及 grottowarmanager 组件或其能力（如战争开始、生成前线、保存加载、调试字符串）的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "洞穴战争",
+    "噩梦生成",
+    "光明怪物",
+    "前线生成",
+    "月岛区域",
+    "玩家追踪",
+    "怪物种群",
+    "战争启动",
+    "裂缝",
+    "噩梦生长点"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "洞穴探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "129135b78dd2893c64c16172a5e25ceea5193fde88736df22a60d0aa3bf1589f",
+    "source_bytes": 13347,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108187446
+  }
+}

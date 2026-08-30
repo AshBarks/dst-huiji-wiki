@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/leaderrollcall.lua"
+  },
+  "category": "component",
+  "display_name": "leaderrollcall",
+  "summary": "LeaderRollCall组件管理领导点名功能，用于定期召集附近的猪人、鱼人或农场植物跟随玩家。它通过设置半径、最大跟随者数等参数控制点名行为，并支持照料农场植物。核心玩法涉及使用独奏乐队等物品激活点名，增强生存和战斗能力。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用组件，开始定期执行点名。若所有者是有效领导者，则标记为点名者。可选inittime参数调整初始更新累积。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用组件，停止点名更新。若所有者是有效领导者，则取消点名者标记。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件是否启用的布尔值。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置点名作用半径，影响召集跟随者的范围。"
+    },
+    {
+      "name": "GetRadius",
+      "effect": "返回当前点名半径。"
+    },
+    {
+      "name": "SetMaxFollowers",
+      "effect": "设置最大跟随者数量，限制点名可召集的实体上限。"
+    },
+    {
+      "name": "GetMaxFollowers",
+      "effect": "返回当前最大跟随者数。"
+    },
+    {
+      "name": "SetCanTendFarmPlant",
+      "effect": "设置是否允许照料农场植物。true或false控制点名时是否对农场植物执行照料行为。"
+    },
+    {
+      "name": "GetCanTendFarmPlant",
+      "effect": "返回是否可以照料农场植物的布尔值。"
+    },
+    {
+      "name": "SetUpdateTime",
+      "effect": "设置点名更新的时间间隔，单位为秒。"
+    },
+    {
+      "name": "SetOnRollCallFn",
+      "effect": "设置当点名执行时调用的回调函数，用于自定义行为。"
+    },
+    {
+      "name": "GetLeader",
+      "effect": "返回当前领导者实体。优先返回物品源所有者（若有效），否则返回组件所有者实体。"
+    },
+    {
+      "name": "IsValidLeader",
+      "effect": "检查给定实体是否是有效领导者（具有leader组件）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ONEMANBAND_RANGE",
+    "TUNING.ONEMANBAND_MAXFOLLOWERS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15183,
+      13556,
+      16630
+    ],
+    "aspects": [
+      {
+        "aspect": "跟随者数量上限",
+        "evidence": [
+          {
+            "pageid": 16630,
+            "quote": "雇佣的[[猪人]]、[[兔人]]和{{分类|鱼人族}}数量不足 10 个"
+          }
+        ]
+      },
+      {
+        "aspect": "跟随距离设定",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "保持在[[温蒂]]附近 1 ~ 5 {{解释|距离单位}}的位置"
+          },
+          {
+            "pageid": 16630,
+            "quote": "雇佣玩家 12 {{解释|距离单位}}内的猪人、兔人和鱼人"
+          }
+        ]
+      },
+      {
+        "aspect": "领导者绑定关系",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "每个阿比盖尔都与一个[[温蒂]]相绑定"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "点名",
+    "猪人跟随",
+    "鱼人跟随",
+    "农场照料",
+    "独奏乐队",
+    "点名范围",
+    "随从上限",
+    "点名间隔",
+    "激活效果"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "领导",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6c89039183bda251ed67d4390c798be81e59469d116130eb3992187db383b716",
+    "source_bytes": 5170,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101228698
+  }
+}

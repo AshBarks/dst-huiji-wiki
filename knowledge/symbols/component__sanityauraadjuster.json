@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sanityauraadjuster.lua"
+  },
+  "category": "component",
+  "display_name": "sanityauraadjuster",
+  "summary": "该组件管理实体上的理智光环调整，通过设置调整函数来影响玩家的理智值。它维护一个受影响的玩家列表，并通过每秒一次的周期性任务执行调整函数，更新玩家的光环效果。参与核心玩法中的理智管理，影响玩家的心理状态和游戏难度。",
+  "api": [
+    {
+      "name": "StopTask",
+      "effect": "停止周期性任务，取消定期检查和调整函数的执行；如果任务存在则取消并清空任务句柄。"
+    },
+    {
+      "name": "StartTask",
+      "effect": "启动周期性任务，如果未运行则设置每秒执行一次调整函数检查，用于更新玩家列表和光环效果；任务句柄存储在实体上。"
+    },
+    {
+      "name": "SetAdjustmentFn",
+      "effect": "设置用于调整的函数，该函数将在周期任务中被调用，接收实体和玩家列表作为参数并返回更新后的玩家列表。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      18234,
+      13437,
+      16197,
+      13268,
+      10374,
+      16419,
+      10379
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述游戏机制、角色能力和物品效果（如理智值变化、光环效果），没有涉及组件层面的 StopTask、StartTask 或 SetAdjustmentFn 的具体行为或玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "理智光环",
+    "光环效果",
+    "周期任务",
+    "玩家列表",
+    "sanity aura",
+    "光环调整",
+    "效果更新",
+    "理智值"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "心理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3a37bd7759e55d5bbf45381d0113c446e9eab2b8d1976a193ae1390e3ff12783",
+    "source_bytes": 770,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112114776
+  }
+}

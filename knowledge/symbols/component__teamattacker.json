@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/teamattacker.lua"
+  },
+  "category": "component",
+  "display_name": "teamattacker",
+  "summary": "teamattacker 组件为非玩家实体（如怪物）提供组队战斗的能力。它管理实体的队伍状态、阵型位置和行动命令，并与 teamleader 组件协作，使怪物能执行集合、攻击等团队行动。该组件的核心玩法在于实现怪物之间的协同攻击，丰富了战斗系统。",
+  "api": [
+    {
+      "name": "SearchForTeam()",
+      "effect": "搜索自身周围（由 searchradius 定义）的潜在队伍领袖（带有 `teamleader_{team_type}` 标签的实体），并尝试加入第一个未满员的队伍。成功加入后返回 true。"
+    },
+    {
+      "name": "LeaveTeam()",
+      "effect": "调用当前队伍领袖的 `OnLostTeammate` 方法以离开队伍。如果实体没有队伍领袖，则无操作。"
+    },
+    {
+      "name": "LeaveFormation()",
+      "effect": "设置 `ignoreformation` 为 true，使实体在接下来的移动中忽略阵型位置（formationpos）的导航，允许其自由移动。"
+    },
+    {
+      "name": "JoinFormation()",
+      "effect": "清除 `ignoreformation` 标志，使实体重新开始导航至其指定的阵型位置（formationpos）。"
+    },
+    {
+      "name": "GetOrders()",
+      "effect": "返回当前实体接收到的命令（orders），该值通常由队伍领袖设置（如 ORDERS.ATTACK, ORDERS.HOLD）。"
+    },
+    {
+      "name": "SetValidMemberFn(fn)",
+      "effect": "设置一个函数 `fn`，该函数可能被用于判断该实体是否是一个合格的队伍成员（源码中未使用此函数，但方法本身存在）。"
+    },
+    {
+      "name": "ShouldGoHome()",
+      "effect": "检查实体当前世界位置与已知“home”位置的距离是否大于 `leashdistance`。如果超出距离则返回 true，表明实体应回家。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "组件的核心更新函数。首先检查是否超距（ShouldGoHome）并调用 LeaveTeam。然后，如果实体在队伍中且领袖能攻击，则根据当前命令（orders）执行行为：对于 WARN 或 HOLD 命令，移动至阵型位置并可能切换为 ATTACK 命令；对于 ATTACK 命令，向队伍的威胁目标发起攻击。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13874,
+      15566,
+      52332
+    ],
+    "aspects": [
+      {
+        "aspect": "飞回洞穴行为",
+        "evidence": [
+          {
+            "pageid": 15566,
+            "quote": "蝙蝠会在白天来临时飞回洞穴入口并消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "组队战斗",
+    "队伍系统",
+    "阵型控制",
+    "命令系统",
+    "协同攻击",
+    "怪物AI",
+    "离队",
+    "组队机制",
+    "战斗命令"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 9/9)",
+  "gameplay_tags": [
+    "战斗",
+    "AI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "21a39a23f95420973196f4c0c081cd71c98df11ebd634479660b0cfdacc40944",
+    "source_bytes": 3367,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095928809
+  }
+}

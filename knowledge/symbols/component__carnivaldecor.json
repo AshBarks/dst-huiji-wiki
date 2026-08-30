@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivaldecor.lua"
+  },
+  "category": "component",
+  "display_name": "carnivaldecor",
+  "summary": "该组件管理装饰品的数值属性，并参与嘉年华装饰品的排名系统。当装饰品被放置或移除时，它会与附近的排名器实体交互，更新装饰品计数。核心玩法涉及通过放置装饰品来影响排名，从而在嘉年华活动中获得得分或奖励。",
+  "api": [
+    {
+      "name": "GetDecorValue",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21620,
+      23187,
+      28738,
+      19222,
+      65881,
+      70704,
+      18530,
+      72974
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件 carnivaldecor 或能力 GetDecorValue 相关的玩家语言表达；所有页面内容涉及其他实体（如发电机、装饰品类型、桌子、保险杠、工厂教程、活动、陷阱），未提及装饰品的数值、效果或任何直接关联的行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "装饰品",
+    "装饰值",
+    "排名",
+    "嘉年华",
+    "装饰组件",
+    "计数器",
+    "放置",
+    "移除",
+    "得分"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b56c643945f5426e0794ab24429a0e0316b15caf83bf8d64ca6eb74d6ab43bb0",
+    "source_bytes": 1219,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094625299
+  }
+}

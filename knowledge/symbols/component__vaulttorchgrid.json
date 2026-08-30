@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaulttorchgrid.lua"
+  },
+  "category": "component",
+  "display_name": "vaulttorchgrid",
+  "summary": "VaultTorchGrid 组件管理一个矩形网格中的火把阵列，控制火把的生成、位置和状态。它用于创建装饰性的照明布局，支持状态保存与加载，并提供回调机制处理火添加或移除事件。",
+  "api": [
+    {
+      "name": "SetOnTorchAddedFn",
+      "effect": "设置火把被添加到网格时调用的回调函数。回调接收两个参数：拥有此组件的实体和添加的火实体。"
+    },
+    {
+      "name": "SetOnTorchRemovedFn",
+      "effect": "设置火把被移除时调用的回调函数。回调接收两个参数：拥有此组件的实体和移除的火实体。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当拥有此组件的实体被移除时，自动移除网格中的所有火实体。"
+    },
+    {
+      "name": "Clear",
+      "effect": "清除网格中的所有火实体，重置网格尺寸为零，并触发火移除回调。"
+    },
+    {
+      "name": "Initialize",
+      "effect": "初始化网格，根据给定的列数、行数和间距生成火实体。清除旧网格，生成新火，设置位置，并触发火添加回调。"
+    },
+    {
+      "name": "GetTorch",
+      "effect": "根据列和行索引返回对应的火实体。索引基于内部偏移计算，如果不存在则返回 nil。"
+    },
+    {
+      "name": "ForEach",
+      "effect": "遍历网格中的所有火实体，对每个火调用回调函数。如果回调返回 true，则停止遍历。"
+    },
+    {
+      "name": "ForEachAdjacent",
+      "effect": "给定一个火实体，遍历其上下左右四个方向相邻的火实体（如果存在），并调用回调函数。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存网格状态，包括列数、行数、间距和每个火的状态（开/关、卡住、破损），返回数据表用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载网格状态。如果网格尺寸或间距不匹配，则重新初始化网格，然后根据保存的数据设置每个火的状态。"
+    }
+  ],
+  "api_note": "组件提供网格管理、火初始化与状态保存/加载方法，支持回调机制。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      61065,
+      57263,
+      70456
+    ],
+    "aspects": [
+      {
+        "aspect": "谜之火焰网格布局",
+        "evidence": [
+          {
+            "pageid": 61065,
+            "quote": "在该房间，9 个谜之火焰呈 3×3 分"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "火把网格",
+    "网格管理",
+    "照明装饰",
+    "vault_torch",
+    "网格初始化",
+    "遍历火",
+    "相邻火",
+    "状态保存",
+    "状态加载"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "装饰",
+    "照明"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "94c9b0abdd20b0f40a207bd11d2844a038013c52ccb9168c8a1ee51a03ec7afe",
+    "source_bytes": 5925,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104732451
+  }
+}

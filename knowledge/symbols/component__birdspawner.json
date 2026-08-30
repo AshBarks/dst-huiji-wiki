@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/birdspawner.lua"
+  },
+  "category": "component",
+  "display_name": "birdspawner",
+  "summary": "该组件管理鸟类生成的调度与数据，包括根据地形和天气选择鸟类类型、控制生成数量与时间。它参与生态模拟玩法，并在月球冰雹事件中触发鸟类尸体生成，影响游戏事件与环境互动。",
+  "api": [
+    {
+      "name": "SetSpawnTimes",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "SetMaxBirds",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "ToggleUpdate",
+      "effect": "强制更新鸟类生成状态，检查是否在夜间和最大鸟类数，并调度生成任务。"
+    },
+    {
+      "name": "SpawnModeNever",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "SpawnModeLight",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "SpawnModeMed",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "SpawnModeHeavy",
+      "effect": "已弃用，无实际效果。"
+    },
+    {
+      "name": "GetSpawnPoint",
+      "effect": "根据给定位置和是否尸体条件，查找一个有效的生成点，返回生成点位置或nil。"
+    },
+    {
+      "name": "SpawnBirdCorpse",
+      "effect": "在指定生成点生成鸟类尸体实体，根据鸟类类型设置外观，并返回尸体实体。"
+    },
+    {
+      "name": "SpawnBird",
+      "effect": "在指定生成点生成鸟类实体，检查诱饵和陷阱，可能吸引到诱饵，并返回鸟类实体。"
+    },
+    {
+      "name": "StartTracking",
+      "effect": "开始跟踪目标鸟类，设置持久化为false并监听睡眠事件。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "停止跟踪目标鸟类，恢复持久化并移除事件监听。"
+    },
+    {
+      "name": "SetBirdTypesForTile",
+      "effect": "为指定地形ID设置鸟类类型列表，用于模组扩展。"
+    },
+    {
+      "name": "SetTimeScaleModifier",
+      "effect": "设置时间缩放修改器，影响生成延迟，用于模组。"
+    },
+    {
+      "name": "RemoveTimeScaleModifier",
+      "effect": "移除指定键的时间缩放修改器。"
+    },
+    {
+      "name": "SpawnCorpseForPlayer",
+      "effect": "为指定玩家生成鸟类尸体，用于特定事件如Wicker书。"
+    },
+    {
+      "name": "GetPostHailEasingMult",
+      "effect": "获取当前后冰雹事件的缓动乘数，用于调整生成率。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "islunarhailing",
+    "israining",
+    "isnight",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BIRD_SPAWN_MAX",
+    "BIRD_SPAWN_DELAY.min",
+    "BIRD_SPAWN_DELAY.max",
+    "BIRD_CORPSE_SPAWN_MAX",
+    "BIRD_CORPSE_MIN_SPAWN",
+    "BIRD_CORPSE_MAX_SPAWN",
+    "BIRD_CORPSE_MUTATE_MAX_COUNT",
+    "BIRD_CORPSE_FADE_MIN_TIME",
+    "BIRD_CORPSE_FADE_MAX_TIME",
+    "BIRD_CORPSE_GESTALT_MIN_TIME",
+    "BIRD_CORPSE_GESTALT_MAX_TIME",
+    "BIRD_SPAWNER_POST_HAIL_TIME",
+    "BIRD_RAIN_FACTOR",
+    "BIRD_POST_HAIL_FACTOR",
+    "LUNARHAIL_EVENT_TIME",
+    "LUNARHAIL_BIRD_EVENT",
+    "LUNARHAIL_BIRD_EVENT_VARIANCE",
+    "LUNARHAIL_MUTATE_BIRD_CHANCE",
+    "BIRD_TRAP_CHANCE",
+    "BIRD_CANARY_LURE_DISTANCE",
+    "SPAWN_MUTATED_BIRDS_GESTALT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      15722,
+      22181,
+      13260,
+      14676,
+      15724,
+      73427,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "固定生成点位置说明",
+        "evidence": [
+          {
+            "pageid": 15724,
+            "quote": "秃鹫拥有固定的生成点"
+          }
+        ]
+      },
+      {
+        "aspect": "最大同时数量限制描述",
+        "evidence": [
+          {
+            "pageid": 15724,
+            "quote": "每个秃鹫生成点最多可以同时拥有 1 ~ 2 只秃鹫"
+          }
+        ]
+      },
+      {
+        "aspect": "生成时间间隔数值标注",
+        "evidence": [
+          {
+            "pageid": 15724,
+            "quote": "不满上限时每 3 天生成一只。"
+          }
+        ]
+      },
+      {
+        "aspect": "自发生成行为描述",
+        "evidence": [
+          {
+            "pageid": 15724,
+            "quote": "在[[白天]]和[[黄昏]]，每 30 ~ 60 秒就会有一只秃鹫自发落下"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鸟类生成",
+    "冰雹事件",
+    "鸟尸",
+    "诱饵",
+    "生态",
+    "生成点",
+    "跟踪",
+    "时间缩放",
+    "模组支持"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "生态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2915df168141d9f6e0ab677c1444555df0f09fd682ad524ec792efec94e89f09",
+    "source_bytes": 21735,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105651405
+  }
+}

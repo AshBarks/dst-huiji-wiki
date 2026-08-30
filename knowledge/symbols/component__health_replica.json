@@ -1,0 +1,206 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/health_replica.lua"
+  },
+  "category": "component",
+  "display_name": "health_replica",
+  "summary": "此组件是生命值系统的网络副本，负责同步玩家的生命值数据、最大值、惩罚值以及状态标志如着火和死亡。它参与饥荒的核心生存玩法，确保客户端能准确反映服务器上的生命值状态，支持治疗、受伤和死亡判定。",
+  "api": [
+    {
+      "name": "SetCurrent",
+      "effect": "通过分类对象设置网络变量currenthealth，实现客户端同步。"
+    },
+    {
+      "name": "SetMax",
+      "effect": "通过分类对象设置网络变量maxhealth，实现客户端同步。"
+    },
+    {
+      "name": "SetPenalty",
+      "effect": "将惩罚值转换为0-200的整数存储在分类对象的healthpenalty中，带范围断言检查。"
+    },
+    {
+      "name": "Max",
+      "effect": "优先返回服务器组件值，否则从分类对象读取，无分类时返回默认值100。"
+    },
+    {
+      "name": "MaxWithPenalty",
+      "effect": "计算方式为最大生命值乘以(1 - 惩罚百分比)，优先使用服务器组件计算。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前生命值除以最大生命值，无分类时返回默认值1。"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "优先返回服务器组件值，否则从分类对象读取，无分类时返回默认值100。"
+    },
+    {
+      "name": "GetPenaltyPercent",
+      "effect": "返回惩罚值除以200，优先使用服务器组件计算。"
+    },
+    {
+      "name": "IsHurt",
+      "effect": "基于服务器或分类数据计算并返回布尔值。"
+    },
+    {
+      "name": "SetIsDead",
+      "effect": "通过添加或移除实体标签'isdead'来标记死亡。"
+    },
+    {
+      "name": "IsDead",
+      "effect": "返回实体是否具有标签'isdead'。"
+    },
+    {
+      "name": "SetIsTakingFireDamage",
+      "effect": "通过分类对象设置网络变量istakingfiredamage。"
+    },
+    {
+      "name": "IsTakingFireDamage",
+      "effect": "返回服务器组件或分类对象中的istakingfiredamage状态。"
+    },
+    {
+      "name": "SetIsTakingFireDamageLow",
+      "effect": "通过分类对象设置网络变量istakingfiredamagelow。"
+    },
+    {
+      "name": "IsTakingFireDamageLow",
+      "effect": "返回服务器组件或分类对象中的istakingfiredamagelow状态。"
+    },
+    {
+      "name": "IsTakingFireDamageFull",
+      "effect": "返回istakingfiredamage为真且istakingfiredamagelow为假的状态。"
+    },
+    {
+      "name": "SetLunarBurnFlags",
+      "effect": "通过分类对象设置网络变量lunarburnflags。"
+    },
+    {
+      "name": "GetLunarBurnFlags",
+      "effect": "返回服务器组件或分类对象中的lunarburnflags值，无分类时返回0。"
+    },
+    {
+      "name": "SetCanHeal",
+      "effect": "通过添加或移除实体标签'cannotheal'来控制。"
+    },
+    {
+      "name": "CanHeal",
+      "effect": "返回实体是否不具有标签'cannotheal'。"
+    },
+    {
+      "name": "SetCanMurder",
+      "effect": "通过添加或移除实体标签'cannotmurder'来控制。"
+    },
+    {
+      "name": "CanMurder",
+      "effect": "返回实体是否不具有标签'cannotmurder'。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "currenthealth",
+    "maxhealth",
+    "healthpenalty",
+    "istakingfiredamage",
+    "istakingfiredamagelow",
+    "lunarburnflags"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15244,
+      13606,
+      13261,
+      15303,
+      13260,
+      34003,
+      15022,
+      23924
+    ],
+    "aspects": [
+      {
+        "aspect": "吸收实体回复生命值",
+        "evidence": [
+          {
+            "pageid": 34003,
+            "quote": "被吸收以给恶液回复生命值。"
+          }
+        ]
+      },
+      {
+        "aspect": "恢复生命值描述",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "恢复一定的饥饿值、生命值和理智值。"
+          }
+        ]
+      },
+      {
+        "aspect": "消耗生命值进行制作",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "消耗 20{{生命值}}制作"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值上限随宝石增益",
+        "evidence": [
+          {
+            "pageid": 23924,
+            "quote": "生命值 = {{tooltip|20000|该数据随红宝石数量增加而提高}}"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值低于阈值触发自我治疗",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "帝王蟹就会开始尝试治疗自己"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值归零导致死亡",
+        "evidence": [
+          {
+            "pageid": 15244,
+            "quote": "生命值降低至 0 会导致角色[[死亡]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "生命值",
+    "血量",
+    "最大生命",
+    "生命惩罚",
+    "着火伤害",
+    "死亡",
+    "治疗",
+    "谋杀",
+    "网络同步",
+    "状态标记"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+    "source_bytes": 5988,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108399134
+  }
+}

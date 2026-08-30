@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playertargetindicator.lua"
+  },
+  "category": "component",
+  "display_name": "playertargetindicator",
+  "summary": "该组件管理屏幕外玩家列表和上一帧在屏幕上的玩家数据，用于维护目标指示器。它在更新时自动检查玩家视窗状态，并显示或移除指示器，参与多人游戏中的玩家定位核心玩法。",
+  "api": [],
+  "api_note": "该组件无对外暴露的方法；所有逻辑通过更新函数和事件监听自动执行。",
+  "events_published": [],
+  "events_listened": [
+    "unregister_hudindicatable"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13897,
+      15380,
+      13701,
+      16023,
+      17998,
+      52138
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标，发现玩家目标后会试图接近发动攻击。"
+          },
+          {
+            "pageid": 13701,
+            "quote": "织影者主动仇恨远古大门所在房间内距离织影者小于 9 单位或距离远古大门小于 7 单位的玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "反击与协助攻击",
+        "evidence": [
+          {
+            "pageid": 16023,
+            "quote": "任何生物或玩家攻击大虎后，大虎都会反击。被玩家雇佣的大虎也会攻击玩家所攻击的生物。"
+          }
+        ]
+      },
+      {
+        "aspect": "忠诚时间控制",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "吹奏牛角后，被牛角影响的皮弗娄牛会吼叫，获得对使用牛角的玩家 30 秒的忠诚时间。"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击优先级与目标转移",
+        "evidence": [
+          {
+            "pageid": 15380,
+            "quote": "钢羊对被黏住的玩家目标拥有最高的攻击优先级，甚至高过攻击它的其他单位"
+          }
+        ]
+      },
+      {
+        "aspect": "目标丢失条件",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "丢失目标后克劳斯会返回赃物袋守卫、探查。"
+          },
+          {
+            "pageid": 13701,
+            "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "玩家目标",
+    "屏幕外指示",
+    "多人游戏追踪",
+    "玩家视窗",
+    "目标指示器",
+    "核心玩法",
+    "游戏内追踪",
+    "玩家定位系统"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "玩家追踪",
+    "指示器",
+    "多人游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6a8c91667d19f6ed32faad9ad127f56ecd84209afa19bb0c455c1b83cd62a645",
+    "source_bytes": 2930,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111230505
+  }
+}

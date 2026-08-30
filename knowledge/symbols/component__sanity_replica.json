@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sanity_replica.lua"
+  },
+  "category": "component",
+  "display_name": "sanity_replica",
+  "summary": "该组件管理玩家的理智值数据，包括当前值、最大值、惩罚值和模式状态。它参与饥荒联机版的核心精神健康玩法，影响玩家在游戏中的状态如清醒、疯狂或幻觉，并通过网络变量同步客户端与服务器数据。",
+  "api": [
+    {
+      "name": "SetCurrent",
+      "effect": "设置当前理智值，通过网络分类对象同步到服务器"
+    },
+    {
+      "name": "SetMax",
+      "effect": "设置最大理智值，通过网络分类对象同步到服务器"
+    },
+    {
+      "name": "SetPenalty",
+      "effect": "设置理智惩罚（范围0-1），转换为0-200整数并同步到分类对象，用于计算带惩罚的理智上限"
+    },
+    {
+      "name": "Max",
+      "effect": "返回最大理智值，优先使用服务器组件值，否则从网络分类对象读取"
+    },
+    {
+      "name": "MaxWithPenalty",
+      "effect": "返回带惩罚的最大理智值，从网络分类对象计算惩罚后的上限"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前理智百分比，优先使用服务器组件计算"
+    },
+    {
+      "name": "GetPercentNetworked",
+      "effect": "直接从网络分类对象读取当前理智值与最大值计算百分比，用于客户端同步"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "返回当前理智值，优先使用服务器组件值，否则从网络分类对象读取"
+    },
+    {
+      "name": "GetPercentWithPenalty",
+      "effect": "返回带惩罚的当前理智百分比，从网络分类对象计算"
+    },
+    {
+      "name": "GetPenaltyPercent",
+      "effect": "返回理智惩罚百分比，优先使用服务器组件值，否则从网络分类对象读取"
+    },
+    {
+      "name": "SetRateScale",
+      "effect": "设置理智变化率缩放值，通过网络分类对象同步"
+    },
+    {
+      "name": "GetRateScale",
+      "effect": "返回当前理智变化率缩放，优先使用服务器组件值，否则从网络分类对象读取"
+    },
+    {
+      "name": "SetSanityMode",
+      "effect": "设置理智模式（疯狂或幻觉），更新内部网络变量_IsSanityMode"
+    },
+    {
+      "name": "SetIsSane",
+      "effect": "设置是否清醒状态，更新内部网络变量_IsSane"
+    },
+    {
+      "name": "IsSane",
+      "effect": "检查当前是否清醒，返回内部网络变量_IsSanity的值"
+    },
+    {
+      "name": "IsInsane",
+      "effect": "检查是否处于疯狂状态（在疯狂模式且不清醒），返回布尔值"
+    },
+    {
+      "name": "IsEnlightened",
+      "effect": "检查是否处于幻觉状态（在幻觉模式且不清醒），返回布尔值"
+    },
+    {
+      "name": "IsCrazy",
+      "effect": "已废弃方法，等同于IsInsane，检查是否疯狂"
+    },
+    {
+      "name": "GetSanityMode",
+      "effect": "返回当前理智模式常量（SANITY_MODE_INSANITY或SANITY_MODE_LUNACY）"
+    },
+    {
+      "name": "IsInsanityMode",
+      "effect": "检查是否处于疯狂模式，返回内部网络变量_IsSanityMode的值"
+    },
+    {
+      "name": "IsLunacyMode",
+      "effect": "检查是否处于幻觉模式，返回内部网络变量_IsSanityMode的相反值"
+    },
+    {
+      "name": "SetGhostDrainMult",
+      "effect": "设置鬼魂理智消耗乘数，根据是否大于0更新网络分类对象的布尔状态"
+    },
+    {
+      "name": "IsGhostDrain",
+      "effect": "检查是否启用鬼魂理智消耗，从网络分类对象读取状态"
+    }
+  ],
+  "events_published": [
+    "gosane",
+    "goinsane",
+    "goenlightened",
+    "sanitymodechanged",
+    "sanitydirty"
+  ],
+  "events_listened": [
+    "issanedirty",
+    "isinsanitymodedirty",
+    "onremove"
+  ],
+  "netvars": [
+    "_issane",
+    "_isinsanitymode",
+    "currentsanity",
+    "maxsanity",
+    "sanitypenalty",
+    "sanityratescale",
+    "issanityghostdrain"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      18234,
+      13437,
+      16419,
+      10374,
+      13156,
+      13139,
+      13268
+    ],
+    "aspects": [
+      {
+        "aspect": "伯尼激活理智阈值",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "伯尼在薇洛的[[理智值]]低于 30% 时就会变为伯尼！"
+          }
+        ]
+      },
+      {
+        "aspect": "技能降低受伤理智扣除",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "装备[[松树先锋队帽子]]时因受伤而扣除的[[理智值]]降低至25%。"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板增加理智值上限",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "每激活一个，增加 40{{理智值}}上限。"
+          }
+        ]
+      },
+      {
+        "aspect": "疯狂光环理智下降倍率",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "沃尔夫冈基础掉理智倍率为 1.1 倍，最高掉理智倍率不能超过 2 倍。"
+          }
+        ]
+      },
+      {
+        "aspect": "阅读时启蒙值状态影响",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "若此时不处于[[启蒙值]]状态，则会立刻生成一只[[理智怪兽]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "鬼魂环境理智下降",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "有[[玩家鬼魂]]的环境中，理智值会下降。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "理智",
+    "精神值",
+    "疯狂",
+    "幻觉",
+    "清醒",
+    "惩罚",
+    "最大值",
+    "百分比",
+    "模式",
+    "鬼魂消耗"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "精神",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "267ee2e7632bfc6d8767944e430cea3d50c0259cf7000544f0fe4330f425ba58",
+    "source_bytes": 7041,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112156691
+  }
+}

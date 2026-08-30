@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/winter_treeseed.lua"
+  },
+  "category": "component",
+  "display_name": "winter_treeseed",
+  "summary": "该组件管理冬季树木种子的数据，具体存储一个字符串类型的树木标识符。它提供了一个设置方法来修改种子对应的树木类型，可能用于游戏中的树木种植系统，特别是在冬季环境中自定义树木变种。",
+  "api": [
+    {
+      "name": "SetTree",
+      "effect": "将组件的 winter_tree 属性设置为传入的 tree 参数值。没有其他副作用，如事件触发或数据持久化修改。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18545,
+      34101,
+      14486,
+      14579,
+      14700,
+      15737,
+      21485,
+      24791
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件 winter_treeseed 相关的能力表达；页面内容主要讨论种子存储、农作物种植、种子包等，未涉及设置树木或冬季树种子的具体行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "冬季树木",
+    "种子",
+    "种植",
+    "树种子",
+    "Winter Tree",
+    "Seed",
+    "树木类型",
+    "冬季种植",
+    "种树",
+    "树种"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "冬季"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d766260268950fd2a944c59a561f74b1d686d0a5be669971f2c1ad9fe20284a3",
+    "source_bytes": 220,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104781630
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sandstormwatcher.lua"
+  },
+  "category": "component",
+  "display_name": "sandstormwatcher",
+  "summary": "sandstormwatcher组件管理实体在沙尘暴环境下的移动速度修正。它监听沙尘暴事件，动态调整速度乘数以影响实体行走速度，并确保在沙尘暴中受到减速效果。组件根据实体状态（如护目镜或骑乘）进行豁免处理。",
+  "api": [
+    {
+      "name": "ToggleSandstorms",
+      "effect": "切换沙尘暴对实体的影响。启用时添加事件监听器（如gogglevision等），禁用时移除监听器并重置速度乘数。"
+    },
+    {
+      "name": "SetSandstormSpeedMultiplier",
+      "effect": "设置沙尘暴速度乘数，范围0到1。若变化则更新监听器和行走速度，并调整移动速度修正。"
+    },
+    {
+      "name": "UpdateSandstormLevel",
+      "effect": "更新当前沙尘暴等级，推送'sandstormlevel'事件，并刷新行走速度。"
+    },
+    {
+      "name": "UpdateSandstormWalkSpeed",
+      "effect": "根据当前沙尘暴等级更新实体行走速度，应用或移除速度乘数。"
+    },
+    {
+      "name": "GetSandstormLevel",
+      "effect": "返回当前沙尘暴等级，依赖stormwatcher组件获取数据。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "实体移除时清理事件监听器，防止内存泄漏。"
+    }
+  ],
+  "events_published": [
+    "sandstormlevel"
+  ],
+  "events_listened": [
+    "ms_stormchanged",
+    "gogglevision",
+    "ghostvision",
+    "mounted",
+    "dismounted"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SANDSTORM_SPEED_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      15539,
+      51221,
+      51494,
+      16570,
+      13406,
+      13437,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "沙尘暴减速免疫描述",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "免疫[[坑|陷坑]]、[[沙尘暴]]、[[月亮风暴]]和[[黑暗瘴气]]的减速效果。"
+          }
+        ]
+      },
+      {
+        "aspect": "沙尘暴减速效果描述",
+        "evidence": [
+          {
+            "pageid": 15234,
+            "quote": "类似于[[沙尘暴]]，玩家的视野会受到阻碍并降低 60% 的移动速度。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "沙尘暴",
+    "沙暴",
+    "减速",
+    "移动速度",
+    "风暴",
+    "速度乘数",
+    "环境效果",
+    "护目镜",
+    "骑乘"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f5aaf6073fdb97172058a29bd38b4e213d896cab867bbcd3adebb17e97b2fe2",
+    "source_bytes": 3617,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091643120
+  }
+}

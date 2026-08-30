@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bottler.lua"
+  },
+  "category": "component",
+  "display_name": "bottler",
+  "summary": "该组件管理瓶装操作的相关数据，主要提供设置瓶装回调函数和执行瓶装功能。它参与游戏中物品瓶装化的玩法，允许通过实体标签动态决定瓶装行为，核心涉及瓶装存储或制作。",
+  "api": [
+    {
+      "name": "SetOnBottleFn",
+      "effect": "设置一个函数作为瓶装操作的回调。该函数在Bottle方法被调用且条件满足时执行，接收三个参数：inst（组件所属实体）、target（目标实体）、doer（执行者），用于自定义瓶装逻辑。"
+    },
+    {
+      "name": "Bottle",
+      "effect": "尝试将目标实体瓶装化。首先检查目标是否有效且具有'canbebottled'标签，若满足，则调用通过SetOnBottleFn设置的回调函数并返回其结果；否则返回false。副作用是可能通过回调函数改变目标实体状态或触发游戏事件。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      10413,
+      15303,
+      20714,
+      33950,
+      13156,
+      65605,
+      10418
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件 bottler 的能力/行为语义清单（SetOnBottleFn, Bottle）相关的任何表达。所有页面内容涉及其他游戏机制或角色能力，与 bottler 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "瓶子",
+    "瓶装",
+    "设置",
+    "执行",
+    "瓶装化",
+    "标签",
+    "回调",
+    "检查",
+    "有效"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "生存",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a3b1fd7227eff565d21a66715031c8b1af88a16ecc9cff08c5d99eb391a98569",
+    "source_bytes": 387,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098620295
+  }
+}

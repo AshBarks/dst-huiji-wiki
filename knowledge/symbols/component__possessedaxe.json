@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/possessedaxe.lua"
+  },
+  "category": "component",
+  "display_name": "possessedaxe",
+  "summary": "该组件管理“被附身的斧头”的所有者状态和玩家链接逻辑，确保斧头只由具有“woodcutter”标签的玩家持有，并防止同时存在多个此类斧头。当玩家死亡、移除或条件不满足时，斧头会变回普通斧头。组件通过事件监听和定时任务实现状态转换和恢复。",
+  "api": [
+    {
+      "name": "WaitForPlayer",
+      "effect": "设置等待玩家重新连接或出现的定时任务，延时结束若无匹配玩家则触发变回普通斧头。副作用：监听ms_playerjoined事件，并启动倒计时任务。"
+    },
+    {
+      "name": "StopWaitingForPlayer",
+      "effect": "停止等待玩家的定时任务，取消等待状态。副作用：移除ms_playerjoined事件监听。"
+    },
+    {
+      "name": "LinkToPlayer",
+      "effect": "将斧头链接到指定玩家，建立绑定关系。副作用：推送axepossessedbyplayer事件，监听onremove和possessedaxe事件以维护链接。"
+    },
+    {
+      "name": "Drop",
+      "effect": "从当前所有者的库存中丢弃斧头。副作用：调用inventory:DropItem强制丢弃。"
+    },
+    {
+      "name": "Revert",
+      "effect": "将被附身的斧头变回普通斧头（默认prefab为axe），根据存储状态生成新物品并处理位置和特效。副作用：移除原物品，生成新物品和可能的特效，更新容器或装备槽。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回组件状态数据用于保存，包括prefab、使用次数、用户ID和等待剩余时间。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据恢复组件状态，如重置prefab、使用次数并重新链接或等待玩家。副作用：可能触发LinkToPlayer和WaitForPlayer方法。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串显示当前所有者、玩家链接和超时状态。无副作用。"
+    }
+  ],
+  "events_published": [
+    "axerejectedowner",
+    "axerejectedotheraxe",
+    "axepossessedbyplayer"
+  ],
+  "events_listened": [
+    "onputininventory",
+    "ondropped",
+    "onremove",
+    "possessedaxe",
+    "ms_playerjoined"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28179,
+      20714,
+      15022,
+      72238,
+      13493,
+      16419,
+      18829,
+      18540
+    ],
+    "aspects": [
+      {
+        "aspect": "斧头状态恢复",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "同时原有的露西斧会转变为普通斧头"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家绑定行为",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "每个露西斧都对应一名伍迪玩家。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "露西",
+    "被附身",
+    "斧头",
+    "伐木工",
+    "绑定",
+    "玩家",
+    "变回",
+    "物品"
+  ],
+  "gameplay_tags": [
+    "伐木",
+    "生存",
+    "角色专属"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7e7e3604c35df33aca2359f1ef77b64842b4681d68991d93b1a825e6d14296ac",
+    "source_bytes": 7971,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788133841529
+  }
+}

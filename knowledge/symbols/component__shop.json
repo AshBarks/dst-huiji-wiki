@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shop.lua"
+  },
+  "category": "component",
+  "display_name": "shop",
+  "summary": "Shop组件用于管理商店的界面信息，包括标签和标题。它负责将指定物品生成到游戏世界中，支持商店交易或奖励发放的核心玩法。组件通过设置标签和标题来定制商店外观，并交付物品给玩家。",
+  "api": [
+    {
+      "name": "SetStartTab",
+      "effect": ""
+    },
+    {
+      "name": "SetTitle",
+      "effect": ""
+    },
+    {
+      "name": "DeliverItems",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      46887,
+      18521,
+      13493,
+      21432,
+      13457,
+      18510,
+      33819
+    ],
+    "aspects": [
+      {
+        "aspect": "交易物品交付行为描述",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "给予[[猪王]]能换来 4 个[[金块]]。"
+          },
+          {
+            "pageid": 33819,
+            "quote": "玩家可以将可交易的物品给予[[交易者]]并触发相应的效果。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "商店",
+    "交易",
+    "物品生成",
+    "交付物品",
+    "商店标签",
+    "商店标题",
+    "奖励发放",
+    "商店管理",
+    "界面定制"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "交易",
+    "商店",
+    "奖励"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4e4df9c9294270fd2c8ddbd3234b2128738f4394aeb154d1593e153b3b088ed2",
+    "source_bytes": 886,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112545712
+  }
+}

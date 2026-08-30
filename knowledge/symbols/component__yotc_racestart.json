@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotc_racestart.lua"
+  },
+  "category": "component",
+  "display_name": "yotc_racestart",
+  "summary": "该组件管理赛车比赛的开始和结束状态，通过回调函数触发相关事件。它使用标签控制比赛进行中的状态，并检查交互条件。核心玩法涉及在“Year of the Cat”等事件中启动和结束老鼠赛车比赛。",
+  "api": [
+    {
+      "name": "StartRace",
+      "effect": "如果定义了 onstartracefn 回调函数，则执行该函数；向实体添加 'race_on' 标签，表示比赛开始。"
+    },
+    {
+      "name": "EndRace",
+      "effect": "如果定义了 onendracefn 回调函数，则执行该函数；从实体移除 'race_on' 标签，表示比赛结束。"
+    },
+    {
+      "name": "CanInteract",
+      "effect": "检查实体是否没有 'race_on' 标签，如果是则返回 true，表示可以交互；否则返回 nil，表示不可交互。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18521,
+      33950,
+      28571,
+      51626,
+      52019,
+      15237,
+      15526,
+      15737
+    ],
+    "aspects": [
+      {
+        "aspect": "比赛启动行为描述",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "===比赛开始==="
+          },
+          {
+            "pageid": 28571,
+            "quote": "开启摔跤游戏时，四只精英猪会被猪王同时召唤出来。"
+          },
+          {
+            "pageid": 15526,
+            "quote": "比赛开始后，裁判会由低到高说出本次比赛的排名依据"
+          },
+          {
+            "pageid": 15737,
+            "quote": "减少比赛开始时胡萝卜鼠的反应时间，从 2~4 秒到 0 秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "比赛结束条件描述",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "===比赛结束==="
+          },
+          {
+            "pageid": 33950,
+            "quote": "当所有的胡萝卜鼠（不包含查理的胡萝卜鼠）到达终点线时，比赛结束。"
+          },
+          {
+            "pageid": 28571,
+            "quote": "在摔跤游戏结束后，精英猪会摆出姿势然后离开。"
+          },
+          {
+            "pageid": 51626,
+            "quote": "最后一名留存在场上的选手即成为赢家，比赛结束。"
+          },
+          {
+            "pageid": 52019,
+            "quote": "比赛结束后，裁判席将会关闭，次日天亮时重启。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "比赛开始",
+    "比赛结束",
+    "老鼠赛车",
+    "互动条件",
+    "事件管理",
+    "游戏活动",
+    "年兽活动"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/7)",
+  "gameplay_tags": [
+    "赛事",
+    "娱乐",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "da89de23be9ccb9bffafdf5e6d2671bbe630541b572085293fb23962d657b4c7",
+    "source_bytes": 702,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105056987
+  }
+}

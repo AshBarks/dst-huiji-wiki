@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/writeable.lua"
+  },
+  "category": "component",
+  "display_name": "writeable",
+  "summary": "该组件管理可书写实体（如告示牌）的文本数据，包括存储文本内容、书写者信息以及自动描述功能。核心玩法涉及玩家在游戏内实体上书写和阅读文本，支持社交互动和环境装饰。组件处理完整的书写流程，从开始到结束，包括与HUD的交互、自动关闭条件检查以及数据保存加载。",
+  "api": [
+    {
+      "name": "SetOnWrittenFn",
+      "effect": "设置书写完成后的回调函数，当书写操作完成时调用，传递实体、文本和书写者参数。"
+    },
+    {
+      "name": "SetOnWritingEndedFn",
+      "effect": "设置书写结束后的回调函数，当书写过程结束（无论是否完成）时调用，传递实体参数。"
+    },
+    {
+      "name": "GetText",
+      "effect": "返回当前存储的文本；在XB1平台上，若文本存在且有书写者网络ID，则返回带分隔符的格式字符串。"
+    },
+    {
+      "name": "SetText",
+      "effect": "直接设置组件的文本内容，并触发文本变更回调，可能影响实体标签和动画显示。"
+    },
+    {
+      "name": "SetAutomaticDescriptionEnabled",
+      "effect": "启用或禁用自动描述功能；启用时，实体可检查组件的描述函数用于显示自定义描述。"
+    },
+    {
+      "name": "SetDefaultWriteable",
+      "effect": "设置默认可书写状态；当状态改变时，根据当前文本更新实体标签和动画，控制是否显示书写界面。"
+    },
+    {
+      "name": "SetWriteableDistance",
+      "effect": "设置书写操作的有效距离，用于自动关闭条件检查。"
+    },
+    {
+      "name": "BeginWriting",
+      "effect": "开始书写过程：设置当前书写者，监听关闭和移除事件，打开书写界面（若书写者有HUD），并启动组件更新。"
+    },
+    {
+      "name": "IsWritten",
+      "effect": "检查文本是否已设置（非nil），返回布尔值表示实体是否已被书写。"
+    },
+    {
+      "name": "IsBeingWritten",
+      "effect": "检查当前是否有书写者正在书写，返回布尔值。"
+    },
+    {
+      "name": "Write",
+      "effect": "执行书写操作：验证书写者匹配且文本长度合法后，设置文本（可能应用词过滤），触发onwritten回调，结束书写，并根据配置移除实体。"
+    },
+    {
+      "name": "EndWriting",
+      "effect": "结束书写过程：清理书写者状态，关闭书写界面，移除事件监听，记录书写者信息（若为玩家），并触发onwritingended回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数：检查自动关闭条件，如书写者骑乘或超出距离/视野，则结束书写。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时的清理：结束书写，移除标签，重置可检查描述函数。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "等同于EndWriting，当实体被移除时调用结束书写过程。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据到表，包括文本、书写者网络ID和用户ID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载组件，设置文本（可能应用词过滤）、书写者网络ID和用户ID。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onbuilt",
+    "ms_closepopups",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      13493,
+      15415,
+      34793,
+      70534,
+      13457,
+      45249,
+      18825
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未体现与component__writeable相关的任何能力表达，如写入行为、文本设置、写入距离等。页面内容主要涉及角色介绍、生物行为、物品描述和交易系统，与写入组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "告示牌",
+    "书写",
+    "文本",
+    "编辑",
+    "保存",
+    "加载",
+    "显示",
+    "互动",
+    "描述",
+    "写作"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "社交",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4bc6a4dd2931cdf949ed9e01730ef3f12e71d6a1c9905bf110a2ebc33eb4509b",
+    "source_bytes": 7269,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093867921
+  }
+}

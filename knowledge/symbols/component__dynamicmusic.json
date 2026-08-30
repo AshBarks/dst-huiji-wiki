@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dynamicmusic.lua"
+  },
+  "category": "component",
+  "display_name": "dynamicmusic",
+  "summary": "dynamicmusic组件管理游戏的动态音乐系统，根据玩家活动（如工作、战斗、事件）和游戏状态（如昼夜、季节、区域）切换背景音乐，以增强游戏氛围和体验。它通过事件监听实时响应玩家行为，如攻击、建造、理智变化等，并播放对应的音乐主题。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。所有功能通过事件监听和私有函数实现。",
+  "events_published": [],
+  "events_listened": [
+    "buildsuccess",
+    "gotnewitem",
+    "performaction",
+    "attacked",
+    "goinsane",
+    "goenlightened",
+    "triggeredevent",
+    "playboatmusic",
+    "isfeasting",
+    "playracemusic",
+    "playhermitmusic",
+    "playtrainingmusic",
+    "playpiratesmusic",
+    "playfarmingmusic",
+    "hasinspirationbuff",
+    "playcarnivalmusic",
+    "stageplaymusic",
+    "playpillowfightmusic",
+    "playrideofthevalkyrie",
+    "playboatracemusic",
+    "playbalatromusic",
+    "wx_performedspinaction",
+    "playeractivated",
+    "playerdeactivated",
+    "enabledynamicmusic"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13701,
+      13897,
+      14938,
+      15551,
+      15642,
+      27578,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "战斗音乐文件引用",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "一阶段战斗音乐 || [[文件:EFS Klaus.ogg]]"
+          },
+          {
+            "pageid": 15551,
+            "quote": "战斗音乐 || [[文件:EFS Bee Queen.ogg]]"
+          }
+        ]
+      },
+      {
+        "aspect": "战斗音乐触发机制描述",
+        "evidence": [
+          {
+            "pageid": 27578,
+            "quote": "和巨兽战斗会触发当前季节/洞穴的史诗战斗音乐或巨兽自己的特殊战斗音乐。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "背景音乐",
+    "战斗音乐",
+    "事件音乐",
+    "音乐切换",
+    "音乐主题",
+    "玩家活动",
+    "游戏状态"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fbfc70ba7667b9138038b01167df5d32cbefc66cefa093ff8f23cfa5d14cd2b1",
+    "source_bytes": 27057,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107151310
+  }
+}

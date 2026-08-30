@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/migrationpetowner.lua"
+  },
+  "category": "component",
+  "display_name": "migrationpetowner",
+  "summary": "migrationpetowner组件用于管理一个实体（如物品）所关联的宠物列表。它通过一个外部传入的函数来获取并返回该实体拥有的宠物信息，旨在支持宠物在物品迁移（如通过传送机）时的正确处理。",
+  "api": [
+    {
+      "name": "SetPetFn(petfn)",
+      "effect": "设置一个用于获取该实体所属宠物的函数。该函数应接收实体本身作为参数，并返回一个或多个宠物实体。"
+    },
+    {
+      "name": "GetPet()",
+      "effect": "尝试获取第一个关联的宠物。内部调用通过SetPetFn设置的函数，若返回值为表格则取第一个元素，否则直接返回。若未设置获取函数则返回nil。"
+    },
+    {
+      "name": "GetAllPets()",
+      "effect": "获取所有关联的宠物。内部调用通过SetPetFn设置的函数，若返回值为表格则直接返回该表格，否则将其包装为单元素表格后返回。若未设置获取函数则返回nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28734,
+      15169
+    ],
+    "aspects": [
+      {
+        "aspect": "宠物绑定操作描述",
+        "evidence": [
+          {
+            "pageid": 15169,
+            "quote": "将皮弗娄牛铃对着一头皮弗娄牛左键可以进行绑定，绑定时玩家可以为它命名"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "宠物归属",
+    "迁移宠物",
+    "携带宠物",
+    "宠物列表",
+    "宠物函数",
+    "随从管理",
+    "宠物切换"
+  ],
+  "search_terms_note": "pass1 后零命中 7/7,改写尝试更差已回退",
+  "gameplay_tags": [
+    "宠物",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b3abf1dc3d687803116da345b1db96dbcb2fd042341d4ed47241922b2d72e569",
+    "source_bytes": 977,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094247132
+  }
+}

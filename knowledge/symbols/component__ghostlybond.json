@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ghostlybond.lua"
+  },
+  "category": "component",
+  "display_name": "ghostlybond",
+  "summary": "该组件管理玩家与幽灵伙伴之间的绑定关系。它跟踪绑定等级、召唤状态和幽灵实体本身。核心玩法包括通过时间积累提升绑定等级以解锁能力，以及召唤和收回幽灵伙伴来协助玩家。",
+  "api": [
+    {
+      "name": "SetBondTimeMultiplier",
+      "effect": "设置绑定时间增长的倍率。接受一个来源、一个倍率值和一个键值。该倍率会影响绑定等级提升所需时间的计算。"
+    },
+    {
+      "name": "ResumeBonding",
+      "effect": "恢复绑定等级的计时器。如果计时器存在，将重新开始更新组件。"
+    },
+    {
+      "name": "PauseBonding",
+      "effect": "暂停绑定等级的计时器。停止组件的更新，使绑定等级不再随时间提升。"
+    },
+    {
+      "name": "SetBondLevel",
+      "effect": "直接设置绑定等级为指定值（不超过最大等级）。可以传入一个已用时间值。如果等级发生变化，会触发`onbondlevelchangefn`回调函数，并推送`ghostlybond_level_change`事件。"
+    },
+    {
+      "name": "Init",
+      "effect": "初始化幽灵绑定。设置幽灵的预制体类型和从当前等级升到下一等级所需的时间。它会安排一个任务来生成幽灵。"
+    },
+    {
+      "name": "Summon",
+      "effect": "尝试将幽灵召唤到玩家身边或指定位置。如果成功，会应用召唤物品的皮肤到幽灵和血条，并触发`onsummonfn`回调。返回是否成功。"
+    },
+    {
+      "name": "SummonComplete",
+      "effect": "标记召唤过程完成。将状态设置为已召唤，并触发`onsummoncompletefn`回调，推送`ghostlybond_summoncomplete`事件。"
+    },
+    {
+      "name": "Recall",
+      "effect": "尝试将幽灵收回。如果幽灵存在且处于已召唤状态，会触发`onrecallfn`回调。接受一个参数指示收回是否是因为幽灵死亡。返回是否成功。"
+    },
+    {
+      "name": "RecallComplete",
+      "effect": "完成收回操作。将幽灵移除场景并设置为玩家的子实体，状态变回未召唤。触发`onrecallcompletefn`回调，推送`ghostlybond_recallcomplete`事件。"
+    },
+    {
+      "name": "ChangeBehaviour",
+      "effect": "尝试改变幽灵的行为。调用`changebehaviourfn`回调函数。返回该函数的返回值。"
+    }
+  ],
+  "events_published": [
+    "ghostlybond_level_change",
+    "ghostlybond_summoncomplete",
+    "ghostlybond_recallcomplete"
+  ],
+  "events_listened": [
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14769,
+      18271
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅描述炼金引擎和书架的建筑功能、制作配方、物品存放与耐久恢复，未提及 ghostlybond 组件的任何能力表达（如绑定、召唤、召回等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "幽灵绑定",
+    "召唤幽灵",
+    "收回幽灵",
+    "连结等级",
+    "等级提升",
+    "能力解锁",
+    "幽灵系统",
+    "羁绊机制"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "协作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9ded972453b1cfaf71696df0a681b6c1ba8a08e97371b0577cefb0f5374e179a",
+    "source_bytes": 6713,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108035167
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/uianim.lua"
+  },
+  "category": "component",
+  "display_name": "uianim",
+  "summary": "UIAnim组件管理实体的UI动画效果，包括色调、缩放、位置和旋转的过渡。它通过UITransform和widget控制视觉属性，参与游戏界面的动画和视觉反馈，增强交互性。",
+  "api": [
+    {
+      "name": "UpdateWhilePaused",
+      "effect": "设置update_while_paused标志，控制组件是否在游戏暂停时继续更新动画。副作用：影响后续OnWallUpdate的执行逻辑。"
+    },
+    {
+      "name": "TintTo",
+      "effect": "启动色调过渡动画，从start色调到dest色调，持续duration时间，完成后调用whendone回调。副作用：启动墙更新组件，开始平滑色调变化。"
+    },
+    {
+      "name": "CancelTintTo",
+      "effect": "取消当前色调动画。如果run_complete_fn为true且存在完成回调，则执行回调。副作用：停止色调更新，可能触发完成函数。"
+    },
+    {
+      "name": "FinishCurrentTint",
+      "effect": "立即完成当前色调动画，将widget色调设置为最终值并调用完成回调。副作用：跳过剩余动画，直接应用最终色调。"
+    },
+    {
+      "name": "ScaleTo",
+      "effect": "启动缩放过渡动画，从start缩放到dest缩放，持续duration时间，完成后调用whendone回调。如果已有缩放动画，先完成它。副作用：启动墙更新组件，开始平滑缩放变化。"
+    },
+    {
+      "name": "CancelScaleTo",
+      "effect": "取消当前缩放动画。如果run_complete_fn为true且存在完成回调，则执行回调。副作用：停止缩放更新，可能触发完成函数。"
+    },
+    {
+      "name": "FinishCurrentScale",
+      "effect": "立即完成当前缩放动画，将UITransform缩放设置为最终值并调用完成回调。副作用：跳过剩余动画，直接应用最终缩放。"
+    },
+    {
+      "name": "MoveTo",
+      "effect": "启动位置移动过渡动画，从start位置到dest位置，持续duration时间，完成后调用whendone回调。副作用：启动墙更新组件，设置初始位置，开始平滑移动。"
+    },
+    {
+      "name": "CancelMoveTo",
+      "effect": "取消当前位置移动动画。如果run_complete_fn为true且存在完成回调，则执行回调。副作用：停止位置更新，可能触发完成函数。"
+    },
+    {
+      "name": "RotateTo",
+      "effect": "启动旋转过渡动画，从start旋转到dest旋转，持续duration时间，完成后调用whendone回调；如果infinite为true，则无限旋转。副作用：启动墙更新组件，设置初始旋转，开始平滑旋转。"
+    },
+    {
+      "name": "CancelRotateTo",
+      "effect": "取消当前旋转动画。如果run_complete_fn为true且存在完成回调，则执行回调。副作用：停止旋转更新，可能触发完成函数。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      14688,
+      15054,
+      19296,
+      19297,
+      19300,
+      19661,
+      19693
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到任何与UI动画组件能力相关的玩家语言表达，内容集中于游戏物品的机制、数值和效果描述，未涉及动画更新、颜色渐变、缩放、移动或旋转等行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "UI动画",
+    "色调过渡",
+    "缩放过渡",
+    "位置过渡",
+    "旋转过渡",
+    "视觉效果",
+    "过渡动画",
+    "交互增强"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "界面",
+    "动画",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9febd6869d06754f956efe745c8d2fbcef75ad61ba368a260f2c942e462e1ed9",
+    "source_bytes": 7049,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113400777
+  }
+}

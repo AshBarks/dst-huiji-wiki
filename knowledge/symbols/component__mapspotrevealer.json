@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mapspotrevealer.lua"
+  },
+  "category": "component",
+  "display_name": "mapspotrevealer",
+  "summary": "该组件管理地图揭示功能，允许实体标记并揭示地图上的特定点，用于探索或导航玩法。它通过函数设置获取目标位置和预揭示检查，成功后推送事件并触发地图区域揭示给指定玩家。",
+  "api": [
+    {
+      "name": "SetGetTargetFn",
+      "effect": "设置一个函数，用于获取要揭示的目标位置坐标。该函数在揭示时被调用，接收实体和执行者作为参数，返回目标位置或失败原因。"
+    },
+    {
+      "name": "SetPreRevealFn",
+      "effect": "设置一个函数，在揭示地图前调用，可用于条件检查或阻止揭示。如果函数返回 false，则揭示过程终止。"
+    },
+    {
+      "name": "RevealMap",
+      "effect": "揭示地图点给指定玩家。先调用 prerevealfn 检查是否允许，再调用 gettargetfn 获取目标位置；成功后推送 'on_reveal_map_spot_pre' 和 'on_reveal_map_spot_pst' 事件，设置网络变量并触发地图区域揭示。失败时返回 false 和原因。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用，清理标签 'mapspotrevealer' 以维持实体状态一致。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "on_reveal_map_spot_pre",
+    "on_reveal_map_spot_pst"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15136,
+      19718,
+      65605,
+      72353,
+      20678,
+      24194
+    ],
+    "aspects": [
+      {
+        "aspect": "地图位置揭露描述",
+        "evidence": [
+          {
+            "pageid": 20678,
+            "quote": "揭露[[隐士小岛]]的位置"
+          },
+          {
+            "pageid": 24194,
+            "quote": "地图上会产生[[X]]的标记"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "地图揭示",
+    "探索点",
+    "地图标记",
+    "揭示位置",
+    "地图区域",
+    "导航辅助",
+    "目标获取",
+    "预揭示检查"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "探索",
+    "导航"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fdf62552d5449c6db05289262c3b6e2cfc283b0b04d62c93391dc043c7e9b97f",
+    "source_bytes": 1602,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095608777
+  }
+}

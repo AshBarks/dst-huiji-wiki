@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/soul.lua"
+  },
+  "category": "component",
+  "display_name": "soul",
+  "summary": "Soul组件在初始化时为实体添加\"soul\"标签，用于标识与灵魂相关的玩法机制。该组件不管理额外数据，仅通过标签支持游戏系统的动作生成或其他灵魂相关处理。它是一个轻量级标签容器，依赖游戏引擎对标签的识别来触发行为。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；源码中未定义任何对外接口，仅通过构造函数添加标签。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      22181,
+      35412,
+      20150,
+      13156,
+      39296,
+      20714,
+      10374
+    ],
+    "aspects": [
+      {
+        "aspect": "灵魂吸引与消失时限",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "若灵魂生成后 10 秒没有受到吸引，就会自行消失；若灵魂受到吸引流动 6 秒后依然没有接触到沃拓克斯，也会消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂生成条件",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "当有实体在[[沃拓克斯]]周围 20 {{解释|距离单位}}范围内死亡或在物品栏内被谋杀时，就会额外生成[[灵魂]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂罐存储灵魂",
+        "evidence": [
+          {
+            "pageid": 35412,
+            "quote": "灵魂罐是一个容器，只有 1 个物品栏，只能收纳[[灵魂]]"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂罐技能要求",
+        "evidence": [
+          {
+            "pageid": 35412,
+            "quote": "并且只有学习了“灵魂罐”技能的[[沃拓克斯]]能打开"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂释放治疗玩家",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "沃拓克斯可以释放灵魂治疗 8 单位内的玩家（[[旺达]]除外）并为范围内的所有沃拓克斯恢复 2.5 {{理智值}}。"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂食用恢复饥饿扣除理智",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "[[沃拓克斯]]可以食用灵魂，回复 25 {{饥饿值}}，默认扣除 5 {{理智值}}。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "灵魂",
+    "标签",
+    "饥荒联机版",
+    "游戏机制",
+    "灵魂机制",
+    "标签容器",
+    "标签识别",
+    "触发行为",
+    "玩法系统",
+    "灵魂玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "灵魂",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "118f992db9f475295773e46bd3e0db3897caf21fdf6b9cb3cdfb104a37de7e17",
+    "source_bytes": 220,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103923735
+  }
+}

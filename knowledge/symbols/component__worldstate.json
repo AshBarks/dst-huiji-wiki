@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldstate.lua"
+  },
+  "category": "component",
+  "display_name": "worldstate",
+  "summary": "WorldState组件管理饥荒联机版世界的核心状态数据，包括时间、阶段、季节、天气、月相和噩梦周期等。它通过监听游戏事件实时更新这些数据，并提供监视器机制允许其他系统响应状态变化。该组件是生存环境管理的基础，影响玩家对时间流逝、季节更替和事件触发的应对策略。",
+  "api": [
+    {
+      "name": "GetWorldAge",
+      "effect": "计算并返回世界年龄（基于周期数和当前时间），无副作用。"
+    },
+    {
+      "name": "AddWatcher",
+      "effect": "为指定状态变量添加监视器，当变量值变化时调用回调函数；允许其他系统监听状态变化并做出响应，可能触发副作用（如实体行为调整）。"
+    },
+    {
+      "name": "RemoveWatcher",
+      "effect": "移除之前为指定变量添加的监视器，防止回调函数被触发；用于清理不再需要的监听。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化当前状态数据表，返回用于保存的数据副本；用于游戏存档，无直接副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据中恢复状态，更新内部数据表；可能触发监视器回调，影响游戏状态同步。"
+    },
+    {
+      "name": "Dump",
+      "effect": "返回状态数据的字符串表示，用于调试输出；无副作用，仅用于开发或调试目的。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "clocktick",
+    "cycleschanged",
+    "phasechanged",
+    "moonphasechanged2",
+    "ms_stormchanged",
+    "nightmareclocktick",
+    "nightmarephasechanged",
+    "seasontick",
+    "seasonlengthschanged",
+    "temperaturetick",
+    "weathertick",
+    "moistureceilchanged",
+    "precipitationchanged",
+    "snowcoveredchanged",
+    "wetchanged"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.AUTUMN_LENGTH",
+    "TUNING.WINTER_LENGTH",
+    "TUNING.SPRING_LENGTH",
+    "TUNING.SUMMER_LENGTH",
+    "TUNING.STARTING_TEMP",
+    "TUNING.TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13570,
+      13569,
+      15303,
+      21137,
+      22522,
+      34314,
+      15922,
+      16057
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论游戏机制（如昼夜循环、季节、月相）、角色能力（如旺达）、物品获取（如噩梦燃料）和世界自定义选项，未提及 component__worldstate 组件的代码能力或行为语义（GetWorldAge, AddWatcher, RemoveWatcher, OnSave, OnLoad, Dump）的任何玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "世界状态",
+    "时间",
+    "季节",
+    "天气",
+    "月相",
+    "噩梦",
+    "监视器",
+    "状态变化",
+    "环境管理",
+    "周期"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "时间管理",
+    "天气系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+    "source_bytes": 12509,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114418064
+  }
+}

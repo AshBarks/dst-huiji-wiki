@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/caveweather.lua"
+  },
+  "category": "component",
+  "display_name": "caveweather",
+  "summary": "该组件管理洞穴内的天气系统，包括降水类型（雨、酸雨）、湿度积累与消散、湿润度变化，并控制天气音效和视觉效果。它通过更新循环实时调整天气状态，影响玩家生存和探索体验，是洞穴环境模拟的核心部分。",
+  "api": [
+    {
+      "name": "OnPostInit",
+      "effect": "在非专用服务器上初始化雨或酸雨的视觉效果实体，使其附加到激活玩家并启动渲染。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "移除雨和酸雨的视觉效果实体，清理相关资源。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新天气状态，包括噪音时间、湿度值、降水率、湿润度，并触发 weathertick 事件；根据降水模式启动或停止降水，同步网络变量，更新音效和地面覆盖层。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "等同于 OnUpdate 方法，用于长时间更新（如游戏暂停后恢复）。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前温度、湿度、降水率、湿润度等状态的调试字符串，用于开发调试。"
+    }
+  ],
+  "events_published": [
+    "weathertick",
+    "moistureceilchanged",
+    "precipitationchanged",
+    "wetchanged"
+  ],
+  "events_listened": [
+    "seasontick",
+    "temperaturetick",
+    "phasechanged",
+    "playeractivated",
+    "playerdeactivated",
+    "ms_forceprecipitation",
+    "ms_setprecipitationmode",
+    "ms_setmoisturescale",
+    "ms_deltamoisture",
+    "ms_deltamoistureceil",
+    "ms_deltawetness",
+    "ms_simunpaused",
+    "moistureceildirty",
+    "preciptypedirty",
+    "wetdirty"
+  ],
+  "netvars": [
+    "weather._noisetime",
+    "weather._moisture",
+    "weather._moisturerate",
+    "weather._moistureceil",
+    "weather._moisturefloor",
+    "weather._precipmode",
+    "weather._preciptype",
+    "weather._peakprecipitationrate",
+    "weather._wetness",
+    "weather._wet"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      18410,
+      22418,
+      13268,
+      20704,
+      46793,
+      16598,
+      19129
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及降水、潮湿、酸雨等游戏机制描述，但未提及洞穴天气组件的具体代码能力如初始化、更新、清理等玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "降水",
+    "湿度",
+    "雨天",
+    "酸雨",
+    "天气音效",
+    "视觉效果",
+    "湿度变化",
+    "天气状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "58bd64e7eadd3fc9344a1e60989e8572ff40d5ffcf3937cb689f8ecbfc5bb096",
+    "source_bytes": 26807,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105992782
+  }
+}

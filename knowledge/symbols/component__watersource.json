@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/watersource.lua"
+  },
+  "category": "component",
+  "display_name": "watersource",
+  "summary": "watersource 组件管理水源的可用性状态，通过网络变量 'available' 控制。当水源可用时，实体自动获得 'watersource' 标签，便于其他系统识别和交互。该组件参与需要水源的核心玩法，如物品加水、灌溉等。",
+  "api": [
+    {
+      "name": "Use",
+      "effect": "执行水源的使用逻辑：若组件设置了 'onusefn' 回调函数，则调用该函数；否则无操作。副作用取决于 'onusefn' 的具体实现。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "available"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      20714,
+      18219,
+      18359,
+      65881,
+      13156,
+      14485,
+      15022
+    ],
+    "aspects": [
+      {
+        "aspect": "水源装水行为描述",
+        "evidence": [
+          {
+            "pageid": 14485,
+            "quote": "需要在[[水源]]装水来获得耐久。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "水源",
+    "可用性",
+    "浇水",
+    "使用",
+    "标签",
+    "网络同步",
+    "回调",
+    "填充",
+    "灌溉"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
+    "source_bytes": 958,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092654407
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nonslipgrituser.lua"
+  },
+  "category": "component",
+  "display_name": "nonslipgrituser",
+  "summary": "NonSlipGritUser 组件管理实体防滑 grit 来源的激活状态，用于减少或避免在湿滑地形（如雨中）的移动惩罚。它通过 SourceModifierList 跟踪多个来源，通常对应库存中的 grit 物品（如沙子），并在来源被完全移除时自动清理组件。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": "添加一个来源修饰符，设置布尔值为 true，激活防滑 grit 效果。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "移除一个来源修饰符；如果所有来源均被移除，则自动从实体上移除该组件。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "处理时间增量 dt，检查实体库存并找到有效 grit 物品，调用其 nonslipgritsource 组件的 DoDelta 方法以更新效果（如减少持续时间）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      70486,
+      15022,
+      18219,
+      71643,
+      15922,
+      51287,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "滑倒值积累与下降机制描述",
+        "evidence": [
+          {
+            "pageid": 71643,
+            "quote": "受影响的实体在光滑表面上行走时会根据移动速度积累滑倒值，停止移动滑倒值就会迅速下降"
+          }
+        ]
+      },
+      {
+        "aspect": "防滑粉在背包栏无效的说明",
+        "evidence": [
+          {
+            "pageid": 70486,
+            "quote": "防滑粉和防滑颗粒在玩家的[[背包栏]]时不起作用。"
+          }
+        ]
+      },
+      {
+        "aspect": "防滑粉防止滑倒的触发条件描述",
+        "evidence": [
+          {
+            "pageid": 70486,
+            "quote": "防滑粉在玩家的基本物品栏内时，能够防止玩家在光滑表面上走动时滑倒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "防滑",
+    "grit",
+    "沙子",
+    "滑倒",
+    "湿滑",
+    "移动",
+    "库存",
+    "物品效果",
+    "nonslip"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9cf80cd9a3bb30262d51a5698f5d36c25607293c361c0d331f546ec9b1d3171b",
+    "source_bytes": 939,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110438537
+  }
+}

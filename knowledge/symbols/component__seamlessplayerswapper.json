@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/seamlessplayerswapper.lua"
+  },
+  "category": "component",
+  "display_name": "seamlessplayerswapper",
+  "summary": "SeamlessPlayerSwapper 组件管理玩家角色的无缝交换数据，允许玩家在不经过角色选择界面的情况下更换角色，如变为猴子或换回主要角色。它存储皮肤和状态信息，处理转换过程中的数据迁移和实体设置，核心玩法涉及多人游戏中的角色切换和生存状态保持。",
+  "api": [
+    {
+      "name": "DoMonkeyChange()",
+      "effect": "将玩家角色切换为“wonkey”（猴子），调用内部交换逻辑，执行皮肤基础、服装和状态的迁移，最终通过网络生成新玩家实体替换旧玩家。"
+    },
+    {
+      "name": "SwapBackToMainCharacter()",
+      "effect": "将玩家角色换回之前保存的主要角色，使用存储的皮肤基础和角色数据，通过网络生成新玩家实体替换当前玩家。"
+    },
+    {
+      "name": "OnSeamlessCharacterSwap(old_player)",
+      "effect": "在新玩家实体上运行，处理旧玩家的数据迁移，包括移除诅咒物品、触发重新滚动事件、保存并加载数据、交换所有特征、禁用旧玩家实体，并根据角色转换状态设置新玩家的动画状态。"
+    },
+    {
+      "name": "PostTransformSetup()",
+      "effect": "设置转换后的标签和语音代理，如果旧玩家是“mime”且条件满足，则添加“mime”标签到新玩家，并更新说话代理为旧玩家角色名。"
+    },
+    {
+      "name": "SaveForReroll()",
+      "effect": "为重新滚动保存当前交换数据，返回包含swap_data的表，用于后续角色重生或切换。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存组件的swap_data和main_data到数据表，用于持久化存储。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "从输入数据加载swap_data和main_data，如果存在主要数据且当前玩家角色不匹配，则执行PostTransformSetup进行设置。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15183,
+      18216,
+      18303,
+      18843,
+      21620,
+      14661,
+      14812,
+      15351
+    ],
+    "aspects": [
+      {
+        "aspect": "角色切换绑定不变",
+        "evidence": [
+          {
+            "pageid": 15183,
+            "quote": "骨灰罐会与'''建造它'''的温蒂玩家<!--写玩家是因为换角色不解绑-->相绑定"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "无缝交换",
+    "猴子角色",
+    "皮肤继承",
+    "状态迁移",
+    "实体设置",
+    "生存保持",
+    "角色变更",
+    "数据迁移",
+    "玩家切换",
+    "重生配置"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 7/10)",
+  "gameplay_tags": [
+    "角色切换",
+    "生存",
+    "多人游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "564ead040c1f0786dc6ab14071698ead111bdfb9c304ad3b1cfc26ab641ebb95",
+    "source_bytes": 4788,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091702115
+  }
+}

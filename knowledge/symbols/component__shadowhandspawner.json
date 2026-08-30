@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowhandspawner.lua"
+  },
+  "category": "component",
+  "display_name": "shadowhandspawner",
+  "summary": "该组件在夜间为低理智值的玩家生成影子手，增加游戏挑战性。它追踪火堆和船只，控制影子手的生成频率和数量，并在玩家加入或离开时动态调整。影子手生成基于时间间隔和随机性，仅在主人机上运行。",
+  "api": [
+    {
+      "name": "checkwaveyjonestarget",
+      "effect": "检查目标是否已被预留为波浪琼斯生成点。返回true如果目标已被预留，否则返回nil。无直接副作用。"
+    },
+    {
+      "name": "reservewaveyjonestarget",
+      "effect": "预留目标，防止其他生成操作使用该目标。副作用：设置目标的预留标记。"
+    },
+    {
+      "name": "removewaveyjonestarget",
+      "effect": "移除目标的预留标记。副作用：取消预留状态，允许目标被重新使用。"
+    },
+    {
+      "name": "spawnwaveyjones",
+      "effect": "在指定船只上生成波浪琼斯标记实体，并追踪该船只。副作用：生成新实体，设置船只追踪，并返回生成的实体。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前所有玩家影子手数量的调试字符串。副作用：无，仅用于调试输出。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "isnight",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      18234,
+      13437,
+      13268,
+      16197,
+      10374,
+      16419,
+      19118
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与 component__shadowhandspawner 相关的能力（如 checkwaveyjonestarget、spawnwaveyjones 等），所有页面内容均围绕理智值、角色、书籍、食物等其他游戏机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影子手",
+    "夜间生成",
+    "理智值",
+    "火堆",
+    "船只",
+    "波浪琼斯",
+    "低理智",
+    "夜晚挑战",
+    "影手",
+    "黑暗生物"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "03050492a6aab9dbd619d6ae971129ae7b317cacbc0f47b271858c24cc962dec",
+    "source_bytes": 9887,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112255532
+  }
+}

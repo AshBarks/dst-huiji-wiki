@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/craftingstation.lua"
+  },
+  "category": "component",
+  "display_name": "craftingstation",
+  "summary": "CraftingStation组件用于管理制作站的配方学习和制作限制数据。它允许玩家通过制作站学习新物品和配方，并设置特定配方的制作次数上限。当配方被制作时，组件会减少制作限制，并在限制耗尽时自动遗忘该配方。此外，组件支持数据的保存和加载，确保制作站状态持久化。",
+  "api": [
+    {
+      "name": "LearnItem",
+      "effect": "学习一个物品和对应配方。如果物品尚未在学习列表中，则将其添加到items和recipes表中。"
+    },
+    {
+      "name": "KnowsItem",
+      "effect": "检查是否学习了指定物品。返回布尔值，如果items表中包含itemname则返回true。"
+    },
+    {
+      "name": "KnowsRecipe",
+      "effect": "检查是否学习了指定配方。返回布尔值，如果recipes表中包含recipename则返回true。"
+    },
+    {
+      "name": "GetItems",
+      "effect": "返回当前学习的所有物品名称列表（items表的引用）。"
+    },
+    {
+      "name": "GetRecipes",
+      "effect": "返回当前学习的所有配方名称列表（recipes表的引用）。"
+    },
+    {
+      "name": "GetRecipeCraftingLimit",
+      "effect": "获取指定配方的制作限制值。如果recipename在recipecraftinglimit表中则返回对应值，否则返回nil。"
+    },
+    {
+      "name": "SetRecipeCraftingLimit",
+      "effect": "设置指定配方的制作限制值。将recipename的制作限制设为amount。"
+    },
+    {
+      "name": "RecipeCrafted",
+      "effect": "当配方被制作时调用。如果recipename有制作限制，则减少1；如果限制减到0或以下，则调用ForgetRecipe遗忘该配方，并通知所有doer重新评估科技树（通过doer.components.builder:EvaluateTechTrees()）。"
+    },
+    {
+      "name": "ForgetItem",
+      "effect": "忘记指定物品。从items和recipes表中删除itemname及其关联的配方，并删除对应的recipecraftinglimit条目。"
+    },
+    {
+      "name": "ForgetRecipe",
+      "effect": "忘记指定配方。从recipes和items表中删除recipename及其关联的物品，并删除对应的recipecraftinglimit条目。"
+    },
+    {
+      "name": "ForgetAllItems",
+      "effect": "清空所有数据。将items、recipes和recipecraftinglimit表重置为空表。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据。如果nosave为假，则返回包含items、recipes和recipecraftinglimit的表；否则返回nil。用于游戏保存系统。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据。如果nosave为假，则从data中加载items、recipes和recipecraftinglimit；如果items和recipes长度不匹配，则调用ForgetAllItems清空所有数据。用于游戏加载系统。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      46887,
+      70447,
+      14776,
+      15885,
+      47088
+    ],
+    "aspects": [
+      {
+        "aspect": "制作站配方解锁机制",
+        "evidence": [
+          {
+            "pageid": 15885,
+            "quote": "玩家只要在它附近制作一次相应配方的原型体，即可以解锁该配方"
+          },
+          {
+            "pageid": 47088,
+            "quote": "靠近时可以制作[[制作#制造|制造]]分类中的物品"
+          },
+          {
+            "pageid": 14776,
+            "quote": "玩家可以将[[草图]]给予陶轮来解锁新的雕塑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "合成台",
+    "配方学习",
+    "制作限制",
+    "遗忘配方",
+    "制作次数",
+    "数据保存",
+    "学配方",
+    "联机制作"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "制作",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
+    "source_bytes": 2999,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093545296
+  }
+}

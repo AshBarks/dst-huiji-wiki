@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivalhostsummon.lua"
+  },
+  "category": "component",
+  "display_name": "carnivalhostsummon",
+  "summary": "该组件用于管理实体是否具有召唤能力。它通过添加或移除 'carnivalhostsummon' 标签来控制实体的召唤状态。这可能在嘉年华相关活动中使用，影响游戏中的召唤机制。",
+  "api": [
+    {
+      "name": "SetCanSummon",
+      "effect": "设置实体是否可以召唤。当 cansummon 为真时，添加标签 'carnivalhostsummon'；当为假时，移除该标签。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73218,
+      15225,
+      15022,
+      18234,
+      20714,
+      23196,
+      15832,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有涉及 carnivalhostsummon 组件或 SetCanSummon 能力的描述。页面中的召唤相关内容（如暗影傀儡召唤、控制台命令等）与嘉年华主持人无关，且无设置召唤能力的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "召唤",
+    "主机",
+    "设置",
+    "标签",
+    "召唤能力",
+    "标签管理",
+    "carnival",
+    "summon"
+  ],
+  "gameplay_tags": [
+    "活动",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0e7e93b59cf94ef354e021fcc1aba09024d45cf601aa73affb994d85b4f2d2e2",
+    "source_bytes": 345,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105947275
+  }
+}

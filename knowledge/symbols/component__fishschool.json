@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishschool.lua"
+  },
+  "category": "component",
+  "display_name": "fishschool",
+  "summary": "该组件管理鱼群的等级数据，最大等级为3，可通过周期任务自动补充等级。核心玩法涉及捕鱼机制，当鱼网捕获时生成对应鱼类实体并减少鱼群等级，模拟鱼群的消耗与恢复过程。",
+  "api": [
+    {
+      "name": "StartReplenish",
+      "effect": "启动一个周期性任务，默认每10秒（或由参数 replenish_rate 指定）调用 Replenish 方法，用于自动补充鱼群等级。"
+    },
+    {
+      "name": "StopReplenish",
+      "effect": "停止当前的补充任务，如果存在则取消 replenish_task。"
+    },
+    {
+      "name": "SetNettedPrefab",
+      "effect": "设置当鱼网捕获时生成的鱼预制体名称，存储在 fish_prefab_name 中。"
+    },
+    {
+      "name": "OnPreNet",
+      "effect": "处理网住前事件；如果鱼等级大于0且 fish_prefab_name 已设置，则在网的位置生成指定数量的鱼，每条鱼推送 'on_caught_in_net' 事件；将鱼等级设为0并播放 'group_pst' 后置动画。"
+    },
+    {
+      "name": "Replenish",
+      "effect": "补充鱼等级；如果鱼等级小于最大值，则增加一级；如果鱼等级为0，则播放 'group_pre' 前置动画和 'group_loop1' 循环动画。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "on_pre_net"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      13493,
+      50898,
+      51221,
+      51498,
+      34314,
+      51046,
+      13779
+    ],
+    "aspects": [
+      {
+        "aspect": "鱼群生成机制描述",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[海鱼|海鱼鱼群]]的生成机会。"
+          },
+          {
+            "pageid": 13779,
+            "quote": "当玩家位于[[海洋|海]]边或海上时，每隔 15 ~ 60 秒就会有一群新的海鱼出现在玩家附近。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鱼群",
+    "捕鱼",
+    "补充",
+    "渔网",
+    "鱼类",
+    "等级",
+    "动画",
+    "刷新",
+    "捕获",
+    "任务"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "11f311bc4d790b49b2c5229d40773c86450b62de59c369aaa330776bc143a1e1",
+    "source_bytes": 1764,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099947104
+  }
+}

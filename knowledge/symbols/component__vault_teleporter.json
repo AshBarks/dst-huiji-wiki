@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vault_teleporter.lua"
+  },
+  "category": "component",
+  "display_name": "vault_teleporter",
+  "summary": "VaultTeleporter组件用于管理传送器的传送目标和状态数据。它存储并操控目标标记名、房间ID、方向名、刚性设置以及一个计数器。组件通过设置房间ID时发布事件来通知其他系统，可能用于金库或房间之间的传送导航玩法。",
+  "api": [
+    {
+      "name": "Reset",
+      "effect": "将标记名和房间ID重置为nil，清除传送器的当前目标设置。"
+    },
+    {
+      "name": "SetRigid",
+      "effect": "设置传送器的刚性属性，参数rigid为true或false，影响传送器的行为模式。"
+    },
+    {
+      "name": "GetRigid",
+      "effect": "返回传送器的当前刚性属性值。"
+    },
+    {
+      "name": "SetTargetMarkerName",
+      "effect": "设置传送器的目标标记名，参数markername为字符串，指定传送的目的地标识。"
+    },
+    {
+      "name": "GetTargetMarkerName",
+      "effect": "返回传送器的当前目标标记名。"
+    },
+    {
+      "name": "SetTargetRoomID",
+      "effect": "设置传送器的目标房间ID，参数roomid为标识符，并发布事件'newvaultteleporterroomid'通知其他系统新房间ID已设置。"
+    },
+    {
+      "name": "GetTargetRoomID",
+      "effect": "返回传送器的当前目标房间ID。"
+    },
+    {
+      "name": "SetDirectionName",
+      "effect": "设置传送器的方向名，参数directionname为字符串，指定传送的方向标识。"
+    },
+    {
+      "name": "GetDirectionName",
+      "effect": "返回传送器的当前方向名。"
+    },
+    {
+      "name": "SetUnshuffledDirectionName",
+      "effect": "设置传送器的未打乱方向名，参数unshuffleddirectionname为字符串，可能用于固定或原始方向。"
+    },
+    {
+      "name": "GetUnshuffledDirectionName",
+      "effect": "返回传送器的当前未打乱方向名。"
+    },
+    {
+      "name": "AddCounter",
+      "effect": "将传送器的计数器值增加1，用于计数或状态跟踪。"
+    },
+    {
+      "name": "RemoveCounter",
+      "effect": "将传送器的计数器值减少1，用于计数或状态跟踪。"
+    },
+    {
+      "name": "GetCounter",
+      "effect": "返回传送器的当前计数器值。"
+    },
+    {
+      "name": "TeleportEntitiesToInst",
+      "effect": "尝试将实体列表ents传送到目标实例targetinst的位置，但当前方法体为空，未实现实际传送逻辑。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "newvaultteleporterroomid"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      39366,
+      17930,
+      20842,
+      19693,
+      24578
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中无任何内容提及符号 `component__vault_teleporter` 或其相关代码能力；页面涉及其他传送实体，但未体现清单中的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送",
+    "导航",
+    "金库",
+    "房间",
+    "标记",
+    "方向",
+    "重置"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/7)",
+  "gameplay_tags": [
+    "传送",
+    "探索",
+    "导航"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b3b92f8afb21e906b90554468a713e5d04e1174f5d4d6e4d55c52e9766ab7acc",
+    "source_bytes": 1771,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104566780
+  }
+}

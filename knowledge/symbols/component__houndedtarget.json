@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/houndedtarget.lua"
+  },
+  "category": "component",
+  "display_name": "houndedtarget",
+  "summary": "HoundedTarget 组件管理实体的目标权重乘数和猎犬偷猎者状态，用于调整猎犬攻击时的优先级和行为。它通过 SourceModifierList 支持多来源的权重修改，并包含废弃的 hound_thief 字段以保持向后兼容。该组件主要参与猎犬相关的战斗事件，影响实体被猎犬选择的几率或猎犬对实体的反应。",
+  "api": [
+    {
+      "name": "GetTargetWeight",
+      "effect": "返回当前的目标权重乘数，用于计算实体在猎犬攻击中的权重优先级。"
+    },
+    {
+      "name": "IsHoundThief",
+      "effect": "检查实体是否被标记为猎犬偷猎者，结合新旧数据源（hound_thief_sources 和废弃的 hound_thief）返回布尔值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13857,
+      20560,
+      22707,
+      20162,
+      16356,
+      15751,
+      34314,
+      23210
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未直接讨论 GetTargetWeight 或 IsHoundThief 的能力表达。GetTargetWeight 可能涉及仇恨权重计算，但页面中仅描述仇恨优先级行为（如‘优先仇恨玩家’），未提及权重数值或计算机制；IsHoundThief 未在任何页面中出现相关描述（如猎犬窃贼行为）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猎犬",
+    "攻击目标",
+    "权重乘数",
+    "偷猎者",
+    "猎犬攻击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ec836812ac4a394cea5ecc3582da6c82e12bea41b09fcb251146a99310829176",
+    "source_bytes": 548,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108575266
+  }
+}

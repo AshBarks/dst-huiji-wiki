@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spellbookcooldowns.lua"
+  },
+  "category": "component",
+  "display_name": "spellbookcooldowns",
+  "summary": "该组件管理法术书的冷却时间数据，用于追踪和控制法术的冷却状态。它提供接口检查冷却、获取冷却进度，并支持重启或停止冷却，确保法术不能在冷却期间重复使用，参与法术系统的平衡玩法。",
+  "api": [
+    {
+      "name": "IsInCooldown",
+      "effect": "检查指定法术是否处于冷却状态，返回布尔值；无副作用，只读操作。"
+    },
+    {
+      "name": "GetSpellCooldownPercent",
+      "effect": "获取指定法术的冷却进度百分比，返回0到1之间的数字（若冷却存在）或nil；无副作用，只读操作。"
+    },
+    {
+      "name": "RegisterSpellbookCooldown",
+      "effect": "注册一个冷却实体以进行跟踪，添加至冷却列表并监听移除事件；若法术冷却已存在，则打印错误；确保冷却被管理。"
+    },
+    {
+      "name": "RestartSpellCooldown",
+      "effect": "在服务器端重启指定法术的冷却并设置持续时间；若冷却已存在则更新，若不存在则创建新的冷却实体并注册；影响法术可用性。"
+    },
+    {
+      "name": "StopSpellCooldown",
+      "effect": "在服务器端停止并移除指定法术的冷却实体，从冷却列表中删除；使法术立即可用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含所有冷却信息的调试字符串（如法术名、百分比、时长）；用于开发调试，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      20714,
+      13701,
+      15415,
+      22611,
+      16197,
+      14938,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有涉及法术书冷却或相关组件能力的讨论；所有提及的冷却时间都关联其他机制（如食物腐烂、月雹间隔），与 spellbookcooldowns 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "冷却时间",
+    "CD",
+    "百分比",
+    "冷却状态",
+    "冷却进度",
+    "重置冷却",
+    "取消冷却",
+    "冷却检测"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "魔法",
+    "战斗",
+    "系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6fa7fc253d426c6b0937f36b8d701b2bdd28df334fadac61913b28c222d45568",
+    "source_bytes": 2704,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091892681
+  }
+}

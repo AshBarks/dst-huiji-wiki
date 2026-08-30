@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatpatch.lua"
+  },
+  "category": "component",
+  "display_name": "boatpatch",
+  "summary": "boatpatch组件管理补丁类型数据，并通过添加'boat_patch'标签标识实体为船只补丁。它参与饥荒联机版中的船只修复玩法，确保实体被系统正确识别为补丁。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的'boat_patch'标签，使实体不再被识别为船只补丁。"
+    },
+    {
+      "name": "GetPatchType",
+      "effect": "返回组件的patch_type属性值，表示补丁的具体类型，无副作用。"
+    }
+  ],
+  "api_note": "组件提供OnRemoveFromEntity和GetPatchType方法用于管理标签和查询类型。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10413,
+      65881,
+      16185,
+      16612,
+      16640,
+      23924,
+      53270,
+      70704
+    ],
+    "aspects": [
+      {
+        "aspect": "补丁类型列举",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "漏洞可以使用[[船补丁]]、[[可靠的胶布]]、[[树果酱]]或[[海带补丁]]来修复"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "船补丁",
+    "补丁",
+    "修复",
+    "船只",
+    "海上",
+    "生存",
+    "建造",
+    "组件",
+    "boat patch"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
+    "source_bytes": 311,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094613225
+  }
+}

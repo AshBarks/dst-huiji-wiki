@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/firefx.lua"
+  },
+  "category": "component",
+  "display_name": "firefx",
+  "summary": "FireFX 组件管理实体的火焰视觉效果和声音，包括灯光、动画和声音级别。它处理火焰的燃烧和熄灭过程，为实体提供动态的火焰表现，如级别变化、半径调整和强度控制。核心玩法涉及火焰的生存相关功能，如照明、取暖和视觉反馈。",
+  "api": [
+    {
+      "name": "AttachLightTo",
+      "effect": "将灯光附加到指定目标实体，替换之前的父实体；如果目标是当前实体，则恢复到原始父实体；支持偏移位置设置。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新灯光半径的波动效果，并根据世界时间状态调整声音参数（如昼夜）。"
+    },
+    {
+      "name": "GetLevelRadius",
+      "effect": "返回指定火焰级别的半径值，优先使用自定义半径级别，否则使用默认级别数据。"
+    },
+    {
+      "name": "UpdateRadius",
+      "effect": "根据当前级别和百分比计算并更新灯光半径，同步设置到灯光组件。"
+    },
+    {
+      "name": "SetPercentInLevel",
+      "effect": "设置当前级别内的百分比，更新灯光半径和强度，并重新计算灯光参数。"
+    },
+    {
+      "name": "SetLevel",
+      "effect": "设置火焰级别，播放对应动画（支持受控燃烧变体），调整灯光属性（半径、强度、颜色等），管理声音播放和强度参数。"
+    },
+    {
+      "name": "Extinguish",
+      "effect": "熄灭火焰：停止声音播放，播放熄灭动画（支持快速或受控燃烧变体），返回是否有动画以决定实体是否立即移除。"
+    },
+    {
+      "name": "SetFxLightOffsetPosition",
+      "effect": "设置灯光的偏移位置，在附加灯光时应用。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "当实体进入睡眠状态时，停止火焰声音播放。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "当实体唤醒时，重新播放火焰声音（如果之前有播放），并恢复声音强度参数。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20496,
+      10374,
+      15539,
+      16419,
+      61065,
+      18234,
+      15922,
+      16197
+    ],
+    "aspects": [
+      {
+        "aspect": "火焰熄灭行为描述",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "装填冰冻弹药的弹弓可以对[[火焰]]射击，命中可以熄灭火焰。"
+          },
+          {
+            "pageid": 18234,
+            "quote": "扑灭角色周围 16 {{解释|距离单位}}范围内的所有[[火|火焰]]和[[闷烧]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "火焰",
+    "火光",
+    "燃烧",
+    "熄灭",
+    "动画",
+    "声音",
+    "级别",
+    "半径",
+    "灯光",
+    "效果"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+    "source_bytes": 6478,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092675064
+  }
+}

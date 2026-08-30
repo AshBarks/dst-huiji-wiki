@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fader.lua"
+  },
+  "category": "component",
+  "display_name": "fader",
+  "summary": "Fader组件管理多个渐变任务，每个任务控制一个值从起始点平滑过渡到结束点。它通过回调函数将当前值传递给外部系统，用于实现游戏中的动态视觉效果或属性渐变。组件在任务进行时自动更新状态，并在任务结束时触发回调。",
+  "api": [
+    {
+      "name": "Fade",
+      "effect": "启动一个淡变任务，参数指定起始值、结束值、过渡时间、设置函数、结束回调和可选ID。返回任务ID。将任务添加到内部列表，若为首个任务则启动组件更新。"
+    },
+    {
+      "name": "StopAll",
+      "effect": "立即停止所有淡变任务，通过模拟大时间值使每个任务到达结束值，调用结束回调，清空任务列表，并停止组件更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "处理组件更新，根据时间增量更新每个淡变任务的进度，调用设置函数传递当前值。任务结束后调用结束回调并移除任务，若所有任务完成则停止组件更新。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      16419,
+      15922,
+      16197,
+      10418,
+      18234,
+      14929,
+      14935
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与component__fader相关的Fade、StopAll或OnUpdate等能力的玩家语言表达，内容主要涉及游戏实体、物品效果、伤害数值和行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "渐变",
+    "过渡",
+    "平滑过渡",
+    "动画",
+    "效果",
+    "视觉效果",
+    "属性渐变",
+    "动态效果",
+    "回调"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "视觉效果",
+    "动态调整",
+    "游戏机制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f89e28d9dea0c2d6064445a15d9f2f6f180dbd2418838c5fbda34911a14ef778",
+    "source_bytes": 1414,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093593250
+  }
+}

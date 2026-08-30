@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ghostgestalter.lua"
+  },
+  "category": "component",
+  "display_name": "ghostgestalter",
+  "summary": "组件管理幽灵实体的激活行为标签，包括站立激活、快速激活、强制右键激活和禁用拾取激活。它通过属性变化自动添加或移除对应标签，控制玩家与幽灵的互动方式。支持突变函数，允许在激活时执行形态改变逻辑。",
+  "api": [
+    {
+      "name": "DoMutate",
+      "effect": "调用domutatefn函数，传入实体和操作者，执行突变逻辑并返回结果；若domutatefn为nil则无操作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      19719,
+      10418,
+      18001,
+      20719,
+      22094,
+      24028,
+      10379
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未涉及幽灵的突变或改变能力，DoMutate 未被玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "幽灵",
+    "激活",
+    "突变",
+    "站立激活",
+    "快速激活",
+    "强制右键",
+    "禁用拾取",
+    "互动"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7a412d168543ec69f793e231364928462982c38a723ec63648da4e6d368cb96e",
+    "source_bytes": 1445,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100345295
+  }
+}

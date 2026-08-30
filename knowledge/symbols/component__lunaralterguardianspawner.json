@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunaralterguardianspawner.lua"
+  },
+  "category": "component",
+  "display_name": "lunaralterguardianspawner",
+  "summary": "此组件负责管理月相守护者的生成与追踪。它维护当前活跃的守护者实体，并允许在特定点生成新的守护者。核心玩法涉及与守护者的战斗，以及在世界中刷新敌人的机制。",
+  "api": [
+    {
+      "name": "GetGuardian",
+      "effect": "返回当前活跃的月相守护者实体，如果没有则返回nil。"
+    },
+    {
+      "name": "HasGuardianOrIsPending",
+      "effect": "检查是否有活跃的守护者或正在生成的守护者，返回true或false。"
+    },
+    {
+      "name": "KickOffSpawn",
+      "effect": "设置定时器，在指定延迟后生成守护者。生成后设置活跃守护者并监听其移除事件。"
+    },
+    {
+      "name": "TrySpawnLunarGuardian",
+      "effect": "尝试在生成器附近生成守护者。如果有活跃守护者或正在生成，则忽略。计算生成点并调用KickOffSpawn。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括活跃守护者的GUID和生成点坐标。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果生成点数据存在，则启动守护者生成。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，恢复活跃守护者的引用。"
+    },
+    {
+      "name": "_Debug_SpawnGuardian",
+      "effect": "调试函数，尝试在玩家位置生成守护者。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65605,
+      34523,
+      20714,
+      52788,
+      13409,
+      14579,
+      24544
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及'lunaralterguardianspawner'或其相关能力如生成守护者、月相变更等；内容涉及世界生成、布景、控制台命令等，但无任何与该组件直接或间接相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月相守护者",
+    "生成",
+    "刷新点",
+    "敌人生成",
+    "守卫者",
+    "挑战",
+    "战斗",
+    "事件",
+    "刷新"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9f19803c52f9b2f90ccb093d891759add14eecdbf78f24bab2185b83a492f0d0",
+    "source_bytes": 4056,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109290904
+  }
+}

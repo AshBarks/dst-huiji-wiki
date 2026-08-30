@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivalevent.lua"
+  },
+  "category": "component",
+  "display_name": "carnivalevent",
+  "summary": "该组件管理饥荒联机版中嘉年华事件的核心逻辑，包括生成和定位嘉年华主机（carnival_host），以及注册和管理嘉年华广场（plazas）。它负责在游戏世界中触发嘉年华事件时生成主机，并处理广场的注册与注销，以支持玩家参与嘉年华相关活动。核心玩法涉及事件触发、主机召唤和广场管理，促进社交和活动参与。",
+  "api": [
+    {
+      "name": "RegisterPlaza(plaza)",
+      "effect": "将给定广场实体注册到内部广场列表，并推送'carnivalplazabuilt'事件，表示广场被建造。"
+    },
+    {
+      "name": "UnregisterPlaza(plaza)",
+      "effect": "从内部广场列表中移除给定广场实体，不再参与后续活动。"
+    },
+    {
+      "name": "DoesAnyPlazaExist()",
+      "effect": "检查内部广场列表是否非空，返回布尔值表示是否有任何嘉年华广场存在。"
+    },
+    {
+      "name": "GetRandomPlaza()",
+      "effect": "从内部广场列表中随机返回一个广场及其索引，用于随机选择活动地点。"
+    },
+    {
+      "name": "SummonHost(plaza)",
+      "effect": "如果嘉年华主机存在，则尝试将其召唤到指定广场；返回主机的召唤结果（可能为布尔值），失败则不移动主机。"
+    },
+    {
+      "name": "OnPostInit()",
+      "effect": "初始化后调用，检查嘉年华主机是否存在，若不存在则生成一个并设置初始位置和状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "carnivalplazabuilt"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15225,
+      18234,
+      34314,
+      19693,
+      15751,
+      23933,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未找到与狂欢节事件（Carnival Event）能力相关的表达，如广场注册、注销、检查存在、获取随机广场、召唤主持人或初始化后执行等。页面内容涉及其他实体如天体英雄、暗影傀儡、书籍、传送门、座狼、春节活动和龙蝇，未讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "事件",
+    "主机",
+    "广场",
+    "召唤",
+    "注册",
+    "传送门",
+    "活动",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "社交",
+    "活动",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "07cde70647e12d98f0136cf485014dee9f13854d7466d814c58951853e1f20f5",
+    "source_bytes": 4553,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105903654
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatringdata.lua"
+  },
+  "category": "component",
+  "display_name": "boatringdata",
+  "summary": "该组件管理船环的数据，包括半径和段数，以及旋转状态。它用于控制船环的视觉表现和状态同步，可能参与船只的装饰或导航辅助功能。",
+  "api": [
+    {
+      "name": "GetRadius",
+      "effect": "返回当前船环的半径值，无副作用。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置船环的半径，更新组件数据，可能影响相关视觉表现。"
+    },
+    {
+      "name": "GetNumSegments",
+      "effect": "返回当前船环的段数，无副作用。"
+    },
+    {
+      "name": "SetNumSegments",
+      "effect": "设置船环的段数，更新组件数据，可能影响相关视觉表现。"
+    },
+    {
+      "name": "IsRotating",
+      "effect": "返回船环的旋转状态，通过网络变量同步，无副作用。"
+    },
+    {
+      "name": "SetIsRotating",
+      "effect": "设置船环的旋转状态，仅在服务器端（主模拟）执行，更新网络变量以同步到客户端。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "_isrotating"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      65605,
+      15022,
+      14929,
+      16605,
+      47009,
+      20714,
+      19113
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有讨论与组件 boatringdata 相关的能力。页面内容涉及电路板、世界翻新、天体英雄、坦克龟、鱼饵、启迪战争瓦器人、控制台和转向舵，但均未提及船环数据的半径、分段数或旋转状态等属性。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "半径",
+    "段数",
+    "旋转",
+    "视觉表现",
+    "装饰部件",
+    "导航辅助",
+    "数据控制",
+    "状态更新"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "装饰",
+    "状态同步",
+    "船只"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d778be4e769cf38d57edb0aff9f3dd5392630858ce93ba5ca7abf94fa7744eac",
+    "source_bytes": 948,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092921127
+  }
+}

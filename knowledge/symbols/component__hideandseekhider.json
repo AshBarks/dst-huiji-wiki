@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hideandseekhider.lua"
+  },
+  "category": "component",
+  "display_name": "hideandseekhider",
+  "summary": "该组件管理躲猫猫游戏中躲藏者的状态和行为，包括是否正在玩、躲藏点信息以及游戏时间记录。核心玩法涉及实体躲藏到指定点、等待被发现或主动中止躲藏过程。组件支持游戏状态的保存和加载。",
+  "api": [
+    {
+      "name": "IsPlaying",
+      "effect": "检查实体是否当前参与躲猫猫游戏。返回布尔值，无副作用。"
+    },
+    {
+      "name": "IsHidden",
+      "effect": "检查实体是否已完全隐藏在躲藏点。返回布尔值，无副作用。"
+    },
+    {
+      "name": "GoHide",
+      "effect": "开始躲藏过程。设置隐藏点，启动超时任务，并触发开始躲藏回调。如果timeout_time为0，则立即隐藏。返回是否成功。副作用：设置隐藏点并可能启动计时任务。"
+    },
+    {
+      "name": "CanPlayHideAndSeek",
+      "effect": "检查自上次玩游戏后是否已过一天，以确定是否可以再次玩。返回布尔值，无副作用。"
+    },
+    {
+      "name": "Found",
+      "effect": "标记实体被发现，清除躲藏状态，触发发现回调。doer是发现者。副作用：清除隐藏点并取消计时任务。"
+    },
+    {
+      "name": "Abort",
+      "effect": "中止当前躲藏过程，调用隐藏点的中止方法并触发发现。副作用：清除隐藏状态并可能中止躲藏点行为。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前状态数据，包括最后玩过的一天和隐藏点引用。返回数据表和引用列表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，恢复最后玩过的一天和隐藏点状态。从数据中恢复组件状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示当前隐藏点。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22094,
+      65881,
+      70704,
+      20714,
+      23204,
+      15734,
+      15642,
+      61804
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未涉及组件 hideandseekhider 的能力表达，如 IsPlaying、IsHidden、GoHide 等。页面内容集中在其他实体或游戏机制（如树木属性、工厂布局、控制台命令、玩具互动、蝾螈行为、熊獾行为、加载屏幕）上，无相关证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "躲藏",
+    "躲猫猫",
+    "隐藏点",
+    "发现",
+    "游戏时间",
+    "保存",
+    "加载",
+    "超时",
+    "中止",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "躲藏",
+    "游戏",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ec94d63f4408ab8290bbbad838169788aa41e35626ae5225b90386f4b17ba8da",
+    "source_bytes": 3486,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096818640
+  }
+}

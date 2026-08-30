@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarplant_tentacle_weapon.lua"
+  },
+  "category": "component",
+  "display_name": "lunarplant_tentacle_weapon",
+  "summary": "该组件管理武器的生成概率、触手预制体和所有者状态，用于在攻击时概率生成月球植物触手辅助战斗。核心玩法涉及技能树激活条件，当持有武器的玩家攻击时，有几率在目标附近生成触手进行额外攻击。",
+  "api": [
+    {
+      "name": "SetOwner(owner)",
+      "effect": "设置武器的所有者，移除对旧所有者的事件监听，并为新所有者监听攻击事件和移除事件，确保组件状态同步。"
+    },
+    {
+      "name": "OnAttack(owner, attack_data)",
+      "effect": "处理攻击事件，验证攻击数据和条件后，根据概率在目标位置附近生成月球植物触手，触手会自动攻击目标。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "清理组件事件回调，移除对装备、卸下和所有者相关事件的监听，防止内存泄漏。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "equipped",
+    "unequipped",
+    "onattackother",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23965,
+      15186,
+      34523,
+      13281,
+      19595,
+      73480,
+      18216,
+      20287
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及 'lunarplant_tentacle_weapon' 或其相关能力（如 SetOwner、OnAttack、OnRemoveFromEntity），内容涉及游戏更新、角色技能树、物品效果、世界生成等其他机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "技能树",
+    "概率生成",
+    "武器组件",
+    "装备效果",
+    "月球触手",
+    "触手攻击",
+    "辅助攻击",
+    "额外攻击",
+    "生成触手"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cbc5c08aab41e86533c163e85b5cad7056f141040a583ae6636595b6287d6ad9",
+    "source_bytes": 3031,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095525377
+  }
+}

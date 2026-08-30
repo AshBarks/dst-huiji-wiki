@@ -1,0 +1,260 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/combat_replica.lua"
+  },
+  "category": "component",
+  "display_name": "combat_replica",
+  "summary": "该组件是战斗系统(Combat)在客户端的复制体，负责在客户端同步和预测战斗相关状态，如当前攻击目标、是否恐慌、攻击范围。它不执行实际的伤害计算，而是为客户端提供攻击目标有效性判定、武器检测、友方识别等逻辑，支持基于网络变量的预测性行为。",
+  "api": [
+    {
+      "name": "AttachClassified",
+      "effect": "附加一个分类网络变量(classified)实体。这通常发生在拥有玩家分类数据的实体上，并注册onremove事件以在分类实体移除时自动解绑。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "解除已附加的分类网络变量实体，清除引用并重置最后开始攻击的时间。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "设置实体的当前攻击目标。此目标通过网络变量`_target`同步至客户端。"
+    },
+    {
+      "name": "GetTarget",
+      "effect": "返回实体当前的网络同步攻击目标。"
+    },
+    {
+      "name": "SetLastTarget",
+      "effect": "设置实体的“最后攻击目标”，此值通过分类网络变量`lastcombattarget`同步，用于客户端判断最近目标。"
+    },
+    {
+      "name": "IsRecentTarget",
+      "effect": "判断给定`target`是否为实体的最近攻击目标。优先检查服务器组件，否则检查分类网络变量`lastcombattarget`或当前目标。"
+    },
+    {
+      "name": "SetIsPanic",
+      "effect": "设置实体是否处于恐慌状态。此状态通过网络变量`_ispanic`同步至客户端，恐慌状态下无法主动选择新目标。"
+    },
+    {
+      "name": "SetAttackRange",
+      "effect": "设置实体的攻击范围。此值通过网络变量`_attackrange`同步至客户端。"
+    },
+    {
+      "name": "GetAttackRangeWithWeapon",
+      "effect": "返回考虑武器攻击范围后的总攻击距离。优先使用服务器组件的计算，否则在客户端将基础攻击范围与武器攻击范围相加。"
+    },
+    {
+      "name": "GetWeaponAttackRange",
+      "effect": "返回当前装备武器的攻击范围。若无武器返回0。"
+    },
+    {
+      "name": "GetWeapon",
+      "effect": "获取实体当前装备的武器。优先使用服务器组件，否则在客户端通过库存系统检查手部装备，需满足武器标签条件（如弹射武器、远程武器），并排除骑乘状态（除非是弹射/远程武器）。"
+    },
+    {
+      "name": "SetMinAttackPeriod",
+      "effect": "设置两次攻击之间的最小间隔。此值通过分类网络变量`minattackperiod`同步至客户端。"
+    },
+    {
+      "name": "MinAttackPeriod",
+      "effect": "返回两次攻击的最小间隔。优先使用服务器组件值，否则从分类网络变量读取。"
+    },
+    {
+      "name": "SetCanAttack",
+      "effect": "设置实体是否允许发起攻击。此状态通过分类网络变量`canattack`同步至客户端。"
+    },
+    {
+      "name": "StartAttack",
+      "effect": "标记攻击开始。在服务器上触发战斗组件的`StartAttack`；在客户端仅记录当前时间戳`_laststartattacktime`，用于冷却计算。"
+    },
+    {
+      "name": "CancelAttack",
+      "effect": "取消当前攻击。在服务器上触发战斗组件的`CancelAttack`；在客户端清除`_laststartattacktime`。"
+    },
+    {
+      "name": "InCooldown",
+      "effect": "判断是否处于攻击冷却中。优先使用服务器组件的判定，否则在客户端比较当前时间与`_laststartattacktime + minattackperiod`的大小。"
+    },
+    {
+      "name": "CanAttack",
+      "effect": "综合判断是否可以对`target`发起攻击。在客户端，需依次通过`IsValidTarget`、`canattack`状态、冷却状态、忙碌状态检查，并计算距离是否在范围内（含0.5的误差补偿）。"
+    },
+    {
+      "name": "LocomotorCanAttack",
+      "effect": "供运动系统使用的攻击判定。除基础的`CanAttack`检查外，还会处理远程武器的地面有效性验证（避免朝虚空中攻击）。返回三个值：是否到达攻击位置、是否有效、是否在冷却。"
+    },
+    {
+      "name": "CanExtinguishTarget",
+      "effect": "判断实体能否通过攻击熄灭`target`。需要实体或其武器拥有“extinguisher”标签，且目标有“smolder”或“fire”标签。"
+    },
+    {
+      "name": "CanLightTarget",
+      "effect": "判断实体能否通过攻击点燃`target`。需要武器有“rangedlighter”标签，目标有“canlight”标签，且目标未着火或烧焦。"
+    },
+    {
+      "name": "CanHitTarget",
+      "effect": "（已弃用）判断是否能击中`target`。客户端版本包含位置误差补偿，并检查目标是否可被熄灭、点燃或可被攻击。源码中标记为弃用。"
+    },
+    {
+      "name": "IsValidTarget",
+      "effect": "判断`target`是否为有效的攻击目标。检查目标有效性、自身无敌状态（如“INLIMBO”），以及一系列复杂的游戏状态标签（如“spawnprotection”、“shadow”、“playerghost”），并考虑PVP设置、武器属性（“propweapon”）和垂直位置（`_attackrange`）。"
+    },
+    {
+      "name": "CanTarget",
+      "effect": "在`IsValidTarget`基础上，进一步检查自身恐慌状态、目标的不可攻击标签（“INLIMBO”、“notarget”、“debugnoattack”）、目标的隐形状态，以及骑乘状态（和平坐骑或远程武器例外）。"
+    },
+    {
+      "name": "CanBeAlly",
+      "effect": "判断`guy`是否可以成为友方。基于一系列关系链（自身、领袖、追随者）和对齐阵营（玩家、驯化生物、特定标签）进行判定，无视PVP设置。"
+    },
+    {
+      "name": "IsAlly",
+      "effect": "在`CanBeAlly`基础上，增加额外检查：如果`guy`当前的目标是自身，则不算友方。"
+    },
+    {
+      "name": "TargetHasFriendlyLeader",
+      "effect": "（已弃用）检查目标是否有友方领袖。使用复杂的关系链判断，源码中标记为弃用，建议使用`IsAlly`/`CanBeAlly`。"
+    },
+    {
+      "name": "CanBeAttacked",
+      "effect": "判断自身是否可以被给定`attacker`攻击。检查自身无敌标签（如“playerghost”、“flight”、“noattack”、“invisible”），以及攻击者与目标间复杂的敌对关系、PVP设置、疯狂状态、影怪特殊规则等。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove (监听于 `classified` 实体，用于自动解绑)"
+  ],
+  "netvars": [
+    "_target (net_entity)",
+    "_ispanic (net_bool)",
+    "_attackrange (net_float)",
+    "lastcombattarget (通过classified)",
+    "minattackperiod (通过classified)",
+    "canattack (通过classified)"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      20150,
+      13379,
+      13828,
+      13823,
+      13857,
+      13897
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨目标选择描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "会主动仇恨并追击 20 距离单位内的拟角色、怪物与暗影傀儡"
+          },
+          {
+            "pageid": 15651,
+            "quote": "龙蝇主动仇恨 15 距离单位内的玩家"
+          },
+          {
+            "pageid": 13823,
+            "quote": "独眼巨鹿会主动攻击 16 距离单位内能进行战斗的单位"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击冷却与间隔提及",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "如果翻滚攻击处于冷却中"
+          },
+          {
+            "pageid": 20150,
+            "quote": "攻击间隔（Attack Period）是实体两次攻击之间的最小时间，单位是秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击启动行为描述",
+        "evidence": [
+          {
+            "pageid": 13379,
+            "quote": "触手会从地下伸出发起攻击"
+          },
+          {
+            "pageid": 13823,
+            "quote": "独眼巨鹿的普通攻击是扇形的攻击范围"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击范围数值标注",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "攻击范围=3.5"
+          },
+          {
+            "pageid": 15651,
+            "quote": "攻击范围 = 4（暴怒时6）"
+          },
+          {
+            "pageid": 13828,
+            "quote": "攻击范围= 2.3 / 3.91 / 5.75"
+          },
+          {
+            "pageid": 13897,
+            "quote": "攻击范围 = 3<br>4.2（狂暴）"
+          },
+          {
+            "pageid": 20150,
+            "quote": "触发攻击范围（Attack Range）是允许实体做出攻击行为的最大距离"
+          }
+        ]
+      },
+      {
+        "aspect": "火焰伤害能力描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "暴怒龙蝇只要进行了普通攻击就直接对攻击目标造成火焰固定伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "战斗组件",
+    "攻击目标",
+    "攻击范围",
+    "攻击冷却",
+    "恐慌状态",
+    "目标判定",
+    "武器检测",
+    "友方识别",
+    "网络预测",
+    "敌对系统"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "角色互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c1b8e1e607d877f05fd1f6debc0dd4262551bc1e19f72183df5f276955f1922c",
+    "source_bytes": 17549,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106210799
+  }
+}

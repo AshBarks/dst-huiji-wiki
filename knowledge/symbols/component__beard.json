@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/beard.lua"
+  },
+  "category": "component",
+  "display_name": "beard",
+  "summary": "'Beard'组件负责管理角色胡须的生长状态，包括天数增长、剃须掉落物和保暖值提供。它参与核心玩法如角色外观定制、生存保暖和资源收集，并与技能树交互以增强生长速度和保暖效果。组件还处理胡须皮肤和库存更新。",
+  "api": [
+    {
+      "name": "EnableGrowth",
+      "effect": "启用或禁用胡须生长，通过开始或停止监听世界状态变化。"
+    },
+    {
+      "name": "GetInsulation",
+      "effect": "计算并返回胡须提供的保暖值，考虑技能树加成。"
+    },
+    {
+      "name": "ShouldTryToShave",
+      "effect": "检查是否可以剃须，返回布尔值和原因字符串。"
+    },
+    {
+      "name": "Shave",
+      "effect": "执行剃须，更新胡须状态，掉落物品给执行者，增加执行者理智，并发布'剃须'事件。"
+    },
+    {
+      "name": "AddCallback",
+      "effect": "为指定天数添加回调函数，在胡须生长到该天时触发。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置胡须状态，清除生长天数、累积值和比特数，并触发重置回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回胡须状态的保存数据，包括生长天数、累积值、比特数和皮肤名称。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载胡须状态数据，恢复生长天数、累积值、比特数和皮肤，并触发回调。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后更新胡须库存，管理胡须袋装备。"
+    },
+    {
+      "name": "SetSkin",
+      "effect": "设置胡须皮肤名称，并触发所有生长天数的回调。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示比特数、生长天数和下一次事件天数。"
+    },
+    {
+      "name": "GetBeardSkinAndLength",
+      "effect": "获取胡须皮肤名称和长度，用于网络同步。"
+    },
+    {
+      "name": "UpdateBeardInventory",
+      "effect": "根据胡须比特数和技能树更新胡须袋装备，添加、替换或移除胡须袋。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "shaved"
+  ],
+  "events_listened": [
+    "ms_respawnedfromghost"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WILSON_BEARD_1",
+    "TUNING.SKILLS.WILSON_BEARD_2",
+    "TUNING.SKILLS.WILSON_BEARD_3",
+    "TUNING.SKILLS.WILSON_BEARD_4",
+    "TUNING.SKILLS.WILSON_BEARD_5",
+    "TUNING.SKILLS.WILSON_BEARD_6",
+    "TUNING.INSULATION_PER_BEARD_BIT",
+    "TUNING.SANITY_SMALL",
+    "TUNING.WILSON_BEARD_BITS.LEVEL1",
+    "TUNING.WILSON_BEARD_BITS.LEVEL2",
+    "TUNING.WILSON_BEARD_BITS.LEVEL3"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10355,
+      18234,
+      15245,
+      10374,
+      13268,
+      13437,
+      13156,
+      18057
+    ],
+    "aspects": [
+      {
+        "aspect": "胡须修剪状态",
+        "evidence": [
+          {
+            "pageid": 10355,
+            "quote": "修剪过"
+          }
+        ]
+      },
+      {
+        "aspect": "胡须隔热保暖属性",
+        "evidence": [
+          {
+            "pageid": 10355,
+            "quote": "保暖 !隔热"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "胡须",
+    "剃须",
+    "保暖",
+    "生长天数",
+    "威尔逊",
+    "技能树",
+    "胡须袋",
+    "掉落物",
+    "理智",
+    "皮肤"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰",
+    "资源收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b3d1016fe175cc1540093a05e5bc9eac2b3b671f32176eb7f23a0d6c888c5d33",
+    "source_bytes": 8998,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098297756
+  }
+}

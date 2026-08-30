@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/circler.lua"
+  },
+  "category": "component",
+  "display_name": "circler",
+  "summary": "组件 Circler 管理实体围绕目标进行圆周运动的数据，包括速度、距离和缩放等参数。它通过更新组件驱动实体在目标周围旋转，实现平滑的移动效果。该组件常用于装饰性动画或特定游戏机制中的移动模式。",
+  "api": [
+    {
+      "name": "SetMode",
+      "effect": "设置组件的运动模式，仅存储模式值，无其他行为。"
+    },
+    {
+      "name": "Start",
+      "effect": "开始圆周运动：若目标有效，则初始化速度、距离、角度等参数，将实体定位到目标周围的圆周上，并启动组件更新。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止圆周运动：停止组件更新，实体停止运动。"
+    },
+    {
+      "name": "SetCircleTarget",
+      "effect": "设置圆周运动的目标实体，用于后续运动计算。"
+    },
+    {
+      "name": "GetSpeed",
+      "effect": "根据时间增量 dt 返回当前速度值，无副作用。"
+    },
+    {
+      "name": "GetMinSpeed",
+      "effect": "返回最小速度值，无副作用。"
+    },
+    {
+      "name": "GetMaxSpeed",
+      "effect": "返回最大速度值，无副作用。"
+    },
+    {
+      "name": "GetMinScale",
+      "effect": "返回最小缩放值，无副作用。"
+    },
+    {
+      "name": "GetMaxScale",
+      "effect": "返回最大缩放值，无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包含正弦值和速度数据，用于调试。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15022,
+      14929,
+      47009,
+      16605,
+      34523,
+      19113,
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "停止旋转行为描述",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "对工作中的转向舵左击能使其停止工作"
+          }
+        ]
+      },
+      {
+        "aspect": "最低移动速度描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "旋转攻击时最低移速为 7.6"
+          }
+        ]
+      },
+      {
+        "aspect": "最大旋转速度描述",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "最快速度为 6 秒旋转一周"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "圆周运动",
+    "环绕",
+    "速度控制",
+    "缩放",
+    "目标实体",
+    "旋转",
+    "移动模式",
+    "装饰性"
+  ],
+  "gameplay_tags": [
+    "移动",
+    "装饰",
+    "动画"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d93f671ca3136a8217efb0ffd5b8ff645962a6f84f656c956967f3966dd9c8c",
+    "source_bytes": 3346,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099164938
+  }
+}

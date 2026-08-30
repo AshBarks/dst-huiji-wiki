@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/magiciantool.lua"
+  },
+  "category": "component",
+  "display_name": "magiciantool",
+  "summary": "该组件管理魔法工具的使用状态，记录当前使用者并提供使用开始和停止时的回调。它通常与魔术师组件配合，用于实现角色施法时的工具效果。",
+  "api": [
+    {
+      "name": "SetOnStartUsingFn",
+      "effect": "设置一个回调函数，当工具开始被使用时调用，传递工具实例和使用者作为参数。"
+    },
+    {
+      "name": "SetOnStopUsingFn",
+      "effect": "设置一个回调函数，当工具停止被使用时调用，传递工具实例和使用者作为参数。"
+    },
+    {
+      "name": "OnStartUsing",
+      "effect": "开始使用工具，设置使用者为doer并调用开始使用回调。如果工具已有使用者，则操作无效。"
+    },
+    {
+      "name": "OnStopUsing",
+      "effect": "停止使用工具，清除使用者并调用停止使用回调。如果doer不是当前使用者，则操作无效。"
+    },
+    {
+      "name": "StopUsing",
+      "effect": "停止当前使用者对工具的使用。如果使用者有魔术师组件，则调用其停止使用方法；否则直接调用自身停止使用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      18219,
+      15022,
+      18359,
+      65881,
+      20714,
+      19129,
+      15303
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未找到与组件 magiciantool 相关的能力表达，所有页面讨论的是其他游戏机制和实体，如电路板、战斗号子、天体英雄、玩具、工厂、控制台、腐烂机制及角色旺达的能力，均未涉及魔法工具的使用开始、停止或回调行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "魔法工具",
+    "使用",
+    "施法",
+    "开始",
+    "停止",
+    "回调",
+    "用户",
+    "工具效果",
+    "魔术师",
+    "状态管理"
+  ],
+  "gameplay_tags": [
+    "魔法",
+    "工具",
+    "使用"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2ae576f41799492ac0521bc5693480994b84ce67f523c1fcae6db80ce74bf802",
+    "source_bytes": 1337,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095548425
+  }
+}

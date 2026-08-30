@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forcecompostable.lua"
+  },
+  "category": "component",
+  "display_name": "forcecompostable",
+  "summary": "组件 ForceCompostable 在初始化时设置实体的 green 和 brown 堆肥属性，默认值为 false。它仅定义数据结构，未包含具体行为或玩法逻辑。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14580,
+      13261,
+      21485,
+      19714,
+      19932,
+      51951,
+      24839,
+      18074
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及'component__forcecompostable'符号或其代码能力，所有内容均为游戏内堆肥相关物品、机制和角色的玩家语言描述，不涉及该代码组件的行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "堆肥",
+    "物品分类",
+    "肥料",
+    "绿肥",
+    "棕肥",
+    "农业",
+    "堆肥属性",
+    "可堆肥"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "297f8ff1e8da41ae1e5bd73954d8df4bf460ced2d17b3df8f870fd148e6082bf",
+    "source_bytes": 154,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093306751
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/luckitem.lua"
+  },
+  "category": "component",
+  "display_name": "luckitem",
+  "summary": "luckitem 组件管理物品的运气值，包括基础运气和装备时的额外运气。当物品被装备、卸下或堆叠变化时，组件自动更新所有者的运气加成。通过与所有者的 luckuser 组件交互，该组件提供动态的运气源。",
+  "api": [
+    {
+      "name": "SetLuck",
+      "effect": "设置组件的基础运气值 self.luck 为传入的 luck 参数，该参数可以是数字或函数，影响后续 GetLuck 的返回值。"
+    },
+    {
+      "name": "GetLuck",
+      "effect": "返回当前基础运气值，通过 FunctionOrValue 求值 self.luck。"
+    },
+    {
+      "name": "SetEquippedLuck",
+      "effect": "设置物品装备时的运气值 self.equippedluck 为传入的 luck 参数，用于在物品装备时提供额外运气。"
+    },
+    {
+      "name": "GetEquippedLuck",
+      "effect": "返回物品装备时的运气值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化字符串，显示基础运气和装备运气百分比，计算为 luck * 堆叠数 * 100。"
+    },
+    {
+      "name": "UpdateOwnerLuck_Internal",
+      "effect": "更新指定所有者或物品当前所有者的运气源。根据物品是否装备选择运气值，并乘以堆叠数，调用所有者的 luckuser 组件设置运气源。"
+    },
+    {
+      "name": "RemoveOwnerLuck_Internal",
+      "effect": "从指定所有者或物品当前所有者移除该物品的运气源，调用 luckuser 组件移除。"
+    },
+    {
+      "name": "OnItemSourceRemoved",
+      "effect": "当物品源被移除时触发，调用 RemoveOwnerLuck_Internal 清理运气源。"
+    },
+    {
+      "name": "OnItemSourceNewOwner",
+      "effect": "当物品源有新所有者时触发，调用 UpdateOwnerLuck_Internal 更新运气源。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理所有事件监听器和 MakeComponentAnInventoryItemSource 的设置。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "equipped",
+    "unequipped",
+    "stacksizechange",
+    "updateownerluck"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      14486,
+      28744,
+      15225,
+      70530,
+      72238,
+      19129,
+      18359
+    ],
+    "aspects": [
+      {
+        "aspect": "幸运值影响收获概率",
+        "evidence": [
+          {
+            "pageid": 14486,
+            "quote": "若收获者的[[幸运值]]为{{MathVar|L_{幸运值}|low=-10|high=50|init=0}}，则概率为"
+          }
+        ]
+      },
+      {
+        "aspect": "幸运值机制介绍",
+        "evidence": [
+          {
+            "pageid": 70530,
+            "quote": "'''幸运值（{{En|Luck}}）'''是[[饥荒：联机版]]{{DST}}中的一种[[游戏机制]]。它会影响部分随机事件的发生概率。"
+          }
+        ]
+      },
+      {
+        "aspect": "装备对幸运值的增加",
+        "evidence": [
+          {
+            "pageid": 70530,
+            "quote": "**装备[[镀金骑士套装]]时，每个增加 0.1。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "运气",
+    "装备",
+    "卸下",
+    "堆叠数",
+    "所有者",
+    "幸运",
+    "加成",
+    "物品",
+    "组件",
+    "buff"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0fbfd13a945816d9c561fef14342417b673ff419e3a0d4a9a9407feccd7e7c21",
+    "source_bytes": 3162,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101431211
+  }
+}

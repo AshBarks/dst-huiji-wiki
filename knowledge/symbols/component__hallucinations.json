@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hallucinations.lua"
+  },
+  "category": "component",
+  "display_name": "hallucinations",
+  "summary": "该组件管理三种幻觉类型（creepyeyes、shadowwatcher、shadowskittish），根据玩家的理智值和世界状态（如夜晚、满月）控制幻觉的生成与停止。幻觉生成与玩家位置、光照条件相关，影响游戏氛围和精神系统玩法。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示各幻觉类型（creepyeyes、shadowwatcher、shadowskittish）的当前生成计数，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      13701,
+      18234,
+      34314,
+      15225,
+      15832,
+      20714,
+      34523
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 GetDebugString 相关的调试字符串能力表达，内容主要涉及游戏机制、实体行为、世界生成等，无调试字符串相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "幻觉",
+    "理智",
+    "暗影",
+    "夜晚",
+    "生成",
+    "creepyeyes",
+    "shadowwatcher",
+    "shadowskittish",
+    "精神",
+    "恐怖"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "恐怖",
+    "精神"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f258afbb996609db5d4a29aa644856729cbede83f14dd8bf83b279dcf0dee184",
+    "source_bytes": 8371,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108372713
+  }
+}

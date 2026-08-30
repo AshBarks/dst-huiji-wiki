@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/balloonmaker.lua"
+  },
+  "category": "component",
+  "display_name": "balloonmaker",
+  "summary": "BalloonMaker组件负责在游戏世界中生成气球实体。它通过SpawnPrefab函数创建气球预设体，并设置其坐标位置。组件不管理气球的生命周期，如计时器功能已被注释掉。气球生成主要用于装饰或娱乐玩法。",
+  "api": [
+    {
+      "name": "MakeBalloon",
+      "effect": "在指定坐标(x,y,z)生成一个'balloon'预设体。如果生成成功，气球将出现在游戏中，设置其位置，并可能影响世界状态，如增加气球数量或触发装饰效果。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16251,
+      18778,
+      18359,
+      23204,
+      13152,
+      23198,
+      22094,
+      19904
+    ],
+    "aspects": [
+      {
+        "aspect": "制作气球的能力描述",
+        "evidence": [
+          {
+            "pageid": 16251,
+            "quote": "它可以被用于制作其它各种气球装备，制作并不会消耗该物品。"
+          },
+          {
+            "pageid": 13152,
+            "quote": "会气球魔法"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "气球",
+    "制作气球",
+    "生成气球",
+    "装饰物品",
+    "马戏",
+    "庆典",
+    "玩具",
+    "娱乐",
+    "道具",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "09ef55c3508df648a20a1c3fb5c43148807f8aa57ac5b598bf478378375fe64d",
+    "source_bytes": 506,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098085028
+  }
+}

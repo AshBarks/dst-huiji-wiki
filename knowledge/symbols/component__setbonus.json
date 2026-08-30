@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/setbonus.lua"
+  },
+  "category": "component",
+  "display_name": "setbonus",
+  "summary": "SetBonus 组件用于管理装备的套装加成系统。它记录装备的套装名称和加成启用状态，当玩家同时装备属于同一套装的头部和身体装备时，加成效果会被激活；否则会被禁用。这直接影响玩家的属性或能力，常见于战斗或生存玩法中。",
+  "api": [
+    {
+      "name": "SetSetName",
+      "effect": "设置组件的套装名称。调用时必须传入在 EQUIPMENTSETNAMES 中定义的有效名称，否则会触发断言错误。"
+    },
+    {
+      "name": "SetOnEnabledFn",
+      "effect": "设置一个回调函数，当套装加成启用时调用该函数，可用于自定义加成逻辑。"
+    },
+    {
+      "name": "SetOnDisabledFn",
+      "effect": "设置一个回调函数，当套装加成禁用时调用该函数，可用于自定义清理逻辑。"
+    },
+    {
+      "name": "EnableBonusForEquip",
+      "effect": "启用指定装备的套装加成。检查装备是否有 setbonus 组件、是否未启用且套装名匹配；若条件满足则启用并调用 onenabledfn 回调，否则无操作。"
+    },
+    {
+      "name": "DisableBonusForEquip",
+      "effect": "禁用指定装备的套装加成。检查装备是否有 setbonus 组件且是否启用；若满足则禁用并调用 ondisabledfn 回调，否则无操作。"
+    },
+    {
+      "name": "UpdateSetBonus",
+      "effect": "根据库存中装备的套装匹配情况更新所有装备的加成状态。若库存中头部和身体装备套装名相同，则启用所有装备的加成；否则禁用。在装备或卸装备时由库存系统调用，会触发 EnableBonusForEquip 或 DisableBonusForEquip。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "检查加成是否启用。可选传入套装名称参数；若传入则需在 EQUIPMENTSETNAMES 中定义有效名称，否则断言错误。返回启用状态和可选名称匹配结果。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用。若加成已启用，则禁用该实体的加成并更新其库存中装备的套装状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，格式为套装名称和加成状态（ON/OFF），用于调试信息显示。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72416,
+      15418,
+      27530,
+      22465,
+      15225,
+      15415,
+      15567,
+      18502
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未提及任何与套装奖励（set bonus）相关的能力表达，如装备组合效果、激活/禁用奖励等。所有页面摘录仅涉及单个装备的使用、行为描述或实体机制，未涉及代码能力清单中的SetSetName、EnableBonusForEquip等语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "装备套装",
+    "头部装备",
+    "身体装备",
+    "装备效果",
+    "套装效果",
+    "触发效果",
+    "关闭效果",
+    "套装系统",
+    "装备搭配"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "装备",
+    "角色增强"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8824562d07169da8a123cb68d642e1d11a201b1d79ac74c73b028cfa80b96ddf",
+    "source_bytes": 3527,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093153359
+  }
+}

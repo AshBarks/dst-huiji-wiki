@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarsupernovaburning.lua"
+  },
+  "category": "component",
+  "display_name": "lunarsupernovaburning",
+  "summary": "该组件管理月球超新星燃烧效果，通过添加和更新燃烧源来处理视觉效果和伤害计算。它参与Boss战中的月球伤害机制，根据实体状态和位置动态调整伤害输出。",
+  "api": [
+    {
+      "name": "GetFxSize()",
+      "effect": "根据实体物理半径或标签返回效果大小（\"large\"、\"med\"、\"small\"）和半径值，用于调整视觉效果。"
+    },
+    {
+      "name": "AddSource(source)",
+      "effect": "添加一个燃烧源；如果源已存在则忽略；否则生成视觉效果实体并设置大小，如果是第一个源则立即调用更新。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "当组件从实体移除时，注销月球燃烧源、弹出颜色效果并移除所有燃烧源实体，进行清理。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "更新燃烧状态：检查源的有效性、位置、阻挡，计算并应用月球燃烧伤害（包括坐骑），管理视觉效果和颜色效果，并在满足条件时移除组件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ALTERGUARDIAN_LUNAR_SUPERNOVA_LUNAR_BURN_DPS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51494,
+      51495,
+      46847,
+      51498,
+      51949,
+      51046,
+      51497,
+      18234
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与 lunar supernovaburning 组件相关的任何能力表达，如特效大小、来源添加、移除事件或更新行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月球超新星",
+    "燃烧伤害",
+    "视觉效果",
+    "Boss战",
+    "Wagstaff",
+    "竞技场",
+    "月球伤害",
+    "伤害计算",
+    "状态更新"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战",
+    "月球"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ea1e1a729673b7c1091e0adaf80c9c188f3189ba849546a7578cd8ef5c2b7ddb",
+    "source_bytes": 5937,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109345827
+  }
+}

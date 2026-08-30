@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/minigame.lua"
+  },
+  "category": "component",
+  "display_name": "minigame",
+  "summary": "该组件用于管理小游戏的生命周期，包括激活、停用和状态切换（intro、playing、outro）。它自动扫描并添加周围的观众和参与者，管理他们的相关组件。同时追踪兴奋度，支持基于时间的兴奋状态判断。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity: 当组件从实体移除时调用，执行Deactivate方法，停用小游戏。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnActivatedFn(fn): 设置激活时的回调函数fn，fn将在Activate方法中被调用。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnDeactivatedFn(fn): 设置停用时的回调函数fn，fn将在Deactivate方法中被调用。",
+      "effect": ""
+    },
+    {
+      "name": "IsActive(): 返回小游戏是否处于激活状态。",
+      "effect": ""
+    },
+    {
+      "name": "Activate(): 停用旧状态，设置active为true，执行DoActivePulse添加周围实体，启动周期性脉冲任务（每0.75秒调用DoActivePulse），如果设置了activate_fn则调用它。副作用：可能添加观众和参与者实体。",
+      "effect": ""
+    },
+    {
+      "name": "Deactivate(): 取消周期性脉冲任务，如果小游戏未激活则返回；设置active为false，推送'ms_minigamedeactivated'事件，如果设置了deactivate_fn则调用它。副作用：停止脉冲并通知停用。",
+      "effect": ""
+    },
+    {
+      "name": "AddSpectator(spectator): 为spectator实体添加minigame_spectator组件（如果不存在），并设置其观看此小游戏。副作用：修改spectator实体的组件。",
+      "effect": ""
+    },
+    {
+      "name": "AddParticipator(participator, notimeout): 为participator实体添加minigame_participator组件（如果不存在），设置其参与此小游戏，如果提供了notimeout则设置对应属性。副作用：修改participator实体的组件。",
+      "effect": ""
+    },
+    {
+      "name": "DoActivePulse(): 扫描周围实体，在spectator_dist范围内添加非怪物、非玩家的角色作为观众（如果没有跟随者），在participator_dist范围内添加玩家作为参与者。副作用：自动添加观众和参与者。",
+      "effect": ""
+    },
+    {
+      "name": "SetIsIntro(): 设置小游戏状态为'intro'。",
+      "effect": ""
+    },
+    {
+      "name": "GetIsIntro(): 返回小游戏状态是否为'intro'。",
+      "effect": ""
+    },
+    {
+      "name": "SetIsPlaying(): 设置小游戏状态为'playing'。",
+      "effect": ""
+    },
+    {
+      "name": "GetIsPlaying(): 返回小游戏状态是否为'playing'。",
+      "effect": ""
+    },
+    {
+      "name": "SetIsOutro(): 设置小游戏状态为'outro'。",
+      "effect": ""
+    },
+    {
+      "name": "GetIsOutro(): 返回小游戏状态是否为'outro'。",
+      "effect": ""
+    },
+    {
+      "name": "RecordExcitement(): 记录当前时间作为兴奋时间。",
+      "effect": ""
+    },
+    {
+      "name": "TimeSinceLastExcitement(): 返回自上次记录兴奋以来经过的时间。",
+      "effect": ""
+    },
+    {
+      "name": "IsExciting(): 返回自上次兴奋以来是否不超过excitement_delay（默认5秒）。",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString(): 返回调试字符串，显示激活状态和兴奋状态。",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "ms_minigamedeactivated"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MINIGAME_CROWD_DIST_MIN",
+    "MINIGAME_CROWD_DIST_TARGET",
+    "MINIGAME_CROWD_DIST_MAX"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      13156,
+      47009,
+      51951,
+      10418,
+      21137,
+      23210,
+      23933
+    ],
+    "aspects": [
+      {
+        "aspect": "小游戏自动完成技能",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "自动完成[[强大健身房]]的小游戏。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小游戏",
+    "观众",
+    "参与者",
+    "激活",
+    "停用",
+    "兴奋",
+    "状态",
+    "活动",
+    "社交",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "社交",
+    "活动",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "32af91555b92937fd240a4ece3477286f0fdf6fe681b90ce1efa91c9d683eedf",
+    "source_bytes": 3795,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097020846
+  }
+}

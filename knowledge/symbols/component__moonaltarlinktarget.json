@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonaltarlinktarget.lua"
+  },
+  "category": "component",
+  "display_name": "moonaltarlinktarget",
+  "summary": "该组件管理月相祭坛目标实体之间的链接关系。它允许在指定半径内寻找其他类型祭坛，并尝试建立由三个祭坛组成的三角形链接。这通常用于触发月相风暴或类似游戏事件，是饥荒联机版中特定环境机制的一部分。",
+  "api": [
+    {
+      "name": "TryEstablishLink",
+      "effect": "以组件所在实体为中心，在20单位半径内搜索 moon_altar、moon_altar_cosmic、moon_altar_astral 类型的实体，检查它们是否可链接且最小距离满足条件。若找到三个有效祭坛且测试三角形有效，则生成 moon_altar_link 实体并建立链接。"
+    },
+    {
+      "name": "CanBeLinked",
+      "effect": "返回布尔值，指示该实体当前是否可以被链接。如果 canbelinkedfn 回调已定义，则执行该函数；否则默认返回 true。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清除 moonaltarlinktarget 标签并移除 onremove 事件监听，确保组件状态清理。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MOON_ALTAR_LINK_ALTAR_MIN_RADIUS_SQ"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      73480,
+      15539,
+      15234,
+      20714,
+      16419,
+      19761,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未讨论组件 moonaltarlinktarget 的能力表达，如 TryEstablishLink、CanBeLinked 或 OnRemoveFromEntity。所有页面内容涉及其他游戏机制，与该组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月相祭坛",
+    "链接",
+    "三角形",
+    "风暴",
+    "建立链接",
+    "可链接",
+    "半径",
+    "搜索",
+    "连接",
+    "目标"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "事件",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2a7b883be0df6e42e40a1904cde975214e34a11a0035ee2c9e834b8220b112ae",
+    "source_bytes": 2324,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095644418
+  }
+}

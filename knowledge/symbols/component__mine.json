@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mine.lua"
+  },
+  "category": "component",
+  "display_name": "mine",
+  "summary": "Mine组件管理矿井或陷阱类实体的状态，包括激活、触发和爆炸。它定期检测半径内的目标，当目标符合条件时触发爆炸事件。组件支持状态保存、重置和停用，用于实现游戏中的陷阱机制。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理测试任务和标签，从实体移除组件时调用。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置触发半径，影响目标检测范围。"
+    },
+    {
+      "name": "SetOnExplodeFn",
+      "effect": "设置爆炸回调函数，在爆炸发生时执行传入的函数。"
+    },
+    {
+      "name": "SetOnSprungFn",
+      "effect": "设置触发回调函数，在组件被触发时调用。"
+    },
+    {
+      "name": "SetOnResetFn",
+      "effect": "设置重置回调函数，在重置组件时执行。"
+    },
+    {
+      "name": "SetOnDeactivateFn",
+      "effect": "设置停用回调函数，在组件停用时调用。"
+    },
+    {
+      "name": "SetTestTimeFn",
+      "effect": "设置测试时间函数，用于决定检测间隔。"
+    },
+    {
+      "name": "SetAlignment",
+      "effect": "设置组件对齐方式，如'player'，影响目标过滤。"
+    },
+    {
+      "name": "SetReusable",
+      "effect": "设置组件是否可重复使用，控制'mine_not_reusable'标签。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置组件状态，停止测试，清空目标，重新开始测试，并触发重置回调。"
+    },
+    {
+      "name": "StartTesting",
+      "effect": "开始定期检测任务，根据测试时间函数设置间隔。"
+    },
+    {
+      "name": "StopTesting",
+      "effect": "停止当前检测任务。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时，将检测任务切换为较长间隔以节省性能。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时，恢复正常的检测任务。"
+    },
+    {
+      "name": "Deactivate",
+      "effect": "停用组件，停止测试，设置状态为非激活，触发停用回调。"
+    },
+    {
+      "name": "Spring",
+      "effect": "触发组件，设置状态为触发，停止测试，触发触发回调。"
+    },
+    {
+      "name": "GetTarget",
+      "effect": "返回当前检测到的目标实体。"
+    },
+    {
+      "name": "Explode",
+      "effect": "触发爆炸，设置目标，停止测试，记录统计，执行爆炸回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回包含'sprung'或'inactive'状态的表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，根据数据调用Spring、Deactivate或Reset。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onputininventory",
+    "onpickup",
+    "teleported"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      16419,
+      15539,
+      24542,
+      14674,
+      14907,
+      19595,
+      14099
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离与目标获取机制描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "主动仇恨并追击 20 {{解释|距离单位}}内的[[拟角色]]"
+          }
+        ]
+      },
+      {
+        "aspect": "陷阱触发范围半径数值描述",
+        "evidence": [
+          {
+            "pageid": 14099,
+            "quote": "触发范围半径为 3 {{解释|距离单位}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "矿井",
+    "陷阱",
+    "触发",
+    "爆炸",
+    "重置",
+    "激活",
+    "测试",
+    "目标",
+    "半径",
+    "对齐"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "陷阱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "23bd5dd1f7803aae9121c34788d4f4b5eb951e9bafdaae9ab9473ae0e5a601c6",
+    "source_bytes": 5127,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094890186
+  }
+}

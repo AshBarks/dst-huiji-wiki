@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/simplebook.lua"
+  },
+  "category": "component",
+  "display_name": "simplebook",
+  "summary": "SimpleBook 组件用于管理书籍实体，通过添加标签 \"simplebook\" 标识书类型。它提供 Read 方法处理阅读交互，检查阅读者是否可见实体，并触发可选的回调函数以实现阅读效果。",
+  "api": [
+    {
+      "name": "Read",
+      "effect": "检查 doer 是否能看到实体（使用 CanEntitySeeTarget），若不可见则返回 false。若可见且定义了 onreadfn 回调函数，则调用该函数并传递实体和 doer，可能执行自定义阅读逻辑。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      13407,
+      18271,
+      15922,
+      13139,
+      65881,
+      15818,
+      13268
+    ],
+    "aspects": [
+      {
+        "aspect": "阅读书籍的能力与效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "只有[[薇克巴顿]]、[[麦斯威尔]]、[[沃特]]才能够阅读书籍。"
+          },
+          {
+            "pageid": 13139,
+            "quote": "麦斯威尔可以阅读[[薇克巴顿]]的[[书]]并发动对应效果，但需要消耗 2.5 倍于薇克巴顿阅读消耗的理智值。"
+          },
+          {
+            "pageid": 13268,
+            "quote": "沃特可以阅读[[薇克巴顿]]的[[书]]，但不会触发原有效果。"
+          },
+          {
+            "pageid": 15818,
+            "quote": "[[薇克巴顿]]每次阅读[[养蜂笔记]]召唤2只嗡嗡蜜蜂。"
+          },
+          {
+            "pageid": 65881,
+            "quote": "此时大量消耗理智值读书并不会吸引[[暗影生物]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "书",
+    "阅读",
+    "书籍",
+    "简单书",
+    "读取",
+    "知识书",
+    "书本",
+    "阅读交互",
+    "可见性"
+  ],
+  "gameplay_tags": [
+    "阅读",
+    "知识",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3be44429e1c3ce2bf26fbe443157fa0cae9f52538f007834fcf69bc11e0dbb6c",
+    "source_bytes": 419,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103718866
+  }
+}

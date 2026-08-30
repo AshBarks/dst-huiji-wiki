@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/plantable.lua"
+  },
+  "category": "component",
+  "display_name": "plantable",
+  "summary": "plantable 组件管理可种植实体的生长时间和产品属性。它参与饥荒联机版的核心种植玩法，控制实体从种植到成熟的时间以及最终产出。该组件是纯数据组件，不包含任何行为逻辑。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14486,
+      21485,
+      18545,
+      34101,
+      14579,
+      13261,
+      14484,
+      24807
+    ],
+    "aspects": [
+      {
+        "aspect": "特定植物种植来源",
+        "evidence": [
+          {
+            "pageid": 24807,
+            "quote": "由阴郁之棘属性的[[惊喜种子]]种…"
+          }
+        ]
+      },
+      {
+        "aspect": "种子种植方式描述",
+        "evidence": [
+          {
+            "pageid": 18545,
+            "quote": "种子可以栽种于[[农田土壤]]，使其随机长出一种[[农作物]]。"
+          },
+          {
+            "pageid": 14486,
+            "quote": "由[[种子]]或[[作物种子]]在[[农田地块]]上或[[沃姆伍…"
+          }
+        ]
+      },
+      {
+        "aspect": "耕种机制影响生长",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "'''耕种'''是[[饥荒：联机版]]{{DST}}中的一项{{分类|游戏机制}}，该机制影响[[农作物]]的生长及其产物。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色特殊种植能力",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德可以不使用[[耕地机]]和[[园艺锄]]，直接将[[种子]]种植在地上。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "种植",
+    "生长",
+    "植物",
+    "种子",
+    "产品",
+    "生长时间",
+    "可种植",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "种植"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98a14c3704e2533b8b1b93680b9c55c76b09a67cd1e0bd1564bae59ff0b784d5",
+    "source_bytes": 135,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102434781
+  }
+}

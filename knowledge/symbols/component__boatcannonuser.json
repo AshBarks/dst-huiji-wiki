@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatcannonuser.lua"
+  },
+  "category": "component",
+  "display_name": "boatcannonuser",
+  "summary": "该组件管理玩家使用船炮时的瞄准状态，包括瞄准的炮实体、瞄准特效和任务。核心玩法是玩家在船上操作大炮进行瞄准和射击，涉及客户端和服务器端的同步。提供方法来获取当前瞄准的炮、瞄准位置和准星，并处理炮的更换和取消瞄准。",
+  "api": [
+    {
+      "name": "AttachClassified(classified)",
+      "effect": "客户端专用：将分类对象附加到组件，监听其移除事件以自动分离，用于网络同步。"
+    },
+    {
+      "name": "DetachClassified()",
+      "effect": "客户端专用：清除分类对象引用，调用OnCannonChanged(nil)以停止瞄准显示并清理资源。"
+    },
+    {
+      "name": "GetCannon()",
+      "effect": "客户端与服务器端：从分类变量中读取并返回当前瞄准的炮实体，若无则返回nil。"
+    },
+    {
+      "name": "GetAimPos()",
+      "effect": "客户端与服务器端：返回当前瞄准炮的准星组件的目标位置，若无则返回nil。"
+    },
+    {
+      "name": "GetReticule()",
+      "effect": "客户端与服务器端：返回当前瞄准炮的准星组件，若无则返回nil。"
+    },
+    {
+      "name": "OnCannonChanged(cannon)",
+      "effect": "客户端与服务器端：仅本地玩家执行；清理旧瞄准状态（取消任务、移除特效、销毁准星），若新炮有效则延迟启动瞄准显示（创建准星和范围特效），更新瞄准炮变量。"
+    },
+    {
+      "name": "SetClassified(classified)",
+      "effect": "服务器端专用：设置分类对象，用于网络同步，需在服务器端调用。"
+    },
+    {
+      "name": "SetCannon(cannon)",
+      "effect": "服务器端专用：设置当前瞄准的炮，若变更则更新分类变量，移除旧炮的监听和停止瞄准，添加新炮的监听和启动瞄准，并设置炮的旋转角度。"
+    },
+    {
+      "name": "CancelAimingStateInternal()",
+      "effect": "服务器端专用：检查玩家状态，若正在使用炮则转到瞄准结束状态，用于内部取消瞄准。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "aimingcannonchanged",
+    "onremove"
+  ],
+  "netvars": [
+    "cannon"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18188,
+      15022,
+      20714,
+      28179,
+      13493,
+      13701,
+      16419,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "大炮瞄准时炮口朝向与瞄准线显示",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "用大炮瞄准时，大炮炮口会朝向角色正面面对的方向，并在炮口前显示虚线"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "船炮",
+    "瞄准",
+    "大炮",
+    "射击",
+    "船上操作",
+    "瞄准状态",
+    "准星",
+    "取消瞄准",
+    "同步",
+    "玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗",
+    "船只"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2b28d7e58ea4b2dba5a00f9a5d401b98362e4dc02a9737ae66f5ac49779571b1",
+    "source_bytes": 5415,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090644248
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deerherding.lua"
+  },
+  "category": "component",
+  "display_name": "deerherding",
+  "summary": "deerherding 组件用于管理鹿群（herd）的集体行为，核心功能包括计算鹿群中心位置、更新鹿群移动路径、处理放牧与受惊状态。它通过定时器和状态检查控制鹿群的活动模式，影响游戏中鹿的智能行为和玩家互动。",
+  "api": [
+    {
+      "name": "Init",
+      "effect": "初始化鹿群的起始位置（startingpt）和生成器引用（herdspawner），设置 herdhomelocation 和 herdlocation。"
+    },
+    {
+      "name": "SetValidAareaCheckFn",
+      "effect": "设置自定义区域检查函数（fn），用于验证鹿群移动目标位置是否可行，影响 UpdateHerdLocation 中的位置选择。"
+    },
+    {
+      "name": "CalcHerdCenterPoint",
+      "effect": "计算鹿群中活跃鹿的中心点、朝向和最大距离；若 detailedinfo 为 true，还返回活跃鹿列表，用于位置更新和受惊逻辑。"
+    },
+    {
+      "name": "UpdateHerdLocation",
+      "effect": "根据给定半径更新鹿群位置，通过 FindWalkableOffset 寻找可行走位置并更新 herdlocation；同时为活跃鹿设置 herdoffset 偏移量，影响它们的队形移动。"
+    },
+    {
+      "name": "IsActiveInHerd",
+      "effect": "检查指定鹿（deer）是否在当前活跃鹿群中，基于 herdspawner 的鹿群列表进行验证，返回布尔值。"
+    },
+    {
+      "name": "UpdateDeerHerdingStatus",
+      "effect": "更新所有鹿的活跃状态，根据距离中心、建筑密度（结构数量超过阈值）和盐舔存在性来标记鹿为活跃或非活跃，影响鹿群整体行为。"
+    },
+    {
+      "name": "CalcIsHerdSpooked",
+      "effect": "计算鹿群是否处于受惊状态，检查活跃鹿是否受到火焰伤害、战斗目标或惊慌影响，返回布尔值并可能触发逃跑逻辑。"
+    },
+    {
+      "name": "IsAnyEntityAsleep",
+      "effect": "检查鹿群中是否有任何活跃实体在睡眠状态，用于判断是否进入放牧模式，返回布尔值。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件逻辑，处理放牧计时器、受惊状态切换、位置更新和威胁检测；受惊时引导鹿群远离玩家威胁，非受惊时控制放牧或漫游。"
+    },
+    {
+      "name": "IsGrazing",
+      "effect": "返回鹿群当前是否在放牧状态（isgrazing），用于外部查询行为模式。"
+    },
+    {
+      "name": "SetHerdAlertTarget",
+      "effect": "为指定鹿（deer）设置警报目标（target），更新 alerttargets 表；当无警报目标时，设置 keepheading 为 true 以固定朝向。"
+    },
+    {
+      "name": "GetClosestHerdAlertTarget",
+      "effect": "获取指定鹿最近的有效警报目标（距离小于500），遍历 alerttargets 表并返回最近目标或 nil。"
+    },
+    {
+      "name": "HerdHasAlertTarget",
+      "effect": "检查鹿群是否有任何警报目标（alerttargets 非空），返回布尔值，影响受惊逻辑。"
+    },
+    {
+      "name": "IsAHerdAlertTarget",
+      "effect": "检查给定目标（target）是否是鹿群的警报目标之一，遍历 alerttargets 表并返回布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据到表，包括 herdhomelocation、herdlocation、grazetimer 和 isgrazing，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载组件状态，恢复 herdlocation、herdhomelocation、grazetimer 和 isgrazing，用于游戏加载。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，重新关联 herdspawner 到世界组件 deerherdspawner，确保鹿群生成器正确连接。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包含放牧状态、计时器、警报目标数量和受惊状态，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      20714,
+      13567,
+      61804,
+      28739,
+      18825,
+      18357,
+      13556
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未涉及鹿群放牧组件（deerherding）的相关能力描述，如群体中心计算、位置更新、警报目标设置等。所有页面讨论的是寄居蟹隐士、控制台命令、旧神更新、加载屏幕、椅子实体、舞台表演、桅杆或阿比盖尔等，与鹿群放牧无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鹿群",
+    "放牧",
+    "移动",
+    "受惊",
+    "警报目标",
+    "生存",
+    "动物",
+    "AI",
+    " herd",
+    "状态更新"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "动物行为",
+    "智能系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f3d0dbfb26ad7fe43c882af586239b24b39473f590ca0e412ee996919ade12d0",
+    "source_bytes": 9420,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106849452
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/saddler.lua"
+  },
+  "category": "component",
+  "display_name": "saddler",
+  "summary": "saddler组件用于管理鞍具类装备的数据，包括视觉交换、额外伤害、速度乘数和伤害吸收。它参与坐骑系统，通过调整移动速度和伤害属性来增强游戏玩法，常用于骑乘生物的装备。",
+  "api": [
+    {
+      "name": "SetSwaps",
+      "effect": "设置装备的视觉交换参数，包括构建、符号和皮肤GUID，用于外观定制。"
+    },
+    {
+      "name": "SetBonusDamage",
+      "effect": "设置装备提供的额外伤害值。"
+    },
+    {
+      "name": "SetBonusSpeedMult",
+      "effect": "设置装备提供的速度乘数，影响移动速度。"
+    },
+    {
+      "name": "SetAbsorption",
+      "effect": "设置装备提供的伤害吸收百分比，减少受到的伤害。"
+    },
+    {
+      "name": "GetBonusDamage",
+      "effect": "返回装备提供的额外伤害值，如果未设置则返回0。"
+    },
+    {
+      "name": "GetBonusSpeedMult",
+      "effect": "返回装备提供的速度乘数，如果未设置则返回1。"
+    },
+    {
+      "name": "GetAbsorption",
+      "effect": "返回装备提供的伤害吸收百分比，如果未设置则返回0。"
+    },
+    {
+      "name": "SetDiscardedCallback",
+      "effect": "设置当装备被丢弃时调用的回调函数。"
+    },
+    {
+      "name": "ApplyDamage",
+      "effect": "处理伤害计算，考虑伤害类型抵抗，应用吸收百分比，并处理特殊伤害，返回剩余伤害和修改后的特殊伤害。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      14653,
+      28166,
+      51287,
+      13455,
+      14654,
+      22240,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "位面防御获取描述",
+        "evidence": [
+          {
+            "pageid": 28166,
+            "quote": "获得 15 点[[位面防御]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击伤害提升描述",
+        "evidence": [
+          {
+            "pageid": 14654,
+            "quote": "攻击伤害提升 16 点。"
+          },
+          {
+            "pageid": 22240,
+            "quote": "攻击伤害提升 5 点。"
+          }
+        ]
+      },
+      {
+        "aspect": "鞍具耐久度消耗触发描述",
+        "evidence": [
+          {
+            "pageid": 14653,
+            "quote": "如果皮弗娄牛因顺从度低于 40% 而主动把自己身上的鞍抖了下来，或皮弗娄牛死亡，鞍具便会消耗一次耐久度。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:鞍具"
+    ],
+    "code_fields": [
+      "saddler"
+    ],
+    "overridable_fields": [],
+    "note": "saddler 组件同时向 weapon_damage / armor_absorb_percent / planardefense 写入鞍具加成值。"
+  },
+  "search_terms": [
+    "鞍具",
+    "骑乘",
+    "速度加成",
+    "伤害吸收",
+    "坐骑装备",
+    "额外伤害",
+    "移动速度",
+    "伤害抵抗",
+    "视觉交换"
+  ],
+  "gameplay_tags": [
+    "坐骑",
+    "战斗",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4a4796417353822b5127f345730cb74353ca05361148bd3d4d163cb7b2ed9d9c",
+    "source_bytes": 2210,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112027346
+  }
+}

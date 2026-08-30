@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spellbook.lua"
+  },
+  "category": "component",
+  "display_name": "spellbook",
+  "summary": "spellbook组件管理一个可交互的法术/技能轮盘，用于存储法术物品列表、界面配置及施法逻辑。它响应openspellwheel和closespellwheel事件以控制界面开关，并通过用户界面(HUD)呈现选择轮盘供玩家选择和施放法术。",
+  "api": [
+    {
+      "name": "SetRequiredTag(tag)",
+      "effect": "设置使用该法术书所需的玩家标签。只有拥有此标签的玩家才能使用。"
+    },
+    {
+      "name": "SetRadius(radius)",
+      "effect": "设置法术轮盘的显示半径。"
+    },
+    {
+      "name": "SetFocusRadius(radius)",
+      "effect": "设置法术轮盘中可聚焦/选择的内部区域半径。"
+    },
+    {
+      "name": "SetBgData(bgdata)",
+      "effect": "设置法术轮盘界面的背景数据。"
+    },
+    {
+      "name": "SetItems(items)",
+      "effect": "设置法术轮盘中显示的法术/物品列表。此列表决定轮盘内容和组件是否可用。"
+    },
+    {
+      "name": "SetOnOpenFn(fn)",
+      "effect": "设置当法术轮盘打开时调用的回调函数。"
+    },
+    {
+      "name": "SetOnCloseFn(fn)",
+      "effect": "设置当法术轮盘关闭时调用的回调函数。"
+    },
+    {
+      "name": "SetCanUseFn(fn)",
+      "effect": "设置一个自定义检查函数，用于判断特定用户是否被允许使用此法术书。"
+    },
+    {
+      "name": "SetShouldOpenFn(fn)",
+      "effect": "设置一个检查函数，用于判断在法术书有效的情况下，是否实际应该打开轮盘界面（例如，可在命令预览状态下静默阻止打开）。"
+    },
+    {
+      "name": "ShouldOpen(user)",
+      "effect": "检查对于给定用户，法术轮盘是否应该打开。依赖于通过SetShouldOpenFn设置的检查函数。"
+    },
+    {
+      "name": "CanBeUsedBy(user)",
+      "effect": "检查给定用户是否可以使用此法术书。检查条件包括：用户是否有所需标签、是否通过自定义使用检查、物品列表是否非空、以及是否为玩家本人或非玩家实体。"
+    },
+    {
+      "name": "OpenSpellBook(user)",
+      "effect": "为用户打开法术轮盘界面。首先取消用户可能正在进行的范围效果(AOE)选择，然后调用用户HUD的OpenSpellWheel方法来显示轮盘。"
+    },
+    {
+      "name": "SelectSpell(id)",
+      "effect": "根据索引id从物品列表中选择一个法术。如果选中项存在且其有onselect回调，则执行该回调。成功返回true。"
+    },
+    {
+      "name": "GetSelectedSpell()",
+      "effect": "返回当前通过SelectSpell方法选中的法术ID。"
+    },
+    {
+      "name": "SetSpellName(name)",
+      "effect": "设置法术的显示名称。"
+    },
+    {
+      "name": "GetSpellName()",
+      "effect": "获取当前设置的法术名称。"
+    },
+    {
+      "name": "SetSpellAction(action)",
+      "effect": "设置一个直接推入的动作(Action)，用于客户端和服务器。"
+    },
+    {
+      "name": "GetSpellAction()",
+      "effect": "获取当前设置的动作。"
+    },
+    {
+      "name": "SetSpellFn(fn)",
+      "effect": "设置一个用于施放法术的函数，该函数将通过状态图的CAST_SPELLBOOK动作在服务器端调用。"
+    },
+    {
+      "name": "HasSpellFn()",
+      "effect": "检查是否通过SetSpellFn设置了施法函数。"
+    },
+    {
+      "name": "CastSpell(user)",
+      "effect": "执行通过SetSpellFn设置的施法函数。如果设置了函数则调用它并返回其结果，否则返回false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "openspellwheel",
+    "closespellwheel"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23924,
+      15225,
+      14099,
+      13897,
+      15594,
+      34992,
+      13139,
+      13407
+    ],
+    "aspects": [
+      {
+        "aspect": "法术书使用条件限制",
+        "evidence": [
+          {
+            "pageid": 14099,
+            "quote": "只有麦斯威尔可以阅读暗影秘典"
+          }
+        ]
+      },
+      {
+        "aspect": "法术书制作能力",
+        "evidence": [
+          {
+            "pageid": 13407,
+            "quote": "可以制作特殊的魔法书"
+          }
+        ]
+      },
+      {
+        "aspect": "法术书施法效果描述",
+        "evidence": [
+          {
+            "pageid": 13407,
+            "quote": "通过消耗理智阅读它们来产生各种效果"
+          }
+        ]
+      },
+      {
+        "aspect": "法术书施法距离描述",
+        "evidence": [
+          {
+            "pageid": 14099,
+            "quote": "施法距离均为 8 单位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "法术书",
+    "技能轮盘",
+    "魔法书",
+    "选择法术",
+    "施法",
+    "HUD界面",
+    "法术选择",
+    "轮盘菜单",
+    "技能选择"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "技能",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1c4692155a1e232c3106086045045da6db9a30dfcf866cd0491ed21a0b3046a1",
+    "source_bytes": 3592,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095149558
+  }
+}

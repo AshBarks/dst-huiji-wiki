@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grogginess.lua"
+  },
+  "category": "component",
+  "display_name": "grogginess",
+  "summary": "该组件管理实体的醉酒状态，追踪醉酒量和抗性阈值。当醉酒量累积到抗性时，实体可能被击倒并进入昏迷状态，影响移动速度。组件还处理醉酒效果的衰减和恢复过程，是游戏生存机制的一部分。",
+  "api": [
+    {
+      "name": "SetSpeedModMultiplier",
+      "effect": "设置速度修改乘数，影响醉酒时的移动速度调整。若当前应用速度修改，则立即更新移动速度。"
+    },
+    {
+      "name": "SetComeToTest",
+      "effect": "设置从击倒状态恢复的测试函数，用于判断实体是否应醒来。"
+    },
+    {
+      "name": "SetKnockOutTest",
+      "effect": "设置击倒测试函数，用于判断实体是否应被击倒。"
+    },
+    {
+      "name": "SetResistance",
+      "effect": "设置基础抗性值，影响击倒阈值。"
+    },
+    {
+      "name": "GetResistance",
+      "effect": "返回计算抗性，即基础抗性加上所有抗性来源的修正值。"
+    },
+    {
+      "name": "SetDecayRate",
+      "effect": "设置醉酒量衰减速率，控制醉酒状态随时间减少的速度。"
+    },
+    {
+      "name": "SetWearOffDuration",
+      "effect": "设置醉酒效果完全消失所需的持续时间。"
+    },
+    {
+      "name": "SetEnableSpeedMod",
+      "effect": "启用或禁用醉酒速度修改效果。启用时恢复速度修改和'groggy'标签，禁用时移除它们。"
+    },
+    {
+      "name": "IsKnockedOut",
+      "effect": "检查实体是否处于击倒状态，基于状态标签'knockout'。"
+    },
+    {
+      "name": "IsGroggy",
+      "effect": "检查实体是否处于醉酒状态，要求醉酒量大于0、速度修改启用且未击倒。"
+    },
+    {
+      "name": "HasGrogginess",
+      "effect": "检查实体是否有醉酒量（大于0）且速度修改启用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含状态、击倒时间、醉酒量等信息。"
+    },
+    {
+      "name": "AddGrogginess",
+      "effect": "增加醉酒量，若达到抗性阈值则可能触发击倒。忽略免疫来源，重置消退时间。"
+    },
+    {
+      "name": "MaximizeGrogginess",
+      "effect": "将醉酒量提升至接近抗性值，但不超过抗性减0.1。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "按百分比设置醉酒量，相对于当前抗性值。"
+    },
+    {
+      "name": "MakeGrogginessAtLeast",
+      "effect": "确保醉酒量至少达到指定值，若低于则增加。"
+    },
+    {
+      "name": "SubtractGrogginess",
+      "effect": "减少醉酒量，忽略免疫来源。确保组件更新以处理结束行为。"
+    },
+    {
+      "name": "ResetGrogginess",
+      "effect": "完全重置醉酒量为0，通过减去当前值实现。"
+    },
+    {
+      "name": "CapToResistance",
+      "effect": "将醉酒量限制在抗性值以内，取当前值和抗性的较小值。"
+    },
+    {
+      "name": "ExtendKnockout",
+      "effect": "延长击倒持续时间，仅在击倒状态下有效，并重置击倒计时和醉酒量。"
+    },
+    {
+      "name": "KnockOut",
+      "effect": "执行击倒事件，若实体可见且未死亡则推送'knockedout'事件并设置击倒标记。"
+    },
+    {
+      "name": "ComeTo",
+      "effect": "执行恢复事件，清除击倒标记，若在击倒状态且未死亡则推送'cometo'事件并重置醉酒量。"
+    },
+    {
+      "name": "AddResistanceSource",
+      "effect": "添加抗性来源，为指定来源设置抗性修正值。"
+    },
+    {
+      "name": "RemoveResistanceSource",
+      "effect": "移除指定来源的抗性修正。"
+    },
+    {
+      "name": "AddImmunitySource",
+      "effect": "添加免疫来源，使实体在免疫期间忽略醉酒量增加或衰减。"
+    },
+    {
+      "name": "RemoveImmunitySource",
+      "effect": "移除指定来源的免疫效果。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数，处理醉酒量衰减、击倒状态转换和消退过程。影响醉酒量、击倒时间和速度修改。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件数据传输到新实体，包括醉酒量、击倒持续时间和消退时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "knockedout",
+    "cometo"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "GROGGINESS_WEAR_OFF_DURATION",
+    "GROGGINESS_DECAY_RATE",
+    "MIN_GROGGY_SPEED_MOD",
+    "MAX_GROGGY_SPEED_MOD",
+    "MIN_KNOCKOUT_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      20511,
+      16197,
+      20561,
+      13261,
+      15651,
+      21620,
+      35216
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及醉酒状态、眩晕值、抗性等与grogginess组件相关的术语或能力表达，如'groggy'、'grogginess'、'醉酒'等；页面主要讨论触电、冰冻、催眠、眩晕（击倒）等其他机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "醉酒",
+    "眩晕",
+    "击倒",
+    "抗性",
+    "速度修改",
+    "昏迷",
+    "衰减",
+    "恢复",
+    "grogginess",
+    "knockout"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "状态",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c6b3ab4172a5284f3559b2d10218b877302486b3fbbc183fefc70b51ce2be64",
+    "source_bytes": 10093,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091303360
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hermitcrab_relocation_manager.lua"
+  },
+  "category": "component",
+  "display_name": "hermitcrab_relocation_manager",
+  "summary": "该组件管理寄居蟹及其关联物品（如房子、肉架、蜂箱等）的搬迁过程，负责将这些实体传送到猴子岛的固定布局中。它处理传送逻辑、旋转调整和视觉效果，以确保实体正确放置。组件参与寄居蟹相关的任务或世界事件，核心玩法涉及搬迁触发和完成通知。",
+  "api": [
+    {
+      "name": "GetPearl",
+      "effect": "返回当前注册的寄居蟹实体（hermitcrab），如果未注册则返回nil。"
+    },
+    {
+      "name": "GetPearlsHouse",
+      "effect": "遍历所有注册的Pearl实体，返回第一个房子类型的实体（如hermithouse2、hermithouse等），如果没有找到则返回nil。"
+    },
+    {
+      "name": "GetPearlsFishingMarkers",
+      "effect": "遍历所有注册的Pearl实体，返回所有钓鱼标记实体（hermitcrab_marker_fishing）的列表。"
+    },
+    {
+      "name": "SetupMovingPearlToMonkeyIsland",
+      "effect": "触发寄居蟹及其关联实体传送到猴子岛的固定布局（PEARLSETPIECE_MONKEYISLAND）。会启动传送逻辑，包括设置实体位置、播放特效和延迟，最终推送搬迁完成事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_hermitcrab_relocated"
+  ],
+  "events_listened": [
+    "ms_register_hermitcrab",
+    "ms_register_pearl_entity",
+    "ms_register_monkeyisland_portal",
+    "ms_register_monkeyqueen",
+    "ms_hermitcrab_wants_to_teleport"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      57263,
+      18001,
+      16641,
+      17930,
+      24578,
+      39366,
+      19693
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与代码能力 GetPearl、GetPearlsHouse、GetPearlsFishingMarkers、SetupMovingPearlToMonkeyIsland 直接对应的玩家语言表达。页面 13493 描述了寄居蟹隐士（珍珠）的行为和互动，但未体现这些特定能力；其他页面涉及传送机制，但未提及珍珠的搬迁、获取或钓鱼标记。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "寄居蟹",
+    "搬迁",
+    "猴子岛",
+    "传送",
+    "珍珠屋",
+    "钓鱼点",
+    "任务",
+    "特效",
+    "世界事件"
+  ],
+  "gameplay_tags": [
+    "任务",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "85660ed648be498b934db9fb63aa45310fa2b52420b3cad794a9dede7d3af751",
+    "source_bytes": 20835,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108453106
+  }
+}

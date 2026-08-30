@@ -1,0 +1,245 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sharkboimanager.lua"
+  },
+  "category": "component",
+  "display_name": "sharkboimanager",
+  "summary": "sharkboimanager 组件管理海洋鲨鱼（sharkboi）Boss战竞技场的完整生命周期。其核心玩法是：通过玩家在特定区域钓鱼触发事件，生成一个由冰面构成的动态竞技场并召唤鲨鱼Boss进行战斗。组件负责管理竞技场的创建、状态转换、尺寸缩放、冰面生成/销毁、Boss生成与移除、战斗触发以及最终的清理与冷却。",
+  "api": [
+    {
+      "name": "GetArenaStateString",
+      "effect": "返回当前竞技场状态的字符串名称（如“UNDEFINED”、“BOSSFIGHTING”等）。如果竞技场不存在，则返回“UNDEFINED”。"
+    },
+    {
+      "name": "CreateTileOffsetCache",
+      "effect": "根据给定的半径 `r` 创建并返回一个预先计算好的、用于快速遍历竞技场内所有潜在地砖位置的偏移缓存表。此缓存按距离排序。"
+    },
+    {
+      "name": "ForEachTileInBetween",
+      "effect": "在竞技场原点，遍历半径在 `min_radius` 和 `max_radius` 之间的所有缓存地砖，并对每个地砖位置执行函数 `fn`。用于批量创建或销毁冰面地砖。"
+    },
+    {
+      "name": "FindWalkableOffsetInArena",
+      "effect": "在竞技场内寻找一个可行走的位置偏移量并返回。如果指定了 `sharkboi` 且该鲨鱼不在当前竞技场内，则返回 nil。优先从外向内搜索，返回的坐标默认为竞技场原点。"
+    },
+    {
+      "name": "GetDesiredArenaRadius",
+      "effect": "根据当前竞技场状态和目标半径，计算并返回竞技场期望达到的半径值。逻辑涉及根据季节、战斗状态和缩放规则进行调整。"
+    },
+    {
+      "name": "PauseArenaShrinking_Hack",
+      "effect": "临时暂停竞技场缩放一段时间（约85帧），用于处理特定游戏逻辑。"
+    },
+    {
+      "name": "IsPointInArena",
+      "effect": "检查坐标点 `(x, y, z)` 是否位于当前竞技场的冰面范围内。会考虑竞技场半径和地图上的可视地面信息。"
+    },
+    {
+      "name": "SetArenaState",
+      "effect": "设置竞技场状态为 `state`。状态只能向前推进。此方法会触发相应状态的逻辑，如启动创建、生成Boss、开始缩放或清理。"
+    },
+    {
+      "name": "SetDesiredArenaRadius",
+      "effect": "直接设置竞技场的当前半径为指定值（被限制在0到最大尺寸之间），并同步更新网络变量。"
+    },
+    {
+      "name": "StopShrinking",
+      "effect": "停止正在运行的竞技场周期性缩放任务。"
+    },
+    {
+      "name": "DoShrink",
+      "effect": "执行一次竞技场缩放：根据目标半径销毁超出范围的冰面，并更新当前半径。如果不需要缩放则停止任务。"
+    },
+    {
+      "name": "StartShrinking",
+      "effect": "启动一个周期性任务，根据配置的时间间隔持续调用 `DoShrink` 来缩放竞技场。"
+    },
+    {
+      "name": "StopCleanup",
+      "effect": "停止正在运行的竞技场清理周期性任务。"
+    },
+    {
+      "name": "DoCleanup",
+      "effect": "执行一次竞技场清理：根据目标半径销毁冰面并更新半径。当无法再缩小时，会调用 `ForceCleanup` 完成彻底清理。"
+    },
+    {
+      "name": "StartCleanup",
+      "effect": "启动一个周期性任务，根据配置的时间间隔持续调用 `DoCleanup` 来清理竞技场。"
+    },
+    {
+      "name": "TryToMakeArenaBig",
+      "effect": "尝试将竞技场扩大到最大尺寸。仅在“已创建”或“Boss已生成”状态下且没有玩家在附近时执行。会生成冰面、破坏附近船只并生成装饰实体。"
+    },
+    {
+      "name": "TryToMakeArenaSmall",
+      "effect": "尝试将竞技场缩小到最小尺寸。在“已创建”或“Boss已生成”状态下，设置目标半径为最小值并启动缩放。"
+    },
+    {
+      "name": "OnCooldownEnd",
+      "effect": "冷却计时器结束时的回调。执行彻底清理，移除竞技场数据，并重新开始寻找放置新竞技场。"
+    },
+    {
+      "name": "CooldownArena",
+      "effect": "为竞技场启动一个冷却计时器。计时结束后会调用 `OnCooldownEnd`。"
+    },
+    {
+      "name": "ForceCleanup",
+      "effect": "彻底清理当前竞技场：停止所有定时任务，销毁剩余冰面，移除钓鱼洞和所有关联的鲨鱼Boss实体，并发布清理事件。"
+    },
+    {
+      "name": "GetFishPrefab",
+      "effect": "获取当前竞技场中心位置可能生成的鱼类预制件名称。优先从 `schoolspawner` 获取，否则返回默认鱼类。"
+    },
+    {
+      "name": "StopPlayerFishingTick",
+      "effect": "停止指定玩家的钓鱼事件计时器任务。"
+    },
+    {
+      "name": "SpawnBoss",
+      "effect": "生成Boss的核心逻辑。先强制钓起所有玩家正在钓的鱼，然后在钓鱼洞位置（或竞技场中心）生成一只鲨鱼Boss，设置其追踪钓鱼洞，启动事件监听，并击退附近单位。"
+    },
+    {
+      "name": "StartEventListeners",
+      "effect": "为竞技场中的所有鲨鱼Boss和钓鱼洞设置事件监听器（如被攻击、移除、开始钓鱼等）。"
+    },
+    {
+      "name": "CreateSharkBoi",
+      "effect": "在指定位置 `(x, y, z)` 生成一只鲨鱼Boss预制件“sharkboi”，并使其进入生成动画状态。"
+    },
+    {
+      "name": "CreateFishingHole",
+      "effect": "在指定位置 `(x, y, z)` 生成一个冰上钓鱼洞预制件“icefishing_hole”。"
+    },
+    {
+      "name": "CreateEntityDecorationsAtPoint",
+      "effect": "在指定地砖位置生成装饰性实体的占位函数。当前实现为空（未启用）。"
+    },
+    {
+      "name": "ArenaFinishCreating",
+      "effect": "竞技场创建完成后的处理。生成装饰、钓鱼洞和大量环绕竞技场的冰刺（sharkboi_ice_hazard），并启动事件监听、发布创建完成事件。"
+    },
+    {
+      "name": "CreateIceTileAtPoint",
+      "effect": "在指定位置 `(x, y, z)` 创建一块海洋冰面地砖。"
+    },
+    {
+      "name": "DestroyIceTileAtPoint",
+      "effect": "销毁指定位置 `(x, y, z)` 的海洋冰面地砖。"
+    },
+    {
+      "name": "PlaceOceanArenaAtPosition",
+      "effect": "在世界坐标 `(x, y, z)` 处放置并初始化一个新的海洋竞技场。设置初始状态、半径，生成初始冰面，并调度下一帧完成创建。如果竞技场已存在则返回 false。"
+    },
+    {
+      "name": "TryToPlaceOceanArena",
+      "effect": "尝试在地图上找到一个最佳位置并放置海洋竞技场。会选择海洋深度最深的点。成功放置返回 true。"
+    },
+    {
+      "name": "StopFindAndPlaceOceanArenaOverTime",
+      "effect": "停止定期尝试寻找并放置竞技场的定时任务。"
+    },
+    {
+      "name": "FindAndPlaceOceanArenaOverTime",
+      "effect": "启动或重启定期尝试寻找并放置海洋竞技场的任务。如果没有合适的点或竞技场已存在，会定期重试。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新（如读档）。根据经过的时间调整冷却计时器的剩余时间。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化组件数据以供保存。返回包含竞技场状态、位置、半径、已钓鱼数、冷却时间以及关联实体GUID的数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中恢复组件状态。重建竞技场数据结构，设置状态，并处理冷却和季节逻辑。如果状态未知，则触发清理。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在实体加载后进行的传递操作。根据保存的GUID重新关联钓鱼洞和鲨鱼Boss实体，并设置事件监听。包含处理旧版存档的修复逻辑。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回用于调试的字符串，包含竞技场状态、实体数量、冷却时间等信息。"
+    },
+    {
+      "name": "OnPlayerFishCaught",
+      "effect": "玩家钓到鱼时的事件处理。更新已钓鱼计数，当计数达到阈值且条件允许时，推进竞技场状态以召唤Boss。"
+    },
+    {
+      "name": "OnPlayerFishingTick",
+      "effect": "玩家钓鱼过程中的周期性事件处理。根据概率在钓鱼洞位置生成鱼并尝试上钩。"
+    },
+    {
+      "name": "OnPondStartFishing",
+      "effect": "玩家开始在钓鱼洞钓鱼时的事件处理。为该玩家启动钓鱼事件周期计时器并设置监听。"
+    },
+    {
+      "name": "OnPlayerStopFishing",
+      "effect": "玩家停止钓鱼时的事件处理。停止该玩家的钓鱼事件周期计时器并移除相关事件监听。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_spawnedsharkboiarena",
+    "ms_cleanedupsharkboiarena",
+    "ms_cleanupticksharkboiarena"
+  ],
+  "events_listened": [
+    "worldmapsetsize",
+    "season",
+    "attacked",
+    "onremove",
+    "startfishinginvirtualocean",
+    "oceanfishing_stoppedfishing",
+    "fishcaught"
+  ],
+  "netvars": [
+    "arena_origin_x",
+    "arena_origin_z",
+    "arena_radius"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15680,
+      16658,
+      18790,
+      19912,
+      19913,
+      19914,
+      19915
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有给定页面摘录均未提及鲨鱼、竞技场管理或组件sharkboimanager相关的任何能力表达；页面内容涉及天体英雄、树精守卫、魔杖和季节，与组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "海鲨战斗",
+    "冰面竞技场",
+    "钓鱼触发",
+    "Boss战",
+    "竞技场生成",
+    "鲨鱼管理",
+    "冰场战斗",
+    "海洋鲨鱼",
+    "战斗事件",
+    "冰面生成"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 9/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "143b2ab594abc28e8d78a0f92c7667b7a6155568adccd652850a6ceb98eb9a69",
+    "source_bytes": 32908,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112446142
+  }
+}

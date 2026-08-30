@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/damagetracker.lua"
+  },
+  "category": "component",
+  "display_name": "damagetracker",
+  "summary": "DamageTracker 组件用于追踪实体在启用期间所受到的伤害总量，并管理伤害累计值、阈值和启用状态。当伤害累计达到预设阈值时，可触发回调函数，常用于战斗系统中监控伤害输出或实现基于伤害的触发效果。",
+  "api": [
+    {
+      "name": "Start",
+      "effect": "启用伤害追踪：将 enabled 状态设为 true，使组件开始响应健康值变化事件。"
+    },
+    {
+      "name": "Stop",
+      "effect": "禁用伤害追踪：将 enabled 状态设为 false，停止组件对健康值变化事件的处理。"
+    },
+    {
+      "name": "OnHealthDelta",
+      "effect": "处理 healthdelta 事件：若 enabled 为 true，则增加 damage_done 值（使用 data.amount 的绝对值），并在累计伤害首次达到或超过 damage_threshold 时调用 damage_threshold_fn（若存在）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "healthdelta"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13455,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害阈值事件触发",
+        "evidence": [
+          {
+            "pageid": 13455,
+            "quote": "并且如果骑乘时在 5 秒内受到的攻击伤害累计达到 8 点，沃比就会把玩家甩…"
+          },
+          {
+            "pageid": 15651,
+            "quote": "龙蝇需要受到超过 100 点伤害才会解除冰冻"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "伤害累计",
+    "阈值触发",
+    "健康监控",
+    "战斗数据",
+    "伤害统计",
+    "追踪器",
+    "启用状态",
+    "健康变化"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "伤害追踪"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "908a100a821d31b0e8fda50ffb7a3c4997fb37585f911ee0c925a2bb8ba5d640",
+    "source_bytes": 871,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099401018
+  }
+}

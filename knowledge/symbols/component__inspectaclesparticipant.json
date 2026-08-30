@@ -1,0 +1,205 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inspectaclesparticipant.lua"
+  },
+  "category": "component",
+  "display_name": "inspectaclesparticipant",
+  "summary": "该组件用于管理玩家参与'inspectacles'迷你游戏的完整生命周期，包括游戏的生成、谜题的计算与缓存、答案验证、奖励发放和冷却时间控制。它负责服务器与客户端之间的状态同步，并响应玩家的装备和事件变化。",
+  "api": [
+    {
+      "name": "OnInspectaclesGameChanged",
+      "effect": "当客户端收到游戏数据变化事件时，更新本地的游戏状态缓存（CLIENT_game, CLIENT_posx, CLIENT_posz, CLIENT_puzzle, CLIENT_puzzledata）。若游戏ID为0则清空缓存。"
+    },
+    {
+      "name": "OnClosePopup",
+      "effect": "处理关闭弹出事件；仅当弹出类型为POPUPS.INSPECTACLES时，检查玩家提交的谜题解决方案，若验证通过则调用FinishCurrentGame结束游戏。"
+    },
+    {
+      "name": "UpdateInspectacles",
+      "effect": "遍历玩家物品栏中所有带有'inspectaclesvision'标签的物品，调用其UpdateInspectacles方法更新视觉效果。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件移除时清理所有事件回调和定时任务（如冷却任务）。"
+    },
+    {
+      "name": "CalculateGamePuzzle",
+      "effect": "根据游戏ID和位置坐标生成24位谜题哈希值，用于客户端和服务器生成相同的随机谜题数据。"
+    },
+    {
+      "name": "MakePuzzleDataARingBuffer",
+      "effect": "将谜题数据数组转换为轻量级环形缓冲结构，添加大小、索引和GetNext/Reset方法。"
+    },
+    {
+      "name": "GetPuzzleData",
+      "effect": "基于谜题哈希值生成包含0-3值的数组，并注入额外值以保证所有值出现，然后将其转换为环形缓冲。"
+    },
+    {
+      "name": "CheckGameSolution",
+      "effect": "仅在服务器端验证谜题解决方案；当前简化实现为只要求solution为0即视为正确。"
+    },
+    {
+      "name": "OnSignalPulse",
+      "effect": "客户端触发时发送inspectaclesping事件（包含游戏位置）；服务器端触发时调用UpdateBox更新游戏盒子。"
+    },
+    {
+      "name": "IsParticipantClose",
+      "effect": "检测玩家是否在游戏盒子或坐标附近（默认距离4），返回布尔值。"
+    },
+    {
+      "name": "GetCLIENTDetails",
+      "effect": "返回客户端缓存的游戏、谜题和谜题数据。"
+    },
+    {
+      "name": "GetSERVERDetails",
+      "effect": "返回服务器端的游戏、谜题和谜题数据。"
+    },
+    {
+      "name": "IsFreeGame",
+      "effect": "判断游戏是否为'无迷你游戏'类型（如'NONE'或以'FREE'开头），这类游戏直接发放奖励。"
+    },
+    {
+      "name": "NetworkCurrentGame",
+      "effect": "服务器端将当前游戏状态（游戏ID、位置）通过网络变量同步到客户端；若应停止交互则发送空值。"
+    },
+    {
+      "name": "ShouldStopGameInteractions",
+      "effect": "判断是否应停止游戏交互（如非主机、游戏被隐藏、无游戏或不在当前分片）。"
+    },
+    {
+      "name": "SetCurrentGame",
+      "effect": "服务器端设置当前游戏的游戏ID、位置，生成谜题数据，并触发网络同步；若游戏ID无效则清空所有状态。"
+    },
+    {
+      "name": "FindGameLocation",
+      "effect": "在玩家附近寻找可放置游戏盒子的可行走位置，尝试不同半径。"
+    },
+    {
+      "name": "CreateBox",
+      "effect": "服务器端在游戏位置生成游戏盒子（inspectaclesbox或inspectaclesbox2），并设置所有者；若位置有障碍物则尝试偏移。"
+    },
+    {
+      "name": "CanCreateGameInWorld",
+      "effect": "检查当前世界是否允许创建游戏（非洞穴世界）。"
+    },
+    {
+      "name": "CreateNewAndOrShowCurrentGame",
+      "effect": "服务器端创建新游戏或显示当前游戏；随机选择游戏类型和位置，设置游戏状态，创建盒子并显示。若处于冷却或不能创建则返回false。"
+    },
+    {
+      "name": "FinishCurrentGame",
+      "effect": "结束当前游戏：发放奖励、清除游戏状态、应用冷却时间、更新视觉道具。"
+    },
+    {
+      "name": "UpdateBox",
+      "effect": "服务器端确保游戏盒子存在，若不存在则调用CreateBox生成。"
+    },
+    {
+      "name": "GrantRewards",
+      "effect": "服务器端调用游戏盒子的DoLootPinata方法发放奖励。"
+    },
+    {
+      "name": "HideCurrentGame",
+      "effect": "服务器端隐藏当前游戏（设置hide标志），并同步网络状态。"
+    },
+    {
+      "name": "ShowCurrentGame",
+      "effect": "服务器端显示当前游戏（清除hide标志），并同步网络状态。"
+    },
+    {
+      "name": "OnCooldownFinished",
+      "effect": "冷却时间结束回调：若玩家装备了'inspectaclesvision'物品则尝试创建新游戏，并更新视觉道具。"
+    },
+    {
+      "name": "ApplyCooldown",
+      "effect": "服务器端应用冷却时间；设置定时任务，超时后触发OnCooldownFinished。若无游戏则应用，否则忽略。"
+    },
+    {
+      "name": "IsInCooldown",
+      "effect": "返回是否处于冷却状态（cooldowntask是否存在）。"
+    },
+    {
+      "name": "IsUpgradedBox",
+      "effect": "返回游戏盒子是否升级（基于技能树解锁）。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，调整冷却定时任务的剩余时间；若冷却结束则触发完成回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前游戏状态（游戏、位置、升级状态、分片ID）或冷却剩余时间到表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载游戏状态或冷却时间；恢复游戏或启动冷却任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前游戏状态、位置、谜题哈希、分片信息等。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "inspectaclesping"
+  ],
+  "events_listened": [
+    "inspectaclesgamechanged",
+    "ms_closepopup",
+    "itemget",
+    "equip",
+    "itemlose",
+    "unequip"
+  ],
+  "netvars": [
+    "inspectacles_game",
+    "inspectacles_posx",
+    "inspectacles_posz"
+  ],
+  "tunables": [
+    "TUNING.SKILLS.WINONA.INSPECTACLES_COOLDOWNTIME",
+    "TUNING.SKILLS.WINONA.INSPECTACLES_UPGRADE_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      13701,
+      72238,
+      13437,
+      13493,
+      15022,
+      72416,
+      14660
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及熔炉模式、巨兽行为、角色能力、装备机制等，但未提及与inspectaclesparticipant组件相关的谜题游戏、参与者交互、盒子创建或清单中任何能力的具体表达，如冷却事件、参与者接近检查等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Inspectacles",
+    "迷你游戏",
+    "谜题",
+    "奖励",
+    "冷却",
+    "装备",
+    "同步",
+    "玩家参与"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 0/8)",
+  "gameplay_tags": [
+    "迷你游戏",
+    "谜题",
+    "奖励",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1d7953184631dd06c612b3fc9f2d31dc9b53ff07c723bed6b77198352bb1c523",
+    "source_bytes": 18283,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108809926
+  }
+}

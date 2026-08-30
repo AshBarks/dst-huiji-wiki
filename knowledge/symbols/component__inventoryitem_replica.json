@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventoryitem_replica.lua"
+  },
+  "category": "component",
+  "display_name": "inventoryitem_replica",
+  "summary": "inventoryitem_replica 组件管理物品的库存相关状态，如可拾取性、湿度、酸性嘶嘶声和温度。它通过网络变量同步这些数据到客户端，确保客户端和服务器状态一致。参与的核心玩法涉及物品的拾取、存储、装备、部署和显示。",
+  "api": [
+    {
+      "name": "SetCanBePickedUp",
+      "effect": "设置物品是否可被拾取，通过网络变量 _cannotbepickedup 同步到客户端。"
+    },
+    {
+      "name": "CanBePickedUp",
+      "effect": "检查物品是否可被指定玩家（doer）拾取，考虑 _grabbableoverridetag 覆盖标签和蜘蛛标签限制。"
+    },
+    {
+      "name": "SetCanGoInContainer",
+      "effect": "设置物品是否可放入容器，通过 classified.cangoincontainer 网络变量同步。"
+    },
+    {
+      "name": "CanGoInContainer",
+      "effect": "查询物品是否可放入容器，返回 classified.cangoincontainer 的值。"
+    },
+    {
+      "name": "SetCanOnlyGoInPocket",
+      "effect": "设置物品是否只能放在口袋中，通过 classified.canonlygoinpocket 网络变量同步。"
+    },
+    {
+      "name": "SetCanOnlyGoInPocketOrPocketContainers",
+      "effect": "设置物品是否只能放在口袋或口袋容器中，通过 classified.canonlygoinpocketorpocketcontainers 网络变量同步。"
+    },
+    {
+      "name": "CanOnlyGoInPocket",
+      "effect": "查询物品是否只能放在口袋中，返回 classified.canonlygoinpocket 的值。"
+    },
+    {
+      "name": "CanOnlyGoInPocketOrPocketContainers",
+      "effect": "查询物品是否只能放在口袋或口袋容器中，返回 classified.canonlygoinpocketorpocketcontainers 的值。"
+    },
+    {
+      "name": "SetIsLockedInSlot",
+      "effect": "设置物品是否锁定在槽位中，通过 classified.islockedinslot 网络变量同步。"
+    },
+    {
+      "name": "IsLockedInSlot",
+      "effect": "查询物品是否锁定在槽位中，返回 classified.islockedinslot 的值。"
+    },
+    {
+      "name": "SetImage",
+      "effect": "设置物品的图像名称，通过 classified.image 网络变量同步。"
+    },
+    {
+      "name": "OverrideImage",
+      "effect": "覆盖物品的图像名称，仅本地生效（不网络同步），并触发 imagechange 事件。"
+    },
+    {
+      "name": "GetImage",
+      "effect": "获取物品的当前图像名称，优先考虑客户端覆盖、网络值或预制体名称。"
+    },
+    {
+      "name": "SetAtlas",
+      "effect": "设置物品的图集名称，通过 classified.atlas 网络变量同步。"
+    },
+    {
+      "name": "GetAtlas",
+      "effect": "获取物品的当前图集名称，优先考虑客户端覆盖、网络值或自动解析。"
+    },
+    {
+      "name": "SetOwner",
+      "effect": "设置物品的所有者，控制网络目标以避免多个容器打开时的性能问题，更新 classified 和实体的网络目标。"
+    },
+    {
+      "name": "IsHeld",
+      "effect": "检查物品是否被持有，服务器端检查组件，客户端检查 classified 是否存在。"
+    },
+    {
+      "name": "IsHeldBy",
+      "effect": "检查物品是否被指定玩家（guy）持有，服务器端调用组件，客户端检查网络持有状态。"
+    },
+    {
+      "name": "IsGrandOwner",
+      "effect": "检查物品是否被指定玩家（guy）拥有（包括容器），服务器端获取 GrandOwner，客户端检查网络持有状态。"
+    },
+    {
+      "name": "SetPickupPos",
+      "effect": "设置物品的拾取位置，通过 classified.src_pos 网络变量同步。"
+    },
+    {
+      "name": "GetPickupPos",
+      "effect": "获取物品的拾取位置，从 classified.src_pos 网络变量读取。"
+    },
+    {
+      "name": "SerializeUsage",
+      "effect": "序列化物品的使用状态（如耐久、新鲜度、充电、温度）到 classified 实体，用于网络同步。"
+    },
+    {
+      "name": "DeserializeUsage",
+      "effect": "从 classified 实体反序列化物品的使用状态（如耐久、新鲜度、充电、温度）。"
+    },
+    {
+      "name": "SetChargeTime",
+      "effect": "设置物品的充电时间，通过 classified 序列化并触发 rechargetimechange 事件。"
+    },
+    {
+      "name": "SetDeployMode",
+      "effect": "设置物品的部署模式，通过 classified.deploymode 网络变量同步。"
+    },
+    {
+      "name": "GetDeployMode",
+      "effect": "获取物品的部署模式，优先检查组件或网络值。"
+    },
+    {
+      "name": "IsDeployable",
+      "effect": "检查物品是否可被指定玩家（deployer）部署，考虑部署模式、限制标签和骑乘状态。"
+    },
+    {
+      "name": "SetDeploySpacing",
+      "effect": "设置物品的部署间距，通过 classified.deployspacing 网络变量同步。"
+    },
+    {
+      "name": "DeploySpacingRadius",
+      "effect": "获取物品的部署间距半径，从组件或网络值计算。"
+    },
+    {
+      "name": "SetDeployRestrictedTag",
+      "effect": "设置物品的部署限制标签，通过 classified.deployrestrictedtag 网络变量同步。"
+    },
+    {
+      "name": "CanDeploy",
+      "effect": "检查物品是否可在指定点（pt）部署，根据部署模式和地图状态判断。"
+    },
+    {
+      "name": "SetUseGridPlacer",
+      "effect": "设置物品是否使用网格放置器，通过 classified.usegridplacer 网络变量同步。"
+    },
+    {
+      "name": "GetDeployPlacerName",
+      "effect": "获取物品的部署放置器名称，优先检查组件或网络值。"
+    },
+    {
+      "name": "SetAttackRange",
+      "effect": "设置物品的攻击范围，通过 classified.attackrange 网络变量同步。"
+    },
+    {
+      "name": "AttackRange",
+      "effect": "获取物品的攻击范围，优先检查组件或网络值。"
+    },
+    {
+      "name": "IsWeapon",
+      "effect": "检查物品是否为武器，基于武器组件或攻击范围网络值。"
+    },
+    {
+      "name": "SetWalkSpeedMult",
+      "effect": "设置物品的移动速度乘数，通过 classified.walkspeedmult 网络变量同步，并验证精度。"
+    },
+    {
+      "name": "GetWalkSpeedMult",
+      "effect": "获取物品的移动速度乘数，考虑装备状态和玩家修正。"
+    },
+    {
+      "name": "SetEquipRestrictedTag",
+      "effect": "设置物品的装备限制标签，通过 classified.equiprestrictedtag 网络变量同步。"
+    },
+    {
+      "name": "GetEquipRestrictedTag",
+      "effect": "获取物品的装备限制标签，优先检查组件或网络值。"
+    },
+    {
+      "name": "SetMoistureLevel",
+      "effect": "设置物品的湿度级别，通过 classified.moisture 网络变量同步。"
+    },
+    {
+      "name": "GetMoisture",
+      "effect": "获取物品的湿度值，优先检查组件或网络值。"
+    },
+    {
+      "name": "GetMoisturePercent",
+      "effect": "获取物品的湿度百分比，基于湿度值和 TUNING.MAX_WETNESS 计算。"
+    },
+    {
+      "name": "SetIsWet",
+      "effect": "设置物品是否湿润，通过 _iswet 网络变量同步并触发 wetnesschange 事件。"
+    },
+    {
+      "name": "IsWet",
+      "effect": "检查物品是否湿润，返回 _iswet 网络变量的值。"
+    },
+    {
+      "name": "SetIsAcidSizzling",
+      "effect": "设置物品是否酸性嘶嘶，通过 _isacidsizzling 网络变量同步并触发 acidsizzlingchange 事件。"
+    },
+    {
+      "name": "IsAcidSizzling",
+      "effect": "检查物品是否酸性嘶嘶，返回 _isacidsizzling 网络变量的值。"
+    },
+    {
+      "name": "SetGrabbableOverrideTag",
+      "effect": "设置物品的可拾取覆盖标签，通过 _grabbableoverridetag 网络变量同步。"
+    },
+    {
+      "name": "SetTemperature",
+      "effect": "设置物品的温度，通过 classified 序列化。"
+    },
+    {
+      "name": "SetMinTemperature",
+      "effect": "设置物品的最小温度，通过 classified 序列化。"
+    },
+    {
+      "name": "SetMaxTemperature",
+      "effect": "设置物品的最大温度，通过 classified 序列化。"
+    },
+    {
+      "name": "GetTemperature",
+      "effect": "获取物品的温度，优先检查组件或网络值。"
+    },
+    {
+      "name": "AttachClassified",
+      "effect": "附加分类实体用于网络同步，并设置移除监听。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "分离分类实体，清理网络同步。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体移除时，删除分类实体（仅在服务器端）。"
+    }
+  ],
+  "events_published": [
+    "wetnesschange",
+    "acidsizzlingchange",
+    "imagechange",
+    "rechargetimechange"
+  ],
+  "events_listened": [
+    "percentusedchange",
+    "perishchange",
+    "forceperishchange",
+    "rechargechange",
+    "onremove"
+  ],
+  "netvars": [
+    "_cannotbepickedup",
+    "_iswet",
+    "_isacidsizzling",
+    "_grabbableoverridetag"
+  ],
+  "tunables": [
+    "MAX_WETNESS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      20700,
+      15295,
+      18572,
+      13779,
+      34523,
+      72238,
+      23187
+    ],
+    "aspects": [
+      {
+        "aspect": "温度数值范围与过冷过热机制",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "个体温度，即角色、暖石和热铃自身具有的温度，初始为 35 度，上限为 90 度，下限为 -20 度。"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度触发条件与台词",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "潮湿度达到 20%"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "物品",
+    "库存",
+    "拾取",
+    "部署",
+    "装备",
+    "湿度",
+    "温度",
+    "图像",
+    "武器",
+    "移动速度"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "战斗",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9e64c3090ce1e3ff2de254aef53f21738f0988dd95a7514ec17c3d37caa975b2",
+    "source_bytes": 19254,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108871972
+  }
+}

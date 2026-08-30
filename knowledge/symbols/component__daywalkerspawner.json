@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/daywalkerspawner.lua"
+  },
+  "category": "component",
+  "display_name": "daywalkerspawner",
+  "summary": "该组件管理日行者(Day Walker)的生成系统，负责注册生成点、倒计时天数和监控日行者状态。它会在世界天数变化时尝试生成日行者竞技场，并在日行者被击败后更新力量等级。组件参与核心玩法中的 boss 战和世界事件管理。",
+  "api": [
+    {
+      "name": "UnregisterDayWalkerSpawningPoint",
+      "effect": "从组件的生成点列表中移除指定的生成点实体。"
+    },
+    {
+      "name": "RegisterDayWalkerSpawningPoint",
+      "effect": "将指定的生成点实体添加到生成点列表，并监听其's onremove'事件以自动注销。注释表明此方法不应直接调用，但为模组提供访问。"
+    },
+    {
+      "name": "TryToRegisterSpawningPoint",
+      "effect": "尝试注册指定的生成点实体：如果已存在则返回 false，否则调用注册并返回 true。"
+    },
+    {
+      "name": "IncrementPowerLevel",
+      "effect": "增加组件的力量等级，最大值为 2。"
+    },
+    {
+      "name": "GetPowerLevel",
+      "effect": "返回组件当前的力量等级。"
+    },
+    {
+      "name": "IsValidSpawningPoint",
+      "effect": "检查指定坐标在 3x3 格子内是否全部为地上地形，用于验证生成点有效性。"
+    },
+    {
+      "name": "SpawnDayWalkerArena",
+      "effect": "在指定坐标生成日行者实体和竞技场柱子，并清除半径内可摧毁物。注释表明此方法不应直接调用，但为模组提供访问。"
+    },
+    {
+      "name": "FindBestSpawningPoint",
+      "effect": "从已注册生成点中寻找最佳生成点，优先选择无玩家、结构少且地形有效的位置。"
+    },
+    {
+      "name": "TryToSpawnDayWalkerArena",
+      "effect": "尝试生成日行者竞技场：随机化生成点列表后寻找最佳生成点并调用生成。"
+    },
+    {
+      "name": "OnDayChange",
+      "effect": "处理世界天数变化事件：如果日行者不存在，则倒计时天数，到期时尝试生成日行者并监控其状态。"
+    },
+    {
+      "name": "WatchDaywalker",
+      "effect": "监控指定日行者实体的's onremove'事件：当日行者移除时，若被击败则增加力量等级并同步 boss 击败事件。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "在组件初始化后：如果启用了日行者生成，则监听世界天数事件并在初始天数倒计时到期时尝试生成。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括天数倒计时、力量等级和日行者实体的 GUID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据：恢复天数倒计时（不超过最大值）和力量等级。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后阶段：通过 GUID 恢复对日行者实体的监控。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_registerdaywalkerspawningground",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DAYWALKER_RESPAWN_DAYS_COUNT",
+    "SPAWN_DAYWALKER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      23187,
+      51046,
+      65605,
+      15327,
+      46847,
+      15601,
+      22707
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中涉及的实体和主题（如角色薇格弗德、冬季装饰品、战争瓦器人、世界翻新、鸟类、天体后裔、蚁狮、猎犬袭击）与DayWalker无关，没有讨论daywalkerspawner组件的能力，如生成点注册、力量级别、竞技场生成等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "日行者",
+    "生成点",
+    "刷新",
+    "boss",
+    "竞技场",
+    "战斗",
+    "等级",
+    "生存",
+    "天数"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e6e7412d401576086aa20bfde032fbc2b5be7bb3c817d7385bb2fc79684189f2",
+    "source_bytes": 9048,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106588290
+  }
+}

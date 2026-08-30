@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldsettingstimer.lua"
+  },
+  "category": "component",
+  "display_name": "worldsettingstimer",
+  "summary": "WorldSettingsTimer组件用于管理实体上的定时器数据，控制基于时间的事件触发。它允许添加、启动、暂停和恢复定时器，并在定时器结束时执行回调或推送事件，参与生存模式中的时间管理和世界事件机制。",
+  "api": [
+    {
+      "name": "AddTimer(name, maxtime, enabled, callback, externallongupdate)",
+      "effect": "添加一个定时器。如果名称或最大时间无效，则打印错误并返回；如果定时器已存在，则不操作。存储定时器配置，包括最大时间、启用状态、回调函数和外部长时间更新标志。如果之前有保存的时间（来自OnLoad），则自动启动定时器。"
+    },
+    {
+      "name": "TimerEnabled(name)",
+      "effect": "返回指定定时器是否启用。如果定时器不存在，返回false；否则返回其启用状态。"
+    },
+    {
+      "name": "GetMaxTime(name)",
+      "effect": "返回指定定时器的最大时间（maxtime）。如果定时器不存在，返回nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "在实体被移除时调用，取消所有活跃的定时器任务，防止泄漏。"
+    },
+    {
+      "name": "TimerExists(name)",
+      "effect": "检查指定名称的定时器是否已添加到组件中。返回布尔值。"
+    },
+    {
+      "name": "ActiveTimerExists(name)",
+      "effect": "检查指定定时器是否活跃（即已添加且时间剩余不为nil）。返回布尔值。"
+    },
+    {
+      "name": "StartTimer(name, time, paused, initialtime_override, blocklongupdate)",
+      "effect": "启动指定定时器。必须先通过AddTimer添加。设置时间剩余、结束时间、初始时间、暂停状态和阻塞长时间更新标志。如果未暂停，则安排一个任务在时间结束时触发完成事件。"
+    },
+    {
+      "name": "StopTimer(name)",
+      "effect": "停止指定定时器。清除其时间剩余、结束时间、初始时间和暂停状态，并取消关联的任务。"
+    },
+    {
+      "name": "IsPaused(name)",
+      "effect": "检查指定定时器是否暂停。如果定时器不存在、未启用或手动暂停，则返回true；否则返回false。"
+    },
+    {
+      "name": "PauseTimer(name, blocklongupdate)",
+      "effect": "暂停指定定时器。获取当前剩余时间，设置暂停标志和阻塞长时间更新标志，并取消任务。"
+    },
+    {
+      "name": "ResumeTimer(name)",
+      "effect": "恢复指定定时器。如果定时器未暂停，则不操作；否则取消暂停，如果定时器启用，则重新安排任务并更新结束时间。成功恢复返回true。"
+    },
+    {
+      "name": "GetTimeLeft(name)",
+      "effect": "获取指定定时器的剩余时间。如果未暂停，则实时计算剩余时间（结束时间减当前时间）；如果暂停，返回存储的时间剩余值。"
+    },
+    {
+      "name": "SetTimeLeft(name, time)",
+      "effect": "设置指定定时器的剩余时间。如果定时器未激活或未启用，则不操作。如果暂停，直接设置时间剩余（最小值为0）；否则先暂停定时器，设置时间剩余，再恢复。"
+    },
+    {
+      "name": "SetMaxTime(name, time)",
+      "effect": "设置指定定时器的最大时间。如果定时器未激活或未启用，则不操作。按比例调整时间剩余：新时间剩余 = (新最大时间 / 旧最大时间) * 旧时间剩余，最小值为0。"
+    },
+    {
+      "name": "GetTimeElapsed(name)",
+      "effect": "获取指定定时器的已过时间。计算初始时间减去剩余时间。如果定时器未激活，返回nil。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存所有活跃定时器的状态。返回一个表，包含定时器名称为键的对象，每个对象有时间剩余比例（时间剩余/最大时间）、暂停状态、阻塞长时间更新标志和初始时间。如果无活跃定时器，返回nil。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "加载定时器状态。从输入数据中恢复定时器：如果定时器已添加，则停止当前定时器并启动新定时器，使用保存的时间剩余、暂停状态等；如果定时器未添加，则保存数据到saved_timers，等待后续添加时使用。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "处理长时间更新。遍历所有定时器，为未外部更新、未暂停、未阻塞长时间更新的定时器减少时间剩余（timeleft - dt）。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "生成调试字符串，显示所有定时器的名称、最大时间、启用状态，以及活跃定时器的剩余时间和暂停状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "timerdone"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      15186,
+      13261,
+      18234,
+      21620,
+      19118,
+      19119,
+      10374
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本描述了游戏机制中的时间相关效果（如持续时间、恢复间隔），但未涉及component__worldsettingstimer的具体API能力表达，如定时器创建、启动、停止、状态查询等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "定时器",
+    "时间管理",
+    "世界设置",
+    "暂停",
+    "恢复",
+    "持续时间",
+    "回调",
+    "事件触发",
+    "保存加载",
+    "长时间更新"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "世界管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+    "source_bytes": 7062,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093859115
+  }
+}

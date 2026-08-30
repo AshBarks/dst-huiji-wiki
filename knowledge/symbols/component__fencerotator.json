@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fencerotator.lua"
+  },
+  "category": "component",
+  "display_name": "fencerotator",
+  "summary": "FenceRotator组件提供旋转围栏类实体的能力。它通过Rotate方法改变目标实体的旋转角度，并触发事件和生成特效。该组件参与游戏中围栏方向的调整玩法，用于布局和装饰。",
+  "api": [
+    {
+      "name": "Rotate",
+      "effect": "如果target为nil则直接返回；否则，获取target的当前旋转角度，使用target.SetOrientation（若存在）或target.Transform:SetRotation将角度设置为当前角度加上delta（默认使用TUNING.FENCE_DEFAULT_ROTATION）；然后推送事件\"fencerotated\"并生成特效实体\"fence_rotator_fx\"在目标位置。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "fencerotated"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FENCE_DEFAULT_ROTATION"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70765
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅提供物品'冲锋骑枪（Joust-a-Dash）'的基本介绍，未提及旋转（Rotate）能力或相关行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "旋转围栏",
+    "围栏旋转器",
+    "调整围栏方向",
+    "围栏布局",
+    "装饰围栏",
+    "围栏旋转功能",
+    "方向调整工具",
+    "围栏实体旋转"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e39cfb9a2f2c79af952009952c945a3f2326bfb4e212f55dd4f8652a984b9fc5",
+    "source_bytes": 633,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096743518
+  }
+}

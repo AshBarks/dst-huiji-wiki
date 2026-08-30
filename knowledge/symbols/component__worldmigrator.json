@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldmigrator.lua"
+  },
+  "category": "component",
+  "display_name": "worldmigrator",
+  "summary": "组件管理世界迁移门户的数据，包括门户ID、链接目标世界、接收门户ID以及门户状态（活跃、不活跃、已满）。它参与跨世界迁移的核心玩法，允许玩家和物品在不同分片间传送，是联机版中实现分片互通的关键机制。",
+  "api": [
+    {
+      "name": "SetHideActions",
+      "effect": "设置是否隐藏门户动作。若隐藏且状态为活跃，则移除'migrator'标签，否则根据状态添加或移除该标签，影响门户交互可见性。"
+    },
+    {
+      "name": "SetDestinationWorld",
+      "effect": "设置门户的目标世界和是否永久链接。更新链接世界并调用ValidateAndPushEvents验证状态，可能触发迁移可用事件。"
+    },
+    {
+      "name": "SetDisabledWithReason",
+      "effect": "基于原因禁用门户。添加禁用修改器，使门户处于不可用状态，并调用ValidateAndPushEvents更新状态。"
+    },
+    {
+      "name": "ClearDisabledWithReason",
+      "effect": "清除指定原因的禁用状态。移除禁用修改器，可能使门户恢复可用，并调用ValidateAndPushEvents更新状态。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "设置门户的启用状态。用于控制门户视觉表现，并调用ValidateAndPushEvents更新状态和推送事件。"
+    },
+    {
+      "name": "SetReceivedPortal",
+      "effect": "设置接收门户的世界和ID。确认链接世界一致性后更新数据，并调用ValidateAndPushEvents验证状态。"
+    },
+    {
+      "name": "GetStatusString",
+      "effect": "返回当前状态的字符串表示（如'active'、'inactive'、'full'），用于调试或日志。"
+    },
+    {
+      "name": "ValidateAndPushEvents",
+      "effect": "验证门户状态（基于启用、禁用和链接世界可用性），并推送对应事件（如migration_available、migration_unavailable、migration_full）。"
+    },
+    {
+      "name": "IsBound",
+      "effect": "检查门户是否绑定（即ID、链接世界和接收门户均已设置），返回布尔值。"
+    },
+    {
+      "name": "SetID",
+      "effect": "设置门户ID，并同步接收门户ID为相同值。同时更新全局下一个ID计数器以确保唯一性。"
+    },
+    {
+      "name": "IsDestinationForPortal",
+      "effect": "检查门户是否为指定世界和门户ID的目标，返回布尔值。"
+    },
+    {
+      "name": "IsAvailableForLinking",
+      "effect": "检查门户是否可用于链接（即未链接状态），返回布尔值。"
+    },
+    {
+      "name": "IsLinked",
+      "effect": "检查门户是否已链接（即链接世界和接收门户均已设置），返回布尔值。"
+    },
+    {
+      "name": "IsActive",
+      "effect": "检查门户是否处于活跃状态（启用且状态为ACTIVE），返回布尔值。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查门户是否处于已满状态，返回布尔值。"
+    },
+    {
+      "name": "CanInventoryItemMigrate",
+      "effect": "检查物品是否可迁移，排除有'irreplaceable'标签或拥有宠物的物品，返回布尔值。"
+    },
+    {
+      "name": "TryToMakeItemMigrateable",
+      "effect": "尝试使物品可迁移，例如通过调用OnStopUsing解除宠物绑定，为迁移做准备。"
+    },
+    {
+      "name": "DropThingsThatShouldNotMigrate",
+      "effect": "丢弃执行者容器中所有不可迁移的物品，基于过滤函数调用物品的迁移尝试和丢弃逻辑。"
+    },
+    {
+      "name": "Activate",
+      "effect": "激活迁移门户。对于玩家，推送migration_activate事件并触发跨世界传送；对于物品，检查可迁移性后处理物品传输。返回成功状态和可能的错误原因（如NODESTINATION）。"
+    },
+    {
+      "name": "ActivatedByOther",
+      "effect": "标记门户被其他实体激活，推送migration_activate_other事件，用于响应式交互。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存门户数据（ID、链接世界、接收门户、自动链接标志）到表格，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载门户状态，恢复ID、链接世界、接收门户和自动标志，包括向后兼容处理。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回门户调试字符串，包含ID、链接世界、可用性、状态等信息，用于开发调试。"
+    }
+  ],
+  "events_published": [
+    "migration_unavailable",
+    "migration_available",
+    "migration_full",
+    "migration_activate",
+    "migration_activate_other",
+    "ms_registermigrationportal",
+    "ms_playerdespawnandmigrate"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19693,
+      20842,
+      18229,
+      34314,
+      45685,
+      16681,
+      18251,
+      19680
+    ],
+    "aspects": [
+      {
+        "aspect": "非自然传送门物品数量上限行为",
+        "evidence": [
+          {
+            "pageid": 18229,
+            "quote": "如果传送门附近有超过 10 个[[物品]]，它就只能喷发出空气。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "传送门",
+    "跨服",
+    "玩家传送",
+    "跨世界",
+    "跨世界传送",
+    "服务器分片",
+    "传送门状态",
+    "物品传送",
+    "传送门链接"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "迁移",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951",
+    "source_bytes": 8848,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093800373
+  }
+}

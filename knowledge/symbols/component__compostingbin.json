@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/compostingbin.lua"
+  },
+  "category": "component",
+  "display_name": "compostingbin",
+  "summary": "堆肥箱组件管理绿色材料（Greens）和棕色材料（Browns）的存储与混合比例。它通过内部计时器驱动堆肥循环，根据两种材料的混合比例动态调整堆肥所需时间，并在每次循环完成后消耗定量材料。组件负责处理玩家添加可堆肥物品、维护材料状态、以及触发与堆肥过程相关的回调事件。",
+  "api": [
+    {
+      "name": "GetMaterialTotal",
+      "effect": "返回当前箱内绿色材料和棕色材料的总数量。无副作用。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查堆肥箱是否已满（材料总数大于或等于 `max_materials`）。返回布尔值。无副作用。"
+    },
+    {
+      "name": "Refresh",
+      "effect": "刷新堆肥箱状态。若材料总数小于2，则通过 `onrefreshfn` 回调并停止堆肥计时器。否则，根据绿色材料占比（greens_ratio）与0.5的差值计算堆肥时间，并启动或更新“composting”计时器，同时调用 `onstartcompostingfn` 和 `onrefreshfn` 回调。`cycle_completed` 参数会传递给 `onrefreshfn`。"
+    },
+    {
+      "name": "AddCompostable",
+      "effect": "尝试向堆肥箱添加一个物品。首先调用 `calcmaterialvalue` 函数获取该物品对应的绿色与棕色材料值，若获取成功则移除该物品（包括其堆叠数量），并调用 `AddMaterials` 添加材料。过程中会触发 `onaddcompostable` 回调。成功返回 true，失败（如 `calcmaterialvalue` 未定义或返回空）则返回 false。"
+    },
+    {
+      "name": "AddMaterials",
+      "effect": "直接向堆肥箱添加指定数量的绿色材料和棕色材料（参数可选，默认为0），并立即调用 `Refresh` 方法以更新堆肥状态。无其他副作用。"
+    },
+    {
+      "name": "IsComposting",
+      "effect": "检查堆肥箱是否正在进行堆肥（即“composting”计时器是否存在）。返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。当处于堆肥中或材料总数大于0时，返回一个包含 `greens`、`browns` 和 `current_composting_time` 的表，否则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据表中加载组件状态，恢复 `greens`、`browns`、`greens_ratio` 和 `current_composting_time` 的值。"
+    }
+  ],
+  "api_note": "该组件提供了多个公开方法，用于查询状态、添加材料、控制堆肥流程以及处理存档。",
+  "events_published": [],
+  "events_listened": [
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [
+    "max_materials",
+    "composting_time_min",
+    "composting_time_max",
+    "materials_per_fertilizer"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14486,
+      19129,
+      14579,
+      13261,
+      21485,
+      15303,
+      16197,
+      14580
+    ],
+    "aspects": [
+      {
+        "aspect": "具体产出时间数值",
+        "evidence": [
+          {
+            "pageid": 14580,
+            "quote": "210 秒左右就会产出一个"
+          }
+        ]
+      },
+      {
+        "aspect": "堆肥产出比例说明",
+        "evidence": [
+          {
+            "pageid": 14580,
+            "quote": "每 2 件物品能够让堆肥桶产出 1 个堆肥"
+          }
+        ]
+      },
+      {
+        "aspect": "容量上限描述",
+        "evidence": [
+          {
+            "pageid": 14580,
+            "quote": "堆肥桶能够容纳 6 件物品"
+          }
+        ]
+      },
+      {
+        "aspect": "状态影响产出时间",
+        "evidence": [
+          {
+            "pageid": 14580,
+            "quote": "产出堆肥的时间取决于堆肥桶当前的状态"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "堆肥",
+    "肥料",
+    "种植",
+    "农业",
+    "腐烂",
+    "材料",
+    "混合",
+    "绿色材料",
+    "棕色材料",
+    "时间"
+  ],
+  "gameplay_tags": [
+    "资源管理",
+    "种植农业",
+    "生存",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "87ce2833d2d7eeccbee4ab1f4f1bc957990cebfd86264e225f06402075323854",
+    "source_bytes": 5779,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099134929
+  }
+}

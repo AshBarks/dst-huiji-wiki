@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gelblobspawner.lua"
+  },
+  "category": "component",
+  "display_name": "gelblobspawner",
+  "summary": "该组件是一个世界组件，负责管理凝胶怪（Gelblob）的生成。它根据裂隙（Shadow Portal）的活跃状态启停生成逻辑，通过注册的生成点向玩家附近生成凝胶怪，并维护凝胶怪的生命周期、数量上限和生成点的冷却。",
+  "api": [],
+  "api_note": "纯数据组件，无对外暴露的公开方法。组件的功能通过监听世界事件（如\"ms_registergelblobspawningground\"）和内部定时更新实现。",
+  "events_published": [],
+  "events_listened": [
+    "ms_registergelblobspawningground",
+    "ms_riftaddedtopool",
+    "ms_riftremovedfrompool"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MIN_GELBLOBS_PER_SPAWNER",
+    "MAX_GELBLOBS_PER_SPAWNER",
+    "MAX_GELBLOBS_TOTAL_IN_WORLD",
+    "MIN_GELBLOB_DIST_FROM_EACHOTHER_SQ",
+    "MAX_GELBLOB_DIST_FROM_SPAWNER",
+    "MIN_GELBLOB_SPAWN_DELAY",
+    "VARIANCE_GELBLOB_SPAWN_DELAY",
+    "COOLDOWN_GELBLOB_SPAWNER_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      23957,
+      23956,
+      15244,
+      16419,
+      13701,
+      15922,
+      19693
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未涉及`component__gelblobspawner`或其相关能力的任何玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "凝胶怪",
+    "裂隙",
+    "生成器",
+    "影怪",
+    "刷怪",
+    "冷却",
+    "上限",
+    "阴影",
+    "传送门"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "da181958a8a0977e1b3c282f37e0abebb9fdf2b4b2b265b310431fd1a3cb584f",
+    "source_bytes": 11721,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107974507
+  }
+}

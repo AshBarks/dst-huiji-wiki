@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boattrail.lua"
+  },
+  "category": "component",
+  "display_name": "boattrail",
+  "summary": "该组件管理船只移动时的水效果生成，通过追踪船只移动距离来决定何时生成动画效果，增强游戏的视觉表现。组件监听实体的睡眠和醒来事件来控制更新状态，参与航海玩法的视觉反馈。",
+  "api": [
+    {
+      "name": "SpawnEffectPrefab",
+      "effect": "在指定位置生成船只水效果预制体，设置其位置、缩放，并播放动画。如果预制体有 boattrailmover 组件，则设置其移动方向。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "根据时间增量更新船只位置，累计移动距离，当距离超过生成速率时生成水效果。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "entitysleep",
+    "entitywake"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要描述实体的战斗行为和状态，如沉睡、攻击触发距离等，但未提及SpawnEffectPrefab或OnUpdate这些代码组件能力的具体玩家语言表达。页面内容聚焦于游戏内行为描述，而非底层组件实现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船只",
+    "水效果",
+    "尾迹",
+    "动画",
+    "移动效果",
+    "boattrail",
+    "水面",
+    "生成效果",
+    "视觉增强",
+    "航海"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f1963d3fdae30297eb5c40786b350c337cac626642ba0c7b2c564163cf7b6570",
+    "source_bytes": 2151,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092664308
+  }
+}

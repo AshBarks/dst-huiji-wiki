@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/avengingghost.lua"
+  },
+  "category": "component",
+  "display_name": "avengingghost",
+  "summary": "该组件管理复仇幽灵的计时器、伤害属性和视觉效果。核心玩法涉及在玩家变成幽灵时，若附近有激活相关技能的玩家，则自动开始复仇攻击状态，对敌人造成伤害并随时间减少。组件根据昼夜变化动态调整伤害值，并与光环、动画系统联动。",
+  "api": [
+    {
+      "name": "GetSymbol",
+      "effect": "返回幽灵的符号标识符，用于网络同步。"
+    },
+    {
+      "name": "GetTime",
+      "effect": "返回当前剩余的复仇时间值。"
+    },
+    {
+      "name": "GetMaxTime",
+      "effect": "返回复仇状态的最大持续时间。"
+    },
+    {
+      "name": "ShouldAvenge",
+      "effect": "检查附近玩家是否激活了“wendy_avenging_ghost”技能，若存在则返回 true，用于决定是否启动复仇。"
+    },
+    {
+      "name": "StartAvenging",
+      "effect": "启动复仇状态：设置复仇计时器，保存原伤害值，根据昼夜世界状态调整伤害，生成攻击特效并播放动画，启用光环组件，改变实体颜色为红色，并开始更新组件。"
+    },
+    {
+      "name": "StopAvenging",
+      "effect": "停止复仇状态：重置复仇时间为 0，恢复原伤害值，移除攻击特效，停止声音和颜色变化，禁用光环，并停止更新组件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新复仇时间，若存在攻击计时器则时间流速减半；当时间减至 0 时自动停止复仇。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存复仇时间数据到表中，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载复仇时间，延迟到下一次任务执行时恢复复仇状态。"
+    }
+  ],
+  "events_published": [
+    "clientavengetimedirty"
+  ],
+  "events_listened": [
+    "avengetimedirty",
+    "ms_becameghost",
+    "ms_respawnedfromghost",
+    "onareaattackother"
+  ],
+  "netvars": [
+    "avengingghost._avengetime",
+    "avengingghost._maxtime",
+    "avengingghost._symbol"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      13556,
+      10374,
+      15539,
+      15922,
+      13156,
+      15022,
+      13437
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害值随昼夜循环变化",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "所造成的伤害取决于世界和时间"
+          }
+        ]
+      },
+      {
+        "aspect": "升级机制基于时间单位",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔每过 1 天升级一次，最初为一级，最多升到三级"
+          }
+        ]
+      },
+      {
+        "aspect": "状态相关的移动距离描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "平静状态下，阿比盖尔会试图保持在温蒂附近 1 ~ 5 距离单位的位置"
+          }
+        ]
+      },
+      {
+        "aspect": "自动攻击温蒂的敌人",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "无论哪种状态，她都会攻击温蒂的敌人。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "温蒂",
+    "幽灵",
+    "复仇",
+    "伤害",
+    "计时器",
+    "光环",
+    "昼夜",
+    "技能",
+    "自动攻击"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eb7bde9f41e8751fa1a78836273c2a0eb48b74d709b8c94ba934560c8afe3908",
+    "source_bytes": 5322,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090565837
+  }
+}

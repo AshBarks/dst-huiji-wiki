@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/builder_replica.lua"
+  },
+  "category": "component",
+  "display_name": "builder_replica",
+  "summary": "该组件管理玩家的科技树、科技加成、配方学习、制作检查、材料计算与制作执行等核心建造玩法。它作为replica组件，在客户端与服务器间同步建造相关数据，支持玩家与制作站交互、蓝图学习、资源收集及物品制作。",
+  "api": [
+    {
+      "name": "GetTechBonuses",
+      "effect": "获取玩家当前所有科技的永久与临时加成总和，返回一个以科技类型为键、加成值为值的表。在服务器上优先使用主服务器组件数据，否则从客户端classified的网络变量中读取。"
+    },
+    {
+      "name": "SetTechBonus",
+      "effect": "设置玩家对指定科技的永久加成值。通过更新classified对象的对应网络变量来同步数据。"
+    },
+    {
+      "name": "SetTempTechBonus",
+      "effect": "设置玩家对指定科技的临时加成值（例如来自制作站的加成）。通过更新classified对象的对应网络变量来同步数据。"
+    },
+    {
+      "name": "SetIngredientMod",
+      "effect": "设置玩家的材料消耗修正系数（例如1.0为默认，0.5为减半）。通过更新classified对象的网络变量来同步数据。"
+    },
+    {
+      "name": "IngredientMod",
+      "effect": "获取玩家当前的材料消耗修正系数。返回一个数值（例如1.0）。在服务器上优先使用主服务器组件数据，否则从classified的网络变量中读取。"
+    },
+    {
+      "name": "SetIsFreeBuildMode",
+      "effect": "设置玩家是否处于自由建造模式（无消耗制作）。通过更新classified对象的网络变量来同步数据。"
+    },
+    {
+      "name": "IsFreeBuildMode",
+      "effect": "查询玩家是否处于自由建造模式。返回一个布尔值。"
+    },
+    {
+      "name": "SetCurrentPrototyper",
+      "effect": "设置玩家当前交互的制作站原型机（如科学机器、炼金引擎等）。通过更新classified对象的网络变量来同步数据。"
+    },
+    {
+      "name": "GetCurrentPrototyper",
+      "effect": "获取玩家当前交互的制作站原型机。返回对应的原型机引用。在服务器上优先使用主服务器组件数据，否则从classified的网络变量中读取。"
+    },
+    {
+      "name": "OpenCraftingMenu",
+      "effect": "触发打开制作菜单的事件。通过向classified对象的opencraftingmenuevent推送事件来实现。"
+    },
+    {
+      "name": "SetTechTrees",
+      "effect": "批量设置玩家的科技树等级。接受一个以科技类型为键、等级为值的表，并通过classified对象的对应网络变量同步。"
+    },
+    {
+      "name": "GetTechTrees",
+      "effect": "获取玩家完整的科技树等级（包含临时加成）。返回一个以科技类型为键、等级为值的表。在服务器上优先使用主服务器组件数据，否则从classified对象中读取。"
+    },
+    {
+      "name": "GetTechTreesNoTemp",
+      "effect": "获取玩家科技树等级（不包含临时加成）。返回一个以科技类型为键、等级为值的表。在服务器上优先使用主服务器组件数据，否则从classified对象中读取。"
+    },
+    {
+      "name": "AddRecipe",
+      "effect": "将指定配方标记为玩家已学习（已解锁）。通过将classified对象中对应配方的网络变量设为true来实现。"
+    },
+    {
+      "name": "RemoveRecipe",
+      "effect": "将指定配方标记为玩家未学习。通过将classified对象中对应配方的网络变量设为false来实现。"
+    },
+    {
+      "name": "SetRecipeCraftingLimit",
+      "effect": "设置指定配方在当前制作站的剩余制作次数限制。如果配方无限制或未找到，则将限制设为0。通过更新classified对象的制作限制网络变量来实现。"
+    },
+    {
+      "name": "GetAllRecipeCraftingLimits",
+      "effect": "获取当前制作站所有有制作次数限制的配方及其剩余次数。返回一个以配方名称为键、剩余次数为值的表。同时会查询外部处理的限制配方。"
+    },
+    {
+      "name": "BufferBuild",
+      "effect": "将指定配方加入预制作缓冲队列，用于批量制作。在服务器上会调用主服务器组件的方法，否则调用classified对象的方法。"
+    },
+    {
+      "name": "SetIsBuildBuffered",
+      "effect": "设置指定配方的预制作缓冲状态（是否已缓冲）。通过更新classified对象中对应配方的缓冲状态网络变量来实现。"
+    },
+    {
+      "name": "IsBuildBuffered",
+      "effect": "查询指定配方是否处于预制作缓冲状态。返回一个布尔值。在服务器上优先使用主服务器组件数据，否则从classified对象中读取（包括预览数据）。"
+    },
+    {
+      "name": "HasCharacterIngredient",
+      "effect": "检查玩家是否拥有指定类型的角色需求材料（如生命、最大生命、理智、最大理智）。返回是否足够以及当前数值。考虑了角色的特殊标签（如health_as_oldage）和惩罚值。"
+    },
+    {
+      "name": "HasTechIngredient",
+      "effect": "检查玩家是否拥有指定类型的科技需求材料（如科学、魔法材料）。返回是否足够以及当前等级。"
+    },
+    {
+      "name": "KnowsRecipe",
+      "effect": "全面检查玩家是否知道指定配方。考虑自由建造模式、皮肤解锁、角色标签、技能树、已学习状态、科技树等级以及临时加成等因素。可选择忽略临时加成并缓存科技树检查结果。"
+    },
+    {
+      "name": "HasIngredients",
+      "effect": "检查玩家是否拥有制作指定配方所需的所有材料（包括普通材料、角色需求材料和科技需求材料）。考虑制作次数限制。自由建造模式下始终返回true。"
+    },
+    {
+      "name": "CanBuild",
+      "effect": "已弃用。功能等同于HasIngredients，接受配方名称字符串。"
+    },
+    {
+      "name": "CanLearn",
+      "effect": "检查玩家是否符合学习指定配方的条件（例如角色标签和技能要求）。"
+    },
+    {
+      "name": "CanBuildAtPoint",
+      "effect": "检查在指定世界坐标点是否可以放置由给定配方制作出的建筑。返回布尔值。"
+    },
+    {
+      "name": "MakeRecipeFromMenu",
+      "effect": "从制作菜单执行制作指定配方（可选皮肤）。在服务器上会调用主服务器组件的方法，否则通过玩家控制器发起远程制作请求。"
+    },
+    {
+      "name": "MakeRecipeAtPoint",
+      "effect": "在指定世界坐标点执行制作指定配方（可选皮肤）。在服务器上会调用主服务器组件的方法，否则通过玩家控制器发起远程制作请求。"
+    },
+    {
+      "name": "IsBusy",
+      "effect": "检查玩家或其背包（包括溢出容器）是否处于忙碌状态（例如正在制作或使用）。返回布尔值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "techtrees",
+    "techtrees_no_temp",
+    "recipes",
+    "bufferedbuilds",
+    "isfreebuildmode",
+    "current_prototyper",
+    "ingredientmod",
+    "craftinglimit_recipe",
+    "craftinglimit_amount",
+    "opencraftingmenuevent"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      18830,
+      45249,
+      20418,
+      15539,
+      16660,
+      45250,
+      13493
+    ],
+    "aspects": [
+      {
+        "aspect": "制作站作为原型工具的功能",
+        "evidence": [
+          {
+            "pageid": 20418,
+            "quote": "锯马同时是[[原型工具]]和[[制作站]]，允许玩家制作[[制作#木工|木工]]分类的配方"
+          }
+        ]
+      },
+      {
+        "aspect": "制作菜单的打开方式",
+        "evidence": [
+          {
+            "pageid": 13642,
+            "quote": "点击屏幕左上方的制作栏可以打开制作菜单"
+          }
+        ]
+      },
+      {
+        "aspect": "蓝图解锁配方的机制",
+        "evidence": [
+          {
+            "pageid": 18830,
+            "quote": "蓝图会记载一个[[制作]]配方，学习蓝图可以解锁该配方"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "制作",
+    "蓝图",
+    "科技",
+    "工作台",
+    "材料",
+    "制作站",
+    "背包制作",
+    "预制作",
+    "科技树"
+  ],
+  "gameplay_tags": [
+    "科技解锁",
+    "制作",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ae403691839029fec2eeb91d6d6b8c550948129bab78324dbcc08be7e38c4135",
+    "source_bytes": 16194,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105839578
+  }
+}

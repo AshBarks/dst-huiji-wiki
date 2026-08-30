@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wagpunk_floor_helper.lua"
+  },
+  "category": "component",
+  "display_name": "wagpunk_floor_helper",
+  "summary": "组件管理竞技场的状态、屏障激活和原点坐标，用于判断游戏世界中的点是否在竞技场区域内。它通过网络变量同步状态，并允许设置标记实体来定义竞技场中心。核心玩法涉及动态竞技场区域的创建和检测，常用于战斗或特殊事件。",
+  "api": [
+    {
+      "name": "IsXZWithThicknessInArena_Calculation",
+      "effect": "计算给定坐标 (x, z) 是否在竞技场内，考虑厚度参数。通过检查三个矩形区域来判断，返回布尔值。"
+    },
+    {
+      "name": "IsPointInArena",
+      "effect": "检查给定坐标 (x, y, z) 是否在激活的竞技场内。如果竞技场未激活，返回 false。"
+    },
+    {
+      "name": "IsXZWithThicknessInArena",
+      "effect": "检查给定坐标 (x, z) 是否在竞技场边界内，考虑厚度参数。返回点是否在边界带内（即内部为真，外部为假）。"
+    },
+    {
+      "name": "GetArenaOrigin",
+      "effect": "返回竞技场原点的坐标 (x, z)。如果竞技场未激活，返回 nil, nil。"
+    },
+    {
+      "name": "IsBarrierUp",
+      "effect": "返回屏障是否激活的状态（布尔值）。"
+    },
+    {
+      "name": "TryToSetMarker",
+      "effect": "尝试设置一个标记实体作为竞技场中心。如果已有标记，新实体将被移除。设置后，激活竞技场并设置原点坐标为标记位置，同时监听标记的移除事件。"
+    },
+    {
+      "name": "OnRemove_Marker",
+      "effect": "当标记实体被移除时的回调，重置竞技场状态为未激活，并将原点坐标设为 0。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "barrier_active",
+    "arena_active",
+    "arena_origin_x",
+    "arena_origin_z"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      46847,
+      34794,
+      65605,
+      34523,
+      51949,
+      18509,
+      22516,
+      51498
+    ],
+    "aspects": [
+      {
+        "aspect": "竞技场中心定位",
+        "evidence": [
+          {
+            "pageid": 46847,
+            "quote": "如果竞技场内没有任何存活的玩家，天体后裔会回到竞技场中央附近游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "竞技场内仇恨判定",
+        "evidence": [
+          {
+            "pageid": 46847,
+            "quote": "天体后裔只会主动仇恨瓦格斯塔夫的竞技场内的玩家；如果目标离开了竞技场就会立刻停止仇恨"
+          }
+        ]
+      },
+      {
+        "aspect": "竞技场屏障开启",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "拉下杠杆选择器后就会开启瓦格斯塔夫的竞技场的力场封锁"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "竞技场",
+    "屏障",
+    "辅助",
+    "地板",
+    "wagpunk",
+    "地图",
+    "标记",
+    "点检测",
+    "区域"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "事件",
+    "地图"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2973ceefadba3a1e8afd7f07008246facc5ca2383acd8addeb1a180ed4b5d912",
+    "source_bytes": 3725,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113740754
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/giftreceiver.lua"
+  },
+  "category": "component",
+  "display_name": "giftreceiver",
+  "summary": "giftreceiver组件管理玩家角色的礼物接收状态，核心数据为礼物数量(giftcount)和与之关联的礼物机器(giftmachine)。它负责监听与响应礼物数量的更新，并协调玩家与礼物机器之间的交互事件，如开始或停止打开礼物。该组件是实现游戏中礼物获取与开启玩法的核心数据与控制模块。",
+  "api": [
+    {
+      "name": "HasGift",
+      "effect": "检查玩家是否有待开启的礼物。返回值：若 giftcount 大于0则返回 true，否则返回 false。"
+    },
+    {
+      "name": "RefreshGiftCount",
+      "effect": "从服务器(TheInventory)获取并更新玩家当前的礼物数量。若数量发生变化，且存在关联的礼物机器，将根据新数量向该机器推送 ms_addgiftreceiver 或 ms_removegiftreceiver 事件。"
+    },
+    {
+      "name": "SetGiftMachine",
+      "effect": "设置或更改该玩家关联的礼物机器实例。若玩家有礼物，则向旧机器推送 ms_removegiftreceiver 事件，向新机器推送 ms_addgiftreceiver 事件。若新设的机器为nil，将调用 OnStopOpenGift 结束打开礼物流程。"
+    },
+    {
+      "name": "OpenNextGift",
+      "effect": "尝试让玩家打开下一个礼物。仅当玩家有礼物(giftcount > 0)且关联了礼物机器时，才向玩家自身推送 ms_opengift 事件。"
+    },
+    {
+      "name": "OnStartOpenGift",
+      "effect": "通知关联的礼物机器，玩家已开始打开礼物。向 giftmachine 推送 ms_giftopened 事件。"
+    },
+    {
+      "name": "OnStopOpenGift",
+      "effect": "标记玩家完成或放弃打开礼物。向玩家自身推送 ms_doneopengift 事件。参数 usewardrobe (可选) 为 true 时，事件数据中包含 wardrobe 字段指向当前 giftmachine。"
+    }
+  ],
+  "api_note": "所有方法均为 giftreceiver 组件定义的公共函数。",
+  "events_published": [
+    "ms_opengift",
+    "ms_doneopengift"
+  ],
+  "events_listened": [
+    "ms_updategiftitems",
+    "ms_closepopup"
+  ],
+  "netvars": [
+    "hasgift",
+    "hasgiftmachine"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      47083,
+      18359,
+      22094,
+      23188,
+      18939,
+      19832,
+      23187,
+      14696
+    ],
+    "aspects": [
+      {
+        "aspect": "刷新礼物计数",
+        "evidence": [
+          {
+            "pageid": 18939,
+            "quote": "会重置其礼物刷新"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "送礼",
+    "礼物",
+    "打开礼物",
+    "礼物数量",
+    "礼物接收",
+    "礼物获取",
+    "玩家礼物",
+    "礼物玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "游戏内物品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d23c4aaa6724072d04635ffb75af88d9822b134e2c436abb6574611e3f45d4f0",
+    "source_bytes": 3031,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091145453
+  }
+}

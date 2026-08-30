@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/socket_shadow_heart.lua"
+  },
+  "category": "component",
+  "display_name": "socket_shadow_heart",
+  "summary": "该组件管理一个名为'spawner'的生成器实体数据。当被附加到非玩家实体的'wx78_backupbody'预制体时，它会自动生成并附加一个'wx78_heartveinspawner'生成器。组件负责在移除时清理该生成器，参与了W.X.78机器人的备份身体和心脏脉络的生成机制。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。仅包含内部生命周期方法OnRemoveFromEntity，用于清理生成器，但不对其他系统暴露。",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      16419,
+      71461,
+      20719,
+      72323,
+      72314,
+      72392,
+      16615
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及组件 socket_shadow_heart 的任何能力或行为描述，所有页面内容围绕 WX-78 角色及其相关物品（如电路板、备份底盘等），与 socket_shadow_heart 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "心脏",
+    "生成器",
+    "清理",
+    "WX78",
+    "机器人",
+    "备份",
+    "脉络",
+    "组件"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "机器人",
+    "生命",
+    "暗影"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "90291003ce691964833799783c35ef7c3670f0c08ab908739f70fdc23c760ac4",
+    "source_bytes": 597,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112727762
+  }
+}

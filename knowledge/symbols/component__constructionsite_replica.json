@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/constructionsite_replica.lua"
+  },
+  "category": "component",
+  "display_name": "constructionsite_replica",
+  "summary": "该组件是建筑工地的副本组件，用于管理建筑工地的启用状态、构建者信息和槽位数量。它参与建筑玩法，允许玩家在服务器和客户端之间同步建筑状态，支持建造过程中的数据交互。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，如果存在classified实体且在服务器端，则移除classified实体并清空引用。"
+    },
+    {
+      "name": "AttachClassified",
+      "effect": "附加给定的classified实体，并设置监听器在实体移除时自动分离。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "分离当前classified实体，清空引用和关联监听器。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "设置建筑工地的启用状态为给定值，并通过网络变量同步到客户端。"
+    },
+    {
+      "name": "SetBuilder",
+      "effect": "设置指定玩家为构建者，更新classified实体的网络同步目标；如果构建者为nil，表示在建造过程中。"
+    },
+    {
+      "name": "SetSlotCount",
+      "effect": "设置指定槽位的数量，通过classified实体同步状态。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回当前建筑工地的启用状态（网络变量值）。"
+    },
+    {
+      "name": "IsBuilder",
+      "effect": "检查给定玩家是否为构建者；如果存在constructionsite组件，则委托查询，否则判断是否为本地玩家。"
+    },
+    {
+      "name": "GetSlotCount",
+      "effect": "获取指定槽位的数量；如果存在constructionsite组件，则委托查询，否则从classified实体获取。"
+    },
+    {
+      "name": "GetIngredients",
+      "effect": "返回当前建筑预制件的材料需求表（从CONSTRUCTION_PLANS全局表中查找）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "_enabled"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15186,
+      22094,
+      35360
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及灵体草药增益、冬季树装饰和幽魂花冠使用，内容聚焦于游戏物品效果与交互，未提及建筑工地复制组件的任何代码能力或行为语义，如实体移除、启用状态、构建器设置、槽位计数或成分获取等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "建筑工地",
+    "建筑副本",
+    "启用状态",
+    "构建者",
+    "槽位",
+    "建筑玩法",
+    "同步状态",
+    "数据同步"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "建造",
+    "结构",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa6cee2b04e6c7dd434e33aecb445163d84b1ccec4ac0093a4dcb127effd6f87",
+    "source_bytes": 3360,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106348420
+  }
+}

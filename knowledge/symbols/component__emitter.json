@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/emitter.lua"
+  },
+  "category": "component",
+  "display_name": "emitter",
+  "summary": "Emitter 组件管理粒子发射的配置参数，包括发射区域生成函数、最大寿命、地面高度和密度因子。它通过 Emit 方法触发粒子发射，使用实体的 VFXEffect 或 ParticleEmitter 系统创建视觉效果。该组件主要参与游戏中的装饰性特效生成，如烟雾或火焰，增强视觉氛围。",
+  "api": [
+    {
+      "name": "Emit",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      16419,
+      18234,
+      15922,
+      14792,
+      16197,
+      65881,
+      15186
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍魔法效果产生",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "产生独特的魔法效果"
+          }
+        ]
+      },
+      {
+        "aspect": "弹弓弹药发射行为",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "发射的弹弓弹药有实体和碰撞"
+          }
+        ]
+      },
+      {
+        "aspect": "灵体草药增益提供",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "为她的阿比盖尔提供增益"
+          }
+        ]
+      },
+      {
+        "aspect": "熔炉技能发射攻击",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "快速发射 8 发直线飞行的吹箭"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板增益激活",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "激活来产生对应的增益"
+          }
+        ]
+      },
+      {
+        "aspect": "雪球发射器灭火冰冻",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "发射雪球扑灭"
+          },
+          {
+            "pageid": 65881,
+            "quote": "使用[[雪球发射器]]冰冻"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "粒子",
+    "发射器",
+    "效果",
+    "视觉",
+    "特效",
+    "emitter",
+    "particle",
+    "effect",
+    "系统"
+  ],
+  "gameplay_tags": [
+    "视觉效果",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "33cbba945f0643878ba52b73fe6965a7979ddb7a641e98177421eb52fa5a7799",
+    "source_bytes": 1941,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099683591
+  }
+}

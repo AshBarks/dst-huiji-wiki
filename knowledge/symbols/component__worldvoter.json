@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldvoter.lua"
+  },
+  "category": "component",
+  "display_name": "worldvoter",
+  "summary": "worldvoter 组件管理游戏内的投票系统，负责处理投票的启动、计时、计数和结果计算。它同步投票数据到客户端，并支持对发起者进行禁言。核心玩法是玩家通过集体决策来执行游戏命令，如踢出玩家或更改设置。",
+  "api": [
+    {
+      "name": "IsVoteActive",
+      "effect": "仅查询状态，无副作用。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "仅查询状态，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "worldvotertick",
+    "showvotedialog",
+    "hidevotedialog",
+    "votecountschanged",
+    "master_worldvoterupdate",
+    "master_worldvotersquelchedupdate",
+    "master_worldvoterenabled"
+  ],
+  "events_listened": [
+    "countdowndirty",
+    "playeractivated",
+    "ms_playerjoined",
+    "ms_startvote",
+    "ms_stopvote",
+    "ms_receivevote",
+    "votecountsdirty",
+    "secondary_worldvoterupdate",
+    "secondary_worldvotersquelchedupdate",
+    "secondary_worldvoterenabled"
+  ],
+  "netvars": [
+    "worldvoter._enabled",
+    "worldvoter._countdown",
+    "worldvoter._commandid",
+    "worldvoter._targetuserid",
+    "worldvoter._starteruserid",
+    "worldvoter._votecounts[1..64]"
+  ],
+  "tunables": [
+    "MAX_SLOTS",
+    "SYNC_PERIOD_SLOW",
+    "SYNC_PERIOD_FAST",
+    "END_VOTE_DELAY",
+    "CANNOT_VOTE",
+    "VOTE_PENDING",
+    "DEFAULT_VOTE_OPTIONS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "投票功能命令的描述",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "c_startvote(\"rollback\")：发起回档投票"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "投票",
+    "发起投票",
+    "玩家投票",
+    "集体投票",
+    "投票机制",
+    "踢出玩家",
+    "投票结果",
+    "投票统计"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "社交",
+    "管理",
+    "决策"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "600059065b3816c9388dcd24ce752cf12362fa7e769db3e8629963c32f9024b2",
+    "source_bytes": 20091,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114463307
+  }
+}

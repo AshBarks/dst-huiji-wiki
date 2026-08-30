@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/crewmember.lua"
+  },
+  "category": "component",
+  "display_name": "crewmember",
+  "summary": "crewmember 组件管理一个实体与特定船只（boat）的从属关系。它负责维护船员身份标签，并在被请求时为船只提供划船力（Row），该力会根据船长（boatcrew/boatracecrew）的指令（如冲锋、撤退、停靠）进行方向调整。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除该组件时调用，会移除实体的 'crewmember' 标签。"
+    },
+    {
+      "name": "Shouldrow",
+      "effect": "判断船员当前是否应该划船。仅在船员位于自己所属的船上，且船长有明确航向（heading）或处于非停靠状态时，返回 true（可划船）。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置船员所属的船只。会移除对旧船只 'onremove' 事件的监听，并对新船只建立监听（当船只被移除时，将内部的 boat 变量置为 nil）。"
+    },
+    {
+      "name": "GetBoat",
+      "effect": "返回船员当前所属的船只实体。"
+    },
+    {
+      "name": "Leave",
+      "effect": "让船员主动离开当前所属的船。这会调用该船 boatcrew 组件的 RemoveMember 方法，将船员从船员组中移除。"
+    },
+    {
+      "name": "OnLeftCrew",
+      "effect": "当船员被从船员组移除后调用。如果定义了 leavecrewfn 回调，则执行该回调。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用或禁用此船员组件。若禁用（enabled=false）且当前有船，则先调用船只的 RemoveMember 方法使其离开船。"
+    },
+    {
+      "name": "Row",
+      "effect": "核心方法，为船只施加划船力。根据船长状态（assault/retreat/delivery）和船长目标（target）的距离，决定划船方向（朝着目标、远离目标、或减速停止）。对船只施加力后，会触发船的 'rowed' 事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示当前关联的船以及是否禁用。"
+    }
+  ],
+  "api_note": "该组件提供公开方法以管理船员与船只的从属关系，并控制划船行为。",
+  "events_published": [
+    "rowed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CREWMEMBER_TARGET_DSQ"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16185,
+      24451,
+      20293,
+      35670,
+      65881,
+      18522,
+      18540,
+      24074
+    ],
+    "aspects": [
+      {
+        "aspect": "船员划船远离行为",
+        "evidence": [
+          {
+            "pageid": 18522,
+            "quote": "当劫掠完毕或船员全数死亡后会划船快速远离玩家。"
+          }
+        ]
+      },
+      {
+        "aspect": "船员弃船逃生机制",
+        "evidence": [
+          {
+            "pageid": 18522,
+            "quote": "当船即将沉没时会弃船逃生并且不掉落任何物品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "船员",
+    "划船",
+    "跟随",
+    "船",
+    "航海",
+    "船队",
+    "划桨",
+    "航行"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0ec825fa9a207799f8c1a236347a85a8af2798e6e7fde257f206dd805f48b8f5",
+    "source_bytes": 5420,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099242839
+  }
+}

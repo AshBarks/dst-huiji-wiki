@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotc_racecompetitor.lua"
+  },
+  "category": "component",
+  "display_name": "yotc_racecompetitor",
+  "summary": "该组件是‘周年庆胡萝卜赛跑’（YOTC）活动的核心竞赛逻辑组件，管理参赛者（通常是胡萝卜）的赛跑状态、检查点导航、耐力系统以及最终的胜负判定。组件通过状态机控制比赛流程，管理从准备、开始、进行中到结束的全过程，并负责在比赛结束时与奖品系统交互。",
+  "api": [
+    {
+      "name": "StartRace(delay)",
+      "effect": "开始比赛。如果提供了delay参数，则设置一个延迟任务后再开始；否则立即开始。开始时会重置比赛距离、访问记录、精力值，并将状态设为‘racing’。会触发已设置的race_begun_fn回调。"
+    },
+    {
+      "name": "FinishRace()",
+      "effect": "结束比赛。停止更新组件，将状态设为‘postrace’，取消可能存在的开始任务。触发已设置的race_finished_fn回调并清空该回调。"
+    },
+    {
+      "name": "AbortRace(prize_table)",
+      "effect": "中止比赛。内部调用FinishRace，并进一步将状态转为‘raceover’，清空检查点。调用OnAllRacersFinished方法，并从世界的RacePrizeManager中注销自己。"
+    },
+    {
+      "name": "OnAllRacersFinished(prize_table)",
+      "effect": "在所有比赛者完成或中止后调用。设置比赛状态为‘raceover’，根据是否有奖品表（prize_table）为实体添加‘has_prize’或‘has_no_prize’标签。触发已设置的race_over_fn回调并清空该回调。"
+    },
+    {
+      "name": "SetRaceBegunFn(race_begun_fn)",
+      "effect": "设置比赛开始时的回调函数。"
+    },
+    {
+      "name": "SetRaceFinishedFn(race_finished_fn)",
+      "effect": "设置比赛完成（到达终点线）时的回调函数。"
+    },
+    {
+      "name": "SetRaceOverFn(race_over_fn)",
+      "effect": "设置比赛完全结束（所有选手完成或中止后）的回调函数。"
+    },
+    {
+      "name": "SetRaceStartPoint(start_point_entity)",
+      "effect": "设置比赛起点实体。将其设为第一个检查点，并标记为起始线。"
+    },
+    {
+      "name": "CollectPrize()",
+      "effect": "收集奖品。如果持有奖品（race_prize），则生成一个红包实体并将奖品包裹其中返回；如果标记为无奖品（has_no_prize），则移除标签并返回nil。"
+    },
+    {
+      "name": "GetRaceDistance()",
+      "effect": "返回本次比赛累计的行进距离。"
+    },
+    {
+      "name": "RecoverStamina()",
+      "effect": "恢复精力值至满值（stamina_max加上一个随机变量），并取消可能存在的恢复任务。"
+    },
+    {
+      "name": "IsExhausted()",
+      "effect": "返回参赛者是否处于精疲力竭状态（即recover_stamina_task是否存在）。"
+    },
+    {
+      "name": "SetLateStarter(start_delay)",
+      "effect": "设置延迟开始。参赛者将在start_delay秒后才算开始比赛，在此期间可能不会消耗精力或受到某些影响。"
+    },
+    {
+      "name": "IsStartingLate()",
+      "effect": "返回参赛者是否处于延迟开始的等待期中。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "carrat_error_direction",
+    "yotc_racer_at_checkpoint",
+    "yotc_racer_exhausted"
+  ],
+  "events_listened": [
+    "onremove",
+    "burntup",
+    "yotc_racebegun"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.YOTC_RACER_CHECKPOINT_FIND_DIST",
+    "TUNING.YOTC_RACER_CHECKPOINT_TIMEOUT",
+    "TUNING.YOTC_RACER_CHECKPOINT_TOO_FAR_AWAY",
+    "TUNING.YOTC_RACER_CHECKPOINT_REACHED_DIST",
+    "TUNING.YOTC_RACER_MAX_VISITS_PER_CHECKPOINT",
+    "TUNING.YOTC_RACER_FORGETFULNESS_MAX_CHECKPOINTS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      33950,
+      51524,
+      33991,
+      18521,
+      51489,
+      13156,
+      47009,
+      51951
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录中，没有找到与代码能力清单（如StartRace、FinishRace等）直接对应的玩家语言表达。页面内容侧重于比赛介绍、建筑描述、训练机制和游戏事件，未涉及参赛者组件的具体行为或能力细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "YOTC",
+    "检查点",
+    "耐力",
+    "终点",
+    "奖品",
+    "比赛",
+    "状态",
+    "耐力耗尽",
+    "活动",
+    "胜负"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "竞技",
+    "迷你游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b33dd9c45d2abdf76a028f5ac8970ee610e959c2d547433a46e6fb11c56d06b6",
+    "source_bytes": 11439,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098013817
+  }
+}

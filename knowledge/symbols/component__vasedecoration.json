@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vasedecoration.lua"
+  },
+  "category": "component",
+  "display_name": "vasedecoration",
+  "summary": "该组件 vasedecoration 在源码中定义为空类，未初始化任何属性或方法。它不管理任何游戏数据，也不参与饥荒联机版的核心玩法。从组件名推断，可能用于装饰相关功能，但当前源码未实现具体行为。",
+  "api": [],
+  "api_note": "源码中组件为空类，构造函数无内容，无公开方法定义。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      13493,
+      70704,
+      20438,
+      18530,
+      60906,
+      52634,
+      23201
+    ],
+    "aspects": [
+      {
+        "aspect": "发光效果描述",
+        "evidence": [
+          {
+            "pageid": 60906,
+            "quote": "当使用荧光果和两种发光浆果装饰时，该花盆或花瓶将会发出最大半径 6 {{解释|距离单位}}的光"
+          }
+        ]
+      },
+      {
+        "aspect": "装饰放置功能",
+        "evidence": [
+          {
+            "pageid": 60906,
+            "quote": "三种仿制远古遗物都可以放置在各种[[桌子]]上作为装饰。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "花瓶",
+    "装饰",
+    "家具",
+    "摆件",
+    "装饰品",
+    "vase",
+    "decoration",
+    "摆设"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "556092b91f4145e85f37ad0d344dc647e54707c320e282c06274fa1c802807c6",
+    "source_bytes": 80,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093733476
+  }
+}

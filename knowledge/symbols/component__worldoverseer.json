@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldoverseer.lua"
+  },
+  "category": "component",
+  "display_name": "worldoverseer",
+  "summary": "该组件负责收集和发送玩家行为的统计数据，包括在线时间、穿着皮肤和制作物品。它通过监听玩家加入、离开、死亡、换装和制作等事件来记录数据，并定期将统计信息发送到服务器进行分析。核心玩法涉及玩家数据的追踪和游戏会话的监控。",
+  "api": [
+    {
+      "name": "OnCyclesChanged",
+      "effect": "更新组件内部的周期变量，用于跟踪游戏世界年龄。"
+    },
+    {
+      "name": "OnClockTick",
+      "effect": "更新组件内部的当前时间变量，用于记录时间流逝。"
+    },
+    {
+      "name": "RecordPlayerJoined",
+      "effect": "记录玩家加入时间，初始化或更新玩家统计数据结构，包括穿着物品的初始时间戳。"
+    },
+    {
+      "name": "RecordPlayerLeft",
+      "effect": "记录玩家离开时间，结束玩家在线时间和穿着物品的计时。"
+    },
+    {
+      "name": "CalcIndividualPlayerStats",
+      "effect": "计算单个玩家的总游戏时间、穿着物品累计时间和制作物品统计，并返回结果及清理标记。"
+    },
+    {
+      "name": "CalcPlayerStats",
+      "effect": "计算所有在线玩家的统计数据，返回统计列表并清理已离开玩家的数据。"
+    },
+    {
+      "name": "DumpIndividualPlayerStats",
+      "effect": "将单个玩家统计格式化为JSON并通过TheSim:SendProfileStats发送到服务器。"
+    },
+    {
+      "name": "DumpPlayerStats",
+      "effect": "计算并发送所有在线玩家的统计信息到服务器。"
+    },
+    {
+      "name": "OnPlayerDeath",
+      "effect": "监听玩家死亡事件，记录死亡信息（如年龄、世界周期、死因）并发送统计到服务器。"
+    },
+    {
+      "name": "OnPlayerChangedSkin",
+      "effect": "监听玩家换装事件，更新穿着物品的时间记录，结束旧皮肤计时并开始新皮肤计时。"
+    },
+    {
+      "name": "OnItemCrafted",
+      "effect": "监听玩家制作事件，将制作物品的皮肤添加到玩家统计中。"
+    },
+    {
+      "name": "OnEquipSkinnedItem",
+      "effect": "监听玩家装备皮肤物品事件，记录该物品的穿着开始时间。"
+    },
+    {
+      "name": "OnUnequipSkinnedItem",
+      "effect": "监听玩家卸下皮肤物品事件，结束该物品的穿着计时。"
+    },
+    {
+      "name": "GetWorldRecipeItems",
+      "effect": "获取世界中所有配方物品（如通过制作获得或准备食物）的预制体列表，用于统计。"
+    },
+    {
+      "name": "DumpSessionStats",
+      "effect": "收集游戏会话统计（如玩家数、服务器设置、世界年龄等）并格式化为JSON发送到服务器。"
+    },
+    {
+      "name": "OnPlayerJoined",
+      "effect": "处理玩家加入事件，初始化玩家统计，监听玩家的死亡、换装、制作等事件，并设置初始穿着物品。"
+    },
+    {
+      "name": "OnPlayerLeft",
+      "effect": "处理玩家离开事件，调用RecordPlayerLeft记录离开时间。"
+    },
+    {
+      "name": "Heartbeat",
+      "effect": "定期调用以发送玩家和会话统计到服务器，用于持续数据收集。"
+    },
+    {
+      "name": "HeartbeatPoll",
+      "effect": "定期轮询玩家状态，处理玩家加入、离开和心跳事件，检测服务器恢复并发送加入/退出/心跳事件。"
+    },
+    {
+      "name": "QuitAll",
+      "effect": "为所有当前玩家发送客户端退出事件到服务器。"
+    },
+    {
+      "name": "SendClientJoin",
+      "effect": "发送客户端加入事件（SESSION_BEGIN）到服务器，包含用户ID、会话ID和角色。"
+    },
+    {
+      "name": "SendClientHeartBeat",
+      "effect": "发送心跳事件（HEARTBEAT）到服务器，包含用户ID、会话ID和角色。"
+    },
+    {
+      "name": "SendClientQuit",
+      "effect": "发送客户端退出事件（SESSION_END）到服务器，包含用户ID、会话ID和角色。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "cycleschanged",
+    "clocktick",
+    "death",
+    "changeclothes",
+    "buildstructure",
+    "builditem",
+    "equipskinneditem",
+    "unequipskinneditem"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "玩家统计",
+    "在线时间",
+    "皮肤追踪",
+    "制作记录",
+    "心跳数据",
+    "服务器统计",
+    "会话管理",
+    "死亡分析"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "社交",
+    "数据"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1b1fca482052706b5ccd7a8e57d7a52db9c36384ebd4b56a6969b4cb6ced5442",
+    "source_bytes": 15531,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114325396
+  }
+}

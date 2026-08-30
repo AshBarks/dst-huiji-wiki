@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstormstaticcatcher.lua"
+  },
+  "category": "component",
+  "display_name": "moonstormstaticcatcher",
+  "summary": "该组件用于管理捕获月风暴静电的过程，它跟踪一个目标实体并处理捕获动作。当执行捕获时，它检查目标的有效性、距离和可捕获性，然后通知目标组件并触发可选的回调函数。组件在移除时会自动取消目标设置。",
+  "api": [
+    {
+      "name": "SetOnCaughtFn",
+      "effect": "设置捕获成功后的回调函数，当捕获发生时调用该函数。"
+    },
+    {
+      "name": "Catch",
+      "effect": "尝试捕获指定目标，如果目标无效、距离过远或目标不可捕获，则返回false和'MISSED'；否则通知目标的moonstormstaticcapturable组件并触发设置的回调，返回true。"
+    },
+    {
+      "name": "OnTarget",
+      "effect": "设置当前目标为指定实体，如果目标不同则先取消旧目标，并通知新目标被定位。"
+    },
+    {
+      "name": "OnUntarget",
+      "effect": "取消当前目标，如果指定了目标或匹配当前目标，则通知目标被取消定位。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      50898,
+      20714,
+      16419,
+      13701,
+      13823,
+      13556
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，没有一个页面提及组件 'moonstormstaticcatcher' 或相关能力表达（如 SetOnCaughtFn、Catch、OnTarget、OnUntarget）。所有页面都是关于其他实体的（如弹弓弹药、天体英雄、幻灵捕获机等），与月风暴静态捕获无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "捕获",
+    "静电收集",
+    "目标",
+    "事件触发",
+    "月风暴",
+    "捕捉器",
+    "回调",
+    "移除",
+    "组件",
+    "有效性检查"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "捕获"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e21d3ed9afefd3cc5ddc5f19a4d774346e5f87bf38df01503dddd6f76d332a11",
+    "source_bytes": 1657,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101917147
+  }
+}

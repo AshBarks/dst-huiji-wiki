@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/crop.lua"
+  },
+  "category": "component",
+  "display_name": "crop",
+  "summary": "该组件管理农作物的生长状态，包括生长百分比、成熟度和枯萎条件。它通过定时任务和环境因素（如光照、温度、雨水）控制作物的生长速度。核心玩法涉及农业种植、生长管理、收获和处理枯萎作物。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "移除实体时，清理作物的“readyforharvest”和“notreadyforharvest”标签。"
+    },
+    {
+      "name": "SetOnMatureFn(fn)",
+      "effect": "设置作物成熟时调用的回调函数。"
+    },
+    {
+      "name": "SetOnWitheredFn(fn)",
+      "effect": "设置作物枯萎时调用的回调函数。"
+    },
+    {
+      "name": "SetOnHarvestFn(fn)",
+      "effect": "设置作物收获时调用的回调函数。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存作物状态，包括产品预制体、生长百分比、生长速率和成熟度。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "加载作物状态，恢复生长百分比、速率等数据，并触发生长和成熟逻辑。"
+    },
+    {
+      "name": "LoadPostPass()",
+      "effect": "加载后处理，如果作物没有种植者，则恢复生长任务。"
+    },
+    {
+      "name": "Fertilize(fertilizer, doer)",
+      "effect": "施肥操作，根据肥料的肥力值增加生长百分比；若生长完成则调用成熟方法并播放施肥声音；停止燃烧状态；在冬季低温时不执行。"
+    },
+    {
+      "name": "GetWorldGrowthRateMultiplier()",
+      "effect": "根据世界环境（温度、雨水、季节）返回生长速率的倍率。低温时返回0，雨水时增加倍率，春季时增加倍率。"
+    },
+    {
+      "name": "DoGrow(dt, nowither)",
+      "effect": "执行生长逻辑，根据环境光照和温度更新生长百分比；若生长完成则调用成熟方法；处理枯萎时间累积和强制枯萎。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试字符串，显示作物状态（枯萎、成熟或生长百分比）。"
+    },
+    {
+      "name": "Resume()",
+      "effect": "恢复生长任务，设置定时任务定期调用DoGrow。"
+    },
+    {
+      "name": "StartGrowing(prod, grow_time, grower, percent)",
+      "effect": "开始生长，设置产品预制体、生长速率（基于生长时间）、初始生长百分比和种植者，并启动定时生长任务。"
+    },
+    {
+      "name": "Harvest(harvester)",
+      "effect": "收获作物，生成产品（考虑燃烧状态可能生成熟食），调用收获回调，将产品放入收获者库存或掉落；清理作物状态并移除或重置实体。"
+    },
+    {
+      "name": "Mature()",
+      "effect": "标记作物成熟，调用成熟回调函数。"
+    },
+    {
+      "name": "MakeWithered()",
+      "effect": "使作物枯萎，停止生长任务，设置枯萎状态（产品设为cutgrass，生长百分比归零），播放枯萎动画，处理燃烧组件，调用枯萎回调。"
+    },
+    {
+      "name": "IsReadyForHarvest()",
+      "effect": "返回作物是否已成熟（可收获）。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "长时间更新，直接调用DoGrow(dt)以模拟生长进度。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_CROP_GROW_TEMP",
+    "CROP_RAIN_BONUS",
+    "SPRING_GROWTH_MODIFIER",
+    "CROP_DARK_WITHER_TIME",
+    "DAYLIGHT_SEARCH_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      51951,
+      14486,
+      13261,
+      18234,
+      14484,
+      15797,
+      18545
+    ],
+    "aspects": [
+      {
+        "aspect": "催熟效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "使角色附近至多 10 棵未长成的食用类作物瞬间生长成熟。"
+          }
+        ]
+      },
+      {
+        "aspect": "成熟触发事件",
+        "evidence": [
+          {
+            "pageid": 15797,
+            "quote": "当半径 6 {{解释|距离单位}}范围内存在 15 个及以上的成熟[[农作物]]时"
+          }
+        ]
+      },
+      {
+        "aspect": "收获机制",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "已长成 | 0 ~ 6 | 对应作物×1，对应"
+          }
+        ]
+      },
+      {
+        "aspect": "施肥影响",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "部分[[可采集]]实体会因缺少[[肥料]]或[[环境温度]]不适而发生枯萎。"
+          }
+        ]
+      },
+      {
+        "aspect": "枯萎状态",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "当环境温度高于 70 度时，加载范围内的草、树苗、浆果丛、多汁浆果丛、石果..."
+          }
+        ]
+      },
+      {
+        "aspect": "生长阶段与速度描述",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "每种农作物都有以下生长阶段：种子，萌芽，小，中，已长成，巨大，腐烂，腐烂巨大。"
+          },
+          {
+            "pageid": 21485,
+            "quote": "但如果当前季节是作物喜欢的季节，则生长时间将变为原来的一半"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "农作物",
+    "生长",
+    "收获",
+    "枯萎",
+    "肥料",
+    "成熟",
+    "农业系统",
+    "种植",
+    "生长速率",
+    "作物"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "生存",
+    "种植"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0b6be165286aeaed8060d5c86061aec516c95ae3252afa2ee6b411a640803f11",
+    "source_bytes": 9059,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106456794
+  }
+}

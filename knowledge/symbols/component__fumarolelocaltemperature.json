@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fumarolelocaltemperature.lua"
+  },
+  "category": "component",
+  "display_name": "fumarolelocaltemperature",
+  "summary": "该组件管理fumarole（喷气孔）区域的局部温度，通过温度覆盖系统影响玩家体温。它根据季节、Perlin噪声和全局温度调制计算动态温度，并为指定世界坐标提供温度影响值。核心玩法涉及火山或热源区域的温度管理，影响角色生存环境。",
+  "api": [
+    {
+      "name": "SetTemperatureMod",
+      "effect": "设置全局温度乘数(multiplier)和基点(locus)，用于温度计算公式，直接影响后续温度值。"
+    },
+    {
+      "name": "GetTemperature",
+      "effect": "返回当前计算的fumarole区域内部温度值，基于季节、噪声和全局调制。"
+    },
+    {
+      "name": "GetTemperatureAtXZ",
+      "effect": "返回指定世界坐标(x, z)的温度影响百分比：若坐标在fumarole区域内则返回插值温度值，否则返回nil。使用缓存网格和邻域搜索计算区域密度。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "seasontick",
+    "ms_simunpaused"
+  ],
+  "netvars": [
+    "_noisetime"
+  ],
+  "tunables": [
+    "NOISE_SYNC_PERIOD",
+    "TILE_SEARCH_HALF_SIZE",
+    "TEMPERATURE_NOISE_SCALE",
+    "TEMPERATURE_NOISE_MAG",
+    "MIN_TEMPERATURE",
+    "MAX_TEMPERATURE",
+    "WINTER_CROSSOVER_TEMPERATURE",
+    "SUMMER_CROSSOVER_TEMPERATURE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14703,
+      15022,
+      16606
+    ],
+    "aspects": [
+      {
+        "aspect": "体温修改行为描述",
+        "evidence": [
+          {
+            "pageid": 14703,
+            "quote": "如果玩家体温低于 40 度则会将玩家体温逐渐恢复至 40 度。"
+          },
+          {
+            "pageid": 14703,
+            "quote": "如果玩家体温高于 40 度则会将玩家体温逐渐降低至 40 度。"
+          },
+          {
+            "pageid": 15022,
+            "quote": "若玩家个体温度低于 10 度会将玩家体温升高 10 度"
+          },
+          {
+            "pageid": 16606,
+            "quote": "装备寒冰护符时，快速降低玩家体温至低于[[世界温度]] 50 度。"
+          }
+        ]
+      },
+      {
+        "aspect": "体温状态检查描述",
+        "evidence": [
+          {
+            "pageid": 14703,
+            "quote": "如果玩家体温低于 40 度"
+          },
+          {
+            "pageid": 15022,
+            "quote": "若玩家个体温度低于 10 度"
+          },
+          {
+            "pageid": 16606,
+            "quote": "低于[[世界温度]] 50 度"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "喷气孔区域",
+    "温度影响",
+    "玩家体温",
+    "火山温度",
+    "Perlin噪声",
+    "季节调制",
+    "动态温度",
+    "环境热源"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1ff99076094897968474a602f67b06994c702a3fca68a014f3d68c5271cb8ecf",
+    "source_bytes": 8652,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107971691
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstormmanager.lua"
+  },
+  "category": "component",
+  "display_name": "moonstormmanager",
+  "summary": "该组件管理月风暴事件，包括风暴的生成、移动和停止，以及与瓦格斯塔夫相关的实验。它跟踪玩家位置、风暴节点、实验进度，并处理计时器和事件生成，如火花、闪电和变异鸟攻击。核心玩法涉及在月风暴中探索、完成实验以对抗天界守护者。",
+  "api": [
+    {
+      "name": "UntrackRoamer",
+      "effect": "移除对指定漫游者的跟踪，停止监听其移除事件"
+    },
+    {
+      "name": "TrackRoamer",
+      "effect": "开始跟踪漫游者，监听其移除事件以自动取消跟踪"
+    },
+    {
+      "name": "CalcNewMoonstormBaseNodeIndex",
+      "effect": "计算新的月风暴基础节点索引，基于地图拓扑和距离条件"
+    },
+    {
+      "name": "GetCelestialChampionsKilled",
+      "effect": "返回天界守护者被击败的次数"
+    },
+    {
+      "name": "StartMoonstorm",
+      "effect": "启动月风暴：停止当前风暴，设置新节点，启动瓦格斯塔夫测试、火花和闪电任务"
+    },
+    {
+      "name": "StopCurrentMoonstorm",
+      "effect": "停止当前月风暴：取消相关任务，记录上一个节点，设置结束标志"
+    },
+    {
+      "name": "StopExperimentTasks",
+      "effect": "停止实验相关的所有任务，包括计时器和工具生成任务"
+    },
+    {
+      "name": "StopExperiment",
+      "effect": "停止实验：移除或淡出工具，清理实验状态"
+    },
+    {
+      "name": "FailExperiment",
+      "effect": "实验失败：瓦格斯塔夫说台词并消失，停止实验"
+    },
+    {
+      "name": "EndExperiment",
+      "effect": "实验成功：瓦格斯塔夫完成实验并消失，启动新月风暴"
+    },
+    {
+      "name": "beginNoWagstaffExperiment",
+      "effect": "开始无瓦格斯塔夫的实验：在玩家位置生成漫游者"
+    },
+    {
+      "name": "beginNoWagstaffDefence",
+      "effect": "开始无瓦格斯塔夫的防御：设置工具和计时器，生成幻影波"
+    },
+    {
+      "name": "beginWagstaffHunt",
+      "effect": "开始瓦格斯塔夫狩猎：生成瓦格斯塔夫NPC，设置计时器"
+    },
+    {
+      "name": "AdvanceWagstaff",
+      "effect": "推进瓦格斯塔夫位置：返回新位置，用于狩猎进度"
+    },
+    {
+      "name": "FindUnmetCharacter",
+      "effect": "找到在月风暴中未遇见的玩家位置"
+    },
+    {
+      "name": "GetNewWagstaffLocation",
+      "effect": "获取瓦格斯塔夫的新位置，基于狩猎进度和风暴中心"
+    },
+    {
+      "name": "startNeedTool",
+      "effect": "暂停实验计时器，瓦格斯塔夫等待工具"
+    },
+    {
+      "name": "foundTool",
+      "effect": "恢复实验计时器，瓦格斯塔夫开始实验，设置下次需要工具"
+    },
+    {
+      "name": "startWaglessNeedTool",
+      "effect": "暂停实验计时器，实验静态实体需要工具"
+    },
+    {
+      "name": "foundWaglessTool",
+      "effect": "恢复实验计时器，实验静态实体工具需求结束"
+    },
+    {
+      "name": "AddMetplayer",
+      "effect": "添加玩家ID到已遇见玩家列表"
+    },
+    {
+      "name": "beginWagstaffDefence",
+      "effect": "开始瓦格斯塔夫防御：停止计时器，设置工具和计时器，生成幻影波"
+    },
+    {
+      "name": "SpawnGestalt",
+      "effect": "在指定角度和预制体生成幻影敌人，设置追踪目标"
+    },
+    {
+      "name": "spawnGestaltWave",
+      "effect": "生成一波幻影敌人（变异鸟和喷吐者），根据剩余时间安排下一次"
+    },
+    {
+      "name": "spawnWaglessGestaltWave",
+      "effect": "生成无瓦格斯塔夫实验的幻影波，逻辑与spawnGestaltWave类似"
+    },
+    {
+      "name": "spawnTool",
+      "effect": "在瓦格斯塔夫附近随机生成一个工具"
+    },
+    {
+      "name": "spawnWaglessTool",
+      "effect": "在实验静态实体附近随机生成一个工具"
+    },
+    {
+      "name": "DoTestForWagstaff",
+      "effect": "测试是否生成瓦格斯塔夫或漫游者，基于玩家位置和游戏状态"
+    },
+    {
+      "name": "DoTestForSparks",
+      "effect": "在月风暴中为玩家生成火花，如果火花数量不足SPARKLIMIT"
+    },
+    {
+      "name": "DoTestForLightning",
+      "effect": "在月风暴中为随机玩家生成闪电，基于计时器重复"
+    },
+    {
+      "name": "TestMoonAltarLinkPositionValid",
+      "effect": "测试月祭坛链接位置是否可通行且无冲突实体"
+    },
+    {
+      "name": "TestAltarTriangleValid",
+      "effect": "测试三个祭坛是否形成有效三角形，基于距离和角度条件"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据到表，包括风暴天数、节点索引、已遇见玩家等"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载组件状态，恢复风暴、实验和玩家进度"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示天界守护者击杀数、风暴天数和任务剩余时间"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_setmoonphasestyle",
+    "ms_lockmoonphase",
+    "ms_setclocksegs",
+    "ms_setmoonphase",
+    "ms_moonstormwindowover",
+    "ms_moonboss_was_defeated"
+  ],
+  "events_listened": [
+    "timerdone",
+    "ms_moonstormstatic_roamer_spawned",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_startthemoonstorms",
+    "ms_stopthemoonstorms",
+    "cycles",
+    "ms_moonstormstatic_roamer_captured"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MOONSTORM_MOVE_TIME",
+    "MOONSTORM_MOVE_MAX",
+    "WAGSTAFF_EXPERIMENT_TIME",
+    "WAGSTAFF_NPC_EXPIRE_TIME",
+    "WAGSTAFF_NPC_HUNTS",
+    "MOON_ALTAR_LINK_MAX_ABS_DOT",
+    "MOON_ALTAR_LINK_ALTAR_MIN_RADIUS_SQ",
+    "MOON_ALTAR_LINK_POINT_VALID_RADIUS_SQ"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      27531,
+      10418,
+      15133,
+      35415,
+      51494,
+      65605,
+      16118,
+      20193
+    ],
+    "aspects": [
+      {
+        "aspect": "月亮风暴中闪电生成机制",
+        "evidence": [
+          {
+            "pageid": 27531,
+            "quote": "当闪电落点位于[[月亮风暴]]中时，确定[[#选择目标|选择目标]]后不生成普通闪电，改为在最终落点处生成一个“月亮风暴…”"
+          }
+        ]
+      },
+      {
+        "aspect": "月亮风暴触发机制描述",
+        "evidence": [
+          {
+            "pageid": 51494,
+            "quote": "玩家初次进入月亮风暴范围内时，'''颗粒状传输（月亮风暴）'''会在玩家附近出现并赠予玩家[[星象护目镜]]和[[未完成的实验]]的蓝图。"
+          }
+        ]
+      },
+      {
+        "aspect": "瓦格斯塔夫研究推进过程",
+        "evidence": [
+          {
+            "pageid": 51494,
+            "quote": "瓦格斯塔夫的投影随后会要求玩家帮助他进行研究。他会瞬移在月亮风暴范围内的某地，玩家追上他之后又会瞬移到附近…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "月风暴",
+    "瓦格斯塔夫",
+    "实验",
+    "变异鸟",
+    "火花",
+    "闪电",
+    "祭坛",
+    "天界守护者",
+    "节点",
+    "漫游者"
+  ],
+  "gameplay_tags": [
+    "事件",
+    "探索",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ef37448a7fbd11dc71e0ad05d3a0e6b2d3fb54adeadfcc80d5a1a217754cfe1f",
+    "source_bytes": 34625,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110093559
+  }
+}

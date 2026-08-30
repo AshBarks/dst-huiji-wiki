@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mightydumbbell.lua"
+  },
+  "category": "component",
+  "display_name": "mightydumbbell",
+  "summary": "该组件管理哑铃的锻炼效率参数和当前锻炼者状态，用于控制力量（mightiness）的增长速率。核心玩法是通过使用哑铃进行锻炼，提升或维持角色的力量值，效率根据当前力量水平动态调整。",
+  "api": [
+    {
+      "name": "CanWorkout",
+      "effect": "检查doer是否拥有'strongman'标签且具有mightiness组件，返回布尔值表示是否可以锻炼。"
+    },
+    {
+      "name": "IsWorkingOut",
+      "effect": "检查doer是否是当前正在锻炼的角色，返回布尔值。"
+    },
+    {
+      "name": "CheckEfficiency",
+      "effect": "如果有锻炼者，根据其当前力量值设置mightiness组件的速率缩放并返回效率值；否则返回0。"
+    },
+    {
+      "name": "CheckAttackEfficiency",
+      "effect": "根据doer当前力量值计算并返回攻击时的效率值，不修改速率缩放。"
+    },
+    {
+      "name": "StartWorkout",
+      "effect": "给哑铃实例添加'lifting'标签，设置锻炼者，并调用CheckEfficiency初始化效率。"
+    },
+    {
+      "name": "StopWorkout",
+      "effect": "移除哑铃实例的'lifting'标签，将锻炼者的mightiness速率缩放重置为NEUTRAL，并清除锻炼者引用。"
+    },
+    {
+      "name": "SetConsumption",
+      "effect": "设置每次锻炼消耗的有限次数值。"
+    },
+    {
+      "name": "SetEfficiency",
+      "effect": "设置不同力量水平（虚弱、普通、强壮）对应的效率值。"
+    },
+    {
+      "name": "DoAttackWorkout",
+      "effect": "计算攻击效率并增加doer的mightiness值，使用攻击效率缩放。"
+    },
+    {
+      "name": "DoWorkout",
+      "effect": "计算当前效率，增加锻炼者的mightiness值，使用有限次数组件消耗耐久，如果耐久耗尽则停止锻炼。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.DUMBBELL_EFFICIENCY_LOW",
+    "TUNING.DUMBBELL_EFFICIENCY_MED",
+    "TUNING.DUMBBELL_EFFICIENCY_HIGH",
+    "TUNING.WIMPY_THRESHOLD",
+    "TUNING.MIGHTY_THRESHOLD",
+    "TUNING.DUMBBELL_EFFICIENCY_ATTCK_SCALE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      15903,
+      15904,
+      70704,
+      33991,
+      45439,
+      24866,
+      13139
+    ],
+    "aspects": [
+      {
+        "aspect": "健身房锻炼中的交互过程",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "当红色指示物移动到判定条区域的时候单击鼠标左键，即可成功增加一次力量值"
+          }
+        ]
+      },
+      {
+        "aspect": "哑铃锻炼的启动与停止操作",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "装备后右键哑铃即可开始举重，再次右键停止举重"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "哑铃",
+    "锻炼",
+    "力量",
+    "强壮",
+    "效率",
+    "健身",
+    "举重",
+    "mightiness",
+    "strongman",
+    "workout"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "10d07df22b2e73d482822a0ca60660938795fff608cfbd9c1eb11041333be117",
+    "source_bytes": 3396,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109858448
+  }
+}

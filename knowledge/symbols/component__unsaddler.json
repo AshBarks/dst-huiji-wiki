@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/unsaddler.lua"
+  },
+  "category": "component",
+  "display_name": "unsaddler",
+  "summary": "这是一个标记组件，不管理任何数据或执行逻辑。它用于标识实体可能与卸鞍功能相关，但具体实现未在此组件中定义。",
+  "api": [],
+  "api_note": "这是一个标记组件，无公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      10355,
+      13779,
+      14579,
+      15295,
+      15922,
+      18359,
+      23187
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及组件 unsaddler 或其相关能力表达，且代码能力/行为语义清单内容缺失，因此无法检索到证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "卸鞍",
+    "鞍具",
+    "骑乘",
+    "坐骑",
+    "标记组件",
+    "Unsaddler",
+    "DST",
+    "饥荒联机版",
+    "组件",
+    "系统"
+  ],
+  "gameplay_tags": [
+    "骑乘"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "72d1a6769836aad604c151ccffa7a35c0cbc683cb57880d5347019d77dd161d2",
+    "source_bytes": 107,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104426849
+  }
+}

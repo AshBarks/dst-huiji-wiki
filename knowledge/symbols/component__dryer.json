@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dryer.lua"
+  },
+  "category": "component",
+  "display_name": "dryer",
+  "summary": "该组件管理干燥器的数据状态，包括正在干燥的原料、产品和剩余时间。它参与核心生存玩法，通过时间管理和天气影响（如下雨会暂停干燥）来处理食物，最终产出干燥食物或腐烂物品。组件支持保存和加载，以确保状态持久化。",
+  "api": [
+    {
+      "name": "SetStartDryingFn",
+      "effect": "设置一个回调函数，在干燥开始时被调用，参数为当前实体、原料和构建文件。"
+    },
+    {
+      "name": "SetDoneDryingFn",
+      "effect": "设置一个回调函数，在干燥完成时被调用，参数为当前实体、产品和干燥构建文件。"
+    },
+    {
+      "name": "SetOnHarvestFn",
+      "effect": "设置一个回调函数，在收获干燥成品或掉落物品后被调用，参数为当前实体。"
+    },
+    {
+      "name": "CanDry",
+      "effect": "检查是否可以干燥给定的物品。如果当前没有干燥中或产品，且物品有dryable组件，则返回true；否则返回false。"
+    },
+    {
+      "name": "IsDrying",
+      "effect": "检查组件是否正在干燥过程。如果原料不为nil，则返回true；否则返回false。"
+    },
+    {
+      "name": "IsDone",
+      "effect": "检查干燥是否已完成。如果产品不为nil且原料为nil，则返回true；否则返回false。"
+    },
+    {
+      "name": "GetTimeToDry",
+      "effect": "返回干燥剩余时间（秒）。如果正在干燥，返回剩余时间；否则返回0。"
+    },
+    {
+      "name": "GetTimeToSpoil",
+      "effect": "返回腐烂剩余时间（秒）。如果干燥已完成，返回剩余时间；否则返回0。"
+    },
+    {
+      "name": "IsPaused",
+      "effect": "检查干燥是否暂停。如果剩余时间不为nil（任务暂停时存储），则返回true；否则返回false。"
+    },
+    {
+      "name": "StartDrying",
+      "effect": "开始干燥过程。接受一个dryable物品，检查是否可干燥，设置内部状态（如原料、产品、时间），移除物品，并启动定时任务。如果未暴露于雨或受保护，则恢复干燥；否则可能暂停。返回true如果成功开始，否则false。"
+    },
+    {
+      "name": "StopDrying",
+      "effect": "停止干燥过程。接受reason参数：如果是'fire'，则直接生成产品并重置状态；否则如果正在干燥，则调用DoDry完成干燥；如果已干燥，则调用DoSpoil生成腐烂食物。重置所有状态并停止监听。"
+    },
+    {
+      "name": "Pause",
+      "effect": "暂停干燥。将当前剩余时间保存到remainingtime，取消定时任务并停止监听雨。"
+    },
+    {
+      "name": "Resume",
+      "effect": "恢复干燥。如果remainingtime不为nil，启动新定时任务（基于原料或产品调用DoDry或DoSpoil），并设置tasktotime。"
+    },
+    {
+      "name": "DropItem",
+      "effect": "掉落当前干燥中的物品（原料或产品）。生成物品并弹出，设置其腐烂百分比基于剩余时间，继承潮湿状态。然后重置所有组件状态并停止监听。"
+    },
+    {
+      "name": "Harvest",
+      "effect": "收获干燥成品。接受harvester实体，如果干燥已完成且harvester有库存，生成产品并给予harvester，设置其腐烂百分比，继承潮湿状态。然后重置所有状态并停止监听。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新，处理离线时间。暂停干燥，根据dt减少剩余时间，如果时间耗尽，则完成干燥或腐烂，并可能恢复干燥。用于世界时间跳跃时同步状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。返回一个包含原料、产品、构建文件、腐烂百分比和剩余时间的表。如果没有产品，则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态。接受data表，恢复原料、产品等状态，设置剩余时间并启动定时任务。如果正在干燥，调用onstartdrying回调；如果已完成，调用ondonedrying回调。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前状态（如DRYING、DRIED、EMPTY）、产品、食物类型、是否暂停，以及干燥和腐烂剩余时间。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用。取消定时任务，停止监听雨，并移除所有相关标签（dried、drying、candry）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "gainrainimmunity",
+    "loserainimmunity"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PERISH_PRESERVED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      19129,
+      14486,
+      13779,
+      14579,
+      15237,
+      15642,
+      13261
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及晾晒或干燥组件的能力表达，所有内容与食物腐烂、生物行为、农作物生长等相关，但无干燥过程的描述或与dryer组件相关的任何能力体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "干燥",
+    "食物",
+    "腌制",
+    "晒干",
+    "腐烂",
+    "暂停",
+    "恢复",
+    "收获",
+    "时间管理",
+    "天气影响"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "食物加工"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b4b2bbf95c899508fc3bed148a19d8d78c162b30c8709ae946a954a83c6e40ac",
+    "source_bytes": 13029,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107083745
+  }
+}

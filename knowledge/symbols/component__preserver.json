@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/preserver.lua"
+  },
+  "category": "component",
+  "display_name": "preserver",
+  "summary": "该组件用于调整实体的腐烂速率和温度变化速率倍率，影响物品的保鲜期和温度敏感性。常见于冰箱、冰屋等设施中，管理物品的保存状态和环境温度控制。",
+  "api": [
+    {
+      "name": "SetPerishRateMultiplier",
+      "effect": "设置腐烂速率倍率。设置后，实体内物品的腐烂速度将根据此倍率调整，影响保鲜时间。"
+    },
+    {
+      "name": "GetPerishRateMultiplier",
+      "effect": "获取腐烂速率倍率。如果倍率是函数，则根据传入的 item 参数计算返回值；否则返回固定数值或默认值 1。"
+    },
+    {
+      "name": "SetTemperatureRateMultiplier",
+      "effect": "设置温度速率倍率。设置后，实体内物品的温度变化速度将根据此倍率调整，影响温度敏感性。"
+    },
+    {
+      "name": "GetTemperatureRateMultiplier",
+      "effect": "获取温度速率倍率。如果倍率是函数，则根据传入的 item 参数计算返回值；否则返回固定数值或默认值 1。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前腐烂速率和温度速率倍率的值，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14708,
+      14699,
+      18572,
+      14695,
+      60885,
+      52726,
+      14709,
+      19129
+    ],
+    "aspects": [
+      {
+        "aspect": "保鲜率乘数效果描述",
+        "evidence": [
+          {
+            "pageid": 14699,
+            "quote": "能使放置在里面的物品减缓 50% 的腐烂速度"
+          },
+          {
+            "pageid": 14709,
+            "quote": "盐盒提供两倍于冰箱的保鲜能力，四倍于食材正常情况下的保鲜能力"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "保鲜",
+    "腐烂速率",
+    "温度控制",
+    "冰箱",
+    "冰屋",
+    "保鲜期",
+    "温度变化",
+    "速率倍率",
+    "保鲜组件",
+    "环境温度"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "保鲜",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "78cb4f2775f7b613f67e4b45f1c0de6c90ff315343ada50c2a5a8a448fa42e4d",
+    "source_bytes": 1354,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092274476
+  }
+}

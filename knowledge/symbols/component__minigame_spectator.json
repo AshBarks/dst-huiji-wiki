@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/minigame_spectator.lua"
+  },
+  "category": "component",
+  "display_name": "minigame_spectator",
+  "summary": "minigame_spectator 组件用于管理实体作为小游戏观众的状态，记录当前观看的小游戏实例。它监听小游戏的移除或停用事件，并在小游戏结束时自动移除该组件。组件还可能在小游戏启动时停止实体对玩家的攻击行为，以支持观战玩法。",
+  "api": [
+    {
+      "name": "SetWatchingMinigame",
+      "effect": "设置实体观看指定的小游戏，添加事件监听（'onremove' 和 'ms_minigamedeactivated'）。如果实体有战斗组件且目标为玩家，则放弃攻击。"
+    },
+    {
+      "name": "GetMinigame",
+      "effect": "返回当前观看的小游戏实例，无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前观看的小游戏状态，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "ms_minigamedeactivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15022,
+      51046,
+      13897,
+      15225,
+      15551,
+      15651,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏角色和巨兽的战斗属性、仇恨机制、掉落物等行为，未提及小游戏观看者组件的能力表达，如SetWatchingMinigame、GetMinigame或GetDebugString。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小游戏",
+    "观战",
+    "观众",
+    "战斗",
+    "攻击",
+    "事件监听",
+    "组件移除"
+  ],
+  "gameplay_tags": [
+    "小游戏",
+    "观战"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a043fafd58c7ad3c0f7490036ee6f2fdf4474d7db31bc9c06fb3403819ebb6a8",
+    "source_bytes": 1246,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109913952
+  }
+}

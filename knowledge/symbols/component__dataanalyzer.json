@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dataanalyzer.lua"
+  },
+  "category": "component",
+  "display_name": "dataanalyzer",
+  "summary": "DataAnalyzer组件用于管理饥荒联机版中角色WX-78（W78）扫描生物时收集的数据。它存储每个预制物的扫描数据量，并提供方法启动数据再生和消耗数据，以支持角色的升级或能力使用。组件通过周期性任务自动增加数据，并可以保存和加载状态。",
+  "api": [
+    {
+      "name": "StartDataRegen",
+      "effect": "启动一个周期性任务，每隔dt时间调用process_data_increase函数来增加self.datahistory中每个预制物的数据量，每个预制物的数据量最多增加到其最大值。如果已有任务在运行，会先取消旧任务再启动新任务。"
+    },
+    {
+      "name": "StopDataRegen",
+      "effect": "取消正在运行的数据再生周期性任务，并清空任务引用，停止自动增加数据。"
+    },
+    {
+      "name": "GetData",
+      "effect": "获取指定实体或预制物的扫描数据。如果self.datahistory中有该预制物的记录，返回其整数值；如果没有记录但存在该预制物的生物数据，则初始化为最大数据量并返回；否则返回0。"
+    },
+    {
+      "name": "SpendData",
+      "effect": "消耗指定预制物的扫描数据。如果self.datahistory中没有记录，则初始化为最大数据量。然后，将当前数据量的整数部分减少并返回消耗的数据量。如果不存在生物数据，则返回0。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含self.datahistory的表，用于保存组件状态到存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据中加载self.datahistory，恢复组件状态，如果数据为nil则不执行操作。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      16615,
+      10418,
+      13606,
+      16438,
+      23965,
+      45439,
+      16439
+    ],
+    "aspects": [
+      {
+        "aspect": "生物数据生成与获取方式",
+        "evidence": [
+          {
+            "pageid": 16615,
+            "quote": "扫描完毕后，它会回到玩家身边，生产一定量的[[生物数据]]"
+          },
+          {
+            "pageid": 16439,
+            "quote": "通过[[生物扫描分析仪]]扫描某些特定的生物来获得"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "数据",
+    "扫描",
+    "分析",
+    "W78",
+    "WX-78",
+    "生物数据",
+    "数据再生",
+    "数据消耗",
+    "预制物数据"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1ddafa81503bc88052cdfee78ceff45c21e1d5c95528cd9812e28bcce06b3c12",
+    "source_bytes": 2286,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106532354
+  }
+}

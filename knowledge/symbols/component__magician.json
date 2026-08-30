@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/magician.lua"
+  },
+  "category": "component",
+  "display_name": "magician",
+  "summary": "该组件管理实体使用魔术师工具的状态，包括当前使用的物品、物品的持有和装备情况。它允许实体开始和停止使用魔术师工具，涉及物品的获取、放置和状态保存。核心玩法围绕魔术师工具的使用与物品管理。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "停止使用当前工具，移除实体上的 'magician'、'usingmagiciantool' 和 'usingmagiciantool_wasequipped' 标签。"
+    },
+    {
+      "name": "DropToolOnStop",
+      "effect": "清除工具的持有和装备状态，将内部变量 'held' 和 'equip' 设置为 nil。"
+    },
+    {
+      "name": "StartUsingTool",
+      "effect": "开始使用指定物品作为魔术师工具。检查物品是否有 magiciantool 组件，并处理物品的持有或装备状态：如果物品被持有则从所有者移除，如果装备则记录状态。成功时返回 true，否则返回 false。"
+    },
+    {
+      "name": "StopUsing",
+      "effect": "停止使用当前工具。调用物品的 magiciantool:OnStopUsing 方法，将物品恢复到所有者库存或掉落，并推送 'magicianstopped' 事件。成功时返回 true，否则返回 false。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "如果当前有使用物品，返回包含物品保存记录、持有状态（非装备时）和装备状态的表用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载物品和状态，如果数据有效则设置当前使用的物品。"
+    }
+  ],
+  "events_published": [
+    "magicianstopped"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      13156,
+      20150,
+      65881,
+      70704,
+      18779,
+      18777,
+      65605
+    ],
+    "aspects": [
+      {
+        "aspect": "储物空间激活方式",
+        "evidence": [
+          {
+            "pageid": 18779,
+            "quote": "当魔术师高礼帽在麦斯威尔的物品栏中时，按下Alt + 右键可以直接打开暗影维度储物空间"
+          }
+        ]
+      },
+      {
+        "aspect": "物品被吃下或打包的互动",
+        "evidence": [
+          {
+            "pageid": 18779,
+            "quote": "可以被食人花吃下并消化，也可以被捆绑包装打包"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "魔术师",
+    "魔法工具",
+    "开始使用",
+    "停止使用",
+    "物品管理",
+    "保存",
+    "加载",
+    "标签"
+  ],
+  "gameplay_tags": [
+    "魔法",
+    "工具使用"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ba6fb684f223d50058cc129b8d41e1c652e84f9c4eec22372f0cc052acf6c77a",
+    "source_bytes": 3441,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109456022
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/miasmamanager.lua"
+  },
+  "category": "component",
+  "display_name": "miasmamanager",
+  "summary": "MiasmaManager 组件管理游戏世界中“瘴气”的网格系统，控制其创建、扩散、增强和消减。它基于地图大小初始化网格，根据裂隙和通风口位置生成瘴气云，影响玩家移动和敌人生成（如蜈蚣虫），参与远古遗迹等区域的生存挑战玩法。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "返回压缩和编码的游戏存档数据，包含瘴气网格和系统启用状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "解码并加载存档数据，恢复瘴气网格和系统状态，重建缓存索引和消减数据。"
+    },
+    {
+      "name": "GetMiasmaTileCoords",
+      "effect": "将世界图块坐标（tx, ty）转换为瘴气网格坐标，通过间距（MIASMA_SPACING）取整。"
+    },
+    {
+      "name": "GetMiasmaAtPoint",
+      "effect": "根据世界坐标点（x, y, z）返回该处的瘴气数据（强度等），无数据则返回nil。"
+    },
+    {
+      "name": "GetMiasmaAtTile",
+      "effect": "根据图块坐标（tx, ty）返回该处的瘴气数据，先转换为瘴气网格坐标查询。"
+    },
+    {
+      "name": "IsMiasmaActive",
+      "effect": "返回瘴气系统是否激活的布尔值。"
+    },
+    {
+      "name": "SetMiasmaActive",
+      "effect": "设置瘴气系统激活状态；若状态改变，启动或停止组件更新，并推送“miasma_setactive”事件到世界。"
+    },
+    {
+      "name": "SetMiasmaDiminishingAtPoint",
+      "effect": "根据世界坐标点设置该处瘴气的消减状态，影响后续消减逻辑。"
+    },
+    {
+      "name": "SetMiasmaDiminishingAtTile",
+      "effect": "根据图块坐标设置该处瘴气的消减状态，先转换为瘴气网格坐标操作。"
+    },
+    {
+      "name": "CreateMiasmaAtPoint",
+      "effect": "在世界坐标点创建瘴气云实体，检查土地图块有效性并激活系统。"
+    },
+    {
+      "name": "CreateMiasmaAtTile",
+      "effect": "在图块坐标创建瘴气云，验证土地图块、生成“miasma_cloud”实体并激活系统。"
+    },
+    {
+      "name": "IsValidForMiasmaCreationAt",
+      "effect": "检查瘴气网格坐标是否适合创建瘴气，基于与裂隙（阴影亲和）和通风口的距离条件。"
+    },
+    {
+      "name": "MiasmaAction_Create",
+      "effect": "尝试在指定坐标创建瘴气，依赖世界裂隙存在和位置有效性检查。"
+    },
+    {
+      "name": "MiasmaAction_Spread",
+      "effect": "向相邻瘴气网格坐标传播瘴气，触发相邻坐标的动作滚动（禁用传播以防止级联）。"
+    },
+    {
+      "name": "MiasmaAction_Enhance",
+      "effect": "增加指定坐标瘴气的强度，上限为MIASMA_MAXSTRENGTH。"
+    },
+    {
+      "name": "MiasmaAction_Diminish",
+      "effect": "减少指定坐标瘴气的强度，若强度降至0则移除数据并清除区域内“miasma”标签实体。"
+    },
+    {
+      "name": "RollForMiasmaActionAt",
+      "effect": "根据概率和条件执行动作：若无阴影裂隙则消减已有瘴气，否则随机创建、传播、增强或消减，并返回动作类型。"
+    },
+    {
+      "name": "DoDiminishes",
+      "effect": "遍历所有标记为消减的瘴气数据，执行消减动作。"
+    },
+    {
+      "name": "DoRolls",
+      "effect": "随机选择现有瘴气执行动作滚动，根据云数量决定是否允许传播。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数，按间隔调用消减和传播逻辑；若无瘴气则停用系统。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示启用状态和网格节点数量。"
+    },
+    {
+      "name": "DebugRoll",
+      "effect": "调试方法，执行一次动作滚动并打印结果。"
+    },
+    {
+      "name": "DebugSpawn",
+      "effect": "调试方法，在玩家位置创建瘴气云。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "miasma_setactive"
+  ],
+  "events_listened": [
+    "worldmapsetsize"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MIASMA_SPACING",
+    "MIASMA_MAXSTRENGTH",
+    "MIASMA_MIN_DISTSQ_FROM_RIFT",
+    "MIASMA_MAX_DISTSQ_FROM_RIFT",
+    "MIASMA_MAX_DIST_FROM_VENTER",
+    "MIASMA_ODDS_CREATE",
+    "MIASMA_ODDS_SPREAD",
+    "MIASMA_DIMINISH_INTERVAL_SECONDS",
+    "MIASMA_SPREAD_INTERVAL_SECONDS",
+    "MIASMA_MAX_CLOUDS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      16419,
+      23957,
+      34314,
+      10418,
+      65456,
+      18001,
+      19595
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 miasmamanager 组件的任何能力或行为语义，如保存、加载、创建或管理瘴气等代码功能；仅描述了游戏内瘴气现象（如“喷气孔会产生瘴气”），但未对应具体组件能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "瘴气",
+    "miasma",
+    "扩散",
+    "消减",
+    "网格",
+    "创建",
+    "激活",
+    "环境效果",
+    "远古遗迹",
+    "裂隙"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5063ec7b6c4d4cf32d181bc401e6132af846987a0c1c79731a619d302a072447",
+    "source_bytes": 13887,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109754333
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/raindomewatcher.lua"
+  },
+  "category": "component",
+  "display_name": "raindomewatcher",
+  "summary": "RainDomeWatcher 组件用于监控实体是否处于雨穹（rain dome）下方。它通过每帧更新实体的世界位置并查询雨穹系统来判断状态变化。当实体进入或退出雨穹时，推送相应事件以触发游戏逻辑，例如提供庇护或改变行为。",
+  "api": [
+    {
+      "name": "IsUnderRainDome",
+      "effect": "返回布尔值，表示实体当前是否在雨穹下。无副作用，仅查询状态。"
+    }
+  ],
+  "events_published": [
+    "enterraindome",
+    "underraindomes",
+    "exitraindome"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      47009,
+      13156,
+      51951,
+      21137,
+      65605,
+      34523,
+      70763
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录中均未提及‘雨穹’或类似概念，也没有讨论与 IsUnderRainDome 能力相关的实体行为或描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "雨穹",
+    "下雨",
+    "天气",
+    "庇护",
+    "监控",
+    "事件",
+    "位置",
+    "状态"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "生存",
+    "天气"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a53fd0766db36f774a7b078b3ee47d5c02d9c7386390b58ea0e8052725b427c6",
+    "source_bytes": 654,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111621439
+  }
+}

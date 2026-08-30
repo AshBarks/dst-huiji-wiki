@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mapdeliverable.lua"
+  },
+  "category": "component",
+  "display_name": "mapdeliverable",
+  "summary": "MapDeliverable组件管理实体在地图上的交付过程，包括设置交付时间、监控进度和处理完成或取消事件。它允许通过地图行动发起交付，并支持保存和加载交付状态。核心玩法涉及玩家或AI执行交付任务，模拟物流或任务系统。",
+  "api": [
+    {
+      "name": "SetDeliveryTime",
+      "effect": "设置交付的基础时间值（单位：秒）。"
+    },
+    {
+      "name": "SetDeliveryTimeFn",
+      "effect": "设置一个函数，用于动态计算交付时间；函数接收实体、目标点和执行者作为参数，返回时间值。"
+    },
+    {
+      "name": "SetOnStartDeliveryFn",
+      "effect": "设置交付开始时的回调函数；函数接收实体、目标点和执行者，返回成功与否和原因。"
+    },
+    {
+      "name": "SetOnDeliveryProgressFn",
+      "effect": "设置交付进度更新时的回调函数；函数接收实体、当前时间、总长度、起点和终点。"
+    },
+    {
+      "name": "SetOnStopDeliveryFn",
+      "effect": "设置交付停止时的回调函数；函数接收实体。"
+    },
+    {
+      "name": "SetOnStartMapActionFn",
+      "effect": "设置地图行动开始时的回调函数；函数接收实体和执行者，返回成功与否和原因。"
+    },
+    {
+      "name": "SetOnCancelMapActionFn",
+      "effect": "设置地图行动取消时的回调函数；函数接收实体和执行者。"
+    },
+    {
+      "name": "StartMapAction",
+      "effect": "开始地图行动：生成bufferedmapaction实体并设置为MAPDELIVER_MAP行动，调用onstartmapactionfn回调；如果已存在行动或回调失败，返回false；否则返回true。"
+    },
+    {
+      "name": "CancelMapAction",
+      "effect": "取消当前地图行动：移除bufferedmapaction实体，重置相关状态。"
+    },
+    {
+      "name": "IsDelivering",
+      "effect": "返回布尔值，指示是否正在进行交付（即内部变量t已设置）。"
+    },
+    {
+      "name": "GetProgress",
+      "effect": "返回交付进度，范围为0到1（当前时间t除以总长度len），若未在交付则返回nil。"
+    },
+    {
+      "name": "SendToPoint",
+      "effect": "启动交付到指定点：设置起点和终点，计算交付时间，开始组件更新，调用onstartdeliveryfn回调；如果已在交付中或地图行动不匹配，返回false。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止交付：重置内部状态并停止组件更新，调用onstopdeliveryfn回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前交付状态，包括起点、终点、当前时间和总长度，返回数据表用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载交付状态：恢复交付进度或重新启动交付，调用onstartdeliveryfn回调。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，清理bufferedmapaction并调用oncancelmapactionfn回调。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，调用CancelMapAction取消地图行动。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      15303,
+      15922,
+      51497,
+      13570,
+      34314,
+      10379,
+      15642
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面内容不涉及component__mapdeliverable的能力表达，如交付时间、地图动作、进度跟踪等，主要讨论实体描述、角色能力、游戏机制（如昼夜循环、世界生成）和任务系统。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "交付",
+    "地图行动",
+    "发送物品",
+    "进度",
+    "时间",
+    "取消",
+    "保存",
+    "加载",
+    "任务",
+    "运输"
+  ],
+  "gameplay_tags": [
+    "任务",
+    "运输",
+    "交付"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "02a1a7541c0dd2aec5e9a063f5d6d85c0bce67eb041a3f1a55ea6da6aaeba384",
+    "source_bytes": 6071,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101542843
+  }
+}

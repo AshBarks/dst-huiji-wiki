@@ -1,0 +1,241 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hounded.lua"
+  },
+  "category": "component",
+  "display_name": "hounded",
+  "summary": "hounded 组件管理狗怪袭击事件，包括袭击的计时、警告、生成和升级。袭击强度基于玩家平均年龄动态计算，并提供季节性变体（冰狗和火狗）。组件参与生存核心玩法，通过定期袭击增加游戏挑战性。",
+  "api": [
+    {
+      "name": "GetTimeToAttack",
+      "effect": "返回下次袭击的剩余时间（秒），用于判断袭击倒计时。"
+    },
+    {
+      "name": "GetWarning",
+      "effect": "返回是否处于警告阶段（布尔值），指示玩家是否即将面临袭击。"
+    },
+    {
+      "name": "GetAttacking",
+      "effect": "返回是否正在袭击中（布尔值），当剩余时间小于等于0且已计划袭击时为真。"
+    },
+    {
+      "name": "SetSpawnData",
+      "effect": "设置生成数据表，更新袭击配置（如基础预设体、季节变体、攻击等级和延迟）。副作用是重新计划下次袭击。"
+    },
+    {
+      "name": "GetWorldEscalationLevel",
+      "effect": "返回基于当前世界周期（天数）的袭击等级数据表，用于外部系统（如树石掉落）。"
+    },
+    {
+      "name": "GetSpawnPrefab",
+      "effect": "根据是否升级和季节返回要生成的预设体名称（如普通狗、冰狗或火狗）。"
+    },
+    {
+      "name": "SetSummerVariant",
+      "effect": "启用或禁用夏季变体（火狗），影响生成预设体的选择。"
+    },
+    {
+      "name": "SetWinterVariant",
+      "effect": "启用或禁用冬季变体（冰狗），影响生成预设体的选择。"
+    },
+    {
+      "name": "SetWaveOverrideSettings",
+      "effect": "设置波次覆盖参数，如针对特定敌人（如虫Boss）的难度设置。"
+    },
+    {
+      "name": "SpawnModeNever",
+      "effect": "将袭击模式设置为从不，停止所有袭击计划。"
+    },
+    {
+      "name": "SpawnModeLight",
+      "effect": "将袭击模式设置为轻度（常数模式），使用重型延迟和轻度警告。"
+    },
+    {
+      "name": "SpawnModeNormal",
+      "effect": "将袭击模式设置为正常（升级模式），袭击强度随玩家年龄增加。"
+    },
+    {
+      "name": "SpawnModeMed",
+      "effect": "将袭击模式设置为中度（常数模式），使用中度延迟和警告。"
+    },
+    {
+      "name": "SpawnModeHeavy",
+      "effect": "将袭击模式设置为重度（常数模式），使用轻度延迟和重度警告。"
+    },
+    {
+      "name": "ForceReleaseSpawn",
+      "effect": "强制在目标实体附近生成一个狗怪并使其攻击目标，用于事件触发。"
+    },
+    {
+      "name": "SummonSpawn",
+      "effect": "在指定点附近生成一个狗怪，可选半径覆盖，返回生成的实体。"
+    },
+    {
+      "name": "ForceNextWave",
+      "effect": "强制触发下一波袭击（调试用），立即将剩余时间设为0并执行生成。"
+    },
+    {
+      "name": "DoWarningSpeech",
+      "effect": "对陆地上的玩家播放警告语音消息，提示袭击即将来临。"
+    },
+    {
+      "name": "GetWarningSoundList",
+      "effect": "获取警告声音列表，根据玩家和波次预升级状态返回声音阈值配置。"
+    },
+    {
+      "name": "DoWarningSound",
+      "effect": "对陆地上的玩家播放警告声音，根据剩余时间选择声音级别并推送事件。"
+    },
+    {
+      "name": "DoDelayedWarningSpeech",
+      "effect": "对延迟玩家播放警告语音，处理玩家加入/离开时的警告状态。"
+    },
+    {
+      "name": "DoDelayedWarningSound",
+      "effect": "对延迟玩家播放警告声音，根据延迟数据中的剩余时间选择声音。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新组件状态，处理计时减少、警告阶段进入、狗怪生成和位置免疫检查。是核心循环函数。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括警告标志、剩余时间、攻击计划等，用于世界存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复计时和警告，如果状态不一致则重新计划袭击。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示袭击状态、剩余时间和生成详情。"
+    }
+  ],
+  "api_note": "组件提供公共方法用于管理狗怪袭击的生命周期、配置和事件。",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "pausehounded",
+    "unpausehounded",
+    "hounded_setdifficulty",
+    "hounded_setsummervariant",
+    "hounded_setwintervariant",
+    "hounds_worm_boss_setdifficulty"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22707,
+      13857,
+      15327,
+      28621,
+      15751,
+      16356,
+      20162,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "世界升级级别影响",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "猎犬袭击的规模取决于[[森林世界]]中在线玩家的平均生存天数。"
+          }
+        ]
+      },
+      {
+        "aspect": "召唤技能描述",
+        "evidence": [
+          {
+            "pageid": 15751,
+            "quote": "嚎叫：座狼仰天长啸，召唤多只[[猎犬]]助战，冷却时间 15 秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节变种替换规则",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "在[[夏季]]和[[秋季]]，袭击的[[猎犬]]有概率被替换为[[火焰猎犬]]"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15751,
+            "quote": "座狼会主动攻击周围的任何生物，但优先仇恨玩家。"
+          }
+        ]
+      },
+      {
+        "aspect": "波次设置自定义",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "猎犬袭击的间隔和警告阶段的时间可以在[[世界规则]]中调整："
+          }
+        ]
+      },
+      {
+        "aspect": "生成来源指定",
+        "evidence": [
+          {
+            "pageid": 13857,
+            "quote": "生成自 = {{Pic|32|猎犬丘}}"
+          }
+        ]
+      },
+      {
+        "aspect": "袭击间隔描述",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "每隔一定[[昼夜循环|天数]]，就会发生一次猎犬袭击。"
+          }
+        ]
+      },
+      {
+        "aspect": "警告阶段描述",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "平均生存天数越高，猎犬数量越多、警告阶段越短"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "猎犬袭击",
+    "冰猎犬",
+    "火猎犬",
+    "袭击警告",
+    "袭击升级",
+    "季节猎犬",
+    "生存天数",
+    "猎犬生成",
+    "袭击事件"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ce8c2079bb57fdd1ad8211f84a19b68f5fdaba0ddab17fbdbbd69e467aa62b09",
+    "source_bytes": 35321,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108556088
+  }
+}

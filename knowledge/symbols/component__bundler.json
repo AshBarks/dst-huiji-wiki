@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bundler.lua"
+  },
+  "category": "component",
+  "display_name": "bundler",
+  "summary": "bundler组件管理物品捆绑的过程，允许玩家将多个物品打包成一个捆绑包物品。它处理捆绑的开始、进行和完成，涉及容器操作和物品生成，核心玩法是物品的打包与存储。",
+  "api": [
+    {
+      "name": "CanStartBundling",
+      "effect": "检查是否可以开始捆绑：返回true当玩家状态为'bundle'且当前无进行中的捆绑。"
+    },
+    {
+      "name": "IsBundling",
+      "effect": "检查是否正在进行捆绑：比较给定捆绑实例与当前实例，且玩家状态为'bundling'时返回true。"
+    },
+    {
+      "name": "StartBundling",
+      "effect": "开始捆绑：使用给定物品生成捆绑容器实体，打开容器并绑定到玩家，记录物品信息；若成功返回true，否则移除容器。"
+    },
+    {
+      "name": "StopBundling",
+      "effect": "停止捆绑：清空捆绑容器内物品到玩家库存（或掉落），移除容器实体，并重新生成原始物品；无副作用于库存时物品直接掉落。"
+    },
+    {
+      "name": "FinishBundling",
+      "effect": "完成捆绑：检查捆绑容器非空且状态正确，关闭容器并进入完成状态，返回true；否则无操作。"
+    },
+    {
+      "name": "OnFinishBundling",
+      "effect": "处理捆绑完成：生成捆绑包物品，将容器内物品包裹其中，移除容器并将捆绑包给予玩家或掉落。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据：返回包含物品和捆绑信息的数据表，供存档使用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据：根据数据恢复捆绑状态，生成容器实体并调整物品，若已有进行中捆绑则先停止。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      14696,
+      28744,
+      18359,
+      19129,
+      72441,
+      15295,
+      22465
+    ],
+    "aspects": [
+      {
+        "aspect": "捆绑包装的打包与拆包行为",
+        "evidence": [
+          {
+            "pageid": 14696,
+            "quote": "捆绑包装允许玩家将最多 4 件物品打包成为 1 个捆绑物资"
+          },
+          {
+            "pageid": 14696,
+            "quote": "拆开捆绑物资后，其中的物品会掉落在地上"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "捆绑",
+    "打包",
+    "包装",
+    "容器",
+    "物品",
+    "制作",
+    "解包",
+    "存储"
+  ],
+  "gameplay_tags": [
+    "制作",
+    "存储",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "882953d8fe07db03fb2aa704276b3a2851b89dfe13d0d9178c0d3011bfbfc579",
+    "source_bytes": 7581,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090686025
+  }
+}

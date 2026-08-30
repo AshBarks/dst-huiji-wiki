@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shedder.lua"
+  },
+  "category": "component",
+  "display_name": "shedder",
+  "summary": "Shedder组件管理实体的物品掉落行为，维护掉落物品预制体、掉落高度和周期性任务。它通过定时任务或手动调用生成物品，常用于生物（如熊獾）定期脱落物品或触发一次性掉落效果。",
+  "api": [
+    {
+      "name": "StartShedding",
+      "effect": "启动周期性掉落任务，每间隔（默认60秒）调用DoSingleShed生成一个物品。副作用：取消现有周期性任务并创建新任务。"
+    },
+    {
+      "name": "StopShedding",
+      "effect": "停止当前周期性掉落任务。副作用：取消任务并将任务引用设为nil。"
+    },
+    {
+      "name": "DoSingleShed",
+      "effect": "生成一个物品（如果shitedItemPrefab不为nil），并将其放置在实体附近的随机位置（偏移±0.5），高度为shedHeight（默认6.5）。副作用：可能生成物品并返回该物品实体。"
+    },
+    {
+      "name": "DoMultiShed",
+      "effect": "生成多个物品，如果random为true则随机数量（1到max），否则固定数量max。生成的物品如果有物理组件，则设置随机方向的水平速度（速度4）。副作用：生成多个物品并可能设置其物理速度。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20154,
+      15642,
+      14579,
+      13779,
+      18359,
+      45249,
+      14938,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 StartShedding、StopShedding、DoSingleShed 或 DoMultiShed 相关的玩家语言表达；所有内容均围绕掉落物、攻击、生成等，无脱皮或类似能力的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "脱落",
+    "掉落",
+    "周期性生成",
+    "物品生成",
+    "熊獾",
+    "资源掉落",
+    "sheddable",
+    "生成物品"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "掉落"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "95bbf2ed4804754ea29039c1a3d4887676bb118902e551d5b7746d111331986b",
+    "source_bytes": 1406,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097480464
+  }
+}

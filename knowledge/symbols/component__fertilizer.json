@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fertilizer.lua"
+  },
+  "category": "component",
+  "display_name": "fertilizer",
+  "summary": "Fertilizer组件管理肥料的营养值和使用属性，用于游戏中的施肥玩法。它允许实体作为肥料被应用到目标，提供营养并可能消耗自身。组件处理有限使用次数和移除逻辑。",
+  "api": [
+    {
+      "name": "SetHealingAmount",
+      "effect": "已弃用方法，无实际功能。"
+    },
+    {
+      "name": "SetNutrients",
+      "effect": "设置组件的营养值。接受三个数值参数或一个表参数，将营养值存储在self.nutrients中。"
+    },
+    {
+      "name": "OnApplied",
+      "effect": "当肥料被应用时调用。消耗有限使用组件的使用次数；如果有onappliedfn回调，则执行；如果是最后一次使用，则移除实体或堆叠项。"
+    },
+    {
+      "name": "Heal",
+      "effect": "已弃用方法，始终返回false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      13261,
+      14711,
+      19932,
+      19714,
+      51951,
+      16197,
+      14712
+    ],
+    "aspects": [
+      {
+        "aspect": "土壤营养提升描述",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "玩家可以使用肥料来提升农田地块的土壤营养"
+          },
+          {
+            "pageid": 19714,
+            "quote": "对农田地块使用肥料会为它添加所对应的营养物质"
+          }
+        ]
+      },
+      {
+        "aspect": "施肥动作加速描述",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "使用肥料包时动作加快"
+          }
+        ]
+      },
+      {
+        "aspect": "植物收成恢复描述",
+        "evidence": [
+          {
+            "pageid": 19714,
+            "quote": "对枯萎的浆果丛、多汁浆果丛、石果灌木丛、草、树苗、猴尾草或香蕉丛使用肥料会使其恢复收成"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值恢复量描述",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "恢复沃姆伍德 40生命值（立即恢复 8 点，在接下来 32 秒内每 2 秒恢复 2 点）"
+          }
+        ]
+      },
+      {
+        "aspect": "蘑菇农场恢复描述",
+        "evidence": [
+          {
+            "pageid": 14712,
+            "quote": "需要使用一个活木头进行施肥来恢复使用"
+          }
+        ]
+      },
+      {
+        "aspect": "高温枯萎解除描述",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "用肥料施肥会在解除作物高温枯萎状态的同时使作物的可采集次数恢复至上限"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "肥料",
+    "施肥",
+    "营养",
+    "使用次数",
+    "种植",
+    "农业",
+    "土壤",
+    "恢复"
+  ],
+  "gameplay_tags": [
+    "种植",
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0fbb8c30a25201a06be76e1e6a814fc2428c1fab002db51607a6570e08a957a7",
+    "source_bytes": 1280,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092385152
+  }
+}

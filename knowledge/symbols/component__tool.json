@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/tool.lua"
+  },
+  "category": "component",
+  "display_name": "tool",
+  "summary": "Tool组件管理工具的动作集和效果值，监听耐久度变化事件。当工具耐久度耗尽时，通过推送toolbroke事件通知所有者。参与工具使用、修理和替换等核心玩法。",
+  "api": [
+    {
+      "name": "EnableToughWork",
+      "effect": "设置工具是否能进行坚固工作。若参数tough不是false，则设为true；否则设为false。"
+    },
+    {
+      "name": "CanDoToughWork",
+      "effect": "查询工具是否能进行坚固工作。返回true或false。"
+    },
+    {
+      "name": "GetEffectiveness",
+      "effect": "获取指定动作的效果值。若动作未设置，则返回0。"
+    },
+    {
+      "name": "SetAction",
+      "effect": "设置工具对指定动作的效果值。断言动作ID在TOOLACTIONS表中有效，并将动作标签添加到实体。"
+    },
+    {
+      "name": "CanDoAction",
+      "effect": "查询工具是否能执行指定动作。返回true或false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "toolbroke"
+  ],
+  "events_listened": [
+    "percentusedchange"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15539,
+      65881,
+      18219,
+      15022,
+      15922,
+      18359,
+      15303
+    ],
+    "aspects": [
+      {
+        "aspect": "倒走表使用效果",
+        "evidence": [
+          {
+            "pageid": 15303,
+            "quote": "[[倒走表]]在使用时可以获得短暂的无敌时间，使其成为一种强大的作战工具，可以用于规避伤害。"
+          }
+        ]
+      },
+      {
+        "aspect": "巨兽攻击行为优先级",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "天体英雄会优先使用翻滚攻击，如果翻滚攻击处于冷却中，就会使用盾牌攻击。"
+          }
+        ]
+      },
+      {
+        "aspect": "弹药技能解锁使用",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "只有在沃尔特在他的[[技能树]]中学习了相应技能才能够制作和使用"
+          }
+        ]
+      },
+      {
+        "aspect": "战歌恢复生命效果",
+        "evidence": [
+          {
+            "pageid": 18219,
+            "quote": "吟唱'''心碎歌谣（{{En|Heartrending Ballad}}）'''时，战歌作用范围内的非薇格弗德玩家角色和被雇佣的生物每次攻击恢复 1{{生"
+          }
+        ]
+      },
+      {
+        "aspect": "武器攻击伤害与条件",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "普通攻击对敌人造成 15 点物理伤害；不易吸引敌人的仇恨。在短时间内攻击 13 次之后下次攻击会对目标施加一次单体的"
+          }
+        ]
+      },
+      {
+        "aspect": "玩具交易功能",
+        "evidence": [
+          {
+            "pageid": 18359,
+            "quote": "熔化的弹珠能作为交易物品使用："
+          }
+        ]
+      },
+      {
+        "aspect": "电路板激活增益设置",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "激活来产生对应的增益"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "工具",
+    "耐久度",
+    "动作",
+    "效果",
+    "坚固工作",
+    "损坏",
+    "修理",
+    "使用",
+    "替换",
+    "采集"
+  ],
+  "gameplay_tags": [
+    "工具",
+    "生存",
+    "制造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ec086e8fd11cf1ca93b1a47894028dd2b9a27df57fe508ab3c42a313f7fb0ada",
+    "source_bytes": 1352,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090402731
+  }
+}

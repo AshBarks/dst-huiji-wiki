@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowcreaturespawner.lua"
+  },
+  "category": "component",
+  "display_name": "shadowcreaturespawner",
+  "summary": "该组件管理与玩家理智值相关的影怪（如恐怖之嘴、爬行恐惧、海洋恐怖）的生成与移除。它根据玩家的理智状态动态调整目标影怪数量，并跟踪已生成的影怪实体，参与游戏的核心生存与战斗玩法。",
+  "api": [
+    {
+      "name": "SpawnShadowCreature",
+      "effect": "根据玩家的理智值和位置生成相应的影怪实体（陆地或海洋），并开始跟踪该实体。副作用：在游戏世界中生成新实体，更新内部玩家跟踪列表，若生成失败或实体移除则调整后续生成任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前所有玩家跟踪的影怪数量字符串，用于调试显示。副作用：无，仅读取内部数据。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_exchangeshadowcreature",
+    "inducedinsanity",
+    "sanitymodechanged"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SANITYMONSTERS_SPAWN_INTERVAL",
+    "TUNING.SANITYMONSTERS_SPAWN_VARIANCE",
+    "TUNING.SANITYMONSTERS_INDUCED_MAXPOP",
+    "TUNING.SANITYMONSTERS_INDUCED_CHANCES",
+    "TUNING.SANITYMONSTERS_MAXPOP",
+    "TUNING.SANITYMONSTERS_CHANCES",
+    "TUNING.SANITYMONSTERS_POP_CHANGE_INTERVAL",
+    "TUNING.SANITYMONSTERS_POP_CHANGE_VARIANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      18234,
+      34314,
+      34523,
+      65605,
+      20714,
+      52788,
+      14579
+    ],
+    "aspects": [
+      {
+        "aspect": "理智值不足时生成理智怪兽",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "则会立刻生成一只[[理智怪兽]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "影怪",
+    "理智",
+    "生成",
+    "恐怖之嘴",
+    "爬行恐惧",
+    "海洋恐怖",
+    "疯了",
+    "精神",
+    "怪物",
+    "刷新"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ff1907926ac3cbe49641d5993c275edc85eef290e3b33adab67b460ffe832cca",
+    "source_bytes": 12742,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112208405
+  }
+}

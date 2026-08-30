@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boattrailmover.lua"
+  },
+  "category": "component",
+  "display_name": "boattrailmover",
+  "summary": "该组件管理一个移动实体的行为，用于模拟船尾迹的运动效果。它存储方向、速度、加速度等数据，并在每帧更新中移动实体，参与航海相关的移动与视觉效果玩法。",
+  "api": [
+    {
+      "name": "Setup",
+      "effect": "接收方向向量（dir_x, dir_z）、初始速度（velocity）和加速度（acceleration），设置内部状态，反转方向用于移动计算，根据方向设置实体旋转角度，并启动组件的更新循环。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "在每个时间步（dt）被调用，减少跟踪时间（track_boat_time），根据加速度更新当前速度，然后基于速度和方向更新实体在世界中的位置。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18357,
+      15022,
+      18410,
+      15922,
+      13406,
+      16594,
+      18188
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__boattrailmover 或其相关能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船尾迹",
+    "移动器",
+    "速度",
+    "加速度",
+    "方向",
+    "航海",
+    "尾迹",
+    "轨迹",
+    "移动效果"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "移动",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37222773d07c9685e61adb8c57429da44db559128ff96fe79dbae55f9ff5d5c3",
+    "source_bytes": 855,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098626755
+  }
+}

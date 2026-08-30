@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerfloater.lua"
+  },
+  "category": "component",
+  "display_name": "playerfloater",
+  "summary": "PlayerFloater组件管理玩家漂浮物品的装备与卸载逻辑，提供自动部署和释放功能。它通过装备组件控制物品在玩家装备栏的状态，确保物品可以安全地添加或移除，参与水上生存或移动的核心玩法。",
+  "api": [
+    {
+      "name": "SetOnEquip",
+      "effect": "设置装备时的回调函数，并将其传递给实体的装备组件（如果存在）。"
+    },
+    {
+      "name": "SetOnUnequip",
+      "effect": "设置卸载时的回调函数，用于在物品卸载时执行自定义逻辑。"
+    },
+    {
+      "name": "MakeEquippable_Internal",
+      "effect": "内部方法，为实体添加装备组件，设置装备和卸载回调，并启用防卸载功能。"
+    },
+    {
+      "name": "AutoDeploy",
+      "effect": "自动将物品装备给玩家：先丢弃玩家手中的物品，关闭身体装备的背包，然后装备自身物品到玩家装备栏。"
+    },
+    {
+      "name": "LetGo",
+      "effect": "允许玩家释放物品：设置防卸载为假，然后根据指定方向和位置丢弃物品。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置物品状态：设置防卸载为假，从装备栏移除物品，然后将物品放回玩家库存。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，如果物品处于装备状态则返回包含equipped标识的数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果数据表明物品已装备则重新添加装备组件以恢复状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后传递，移除装备组件以防止状态不一致（仅当物品未通过库存加载时生效）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13701,
+      20714,
+      28179,
+      72238,
+      16419,
+      15238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录未涉及玩家浮动（playerfloater）组件的能力或行为语义，如装备、部署、保存等具体描述。页面内容主要关于游戏实体、装备分类、控制台命令等，与 playerfloater 无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "漂浮",
+    "装备",
+    "自动部署",
+    "释放",
+    "玩家",
+    "浮标",
+    "水上",
+    "重置",
+    "防卸载",
+    "库存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装备",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7af27924e5a22ac0d1aba94d90c49b29fde11b39b14e559671e78a671e68aeff",
+    "source_bytes": 2403,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102577830
+  }
+}

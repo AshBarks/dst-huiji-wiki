@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/terraformer.lua"
+  },
+  "category": "component",
+  "display_name": "terraformer",
+  "summary": "Terraformer组件负责地形改造功能，管理地图瓦片类型的设置与点检查。它通过Terraform方法改变地面地形，触发相关事件，是建造、农田管理和地形调整等核心玩法的基础组件。",
+  "api": [
+    {
+      "name": "Terraform",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "onterraform"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14711,
+      14484,
+      21485,
+      15415,
+      13567,
+      18545,
+      14648,
+      14672
+    ],
+    "aspects": [
+      {
+        "aspect": "园艺锄犁地工具功能描述",
+        "evidence": [
+          {
+            "pageid": 14648,
+            "quote": "园艺锄是用来给[[农田地块]]犁地的工具。"
+          }
+        ]
+      },
+      {
+        "aspect": "耕地机部署与地块转化",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "物品形态的耕地机可以被部署在任意一块可进行{{解释|种植}}且不是[[#农田地块|农田地块]]的[[地块]]上成为建筑形态"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人挖掘与犁地行为",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "否则，就会寻找可用的犁地点位："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "地形改造",
+    "瓦片设置",
+    "犁地",
+    "土壤",
+    "地图修改",
+    "地面类型",
+    "农田",
+    "建造工具"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "生存",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5ebc97583da1f36e8f4ad6d94ae343023642d16a0b9c38232fa31cdeb16c521c",
+    "source_bytes": 1288,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096009033
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dsp.lua"
+  },
+  "category": "component",
+  "display_name": "dsp",
+  "summary": "该组件管理数字信号处理滤镜，用于调整游戏音频以增强环境沉浸感。根据季节变化（冬季应用低通滤镜，夏季根据温度应用高通滤镜）动态修改移动、玩家和语音等声音通道。通过事件驱动和堆栈系统支持多个滤镜效果叠加，参与季节生存和环境玩法。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；所有操作通过事件（如pushdsp、popdsp）和内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated",
+    "seasontick",
+    "pushdsp",
+    "popdsp",
+    "temperaturetick"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19802,
+      15567,
+      16165
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与component__dsp直接相关的能力或行为描述，且未提供该符号的具体能力清单以进行匹配。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "音效滤镜",
+    "环境音效",
+    "季节音效",
+    "声音处理",
+    "滤镜效果",
+    "低通滤波",
+    "高通滤波",
+    "温度影响",
+    "游戏音效"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "沉浸"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a537c92feff34061102656d18c3f954b09bca6152ae1a258d6d60a42f0aadb86",
+    "source_bytes": 9544,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107075227
+  }
+}

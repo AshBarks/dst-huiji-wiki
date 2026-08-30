@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/riftthralltype.lua"
+  },
+  "category": "component",
+  "display_name": "riftthralltype",
+  "summary": "该组件管理实体的裂隙奴役类型（thrall_type），提供设置、获取和检查类型的功能。它参与游戏中的裂隙奴役系统，影响实体在裂隙事件中的行为和交互。组件还支持数据的保存和加载，确保游戏状态的一致性。",
+  "api": [
+    {
+      "name": "SetThrallType",
+      "effect": "设置实体的裂隙奴役类型为指定值（new_type），无额外副作用。"
+    },
+    {
+      "name": "GetThrallType",
+      "effect": "返回当前实体的裂隙奴役类型值。"
+    },
+    {
+      "name": "IsThrallType",
+      "effect": "检查当前裂隙奴役类型是否与给定类型（check_type）匹配，返回布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存裂隙奴役类型数据到表中用于存档；如果类型为 nil 则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据（data）中加载裂隙奴役类型，如果数据存在且包含 thrall_type 则设置。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回裂隙奴役类型的调试字符串，如果类型为 nil 则返回 \"NONE\"。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23957,
+      23956,
+      34314,
+      20714,
+      65605,
+      15303,
+      65881,
+      19595
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述裂隙循环机制、世界翻新、控制台命令等游戏内容，未涉及component__riftthralltype组件的SetThrallType、GetThrallType、IsThrallType、OnSave、OnLoad、GetDebugString等能力的任何玩家语言表达（如设置、获取、判断仆从类型或保存/加载行为）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "裂隙",
+    "奴役",
+    "类型",
+    "thrall",
+    "rift",
+    "设置",
+    "获取",
+    "检查",
+    "保存",
+    "加载"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "304158c9d43a0aea87149df7f937a65a693a8d68a5b99990a1ae7841ef2e1157",
+    "source_bytes": 766,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097295493
+  }
+}

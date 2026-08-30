@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sleepingbag.lua"
+  },
+  "category": "component",
+  "display_name": "sleepingbag",
+  "summary": "组件管理睡眠袋的睡眠状态，包括睡眠者、健康睡眠设置、温度调节和睡眠阶段。核心玩法是允许玩家在睡眠袋中睡眠，以恢复健康、饥饿和理智，并受温度影响。",
+  "api": [
+    {
+      "name": "SetSleepPhase",
+      "effect": "设置组件的睡眠阶段为指定值。行为：修改sleep_phase属性。副作用：无。"
+    },
+    {
+      "name": "GetSleepPhase",
+      "effect": "获取当前睡眠阶段。行为：返回sleep_phase值。副作用：无。"
+    },
+    {
+      "name": "SetTemperatureTickFn",
+      "effect": "设置温度tick函数为指定函数。行为：将temperaturetickfn设置为fn。副作用：无。"
+    },
+    {
+      "name": "DoSleep",
+      "effect": "让doer开始睡眠。行为：如果当前没有睡眠者且doer未使用其他睡眠袋，则设置sleeper为doer，关联睡眠袋，调用sleepingbaguser组件的DoSleep，并触发onsleep回调。副作用：修改sleeper，添加标签'hassleeper'，调用外部回调和组件方法。"
+    },
+    {
+      "name": "DoWakeUp",
+      "effect": "结束睡眠。行为：如果sleeper存在且属于当前实例，则解除关联，调用sleepingbaguser组件的DoWakeUp，并触发onwake回调。副作用：清空sleeper，移除标签'hassleeper'，调用外部回调和组件方法。"
+    },
+    {
+      "name": "InUse",
+      "effect": "检查睡眠袋是否在使用中。行为：返回sleeper是否非空。副作用：无。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SLEEP_TICK_PERIOD",
+    "SLEEP_HUNGER_PER_TICK",
+    "SLEEP_HEALTH_PER_TICK",
+    "SLEEP_SANITY_PER_TICK"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      28739,
+      14701,
+      15258,
+      51097,
+      70704,
+      14703,
+      15327,
+      15832
+    ],
+    "aspects": [
+      {
+        "aspect": "使用状态描述",
+        "evidence": [
+          {
+            "pageid": 28739,
+            "quote": "|被使用中|"
+          }
+        ]
+      },
+      {
+        "aspect": "睡觉行为描述",
+        "evidence": [
+          {
+            "pageid": 14701,
+            "quote": "在[[黄昏]]、[[夜晚]]或者在[[洞穴]]，且{{饥饿值}}不少于 26 时，右键物品栏中的草席卷可以睡觉。"
+          },
+          {
+            "pageid": 15258,
+            "quote": "在夜晚则会睡觉。"
+          },
+          {
+            "pageid": 51097,
+            "quote": "在白天，舒适的兔人会在自己的枕头盔甲上睡觉"
+          }
+        ]
+      },
+      {
+        "aspect": "醒来行为描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "角色靠近它 10 单位会使它醒来"
+          },
+          {
+            "pageid": 51097,
+            "quote": "在黄昏和夜晚醒来"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "睡眠袋",
+    "睡觉",
+    "恢复健康",
+    "饥饿恢复",
+    "理智恢复",
+    "温度管理",
+    "睡眠阶段",
+    "睡眠状态",
+    "使用中"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "恢复",
+    "睡眠"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8b5423cad0d8e31e9e32c1770f83496fb609c22915167d39f8b9864c77ae1e40",
+    "source_bytes": 2449,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094488200
+  }
+}

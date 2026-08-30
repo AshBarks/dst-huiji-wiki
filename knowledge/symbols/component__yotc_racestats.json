@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotc_racestats.lua"
+  },
+  "category": "component",
+  "display_name": "yotc_racestats",
+  "summary": "该组件管理赛车的四个核心属性：速度、方向、反应和耐力。这些属性通过点数系统进行调整，影响赛车在竞速比赛中的表现。组件提供了修改、查询和保存这些属性的方法，支持随机分配点数和降级功能。",
+  "api": [
+    {
+      "name": "GetSpeedModifier",
+      "effect": "返回速度属性值除以最大值的比率，无副作用。"
+    },
+    {
+      "name": "GetDirectionModifier",
+      "effect": "返回方向属性值除以最大值的比率，无副作用。"
+    },
+    {
+      "name": "GetReactionModifier",
+      "effect": "返回反应属性值除以最大值的比率，无副作用。"
+    },
+    {
+      "name": "GetStaminaModifier",
+      "effect": "返回耐力属性值除以最大值的比率，无副作用。"
+    },
+    {
+      "name": "ModifySpeed",
+      "effect": "如果point_mod非nil且非0，则增加或减少速度点数，但受基线值（baseline_speed或初始值）和最大值限制；副作用是修改self.speed。"
+    },
+    {
+      "name": "ModifyDirection",
+      "effect": "如果point_mod非nil且非0，则增加或减少方向点数，但受基线值（baseline_direction或初始值）和最大值限制；副作用是修改self.direction。"
+    },
+    {
+      "name": "ModifyReaction",
+      "effect": "如果point_mod非nil且非0，则增加或减少反应点数，但受基线值（baseline_reaction或初始值）和最大值限制；副作用是修改self.reaction。"
+    },
+    {
+      "name": "ModifyStamina",
+      "effect": "如果point_mod非nil且非0，则增加或减少耐力点数，但受基线值（baseline_stamina或初始值）和最大值限制；副作用是修改self.stamina。"
+    },
+    {
+      "name": "GetBestStats",
+      "effect": "返回一个列表，包含最高属性值的索引（1对应速度，2对应方向，3对应反应，4对应耐力），无副作用。"
+    },
+    {
+      "name": "GetNumStatPoints",
+      "effect": "返回四个属性值之和，无副作用。"
+    },
+    {
+      "name": "AddRandomPointSpread",
+      "effect": "将num_points个点数随机分配到未达到最大值的属性中，每个点数增加1点；如果num_points为nil，则不操作；副作用是修改属性值，并更新未达最大值的属性列表。"
+    },
+    {
+      "name": "DegradePoints",
+      "effect": "如果num_points为nil，则将所有属性重置为基线值（baseline或初始值）；否则，随机减少num_points个点数，仅从高于基线的属性中减少；返回布尔值表示是否还有属性值高于基线；副作用是修改属性值，并更新高于基线的属性列表。"
+    },
+    {
+      "name": "SaveCurrentStatsAsBaseline",
+      "effect": "将当前四个属性值保存为对应的基线值（baseline_*变量）；副作用是设置baseline_speed、baseline_direction、baseline_reaction和baseline_stamina。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含当前所有属性值和基线值，用于数据保存；无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从输入的data表中加载四个属性值和四个基线值；副作用是更新self.speed、self.direction、self.reaction、self.stamina及其基线值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的字符串，显示当前属性值和基线值（如果存在），用于调试；无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18357,
+      18410,
+      15922,
+      15022,
+      13406,
+      16594,
+      18188
+    ],
+    "aspects": [
+      {
+        "aspect": "方向舵控制方向",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "建在漂浮平台上的方向舵能控制同一漂浮平台上的桅杆的动力方向。"
+          }
+        ]
+      },
+      {
+        "aspect": "装备移动速度属性",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "装备/速度=×1.1"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "竞速",
+    "速度",
+    "方向",
+    "反应",
+    "耐力",
+    "点数",
+    "调整",
+    "降级",
+    "随机分配"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "竞赛",
+    "赛车",
+    "属性管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fc269164cb6d2870eaaf11bcc6cdfb6ea888c0083753d373d6b52b9c962492d0",
+    "source_bytes": 8908,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098040657
+  }
+}

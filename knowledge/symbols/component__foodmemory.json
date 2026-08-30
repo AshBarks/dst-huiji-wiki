@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/foodmemory.lua"
+  },
+  "category": "component",
+  "display_name": "foodmemory",
+  "summary": "FoodMemory 组件管理实体对食物的记忆数据，记录每种食物被食用的次数，并设置定时遗忘任务。它参与饥荒中的食物效果机制，通过倍率表根据食用次数计算食物效果倍率，支持保存和加载状态。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当实体移除该组件时，取消所有食物记忆的定时任务，清理资源。"
+    },
+    {
+      "name": "SetDuration",
+      "effect": "设置食物记忆的全局遗忘持续时间，影响所有新记忆的食物。"
+    },
+    {
+      "name": "SetMultipliers",
+      "effect": "设置食物效果倍率表，用于根据食用次数计算倍率。"
+    },
+    {
+      "name": "GetBaseFood",
+      "effect": "返回食物的基础名称；如果是调味食物，则返回其基础食物名称。"
+    },
+    {
+      "name": "RememberFood",
+      "effect": "记录食物被食用，增加该食物的食用次数并重置遗忘计时器。若食物已记录则更新计数，否则创建新记录。"
+    },
+    {
+      "name": "GetMemoryCount",
+      "effect": "返回指定食物的食用次数；若未记录则返回0。"
+    },
+    {
+      "name": "GetFoodMultiplier",
+      "effect": "根据食用次数从倍率表获取食物效果倍率；若未记录或倍率表未设置，则返回1。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前食物记忆数据，包括食用次数和剩余时间。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据中加载食物记忆，恢复食用次数并重设定时任务。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      13153,
+      19692
+    ],
+    "aspects": [
+      {
+        "aspect": "沃利的特殊能力描述",
+        "evidence": [
+          {
+            "pageid": 13153,
+            "quote": "沃利独有'''食物记忆倍率'''。"
+          }
+        ]
+      },
+      {
+        "aspect": "牛奶帽受食物记忆倍率影响",
+        "evidence": [
+          {
+            "pageid": 19692,
+            "quote": "食物记忆倍率和饥饿值吸收倍率适用于牛奶帽的恢复饥饿效果。"
+          }
+        ]
+      },
+      {
+        "aspect": "食物恢复公式中的倍率提及",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "食物记忆倍率×饥饿值吸收倍率"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "食物记忆",
+    "食用次数",
+    "食物倍率",
+    "定时遗忘",
+    "食物调味",
+    "基本食物",
+    "食物增益",
+    "多次食用"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "进食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "89fef75cdf4eac4db36bb383c90e7130aae577abb7a0a29e54159b7c293962ef",
+    "source_bytes": 2445,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107665266
+  }
+}

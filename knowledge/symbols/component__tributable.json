@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/tributable.lua"
+  },
+  "category": "component",
+  "display_name": "tributable",
+  "summary": "Tributable 组件管理实体的贡品值、奖励阈值、衰减时间和已给奖励次数。核心玩法是当实体接受贡品时，贡品值增加，达到阈值后可给予奖励，贡品值会随时间衰减。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前贡品值的调试字符串。"
+    },
+    {
+      "name": "HasPendingReward",
+      "effect": "检查当前贡品值是否达到奖励阈值（rewardattributevalue），返回布尔值。"
+    },
+    {
+      "name": "OnGivenReward",
+      "effect": "重置贡品值为0，增加已给奖励次数，取消衰减任务，调用 ongivenrewardfn 回调函数。"
+    },
+    {
+      "name": "OnAccept",
+      "effect": "接受贡品，增加当前贡品值，推送 onaccepttribute 事件，设置衰减任务（若未达到奖励阈值且衰减时间大于0）。"
+    },
+    {
+      "name": "OnRefuse",
+      "effect": "拒绝贡品，推送 onrefusetribute 事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前状态数据，包括贡品值、剩余衰减时间和已给奖励次数。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载状态，恢复贡品值、衰减任务和已给奖励次数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onaccepttribute",
+    "onrefusetribute"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51497,
+      51221,
+      15975,
+      51498,
+      56871,
+      18778,
+      21333
+    ],
+    "aspects": [
+      {
+        "aspect": "任务奖励给予描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "任务完成后，珍珠会念完相应台词之后才会送给玩家一包谢意。"
+          },
+          {
+            "pageid": 51497,
+            "quote": "首次完成任务后，瓦格斯塔夫会奖励给玩家 1 个空的火花柜。"
+          },
+          {
+            "pageid": 51498,
+            "quote": "瓦格斯塔夫都会返还一张{{item|研究笔记}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "贡品值",
+    "奖励阈值",
+    "接受贡品",
+    "拒绝贡品",
+    "衰减时间",
+    "当前值",
+    "已给奖励",
+    "任务",
+    "回调"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "社交",
+    "奖励"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "be60456e8dff9a739c6f207ecf142de1c7c15550ce535d5be37b2bf466687edd",
+    "source_bytes": 2302,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113340288
+  }
+}

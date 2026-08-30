@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/transformer.lua"
+  },
+  "category": "component",
+  "display_name": "transformer",
+  "summary": "该组件用于管理实体在两种形态（例如兔子与兔人）之间的变换与恢复。它通过监听指定事件或世界状态来触发变换，并负责保存与恢复实体的原始状态数据。核心玩法涉及根据游戏事件或条件，将实体在不同预制体形态间转换。",
+  "api": [
+    {
+      "name": "SetOnTransformFn(fn)",
+      "effect": "设置一个在变换开始时调用的回调函数。"
+    },
+    {
+      "name": "SetOnRevertFn(fn)",
+      "effect": "设置一个在恢复开始时调用的回调函数。"
+    },
+    {
+      "name": "SetObjectData(data)",
+      "effect": "直接设置组件保存的实体对象数据（objectData）。"
+    },
+    {
+      "name": "GetObjectData()",
+      "effect": "收集当前实体所有组件的存档数据和实体自身的存档数据，并将其保存到 self.objectData 中，供后续恢复时使用。"
+    },
+    {
+      "name": "RemoveSleepEvents()",
+      "effect": "移除监听的“entitysleep”事件回调，并清空排队的变换/恢复任务状态。"
+    },
+    {
+      "name": "SetRevertEvent(event, target)",
+      "effect": "设置触发恢复变换的事件名和目标。在约0.1秒延迟后监听该事件，事件触发时会调用恢复流程。若已设置过，则忽略新设置。"
+    },
+    {
+      "name": "SetTransformEvent(event, target)",
+      "effect": "设置触发开始变换的事件名和目标。在约0.1秒延迟后监听该事件，事件触发时会调用变换流程。若已设置过，则忽略新设置。"
+    },
+    {
+      "name": "SetRevertWorldEvent(event, value)",
+      "effect": "设置触发恢复的世界状态事件名和期望值。监听该世界状态，当状态值匹配或未设置过滤值时触发恢复。若已设置过，则忽略新设置。"
+    },
+    {
+      "name": "SetTransformWorldEvent(event, value)",
+      "effect": "设置触发变换的世界状态事件名和期望值。监听该世界状态，当状态值匹配或未设置过滤值时触发变换。若已设置过，则忽略新设置。"
+    },
+    {
+      "name": "SetOnLoadCheck(check)",
+      "effect": "设置一个在存档加载后（LoadPostPass）用于检查实体是否应该进行变换或恢复的函数。"
+    },
+    {
+      "name": "StartTransform()",
+      "effect": "启动变换流程。首先清除睡眠事件，然后根据实体是否处于离线（睡眠）状态及 transformOffScreen 设置，决定立即执行变换还是等待下次睡眠时再执行。"
+    },
+    {
+      "name": "StartRevert()",
+      "effect": "启动恢复流程。首先清除睡眠事件，然后根据实体是否处于离线（睡眠）状态及 transformOffScreen 设置，决定立即执行恢复还是等待下次睡眠时再执行。"
+    },
+    {
+      "name": "Transform()",
+      "effect": "实际执行变换。在随机延迟后，生成 transformPrefab 指定的预制体，将其放置在当前实体位置，并尝试将当前实体的变换事件、世界事件、加载检查和对象数据复制给新实体。然后移除当前实体。"
+    },
+    {
+      "name": "Revert()",
+      "effect": "实际执行恢复。在随机延迟后，根据 objectData 中记录的原始预制体名称生成新实体，将其放置在当前实体位置，并根据保存的组件数据恢复新实体的状态。然后移除当前实体。"
+    },
+    {
+      "name": "TransformOnSleep()",
+      "effect": "将变换任务排入队列，并监听当前实体的“entitysleep”事件，事件发生时执行变换。"
+    },
+    {
+      "name": "RevertOnSleep()",
+      "effect": "将恢复任务排入队列，并监听当前实体的“entitysleep”事件，事件发生时执行恢复。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "序列化组件状态，包括排队的变换/恢复状态、变换预制体、是否已变换、对象数据、事件监听设置等，并返回数据和引用列表。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "反序列化组件状态，恢复变换预制体、对象数据、变换状态和事件名，并根据保存的状态重新排队变换或恢复任务。"
+    },
+    {
+      "name": "LoadPostPass(ents, data)",
+      "effect": "加载后处理。在0秒延迟后，根据保存的 onLoadCheck 函数检查实体是否需要变换或恢复。同时根据保存的数据，重新设置事件监听（变换事件、恢复事件、世界状态事件），并恢复事件目标实体的引用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      14683,
+      45891,
+      57263
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及任何与组件变换或回复相关的代码能力或行为描述，内容主要涉及角色特性、物品用法、事件触发器和区域机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "状态切换",
+    "事件触发",
+    "形态变化",
+    "实体转换",
+    "状态保存",
+    "环境状态",
+    "变换恢复",
+    "预制体切换",
+    "事件监听"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "生存",
+    "魔法",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a91b24391592de471e9b49d9b5aa1ed131b5532728ef7ce2c6b08cd88404b87f",
+    "source_bytes": 8307,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113299486
+  }
+}

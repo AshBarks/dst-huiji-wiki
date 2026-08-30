@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_clock.lua"
+  },
+  "category": "component",
+  "display_name": "shard_clock",
+  "summary": "shard_clock 是一个纯数据同步组件，负责在主分片（Master Shard）与副分片（Cave/Ruins）之间同步游戏世界的时间状态。主分片在接收到主世界的时钟更新事件后，将关键时间数据写入网络变量；副分片则监听这些网络变量的变化，并将接收到的更新数据作为事件推送出去，确保所有分片维持统一的时间流。",
+  "api": [],
+  "api_note": "纯数据网络同步组件，不包含任何公开的Lua方法。其功能完全通过网络变量同步和内部事件监听器实现。",
+  "events_published": [
+    "secondary_clockupdate"
+  ],
+  "events_listened": [
+    "master_clockupdate",
+    "clockdirty"
+  ],
+  "netvars": [
+    "shard_clock.segs[1..3]",
+    "shard_clock._cycles",
+    "shard_clock._phase",
+    "shard_clock._moonphase",
+    "shard_clock._mooniswaxing",
+    "shard_clock._totaltimeinphase",
+    "shard_clock._remainingtimeinphase"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13570,
+      13569,
+      13408,
+      13556,
+      13603,
+      15137,
+      22703,
+      13700
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及符号 'component__shard_clock' 或其相关能力；所有内容讨论昼夜循环、季节、特定实体行为等游戏机制，但未涉及分片时钟组件的具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "分片时间同步",
+    "主世界时间",
+    "副世界时间",
+    "昼夜循环",
+    "月相变化",
+    "网络时间同步",
+    "时间数据同步",
+    "分片机制"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "aea51669bb0b7c387400b8bf62930a9fbdc664895bade6493f8b107ca02322e4",
+    "source_bytes": 3755,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103332100
+  }
+}

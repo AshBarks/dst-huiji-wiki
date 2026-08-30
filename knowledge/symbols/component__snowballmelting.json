@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/snowballmelting.lua"
+  },
+  "category": "component",
+  "display_name": "snowballmelting",
+  "summary": "SnowballMelting组件管理实体的融化状态，根据环境温度和世界雪覆盖情况自动控制融化过程。它通过定时检查温度来更新状态，触发开始融化、融化中或停止融化的回调。该组件参与生存玩法，影响雪球等物体的动态变化，增加游戏环境的真实性。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": ""
+    },
+    {
+      "name": "ShouldMelt",
+      "effect": ""
+    },
+    {
+      "name": "CheckTemperature",
+      "effect": ""
+    },
+    {
+      "name": "SetOnDoMeltAction",
+      "effect": ""
+    },
+    {
+      "name": "CheckStartMelting",
+      "effect": ""
+    },
+    {
+      "name": "AllowMelting",
+      "effect": ""
+    },
+    {
+      "name": "SetOnStartMelting",
+      "effect": ""
+    },
+    {
+      "name": "StopMelting",
+      "effect": ""
+    },
+    {
+      "name": "SetOnStopMelting",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "issnowcovered"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      60885,
+      14695,
+      52726,
+      20700,
+      51951,
+      14780,
+      19129
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及雪球融化组件或相关实体，所有内容均围绕温度机制、环境温度及其对其他游戏元素的影响。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "状态切换",
+    "融化状态",
+    "温度检查",
+    "雪覆盖",
+    "动态变化",
+    "融化回调",
+    "定时检查",
+    "环境温度"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "动态效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f19dc89f3d915f55fb0dcd43f797d1543f95bf8d153dcd5cb14ff11220c6e76f",
+    "source_bytes": 4554,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097648777
+  }
+}

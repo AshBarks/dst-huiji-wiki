@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/teamleader.lua"
+  },
+  "category": "component",
+  "display_name": "teamleader",
+  "summary": "该组件为敌对生物提供群体领导功能，管理团队成员列表、威胁目标和队形参数。核心玩法是让生物在遇到共同威胁时自动集结，组织起有队形、有轮换的协同进攻，并在威胁消失或团队瓦解时自动解散。",
+  "api": [
+    {
+      "name": "SetUp",
+      "effect": "设置新的威胁目标，并尝试将指定的第一个成员加入团队。若第一个成员有效且其teamattacker组件存在，则更新本团队类型并调用NewTeammate。"
+    },
+    {
+      "name": "NewTeammate",
+      "effect": "将一个有效成员加入团队。为该成员绑定死亡、受伤、攻击和移除等事件的监听回调，设置其teamattacker组件状态，并更新其所属的团队领导者。"
+    },
+    {
+      "name": "BroadcastDistress",
+      "effect": "以指定成员（或自身）的位置为中心，在搜索范围内查找其他有效同类型成员，并将它们招募为新队友。"
+    },
+    {
+      "name": "DisbandTeam",
+      "effect": "解散整个团队：移除所有成员的事件监听和团队状态，清空威胁目标，最后移除本实体。"
+    },
+    {
+      "name": "OnLostTeammate",
+      "effect": "将指定成员移出团队：移除与该成员相关的所有事件监听，清除其teamattacker组件中的团队状态，并让其脱离当前战斗目标。"
+    },
+    {
+      "name": "GetTeamSize",
+      "effect": "返回当前团队中不包含“teamleader_[team_type]”标签的成员数量。"
+    },
+    {
+      "name": "IsTeamFull",
+      "effect": "检查当前团队大小是否已达到或超过最大团队规模（max_team_size）。"
+    },
+    {
+      "name": "IsTeamEmpty",
+      "effect": "检查当前团队是否没有任何成员。"
+    },
+    {
+      "name": "ValidMember",
+      "effect": "判断一个实体是否符合成为本团队成员的有效条件（需存活、未死亡、有战斗组件、未加入其他团队、有对应类型标签，并通过自定义验证函数）。"
+    },
+    {
+      "name": "TeamSizeControl",
+      "effect": "控制团队规模，如果当前团队成员数超过最大规模，则移除多余的成员。"
+    },
+    {
+      "name": "CanAttack",
+      "effect": "判断当前团队是否达到可发起攻击所需的最小规模（min_team_size）。"
+    },
+    {
+      "name": "CenterLeader",
+      "effect": "根据所有团队成员的位置计算平均值，将本实体（领导者）移动到该中心点。"
+    },
+    {
+      "name": "GetFormationPositions",
+      "effect": "根据威胁目标的位置、当前角度（theta）和半径（radius），为团队中每个成员计算并分配一个环绕威胁的圆形队形位置。"
+    },
+    {
+      "name": "OrganizeTeams",
+      "effect": "在搜索范围内查找所有针对同一威胁的同类型领导者，并根据生命周期长短排序。仅存活时间最长的领导者有权调整所有团队的队形参数（半径、角度增量等）。"
+    },
+    {
+      "name": "GiveOrders",
+      "effect": "随机为指定数量的团队成员下达新的指令（order），未被指定的成员将被标记为默认指令（ORDERS.HOLD）。"
+    },
+    {
+      "name": "GiveOrdersToAllWithOrder",
+      "effect": "将团队中所有持有旧指令（oldorder）的成员的指令更新为新指令（order）。"
+    },
+    {
+      "name": "AllInState",
+      "effect": "检查团队中所有成员（除特殊情况外）是否都处于指定的指令状态（state）。"
+    },
+    {
+      "name": "SetNewThreat",
+      "effect": "设置新的威胁目标。如果目标存在，则监听其“onremove”事件，以便在威胁被移除时自动解散团队。"
+    },
+    {
+      "name": "GetTheta",
+      "effect": "根据时间增量（dt）、方向（由reverse决定）和角度增量（thetaincrement）计算并返回新的队形角度（theta）。"
+    },
+    {
+      "name": "SetAttackGrpSize",
+      "effect": "设置每次发起攻击的小组规模，可以是函数或数字。"
+    },
+    {
+      "name": "NumberToAttack",
+      "effect": "决定本次发起攻击的成员数量。优先使用attack_grp_size函数或数字，否则按概率返回1或2。"
+    },
+    {
+      "name": "ManageChase",
+      "effect": "累加追逐时间（chasetime），如果超过最大追逐时间（maxchasetime），则解散整个团队。"
+    },
+    {
+      "name": "ValidateTeam",
+      "effect": "遍历团队，将无效的成员移出团队。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "attacked",
+    "onattackother",
+    "onremove",
+    "onenterlimbo"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      51046,
+      72238,
+      10379,
+      13156,
+      13556,
+      13406,
+      13437
+    ],
+    "aspects": [
+      {
+        "aspect": "保持跟随位置",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔会试图保持在[[温蒂]]附近 1 ~ 5 {{解释|距离单位}}的位置"
+          }
+        ]
+      },
+      {
+        "aspect": "指挥召唤物行动",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "温蒂可以随时用[[阿比盖尔之花]]召唤阿比盖尔、解除召唤、以及指挥阿比盖尔的行动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "团队",
+    "队长",
+    "进攻",
+    "队形",
+    "协同",
+    "集结",
+    "解散",
+    "威胁",
+    "招募",
+    "轮换"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "社交",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c8bdd447afb3f327c72cad1936e876c68d2fbfd1c5db68f402007411f3ad81b",
+    "source_bytes": 9836,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104198364
+  }
+}

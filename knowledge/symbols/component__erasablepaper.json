@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/erasablepaper.lua"
+  },
+  "category": "component",
+  "display_name": "erasablepaper",
+  "summary": "组件管理可擦除纸张的属性，包括擦除后生成的预置物和堆叠大小。核心玩法是通过擦除操作将纸张转换为其他物品，如莎草纸或自定义物品，用于资源转换或制作。",
+  "api": [
+    {
+      "name": "SetErasedPrefab",
+      "effect": "设置擦除后生成的预置物名称。行为：验证预置物是否存在，如果无效则断言失败；更新内部变量erased_prefab。副作用：无，仅修改组件状态。"
+    },
+    {
+      "name": "SetStackSize",
+      "effect": "设置生成物品的堆叠大小。行为：验证大小至少为1，如果无效则断言失败；更新内部变量stacksize。副作用：无，仅修改组件状态。"
+    },
+    {
+      "name": "DoErase",
+      "effect": "执行擦除操作。行为：生成erased_prefab指定的物品，如果生成失败或不是物品则移除并返回nil；移除原物品（如果可堆叠则移除堆叠中的一个，否则移除整个物品）；将生成的物品交给玩家（如果doer有库存）或掉落；支持堆叠生成多个物品。副作用：移除原物品，生成新物品并交给玩家或掉落。返回生成的物品。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13407,
+      16534,
+      14774,
+      18509,
+      65737,
+      14673,
+      15246,
+      15853
+    ],
+    "aspects": [
+      {
+        "aspect": "擦除物品动作描述",
+        "evidence": [
+          {
+            "pageid": 16534,
+            "quote": "通过[[制图桌]]擦除变成莎草纸。"
+          },
+          {
+            "pageid": 14774,
+            "quote": "通过[[制图桌]]擦除变成莎草纸。"
+          },
+          {
+            "pageid": 18509,
+            "quote": "可以在[[制图桌]]处对地图卷轴进行擦除以换取[[莎草纸]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "可擦除纸",
+    "纸张擦除",
+    "莎草纸",
+    "物品转换",
+    "擦除器",
+    "堆叠物品",
+    "预置物",
+    "资源生成"
+  ],
+  "gameplay_tags": [
+    "制作",
+    "资源转换"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7885026d9710fcc4ef9508bd84f6844b62fa462382ba0d8e705bbf265eb4d4a4",
+    "source_bytes": 1966,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093518890
+  }
+}

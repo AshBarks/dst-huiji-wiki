@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fan.lua"
+  },
+  "category": "component",
+  "display_name": "fan",
+  "summary": "该组件管理风扇实体的使用逻辑，包括设置使用条件、触发使用和通道行为。通过函数回调定义交互效果，并管理标签以支持持续通道功能。可能用于降温或风效果等游戏机制。",
+  "api": [
+    {
+      "name": "SetCanUseFn",
+      "effect": "设置一个函数，用于检查是否可以使用风扇。"
+    },
+    {
+      "name": "SetOnUseFn",
+      "effect": "设置一个函数，定义风扇被使用时的行为。"
+    },
+    {
+      "name": "SetOnChannelingFn",
+      "effect": "设置一个函数，定义风扇的通道行为，并添加或移除'channelingfan'标签。"
+    },
+    {
+      "name": "SetOverrideSymbol",
+      "effect": "设置覆盖符号，可能用于动画或视觉效果。"
+    },
+    {
+      "name": "IsChanneling",
+      "effect": "返回布尔值，指示当前是否正在通道。"
+    },
+    {
+      "name": "Channel",
+      "effect": "尝试对目标进行通道操作；如果通道函数存在且使用条件满足，则调用通道函数并返回true。"
+    },
+    {
+      "name": "Fan",
+      "effect": "尝试对目标使用风扇；如果使用函数存在且使用条件满足，则调用使用函数并返回true。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15539,
+      15234,
+      18359,
+      65881,
+      20714,
+      18219,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及风扇组件（component__fan）或清单中列出的能力（如引导、使用函数等），所有页面均讨论其他游戏元素。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "风扇",
+    "使用",
+    "通道",
+    "效果",
+    "交互",
+    "降温",
+    "风",
+    "组件",
+    "配置",
+    "标签"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "交互",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8ea5b6878474755ab4012150b9f69976b72bf026c1f38d3a21e118faf8b814db",
+    "source_bytes": 1222,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096690515
+  }
+}

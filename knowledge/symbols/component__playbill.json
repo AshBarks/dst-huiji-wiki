@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playbill.lua"
+  },
+  "category": "component",
+  "display_name": "playbill",
+  "summary": "该组件管理演出相关的数据，包括剧本脚本、服装、起始演出和当前演出状态。它提供设置当前演出状态的方法，并支持通过保存和加载机制进行数据持久化。",
+  "api": [
+    {
+      "name": "SetCurrentAct",
+      "effect": "将当前演出状态设置为传入的演出值，无直接副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含当前演出状态的数据表，用于序列化保存，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据表中恢复当前演出状态，如果数据中存在该字段，会更改组件状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      13606,
+      34792,
+      19209,
+      20714,
+      65881,
+      70704,
+      35007
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未提及组件 playbill 的 SetCurrentAct、OnSave 或 OnLoad 能力的任何玩家语言表达，仅描述剧本物品属性、表演机制和相关实体，但无代码能力的具体行为或数值体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "演出",
+    "剧本",
+    "服装",
+    "保存",
+    "加载",
+    "当前状态",
+    "节目单",
+    "表演",
+    "管理",
+    "数据"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "023d4ac451a6432ec5ed0b77193f1b7918232ca3f88d31a19eb5998ff7783fac",
+    "source_bytes": 494,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110952288
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/searchable.lua"
+  },
+  "category": "component",
+  "display_name": "searchable",
+  "summary": "该组件管理实体是否可被搜索，通过 canbesearched 和 caninteractwith 属性控制交互条件。执行搜索时调用注册的 onsearchfn 回调函数，并推送 searched 事件。支持搜索后移除实体，以及快速搜索和推挤搜索标签，参与游戏中的搜索与收集玩法。",
+  "api": [
+    {
+      "name": "Search",
+      "effect": "检查实体是否可被搜索（canbesearched 和 caninteractwith 均为真），若可搜索则执行 onsearchfn 回调函数（传入实体和搜索者），返回搜索结果和原因。如果搜索成功，推送 searched 事件，并根据 remove_when_searched 设置决定是否移除实体。返回搜索结果布尔值和可选的原因字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "searched"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      24589,
+      45173,
+      13847,
+      20714,
+      24196
+    ],
+    "aspects": [
+      {
+        "aspect": "地图搜索宝藏",
+        "evidence": [
+          {
+            "pageid": 24196,
+            "quote": "玩家可以在地图上的边缘搜索以找到X。"
+          }
+        ]
+      },
+      {
+        "aspect": "控制台搜索命令",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "c_find(目标实体代码名,寻找半径,特定实体)"
+          }
+        ]
+      },
+      {
+        "aspect": "窝点搜索机制",
+        "evidence": [
+          {
+            "pageid": 24589,
+            "quote": "窝点中有物品时，玩家可以搜索窝点，每次会获得一个物品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "搜索",
+    "实体搜索",
+    "搜索功能",
+    "搜索条件",
+    "搜索回调",
+    "搜索标签",
+    "搜索玩法",
+    "收集玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "探索",
+    "收集",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9bd1104f228689f290ff47947e8ec77f53efbb41b163dba106a41fcf642df89e",
+    "source_bytes": 2439,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103169272
+  }
+}

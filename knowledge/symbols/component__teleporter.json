@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/teleporter.lua"
+  },
+  "category": "component",
+  "display_name": "teleporter",
+  "summary": "该组件管理传送器实体的数据，包括目标传送器、启用状态、传送偏移量和传送时间配置。核心玩法涉及将玩家或物品传送到指定位置，支持跨世界迁移和跟随者自动传送。通过注册和注销传送参与者，控制传送的激活、接收和完成事件，管理传送过程中的镜头淡入淡出效果。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的' teleporter'标签。"
+    },
+    {
+      "name": "SetSelfManaged",
+      "effect": "设置传送器是否自我管理，影响传送目标的选择逻辑。"
+    },
+    {
+      "name": "IsActive",
+      "effect": "检查传送器是否激活，基于启用状态和是否存在临时目标、目标传送器或迁移数据。"
+    },
+    {
+      "name": "IsBusy",
+      "effect": "检查传送器是否繁忙，即是否有实体正在传送或已注册为传送参与者。"
+    },
+    {
+      "name": "IsTargetBusy",
+      "effect": "检查目标传送器是否繁忙，即目标传送器的IsBusy方法返回真。"
+    },
+    {
+      "name": "RegisterTeleportee",
+      "effect": "注册一个实体为即将传送的参与者，监听其' onremove'事件以便自动注销。"
+    },
+    {
+      "name": "UnregisterTeleportee",
+      "effect": "注销一个传送参与者，移除其从传送列表和事件监听。"
+    },
+    {
+      "name": "UseTemporaryExit",
+      "effect": "使用临时出口传送实体，临时设置目标传送器并调用Activate方法。"
+    },
+    {
+      "name": "Activate",
+      "effect": "激活传送器执行传送逻辑：如果存在迁移数据则触发跨世界迁移事件，否则调用Teleport传送实体并处理玩家、物品及跟随者的到达。"
+    },
+    {
+      "name": "Teleport",
+      "effect": "直接传送对象到目标位置，计算偏移量以避开玩家或空洞，处理地形和海洋限制，通过物理或变换组件设置位置。"
+    },
+    {
+      "name": "PushDoneTeleporting",
+      "effect": "推送' doneteleporting'事件到实体，并调用OnDoneTeleporting回调（如果存在）。"
+    },
+    {
+      "name": "ReceiveItem",
+      "effect": "接收传送的物品，触发onActivateByOther回调，增加传送计数，将物品添加为子实体并移除场景，延迟后处理物品到达和放置。"
+    },
+    {
+      "name": "ReceivePlayer",
+      "effect": "接收传送的玩家，触发onActivateByOther回调，增加传送计数，处理镜头淡入淡出和延迟后设置玩家状态及推送传送完成事件。"
+    },
+    {
+      "name": "Target",
+      "effect": "设置传送器的目标传送器实体。"
+    },
+    {
+      "name": "MigrationTarget",
+      "effect": "设置迁移目标数据，包括世界ID和坐标，用于跨世界传送。"
+    },
+    {
+      "name": "GetTarget",
+      "effect": "返回当前目标传送器实体。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "设置传送器的启用状态，影响IsActive判断。"
+    },
+    {
+      "name": "GetEnabled",
+      "effect": "返回传送器的启用状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括目标传送器GUID、迁移数据和正在传送的物品记录。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，根据保存的物品记录生成实体并调用ReceiveItem。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据保存的目标GUID恢复目标传送器引用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示启用状态和目标传送器信息。"
+    }
+  ],
+  "events_published": [
+    "doneteleporting"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      57263,
+      18001,
+      16641,
+      20714,
+      17930,
+      20842
+    ],
+    "aspects": [
+      {
+        "aspect": "传送漂浮平台",
+        "evidence": [
+          {
+            "pageid": 20842,
+            "quote": "产生一对可以传送[[漂浮平台]]的漩涡"
+          }
+        ]
+      },
+      {
+        "aspect": "传送目标能力",
+        "evidence": [
+          {
+            "pageid": 16641,
+            "quote": "将目标传送到其他位置"
+          }
+        ]
+      },
+      {
+        "aspect": "多人传送目标设置",
+        "evidence": [
+          {
+            "pageid": 17930,
+            "quote": "当第一位玩家右击使用传送塔时，该玩家触摸的传送塔会作为其他传送塔的传送目标"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家传送命令",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "将所有玩家传送到使用指令的玩家处"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "传送器",
+    "传送",
+    "迁徙",
+    "目标",
+    "启用",
+    "忙碌",
+    "玩家传送",
+    "物品传送",
+    "镜头淡入淡出",
+    "偏移量"
+  ],
+  "gameplay_tags": [
+    "传送",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fec8be3bcd9b9216e9a2df12abee06d92bee8dad29bbdd91a51bf501a97101ef",
+    "source_bytes": 14241,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092765111
+  }
+}

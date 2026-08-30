@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/channelable.lua"
+  },
+  "category": "component",
+  "display_name": "channelable",
+  "summary": "Channelable组件管理实体的通道化状态，控制是否允许多个通道者、通道化功能是否启用，以及通道开始和停止的回调函数。核心玩法涉及实体被其他实体引导，用于魔法施放、能量传输或合作行动，通过标签和状态机管理通道化生命周期。",
+  "api": [
+    {
+      "name": "SetMultipleChannelersAllowed(allowed)",
+      "effect": "设置是否允许多个通道者同时通道化。如果切换状态，会停止当前所有通道化并清理通道者列表。"
+    },
+    {
+      "name": "SetEnabled(enabled)",
+      "effect": "设置组件是否启用，影响能否启动通道化。启用时添加'channelable'标签，禁用时移除。"
+    },
+    {
+      "name": "GetEnabled()",
+      "effect": "返回组件启用状态的布尔值。"
+    },
+    {
+      "name": "SetChannelingFn(startfn, stopfn)",
+      "effect": "设置通道化开始和停止时的回调函数，分别在通道化启动和停止时触发。"
+    },
+    {
+      "name": "IsChanneling(targetchanneler)",
+      "effect": "检查是否正在通道化。可选指定通道者实体；如果指定，检查该通道者是否处于通道化状态；否则检查任意通道者。返回布尔值。"
+    },
+    {
+      "name": "StartChanneling(channeler)",
+      "effect": "启动通道化，传入通道者实体。如果组件启用且通道者处于预通道状态，则设置通道化记录，触发开始回调，启动组件更新，并可能切换通道者状态机到通道化状态。"
+    },
+    {
+      "name": "StopChanneling(aborted, targetchanneler)",
+      "effect": "停止通道化，可选指定通道者和是否中止。清理通道者记录，移除事件监听，触发停止回调，切换通道者状态机到停止通道化状态，并在无通道者时停止组件更新。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "组件更新方法，检查是否仍在通道化；如果无通道化则自动停止。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试字符串，显示当前通道化状态（'Channeling'或'Not Channeling'）。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "组件从实体移除时的清理方法，停止所有通道化并移除相关标签（'channeled'、'channelable'、'use_channel_longaction'、'multichannelable'）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10413,
+      13700,
+      15415,
+      15832,
+      18057,
+      20116,
+      23196,
+      24880
+    ],
+    "aspects": [
+      {
+        "aspect": "骨架跟随暗影香炉的通道行为",
+        "evidence": [
+          {
+            "pageid": 13700,
+            "quote": "两种形态的骨架都会跟随[[暗影香炉]]行动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "通道化",
+    "引导",
+    "魔法引导",
+    "能量传输",
+    "多人通道",
+    "启动通道",
+    "停止通道",
+    "角色状态",
+    "组件控制",
+    "状态标签"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,改写尝试更差已回退",
+  "gameplay_tags": [
+    "魔法",
+    "合作",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e5388759139e821f66dd9bd3e741e2ef14f94049b83465793d0394836365decd",
+    "source_bytes": 6806,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095383165
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stewer.lua"
+  },
+  "category": "component",
+  "display_name": "stewer",
+  "summary": "Stewer组件管理烹饪设备的烹饪状态，包括烹饪开始、进行中、完成和变质过程。它参与核心玩法中的食物制作，允许玩家使用烹饪锅等设备将食材转化为成品食物，并跟踪产品变质时间。",
+  "api": [
+    {
+      "name": "IsDone",
+      "effect": "检查烹饪是否完成，返回布尔值。"
+    },
+    {
+      "name": "IsSpoiling",
+      "effect": "检查产品是否正在变质（烹饪完成且变质计时器运行中），返回布尔值。"
+    },
+    {
+      "name": "IsCooking",
+      "effect": "检查是否正在烹饪（未完成且烹饪计时器运行中），返回布尔值。"
+    },
+    {
+      "name": "GetTimeToCook",
+      "effect": "获取剩余烹饪时间，返回秒数；如果未烹饪则返回0。"
+    },
+    {
+      "name": "GetTimeToSpoil",
+      "effect": "获取剩余变质时间，返回秒数；如果未变质则返回0。"
+    },
+    {
+      "name": "CanCook",
+      "effect": "检查是否可以开始烹饪（容器组件存在且已满），返回布尔值。"
+    },
+    {
+      "name": "GetRecipeForProduct",
+      "effect": "根据当前产品获取配方表；如果无产品或无配方则返回nil。"
+    },
+    {
+      "name": "StartCooking",
+      "effect": "开始烹饪过程，接受doer参数（玩家）。设置烹饪计时器，销毁容器内容，关闭容器；副作用包括记录厨师ID、计算产品变质状态，并触发onstartcooking回调。"
+    },
+    {
+      "name": "StopCooking",
+      "effect": "停止烹饪，取消计时器。如果reason为\"fire\"，则生成产品实体在当前位置；清空产品、变质时间和状态。"
+    },
+    {
+      "name": "Harvest",
+      "effect": "收获烹饪完成的产品，接受harvester参数。生成产品实体，给予收获者；如果收获者是原厨师且配方存在，触发学习食谱事件；设置产品变质状态；清空烹饪状态并重置容器。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新（dt为时间差），加速烹饪或变质过程：如果正在烹饪且时间剩余，则调整计时器；如果正在变质且时间剩余，则调整计时器；否则立即完成阶段。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "itemget",
+    "onclose",
+    "itemlose",
+    "onopen"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65872,
+      13476,
+      24540,
+      13779,
+      16197,
+      13642,
+      13477,
+      20789
+    ],
+    "aspects": [
+      {
+        "aspect": "开始烹饪的条件",
+        "evidence": [
+          {
+            "pageid": 13476,
+            "quote": "向烹饪用具中放入 4 个食材即可开始烹饪"
+          },
+          {
+            "pageid": 24540,
+            "quote": "向烹饪用具中放入 4 个食材即可开始烹饪"
+          }
+        ]
+      },
+      {
+        "aspect": "烹饪状态与倒计时台词",
+        "evidence": [
+          {
+            "pageid": 13477,
+            "quote": "不在烹饪且没有烹饪好的料理"
+          },
+          {
+            "pageid": 13477,
+            "quote": "烹饪倒计时大于 15 秒"
+          }
+        ]
+      },
+      {
+        "aspect": "食谱记录烹饪时间",
+        "evidence": [
+          {
+            "pageid": 65872,
+            "quote": "食谱中记录了该料理的烹饪要求、优先级、烹饪时间。"
+          },
+          {
+            "pageid": 13476,
+            "quote": "食谱中记录了该料理的烹饪要求、优先级、烹饪时间。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "烹饪",
+    "锅",
+    "煮",
+    "食物",
+    "变质",
+    "制作",
+    "食谱",
+    "收获",
+    "烹饪时间",
+    "烹饪设备"
+  ],
+  "gameplay_tags": [
+    "烹饪",
+    "食物制作",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+    "source_bytes": 10960,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097673484
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/klaussackkey.lua"
+  },
+  "category": "component",
+  "display_name": "klaussackkey",
+  "summary": "该组件管理克劳斯钥匙的真钥匙状态，通过设置 truekey 布尔值控制钥匙属性。当设置为真钥匙时，会触发世界事件 ms_restoreklaussackkey 以恢复钥匙。这与克劳斯 Boss 战的藏宝袋开启机制相关，影响游戏内的奖励获取。",
+  "api": [
+    {
+      "name": "SetTrueKey",
+      "effect": "设置真钥匙状态。参数 truekey 为布尔值：若为 true 且之前非真钥匙，则将 truekey 设为 true 并触发延迟恢复事件（通过任务 RestoreKey）；若为 false 且之前为真钥匙，则取消真钥匙状态并清除相关任务。副作用是推送世界事件 ms_restoreklaussackkey。"
+    }
+  ],
+  "events_published": [
+    "ms_restoreklaussackkey"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      13897,
+      73480,
+      34314,
+      51497,
+      13199,
+      51221,
+      13457
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未发现与组件klaussackkey的SetTrueKey能力相关的玩家语言表达；页面主要讨论游戏机制、任务或世界生成，未涉及该组件的具体能力描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "克劳斯",
+    "钥匙",
+    "藏宝袋",
+    "真钥匙",
+    "Boss战",
+    "奖励",
+    "开启",
+    "任务"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探险"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "74dbbc60370215090b2e450a292b08044c539fcad51e72fd3b70f3f1e35e075e",
+    "source_bytes": 1199,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109020255
+  }
+}

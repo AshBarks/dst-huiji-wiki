@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/container_proxy.lua"
+  },
+  "category": "component",
+  "display_name": "container_proxy",
+  "summary": "container_proxy组件管理容器代理实体的打开和关闭状态，通过网络变量同步可打开性，并与主容器组件交互以处理玩家操作。它负责生成代理打开器实体，跟踪打开者列表，并在服务器端处理更新逻辑。核心玩法涉及库存管理和容器界面的使用。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "断言失败，用于防止误用，调用会导致错误。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "服务器端关闭所有打开状态并设置主实体为nil，清理关联。"
+    },
+    {
+      "name": "SetCanBeOpened",
+      "effect": "设置容器代理是否可打开，通过网络变量同步到客户端。"
+    },
+    {
+      "name": "CanBeOpened",
+      "effect": "返回容器代理当前是否可打开，基于网络变量值。"
+    },
+    {
+      "name": "IsOpenedBy",
+      "effect": "检查指定玩家是否打开了容器代理，服务器端检查openlist，客户端检查本地状态。"
+    },
+    {
+      "name": "AttachOpener",
+      "effect": "客户端专用，将容器打开器附加到代理，并监听其移除事件。"
+    },
+    {
+      "name": "GetMaster",
+      "effect": "获取关联的主实体。"
+    },
+    {
+      "name": "SetMaster",
+      "effect": "设置关联的主实体，移除旧实体的事件监听，并添加新实体的事件监听（onopenother和onclose）。"
+    },
+    {
+      "name": "SetOnOpenFn",
+      "effect": "服务器端设置当第一个玩家打开时调用的回调函数。"
+    },
+    {
+      "name": "SetOnCloseFn",
+      "effect": "服务器端设置当最后一个玩家关闭时调用的回调函数。"
+    },
+    {
+      "name": "Open",
+      "effect": "服务器端处理玩家打开容器代理：向主实体推送onopenother事件，调用主容器的Open，生成container_opener实体，添加玩家到openlist，更新玩家的inventory.opencontainerproxies，可能启动更新并调用onopenfn。"
+    },
+    {
+      "name": "Close",
+      "effect": "服务器端处理玩家关闭容器代理：调用主容器的Close，如果是单个玩家则关闭指定玩家，否则关闭所有打开者。"
+    },
+    {
+      "name": "OnClose",
+      "effect": "服务器端处理关闭后的清理：移除主实体的oncloseother事件，删除container_opener实体，从openlist移除玩家，更新玩家的inventory.opencontainerproxies，可能停止更新并调用onclosefn。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "服务器端更新逻辑，委托给主容器组件的OnUpdate方法处理。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onopenother",
+    "onclose",
+    "onremove"
+  ],
+  "netvars": [
+    "container_proxy._cannotbeopened"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      61065,
+      10379,
+      14708,
+      13271,
+      28181
+    ],
+    "aspects": [
+      {
+        "aspect": "冰箱打开关闭状态对腐烂的影响",
+        "evidence": [
+          {
+            "pageid": 14708,
+            "quote": "毒菌蟾蜍的毒雾不会让处于关闭状态的冰箱里的物品加速腐烂，但是如果冰箱是打开状态则会被影响。"
+          }
+        ]
+      },
+      {
+        "aspect": "谜之火焰的打开状态描述",
+        "evidence": [
+          {
+            "pageid": 61065,
+            "quote": "卡住的谜之火焰会一直处于打开状态，无法被关闭。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "容器代理",
+    "打开状态",
+    "主容器",
+    "网络同步",
+    "库存管理",
+    "代理实体",
+    "打开者",
+    "容器界面",
+    "状态同步"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eb9273270e54a68933606922d72f6fb4d9d1c6e2a355ccbccb1b75b014fa4262",
+    "source_bytes": 4770,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093968319
+  }
+}

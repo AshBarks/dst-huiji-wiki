@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stageactingprop.lua"
+  },
+  "category": "component",
+  "display_name": "stageactingprop",
+  "summary": "该组件管理舞台表演的脚本数据、演员阵容和服装匹配，通过识别玩家装备来分配角色，并控制表演的开始、台词执行和结束流程。它涉及触发对话、动画和事件推送，是戏剧玩法的核心控制器。",
+  "api": [
+    {
+      "name": "AddGeneralScript(script_name, script_content)",
+      "effect": "添加通用脚本到组件，脚本名称必须唯一，否则断言失败。脚本被存储在generalscripts和scripts表中。"
+    },
+    {
+      "name": "AddPlay(playdata)",
+      "effect": "添加剧本数据，覆盖当前服装、脚本和当前幕。服装从playdata.costumes复制，脚本合并通用脚本和剧本特定脚本，设置current_act。"
+    },
+    {
+      "name": "EnableProp()",
+      "effect": "启用道具，添加stageactingprop标签到实体，并调用可选的enablefn函数。"
+    },
+    {
+      "name": "DisableProp(time)",
+      "effect": "禁用道具，调用可选的dissablefn函数，移除stageactingprop标签。若提供时间参数，设置计时器并在时间到后重新启用。"
+    },
+    {
+      "name": "SetEnabledFn(fn)",
+      "effect": "设置启用道具时调用的函数，存储在enablefn字段。"
+    },
+    {
+      "name": "SetDisabledFn(fn)",
+      "effect": "设置禁用道具时调用的函数，存储在dissablefn字段。"
+    },
+    {
+      "name": "FindCostume(head, body)",
+      "effect": "根据头部和身体装备的prefab查找匹配的服装，返回服装名称。若部分匹配，设置performance_problem为BAD_COSTUMES。"
+    },
+    {
+      "name": "CheckCostume(player)",
+      "effect": "检查玩家装备的头部和身体物品，调用FindCostume返回匹配的服装。"
+    },
+    {
+      "name": "CollectCast(doer)",
+      "effect": "收集附近带有stageactor标签的实体，根据服装匹配分配角色到cast表。若doer无匹配服装，则单独添加。检测重复服装设置REPEAT_COSTUMES问题。"
+    },
+    {
+      "name": "FindScript(doer)",
+      "effect": "根据cast阵容查找合适的脚本，优先选择角色数最多的脚本。若无匹配，设置NO_SCRIPT问题。支持独白脚本。"
+    },
+    {
+      "name": "EndPerformance(doer)",
+      "effect": "结束表演，推送play_ended事件，清除演员的acting标签和状态，恢复动画，触发结束对话，禁用黑屏效果，退出鸟，并延迟移除play_in_progress和NOCLICK标签。"
+    },
+    {
+      "name": "ClearPerformance(doer)",
+      "effect": "清除表演，调用EndPerformance并取消播放任务。"
+    },
+    {
+      "name": "DoPerformance(doer)",
+      "effect": "开始表演，检查是否进行中，收集阵容、查找脚本。成功则启动线程执行DoLines，添加演员标签，设置stageactor，推送play_begun事件，添加play_in_progress和NOCLICK标签。"
+    },
+    {
+      "name": "DoLines()",
+      "effect": "执行脚本中的台词，触发对话、动画和音效，根据sleep暂停，最后推送play_performed事件并调用FinishAct切换下一幕。"
+    },
+    {
+      "name": "FinishAct(next_act)",
+      "effect": "完成当前幕，通过lecturn切换到下一幕，更新current_act字段。"
+    },
+    {
+      "name": "SpawnBirds(arch)",
+      "effect": "生成两只charlie_heckler鸟，跟随指定骨架（默认为实体自身）的符号位置。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "更新函数，处理禁用计时器，时间到后重新启用道具。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "长更新，调用OnUpdate处理时间。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存时间数据到表中返回。"
+    },
+    {
+      "name": "LoadPostPass(newents, data)",
+      "effect": "加载后处理，若数据中有时间，调用DisableProp恢复禁用状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "从实体移除组件时，移除stageactingprop标签。"
+    }
+  ],
+  "events_published": [
+    "play_ended",
+    "play_begun",
+    "play_performed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      16174,
+      34792,
+      13409,
+      34523,
+      34793,
+      19209,
+      70534
+    ],
+    "aspects": [
+      {
+        "aspect": "剧本添加至舞台系统",
+        "evidence": [
+          {
+            "pageid": 34792,
+            "quote": "可以放入[[剧本]]中，以在[[舞台]]上表演其中的剧目。"
+          }
+        ]
+      },
+      {
+        "aspect": "戏服装备与剧本匹配要求",
+        "evidence": [
+          {
+            "pageid": 19209,
+            "quote": "玩家和[[假人]]需要装备与剧本要求相匹配的戏服才能表演剧本的内容。"
+          }
+        ]
+      },
+      {
+        "aspect": "舞台表演触发机制",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "右击舞台后角色会走入舞台中间进行表演"
+          }
+        ]
+      },
+      {
+        "aspect": "表演冷却时间限制",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "舞台幕布落下，在 3~6 天内无法再次进行"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "戏剧",
+    "表演",
+    "舞台",
+    "剧本",
+    "演员",
+    "服装",
+    "角色分配",
+    "对话",
+    "动画",
+    "事件"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 0/10)",
+  "gameplay_tags": [
+    "表演",
+    "戏剧",
+    "社交",
+    "叙事"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a671a1a4422943801fd6df34ba2484a8ae9d4830e3d85db78c3f16e8a4dcac0f",
+    "source_bytes": 13518,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104061793
+  }
+}

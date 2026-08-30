@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playingcardsmanager.lua"
+  },
+  "category": "component",
+  "display_name": "playingcardsmanager",
+  "summary": "PlayingCardsManager组件负责管理游戏世界中的扑克牌资源，包括维护一个基于花色和点数的可用卡牌ID池子。它生成牌组、创建单张卡牌，并追踪卡牌生命周期，确保卡牌ID在移除时回收，以支持扑克牌相关玩法活动。",
+  "api": [
+    {
+      "name": "MakeDeck(size)",
+      "effect": "生成一个牌组实体，返回该实体。行为：根据size参数（默认1）生成指定数量的卡牌，从可用ID池中随机移除ID或生成新ID，创建'deck_of_cards'实体并添加卡牌。副作用：消耗可用卡牌ID，创建新实体，将牌组添加到内部追踪表并监听onremove事件。"
+    },
+    {
+      "name": "MakePlayingCard(id, facedown)",
+      "effect": "创建一张扑克牌实体，返回该实体。行为：可选指定id和面朝下（facedown），从可用ID池中移除ID（如果未指定id则随机分配），创建'playing_card'实体并设置ID。副作用：消耗可用卡牌ID，创建新实体，将卡牌添加到内部追踪表并监听onremove事件。"
+    },
+    {
+      "name": "RegisterPlayingCard(card)",
+      "effect": "注册一张已有的扑克牌实体，返回该实体。行为：为给定卡牌实体设置ID（从可用ID池中移除或随机生成），并监听onremove事件。副作用：消耗可用卡牌ID，将卡牌添加到内部追踪表。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存组件数据。行为：返回包含available_ids和living_decks（牌组GUID列表）的数据表。副作用：无，仅返回数据。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "加载组件数据。行为：从data参数中恢复available_card_ids表（如果存在）。副作用：更新内部可用卡牌ID表。"
+    },
+    {
+      "name": "LoadPostPass(newents, data)",
+      "effect": "加载后处理。行为：根据data中的living_decks恢复牌组追踪，将牌组实体添加到内部表并监听onremove事件。副作用：重新建立牌组监听关系。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "获取调试字符串。行为：返回一个字符串，包含所有可用卡牌ID。副作用：无。"
+    },
+    {
+      "name": "Debug_ResetAvailableIDs()",
+      "effect": "调试用，重置可用卡牌ID表。行为：重新生成available_card_ids表，覆盖现有数据。副作用：清空并重置可用ID池。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PLAYINGCARDS_NUM_SUITS",
+    "PLAYINGCARDS_NUM_PIPS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      45154,
+      23187,
+      45135,
+      70704,
+      13493,
+      52634,
+      18231,
+      18530
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 playingcardsmanager 代码能力（如创建牌堆、注册扑克牌、保存/加载等）相关的玩家语言表达，仅描述了扑克牌的属性、游戏玩法和装饰品。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "扑克牌",
+    "牌组",
+    "卡牌",
+    "花色",
+    "点数",
+    "卡牌ID",
+    "卡牌管理",
+    "娱乐",
+    "装饰",
+    "卡牌游戏"
+  ],
+  "gameplay_tags": [
+    "娱乐",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e81f6d0629a68f773fad8d9e9d93a5a5c3bd86ddcc12b415c765edd4861d9bfb",
+    "source_bytes": 5496,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111269658
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/centipedebody.lua"
+  },
+  "category": "component",
+  "display_name": "centipedebody",
+  "summary": "该组件管理影怪蜈蚣的身体结构，存储多个身体段和头部段的数据。它控制蜈蚣的移动、转向和段之间的物理约束，支持头部切换控制权。组件还处理身体的生长、停止和序列化，是影怪蜈蚣AI行为的核心部分。",
+  "api": [
+    {
+      "name": "Halt",
+      "effect": "停止所有头部段的大脑活动，设置halted状态为true，阻止移动。"
+    },
+    {
+      "name": "CheckUnhalt",
+      "effect": "检查所有身体段是否都醒着，如果都是醒着，则设置halted为false并恢复头部段的大脑。"
+    },
+    {
+      "name": "IsHalted",
+      "effect": "返回组件是否处于停止状态。"
+    },
+    {
+      "name": "IsNonControllingHead",
+      "effect": "检查传入的head是否是一个非控制头部（即不是当前控制头部）。"
+    },
+    {
+      "name": "GetControllingHead",
+      "effect": "返回当前控制身体移动的头部段。"
+    },
+    {
+      "name": "CreateFullBody",
+      "effect": "生成一个完整的身体结构，包括两个头部和默认数量的躯干段，并将控制权交给第一个头部。"
+    },
+    {
+      "name": "SpawnHead",
+      "effect": "生成一个头部段并添加到身体链中。"
+    },
+    {
+      "name": "SpawnTorso",
+      "effect": "生成一个躯干段并添加到身体链中。"
+    },
+    {
+      "name": "SetSegment",
+      "effect": "将指定的身体段设置到身体链的指定位置（或末尾），并建立物理约束连接。"
+    },
+    {
+      "name": "SpawnSegment",
+      "effect": "根据给定的prefab和位置生成一个新的身体段，并调用SetSegment添加。"
+    },
+    {
+      "name": "GrowNewSegment",
+      "effect": "在身体链的随机位置（或指定索引）增长一个新的躯干段，如果未超过最大段数限制。"
+    },
+    {
+      "name": "SegmentHasControl",
+      "effect": "检查传入的段是否是当前控制段。"
+    },
+    {
+      "name": "GiveControlToRandomHead",
+      "effect": "随机选择一个头部段并赋予控制权。"
+    },
+    {
+      "name": "GiveControlToOtherHead",
+      "effect": "将控制权切换到另一个非当前控制的头部段。"
+    },
+    {
+      "name": "GiveControlToHead",
+      "effect": "将控制权赋予指定的头部段，并更新所有段的运动状态和方向。"
+    },
+    {
+      "name": "ForEachSegment",
+      "effect": "对身体链中的每个段执行传入的函数。"
+    },
+    {
+      "name": "ForEachSegmentControlled",
+      "effect": "对身体链中除控制段外的每个段执行传入的函数。"
+    },
+    {
+      "name": "SetPivotsForBody",
+      "effect": "根据旋转角度设置指定身体段的物理枢轴点。"
+    },
+    {
+      "name": "GetTurnSpeed",
+      "effect": "返回身体段的转向速度。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新所有身体段的旋转和物理枢轴，以模拟身体跟随控制头部的移动。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当组件移除时，清理所有身体段，解除物理约束并移除它们。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存身体段的GUID列表，用于序列化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据（源码为空方法）。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后恢复身体段连接，并随机赋予头部控制权。"
+    }
+  ],
+  "events_published": [
+    "grow_segment"
+  ],
+  "events_listened": [
+    "entitysleep",
+    "entitywake",
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SHADOWTHRALL_CENTIPEDE.TURNSPEED",
+    "SHADOWTHRALL_CENTIPEDE.MAX_SEGMENTS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      28611,
+      19113,
+      14484,
+      14322,
+      15022,
+      18234,
+      53008
+    ],
+    "aspects": [
+      {
+        "aspect": "体节生长与生成行为",
+        "evidence": [
+          {
+            "pageid": 53008,
+            "quote": "每吃掉 5 团瘴气就会生成一个新的躯干体节"
+          }
+        ]
+      },
+      {
+        "aspect": "控制头主导与交接机制",
+        "evidence": [
+          {
+            "pageid": 53008,
+            "quote": "涟漪的两个头部体节在同一时间只有一个能主导移动"
+          }
+        ]
+      },
+      {
+        "aspect": "离开加载范围停止活动",
+        "evidence": [
+          {
+            "pageid": 53008,
+            "quote": "但凡涟漪的任何一个体节离开了加载范围，涟漪就会完全停止活动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "影怪蜈蚣",
+    "蜈蚣",
+    "影怪",
+    "转向",
+    "移动",
+    "生长",
+    "停止",
+    "身体",
+    "头部"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "战斗",
+    "怪物",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9ecd4671dc95e78a5eb80a0c71e8e8f16cd66a6535cd1f722bfdffcb3daaab19",
+    "source_bytes": 9756,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098924782
+  }
+}

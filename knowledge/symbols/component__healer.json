@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/healer.lua"
+  },
+  "category": "component",
+  "display_name": "healer",
+  "summary": "Healer 组件管理治疗量（health）和可选的回调函数，用于治疗目标实体。它参与游戏中的治疗玩法，允许物品或角色恢复生命值，并在治疗后可能移除实体。",
+  "api": [
+    {
+      "name": "SetHealthAmount",
+      "effect": "设置组件的治疗量，用于后续治疗计算。"
+    },
+    {
+      "name": "SetOnHealFn",
+      "effect": "设置治疗成功后执行的回调函数，接收治疗者、目标和执行者作为参数。"
+    },
+    {
+      "name": "SetCanHealFn",
+      "effect": "设置检查目标是否可治疗的函数，返回有效状态和原因，用于治疗前条件验证。"
+    },
+    {
+      "name": "Heal",
+      "effect": "对目标执行治疗。行为：检查目标是否有 health 组件；调用 canhealfn 进行条件检查；计算治疗量（考虑执行者的 efficientuser 组件乘数）；如果目标可治疗则应用生命值变化；触发 onhealfn 回调；最后移除组件所在的实体（堆叠物品移除一个，否则移除整个）。副作用：改变目标生命值，可能移除实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "HEALING_SMALL"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15244,
+      18215,
+      13260,
+      15973,
+      16419,
+      15415,
+      15965
+    ],
+    "aspects": [
+      {
+        "aspect": "治疗效果的角色特定修改",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "好孩子沃拓克斯在受到释放灵魂的治疗时，回复 5理智值（原为回复 2.5理智值）。"
+          },
+          {
+            "pageid": 13260,
+            "quote": "淘气包沃拓克斯受到灵魂治疗效果的默认效果减少至 15生命值，且不会回复理智值。"
+          }
+        ]
+      },
+      {
+        "aspect": "治疗物品的效果描述",
+        "evidence": [
+          {
+            "pageid": 18215,
+            "quote": "回复 0生命值。并为周围 4 距离单位内的的所有蜘蛛恢复 80生命值，所有韦伯恢复 8生命值。"
+          }
+        ]
+      },
+      {
+        "aspect": "治疗能力的行为触发条件",
+        "evidence": [
+          {
+            "pageid": 15965,
+            "quote": "护士蜘蛛可以治疗周围 8 距离单位内的所有己方蜘蛛 150 点生命值，韦伯 8 点生命值。"
+          },
+          {
+            "pageid": 15965,
+            "quote": "护士蜘蛛平时不会使用他们的治疗能力，只会在战斗中使用，每 8 秒的释放一次。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "治疗",
+    "恢复生命",
+    "血量回复",
+    "治疗物品",
+    "医疗",
+    "治愈",
+    "生命恢复",
+    "heal",
+    "health"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+    "source_bytes": 1362,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093694677
+  }
+}

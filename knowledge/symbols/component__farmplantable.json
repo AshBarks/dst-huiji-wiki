@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farmplantable.lua"
+  },
+  "category": "component",
+  "display_name": "farmplantable",
+  "summary": "该组件管理种子实体的种植能力，持有要生成的植物预制体名称。当调用种植方法时，它会检查目标是否为土壤，然后生成植物并播放声音，涉及游戏的种植和农场系统。组件通过移除种子和目标来完成种植过程，并推送相关事件。",
+  "api": [
+    {
+      "name": "Plant",
+      "effect": "如果组件有植物预制体（self.plant不为nil）且目标有'soil'标签，则移除目标实体，生成植物预制体并设置位置，推送'on_planted'事件给植物（包含种植者和种子信息），推送'itemplanted'事件到世界（包含种植者和位置），播放种植声音，移除当前种子实体，并返回true；否则返回false。"
+    }
+  ],
+  "api_note": "该组件提供一个种植方法，用于将种子实体种植到土壤中。",
+  "events_published": [
+    "on_planted",
+    "itemplanted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      14486,
+      18545,
+      13261,
+      18234,
+      34101,
+      14579,
+      14484
+    ],
+    "aspects": [
+      {
+        "aspect": "作物掉落物",
+        "evidence": [
+          {
+            "pageid": 14579,
+            "quote": "掉落 = {{Pic|32|胡萝卜}}×2，{{Pic|32|椭圆形种子}}×2"
+          }
+        ]
+      },
+      {
+        "aspect": "催熟植物效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "可以催熟[[石果灌木丛]]、[[浆果丛]]、[[多汁浆果丛]]、[[公牛海带]]、[[仙人掌]]、所有[[农作物]]、[[洞穴苔藓]]、[[洞穴香…"
+          },
+          {
+            "pageid": 18234,
+            "quote": "使角色周围 30 范围内的所有非食用类作物以及树瞬间生长到最大阶段"
+          }
+        ]
+      },
+      {
+        "aspect": "农作物生长阶段描述",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "农作物都有以下生长阶段：种子，萌芽，小，中，已长成，巨大，腐烂，腐烂巨大。"
+          },
+          {
+            "pageid": 14484,
+            "quote": "杂草需要 2.75 至 4 天才能从种子到完全长大"
+          }
+        ]
+      },
+      {
+        "aspect": "杂草对农作物生长的影响",
+        "evidence": [
+          {
+            "pageid": 14484,
+            "quote": "杂草（Weeds）是一类作物。它们会干涉普通[[农作物]]的生长，给予[[耕种#杂物|杂物压力]]"
+          }
+        ]
+      },
+      {
+        "aspect": "种子种植机制",
+        "evidence": [
+          {
+            "pageid": 14486,
+            "quote": "农作物（Farm Plant）是一类植物，由种子或作物种子在农田地块上或沃姆伍德直接种植"
+          },
+          {
+            "pageid": 18545,
+            "quote": "种子可以栽种于农田土壤，使其随机长出一种农作物。"
+          }
+        ]
+      },
+      {
+        "aspect": "种子获取途径",
+        "evidence": [
+          {
+            "pageid": 34101,
+            "quote": "后每包都可以获得 3 个[[种子]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色特殊种植能力",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德可以不使用[[耕地机]]和[[园艺锄]]，直接将[[种子]]种植在地上。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "种植",
+    "种子",
+    "土壤",
+    "植物",
+    "农场",
+    "园艺",
+    "播种",
+    "农业",
+    "作物",
+    "生长"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "农场",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98de02178b907eef0845703b4aab57183ab302fdd4ca57e00cec190d5d49d178",
+    "source_bytes": 867,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099657772
+  }
+}

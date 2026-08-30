@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_sinkholes.lua"
+  },
+  "category": "component",
+  "display_name": "shard_sinkholes",
+  "summary": "该组件管理饥荒联机版中天坑（sinkholes）相关的目标状态数据，用于多服务器间同步。它最多追踪两个目标，通过网络变量同步哈希值与状态（警告或攻击），确保主服务器与副服务器之间的数据一致性。核心玩法涉及环境事件的实时更新与警告机制。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。所有逻辑通过事件监听和网络变量处理，不对外暴露直接调用接口。",
+  "events_published": [
+    "secondary_sinkholesupdate"
+  ],
+  "events_listened": [
+    "master_sinkholesupdate",
+    "sinkholesdirty"
+  ],
+  "netvars": [
+    "userhash",
+    "state"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      15651,
+      13828,
+      15551,
+      13823,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及任何与'shard_sinkholes'相关的能力表达，所有内容集中于实体的战斗行为、仇恨机制和掉落物，无地坑或世界碎片化相关的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "天坑",
+    "同步",
+    "服务器",
+    "警告",
+    "攻击",
+    "网络变量",
+    "事件",
+    "主服务器",
+    "副服务器"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "同步"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dfa3ac335d5b269264092a30a4a693519c75f238d286aabbd11ed0a1536e92b9",
+    "source_bytes": 3020,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103474646
+  }
+}

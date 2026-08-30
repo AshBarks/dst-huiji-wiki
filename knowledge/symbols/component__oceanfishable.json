@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanfishable.lua"
+  },
+  "category": "component",
+  "display_name": "oceanfishable",
+  "summary": "此组件赋予实体可被玩家用鱼竿钓起的属性，并管理被钓过程中‘挣扎’与耐力的模拟状态。它根据鱼竿张力动态调整自身移动速度，并在满足距离条件时标记可捕获状态。组件通过耐力消耗与恢复机制，模拟鱼类与钓鱼者之间的对抗过程。",
+  "api": [
+    {
+      "name": "OnReelingIn",
+      "effect": "当实体正在被收回时调用。若设置了 `onreelinginfn` 回调，则执行该回调函数并传入实体与收线者(doer)。"
+    },
+    {
+      "name": "OnReelingInPst",
+      "effect": "当实体被收回后调用。若设置了 `onreelinginpstfn` 回调，则执行该回调函数并传入实体与收线者(doer)。"
+    },
+    {
+      "name": "WasEatenByA",
+      "effect": "处理被金枪鱼(tunafish)吃掉的逻辑。若设置了 `oneatenfn` 回调，则执行该回调。无论回调是否存在，执行后都会移除(self.inst:Remove())该实体。"
+    },
+    {
+      "name": "MakeProjectile",
+      "effect": "用于生成投射物。若设置了 `makeprojectilefn` 回调，则执行该回调并返回结果；否则直接返回实体(self.inst)自身。"
+    },
+    {
+      "name": "StrugglingSetup",
+      "effect": "初始化挣扎状态的所有参数。设置最大行走/奔跑速度(max_walk_speed, max_run_speed)，并配置耐力定义(stamina_def)。同时重置挣扎状态计时器和耐力值。"
+    },
+    {
+      "name": "SetRod",
+      "effect": "设置或移除与此组件关联的鱼竿(rod)。设置新鱼竿时，会移除“oceanfishing_catchable”标签，监听鱼竿移除事件，并更新鱼竿的目标。若提供了 `onsetrodfn` 回调，则在设置或清除鱼竿时执行。无论设置或清除，都会启动组件更新并重新计算移动速度。返回是否成功设置了鱼竿。"
+    },
+    {
+      "name": "GetRod",
+      "effect": "返回当前关联的鱼竿(self.rod)。"
+    },
+    {
+      "name": "IsStruggling",
+      "effect": "返回实体当前是否处于挣扎状态(self.is_struggling_state)。"
+    },
+    {
+      "name": "UpdateRunSpeed",
+      "effect": "根据当前鱼竿张力和实体朝向，动态计算并更新实体的移动速度。若有关联的移动组件(locomotor)，则根据张力系数调整其行走(walkspeed)和奔跑(runspeed)速度。"
+    },
+    {
+      "name": "CalcStaminaDrainRate",
+      "effect": "计算当前耐力消耗率。返回基础消耗率(self.stamina_def.drain_rate)加上鱼竿提供的额外消耗率(oceanfishingrod:GetExtraStaminaDrain())的负值。若无鱼竿或鱼竿无额外消耗，则返回基础消耗率的负值。"
+    },
+    {
+      "name": "IsCloseEnoughToCatch",
+      "effect": "判断实体是否距离鱼竿的持有者足够近，满足被捕获的条件。若没有关联鱼竿则返回false。否则计算实体与鱼竿持有者（通过库存系统获取）的距离，并与捕捉距离(catch_distance)加持有者物理半径及一个小误差值(0.25)进行比较。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件每帧更新逻辑。主要功能：1. 更新耐力值（根据鱼竿线张力高低进行消耗或恢复）。2. 更新挣扎状态计时器，并在计时结束时切换挣扎状态。3. 根据与持有者的距离，动态添加或移除“oceanfishing_catchable”标签。4. 调用UpdateRunSpeed更新移动速度。"
+    },
+    {
+      "name": "ResetStruggling",
+      "effect": "重置挣扎状态。将待处理的挣扎状态(pending_is_struggling_state)和当前挣扎状态(is_struggling_state)都设为true，耐力值设为1，并重新计算挣扎状态持续时间。"
+    },
+    {
+      "name": "CalcStruggleDuration",
+      "effect": "计算下一次挣扎状态或疲惫状态的持续时间。根据当前挣扎状态从耐力定义中获取对应的时间范围（struggle_times 或 tired_times），在范围内根据当前耐力值进行插值计算基础时间，并加上随机值。"
+    },
+    {
+      "name": "UpdateStruggleState",
+      "effect": "同步挣扎状态。若待处理的挣扎状态(pending_is_struggling_state)与当前状态(is_struggling_state)不同，则更新当前状态并重置持续时间计时器。"
+    },
+    {
+      "name": "CalcLineUnreelRate",
+      "effect": "计算鱼线回卷速率。若设置了 `overrideunreelratefn` 回调，则使用其返回值。否则，在有耐力且处于挣扎状态、并有移动组件时，根据实体与鱼竿的角度和奔跑速度计算速率；否则返回0。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回用于调试的字符串，包含当前鱼竿关联状态、挣扎状态、计时器、耐力值以及鱼类定义中与鱼饵相关的修正参数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove (监听关联的鱼竿移除事件)"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16605,
+      14683,
+      13493,
+      13779,
+      24212,
+      34523,
+      51287,
+      13567
+    ],
+    "aspects": [
+      {
+        "aspect": "收线足够近判断",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "玩家在保证鱼上钩前持续收线到足够近"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "钓鱼",
+    "鱼挣扎",
+    "耐力值",
+    "移动速度",
+    "钓鱼距离",
+    "咬钩",
+    "鱼线张力",
+    "鱼饵",
+    "钓起"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "钓鱼",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4e528a9ea35b8218af8c08d3a91e1e25f80ae9d545e861a0f1e9c0ac28b8a85",
+    "source_bytes": 6778,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095045766
+  }
+}

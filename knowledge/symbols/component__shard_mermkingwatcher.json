@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_mermkingwatcher.lua"
+  },
+  "category": "component",
+  "display_name": "shard_mermkingwatcher",
+  "summary": "shard_mermkingwatcher组件负责在饥荒联机版的多个分片之间同步鱼人王的存在状态，以及鱼人王的三叉戟、王冠和护肩的增益状态。它通过网络变量在服务器与客户端之间同步数据，并监听世界事件来触发增益状态的变化。核心玩法涉及跨分片的团队协作，确保鱼人王的增益效果在整个游戏世界中保持一致。",
+  "api": [
+    {
+      "name": "AddMermKingSource",
+      "effect": "添加鱼人王来源。如果之前没有鱼人王，则更新网络变量并触发\"onmermkingcreated_anywhere\"事件。"
+    },
+    {
+      "name": "RemoveMermKingSource",
+      "effect": "移除鱼人王来源。如果没有剩余来源，则更新网络变量并触发\"onmermkingdestroyed_anywhere\"事件。"
+    },
+    {
+      "name": "HasMermKing",
+      "effect": "返回当前是否有鱼人王（基于网络变量值）。"
+    },
+    {
+      "name": "OnMermKingCreated",
+      "effect": "调用Shard_SyncMermKingExists(true)以同步鱼人王存在状态到其他分片。"
+    },
+    {
+      "name": "OnMermKingDestroyed",
+      "effect": "调用Shard_SyncMermKingExists(false)以同步鱼人王不存在状态到其他分片。"
+    },
+    {
+      "name": "AddTridentSource",
+      "effect": "添加三叉戟增益来源。如果之前没有三叉戟增益，则更新网络变量并触发\"onmermkingtridentadded_anywhere\"事件。"
+    },
+    {
+      "name": "RemoveTridentSource",
+      "effect": "移除三叉戟增益来源。如果没有剩余来源，则更新网络变量并触发\"onmermkingtridentremoved_anywhere\"事件。"
+    },
+    {
+      "name": "HasTrident",
+      "effect": "返回当前是否有三叉戟增益（基于网络变量值）。"
+    },
+    {
+      "name": "OnTridentAdded",
+      "effect": "调用Shard_SyncMermKingTrident(true)以同步三叉戟增益状态到其他分片。"
+    },
+    {
+      "name": "OnTridentRemoved",
+      "effect": "调用Shard_SyncMermKingTrident(false)以同步三叉戟增益状态到其他分片。"
+    },
+    {
+      "name": "AddCrownSource",
+      "effect": "添加王冠增益来源。如果之前没有王冠增益，则更新网络变量并触发\"onmermkingcrownadded_anywhere\"事件。"
+    },
+    {
+      "name": "RemoveCrownSource",
+      "effect": "移除王冠增益来源。如果没有剩余来源，则更新网络变量并触发\"onmermkingcrownremoved_anywhere\"事件。"
+    },
+    {
+      "name": "HasCrown",
+      "effect": "返回当前是否有王冠增益（基于网络变量值）。"
+    },
+    {
+      "name": "OnCrownAdded",
+      "effect": "调用Shard_SyncMermKingCrown(true)以同步王冠增益状态到其他分片。"
+    },
+    {
+      "name": "OnCrownRemoved",
+      "effect": "调用Shard_SyncMermKingCrown(false)以同步王冠增益状态到其他分片。"
+    },
+    {
+      "name": "AddPauldronSource",
+      "effect": "添加护肩增益来源。如果之前没有护肩增益，则更新网络变量并触发\"onmermkingpauldronadded_anywhere\"事件。"
+    },
+    {
+      "name": "RemovePauldronSource",
+      "effect": "移除护肩增益来源。如果没有剩余来源，则更新网络变量并触发\"onmermkingpauldronremoved_anywhere\"事件。"
+    },
+    {
+      "name": "HasPauldron",
+      "effect": "返回当前是否有护肩增益（基于网络变量值）。"
+    },
+    {
+      "name": "OnPauldronAdded",
+      "effect": "调用Shard_SyncMermKingPauldron(true)以同步护肩增益状态到其他分片。"
+    },
+    {
+      "name": "OnPauldronRemoved",
+      "effect": "调用Shard_SyncMermKingPauldron(false)以同步护肩增益状态到其他分片。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示是否为大师分片和是否有鱼人王。"
+    },
+    {
+      "name": "ResyncNetVars",
+      "effect": "仅在大师分片下可用。重新同步所有网络变量以确保分片连接时数据一致。"
+    }
+  ],
+  "events_published": [
+    "onmermkingcreated_anywhere",
+    "onmermkingdestroyed_anywhere",
+    "onmermkingtridentadded_anywhere",
+    "onmermkingtridentremoved_anywhere",
+    "onmermkingcrownadded_anywhere",
+    "onmermkingcrownremoved_anywhere",
+    "onmermkingpauldronadded_anywhere",
+    "onmermkingpauldronremoved_anywhere"
+  ],
+  "events_listened": [
+    "onmermkingcreated",
+    "onmermkingdestroyed",
+    "onmermkingtridentadded",
+    "onmermkingtridentremoved",
+    "onmermkingcrownadded",
+    "onmermkingcrownremoved",
+    "onmermkingpauldronadded",
+    "onmermkingpauldronremoved",
+    "master_shardmermkingexists",
+    "master_shardmermkingtrident",
+    "master_shardmermkingcrown",
+    "master_shardmermkingpauldron",
+    "hasmermkingdirty",
+    "hastridentdirty",
+    "hascrowndirty",
+    "haspauldrondirty"
+  ],
+  "netvars": [
+    "mermkingwatcher.hasmermking",
+    "mermkingwatcher.hastrident",
+    "mermkingwatcher.hascrown",
+    "mermkingwatcher.haspauldron"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      17945,
+      14814,
+      15975,
+      15186,
+      13493,
+      13701,
+      35360,
+      13268
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家贡献三叉戟给鱼人之王",
+        "evidence": [
+          {
+            "pageid": 13268,
+            "quote": "沃特可以向鱼人之王献上[[刺耳三叉戟]]来获得如下增益"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王拥有三叉戟的效果",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "鱼人之王拥有刺耳三叉…"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王拥有肩甲的效果",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "鱼人之王拥有大理石甲时会提供以下效果"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王的仇恨行为",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "攻击它会引起附近[[鱼人]]、[[忠诚鱼人守卫]]等的仇恨"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王的召唤守卫机制",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "生命值低于 750 时将召唤 4 只特殊的[[忠诚鱼人守卫]]"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王的生成方式",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "由皇室练习生转变而来"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼人之王的饥饿值管理",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "鱼人之王具有饥饿值，上限为 200{{饥饿值}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鱼人王",
+    "三叉戟",
+    "王冠",
+    "增益效果",
+    "跨分片",
+    "同步状态",
+    "世界事件",
+    "团队协作",
+    "装备增益"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "多人游戏",
+    "团队协作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "daf70f7dae1b3bbea7c8bd7587e80620deb816495b8c20887aa5786da65e3a5b",
+    "source_bytes": 9513,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103535856
+  }
+}

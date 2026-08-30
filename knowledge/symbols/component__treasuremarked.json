@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/treasuremarked.lua"
+  },
+  "category": "component",
+  "display_name": "treasuremarked",
+  "summary": "TreasureMarked 组件管理一个宝藏标记实体，用于在游戏世界中显示宝藏的精确位置。它通过生成和移除标记预制体来控制标记的显示状态，参与宝藏搜索与定位的核心玩法。",
+  "api": [
+    {
+      "name": "TurnOn",
+      "effect": "生成一个 messagebottletreasure_marker 预制体，并将其父实体设置为当前实体，使宝藏标记可见。"
+    },
+    {
+      "name": "TurnOff",
+      "effect": "如果宝藏标记预制体存在且有效，则移除它，使宝藏标记不可见。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15336,
+      15896,
+      34794,
+      47057,
+      51221,
+      65605,
+      10418,
+      15973
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未发现与 TurnOn 或 TurnOff 相关的宝藏标记能力表达，所有摘录均未讨论该符号的激活或关闭行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宝藏标记",
+    "寻宝",
+    "藏宝图",
+    "定位",
+    "标记",
+    "探索",
+    "宝藏点",
+    "指引",
+    "组件",
+    "显示"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "定位",
+    "宝藏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6688de5586536dde99eac72a2925d1171e32db4caaaa77702499c53781fb8f3d",
+    "source_bytes": 833,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104303445
+  }
+}

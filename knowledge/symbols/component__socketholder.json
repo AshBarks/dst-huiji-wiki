@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/socketholder.lua"
+  },
+  "category": "component",
+  "display_name": "socketholder",
+  "summary": "socketholder组件管理实体的插槽系统，用于存储和操作多个物品。它支持插槽配置、物品的插入与卸下，并参与核心玩法中的物品装备、存储和死亡掉落机制。",
+  "api": [
+    {
+      "name": "SetMaxSockets",
+      "effect": "设置最大插槽数量，初始化网络变量socketed、socketquality、socketnames，只能调用一次。"
+    },
+    {
+      "name": "SetSocketPositionName",
+      "effect": "设置指定插槽位置的名称，如果名称更改且插槽已占用，则卸下物品并掉落在地面。"
+    },
+    {
+      "name": "GetAllSocketPositions",
+      "effect": "获取所有指定名称（或全部）的插槽位置列表。"
+    },
+    {
+      "name": "GetAllEmptySocketPositions",
+      "effect": "获取所有空插槽位置列表。"
+    },
+    {
+      "name": "GetAllFullSocketPositions",
+      "effect": "获取所有已占用插槽位置列表。"
+    },
+    {
+      "name": "GetFirstEmptySocketPosition",
+      "effect": "获取第一个空插槽位置。"
+    },
+    {
+      "name": "GetFirstFullSocketPosition",
+      "effect": "获取第一个已占用插槽位置。"
+    },
+    {
+      "name": "GetHighestQualitySocketedPositions",
+      "effect": "获取指定名称中品质最高的已占用插槽位置列表。"
+    },
+    {
+      "name": "GetQualityForPosition",
+      "effect": "获取指定插槽位置的品质值。"
+    },
+    {
+      "name": "GetHighestQualitySocketed",
+      "effect": "获取指定名称中品质最高的已占用插槽的品质值。"
+    },
+    {
+      "name": "IsSocketNameForPosition",
+      "effect": "检查指定插槽位置是否与给定名称匹配。"
+    },
+    {
+      "name": "CanTryToSocket",
+      "effect": "检查物品是否可以尝试插入，包括物品socketable组件、空插槽和客户端允许函数。"
+    },
+    {
+      "name": "SetShouldAllowSocketableFn_CLIENT",
+      "effect": "设置客户端允许插入的过滤函数。"
+    },
+    {
+      "name": "TryToUnsocket",
+      "effect": "尝试从指定插槽卸下物品，触发socketholder_unsocket事件。"
+    },
+    {
+      "name": "EnableDropOnDeath",
+      "effect": "启用死亡时掉落插槽物品的功能。"
+    },
+    {
+      "name": "DisableDropOnDeath",
+      "effect": "禁用死亡时掉落插槽物品的功能。"
+    },
+    {
+      "name": "SetShouldAllowSocketableFn_SERVER",
+      "effect": "设置服务器端允许插入的过滤函数。"
+    },
+    {
+      "name": "SetOnGetSocketableFn",
+      "effect": "设置当物品被插入时的回调函数。"
+    },
+    {
+      "name": "SetOnRemoveSocketableFn",
+      "effect": "设置当物品被移除时的回调函数。"
+    },
+    {
+      "name": "DoSocket",
+      "effect": "执行插入物品到指定插槽，转换物品为存档数据并存储，删除物品实体，触发onsocketeditem事件。"
+    },
+    {
+      "name": "TryToSocket",
+      "effect": "尝试插入物品，先检查权限再调用DoSocket。"
+    },
+    {
+      "name": "UnsocketPosition",
+      "effect": "从指定插槽卸下物品，恢复物品实体，触发onunsocketeditem事件。"
+    },
+    {
+      "name": "UnsocketEverything",
+      "effect": "卸下所有已占用的插槽物品，返回物品列表。"
+    },
+    {
+      "name": "VerifySockets",
+      "effect": "验证所有已占用插槽的名称匹配性，不匹配则卸下并掉落物品。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回socketdata作为存档数据。"
+    },
+    {
+      "name": "DoLoadingOfSockets",
+      "effect": "从存档数据加载插槽。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载插槽数据，玩家实例直接加载并验证，其他实体通过LoadPostPass加载。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在实体状态设置后加载插槽数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示插槽状态信息。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onsocketeditem",
+    "onunsocketeditem",
+    "socketholder_unsocket"
+  ],
+  "events_listened": [
+    "death",
+    "ms_skilltreeinitialized"
+  ],
+  "netvars": [
+    "socketed (net_bool)",
+    "socketquality (net_enum)",
+    "socketnames (net_hash)"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      16419,
+      28744,
+      72238,
+      18359,
+      19129,
+      15225,
+      72441
+    ],
+    "aspects": [
+      {
+        "aspect": "扩展储存单元插槽位置增加机制",
+        "evidence": [
+          {
+            "pageid": 72441,
+            "quote": "安装空间扩展电路时，从最右侧的[[基本物品栏]] 15 格之后开始增加一个扩展储存单元的 1 格物品栏。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "插槽",
+    "物品",
+    "装备",
+    "存储",
+    "卸下",
+    "插入",
+    "品质",
+    "死亡掉落",
+    "socketable",
+    "网络变量"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "存储"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "69adea01270aed9ab8da6b59e2774ab48aad9a4bde279c743b003d7bb24e949c",
+    "source_bytes": 14337,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112860779
+  }
+}

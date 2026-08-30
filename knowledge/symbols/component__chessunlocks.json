@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/chessunlocks.lua"
+  },
+  "category": "component",
+  "display_name": "chessunlocks",
+  "summary": "该组件管理棋子解锁状态，通过维护锁定的草图和小饰品列表来控制玩家可获取的物品。它响应解锁事件更新内部状态，并支持存档保存与加载。参与游戏的收集和棋子相关玩法。",
+  "api": [
+    {
+      "name": "IsLocked",
+      "effect": "检查给定prefab是否被锁定；若该prefab在锁定草图或小饰品列表中则返回true，否则返回false。"
+    },
+    {
+      "name": "GetNumLockedSketches",
+      "effect": "获取当前锁定草图的数量；返回一个整数，表示未解锁的棋子草图总数。"
+    },
+    {
+      "name": "GetNumLockedTrinkets",
+      "effect": "获取当前锁定小饰品的数量；返回一个整数，表示未解锁的棋子相关小饰品总数。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态；遍历所有棋子，收集已解锁的棋子名称，返回一个包含unlocks列表的表或nil（无解锁时）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从给定数据加载组件状态；若数据包含unlocks列表，则逐个解锁棋子，更新锁定状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_unlockchesspiece"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22094
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容仅涉及冬季盛宴树的装饰、生长阶段和礼物掉落，未提及国际象棋解锁或相关代码能力（IsLocked, GetNumLockedSketches, GetNumLockedTrinkets, OnSave, OnLoad）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "棋子收集",
+    "草图解锁",
+    "小饰品",
+    "棋子蓝图",
+    "解锁进度",
+    "存档管理",
+    "收集玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "收集",
+    "解锁",
+    "棋子"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c2e6031e13cff54498891e8bc57ab6d1cc40c18d30647dec5f1d701619ca656",
+    "source_bytes": 4186,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105986040
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vinebridgemanager.lua"
+  },
+  "category": "component",
+  "display_name": "vinebridgemanager",
+  "summary": "vinebridgemanager 组件是藤蔓桥系统的核心管理器，负责在世界地图上创建、伤害、销毁由查理力量生成的藤蔓桥（CHARLIE_VINE 地形），并管理其生命值、动画效果和状态持久化。它通过多个数据网格（DataGrid）追踪每个地图格子的状态，确保藤蔓桥的创建与销毁逻辑正确执行，并处理与周围环境的交互（如修复漂浮物）。",
+  "api": [
+    {
+      "name": "CreateVineBridgeAtPoint(x, y, z, direction)",
+      "effect": "将指定世界坐标所在的地图格子设置为 `WORLD_TILES.CHARLIE_VINE` 藤蔓桥地形。同时会记录该格子的初始生命值（`TUNING.VINEBRIDGE_HEALTH`）和创建方向，修复该区域内的漂浮物（`floaterobject`）状态，并生成藤蔓桥动画实体。如果该格子已有藤蔓桥数据，则会重置其生命值。返回 `true` 表示创建成功。"
+    },
+    {
+      "name": "CreateVineBridgeAtTile(tile_x, tile_y, x, z, direction)",
+      "effect": "将指定地图格子坐标（tile_x, tile_y）设置为藤蔓桥地形。其逻辑与 `CreateVineBridgeAtPoint` 基本一致，但接受地图格子坐标而非世界坐标。"
+    },
+    {
+      "name": "QueueCreateVineBridgeAtPoint(x, y, z, data)",
+      "effect": "延迟创建藤蔓桥。如果该坐标当前没有藤蔓桥数据，则设置初始数据并安排一个延迟任务（默认 0.5-0.8 秒）来实际执行创建。`data` 参数可选，包含 `base_time`、`random_time` 和 `direction` 以自定义延迟和方向。"
+    },
+    {
+      "name": "DestroyVineBridgeAtPoint(x, y, z, data)",
+      "effect": "立即销毁指定坐标处的藤蔓桥。将该格子地形恢复为创建前的原地形（通过 `undertile` 组件查询），或默认为 `WORLD_TILES.OCEAN_COASTAL`（地表）/ `WORLD_TILES.IMPASSABLE`（洞穴）。清理该格子在所有数据网格中的状态，移除关联的伤害预设体和动画实体。返回 `true` 表示销毁成功，如果该坐标不是藤蔓桥则返回 `false`。"
+    },
+    {
+      "name": "QueueDestroyForVineBridgeAtPoint(x, y, z, data)",
+      "effect": "延迟销毁指定坐标处的藤蔓桥。将该格子标记为待删除，并安排一个延迟任务（默认约 2-3.5 秒）来执行销毁。期间会根据 `data` 中的 `fxtime` 和 `shaketime` 播放藤蔓桥摇晃和警告动画效果，并触发临时地形变更警告（`TempTile_HandleTileChange_Warn`）。"
+    },
+    {
+      "name": "DamageVineBridgeAtPoint(x, y, z, damage)",
+      "effect": "对指定世界坐标处的藤蔓桥造成伤害。伤害值会从其当前生命值中扣除。返回扣减后的剩余生命值，如果该坐标不是藤蔓桥或生命值已为0则返回 `nil`。"
+    },
+    {
+      "name": "DamageVineBridgeAtTile(tx, ty, damage)",
+      "effect": "对指定地图格子坐标处的藤蔓桥造成伤害。逻辑与 `DamageVineBridgeAtPoint` 一致。如果剩余生命值降至0，则会调用 `QueueDestroyForVineBridgeAtPoint` 启动销毁流程。"
+    },
+    {
+      "name": "SpawnDamagePrefab(tile_index, health)",
+      "effect": "根据藤蔓桥的当前生命值尝试生成或移除伤害预设体。源码中生成预设体（`oceanice_damage`）的逻辑已被注释禁用，因此此方法实际上仅在生命值满时移除已存在的伤害预设体，其他情况下无操作。"
+    },
+    {
+      "name": "SpawnBridgeAnim(tile_index, x, z, direction)",
+      "effect": "在指定位置生成藤蔓桥动画实体（`vine_bridge_fx`），并根据创建方向设置其旋转。如果该格子已有动画实体，则跳过生成。在游戏世界正在加载（`POPULATING`）时，会跳过动画的准备阶段。"
+    },
+    {
+      "name": "FixupFloaterObjects(x, z, tile_radius_plus_overhang, is_ocean_tile)",
+      "effect": "修复指定坐标周围特定半径内所有带 `floaterobject` 标签实体的漂浮状态。如果该实体所在位置是海洋地形（或传入的 `is_ocean_tile` 为 `true`），则触发 `on_landed` 事件；否则触发 `on_no_longer_landed` 事件。用于处理藤蔓桥创建/销毁后，周围漂浮物的着陆状态。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "将组件状态（`marked_for_delete_grid` 和 `duration_grid`）打包并编码，返回可用于持久化的存档数据。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "从存档数据中恢复组件状态。重建所有藤蔓桥的数据网格，并为每个有效的藤蔓桥格子重新生成动画和伤害预设体。对于存档中处于“待删除”状态的格子，会重新安排一个随机的短延迟销毁任务。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "worldmapsetsize"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.VINEBRIDGE_HEALTH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15244,
+      20058,
+      10374,
+      20150,
+      15922,
+      13156,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现任何关于藤蔓桥梁（vine bridge）的讨论，内容主要涉及其他游戏机制和实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "藤蔓桥",
+    "查理的藤蔓",
+    "过海",
+    "桥梁",
+    "伤害",
+    "生命值",
+    "修复",
+    "销毁",
+    "动画效果",
+    "数据保存"
+  ],
+  "gameplay_tags": [
+    "地形",
+    "生命值",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8f20d3a37b39c633630f9c10bfc345d4533aefdea8b422b654f6634227ec96d2",
+    "source_bytes": 12144,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113686249
+  }
+}

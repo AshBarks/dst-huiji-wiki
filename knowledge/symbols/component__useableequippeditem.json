@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/useableequippeditem.lua"
+  },
+  "category": "component",
+  "display_name": "useableequippeditem",
+  "summary": "UseableEquippedItem 组件管理装备物品的使用状态，通过布尔值 inuse 跟踪是否正在使用。它维护回调函数 onusefn 和 onstopusefn，在使用开始和结束时触发。组件还根据 inuse 状态添加或移除实体标签 'equipped_and_inuse'，影响网络同步。核心玩法涉及需要持续动作的装备操作，如工具使用和武器攻击。",
+  "api": [
+    {
+      "name": "SetOnUseFn",
+      "effect": "设置当物品开始使用时调用的回调函数。回调函数接受两个参数：实体（self.inst）和使用者（doer）。在 StartUsingItem 中调用，如果回调失败（返回 false 或非 true），使用状态被重置并返回失败原因。"
+    },
+    {
+      "name": "SetOnStopUseFn",
+      "effect": "设置当物品停止使用时调用的回调函数。回调函数接受两个参数：实体（self.inst）和使用者（doer）。在 StopUsingItem 中调用。"
+    },
+    {
+      "name": "IsInUse",
+      "effect": "返回当前物品是否正在使用中的布尔值。"
+    },
+    {
+      "name": "StartUsingItem",
+      "effect": "尝试开始使用物品。如果物品未在使用中（inuse 为 false），则设置 inuse 为 true，并调用 onusefn 回调。如果回调失败（返回 false 或非 true），inuse 被重置为 false，方法返回 false 和原因；否则返回 true。如果物品已在使用中，返回 false。"
+    },
+    {
+      "name": "StopUsingItem",
+      "effect": "停止使用物品。如果物品正在使用中（inuse 为 true），则设置 inuse 为 false，并调用 onstopusefn 回调。如果物品未在使用中，则无操作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      13437,
+      16633,
+      15729,
+      17930,
+      22383,
+      13421,
+      14485
+    ],
+    "aspects": [
+      {
+        "aspect": "使用物品行为的玩家语言描述",
+        "evidence": [
+          {
+            "pageid": 16633,
+            "quote": "使用桨作为武器攻击每次造成伤害会损失 25 次耐久。"
+          },
+          {
+            "pageid": 17930,
+            "quote": "当第一位玩家右击使用传送塔时"
+          },
+          {
+            "pageid": 14485,
+            "quote": "用水壶作为武器攻击不会消耗其耐久。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "使用物品",
+    "武器攻击",
+    "装备使用",
+    "使用状态",
+    "回调函数",
+    "标签管理",
+    "持续使用",
+    "工具操作"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4044a9c503ac4aa9b508754d4fda0d8c536bd70866dd0eb49aa7d1d840d63d92",
+    "source_bytes": 1247,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104525544
+  }
+}

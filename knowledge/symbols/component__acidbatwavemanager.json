@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/acidbatwavemanager.lua"
+  },
+  "category": "component",
+  "display_name": "acidbatwavemanager",
+  "summary": "acidbatwavemanager 组件负责在酸雨期间管理酸蝙蝠的波次生成。它跟踪所有在线玩家持有的特定物品（硝石）数量，根据数量计算生成概率和蝙蝠群规模，并在满足条件时生成蝙蝠群袭击玩家。组件还处理波次生成的计时、警告、暂停与恢复，以及玩家数据的保存和加载。",
+  "api": [],
+  "api_note": "该组件无对外暴露的公共方法，所有功能均通过内部事件监听和周期更新实现。",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "pausehounded",
+    "unpausehounded",
+    "isacidraining"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ACIDBATWAVE_SPAWN_DISTANCE",
+    "ACIDBATWAVE_NUMBER_OF_ITEMS_TO_GUARANTEE_WAVE_SPAWN",
+    "ACIDBATWAVE_COOLDOWN_BETWEEN_WAVES",
+    "ACIDBATWAVE_TIME_FOR_WARNING",
+    "ACIDBATWAVE_SPAWN_COUNT_MAX",
+    "ACIDBATWAVE_SPAWN_COUNT_MIN"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      20714,
+      34523,
+      52788,
+      65605,
+      14579,
+      22418,
+      24544
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与acidbatwavemanager相关的讨论或能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "酸雨",
+    "硝石",
+    "蝙蝠袭击",
+    "玩家物品",
+    "周期任务",
+    "波次",
+    "生成",
+    "蝙蝠波次"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "550227b6aa6332940a5ce2243acd3c9edcc5e390a010bfb8974941f64b312ca7",
+    "source_bytes": 14031,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105106583
+  }
+}

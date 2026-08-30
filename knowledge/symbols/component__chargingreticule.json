@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/chargingreticule.lua"
+  },
+  "category": "component",
+  "display_name": "chargingreticule",
+  "summary": "ChargingReticule组件管理一个充电瞄准标线，用于在实体上指示目标位置。它跟踪所有者实体的位置，并响应鼠标或控制器输入更新标线的朝向和旋转。组件通过动画状态和着色器渲染标线，参与核心的瞄准和技能释放玩法。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清理followhandler输入处理器和相机监听器，释放资源。"
+    },
+    {
+      "name": "GetMouseTargetXZ",
+      "effect": "将屏幕坐标(x, y)转换为世界坐标XZ，返回x和z值，可能为nil。"
+    },
+    {
+      "name": "GetControllerTargetXZ",
+      "effect": "根据控制器模拟输入值计算目标位置XZ，返回x和z值，可能为nil；若输入未超出死区则返回nil。"
+    },
+    {
+      "name": "LinkToEntity",
+      "effect": "将组件链接到目标实体，设置owner，初始化目标位置基于实体朝向或当前输入，添加鼠标移动处理器或控制器输入处理，并注册相机监听器以持续更新位置和旋转。"
+    },
+    {
+      "name": "UpdatePosition_Internal",
+      "effect": "将自身位置更新为owner实体的世界位置。"
+    },
+    {
+      "name": "UpdateRotation_Internal",
+      "effect": "更新自身旋转以指向targetpos；若ease属性为true且提供dt参数，则平滑旋转过渡。"
+    },
+    {
+      "name": "OnCameraUpdate",
+      "effect": "相机更新时调用，更新自身位置，并根据输入类型（鼠标或控制器）更新targetpos和旋转。"
+    },
+    {
+      "name": "Snap",
+      "effect": "立即更新自身位置到owner位置，并强制面向targetpos。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15022,
+      28734,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "实体跟随玩家移动",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘平时跟随在玩家身边。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "充电瞄准",
+    "目标指示",
+    "输入响应",
+    "朝向旋转",
+    "动画状态",
+    "着色器",
+    "技能释放"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 5/7)",
+  "gameplay_tags": [
+    "战斗",
+    "瞄准",
+    "技能"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d4ef53a00af9e549ad344908570443e4ef04ae9e6be1e01245ea3cdf6308a08",
+    "source_bytes": 3415,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098961135
+  }
+}

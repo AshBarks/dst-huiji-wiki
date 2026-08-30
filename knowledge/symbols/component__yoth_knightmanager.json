@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yoth_knightmanager.lua"
+  },
+  "category": "component",
+  "display_name": "yoth_knightmanager",
+  "summary": "组件管理马年骑士事件的相关数据，包括神龛激活状态、公主注册信息和骑士召唤调度。它通过监听世界事件处理神龛的激活与停用，并在玩家佩戴特定帽子（公主身份）时尝试召唤骑士。组件负责骑士生成的冷却检查、位置验证和延迟调度，确保在马年活动期间正确触发骑士战斗玩法。",
+  "api": [],
+  "api_note": "纯数据与内部逻辑组件，所有方法均通过事件监听器桥接或内部调用，无直接暴露的公共 API。",
+  "events_published": [],
+  "events_listened": [
+    "ms_knightshrineactivated",
+    "ms_knightshrinedeactivated",
+    "ms_register_yoth_princess",
+    "ms_unregister_yoth_princess"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15225,
+      13409,
+      13701,
+      18234,
+      15922,
+      15601,
+      15832
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及与 'component__yoth_knightmanager' 相关的任何能力表达，所有页面讨论的是其他实体（如天体英雄、暗影傀儡、薇格弗德等），与骑士管理无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "马年骑士",
+    "神龛",
+    "公主",
+    "召唤",
+    "冷却",
+    "骑士管理",
+    "事件",
+    "战斗",
+    "马年",
+    "召唤骑士"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ca7cf6a62608505e402a571d3b305eaa6e995187324e0233bb4f4879dbc52ddd",
+    "source_bytes": 7794,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114751255
+  }
+}

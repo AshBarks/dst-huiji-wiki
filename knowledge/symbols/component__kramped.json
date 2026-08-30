@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/kramped.lua"
+  },
+  "category": "component",
+  "display_name": "kramped",
+  "summary": "该组件管理玩家的淘气值系统，当玩家杀死友好生物时会增加淘气值。当淘气值累积达到随机生成的阈值时，会生成Krampus恶魔攻击玩家。组件处理淘气值的随时间衰减，并在淘气值接近阈值时播放警告声音。",
+  "api": [
+    {
+      "name": "DoWarningSound",
+      "effect": "为指定玩家生成警告声音实体，延迟1到2秒后执行。警告声音级别（1到3级）根据玩家当前淘气值与阈值的差值决定，差值越小声音越紧急。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新，衰减所有活跃玩家的淘气值。如果玩家淘气值大于0，则减少衰减计时器；当计时器小于0时，重置计时器并减少1点淘气值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回所有活跃玩家的调试字符串，格式为“Player [玩家名] - Actions: [当前淘气值] / [阈值], decay in [衰减时间]”，用于调试控制台输出。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "killed",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_forcenaughtiness"
+  ],
+  "netvars": [],
+  "tunables": [
+    "KRAMPUS_THRESHOLD",
+    "KRAMPUS_THRESHOLD_VARIANCE",
+    "KRAMPUS_NAUGHTINESS_DECAY_PERIOD",
+    "KRAMPUS_INCREASE_RAMP",
+    "KRAMPUS_INCREASE_LVL2",
+    "KRAMPUS_INCREASE_LVL1"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      20714,
+      34523,
+      52788,
+      65605,
+      14579,
+      24544,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论世界生成、布景、控制台命令等内容，未涉及component__kramped的DoWarningSound、OnUpdate或GetDebugString能力的任何描述或相关行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Krampus",
+    "淘气值",
+    "恶魔",
+    "惩罚",
+    "生成",
+    "警告声音",
+    "阈值",
+    "衰减",
+    "Naughtiness"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "惩罚"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ee233f8fbb69da4f39c1e8497b2123ff2144e9dec2a2518a1217331319994f6a",
+    "source_bytes": 7836,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109111350
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/attuner.lua"
+  },
+  "category": "component",
+  "display_name": "attuner",
+  "summary": "attuner组件管理玩家与可调谐目标（如火坑、避雷针）的链接数据，用于支持玩家与环境物品的互动机制。在服务器上，所有玩家数据可用；在客户端，仅本地玩家数据可用。核心玩法涉及生存和建造中的物品链接功能。",
+  "api": [
+    {
+      "name": "IsAttunedTo",
+      "effect": "检查玩家是否已链接到指定目标实体。在服务器上，通过GUID直接检查attuned表；在客户端，遍历attuned表并通过标签检查目标。无副作用，返回布尔值。"
+    },
+    {
+      "name": "HasAttunement",
+      "effect": "检查玩家是否有任何带有特定标签的链接。遍历attuned表中所有代理，检查其是否具有给定标签。无副作用，返回布尔值。"
+    },
+    {
+      "name": "GetAttunedTarget",
+      "effect": "获取带有特定标签的链接目标实体。仅在服务器上工作，遍历attuned表并返回匹配标签的第一个实体或nil。无副作用，客户端调用无操作。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将链接转移到新玩家实例。仅在服务器上工作，对attuned表中每个目标调用UnlinkFromPlayer和LinkToPlayer，更新链接关系。副作用：修改所有链接目标状态。"
+    },
+    {
+      "name": "RegisterAttunedSource",
+      "effect": "注册链接源代理。如果代理未在attuned表中，则添加代理并推送gotnewattunement事件。副作用：更新attuned表并触发事件。"
+    },
+    {
+      "name": "UnregisterAttunedSource",
+      "effect": "取消注册链接源代理。如果代理在attuned表中，则移除代理并推送attunementlost事件。副作用：更新attuned表并触发事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，列出所有链接。在服务器上显示实体名称，在客户端上显示GUID。无副作用，用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "gotnewattunement",
+    "attunementlost"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      20714,
+      16419,
+      13701,
+      28179,
+      15539,
+      13823,
+      13897
+    ],
+    "aspects": [
+      {
+        "aspect": "兔王绑定玩家描述",
+        "evidence": [
+          {
+            "pageid": 28179,
+            "quote": "暴戾兔王向绑定玩家的方向飞踢"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板插拔机制",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "电路板可以插入WX-78的底盘"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "链接",
+    "调谐",
+    "目标",
+    "火坑",
+    "避雷针",
+    "玩家",
+    "注册",
+    "取消注册",
+    "事件",
+    "调试"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "互动",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3d581e59fca91bd8a3714ccde7bbd4b065716a2858755b9c02176f19c4110f1a",
+    "source_bytes": 2785,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090526346
+  }
+}

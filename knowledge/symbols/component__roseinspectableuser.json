@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/roseinspectableuser.lua"
+  },
+  "category": "component",
+  "display_name": "roseinspectableuser",
+  "summary": "该组件管理玩家使用玫瑰眼镜进行检查的能力，包括设置检查目标或位置、生成临时查理残影、执行检查并处理冷却时间。它通过残影激活事件触发检查效果，并根据冷却状态决定是否执行，以平衡游戏玩法中的探索与工具使用。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，取消冷却任务并结束冷却，清理相关状态。"
+    },
+    {
+      "name": "SetCooldownTime",
+      "effect": "设置冷却时间的长度，用于控制检查能力的恢复间隔。"
+    },
+    {
+      "name": "GoOnCooldown",
+      "effect": "开始冷却计时，取消现有冷却任务并应用新冷却时间，同时更新网络变量。"
+    },
+    {
+      "name": "OnCharlieResidueActivated",
+      "effect": "处理查理残影激活事件：如果残影匹配且目标存在，执行检查并可能触发冷却；否则显示失败对话。"
+    },
+    {
+      "name": "SetRoseInpectionOnTarget",
+      "effect": "设置检查目标为指定实体，生成残影并挂钩残影事件，清理旧残影。"
+    },
+    {
+      "name": "SetRoseInpectionOnPoint",
+      "effect": "设置检查点为指定位置，生成残影并清理旧残影。"
+    },
+    {
+      "name": "ForceDecayResidue",
+      "effect": "强制衰减当前残影，移除事件监听并触发残影衰减。"
+    },
+    {
+      "name": "SpawnResidue",
+      "effect": "生成一个查理残影在目标或点位置，设置残影归属并处理移除事件。"
+    },
+    {
+      "name": "DoRoseInspectionOnPoint",
+      "effect": "在设置的点上执行检查，遍历配置项进行条件检查和回调，可能触发冷却或显示失败对话。"
+    },
+    {
+      "name": "DoQuip",
+      "effect": "显示角色对话：如果失败，显示指定原因的失败对话；如果成功，显示成功对话并设置冷却间隔。"
+    },
+    {
+      "name": "TryToDoRoseInspectionOnTarget",
+      "effect": "尝试对目标进行检查：验证目标有效性、标签和冷却状态，如果通过则设置检查并显示对话。"
+    },
+    {
+      "name": "TryToDoRoseInspectionOnPoint",
+      "effect": "尝试对点进行检查：设置检查点并显示对话。"
+    },
+    {
+      "name": "ApplyCooldown",
+      "effect": "应用冷却效果：设置定时任务在指定持续时间后结束冷却，并更新玩家分类的网络变量。"
+    },
+    {
+      "name": "OnCooldown",
+      "effect": "冷却结束：取消冷却任务，更新网络变量为未冷却状态。"
+    },
+    {
+      "name": "IsInCooldown",
+      "effect": "返回布尔值，表示组件是否处于冷却状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存冷却剩余时间到数据表，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据，如果存在冷却时间则应用冷却。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新：调整冷却剩余时间，如果时间耗尽则结束冷却。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包括当前目标或点以及冷却剩余时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "silentcloseinspect"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "roseglasses_cooldown"
+  ],
+  "tunables": [
+    "TUNING.SKILLS.WINONA.ROSEGLASSES_COOLDOWNTIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15303,
+      24866,
+      24862,
+      51494,
+      10413,
+      33950,
+      24960,
+      10418
+    ],
+    "aspects": [
+      {
+        "aspect": "仔细检查行为描述",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "薇诺娜装备玫瑰色眼镜时可以进行仔细检查。"
+          },
+          {
+            "pageid": 24960,
+            "quote": "“仔细检查”以下物品会生成黑暗痕迹"
+          },
+          {
+            "pageid": 24960,
+            "quote": "可以仔细检查陆地边缘"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却时间设置与描述",
+        "evidence": [
+          {
+            "pageid": 15303,
+            "quote": "冷却时间 2 分钟"
+          },
+          {
+            "pageid": 24960,
+            "quote": "激活黑暗痕迹有 4 分钟冷却时间"
+          }
+        ]
+      },
+      {
+        "aspect": "黑暗痕迹生成与激活",
+        "evidence": [
+          {
+            "pageid": 24960,
+            "quote": "生成黑暗痕迹"
+          },
+          {
+            "pageid": 24960,
+            "quote": "激活黑暗痕迹"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "检查",
+    "玫瑰眼镜",
+    "冷却时间",
+    "互动",
+    "工具",
+    "幻影",
+    "查理幻影",
+    "查看目标"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "探索",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "40610cb1efc6a188e983637779e1a0fa19b5035bc946301cbb4a7cc63be8ca68",
+    "source_bytes": 8317,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111973257
+  }
+}

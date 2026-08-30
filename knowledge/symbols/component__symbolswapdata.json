@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/symbolswapdata.lua"
+  },
+  "category": "component",
+  "display_name": "symbolswapdata",
+  "summary": "SymbolSwapData组件是一个数据容器，用于存储实体的外观定制信息，包括构建名称、符号名称和是否为皮肤版本。它可能被其他系统用于控制实体的视觉表现或皮肤切换，支持游戏中的外观定制功能。",
+  "api": [
+    {
+      "name": "SetData",
+      "effect": "设置组件的build、symbol和is_skinned属性，用于存储实体的外观数据。无副作用，仅进行数据赋值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个包含当前build、symbol和is_skinned值的格式化字符串，用于调试输出。无副作用，仅生成并返回字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15301,
+      17836,
+      22249,
+      52631,
+      18525,
+      28103
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件能力 SetData 或 GetDebugString 相关的玩家语言表达；所有页面均讨论实体描述、掉落物或生成机制，不涉及符号交换数据的设置或调试功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "皮肤定制",
+    "构建名称",
+    "符号名称",
+    "皮肤版本",
+    "视觉表现",
+    "皮肤切换",
+    "自定义外观",
+    "外观模型"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "外观定制",
+    "皮肤系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ff6571899b4b4c6cc24dd72dc07e8735d2c693da2be43447c42385ad6ffceacf",
+    "source_bytes": 413,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094169513
+  }
+}

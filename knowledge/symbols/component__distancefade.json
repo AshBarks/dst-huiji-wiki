@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/distancefade.lua"
+  },
+  "category": "component",
+  "display_name": "distancefade",
+  "summary": "DistanceFade 组件管理实体的范围和渐变距离参数，根据玩家摄像机距离动态调整实体的透明度。它通过墙壁更新系统在实体激活时持续计算，用于优化远距离实体的渲染性能或实现视觉效果。组件允许设置额外函数来自定义透明度计算。",
+  "api": [
+    {
+      "name": "Setup",
+      "effect": "设置渐隐的起始范围（range）和渐变距离（fadedist），直接影响实体的透明度计算阈值。"
+    },
+    {
+      "name": "SetExtraFn",
+      "effect": "设置一个额外函数，在透明度计算过程中被调用，用于自定义最终透明度值，可能改变渐隐行为。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13701,
+      70704,
+      65881,
+      16419,
+      21063,
+      15225,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述实体的行为、仇恨距离、攻击范围等机制，没有提及与距离渐隐（distance fade）相关的可视化效果或组件能力如 Setup 和 SetExtraFn 的表现。所有距离描述均用于仇恨、攻击、生成等，而非渐隐效果。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "距离渐隐",
+    "透明度",
+    "摄像机",
+    "墙壁更新",
+    "优化",
+    "视觉效果",
+    "范围",
+    "渐变",
+    "渲染"
+  ],
+  "gameplay_tags": [
+    "优化",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9f5eba113e0793c42ae7a14ad49d309c1ba96995b5f3eb9c7e5050758ab1df44",
+    "source_bytes": 1385,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094702862
+  }
+}

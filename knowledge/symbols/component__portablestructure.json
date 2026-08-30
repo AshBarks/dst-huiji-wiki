@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/portablestructure.lua"
+  },
+  "category": "component",
+  "display_name": "portablestructure",
+  "summary": "PortableStructure组件管理一个拆解回调函数，用于在拆解可移动结构时触发自定义逻辑。它参与游戏中结构移动和管理的玩法，确保拆解时执行特定操作。",
+  "api": [
+    {
+      "name": "SetOnDismantleFn",
+      "effect": "设置拆解时的回调函数。将传入的函数存储为ondismantlefn，用于后续拆解操作。"
+    },
+    {
+      "name": "Dismantle",
+      "effect": "执行拆解操作。如果设置了回调函数（ondismantlefn不为nil），则调用该函数，传递实体实例和执行者作为参数；如果没有设置回调，则无操作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21620,
+      18216,
+      18843,
+      24962,
+      14337,
+      16156,
+      18303,
+      39307
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 SetOnDismantleFn 或 Dismantle 能力的直接表达，如拆除行为描述或触发效果；仅有'摧毁'和'锤击'等词，但不足以确认为该能力的玩家语言体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "便携建筑",
+    "拆除触发",
+    "移动结构",
+    "拆掉建筑",
+    "结构移动"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 5/5)",
+  "gameplay_tags": [
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
+    "source_bytes": 369,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092480356
+  }
+}

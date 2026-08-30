@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sisturnregistry.lua"
+  },
+  "category": "component",
+  "display_name": "sisturnregistry",
+  "summary": "sisturnregistry组件管理游戏中所有妹妹雕像（sisturn）的注册与状态跟踪。它监测雕像是否激活或开花，并在状态变化时触发事件通知其他系统，主要服务于温蒂角色的核心玩法机制。",
+  "api": [
+    {
+      "name": "Register",
+      "effect": "注册一个妹妹雕像实例到注册表中，使其状态被持续跟踪。若雕像已注册则无操作。注册后会监听该雕像的移除和燃烧事件，当雕像被移除或烧毁时自动注销并更新状态。"
+    },
+    {
+      "name": "IsActive",
+      "effect": "返回一个布尔值，表示当前是否有任何妹妹雕像处于激活状态。无副作用，仅查询状态。"
+    },
+    {
+      "name": "IsBlossom",
+      "effect": "返回一个布尔值，表示当前是否有任何妹妹雕像处于开花状态。无副作用，仅查询状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，包含当前注册的雕像数量、激活状态和开花状态。无副作用，用于开发调试。"
+    }
+  ],
+  "events_published": [
+    "onsisturnstatechanged"
+  ],
+  "events_listened": [
+    "ms_updatesisturnstate"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      16419,
+      13556,
+      13261,
+      13156,
+      51951,
+      57263,
+      47009
+    ],
+    "aspects": [
+      {
+        "aspect": "开花状态阶段描述",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德开花的状态一共有四个阶段，其中包含一个开花值升高或降低的速率"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "妹妹雕像",
+    "温蒂",
+    "注册",
+    "状态",
+    "开花",
+    "激活",
+    "事件",
+    "管理",
+    "雕像",
+    "游戏机制"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "精神",
+    "角色专属"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3a1ffc244316e307b61993089205b15242d7f9cbbd287c5b95d1c0dd3df1875b",
+    "source_bytes": 3780,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103774724
+  }
+}

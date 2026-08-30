@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lavaarenamusic.lua"
+  },
+  "category": "component",
+  "display_name": "lavaarenamusic",
+  "summary": "该组件用于管理熔岩竞技场（Lava Arena）的背景音乐播放。它通过网络变量同步音乐级别状态，并在玩家激活时启动音乐、在停用时停止音乐。核心玩法是控制战斗场景的环境音效，增强沉浸感。",
+  "api": [],
+  "api_note": "该组件无对外暴露的公共方法，仅通过事件监听和网络变量内部管理状态，属于纯事件驱动和数据同步组件。",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated"
+  ],
+  "netvars": [
+    "level"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19802,
+      15022,
+      13701,
+      13897,
+      14938,
+      15551,
+      15642,
+      27578
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及 component__lavaarenamusic 或与熔岩竞技场音乐相关的任何内容，所有页面均涉及其他游戏实体和机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "背景音乐",
+    "战斗音乐",
+    "环境音效",
+    "玩家激活",
+    "音乐同步",
+    "竞技场环境",
+    "音效管理",
+    "游戏背景音"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "环境",
+    "音乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d981e6374815da27e1d5fa364aa49e776acedc2094cbb7df0fcc69e71edafcf",
+    "source_bytes": 2794,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101129459
+  }
+}

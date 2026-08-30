@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/klaussackloot.lua"
+  },
+  "category": "component",
+  "display_name": "klaussackloot",
+  "summary": "该组件管理克劳斯袋的掉落物数据，包括冬季盛宴特殊事件下的额外战利品。它在初始化时生成随机战利品列表，并提供获取战利品的方法，每次获取后自动重新生成新列表。核心玩法涉及玩家打开克劳斯袋以获得随机物品，用于生存和节日活动。",
+  "api": [
+    {
+      "name": "GetLoot",
+      "effect": "返回当前战利品列表（包括冬季盛宴战利品和普通战利品），然后调用RollKlausLoot重新生成新的战利品列表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13898,
+      18521,
+      18830,
+      18359,
+      18939,
+      13493,
+      22094,
+      19832
+    ],
+    "aspects": [
+      {
+        "aspect": "赃物袋战利品季节性变化",
+        "evidence": [
+          {
+            "pageid": 18939,
+            "quote": "*[[赃物袋]]会无视季节每隔一段时间生成，其中的战利品也会变化。"
+          }
+        ]
+      },
+      {
+        "aspect": "赃物袋掉落物品概率与种类",
+        "evidence": [
+          {
+            "pageid": 19832,
+            "quote": "随机''' 0 ~ 1 个'''（50% 概率）"
+          }
+        ]
+      },
+      {
+        "aspect": "赃物袋生成时间与地点描述",
+        "evidence": [
+          {
+            "pageid": 19832,
+            "quote": "在[[冬季]]的第 2 ~ 3 天，随机选择一个[[无眼鹿生成地]]生成一个赃物袋，条件如下："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "克劳斯袋",
+    "战利品",
+    "冬季盛宴",
+    "Boss掉落",
+    "蓝图",
+    "金块",
+    "复活护符",
+    "蜂王帽",
+    "曼德拉草"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "节日",
+    "战利品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db94b9d82ae1c0bc434c53a0052ce68de570f327781c97daf241a7d9d78d7b20",
+    "source_bytes": 3637,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109067698
+  }
+}

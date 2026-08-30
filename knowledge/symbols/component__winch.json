@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/winch.lua"
+  },
+  "category": "component",
+  "display_name": "winch",
+  "summary": "该组件管理绞盘的状态数据，包括线的长度、升降速度和就绪标志。它参与核心玩法，允许实体在海洋深度中升降物品，可能用于打捞或钓鱼机制。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的“winch_ready”标签。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存绞盘状态数据（如线长、升降状态、速度）到表中，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载绞盘状态，恢复线长、升降状态、速度等参数。"
+    },
+    {
+      "name": "SetLoweringSpeedMultiplier",
+      "effect": "设置下降速度乘数，影响绞盘下降的速率。"
+    },
+    {
+      "name": "SetRaisingSpeedMultiplier",
+      "effect": "设置上升速度乘数，影响绞盘上升的速率。"
+    },
+    {
+      "name": "SetOnFullyLoweredFn",
+      "effect": "设置完全下降时的回调函数，当绞盘线降至当前深度时触发。"
+    },
+    {
+      "name": "SetOnFullyRaisedFn",
+      "effect": "设置完全上升时的回调函数，当绞盘线收起至零时触发。"
+    },
+    {
+      "name": "SetOnStartRaisingFn",
+      "effect": "设置开始上升时的回调函数，在启动上升过程时调用。"
+    },
+    {
+      "name": "SetOnStartLoweringFn",
+      "effect": "设置开始下降时的回调函数，在启动下降过程时调用。"
+    },
+    {
+      "name": "SetOverrideGetCurrentDepthFn",
+      "effect": "设置覆盖获取当前深度的函数，允许自定义深度计算逻辑。"
+    },
+    {
+      "name": "SetUnloadFn",
+      "effect": "设置卸载函数，用于自定义卸载行为。"
+    },
+    {
+      "name": "GetCurrentDepth",
+      "effect": "获取当前海洋深度，优先使用覆盖函数，否则根据世界地图的瓦片信息计算深度类别对应的时间值。"
+    },
+    {
+      "name": "StartRaising",
+      "effect": "开始上升过程：启动深度测试，调用开始上升回调，并推送“start_raising_winch”事件。"
+    },
+    {
+      "name": "StartLowering",
+      "effect": "开始下降过程：启动深度测试，调用开始下降回调，推送“start_lowering_winch”事件，并返回true。"
+    },
+    {
+      "name": "FullyRaised",
+      "effect": "完全上升：重置线长为0，停止深度测试，调用完全上升回调，并推送“winch_fully_raised”事件。"
+    },
+    {
+      "name": "FullyLowered",
+      "effect": "完全下降：设置线长为当前深度，停止深度测试，调用完全下降回调，并推送“winch_fully_lowered”事件。"
+    },
+    {
+      "name": "StartDepthTesting",
+      "effect": "启动深度测试：设置状态为非静态，根据参数标记升降方向，并开始更新组件。"
+    },
+    {
+      "name": "StopDepthTesting",
+      "effect": "停止深度测试：设置状态为静态，重置升降标志，并停止更新组件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数：根据升降速度调整线长，当线长达到0或当前深度时，触发完全上升或完全下降。"
+    }
+  ],
+  "events_published": [
+    "start_raising_winch",
+    "start_lowering_winch",
+    "winch_fully_raised",
+    "winch_fully_lowered"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      13406,
+      18410,
+      18357,
+      18853,
+      65605,
+      73480,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未提及组件 winch 或绞盘相关能力表达；所有页面内容涉及世界自定义、角色能力、降水、桅杆、捕鱼器、世界翻新、群系连接和角色沃尔夫冈，无与 winch 代码能力/行为语义匹配的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "绞盘",
+    "升降",
+    "线长",
+    "深度",
+    "上升",
+    "下降",
+    "速度",
+    "海洋",
+    "打捞"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "海洋",
+    "机械"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "18c2b1043284f0e6b59c64943dcf51382be395c8cb6930f80d3127e2aabccb25",
+    "source_bytes": 4949,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104740398
+  }
+}

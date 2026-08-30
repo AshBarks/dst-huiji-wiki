@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/papereraser.lua"
+  },
+  "category": "component",
+  "display_name": "papereraser",
+  "summary": "此组件为实体添加 'papereraser' 标签，使其能够擦除纸张。通过 DoErase 方法调用纸张的 erasablepaper 组件执行擦除操作。该组件参与游戏中的纸张管理或艺术创作玩法。",
+  "api": [
+    {
+      "name": "DoErase",
+      "effect": "调用纸张的 erasablepaper 组件的 DoErase 方法，传入擦除者和执行者。如果擦除成功（返回值非 nil），则返回 true；否则返回 false。擦除操作可能改变纸张状态或消耗资源。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14774
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅讨论制图桌的制作地图卷轴、分享地图状态和将地图转换成莎草纸的功能，未提及任何与擦除或 DoErase 相关的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "擦纸器",
+    "纸张橡皮",
+    "可擦纸",
+    "纸张管理",
+    "艺术工具"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 5/5)",
+  "gameplay_tags": [
+    "装饰",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "27521563b6c8e3c45d658ede4c277c076a406042321a67fc488e654fd49b60f2",
+    "source_bytes": 407,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102451074
+  }
+}

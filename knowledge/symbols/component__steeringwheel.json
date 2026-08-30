@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/steeringwheel.lua"
+  },
+  "category": "component",
+  "display_name": "steeringwheel",
+  "summary": "SteeringWheel组件管理舵轮实体的驾驶状态，追踪当前驾驶者（sailor）实体，并在开始或停止驾驶时触发回调函数。组件通过添加'occupied'标签标识占用状态，参与的核心玩法是玩家与舵轮交互以控制载具。",
+  "api": [
+    {
+      "name": "SetOnStartSteeringFn",
+      "effect": "设置启动驾驶时的回调函数，无直接副作用。"
+    },
+    {
+      "name": "SetOnStopSteeringFn",
+      "effect": "设置停止驾驶时的回调函数，无直接副作用。"
+    },
+    {
+      "name": "StartSteering",
+      "effect": "开始驾驶流程；设置传入的sailor实体为当前驾驶者；监听sailor的onremove事件以在移除时自动停止驾驶；为实体添加'occupied'标签；调用启动回调函数。"
+    },
+    {
+      "name": "StopSteering",
+      "effect": "停止驾驶流程；如果当前驾驶者存在，监听其onremove事件（但可能重复）；移除实体的'occupied'标签；调用停止回调函数；清空驾驶者记录。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时清理关联；如果驾驶者存在，尝试将其SteeringWheel组件设置为nil或直接调用StopSteering停止驾驶。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前驾驶者信息，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20293,
+      72314,
+      20714,
+      23956,
+      13701,
+      65881,
+      23924,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及方向盘组件或相关转向能力；内容涉及自动航行仪、电刑机控制器、控制台等其他实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "舵轮",
+    "驾驶",
+    "控制",
+    "船只",
+    "航行",
+    "玩家交互",
+    "组件管理",
+    "游戏机制"
+  ],
+  "gameplay_tags": [
+    "驾驶",
+    "控制",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b2737fd2602d2d057278ae79996290eb73ae0e42b7d70519d1540359e801701f",
+    "source_bytes": 1342,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097620987
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/snowmandecoratable.lua"
+  },
+  "category": "component",
+  "display_name": "snowmandecoratable",
+  "summary": "该组件管理雪人的装饰状态，包括装饰物品的存储、雪球的堆叠和帽子的装备。玩家可以开始装饰界面，添加装饰物，堆叠雪人球，并给雪人戴上帽子，参与冬季或节日相关的装饰玩法。",
+  "api": [
+    {
+      "name": "CollectScrapbookDeps",
+      "effect": "收集所有可装饰物品的名称作为图鉴依赖，返回物品名称列表。"
+    },
+    {
+      "name": "AddDecorData",
+      "effect": "向装饰数据表添加一项装饰信息，包括物品哈希值、旋转、翻转、x和y坐标。"
+    },
+    {
+      "name": "ApplyDecor",
+      "effect": "根据解码后的装饰数据字符串，在指定实体上创建装饰特效，并同步到网络；返回是否成功应用。"
+    },
+    {
+      "name": "CalculateStackOffset",
+      "effect": "根据半径和随机数计算堆叠的偏移量，用于装饰位置计算。"
+    },
+    {
+      "name": "GetItemData",
+      "effect": "根据物品哈希值返回对应的装饰物品数据，包括动画、构建等信息。"
+    },
+    {
+      "name": "GetDecorData",
+      "effect": "返回当前雪人装饰数据的网络字符串值。"
+    },
+    {
+      "name": "HasDecor",
+      "effect": "检查雪人是否有装饰数据，返回布尔值。"
+    },
+    {
+      "name": "GetSize",
+      "effect": "返回雪人基础大小的名称（如 'small'、'med'、'large'）。"
+    },
+    {
+      "name": "SetSize",
+      "effect": "设置雪人的基础大小，参数为大小名称；若无效则保持原值。"
+    },
+    {
+      "name": "SetOnStacksChangedFn",
+      "effect": "设置堆叠变化时的回调函数，用于监听堆叠状态改变。"
+    },
+    {
+      "name": "IsStacked",
+      "effect": "检查雪人是否堆叠了其他雪人球，返回布尔值。"
+    },
+    {
+      "name": "GetStacks",
+      "effect": "返回当前堆叠的雪人球ID数组和偏移量数组。"
+    },
+    {
+      "name": "CanStack",
+      "effect": "检查是否可以堆叠另一个雪人对象，考虑高度限制、使用状态等；返回布尔值和错误代码（如 'STACKEDTOOHIGH'、'INUSE'）。"
+    },
+    {
+      "name": "Stack",
+      "effect": "堆叠另一个雪人对象，消耗该对象并将其雪人球添加到当前堆栈，触发堆叠变化回调。"
+    },
+    {
+      "name": "DoDropItem",
+      "effect": "生成并掉落指定预制的物品，处理物理效果和湿润度继承；返回生成的物品实体。"
+    },
+    {
+      "name": "Unstack",
+      "effect": "取消堆叠，将堆叠的雪人球作为物品掉落，若雪人销毁则生成新雪人实体；参数 isdestroyed 控制行为。"
+    },
+    {
+      "name": "OnStacksChanged",
+      "effect": "触发堆叠变化回调函数，传递堆叠信息和原因（如 'addstack'、'unstack'、'load'）。"
+    },
+    {
+      "name": "HasHat",
+      "effect": "检查雪人是否装备了帽子，返回布尔值。"
+    },
+    {
+      "name": "EquipHat",
+      "effect": "为雪人装备一顶帽子，创建帽子特效并设置动画帧；触发帽子变化回调。"
+    },
+    {
+      "name": "EquipHat_Internal",
+      "effect": "内部装备帽子方法，可指定动画帧；创建帽子特效，装备帽子实体，并处理旧帽子移除。"
+    },
+    {
+      "name": "UnequipHat",
+      "effect": "移除雪人的帽子，删除帽子特效并触发帽子变化回调。"
+    },
+    {
+      "name": "SetMelting",
+      "effect": "设置雪人的融化状态，参数为布尔值；影响装饰操作的可用性。"
+    },
+    {
+      "name": "IsMelting",
+      "effect": "返回雪人是否处于融化状态。"
+    },
+    {
+      "name": "CanBeginDecorating",
+      "effect": "检查是否可以开始装饰，考虑忙碌状态、负重、使用中、融化等因素；返回布尔值和错误代码（如 'INUSE'、'MELTING'）。"
+    },
+    {
+      "name": "BeginDecorating",
+      "effect": "开始装饰过程，设置装饰者，监听关闭事件，启动更新循环；返回是否成功开始。"
+    },
+    {
+      "name": "EndDecorating",
+      "effect": "结束装饰过程，清理装饰者，移除事件监听，停止更新循环；触发关闭回调。"
+    },
+    {
+      "name": "DropAllDecor",
+      "effect": "移除所有装饰，将装饰物品作为战利品掉落，并清空装饰数据。"
+    },
+    {
+      "name": "DoRefreshDecorData",
+      "effect": "刷新装饰数据，重新应用装饰特效到实体；返回是否成功。"
+    },
+    {
+      "name": "LoadDecorData",
+      "effect": "加载装饰数据字符串，设置到网络变量并刷新装饰特效。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括装饰数据、堆叠信息和帽子数据；返回数据表和引用列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载组件状态，恢复堆叠、装饰和帽子。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件数据传输到新实体，包括大小、堆叠和装饰数据。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，检查装饰者是否在范围内且可见；若不在则结束装饰。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "equipped",
+    "unequipped",
+    "enterlimbo",
+    "decordatadirty",
+    "stacksdirty"
+  ],
+  "netvars": [
+    "decordata",
+    "basesize",
+    "stacks",
+    "stackoffsets"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      52631,
+      23187,
+      22094,
+      18939,
+      13493,
+      13823,
+      14792,
+      19832
+    ],
+    "aspects": [
+      {
+        "aspect": "雪人堆叠层数描述",
+        "evidence": [
+          {
+            "pageid": 52631,
+            "quote": "雪人最多搭 6 层，雪球算 1 层"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "雪人",
+    "装饰",
+    "堆叠",
+    "帽子",
+    "雪球",
+    "冬季",
+    "节日",
+    "美化",
+    "装扮",
+    "DIY"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "建造",
+    "冬季",
+    "节日"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c9efa3713af47248d3cd0773de1eab91629c606fa885526736f5abc199fbeb03",
+    "source_bytes": 27926,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097590142
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/channelcastable.lua"
+  },
+  "category": "component",
+  "display_name": "channelcastable",
+  "summary": "此组件管理物品的通道施法状态，记录当前施法用户。核心玩法是玩家通过channelcaster组件与物品交互进行施法，支持施法开始和停止的回调，并可控制转向行为。",
+  "api": [
+    {
+      "name": "SetStrafing",
+      "effect": "设置物品在通道施法时是否允许转向。参数 enable 为 true 时允许转向，false 时禁止。"
+    },
+    {
+      "name": "SetOnStartChannelingFn",
+      "effect": "设置通道施法开始时的回调函数。fn 在施法开始时被调用，参数为施法物品和用户。"
+    },
+    {
+      "name": "SetOnStopChannelingFn",
+      "effect": "设置通道施法停止时的回调函数。fn 在施法停止时被调用，参数为施法物品和用户。"
+    },
+    {
+      "name": "IsUserChanneling",
+      "effect": "检查指定用户是否正在对该物品进行通道施法。返回 true 如果 user 是当前施法用户且有效。"
+    },
+    {
+      "name": "IsAnyUserChanneling",
+      "effect": "检查是否有任何用户正在对该物品进行通道施法。返回 true 如果存在施法用户。"
+    },
+    {
+      "name": "OnStartChanneling",
+      "effect": "开始通道施法。如果新用户不同当前用户，先停止当前施法，然后设置新用户，监听 unequipped 事件，并调用开始回调。副作用：可能触发停止回调和开始回调。"
+    },
+    {
+      "name": "OnStopChanneling",
+      "effect": "停止通道施法。如果 user 是当前用户，清空用户，移除 unequipped 事件监听，并调用停止回调。"
+    },
+    {
+      "name": "StopChanneling",
+      "effect": "强制停止通道施法。如果有施法用户，调用该用户的 channelcaster 组件的 StopChanneling 方法。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前施法状态和用户信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "unequipped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14099,
+      16641,
+      15823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录描述了物品的功能和效果，但没有涉及'channelcastable'组件的能力，如引导开始、停止、状态检查等。所有页面都没有提到与代码能力清单相关的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "引导施法",
+    "施法者",
+    "物品施法",
+    "施法开始",
+    "施法停止",
+    "转向控制",
+    "施法回调",
+    "施法状态"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "魔法",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "983381c14e224de108dec49f8384c092bb1268eab2b61c5791548eeac84a678e",
+    "source_bytes": 1938,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098958909
+  }
+}

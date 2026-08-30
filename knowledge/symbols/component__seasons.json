@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/seasons.lua"
+  },
+  "category": "component",
+  "display_name": "seasons",
+  "summary": "季节组件管理世界季节的状态与循环，包括当前季节、季节长度、已过天数和剩余天数。它控制季节的推进、回退和设置，并通过调整时钟分段影响游戏时间与环境。该组件是饥荒联机版中驱动季节变化的核心系统。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前季节状态的调试字符串，包含季节名、已过天数、剩余天数、进度百分比、模式及是否为预设阶段。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "seasontick",
+    "seasonlengthschanged",
+    "ms_setclocksegs",
+    "master_seasonsupdate"
+  ],
+  "events_listened": [
+    "seasondirty",
+    "lengthsdirty",
+    "ms_cyclecomplete",
+    "ms_advanceseason",
+    "ms_retreatseason",
+    "ms_setseason",
+    "ms_setseasonlength",
+    "ms_setseasonclocksegs",
+    "ms_setseasonsegmodifier",
+    "secondary_seasonsupdate"
+  ],
+  "netvars": [
+    "seasons._season",
+    "seasons._totaldaysinseason",
+    "seasons._elapseddaysinseason",
+    "seasons._remainingdaysinseason",
+    "seasons._endlessdaysinseason",
+    "seasons._lengths.autumn",
+    "seasons._lengths.winter",
+    "seasons._lengths.spring",
+    "seasons._lengths.summer"
+  ],
+  "tunables": [
+    "SEASON_LENGTH_FRIENDLY_DEFAULT",
+    "AUTUMN_LENGTH",
+    "WINTER_LENGTH",
+    "SPRING_LENGTH",
+    "SUMMER_LENGTH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13569,
+      13570,
+      21137,
+      18410,
+      19952,
+      60885,
+      19913,
+      21421
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及GetDebugString或任何调试字符串相关的描述，所有内容均围绕季节的游戏机制、持续时间、影响等玩家可感知方面，无证据表明讨论该符号的调试能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "季节",
+    "季节循环",
+    "季节长度",
+    "世界时间",
+    "季节调整",
+    "季节进展",
+    "季节逆转",
+    "游戏时间",
+    "季节系统"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "时间"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3a00c4c9e11928f5c16bde8a0df48cafe5814bc9e29311922166310bac548e4b",
+    "source_bytes": 17932,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112177827
+  }
+}

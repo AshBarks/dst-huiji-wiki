@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatracecrew.lua"
+  },
+  "category": "component",
+  "display_name": "boatracecrew",
+  "summary": "该组件管理船只竞赛中的船员团队，负责添加、移除船员，设置队长和目标，并周期性更新状态以支持竞赛玩法。它通过事件监听维护船员状态，并在船员清空时触发回调。",
+  "api": [
+    {
+      "name": "SetTarget",
+      "effect": "设置目标实体，移除旧目标的监听，添加新目标的监听；副作用：改变target字段，可能触发事件。"
+    },
+    {
+      "name": "AddMemberListeners",
+      "effect": "为指定成员添加onremove、death、teleported事件的监听，当这些事件发生时自动移除成员。"
+    },
+    {
+      "name": "RemoveMemberListeners",
+      "effect": "移除指定成员的onremove、death、teleported事件监听。"
+    },
+    {
+      "name": "SetCaptain",
+      "effect": "设置队长实体，移除旧队长的监听，添加新队长的监听；副作用：改变captain字段。"
+    },
+    {
+      "name": "AddMember",
+      "effect": "添加新成员到members表，设置其船员组件指向本船，触发on_member_added回调；若指定为队长则设置队长。"
+    },
+    {
+      "name": "RemoveMember",
+      "effect": "从members表移除成员，处理船员组件离开，触发on_member_removed回调；若船员清空则触发on_crew_empty回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新状态为'status'字段设为'assault'。"
+    },
+    {
+      "name": "GetHeadingNormal",
+      "effect": "计算并返回从船到目标的归一化方向向量（x,z坐标）；若无目标则返回nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "取消周期更新任务，移除所有成员的事件监听。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "移除所有成员，触发各自的RemoveMember逻辑。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存成员的GUID列表，用于存档。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后根据GUID恢复成员实体，调用AddMember添加。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "death",
+    "teleported"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      20714,
+      13567,
+      16419,
+      15922,
+      13556,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中不包含任何关于 boatracecrew 组件或其能力的信息；所有页面涉及天体英雄、弹弓弹药、控制台命令、更新日志、电路板、熔炉装备、阿比盖尔、独眼巨鹿等实体，没有提及船赛船员或相关功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船员",
+    "船长",
+    "目标",
+    "竞赛",
+    "更新",
+    "方向",
+    "监听",
+    "移除",
+    "添加",
+    "存档"
+  ],
+  "gameplay_tags": [
+    "竞赛",
+    "船只",
+    "团队"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d5a75bf5865621b6f7227861b910903a4e76fb2859e0c9850da57039a303c609",
+    "source_bytes": 4479,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098544176
+  }
+}

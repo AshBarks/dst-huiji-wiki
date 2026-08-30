@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hudindicatorwatcher.lua"
+  },
+  "category": "component",
+  "display_name": "hudindicatorwatcher",
+  "summary": "该组件管理屏幕外项目的列表，并在HUD上添加或移除目标指示器。它监听玩家退出和注销事件以清理指示器。参与的核心玩法是帮助玩家追踪视野外的目标，提升探索和生存体验。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，清理所有屏幕外项目的指示器，移除事件监听，并置空数据列表。"
+    },
+    {
+      "name": "ShouldShowIndicator",
+      "effect": "检查给定目标是否应显示HUD指示器，基于目标组件的ShouldTrack方法判断；用于内部更新逻辑。"
+    },
+    {
+      "name": "ShouldRemoveIndicator",
+      "effect": "检查给定目标是否应移除HUD指示器，是ShouldShowIndicator的反向逻辑；用于内部更新逻辑。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，定期检查屏幕外项目，根据目标是否在视野内添加或移除HUD指示器，并维护列表数据。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "playerexited",
+    "unregister_hudindicatable"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28179
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述实体 rabbitking_lucky 的掉落物和绑定玩家行为，未涉及 HUD 指示器观察者的能力如显示、移除或更新指示器，清单中的能力无对应表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "HUD指示器",
+    "屏幕外追踪",
+    "目标显示",
+    "玩家退出",
+    "未注册",
+    "视野检查",
+    "指示器管理"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "HUD"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6b9d4648697a7edb3d2de0f1234bb7f7189ce7bae87d51732194a55fc0c9134b",
+    "source_bytes": 3197,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108623976
+  }
+}

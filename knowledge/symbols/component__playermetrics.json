@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playermetrics.lua"
+  },
+  "category": "component",
+  "display_name": "playermetrics",
+  "summary": "PlayerMetrics 组件用于追踪和上报玩家的制作相关行为指标。它监听实体上的解锁配方事件，并通过统计系统推送 'character.prototyped' 事件，以支持数据分析和游戏行为监控。该组件参与饥荒联机版的制作玩法，专注于配方解锁的追踪。",
+  "api": [],
+  "api_note": "纯数据监听与上报组件，无对外暴露的方法；仅通过构造函数初始化事件监听，并在移除时清理回调。",
+  "events_published": [
+    "character.prototyped"
+  ],
+  "events_listened": [
+    "unlockrecipe"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      18830,
+      15022,
+      15245,
+      16686,
+      17826,
+      17943,
+      18234
+    ],
+    "aspects": [
+      {
+        "aspect": "启蒙值提升数值",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "刺，击中目标提高 10 点[[启蒙值]]"
+          }
+        ]
+      },
+      {
+        "aspect": "理智值影响因素",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "部分[[物品]]，具有[[理智光环]]的生物、建筑，潮湿状态等因素会影响理智值。"
+          }
+        ]
+      },
+      {
+        "aspect": "理智值恢复数值",
+        "evidence": [
+          {
+            "pageid": 17943,
+            "quote": "每解锁一个配方可以为玩家恢复 15 {{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "理智值显示位置",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "显示在屏幕右上角，位于角色的[[饥饿值]]和[[生命值]]中间。"
+          }
+        ]
+      },
+      {
+        "aspect": "理智值消耗与理智怪兽触发",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "薇克巴顿阅读书籍可以消耗一定的理智值来产生独特的魔法效果"
+          },
+          {
+            "pageid": 18234,
+            "quote": "在理智值不足时阅读仍可以产生效果，但若此时不处于[[启蒙值]]状态，则会立刻生成一只[[理智怪兽]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "配方解锁",
+    "配方事件",
+    "玩家统计",
+    "行为追踪",
+    "制作监控",
+    "数据上报",
+    "解锁配方",
+    "事件监听"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "制作",
+    "数据追踪"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "60eead288e76c0bec569a5b7b04a44ff4905c8377a7cdfdcb145b1b1b78bf1af",
+    "source_bytes": 575,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111123076
+  }
+}

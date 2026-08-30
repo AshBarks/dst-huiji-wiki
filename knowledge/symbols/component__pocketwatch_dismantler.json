@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pocketwatch_dismantler.lua"
+  },
+  "category": "component",
+  "display_name": "pocketwatch_dismantler",
+  "summary": "PocketWatch_Dismantler 组件允许拥有 'clockmaker' 标签的角色拆卸特定物品，核心玩法涉及物品破坏与资源回收。组件在拆卸前检查目标是否处于冷却状态，并在执行时生成破坏效果和战利品。",
+  "api": [
+    {
+      "name": "CanDismantle",
+      "effect": "检查是否可以拆卸目标：如果目标有 rechargeable 组件且未充能，返回 false 和 'ONCOOLDOWN'；如果 doer 没有 'clockmaker' 标签，返回 false；否则返回 true。无副作用。"
+    },
+    {
+      "name": "Dismantle",
+      "effect": "执行拆卸：获取目标的拥有者和接收者；如果目标有 itemmimic 组件，播放声音并调用 TurnEvil；否则获取目标配方的战利品，生成 brokentool，将战利品（排除 nightmarefuel）给予接收者或生成，并移除目标。副作用包括生成物品、移除目标和可能的声音播放。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15303,
+      13701,
+      15922,
+      15022,
+      16197,
+      15337,
+      15832,
+      14938
+    ],
+    "aspects": [
+      {
+        "aspect": "拆解溯源表的能力描述",
+        "evidence": [
+          {
+            "pageid": 15337,
+            "quote": "溯源表可以使用[[钟表匠工具]]进行拆解，返还全部的制作材料。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "拆卸",
+    "怀表",
+    "破坏",
+    "战利品",
+    "钟表匠",
+    "冷却",
+    "物品模仿",
+    "资源回收"
+  ],
+  "gameplay_tags": [
+    "破坏",
+    "资源回收",
+    "技能"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6eee95a136264b0a2d5b76afabfa47237e5ad8690e56e6446820a95be53e961c",
+    "source_bytes": 1765,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102662500
+  }
+}

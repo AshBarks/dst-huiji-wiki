@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spellcaster.lua"
+  },
+  "category": "component",
+  "display_name": "spellcaster",
+  "summary": "该组件管理实体的施法能力，包括设置施法函数、施法条件标志和法术类型。它通过控制施法的目标、位置和条件，参与游戏中的法术和技能系统，允许实体执行各种法术效果。",
+  "api": [
+    {
+      "name": "SetSpellFn",
+      "effect": ""
+    },
+    {
+      "name": "SetOnSpellCastFn",
+      "effect": ""
+    },
+    {
+      "name": "SetCanCastFn",
+      "effect": ""
+    },
+    {
+      "name": "SetSpellType",
+      "effect": ""
+    },
+    {
+      "name": "CastSpell",
+      "effect": ""
+    },
+    {
+      "name": "CanCast",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10413,
+      15186,
+      16419,
+      13701,
+      13260,
+      23965,
+      13437,
+      10374
+    ],
+    "aspects": [
+      {
+        "aspect": "使用物品施放增益效果",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "温蒂可以右键使用灵体草药，为她的[[阿比盖尔]]提供增益。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "施法",
+    "法术",
+    "技能",
+    "魔法",
+    "施法效果",
+    "法术类型",
+    "施法系统",
+    "目标选择",
+    "施法范围"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d0b02e9d4f6dafb17b759298485a895445572708414a4b0e20a2e7b04b70bec5",
+    "source_bytes": 7160,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091893144
+  }
+}

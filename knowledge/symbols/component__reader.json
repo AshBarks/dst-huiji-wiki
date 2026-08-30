@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/reader.lua"
+  },
+  "category": "component",
+  "display_name": "reader",
+  "summary": "Reader组件管理实体阅读书籍的能力，涉及设置书虫状态和理智惩罚乘数。核心玩法是通过阅读书籍触发效果或获取知识，影响角色的理智和状态。",
+  "api": [
+    {
+      "name": "SetAspiringBookworm",
+      "effect": "设置实体是否为有抱负的书虫，触发标签'aspiring_bookworm'的添加或移除。参数bookworm为布尔值。"
+    },
+    {
+      "name": "IsAspiringBookworm",
+      "effect": "返回实体是否为有抱负的书虫的布尔值，基于self.aspiring_bookworm属性。"
+    },
+    {
+      "name": "SetSanityPenaltyMultiplier",
+      "effect": "设置阅读时的理智惩罚乘数，存储在self.sanity_mult中。参数mult为乘数值。"
+    },
+    {
+      "name": "GetSanityPenaltyMultiplier",
+      "effect": "获取当前的理智惩罚乘数，返回self.sanity_mult的值，若未设置则默认为1。"
+    },
+    {
+      "name": "SetOnReadFn",
+      "effect": "设置在阅读成功后调用的回调函数，存储在self.onread中。参数fn为回调函数。"
+    },
+    {
+      "name": "Read",
+      "effect": "尝试阅读指定的书。如果书有book组件，则根据书虫状态调用book组件的OnPeruse或OnRead方法。成功时触发self.onread回调（如果设置）。返回成功状态和原因（如书无效）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "在组件从实体移除时，清理标签'reader'和'aspiring_bookworm'。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      15245,
+      13407,
+      13437,
+      13139,
+      13268,
+      16419,
+      18271
+    ],
+    "aspects": [
+      {
+        "aspect": "阅读书籍消耗理智值",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "薇克巴顿阅读书籍可以消耗一定的理智值来产生独特的魔法效果"
+          }
+        ]
+      },
+      {
+        "aspect": "麦斯威尔阅读书籍消耗理智值倍数",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "麦斯威尔也可以产生同样的魔法效果，但需要消耗2.5倍于薇克巴顿的理智值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "阅读",
+    "书",
+    "理智",
+    "书虫",
+    "读书",
+    "书本",
+    "惩罚",
+    "阅读效果",
+    "技能书"
+  ],
+  "gameplay_tags": [
+    "知识",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d97b969c0df3e78d3b986c7ab2546c597d567bdd9b5e0286491de0b34c43dc5",
+    "source_bytes": 1205,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111621881
+  }
+}

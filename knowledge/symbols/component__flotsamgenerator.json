@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/flotsamgenerator.lua"
+  },
+  "category": "component",
+  "display_name": "flotsamgenerator",
+  "summary": "flotsamgenerator 组件负责在玩家周围的海洋中周期性生成各种漂浮物（如木头碎片、船体碎片、草、树枝、鱼群诱饵和消息瓶）。它管理漂浮物的生成、存在时间（到时间后会沉没消失）以及基于世界最大数量限制的生成逻辑。其核心玩法是为海洋探索提供动态资源与特殊物品（如消息瓶）的来源。",
+  "api": [
+    {
+      "name": "SetSpawnTimes(delay)",
+      "effect": "设置漂浮物生成的最小和最大延迟时间。此方法已被弃用，应改用 birdattractor.spawnmodifier。"
+    },
+    {
+      "name": "ToggleUpdate(force?)",
+      "effect": "启动或强制重启漂浮物的生成循环。当 `force` 为 true 时，会取消所有已安排的生成任务并重新开始。"
+    },
+    {
+      "name": "setinsttoflotsam(inst, time?, notag?)",
+      "effect": "将一个实体设置为受管理的漂浮物。为其添加倒计时器（若无则默认一个随机基础时长加浮动时长），并在计时结束、被拾取或移除时触发相应清理逻辑。若 `notag` 为 true，则不添加 'flotsam' 标签（避免影响其他漂浮物的生成位置检测）。"
+    },
+    {
+      "name": "SpawnFlotsam(spawnpoint, prefab?, notrealflotsam?)",
+      "effect": "在指定点生成一个漂浮物实体。若未指定 prefab，则按权重随机选择一种。生成后随机设置旋转，并调用 `setinsttoflotsam` 进行管理。返回生成的实体，若生成失败则返回 nil。"
+    },
+    {
+      "name": "StartTracking(target)",
+      "effect": "开始追踪一个目标实体（如被丢弃的渔网捕获物）。会将其 persist 属性保存并置为 false，使其在世界保存时不被永久存储，并监听其休眠事件以在休眠时自动移除。"
+    },
+    {
+      "name": "StopTracking(target)",
+      "effect": "停止追踪一个目标实体。恢复其 persist 属性，并移除休眠事件监听。"
+    },
+    {
+      "name": "ScheduleGuaranteedSpawn(player, preset, override_time?)",
+      "effect": "为指定玩家安排一次保证生成特定 prefab 的任务。使用预设的生成间隔和浮动时间，或使用提供的 `override_time`。用于确保消息瓶等特定物品的生成。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "timerdone",
+    "onpickup",
+    "onremove",
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      61070,
+      57263,
+      19595,
+      60911,
+      61860
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述海洋漂浮物作为游戏实体的基本信息和用途，如生成地点、存储物品、形态大小等，未涉及代码组件component__flotsamgenerator的具体能力表达，如生成时间设置、更新触发、目标跟踪等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "漂浮物生成器",
+    "海洋漂浮物",
+    "航海探索",
+    "周期性生成",
+    "沉没机制",
+    "生存物品",
+    "动态资源"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "海洋探索",
+    "资源收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d3431347dd8a7e70ef67bdcae52b1749a8689e81ffdd2f7603d12014b6834f42",
+    "source_bytes": 13888,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107550560
+  }
+}

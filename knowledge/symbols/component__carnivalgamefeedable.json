@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivalgamefeedable.lua"
+  },
+  "category": "component",
+  "display_name": "carnivalgamefeedable",
+  "summary": "组件管理实体的可喂食状态和喂食回调。它通过 enabled 属性控制是否添加 carnivalgame_canfeed 标签，用于嘉年华游戏中的喂食互动。核心玩法涉及玩家向特定实体喂食物品以触发游戏逻辑。",
+  "api": [
+    {
+      "name": "DoFeed(doer, item)",
+      "effect": "尝试喂食指定物品给实体。如果设置了 OnFeed 回调，则执行该回调并传递参数 doer 和 item，返回回调结果；否则返回 false。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13457,
+      14710,
+      13569,
+      18057,
+      14815,
+      35007,
+      15237,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "喂食猪人解除仇恨并雇佣",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "玩家可以使用[[肉类食物]]或[[可怕食物]]雇佣猪人为[[随从]]"
+          }
+        ]
+      },
+      {
+        "aspect": "喂食皮弗娄牛触发跟随行为",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "喂食一只牛可以让其跟随玩家一段时间"
+          }
+        ]
+      },
+      {
+        "aspect": "宠物喂食刷新保质期与特质赋予",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物会接受一切[[常规食物]]。吃下任何东西后宠物的的保质期就会刷新。"
+          },
+          {
+            "pageid": 18057,
+            "quote": "当玩家喂食宠物时，会给予它们 '''吃饱喝足''' 特质。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "喂食",
+    "嘉年华",
+    "CanFeed",
+    "互动",
+    "游戏",
+    "组件",
+    "喂食实体"
+  ],
+  "gameplay_tags": [
+    "嘉年华",
+    "喂食",
+    "游戏互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f15d3b0f7c40b11fa7dbe794f9325f377de3dfaa0d910ae9b495235bfd6a8d2e",
+    "source_bytes": 558,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098768260
+  }
+}

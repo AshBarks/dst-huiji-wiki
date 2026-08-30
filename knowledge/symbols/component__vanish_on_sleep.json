@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vanish_on_sleep.lua"
+  },
+  "category": "component",
+  "display_name": "vanish_on_sleep",
+  "summary": "此组件管理实体的消失机制，当实体休眠时启动定时任务延迟消失。它支持自定义消失函数，并在实体唤醒或组件移除时取消任务，用于自动清理场景实体。",
+  "api": [
+    {
+      "name": "vanish",
+      "effect": "如果定义了消失函数则调用该函数，随后移除实体"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      18476,
+      14579,
+      13493,
+      13779,
+      18359,
+      16419,
+      15539
+    ],
+    "aspects": [
+      {
+        "aspect": "巨型蔬果腐烂后外观消失描述",
+        "evidence": [
+          {
+            "pageid": 14579,
+            "quote": "外观的变化就会消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "弹弓弹药飞行消失行为",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "在消失前最远可飞行 30 距离单位。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "消失",
+    "休眠",
+    "定时",
+    "移除",
+    "清理",
+    "延迟",
+    "自动",
+    "任务"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "清理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e0bd05b33eb50c629648d6f9134cbd53fb6bb8fdb6033d28a56412fcef063b1c",
+    "source_bytes": 737,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113535494
+  }
+}

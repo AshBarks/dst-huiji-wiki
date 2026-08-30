@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mightygym.lua"
+  },
+  "category": "component",
+  "display_name": "mightygym",
+  "summary": "该组件管理着“大力士健身房”（mighty_gym）实体的负重状态与玩家锻炼过程。玩家可将标有“重物”标签的物品放入健身房的两个槽位中，组件据此计算并显示总重量等级。当大力士玩家进入并开始锻炼时，组件会接管玩家的外观与动画，根据重量和操作时机（完美/非完美）计算并赋予玩家“力量值”（mightiness）的增益，同时调整玩家的饥饿消耗速度。",
+  "api": [
+    {
+      "name": "SetLevelArt(level, target)",
+      "effect": "设置并显示健身房或目标玩家的重量等级动画。当等级小于2时，隐藏“meter_color2”符号；否则，根据等级（2-4）显示对应的仪表颜色符号。如果目标有皮肤，则使用皮肤的符号覆盖。"
+    },
+    {
+      "name": "CalcWeight()",
+      "effect": "计算健身房内所有带有“heavy”标签的物品的总重量（每个物品的重量为其`gymweight`属性，默认为2）。返回总重量值，并更新组件内部的`self.weight`变量。"
+    },
+    {
+      "name": "CheckForWeight()",
+      "effect": "检查健身房物品栏的前两个槽位是否有物品，如果有则为其设置视觉符号并添加“loaded”标签。若健身房处于“burnt”状态则直接返回。"
+    },
+    {
+      "name": "SwapWeight(item, swapitem)",
+      "effect": "将健身房内指定物品替换为另一件物品。获取原物品所在槽位，并调用`LoadWeight`将新物品加载到该槽位。"
+    },
+    {
+      "name": "SetWeightSymbol(weight, slot)",
+      "effect": "为健身房（或正在锻炼的玩家）的指定槽位设置重物的视觉符号。处理物品的皮肤外观，并触发“放置重物”的状态。如果重物是南瓜雕刻物品，还会生成并设置相应的特效。"
+    },
+    {
+      "name": "LoadWeight(weight, slot)",
+      "effect": "将一件重物加载到健身房的指定（或自动选择的）槽位中。若物品栏已满且未指定槽位，则会踢出当前槽位的物品。加载后更新视觉符号、计算总重量等级、播放对应材质的音效，并向锻炼中的玩家同步重量与等级信息。"
+    },
+    {
+      "name": "UnloadWeight()",
+      "effect": "卸载健身房的所有重物。清空物品栏，移除所有重物的视觉符号覆盖，清理南瓜雕刻特效，重置槽位选择器，移除“loaded”标签，并向锻炼中的玩家同步更新后的等级。"
+    },
+    {
+      "name": "CanWorkout(doer)",
+      "effect": "检查指定角色（`doer`）是否可以开始锻炼。返回一个布尔值和可选的状态码（如“ONFIRE”，“HUNGRY”，“NOWEIGHT”，“UNBALANCED”）。检查条件包括：角色必须有“strongman”标签和“mightiness”组件、健身房未燃烧或冒烟、当前无其他大力士锻炼、玩家饥饿值足够、健身房内有且仅有两件重物。"
+    },
+    {
+      "name": "CalculateMightiness(perfect)",
+      "effect": "根据当前总重量和锻炼是否为“完美”操作，计算本次锻炼将获得的力量值增益。返回一个代表增益等级的常量（`TUNING.GYM_RATE.LOW/MED/HIGH`）。重量越高，基础增益越高；完美操作会提升一个等级。"
+    },
+    {
+      "name": "SetSkinModeOnGym(doer, skin_mode)",
+      "effect": "根据玩家当前的皮肤模式，将对应的角色皮肤外观应用到健身房实体上，使锻炼动画与玩家皮肤匹配。"
+    },
+    {
+      "name": "StartWorkout(doer)",
+      "effect": "开始锻炼过程。将玩家设为当前锻炼者（`self.strongman`），调用玩家的`strongman`组件开始锻炼，根据总重量设置玩家的饥饿消耗速度修改器，应用玩家的皮肤外观到健身房，并将玩家的外观（包含健身房符号）应用到玩家自身。"
+    },
+    {
+      "name": "StopWorkout()",
+      "effect": "停止锻炼过程。恢复健身房的原始皮肤或材质，调用玩家的`strongman`组件停止锻炼，移除饥饿消耗速度修改器，并清除当前锻炼者引用。"
+    },
+    {
+      "name": "InUse()",
+      "effect": "返回一个布尔值，指示健身房当前是否有玩家正在使用（锻炼）。"
+    },
+    {
+      "name": "CharacterEnterGym(player)",
+      "effect": "处理玩家进入健身房锻炼的核心逻辑。隐藏健身房实体、调整玩家物理状态和动画（应用健身房外观和重物符号）、传送玩家到健身房位置、切换玩家状态为锻炼预备、绑定事件监听（防止玩家在锻炼中消失或被攻击时卡住）、最终调用`StartWorkout`。"
+    },
+    {
+      "name": "CharacterExitGym(player)",
+      "effect": "处理玩家退出锻炼的核心逻辑。解除事件监听、恢复健身房实体和玩家物理状态、清除玩家身上的健身房动画覆盖、根据玩家状态（健康、冷冻等）选择将玩家传送离开或播放跳离动画、最后调用`StopWorkout`。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GYM_RATE.LOW",
+    "TUNING.GYM_RATE.MED",
+    "TUNING.GYM_RATE.HIGH",
+    "TUNING.CALORIES_SMALL",
+    "TUNING.MIGHTYGYM_WORKOUT_HUNGER.LOW",
+    "TUNING.MIGHTYGYM_WORKOUT_HUNGER.MED",
+    "TUNING.MIGHTYGYM_WORKOUT_HUNGER.HIGH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      15904,
+      15903,
+      33991,
+      20044,
+      45439,
+      24612,
+      13409
+    ],
+    "aspects": [
+      {
+        "aspect": "力量值提升机制描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "即可成功增加一次力量值"
+          }
+        ]
+      },
+      {
+        "aspect": "自动QTE技能描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "QTE小游戏将自动进行"
+          }
+        ]
+      },
+      {
+        "aspect": "配重放置条件说明",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "放置两个配重的健身房才能进行锻炼。"
+          }
+        ]
+      },
+      {
+        "aspect": "锻炼停止操作描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "右键可以停止锻炼，从健身房中跳出来。"
+          }
+        ]
+      },
+      {
+        "aspect": "锻炼启动方式描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "鼠标左键单击即可进入健身房锻炼。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "健身房",
+    "锻炼",
+    "重物",
+    "沃尔夫冈",
+    "力量",
+    "举重",
+    "训练",
+    "肌肉",
+    "沃尔夫冈健身房",
+    "负重"
+  ],
+  "gameplay_tags": [
+    "锻炼",
+    "力量"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c627f0067905269b3df3de2a120c61b45dedbc23a8fa465d94cf130c994c05bb",
+    "source_bytes": 16272,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101651432
+  }
+}

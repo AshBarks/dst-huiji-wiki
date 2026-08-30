@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shelf.lua"
+  },
+  "category": "component",
+  "display_name": "shelf",
+  "summary": "shelf组件用于管理实体作为货架时物品的存放状态，记录当前货架上的物品并控制物品的可取性。它参与物品放置和取走的核心玩法，常用于家具或存储容器的交互逻辑。",
+  "api": [
+    {
+      "name": "SetOnShelfItem",
+      "effect": "设置回调函数，当物品被放上货架时触发，回调参数为实体和物品。"
+    },
+    {
+      "name": "SetOnTakeItem",
+      "effect": "设置回调函数，当物品被取走时触发，回调参数为实体、取物品者和物品。"
+    },
+    {
+      "name": "PutItemOnShelf",
+      "effect": "将指定物品放置到货架上，更新组件内部物品记录并调用设置的放上回调。"
+    },
+    {
+      "name": "TakeItem",
+      "effect": "尝试取走货架上的物品给指定角色，需满足内部可取条件，成功后更新物品所有权至角色库存并调用取走回调，若无角色则丢弃物品。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前货架状态的调试字符串，包括物品预制体名称和可取性描述。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      70704,
+      13493,
+      52634,
+      14463,
+      18231,
+      28738,
+      19832
+    ],
+    "aspects": [
+      {
+        "aspect": "桌上放置家具装饰的功能",
+        "evidence": [
+          {
+            "pageid": 28738,
+            "quote": "木圆桌上可以放置[[家具装饰]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "货架",
+    "存放",
+    "取物",
+    "交互",
+    "存储",
+    "家具",
+    "装饰",
+    "物品管理",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "存储",
+    "装饰",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d504f43096aa12dfdebecf010c08d475d550ca95ea844710fb2c4ffd653f9a4",
+    "source_bytes": 2001,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094369822
+  }
+}

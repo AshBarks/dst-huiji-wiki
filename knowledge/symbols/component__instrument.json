@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/instrument.lua"
+  },
+  "category": "component",
+  "display_name": "instrument",
+  "summary": "该组件管理乐器的播放数据，包括影响范围和回调函数。它允许实体演奏乐器，触发播放、听到和完成事件，影响范围内其他实体。核心玩法涉及社交互动和增益效果。",
+  "api": [
+    {
+      "name": "SetOnHeardFn",
+      "effect": ""
+    },
+    {
+      "name": "SetOnPlayedFn",
+      "effect": ""
+    },
+    {
+      "name": "SetOnFinishedPlayingFn",
+      "effect": ""
+    },
+    {
+      "name": "SetRange",
+      "effect": ""
+    },
+    {
+      "name": "SetAssetOverrides",
+      "effect": ""
+    },
+    {
+      "name": "GetAssetOverrides",
+      "effect": ""
+    },
+    {
+      "name": "Play",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15922,
+      13701,
+      15539,
+      10418,
+      15022,
+      65881,
+      15186
+    ],
+    "aspects": [
+      {
+        "aspect": "范围设置能力体现",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "为[[电刑机]]增加 5 {{解释|距离单位}}额外操纵范围。"
+          },
+          {
+            "pageid": 10418,
+            "quote": "控制旋翼测绘机的范围增加 300 距离单位。"
+          },
+          {
+            "pageid": 15022,
+            "quote": "攻击范围=3.5"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "乐器",
+    "演奏",
+    "声音",
+    "范围",
+    "回调",
+    "播放",
+    "社交",
+    "效果",
+    "增益",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "社交",
+    "互动",
+    "音乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "562cd70967a8e8084c7037e74a0b54d70cca34bcaaf1efa470e142619070fc45",
+    "source_bytes": 1367,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094039959
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonrelic.lua"
+  },
+  "category": "component",
+  "display_name": "moonrelic",
+  "summary": "组件 moonrelic 定义了一个名为 MoonRelic 的类，构造函数中仅初始化实例引用。它没有存储额外数据或实现任何行为方法，可能用于月遗迹实体的标识，但不参与具体游戏逻辑。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18502,
+      18503,
+      15234,
+      51221,
+      34314,
+      22611,
+      18510,
+      13847
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 'moonrelic' 或其相关能力表达，所有页面涉及月亮相关主题（如月亮石、月亮码头、月亮风暴等）但未讨论该组件的能力或行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月遗迹",
+    "moon relic",
+    "遗迹",
+    "月亮",
+    "装饰物",
+    "探索",
+    "饥荒联机版"
+  ],
+  "gameplay_tags": [
+    "月遗迹",
+    "装饰",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6b19189d2a10e2d101a745e9edb2c4cdcbb6c8d2f113523707de6b2386867c10",
+    "source_bytes": 94,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101798726
+  }
+}

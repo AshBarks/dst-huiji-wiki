@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatdrag.lua"
+  },
+  "category": "component",
+  "display_name": "boatdrag",
+  "summary": "该组件管理船只的拖曳力、最大速度修改因子和强制阻尼效果，影响船在水中的移动性能。参与核心玩法如航行控制和风帆使用，通过调整参数实现船速与阻力的动态平衡。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个格式化字符串，显示组件的当前拖曳力、最大速度修改因子和强制阻尼状态，用于调试输出，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18357,
+      13606,
+      16633,
+      13567,
+      16185,
+      51529,
+      13156,
+      13406
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容涉及游戏实体的描述、行为和数值，未提及调试字符串或GetDebugString能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "拖曳力",
+    "最大速度",
+    "阻尼",
+    "航行控制",
+    "风帆",
+    "船速",
+    "水上移动",
+    "航海",
+    "移动性能"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "航行",
+    "海洋",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
+    "source_bytes": 379,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094507146
+  }
+}

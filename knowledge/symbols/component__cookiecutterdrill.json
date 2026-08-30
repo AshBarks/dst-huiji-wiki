@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cookiecutterdrill.lua"
+  },
+  "category": "component",
+  "display_name": "cookiecutterdrill",
+  "summary": "该组件管理饼干切割机的钻孔过程，控制钻孔进度和持续时间。当钻孔完成时，它会在当前平台上生成一个中型漏洞，并可能对船体造成伤害。组件通过更新系统实现钻孔的暂停与恢复。",
+  "api": [
+    {
+      "name": "GetIsDoneDrilling",
+      "effect": "检查钻孔是否完成，返回布尔值。无副作用。"
+    },
+    {
+      "name": "ResetDrilling",
+      "effect": "将钻孔进度重置为0。无其他副作用。"
+    },
+    {
+      "name": "ResumeDrilling",
+      "effect": "启动组件更新，开始累积钻孔进度。副作用：组件开始周期性更新。"
+    },
+    {
+      "name": "PauseDrilling",
+      "effect": "停止组件更新，暂停钻孔进度累积。副作用：组件停止更新。"
+    },
+    {
+      "name": "FinishDrilling",
+      "effect": "停止组件更新并重置进度。处理钻孔完成逻辑：若实体有eater组件则更新最后进食时间；若设置了leak_damage且当前平台有hullhealth组件，则对船造成伤害；推送'spawnnewboatleak'事件生成漏洞。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "spawnnewboatleak"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15746,
+      14815,
+      17831,
+      18186,
+      65605,
+      13567,
+      16185,
+      14801
+    ],
+    "aspects": [
+      {
+        "aspect": "钻洞完成条件",
+        "evidence": [
+          {
+            "pageid": 15746,
+            "quote": "钻洞结束前将其杀死，则不会留下任何漏洞"
+          }
+        ]
+      },
+      {
+        "aspect": "钻洞暂停机制",
+        "evidence": [
+          {
+            "pageid": 15746,
+            "quote": "受到攻击后，钻洞计时暂时打断"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "饼干切割机",
+    "leak",
+    "钻孔过程",
+    "生成漏洞",
+    "船体损坏",
+    "pause",
+    "resume",
+    "完成钻孔"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "航海",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "618a993c75cb9a58fbd20f2c0208772c895738d412fbb594046e3b5a998ef496",
+    "source_bytes": 1529,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099210826
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hatchable.lua"
+  },
+  "category": "component",
+  "display_name": "hatchable",
+  "summary": "Hatchable组件管理实体的孵化过程，包括孵化进度、不适度和状态转换。核心玩法是通过控制温度条件（加热或冷却）来推进孵化，需要避免过热或过冷，否则会增加不适度导致孵化失败或成功孵化。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前状态、进度和不适度值。"
+    },
+    {
+      "name": "SetOnState",
+      "effect": "设置状态变化回调函数，当孵化状态改变时调用该函数，传递实体和状态参数。"
+    },
+    {
+      "name": "SetCrackTime",
+      "effect": "设置从未孵化状态到破壳状态所需的时间，影响孵化进度推进速度。"
+    },
+    {
+      "name": "SetHatchTime",
+      "effect": "设置从破壳状态到孵化成功状态所需的时间，影响孵化进度推进速度。"
+    },
+    {
+      "name": "SetHatchFailTime",
+      "effect": "设置在不适状态下导致孵化失败（死亡）的时间，影响不适度累积速度。"
+    },
+    {
+      "name": "OnState",
+      "effect": "设置实体孵化状态，若状态改变或强制更新则触发回调函数。"
+    },
+    {
+      "name": "Delay",
+      "effect": "设置延迟时间，在指定时间内暂停孵化更新逻辑。"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "取消周期性更新任务，停止孵化进度推进和不适度计算。"
+    },
+    {
+      "name": "StartUpdating",
+      "effect": "开始周期性更新任务，根据当前状态推进孵化进度和处理温度条件。"
+    },
+    {
+      "name": "SetHeaterPrefs",
+      "effect": "设置白天、黄昏、夜晚时段是否需要加热，值为true/false/nil（nil表示无所谓）。"
+    },
+    {
+      "name": "SetChillerPrefs",
+      "effect": "设置白天、黄昏、夜晚时段是否需要冷却，值为true/false/nil（nil表示无所谓）。"
+    },
+    {
+      "name": "GetHeaterPref",
+      "effect": "根据当前世界阶段返回加热偏好值，用于判断温度条件是否满足。"
+    },
+    {
+      "name": "GetChillerPref",
+      "effect": "根据当前世界阶段返回冷却偏好值，用于判断温度条件是否满足。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "内部更新函数，计算温度影响、推进孵化进度或增加不适度，决定状态转换。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括状态、进度、不适度和温度标志。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，恢复状态、进度和不适度，并启动更新任务。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "HATCH_UPDATE_PERIOD",
+    "HATCH_CAMPFIRE_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      17997,
+      15922,
+      13476,
+      13701,
+      14695,
+      21137,
+      16197
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及孵化相关机制或行为描述；提供的页面内容主要关于温度、烹饪、战斗、装备、食物等，与组件hatchable的能力语义无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "孵化",
+    "蛋",
+    "温度",
+    "加热",
+    "冷却",
+    "进度",
+    "不适",
+    "状态",
+    "更新",
+    "保存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "繁殖",
+    "温度管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f96d526fd3d15a451c082e96bbc22015651c722797921196aa05a6d79df41400",
+    "source_bytes": 6369,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094815158
+  }
+}

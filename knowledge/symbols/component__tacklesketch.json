@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/tacklesketch.lua"
+  },
+  "category": "component",
+  "display_name": "tacklesketch",
+  "summary": "TackleSketch 组件为实体添加'tacklesketch'标签，并管理钓竿草图数据，允许通过 Teach 方法将草图教授给目标实体，核心玩法涉及学习和制作站功能。",
+  "api": [
+    {
+      "name": "Teach",
+      "effect": "将钓竿草图教授给目标实体，调用目标的 craftingstation 组件学习特定草图物品，推送'onlearnednewtacklesketch'事件，并移除自身实体。"
+    }
+  ],
+  "events_published": [
+    "onlearnednewtacklesketch"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18476,
+      45249,
+      18359,
+      45250,
+      13642,
+      24027,
+      20149,
+      15832
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与'Teach'能力相关的玩家语言表达，内容主要涉及雕塑草图掉落、玩具兑换、制作机制等，不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "草图",
+    "制作站",
+    "教授草图",
+    "学习制作",
+    "草图标签",
+    "草图数据",
+    "钓竿制作",
+    "教学方法"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "20561ecfe02aeda06d3c5fc6c70d5681eda3829aed32fd40b9813af6edadce93",
+    "source_bytes": 462,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113195236
+  }
+}

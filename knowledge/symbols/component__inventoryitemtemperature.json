@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventoryitemtemperature.lua"
+  },
+  "category": "component",
+  "display_name": "inventoryitemtemperature",
+  "summary": "inventoryitemtemperature 组件管理库存物品的温度数据，包括当前温度、最小和最大温度范围。它参与核心玩法如物品变质、热源交互和环境温度影响，通过周期性更新和事件通知来同步温度状态。",
+  "api": [
+    {
+      "name": "AttachReplica",
+      "effect": "内部方法，用于将组件与库存物品副本关联，并初始化温度相关变量（如初始温度、修改器缓存）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时调用，移除标签、重置温度并取消更新任务。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时调用，暂停更新任务并记录休眠时间，以便唤醒后补偿。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用，根据休眠时间更新温度并重新启动周期性更新任务。"
+    },
+    {
+      "name": "DiluteTemperature",
+      "effect": "当物品可堆叠时，将当前温度与新物品的温度按数量加权平均，用于堆叠物品时的温度混合。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "增加或减少温度值，调用SetTemperature方法进行更新。"
+    },
+    {
+      "name": "SetTemperature",
+      "effect": "设置物品温度，钳制在最小和最大温度范围内，并推事件'temperaturedelta'通知变化。"
+    },
+    {
+      "name": "SetMinTemperature",
+      "effect": "设置最小温度值，并推事件'temperaturedelta'。"
+    },
+    {
+      "name": "SetMaxTemperature",
+      "effect": "设置最大温度值，并推事件'temperaturedelta'。"
+    },
+    {
+      "name": "SetMaxMoisturePenalty",
+      "effect": "设置最大湿度惩罚值，影响目标温度计算。"
+    },
+    {
+      "name": "SetPercentAtMost",
+      "effect": "根据百分比设置温度上限，仅当当前温度高于目标值时降低温度。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前温度在最小和最大温度范围内的百分比值。"
+    },
+    {
+      "name": "SetModifier",
+      "effect": "设置或更新命名的温度修改器值，累计总修改器。"
+    },
+    {
+      "name": "RemoveModifier",
+      "effect": "移除指定的温度修改器，并更新总修改器。"
+    },
+    {
+      "name": "GetMoisturePenalty",
+      "effect": "根据物品湿度百分比返回负的温度惩罚值。"
+    },
+    {
+      "name": "GetTargetTemperature",
+      "effect": "计算并返回目标温度，考虑环境温度、修改器、湿度惩罚、热源交互和特殊状态（如漂浮、冰箱）。"
+    },
+    {
+      "name": "UpdateTemperature",
+      "effect": "根据目标温度和时间差更新当前温度，当变化不足时返回false。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含当前温度的数据表，用于保存游戏状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载温度值，并调用SetTemperature更新。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前温度和目标温度的调试字符串。"
+    }
+  ],
+  "events_published": [
+    "temperaturedelta"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.STARTING_TEMP",
+    "TUNING.MAX_ENTITY_TEMP",
+    "TUNING.MIN_ENTITY_TEMP",
+    "TUNING.MOISTURE_TEMP_PENALTY",
+    "TUNING.WARM_DEGREES_PER_SEC",
+    "TUNING.WET_HEAT_FACTOR_PENALTY",
+    "TUNING.OCEAN_AMBIENT_TEMPERATURE_PENALTY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15734,
+      15922,
+      16197,
+      20700,
+      18572,
+      52726,
+      15022
+    ],
+    "aspects": [
+      {
+        "aspect": "温度变化速率描述",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "个体温度的下降速率通过以下公式计算（单位：度/秒）："
+          }
+        ]
+      },
+      {
+        "aspect": "温度计算规则说明",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "热源对体感温度的贡献值通过以下公式计算："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:物品温度"
+    ],
+    "code_fields": [
+      "inventoryitemtemperature"
+    ],
+    "overridable_fields": [],
+    "note": "目前只能随 inventoryitem 添加(导出脚本注释)。"
+  },
+  "search_terms": [
+    "温度管理",
+    "物品温度",
+    "变质",
+    "热源",
+    "冷却",
+    "加热",
+    "湿度惩罚",
+    "环境温度",
+    "堆叠稀释",
+    "目标温度"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1e48237ff254efc406620c1c9fdc398c304225eb79c7ea396781a7b347031728",
+    "source_bytes": 11510,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108939833
+  }
+}

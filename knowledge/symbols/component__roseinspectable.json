@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/roseinspectable.lua"
+  },
+  "category": "component",
+  "display_name": "roseinspectable",
+  "summary": "组件 RoseInspectable 管理与玫瑰检查相关的回调函数和冷却状态，用于控制实体在被检查时的行为，包括生成残渣和触发冷却效果。它参与游戏中的交互玩法，允许自定义检查结果和冷却机制。",
+  "api": [
+    {
+      "name": "SetOnResidueActivated",
+      "effect": "传入一个函数，当残渣被激活时调用，该函数接收实体和 doer 参数，用于自定义激活行为。"
+    },
+    {
+      "name": "SetOnResidueCreated",
+      "effect": "传入一个函数，当残渣被创建时调用，该函数接收实体、残渣拥有者和残渣参数，用于自定义创建行为。"
+    },
+    {
+      "name": "SetCanResidueBeSpawnedBy",
+      "effect": "传入一个函数，用于检查 doer 是否有权生成残渣，影响残渣生成权限。"
+    },
+    {
+      "name": "CanResidueBeSpawnedBy",
+      "effect": "返回布尔值，如果未设置函数则默认返回 true，否则调用设置的函数进行检查，决定残渣生成权限。"
+    },
+    {
+      "name": "SetForcedInduceCooldownOnActivate",
+      "effect": "传入布尔值，直接设置冷却触发状态，优先级高于函数判断。"
+    },
+    {
+      "name": "SetWillInduceCooldownOnActivate",
+      "effect": "传入一个函数，用于动态判断在激活时是否触发冷却，当强制冷却未设置时生效。"
+    },
+    {
+      "name": "WillInduceCooldownOnActivate",
+      "effect": "返回布尔值，优先使用强制冷却设置，然后调用判断函数，如果都未设置则返回 false，决定冷却触发行为。"
+    },
+    {
+      "name": "HookupResidue",
+      "effect": "传入残渣拥有者和残渣实例，如果设置了创建回调则调用，用于在残渣创建时执行自定义逻辑。"
+    },
+    {
+      "name": "DoRoseInspection",
+      "effect": "传入 doer 参数，如果设置了激活回调则调用，用于在检查时执行自定义逻辑，如生成残渣或触发事件。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      34314,
+      34523,
+      20714,
+      52788,
+      13701,
+      14579,
+      24542
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面中未提及组件 roseinspectable 的具体能力或行为；仅页面 13701 提到玫瑰的生成，但未涉及检查、激活等代码语义，其他页面无相关讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "玫瑰",
+    "检查",
+    "残渣",
+    "冷却",
+    "交互",
+    "自定义",
+    "触发",
+    "生成",
+    "回调"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "生存",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "590f3a3e46759adfbe0d9d60b62ab5b311c0fd95c5d7d3ee849800d66e7fb3b1",
+    "source_bytes": 1693,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094349234
+  }
+}

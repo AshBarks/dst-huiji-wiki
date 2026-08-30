@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rainimmunity.lua"
+  },
+  "category": "component",
+  "display_name": "rainimmunity",
+  "summary": "rainimmunity组件管理实体的雨水免疫状态，通过维护免疫源列表来确保实体在多个来源下保持免疫。当组件初始化时，实体获得免疫并推送事件；当所有免疫源移除时，组件自动移除，恢复雨水影响。这参与了生存玩法中的天气管理，帮助玩家在雨中保持干燥。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": ""
+    },
+    {
+      "name": "RemoveSource",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "gainrainimmunity",
+    "loserainimmunity"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15327,
+      18572,
+      22707,
+      60885,
+      14695,
+      39366,
+      28621,
+      52726
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未涉及雨水免疫组件（component__rainimmunity）的AddSource或RemoveSource能力描述，页面内容集中于鸟类、温度机制、袭击事件、群系、物品或导弹实体，未提及该组件的任何能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "雨水免疫",
+    "免疫源",
+    "组件移除",
+    "天气免疫",
+    "生存",
+    "环境",
+    "事件推送",
+    "源管理"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "170f7fe2ea55b2fe14a873b378c464b236c962590eef74fa1d1129feef875125",
+    "source_bytes": 1305,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102978089
+  }
+}

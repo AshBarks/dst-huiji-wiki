@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerinspectable.lua"
+  },
+  "category": "component",
+  "display_name": "playerinspectable",
+  "summary": "组件 playerinspectable 用于管理玩家角色的可查看信息，包括装备外观和技能选择。它通过网络同步这些数据，使其他玩家能够查看当前玩家的装备和技能配置。参与的核心玩法涉及玩家间的交互和角色定制展示。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。组件通过监听事件自动更新网络同步数据，不暴露任何API方法。",
+  "events_published": [],
+  "events_listened": [
+    "equip",
+    "unequip",
+    "onactivateskill_server",
+    "ondeactivateskill_server",
+    "onsetskillselection_server"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      23965,
+      15186,
+      27530,
+      13281,
+      19595,
+      10355,
+      10374
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容涉及游戏机制、装备属性、角色技能树等，但未提及component__playerinspectable的任何能力表达，如玩家检查、inspectable相关描述或行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "玩家查看",
+    "装备栏",
+    "技能树",
+    "角色信息",
+    "可查看",
+    "装备外观",
+    "技能配置",
+    "同步信息",
+    "角色展示",
+    "在线查看"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "玩家交互",
+    "角色定制",
+    "网络同步"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b0cc12666840bd230aa506722226d972e8430123cf6f6c1dfe897a361b4b81b",
+    "source_bytes": 1020,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091455557
+  }
+}

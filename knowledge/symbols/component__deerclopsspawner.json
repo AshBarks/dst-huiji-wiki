@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deerclopsspawner.lua"
+  },
+  "category": "component",
+  "display_name": "deerclopsspawner",
+  "summary": "该组件管理巨鹿（Deerclops）的生成和攻击事件。它监控玩家状态和季节变化，在冬季或特定条件下触发巨鹿的生成。组件包括警告系统，提前提醒玩家，并选择攻击目标（附近有建筑的玩家）。它还处理巨鹿的移除、存储和重生。",
+  "api": [
+    {
+      "name": "SetAttacksPerWinter",
+      "effect": "已弃用方法，无实际操作。"
+    },
+    {
+      "name": "OverrideAttacksPerSeason",
+      "effect": "已弃用方法，无实际操作。"
+    },
+    {
+      "name": "OverrideAttackDuringOffSeason",
+      "effect": "已弃用方法，无实际操作。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "初始化巨鹿攻击计时器，根据冬季长度计算攻击间隔，并开始尝试攻击流程。"
+    },
+    {
+      "name": "DoWarningSpeech",
+      "effect": "为目标玩家附近的玩家播放警告语音消息，内容为'ANNOUNCE_DEERCLOPS'。"
+    },
+    {
+      "name": "DoWarningSound",
+      "effect": "在目标玩家位置生成相应等级的警告音效实体，根据剩余时间选择音效级别。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件状态，检查计时器，控制警告播放和巨鹿生成逻辑。如果计时器结束且目标存在，则生成巨鹿。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "执行长更新，调用OnUpdate方法处理时间累积。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括警告状态、存储的巨鹿数据和活动巨鹿GUID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据，恢复警告状态和存储的巨鹿，兼容旧版计时器。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，恢复活动巨鹿实体引用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示计时器状态、目标玩家和巨鹿信息。"
+    },
+    {
+      "name": "SummonMonster",
+      "effect": "调试用方法，强制设置计时器为10秒并开始更新，以快速触发巨鹿生成。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "season",
+    "hasslerremoved",
+    "hasslerkilled",
+    "storehassler",
+    "megaflare_detonated"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DEERCLOPS_ATTACKS_PER_SEASON",
+    "DEERCLOPS_ATTACKS_OFF_SEASON",
+    "NO_BOSS_TIME",
+    "TOTAL_DAY_TIME",
+    "SPAWN_DEERCLOPS",
+    "DEERCLOPS_MEGAFLARE_SPAWN_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13823,
+      20714,
+      13897,
+      13701,
+      34314,
+      51046,
+      28179
+    ],
+    "aspects": [
+      {
+        "aspect": "世界规则对独眼巨鹿冬季生成的影响",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "|影响[[独眼巨鹿]]在冬季的生成。"
+          }
+        ]
+      },
+      {
+        "aspect": "控制台召唤独眼巨鹿的命令",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "<td>c_summondeerclops</td><td>召唤独眼巨鹿</td>"
+          }
+        ]
+      },
+      {
+        "aspect": "独眼巨鹿袭击的触发频率",
+        "evidence": [
+          {
+            "pageid": 13823,
+            "quote": "每隔 2.8 天[[冬季]]时间触发一次'''独眼巨鹿袭击'''。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "巨鹿",
+    "冬季BOSS",
+    "生成",
+    "警告",
+    "攻击",
+    "季节",
+    "计时器",
+    "玩家",
+    "目标",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2f6ca1df64a0bdd5cd3cacc9c130aaa8741cc50dc9f634be3943ba34f6172a89",
+    "source_bytes": 14861,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106790797
+  }
+}

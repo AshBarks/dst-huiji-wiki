@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inkable.lua"
+  },
+  "category": "component",
+  "display_name": "inkable",
+  "summary": "Inkable组件管理实体的墨水喷溅状态与计时效果，核心玩法是处理墨水对玩家视野的临时干扰，通常由鱿鱼等生物触发，持续一段时间后自动清除。",
+  "api": [
+    {
+      "name": "Ink",
+      "effect": "调用时设置墨水效果持续时间为2秒，标记实体为墨水覆盖状态（inked=true），推送inked网络变量更新，启动组件更新循环，并添加squid_ink_player_fx减益效果。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每次更新减少墨水持续时间，当时间耗尽时清除墨水状态（inked=nil），推送deinked事件，移除squid_ink_player_fx减益，并停止组件更新。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "在组件迁移到新实体时，如果当前实体被墨水覆盖，则在新实体上应用墨水效果并传递剩余时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "deinked"
+  ],
+  "events_listened": [],
+  "netvars": [
+    "inked"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      16419,
+      15922,
+      16197,
+      15186,
+      13641,
+      10418,
+      16645
+    ],
+    "aspects": [
+      {
+        "aspect": "意识传输复活机制",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "效果等同于意识传输"
+          }
+        ]
+      },
+      {
+        "aspect": "鱿鱼墨汁攻击描述",
+        "evidence": [
+          {
+            "pageid": 13641,
+            "quote": "鱿鱼会发射墨汁来遮挡玩家的视野"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "墨水",
+    "喷溅",
+    "鱿鱼",
+    "模糊",
+    "视野",
+    "debuff",
+    "效果",
+    "inkable",
+    "墨水效果",
+    "玩家状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5f14ea46026b84969e48408bbcca2efb01ce711ff557e33343b83b5abc01c8ed",
+    "source_bytes": 907,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091277316
+  }
+}

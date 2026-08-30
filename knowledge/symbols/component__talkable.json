@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/talkable.lua"
+  },
+  "category": "component",
+  "display_name": "talkable",
+  "summary": "Talkable组件管理实体的对话状态，包括对话内容和进度索引。它参与饥荒联机版中的对话系统，使实体能够响应玩家的互动，提供叙事信息或触发任务。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13152,
+      13493,
+      18079,
+      13406,
+      15237,
+      18825,
+      18829,
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "寄居蟹隐士说话语气变化",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "随着好感度的升高，寄居蟹隐士的说话语气从暴躁变得温柔。"
+          }
+        ]
+      },
+      {
+        "aspect": "芜猴语言理解限制",
+        "evidence": [
+          {
+            "pageid": 18079,
+            "quote": "芜猴可以理解火药猴和月亮码头女王的语言，但无法理解非芜猴角色"
+          }
+        ]
+      },
+      {
+        "aspect": "说话动作表演变化",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "站在舞台底座上时，玩家角色说出任意台词都会做出表演动作，而不是平时的说话动作。"
+          }
+        ]
+      },
+      {
+        "aspect": "露西斧说话行为",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "露西斧会用红色的字体说话，台词位于角色下方与角色本身台词区分。"
+          }
+        ]
+      },
+      {
+        "aspect": "韦斯说话限制",
+        "evidence": [
+          {
+            "pageid": 13152,
+            "quote": "韦斯不会说话，而是用哑剧代替台词。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "对话",
+    "交谈",
+    "说话",
+    "NPC互动",
+    "叙事",
+    "任务触发",
+    "聊天",
+    "语言"
+  ],
+  "gameplay_tags": [
+    "对话",
+    "叙事"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "72f8027de8fb8abc5c14cba74da95de513469f33e74225bfa080ebc73b09d993",
+    "source_bytes": 138,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113200328
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worker.lua"
+  },
+  "category": "component",
+  "display_name": "worker",
+  "summary": "Worker组件用于管理实体执行特定游戏动作（如采集、战斗）时的有效性或熟练度。它维护一个映射表，记录每个动作对应的数值（effectiveness），并提供了查询和设置这些数值的基本接口。该组件常被用于表示工具、角色技能或环境因素对特定行为的加成效果。",
+  "api": [
+    {
+      "name": "GetEffectiveness",
+      "signature": "Worker:GetEffectiveness(action)",
+      "effect": "返回该动作在`self.actions`表中对应的数值。若该动作未被设置过，则返回0。"
+    },
+    {
+      "name": "SetAction",
+      "signature": "Worker:SetAction(action, effectiveness)",
+      "effect": "将`self.actions[action]`设置为传入的`effectiveness`值。若未提供`effectiveness`参数或其值为`nil`，则默认设置为1。"
+    },
+    {
+      "name": "CanDoAction",
+      "signature": "Worker:CanDoAction(action)",
+      "effect": "检查`self.actions`表中是否存在与`action`对应的条目。若存在（即有效性不为`nil`）则返回`true`，否则返回`false`。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      35371,
+      52788,
+      13281,
+      13569,
+      15225,
+      13216,
+      13412
+    ],
+    "aspects": [
+      {
+        "aspect": "工作决策设置",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "在创造它们时就需要决定它们应该执行的工作"
+          }
+        ]
+      },
+      {
+        "aspect": "自动工作执行",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "根据它们的职位在范围内自动工作或战斗"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "伐木",
+    "挖矿",
+    "有效性",
+    "熟练度",
+    "加成效果",
+    "工具效果",
+    "动作数值",
+    "游戏机制"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "采集",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "69e9c65c4bbece84ee847dcd0ad29e37873c51ee335f8651a7ae808f8a0af237",
+    "source_bytes": 368,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114161024
+  }
+}

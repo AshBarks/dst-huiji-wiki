@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nonslipgritsource.lua"
+  },
+  "category": "component",
+  "display_name": "nonslipgritsource",
+  "summary": "非滑溜沙源组件管理物品作为防滑沙源的数据。当物品被放置或移除时，它会与拥有者的滑溜脚组件交互，添加或移除防滑效果。组件还支持通过delta回调处理数量或状态变化。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当实体移除此组件时调用，移除组件作为库存物品源的功能。"
+    },
+    {
+      "name": "OnItemSourceRemoved",
+      "effect": "当物品源从拥有者移除时调用，从拥有者的nonslipgrituser组件中移除该源。"
+    },
+    {
+      "name": "OnItemSourceNewOwner",
+      "effect": "当物品源获得新拥有者时调用，如果拥有者有slipperyfeet组件，则添加或创建nonslipgrituser组件并添加该源。"
+    },
+    {
+      "name": "SetOnDeltaFn",
+      "effect": "设置一个回调函数，该函数在delta变化时被调用，用于处理非滑溜沙的数量或状态变化。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "执行delta变化，调用已设置的ondeltafn回调函数，传递当前实体和dt值。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      70486,
+      66546,
+      15244,
+      19662,
+      19772,
+      20714,
+      35007,
+      70756
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本（主要为页面70486）描述防滑颗粒的游戏机制（如防止滑倒、损耗耐久），但未直接或间接提及组件能力清单中的代码行为（OnRemoveFromEntity、OnItemSourceRemoved、OnItemSourceNewOwner、SetOnDeltaFn、DoDelta）。其他页面不涉及该组件能力讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "非滑溜",
+    "沙源",
+    "物品源",
+    "防滑",
+    "滑溜脚",
+    "delta",
+    "回调",
+    "源管理",
+    "库存物品"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "物品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eb949cf06fb994b97b6991b15b21861b3635338429b4d406b252fd2814994847",
+    "source_bytes": 969,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097109186
+  }
+}

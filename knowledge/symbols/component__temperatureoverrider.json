@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/temperatureoverrider.lua"
+  },
+  "category": "component",
+  "display_name": "temperatureoverrider",
+  "summary": "组件管理温度覆盖数据，允许实体在其指定半径内覆盖世界温度。它通过注册活动覆盖器影响全局温度查询函数，从而改变玩家或生物所处的环境温度。核心玩法涉及环境温度控制和生存系统的交互。",
+  "api": [
+    {
+      "name": "GetActiveRadius",
+      "effect": "返回当前活动半径值，用于查询温度覆盖的有效区域。"
+    },
+    {
+      "name": "GetTemperature",
+      "effect": "返回覆盖温度值。"
+    },
+    {
+      "name": "SetTemperature",
+      "effect": "设置覆盖温度，仅在主服务器执行，更新网络变量 _temperature。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置潜在覆盖半径，仅在主服务器执行，更新内部变量 radius，当启用时使用。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用温度覆盖功能，将半径设置为当前 radius 并注册活动覆盖器，更新 _activeradius。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用温度覆盖功能，将半径设置为0并注销活动覆盖器，更新 _activeradius。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体移除时，如果活动半径不为0，则注销活动覆盖器以清理状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "_activeradiusdirty"
+  ],
+  "netvars": [
+    "_activeradius",
+    "_temperature"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      60885,
+      14695,
+      52726,
+      20700,
+      51951,
+      14780,
+      19129
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未直接讨论组件temperatureoverrider或其相关代码能力（如GetActiveRadius、GetTemperature、SetTemperature等）的玩家语言表达；所有内容涉及游戏温度机制、环境温度影响等，但无证据对应给定的能力清单。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "环境温度",
+    "温度覆盖",
+    "覆盖范围",
+    "温度影响",
+    "激活覆盖",
+    "停用覆盖",
+    "温度检测",
+    "当前温度",
+    "温度控制"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "271c286a7c08b787e0e2ceffd6ff2f213d2b37f448d17986e7056655d91a2ca8",
+    "source_bytes": 3798,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104244804
+  }
+}

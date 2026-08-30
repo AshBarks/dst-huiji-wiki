@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/summoningitem.lua"
+  },
+  "category": "component",
+  "display_name": "summoningitem",
+  "summary": "该组件 `summoningitem` 是一个基础组件，用于存储实体实例的引用。它没有定义任何具体方法或事件，仅作为数据容器存在。在饥荒联机版中，它可能为更复杂的召唤系统提供基础支持，但无直接玩法实现。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      15022,
+      18234,
+      15751,
+      15832,
+      13897,
+      13701,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍魔法效果召唤描述",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "在角色周围召唤 10 - 20 只鸟。"
+          }
+        ]
+      },
+      {
+        "aspect": "暗影傀儡召唤方式与资源消耗描述",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影傀儡是麦斯威尔通过暗影秘典召唤的一类生物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "召唤",
+    "物品管理",
+    "召唤组件",
+    "物品存储",
+    "实体存储",
+    "组件容器",
+    "基础组件",
+    "召唤支持"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "召唤",
+    "物品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4816435d00dc1f42a2402ef935fc9e05434b07edc7bc18a088401e7e1456cad",
+    "source_bytes": 104,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104097707
+  }
+}

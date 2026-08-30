@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forestresourcespawner.lua"
+  },
+  "category": "component",
+  "display_name": "forestresourcespawner",
+  "summary": "ForestResourceSpawner 组件在服务器端管理森林资源的自动刷新。它通过注册刷新点并周期性检查玩家距离，确保燧石、树苗、草和浆果丛等资源在世界中持续再生，支持玩家的生存需求。",
+  "api": [],
+  "api_note": "纯事件驱动组件，无公开方法；功能通过事件触发控制。",
+  "events_published": [],
+  "events_listened": [
+    "ms_registerspawnpoint",
+    "ms_enableresourcerenewal"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SEG_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18441,
+      35001,
+      18234,
+      34523,
+      21416,
+      21466,
+      53232
+    ],
+    "aspects": [
+      {
+        "aspect": "世界再生机制描述",
+        "evidence": [
+          {
+            "pageid": 35001,
+            "quote": "再生有四种主要机制，它们的工作方式略有不同：“再生”、“后代再生”、“荒芜再生”和“基础资源再生”。"
+          }
+        ]
+      },
+      {
+        "aspect": "书籍催熟浆果丛效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "可以催熟[[浆果丛]]、[[多汁浆果丛]]、"
+          }
+        ]
+      },
+      {
+        "aspect": "固定布景中浆果丛生成",
+        "evidence": [
+          {
+            "pageid": 34523,
+            "quote": "随机包含 4 种资源之一：[[胡萝卜（自然生成）]]、[[花]]、[[草]]、[[浆果丛（三叶）]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "巨石枝再生机制应用",
+        "evidence": [
+          {
+            "pageid": 53232,
+            "quote": "巨石枝应用[[荒芜再生]]和[[后代再生]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "常青树自然生成与生长阶段",
+        "evidence": [
+          {
+            "pageid": 21416,
+            "quote": "自然生成于|evergreen"
+          }
+        ]
+      },
+      {
+        "aspect": "树苗采集与再生时间",
+        "evidence": [
+          {
+            "pageid": 21466,
+            "quote": "采集后需要 4 天重新生长。"
+          }
+        ]
+      },
+      {
+        "aspect": "浆果丛火鸡生成概率影响",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[浆果丛]]和[[多汁浆果丛]]生成[[火鸡]]的概率。"
+          }
+        ]
+      },
+      {
+        "aspect": "浆果丛生长周期说明",
+        "evidence": [
+          {
+            "pageid": 18441,
+            "quote": "采集后需要 3 ~ 5 天重新生长。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "资源刷新",
+    "森林刷新",
+    "刷新点",
+    "燧石",
+    "树苗",
+    "草刷新",
+    "浆果丛",
+    "再生",
+    "世界刷新"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源刷新",
+    "世界生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d1c8aff865ce89ba481b031012fa79e668b26f00d5ecf7c11367e6c5732157e0",
+    "source_bytes": 5669,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107688216
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/teacher.lua"
+  },
+  "category": "component",
+  "display_name": "teacher",
+  "summary": "Teacher组件管理要教授的配方数据，用于教学其他实体解锁新配方。它参与饥荒联机版建造系统的核心玩法，允许玩家或NPC通过教学扩展可用配方列表。",
+  "api": [
+    {
+      "name": "SetRecipe",
+      "effect": "设置要教授的配方。参数recipe为配方标识符，存储到组件中。无直接副作用，仅更新内部数据。"
+    },
+    {
+      "name": "Teach",
+      "effect": "尝试教授配方给目标实体。行为：检查目标是否有builder组件，是否已知道配方或能学习配方；若目标无builder组件则返回false，若已知道配方则返回false和'KNOWN'错误，若不能学习则返回false和'CANTLEARN'错误。若可学习，则调用builder:UnlockRecipe解锁配方，并执行onteach回调（如果定义），最后移除自身。返回true表示成功，解锁配方并可能触发回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      45249,
+      10413,
+      13642,
+      18830,
+      45248,
+      45250,
+      10355
+    ],
+    "aspects": [
+      {
+        "aspect": "蓝图解锁配方的教学机制",
+        "evidence": [
+          {
+            "pageid": 18830,
+            "quote": "蓝图会记载一个制作配方，学习蓝图可以解锁该配方"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "教学",
+    "配方",
+    "解锁",
+    "学习",
+    "建造师",
+    "技能书",
+    "建筑师",
+    "教师",
+    "教学书"
+  ],
+  "gameplay_tags": [
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "807eb8d8053ec386ef1776769c25c1cfac8384d7a1acd9179271949c4bd9152c",
+    "source_bytes": 764,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104098559
+  }
+}

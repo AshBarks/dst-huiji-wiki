@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wanderingtraderspawner.lua"
+  },
+  "category": "component",
+  "display_name": "wanderingtraderspawner",
+  "summary": "该组件管理游荡商人的生成点和当前实例，负责在合适条件下生成或移除游荡商人。它通过监听世界事件和生成点动态调整商人的出现，参与游戏中随机商人事件的核心玩法。",
+  "api": [
+    {
+      "name": "TrackWanderingTrader",
+      "effect": "跟踪指定的游荡商人实体，设置组件内部引用，并监听其移除事件以自动清除跟踪。"
+    },
+    {
+      "name": "SpawnWanderingTrader",
+      "effect": "生成一个新的游荡商人实体，将其设置为随机生成点位置，并开始跟踪该实体。"
+    },
+    {
+      "name": "TryToSpawnWanderingTrader",
+      "effect": "检查是否有可用生成点且无现有游荡商人，如果条件满足则随机选择生成点并生成商人；否则不执行任何操作。"
+    },
+    {
+      "name": "RemoveWanderingTrader",
+      "effect": "移除当前跟踪的游荡商人实体（如果存在）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前游荡商人的GUID用于游戏保存，若无商人则返回空数据。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在游戏加载后，根据保存数据重新跟踪已存在的游荡商人实体，确保组件状态恢复。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_registerspawnpoint"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      46887,
+      65605,
+      15724,
+      73427,
+      34523,
+      34314,
+      57310,
+      15677
+    ],
+    "aspects": [
+      {
+        "aspect": "世界生成时流浪商人的生成",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "世界生成的时候，流浪商人会生成[[森林世界]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "生成点",
+    "随机事件",
+    "流浪商人",
+    "商人出现",
+    "商人交易",
+    "商人机制",
+    "世界事件",
+    "商人刷新",
+    "游戏事件"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "事件",
+    "交易"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d8b331c56a153ee1c95ac4865314bf23855ca9e0ba1fc64eb7caf2ecf39af8bf",
+    "source_bytes": 3287,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113974209
+  }
+}

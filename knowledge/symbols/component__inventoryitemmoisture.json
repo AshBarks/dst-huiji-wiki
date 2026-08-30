@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventoryitemmoisture.lua"
+  },
+  "category": "component",
+  "display_name": "inventoryitemmoisture",
+  "summary": "该组件管理物品的湿度和湿润状态，扩展了库存物品组件，是物品物理属性的一部分。它通过周期性更新使物品湿度趋向环境目标值，影响物品在雨水或潮湿环境中的行为，如食物腐烂和使用条件。核心玩法涉及物品的干燥与湿润状态变化，与生存和天气系统紧密相关。",
+  "api": [
+    {
+      "name": "AttachReplica",
+      "effect": "连接库存物品复制品，初始化湿度值为0和湿润状态为false。这是内部方法，由库存物品组件调用以建立网络同步。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，重置湿度值为0和湿润状态为false，并取消湿度更新任务。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时，取消湿度更新任务并记录休眠时间戳，用于唤醒时计算时间流逝。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时，根据休眠时间更新湿度值，并重启周期性湿度更新任务。"
+    },
+    {
+      "name": "InheritMoisture",
+      "effect": "继承指定湿度值和湿润状态，将湿度值限制在最大值内，根据湿度阈值或饱和设置决定湿润状态，并触发湿度变化回调。"
+    },
+    {
+      "name": "DiluteMoisture",
+      "effect": "在物品堆叠时，根据当前堆叠数量和新物品湿度，计算并设置平均湿度值。"
+    },
+    {
+      "name": "MakeMoistureAtLeast",
+      "effect": "设置湿度至少为指定值，更新湿润状态（基于湿度阈值或饱和设置），并触发回调。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "直接增加或减少湿度值，内部调用SetMoisture进行设置。"
+    },
+    {
+      "name": "SetMoisture",
+      "effect": "设置指定湿度值，将值限制在最大值内，根据湿度阈值或饱和设置更新湿润状态，并触发湿度变化回调。"
+    },
+    {
+      "name": "SetExternallyControlled",
+      "effect": "设置外部控制标志，影响GetTargetMoisture返回当前湿度值而非环境目标值。"
+    },
+    {
+      "name": "SetOnlyWetWhenSaturated",
+      "effect": "设置是否只有湿度达到最大值时才标记为湿润，影响湿润状态判断逻辑。"
+    },
+    {
+      "name": "SetOnMoistureDeltaCallback",
+      "effect": "设置湿度变化时的回调函数，当湿度值改变时调用，用于外部系统监听。"
+    },
+    {
+      "name": "GetTargetMoisture",
+      "effect": "基于物品所有者、环境（如雨水、海洋）和容器暴露状态，计算并返回目标湿度值。"
+    },
+    {
+      "name": "UpdateMoisture",
+      "effect": "根据时间增量更新湿度值以趋向目标值，返回是否发生湿度变化，用于控制更新频率。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存湿度值和湿润状态到数据表，仅保存非零湿度或湿润状态，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载湿度值和湿润状态，限制值范围并触发回调，用于读档。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前湿度、目标湿度和湿润状态的调试字符串，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MAX_WETNESS",
+    "TUNING.MOISTURE_DRY_THRESHOLD",
+    "TUNING.MOISTURE_WET_THRESHOLD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      20704,
+      13268,
+      70462,
+      19129,
+      18410,
+      18359,
+      28744
+    ],
+    "aspects": [
+      {
+        "aspect": "潮湿度变化速率描述",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "天气潮湿速率：下雨导致的潮湿度上升速率"
+          },
+          {
+            "pageid": 70462,
+            "quote": "此时玩家潮湿速率 -0.5"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度数值增加事件",
+        "evidence": [
+          {
+            "pageid": 13268,
+            "quote": "并且只会 + 50 {{潮湿度}}"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度潮湿判定阈值",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "当潮湿度 ≥ 40 时，实体潮湿"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "湿度",
+    "湿润",
+    "干燥",
+    "雨水",
+    "物品",
+    "库存",
+    "水分",
+    "潮湿",
+    "饱和"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d3a0e1b61fdcddd9f4afd07b3e66f9da7c5d75e83b41e35df067a7d7a5b9b9c5",
+    "source_bytes": 8718,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108917854
+  }
+}

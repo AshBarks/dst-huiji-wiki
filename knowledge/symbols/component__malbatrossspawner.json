@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/malbatrossspawner.lua"
+  },
+  "category": "component",
+  "display_name": "malbatrossspawner",
+  "summary": "MalbatrossSpawner 组件负责管理巨嘴鸟的生成逻辑。它维护一个鱼群列表，并在玩家接近鱼群时触发巨嘴鸟的召唤。当巨嘴鸟被杀死或移除后，组件会重新开始生成计时器。该组件参与钓鱼和巨嘴鸟遭遇战的核心玩法。",
+  "api": [
+    {
+      "name": "OnUpdate",
+      "effect": "当组件更新时，检查生成计时器是否结束，并遍历鱼群列表，若玩家接近某个鱼群，则召唤巨嘴鸟并停止更新。"
+    },
+    {
+      "name": "Relocate",
+      "effect": "重新定位巨嘴鸟，打乱鱼群列表并重置生成计时器；如果传入目标巨嘴鸟，则将其移除，并调整鱼群列表顺序以避免重复生成。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回组件的调试信息字符串，包括生成状态、剩余时间和被跟踪的鱼群数量。"
+    },
+    {
+      "name": "Summon",
+      "effect": "调试方法，设置生成过程：可选地根据目标实体对鱼群进行排序，并设置生成计时器为5秒以强制触发生成。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_registerfishshoal",
+    "ms_unregisterfishshoal",
+    "ms_shoalfishhooked",
+    "ms_shoalfishhooked_redux",
+    "malbatrossremoved",
+    "malbatrosskilled"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MALBATROSS_NOTICEPLAYER_DISTSQ",
+    "MALBATROSS_SPAWNDELAY_BASE",
+    "MALBATROSS_SPAWNDELAY_RANDOM",
+    "MALBATROSS_SHOAL_PERCENTAGE_TO_TEST",
+    "MALBATROSS_HOOKEDFISH_SUMMONCHANCE",
+    "SPAWN_MALBATROSS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      34314,
+      65605,
+      18234,
+      34523,
+      52788,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提到与 component__malbatrossspawner 相关的内容，所有页面讨论的是控制台命令、天体英雄、自定义世界选项、世界翻新、书籍、布景等其他机制，未体现 OnUpdate、Relocate、GetDebugString、Summon 等能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "巨嘴鸟",
+    "鱼群",
+    "生成",
+    "钓鱼",
+    "计时器",
+    "玩家接近",
+    "召唤",
+    "遭遇战"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "064e1463bef3b69ea6983378ba89ab9cf09ff2305295ed0c2174b42248c736b2",
+    "source_bytes": 12148,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109482862
+  }
+}

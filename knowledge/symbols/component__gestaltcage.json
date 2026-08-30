@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gestaltcage.lua"
+  },
+  "category": "component",
+  "display_name": "gestaltcage",
+  "summary": "gestaltcage组件管理一个目标实体，用于捕捉游戏中的幻影生物。它通过Capture方法检查条件并生成填充的笼子，参与捕捉和生成机制。组件还提供瞄准和取消瞄准的方法，管理捕捉过程。",
+  "api": [
+    {
+      "name": "Capture",
+      "effect": "尝试捕捉目标实体。检查目标是否有效、doer是否在目标附近（距离1内）、且目标组件gestaltcapturable可用后，获取目标的level和isplanar属性，触发目标的OnCaptured方法。然后移除当前实体，在当前拥有者位置生成填充的笼子实体（prefab名由level决定），设置其旋转和isplanar属性，并调用笼子的StartCapture方法。如果条件不满足，返回false和字符串'MISSED'。"
+    },
+    {
+      "name": "OnTarget",
+      "effect": "设置目标实体。如果目标改变，先调用OnUntarget取消旧目标，然后检查新目标是否有效且具有gestaltcapturable组件，如果是，则存储新目标并调用其OnTargeted方法。"
+    },
+    {
+      "name": "OnUntarget",
+      "effect": "取消目标实体。如果提供了target参数且匹配当前目标，或未提供参数但当前目标存在，则清除当前目标，并检查目标是否有效且具有gestaltcapturable组件，如果是，调用其OnUntargeted方法。"
+    }
+  ],
+  "api_note": "组件提供Capture、OnTarget和OnUntarget公开方法，用于捕捉和目标管理。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      15539,
+      13701,
+      34314,
+      34523,
+      52788,
+      65605
+    ],
+    "aspects": [
+      {
+        "aspect": "化石笼子捕获行为描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "若织影者周围 12 单位有任何<!--实际上有一堆SNARE_NO_TAGS，懒得列举了-->有移动组件的非玩家目标或不..."
+          }
+        ]
+      },
+      {
+        "aspect": "弹药命中目标伤害描述",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "鹅卵石（{{en|Pebbles}}）命中目标能造成 17 点物理伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "捕捉",
+    "幻影",
+    "笼子",
+    "瞄准",
+    "生成",
+    "目标",
+    "属性"
+  ],
+  "gameplay_tags": [
+    "捕捉",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e30207e1ae49b78b4baaaf7658202b7150d7d4b85c1f67058aa00c725cfb7cc8",
+    "source_bytes": 1744,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100299419
+  }
+}

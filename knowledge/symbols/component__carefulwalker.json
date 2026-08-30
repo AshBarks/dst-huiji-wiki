@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carefulwalker.lua"
+  },
+  "category": "component",
+  "display_name": "carefulwalker",
+  "summary": "这个组件管理实体的小心行走状态，通过监听‘不平地面检测’事件来跟踪附近目标。当检测到不平地面且在范围内时，实体自动降低移动速度以避免潜在危险。核心玩法涉及地形感知和移动模式切换，增强生存挑战。",
+  "api": [
+    {
+      "name": "SetCarefulWalkingSpeedMultiplier",
+      "effect": "设置小心行走速度乘数，参数mult被限制在0到1之间。根据当前状态更新乘数：若无跟踪目标则直接设置；若mult大于等于1且有目标则取消小心行走；若小心行走中则更新移动组件速度；否则更新乘数并可能触发状态检查。"
+    },
+    {
+      "name": "TrackTarget",
+      "effect": "开始跟踪指定目标实体，设置检测半径和持续时间。若目标未在跟踪列表中，则添加条目并启动组件更新；更新目标的范围平方和剩余时间。"
+    },
+    {
+      "name": "IsCarefulWalking",
+      "effect": "返回布尔值，表示实体当前是否处于小心行走状态，无副作用。"
+    },
+    {
+      "name": "ToggleCareful",
+      "effect": "手动切换小心行走状态。若切换到小心行走，更新移动组件速度乘数并推送事件；若取消，移除速度乘数并推送事件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件，检查所有跟踪目标：若目标有效且剩余时间大于dt，则减少剩余时间并在范围内（满足条件如速度乘数小于1）时启用小心行走；移除过期目标；若无目标则停止更新。"
+    }
+  ],
+  "events_published": [
+    "carefulwalking"
+  ],
+  "events_listened": [
+    "unevengrounddetected"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CAREFUL_SPEED_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      13406,
+      15183,
+      16636,
+      18410,
+      19118,
+      19119,
+      20192
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及小心行走组件（carefulwalker）的任何能力表达，如设置行走速度倍数、追踪目标、是否小心行走、切换模式或更新行为；所有页面内容主要描述角色属性、物品效果、游戏机制等，与carefulwalker组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "速度降低",
+    "地形感知",
+    "自动减速",
+    "避障行走",
+    "行走切换",
+    "环境适应"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 5/6)",
+  "gameplay_tags": [
+    "生存",
+    "移动",
+    "地形"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0e968d88571518c2962d1eed46b9d76fe3175971508aedff28b2493b34a1db39",
+    "source_bytes": 3564,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090787990
+  }
+}

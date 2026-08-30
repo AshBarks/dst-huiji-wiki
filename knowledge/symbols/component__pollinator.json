@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pollinator.lua"
+  },
+  "category": "component",
+  "display_name": "pollinator",
+  "summary": "Pollinator 组件用于管理实体与花的互动，记录授粉过的花并控制新花的生成。它维护一个花的收集列表，当收集足够多的花时，可以在有效地面随机生成一朵新花。组件还检查周围花的密度以避免过度种植，常用于与花相关的生物或物品。",
+  "api": [
+    {
+      "name": "Pollinate",
+      "effect": "将指定花添加到内部收集列表中；如果花可被授粉（存在、有花标签且未被收集过），则成功授粉并重置目标。"
+    },
+    {
+      "name": "CanPollinate",
+      "effect": "检查指定花是否可被授粉：花存在、有“flower”标签且不在当前收集列表中；返回布尔值，无副作用。"
+    },
+    {
+      "name": "HasCollectedEnough",
+      "effect": "检查收集的花数量是否超过生成阈值（collectcount），返回布尔值；无副作用。"
+    },
+    {
+      "name": "CreateFlower",
+      "effect": "如果收集足够且实体在有效地面，随机选择一个收集的花作为父本，在实体位置生成一朵新花（设置planted为true），并清空收集列表；否则无操作。"
+    },
+    {
+      "name": "CheckFlowerDensity",
+      "effect": "检查以实体为中心、指定距离内的实体数量是否低于最大密度限制（maxdensity），使用特定标签过滤；返回布尔值，无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前收集花数和是否可生成新花的调试字符串，用于开发调试。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "在组件从实体移除时调用，移除实体的“pollinator”标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22066,
+      13493,
+      15922,
+      18050,
+      21613,
+      10379,
+      53270,
+      13261
+    ],
+    "aspects": [
+      {
+        "aspect": "授粉行为描述",
+        "evidence": [
+          {
+            "pageid": 22066,
+            "quote": "花会吸引[[蜜蜂#蜜蜂授粉|蜜蜂授粉]]，详见其页面。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "授粉",
+    "花朵",
+    "种植",
+    "密度",
+    "生成花",
+    "花丛",
+    "花田",
+    "吸引",
+    "pollinator",
+    "flower"
+  ],
+  "gameplay_tags": [
+    "种植",
+    "环境",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "037802dff41946abdb493bb825bb25ad189c7ede219f70ba632acd20d2de2cae",
+    "source_bytes": 1617,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097169253
+  }
+}

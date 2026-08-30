@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/electricconnector.lua"
+  },
+  "category": "component",
+  "display_name": "electricconnector",
+  "summary": "该组件管理实体间的电气连接关系，用于构建导电围栏网络。它维护一个已连接实体的字典，管理电场特效的生成与移除，并响应连接/断开事件来更新实体标签。主要服务于建造和陷阱玩法。",
+  "api": [
+    {
+      "name": "StartLinking",
+      "signature": "ElectricConnector:StartLinking()",
+      "effect": "推送 `start_linking` 事件，使实体进入准备链接状态。返回 `true`。"
+    },
+    {
+      "name": "EndLinking",
+      "signature": "ElectricConnector:EndLinking()",
+      "effect": "推送 `end_linking` 事件，使实体退出准备链接状态。返回 `true`。"
+    },
+    {
+      "name": "IsLinking",
+      "signature": "ElectricConnector:IsLinking()",
+      "effect": "检查实体是否处于“linking”状态标签中。返回一个布尔值。"
+    },
+    {
+      "name": "HasConnection",
+      "signature": "ElectricConnector:HasConnection()",
+      "effect": "检查实体当前是否已建立至少一个电气连接。返回一个布尔值。"
+    },
+    {
+      "name": "CanLinkTo",
+      "signature": "ElectricConnector:CanLinkTo(guy, on_load)",
+      "effect": "判断是否可以与目标实体 `guy` 建立连接。条件包括：目标也有此组件且处于链接状态（或正在加载）、双方都不在船上、且双方当前未相互连接。返回一个布尔值。"
+    },
+    {
+      "name": "Disconnect",
+      "signature": "ElectricConnector:Disconnect()",
+      "effect": "断开实体所有电气连接。推送 `disconnect_links` 事件，移除所有电场特效，取消所有相互的注册，并向所有已连接实体推送 `disconnect_links` 事件。返回 `true`。此方法同时绑定为实体移除时的清理函数。"
+    },
+    {
+      "name": "FindAndLinkConnector",
+      "signature": "ElectricConnector:FindAndLinkConnector()",
+      "effect": "在指定范围内查找一个可连接的实体并尝试建立连接。返回连接到的实体或 `nil`。"
+    },
+    {
+      "name": "ConnectTo",
+      "signature": "ElectricConnector:ConnectTo(connector)",
+      "effect": "尝试与目标实体 `connector` 建立连接。若已达到最大连接数则直接返回。否则，在两点间生成电场预制体 `fence_electric_field` 并设置其位置、长度和角度，随后在双方组件中注册该连接，并向目标推送 `linked_to` 事件。返回连接到的实体。"
+    },
+    {
+      "name": "RegisterField",
+      "signature": "ElectricConnector:RegisterField(other, field)",
+      "effect": "将与 `other` 的连接关系记录到 `self.fields` 字典中，设置电场预制体 `field` 的关联实体。添加 `is_electrically_linked` 标签。如果连接数达到上限，则额外添加 `fully_electrically_linked` 标签。如果提供了 `onlinkedfn` 回调，则调用它。"
+    },
+    {
+      "name": "UnregisterField",
+      "signature": "ElectricConnector:UnregisterField(other)",
+      "effect": "从 `self.fields` 中移除与 `other` 的连接关系。移除 `fully_electrically_linked` 标签。如果当前已无任何连接，则移除 `is_electrically_linked` 标签，并调用 `onunlinkedfn` 回调（如果存在）。"
+    }
+  ],
+  "events_published": [
+    "start_linking",
+    "end_linking",
+    "disconnect_links",
+    "linked_to"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ELECTRIC_FENCE_MAX_LINKS",
+    "ELECTRIC_FENCE_MAX_DIST"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24542,
+      14674,
+      15022,
+      65881,
+      52142,
+      53270,
+      14676,
+      16640
+    ],
+    "aspects": [
+      {
+        "aspect": "电场形成依赖连接",
+        "evidence": [
+          {
+            "pageid": 52142,
+            "quote": "连接的麻刺节点之间会形成麻刺电场"
+          }
+        ]
+      },
+      {
+        "aspect": "电气连接启动行为",
+        "evidence": [
+          {
+            "pageid": 52142,
+            "quote": "部署后可以对其左键“打开连接”"
+          }
+        ]
+      },
+      {
+        "aspect": "节点连接距离描述",
+        "evidence": [
+          {
+            "pageid": 52142,
+            "quote": "与 10 {{解释|距离单位}}内的其他麻刺节点连接"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "电场",
+    "电网",
+    "绝缘",
+    "陷阱",
+    "建造",
+    "电气连接",
+    "连接事件",
+    "导电网络"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "建造",
+    "生存",
+    "陷阱",
+    "电力"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "56ba99fb92fd689e55d7b2cbfd9981b63b2746bd8d54d4f73171b8b9cacda7d2",
+    "source_bytes": 4410,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099598920
+  }
+}

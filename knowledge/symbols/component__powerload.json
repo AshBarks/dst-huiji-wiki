@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/powerload.lua"
+  },
+  "category": "component",
+  "display_name": "powerload",
+  "summary": "该组件管理实体的电力负载值和空闲状态，存储一个数值负载和一个布尔型空闲标志。可能参与游戏中电力网络的负载平衡或设备能源消耗管理。通过设置和获取负载值来影响实体的电力行为。",
+  "api": [
+    {
+      "name": "SetLoad",
+      "effect": "设置实体的电力负载值和空闲状态，接受一个负载值参数和一个可选空闲标志参数，直接修改内部数据，无其他副作用。"
+    },
+    {
+      "name": "GetLoad",
+      "effect": "返回实体的当前电力负载值，不修改状态，仅读取数据。"
+    },
+    {
+      "name": "IsIdle",
+      "effect": "返回实体是否处于空闲状态，不修改状态，仅读取数据。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      18843,
+      24834,
+      24578,
+      24962,
+      18303,
+      24842
+    ],
+    "aspects": [
+      {
+        "aspect": "设备空闲状态描述",
+        "evidence": [
+          {
+            "pageid": 18303,
+            "quote": "薇诺娜的聚光灯每天消耗 0.5 单位的电力，待机状态"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "空闲状态",
+    "负载平衡",
+    "电力网络",
+    "能源消耗",
+    "负载管理",
+    "空闲标志",
+    "负载数值",
+    "设备电力",
+    "状态检测",
+    "负载设置"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 9/10)",
+  "gameplay_tags": [
+    "电力",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f4b458a7925207c32ce307b007d9cb73c5bb0d197280537d2c8d0e66ddb17d0b",
+    "source_bytes": 339,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094089271
+  }
+}

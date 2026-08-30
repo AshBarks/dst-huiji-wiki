@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cursable.lua"
+  },
+  "category": "component",
+  "display_name": "cursable",
+  "summary": "该组件管理实体的诅咒数据，允许施加和移除诅咒状态，特别处理MONKEY类型的诅咒。它参与诅咒相关的核心玩法，如物品诅咒状态管理、库存交互和死亡时清理诅咒。",
+  "api": [
+    {
+      "name": "ApplyCurse",
+      "effect": "施加诅咒到实体：如果提供item，则从item的curseditem组件获取curse，并更新item的cursed_target为当前实体；支持堆叠物品的数量累加；更新self.curses字典中curse的计数；如果是MONKEY诅咒，则调用curse_monkey.docurse进行特殊处理；给item添加'applied_curse'标签。"
+    },
+    {
+      "name": "RemoveCurse",
+      "effect": "移除指定数量的诅咒：如果是MONKEY诅咒，查找实体库存中带'monkey_token'标签的物品，并消耗指定数量；可选是否掉落物品；更新self.curses字典中curse的计数（不小于0）；如果是MONKEY诅咒，则调用curse_monkey.uncurse进行特殊处理。"
+    },
+    {
+      "name": "IsCursable",
+      "effect": "检查实体是否可被诅咒：如果实体有ghost标签则返回nil；如果有spawnprotectionbuffdebuff则返回false；检查实体库存是否满，或是否有未满堆叠、可偷取的物品；返回true或false表示是否可施加诅咒。"
+    },
+    {
+      "name": "ForceOntoOwner",
+      "effect": "强制将物品添加到实体的库存：检查实体有效性和存活状态；如果库存满，优先寻找未满堆叠的相同物品，否则尝试偷取一个非nosteal标签的物品并掉落；将item从原所有者移除并添加到实体的库存中。"
+    },
+    {
+      "name": "Died",
+      "effect": "处理实体死亡：查找实体库存中所有带curseditem组件的物品，根据诅咒类型和数量调用RemoveCurse移除诅咒，并掉落物品。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存数据：当前返回空表，因为诅咒数据保存功能被注释掉，无实际副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据：当前整个函数被注释掉，无实际功能，不处理任何数据加载。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18524,
+      13406,
+      15186,
+      13556,
+      18079,
+      18510,
+      18504,
+      10379
+    ],
+    "aspects": [
+      {
+        "aspect": "强制归属物品栏",
+        "evidence": [
+          {
+            "pageid": 18524,
+            "quote": "诅咒饰品会将玩家物品栏中的第一个物品强制“挤”出物品栏。"
+          }
+        ]
+      },
+      {
+        "aspect": "施加脆弱诅咒效果",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔的攻击会向目标施加一个脆弱诅咒效果"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡生成诅咒饰品",
+        "evidence": [
+          {
+            "pageid": 18524,
+            "quote": "火药猴或大副会在死亡时生成 1 个诅咒饰品"
+          },
+          {
+            "pageid": 18504,
+            "quote": "死后，他们会掉落所穿戴的装备、一个[[小肉]]和一个[[诅咒饰品]]"
+          }
+        ]
+      },
+      {
+        "aspect": "获得诅咒饰品变身",
+        "evidence": [
+          {
+            "pageid": 18079,
+            "quote": "角色在获得 10 个诅咒饰品时会变为芜猴"
+          }
+        ]
+      },
+      {
+        "aspect": "通过交易移除诅咒饰品",
+        "evidence": [
+          {
+            "pageid": 18079,
+            "quote": "每给予[[月亮码头女王]] 1 个[[香蕉]]或[[熟香蕉]]可以移除 4 个诅咒饰品"
+          },
+          {
+            "pageid": 18510,
+            "quote": "每次交易能够减少 4 个诅咒饰品"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "诅咒",
+    "猴子诅咒",
+    "添加诅咒",
+    "解除诅咒",
+    "被诅咒物品",
+    "库存诅咒",
+    "死亡诅咒",
+    "诅咒状态"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "78df623b5b074005c17ebbf29522b0435aa943134d1848dc6cc766990fd2781a",
+    "source_bytes": 4836,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091014546
+  }
+}

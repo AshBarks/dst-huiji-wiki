@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatring.lua"
+  },
+  "category": "component",
+  "display_name": "boatring",
+  "summary": "BoatRing组件管理船的旋转状态，包括旋转方向、速度以及相关的碰撞器和旋转器。它参与船的操控机制，通过更新旋转角度实现船的转动，并处理碰撞检测。组件依赖boatringdata组件获取半径和段数信息。",
+  "api": [
+    {
+      "name": "GetRadius",
+      "effect": "返回船环的半径，从boatringdata组件获取。"
+    },
+    {
+      "name": "GetNumSegments",
+      "effect": "返回船环的段数，从boatringdata组件获取。"
+    },
+    {
+      "name": "SetRotationDirection",
+      "effect": "设置旋转方向，并控制组件更新状态。当方向不为零时启动更新循环，为零时停止更新。"
+    },
+    {
+      "name": "GetRotationDirection",
+      "effect": "返回当前旋转方向。"
+    },
+    {
+      "name": "AddBumper",
+      "effect": "将指定碰撞器添加到船环的碰撞器列表中。"
+    },
+    {
+      "name": "RemoveBumper",
+      "effect": "从碰撞器列表中移除指定碰撞器。"
+    },
+    {
+      "name": "AddRotator",
+      "effect": "将指定旋转器添加到船环的旋转器列表中。"
+    },
+    {
+      "name": "RemoveRotator",
+      "effect": "从旋转器列表中移除指定旋转器。"
+    },
+    {
+      "name": "GetBumperAtPoint",
+      "effect": "根据给定坐标点查找并返回对应的碰撞器，如果未找到则返回nil。"
+    },
+    {
+      "name": "OnDeath",
+      "effect": "实体死亡时停止船移动声音。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新，根据旋转方向和旋转器数量计算并设置船的旋转角度。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含旋转方向的表用于保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据，设置旋转方向。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "rotationdirchanged"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      19113,
+      24589,
+      24090,
+      24764,
+      20291,
+      24074,
+      24451
+    ],
+    "aspects": [
+      {
+        "aspect": "旋转器数量影响旋转速度",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "且一个漂浮平台上的转向舵越多，旋转速度越快"
+          }
+        ]
+      },
+      {
+        "aspect": "旋转方向显示提示",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "将鼠标放在闲置的转向舵上会显示左舷旋转和右舷旋转字样"
+          }
+        ]
+      },
+      {
+        "aspect": "旋转方向设置操作",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "对转向舵用鼠标左击能使平台逆时针旋转，用鼠标右击能使平台顺时针旋转"
+          }
+        ]
+      },
+      {
+        "aspect": "船崩溃掉落机制",
+        "evidence": [
+          {
+            "pageid": 24090,
+            "quote": "耐久为 0 {{船耐久值|DST}}时崩溃掉落 3 个[[木板]]"
+          }
+        ]
+      },
+      {
+        "aspect": "船的半径描述",
+        "evidence": [
+          {
+            "pageid": 24090,
+            "quote": "具有 4 {{解释|距离单位}}半径的圆形空间"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "船旋转",
+    "碰撞检测",
+    "操控机制",
+    "BoatRing",
+    "旋转速度",
+    "船环半径",
+    "段数",
+    "更新机制"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "航行",
+    "操控"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "05372466a036f15a2cc4d3c2ad9889aa4aa20fa927442a462cb46296c0106c90",
+    "source_bytes": 3734,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092890629
+  }
+}

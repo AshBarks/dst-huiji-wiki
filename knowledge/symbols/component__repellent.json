@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/repellent.lua"
+  },
+  "category": "component",
+  "display_name": "repellent",
+  "summary": "Repellent组件用于管理实体的驱散行为，它定义了一组驱散标签（repel_tags）和忽略标签（ignore_tags），并配置驱散半径、使用量等参数。该组件参与核心战斗玩法，允许实体驱散其追随者或范围内的敌人，使它们脱离战斗状态，同时可能消耗实体的耐久度。",
+  "api": [
+    {
+      "name": "ValidateTargetTags",
+      "effect": "检查目标实体是否具有所有repel_tags中的标签，返回true或false。此方法用于验证驱散目标，但忽略标签的检查已被注释掉，实际未生效。"
+    },
+    {
+      "name": "AddRepelTag",
+      "effect": "向repel_tags列表添加一个指定标签，避免重复添加。用于配置驱散条件。"
+    },
+    {
+      "name": "RemoveRepelTag",
+      "effect": "从repel_tags列表中移除一个指定标签。用于调整驱散条件。"
+    },
+    {
+      "name": "AddIgnoreTag",
+      "effect": "向ignore_tags列表添加一个指定标签，避免重复添加。用于配置忽略条件。"
+    },
+    {
+      "name": "RemoveIgnoreTag",
+      "effect": "从ignore_tags列表中移除一个指定标签。用于调整忽略条件。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置驱散效果的半径值，影响非追随者模式下的范围驱散。"
+    },
+    {
+      "name": "SetUseAmount",
+      "effect": "设置每次执行驱散时消耗的使用量，用于有限次数的驱散物品。"
+    },
+    {
+      "name": "SetOnRepelFollowerFn",
+      "effect": "设置一个回调函数，在驱散一个追随者时被调用，提供自定义行为扩展点。"
+    },
+    {
+      "name": "SetOnlyRepelsFollowers",
+      "effect": "设置一个布尔值，控制是否仅驱散追随者。若为true，则跳过范围驱散敌人的逻辑。"
+    },
+    {
+      "name": "Repel",
+      "effect": "执行驱散逻辑：首先驱散doer组件的追随者（如果符合标签条件），调用其StopFollowing方法；若onlyfollowers为false，则在指定半径内驱散所有具有repel_tags的实体，使它们脱离战斗（调用DropTarget方法）；最后如果实体有finiteuses组件，则消耗指定使用量。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15415,
+      61235,
+      18234,
+      57263,
+      10355,
+      15734,
+      17996,
+      18838
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 repellent 组件相关的排斥、驱赶或范围设置等能力的玩家语言表达。所有页面内容涉及生物行为、物品效果、谜题机制等，但无匹配能力清单的直接或间接描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "驱散",
+    "脱离战斗",
+    "追随者",
+    "范围效果",
+    "消耗耐久",
+    "标签过滤",
+    "战斗控制"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "47fb57cb0563b4ac63b7e62f2615288cda2748b058bd217c208e3a45dd9a6d53",
+    "source_bytes": 2377,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103090085
+  }
+}

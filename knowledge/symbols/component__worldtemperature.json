@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldtemperature.lua"
+  },
+  "category": "component",
+  "display_name": "worldtemperature",
+  "summary": "该组件管理饥荒联机版世界的基础温度。它基于季节、昼夜阶段和柏林噪声计算全局温度，并通过 'temperaturetick' 事件将计算结果推送给其他系统。在夏季白天，它还会控制一个周期性波动的屏幕泛光效果。",
+  "api": [
+    {
+      "name": "SetTemperatureMod",
+      "effect": "设置全局温度计算的乘数和中心点。调用此方法会立即重新计算并推送一次温度事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "temperaturetick",
+    "overridecolourmodifier"
+  ],
+  "events_listened": [
+    "seasontick",
+    "clocktick",
+    "phasechanged",
+    "ms_simunpaused"
+  ],
+  "netvars": [
+    "_noisetime"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      19952,
+      19913,
+      14695,
+      52726,
+      60885,
+      20700,
+      16197
+    ],
+    "aspects": [
+      {
+        "aspect": "世界温度影响因素描述",
+        "evidence": [
+          {
+            "pageid": 19952,
+            "quote": "世界温度，即是当前世界的温度。它受季节、昼夜循环等因素影响。"
+          }
+        ]
+      },
+      {
+        "aspect": "个体温度计算公式描述",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "体感温度，即实体在某个状态下最终会达到的个体温度。"
+          }
+        ]
+      },
+      {
+        "aspect": "地热温度修改环境描述",
+        "evidence": [
+          {
+            "pageid": 60885,
+            "quote": "喷气孔群系拥有自己的‘地热温度’，它会影响喷气孔群系附近的环境温度。"
+          }
+        ]
+      },
+      {
+        "aspect": "夏季温度升高描述",
+        "evidence": [
+          {
+            "pageid": 19913,
+            "quote": "进入夏季后，世界温度会在几天内迅速升至 70 度以上"
+          }
+        ]
+      },
+      {
+        "aspect": "暖石温度行为描述",
+        "evidence": [
+          {
+            "pageid": 14695,
+            "quote": "暖石自身具有温度，其温度的变化规律与玩家温度类似。"
+          }
+        ]
+      },
+      {
+        "aspect": "温度检测机制描述",
+        "evidence": [
+          {
+            "pageid": 52726,
+            "quote": "检测温度=世界温度"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度温度影响描述",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "潮湿度会降低玩家的体感温度。"
+          }
+        ]
+      },
+      {
+        "aspect": "食物温度效果描述",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "变温食物是食用后会在效果持续时间内影响体感温度的食物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "温度",
+    "世界温度",
+    "季节温度",
+    "夏季",
+    "泛光",
+    "温度调节",
+    "温度周期"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c59000ad5206e960c5047bd08e333dda2c0440b5518a8e192529279ca123812d",
+    "source_bytes": 10369,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114405244
+  }
+}

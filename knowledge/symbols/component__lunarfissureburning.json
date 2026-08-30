@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarfissureburning.lua"
+  },
+  "category": "component",
+  "display_name": "lunarfissureburning",
+  "summary": "该组件管理实体在月球裂缝上的燃烧状态，通过周期性造成月燃烧伤害并触发眩晕效果。它自动检测实体位置，控制燃烧特效的显示与隐藏，并在实体移除时清理伤害注册。组件核心参与月球区域的战斗与生存机制。",
+  "api": [
+    {
+      "name": "SetFxEnabled",
+      "effect": "控制燃烧特效的开关。当enable为true时，生成或显示特效'alterguardian_lunar_fissure_burn_fx'，根据实体大小（包括坐骑）设置特效尺寸为'large'、'med'或'small'，并添加颜色覆盖（RGBA 0.15,0.15,0.15,0）；为false时，隐藏特效并移除颜色覆盖。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ALTERGUARDIAN_LUNAR_FISSURE_LUNAR_BURN_DPS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      15539,
+      15922,
+      20058,
+      20150,
+      13156,
+      15022,
+      10379
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 SetFxEnabled（特效启用）相关的玩家语言表达，所有页面内容聚焦于角色能力、伤害机制、物品属性等，未涉及特效开关或启用行为的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月燃烧",
+    "月裂隙",
+    "伤害",
+    "特效",
+    "月球",
+    "燃烧效果",
+    "裂隙燃烧",
+    "月灼伤"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9f4f14adb3244a999d7507a06a2c8fe1c2ae4caa607ffbf4741db62cdd80ad8d",
+    "source_bytes": 4578,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101381868
+  }
+}

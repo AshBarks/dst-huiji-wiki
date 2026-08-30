@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oldager.lua"
+  },
+  "category": "component",
+  "display_name": "oldager",
+  "summary": "该组件管理角色的老化伤害系统，通过累积伤害值来调整年龄计时器，并影响生命值。它参与的核心玩法是角色老化机制，可能导致生命值随时间减少，或通过特定治疗原因逆转老化过程。组件与健康组件交互，处理来自“oldager_component”类型的伤害事件。",
+  "api": [
+    {
+      "name": "AddValidHealingCause",
+      "effect": "添加指定的治疗原因名称到有效治疗列表中。后续伤害事件中，如果伤害原因匹配列表中的名称，则视为治疗并反转伤害为老化伤害。"
+    },
+    {
+      "name": "OnTakeDamage",
+      "effect": "处理伤害事件。如果伤害量为负或原因在有效治疗列表中，则将伤害反转为老化伤害：更新剩余伤害值和每秒伤害率，根据剩余伤害计算新的每秒伤害率并限制在30以内。如果伤害原因不在有效治疗列表中且伤害量非负，则忽略处理。可能触发网络变量同步。"
+    },
+    {
+      "name": "StopDamageOverTime",
+      "effect": "停止所有持续伤害，重置剩余伤害值和每秒伤害率为零。强制触发健康更新事件，主要用于刷新生命值徽章等UI元素。"
+    },
+    {
+      "name": "GetCurrentYearPercent",
+      "effect": "返回当前年份计时器的值，表示老化进度的百分比。无副作用。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "执行长时间更新，调用OnUpdate方法处理给定时间间隔内的伤害和老化逻辑。副作用与OnUpdate相同。"
+    },
+    {
+      "name": "FastForwardDamageOverTime",
+      "effect": "快进持续伤害过程。如果当前正在受到伤害（每秒伤害率和剩余伤害均大于零），则立即计算并应用所有剩余伤害，然后停止持续伤害。副作用包括重置伤害值和可能触发健康更新。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个包含年份计时器、剩余伤害值、每秒伤害率、速率和基准速率信息的调试字符串。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "oldager_yearpercent"
+  ],
+  "tunables": [
+    "OLDAGE_HEALTH_SCALE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15303,
+      15022,
+      15244,
+      15922,
+      10374,
+      20058,
+      20150,
+      10379
+    ],
+    "aspects": [
+      {
+        "aspect": "年龄值与生命值关联的表示",
+        "evidence": [
+          {
+            "pageid": 15303,
+            "quote": "年龄=20~80"
+          },
+          {
+            "pageid": 15244,
+            "quote": "旺达的年龄等效于150生命值。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "老化",
+    "年龄",
+    "伤害",
+    "生命值",
+    "治疗",
+    "健康",
+    "时间",
+    "持续伤害",
+    "伤害每秒",
+    "年份"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "角色发展"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c115a9f39155355fe8d49b659e264a642e3f636179e563459e812c96b3c64af",
+    "source_bytes": 4606,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110651270
+  }
+}

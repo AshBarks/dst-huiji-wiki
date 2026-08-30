@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hideout.lua"
+  },
+  "category": "component",
+  "display_name": "hideout",
+  "summary": "该组件为生物提供一个替代的“家”或存储空间，管理存储的生物列表和数量。它允许生物进入存储状态（被移除场景）并定时释放到世界中，参与生物生成、循环和防御的核心玩法。组件通过回调函数与其他系统交互，支持保存和加载状态。",
+  "api": [
+    {
+      "name": "SetSpawnPeriod",
+      "effect": "设置生物释放的生成周期（period）和方差（variance），影响释放时间间隔。副作用：更新内部生成参数。"
+    },
+    {
+      "name": "StartSpawning",
+      "effect": "开始生成过程，将下次释放时间设为0并启动周期更新任务。副作用：启动内部计时器。"
+    },
+    {
+      "name": "StopSpawning",
+      "effect": "停止生成过程，取消周期更新任务。副作用：停止自动释放生物。"
+    },
+    {
+      "name": "SetOccupiedFn",
+      "effect": "设置当存储生物首次被占用时调用的回调函数（fn）。副作用：无直接行为，仅存储回调。"
+    },
+    {
+      "name": "SetSpawnedFn",
+      "effect": "设置当生物被释放后调用的回调函数（fn）。副作用：无直接行为，仅存储回调。"
+    },
+    {
+      "name": "SetGoHomeFn",
+      "effect": "设置当生物进入存储时调用的回调函数（fn）。副作用：无直接行为，仅存储回调。"
+    },
+    {
+      "name": "SetVacateFn",
+      "effect": "设置当最后一个存储生物被释放时调用的回调函数（fn）。副作用：无直接行为，仅存储回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回存储生物的GUID列表和生成任务状态。副作用：无，仅生成数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果保存时正在生成，则重新启动生成过程。副作用：可能启动更新任务。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，将存储的生物通过GUID重新放回家中。副作用：调用GoHome方法。"
+    },
+    {
+      "name": "DoReleaseChild",
+      "effect": "内部释放单个生物到指定目标（target）附近，设置位置并唤醒大脑。副作用：移除生物的存储状态，可能设置战斗目标，触发onspawned回调。"
+    },
+    {
+      "name": "ReleaseChild",
+      "effect": "释放一个随机存储的生物，如果可释放则执行。副作用：调用DoReleaseChild，移除生物存储，触发onvacate回调当最后一个生物被释放。"
+    },
+    {
+      "name": "GoHome",
+      "effect": "将生物存储到组件中，移除场景并休眠大脑。副作用：更新存储计数，触发ongohome和onoccupied回调。"
+    },
+    {
+      "name": "CanRelease",
+      "effect": "检查是否可释放生物，考虑存储数量、实例状态等。副作用：无，仅返回布尔值。"
+    },
+    {
+      "name": "ReleaseAllChildren",
+      "effect": "释放所有存储的生物，直到无法释放为止。副作用：多次调用ReleaseChild，可能触发多个回调。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新，如果生成任务活跃则调用OnUpdate处理时间流逝。副作用：更新生成计时器。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示生成状态和存储生物列表。副作用：无，仅生成文本。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      15415,
+      22638,
+      15724,
+      73427,
+      15663,
+      28181,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "归家行为描述",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "白天时，其生物巢穴的鱼人会返回"
+          }
+        ]
+      },
+      {
+        "aspect": "生成时间描述",
+        "evidence": [
+          {
+            "pageid": 22638,
+            "quote": "每 2 分钟生成一只海黾"
+          },
+          {
+            "pageid": 15724,
+            "quote": "不满上限时每 3 天生成一只"
+          },
+          {
+            "pageid": 15663,
+            "quote": "大约 2 分钟后会生成一只新的草鳄鱼"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "藏身点",
+    "巢穴",
+    "存储区",
+    "定时刷新",
+    "生成点",
+    "防御工事",
+    "管理点",
+    "存档点"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f4c48c953a90cc9ecd4547cff632f6a550203bc9cf2b03cdc1eb2d440166465",
+    "source_bytes": 6096,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094819273
+  }
+}

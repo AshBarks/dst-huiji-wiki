@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wax.lua"
+  },
+  "category": "component",
+  "display_name": "wax",
+  "summary": "该组件管理实体的喷雾状态数据 is_spray，用于标记实体是否处于蜡喷雾效果中。在状态变化时，它自动更新实体标签 'waxspray'，参与游戏中与蜡喷雾相关的装饰或保护玩法。",
+  "api": [
+    {
+      "name": "SetIsSpray",
+      "effect": "将 is_spray 设为 true；若状态从 false 变为 true，添加标签 'waxspray' 到实体"
+    },
+    {
+      "name": "GetIsSpray",
+      "effect": "返回 is_spray 的当前布尔值"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      70704,
+      24544,
+      13493,
+      52634,
+      18231,
+      19832,
+      23201
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及装饰品、实体行为、生成机制等主题，但未提及任何与'喷雾'(spray)相关的设置或获取状态描述，因此无法找到体现 SetIsSpray 或 GetIsSpray 能力的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜡喷雾",
+    "喷雾状态",
+    "打蜡",
+    "waxspray",
+    "蜡标签",
+    "保护",
+    "装饰",
+    "状态管理"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "23ceb28ec40647b6d9e05b369d9f387f1b26ef810b49d77223c004ea56edcd65",
+    "source_bytes": 417,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097928877
+  }
+}

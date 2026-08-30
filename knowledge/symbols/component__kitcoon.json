@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/kitcoon.lua"
+  },
+  "category": "component",
+  "display_name": "kitcoon",
+  "summary": "Kitcoon 组件是一个简单的 Lua 类，仅在构造时设置实例引用并定义了一个调试方法。它不管理任何游戏数据，也不直接参与核心玩法机制，主要作为基础框架或占位符存在。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回空字符串，用于调试输出，无其他副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      23187,
+      70704,
+      20714,
+      17848,
+      13493,
+      10419,
+      15295
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件能力 GetDebugString 相关的玩家语言表达，内容主要涉及游戏机制、实体行为、控制台命令等，未提及调试字符串输出。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Kitcoon",
+    "玩具猫",
+    "调试",
+    "组件",
+    "饥荒",
+    "联机版",
+    "宠物",
+    "装饰"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a0a8a51f449c5ea9ccacacc448635d9180b04e298e9429038146679f9ea294da",
+    "source_bytes": 149,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096903868
+  }
+}

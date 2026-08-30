@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/occupiable.lua"
+  },
+  "category": "component",
+  "display_name": "occupiable",
+  "summary": "occupiable组件管理可占据实体的状态，包括当前占据者和占据类型。它允许实体如椅子或床被玩家或其他实体占据，实现坐、睡等交互功能。组件处理占据事件、保存和加载，并支持收获操作。",
+  "api": [
+    {
+      "name": "IsOccupied",
+      "effect": "无副作用，返回布尔值表示实体是否被占据。"
+    },
+    {
+      "name": "GetOccupant",
+      "effect": "无副作用，返回当前占据者实体或nil。"
+    },
+    {
+      "name": "CanOccupy",
+      "effect": "参数occupier，无副作用，检查occupier是否可以占据此实体，基于occupanttype、occupier的标签和occupier组件是否存在。"
+    },
+    {
+      "name": "Occupy",
+      "effect": "参数occupier，有副作用：设置occupant为occupier，将occupier添加为子实体并从场景移除，监听perished和onremove事件，触发occupier的occupier组件回调和自身的onoccupied回调（如果定义），并返回true。"
+    },
+    {
+      "name": "Harvest",
+      "effect": "无副作用？实际有副作用：移除occupant，取消事件监听，将occupant添加回场景，触发onemptied回调（如果定义），并返回occupant实体；若条件不满足则返回nil。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "无副作用，返回一个表包含occupant的保存记录（如果有效）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "参数data和newents，有副作用：从data中生成实体并调用Occupy占据。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "有副作用：移除occupied和类型相关标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "perished",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      70704,
+      14486,
+      65881,
+      13493,
+      20609,
+      28739,
+      15327,
+      22707
+    ],
+    "aspects": [
+      {
+        "aspect": "收获概率与幸运值关联",
+        "evidence": [
+          {
+            "pageid": 14486,
+            "quote": "若收获者的幸运值为{{MathVar|L_{幸运值}|low=-10|high=50|init=0}}，则概率为"
+          }
+        ]
+      },
+      {
+        "aspect": "椅子占用交互",
+        "evidence": [
+          {
+            "pageid": 28739,
+            "quote": "角色可以左键单击来坐在椅子上。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "占据",
+    "坐下",
+    "椅子",
+    "床",
+    "收获",
+    "交互",
+    "家具",
+    "保存",
+    "加载",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "交互",
+    "家具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1ecc1e273636b0102fa24a396f84aeff12556d07f3eb554babf1369573ad0b40",
+    "source_bytes": 4058,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102162975
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/brushable.lua"
+  },
+  "category": "component",
+  "display_name": "brushable",
+  "summary": "Brushable组件管理实体的刷毛状态和奖励生成周期。它允许玩家通过刷毛动物获得物品奖励，参与游戏中的动物饲养和互动核心玩法。组件通过配置奖励物品和周期数，控制刷毛的收益频率。",
+  "api": [
+    {
+      "name": "SetBrushable",
+      "effect": "设置实体是否可刷毛。参数brushable为布尔值，控制刷毛功能开关；参数reset为布尔值，如果为true则重置最后刷毛周期为当前世界周期。"
+    },
+    {
+      "name": "SetOnBrushed",
+      "effect": "设置刷毛后的回调函数。参数fn为函数，当刷毛操作发生时，该函数会被调用并传递实体、刷毛者和奖励数量。"
+    },
+    {
+      "name": "CalculateNumPrizes",
+      "effect": "计算自上次刷毛以来可获得的奖励数量。基于当前世界周期与最后刷毛周期的差值，以及配置的每个奖励所需周期数，计算并返回不超过最大值的整数奖励数。"
+    },
+    {
+      "name": "Brush",
+      "effect": "执行刷毛操作。参数doer为刷毛者实体，brush为使用的刷子。如果实体可刷毛且有奖励配置，会生成物品奖励并给予刷毛者；然后推送'brushed'事件，并调用设置的回调函数。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。返回一个表格，包含lastbrushcycle（最后刷毛周期）和brushable（可刷毛状态）字段。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态。从数据表格中恢复lastbrushcycle和brushable字段，用于存档读取。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串。包含brushable状态、最后刷毛周期和当前可奖励数量，用于开发调试。"
+    }
+  ],
+  "events_published": [
+    "brushed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      19129,
+      28744,
+      72441,
+      23204,
+      15722,
+      15011,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与brushable组件相关的任何能力表达，如SetBrushable、Brush、CalculateNumPrizes等。所有页面讨论的内容涉及玩具交易、腐烂机制、生物行为、储存功能等，无刷相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "刷毛",
+    "动物",
+    "奖励",
+    "周期",
+    "物品",
+    "互动",
+    "养殖",
+    "毛发",
+    "玩具",
+    "保存"
+  ],
+  "gameplay_tags": [
+    "互动",
+    "养殖",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "30cf88e8f97ab5d38d73a1790fc69363ee71237e00da97d6e6e30a8695a8607f",
+    "source_bytes": 2234,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098684132
+  }
+}

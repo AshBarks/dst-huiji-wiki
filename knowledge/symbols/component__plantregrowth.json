@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/plantregrowth.lua"
+  },
+  "category": "component",
+  "display_name": "plantregrowth",
+  "summary": "plantregrowth组件管理植物再生的数据，包括再生时间、产品类型和搜索标签。它参与核心玩法中的资源可持续性和生态平衡，允许植物在特定条件下自动重生以支持生存模式。",
+  "api": [
+    {
+      "name": "SetRegrowthRate",
+      "effect": "设置植物再生速率，并注册更新任务到周期性更新桶中。如果当前再生时间已过，则重置下次再生时间。"
+    },
+    {
+      "name": "SetProduct",
+      "effect": "设置重生时生成的产品实体标识符。"
+    },
+    {
+      "name": "SetSearchTag",
+      "effect": "设置搜索标签，用于检查附近同类植物数量以决定是否生成新植物。"
+    },
+    {
+      "name": "SetSkipCanPlantCheck",
+      "effect": "设置是否跳过种植点检查，允许在非标准位置生成植物。"
+    },
+    {
+      "name": "ResetGrowthTime",
+      "effect": "重置下次再生时间，基于当前内部时间和随机方差（±20%）。"
+    },
+    {
+      "name": "TrySpawnNearby",
+      "effect": "尝试在附近重生植物。检查再生时间、区域半径、可用空间等条件，如果满足则在随机位置生成新植物实体。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存再生时间数据到存档中。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档加载数据，恢复再生时间。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，注销更新任务并清理更新桶。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体移除时，注销更新任务并清理更新桶。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包括区域半径和剩余再生时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.EVERGREEN_REGROWTH_TIME_MULT",
+    "TUNING.TWIGGYTREE_REGROWTH_TIME_MULT",
+    "TUNING.DECIDIOUS_REGROWTH_TIME_MULT",
+    "TUNING.MUSHTREE_REGROWTH_TIME_MULT",
+    "TUNING.MOONTREE_REGROWTH_TIME_MULT",
+    "TUNING.MOONMUSHTREE_REGROWTH_TIME_MULT",
+    "TUNING.PALMCONETREE_REGROWTH_TIME_MULT",
+    "TUNING.TREE_ROCK_REGROWTH_TIME_MULT",
+    "TUNING.REGROWTH_TIME_MULTIPLIER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      35001,
+      39366,
+      34314,
+      18441,
+      73427,
+      14713,
+      15352,
+      16577
+    ],
+    "aspects": [
+      {
+        "aspect": "再生时间设置描述",
+        "evidence": [
+          {
+            "pageid": 35001,
+            "quote": "荒芜再生时间是50天"
+          },
+          {
+            "pageid": 18441,
+            "quote": "采集后需要 3 ~ 5 天重新生长"
+          },
+          {
+            "pageid": 14713,
+            "quote": "再生时间<br/>（秒）"
+          }
+        ]
+      },
+      {
+        "aspect": "基础资源再生生成机制",
+        "evidence": [
+          {
+            "pageid": 15352,
+            "quote": "通过[[基础资源再生]]生成"
+          },
+          {
+            "pageid": 16577,
+            "quote": "可通过[[基础资源再生]]生成"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "资源再生",
+    "生存模式",
+    "植物生长",
+    "自动重生",
+    "再生时间",
+    "生态恢复",
+    "资源刷新"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/7)",
+  "gameplay_tags": [
+    "生存",
+    "资源管理",
+    "生态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+    "source_bytes": 8495,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110866208
+  }
+}

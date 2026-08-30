@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatleak.lua"
+  },
+  "category": "component",
+  "display_name": "boatleak",
+  "summary": "BoatLeak组件管理船只漏水的状态和修复过程，包括小型漏水、中型漏水以及它们的堵住和修复状态。核心玩法是玩家需要使用补丁物品修复船只漏洞，以防止船只沉没，涉及生存和海事维修。",
+  "api": [
+    {
+      "name": "Repair",
+      "effect": "使用补丁物品修复漏洞。如果补丁物品有repairer组件，尝试修复当前平台；否则消耗物品。播放修复动画并设置状态为已修复，返回true。"
+    },
+    {
+      "name": "ChangeToRepaired",
+      "effect": "改变状态为已修复，更新动画、音效，移除boat_leak标签并添加boat_repaired_patch标签，设置动画层级和方向，播放修复音效。"
+    },
+    {
+      "name": "SetRepairedTime",
+      "effect": "设置修复超时任务，如果已有任务则取消并重新设置，用于控制修复效果的持续时间。"
+    },
+    {
+      "name": "GetRemainingRepairedTime",
+      "effect": "返回修复超时任务的剩余时间，如果没有任务则返回nil。"
+    },
+    {
+      "name": "SetPlugged",
+      "effect": "根据设置堵住或取消堵住漏洞，查找当前状态对应的新状态（如small_leak变为small_leak_plugged）并设置。"
+    },
+    {
+      "name": "SetState",
+      "effect": "设置漏洞状态（如small_leak、med_leak、repaired等），处理动画、音效、标签和修复超时，包括播放漏水动画、生成特效、触发回调等。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置所属船只，并从船只获取leak_build和leak_build_override属性以更新组件数据。"
+    },
+    {
+      "name": "IsFinishedSpawning",
+      "effect": "检查漏洞是否完成生成动画，根据当前状态和动画是否循环判断。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存动态漏洞的状态和剩余修复时间，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据，延迟设置状态和修复时间，并将漏洞添加到船只的动态漏洞列表。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，调整修复超时任务的剩余时间，如果时间耗尽则设置为中型漏水状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT_REPAIR_KELP_REPAIR_TIME_MED_LEAK",
+    "TUNING.BOAT_REPAIR_KELP_REPAIR_TIME_SMALL_LEAK"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16185,
+      23924,
+      13606,
+      16612,
+      24816,
+      19954,
+      24027,
+      10413
+    ],
+    "aspects": [
+      {
+        "aspect": "可靠的胶布的修补功能",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "可靠的胶布：可以修补可缝补的物品和为漂浮平台补漏"
+          }
+        ]
+      },
+      {
+        "aspect": "海带补丁的临时修复与消失时间",
+        "evidence": [
+          {
+            "pageid": 24816,
+            "quote": "海带补丁可以补漏，但只能持续一段时间。小漏洞的海带补丁会在6分钟后消失，大漏洞的海带补丁会在4分钟后消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "漏洞修复工具与修复后持续时间",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "漏洞可以使用船补丁、可靠的胶布、树果酱或海带补丁来修复，其中海带补丁修复后会在一段时间后再度破掉"
+          }
+        ]
+      },
+      {
+        "aspect": "船补丁的修复能力",
+        "evidence": [
+          {
+            "pageid": 16612,
+            "quote": "船补丁可以补漏，同时回复其所在漂浮平台25船耐久值。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "漏水",
+    "修复",
+    "漏洞",
+    "船只",
+    "补丁",
+    "维修",
+    "水密",
+    "海难",
+    "漏洞修复"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "海事"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5bf0bd082808e5d4dbc57e2977fccbf2a99cfa3d9f9d1e77940b379a1f0b8f79",
+    "source_bytes": 10816,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098350060
+  }
+}

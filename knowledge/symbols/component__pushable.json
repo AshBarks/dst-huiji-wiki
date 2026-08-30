@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pushable.lua"
+  },
+  "category": "component",
+  "display_name": "pushable",
+  "summary": "该组件管理可推动物体的状态和参数，包括推动者、距离限制和速度。核心玩法涉及玩家推动实体如箱子或车辆，实现平滑的物理交互。组件处理推动的开始和停止，并触发相关事件。",
+  "api": [
+    {
+      "name": "SetTargetDist",
+      "effect": "设置被推动实体与推动者之间试图维持的目标距离。"
+    },
+    {
+      "name": "SetMinDist",
+      "effect": "设置推动者停止前进运动的最小距离，当太近时停止前进。"
+    },
+    {
+      "name": "SetMaxDist",
+      "effect": "设置取消推动的最大距离，超过此距离则停止推动。"
+    },
+    {
+      "name": "SetPushingSpeed",
+      "effect": "设置推动者的行走速度。"
+    },
+    {
+      "name": "SetOnStartPushingFn",
+      "effect": "设置开始推动时执行的回调函数。"
+    },
+    {
+      "name": "SetOnStopPushingFn",
+      "effect": "设置停止推动时执行的回调函数。"
+    },
+    {
+      "name": "IsPushing",
+      "effect": "返回布尔值，指示实体是否正在被推动。"
+    },
+    {
+      "name": "GetPushingSpeed",
+      "effect": "返回当前推动速度。"
+    },
+    {
+      "name": "ShouldStopForwardMotion",
+      "effect": "检查推动者是否因太近而应停止前进运动，基于最小距离。"
+    },
+    {
+      "name": "StartPushing",
+      "effect": "开始推动：设置推动者，启动组件更新，触发回调和'startpushing'事件。副作用包括停止之前的推动并立即更新位置。"
+    },
+    {
+      "name": "StopPushing",
+      "effect": "停止推动：清除推动者，停止物理运动，停止组件更新，触发回调和'stoppushing'事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "startpushing",
+    "stoppushing"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18410,
+      18357,
+      13406,
+      15922,
+      51287,
+      21620,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未出现与推动组件相关的任何能力表达，如推动距离、速度、开始/停止推动或相关行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "推动",
+    "推动物体",
+    "距离限制",
+    "速度",
+    "交互",
+    "推动事件",
+    "物理效果",
+    "箱子推动",
+    "车辆推动",
+    "玩家推动"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d15ace2d19acbe57b1c5818158850fdcdf2114d2699266d9d4f6bd2a69e6f3aa",
+    "source_bytes": 2676,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097258410
+  }
+}

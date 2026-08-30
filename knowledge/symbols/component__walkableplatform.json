@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/walkableplatform.lua"
+  },
+  "category": "component",
+  "display_name": "walkableplatform",
+  "summary": "该组件管理可行走平台（如船只）上的玩家和实体，处理碰撞检测、物体添加与移除，以及平台状态更新。它参与船只的航行、物体掉落和玩家登离等核心玩法，确保平台上的实体交互和物理行为。",
+  "api": [
+    {
+      "name": "HasPlatformCamera",
+      "effect": "返回平台是否使用特定摄像机缩放（基于实例的doplatformcamerazoom属性）"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "在平台实体移除时调用：停止更新、销毁玩家碰撞体、处理平台上所有实体的溺水事件（推送'onsink'事件）、销毁平台上物体、移除平台跟随者，并注销平台注册"
+    },
+    {
+      "name": "GetUID",
+      "effect": "获取平台的唯一ID，如果不存在则注册新ID"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存平台数据（包括UID）"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载平台数据（包括UID），并注册平台到管理器"
+    },
+    {
+      "name": "StartUpdating",
+      "effect": "将平台添加到世界组件walkableplatformmanager以开始更新"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "从世界组件walkableplatformmanager中移除平台以停止更新"
+    },
+    {
+      "name": "DestroyObjectsOnPlatform",
+      "effect": "销毁平台半径内的所有非玩家、非特殊实体（如物品、生物），排除指定实体，物品类实体设为非落地状态，其他实体被直接销毁"
+    },
+    {
+      "name": "GetEntitiesOnPlatform",
+      "effect": "返回当前平台上的物体表（objects_on_platform）"
+    },
+    {
+      "name": "GetPlayersOnPlatform",
+      "effect": "返回当前平台上的玩家表（players_on_platform）"
+    },
+    {
+      "name": "AddPlayerOnPlatform",
+      "effect": "将指定玩家添加到平台玩家表中"
+    },
+    {
+      "name": "RemovePlayerOnPlatform",
+      "effect": "从平台玩家表中移除指定玩家"
+    },
+    {
+      "name": "SetIsFull",
+      "effect": "设置平台是否已满（服务器端），通过添加或移除'walkableplatform_full'标签来阻止更多玩家或移动器上平台"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查平台是否已满（服务器端）"
+    },
+    {
+      "name": "GetEmbarkPosition",
+      "effect": "根据登船者坐标和最小距离，计算并返回平台边缘的登船位置点"
+    },
+    {
+      "name": "AddEntityToPlatform",
+      "effect": "将指定实体添加到平台，如果实体无父实体且不在物体表中，则添加平台跟随者"
+    },
+    {
+      "name": "SetEntitiesOnPlatform",
+      "effect": "更新平台上的物体列表：查找平台半径内的实体，添加新实体、移除旧实体，处理与静态物体的碰撞以防止平台卡住，并检查平台是否在视觉地面上以杀死平台"
+    },
+    {
+      "name": "RemoveObject",
+      "effect": "从平台物体表中移除指定物体并移除其平台跟随者（供模组使用）"
+    },
+    {
+      "name": "SpawnPlayerCollision",
+      "effect": "生成玩家碰撞体预制件，作为平台跟随者，并监听其移除事件"
+    },
+    {
+      "name": "DespawnPlayerCollision",
+      "effect": "移除并销毁玩家碰撞体"
+    },
+    {
+      "name": "CommitPlayersOnPlatform",
+      "effect": "根据平台玩家表变化，触发boatdrifter组件的漂移事件（玩家上船时停止漂移，全离船时开始漂移）"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onsink"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14579,
+      13779,
+      14938,
+      18359,
+      15922,
+      14486,
+      20293,
+      45249
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及与 walkableplatform 组件相关的能力或行为表达，内容涉及生物掉落、物品描述、游戏模式机制等其他方面。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "可行走平台",
+    "船只",
+    "玩家交互",
+    "碰撞",
+    "物体添加",
+    "状态更新",
+    "航行",
+    "掉落",
+    "登船"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "生存",
+    "导航",
+    "物理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c63f80c0ebad972c6a16c17c966649d3b6bc2e4d20e105b3957d82f0a7601b3a",
+    "source_bytes": 8957,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092813904
+  }
+}

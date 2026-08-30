@@ -1,0 +1,161 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatcrew.lua"
+  },
+  "category": "component",
+  "display_name": "boatcrew",
+  "summary": "boatcrew 组件用于管理一艘船（实体）上的船员团队，主要服务于海盗玩法。它维护船员列表、队长身份、劫掠状态机（狩猎、攻击、撤退、交付），并管理船员的增删、阵亡监听。组件根据船员携带的战利品数量与预设阈值判定劫掠是否成功，并触发庆祝行为。",
+  "api": [
+    {
+      "name": "SetMemberTag",
+      "effect": "设置用于标识船员类型的标签（self.membertag），并同步更新用于搜索船员的标签列表（self.membersearchtags）。"
+    },
+    {
+      "name": "AddMember",
+      "effect": "将指定实体（inst）加入当前船员列表（self.members），增加成员计数，为其添加事件监听，并为其 crewmember 组件设置所属船只。可选地，将其设为队长（如果参数 setcaptain 为 true）。会触发自定义的 addmember 回调函数。"
+    },
+    {
+      "name": "RemoveMember",
+      "effect": "从当前船员列表（self.members）中移除指定实体，减少成员计数，移除其事件监听，并通知其 crewmember 组件离开船员组。会触发自定义的 removemember 回调函数。如果移除后成员数小于1，则从该实体上移除 'vanish_on_sleep' 和 'boatcrew' 组件。"
+    },
+    {
+      "name": "SetCaptain",
+      "effect": "设置船的队长（self.captain）。移除旧队长的 'onremove' 事件监听，并为新队长注册监听，以便在队长被移除时清理整个船只组件。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "设置船只的行动目标（self.target），目标可以是一个 Vector3 坐标点或一个实体（如另一艘船）。影响船只的航行方向。"
+    },
+    {
+      "name": "SetHeading",
+      "effect": "设置船只的固定航行方向角度（self.heading，单位为度），影响船只的航行方向。"
+    },
+    {
+      "name": "SetUpdateRange",
+      "effect": "设置船只的更新范围（self.updaterange）。"
+    },
+    {
+      "name": "SetAddMemberFn",
+      "effect": "设置一个回调函数，在成功添加新船员时被调用。"
+    },
+    {
+      "name": "SetRemoveMemberFn",
+      "effect": "设置一个回调函数，在成功移除船员时被调用。"
+    },
+    {
+      "name": "GetHeadingNormal",
+      "effect": "根据当前目标（self.target）或固定方向（self.heading）计算并返回船只应前往方向的标准化向量。计算时会考虑目标的移动速度和撤退状态下的特定逻辑。"
+    },
+    {
+      "name": "areAllCrewOnBoat",
+      "effect": "检查所有船员是否都站在其归属船只（通过 crewmember 组件记录）的甲板上。返回一个布尔值。"
+    },
+    {
+      "name": "IsCrewOnDeck",
+      "effect": "检查所有船员是否都站在当前船只（self.inst）的甲板上。返回一个布尔值。"
+    },
+    {
+      "name": "CountCrew",
+      "effect": "返回当前船员数量（基于 self.members 表的大小）。"
+    },
+    {
+      "name": "CountPirateLoot",
+      "effect": "统计所有船员背包中非个人物品（无 'personal_possession' 标签）的总堆叠数量。"
+    },
+    {
+      "name": "TestForLootToSteal",
+      "effect": "测试是否存在非队长的船员背包中仍有可劫掠的战利品。返回一个布尔值。"
+    },
+    {
+      "name": "TestForVictory",
+      "effect": "测试是否达成胜利条件：要么所有船员战利品总和超过（船员数 * 单人目标战利品数），要么存在任何标记了 'victory' 的船员。返回一个布尔值。"
+    },
+    {
+      "name": "CrewCheer",
+      "effect": "为所有未标记 'victory' 的船员触发一个带有随机欢呼台词（取自 'MONKEY_BATTLECRY_VICTORY_CHEER'）的 'cheer' 事件，并将其标记为 'victory'。"
+    },
+    {
+      "name": "checktinkertarget",
+      "effect": "检查指定目标实体（target）是否被标记为被占用的“修补目标”（self.tinkertargets）。返回一个布尔值。"
+    },
+    {
+      "name": "reserveinkertarget",
+      "effect": "将指定目标实体（target）标记为被占用的“修补目标”。"
+    },
+    {
+      "name": "removeinkertarget",
+      "effect": "移除指定目标实体（target）的“修补目标”占用标记。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "根据当前战利品情况、胜利条件和逃跑状态，更新船只的行动状态（self.status）：'delivery'、'retreat'、'assault' 或 'hunting'。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化当前组件的状态，返回一个包含所有船员实体 GUID 列表（data.members）的数据表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在存档加载后，根据保存的船员 GUID 列表，从新创建的实体表（newents）中查找并重新添加船员。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理操作：取消周期性更新任务，并为所有当前船员移除事件监听。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体被移除时，调用 RemoveMember 移除所有船员。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "death",
+    "teleported"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BOATCREW_LOOT_PER_MEMBER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18540,
+      13409,
+      18504,
+      14815,
+      18536,
+      15601,
+      18503,
+      18219
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述海盗袭击、火药猴行为、角色能力等游戏机制，未提及与船员管理相关的代码能力如SetMemberTag、AddMember等具体表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船员",
+    "海盗",
+    "劫掠",
+    "猴子",
+    "船只",
+    "队长",
+    "战斗",
+    "胜利",
+    "船队",
+    "修补"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9c1530fc1a69870049cfedd71a396926dd70acbe20cb5d746ce7a6fbac9618f0",
+    "source_bytes": 8752,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105669056
+  }
+}

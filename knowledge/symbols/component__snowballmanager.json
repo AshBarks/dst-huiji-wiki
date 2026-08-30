@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/snowballmanager.lua"
+  },
+  "category": "component",
+  "display_name": "snowballmanager",
+  "summary": "该组件管理雪球的生成、注册、注销和密度跟踪，是冬季庆典事件中雪球玩法的核心机制。它通过网格系统监控雪球分布，并响应下雪和雪覆盖的天气状态来动态启用或禁用雪球生成与移除。",
+  "api": [
+    {
+      "name": "GetGridCoordsForSnowball(x, z)",
+      "effect": "将世界坐标转换为对应的网格坐标，用于雪球密度管理。"
+    },
+    {
+      "name": "UnregisterSnowball(snowball)",
+      "effect": "注销雪球实体：减少网格密度计数，移除雪球上的'相对移除'和'放入库存'事件监听，并允许雪球开始融化过程。"
+    },
+    {
+      "name": "RegisterSnowball(snowball)",
+      "effect": "注册雪球实体：将雪球添加到网格中并增加密度计数，添加'相对移除'和'放入库存'事件监听以便自动注销，并停止雪球的融化过程。"
+    },
+    {
+      "name": "TryToCreateSnowballAtPoint(x, y, z, skipsnowballtest)",
+      "effect": "尝试在指定世界坐标生成一个雪球实体；若通过生成测试（或跳过测试）则生成雪球并注册，返回生成成功与否。"
+    },
+    {
+      "name": "TryToCreateSnowballAnywhere()",
+      "effect": "在世界地图上随机选择一个有效点生成雪球，该点需通过生成测试；若找到点则调用TryToCreateSnowballAtPoint。"
+    },
+    {
+      "name": "TryToCreateSnowballForEachPlayer()",
+      "effect": "为每个在线玩家在其摄像机视野范围内随机尝试生成雪球，最多尝试10次直到成功一次。"
+    },
+    {
+      "name": "SetEnabled(enabled)",
+      "effect": "设置组件启用状态；若状态改变且启用则启动组件更新循环，若禁用则依赖更新循环处理移除。"
+    },
+    {
+      "name": "TryToEnable()",
+      "effect": "尝试根据当前世界状态（下雪和雪覆盖）和冬季庆典特殊事件是否激活来启用组件；仅当事件激活且天气条件满足时才启用。"
+    },
+    {
+      "name": "OnIsSnowing(issnowing)",
+      "effect": "更新下雪状态变量，并调用TryToEnable以可能改变组件启用状态。"
+    },
+    {
+      "name": "OnIsSnowCovered(issnowcovered)",
+      "effect": "更新雪覆盖状态变量，并调用TryToEnable以可能改变组件启用状态。"
+    },
+    {
+      "name": "OnPostInit()",
+      "effect": "在组件初始化后，根据当前世界状态设置下雪和雪覆盖变量，并触发TryToEnable。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "组件更新循环：当启用时，按固定间隔生成雪球；当禁用时，按固定间隔移除雪球并播放碎裂特效，直至所有雪球移除后停止更新。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存当前所有注册雪球的GUID列表，用于世界存档。"
+    },
+    {
+      "name": "LoadPostPass(newents, savedata)",
+      "effect": "在存档加载后，根据保存的GUID重新注册雪球实体，并启动组件更新循环（若有雪球存在）。"
+    },
+    {
+      "name": "NoSnowballTest",
+      "effect": "测试函数，用于检查给定世界坐标是否适合生成雪球：必须为陆地、无地面覆盖物、无物理碰撞实体，且所在网格密度未达上限。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "worldmapsetsize",
+    "onremove",
+    "onputininventory",
+    "issnowing",
+    "issnowcovered"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SNOWBALLMANAGER_SPACING",
+    "SNOWBALLMANAGER_DENSITY",
+    "SNOWBALLMANAGER_SECONDS_PER_SPAWN",
+    "SNOWBALLMANAGER_SECONDS_PER_DESPAWN"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      52631,
+      65605,
+      52788,
+      34314,
+      34523,
+      14579,
+      24544
+    ],
+    "aspects": [
+      {
+        "aspect": "雪球生成机制描述",
+        "evidence": [
+          {
+            "pageid": 52631,
+            "quote": "雪球管理器会尝试在世界上随机一点生成 1 个雪球，最多尝试 50 次，该点$(x,z)$需要同时满足："
+          }
+        ]
+      },
+      {
+        "aspect": "雪球生成条件描述",
+        "evidence": [
+          {
+            "pageid": 52631,
+            "quote": "在[[冬季盛宴]]期间的[[森林世界]]，存在积雪时，每 5 秒："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "雪球",
+    "管理",
+    "生成",
+    "密度",
+    "冬季庆典",
+    "天气",
+    "注册",
+    "移除",
+    "网格"
+  ],
+  "gameplay_tags": [
+    "季节",
+    "事件",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0107b428becbad0fb50f689b554e1d3c54cc8e969c1a6ac8dfede2d06418e8be",
+    "source_bytes": 8806,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112763385
+  }
+}

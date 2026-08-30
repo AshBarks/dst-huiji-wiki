@@ -1,0 +1,500 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/map.lua"
+  },
+  "category": "component",
+  "display_name": "map",
+  "summary": "Map组件管理饥荒联机版游戏地图的核心数据，包括地形类型检查、物体部署点验证、竞技场生成和特殊区域检测。它参与玩家建造、探索和战斗的核心玩法，确保物体放置的合法性并支持地形交互如海洋、陆地和桥梁部署。",
+  "api": [
+    {
+      "name": "SetTile",
+      "effect": "设置指定坐标的地砖类型，触发地图变化并推送'onterraform'事件，包含原始地砖和新地砖信息。"
+    },
+    {
+      "name": "RegisterDeployExtraSpacing",
+      "effect": "注册自定义部署额外间距，取所有已注册间距的最大值，用于后续部署检查。"
+    },
+    {
+      "name": "RegisterDeploySmartRadius",
+      "effect": "注册智能部署半径，将其与标准部署半径合并后取最大值，更新部署额外间距。"
+    },
+    {
+      "name": "RegisterTerraformExtraSpacing",
+      "effect": "注册自定义 terraform 额外间距，取所有已注册间距的最大值，用于 terraform 检查。"
+    },
+    {
+      "name": "RegisterGroundTargetBlocker",
+      "effect": "注册地面目标阻挡者半径，取所有已注册半径的最大值，用于地面目标阻挡检查。"
+    },
+    {
+      "name": "IsPassableAtPoint",
+      "effect": "检查指定点是否可通过，考虑地形和平台，支持排除船只。"
+    },
+    {
+      "name": "IsPassableAtPointWithPlatformRadiusBias",
+      "effect": "检查指定点是否可通过，支持平台半径偏差和忽略陆地悬垂，用于精确通过性判断。"
+    },
+    {
+      "name": "IsAboveGroundAtPoint",
+      "effect": "检查指定点是否在地面上方，考虑地形类型，支持允许水地砖。"
+    },
+    {
+      "name": "IsLandTileAtPoint",
+      "effect": "检查指定点是否为陆地地砖。"
+    },
+    {
+      "name": "IsLandTileNoDocksAtPoint",
+      "effect": "检查指定点是否为陆地地砖且排除码头地砖。"
+    },
+    {
+      "name": "IsOceanTileAtPoint",
+      "effect": "检查指定点是否为海洋地砖。"
+    },
+    {
+      "name": "IsInvalidTileAtPoint",
+      "effect": "检查指定点是否为无效地砖。"
+    },
+    {
+      "name": "IsImpassableTileAtPoint",
+      "effect": "检查指定点是否为不可通行地砖。"
+    },
+    {
+      "name": "IsTemporaryTileAtPoint",
+      "effect": "检查指定点是否为临时地砖。"
+    },
+    {
+      "name": "IsOceanAtPoint",
+      "effect": "检查指定点是否为海洋，排除视觉悬垂和可选船只检查。"
+    },
+    {
+      "name": "IsValidTileAtPoint",
+      "effect": "检查指定点是否为有效地砖（非无效）。"
+    },
+    {
+      "name": "CanTerraformAtPoint",
+      "effect": "检查指定点是否可进行 terraform，考虑地砖免疫和阻挡实体。"
+    },
+    {
+      "name": "IsTerraformingBlockedByAnObject",
+      "effect": "检查指定地砖坐标是否被实体阻挡 terraform。"
+    },
+    {
+      "name": "CanPlowAtPoint",
+      "effect": "检查指定点是否可犁地，基于可种植检查和阻挡实体。"
+    },
+    {
+      "name": "CanPlaceTurfAtPoint",
+      "effect": "检查指定点是否可放置草皮，要求地砖为泥土地。"
+    },
+    {
+      "name": "CanPlantAtPoint",
+      "effect": "检查指定点是否可种植，要求为陆地地砖且非硬地。"
+    },
+    {
+      "name": "CollapseSoilAtPoint",
+      "effect": "在指定点坍塌土壤，触发附近土壤实体的'collapsesoil'或'breaksoil'事件。"
+    },
+    {
+      "name": "IsFarmableSoilAtPoint",
+      "effect": "检查指定点是否为可耕作土壤地砖。"
+    },
+    {
+      "name": "CanTillSoilAtPoint",
+      "effect": "检查指定点是否可耕作土壤，考虑地砖类型和部署点清晰度。"
+    },
+    {
+      "name": "IsPointNearHole",
+      "effect": "检查指定点是否靠近地面孔洞，基于孔洞半径和范围。"
+    },
+    {
+      "name": "IsGroundTargetBlocked",
+      "effect": "检查指定点是否被地面目标阻挡者阻止。"
+    },
+    {
+      "name": "IsDeployPointClear",
+      "effect": "检查部署点是否清晰，考虑间距、实体标签和玩家检查，支持自定义忽略标签。"
+    },
+    {
+      "name": "IsDeployPointClear2",
+      "effect": "检查部署点是否清晰，改进数学计算和额外间距处理，用于更精确的部署验证。"
+    },
+    {
+      "name": "CanDeployAtPoint",
+      "effect": "检查指定点是否可部署物体，考虑鼠标悬停、通过性和部署点清晰度。"
+    },
+    {
+      "name": "CanDeployPlantAtPoint",
+      "effect": "检查指定点是否可部署植物，基于可种植和部署点清晰度。"
+    },
+    {
+      "name": "CanDeployWallAtPoint",
+      "effect": "检查指定点是否可部署墙壁，支持墙壁和玩家间距检查。"
+    },
+    {
+      "name": "CanDeployFumaroleTrapAtPoint",
+      "effect": "检查指定点是否可部署喷气孔陷阱，考虑陷阱位置和阻挡。"
+    },
+    {
+      "name": "CanDeployAtPointInWater",
+      "effect": "检查指定点是否可在水中部署，考虑船只、陆地距离和部署点清晰度。"
+    },
+    {
+      "name": "CanDeployMastAtPoint",
+      "effect": "检查指定点是否可部署桅杆，考虑桅杆间距和通过性。"
+    },
+    {
+      "name": "CanDeployWalkablePeripheralAtPoint",
+      "effect": "检查指定点是否可部署可行走外围物体，基于外围标签和部署点清晰度。"
+    },
+    {
+      "name": "CanDeployDockAtPoint",
+      "effect": "检查指定点是否可部署码头，考虑海洋地砖、船只距离和码头干扰者。"
+    },
+    {
+      "name": "CanDeployBridgeAtPointWithFilter",
+      "effect": "检查指定点是否可部署桥梁，支持地砖过滤器和特殊区域排除。"
+    },
+    {
+      "name": "BridgeFilter_OceanAndVoid",
+      "effect": "过滤地砖，返回海洋或无效地砖。"
+    },
+    {
+      "name": "BridgeFilter_Void",
+      "effect": "过滤地砖，返回无效地砖。"
+    },
+    {
+      "name": "CanDeployRopeBridgeAtPoint",
+      "effect": "检查指定点是否可部署绳索桥梁，仅限洞穴世界且过滤无效地砖。"
+    },
+    {
+      "name": "CanDeployVineBridgeAtPoint",
+      "effect": "检查指定点是否可部署藤蔓桥梁，过滤海洋和无效地砖。"
+    },
+    {
+      "name": "IsValidTileForRopeBridgeAtPoint",
+      "effect": "检查指定点是否为绳索桥梁的有效地砖（无效地砖）。"
+    },
+    {
+      "name": "IsValidTileForVineBridgeAtPoint",
+      "effect": "检查指定点是否为藤蔓桥梁的有效地砖（海洋或无效地砖）。"
+    },
+    {
+      "name": "IsDockAtPoint",
+      "effect": "检查指定点是否为码头地砖。"
+    },
+    {
+      "name": "IsOceanIceAtPoint",
+      "effect": "检查指定点是否为海洋冰地砖。"
+    },
+    {
+      "name": "CanDeployBoatAtPointInWater",
+      "effect": "检查指定点是否可在水中部署船只，考虑船半径、陆地距离和部署点清晰度。"
+    },
+    {
+      "name": "CanPlacePrefabFilteredAtPoint",
+      "effect": "检查指定点是否可放置预制物体，基于地砖过滤器。"
+    },
+    {
+      "name": "CanDeployRecipeAtPoint",
+      "effect": "检查指定点是否可部署配方物体，考虑建造模式、通过性和部署点清晰度。"
+    },
+    {
+      "name": "IsSurroundedByWater",
+      "effect": "检查指定点周围是否被海洋地砖包围，基于给定半径采样测试。"
+    },
+    {
+      "name": "IsSurroundedByLand",
+      "effect": "检查指定点周围是否被陆地地砖包围，基于给定半径采样测试。"
+    },
+    {
+      "name": "IsSurroundedByLandNoDocks",
+      "effect": "检查指定点周围是否被陆地地砖（排除码头）包围，基于给定半径采样测试。"
+    },
+    {
+      "name": "GetNearbyOceanPointFromXZ",
+      "effect": "从指定坐标开始，以螺旋搜索附近海洋点，返回坐标或nil。"
+    },
+    {
+      "name": "GetNearestPointOnWater",
+      "effect": "已弃用，通过迭代搜索指定半径内的水上点，返回状态和坐标。"
+    },
+    {
+      "name": "InternalIsPointOnWater",
+      "effect": "内部检查指定点是否在水上，排除视觉悬垂和平台。"
+    },
+    {
+      "name": "GetPlatformAtPoint",
+      "effect": "获取指定点附近的平台实体，基于平台半径检查。"
+    },
+    {
+      "name": "GetNearestPlatformInDirection",
+      "effect": "在给定方向上获取最近平台，考虑距离和平台半径。"
+    },
+    {
+      "name": "FindRandomPointWithFilter",
+      "effect": "查找随机点，支持过滤器函数，用于生成位置。"
+    },
+    {
+      "name": "FindRandomPointInOcean",
+      "effect": "在海洋中查找随机点，使用海洋过滤器。"
+    },
+    {
+      "name": "FindRandomPointOnLand",
+      "effect": "在陆地上查找随机点，使用陆地过滤器。"
+    },
+    {
+      "name": "GetTopologyIDAtPoint",
+      "effect": "获取指定点的拓扑ID和节点索引。"
+    },
+    {
+      "name": "FindNodeAtPoint",
+      "effect": "查找指定点对应的拓扑节点和索引。"
+    },
+    {
+      "name": "NodeAtPointHasTag",
+      "effect": "检查指定点的拓扑节点是否具有给定标签。"
+    },
+    {
+      "name": "NodeAtTileHasTag",
+      "effect": "检查指定地砖坐标的拓扑节点是否具有给定标签。"
+    },
+    {
+      "name": "CanAreaTagsHaveAcidRain",
+      "effect": "检查区域标签是否允许酸雨，排除月光和无塌陷区域。"
+    },
+    {
+      "name": "CanPointHaveAcidRain",
+      "effect": "检查指定点是否可发生酸雨，考虑不可通行地砖和仓库区域。"
+    },
+    {
+      "name": "CanAreaTagsHaveQuaker",
+      "effect": "检查区域标签是否允许地震，排除无地震区域。"
+    },
+    {
+      "name": "CanPointHaveQuaker",
+      "effect": "检查指定点是否可发生地震，考虑仓库区域。"
+    },
+    {
+      "name": "GetRandomPointClustersForNodePrefix",
+      "effect": "为指定前缀的拓扑节点生成随机点簇。"
+    },
+    {
+      "name": "FindVisualNodeAtPoint",
+      "effect": "查找指定点的视觉拓扑节点，支持标签检查，基于渲染层优化。"
+    },
+    {
+      "name": "IsInLunacyArea",
+      "effect": "检查指定点是否在疯狂区域，考虑多种条件如月光、裂隙等。"
+    },
+    {
+      "name": "GetLunacyAreaModifier",
+      "effect": "获取指定点的疯狂区域修改器，用于突变生成概率调整。"
+    },
+    {
+      "name": "CanCastAtPoint",
+      "effect": "检查指定点是否可施法，考虑通过性、水和部署半径。"
+    },
+    {
+      "name": "IsInMapBounds",
+      "effect": "检查指定点是否在地图边界内。"
+    },
+    {
+      "name": "IsTileLandNoDocks",
+      "effect": "检查地砖是否为陆地且排除码头地砖。"
+    },
+    {
+      "name": "IsTileOcean",
+      "effect": "检查地砖是否为海洋地砖。"
+    },
+    {
+      "name": "IsAboveGroundInSquare",
+      "effect": "检查方形区域内所有点是否在地面上方，支持过滤器函数。"
+    },
+    {
+      "name": "ClearGoodArenaPoints",
+      "effect": "清除陆地竞技场缓存点。"
+    },
+    {
+      "name": "GetGoodArenaPoints",
+      "effect": "获取陆地竞技场缓存点及其数量。"
+    },
+    {
+      "name": "CheckForBadThingsInArena",
+      "effect": "检查陆地竞技场点附近是否有不良物体，如结构、阻挡者等。"
+    },
+    {
+      "name": "StartFindingGoodArenaPoints",
+      "effect": "启动任务周期性查找陆地竞技场良好点，缓存到最大数量。"
+    },
+    {
+      "name": "StopFindingGoodArenaPoints",
+      "effect": "停止查找陆地竞技场良好点任务。"
+    },
+    {
+      "name": "FindBestSpawningPointForArena",
+      "effect": "为陆地竞技场查找最佳生成点，支持自定义测试和完美模式。"
+    },
+    {
+      "name": "ClearGoodOceanArenaPoints",
+      "effect": "清除海洋竞技场缓存点。"
+    },
+    {
+      "name": "GetGoodOceanArenaPoints",
+      "effect": "获取海洋竞技场缓存点及其数量。"
+    },
+    {
+      "name": "CheckForBadThingsInOceanArena",
+      "effect": "检查海洋竞技场点附近是否有不良物体，如结构、阻挡者等。"
+    },
+    {
+      "name": "StartFindingGoodOceanArenaPoints",
+      "effect": "启动任务周期性查找海洋竞技场良好点，缓存到最大数量。"
+    },
+    {
+      "name": "StopFindingGoodOceanArenaPoints",
+      "effect": "停止查找海洋竞技场良好点任务。"
+    },
+    {
+      "name": "FindBestSpawningPointForOceanArena",
+      "effect": "为海洋竞技场查找最佳生成点，支持自定义测试和完美模式。"
+    },
+    {
+      "name": "IsPointInSharkBoiArena",
+      "effect": "检查指定点是否在鲨鱼竞技场内。"
+    },
+    {
+      "name": "IsPointInWagPunkArena",
+      "effect": "检查指定点是否在废料朋克竞技场内。"
+    },
+    {
+      "name": "IsPointInWagPunkArenaAndBarrierIsUp",
+      "effect": "检查指定点是否在废料朋克竞技场内且屏障升起。"
+    },
+    {
+      "name": "IsXZWithThicknessInWagPunkArena",
+      "effect": "检查指定XZ坐标带厚度是否在废料朋克竞技场内。"
+    },
+    {
+      "name": "IsXZWithThicknessInWagPunkArenaAndBarrierIsUp",
+      "effect": "检查指定XZ坐标带厚度是否在废料朋克竞技场内且屏障升起。"
+    },
+    {
+      "name": "GetWagPunkArenaCenterXZ",
+      "effect": "获取废料朋克竞技场中心XZ坐标。"
+    },
+    {
+      "name": "IsWagPunkArenaBarrierUp",
+      "effect": "检查废料朋克竞技场屏障是否升起。"
+    },
+    {
+      "name": "IsPointInVaultRoom",
+      "effect": "检查指定点是否在仓库房间内。"
+    },
+    {
+      "name": "IsPointInVaultLobby",
+      "effect": "检查指定点是否在仓库大厅内。"
+    },
+    {
+      "name": "IsPointInAnyVault",
+      "effect": "检查指定点是否在任意仓库区域（大厅或房间）内。"
+    },
+    {
+      "name": "IsPointInOrAdjacentToAnyVault",
+      "effect": "检查指定点是否在或相邻于任意仓库区域。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onterraform"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      16185,
+      65881,
+      24451,
+      34523,
+      35670,
+      28733,
+      47009
+    ],
+    "aspects": [
+      {
+        "aspect": "桥梁套件建造桥梁",
+        "evidence": [
+          {
+            "pageid": 28733,
+            "quote": "洞穴探险者的桥梁套件（{{En|Spelunker's Bridge Kit}}）是[[饥荒：联机版]]{{DST}}中的一种[[可制作]][[物品]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "海洋平台部署与可通行性",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "船是一个[[漂浮平台]]，用于支撑不会游泳的角色和生物在[[海洋]]上的站立和移动。"
+          }
+        ]
+      },
+      {
+        "aspect": "生成实体所需空间边距",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "生成[[舞台之手]]，需要的<b>空间边距</b>"
+          }
+        ]
+      },
+      {
+        "aspect": "竞技场区域检测",
+        "evidence": [
+          {
+            "pageid": 47009,
+            "quote": "当它位于[[瓦格斯塔夫的竞技场]]里时"
+          }
+        ]
+      },
+      {
+        "aspect": "部署点周围建筑限制",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "周围 10 距离单位内无[[建筑]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "地形",
+    "部署",
+    "建筑",
+    "海洋",
+    "陆地",
+    "竞技场",
+    "桥梁",
+    "船",
+    "矿场",
+    "荒地"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "探索",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "11ee338740d450a3a075a4c56f8816dfeeef115a45e222b6c08ebf83a0fbade4",
+    "source_bytes": 61680,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788133972067
+  }
+}

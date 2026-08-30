@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/itemweigher.lua"
+  },
+  "category": "component",
+  "display_name": "itemweigher",
+  "summary": "ItemWeigher组件管理实体的类型标签和称重回调函数。通过设置类型属性，实体会添加或移除以'trophyscale_'为前缀的标签，用于区分不同种类的秤。当执行称重操作时，组件会触发用户自定义的回调逻辑，传入实体、目标和执行者参数。组件在从实体移除时会清理类型属性。",
+  "api": [
+    {
+      "name": "SetOnDoWeighInFn(fn)",
+      "effect": "设置称重时的回调函数，该函数在DoWeighIn方法被调用时执行，传入实体、目标和执行者。"
+    },
+    {
+      "name": "DoWeighIn(target, doer)",
+      "effect": "执行称重操作，调用设置的回调函数，传入实体、目标和执行者，返回回调的返回值或nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "组件从实体移除时调用，将type属性设置为nil，从而移除相关标签。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13779,
+      18359,
+      19129,
+      28744,
+      72441,
+      20714,
+      34314,
+      15722
+    ],
+    "aspects": [
+      {
+        "aspect": "称重工具提及",
+        "evidence": [
+          {
+            "pageid": 19129,
+            "quote": "* 鱼类计重器、农产品秤"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "称重",
+    "秤",
+    "奖杯",
+    "物品",
+    "回调",
+    "类型",
+    "标签",
+    "交互",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "称重",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1a42300b1df76f78a209a90e84a1d24ed98994de6ff55ef41ed286c3184236d7",
+    "source_bytes": 682,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100799740
+  }
+}

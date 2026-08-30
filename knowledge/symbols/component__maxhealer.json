@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/maxhealer.lua"
+  },
+  "category": "component",
+  "display_name": "maxhealer",
+  "summary": "MaxHealer 组件管理一个治疗量因子，在饥荒联机版中用于减少目标实体的健康惩罚。它提供 SetHealthAmount 方法设置治疗量，并通过 Heal 方法执行治疗，成功后移除自身，常用于复活或恢复机制。",
+  "api": [
+    {
+      "name": "SetHealthAmount",
+      "effect": "设置组件的治疗量因子为给定的 health 值，无副作用。"
+    },
+    {
+      "name": "Heal",
+      "effect": "对目标实体执行治疗：如果目标有 health 组件，则减少其惩罚 self.healamount；然后移除自身（若为堆叠物品则移除一个堆叠，否则移除整个实体）；返回 true 表示成功。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13700,
+      13260,
+      18727,
+      13701,
+      14669,
+      15335,
+      50903,
+      15244
+    ],
+    "aspects": [
+      {
+        "aspect": "灵魂治疗范围提升",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "释放灵魂治疗玩家的范围增加至 11 单位。"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值回复机制说明",
+        "evidence": [
+          {
+            "pageid": 15244,
+            "quote": "角色可以使用医疗用品来回复自身或其他实体的生命值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "治疗",
+    "生命恢复",
+    "惩罚减少",
+    "复活",
+    "医疗",
+    "健康",
+    "MaxHealer",
+    "治疗因子"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "治疗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "01010114f2d7843f3c1418ef4aab79b12af973457e6c4d9c0cfc17d6c17e4aac",
+    "source_bytes": 744,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101621541
+  }
+}

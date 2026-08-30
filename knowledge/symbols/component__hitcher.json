@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hitcher.lua"
+  },
+  "category": "component",
+  "display_name": "hitcher",
+  "summary": "hitcher 组件管理实体之间的“拴接”关系，核心数据为拴接目标（hitched）、是否允许被拴接（canbehitched）以及锁定状态（locked）。它通过与被拴实体的 hitchable 组件交互，实现实体间的相互连接或跟随。",
+  "api": [
+    {
+      "name": "GetHitched()",
+      "effect": "返回当前拴接的目标实体，如果没有拴接则返回 nil。"
+    },
+    {
+      "name": "SetHitched(target)",
+      "effect": "将自身拴接到目标实体上。会设置自身为不可再被拴接（canbehitched=false），并将目标记录为当前拴接目标。如果目标实体存在 hitchable 组件，则调用目标的 SetHitched 方法建立反向关联。如果定义了 hitchedfn 回调函数，会执行它。"
+    },
+    {
+      "name": "Unhitch()",
+      "effect": "解除当前的拴接关系。会重置自身为可被拴接（canbehitched=true）。如果目标实体存在且其 hitchable 组件当前状态为不可被拴接（canbehitched=false），则会调用目标的 Unhitch 方法。如果定义了 unhitchfn 回调函数，会执行它。最后推送一个 “unhitched” 事件并将当前拴接目标清空。"
+    },
+    {
+      "name": "Lock(setting)",
+      "effect": "设置组件的锁定状态（locked）。参数 setting 为布尔值。此状态改变会通过内部监听器触发添加或移除 “hitcher_locked” 标签，可能影响其他系统对它的交互判定。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "unhitched"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      73480,
+      20714,
+      23187,
+      18476,
+      14579,
+      15295,
+      13779
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及任何与GetHitched、SetHitched、Unhitch或Lock相关的玩家语言表达；这些能力未在提供的页面中体现，页面内容主要涉及电路板、世界生成锁钥、控制台命令等，与hitcher组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "hitcher",
+    "连接",
+    "锁定",
+    "跟随",
+    "挂载",
+    "解锁",
+    "实体"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 1/7)",
+  "gameplay_tags": [
+    "运输",
+    "机械"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dd00b11c0317868624e69ea736cdf2b77a5150ed29b6751d8c79b8b6f1f530d5",
+    "source_bytes": 1491,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096821752
+  }
+}

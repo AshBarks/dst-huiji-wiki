@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spell.lua"
+  },
+  "category": "component",
+  "display_name": "spell",
+  "summary": "该组件管理一个法术的生命周期，包括其持续时间、周期性触发、目标和存档恢复。它通过回调函数驱动法术的开始、命中、每帧更新和结束，是实现可暂停、可存档的持续性法术效果的核心机制。",
+  "api": [
+    {
+      "name": "StartSpell",
+      "effect": "若目标存在，则启动组件的每帧更新逻辑并调用 `OnStart` 回调；若目标为空，则此操作无效。"
+    },
+    {
+      "name": "ResumeSpell",
+      "effect": "调用 `resumefn` 回调并传入剩余时间 (`duration - lifetime`)，然后重新启动组件的每帧更新逻辑。"
+    },
+    {
+      "name": "SetVariables",
+      "effect": "将传入的表格赋值给 `self.variables`，覆盖之前的值。传入值若非表格，则仅打印错误信息。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "若目标实体没有本组件定义的 `spellname` 标签，则将目标赋值给 `self.target` 并调用 `OnTarget` 回调；否则不设置目标。"
+    },
+    {
+      "name": "OnStart",
+      "effect": "将组件的 `active` 状态设为 `true`，然后调用构造时提供的 `onstartfn` 回调（如果存在）。"
+    },
+    {
+      "name": "OnFinish",
+      "effect": "调用 `onfinishfn` 回调（如果存在），停止组件的每帧更新，并根据 `removeonfinish` 标记决定是否移除所属实体。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "累加法术生命周期 `lifetime`，管理周期计时器 `timer`。当计时器归零且 `fn` 回调存在时，以法术所属实体和目标为参数调用 `fn`。若 `lifetime` 达到 `duration`，则调用 `OnFinish` 结束法术。"
+    },
+    {
+      "name": "OnTarget",
+      "effect": "调用构造时提供的 `ontargetfn` 回调（如果存在），并传入法术所属实体和当前目标。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      16419,
+      15922,
+      16197,
+      15186,
+      20714,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "施放技能的发射启动",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "快速发射 8 发直线飞行的吹箭"
+          }
+        ]
+      },
+      {
+        "aspect": "施放技能的命中效果",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "每发吹箭命中时造成 20 点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "施放技能的目标方向设置",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "右键选定方向施放"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "法术",
+    "施法",
+    "目标",
+    "持续时间",
+    "效果",
+    "周期",
+    "存档",
+    "恢复",
+    "法术组件",
+    "spell"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8f7c28cf3db67172e1cd9b021707312db6ccd5dda8f3817bd9286cb0f9c3b229",
+    "source_bytes": 3258,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095897328
+  }
+}

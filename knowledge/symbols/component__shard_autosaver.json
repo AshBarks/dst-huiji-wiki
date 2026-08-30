@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_autosaver.lua"
+  },
+  "category": "component",
+  "display_name": "shard_autosaver",
+  "summary": "Shard_AutoSaver 组件用于管理世界存档的自动保存状态快照 ID。它负责在主存档（mastershard）和从存档（secondary shards）之间通过网络同步该快照 ID。该组件是饥荒联机版多世界存档机制的基础部分，确保所有关联世界能协调其保存状态。",
+  "api": [],
+  "api_note": "纯数据/事件同步组件，无对外暴露的公开方法。",
+  "events_published": [
+    "secondary_autosaverupdate"
+  ],
+  "events_listened": [
+    "master_autosaverupdate",
+    "snapshotdirty"
+  ],
+  "netvars": [
+    "shard_autosaver._snapshot"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      34314,
+      35007,
+      34523,
+      73480,
+      18410,
+      19740,
+      13689
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论世界翻新、自定义世界、存档机制、布景、生物群系连接、降水、洞穴世界和森林世界等游戏机制，但未直接或间接提及 component__shard_autosaver 组件或其自动保存能力，如自动保存分片数据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "存档",
+    "自动保存",
+    "快照",
+    "同步",
+    "世界",
+    "主存档",
+    "从存档",
+    "数据保存"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "世界"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "00d796444184d73507ec551e2b8eaa1d09c0af54121bb96de639a5c92fea2305",
+    "source_bytes": 1774,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103324037
+  }
+}

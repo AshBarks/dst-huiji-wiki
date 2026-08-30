@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanfishinghook.lua"
+  },
+  "category": "component",
+  "display_name": "oceanfishinghook",
+  "summary": "这个组件用于海洋钓鱼系统，管理鱼钩的诱饵数据和鱼的兴趣值。它计算鱼钩的魅力值，并根据环境因素（如时间、天气）调整鱼是否上钩，参与核心钓鱼玩法。",
+  "api": [
+    {
+      "name": "SetLureData(lure_data, lure_fns)",
+      "effect": "设置鱼钩的诱饵数据（lure_data）和自定义函数（lure_fns）。如果诱饵数据包含reel_charm字段，则启动组件更新以调整收线魅力。副作用：更新内部数据，可能启动更新循环。"
+    },
+    {
+      "name": "HasLostInterest(fish)",
+      "effect": "检查给定鱼是否失去兴趣（兴趣值≤0）。返回布尔值，无副作用。"
+    },
+    {
+      "name": "SetLostInterest(fish)",
+      "effect": "设置给定鱼的兴趣值为0，表示鱼对鱼钩失去兴趣。修改interest表。"
+    },
+    {
+      "name": "ClearLostInterestList()",
+      "effect": "清空所有鱼的兴趣记录，重置interest表。"
+    },
+    {
+      "name": "UpdateInterestForFishable(fish)",
+      "effect": "更新给定鱼的兴趣值。基于鱼钩魅力值计算并累积兴趣，影响鱼是否被吸引。返回更新后的兴趣值，修改interest表。"
+    },
+    {
+      "name": "TestInterest(fish)",
+      "effect": "测试鱼是否对鱼钩感兴趣：兴趣值存在且大于0，并且鱼在鱼钩的诱饵半径内。返回布尔值，无副作用。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回组件的调试字符串，包含魅力值、新鲜度、时间等信息，用于调试。无游戏内副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "OCEANFISHING_LURE_WEATHER_DEFAULT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16605,
+      14683,
+      24212,
+      34523,
+      13567,
+      13779,
+      13493,
+      18830
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未提及 oceanfishinghook 组件或代码清单中的具体行为（如设置鱼饵数据、兴趣管理等）；内容仅涉及鱼饵功能描述、海钓竿使用方式和海鱼习性，无玩家语言表达对应给定函数。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "钓鱼钩",
+    "海洋钓鱼",
+    "鱼饵",
+    "吸引力",
+    "鱼兴趣",
+    "诱饵数据",
+    "收线魅力",
+    "钓鱼组件",
+    "鱼上钩",
+    "钓鱼系统"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "钓鱼"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6cb1c7f397ff3590e7bb1e01569dde78557f5a39cf2aa0f8fc26c617de916dcf",
+    "source_bytes": 3811,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110562897
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/herd.lua"
+  },
+  "category": "component",
+  "display_name": "herd",
+  "summary": "herd组件用于管理一个实体作为“兽群”的中心，跟踪一组成员（如牛、鸟）并维护群体行为。其核心玩法是自动聚集附近的同类实体、合并较小的群体，并定期更新群体中心位置，使其成为兽群AI的枢纽。",
+  "api": [
+    {
+      "name": "SetMemberTag(tag)",
+      "effect": "设置该兽群接受的成员标签。同时会自动设置搜索标签为\"herdmember\"和给定标签，用于聚集和合并时的实体筛选。若参数为nil，则清除搜索标签。"
+    },
+    {
+      "name": "SetGatherRange(range)",
+      "effect": "设置聚集范围（数值），`GatherNearbyMembers`和`MergeNearbyHerds`将在此范围内搜索实体。"
+    },
+    {
+      "name": "SetUpdateRange(range)",
+      "effect": "设置位置更新范围（数值），仅当成员在此范围内时，其位置才会计入群体中心位置的计算。"
+    },
+    {
+      "name": "SetMaxSize(size)",
+      "effect": "设置该兽群允许的最大成员数量（整数）。"
+    },
+    {
+      "name": "SetOnEmptyFn(fn)",
+      "effect": "设置当兽群变为空（最后一个成员被移除）时调用的回调函数。函数参数为兽群实体。"
+    },
+    {
+      "name": "SetOnFullFn(fn)",
+      "effect": "设置当兽群达到最大成员数量时调用的回调函数。函数参数为兽群实体。"
+    },
+    {
+      "name": "SetAddMemberFn(fn)",
+      "effect": "设置当有新成员被添加到兽群时调用的回调函数。函数参数为兽群实体和成员实体。"
+    },
+    {
+      "name": "SetRemoveMemberFn(fn)",
+      "effect": "设置当有成员从兽群中被移除时调用的回调函数。函数参数为兽群实体和成员实体。"
+    },
+    {
+      "name": "IsFull()",
+      "effect": "返回一个布尔值，指示兽群当前成员数是否已达到最大容量。"
+    },
+    {
+      "name": "AddMember(inst)",
+      "effect": "将一个实体添加为兽群成员。会更新成员数量、注册成员死亡/移除监听、让成员记住兽群位置、设置成员的`herdmember`组件、调用`addmember`回调。当添加后兽群满员时，会触发`onfull`回调。"
+    },
+    {
+      "name": "RemoveMember(inst)",
+      "effect": "将一个实体从兽群中移除。会调用`removemember`回调、取消成员监听、清除成员记住的兽群位置、清空成员的`herdmember`组件、更新成员数量。当移除后兽群变空时，会触发`onempty`回调。"
+    },
+    {
+      "name": "GatherNearbyMembers()",
+      "effect": "在聚集范围内搜索未加入任何兽群、且满足成员标签、状态存活的实体，并调用`AddMember`将其加入。若兽群已满则提前终止。"
+    },
+    {
+      "name": "MergeNearbyHerds()",
+      "effect": "在聚集范围内搜索其他兽群实体（`herd`标签），若其成员标签相同、成员数小于4，且合并后不超过本兽群最大容量，则将目标兽群的所有成员通过`AddMember`转移到本兽群，然后移除目标兽群实体。若`nomerging`为真则跳过此逻辑。"
+    },
+    {
+      "name": "OnUpdate()",
+      "effect": "作为定期任务调用。依次执行：1. `GatherNearbyMembers` 2. `MergeNearbyHerds` 3. 清理不再有效（缺少`herdmember`组件或标签不匹配）的成员。4. 计算在`updaterange`内且非战斗状态（或允许战斗更新）的有效成员平均位置，并据此更新兽群实体自身的位置。5. 让所有成员重新记住兽群的当前位置。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "用于存档。返回一个包含当前所有成员实体GUID列表的数据表，以及一个需要额外保存的实体GUID列表。"
+    },
+    {
+      "name": "LoadPostPass(newents, savedata)",
+      "effect": "用于读档后处理。根据存档数据中的成员GUID列表，从新生成的实体表中找到对应实体并调用`AddMember`恢复成员关系。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19676,
+      15258,
+      65881,
+      34523,
+      45154,
+      53270,
+      34557,
+      65605
+    ],
+    "aspects": [
+      {
+        "aspect": "草鳄鱼游荡范围描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "在距离自己大树干 26 距离单位的范围内游荡。"
+          }
+        ]
+      },
+      {
+        "aspect": "蝴蝶聚集策略描述",
+        "evidence": [
+          {
+            "pageid": 53270,
+            "quote": "聚集[[蝴蝶]]然后利用某些手段击杀[[蝴蝶]]是黄油工厂的基本思路。"
+          }
+        ]
+      },
+      {
+        "aspect": "面具生物兽群脱离描述",
+        "evidence": [
+          {
+            "pageid": 34557,
+            "quote": "脱离原有的兽群，也不会创建新的兽群。"
+          }
+        ]
+      },
+      {
+        "aspect": "鸟群落点控制描述",
+        "evidence": [
+          {
+            "pageid": 65881,
+            "quote": "控制鸟群落点"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "兽群",
+    "聚集",
+    "合并",
+    "群落",
+    "群体中心",
+    "自动聚集",
+    "成员跟踪",
+    "核心玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "社交",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d5e7d85fda8205a145c7411dd3b97ec7562e8acdb030b09c6e01693b4be49b1a",
+    "source_bytes": 7980,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093453285
+  }
+}

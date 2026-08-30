@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/recipestockpile.lua"
+  },
+  "category": "component",
+  "display_name": "recipestockpile",
+  "summary": "该组件管理实体的配方库存，跟踪每个配方的当前数量、最大数量和补货时间。它监听制作事件，在玩家制作物品时自动减少库存，并可能触发自动补货机制。核心玩法涉及资源管理和自动化制作支持。",
+  "api": [
+    {
+      "name": "SetupItem",
+      "effect": "初始化或设置一个配方的库存。如果配方未存在，则创建库存条目；如果已存在，则忽略。行为：根据 data 参数设置库存参数（如最大数量、补货时间）；若 start_restock_timer 为真且库存数量小于最大值，则开始补货计时器。副作用：可能触发 onrestockfn 或 onemptyfn 回调函数。"
+    },
+    {
+      "name": "RemoveAllStock",
+      "effect": "移除所有配方的库存，将数量设为0。行为：遍历所有库存，设置数量为0并取消现有计时器；若 allow_restock 为真且补货时间存在，则重新开始补货计时器。副作用：触发每个配方的 onemptyfn 回调函数。"
+    },
+    {
+      "name": "RemoveStock",
+      "effect": "移除指定配方的库存，将数量设为0。行为：针对单个配方，设置数量为0并取消计时器；若 allow_restock 为真且补货时间存在，则重新开始补货计时器。副作用：触发该配方的 onemptyfn 回调函数。"
+    },
+    {
+      "name": "FullyRestockItem",
+      "effect": "完全补货指定配方，将库存数量设为最大值。行为：设置数量为最大值，取消现有计时器。副作用：触发 onrestockfn 回调函数。"
+    },
+    {
+      "name": "HasAnyStock",
+      "effect": "检查是否有任何配方的库存数量大于0。行为：遍历所有库存，如果任一数量大于0，则返回 true；否则返回 false。无副作用。"
+    },
+    {
+      "name": "OnItemCrafted",
+      "effect": "响应制作事件，减少指定配方的库存数量。行为：将库存数量减1；若库存数量减少后小于最大值且补货时间存在且无计时器，则开始补货计时器；若数量为0，触发 onemptyfn 回调。副作用：更新库存数量和计时器状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存库存数据以供存档。行为：返回一个表，包含每个配方的当前数量和剩余计时时间（若计时器存在）。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载库存。行为：恢复库存数量并重新设置计时器（若数据中有计时信息）；取消现有计时器。副作用：可能触发计时器更新。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "获取调试信息字符串。行为：返回一个字符串，显示所有库存的配方、数量、最大值和剩余计时时间。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "builditem"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      45249,
+      13642,
+      45250,
+      45248,
+      13437,
+      16660,
+      18830,
+      15539
+    ],
+    "aspects": [
+      {
+        "aspect": "弹药制作数量倍增",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "|制作[[弹弓弹药]]时，产出 1.5 倍数量的成品。"
+          },
+          {
+            "pageid": 15539,
+            "quote": "学习了“弹药工匠”技能的沃尔特制作弹弓弹药时，会产出 1.5 倍数量的成品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "制作",
+    "配方",
+    "库存",
+    "刷新",
+    "自动制作",
+    "计时器",
+    "合成"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 2/7)",
+  "gameplay_tags": [
+    "制作",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c17269f999b5b465180af920180501970b17bad3d5285d075e69da6e232a7a2",
+    "source_bytes": 4614,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111774370
+  }
+}

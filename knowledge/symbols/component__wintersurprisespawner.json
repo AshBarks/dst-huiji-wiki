@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wintersurprisespawner.lua"
+  },
+  "category": "component",
+  "display_name": "wintersurprisespawner",
+  "summary": "该组件管理冬季惊喜事件的生成逻辑，维护生成点列表和本季生成计数。核心玩法是在冬季随机生成带有礼物的装饰树，玩家开启礼物可能触发陷阱，召唤猎犬等敌人。组件通过计时器自动触发生成，并确保生成位置符合游戏规则。",
+  "api": [],
+  "api_note": "该组件无对外暴露的方法，所有逻辑通过事件监听和内部计时器驱动，不提供可调用的公开接口。",
+  "events_published": [],
+  "events_listened": [
+    "ms_registerdeerspawningground",
+    "iswinter"
+  ],
+  "netvars": [],
+  "tunables": [
+    "WINTERSURPRISE_MAX_SPAWNS",
+    "WINTERSURPRISE_SPAWN_DELAY",
+    "WINTERSURPRISE_SPAWN_DELAY_VARIANCE",
+    "SPAWN_WINTERSURPRISE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13857,
+      20560,
+      22707,
+      20162,
+      16356,
+      15751,
+      34314,
+      23210
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未提及 component__wintersurprisespawner 或其相关能力；所有页面内容围绕猎犬、猎犬丘、猎犬袭击等实体，无冬季惊喜生成的具体行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "冬季惊喜",
+    "礼物树",
+    "惊喜陷阱",
+    "猎犬",
+    "礼物盒",
+    "生成触发",
+    "计时器",
+    "随机生成"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4f5827b2ef6162b606c5ce01e65fed0c59262c21104af365497a74b57812d171",
+    "source_bytes": 10743,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114145009
+  }
+}

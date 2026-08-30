@@ -1,0 +1,300 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pearldecorationscore.lua"
+  },
+  "category": "component",
+  "display_name": "pearldecorationscore",
+  "summary": "该组件用于计算和管理珍珠岛（Pearl's Island）的装饰评分，跟踪区域内地砖类型和各类装饰物（如花、蜂箱、灯柱、战利品鱼等）的数量与状态，并基于预设规则计算总分。评分影响珍珠蟹（Hermit Crab）的相关进度或奖励，玩家可通过在岛屿上放置装饰物来提升评分。",
+  "api": [
+    {
+      "name": "IsEnabled()",
+      "effect": "返回组件的启用状态（true 或 false）。无副作用。"
+    },
+    {
+      "name": "Enable(on_load)",
+      "effect": "启用组件，开始定期更新评分，监听地形改变和传送事件。如果 on_load 为 true，则在加载时初始化；否则立即强制更新并触发状态更新事件。"
+    },
+    {
+      "name": "Disable()",
+      "effect": "禁用组件，停止更新，移除事件监听，并触发状态更新事件。"
+    },
+    {
+      "name": "ForceUpdate()",
+      "effect": "强制设置更新标志，使下次更新时重新计算评分。无直接副作用。"
+    },
+    {
+      "name": "UpdateOccupiedGrid()",
+      "effect": "更新当前占据的网格数据（基于实体位置），重新计算地砖评分，并触发瓷砖更新事件和评分半径更新。"
+    },
+    {
+      "name": "UpdateTileScore()",
+      "effect": "根据当前网格中的地砖数量计算地砖总分（tile_score）。无副作用。"
+    },
+    {
+      "name": "GetWaterTreeNumTileCoverage(ent)",
+      "effect": "计算指定水树实体覆盖的网格数量，结果被缓存。如果缓存不存在则计算，否则返回缓存值。无副作用。"
+    },
+    {
+      "name": "IsEntityWaterTree(ent)",
+      "effect": "检查实体是否为水树（具有 'shadecanopysmall' 或 'shadecanopy' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityFlower(ent)",
+      "effect": "检查实体是否为花（具有 'flower' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityBeeBox(ent)",
+      "effect": "检查实体是否为建造的蜂箱（具有 'beebox' 标签且有 workable 组件）。无副作用。"
+    },
+    {
+      "name": "IsEntityLightPost(ent)",
+      "effect": "检查实体是否为灯柱（具有 'hermitcrab_lantern_post' 标签且未废弃）。无副作用。"
+    },
+    {
+      "name": "IsEntityPickableBush(ent)",
+      "effect": "检查实体是否为可采摘植物（有 pickable 组件、未移除、有 'plant' 标签且无 'thorny' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityMeatRack(ent)",
+      "effect": "检查实体是否为建造的肉架（有 dryingrack 组件、未废弃且有 workable 组件）。无副作用。"
+    },
+    {
+      "name": "IsEntityFacedChair(ent)",
+      "effect": "检查实体是否为朝向椅或摇椅（具有 'faced_chair' 或 'rocking_chair' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityTrophyFish(ent)",
+      "effect": "检查实体是否为战利品鱼（有 trophyscale 组件且类型为鱼）。无副作用。"
+    },
+    {
+      "name": "IsEntityPottedPlant(ent)",
+      "effect": "检查实体是否为盆栽植物（具有 'pottedplant' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityDockPost(ent)",
+      "effect": "检查实体是否为码头柱子（具有 'dock_woodpost' 标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityDecorTaker(ent)",
+      "effect": "检查实体是否为装饰接收者（有 furnituredecortaker 组件）。无副作用。"
+    },
+    {
+      "name": "IsEntityJunk(ent)",
+      "effect": "检查实体是否为垃圾（有 'junk_pile' 或 '_inventoryitem' 标签，且无排除标签，非生物且未放置在家具上）。无副作用。"
+    },
+    {
+      "name": "IsEntitySpawner(ent)",
+      "effect": "检查实体是否为生成器（有 childspawner 或 spawner 组件，且无排除标签）。无副作用。"
+    },
+    {
+      "name": "IsEntityUniqueDecor(ent)",
+      "effect": "检查实体是否为独特装饰（在预定义独特装饰表中，未燃烧或废弃）。无副作用。"
+    },
+    {
+      "name": "IsEntityWithin(ent)",
+      "effect": "检查实体是否在评分区域内（基于实体位置）。无副作用。"
+    },
+    {
+      "name": "IsPointWithin(x, y, z, ignore_overhang)",
+      "effect": "检查点是否在评分区域内，处理悬垂情况（非陆地地砖时检查相邻陆地）。无副作用。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "定期更新评分：计算区域内实体装饰分、地砖分、宠物分、装饰物分等，更新总分并触发评分评估和更新事件。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "长时间更新，减少更新计时器。无直接副作用。"
+    },
+    {
+      "name": "GetLastDecorScore(key)",
+      "effect": "返回上次计算中特定装饰类型的分数。无副作用。"
+    },
+    {
+      "name": "GetLastDecorScorePercentToMax(key)",
+      "effect": "返回上次计算中特定装饰类型分数相对于其最大值的百分比（如果有最大值）。无副作用。"
+    },
+    {
+      "name": "GetLastDecorScorePercentToMin(key)",
+      "effect": "返回上次计算中特定装饰类型分数相对于其最小值的百分比（如果有最小值）。无副作用。"
+    },
+    {
+      "name": "GetDecorScoreLevel(key, reverse)",
+      "effect": "根据分数百分比返回装饰等级（HIGH、MED、LOW），reverse 参数控制基于最小值还是最大值。无副作用。"
+    },
+    {
+      "name": "SetScore(score)",
+      "effect": "设置总分，值被钳制在 0 到最大评分之间。如果分数变化，触发评分更新事件。"
+    },
+    {
+      "name": "GetScore()",
+      "effect": "返回当前总分。无副作用。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存组件状态（启用状态和总分），用于序列化。无副作用。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "从保存数据加载组件状态，如果启用则启用组件，如果存在总分则设置分数。无副作用。"
+    },
+    {
+      "name": "LoadPostPass(newents, data)",
+      "effect": "加载后处理：如果启用则触发状态更新事件，如果存在总分则触发评分更新事件。无副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "从实体移除组件时调用，禁用组件。"
+    },
+    {
+      "name": "OnRemoveEntity()",
+      "effect": "实体移除时调用，除非标记为建设移除，否则禁用组件。"
+    },
+    {
+      "name": "FlagForConstructionRemoval()",
+      "effect": "标记组件为建设移除，防止 OnRemoveEntity 中禁用。无副作用。"
+    },
+    {
+      "name": "OnEntityWake()",
+      "effect": "实体唤醒时调用，如果组件启用则开始更新。"
+    },
+    {
+      "name": "OnEntitySleep()",
+      "effect": "实体睡眠时调用，停止更新。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试字符串，包含启用状态和总分。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "pearldecorationscore_updatestatus",
+    "ms_updatepearldecorationscore_tiles",
+    "pearldecorationscore_updatescore",
+    "pearldecorationscore_evaluatescores"
+  ],
+  "events_listened": [
+    "onterraform",
+    "ms_hermitcrab_relocated",
+    "teleported",
+    "teleport_move"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.HERMITCRAB_DECOR_MAX_TILE_SPACE",
+    "TUNING.HERMITCRAB_DECOR_UPDATE_TIME",
+    "TUNING.HERMITCRAB_DECOR_TILE_SCORE",
+    "TUNING.HERMITCRAB_DECOR_TILE_SCORE_LOW",
+    "TUNING.HERMITCRAB_DECOR_WATER_TREE_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_BEEBOX_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_FLOWER_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_TILE_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_LIGHTPOST_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_MEAT_RACK_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_PICKABLE_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_CHAIR_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_POTTEDPLANT_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_DOCKPOST_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_TABLE_SCORE_MAX",
+    "TUNING.HERMITCRAB_DECOR_FISHING_BLOCKED_SCORE_MIN",
+    "TUNING.HERMITCRAB_DECOR_SPAWNER_SCORE_MIN",
+    "TUNING.HERMITCRAB_DECOR_JUNK_SCORE_MIN",
+    "TUNING.HERMITCRAB_DECOR_UNIQUE_BOOSTS",
+    "TUNING.HERMITCRAB_DECOR_FLOWER_SCORE",
+    "TUNING.HERMITCRAB_DECOR_BEEBOX_SCORE",
+    "TUNING.HERMITCRAB_DECOR_LIGHTPOST_ON_SCORE",
+    "TUNING.HERMITCRAB_DECOR_LIGHTPOST_SCORE",
+    "TUNING.HERMITCRAB_DECOR_PICKABLE_SCORE",
+    "TUNING.HERMITCRAB_DECOR_MEAT_RACK_SCORE",
+    "TUNING.HERMITCRAB_DECOR_CHAIR_SCORE",
+    "TUNING.HERMITCRAB_DECOR_TROPHY_SCALE_FISH_SCORE",
+    "TUNING.HERMITCRAB_DECOR_POTTEDPLANT_SCORE",
+    "TUNING.HERMITCRAB_DECOR_DOCKPOST_SCORE",
+    "TUNING.HERMITCRAB_DECOR_TABLE_ITEM_SCORE",
+    "TUNING.HERMITCRAB_DECOR_TABLE_SCORE",
+    "TUNING.HERMITCRAB_DECOR_SPAWNER_SCORE_GRAVE",
+    "TUNING.HERMITCRAB_DECOR_SPAWNER_SCORE",
+    "TUNING.HERMITCRAB_DECOR_JUNK_SCORE",
+    "TUNING.HERMITCRAB_DECOR_WINTER_BONUS_SCORE",
+    "TUNING.HERMITCRAB_DECOR_WATER_TREE_TILE_COVERAGE_MIN",
+    "TUNING.HERMITCRAB_DECOR_WATER_TREE_SCORE",
+    "TUNING.HERMITCRAB_DECOR_MAX_SCORE",
+    "TUNING.HERMITCRAB_DECOR_LVL5_HOUSE",
+    "TUNING.HERMITCRAB_DECOR_WAGSTAFF_ORNAMENT_SCORE",
+    "TUNING.HERMITCRAB_DECOR_WINTER_ORNAMENT_SCORE",
+    "TUNING.HERMITCRAB_DECOR_ORNAMENT_SCORE",
+    "TUNING.HERMITCRAB_DECOR_CRITTER_PET_SCORE",
+    "TUNING.HERMITCRAB_DECOR_ALL_FISH_SCORE",
+    "TUNING.HERMITCRAB_DECOR_FISHING_BLOCKED_SCORE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      13457,
+      14426,
+      13199,
+      23202,
+      14463,
+      51497,
+      18357
+    ],
+    "aspects": [
+      {
+        "aspect": "悬挂装饰物数量与总分提升",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "最多可悬挂 4 个，提升 20 分。"
+          }
+        ]
+      },
+      {
+        "aspect": "装饰度阈值影响角色行为",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "如果由[[珍珠的灯柱]]提供的装饰度大于 6.67 分，那么寄居蟹隐士在黄昏将不会回家。"
+          }
+        ]
+      },
+      {
+        "aspect": "装饰物分数值标注",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "在五级的隐士之家悬挂装饰物。{{item|风铃}} 2 分，{{item|手套}} 8 分；"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "珍珠岛",
+    "装饰评分",
+    "地砖",
+    "装饰物",
+    "珍珠蟹",
+    "奖励",
+    "评分",
+    "放置装饰"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "装饰",
+    "评分",
+    "进度",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "62323bcb72c090c7419ff2c51ae8a0567a22f89ba01e90a989da76d7361fdd1c",
+    "source_bytes": 26380,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110698666
+  }
+}

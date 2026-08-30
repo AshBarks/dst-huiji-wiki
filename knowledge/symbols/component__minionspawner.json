@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/minionspawner.lua"
+  },
+  "category": "component",
+  "display_name": "minionspawner",
+  "summary": "该组件管理小弟（如眼植物）的生成、计数和位置，用于生成和维护一群跟随实体的小弟，参与战斗或防御玩法。它控制生成时机、位置选择、小弟生命周期，并发布事件通知变化。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含小弟数量、生成状态、下次生成时间和是否应生成的调试字符串。"
+    },
+    {
+      "name": "RemovePosition",
+      "effect": "从空闲位置列表中移除指定编号的位置，用于更新生成位置状态。"
+    },
+    {
+      "name": "AddPosition",
+      "effect": "向空闲位置列表中添加指定编号的位置，避免重复，用于回收生成位置。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括小弟信息、最大数量、生成位置和生成状态，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，恢复最大数量、生成位置和生成状态，用于游戏恢复。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后处理小弟实体，接管所有权并设置位置，用于重新生成场景。"
+    },
+    {
+      "name": "TakeOwnership",
+      "effect": "接管一个小弟，添加到管理列表，设置事件监听器（如攻击、死亡），并发布'minionchange'事件。"
+    },
+    {
+      "name": "OnLostMinion",
+      "effect": "处理失去小弟的情况，从列表中移除，移除事件监听器，回收位置，并可能开始新生成。"
+    },
+    {
+      "name": "MakeMinion",
+      "effect": "根据miniontype创建新小弟实体，如果未达最大数量；否则返回nil。"
+    },
+    {
+      "name": "CheckTileCompatibility",
+      "effect": "检查给定地皮类型是否在validtiletypes列表中兼容，返回true或false。"
+    },
+    {
+      "name": "MakeSpawnLocations",
+      "effect": "生成一组有效的生成位置，考虑地面、地皮、路径清除和障碍物，返回位置列表或nil；如果位置不足，调整最大数量。"
+    },
+    {
+      "name": "GetSpawnLocation",
+      "effect": "获取指定编号的生成位置，如果存在且地皮兼容；否则返回nil。"
+    },
+    {
+      "name": "GetNextSpawnTime",
+      "effect": "返回下一次生成的随机时间，介于minionspawntime的min和max之间。"
+    },
+    {
+      "name": "KillAllMinions",
+      "effect": "停止生成并杀死所有当前小弟，通过健康组件逐个击杀。"
+    },
+    {
+      "name": "SpawnNewMinion",
+      "effect": "尝试生成一个新的小弟，如果条件满足（未在生成中、未达最大数量、有空闲位置），并设置位置；如果失败则重新生成位置。"
+    },
+    {
+      "name": "MaxedMinions",
+      "effect": "检查当前小弟数量是否已达到最大数量，返回true或false。"
+    },
+    {
+      "name": "SetSpawnInfo",
+      "effect": "设置下一次生成的信息，包括开始时间和持续时间，用于跟踪生成进度。"
+    },
+    {
+      "name": "StartNextSpawn",
+      "effect": "开始下一次生成任务，如果未在生成中且未达最大数量，设置生成计时器。"
+    },
+    {
+      "name": "ResumeSpawn",
+      "effect": "恢复生成任务，给定剩余时间，设置生成计时器。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，模拟多次生成以赶上时间，如果生成进行中且应生成。"
+    }
+  ],
+  "events_published": [
+    "minionchange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      10418,
+      15713,
+      18493,
+      19769,
+      23956,
+      13874,
+      14713
+    ],
+    "aspects": [
+      {
+        "aspect": "数量上限描述",
+        "evidence": [
+          {
+            "pageid": 18493,
+            "quote": "生成萤火虫的数量上限为 3 个"
+          }
+        ]
+      },
+      {
+        "aspect": "生成速度描述",
+        "evidence": [
+          {
+            "pageid": 19769,
+            "quote": "熔合暗影的储存数量上限、生成速度、涌出间隔取决于裂隙的阶段："
+          }
+        ]
+      },
+      {
+        "aspect": "生成间隔描述",
+        "evidence": [
+          {
+            "pageid": 15713,
+            "quote": "再生成浣猫，需要 15 ~ 20 天才能恢复。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "随从刷新",
+    "数量上限",
+    "刷新位置",
+    "生命持续",
+    "事件回调",
+    "战斗帮助",
+    "防御随从",
+    "跟随实体"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生成",
+    "防御"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "da27feae3cb8b5292fc9a30f522f23066ee6d3103e14983ba47fdaf0742a7e2b",
+    "source_bytes": 11669,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101760344
+  }
+}

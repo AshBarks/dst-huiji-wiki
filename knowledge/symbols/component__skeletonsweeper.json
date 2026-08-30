@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/skeletonsweeper.lua"
+  },
+  "category": "component",
+  "display_name": "skeletonsweeper",
+  "summary": "该组件管理世界中玩家骨架的列表，监听骨架生成事件和启用状态变化。当骨架数量超过限制时，自动移除或衰变多余的骨架，防止骨架堆积影响世界性能。核心玩法涉及骨架生命周期管理和世界清理。",
+  "api": [
+    {
+      "name": "Sweep",
+      "effect": "执行骨架清理，移除超过max_to_keep数量的骨架。max_to_keep默认为TUNING.MAX_PLAYER_SKELETONS。若no_decay为true或骨架无Decay方法，则直接移除骨架实体；否则调用骨架的Decay方法使其衰变。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "在组件初始化后调用，启用sweep功能并执行初始清理。将_nosweep设为nil，若启用则排序骨架列表并调用Sweep进行初始清理。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_skeletonspawn",
+    "ms_enableskeletonsweeper"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MAX_PLAYER_SKELETONS"
+  ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "清理骨架",
+    "玩家骨架移除",
+    "骨架自动清理",
+    "世界骨架过多",
+    "骨架腐烂衰变",
+    "管理骨架数量",
+    "防止骨架堆积",
+    "骨架清理机制"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "清理",
+    "世界管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a4ae783be49b183a40c98516d8b06a57bb71af1993e3c7096ad1b89e9f13eabe",
+    "source_bytes": 3258,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112629046
+  }
+}

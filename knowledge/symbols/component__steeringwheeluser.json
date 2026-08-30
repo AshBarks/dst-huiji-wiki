@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/steeringwheeluser.lua"
+  },
+  "category": "component",
+  "display_name": "steeringwheeluser",
+  "summary": "该组件管理玩家实体与方向盘交互的行为，包括设置和取消方向盘使用、执行转向操作。核心玩法涉及驾驶船只，玩家通过方向盘控制船的方向，组件处理位置更新和事件广播以维持驾驶状态。",
+  "api": [
+    {
+      "name": "SetSteeringWheel",
+      "effect": "设置或取消玩家使用的方向盘。如果设置新方向盘，会停止旧方向盘的更新、移除'steeringboat'标签、停止旧方向盘转向并推送'stop_steering_boat'事件；如果设置新方向盘，会启动更新、添加标签、传送玩家到方向盘位置、监听方向盘和船的事件、启动转向。"
+    },
+    {
+      "name": "Steer",
+      "effect": "根据目标坐标转向船只。计算从船当前位置到目标的方向，调用SteerInDir，如果船存在返回true，否则返回false。"
+    },
+    {
+      "name": "SteerInDir",
+      "effect": "根据方向向量转向船只。设置船的方向舵方向，如果方向变化超过容差（0.1），推送'set_heading'事件并决定是否播放左转动画。"
+    },
+    {
+      "name": "GetBoat",
+      "effect": "返回玩家当前所在的船实体（平台）。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新函数。如果玩家没有方向盘或状态图中断，则停止更新；否则，保持玩家位置与方向盘位置同步。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "stop_steering_boat",
+    "playerstopturning",
+    "set_heading"
+  ],
+  "events_listened": [
+    "onremove",
+    "stopturning"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19113,
+      16594,
+      20293,
+      65881,
+      51428,
+      72314,
+      15022,
+      18188
+    ],
+    "aspects": [
+      {
+        "aspect": "掌舵转向交互",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "点击方向舵角色会前去掌舵，在掌舵时，用带有“设定航向”的鼠标点击会将桅杆的动力方向转到"
+          }
+        ]
+      },
+      {
+        "aspect": "方向盘建造方式",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "由方向舵套装建造"
+          }
+        ]
+      },
+      {
+        "aspect": "方向舵控制方向能力",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "建在漂浮平台上的方向舵能控制同一漂浮平台上的桅杆的动力方向。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "方向盘",
+    "驾驶",
+    "船只",
+    "转向",
+    "控制",
+    "航行",
+    "舵",
+    "方向",
+    "乘船",
+    "steering"
+  ],
+  "gameplay_tags": [
+    "驾驶",
+    "航海"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "48890623abaa158c55e18c8c215d954eebf0a38311ffee05f264a45d3199a46d",
+    "source_bytes": 3770,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091958673
+  }
+}

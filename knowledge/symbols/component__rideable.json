@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rideable.lua"
+  },
+  "category": "component",
+  "display_name": "rideable",
+  "summary": "该组件管理坐骑（如牛）的可骑乘状态，包括鞍具的安装与移除、骑手的绑定与解绑。核心玩法涉及骑乘系统，允许玩家骑乘生物并影响游戏机制，如骑乘时的灵感值回复。组件还处理顺从度要求、自定义骑手测试以及数据保存。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，停止骑乘计时任务，并移除'saddleable'和'rideable'标签。"
+    },
+    {
+      "name": "TimeSinceLastRide",
+      "effect": "返回自上次骑乘以来的游戏时间。"
+    },
+    {
+      "name": "SetRequiredObedience",
+      "effect": "设置骑乘所需的顺从度阈值。"
+    },
+    {
+      "name": "SetCustomRiderTest",
+      "effect": "设置自定义函数以测试潜在骑手是否允许骑乘。"
+    },
+    {
+      "name": "TestObedience",
+      "effect": "测试坐骑的顺从度是否满足要求；如果未设置阈值或无驯服组件，返回 true。"
+    },
+    {
+      "name": "TestRider",
+      "effect": "测试潜在骑手是否允许骑乘；如果未设置自定义测试函数，返回 true。"
+    },
+    {
+      "name": "SetSaddle",
+      "effect": "设置鞍具。移除现有鞍具时触发'unequipped'事件并丢弃物品；安装新鞍具时更新动画、触发'equipped'事件并设置'canride'为 true。如果不可骑乘，丢弃鞍具并攻击施法者。"
+    },
+    {
+      "name": "SetSaddleable",
+      "effect": "设置坐骑是否可安装鞍具。"
+    },
+    {
+      "name": "IsSaddled",
+      "effect": "检查坐骑是否已安装鞍具。"
+    },
+    {
+      "name": "SetRider",
+      "effect": "设置骑手。变更时触发'riderchanged'事件，启动或停止骑乘计时任务，并监听骑手攻击事件。"
+    },
+    {
+      "name": "GetRider",
+      "effect": "获取当前骑手实体。"
+    },
+    {
+      "name": "IsBeingRidden",
+      "effect": "检查坐骑是否正在被骑乘。"
+    },
+    {
+      "name": "Buck",
+      "effect": "使坐骑踢下骑手，触发骑手的'bucked'事件。"
+    },
+    {
+      "name": "SetShouldSave",
+      "effect": "设置组件数据是否应该被保存。"
+    },
+    {
+      "name": "ShouldSave",
+      "effect": "检查组件数据是否应该被保存。"
+    },
+    {
+      "name": "OnSaveDomesticatable",
+      "effect": "保存鞍具数据和上次骑乘时间差，用于游戏存档。"
+    },
+    {
+      "name": "OnLoadDomesticatable",
+      "effect": "加载鞍具数据和上次骑乘时间差，从存档恢复状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前鞍具信息。"
+    }
+  ],
+  "events_published": [
+    "beingridden",
+    "saddlechanged",
+    "riderchanged",
+    "riderdoattackother"
+  ],
+  "events_listened": [
+    "death",
+    "onattackother"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15169,
+      15526,
+      52019,
+      15941,
+      23933,
+      14653,
+      15737
+    ],
+    "aspects": [
+      {
+        "aspect": "鞍具耐久损失",
+        "evidence": [
+          {
+            "pageid": 14653,
+            "quote": "如果皮弗娄牛因顺从度低于 40% 而主动把自己身上的鞍抖了下来"
+          }
+        ]
+      },
+      {
+        "aspect": "顺从度安装要求",
+        "evidence": [
+          {
+            "pageid": 14653,
+            "quote": "只有顺从度高于 50% 的皮弗娄牛才会同意让玩家安装鞍具"
+          }
+        ]
+      },
+      {
+        "aspect": "骑乘权限控制",
+        "evidence": [
+          {
+            "pageid": 15169,
+            "quote": "当皮弗娄牛铃在玩家的物品栏中或容器里时，其他玩家将无法再骑乘这头牛。"
+          }
+        ]
+      },
+      {
+        "aspect": "骑乘速度加成",
+        "evidence": [
+          {
+            "pageid": 14653,
+            "quote": "装备鞍具的皮弗娄牛将会在被骑乘时提升 40% 的移动速度"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "骑乘",
+    "鞍具",
+    "骑手",
+    "牛",
+    "顺从度",
+    "踢下",
+    "保存",
+    "加载",
+    "灵感",
+    "驯服"
+  ],
+  "gameplay_tags": [
+    "骑乘",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7ad10d4a5439edc68ce5566574cb10de5b95da90a225abd08ae2e24ad3a6f37a",
+    "source_bytes": 6757,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097276119
+  }
+}

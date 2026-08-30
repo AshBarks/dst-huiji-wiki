@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/questowner.lua"
+  },
+  "category": "component",
+  "display_name": "questowner",
+  "summary": "该组件管理实体的 questing 和 questcomplete 状态，用于控制任务的开始、放弃和完成。它通过回调函数允许自定义任务行为，并在状态变化时更新实体的标签以反映任务状态。核心玩法涉及任务系统，是游戏中任务驱动内容的基础组件。",
+  "api": [
+    {
+      "name": "SetOnBeginQuest",
+      "effect": "设置开始任务时调用的回调函数。当 BeginQuest 被调用时，该函数将被触发，用于定义任务开始的具体行为。"
+    },
+    {
+      "name": "SetOnAbandonQuest",
+      "effect": "设置放弃任务时调用的回调函数。当 AbandonQuest 被调用时，该函数将被触发，用于定义任务放弃的具体行为。"
+    },
+    {
+      "name": "SetOnCompleteQuest",
+      "effect": "设置完成任务时调用的回调函数。当 CompleteQuest 被调用时，该函数将被触发，用于定义任务完成的具体行为。"
+    },
+    {
+      "name": "CanBeginQuest",
+      "effect": "检查是否可以开始任务。如果未设置 CanBeginFn，则默认返回 true；否则调用该函数判断。返回布尔值表示是否可以开始。"
+    },
+    {
+      "name": "BeginQuest",
+      "effect": "开始任务。重置 questcomplete 为 false，调用 on_begin_quest 回调（如果设置），更新 questing 状态并返回状态和消息。副作用：可能添加 'questing' 标签到实体。"
+    },
+    {
+      "name": "CanAbandonQuest",
+      "effect": "检查是否可以放弃任务。如果未设置 CanAbandonFn，则默认返回 true；否则调用该函数判断。返回布尔值表示是否可以放弃。"
+    },
+    {
+      "name": "AbandonQuest",
+      "effect": "放弃任务。如果当前 questing 为 true，则调用 on_abandon_quest 回调（如果设置）或直接设置 questing 为 false。返回放弃状态和消息。副作用：可能移除 'questing' 标签。"
+    },
+    {
+      "name": "CompleteQuest",
+      "effect": "完成任务。设置 questing 为 false，questcomplete 为 true，并调用 on_complete_quest 回调（如果设置）。副作用：添加 'questcomplete' 标签，移除 'questing' 标签。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用。清理实体的 'questing' 和 'questcomplete' 标签。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前组件状态，返回包含 questing 和 questcomplete 值的 table。用于数据持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的状态数据，恢复 questing 和 questcomplete 的值。如果数据为 nil，则使用默认值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51497,
+      56871,
+      13156,
+      20150,
+      51221,
+      51495,
+      15975
+    ],
+    "aspects": [
+      {
+        "aspect": "任务完成机制与效果",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "任务完成后，珍珠会念完相应台词之后才会送给玩家[[一包谢意]]。"
+          },
+          {
+            "pageid": 51497,
+            "quote": "每当玩家完成其中一项时，'''颗粒状传输（变异生物）'''将会在它们的尸体周围出现，提醒玩家当前任务进度或发放奖励。"
+          },
+          {
+            "pageid": 51221,
+            "quote": "完成[[寄居蟹隐士#任务|寄居蟹隐士的任务]]。"
+          },
+          {
+            "pageid": 51495,
+            "quote": "完成[[瓦格斯塔夫的战争瓦器人任务]]后"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "任务",
+    "任务完成",
+    "quest",
+    "回调",
+    "标签",
+    "任务进行",
+    "任务组件",
+    "任务驱动"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "任务",
+    "冒险",
+    "角色扮演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "caf79527828831081f19417e902fa5d4f9799800c4ec381b190bb8357e8d461f",
+    "source_bytes": 2659,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097285175
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stackable_replica.lua"
+  },
+  "category": "component",
+  "display_name": "stackable_replica",
+  "summary": "组件管理物品的堆叠数据，通过网络变量在客户端同步堆叠大小、最大容量等信息。它支持堆叠预览、查询堆叠状态，并参与物品合并与堆叠判断，是饥荒联机版物品堆叠系统的核心副本组件。",
+  "api": [
+    {
+      "name": "SetStackSize",
+      "effect": "设置当前堆叠大小，通过网络变量同步。堆叠大小减1后存储，上限为4095（超过时设为最大值63表示封顶），用于更新物品数量。"
+    },
+    {
+      "name": "SetPreviewStackSize",
+      "effect": "在客户端设置预览堆叠大小，用于UI显示临时堆叠值。接受堆叠大小、上下文和超时时间，超时后自动清除预览。"
+    },
+    {
+      "name": "ClearPreviewStackSize",
+      "effect": "清除客户端的预览堆叠大小，并取消相关超时任务，确保预览状态重置。"
+    },
+    {
+      "name": "GetPreviewStackSize",
+      "effect": "获取当前预览堆叠大小，基于物品的stackable_preview_context返回对应预览值，若无则返回nil。"
+    },
+    {
+      "name": "SetMaxSize",
+      "effect": "设置最大堆叠容量，将输入的预定义容量值转换为代码存储，用于控制物品堆叠上限。"
+    },
+    {
+      "name": "SetIgnoreMaxSize",
+      "effect": "设置是否忽略最大堆叠限制，通过布尔网络变量控制，开启后最大容量视为无限。"
+    },
+    {
+      "name": "StackSize",
+      "effect": "返回当前实际堆叠大小。优先返回预览堆叠值，否则计算网络变量（上位字节*64 + 下位字节 + 1）。"
+    },
+    {
+      "name": "MaxSize",
+      "effect": "返回最大堆叠容量。若忽略最大限制则返回无限大（math.huge），否则返回预定义的容量值。"
+    },
+    {
+      "name": "OriginalMaxSize",
+      "effect": "返回原始最大堆叠容量（不考虑忽略设置），始终返回预定义的容量值。"
+    },
+    {
+      "name": "IsStack",
+      "effect": "检查是否是堆叠物品，返回布尔值：堆叠大小大于1时为true。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查是否满堆叠，返回布尔值：堆叠大小达到或超过最大容量时为true。"
+    },
+    {
+      "name": "IsOverStacked",
+      "effect": "检查是否超堆叠，返回布尔值：堆叠大小超过原始最大容量时为true。"
+    },
+    {
+      "name": "CanStackWith",
+      "effect": "检查是否可与另一物品堆叠。若存在服务端堆叠组件则委托检查，否则比较预制物名称和动画皮肤，并可自定义检查函数。"
+    }
+  ],
+  "events_published": [
+    "inventoryitem_stacksizedirty"
+  ],
+  "events_listened": [
+    "stacksizedirty"
+  ],
+  "netvars": [
+    "_stacksize",
+    "_stacksizeupper",
+    "_ignoremaxsize",
+    "_maxsize"
+  ],
+  "tunables": [
+    "STACK_SIZE_MEDITEM",
+    "STACK_SIZE_SMALLITEM",
+    "STACK_SIZE_LARGEITEM",
+    "STACK_SIZE_TINYITEM",
+    "STACK_SIZE_PELLET"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      22552,
+      72441,
+      15011,
+      15012,
+      61070,
+      16584,
+      20079,
+      34096
+    ],
+    "aspects": [
+      {
+        "aspect": "原始堆叠数引用",
+        "evidence": [
+          {
+            "pageid": 72441,
+            "quote": "该物品的数量除以其原始的最大堆叠数，向上取整"
+          }
+        ]
+      },
+      {
+        "aspect": "取用数量限制描述",
+        "evidence": [
+          {
+            "pageid": 22552,
+            "quote": "一次只能拿取 40 个树枝"
+          },
+          {
+            "pageid": 34096,
+            "quote": "翻找到的数量最多为该物品的最大堆叠数"
+          }
+        ]
+      },
+      {
+        "aspect": "堆叠上限数值",
+        "evidence": [
+          {
+            "pageid": 16584,
+            "quote": "石砖的堆叠上限只有10"
+          },
+          {
+            "pageid": 20079,
+            "quote": "|堆叠=20"
+          }
+        ]
+      },
+      {
+        "aspect": "堆叠过度条件说明",
+        "evidence": [
+          {
+            "pageid": 72441,
+            "quote": "堆数|该物品的数量除以其原始的最大堆叠数，向上取整}}大于 14 时"
+          }
+        ]
+      },
+      {
+        "aspect": "无限堆叠行为描述",
+        "evidence": [
+          {
+            "pageid": 72441,
+            "quote": "扩展储存单元中的物品可以无限堆叠"
+          },
+          {
+            "pageid": 15011,
+            "quote": "升级后的箱子内的物品可以无限堆叠"
+          },
+          {
+            "pageid": 15012,
+            "quote": "升级后的龙鳞宝箱内的物品可以无限堆叠"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "堆叠",
+    "物品数量",
+    "堆叠上限",
+    "堆叠大小",
+    "客户端同步",
+    "堆叠预览",
+    "核心组件",
+    "最大堆叠"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "物品管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6ad4c63c07955aa4be30d3d144705fbf12915a6842981b1e66e8f666349ccfa5",
+    "source_bytes": 4227,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113039433
+  }
+}

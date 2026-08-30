@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forgerepairable.lua"
+  },
+  "category": "component",
+  "display_name": "forgerepairable",
+  "summary": "该组件管理实体的可修复状态和修复材料类型，用于游戏中修复损坏的物品。它通过添加/移除特定标签与铁匠修复机制交互，支持修复盔甲或燃料组件，参与生存和装备维护的核心玩法。",
+  "api": [
+    {
+      "name": "SetRepairMaterial",
+      "effect": "设置修复材料类型（如铁、金），更新组件内部数据。当修复材料变化时，自动移除旧材料标签并添加新材料标签（格式为forgerepairable_<material>），前提是实体可修复。"
+    },
+    {
+      "name": "SetRepairable",
+      "effect": "设置实体是否可修复（true或false）。当状态变化时，自动添加或移除当前修复材料对应的标签（格式为forgerepairable_<repairmaterial>），依赖于修复材料已设置。"
+    },
+    {
+      "name": "SetOnRepaired",
+      "effect": "设置修复成功后的回调函数（fn）。当修复操作成功执行时，调用该函数并传递实体、修复者和修复项作为参数。"
+    },
+    {
+      "name": "Repair",
+      "effect": "尝试修复实体：首先检查修复项是否具有forgerepair组件且材料匹配（repairmaterial），否则返回false；然后验证实体可修复状态；接着调用修复项组件的OnRepair方法。如果所有检查通过且OnRepair返回true，则触发onrepaired回调并返回true；否则返回false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      20058,
+      34792,
+      18216,
+      16057,
+      18534,
+      19954,
+      20061
+    ],
+    "aspects": [
+      {
+        "aspect": "使用材料恢复耐久",
+        "evidence": [
+          {
+            "pageid": 18534,
+            "quote": "可以用[[噩梦燃料]]或[[纯粹恐惧]]恢复耐久"
+          },
+          {
+            "pageid": 19954,
+            "quote": "自动修理机可以为{{item|W.A.R.B.I.S.头戴齿轮}}、{{item|W.A.R.B.I.S.盔甲}}和{{item|瓦器人}}修复 100% 的耐久。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "修复",
+    "铁匠",
+    "材料",
+    "盔甲",
+    "燃料",
+    "可修复",
+    "修复项",
+    "forgerepairable",
+    "repair"
+  ],
+  "gameplay_tags": [
+    "修复",
+    "装备",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ba3397a6bead07c908a34a88fc1446cf3e055f2bdf179e94a2ff0b27b30cb041",
+    "source_bytes": 1997,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091144188
+  }
+}

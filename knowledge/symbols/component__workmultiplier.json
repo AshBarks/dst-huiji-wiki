@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/workmultiplier.lua"
+  },
+  "category": "component",
+  "display_name": "workmultiplier",
+  "summary": "该组件管理实体在不同动作上的工作乘数，通过 SourceModifierList 支持多个来源的动态修改。核心玩法涉及调整挖掘、砍伐等动作的效率，影响资源收集或建造的速度。还允许设置自定义函数来解析特殊工作量，实现更灵活的游戏机制。",
+  "api": [
+    {
+      "name": "GetMultiplier",
+      "effect": "返回指定动作的当前总乘数。如果未设置乘数，则返回默认值 1。"
+    },
+    {
+      "name": "AddMultiplier",
+      "effect": "为指定动作添加乘数，使用 SourceModifierList 存储来自特定来源的乘数。多个来源的乘数会叠加计算，影响动作效率。"
+    },
+    {
+      "name": "RemoveMultiplier",
+      "effect": "从指定动作中移除来自特定来源的乘数。如果来源不存在或动作未设置乘数，则无操作。"
+    },
+    {
+      "name": "SetSpecialMultiplierFn",
+      "effect": "设置一个自定义函数，用于在 ResolveSpecialWorkAmount 中调用，以覆盖默认工作量解析逻辑。"
+    },
+    {
+      "name": "ResolveSpecialWorkAmount",
+      "effect": "解析工作量的特殊逻辑。如果设置了特殊函数，则调用它并返回结果；否则返回原始的 numworks 参数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      18825
+    ],
+    "aspects": [
+      {
+        "aspect": "砍树与岩石工作效率提升描述",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "海狸人啃咬的砍树效率+80%。<br>（啃咬大部分最大形态的[[树]]需要的次数 4 次→ 3 次）"
+          },
+          {
+            "pageid": 13406,
+            "quote": "岩石需要的次数 11 次→ 5 次"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "效率加成",
+    "挖掘效率",
+    "砍树效率",
+    "动作速度",
+    "来源调整",
+    "特殊动作",
+    "动态修改",
+    "乘数调整",
+    "工具加成",
+    "工作量计算"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "生存",
+    "资源收集",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3ff044fa35dc645b9b7af6df24d8d5a73c6f879fc78005d786e40d55d2cfbdbc",
+    "source_bytes": 1035,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092155249
+  }
+}

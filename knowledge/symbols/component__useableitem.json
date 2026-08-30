@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/useableitem.lua"
+  },
+  "category": "component",
+  "display_name": "useableitem",
+  "summary": "该组件管理物品的“正在使用”状态（inuse）及相关回调函数。它用于控制装备后物品的使用行为，例如在交互时检查状态、触发使用或停止事件。核心玩法涉及物品的激活与停用机制，影响玩家动作序列。",
+  "api": [
+    {
+      "name": "SetOnUseFn",
+      "effect": ""
+    },
+    {
+      "name": "SetOnStopUseFn",
+      "effect": ""
+    },
+    {
+      "name": "CanInteract",
+      "effect": ""
+    },
+    {
+      "name": "StartUsingItem",
+      "effect": ""
+    },
+    {
+      "name": "StopUsingItem",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      17978,
+      13409,
+      13642,
+      13823,
+      15225,
+      17930,
+      20193
+    ],
+    "aspects": [
+      {
+        "aspect": "物品可交互性说明",
+        "evidence": [
+          {
+            "pageid": 17978,
+            "quote": "也可以用于传送到懒人传送塔。"
+          },
+          {
+            "pageid": 17930,
+            "quote": "当第一位玩家右击使用传送塔时"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "使用物品",
+    "装备使用",
+    "可使用",
+    "使用状态",
+    "物品激活",
+    "停用事件",
+    "使用效果",
+    "状态检查"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "装备使用",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "756017c2b1c250bc775bc681e3eb8eadb3f788e952d0f995b472f9fad249c0da",
+    "source_bytes": 1066,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095207247
+  }
+}

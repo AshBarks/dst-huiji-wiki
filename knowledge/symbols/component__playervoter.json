@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playervoter.lua"
+  },
+  "category": "component",
+  "display_name": "playervoter",
+  "summary": "此组件管理玩家的投票状态数据，包括投票选择值、禁言状态以及是否可以投票。它参与饥荒联机版中的玩家投票系统，允许玩家通过提交投票来影响游戏世界决策，如服务器设置或事件触发。组件通过网络变量同步投票信息，支持客户端与服务器的交互，并处理超时刷新机制。",
+  "api": [
+    {
+      "name": "SubmitVote",
+      "effect": "验证投票选择值有效（大于CANNOT_VOTE且小于VOTE_PENDING）且当前状态为VOTE_PENDING时，立即更新本地投票状态并调用TheNet:Vote(sel)提交投票到服务器；同时启动超时任务（TIMEOUT秒后刷新状态）。"
+    },
+    {
+      "name": "SetSelection",
+      "effect": "仅在服务器端执行，设置分类器网络变量voteselection为sel，并触发投票变更事件playervotechanged。"
+    },
+    {
+      "name": "GetSelection",
+      "effect": "返回当前有效的投票选择值（整数）或nil（若未投票或状态无效）。"
+    },
+    {
+      "name": "HasVoted",
+      "effect": "返回布尔值，指示玩家是否已提交投票（即voteselection值大于CANNOT_VOTE且小于VOTE_PENDING）。"
+    },
+    {
+      "name": "CanVote",
+      "effect": "返回布尔值，指示玩家当前是否可以投票（即voteselection值等于VOTE_PENDING）。"
+    },
+    {
+      "name": "SetSquelched",
+      "effect": "仅在服务器端执行，设置分类器网络变量votesquelched为val，用于禁言玩家投票功能。"
+    },
+    {
+      "name": "IsSquelched",
+      "effect": "返回布尔值，指示玩家是否被禁言（若分类器不存在或votesquelched为true）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理操作：取消未完成的超时刷新任务，并断开与分类器的连接（服务器端置空分类器，客户端移除事件监听）。"
+    },
+    {
+      "name": "AttachClassified",
+      "effect": "连接分类器对象，设置事件监听以同步投票状态变更（voteselectiondirty事件），并建立onremove事件处理以自动分离连接。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "断开与分类器的连接，移除相关事件监听并置空相关引用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "playervotechanged"
+  ],
+  "events_listened": [
+    "onremove",
+    "voteselectiondirty"
+  ],
+  "netvars": [
+    "voteselection",
+    "votesquelched"
+  ],
+  "tunables": [
+    "TIMEOUT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      19595,
+      45891
+    ],
+    "aspects": [
+      {
+        "aspect": "投票发起命令描述",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "c_startvote(投票指令名，玩家实体或玩家ID)"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "投票",
+    "投票系统",
+    "投票状态",
+    "禁言状态",
+    "提交投票",
+    "网络同步",
+    "超时刷新",
+    "服务器设置",
+    "事件触发"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "社交",
+    "多人游戏",
+    "服务器管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "15c4e902b40950c551769b5f14477e8dc7e41a7b3259a83214fc3d6582ae89e1",
+    "source_bytes": 3977,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111302285
+  }
+}

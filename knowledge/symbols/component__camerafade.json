@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/camerafade.lua"
+  },
+  "category": "component",
+  "display_name": "camerafade",
+  "summary": "CameraFade组件管理实体的透明度(alpha)，根据摄像机位置、距离和特定符号位置动态计算淡入淡出效果。它控制实体在摄像机视野中的可见性，用于场景过渡或隐藏远处物体，增强视觉渲染体验。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用或禁用组件。启用时开始透明度更新；禁用时若instant参数为真，立即重置alpha为1并停止更新。"
+    },
+    {
+      "name": "SetUp",
+      "effect": "设置淡出参数：range为最大距离，fadetodist为淡入距离，影响透明度计算。"
+    },
+    {
+      "name": "SetUpCenterFade",
+      "effect": "设置基于指定符号位置的中心淡出参数：symbol为符号名称，min_dist_sq、dist_sq为距离平方阈值，min_fade为最小淡出比例。"
+    },
+    {
+      "name": "SetLerpToHeight",
+      "effect": "设置高度阈值height，用于线性插值透明度，当实体高度低于该值时渐变淡出。"
+    },
+    {
+      "name": "GetCurrentAlpha",
+      "effect": "返回当前实体的透明度(alpha)值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65605,
+      15415,
+      65881,
+      70704,
+      15022,
+      15225,
+      20113
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及相机、淡入淡出、透明度调整或相关组件能力，内容集中于游戏机制、实体行为、战斗和生成等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "淡入淡出",
+    "透明度",
+    "摄像机",
+    "alpha",
+    "位置",
+    "距离",
+    "场景过渡",
+    "隐藏物体",
+    "可见性",
+    "视觉效果"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "视觉",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d9488c86a047a6173ac0ac916b89800aec47ab4ac902ad27b9feab2ffed6594",
+    "source_bytes": 4033,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098804759
+  }
+}

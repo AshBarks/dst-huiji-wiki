@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/uniqueprefabids.lua"
+  },
+  "category": "component",
+  "display_name": "uniqueprefabids",
+  "summary": "UniquePrefabIDs组件管理一个名为topprefabids的表，用于存储每种预制件名称的当前最大ID计数器。它通过生成唯一整数ID来确保游戏中相同预制件的多个实例具有唯一标识，这可能在存档、生成或网络同步等核心玩法中用于实例区分。",
+  "api": [
+    {
+      "name": "GetNextID",
+      "effect": "接受预制件名称字符串，返回该名称的下一个唯一整数ID。副作用：递增内部topprefabids表中对应名称的计数器。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "无参数，返回包含topprefabids表的存档数据，用于游戏保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "接受数据表参数，将内部topprefabids表设置为data.topprefabids或空表，用于加载存档。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "无参数，返回字符串，显示所有预制件名称及其当前ID，用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      35007,
+      20714,
+      13281,
+      15853,
+      22703,
+      65605,
+      13934,
+      15335
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及“component__uniqueprefabids”或其相关能力（GetNextID、OnSave、OnLoad、GetDebugString）的玩家语言表达。所有页面内容涉及存档、控制台、角色、烹饪指南等通用游戏机制，未针对该符号的特定能力进行讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "唯一ID",
+    "预制件ID",
+    "ID生成器",
+    "存档",
+    "调试字符串",
+    "计数器",
+    "实例管理",
+    "topprefabids",
+    "GetNextID"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "唯一标识管理",
+    "存档系统",
+    "生成系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "123fe6b4ad232a19dd2de5e52ca90d66cc486a6d079e1ba2091ed7b57bd4429e",
+    "source_bytes": 783,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113402734
+  }
+}

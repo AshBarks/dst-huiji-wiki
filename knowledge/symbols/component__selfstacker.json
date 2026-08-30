@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/selfstacker.lua"
+  },
+  "category": "component",
+  "display_name": "selfstacker",
+  "summary": "SelfStacker组件管理物品的自动堆叠功能，允许实体在满足条件时（如不被持有、未满堆叠、未燃烧等）寻找附近同类物品进行合并。核心玩法涉及资源收集和物品管理的自动化，减少玩家手动操作。",
+  "api": [
+    {
+      "name": "SetIgnoreMovingFast",
+      "effect": "设置是否忽略快速移动检查。副作用：修改ignoremovingfast变量为true或nil。"
+    },
+    {
+      "name": "CanSelfStack",
+      "effect": "检查当前实体是否可以堆叠。返回布尔值，基于条件如不被陷阱捕获、不燃烧、不在库存中、堆叠未满、不被持有、移动速度低于阈值且无堆叠伙伴。无副作用。"
+    },
+    {
+      "name": "FindItemToStackWith",
+      "effect": "在搜索半径内查找可堆叠的同类物品。副作用：设置自身和伙伴的stackpartner变量，返回找到的实体或nil。"
+    },
+    {
+      "name": "DoStack",
+      "effect": "执行堆叠操作。副作用：取消现有堆叠任务，查找堆叠伙伴并合并堆叠数量，修改堆叠组件状态。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体移除时调用。副作用：取消堆叠任务并移除selfstacker标签。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用。副作用：重置堆叠伙伴，若可堆叠则启动随机延迟的堆叠任务。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      17948,
+      20538,
+      46858,
+      17926
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本专注于食物物品的烹饪用途、属性（如肉度）和游戏效果（如猪人变狂暴），未提及任何与堆叠、自我堆叠、实体移除或唤醒等组件能力相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "自动物品堆叠",
+    "合并附近资源",
+    "堆叠条件管理",
+    "游戏内自动合并",
+    "DST堆叠功能",
+    "资源整理自动化",
+    "物品自动合并",
+    "堆叠机制触发"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "物品管理",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d78ed87bb0950730ac48d57f2474126c9e296c0e9c41f11a256db542accdec41",
+    "source_bytes": 2414,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094360689
+  }
+}

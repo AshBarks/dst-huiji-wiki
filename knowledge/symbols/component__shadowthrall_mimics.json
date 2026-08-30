@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowthrall_mimics.lua"
+  },
+  "category": "component",
+  "display_name": "shadowthrall_mimics",
+  "summary": "该组件管理影子仆从模仿者的生成逻辑，根据裂隙状态和游戏内时间（如夜晚）在玩家附近动态创建模仿者。模仿者复制玩家附近的物品作为威胁，增加游戏的挑战性。它监听裂隙事件和玩家状态，自动调整生成计划。",
+  "api": [
+    {
+      "name": "IsTargetMimicable",
+      "effect": "检查目标实体是否满足模仿条件：必须具有itemmimic_data.MUST_TAGS标签且没有itemmimic_data.CANT_TAGS标签。无副作用，仅返回布尔值。"
+    },
+    {
+      "name": "SpawnMimicFor",
+      "effect": "为给定物品尝试生成一个模仿者。如果物品可模仿（通过IsTargetMimicable检查），则生成模仿者实体并返回true和模仿者实体；否则返回nil。副作用：生成模仿者实体和阴影特效。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件是否启用，基于_rift_enabled_modifiers修改器的状态（由裂隙事件控制）。无副作用，仅返回布尔值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前活跃模仿者数量和组件启用状态。无副作用，仅用于调试输出。"
+    },
+    {
+      "name": "Debug_PlayerSpawns",
+      "effect": "为指定玩家启动模仿生成尝试任务。副作用：可能触发模仿者生成，类似于正常生成流程。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_riftaddedtopool",
+    "ms_riftremovedfrompool"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ITEMMIMIC_CAP"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23957,
+      23956,
+      34314,
+      65456,
+      19595,
+      65881,
+      19307,
+      34557
+    ],
+    "aspects": [
+      {
+        "aspect": "入侵型虚影生成行为描述",
+        "evidence": [
+          {
+            "pageid": 23957,
+            "quote": "生成 4 ~ 6 波入侵型虚影后，裂隙就会消失"
+          },
+          {
+            "pageid": 65456,
+            "quote": "将会有一只[[入侵型虚影]]生成并前往入侵尸体"
+          },
+          {
+            "pageid": 65881,
+            "quote": "在[[月亮裂隙循环]]开启后，裂隙存在期间启动工厂后可能会吸引大量[[入侵型虚影]]"
+          }
+        ]
+      },
+      {
+        "aspect": "裂隙循环启用控制",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[月亮裂隙循环]]的开启和关闭。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "裂隙",
+    "夜晚生成",
+    "黑暗生物",
+    "物品复制",
+    "动态生成",
+    "威胁生物",
+    "事件监听",
+    "玩家状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d7beedde103e16ac1c4f2bc4e90951552f199510a6b81b8e979d8e0f0942cade",
+    "source_bytes": 8288,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112274680
+  }
+}

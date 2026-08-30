@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nightmareclock.lua"
+  },
+  "category": "component",
+  "display_name": "nightmareclock",
+  "summary": "噩梦时钟组件管理洞穴中噩梦阶段的周期变化，包括平静、警告、狂暴和黎明四个阶段及其持续时间。它通过网络变量同步数据到客户端，并控制环境音效和事件发布，核心玩法涉及洞穴生存、区域感知和怪物生成。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法，所有交互通过事件监听和发布进行。",
+  "events_published": [
+    "nightmarephasechanged",
+    "nightmareclocktick"
+  ],
+  "events_listened": [
+    "nightmarephasedirty",
+    "playeractivated",
+    "playerdeactivated",
+    "ms_setnightmaresegs",
+    "ms_setnightmarephase",
+    "ms_nextnightmarephase",
+    "ms_nextnightmarecycle",
+    "ms_locknightmarephase"
+  ],
+  "netvars": [
+    "nightmareclock._segs.calm",
+    "nightmareclock._segs.warn",
+    "nightmareclock._segs.wild",
+    "nightmareclock._segs.dawn",
+    "nightmareclock._phase",
+    "nightmareclock._totaltimeinphase",
+    "nightmareclock._remainingtimeinphase"
+  ],
+  "tunables": [
+    "NIGHTMARE_SEGS",
+    "SEG_TIME",
+    "NIGHTMARE_SEG_VARIATION"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13897,
+      20152,
+      19802,
+      20154,
+      14935,
+      15551,
+      24892,
+      24896
+    ],
+    "aspects": [
+      {
+        "aspect": "暗影生物在巢穴中的生成机制",
+        "evidence": [
+          {
+            "pageid": 24892,
+            "quote": "若不满上限，每 30 秒就会生成一只新的"
+          },
+          {
+            "pageid": 24896,
+            "quote": "循环的暴动阶段每 5 秒释放一只出来。"
+          }
+        ]
+      },
+      {
+        "aspect": "梦魇循环各阶段持续时间",
+        "evidence": [
+          {
+            "pageid": 19802,
+            "quote": "*平静阶段会持续 360 ~ 450 秒（6 分钟 ~ 7 分 30 秒"
+          },
+          {
+            "pageid": 19802,
+            "quote": "*警告阶段持续 90 ~ 180 秒（1 分 30 秒 ~ 3 分钟"
+          },
+          {
+            "pageid": 19802,
+            "quote": "*暴动阶段持续 150 ~ 240 秒（2 分 30 秒 ~ 4 分钟"
+          },
+          {
+            "pageid": 19802,
+            "quote": "*黎明阶段持续 60 ~ 150 秒（1 分钟 ~ 2 分 30 秒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "噩梦周期",
+    "洞穴噩梦",
+    "阶段切换",
+    "网络同步",
+    "环境音效",
+    "怪物生成",
+    "区域感知",
+    "狂暴状态",
+    "平静期",
+    "警告音效"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 7/10)",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "08a7bf601285335c5efbc5c381a22a60116ec92edb25660425af04967950f48b",
+    "source_bytes": 10604,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110358686
+  }
+}

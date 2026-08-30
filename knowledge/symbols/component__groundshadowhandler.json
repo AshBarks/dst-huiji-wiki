@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/groundshadowhandler.lua"
+  },
+  "category": "component",
+  "display_name": "groundshadowhandler",
+  "summary": "该组件管理一个地面阴影实体，用于在宿主实体下方显示动态阴影。它根据宿主实体的世界位置和高度自动调整阴影的位置和大小，提供视觉深度效果，参与游戏的视觉表现系统。",
+  "api": [
+    {
+      "name": "SetSize",
+      "effect": "设置阴影的原始宽度和高度，并立即应用到动态阴影。副作用：存储原始尺寸，用于后续更新时的缩放计算。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当宿主实体被移除时，移除阴影实体并清空引用，确保资源清理。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      14688,
+      15054,
+      19296,
+      19297,
+      19300,
+      19661,
+      19693
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 groundshadowhandler 组件的任何能力表达，SetSize（设置大小）和 OnRemoveEntity（实体移除时的行为）均未在提供的页面中以数值、行为描述或策略段落形式体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "地面阴影",
+    "动态阴影",
+    "阴影位置",
+    "阴影大小",
+    "视觉效果",
+    "阴影调整",
+    "高度影响"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5e253e6e73756805a11b7c380f2e33867ea64643088cc3fba52f06c7071d9b04",
+    "source_bytes": 1583,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093325044
+  }
+}

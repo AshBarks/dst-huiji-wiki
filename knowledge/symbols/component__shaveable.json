@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shaveable.lua"
+  },
+  "category": "component",
+  "display_name": "shaveable",
+  "summary": "该组件管理实体是否可被剃毛的数据，包括奖励预制物、数量、剃毛条件及回调。它允许其他实体使用剃毛工具对该实体进行剃毛操作，生成奖励物品并触发自定义行为，常用于角色胡子或动物毛发剃取等生存互动玩法。",
+  "api": [
+    {
+      "name": "SetPrize",
+      "effect": "设置剃毛后产生的奖励预制物类型（prize_prefab）和数量（prize_count），用于后续剃毛时生成物品。"
+    },
+    {
+      "name": "CanShave",
+      "effect": "检查是否可以剃毛，依赖自定义条件函数（can_shave_test）判断剃毛者和工具是否符合条件，返回布尔值和可选原因。"
+    },
+    {
+      "name": "Shave",
+      "effect": "执行剃毛操作，先通过CanShave验证；若可剃，则生成prize_count个prize_prefab物品，根据剃毛者存在与否将物品交给剃毛者或发射到空中，最后调用on_shaved回调并返回成功。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，自动移除实体的“bearded”标签，清理状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含当前prize_count的表，用于游戏存档保存剃毛进度。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中加载prize_count，恢复剃毛状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，显示prize_count和prize_prefab，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      10355,
+      13457,
+      22094,
+      14426,
+      13199,
+      14649,
+      23202
+    ],
+    "aspects": [
+      {
+        "aspect": "剃须能力描述",
+        "evidence": [
+          {
+            "pageid": 10355,
+            "quote": "可以用[[剃刀]]剃须，使胡须长度降低一个阶段，掉落一定数量的[[胡须]]，同时回复 10 {{理智值}}。"
+          },
+          {
+            "pageid": 14649,
+            "quote": "部分[[角色]]可以用来给自己刮胡子，回复 10{{理智值}} 并掉落当前生长状态所对应的物品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "剃毛",
+    "刮胡子",
+    "胡子",
+    "奖励",
+    "剃刀",
+    "互动",
+    "资源生成",
+    "可剃毛",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "互动",
+    "资源"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "577c77f27222d8774b83bddba6847f5c810f2273e8fc91c08a0e50e5c3a7b3f1",
+    "source_bytes": 2141,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097498443
+  }
+}

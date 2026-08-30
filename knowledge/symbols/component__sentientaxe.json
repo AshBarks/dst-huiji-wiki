@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sentientaxe.lua"
+  },
+  "category": "component",
+  "display_name": "sentientaxe",
+  "summary": "该组件管理一把智能斧头（如Lucy）的状态和行为，跟踪所有者并监听玩家事件。当所有者执行特定动作（如砍伐、建造或变身）时，组件会触发斧头的对话和警告。这增强了游戏的互动性和角色扮演元素，使斧头能够与玩家进行动态交流。",
+  "api": [
+    {
+      "name": "SetOwner",
+      "effect": "设置所有者，清理之前所有者相关的事件监听，并为新所有者设置事件监听。如果新所有者存在且斧头已装备，会触发拾取对话。重置警告级别、低警告状态和雕刻对话记录。"
+    },
+    {
+      "name": "OnBuildItem",
+      "effect": "当所有者建造物品时调用，基于配方名称触发斧头的雕刻对话。冷却时间由TUNING.LUCY_CARVING_TALK_COOLDOWN控制。"
+    },
+    {
+      "name": "OnFinishedWork",
+      "effect": "当所有者完成工作（如砍伐）且斧头已装备时调用，触发斧头的砍伐完成对话。"
+    },
+    {
+      "name": "OnWereEaterChanged",
+      "effect": "当所有者的饥饿等级变化时调用，如果等级上升且斧头在物品栏中，会触发警告对话（早期或晚期警告）。"
+    },
+    {
+      "name": "OnBecomeHuman",
+      "effect": "当所有者变回人类且在附近时调用，触发斧头的变回人类对话。如果不在附近，取消说话任务。"
+    },
+    {
+      "name": "OnBecomeWere",
+      "effect": "当所有者变成海狸且在附近时调用，触发斧头的变成海狸对话。如果不在附近，取消说话任务。"
+    },
+    {
+      "name": "Say",
+      "effect": "使斧头说话，使用对话列表、可选声音覆盖和延迟。如果有延迟，调度说话任务；否则立即执行对话并重新调度自动对话。"
+    },
+    {
+      "name": "ShouldMakeConversation",
+      "effect": "检查是否应该进行对话，基于所有者状态：所有者存在、未死亡、未处于变身状态、未标记为海狸玩家或玩家幽灵。"
+    },
+    {
+      "name": "ScheduleConversation",
+      "effect": "调度一次自动对话，延迟为指定值或默认10-15秒随机。取消现有对话任务。"
+    },
+    {
+      "name": "MakeConversation",
+      "effect": "执行一次自动对话，根据斧头位置（地面、装备或容器中）触发相应对话。如果条件不满足，重新调度对话。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "axepossessedbyplayer",
+    "axerejectedowner",
+    "axerejectedotheraxe",
+    "ondropped",
+    "equipped",
+    "builditem",
+    "finishedwork",
+    "wereeaterchanged",
+    "startwereplayer",
+    "stopwereplayer"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LUCY_CARVING_TALK_COOLDOWN"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      18829,
+      15250,
+      65881,
+      28621,
+      45439,
+      15421,
+      16640
+    ],
+    "aspects": [
+      {
+        "aspect": "伍迪的诅咒变身描述",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "他的形态不仅会变身为海狸，还能变身为鹿人和鹅人…"
+          }
+        ]
+      },
+      {
+        "aspect": "露西斧的对话内容",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "内容大多为怂恿伍迪砍树或和他闲聊"
+          }
+        ]
+      },
+      {
+        "aspect": "露西斧的语音功能",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "露西斧会用红色的字体说话，台词位于角色下方与角色本身台词区分。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "智能斧头",
+    "Lucy",
+    "对话",
+    "说话",
+    "警告",
+    "所有者",
+    "砍伐",
+    "建造",
+    "变身",
+    "海狸"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "互动",
+    "工具",
+    "角色扮演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d2371d5b3a9b39ba190c4251965d701305a4ba3ff6dec361ce844bf304d02c17",
+    "source_bytes": 7583,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103247229
+  }
+}

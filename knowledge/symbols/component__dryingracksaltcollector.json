@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dryingracksaltcollector.lua"
+  },
+  "category": "component",
+  "display_name": "dryingracksaltcollector",
+  "summary": "该组件用于管理干燥架上的盐收集功能，通过槽位系统跟踪盐的存储状态并维护盐的总数量。当盐数量变化时，会触发预设的回调函数。该组件参与盐的收集和干燥架的运作。",
+  "api": [
+    {
+      "name": "SetOnSaltChangedFn",
+      "effect": "设置一个回调函数，当盐数量变化时调用。"
+    },
+    {
+      "name": "AddSalt",
+      "effect": "在指定槽位添加盐；如果槽位未被占用，则设置槽位状态为真，增加盐数量，并触发回调函数。"
+    },
+    {
+      "name": "RemoveSalt",
+      "effect": "从指定槽位移除盐；如果槽位被占用，则清除槽位状态，减少盐数量，并触发回调函数。"
+    },
+    {
+      "name": "HasSalt",
+      "effect": "检查指定槽位是否有盐；如果提供槽位参数，返回该槽位状态；否则返回是否有任何盐（盐数量大于零）。"
+    },
+    {
+      "name": "GetNumSalts",
+      "effect": "返回当前盐的数量。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态；如果盐数量大于零，则返回包含槽位列表的数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载组件状态，恢复槽位和盐数量，并触发回调函数。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      70704,
+      20714,
+      15734,
+      35007,
+      61804,
+      15386,
+      28179
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论工厂合集、控制台命令、特定实体行为（如热源寻找、生物孵化）、存档机制和加载屏幕，但没有提及盐收集、晾肉架或组件能力（如盐变化、添加/移除盐等）的任何相关描述，因此无法找到玩家语言表达的证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "晒肉架",
+    "盐收集器",
+    "盐存储槽",
+    "盐量",
+    "槽位",
+    "回调",
+    "保存",
+    "加载",
+    "管盐"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "64cb48cfdd2f93df783540ae9a98268d5ea16c6651dcb00b2a24ed431abce264",
+    "source_bytes": 1591,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107007276
+  }
+}

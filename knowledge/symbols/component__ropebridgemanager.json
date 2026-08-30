@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ropebridgemanager.lua"
+  },
+  "category": "component",
+  "display_name": "ropebridgemanager",
+  "summary": "该组件管理绳索桥的生命周期，包括创建、伤害和销毁。它使用数据网格跟踪桥梁的健康值、方向和动画状态，并处理地震事件对桥梁的破坏。核心玩法涉及玩家建造桥梁以及环境事件（如地震）对桥梁的影响。",
+  "api": [
+    {
+      "name": "IsPointProtectedFromQuakes",
+      "effect": "检查指定世界坐标是否有地震阻挡器存在。如果存在，则返回 true，表示该点受保护；否则返回 false。"
+    },
+    {
+      "name": "OnQuaked",
+      "effect": "处理地震事件。遍历所有绳索桥地块，对未受地震保护的桥梁造成固定伤害（由 TUNING.ROPEBRIDGE_EARTHQUAKE_DAMAGE_TAKEN 定义），并更新桥梁健康值。"
+    },
+    {
+      "name": "OnStartQuake",
+      "effect": "启动地震处理任务。取消现有地震任务，然后根据地震数据（如 debrisperiod）延迟后调用 OnQuaked 方法。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "组件初始化后，在 TheWorld.net 上监听 'startquake' 事件，以响应地震事件。"
+    },
+    {
+      "name": "CreateRopeBridgeAtPoint",
+      "effect": "在指定世界坐标创建绳索桥。将地块类型设置为 ROPE_BRIDGE，存储桥梁数据（健康值、方向），并生成桥梁动画预制体。返回 true 表示成功创建。"
+    },
+    {
+      "name": "CreateRopeBridgeAtTile",
+      "effect": "在指定地块坐标创建绳索桥。设置地块类型、存储数据、生成动画，并处理底层地块记录。与 CreateRopeBridgeAtPoint 功能类似，但使用地块坐标。"
+    },
+    {
+      "name": "QueueCreateRopeBridgeAtPoint",
+      "effect": "队列化创建绳索桥。在指定世界坐标延迟一段时间（可配置）后执行创建，避免立即创建。"
+    },
+    {
+      "name": "DestroyRopeBridgeAtPoint",
+      "effect": "立即销毁指定世界坐标的绳索桥。移除伤害预制体、恢复原地块类型、清理相关数据网格条目，并播放临时瓦片变化效果。返回 true 表示成功销毁。"
+    },
+    {
+      "name": "QueueDestroyForRopeBridgeAtPoint",
+      "effect": "队列化销毁绳索桥。在指定世界坐标延迟后执行销毁，并可能播放破坏动画（如震动和警告效果）。"
+    },
+    {
+      "name": "DamageRopeBridgeAtPoint",
+      "effect": "对指定世界坐标的绳索桥造成伤害。减少健康值并更新伤害显示预制体。如果健康值降至 0，则队列化销毁桥梁。返回新的健康值。"
+    },
+    {
+      "name": "DamageRopeBridgeAtTile",
+      "effect": "对指定地块的绳索桥造成伤害。功能与 DamageRopeBridgeAtPoint 类似，但使用地块坐标。"
+    },
+    {
+      "name": "SpawnDamagePrefab",
+      "effect": "根据桥梁健康值生成或更新伤害显示预制体。如果健康值低于最大值，则生成或更新 'dock_damage' 预制体；否则移除该预制体。"
+    },
+    {
+      "name": "SpawnBridgeAnim",
+      "effect": "在指定位置生成桥梁动画预制体（'rope_bridge_fx'），并设置旋转和图标偏移。如果游戏正在填充世界，则跳过预动画。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括标记删除网格和持续时间网格。返回压缩编码后的保存数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，恢复标记删除网格和持续时间网格。对于已标记删除的地块，重启销毁任务；对于健康数据，重新生成动画和伤害预制体。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "startquake"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ROPEBRIDGE_EARTHQUAKE_TIMETOBREAK",
+    "ROPEBRIDGE_EARTHQUAKE_DAMAGE_TAKEN",
+    "ROPEBRIDGE_HEALTH",
+    "ROPEBRIDGE_LENGTH_TILES",
+    "QUAKE_BLOCKER_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      28733
+    ],
+    "aspects": [
+      {
+        "aspect": "地震伤害耐久损失",
+        "evidence": [
+          {
+            "pageid": 28733,
+            "quote": "地震]]时就会损失 50 点耐久。"
+          }
+        ]
+      },
+      {
+        "aspect": "建造桥梁消耗套件",
+        "evidence": [
+          {
+            "pageid": 28733,
+            "quote": "建造桥梁时，每跨过一格地块则消耗 1 个套件，且一次性消耗所有所需的套件。"
+          }
+        ]
+      },
+      {
+        "aspect": "桥梁耐久数值标注",
+        "evidence": [
+          {
+            "pageid": 28733,
+            "quote": "具有 200 点耐久"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Rope Bridge",
+    "绳桥",
+    "桥梁生命周期",
+    "地震破坏",
+    "网格系统",
+    "健康值管理",
+    "建造桥梁",
+    "环境事件"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "建造",
+    "生存",
+    "破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa643d325a5ea0b3c32b7a9bb8673dc1cbdaf6f83675cf637607c0b5f49a9028",
+    "source_bytes": 14185,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111948439
+  }
+}

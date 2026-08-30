@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/explosive.lua"
+  },
+  "category": "component",
+  "display_name": "explosive",
+  "summary": "该组件管理实体爆炸时的属性数据，包括爆炸范围、伤害值和建筑伤害。它参与核心玩法中的战斗与破坏机制，当实体被点燃或触发时，对周围实体造成伤害并推动相关事件。",
+  "api": [
+    {
+      "name": "SetOnExplodeFn",
+      "effect": "设置爆炸发生时的回调函数，该函数在爆炸开始时被调用。"
+    },
+    {
+      "name": "SetAttacker",
+      "effect": "设置攻击者实体，用于爆炸后仇恨系统的指向。"
+    },
+    {
+      "name": "SetPvpAttacker",
+      "effect": "设置PvP攻击者实体，用于PvP模式下的仇恨系统。"
+    },
+    {
+      "name": "OnBurnt",
+      "effect": "触发爆炸的主要方法。它执行屏幕闪烁、摄像机震动，对周围实体造成伤害，点燃可燃物，破坏工作物，并推动爆炸和死亡事件。副作用包括移除自身实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "explosion",
+    "entity_death",
+    "death"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "EXPLOSIVE_MAX_WORKABLE_INVENTORYITEMS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      15022,
+      15922,
+      15651,
+      20150,
+      13701,
+      15539,
+      10379
+    ],
+    "aspects": [
+      {
+        "aspect": "爆炸伤害类型描述",
+        "evidence": [
+          {
+            "pageid": 20150,
+            "quote": "存在此标签时，对具有[[爆炸抗性]]的敌人造成更少的物理伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "爆炸",
+    "伤害",
+    "范围",
+    "点燃",
+    "建筑破坏",
+    "仇恨",
+    "死亡",
+    "屏幕闪烁",
+    "摄像机震动",
+    "工作物"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "破坏",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f4d39182518429468cafc7e886ece85a22a857194ed2eeb3fdf2fb06f4829aa5",
+    "source_bytes": 5075,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093953650
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bosstargeter.lua"
+  },
+  "category": "component",
+  "display_name": "bosstargeter",
+  "summary": "该组件用于管理Boss实体的目标选择数据，参与饥荒联机版的战斗系统。它允许Boss指定攻击目标，影响仇恨机制和战斗策略。",
+  "api": [],
+  "api_note": "源码为空，无公开方法定义",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      13701,
+      51046,
+      13823,
+      15551,
+      15922,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "第一形态的天体英雄会主动仇恨并追击 20 {{解释|距离单位}}内的[[拟角色]]、[[怪物]]与[[暗影傀儡]]"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 {{解释|距离单位}}内的玩家目标"
+          },
+          {
+            "pageid": 13701,
+            "quote": "织影者主动仇恨远古大门所在房间内距离织影者小于 9 单位或距离远古大门小于 7 单位的玩家"
+          },
+          {
+            "pageid": 13823,
+            "quote": "独眼巨鹿会主动攻击 16 {{解释|距离单位}}内能进行[[攻击|战斗]]的单位"
+          }
+        ]
+      },
+      {
+        "aspect": "目标丢失条件",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯远离赃物袋 30 单位后立即丢失目标"
+          },
+          {
+            "pageid": 13701,
+            "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨。"
+          },
+          {
+            "pageid": 13823,
+            "quote": "若追逐目标的时间达到 20 秒或离目标超过 32 距离单位，独眼巨鹿会丢失仇恨。"
+          }
+        ]
+      },
+      {
+        "aspect": "目标选择优先级",
+        "evidence": [
+          {
+            "pageid": 13823,
+            "quote": "周围有 4 个及以上[[建筑]]的玩家优先"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Boss",
+    "目标",
+    "仇恨",
+    "攻击",
+    "战斗",
+    "目标器",
+    "怪物",
+    "玩家"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_bytes": 0,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105748739
+  }
+}

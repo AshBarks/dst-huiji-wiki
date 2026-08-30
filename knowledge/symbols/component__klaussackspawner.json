@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/klaussackspawner.lua"
+  },
+  "category": "component",
+  "display_name": "klaussackspawner",
+  "summary": "该组件管理克劳斯包裹在冬季期间的生成与重生机制。它处理生成点的注册、包裹的生成逻辑，并控制每个冬季的生成次数。核心玩法涉及玩家与包裹互动以召唤克劳斯BOSS。",
+  "api": [
+    {
+      "name": "GetKlausSack",
+      "effect": "返回当前有效的克劳斯包裹实体；如果包裹不存在或无效，则返回nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_registerdeerspawningground",
+    "ms_registerklaussack",
+    "ms_restoreklaussackkey",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "KLAUSSACK_SPAWN_DELAY",
+    "KLAUSSACK_SPAWN_DELAY_VARIANCE",
+    "KLAUSSACK_MAX_SPAWNS",
+    "KLAUSSACK_EVENT_RESPAWN_TIME",
+    "KLAUSSACK_RESPAWN_DELAY",
+    "SPAWN_KLAUS",
+    "TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      23187,
+      13897,
+      19832,
+      20714,
+      52788,
+      65605,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "赃物袋生成时间与地点",
+        "evidence": [
+          {
+            "pageid": 19832,
+            "quote": "在[[冬季]]的第 2 ~ 3 天，随机选择一个[[无眼鹿生成地]]生成一个赃物袋"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "克劳斯",
+    "包裹",
+    "冬季",
+    "生成",
+    "重生",
+    "BOSS",
+    "节日",
+    "克劳斯包裹",
+    "冬季BOSS"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "节日活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d4d5b4153f101305885993a5b1e7e646c4ef0502eb2da14896ab0b91ed6d50e",
+    "source_bytes": 9316,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109069866
+  }
+}

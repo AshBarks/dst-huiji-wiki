@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/squidspawner.lua"
+  },
+  "category": "component",
+  "display_name": "squidspawner",
+  "summary": "squidspawner组件负责在海洋中生成鱿鱼群，基于当前玩家位置、时间（夜晚或黄昏）和月相调整生成概率和数量。它管理活跃玩家列表，并监听世界状态和玩家事件来触发定时生成任务。核心玩法中，鱿鱼作为海洋生物资源出现，影响玩家的渔业活动和生存挑战。",
+  "api": [
+    {
+      "name": "Debug_ForceTestForSquid",
+      "effect": "强制执行鱿鱼生成测试，忽略时间条件（如白天），立即尝试在玩家位置附近生成鱿鱼群，用于调试目的。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SQUID_TEST_RADIUS",
+    "SQUID_MAX_NUMBERS",
+    "SQUID_CHANCE",
+    "SQUID_MAX_FISH",
+    "SEG_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      20714,
+      34523,
+      34314,
+      15022,
+      28179,
+      24544,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及 component__squidspawner 组件或 Debug_ForceTestForSquid 调试能力的具体表达。页面 34314 提到了鱿鱼的生成概率，但那是世界规则设置，与组件能力无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鱿鱼",
+    "生成",
+    "海洋",
+    "月相",
+    "夜晚",
+    "拖网机",
+    "鱼群",
+    "玩家",
+    "随机",
+    "资源"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "海洋",
+    "生物生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ec0fee95f3b72b2d7f8a5d378f89616328eebfff4c77dee69acbb34eb07a3eb1",
+    "source_bytes": 6584,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113034447
+  }
+}

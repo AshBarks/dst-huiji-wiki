@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bedazzler.lua"
+  },
+  "category": "component",
+  "display_name": "bedazzler",
+  "summary": "Bedazzler 组件管理对实体进行 bedazzle 操作的数据与逻辑。它允许设置使用量以控制工具耐久消耗，并在执行 bedazzle 前检查目标状态，确保目标未燃烧、未冻结且未已被装饰。该组件参与游戏中通过工具装饰物体的核心玩法。",
+  "api": [
+    {
+      "name": "SetUseAmount",
+      "effect": "更新组件内部的 use_amount 参数，无其他副作用。"
+    },
+    {
+      "name": "CanBedazzle",
+      "effect": "查询目标状态，返回布尔值和错误原因字符串（如'BURNING'、'BURNT'、'FROZEN'或'ALREADY_BEDAZZLED'），无副作用。"
+    },
+    {
+      "name": "Bedazzle",
+      "effect": "调用目标的 bedazzlement 组件的 Start 方法，如果自身有 finiteuses 组件则消耗指定使用量（默认为1），从而修改目标状态和工具耐久。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      20496,
+      20511,
+      10374,
+      70704,
+      13493,
+      18231,
+      52634
+    ],
+    "aspects": [
+      {
+        "aspect": "装饰效果的影响描述",
+        "evidence": [
+          {
+            "pageid": 18231,
+            "quote": "装饰后蛛网地块都会缩小至 4 {{解释|距离单位}}之内"
+          }
+        ]
+      },
+      {
+        "aspect": "装饰物品的使用对象限制",
+        "evidence": [
+          {
+            "pageid": 18231,
+            "quote": "蛛巢装饰套装只能使用在蜘蛛巢上"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "bedazzle",
+    "装饰",
+    "闪亮",
+    "工具耐久",
+    "状态检查",
+    "燃烧",
+    "冻结",
+    "已装饰",
+    "使用量",
+    "目标检查"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "63548f3ed7eabc144cf16b5def9a7459be6b44b82977883116d2270b9cc27ee8",
+    "source_bytes": 819,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098227434
+  }
+}

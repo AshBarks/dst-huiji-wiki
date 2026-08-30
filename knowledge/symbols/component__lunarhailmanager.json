@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarhailmanager.lua"
+  },
+  "category": "component",
+  "display_name": "lunarhailmanager",
+  "summary": "组件管理月圆冰雹风暴期间的碎片掉落事件。它监控玩家位置，调度碎片生成并处理碎片着陆行为，包括对玩家造成伤害和影响作物状态。组件考虑地形保护机制，并支持自定义碎片掉落表。",
+  "api": [
+    {
+      "name": "SetDebris",
+      "effect": "设置默认的碎片掉落表，仅在主机模拟上执行，修改风暴中掉落的物品类型和权重。"
+    },
+    {
+      "name": "SetTagDebris",
+      "effect": "为特定地形标签设置额外的碎片掉落表，仅在主机模拟上执行，允许根据地形定制掉落内容。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LUNARHAIL_DEBRIS_SPAWN_SCALE_RATE_MIN",
+    "LUNARHAIL_DEBRIS_SPAWN_SCALE_RATE_MAX",
+    "LUNARHAIL_DEBRIS_DAMAGE_RADIUS",
+    "LUNARHAIL_DEBRIS_DAMAGE",
+    "LUNARHAIL_DEBRIS_KEEP_CHANCE",
+    "LUNARHAIL_DEBRIS_LIFETIME",
+    "LUNARHAIL_DEBRIS_SPAWN_RADIUS",
+    "SHADE_CANOPY_RANGE",
+    "SHADE_CANOPY_RANGE_SMALL",
+    "LAUNCH_SPEED_SMALL"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      35814,
+      15183,
+      10379,
+      13556,
+      13698,
+      13823,
+      15133,
+      15295
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及lunarhailmanager组件或其能力SetDebris、SetTagDebris的任何相关表达，内容主要涉及角色、生物和建筑等其他实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月圆冰雹风暴",
+    "碎片坠落",
+    "碎片生成",
+    "玩家伤害",
+    "作物影响",
+    "地形保护",
+    "碎片掉落表",
+    "风暴事件"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境事件",
+    "农业",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "915ed826b2714271ec0a020e6781e18cc2485e50e7bfaf4949166a0402b367d7",
+    "source_bytes": 16102,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109280113
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fertilizerresearchable.lua"
+  },
+  "category": "component",
+  "display_name": "fertilizerresearchable",
+  "summary": "这是一个管理肥料研究的组件，为实体添加“fertilizerresearchable”标签表示可研究肥料信息。它通过函数设置研究函数，并提供获取研究信息的方法。核心玩法涉及肥料学习，推动玩家在游戏中解锁或掌握肥料知识。",
+  "api": [
+    {
+      "name": "SetResearchFn(fn)",
+      "effect": "设置一个研究函数到组件内部，用于后续获取肥料研究信息。"
+    },
+    {
+      "name": "GetResearchInfo()",
+      "effect": "调用已设置的研究函数并返回其结果；如果未设置函数则返回 nil。"
+    },
+    {
+      "name": "LearnFertilizer(doer)",
+      "effect": "获取研究信息，如果信息存在则向执行者推送“learnfertilizer”事件，携带肥料信息作为参数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      21333,
+      19714,
+      21485,
+      19932,
+      51951,
+      20436,
+      14483
+    ],
+    "aspects": [
+      {
+        "aspect": "肥料研究信息收集",
+        "evidence": [
+          {
+            "pageid": 19932,
+            "quote": "植物登记表分为两页，分别是肥料和植物。想要添加植物登记表，需要佩戴耕作先驱帽或高级耕作先驱帽后右键可调查的农作物或肥料。"
+          },
+          {
+            "pageid": 14483,
+            "quote": "戴上耕作先驱帽后玩家可以研究农作物和肥料，将它们的信息收集到植物登记表中。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "肥料研究",
+    "学习肥料",
+    "研究函数",
+    "肥料信息",
+    "肥料学习",
+    "研究方法",
+    "肥料",
+    "研究"
+  ],
+  "gameplay_tags": [
+    "研究",
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a8bdc0eb291cacccf45f328e5d61ddd613885a18b5f598bf522b57e5f3aa4042",
+    "source_bytes": 595,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092451962
+  }
+}

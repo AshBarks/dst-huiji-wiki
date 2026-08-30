@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/transparentondrones.lua"
+  },
+  "category": "component",
+  "display_name": "transparentondrones",
+  "summary": "此组件为客户端组件，管理实体在无人机或随从附近的透明度。它通过注册和分组无人机，跟踪接近状态，并在多个组接近时动态调整实体的透明度，以减少视觉干扰，帮助玩家在操作多个随从时更清晰地观察游戏世界。",
+  "api": [
+    {
+      "name": "PushAlpha(a)",
+      "effect": "设置实体的动画颜色alpha值（透明度），同时影响附带的fx实体，以调整透明度效果。"
+    },
+    {
+      "name": "ResetAlpha()",
+      "effect": "重置实体的动画颜色alpha值，清除覆盖的颜色设置，恢复默认透明度。"
+    },
+    {
+      "name": "RegisterDrone(leaderid)",
+      "effect": "将当前无人机组件注册到指定leaderid的组中，初始化或更新组数据，并设置leaderid。"
+    },
+    {
+      "name": "UnregisterDrone()",
+      "effect": "从当前组注销无人机组件，清理组数据，如果组变为空则删除整个组，并重置leaderid。"
+    },
+    {
+      "name": "SetIsNear(near)",
+      "effect": "设置无人机的接近状态，更新接近组的计数；当设置为false时，如果组内无其他无人机接近，则从接近组中移除。"
+    },
+    {
+      "name": "IsGroupNear()",
+      "effect": "返回当前无人机所属组是否被标记为接近，用于判断是否需要调整透明度。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "从实体移除组件时的清理操作，重置透明度并注销无人机，同时移除CanMouseThrough回调。"
+    },
+    {
+      "name": "OnRemoveEntity()",
+      "effect": "实体被移除时的回调，执行注销无人机操作。"
+    },
+    {
+      "name": "OnEntitySleep()",
+      "effect": "实体进入休眠状态时停止组件更新，重置透明度为1，并注销无人机。"
+    },
+    {
+      "name": "OnEntityWake()",
+      "effect": "实体唤醒时开始组件更新，但如果实体是leader（玩家自己），则不启动更新以避免冗余。"
+    },
+    {
+      "name": "IsNearMe(range)",
+      "effect": "检查实体是否在给定范围内（考虑距离平方），同时检查自己和同组其他无人机，返回是否接近。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "每帧更新逻辑，自动注册无人机到组，根据接近状态和组计数动态调整实体透明度，实现渐变效果。"
+    }
+  ],
+  "api_note": "该组件有多个公开方法，用于管理透明度和分组状态。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72299,
+      13567,
+      45439,
+      19595,
+      13785,
+      23965,
+      51046,
+      16630
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录未提及 transparentondrones 组件的能力，如透明度设置、无人机注册或相关行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "透明",
+    "无人机",
+    "分组",
+    "接近",
+    "视觉",
+    "随从",
+    "更新",
+    "alpha",
+    "玩家控制",
+    "动态调整"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "随从管理",
+    "视觉优化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f346eeb437b0ac06b8eda584f38fee7869c05d1ebd8ba90c554e2962a60e1421",
+    "source_bytes": 4250,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104265242
+  }
+}

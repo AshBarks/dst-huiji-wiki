@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/winchtarget.lua"
+  },
+  "category": "component",
+  "display_name": "winchtarget",
+  "summary": "该组件管理实体的深度数据和打捞函数，使其能作为绞盘的打捞目标。它参与游戏中的打捞玩法，允许玩家从沉没物体中提取资源或物品。通过设置自定义函数，可以扩展打捞行为。",
+  "api": [
+    {
+      "name": "SetSalvageFn",
+      "effect": "设置组件的打捞函数为传入的fn参数，该函数在打捞操作时被调用，无其他副作用。"
+    },
+    {
+      "name": "Salvage",
+      "effect": "执行打捞操作：检查实体是否持有沉没对象，如果存在且具有submersible组件，则设置force_no_repositioning为false以允许重新定位；然后调用打捞函数并返回其结果，若无打捞函数则返回nil。"
+    },
+    {
+      "name": "GetSunkenObject",
+      "effect": "检查实体是否有inventory组件，如果有则返回第一个槽中的物品作为沉没对象，否则返回nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，自动移除实体的'winchtarget'标签，使其不再被识别为绞盘目标。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      13823,
+      16419,
+      13897,
+      19761,
+      13556,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及SetSalvageFn、Salvage、GetSunkenObject或OnRemoveFromEntity相关的任何能力或行为表达，内容集中于实体描述、攻击行为、伤害数值等，未涉及打捞、沉没对象或移除事件。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "打捞",
+    "沉船",
+    "绞盘",
+    "沉没物体",
+    "收集物品",
+    "深海",
+    "目标",
+    "资源回收",
+    "水下探索",
+    "物品获取"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5095248bf2ddc6c08389c233941915d580fc40cc07b4499a46419ce5169e2eb7",
+    "source_bytes": 904,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097954166
+  }
+}

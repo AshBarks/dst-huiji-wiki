@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/debugger.lua"
+  },
+  "category": "component",
+  "display_name": "debugger",
+  "summary": "该组件为实体提供调试绘制功能，用于在游戏世界中可视化线条信息。它管理一组基于键值对的绘制条目，通过每帧更新将线条绘制到游戏画面中。该组件主要用于开发者调试逻辑，如路径、范围等。",
+  "api": [
+    {
+      "name": "SetOrigin(key, x, y)",
+      "effect": "设置指定键(key)的绘制条目的起点坐标。如果该键不存在，则创建一个新条目。"
+    },
+    {
+      "name": "SetTarget(key, x, y)",
+      "effect": "设置指定键(key)的绘制条目的终点坐标。如果该键不存在，则创建一个新条目。"
+    },
+    {
+      "name": "SetColour(key, r, g, b, a)",
+      "effect": "设置指定键(key)的绘制条目的颜色（RGBA）。如果该键不存在，则创建一个新条目。"
+    },
+    {
+      "name": "SetAll(key, origin, tar, colour)",
+      "effect": "为指定键(key)的绘制条目一次性设置起点(origin)、终点(tar)和颜色(colour)。参数 origin 和 tar 应为包含 x 和 y(或 z) 的表，colour 应为包含 r, g, b, a 的表。如果对应参数为 nil，则不进行设置。如果键不存在，则创建一个新条目。注意：当 origin 或 tar 表包含 z 字段时，将使用 z 作为 y 坐标进行绘制。"
+    },
+    {
+      "name": "SetZ(val)",
+      "effect": "设置组件内部的绘制层 z 值。注意：该方法会将内部 self.z 赋值给渲染器的 z 值，但函数参数 `val` 并未在当前实现中使用，实际设置的 z 值始终为初始化时设定的 0.5。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65505,
+      18173,
+      13493,
+      65881,
+      19932,
+      24839,
+      14463
+    ],
+    "aspects": [
+      {
+        "aspect": "坐标原点定义",
+        "evidence": [
+          {
+            "pageid": 65881,
+            "quote": "坐标以中心为原点，单位为{{解释|距离单位}}"
+          }
+        ]
+      },
+      {
+        "aspect": "颜色值设置",
+        "evidence": [
+          {
+            "pageid": 65505,
+            "quote": "光源颜色为初始参数。"
+          },
+          {
+            "pageid": 13493,
+            "quote": "寄居蟹隐士说话字幕的颜色最初是淡粉色的。在 4 级时，颜色变为"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "调试",
+    "绘制",
+    "线条",
+    "渲染",
+    "可视化",
+    "坐标",
+    "颜色",
+    "开发工具",
+    "渲染器"
+  ],
+  "gameplay_tags": [
+    "调试"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2b7130a3559572137847cc6835ef7215aa0155d63150997fbd5b5e1c8c91c907",
+    "source_bytes": 2119,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106605852
+  }
+}

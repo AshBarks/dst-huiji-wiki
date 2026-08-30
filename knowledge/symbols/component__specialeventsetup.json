@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/specialeventsetup.lua"
+  },
+  "category": "component",
+  "display_name": "specialeventsetup",
+  "summary": "该组件管理饥荒联机版中的特殊事件，如万圣节和猫coon年。它负责事件的设置与关闭，生成相关游戏对象（如万圣节小饰品）并处理状态保存加载。组件在事件激活时初始化世界内容，在事件停用时进行清理，影响世界状态。",
+  "api": [
+    {
+      "name": "SetupNewSpecialEvent",
+      "effect": "根据传入的事件类型调用对应设置函数，例如为万圣节生成小饰品或为猫coon年隐藏猫coon；发布 ms_setupspecialevent 事件以通知其他系统。"
+    },
+    {
+      "name": "ShutdownPrevSpecialEvent",
+      "effect": "根据传入的事件类型执行清理操作，例如清理万圣节小饰品（代码中标注 TODO 未实现）；发布 ms_shutdownspecialevent 事件以通知其他系统。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "在后初始化阶段调用，设置海洋鱼类定义，比较前后事件状态，自动设置或关闭变化的事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含 halloween_bats、current_event、current_extra_events 的表，用于保存游戏状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中恢复 halloween_bat_grave_spawn_chance、prev_event、prev_extra_events，并处理旧数据迁移。"
+    }
+  ],
+  "events_published": [
+    "ms_setupspecialevent",
+    "ms_shutdownspecialevent"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18530,
+      20714,
+      73480,
+      61065,
+      13823,
+      23199,
+      14792,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "万圣夜活动开启时的物品生成",
+        "evidence": [
+          {
+            "pageid": 18530,
+            "quote": "活动首次开启时，世界上会随机生成[[万圣节小玩具|小玩具]]和[[万圣节装饰品|装饰品]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "万圣节",
+    "猫coon",
+    "特殊事件",
+    "小饰品",
+    "隐藏",
+    "设置",
+    "关闭",
+    "节日活动",
+    "事件管理",
+    "状态保存"
+  ],
+  "gameplay_tags": [
+    "节日",
+    "生存",
+    "事件管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "26588b209b01743412340353cbd4ea94ad8ed34617f2e126fea9c85e5ef317b4",
+    "source_bytes": 14305,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112916761
+  }
+}

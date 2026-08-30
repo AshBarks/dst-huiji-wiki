@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mutatedbuzzardmanager.lua"
+  },
+  "category": "component",
+  "display_name": "mutatedbuzzardmanager",
+  "summary": "该组件是变异秃鹰管理器，负责管理变异秃鹰种群的跟踪与阴影生成，与裂隙系统和尸体持久化管理器协作。它根据玩家位置和游戏状态（如月相、死亡事件）控制秃鹰的迁移与生成，参与游戏中的生存和战斗玩法。",
+  "api": [
+    {
+      "name": "SetDropBuzzardsSource",
+      "effect": "设置一个源来控制是否掉落秃鹰。行为：根据布尔值启用或禁用秃鹰掉落逻辑。副作用：影响后续更新中秃鹰的生成或移除，通过源修饰列表修改状态。"
+    },
+    {
+      "name": "GetDropBuzzards",
+      "effect": "获取当前是否允许掉落秃鹰的状态。行为：返回布尔值，指示掉落功能是否启用。无副作用。"
+    },
+    {
+      "name": "TrackPopulationOnPlayer",
+      "effect": "在指定玩家上跟踪一个秃鹰种群。行为：记录种群UID和计时器（基于总日时间）。副作用：开始跟踪该玩家的秃鹰种群，影响后续更新逻辑。"
+    },
+    {
+      "name": "ClearPopulationTracking",
+      "effect": "清除指定玩家的种群跟踪。行为：停止跟踪，将种群迁移到下一个节点，清除所有相关阴影。副作用：更新种群状态和迁移管理器数据。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "初始化后执行。行为：开始组件更新，初始化裂隙状态，注册尸体持久化源。副作用：启动周期更新，设置尸体持久化函数，根据裂隙活跃状态设置掉落源。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数，周期性调用。行为：更新计时器（如巨鹿爆炸和死亡时间），根据掉落状态处理秃鹰移除或生成逻辑，跟踪玩家种群。副作用：可能生成或移除秃鹰阴影，更新种群迁移状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据。行为：返回包含巨鹿爆炸节点和死亡节点时间的表。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据。行为：恢复保存的巨鹿爆炸节点和死亡节点时间。副作用：更新内部状态以匹配保存数据。"
+    },
+    {
+      "name": "Debug_GetPlayerData",
+      "effect": "调试方法。行为：返回内部活动玩家数据表。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "调试方法。行为：返回空字符串。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_registermutatedbuzzard",
+    "megaflare_detonated",
+    "entity_death",
+    "ms_riftaddedtopool",
+    "ms_riftremovedfrompool"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.RIFT_BIRD_MIGRATE_TIME_MOONPHASE_FACTOR",
+    "TUNING.RIFT_BIRD_MIGRATE_TIME_NON_NIGHT_FACTOR",
+    "TUNING.MUTATEDBUZZARD_MIGRATE_TIME_BASE",
+    "TUNING.MUTATEDBUZZARD_MIGRATE_TIME_VAR",
+    "TUNING.MUTATEDBUZZARD_CORPSE_RANGE",
+    "TUNING.MUTATEDBUZZARD_MEGAFLARE_TIME",
+    "TUNING.MUTATEDBUZZARD_DEATHATTRACTION_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65737,
+      13823,
+      23957,
+      52138,
+      20152,
+      23956,
+      65456,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "秃鹫啄食行为及变异触发",
+        "evidence": [
+          {
+            "pageid": 65456,
+            "quote": "[[启蒙区域]]和[[水晶冠秃鹫]]的啄食能够造成普通变异"
+          }
+        ]
+      },
+      {
+        "aspect": "种群数量清零机制",
+        "evidence": [
+          {
+            "pageid": 52138,
+            "quote": "[[裂隙（月亮）]]消失时，世界上所有生物群系的水晶冠秃鹫种群数量会直接清零。"
+          }
+        ]
+      },
+      {
+        "aspect": "种群状态影响尸体生成",
+        "evidence": [
+          {
+            "pageid": 52138,
+            "quote": "在{{PAGENAME}}种群数量不为 0 的生物群系中，具有[[尸体]]的生物会在死亡时留下尸体。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "变异秃鹰",
+    "阴影",
+    "裂隙",
+    "尸体",
+    "迁移",
+    "种群",
+    "秃鹰",
+    "月相",
+    "死亡",
+    "巨鹿"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c051a857516064037513e4dc398144914f4617d4358eb51a06364f818d2b375d",
+    "source_bytes": 19746,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110318145
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sandstorms.lua"
+  },
+  "category": "component",
+  "display_name": "sandstorms",
+  "summary": "该组件管理沙尘暴的激活状态与绿洲机制，根据季节和天气条件自动触发或关闭沙尘暴。它提供方法检测实体是否在沙尘暴或绿洲中，并计算沙尘暴级别，影响游戏中的生存环境和玩家避难行为。",
+  "api": [
+    {
+      "name": "CalcSandstormLevel",
+      "effect": "计算给定实体在沙尘暴中的深度级别，基于其位置和沙尘暴边界。返回0到1之间的值，1表示完全进入沙尘暴。依赖于实体的areaaware组件和世界拓扑数据。"
+    },
+    {
+      "name": "IsInOasis",
+      "effect": "检查实体是否位于任何已注册的绿洲内。遍历所有绿洲并调用其oasis组件进行检测。返回布尔值。"
+    },
+    {
+      "name": "CalcOasisLevel",
+      "effect": "计算实体在绿洲中的最大接近级别。返回0到1之间的值，1表示完全在绿洲内。遍历所有绿洲并取最大值。"
+    },
+    {
+      "name": "IsInSandstorm",
+      "effect": "检查沙尘暴是否活跃且实体当前位于沙尘暴区域内。依赖实体的areaaware组件和沙尘暴激活状态。返回布尔值。"
+    },
+    {
+      "name": "GetSandstormLevel",
+      "effect": "获取实体的最终沙尘暴级别，考虑绿洲的抵消效果。返回级别值，0表示不受影响或沙尘暴未激活。"
+    },
+    {
+      "name": "IsSandstormActive",
+      "effect": "返回当前沙尘暴是否处于激活状态。根据季节和天气条件动态变化。"
+    },
+    {
+      "name": "RetrofitCheckIfWorldContainsOasis",
+      "effect": "检查世界中是否至少注册了一个绿洲。返回布尔值，用于兼容性检查。"
+    }
+  ],
+  "events_published": [
+    "ms_stormchanged"
+  ],
+  "events_listened": [
+    "weathertick",
+    "seasontick",
+    "ms_registeroasis"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SANDSTORM_FULLY_ENTERED_DEPTH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13569,
+      13570,
+      24587,
+      21137,
+      18410,
+      52726,
+      14813,
+      65605
+    ],
+    "aspects": [
+      {
+        "aspect": "沙尘暴活跃状态描述",
+        "evidence": [
+          {
+            "pageid": 24587,
+            "quote": "在夏季，绿洲沙漠会发生沙尘暴。下雨时，沙尘暴会暂停"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家进入沙尘暴的提示",
+        "evidence": [
+          {
+            "pageid": 24587,
+            "quote": "未佩戴护目镜进入沙尘暴时"
+          }
+        ]
+      },
+      {
+        "aspect": "翻新机制中沙尘暴发生条件",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "这两个实体的对应生态群系内可发生[[沙尘暴]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "沙尘暴",
+    "绿洲",
+    "天气",
+    "季节",
+    "级别",
+    "检测",
+    "避难所",
+    "强度",
+    "活跃",
+    "注册"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fc8249889527a7e2aec6f181ba396e92c551c95fb25c5b3aa7f4bd9683bb011f",
+    "source_bytes": 5601,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112074262
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/platformhopdelay.lua"
+  },
+  "category": "component",
+  "display_name": "platformhopdelay",
+  "summary": "该组件用于管理平台跳跃的延迟时间，以 tick 为单位存储和调整。它通过 SetDelay、SetDelayTicks 和 GetDelayTicks 方法，允许游戏逻辑控制角色在跳跃平台时的响应延迟，影响移动行为。",
+  "api": [
+    {
+      "name": "SetDelay",
+      "effect": "将给定的时间值（以游戏时间为单位）转换为 tick 数并设置为延迟，使用 math.ceil 向上取整，更新内部 delayticks 变量。"
+    },
+    {
+      "name": "SetDelayTicks",
+      "effect": "直接设置延迟的 tick 数，更新内部 delayticks 变量。"
+    },
+    {
+      "name": "GetDelayTicks",
+      "effect": "返回当前设置的延迟 tick 数，不修改任何状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16185,
+      13606,
+      22181,
+      19222,
+      20842,
+      24240,
+      65605,
+      13260
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 component__platformhopdelay 相关的 SetDelay、SetDelayTicks 或 GetDelayTicks 能力的玩家语言表达；所有页面内容涉及其他延迟机制（如重生、灵魂消失、过载等），但未讨论平台跳跃延迟。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "延迟",
+    "跳跃",
+    "平台",
+    "tick",
+    "等待时间",
+    "平台跳跃",
+    "响应延迟",
+    "tick单位",
+    "延迟管理"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "移动",
+    "平台跳跃"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "388a4a8490613f4405677085fcba9c4adbeffc92d951bd6a8438a647121a31ab",
+    "source_bytes": 377,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102519719
+  }
+}

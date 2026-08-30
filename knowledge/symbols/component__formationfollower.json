@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/formationfollower.lua"
+  },
+  "category": "component",
+  "display_name": "formationfollower",
+  "summary": "FormationFollower 组件管理实体作为编队跟随者，存储编队状态、领导引用、位置和搜索参数。核心玩法涉及实体主动搜索并加入编队领导，跟随领导移动，可响应领导丢失或实体休眠等事件调整状态。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前编队状态（in_formation）和活跃状态（active），无副作用。"
+    },
+    {
+      "name": "StartUpdating",
+      "effect": "启动组件更新循环，使 OnUpdate 方法被周期性调用，允许跟随者响应位置变化。"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "停止组件更新循环，阻止 OnUpdate 被调用，通常用于节省性能或处理休眠。"
+    },
+    {
+      "name": "SearchForFormation",
+      "effect": "在指定半径（searchradius）内搜索未满编队的领导实体；若提供 override_find_entities 则使用该列表，否则默认搜索带 formationsearchtags 标签的实体。若找到则加入编队并更新 in_formation 和 formationleader 状态。"
+    },
+    {
+      "name": "LeaveFormation",
+      "effect": "离开当前编队，若存在 formationleader 则通知领导失去成员，并可能重置跟随者状态。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时调用，通知编队领导失去该成员，并停止组件更新以节省资源。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体醒来时调用，若实体未在容器中（inventoryitem 组件检查），则启动组件更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "执行更新逻辑，若存在 onupdatefn 回调且跟随者有领导和位置，则调用该函数更新跟随位置；通常由系统周期性触发。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15682
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本描述了球状光虫的周期性行为和寻家行为，但未涉及component__formationfollower的具体能力或代码语义，如SearchForFormation、LeaveFormation、OnUpdate等术语在页面中无任何体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "编队跟随者",
+    "搜索加入",
+    "领导跟随",
+    "移动跟随",
+    "状态管理",
+    "事件响应",
+    "实体搜索",
+    "编队状态",
+    "丢失处理"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 9/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d9857f1b8b905a26ca498c87a4bac8721533936d0bfa44c1c63f8c12f3277083",
+    "source_bytes": 2783,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100083739
+  }
+}

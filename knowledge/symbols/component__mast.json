@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mast.lua"
+  },
+  "category": "component",
+  "display_name": "mast",
+  "summary": "桅杆组件管理帆的升降状态、物理力属性和卷帆操作，并与船和方向舵交互。核心玩法涉及玩家通过控制帆来调整船的航行速度和方向，影响船只在海洋中的移动。组件处理动画过渡、声音效果和事件响应，确保船在航行中的动态表现。",
+  "api": [
+    {
+      "name": "SetReveseDeploy",
+      "effect": "设置桅杆是否反转部署，影响帆的默认状态和反转标志。如果设置为 true，则 furlunits 设为 0 且 is_sail_raised 和 inverted 设为 true。"
+    },
+    {
+      "name": "SetSailForce",
+      "effect": "设置帆的基础力值，影响船的加速度。参数 set 被赋值给 self.sail_force。"
+    },
+    {
+      "name": "CalcSailForce",
+      "effect": "计算当前有效帆力，基于帆状态和卷帆程度。如果 inverted 且帆未升起或正在过渡，返回 sail_force 乘以 furlunits 比例；否则如果非 inverted 且帆升起，返回 sail_force 乘以剩余比例；否则返回 0。"
+    },
+    {
+      "name": "CalcMaxVelocity",
+      "effect": "计算当前最大速度，基于帆状态和卷帆程度。计算逻辑与 CalcSailForce 类似，但使用 max_velocity 值。"
+    },
+    {
+      "name": "SetVelocityMod",
+      "effect": "设置速度修改器，但源码中 max_velocity_mod 已注释，该方法可能无效。参数 set 被赋值给 self.max_velocity_mod。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置关联的船实体。如果新船不同，移除旧船的物理组件和事件监听，添加新船的关联、旋转同步、事件监听，并管理 rotatableobject 标签。"
+    },
+    {
+      "name": "SetRudder",
+      "effect": "设置方向舵实体，将其设为桅杆的子实体，并添加到高亮子实体列表中。"
+    },
+    {
+      "name": "OnDeath",
+      "effect": "处理桅杆死亡事件，标记 boat_death 为 true，停止船移动声音，并调用 SetBoat(nil) 清除船关联。"
+    },
+    {
+      "name": "AddSailFurler",
+      "effect": "添加卷帆者，开始过渡状态。设置 is_sail_transitioning 为 true，添加 sail_transitioning 标签，记录卷帆者强度，并播放帆打开声音。"
+    },
+    {
+      "name": "RemoveSailFurler",
+      "effect": "移除卷帆者。如果卷帆者存在，从 furlers 表中移除，并触发 doer 的 stopfurling 事件。"
+    },
+    {
+      "name": "GetCurrentFurlUnits",
+      "effect": "计算当前所有活跃卷帆者的总强度。遍历 furlers，检查动画状态是否在有效拉帆帧内，累加强度值。"
+    },
+    {
+      "name": "UnfurlSail",
+      "effect": "开始降帆过渡。设置 is_sail_transitioning 为 true，添加 sail_transitioning 标签，播放帆打开声音和 knot_release 动画。"
+    },
+    {
+      "name": "SailFurled",
+      "effect": "完成收帆状态。重置 furlunits 为最大值，清除过渡标签，根据反转标志播放动画（knot_tie 和 open_loop 或 closed），播放声音，并移除所有卷帆者。"
+    },
+    {
+      "name": "SailUnfurled",
+      "effect": "完成降帆状态。重置 furlunits 为 0，清除过渡标签，设置 is_sail_raised 为 true，根据反转标志播放动画（closed 或 open_loop）。"
+    },
+    {
+      "name": "CloseSail",
+      "effect": "立即根据反转标志关闭帆到非活动状态。如果 inverted，调用 SailUnfurled()；否则调用 SailFurled()。"
+    },
+    {
+      "name": "GetFurled0to1",
+      "effect": "返回当前卷帆比例（0 到 1），即 furlunits 除以 furlunits_max。"
+    },
+    {
+      "name": "SetRudderDirection",
+      "effect": "设置桅杆朝向方向舵指定的方向。根据参数坐标使桅杆面向该点。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，处理帆过渡动画和状态变化。基于时间调整 furlunits（如果有卷帆者则增加，否则减少），当达到阈值时触发 SailFurled 或 SailUnfurled，并更新动画百分比。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.MAST.BASIC.SAIL_FORCE",
+    "TUNING.BOAT.MAST.BASIC.MAX_VELOCITY",
+    "TUNING.BOAT.MAST.BASIC.RUDDER_TURN_DRAG"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18357,
+      13156,
+      21620,
+      16185,
+      34314,
+      18216,
+      65881,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "帆初始收起状态",
+        "evidence": [
+          {
+            "pageid": 18357,
+            "quote": "刚建造好的飞翼风帆处于收起状态。"
+          }
+        ]
+      },
+      {
+        "aspect": "帆展开操作交互",
+        "evidence": [
+          {
+            "pageid": 18357,
+            "quote": "如果想更快地展开帆布，在展开时将鼠标停留在桅杆上"
+          }
+        ]
+      },
+      {
+        "aspect": "最高速度提供数值",
+        "evidence": [
+          {
+            "pageid": 18357,
+            "quote": "展开的桅杆、飞翼风帆、龙翼桅杆分别能提供 2.5、4、2.5 单位的最高速度。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "桅杆",
+    "帆",
+    "升降",
+    "卷帆",
+    "船",
+    "方向舵",
+    "速度",
+    "力",
+    "动画",
+    "状态"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "生存",
+    "合作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b79aa769a7baa42a94f7980e8a943b633161534718ad72e4849129c2ee8eab7d",
+    "source_bytes": 7951,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095804497
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mood.lua"
+  },
+  "category": "component",
+  "display_name": "mood",
+  "summary": "Mood组件管理实体的心情状态，如牛的发情期。它通过计时和季节变化来控制心情的开始和结束，并触发相应的回调函数。核心玩法涉及生物行为的周期性变化和与季节系统的交互。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前心情状态的调试字符串，包含心情启用状态、剩余天数等信息，无副作用。"
+    },
+    {
+      "name": "Enable",
+      "effect": "设置组件启用状态；如果禁用，则调用SetIsInMood(false, false)将心情设为false，可能触发离开心情回调。"
+    },
+    {
+      "name": "SetMoodTimeInDays",
+      "effect": "设置心情时间参数（持续时间、等待时间等）和世界设置乘数，并重置心情为false，重置剩余天数。"
+    },
+    {
+      "name": "ValidateMood",
+      "effect": "调用OnSeasonChange函数，验证当前季节下的心情状态，可能改变心情状态以匹配季节。"
+    },
+    {
+      "name": "SetMoodSeason",
+      "effect": "添加活跃季节到moodseasons表；首次调用时启动季节监听事件，此后每次季节变化自动检查心情。"
+    },
+    {
+      "name": "CheckForMoodChange",
+      "effect": "检查剩余天数是否小于等于0；如果是，则切换心情状态（如果已处于心情或强制心情则切换），可能触发回调。"
+    },
+    {
+      "name": "SetInMoodFn",
+      "effect": "设置进入心情时的回调函数，存储于onentermood字段，无其他副作用。"
+    },
+    {
+      "name": "SetLeaveMoodFn",
+      "effect": "设置离开心情时的回调函数，存储于onleavemood字段，无其他副作用。"
+    },
+    {
+      "name": "ResetMood",
+      "effect": "如果处于季节心情（seasonmood为true），则重置心情状态（isinmood设为false，剩余天数重置为等待时间），并触发离开心情回调。"
+    },
+    {
+      "name": "SetIsInMood",
+      "effect": "设置心情状态；根据inmood和entireseason参数更新剩余天数、季节心情标志，并触发相应的进入或离开心情回调。"
+    },
+    {
+      "name": "IsInMood",
+      "effect": "返回当前心情状态（isinmood的值），无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存心情数据的表，包含心情状态、剩余天数、季节列表等，用于序列化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载心情状态，恢复心情、剩余天数，并根据当前季节验证心情，可能触发状态改变和回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "cycles",
+    "season"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15169,
+      15526,
+      13569,
+      52019,
+      15941,
+      13570,
+      23933
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件能力/mood相关的任何表达，所有页面讨论的是皮弗娄牛的生成、掉落、管理、皮肤更换、季节机制、选美比赛、生物行为和昼夜循环，与情绪系统无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发情期",
+    "季节",
+    "牛",
+    "繁殖",
+    "发情",
+    "计时器",
+    "回调",
+    "生物周期",
+    "季节系统"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生物行为",
+    "季节变化",
+    "繁殖"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "48425d890b1f6c8093fa03ea9d49062846ee2f9e9786fb8af960dca33d15836f",
+    "source_bytes": 5333,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097048455
+  }
+}

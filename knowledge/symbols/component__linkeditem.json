@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/linkeditem.lua"
+  },
+  "category": "component",
+  "display_name": "linkeditem",
+  "summary": "组件LinkedItem用于管理物品与特定玩家的所有权链接，存储所有者用户ID、名称和装备限制设置。它通过网络变量同步数据，支持服务器和客户端访问，并参与物品的保存与加载过程，确保物品在重新加入游戏时能恢复所有者关系。该组件主要服务于物品绑定和玩家专属道具的场景。",
+  "api": [
+    {
+      "name": "GetOwnerName",
+      "effect": "返回所有者名称。客户端可调用，优先从网络变量获取，或查询客户端表（每10秒更新一次）。无副作用。"
+    },
+    {
+      "name": "GetOwnerUserID",
+      "effect": "返回所有者用户ID。客户端和服务器均可调用，直接从网络变量读取。无副作用。"
+    },
+    {
+      "name": "IsEquippableRestrictedToOwner",
+      "effect": "返回是否限制该物品只能被所有者装备。客户端和服务器均可调用，从网络变量读取布尔值。无副作用。"
+    },
+    {
+      "name": "GetOwnerInst",
+      "effect": "仅服务器方法，返回所有者实体实例（owner_inst）。如果未设置则返回nil。无副作用。"
+    },
+    {
+      "name": "LinkToOwnerUserID",
+      "effect": "仅服务器方法，设置或更改所有者用户ID。如果新ID与旧ID不同，则先推送'ms_unregisterlinkeditem'事件注销旧所有者，再推送'ms_registerlinkeditem'事件注册新所有者。同步网络变量。"
+    },
+    {
+      "name": "SetEquippableRestrictedToOwner",
+      "effect": "仅服务器方法，设置restrictequippabletoowner网络变量的值，控制装备限制。无其他副作用。"
+    },
+    {
+      "name": "SetOnOwnerInstRemovedFn",
+      "effect": "仅服务器方法，设置所有者实例移除时的回调函数。用于自定义当所有者实体被移除时的行为。无副作用，仅存储函数引用。"
+    },
+    {
+      "name": "SetOnOwnerInstCreatedFn",
+      "effect": "仅服务器方法，设置所有者实例创建时的回调函数。用于自定义当所有者实体被设置时的行为。无副作用，仅存储函数引用。"
+    },
+    {
+      "name": "SetOnSkillTreeInitializedFn",
+      "effect": "仅服务器方法，设置技能树初始化时的回调函数。用于自定义当所有者技能树初始化时的行为。无副作用，仅存储函数引用。"
+    },
+    {
+      "name": "SetOwnerInst",
+      "effect": "仅服务器方法，由linkeditemmanager组件调用，设置所有者实体实例。如果新实例与旧实例不同，则先触发旧实例的移除回调（onownerinst_removedfn），再设置新实例并触发创建回调（onownerinst_createdfn）。同步所有者名称到网络变量。"
+    },
+    {
+      "name": "OnSkillTreeInitialized",
+      "effect": "仅服务器方法，由linkeditemmanager组件调用，触发技能树初始化回调（onownerinst_skilltreeinitializedfn）。无其他副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "仅服务器方法，保存netowneruserid和netownername到数据表。返回nil如果数据为空。用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "仅服务器方法，从数据表加载netowneruserid和netownername，同步网络变量。如果加载的用户ID非空，则推送'ms_registerlinkeditem'事件注册所有者。用于恢复数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含所有者名称、用户ID和实例信息。服务器端返回更详细内容。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_registerlinkeditem",
+    "ms_unregisterlinkeditem"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "linkeditem.netowneruserid",
+    "linkeditem.netownername",
+    "linkeditem.restrictequippabletoowner"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      71461,
+      17914,
+      52631,
+      15415,
+      16598,
+      15373,
+      18843,
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "所有者绑定管理",
+        "evidence": [
+          {
+            "pageid": 71461,
+            "quote": "如果备份底盘断开了与所有者的绑定，或所有者改变了技能树取消了暗影仆从技能"
+          },
+          {
+            "pageid": 18843,
+            "quote": "绑定薇诺娜为30秒，无绑定为20秒"
+          }
+        ]
+      },
+      {
+        "aspect": "技能树改变响应",
+        "evidence": [
+          {
+            "pageid": 71461,
+            "quote": "所有者改变了技能树取消了暗影仆从技能"
+          }
+        ]
+      },
+      {
+        "aspect": "直接所有者影响",
+        "evidence": [
+          {
+            "pageid": 17914,
+            "quote": "其直接所有者增加 2 {{潮湿度}}"
+          },
+          {
+            "pageid": 52631,
+            "quote": "其直接所有者增加 1 {{潮湿度}}"
+          },
+          {
+            "pageid": 16598,
+            "quote": "冰帽[[完全腐烂]]时，其直接所有者增加 30 {{潮湿度}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "物品绑定",
+    "所有者",
+    "装备绑定",
+    "数据同步",
+    "存档加载",
+    "玩家ID",
+    "专属道具",
+    "所有权"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "装备",
+    "个性化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "276b16be1504daacc7ec337232c1e7ab6b0348cc1af48c7f5500b5a9c9572ce9",
+    "source_bytes": 5220,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094836941
+  }
+}

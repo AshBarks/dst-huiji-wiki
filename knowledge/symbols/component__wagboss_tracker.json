@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wagboss_tracker.lua"
+  },
+  "category": "component",
+  "display_name": "wagboss_tracker",
+  "summary": "该组件用于追踪Wagboss（瓦格博斯）的击败状态。它监听Wagboss被击败的事件，更新内部标志并通知世界状态变化。支持存档和加载以持久化数据，确保击败记录在游戏重启后保持。",
+  "api": [
+    {
+      "name": "IsWagbossDefeated",
+      "effect": "返回一个布尔值，表示Wagboss是否被击败。无副作用，仅查询状态。"
+    },
+    {
+      "name": "OnWagbossDefeated",
+      "effect": "设置wagboss_defeated为true，并向世界推送事件master_wagbossinfoupdate。副作用：更新击败状态并触发事件通知。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含wagboss_defeated的值，用于游戏存档。无副作用，仅返回数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据表中加载wagboss_defeated状态，若数据存在则更新状态并推送事件master_wagbossinfoupdate。副作用：加载数据后更新状态并触发事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "master_wagbossinfoupdate"
+  ],
+  "events_listened": [
+    "wagboss_defeated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      35007,
+      15022,
+      21137,
+      21432,
+      45249,
+      56980,
+      22383
+    ],
+    "aspects": [
+      {
+        "aspect": "击败天体后裔后解锁配方",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "在击败[[天体后裔]]后，{{item|概念制造器}}中会多出{{item|战争瓦器人底座套装}}及{{item|战争瓦器人零件}}的配方。"
+          }
+        ]
+      },
+      {
+        "aspect": "存档游戏机制描述",
+        "evidence": [
+          {
+            "pageid": 35007,
+            "quote": "'''存档（{{En|Saving}}）'''是[[饥荒：联机版]]中的一项[[游戏机制]]，位于“游戏”界面中。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "Wagboss",
+    "击败",
+    "追踪",
+    "存档",
+    "Boss战",
+    "状态更新",
+    "成就",
+    "进度"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "成就追踪"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a4112a68311357c2d1c8f3e5fdbba7321bcf0817e07c650bc4e692ea21c11218",
+    "source_bytes": 738,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113725837
+  }
+}

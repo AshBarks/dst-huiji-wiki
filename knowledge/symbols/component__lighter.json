@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lighter.lua"
+  },
+  "category": "component",
+  "display_name": "lighter",
+  "summary": "Lighter组件管理点火能力，允许持有该组件的实体点燃其他可燃实体。它通过一个回调函数在点燃时执行自定义行为，并参与生存玩法中的资源管理和环境交互。",
+  "api": [
+    {
+      "name": "SetOnLightFn",
+      "effect": "设置点燃时的回调函数。当实体成功点燃目标时，将调用此函数，传递当前实体和目标作为参数。"
+    },
+    {
+      "name": "Light",
+      "effect": "点燃目标实体。如果目标有burnable组件且未耗尽燃料（除非有burnableignorefuel标签）且不在INLIMBO状态，则调用burnable:Ignite点燃目标，并执行设置的回调。无论点燃是否成功，都会向目标推送'onlighterlight'事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onlighterlight"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      20496,
+      19913,
+      21416,
+      20152,
+      20789,
+      21291,
+      17973
+    ],
+    "aspects": [
+      {
+        "aspect": "打火机作为烹饪火源",
+        "evidence": [
+          {
+            "pageid": 20789,
+            "quote": "可供烹饪的火源包括：{{item|营火}}、{{item|火坑}}、{{item|龙鳞火炉}}、{{item|矮星}}、{{item|薇洛的打火机}}、{{item|超级可爱岩…"
+          }
+        ]
+      },
+      {
+        "aspect": "打火机制作与范围属性",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛可以在角色专属制作栏制作[[薇洛的打火机]]。相当于一个范围较小使用时间更长的[[火炬]]"
+          }
+        ]
+      },
+      {
+        "aspect": "打火机点燃生物行为",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛使用[[薇洛的打火机|打火机]]与[[火把]]攻击生物时，100% 将其[[火|点燃]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "打火机触发可控燃烧",
+        "evidence": [
+          {
+            "pageid": 20496,
+            "quote": "由学习了“可控燃烧”技能的[[薇洛]]使用[[火把]]、[[薇洛的打火机]]、[[火魔杖]]、[[火焰吹箭]]、[[火焰笔]]、[[余烬|火焰…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "点火器",
+    "点燃",
+    "燃烧",
+    "火源",
+    "生火",
+    "可燃物",
+    "轻量火把",
+    "点火"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "66259314cba3d5b37fc74d2b2a424767632d301c47db620de76f3effbca05456",
+    "source_bytes": 751,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096925335
+  }
+}

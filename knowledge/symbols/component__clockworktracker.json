@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/clockworktracker.lua"
+  },
+  "category": "component",
+  "display_name": "clockworktracker",
+  "summary": "该组件管理玩家拥有的时钟发条（clockwork）棋子类型（主教、骑士、城堡）的跟随者数量。它跟踪每种类型的当前计数和最大值，并通过 bonus 修饰符动态调整上限。核心玩法涉及玩家指挥这些实体作为伙伴，组件确保不超过跟随限制，特殊事件（如 YOTH）下骑士类型有无限最大值。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时清理所有事件回调，移除对每个时钟发条实体监听的 'onremove' 和 'leaderchanged' 事件，防止内存泄漏。"
+    },
+    {
+      "name": "GetChessType",
+      "effect": "根据实体的标签（如 rook、knight、bishop）返回其对应的棋子类型字符串，如果无匹配则返回 nil。"
+    },
+    {
+      "name": "OverrideMaxFollowersForType",
+      "effect": "覆盖特定棋子类型的最大跟随者数量。如果新最大值低于旧值，会触发重新验证跟随者；如果设置为 nil，会尝试移除组件。"
+    },
+    {
+      "name": "SetBonus",
+      "effect": "设置 bonus 修饰符，影响总 bonus 值。如果新 bonus 值低于旧值，会重新验证跟随者；如果设置为 0，会尝试移除组件。"
+    },
+    {
+      "name": "GetCountForType",
+      "effect": "返回特定棋子类型当前拥有的时钟发条实体数量。"
+    },
+    {
+      "name": "GetMaxForType",
+      "effect": "返回特定棋子类型的最大跟随者数量。在 YOTH 特殊事件下骑士类型返回无穷大；否则考虑玩家标签（如 chessfriend）和默认值。"
+    },
+    {
+      "name": "GetBonusForType",
+      "effect": "返回特定棋子类型的 bonus 值。在 YOTH 特殊事件下骑士类型返回 0，其他类型返回总 bonus 的一半（向上取整）；否则返回总 bonus 的三分之一（向上取整）。"
+    },
+    {
+      "name": "CanAddClockwork",
+      "effect": "检查是否可以添加一个新的时钟发条实体到指定类型。考虑当前计数、最大值和 bonus 分配，如果未用完 bonus 槽位则返回 true。"
+    },
+    {
+      "name": "AddClockwork",
+      "effect": "添加一个时钟发条实体到跟踪列表，增加对应类型的计数，并为该实体设置 'onremove' 和 'leaderchanged' 事件监听。"
+    },
+    {
+      "name": "RemoveClockwork",
+      "effect": "从跟踪列表中移除一个时钟发条实体，减少对应类型的计数，移除事件监听，如果计数降至 0 则尝试移除组件。"
+    },
+    {
+      "name": "RevalidateFollowers",
+      "effect": "重新验证所有跟随者，按主教、城堡、骑士顺序移除超出最大值（包括 bonus）的实体，释放 follower 组件的 leader。"
+    },
+    {
+      "name": "TryRemoveComponentIfClear",
+      "effect": "检查是否可以移除组件：如果没有 bonus 修饰符且所有类型计数为 0 且无自定义最大值，则从实体移除 'clockworktracker' 组件。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.CLOCKWORK_MAX_FOLLOWING_CHESSFRIEND",
+    "TUNING.CLOCKWORK_MAX_FOLLOWING"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      13421,
+      16419,
+      15389,
+      24027,
+      15244,
+      34314,
+      45248
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述发条生物和暗影棋子的介绍、生成、掉落、生命值及世界生成选项，但未具体提及与发条生物追踪相关的机制表达，如计数、添加、移除、奖励设置或组件行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "时钟发条",
+    "跟随者",
+    "棋子",
+    "主教",
+    "骑士",
+    "城堡",
+    "上限",
+    "奖励",
+    "战斗伙伴",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "伙伴"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0e5b830676b101fb9412a12d4be30bbb2d975310e2d140abc5949589c1616a58",
+    "source_bytes": 5000,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106094655
+  }
+}

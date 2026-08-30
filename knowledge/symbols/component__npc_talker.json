@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/npc_talker.lua"
+  },
+  "category": "component",
+  "display_name": "npc_talker",
+  "summary": "该组件管理 NPC 的对话队列和声音队列，控制对话的序列播放。支持对话覆盖、可打断性和聊天优先级，常用于 NPC 交互和任务脚本。",
+  "api": [
+    {
+      "name": "Say",
+      "effect": "添加对话行到队列。若 override 为 true 或当前队列 stompable，则清空队列并重置 stompable 标志。若 stompable 为 true 且队列非空，则不添加新行。lines 可为字符串或字符串表，sound 为可选音效路径（字符串）。"
+    },
+    {
+      "name": "Chatter",
+      "effect": "通过字符串表引用添加对话到队列。若 override 为 true 或当前队列 stompable，则清空队列并重置 stompable 标志。若 stompable 为 true 且队列非空，则不添加。strtbl 为 STRINGS 中的路径，index 指定特定行，chatpriority 设置聊天优先级，sound 为可选音效路径。"
+    },
+    {
+      "name": "HasLines",
+      "effect": "检查队列是否有待播放的对话行，返回布尔值。"
+    },
+    {
+      "name": "ResetQueue",
+      "effect": "清空对话队列和声音队列。"
+    },
+    {
+      "name": "DoNextLine",
+      "effect": "如果队列有行，则播放下一行：根据队列项类型调用 talker 组件的 Say 或 Chatter，播放关联声音（如果有），然后移除该项。"
+    },
+    {
+      "name": "haslines",
+      "effect": "别名：小写版本，功能与 HasLines 相同。"
+    },
+    {
+      "name": "resetqueue",
+      "effect": "别名：小写版本，功能与 ResetQueue 相同。"
+    },
+    {
+      "name": "donextline",
+      "effect": "别名：小写版本，功能与 DoNextLine 相同。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51498,
+      51497
+    ],
+    "aspects": [
+      {
+        "aspect": "交互时言语表达",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "她会走到帮她干活的玩家附近发表意见。"
+          }
+        ]
+      },
+      {
+        "aspect": "台词触发条件",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "低好感度（0 ~ 3）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "NPC对话",
+    "对话队列",
+    "声音队列",
+    "对话覆盖",
+    "可打断对话",
+    "对话优先级",
+    "NPC交互",
+    "任务对话",
+    "对话序列"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 9/9)",
+  "gameplay_tags": [
+    "对话管理",
+    "NPC互动",
+    "叙事脚本"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "421ee0046a38e7b022a37abbd02cb33f57e6c699ac6a37f530f2f1f6a2fd3e4a",
+    "source_bytes": 3859,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094991578
+  }
+}

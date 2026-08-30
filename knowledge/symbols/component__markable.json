@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/markable.lua"
+  },
+  "category": "component",
+  "display_name": "markable",
+  "summary": "该组件管理实体的标记系统，使用标记池为每个标记分配唯一ID，允许玩家标记或取消标记目标。它通过回调函数与外部系统集成，参与玩家互动和目标识别的核心玩法。组件还维护标记状态并支持重置所有标记。",
+  "api": [
+    {
+      "name": "getid",
+      "effect": "从标记池中随机移除并返回一个ID；如果标记池为空，则返回nil。"
+    },
+    {
+      "name": "returnid",
+      "effect": "将指定ID添加回标记池，增加标记池的可用ID数量。"
+    },
+    {
+      "name": "Mark",
+      "effect": "标记实体给指定doer。如果doer已标记该实体，则取消标记（调用unmarkfn并返回ID）；否则检查canmarkfn回调，若允许则分配新ID（调用markfn）并添加到marks列表；返回true表示成功，或false和失败原因。"
+    },
+    {
+      "name": "Unmarkall",
+      "effect": "取消所有标记：调用unmarkallfn回调，重置标记池为初始状态，并清空marks列表。"
+    },
+    {
+      "name": "SetMarkable",
+      "effect": "设置实体是否可标记：更新canbemarked属性，并通过onmarkable函数添加或移除'markable'标签。"
+    },
+    {
+      "name": "HasMarked",
+      "effect": "检查指定doer是否已标记该实体：遍历marks列表，返回true或false。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存数据：返回空表（从代码看无实际保存内容）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据：无操作（从代码看无实际加载逻辑）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24901,
+      52107
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中，页面24901描述柱子的装饰和阻碍功能，页面52107描述舞台的建造和交互，均未提及标记、取消标记、保存、加载等与markable组件相关的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "标记目标",
+    "取消标记",
+    "唯一ID",
+    "标记池",
+    "玩家互动",
+    "目标识别",
+    "标记状态",
+    "重置标记"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "管理",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2f33bad9c3a8d219d5a86ad8dbc23055a11c24561e5885b0d67f06e30dfb6c21",
+    "source_bytes": 1967,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101538975
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/targettracker.lua"
+  },
+  "category": "component",
+  "display_name": "targettracker",
+  "summary": "目标追踪器组件管理一个目标实体、追踪时间和暂停时间，并提供回调函数来响应追踪事件。它用于追踪另一个实体的存活状态，更新追踪时间，并在目标死亡或移除时自动停止追踪。核心玩法涉及追踪目标以触发相关行为，如战斗或生存机制。",
+  "api": [
+    {
+      "name": "SetOnResetTarget(fn)",
+      "effect": "设置当目标被重置时的回调函数，回调参数为(实体, 目标)。"
+    },
+    {
+      "name": "SetOnPauseFn(fn)",
+      "effect": "设置当追踪暂停时的回调函数，回调参数为(实体)。"
+    },
+    {
+      "name": "SetOnResumeFn(fn)",
+      "effect": "设置当追踪恢复时的回调函数，回调参数为(实体)。"
+    },
+    {
+      "name": "SetOnTimeUpdateFn(fn)",
+      "effect": "设置当追踪时间更新时的回调函数，回调参数为(实体, 当前时间, 上次时间)。"
+    },
+    {
+      "name": "SetShouldKeepTrackingFn(fn)",
+      "effect": "设置是否继续追踪的条件判断函数，函数参数为(实体, 目标)，返回布尔值。"
+    },
+    {
+      "name": "HasTarget()",
+      "effect": "返回当前是否有追踪目标。"
+    },
+    {
+      "name": "IsTracking(testtarget)",
+      "effect": "检查是否正在追踪指定的目标实体。"
+    },
+    {
+      "name": "IsPaused()",
+      "effect": "检查追踪是否处于暂停状态。"
+    },
+    {
+      "name": "IsCloningTarget()",
+      "effect": "检查是否处于克隆目标状态，当追踪时间小于等于0且暂停时返回true。"
+    },
+    {
+      "name": "GetTimeTracking()",
+      "effect": "获取当前的追踪时间。"
+    },
+    {
+      "name": "SetTimeTracking(time)",
+      "effect": "设置追踪时间，并触发时间更新回调。"
+    },
+    {
+      "name": "CloneTargetFrom(item, pausetime)",
+      "effect": "从另一个目标追踪器克隆目标和暂停时间，如果源追踪器无目标或追踪时间则无效。"
+    },
+    {
+      "name": "TrackTarget(target)",
+      "effect": "开始追踪指定目标，设置目标并监听其移除事件，推送' targettracker_starttrack'事件，并开始组件更新。"
+    },
+    {
+      "name": "StopTracking(reset)",
+      "effect": "停止追踪，清理目标和时间状态，推送' targettracker_stoptrack'事件，移除事件监听，可选调用重置回调。"
+    },
+    {
+      "name": "Pause(time)",
+      "effect": "暂停追踪指定时间，设置暂停时间并触发暂停回调。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "每帧更新，检查目标有效性，处理暂停倒计时和追踪时间增加，调用时间更新回调。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "等同于OnUpdate，用于长时间更新。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试信息字符串，包含目标、追踪时间、暂停时间和更新状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "targettracker_starttrack",
+    "targettracker_stoptrack"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20428
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅介绍盔甲物品的制作信息和移动速度提升效果，未涉及目标跟踪组件的任何能力或行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "目标追踪器",
+    "追踪时间",
+    "暂停追踪",
+    "追踪停止",
+    "追踪开始",
+    "重置目标",
+    "追踪事件",
+    "存活追踪",
+    "追踪组件"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 9/9)",
+  "gameplay_tags": [
+    "追踪",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "daaba3792dee92a7391bb8f442383ff1956bafc4dfbb16eec4fb625d489bc00b",
+    "source_bytes": 5158,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095186883
+  }
+}

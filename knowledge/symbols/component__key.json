@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/key.lua"
+  },
+  "category": "component",
+  "display_name": "key",
+  "summary": "Key组件管理钥匙的类型（默认为LOCKTYPE.DOOR），并在钥匙类型变化时通过标签关联实体。它提供回调函数，允许在钥匙被使用或移除时执行自定义逻辑，主要参与开锁和物品交互的核心玩法。",
+  "api": [
+    {
+      "name": "SetOnUsedFn",
+      "effect": "更新组件的onused字段，当钥匙被使用时会调用此回调函数"
+    },
+    {
+      "name": "SetOnRemovedFn",
+      "effect": "更新组件的onremoved字段，当钥匙被移除时会调用此回调函数"
+    },
+    {
+      "name": "OnUsed",
+      "effect": "触发onused回调，传递锁（lock）和使用者（doer）信息；如果回调不存在则无操作"
+    },
+    {
+      "name": "OnRemoved",
+      "effect": "触发onremoved回调，传递锁（lock）和使用者（doer）信息；如果回调不存在则无操作"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除与当前keytype相关的实体标签（如'door_key'），清理副作用"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      13199,
+      20092,
+      13701,
+      22636,
+      15976,
+      15764,
+      16352
+    ],
+    "aspects": [
+      {
+        "aspect": "钥匙使用激活行为描述",
+        "evidence": [
+          {
+            "pageid": 20092,
+            "quote": "将[[远古钥匙]]插入远古大门可将其激活"
+          },
+          {
+            "pageid": 13701,
+            "quote": "用[[远古钥匙]]激活[[远古大门]]"
+          }
+        ]
+      },
+      {
+        "aspect": "钥匙移除失活行为描述",
+        "evidence": [
+          {
+            "pageid": 20092,
+            "quote": "将远古钥匙拔出可以令远古大门失去激活"
+          },
+          {
+            "pageid": 13701,
+            "quote": "织影者会走向远古大门并拔出[[远古钥匙]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "钥匙",
+    "开锁",
+    "开门",
+    "钥匙使用",
+    "钥匙移除",
+    "标签关联",
+    "钥匙功能",
+    "物品交互"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "31f9c7e855f300e7ea6b6fee66ada6d72d1aeab5649a9ae073a17d760dfe406d",
+    "source_bytes": 853,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100953951
+  }
+}

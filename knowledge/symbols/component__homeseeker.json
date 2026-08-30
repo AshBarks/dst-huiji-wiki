@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/homeseeker.lua"
+  },
+  "category": "component",
+  "display_name": "homeseeker",
+  "summary": "该组件管理实体的‘家’数据，包括设置和获取家对象。它允许实体识别并返回自己的家，常用于NPC或动物等生物的家园行为。核心玩法涉及生存模式下的动物归巢或返回基地。",
+  "api": [
+    {
+      "name": "HasHome",
+      "effect": "检查实体是否拥有一个家，并且家未处于燃烧状态。返回布尔值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含家信息的调试字符串，用于开发调试。"
+    },
+    {
+      "name": "GetHome",
+      "effect": "返回当前设置的家对象，若无家则返回nil。"
+    },
+    {
+      "name": "SetHome",
+      "effect": "设置实体的家为指定对象。如果之前有家，移除对该家的事件监听器；如果新家非空，添加监听器以在家移除时更新。"
+    },
+    {
+      "name": "GoHome",
+      "effect": "让实体执行回家动作。如果实体有移动组件，使用移动器推送动作；否则直接推送缓冲动作。参数shouldrun指定是否奔跑。"
+    },
+    {
+      "name": "GetHomePos",
+      "effect": "返回家的坐标位置，若无家则返回nil。"
+    },
+    {
+      "name": "GetHomeDirectTravelTime",
+      "effect": "计算从当前位置直接回家的理论时间，基于距离和速度。速度取最大行走速度（默认威尔逊速度或移动器速度）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WILSON_WALK_SPEED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13493,
+      20714,
+      28179,
+      51494,
+      16419,
+      13701,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "昼夜回屋行为",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "[[黄昏]]和[[夜晚]]时珍珠会试图回屋"
+          }
+        ]
+      },
+      {
+        "aspect": "超出范围返回猪屋",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "在地面时，猪人会在所属的猪屋附近 30 {{解释|距离单位}}范围内活动，超出距离会径直朝猪屋移动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "回家",
+    "家",
+    "寻路",
+    "NPC",
+    "动物",
+    "家园",
+    "归宿",
+    "移动",
+    "寻家",
+    "归巢"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "社交",
+    "导航"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "73e9cdafed333fdd0d28f07002449ad012379677e2943d6ccd18afcc300a747f",
+    "source_bytes": 2007,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092782480
+  }
+}

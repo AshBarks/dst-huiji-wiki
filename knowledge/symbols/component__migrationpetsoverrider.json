@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/migrationpetsoverrider.lua"
+  },
+  "category": "component",
+  "display_name": "migrationpetsoverrider",
+  "summary": "此组件用于管理迁移宠物在玩家生成时的偏移量计算，通过设置自定义函数覆盖默认的位置偏移行为。它参与的核心玩法是宠物迁移，确保宠物在玩家传送或生成时正确定位。组件主要服务于玩家生成器，处理迁移宠物的位置调整。",
+  "api": [
+    {
+      "name": "SetOffsetFromFn",
+      "effect": "设置用于计算偏移量的自定义函数，更新内部函数引用。"
+    },
+    {
+      "name": "GetOffsetFrom",
+      "effect": "返回相对于输入坐标 (x, y, z) 的偏移量。如果有设置的函数，则调用它计算偏移；否则返回默认偏移 (0,0,0)。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73427,
+      34523,
+      24743,
+      34314,
+      35001,
+      13689,
+      13698,
+      13707
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有讨论 SetOffsetFromFn 或 GetOffsetFrom 相关的能力表达；所有页面主要关注实体生成、数量、行为等，但未涉及偏移量函数或坐标设置。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宠物传送",
+    "玩家生成",
+    "偏移量",
+    "位置调整",
+    "自定义函数",
+    "覆盖设置",
+    "传送生成",
+    "宠物定位",
+    "迁移定位",
+    "生成偏移"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "生存",
+    "宠物",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "719236aa93af22911776d1b1d63459e6f9702fe5840cb8292904327701345656",
+    "source_bytes": 611,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101712623
+  }
+}

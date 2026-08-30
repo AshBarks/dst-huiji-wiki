@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/touchstonetracker.lua"
+  },
+  "category": "component",
+  "display_name": "touchstonetracker",
+  "summary": "组件追踪玩家在不同世界分片中使用的触石状态，记录已使用触石的ID列表。它维护当前分片和其他分片的持久化数据，支持跨世界转移。核心玩法是管理触石的使用记录，确保在重生机制中不会重复激活触石。",
+  "api": [
+    {
+      "name": "IsUsed",
+      "effect": "检查给定触石是否已被使用，返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "生成保存数据，包含当前分片和其他分片的已使用触石ID。返回一个包含'data.usedinsessions'的表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存数据，更新当前分片的'used'表和其他分片的'used_foreign'表。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件数据（包括'used'和'used_foreign'）传输到新实体组件，用于跨实体转移。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回已使用触石ID的调试字符串，用于调试输出。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理网络变量和事件监听，防止内存泄漏。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "usedtouchstone"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15335,
+      15337,
+      13260,
+      15336,
+      16627,
+      35415,
+      65605
+    ],
+    "aspects": [
+      {
+        "aspect": "复活后实体消耗",
+        "evidence": [
+          {
+            "pageid": 16627,
+            "quote": "复活并消耗掉这个肉块雕像。"
+          }
+        ]
+      },
+      {
+        "aspect": "复活激活操作",
+        "evidence": [
+          {
+            "pageid": 16627,
+            "quote": "点击右上角出现‘激活肉块雕像’按钮"
+          }
+        ]
+      },
+      {
+        "aspect": "跨世界传送能力",
+        "evidence": [
+          {
+            "pageid": 15337,
+            "quote": "可以从[[森林世界]]直接传送来到[[洞穴世界]]、反之亦然。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "重生点",
+    "跨世界",
+    "传送石",
+    "复活机制",
+    "使用记录",
+    "状态追踪",
+    "跨服传送",
+    "复活石",
+    "世界转移"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "生存",
+    "重生",
+    "世界探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "94c24acad966a5d84f682aec0180087f7183d23426b04fe20142f87f23fc1a82",
+    "source_bytes": 2641,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091997754
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldcharacterselectlobby.lua"
+  },
+  "category": "component",
+  "display_name": "worldcharacterselectlobby",
+  "summary": "该组件管理角色选择大厅的状态，包括玩家准备开始游戏和倒计时启动匹配。它处理玩家连接、断开和角色选择请求，确保所有玩家准备好后触发游戏开始。核心玩法涉及多人游戏的等待大厅阶段，控制匹配启动时机。",
+  "api": [
+    {
+      "name": "GetSpawnDelay",
+      "effect": "返回当前生成延迟的倒计时时间（秒），如果倒计时未激活（值为 COUNTDOWN_INACTIVE）则返回 -1。"
+    },
+    {
+      "name": "IsAllowingCharacterSelect",
+      "effect": "仅在主模拟下可用。返回布尔值，指示是否允许角色选择；条件为倒计时未激活且服务器未锁定关机。"
+    },
+    {
+      "name": "IsServerLockedForShutdown",
+      "effect": "返回布尔值，指示服务器是否锁定为关机状态（基于网络变量 _lockedforshutdown 的值）。"
+    },
+    {
+      "name": "IsPlayerReadyToStart",
+      "effect": "接受用户ID（userid）作为参数，返回布尔值，指示该玩家是否在准备开始列表中。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "仅在主模拟下可用。在初始化后执行，如果服务器已请求延迟关机（DeferredServerShutdownRequested），则设置关机锁定。"
+    },
+    {
+      "name": "Dump",
+      "effect": "打印所有玩家的准备状态到控制台，用于调试目的。"
+    },
+    {
+      "name": "CanPlayersSpawn",
+      "effect": "返回布尔值，指示倒计时是否结束（_countdownf == 0），即玩家可以生成。"
+    }
+  ],
+  "events_published": [
+    "lobbyplayerspawndelay"
+  ],
+  "events_listened": [
+    "spawncharacterdelaydirty",
+    "ms_requestedlobbycharacter",
+    "player_ready_to_start_dirty",
+    "ms_clientauthenticationcomplete",
+    "ms_clientdisconnected"
+  ],
+  "netvars": [
+    "_countdowni",
+    "_lockedforshutdown",
+    "_players_ready_to_start"
+  ],
+  "tunables": [
+    "ALLOW_DEBUG_START",
+    "COUNTDOWN_TIME",
+    "COUNTDOWN_INACTIVE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      65605,
+      18540,
+      10418,
+      18723,
+      19776,
+      28181,
+      52142
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 component__worldcharacterselectlobby 相关的能力表达，所有内容涉及其他游戏机制如世界翻新、海盗袭击、地震等，不讨论角色选择大厅的生成延迟、允许选择、服务器锁定、玩家准备状态、初始化、转储或玩家生成能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "角色选择",
+    "大厅",
+    "准备开始",
+    "倒计时",
+    "多人游戏",
+    "连接",
+    "断开",
+    "匹配开始",
+    "玩家状态",
+    "网络变量"
+  ],
+  "gameplay_tags": [
+    "多人游戏",
+    "大厅",
+    "准备开始",
+    "倒计时"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b1967b6543adbc1eef9ee149a1524babe596fff34ec2231d608a5f0cce0b6d9e",
+    "source_bytes": 12117,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098015253
+  }
+}

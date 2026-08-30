@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fertilizable.lua"
+  },
+  "category": "component",
+  "display_name": "fertilizable",
+  "summary": "`Fertilizable` 组件管理实体的施肥过程。它存储实例引用和一个可选的施肥回调函数。当施肥时，组件触发该回调以应用肥料效果，支持游戏中的农业系统。",
+  "api": [
+    {
+      "name": "Fertilize",
+      "effect": "检查施肥回调函数是否存在；若存在则调用该函数，传入实例和肥料参数，并返回其返回值。若回调不存在，则无操作。回调执行可能产生副作用，如改变实体状态或消耗肥料。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      21485,
+      15539,
+      14484,
+      16419,
+      15922,
+      18234,
+      16197
+    ],
+    "aspects": [
+      {
+        "aspect": "沃姆伍德施肥能力描述",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德可以用[[肥料]]给自己施肥，效果取决于肥料的营养物质"
+          },
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德为自己施肥加速开花值的效果+30%"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "施肥",
+    "肥料",
+    "植物",
+    "生长",
+    "农业",
+    "效果",
+    "回调",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8352708f8870da0194ffb2b1a63ea92e68abdd77fe6c9140564fa2296136f7d4",
+    "source_bytes": 266,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107435370
+  }
+}

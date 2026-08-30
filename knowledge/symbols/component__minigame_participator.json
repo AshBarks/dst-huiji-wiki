@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/minigame_participator.lua"
+  },
+  "category": "component",
+  "display_name": "minigame_participator",
+  "summary": "该组件管理实体参与小游戏的状态，包括当前小游戏实例和超时检查机制。核心玩法是实体通过设置小游戏实例来加入小游戏，并在小游戏结束或超时时自动退出组件。参与时还会处理跟随者的状态，确保它们在小游戏期间的行为调整。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时执行清理：移除'minigame_participator'标签，取消周期性超时检查任务，移除小游戏实例的'onremove'和'ms_minigamedeactivated'事件监听，并重置跟随者的战斗目标超时（keeptargettimeout设为0）以重新验证目标。"
+    },
+    {
+      "name": "GetMinigame",
+      "effect": "返回当前设置的小游戏实例（self.minigame），无副作用。"
+    },
+    {
+      "name": "SetMinigame",
+      "effect": "设置小游戏实例：若未设置'notimeout'，则将过期时间设为当前时间加3秒；监听小游戏实例的'onremove'和'ms_minigamedeactivated'事件以在小游戏结束时触发清理；启动周期性任务（每0.9秒）检查是否超时；若实体有leader组件，则让所有未设置'keepleaderduringminigame'的跟随者停止跟随。"
+    },
+    {
+      "name": "CurrentMinigameType",
+      "effect": "返回小游戏组件中的'gametype'值（通过self.minigame.components.minigame.gametype获取），若小游戏或组件不存在则返回nil。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串'Playing: '后跟小游戏实例的字符串表示，用于调试目的。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "ms_minigamedeactivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      16197,
+      20714,
+      46847,
+      51046,
+      51949,
+      72299,
+      13779
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未出现与'minigame'（小游戏）相关的任何内容，也未体现代码能力如OnRemoveFromEntity、GetMinigame、SetMinigame、CurrentMinigameType、GetDebugString的行为描述或玩家语言表达。页面内容集中于世界规则、食物机制、控制台命令、实体行为、区域描述、随从机制和海鱼生物，与component__minigame_participator的能力无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小游戏",
+    "参与",
+    "竞技",
+    "超时",
+    "跟随",
+    "领袖",
+    "事件",
+    "类型"
+  ],
+  "gameplay_tags": [
+    "小游戏",
+    "竞技"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "41adf1cf950cae7162f0b833af50a98c8695fcc06c5b0a8b4b9b4fd2ed5cb309",
+    "source_bytes": 2304,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109839205
+  }
+}

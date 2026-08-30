@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/amorphous.lua"
+  },
+  "category": "component",
+  "display_name": "amorphous",
+  "summary": "组件管理实体的多种形态定义，并根据容器内物品的标签自动切换形态，参与基于物品依赖的变形机制。形态切换通过调用形态表中的进入和退出函数实现，影响实体外观或功能。",
+  "api": [
+    {
+      "name": "GetCurrentForm",
+      "effect": "返回当前形态的名称字符串；如果无形态则返回nil。"
+    },
+    {
+      "name": "AddForm",
+      "effect": "接受一个形态表作为参数，将其添加到形态列表中。形态表应包含name、itemtags、enterformfn、exitformfn等字段。"
+    },
+    {
+      "name": "FindForm",
+      "effect": "接受一个名称字符串，返回在形态列表中匹配的形态表；如果未找到则返回nil。"
+    },
+    {
+      "name": "MorphToForm",
+      "effect": "切换到指定形态。如果当前形态不同，先调用当前形态的exitformfn函数，然后设置当前形态为新形态，并调用新形态的enterformfn函数。参数instant控制是否立即切换。"
+    },
+    {
+      "name": "CheckForMorph",
+      "effect": "检查容器是否打开或实体是否死亡，如果是则直接返回；否则遍历形态列表，根据容器物品的标签匹配形态，调用MorphToForm切换到第一个匹配的形态，如果没有匹配则切换到默认形态（列表最后一个）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onclose",
+    "itemget",
+    "itemlose"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      18359,
+      28744,
+      19129,
+      72441,
+      14696,
+      22465,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "备份形态转换机制",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "当附身底盘跟随的玩家左键点击附身底盘，会将其转变为一个同步了附身底盘生命值且拥有 100% 伤害减免的备份形态"
+          }
+        ]
+      },
+      {
+        "aspect": "形态转换过程描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "天体英雄拥有三个形态，在每个形态被击败后，它会崩塌倒地、掉落一些物品并很快进入下一个形态。"
+          }
+        ]
+      },
+      {
+        "aspect": "物品显形为生物描述",
+        "evidence": [
+          {
+            "pageid": 28744,
+            "quote": "当拟态蠕虫刚从拟态物品中显形时，它会恐慌地乱跑 5 秒钟。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "变形",
+    "形态",
+    "容器",
+    "物品",
+    "形态切换",
+    "自动变形",
+    "变形机制",
+    "容器标签",
+    "物品影响"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "物品",
+    "形态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4d31819b0cec6cb6af29b7451e84a933f1995d980c654e7de21aed6c14abbd2e",
+    "source_bytes": 3144,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098079631
+  }
+}

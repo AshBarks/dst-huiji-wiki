@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_worldreset.lua"
+  },
+  "category": "component",
+  "display_name": "shard_worldreset",
+  "summary": "Shard_WorldReset 组件管理一个网络同步的倒计时计数器，用于协调饥荒联机版中主分片与副分片之间的世界重置事件。它监听并同步重置倒计时数据，确保副分片能及时获取更新信息，参与联机世界的重置流程。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。仅通过事件监听和网络变量同步数据，不暴露可调用接口。",
+  "events_published": [],
+  "events_listened": [
+    "master_worldresetupdate",
+    "countdowndirty"
+  ],
+  "netvars": [
+    "shard_worldreset._countdown"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18540,
+      65605,
+      18723,
+      19776,
+      50903,
+      14713,
+      13216,
+      13477
+    ],
+    "aspects": [
+      {
+        "aspect": "世界重置倒计时可调整",
+        "evidence": [
+          {
+            "pageid": 50903,
+            "quote": "世界重置的倒计时可以在[[世界规则]]中调整"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡触发世界重置条件",
+        "evidence": [
+          {
+            "pageid": 50903,
+            "quote": "如果世界中的所有玩家都已死亡，并且重置倒计时（默认 120 秒）内没有玩家复活，则世界将重置。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "世界重置",
+    "倒计时",
+    "分片协调",
+    "主分片",
+    "副分片",
+    "重置倒计时",
+    "同步倒计时",
+    "联机重置事件"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "联机",
+    "世界事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "97a6ef374032eeb27dc3d8bed99f90039c8542fcc941f63fed595532c02051b3",
+    "source_bytes": 1714,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103547894
+  }
+}

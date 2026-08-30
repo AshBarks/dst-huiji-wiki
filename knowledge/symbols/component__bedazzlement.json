@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bedazzlement.lua"
+  },
+  "category": "component",
+  "display_name": "bedazzlement",
+  "summary": "该组件管理蜘蛛巢的“钻石化”状态，通过视觉动画和声音效果装饰蜘蛛巢实体。它控制蜘蛛巢的生长、小地图图标显示以及地面爬行半径，并定期安抚附近的蜘蛛，为其添加“bedazzle_buff”减益效果。核心玩法涉及装饰蜘蛛巢和干扰蜘蛛行为，常用于生存或控制策略。",
+  "api": [
+    {
+      "name": "Start",
+      "effect": "开始钻石化效果：为实体添加“bedazzled”标签，显示动画符号“bedazzled_flare”，播放钻石化动画后切换到闲置动画，播放“bedazzle”声音，停止蜘蛛巢生长（通过growable组件），将小地图图标设为“spiderden_bedazzled.png”，设置地面爬行半径为TUNING.SPIDERDEN_CREEP_RADIUS_BEDAZZLED（若不在平台上），并启动周期任务每TUNING.BEDAZZLEMENT_RATE时间调用PacifySpiders。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止钻石化效果：播放“downgrade”声音，移除“bedazzled”标签，隐藏动画符号“bedazzled_flare”，恢复小地图图标为当前阶段对应版本（如“spiderden_[stage].png”），若不在平台上则恢复蜘蛛巢生长并设置地面爬行半径为TUNING.SPIDERDEN_CREEP_RADIUS[阶段]，清理“shaving”变量，并取消周期任务。"
+    },
+    {
+      "name": "PacifySpiders",
+      "effect": "安抚附近蜘蛛：根据蜘蛛巢阶段（上限为3）获取对应TUNING.BEDAZZLEMENT_RADIUS半径，搜索该半径内标签包含“spider”且排除“spiderqueen”、“creaturecorpse”、“NOCLICK”的实体，并为每个蜘蛛添加“bedazzle_buff”减益效果。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态：若实体有“bedazzled”标签，则返回包含data.bedazzled为true的表；否则返回空表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态：如果传入数据中存在data.bedazzled为true，则延迟一帧（通过DoTaskInTime(0)）调用Start()以恢复钻石化状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SPIDERDEN_CREEP_RADIUS_BEDAZZLED",
+    "TUNING.BEDAZZLEMENT_RATE",
+    "TUNING.BEDAZZLEMENT_RADIUS",
+    "TUNING.SPIDERDEN_CREEP_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70704,
+      15434,
+      23187,
+      18231,
+      13493,
+      13408,
+      52634,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "停止蜘蛛巢生长",
+        "evidence": [
+          {
+            "pageid": 13408,
+            "quote": "停止生长"
+          }
+        ]
+      },
+      {
+        "aspect": "安抚附近蜘蛛",
+        "evidence": [
+          {
+            "pageid": 13408,
+            "quote": "安抚附近的所有蜘蛛"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "钻石化",
+    "蜘蛛安抚",
+    "蜘蛛巢",
+    "装饰",
+    "地图图标",
+    "停止生长",
+    "动画效果",
+    "减益效果"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存",
+    "控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "35caa0ab3ff696fce12a1c23ac99c8b707af276bcbb8b1d3ce3962625c53e18c",
+    "source_bytes": 2696,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105554902
+  }
+}

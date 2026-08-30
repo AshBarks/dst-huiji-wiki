@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/preservative.lua"
+  },
+  "category": "component",
+  "display_name": "preservative",
+  "summary": "preservative组件管理与保鲜相关的数据，包括百分比增加值和是否根据堆栈大小调整效果。这些属性用于控制物品的防腐效果，在游戏中延长易腐物品的保质期。核心玩法涉及物品保鲜机制，影响食物的保存和生存策略。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13779,
+      14699,
+      18057,
+      19129,
+      20192,
+      15415,
+      16197,
+      14709
+    ],
+    "aspects": [
+      {
+        "aspect": "保鲜背包的腐烂减缓机制描述",
+        "evidence": [
+          {
+            "pageid": 14699,
+            "quote": "保鲜背包提供 8 个物品栏，并且能使放置在里面的物品减缓 50% 的腐烂速度"
+          }
+        ]
+      },
+      {
+        "aspect": "极地熊獾桶的保质期延长效果说明",
+        "evidence": [
+          {
+            "pageid": 20192,
+            "quote": "极地熊獾桶中存放的食物腐烂速度降低 95%，即保质期延长至 20 倍。"
+          }
+        ]
+      },
+      {
+        "aspect": "盐盒的保鲜能力对比描述",
+        "evidence": [
+          {
+            "pageid": 14709,
+            "quote": "盐盒提供两倍于冰箱的保鲜能力，四倍于食材正常情况下的保鲜能力。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "保鲜",
+    "防腐",
+    "保鲜效果",
+    "堆叠大小",
+    "保鲜百分比",
+    "物品保鲜",
+    "易腐物品",
+    "保质期",
+    "保鲜机制"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "生存",
+    "物品保鲜"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cafc4d4e9d28bf166765461cf8a1e53ddc436d4c813f480bccb464d9d0a0baea",
+    "source_bytes": 176,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102750151
+  }
+}

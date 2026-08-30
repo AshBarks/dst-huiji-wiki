@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/blowinwind.lua"
+  },
+  "category": "component",
+  "display_name": "blowinwind",
+  "summary": "该组件管理实体的风速和风向数据，控制实体在风中的移动行为。它通过更新速度、方向和声音参数来模拟风对实体的吹动效果，影响游戏中的动态环境交互。",
+  "api": [
+    {
+      "name": "OnEntitySleep",
+      "effect": "当实体进入睡眠状态时调用，停止风效果和声音循环。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "当实体从睡眠状态唤醒时调用，以之前设置的角度和速度倍数重新启动风效果。"
+    },
+    {
+      "name": "StartSoundLoop",
+      "effect": "开始播放指定的声音循环，如果声音路径和名称有效且未在播放。"
+    },
+    {
+      "name": "StopSoundLoop",
+      "effect": "停止指定的声音循环。"
+    },
+    {
+      "name": "Start",
+      "effect": "启动风效果，设置风向角度和速度倍数，初始化声音循环并开始每帧更新组件。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止风效果，终止声音循环并停止每帧更新组件。"
+    },
+    {
+      "name": "ChangeDirection",
+      "effect": "改变风向角度，但不改变速度倍数。"
+    },
+    {
+      "name": "SetMaxSpeedMult",
+      "effect": "设置最大速度倍数，用于速度变化范围的上界。"
+    },
+    {
+      "name": "SetMinSpeedMult",
+      "effect": "设置最小速度倍数，用于速度变化范围的下界。"
+    },
+    {
+      "name": "SetAverageSpeed",
+      "effect": "设置平均速度基准，用于映射速度向量长度到实际移动速度。"
+    },
+    {
+      "name": "GetSpeed",
+      "effect": "返回当前实体的风速值。"
+    },
+    {
+      "name": "GetVelocity",
+      "effect": "返回当前实体的速度向量。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "获取调试字符串，当前实现为空，不返回任何信息。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新风效果，计算速度变化、更新声音参数，并驱动实体移动和旋转。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WILSON_RUN_SPEED",
+    "TUNING.WILSON_WALK_SPEED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14813,
+      51287,
+      13406,
+      15922,
+      24276,
+      20428,
+      13260,
+      14938
+    ],
+    "aspects": [
+      {
+        "aspect": "周期性更新行为",
+        "evidence": [
+          {
+            "pageid": 24276,
+            "quote": "每 1/6 秒对附近的所有实体造成 7 点物理伤害并进行 1 次砍伐、开采、挖掘和锤击工作"
+          }
+        ]
+      },
+      {
+        "aspect": "方向变化行为",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "到达目标位置后转为随机移动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "风速",
+    "风向",
+    "移动速度",
+    "吹动",
+    "移动行为",
+    "吹动效果",
+    "环境交互"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "环境交互",
+    "移动控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "18b191c67bc2479413f2ca5200ba1a7c8cdfbcdf7fe6e24771255da20a35473d",
+    "source_bytes": 4456,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098332752
+  }
+}

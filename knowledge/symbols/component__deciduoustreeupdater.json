@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deciduoustreeupdater.lua"
+  },
+  "category": "component",
+  "display_name": "deciduoustreeupdater",
+  "summary": "管理落叶树的“怪物树”形态转换与攻击行为。在怪物持续时间内，树木会寻找附近目标，定期生成树根进行攻击，并周期性生成 birchnutdrake（小龙）发动群体袭击。组件还处理怪物形态的启动、停止以及实体休眠/唤醒状态下的任务管理。",
+  "api": [
+    {
+      "name": "StartMonster",
+      "effect": "启动树木的怪物形态。设置怪物持续时间、小龙生成间隔，为实体添加\"monster\"标签，并启动组件的更新循环。若实体已在怪物形态，则无效。"
+    },
+    {
+      "name": "StopMonster",
+      "effect": "停止树木的怪物形态。重置所有怪物相关状态与任务，移除\"monster\"标签，并停止组件的更新循环。此为清除怪物形态的核心方法。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "当实体从休眠中唤醒时调用。取消当前的休眠停止任务，若怪物形态未激活则尝试启动怪物形态。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "当实体即将进入休眠时调用。设置一个1秒后的任务，若此期间实体仍未唤醒则调用StopMonster停止怪物形态。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件的每帧更新函数。核心逻辑包括：检查怪物持续时间是否结束、根据间隔生成被动小龙、周期性寻找攻击目标并生成树根（deciduous_root）攻击、在满足条件时触发小龙生成波次。是怪物形态下战斗行为的主要驱动器。"
+    },
+    {
+      "name": "SpawnIgniteWave",
+      "effect": "立即触发一波小龙（birchnutdrake）的生成，生成数量在TUNING定义的范围内随机。这是独立于周期生成逻辑的主动召唤方法。"
+    }
+  ],
+  "api_note": "包含怪物形态控制与战斗逻辑的方法。",
+  "events_published": [
+    "sway"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      34523,
+      20714,
+      34314,
+      65605,
+      51046,
+      52788,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有找到与组件 `component__deciduoustreeupdater` 相关的能力表达。所有页面讨论的是其他游戏实体或机制，如天体英雄、布景生成、控制台命令、世界生成、战争瓦器人、克劳斯等，未涉及落叶树更新或对应组件能力（如 StartMonster、StopMonster、OnEntityWake、OnEntitySleep、OnUpdate、SpawnIgniteWave）的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "桦树",
+    "桦树精",
+    "树根",
+    "小龙",
+    "攻击",
+    "生成",
+    "形态变化"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 0/7)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "自然"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "831c84b470dbf8f764f59ea1c7c7a9bc1036fe9b5c0b870ba09fb2d3a1e548aa",
+    "source_bytes": 12783,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106645100
+  }
+}

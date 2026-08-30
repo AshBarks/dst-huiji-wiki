@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/disappears.lua"
+  },
+  "category": "component",
+  "display_name": "disappears",
+  "summary": "该组件管理实体的定时消失过程。通过 PrepareDisappear 设置随机延迟后自动触发消失，在消失时播放声音和动画、添加 'NOCLICK' 标签禁用交互、并最终移除实体。常用于临时物体或事件驱动的实体生命周期管理。",
+  "api": [
+    {
+      "name": "Disappear",
+      "effect": "立即触发消失。设置消失标志，取消延迟任务，调用可选消失函数；如果实体在睡眠则直接移除；否则设置为不可保存、添加 NOCLICK 标签、禁用库存拾取、播放声音和动画，监听动画结束以移除实体，并添加备用定时移除。"
+    },
+    {
+      "name": "StopDisappear",
+      "effect": "停止当前的消失延迟任务。如果消失未触发，取消任务并重置时间记录。"
+    },
+    {
+      "name": "PrepareDisappear",
+      "effect": "准备消失，在随机延迟后触发。停止现有任务，设置新延迟任务，延迟为配置延迟加0-10秒随机值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示状态：已消失、倒计时中或未激活。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      23957,
+      13260,
+      15022,
+      28179,
+      34003,
+      46887,
+      15539
+    ],
+    "aspects": [
+      {
+        "aspect": "小虚影的冲刺后消失",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "小虚影（天体英雄）会向前冲刺，击中目标造成 135 点伤害，冲刺结束后就会消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "弹弓弹药的飞行后消失",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "所有发射的弹弓弹药的基础飞行速度为 25，在消失前最远可飞行 30 {{解释|距离单位}}。"
+          }
+        ]
+      },
+      {
+        "aspect": "恶液的定时消失",
+        "evidence": [
+          {
+            "pageid": 34003,
+            "quote": "由恶液罐产生的小团恶液能够持续存在 1 天，一天后就会直接消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "机缘兔子的离开范围消失",
+        "evidence": [
+          {
+            "pageid": 28179,
+            "quote": "离开{{解释|加载范围}}的机缘兔子会直接消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "流浪商人的活动期间消失",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "开启[[皮弗娄牛选美比赛]]会让流浪商人暂时消失，比赛结束以后再在原地重新出现。"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂的延迟消失",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "释放灵魂在治疗一次之后不会消失，而是继续存在3.5秒。时间结束后进行第二次治疗，然后消失"
+          }
+        ]
+      },
+      {
+        "aspect": "裂隙消失时的连锁消失",
+        "evidence": [
+          {
+            "pageid": 23956,
+            "quote": "裂隙生成的[[熔合暗影]]和[[黑暗瘴气]]会一同消失。"
+          },
+          {
+            "pageid": 23957,
+            "quote": "裂隙生成的[[牧者]]和[[裂隙晶体会一同消失。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "消失",
+    "定时消失",
+    "播放声音",
+    "播放动画",
+    "禁用点击",
+    "临时物体",
+    "事件驱动",
+    "实体管理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "临时物体"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "170d23ccac1feb27770f93476c600de0cd2178732b0c9dc146c43d2e05c50e03",
+    "source_bytes": 2307,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096540570
+  }
+}

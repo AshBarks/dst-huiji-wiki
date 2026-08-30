@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanicemanager.lua"
+  },
+  "category": "component",
+  "display_name": "oceanicemanager",
+  "summary": "OceanIceManager组件管理海洋冰的创建、损伤和破坏生命周期。它维护一个数据网格来跟踪冰的健康值、破坏标记和伤害预制体，破坏时触发地形变化（从冰变回海洋）、实体交互（如玩家落水、物品弹射）和视觉效果。该组件参与海洋冰的地形管理和破坏机制，影响生存环境和玩家互动。",
+  "api": [
+    {
+      "name": "CreateIceAtPoint",
+      "effect": "在指定世界坐标点创建海洋冰。副作用：将地形瓦片设置为OCEAN_ICE，更新冰健康网格，处理附近实体（如鱼类被弹射、牛蒡被移除、物品被推开），修复浮动对象状态。"
+    },
+    {
+      "name": "CreateIceAtTile",
+      "effect": "在指定瓦片坐标创建海洋冰。行为与CreateIceAtPoint类似，使用瓦片坐标操作。"
+    },
+    {
+      "name": "QueueCreateIceAtPoint",
+      "effect": "排队延迟创建海洋冰。副作用：设置冰健康值，延迟调用CreateIceAtPoint，可指定延迟时间参数。"
+    },
+    {
+      "name": "DestroyIceAtPoint",
+      "effect": "在指定世界坐标点破坏海洋冰。副作用：将地形瓦片恢复为原状（如OCEAN_SWELL），处理附近实体（如玩家推送事件落水、物品销毁或掉落），生成破坏效果（如碎片、冰块弹射）和视觉效果，修复浮动对象状态。"
+    },
+    {
+      "name": "QueueDestroyForIceAtPoint",
+      "effect": "排队延迟破坏海洋冰。副作用：生成裂缝视觉效果，延迟调用DestroyIceAtPoint，向附近实体推送事件（如abandon_ship、onpresink），可指定延迟时间。"
+    },
+    {
+      "name": "DamageIceAtPoint",
+      "effect": "对指定世界坐标点的海洋冰造成伤害。副作用：减少冰健康值，如果健康值降为0则排队破坏，生成或更新伤害视觉效果。"
+    },
+    {
+      "name": "DamageIceAtTile",
+      "effect": "对指定瓦片坐标的海洋冰造成伤害。行为与DamageIceAtPoint类似。"
+    },
+    {
+      "name": "SpawnDamagePrefab",
+      "effect": "根据冰健康值生成或移除伤害预制体视觉效果。副作用：健康值低于最大值时显示伤害效果，健康值满时移除效果。"
+    },
+    {
+      "name": "FixupFloaterObjects",
+      "effect": "修复指定区域内浮动对象的状态。副作用：根据地形是否为海洋，向浮动对象推送on_landed或on_no_longer_landed事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据。副作用：返回编码的破坏标记网格和健康网格数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据。副作用：恢复破坏标记和健康网格状态，重启中断的破坏任务，生成伤害预制体视觉效果。"
+    }
+  ],
+  "events_published": [
+    "icefloebreak"
+  ],
+  "events_listened": [
+    "worldmapsetsize"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15204
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录讨论 fence_gate 的掉落物和碰撞体积，不涉及 oceanicemanager 的代码能力清单（如 CreateIceAtPoint 等）的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "海洋冰",
+    "冰破坏",
+    "冰创建",
+    "地形变化",
+    "伤害冰",
+    "浮动物",
+    "破坏效果",
+    "健康网格",
+    "冰管理",
+    "生存环境"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "地形",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c36b26c40a4e13a28f70c1fe814679c5de3aaa0897a77edda3b77cd556e6b8f8",
+    "source_bytes": 22925,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110595599
+  }
+}

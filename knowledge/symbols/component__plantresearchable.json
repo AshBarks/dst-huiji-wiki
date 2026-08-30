@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/plantresearchable.lua"
+  },
+  "category": "component",
+  "display_name": "plantresearchable",
+  "summary": "PlantResearchable组件用于标记和管理可研究的植物实体，通过添加'plantresearchable'标签实现。它提供设置研究信息函数、获取植物研究信息、判断是否为随机种子以及学习植物阶段的方法。该组件参与植物识别和研究的核心玩法，通过事件与玩家互动，支持植物知识的学习机制。",
+  "api": [
+    {
+      "name": "SetResearchFn",
+      "effect": "设置一个函数，用于返回植物的研究信息。更新内部状态self.reasearchinfofn。"
+    },
+    {
+      "name": "GetResearchInfo",
+      "effect": "调用设置的函数获取植物研究信息；如果未设置函数则返回nil。无副作用。"
+    },
+    {
+      "name": "IsRandomSeed",
+      "effect": "通过调用GetResearchInfo获取研究信息，如果返回nil则判断植物为随机种子，返回true；否则返回false。无副作用。"
+    },
+    {
+      "name": "LearnPlant",
+      "effect": "调用GetResearchInfo获取植物和阶段信息，如果均存在则向doer实体推送'learnplantstage'事件，携带{plant, stage}数据；否则无操作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "learnplantstage"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14486,
+      18545,
+      34101,
+      14579,
+      13567,
+      15737,
+      73159,
+      15240
+    ],
+    "aspects": [
+      {
+        "aspect": "吃种子后外观变化",
+        "evidence": [
+          {
+            "pageid": 15737,
+            "quote": "吃掉不同种子的胡萝卜鼠的耳朵和尾巴会显现不同颜色和形状："
+          }
+        ]
+      },
+      {
+        "aspect": "种子随机种植行为",
+        "evidence": [
+          {
+            "pageid": 18545,
+            "quote": "种子可以栽种于[[农田土壤]]，使其随机长出一种[[农作物]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "植物识别",
+    "研究植物",
+    "植物学习",
+    "种子",
+    "植物阶段",
+    "信息获取",
+    "事件互动",
+    "知识"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "研究",
+    "识别"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "03a400bb06b49730370b99ca8b2fbb37e2629af6e09330f8dabdb486937188a5",
+    "source_bytes": 684,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110930584
+  }
+}

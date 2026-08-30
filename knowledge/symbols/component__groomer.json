@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/groomer.lua"
+  },
+  "category": "component",
+  "display_name": "groomer",
+  "summary": "groomer组件管理玩家使用理发店或衣柜进行外观改变的状态数据，包括使用者列表、启用状态和交互范围。核心玩法是支持角色皮肤更换，允许玩家在游戏内自定义外观，支持多人共享或独占使用，并处理相关事件如着火时强制关闭。组件通过范围检测自动结束超出距离的使用者交互。",
+  "api": [
+    {
+      "name": "SetOccupant",
+      "effect": "设置组件的占用者实体，用于指定皮肤变更的目标。"
+    },
+    {
+      "name": "SetCanUseAction",
+      "effect": "设置是否将该实体包含在玩家动作集合中，控制是否可交互。"
+    },
+    {
+      "name": "SetCanBeDressed",
+      "effect": "设置是否允许实体被装扮，影响标签'dressable'的添加或移除。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用或禁用组件，禁用时所有更换尝试将失败并返回'INUSE'原因。"
+    },
+    {
+      "name": "SetCanBeShared",
+      "effect": "设置组件是否允许多人同时使用，共享模式下移除着火事件监听，非共享时监听着火事件强制关闭。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "设置交互范围，用于检测使用者是否在有效距离内。"
+    },
+    {
+      "name": "SetChangeInDelay",
+      "effect": "设置更换延迟时间。"
+    },
+    {
+      "name": "GetOccupant",
+      "effect": ""
+    },
+    {
+      "name": "CanBeginChanging",
+      "effect": "检查是否可以开始更换过程，返回布尔值和原因（如'INUSE'、'BURNING'或状态繁忙）。"
+    },
+    {
+      "name": "BeginChanging",
+      "effect": "开始更换过程，为使用者添加事件监听（如'onremove'、'ms_closepopup'），并触发状态机转换为'openwardrobe'，同时启动组件更新。"
+    },
+    {
+      "name": "EndChanging",
+      "effect": "结束特定使用者的更换，移除事件监听，清理状态，并在无使用者时停止组件更新。"
+    },
+    {
+      "name": "EndAllChanging",
+      "effect": "结束所有使用者的更换，逐个调用EndChanging进行清理。"
+    },
+    {
+      "name": "ActivateChanging",
+      "effect": "激活皮肤更换，验证条件后调用DoChange函数，触发状态机转换为'dressupwardrobe'并应用皮肤。"
+    },
+    {
+      "name": "ApplyTargetSkins",
+      "effect": "应用皮肤到目标实体，通过回调函数applytargetskinsfn执行实际皮肤变更。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，检查使用者是否在范围内，超出范围则自动结束其更换过程。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时的清理，结束所有更换并移除事件监听和标签。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体被移除时结束所有更换，调用EndAllChanging。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onignite",
+    "onremove",
+    "ms_closepopup",
+    "unhitched"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      15526,
+      15301,
+      18075,
+      15011,
+      13268,
+      14426,
+      14660
+    ],
+    "aspects": [
+      {
+        "aspect": "皮肤更换功能描述",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "皮弗娄牛美妆台可以用于给皮弗娄牛更换皮肤。"
+          }
+        ]
+      },
+      {
+        "aspect": "绑定占用者过程描述",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "可以将皮弗娄牛绑到美妆台上，此时牛会主动来到美妆台旁边并停止移动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "衣柜",
+    "换装",
+    "皮肤",
+    "外观",
+    "装扮",
+    "皮肤更换",
+    "自定义外观",
+    "多人共享",
+    "交互范围"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "装扮",
+    "社交",
+    "自定义"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3c60a3c3f3f8d36d2f794591229e72d7c71fe4719113c4fc68d4b5f40bc0b815",
+    "source_bytes": 8197,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100479867
+  }
+}

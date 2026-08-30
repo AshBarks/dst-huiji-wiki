@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grottowaterfallsoundcontroller.lua"
+  },
+  "category": "component",
+  "display_name": "grottowaterfallsoundcontroller",
+  "summary": "该组件用于管理洞穴瀑布区域的音效播放，跟踪附近的大型和小型水池，并使用多个声音发射器根据玩家位置动态调整瀑布循环声音。通过音量淡入淡出和位置更新，提供平滑的环境音效体验，增强游戏沉浸感。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，包含当前跟踪的大型水池数量、小型水池数量和播放中的声音发射器数量。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_registergrottopool",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19297,
+      20714
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未涉及 component__grottowaterfallsoundcontroller 或其 GetDebugString 能力的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "洞穴瀑布音效",
+    "水池声音控制",
+    "声音发射器",
+    "玩家位置触发",
+    "循环播放音效",
+    "音量淡入淡出",
+    "环境音效管理",
+    "动态位置调整"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "环境",
+    "音效"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "71d89ade4720ba6269adea65a372b0760f342c7722dd061c45ce5b942d49c29a",
+    "source_bytes": 7851,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108172244
+  }
+}

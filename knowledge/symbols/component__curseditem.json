@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/curseditem.lua"
+  },
+  "category": "component",
+  "display_name": "curseditem",
+  "summary": "该组件管理诅咒物品的数据，包括激活状态和目标。它通过周期性任务寻找附近玩家，检查其库存空间，并在合适时施加诅咒。物品会自动向目标玩家移动，并处理所有者死亡或物品移除时的清除逻辑。",
+  "api": [
+    {
+      "name": "checkplayersinventoryforspace",
+      "effect": "检查指定玩家的库存是否有空间容纳此诅咒物品。考虑空位、部分堆叠或可丢弃物品，返回布尔值表示是否有空间。"
+    },
+    {
+      "name": "lookforplayer",
+      "effect": "启动周期性任务，每1秒寻找附近10单位内的玩家，并检查其库存空间和可诅咒状态。找到合适玩家后设置为当前目标。"
+    },
+    {
+      "name": "CheckForOwner",
+      "effect": "检查诅咒目标的状态。如果目标死亡，清除诅咒；如果物品不在正确位置，强制将其附着到所有者。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新函数。处理向目标玩家移动、检查所有者状态；如果无目标则寻找玩家。移动速度根据距离调整，最大速度20。"
+    },
+    {
+      "name": "Given",
+      "effect": "当物品被拾取时调用。如果未应用诅咒，则对所有者应用诅咒；如果已应用，显示无法逃脱诅咒的消息。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onpickup",
+    "entitysleep",
+    "entitywake"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15186,
+      13556,
+      10379,
+      13897,
+      15380,
+      13406,
+      13701,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 'component__curseditem' 组件的能力或行为；所有页面讨论的是其他实体（如灵体草药、阿比盖尔等）的属性和行为，与 'curseditem' 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "诅咒装备",
+    "自动附魔",
+    "玩家目标",
+    "背包检查",
+    "死亡清除",
+    "诅咒效果",
+    "物品移动",
+    "任务周期"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "22023a5deb5783a7705c5a5e97133d3d9f9f4d580a0249c3de9b5792298cddc8",
+    "source_bytes": 6743,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099313128
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_worldvoter.lua"
+  },
+  "category": "component",
+  "display_name": "shard_worldvoter",
+  "summary": "该组件管理跨碎片的世界投票状态，包括投票启用、倒计时、命令ID、目标用户、发起用户、投票者列表和禁言列表。它协调主碎片与次碎片之间的投票数据同步，用于多人服务器中玩家发起的世界规则投票决策。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；仅处理网络变量同步和事件监听。",
+  "events_published": [
+    "secondary_worldvoterenabled",
+    "secondary_worldvoterupdate",
+    "secondary_worldvotersquelchedupdate"
+  ],
+  "events_listened": [
+    "master_worldvoterenabled",
+    "master_worldvoterupdate",
+    "master_worldvotersquelchedupdate",
+    "voterenableddirty",
+    "voterdirty",
+    "squelcheddirty"
+  ],
+  "netvars": [
+    "_enabled",
+    "_countdown",
+    "_commandid",
+    "_targetuserid",
+    "_starteruserid",
+    "_voters",
+    "_squelched"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22611,
+      18474,
+      52220,
+      15022,
+      19872,
+      52773,
+      17809,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及与 component__shard_worldvoter 相关的任何能力或行为。页面内容涉及月雹、化石碎片、礼服款式、天体英雄、启迪碎片、敌意虚影、骨头汤和世界翻新，但这些与组件 shard_worldvoter 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "投票",
+    "碎片",
+    "倒计时",
+    "投票启用",
+    "投票列表",
+    "世界规则",
+    "多人服务器",
+    "投票决策"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "社交",
+    "多人游戏",
+    "世界管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "df0b8b27ae565ea3002559ff77b03d3950062427191aaf4967f7e2eedbf73c8b",
+    "source_bytes": 5540,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103633797
+  }
+}

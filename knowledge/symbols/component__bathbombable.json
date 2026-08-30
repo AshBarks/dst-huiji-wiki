@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bathbombable.lua"
+  },
+  "category": "component",
+  "display_name": "bathbombable",
+  "summary": "BathBombable组件管理实体对浴缸炸弹的响应状态和交互。它控制实体是否可被浴缸炸弹击中，并在击中时执行自定义效果。该组件是浴缸炸弹玩法机制的核心，允许实体在游戏世界中与浴缸炸弹物品互动。",
+  "api": [
+    {
+      "name": "SetOnBathBombedFn",
+      "effect": "设置回调函数，当实体被浴缸炸弹击中时调用。参数 new_fn 为回调函数。"
+    },
+    {
+      "name": "OnBathBombed",
+      "effect": "执行浴缸炸弹击中逻辑：将 is_bathbombed 设为 true，can_be_bathbombed 设为 false，并调用已设置的回调函数（如果存在）。参数 item 为浴缸炸弹物品，doer 为使用者。"
+    },
+    {
+      "name": "DisableBathBombing",
+      "effect": "禁用浴缸炸弹功能：将 is_bathbombed 和 can_be_bathbombed 都设为 false，使实体不再响应浴缸炸弹。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置组件状态：将 is_bathbombed 设为 false，can_be_bathbombed 设为 true，使实体可再次被浴缸炸弹击中。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用：移除标签 'bathbombable'，使实体不再标识为可被浴缸炸弹击中。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13271,
+      52069,
+      18269,
+      70479
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及浴缸炸弹相关的能力或行为表达。所有页面讨论的是其他游戏元素，如切斯特、月亮冰雹和温泉，与浴缸炸弹组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "浴缸炸弹机制",
+    "炸弹击中",
+    "实体互动",
+    "响应状态",
+    "交互效果",
+    "状态控制",
+    "重置功能"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 5/7)",
+  "gameplay_tags": [
+    "装饰",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d162a19fb75c10b0e44b425f4ec0b1b90802a674c34079ba5a73e18577b9953b",
+    "source_bytes": 1049,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096251254
+  }
+}

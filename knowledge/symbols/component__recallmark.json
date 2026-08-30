@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/recallmark.lua"
+  },
+  "category": "component",
+  "display_name": "recallmark",
+  "summary": "recallmark组件管理实体标记的位置坐标和世界ID，用于实现传送相关的核心玩法。它负责设置、检查和获取标记位置，处理跨分片的标记复制，并确保位置在允许传送的区域内。组件还支持数据的保存和加载，以维持游戏状态。",
+  "api": [
+    {
+      "name": "MarkPosition",
+      "effect": "设置标记位置，传入坐标和世界ID。首先检查坐标点是否允许传送（通过IsTeleportingPermittedFromPointToPoint函数），如果允许则存储坐标和世界ID，移除实体上的'recall_unmarked'标签，并触发onMarkPosition回调。返回成功状态布尔值，如果传送不允许则返回错误原因字符串（如'NO_TELEPORT_ZONE'）。副作用：修改组件的内部状态，可能触发回调。"
+    },
+    {
+      "name": "Copy",
+      "effect": "从另一个recallmark组件复制标记位置。传入另一个实体作为参数，获取其recallmark组件，如果存在则调用MarkPosition方法复制坐标和世界ID。副作用：更新当前组件的标记数据。"
+    },
+    {
+      "name": "IsMarked",
+      "effect": "检查是否已标记位置。返回布尔值，如果recall_worldid不为nil则为true。无副作用。"
+    },
+    {
+      "name": "IsMarkedForSameShard",
+      "effect": "检查标记是否与当前分片相同。返回布尔值，比较recall_worldid与当前分片ID（通过TheShard:GetShardId()获取）。无副作用。"
+    },
+    {
+      "name": "GetMarkedPosition",
+      "effect": "获取标记位置坐标。仅当标记的世界ID与当前分片相同时，返回recall_x、recall_y、recall_z；否则返回nil。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据。返回一个表，包含recall_x、recall_y、recall_z和recall_worldid字段，用于序列化。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据。从传入的数据表中提取recall_worldid，如果存在则调用MarkPosition方法设置标记位置。副作用：更新组件状态，可能触发MarkPosition的回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "回城标记",
+    "传送标记",
+    "位置坐标",
+    "世界标识",
+    "跨片传送",
+    "标记复制",
+    "数据保存",
+    "传送核心"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "传送",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "25105cd4a04c39c64f2c4f08a99aeca1f413d2172abfc70c40e6eb0e706e3aa4",
+    "source_bytes": 1825,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111626647
+  }
+}

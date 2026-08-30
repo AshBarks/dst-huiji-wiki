@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farmsoildrinker.lua"
+  },
+  "category": "component",
+  "display_name": "farmsoildrinker",
+  "summary": "FarmSoilDrinker 组件管理实体（如土壤）的湿润和干燥时间，用于追踪水分状态。它计算土壤水合时间的百分比，参与农场种植系统，确保作物能根据湿度生长。组件在创建时自动注册到世界系统，并在移除时注销，以管理其生命周期。",
+  "api": [
+    {
+      "name": "CalcPercentTimeHydrated",
+      "effect": "计算并返回土壤水合时间的百分比（湿润时间占总时间的比例）。行为是先调用 UpdateMoistureTime 更新时间数据，然后基于当前土壤湿度状态计算百分比。副作用是修改内部 time 数据和 timer_start_time。"
+    },
+    {
+      "name": "GetMoistureRate",
+      "effect": "获取实体的浇水率。行为是如果定义了 getdrinkratefn 函数，则调用它并返回结果，否则返回 0。无副作用，仅返回数值。"
+    },
+    {
+      "name": "OnSoilMoistureStateChange",
+      "effect": "处理土壤湿度状态变化事件。行为是当土壤湿度状态变化时，如果定义了 onsoilmoisturestatechangefn 回调函数，则调用它并传入当前和之前状态。副作用是触发回调函数，可能修改实体状态。"
+    },
+    {
+      "name": "CopyFrom",
+      "effect": "从另一个 FarmSoilDrinker 实例复制数据。行为是调用目标实例的 OnSave 方法获取数据，然后通过 OnLoad 方法加载到自身。副作用是修改自身的时间和计时器数据。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置组件的内部时间数据和计时器。行为是将 dry 和 wet 时间设为 0，并重置 timer_start_time 为当前时间。副作用是修改内部 time 数据和 timer_start_time。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据用于存档。行为是返回一个包含 time 数据和 timer_start_time 的表，其中 timer_start_time 被转换为相对于当前时间的值。副作用是无，仅返回数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据从存档。行为是根据传入的数据设置 dry、wet 时间和 timer_start_time，如果数据缺失则使用默认值。副作用是修改内部 time 数据和 timer_start_time。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示土壤的湿润/干燥状态和当前时间数据。行为是查询世界组件获取土壤湿度状态，然后拼接时间信息。副作用是无，仅返回字符串。"
+    }
+  ],
+  "events_published": [
+    "ms_registersoildrinker",
+    "ms_unregistersoildrinker"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      18410,
+      51951,
+      20700,
+      14711,
+      70462,
+      13261,
+      14486
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未发现与组件 farmsoildrinker 的代码能力（如 CalcPercentTimeHydrated、GetMoistureRate 等）直接相关的描述或玩家语言表达。页面内容主要讨论游戏机制（如耕种、降水、枯萎、潮湿等），未提及该组件或其具体行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "浇水",
+    "农场",
+    "土壤",
+    "水分",
+    "干燥",
+    "种植",
+    "作物"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 0/7)",
+  "gameplay_tags": [
+    "种植",
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98de84f08b2b28fb86320875d2110aea90ac25ca5307ce434bb4fefa6f8e4189",
+    "source_bytes": 2368,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107374900
+  }
+}

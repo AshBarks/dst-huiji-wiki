@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/corpsepersistmanager.lua"
+  },
+  "category": "component",
+  "display_name": "corpsepersistmanager",
+  "summary": "CorpsePersistManager组件管理游戏中尸体的持久化状态。它维护一个尸体列表，并周期性应用持久化函数来决定哪些尸体应保留。组件还控制尸体数量上限（最大200），确保不超过限制，从而影响尸体作为资源或装饰的长期存在。",
+  "api": [
+    {
+      "name": "AddPersistSourceFn",
+      "effect": "添加一个以key标识的持久化源函数fn。如果组件未开始更新，则启动更新循环，开始定期检查尸体持久化。"
+    },
+    {
+      "name": "RemovePersistSourceFn",
+      "effect": "移除指定key的持久化源函数，并从所有尸体中移除该持久化源。如果没有持久化函数剩余，停止更新循环。"
+    },
+    {
+      "name": "ShouldRetainCreatureAsCorpse",
+      "effect": "检查是否应将生物creature保留为尸体。如果当前尸体数达到最大值，返回false；否则，遍历所有持久化函数，如果任一函数返回true，则返回true；否则返回false。无直接副作用。"
+    },
+    {
+      "name": "IsMaxReached",
+      "effect": "检查当前尸体数是否达到最大值（200），返回布尔值。无副作用。"
+    },
+    {
+      "name": "AnyCorpseExists",
+      "effect": "检查是否有任何尸体存在，返回布尔值。无副作用。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定期更新函数。当冷却时间结束时，遍历尸体应用持久化函数，设置或移除尸体的持久化源；如果尸体数超过最大值，移除多余尸体的持久化源。冷却时间基于CHECK_CORPSE_TIME_BASE和CHECK_CORPSE_TIME_VAR重置。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前持久化的尸体数量。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_registercorpse"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15434,
+      15245,
+      15327,
+      34314,
+      13707,
+      15718,
+      19676,
+      53270
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论生物生成、数量管理、行为描述等，未涉及尸体持久化管理（如添加/移除持久源、尸体保留判断、最大值检查等）相关的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "尸体消散",
+    "尸体清理",
+    "尸体上限",
+    "尸体列表",
+    "尸体保留",
+    "资源尸体",
+    "装饰尸体",
+    "世界管理",
+    "最大数量"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "生存",
+    "资源管理",
+    "持久化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "afed5676dde6d851a88911d6ff75cbce870f42e93895ae3bcf494f01fd6d7379",
+    "source_bytes": 4392,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106439034
+  }
+}

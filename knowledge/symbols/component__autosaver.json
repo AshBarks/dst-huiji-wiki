@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/autosaver.lua"
+  },
+  "category": "component",
+  "display_name": "autosaver",
+  "summary": "该组件负责管理游戏的自动保存功能，定期触发保存任务并维护主次模拟之间的存档快照同步。它参与生存模式的核心玩法，确保玩家进度能通过定时存档得到持久化，防止数据丢失。",
+  "api": [
+    {
+      "name": "GetLastSaveTime",
+      "effect": "返回最后执行保存操作的时间戳（数值类型），用于查询存档时间点。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "master_autosaverupdate"
+  ],
+  "events_listened": [
+    "issavingdirty",
+    "ms_save",
+    "ms_setautosaveenabled",
+    "secondary_autosaverupdate"
+  ],
+  "netvars": [
+    "autosaver._issaving"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      35007,
+      20714,
+      13281,
+      15853,
+      20426,
+      22703,
+      65605,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面未提及获取最后保存时间（GetLastSaveTime）的相关玩家语言表达，仅描述了自动保存机制的存在和频率，未涉及如何获取或显示该时间。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "自动保存",
+    "存档",
+    "保存时间",
+    "快照",
+    "同步",
+    "回滚",
+    "游戏进度",
+    "数据持久化"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "31fb4de42ea3e73d35a677120ef491a89f475092e3c45cbd3d62e341fca3127c",
+    "source_bytes": 7246,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096214194
+  }
+}

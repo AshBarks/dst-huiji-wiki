@@ -1,0 +1,511 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playercontroller.lua"
+  },
+  "category": "component",
+  "display_name": "playercontroller",
+  "summary": "该组件是玩家实体的核心控制器，管理所有玩家输入响应、动作执行、远程预测与同步，以及建筑放置、瞄准等交互界面。它负责将本地或远程输入转换为游戏内的动作（如攻击、采集、建造），并处理客户端与服务器间的预测校正，是实现玩家角色控制和在线同步的关键。",
+  "api": [
+    {
+      "name": "Activate",
+      "effect": "激活控制器，注册输入处理器和事件监听（如装备、建造、缩放等），开始响应玩家输入。客户端会启动更新循环以处理预测。"
+    },
+    {
+      "name": "Deactivate",
+      "effect": "停用控制器，取消当前建筑放置、瞄准和部署，移除输入处理器和所有事件监听，停止更新循环以释放资源。"
+    },
+    {
+      "name": "Enable",
+      "effect": "设置控制器是否启用（通过网络变量通知客户端），启用或禁用玩家控制输入的能力。"
+    },
+    {
+      "name": "ToggleController",
+      "effect": "切换控制器附加状态（如是否连接手柄），刷新瞄准标尺并通知服务器。客户端通过RPC同步状态。"
+    },
+    {
+      "name": "EnableMapControls",
+      "effect": "启用或禁用地图控制，同时考虑当前是否允许使用地图。"
+    },
+    {
+      "name": "SetCanUseMap",
+      "effect": "设置玩家是否被允许使用地图，与地图控制启用状态共同决定最终是否可用。"
+    },
+    {
+      "name": "GetMapTarget",
+      "effect": "根据动作和物品判断是否存在可操作的地图目标（如具有‘action_pulls_up_map’标签的物品），用于决定是否打开地图。"
+    },
+    {
+      "name": "PullUpMap",
+      "effect": "打开地图界面并设置地图目标，关闭可能干扰的界面（如制作栏、法术轮盘），并聚焦地图视图。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回控制器是否启用（考虑分类器状态和HUD是否有输入焦点），用于判断玩家是否能进行游戏内操作。"
+    },
+    {
+      "name": "IsMapControlsEnabled",
+      "effect": "检查地图控制是否当前可用（控制器启用、地图控制可见且HUD存在）。"
+    },
+    {
+      "name": "IsControlPressed",
+      "effect": "检查特定控制键是否被按下，本地或通过远程控制状态表判断。"
+    },
+    {
+      "name": "IsAnyOfControlsPressed",
+      "effect": "检查一组控制键中是否有任意一个被按下。"
+    },
+    {
+      "name": "CooldownRemoteController",
+      "effect": "递减所有远程控制按键的冷却时间，并调用持有动作冷却。"
+    },
+    {
+      "name": "CooldownHeldAction",
+      "effect": "递减持有动作的重复执行冷却时间。"
+    },
+    {
+      "name": "OnRemoteStopControl",
+      "effect": "服务器端处理：移除指定的远程控制按键状态。"
+    },
+    {
+      "name": "OnRemoteStopAllControls",
+      "effect": "服务器端处理：清除所有远程控制按键状态。"
+    },
+    {
+      "name": "RemoteStopControl",
+      "effect": "客户端：停止指定的远程控制按键并发送RPC通知服务器。"
+    },
+    {
+      "name": "RemoteStopAllControls",
+      "effect": "客户端：停止所有远程控制按键并发送RPC通知服务器。"
+    },
+    {
+      "name": "RemotePausePrediction",
+      "effect": "服务器端：通过分类器通知客户端暂停预测指定帧数。"
+    },
+    {
+      "name": "ShouldPlayerHUDControlBeIgnored",
+      "effect": "判断是否应忽略PlayerHUD的特定控制事件（例如为轴对齐放置或目标锁定让出优先级）。"
+    },
+    {
+      "name": "OnControl",
+      "effect": "主输入分发函数：处理所有控制输入，根据输入类型调用相应的动作方法（如攻击、动作按钮、取消等）。"
+    },
+    {
+      "name": "EncodeControlMods",
+      "effect": ""
+    },
+    {
+      "name": "DecodeControlMods",
+      "effect": "解码修改键状态数字，恢复远程控制表中的修改键状态。"
+    },
+    {
+      "name": "ClearControlMods",
+      "effect": "清除所有修改键的远程控制状态。"
+    },
+    {
+      "name": "CanLocomote",
+      "effect": "检查角色是否可以移动（考虑模拟类型、状态标签、预测暂停等）。"
+    },
+    {
+      "name": "IsBusy",
+      "effect": "检查角色是否处于忙碌状态（如正在执行动作或被预测暂停）。"
+    },
+    {
+      "name": "GetCursorInventoryObject",
+      "effect": "在控制器模式下，获取当前光标所指的物品槽中的物品对象。"
+    },
+    {
+      "name": "GetCursorInventorySlotAndContainer",
+      "effect": "在控制器模式下，获取当前光标所指的物品槽编号及其所属容器。"
+    },
+    {
+      "name": "DoControllerActionButton",
+      "effect": "处理控制器动作按钮输入：执行建筑放置、瞄准施法、或场景/地面交互。可能生成RPC或预览回调。"
+    },
+    {
+      "name": "OnRemoteControllerActionButton",
+      "effect": "服务器端：处理来自客户端的控制器动作按钮RPC，验证并执行相应场景物品动作。"
+    },
+    {
+      "name": "OnRemoteControllerActionButtonPoint",
+      "effect": "服务器端：处理针对地面点的控制器动作按钮RPC，验证并执行相应地面动作（如施法）。"
+    },
+    {
+      "name": "OnRemoteControllerActionButtonDeploy",
+      "effect": "服务器端：处理控制器动作按钮的部署RPC，验证物品归属并执行部署动作。"
+    },
+    {
+      "name": "DoControllerAltActionButton",
+      "effect": "处理控制器替代动作按钮输入：取消当前放置/瞄准，或执行第二交互（如右键），可能打开法术轮盘、下马等。"
+    },
+    {
+      "name": "OnRemoteControllerAltActionButton",
+      "effect": "服务器端：处理来自客户端的控制器替代动作按钮RPC，验证并执行相应场景物品动作（通常是右键类）。"
+    },
+    {
+      "name": "OnRemoteControllerAltActionButtonPoint",
+      "effect": "服务器端：处理针对地面点的控制器替代动作按钮RPC，验证并执行相应地面动作。"
+    },
+    {
+      "name": "DoControllerAttackButton",
+      "effect": "处理控制器攻击按钮输入：查找或使用当前目标执行攻击，或对空攻击。生成RPC或预览回调。"
+    },
+    {
+      "name": "OnRemoteControllerAttackButton",
+      "effect": "服务器端：处理来自客户端的控制器攻击按钮RPC，验证目标并缓冲攻击动作。"
+    },
+    {
+      "name": "DoControllerDropItemFromInvTile",
+      "effect": "从物品栏中丢弃指定物品，可选择丢弃单个（如果物品可堆叠）。"
+    },
+    {
+      "name": "DoControllerInspectItemFromInvTile",
+      "effect": "检查指定物品栏中的物品。"
+    },
+    {
+      "name": "DoControllerUseItemOnSelfFromInvTile",
+      "effect": "对自身使用指定物品栏中的物品，支持重复执行。"
+    },
+    {
+      "name": "DoControllerUseItemOnSceneFromInvTile",
+      "effect": "对场景使用指定物品栏中的物品，支持重复执行。"
+    },
+    {
+      "name": "RotLeft",
+      "effect": "向左旋转摄像机，支持速度参数进行连续旋转。"
+    },
+    {
+      "name": "RotRight",
+      "effect": "向右旋转摄像机，支持速度参数进行连续旋转。"
+    },
+    {
+      "name": "GetHoverTextOverride",
+      "effect": "在建筑放置模式下，返回建筑物品的名称作为悬停文本覆盖。"
+    },
+    {
+      "name": "CancelPlacement",
+      "effect": "取消当前建筑放置，移除放置器，可选择是否缓存配方以便重新开始。"
+    },
+    {
+      "name": "CancelDeployPlacement",
+      "effect": "取消当前部署模式，移除部署放置器。"
+    },
+    {
+      "name": "StartBuildPlacementMode",
+      "effect": "进入建筑放置模式，生成放置器并设置建造测试函数。"
+    },
+    {
+      "name": "IsTwinStickAiming",
+      "effect": "检查是否处于双摇杆瞄准模式（由瞄准标尺组件决定）。"
+    },
+    {
+      "name": "GetAOETargetingPos",
+      "effect": "获取AOE瞄准的目标位置。"
+    },
+    {
+      "name": "IsAOETargeting",
+      "effect": "检查是否正在进行AOE瞄准（存在瞄准标尺且其物品有AOE瞄准组件）。"
+    },
+    {
+      "name": "HasAOETargeting",
+      "effect": "检查装备的武器是否具有可用的AOE瞄准或AOE充能能力（考虑骑乘限制）。"
+    },
+    {
+      "name": "TryAOETargeting",
+      "effect": "尝试启动AOE瞄准，如果成功则返回true。"
+    },
+    {
+      "name": "StartAOETargetingUsing",
+      "effect": "使用指定物品启动AOE瞄准，取消当前其他操作。"
+    },
+    {
+      "name": "GetActiveSpellBook",
+      "effect": "获取当前处于瞄准状态下的法术书物品。"
+    },
+    {
+      "name": "CancelAOETargeting",
+      "effect": "取消AOE瞄准。"
+    },
+    {
+      "name": "TryAOECharging",
+      "effect": "尝试启动AOE充能（如弹弓蓄力），设置初始旋转并进入充能状态，通过RPC同步。"
+    },
+    {
+      "name": "OnRemoteAOECharging",
+      "effect": "服务器端：处理AOE充能的启动或旋转更新RPC。"
+    },
+    {
+      "name": "RemoteAOEChargingDir",
+      "effect": "客户端：发送AOE充能方向更新RPC。"
+    },
+    {
+      "name": "EchoReticuleAt",
+      "effect": "在指定位置生成一个临时的瞄准标尺回声效果。"
+    },
+    {
+      "name": "RefreshReticule",
+      "effect": "刷新瞄准标尺，根据当前装备物品重新设置标尺组件。"
+    },
+    {
+      "name": "GetAttackTarget",
+      "effect": "根据条件和范围查找有效的攻击目标（考虑强制攻击、最近目标、武器、距离等）。"
+    },
+    {
+      "name": "DoAttackButton",
+      "effect": "执行攻击按钮逻辑：查找目标并发动攻击，处理强制攻击和远程同步。"
+    },
+    {
+      "name": "OnRemoteAttackButton",
+      "effect": "服务器端：处理攻击按钮RPC，验证并缓冲攻击动作，处理链式攻击。"
+    },
+    {
+      "name": "SetIsOverrideAttack",
+      "effect": "设置是否处于覆盖攻击状态（通过网络变量）。"
+    },
+    {
+      "name": "IsOverrideAttack",
+      "effect": "检查是否处于覆盖攻击状态（如某些角色的特殊攻击模式）。"
+    },
+    {
+      "name": "GetActionButtonAction",
+      "effect": "根据当前状态和目标，获取动作按钮应执行的动作（如捡起、采集、互动等）。"
+    },
+    {
+      "name": "DoActionButton",
+      "effect": "处理主动作按钮输入：执行建筑放置或获取并执行默认动作（如捡起）。"
+    },
+    {
+      "name": "OnRemoteActionButton",
+      "effect": "服务器端：处理动作按钮RPC，验证并执行客户端请求的动作。"
+    },
+    {
+      "name": "GetInspectButtonAction",
+      "effect": "获取检查按钮的动作（对可检查目标执行LOOKAT动作）。"
+    },
+    {
+      "name": "DoInspectButton",
+      "effect": "执行检查按钮逻辑，对控制器目标执行检查动作。"
+    },
+    {
+      "name": "OnRemoteInspectButton",
+      "effect": "服务器端：处理检查按钮RPC。"
+    },
+    {
+      "name": "GetResurrectButtonAction",
+      "effect": "获取复活按钮的动作（如果玩家是鬼魂且满足复活条件）。"
+    },
+    {
+      "name": "DoResurrectButton",
+      "effect": "执行复活按钮逻辑，尝试远程复活。"
+    },
+    {
+      "name": "OnRemoteResurrectButton",
+      "effect": "服务器端：处理复活按钮RPC。"
+    },
+    {
+      "name": "DoCharacterCommandWheelButton",
+      "effect": "处理角色命令轮盘按钮：打开或关闭当前可用的法术书。"
+    },
+    {
+      "name": "OnRemoteCharacterCommandWheelButton",
+      "effect": "服务器端：处理角色命令轮盘按钮RPC。"
+    },
+    {
+      "name": "RemapMapAction",
+      "effect": "将地面动作重映射为可在地图上执行的动作（如果目标位置在地图上可见且有效）。"
+    },
+    {
+      "name": "GetMapActions",
+      "effect": "根据地图上的位置获取玩家可以执行的左键和右键动作。"
+    },
+    {
+      "name": "UpdateActionsToMapActions",
+      "effect": "将玩家的当前动作更新为对应的地图动作，用于地图界面。"
+    },
+    {
+      "name": "OnMapAction",
+      "effect": "处理来自地图界面的动作请求，获取并执行相应的地图动作。"
+    },
+    {
+      "name": "GetLeftMouseAction",
+      "effect": "获取当前的左键动作。"
+    },
+    {
+      "name": "GetRightMouseAction",
+      "effect": "获取当前的右键动作。"
+    },
+    {
+      "name": "GetItemSelfAction",
+      "effect": "获取对物品自身执行的动作（如食用、装备等）。"
+    },
+    {
+      "name": "GetSceneItemControllerAction",
+      "effect": "获取控制器模式下对场景中指定物品的交互动作（左键和右键）。"
+    },
+    {
+      "name": "IsAxisAlignedPlacement",
+      "effect": "检查是否处于轴对齐建筑放置模式。"
+    },
+    {
+      "name": "GetPlacerPosition",
+      "effect": "获取当前建筑放置器或部署放置器的位置。"
+    },
+    {
+      "name": "GetGroundUseAction",
+      "effect": "获取对地面点（或瞄准位置）的使用动作（考虑物品、AOE瞄准等）。"
+    },
+    {
+      "name": "GetGroundUseSpecialAction",
+      "effect": "获取对地面点的特殊动作（不依赖装备物品）。"
+    },
+    {
+      "name": "HasGroundUseSpecialAction",
+      "effect": "检查当前位置是否存在特殊的地面使用动作。"
+    },
+    {
+      "name": "GetItemUseAction",
+      "effect": "获取对目标使用当前激活物品的动作（如给NPC物品、使用工具等）。"
+    },
+    {
+      "name": "RemoteUseItemFromInvTile",
+      "effect": "客户端：发送使用物品栏物品的RPC。"
+    },
+    {
+      "name": "RemoteControllerUseItemOnItemFromInvTile",
+      "effect": "客户端：发送控制器模式下物品对物品使用的RPC。"
+    },
+    {
+      "name": "RemoteControllerUseItemOnSelfFromInvTile",
+      "effect": "客户端：发送控制器模式下物品对自身使用的RPC。"
+    },
+    {
+      "name": "RemoteControllerUseItemOnSceneFromInvTile",
+      "effect": "客户端：发送控制器模式下物品对场景使用的RPC。"
+    },
+    {
+      "name": "RemoteInspectItemFromInvTile",
+      "effect": "客户端：发送检查物品栏物品的RPC。"
+    },
+    {
+      "name": "RemoteDropItemFromInvTile",
+      "effect": "客户端：发送丢弃物品栏物品的RPC。"
+    },
+    {
+      "name": "RemoteCastSpellBookFromInv",
+      "effect": "客户端：发送从物品栏施放法术书的RPC。"
+    },
+    {
+      "name": "RemoteMakeRecipeFromMenu",
+      "effect": "客户端：发送从菜单制作配方的RPC。"
+    },
+    {
+      "name": "RemoteMakeRecipeAtPoint",
+      "effect": "客户端：发送在指定点制作配方的RPC。"
+    },
+    {
+      "name": "RemoteBufferedAction",
+      "effect": "客户端：执行缓冲动作的预览回调，处理最后的行走预测并发送RPC。"
+    },
+    {
+      "name": "OnRemoteBufferedAction",
+      "effect": "服务器端：处理远程缓冲动作开始时的预测位置校正。"
+    },
+    {
+      "name": "OnRemoteInteractionTarget",
+      "effect": "服务器端：设置远程交互目标（用于某些生物等待玩家交互）。"
+    },
+    {
+      "name": "RemoteInteractionTarget",
+      "effect": "客户端：发送远程交互目标更新RPC。"
+    },
+    {
+      "name": "GetRemoteInteraction",
+      "effect": "获取当前的远程交互动作、目标和位置。"
+    },
+    {
+      "name": "OnLocomotorBufferedAction",
+      "effect": "处理移动器缓冲动作，设置远程交互目标并记录最近动作以防立即取消。"
+    },
+    {
+      "name": "OnRemoteToggleMovementPrediction",
+      "effect": "服务器端：切换远程移动预测状态，重置移动器并管理状态事件监听。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated",
+    "buildstructure",
+    "equip",
+    "unequip",
+    "zoomcamera",
+    "newactiveitem",
+    "continuefrompause",
+    "deactivateworld",
+    "inventoryclosed"
+  ],
+  "netvars": [
+    "classified.iscontrollerenabled",
+    "classified.ismapcontrolsvisible",
+    "classified.pausepredictionframes",
+    "classified.currentstate",
+    "classified.isoverrideattack",
+    "classified.inmightygym"
+  ],
+  "tunables": [
+    "CONTROLLER_DEADZONE_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      13897,
+      15922,
+      65881,
+      70704,
+      15551,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "战争瓦器人的激活与失控过程",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "战争瓦器人初次被激活后不会游荡，直接原地失控并进入敌对状态。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "控制器",
+    "按键",
+    "动作",
+    "攻击",
+    "建造",
+    "放置",
+    "瞄准",
+    "远程",
+    "预测",
+    "物品使用"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "建造",
+    "移动控制",
+    "界面操作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "728ee838024ef5ba3509d4271ab3f4d3602f6263881cb19a56dead2ab0a0a85c",
+    "source_bytes": 230582,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111220060
+  }
+}

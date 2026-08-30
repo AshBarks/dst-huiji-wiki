@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/heavyobstaclephysics.lua"
+  },
+  "category": "component",
+  "display_name": "heavyobstaclephysics",
+  "summary": "该组件管理重型物体的物理状态，包括物品、障碍物和下落三种状态。它控制物体的碰撞属性、半径和与角色的交互，核心玩法涉及物体的推动、放置和掉落等物理行为。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，清理所有事件回调，包括放入背包、丢弃、下落、推动等监听。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时，若未被持有且高度大于0.01，强制将物体设置为物品状态再变为障碍物状态，并重置速度使其下落。"
+    },
+    {
+      "name": "SetRadius(radius)",
+      "effect": "设置最大半径和当前半径，初始化物理状态为障碍物，并开始监听放入背包和丢弃事件。"
+    },
+    {
+      "name": "MakeSmallObstacle",
+      "effect": "将物体标记为小型障碍物，影响碰撞组设置为SMALLOBSTACLES。"
+    },
+    {
+      "name": "AddFallingStates",
+      "effect": "添加对'开始下落'和'停止下落'事件的监听，启用下落状态管理。"
+    },
+    {
+      "name": "AddPushingStates",
+      "effect": "添加对'开始推动'和'停止推动'事件的监听，启用推动状态管理。"
+    },
+    {
+      "name": "GetPhysicsState",
+      "effect": "返回当前物理状态的名称字符串，如'ITEM'、'OBSTACLE'或'FALLING'。"
+    },
+    {
+      "name": "IsItem",
+      "effect": "检查当前是否为物品状态，返回布尔值。"
+    },
+    {
+      "name": "IsObstacle",
+      "effect": "检查当前是否为障碍物状态，返回布尔值。"
+    },
+    {
+      "name": "IsFalling",
+      "effect": "检查当前是否为下落状态，返回布尔值。"
+    },
+    {
+      "name": "SetOnPhysicsStateChangedFn(fn)",
+      "effect": "设置当物理状态改变时调用的回调函数，回调参数为实体和状态名称。"
+    },
+    {
+      "name": "SetOnChangeToItemFn(fn)",
+      "effect": "设置当物体变为物品时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "SetOnChangeToObstacleFn(fn)",
+      "effect": "设置当物体变为障碍物时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "SetOnStartFallingFn(fn)",
+      "effect": "设置当开始下落时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "SetOnStopFallingFn(fn)",
+      "effect": "设置当停止下落时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "Setonstartpushingfn(fn)",
+      "effect": "设置当开始推动时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "Setonstoppushingfn(fn)",
+      "effect": "设置当停止推动时调用的回调函数，回调参数为实体。"
+    },
+    {
+      "name": "ForceDropPhysics",
+      "effect": "强制将物体变为物品状态再立即变为障碍物状态，用于立即投掷物体，如战利品生成。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，返回包含'deprecated_floating_exploit'标记的表或nil。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "加载组件数据，根据数据设置'deprecated_floating_exploit'标记。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onputininventory",
+    "ondropped",
+    "startfalling",
+    "stopfalling",
+    "startpushing",
+    "stoppushing"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      28744,
+      19129,
+      72441,
+      15722,
+      15715,
+      14696,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录内容涉及玩具、拟态蠕虫、腐烂机制、容器、眼球草、鼹鼠、捆绑包装、暗影傀儡等，但没有提及任何与heavyobstaclephysics组件相关的能力，如物理状态、推动、下落、障碍物属性等表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "重型障碍物",
+    "物理状态",
+    "推动",
+    "下落",
+    "碰撞",
+    "物品",
+    "障碍物",
+    "半径",
+    "状态切换"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "物理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38a15ca57f3f8865d6874733c314980d5683fcd78006d4378c9e68360232bb20",
+    "source_bytes": 9734,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094264629
+  }
+}

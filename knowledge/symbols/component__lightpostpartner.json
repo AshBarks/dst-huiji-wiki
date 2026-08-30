@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lightpostpartner.lua"
+  },
+  "category": "component",
+  "display_name": "lightpostpartner",
+  "summary": "这个组件用于管理灯柱伙伴之间的束缚关系，允许灯柱形成灯光链。它维护一个束缚实体列表，处理连接、断开以及事件触发时的清理工作。主要参与灯柱的放置和链接玩法，影响照明和装饰效果。",
+  "api": [
+    {
+      "name": "GetShackleIdForPartner(partner)",
+      "effect": "获取指定伙伴的束缚 ID，如果未绑定则返回 nil。"
+    },
+    {
+      "name": "IsMultiShackled()",
+      "effect": "检查是否初始化了多重束缚，如果有束缚实体列表则返回真。"
+    },
+    {
+      "name": "InitializeNumShackles(num_entities)",
+      "effect": "初始化指定数量的束缚实体网络变量，创建 net_entity 数组。"
+    },
+    {
+      "name": "SetType(prefab)",
+      "effect": "设置灯柱的类型为指定预制件名称。"
+    },
+    {
+      "name": "GetNextAvailableShackleID()",
+      "effect": "获取下一个可用的束缚 ID，如果所有 ID 已绑定或未初始化则返回 nil。"
+    },
+    {
+      "name": "ShacklePartnerToID(partner, id)",
+      "effect": "将伙伴实体束缚到指定的 ID，在服务器端设置 net_entity 值并记录伙伴的 shackle_id 属性，仅当是主机模拟时执行。"
+    },
+    {
+      "name": "ShacklePartnerToNextID(partner)",
+      "effect": "将伙伴实体束缚到下一个可用 ID，调用 GetNextAvailableShackleID 和 ShacklePartnerToID，仅当是主机模拟时执行。"
+    },
+    {
+      "name": "UnshackleAll()",
+      "effect": "解除所有束缚连接，在服务器端清空所有 net_entity 值并清除伙伴的 shackle_id 属性，仅当是主机模拟时执行。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存束缚实体数据以供持久化，返回包含实体信息和引用的表。"
+    },
+    {
+      "name": "LoadPostPass(ents, data)",
+      "effect": "从保存数据中加载束缚实体并重新建立连接，如果实体被烧毁则跳过。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "teleported",
+    "teleport_move",
+    "onremove",
+    "onburnt"
+  ],
+  "netvars": [
+    "shackled_entities.entity"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      23187,
+      70704,
+      13493,
+      70483,
+      16671,
+      52634,
+      65881
+    ],
+    "aspects": [
+      {
+        "aspect": "灯柱数量影响行为",
+        "evidence": [
+          {
+            "pageid": 70483,
+            "quote": "至少需要 7 个灯柱才能让寄居蟹隐士在黄昏不再回家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "灯柱",
+    "束缚",
+    "灯光链",
+    "连接",
+    "伙伴",
+    "照明",
+    "装饰",
+    "网络同步",
+    "保存",
+    "加载"
+  ],
+  "gameplay_tags": [
+    "照明",
+    "装饰",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "45d5bb6cf66dc97d5b720747f4566551df591d58f01536ab26b716298f087b92",
+    "source_bytes": 4146,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101338919
+  }
+}

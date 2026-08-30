@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/retrofitcavemap_anr.lua"
+  },
+  "category": "component",
+  "display_name": "retrofitcavemap_anr",
+  "summary": "该组件负责管理世界地图的改造（retrofitting）数据，用于在现有存档中添加或修复新内容，如心的废墟（Atrium）、古老档案馆、洞穴裂缝等。它通过一系列私有函数检查世界状态并生成新实体，确保存档升级后能体验到新玩法内容。核心玩法涉及探索新区域、发现秘密以及修复游戏问题。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法。所有改造逻辑在组件内部通过OnPostInit生命周期方法自动执行，未定义可供外部调用的自定义API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19740,
+      28611,
+      13761,
+      34314,
+      34523,
+      65605,
+      28621,
+      73480
+    ],
+    "aspects": [
+      {
+        "aspect": "洞穴世界翻新服务器重启",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "[[洞穴世界]]的服务器在 45 秒内重启。"
+          }
+        ]
+      },
+      {
+        "aspect": "翻新生成函数应用",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "[[洞穴世界]]采用<b>洞穴翻新生成</b><ref>本处及下文的“洞穴翻新生成”使用的都是RetrofitNewCaveContentPrefab函数。"
+          }
+        ]
+      },
+      {
+        "aspect": "通过翻新增加生物群系",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "在洞穴世界的虚空中增加[[中庭群系]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "改造",
+    "洞穴",
+    "地图",
+    "添加内容",
+    "修复",
+    "存档升级",
+    "新内容",
+    "世界生成",
+    "心的废墟",
+    "档案馆"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "世界改造",
+    "内容添加",
+    "修复"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "59777166e0e3b2bc809dbef73aeb6b6defa1afa7baef0c78cd8e937c06519af3",
+    "source_bytes": 42400,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111813773
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/toadstoolspawner.lua"
+  },
+  "category": "component",
+  "display_name": "toadstoolspawner",
+  "summary": "该组件管理毒蘑菇（Toadstool）的生成器，负责注册和监控毒蘑菇生成器，控制毒蘑菇的重生定时器，并处理毒蘑菇状态变化和死亡事件。核心玩法涉及探索和战斗，因为毒蘑菇是游戏中的一种敌人，其生成影响玩家在沼泽等区域的生存挑战。",
+  "api": [
+    {
+      "name": "IsEmittingGas",
+      "effect": "检查当前是否有毒蘑菇已生成并正在排放毒气；返回一个布尔值，表示毒蘑菇是否活跃。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态到表，包含toadstool_queued_spawn标志；返回该表用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载组件状态，恢复定时器；根据数据启动或停止重生定时器，确保状态一致性。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "生成调试信息字符串，显示当前活动毒蘑菇和冷却时间；返回格式化字符串用于调试输出。"
+    }
+  ],
+  "events_published": [
+    "toadstoolstatechanged",
+    "toadstoolkilled"
+  ],
+  "events_listened": [
+    "ms_registertoadstoolspawner",
+    "toadstoolstatechanged",
+    "toadstoolkilled",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TOADSTOOL_RESPAWN_TIME",
+    "TOADSTOOL_SPAWN_TIME",
+    "SPAWN_TOADSTOOL"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15922,
+      13268,
+      14938,
+      34314,
+      34523,
+      15225,
+      15601
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，所有页面均未提及 `component__toadstoolspawner` 组件或其能力（IsEmittingGas、OnSave、OnLoad、GetDebugString）。页面内容聚焦于角色、装备、世界生成、布景等，未涉及该组件的玩家语言描述或相关行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "毒蘑菇",
+    "重生",
+    "生成器",
+    "沼泽",
+    "敌人",
+    "战斗",
+    "定时器",
+    "毒气",
+    "事件",
+    "toadstool"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ca65aa20a10f39a5010581752e5bf6d5001b6d0f03536e3c64c885432e102a95",
+    "source_bytes": 6412,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113276738
+  }
+}

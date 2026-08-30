@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanfishingtackle.lua"
+  },
+  "category": "component",
+  "display_name": "oceanfishingtackle",
+  "summary": "该组件用于管理海洋钓鱼装备的数据，包括投射物设置和诱饵配置。它参与钓鱼系统中的装备准备，影响钓鱼投射和诱饵行为。支持设置投射数据并查询诱饵是否为一次性使用。",
+  "api": [
+    {
+      "name": "SetCastingData",
+      "effect": "设置装备的投射数据和投射物预制体。副作用是更新组件内部的 casting_data 和 projectile_prefab 字段。"
+    },
+    {
+      "name": "SetupLure",
+      "effect": "设置装备的诱饵配置。副作用是更新组件内部的 lure_data 和 lure_setup 字段。"
+    },
+    {
+      "name": "IsSingleUse",
+      "effect": "查询当前装备的诱饵是否为一次性使用。无副作用，返回布尔值。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      17830,
+      15885,
+      22181,
+      15722,
+      13260,
+      14676,
+      18830,
+      13642
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及实体component__oceanfishingtackle，也未涉及其代码能力SetCastingData、SetupLure、IsSingleUse的任何玩家语言表达。所有页面聚焦于其他实体（如钓具箱、钓具容器、灵魂、食人花等），无海洋钓鱼相关内容。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "海洋钓鱼",
+    "钓具",
+    "诱饵",
+    "一次性",
+    "投射",
+    "钓鱼装备",
+    "装备设置",
+    "钓鱼数据",
+    "ocean fishing",
+    "tackle"
+  ],
+  "gameplay_tags": [
+    "钓鱼",
+    "生存",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5e99cb6bed8d3b3e1a2af620517d31b1964b6f01d2e123459428a098a4f5241c",
+    "source_bytes": 639,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097128266
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/healthbar.lua"
+  },
+  "category": "component",
+  "display_name": "healthbar",
+  "summary": "该组件用于在游戏世界中为实体显示一个可配置的血条视觉条，主要管理生命值百分比的显示。它通过网络变量 `_healthpct` 同步生命值百分比数据，并监听实体的 `healthdelta` 事件来实时更新血条。核心玩法是为玩家提供直观的实体生命状态反馈，常用于玩家、Boss或重要可破坏目标。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "设置 `self.enabled` 标志。若设置为启用，则根据当前血量调用 `SetValue` 以显示血条；若设置为禁用，则隐藏血条的所有可见部分（背景图、填充图、数字标签）。"
+    },
+    {
+      "name": "SetValue",
+      "effect": "当 `percent` 大于 0 时，根据该值计算并设置血条填充部分的宽度、位置以及显示的百分比数字标签（例如 ‘75%’）。同时根据 `self.enabled` 的状态决定是否可见。当 `percent` 为 0 或更小时，隐藏血条的所有可见部分。"
+    }
+  ],
+  "api_note": "该组件提供 `Enable` 和 `SetValue` 两个公开方法，用于控制血条的显示状态和更新其显示内容。",
+  "events_published": [],
+  "events_listened": [
+    "healthdelta",
+    "healthpctdirty"
+  ],
+  "netvars": [
+    "healthbar._healthpct"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15244,
+      13606,
+      13261,
+      15022,
+      34003,
+      16197,
+      15303,
+      15295
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及 component__healthbar 组件的能力（如 Enable 或 SetValue），仅描述了生命值的数值、行为、效果和计算机制，不涉及该组件的启用或设置值操作。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "血条",
+    "生命值",
+    "HP",
+    "生命显示",
+    "状态栏",
+    "受伤显示",
+    "数值显示",
+    "启用",
+    "禁用",
+    "网络同步"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e4926217938dc5995ea7847595fb0abbe6f6f93362f6538f95b2bd98da64b0d2",
+    "source_bytes": 3937,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108418857
+  }
+}

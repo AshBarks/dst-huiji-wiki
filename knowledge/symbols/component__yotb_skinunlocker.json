@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotb_skinunlocker.lua"
+  },
+  "category": "component",
+  "display_name": "yotb_skinunlocker",
+  "summary": "该组件名为YOTB_SkinUnlocker，用于管理实体的皮肤属性数据。它提供设置和获取皮肤的方法，可能参与游戏中的皮肤解锁机制，特别是在Year of the Bird等活动中。",
+  "api": [
+    {
+      "name": "SetSkin",
+      "effect": "设置组件的皮肤数据为传入的skin参数，更新内部存储的皮肤属性。"
+    },
+    {
+      "name": "GetSkin",
+      "effect": "返回当前组件存储的皮肤数据，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22145,
+      52220,
+      15526,
+      35286,
+      35609,
+      52219,
+      23933,
+      52105
+    ],
+    "aspects": [
+      {
+        "aspect": "皮肤更换功能",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "皮弗娄牛美妆台可以用于给[[皮弗娄牛]]更换[[皮肤]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "获取礼服款式",
+        "evidence": [
+          {
+            "pageid": 52219,
+            "quote": "生成一份[[礼服款式]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "皮肤属性",
+    "鸟年",
+    "解锁皮肤",
+    "皮肤设置",
+    "皮肤获取",
+    "皮肤系统",
+    "活动皮肤",
+    "YOTB"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "皮肤解锁",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "42d187c44f65c08b8468645c41646fa432a71eb7ce81974daec956f519764a53",
+    "source_bytes": 246,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114596013
+  }
+}

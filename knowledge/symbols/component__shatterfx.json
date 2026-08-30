@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shatterfx.lua"
+  },
+  "category": "component",
+  "display_name": "shatterfx",
+  "summary": "ShatterFX组件用于管理实体的破碎等级状态，通过levels表存储各等级的动画数据。核心玩法是根据等级播放预设的动画序列（如pre和anim），以视觉化实体的损伤或破碎程度，常见于战斗或生存中的物体损坏表现。",
+  "api": [
+    {
+      "name": "SetLevel",
+      "effect": "设置实体的破碎等级。根据传入的等级值，若等级变化且有效（在levels范围内），则播放对应的动画：如果之前无等级且有pre动画，则先播放pre动画再推入anim动画；否则直接播放anim动画。副作用是更新当前等级并改变实体的动画状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15744,
+      14816,
+      14935,
+      14936,
+      15941,
+      13606,
+      14907,
+      14929
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未找到与 SetLevel 能力相关的任何表达，所有页面仅描述怪物行为、属性或掉落，未涉及级别设置或调整。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "破碎",
+    "动画",
+    "等级",
+    "视觉效果",
+    "损伤",
+    "组件",
+    "ShatterFX",
+    "设置等级",
+    "预动画",
+    "循环动画"
+  ],
+  "gameplay_tags": [
+    "视觉表现",
+    "损伤效果",
+    "动画控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c707b9221ba8c4a4e73507a77fc9ad8751f8181b7c1da5fabb1bf37606b0b071",
+    "source_bytes": 609,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103704806
+  }
+}

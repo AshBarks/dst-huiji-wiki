@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/messagebottlemanager.lua"
+  },
+  "category": "component",
+  "display_name": "messagebottlemanager",
+  "summary": "该组件管理消息瓶宝藏的生成与玩家寻宝状态，参与海洋寻宝核心玩法。它处理使用消息瓶后的宝藏位置计算，并追踪活跃的宝藏 hunt 标记及玩家交互记录。",
+  "api": [
+    {
+      "name": "GetHermitCrab()",
+      "effect": "返回隐士蟹实体，若不存在或无效则返回 nil。"
+    },
+    {
+      "name": "SetPlayerHasFoundHermit(player)",
+      "effect": "设置指定玩家已找到隐士蟹的标记，基于玩家 userid 记录。"
+    },
+    {
+      "name": "GetPlayerHasFoundHermit(player)",
+      "effect": "返回指定玩家是否曾经找到过隐士蟹，基于 userid 查询。"
+    },
+    {
+      "name": "SetPlayerHasUsedABottle(player)",
+      "effect": "设置指定玩家已使用过消息瓶的标记，基于玩家 userid 记录。"
+    },
+    {
+      "name": "GetPlayerHasUsedABottle(player)",
+      "effect": "返回指定玩家是否曾经使用过消息瓶，基于 userid 查询。"
+    },
+    {
+      "name": "UseMessageBottle(bottle, doer, is_not_from_hermit)",
+      "effect": "核心方法：若瓶子来自隐士蟹且玩家未找到隐士蟹，则返回隐士蟹位置；否则在海洋中生成新宝藏或返回已有宝藏位置，需避开玩家、陆地和障碍物，并受最大活跃 hunt 数量限制。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "messagebottletreasure_marker_added",
+    "messagebottletreasure_marker_removed"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MAX_ACTIVE_TREASURE_HUNTS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      18853,
+      15336,
+      18359,
+      20315,
+      21063,
+      61070,
+      13779
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未提及任何与消息瓶管理器（messagebottlemanager）相关的代码能力或行为语义，如获取隐士蟹（Hermit Crab）、设置玩家状态（found hermit/used bottle）或使用消息瓶（UseMessageBottle）等。所有页面摘录聚焦于其他游戏机制（如世界翻新、海洋拖网捕鱼器、倒走表、玩具、海洋、冰钓洞、海洋漂浮物、海鱼），未涉及该组件的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宝藏",
+    "海洋",
+    "标记",
+    "生成位置",
+    "玩家状态",
+    "漂流瓶",
+    "寻宝玩法",
+    "宝藏hunt",
+    "海洋探索"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "探索",
+    "收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7512ffc19b1c6f5dcc2a72ade92c406eab8db776d9b422a919e5ed35922fa050",
+    "source_bytes": 9398,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109717632
+  }
+}

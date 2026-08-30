@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/scrapbookable.lua"
+  },
+  "category": "component",
+  "display_name": "scrapbookable",
+  "summary": "该组件管理实体的'可教'状态，允许通过 SetOnTeachFn 方法设置一个回调函数。当调用 Teach 方法时，会触发该回调，并固定返回 true。它主要参与游戏中的教学或学习机制，提供抽象接口供其他系统调用。",
+  "api": [
+    {
+      "name": "SetOnTeachFn",
+      "effect": "设置一个回调函数，存储在组件的 onteach 属性中，无副作用。"
+    },
+    {
+      "name": "Teach",
+      "effect": "如果教学回调存在，则调用该回调，传入实体和调用者作为参数，并总是返回 true。可能执行回调定义的副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      20714,
+      23187,
+      18476,
+      14579,
+      15539,
+      15295,
+      13779
+    ],
+    "aspects": [
+      {
+        "aspect": "技能学习后的增益效果描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "已学习“瓦特提升”技能的WX-78，拔下激活的电路板时损失的电荷减少 1（至少 1）。"
+          },
+          {
+            "pageid": 15539,
+            "quote": "学习了“弹药工匠”技能的沃尔特制作弹弓弹药时，会产出 1.5 倍数量的成品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "教学",
+    "记录",
+    "学习",
+    "剪贴簿",
+    "教导",
+    "回调",
+    "实体",
+    "组件",
+    "游戏系统"
+  ],
+  "gameplay_tags": [
+    "记录",
+    "学习"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37c84166449fee46d6da791b93eef4c1b206d142a2694ed066e1515b5e9caed5",
+    "source_bytes": 314,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097439193
+  }
+}

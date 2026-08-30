@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/efficientuser.lua"
+  },
+  "category": "component",
+  "display_name": "efficientuser",
+  "summary": "EfficientUser组件管理实体执行游戏动作时的效率乘数，使用SourceModifierList实现多来源修改器。它特别处理采矿动作，并自动关联到移除月岩积聚动作，从而影响相关动作的执行效果。",
+  "api": [
+    {
+      "name": "GetMultiplier",
+      "effect": "返回指定动作的当前总乘数；若该动作未设置修改器，则返回1。"
+    },
+    {
+      "name": "AddMultiplier",
+      "effect": "为指定动作添加一个乘数修改器（源、键和值），使用SourceModifierList管理；若动作为采矿（ACTIONS.MINE），则同时为移除月岩积聚（ACTIONS.REMOVELUNARBUILDUP）添加相同的乘数修改器。"
+    },
+    {
+      "name": "RemoveMultiplier",
+      "effect": "从指定动作移除由特定源和键标识的乘数修改器；若动作为采矿（ACTIONS.MINE），则同时移除移除月岩积聚（ACTIONS.REMOVELUNARBUILDUP）的相同修改器。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个字符串，列出所有动作及其当前乘数值，用于调试信息显示。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，重置所有动作的乘数修改器，清除其修改状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述附身底盘的引言、机制和行为，未涉及组件能力 GetMultiplier, AddMultiplier, RemoveMultiplier, GetDebugString, OnRemoveFromEntity 的任何玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "采矿效率",
+    "动作乘数",
+    "效率加成",
+    "月岩积聚",
+    "修改器",
+    "资源采集速度",
+    "乘数效果",
+    "玩家效率"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+    "source_bytes": 1291,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099589206
+  }
+}

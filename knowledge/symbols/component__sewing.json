@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sewing.lua"
+  },
+  "category": "component",
+  "display_name": "sewing",
+  "summary": "Sewing组件管理修复值数据，用于修复带有'needssewing'标签的物品。它通过消耗缝纫工具耐久或堆叠物品来修复目标耐久度，并触发回调和成就。核心玩法涉及物品维护和生存资源管理。",
+  "api": [
+    {
+      "name": "DoSewing",
+      "effect": "如果目标有'needssewing'标签，则修复目标的耐久度（增加repair_value值），消耗自身finiteuses耐久或移除一个stackable堆叠物品，触发onsewn回调（如果定义），并奖励玩家成就'sewing_kit'。返回true表示成功。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      24866,
+      15903,
+      19940,
+      16185,
+      21620,
+      24862,
+      51494
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及缝纫（sewing）相关的能力或行为；页面内容主要涉及书籍耐久消耗、工具耐久消耗、建筑耐久修复等，但修复机制均未涉及缝纫组件，因此无证据表达DoSewing能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缝纫",
+    "修复",
+    "耐久",
+    "工具",
+    "成就",
+    "needssewing",
+    "fueled",
+    "消耗",
+    "堆叠",
+    "回调"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "工具",
+    "修复"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2b603fa01e85829b8f1aaa983feb35917f26bea811b006a65d68abf005def031",
+    "source_bytes": 571,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097442812
+  }
+}

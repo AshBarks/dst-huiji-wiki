@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/poppable.lua"
+  },
+  "category": "component",
+  "display_name": "poppable",
+  "summary": "Poppable 组件管理物体的弹出状态和回调函数。当调用 Pop 方法时，如果物体未弹出，则将其标记为弹出并执行定义的回调函数。该组件常用于控制可交互或装饰性物体的弹出行为，如点击触发效果。",
+  "api": [
+    {
+      "name": "Pop",
+      "effect": "如果 self.popped 为 false，则将其设置为 true，并调用 self.onpopfn(self.inst)（如果定义）。此方法触发物体的弹出状态变化并执行相关回调函数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15539,
+      23187,
+      13156,
+      16419,
+      65881,
+      70763,
+      70704
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现任何与'Pop'能力相关的描述或表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "弹出",
+    "状态",
+    "回调",
+    "交互",
+    "装饰",
+    "触发",
+    "效果",
+    "点击",
+    "可弹出"
+  ],
+  "gameplay_tags": [
+    "交互",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2b78f816cacedc7ffc3e07cca245ed5872914214512bac0b9793590616be8566",
+    "source_bytes": 298,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111337916
+  }
+}

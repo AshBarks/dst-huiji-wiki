@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fumaroletool.lua"
+  },
+  "category": "component",
+  "display_name": "fumaroletool",
+  "summary": "该组件管理一个与温度相关的工具（如喷气孔工具）的状态和效果。它根据物品自身温度自动判断是否损坏，并控制一个随身光源。核心玩法在于：玩家使用该工具时会转移热量，同时工具的可用性（损坏与否）和视觉亮度与其温度动态关联。",
+  "api": [
+    {
+      "name": "SetBroken",
+      "effect": "设置工具的损坏状态。当状态从‘未损坏’变为‘损坏’时，触发‘onbroken’回调；当状态从‘损坏’变为‘未损坏’时，触发‘onrepaired’回调。参数`isloading`用于标记是否在数据加载时调用。"
+    },
+    {
+      "name": "SetOnBroken",
+      "effect": "注册一个回调函数`fn`。当工具因温度过低被设置为‘损坏’状态时调用该回调。"
+    },
+    {
+      "name": "SetOnRepaired",
+      "effect": "注册一个回调函数`fn`。当工具因温度回升被设置为‘未损坏’状态时调用该回调。"
+    },
+    {
+      "name": "SetHeatOnUse",
+      "effect": "设置工具每次使用（攻击或作为物品使用）时转移的热量值。"
+    },
+    {
+      "name": "SetOnUpdateTemperatureRange",
+      "effect": "注册一个回调函数`fn`。当工具温度区间（根据`TUNING.FUMAROLETOOL_TEMPS`划分）发生变化且工具未损坏时调用，传递物品所有者和新区间编号。"
+    },
+    {
+      "name": "OnUsed",
+      "effect": "执行工具使用效果。如果设置了`heatonuse`，则根据使用者的`aoediminishingreturns`组件（如果存在）计算实际热量，将其加到工具自身温度，并从使用者的温度中减去相应数值。"
+    },
+    {
+      "name": "UpdateTempRange",
+      "effect": "根据工具当前温度，返回其对应的温度区间编号（由`TUNING.FUMAROLETOOL_TEMPS`决定，从高到低匹配）。"
+    },
+    {
+      "name": "GetTempRange",
+      "effect": "返回组件当前记录的温度区间编号`temprange`。"
+    },
+    {
+      "name": "OnUsedAsItem",
+      "effect": "当工具作为物品被使用时触发。若物品可以执行该动作，则调用`OnUsed`方法。"
+    },
+    {
+      "name": "OnBuilt",
+      "effect": "工具被建造时初始化其温度。初始温度为`TUNING.FUMAROLETOOL_STARTING_TEMP`，并根据建造者的潮湿程度进行惩罚性扣减。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态（仅保存`broken`字段）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，调用`SetBroken`恢复之前的损坏状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "temperaturedelta",
+    "weapononattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FUMAROLETOOL_TEMPS",
+    "FUMAROLETOOL_STARTING_TEMP",
+    "FUMAROLETOOL_STARTING_MOISTURE_PENALTY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      47009,
+      60885,
+      14695,
+      18234,
+      13156,
+      19940,
+      19952
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及‘fumaroletool’符号或其相关能力表达，所有页面内容涉及其他实体（如温度机制、wagdrone_rolling、喷气孔群系、暖石等），与代码能力/行为语义清单无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "喷气孔",
+    "发光",
+    "光源",
+    "耐久",
+    "损坏",
+    "热量转移",
+    "温度",
+    "状态"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "生存",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "00fcb04ce0eccd4bfc9af6fe13f2c4858fb10b530e9b266576e80762e6589287",
+    "source_bytes": 5225,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107964739
+  }
+}

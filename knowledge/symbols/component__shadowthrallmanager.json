@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowthrallmanager.lua"
+  },
+  "category": "component",
+  "display_name": "shadowthrallmanager",
+  "summary": "该组件管理噩梦裂隙的生成与释放，控制阴影仆从（如手、角、翼或嘴巴类型）的生成和战斗行为，参与噩梦阶段的战斗玩法。它追踪裂隙位置、仆从数量、冷却时间，并处理相关事件以协调裂隙与仆从的生命周期。",
+  "api": [
+    {
+      "name": "IsGoodFissureLocation",
+      "effect": "检查给定坐标是否适合放置裂隙，验证地形是否在地面以上且周围无阻挡实体（如结构、障碍物）。"
+    },
+    {
+      "name": "FindGoodFissureLocation",
+      "effect": "在噩梦区域中查找一个合适的裂隙放置点，随机选择玩家位置并搜索可行走偏移点，返回坐标或nil。"
+    },
+    {
+      "name": "TickFindingGoodFissures",
+      "effect": "定期检查并寻找合适的裂隙，若找到则控制它；考虑冷却时间、现有裂隙或创建临时裂隙。"
+    },
+    {
+      "name": "StopFindingGoodFissures",
+      "effect": "停止寻找裂隙的定期任务，取消相关计时器。"
+    },
+    {
+      "name": "StartFindingGoodFissures",
+      "effect": "启动寻找裂隙的定期任务，周期性调用TickFindingGoodFissures。"
+    },
+    {
+      "name": "RegisterFissure",
+      "effect": "将裂隙实体注册到潜在裂隙列表中，并取消该裂隙的战斗检查任务。"
+    },
+    {
+      "name": "OnSpawnThralls",
+      "effect": "在控制的裂隙处生成阴影仆从，根据类型生成三种仆从（手、角、翼或嘴巴），设置生成延迟和追踪关系，并启动事件监听。"
+    },
+    {
+      "name": "IsThrallInCombat",
+      "effect": "检查一个仆从是否处于战斗状态，判断其是否有目标或最近是否被攻击。"
+    },
+    {
+      "name": "SafeToReleaseFissure",
+      "effect": "检查所有仆从是否都不在战斗中，且不在加载宽限期内，以决定是否可以安全释放裂隙。"
+    },
+    {
+      "name": "UnregisterFissure",
+      "effect": "从潜在裂隙列表中注销一个裂隙实体，若该裂隙被控制则检查是否可安全释放。"
+    },
+    {
+      "name": "CheckForNoThralls",
+      "effect": "检查仆从数量是否为零，若是则释放裂隙并设置击败仆从的冷却时间。"
+    },
+    {
+      "name": "StartEventListeners",
+      "effect": "为生成的仆从实体设置移除事件监听器，追踪仆从数量变化。"
+    },
+    {
+      "name": "KillThrall",
+      "effect": "清空仆从的掉落物列表和随机掉落，并将其生命值设为零以杀死它。"
+    },
+    {
+      "name": "ReleaseFissure",
+      "effect": "释放控制的裂隙，设置内部冷却时间，清理霉云和所有仆从（杀死），并触发裂隙释放事件。"
+    },
+    {
+      "name": "SpawnThrallFromPoint",
+      "effect": "从指定坐标生成一个阴影仆从实体，设置位置偏移、已知出生点，并启动生成延迟状态。"
+    },
+    {
+      "name": "OnDreadstoneMineCooldown",
+      "effect": "处理恐惧石采矿后的冷却重置，若裂隙存在则通知其采矿冷却完成。"
+    },
+    {
+      "name": "OnFissureMinedFinished",
+      "effect": "当裂隙采矿完成后，取消现有冷却任务并开始恐惧石再生冷却计时。"
+    },
+    {
+      "name": "OnFissureAnimationsFinished",
+      "effect": "当裂隙动画完成后，生成霉云围绕裂隙，并启动定期生成仆从的任务。"
+    },
+    {
+      "name": "ControlFissure",
+      "effect": "控制一个裂隙实体，触发其噩梦阶段变化并设置为当前控制的裂隙。"
+    },
+    {
+      "name": "GetControlledFissure",
+      "effect": "返回当前被组件控制的裂隙实体或nil。"
+    },
+    {
+      "name": "GetThrallCount",
+      "effect": "返回当前存活的仆从数量。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态到数据表，包括冷却时间、任务剩余时间、裂隙、霉云和仆从的GUID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载组件状态，恢复冷却时间、任务，并设置加载宽限期以避免立即操作。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后恢复实体引用（裂隙、霉云、仆从），启动事件监听和相关任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包含裂隙状态、仆从存在、冷却时间和任务剩余时间等。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "isnightmarewild",
+    "ms_riftaddedtopool",
+    "ms_riftremovedfrompool"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.FISSURE_TIME_THRALLS_OUT_OF_COMBAT",
+    "TUNING.FISSURE_COOLDOWN_DEFEATED_ANY_THRALLS",
+    "TUNING.FISSURE_COOLDOWN_WALKED_AWAY",
+    "TUNING.FISSURE_DREADSTONE_COOLDOWN"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      34314,
+      23957,
+      20714,
+      65605,
+      13701,
+      34523,
+      52788
+    ],
+    "aspects": [
+      {
+        "aspect": "裂隙消失触发仆从生成",
+        "evidence": [
+          {
+            "pageid": 23957,
+            "quote": "生成 4 ~ 6 波入侵型虚影后，裂隙就会消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "阴影仆从",
+    "裂隙",
+    "噩梦",
+    "战斗",
+    "恐惧石",
+    "霉云",
+    "生成",
+    "冷却",
+    "服务器"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "噩梦",
+    "裂隙",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0ebf8dd60668774877d4c677336c35f1bea16a3d7511f560d0ea4ac378ec3211",
+    "source_bytes": 21623,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112328865
+  }
+}

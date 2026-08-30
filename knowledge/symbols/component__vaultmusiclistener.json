@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaultmusiclistener.lua"
+  },
+  "category": "component",
+  "display_name": "vaultmusiclistener",
+  "summary": "该组件监听实体的区域变化事件，在进入Vault特定区域时启动延迟音乐触发流程，管理延迟计时器以控制事件推送，并在离开时停止音乐。参与Vault相关的环境音乐和事件系统，增强探索体验。",
+  "api": [
+    {
+      "name": "IsMusicPlaying",
+      "effect": "检查音乐是否正在播放。返回布尔值，true表示音乐在播放（延迟计时器非nil），false表示未播放。无副作用。"
+    },
+    {
+      "name": "StartVaultMusic",
+      "effect": "启动Vault音乐播放流程。若音乐未播放，设置延迟计时器为3.5秒，启动组件更新循环，并立即调用OnUpdate(0)。副作用：激活更新系统，可能最终触发事件。"
+    },
+    {
+      "name": "StopVaultMusic",
+      "effect": "停止Vault音乐播放流程。若音乐在播放，清除延迟计时器并停止组件更新循环。副作用：终止更新系统，防止进一步事件触发。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "内部更新方法，处理延迟时间递减。当延迟结束时，推送'triggeredevent'事件到实体，事件数据包含名称'vault'和持续时间5秒。副作用：触发事件，影响游戏逻辑。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除对'changearea'事件的监听器。副作用：清理事件注册，防止内存泄漏或错误触发。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "triggeredevent"
+  ],
+  "events_listened": [
+    "changearea"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19802,
+      34523,
+      16165,
+      45891
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及vaultmusiclistener组件或其相关能力（IsMusicPlaying、StartVaultMusic等）；内容涉及梦魇循环音效、固定布景生成等，与vault music无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Vault音乐",
+    "区域变化",
+    "事件触发",
+    "音乐播放",
+    "延迟计时",
+    "环境音效",
+    "探索音乐",
+    "触发事件",
+    "Vault区域"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "探索",
+    "事件",
+    "音乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2b34ef85dfa7c99c07b5fc6d5bcc7489efea58a2e73d5c6852b67f39e56c0706",
+    "source_bytes": 1462,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113599144
+  }
+}

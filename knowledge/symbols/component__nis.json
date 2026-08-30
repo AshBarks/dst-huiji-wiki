@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nis.lua"
+  },
+  "category": "component",
+  "display_name": "nis",
+  "summary": "NIS组件管理脚本化事件的播放状态、数据和回调函数。它允许玩家在事件播放期间通过输入跳过，常用于游戏中的过场动画和叙事事件触发。组件在播放开始时调用初始化脚本，结束时移除实体以清理资源。",
+  "api": [
+    {
+      "name": "SetName",
+      "effect": "设置组件的名称标识符，用于内部管理。副作用：更新self.name变量。"
+    },
+    {
+      "name": "SetScript",
+      "effect": "设置播放时执行的主脚本函数，脚本将在线程中运行。副作用：更新self.script变量。"
+    },
+    {
+      "name": "SetInit",
+      "effect": "设置播放开始时调用的初始化回调函数。副作用：更新self.init变量。"
+    },
+    {
+      "name": "SetCancel",
+      "effect": "设置取消播放时调用的回调函数。副作用：更新self.cancel变量。"
+    },
+    {
+      "name": "Play",
+      "effect": "开始播放事件：设置播放状态为真，调用初始化回调，启动线程执行脚本，脚本完成后调用OnFinish移除实体。副作用：可能改变游戏状态和创建新线程。"
+    },
+    {
+      "name": "Cancel",
+      "effect": "取消当前播放：终止任务线程，调用取消回调，然后调用OnFinish移除实体。副作用：停止脚本和移除实体。"
+    },
+    {
+      "name": "OnClick",
+      "effect": "处理输入点击事件：如果skippable为真，则调用Cancel取消播放。副作用：可能终止事件播放。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      45891,
+      47057,
+      57263
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏实体、界面和区域（如事件触发器、资料界面、圣殿区域），未提及 component__nis 的代码能力或行为语义清单中的任何术语（如 SetName、Play、OnClick 等），也没有玩家语言表达相关能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "过场动画",
+    "玩家跳过",
+    "脚本化事件",
+    "叙事事件",
+    "播放管理",
+    "回调函数",
+    "事件触发",
+    "清理资源"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "叙事",
+    "事件",
+    "过场动画"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b0459472c5e960afe403208f93a47607f10d8ca44023e792277be47bb88012c",
+    "source_bytes": 1902,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110425571
+  }
+}

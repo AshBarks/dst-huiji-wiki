@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quaker.lua"
+  },
+  "category": "component",
+  "display_name": "quaker",
+  "summary": "该组件管理地震事件的周期和过程，包括警告阶段和地震阶段，控制碎片从天空掉落并影响环境与玩家。它管理地震频率、碎片类型和掉落密度，是洞穴生存中的关键环境挑战。",
+  "api": [
+    {
+      "name": "SetQuakeData",
+      "effect": "设置地震配置数据，包括警告时间、地震持续时间、碎片掉落率、下次地震间隔等。如果配置有效且频率乘数大于0，则启动下一次地震的调度任务；否则清除现有任务。"
+    },
+    {
+      "name": "SetDebris",
+      "effect": "设置默认的碎片掉落表，定义不同权重和掉落物（如岩石、燧石、金块等），影响地震时生成的碎片类型。"
+    },
+    {
+      "name": "SetTagDebris",
+      "effect": "设置基于地形标签的碎片掉落表，例如为月岛区域（lunacyarea）配置特殊掉落物（如月玻璃、牛果），或为空表以阻止生成。"
+    },
+    {
+      "name": "IsQuaking",
+      "effect": "检查当前是否正在地震（包括普通地震或微型地震），通过网络变量的声音强度值判断，返回布尔值。"
+    }
+  ],
+  "events_published": [
+    "endquake",
+    "startquake",
+    "warnquake"
+  ],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_miniquake",
+    "ms_forcequake",
+    "explosion",
+    "pausequakes",
+    "unpausequakes",
+    "quakesoundintensitydirty",
+    "miniquakesoundintensitydirty"
+  ],
+  "netvars": [
+    "quakesoundintensitydirty",
+    "miniquakesoundintensitydirty"
+  ],
+  "tunables": [
+    "QUAKE_FREQUENCY_MULTIPLIER",
+    "FROG_RAIN_SPAWN_RADIUS",
+    "QUAKE_BLOCKER_RANGE",
+    "RIFT_SHADOW1_QUAKER_ODDS",
+    "RIFT_SHADOW1_QUAKER_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19776,
+      28611,
+      28621,
+      13761,
+      14579,
+      19740,
+      13779,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "地震掉落物生成描述",
+        "evidence": [
+          {
+            "pageid": 19776,
+            "quote": "生成 5 ~ 6 个掉落物"
+          }
+        ]
+      },
+      {
+        "aspect": "地震频率设置选项",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "|影响[[地震]]发生的频率。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "地震",
+    "掉落",
+    "碎片",
+    "警告",
+    "地震频率",
+    "洞穴",
+    "生存挑战",
+    "环境事件",
+    "微型地震",
+    "地震暂停"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eea443cfc28c88c1424cdcf4f9631b0b6b51770e85585207453c3847234ac68c",
+    "source_bytes": 28909,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111523352
+  }
+}

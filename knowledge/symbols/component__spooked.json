@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spooked.lua"
+  },
+  "category": "component",
+  "display_name": "spooked",
+  "summary": "该组件管理玩家的惊吓等级（spookedlevel），当等级超过阈值时，在砍伐特定树木（如常青树、桦树等）有概率触发惊吓特效。惊吓等级随时间衰减，并受玩家年龄影响，年龄越大越容易触发惊吓。触发时生成视觉特效并推送“spooked”事件，增加游戏的随机事件和趣味性。",
+  "api": [
+    {
+      "name": "Spook",
+      "effect": "增加玩家的惊吓等级，根据来源树木的预制体和生长阶段生成对应特效（如 battreefx），并在延迟后推送'spooked'事件。副作用：惊吓等级重置为0，生成特效实体。"
+    },
+    {
+      "name": "TryCustomSpook",
+      "effect": "自定义惊吓，增加惊吓等级，如果应该惊吓，则生成指定预制体的特效并推送'spooked'事件。副作用：惊吓等级重置为0，生成特效实体。"
+    },
+    {
+      "name": "ShouldSpook",
+      "effect": "检查是否应该触发惊吓，基于惊吓等级是否超过阈值、玩家是否有勇气药水debuff或狼人标签。无副作用，返回布尔值。"
+    },
+    {
+      "name": "CalcSpookedLevelDecay",
+      "effect": "计算从上次惊吓时间到当前时间的惊吓等级衰减，衰减公式为 dt * dt（dt 为时间差）。无副作用，返回衰减后的等级值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前惊吓等级的调试字符串，格式为 'spookedlevel = %.2f'。无副作用。"
+    }
+  ],
+  "events_published": [
+    "spooked"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SEASON_LENGTH_HARSH_DEFAULT",
+    "TUNING.TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18778,
+      35817,
+      10379,
+      18530,
+      20714,
+      18234,
+      23199,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "惊吓攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 35817,
+            "quote": "大惊吓不会攻击，但它会每隔 1.2 秒对周围 2.5 距离单位以内除幽灵以外的所有生物造成伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "惊吓",
+    "砍树",
+    "特效",
+    "等级衰减",
+    "概率触发",
+    "树木怪物",
+    "勇气药水",
+    "万圣节",
+    "狼人",
+    "调试"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "砍伐",
+    "惊吓"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2209eb3776982eee890070155c5777fa38a62709ddfa1491f3aec9f4577799c8",
+    "source_bytes": 4226,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091885253
+  }
+}

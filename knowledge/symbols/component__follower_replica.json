@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/follower_replica.lua"
+  },
+  "category": "component",
+  "display_name": "follower_replica",
+  "summary": "此组件用于管理实体的跟随关系，存储领导者和物品所有者信息。通过网络变量同步状态，支持游戏中的跟随机制，如宠物或同伴实体跟随玩家或物品所有者。",
+  "api": [
+    {
+      "name": "SetLeader",
+      "effect": "设置实体的领导者为指定实体，更新网络变量 _leader 以同步状态。无其他副作用。"
+    },
+    {
+      "name": "SetItemOwner",
+      "effect": "设置实体的物品所有者为指定实体，更新网络变量 _itemowner 以同步状态。无其他副作用。"
+    },
+    {
+      "name": "GetLeader",
+      "effect": "返回当前有效的领导者，优先返回物品所有者，若无则返回领导者。此方法为只读查询，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "_leader",
+    "_itemowner"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      51494,
+      51495,
+      51497,
+      13139,
+      13898,
+      17998,
+      18303
+    ],
+    "aspects": [
+      {
+        "aspect": "随从物品绑定解除",
+        "evidence": [
+          {
+            "pageid": 17998,
+            "quote": "如果它们绑定了[[皮弗娄牛铃]]，还会解除与铃铛的绑定。"
+          }
+        ]
+      },
+      {
+        "aspect": "随从跟随玩家设置行为",
+        "evidence": [
+          {
+            "pageid": 13898,
+            "quote": "曼德拉草会作为随从跟随采摘者玩家"
+          },
+          {
+            "pageid": 17998,
+            "quote": "演奏牛角可以使 25 {{解释|距离单位}}半径内的最多 5 头[[皮弗娄牛]]聚集跟随玩家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "跟随",
+    "领导",
+    "所有者",
+    "宠物",
+    "同伴",
+    "跟随关系",
+    "NPC",
+    "网络同步",
+    "伙伴",
+    "领导者"
+  ],
+  "gameplay_tags": [
+    "跟随",
+    "宠物",
+    "NPC"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4d95c672f8b0ac25c4e3af2e3f9ff7fc6d7b7b9c09ce3cf10ca8677e0d21184c",
+    "source_bytes": 453,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107528777
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanfishingrod_replica.lua"
+  },
+  "category": "component",
+  "display_name": "oceanfishingrod_replica",
+  "summary": "这个组件管理海洋钓鱼竿的状态数据，包括钓鱼目标、线张力和最大投掷距离。它通过网络变量同步这些数据到客户端，支持海洋钓鱼玩法中的交互和反馈。组件提供查询和设置方法，影响钓鱼过程中的状态判断和操作。",
+  "api": [
+    {
+      "name": "GetTarget",
+      "effect": "返回当前钓鱼目标实体；如果目标无效或不存在，返回 nil。无副作用。"
+    },
+    {
+      "name": "IsLineTensionHigh",
+      "effect": "返回布尔值，指示线张力是否高（值为 2）。无副作用。"
+    },
+    {
+      "name": "IsLineTensionGood",
+      "effect": "返回布尔值，指示线张力是否良好（值为 1）。无副作用。"
+    },
+    {
+      "name": "IsLineTensionLow",
+      "effect": "返回布尔值，指示线张力是否低（值为 0）。无副作用。"
+    },
+    {
+      "name": "SetClientMaxCastDistance",
+      "effect": "设置最大投掷距离为 dist，向下取整后存储到网络变量 _max_cast_dist。副作用：更新网络变量。"
+    },
+    {
+      "name": "GetMaxCastDist",
+      "effect": "返回当前最大投掷距离值。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含目标信息和张力状态（High/Good/Low）。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "_target",
+    "_line_tension",
+    "_max_cast_dist"
+  ],
+  "tunables": [
+    "TUNING.OCEAN_FISHING.LINE_TENSION_HIGH",
+    "TUNING.OCEAN_FISHING.LINE_TENSION_GOOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      13823,
+      16419,
+      20714,
+      13897,
+      14683,
+      19761
+    ],
+    "aspects": [
+      {
+        "aspect": "可钓目标类型描述",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "海钓竿可以用来钓[[海鱼]]、[[海洋残骸]]、[[龙虾]]、[[月光龙虾]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "抛竿距离决定机制",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "海钓竿有两个装备栏，一个用来放置吸引鱼类的[[鱼饵]]，一个用来放置决定抛竿距离的[[浮标]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "钓鱼",
+    "海钓",
+    "线张力",
+    "投掷距离",
+    "目标",
+    "钓鱼竿",
+    "张力",
+    "海洋"
+  ],
+  "gameplay_tags": [
+    "钓鱼",
+    "海洋",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b5bce1c2a87bf300a76861adde3de61474f1a421ee6d21d808cedbaf275f6a41",
+    "source_bytes": 1502,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110550653
+  }
+}

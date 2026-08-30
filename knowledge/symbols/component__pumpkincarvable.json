@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pumpkincarvable.lua"
+  },
+  "category": "component",
+  "display_name": "pumpkincarvable",
+  "summary": "pumpkincarvable组件管理南瓜的雕刻图案数据，包括形状、旋转和位置信息。它允许玩家使用雕刻工具在南瓜上创建自定义切割图案，并在夜间通过光照和辉光效果展示装饰。该组件参与万圣节相关的节日玩法，支持图案的保存、加载和网络同步。",
+  "api": [
+    {
+      "name": "AddCutData",
+      "effect": "添加切割数据到指定表中，基于形状名称、旋转、x和y坐标。行为：将形状ID、旋转、坐标依次写入表。副作用：无直接副作用，仅修改输入表。"
+    },
+    {
+      "name": "ApplyCuts",
+      "effect": "应用切割数据到南瓜实体，创建切割子实体并设置位置。行为：解析切割数据字符串，按顺序创建切割实体，使用跟随组件定位到指定符号位置。副作用：移除现有切割实体并重新创建，可能改变南瓜的视觉外观。"
+    },
+    {
+      "name": "GetCutData",
+      "effect": "返回当前切割数据的网络字符串值。行为：读取cutdata网络变量。副作用：无。"
+    },
+    {
+      "name": "CanBeginCarving",
+      "effect": "检查玩家是否可以开始雕刻。行为：验证玩家是否忙碌、是否在燃烧或已被占用。副作用：返回布尔值和可能错误原因，不修改状态。"
+    },
+    {
+      "name": "BeginCarving",
+      "effect": "开始雕刻过程，设置玩家为雕刻者并打开雕刻UI。行为：注册玩家移除和弹窗关闭事件监听，启动组件更新，调用开启动画。副作用：玩家进入雕刻状态，可能触发视觉或声音效果。"
+    },
+    {
+      "name": "EndCarving",
+      "effect": "结束雕刻过程，清理事件监听并推送结束事件。行为：移除玩家监听器，停止组件更新，推送'ms_endpumpkincarving'事件。副作用：玩家退出雕刻状态，可能关闭UI并执行关闭回调。"
+    },
+    {
+      "name": "DoRefreshCutData",
+      "effect": "刷新切割数据的视觉显示。行为：调用ApplyCuts重新应用当前切割数据。副作用：更新南瓜上的切割实体，改变外观。"
+    },
+    {
+      "name": "LoadCutData",
+      "effect": "加载切割数据并更新显示。行为：设置cutdata网络变量并刷新视觉，同步光照状态。副作用：立即应用新图案，可能触发动画或光效变化。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存切割数据到表用于持久化。行为：如果cutdata非空，返回包含'cuts'键的表。副作用：无，仅返回数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载切割数据。行为：如果数据包含'cuts'字符串，调用LoadCutData。副作用：恢复雕刻图案，更新显示。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件数据转移到另一个实体。行为：复制cutdata到新组件并刷新显示，同步光照状态。副作用：新实体获得相同雕刻图案，旧实体数据不变。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，检查雕刻状态。行为：如果雕刻者不在附近或不可见，结束雕刻。副作用：可能自动关闭雕刻界面。"
+    }
+  ],
+  "events_published": [
+    "ms_endpumpkincarving"
+  ],
+  "events_listened": [
+    "equipped",
+    "unequipped",
+    "onremove",
+    "ms_closepopup",
+    "cutdatadirty",
+    "isday"
+  ],
+  "netvars": [
+    "cutdata"
+  ],
+  "tunables": [
+    "HALLOWEEN_PUMPKINCARVER_MAX_CUTS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      18530,
+      70704,
+      13493,
+      34615,
+      52634,
+      18231,
+      23201
+    ],
+    "aspects": [
+      {
+        "aspect": "雕刻图形与工具对应关系",
+        "evidence": [
+          {
+            "pageid": 34615,
+            "quote": "不同雕刻工具对应的雕刻图形如下表所示。"
+          }
+        ]
+      },
+      {
+        "aspect": "雕刻图案数量上限",
+        "evidence": [
+          {
+            "pageid": 34615,
+            "quote": "南瓜最多可以挖出15个图案"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "南瓜雕刻",
+    "南瓜灯",
+    "雕刻工具",
+    "切割图案",
+    "夜间发光",
+    "万圣节",
+    "装饰",
+    "雕刻状态"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "节日",
+    "创造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bcadbe04234b15d28716575fde28627059e3c11699b0340954d2b0f5d0aca546",
+    "source_bytes": 13624,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111534553
+  }
+}

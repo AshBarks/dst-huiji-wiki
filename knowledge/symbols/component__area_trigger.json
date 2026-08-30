@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/area_trigger.lua"
+  },
+  "category": "component",
+  "display_name": "area_trigger",
+  "summary": "AreaTrigger组件管理一个故事触发器表，当实体所在区域发生变化时，根据已注册的故事匹配情况动态覆盖游戏参数。它通过监听'changearea'事件实现实时参数调整，以改变游戏体验。",
+  "api": [
+    {
+      "name": "DoOverride",
+      "effect": "根据传入的覆盖数组，遍历每个项并检查'tuning_override'模块中是否存在对应函数；若存在则调用该函数修改游戏参数。副作用是直接改变游戏全局参数值。"
+    },
+    {
+      "name": "CheckTrigger",
+      "effect": "检查area对象的'story'和'story_depth'字段是否在组件的故事表中；若匹配则调用DoOverride方法覆盖参数。副作用是可能触发游戏参数调整。"
+    },
+    {
+      "name": "RegisterTriggers",
+      "effect": "将组件的故事触发器表设置为传入的stories表。副作用是注册或更新触发器，替换原有故事表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "changearea"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "区域触发器",
+    "故事触发器",
+    "参数覆盖",
+    "动态调整",
+    "区域变化",
+    "事件监听",
+    "游戏参数",
+    "体验调整",
+    "触发表"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 9/9)",
+  "gameplay_tags": [
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "80082c58ca796ea757c1df9d477f5fdac1861853d365ca7d63999eff4fd3de20",
+    "source_bytes": 940,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105358007
+  }
+}

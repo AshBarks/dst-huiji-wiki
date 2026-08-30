@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/epicscare.lua"
+  },
+  "category": "component",
+  "display_name": "epicscare",
+  "summary": "EpicScare 组件管理恐吓的范围、默认持续时间和标签过滤条件。它用于在战斗中使附近符合条件的实体受到惊吓，通过推送 'epicscare' 事件触发效果。核心玩法涉及影响敌对实体的行为，如使其逃跑或停止动作。",
+  "api": [
+    {
+      "name": "SetRange",
+      "effect": "设置恐吓的范围，影响后续 Scare 调用查找实体的半径。"
+    },
+    {
+      "name": "SetDefaultDuration",
+      "effect": "设置默认持续时间，当 Scare 调用未提供 duration 参数时使用。"
+    },
+    {
+      "name": "Scare",
+      "effect": "查找范围内实体，向符合条件的实体推送 'epicscare' 事件，事件包含 scarer（施加恐吓的实体）和 duration（持续时间）。副作用是可能触发被恐吓实体的行为变化，如逃跑或停止动作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "epicscare"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      18778,
+      13701,
+      15922,
+      35817,
+      70704,
+      10379,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "咆哮产生巨兽恐慌效果的范围与持续时间描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "咆哮时在 10 {{解释|距离单位}}内产生 5 ~ 6秒的[[巨兽恐慌]]效果。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:巨兽恐慌"
+    ],
+    "code_fields": [
+      "epicscare_range"
+    ],
+    "overridable_fields": [],
+    "note": "导出键 epicscare_range = epicscare.range。"
+  },
+  "search_terms": [
+    "惊吓",
+    "范围",
+    "持续时间",
+    "逃跑",
+    "移动",
+    "战斗效果",
+    "实体行为",
+    "事件触发",
+    "标签条件",
+    "停止动作"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7f7320d22c417ee3ed36b4ca96831c6c1bd6879381e6c7a54c7b8bedae1fc406",
+    "source_bytes": 955,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091046056
+  }
+}

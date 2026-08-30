@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/saltlicker.lua"
+  },
+  "category": "component",
+  "display_name": "saltlicker",
+  "summary": "组件saltlicker管理实体的舔盐状态，通过定时器控制盐效果的持续时间。它自动寻找并消耗附近的盐舔对象，以维持实体的临时增益状态。参与核心玩法涉及动物养殖和资源管理，盐舔是恢复动物生命值或饥饿值的关键物品。",
+  "api": [
+    {
+      "name": "SetUp",
+      "effect": "初始化组件，设置每次舔盐消耗的使用次数，并监听多个事件（如进入/退出边缘、睡眠、冻结、死亡）以响应状态变化。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止组件功能，移除所有事件监听，停止计时器并重置舔盐状态为未舔盐。"
+    },
+    {
+      "name": "SetSalted",
+      "effect": "设置实体是否处于舔盐状态，如果状态改变，推送'saltchange'事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前舔盐状态到存档，返回包含'salted'字段的表或nil。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "从存档加载后，如果计时器存在，则停止寻找任务并设置舔盐状态为true。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示舔盐状态、寻找任务剩余时间、持续时间和使用次数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "saltchange"
+  ],
+  "events_listened": [
+    "saltlick_placed",
+    "timerdone",
+    "enterlimbo",
+    "exitlimbo",
+    "gotosleep",
+    "onwakeup",
+    "freeze",
+    "unfreeze",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14659,
+      15753,
+      15903,
+      18502,
+      10355,
+      34523,
+      70530,
+      70763
+    ],
+    "aspects": [
+      {
+        "aspect": "动物舔舐频率描述",
+        "evidence": [
+          {
+            "pageid": 14659,
+            "quote": "这些动物每 60 秒舔舐一次"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "舔盐",
+    "盐舔",
+    "saltlick",
+    "动物恢复",
+    "耐久消耗",
+    "状态效果",
+    "timer",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "动物管理",
+    "资源消耗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+    "source_bytes": 5810,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093358713
+  }
+}

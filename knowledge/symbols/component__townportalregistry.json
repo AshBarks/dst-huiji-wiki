@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/townportalregistry.lua"
+  },
+  "category": "component",
+  "display_name": "townportalregistry",
+  "summary": "该组件负责管理城镇门户的注册、激活与链接。它维护一个门户列表，在门户激活时检查传送条件，使符合条件的门户相互连接。涉及游戏中的快速旅行系统，并处理如WagPunk竞技场等区域的门户禁用逻辑。",
+  "api": [
+    {
+      "name": "IsATownPortalActive",
+      "effect": "检查是否有城镇门户被激活。如果存在激活的门户，返回true；否则返回false。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前注册的城镇门户数量以及是否有门户处于激活状态。用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_registertownportal",
+    "townportalactivated",
+    "townportaldeactivated",
+    "ms_wagpunk_barrier_isactive",
+    "ms_wagpunk_barrier_playerentered",
+    "ms_wagpunk_barrier_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      51949,
+      51046,
+      19693,
+      51498,
+      10418,
+      46847,
+      18001
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与component__townportalregistry相关的IsATownPortalActive（城镇传送门激活状态检查）或GetDebugString（调试字符串获取）等能力的玩家语言表达。内容主要涉及电路板、竞技场、战争瓦器人、天体传送门和传送焦点，但无城镇传送门相关讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "城镇门户",
+    "传送门",
+    "链接",
+    "激活",
+    "注册",
+    "WagPunk",
+    "竞技场",
+    "屏障",
+    "门户管理",
+    "快速旅行"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "旅行",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f630829188ba1c9221b90d445be95574334a23eba6f6c514cd0266f6de74ca25",
+    "source_bytes": 7639,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113302267
+  }
+}

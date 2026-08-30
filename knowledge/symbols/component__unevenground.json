@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/unevenground.lua"
+  },
+  "category": "component",
+  "display_name": "unevenground",
+  "summary": "该组件用于管理实体的地面不平检测功能，通过周期性扫描附近玩家来推送事件。它控制启用状态、检测半径和周期，核心玩法涉及环境交互和玩家移动影响。",
+  "api": [
+    {
+      "name": "Start",
+      "effect": "启动周期性检测任务，每0.6秒检查一次半径15单位内的玩家，并为符合条件的玩家推送'unevengrounddetected'事件。副作用：激活检测并可能影响玩家行为。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止检测任务，取消周期任务。副作用：停止事件推送，组件进入休眠状态。"
+    },
+    {
+      "name": "Enable",
+      "effect": "如果组件未启用，设置为启用状态并在实例未休眠时启动检测。副作用：重新激活检测功能。"
+    },
+    {
+      "name": "Disable",
+      "effect": "如果组件已启用，设置为禁用状态并停止检测。副作用：完全停止检测，防止事件推送。"
+    }
+  ],
+  "events_published": [
+    "unevengrounddetected"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      15601
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件 component__unevenground 相关的能力表达。内容涉及布景生成规则和 antlion 实体行为，但没有讨论不平地面组件的启动、停止、启用或禁用能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "地面不平检测",
+    "检测附近玩家",
+    "触发事件",
+    "检测半径",
+    "扫描周期",
+    "环境交互",
+    "移动影响",
+    "启用状态"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境交互",
+    "移动影响"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "69ff0df36d500177a2a7e5c63594cef28098ce9632c29a25adc7a531602a32e6",
+    "source_bytes": 1814,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104385937
+  }
+}

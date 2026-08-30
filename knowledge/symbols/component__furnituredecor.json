@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/furnituredecor.lua"
+  },
+  "category": "component",
+  "display_name": "furnituredecor",
+  "summary": "该组件用于管理装饰物品的状态，包括是否启用装饰功能以及是否附着在家具上。它通过属性监听器控制标签的添加或移除，并提供回调函数以响应放置和移除操作，参与游戏中的装饰系统。",
+  "api": [
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件的启用状态。行为：更新 enabled 属性。副作用：根据状态添加或移除 'furnituredecor' 标签。"
+    },
+    {
+      "name": "IsOnFurniture",
+      "effect": "检查装饰物品是否附着在家具上。行为：返回布尔值表示是否在家具上。无副作用。"
+    },
+    {
+      "name": "PutOnFurniture",
+      "effect": "将装饰物品放置在指定家具上。行为：设置 on_furniture 为 true，并调用 onputonfurniture 回调（如果定义）。副作用：可能触发回调，改变实体状态。"
+    },
+    {
+      "name": "TakeOffFurniture",
+      "effect": "从家具上移除装饰物品。行为：设置 on_furniture 为 nil，并调用 ontakeofffurniture 回调（如果定义）。副作用：可能触发回调，改变实体状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时清理。行为：移除 'furnituredecor' 标签。副作用：更新实体标签。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      23187,
+      13156,
+      70704,
+      20438,
+      47009,
+      51951,
+      14929
+    ],
+    "aspects": [
+      {
+        "aspect": "装饰物品放置功能",
+        "evidence": [
+          {
+            "pageid": 20438,
+            "quote": "装饰物品是用[[锯马]]解锁制造的可以放在[[桌子]]上的物品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "装饰",
+    "家具",
+    "放置",
+    "移除",
+    "动画",
+    "启用",
+    "状态",
+    "回调",
+    "decor",
+    "furniture"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "家具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8270c89c0d09a2795ab017ea2d0171eb553b0785ab155c5e9550439da504c292",
+    "source_bytes": 1156,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094220940
+  }
+}

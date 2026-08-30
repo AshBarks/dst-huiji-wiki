@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dpstracker.lua"
+  },
+  "category": "component",
+  "display_name": "dpstracker",
+  "summary": "该组件通过监听实体的生命值变化事件，在滑动时间窗口内记录生命值数据，计算并更新每秒伤害输出（DPS）。主要用于战斗系统中，帮助评估和跟踪伤害效率。",
+  "api": [
+    {
+      "name": "SetOnDpsUpdateFn",
+      "effect": "设置一个回调函数，当DPS值更新时自动调用，函数参数为实体实例和当前DPS值。用于外部系统响应DPS变化。"
+    },
+    {
+      "name": "GetDps",
+      "effect": "返回当前计算的DPS值，基于最近时间窗口内的生命值变化，无副作用。"
+    },
+    {
+      "name": "DoUpdate",
+      "effect": "执行DPS计算更新，移除时间窗口外的旧数据，更新内部DPS值并触发回调。通常在生命值变化事件中自动调用，但可手动调用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "healthdelta"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      20150,
+      66492,
+      15022,
+      16197,
+      16419,
+      20714,
+      35821
+    ],
+    "aspects": [
+      {
+        "aspect": "控制台调试命令的DPS测试功能",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "|d_testdps||||d_testdps(time: any, target: any)||"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "DPS",
+    "伤害输出",
+    "伤害计算",
+    "生命值变化",
+    "滑动窗口",
+    "伤害统计",
+    "战斗跟踪",
+    "效率评估"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "数据分析"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "27577aec8d5033ac41094693e5d3039677b8336cb66e1f28077b6a1f5e45f2cd",
+    "source_bytes": 1928,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096578073
+  }
+}

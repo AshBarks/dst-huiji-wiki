@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/appraisable.lua"
+  },
+  "category": "component",
+  "display_name": "appraisable",
+  "summary": "该组件提供目标评估功能，通过两个回调函数：一个用于检查评估资格，另一个用于执行评估操作。它参与游戏中的评估交互机制，如物品鉴定或NPC对话。",
+  "api": [
+    {
+      "name": "CanAppraise",
+      "effect": "检查是否可以评估目标。如果定义了canappraisefn回调，则调用它并返回结果；否则返回true。无副作用。"
+    },
+    {
+      "name": "Appraise",
+      "effect": "执行对目标的评估。如果定义了appraisefn回调，则调用它。无返回值，可能有副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10413,
+      15303,
+      33950,
+      51489,
+      65605,
+      10418,
+      13214,
+      18234
+    ],
+    "aspects": [
+      {
+        "aspect": "玫瑰色眼镜的检查能力描述",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "薇诺娜装备[[玫瑰色眼镜]]时可以进行仔细检查。"
+          },
+          {
+            "pageid": 10413,
+            "quote": "仔细检查时将有概率获得纯粹恐惧。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "评估",
+    "鉴定",
+    "检查",
+    "评价",
+    "价值评估",
+    "物品检查",
+    "目标鉴定",
+    "交互评估"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "评估",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "246e818f9deb66fb83d2e4f7f1aeb845a7b11fee2e9a72b53a897c39ed689e8c",
+    "source_bytes": 477,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105255114
+  }
+}

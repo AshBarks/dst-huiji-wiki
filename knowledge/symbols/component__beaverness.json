@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/beaverness.lua"
+  },
+  "category": "component",
+  "display_name": "beaverness",
+  "summary": "海狸度组件管理实体的海狸度值，控制其随时间减少并影响饥饿状态。当海狸度耗尽时，组件会触发饥饿伤害并通过事件通知状态变化，核心玩法涉及生存和状态管理。",
+  "api": [
+    {
+      "name": "IsStarving",
+      "effect": "检查当前海狸度是否小于等于0，返回布尔值表示是否饥饿。"
+    },
+    {
+      "name": "StartTimeEffect",
+      "effect": "启动一个周期性任务，每隔指定时间减少海狸度，减少量为 delta_b 乘以当前时间效果乘数；若海狸度降至0则造成饥饿伤害。"
+    },
+    {
+      "name": "StopTimeEffect",
+      "effect": "停止海狸度的周期性减少任务。"
+    },
+    {
+      "name": "SetTimeEffectMultiplier",
+      "effect": "设置海狸度减少效果的时间乘数，默认值为1。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "改变海狸度值，增加指定 delta 并限制在0到最大值之间；推送海狸度变化事件，并在饥饿状态变化时推送开始或停止饥饿事件。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前海狸度占最大值的百分比。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "设置海狸度为指定百分比，并触发变化事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前海狸度值，返回包含 current 字段的表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据中加载海狸度值，如果数据存在且不同，则更新并触发变化事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回海狸度的调试字符串，格式为 '当前值 / 最大值'。"
+    }
+  ],
+  "events_published": [
+    "beavernessdelta",
+    "startstarving",
+    "stopstarving"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      13406,
+      10374,
+      15922,
+      13437,
+      15022,
+      20150,
+      15539
+    ],
+    "aspects": [
+      {
+        "aspect": "变身值初始数值设定",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "初始拥有 100 点变身值"
+          }
+        ]
+      },
+      {
+        "aspect": "变身值消耗速度调整",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "变身值的消耗速度与[[月相]]和玩家行为有关。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海狸度",
+    "饥饿",
+    "变身",
+    "状态",
+    "生存",
+    "伤害",
+    "周期",
+    "事件",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6c6ca281192fc3d95c7233172417f7bd5d0f4946fcd8b0c6c33c2d8adedcaebc",
+    "source_bytes": 2879,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105530095
+  }
+}

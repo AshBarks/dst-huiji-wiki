@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sharklistener.lua"
+  },
+  "category": "component",
+  "display_name": "sharklistener",
+  "summary": "该组件用于跟踪游戏中鲨鱼的生成与移除，并根据鲨鱼与玩家的距离动态更新玩家的鲨鱼声音参数，以增强环境氛围和危险感知。它管理玩家和鲨鱼的跟踪数据，通过周期性任务计算最近鲨鱼的距离，并设置声音参数值或延时任务来控制声音效果。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法;所有操作通过内部事件处理和周期性任务实现",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "sharkspawned",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      65605,
+      34314,
+      28179,
+      13701,
+      34523,
+      18540
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及component__sharklistener或任何与鲨鱼监听相关的能力表达；所有摘录讨论其他游戏机制或实体，与鲨鱼监听无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鲨鱼",
+    "声音",
+    "距离",
+    "玩家",
+    "跟踪",
+    "危险",
+    "环境",
+    "氛围",
+    "生成",
+    "移除"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "535db8b24a24dfcd2ed9617bc2d2400c94e6b923a3a384cd1e2b52dede8ca9a3",
+    "source_bytes": 4181,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112432445
+  }
+}

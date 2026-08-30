@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wereness.lua"
+  },
+  "category": "component",
+  "display_name": "wereness",
+  "summary": "组件管理玩家的狂暴值（wereness），用于控制变身状态。它跟踪当前值、最大值和消耗率，通过事件通知状态变化，并支持保存与加载。核心玩法涉及变身模式的管理。",
+  "api": [
+    {
+      "name": "SetWereMode(weremode): 设置玩家的变身模式，存储于 weremode 属性。",
+      "effect": ""
+    },
+    {
+      "name": "GetWereMode(): 返回当前的变身模式。",
+      "effect": ""
+    },
+    {
+      "name": "SetDrainRate(rate): 设置狂暴值的消耗速率，影响后续更新行为。",
+      "effect": ""
+    },
+    {
+      "name": "StartDraining(): 开始消耗狂暴值，若当前值大于0且未在消耗中，则启动组件更新。",
+      "effect": ""
+    },
+    {
+      "name": "StopDraining(): 停止消耗狂暴值，停止组件更新。",
+      "effect": ""
+    },
+    {
+      "name": "DoDelta(delta, overtime): 改变当前狂暴值，范围在0到最大值之间；若值变为0则停止消耗；并推送 werenessdelta 事件。",
+      "effect": ""
+    },
+    {
+      "name": "GetPercent(): 返回当前狂暴值占最大值的百分比。",
+      "effect": ""
+    },
+    {
+      "name": "SetPercent(percent, overtime): 设置当前狂暴值为最大值的指定百分比，并调用 DoDelta。",
+      "effect": ""
+    },
+    {
+      "name": "OnUpdate(dt): 组件更新函数，根据消耗率随时间变化狂暴值。",
+      "effect": ""
+    },
+    {
+      "name": "OnSave(): 保存当前狂暴值和变身模式（若当前值大于0），返回数据表。",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad(data): 加载保存的数据，恢复狂暴值和变身模式，并开始消耗。",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString(): 返回调试字符串，显示当前值、最大值和消耗率。",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "werenessdelta"
+  ],
+  "events_listened": [],
+  "netvars": [
+    "currentwereness",
+    "werenessdrainrate"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      20714,
+      15250,
+      13897,
+      15421,
+      18502,
+      45439,
+      70704
+    ],
+    "aspects": [
+      {
+        "aspect": "变身值下降速度控制",
+        "evidence": [
+          {
+            "pageid": 45439,
+            "quote": "可以通过某些行为人为控制变身值的下降速度。"
+          }
+        ]
+      },
+      {
+        "aspect": "控制台命令设置变身值",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "c_setwereness改变使用者的变身值 c_setwereness(百分比)"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "狂暴",
+    "变身",
+    "wereness",
+    "消耗率",
+    "狼人",
+    "百分比",
+    "事件",
+    "保存",
+    "加载",
+    "调试"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "变身",
+    "角色状态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "efa5219275df81f4d00fdd788fa0a5eb9c2c2843440387cdce58f96a98de573f",
+    "source_bytes": 2945,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114064780
+  }
+}

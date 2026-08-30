@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/slipperyfeettarget.lua"
+  },
+  "category": "component",
+  "display_name": "slipperyfeettarget",
+  "summary": "该组件用于管理滑溜地面目标，允许实体在特定位置触发滑溜效果。它通过设置自定义函数来确定位置是否滑溜，并计算滑溜率，影响实体的移动速度。参与游戏中的环境交互，如冰面或湿滑表面的滑行行为。",
+  "api": [
+    {
+      "name": "SetIsSlipperyAtPoint",
+      "effect": "设置一个自定义函数，用于判断给定世界坐标（x, y, z）是否滑溜。该函数接收实体、x, y, z 参数，返回布尔值。行为：更新组件内部函数引用，无直接副作用。"
+    },
+    {
+      "name": "IsSlipperyAtPosition",
+      "effect": "检查指定世界坐标（x, y, z）是否滑溜。如果设置了自定义函数则调用它；否则检查位置是否在实体的物理半径内。返回 true 或 false。行为：执行位置检查，无副作用。"
+    },
+    {
+      "name": "SetSlipperyRate",
+      "effect": "设置一个自定义函数，用于计算滑溜率。该函数接收实体和目标参数，返回数值。行为：更新组件内部函数引用，无直接副作用。"
+    },
+    {
+      "name": "GetSlipperyRate",
+      "effect": "获取滑溜率。如果设置了自定义函数则调用它；否则返回默认值 1。返回数值。行为：计算并返回滑溜率，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51287,
+      13406,
+      15922,
+      20428,
+      13260,
+      16622,
+      28445,
+      13261
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论移动速度、装备效果和角色能力，未发现任何与“滑溜”、“滑倒”或代码能力（如 SetIsSlipperyAtPoint）直接相关的描述，因此无法找到该符号的能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "滑溜效果",
+    "冰上滑行",
+    "移动减速",
+    "地面触发",
+    "滑行率",
+    "位置检测",
+    "环境效果",
+    "移动速度",
+    "组件作用"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5bc04010576e230eaef1a41e9b78fd638f698be7ede8acf15453f0e4e5e7fb6d",
+    "source_bytes": 1187,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095069149
+  }
+}

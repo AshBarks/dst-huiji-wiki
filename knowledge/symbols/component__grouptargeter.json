@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grouptargeter.lua"
+  },
+  "category": "component",
+  "display_name": "grouptargeter",
+  "summary": "grouptargeter 组件管理一组目标的权重字典，通过动态调整权重来影响目标选择概率。核心玩法涉及群敌中的目标切换，例如多个敌人争夺玩家注意力时，权重系统确保目标公平轮换，模拟群体行为中的注意力分配。",
+  "api": [
+    {
+      "name": "StartTracking",
+      "effect": "开始跟踪指定目标，监听其 onremove 事件。副作用：注册事件监听器，当目标被移除时自动调用 RemoveTarget。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "停止跟踪指定目标，移除其 onremove 事件监听。副作用：注销事件监听器，防止目标移除后触发额外逻辑。"
+    },
+    {
+      "name": "GetTotalWeight",
+      "effect": "打印当前所有目标的总权重，用于调试目的。副作用：无游戏影响，仅输出调试信息。"
+    },
+    {
+      "name": "OnPickTarget",
+      "effect": "当选择新目标后调整权重：被选中的目标权重减少，其他目标权重按比例增加。副作用：修改目标权重字典，确保总权重保持为1。"
+    },
+    {
+      "name": "AddTarget",
+      "effect": "添加新目标到字典，若已存在则忽略。调整现有目标权重以分配部分权重给新目标，保持总权重为1。副作用：修改目标字典和权重，触发 StartTracking。"
+    },
+    {
+      "name": "RemoveTarget",
+      "effect": "从字典中移除目标，若不存在则忽略。调整其他目标权重以均分被移除目标的权重。副作用：修改目标字典和权重，触发 StopTracking。"
+    },
+    {
+      "name": "GetTargets",
+      "effect": "返回当前目标字典的引用。副作用：无，仅返回数据。"
+    },
+    {
+      "name": "IsTargeting",
+      "effect": "检查指定目标是否在当前目标字典中。副作用：无，仅返回布尔值。"
+    },
+    {
+      "name": "TryGetNewTarget",
+      "effect": "基于当前概率尝试获取新目标：若成功则调用 SelectTarget 和 OnPickTarget 并返回新目标；否则增加概率值。副作用：可能修改当前概率值，并调用其他方法调整权重。"
+    },
+    {
+      "name": "SelectTarget",
+      "effect": "根据权重随机选择目标，使用加权随机算法。副作用：无，仅返回选择的目标。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "weight_change",
+    "min_chance",
+    "max_chance",
+    "chance_delta"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      52788,
+      18540,
+      24543,
+      24544,
+      34314,
+      24028,
+      24542
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未讨论component__grouptargeter的能力，如目标跟踪、选择、权重计算等。内容集中在世界生成、布景概率和资源生成机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "群敌",
+    "概率",
+    "目标轮换",
+    "权重系统",
+    "注意力分配",
+    "敌人争夺",
+    "群体行为",
+    "动态权重"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "战斗",
+    "目标管理",
+    "群体行为"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
+    "source_bytes": 4184,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092194426
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/firebug.lua"
+  },
+  "category": "component",
+  "display_name": "firebug",
+  "summary": "该组件控制实体定期执行放火行为，管理一个计时器。它依赖于实体的 sanity（理智）状态，如果 sanity 过高则跳过执行。当计时器到期时，实体会说话并生成指定的 prefab（如火焰物品）。组件可以通过启用或禁用来控制行为。",
+  "api": [
+    {
+      "name": "Enable(enable)",
+      "effect": "启用组件，设置 enabled 为 true 并启动组件更新循环。"
+    },
+    {
+      "name": "Disable()",
+      "effect": "禁用组件，设置 enabled 为 false 并停止组件更新循环。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试字符串，显示组件启用状态和剩余时间（time_to_fire）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65605,
+      34523,
+      35001,
+      34314,
+      52788,
+      14579,
+      24544
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及组件firebug或其能力Enable、Disable、GetDebugString的任何表达，内容集中于游戏机制、布景生成和世界设置。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "火虫",
+    "放火",
+    "疯狂",
+    "说话",
+    "生成",
+    "计时",
+    "时间间隔",
+    "阈值",
+    "启用",
+    "Prefab"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d4701e0dc8fd2fe2ff1c5de114a8a30f6b22e3ab3844b579b130bd93f6468e75",
+    "source_bytes": 1325,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107439892
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quagmire_music.lua"
+  },
+  "category": "component",
+  "display_name": "quagmire_music",
+  "summary": "该组件管理游戏内的背景音乐播放，通过网络变量 level 控制音乐曲目切换，并在获胜事件时播放特定音乐。它监听玩家激活与停用事件来同步音乐状态，参与特殊游戏模式的氛围营造与进程响应。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法，所有逻辑通过事件监听和网络变量驱动。",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated",
+    "leveldirty",
+    "lavaarenamusic._netvars.won"
+  ],
+  "netvars": [
+    "level",
+    "won"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20079,
+      65872,
+      13477,
+      13199,
+      19765,
+      15746,
+      16156,
+      72167
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 `component__quagmire_music` 或任何与音乐相关的能力表达，所有内容均涉及货币、烹饪、生物等其他主题。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "音乐",
+    "背景音乐",
+    "远古遗迹",
+    "获胜",
+    "cook",
+    "quagmire",
+    "音乐播放",
+    "网络同步",
+    "事件响应",
+    "玩家激活"
+  ],
+  "gameplay_tags": [
+    "氛围",
+    "游戏进程"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4f7de811bc8a22bd0eaf0989f3ce8e5ed410037eade9157df080d3f80497deed",
+    "source_bytes": 3192,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102814400
+  }
+}

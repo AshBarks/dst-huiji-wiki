@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deckcontainer.lua"
+  },
+  "category": "component",
+  "display_name": "deckcontainer",
+  "summary": "DeckContainer 组件管理实体持有的卡片集合，以数组形式存储卡片 ID。它提供了添加、移除、合并、分割、洗牌等操作，支持卡牌游戏的库存管理和卡组处理功能。核心玩法涉及自定义卡牌交互和实体数据的持久化。",
+  "api": [
+    {
+      "name": "MergeDecks",
+      "effect": "将另一个 deck 的指定数量卡片合并到当前 deck，并从另一个 deck 移除这些卡片。如果未指定 moved_count，则使用另一个 deck 的全部卡片数量。"
+    },
+    {
+      "name": "SplitDeck",
+      "effect": "从另一个 deck 获取指定数量的卡片添加到当前 deck，并反转当前 deck 顺序。如果设置了 on_split_deck 回调，则触发该回调。"
+    },
+    {
+      "name": "AddCard",
+      "effect": "在指定位置或末尾添加一张卡片，如果设置了 on_card_added 回调，则触发该回调。"
+    },
+    {
+      "name": "AddRandomCard",
+      "effect": "添加一张随机生成的卡片 ID（基于公式 100 * random(4) + random(13)），然后调用 AddCard 方法。"
+    },
+    {
+      "name": "AddCards",
+      "effect": "批量添加一组卡片到当前 deck，如果设置了 on_cards_added_bulk 回调，则触发该回调。"
+    },
+    {
+      "name": "RemoveCard",
+      "effect": "移除指定位置或最后一张卡片，如果设置了 on_card_removed 回调，则触发该回调。如果移除后卡片为空，则移除整个实体。"
+    },
+    {
+      "name": "PeekCard",
+      "effect": "查看指定位置或最后一张卡片，不移除，返回卡片 ID。"
+    },
+    {
+      "name": "Shuffle",
+      "effect": "随机打乱当前 deck 的卡片顺序，如果设置了 on_deck_shuffled 回调，则触发该回调。"
+    },
+    {
+      "name": "Reverse",
+      "effect": "反转当前 deck 的卡片顺序。"
+    },
+    {
+      "name": "Count",
+      "effect": "返回当前 deck 的卡片数量。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含卡片数据的表（格式为 {cards = self.cards}），用于保存实体状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载卡片数据，合并到当前 cards 数组。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回卡片数量的格式化字符串，用于调试输出。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      13606,
+      65605,
+      13281,
+      20714,
+      15539,
+      52138,
+      23924
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面内容不涉及牌组、卡牌或组件 deckcontainer 的任何能力表达；所有摘录主题为游戏机制、生物行为、物品属性等，与代码能力清单无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "卡牌",
+    "卡组",
+    "洗牌",
+    "合并",
+    "分割",
+    "添加",
+    "移除",
+    "随机卡",
+    "数量",
+    "保存"
+  ],
+  "gameplay_tags": [
+    "卡牌",
+    "库存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38da0b2ba39c2a712ea5dcb18e9310a42467dfa6ae25fb27ee8154764979ac41",
+    "source_bytes": 3140,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099457700
+  }
+}

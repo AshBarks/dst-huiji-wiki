@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forestpetrification.lua"
+  },
+  "category": "component",
+  "display_name": "forestpetrification",
+  "summary": "组件管理可石化实体的追踪列表和石化周期的冷却时间。它周期性搜索附近的森林区域，当可石化树木数量低于阈值时，触发区域石化并公告环境变化。石化过程基于随机冷却时间，增加了游戏的生存挑战和环境动态性。",
+  "api": [
+    {
+      "name": "OnPostInit",
+      "effect": "在组件初始化后调用；若冷却未启动且未在搜索森林，则根据全局参数启动随机冷却时间。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新时处理森林搜索逻辑；检查扇区内的石化实体，若数量低于阈值则触发石化，否则重试或停止搜索。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间跳跃的更新；推进冷却时间，若冷却结束则启动森林搜索。"
+    },
+    {
+      "name": "FindForest",
+      "effect": "公共方法；立即停止当前冷却并开始搜索森林，以触发石化事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件的冷却状态或搜索状态到数据表，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据恢复冷却状态；若冷却天数大于等于1则恢复冷却。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理；若冷却为0且未在搜索森林，则启动搜索。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前组件状态的调试字符串，如搜索进度、冷却天数或空闲。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_registerpetrifiable",
+    "ms_unregisterpetrifiable",
+    "ms_cyclecomplete"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.PETRIFICATION_CYCLE.MIN_YEARS",
+    "TUNING.PETRIFICATION_CYCLE.MAX_YEARS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      13701,
+      15022,
+      16197,
+      14938,
+      18487,
+      24960,
+      14936
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件 forestpetrification 相关的玩家语言表达，如森林石化过程、更新行为或寻找森林描述。相关页面如18487仅描述石化树实体掉落，未涉及组件能力如 OnPostInit、FindForest 等的行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "森林石化",
+    "石化树木",
+    "环境变化",
+    "生存挑战",
+    "随机事件",
+    "周期事件",
+    "冷却时间",
+    "区域搜索",
+    "公告"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "随机事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a980f8bb5509dd69c1eb06463a814a8d012089dc170fdf93ab52cf505ac8618d",
+    "source_bytes": 10037,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107705694
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/werebeast.lua"
+  },
+  "category": "component",
+  "display_name": "werebeast",
+  "summary": "该组件管理实体的兽化状态，核心功能是根据满月世界状态自动触发变身，或通过触发器机制手动触发。它维护计时任务控制变身持续时间，并管理回调函数和事件推送。参与生存和战斗玩法，增加游戏挑战性。",
+  "api": [
+    {
+      "name": "SetOnWereFn",
+      "effect": "设置当实体变为兽化状态时调用的回调函数。"
+    },
+    {
+      "name": "SetOnNormalFn",
+      "effect": "设置当实体恢复普通状态时调用的回调函数。"
+    },
+    {
+      "name": "SetTriggerLimit",
+      "effect": "设置触发器限制值，并重置当前触发器量为零。"
+    },
+    {
+      "name": "TriggerDelta",
+      "effect": "调整当前触发器量，如果达到或超过限制则自动触发兽化状态。"
+    },
+    {
+      "name": "ResetTriggers",
+      "effect": "将触发器量重置为零。"
+    },
+    {
+      "name": "SetWere",
+      "effect": "设置实体为兽化状态：取消现有任务，调用兽化回调函数，推送'transformwere'事件，重置触发器，并设置计时任务在指定时间（默认为weretime）后恢复普通状态。"
+    },
+    {
+      "name": "SetNormal",
+      "effect": "设置实体为普通状态：取消现有任务，调用普通回调函数，推送'transformnormal'事件，重置触发器，并取消恢复任务。"
+    },
+    {
+      "name": "IsInWereState",
+      "effect": "返回布尔值，表示实体是否处于兽化状态（基于恢复任务是否存在）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态：返回一个表，包含兽化剩余时间（如果处于兽化状态），用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态：从存档数据中恢复兽化状态，设置剩余时间并触发变身。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示触发器当前量和限制，以及兽化剩余时间（如果适用）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时清理任务和事件监听。"
+    }
+  ],
+  "events_published": [
+    "transformwere",
+    "transformnormal"
+  ],
+  "events_listened": [
+    "exitlimbo",
+    "enterlimbo"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      15250,
+      22522,
+      15421,
+      45439,
+      13408,
+      18829,
+      15137
+    ],
+    "aspects": [
+      {
+        "aspect": "变身值控制机制",
+        "evidence": [
+          {
+            "pageid": 45439,
+            "quote": "可以通过某些行为人为控制变身值的下降速度。"
+          }
+        ]
+      },
+      {
+        "aspect": "变身时长技能修改",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "变身时长+20%"
+          }
+        ]
+      },
+      {
+        "aspect": "变身状态切换台词",
+        "evidence": [
+          {
+            "pageid": 18829,
+            "quote": "伍迪发生了变身"
+          },
+          {
+            "pageid": 18829,
+            "quote": "伍迪变身结束"
+          }
+        ]
+      },
+      {
+        "aspect": "变身触发条件描述",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "如果伍迪在 4 分钟之内食用 2 个{{分类|怪物肉类}}，或者遇到[[满月]]，伍迪会随机变身为海狸人、鹿人或者鹅人。"
+          }
+        ]
+      },
+      {
+        "aspect": "月相指示与变身关联",
+        "evidence": [
+          {
+            "pageid": 15137,
+            "quote": "当你扮演伍迪时，月晷是很有用的，因为它可以更明显地指示满月即将到来的时间。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "满月",
+    "变身",
+    "狼人",
+    "触发器",
+    "状态切换",
+    "变身状态",
+    "狼人变身"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/7)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+    "source_bytes": 4845,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096044583
+  }
+}

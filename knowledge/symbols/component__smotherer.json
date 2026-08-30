@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/smotherer.lua"
+  },
+  "category": "component",
+  "display_name": "smotherer",
+  "summary": "Smotherer组件是一个简单的Lua类，仅包含一个构造函数用于初始化实例引用。它没有管理任何游戏数据，也不参与特定的核心玩法机制。",
+  "api": [],
+  "api_note": "源码中未定义任何公开方法，该组件仅为一个空壳类。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      18234,
+      24544,
+      10374,
+      14792,
+      22516,
+      23957,
+      13214
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍魔法灭火效果描述",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "扑灭角色周围 16 {{解释|距离单位}}范围内的所有[[火|火焰]]和[[闷烧]]"
+          }
+        ]
+      },
+      {
+        "aspect": "角色薇洛的扑烟能力描述",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛徒手扑灭闷烧的物品更快"
+          }
+        ]
+      },
+      {
+        "aspect": "雪球发射器的灭火功能说明",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "发射雪球扑灭 15 {{解释|距离单位}}内所有{{Tooltip|火焰和闷烧的实体|"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "闷熄",
+    "窒息",
+    "灭火",
+    "扑灭",
+    "熄灭",
+    "覆盖",
+    "阻燃",
+    "压制",
+    "防火",
+    "灭火器"
+  ],
+  "gameplay_tags": [],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5df4004ab0d2793779a224c378ac4c42af1534fbd6b8c695a20fa3f9b6cd18b2",
+    "source_bytes": 89,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093740115
+  }
+}

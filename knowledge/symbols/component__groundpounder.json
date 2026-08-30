@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/groundpounder.lua"
+  },
+  "category": "component",
+  "display_name": "groundpounder",
+  "summary": "GroundPounder组件管理地面震击的数据和效果参数，包括环数、延迟、半径、伤害范围等。它参与核心玩法中的战斗和生存机制，通过执行地面震击来造成伤害、破坏物体、推动船只平台和点燃可燃物。",
+  "api": [
+    {
+      "name": "UseRingMode",
+      "effect": ""
+    },
+    {
+      "name": "GetPoints",
+      "effect": ""
+    },
+    {
+      "name": "DestroyPoints",
+      "effect": ""
+    },
+    {
+      "name": "DestroyRing",
+      "effect": ""
+    },
+    {
+      "name": "GroundPound",
+      "effect": ""
+    },
+    {
+      "name": "GroundPound_Offscreen",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      21063,
+      14099,
+      18843,
+      20714,
+      10379,
+      15675,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件 groundpounder 相关的能力表达，所有页面讨论的是世界翻新、冰钓洞、暗影秘典、投石机、控制台、温蒂、疙瘩树或暗影棋子等其他游戏机制或实体行为，不涉及代码能力清单中的 UseRingMode、GetPoints、DestroyPoints、DestroyRing、GroundPound、GroundPound_Offscreen 或 GetDebugString 的玩家语言描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "环数",
+    "延迟",
+    "半径",
+    "伤害范围",
+    "火焰点燃",
+    "视觉特效",
+    "环攻击",
+    "地面冲击",
+    "破坏效果",
+    "推动船只"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
+    "source_bytes": 16332,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092993422
+  }
+}

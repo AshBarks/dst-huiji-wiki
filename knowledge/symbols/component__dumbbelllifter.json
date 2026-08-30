@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dumbbelllifter.lua"
+  },
+  "category": "component",
+  "display_name": "dumbbelllifter",
+  "summary": "DumbbellLifter组件管理实体举起哑铃的状态。它提供开始、停止和执行举起动作的方法，并调用哑铃组件的训练功能。参与哑铃锻炼系统，允许角色通过举起哑铃进行锻炼以提升属性。",
+  "api": [
+    {
+      "name": "CanLift",
+      "effect": "检查是否可以举起指定的哑铃，始终返回true"
+    },
+    {
+      "name": "IsLiftingAny",
+      "effect": "返回是否正在举起任何哑铃的布尔值"
+    },
+    {
+      "name": "IsLifting",
+      "effect": "返回是否正在举起特定哑铃的布尔值"
+    },
+    {
+      "name": "StartLifting",
+      "effect": "开始举起指定的哑铃，设置哑铃引用，调用哑铃组件的开始训练方法，并为实体添加'liftingdumbbell'标签"
+    },
+    {
+      "name": "StopLifting",
+      "effect": "停止举起当前哑铃，调用哑铃组件的结束训练方法，清除哑铃引用，并移除'liftingdumbbell'标签"
+    },
+    {
+      "name": "Lift",
+      "effect": "执行一次举起动作，调用哑铃组件的训练方法，根据结果返回状态；如果训练失败，清除哑铃引用"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      15903,
+      15904,
+      33991,
+      13260,
+      20044,
+      45439,
+      14815
+    ],
+    "aspects": [
+      {
+        "aspect": "举重停止操作",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "再次右键停止举重"
+          }
+        ]
+      },
+      {
+        "aspect": "举重启动操作",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "装备后右键哑铃即可开始举重"
+          }
+        ]
+      },
+      {
+        "aspect": "举重状态描述",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "但当沃尔夫冈手持哑铃移动时"
+          }
+        ]
+      },
+      {
+        "aspect": "举重行为消耗",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "每举重一次消耗一倍耐久（0.8）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "哑铃",
+    "举重",
+    "锻炼",
+    "训练",
+    "力量",
+    "健身",
+    "Workout",
+    "lift",
+    "dumbbell"
+  ],
+  "gameplay_tags": [
+    "锻炼",
+    "训练"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5d4ca73d08013bbd765bd68988d61521a24405cd285a26881915b2127f69072d",
+    "source_bytes": 1075,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107155786
+  }
+}

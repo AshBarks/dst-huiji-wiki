@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldsettings.lua"
+  },
+  "category": "component",
+  "display_name": "worldsettings",
+  "summary": "该组件负责存储和管理游戏世界设置的值，提供获取和设置接口。它通过监听'ms_setworldsetting'事件来动态更新设置数据。在饥荒联机版中，此组件参与核心生存玩法，允许调整游戏规则以影响难度和体验。",
+  "api": [
+    {
+      "name": "GetSetting",
+      "effect": "获取指定设置的值。行为：根据传入的设置名称，从内部设置表中查询并返回对应的值。副作用：无。"
+    },
+    {
+      "name": "SetSetting",
+      "effect": "设置指定设置的值。行为：将传入的设置名称和值存储到内部设置表中。副作用：可能影响游戏逻辑，但源码中未直接体现具体副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_setworldsetting"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13569,
+      35007,
+      13570,
+      13634,
+      15237,
+      15684,
+      15975,
+      18441
+    ],
+    "aspects": [
+      {
+        "aspect": "昼夜循环倍率设置应用",
+        "evidence": [
+          {
+            "pageid": 13570,
+            "quote": "游戏会应用玩家在世界设置中选择的倍率 $M$（如“长白天”中白天倍率为 1.6）。"
+          }
+        ]
+      },
+      {
+        "aspect": "道路与路径设置可调整",
+        "evidence": [
+          {
+            "pageid": 13634,
+            "quote": "玩家可以在世界选项中改变道路和路径的某些设置。"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿伤害设置影响生命值",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "如果世界设置中“饥饿伤害”被设置为“非致命”，那么即使鱼人之王的饥饿值为 0 ，生命值最低也只能到达为200"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "世界设置",
+    "游戏规则",
+    "服务器设置",
+    "主机设置",
+    "游戏选项",
+    "世界选项",
+    "难度设置",
+    "规则设置"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "世界"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cb7e76fa9817cdc52cdd096e59d4091c7439b33ebee31d3483de21d7171f7d5a",
+    "source_bytes": 559,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114407690
+  }
+}

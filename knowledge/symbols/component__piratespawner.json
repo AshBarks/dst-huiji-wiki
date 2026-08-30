@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/piratespawner.lua"
+  },
+  "category": "component",
+  "display_name": "piratespawner",
+  "summary": "piratespawner组件管理海盗船只的生成、海盗船员的配置、战利品处理以及与海盗袭击相关的数据。它根据玩家位置和游戏时间触发海盗袭击，玩家需要应对海盗战斗并可能获取战利品。组件还处理海盗船消失时的物品转移和藏宝点生成。",
+  "api": [
+    {
+      "name": "FindStashLocation",
+      "effect": "查找并返回一个远离玩家的安全坐标用于放置藏宝点，确保位置不被玩家占据且不在地面。"
+    },
+    {
+      "name": "StashLoot",
+      "effect": "将指定实体中的物品送入当前的藏宝点，物品会被处理并转移到藏宝点容器。"
+    },
+    {
+      "name": "GetCurrentStash",
+      "effect": "获取当前的藏宝点实体；若不存在则创建一个新藏宝点并生成随机战利品。"
+    },
+    {
+      "name": "ClearCurrentStash",
+      "effect": "清除当前藏宝点的引用，使其不再被组件追踪。"
+    },
+    {
+      "name": "SpawnPirates",
+      "effect": "在指定坐标生成一艘海盗船及其船员（包括船长和猴子船员），并保存船只数据。"
+    },
+    {
+      "name": "SpawnPiratesForPlayer",
+      "effect": "为指定玩家生成海盗，可选择是否送货（船载宝藏）或强制送货；生成后触发玩家公告。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件状态，根据玩家位置和距离计算海盗生成概率，管理海盗音乐状态，并处理船只数据。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长期更新，调用OnUpdate处理长时间间隔的逻辑。"
+    },
+    {
+      "name": "SaveShipData",
+      "effect": "将船只数据（包括船、船长和船员）保存到内部列表中。"
+    },
+    {
+      "name": "RemoveShipData",
+      "effect": "从内部列表中移除指定船只的数据。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态到数据表，包括生成参数、船只数据和藏宝点引用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载组件状态，恢复生成参数和下次生成概率。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后处理，重新连接实体引用并恢复船只和船员状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回空字符串，用于调试输出（源码中未实现具体功能）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "megaflare_detonated"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.PIRATE_SPAWN_DELAY.min",
+    "TUNING.PIRATE_SPAWN_DELAY.max",
+    "TUNING.PIRATESPAWNER.INNER.MAX",
+    "TUNING.PIRATESPAWNER.INNER.CHANCE",
+    "TUNING.PIRATESPAWNER.INNER.WEIGHT",
+    "TUNING.PIRATESPAWNER.MID.MAX",
+    "TUNING.PIRATESPAWNER.MID.CHANCE",
+    "TUNING.PIRATESPAWNER.MID.WEIGHT",
+    "TUNING.PIRATESPAWNER.OUTTER.MAX",
+    "TUNING.PIRATESPAWNER.OUTTER.CHANCE",
+    "TUNING.PIRATESPAWNER.OUTTER.WEIGHT",
+    "TUNING.PIRATE_RAIDS_ENABLED",
+    "TUNING.PIRATE_RAIDS_CHANCE_MODIFIER",
+    "TUNING.PIRATERAID_MEGAFLARE_SPAWN_CHANCE",
+    "TUNING.PIRATE_SPAWN_MAX",
+    "TUNING.MONKEY_PIRATE_TREASURE_BOAT_CHANCE",
+    "TUNING.PIRATESPAWNER_BASEPIRATECHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18540,
+      20113,
+      14684,
+      18503,
+      65881,
+      18504,
+      13823,
+      18522
+    ],
+    "aspects": [
+      {
+        "aspect": "海盗袭击的玩家进入触发",
+        "evidence": [
+          {
+            "pageid": 18540,
+            "quote": "当一名玩家进入距离月亮码头女王 800 单位内的海域时，这名玩家就可能遭受海盗袭击。"
+          }
+        ]
+      },
+      {
+        "aspect": "海盗袭击的生成单位与概率召唤",
+        "evidence": [
+          {
+            "pageid": 18540,
+            "quote": "海盗袭击包括 1 艘挂有月亮码头海盗旗的海盗单桅帆船，1 个大副，以及 2 ~ 5 个火药猴。"
+          },
+          {
+            "pageid": 20113,
+            "quote": "敌对信号弹被燃放后，将在 5 ~ 25 秒内，概率召唤出海象、独眼巨鹿或海盗袭击。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海盗袭击",
+    "海盗船出现",
+    "宝藏位置",
+    "战利品获取",
+    "海盗船员",
+    "藏宝图",
+    "信号弹",
+    "船员配置",
+    "游戏时间"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "冒险",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4be41f65849a6059db902e90b95b9ffb2c92f41e4d3beabe8a5c3d49bc9875de",
+    "source_bytes": 27571,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110855336
+  }
+}

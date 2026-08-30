@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wobycourier.lua"
+  },
+  "category": "component",
+  "display_name": "wobycourier",
+  "summary": "此组件管理 Woby 宠物的快递存储位置，允许玩家设置和清除在当前分片的坐标。它通过网络变量同步位置信息，并确保坐标位于陆地瓦片上以支持跨分片运输玩法。",
+  "api": [
+    {
+      "name": "NetworkLocation()",
+      "effect": "更新网络变量 chest_posx 和 chest_posz 以同步当前存储坐标。如果实例是 ThePlayer，则推送 'updatewobycourierchesticon' 事件。"
+    },
+    {
+      "name": "CanStoreXZ(x, z)",
+      "effect": "检查给定世界坐标 (x, z) 是否位于陆地瓦片上，返回 true 或 false。"
+    },
+    {
+      "name": "StoreXZ(x, z)",
+      "effect": "存储当前分片的坐标到 positions 表，仅当坐标位于陆地瓦片上时成功。成功后调用 NetworkLocation() 更新网络并返回 true，否则返回 false。"
+    },
+    {
+      "name": "ClearXZ()",
+      "effect": "清除当前分片的存储坐标。如果存在存储则删除并调用 NetworkLocation() 更新网络，返回 true；否则返回 false。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "返回 positions 表用于保存游戏状态。如果为空则返回 nil。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "从 data 中加载 positions 表并调用 NetworkLocation() 更新网络。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试字符串，显示存储坐标的格式化字符串或 'NPOS'。"
+    }
+  ],
+  "events_published": [
+    "updatewobycourierchesticon"
+  ],
+  "events_listened": [],
+  "netvars": [
+    "chest_posx",
+    "chest_posz"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13437,
+      13455,
+      20714,
+      65881,
+      65605,
+      35371,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "将物品放入指定位置箱子",
+        "evidence": [
+          {
+            "pageid": 13455,
+            "quote": "沃比来这，沃比去那'的沃尔特可以派遣沃比前往其他玩家处，或将物品放入指定位置的箱子中。"
+          }
+        ]
+      },
+      {
+        "aspect": "派遣沃比前往其他玩家",
+        "evidence": [
+          {
+            "pageid": 13455,
+            "quote": "沃比来这，沃比去那'的沃尔特可以派遣沃比前往其他玩家处，或将物品放入指定位置的箱子中。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "沃比",
+    "宠物",
+    "运输",
+    "存储",
+    "位置",
+    "坐标",
+    "区域",
+    "陆地",
+    "同步"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "宠物",
+    "快递",
+    "网络同步"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e7b3ce8e35162efae9aca62a15ac02db28632bc9ed6fac9b63080e17197b5b33",
+    "source_bytes": 2610,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114182544
+  }
+}

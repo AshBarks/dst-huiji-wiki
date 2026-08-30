@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_daywalkerspawner.lua"
+  },
+  "category": "component",
+  "display_name": "shard_daywalkerspawner",
+  "summary": "该组件管理日行者在游戏世界中的位置状态。它通过网络变量同步位置信息，并在主shard上响应'boss击败'事件更新位置，实现跨shard的日行者位置切换。组件参与 boss 击败后的事件处理，影响日行者的生成或行为。",
+  "api": [
+    {
+      "name": "GetLocation",
+      "effect": "返回日行者的当前位置枚举值（数字，如0或1）。"
+    },
+    {
+      "name": "GetLocationName",
+      "effect": "返回日行者的当前位置名称字符串（如'cavejail'或'forestjunkpile'）。"
+    },
+    {
+      "name": "SetLocation",
+      "effect": "设置日行者的位置。参数接受字符串（位置名称）或数字（枚举值），更新网络变量。"
+    },
+    {
+      "name": "GetNewLocationName",
+      "effect": "在主shard上，根据旧位置返回新位置名称。如果旧位置是'cavejail'返回'forestjunkpile'，如果是'forestjunkpile'返回'cavejail'。"
+    },
+    {
+      "name": "OnLocationUpdate",
+      "effect": "事件处理函数。当'master_shardbossdefeated'事件触发且数据包含bossprefab为'daywalker'时，更新日行者位置。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含当前日行者位置名称，用于保存游戏数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据表中加载日行者位置信息。"
+    },
+    {
+      "name": "OnLocationDirty",
+      "effect": "在从shard上，当'locationdirty'事件触发时调用的处理函数（当前为空操作）。"
+    },
+    {
+      "name": "UpdateLocationNames",
+      "effect": "更新内部查找表，将位置枚举值映射到名称。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前shard是否为 主shard 以及日行者位置名称。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "master_shardbossdefeated",
+    "locationdirty"
+  ],
+  "netvars": [
+    "location (net_tinybyte)"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65605,
+      34523,
+      34314,
+      52788,
+      23187,
+      14579,
+      24544
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件能力/行为语义清单相关的玩家语言表达。所有页面内容集中于游戏机制、布景生成、世界自定义等宏观主题，未提及GetLocation、SetLocation等函数或相关行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "日行者",
+    "位置",
+    "跨shard",
+    "boss",
+    "生成",
+    "事件",
+    "网络同步",
+    "保存加载",
+    "调试",
+    "切换"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9195982930400aea20c12ade7f3b7dbbded5d211c7b7afb0442c7bec7d8e424b",
+    "source_bytes": 2902,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103391629
+  }
+}

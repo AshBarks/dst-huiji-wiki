@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/battleborn.lua"
+  },
+  "category": "component",
+  "display_name": "battleborn",
+  "summary": "组件Battleborn管理战斗中积累的奖励值（battleborn），玩家攻击敌人时该值根据伤害比例增加，并随时间衰减。积累值超过阈值时，可触发回复生命值、精神值或修复装备，增强了战斗的可持续性和奖励机制。",
+  "api": [
+    {
+      "name": "SetTriggerThreshold",
+      "effect": "设置触发回复的battleborn阈值，影响积累值何时被消耗。"
+    },
+    {
+      "name": "SetDecayTime",
+      "effect": "设置battleborn值的衰减时间，控制未触发时积累值的消失速度。"
+    },
+    {
+      "name": "SetStoreTime",
+      "effect": "设置battleborn值的存储时间，影响衰减计算的起始点。"
+    },
+    {
+      "name": "SetOnTriggerFn",
+      "effect": "设置触发时的回调函数，在积累值超过阈值并消耗后调用。"
+    },
+    {
+      "name": "SetBattlebornBonus",
+      "effect": "设置battleborn的额外奖励系数，直接影响每次攻击积累的delta值。"
+    },
+    {
+      "name": "SetSanityEnabled",
+      "effect": "设置是否启用精神回复，控制触发时是否回复精神值。"
+    },
+    {
+      "name": "SetHealthEnabled",
+      "effect": "设置是否启用生命值回复，控制触发时是否回复生命值或修复装备。"
+    },
+    {
+      "name": "SetClampMin",
+      "effect": "设置delta值的最小钳制值，确保积累值不小于该下限。"
+    },
+    {
+      "name": "SetClampMax",
+      "effect": "设置delta值的最大钳制值，确保积累值不大于该上限。"
+    },
+    {
+      "name": "SetValidVictimFn",
+      "effect": "设置有效受害者的验证函数，用于过滤哪些敌人可触发battleborn积累。"
+    },
+    {
+      "name": "OnAttack",
+      "effect": "处理攻击事件：计算伤害比例delta，衰减旧积累值，存储新值，并在超过阈值时消耗积累值回复生命/精神或修复装备，同时调用回调函数。"
+    },
+    {
+      "name": "OnDeath",
+      "effect": "处理死亡事件：将battleborn积累值重置为0，防止死亡后保留奖励。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onattackother",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BATTLEBORN_REPAIR_EQUIPMENT_MULT",
+    "TUNING.BATTLEBORN_TRIGGER_THRESHOLD",
+    "TUNING.BATTLEBORN_DECAY_TIME",
+    "TUNING.BATTLEBORN_STORE_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15922,
+      15225,
+      15601,
+      14938,
+      18219,
+      14815,
+      15022
+    ],
+    "aspects": [
+      {
+        "aspect": "战吼冷却时间",
+        "evidence": [
+          {
+            "pageid": 18219,
+            "quote": "学习“战斗之诵”技能后吟唱该战吼不消耗激励值，但是吟唱后有10秒的冷却时间。"
+          }
+        ]
+      },
+      {
+        "aspect": "战斗时理智光环变化",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "|理智光环 = -40{{理智值}}/分钟（战斗时）"
+          }
+        ]
+      },
+      {
+        "aspect": "战歌达到阈值使用",
+        "evidence": [
+          {
+            "pageid": 13409,
+            "quote": "战斗号子分为战歌和战吼两类，前者达到阈值即可使用以提供持续的范围增益"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡时仇恨转移",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影傀儡因死亡、受击瞬移、突刺攻击等原因脱离战斗时，如果召唤者在 24 距离单位内，会将敌人的仇恨转移至召唤者本…"
+          }
+        ]
+      },
+      {
+        "aspect": "被攻击获得激励值",
+        "evidence": [
+          {
+            "pageid": 13409,
+            "quote": "每次被敌人攻击获得的[[File:Inspiration Meter.png|32px|link=]]为$\\frac{3}{10000}\\times 失去的生命值\\times (100-当前激励值)$"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "战斗奖励",
+    "生命回复",
+    "精神回复",
+    "装备修复",
+    "攻击触发",
+    "阈值",
+    "衰减",
+    "死亡重置",
+    "敌人",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "回复",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d25ba4bd1a24ac0066281f9f064fa504618a2edf4bc412341cdb1eb8105a9a9d",
+    "source_bytes": 4332,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105475203
+  }
+}

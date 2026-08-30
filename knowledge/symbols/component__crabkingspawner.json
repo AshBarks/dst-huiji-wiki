@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/crabkingspawner.lua"
+  },
+  "category": "component",
+  "display_name": "crabkingspawner",
+  "summary": "该组件负责管理螃蟹王生成器的数据，在世界加载时恢复其状态。它确保螃蟹王生成器在正确位置生成，并处理生成器的再生计时器，参与核心玩法中的Boss战和世界事件管理。",
+  "api": [
+    {
+      "name": "LoadPostPass",
+      "effect": "检查世界中是否存在螃蟹王生成器实体，如果没有，则根据保存的数据生成新的生成器，并设置其位置、子生成器内部数量，如果存在恢复时间，则启动再生计时器。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      35001,
+      34314,
+      45249,
+      15415,
+      13606,
+      51046,
+      70704
+    ],
+    "aspects": [
+      {
+        "aspect": "加载范围离开响应行为",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "如果帝王蟹离开{{解释|加载范围}}，将会回到沉睡状态"
+          }
+        ]
+      },
+      {
+        "aspect": "帝王蟹死亡重生机制",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "帝王蟹死亡后会在 20 天后于同一位置重生。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "螃蟹王",
+    "生成器",
+    "Boss",
+    "世界加载",
+    "再生",
+    "计时器",
+    "保存加载",
+    "CrabKing"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "世界生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "292cc742f0950b2f37b44674e2d8de087e87159a6a5b1eb1be7fdb7c5790a785",
+    "source_bytes": 1428,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106414007
+  }
+}

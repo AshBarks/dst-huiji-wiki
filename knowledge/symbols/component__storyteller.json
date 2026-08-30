@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/storyteller.lua"
+  },
+  "category": "component",
+  "display_name": "storyteller",
+  "summary": "该组件管理实体的故事讲述功能，允许设置故事内容和回调函数，并在特定距离内向玩家或其他实体讲述故事。参与核心玩法中的叙述和NPC互动，增强游戏叙事体验。",
+  "api": [
+    {
+      "name": "SetStoryToTellFn",
+      "effect": "设置用于获取故事内容的函数。副作用：存储该函数到组件的 storytotellfn 字段。"
+    },
+    {
+      "name": "SetOnStoryBeginFn",
+      "effect": "设置故事开始时的回调函数。副作用：存储该函数到组件的 onstorybeginfn 字段。"
+    },
+    {
+      "name": "SetOnStoryOverFn",
+      "effect": "设置故事结束时的回调函数。副作用：存储该函数到组件的 onstoryoverfn 字段。"
+    },
+    {
+      "name": "IsTellingStory",
+      "effect": "检查实体是否正在讲述故事。副作用：返回布尔值，基于当前故事是否存在。"
+    },
+    {
+      "name": "AbortStory",
+      "effect": "中止当前故事讲述。副作用：调用 OnDone 清理故事状态；如果存在 talker 组件，则使用指定原因说消息或关闭对话。"
+    },
+    {
+      "name": "TellStory",
+      "effect": "开始讲述故事，传入故事道具实体。副作用：调用 storytotellfn 获取故事对象；设置故事状态；解析台词并使用 talker 组件说；如果故事有周期 tick 函数，则设置定时任务；注册事件监听；调用 onstorybeginfn 回调；返回成功状态和故事。"
+    },
+    {
+      "name": "OnDone",
+      "effect": "完成故事讲述的清理操作。副作用：移除事件回调；取消 tick 定时任务；调用 onstoryoverfn 回调；清空当前故事数据。"
+    },
+    {
+      "name": "OnStoryTick",
+      "effect": "处理故事周期 tick 事件。副作用：调用当前故事的 ontickfn 函数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "donetalking",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15415,
+      51494,
+      65605,
+      70704,
+      15022,
+      51495,
+      15225,
+      15938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及component__storyteller相关的代码能力（如SetStoryToTellFn、TellStory等）或行为语义表达，内容主要描述生物行为、游戏机制和战斗策略，未提及故事讲述、开始、结束等概念。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "故事",
+    "NPC",
+    "对话",
+    "讲述",
+    "距离",
+    "叙述",
+    "互动",
+    "内容",
+    "触发"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "叙述",
+    "对话"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2086538c9e1ab3026511eb48e426a095ad68aeedd45ab21ab8b6202740404961",
+    "source_bytes": 2758,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113077074
+  }
+}

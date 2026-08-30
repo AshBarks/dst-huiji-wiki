@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/custombuildmanager.lua"
+  },
+  "category": "component",
+  "display_name": "custombuildmanager",
+  "summary": "该组件管理实体的自定义构建组和当前构建，用于控制动画符号的覆盖。它允许通过设置组数据、条件函数和改变组来动态调整实体的视觉表现。参与游戏中的外观自定义系统，支持保存和加载状态以持久化更改。",
+  "api": [
+    {
+      "name": "refreshart",
+      "effect": "刷新所有组的动画覆盖。遍历groups中的每个符号，如果当前构建存在且canswapsymbol函数返回true，则调用AnimState:OverrideSymbol覆盖动画符号；否则不做操作。副作用是修改实体的动画状态。"
+    },
+    {
+      "name": "SetGroups",
+      "effect": "设置组件管理的组数据，将传入的data赋值给self.groups。副作用是更新内部groups表，可能影响后续的动画刷新。"
+    },
+    {
+      "name": "SetCanSwapSymbol",
+      "effect": "设置可以交换符号的条件函数，将传入的fn赋值给self.canswapsymbol。副作用是更新内部条件函数，用于控制动画覆盖的触发条件。"
+    },
+    {
+      "name": "ChangeGroup",
+      "effect": "改变指定组的当前构建。如果传入的group存在于groups中，则更新current[group]为传入的build（如果build为nil则清除）；然后调用refreshart刷新动画。副作用是更新当前构建并立即触发动画覆盖。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前状态到数据表。返回一个包含current字段的对象，用于存档系统。副作用是将current表序列化，以便后续加载。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载状态。如果传入的data包含current字段，则恢复self.current；然后调用refreshart刷新动画。副作用是恢复内部状态并触发动画覆盖。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      14683,
+      46866,
+      70763
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本聚焦于游戏实体（如寄居蟹隐士、海钓竿、晾肉架、触电机制）的行为描述、属性数值和玩法交互，未提及代码能力如刷新艺术、组设置、符号交换或保存/加载事件等开发者层面的功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "皮肤管理",
+    "外观定制",
+    "动画效果",
+    "构建控制",
+    "符号覆盖",
+    "外观保存",
+    "视觉调整"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "装饰",
+    "自定义",
+    "角色管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "794ab982bdb6e445cd29a28772a94dac5c521e07ad711f8076f66a8ec6e84b2c",
+    "source_bytes": 1423,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106488066
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventoryitemholder.lua"
+  },
+  "category": "component",
+  "display_name": "inventoryitemholder",
+  "summary": "组件 inventoryitemholder 管理实体上的物品持有功能，允许存放和取出物品，并支持堆叠和标签限制。它参与游戏中物品存储和交换的机制，例如在容器或结构上使用。物品被持有时会从世界中移除，并在需要时返回。",
+  "api": [
+    {
+      "name": "SetAllowedTags",
+      "effect": "设置允许的标签列表，影响哪些物品可以被给予此持有者。"
+    },
+    {
+      "name": "SetOnItemGivenFn",
+      "effect": "设置物品被给予时触发的回调函数。"
+    },
+    {
+      "name": "SetOnItemTakenFn",
+      "effect": "设置物品被取出时触发的回调函数。"
+    },
+    {
+      "name": "SetAcceptStacks",
+      "effect": "设置是否接受堆叠物品，影响堆叠物品的给予逻辑。"
+    },
+    {
+      "name": "IsHolding",
+      "effect": "返回当前是否持有物品的布尔值。"
+    },
+    {
+      "name": "CanGive",
+      "effect": "检查是否可以给予物品，基于物品标签和持有者状态；无副作用。"
+    },
+    {
+      "name": "CanTake",
+      "effect": "检查是否可以取出物品，基于当前持有物品的有效性；无副作用。"
+    },
+    {
+      "name": "GiveItem",
+      "effect": "尝试给予物品；如果成功，物品成为子实体，监听移除和掉落事件，触发 onitemgivenfn 回调；返回是否成功。"
+    },
+    {
+      "name": "TakeItem",
+      "effect": "尝试取出物品；如果成功，移除物品，清理事件监听，触发 onitemtakenfn 回调，物品被给予取者或掉落；返回是否成功。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前持有物品的保存数据，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中生成物品并给予持有者，用于游戏读档。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，取出物品并移除相关标签，进行清理。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示当前持有物品和允许标签。"
+    }
+  ],
+  "api_note": "组件提供多个方法管理物品持有，包括设置、检查、给予、取出和存档功能。",
+  "events_published": [],
+  "events_listened": [
+    "onremove",
+    "ondropped",
+    "onputininventory"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      13156,
+      20150,
+      39296,
+      22465,
+      65605,
+      72441,
+      10355
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__inventoryitemholder 或其代码能力/行为语义清单中的任何能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "容器",
+    "堆叠",
+    "标签",
+    "存储",
+    "交换",
+    "物品管理",
+    "移除",
+    "返回"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 0/8)",
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8b3b3116039a9e753a907fee0a734d6501694fd3d279547ad4773c65c8f54c3d",
+    "source_bytes": 8106,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095445814
+  }
+}

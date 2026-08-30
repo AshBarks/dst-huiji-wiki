@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/trapfumaroleburning.lua"
+  },
+  "category": "component",
+  "display_name": "trapfumaroleburning",
+  "summary": "该组件管理实体在喷气孔陷阱上的燃烧状态，包括点火时间、清理时间和温度变化。它负责处理持续伤害、烹饪物品或传播热量，是喷气孔陷阱系统的一部分。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，调用最后陷阱的 ClearIgnitingEntity 方法，并移除视觉效果实体。"
+    },
+    {
+      "name": "SetFxEnabled",
+      "effect": "设置视觉效果开关，但当前实现中 enable 参数被硬编码为 false，因此效果始终禁用。当启用时，会创建或显示燃烧效果并调整颜色；禁用时，隐藏效果并移除颜色。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新组件状态：检查实体是否在活跃的喷气孔陷阱中，如果是，则根据陷阱温度范围应用伤害、烹饪可烹饪物品或传播热量给可传播实体，并调整实体温度；否则减少点火时间，并在超时后移除组件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示清理时间、点火时间和最后着火伤害时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TRAP_FUMAROLE_IGNITE_MULTS",
+    "TRAP_FUMAROLE_DAMAGE",
+    "TRAP_FUMAROLE_IGNITE_TIME",
+    "TRAP_FUMAROLE_PROPAGATOR_RATE",
+    "TRAP_FUMAROLE_TEMPERATURE_RATE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      10374,
+      15922,
+      20496,
+      18572,
+      16419,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__trapfumaroleburning 组件或其能力如 OnRemoveFromEntity、SetFxEnabled、OnUpdate、GetDebugString 的直接或间接描述。页面内容主要涉及角色、物品、燃烧和温度机制，但无针对该特定组件的讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "喷气孔",
+    "陷阱",
+    "燃烧",
+    "伤害",
+    "烹饪",
+    "温度",
+    "热源",
+    "效果",
+    "组件",
+    "更新"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "烹饪",
+    "陷阱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eb1b61a052a578b59c8d7976f2560e443dba4a624ac8996540d502e290100654",
+    "source_bytes": 5698,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104315123
+  }
+}

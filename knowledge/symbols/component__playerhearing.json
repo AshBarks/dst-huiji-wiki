@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerhearing.lua"
+  },
+  "category": "component",
+  "display_name": "playerhearing",
+  "summary": "组件playerhearing管理玩家听力相关的音频衰减数据，通过装备物品来调整音频输出。它监听装备和卸下事件，更新内部DSP表，并推送音频变化事件。核心玩法涉及生存中通过装备影响听觉体验，如使用闷声帽降低环境音量。",
+  "api": [
+    {
+      "name": "GetDSPTables",
+      "effect": "返回当前激活的数字信号处理（DSP）衰减表。无副作用。"
+    },
+    {
+      "name": "UpdateDSPTables",
+      "effect": "根据装备状态更新DSP表，推送pushdsp或popdsp事件，修改dsptables并触发事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "pushdsp",
+    "popdsp"
+  ],
+  "events_listened": [
+    "equip",
+    "unequip",
+    "inventoryclosed"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      24540,
+      13437,
+      72238,
+      13260,
+      20700,
+      16419,
+      19118
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论装备、烹饪、角色技能、潮湿度、电路板和盔甲等游戏机制，未出现与声音、听觉或 GetDSPTables、UpdateDSPTables 相关的能力描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "听力",
+    "音频",
+    "衰减",
+    "装备",
+    "帽子",
+    "音量",
+    "降低",
+    "声音",
+    "DSP"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "aa7ebf1b831a5d77815dba4611904966f244032e2667cbb1df720e1e0bd123b8",
+    "source_bytes": 1964,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111030567
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lightningblocker.lua"
+  },
+  "category": "component",
+  "display_name": "lightningblocker",
+  "summary": "该组件管理一个实体的闪电阻止区域，通过设置范围平方值来定义保护区域。当闪电击中该区域时，可以触发自定义回调行为，常用于避雷针等保护装置以防止闪电伤害。",
+  "api": [
+    {
+      "name": "SetBlockRange",
+      "effect": "设置阻止范围的平方值。如果新范围有效（大于EPSILON），则给实体添加标签 'lightningblocker'；否则移除该标签。"
+    },
+    {
+      "name": "SetOnLightningStrike",
+      "effect": "设置闪电击中时的回调函数。将函数存储在组件中，供后续调用。"
+    },
+    {
+      "name": "DoLightningStrike",
+      "effect": "执行闪电击中行为。如果设置了回调函数，则调用它，传递当前实体和击中位置。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除标签 'lightningblocker' 以清理状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      20150,
+      10374,
+      13156,
+      20058,
+      15539,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未涉及闪电相关机制或组件能力，未发现与SetBlockRange、SetOnLightningStrike、DoLightningStrike或OnRemoveFromEntity相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "闪电",
+    "阻止",
+    "避雷针",
+    "保护",
+    "范围",
+    "回调",
+    "伤害",
+    "天气",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ee4d7d395e8abc905cd1ca3791dccf001bed538e9463a85f5207edfbf91d26bd",
+    "source_bytes": 941,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096945731
+  }
+}

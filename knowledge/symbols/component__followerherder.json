@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/followerherder.lua"
+  },
+  "category": "component",
+  "display_name": "followerherder",
+  "summary": "FollowerHerder 组件用于管理实体的牧羊行为，允许切换其领导的跟随者的敌对状态。它提供了自定义检查和行为回调的方法，并在执行牧羊操作时消耗工具的使用次数。核心玩法涉及战斗中的群体控制或工具资源管理。",
+  "api": [
+    {
+      "name": "SetCanHerdFn",
+      "effect": "设置一个回调函数，用于自定义牧羊的检查条件。当调用 CanHerd 方法时，该函数会执行，若返回 false 则阻止牧羊操作。"
+    },
+    {
+      "name": "SetOnHerdFn",
+      "effect": "设置一个回调函数，在牧羊操作完成后执行。当调用 Herd 方法后，该函数会被触发，用于添加自定义行为。"
+    },
+    {
+      "name": "SetUseAmount",
+      "effect": "设置每次牧羊操作消耗的工具使用量。存储的值在 Herd 方法中用于减少 finiteuses 组件的使用次数。"
+    },
+    {
+      "name": "CanHerd",
+      "effect": "检查是否可以对给定的 leader 进行牧羊。若设置了 canherdfn 函数，则调用它判断，返回 true 或 false 及原因；否则默认返回 true。"
+    },
+    {
+      "name": "Herd",
+      "effect": "执行牧羊操作，翻转自身的 hostile 状态，并将所有跟随者的 hostile 属性更新为相同状态。同时消耗 finiteuses 组件的使用次数（如果存在），最后调用 onherfn 回调函数（如果设置）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      21620,
+      10413,
+      15303,
+      10418,
+      15903,
+      33950,
+      13437
+    ],
+    "aspects": [
+      {
+        "aspect": "沃比协同开采指令行为",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "未骑乘大沃比时，玩家砍树和采矿附带对大沃比的指令，大沃比会协同开采。"
+          }
+        ]
+      },
+      {
+        "aspect": "自动抓取机跟随上限提升",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "可制作[[自动抓取机]]；其同时跟随上限提升至 2 个"
+          }
+        ]
+      },
+      {
+        "aspect": "鸟类召唤数量限制条件",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "周围 10 距离单位内鸟类数量过多。多于 20 只就无法继续进行召唤。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "牧羊",
+    "跟随",
+    "敌对",
+    "检查",
+    "回调",
+    "消耗",
+    "herder",
+    "follower"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "控制",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38a0f2b0eadb2785a1e19e1f129a8ef1c51d0abe6243de796b0f2ec5e2057b07",
+    "source_bytes": 1021,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100065081
+  }
+}

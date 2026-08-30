@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rooted.lua"
+  },
+  "category": "component",
+  "display_name": "rooted",
+  "summary": "rooted组件管理实体的根除状态，通过添加'rooted'标签、停止物理运动和设置移动速度乘数为零来使实体无法移动。它参与控制实体的移动能力，影响生存和战斗等核心玩法，常用于固定敌人或环境物体。",
+  "api": [
+    {
+      "name": "AddSource",
+      "effect": "添加一个根除源到实体的sources表中；如果源不是实体自身，则监听其'rooted'事件以在源移除时自动清理。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "从实体的sources表中移除指定根除源；清理相关的事件监听，并调用内部函数处理清理逻辑。"
+    }
+  ],
+  "events_published": [
+    "rooted",
+    "unrooted"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      72314,
+      20714,
+      13701,
+      20150,
+      23956,
+      13156,
+      10418
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏元素生成、角色技能、战斗机制等内容，未发现与组件 component__rooted 的 AddSource 或 RemoveSource 能力直接相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "根除",
+    "固定",
+    "无法移动",
+    "物理停止",
+    "速度乘数",
+    "rooted",
+    "unrooted",
+    "标签",
+    "组件",
+    "控制"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "da8dd6bb3a3357b003763499d463d6cae48d9523f2f492897fca8e9c4593e7c7",
+    "source_bytes": 1840,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097372078
+  }
+}

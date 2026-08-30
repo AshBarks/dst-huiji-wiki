@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quagmire_recipeprices.lua"
+  },
+  "category": "component",
+  "display_name": "quagmire_recipeprices",
+  "summary": "该组件管理Quagmire模式中食物配方的评估数据，包括菜名、餐具类型、银餐具状态、最大值标志、匹配的渴望类型、零食惩罚和四种硬币的价值。它通过队列系统处理配方评估事件，并在网络同步后发布评估结果，参与食物提交和评分的核心玩法。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。",
+  "events_published": [
+    "quagmire_recipeappraised"
+  ],
+  "events_listened": [
+    "ms_quagmirerecipeappraised",
+    "recipedirty"
+  ],
+  "netvars": [
+    "_recipename",
+    "_klumpkey",
+    "_dish",
+    "_silverdish",
+    "_maxvalue",
+    "_matchedcraving",
+    "_snackpenalty",
+    "_coins"
+  ],
+  "tunables": [
+    "NUM_COIN_TYPES",
+    "QUEUE_DELAY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20079,
+      13199,
+      72167,
+      73480,
+      39334,
+      20073,
+      20076,
+      65888
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中无 component__quagmire_recipeprices 的直接提及或相关能力描述；所有内容聚焦于暴食模式的货币、祭坛、物品等其他实体，未涉及食谱价格组件的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Quagmire",
+    "食物配方",
+    "评估数据",
+    "银餐具",
+    "渴望类型",
+    "零食机制",
+    "硬币价值",
+    "队列系统",
+    "评分玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "烹饪",
+    "生存",
+    "评分",
+    "经济"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "833ba7d26f6edfb1d9928ac63a597a948bea309088f5902dfd8888f99f44056e",
+    "source_bytes": 6638,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102894461
+  }
+}

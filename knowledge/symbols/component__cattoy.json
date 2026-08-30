@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cattoy.lua"
+  },
+  "category": "component",
+  "display_name": "cattoy",
+  "summary": "组件 `cattoy` 管理一个可设置的回调函数和一个绕过最后空中时间的标志。它用于在生物与玩具互动时触发特定行为，常见于宠物或动物的玩耍互动中。组件本身不直接执行玩法，而是提供设置和调用机制。",
+  "api": [
+    {
+      "name": "SetOnPlay",
+      "effect": "设置当玩具被玩时调用的回调函数。副作用：仅存储回调函数到内部状态，不影响其他游戏逻辑。"
+    },
+    {
+      "name": "SetBypassLastAirTime",
+      "effect": "设置是否绕过最后空中时间的标志。副作用：更新内部布尔值标志位，用于控制玩耍时的时间限制逻辑。"
+    },
+    {
+      "name": "ShouldBypassLastAirTime",
+      "effect": "查询当前绕过最后空中时间的状态。副作用：无，仅返回内部标志值。"
+    },
+    {
+      "name": "Play",
+      "effect": "执行玩耍动作，调用已设置的回调函数（若存在）并返回其结果。副作用：可能触发与玩具互动的具体行为，具体效果由回调函数定义，可影响生物状态或环境交互。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22094,
+      23204,
+      15240,
+      15642,
+      23924,
+      10379,
+      13271,
+      13857
+    ],
+    "aspects": [
+      {
+        "aspect": "猫玩具被触发时的动画播放行为",
+        "evidence": [
+          {
+            "pageid": 23204,
+            "quote": "发条鼠玩具被互动时，会向随机方向移动共计 4 {{解释|距离单位}}后停止。"
+          },
+          {
+            "pageid": 23204,
+            "quote": "火鸡不倒翁被互动时会摇晃。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "猫玩具",
+    "玩耍",
+    "互动",
+    "宠物玩具",
+    "回调函数",
+    "绕过时间",
+    "cattoy",
+    "玩具组件"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "宠物",
+    "互动",
+    "玩耍"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2fa3ad4983b0b47f7c17b8a6955fdc967a8c4c559998d8b340eb49fe0a00176c",
+    "source_bytes": 771,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094640619
+  }
+}

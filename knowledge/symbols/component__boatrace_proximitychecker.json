@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatrace_proximitychecker.lua"
+  },
+  "category": "component",
+  "display_name": "boatrace_proximitychecker",
+  "summary": "该组件用于帆船比赛中，检测信标是否在检查器的范围内。管理检测范围、延迟时间和存储的信标数据。在比赛期间定期扫描附近信标，当信标持续在范围内一段时间后触发事件。",
+  "api": [
+    {
+      "name": "OnStartRace",
+      "effect": "开始比赛检测，启动周期任务每5帧更新一次附近信标，未运行时才启动。"
+    },
+    {
+      "name": "OnFinishRace",
+      "effect": "结束比赛检测，取消周期任务并清理所有存储的信标数据。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除'boatrace_proximitychecker'标签。"
+    }
+  ],
+  "events_published": [
+    "found_by_boatrace_checker"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOATRACE_DEFAULT_PROXIMITY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      45891,
+      51486,
+      51489
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现 OnStartRace、OnFinishRace 或 OnRemoveFromEntity 的任何玩家语言表达，也未直接讨论组件 boatrace_proximitychecker 的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "帆船比赛",
+    "信标扫描",
+    "范围检测",
+    "接近信标",
+    "信标范围",
+    "延迟触发",
+    "事件触发",
+    "定期扫描"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "比赛",
+    "检测",
+    "航海"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "401c324ddb86de830d03939779aac7489b0956a31e1fe4eb9c42fa9dd1576db0",
+    "source_bytes": 3176,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096290348
+  }
+}

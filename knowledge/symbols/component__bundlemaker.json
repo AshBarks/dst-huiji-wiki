@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bundlemaker.lua"
+  },
+  "category": "component",
+  "display_name": "bundlemaker",
+  "summary": "BundleMaker组件管理与捆绑操作相关的预制件和皮肤数据，用于指定捆绑前后的物品类型。它允许设置捆绑开始时的回调函数，在捆绑过程触发时执行自定义逻辑。该组件参与游戏中物品打包和制作包裹的核心玩法，常见于生存模式中的资源管理。",
+  "api": [
+    {
+      "name": "SetBundlingPrefabs",
+      "effect": "设置组件的bundlingprefab和bundledprefab属性，分别用于指定捆绑前物品和捆绑后包裹的预制件名称。"
+    },
+    {
+      "name": "SetSkinData",
+      "effect": "设置组件的bundledskinname和bundledskin_id属性，用于存储捆绑后包裹的皮肤名称和标识。"
+    },
+    {
+      "name": "SetOnStartBundlingFn",
+      "effect": "设置onstartbundlingfn属性为传入的回调函数fn，该函数将在捆绑过程开始时被调用。"
+    },
+    {
+      "name": "OnStartBundling",
+      "effect": "如果onstartbundlingfn不为nil，则调用该函数并传入组件实体和doer参数，触发捆绑开始的动作，执行预设的回调逻辑。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      18057,
+      14696,
+      15526,
+      45249,
+      15539,
+      45250,
+      15295
+    ],
+    "aspects": [
+      {
+        "aspect": "打包物品的限制条件",
+        "evidence": [
+          {
+            "pageid": 14696,
+            "quote": "捆绑包装允许玩家将最多 4 件[[物品]]打包成为 1 个[[#捆绑物资|捆绑物资]]，但不能打包以下物品："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "捆绑",
+    "包裹",
+    "皮肤",
+    "预制件",
+    "开始捆绑",
+    "回调",
+    "制作"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "12734af4aee49169e4a67c50e54d87086d25b30d8fbfbf0cae349a82ba7607a0",
+    "source_bytes": 701,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105825750
+  }
+}

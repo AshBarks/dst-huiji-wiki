@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/prophider.lua"
+  },
+  "category": "component",
+  "display_name": "prophider",
+  "summary": "PropHider组件管理实体的隐藏与显示状态，通过创建一个临时道具（prop）来替代实体，常用于伪装或陷阱机制。它维护隐藏计时器和计数器，并支持多种回调函数以定制行为。",
+  "api": [
+    {
+      "name": "SetPropCreationFn",
+      "effect": "设置创建替代道具的回调函数，当实体隐藏时被调用以生成道具。"
+    },
+    {
+      "name": "SetOnVisibleFn",
+      "effect": "设置实体恢复可见时的回调函数，当实体从隐藏状态返回场景时触发。"
+    },
+    {
+      "name": "SetWillUnhideFn",
+      "effect": "设置即将取消隐藏时的回调函数，用于在计时器结束前决定是否取消隐藏。"
+    },
+    {
+      "name": "SetOnUnhideFn",
+      "effect": "设置取消隐藏时的回调函数，当实体成功取消隐藏并恢复可见后触发。"
+    },
+    {
+      "name": "SetOnHideFn",
+      "effect": "设置实体隐藏时的回调函数，当实体被隐藏并创建道具后触发。"
+    },
+    {
+      "name": "GenerateHideTime",
+      "effect": "生成一个基于hideupdate_duration和hideupdate_variance的随机隐藏时间值，用于定时任务。"
+    },
+    {
+      "name": "ClearHideTask",
+      "effect": "清除当前进行中的隐藏定时任务，取消并释放hide_task资源。"
+    },
+    {
+      "name": "HideWithProp",
+      "effect": "立即隐藏实体并创建一个替代道具，设置隐藏状态和计数器，启动定时任务，触发onhidefn回调。实体被移出场景，道具出现。"
+    },
+    {
+      "name": "ShowFromProp",
+      "effect": "从道具状态恢复实体显示，移除道具，恢复实体到场景，触发onvisiblefn回调，并向道具推送propreveal事件。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，清除隐藏任务以清理资源。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "当实体进入休眠状态时调用，清除隐藏任务。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "当实体从休眠状态唤醒时调用，如果正在隐藏且无任务，重启隐藏定时任务。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回包含hiding和counter信息的数据表，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果数据存在则调用HideWithProp恢复隐藏状态，支持旧版兼容。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示计数器值和隐藏任务的剩余时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "propreveal"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14674,
+      15022,
+      24542,
+      14676,
+      35615,
+      19905,
+      14099,
+      15357
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未讨论`component__prophider`组件的能力，所有页面内容聚焦于实体行为、策略和游戏机制，未提及组件级别的隐藏、显示、保存加载等函数。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "隐藏",
+    "替代道具",
+    "陷阱",
+    "伪装",
+    "显示",
+    "道具",
+    "实体隐藏",
+    "计时器",
+    "状态保存"
+  ],
+  "gameplay_tags": [
+    "伪装",
+    "陷阱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e86ab3e02a2ee8c5789b29c0b7489a119ac51ed0cd9af80179a66efbbbf29ec7",
+    "source_bytes": 3910,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102785854
+  }
+}

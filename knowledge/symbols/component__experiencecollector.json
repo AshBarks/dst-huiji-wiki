@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/experiencecollector.lua"
+  },
+  "category": "component",
+  "display_name": "experiencecollector",
+  "summary": "组件管理实体的周期性经验值生成。当实体拥有技能树定义时，每经过一个游戏日周期自动增加1点经验值。支持长时间更新补偿，确保离线时间不浪费经验值。参与核心的角色成长和技能升级玩法。",
+  "api": [
+    {
+      "name": "SetTask",
+      "effect": "设置或重置周期性任务，用于生成经验值。取消现有任务并启动新的周期任务，默认周期为游戏一天时间。"
+    },
+    {
+      "name": "UpdateXp",
+      "effect": "更新经验值。检查实体是否有技能树定义，若有则调用skilltreeupdater组件增加1点经验值。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，计算离线期间时间差并补偿经验值生成，多次调用UpdateXp。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，返回当前周期任务的剩余时间。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，根据保存的剩余时间设置任务以继续经验值生成。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23965,
+      15186,
+      13281,
+      19595,
+      13406,
+      18216,
+      10355,
+      10374
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要讨论游戏角色、技能树、物品更新等高层游戏内容，未提及 experiencecollector 组件的具体能力表达，如 SetTask、UpdateXp、LongUpdate、OnSave 或 OnLoad。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "经验值",
+    "技能树",
+    "技能点",
+    "经验值生成",
+    "游戏日周期",
+    "离线时间补偿",
+    "角色成长",
+    "技能升级"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "角色成长",
+    "技能升级"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5e630ec1f380d2b97309aa13d2b1df521f05dd1e1aed68e73bb065c77d4cbe00",
+    "source_bytes": 1648,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091136898
+  }
+}

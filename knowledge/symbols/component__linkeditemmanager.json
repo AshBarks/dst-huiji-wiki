@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/linkeditemmanager.lua"
+  },
+  "category": "component",
+  "display_name": "linkeditemmanager",
+  "summary": "LinkedItemManager组件负责管理物品与玩家之间的链接关系，用于在物品创建者重新加入游戏时恢复所有者状态。它监听玩家加入、离开以及物品注册、注销事件，确保链接物品的所有者实例正确设置，并处理技能树初始化以完成物品功能。该组件仅存在于服务器端，协调物品与玩家状态的同步。",
+  "api": [
+    {
+      "name": "ForEachLinkedItemForPlayerOfPrefab",
+      "effect": "遍历指定玩家的所有链接物品，筛选出预制体名称匹配的物品，并对每个匹配物品执行提供的回调函数。副本列表以避免遍历中修改。"
+    },
+    {
+      "name": "ForEachLinkedItemForPlayer",
+      "effect": "遍历指定玩家的所有链接物品，对每个物品执行提供的回调函数。副本列表以避免遍历中修改。"
+    },
+    {
+      "name": "OnPlayerJoined",
+      "effect": "处理玩家加入事件：跳过快照会话，存储玩家引用，为所有链接物品设置所有者实例为该玩家，并根据玩家技能树初始化状态触发物品初始化或等待事件。"
+    },
+    {
+      "name": "OnPlayerLeft",
+      "effect": "处理玩家离开事件：跳过快照会话，为所有链接物品清除所有者实例，移除玩家引用，并清理未完成的初始化监听。"
+    },
+    {
+      "name": "OnRegisterLinkedItem",
+      "effect": "注册一个链接物品：将物品添加到玩家的链接物品列表中，如果玩家在线则设置所有者实例并触发技能树初始化（除非玩家尚未初始化）。"
+    },
+    {
+      "name": "OnUnregisterLinkedItem",
+      "effect": "注销一个链接物品：从玩家的链接物品列表中移除物品，如果列表为空则删除玩家条目，并清除物品的所有者实例。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_registerlinkeditem",
+    "ms_unregisterlinkeditem",
+    "ms_skilltreeinitialized"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23965,
+      15186,
+      19595,
+      13281,
+      71461,
+      18216,
+      10355,
+      10374
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家与可制作建筑绑定注册",
+        "evidence": [
+          {
+            "pageid": 18216,
+            "quote": "发电机会与'''建造、放置、为其添加燃料、将其用作[[蓄电池]]充电'''的薇诺娜玩家相绑定"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家切换角色时绑定物品解除",
+        "evidence": [
+          {
+            "pageid": 71461,
+            "quote": "如果玩家切换到[[WX-78]]以外的角色，所有已绑定的备份底盘都会解除绑定。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "链接物品",
+    "玩家绑定",
+    "所有者",
+    "技能树",
+    "注册物品",
+    "注销物品",
+    "物品管理",
+    "玩家加入",
+    "玩家离开",
+    "物品追踪"
+  ],
+  "gameplay_tags": [
+    "物品管理",
+    "玩家绑定"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fcceb2fc2e9a3e98eb6882a9b83dd0c955b387c0ae2f49b17f9a6fb22dcb6493",
+    "source_bytes": 4779,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109164203
+  }
+}

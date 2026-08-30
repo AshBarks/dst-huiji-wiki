@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishable.lua"
+  },
+  "category": "component",
+  "display_name": "fishable",
+  "summary": "该组件管理实体的鱼类资源，包括鱼的最大数量、当前数量和冰冻状态。核心玩法涉及钓鱼活动，玩家可以钩住和释放鱼，同时组件处理鱼的生成、刷新和环境交互。冰冻状态会影响鱼的可用性。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的'fishable'标签。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含当前鱼剩余数量的调试字符串。"
+    },
+    {
+      "name": "AddFish",
+      "effect": "添加一个鱼预制体到鱼池列表中。"
+    },
+    {
+      "name": "SetGetFishFn",
+      "effect": "设置一个自定义函数用于确定钩住的鱼类型，替换默认的随机选择。"
+    },
+    {
+      "name": "SetRespawnTime",
+      "effect": "设置鱼刷新所需的时间，用于定时恢复鱼数量。"
+    },
+    {
+      "name": "HookFish",
+      "effect": "钩住一条鱼：根据自定义函数或随机选择生成鱼实体，将其作为子实体隐藏并禁用物理和阴影，减少鱼数量；如果钓鱼者存在且鱼有可称重组件，则设置钓鱼者为所有者。返回钩住的鱼实体。"
+    },
+    {
+      "name": "ReleaseFish",
+      "effect": "释放钩住的鱼：如果鱼在钩住列表中，则移除鱼实体并增加鱼数量。"
+    },
+    {
+      "name": "RemoveFish",
+      "effect": "从钩住列表移除鱼：如果鱼在列表中，则移除它，触发鱼刷新；鱼状态恢复由钓鱼竿负责。返回鱼实体。"
+    },
+    {
+      "name": "IsFrozenOver",
+      "effect": "返回是否处于冰冻状态（布尔值）。"
+    },
+    {
+      "name": "Freeze",
+      "effect": "设置冰冻状态为真，并移除实体的'fishable'标签。"
+    },
+    {
+      "name": "Unfreeze",
+      "effect": "设置冰冻状态为假，并添加实体的'fishable'标签。"
+    },
+    {
+      "name": "RefreshFish",
+      "effect": "如果设置了刷新时间，则安排一个任务来定时恢复鱼数量。"
+    },
+    {
+      "name": "GetFishPercent",
+      "effect": "返回当前鱼数量与最大数量的百分比（浮点数）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存鱼数量数据，仅在当前鱼数量小于最大数量时返回数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载鱼数量数据并触发鱼刷新。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19808,
+      20511,
+      34314,
+      14938,
+      13823,
+      15357,
+      23924,
+      46887
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及鱼相关能力（如添加鱼、挂钩鱼、鱼刷新、鱼百分比等）的描述，仅讨论了池塘生成蚊子/青蛙、冰冻机制、Boss行为或交易功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "钓鱼",
+    "池塘",
+    "冰冻",
+    "刷新",
+    "鱼类资源",
+    "钓鱼机制",
+    "鱼生成"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/7)",
+  "gameplay_tags": [
+    "钓鱼",
+    "生存",
+    "资源管理",
+    "环境交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7ce90f3d6ce52b38bdf46fa6ff0af663f28bee3ea9b1837d8d133f2d5315b5e1",
+    "source_bytes": 3500,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094715068
+  }
+}

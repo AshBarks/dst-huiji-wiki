@@ -1,0 +1,227 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatphysics.lua"
+  },
+  "category": "component",
+  "display_name": "boatphysics",
+  "summary": "该组件是管理船只物理行为的核心系统，负责维护船只的水平速度向量、转向方向、最大速度以及处理碰撞反应。它通过整合船帆（masts）、船锚（boatdrag）和磁力器（magnets）等子系统的力来计算最终航行状态，并驱动船只的Transform旋转与位置更新。其核心玩法包括船只的转向控制、风力驱动、锚定减速以及船只碰撞后的物理反弹与损害。",
+  "api": [
+    {
+      "name": "AddBoatDrag(boatdraginst)",
+      "effect": "为船只添加一个‘拖拽’实例（如船锚），监听其移除、死亡或烧毁事件以自动清理。如果船只拥有'physicsmodifiedexternally'组件，则会触发其重新计算外部速度。"
+    },
+    {
+      "name": "RemoveBoatDrag(boatdraginst)",
+      "effect": "移除船只上指定的‘拖拽’实例，并取消相关事件的监听。如果船只拥有'physicsmodifiedexternally'组件，则会触发其重新计算外部速度。"
+    },
+    {
+      "name": "SetTargetRudderDirection(dir_x, dir_z)",
+      "effect": "设置船只目标航向的方向向量（X, Z分量）。"
+    },
+    {
+      "name": "GetTargetRudderDirection()",
+      "effect": "返回船只当前的目标航向方向向量（X, Z分量）。"
+    },
+    {
+      "name": "GetRudderDirection()",
+      "effect": "返回船只当前实际的航向方向向量（X, Z分量）。"
+    },
+    {
+      "name": "AddMast(mast)",
+      "effect": "将一个桅杆组件添加到船只的动力系统中。"
+    },
+    {
+      "name": "RemoveMast(mast)",
+      "effect": "从船只的动力系统中移除一个桅杆组件。"
+    },
+    {
+      "name": "AddMagnet(magnet)",
+      "effect": "将一个磁力器组件添加到船只的动力系统中。"
+    },
+    {
+      "name": "RemoveMagnet(magnet)",
+      "effect": "从船只的动力系统中移除一个磁力器组件。"
+    },
+    {
+      "name": "OnDeath()",
+      "effect": "在船只死亡时调用，停止播放‘boat_movement’音效。"
+    },
+    {
+      "name": "GetMoveDirection()",
+      "effect": "返回船只当前的速度向量。"
+    },
+    {
+      "name": "GetNormalizedVelocities()",
+      "effect": "返回船只当前速度方向的单位向量（处理NaN值）。"
+    },
+    {
+      "name": "GetVelocity()",
+      "effect": "返回船只当前的速度标量大小（速率）。"
+    },
+    {
+      "name": "GetForceDampening()",
+      "effect": "计算并返回当前所有‘拖拽’实例（如船锚）施加的总力衰减系数（0到1之间）。"
+    },
+    {
+      "name": "DoApplyForce(dir_x, dir_z, force)",
+      "effect": "直接在指定方向上施加一个力，立即改变船只速度。施加后，若速度超过全局最大允许速度（TUNING.BOAT.MAX_ALLOWED_VELOCITY），则将速度限制至该最大值。"
+    },
+    {
+      "name": "ApplyRowForce(dir_x, dir_z, force, max_velocity)",
+      "effect": "模拟划桨施加的力。根据当前速度方向与施加力方向的角度差，将力分解为前进和侧向分量进行施加。前进分量受基于当前速度的动态阻尼影响，侧向分量受基础阻尼影响。最终速度同样受最大允许速度限制。"
+    },
+    {
+      "name": "ApplyForce(dir_x, dir_z, force)",
+      "effect": "在指定方向上施加一个受当前总力衰减系数影响的力，改变船只速度。"
+    },
+    {
+      "name": "GetMaxVelocity()",
+      "effect": "计算并返回船只当前的最大速度。该速度由所有桅杆和磁力器贡献的速度值（按递减系数叠加）乘以组件最大速度系数和所有‘拖拽’实例的最大速度修正因子，最终受全局最大允许速度限制。"
+    },
+    {
+      "name": "GetTotalAnchorDrag()",
+      "effect": "计算并返回所有‘拖拽’实例的总阻力值之和。"
+    },
+    {
+      "name": "GetBoatDrag(velocity, total_anchor_drag)",
+      "effect": "根据当前速度和总锚定阻力，计算并返回当前应施加的阻力值。该计算结合了基于速度的基础阻力和基于锚定阻力的附加阻力。"
+    },
+    {
+      "name": "GetAnchorSailForceModifier()",
+      "effect": "计算并返回所有‘拖拽’实例的帆力修正因子的乘积。"
+    },
+    {
+      "name": "GetRudderTurnSpeed()",
+      "effect": "根据船只当前速度返回航向转动速度。速度越高，转动越慢。如果船只上有人拥有'master_crewman'标签并在驾驶，则返回一个加速后的转动速度。"
+    },
+    {
+      "name": "SetCanSteeringRotate(can_rotate)",
+      "effect": "设置船只是否可以通过转向直接旋转实体Transform。开启时，会根据当前航向方向和Transform旋转设置一个旋转偏移量。"
+    },
+    {
+      "name": "ApplyDrag(dt, total_drag, cur_velocity, velocity_normal_x, velocity_normal_z)",
+      "effect": "在一个时间步长(dt)内施加总阻力。阻力会反向作用于当前速度向量。若速度降至0以下，则清零。"
+    },
+    {
+      "name": "ApplySailForce(dt, sail_force, cur_velocity, max_velocity)",
+      "effect": "在一个时间步长(dt)内施加帆力。力的方向为当前航向方向。施加后，若速度超过最大速度，则将速度限制至该最大值。"
+    },
+    {
+      "name": "ApplyMagnetForce(dt, magnet_force, magnet_direction, cur_velocity, max_velocity)",
+      "effect": "在一个时间步长(dt)内施加磁力。力的方向由磁力器计算得出。施加后，若速度超过最大速度，则将速度限制至该最大值。"
+    },
+    {
+      "name": "AddEmergencyBrakeSource(source)",
+      "effect": "添加一个紧急制动源，立即使船只进入停止状态（halting），并将物理质量设为0。"
+    },
+    {
+      "name": "RemoveEmergencyBrakeSource(source)",
+      "effect": "移除一个紧急制动源。如果没有其他制动源，则取消停止状态，并将物理质量恢复为船只默认值（TUNING.BOAT.MASS）。"
+    },
+    {
+      "name": "SetHalting(halt)",
+      "effect": "设置或取消船只的紧急停止状态。开启时会关闭所有船帆并添加制动源；关闭时移除制动源。该方法主要用于内部系统（如walkableplatform），非一般游戏玩法用途。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回用于调试的字符串，显示当前速度分量和速率。"
+    },
+    {
+      "name": "StartUpdating()",
+      "effect": "开始组件的每帧更新循环。"
+    },
+    {
+      "name": "StopUpdating()",
+      "effect": "停止组件的每帧更新循环。"
+    },
+    {
+      "name": "CloseAllSails()",
+      "effect": "关闭该船只上所有桅杆的船帆。"
+    }
+  ],
+  "events_published": [
+    "on_collide",
+    "boat_start_moving",
+    "boat_stop_moving",
+    "stopturning"
+  ],
+  "events_listened": [
+    "death",
+    "onremove",
+    "death",
+    "onburnt"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.MAX_VELOCITY_MOD",
+    "TUNING.BOAT.RUDDER_TURN_SPEED",
+    "TUNING.BOAT.MAX_ALLOWED_VELOCITY",
+    "TUNING.BOAT.BASE_DAMPENING",
+    "TUNING.BOAT.MAX_DAMPENING",
+    "TUNING.BOAT.BASE_DRAG",
+    "TUNING.BOAT.MAX_DRAG",
+    "TUNING.BOAT.SCARY_MINSPEED",
+    "TUNING.BOAT.RADIUS",
+    "TUNING.BOAT.MASS",
+    "TUNING.MASTER_CREWMAN_MULT.RUDDER_TURN_SPEED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51427,
+      65881,
+      13606,
+      13698,
+      27603,
+      72238,
+      16596,
+      17996
+    ],
+    "aspects": [
+      {
+        "aspect": "一角鲸角的加速效果",
+        "evidence": [
+          {
+            "pageid": 17996,
+            "quote": "可以利用一角鲸的角来对[[船]]进行加速"
+          }
+        ]
+      },
+      {
+        "aspect": "锚的减速作用描述",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "建在漂浮平台上的锚可以为抛锚以使其大幅减速"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "船速",
+    "船锚",
+    "船帆",
+    "磁力器",
+    "碰撞反弹",
+    "转向控制",
+    "风力驱动",
+    "锚定减速",
+    "航行状态"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "航行",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+    "source_bytes": 27360,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092313348
+  }
+}

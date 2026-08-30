@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/firedetector.lua"
+  },
+  "category": "component",
+  "display_name": "firedetector",
+  "summary": "该组件用于管理实体的火灾与火源检测功能，提供主动搜索与紧急模式两种检测逻辑。它监控范围内可燃烧、可枯萎物体的状态，根据燃烧/枯萎程度计算紧急等级，并通过预设的回调函数驱动外部系统（如警报、洒水器）响应火灾事件。",
+  "api": [
+    {
+      "name": "SetOnFindFireFn",
+      "signature": "FireDetector:SetOnFindFireFn(fn)",
+      "effect": "设置当检测到火源（在普通模式或紧急模式下）时触发的回调函数。回调参数为(inst, target_pos)，用于执行如发出警报等行为。"
+    },
+    {
+      "name": "SetOnBeginEmergencyFn",
+      "signature": "FireDetector:SetOnBeginEmergencyFn(fn)",
+      "effect": "设置当组件从警告状态进入紧急状态（emergency 变为 true）时触发的回调函数。回调参数为(inst, emergencyLevel)，用于启动紧急响应机制。"
+    },
+    {
+      "name": "SetOnEndEmergencyFn",
+      "signature": "FireDetector:SetOnEndEmergencyFn(fn)",
+      "effect": "设置当组件退出紧急状态时触发的回调函数。回调参数为(inst, emergencyLevel)，用于停止紧急响应。"
+    },
+    {
+      "name": "SetOnBeginWarningFn",
+      "signature": "FireDetector:SetOnBeginWarningFn(fn)",
+      "effect": "设置当组件开始进入警告状态（emergencyLevel 从0变为正数）时触发的回调函数。回调参数为(inst, emergencyLevel)。"
+    },
+    {
+      "name": "SetOnUpdateWarningFn",
+      "signature": "FireDetector:SetOnUpdateWarningFn(fn)",
+      "effect": "设置当组件在警告状态中更新等级时触发的回调函数。回调参数为(inst, emergencyLevel)。"
+    },
+    {
+      "name": "SetOnEndWarningFn",
+      "signature": "FireDetector:SetOnEndWarningFn(fn)",
+      "effect": "设置当组件退出警告状态（emergencyLevel 变为0）时触发的回调函数。回调参数为(inst, emergencyLevel)。"
+    },
+    {
+      "name": "Activate",
+      "signature": "FireDetector:Activate(randomizedStartTime)",
+      "effect": "激活组件的普通检测模式。开始一个周期性任务，在范围内寻找燃烧或枯萎的物体。若 `randomizedStartTime` 为真，则初始检测时间会有随机延迟。此操作会取消之前任何激活的任务。"
+    },
+    {
+      "name": "ActivateEmergencyMode",
+      "signature": "FireDetector:ActivateEmergencyMode(randomizedStartTime)",
+      "effect": "激活组件的紧急检测模式。开始一个周期性任务，专门寻找火焰实体。此模式下，组件会持续监控并累积‘已燃烧’物体列表，用于计算紧急等级。若 `randomizedStartTime` 为真，则初始检测时间随机。此操作会取消之前任何激活的任务。"
+    },
+    {
+      "name": "IsEmergency",
+      "signature": "FireDetector:IsEmergency()",
+      "effect": "查询组件是否处于紧急状态（emergency 字段为 true）。返回 boolean 值。"
+    },
+    {
+      "name": "GetEmergencyLevel",
+      "signature": "FireDetector:GetEmergencyLevel()",
+      "effect": "获取当前的紧急等级（emergencyLevel）。返回一个数字，0表示正常，正数表示警告或紧急级别。"
+    },
+    {
+      "name": "GetMaxEmergencyLevel",
+      "signature": "FireDetector:GetMaxEmergencyLevel()",
+      "effect": "获取该组件允许的最大紧急等级（emergencyLevelMax）。返回一个数字。"
+    },
+    {
+      "name": "ResetEmergencyCooldown",
+      "signature": "FireDetector:ResetEmergencyCooldown()",
+      "effect": "重置紧急模式下的冷却时间。在紧急模式下，会重置每个‘已燃烧’物体的计时器。在普通激活但存在紧急记录（emergencyBurnt）时，会重置关闭计时器。"
+    },
+    {
+      "name": "RaiseEmergencyLevel",
+      "signature": "FireDetector:RaiseEmergencyLevel(numlevels)",
+      "effect": "手动提升紧急等级。向‘已燃烧’物体列表中添加条目（数量不超过最大等级），然后重置冷却并重新评估紧急状态。通常用于外部系统反馈火灾损失。"
+    },
+    {
+      "name": "LowerEmergencyLevel",
+      "signature": "FireDetector:LowerEmergencyLevel(numlevels)",
+      "effect": "手动降低紧急等级。从‘已燃烧’物体列表中移除条目（数量不超过当前等级），然后重置冷却并重新评估紧急状态。"
+    },
+    {
+      "name": "Deactivate",
+      "signature": "FireDetector:Deactivate()",
+      "effect": "停用组件。根据当前状态（紧急、普通激活）执行清理，并触发相应的结束回调（如 onendemergency）。"
+    },
+    {
+      "name": "DetectFire",
+      "signature": "FireDetector:DetectFire()",
+      "effect": "供状态图（StateGraph）调用，以主动触发一次检测。会根据组件当前所处的模式（紧急或普通）执行相应的检测逻辑，而不是等待周期性任务。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "signature": "FireDetector:OnRemoveFromEntity()",
+      "effect": "组件从实体上移除时自动调用。取消所有任务、监听器和定时器，清理所有数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "signature": "FireDetector:GetDebugString()",
+      "effect": "返回一个用于调试的字符串，包含组件当前状态（OFF/EMERGENCY/ARMED/ON）、紧急等级、监控目标数等信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "FIRE_DETECTOR_RANGE",
+    "FIRE_DETECTOR_PERIOD",
+    "EMERGENCY_RESPONSE_TIME",
+    "EMERGENCY_SHUT_OFF_TIME",
+    "EMERGENCY_BURNT_NUMBER",
+    "EMERGENCY_BURNING_NUMBER",
+    "EMERGENCY_WARNING_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51951,
+      14792,
+      18441,
+      70763,
+      18533,
+      19729,
+      56991,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "检测火灾距离描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "所属的猪人能检测 18 单位内的猪屋着火状态"
+          }
+        ]
+      },
+      {
+        "aspect": "紧急模式自动切换描述",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "被关闭的雪球发射器会在一定情况下自动切换为紧急模式"
+          }
+        ]
+      },
+      {
+        "aspect": "警报时间长度描述",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "警报时间持续 30 秒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "火灾检测",
+    "火警",
+    "自动洒水",
+    "紧急模式",
+    "着火",
+    "冒烟",
+    "枯萎",
+    "防火",
+    "响应"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b59dda2ff957905fbd2edf0903be0c9ea36bce5668bab0f70be6f4fcbd91a3ba",
+    "source_bytes": 14476,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099820536
+  }
+}

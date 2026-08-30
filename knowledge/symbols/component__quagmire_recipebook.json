@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quagmire_recipebook.lua"
+  },
+  "category": "component",
+  "display_name": "quagmire_recipebook",
+  "summary": "该组件管理沼泽模式（Quagmire）中食谱发现的数据，包括食谱名称、成分、菜肴类型和烹饪站等信息。它通过网络变量将服务器端发现的食谱同步到客户端，并在客户端触发事件以更新游戏状态。核心玩法涉及玩家在烹饪过程中解锁新食谱的记录与展示。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。",
+  "events_published": [
+    "quagmire_recipediscovered"
+  ],
+  "events_listened": [
+    "ms_quagmirerecipediscovered",
+    "recipedirty"
+  ],
+  "netvars": [
+    "quagmire_recipebook._recipename",
+    "quagmire_recipebook._klumpkey",
+    "quagmire_recipebook._dish",
+    "quagmire_recipebook._station",
+    "quagmire_recipebook._overcooked",
+    "quagmire_recipebook._ingredients[1]",
+    "quagmire_recipebook._ingredients[2]",
+    "quagmire_recipebook._ingredients[3]",
+    "quagmire_recipebook._ingredients[4]"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24540,
+      13476,
+      65872,
+      20079,
+      13199,
+      13779,
+      13477,
+      16419
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论烹饪机制、食谱内容、暴食模式玩法及食材属性，但未提及 `component__quagmire_recipebook` 组件的具体能力或行为，如食谱书的记录、显示、解锁或交互功能；且代码能力/行为语义清单未给出，无法对照寻找证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "沼泽",
+    "食谱",
+    "烹饪",
+    "食材",
+    "菜肴",
+    "同步",
+    "事件",
+    "解锁",
+    "Quagmire",
+    "记录"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 0/10)",
+  "gameplay_tags": [
+    "烹饪",
+    "记录",
+    "沼泽模式"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5e1a2c096b161de2fbf0d9bd7d24b5157627cc43d8532c8e8471d0a656fd00ab",
+    "source_bytes": 6630,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102852020
+  }
+}

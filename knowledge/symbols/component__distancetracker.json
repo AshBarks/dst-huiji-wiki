@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/distancetracker.lua"
+  },
+  "category": "component",
+  "display_name": "distancetracker",
+  "summary": "DistanceTracker 组件用于跟踪游戏实体的移动距离。它在每次更新时计算实例当前世界位置与上一次记录位置之间的欧几里得距离，并存储上一次位置数据。该组件通过 StartUpdatingComponent 自动激活，不暴露公共方法或参与事件系统，仅作为内部距离计算工具。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28611,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家移动距离触发战术响应",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "当玩家移动时，如果本次移动距离超过 0.75"
+          }
+        ]
+      },
+      {
+        "aspect": "蠕虫移动距离数值标注",
+        "evidence": [
+          {
+            "pageid": 28611,
+            "quote": "巨大洞穴蠕虫每次移动距离为 6 个距离单位。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "距离跟踪",
+    "移动距离",
+    "位置记录",
+    "距离计算",
+    "位置更新",
+    "移动统计",
+    "距离跟踪器",
+    "位置变化"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3cd89e40b07c93aaea24cd1f245f94b3e2672330c86ff7640a2e7043dacc0cd4",
+    "source_bytes": 569,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091019552
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/socket_shadow_harvester.lua"
+  },
+  "category": "component",
+  "display_name": "socket_shadow_harvester",
+  "summary": "该组件管理影子收割无人机的自动收割行为，控制无人机在实体周围指定半径内寻找、收割并搬运可拾取物品。它支持玩家实体通过拾取事件触发，以及非玩家实体的周期性检测。组件模拟无人机在休眠状态下的移动和交互，确保资源收集的自动化。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，清理所有事件监听、周期任务，并强制忙碌收割者丢弃物品。"
+    },
+    {
+      "name": "SetHarvestRadius",
+      "effect": "设置收割半径，影响无人机搜索物品的范围。"
+    },
+    {
+      "name": "GetHarvestRadius",
+      "effect": "返回实际收割半径，考虑技能和模块加成后的值。"
+    },
+    {
+      "name": "GetItemForHarvester",
+      "effect": "返回指定收割者当前正在收割的物品实体。"
+    },
+    {
+      "name": "TryToFindItem",
+      "effect": "在收割半径内搜索可拾取物品，应用植物过滤器，并返回找到的物品。"
+    },
+    {
+      "name": "DoTick",
+      "effect": "主逻辑函数，获取所有影子收割无人机并循环分配收割任务。"
+    },
+    {
+      "name": "DoTick_Internal",
+      "effect": "内部逻辑，分配空闲收割者给找到的物品，并设置事件监听。"
+    },
+    {
+      "name": "DoTick_Internal_Simulations",
+      "effect": "模拟忙碌收割者在休眠状态下的行为，处理移动、收割和存储动作。"
+    },
+    {
+      "name": "DoTick_Internal_Simulations_Traveling",
+      "effect": "模拟收割者向目标位置移动，根据速度计算并更新位置。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onpickupitem",
+    "picksomething",
+    "picksomethingfromaoe",
+    "onputininventory",
+    "onremove",
+    "braincommon_pickup_failed",
+    "braincommon_pickup_success",
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WX78.SHADOWDRONE_HARVESTER_PASSIVE_TICK_PERIOD",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_HARVESTER_FINDITEM_RADIUS_SKILLBOOST",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_HARVESTER_FINDITEM_RADIUS_RADAR"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70738,
+      65505,
+      70864,
+      13570,
+      45249
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及component__socket_shadow_harvester或其代码能力（如收割半径、物品获取、Tick行为等），内容涉及其他实体（如迁移门户、洞穴光照）或一般游戏机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影子收割机",
+    "自动收割",
+    "资源收集",
+    "搬运无人机",
+    "收割范围",
+    "休眠状态",
+    "自动化",
+    "拾取事件",
+    "周期检测",
+    "影子无人机"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "生存",
+    "资源收集",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7b1dce22c43be938eed5590f6ed7fbdabb944f1e84816d8fc659669fd15c5ba2",
+    "source_bytes": 12489,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112739399
+  }
+}

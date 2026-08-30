@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/domesticatable.lua"
+  },
+  "category": "component",
+  "display_name": "domesticatable",
+  "summary": "domesticatable组件管理动物的驯化度（domestication）和服从度（obedience）数据，用于控制动物的驯服程度。核心玩法涉及通过喂食、互动等行为增加驯化度，当驯化度达到1.0时动物变为驯化状态，并影响动物的倾向性（tendencies）。服从度会随时间衰减，驯化度在特定条件下也会衰减，如果驯化度降至0且动物饥饿，动物会恢复野性。",
+  "api": [
+    {
+      "name": "SetDomesticationTrigger",
+      "effect": "设置一个自定义函数（fn），用于在驯化更新循环中判断是否应增加驯化度。函数返回true时触发驯化度增加。"
+    },
+    {
+      "name": "GetObedience",
+      "effect": "返回当前服从度（obedience）的值。"
+    },
+    {
+      "name": "GetDomestication",
+      "effect": "返回当前驯化度（domestication）的值。"
+    },
+    {
+      "name": "Validate",
+      "effect": "验证组件状态：如果服从度低于最小值、动物饥饿且驯化度为0，则取消衰减任务并返回false；否则返回true。"
+    },
+    {
+      "name": "CheckForChanges",
+      "effect": "检查驯化状态变化：如果未驯化且驯化度达到1.0，则设置驯化锁（latch）并保持驯化度为1.0；如果驯化度低于0.95，则解锁。如果动物饥饿且驯化度为0，清空倾向性并触发'goneferal'事件，若已驯化则设为未驯化。"
+    },
+    {
+      "name": "BecomeDomesticated",
+      "effect": "将动物变为驯化状态：重置驯化锁，设置驯化状态为true，并触发'domesticated'事件，附带当前倾向性。"
+    },
+    {
+      "name": "DeltaObedience",
+      "effect": "改变服从度（delta为增量或减量），更新服从度值并触发'obediencedelta'事件。如果值变化，检查并启动衰减任务。"
+    },
+    {
+      "name": "DeltaDomestication",
+      "effect": "改变驯化度（delta为增量或减量），正值会应用技能树乘数（doer为操作者）。更新驯化度值并触发'domesticationdelta'事件。如果值变化，检查驯化状态变化并启动衰减任务。"
+    },
+    {
+      "name": "DeltaTendency",
+      "effect": "增加指定倾向性（tendency）的值（delta为增量）。"
+    },
+    {
+      "name": "PauseDomesticationDecay",
+      "effect": "设置暂停驯化度衰减标志（pause为true或false），暂停时驯化度衰减停止，但服从度衰减继续。"
+    },
+    {
+      "name": "TryBecomeDomesticated",
+      "effect": "尝试变为驯化状态：如果驯化锁（latch）为true，则调用BecomeDomesticated。"
+    },
+    {
+      "name": "CancelTask",
+      "effect": "取消驯化和服从度的周期性衰减任务。"
+    },
+    {
+      "name": "CheckAndStartTask",
+      "effect": "验证组件状态：如果有效且衰减任务未运行，则启动周期性衰减任务（每10秒更新一次）。"
+    },
+    {
+      "name": "SetDomesticated",
+      "effect": "设置驯化状态（domesticated为true或false），并验证组件状态。"
+    },
+    {
+      "name": "IsDomesticated",
+      "effect": "返回当前是否已驯化（domesticated）的布尔值。"
+    },
+    {
+      "name": "SetMinObedience",
+      "effect": "设置最小服从度（min），如果当前服从度低于最小值则增加至最小值，并检查启动衰减任务。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括驯化度、倾向性、驯化锁、驯化状态、服从度、最小服从度、上次驯化增益时间差和骑乘数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，恢复驯化度、倾向性、驯化锁、驯化状态、服从度、最小服从度等，并触发检查启动衰减任务。同时处理骑乘数据的加载。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含驯化状态、驯化度百分比、服从度范围、倾向性值和驯化锁状态。"
+    }
+  ],
+  "events_published": [
+    "obediencedelta",
+    "domesticationdelta",
+    "domesticated",
+    "goneferal"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.TOTAL_DAY_TIME",
+    "TUNING.BEEFALO_DOMESTICATION_GAIN_DOMESTICATION",
+    "TUNING.BEEFALO_DOMESTICATION_LOSE_DOMESTICATION",
+    "TUNING.BEEFALO_DOMESTICATION_MAX_LOSS_DAYS",
+    "TUNING.SKILLS.WATHGRITHR.WATHGRITHRHAT_BEEFALO_DOMESTICATION_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15526,
+      15169,
+      52019,
+      15941,
+      23933,
+      15737,
+      18553
+    ],
+    "aspects": [
+      {
+        "aspect": "驯化牛的选美属性描述",
+        "evidence": [
+          {
+            "pageid": 52019,
+            "quote": "驯化的牛更换任意皮肤后，都会覆盖驯势自带的选美属性。"
+          }
+        ]
+      },
+      {
+        "aspect": "驯化过程中避免攻击的提示",
+        "evidence": [
+          {
+            "pageid": 18553,
+            "quote": "避免被皮弗娄牛或自己正在驯化的牛攻击。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "驯化",
+    "服从度",
+    "牛",
+    "喂食",
+    "驯服",
+    "野性",
+    "衰减",
+    "倾向性",
+    "驯化触发",
+    "最小服从"
+  ],
+  "gameplay_tags": [
+    "驯养",
+    "生存",
+    "动物行为",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1258e0f849196765b48ea280bb14971090f06d3765397434af6e0af03dd2f01e",
+    "source_bytes": 8470,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099560799
+  }
+}

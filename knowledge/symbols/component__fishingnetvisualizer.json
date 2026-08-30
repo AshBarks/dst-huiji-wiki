@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishingnetvisualizer.lua"
+  },
+  "category": "component",
+  "display_name": "fishingnetvisualizer",
+  "summary": "FishingNetVisualizer 组件管理渔网的视觉和动画状态，包括抛投、打开和回收阶段。它控制渔网的移动轨迹、高度计算、捕获实体的收集与丢弃物品的掉落动画，直接参与饥荒联机版中的捕鱼玩法。",
+  "api": [
+    {
+      "name": "BeginCast",
+      "effect": "初始化渔网抛投过程，设置渔网初始位置于抛投者坐标，计算目标方向和剩余距离，并隐藏抛投者的持臂动画、显示正常手臂动画，使抛投者朝向目标。"
+    },
+    {
+      "name": "UpdateWhenMovingToTarget",
+      "effect": "更新渔网向目标移动的状态，根据时间增量和速度移动渔网位置，计算高度，并在移动距离达到剩余距离时触发 'begin_opening' 事件，在特定距离触发 'play_throw_pst' 事件。"
+    },
+    {
+      "name": "CalculateY",
+      "effect": "根据水平位置、跨度和缩放比例计算渔网的高度值，用于模拟抛物线运动轨迹。"
+    },
+    {
+      "name": "UpdateWhenOpening",
+      "effect": "更新渔网打开状态，将捕获的实体逐渐移动向渔网中心位置，基于收集速度和最大收集距离限制。"
+    },
+    {
+      "name": "BeginOpening",
+      "effect": "开始打开渔网，搜索周围实体并推送 'on_pre_net' 事件给所有实体，然后捕获具有 inventoryitem 组件的实体到列表中。"
+    },
+    {
+      "name": "DropItem",
+      "effect": "延迟丢弃物品到指定位置，根据摄像机方向和随机偏移计算掉落点，设置物品位置和物理速度，并推送 'on_release_from_net' 事件。"
+    },
+    {
+      "name": "BeginRetrieving",
+      "effect": "开始回收渔网，向抛投者推送 'begin_retrieving' 事件，并移除所有捕获实体的场景。"
+    },
+    {
+      "name": "BeginFinalPickup",
+      "effect": "开始最终拾取，向抛投者推送 'begin_final_pickup' 事件，丢弃所有捕获物品，恢复抛投者的持臂动画，并移除渔网实例。"
+    },
+    {
+      "name": "UpdateWhenRetrieving",
+      "effect": "更新渔网回收状态，根据时间增量和回收速度将渔网移动回抛投者位置，计算高度，并在距离足够近时触发 'begin_final_pickup' 事件。"
+    }
+  ],
+  "events_published": [
+    "begin_opening",
+    "play_throw_pst",
+    "begin_retrieving",
+    "begin_final_pickup"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_FISH_SCHOOL_SIZE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述实体（如海洋拖网捕鱼器和熔炉模式怪物）的基本信息、行为模式及游戏提示，但未涉及 component__fishingnetvisualizer 的代码能力如 BeginCast、UpdateWhenMovingToTarget、CalculateY、UpdateWhenOpening、BeginOpening、DropItem、BeginRetrieving、BeginFinalPickup、UpdateWhenRetrieving 等的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "渔网",
+    "捕鱼",
+    "抛投",
+    "回收",
+    "动画",
+    "视觉",
+    "实体捕获",
+    "丢弃物品",
+    "移动轨迹"
+  ],
+  "gameplay_tags": [
+    "捕鱼",
+    "生存",
+    "动画",
+    "视觉"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a5e52a0c34866cf987db764d7d58ee160b554e00cb53a14215e2c813ffca01f9",
+    "source_bytes": 7874,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099916507
+  }
+}

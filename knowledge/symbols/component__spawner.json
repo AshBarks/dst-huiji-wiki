@@ -1,0 +1,211 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/spawner.lua"
+  },
+  "category": "component",
+  "display_name": "spawner",
+  "summary": "spawner 组件负责管理一个持久实体的生成与回收，例如在猪屋中生成特定的猪人。它控制实体的出生、归巢、死亡和重生，通过延迟生成和队列生成机制确保实体的持续存在。组件还处理实体的状态保存和加载，以维持游戏世界的连贯性。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理事件监听器和定时任务，确保资源释放。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示子实体的状态、是否占用、是否队列生成以及下次生成时间。"
+    },
+    {
+      "name": "SetOnSpawnedFn",
+      "effect": "设置当子实体生成后调用的回调函数，用于自定义生成后的行为。"
+    },
+    {
+      "name": "SetOnKilledFn",
+      "effect": "设置当子实体被杀死时调用的回调函数，用于处理死亡事件。"
+    },
+    {
+      "name": "SetOnOccupiedFn",
+      "effect": "设置当子实体归巢（进入占用状态）时调用的回调函数，用于触发占用相关逻辑。"
+    },
+    {
+      "name": "SetOnVacateFn",
+      "effect": "设置当子实体离开（释放）时调用的回调函数，用于处理离开后的行为。"
+    },
+    {
+      "name": "SetWaterSpawning",
+      "effect": "设置子实体是否在水上生成以及是否在船上生成，影响生成位置的选择。"
+    },
+    {
+      "name": "SetOnlySpawnOffscreen",
+      "effect": "设置是否只在屏幕外生成子实体，启用时监听 'entitysleep' 事件以触发释放。"
+    },
+    {
+      "name": "Configure",
+      "effect": "配置子实体的名称、生成延迟和初始延迟，并启动延迟生成任务。"
+    },
+    {
+      "name": "SpawnWithDelay",
+      "effect": "在指定延迟后生成子实体，如果使用外部计时器则调用外部函数，否则设置内部计时器。"
+    },
+    {
+      "name": "IsSpawnPending",
+      "effect": "检查是否有子实体生成待处理，如果使用外部计时器则调用测试函数，否则检查内部任务状态。"
+    },
+    {
+      "name": "SetQueueSpawning",
+      "effect": "设置是否队列生成子实体，并指定重试周期，用于控制生成频率。"
+    },
+    {
+      "name": "CancelSpawning",
+      "effect": "取消当前的子实体生成任务，如果使用外部计时器则停止外部计时器，否则取消内部任务。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括子实体数据或生成延迟，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复子实体或生成延迟，从存档中重建组件行为。"
+    },
+    {
+      "name": "TakeOwnership",
+      "effect": "接管一个子实体，设置事件监听（如死亡、陷阱等）和家位置，建立实体关联。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据保存的数据关联子实体，确保实体在游戏世界中正确恢复。"
+    },
+    {
+      "name": "IsOccupied",
+      "effect": "检查子实体是否在家（占用状态），返回布尔值表示当前占用情况。"
+    },
+    {
+      "name": "ReleaseChild",
+      "effect": "释放子实体，使其从家离开；如果子实体不存在则生成一个，否则将其传送到附近位置。"
+    },
+    {
+      "name": "GoHome",
+      "effect": "让子实体回家，停止移动、灭火、移除寻家组件，并触发占用回调。"
+    },
+    {
+      "name": "OnChildKilled",
+      "effect": "处理子实体被杀死的情况，调用回调函数并重启生成延迟，以确保实体重生。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "entitysleep",
+    "ontrapped",
+    "death",
+    "detachchild",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      34314,
+      15237,
+      13701,
+      15022,
+      34523,
+      16419,
+      28179
+    ],
+    "aspects": [
+      {
+        "aspect": "世界规则生成速度配置",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[猪屋]]生成[[猪人]]的速度。"
+          }
+        ]
+      },
+      {
+        "aspect": "固定布景生成数量设定",
+        "evidence": [
+          {
+            "pageid": 34523,
+            "quote": "每个区块随机生成 2 ~ 5 个。"
+          }
+        ]
+      },
+      {
+        "aspect": "机缘兔子概率生成条件",
+        "evidence": [
+          {
+            "pageid": 28179,
+            "quote": "兔洞在即将生成[[兔子]]时，如果附近 30 {{解释|距离单位}}内有玩家，则有 {{幸运影响|1% 概率|id=luck_rab}}替换成机缘兔子。"
+          }
+        ]
+      },
+      {
+        "aspect": "猪人回归猪屋行为",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "超出距离会径直朝猪屋移动"
+          }
+        ]
+      },
+      {
+        "aspect": "猪人死亡后重生机制",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪人死亡 4 天后猪屋会重新生成新的猪人。"
+          }
+        ]
+      },
+      {
+        "aspect": "猪屋生成猪人行为",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪人通常由[[猪屋]]生成。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:生物巢穴"
+    ],
+    "code_fields": [
+      "spawner"
+    ],
+    "overridable_fields": [],
+    "note": "导出键为 spawner,同时覆盖 spawner 与 childspawner 两个组件(任一存在即导出)。"
+  },
+  "search_terms": [
+    "猪人",
+    "生成",
+    "家",
+    "归巢",
+    "死亡",
+    "重生",
+    "延迟",
+    "队列",
+    "占用",
+    "释放"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "生成",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3bd56cdc82534bcdd6e044a66fc32daddcb947fd96cd6a72c0f49e0274c60ad5",
+    "source_bytes": 10589,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092552954
+  }
+}

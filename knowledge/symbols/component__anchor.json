@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/anchor.lua"
+  },
+  "category": "component",
+  "display_name": "anchor",
+  "summary": "anchor组件管理与船只关联的锚的升降状态和物理交互。它通过跟踪多个“提升者”(raisers)来协调多名玩家协作升锚的过程，并控制锚在升起到底或降下触底时的状态转换。组件核心功能是为船只提供可开关的物理阻力，以实现停船。",
+  "api": [
+    {
+      "name": "SetVelocityMod",
+      "effect": "设置一个速度修正值(self.max_velocity_mod)，但该变量在后续代码中未被使用，可能用于未实现的调试或未来功能。"
+    },
+    {
+      "name": "GetCurrentDepth",
+      "effect": "获取锚当前所在位置的海洋深度系数。根据船只当前位置的地图瓦片类型查询深度信息，若有效则返回对应的深度单位(TUNING.ANCHOR_DEPTH_TIMES)，否则返回默认值0.1。"
+    },
+    {
+      "name": "GetBoat",
+      "effect": "返回与当前锚关联的船只实体(self.boat)。"
+    },
+    {
+      "name": "SetIsAnchorLowered",
+      "effect": "直接设置锚的下降状态标志(is_anchor_lowered)。若状态发生变更，会同步更新关联船只的物理系统：降下时调用boatphysics:AddBoatDrag为船添加阻力，升起时调用boatphysics:RemoveBoatDrag移除阻力。"
+    },
+    {
+      "name": "StartRaisingAnchor",
+      "effect": "尝试启动升锚流程。若锚未被烧毁且未处于升起状态，则触发“raising_anchor”事件并返回true；否则返回false。"
+    },
+    {
+      "name": "StartLoweringAnchor",
+      "effect": "尝试启动降锚流程。若锚未被烧毁且未处于下降状态，且当前不在过渡状态，则将过渡标志设为true，添加“anchor_transitioning”标签并触发“lowering_anchor”事件，返回true；否则返回false。"
+    },
+    {
+      "name": "AddAnchorRaiser",
+      "effect": "将一个角色(doer)添加为当前升锚的参与者。确保锚进入过渡状态并触发“raising_anchor”事件。根据角色的专业水手组件和船员标签计算其升锚速度，并累加到当前总升锚速率(currentraiseunits)中。"
+    },
+    {
+      "name": "RemoveAnchorRaiser",
+      "effect": "将一个角色(doer)从当前升锚参与者中移除。从总速率中减去该角色的贡献。若所有参与者都已移除，且锚处于过渡状态，则触发“lowering_anchor”事件（即停止升锚并开始自动下降）。"
+    },
+    {
+      "name": "AnchorRaised",
+      "effect": "完成升锚操作。重置过渡状态，移除相关标签，清除所有参与者，并触发“anchor_raised”事件。同时重置动画速度。"
+    },
+    {
+      "name": "AnchorLowered",
+      "effect": "完成降锚操作。重置过渡状态，移除相关标签，触发“anchor_lowered”事件。同时重置动画速度。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件的帧更新函数。根据当前是否有提升者来更新raiseunits的值：有提升者则减少（升锚），无提升者则自动增加（降锚）。检查raiseunits是否达到0（完全升起）或等于当前深度且无提升者（完全降下）来触发相应的完成状态。若锚处于中间状态且无提升者，会自动启动降锚流程。根据提升者数量动态调整锚的动画速度。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。将当前的raiseunits值序列化后返回。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态。从保存的数据中恢复raiseunits值。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后执行的额外初始化。重新关联锚与当前所在的船只平台。根据加载后的raiseunits和当前深度决定初始状态：若已完全升起则进入“raised”状态；若已完全降下则根据是否有船进入“lowered”或“lowered_land”状态；否则进入“lowering”过渡状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回用于调试的字符串，包含关联的船只、当前提升者数量、raiseunits值、总提升速率和深度信息。"
+    }
+  ],
+  "events_published": [
+    "raising_anchor",
+    "lowering_anchor",
+    "anchor_raised",
+    "anchor_lowered"
+  ],
+  "events_listened": [
+    "onremove",
+    "boat_stop_moving",
+    "boat_start_moving"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16596,
+      51427,
+      15337,
+      20315,
+      45248,
+      15303,
+      15976,
+      27603
+    ],
+    "aspects": [
+      {
+        "aspect": "深度对锚操作时间的影响",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "在不同深度的[[水面地块]]上，起锚和下锚所需的时间不同"
+          },
+          {
+            "pageid": 20315,
+            "quote": "不同的海域会影响收放[[锚]]的时间"
+          }
+        ]
+      },
+      {
+        "aspect": "起锚下锚时间数值",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "锚的减速效果",
+        "evidence": [
+          {
+            "pageid": 16596,
+            "quote": "建在漂浮平台上的锚可以为抛锚以使其大幅减速。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "锚",
+    "船锚",
+    "物理阻力",
+    "锚升起",
+    "锚降低",
+    "多人协作",
+    "航海",
+    "海上航行"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "航海",
+    "多人协作",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db9e3d3178bbf9a83182b4242b1773d83b2c0dbacacfd0eb980e3b7583cf72cb",
+    "source_bytes": 8259,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096084530
+  }
+}

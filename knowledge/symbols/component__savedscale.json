@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/savedscale.lua"
+  },
+  "category": "component",
+  "display_name": "savedscale",
+  "summary": "该组件用于管理实体的缩放比例，确保在游戏存档和加载时保持实体的大小设置。它通过保存和恢复 Transform 的缩放值来工作，适用于任何需要持久化大小调整的实体。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "获取实体当前 Transform 的缩放值，返回一个表，其中 x 字段为缩放值（若 x 不等于 1），y 和 z 字段在对应缩放值与 x 不同时存在；若所有缩放值均为默认状态则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从给定的数据表中加载缩放值，设置到实体的 Transform 上。若数据中缺少 x 字段则默认为 1，y 和 z 字段缺失时使用 x 的值（或默认 1）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      70704,
+      34314,
+      65505,
+      20714,
+      65605,
+      15734,
+      21432
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 OnSave 或 OnLoad 相关的行为描述；保存和加载的提及仅限于游戏整体存档、世界设置或控制台命令，不涉及 component__savedscale 组件的特定能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缩放",
+    "保存",
+    "加载",
+    "大小",
+    "比例",
+    "缩放保存",
+    "缩放加载",
+    "Transform",
+    "实体缩放",
+    "存档缩放"
+  ],
+  "gameplay_tags": [
+    "存档",
+    "视觉效果",
+    "实体调整"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "02e2c95b77439991af4bdaaa56377c5f51a3eca781d625ff67ee3064025d4dc5",
+    "source_bytes": 523,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095860647
+  }
+}

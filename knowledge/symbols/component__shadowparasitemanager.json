@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowparasitemanager.lua"
+  },
+  "category": "component",
+  "display_name": "shadowparasitemanager",
+  "summary": "ShadowParasiteManager组件管理饥荒联机版中的影子寄生虫系统。它负责在影子裂隙附近生成寄生虫波，跟踪目标玩家，并协调寄生虫的生成、行为和群体对话。核心玩法涉及玩家与影子裂隙和寄生虫的战斗互动。",
+  "api": [
+    {
+      "name": "ApplyWorldSettings",
+      "effect": "根据世界设置调整可生成的寄生虫宿主生物表，移除禁用生物（如岩羊、兔人、蜘蛛等）的条目。"
+    },
+    {
+      "name": "OnPlayerJoined",
+      "effect": "当玩家加入世界时调用，若该玩家是目标玩家（基于用户ID），则立即为其生成寄生虫波。"
+    },
+    {
+      "name": "OnPlayerLeft",
+      "effect": "当玩家离开世界时调用，记录该玩家为离开目标，以便后续重新加入时生成波。"
+    },
+    {
+      "name": "AddParasiteToHost",
+      "effect": "为指定宿主生物生成并装备影子寄生虫面具（shadow_thrall_parasitehat），使其成为寄生虫载体。"
+    },
+    {
+      "name": "ChoseHostCreature",
+      "effect": "根据加权表随机选择一种宿主生物类型（如兔人、蜘蛛等）。"
+    },
+    {
+      "name": "SpawnHostCreature",
+      "effect": "生成选定的宿主生物并为其添加寄生虫面具，若生成成功则触发淡入效果。"
+    },
+    {
+      "name": "SpawnParasiteWaveForPlayer",
+      "effect": "在玩家附近生成一组寄生虫波（5-8只宿主生物），要求影子裂隙存在；若为加入玩家则延迟攻击，否则立即攻击。"
+    },
+    {
+      "name": "OnRiftAddedToPool",
+      "effect": "当影子裂隙加入池时调用，增加待处理波数（加载期间忽略）。"
+    },
+    {
+      "name": "GetShadowRift",
+      "effect": "获取当前世界中的影子裂隙（shadow affinity rift）实例，用于判定裂隙存在性。"
+    },
+    {
+      "name": "DoParasiteGroupTalk",
+      "effect": "使所有跟踪中的寄生虫随机说一句台词，用于群体对话效果。"
+    },
+    {
+      "name": "StartTalkTask",
+      "effect": "启动定期任务（每5秒），触发寄生虫群体对话。"
+    },
+    {
+      "name": "StartTrackingParasite",
+      "effect": "开始跟踪指定寄生虫实例，并在无跟踪任务时启动群体对话任务。"
+    },
+    {
+      "name": "StopTrackingParasite",
+      "effect": "停止跟踪指定寄生虫实例，若无其他寄生虫则取消群体对话任务。"
+    },
+    {
+      "name": "OnFloaterRemoved",
+      "effect": "当漂浮物（寄生虫）被移除时调用，若所有漂浮物移除则为所有目标玩家生成波。"
+    },
+    {
+      "name": "SpawnFloater",
+      "effect": "在指定位置生成一个漂浮物（shadowthrall_parasite），并播放出现音效。"
+    },
+    {
+      "name": "SpawnParasiteWaveForAllTargetPlayers",
+      "effect": "为所有标记为目标玩家的玩家生成寄生虫波，并清空目标列表。"
+    },
+    {
+      "name": "BeginParasiteWave",
+      "effect": "开始寄生虫波：若影子裂隙在玩家附近则生成漂浮物，否则为目标玩家生成波。"
+    },
+    {
+      "name": "OverrideBlobSpawn",
+      "effect": "尝试覆盖Blob（可能为其他怪物）生成：若影子裂隙存在且随机概率命中，则标记玩家为目标并可能开始波。"
+    },
+    {
+      "name": "SpawnHostedPlayer",
+      "effect": "生成被寄生虫控制的玩家（player_hosted），复制原玩家外观和属性，并触发出现事件。"
+    },
+    {
+      "name": "ReviveHosted",
+      "effect": "复活被寄生虫控制的玩家，移除寄生虫效果，停止跟随、战斗和群体行为，并生成复活特效。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括波数和目标玩家用户ID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，恢复波数和目标玩家用户ID。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时清理：取消事件监听和群体对话任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前波数、寄生虫数、漂浮物数和目标玩家数。"
+    }
+  ],
+  "api_note": "所有方法均为对外暴露的公共方法，通过实体组件接口调用。",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_riftaddedtopool"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34557,
+      23957,
+      23956,
+      34314,
+      19676,
+      19595,
+      53283,
+      65456
+    ],
+    "aspects": [
+      {
+        "aspect": "世界规则影响裂隙循环",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[月亮裂隙循环]]的开启和关闭。"
+          }
+        ]
+      },
+      {
+        "aspect": "入侵尸体触发寄生变异",
+        "evidence": [
+          {
+            "pageid": 65456,
+            "quote": "将会有一只入侵型虚影生成并前往入侵尸体"
+          }
+        ]
+      },
+      {
+        "aspect": "生成入侵型虚影波次",
+        "evidence": [
+          {
+            "pageid": 23957,
+            "quote": "生成 4 ~ 6 波入侵型虚影后，裂隙就会消失"
+          }
+        ]
+      },
+      {
+        "aspect": "选择植物群落作为寄生目标",
+        "evidence": [
+          {
+            "pageid": 19676,
+            "quote": "在裂隙（月亮）达到第三阶段后，每隔 2 ~ 3 天，会优先选择地表世界的一个植物群落"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "影子寄生虫",
+    "裂隙",
+    "波攻击",
+    "宿主生物",
+    "面具",
+    "漂浮物",
+    "群体对话",
+    "目标玩家",
+    "影子裂隙",
+    "寄生"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "冒险"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab26fb8e0ea172fbe758f2d3bf044ff18c7bd32addd4b31d76effaed18e570da",
+    "source_bytes": 14402,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112286606
+  }
+}

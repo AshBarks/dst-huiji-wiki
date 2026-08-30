@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarsupernovablocker.lua"
+  },
+  "category": "component",
+  "display_name": "lunarsupernovablocker",
+  "summary": "该组件管理一个来源列表，用于阻挡月球超新星效果。当存在来源时，组件启动每帧更新，生成视觉特效和闪烁效果，并调用开始/停止阻挡的回调函数。它主要用于Boss战斗中保护实体免受超新星伤害。",
+  "api": [
+    {
+      "name": "SetOnStartBlockingFn",
+      "effect": "设置一个回调函数，当组件开始阻挡（即添加第一个来源时）被调用，参数为实体实例。"
+    },
+    {
+      "name": "SetOnStopBlockingFn",
+      "effect": "设置一个回调函数，当组件停止阻挡（即移除最后一个来源时）被调用，参数为实体实例。"
+    },
+    {
+      "name": "AddSource",
+      "effect": "添加一个来源，如果来源不存在则生成特效（wagboss_robot_leg_fx）并附着到实体。如果是第一个来源，启动组件更新、开启闪烁效果并调用开始阻挡回调。"
+    },
+    {
+      "name": "RemoveSource",
+      "effect": "移除一个来源并删除其特效。如果没有来源剩余，停止组件更新、重置实体颜色并调用停止阻挡回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13567,
+      19595,
+      45439,
+      13785,
+      23965,
+      13779,
+      18234,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 'lunarsupernovablocker' 组件能力相关的表达，如阻挡行为、源添加/移除或月亮超级新星相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "阻挡",
+    "超新星",
+    "月球",
+    "特效",
+    "闪烁",
+    "来源",
+    "更新",
+    "Boss战斗",
+    "月球超新星"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "月球"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "97ed2d7e66a39147e6adbd7a3df1eebde58bf0df75d7c8f34dd099dc88738dc0",
+    "source_bytes": 2979,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101476758
+  }
+}

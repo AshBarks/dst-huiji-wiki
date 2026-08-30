@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/trophyscale.lua"
+  },
+  "category": "component",
+  "display_name": "trophyscale",
+  "summary": "TrophyScale组件用于管理战利品的称重数据，包括物品的重量、预制物品、所有者信息等。它参与核心玩法如称重比赛或战利品展示，允许比较新物品的重量并替换更重的战利品，同时支持物品的生成、取走、保存和加载。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前存储物品的调试字符串，包括重量、预制物品和所有者信息；如果存储为空，则返回“empty”。"
+    },
+    {
+      "name": "SetComparePostFn",
+      "effect": "设置比较后回调函数，在Compare方法比较成功并更新数据后调用，参数为物品数据和比较的物品实例。"
+    },
+    {
+      "name": "SetOnSpawnItemFromDataFn",
+      "effect": "设置生成物品时的回调函数，在SpawnItemFromData方法生成物品后调用，参数为生成的物品和数据。"
+    },
+    {
+      "name": "SetTakeItemTestFn",
+      "effect": "设置取物品测试回调函数，用于测试是否允许取物品，但源码中未直接调用，可能在其他系统使用。"
+    },
+    {
+      "name": "SetOnItemTakenFn",
+      "effect": "设置物品被取走后的回调函数，在TakeItem方法成功取走物品后调用，参数为组件实例和存储的物品数据。"
+    },
+    {
+      "name": "GetItemData",
+      "effect": "返回当前存储的物品数据，包括重量、预制物品、所有者等信息；如果为空则返回nil。"
+    },
+    {
+      "name": "Compare",
+      "effect": "比较传入物品的重量与当前存储的重量，如果存储为空或新物品更重，则更新存储数据，移除传入物品，并推送“onnewtrophy”事件；返回true表示成功，否则返回false和错误类型（如类型TOO_SMALL）。"
+    },
+    {
+      "name": "ClearItemData",
+      "effect": "清除当前存储的物品数据，将其设置为nil。"
+    },
+    {
+      "name": "SpawnItemFromData",
+      "effect": "根据传入数据或当前存储数据生成物品，设置其weighable组件属性，并调用onspawnitemfromdatafn回调；返回生成的物品实例，如果数据无效则返回nil。"
+    },
+    {
+      "name": "SetItemCanBeTaken",
+      "effect": "设置是否允许取物品，通过添加或移除“trophycanbetaken”标签控制实体的行为。"
+    },
+    {
+      "name": "TakeItem",
+      "effect": "取走存储的物品并放入接收者的库存，调用onitemtakenfn回调并清除存储数据；返回true表示成功，否则返回false。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前存储的物品数据，用于游戏保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据中加载物品数据，恢复组件状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onnewtrophy"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13779,
+      18359,
+      28744,
+      19129,
+      72441,
+      15722,
+      18825,
+      22465
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到直接描述 component__trophyscale 组件能力的玩家语言表达；页面内容涉及物品属性、生成、拾取等，但未明确关联到该组件的具体能力如比较、生成回调等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "战利品",
+    "称重",
+    "重量",
+    "比较",
+    "展示",
+    "物品",
+    "数据",
+    "保存",
+    "加载",
+    "称重器"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "38a7ae84d8025871ae985c22ec0c3ed98e2227e87650a1277d78c392ea3e18b8",
+    "source_bytes": 4424,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097829950
+  }
+}

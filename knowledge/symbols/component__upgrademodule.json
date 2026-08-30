@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/upgrademodule.lua"
+  },
+  "category": "component",
+  "display_name": "upgrademodule",
+  "summary": "此组件管理升级模块的核心数据，包括插槽占用、模块类型和激活状态。它参与饥荒联机版中的装备或电路升级系统，允许模块设置目标实体并在添加、激活、停用或移除时执行自定义逻辑。",
+  "api": [
+    {
+      "name": "SetRequiredSlots",
+      "effect": "设置升级模块所需的插槽数，影响模块在所有者中的空间占用。"
+    },
+    {
+      "name": "GetSlots",
+      "effect": "返回升级模块当前设置的插槽数。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "设置模块的目标实体，并在成功设置时触发onaddedtoownerfn回调函数，可能用于初始化模块与所有者的连接。"
+    },
+    {
+      "name": "SetType",
+      "effect": "设置模块的类型，例如电路板条类型，用于区分不同升级效果。"
+    },
+    {
+      "name": "GetType",
+      "effect": "返回模块当前设置的类型。"
+    },
+    {
+      "name": "TryActivate",
+      "effect": "尝试激活模块，如果当前未激活则设为激活状态并调用onactivatedfn回调，可能激活模块的升级效果。"
+    },
+    {
+      "name": "TryDeactivate",
+      "effect": "尝试停用模块，如果当前已激活则设为停用状态并调用ondeactivatedfn回调，可能禁用模块的升级效果。"
+    },
+    {
+      "name": "RemoveFromOwner",
+      "effect": "将模块从当前所有者移除，清除目标实体并调用onremovedfromownerfn回调，用于清理模块与所有者的关系。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      34314,
+      20714,
+      16197,
+      13779,
+      18001,
+      20719
+    ],
+    "aspects": [
+      {
+        "aspect": "插槽配置描述",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "中间是用于插入电路板的三个插槽"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板所需插槽数量显示",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "每个电路板的外观上都显示了它所需的插槽数量和类型。"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板拔下电荷损失机制",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "拔下激活的电路板时损失的电荷减少"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板激活条件描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "电路板可以插入WX-78的底盘，只要WX-78具有足够的电荷，就能将插入的电路板激活来产生对应的增益。"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板移除行为",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "可以随意拔下任意一种电路板中最上方的一个"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板类型分类说明",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "电路板分为阿尔法、贝塔和伽马三类，分别需要插入不同的插槽"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "升级模块",
+    "插槽",
+    "类型",
+    "激活",
+    "停用",
+    "目标实体",
+    "所有者",
+    "电路板",
+    "模块化",
+    "装备升级"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a693d9fe5cc9f820501e9830036598312d05817323d494b6395f29d4b0f02598",
+    "source_bytes": 1642,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113535192
+  }
+}

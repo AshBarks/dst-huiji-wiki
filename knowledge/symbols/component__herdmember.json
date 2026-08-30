@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/herdmember.lua"
+  },
+  "category": "component",
+  "display_name": "herdmember",
+  "summary": "该组件管理实体的兽群成员资格，确保实体在所属兽群中。它负责在实体无兽群时自动创建新兽群，并处理加入和离开兽群的逻辑。核心玩法涉及兽群行为，如牛群的群居和互动。",
+  "api": [
+    {
+      "name": "SetHerd(herd): 设置实体所属的兽群对象，无副作用。",
+      "effect": ""
+    },
+    {
+      "name": "SetHerdPrefab(prefab): 设置兽群预制体的名称，无副作用。",
+      "effect": ""
+    },
+    {
+      "name": "GetHerd(): 返回当前所属的兽群对象，无副作用。",
+      "effect": ""
+    },
+    {
+      "name": "CreateHerd(): 如果组件启用、当前无有效兽群且实体未死亡，则生成指定兽群预制体并设置位置，调用兽群的聚集附近成员功能；副作用为创建兽群实体。",
+      "effect": ""
+    },
+    {
+      "name": "Leave(): 从当前兽群移除自身，如果组件启用则设置5秒后延迟任务重新创建兽群；副作用为离开兽群并可能触发重新创建。",
+      "effect": ""
+    },
+    {
+      "name": "Enable(enabled): 启用或禁用组件；禁用时从兽群移除，启用时若无兽群则设置延迟创建任务；副作用为影响兽群成员身份和状态。",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString(): 返回包含兽群状态和启用状态的调试字符串，无副作用。",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      15729,
+      15753,
+      18476,
+      52631,
+      15022,
+      18540,
+      35007
+    ],
+    "aspects": [
+      {
+        "aspect": "兽群位置决定机制",
+        "evidence": [
+          {
+            "pageid": 15729,
+            "quote": "羊群的位置由群中的所有无仇恨目标的个体共同决定"
+          },
+          {
+            "pageid": 15753,
+            "quote": "壁虎群的位置则由群中的所有无仇恨目标的个体共同决定"
+          }
+        ]
+      },
+      {
+        "aspect": "兽群再生规则",
+        "evidence": [
+          {
+            "pageid": 15729,
+            "quote": "不满 6 只时，羊群在加载范围外会每 1.5 ~ 2 天再生一只新的伏特羊。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "兽群",
+    "成员",
+    "牛群",
+    "加入",
+    "离开",
+    "创建",
+    "管理",
+    "群居",
+    "herd",
+    "member"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "动物",
+    "群居"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98d932c9bb82412871e32014f29df654569ec0083906560457c9983dbec10787",
+    "source_bytes": 2335,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093012453
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/skilltreeupdater.lua"
+  },
+  "category": "component",
+  "display_name": "skilltreeupdater",
+  "summary": "该组件是管理玩家技能树（Skill Tree）的核心组件。它封装了技能树的数据层，负责技能的查询、激活、停用、经验值管理以及同步客户端/服务器状态。组件参与技能树系统的核心玩法，包括角色成长、能力选择与解锁。",
+  "api": [
+    {
+      "name": "IsActivated(skill)",
+      "effect": "检查指定技能是否已被当前角色激活。返回布尔值。"
+    },
+    {
+      "name": "IsValidSkill(skill)",
+      "effect": "检查指定技能对于当前角色是否是有效的。返回布尔值。"
+    },
+    {
+      "name": "GetSkillXP()",
+      "effect": "获取当前角色的技能经验值。返回数值。"
+    },
+    {
+      "name": "GetPointsForSkillXP(skillxp)",
+      "effect": "计算给定经验值对应的技能点数。返回数值。"
+    },
+    {
+      "name": "GetAvailableSkillPoints()",
+      "effect": "获取当前角色可用的技能点数。返回数值。"
+    },
+    {
+      "name": "GetPlayerSkillSelection()",
+      "effect": "返回当前角色所有已激活技能的一个数组（位字段条目）。"
+    },
+    {
+      "name": "GetNamesFromSkillSelection(skillselection)",
+      "effect": "将给定的技能选择数组（位字段条目）转换为一个技能名称键值对表。"
+    },
+    {
+      "name": "GetActivatedSkills()",
+      "effect": "获取当前角色所有已激活技能的名称键值对表。"
+    },
+    {
+      "name": "CountSkillTag(tag)",
+      "effect": "统计当前角色已激活技能中，带有指定标签的技能数量。返回数值。"
+    },
+    {
+      "name": "HasSkillTag(tag)",
+      "effect": "检查当前角色是否拥有至少一个带有指定标签的激活技能。返回布尔值。"
+    },
+    {
+      "name": "ActivateSkill(skill, prefab, fromrpc)",
+      "effect": "尝试激活指定技能。会处理网络同步（向服务器/客户端发送RPC并触发相应事件）和技能激活回调。参数`prefab`被忽略，`fromrpc`标志是否来自网络远程调用以防止循环。"
+    },
+    {
+      "name": "ActivateSkill_Client(skill)",
+      "effect": "客户端激活技能的内部方法。向`ThePlayer`实体推送`onactivateskill_client`事件。通常由`ActivateSkill`在客户端调用。"
+    },
+    {
+      "name": "ActivateSkill_Server(skill)",
+      "effect": "服务器激活技能的内部方法。执行该技能定义的`onactivate`回调，并推送`onactivateskill_server`事件，同时触发`_skilltreeactivatedany`网络变量。通常由`ActivateSkill`在服务器调用。"
+    },
+    {
+      "name": "DeactivateSkill(skill, prefab, fromrpc)",
+      "effect": "尝试停用指定技能。处理流程与`ActivateSkill`类似，包括网络同步和停用回调。参数`prefab`被忽略。"
+    },
+    {
+      "name": "DeactivateSkill_Client(skill)",
+      "effect": "客户端停用技能的内部方法。向`ThePlayer`实体推送`ondeactivateskill_client`事件。通常由`DeactivateSkill`在客户端调用。"
+    },
+    {
+      "name": "DeactivateSkill_Server(skill)",
+      "effect": "服务器停用技能的内部方法。执行该技能定义的`ondeactivate`回调，并推送`ondeactivateskill_server`事件。通常由`DeactivateSkill`在服务器调用。"
+    },
+    {
+      "name": "AddSkillXP(amount, prefab, fromrpc)",
+      "effect": "为角色增加指定量的技能经验值。处理网络同步，更新技能点，并在玩家有可用技能点时推送`newskillpointupdated`事件。参数`prefab`被忽略。"
+    },
+    {
+      "name": "AddSkillXP_Client(amount, total)",
+      "effect": "客户端增加技能经验值的内部方法。向`ThePlayer`实体推送`onaddskillxp_client`事件。通常由`AddSkillXP`在客户端调用。"
+    },
+    {
+      "name": "AddSkillXP_Server(amount, total)",
+      "effect": "服务器增加技能经验值的内部方法。向当前实体推送`onaddskillxp_server`事件。通常由`AddSkillXP`在服务器调用。"
+    },
+    {
+      "name": "SetSilent(silent)",
+      "effect": "设置静默模式。开启后，技能激活/停用/经验增加操作将不进行网络同步，也不触发相关回调。"
+    },
+    {
+      "name": "SetSkipValidation(skip)",
+      "effect": "设置跳过技能验证。开启后，技能激活操作将跳过技能树的前置条件等验证检查。"
+    },
+    {
+      "name": "SetPlayerSkillSelection(skillselection)",
+      "effect": "直接应用一个技能选择数组（位字段条目），静默且跳过验证地批量激活技能，并保存当前技能树状态到内部缓存。用于从存档或网络恢复状态。"
+    },
+    {
+      "name": "SendFromSkillTreeBlob(inst)",
+      "effect": "从内部存储的技能树数据（blob）应用技能选择。用于加载存档或接收服务器同步数据。会先尝试解码、验证、停用所有技能再重新激活，并推送`onsetskillselection_server`事件。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "组件保存方法。将技能树数据编码为一个字符串（blob）和角色prefab名，用于存档。返回包含这两项数据的表。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "组件加载方法。从存档数据中恢复技能树数据的字符串（blob）和角色prefab名。实际技能应用由后续流程触发。"
+    },
+    {
+      "name": "TransferComponent(newinst)",
+      "effect": "将组件状态转移到另一个实体的新组件实例上。主要转移编码后的技能树数据。用于角色切换等场景。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onactivateskill_server",
+    "ondeactivateskill_server",
+    "onaddskillxp_server",
+    "onsetskillselection_server",
+    "newskillpointupdated"
+  ],
+  "events_listened": [
+    "playeractivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10413,
+      10418,
+      23965,
+      15186,
+      10374,
+      10379,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "技能增益效果描述",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "WX-78 电荷自动恢复所需的时间缩短至 36 秒（原为 90 秒）。"
+          },
+          {
+            "pageid": 10418,
+            "quote": "拔出插槽数大于 1 的激活的电路板时，减少 1 损失的电荷"
+          }
+        ]
+      },
+      {
+        "aspect": "技能学习条件描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "已学习“瓦特提升”技能的WX-78"
+          },
+          {
+            "pageid": 10413,
+            "quote": "学习至少 3 个底层技能"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板激活状态显示",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "如果这个电路板处于激活状态"
+          },
+          {
+            "pageid": 10418,
+            "quote": "激活的电路板"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板激活行为描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "只要WX-78具有足够的电荷，就能将插入的电路板激活来产生对应的增益。"
+          },
+          {
+            "pageid": 10418,
+            "quote": "将插入的电路板激活来产生对应的增益。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "技能树",
+    "技能点",
+    "经验",
+    "激活",
+    "停用",
+    "天赋",
+    "加点",
+    "角色成长",
+    "技能解锁",
+    "skilltree"
+  ],
+  "gameplay_tags": [
+    "成长",
+    "角色"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6fe384c79e0c0e535378716dd21cf4dce6289e91a182b939b01f65fe8a7cbfbb",
+    "source_bytes": 12927,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091744923
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatrace_proximitybeacon.lua"
+  },
+  "category": "component",
+  "display_name": "boatrace_proximitybeacon",
+  "summary": "此组件管理实体的船赛接近信标标签和事件回调。它参与船赛玩法，通过监听船赛开始和结束事件来触发配置的回调函数，用于识别信标是否在检测器的范围内。",
+  "api": [
+    {
+      "name": "SetBoatraceStartedFn",
+      "effect": "设置当船赛开始事件触发时调用的回调函数。行为：存储提供的函数。副作用：事件发生时执行该函数。"
+    },
+    {
+      "name": "SetBoatraceFinishedFn",
+      "effect": "设置当船赛结束事件触发时调用的回调函数。行为：存储提供的函数。副作用：事件发生时执行该函数，并传递比赛结果数据。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时清理资源。行为：移除实体上的'boatrace_proximitybeacon'标签，并移除对船赛事件的监听器。副作用：实体不再响应船赛相关事件。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "boatrace_start",
+    "boatrace_finish"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13701,
+      70704,
+      65881,
+      16419,
+      21063,
+      15225,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未出现与组件 boatrace_proximitybeacon 相关的能力表达，如赛船比赛开始、结束或实体移除行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "比赛开始",
+    "比赛结束",
+    "范围",
+    "接近信标",
+    "船赛事件",
+    "事件处理",
+    "探测器",
+    "boat race",
+    "proximity beacon"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "竞争",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a2f9ab5b2b7fe875cc6233604732eecd627abd90ad0001f1c7594b0a11433e6a",
+    "source_bytes": 1425,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098456144
+  }
+}

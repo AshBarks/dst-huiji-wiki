@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/area_unlock.lua"
+  },
+  "category": "component",
+  "display_name": "area_unlock",
+  "summary": "组件 AreaUnlock 管理故事的解锁状态，当玩家进入新区域时自动检查并更新解锁状态。它允许注册故事并追踪哪些故事已被解锁，用于推进游戏叙事或区域探索。",
+  "api": [
+    {
+      "name": "CheckUnlock",
+      "effect": "检查给定区域的故事是否解锁，如果故事存在且未解锁，则将其解锁状态设为 true，更新内部 stories 表。"
+    },
+    {
+      "name": "RegisterStory",
+      "effect": "注册一个新故事，初始解锁状态为 false，添加到内部 stories 表中。"
+    },
+    {
+      "name": "GetUnlocked",
+      "effect": "返回一个表，包含所有已解锁的故事名称，遍历内部 stories 表获取状态为 true 的故事。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "changearea"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "故事解锁",
+    "区域解锁",
+    "解锁检查",
+    "新区域",
+    "叙事进度",
+    "解锁更新",
+    "追踪故事"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/7)",
+  "gameplay_tags": [
+    "探索",
+    "叙事",
+    "进度"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2193c5d99b81ecb873e303cfa5447ad0e9ad0f24a18093dd0a3a4e034efc530e",
+    "source_bytes": 649,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105384947
+  }
+}

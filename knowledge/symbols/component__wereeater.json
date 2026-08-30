@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wereeater.lua"
+  },
+  "category": "component",
+  "display_name": "wereeater",
+  "summary": "该组件管理实体食用怪物食物后的变身机制，跟踪怪物肉的食用次数。当食用次数达到阈值或食用特定物品时，触发狼人变身，变身状态有定时器，超时后逐渐减少计数并可能取消变身。",
+  "api": [
+    {
+      "name": "SetForceTransformFn",
+      "effect": "设置强制转换时调用的自定义函数，存储函数引用以供后续强制转换使用。"
+    },
+    {
+      "name": "ResetFoodMemory",
+      "effect": "重置怪物食用计数器为0，并取消并清除相关的定时冷却任务，移除变身记忆。"
+    },
+    {
+      "name": "ForceTransformToWere",
+      "effect": "强制触发狼人变身，如果设置了强制转换函数则调用它，可传入模式参数控制变身类型。"
+    },
+    {
+      "name": "EatMosterFood",
+      "effect": "处理食用怪物食物的数据，若实体已变身则忽略；否则根据食物标签增加计数或强制转换，并发布“wereeaterchanged”事件记录状态变化。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回包含怪物计数器和剩余任务时间的表，如果状态为空则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复怪物计数器并重新启动定时冷却任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，显示当前怪物计数和定时器剩余时间，用于调试信息输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "wereeaterchanged"
+  ],
+  "events_listened": [
+    "oneat"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20538,
+      17816,
+      16253,
+      18940,
+      16197,
+      22463,
+      24540,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "角色食用怪物肉类后变形触发条件描述",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "如果伍迪在 4 分钟之内食用 2 个{{分类|怪物肉类}}，或者遇到[[满月]]，伍迪会随机变身为海狸人、鹿人或者鹅人。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "怪物肉",
+    "食物记忆",
+    "变身状态",
+    "食用次数",
+    "变身触发",
+    "计时器",
+    "取消变身",
+    "阈值",
+    "怪物食物"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "变身",
+    "食物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "72add010b943f0677a7630ca85b6e1bfc7a03fb5fe323f628ceb6891343ed860",
+    "source_bytes": 3177,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114054493
+  }
+}

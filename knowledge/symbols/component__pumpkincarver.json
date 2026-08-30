@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pumpkincarver.lua"
+  },
+  "category": "component",
+  "display_name": "pumpkincarver",
+  "summary": "该组件用于南瓜雕刻实体的初始化，在饥荒联机版中可能参与节日活动，允许玩家与南瓜互动进行雕刻。组件本身不管理复杂数据，主要依赖在其他系统中注册的动作实现功能。",
+  "api": [],
+  "api_note": "该组件没有定义任何公共API方法；它仅初始化实例，具体功能通过在其他文件中注册的动作实现，属于纯数据组件。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      34615,
+      18530,
+      23187,
+      34523,
+      24862,
+      24866,
+      51494
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单未提供，无法在页面摘录中检索对应能力的表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "南瓜",
+    "雕刻",
+    "万圣节",
+    "装饰",
+    "制作",
+    "活动",
+    "工具",
+    "互动"
+  ],
+  "gameplay_tags": [],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8e564d91d36a7e7937c4ede414c57f2dce8c083154c1628eb57bad2e4954bfa5",
+    "source_bytes": 147,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111519474
+  }
+}

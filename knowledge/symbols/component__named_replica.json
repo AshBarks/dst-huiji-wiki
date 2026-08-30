@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/named_replica.lua"
+  },
+  "category": "component",
+  "display_name": "named_replica",
+  "summary": "这个组件管理实体的自定义名称和作者ID，用于在多人游戏中标识对象。它通过网络变量在服务器和客户端之间同步名称显示，确保玩家能个性化游戏实体。参与的核心玩法是支持玩家创建和定制游戏对象。",
+  "api": [
+    {
+      "name": "SetName",
+      "effect": "在服务器端设置实体的自定义名称和作者ID，并通过网络变量同步到客户端显示。仅当在服务器端调用时有效，否则无任何操作。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "namedirty",
+    "authordirty"
+  ],
+  "netvars": [
+    "_name",
+    "_author_netid"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23203,
+      24028,
+      72314,
+      24589,
+      13199,
+      14484,
+      20714,
+      10418
+    ],
+    "aspects": [
+      {
+        "aspect": "为浣猫命名的交互描述",
+        "evidence": [
+          {
+            "pageid": 23203,
+            "quote": "鼠标点起小浣猫项圈再左键点击一只小浣猫会使小浣猫停下移动并弹出一个命名框，玩家可以手动键入小浣猫的名字"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "命名",
+    "作者",
+    "服务器设置",
+    "名称同步",
+    "玩家标识",
+    "实体定制",
+    "多人游戏",
+    "客户端名称"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "社交",
+    "自定义"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b2e92702faa4d6e32981ce9cf19bf17171391dfc29b8c198ffefefa688c2f25",
+    "source_bytes": 864,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110347965
+  }
+}

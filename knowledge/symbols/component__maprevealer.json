@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/maprevealer.lua"
+  },
+  "category": "component",
+  "display_name": "maprevealer",
+  "summary": "这是一个周期性地向玩家揭示实体周围迷雾地图的组件。它管理揭示周期、任务调度以及针对特定玩家或全部玩家的揭示逻辑。核心玩法是辅助玩家探索，通过定期显示地图信息来降低探索难度。",
+  "api": [
+    {
+      "name": "MapRevealer:Start([delay])",
+      "effect": "启动地图揭示周期。如果未运行，会为实体添加`maprevealer`标签，并在指定延迟后（默认为0到0.5秒的随机延迟）开始执行揭示逻辑。如果已运行，则不会重复启动。"
+    },
+    {
+      "name": "MapRevealer:Stop()",
+      "effect": "停止并清理当前的地图揭示任务。会移除实体的`maprevealer`标签，取消正在运行的定时任务，并清空内部缓存的玩家列表。"
+    },
+    {
+      "name": "MapRevealer:RevealMapToPlayer(player)",
+      "effect": "立即尝试将实体所在位置的地图信息揭示给指定的玩家。该方法会检查玩家客户端是否就绪，如果就绪，则通过玩家的`player_classified`组件中的`MapExplorer`组件发送位置信息以揭示地图。"
+    },
+    {
+      "name": "MapRevealer:SetPrivateOwner(owner)",
+      "effect": "设置此揭示器的私有所有者。设置后，地图揭示将只对该所有者生效（如果所有者有效且是玩家）。如果更改了所有者，会立即停止当前揭示任务并重新启动以应用新的所有者设置。"
+    },
+    {
+      "name": "MapRevealer:GetPrivateOwner()",
+      "effect": "返回当前设置的私有所有者。"
+    },
+    {
+      "name": "MapRevealer:RestartPrivateRevealCooldown()",
+      "effect": "重置私有所有者的揭示冷却时间。如果当前任务正在运行，会取消任务，清空玩家缓存，并以完整的揭示周期（`revealperiod`）重新启动。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18509,
+      72353,
+      18296
+    ],
+    "aspects": [
+      {
+        "aspect": "为玩家揭示地图描述",
+        "evidence": [
+          {
+            "pageid": 18296,
+            "quote": "月眼守卫能够为世界上的所有玩家实时更新其周围 25 {{解释|距离单位}}的[[地图]]。"
+          },
+          {
+            "pageid": 18509,
+            "quote": "被其他玩家学习后，学习地图卷轴的玩家地图中会添加卷轴的记录。"
+          }
+        ]
+      },
+      {
+        "aspect": "绑定制作玩家描述",
+        "evidence": [
+          {
+            "pageid": 72353,
+            "quote": "旋翼测绘机会与制作它的玩家相绑定"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "地图揭示",
+    "迷雾显示",
+    "周期显示",
+    "探索辅助",
+    "玩家地图",
+    "全局显示",
+    "任务调度",
+    "辅助工具"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "探索",
+    "生存",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a3c02c6a4c69e8348d6d0f09f90e80ccd517c1cae315e0cc9569e808bd11d822",
+    "source_bytes": 2946,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095589019
+  }
+}

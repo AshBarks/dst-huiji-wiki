@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/feasts.lua"
+  },
+  "category": "component",
+  "display_name": "feasts",
+  "summary": "该组件管理冬季盛宴活动中的餐桌组和用餐玩家数据。它负责检测玩家用餐状态，通过周期任务应用增益效果，并处理玩家之间的公告交互。核心玩法围绕多人社交聚餐和增益获取展开。",
+  "api": [
+    {
+      "name": "GetTableGroup",
+      "effect": "返回指定实体所属的餐桌组索引。无副作用。"
+    },
+    {
+      "name": "GetFeasters",
+      "effect": "返回当前所有用餐玩家的列表。无副作用。"
+    },
+    {
+      "name": "GetTableGroups",
+      "effect": "返回所有餐桌组的列表。无副作用。"
+    },
+    {
+      "name": "GetFeasterGroup",
+      "effect": "返回指定用餐者所属的餐桌组索引。无副作用，但代码中存在变量引用错误，实际可能无法正确执行。"
+    },
+    {
+      "name": "RegisterTable",
+      "effect": "注册一个新餐桌，自动查找并合并附近的餐桌组，触发'摇动'事件。副作用：修改餐桌组数据并触发事件。"
+    },
+    {
+      "name": "UnregisterTable",
+      "effect": "注销一个餐桌，重新分组剩余餐桌。副作用：修改餐桌组数据。"
+    }
+  ],
+  "events_published": [
+    "feasterfinished"
+  ],
+  "events_listened": [
+    "feasterstarted",
+    "feasterfinished"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WINTERSFEASTTABLE.TABLE_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18939,
+      22094,
+      13493,
+      19832,
+      23187,
+      21285,
+      13823,
+      24170
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家盛宴树下睡觉行为",
+        "evidence": [
+          {
+            "pageid": 18939,
+            "quote": "玩家可以在[[冬季盛宴树]]旁睡觉以获得礼物。"
+          }
+        ]
+      },
+      {
+        "aspect": "餐桌组链接机制",
+        "evidence": [
+          {
+            "pageid": 21285,
+            "quote": "距离 3.5 距离单位内的全部冬季盛宴餐桌会链接为一个餐桌组。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "冬季盛宴",
+    "餐桌组",
+    "用餐状态",
+    "增益效果",
+    "玩家公告",
+    "多人聚餐"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/6)",
+  "gameplay_tags": [
+    "社交",
+    "节日",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ccf8fdf24bad113c689d4f9a28d4e8b2877521589652474e4438f9f115651854",
+    "source_bytes": 11500,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107399014
+  }
+}

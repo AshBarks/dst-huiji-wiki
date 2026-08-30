@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/constructionsite.lua"
+  },
+  "category": "component",
+  "display_name": "constructionsite",
+  "summary": "该组件用于管理游戏世界中可建造结构的“建筑工地”状态。它追踪建造所需的材料及其进度，并与负责建造的实体（通常是玩家）进行交互。当材料收集完毕时，可触发结构的最终建造。",
+  "api": [
+    {
+      "name": "ForceStopConstruction",
+      "effect": "强制停止当前的建造过程。如果存在正在建造的建造者且其处于建造状态，则调用其建造者的 StopConstruction 方法。当实体被移除时也会自动触发此方法。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用此建筑工地，允许其被建造。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用此建筑工地。会先强制停止任何进行中的建造过程，然后将其状态设为禁用。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回布尔值，指示此建筑工地当前是否处于启用状态。"
+    },
+    {
+      "name": "SetConstructionPrefab",
+      "effect": "设置此建筑工地对应的最终建造预制件的名称。"
+    },
+    {
+      "name": "SetOnStartConstructionFn",
+      "effect": "设置一个回调函数，当建造过程开始时触发。函数签名：function(inst, doer)。"
+    },
+    {
+      "name": "SetOnStopConstructionFn",
+      "effect": "设置一个回调函数，当建造过程停止时触发。函数签名：function(inst, doer)。"
+    },
+    {
+      "name": "SetOnConstructedFn",
+      "effect": "设置一个回调函数，当建筑完全建成时触发。函数签名：function(inst, doer)。"
+    },
+    {
+      "name": "OnStartConstruction",
+      "effect": "由系统（通常是constructionbuilder组件）调用以开始建造。会记录建造者，并调用之前设置的开始回调函数。"
+    },
+    {
+      "name": "OnStopConstruction",
+      "effect": "由系统调用以停止建造。会清除建造者记录，并调用之前设置的停止回调函数。"
+    },
+    {
+      "name": "OnConstruct",
+      "effect": "由系统调用以提交建造材料。它遍历提供的物品，将材料添加到工地；如果材料超出需求，则会返还给建造者（如果玩家）或掉落在地。完成材料统计后，会清除建造者，并触发完成回调（如果已完工）。同时会推送游戏统计事件。"
+    },
+    {
+      "name": "HasBuilder",
+      "effect": "返回布尔值，指示当前是否有实体（如玩家）正在此工地进行建造。"
+    },
+    {
+      "name": "IsBuilder",
+      "effect": "返回布尔值，指示传入的实体（guy）是否为当前正在进行建造的建造者。"
+    },
+    {
+      "name": "AddMaterial",
+      "effect": "尝试向工地添加指定数量的某种预制件材料。会根据蓝图（CONSTRUCTION_PLANS）计算可接受的数量，并更新内部材料记录和网络同步数据。返回未能添加的剩余材料数量。"
+    },
+    {
+      "name": "RemoveMaterial",
+      "effect": "从工地移除指定数量的某种材料。返回实际移除的数量。如果移除后该材料数量归零，则会从内部记录中删除该材料。"
+    },
+    {
+      "name": "DropAllMaterials",
+      "effect": "将工地上所有已收集的材料作为物品掉落。掉落位置默认为建筑工地点，也可指定。"
+    },
+    {
+      "name": "GetMaterialCount",
+      "effect": "返回指定预制件材料在工地上的当前数量。"
+    },
+    {
+      "name": "GetSlotCount",
+      "effect": "根据蓝图槽位索引（slot），返回该槽位对应材料的当前数量。"
+    },
+    {
+      "name": "IsComplete",
+      "effect": "返回布尔值，指示建筑工地是否已收集完所有蓝图要求的材料。"
+    },
+    {
+      "name": "ForceCompletion",
+      "effect": "强制完成建造。会立即补充所有尚未满足的材料需求，并调用 OnConstruct 完成建造。通常用于调试或特殊游戏事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含工地已收集材料的保存数据（材料名称及其数量），用于存档。如果没有材料则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中加载材料信息，恢复工地的建造进度。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18830,
+      24544,
+      65605,
+      34314,
+      24663,
+      21137,
+      21632,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未涉及 component__constructionsite 相关能力表达；所有页面讨论蓝图、世界生成、资源机制等，未提及建筑构造过程或构造站点组件的行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "建筑工地",
+    "蓝图",
+    "材料",
+    "建造中",
+    "施工",
+    "蓝图系统",
+    "建筑组件",
+    "资源",
+    "进度",
+    "完成建筑"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "资源管理",
+    "进度追踪"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
+    "source_bytes": 8174,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092930658
+  }
+}

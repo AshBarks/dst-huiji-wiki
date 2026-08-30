@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/heavyobstacleusetarget.lua"
+  },
+  "category": "component",
+  "display_name": "heavyobstacleusetarget",
+  "summary": "HeavyObstacleUseTarget 组件管理实体的 can_use_heavy 布尔值和 on_use_fn 回调函数。当 can_use_heavy 为真时，实体被添加 'can_use_heavy' 标签，允许使用重型障碍物。核心玩法涉及实体与重型障碍物的交互，可能用于清除障碍、建造或生存任务。",
+  "api": [
+    {
+      "name": "UseHeavyObstacle",
+      "effect": "该方法接受 doer 和 heavy_obstacle 参数。如果 on_use_fn 函数已定义，则调用该函数并返回其结果；否则返回 false。副作用取决于 on_use_fn 的具体实现，但组件代码本身不定义具体行为。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      20150,
+      10355,
+      10374,
+      13437,
+      20714,
+      24875,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未找到任何与'使用重障碍物'或UseHeavyObstacle相关的表达。所有摘录内容聚焦于角色能力、攻击机制、伤害计算、制作配方、技能树、控制台命令等，未涉及重障碍物的使用行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "建造工具",
+    "障碍物",
+    "交互",
+    "标签",
+    "生存任务",
+    "障碍交互",
+    "建造用途"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 3/7)",
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5a2ef569266913598ff897fd4e5e497cb4b96e32ce86123785f96b0ea3f3d5f5",
+    "source_bytes": 730,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096769880
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playbill_lecturn.lua"
+  },
+  "category": "component",
+  "display_name": "playbill_lecturn",
+  "summary": "该组件管理播放单物品和阶段状态，用于控制戏剧表演系统的核心玩法。它允许设置表演阶段、改变当前行动、更新显示文本，并处理播放单物品的交换、保存与加载。",
+  "api": [
+    {
+      "name": "SetStage",
+      "effect": "设置当前阶段，并触发 onstageset 回调函数。"
+    },
+    {
+      "name": "ChangeAct",
+      "effect": "如果播放单物品存在，改变其当前行动并调用 UpdateText 更新文本。"
+    },
+    {
+      "name": "UpdateText",
+      "effect": "从播放单物品获取脚本信息，格式化为文本并设置到 writeable 组件，同时推送 'text_changed' 事件。"
+    },
+    {
+      "name": "SwapPlayBill",
+      "effect": "交换播放单物品：重置新物品行动、移除使用者库存、设置位置、处理旧物品丢弃与动画覆盖、更新文本，并在阶段存在时添加表演数据和播放动画。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存播放单物品的 GUID 以用于存档，返回数据和引用列表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理：恢复播放单物品并调用 SwapPlayBill 完成设置。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "text_changed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      16174,
+      34792,
+      13409,
+      52107,
+      70534,
+      34523,
+      34793
+    ],
+    "aspects": [
+      {
+        "aspect": "剧本置入讲台能力",
+        "evidence": [
+          {
+            "pageid": 34792,
+            "quote": "可以放入[[剧本]]中，以在[[舞台]]上表演其中的剧目。"
+          }
+        ]
+      },
+      {
+        "aspect": "舞台环境生成剧本",
+        "evidence": [
+          {
+            "pageid": 34793,
+            "quote": "装备蠢人面具靠近舞台8单位，舞台中心生成黑罩剧本。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "戏剧",
+    "表演",
+    "舞台",
+    "表演阶段",
+    "显示文本",
+    "道具交换",
+    "行动设置",
+    "保存进度"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "表演",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "547fb39f4e2d2f74b0c0442488dbc690df5ea6f6c9eef0ff39cf35060c7ad1a1",
+    "source_bytes": 3479,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102577589
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/toggleableitem.lua"
+  },
+  "category": "component",
+  "display_name": "toggleableitem",
+  "summary": "该组件管理一个物品的开关状态，包括布尔标志和回调函数。允许玩家通过交互切换物品状态，并执行自定义效果，常用于可开关设备或工具。",
+  "api": [
+    {
+      "name": "SetOnToggleFn",
+      "effect": "设置在ToggleItem调用时执行的回调函数，参数为函数fn，当切换状态时被调用，传递实体实例和布尔新状态"
+    },
+    {
+      "name": "CanInteract",
+      "effect": "检查实体是否可以被交互，始终返回true，无其他副作用"
+    },
+    {
+      "name": "ToggleItem",
+      "effect": "切换物品的开关状态（on字段），如果设置了onusefn回调，则调用它并传递实体实例和新状态"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28744,
+      18359,
+      19129,
+      72441,
+      13156,
+      24866,
+      13642,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "储存单元激活状态与打开交互",
+        "evidence": [
+          {
+            "pageid": 72441,
+            "quote": "每插入一个空间扩展电路，无论是否激活都能得到一个扩展储存单元。"
+          },
+          {
+            "pageid": 72441,
+            "quote": "若扩展储存单元未打开，则不能直接将其中的物品用于制作。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "切换",
+    "开关",
+    "物品",
+    "交互",
+    "状态",
+    "回调",
+    "设备",
+    "工具"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "513888b44728948c9ba6f72b1beee746693a50dc537ddf7d0e61517c0bf75c0f",
+    "source_bytes": 505,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113288989
+  }
+}

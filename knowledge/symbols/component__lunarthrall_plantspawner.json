@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarthrall_plantspawner.lua"
+  },
+  "category": "component",
+  "display_name": "lunarthrall_plantspawner",
+  "summary": "该组件管理月相裂隙触发的暗影波次生成系统，控制暗影从裂隙释放或直接入侵植物群，是月光主题玩法中的动态事件生成器。它监听裂隙状态变化，定时生成暗影并目标化植物，参与月光事件链的战斗与生存机制。",
+  "api": [
+    {
+      "name": "MoveGestaltToPlant",
+      "effect": "将指定暗影生物移动到其目标植物附近，确保位置在玩家视野外；若目标无效则移除暗影。"
+    },
+    {
+      "name": "SpawnGestalt",
+      "effect": "生成一个暗影生物指向目标植物；若提供裂隙则从裂隙位置生成，否则在目标附近视野外生成，并播放生成音效。"
+    },
+    {
+      "name": "SpawnPlant",
+      "effect": "在目标位置生成一个暗影植物并执行入侵动画，使其附着到目标植物上。"
+    },
+    {
+      "name": "FindWildPatch",
+      "effect": "在地图上随机寻找野生植物补丁（具有'plant'和'lunarplant_target'标签），返回包含最多未入侵植物的列表。"
+    },
+    {
+      "name": "FindHerd",
+      "effect": "从已注册的植物群中查找未入侵且未枯萎的植物数量最多的群落，随机返回前五名之一。"
+    },
+    {
+      "name": "FindPlant",
+      "effect": "从所有已注册植物群中随机选取一个可入侵的植物（无暗影植物附着）返回。"
+    },
+    {
+      "name": "InvadeTarget",
+      "effect": "入侵指定目标植物：若目标在玩家视野内则生成暗影生物，否则直接生成暗影植物入侵。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化当前状态（包括剩余波次、任务计时和当前裂隙引用），用于游戏保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "反序列化数据，恢复剩余波次数量。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据保存数据恢复裂隙引用和定时任务，取消现有任务并重新启动。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示剩余波次、下次生成时间和波次生成任务时间。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，调整波次生成和周期性任务的剩余时间，确保任务时间递减。"
+    },
+    {
+      "name": "RemoveWave",
+      "effect": "减少剩余波次计数，若波次耗尽则取消所有任务并触发裂隙结束计时器。"
+    },
+    {
+      "name": "setHerdsOnPlantable",
+      "effect": "为指定可种植物添加已知位置和群落成员组件，将其归类为' domesticplantherd'群落。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_lunarrift_maxsize",
+    "plantherdspawned",
+    "ms_lunarportal_removed",
+    "lunarthrallplant_infested",
+    "timerdone",
+    "ms_gestalt_possession"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      15225,
+      13701,
+      14099,
+      24748,
+      34037,
+      19769,
+      13139
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未涉及组件 lunarthrall_plantspawner 的能力表达，页面内容聚焦于暗影生物、角色技能和物品功能，与清单中的植物生成、移动、寻找等能力无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月相裂隙",
+    "暗影植物",
+    "生成暗影",
+    "入侵",
+    "植物群",
+    "裂隙事件",
+    "月光",
+    "暗影",
+    "波次"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5dc5417c868a098b8fa6e7215e8899abc03491a9bc175a7bbcfe1f415a96f9fc",
+    "source_bytes": 17860,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109416691
+  }
+}

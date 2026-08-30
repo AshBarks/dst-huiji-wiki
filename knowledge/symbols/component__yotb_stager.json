@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotb_stager.lua"
+  },
+  "category": "component",
+  "display_name": "yotb_stager",
+  "summary": "组件`yotb_stager`管理“脱颖而出吧”（Year of the Beefalo）活动中牛仔装评选比赛的舞台流程。它控制着比赛的启动、进行、评估、颁奖和结束的全过程，包括对参选牛的评分和对牛仔玩偶的评估。核心玩法围绕着玩家为牛装扮，并让裁判根据预设的“恐怖、欢乐、正式”主题参数评选出优胜者。",
+  "api": [
+    {
+      "name": "EnableContest",
+      "effect": "启用舞台的比赛功能。为实体添加“yotb_contestenabled”和“yotb_conteststartable”标签，并推送“contestenabled”事件。在启用前会检查全局比赛管理器状态，若比赛已激活、未启用或主持已可见，则不执行操作。"
+    },
+    {
+      "name": "DisableContest",
+      "effect": "禁用舞台的比赛功能。移除“yotb_contestenabled”标签，并推送“contestdisabled”事件。"
+    },
+    {
+      "name": "StartContest",
+      "effect": "尝试启动一场比赛。先禁用工作功能，通过`TestStartContest`检查环境是否安全（如无怪物、非深夜、足够数量的栓牛柱和至少一头牛）。若检查失败，会触发相应的失败对话；若成功，则生成裁判语音实体、播放背景音乐，并将后续流程推入队列。"
+    },
+    {
+      "name": "AbortContest",
+      "effect": "中止当前进行的比赛。推送“yotb_onabortcontest”事件，清除所有计时器和任务队列，清理临时生成的裁判和牛，解锁栓牛柱，并停止背景音乐。若比赛未结束且有赢家，则催促收集奖品；否则尝试结束比赛。"
+    },
+    {
+      "name": "EndContest",
+      "effect": "结束当前比赛。推送“yotb_oncontestfinshed”事件，清除计时器，移除“has_prize”标签，解锁所有栓牛柱并移除相关事件监听，停止背景音乐。根据结束原因（如“attack”或“toolate”）显示不同对话，并将后续清理工作推入队列。"
+    },
+    {
+      "name": "MakeRandomBeef",
+      "effect": "在指定栓牛柱生成一对临时裁判（猪或鱼人）和牛。裁判会跟随生成的牛，并为牛随机生成外观和名字。若裁判或牛被攻击或死亡，会触发比赛中止。生成的生物会被添加到临时列表中管理。"
+    },
+    {
+      "name": "TestStartContest",
+      "effect": "测试比赛启动条件是否满足。检查包括：当前是否为猎犬来袭状态、指定半径内是否有敌对生物或处于战斗中的生物、距离夜晚是否足够、范围内的栓牛柱数量是否大于3、以及至少有一头栓上的牛。返回错误代码或空表示通过。"
+    },
+    {
+      "name": "GetBeefScore",
+      "effect": "根据指定牛的当前服装，计算其在“FEARSOME”、“FESTIVE”、“FORMAL”三个类别上的得分总和。分数来源于服装数据集。返回一个包含三个类别得分的表。"
+    },
+    {
+      "name": "GetComment",
+      "effect": "为指定栓牛柱上的牛生成一条评价语音。根据`choice`设置（“close”、“far”或“random”），选择与目标参数最接近、最远或随机的类别，并根据得分差异选择对应的评价字符串。返回一个包含持续时间和评价文本的表。"
+    },
+    {
+      "name": "DeclareWinner",
+      "effect": "宣布比赛结果。依次高亮并宣布第三名、第二名和第一名，为每头牛播放评价语音。最后根据玩家投票（通过栓牛柱标记）收集赢家，并触发颁奖流程。"
+    },
+    {
+      "name": "AwardVictors",
+      "effect": "颁发奖品给赢家。收集标记了获胜栓牛柱的玩家，如果无人获奖则不发奖；否则推送“yotb_throwprizes”事件并显示奖品对话。随后将流程推入队列，为未获奖者和所有栓牛柱分发奖励。"
+    },
+    {
+      "name": "Tossprize",
+      "effect": "向目标投掷奖品包。默认生成一个装有“lucky_goldnugget”的红包并抛掷；若`pattern`为真，则抛掷一个随机图案碎片；若`other`为真，则只抛掷一个金币。对于NPC赢家，会将其与红包关联。"
+    },
+    {
+      "name": "appraisedoll",
+      "effect": "评估一个牛仔玩偶。禁用舞台工作功能，生成裁判语音，根据玩偶的类别和属性（乘以系数5）生成评估值，并启动评估流程。"
+    },
+    {
+      "name": "SpawnVoice",
+      "effect": "在指定位置生成一个短暂的语音气泡，显示指定评论。语音实体由`yotb_stage_voice`预制体生成。"
+    },
+    {
+      "name": "SpawnVoiceName",
+      "effect": "高亮指定排名的栓牛柱，并尝试显示其上牛的名称。若无名称则显示传入的默认语音。返回显示的名称字符串。"
+    },
+    {
+      "name": "CheckForMarks",
+      "effect": "检查指定玩家是否标记了任意栓牛柱。遍历所有栓牛柱的标记，若找到该玩家的标记，则返回对应的栓牛柱实体；否则返回false。"
+    }
+  ],
+  "events_published": [
+    "contestenabled",
+    "contestdisabled",
+    "conteststarted",
+    "onflourishstart",
+    "onflourishend",
+    "trader_arrives",
+    "trader_leaves",
+    "yotb_throwprizes"
+  ],
+  "events_listened": [
+    "yotb_contest_abort",
+    "yotb_advance_queue",
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      52019,
+      18825,
+      18521,
+      16174,
+      51524,
+      15526,
+      33950,
+      51489
+    ],
+    "aspects": [
+      {
+        "aspect": "比赛开启条件列举",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "2.在裁判席范围内有四个及以上的[[皮弗娄牛舞台]]。<br>3.至少有一个已经绑定[[皮弗娄牛铃]]的皮弗娄牛绑定了皮弗娄牛舞台。"
+          }
+        ]
+      },
+      {
+        "aspect": "裁判评选标准陈述",
+        "evidence": [
+          {
+            "pageid": 52019,
+            "quote": "裁判会说出今天的评选标准。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "脱颖而出",
+    "牛仔装",
+    "评选",
+    "舞台",
+    "比赛",
+    "分数",
+    "奖品",
+    "裁判",
+    "玩偶评估",
+    "恐怖欢乐正式"
+  ],
+  "gameplay_tags": [
+    "节日",
+    "小游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d95b849671000ee43385bcecfedcecd333cb131c45802b70c083f4b63fbb0147",
+    "source_bytes": 41070,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105011413
+  }
+}

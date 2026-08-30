@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wx78_shield.lua"
+  },
+  "category": "component",
+  "display_name": "wx78_shield",
+  "summary": "wx78_shield 组件管理 WX-78 角色的护盾数据，包括当前护盾值、最大护盾值和穿透阈值。参与核心玩法是战斗防御，护盾可以吸收伤害，并在未受伤且非战斗状态下自动充能。通过伤害处理函数，护盾在不可穿透时完全吸收伤害，否则部分吸收并返回剩余伤害。",
+  "api": [
+    {
+      "name": "AddChargeSource",
+      "effect": "添加一个充能来源，设置修改器并可能启动护盾充能的更新循环。"
+    },
+    {
+      "name": "RemoveChargeSource",
+      "effect": "移除充能来源修改器，可能停止护盾充能的更新循环。"
+    },
+    {
+      "name": "HasChargeSource",
+      "effect": "返回布尔值，指示是否存在充能来源。"
+    },
+    {
+      "name": "SetMax",
+      "effect": "设置最大护盾值，并调用 DoDelta(0) 触发更新事件。"
+    },
+    {
+      "name": "SetCurrent",
+      "effect": "设置当前护盾值，触发 wxshielddelta 事件并根据状态变化生成视觉效果。"
+    },
+    {
+      "name": "GetMax",
+      "effect": "返回最大护盾值。"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "返回当前护盾值。"
+    },
+    {
+      "name": "GetPenetrationThreshold",
+      "effect": "返回穿透阈值。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回护盾百分比（当前值除以最大值）。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "设置护盾百分比，调用 SetCurrent 方法设置对应当前值。"
+    },
+    {
+      "name": "Impenetrable",
+      "effect": "返回布尔值，指示护盾是否不可穿透（当前护盾值大于等于穿透阈值）。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "增加或减少护盾值，调用 SetCurrent 方法更新当前值。"
+    },
+    {
+      "name": "GetCanShieldCharge",
+      "effect": "返回布尔值，指示护盾是否处于可充能状态。"
+    },
+    {
+      "name": "UpdateCanShieldCharge",
+      "effect": "更新可充能状态，基于当前护盾值、是否在战斗中或受伤状态。"
+    },
+    {
+      "name": "OnTakeDamage",
+      "effect": "处理伤害输入，根据护盾状态决定伤害吸收：若不可穿透则护盾吸收所有伤害并返回0，否则护盾吸收部分伤害并返回剩余伤害给生命值。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "系统更新函数，每帧调用以更新充能状态和周期性生成护盾视觉效果。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前护盾值用于数据保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载当前护盾值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，显示当前护盾值和最大护盾值。"
+    }
+  ],
+  "events_published": [
+    "wx_canshieldcharge",
+    "wxshielddelta"
+  ],
+  "events_listened": [],
+  "netvars": [
+    "shieldpenetrationthreshold",
+    "currentshield",
+    "maxshield",
+    "canshieldcharge"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      10418,
+      20058,
+      15022,
+      16419,
+      16197,
+      13261,
+      18219
+    ],
+    "aspects": [
+      {
+        "aspect": "护盾回复速率描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "会以每秒 0.25 点的速率回复护盾。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "护盾",
+    "充能",
+    "穿透",
+    "防御",
+    "WX-78",
+    "伤害吸收",
+    "盾值",
+    "最大护盾",
+    "恢复",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c46a09b5dac86821c83a644b65c67d717c034fe6a486deadb428afc8683b033",
+    "source_bytes": 7298,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104922295
+  }
+}

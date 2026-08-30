@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/kitcoonden.lua"
+  },
+  "category": "component",
+  "display_name": "kitcoonden",
+  "summary": "该组件用于管理实体上的kitcoon集合，追踪kitcoon数量，并通过可选回调在添加和移除时执行自定义逻辑。它支持了饲养和聚集kitcoon的核心玩法，维护一个kitcoon窝的群体状态。",
+  "api": [
+    {
+      "name": "AddKitcoon",
+      "effect": "添加kitcoon到窝中，增加计数，监听该kitcoon的onremove事件，并调用OnAddKitcoon回调（如果定义）。"
+    },
+    {
+      "name": "RemoveKitcoon",
+      "effect": "移除指定kitcoon，减少计数，移除对该kitcoon的事件监听，并调用OnRemoveKitcoon回调（如果定义）。"
+    },
+    {
+      "name": "RemoveAllKitcoons",
+      "effect": "遍历并移除所有kitcoons，对每个kitcoon执行onremove_kitcoon函数。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理所有kitcoons，调用每个kitcoon的onremove_kitcoon函数。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前kitcoon数量的字符串，用于调试显示。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23202
+    ],
+    "aspects": [
+      {
+        "aspect": "制作与刷新小猫的行为描述",
+        "evidence": [
+          {
+            "pageid": 23202,
+            "quote": "[quantity] 龛]]附近可以花费 1 个[[幸运金块]]制作小"
+          },
+          {
+            "pageid": 23202,
+            "quote": "[interval] 一次。托儿所周围 5~30 距离内需要有至少"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "kitcoon数量",
+    "添加小猫",
+    "移除小猫",
+    "小猫饲养",
+    "小猫聚集",
+    "kitcoon窝",
+    "小猫回调",
+    "kitcoon管理"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "宠物",
+    "聚集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2c93743801acb3441207de530b1a061ad8438e0f36cd3843f7087908a0a6a67f",
+    "source_bytes": 1314,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101030782
+  }
+}

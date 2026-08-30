@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_seasons.lua"
+  },
+  "category": "component",
+  "display_name": "shard_seasons",
+  "summary": "Shard_Seasons 组件管理季节相关数据，包括当前季节、季节天数及长度。它在饥荒联机版的多分片系统中同步季节状态，确保不同世界间的季节变化一致。参与核心玩法如季节更替影响的游戏机制。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；仅通过网络变量和事件进行内部数据同步。",
+  "events_published": [],
+  "events_listened": [
+    "master_seasonsupdate",
+    "seasonsdirty"
+  ],
+  "netvars": [
+    "shard_seasons.lengths",
+    "shard_seasons._season",
+    "shard_seasons._totaldaysinseason",
+    "shard_seasons._remainingdaysinseason",
+    "shard_seasons._elapseddaysinseason",
+    "shard_seasons._endlessdaysinseason"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13569,
+      13570,
+      60885,
+      18410,
+      21137,
+      15327,
+      19952,
+      22707
+    ],
+    "aspects": [
+      {
+        "aspect": "夏季调整猎犬袭击的变种概率",
+        "evidence": [
+          {
+            "pageid": 22707,
+            "quote": "在夏季，替换概率会还会额外提升至原本的 1.5 倍。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节作为世界温度的计算参数",
+        "evidence": [
+          {
+            "pageid": 19952,
+            "quote": "其中$T_s$、$T_d$、$r$、$q$分别表示季节基础温度、昼夜基础温度、随机温度偏移和世界温度因子。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节倍率对降水阈值的调控",
+        "evidence": [
+          {
+            "pageid": 18410,
+            "quote": "水分下限 = 水分上限×（0.25~0.75随机值）×季节倍率。其中季节倍率，秋冬为 1，春为 0.25，夏为 1.5。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节决定特定鸟类的生成",
+        "evidence": [
+          {
+            "pageid": 15327,
+            "quote": "雪雀只在冬季生成，在这个季节中代替红雀。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节基础温度的动态调整",
+        "evidence": [
+          {
+            "pageid": 60885,
+            "quote": "季节基础温度随当前季节和天数的变化而变化"
+          }
+        ]
+      },
+      {
+        "aspect": "季节对昼夜循环的计算影响",
+        "evidence": [
+          {
+            "pageid": 13570,
+            "quote": "昼夜循环的最终时间分配是由季节基础值计算和自定义世界修正两个步骤共同决定的。"
+          }
+        ]
+      },
+      {
+        "aspect": "季节对环境变化的驱动",
+        "evidence": [
+          {
+            "pageid": 13569,
+            "quote": "季节的变化宣示着整个游戏的环境变化"
+          }
+        ]
+      },
+      {
+        "aspect": "季节进度控制迷你冰川状态变化",
+        "evidence": [
+          {
+            "pageid": 21137,
+            "quote": "迷你冰川会每 1~3 天检查季节的进度，然后随着季节发生变化"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "季节",
+    "天数",
+    "游戏世界",
+    "季节长度",
+    "季节同步",
+    "季节变化",
+    "主机世界",
+    "客机世界"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "时间"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1f63f5126bde3836e583f2801f1a37f93a3fee78a2b04771cda740c3cccc93ac",
+    "source_bytes": 3776,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103457380
+  }
+}

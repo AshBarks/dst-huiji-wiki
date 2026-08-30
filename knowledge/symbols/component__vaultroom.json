@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaultroom.lua"
+  },
+  "category": "component",
+  "display_name": "vaultroom",
+  "summary": "VaultRoom组件管理饥荒联机版中虚拟房间的创建、卸载和加载，包括房间ID追踪、地形变换、实体布局与保存。它允许房间数据持久化，并处理实体在虚拟空间中的移除或保留逻辑。核心玩法涉及玩家在虚拟存储区域或特殊房间中的交互与探索。",
+  "api": [
+    {
+      "name": "GetCurrentRoomId",
+      "effect": "返回当前房间ID（roomid），若未初始化则为nil，无副作用。"
+    },
+    {
+      "name": "LayoutNewRoom",
+      "effect": "根据提供的id布局新房间：设置roomid为id，调用defs中的地形变换和实体布局函数。若roomid已存在则断言失败，否则在指定坐标创建房间。"
+    },
+    {
+      "name": "UnloadRoom",
+      "effect": "卸载当前房间：若save为true，则保存半径内的实体到表中并返回保存数据和剩余实体；否则移除实体。设置roomid为nil，处理实体引用和时间戳。"
+    },
+    {
+      "name": "ResetRoom",
+      "effect": "重置房间：若roomid存在则调用UnloadRoom卸载，然后重置地形到初始状态。设置roomid为nil。"
+    },
+    {
+      "name": "LoadRoom",
+      "effect": "加载指定id的房间：若data为nil则调用LayoutNewRoom布局新房间；否则设置roomid，从data中恢复实体并处理引用。如果data包含world_time，则对实体进行时间更新。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回组件的保存数据：若roomid存在则返回包含room键的表，否则返回nil，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从data中加载房间ID：设置roomid为data.room，若data为nil则roomid为nil，无其他副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10419
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅提供游戏标题和系统需求片段，未涉及vaultroom组件或其代码能力（如GetCurrentRoomId等）的任何描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "金库房间",
+    "存储空间",
+    "房间编号",
+    "地形转换",
+    "实体排列",
+    "数据保存",
+    "房间卸载",
+    "房间加载",
+    "虚拟副本"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "存储",
+    "建造",
+    "探索",
+    "虚拟空间"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "41e1f4744dd938d47d0f0fce1e918916a37f23a9157f0e0038208600a26477df",
+    "source_bytes": 6485,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104711078
+  }
+}

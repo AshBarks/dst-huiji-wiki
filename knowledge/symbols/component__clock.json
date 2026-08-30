@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/clock.lua"
+  },
+  "category": "component",
+  "display_name": "clock",
+  "summary": "Clock组件管理游戏时间系统，包括日夜阶段、月相周期和天数计数。它驱动日夜循环、月相变化，通过网络变量同步时间状态，影响生物行为、光照和事件触发。",
+  "api": [
+    {
+      "name": "GetTimeUntilPhase",
+      "effect": ""
+    },
+    {
+      "name": "AddMoonPhaseStyle",
+      "effect": ""
+    },
+    {
+      "name": "Dump",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "clocksegschanged",
+    "cycleschanged",
+    "phasechanged",
+    "moonphasechanged",
+    "moonphasechanged2",
+    "moonphasestylechanged",
+    "clocktick",
+    "master_clockupdate"
+  ],
+  "events_listened": [
+    "segsdirty",
+    "cyclesdirty",
+    "phasedirty",
+    "moonphasedirty",
+    "moonphasestyledirty",
+    "playeractivated",
+    "ms_setclocksegs",
+    "ms_setphase",
+    "ms_nextphase",
+    "ms_nextcycle",
+    "ms_setmoonphase",
+    "ms_lockmoonphase",
+    "ms_setmoonphasestyle",
+    "ms_simunpaused",
+    "secondary_clockupdate"
+  ],
+  "netvars": [
+    "_segs",
+    "_cycles",
+    "_phase",
+    "_moonphase",
+    "_mooniswaxing",
+    "_totaltimeinphase",
+    "_remainingtimeinphase",
+    "_moonphasestyle"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13570,
+      15303,
+      15237,
+      22522,
+      34314,
+      10379,
+      15922,
+      15642
+    ],
+    "aspects": [
+      {
+        "aspect": "月相显示在时钟上",
+        "evidence": [
+          {
+            "pageid": 22522,
+            "quote": "每天夜晚右上角的时钟会显示当夜的月相。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "时间",
+    "日夜",
+    "月相",
+    "白天",
+    "黄昏",
+    "夜晚",
+    "周期",
+    "钟表",
+    "时段",
+    "天数"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "时间管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e15702779a31cd7d3ef23cd7e761079bf44032c2f5c04b349fdb457ed9343925",
+    "source_bytes": 18204,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106071429
+  }
+}

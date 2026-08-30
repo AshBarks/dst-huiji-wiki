@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/submersible.lua"
+  },
+  "category": "component",
+  "display_name": "submersible",
+  "summary": "submersible组件管理实体在海洋中的潜水行为，监听沉没和着陆事件以触发扬潜水。它处理位置重新定位逻辑，确保实体能在可到达的海洋区域沉没，并生成水下可打捞对象供后续交互。",
+  "api": [
+    {
+      "name": "GetUnderwaterObject",
+      "effect": "检查实体是否有库存组件，获取其容器并验证容器是否有'underwater_salvageable'标签。如果满足条件，返回容器对象；否则返回nil。"
+    },
+    {
+      "name": "OnLanded",
+      "effect": "当实体着陆时调用，检查实体是否无主且位于海洋上。如果是，则调用Submerge方法尝试潜水。"
+    },
+    {
+      "name": "Submerge",
+      "effect": "核心潜水方法。获取水下对象，若存在则返回。否则检查附近瓦片，根据海洋和陆地情况决定重新定位：可能移动实体到陆地或海洋位置并生成溅水效果，或调用MakeSunken使实体沉没。返回是否发生移动。"
+    },
+    {
+      "name": "MakeSunken",
+      "effect": "在指定位置检查是否为海洋，如果是则生成'underwater_salvageable'预制体，并将实体放入其库存。发布'on_submerge'事件，并可选生成溅水效果（通过nosplash参数控制）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含force_no_repositioning状态，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载force_no_repositioning状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除'onsink'和'on_landed'事件的监听器，用于组件清理。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "on_submerge"
+  ],
+  "events_listened": [
+    "onsink",
+    "on_landed"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MAX_WALKABLE_PLATFORM_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      18853,
+      20315,
+      18359,
+      23924,
+      13606,
+      13933,
+      13698
+    ],
+    "aspects": [
+      {
+        "aspect": "实体从加载范围移除事件",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "如果帝王蟹离开{{解释|加载范围}}，将会回到沉睡状态，由帝王蟹生成的[[巨钳]]、[[加农炮塔]]和[[浮冰地块]]都会消失"
+          }
+        ]
+      },
+      {
+        "aspect": "潜水或下水行为描述",
+        "evidence": [
+          {
+            "pageid": 18853,
+            "quote": "海洋拖网捕鱼器套装能在[[海]]上右键下水，其会展开变为'''海洋拖网捕鱼器（{{en|Ocean Trawler}}）'''。"
+          },
+          {
+            "pageid": 13933,
+            "quote": "被玩家攻击后，它会潜水并用角从[[船]]下钻洞，对船只造成 20 点伤害。"
+          },
+          {
+            "pageid": 13698,
+            "quote": "当 15 单位内有海鱼时，邪天翁会潜水捕捉海鱼，入水时会制造出一圈[[波浪]]"
+          }
+        ]
+      },
+      {
+        "aspect": "着陆事件响应",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "如果邪天翁来到陆地上，会飞天消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "获取水中物体方法",
+        "evidence": [
+          {
+            "pageid": 20315,
+            "quote": "可以通过[[夹夹绞盘]]进行…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "潜水",
+    "海洋",
+    "打捞",
+    "水下",
+    "沉没",
+    "溅水",
+    "重新定位",
+    "可打捞",
+    "船只"
+  ],
+  "gameplay_tags": [
+    "海洋",
+    "潜水",
+    "打捞",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dd99e89ec3845777543befb9dfa698869fbf876830696e3f70bdd2745996fec9",
+    "source_bytes": 6186,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094495788
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/slipperyfeet.lua"
+  },
+  "category": "component",
+  "display_name": "slipperyfeet",
+  "summary": "滑溜脚组件管理实体的滑溜度数据，基于移动速度和冰面环境因素进行积累。当滑溜度超过阈值时，会触发‘feetslipped’事件，可能影响玩家控制或动画。该组件参与冰上滑行的核心玩法，增加生存挑战和物理交互元素。",
+  "api": [
+    {
+      "name": "StartSlipperySource",
+      "effect": "启动滑溜源，设置布尔修改器并启动内部更新。副作用：若组件未开始，会激活事件监听和状态检查。"
+    },
+    {
+      "name": "StopSlipperySource",
+      "effect": "停止滑溜源，移除指定修改器。副作用：若无滑溜源存在，停止内部更新并可能重新调度慢速检查。"
+    },
+    {
+      "name": "GetSlipperyAndNearbyEnts",
+      "effect": "搜索以实体为中心半径12内带有‘slipperyfeettarget’标签的实体，返回第一个滑溜实体和最近实体。副作用：无直接状态改变，仅查询。"
+    },
+    {
+      "name": "SetCurrent",
+      "effect": "设置当前滑溜度为val。副作用：若val大于0，启动衰减更新；若val大于等于阈值，发布‘feetslipped’事件；若val为0，停止衰减更新。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "改变滑溜度增量delta。副作用：正值重置衰减速度为0；负值确保滑溜度不小于0，并更新当前值。"
+    },
+    {
+      "name": "CalcAccumulatingSpeed",
+      "effect": "根据实体物理速度计算滑溜积累速度，考虑旋转状态下的速度调整。副作用：无，仅返回计算值。"
+    },
+    {
+      "name": "DoDecay",
+      "effect": "执行滑溜度衰减，基于衰减加速度和平均速度减少滑溜度。副作用：若滑溜度降至0，停止衰减更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "主更新函数，每帧执行：检查冰面状态、附近滑溜实体、积累逻辑（考虑防滑剂池）和衰减逻辑。副作用：动态调整滑溜度、更新检查任务和启动/停止内部更新。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新处理，仅积累一帧或执行衰减。副作用：模拟离线期间的滑溜度变化。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化调试字符串，显示当前滑溜度、阈值和速度。副作用：无，仅用于调试输出。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载时初始化事件监听，取消延迟任务并直接执行初始化。副作用：设置事件监听器。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除时清理：取消延迟任务、移除事件监听、停止内部更新和检查任务。副作用：彻底清理组件状态。"
+    }
+  ],
+  "events_published": [
+    "feetslipped"
+  ],
+  "events_listened": [
+    "on_OCEAN_ICE_tile",
+    "newstate"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WILSON_RUN_SPEED",
+    "TUNING.WX78_SPIN_RUNSPEED_MULT",
+    "TUNING.WX78_SPIN_SLIPPERY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      34314,
+      23187,
+      15922,
+      18476,
+      14579,
+      15022,
+      15295
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及控制台命令、世界设置、装饰品、熔炉装备、雕刻品、巨型蔬果、天体英雄和墙的建造等内容，均未提及滑行、摩擦或与slipperyfeet组件相关的行为描述或数值表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "滑溜",
+    "冰面",
+    "滑行",
+    "脚滑",
+    "速度",
+    "衰减",
+    "积累",
+    "阈值",
+    "实体",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "物理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "28a8e92c38ed121910b8c6ef78c9492f2d0fe6ee5adcc856fe5985bb6683e4c7",
+    "source_bytes": 8970,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090419446
+  }
+}

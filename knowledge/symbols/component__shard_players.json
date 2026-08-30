@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_players.lua"
+  },
+  "category": "component",
+  "display_name": "shard_players",
+  "summary": "该组件在饥荒联机版中负责管理所有分片的玩家数量统计数据。它跟踪本地和次级分片的玩家总数、鬼魂数以及存活玩家数，并通过网络变量同步这些数据到客户端。在核心玩法中，它监听玩家状态变化事件，并发布玩家数量更新事件以供其他系统响应。",
+  "api": [
+    {
+      "name": "GetNumPlayers",
+      "effect": "返回当前总玩家数，包括所有分片上的玩家。无副作用，仅读取网络变量值。"
+    },
+    {
+      "name": "GetNumGhosts",
+      "effect": "返回当前鬼魂数。无副作用，仅读取网络变量值。"
+    },
+    {
+      "name": "GetNumAlive",
+      "effect": "返回当前活着的玩家数，计算为总玩家数减鬼魂数。无副作用，仅读取网络变量值。"
+    }
+  ],
+  "events_published": [
+    "ms_playercounts"
+  ],
+  "events_listened": [
+    "master_secondaryplayerschanged",
+    "ms_playerspawn",
+    "ms_playerleft",
+    "playercountsdirty"
+  ],
+  "netvars": [
+    "_numPlayers",
+    "_numGhosts"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18838,
+      10379,
+      18521,
+      50903,
+      15335,
+      10418,
+      10419,
+      13260
+    ],
+    "aspects": [
+      {
+        "aspect": "摔跤比赛奖励数量基于玩家数量计算",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "最少为 $2+\\frac{\\text{玩家数量}}{2}$，最多为 $4+\\frac{\\text{玩家数量}}{2}$"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "玩家数量",
+    "鬼魂",
+    "存活玩家",
+    "分片同步",
+    "网络变量",
+    "玩家状态",
+    "多人联机",
+    "人数统计"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "系统",
+    "多人游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "12391c2a9b237240f59904abbf383b70d335661829fc8cc9ea3a16febb47b167",
+    "source_bytes": 4907,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103455122
+  }
+}

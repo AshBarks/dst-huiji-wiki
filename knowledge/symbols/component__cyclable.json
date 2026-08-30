@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cyclable.lua"
+  },
+  "category": "component",
+  "display_name": "cyclable",
+  "summary": "Cyclable 组件管理实体的步进循环系统，维护当前步数和总步数，允许在多个状态间切换。通过回调函数响应步数变化，常用于交互或装饰性设置，如切换物品模式或属性。",
+  "api": [
+    {
+      "name": "SetNumSteps",
+      "effect": "设置总步数，参数 num 为整数，无返回值；直接修改 num_steps 值，影响后续循环范围，但未直接触发回调。"
+    },
+    {
+      "name": "SetOnCycleFn",
+      "effect": "设置循环回调函数，参数 fn 为函数，无返回值；存储回调函数，用于在步数变化时调用。"
+    },
+    {
+      "name": "SetStep",
+      "effect": "设置当前步数，参数 step 为整数，doer 为执行者，ignore_callback 为布尔值；将 step 限制在 1 到 num_steps 范围内并赋值给 self.step，如果 ignore_callback 为 false 且回调函数存在，则调用 oncyclefn 并传递当前步数和 doer。"
+    },
+    {
+      "name": "Cycle",
+      "effect": "循环步数，参数 doer 为执行者，negative 为布尔值；如果 negative 为 true，则反向递减步数（step 减 1，若 step <= 0 则重置为 num_steps），否则正向递增（step 加 1，若 step > num_steps 则重置为 1），然后调用 oncyclefn 并传递当前步数和 doer。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存数据，无参数，返回一个包含 step 字段的表，用于持久化当前步数。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据，参数 data 为表；如果 data 不为 nil，则从 data.step 读取步数（若不存在则使用当前值），然后调用 SetStep 应用步数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14683
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述海钓竿的基本用途和钓鱼失败条件，未涉及SetNumSteps、SetOnCycleFn、SetStep、Cycle、OnSave、OnLoad等组件能力的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "步进循环",
+    "状态切换",
+    "模式切换",
+    "属性切换",
+    "交互组件",
+    "步数管理",
+    "循环设置"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "交互",
+    "状态切换",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1e8ec74f675b1eb40d5bd1c4c0656a7ca1675740b803866f43444a334db09f6b",
+    "source_bytes": 1532,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099389148
+  }
+}

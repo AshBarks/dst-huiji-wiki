@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ocean.lua"
+  },
+  "category": "component",
+  "display_name": "ocean",
+  "summary": "Ocean组件管理海洋的流动数据，包括当前流动角度和速度。它通过方法提供这些数据的访问，可能用于控制海洋环境中的移动方向或交互行为。",
+  "api": [
+    {
+      "name": "GetCurrentAngle",
+      "effect": "返回当前海洋流动角度（度），该值在初始化时随机设置。"
+    },
+    {
+      "name": "GetCurrentSpeed",
+      "effect": "返回当前海洋流动速度，初始值为1。"
+    },
+    {
+      "name": "GetCurrentVec3",
+      "effect": "返回基于当前角度和速度计算的3D速度向量（x, y, z），y值为0。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18357,
+      65605,
+      15022,
+      15922,
+      18410,
+      13406,
+      13606
+    ],
+    "aspects": [
+      {
+        "aspect": "帆具最高速度数值",
+        "evidence": [
+          {
+            "pageid": 18357,
+            "quote": "展开的桅杆、飞翼风帆、龙翼桅杆分别能提供 2.5、4、2.5 单位的最高速度。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色在海面移动的速度加成",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "鹅人状态下伍迪的移动速度增加 40%，并且可以在[[海洋|水面]]上奔跑。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海洋",
+    "洋流",
+    "方向",
+    "速度",
+    "向量",
+    "角度",
+    "数据",
+    "流动"
+  ],
+  "gameplay_tags": [
+    "环境",
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8c7c337882769a299fda0994988acbc52792750ec3c3cf7ab282f45d69df61ec",
+    "source_bytes": 617,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110496279
+  }
+}

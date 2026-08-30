@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hull.lua"
+  },
+  "category": "component",
+  "display_name": "hull",
+  "summary": "Hull 组件管理船体相关数据，包括半径、木板对象和船沿对象。它参与船的部署过程，负责附加实体到船上并处理部署动画。组件在船放置时推开物品，并支持木板皮肤的保存与加载。",
+  "api": [
+    {
+      "name": "FinishRemovingEntity",
+      "effect": "检查传入实体是否有效，若有效则移除该实体。常用于清理附加到船的对象。"
+    },
+    {
+      "name": "AttachEntityToBoat",
+      "effect": "将对象附加到船，监听其 onremove 事件以自动清理；根据 parent_to_boat 参数决定是否父化对象或通过延迟任务设置位置。"
+    },
+    {
+      "name": "SetPlank",
+      "effect": "设置船的木板对象，用于后续部署动画。"
+    },
+    {
+      "name": "SetBoatLip",
+      "effect": "设置船沿对象，添加平台跟随者，附加到船，添加 ignoremouseover 标签，可选设置动画缩放。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置船体的半径值，影响船的可行走范围。"
+    },
+    {
+      "name": "GetRadius",
+      "effect": "返回船体的半径值。注意：参数 radius 未使用，直接返回存储值。"
+    },
+    {
+      "name": "OnDeployed",
+      "effect": "在船部署时调用，若存在 walkableplatform 组件则推开船上物品；播放船沿的放置动画；延迟隐藏并播放木板的放置动画。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含木板皮肤信息（skinname 和 skin_id）的表，若木板存在。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后若存在木板皮肤数据，使用 ReskinEntity 恢复木板的皮肤外观。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24451,
+      16185,
+      18057,
+      65881,
+      35670,
+      47009,
+      15526,
+      24074
+    ],
+    "aspects": [
+      {
+        "aspect": "船半径数值描述",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "船具有 4 {{解释|距离单位}}半径的圆形…"
+          },
+          {
+            "pageid": 24074,
+            "quote": "具有 1.6 {{解释|距离单位}}半径的圆…"
+          }
+        ]
+      },
+      {
+        "aspect": "船崩溃掉落行为描述",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "崩溃掉落 3 个[[木板]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "船部署过程描述",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "船套装在[[海洋]]上右键下水，会展开变为船。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "船体",
+    "船",
+    "木板",
+    "船沿",
+    "半径",
+    "部署",
+    "附加",
+    "清理",
+    "皮肤",
+    "动画"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "水上"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "60efbabca64250ec317a3277bbc7b10e88ef1cbe6ea54debce9034f345a2a6f1",
+    "source_bytes": 2174,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093108902
+  }
+}

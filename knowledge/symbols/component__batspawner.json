@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/batspawner.lua"
+  },
+  "category": "component",
+  "display_name": "batspawner",
+  "summary": "BatSpawner组件负责蝙蝠的生成和跟踪管理。它维护一个蝙蝠实例列表，并配置生成延迟与数量上限。该组件通过计算有效生成点避开危险区域，参与游戏中敌人生成机制，影响玩家生存威胁。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前蝙蝠数量和上限的调试字符串，用于调试信息显示。无副作用。"
+    },
+    {
+      "name": "SetSpawnTimes",
+      "effect": "设置蝙蝠的生成延迟时间，影响后续生成的时机。"
+    },
+    {
+      "name": "SetMaxBats",
+      "effect": "设置蝙蝠的最大生成数量，限制同时存在的蝙蝠数。"
+    },
+    {
+      "name": "StartTracking",
+      "effect": "开始跟踪一个蝙蝠实例，设置其不持久化，并监听'entitysleep'事件在蝙蝠睡眠时移除它，负责清理。"
+    },
+    {
+      "name": "GetSpawnPoint",
+      "effect": "根据输入点计算一个有效的生成点，避开不可通行或爬行区域，用于确定蝙蝠生成位置。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BIRD_SPAWN_DELAY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65605,
+      15244,
+      16419,
+      51046,
+      15245,
+      18410,
+      20719
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有给定页面摘录均未提及蝙蝠或蝙蝠生成器相关的内容，页面主要涉及生命值、理智值、降水、电路板、战争瓦器人等其他游戏机制，无任何与组件batspawner能力/行为语义的表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蝙蝠生成",
+    "刷新点",
+    "敌人生成",
+    "上限",
+    "延迟",
+    "追踪",
+    "移除",
+    "生成点",
+    "爬行区域"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d180869a3edf64c588be30724ce40fe41d0b2dd425bc757c4f4113ebce8b1e60",
+    "source_bytes": 1247,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105456918
+  }
+}

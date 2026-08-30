@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishingnet.lua"
+  },
+  "category": "component",
+  "display_name": "fishingnet",
+  "summary": "FishingNet 组件管理与渔网相关的操作，核心功能是通过 CastNet 方法生成抛网动画。它关联实体并参与捕鱼玩法，提供视觉反馈。",
+  "api": [
+    {
+      "name": "CastNet",
+      "effect": "在指定坐标生成渔网视觉化器预制体，调用其 BeginCast 方法开始抛网动画，并返回 true 表示操作成功。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      10355,
+      13779,
+      13437,
+      15922,
+      14579,
+      15295,
+      18359
+    ],
+    "aspects": [
+      {
+        "aspect": "渔网捕获行为描述",
+        "evidence": [
+          {
+            "pageid": 13779,
+            "quote": "也可以使用[[海洋拖网捕鱼器]]捕获"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "渔网",
+    "捕鱼",
+    "抛网",
+    "动画",
+    "视觉化",
+    "DST",
+    "组件",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "捕鱼"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6ab9de4e8742091a923f09846fef300d2d42da47cc8a24a0331479f5679e0fdb",
+    "source_bytes": 333,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099823530
+  }
+}

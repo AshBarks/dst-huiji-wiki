@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivaldecorranker.lua"
+  },
+  "category": "component",
+  "display_name": "carnivaldecorranker",
+  "summary": "该组件用于管理实体附近装饰品的总价值和排名。它追踪一定范围内的装饰品，计算总价值并根据预设阈值映射到排名，排名变化时触发回调。参与嘉年华等装饰相关活动，支持装饰品的动态添加与移除。",
+  "api": [
+    {
+      "name": "AddDecor",
+      "effect": "将指定装饰品添加到追踪列表中，更新总价值和排名。若装饰品无装饰组件或值为 nil，则不记录有效值。"
+    },
+    {
+      "name": "RemoveDecor",
+      "effect": "从追踪列表中移除指定装饰品，更新总价值和排名。"
+    },
+    {
+      "name": "UpdateDecorValue",
+      "effect": "重新计算总价值和排名：遍历追踪列表求和，根据总价值除以每级阈值并向上取整得到新排名（不超过最大排名）。若排名变化，调用 onrankchanged 回调函数，传递新旧排名和 snap 参数。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前追踪的装饰品数量、总价值和排名。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CARNIVAL_DECOR_RANK_RANGE",
+    "CARNIVAL_DECOR_VALUE_PER_RANK",
+    "CARNIVAL_DECOR_RANK_MAX"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      22095
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅涉及物品掉落和生成的描述，未提及与装饰组件能力（如添加、移除、更新装饰或调试字符串）相关的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "装饰排名",
+    "嘉年华装饰",
+    "装饰品价值",
+    "排名计算",
+    "装饰管理",
+    "排名系统",
+    "装饰组件",
+    "总价值"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "嘉年华",
+    "排名"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa1476ae941eec9fefdb4d028b8473064d89f2c9efdcb7390c3024bf1505a98d",
+    "source_bytes": 1796,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098794194
+  }
+}

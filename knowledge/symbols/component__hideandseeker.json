@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hideandseeker.lua"
+  },
+  "category": "component",
+  "display_name": "hideandseeker",
+  "summary": "组件管理躲猫猫游戏中寻找者玩家的位置数据，周期性验证玩家是否在游戏区域内。如果玩家远离，组件会发出警告消息；如果玩家返回或游戏结束，组件会相应处理并可能移除自身。核心玩法涉及多人躲猫猫游戏中的位置跟踪和状态通知。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，取消周期性验证任务，防止资源泄漏。"
+    },
+    {
+      "name": "SetGame",
+      "effect": "设置关联的躲猫猫游戏实例，更新abort_game_msg用于后续游戏结束时的消息。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前游戏实例和玩家是否远距离的调试字符串，用于开发调试。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13457,
+      14710,
+      10419,
+      15183,
+      23193,
+      23194,
+      23196,
+      28571
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及组件 hideandseeker 或其代码能力 OnRemoveFromEntity、SetGame、GetDebugString 的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "区域验证",
+    "远离警告",
+    "返回处理",
+    "游戏结束",
+    "自动移除",
+    "位置跟踪",
+    "状态通知",
+    "多人游戏"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "躲猫猫",
+    "多人游戏",
+    "位置验证"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "14d2a2ccde2adf5dcf3059733039549e0e291ae9a4cbda631dccdc36cf77b3c7",
+    "source_bytes": 1840,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100616189
+  }
+}

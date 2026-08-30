@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/formationleader.lua"
+  },
+  "category": "component",
+  "display_name": "formationleader",
+  "summary": "FormationLeader组件管理一个编队的领导者实体，控制编队类型、成员列表、目标、搜索半径、旋转角度和位置计算等数据。核心玩法涉及组织怪物或其他实体形成队形，跟随目标移动，动态调整队形大小和成员状态，以支持战斗和移动中的集体行为。",
+  "api": [
+    {
+      "name": "GetFormationSize",
+      "effect": "返回编队中非领导者成员的数量（即不包括其他FormationLeader实体）。无副作用。"
+    },
+    {
+      "name": "SetUp",
+      "effect": "设置编队目标为指定实体，并将第一个成员添加到编队。从成员的formationfollower组件获取编队类型，并调用NewFormationMember。副作用：修改编队状态和成员状态。"
+    },
+    {
+      "name": "OrganizeFormations",
+      "effect": "搜索附近所有相同类型的编队领导者，按年龄排序，确保当前实例为首要领导者，并调用makeotherformationssecondaryfn设置其他编队的参数（如半径、方向等）。副作用：可能修改其他编队的参数。"
+    },
+    {
+      "name": "IsFormationFull",
+      "effect": "检查编队成员数是否达到最大限制（max_formation_size）。无副作用。"
+    },
+    {
+      "name": "ValidMember",
+      "effect": "验证给定实体是否是有效的编队成员：检查实体有效性、是否在边缘地带、是否具有对应编队标签、健康状态是否死亡、以及是否有编队领导者。无副作用。"
+    },
+    {
+      "name": "DisbandFormation",
+      "effect": "解散编队：调用ondisbandfn回调，移除所有成员，重置目标和成员列表，然后移除自身实体。副作用：修改所有成员状态（如调用OnLostFormationMember），并移除实体。"
+    },
+    {
+      "name": "FormationSizeControl",
+      "effect": "如果编队成员数超过最大限制，按顺序移除多余成员。副作用：可能移除成员并触发其状态重置。"
+    },
+    {
+      "name": "NewFormationMember",
+      "effect": "添加成员到编队：验证成员有效性，调用成员的onenterformationfn回调，设置死亡、移除、边缘地带事件监听，更新成员和领导者状态，如果成员有follower组件则设置其目标。副作用：修改成员和领导者状态，添加事件监听。"
+    },
+    {
+      "name": "OnLostFormationMember",
+      "effect": "从编队移除成员：调用成员的onleaveformationfn回调，移除相关事件监听，重置成员状态（如清空formationleader引用、设置in_formation为false、丢弃战斗目标、停止跟随）。副作用：修改成员状态，移除事件监听。"
+    },
+    {
+      "name": "GetFormationPositions",
+      "effect": "根据当前旋转角度和半径计算每个成员在队形中的位置（圆形排列），并将位置设置到成员的formationfollower组件的formationpos字段。副作用：更新成员位置。"
+    },
+    {
+      "name": "IsFormationEmpty",
+      "effect": "检查编队是否没有成员。无副作用。"
+    },
+    {
+      "name": "GetTheta",
+      "effect": "根据方向（reverse标志）计算并返回新的旋转角度增量：如果reverse为真则减小角度，否则增加角度。无副作用。"
+    },
+    {
+      "name": "ValidateFormation",
+      "effect": "检查编队成员是否有效，如果成员无效则调用OnLostFormationMember移除。副作用：可能移除无效成员。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新编队状态：验证成员有效性，调用onupdatefn回调，增加年龄，组织编队，控制大小，如果目标有效则计算旋转和位置，如果编队为空或目标无效则解散。副作用：触发多个更新操作。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "onremove",
+    "onenterlimbo"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      13409,
+      20538,
+      15225,
+      17816,
+      13701,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与编队领导相关的能力表达，如编队大小管理、成员加入/丢失、组织编队等行为描述，所有页面集中在怪物战斗、物品效果或角色技能，不涉及编队机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "编队",
+    "队形",
+    "领导",
+    "跟随",
+    "怪物",
+    "组织",
+    "队列",
+    "战斗",
+    "移动",
+    "目标"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "移动",
+    "组织"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "17a89c95b3332a52709f78c8fdaa204b78a6a0d57c14fc61598d7ef1dc00740d",
+    "source_bytes": 8153,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100104229
+  }
+}

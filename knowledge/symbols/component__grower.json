@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grower.lua"
+  },
+  "category": "component",
+  "display_name": "grower",
+  "summary": "Grower组件管理种植点的肥沃度和作物生长数据。它负责种植作物、施肥增加肥沃周期，并在作物移除时减少肥沃度。该组件参与农业和生存玩法，允许玩家种植和收获作物。",
+  "api": [
+    {
+      "name": "IsEmpty",
+      "effect": "返回种植点是否为空的布尔值，基于self.isempty状态。"
+    },
+    {
+      "name": "IsFullFertile",
+      "effect": "返回是否肥沃满，即self.cycles_left是否大于等于self.max_cycles_left。"
+    },
+    {
+      "name": "GetFertilePercent",
+      "effect": "返回当前肥沃百分比，即self.cycles_left除以self.max_cycles_left。"
+    },
+    {
+      "name": "IsFertile",
+      "effect": "返回是否肥沃，即self.cycles_left是否大于0。"
+    },
+    {
+      "name": "Fertilize",
+      "effect": "使用施肥对象obj增加肥沃周期（self.cycles_left），并播放施肥声音；如果有setfertility回调则调用，返回true表示成功。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从data加载作物和肥沃周期数据，恢复种植点状态，设置isempty并调用setfertility回调。"
+    },
+    {
+      "name": "PlantItem",
+      "effect": "种植物品item，创建作物实体，设置生长参数，移除物品，推送\"itemplanted\"事件；返回true表示成功，否则返回false。"
+    },
+    {
+      "name": "RemoveCrop",
+      "effect": "移除作物实体，如果所有作物被移除则重置为空，减少肥沃周期（self.cycles_left），并调用setfertility回调。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前肥沃周期（self.cycles_left / self.max_cycles_left）。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置种植点，移除所有作物；如果reason为\"fire\"，则生成灰烬或烤种子等物品，否则移除NOCLICK标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "itemplanted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      13261,
+      51951,
+      14484,
+      14712,
+      14486,
+      18234,
+      19932
+    ],
+    "aspects": [
+      {
+        "aspect": "种植物品能力",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "沃姆伍德可以不使用[[耕地机]]和[[园艺锄]]，直接将[[种子]]种植在地上。"
+          },
+          {
+            "pageid": 14712,
+            "quote": "蘑菇农场将允许玩家种植蘑菇。"
+          },
+          {
+            "pageid": 14486,
+            "quote": "由[[种子]]或[[作物种子]]在[[农田地块]]上或[[沃姆伍...种植"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "种植",
+    "肥沃度",
+    "作物",
+    "肥料",
+    "生长",
+    "农场",
+    "土地",
+    "生产",
+    "资源",
+    "浇水"
+  ],
+  "gameplay_tags": [
+    "种植",
+    "农业",
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1d3a3b1fe5759ddb2c923ec808f59e39a3c0548b9b2716ffc448cb1bf122cc74",
+    "source_bytes": 5708,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108323452
+  }
+}

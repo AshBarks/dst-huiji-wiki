@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceantrawler.lua"
+  },
+  "category": "component",
+  "display_name": "oceantrawler",
+  "summary": "OceanTrawler组件管理一个海洋拖网器的状态，包括其降低和升起、鱼类捕获与存储、溢出处理以及逃脱事件。它参与的核心玩法是自动化海洋鱼类捕捞，允许玩家放置拖网器来被动收集鱼类。",
+  "api": [
+    {
+      "name": "Reset",
+      "effect": ""
+    },
+    {
+      "name": "OnSave",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad",
+      "effect": ""
+    },
+    {
+      "name": "HasCaughtItem",
+      "effect": ""
+    },
+    {
+      "name": "HasFishEscaped",
+      "effect": ""
+    },
+    {
+      "name": "IsLowered",
+      "effect": ""
+    },
+    {
+      "name": "Lower",
+      "effect": ""
+    },
+    {
+      "name": "GetOceanTrawlerSpawnChanceModifier",
+      "effect": ""
+    },
+    {
+      "name": "GetBait",
+      "effect": ""
+    },
+    {
+      "name": "ReleaseOverflowFish",
+      "effect": ""
+    },
+    {
+      "name": "Raise",
+      "effect": ""
+    },
+    {
+      "name": "Fix",
+      "effect": ""
+    },
+    {
+      "name": "StopUpdating",
+      "effect": ""
+    },
+    {
+      "name": "StartUpdate",
+      "effect": ""
+    },
+    {
+      "name": "SimulateCatchFish",
+      "effect": ""
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": ""
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": ""
+    },
+    {
+      "name": "OnUpdate",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_shoalfishhooked"
+  ],
+  "events_listened": [
+    "itemlose",
+    "itemget"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SEG_TIME",
+    "TUNING.OCEAN_TRAWLER_SPAWN_FISH_MODIFIER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      50898,
+      14676,
+      22181,
+      15722,
+      51221,
+      51498,
+      13260
+    ],
+    "aspects": [
+      {
+        "aspect": "下水操作描述",
+        "evidence": [
+          {
+            "pageid": 18853,
+            "quote": "海洋拖网捕鱼器套装能在[[海]]上右键下水"
+          }
+        ]
+      },
+      {
+        "aspect": "捕鱼效率描述",
+        "evidence": [
+          {
+            "pageid": 18853,
+            "quote": "搭配固定的邪天翁斑鱼鱼群或[[海草]]的海洋拖网捕鱼器能快速捕获大量海鱼"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏描述体现捕获能力",
+        "evidence": [
+          {
+            "pageid": 18853,
+            "quote": "海洋拖网捕鱼器有 4 个物品栏，可以放入生食"
+          }
+        ]
+      },
+      {
+        "aspect": "诱饵放置机制",
+        "evidence": [
+          {
+            "pageid": 14676,
+            "quote": "玩家可以在其上放诱饵"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "拖网器",
+    "捕鱼",
+    "海洋鱼",
+    "溢出",
+    "逃脱",
+    "诱饵",
+    "捕获",
+    "自动化",
+    "设备",
+    "存储"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "自动化",
+    "海洋",
+    "捕鱼"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "534623b9e60a0af35c8f577d6c9b8d00ed808c027ef9483f8e209866f772b457",
+    "source_bytes": 14608,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102307076
+  }
+}

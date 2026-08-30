@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playeractionpicker.lua"
+  },
+  "category": "component",
+  "display_name": "playeractionpicker",
+  "summary": "PlayerActionPicker 组件管理玩家动作的选择逻辑，根据鼠标位置、目标实体、装备物品和游戏状态动态生成可用动作列表。它参与玩家与世界的交互核心玩法，如攻击、检查、使用物品、掌舵和AOE目标选择。",
+  "api": [
+    {
+      "name": "RegisterContainer",
+      "effect": "注册容器到组件的容器列表中，并设置当容器实体移除时自动调用UnregisterContainer进行清理。"
+    },
+    {
+      "name": "UnregisterContainer",
+      "effect": "从容器列表中移除指定容器，并取消之前注册的onremove事件监听器。"
+    },
+    {
+      "name": "HasContainerWidgetAction",
+      "effect": "返回布尔值，指示是否有容器部件已注册到列表中，用于判断是否存在容器相关的界面动作。"
+    },
+    {
+      "name": "PushActionFilter",
+      "effect": "将动作过滤器函数及其优先级推入过滤器栈中，并更新当前激活的最高优先级过滤器。"
+    },
+    {
+      "name": "PopActionFilter",
+      "effect": "从过滤器栈中移除指定的过滤器函数（或栈顶过滤器），并更新当前激活的过滤器。"
+    },
+    {
+      "name": "SortActionList",
+      "effect": "对动作列表按优先级降序排序，过滤掉未通过当前激活的动作过滤器（若存在）的动作，并为每个动作创建BufferedAction实例，返回排序后的列表。"
+    },
+    {
+      "name": "GetSceneActions",
+      "effect": "获取对场景中使用物品的可用动作，考虑左右键点击和物品的固有场景动作；若无动作且满足条件则默认返回WALKTO动作。"
+    },
+    {
+      "name": "GetUseItemActions",
+      "effect": "获取对目标使用物品的可用动作，基于物品的USEITEM类型收集动作并排序。"
+    },
+    {
+      "name": "GetSteeringActions",
+      "effect": "如果玩家正在掌舵船只，根据左右键返回掌舵或停止掌舵的动作；否则返回nil。"
+    },
+    {
+      "name": "GetCannonAimActions",
+      "effect": "如果玩家正在操作船炮，根据左右键返回瞄准或停止瞄准的动作；否则返回nil。"
+    },
+    {
+      "name": "GetPointActions",
+      "effect": "获取在指定位置使用物品的可用动作，考虑目标、左右键和堆叠控制，为DROP动作设置整堆选项。"
+    },
+    {
+      "name": "GetPointSpecialActions",
+      "effect": "通过自定义的pointspecialactionsfn函数获取特殊点动作，并排序；若函数不存在则返回空列表。"
+    },
+    {
+      "name": "GetDoubleClickActions",
+      "effect": "通过自定义的doubleclickactionsfn函数获取双击动作，并排序；若函数不存在则返回空列表。"
+    },
+    {
+      "name": "GetEquippedItemActions",
+      "effect": "获取装备物品对目标的可用动作，基于物品的EQUIPPED类型收集动作并排序。"
+    },
+    {
+      "name": "GetInventoryActions",
+      "effect": "获取库存中物品的可用动作，考虑左右键、堆叠控制和强制交易；若强制交易且物品未锁定，则默认返回DROP动作。"
+    },
+    {
+      "name": "GetLeftClickActions",
+      "effect": "根据鼠标位置、目标、装备物品和活跃物品，整合掌舵、船炮、物品使用、场景检查、攻击等多种情况，返回左键点击的可用动作列表。"
+    },
+    {
+      "name": "GetRightClickActions",
+      "effect": "根据鼠标位置、目标、装备物品、活跃物品和法术书，整合掌舵、船炮、容器交互、物品使用、场景动作、点动作等，返回右键点击的可用动作列表。"
+    },
+    {
+      "name": "DoGetMouseActions",
+      "effect": "主入口函数，处理鼠标输入、AOE目标选择和黑暗情况，调用GetLeftClickActions和GetRightClickActions，并过滤重复动作或UI动作，返回左右键动作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      15022,
+      16594,
+      18188,
+      13602,
+      13606,
+      28751,
+      46847
+    ],
+    "aspects": [
+      {
+        "aspect": "右键点击动作说明",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "右键点击任何位置即可停止掌舵。"
+          },
+          {
+            "pageid": 18188,
+            "quote": "直接右键点击大炮填装"
+          }
+        ]
+      },
+      {
+        "aspect": "大炮瞄准与装填动作描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "先用鼠标持有炮弹点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装，再左键点击大炮进"
+          }
+        ]
+      },
+      {
+        "aspect": "左键点击动作说明",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "再左键点击大炮进"
+          }
+        ]
+      },
+      {
+        "aspect": "物品使用交互描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "先用鼠标持有炮弹点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装，再左键点击大炮进"
+          },
+          {
+            "pageid": 13606,
+            "quote": "玩家可以给沉睡形态的帝王蟹嵌入 9 颗宝石或珍珠的珍珠来唤醒他。"
+          }
+        ]
+      },
+      {
+        "aspect": "转向动作的鼠标交互描述",
+        "evidence": [
+          {
+            "pageid": 16594,
+            "quote": "在掌舵时，用带有“设定航向”的鼠标点击会将桅杆的动力方向转到接近船中心与鼠标点"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "玩家动作",
+    "鼠标点击",
+    "左键点击",
+    "右键点击",
+    "装备使用",
+    "物品管理",
+    "可用动作",
+    "特殊动作",
+    "双击操作",
+    "范围攻击"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "交互",
+    "战斗",
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0576b7dfd2ea406b96e819bfa337360fe87e63e62f6e03934aecf1e6f1edeeb6",
+    "source_bytes": 21757,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111060775
+  }
+}

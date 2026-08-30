@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/focalpoint.lua"
+  },
+  "category": "component",
+  "display_name": "focalpoint",
+  "summary": "focalpoint 组件管理客户端相机焦点源，控制相机偏移以聚焦于特定目标。它基于优先级和距离选择最佳焦点，用于场景视觉效果或事件高亮。组件参与核心玩法中的视觉体验调整。",
+  "api": [
+    {
+      "name": "Reset",
+      "effect": "重置相机焦点：清除当前焦点，调用 TheCamera:SetDefault() 恢复默认相机状态。若参数 no_snap 为 false，则调用 TheCamera:Snap() 立即应用相机位置。"
+    },
+    {
+      "name": "StartFocusSource",
+      "effect": "添加或更新焦点源：在内部 targets 表中存储源参数（目标、范围、优先级等），监听源实体的 'onremove' 事件。若源已存在则更新参数；立即调用 CameraUpdate(0) 触发相机更新。"
+    },
+    {
+      "name": "StopFocusSource",
+      "effect": "移除焦点源：从 targets 表中删除指定源或源的特定 ID，并移除对应的事件监听。若被移除的焦点是当前焦点，则调用 Reset(true) 重置相机。"
+    },
+    {
+      "name": "RemoveAllFocusSources",
+      "effect": "移除所有焦点源：遍历并停止所有已注册的焦点源，然后调用 Reset(no_snap) 重置相机。"
+    },
+    {
+      "name": "PushTempFocus",
+      "effect": "已弃用方法：调用时仅打印弃用警告，无实际功能或副作用。"
+    },
+    {
+      "name": "CameraUpdate",
+      "effect": "更新相机焦点：遍历所有有效焦点源，根据优先级和距离选择最佳焦点；计算相机偏移并设置到 TheCamera。若最佳焦点变化，调用其 updater 的 ActiveFn 和 UpdateFn；若无有效焦点则重置相机。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串：包含当前相机偏移、增益、焦点信息以及所有注册的焦点源详情（ID、优先级、源、目标、范围）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      13701,
+      16419,
+      15225,
+      15734,
+      20714,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论游戏实体、物品、攻击、伤害、仇恨范围、生成机制等，未涉及 focalpoint 组件的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "焦点",
+    "相机偏移",
+    "优先级",
+    "范围",
+    "源",
+    "目标",
+    "更新",
+    "重置",
+    "调试",
+    "视觉效果"
+  ],
+  "gameplay_tags": [
+    "视觉效果",
+    "相机控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1b3336d21f5a8a2ed6d78a44cd8f359a67909b256be03c39d5168bf9daa52f53",
+    "source_bytes": 6187,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100055913
+  }
+}

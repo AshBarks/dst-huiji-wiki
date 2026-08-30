@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ghostlyelixir.lua"
+  },
+  "category": "component",
+  "display_name": "ghostlyelixir",
+  "summary": "该组件管理灵药的应用逻辑，核心玩法是当灵药被使用时，通过Apply方法处理目标选择和效果执行，并移除灵药实体。主要参与游戏中的增益效果和物品消耗机制，例如为鬼魂或玩家提供特殊能力。",
+  "api": [
+    {
+      "name": "Apply",
+      "effect": "当被调用时，检查目标是否有'elixir_drinker'标签，若有则获取其inventoryitem的所有者作为目标。然后调用目标的'ghostlyelixirable'组件的GetApplyToTarget方法确定实际目标。如果目标有效且灵药有doapplyelixerfn函数，则执行该函数。成功后，如果灵药可堆叠则移除一个堆叠，否则移除整个灵药实体。返回成功状态和原因。副作用：成功应用后会移除或减少灵药实体，并可能改变目标状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      16419,
+      15022,
+      15922,
+      15186,
+      18838,
+      10418,
+      20714
+    ],
+    "aspects": [
+      {
+        "aspect": "草药应用增益机制",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "温蒂可以右键使用灵体草药，为她的[[阿比盖尔]]提供增益。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "灵药",
+    "应用",
+    "目标",
+    "效果",
+    "移除",
+    "堆叠",
+    "鬼魂",
+    "增益"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "增益",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7dd5bf484054903c5d0dac1e39ffbdcbf51d399c03f03d44e5f732d07756f901",
+    "source_bytes": 861,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108098176
+  }
+}

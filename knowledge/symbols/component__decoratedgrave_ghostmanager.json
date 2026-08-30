@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/decoratedgrave_ghostmanager.lua"
+  },
+  "category": "component",
+  "display_name": "decoratedgrave_ghostmanager",
+  "summary": "该组件负责管理游戏中的装饰坟墓及其关联的幽灵守卫实体。它跟踪已注册的装饰坟墓和拥有“ghostlyfriend”标签的玩家（如温蒂），并在更新周期中根据玩家位置和技能状态，自动生成或移除幽灵守卫，以增强墓地装饰和幽灵相关玩法。",
+  "api": [
+    {
+      "name": "RegisterDecoratedGrave",
+      "effect": "注册一个装饰坟墓到管理器中。若坟墓有效且未注册，则将其添加到内部列表，并启动组件更新。副作用：监听坟墓的“onremove”事件，以便后续清理。"
+    },
+    {
+      "name": "UnregisterDecoratedGrave",
+      "effect": "注销一个装饰坟墓。若坟墓已注册，则从列表中移除并触发移除逻辑。副作用：若无剩余坟墓或幽灵朋友，则停止组件更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定期更新逻辑，由系统按帧调用。检查幽灵朋友（如温蒂）的技能“wendy_gravestone_1”激活状态，并在其附近装饰坟墓中生成幽灵守卫（graveguard_ghost），直至达到上限。同时，根据玩家距离处理幽灵的消失或死亡延迟。副作用：生成新幽灵实体、更新坟墓状态、可能停止组件更新。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，显示当前注册的坟墓数量和已生成的幽灵数量。无游戏性副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "WENDYSKILL_GRAVESTONE_GHOSTCOUNT",
+    "WENDYSKILL_GRAVEGHOST_DEADTIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      13556,
+      15186,
+      10413,
+      24028,
+      23187,
+      13701,
+      16419
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 component__decoratedgrave_ghostmanager 的能力 RegisterDecoratedGrave, UnregisterDecoratedGrave, OnUpdate, GetDebugString 相关的玩家语言表达。页面内容主要涉及角色能力、生物行为、物品效果等，如坟墓美化技能和幽灵生成，但未直接描述该组件的注册、注销、更新或调试功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "坟墓",
+    "幽灵",
+    "温蒂",
+    "墓地",
+    "鬼魂",
+    "装饰",
+    "管理",
+    "重生",
+    "死亡",
+    "技能"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存",
+    "鬼魂"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "112c5fd7231cc85b3c566d2b9a0c6b30df4ca4fa5484c32d98372ba0a13cb076",
+    "source_bytes": 8391,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106727397
+  }
+}

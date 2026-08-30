@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stuckdetection.lua"
+  },
+  "category": "component",
+  "display_name": "stuckdetection",
+  "summary": "组件 StuckDetection 用于监控实体是否在移动中卡住，基于位置变化和时间阈值进行判断。它管理上次位置、开始时间和卡住时间阈值等数据，参与核心玩法中的寻路和移动辅助，防止实体因卡住而无法正常行动。",
+  "api": [
+    {
+      "name": "SetTimeToStuck",
+      "effect": "设置卡住判定所需的时间阈值。参数 t 为秒数，直接修改 self.timetostuck，无其他副作用。"
+    },
+    {
+      "name": "IsStuck",
+      "effect": "检查实体当前是否卡住。基于 Transform:GetWorldPosition 获取当前位置，与上次位置比较距离。若距离大于 STUCK_DIST_SQ（0.05²）或首次检测，则重置开始时间；否则，当当前时间超过开始时间加阈值时返回 true。副作用：更新 self.lastx、self.lastz 和 self.starttime。"
+    },
+    {
+      "name": "GetRemainingTime",
+      "effect": "返回距离判定卡住还剩余的时间。若 self.starttime 为 nil 则返回 -1，否则计算 (self.timetostuck + self.starttime) - GetTime() 的结果。无副作用，仅读取数据。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置卡住检测状态。若 self.starttime 不为 nil，则更新 self.lastx、self.lastz 为当前位置，并重置 self.starttime 为当前时间。仅在已开始检测时生效。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15303,
+      65605,
+      13701,
+      15922,
+      14938,
+      20092,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "卡住回避行为描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "织影者追击目标时会有意绕开远古大门，以避免被远古大门卡住。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "卡住",
+    "检测",
+    "位置",
+    "时间",
+    "重置",
+    "阈值",
+    "剩余时间",
+    "移动卡顿",
+    "状态监控",
+    "寻路辅助"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "移动",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4bbc06274fa46b7280daf844797f1a3ac84d9b7ca8525974be0e5a8d33146172",
+    "source_bytes": 1066,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093222512
+  }
+}

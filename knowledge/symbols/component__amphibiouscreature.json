@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/amphibiouscreature.lua"
+  },
+  "category": "component",
+  "display_name": "amphibiouscreature",
+  "summary": "此组件用于管理两栖生物在陆地和水域之间的状态转换。它跟踪实体的当前位置环境，自动切换对应的动画库并触发相关回调函数。组件参与生物的移动机制，确保它们在水陆环境中正确表现动画和行为。",
+  "api": [
+    {
+      "name": "SetBanks",
+      "effect": "设置陆地和水域对应的动画库名。副作用：更新组件的 land_bank 和 ocean_bank 属性。"
+    },
+    {
+      "name": "SetTransitionDistance",
+      "effect": "设置水陆转换的距离阈值。副作用：更新组件的 transitiondistance 属性。"
+    },
+    {
+      "name": "GetTransitionDistance",
+      "effect": "获取当前水陆转换的距离阈值。返回 transitiondistance 的值。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新检查实体位置是否在陆地或水域。如果环境变化且不在跳跃状态，调用 OnEnterOcean 或 OnExitOcean 触发转换。"
+    },
+    {
+      "name": "ShouldTransition",
+      "effect": "根据指定坐标检查是否应该触发环境转换。返回布尔值：如果在水中则检查是否到达陆地，反之亦然。"
+    },
+    {
+      "name": "OnEnterOcean",
+      "effect": "触发进入水域行为。副作用：切换水域动画库，设置 in_water 为 true，添加 'swimming' 标签，并调用 enterwaterfn 回调函数（如果已设置）。"
+    },
+    {
+      "name": "OnExitOcean",
+      "effect": "触发退出水域行为。副作用：切换陆地动画库，设置 in_water 为 false，移除 'swimming' 标签，并调用 exitwaterfn 回调函数（如果已设置）。"
+    },
+    {
+      "name": "SetEnterWaterFn",
+      "effect": "设置进入水域时调用的回调函数。副作用：更新组件的 enterwaterfn 属性。"
+    },
+    {
+      "name": "SetExitWaterFn",
+      "effect": "设置退出水域时调用的回调函数。副作用：更新组件的 exitwaterfn 属性。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "获取调试信息字符串，返回当前是否在水中的状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      18853,
+      20315,
+      15327,
+      18359,
+      34954,
+      18572,
+      22707
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录未提及amphibiouscreature组件或其能力清单中的任何行为语义，如过渡距离设置、进入/退出海洋函数等，页面主题集中于世界翻新、物品、海洋区域、鸟类、玩具、溺水、温度和袭击，未涉及该组件的具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "两栖",
+    "水陆",
+    "游泳",
+    "陆地",
+    "海洋",
+    "动画切换",
+    "环境",
+    "地形",
+    "生物移动",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d7a2c3108cd3888853236d61ceda5e68563a51528a78ea33616fc5f798003e7",
+    "source_bytes": 2698,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090474694
+  }
+}

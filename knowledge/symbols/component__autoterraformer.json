@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/autoterraformer.lua"
+  },
+  "category": "component",
+  "display_name": "autoterraformer",
+  "summary": "AutoTerraformer组件管理自动地形改造功能，通过容器组件存储草皮物品，并在实体移动时自动改变地面瓦片类型。它参与游戏的建造和环境改造玩法，支持放置或恢复地形。",
+  "api": [
+    {
+      "name": "FinishTerraforming",
+      "effect": "完成地形改造，推送'onterraform'事件，如果实体有有限用途组件则使用一次，调用onfinishterraformingfn回调。"
+    },
+    {
+      "name": "DoTerraform",
+      "effect": "执行地形改造逻辑，检查目标瓦片类型，放置草皮或恢复底层瓦片，移除容器物品，处理土壤实体碰撞事件。"
+    },
+    {
+      "name": "StartTerraforming",
+      "effect": "开始地形改造，重置延迟并启动组件更新。"
+    },
+    {
+      "name": "StopTerraforming",
+      "effect": "停止地形改造，停止组件更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "周期更新函数，根据实体位置和重复延迟触发地形改造。"
+    }
+  ],
+  "events_published": [
+    "onterraform"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "AUTOTERRAFORMER_REPEAT_DELAY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24866,
+      24862,
+      51494,
+      34794,
+      18509,
+      65605,
+      65881,
+      16640
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及autotterraformer组件或其相关能力（如地形改造动作），所有页面讨论的是其他游戏实体和机制，与代码能力清单中的FinishTerraforming, DoTerraform, StartTerraforming, StopTerraforming, OnUpdate无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "自动改造",
+    "地形",
+    "草皮",
+    "建造",
+    "瓦片",
+    "地图",
+    "地面",
+    "工具",
+    "铺地"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "环境改造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d8467999677ecae7dd057a9745dd646931b126c37b1862bb2e890e8fca9b08a7",
+    "source_bytes": 4476,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095271788
+  }
+}

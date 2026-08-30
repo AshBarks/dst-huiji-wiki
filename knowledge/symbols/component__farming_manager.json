@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farming_manager.lua"
+  },
+  "category": "component",
+  "display_name": "farming_manager",
+  "summary": "farming_manager组件管理土壤的湿度与养分数据，用于支持植物生长和农业系统。它周期性更新土壤湿度，并处理施肥、浇水等操作。组件还控制杂草的季节性生成和果蝇事件的触发时机。",
+  "api": [
+    {
+      "name": "GetTileNutrients",
+      "effect": "获取指定世界坐标(x,y)处的土壤养分值，返回三个数值分别代表不同养分类型。如果坐标无数据，则从地形信息中返回默认值。"
+    },
+    {
+      "name": "SetTileNutrients",
+      "effect": "设置指定世界坐标(x,y)处的土壤养分值为n1、n2、n3，并更新营养覆盖层的视觉显示。"
+    },
+    {
+      "name": "AddTileNutrients",
+      "effect": "向指定世界坐标(x,y)的土壤添加养分，每个养分值增加对应增量，结果限制在0到100之间。"
+    },
+    {
+      "name": "CycleNutrientsAtPoint",
+      "effect": "在指定点(x,y,z)执行养分循环：消耗指定类型的养分，并恢复指定类型的养分，可选测试模式仅检查是否耗尽。"
+    },
+    {
+      "name": "GetTileBelowSoil",
+      "effect": "获取指定世界坐标(x,y)处土壤下方的原始地形类型。"
+    },
+    {
+      "name": "AddSoilMoistureAtPoint",
+      "effect": "在指定点(x,y,z)改变土壤湿度，增加或减少湿度值，仅影响已注册的农业土壤。"
+    },
+    {
+      "name": "IsSoilMoistAtPoint",
+      "effect": "检查指定点(x,y,z)的土壤是否湿润，返回布尔值；如果土壤数据不存在，则根据世界湿度状态判断。"
+    }
+  ],
+  "events_published": [
+    "ms_fruitflytimerfinished"
+  ],
+  "events_listened": [
+    "worldmapsetsize",
+    "onterraform",
+    "ms_registersoildrinker",
+    "ms_unregistersoildrinker",
+    "ms_fruitflyspawneractive",
+    "ms_lordfruitflykilled",
+    "ms_oncroprotted",
+    "season"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SOIL_RAIN_MOD",
+    "SOIL_MIN_DRYING_TEMP",
+    "SOIL_MAX_DRYING_TEMP",
+    "SOIL_MIN_TEMP_DRY_RATE",
+    "SOIL_MAX_TEMP_DRY_RATE",
+    "SOIL_MAX_MOISTURE_VALUE",
+    "LORDFRUITFLY_RESPAWN_TIME",
+    "SPAWN_LORDFRUITFLY",
+    "LORDFRUITFLY_INITIALSPAWN_TIME",
+    "STARTING_NUTRIENTS_MIN",
+    "STARTING_NUTRIENTS_MAX",
+    "SOIL_MOISTURE_UPDATE_TIME",
+    "LORDFRUITFLY_SPAWNERRADIUS",
+    "LORDFRUITFLY_SPAWNERRCOUNT",
+    "SEG_TIME",
+    "SEASONAL_WEED_SPAWN_CAHNCE",
+    "LORDFRUITFLY_CROP_ROTTED_ADVANCE_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14486,
+      15797,
+      19695,
+      21485,
+      18545,
+      14485,
+      14579,
+      14711
+    ],
+    "aspects": [
+      {
+        "aspect": "土壤水分提升操作",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "使用[[浇水壶]]等方式来提升农田地块的土壤水分"
+          }
+        ]
+      },
+      {
+        "aspect": "土壤水分状态描述",
+        "evidence": [
+          {
+            "pageid": 14486,
+            "quote": "如果农田地块是潮湿的，即土壤水分不为 0 时"
+          }
+        ]
+      },
+      {
+        "aspect": "土壤营养初始值说明",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "初始营养物质在 25~50 不等"
+          }
+        ]
+      },
+      {
+        "aspect": "土壤营养提升操作",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "使用[[肥料]]来提升农田地块的土壤营养"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "土壤湿度",
+    "养分管理",
+    "杂草生成",
+    "果蝇",
+    "浇水",
+    "施肥",
+    "土壤",
+    "农业",
+    "植物生长",
+    "季节变化"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "种植",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+    "source_bytes": 22986,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107254664
+  }
+}

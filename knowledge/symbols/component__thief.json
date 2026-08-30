@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/thief.lua"
+  },
+  "category": "component",
+  "display_name": "thief",
+  "summary": "Thief 组件管理偷窃行为，允许实体从其他实体（如玩家或容器）中偷取物品。它通过检查物品的 'nosteal' 标签来决定物品是否可偷，并参与战斗和生存玩法。组件可触发物品掉落和相关事件，并提供回调函数用于自定义偷窃后行为。",
+  "api": [
+    {
+      "name": "SetOnStolenFn",
+      "effect": "设置一个回调函数，当物品被成功偷取时调用。该函数接收窃贼实体、受害者实体和被偷物品作为参数。"
+    },
+    {
+      "name": "StealItem",
+      "effect": "从受害者身上偷取指定物品或任意可偷物品。如果 attack 参数为 true，会尝试攻击受害者（如果受害者有 inventory、equippable、inventoryitem 和 owner 组件）。成功偷取物品时，物品会从受害者身上掉落，受害者会推送 'onitemstolen' 事件，并调用设置的回调函数（如果有）。返回 true 如果成功偷到物品，否则 false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13707,
+      15012,
+      15399,
+      34314,
+      15642,
+      15587,
+      24364,
+      15566
+    ],
+    "aspects": [
+      {
+        "aspect": "偷窃物品行为描述",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "坎普斯会偷走地面上的绝大部分[[物品]]"
+          }
+        ]
+      },
+      {
+        "aspect": "防护偷窃能力描述",
+        "evidence": [
+          {
+            "pageid": 15012,
+            "quote": "也能够防护[[坎普斯]]的偷窃。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "偷窃",
+    "物品掉落",
+    "偷取物品",
+    "偷窃事件",
+    "偷窃机制",
+    "回调偷窃",
+    "物品可偷"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
+    "source_bytes": 1984,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092301108
+  }
+}

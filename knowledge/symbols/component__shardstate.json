@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shardstate.lua"
+  },
+  "category": "component",
+  "display_name": "shardstate",
+  "summary": "ShardState组件管理饥荒联机版中的主世界会话标识符，用于标识主机会话以支持联机游戏。它监听主机的新会话标识符事件，并在客户端侧同步该标识符到网络缓存，确保游戏状态和用户会话的正确连接。",
+  "api": [
+    {
+      "name": "GetMasterSessionId",
+      "effect": "返回当前主世界会话标识符的字符串值，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_newmastersessionid",
+    "mastersessioniddirty"
+  ],
+  "netvars": [
+    "mastersessionid"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      13156,
+      51951,
+      47009,
+      21137,
+      20714,
+      15922,
+      70763
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 GetMasterSessionId 的任何能力或行为表达。所有页面内容均聚焦于其他游戏机制、角色属性或物品行为，与 GetMasterSessionId 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "主世界",
+    "会话",
+    "同步",
+    "联机",
+    "主机",
+    "网络",
+    "客户端",
+    "服务器",
+    "连接",
+    "状态"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "联机",
+    "同步",
+    "网络"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a85b4573067d30632368ad3e3c522c7428d77ed7cd073bb1621eaa2da6be49c9",
+    "source_bytes": 2029,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112326204
+  }
+}

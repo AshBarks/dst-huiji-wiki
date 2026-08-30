@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wx78_taserbuildup.lua"
+  },
+  "category": "component",
+  "display_name": "wx78_taserbuildup",
+  "summary": "该组件管理电击积累（Taser Buildup）数值系统，包括积累值、衰减与增益机制。当角色受到攻击时积累电荷，达到最大值后自动释放电击爆炸，造成范围伤害并触发视觉特效。组件处理特效的生成、更新与重置，并支持保存加载。",
+  "api": [
+    {
+      "name": "SetMaxBuildup(max)",
+      "effect": "设置电荷积累的最大值。"
+    },
+    {
+      "name": "GetMaxBuildup()",
+      "effect": "返回电荷积累的最大值。"
+    },
+    {
+      "name": "SetCurrentBuildup(value)",
+      "effect": "设置当前积累值（限制在0到最大值之间）。若新值达到最大值且旧值未达，则触发释放爆炸；若从0变为正，启动组件更新；若从正变为0，停止更新。可能触发角色对话。"
+    },
+    {
+      "name": "GetBuildupPercent()",
+      "effect": "返回当前积累值与最大值的百分比。"
+    },
+    {
+      "name": "SetBuildupPercent(percent)",
+      "effect": "设置积累百分比，等价于SetCurrentBuildup(percent * max)。"
+    },
+    {
+      "name": "SetBuildupDrainRate(rate)",
+      "effect": "设置积累值的衰减速率。"
+    },
+    {
+      "name": "GetBuildupDrainRate()",
+      "effect": "返回积累值的衰减速率。"
+    },
+    {
+      "name": "SetBuildupGainRate(rate)",
+      "effect": "设置积累值的增益倍率。"
+    },
+    {
+      "name": "GetBuildupGainRate()",
+      "effect": "返回积累值的增益倍率。"
+    },
+    {
+      "name": "SetBlastDamage(damage)",
+      "effect": "设置电击爆炸的基础伤害值。"
+    },
+    {
+      "name": "GetBlastDamage()",
+      "effect": "返回电击爆炸的基础伤害值。"
+    },
+    {
+      "name": "SetBlastRadius(radius)",
+      "effect": "设置电击爆炸的基础半径。"
+    },
+    {
+      "name": "GetBlastRadius()",
+      "effect": "返回电击爆炸的基础半径。"
+    },
+    {
+      "name": "SetDetonateTimer(time, cb)",
+      "effect": "设置引爆倒计时（秒）和可选的回调函数。倒计时结束时执行爆炸。"
+    },
+    {
+      "name": "DetachFX()",
+      "effect": "分离视觉效果实体，移除相关事件监听。"
+    },
+    {
+      "name": "SpawnFX()",
+      "effect": "生成电击特效实体并设置归属。"
+    },
+    {
+      "name": "ReleaseBuildup(time, cb)",
+      "effect": "释放积累值，若百分比不低于0.25则启动引爆倒计时，触发特效闪光并设置回调。"
+    },
+    {
+      "name": "DoShockExplosion()",
+      "effect": "执行电击爆炸：根据积累百分比造成范围伤害，触发“electrocute”事件，重置积累值，分离并重新生成特效，调用回调（如有），延迟触发爆炸后对话。"
+    },
+    {
+      "name": "OnAttacked()",
+      "effect": "响应被攻击事件，增加积累值并可能缩短效果冷却时间。"
+    },
+    {
+      "name": "DoDelta(delta)",
+      "effect": "对当前积累值进行增减操作，并更新时间戳。"
+    },
+    {
+      "name": "GetEffectCooldown()",
+      "effect": "计算下次闪光特效的冷却时间，基于积累百分比和随机值。"
+    },
+    {
+      "name": "GetEffectDuration()",
+      "effect": "计算闪光特效的持续时间，基于积累百分比和随机值。"
+    },
+    {
+      "name": "FlashEffect()",
+      "effect": "若积累百分比不低于0.25，触发闪光特效，持续时间和强度与百分比相关。"
+    },
+    {
+      "name": "OnUpdate(dt)",
+      "effect": "组件更新函数：处理引爆倒计时、效果冷却倒计时和积累值衰减。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存当前积累值到存档数据。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "从存档数据加载积累值。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回当前积累值的调试字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "electrocute"
+  ],
+  "events_listened": [
+    "attacked",
+    "blocked"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TASER_MAXBUILDUP",
+    "TASER_BUILDUP_DRAIN_RATE",
+    "TASER_BUILDUP_GAIN_RATE",
+    "TASER_BUILDUP_DAMAGE",
+    "TASER_BUILDUP_RADIUS",
+    "TASER_BUILDUP_DRAIN_BUFFER_TIME",
+    "TASER_EFFECT_BASE_TIME",
+    "TASER_EFFECT_VAR_TIME",
+    "TASER_EFFECT_DURATION_BASE_TIME",
+    "TASER_EFFECT_DURATION_VAR_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18211,
+      13701,
+      18783,
+      10379,
+      10413,
+      13261,
+      13602,
+      13698
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及电击积累（taserbuildup）相关的任何能力表达，如积累值、爆炸伤害、泄露率、增益率等，所有实体页面均不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "电击积累",
+    "电荷爆炸",
+    "范围伤害",
+    "电击特效",
+    "机器人技能",
+    "积累值",
+    "衰减率",
+    "增益倍率"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "机器人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "351e8f93f03fa014f6d27852f9417d55d4dae8c37e872e5d7532732d92a5aa95",
+    "source_bytes": 7307,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114598831
+  }
+}

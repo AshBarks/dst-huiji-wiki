@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moosespawner.lua"
+  },
+  "category": "component",
+  "display_name": "moosespawner",
+  "summary": "该组件管理 Moose（鹅）的生成密度与巢穴状态，在春天触发 Moose 的软生成或硬生成，参与季节性 boss 玩法。它根据世界时间选择巢穴并启动定时器，控制 Moose 的出现时机与行为。",
+  "api": [
+    {
+      "name": "OverrideAttackDensity",
+      "effect": "已废弃，无实际行为，仅为接口兼容。"
+    },
+    {
+      "name": "DoSoftSpawn",
+      "effect": "在指定巢穴生成 Moose 并令其飞入巢穴，设置产蛋定时器（4-8 个 SEG_TIME），并停止巢穴的召唤定时器。"
+    },
+    {
+      "name": "DoHardSpawn",
+      "effect": "生成 Moose 蛋和 Moose，建立实体追踪关系（Moose 追踪蛋，蛋追踪 Moose），并初始化蛋的孵化状态。"
+    },
+    {
+      "name": "InitializeNest",
+      "effect": "为巢穴启动召唤 Moose 的定时器（8-24 个 SEG_TIME），并标记 Moose 即将到来（设置 mooseIncoming 标志）。"
+    },
+    {
+      "name": "InitializeNests",
+      "effect": "根据 Moose 密度选择部分巢穴（使用 PickSome 函数），并对这些巢穴调用 InitializeNest 进行初始化。"
+    }
+  ],
+  "api_note": "组件有公开方法，详见 api 数组。",
+  "events_published": [],
+  "events_listened": [
+    "isspring"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MOOSE_DENSITY",
+    "SEG_TIME",
+    "NO_BOSS_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15594,
+      34523,
+      34314,
+      23187,
+      20714,
+      65605,
+      52788,
+      14579
+    ],
+    "aspects": [
+      {
+        "aspect": "麋鹿鹅巢数量世界规则设置",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响生成[[麋鹿鹅]]的麋鹿鹅巢数量。"
+          }
+        ]
+      },
+      {
+        "aspect": "麋鹿鹅筑巢地生成机制",
+        "evidence": [
+          {
+            "pageid": 15594,
+            "quote": "春初 0.5 ~ 1.5 天后会有 50% 的[[麋鹿鹅筑巢地]]生成麋鹿鹅，数目向上取整。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鹅",
+    "boss",
+    "春天",
+    "巢穴",
+    "生成",
+    "蛋",
+    "密度",
+    "定时器",
+    "季节性",
+    "Moose"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "季节"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b0def1cb73ff11adb8ad507d70a589b0d48fc53fb378740e283dc856866d4cb",
+    "source_bytes": 3247,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110205004
+  }
+}

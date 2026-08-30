@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/weather.lua"
+  },
+  "category": "component",
+  "display_name": "weather",
+  "summary": "该组件是游戏世界天气系统的核心管理器。它负责维护并同步关键天气数据，包括水分、湿度、降水类型（雨、雪、月冰雹）以及地面积雪/水坑状态。通过周期性推送 'weathertick' 事件，将计算出的降水强度、湿度水平、光照等数据提供给其他系统，驱动诸如玩家湿润、闪电生成、环境音效与视觉特效（雨、雪、花粉粒子、地面纹理）等核心玩法。",
+  "api": [],
+  "api_note": "纯数据与状态同步组件，其功能通过监听世界事件（如 ms_forceprecipitation）和广播网络变量更新实现，没有对外部暴露的公开方法。",
+  "events_published": [
+    "weathertick",
+    "moistureceilchanged",
+    "precipitationchanged",
+    "snowcoveredchanged",
+    "wetchanged"
+  ],
+  "events_listened": [
+    "seasontick",
+    "temperaturetick",
+    "phasechanged",
+    "playeractivated",
+    "playerdeactivated",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_forceprecipitation",
+    "ms_setprecipitationmode",
+    "ms_setmoisturescale",
+    "ms_deltamoisture",
+    "ms_deltamoistureceil",
+    "ms_setsnowlevel",
+    "ms_deltawetness",
+    "ms_setlightningmode",
+    "ms_setlightningdelay",
+    "ms_sendlightningstrike",
+    "ms_simunpaused",
+    "ms_startlunarhail"
+  ],
+  "netvars": [
+    "_noisetime",
+    "_moisture",
+    "_moisturerate",
+    "_moistureceil",
+    "_moisturefloor",
+    "_precipmode",
+    "_preciptype",
+    "_peakprecipitationrate",
+    "_snowlevel",
+    "_lunarhaillevel",
+    "_snowcovered",
+    "_wetness",
+    "_wet"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      27531,
+      13569,
+      13570,
+      18410,
+      13268,
+      21137,
+      20704
+    ],
+    "aspects": [],
+    "no_evidence_reason": "代码能力/行为语义清单未提供，无法确定需要检索的具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "下雨",
+    "下雪",
+    "积水",
+    "湿润",
+    "打雷",
+    "闪电",
+    "天气",
+    "季节",
+    "湿度",
+    "月冰雹"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "df0e8480c29c38addc4abfc5dbc7823adccb716c7b253f718fd22d2a0b6cc7ce",
+    "source_bytes": 48557,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114007434
+  }
+}

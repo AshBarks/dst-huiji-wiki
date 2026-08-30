@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rechargeable.lua"
+  },
+  "category": "component",
+  "display_name": "rechargeable",
+  "summary": "该组件管理实体的充电状态，包括总电荷、当前电荷和充电时间，用于实现工具或武器的冷却机制。当电荷耗尽时自动开始充电，充满后可再次使用，支持修改充电时间并触发状态变化事件。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的 'rechargeable' 标签。"
+    },
+    {
+      "name": "SetOnDischargedFn",
+      "effect": "设置电荷耗尽时的回调函数，当实体从充满变为未充满时触发。"
+    },
+    {
+      "name": "SetOnChargedFn",
+      "effect": "设置充满时的回调函数，当实体从未充满变为充满时触发。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新充电状态，根据实际充电时间增加电荷；如果充电时间为0或负，则直接设为满电。"
+    },
+    {
+      "name": "SetMaxCharge",
+      "effect": "设置最大电荷值，调整当前电荷以保持百分比（如果未充满），并启动更新。"
+    },
+    {
+      "name": "SetChargeTime",
+      "effect": "设置基础充电时间，并启动更新。"
+    },
+    {
+      "name": "SetChargeTimeMod",
+      "effect": "设置充电时间修改器，基于源和键应用修改值；修改生效时更新充电时间显示并启动更新。"
+    },
+    {
+      "name": "RemoveChargeTimeMod",
+      "effect": "移除充电时间修改器；移除生效时更新充电时间显示并启动更新。"
+    },
+    {
+      "name": "IsCharged",
+      "effect": "返回当前电荷是否大于或等于总电荷。"
+    },
+    {
+      "name": "SetCharge",
+      "effect": "设置当前电荷值（限制在0到总电荷之间），触发 'rechargechange' 事件，并根据状态变化调用对应回调或启动/停止更新。"
+    },
+    {
+      "name": "GetChargeTime",
+      "effect": "返回基础充电时间。"
+    },
+    {
+      "name": "GetCharge",
+      "effect": "返回当前电荷值。"
+    },
+    {
+      "name": "Discharge",
+      "effect": "放电操作：设置充电时间和当前电荷为0，启动更新。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前电荷占总电荷的百分比（0到1之间）。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "根据百分比设置当前电荷值（基于总电荷计算）。"
+    },
+    {
+      "name": "GetRechargeTime",
+      "effect": "返回实际充电时间，考虑充电时间修改器；最小值为0。"
+    },
+    {
+      "name": "GetTimeToCharge",
+      "effect": "返回充满所需时间；如果已充满则返回0。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前状态：如果未充满，返回包含充电时间和当前电荷的数据；如果已充满，返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载保存的数据，恢复充电时间和当前电荷值。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前电荷、总电荷、百分比、充电时间修改器和充满所需时间。"
+    }
+  ],
+  "events_published": [
+    "rechargechange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      15922,
+      13701,
+      15729,
+      15022,
+      21634,
+      16197,
+      15303
+    ],
+    "aspects": [
+      {
+        "aspect": "充电操作描述",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "可以在[[蓄电池]]处充电，消耗蓄电池的 1 个电荷，增加 1 格电荷"
+          }
+        ]
+      },
+      {
+        "aspect": "充电状态效果",
+        "evidence": [
+          {
+            "pageid": 15729,
+            "quote": "充电的伏特羊[[免疫电击伤害]]，且是[[光源]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "充能武器机制",
+        "evidence": [
+          {
+            "pageid": 21634,
+            "quote": "每击中一个目标恢复充能奔雷矛 2% 耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却时间描述",
+        "evidence": [
+          {
+            "pageid": 13701,
+            "quote": "远古大门需要冷却 20 天才能再次用来召唤远古织影者。"
+          },
+          {
+            "pageid": 15303,
+            "quote": "冷却时间 2 分钟。"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却缩减效果",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "+5% 冷却缩减。"
+          },
+          {
+            "pageid": 16197,
+            "quote": "每腐烂 1 秒，冷却时间增加 4"
+          }
+        ]
+      },
+      {
+        "aspect": "技能冷却状态",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "如果翻滚攻击处于冷却中"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "充电",
+    "充能",
+    "冷却",
+    "电荷",
+    "recharge",
+    "discharge",
+    "充能时间",
+    "充能状态",
+    "能量",
+    "工具冷却"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+    "source_bytes": 5069,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092679730
+  }
+}

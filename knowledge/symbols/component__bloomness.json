@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bloomness.lua"
+  },
+  "category": "component",
+  "display_name": "bloomness",
+  "summary": "该组件管理实体（通常是植物）的开花状态，包括开花等级、持续时间、衰退速率和施肥效果。它通过计时器驱动等级的递进或衰退，实现植物从生长、盛放到凋谢的完整循环，是植物生长与季节变化玩法中的核心状态管理组件。",
+  "api": [
+    {
+      "name": "SetLevel",
+      "effect": "设置实体的开花等级。等级被钳制在[0, max]范围内。若等级从0变为非0，将启动组件更新；若变为0，则停止更新并重置计时器。每次设置后会重置施肥值（fertilizer）为0，并触发 onlevelchangedfn 回调。当等级设为最大值时，计时器增加完整开花持续时间；设为其他非零值时，计时器增加单阶段持续时间。"
+    },
+    {
+      "name": "SetDurations",
+      "effect": "设置开花过程中每个阶段的持续时间（stage）和达到最大等级时的完整开花持续时间（full）。这些值用于后续等级设置时的计时器计算。"
+    },
+    {
+      "name": "GetLevel",
+      "effect": "返回实体当前的开花等级（self.level）。"
+    },
+    {
+      "name": "Fertilize",
+      "effect": "对实体进行施肥。若当前处于最大开花等级（level == max），会通过 calcfullbloomdurationfn 回调或直接将施肥值叠加到计时器上，以延长盛花期。若未达到最大等级，则会确保等级至少为1，并累计施肥值（fertilizer）用于影响后续的速率计算。此操作会触发更新速率。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件的核心更新函数。根据当前速率（rate）减少计时器（timer）。当计时器归零时，根据当前处于开花递进阶段（is_blooming）还是衰退阶段，调用 SetLevel 进行等级提升或降低。等级降为0时停止组件更新。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间跳过（如世界加载）的更新。仅在当前存在计时（timer != 0）时，调用 OnUpdate 进行计时器衰减。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化组件状态用于保存。仅在等级（level）大于0时返回包含等级、计时器、速率、开花状态和施肥值的表，否则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载组件状态。恢复所有核心数据字段。如果加载后的等级大于0，则启动组件更新并触发 onlevelchangedfn 回调。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个用于调试的格式化字符串，显示当前等级（L）、是否正在开花（B）、剩余计时（T）和当前速率（xRate）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      21485,
+      35001,
+      20700,
+      14484,
+      51046,
+      19802,
+      10355
+    ],
+    "aspects": [
+      {
+        "aspect": "催长剂影响开花速度",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "催长剂会触发开花。服用更多催长剂会加快开花速度"
+          }
+        ]
+      },
+      {
+        "aspect": "开花阶段成长值需求调整",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "开花期的前两个阶段所需成长值 -10%"
+          }
+        ]
+      },
+      {
+        "aspect": "开花阶段隔热值奖励",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "最大开花阶段获得 180 隔热值。"
+          }
+        ]
+      },
+      {
+        "aspect": "施肥触发开花效果",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "同时开始开花"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "开花",
+    "绽放",
+    "等级",
+    "计时",
+    "肥料",
+    "速率",
+    "满开",
+    "阶段",
+    "更新",
+    "保存"
+  ],
+  "gameplay_tags": [
+    "植物",
+    "生长",
+    "状态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1348d942255324854c331a039126155595a8c37ea7bdfe8dd59f19b96bab6140",
+    "source_bytes": 3183,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105643114
+  }
+}

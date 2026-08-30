@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/singable.lua"
+  },
+  "category": "component",
+  "display_name": "singable",
+  "summary": "Singable 组件用于管理实体被歌唱时的行为，存储一个回调函数以在歌唱时触发。当实体被歌唱时，组件会检查歌手是否有灵感组件，然后调用回调函数并将歌曲数据添加到歌手的灵感组件中，核心参与游戏中的歌唱玩法。",
+  "api": [
+    {
+      "name": "SetOnSing",
+      "effect": "设置一个回调函数，当实体被歌唱时调用该函数，函数接收实体和歌手作为参数。"
+    },
+    {
+      "name": "Sing",
+      "effect": "触发歌唱行为：首先检查歌手是否有 singinginspiration 组件，如果没有则打印错误并返回；如果有，则调用设置的回调函数，并调用歌手的 singinginspiration 组件的 AddSong 方法传递歌曲数据。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      15539,
+      16419,
+      15186,
+      15922,
+      13261,
+      18234,
+      16645
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及任何与'唱歌'或'singable'相关的能力或行为表达。所有页面内容涉及食物、弹药、电路板、灵体草药、熔炉技能、角色沃姆伍德、书籍和调味料，均无歌唱相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "歌唱",
+    "歌曲",
+    "演唱",
+    "音乐",
+    "灵感",
+    "恢复",
+    "效果",
+    "singable",
+    "singinginspiration"
+  ],
+  "gameplay_tags": [
+    "歌唱",
+    "生存",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "56b2e327efb42825e03a064c91e45ae0ec3f8f0470451f46f17ebb1e305f32ae",
+    "source_bytes": 657,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112561183
+  }
+}

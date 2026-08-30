@@ -1,0 +1,196 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playervision.lua"
+  },
+  "category": "component",
+  "display_name": "playervision",
+  "summary": "playervision组件管理玩家角色的多种视觉状态，包括幽灵视觉、噩梦视觉、夜视、护目镜视觉、营养视觉、废料单眼视觉、检查视觉和玫瑰眼镜视觉。它通过颜色校正表（colour cubes）调整玩家屏幕的视觉效果，并响应装备变化和游戏状态事件，如区域变更。该组件在探索、生存和战斗中起关键作用，允许玩家在不同环境条件下优化视觉体验。",
+  "api": [
+    {
+      "name": "HasGhostVision",
+      "effect": "返回布尔值，指示玩家是否具有幽灵视觉状态。"
+    },
+    {
+      "name": "HasNightmareVision",
+      "effect": "返回布尔值，指示玩家是否具有噩梦视觉状态。"
+    },
+    {
+      "name": "HasNightVision",
+      "effect": "返回布尔值，指示玩家是否具有夜视状态（包括装备触发的夜视或强制夜视）。"
+    },
+    {
+      "name": "HasGoggleVision",
+      "effect": "返回布尔值，指示玩家是否具有护目镜视觉状态（包括装备触发的或强制的）。"
+    },
+    {
+      "name": "HasNutrientsVision",
+      "effect": "返回布尔值，指示玩家是否具有营养视觉状态（仅本地玩家检查）。"
+    },
+    {
+      "name": "HasScrapMonoleVision",
+      "effect": "返回布尔值，指示玩家是否具有废料单眼视觉状态（包括装备触发的或强制的）。"
+    },
+    {
+      "name": "HasInspectaclesVision",
+      "effect": "返回布尔值，指示玩家是否具有检查视觉状态（包括装备触发的或强制的）。"
+    },
+    {
+      "name": "HasRoseGlassesVision",
+      "effect": "返回布尔值，指示玩家是否具有玫瑰眼镜视觉状态（包括装备触发的或强制的）。"
+    },
+    {
+      "name": "GetCCPhaseFn",
+      "effect": "返回当前颜色校正阶段函数（可能为nil），用于处理视觉效果的渐变。"
+    },
+    {
+      "name": "GetCCTable",
+      "effect": "返回当前颜色校正表（可能为nil），决定屏幕颜色调整。"
+    },
+    {
+      "name": "UpdateCCTable",
+      "effect": "根据当前视觉状态（如幽灵视觉、夜视、噩梦视觉）计算并更新颜色校正表；若表变化，则推送'ccoverrides'和'ccphasefn'事件。"
+    },
+    {
+      "name": "SetGhostVision",
+      "effect": "启用或禁用幽灵视觉；若状态变化，更新颜色校正表并推送'ghostvision'事件。"
+    },
+    {
+      "name": "SetNightmareVision",
+      "effect": "启用或禁用噩梦视觉；若状态变化，更新颜色校正表并推送'nightmarevision'事件。"
+    },
+    {
+      "name": "ForceNightVision",
+      "effect": "强制启用或禁用夜视；若状态变化且玩家无装备夜视，更新颜色校正表并推送'nightvision'事件。"
+    },
+    {
+      "name": "ForceNoNightVisionCC",
+      "effect": "强制禁用夜视颜色校正（nonightvisioncc）；若状态变化，更新颜色校正表。"
+    },
+    {
+      "name": "PushForcedNightVision",
+      "effect": "推送一个强制夜视条目（带来源、优先级、自定义颜色表等），并按优先级排序；若最高优先级条目变化，则激活或更新夜视设置。"
+    },
+    {
+      "name": "PopForcedNightVision",
+      "effect": "移除指定来源的强制夜视条目；若栈为空，则禁用所有强制夜视，否则更新为下一个最高优先级条目。"
+    },
+    {
+      "name": "SetForcedNightVisionAmbientOverrides",
+      "effect": "设置强制夜视的环境覆盖表；若变化，推送'nightvisionambientoverrides'事件。"
+    },
+    {
+      "name": "GetNightVisionAmbientOverrides",
+      "effect": "返回当前强制夜视环境覆盖表（可能为nil）。"
+    },
+    {
+      "name": "ForceGoggleVision",
+      "effect": "强制启用或禁用护目镜视觉；若状态变化且玩家无装备护目镜，推送'gogglevision'事件。"
+    },
+    {
+      "name": "ForceNutrientVision",
+      "effect": "强制启用或禁用营养视觉；若状态变化且玩家无装备营养视觉且为本地玩家，向世界推送'nutrientsvision'事件。"
+    },
+    {
+      "name": "ForceScrapMonoleVision",
+      "effect": "强制启用或禁用废料单眼视觉；若状态变化且玩家无装备，推送'scrapmonolevision'事件。"
+    },
+    {
+      "name": "ForceInspectaclesVision",
+      "effect": "强制启用或禁用检查视觉；若状态变化且玩家无装备，推送'inspectaclesvision'事件。"
+    },
+    {
+      "name": "ForceRoseGlassesVision",
+      "effect": "强制启用或禁用玫瑰眼镜视觉；若状态变化且玩家无装备，推送'roseglassesvision'事件。"
+    },
+    {
+      "name": "SetCustomCCTable",
+      "effect": "设置自定义颜色校正表和混合标志；若变化，更新颜色校正表。"
+    }
+  ],
+  "events_published": [
+    "nightvision",
+    "gogglevision",
+    "nutrientsvision",
+    "scrapmonolevision",
+    "inspectaclesvision",
+    "roseglassesvision",
+    "ccoverrides",
+    "ccphasefn",
+    "ghostvision",
+    "nightmarevision",
+    "nightvisionambientoverrides"
+  ],
+  "events_listened": [
+    "equip",
+    "unequip",
+    "inventoryclosed",
+    "changearea"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16570,
+      16569,
+      16568,
+      51221,
+      13216,
+      51494,
+      16419,
+      18830
+    ],
+    "aspects": [
+      {
+        "aspect": "夜视模式自动开启",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "激活时，在夜晚与洞穴将会自动开启夜视模式，效果等同于鼹鼠帽。"
+          }
+        ]
+      },
+      {
+        "aspect": "护目镜视觉辅助指示",
+        "evidence": [
+          {
+            "pageid": 16570,
+            "quote": "装备星象护目镜时，当瓦格斯塔夫或未约束的静电在附近时，屏幕边缘会显示箭头指向它们的方向。"
+          },
+          {
+            "pageid": 51494,
+            "quote": "装备星象护目镜时，若瓦格斯塔夫在附近，屏幕边缘会有瓦格斯塔夫的头像箭头指示他的位置。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "夜视",
+    "幽灵视觉",
+    "噩梦视觉",
+    "护目镜",
+    "颜色校正",
+    "视觉效果",
+    "强制视觉",
+    "环境覆盖",
+    "营养视觉",
+    "废料单眼"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0e8e8fd7cc66a00c9f17168bf98bbf62bedd1001dd7b8fd2746197af8bcc1d74",
+    "source_bytes": 11249,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091589483
+  }
+}

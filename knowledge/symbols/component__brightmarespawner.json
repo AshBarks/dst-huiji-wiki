@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/brightmarespawner.lua"
+  },
+  "category": "component",
+  "display_name": "brightmarespawner",
+  "summary": "该组件是‘噩梦’（Gestalt）生物的生成控制器，负责在世界中动态管理噩梦生物的生成与追踪。它监控所有处于‘月度’（Lunacy）理智模式的玩家，并根据玩家的理智值（SAN值）水平，在合适位置定期尝试生成噩梦生物以挑战玩家。组件还负责为生成的噩梦生物寻找并分配最佳追踪目标（玩家），以及在需要时寻找新的定位点。",
+  "api": [
+    {
+      "name": "FindBestPlayer",
+      "effect": "为指定的噩梦生物实体（gestalt）寻找最佳追踪玩家。该方法会遍历所有处于月度模式且状态有效的玩家，计算距离，并结合玩家周围的噩梦生物数量与该玩家理智等级对应的生成上限，返回一个距离最近且允许生成更多噩梦的目标玩家，以及该玩家的理智等级。若未找到符合条件的玩家，则返回nil。此方法不改变游戏状态，仅进行计算和查找。"
+    },
+    {
+      "name": "FindRelocatePoint",
+      "effect": "为指定的噩梦生物实体（gestalt）寻找一个新的重生或重新定位的坐标点。该方法调用内部的寻路逻辑，以该噩梦生物当前追踪的玩家为中心，在满足条件（避免与其他玩家、噩梦生物、幽灵过于接近）的随机距离上寻找一个有效位置。若该噩梦生物没有追踪目标，则返回nil。此方法不改变游戏状态，仅计算并返回一个坐标。"
+    }
+  ],
+  "api_note": "组件有公开方法，用于噩梦生物的追踪与定位逻辑。",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15245,
+      34314,
+      15225,
+      18234,
+      34523,
+      13828,
+      20714
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论游戏实体、机制、生成规则和控制台命令，但没有涉及组件 brightmarespawner 或其能力 FindBestPlayer 和 FindRelocatePoint 的任何玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "噩梦",
+    "生成",
+    "月度",
+    "理智",
+    "追踪",
+    "刷新",
+    "暗影",
+    "潜影",
+    "月岛"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "760f92699759f5df8db66b7e67ca5b7d24473ca259e5d44405f38064dddba71e",
+    "source_bytes": 7561,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105742175
+  }
+}

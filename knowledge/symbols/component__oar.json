@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oar.lua"
+  },
+  "category": "component",
+  "display_name": "oar",
+  "summary": "Oar组件管理划船相关的数据，如最大速度、力和失败状态。它参与饥荒联机版的航海玩法，允许玩家通过划船来移动船只。组件处理划船的成功和失败情况，并与船物理和玩家交互。",
+  "api": [
+    {
+      "name": "Row",
+      "effect": "检查划船者所在的平台是否有效并获取船物理组件。计算划船方向，若划船者有玩家控制器则调整方向以面向平台中心。应用划船力到平台，考虑玩家的专家水手组件提供的力乘数和额外最大速度。推送'rowing'事件给划船者和'rowed'事件给平台。"
+    },
+    {
+      "name": "RowFail",
+      "effect": "递增失败索引并循环。找到划船者附近2单位内的所有实体并增加它们的湿气值。通知划船者的跟随者划船失败事件。返回失败字符串'BAD_TIMING'加上当前失败索引。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "rowing",
+    "rowed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.MAX_FORCE_VELOCITY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      21620,
+      34314,
+      18216,
+      16185,
+      18357,
+      21485,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "漂浮平台划动行为",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "玩家可以在漂浮平台上使用各种[[桨]]、[[邪天翁喙]]朝某个方向划动，提供一瞬的动力"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "划船",
+    "船桨",
+    "划船失败",
+    "湿气",
+    "跟随者",
+    "船物理",
+    "力",
+    "速度",
+    "玩家控制",
+    "平台"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "航海",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5ed14794c4f70b432e0f53209f807e3828ed5f11aaa3f9caf8a002cbb38ebb41",
+    "source_bytes": 1914,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094278068
+  }
+}

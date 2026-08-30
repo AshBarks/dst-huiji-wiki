@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/walkingplank.lua"
+  },
+  "category": "component",
+  "display_name": "walkingplank",
+  "summary": "该组件管理一个可伸缩的行走木板，用于角色登船和航海相关活动。它跟踪当前使用木板的角色（doer），并提供扩展、收缩、安装木板和跳海等功能。核心玩法涉及航海生存中的移动和交互，如从船上登船或跳海。",
+  "api": [
+    {
+      "name": "Extend",
+      "effect": "触发事件'start_extending'，使木板开始扩展。无额外副作用。"
+    },
+    {
+      "name": "Retract",
+      "effect": "触发事件'start_retracting'，使木板开始收缩。无额外副作用。"
+    },
+    {
+      "name": "MountPlank",
+      "effect": "如果木板未被占用（self.doer为nil），则将doer传送到木板位置，触发事件'start_mounting'，并调用doer的walkingplankuser组件设置当前木板为self.inst。返回true表示成功；如果木板已被占用则返回false。"
+    },
+    {
+      "name": "StopMounting",
+      "effect": "清除当前doer（设为nil），触发事件'stop_mounting'，停止木板的安装状态。无额外副作用。"
+    },
+    {
+      "name": "AbandonShip",
+      "effect": "如果doer非nil且是当前使用木板的角色（self.doer），则调用doer的walkingplankuser组件的Dismount方法，并触发事件'start_abandoning'，使角色跳海。返回true表示成功；否则返回false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "start_extending",
+    "start_retracting",
+    "start_mounting",
+    "stop_mounting",
+    "start_abandoning"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72441,
+      35790,
+      16419,
+      51949,
+      16587,
+      34523,
+      47058,
+      48926
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及 walkingplank 实体或其相关能力 Extend, Retract, MountPlank, StopMounting, AbandonShip，页面内容涉及其他游戏物品和机制，与 walkingplank 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "木板",
+    "扩展",
+    "收缩",
+    "安装",
+    "伸缩木板",
+    "上船",
+    "落水",
+    "航海设备",
+    "浮动平台"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "航海",
+    "生存",
+    "移动",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3cc3c67dd4932e5013e678e8ebb9a9f78c6e02c4b6bf014acc2123fae0829fcd",
+    "source_bytes": 1125,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113814546
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quagmire_map.lua"
+  },
+  "category": "component",
+  "display_name": "quagmire_map",
+  "summary": "该组件提供了检查地图上特定点土壤是否可耕种的功能，通过两个方法验证土壤类型和耕种条件。它参与饥荒联机版中的农业玩法，帮助玩家确定适合耕种的地点。",
+  "api": [
+    {
+      "name": "IsFarmableSoilAtPoint",
+      "effect": "检查给定坐标(x, y, z)处的瓦片是否为可耕种土壤类型（WORLD_TILES.QUAGMIRE_SOIL），返回布尔值。无副作用。"
+    },
+    {
+      "name": "CanTillSoilAtPoint",
+      "effect": "检查给定点pt是否为可耕种土壤并且附近（1单位范围内）没有标签为'plantedsoil'的实体，返回布尔值。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34794,
+      18509,
+      33950,
+      21485,
+      51489,
+      14711,
+      51524,
+      14712
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要讨论地图机制、比赛检查点、耕种的一般描述和物品制作，但未直接提及与代码能力 IsFarmableSoilAtPoint 或 CanTillSoilAtPoint 相关的玩家语言表达，如土壤耕作检查、行为描述或策略段落。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "耕种",
+    "土壤",
+    "农场",
+    "可耕种",
+    "检查点",
+    "农业",
+    "地图",
+    "土壤类型"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "耕种",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f052b62de112dbe356ccc61dee5bc7b3fbe6ca9ebb0d58e98e98f1ab396f80d7",
+    "source_bytes": 406,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111428984
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/schoolspawner.lua"
+  },
+  "category": "component",
+  "display_name": "schoolspawner",
+  "summary": "schoolspawner组件负责管理海洋中鱼群的动态生成，包括调度玩家附近的鱼群、鲨鱼和gnarwail的生成事件。它基于玩家位置、海洋环境和运气因素触发生成，增强游戏的海洋生存和捕鱼玩法。",
+  "api": [
+    {
+      "name": "ShouldSpawnANewSchoolForPlayer(player)",
+      "effect": "检查玩家周围海洋百分比、阻挡者数量和鱼类数量，基于运气公式决定是否应该生成新鱼群。返回布尔值。"
+    },
+    {
+      "name": "GetSpawnPoint(pt)",
+      "effect": "根据给定位置通过扇形搜索查找可游泳的海洋生成点，确保适合鱼群生成。返回生成点坐标或nil。"
+    },
+    {
+      "name": "SpawnSchool(spawnpoint, target, override_spawn_offset)",
+      "effect": "在指定生成点创建鱼群，生成鱼类和herd，可能触发鲨鱼和gnarwail生成，并发布'schoolspawned'事件。返回生成的鱼数量。"
+    },
+    {
+      "name": "GetFishPrefabAtPoint(spawnpoint)",
+      "effect": "根据生成点返回对应的鱼类预制体名称，基于季节和海洋地形。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "schoolspawned"
+  ],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GNARWAIL_TEST_RADIUS",
+    "TUNING.GNARWAIL_SPAWN_CHANCE",
+    "TUNING.SHARK_TEST_RADIUS",
+    "TUNING.SHARK_SPAWN_CHANCE",
+    "TUNING.SCHOOL_SPAWN_DELAY",
+    "TUNING.SCHOOL_SPAWNER_FISH_OCEAN_PERCENT",
+    "TUNING.SCHOOL_SPAWNER_BLOCKER_MOD",
+    "TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS",
+    "TUNING.SCHOOL_SPAWNER_MAX_FISH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      34314,
+      34523,
+      18853,
+      52788,
+      18359,
+      20714,
+      14579
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未提及component__schoolspawner组件或其代码能力（如ShouldSpawnANewSchoolForPlayer、SpawnSchool等）的玩家语言表达，相关页面主要讨论世界生成、布景、拖网捕鱼器等机制，无鱼群生成能力的具体描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鱼群",
+    "生成",
+    "海洋",
+    "鲨鱼",
+    "gnarwail",
+    "捕鱼",
+    "生存",
+    "鱼类",
+    "herd",
+    "海洋生物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "捕鱼",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c466669c677744bc8a6cabd37a2563a43b449085be3bc95138e988323de3f0fe",
+    "source_bytes": 12207,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112154949
+  }
+}

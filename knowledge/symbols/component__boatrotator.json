@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatrotator.lua"
+  },
+  "category": "component",
+  "display_name": "boatrotator",
+  "summary": "BoatRotator组件用于控制船只的旋转方向。它管理实体与船的关联，监听船的移除和死亡事件，并通过boatring组件设置旋转方向，是船只移动转向的核心玩法组件。",
+  "api": [
+    {
+      "name": "SetRotationDirection",
+      "effect": "设置船只的旋转方向。参数dir为正数表示顺时针，负数表示逆时针，0表示停止旋转。行为：检查当前平台是否为船，若有效则调用boatring组件的SetRotationDirection方法。副作用：推送rotationdirchanged事件，通知所有船只旋转器方向已改变。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置或清除组件关联的船。行为：如果当前有关联的船，会移除关联和事件监听；如果设置新船，会添加关联和监听。副作用：更新实体变换旋转、状态内存和事件监听，可能触发船的死亡或移除事件。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用。行为：取消延时设置任务。副作用：防止未完成的船关联设置任务执行。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时调用。行为：调用SetBoat(nil)清除船关联。副作用：确保组件正确清理，避免内存泄漏。"
+    },
+    {
+      "name": "OnDeath",
+      "effect": "当关联的船死亡时调用。行为：如果实体有效，则调用SetBoat(nil)清除船关联。副作用：响应船的死亡事件，重置组件状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "rotationdirchanged"
+  ],
+  "events_listened": [
+    "onremove",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19113,
+      18357,
+      18571,
+      13567,
+      13642,
+      18188,
+      24759,
+      45525
+    ],
+    "aspects": [
+      {
+        "aspect": "平台绑定要求",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "只有建在漂浮平台上的转向舵才能对平台及船上建筑进行旋转"
+          }
+        ]
+      },
+      {
+        "aspect": "旋转方向控制",
+        "evidence": [
+          {
+            "pageid": 19113,
+            "quote": "对转向舵用鼠标左击能使平台逆时针旋转，用鼠标右击能使平台顺时针旋转"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "转向",
+    "移动方向",
+    "旋转方向",
+    "船只转向",
+    "转向控制",
+    "方向调整",
+    "移动控制",
+    "旋转控制"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "探索",
+    "移动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "afdc54ef7a09cdf78db0005c472bd034cc9b156755afe6ba8c9173da4471b6d6",
+    "source_bytes": 2237,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098627802
+  }
+}

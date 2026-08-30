@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowdominance.lua"
+  },
+  "category": "component",
+  "display_name": "shadowdominance",
+  "summary": "组件shadowdominance用于管理物品的影子支配标签。当物品被装备时，自动给所有者添加'shadowdominance'标签；卸下时，若所有者无其他同类物品装备，则移除该标签。这参与了影子仆从的核心玩法，可能影响战斗或生存能力。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [
+    "equipped",
+    "unequipped",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72416
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容仅涉及装备机制，未提及 component__shadowdominance 或其能力表达，且代码能力/行为语义清单为空，无法匹配。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影支配",
+    "装备属性",
+    "卸下效果",
+    "暗影随从",
+    "装备机制",
+    "标签系统",
+    "暗影武器",
+    "战斗增益",
+    "物品标签"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "战斗",
+    "影子"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8fee6f359fcb83d9df67ecbced077b5b69da6983720540943406cfb4941f5681",
+    "source_bytes": 1905,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095886275
+  }
+}

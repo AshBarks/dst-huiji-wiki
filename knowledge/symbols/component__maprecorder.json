@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/maprecorder.lua"
+  },
+  "category": "component",
+  "display_name": "maprecorder",
+  "summary": "MapRecorder 组件用于管理地图记录数据，包括地图信息、会话标识、作者和日期。它支持玩家记录当前世界地图并教导给其他玩家，促进地图探索和分享的核心玩法。",
+  "api": [
+    {
+      "name": "SetOnTeachFn(fn): 设置当教导地图给其他玩家时触发的回调函数，接收组件实例和目标玩家作为参数。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnDataChangedFn(fn): 设置当地图数据发生变化时触发的回调函数，接收组件实例作为参数。",
+      "effect": ""
+    },
+    {
+      "name": "HasData(): 检查组件是否存储了有效的地图数据（mapdata 非空且长度大于0），返回布尔值。",
+      "effect": ""
+    },
+    {
+      "name": "IsCurrentWorld(): 检查记录的地图数据是否来自当前世界，通过比较 mapsesssion 与 TheWorld.meta.session_identifier，返回布尔值。",
+      "effect": ""
+    },
+    {
+      "name": "ClearMap(): 清除所有存储的地图数据（mapdata、mapsesssion、mapauthor、mapday），并触发数据变化回调，无返回值。",
+      "effect": ""
+    },
+    {
+      "name": "RecordMap(target): 从指定玩家实体记录地图数据，调用目标玩家的 MapExplorer:RecordMap()，更新组件属性（mapdata、mapsesssion、maplocation、mapauthor、mapday），成功返回 true，失败返回 false 和错误码（如 'NOEXPLORER' 或 'BLANK'），并可能触发数据变化回调。",
+      "effect": ""
+    },
+    {
+      "name": "TeachMap(target): 将存储的地图教导给指定玩家，检查数据有效性和世界匹配后调用目标玩家的 MapExplorer:LearnRecordedMap()，成功则触发教导回调并移除组件实例，返回 true；失败返回 false 和错误码（如 'BLANK'、'WRONGWORLD' 或 'NOEXPLORER'）。",
+      "effect": ""
+    },
+    {
+      "name": "IsTileSeeableInRecordedMap(target, tx, ty): 检查在记录的地图中指定坐标 (tx, ty) 的瓦片是否可见，调用目标玩家的 MapExplorer:IsTileSeeableInRecordedMap()，返回布尔值；如果无数据或目标无效则返回 false。",
+      "effect": ""
+    },
+    {
+      "name": "TransferComponent(newinst): 将当前组件的所有数据（mapdata、mapsesssion、maplocation、mapauthor、mapday）转移到新实例的 MapRecorder 组件，并触发数据变化回调。",
+      "effect": ""
+    },
+    {
+      "name": "OnSave(): 保存组件数据为表，包括 mapdata、mapsesssion、maplocation、mapauthor、mapday，用于持久化。",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad(data): 从数据表加载组件数据，更新对应属性，如果数据有效且会话标识匹配则标记为脏数据并触发数据变化回调。",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18509,
+      13260,
+      19693,
+      22181,
+      34794
+    ],
+    "aspects": [
+      {
+        "aspect": "地图世界匹配检查",
+        "evidence": [
+          {
+            "pageid": 18509,
+            "quote": "如果地图卷轴是在地表世界上创建的，它不会记录洞穴世界的地图数据，反之亦然。"
+          }
+        ]
+      },
+      {
+        "aspect": "地图教导给其他玩家",
+        "evidence": [
+          {
+            "pageid": 18509,
+            "quote": "被其他玩家学习后，学习地图卷轴的玩家地图中会添加卷轴的记录。"
+          }
+        ]
+      },
+      {
+        "aspect": "地图数据记录功能",
+        "evidence": [
+          {
+            "pageid": 18509,
+            "quote": "卷轴在创建时会记录制图的玩家当前地图的探索状态。"
+          },
+          {
+            "pageid": 34794,
+            "quote": "该卷轴存储了玩家在制作卷轴时的地图探索进度。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "地图记录",
+    "地图数据",
+    "地图探索",
+    "地图分享",
+    "世界地图",
+    "记录功能",
+    "地图组件"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "探索",
+    "地图",
+    "合作",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3e034544167d83ec7518c39f7df96dd411c0c2b055218ed0cf465240f2f38e5f",
+    "source_bytes": 4208,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096975624
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/colourcube.lua"
+  },
+  "category": "component",
+  "display_name": "colourcube",
+  "summary": "colourcube 组件管理游戏中的颜色立方体数据，用于根据昼夜时间、季节变化和精神状态（正常、疯狂、月光）动态调整屏幕视觉效果。它参与核心玩法中的环境渲染，影响玩家的视觉体验和沉浸感。",
+  "api": [
+    {
+      "name": "SetDistortionModifier",
+      "effect": "设置失真修改器，改变视觉失真效果的强度，影响屏幕扭曲程度。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每个帧更新颜色立方体的混合过程、失真效果计时器和疯狂/月光强度，实现视觉过渡和动态效果。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "执行长时间更新，快速推进颜色立方体的混合过程，用于加速视觉变化。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回组件当前状态的调试信息字符串，包括覆盖设置、混合时间和各颜色立方体状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "playeractivated",
+    "playerdeactivated",
+    "phasechanged",
+    "moonphasechanged2",
+    "moonphasestylechanged",
+    "seasontick",
+    "overridecolourcube",
+    "overridecolourmodifier"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      14688,
+      15054,
+      19118,
+      19119,
+      19296,
+      19297,
+      19300
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述物品的制作、效果、数值和策略，未提及视觉扭曲、组件更新行为或调试字符串等与代码能力 SetDistortionModifier、OnUpdate、LongUpdate、GetDebugString 相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "色彩调整",
+    "视觉效果",
+    "昼夜渲染",
+    "季节视觉",
+    "疯狂效果",
+    "月光视觉",
+    "画面混合",
+    "屏幕变色",
+    "理智调整"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "视觉效果",
+    "昼夜循环",
+    "季节变化",
+    "精神状态"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7c3062b02e39aef6f546fecc91b0043c18240a2dafd1d30818cb04193d914c00",
+    "source_bytes": 20789,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106113594
+  }
+}

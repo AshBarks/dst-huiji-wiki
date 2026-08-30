@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/objectspawner.lua"
+  },
+  "category": "component",
+  "display_name": "objectspawner",
+  "summary": "ObjectSpawner 组件负责管理游戏世界中生成的对象集合，跟踪实体的生成和所有权。它支持存档保存和加载，以确保生成状态在重启后恢复。核心玩法涉及动态生成物体，常用于建造、装饰或事件触发系统。",
+  "api": [
+    {
+      "name": "TakeOwnership",
+      "effect": "接受一个实体对象，将其添加到内部生成列表中。如果设置了 onnewobjectfn 回调函数，则调用该回调，传递组件实体和对象作为参数。副作用：修改 self.objects 表，并可能触发外部逻辑。"
+    },
+    {
+      "name": "SpawnObject",
+      "effect": "生成一个指定的预制体对象（使用 SpawnPrefab 函数），支持链接皮肤和皮肤 ID。然后调用 TakeOwnership 方法添加对象到生成列表，并返回生成的对象。副作用：在游戏世界中创建新实体，添加到组件管理列表中。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含生成对象 GUID 列表的数据表，用于存档保存。同时返回 GUID 列表作为引用以供加载时使用。副作用：无修改，仅读取数据。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载存档数据，根据保存的 GUID 列表查找对应实体，并调用 TakeOwnership 方法恢复组件所有权。副作用：修改 self.objects 表，触发 onnewobjectfn 回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24589,
+      24960,
+      35007,
+      45891,
+      18001,
+      23196
+    ],
+    "aspects": [
+      {
+        "aspect": "游戏存档与回档功能",
+        "evidence": [
+          {
+            "pageid": 35007,
+            "quote": "服务器的创建者可以通过“回档”将存档恢复到之前的保存"
+          }
+        ]
+      },
+      {
+        "aspect": "自动对象生成描述",
+        "evidence": [
+          {
+            "pageid": 24589,
+            "quote": "窝点的物品栏未满时: 从下表按概率选择一个物品生成。"
+          },
+          {
+            "pageid": 24960,
+            "quote": "激活黑暗痕迹有 4 分钟冷却时间，冷却时间内无法通过仔细检查上述物品生成新的黑暗痕迹。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "物品生成",
+    "生成系统",
+    "实体跟踪",
+    "存档恢复",
+    "动态创建",
+    "建造相关",
+    "装饰用途",
+    "事件触发"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "建造",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "544052a579d454e39c881de43d6bb2193df78c8f91139580a79954af7ee29011",
+    "source_bytes": 1069,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094326424
+  }
+}

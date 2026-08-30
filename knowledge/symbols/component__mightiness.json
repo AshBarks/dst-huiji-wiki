@@ -1,0 +1,265 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mightiness.lua"
+  },
+  "category": "component",
+  "display_name": "mightiness",
+  "summary": "该组件管理角色沃尔夫冈的力量值（mightiness），决定其处于虚弱（wimpy）、正常（normal）或强大（mighty）状态。核心玩法涉及通过锻炼（如使用哑铃）提升力量值，从而改变角色的伤害、温度、饥饿消耗、动画和声音等属性。力量值会随时间衰减，衰减速度受饥饿状态影响，玩家需要维持力量值以保持强大状态。",
+  "api": [
+    {
+      "name": "OnSetInvincible",
+      "effect": "响应无敌状态切换，设置内部无敌标志，影响力量值衰减逻辑。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前力量值用于游戏保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载力量值，并强制更新状态。"
+    },
+    {
+      "name": "GetState",
+      "effect": "返回当前状态字符串，如 'normal'。"
+    },
+    {
+      "name": "GetScale",
+      "effect": "返回当前状态的动画缩放比例。"
+    },
+    {
+      "name": "IsMighty",
+      "effect": "检查角色是否处于强大状态。"
+    },
+    {
+      "name": "IsNormal",
+      "effect": "检查角色是否处于正常状态。"
+    },
+    {
+      "name": "IsWimpy",
+      "effect": "检查角色是否处于虚弱状态。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "执行长时间力量值衰减，忽略伤害计算。"
+    },
+    {
+      "name": "Pause",
+      "effect": "暂停力量值衰减。"
+    },
+    {
+      "name": "Resume",
+      "effect": "恢复力量值衰减。"
+    },
+    {
+      "name": "IsPaused",
+      "effect": "检查力量值衰减是否暂停。"
+    },
+    {
+      "name": "DelayDrain",
+      "effect": "设置力量值衰减的延迟时间，延迟后才开始衰减。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包含当前值、衰减率和暂停状态。"
+    },
+    {
+      "name": "SetMax",
+      "effect": "设置最大力量值，并将当前力量值同步为该值。"
+    },
+    {
+      "name": "GetMax",
+      "effect": "返回最大力量值。"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "返回当前力量值。"
+    },
+    {
+      "name": "SetOverMax",
+      "effect": "设置超过最大值的值，用于健身房提升。"
+    },
+    {
+      "name": "GetOverMax",
+      "effect": "返回超过最大值的值。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "改变当前力量值，根据 delta 正负更新，触发状态转换和皮肤更新。正值增加力量值，负值减少，并可能播放声音和显示公告。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回力量值百分比（当前值除以最大值）。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "设置力量值百分比，转换为绝对 delta 并调用 DoDelta。"
+    },
+    {
+      "name": "DoDec",
+      "effect": "执行力量值衰减，受暂停、无敌状态和移动状态影响。"
+    },
+    {
+      "name": "SetRate",
+      "effect": "设置基础衰减率。"
+    },
+    {
+      "name": "CanTransform",
+      "effect": "检查是否可以转换到指定状态，基于状态标签、玩家幽灵或死亡状态。"
+    },
+    {
+      "name": "UpdateSkinMode",
+      "effect": "更新角色皮肤模式，支持延迟更新。"
+    },
+    {
+      "name": "BecomeState",
+      "effect": "转换角色状态，更新皮肤、动画、声音、战斗修改器、温度绝缘、饥饿消耗和工作效果等所有相关属性，并推送状态变更事件。"
+    },
+    {
+      "name": "OnHungerDelta",
+      "effect": "根据饥饿百分比调整力量值衰减率，饥饿越低衰减越快。"
+    },
+    {
+      "name": "GetRateScale",
+      "effect": "返回速率缩放值。"
+    },
+    {
+      "name": "SetRateScale",
+      "effect": "设置速率缩放值。"
+    },
+    {
+      "name": "GetSkinMode",
+      "effect": "返回当前状态的皮肤模式字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "mightinessdelta",
+    "mightiness_statechange"
+  ],
+  "events_listened": [
+    "hungerdelta",
+    "invincibletoggle",
+    "mounted",
+    "dismounted"
+  ],
+  "netvars": [
+    "currentmightiness",
+    "mightinessratescale"
+  ],
+  "tunables": [
+    "TUNING.MIGHTINESS_MAX",
+    "TUNING.MIGHTINESS_DRAIN_RATE",
+    "TUNING.MIGHTINESS_DRAIN_MULT_NORMAL",
+    "TUNING.WOLFGANG_MIGHTINESS_DRAIN_DELAY",
+    "TUNING.MIGHTY_THRESHOLD",
+    "TUNING.WIMPY_THRESHOLD",
+    "TUNING.WIMPY_HUNGER_RATE_MULT",
+    "TUNING.WIMPY_WORK_EFFECTIVENESS",
+    "TUNING.MIGHTY_WORK_EFFECTIVENESS",
+    "TUNING.MIGHTY_ROWER_MULT",
+    "TUNING.MIGHTY_ROWER_EXTRA_MAX_VELOCITY",
+    "TUNING.MIGHTY_ANCHOR_SPEED",
+    "TUNING.MIGHTY_SAIL_BOOST_STRENGTH",
+    "TUNING.INSULATION_TINY",
+    "TUNING.MIGHTINESS_DRAIN_MULT_SLOW",
+    "TUNING.MIGHTINESS_DRAIN_MULT_FAST",
+    "TUNING.MIGHTINESS_DRAIN_MULT_FASTEST",
+    "TUNING.MIGHTINESS_DRAIN_MULT_STARVING"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      15903,
+      15904,
+      45439,
+      13409,
+      20044,
+      20152,
+      20154
+    ],
+    "aspects": [
+      {
+        "aspect": "力量值上限与突破",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "可以使力量值增加到超过100，上限从技能一级到五级分别为110、120、130、140、150。"
+          }
+        ]
+      },
+      {
+        "aspect": "力量值增加机制",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "每举重一次消耗一倍耐久（0.8），并增加3（弱小时）/3（普通时）/1.5（强壮时）力量值。"
+          },
+          {
+            "pageid": 15904,
+            "quote": "强大健身房提供高强度举重训练，允许沃尔夫冈消耗饥饿值来快速提升力量值。"
+          }
+        ]
+      },
+      {
+        "aspect": "力量值系统概述",
+        "evidence": [
+          {
+            "pageid": 45439,
+            "quote": "为沃尔夫冈加入了力量值系统，沃尔夫冈的状态会由力量值而不是饥饿值决定。"
+          }
+        ]
+      },
+      {
+        "aspect": "力量条视觉变化",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "力量条会变为紫色。"
+          }
+        ]
+      },
+      {
+        "aspect": "力量状态形态",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "特殊能力 = 锻炼就能变强<br/>不经常锻炼就会变弱"
+          },
+          {
+            "pageid": 20044,
+            "quote": "只有中等形态的沃尔夫冈，在学习“沃尔夫冈教练”技能后，才可以使用训练哨。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "力量",
+    "肌肉",
+    "沃尔夫冈",
+    "强壮",
+    "虚弱",
+    "锻炼",
+    "哑铃",
+    "力量值",
+    "状态转换",
+    "饥饿影响"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "角色成长",
+    "力量管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9c96393797f5484241253f1d11314e42311bab984f3987a0575b322ab47b6bbc",
+    "source_bytes": 14313,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109782230
+  }
+}

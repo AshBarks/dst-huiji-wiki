@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivalgameitem.lua"
+  },
+  "category": "component",
+  "display_name": "carnivalgameitem",
+  "summary": "该组件名为CarnivalGameItem，可能用于嘉年华游戏相关的物品实体，但在提供的源码中未定义任何数据或功能。它仅包含一个空的类构造函数，不参与具体核心玩法。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法,组件为空实现。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      14579,
+      18476,
+      15295,
+      13779,
+      15922,
+      18359,
+      45249
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提到carnivalgameitem或与嘉年华游戏物品相关的任何内容，因此无法找到该组件能力的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "游戏物品",
+    "组件",
+    "饥荒联机版",
+    "DST",
+    "Lua",
+    "实体",
+    "占位符",
+    "基础类"
+  ],
+  "gameplay_tags": [
+    "游戏",
+    "嘉年华"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "58eece9d5f4c630d58e06c6742d6b3b3339e876ffb341a277dec538c7b4fdf89",
+    "source_bytes": 108,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098861986
+  }
+}

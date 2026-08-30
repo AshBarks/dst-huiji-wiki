@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/uniqueid.lua"
+  },
+  "category": "component",
+  "display_name": "uniqueid",
+  "summary": "uniqueid组件负责管理每个实体的唯一标识符（ID），用于在游戏中唯一标识实体实例。ID在实体生成时通过世界组件自动分配，并在保存和加载时处理持久化。该组件确保实体在联机环境中的唯一性和状态同步。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法；所有逻辑由组件内部处理，如ID生成、保存和加载。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录聚焦于皮弗娄牛的生物行为、掉落物品、仇恨机制和繁殖特性，未提及唯一标识符或组件相关的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "唯一ID",
+    "实体ID",
+    "保存加载",
+    "联机同步",
+    "ID分配",
+    "持久化",
+    "数据保存"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/7)",
+  "gameplay_tags": [
+    "联机",
+    "同步",
+    "标识"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f91d748e2e97bd8680bceaa7a4f8b205a571e31ae03bfe163b12c1a21b0524f1",
+    "source_bytes": 697,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104431614
+  }
+}

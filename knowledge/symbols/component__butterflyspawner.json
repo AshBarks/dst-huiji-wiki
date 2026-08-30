@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/butterflyspawner.lua"
+  },
+  "category": "component",
+  "display_name": "butterflyspawner",
+  "summary": "该组件管理蝴蝶的生成逻辑，根据玩家位置和世界状态（白天且非冬季）在花朵附近自动生成蝴蝶。它维护蝴蝶数量上限，并在玩家加入或离开时调整调度任务。组件还追踪蝴蝶的睡眠状态以自动移除它们，确保环境动态更新。",
+  "api": [
+    {
+      "name": "StartTracking(target)",
+      "effect": "开始跟踪指定蝴蝶实体。副作用：设置 target.persists 为 false（若原本为 true），如果缺少 homeseeker 组件则添加，并监听其 entitysleep 事件以自动移除。"
+    },
+    {
+      "name": "StopTracking(target)",
+      "effect": "停止跟踪蝴蝶实体。副作用：恢复 target.persists 属性（根据跟踪状态），如果之前添加了 homeseeker 组件则移除，并取消 entitysleep 事件监听。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回调试信息字符串，包含当前更新状态（是否激活）和蝴蝶数量（当前/最大）。"
+    },
+    {
+      "name": "OnPostInit()",
+      "effect": "在组件初始化后调用，根据世界状态启动蝴蝶生成调度。"
+    },
+    {
+      "name": "SpawnModeNever()",
+      "effect": "已废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeLight()",
+      "effect": "已废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeMed()",
+      "effect": "已废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeHeavy()",
+      "effect": "已废弃方法，无实际效果。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "isday",
+    "iswinter",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MAX_BUTTERFLIES"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      20714,
+      15022,
+      13493,
+      28179,
+      34523,
+      13823,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "世界规则中蝴蝶生成数量影响",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响同时从花自然生成的蝴蝶的最大数量。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蝴蝶",
+    "生成",
+    "花朵",
+    "追踪",
+    "玩家",
+    "白天",
+    "冬季",
+    "调度",
+    "睡眠",
+    "自然"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "28695802c31d85cc1b3c281971c8ab5ae69320e0d993c9d97c447bbb4b290efc",
+    "source_bytes": 6944,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105900409
+  }
+}

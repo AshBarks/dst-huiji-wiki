@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fillable.lua"
+  },
+  "category": "component",
+  "display_name": "fillable",
+  "summary": "该组件赋予实体被填充水的属性，管理填充后的物品替换逻辑，是游戏中容器与水资源交互的核心机制之一。当实体被填充时，通常会消耗一个水源并将其转变为指定的“已填充”预制物品。该组件参与了水资源管理和物品交互玩法。",
+  "api": [
+    {
+      "name": "Fill",
+      "effect": "执行填充操作。优先调用overrideonfillfn进行自定义处理。若未定义，且filledprefab不为空，则会生成对应的预制物品，并替换当前实体在持有者库存中的物品或地图上的物品。同时会尝试调用来源物体的watersource:Use()方法。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理组件，从实体上移除所有相关的标签（'fillable', 'fillable_showoceanaction', 'allow_action_on_impassable'）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      39296,
+      22465,
+      15885,
+      14485,
+      17830,
+      14661,
+      27530,
+      14696
+    ],
+    "aspects": [
+      {
+        "aspect": "填充操作或装水行为描述",
+        "evidence": [
+          {
+            "pageid": 14485,
+            "quote": "浇水壶和鸟嘴壶被制作出来时耐久均为 0%，需要在水源装水来获得耐久。"
+          },
+          {
+            "pageid": 14661,
+            "quote": "矿工帽耐久耗尽后不会消失，仍然可以装备、填充耐久。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "装水",
+    "容器",
+    "填充",
+    "给水",
+    "消耗水",
+    "填充物品",
+    "水交互",
+    "物品转变"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d8641a7d943964a9e5ab3095fcc4a13beaa5bbf63aa82607c481f7b4fec37c9c",
+    "source_bytes": 1967,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099752940
+  }
+}

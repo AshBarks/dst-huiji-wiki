@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/constructionbuilder.lua"
+  },
+  "category": "component",
+  "display_name": "constructionbuilder",
+  "summary": "该组件管理实体（如玩家）在建筑工地上的建造过程。它跟踪当前建造实例和目标工地，处理开始、停止和完成建造操作。参与的核心玩法是游戏的建造系统，允许玩家通过收集材料并放置在工地上来构建结构。",
+  "api": [
+    {
+      "name": "CanStartConstruction",
+      "effect": ""
+    },
+    {
+      "name": "IsConstructing",
+      "effect": ""
+    },
+    {
+      "name": "IsConstructingAny",
+      "effect": ""
+    },
+    {
+      "name": "StartConstruction",
+      "effect": ""
+    },
+    {
+      "name": "StopConstruction",
+      "effect": ""
+    },
+    {
+      "name": "FinishConstruction",
+      "effect": ""
+    },
+    {
+      "name": "OnFinishConstruction",
+      "effect": ""
+    },
+    {
+      "name": "OnSave",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "stopconstruction"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      45249,
+      65881,
+      70704,
+      16640,
+      65605,
+      15539,
+      10413
+    ],
+    "aspects": [
+      {
+        "aspect": "薇诺娜建造时间减半能力描述",
+        "evidence": [
+          {
+            "pageid": 10413,
+            "quote": "薇诺娜的饥饿值不低于 49.95{{饥饿值}} 时，其建造动作和收回动…需要的时间减半（0.5 秒）。首次建造，或…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "建造",
+    "工地",
+    "施工",
+    "建筑",
+    "制作",
+    "工程",
+    "建造者",
+    "建造过程",
+    "建筑工地",
+    "建造系统"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "建筑",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4e02ca2ca0182c711c22489a4d0dac284eb75f005ddec411a477e8a4cd44a727",
+    "source_bytes": 7239,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090932181
+  }
+}

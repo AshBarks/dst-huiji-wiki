@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/retrofitforestmap_anr.lua"
+  },
+  "category": "component",
+  "display_name": "retrofitforestmap_anr",
+  "summary": "RetrofitForestMap_ANR组件负责在世界加载后更新地图内容，以适配游戏新版本或修复已知问题。它通过检查现有实体和地形，在合适位置生成新的游戏对象（如生物、建筑、资源），同时移除或修改旧内容，确保世界状态与游戏版本同步。该组件管理一系列更新标志，用于控制不同版本的改造逻辑执行。",
+  "api": [
+    {
+      "name": "OnPostInit",
+      "effect": "执行地图改造逻辑：检查并应用各种 retrofit 标志（如 retrofit_turnoftides、retrofit_barnacles 等），生成新实体（如 moonbase、oasislake）、移除或修改现有实体、修改地形标签，可能触发服务器重启。副作用包括生成实体、删除实体、修改世界拓扑和推送事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个空表，不保存任何数据；无直接副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从传入的数据表中加载多个 retrofit 标志（如 retrofit_part1、retrofit_artsandcrafts 等），并设置为实例变量，供后续 OnPostInit 使用；副作用是设置这些标志，影响世界改造行为。"
+    }
+  ],
+  "events_published": [
+    "ms_unlockchesspiece"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      45439,
+      45899,
+      72630
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未涉及 OnPostInit、OnSave、OnLoad 等代码能力的描述，仅包含游戏内容、更新日志或模组一般信息，无相关行为或表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "改造地图",
+    "更新内容",
+    "旧存档修复",
+    "世界改造",
+    "版本兼容",
+    "生成新物体",
+    "移除旧物体",
+    "地图更新",
+    "内容添加"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "世界生成",
+    "内容更新",
+    "修复"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "96d45130fcfa55a26c5a87b11293b38175b113e2f8ca946be7c997fc7d21a2a7",
+    "source_bytes": 72482,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111873694
+  }
+}

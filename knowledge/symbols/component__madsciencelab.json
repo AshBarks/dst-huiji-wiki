@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/madsciencelab.lua"
+  },
+  "category": "component",
+  "display_name": "madsciencelab",
+  "summary": "MadScienceLab组件用于管理科学实验室的制作过程。它维护制作阶段、产品、任务和名称数据。通过设置阶段和任务，控制科学产品的逐步生产。当制作完成时，触发回调通知外部系统。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当实体移除该组件时调用，取消当前进行中的任务，停止制作过程。"
+    },
+    {
+      "name": "IsMakingScience",
+      "effect": "返回一个布尔值，指示组件是否正在制作科学产品。无副作用。"
+    },
+    {
+      "name": "SetStage",
+      "effect": "设置当前制作阶段。如果阶段超过总阶段数，完成制作，触发OnScienceWasMade回调，并清空产品、名称和任务；否则设置下一个阶段任务，触发OnStageStarted回调。time_override参数用于保存/加载时恢复剩余时间。"
+    },
+    {
+      "name": "StartMakingScience",
+      "effect": "开始制作科学产品，指定产品标识符和可选的名称。调用SetStage(1)启动第一阶段，并触发OnStartMakingScience回调。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前组件状态，返回包含名称、产品、阶段和剩余时间的表，用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载状态，恢复制作过程，包括阶段和剩余时间。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前状态：如果不活动则显示'Inactive'，否则显示制作的产品、阶段和剩余时间。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长更新函数，当前实现为空，无实际效果。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14669,
+      70480
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及实体'reviver'和'shellweaver'，内容关于制作物品和建筑，未提及'madsciencelab'组件或其代码能力如IsMakingScience、SetStage等的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "科学实验室",
+    "制作过程",
+    "制作阶段",
+    "任务管理",
+    "产品合成",
+    "回调通知",
+    "数据维护",
+    "逐步生产"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "制作",
+    "科技"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "82b71c2f97d213a473c026df2763365aef32b90107053350f5e37ed550651e33",
+    "source_bytes": 2007,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101512768
+  }
+}

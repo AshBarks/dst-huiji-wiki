@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nutrients_visual_manager.lua"
+  },
+  "category": "component",
+  "display_name": "nutrients_visual_manager",
+  "summary": "这是一个客户端组件，负责管理游戏中营养物质可视化效果的显示与隐藏。它通过监听`nutrientsvision`事件来切换全局视野开关，并据此更新所有已注册的营养物质视觉特效的动画状态，使其在启用与禁用之间切换。",
+  "api": [
+    {
+      "name": "RegisterNutrientsVisual",
+      "effect": "将一个视觉特效实例注册到本管理器中，以便在全局营养视野开关切换时对其显示状态进行更新。"
+    },
+    {
+      "name": "UnregisterNutrientsVisual",
+      "effect": "将一个已注册的视觉特效实例从本管理器中移除，停止对其显示状态的管理。"
+    },
+    {
+      "name": "UpdateVisualAnimState",
+      "effect": "根据当前`nutrients_vision`标志的状态（开/关），更新传入视觉特效实例的动画状态。关闭时将其变为黑色半透明并置于地面层；开启时将其恢复为正常颜色并置于背景层。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "nutrientsvision"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      14711,
+      19932,
+      18234,
+      13493,
+      65505,
+      14816,
+      14935
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及土壤营养描述（如催长剂、堆肥、粪肥）、植物登记表、光照动画等，但未具体提及营养视觉管理器的注册、注销或动画状态更新行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "营养",
+    "可视化",
+    "显示",
+    "开关",
+    "动画",
+    "颜色",
+    "特效",
+    "注册",
+    "客户端",
+    "农田"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "农业"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3ad7707835ed1d2004fd989a69ac33dd0d9997b00fdc15cb2475ed450f5f3969",
+    "source_bytes": 2977,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110436295
+  }
+}

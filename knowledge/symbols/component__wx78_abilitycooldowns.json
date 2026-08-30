@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wx78_abilitycooldowns.lua"
+  },
+  "category": "component",
+  "display_name": "wx78_abilitycooldowns",
+  "summary": "该组件管理 WX78 角色的技能冷却时间数据，负责存储和追踪每个技能的冷却状态。它参与技能使用后的冷却计时机制，确保技能在冷却期间无法重复使用，并支持冷却的重启和停止操作。",
+  "api": [
+    {
+      "name": "IsInCooldown(abilityname)",
+      "effect": "检查指定技能是否处于冷却状态，返回布尔值。"
+    },
+    {
+      "name": "GetAbilityCooldownPercent(abilityname)",
+      "effect": "获取指定技能冷却的完成百分比（0到1之间），若技能无冷却则返回 nil。"
+    },
+    {
+      "name": "RegisterAbilityCooldown(cd)",
+      "effect": "注册一个冷却实体到组件中，并推送更新事件；若 abilityname 无效或已存在，打印错误信息。"
+    },
+    {
+      "name": "RestartAbilityCooldown(abilityname, duration)",
+      "effect": "仅在服务器端执行：重启指定技能的冷却计时，若不存在则创建新的冷却实体，持续时间为 duration。"
+    },
+    {
+      "name": "StopAbilityCooldown(abilityname)",
+      "effect": "仅在服务器端执行：停止指定技能的冷却，移除对应的冷却实体。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回所有冷却状态的调试字符串，包含技能名称、百分比和持续时间。"
+    }
+  ],
+  "events_published": [
+    "wx78_abilitycooldowns_update"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      20719,
+      15922,
+      13701,
+      16615,
+      72141,
+      15832
+    ],
+    "aspects": [
+      {
+        "aspect": "冷却时间界面显示",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "默认只显示电荷和处于冷却时间中的电路板"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "技能冷却",
+    "WX78",
+    "冷却时间",
+    "冷却状态",
+    "冷却重置",
+    "冷却暂停",
+    "冷却进度",
+    "冷却设置",
+    "冷却调试"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5011dcdf287b88a101fc9d28b6d4b65ed9cfa13b3d3d9a5b6b895450cf184d53",
+    "source_bytes": 2996,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104902506
+  }
+}

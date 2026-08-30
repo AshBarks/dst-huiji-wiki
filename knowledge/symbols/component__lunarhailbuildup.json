@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarhailbuildup.lua"
+  },
+  "category": "component",
+  "display_name": "lunarhailbuildup",
+  "summary": "该组件管理实体在月球冰雹事件中的积累状态，包括积累值、可工作状态和月玻璃奖励掉落。核心玩法涉及在月球冰雹期间积累值，通过工作移除积累并获得奖励，同时响应世界状态变化控制积累和衰减。",
+  "api": [
+    {
+      "name": "SetOnStartIsLunarHailingFn",
+      "effect": "设置当世界状态变为月球冰雹且组件启动积累任务时调用的回调函数。"
+    },
+    {
+      "name": "SetOnStopIsLunarHailingFn",
+      "effect": "设置当世界状态变为非月球冰雹且组件停止积累任务时调用的回调函数。"
+    },
+    {
+      "name": "IsBuildupWorkable",
+      "effect": "检查组件是否可工作，返回布尔值，表示 workleft 是否大于 0。"
+    },
+    {
+      "name": "SetTotalWorkAmount",
+      "effect": "设置总工作量，并调整当前工作量不超过新值。"
+    },
+    {
+      "name": "SetMoonGlassAmount",
+      "effect": "设置掉落月玻璃的数量。"
+    },
+    {
+      "name": "GetBuildupPercent",
+      "effect": "返回当前积累量与最大积累量的比值。"
+    },
+    {
+      "name": "SetBuildupPercent",
+      "effect": "设置积累百分比，通过调整当前积累量实现，并触发积累变化事件。"
+    },
+    {
+      "name": "SetIgnoreLunarHailTicks",
+      "effect": "设置是否忽略月球冰雹ticks，如果忽略则阻止积累，并可能触发开始或停止月球冰雹的回调函数。"
+    },
+    {
+      "name": "DoLunarHailTick",
+      "effect": "执行月球冰雹tick，如果 buildingup 为真且实体有雨水免疫或忽略ticks则返回；否则根据参数增加或减少积累量。"
+    },
+    {
+      "name": "StartBuildupTask",
+      "effect": "开始周期性任务以增加积累量，周期基于 TUNING.LUNARHAIL_BUILDUP_TICK_TIME。"
+    },
+    {
+      "name": "StartDecayTask",
+      "effect": "开始周期性任务以减少积累量，周期基于 TUNING.LUNARHAIL_BUILDUP_DECAY_TICK_TIME。"
+    },
+    {
+      "name": "OnIsLunarHailing",
+      "effect": "响应世界状态变化，停止当前tick任务，如果月球冰雹则启动积累任务并调用开始回调，否则启动衰减任务并调用停止回调。"
+    },
+    {
+      "name": "DoWorkToRemoveBuildup",
+      "effect": "减少工作量，如果工作量归零则掉落奖励、完成工作并可能重启积累任务；向 doer 和实体推送事件。"
+    },
+    {
+      "name": "DoAllRemainingWorkToRemoveBuildup",
+      "effect": "移除所有剩余工作量，调用 DoWorkToRemoveBuildup。"
+    },
+    {
+      "name": "DropRewards",
+      "effect": "掉落月玻璃奖励，数量为 moonglassamount 乘以 mult，每个有概率变成充电月玻璃。"
+    },
+    {
+      "name": "OnWorkFinished",
+      "effect": "处理工作完成，移除事件监听、重置工作量、移除标签、推送状态变化事件并减少积累量。"
+    },
+    {
+      "name": "WorkInit",
+      "effect": "初始化工作，设置工作量、添加标签、监听 worked 事件并推送状态变化事件。"
+    },
+    {
+      "name": "DoBuildupDelta",
+      "effect": "调整积累量，如果变化则更新状态并可能启动或停止任务，推送积累变化事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存的数据表，包含工作量和积累量。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载状态，如果数据有工作量则初始化工作并调整积累量。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示积累量、最大积累量、剩余工作和下一个tick时间。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时调用，停止tick任务、移除标签并更新状态。"
+    },
+    {
+      "name": "StopTickTask",
+      "effect": "停止当前的周期性任务。"
+    }
+  ],
+  "events_published": [
+    "lunarhailbuildupworked",
+    "lunarhailbuildupworkablestatechanged",
+    "lunarhailbuildupdelta"
+  ],
+  "events_listened": [
+    "worked"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LUNARHAIL_BUILDUP_TOTAL_WORK_AMOUNT_MEDIUM",
+    "LUNARHAIL_BUILDUP_MOONGLASS_AMOUNT_MEDIUM",
+    "LUNARHAIL_BUILDUP_TICK_TIME",
+    "LUNARHAIL_BUILDUP_RATE",
+    "LUNARHAIL_BUILDUP_DECAY_TICK_TIME",
+    "LUNARHAIL_BUILDUP_DECAY_RATE",
+    "LUNARHAIL_BUILDUP_MOONGLASS_REWARDS_CHARGED_CHANCE_MIN",
+    "LUNARHAIL_BUILDUP_MOONGLASS_REWARDS_CHARGED_CHANCE_MAX",
+    "LUNARHAIL_BUILDUP_MOONGLASS_REWARDS_DESTRUCTION_MULT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      15225,
+      15415,
+      13457,
+      21485,
+      14426,
+      18357,
+      24240
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未涉及 `component__lunarhailbuildup` 的能力表达。页面主题包括寄居蟹、暗影傀儡、鱼人、交易小店、耕种、提灯、桅杆和嘉年华奖票，没有讨论月亮碎片附着机制或相关能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "特殊互动/月亮碎片附着/工作次数",
+      "特殊互动/月亮碎片附着/掉落数量",
+      "分类:月亮碎片附着"
+    ],
+    "code_fields": [
+      "lunarhailbuildup_totalworkamount",
+      "lunarhailbuildup_moonglassamount"
+    ],
+    "overridable_fields": [],
+    "note": "月亮碎片附着清除工作量与月璃掉落数。"
+  },
+  "search_terms": [
+    "月球冰雹",
+    "积累",
+    "月玻璃",
+    "工作",
+    "奖励",
+    "衰减",
+    "tick",
+    "状态变化",
+    "构建"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "收集",
+    "环境互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "70f3e9b9663d3983ad91bed36fa3c86d1cc9e9dc7cf9404ecbe6dd4fcf12a4d9",
+    "source_bytes": 8393,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095468244
+  }
+}

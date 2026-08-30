@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanthrowable.lua"
+  },
+  "category": "component",
+  "display_name": "oceanthrowable",
+  "summary": "OceanThrowable 组件管理实体的海洋投掷相关功能，确保实体添加复杂投射物组件并支持自定义回调。该组件主要参与将物体投掷到海洋的核心玩法。",
+  "api": [
+    {
+      "name": "SetOnAddProjectileFn",
+      "effect": "设置添加投射物时调用的回调函数。效果：将传入的函数赋值给 self.onaddprojectilefn，用于在添加投射物后执行自定义逻辑。"
+    },
+    {
+      "name": "AddProjectile",
+      "effect": "为实体添加复杂投射物组件。效果：如果实体没有 complexprojectile 组件，则自动添加；如果设置了回调函数，则执行该回调。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18843,
+      14486,
+      14938,
+      15532,
+      15539,
+      20842,
+      52142,
+      18005
+    ],
+    "aspects": [
+      {
+        "aspect": "投掷动作描述",
+        "evidence": [
+          {
+            "pageid": 18005,
+            "quote": "只能向海洋投掷"
+          }
+        ]
+      },
+      {
+        "aspect": "投掷后效果触发",
+        "evidence": [
+          {
+            "pageid": 18005,
+            "quote": "投掷后在海面上形成半径为 4 单位的饵料圈"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海洋投掷",
+    "投射物",
+    "复杂投射物",
+    "自定义回调",
+    "投掷组件",
+    "海面投掷",
+    "物品投掷",
+    "武器投射",
+    "抛射物"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "海洋",
+    "投掷"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4620df8821daaa16750d2cbeaafa8dfe50527c7bdbd3c4730eab4f4344f73f58",
+    "source_bytes": 498,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102239662
+  }
+}

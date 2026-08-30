@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/walkableplatformmanager.lua"
+  },
+  "category": "component",
+  "display_name": "walkableplatformmanager",
+  "summary": "该组件管理可行走平台的唯一标识符（UID）分配和注册表，确保每个平台拥有唯一ID。在游戏更新时，服务器端负责更新平台上的实体位置、测试玩家是否在平台上并提交玩家状态，支持多人游戏中玩家在移动平台上的同步。组件还提供保存和加载功能以持久化UID计数器。",
+  "api": [
+    {
+      "name": "GetNewUID",
+      "effect": "生成并返回一个新的唯一标识符（UID），副作用是将内部 lastuid 计数器递增1。"
+    },
+    {
+      "name": "UnregisterPlatform",
+      "effect": "根据平台的 UID 将其从注册表中移除；如果平台无 UID 或 UID 与注册表不匹配，则打印警告信息。"
+    },
+    {
+      "name": "RegisterPlatform",
+      "effect": "注册平台：如果平台无 UID，则分配新 UID；如果 UID 大于当前 lastuid，则更新 lastuid（支持遗留数据）；如果 UID 未重复，则将平台添加到注册表；否则打印警告。"
+    },
+    {
+      "name": "GetPlatformWithUID",
+      "effect": "根据提供的 UID 从注册表中返回对应的平台实体，如果不存在则返回 nil。"
+    },
+    {
+      "name": "AddPlatform",
+      "effect": "将平台添加到内部跟踪列表 walkable_platforms 中，标记为 true。"
+    },
+    {
+      "name": "RemovePlatform",
+      "effect": "从内部跟踪列表 walkable_platforms 中移除平台。"
+    },
+    {
+      "name": "PostUpdate",
+      "effect": "服务器端更新：遍历所有平台，调用 SetEntitiesOnPlatform 更新实体位置，然后测试所有玩家的平台状态，最后提交玩家在平台上的状态；客户端仅更新当前玩家（ThePlayer）的平台测试。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含 lastuid 的表，用于保存数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从传入的数据中加载 lastuid，如果存在则更新内部 lastuid 计数器。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      13199,
+      14682,
+      14683,
+      14710,
+      15337,
+      47057,
+      61804
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与walkableplatformmanager相关的任何能力或行为语义，如平台注册、注销、更新等；仅页面15337提到漂浮平台但仅作为溯源表的使用提示，未涉及组件管理。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "可行走平台",
+    "唯一ID",
+    "平台注册表",
+    "多人同步",
+    "平台移动",
+    "游戏更新",
+    "实体位置",
+    "玩家状态",
+    "保存加载",
+    "UID计数器"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "移动",
+    "同步",
+    "多人游戏",
+    "平台"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "24b17b6ad3a55b13faa7aff93e0e70071861ff94d92ad4cc8607835a48a36400",
+    "source_bytes": 3020,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113808852
+  }
+}

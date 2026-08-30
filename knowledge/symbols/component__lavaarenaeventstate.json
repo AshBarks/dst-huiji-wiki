@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lavaarenaeventstate.lua"
+  },
+  "category": "component",
+  "display_name": "lavaarenaeventstate",
+  "summary": "lavaarenaeventstate 组件管理熔岩竞技场事件的状态数据，包括当前回合数、比赛结果（胜利或失败）、社区整体进度以及每个玩家的个人任务进度。它用于同步客户端与服务器之间的竞技场事件进展，并在比赛结束时触发 endofmatch 事件以通知玩家。",
+  "api": [
+    {
+      "name": "GetServerProgressionJson",
+      "effect": "返回服务器端的社区进度 JSON 字符串，用于查询熔岩竞技场的整体进度数据。"
+    },
+    {
+      "name": "GetCurrentRound",
+      "effect": "返回当前回合数，确保最小值为1。"
+    },
+    {
+      "name": "GetServerPlayerQuestJson",
+      "effect": "给定玩家槽位（quest_slot），返回该玩家的任务进度 JSON 字符串，用于查询个人任务状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "victorystatedirty"
+  ],
+  "netvars": [
+    "round",
+    "victorystate",
+    "progression_json",
+    "player_quest_json"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      14815,
+      18234,
+      15941,
+      18540,
+      34314,
+      14683,
+      15753
+    ],
+    "aspects": [
+      {
+        "aspect": "社区进度解锁boss描述",
+        "evidence": [
+          {
+            "pageid": 14815,
+            "quote": "击败大熔炉猪战士或野猪猩，游戏胜利（在社区进度解锁下个boss之前）"
+          },
+          {
+            "pageid": 14815,
+            "quote": "击败犀牛兄弟，游戏胜利（在社区进度解锁下个boss之前）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "熔岩竞技场",
+    "事件状态",
+    "回合",
+    "胜利",
+    "失败",
+    "社区进度",
+    "玩家任务",
+    "网络同步",
+    "比赛结果"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "事件",
+    "进度"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "de7cfc6cbda4c3bb3b3c379db7a29077fb79710907bfe77291094d27e0891f44",
+    "source_bytes": 3397,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101160459
+  }
+}

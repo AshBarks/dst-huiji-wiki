@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pethealthbar.lua"
+  },
+  "category": "component",
+  "display_name": "pethealthbar",
+  "summary": "pethealthbar组件用于管理宠物的血条显示数据，包括当前血量百分比、最大血量、增益血量、皮肤和状态（如中毒、恢复趋势）。该组件通过网络变量同步数据到客户端，在战斗和生存玩法中为玩家提供宠物的实时健康状态反馈，影响玩家决策和操作。",
+  "api": [
+    {
+      "name": "GetSymbol",
+      "effect": "返回当前宠物血条符号的值（网络变量_symbol），用于显示不同外观。"
+    },
+    {
+      "name": "GetSymbol2",
+      "effect": "返回第二个宠物血条符号的值（网络变量_symbol2），用于显示额外外观。"
+    },
+    {
+      "name": "GetMaxHealth",
+      "effect": "返回宠物的最大血量值（网络变量_maxhealth）。"
+    },
+    {
+      "name": "GetMaxBonus",
+      "effect": "如果增益最大血量（_maxbonus）大于0，则返回该值；否则返回nil。"
+    },
+    {
+      "name": "GetOverTime",
+      "effect": "返回血量变化趋势状态值：-2（大幅下降）、-1（小幅下降）、0（无变化）、1（小幅上升）、2（大幅上升），基于网络变量_status计算。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回宠物当前血量百分比（网络变量_healthpct）。"
+    },
+    {
+      "name": "GetPercentBonus",
+      "effect": "如果增益最大血量（_maxbonus）大于0，则返回增益血量百分比（网络变量_bonuspct）；否则返回nil。"
+    },
+    {
+      "name": "GetPulse",
+      "effect": "返回脉冲值（网络变量_pulse），1表示绿色（恢复），2表示红色（受伤）。"
+    },
+    {
+      "name": "ResetPulse",
+      "effect": "将脉冲值（_pulse）本地重置为0，用于客户端同步。"
+    },
+    {
+      "name": "SetSymbol",
+      "effect": "设置宠物血条符号值（仅服务器端执行）；如果值变化，更新网络变量并触发客户端事件'clientpethealthsymboldirty'。"
+    },
+    {
+      "name": "SetSymbol2",
+      "effect": "设置第二个宠物血条符号值（仅服务器端执行）；如果值变化，更新网络变量并触发客户端事件'clientpethealthsymboldirty'。"
+    },
+    {
+      "name": "SetMaxHealth",
+      "effect": "设置宠物最大血量（仅服务器端执行）；如果值变化，更新网络变量并触发客户端事件'clientpetmaxhealthdirty'。"
+    },
+    {
+      "name": "SetPetSkin",
+      "effect": "设置宠物皮肤字符串（仅服务器端执行）；更新网络变量_petskin并触发客户端事件'clientpetskindirty'。"
+    },
+    {
+      "name": "SetPet",
+      "effect": "绑定宠物实体（仅服务器端执行）：设置符号、最大血量、皮肤，清理旧宠物事件绑定，监听新宠物的健康变化、增益变化、腐蚀和恢复debuff事件，启动初始健康百分比更新和组件持续更新。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新宠物血条状态（服务器端）：根据宠物是否冻结、过热、饥饿、受火灾伤害、有腐蚀debuff或恢复debuff，计算状态趋势值（如3表示下降），并更新网络变量_status触发客户端事件'clientpethealthstatusdirty'。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前血量百分比、最大血量、符号值和状态值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "healthdelta",
+    "startcorrosivedebuff",
+    "starthealthregen",
+    "startsmallhealthregen",
+    "pethealthbar_bonuschange",
+    "onremove",
+    "pethealthsymboldirty",
+    "pethealthstatusdirty",
+    "pethealthpulsedirty",
+    "pethealthmaxdirty",
+    "pethealthpctdirty",
+    "pethealthpetskindirty",
+    "petbonusmaxdirty",
+    "petbonuspctdirty",
+    "pethealthsymbol2dirty"
+  ],
+  "netvars": [
+    "_symbol",
+    "_symbol2",
+    "_status",
+    "_maxhealth",
+    "_pulse",
+    "_healthpct",
+    "_petskin",
+    "_maxbonus",
+    "_bonuspct"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15244,
+      13261,
+      16197,
+      18057,
+      15022,
+      34003,
+      15295,
+      13268
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要涉及生命值机制、角色属性、食物效果和宠物一般行为，但未提及component__pethealthbar组件或其代码能力（如获取/设置符号、最大生命值、宠物皮肤等），无玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宠物血条",
+    "生命值",
+    "健康状态",
+    "增益血量",
+    "皮肤",
+    "网络同步",
+    "血量变化",
+    "恢复",
+    "中毒"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "215c1940d78446d3057563e6e9d574b06fc9de421741448e3233ff20b9167047",
+    "source_bytes": 12074,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110774408
+  }
+}

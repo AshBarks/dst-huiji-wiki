@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farmtiller.lua"
+  },
+  "category": "component",
+  "display_name": "farmtiller",
+  "summary": "FarmTiller 组件管理实体耕种土壤的能力，提供 Till 方法用于在指定位置创建农田土壤。它通过塌陷土壤并生成 farm_soil 实体来实现，同时触发执行者的耕种事件。这支持游戏中的农业和种植核心玩法。",
+  "api": [
+    {
+      "name": "Till",
+      "effect": "检查给定点是否可耕种；若可，塌陷该点土壤并生成 farm_soil 实体并设置位置；若提供执行者（doer），触发其 'tilling' 事件；成功返回 true，否则返回 false。"
+    }
+  ],
+  "events_published": [
+    "tilling"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14711,
+      21485,
+      14486,
+      14484,
+      34523,
+      13261,
+      14712,
+      15415
+    ],
+    "aspects": [
+      {
+        "aspect": "耕地机部署与地块翻土",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "物品形态的耕地机可以被部署在任意一块可进行种植且不是农田地块的地块上成为建筑形态，15 秒后使所在地块变为"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "耕种",
+    "农田",
+    "土壤",
+    "种植",
+    "翻地",
+    "farm",
+    "till"
+  ],
+  "gameplay_tags": [
+    "农业",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e78d26df9f6a734fbb2c8d2436f4bfe0f375320341cf1ca9f7acbb3cf367755b",
+    "source_bytes": 433,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099705403
+  }
+}

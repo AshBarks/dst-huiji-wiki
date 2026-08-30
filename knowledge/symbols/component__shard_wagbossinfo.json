@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shard_wagbossinfo.lua"
+  },
+  "category": "component",
+  "display_name": "shard_wagbossinfo",
+  "summary": "该组件管理 Wagboss 的击败状态数据，通过网络变量 net_bool 在分片间同步状态。它响应主分片的 master_wagbossinfoupdate 事件，确保击败状态全局一致，支持跨分片的游戏进度共享与挑战触发。",
+  "api": [
+    {
+      "name": "IsWagbossDefeated",
+      "effect": "返回一个布尔值，表示 Wagboss 是否被击败，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "master_wagbossinfoupdate"
+  ],
+  "netvars": [
+    "_isdefeated"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      45249,
+      13437,
+      23187,
+      10355,
+      13779,
+      14579,
+      15295,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及'Wagboss'或其击败状态的相关表达。页面中虽有击败 boss 的描述（如帝王蟹、大霜鲨），但 boss 名称与能力清单 IsWagbossDefeated 不匹配，且无证据表明页面讨论了该特定能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Wagboss",
+    "击败",
+    "状态同步",
+    "分片",
+    "Boss战",
+    "进度共享",
+    "联机同步",
+    "DST"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "进度",
+    "跨分片"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fc57d3d2c531c4adf925391f8566578021678529441f7d7cc8de2087fdbe3772",
+    "source_bytes": 1759,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103553333
+  }
+}

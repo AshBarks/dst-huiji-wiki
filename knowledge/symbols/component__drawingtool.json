@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/drawingtool.lua"
+  },
+  "category": "component",
+  "display_name": "drawingtool",
+  "summary": "DrawingTool 组件管理绘制工具的逻辑，包括设置绘制回调、获取实体图像信息以及执行绘制操作。它参与的核心玩法是允许玩家使用工具自定义实体外观，增强游戏的装饰和个性化体验。",
+  "api": [
+    {
+      "name": "SetOnDrawFn",
+      "effect": "设置一个回调函数，当绘制发生时被调用。副作用：将函数存储到组件的 ondrawfn 属性中。"
+    },
+    {
+      "name": "GetImageToDraw",
+      "effect": "根据目标实体和执行者获取要绘制的图像信息，包括图像名、图集、背景图像等。行为：查找附近可绘制的实体，提取其图像覆盖或库存物品图像。副作用：无显著副作用，仅返回数据。"
+    },
+    {
+      "name": "Draw",
+      "effect": "在目标实体上执行绘制操作，调用目标的 drawable 组件的 OnDrawn 方法，并触发 ondrawfn 回调。副作用：可能更新目标的视觉表现，使其显示新的图像。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      15295,
+      45249,
+      13779,
+      18476,
+      14486,
+      45248,
+      45250
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅包含静态图像引用、属性描述和模板标记，未涉及绘制工具的代码能力或相关行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "绘画",
+    "工具",
+    "图像",
+    "装饰",
+    "自定义",
+    "绘制",
+    "皮肤",
+    "外观",
+    "实体"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "自定义"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e48ce47a14d2e28c775012e38aa43c82bf3fb42341c659ef94d14fa4662e0b7b",
+    "source_bytes": 2065,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099520670
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/souleater.lua"
+  },
+  "category": "component",
+  "display_name": "souleater",
+  "summary": "SoulEater 组件管理实体吞噬灵魂的能力，设置一个回调函数在吞噬时触发。它通过添加 'souleater' 标签标识实体，并在 EatSoul 方法中处理灵魂实体，推送 'oneatsoul' 事件并调用回调。核心玩法涉及灵魂的消耗和收集，常用于战斗或生存机制。",
+  "api": [
+    {
+      "name": "SetOnEatSoulFn(fn)",
+      "effect": "设置一个回调函数，该函数在实体吃灵魂时被调用。函数参数为实体和灵魂，无其他副作用。"
+    },
+    {
+      "name": "EatSoul(soul)",
+      "effect": "尝试吃灵魂实体。首先检查灵魂是否有 soul 组件，如果没有则返回 false。如果灵魂有堆叠组件，则获取一个灵魂。然后推送 'oneatsoul' 事件到实例，事件数据包含 soul。之后调用设置的回调函数（如果存在）。最后，如果灵魂实体仍然有效，则移除它。返回 true 表示成功吞噬。"
+    }
+  ],
+  "events_published": [
+    "oneatsoul"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      22181,
+      18234,
+      21620,
+      18216,
+      35412,
+      15903,
+      13437
+    ],
+    "aspects": [
+      {
+        "aspect": "技能树对食用灵魂的理智影响",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "好孩子沃拓克斯在食用灵魂时，扣除 10{{理智值}}（原为扣除 5{{理智值}}）。"
+          },
+          {
+            "pageid": 13260,
+            "quote": "淘气包沃拓克斯在食用灵魂时，不再扣除理智值。"
+          }
+        ]
+      },
+      {
+        "aspect": "灵魂食用基本机制",
+        "evidence": [
+          {
+            "pageid": 22181,
+            "quote": "沃拓克斯可以食用灵魂，回复 25 {{饥饿值}}，默认扣除 5 {{理智值}}。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "灵魂",
+    "吞噬",
+    "吃灵魂",
+    "组件",
+    "回调",
+    "事件",
+    "Souleater",
+    "灵魂收集",
+    "消耗",
+    "标签"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ead80ed2ae58bf1ef86ff7bcdc74b70763c39ba59f3cdaff076ea53e9ea6c9ef",
+    "source_bytes": 769,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112861320
+  }
+}

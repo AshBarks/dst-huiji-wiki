@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yoth_hecklermanager.lua"
+  },
+  "category": "component",
+  "display_name": "yoth_hecklermanager",
+  "summary": "该组件管理“古怪人”在骑士神龛上的行为，包括着陆、离开和计时。它响应舞台表演的开始和结束，控制古怪人的出现时机，并处理与神龛状态的交互。核心玩法涉及马年活动中的互动事件和计时管理。",
+  "api": [
+    {
+      "name": "IsHecklerAvailable",
+      "effect": "返回布尔值，检查古怪人是否未被保留给任何神龛。"
+    },
+    {
+      "name": "ShrineHasHeckler",
+      "effect": "接收神龛参数，返回布尔值，检查该神龛是否保留了古怪人。"
+    },
+    {
+      "name": "ReserveHecklerToShrine",
+      "effect": "接收神龛参数，将古怪人保留给该神龛，无返回值。"
+    },
+    {
+      "name": "UnreserveHecklerFromShrine",
+      "effect": "接收神龛参数，取消古怪人对该神龛的保留，无返回值。"
+    },
+    {
+      "name": "HecklerReturnTimerExists",
+      "effect": "返回布尔值，检查古怪人返回计时器是否存在。"
+    },
+    {
+      "name": "CanHecklerLand",
+      "effect": "返回布尔值，检查古怪人是否可以着陆：需无舞台表演进行、神龛活跃、古怪人可用且无返回计时器。"
+    },
+    {
+      "name": "TryHecklerLand",
+      "effect": "接收神龛参数，尝试让古怪人着陆于该神龛。若成功，保留古怪人并启动离开计时器，触发“arrive”事件，返回 true；否则返回 false。"
+    },
+    {
+      "name": "TryHecklerFlyAway",
+      "effect": "接收神龛参数和可选离开台词覆盖，尝试让古怪人飞离该神龛。若成功，播放离开对话，停止离开计时器并启动返回计时器，触发“leave”事件，取消保留，返回 true；否则返回 false。"
+    },
+    {
+      "name": "HasGivenPlaybill",
+      "effect": "返回布尔值，检查是否已经给了演出单。"
+    },
+    {
+      "name": "SetPlaybillGiven",
+      "effect": "设置已给出演出单标志，无返回值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回数据表和实体表，保存演出单状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "接收数据表参数，加载演出单状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回字符串，包含演出单状态和保留神龛的调试信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_register_charlie_stage",
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [
+    "YOTH_HECKLER_SHRINE_LEAVE_BASE",
+    "YOTH_HECKLER_SHRINE_LEAVE_VARIANCE",
+    "YOTH_HECKLER_SHRINE_RETURN_BASE",
+    "YOTH_HECKLER_SHRINE_RETURN_VARIANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      16174,
+      70633,
+      23211,
+      13642,
+      52107,
+      70534,
+      19266
+    ],
+    "aspects": [
+      {
+        "aspect": "嘲鸫出现与降落条件",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "在发条骑士之年活动期间，且当前并未正在表演舞台剧时，供奉发条骑士神龛，嘲鸫会降落在上面。"
+          }
+        ]
+      },
+      {
+        "aspect": "嘲鸫离开神龛行为",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "舞台剧开始表演后，嘲鸫会离开该神龛并回到舞台。"
+          }
+        ]
+      },
+      {
+        "aspect": "嘲鸫给予剧本事件",
+        "evidence": [
+          {
+            "pageid": 70534,
+            "quote": "嘲鸫会降落到神龛上交谈，最后丢下该剧目。"
+          }
+        ]
+      },
+      {
+        "aspect": "嘲鸫返回计时描述",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "舞台剧表演结束 3 秒后，嘲鸫才会重新随机降。"
+          }
+        ]
+      },
+      {
+        "aspect": "嘲鸫飞走意图表达",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "站在神龛上的嘲鸫会告知自己将要参与并飞走。"
+          }
+        ]
+      },
+      {
+        "aspect": "神龛与嘲鸫的绑定状态",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "站在神龛上的嘲鸫"
+          },
+          {
+            "pageid": 18825,
+            "quote": "嘲鸫会降临到[[发条骑士神龛]]上与玩家对话。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "古怪人",
+    "神龛",
+    "马年",
+    "舞台",
+    "演出单",
+    "着陆",
+    "飞走",
+    "计时器",
+    "保留",
+    "可用"
+  ],
+  "gameplay_tags": [
+    "活动",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b248f827c0f3273ce6b41e30a6993a628a5b6181f3a47d6e03f4228095890bad",
+    "source_bytes": 7760,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114725098
+  }
+}

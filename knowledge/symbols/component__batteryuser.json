@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/batteryuser.lua"
+  },
+  "category": "component",
+  "display_name": "batteryuser",
+  "summary": "该组件管理实体的电池使用行为，包括设置充电乘数函数、电池使用回调函数以及是否允许部分充电。它参与游戏中的充电机制，允许实体从电池源（如可充电设备）获取能量，通常用于科技工具或设备的充能过程。",
+  "api": [
+    {
+      "name": "SetChargeMultFn",
+      "effect": "设置一个函数，用于计算充电乘数，该函数在充电时被调用，以影响最终充电量。副作用：更新内部chargemultfn属性。"
+    },
+    {
+      "name": "SetOnBatteryUsedFn",
+      "effect": "设置一个回调函数，在电池被成功使用后触发，可用于执行自定义逻辑。副作用：更新内部onbatteryused属性。"
+    },
+    {
+      "name": "SetAllowPartialCharge",
+      "effect": "设置是否允许部分充电，如果允许，则调用目标电池组件的ResolvePartialChargeMult方法解析部分充电乘数。副作用：更新内部allowpartialcharge属性。"
+    },
+    {
+      "name": "ChargeFrom",
+      "effect": "从指定充电目标实体充电。行为：获取充电乘数函数计算乘数，如果允许部分充电则解析，检查电池是否可用（调用目标battery:CanBeUsed），触发电池使用回调（若设置），成功则调用目标battery:OnUsed减少燃料。副作用：可能改变目标电池状态，执行回调函数，返回充电结果和原因。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15729,
+      10418,
+      71584,
+      51494,
+      15027,
+      15022,
+      21634,
+      15234
+    ],
+    "aspects": [
+      {
+        "aspect": "充电恢复效果",
+        "evidence": [
+          {
+            "pageid": 21634,
+            "quote": "使用充能奔雷矛冲刺时，每击中一个目标恢复充能奔雷矛 2% 耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "充电机制描述",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "可以在[[蓄电池]]处充电，消耗蓄电池的 1 个电荷，增加 1 格电荷"
+          },
+          {
+            "pageid": 71584,
+            "quote": "蓄电池可以为[[可充电]]的实体充电，回复耐久或触发效果等。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:可充电"
+    ],
+    "code_fields": [
+      "batteryuser"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
+  "search_terms": [
+    "充电",
+    "充能",
+    "电池",
+    "能量",
+    "充电机制",
+    "可充电设备",
+    "科技工具",
+    "充电行为",
+    "使用电池"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "生存",
+    "科技"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "92620bffb443f3f42b378f67a8b979b90156443cc9b4c99a811d17482ec5867f",
+    "source_bytes": 1461,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096267164
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/walkableplatformplayer.lua"
+  },
+  "category": "component",
+  "display_name": "walkableplatformplayer",
+  "summary": "该组件负责管理玩家实体与可行走平台（如船只）之间的交互状态。它跟踪玩家当前所在的平台，并协调在平台上的特殊行为，包括平台移动音乐的触发、平台专属相机的启用与关闭、以及用于网络优化的移动预测。核心玩法是确保玩家在水上平台（如船）上能获得流畅的移动、视角和音效体验。",
+  "api": [
+    {
+      "name": "StartBoatMusicTest",
+      "effect": "启动一个周期性任务（每0.5秒），用于检测平台移动速度。当速度变化超过阈值时，会向玩家实体推送 \"playboatmusic\" 事件以触发平台移动相关的背景音乐。"
+    },
+    {
+      "name": "StopBoatMusicTest",
+      "effect": "停止由 StartBoatMusicTest 启动的音乐检测周期性任务，并清除存储的平台位置信息。"
+    },
+    {
+      "name": "StartBoatCamera",
+      "effect": "为当前平台启用特殊的平台相机视角。此方法会设置一个焦点源，使相机在平台移动时产生平滑的跟随和偏移效果，提升在移动平台上的视觉体验。"
+    },
+    {
+      "name": "StopBoatCamera",
+      "effect": "停止由 StartBoatCamera 启用的平台焦点源，使相机视角恢复正常。"
+    },
+    {
+      "name": "StartBoatCameraZooms",
+      "effect": "启用平台相机的缩放功能。开始监听平台的 \"doplatformcamerazoomdirty\" 事件，以便根据平台状态触发相机的放大或缩小动画。"
+    },
+    {
+      "name": "StopBoatCameraZooms",
+      "effect": "禁用平台相机的缩放功能。移除对 \"doplatformcamerazoomdirty\" 事件的监听，停止缩放动画。"
+    },
+    {
+      "name": "GetOnPlatform",
+      "effect": "将玩家实体置入指定平台状态。设置内部平台引用、标记玩家位于平台上、在服务器端向平台注册玩家。如果启用了移动预测，则生成玩家碰撞体。对于本地玩家，还会推送 \"got_on_platform\" 事件，并可能启动音乐测试和平台相机。"
+    },
+    {
+      "name": "GetOffPlatform",
+      "effect": "将玩家实体移出当前平台状态。对于本地玩家，可能停止平台相机和音乐测试，并推送 \"got_off_platform\" 事件。如果启用了移动预测，则移除玩家碰撞体。在服务器端从平台注销玩家，并清除平台引用和相关标记。"
+    },
+    {
+      "name": "TestForPlatform",
+      "effect": "检测玩家实体是否位于平台上，并自动调用 GetOnPlatform 或 GetOffPlatform 进行状态更新。在服务器端直接从世界获取玩家所在平台；在客户端（本地玩家）则通过地图查询位置来确定平台。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当组件所属实体被移除时调用。执行清理工作，将玩家从当前平台中完全移除，包括移除平台跟随者、注销玩家并清除平台状态。"
+    }
+  ],
+  "events_published": [
+    "playboatmusic",
+    "got_on_platform",
+    "got_off_platform",
+    "zoomcamera"
+  ],
+  "events_listened": [
+    "enableboatcamera",
+    "enablemovementprediction",
+    "playeractivated",
+    "doplatformcamerazoomdirty"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BOAT_SPEED_MUSIC_THRESHOLD",
+    "ZOOM_STEP",
+    "ZOOM_TARGET",
+    "ZOOM_TIME",
+    "NUM_ZOOMS",
+    "ZOOM_TASK_PERIOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      15022,
+      47010
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅讨论角色（如伍迪的诅咒）和敌人（如天体英雄的攻击），未涉及船或平台组件的能力表达，如平台交互、音乐或摄像机控制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "玩家碰撞",
+    "平台交互",
+    "船只平台",
+    "移动音乐",
+    "相机控制",
+    "网络预测",
+    "水上移动",
+    "音效管理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "移动",
+    "视角",
+    "航海"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "897a763bdc0c37c7c39933d92c3bac86072a0ec175c344fce7824070a042dd93",
+    "source_bytes": 10223,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092012456
+  }
+}

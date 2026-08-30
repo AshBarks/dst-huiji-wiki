@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/plantregistryupdater.lua"
+  },
+  "category": "component",
+  "display_name": "plantregistryupdater",
+  "summary": "此组件管理植物注册数据的学习与同步，处理植物生长阶段、肥料类型和超大植物照片的记录。它通过更新本地数据并发送网络消息，确保服务器和客户端的游戏进度一致，促进农业知识的积累和成就追踪。",
+  "api": [
+    {
+      "name": "LearnPlantStage",
+      "effect": "学习指定植物的指定阶段，更新植物注册数据。如果更新成功且玩家在场，播放‘get_gold’声音效果；在服务器或主机模拟条件下，向客户端发送RPC消息以同步数据。"
+    },
+    {
+      "name": "LearnFertilizer",
+      "effect": "学习指定肥料类型，更新肥料注册数据。如果更新成功且玩家在场，播放‘get_gold’声音效果；在服务器或主机模拟条件下，向客户端发送RPC消息以同步数据。"
+    },
+    {
+      "name": "TakeOversizedPicture",
+      "effect": "记录超大植物照片，包括植物类型、重量、胡须皮肤和胡须长度，更新注册数据。如果更新成功，在服务器或主机模拟条件下，向客户端发送RPC消息以同步数据。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "playeractivated"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      21485,
+      19714,
+      51951,
+      19932,
+      24839,
+      20020,
+      14483
+    ],
+    "aspects": [
+      {
+        "aspect": "农作物生长阶段的记录",
+        "evidence": [
+          {
+            "pageid": 19932,
+            "quote": "植物登记表可记录作物在每个阶段的生长形态"
+          }
+        ]
+      },
+      {
+        "aspect": "肥料信息的记录",
+        "evidence": [
+          {
+            "pageid": 19932,
+            "quote": "植物登记表分为两页，分别是[[肥料]]和[[农作物|植物]]"
+          },
+          {
+            "pageid": 14483,
+            "quote": "戴上耕作先驱帽后玩家可以研究[[农作物]]和[[肥料]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "肥料",
+    "玩家激活",
+    "作物生长",
+    "农业记录",
+    "进度同步",
+    "超大植物",
+    "网络消息",
+    "成就追踪",
+    "游戏进度",
+    "植物图鉴"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "农业",
+    "种植",
+    "记录"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "21565e49b3ae2a1820954f5c423f81883fdf339c64dcc8f9917bbea009396c8a",
+    "source_bytes": 2829,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091411105
+  }
+}

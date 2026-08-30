@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/container_transform.lua"
+  },
+  "category": "component",
+  "display_name": "container_transform",
+  "summary": "ContainerTransform组件管理实体是否可以转换为容器以及转换时的行为。它通过设置函数来控制转换条件和执行转换操作。核心玩法涉及玩家与实体交互，尝试打开或转换实体为存储容器。",
+  "api": [
+    {
+      "name": "SetCanTransform",
+      "effect": ""
+    },
+    {
+      "name": "SetOnTransform",
+      "effect": ""
+    },
+    {
+      "name": "IsTryingToOpenMe",
+      "effect": ""
+    },
+    {
+      "name": "CanTransform",
+      "effect": ""
+    },
+    {
+      "name": "TryTransformToContainer",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15642,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及容器转换、打开或任何与SetCanTransform、SetOnTransform、IsTryingToOpenMe、CanTransform、TryTransformToContainer相关的能力表达；熊獾行为侧重于食物交互和攻击，附身底盘行为侧重于武器装备和攻击协助。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "容器变化",
+    "开启容器",
+    "状态改变",
+    "存储容器",
+    "交互动作",
+    "条件控制",
+    "缓冲操作",
+    "远程操作",
+    "转换验证"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5ad0f7b24b36a44d3b4bc2a7256099b50b8a786e1383d5d9d6f8c38aac9b692d",
+    "source_bytes": 1018,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099182059
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/weighable.lua"
+  },
+  "category": "component",
+  "display_name": "weighable",
+  "summary": "weighable 组件管理实体的重量和所有者信息，记录重量、类型和玩家所有者数据。它参与如钓鱼或捕猎等核心玩法，其中重量可能影响战利品价值或比赛排名。组件还计算重量百分比以供比较和显示。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除与 weighable 类型相关的标签（如 weighable_fish）。当组件被移除时调用，清理实体标签。"
+    },
+    {
+      "name": "CopyWeighable",
+      "effect": "复制源 weighable 组件（src_weighable）的数据到当前实例。如果源为 nil，则不执行操作。"
+    },
+    {
+      "name": "GetWeight",
+      "effect": "返回当前存储的重量值（weight）。如果未设置，返回 nil。"
+    },
+    {
+      "name": "GetWeightPercent",
+      "effect": "返回基于最小和最大重量计算的百分比值（0到1之间）。如果未初始化 min_weight 或 max_weight，默认返回 0.5。"
+    },
+    {
+      "name": "Initialize",
+      "effect": "设置重量的最小值和最大值（min_weight, max_weight），用于计算百分比。调用后，weight_percent 会重新计算。"
+    },
+    {
+      "name": "SetWeight",
+      "effect": "设置重量值（weight），并自动更新 weight_percent。重量值会被截断为两位小数（向下取整到百分位）。"
+    },
+    {
+      "name": "SetPlayerAsOwner",
+      "effect": "设置玩家实体（owner）为所有者，存储其 userid 和 name。如果 owner 为 nil，则清除所有者信息。同时重置 prefab_override_owner 为 nil。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含 weight、owner_userid、owner_name 和 prefab_override_owner，用于序列化保存数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表（data）加载 weight、owner_userid、owner_name 和 prefab_override_owner，恢复组件状态。如果 data 为 nil，则不执行操作。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，包含重量、百分比、所有者 userid 和 override owner 信息，用于开发调试。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13779,
+      18521,
+      50898,
+      51524,
+      15898,
+      15896,
+      52019,
+      33950
+    ],
+    "aspects": [
+      {
+        "aspect": "农产品秤重量比较与替换规则",
+        "evidence": [
+          {
+            "pageid": 15898,
+            "quote": "农产品秤上的作物只能由更重的作物替换下来"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼重量百分比判定与分类",
+        "evidence": [
+          {
+            "pageid": 13779,
+            "quote": "当一条鱼的重量在这类鱼重量范围的前30%，会被算作是“足够重”的鱼。"
+          },
+          {
+            "pageid": 15896,
+            "quote": "存放着不是自己钓的鱼并且其重量在此类鱼重量范围的后80%"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "重量",
+    "称重",
+    "所有者",
+    "战利品",
+    "钓鱼",
+    "比赛",
+    "秤",
+    "捕获",
+    "排名",
+    "百分比"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "捕猎",
+    "竞赛"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d517f03ab5d8b9a7faef1148f74205b19473603597d5ef481ba285bee010dd1e",
+    "source_bytes": 2323,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094158553
+  }
+}

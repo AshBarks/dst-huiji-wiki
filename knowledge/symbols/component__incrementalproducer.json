@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/incrementalproducer.lua"
+  },
+  "category": "component",
+  "display_name": "incrementalproducer",
+  "summary": "IncrementalProducer组件管理实体的增量式生产逻辑，包括当前计数、最大计数、生产增量和延迟时间等数据。它用于控制实体的自动化生产行为，例如定期生成物品或资源，是饥荒联机版中资源管理和自动化玩法的核心组件。",
+  "api": [
+    {
+      "name": "CanProduce",
+      "effect": "检查生产条件是否满足。通过maxcountfn和incrementfn函数（若存在）更新最大计数和增量值，基于当前计数、最大计数和延迟时间计算待生产数量。返回true表示可以生产（toproduce > 0），副作用包括更新self.maxcount、self.increment和self.toproduce。"
+    },
+    {
+      "name": "TryProduce",
+      "effect": "尝试执行生产。如果CanProduce返回true，则调用DoProduce进行实际生产；否则无操作。"
+    },
+    {
+      "name": "DoProduce",
+      "effect": "执行生产动作。调用producefn函数生产一个单位，减少待生产数量（self.toproduce）并更新上次生产时间（self.lastproduction）。需要producefn已设置；若未设置则无操作。副作用：self.toproduce减1，self.lastproduction更新为当前时间。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，格式为'count:%d toproduce:%d max:%d nextincrement:%f'，包含当前计数、待生产数量、最大计数和下次生产时间（基于延迟和上次生产时间计算）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14711,
+      24663,
+      15247
+    ],
+    "aspects": [
+      {
+        "aspect": "农田杂物生成数量描述",
+        "evidence": [
+          {
+            "pageid": 14711,
+            "quote": "生成 2-4 个[[农田杂物]]"
+          }
+        ]
+      },
+      {
+        "aspect": "蜘蛛生成概率变体描述",
+        "evidence": [
+          {
+            "pageid": 15247,
+            "quote": "有 45% 概率改为生成[[护士蜘蛛]]"
+          }
+        ]
+      },
+      {
+        "aspect": "蜘蛛生成频率描述",
+        "evidence": [
+          {
+            "pageid": 15247,
+            "quote": "蜘蛛女王会以每 10 秒一只的速度生成[[蜘"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "增量生产",
+    "延迟生产",
+    "自动生产",
+    "生产上限",
+    "生产间隔",
+    "生产组件",
+    "incrementalproducer",
+    "生产控制",
+    "资源生成",
+    "生产逻辑"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生产",
+    "资源管理",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9a73396d86c91a138b61293d182627ac83d64603f1053cf34862cc6c587279de",
+    "source_bytes": 1345,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100763512
+  }
+}

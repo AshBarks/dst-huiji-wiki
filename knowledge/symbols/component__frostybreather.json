@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/frostybreather.lua"
+  },
+  "category": "component",
+  "display_name": "frostybreather",
+  "summary": "FrostyBreather 组件管理角色的呼吸视觉效果数据，包括呼吸实体和偏移位置。它根据世界温度自动启停呼吸效果，在寒冷环境下显示呼吸以增强游戏沉浸感。组件还支持强制控制呼吸和调整呼吸位置。",
+  "api": [
+    {
+      "name": "StartBreath",
+      "effect": "创建 frostbreath 子实体并附加到当前实体，设置呼吸偏移位置；若组件启用，则开始监听动画事件（服务器监听 animover，客户端监听 breathevent）。"
+    },
+    {
+      "name": "StopBreath",
+      "effect": "移除 frostbreath 子实体并停止监听相关事件。"
+    },
+    {
+      "name": "Enable",
+      "effect": "设置 enabled 状态为 true；若呼吸实体存在，则启动事件监听器。"
+    },
+    {
+      "name": "Disable",
+      "effect": "设置 enabled 状态为 false；若呼吸实体存在，则停止事件监听器。"
+    },
+    {
+      "name": "OnTemperatureChanged",
+      "effect": "根据传入温度判断是否启停呼吸：若未强制呼吸，当温度高于 TUNING.FROSTY_BREATH 时停止呼吸，否则开始呼吸。"
+    },
+    {
+      "name": "EmitOnce",
+      "effect": "若呼吸实体存在且角色朝向非向上，则更新偏移位置并发出一次呼吸效果。"
+    },
+    {
+      "name": "ForceBreathOn",
+      "effect": "设置 forced_breath 状态为 true 并开始呼吸效果，忽略温度条件。"
+    },
+    {
+      "name": "ForceBreathOff",
+      "effect": "设置 forced_breath 状态为 false 并基于当前温度重新判断呼吸启停。"
+    },
+    {
+      "name": "SetOffset",
+      "effect": "设置呼吸效果的固定偏移位置（x, y, z）。"
+    },
+    {
+      "name": "SetOffsetFn",
+      "effect": "设置自定义偏移函数，用于动态计算呼吸位置。"
+    },
+    {
+      "name": "GetOffset",
+      "effect": "返回当前偏移位置：优先使用偏移函数的结果，否则使用固定偏移。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "实体移除时清理：停止监听温度变化并停止呼吸效果。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "frostybreather.breathevent"
+  ],
+  "events_listened": [
+    "animover",
+    "frostybreather.breathevent"
+  ],
+  "netvars": [
+    "frostybreather.breathevent"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      20511,
+      19952,
+      52726,
+      14695,
+      60885,
+      20700,
+      73231
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及组件frostybreather或其相关能力如StartBreath、OnTemperatureChanged等，内容集中于温度、冰冻、潮湿度等一般游戏机制，无玩家语言表达对应代码能力清单。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "呼吸",
+    "寒冷",
+    "冰冻",
+    "温度",
+    "视觉",
+    "frostbreath",
+    "呼吸动画",
+    "环境提示"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1bfbcc8ed89f8c0b1415c14f62c5eee6b9a37a3d6f8f4beedf37a316e80460ac",
+    "source_bytes": 3439,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091170313
+  }
+}

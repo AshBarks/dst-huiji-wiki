@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/highlight.lua"
+  },
+  "category": "component",
+  "display_name": "highlight",
+  "summary": "高亮组件管理实体的视觉高亮效果，包括静态颜色设置和动态闪烁动画。它通过调整 AnimState 的高亮颜色来影响实体显示，常用于指示可交互物体或特殊状态，参与游戏中的交互反馈和视觉效果系统。",
+  "api": [
+    {
+      "name": "SetAddColour",
+      "effect": "设置基础添加颜色，如果不处于闪烁状态则立即应用颜色到实体。"
+    },
+    {
+      "name": "Flash",
+      "effect": "启动闪烁效果，指定闪烁颜色增量、渐入时间和渐出时间，开始更新组件并执行动画过渡。"
+    },
+    {
+      "name": "Highlight",
+      "effect": "启动高亮状态，设置高亮颜色，考虑玩家可见性（如玩家实体或 CanEntitySeeTarget 检查），如果不闪烁则立即应用颜色。"
+    },
+    {
+      "name": "UnHighlight",
+      "effect": "取消高亮状态，如果不处于闪烁状态则移除组件并清理。"
+    },
+    {
+      "name": "ApplyColour",
+      "effect": "内部方法，将当前颜色（基础颜色、高亮颜色、闪烁值）应用到实体的 AnimState 和子实体高亮列表。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "内部更新方法，处理闪烁动画的时间计算和状态转换，当实体无效时停止更新或移除组件。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理 AnimState 和子实体的高亮颜色设置。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15054,
+      65881,
+      13493,
+      13606,
+      13701,
+      14483,
+      14683,
+      14688
+    ],
+    "aspects": [
+      {
+        "aspect": "地图高亮标记",
+        "evidence": [
+          {
+            "pageid": 15054,
+            "quote": "天体宝球会在地图上产生一个实时更新的高亮标记"
+          }
+        ]
+      },
+      {
+        "aspect": "宝石闪烁效果",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "宝石将会在帝王蟹使用其对应能力时闪烁。"
+          }
+        ]
+      },
+      {
+        "aspect": "视野颜色叠加",
+        "evidence": [
+          {
+            "pageid": 14483,
+            "quote": "玩家戴上高级耕作先驱帽时视野边缘会被半透明的紫色叠加层所覆盖"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "高亮",
+    "闪烁",
+    "颜色设置",
+    "交互反馈",
+    "动画效果",
+    "选中状态",
+    "视觉效果",
+    "AnimState"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "交互",
+    "视觉效果",
+    "动画"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "811c5956a4055494e8d08aba478ebbe0a66ecc8d5063be743700eb32777d0797",
+    "source_bytes": 4046,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108497037
+  }
+}

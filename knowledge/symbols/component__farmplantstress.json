@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farmplantstress.lua"
+  },
+  "category": "component",
+  "display_name": "farmplantstress",
+  "summary": "该组件管理农场植物的压力状态，跟踪多个压力源及其当前状态，并通过压力点数计算最终压力等级。它参与农场种植核心玩法，玩家需监控并管理压力源以维持植物健康，影响植物生长和互动描述。",
+  "api": [
+    {
+      "name": "AddStressCategory",
+      "effect": "添加一个压力类别到组件，指定名称、测试函数和变化回调，初始化该压力源为压力状态，并增加压力源计数。"
+    },
+    {
+      "name": "CopyFrom",
+      "effect": "从另一个 FarmPlantStress 实例复制状态数据，通过调用 OnLoad 方法加载存档数据实现复制。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置所有压力源为压力状态，将压力点数清零，并清空最终压力状态。"
+    },
+    {
+      "name": "SetStressed",
+      "effect": "设置指定压力源的压力状态，如果状态发生变化且存在回调函数，则触发回调，传递实例、新状态和执行者。"
+    },
+    {
+      "name": "MakeCheckpoint",
+      "effect": "创建检查点，计算当前压力源中处于压力状态的数量，累加到压力点数，然后将所有未压力的压力源重置为压力状态。"
+    },
+    {
+      "name": "CalcFinalStressState",
+      "effect": "根据当前压力点数计算最终压力状态（无压力、低、中、高），并存储结果，返回该状态。"
+    },
+    {
+      "name": "GetFinalStressState",
+      "effect": "返回当前存储的最终压力状态值，不进行计算。"
+    },
+    {
+      "name": "OnInteractWith",
+      "effect": "当玩家与植物互动时调用，如果存在交互回调函数，则执行该回调并返回其结果。"
+    },
+    {
+      "name": "GetStressDescription",
+      "effect": "获取植物压力描述字符串，根据观察者类型（如植物族或装备物品）显示不同描述，包括检查黑暗、冒烟状态和压力源数量。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含最终压力状态、压力点数和压力源表的存档数据，用于持久化存储。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据加载状态，恢复最终压力状态、压力点数和压力源表。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含压力点数、最大压力点数、检查点压力和各压力源状态，用于开发调试。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      14486,
+      14712,
+      18234,
+      19932,
+      21166,
+      57263
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍使用增加作物压力值",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "被它催熟的农作物无法变为巨大作物，且会因没有照料而增加压力值。"
+          }
+        ]
+      },
+      {
+        "aspect": "农场杂物导致压力值积累",
+        "evidence": [
+          {
+            "pageid": 21166,
+            "quote": "农田杂物的存在会导致周围6距离单位范围内的农作物积累1点压力值。"
+          }
+        ]
+      },
+      {
+        "aspect": "压力值决定作物产出品质",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "巨大 | 0 ~ 1 | [[巨大作物]]×1"
+          }
+        ]
+      },
+      {
+        "aspect": "压力值影响作物生长速度计算",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "处于前四个阶段的农作物生长到下一阶段速度取决于其前一个阶段生长跨越至本阶段时所积累的压力值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "压力状态",
+    "压力源",
+    "压力值",
+    "农场种植",
+    "植物生长",
+    "互动描述",
+    "压力管理"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 3/7)",
+  "gameplay_tags": [
+    "农场",
+    "种植",
+    "生存",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "506db90d846dfa4d8e3d50be90297fdb9d11a2bef5847ee61d5bb4a5431045e5",
+    "source_bytes": 4706,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107262447
+  }
+}

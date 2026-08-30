@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/singingshelltrigger.lua"
+  },
+  "category": "component",
+  "display_name": "singingshelltrigger",
+  "summary": "这个组件管理唱歌贝壳的触发机制，维护触发范围、重叠实体状态和更新逻辑。它通过周期检测范围内的唱歌贝壳实体，并触发其激活函数，参与游戏中的环境互动玩法，涉及实体状态跟踪和死亡/重生时的更新控制。",
+  "api": [
+    {
+      "name": "StartUpdating",
+      "effect": "开始组件更新，设置更新状态为真并启动组件更新循环，使组件能够周期检测范围内的实体。"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "停止组件更新，设置更新状态为假并停止组件更新循环，使组件不再检测范围内实体。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理实体标签“singingshelltrigger”并移除死亡和重生事件的监听回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新时，重置重叠实体状态，查找触发范围内的唱歌贝壳实体，并对新出现的实体调用其激活函数，对持续重叠的实体保持状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "respawnfromghost"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      17979,
+      21479,
+      13567,
+      16165,
+      19222,
+      23924,
+      24212,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录专注于游戏内物品、实体和机制的描述，如贝壳钟的使用、掉落物、实体行为等，但没有提及与组件更新、移除或事件触发相关的玩家语言表达。能力清单中的StartUpdating、StopUpdating、OnRemoveFromEntity、OnUpdate是编程接口，在提供的文本中未被讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "触发范围",
+    "贝壳",
+    "重叠检测",
+    "死亡效果",
+    "重生机制",
+    "互动玩法",
+    "更新逻辑",
+    "激活机制",
+    "实体状态"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "触发",
+    "环境",
+    "贝壳",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "85e0a21cf8f5ebffb97c598f1837d31d22e8813946d5d84903034a3619b69b63",
+    "source_bytes": 1896,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091722654
+  }
+}

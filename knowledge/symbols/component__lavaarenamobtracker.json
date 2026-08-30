@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lavaarenamobtracker.lua"
+  },
+  "category": "component",
+  "display_name": "lavaarenamobtracker",
+  "summary": "LavaArenaMobTracker组件用于管理熔岩竞技场中生物的追踪。它维护一个被跟踪实体的集合，并提供查询数量、列表和范围搜索等功能。核心玩法涉及在竞技场事件中追踪生物状态，支持战斗和事件逻辑。",
+  "api": [
+    {
+      "name": "StartTracking",
+      "effect": "将实体添加到追踪集合，并监听其\"onremove\"事件以自动停止跟踪。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "从追踪集合中移除实体，并移除对应的事件监听。"
+    },
+    {
+      "name": "GetNumMobs",
+      "effect": "返回当前被追踪的生物数量（注意：源码中count未更新，可能始终返回0）。"
+    },
+    {
+      "name": "GetAllMobs",
+      "effect": "返回所有被追踪实体的列表。"
+    },
+    {
+      "name": "FindMobs",
+      "effect": "在以(x,y,z)为中心、半径为r的球形范围内查找实体，根据标签过滤（musttags为必有，canttags为禁止，mustoneoftags为必有一标签），并按距离升序返回匹配实体列表。"
+    },
+    {
+      "name": "ForEachMob",
+      "effect": "对每个被追踪实体执行回调函数cb，传递实体和params参数。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "熔岩竞技场",
+    "生物追踪",
+    "实体管理",
+    "范围搜索",
+    "事件处理",
+    "战斗逻辑",
+    "集合管理",
+    "状态追踪"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "战斗",
+    "竞技场"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "27d5cd3c81abbb3bff418d17d71c6e30db2dd54b59d7225e7b090c78e21b0d69",
+    "source_bytes": 2646,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109144426
+  }
+}

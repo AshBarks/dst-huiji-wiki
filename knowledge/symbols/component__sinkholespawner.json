@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sinkholespawner.lua"
+  },
+  "category": "component",
+  "display_name": "sinkholespawner",
+  "summary": "组件管理玩家目标的落穴攻击序列，根据玩家年龄和季节状态计算攻击次数。它协调警告效果和落穴生成，参与蚁狮灾难的战斗和生存玩法。数据包括目标列表、警告与攻击计时、玩家位置等。",
+  "api": [
+    {
+      "name": "StartSinkholes",
+      "effect": "开始落穴攻击序列：根据玩家年龄和季节状态计算攻击次数，选择目标玩家，初始化警告计时，启动组件更新，发布onsinkholesstarted事件。"
+    },
+    {
+      "name": "StopSinkholes",
+      "effect": "停止落穴攻击：清空目标列表，停止组件更新，发布onsinkholesfinished事件。"
+    },
+    {
+      "name": "UpdateTarget",
+      "effect": "更新目标信息：根据用户ID查找玩家，更新目标的玩家对象和位置，如果目标不在主世界则尝试重新获取客户端信息。"
+    },
+    {
+      "name": "DoTargetWarning",
+      "effect": "执行目标警告：减少警告计数，生成屏幕震动和视觉特效，如果玩家存活则发布对话消息；警告结束后设置攻击计时。"
+    },
+    {
+      "name": "DoTargetAttack",
+      "effect": "执行目标攻击：减少攻击计数，检查距离避免重复攻击，调用SpawnSinkhole生成落穴实体；远程目标仅攻击一次。"
+    },
+    {
+      "name": "SpawnSinkhole",
+      "effect": "在指定点生成落穴：计算随机偏移，验证位置有效性（地形、障碍物、可通行性），生成antlion_sinkhole实体并触发startcollapse事件。"
+    },
+    {
+      "name": "PushRemoteTargets",
+      "effect": "推送远程目标状态：将非本地目标的警告和攻击状态打包，通过master_sinkholesupdate事件发送到世界。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件每帧更新：处理警告和攻击计时器，更新目标位置和状态，调用DoTargetWarning和DoTargetAttack，如果目标清空则停止更新并发布onsinkholesfinished事件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据：返回目标的位置、攻击次数、计时器状态等信息用于持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据：从保存数据恢复目标列表，初始化警告计数，启动组件更新，发布onsinkholesstarted事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "获取调试字符串：返回每个目标的警告或攻击状态、位置、计时信息，用于调试显示。"
+    }
+  ],
+  "events_published": [
+    "onsinkholesstarted",
+    "onsinkholesfinished",
+    "master_sinkholesupdate"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.AUTUMN_LENGTH",
+    "TUNING.WINTER_LENGTH",
+    "TUNING.SPRING_LENGTH",
+    "TUNING.SUMMER_LENGTH",
+    "TUNING.ANTLION_SINKHOLE.WAVE_MIN_ATTACKS",
+    "TUNING.ANTLION_SINKHOLE.WAVE_MAX_ATTACKS",
+    "TUNING.ANTLION_SINKHOLE.NUM_WARNINGS",
+    "TUNING.ANTLION_SINKHOLE.WARNING_DELAY_VARIANCE",
+    "TUNING.ANTLION_SINKHOLE.WARNING_DELAY",
+    "TUNING.ANTLION_SINKHOLE.WAVE_ATTACK_DELAY",
+    "TUNING.ANTLION_SINKHOLE.WAVE_ATTACK_DELAY_VARIANCE",
+    "TUNING.ANTLION_SINKHOLE.WAVE_MERGE_ATTACKS_DIST_SQ",
+    "TUNING.ANTLION_SINKHOLE.RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15601,
+      13897,
+      51046,
+      13823,
+      13409,
+      15551,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "坑洞生成行为描述",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "否则它会生气而在森林世界产生[[#坑|坑]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蚁狮",
+    "落穴",
+    "警告",
+    "攻击",
+    "玩家",
+    "季节",
+    "地洞",
+    "灾难",
+    "生存",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c254a5ba0cc4a24460b1a7ecf6aae17235fc852ce66a78242f3ab5007c47098f",
+    "source_bytes": 11990,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103765434
+  }
+}

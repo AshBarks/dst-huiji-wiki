@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/meteorshower.lua"
+  },
+  "category": "component",
+  "display_name": "meteorshower",
+  "summary": "该组件管理陨石雨事件，通过级别系统控制事件的持续时间、陨石生成速率以及不同大小陨石的数量。它周期性地在实体周围生成陨石，并根据玩家位置调整生成逻辑。核心玩法涉及世界事件，为玩家带来资源获取或环境威胁。",
+  "api": [
+    {
+      "name": "IsShowering",
+      "effect": "返回布尔值，表示当前是否处于陨石雨状态。"
+    },
+    {
+      "name": "IsCoolingDown",
+      "effect": "返回布尔值，表示当前是否处于冷却状态。"
+    },
+    {
+      "name": "SpawnMeteor",
+      "effect": "在实体周围随机位置生成一个陨石，根据mod参数调整大小概率，并减少剩余陨石计数。若玩家不在附近，可能修改生成模式。"
+    },
+    {
+      "name": "StartShower",
+      "effect": "停止当前事件，开始指定级别或随机级别的陨石雨，设置持续时间、生成速率和陨石数量限制，并启动周期性生成任务。"
+    },
+    {
+      "name": "StopShower",
+      "effect": "停止陨石雨或冷却任务，重置所有状态变量，包括间隔、剩余陨石计数和重试次数。"
+    },
+    {
+      "name": "StartCooldown",
+      "effect": "停止当前事件，开始冷却周期，根据级别设置冷却时间，并可能重试以等待玩家靠近实体。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前状态的保存数据表，包括级别、剩余时间比例、间隔和剩余陨石数量。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载状态，恢复陨石雨或冷却过程，处理版本兼容性。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回当前状态的调试信息字符串，包括级别、状态详情（如剩余时间、间隔、剩余陨石数量）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEG_TIME",
+    "TOTAL_DAY_TIME",
+    "METEOR_SHOWER_LVL1_DURATION_BASE",
+    "METEOR_SHOWER_LVL1_DURATIONVAR_MIN",
+    "METEOR_SHOWER_LVL1_DURATIONVAR_MAX",
+    "METEOR_SHOWER_LVL1_METEORSPERSEC_MIN",
+    "METEOR_SHOWER_LVL1_METEORSPERSEC_MAX",
+    "METEOR_SHOWER_LVL1_MEDMETEORS_MIN",
+    "METEOR_SHOWER_LVL1_MEDMETEORS_MAX",
+    "METEOR_SHOWER_LVL1_LRGMETEORS_MIN",
+    "METEOR_SHOWER_LVL1_LRGMETEORS_MAX",
+    "METEOR_SHOWER_LVL1_BASETIME",
+    "METEOR_SHOWER_LVL1_VARTIME",
+    "METEOR_SHOWER_LVL2_DURATION_BASE",
+    "METEOR_SHOWER_LVL2_DURATIONVAR_MIN",
+    "METEOR_SHOWER_LVL2_DURATIONVAR_MAX",
+    "METEOR_SHOWER_LVL2_METEORSPERSEC_MIN",
+    "METEOR_SHOWER_LVL2_METEORSPERSEC_MAX",
+    "METEOR_SHOWER_LVL2_MEDMETEORS_MIN",
+    "METEOR_SHOWER_LVL2_MEDMETEORS_MAX",
+    "METEOR_SHOWER_LVL2_LRGMETEORS_MIN",
+    "METEOR_SHOWER_LVL2_LRGMETEORS_MAX",
+    "METEOR_SHOWER_LVL2_BASETIME",
+    "METEOR_SHOWER_LVL2_VARTIME",
+    "METEOR_SHOWER_LVL3_DURATION_BASE",
+    "METEOR_SHOWER_LVL3_DURATIONVAR_MIN",
+    "METEOR_SHOWER_LVL3_DURATIONVAR_MAX",
+    "METEOR_SHOWER_LVL3_METEORSPERSEC_MIN",
+    "METEOR_SHOWER_LVL3_METEORSPERSEC_MAX",
+    "METEOR_SHOWER_LVL3_MEDMETEORS_MIN",
+    "METEOR_SHOWER_LVL3_MEDMETEORS_MAX",
+    "METEOR_SHOWER_LVL3_LRGMETEORS_MIN",
+    "METEOR_SHOWER_LVL3_LRGMETEORS_MAX",
+    "METEOR_SHOWER_LVL3_BASETIME",
+    "METEOR_SHOWER_LVL3_VARTIME",
+    "METEOR_SHOWER_SPAWN_RADIUS",
+    "METEOR_SHOWER_CLEANUP_BUFFER",
+    "METEOR_LARGE_CHANCE",
+    "METEOR_MEDIUM_CHANCE",
+    "METEOR_SHOWER_OFFSCREEN_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      15055,
+      65605,
+      34523,
+      24544,
+      20714,
+      52788,
+      14579
+    ],
+    "aspects": [
+      {
+        "aspect": "流星生成范围描述",
+        "evidence": [
+          {
+            "pageid": 15055,
+            "quote": "在流星区域中心点 0~67 单位的范围内生成"
+          }
+        ]
+      },
+      {
+        "aspect": "流星雨冷却启动描述",
+        "evidence": [
+          {
+            "pageid": 15055,
+            "quote": "然后进入冷却"
+          }
+        ]
+      },
+      {
+        "aspect": "流星雨开始时机描述",
+        "evidence": [
+          {
+            "pageid": 15055,
+            "quote": "世界生成时，会立刻下一场流星雨"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "陨石雨",
+    "流星",
+    "事件",
+    "生成",
+    "冷却",
+    "级别",
+    "大小",
+    "资源",
+    "威胁",
+    "世界事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b7c02debd7a6841329a8ad3de8967ffebaead03660f41a21e8221b1dc19cc5d1",
+    "source_bytes": 11662,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101627026
+  }
+}

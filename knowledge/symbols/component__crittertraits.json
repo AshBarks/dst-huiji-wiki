@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/crittertraits.lua"
+  },
+  "category": "component",
+  "display_name": "crittertraits",
+  "summary": "crittertraits组件用于管理宠物（critter）的行为特质分数与主导特质。它通过监听宠物和主人的相关事件（如喂食、抚摸、战斗、制作）来动态更新不同行为维度（如‘好养活’、‘顽皮’、‘战斗’、‘手巧’）的分数。分数随时间衰减，并根据得分最高的分数决定宠物的主导特质，该特质会影响宠物的外观（标签）并可能触发特定的行为。",
+  "api": [
+    {
+      "name": "SetOnPetFn(fn)",
+      "effect": "设置一个当宠物被抚摸时调用的回调函数。该函数会在宠物进入抚摸表情状态（emote_pet）后被调用，并传递实例和抚摸者作为参数。"
+    },
+    {
+      "name": "OnPet(petter)",
+      "effect": "触发宠物的抚摸逻辑。会使宠物的动画状态机进入‘emote_pet’状态，并调用通过SetOnPetFn设置的回调函数。"
+    },
+    {
+      "name": "IncTracker(name, multiplier)",
+      "effect": "增加指定名称（如‘wellfed’、‘combat’）的特质分数。分数增加量为 `multiplier * 调谐表中该特质的inc值`。如果当前存在主导特质且增加的分数正是主导特质，则增加量额外乘以1.1的小幅增益。最终分数被限制在TRAIT_MAX（40）以内。"
+    },
+    {
+      "name": "DecayTraits()",
+      "effect": "对所有特质分数进行衰减。每个特质的衰减量为 `该特质的decay值 * DECAY_TICK_RATE`。最终分数被限制在TRAIT_MIN（-6）以上。"
+    },
+    {
+      "name": "SetDominantTrait(trait)",
+      "effect": "设置宠物的主导特质。如果之前有主导特质，会移除其对应的标签（trait_XXX）。设置后，如果trait不为空，则添加对应的标签（trait_XXX），并更新内部记录。"
+    },
+    {
+      "name": "IsDominantTrait(trait)",
+      "effect": "判断传入的特质名称是否是当前的主导特质。返回布尔值。"
+    },
+    {
+      "name": "RefreshDominantTrait()",
+      "effect": "刷新并重新计算主导特质。如果主导特质未被锁定，则从所有特质分数中找出分数大于0且最高的一个。若与当前主导特质不同，则更新主导特质，并推送‘crittertraitchanged’事件。若所有分数都不大于0，则清除主导特质。最后会推送数据统计事件。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "保存组件状态。返回一个包含主导特质、锁定状态以及所有特质分数的表，用于存档。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "加载组件状态。从传入的数据表中读取主导特质（并处理旧版‘AFFECTIONATE’特质到‘PLAYFUL’的兼容性迁移）、锁定状态和特质分数，并应用到当前实例。"
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": "返回一个用于调试的字符串，包含当前主导特质及其锁定状态，以及所有特质分数的详细列表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "crittertraitchanged"
+  ],
+  "events_listened": [
+    "oneat",
+    "perished",
+    "critter_onpet",
+    "critter_onnuzzle",
+    "oncritterplaying",
+    "timerdone",
+    "killed",
+    "onhitother",
+    "death",
+    "finishedwork",
+    "unlockrecipe",
+    "builditem",
+    "buildstructure"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.CRITTER_TRAITS",
+    "TUNING.CRITTER_TRAIT_DECAY_DELAY",
+    "TUNING.CRITTER_WANTS_TO_BE_PET_TIME",
+    "TUNING.CRITTER_TRAIT_DOMINANT_DELAY",
+    "TUNING.CRITTER_TRAIT_DOMINANT_RETRY_DELAY",
+    "TUNING.CRITTER_TRAIT_DOMINANT_DELAY_VARIANCE",
+    "TUNING.CRITTER_TRAIT_INITIAL_DOMINANT_DELAY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13642,
+      13409,
+      45249,
+      15539,
+      45250,
+      18219,
+      15601
+    ],
+    "aspects": [
+      {
+        "aspect": "宠物特征分数动态调整与主要特征确定机制",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "玩家动作根据动作从宠物的一个特征中增加或减去分数，得分最高的特征成为主要特征"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "宠物",
+    "行为特质",
+    "主要特质",
+    "喂食",
+    "抚摸",
+    "战斗",
+    "制作",
+    "衰减机制"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "宠物养成",
+    "特质系统",
+    "行为追踪"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e50e23049805f1810c576e639a51b9cd92052546a3fa494e4230e7236f6b7a35",
+    "source_bytes": 8495,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099264900
+  }
+}

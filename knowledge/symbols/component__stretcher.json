@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stretcher.lua"
+  },
+  "category": "component",
+  "display_name": "stretcher",
+  "summary": "Stretcher 组件管理目标实体、休息长度和宽度比例数据，用于根据目标位置动态调整实体动画的缩放效果。它控制实体面向目标并基于距离计算缩放比例，从而参与视觉动画调整的核心玩法。",
+  "api": [
+    {
+      "name": "SetRestingLength",
+      "effect": "设置休息长度为指定值，用于计算缩放比例；无其他副作用。"
+    },
+    {
+      "name": "SetWidthRatio",
+      "effect": "设置宽度比例为指定值，影响缩放时的宽度调整；无其他副作用。"
+    },
+    {
+      "name": "SetStretchTarget",
+      "effect": "设置拉伸目标实体。如果目标有效，启动组件更新并立即执行缩放调整；如果目标为nil，停止组件更新。更新时，实体面向目标并根据距离动态调整动画缩放。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65505,
+      65881,
+      13421,
+      13570,
+      14688,
+      15054,
+      15587
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未涉及component__stretcher组件或其能力SetRestingLength、SetWidthRatio、SetStretchTarget的讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缩放",
+    "目标实体",
+    "动态缩放",
+    "距离缩放",
+    "动画缩放",
+    "视觉效果",
+    "跟踪目标",
+    "比例调整",
+    "实体动画",
+    "面向目标"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "动画效果",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa23df9bf418b4ba8a7c0dd78a1a31fc721797e94b2fd0c798d8bcb6780baa91",
+    "source_bytes": 1322,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097719991
+  }
+}

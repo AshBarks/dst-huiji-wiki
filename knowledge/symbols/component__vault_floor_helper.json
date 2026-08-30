@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vault_floor_helper.lua"
+  },
+  "category": "component",
+  "display_name": "vault_floor_helper",
+  "summary": "该组件管理宝库（vault）地面的激活状态和原点坐标，用于检测一个点是否位于宝库房间内。核心玩法涉及区域检测，支持宝库相关的交互或事件触发，如玩家进入特定区域时的逻辑处理。",
+  "api": [
+    {
+      "name": "TryToSetMarker",
+      "effect": "尝试设置标记实体：如果vault已激活且有标记，则移除新实体；否则，设置标记实体，激活vault并记录其坐标，同时监听标记实体的移除事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "vault_active",
+    "vault_origin_x",
+    "vault_origin_z"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      65881,
+      65605,
+      65456,
+      15022,
+      15055,
+      52726,
+      15234
+    ],
+    "aspects": [
+      {
+        "aspect": "热追踪导弹的锁定目标行为",
+        "evidence": [
+          {
+            "pageid": 52726,
+            "quote": "锁定一个目标后"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "宝库",
+    "地面",
+    "坐标",
+    "激活状态",
+    "区域",
+    "房间",
+    "检测",
+    "原点",
+    "宝库房间"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "建造",
+    "装饰",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d33b19a696535dbfe5ccee056137c9e6c9edabbf64e7b9c6ba032383032fd13",
+    "source_bytes": 2884,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113525022
+  }
+}

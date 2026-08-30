@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wildfires.lua"
+  },
+  "category": "component",
+  "display_name": "wildfires",
+  "summary": "Wildfires组件管理野火系统的触发条件与点燃逻辑。它根据夏季、白天、高温且不潮湿的环境状态，为在线玩家周期性尝试在周围点燃可燃物体。核心玩法涉及季节、天气、温度对生存环境的影响，玩家需应对野火危害。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回字符串指示组件当前状态，若野火激活则为'Active'，否则为'Inactive'。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "weathertick",
+    "seasontick",
+    "temperaturetick",
+    "phasechanged",
+    "ms_lightwildfireforplayer",
+    "ms_playerjoined",
+    "ms_playerleft"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.STARTING_TEMP",
+    "TUNING.WILDFIRE_THRESHOLD",
+    "TUNING.WILDFIRE_CHANCE",
+    "TUNING.WILDFIRE_RETRY_TIME",
+    "TUNING.SHADE_CANOPY_RANGE",
+    "TUNING.SHADE_CANOPY_RANGE_SMALL"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      19952,
+      13569,
+      20496,
+      19913,
+      60885,
+      13570,
+      52726
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现任何与调试字符串获取相关的表达，所有内容均围绕温度、季节、燃烧、昼夜循环等游戏机制展开，未涉及调试功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "野火",
+    "火灾",
+    "夏季",
+    "高温",
+    "燃烧",
+    "玩家点燃",
+    "环境危害",
+    "天气影响",
+    "温度",
+    "季节"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a505c3b08e80e9732510e15f85df4a47614cc87f81c84d73b2267b1b2f23f1cd",
+    "source_bytes": 7064,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114097205
+  }
+}

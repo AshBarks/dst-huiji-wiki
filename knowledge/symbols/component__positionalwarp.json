@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/positionalwarp.lua"
+  },
+  "category": "component",
+  "display_name": "positionalwarp",
+  "summary": "该组件管理实体的位置历史数据，存储每0.1秒更新的坐标（当移动超过2单位时），维护一个最多60个点的环形缓冲区。它支持回溯到指定距离前的历史位置，并使用标记实体可视化这些位置，参与游戏中的位置追踪、回溯或传送相关玩法。",
+  "api": [
+    {
+      "name": "SetMarker",
+      "effect": "设置标记预制体，创建并缓存多个标记实体（默认3个）。副作用：生成标记实体，设置其查看者为当前实体，并为每个标记添加移除事件监听器以自动重建。"
+    },
+    {
+      "name": "SetWarpBackDist",
+      "effect": "设置回溯距离（历史点数），并更新标记显示。副作用：改变历史回溯深度，可能影响标记位置。"
+    },
+    {
+      "name": "UpdateMarker",
+      "effect": "更新标记实体的位置和显示状态，基于当前历史位置和标记缓存。副作用：移动或隐藏标记实体，循环使用缓存。"
+    },
+    {
+      "name": "CachePosition",
+      "effect": "缓存当前实体位置到历史记录中，仅当移动超过2单位且允许传送时。副作用：更新历史数组索引和坐标，可能触发标记更新。"
+    },
+    {
+      "name": "GetHistoryPosition",
+      "effect": "获取历史位置，参数rewind为true时回溯当前索引。副作用：如果rewind为true，更新history_cur并调用UpdateMarker。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置历史记录到当前位置（如果允许传送）或原点。副作用：清空历史数组，重置索引为0，更新标记。"
+    },
+    {
+      "name": "EnableMarker",
+      "effect": "启用或禁用标记显示。副作用：改变showmarker标志，并更新标记显示状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存历史数据和索引用于持久化。副作用：返回包含history_x/y/z和cur/back的数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载历史数据和索引，仅在非服务器迁移时生效。副作用：恢复历史状态，取消初始任务，更新索引。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示历史大小。副作用：无游戏状态影响。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时清理。副作用：取消更新任务，移除所有标记实体。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体移除时清理。副作用：移除所有标记实体。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      23957
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本描述了裂隙的游戏机制（如开启条件、阶段变化、位置标记显示），但未提及 component__positionalwarp 组件或其具体能力（如 SetMarker、SetWarpBackDist 等）的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "位置历史",
+    "坐标记录",
+    "回溯功能",
+    "标记显示",
+    "环形缓冲",
+    "传送回溯",
+    "移动追踪",
+    "历史位置"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "97b7f520217c692437d987678b099b2fb77e15a17369842b99d4363cc13235f2",
+    "source_bytes": 5820,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111432002
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerspawner.lua"
+  },
+  "category": "component",
+  "display_name": "playerspawner",
+  "summary": "该组件管理玩家生成点，支持固定和分散两种生成模式。处理玩家的生成、消失和跨世界迁移逻辑，包括坐标传送和宠物跟随。包含基于环境条件的生成保护机制，为玩家提供临时无敌状态。",
+  "api": [
+    {
+      "name": "SpawnAtNextLocation",
+      "effect": "获取下一个生成位置坐标，并调用SpawnAtLocation生成玩家。"
+    },
+    {
+      "name": "SpawnAtLocation",
+      "effect": "将玩家传送到指定坐标，处理迁移宠物的重定位，记录玩家生成历史，在黑暗中生成光源，根据条件添加生成保护增益，并执行生成动画以启用玩家控制。"
+    },
+    {
+      "name": "GetAnySpawnPoint",
+      "effect": "返回下一个生成位置的坐标(x, y, z)，若无可用点则返回(0, 0, 0)。"
+    },
+    {
+      "name": "IsPlayersInitialSpawn",
+      "effect": "检查玩家是否是首次在世界中生成，返回布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括已生成的玩家列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复已生成的玩家列表。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清理实体，移除所有注册的迁移门户。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_newplayercharacterspawned"
+  ],
+  "events_listened": [
+    "ms_playerdespawn",
+    "ms_playerdespawnanddelete",
+    "ms_playerdespawnandmigrate",
+    "ms_setspawnmode",
+    "ms_registerspawnpoint",
+    "ms_registermigrationportal"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      17930,
+      65605,
+      24578,
+      39366,
+      73427
+    ],
+    "aspects": [
+      {
+        "aspect": "固定生成点位置",
+        "evidence": [
+          {
+            "pageid": 73427,
+            "quote": "固定生成 1 个于[[绚丽之门布景]]"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家初始生成点行为",
+        "evidence": [
+          {
+            "pageid": 73427,
+            "quote": "在选择[[角色]]之后，玩家默认会从玩家生成点来到[[森林世界]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "生成点",
+    "迁移",
+    "多人游戏",
+    "传送",
+    "出生点",
+    "玩家生成",
+    "生成模式",
+    "跨世界",
+    "宠物跟随",
+    "临时无敌"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "生存",
+    "多人",
+    "生成",
+    "迁移"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+    "source_bytes": 11863,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111103701
+  }
+}

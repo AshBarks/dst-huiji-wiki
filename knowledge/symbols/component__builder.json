@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/builder.lua"
+  },
+  "category": "component",
+  "display_name": "builder",
+  "summary": "builder组件管理角色的制作能力，包括已解锁的配方列表、科技等级加成（含临时加成）以及缓冲建造状态。它负责评估角色当前可用的科技树，并在角色使用工作台或执行建造动作时，处理材料检查、消耗、物品生成与给予等核心制作流程。",
+  "api": [
+    {
+      "name": "ActivateCurrentResearchMachine",
+      "effect": "尝试激活当前关联的原型机（prototyper）。如果原型机有效，会调用其Activate方法，通常用于触发研究台制作配方的“解锁”动画或效果。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存builder组件的状态数据到一张表，包括缓冲建造状态、已解锁配方、上次饥饿建造的时间和位置、临时科技加成等。用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中加载builder组件的状态。恢复缓冲建造、已解锁配方、饥饿建造计时器以及临时科技加成。"
+    },
+    {
+      "name": "IsBuildBuffered",
+      "effect": "检查指定配方名称是否处于“缓冲建造”状态（即材料已扣除但尚未生成实物）。返回布尔值。"
+    },
+    {
+      "name": "GiveAllRecipes",
+      "effect": "切换“自由建造模式”(freebuildmode)。此模式下，玩家可以建造所有配方而无需材料或科技。会触发“unlockrecipe”事件。"
+    },
+    {
+      "name": "UnlockRecipesForTech",
+      "effect": "根据提供的科技等级(tech)树，一次性解锁所有满足科技需求的有效配方。"
+    },
+    {
+      "name": "GetTechBonuses",
+      "effect": "计算并返回一个包含所有科技类型当前总加成值（永久加成+临时加成）的表。"
+    },
+    {
+      "name": "GetTempTechBonuses",
+      "effect": "获取当前所有有效的临时科技加成值表。"
+    },
+    {
+      "name": "GiveTempTechBonus",
+      "effect": "给予一组临时科技加成。会增加临时加成计数(temptechbonus_count)，并在保存/加载时持久化这些加成。"
+    },
+    {
+      "name": "ConsumeTempTechBonuses",
+      "effect": "消耗一组临时科技加成。将temptechbonus_count减一，若减至0则清除所有临时加成值。用于配方制作成功后消费临时增益。"
+    },
+    {
+      "name": "EvaluateTechTrees",
+      "effect": "核心评估方法。计算角色当前可达的科技树（结合原型机、角色加成、临时加成），更新可制作的配方列表（特别是来自工作台的配方），并在科技树变化时触发“techtreechange”事件并同步至客户端副本。"
+    },
+    {
+      "name": "UsePrototyper",
+      "effect": "尝试使用指定的原型机（prototyper）。会进行有效性检查（标签、排斥标签、限制标签、距离），成功则设置其为override_current_prototyper，可能打开制作菜单。返回布尔值及失败原因字符串。"
+    },
+    {
+      "name": "AddRecipe",
+      "effect": "将一个配方名称添加到已解锁配方列表(self.recipes)中，如果尚未存在。并同步至客户端副本。"
+    },
+    {
+      "name": "RemoveRecipe",
+      "effect": "从已解锁配方列表中移除指定配方。并同步至客户端副本。"
+    },
+    {
+      "name": "UnlockRecipe",
+      "effect": "解锁一个配方。如果配方有效且非“不需解锁”(nounlock)，会奖励理智值（SANITY_MED），添加配方到列表，并触发“unlockrecipe”事件。可传入nosanity参数跳过理智奖励。"
+    },
+    {
+      "name": "GetIngredientWetness",
+      "effect": "计算一组制作材料的总湿度值。根据每个物品自身的湿度或世界环境湿度进行加权平均。"
+    },
+    {
+      "name": "GetIngredients",
+      "effect": "获取制作指定配方所需的材料。考虑当前的材料折扣(ingredientmod)，返回材料表和是否享有折扣的标志。"
+    },
+    {
+      "name": "CheckIngredientsForMimic",
+      "effect": "检查一组材料中是否包含“物品模仿者”(itemmimic)。若发现，会使其暴露原型并返回true。"
+    },
+    {
+      "name": "CheckDiscountEquipsForMimic",
+      "effect": "检查玩家装备栏中的物品（特别是享有折扣的绿色护身符）是否为“物品模仿者”。若发现，会使其暴露原型并返回true。"
+    },
+    {
+      "name": "RemoveIngredients",
+      "effect": "从玩家物品栏中扣除制作配方所需的材料和角色属性消耗（生命、理智等）。自由建造模式下不消耗。会触发“consumeingredients”事件。"
+    },
+    {
+      "name": "HasCharacterIngredient",
+      "effect": "检查玩家是否满足配方中“角色材料”（如生命值、理智值）的要求。返回布尔值和当前对应属性值。"
+    },
+    {
+      "name": "HasTechIngredient",
+      "effect": "检查玩家是否满足配方中“科技材料”的要求（基于当前科技树等级）。返回布尔值和对应科技等级。"
+    },
+    {
+      "name": "MakeRecipe",
+      "effect": "发起制作一个配方的动作。会创建一个BufferedAction(BUILD)，由移动组件执行。成功发起后返回true。"
+    },
+    {
+      "name": "DoBuild",
+      "effect": "实际执行配方的建造逻辑。检查各种条件（骑乘、宠物、制造站等），扣除材料，生成物品（inventoryitem或structure），处理物品的给予/掉落、装备、堆叠、潮湿继承以及触发“builditem”/“buildstructure”事件。返回成功与否及失败原因。"
+    },
+    {
+      "name": "KnowsRecipe",
+      "effect": "判断玩家是否“知道”一个配方（即已解锁或可通过当前科技/皮肤制作）。检查配方解锁状态、角色标签、技能、临时加成等。返回布尔值。可选忽略临时加成进行检查。"
+    },
+    {
+      "name": "HasIngredients",
+      "effect": "检查玩家是否拥有制作指定配方所需的所有材料（物品、角色属性、科技）。自由建造模式下返回true。返回布尔值。"
+    },
+    {
+      "name": "CanBuild",
+      "effect": "已弃用。功能与HasIngredients相同，传入配方名称。"
+    },
+    {
+      "name": "CanLearn",
+      "effect": "检查玩家是否有资格学习指定配方（基于角色标签和技能树要求）。返回布尔值。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新逻辑。减少饥饿建造的计时器(self.last_hungry_build)。"
+    },
+    {
+      "name": "MakeRecipeFromMenu",
+      "effect": "从制作菜单发起制作。处理已知配方和未知但可学习配方的制作流程。如果主材料不足，会尝试递归制作其子材料配方。"
+    },
+    {
+      "name": "MakeRecipeAtPoint",
+      "effect": "在指定地点放置已缓冲的建筑类配方。检查是否已知配方、是否已缓冲、地点是否合法。"
+    },
+    {
+      "name": "BufferBuild",
+      "effect": "“缓冲建造”操作。检查条件后扣除材料，并将配方标记为缓冲状态(buffered_builds)。用于需要放置的建筑类配方。"
+    }
+  ],
+  "api_note": "builder组件拥有大量核心方法，用于管理配方解锁、科技计算、材料检查、物品制作与放置等关键游戏逻辑。",
+  "events_published": [
+    "techtreechange",
+    "unlockrecipe",
+    "consumeingredients",
+    "consumehealthcost",
+    "builditem",
+    "buildstructure",
+    "makerecipe",
+    "refreshcrafting",
+    "hungrybuild"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      45249,
+      45250,
+      45248,
+      16419,
+      16640,
+      18830,
+      16660
+    ],
+    "aspects": [
+      {
+        "aspect": "原型工具使用限制",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "所有的电路板都无法通过原型工具解锁"
+          }
+        ]
+      },
+      {
+        "aspect": "配方解锁机制",
+        "evidence": [
+          {
+            "pageid": 13642,
+            "quote": "制作第一次后就会解锁"
+          },
+          {
+            "pageid": 16419,
+            "quote": "只能由使用生物扫描分析仪扫描特定生物来解锁"
+          },
+          {
+            "pageid": 18830,
+            "quote": "学习蓝图可以解锁该配方"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "制作",
+    "建造",
+    "解锁",
+    "配方",
+    "材料",
+    "科技",
+    "加成",
+    "建造缓冲",
+    "制作台"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1816c27a5a38ddc34e08a16eae9d138567269795564843ea80b355c037b12fa4",
+    "source_bytes": 46529,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090678806
+  }
+}

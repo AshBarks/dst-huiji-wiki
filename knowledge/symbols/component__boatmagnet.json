@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatmagnet.lua"
+  },
+  "category": "component",
+  "display_name": "boatmagnet",
+  "summary": "BoatMagnet 组件管理船只磁铁实体，负责维护与船只和信标的关联数据。它允许磁铁将船只吸引到信标位置，实现自动导航或控制移动。组件处理配对逻辑、距离计算和速度控制，是水上生存或运输玩法的核心部分。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，返回包含 magnet_guid 的表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载数据，设置 magnet_guid 值，兼容旧存档数据。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，取消设置任务并解除与信标的配对。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体移除时调用，清除所有与船只和信标的关联。"
+    },
+    {
+      "name": "SetBoat",
+      "effect": "设置关联的船只，移除旧船只的监听并添加新船只的监听。"
+    },
+    {
+      "name": "IsActivated",
+      "effect": "返回是否已配对信标，即 beacon 不为 nil。"
+    },
+    {
+      "name": "PairedBeacon",
+      "effect": "返回当前配对的信标实体。"
+    },
+    {
+      "name": "IsBeaconOnSameBoat",
+      "effect": "检查给定信标是否与磁铁在同一艘船上。"
+    },
+    {
+      "name": "FindNearestBeacon",
+      "effect": "查找最近的可用信标，返回未配对且在范围内的信标实体。"
+    },
+    {
+      "name": "PairWithBeacon",
+      "effect": "与信标配对，设置事件监听，添加 paired 标签，并启动更新。"
+    },
+    {
+      "name": "UnpairWithBeacon",
+      "effect": "解除与信标的配对，移除事件监听，移除 paired 标签，并停止更新。"
+    },
+    {
+      "name": "GetFollowTarget",
+      "effect": "获取跟随目标，基于信标状态返回船只或携带信标的实体。"
+    },
+    {
+      "name": "CalcMaxVelocity",
+      "effect": "计算磁铁的最大速度，基于距离、转向和信标速度。"
+    },
+    {
+      "name": "CalcMagnetDirection",
+      "effect": "计算磁铁到目标的方向向量和距离。"
+    },
+    {
+      "name": "CalcMagnetForce",
+      "effect": "计算磁铁的引力值，基于距离和船体半径。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新处理配对状态、移动逻辑和距离检查，推动相关事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前配对的信标信息。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "boatmagnet_pull_stop",
+    "boatmagnet_pull_start"
+  ],
+  "events_listened": [
+    "onremove",
+    "death",
+    "onturnon",
+    "onturnoff"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.BOAT_MAGNET.PAIR_RADIUS",
+    "TUNING.BOAT.BOAT_MAGNET.MAX_DISTANCE",
+    "TUNING.BOAT.BOAT_MAGNET.MAX_VELOCITY",
+    "TUNING.BOAT.BOAT_MAGNET.CATCH_UP_SPEED",
+    "TUNING.BOAT.BOAT_MAGNET.MAGNET_FORCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      73216,
+      16605,
+      14683,
+      51221,
+      13260,
+      24540,
+      18410
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及熔炉模式装备、路标导航仪、鱼饵、海钓竿、游戏流程、角色技能、烹饪原理和降水机制，均未提及船磁铁（boatmagnet）组件或其代码能力/行为语义清单中的任何表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "磁铁",
+    "信标",
+    "船只吸引",
+    "配对",
+    "导航",
+    "水上移动",
+    "自动行驶",
+    "吸引",
+    "距离控制",
+    "速度计算"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c782b41089cd13fd9fcbfe07c2adf7b0a35e0ed35c03fd02c777346c2fd3157c",
+    "source_bytes": 11793,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098416381
+  }
+}

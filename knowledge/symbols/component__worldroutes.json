@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldroutes.lua"
+  },
+  "category": "component",
+  "display_name": "worldroutes",
+  "summary": "WorldRoutes 组件用于存储和检索世界上的静态路径数据，支持创建跨越可遍历地形的循环路线。这些路由信息被缓存以优化性能，参与游戏中的导航和世界交互，核心玩法涉及探索和旅行。",
+  "api": [
+    {
+      "name": "SetRoute",
+      "effect": "存储路由数据到组件中，以 routename 为键；若同名路由已存在，则覆盖原有数据。"
+    },
+    {
+      "name": "GetRoute",
+      "effect": "返回以 routename 为键的路由数据；若不存在，则返回 nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      35007,
+      65605,
+      65881,
+      46887,
+      51221,
+      13847,
+      19802,
+      13634
+    ],
+    "aspects": [
+      {
+        "aspect": "旅行路径描述",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "流浪商人会沿一条固定的旅行路径在世界上循环移动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "路径",
+    "导航",
+    "探索",
+    "旅行",
+    "地形",
+    "循环",
+    "缓存优化",
+    "存档",
+    "加载"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "探索",
+    "旅行",
+    "世界生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0862a6c79c46e64a85882585de446f56c1cd8e40a59673f0ddda99b0aa56bac3",
+    "source_bytes": 1502,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114329341
+  }
+}

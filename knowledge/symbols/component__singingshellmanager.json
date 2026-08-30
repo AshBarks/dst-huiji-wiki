@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/singingshellmanager.lua"
+  },
+  "category": "component",
+  "display_name": "singingshellmanager",
+  "summary": "SingingShellManager组件动态添加到世界，管理唱歌贝壳的活跃状态。它监听贝壳的唤醒和睡眠事件，以及玩家加入事件，以协调贝壳的互动玩法。当贝壳活跃时，开始更新所有玩家的singingshelltrigger组件；当所有贝壳睡眠时，自动移除该组件。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "停止更新所有玩家的singingshelltrigger组件，清理相关状态。"
+    },
+    {
+      "name": "RememberActiveShell",
+      "effect": "将指定的贝壳添加到活跃贝壳列表中，相当于触发唤醒事件，开始跟踪其状态。"
+    },
+    {
+      "name": "ForgetActiveShell",
+      "effect": "将指定的贝壳从活跃贝壳列表中移除；如果列表为空，则移除SingingShellManager组件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "singingshell_wake",
+    "singingshell_sleep",
+    "ms_playerjoined"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14705,
+      18234,
+      20113,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本摘录中未提及实体 'component__singingshellmanager' 或其相关能力 OnRemoveFromEntity、RememberActiveShell、ForgetActiveShell 的任何描述或表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "声音贝壳",
+    "贝壳状态",
+    "玩家触发",
+    "世界组件",
+    "唤醒睡眠",
+    "自动移除",
+    "动态添加",
+    "互动协调"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "探索",
+    "收集",
+    "音乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c2df8365f77146f85e6b2716e0217f606a19c38a0063551f5ee06b5fc2b2fc5d",
+    "source_bytes": 2989,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112598239
+  }
+}

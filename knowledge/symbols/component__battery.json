@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/battery.lua"
+  },
+  "category": "component",
+  "display_name": "battery",
+  "summary": "battery组件用于管理电池类实体的使用逻辑，包括判断是否可使用、使用时的回调以及处理部分充电时的倍率调整。它通过为实体添加'battery'标签来标识电池，并提供接口让其他系统定制电池行为。该组件参与游戏的电力或能量管理系统，支持电池在使用时触发特定效果。",
+  "api": [
+    {
+      "name": "SetCanBeUsedFn",
+      "effect": "设置一个回调函数，用于判断电池是否可被使用。回调函数接收参数(inst, user, mult)，应返回success和reason表示使用结果。"
+    },
+    {
+      "name": "SetOnUsedFn",
+      "effect": "设置一个回调函数，用于电池被使用时触发。回调函数接收参数(inst, user, mult)，无返回值。"
+    },
+    {
+      "name": "SetResolvePartialChargeMultFn",
+      "effect": "设置一个回调函数，用于调整部分充电时的倍率。回调函数接收参数(inst, user, mult)，应返回调整后的倍率。"
+    },
+    {
+      "name": "ResolvePartialChargeMult",
+      "effect": "返回部分充电时的倍率。如果设置了resolvepartialchargemult回调则调用它并返回其结果，否则返回传入的mult参数。"
+    },
+    {
+      "name": "CanBeUsed",
+      "effect": "返回电池是否可被使用的判断结果。如果设置了canbeused回调则调用它并返回success和reason，否则返回true表示可使用。"
+    },
+    {
+      "name": "OnUsed",
+      "effect": "当电池被使用时调用。如果设置了onused回调则执行它，否则无操作。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20150,
+      15729,
+      16197,
+      13156,
+      10418,
+      71584,
+      45135,
+      51494
+    ],
+    "aspects": [
+      {
+        "aspect": "蓄电池充电使用效果",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "可以在[[蓄电池]]处充电，消耗蓄电池的 1 个电荷，增加 1 格电荷，此外还会回复 3 {{生命值}}并降低 10 {{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "蓄电池功能定义",
+        "evidence": [
+          {
+            "pageid": 71584,
+            "quote": "蓄电池可以为[[可充电]]的实体充电，回复耐久或触发效果等。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:蓄电池"
+    ],
+    "code_fields": [
+      "battery"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
+  "search_terms": [
+    "电池",
+    "充电",
+    "能量",
+    "可使用",
+    "使用回调",
+    "部分充电",
+    "倍率",
+    "电池系统",
+    "电力管理"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3470072afa447e1d5541734c69fefaf19edd09a461ae131f675bc1e85908eb81",
+    "source_bytes": 1254,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095327326
+  }
+}

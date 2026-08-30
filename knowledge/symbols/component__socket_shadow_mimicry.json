@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/socket_shadow_mimicry.lua"
+  },
+  "category": "component",
+  "display_name": "socket_shadow_mimicry",
+  "summary": "Socket_Shadow_Mimicry组件管理影子模仿实体的暂停状态刷新机制。当实体为WX-78的备份身体时，组件会生成一个模仿生成器实体。通过遍历库存容器中的物品并推送事件，确保模仿暂停状态正确更新。",
+  "api": [
+    {
+      "name": "RefreshMimicPauseStates",
+      "effect": "遍历实体的库存或容器，以及wx78备份身体的库存，对每个物品推送'itemmimic_refreshpausestates'事件，事件数据包含所有者实体和forceadd标志，用于强制或默认刷新模仿暂停状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除关联的模仿生成器实体（如果存在），并调用RefreshMimicPauseStates()刷新暂停状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      16419,
+      16615,
+      16438,
+      23965,
+      16197,
+      71461,
+      70763
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论WX-78的电路板机制、备份底盘、生物扫描和触电等，未涉及与阴影模仿相关的组件能力RefreshMimicPauseStates或OnRemoveFromEntity的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影子分身",
+    "刷新暂停",
+    "身体备份",
+    "模仿器",
+    "事件触发",
+    "状态更新",
+    "WX-78",
+    "容器物品",
+    "库存物品"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "影子模仿",
+    "角色技能",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8e6b34a35507f06eb8c545e8fc2f2138873b1c02630388155448f17eaa8d50f0",
+    "source_bytes": 1290,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112733988
+  }
+}

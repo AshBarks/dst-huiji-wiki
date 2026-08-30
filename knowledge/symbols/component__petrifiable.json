@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/petrifiable.lua"
+  },
+  "category": "component",
+  "display_name": "petrifiable",
+  "summary": "该组件管理实体的石化状态和相关定时任务，用于实现石化效果。核心玩法涉及实体在特定条件下石化，并能连锁触发附近实体的石化效果。石化过程可通过回调函数定制行为，并支持保存和加载状态。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "清理组件的石化任务和事件回调，如果实体未石化则注销世界事件并移除标签。"
+    },
+    {
+      "name": "IsPetrified",
+      "effect": "返回布尔值，表示实体当前是否处于石化状态。"
+    },
+    {
+      "name": "SetPetrifiedFn",
+      "effect": "设置石化时触发的回调函数，用于自定义石化行为。"
+    },
+    {
+      "name": "Petrify",
+      "effect": "开始石化过程：immediate 为 true 时立即石化并触发连锁；为 false 且实体睡眠时延迟唤醒后石化；否则延迟随机时间石化。石化后设置 petrified 标志并清理旧任务。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回石化状态和剩余唤醒时间用于游戏保存，未石化则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载石化状态并恢复任务：根据保存的剩余时间设置唤醒任务或触发连锁石化。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试信息字符串，包含石化状态、剩余唤醒时间和剩余石化时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_registerpetrifiable",
+    "ms_unregisterpetrifiable"
+  ],
+  "events_listened": [
+    "entitywake"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SEG_TIME",
+    "TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      18487,
+      15941,
+      15938,
+      14907,
+      14936,
+      14929,
+      34314
+    ],
+    "aspects": [
+      {
+        "aspect": "石化技能效果与持续时间数值",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "石化：右键选定范围施放，石化范围内的敌人 12 秒。"
+          },
+          {
+            "pageid": 15941,
+            "quote": "石化时间 6"
+          },
+          {
+            "pageid": 15938,
+            "quote": "石化时间 2"
+          },
+          {
+            "pageid": 14907,
+            "quote": "石化时间 1"
+          },
+          {
+            "pageid": 14936,
+            "quote": "石化时间 1"
+          }
+        ]
+      },
+      {
+        "aspect": "石化状态在生物行为条件中的提及",
+        "evidence": [
+          {
+            "pageid": 15941,
+            "quote": "不在攻击、硬直、冲刺、睡眠、石化状态时"
+          },
+          {
+            "pageid": 15938,
+            "quote": "不在攻击、硬直、冲刺、睡眠、石化状态时"
+          },
+          {
+            "pageid": 14907,
+            "quote": "不在攻击、硬直、冲刺、睡眠、石化状态时"
+          },
+          {
+            "pageid": 14936,
+            "quote": "不在攻击、硬直、冲刺、睡眠、石化状态时"
+          },
+          {
+            "pageid": 14929,
+            "quote": "石化状态"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "石化",
+    "石化效果",
+    "石化状态",
+    "石化时间",
+    "石化机制",
+    "石化过程",
+    "连锁反应",
+    "石化解除",
+    "石化存档",
+    "石化事件"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "石化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c06433b647196ece1f43bee88794f5fcdb664e97b22815c6eacc92661a94b166",
+    "source_bytes": 4411,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110755828
+  }
+}

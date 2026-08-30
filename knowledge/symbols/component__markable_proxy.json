@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/markable_proxy.lua"
+  },
+  "category": "component",
+  "display_name": "markable_proxy",
+  "summary": "该组件管理一个代理实体，用于间接控制目标实体的标记（marking）能力。它通过转发标记操作到目标实体的 markable 组件，支持游戏中的标记系统核心玩法。组件还处理可标记状态的设置和标记记录的查询。",
+  "api": [
+    {
+      "name": "Mark",
+      "effect": "尝试标记代理实体，实际调用代理实体的 markable 组件的 Mark 方法，传入 doer 参数，返回操作结果（true 或 false）。如果代理或 markable 组件不存在，则返回 false。"
+    },
+    {
+      "name": "SetMarkable",
+      "effect": "设置代理实体的可标记状态，通过调用其 markable 组件的 SetMarkable 方法，并同步更新本地 canbemarked 属性。"
+    },
+    {
+      "name": "HasMarked",
+      "effect": "查询代理实体是否被给定 doer 标记过，调用其 markable 组件的 HasMarked 方法并返回结果。如果代理或 markable 组件不存在，则可能返回 nil。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15336,
+      65605,
+      20714,
+      14684,
+      19718,
+      20113,
+      20287,
+      13268
+    ],
+    "aspects": [
+      {
+        "aspect": "标记状态存在与清除",
+        "evidence": [
+          {
+            "pageid": 15336,
+            "quote": "溯源表使用后清除所有标记。"
+          },
+          {
+            "pageid": 20287,
+            "quote": "由此情况触发的狩猎惊喜，从第一个可疑的土堆开始就会被犬牙标记。"
+          }
+        ]
+      },
+      {
+        "aspect": "标记生成与放置行为",
+        "evidence": [
+          {
+            "pageid": 15336,
+            "quote": "命中:*每 0.1 秒检测一次，若与上次标记相差超过 4 单位，则记录一个标记。"
+          },
+          {
+            "pageid": 65605,
+            "quote": "如果检测到世界缺失[[被丢弃的垃圾]]标记点，会在摇摇欲坠的垃圾堆为中心，在附近生成一个标记点。"
+          },
+          {
+            "pageid": 14684,
+            "quote": "点燃放置的信号弹，即可在地图上的当前位置放置一个持续 15 秒的标记。"
+          },
+          {
+            "pageid": 19718,
+            "quote": "可以使用相同颜色的[[月眼]]，或是建造有同样地图标记的建筑，亦或是更换虫洞的[[财物|皮肤]]来标记一对虫洞。"
+          },
+          {
+            "pageid": 20113,
+            "quote": "点燃放置的信号弹，即可在地图上的当前位置放置三个持续 15 秒的标记。"
+          },
+          {
+            "pageid": 20287,
+            "quote": "触发狩猎惊喜时，从第 X 个可疑的土堆开始会被犬牙标记。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "标记",
+    "目标实体",
+    "标记功能",
+    "标记转发",
+    "标记状态",
+    "标记记录"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/6)",
+  "gameplay_tags": [
+    "标记",
+    "代理",
+    "系统交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b9b11ca86b2095c2efa87eea7544e2246ef29147427608001ee5da5480840a65",
+    "source_bytes": 930,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101550808
+  }
+}

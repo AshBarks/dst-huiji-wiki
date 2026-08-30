@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dockmanager.lua"
+  },
+  "category": "component",
+  "display_name": "dockmanager",
+  "summary": "该组件管理码头地砖的网格数据，包括根地砖标记、删除标记和健康值。它负责码头的创建、销毁和连接性检查，确保孤立的码头会被破坏。核心玩法涉及在猴子岛区域建造和维护码头结构，支持生存和探索活动。",
+  "api": [
+    {
+      "name": "CreateDockAtPoint",
+      "effect": "在指定世界坐标点创建码头地砖，设置码头类型，更新内部网格数据并处理底层地砖。"
+    },
+    {
+      "name": "CreateDockAtTile",
+      "effect": "在指定网格坐标创建码头地砖，设置码头类型，更新内部网格数据并处理底层地砖。"
+    },
+    {
+      "name": "DestroyDockAtPoint",
+      "effect": "销毁指定点的码头地砖，恢复旧地砖，处理附近实体溺水事件，触发相邻码头破坏检查，并随机掉落战利品。"
+    },
+    {
+      "name": "QueueDestroyForDockAtPoint",
+      "effect": "排队销毁指定点的码头地砖，延迟执行破坏，触发附近实体'abandon_ship'和'onpresink'事件。"
+    },
+    {
+      "name": "ResolveDockSafetyAtPoint",
+      "effect": "测试指定点的码头连接性，如果孤立则触发破坏流程。"
+    },
+    {
+      "name": "DamageDockAtPoint",
+      "effect": "对指定坐标点的码头造成伤害，更新健康值，如果健康值降至0则排队销毁。"
+    },
+    {
+      "name": "DamageDockAtTile",
+      "effect": "对指定网格坐标的码头造成伤害，更新健康值，如果健康值降至0则排队销毁。"
+    },
+    {
+      "name": "GetCoordsFromIndex",
+      "effect": "从网格索引计算并返回对应的x和z坐标。"
+    },
+    {
+      "name": "SpawnDamagePrefab",
+      "effect": "根据码头健康值生成或移除伤害预制体，视觉上显示码头损伤程度。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存码头网格数据（根地砖、删除标记、健康值）到存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档加载码头网格数据，恢复健康值预制体并重启未完成的破坏任务。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "worldmapsetsize"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MONKEYISLANDDOCK_HEALTH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      15539,
+      15922,
+      20058,
+      20150,
+      13156,
+      15022,
+      18503
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面均未讨论与码头相关的创建、销毁、伤害、坐标或保存/加载等能力表达。页面18503仅描述月亮码头的布景特性和生成规则，未涉及代码行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "码头",
+    "建造",
+    "破坏",
+    "健康值",
+    "猴子岛",
+    "地砖",
+    "连接性",
+    "掉落物",
+    "溺水",
+    "伤害"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cdbe2856b0ed93c6891d5393ae893cc1aaec2d400d3edf28c8cde56dafb78783",
+    "source_bytes": 18215,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106944578
+  }
+}

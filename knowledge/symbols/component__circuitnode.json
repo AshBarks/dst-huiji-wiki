@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/circuitnode.lua"
+  },
+  "category": "component",
+  "display_name": "circuitnode",
+  "summary": "该组件管理实体之间形成电路网络的能力。它负责自动发现、连接和管理处于指定范围内的其他同类节点，构成游戏中的电路系统基础。",
+  "api": [
+    {
+      "name": "IsEnabled",
+      "effect": "返回一个布尔值，表示该节点的内部节点列表是否已初始化（即不为nil）。通常通过`ConnectTo`或`AddNode`方法初始化。"
+    },
+    {
+      "name": "IsConnected",
+      "effect": "返回一个布尔值，表示该节点当前是否有与之连接的其他节点。连接数大于0时返回true。"
+    },
+    {
+      "name": "NumConnectedNodes",
+      "effect": "返回一个整数，表示当前与该节点直接相连的其他节点的精确数量。"
+    },
+    {
+      "name": "ConnectTo",
+      "effect": "接收一个`tag`字符串参数。它会搜索该实体指定范围（`self.range`）内所有带有该`tag`标签的实体，并将符合条件的、启用了电路节点组件且可见的实体连接为节点。连接逻辑受`connectsacrossplatforms`和`rangeincludesfootprint`属性控制。"
+    },
+    {
+      "name": "Disconnect",
+      "effect": "断开该实体与所有已连接节点的连接。会依次调用每个被移除节点的`RemoveNode`方法，最终将内部节点列表置为nil。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "接收一个数字`range`参数，用于设置该节点搜索并连接其他节点的最大范围（游戏单位）。"
+    },
+    {
+      "name": "SetFootprint",
+      "effect": "接收一个数字`footprint`参数，用于设置该节点的“足迹”大小。当`rangeincludesfootprint`为true时，在计算实际连接范围时会减去对方节点的足迹值。"
+    },
+    {
+      "name": "SetOnConnectFn",
+      "effect": "接收一个函数`fn`，当该节点成功连接到一个新节点时被调用。回调参数为`(inst, node)`，即该实体和被连接的节点实体。"
+    },
+    {
+      "name": "SetOnDisconnectFn",
+      "effect": "接收一个函数`fn`，当该节点断开与另一个节点的连接时被调用。回调参数为`(inst, node)`，即该实体和被断开的节点实体。"
+    },
+    {
+      "name": "AddNode",
+      "effect": "接收一个节点实体`node`参数。将`node`添加到当前节点的连接列表中，更新连接数，并触发`onconnectfn`回调。同时会递归调用`node`的`circuitnode:AddNode(self.inst)`以建立双向连接。"
+    },
+    {
+      "name": "RemoveNode",
+      "effect": "接收一个节点实体`node`参数。从当前节点的连接列表中移除`node`，更新连接数，并触发`ondisconnectfn`回调。同时会递归调用`node`的`circuitnode:RemoveNode(self.inst)`以移除双向连接。"
+    },
+    {
+      "name": "ForEachNode",
+      "effect": "接收一个函数`fn`参数。遍历所有已连接的节点，并对每个节点调用`fn(self.inst, node)`。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      73480,
+      16419,
+      20719,
+      21620,
+      18216,
+      16615,
+      65881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未直接或间接讨论circuitnode组件的能力（如连接、断开、设置范围等）；涉及连接的段落（如页面73480）描述的是生物群系连接机制，与电路节点组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "电路",
+    "节点",
+    "连接",
+    "建造",
+    "网络",
+    "电力",
+    "自动化",
+    "维修",
+    "工程",
+    "设计"
+  ],
+  "gameplay_tags": [
+    "电路",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
+    "source_bytes": 2967,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093241108
+  }
+}

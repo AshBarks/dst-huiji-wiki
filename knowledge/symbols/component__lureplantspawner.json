@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lureplantspawner.lua"
+  },
+  "category": "component",
+  "display_name": "lureplantspawner",
+  "summary": "lureplantspawner组件负责管理诱饵植物在世界中的自动生成。它根据玩家的位置轨迹，在春季以随机间隔尝试在有效位置生成诱饵植物。该组件通过跟踪玩家活动，确保生成过程自然且避免过于频繁。",
+  "api": [
+    {
+      "name": "SpawnModeNever",
+      "effect": "已废弃方法，无实际操作或影响。"
+    },
+    {
+      "name": "SpawnModeHeavy",
+      "effect": "已废弃方法，无实际操作或影响。"
+    },
+    {
+      "name": "SpawnModeNormal",
+      "effect": "已废弃方法，无实际操作或影响。"
+    },
+    {
+      "name": "SpawnModeMed",
+      "effect": "已废弃方法，无实际操作或影响。"
+    },
+    {
+      "name": "SpawnModeLight",
+      "effect": "已废弃方法，无实际操作或影响。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个格式化字符串，显示当前生成间隔和方差，用于调试信息输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "seasontick"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LUREPLANT_SPAWNINTERVAL",
+    "LUREPLANT_SPAWNINTERVALVARIANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      34523,
+      14579,
+      15022,
+      65605,
+      34314,
+      18359,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及 `component__lureplantspawner` 或相关生成模式（如 SpawnModeNever、SpawnModeHeavy 等）的玩家语言表达，也未涉及 GetDebugString 能力的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "诱饵植物",
+    "生成",
+    "春季",
+    "轨迹",
+    "随机",
+    "植物",
+    "生态",
+    "玩家",
+    "自动",
+    "lureplant"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "64be1d3e83089f4d5d74f8d3176e8a988523849c233e1738494ba63369840b71",
+    "source_bytes": 8583,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109436684
+  }
+}

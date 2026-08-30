@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/mermcandidate.lua"
+  },
+  "category": "component",
+  "display_name": "mermcandidate",
+  "summary": "该组件管理鱼人候选者的卡路里数据，用于追踪其进食状态。核心玩法涉及通过食用食物积累卡路里，当卡路里达到阈值时可能触发鱼人的转化机制。组件提供卡路里重置和转化判断功能，并支持数据保存与加载。",
+  "api": [
+    {
+      "name": "AddCalories",
+      "effect": "检查食物是否具有 edible 组件，如果有则将其饥饿值添加到当前卡路里中，副作用是修改 self.calories。"
+    },
+    {
+      "name": "ResetCalories",
+      "effect": "将卡路里值重置为 0，副作用是修改 self.calories。"
+    },
+    {
+      "name": "ShouldTransform",
+      "effect": "返回布尔值，表示当前卡路里是否大于或等于转化阈值，无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含卡路里和转化阈值的表，用于数据保存，无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从传入数据中加载卡路里和转化阈值，如果数据存在则更新组件状态，副作用是修改 self.calories 和 self.transformation_calories。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15415,
+      15975,
+      13268,
+      15973,
+      24875,
+      24748,
+      16197,
+      13779
+    ],
+    "aspects": [
+      {
+        "aspect": "变异转化触发条件描述",
+        "evidence": [
+          {
+            "pageid": 24875,
+            "quote": "沃特将[[月亮碎片]]或[[注能月亮碎片]]给予追随它的[[鱼人]]后，该鱼人会原地转化为变异鱼人。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鱼人",
+    "卡路里",
+    "转化",
+    "食物",
+    "饥饿",
+    "阈值",
+    "进化",
+    "候选者",
+    "Merm",
+    "Candidate"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "生物",
+    "转化",
+    "食物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "754c444a2b95a9316f6a14de0ba721f1b6e23c7079b40c29da8f179aa2b0f30f",
+    "source_bytes": 972,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109611699
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/discoverable.lua"
+  },
+  "category": "component",
+  "display_name": "discoverable",
+  "summary": "该组件管理实体的发现状态，通过点击交互触发发现或隐藏，并动态更新小地图图标以反映实体是否被发现。核心玩法涉及游戏中的探索和发现机制，帮助玩家在地图上定位重要实体。",
+  "api": [
+    {
+      "name": "Discover()",
+      "effect": "将实体的发现状态设置为true，并更新小地图图标为已发现图标（discoveredIcon）。"
+    },
+    {
+      "name": "Hide()",
+      "effect": "将实体的发现状态设置为false，并更新小地图图标为未发现图标（undiscoveredIcon）。"
+    },
+    {
+      "name": "SetIcons(undiscovered, discovered)",
+      "effect": "设置未发现图标（undiscoveredIcon）和已发现图标（discoveredIcon），然后调用Hide()将状态重置为未发现。"
+    },
+    {
+      "name": "OnSave(data)",
+      "effect": "如果发现状态为true，则在传入的数据表data中添加字段discovered并设置为true，用于保存状态。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "如果传入的数据表data中存在字段discovered且为true，则调用Discover()恢复发现状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onclick"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      18219,
+      23187,
+      13156,
+      35609,
+      47009,
+      51951,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏实体、机制和物品的玩家可见属性（如装备伤害、图标、状态变化、游戏机制），未提及或体现 Discover()、Hide()、SetIcons()、OnSave()、OnLoad() 等编程接口或能力行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发现",
+    "小地图",
+    "点击",
+    "图标",
+    "隐藏",
+    "状态",
+    "探索",
+    "交互"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f007ed92c303e24281ed83e29b1c47b2903683db9ad5d0e61c5faaeba7ddacaf",
+    "source_bytes": 1021,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106911368
+  }
+}

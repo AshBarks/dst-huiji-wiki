@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/globaltrackingicon.lua"
+  },
+  "category": "component",
+  "display_name": "globaltrackingicon",
+  "summary": "该组件用于管理全局追踪图标，允许特定玩家在地图上查看移动实体的位置。它处理所有者、全局图标和可揭示图标的数据，支持地图揭示者和其他玩家在附近看到。参与多人游戏中的位置共享和地图探索玩法。",
+  "api": [
+    {
+      "name": "StartTracking",
+      "effect": "开始跟踪指定所有者。行为：设置owner为传入的owner；如果name未提供，则使用实体prefab名；禁用实体的MiniMapEntity缓存；生成全局图标实体并设置其跟踪当前实体，设置分类所有者为owner；生成可揭示图标实体作为子实体，设置为非代理模式排除owner；如果实体没有maprevealable组件，则添加并设置图标预制体和回调，否则更新现有图标为代理模式排除owner。副作用：可能生成新实体，禁用缓存，修改或添加maprevealable组件。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "停止跟踪。行为：恢复实体的MiniMapEntity启用；移除全局图标和可揭示图标实体；移除maprevealable组件；清空owner。副作用：移除生成的实体，恢复组件状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      52726,
+      71461,
+      17914,
+      52631,
+      13689,
+      15415,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨追踪的开始与停止条件",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "启迪战争瓦器人只会主动仇恨[[瓦格斯塔夫的竞技场]]内距其 15 {{解释|距离单位}}内的玩家"
+          },
+          {
+            "pageid": 51046,
+            "quote": "如果目标离开了竞技场就会立刻停止仇恨"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "全局图标",
+    "追踪",
+    "所有者",
+    "地图揭示",
+    "可揭示",
+    "MiniMap",
+    "地图追踪",
+    "多人游戏",
+    "位置共享"
+  ],
+  "gameplay_tags": [
+    "追踪",
+    "地图",
+    "多人游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f28aa73049d777da6182e37d06d4f6b7d4abbada0c61577c105646909fe99600",
+    "source_bytes": 2265,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096765653
+  }
+}

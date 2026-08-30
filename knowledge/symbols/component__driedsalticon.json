@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/driedsalticon.lua"
+  },
+  "category": "component",
+  "display_name": "driedsalticon",
+  "summary": "该组件管理物品的盐干燥图标显示，通过网络变量同步状态到客户端。它参与生存机制中的物品干燥过程，允许自定义图标显示和隐藏行为，并控制是否在干燥时收集物品。组件在服务器和客户端之间协调图标更新，确保视觉反馈一致。",
+  "api": [
+    {
+      "name": "OverrideShowIconFn",
+      "effect": "设置自定义的显示图标函数；当图标显示时调用此函数执行额外行为，如修改物品外观。"
+    },
+    {
+      "name": "OverrideHideIconFn",
+      "effect": "设置自定义的隐藏图标函数；当图标隐藏时调用此函数执行额外行为，如恢复物品默认外观。"
+    },
+    {
+      "name": "SetCollectsOnDried",
+      "effect": "设置干燥时是否收集物品的属性；仅在主服务器上生效，用于控制干燥过程中的物品收集逻辑。"
+    },
+    {
+      "name": "ShowSaltIcon",
+      "effect": "显示盐图标；仅在主服务器上执行，更新网络变量showicon为true并触发OnShowIconDirty函数更新库存图标显示。"
+    },
+    {
+      "name": "HideSaltIcon",
+      "effect": "隐藏盐图标；仅在主服务器上执行，更新网络变量showicon为false并触发OnShowIconDirty函数更新库存图标显示。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "imagechange"
+  ],
+  "events_listened": [
+    "showicondirty"
+  ],
+  "netvars": [
+    "showicon"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      18219,
+      20700,
+      15922,
+      35609,
+      34314,
+      45249,
+      70462
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未提及与driedsalticon组件能力（如盐图标显示/隐藏、干燥收集设置）相关的玩家语言表达，如数值、行为描述或策略段落。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "盐",
+    "干燥",
+    "图标",
+    "库存",
+    "网络同步",
+    "物品状态",
+    "生存",
+    "装饰",
+    "组件",
+    "显示"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "物品",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "80557dfbf6d3802eca3750c455ab4a68173d9f5d2d6aadb24e77bf1d299eb08e",
+    "source_bytes": 1801,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107005137
+  }
+}

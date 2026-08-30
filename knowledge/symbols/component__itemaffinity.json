@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/itemaffinity.lua"
+  },
+  "category": "component",
+  "display_name": "itemaffinity",
+  "summary": "该组件管理角色的物品亲和力列表，为携带特定物品提供理智加成。加成基于物品优先级，一次只应用最高优先级的物品加成。组件响应物品获取、丢失和丢弃事件来刷新加成效果。",
+  "api": [
+    {
+      "name": "AddAffinity",
+      "effect": "添加一个物品亲和力条目，指定prefab、tag、理智加成和优先级，然后调用RefreshAffinity刷新理智加成。"
+    },
+    {
+      "name": "RemoveAffinity",
+      "effect": "根据prefab移除一个物品亲和力条目，然后调用RefreshAffinity刷新理智加成。"
+    },
+    {
+      "name": "RefreshAffinity",
+      "effect": "重新计算理智加成：按优先级排序亲和力列表，移除现有理智修正，遍历列表应用第一个匹配库存物品（根据prefab或tag）的加成，并停止遍历。"
+    },
+    {
+      "name": "SortAffinities",
+      "effect": "按优先级降序排序亲和力列表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "itemget",
+    "itemlose",
+    "dropitem"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      18838,
+      72830
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与物品亲和力（item affinity）相关的 AddAffinity、RemoveAffinity、RefreshAffinity 或 SortAffinities 能力表达。所有内容专注于角色能力、物品效果或机制描述，未涉及亲和力的添加、移除、刷新或排序。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "携带物品",
+    "buff效果",
+    "理智提升",
+    "物品加成",
+    "优先级加成",
+    "事件响应",
+    "刷新效果",
+    "获取丢弃"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "精神管理",
+    "物品收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fcde2c0af926f5ecfaca51dca507086f7557bf46c2b39b863ac7d9e628e96edc",
+    "source_bytes": 1879,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108956462
+  }
+}

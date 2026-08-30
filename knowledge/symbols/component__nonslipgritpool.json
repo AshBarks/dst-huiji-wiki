@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nonslipgritpool.lua"
+  },
+  "category": "component",
+  "display_name": "nonslipgritpool",
+  "summary": "该组件为实体添加 'nonslipgritpool' 标签，管理防滑 grit 池数据，并提供方法检查指定位置是否处于防滑范围内，参与游戏中的地形防滑机制，允许自定义检查逻辑或基于物理半径判定。",
+  "api": [
+    {
+      "name": "SetIsGritAtPoint",
+      "effect": "设置自定义函数以检查指定位置是否在 grit 范围内，覆盖默认的物理半径检查逻辑。"
+    },
+    {
+      "name": "IsGritAtPosition",
+      "effect": "检查坐标 (x, y, z) 是否在 grit 范围内；若自定义函数存在则调用该函数，否则使用实体的物理半径和位置计算判定。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，删除实体的 'nonslipgritpool' 标签以进行清理。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      70486,
+      13569,
+      13216,
+      13281,
+      13412,
+      13456,
+      13570,
+      13634
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要介绍防滑粉的基本功能（如防止滑倒）和耐久属性，但未涉及组件代码能力SetIsGritAtPoint、IsGritAtPosition、OnRemoveFromEntity的具体行为或玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "防滑池",
+    "位置检查",
+    "物理半径",
+    "nonslipgrit",
+    "gritpool",
+    "防滑区域",
+    "地形效果",
+    "实体标签",
+    "游戏机制",
+    "生存工具"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "防滑",
+    "地形"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "14194b727ee95453a73ed6b45d1c9c2df03e41fd78bae54310c50279d6de8b7e",
+    "source_bytes": 859,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102088080
+  }
+}

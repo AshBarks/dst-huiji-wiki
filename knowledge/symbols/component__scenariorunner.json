@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/scenariorunner.lua"
+  },
+  "category": "component",
+  "display_name": "scenariorunner",
+  "summary": "ScenarioRunner 组件用于管理场景脚本的执行，负责加载、运行和清理脚本。它控制脚本的首次创建和后续加载，确保脚本正确运行并在必要时移除自身，参与游戏世界中的事件触发和任务执行。",
+  "api": [
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据中加载脚本名和运行状态，用于恢复组件状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回当前脚本名和运行状态的数据表，用于保存组件状态。"
+    },
+    {
+      "name": "SetScript",
+      "effect": "设置场景脚本的名称，加载对应的脚本文件，并检查脚本是否导出了 OnCreate 或 OnLoad 函数。"
+    },
+    {
+      "name": "Run",
+      "effect": "执行场景脚本：如果脚本尚未运行过且有 OnCreate 函数，则调用它并标记为已运行；然后调用脚本的 OnLoad 函数，若无则清理场景。"
+    },
+    {
+      "name": "ClearScenario",
+      "effect": "从实体移除 scenariorunner 组件，并调用脚本的 OnDestroy 函数（如果存在）。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置所有组件状态，调用脚本的 OnDestroy 函数（如果存在），并清空脚本名和运行标志。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34109
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面内容仅描述了实体 chest_mimic 的游戏行为（如伪装、显形、仇恨）和掉落机制，没有提及 component__scenariorunner 的任何代码能力或行为语义，如 OnLoad、OnSave、SetScript、Run、ClearScenario、Reset 等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "场景脚本管理",
+    "脚本控制",
+    "执行场景",
+    "加载脚本",
+    "运行场景",
+    "清理脚本",
+    "首次创建",
+    "事件处理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "任务",
+    "故事",
+    "事件",
+    "场景管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "113cd7848f23d0460354c93497207cbd3b633f2d7a50e2e872e6625902a4f812",
+    "source_bytes": 1538,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095901240
+  }
+}

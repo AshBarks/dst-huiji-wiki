@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaultorbteleportdestination.lua"
+  },
+  "category": "component",
+  "display_name": "vaultorbteleportdestination",
+  "summary": "该组件用于管理传送目的地的小地图标记，它生成一个隐藏的全局地图图标来追踪关联实体，并在实体移除时自动清理图标，支持传送系统中的目标显示功能。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法。所有方法（如 OnRemoveEntity）均为内部事件处理函数，不对外暴露。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      39366,
+      23187,
+      57263,
+      18001,
+      18219,
+      34314,
+      16641,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及'component__vaultorbteleportdestination'或相关传送目的地组件的能力表达，无法找到匹配的玩家语言证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送",
+    "目的地",
+    "小地图",
+    "标记",
+    "图标",
+    "全局",
+    "追踪",
+    "teleport",
+    "destination",
+    "minimap"
+  ],
+  "gameplay_tags": [
+    "传送",
+    "地图"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e0679730d818948cd81e8273b9c170dceb6459a709667a9e5f7633b9a9aefbfb",
+    "source_bytes": 1401,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104633408
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/guardian.lua"
+  },
+  "category": "component",
+  "display_name": "guardian",
+  "summary": "该组件管理一个守护者（Guardian）的召唤与遣散机制，通过追踪“召唤值”的增减，在达到预设阈值时自动为所属实体召唤出指定的守护者生物。守护者死亡或消失时会触发回调，并伴随一个自动衰减召唤值的计时器。",
+  "api": [
+    {
+      "name": "SetGuardian",
+      "effect": "设置或更改该实体的守护者实体。如果设置了一个新的守护者，则会移除对旧守护者的监听并开始监听新守护者的“death”和“onremove”事件。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "增加或减少当前的召唤值（summons），并限制在0到阈值之间。推送“summonsdelta”事件。启动衰减计时器。如果当前没有守护者且召唤值达到阈值，则调用SummonGuardian；如果已有守护者且召唤值降至0，则调用DismissGuardian。"
+    },
+    {
+      "name": "Call",
+      "effect": "召唤值增加调用。调用DoDelta，参数d默认为1。"
+    },
+    {
+      "name": "Decay",
+      "effect": "召唤值衰减调用。调用DoDelta，参数d默认为-1。"
+    },
+    {
+      "name": "SummonGuardian",
+      "effect": "尝试召唤守护者。如果提供了override实体，则直接将其设置为守护者。否则，首先在附近查找与预设prefab相同的实体并建立关联；若找不到，则生成一个新的守护者实体并将其传送到所属实体的位置。生成后会触发onsummonfn回调。"
+    },
+    {
+      "name": "DismissGuardian",
+      "effect": "遣散当前的守护者。如果定义了ondismissfn回调，则调用它并解除关联；否则直接移除（Remove）守护者实体。"
+    },
+    {
+      "name": "HasGuardian",
+      "effect": "检查是否当前拥有一个守护者。返回布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括当前的召唤值（summons）和守护者实体的GUID。用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载存档数据，恢复召唤值（summons），并启动衰减计时器。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在实体加载后调用，用于在存档世界中重新关联已经存在的守护者实体。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "summonsdelta"
+  ],
+  "events_listened": [
+    "death",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      15248,
+      15022,
+      18234,
+      15651,
+      35007,
+      13606,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "召唤暗影傀儡行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "是[[麦斯威尔]]通过[[暗影秘典]]召唤的一类生物。"
+          }
+        ]
+      },
+      {
+        "aspect": "暗影傀儡死亡解散行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影傀儡受到召唤者的攻击会立即死亡"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "守护者",
+    "召唤",
+    "阈值",
+    "召唤值",
+    "生物跟随",
+    "死亡",
+    "遣散",
+    "衰减",
+    "存档",
+    "鹅妈妈"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "召唤生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a103a6e27f5262f4c62afd517ba8587bbc1e2aeb51a3f248b6f3bcc75a6e4aa6",
+    "source_bytes": 4421,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100510960
+  }
+}

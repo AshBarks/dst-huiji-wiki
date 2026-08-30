@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lordfruitflytrigger.lua"
+  },
+  "category": "component",
+  "display_name": "lordfruitflytrigger",
+  "summary": "该组件管理水果蝇触发器的更新状态，跟踪指定范围内实体的重叠情况。当新实体进入范围时，会触发其激活函数。组件响应实体的死亡和复活事件来控制更新，并监听游戏世界的计时器完成事件以重置重叠列表。",
+  "api": [
+    {
+      "name": "StartUpdating",
+      "effect": "启动组件的更新循环，设置updating标志为true，使组件开始周期性执行OnUpdate方法。"
+    },
+    {
+      "name": "StopUpdating",
+      "effect": "停止组件的更新循环，设置updating标志为false，使组件停止执行OnUpdate方法。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每次更新时，清理重叠列表中状态为false的实体，查找指定范围内带fruitflyspawner标签的实体，对新进入范围的实体触发其_activatefn函数，并更新重叠状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，移除lordfruitflytrigger标签，并移除对ms_fruitflytimerfinished、death和respawnfromghost事件的监听。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_fruitflytimerfinished",
+    "death",
+    "respawnfromghost"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15022,
+      20714,
+      13701,
+      23187,
+      15922,
+      13779,
+      18476
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与component__lordfruitflytrigger相关的实体或能力表达；文本讨论的是其他游戏实体和机制，未涉及StartUpdating、StopUpdating、OnUpdate、OnRemoveFromEntity等代码能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水果蝇",
+    "触发",
+    "更新",
+    "重叠",
+    "计时器",
+    "死亡",
+    "复活",
+    "范围",
+    "实体",
+    "激活"
+  ],
+  "gameplay_tags": [
+    "触发器",
+    "水果蝇"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f70a28470a469b7bad71eae34cd3af5fb346862ea14fdd83bb87f8656c650e83",
+    "source_bytes": 2135,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109215762
+  }
+}

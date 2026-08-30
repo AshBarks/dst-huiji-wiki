@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/squadmember.lua"
+  },
+  "category": "component",
+  "display_name": "squadmember",
+  "summary": "该组件管理实体的队伍成员资格，维护队伍名称和其他成员引用。核心玩法允许实体通过加入或离开队伍进行组队，利用事件系统同步成员状态以支持合作交互。",
+  "api": [
+    {
+      "name": "IsInSquad",
+      "effect": "返回布尔值，指示实体是否处于队伍中（即队伍名称非空）。"
+    },
+    {
+      "name": "GetSquadName",
+      "effect": "返回当前队伍名称字符串。"
+    },
+    {
+      "name": "GetOtherMembers",
+      "effect": "返回包含所有其他队伍成员的表（键为实体引用，值为 true）。"
+    },
+    {
+      "name": "JoinSquad",
+      "effect": "加入指定名称的队伍。如果实体已在不同队伍，则先调用 LeaveSquad；然后设置新队伍，发布 ms_joinsquad_ 事件到 TheWorld，并监听该事件以跟踪新成员加入。"
+    },
+    {
+      "name": "LeaveSquad",
+      "effect": "离开当前队伍。停止跟踪所有其他成员，设置队伍名称为 nil，并发布 ms_leavesquad_ 事件从实体自身。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含队伍名称和所有其他成员的引用；如果不在队伍中则返回 nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_joinsquad_<squadname>",
+    "ms_leavesquad_<squadname>"
+  ],
+  "events_listened": [
+    "ms_joinsquad_<squadname>",
+    "ms_leavesquad_<squadname>",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14907,
+      13199,
+      13406,
+      20510,
+      10379,
+      13556,
+      15938,
+      18540
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未涉及 component__squadmember 的能力讨论，如 IsInSquad、GetSquadName 等；内容主要关于怪物行为、角色特性和游戏模式，无小队管理细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "队伍",
+    "成员",
+    "组队",
+    "加入队伍",
+    "离开队伍",
+    "队友",
+    "合作",
+    "团队",
+    "squad",
+    "member"
+  ],
+  "gameplay_tags": [
+    "合作",
+    "社交",
+    "队伍管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ca594d6420630c35fe6f29cca112fbc32d5860da567fff7c44e925bf20bd9298",
+    "source_bytes": 2076,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112977882
+  }
+}

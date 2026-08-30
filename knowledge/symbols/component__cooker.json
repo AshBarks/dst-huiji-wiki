@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cooker.lua"
+  },
+  "category": "component",
+  "display_name": "cooker",
+  "summary": "cooker组件管理实体的烹饪功能，通过添加'cooker'标签标识可烹饪源。它参与游戏的核心烹饪玩法，提供方法检查物品是否可烹饪并执行烹饪过程，涉及厨师技能、燃料状态和物品状态等条件。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体的'cooker'标签。"
+    },
+    {
+      "name": "CanCook",
+      "effect": "检查给定物品是否可以被厨师烹饪。返回布尔值，条件为物品不为nil、有cookable组件、燃料未空（如果有fueled组件）、物品未燃烧、物品未被投掷，且如果是危险厨师则需厨师有'expertchef'标签。无直接副作用。"
+    },
+    {
+      "name": "CookItem",
+      "effect": "执行烹饪：如果CanCook返回true，则调用item的cookable组件进行烹饪，更新统计（cooked_加上物品prefab），调用oncookitem回调（如果存在），播放烹饪声音（如果声音实例有SoundEmitter），调用oncookfn回调（如果存在），移除原物品并返回新物品。副作用包括更新游戏统计、播放声音和触发外部回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13476,
+      13779,
+      24540,
+      16197,
+      13642,
+      28610,
+      13477,
+      13153
+    ],
+    "aspects": [
+      {
+        "aspect": "烹饪操作步骤描述",
+        "evidence": [
+          {
+            "pageid": 13476,
+            "quote": "向烹饪用具中放入 4 个食材即可开始烹"
+          }
+        ]
+      },
+      {
+        "aspect": "烹饪锅的烹饪功能描述",
+        "evidence": [
+          {
+            "pageid": 13476,
+            "quote": "玩家可以在[[烹饪锅]]、[[远古窑]]或[[便携烹饪锅]]（仅限[[沃利]]）内放入食材进行烹饪"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "烹饪",
+    "厨师",
+    "食物",
+    "制作",
+    "燃料",
+    "烹饪锅",
+    "厨师技能",
+    "燃料状态",
+    "物品状态"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "烹饪",
+    "食物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6da76890dee84a843f72420a4e9ba15cb810d8d6f6791c2bba680476380a2c02",
+    "source_bytes": 1665,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092372347
+  }
+}

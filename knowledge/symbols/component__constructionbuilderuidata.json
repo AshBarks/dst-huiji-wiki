@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/constructionbuilderuidata.lua"
+  },
+  "category": "component",
+  "display_name": "constructionbuilderuidata",
+  "summary": "该组件通过网络变量同步建筑构建器的容器实例和目标实例，用于在建造系统中管理与建筑计划相关的用户界面数据。它参与玩家建造核心玩法，帮助获取建筑材料信息和槽位映射，支持网络联机下的数据一致。",
+  "api": [
+    {
+      "name": "SetContainer",
+      "effect": "设置网络变量 `_containerinst` 为指定的容器实例，用于同步容器数据到网络。"
+    },
+    {
+      "name": "GetContainer",
+      "effect": "返回当前存储的容器实例，用于获取容器参考。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "设置网络变量 `_targetinst` 为指定的目标实例，表示建筑目标，用于同步建筑目标数据。"
+    },
+    {
+      "name": "GetTarget",
+      "effect": "返回当前存储的目标实例，用于获取建筑目标参考。"
+    },
+    {
+      "name": "GetConstructionSite",
+      "effect": "如果目标实例存在且有 `constructionsite` 组件副本，则返回该副本；否则返回 nil，用于获取构造场地组件。"
+    },
+    {
+      "name": "GetIngredientForSlot",
+      "effect": "根据目标实例的建筑计划，返回指定槽位的材料类型（从全局表 `CONSTRUCTION_PLANS` 查找）；如果槽位无效或无计划，返回空表。"
+    },
+    {
+      "name": "GetSlotForIngredient",
+      "effect": "在目标实例的建筑计划中查找与给定材料预制件匹配的槽位索引并返回；如果未找到，返回 nil，用于材料槽位映射。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "constructionbuilderuidata._containerinst",
+    "constructionbuilderuidata._targetinst"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      13823,
+      70704,
+      20714,
+      65881,
+      16640,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要涉及怪物行为（如天体英雄、独眼巨鹿）、弹弓弹药效果、建筑破坏、控制台命令、建筑策略（如蜘蛛工厂建造）、建造护符制作效果和世界生成机制，没有提及与 `constructionbuilderuidata` 组件相关的任何能力或行为语义，如设置容器、目标、建筑站点或槽位成分等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "建筑",
+    "建造",
+    "材料",
+    "槽位",
+    "容器",
+    "目标",
+    "ConstructionBuilder",
+    "建筑计划",
+    "施工站点",
+    "网络同步"
+  ],
+  "gameplay_tags": [
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0536e923833b4efb631f6f2ed3fd138d7a74f35710e171efeaae3a5168ac975b",
+    "source_bytes": 1517,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090925049
+  }
+}

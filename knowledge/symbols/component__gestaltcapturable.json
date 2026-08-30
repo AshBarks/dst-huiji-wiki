@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gestaltcapturable.lua"
+  },
+  "category": "component",
+  "display_name": "gestaltcapturable",
+  "summary": "gestaltcapturable 组件管理实体的精神捕获状态，包括捕获级别、启用状态和目标化信息。它用于饥荒联机版中的精神捕获机制，允许其他组件如 gestaltcage 控制捕获过程。组件通过回调函数和事件与游戏系统交互。",
+  "api": [
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件的启用状态，影响实体上的 \"gestaltcapturable\" 标签添加或移除。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件的启用状态。"
+    },
+    {
+      "name": "SetLevel",
+      "effect": "设置捕获级别。"
+    },
+    {
+      "name": "GetLevel",
+      "effect": "获取捕获级别。"
+    },
+    {
+      "name": "SetIsPlanar",
+      "effect": "设置实体是否为计划性类型；如果传入 nil 或 false，则设为 nil。"
+    },
+    {
+      "name": "GetIsPlanar",
+      "effect": "获取实体是否为计划性类型。"
+    },
+    {
+      "name": "SetOnCapturedFn",
+      "effect": "设置被捕获时的回调函数，该函数将在 OnCaptured 调用时执行。"
+    },
+    {
+      "name": "SetOnTargetedFn",
+      "effect": "设置被目标化时的回调函数，该函数将在首次被目标化时执行。"
+    },
+    {
+      "name": "SetOnUntargetedFn",
+      "effect": "设置未被目标化时的回调函数，该函数将在所有目标器移除后执行。"
+    },
+    {
+      "name": "IsTargeted",
+      "effect": "检查实体是否被至少一个目标器目标化。"
+    },
+    {
+      "name": "OnTargeted",
+      "effect": "由 gestaltcage 组件调用，当实体被目标化时，记录目标器并监听其 \"onremove\" 事件；如果之前未被目标化，则触发回调函数和 \"gestaltcapturable_targeted\" 事件。"
+    },
+    {
+      "name": "OnUntargeted",
+      "effect": "由 gestaltcage 组件调用，当实体未被目标化时，移除目标器并清理事件监听；如果没有其他目标器，则触发回调函数和 \"gestaltcapturable_untargeted\" 事件。"
+    },
+    {
+      "name": "OnCaptured",
+      "effect": "由 gestaltcage 组件调用，当实体被捕获时，如果存在捕获者 (doer)，则向其推送 \"gestaltcaptured\" 事件，并执行设置的回调函数。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理实体上的 \"gestaltcapturable\" 标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "gestaltcapturable_targeted",
+    "gestaltcapturable_untargeted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      50898,
+      72314,
+      20714,
+      51221,
+      51498,
+      13701,
+      23956,
+      13551
+    ],
+    "aspects": [
+      {
+        "aspect": "捕获行为描述",
+        "evidence": [
+          {
+            "pageid": 50898,
+            "quote": "幻灵捕获机可以用于捕获以下目标，变为装有虚影对应等级的幻灵捕获机"
+          },
+          {
+            "pageid": 51498,
+            "quote": "玩家需要将 6 个装满的一级或二级[[幻灵捕获机]]交给瓦格斯塔夫"
+          },
+          {
+            "pageid": 13551,
+            "quote": "虚影可以用[[幻灵捕获机]]捕获，以用于建造[[螨地爬]]"
+          }
+        ]
+      },
+      {
+        "aspect": "级别状态标注",
+        "evidence": [
+          {
+            "pageid": 50898,
+            "quote": "装满的一级/二级[[幻灵捕获机]]"
+          },
+          {
+            "pageid": 51498,
+            "quote": "装满的一级或二级[[幻灵捕获机]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "精神捕获",
+    "捕获",
+    "目标化",
+    "gestalt",
+    "级别",
+    "计划性",
+    "启用",
+    "回调",
+    "控制"
+  ],
+  "gameplay_tags": [
+    "精神",
+    "捕获"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1fa5c9f7185e67940107838233a9b350cd95d6cd2b11efc6b08b7414707f0cab",
+    "source_bytes": 2677,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094018436
+  }
+}

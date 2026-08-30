@@ -1,0 +1,195 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/temperature.lua"
+  },
+  "category": "component",
+  "display_name": "temperature",
+  "summary": "该组件管理实体的温度数据，包括当前温度、最大值、最小值及过热阈值等。它参与核心生存玩法，通过温度变化影响实体状态，如过热或过冷会导致伤害，玩家需利用绝缘、加热器、环境因素和食物来调节温度以维持生存。",
+  "api": [
+    {
+      "name": "SetFreezingHurtRate",
+      "effect": "设置冻结伤害率，影响实体在低温时的生命值减少速度。参数rate为伤害率值。"
+    },
+    {
+      "name": "SetOverheatHurtRate",
+      "effect": "设置过热伤害率，影响实体在高温时的生命值减少速度。参数rate为伤害率值。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "应用温度变化delta值，可选择跳过绝缘计算（skipinsulation为true时跳过）。副作用：直接修改当前温度，可能触发温度状态事件。"
+    },
+    {
+      "name": "SetTemperatureInBelly",
+      "effect": "设置消化温度变化，在指定duration时间内提供温度delta。用于食物或物品的内部加热/冷却效果。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时清理状态，包括取消消化温度任务、重置网络变量isfreezing为false、移除事件监听。"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "返回实体的当前温度值。"
+    },
+    {
+      "name": "GetMax",
+      "effect": "返回实体的最大温度值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态到表，包括当前温度、消化温度变化和剩余时间。用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载组件状态，恢复消化温度变化、当前温度，并根据世界温度调整玩家离线期间的温度变化。"
+    },
+    {
+      "name": "IgnoreTags",
+      "effect": "设置忽略的加热器标签列表，始终包含\"INLIMBO\"。影响温度更新时对附近加热器实体的检测。"
+    },
+    {
+      "name": "SetTemp",
+      "effect": "设置固定温度值（settemp）。若temp非nil，则立即调用SetTemperature设置温度，覆盖正常温度更新。"
+    },
+    {
+      "name": "SetTemperature",
+      "effect": "设置当前温度值，限制在最大值和最小值之间。副作用：若温度跨越0度或过热阈值，推送startfreezing/stopfreezing或startoverheating/stopoverheating事件；始终推送temperaturedelta事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前温度、变化率、delta值、修改器总和、绝缘值及睡眠袋温度（若存在）。"
+    },
+    {
+      "name": "IsFreezing",
+      "effect": "检查当前温度是否小于0（冻结状态）。返回布尔值。"
+    },
+    {
+      "name": "IsOverheating",
+      "effect": "检查当前温度是否大于过热阈值（过热状态）。返回布尔值。"
+    },
+    {
+      "name": "SetModifier",
+      "effect": "设置命名温度修改器，值为value。若value为nil或0则移除修改器。修改器会累加影响温度delta。"
+    },
+    {
+      "name": "RemoveModifier",
+      "effect": "移除指定名称的温度修改器，更新修改器总和。"
+    },
+    {
+      "name": "SetInsulationModifier",
+      "effect": "设置绝缘修改器，按绝缘类型（如冬季/夏季）、来源src和key存储绝缘值insulation。影响温度变化计算。"
+    },
+    {
+      "name": "RemoveInsulationModifier",
+      "effect": "移除指定绝缘类型、来源和key的绝缘修改器，若修改器列表为空则清理。"
+    },
+    {
+      "name": "GetInsulation",
+      "effect": "计算并返回冬季绝缘值和夏季绝缘值，考虑固有绝缘、装备绝缘、胡子、庇护、绝缘修改器及时间（黄昏/夜晚）加成。"
+    },
+    {
+      "name": "GetMoisturePenalty",
+      "effect": "根据实体湿度百分比返回温度惩罚值，湿度越高惩罚越大（负值）。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新温度，计算环境温度、外部加热器影响、绝缘、湿度惩罚等，应用温度变化并造成过冷/过热伤害（若applyhealthdelta非false）。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件状态（当前温度和消化温度变化）转移到新实例newinst，用于实体转移或重生。"
+    }
+  ],
+  "api_note": "该组件暴露多个公开方法，用于温度管理、状态查询和修改器控制。",
+  "events_published": [
+    "startfreezing",
+    "stopfreezing",
+    "startoverheating",
+    "stopoverheating",
+    "temperaturedelta"
+  ],
+  "events_listened": [
+    "sheltered"
+  ],
+  "netvars": [
+    "Temperature",
+    "isfreezing"
+  ],
+  "tunables": [
+    "STARTING_TEMP",
+    "MAX_ENTITY_TEMP",
+    "MIN_ENTITY_TEMP",
+    "OVERHEAT_TEMP",
+    "WILSON_HEALTH",
+    "FREEZING_KILL_TIME",
+    "INSULATION_MED_LARGE",
+    "MOISTURE_TEMP_PENALTY",
+    "SEG_TIME",
+    "WARM_DEGREES_PER_SEC",
+    "DUSK_INSULATION_BONUS",
+    "NIGHT_INSULATION_BONUS",
+    "TREE_SHADE_COOLING_THRESHOLD",
+    "TREE_SHADE_COOLER",
+    "WET_HEAT_FACTOR_PENALTY",
+    "THAW_DEGREES_PER_SEC",
+    "HOT_FOOD_WARMING_THRESHOLD",
+    "COLD_FOOD_CHILLING_THRESHOLD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      20700,
+      20150,
+      10374,
+      15539,
+      15922,
+      20058,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "角色隔热值与过热伤害减免",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛自带 30 点隔热值，使她在炎热环境中过热需要更长时间。过热时，薇洛只会受到 2/3 的伤害（ -0.83 {{生命值}}/秒）。"
+          }
+        ]
+      },
+      {
+        "aspect": "过冷与过热伤害机制",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "角色的个体温度低于 0 度时会发生过冷，高于 70 度时则会过热。无论过冷还是过热，角色的[[生命值]]都会以 1.25{{生命值}…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "温度",
+    "过热",
+    "冻结",
+    "绝缘",
+    "御寒",
+    "消暑",
+    "体温",
+    "伤害",
+    "湿度",
+    "环境"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bd454eadacd69578da36a5e7982133b2d3049d20751f6b3043e7a79f3d5f5099",
+    "source_bytes": 21205,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090430318
+  }
+}

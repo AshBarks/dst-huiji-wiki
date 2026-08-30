@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forestdaywalkerspawner.lua"
+  },
+  "category": "component",
+  "display_name": "forestdaywalkerspawner",
+  "summary": "该组件管理DayWalker在森林中的生成机制，维护剩余生成天数和力量等级。它通过响应世界天数变化来尝试生成DayWalker，依赖大型垃圾堆实体作为生成点，并负责在DayWalker被击败时提升力量等级并同步事件。",
+  "api": [
+    {
+      "name": "IncrementPowerLevel",
+      "effect": "增加力量等级power_level，最大值为2。当DayWalker被击败时调用，用于提升后续生成的DayWalker强度。"
+    },
+    {
+      "name": "GetPowerLevel",
+      "effect": "返回当前力量等级power_level的值。"
+    },
+    {
+      "name": "TryToSetDayWalkerJunkPile",
+      "effect": "尝试通过wagpunk_manager获取大型垃圾堆实体并赋值给self.bigjunk。成功返回true，失败返回false。副作用：若成功则设置self.bigjunk。"
+    },
+    {
+      "name": "ShouldShakeJunk",
+      "effect": "检查self.bigjunk是否存在，返回布尔值。用于判断是否需要摇晃垃圾堆生成DayWalker。"
+    },
+    {
+      "name": "CanSpawnFromJunk",
+      "effect": "判断是否可以从垃圾堆生成DayWalker。检查bigjunk是否存在、daywalker是否已存在、shard_daywalkerspawner的位置是否为\"forestjunkpile\"以及days_to_spawn是否小于等于0，返回布尔值。"
+    },
+    {
+      "name": "OnDayChange",
+      "effect": "响应世界天数变化。如果daywalker或bigjunk已存在则返回；否则减少days_to_spawn，当减至0时调用TryToSetDayWalkerJunkPile设置垃圾堆并启动生成。副作用：可能设置bigjunk并触发生成。"
+    },
+    {
+      "name": "WatchDaywalker",
+      "effect": "设置self.daywalker为指定实体，并监听其\"onremove\"事件。当实体移除时，如果被击败则调用IncrementPowerLevel增加力量等级并同步boss击败事件。副作用：设置self.daywalker和注册事件监听。"
+    },
+    {
+      "name": "HasDaywalker",
+      "effect": "检查self.daywalker是否存在，返回布尔值。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "初始化组件。如果TUNING.SPAWN_DAYWALKER为true，则注册世界状态\"cycles\"变化监听，并可能立即调用OnDayChange尝试生成。副作用：注册事件监听和可能触发生成。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据到表，包括days_to_spawn、power_level、daywalker和bigjunk的GUID。返回数据表和引用列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载days_to_spawn和power_level。副作用：恢复组件状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，根据GUID恢复daywalker和bigjunk的实体引用。副作用：设置self.daywalker和self.bigjunk。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "cycles",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DAYWALKER_RESPAWN_DAYS_COUNT",
+    "SPAWN_DAYWALKER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      22383,
+      19110,
+      22514,
+      22503,
+      45249,
+      65605,
+      34314,
+      16587
+    ],
+    "aspects": [
+      {
+        "aspect": "从垃圾堆生成实体",
+        "evidence": [
+          {
+            "pageid": 22503,
+            "quote": "在击败梦魇疯猪的 10 天后，玩家翻找摇摇欲坠的垃圾堆时，将会生成拾荒疯猪。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "DayWalker",
+    "森林生成",
+    "垃圾堆",
+    "等级提升",
+    "天数变化",
+    "生成条件",
+    "计时器",
+    "击败效果",
+    "事件同步"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "da64788ee97c5909822ad132c0465303e3402e4b3a780230a2156f758ec85564",
+    "source_bytes": 4684,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107697572
+  }
+}

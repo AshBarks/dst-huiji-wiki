@@ -1,0 +1,335 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/inventory_replica.lua"
+  },
+  "category": "component",
+  "display_name": "inventory_replica",
+  "summary": "该组件是饥荒联机版中玩家库存的复制组件，用于在客户端和服务器之间同步物品栏数据。它管理玩家的物品槽位、装备栏、活动物品以及负重和漂浮物持有状态。参与核心玩法中的物品收集、装备使用和玩家交互。",
+  "api": [
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体移除时，清理classified对象、取消开放任务并触发相关事件。"
+    },
+    {
+      "name": "AttachClassified",
+      "effect": "附加classified对象，设置事件监听器以响应可见性、负重和漂浮物状态变化。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "分离classified对象，隐藏库存界面并触发新活动物品和库存关闭事件。"
+    },
+    {
+      "name": "OnOpen",
+      "effect": "打开库存界面，设置classified可见并通过网络同步到客户端。"
+    },
+    {
+      "name": "OnClose",
+      "effect": "关闭库存界面，取消开放任务并设置classified不可见。"
+    },
+    {
+      "name": "OnShow",
+      "effect": "显示库存界面，设置classified可见。"
+    },
+    {
+      "name": "OnHide",
+      "effect": "隐藏库存界面，设置classified不可见。"
+    },
+    {
+      "name": "SetHeavyLifting",
+      "effect": "设置负重状态，更新classified变量并触发负重过滤器变化。"
+    },
+    {
+      "name": "SetFloaterHeld",
+      "effect": "设置漂浮物持有状态，更新classified变量并触发漂浮物动作过滤器变化。"
+    },
+    {
+      "name": "GetNumSlots",
+      "effect": "返回物品槽位数量，客户端时从服务器inventory组件或游戏模式获取。"
+    },
+    {
+      "name": "CanTakeItemInSlot",
+      "effect": "检查物品是否可放入指定槽位，考虑物品属性、容器限制和槽位状态。"
+    },
+    {
+      "name": "AcceptsStacks",
+      "effect": "检查库存是否接受堆叠物品，客户端时从服务器inventory组件获取。"
+    },
+    {
+      "name": "IgnoresCanGoInContainer",
+      "effect": "检查库存是否忽略物品进入容器的限制，客户端时从服务器inventory组件获取。"
+    },
+    {
+      "name": "EquipHasTag",
+      "effect": "检查装备栏中是否有带指定标签的物品，客户端时遍历classified装备数据。"
+    },
+    {
+      "name": "IsHeavyLifting",
+      "effect": "检查是否处于负重状态，客户端时从classified变量获取。"
+    },
+    {
+      "name": "IsFloaterHeld",
+      "effect": "检查是否持有漂浮物，客户端时从classified变量获取。"
+    },
+    {
+      "name": "IsVisible",
+      "effect": "检查库存界面是否可见，客户端时从classified变量获取。"
+    },
+    {
+      "name": "IsOpenedBy",
+      "effect": "检查库存是否被指定玩家打开，客户端时基于可见性和玩家身份判断。"
+    },
+    {
+      "name": "IsHolding",
+      "effect": "检查是否持有指定物品，客户端时通过classified方法验证。"
+    },
+    {
+      "name": "FindItem",
+      "effect": "查找符合条件的物品，客户端时通过classified方法搜索。"
+    },
+    {
+      "name": "GetActiveItem",
+      "effect": "获取当前活动物品，客户端时从classified获取。"
+    },
+    {
+      "name": "GetItemInSlot",
+      "effect": "获取指定槽位的物品，客户端时从classified获取。"
+    },
+    {
+      "name": "GetEquippedItem",
+      "effect": "获取指定装备栏的物品，客户端时从classified获取。"
+    },
+    {
+      "name": "GetItems",
+      "effect": "获取所有物品槽位的物品列表，客户端时从classified获取。"
+    },
+    {
+      "name": "GetEquips",
+      "effect": "获取所有装备栏的物品列表，客户端时从classified获取。"
+    },
+    {
+      "name": "GetOpenContainers",
+      "effect": "获取已打开的容器实体，客户端时从HUD控件或溢出容器获取。"
+    },
+    {
+      "name": "GetOverflowContainer",
+      "effect": "获取溢出容器（如背包）的replica组件，客户端时从classified获取。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查库存是否已满，客户端时通过classified方法判断。"
+    },
+    {
+      "name": "Has",
+      "effect": "检查是否拥有指定预制物品和数量，客户端时通过classified方法验证。"
+    },
+    {
+      "name": "HasItemWithTag",
+      "effect": "检查是否拥有带指定标签的物品和数量，客户端时通过classified方法验证。"
+    },
+    {
+      "name": "ReturnActiveItem",
+      "effect": "将活动物品返回到槽位，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "PutOneOfActiveItemInSlot",
+      "effect": "将活动物品的一个放入槽位，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "PutAllOfActiveItemInSlot",
+      "effect": "将活动物品全部放入槽位，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "TakeActiveItemFromHalfOfSlot",
+      "effect": "从槽位取走活动物品的一半，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "TakeActiveItemFromCountOfSlot",
+      "effect": "从槽位取走活动物品的指定数量，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "TakeActiveItemFromAllOfSlot",
+      "effect": "从槽位取走全部活动物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "AddOneOfActiveItemToSlot",
+      "effect": "向槽位添加活动物品的一个，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "AddAllOfActiveItemToSlot",
+      "effect": "向槽位添加活动物品全部，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "SwapActiveItemWithSlot",
+      "effect": "交换活动物品与槽位物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "UseItemFromInvTile",
+      "effect": "使用库存中的物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "ControllerUseItemOnItemFromInvTile",
+      "effect": "控制器使用物品在另一个物品上，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "ControllerUseItemOnSelfFromInvTile",
+      "effect": "控制器使用物品在自身上，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "ControllerUseItemOnSceneFromInvTile",
+      "effect": "控制器使用物品在场景上，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "InspectItemFromInvTile",
+      "effect": "检查库存中的物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "DropItemFromInvTile",
+      "effect": "丢弃库存中的物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "CastSpellBookFromInv",
+      "effect": "从库存施放魔法书，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "EquipActiveItem",
+      "effect": "装备活动物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "EquipActionItem",
+      "effect": "装备动作物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "SwapEquipWithActiveItem",
+      "effect": "交换装备栏与活动物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "TakeActiveItemFromEquipSlot",
+      "effect": "从装备栏取走活动物品，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "MoveItemFromAllOfSlot",
+      "effect": "从槽位移动全部物品到容器，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "MoveItemFromHalfOfSlot",
+      "effect": "从槽位移动一半物品到容器，客户端时通过classified方法执行。"
+    },
+    {
+      "name": "MoveItemFromCountOfSlot",
+      "effect": "从槽位移动指定数量物品到容器，客户端时通过classified方法执行。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "newactiveitem",
+    "inventoryclosed"
+  ],
+  "events_listened": [
+    "newactiveitem",
+    "itemget",
+    "itemlose",
+    "equip",
+    "unequip",
+    "visibledirty",
+    "heavyliftingdirty",
+    "floaterhelddirty",
+    "onremove"
+  ],
+  "netvars": [
+    "visible",
+    "heavylifting",
+    "floaterheld"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      14697,
+      27530,
+      18721,
+      14699,
+      19129,
+      72238,
+      13260
+    ],
+    "aspects": [
+      {
+        "aspect": "武器分类决定拿起能力",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "每种手部装备都有一个武器分类，决定一个武器能否被角色拿起。"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏槽位数量描述",
+        "evidence": [
+          {
+            "pageid": 27530,
+            "quote": "基本物品栏具有15个栏位"
+          },
+          {
+            "pageid": 14697,
+            "quote": "背包提供 8 个物品栏"
+          },
+          {
+            "pageid": 18721,
+            "quote": "坎普斯背包提供 14 个物品栏"
+          },
+          {
+            "pageid": 14699,
+            "quote": "保鲜背包提供 8 个物品栏"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏物品检查与加成",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "当物品栏中存在处于“灵魂回声”的灵魂时，沃拓克斯会获得×120%的移动速度加成"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏装备武器行为",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘会尝试装备物品栏中的武器"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "库存",
+    "背包",
+    "装备栏",
+    "物品栏",
+    "负重",
+    "漂浮物",
+    "复制组件",
+    "玩家物品",
+    "槽位管理",
+    "物品同步"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "物品管理",
+    "装备",
+    "收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+    "source_bytes": 20771,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108799954
+  }
+}

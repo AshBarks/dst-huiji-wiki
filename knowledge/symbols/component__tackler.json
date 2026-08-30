@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/tackler.lua"
+  },
+  "category": "component",
+  "display_name": "tackler",
+  "summary": "Tackler 组件为实体提供了管理冲锋、撞击行为的能力。它负责配置冲锋时的物理参数、碰撞检测规则与伤害逻辑，并在发动冲锋时检测并作用于路径上的可工作物体和敌对生物。",
+  "api": [
+    {
+      "name": "SetOnStartTackleFn(fn)",
+      "effect": "设置冲锋开始时的回调函数。当调用 StartTackle 方法时，此函数会被触发。"
+    },
+    {
+      "name": "StartTackle()",
+      "effect": "尝试开始一次冲锋。如果设置了 onstarttacklefn，则调用该函数并返回其返回值。"
+    },
+    {
+      "name": "SetDistance(distance)",
+      "effect": "设置碰撞检测中心点相对于实体前方的距离。"
+    },
+    {
+      "name": "SetRadius(radius)",
+      "effect": "设置碰撞检测的球形半径。"
+    },
+    {
+      "name": "SetStructureDamageMultiplier(mult)",
+      "effect": "设置对建筑类目标造成伤害时的外部伤害乘数。"
+    },
+    {
+      "name": "AddWorkAction(action, amount)",
+      "effect": "将指定工作动作添加到可撞击的工作列表中。如果动作不存在于列表中，则将其添加到碰撞标签（collide_tags）中；无论是否新添加，都会设置该动作的伤害量（amount）。"
+    },
+    {
+      "name": "SetOnCollideFn(fn)",
+      "effect": "设置与目标发生碰撞（撞击到工作物体或建筑）时的回调函数。"
+    },
+    {
+      "name": "SetOnTrampleFn(fn)",
+      "effect": "设置踩踏到普通生物时的回调函数。"
+    },
+    {
+      "name": "CheckCollision(ignores)",
+      "effect": "执行一次碰撞检测。根据实体位置、朝向、配置的距离和半径寻找目标。优先选择可工作物体（需满足配置的工作动作、可工作且非小生物），其次选择可攻击的建筑结构（使用结构伤害乘数），最后收集可踩踏的普通生物。确定首要目标后，会调用对应的回调函数（oncollidefn或ontramplefn）并造成伤害（对工作物体调用 WorkedBy，对生物直接攻击）。ignores 参数为可选的表，用于在连续检测中排除已处理过的实体。方法返回一个布尔值，指示是否找到了首要目标（工作物体或建筑）。"
+    },
+    {
+      "name": "SetEdgeDistance(distance)",
+      "effect": "设置用于悬崖/边缘检测的距离。"
+    },
+    {
+      "name": "CheckEdge()",
+      "effect": "检测实体前方一定距离内是否处于地图边缘（悬崖或不可行走的地面）。在正前方、前方左右各30度三个方向进行检测，仅当三个方向均检测到边缘时才返回 true。"
+    }
+  ],
+  "api_note": "组件提供了丰富的配置方法和状态检查/执行方法，主要用于定义和触发一次冲锋撞击行为，不涉及网络同步数据或公开的常量。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      15225,
+      19110,
+      51046,
+      13828,
+      15832,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨范围设定",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "启迪战争瓦器人只会主动仇恨瓦格斯塔夫的竞技场内距其 15 距离单位内的玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "仇恨距离与边缘丢失",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯远离赃物袋 30 单位后立即丢失目标"
+          }
+        ]
+      },
+      {
+        "aspect": "冲撞攻击与践踏损坏",
+        "evidence": [
+          {
+            "pageid": 19110,
+            "quote": "对周围 1.5 单位的实体造成小损坏"
+          }
+        ]
+      },
+      {
+        "aspect": "翻滚撞击与建筑破坏",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "翻滚撞击，摧毁沿途的建筑并对沿途的生物造成 166.67"
+          }
+        ]
+      },
+      {
+        "aspect": "长程冲撞攻击描述",
+        "evidence": [
+          {
+            "pageid": 15832,
+            "quote": "冲撞：空中旋转数周然后朝目标冲撞一次"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "撞击",
+    "冲锋",
+    "踩踏",
+    "冲撞",
+    "碰撞",
+    "攻击",
+    "工作",
+    "建筑伤害",
+    "踩踏生物",
+    "悬崖检测"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "df0eb7caa6c25d7d4c2b59a8e315f4e429c621e7b83e02b33eb4e65cfc2862de",
+    "source_bytes": 5907,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113177731
+  }
+}

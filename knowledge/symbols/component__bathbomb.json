@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bathbomb.lua"
+  },
+  "category": "component",
+  "display_name": "bathbomb",
+  "summary": "该组件为实体添加‘bathbomb’标签，用于标识浴弹实体。在组件移除时，自动移除该标签，以更新实体状态。它可能参与浴弹相关的游戏玩法，如交互或效果触发，但源码中未定义具体行为。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      23187,
+      18476,
+      14579,
+      15295,
+      13779,
+      65605,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及浴盐炸弹（bathbomb）或相关能力表达，所有页面均讨论其他游戏机制或实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "浴弹",
+    "bathbomb",
+    "标签",
+    "标识",
+    "组件",
+    "实体",
+    "添加",
+    "移除"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "20e0b0389606642224e20f3484b9e637828306ab41bbe8cd43028add287448cc",
+    "source_bytes": 212,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098167758
+  }
+}

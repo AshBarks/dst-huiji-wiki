@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vase.lua"
+  },
+  "category": "component",
+  "display_name": "vase",
+  "summary": "此组件管理实体（花瓶）中花朵的装饰状态、新鲜度、枯萎倒计时以及基于花朵类型的光源效果。玩家可通过特定交互将物品作为花朵插入花瓶，花朵会随时间推移而枯萎并影响花瓶发出的灯光。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用此花瓶组件，允许其接受装饰。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用此花瓶组件，使其无法接受装饰。"
+    },
+    {
+      "name": "HasFlower",
+      "effect": "返回布尔值，指示花瓶当前是否插有花朵。"
+    },
+    {
+      "name": "HasFreshFlower",
+      "effect": "返回布尔值，指示花瓶中的花朵是否仍为新鲜状态（未枯萎）。"
+    },
+    {
+      "name": "GetTimeToWilt",
+      "effect": "返回花朵距离枯萎的剩余时间（秒），若无花朵或无枯萎计时器则返回nil。"
+    },
+    {
+      "name": "SetFlower",
+      "effect": "设置花瓶中的花朵类型(flowerid)。根据参数wilt_time设置枯萎计时器，若为0则花朵立即枯萎。同时管理灯光任务和状态。"
+    },
+    {
+      "name": "WiltFlower",
+      "effect": "将当前花朵标记为枯萎状态，停止枯萎和灯光更新任务，并通知外部花朵状态已更新为不新鲜。"
+    },
+    {
+      "name": "ClearFlower",
+      "effect": "完全移除花瓶中的花朵，清除所有相关状态和任务，并通知外部花朵已被清除。"
+    },
+    {
+      "name": "Decorate",
+      "effect": "核心交互方法。尝试用给定物品(giver和item)装饰花瓶。成功条件：物品可装饰且花瓶已启用。成功后会消耗物品，根据物品类型随机选择一个花朵ID并调用SetFlower，然后触发ondecorate回调。"
+    },
+    {
+      "name": "SetOnUpdateFlowerFn",
+      "effect": "设置一个回调函数，在花朵类型或新鲜度状态改变时被调用。"
+    },
+    {
+      "name": "SetOnUpdateLightFn",
+      "effect": "设置一个回调函数，在需要更新灯光参数（半径、强度、衰减）时被调用。"
+    },
+    {
+      "name": "SetOnDecorateFn",
+      "effect": "设置一个回调函数，在成功完成装饰动作（Decorate）后被调用。"
+    },
+    {
+      "name": "PushFlower",
+      "effect": "调用已设置的onupdateflowerfn回调，通知外部花朵ID和新鲜度状态。"
+    },
+    {
+      "name": "PushLight",
+      "effect": "调用已设置的onupdatelightfn回调，通知外部更新光源参数。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含花朵ID和枯萎剩余时间的表格，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中恢复花朵状态和枯萎计时。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新（如加载存档后），根据流逝时间(dt)推进枯萎计时器。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      51951,
+      19129,
+      20438,
+      70704,
+      13493,
+      60906,
+      16197
+    ],
+    "aspects": [
+      {
+        "aspect": "花瓶中花朵的放置操作",
+        "evidence": [
+          {
+            "pageid": 60906,
+            "quote": "也可以对花盆和花瓶使用花瓣、月树花、发光浆果"
+          }
+        ]
+      },
+      {
+        "aspect": "花瓶中花朵的枯萎时间",
+        "evidence": [
+          {
+            "pageid": 20438,
+            "quote": "插荧光果和发光浆果会在 10 天后枯萎。"
+          },
+          {
+            "pageid": 60906,
+            "quote": "会根据剩余新鲜度在最多 10 天后逐渐枯萎"
+          }
+        ]
+      },
+      {
+        "aspect": "花瓶的光照功能",
+        "evidence": [
+          {
+            "pageid": 60906,
+            "quote": "当使用荧光果和两种发光浆果装饰时，该花盆或花瓶将会发出最大半径 6 的光"
+          }
+        ]
+      },
+      {
+        "aspect": "花瓶的装饰摆放",
+        "evidence": [
+          {
+            "pageid": 20438,
+            "quote": "可以通过鼠标左键来把它摆放到桌子上。"
+          },
+          {
+            "pageid": 60906,
+            "quote": "三种仿制远古遗物都可以放置在各种桌子上作为装饰。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "花瓶",
+    "装饰",
+    "花朵",
+    "枯萎",
+    "灯光",
+    "插花",
+    "摆放",
+    "新鲜"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d54538cde6721beedd84eb74226d4cc4c513ef822412530f0532c8fe5996f6f1",
+    "source_bytes": 6270,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097825796
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wardrobe.lua"
+  },
+  "category": "component",
+  "display_name": "wardrobe",
+  "summary": "wardrobe组件管理衣柜实体的使用状态和玩家更换皮肤的过程。它允许玩家或目标改变外观，支持多人共享使用，并处理燃烧等事件干扰。核心玩法涉及角色定制和社交互动。",
+  "api": [
+    {
+      "name": "SetCanUseAction(canuseaction): 设置是否允许将衣柜添加到玩家动作集合中，影响标签wardrobe。",
+      "effect": ""
+    },
+    {
+      "name": "SetCanBeDressed(canbedressed): 设置是否允许被装扮，影响标签dressable。",
+      "effect": ""
+    },
+    {
+      "name": "Enable(enable): 启用或禁用衣柜组件，控制是否允许开始更换皮肤。",
+      "effect": ""
+    },
+    {
+      "name": "SetCanBeShared(canbeshared): 设置是否允许多人同时使用衣柜；若为false则监听onignite事件结束所有更换。",
+      "effect": ""
+    },
+    {
+      "name": "SetRange(range): 设置衣柜的有效使用范围，用于检查玩家距离。",
+      "effect": ""
+    },
+    {
+      "name": "SetChangeInDelay(delay): 设置进入衣柜更换状态的延迟时间。",
+      "effect": ""
+    },
+    {
+      "name": "CanBeginChanging(doer): 检查指定玩家是否可以开始更换皮肤，返回布尔值和状态（如INUSE, BURNING）。",
+      "effect": ""
+    },
+    {
+      "name": "BeginChanging(doer): 开始指定玩家的更换皮肤过程，触发状态变化、添加事件监听，并调用onopenfn。",
+      "effect": ""
+    },
+    {
+      "name": "EndChanging(doer): 结束指定玩家的更换皮肤过程，清理事件、推送onskinschanged事件，并调用onclosefn。",
+      "effect": ""
+    },
+    {
+      "name": "EndAllChanging(): 结束所有玩家的更换皮肤过程。",
+      "effect": ""
+    },
+    {
+      "name": "ActivateChanging(doer, skins): 激活皮肤更换，若canbedressed则调用DoTargetChanging，否则调用DoDoerChanging。",
+      "effect": ""
+    },
+    {
+      "name": "ApplyTargetSkins(target, doer, skins): 将皮肤应用到目标实体，更新外观并推送dressedup事件。",
+      "effect": ""
+    },
+    {
+      "name": "ApplySkins(doer, diff): 将皮肤差异应用到玩家，更新基础、身体、手、腿、脚的外观。",
+      "effect": ""
+    },
+    {
+      "name": "OnUpdate(dt): 更新组件，检查并结束超出范围或视线的玩家。",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveFromEntity(): 从实体移除时，结束所有更换、清理事件监听并移除标签。",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "onskinschanged",
+    "dressedup"
+  ],
+  "events_listened": [
+    "onremove",
+    "ms_closepopup",
+    "onignite"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20496,
+      10374,
+      47009,
+      13156,
+      13701,
+      18057,
+      15022,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未涉及衣柜组件的能力表达，内容聚焦于燃烧状态、角色技能、实体行为、宠物系统、装备模式等主题，无任何与皮肤更换、装扮或相关组件功能的文本体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "衣柜",
+    "换装",
+    "皮肤",
+    "外观",
+    "定制",
+    "共享",
+    "燃烧",
+    "范围",
+    "状态",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "角色定制",
+    "社交互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fd4947b266324b3aa37a565a8130c2ed8c05694c1cc6360ec6bf0e1ca6dfdc9d",
+    "source_bytes": 10110,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097938533
+  }
+}

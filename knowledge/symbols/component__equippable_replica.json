@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/equippable_replica.lua"
+  },
+  "category": "component",
+  "display_name": "equippable_replica",
+  "summary": "此组件管理物品的装备槽位和防止脱装备状态，通过网络变量同步客户端数据。它参与装备系统的核心玩法，允许玩家将物品装备到指定槽位，并控制脱装备行为。",
+  "api": [
+    {
+      "name": "SetEquipSlot",
+      "effect": ""
+    },
+    {
+      "name": "EquipSlot",
+      "effect": ""
+    },
+    {
+      "name": "IsEquipped",
+      "effect": ""
+    },
+    {
+      "name": "IsRestricted",
+      "effect": ""
+    },
+    {
+      "name": "ShouldPreventUnequipping",
+      "effect": ""
+    },
+    {
+      "name": "SetPreventUnequipping",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "_equipslot",
+    "_preventunequipping"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      72238,
+      13437,
+      72416,
+      19118,
+      19119,
+      24868,
+      20700
+    ],
+    "aspects": [
+      {
+        "aspect": "穿戴装备时的效果描述",
+        "evidence": [
+          {
+            "pageid": 19118,
+            "quote": "装备时，如果受到的伤害来自暗影阵营，装备扣除的耐久和装备者受到的伤害都会再减少 10%。"
+          }
+        ]
+      },
+      {
+        "aspect": "装备栏位的定义",
+        "evidence": [
+          {
+            "pageid": 72416,
+            "quote": "装备栏包括手部装备栏、身体装备栏、头部装备栏共 3 个栏位"
+          }
+        ]
+      },
+      {
+        "aspect": "装备的穿戴限制",
+        "evidence": [
+          {
+            "pageid": 24868,
+            "quote": "无法被玩家装备。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "装备",
+    "槽位",
+    "装备位置",
+    "卸下装备",
+    "装备锁定",
+    "数据同步",
+    "装备系统",
+    "物品穿戴",
+    "装备控制",
+    "同步机制"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3326daa0b1e0528b4fc2e72dd56293aefa52f13573150c70c35ef7072acbe0ea",
+    "source_bytes": 1874,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788133865425
+  }
+}

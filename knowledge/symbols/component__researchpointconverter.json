@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/researchpointconverter.lua"
+  },
+  "category": "component",
+  "display_name": "researchpointconverter",
+  "summary": "ResearchPointConverter 组件管理实体的研究点转换数据，包括一个值(val)、活动状态(active)、等级(level)和开关状态(on)。它提供开关和激活方法，用于控制实体的转换行为，可能参与研究或制作玩法。源码注释建议使用 prototyper.lua 代替。",
+  "api": [
+    {
+      "name": "TurnOn",
+      "effect": "如果实体未开启且存在 onturnon 回调，则调用该回调并设置开启状态为 true。"
+    },
+    {
+      "name": "TurnOff",
+      "effect": "如果实体已开启且存在 onturnoff 回调，则调用该回调并设置开启状态为 false。"
+    },
+    {
+      "name": "Activate",
+      "effect": "调用 onactivate 回调（如果存在）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      18001,
+      51046,
+      20719,
+      52634,
+      72441,
+      18271
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 component__researchpointconverter 或其相关能力 TurnOn, TurnOff, Activate。所有页面讨论的是其他实体（如电路板、宝石底座、战争瓦器人等）的激活行为，而非该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "研究点",
+    "转换器",
+    "开关",
+    "激活",
+    "等级",
+    "Prototyper",
+    "组件",
+    "制作台"
+  ],
+  "gameplay_tags": [
+    "研究",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9ed26c6b2b97797a9a70fe39bc4eb588601cd1472e78296859c7661f808946ac",
+    "source_bytes": 597,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111741557
+  }
+}

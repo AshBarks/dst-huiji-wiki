@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/expertsailor.lua"
+  },
+  "category": "component",
+  "display_name": "expertsailor",
+  "summary": "ExpertSailor组件管理与船只操控相关的属性数据，包括划船力量乘数、额外最大速度、锚升起速度和降帆强度。它参与游戏中的航海和探索玩法，允许玩家调整这些参数以优化船只性能、提升航行效率和适应不同海况。核心玩法涉及海上移动、锚操作和帆控制，增强航海体验。",
+  "api": [
+    {
+      "name": "GetRowForceMultiplier",
+      "effect": "返回当前划船力量乘数，只读取组件内部数据，无副作用。"
+    },
+    {
+      "name": "SetRowForceMultiplier",
+      "effect": "设置划船力量乘数为指定值，修改组件内部数据，影响划船时的力量效果。"
+    },
+    {
+      "name": "GetRowExtraMaxVelocity",
+      "effect": "返回额外最大速度，只读取组件内部数据，无副作用。"
+    },
+    {
+      "name": "SetRowExtraMaxVelocity",
+      "effect": "设置额外最大速度为指定值，修改组件内部数据，影响船只的最大移动速度。"
+    },
+    {
+      "name": "GetAnchorRaisingSpeed",
+      "effect": "返回锚升起速度，只读取组件内部数据，无副作用。"
+    },
+    {
+      "name": "SetAnchorRaisingSpeed",
+      "effect": "设置锚升起速度为指定值，修改组件内部数据，影响锚操作的速度。"
+    },
+    {
+      "name": "GetLowerSailStrength",
+      "effect": "返回降帆强度，只读取组件内部数据，无副作用。"
+    },
+    {
+      "name": "SetLowerSailStrength",
+      "effect": "设置降帆强度为指定值，修改组件内部数据，影响降帆的力度效果。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51221,
+      10419,
+      34794,
+      18838,
+      70864,
+      13408,
+      18509,
+      51529
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未涉及船只控制能力如行进力、速度、锚操作或帆强度等；仅有的航海相关内容（页面51529）仅提及浮标作为地图标记，未体现清单中的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船速度",
+    "海上移动",
+    "划船力",
+    "锚速",
+    "帆强度",
+    "航海",
+    "探索",
+    "船只控制",
+    "水手"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "航海",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5c62c1201654d66ad47659eca52f0380a5803efeec168bfe2f1eae50456d14d7",
+    "source_bytes": 842,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107238000
+  }
+}

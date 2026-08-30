@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gym.lua"
+  },
+  "category": "component",
+  "display_name": "gym",
+  "summary": "Gym组件负责管理训练设施（如胡萝卜体育馆）的数据，包括训练者引用、训练函数和计时器。它参与胡萝卜训练的核心玩法，通过训练提升训练者的能力，并处理训练过程中的腐败检查和状态事件。组件还支持训练的保存与加载，以及根据世界阶段调整训练节奏。",
+  "api": [
+    {
+      "name": "SetOnRemoveTraineeFn",
+      "effect": "设置当训练者被移除时调用的回调函数，用于执行自定义清理逻辑。"
+    },
+    {
+      "name": "RemoveTrainee",
+      "effect": "移除当前训练者，停止训练计时器，清理事件监听，并调用已设置的移除回调函数。"
+    },
+    {
+      "name": "SetTrainee",
+      "effect": "设置训练者实体，并监听其'移除'和'死亡'事件以自动触发移除流程。"
+    },
+    {
+      "name": "SetTrainFn",
+      "effect": "设置训练函数，该函数在训练计时器完成时被调用，用于执行训练效果。"
+    },
+    {
+      "name": "PushMontage",
+      "effect": "根据训练者是否存在且非夜晚，设置实体的音乐状态为训练或无状态。"
+    },
+    {
+      "name": "StartTraining",
+      "effect": "启动训练计时器（默认使用配置时间），推送'开始训练'或'休息'事件，并启动周期性任务检查训练者腐败和更新音乐状态。"
+    },
+    {
+      "name": "StopTraining",
+      "effect": "停止训练计时器，推送'结束训练'事件，并取消所有相关的周期性任务（如腐败检查和音乐更新）。"
+    },
+    {
+      "name": "CheckPerish",
+      "effect": "检查训练者的腐败程度，若低于10%且训练进行中，有30%概率暂停训练并设置随机休息任务。"
+    },
+    {
+      "name": "OnTimerDone",
+      "effect": "当训练计时器完成时，停止训练并调用训练函数执行训练效果。"
+    },
+    {
+      "name": "Train",
+      "effect": "执行训练函数，增加训练者的训练点数，并触发训练效果。"
+    },
+    {
+      "name": "checktraineesleep",
+      "effect": "根据世界阶段（白天或夜晚）推送'休息'或'结束休息'事件，影响训练者的休息状态。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回训练计时器剩余时间的表，用于保存当前训练进度。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载保存的数据，若存在训练计时器则重新开始训练并使用剩余时间。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回固定调试字符串'nothing yet'，用于调试目的。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "rest",
+    "starttraining",
+    "endtraining",
+    "endrest"
+  ],
+  "events_listened": [
+    "timerdone",
+    "onremove",
+    "death"
+  ],
+  "netvars": [
+    "_musicstate"
+  ],
+  "tunables": [
+    "CARRAT_GYM.TRAINING_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      33950,
+      16626,
+      23932,
+      33991,
+      51097,
+      28179,
+      33823
+    ],
+    "aspects": [
+      {
+        "aspect": "训练功能介绍",
+        "evidence": [
+          {
+            "pageid": 23932,
+            "quote": "胡萝卜鼠可以放入[[胡萝卜鼠健身房]]进行训练。"
+          }
+        ]
+      },
+      {
+        "aspect": "训练时间与技能提升",
+        "evidence": [
+          {
+            "pageid": 33991,
+            "quote": "每一种健身房训练时都会花费 90 秒时间，将对应的技能提升 1 点。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "训练",
+    "体育馆",
+    "胡萝卜",
+    "腐败",
+    "计时器",
+    "休息",
+    "音乐",
+    "训练点数",
+    "保存",
+    "加载"
+  ],
+  "gameplay_tags": [
+    "训练",
+    "生存",
+    "设施"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "307dfa8c93db49413758cfd3a72887af17b4ad50d242066b87acb37f271b8e6d",
+    "source_bytes": 4415,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108361424
+  }
+}

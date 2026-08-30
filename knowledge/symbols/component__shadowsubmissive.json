@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shadowsubmissive.lua"
+  },
+  "category": "component",
+  "display_name": "shadowsubmissive",
+  "summary": "该组件管理阴影生物的服从行为，通过forgetattackertime属性控制攻击者阴影支配状态的重置时间。它监听攻击事件，临时移除攻击者的阴影支配标签，并在指定时间后根据装备或内在标签重新激活。核心玩法涉及阴影生物的战斗交互和阴影支配系统的协同。",
+  "api": [
+    {
+      "name": "ShouldSubmitToTarget",
+      "effect": "检查目标实体是否应服从，基于目标是否有shadowdominance标签。返回布尔值，无副作用。"
+    },
+    {
+      "name": "TargetHasDominance",
+      "effect": "检查目标实体是否具有阴影支配状态，基于其库存装备拥有shadowdominance标签或实体拥有inherentshadowdominance标签。返回布尔值，无副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除shadowsubmissive标签并取消attacked事件监听。副作用：实体不再被视为阴影服从生物。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      71461,
+      10418,
+      13408,
+      13606,
+      14936,
+      19692,
+      28752
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与代码能力/行为语义清单（ShouldSubmitToTarget, TargetHasDominance, OnRemoveFromEntity）相关的玩家语言表达。这些能力在提供的页面文本中没有以数值、行为描述或策略段落等形式体现，页面内容主要涉及其他实体的一般行为和属性，未讨论 component__shadowsubmissive 的特定能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影仆从",
+    "暗影支配",
+    "仇恨系统",
+    "仇恨重置",
+    "遗忘仇恨",
+    "装备效果",
+    "内在属性",
+    "战斗机制",
+    "生物AI"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "阴影战斗",
+    "生物服从",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fcfcd6254a2cccafe205be2030ae5c4b821b19fb1c2a227bf001a9c2b8634d67",
+    "source_bytes": 1857,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103202917
+  }
+}

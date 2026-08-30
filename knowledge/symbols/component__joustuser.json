@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/joustuser.lua"
+  },
+  "category": "component",
+  "display_name": "joustuser",
+  "summary": "JoustUser 组件管理实体在冲锋（joust）行为中的边缘检测和状态回调。它存储边缘检测距离，并通过可设置的回调函数控制冲锋的条件检查、开始和结束。该组件主要参与骑乘或战斗相关的机动性玩法，用于防止实体在冲锋时坠落或进入无效区域。",
+  "api": [
+    {
+      "name": "SetCanJoustFn(fn): 设置一个函数，用于检查实体是否可以执行冲锋，函数应返回失败原因以阻止冲锋；如果未设置，CanJoust 默认返回 true。",
+      "effect": ""
+    },
+    {
+      "name": "CanJoust(): 检查实体是否可冲锋，调用设置的 canjoustfn 函数；副作用是若无函数则直接返回 true。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnStartJoustFn(fn): 设置冲锋开始时的回调函数 onstartjoustfn，无其他副作用。",
+      "effect": ""
+    },
+    {
+      "name": "StartJoust(): 触发冲锋开始的回调，执行 onstartjoustfn；如果未设置回调，无操作。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnEndJoustFn(fn): 设置冲锋结束时的回调函数 onendjoustfn，无其他副作用。",
+      "effect": ""
+    },
+    {
+      "name": "EndJoust(): 触发冲锋结束的回调，执行 onendjoustfn；如果未设置回调，无操作。",
+      "effect": ""
+    },
+    {
+      "name": "CheckEdge(): 检查实体当前位置和旋转在三个角度（0°, 30°, -30°）是否处于地图边缘，返回 true 如果所有角度都检测到边缘（基于 edgedistance 计算）；副作用是可能影响冲锋决策。",
+      "effect": ""
+    },
+    {
+      "name": "SetEdgeDistance(distance): 更新边缘检测距离 edgedistance 的值，用于 CheckEdge 中的距离计算。",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15941,
+      13455,
+      13437,
+      35371,
+      70537,
+      15238,
+      15248,
+      70765
+    ],
+    "aspects": [
+      {
+        "aspect": "冲锋时间与撞击晕眩",
+        "evidence": [
+          {
+            "pageid": 15248,
+            "quote": "冲锋的时间大于 0.3 秒时，远古守护者撞击柱子或块状废墟后将会晕眩"
+          }
+        ]
+      },
+      {
+        "aspect": "冲锋碰撞与瘫痪效果",
+        "evidence": [
+          {
+            "pageid": 70537,
+            "quote": "两个镀金骑士冲锋时撞到一起会互相造成伤害并短暂的瘫痪"
+          }
+        ]
+      },
+      {
+        "aspect": "冲锋触发距离与伤害",
+        "evidence": [
+          {
+            "pageid": 15941,
+            "quote": "低头向目标发起冲锋，对接触到的所有敌人造成 150 伤害，附带击退。"
+          },
+          {
+            "pageid": 70537,
+            "quote": "当距离目标 6 ~ 14 距离单位时会进行冲锋"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "冲锋",
+    "骑乘",
+    "边缘检测",
+    "地图边缘",
+    "Joust",
+    "CanJoust",
+    "StartJoust",
+    "EndJoust",
+    "边缘距离"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "骑乘"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "43f1fe02a0c858eea7c9f18c677d49077dbe4fc7323822dbe023203fb3d57647",
+    "source_bytes": 1632,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091308403
+  }
+}

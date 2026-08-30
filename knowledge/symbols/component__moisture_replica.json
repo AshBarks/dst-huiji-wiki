@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moisture_replica.lua"
+  },
+  "category": "component",
+  "display_name": "moisture_replica",
+  "summary": "该组件管理实体的湿润状态（iswet），通过网络变量在客户端和服务器间同步。湿润状态影响实体在雨天或水源附近的行为，是生存玩法的一部分。",
+  "api": [
+    {
+      "name": "SetIsWet",
+      "effect": "设置实体的湿润状态。接受一个布尔参数 iswet，通过网络变量 _iswet 同步状态。"
+    },
+    {
+      "name": "IsWet",
+      "effect": "返回实体当前的湿润状态。读取网络变量 _iswet 的值，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "moisture._iswet"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      20704,
+      70462,
+      18410,
+      13268,
+      13156,
+      18572,
+      51951
+    ],
+    "aspects": [
+      {
+        "aspect": "干燥剂降低潮湿速率",
+        "evidence": [
+          {
+            "pageid": 70462,
+            "quote": "携带干燥剂时，若玩家潮湿度不为 0，玩家潮湿速率 -0.5。"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿对温度的惩罚",
+        "evidence": [
+          {
+            "pageid": 18572,
+            "quote": "潮湿惩罚，计算公式为$0.3w$，其中$w$表示角色潮湿度。"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿状态判定标准",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "对于拥有潮湿度的实体，当潮湿度 ≥ 40 时，实体潮湿。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色潮湿免疫能力",
+        "evidence": [
+          {
+            "pageid": 13268,
+            "quote": "潮湿不会影响沃特的理智值，其手部装备也不会因潮湿滑落。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "湿润",
+    "潮湿",
+    "水分",
+    "湿度",
+    "雨天",
+    "浸湿",
+    "干燥",
+    "状态"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cc9c67b40e3efe631aba0923d43eed977d1b297b78f7bdf57bc714daa59a7c36",
+    "source_bytes": 272,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109924520
+  }
+}

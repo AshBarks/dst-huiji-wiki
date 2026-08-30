@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/flotationdevice.lua"
+  },
+  "category": "component",
+  "display_name": "flotationdevice",
+  "summary": "该组件管理一个漂浮设备的启用状态和一个防止溺水伤害的回调函数。它用于游戏中与水面交互的实体，当设备启用时，可以在实体接触水时触发回调以阻止伤害。核心参与生存玩法中的溺水防护机制。",
+  "api": [
+    {
+      "name": "IsEnabled",
+      "effect": "返回设备的启用状态，无副作用。"
+    },
+    {
+      "name": "OnPreventDrowningDamage",
+      "effect": "如果注册了防止溺水伤害的回调函数（onpreventdrowningdamagefn），则调用该函数并传递实体实例；可能触发游戏逻辑以避免溺水伤害，具体行为由回调函数定义。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18843,
+      15852,
+      10418,
+      20293,
+      15976,
+      16419,
+      16438,
+      18001
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及浮力装置或相关能力，所有页面讨论其他实体如投石机、泰拉盒、角色电路板等，无溺水或浮力相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "浮具",
+    "漂浮器",
+    "溺水防护",
+    "水上安全",
+    "救生装置",
+    "激活状态",
+    "防溺",
+    "水面交互",
+    "生存工具"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d1d270583050634f78216bdad2cfcf1ad231ed50cb7996934e57eb6a327b986",
+    "source_bytes": 402,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099932542
+  }
+}

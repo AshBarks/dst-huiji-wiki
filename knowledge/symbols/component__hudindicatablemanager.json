@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hudindicatablemanager.lua"
+  },
+  "category": "component",
+  "display_name": "hudindicatablemanager",
+  "summary": "该组件仅存在于客户端，用于管理可指示的HUD项。通过注册和注销方法，追踪项目以支持界面显示。参与游戏的HUD系统管理，确保客户端正确显示相关元素。",
+  "api": [
+    {
+      "name": "RegisterItem",
+      "effect": "将item注册到管理器中，以GUID为键存储在items表中，避免重复注册。"
+    },
+    {
+      "name": "UnRegisterItem",
+      "effect": "从管理器中移除item，如果item存在则删除其GUID键，否则无操作。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回空数据表，无实际保存行为。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "接受data参数但无加载行为，保持空操作。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "始终返回nil，无调试输出信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "HUD项管理",
+    "客户端HUD",
+    "注册HUD",
+    "注销HUD",
+    "界面HUD",
+    "HUD追踪",
+    "可显示HUD",
+    "HUD系统"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "显示",
+    "UI"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "884150dab1a6a5bf831dc5734972c83e1493cbf8f38b3228c6566364f8d21fa7",
+    "source_bytes": 2623,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108566208
+  }
+}

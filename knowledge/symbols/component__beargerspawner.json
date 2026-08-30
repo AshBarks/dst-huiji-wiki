@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/beargerspawner.lua"
+  },
+  "category": "component",
+  "display_name": "beargerspawner",
+  "summary": "该组件管理熊狸(Bearger)的生成、警告和死亡逻辑。它根据秋季季节、玩家数量、游戏时间以及熊狸被击杀的天数来计算生成概率和延迟。在生成前，会向目标玩家及其附近播放警告声音和对话，提示危险临近。组件还处理玩家加入/离开和事件监听，以动态调整生成策略。",
+  "api": [
+    {
+      "name": "SetSecondBeargerChance",
+      "effect": "设置第二只熊狸的生成概率，但已弃用，无实际效果。"
+    },
+    {
+      "name": "SetFirstBeargerChance",
+      "effect": "设置第一只熊狸的生成概率，但已弃用，无实际效果。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "初始化生成计时器，根据总熊狸概率计算生成延迟，并注册到世界计时器系统。如果存在保存的生成时间，则使用该时间启动计时器。"
+    },
+    {
+      "name": "DoWarningSpeech",
+      "effect": "向目标玩家及其附近的活跃玩家播放警告对话，对话内容基于玩家字符串。"
+    },
+    {
+      "name": "DoWarningSound",
+      "effect": "在目标玩家位置生成警告声音预制体，声音级别取决于剩余生成时间。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件，检查生成计时器剩余时间，触发警告声音和对话，并处理熊狸生成逻辑。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长更新函数，调用OnUpdate以处理时间推进。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括警告状态、生成数量、最后击杀天数和活跃熊狸列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复警告、生成数量、最后击杀天数等数据，并初始化计时器。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，恢复活跃熊狸引用，并在条件满足时恢复生成计时器。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示生成状态、计时器信息、目标玩家和活跃熊狸数量。"
+    },
+    {
+      "name": "SummonMonster",
+      "effect": "调试用方法，设置生成计时器为10秒以快速生成熊狸，并启动组件更新。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "seasontick",
+    "beargerremoved",
+    "beargerkilled"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BEARGER_CHANCES",
+    "TUNING.NO_BOSS_TIME",
+    "TUNING.TOTAL_DAY_TIME",
+    "TUNING.SPAWN_BEARGER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65605,
+      52788,
+      20714,
+      34523,
+      14579,
+      23187,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未讨论组件 bearerspawner 的能力或行为语义，因此无法找到相关表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "熊狸",
+    "生成",
+    "警告",
+    "秋季",
+    "Boss",
+    "敌人",
+    "季节事件",
+    "饥荒",
+    "联机版",
+    "计时器"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dc4d1ad5c469d6e439dd1037e9f9f6079a00f7d2378feab90b3426943becda04",
+    "source_bytes": 13780,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105602110
+  }
+}

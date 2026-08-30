@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/halloweenpotionmoon.lua"
+  },
+  "category": "component",
+  "display_name": "halloweenpotionmoon",
+  "summary": "该组件管理万圣节月亮药水的使用行为。当药水被使用时，它尝试转换目标物体（如果目标具有 halloweenmoonmutable 组件）。转换后，药水自身被移除，并可触发自定义回调函数。",
+  "api": [
+    {
+      "name": "SetOnUseFn",
+      "effect": "设置一个回调函数，当药水被使用时触发。函数接收参数为药水实例、使用者、目标、成功标志、转换后实例和容器。"
+    },
+    {
+      "name": "Use",
+      "effect": "使用药水：检查目标是否具有 halloweenmoonmutable 组件，若有则调用其 Mutate 方法进行转换；然后调用设置的回调函数（如果存在）；最后移除药水自身（若可堆叠则移除一个，否则移除整个实例）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18502,
+      15022,
+      16419,
+      18503,
+      45249,
+      15234,
+      18219,
+      65881
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 halloweenpotionmoon 实体或其能力，所有内容涉及月亮石、天体英雄、电路板等其他实体，未讨论药水使用行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "万圣节",
+    "药水",
+    "月亮",
+    "转换",
+    "使用",
+    "回调",
+    "Mutate",
+    "物体转换"
+  ],
+  "gameplay_tags": [
+    "活动",
+    "魔法",
+    "转换"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "14de71b3b8dbb0757db4d4fc1cfce350e08399806b61d57dd346d15daac37a34",
+    "source_bytes": 913,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100564076
+  }
+}

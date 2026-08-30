@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatdrifter.lua"
+  },
+  "category": "component",
+  "display_name": "boatdrifter",
+  "summary": "BoatDrifter 组件管理船只的移动状态（is_moving）和漂移状态（is_drifting），并控制相关的物理模拟与唤醒测试的启停。参与的核心玩法涉及船只航行时的物理交互、环境响应及睡眠性能优化，确保船只在移动或漂移时正确执行物理计算和状态管理。",
+  "api": [
+    {
+      "name": "IsMoving",
+      "effect": "返回船只当前是否处于移动状态（is_moving）。无副作用。"
+    },
+    {
+      "name": "IsDrifting",
+      "effect": "返回船只是否同时处于移动和漂移状态。需依赖 IsMoving()，无副作用。"
+    },
+    {
+      "name": "StartBoatPhysics",
+      "effect": "启动船只物理模拟。若存在延迟停止任务则取消，否则直接调用实体的 StartBoatPhysics 方法。副作用：激活物理交互。"
+    },
+    {
+      "name": "StopBoatPhysics",
+      "effect": "延迟停止船只物理模拟。设置一个延迟任务（1秒）调用实体的 StopBoatPhysics，期间若未取消则停止物理。副作用：物理模拟可能延迟关闭。"
+    },
+    {
+      "name": "StartWakeTests",
+      "effect": "启动物理唤醒测试，通过实体的 PhysicsWaker 开始检测。副作用：允许实体从睡眠中被物理事件唤醒。"
+    },
+    {
+      "name": "StopWakeTests",
+      "effect": "停止物理唤醒测试，通过实体的 PhysicsWaker 停止检测。副作用：避免实体被物理事件唤醒。"
+    },
+    {
+      "name": "OnStartDrifting",
+      "effect": "设置漂移状态（is_drifting）为 true。若船只正在移动，则启动唤醒测试。副作用：可能激活唤醒测试，影响睡眠行为。"
+    },
+    {
+      "name": "OnStopDrifting",
+      "effect": "设置漂移状态（is_drifting）为 false，并停止唤醒测试。副作用：禁用唤醒测试，减少唤醒事件。"
+    },
+    {
+      "name": "OnStopMoving",
+      "effect": "设置移动状态（is_moving）为 false。若实体处于睡眠，则停止物理模拟；始终停止唤醒测试。副作用：可能关闭物理和唤醒测试，影响交互。"
+    },
+    {
+      "name": "OnStartMoving",
+      "effect": "设置移动状态（is_moving）为 true。若船只正在漂移，则启动唤醒测试；始终启动物理模拟。副作用：激活物理和可能唤醒测试，增强交互响应。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "清理组件资源：停止唤醒测试并取消延迟停止物理任务。副作用：确保移除时无残留任务。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "当实体睡眠时，若不在移动状态，则停止物理模拟。副作用：节省性能，但可能减少睡眠时交互。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "当实体唤醒时，启动物理模拟。副作用：恢复物理交互。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24589,
+      24090,
+      24764,
+      20291,
+      24074,
+      24451,
+      35670
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未提及船漂移相关行为，主要描述船的实体类型、掉落物和基础功能，未涉及漂移组件的具体能力表达如IsDrifting、OnStartDrifting等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船只移动",
+    "漂移控制",
+    "物理计算",
+    "唤醒机制",
+    "船只航行",
+    "物理交互",
+    "环境响应",
+    "睡眠优化"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "航海",
+    "物理",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "773f614a323ccadd3a7e402ceec3d8268eab3210bcf1fa39114058956e304dc3",
+    "source_bytes": 1954,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092867162
+  }
+}

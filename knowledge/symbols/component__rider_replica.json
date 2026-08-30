@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rider_replica.lua"
+  },
+  "category": "component",
+  "display_name": "rider_replica",
+  "summary": "rider_replica 组件是玩家骑乘状态的客户端副本，负责同步和管理骑乘相关的网络数据。它记录玩家是否正在骑乘、当前的坐骑与鞍具信息，并在玩家上坐骑时修改玩家控制器的动作过滤与按钮覆盖逻辑，以适配骑乘状态下的交互行为。",
+  "api": [
+    {
+      "name": "AttachClassified",
+      "effect": "关联玩家的 classified 对象。若当前已处于骑乘状态，则调用 SetActionFilter(true) 以应用骑乘下的动作过滤。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "解除与 classified 对象的关联。"
+    },
+    {
+      "name": "SetActionFilter",
+      "effect": "根据骑乘状态设置玩家控制器的动作过滤器。骑行时，替换玩家控制器的 actionbuttonoverride 为骑乘专用的 ActionButtonOverride 函数，并推入 MountedActionFilter 来过滤动作（只允许 mount_valid 为 true 的动作）；下坐骑时则恢复默认。"
+    },
+    {
+      "name": "OnIsRiding",
+      "effect": "当客户端接收到 isridingdirty 网络事件或被主动调用时，根据传入的 riding 状态更新动作过滤器。"
+    },
+    {
+      "name": "SetRiding",
+      "effect": "设置玩家的骑乘状态网络变量 _isriding。若状态改变，则更新变量并调用 OnIsRiding 刷新动作过滤器。"
+    },
+    {
+      "name": "IsRiding",
+      "effect": "返回玩家当前是否处于骑乘状态（读取 _isriding 网络变量的值）。"
+    },
+    {
+      "name": "OnMountHealth",
+      "effect": "接收坐骑的当前生命百分比，更新 classified 中的 isridermounthurt 网络变量。当生命值低于 20% 时为 true，否则为 false。"
+    },
+    {
+      "name": "IsMountHurt",
+      "effect": "返回坐骑是否处于受伤状态（生命值低于 20%），读取 classified.isridermounthurt 的值。"
+    },
+    {
+      "name": "SetMount",
+      "effect": "设置当前的坐骑实体。若坐骑改变，会更新 classified 中的 ridermount 网络变量，并同步坐骑的奔跑速度（riderrunspeed）和道路加速属性（riderfasteronroad）。同时为新的坐骑注册 healthdelta 事件监听，以便更新坐骑受伤状态。"
+    },
+    {
+      "name": "GetMount",
+      "effect": "获取当前的坐骑实体。优先从本体的 rider 组件获取，其次从 classified.ridermount 网络变量获取。"
+    },
+    {
+      "name": "GetMountRunSpeed",
+      "effect": "获取当前坐骑的奔跑速度。优先从坐骑的 locomotor 组件获取，否则从 classified.riderrunspeed 网络变量获取。若无坐骑则返回 0。"
+    },
+    {
+      "name": "GetMountFasterOnRoad",
+      "effect": "获取当前坐骑是否拥有道路加速属性。优先从坐骑的 locomotor 组件获取，否则从 classified.riderfasteronroad 网络变量获取。若无坐骑则返回 false。"
+    },
+    {
+      "name": "SetSaddle",
+      "effect": "设置当前装备的鞍具实体。若鞍具改变，会更新 classified 中的 ridersaddle 网络变量，并更新鞍具实体的所有者网络目标（若鞍具存在且被正确绑定）。"
+    },
+    {
+      "name": "GetSaddle",
+      "effect": "获取当前装备的鞍具实体。优先从本体的 rider 组件获取，其次从 classified.ridersaddle 网络变量获取。"
+    }
+  ],
+  "api_note": "此组件为客户端副本，其主要职责是同步和反映服务器上骑乘组件（rider）的状态，并实现客户端特有的动作控制逻辑。",
+  "events_published": [],
+  "events_listened": [
+    "isridingdirty"
+  ],
+  "netvars": [
+    "_isriding"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      23187,
+      15594,
+      15922,
+      13897,
+      13823,
+      15169,
+      15812
+    ],
+    "aspects": [
+      {
+        "aspect": "牛铃绑定与骑乘状态管理",
+        "evidence": [
+          {
+            "pageid": 15169,
+            "quote": "当皮弗娄牛铃在玩家的物品栏中或容器里时，其他玩家将无法再骑乘这头牛。"
+          },
+          {
+            "pageid": 15169,
+            "quote": "可以将绑定的皮弗娄牛铃放在营地中，这样可以让牛在不被玩家骑行时自行返回营地。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "骑乘",
+    "坐骑",
+    "牛",
+    "鹿",
+    "鞍",
+    "装备",
+    "拾取",
+    "自动",
+    "奔跑速度",
+    "受伤"
+  ],
+  "gameplay_tags": [
+    "移动",
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c5da58ac5ad82aa283753bcc908ee9bbd85756ad6d6261d554f62b14e345fcd",
+    "source_bytes": 9123,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111848343
+  }
+}

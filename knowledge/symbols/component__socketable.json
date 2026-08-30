@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/socketable.lua"
+  },
+  "category": "component",
+  "display_name": "socketable",
+  "summary": "该组件管理实体的套接字名称和套接字质量属性。这些属性可能用于定义物品的插槽类型或连接状态。组件提供简单的设置和获取方法来操作这些属性。",
+  "api": [
+    {
+      "name": "SetSocketName",
+      "effect": "设置实体的 socketname 属性为给定的 socketname 值。无副作用。"
+    },
+    {
+      "name": "GetSocketName",
+      "effect": "返回实体的 socketname 属性值。无副作用。"
+    },
+    {
+      "name": "SetSocketQuality",
+      "effect": "设置实体的 socketquality 属性为给定的 socketquality 值。无副作用。"
+    },
+    {
+      "name": "GetSocketQuality",
+      "effect": "返回实体的 socketquality 属性值。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      73480,
+      16419,
+      13476,
+      10418,
+      34992,
+      15526,
+      24540,
+      52019
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件能力SetSocketName、GetSocketName、SetSocketQuality、GetSocketQuality相关的玩家语言表达。文本主要涉及世界生成、电路板插槽使用、料理烹饪等主题，未讨论socket的名称和质量设置或获取行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "套接字",
+    "插槽",
+    "质量",
+    "品质",
+    "设置",
+    "获取",
+    "连接",
+    "属性",
+    "名称"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "装备"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b2b8efef7981de5b614740adbcc132ed915dd4007088e9f1907f2deb676b9c89",
+    "source_bytes": 572,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112826296
+  }
+}

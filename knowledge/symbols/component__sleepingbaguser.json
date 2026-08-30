@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sleepingbaguser.lua"
+  },
+  "category": "component",
+  "display_name": "sleepingbaguser",
+  "summary": "该组件管理玩家使用睡眠袋时的睡眠与醒来行为，包括调整饥饿、健康和理智的恢复速率。它通过周期任务处理睡眠tick，并监听世界阶段变化以自动唤醒。组件还提供方法控制是否可以睡觉以及设置各种奖励倍数。",
+  "api": [
+    {
+      "name": "SetHungerBonusMult",
+      "effect": "设置饥饿奖励倍数，影响睡眠时的饥饿恢复速率。"
+    },
+    {
+      "name": "SetHealthBonusMult",
+      "effect": "设置健康奖励倍数，影响睡眠时的健康恢复速率。"
+    },
+    {
+      "name": "SetSanityBonusMult",
+      "effect": "设置理智奖励倍数，影响睡眠时的理智恢复速率。"
+    },
+    {
+      "name": "SetCanSleepFn",
+      "effect": "设置一个回调函数，用于判断实体是否可以睡觉；函数返回成功状态和原因。"
+    },
+    {
+      "name": "DoSleep",
+      "effect": "开始睡觉过程：设置当前床，监视世界阶段变化，启动周期任务执行SleepTick。"
+    },
+    {
+      "name": "DoWakeUp",
+      "effect": "唤醒过程：取消睡眠任务，停止监视世界阶段；可选地改变实体状态为醒来，如果未指定nostatechange则触发醒来状态。"
+    },
+    {
+      "name": "ShouldSleep",
+      "effect": "检查是否可以睡觉，调用cansleepfn（如果已设置）并返回成功状态和原因；否则默认返回true。"
+    },
+    {
+      "name": "SleepTick",
+      "effect": "每个睡眠周期执行：根据床组件数据调整饥饿、健康、理智恢复，检查饥饿状态；如果饥饿则强制唤醒。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "phase"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GOODSLEEP_SANITY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      15245,
+      13437,
+      16197,
+      13456,
+      13261,
+      16419,
+      10374
+    ],
+    "aspects": [
+      {
+        "aspect": "睡眠时饥饿消耗倍率",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "沃尔特睡觉时只消耗一半的[[饥饿值]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "睡眠袋",
+    "睡觉",
+    "恢复",
+    "饥饿",
+    "健康",
+    "理智",
+    "醒来",
+    "休息",
+    "睡眠增益"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "恢复"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fad208f3b8cb373d89f80fe288a9d0c3402c3d1458a71999b2f2f0bda11cce87",
+    "source_bytes": 3682,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091753074
+  }
+}

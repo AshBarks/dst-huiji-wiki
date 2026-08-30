@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/parryweapon.lua"
+  },
+  "category": "component",
+  "display_name": "parryweapon",
+  "summary": "parryweapon 组件用于管理武器的格挡功能，包括设置格挡弧度、格挡前和格挡时的回调函数。它通过计算防御者与攻击者之间的角度差来判断格挡是否成功，从而在战斗中提供防御机制。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除实体的 'parryweapon' 标签，用于组件清理。"
+    },
+    {
+      "name": "SetParryArc",
+      "effect": "设置格挡弧度（arc），影响格挡判断时计算的角度阈值。"
+    },
+    {
+      "name": "SetOnPreParryFn",
+      "effect": "设置格挡前回调函数，当 OnPreParry 被调用时执行。"
+    },
+    {
+      "name": "SetOnParryFn",
+      "effect": "设置格挡回调函数，当 TryParry 成功格挡时执行。"
+    },
+    {
+      "name": "OnPreParry",
+      "effect": "调用设置的 onpreparryfn 回调函数，传递当前实体和 doer，用于状态图动画音效等。"
+    },
+    {
+      "name": "EnterParryState",
+      "effect": "向 doer 实体推送 'combat_parry' 事件，包含武器、方向和持续时间信息，用于进入格挡状态。"
+    },
+    {
+      "name": "TryParry",
+      "effect": "尝试执行格挡：检查 stimuli 是否为 'stun' 或攻击者是否有 'groundspike' 标签，然后计算 doer 与 attacker 的角度差；若在格挡弧度内则调用 onparryfn 回调并返回 true，否则返回 false。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "combat_parry"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      20058,
+      15922,
+      22383,
+      15022,
+      13156,
+      18219,
+      22239
+    ],
+    "aspects": [
+      {
+        "aspect": "格挡能力与时间增强描述",
+        "evidence": [
+          {
+            "pageid": 22239,
+            "quote": "战斗圆盾具有格挡伤害的特殊能力，右键点击并选中方向后即能格挡来自对应方向的攻击，持续 1 秒钟。"
+          }
+        ]
+      },
+      {
+        "aspect": "格挡角度与持续时间描述",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "在之后的至多 6 秒内完全格挡来自 选定角度左右各60° 共计120° 方向的所有攻击。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "格挡",
+    "防御",
+    "武器",
+    "战斗",
+    "角度",
+    "弧度",
+    "parry",
+    "格挡武器",
+    "攻击抵挡"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8c52a00571dbb11fa25505d47a3f60467e8c72488879a7005cea1946b91b8169",
+    "source_bytes": 2113,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102456350
+  }
+}

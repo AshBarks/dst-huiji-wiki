@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/strongman.lua"
+  },
+  "category": "component",
+  "display_name": "strongman",
+  "summary": "该组件管理实体在健身房中的健身状态，控制健身的开始和结束。它通过添加或移除标签来标识健身状态，并与 mightiness 组件交互以暂停或恢复其功能。核心玩法涉及力量锻炼，影响角色的战斗能力。",
+  "api": [
+    {
+      "name": "DoWorkout",
+      "effect": "设置健身房引用，暂停 mightiness 组件，添加 'ingym' 标签到实体，使实体进入健身状态。"
+    },
+    {
+      "name": "StopWorkout",
+      "effect": "移除 'ingym' 标签，恢复 mightiness 组件，清除健身房引用，使实体退出健身状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      15904,
+      33991,
+      15903,
+      20044,
+      23932,
+      13642,
+      14815
+    ],
+    "aspects": [
+      {
+        "aspect": "停止锻炼的操作描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "右键可以停止锻炼，从健身房中跳出来"
+          },
+          {
+            "pageid": 15903,
+            "quote": "再次右键停止举重"
+          }
+        ]
+      },
+      {
+        "aspect": "开始锻炼的操作描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "鼠标左键单击即可进入健身房锻炼"
+          },
+          {
+            "pageid": 15903,
+            "quote": "装备后右键哑铃即可开始举重"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "健身",
+    "锻炼",
+    "力量",
+    "训练",
+    "健身房",
+    "运动",
+    "强壮",
+    "强人"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "20ff7908366a605d3115c98cb86308ccdd224477af3aef5778bac106a9e69d58",
+    "source_bytes": 373,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113119110
+  }
+}

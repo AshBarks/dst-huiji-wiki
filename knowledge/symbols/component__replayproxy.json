@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/replayproxy.lua"
+  },
+  "category": "component",
+  "display_name": "replayproxy",
+  "summary": "ReplayProxy 组件用于存储和管理实体的真实GUID（全局唯一标识符）和预制体名称。它提供了设置和获取这些信息的方法，可能用于在回放或类似系统中作为代理实体关联到原始实体。",
+  "api": [
+    {
+      "name": "SetRealEntityGUID",
+      "effect": "设置组件的真实实体GUID为提供的guid值，修改内部存储状态。"
+    },
+    {
+      "name": "GetRealEntityGUID",
+      "effect": "返回组件当前存储的真实实体GUID，无副作用。"
+    },
+    {
+      "name": "SetRealEntityPrefabName",
+      "effect": "设置组件的真实实体预制体名称为提供的name值，修改内部存储状态。"
+    },
+    {
+      "name": "GetRealEntityPrefabName",
+      "effect": "返回格式化字符串，包含真实实体GUID和预制体名称，格式为“%d - %s”，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      23187,
+      18476,
+      14579,
+      15295,
+      13779,
+      15922,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未提及组件 component__replayproxy 或其相关能力（SetRealEntityGUID、GetRealEntityGUID、SetRealEntityPrefabName、GetRealEntityPrefabName）。所有摘录均为游戏内物品、实体、控制台命令或机制的描述，不涉及实体标识符设置或获取的内容。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "回放",
+    "代理",
+    "实体",
+    "GUID",
+    "预制体",
+    "标识",
+    "存储",
+    "管理"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "代理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e7e2172ad4040bfec9e60ac47d9d0c5dea1a91810be089891e99a176f4818d75",
+    "source_bytes": 564,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103138017
+  }
+}

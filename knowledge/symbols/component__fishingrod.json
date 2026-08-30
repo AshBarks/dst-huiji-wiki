@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishingrod.lua"
+  },
+  "category": "component",
+  "display_name": "fishingrod",
+  "summary": "此组件管理手持鱼竿（钓鱼杆）的实体状态与钓鱼流程。它维护着目标水域、钓鱼者、鱼的状态（咬钩/钓到）以及相关计时任务，协调从等待鱼上钩到最终收取渔获的整个交互过程。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "signature": "function FishingRod:GetDebugString()",
+      "effect": "返回一个包含当前目标、已咬钩鱼和已捕获鱼信息的调试字符串。此方法用于调试输出。"
+    },
+    {
+      "name": "SetWaitTimes",
+      "signature": "function FishingRod:SetWaitTimes(min, max)",
+      "effect": "设置鱼咬钩前的最小和最大等待时间（秒）。影响后续`WaitForFish`计算的实际等待时长。"
+    },
+    {
+      "name": "SetStrainTimes",
+      "signature": "function FishingRod:SetStrainTimes(min, max)",
+      "effect": "设置在鱼上钩后，鱼竿因拉扯（strain）可能丢失的最小和最大时间（秒）。与鱼竿耐久度共同决定实际丢失时限。"
+    },
+    {
+      "name": "IsFishing",
+      "signature": "function FishingRod:IsFishing()",
+      "effect": "返回一个布尔值，指示当前是否处于钓鱼状态（即有目标水域和钓鱼者）。"
+    },
+    {
+      "name": "HasHookedFish",
+      "signature": "function FishingRod:HasHookedFish()",
+      "effect": "返回一个布尔值，指示当前是否有鱼已咬钩（即有目标水域和已咬钩的鱼）。"
+    },
+    {
+      "name": "HasCaughtFish",
+      "signature": "function FishingRod:HasCaughtFish()",
+      "effect": "返回一个布尔值，指示当前是否已成功捕获一条鱼（即`caughtfish`字段非空）。"
+    },
+    {
+      "name": "FishIsBiting",
+      "signature": "function FishingRod:FishIsBiting()",
+      "effect": "返回一个布尔值，通过检查钓鱼者的状态标签`nibble`来判断鱼是否正在咬钩。"
+    },
+    {
+      "name": "StartFishing",
+      "signature": "function FishingRod:StartFishing(target, fisherman)",
+      "effect": "开始钓鱼流程。会先调用`StopFishing`停止当前流程，然后设置新的目标水域和钓鱼者，并开始组件的更新。目标必须是具有`fishable`组件的实体。"
+    },
+    {
+      "name": "WaitForFish",
+      "signature": "function FishingRod:WaitForFish()",
+      "effect": "启动一个等待鱼咬钩的计时任务。根据目标水域剩余鱼量百分比，在最小和最大等待时间之间计算出一个随机等待时间，时间到后触发`DoNibble`函数。"
+    },
+    {
+      "name": "CancelFishTask",
+      "signature": "function FishingRod:CancelFishTask()",
+      "effect": "取消当前正在进行的等待或拉扯计时任务（`fishtask`）。"
+    },
+    {
+      "name": "StopFishing",
+      "signature": "function FishingRod:StopFishing()",
+      "effect": "停止整个钓鱼流程。会向钓鱼者推送`fishingcancel`事件，清空目标、钓鱼者、已咬钩和已捕获的鱼的数据，取消计时任务，并停止组件更新。"
+    },
+    {
+      "name": "Hook",
+      "signature": "function FishingRod:Hook()",
+      "effect": "对当前目标执行“钩鱼”操作。会调用目标水域的`HookFish`方法获取已咬钩的鱼，并根据鱼竿耐久度启动一个可能的“脱钩”计时任务。同时向鱼竿和钓鱼者推送`fishingstrain`事件。"
+    },
+    {
+      "name": "Release",
+      "signature": "function FishingRod:Release()",
+      "effect": "释放当前已咬钩的鱼。会调用目标水域的`ReleaseFish`方法，然后调用`StopFishing`完全停止钓鱼流程。"
+    },
+    {
+      "name": "Reel",
+      "signature": "function FishingRod:Reel()",
+      "effect": "执行“收杆”操作，尝试将已咬钩的鱼捕获。会调用目标水域的`RemoveFish`方法获取鱼的实体，将其传送至钓鱼者附近，并推送`fishingcatch`事件。"
+    },
+    {
+      "name": "Collect",
+      "signature": "function FishingRod:Collect()",
+      "effect": "收集已成功捕获的鱼。显示鱼的实体，推送`fishingcollect`事件，并调用`StopFishing`结束流程。"
+    }
+  ],
+  "events_published": [
+    "fishingcancel",
+    "fishingstrain",
+    "fishingcatch",
+    "fishingcollect"
+  ],
+  "events_listened": [
+    "fishingnibble",
+    "fishingloserod"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19940,
+      18234,
+      16185,
+      15903,
+      14683,
+      16633,
+      24866,
+      19118
+    ],
+    "aspects": [
+      {
+        "aspect": "钓鱼操作技巧",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "可以将鱼钩抛到某条鱼附近，在鱼饵吸引范围内时鱼会自动朝鱼饵移动，玩家在保证鱼上钩前持续收线到足够近"
+          }
+        ]
+      },
+      {
+        "aspect": "钓鱼收获机制",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "如果当时有上钩提示会因此没有收获"
+          }
+        ]
+      },
+      {
+        "aspect": "钓鱼状态描述",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "注意：钓鱼时，主动移动或其他更换玩家状态的情况会使玩家收回鱼竿"
+          }
+        ]
+      },
+      {
+        "aspect": "鱼咬钩行为",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "在鱼咬钩后玩家若被攻击或进入其他状态则会判定钓鱼失败"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "钓鱼",
+    "鱼竿",
+    "咬钩",
+    "上钩",
+    "收杆",
+    "鱼线",
+    "脱钩",
+    "等待",
+    "耐久",
+    "渔获"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3cb93b3604d4dd9e78bab9ecfd92b32ef48a98deda2698c440f82dd89aa71519",
+    "source_bytes": 6227,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099923914
+  }
+}

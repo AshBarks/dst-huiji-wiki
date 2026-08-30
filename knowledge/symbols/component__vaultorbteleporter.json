@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaultorbteleporter.lua"
+  },
+  "category": "component",
+  "display_name": "vaultorbteleporter",
+  "summary": "该组件用于管理一个名为“金库宝珠传送器”的实体的核心传送逻辑。它负责协调启动、取消和执行一个地图传送动作，并允许外部系统通过回调函数来定制传送的条件与效果。组件主要处理传送器（作为起点）的行为，与传送目的地（需有vaultorbteleportdestination组件）进行交互。",
+  "api": [
+    {
+      "name": "SetOnActivateFn",
+      "effect": "设置当传送被成功激活时调用的回调函数。该函数在每次传送尝试（通过Activate方法）并成功验证目标后执行，可用于执行具体的传送逻辑或附加效果。"
+    },
+    {
+      "name": "SetOnStartMapActionFn",
+      "effect": "设置当开始地图传送动作（通过StartMapAction方法）前调用的验证回调函数。若该函数返回 false 及原因，则传送动作启动被中止。"
+    },
+    {
+      "name": "SetOnCancelMapActionFn",
+      "effect": "设置当地图传送动作被取消（通过CancelMapAction方法或实体移除）时调用的回调函数。用于清理状态或通知相关系统。"
+    },
+    {
+      "name": "StartMapAction",
+      "effect": "尝试为执行者（doer）启动一个到该传送器的地图传送动作。首先检查是否已有进行中的动作，然后调用SetOnStartMapActionFn设置的验证函数。若验证通过，则生成并配置一个“bufferedmapaction”预制体来实际执行VAULTORBTELEPORT_MAP动作，并返回true；否则返回false及原因。"
+    },
+    {
+      "name": "CancelMapAction",
+      "effect": "取消当前进行中的地图传送动作。如果存在已生成的bufferedmapaction，则将其移除并置空。"
+    },
+    {
+      "name": "Activate",
+      "effect": "执行传送的核心检查逻辑。首先验证目标实体（target）是否拥有vaultorbteleportdestination组件，若无则返回false和“NOTARGET”原因。然后调用SetOnActivateFn设置的回调函数进行进一步验证。所有检查通过后返回true，否则返回false及相应原因。此方法本身不直接移动玩家，而是为外部系统提供合法性校验。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      19693,
+      18001,
+      16641,
+      20842,
+      13847,
+      17930,
+      24578
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及符号 `component__vaultorbteleporter` 或其代码能力在玩家语言中的表达。所有页面讨论的是其他实体如圣殿、天体传送门、传送焦点等，没有涉及该特定组件。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送门",
+    "金库宝珠",
+    "远古遗迹",
+    "快速旅行",
+    "地下传送",
+    "标记点",
+    "遗迹",
+    "神殿",
+    "传送"
+  ],
+  "gameplay_tags": [
+    "传送/探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "def03d6d4ade15de47576e4853d7a994b7363a01e346fda4dd5b18e4b6b9c4d0",
+    "source_bytes": 2284,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104662612
+  }
+}

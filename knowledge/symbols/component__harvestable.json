@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/harvestable.lua"
+  },
+  "category": "component",
+  "display_name": "harvestable",
+  "summary": "harvestable组件用于管理实体（如农作物）的可收获状态与生长周期。它通过跟踪当前产量（produce）并添加/移除“harvestable”标签来控制实体的可交互性，是实现“种植-生长-收获”核心玩法循环的关键组件。",
+  "api": [
+    {
+      "name": "SetUp",
+      "effect": "一次性完成组件的初始化设置。设置产品预制体(product)、最大产量(max)、生长时间(time)、收获回调(onharvest)和生长回调(ongrow)，并立即启动生长计时器。"
+    },
+    {
+      "name": "SetProduct",
+      "effect": "设置收获时产出的物品预制体(product)和最大产量(max)，并将当前产量(produce)重置为0。"
+    },
+    {
+      "name": "SetGrowTime",
+      "effect": "设置每次生长所需的时间(growtime)。"
+    },
+    {
+      "name": "SetOnGrowFn",
+      "effect": "设置一个回调函数(ongrowfn)，当产量(produce)增加时被调用。"
+    },
+    {
+      "name": "SetOnHarvestFn",
+      "effect": "设置一个回调函数(onharvestfn)，在Harvest方法成功收获后被调用。"
+    },
+    {
+      "name": "SetCanHarvestFn",
+      "effect": "设置一个自定义检查函数(can_harvest_fn)，用于判断特定角色或条件下是否允许收获。"
+    },
+    {
+      "name": "SetDoMagicGrowthFn",
+      "effect": "设置一个魔法生长回调函数(domagicgrowthfn)，使得组件可被特定魔法效果（如沃姆伍德的技能）影响。"
+    },
+    {
+      "name": "IsMagicGrowable",
+      "effect": "检查是否设置了魔法生长回调函数，返回一个布尔值。"
+    },
+    {
+      "name": "DoMagicGrowth",
+      "effect": "如果设置了魔法生长回调函数，则调用它，传入施法者(doer)。"
+    },
+    {
+      "name": "StartGrowing",
+      "effect": "启动或恢复生长计时器。若提供time则使用该值，否则优先使用暂停剩余时间(pausetime)，再使用设定的生长时间(growtime)。启动前会先取消已有计时器。"
+    },
+    {
+      "name": "StopGrowing",
+      "effect": "取消当前的生长计时器并清空目标时间(targettime)。"
+    },
+    {
+      "name": "PauseGrowing",
+      "effect": "暂停生长计时器，并计算出剩余时间存入pausetime。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用组件（设置enabled为true），并启动生长。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用组件（设置enabled为false），并暂停生长。"
+    },
+    {
+      "name": "Grow",
+      "effect": "手动增加一次产量(produce)。若产量未达最大值，则调用生长回调并重新启动生长计时器；若已达最大值，则停止生长。返回一个布尔值表示是否成功增长。"
+    },
+    {
+      "name": "CanBeHarvested",
+      "effect": "检查组件是否可收获：要求enabled为true且produce大于0。返回一个布尔值。"
+    },
+    {
+      "name": "Harvest",
+      "effect": "执行收获操作。首先检查CanBeHarvested，然后执行can_harvest_fn自定义检查。通过后，将产量清零，生成指定数量的产品预制体，并根据情况放入收获者(picker)的背包或弹射到世界。收获后会自动启动新一轮生长。返回成功状态及可能的失败原因。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化组件状态，用于存档。保存剩余生长时间、暂停时间和当前产量。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "反序列化并加载组件状态，用于读档。恢复产量和暂停时间，并在有剩余生长时间时启动生长。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回用于调试的字符串，显示当前产量、产品以及剩余生长/暂停时间。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体上移除时调用，确保移除“harvestable”标签。"
+    }
+  ],
+  "events_published": [
+    "harvestsomething"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      14486,
+      14711,
+      14484,
+      18234,
+      51951,
+      13261,
+      15797
+    ],
+    "aspects": [
+      {
+        "aspect": "收获时机控制",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "农作物在进入已长成阶段后 4 天未收获将会进入腐烂阶段"
+          }
+        ]
+      },
+      {
+        "aspect": "收获概率机制",
+        "evidence": [
+          {
+            "pageid": 14486,
+            "quote": "若收获者的[[幸运值]]为{{MathVar|L_{幸运值}|low=-10|high=50|init=0}}，则概率为"
+          }
+        ]
+      },
+      {
+        "aspect": "收获速度提升",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "更快地收获农作物。"
+          }
+        ]
+      },
+      {
+        "aspect": "枯萎状态禁用",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "枯萎的作物有特殊的贴图，无法生长和采集"
+          }
+        ]
+      },
+      {
+        "aspect": "生长阶段描述",
+        "evidence": [
+          {
+            "pageid": 21485,
+            "quote": "每种农作物都有以下生长阶段：种子，萌芽，小，中，已长成，巨大，腐烂，腐烂巨大。"
+          }
+        ]
+      },
+      {
+        "aspect": "魔法催熟效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "使角色附近至多 10 棵未长成的食用类作物瞬间生长成熟。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:可收获"
+    ],
+    "code_fields": [
+      "harvestable"
+    ],
+    "overridable_fields": [],
+    "note": "存在性键。"
+  },
+  "search_terms": [
+    "收获",
+    "生长",
+    "农田",
+    "作物",
+    "成熟",
+    "魔法生长",
+    "标签",
+    "产量",
+    "种植",
+    "启用禁用"
+  ],
+  "gameplay_tags": [
+    "生长",
+    "收获",
+    "农业",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "af98716bcc699861045b9ffd665161e68965122ed3063765b4bb44a37e7bae99",
+    "source_bytes": 5157,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094762189
+  }
+}

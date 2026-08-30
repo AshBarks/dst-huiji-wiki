@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstormwatcher.lua"
+  },
+  "category": "component",
+  "display_name": "moonstormwatcher",
+  "summary": "moonstormwatcher组件管理月风暴的启用状态、等级和速度倍率。它通过监听风暴变化事件来响应月风暴的开始和结束，并调整玩家在月风暴中的移动速度。组件根据风暴等级和玩家装备（如护目镜或骑乘状态）决定是否施加速度减益。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，如果月风暴已启用且速度倍率小于1，则移除事件监听器（如gogglevision、ghostvision等）和速度修改器。"
+    },
+    {
+      "name": "ToggleMoonstorms",
+      "effect": "根据传入的数据切换月风暴状态。如果风暴类型为月风暴，则启用或禁用组件；启用时添加事件监听器并更新月风暴等级，禁用时移除事件监听器。"
+    },
+    {
+      "name": "SetMoonstormSpeedMultiplier",
+      "effect": "设置月风暴速度倍率，值被限制在0到1之间。如果组件已启用，根据新倍率添加或移除事件监听器，并更新行走速度。"
+    },
+    {
+      "name": "UpdateMoonstormLevel",
+      "effect": "获取当前月风暴等级，更新行走速度，并推送'moonstormlevel'事件到实体，事件数据包含等级。"
+    },
+    {
+      "name": "UpdateMoonstormWalkSpeed",
+      "effect": "调用内部方法UpdateMoonstormWalkSpeed_Internal，以当前月风暴等级更新行走速度。"
+    },
+    {
+      "name": "UpdateMoonstormWalkSpeed_Internal",
+      "effect": "根据传入的等级和玩家状态（如护目镜、幽灵视觉、骑乘）决定是否设置外部速度修改器。如果等级低于满级或玩家有护目镜、幽灵视觉或骑乘状态，则移除速度修改器；否则设置速度倍率为moonstormspeedmult。"
+    },
+    {
+      "name": "GetMoonStormLevel",
+      "effect": "从实体的stormwatcher组件获取月风暴等级并返回。如果stormwatcher组件不存在，返回nil。"
+    }
+  ],
+  "events_published": [
+    "moonstormlevel"
+  ],
+  "events_listened": [
+    "ms_stormchanged",
+    "gogglevision",
+    "ghostvision",
+    "mounted",
+    "dismounted"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MOONSTORM_SPEED_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      13437,
+      13406,
+      34003,
+      16570,
+      51287,
+      13455,
+      15327
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有讨论与代码能力清单对应的月亮风暴控制、速度调整或级别更新等行为；相关页面（如星象护目镜页面）仅提及风暴作为背景，未涉及具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月风暴",
+    "移动速度",
+    "减速",
+    "风暴等级",
+    "速度倍率",
+    "护目镜",
+    "骑乘",
+    "风暴事件",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "58150c782970e742145881d41bcc893dc1fdce886680b4e90386d574a4d448ba",
+    "source_bytes": 3705,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091393004
+  }
+}

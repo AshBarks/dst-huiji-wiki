@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/waxable.lua"
+  },
+  "category": "component",
+  "display_name": "waxable",
+  "summary": "waxable 组件管理实体的上蜡功能，维护上蜡函数和是否需要喷雾的状态。执行上蜡时，根据蜡物品类型消耗物品以保护或修改实体。",
+  "api": [
+    {
+      "name": "SetWaxfn",
+      "effect": "设置上蜡时调用的函数；若函数非 nil，则为实体添加 'waxable' 标签，否则移除该标签。"
+    },
+    {
+      "name": "SetNeedsSpray",
+      "effect": "设置是否需要喷雾；若值不为 false，则为实体添加 'needswaxspray' 标签，否则移除该标签。"
+    },
+    {
+      "name": "NeedsSpray",
+      "effect": "返回当前 needs_spray 的布尔值，表示是否需要喷雾。"
+    },
+    {
+      "name": "Wax",
+      "effect": "执行上蜡操作：若需要喷雾且蜡物品非喷雾则返回 false；否则调用 waxfn 函数，成功则消耗蜡物品——有限使用组件用一次，可堆叠组件移除一个堆叠物品，其他情况移除整个物品。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除 'waxable' 和 'needswaxspray' 标签。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      24544,
+      72441,
+      22552,
+      15011,
+      15012,
+      20149,
+      20714,
+      13567
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与蜡、蜡化、喷雾或 waxable 组件相关的任何能力或行为描述，因此无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "涂蜡",
+    "蜡封",
+    "喷雾蜡",
+    "保护",
+    "消耗蜡",
+    "使用次数",
+    "堆叠",
+    "移除"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fe13e66e049d2d832b2d132f7ac1d0bde2dd009719b67462e25119bf8bfeef5c",
+    "source_bytes": 1494,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092846562
+  }
+}

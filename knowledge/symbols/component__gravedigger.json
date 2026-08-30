@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gravedigger.lua"
+  },
+  "category": "component",
+  "display_name": "gravedigger",
+  "summary": "该组件管理一个实例引用和一个可选的使用回调（onused）。当实体被使用时，触发 OnUsed 方法执行外部定义的回调行为。可能用于响应玩家与墓碑的互动，具体行为由外部设置。",
+  "api": [
+    {
+      "name": "OnUsed",
+      "effect": "当实体被使用时调用；如果设置了 onused 回调，则执行该回调并传递实例、用户和目标。副作用为执行回调，可能改变游戏状态，但回调内容由外部定义。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      24866,
+      18219,
+      18359,
+      65881,
+      15303,
+      24028,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 component__gravedigger 或其 OnUsed 能力的具体描述；相关页面如坟墓和玩具页面仅提到挖掘坟墓获取物品，但未明确关联到该组件的使用行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "掘墓",
+    "墓碑",
+    "使用",
+    "互动",
+    "回调",
+    "实例",
+    "工具",
+    "挖掘"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b393ce72a179b4749eb4a671f1d51f753d238abbd53757b47d433fe26a4e02a6",
+    "source_bytes": 254,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100485897
+  }
+}

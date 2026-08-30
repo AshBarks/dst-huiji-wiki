@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wintersfeasttable.lua"
+  },
+  "category": "component",
+  "display_name": "wintersfeasttable",
+  "summary": "该组件管理冬季盛宴桌的数据，包括盛宴可用状态（canfeast）、当前盛宴者列表（current_feasters）和食物消耗回调。核心玩法涉及玩家放置食物在盛宴桌上进行盛宴，食物有有限使用次数，用尽后盛宴结束，组件通过标签和事件与其他系统交互。",
+  "api": [
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前盛宴者、物品及使用次数信息。副作用：仅输出调试数据，不改变游戏状态。"
+    },
+    {
+      "name": "CancelFeasting",
+      "effect": "取消盛宴，向所有当前盛宴者（current_feasters中的实体）推送'feastinterrupted'事件，并清空盛宴者列表。副作用：盛宴者收到中断事件，盛宴状态重置。"
+    },
+    {
+      "name": "DepleteFood",
+      "effect": "消耗盛宴桌上的食物，使用实体库存第一个槽位物品的有限使用次数（finiteuses组件）。若物品用尽则触发onfinishfoodfn回调，否则触发ondepletefoodfn回调。副作用：食物使用次数减少，可能触发回调函数。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，将canfeast设为false并移除'wintersfeasttable'标签。副作用：盛宴状态禁用，实体标签更新。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "feastinterrupted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18939,
+      22094,
+      13493,
+      19832,
+      23187,
+      21285,
+      13823,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "食物消耗时间描述",
+        "evidence": [
+          {
+            "pageid": 21285,
+            "quote": "每个菜肴会在 1 分钟后消耗完。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "盛宴",
+    "冬季盛宴",
+    "放置食物",
+    "使用次数",
+    "盛宴结束",
+    "盛宴进行",
+    "事件",
+    "组件"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "社交",
+    "节日",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d01187112cd6049b4bb78c61d7ecd3de8e722bd779e44ebcf6d0d5bdf6b0941",
+    "source_bytes": 1914,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104840688
+  }
+}

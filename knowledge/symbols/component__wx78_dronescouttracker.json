@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wx78_dronescouttracker.lua"
+  },
+  "category": "component",
+  "display_name": "wx78_dronescouttracker",
+  "summary": "该组件用于管理wx78角色的无人机侦察跟踪，维护一个无人机列表并处理跨碎片数据保存。核心玩法涉及无人机的部署、跟踪、释放以及数据持久化，确保无人机状态在游戏保存和加载时得以保留。",
+  "api": [
+    {
+      "name": "StartTracking",
+      "effect": "开始跟踪指定无人机，将其加入跟踪列表，监听其移除事件以自动停止跟踪，调用设置的跟踪开始回调函数，并向无人机推送'ms_dronescout_tracked'事件通知其已被跟踪。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "停止跟踪指定无人机，从跟踪列表移除，取消监听其移除事件，调用设置的跟踪停止回调函数，并向无人机推送'ms_dronescout_untracked'事件通知其已取消跟踪。"
+    },
+    {
+      "name": "ReleaseAllDrones",
+      "effect": "停止跟踪所有无人机，向每个无人机推送'ms_dronescout_despawn'事件通知其消失，并清空保存数据。"
+    },
+    {
+      "name": "SetOnStartTrackingFn",
+      "effect": "设置当开始跟踪无人机时调用的回调函数，该函数在跟踪启动后执行，可用于执行自定义逻辑。"
+    },
+    {
+      "name": "SetOnStopTrackingFn",
+      "effect": "设置当停止跟踪无人机时调用的回调函数，该函数在跟踪停止后执行，可用于执行自定义逻辑。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "生成当前碎片的无人机数据（通过无人机的GetSaveRecord方法），并合并其他碎片的无人机数据，返回包含所有碎片数据的保存记录以供持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中恢复无人机，根据当前碎片ID生成并跟踪本碎片的无人机，其他碎片的数据存储在内部以供跨碎片使用。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当宿主实体被移除时，向所有当前跟踪的无人机推送'ms_dronescout_despawn'事件通知它们消失。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      22611,
+      51046,
+      13701,
+      45248,
+      13606,
+      52773,
+      18474
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与无人机追踪、释放无人机、保存、加载或移除实体相关的描述。所有页面讨论的是其他实体如天体英雄、月雹、战争瓦器人等，没有提及符号 component__wx78_dronescouttracker 的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "无人机",
+    "跟踪",
+    "侦察",
+    "保存",
+    "加载",
+    "管理",
+    "取消跟踪",
+    "释放",
+    "碎片",
+    "数据"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "科技"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e53388baea73045f91188d08991591c7dab7eee7a4240c76d2923c1c0e3f0c37",
+    "source_bytes": 2430,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114516749
+  }
+}

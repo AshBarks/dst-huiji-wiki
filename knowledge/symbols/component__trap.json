@@ -1,0 +1,200 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/trap.lua"
+  },
+  "category": "component",
+  "display_name": "trap",
+  "summary": "Trap组件管理陷阱的设置、诱饵放置、触发机制和收获流程。它参与饥荒联机版中捕捉生物或物品的核心玩法，支持目标饥饿死亡和灵魂收集。",
+  "api": [
+    {
+      "name": "SetOnHarvestFn",
+      "effect": "设置收获时的回调函数。副作用：当陷阱被收获时调用传入的函数。"
+    },
+    {
+      "name": "SetOnSpringFn",
+      "effect": "设置触发时的回调函数。副作用：当陷阱触发时调用传入的函数。"
+    },
+    {
+      "name": "SetOnBaitedFn",
+      "effect": "设置诱饵放置时的回调函数。副作用：当诱饵被放置到陷阱上时调用传入的函数。"
+    },
+    {
+      "name": "IsFree",
+      "effect": "检查陷阱是否空闲（无诱饵）。返回布尔值，无副作用。"
+    },
+    {
+      "name": "IsBaited",
+      "effect": "检查陷阱是否已放置诱饵且未触发。返回布尔值，无副作用。"
+    },
+    {
+      "name": "HasLoot",
+      "effect": "检查陷阱是否有战利品。返回布尔值，无副作用。"
+    },
+    {
+      "name": "Reset",
+      "effect": "重置陷阱状态：停止更新、清除设置状态、触发状态、战利品数据、目标和饥饿计时器。可选参数 sprung 设置触发状态。"
+    },
+    {
+      "name": "Set",
+      "effect": "设置陷阱为就绪状态：重置后标记为已设置，并启动周期性更新以检测目标。"
+    },
+    {
+      "name": "DoTriggerOn",
+      "effect": "触发陷阱针对指定目标：停止更新，发布触发事件，目标可能发布被捕获或安全解除事件，并处理诱饵移除。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "周期性更新函数：如果陷阱已设置，搜索范围内是否有可捕捉的目标，若有则触发陷阱。"
+    },
+    {
+      "name": "OnTrappedStarve",
+      "effect": "处理陷阱中目标饥饿死亡：发布收获事件，生成饥饿战利品（如有），释放灵魂（如有），并重置陷阱。"
+    },
+    {
+      "name": "StartStarvation",
+      "effect": "开始饥饿计时：根据目标的腐烂时间设置计时器，生成饥饿战利品列表。"
+    },
+    {
+      "name": "StopStarvation",
+      "effect": "停止饥饿计时：取消食物腐烂计时器，清除饥饿战利品数据。"
+    },
+    {
+      "name": "DoSpring",
+      "effect": "执行触发逻辑：处理目标捕捉、战利品生成、灵魂收集、诱饵消耗或偷取，并设置陷阱为触发状态。"
+    },
+    {
+      "name": "IsSprung",
+      "effect": "检查陷阱是否已触发。返回布尔值，无副作用。"
+    },
+    {
+      "name": "Harvest",
+      "effect": "收获陷阱内容：发布收获事件，生成战利品并给予收获者（或放置到世界），处理灵魂收集，根据耐久重置或设置陷阱。"
+    },
+    {
+      "name": "RemoveBait",
+      "effect": "移除陷阱上的诱饵：清除诱饵引用，重置诱饵动画偏移，并断开诱饵与陷阱的关联。"
+    },
+    {
+      "name": "SetBait",
+      "effect": "设置诱饵到陷阱：移除现有诱饵，关联新诱饵，设置位置和动画偏移，并触发诱饵放置回调。"
+    },
+    {
+      "name": "BaitTaken",
+      "effect": "处理诱饵被拿取事件：如果目标匹配目标标签或偷取标签则触发陷阱，否则移除诱饵。"
+    },
+    {
+      "name": "AcceptingBait",
+      "effect": "检查陷阱是否接受诱饵：如果已设置且无诱饵则返回真，无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存陷阱状态：返回包含触发状态、设置状态、诱饵GUID、战利品、灵魂等数据的表，并列出关联实体GUID。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载陷阱状态：恢复触发状态、设置状态、战利品、灵魂等数据，并根据状态启动更新或发布事件。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理：如果保存数据中有诱饵GUID，则从新实体表中恢复诱饵并设置。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示陷阱状态、诱饵、目标、战利品和灵魂信息。无副作用。"
+    }
+  ],
+  "events_published": [
+    "springtrap",
+    "harvesttrap",
+    "trapped",
+    "safelydisarmedtrap",
+    "ontrapped",
+    "harvesttrapsouls",
+    "starvedtrapsouls"
+  ],
+  "events_listened": [
+    "timerdone",
+    "ondropped",
+    "onpickup"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      22181,
+      14674,
+      24542,
+      13456,
+      15022,
+      14676,
+      15975
+    ],
+    "aspects": [
+      {
+        "aspect": "战利品生成说明",
+        "evidence": [
+          {
+            "pageid": 14676,
+            "quote": "在捕鸟陷阱中留下随机 1 个该鸟的掉落物。"
+          }
+        ]
+      },
+      {
+        "aspect": "收获操作描述",
+        "evidence": [
+          {
+            "pageid": 14676,
+            "quote": "由于收获捕鸟陷阱时实际上是生成了一个新的鸟或掉落物。"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲状态表述",
+        "evidence": [
+          {
+            "pageid": 14676,
+            "quote": "放在地上且未触发的捕鸟陷阱"
+          }
+        ]
+      },
+      {
+        "aspect": "陷阱触发机制",
+        "evidence": [
+          {
+            "pageid": 14674,
+            "quote": "一旦这些生物从陷阱附近通过，就会触发陷阱"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "陷阱",
+    "诱饵",
+    "捕捉",
+    "收获",
+    "触发",
+    "饥饿",
+    "灵魂",
+    "战利品",
+    "设置",
+    "重置"
+  ],
+  "gameplay_tags": [
+    "捕捉",
+    "生存",
+    "陷阱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8bd660e63d2c27a255d9a8da56ff2e34a419286cd48b5098492350b7283f8f0a",
+    "source_bytes": 14241,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097807105
+  }
+}

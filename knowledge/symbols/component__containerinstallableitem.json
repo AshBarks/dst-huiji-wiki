@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/containerinstallableitem.lua"
+  },
+  "category": "component",
+  "display_name": "containerinstallableitem",
+  "summary": "该组件管理可安装到容器中的物品的安装与卸载状态。当物品被放入库存或容器时，它可能被安装到目标容器；当物品被丢弃或移动时，可能被卸载。组件通过事件监听和回调函数处理安装和卸载逻辑，用于实现装备替换、道具管理等核心玩法。",
+  "api": [
+    {
+      "name": "SetValidContainerFn",
+      "effect": "设置一个函数用于验证容器是否有效。该函数将在IsValidContainer方法中被调用，用于自定义容器验证逻辑。"
+    },
+    {
+      "name": "IsValidContainer",
+      "effect": "检查给定容器实例是否有效。如果设置了validcontainerfn，则调用该函数进行验证；否则默认返回true。"
+    },
+    {
+      "name": "GetValidOpenContainer",
+      "effect": "获取给定执行者打开的有效容器。遍历执行者打开的容器列表，返回第一个非只读且有效的容器实例，如果没有则返回nil。"
+    },
+    {
+      "name": "SetInstalledFn",
+      "effect": "设置物品安装时的回调函数。该函数将在OnInstalled方法中被调用，参数为物品实例和目标。"
+    },
+    {
+      "name": "SetUninstalledFn",
+      "effect": "设置物品卸载时的回调函数。该函数将在OnUninstalled方法中被调用，参数为物品实例和目标。"
+    },
+    {
+      "name": "SetUseDeferredUninstall",
+      "effect": "启用或禁用延迟卸载功能。启用时移除exitlimbo事件监听，允许卸载在安装之后发生；禁用时恢复监听。"
+    },
+    {
+      "name": "OnInstalled",
+      "effect": "在目标上安装物品。调用oninstalledfn回调函数（如果已设置），并向目标推送'containerinstalleditem'事件，传递物品实例。"
+    },
+    {
+      "name": "OnUninstalled",
+      "effect": "在目标上卸载物品。调用onuninstalledfn回调函数（如果已设置），并向目标推送'containeruninstalleditem'事件，传递物品实例。"
+    }
+  ],
+  "events_published": [
+    "containerinstalleditem",
+    "containeruninstalleditem"
+  ],
+  "events_listened": [
+    "onputininventory",
+    "ondropped",
+    "exitlimbo"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      16419,
+      28744,
+      72238,
+      27530,
+      18359,
+      19129,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "容器使用权限限制",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "只有WX-78、备份底盘和附身底盘可以使用。"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板卸载损耗机制",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "可以随意拔下任意一种电路板中最上方的一个，电路板被拔下后损失 12.5% 耐久"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板安装激活机制",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "电路板可以插入WX-78的底盘，只要WX-78具有足够的电荷，就能将插入的电路板激活来产生对应的增益。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "安装",
+    "卸载",
+    "容器",
+    "物品",
+    "装备",
+    "插槽",
+    "替换",
+    "延迟",
+    "开放容器",
+    "有效容器"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "33a8a9bfc9e3cbabb09fd0173c6875a55eaed42842819c771507202b372109aa",
+    "source_bytes": 4228,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106297247
+  }
+}

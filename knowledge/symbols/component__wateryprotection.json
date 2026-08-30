@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wateryprotection.lua"
+  },
+  "category": "component",
+  "display_name": "wateryprotection",
+  "summary": "wateryprotection组件管理水对实体的保护效果数据，包括防止枯萎时间、温度降低、冷度添加、湿度增加等。它参与核心玩法中的浇水或水相关机制，可用于灭火、帮助植物生长、影响实体温度和湿度。",
+  "api": [
+    {
+      "name": "AddIgnoreTag(tag)",
+      "effect": "向忽略标签列表添加指定标签，以排除某些实体不受保护效果影响。检查标签是否已存在以避免重复添加。"
+    },
+    {
+      "name": "ApplyProtectionToEntity(ent, noextinguish)",
+      "effect": "对目标实体应用保护效果。如果实体有burnable组件，根据witherabletectiontime属性保护枯萎状态，根据extinguish属性和extinguishheatpercent灭火。添加冷度、降低温度、增加湿度等。noextinguish参数为true时跳过灭火操作。"
+    },
+    {
+      "name": "SpreadProtectionAtPoint(x, y, z, dist, noextinguish)",
+      "effect": "在指定坐标点传播保护效果到指定距离内的所有实体（排除ignoretags中的标签）。对每个实体调用ApplyProtectionToEntity。如果addwetness大于0，更新该点土壤湿度。如果onspreadprotectionfn回调函数存在则调用。"
+    },
+    {
+      "name": "SpreadProtection(inst, dist, noextinguish)",
+      "effect": "在指定实体的当前位置传播保护效果。获取实体世界坐标并调用SpreadProtectionAtPoint。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      14485,
+      13268,
+      20704,
+      16598,
+      46793,
+      19129,
+      34954
+    ],
+    "aspects": [
+      {
+        "aspect": "防水效果减免限制",
+        "evidence": [
+          {
+            "pageid": 16598,
+            "quote": "冰帽带来的潮湿度增加不能被[[防水]]效果减免。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "浇水",
+    "灭火",
+    "降温",
+    "湿度",
+    "枯萎保护",
+    "水效果",
+    "浇水器",
+    "温度降低",
+    "土壤湿润"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "农业",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9f09221e5ef081253e0e4d659bbd49ac61faf3512b849c80929ab8aec74d091d",
+    "source_bytes": 2172,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093239843
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/upgrademoduleowner.lua"
+  },
+  "category": "component",
+  "display_name": "upgrademoduleowner",
+  "summary": "UpgradeModuleOwner组件管理实体上的升级模块安装槽，控制模块的激活与停用，管理充电等级，并支持模块的交换和检查操作。它用于支持模块化升级系统，允许实体根据充电能力激活不同模块。",
+  "api": [
+    {
+      "name": "StartInspecting",
+      "effect": "开始检查模块过程，播放'open'声音，添加'inspectingupgrademodules'标签，设置inspecting为true，记录检查者。如果检查者有HUD，则显示升级模块界面。"
+    },
+    {
+      "name": "StopInspecting",
+      "effect": "停止检查模块过程，播放'close'声音，移除'inspectingupgrademodules'标签，设置inspecting为false，关闭升级模块界面，并清除检查者。"
+    },
+    {
+      "name": "GetModuleTypeCount",
+      "effect": "获取指定类型模块在充电等级内的数量。遍历所有模块条，基于剩余充电等级计算指定类型模块数。"
+    },
+    {
+      "name": "GetUsedSlotCount",
+      "effect": "获取指定类型模块条已使用的槽位数，累加该条中所有模块的槽位消耗。"
+    },
+    {
+      "name": "GetAllModules",
+      "effect": "获取所有模块的列表，返回所有模块条中所有模块的集合。"
+    },
+    {
+      "name": "GetModules",
+      "effect": "获取指定类型模块条的模块列表，返回该条中所有模块。"
+    },
+    {
+      "name": "GetNumModules",
+      "effect": "获取指定类型模块的数量，返回该条中模块的数量。"
+    },
+    {
+      "name": "GetModule",
+      "effect": "获取指定类型和索引的模块，返回该条中指定索引的模块。"
+    },
+    {
+      "name": "NumModules",
+      "effect": "已弃用方法，固定返回0。"
+    },
+    {
+      "name": "CanUpgrade",
+      "effect": "检查是否可以升级指定模块实例，调用自定义canupgradefn函数（如果存在），否则返回true。"
+    },
+    {
+      "name": "UpdateActivatedModules",
+      "effect": "更新所有模块的激活状态，根据充电等级和防止自动激活设置，遍历模块条并尝试激活或停用模块。"
+    },
+    {
+      "name": "SetAutomaticModuleActivations",
+      "effect": "设置是否允许自动激活模块，更新prevent_automatic_module_activations标志，并重新调用UpdateActivatedModules。"
+    },
+    {
+      "name": "PushModule",
+      "effect": "添加模块到指定类型条（如果未指定则使用模块自身类型），设置模块目标，作为子实体，更新激活状态，并触发onmoduleadded回调。"
+    },
+    {
+      "name": "PopModule",
+      "effect": "移除指定类型和索引的模块，返回模块和是否激活状态，触发onmoduleremoved回调，并重新更新激活状态。"
+    },
+    {
+      "name": "FindAndPopModule",
+      "effect": "查找并移除指定模块实例，遍历所有模块条找到匹配模块后调用PopOneModule。"
+    },
+    {
+      "name": "PopAllModules",
+      "effect": "移除所有模块或指定类型条的所有模块，返回移除的模块列表，并触发onallmodulespopped回调。"
+    },
+    {
+      "name": "PopOneModule",
+      "effect": "移除指定类型和索引的一个模块（已弃用能量成本处理），触发ononemodulepopped回调，并返回0。"
+    },
+    {
+      "name": "SetMaxCharge",
+      "effect": "设置最大充电等级，如果新等级降低，则移除超过新充电等级的多余模块。"
+    },
+    {
+      "name": "SetChargeLevel",
+      "effect": "设置充电等级，范围在0到最大充电等级之间，如果等级变化则更新激活模块。"
+    },
+    {
+      "name": "DoDeltaCharge",
+      "effect": "增加充电等级指定值n，调用SetChargeLevel实现。"
+    },
+    {
+      "name": "AddCharge",
+      "effect": "DoDeltaCharge的别名，用于向后兼容。"
+    },
+    {
+      "name": "IsRealChargeMaxed",
+      "effect": "检查充电是否真正满（不考虑override设置），返回当前充电等级是否等于最大充电等级。"
+    },
+    {
+      "name": "IsChargeMaxed",
+      "effect": "检查充电是否满（考虑override设置），返回当前有效充电等级是否等于最大充电等级。"
+    },
+    {
+      "name": "ChargeIsMaxed",
+      "effect": "IsChargeMaxed的别名，用于向后兼容。"
+    },
+    {
+      "name": "IsChargeEmpty",
+      "effect": "检查充电是否为空，返回当前充电等级是否为0。"
+    },
+    {
+      "name": "GetChargeLevel",
+      "effect": "获取当前充电等级，如果overridefullcharge为true则返回最大充电等级，否则返回实际充电等级。"
+    },
+    {
+      "name": "GetMaxChargeLevel",
+      "effect": "获取最大充电等级，返回self.max_charge值。"
+    },
+    {
+      "name": "SetOverrideFullCharge",
+      "effect": "设置是否覆盖为满充电，更新overridefullcharge标志，并重新更新激活模块。"
+    },
+    {
+      "name": "IsSwapping",
+      "effect": "检查是否在交换模块过程中，返回self.is_swapping标志。"
+    },
+    {
+      "name": "SwapUpgradeModules",
+      "effect": "与另一个拥有者交换所有模块，设置is_swapping标志，交换双方所有模块后清除标志。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，返回包含模块条和充电等级的数据，以及模块引用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，设置充电等级并恢复模块，标记为加载状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "获取调试字符串，返回充电等级和各模块条中模块的信息。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "energylevelupdate"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WX78_INITIAL_MAXCHARGELEVEL"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      71461,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录描述了备份底盘的容器属性和附身底盘的攻击行为，但未涉及升级模块、充电管理或相关组件能力，如模块操作、充电控制等在清单中的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "模块升级",
+    "充电等级",
+    "安装槽位",
+    "激活停用",
+    "模块交换",
+    "检查模块",
+    "升级能力",
+    "模块系统"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "升级",
+    "模块",
+    "能量管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4871832cf2ffb4ecfde8cecacfedc994a9b082893421ed171067de8e281c0c92",
+    "source_bytes": 15386,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097852834
+  }
+}

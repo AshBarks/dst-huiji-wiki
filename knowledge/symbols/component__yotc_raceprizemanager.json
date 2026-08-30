@@ -1,0 +1,202 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotc_raceprizemanager.lua"
+  },
+  "category": "component",
+  "display_name": "yotc_raceprizemanager",
+  "summary": "该组件管理饥荒联机版中赛车比赛的奖品系统，负责追踪赛车手注册、比赛进程、检查点记录以及根据比赛成绩分配奖品。核心玩法是玩家控制赛车手参与竞赛，通过完成比赛获得奖励（如幸运金块），组件确保奖品发放的公平性与比赛状态的协调。",
+  "api": [
+    {
+      "name": "GivePrizes",
+      "effect": "根据比赛结果计算并分配奖品给赛车手。一等奖根据参与度和距离奖励多个幸运金块，安慰奖固定为1个幸运金块。触发奖品变化事件。"
+    },
+    {
+      "name": "HasPrizeAvailable",
+      "effect": "检查当前世界周期内奖品是否可用，返回布尔值。基于内部奖品日期与世界周期比较。"
+    },
+    {
+      "name": "RegisterRacer",
+      "effect": "将赛车手注册到指定起点开始的比赛中。如果赛车手有训练师或为幽灵赛车手，且未参加其他比赛，则注册成功。返回是否成功及同一训练师的旧赛车手（如有）。"
+    },
+    {
+      "name": "racethemecheck",
+      "effect": "检查所有赛车手的音乐状态，设置为比赛状态。如果无比赛进行，则取消定期检查任务。"
+    },
+    {
+      "name": "BeginRace",
+      "effect": "开始指定起点的比赛。设置比赛开始标志，并触发比赛开始事件。如果无音乐任务，则启动定期检查音乐状态的任务。"
+    },
+    {
+      "name": "GetRaceIdByRacer",
+      "effect": "根据赛车手获取其所属比赛的ID。遍历所有比赛查找，返回匹配的起点实体。"
+    },
+    {
+      "name": "GetRaceByRacer",
+      "effect": "根据赛车手获取其所属比赛的数据表。遍历所有比赛查找，返回匹配的比赛数据。"
+    },
+    {
+      "name": "GetRaceById",
+      "effect": "根据比赛ID（起点实体）获取对应的比赛数据表。直接返回内部存储的比赛数据。"
+    },
+    {
+      "name": "IsRaceUnderway",
+      "effect": "检查指定起点的比赛是否正在进行。返回比赛数据存在且已开始标志为真的布尔值。"
+    },
+    {
+      "name": "EndOfRace",
+      "effect": "结束指定ID的比赛。设置所有赛车手音乐状态为无，触发检查点结束事件，清理比赛数据并移除比赛条目。"
+    },
+    {
+      "name": "RemoveRacer",
+      "effect": "从比赛中移除赛车手。设置赛车手音乐状态为无，调整比赛赛车手计数，如果比赛未开始则减少计数。如果比赛无剩余赛车手或所有赛车手完成，则结束比赛并分配奖品。"
+    },
+    {
+      "name": "RegisterCheckpoint",
+      "effect": "将检查点注册到赛车手所属比赛的检查点列表中。更新比赛数据以记录检查点。"
+    },
+    {
+      "name": "RacerFinishedRace",
+      "effect": "标记赛车手完成比赛。记录第一名并更新完成计数。如果所有赛车手完成，则分配奖品并结束比赛。返回是否为第一名的布尔值。"
+    },
+    {
+      "name": "IsFirstPlaceRacer",
+      "effect": "检查赛车手是否为比赛的第一名。返回比赛数据存在、无结果且第一名字段匹配的布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回包含奖品日期数据的表。用于持久化内部奖品日期。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载组件状态，根据保存的数据恢复奖品日期。处理旧版数据兼容性，并触发奖品变化事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前奖品日期。用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "yotc_ratraceprizechange",
+    "yotc_racebegun",
+    "yotc_race_over"
+  ],
+  "events_listened": [
+    "cycles"
+  ],
+  "netvars": [],
+  "tunables": [
+    "YOTC_RACER_CHECKPOINT_FIND_DIST",
+    "YOTC_RACE_MAX_DISTANCE_REWARDS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18521,
+      51524,
+      33950,
+      51489,
+      52019,
+      15022,
+      15526,
+      14815
+    ],
+    "aspects": [
+      {
+        "aspect": "奖品分发机制",
+        "evidence": [
+          {
+            "pageid": 52019,
+            "quote": "分发奖品"
+          },
+          {
+            "pageid": 15526,
+            "quote": "奖品分发之后都会获得随机的四个时装款式碎片。"
+          }
+        ]
+      },
+      {
+        "aspect": "检查点生成与作用",
+        "evidence": [
+          {
+            "pageid": 51524,
+            "quote": "起点塔初次部署时会生成 3 个检查点"
+          },
+          {
+            "pageid": 33950,
+            "quote": "检查点用于延长赛道"
+          },
+          {
+            "pageid": 51489,
+            "quote": "比赛检查点由玩家或起点塔投掷比赛检查点套装生成"
+          }
+        ]
+      },
+      {
+        "aspect": "比赛开启触发条件",
+        "evidence": [
+          {
+            "pageid": 51524,
+            "quote": "玩家需要激活起点塔来开启龙蝇舟比赛。"
+          },
+          {
+            "pageid": 33950,
+            "quote": "起点用于开启胡萝卜鼠跑步比赛"
+          },
+          {
+            "pageid": 52019,
+            "quote": "必须开启皮弗娄牛之年才能进行比赛。"
+          }
+        ]
+      },
+      {
+        "aspect": "比赛结束条件",
+        "evidence": [
+          {
+            "pageid": 33950,
+            "quote": "当所有的胡萝卜鼠到达终点线时，比赛结束。"
+          },
+          {
+            "pageid": 52019,
+            "quote": "都会立刻结束比赛"
+          }
+        ]
+      },
+      {
+        "aspect": "第一名判定相关",
+        "evidence": [
+          {
+            "pageid": 52019,
+            "quote": "如果没猜中第一名的皮弗娄牛"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "赛车",
+    "奖品",
+    "比赛",
+    "注册",
+    "赛车手",
+    "检查点",
+    "幸运金块",
+    "音乐",
+    "开始",
+    "结束"
+  ],
+  "gameplay_tags": [
+    "竞赛",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "070a1fe79dcaf34ddc7b99d228dc7b30869d50bd12bccfee56e9033dc59e794e",
+    "source_bytes": 9105,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114677946
+  }
+}

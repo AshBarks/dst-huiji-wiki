@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ambientlighting.lua"
+  },
+  "category": "component",
+  "display_name": "ambientlighting",
+  "summary": "ambientlighting组件管理游戏世界的环境光照系统，根据时间、季节、月相和天气动态调整光照颜色与强度。它处理玩家夜视效果，并支持屏幕闪烁等视觉特效，是昼夜循环和视觉表现的核心组成部分。",
+  "api": [
+    {
+      "name": "GetVisualAmbientValue",
+      "effect": "返回当前视觉环境光照值，基于当前颜色、亮度百分比和闪烁状态计算。该值用于渲染系统或界面显示。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新组件状态，执行颜色插值和闪烁处理，平滑过渡光照变化。当所有过渡完成时，停止更新循环。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新，跳过所有未完成的颜色过渡和闪烁效果，直接设置最终状态并停止更新。通常在游戏暂停或时间快速流逝时调用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "phasechanged",
+    "moonphasechanged2",
+    "weathertick",
+    "screenflash",
+    "seasontick",
+    "playeractivated",
+    "playerdeactivated",
+    "overrideambientlighting",
+    "continuefrompause"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65505,
+      22522,
+      13570,
+      15137,
+      34523,
+      13569,
+      65456,
+      13406
+    ],
+    "aspects": [
+      {
+        "aspect": "光照强度随时间变化",
+        "evidence": [
+          {
+            "pageid": 65505,
+            "quote": "其光照随着一天所处的时间段变化。"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却状态定时更新",
+        "evidence": [
+          {
+            "pageid": 65505,
+            "quote": "于冷却状态，会在 5 ~ 10 种后"
+          }
+        ]
+      },
+      {
+        "aspect": "视野激活机制",
+        "evidence": [
+          {
+            "pageid": 65505,
+            "quote": "当进入玩家视野后，会被激活"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "环境光照",
+    "昼夜循环",
+    "夜视效果",
+    "天气颜色",
+    "月相变化",
+    "闪烁",
+    "季节调整",
+    "洞穴光照",
+    "满月",
+    "颜色插值"
+  ],
+  "gameplay_tags": [
+    "环境",
+    "光照",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "69e2efe8edc2e07599b034717a04d30a2ed253a73fd482f953128e02a5ef5498",
+    "source_bytes": 13963,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105110775
+  }
+}

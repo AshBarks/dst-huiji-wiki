@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/caveins.lua"
+  },
+  "category": "component",
+  "display_name": "caveins",
+  "summary": "CaveIns组件在客户端管理由服务器同步的塌方事件目标列表，并负责在这些目标位置生成视觉预警效果和最终的塌方攻击（地震、落石）。它主要处理来自'沉坑'系统的事件数据，并将其实例化为玩家可见的游戏效果，如屏幕震动、碎片生成和角色语音警告。",
+  "api": [],
+  "api_note": "纯数据与客户端效果执行组件，其核心逻辑（接收服务器指令并生成特效）由内部的 'OnSinkholesUpdate' 事件处理器和 'OnUpdate' 函数驱动，未暴露任何公开的可调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "secondary_sinkholesupdate"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19776,
+      22611,
+      18474,
+      52220,
+      15022,
+      19872,
+      52773,
+      17809
+    ],
+    "aspects": [
+      {
+        "aspect": "地震发生频率描述",
+        "evidence": [
+          {
+            "pageid": 19776,
+            "quote": "地震每隔 1 到 3 天发生一次"
+          }
+        ]
+      },
+      {
+        "aspect": "地震期间落石生成机制",
+        "evidence": [
+          {
+            "pageid": 19776,
+            "quote": "[[裂隙（暗影）|裂隙]]存在时，位于玩家角色周围 4 单位以内的掉落物将有 {{幸运影响|10% 概率|id=luck_fall}}被[[落石|岩石]]…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "塌方",
+    "落石",
+    "地震",
+    "预警",
+    "沉坑",
+    "屏幕震动",
+    "碎片",
+    "语音警告"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d7571773b103cf13f3fcfd9df5b0f667bd4b784472b68b031a8c75bb53c82423",
+    "source_bytes": 6979,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105918691
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wobyrack.lua"
+  },
+  "category": "component",
+  "display_name": "wobyrack",
+  "summary": "WobyRack组件是干燥架组件的变体，继承自DryingRack。它管理一个与Wooby角色关联的容器，用于存放和干燥物品，扩展了游戏中的干燥架玩法。",
+  "api": [],
+  "api_note": "源码中未定义任何公共方法，仅包含继承调用和私有调试函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      70462,
+      20704,
+      14699,
+      18572,
+      22465,
+      39296,
+      15885
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未找到与 component__wobyrack 相关的任何能力讨论；代码能力/行为语义清单未提供，无法匹配能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "干燥架",
+    "Wooby",
+    "容器",
+    "干燥",
+    "储物",
+    "保鲜",
+    "食物处理",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "制作",
+    "储物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "143f54aa4622ad81ce5b6f396a4c9dd6858f92397ae7b8718cff86762e2e4909",
+    "source_bytes": 374,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097942475
+  }
+}

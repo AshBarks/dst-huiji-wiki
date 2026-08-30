@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/occupier.lua"
+  },
+  "category": "component",
+  "display_name": "occupier",
+  "summary": "Occupier 组件管理实体的所有者关系数据。它通过 SetOwner 和 GetOwner 方法设置和检索所有者实体。在游戏中，这常用于维护宠物、坐骑或随从的控制状态。",
+  "api": [
+    {
+      "name": "GetOwner",
+      "effect": "返回当前所有者实体（self.owner），仅读取数据，无副作用。"
+    },
+    {
+      "name": "SetOwner",
+      "effect": "设置当前所有者为给定的 owner 实体，更新组件的所有者属性，改变占用状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      16419,
+      72314,
+      72299,
+      20714,
+      13701,
+      16630,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "独奏乐器雇佣随从设置所有权",
+        "evidence": [
+          {
+            "pageid": 16630,
+            "quote": "玩家装备独奏乐器后，如果雇佣的猪人、兔人和鱼人族数量不足 10 个，则会雇佣玩家 12 距离单位内的猪人、兔人和鱼人"
+          }
+        ]
+      },
+      {
+        "aspect": "附身底盘的跟随所有者",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "附身底盘平时跟随在玩家身边。"
+          }
+        ]
+      },
+      {
+        "aspect": "随从与领袖的基本关系",
+        "evidence": [
+          {
+            "pageid": 72299,
+            "quote": "随从会追随它的领袖。领袖既可以是玩家，也可以是其他生物，甚至可以是[[物品]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "占用",
+    "所有者",
+    "控制",
+    "宠物",
+    "骑乘",
+    "随从",
+    "拥有",
+    "管理",
+    "关系"
+  ],
+  "gameplay_tags": [
+    "控制",
+    "关系"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "15fb5a85efc7d4244ea59ab1482785285abd8c38ddb44417ad6d24187ce32f2d",
+    "source_bytes": 244,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095765398
+  }
+}

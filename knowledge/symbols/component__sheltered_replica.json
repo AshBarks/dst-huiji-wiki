@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sheltered_replica.lua"
+  },
+  "category": "component",
+  "display_name": "sheltered_replica",
+  "summary": "该组件管理实体的阴影遮蔽状态，控制从完全暴露到被遮蔽的平滑视觉过渡。核心玩法是模拟环境遮蔽对实体外观的影响，例如在树下或建筑物下获得阴影效果，增强游戏世界的环境真实感。",
+  "api": [
+    {
+      "name": "StartSheltered",
+      "effect": "开始遮蔽状态，将内部遮蔽标志设置为true，并触发阴影检查以更新目标阴影值。"
+    },
+    {
+      "name": "StopSheltered",
+      "effect": "停止遮蔽状态，将内部遮蔽标志设置为false，并触发阴影检查以更新目标阴影值。"
+    },
+    {
+      "name": "IsSheltered",
+      "effect": "返回当前是否处于遮蔽状态，基于内部标志值和实际阴影值是否小于等于遮蔽阈值判断。"
+    },
+    {
+      "name": "CheckShade",
+      "effect": "根据遮蔽标志设置目标阴影值，并根据当前阴影与目标的差异决定是否启动或停止组件更新，以实现平滑过渡。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "在每帧更新时，逐步调整当前阴影值向目标值靠近，并覆盖实体动画状态的阴影覆盖。当阴影达到目标值时停止更新。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "issheltereddirty"
+  ],
+  "netvars": [
+    "_issheltered"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21415,
+      19769,
+      19287,
+      19303,
+      19300,
+      19304,
+      19720,
+      17848
+    ],
+    "aspects": [
+      {
+        "aspect": "荫蔽状态效果描述",
+        "evidence": [
+          {
+            "pageid": 21415,
+            "quote": "当玩家位于荫蔽下时，会获得 180 的隔热和 35% 的[[防水|防雨]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "遮蔽",
+    "阴影",
+    "荫蔽",
+    "庇护",
+    "shelter",
+    "shade",
+    "环境效果",
+    "视觉过渡",
+    "状态更新",
+    "动画覆盖"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37bdbcc19ef10d45059575ace90a430abd0cf134b7165246c8d88836ce6ab131",
+    "source_bytes": 2423,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112480044
+  }
+}

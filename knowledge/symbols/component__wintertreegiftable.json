@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wintertreegiftable.lua"
+  },
+  "category": "component",
+  "display_name": "wintertreegiftable",
+  "summary": "WinterTreeGiftable组件用于追踪圣诞树礼物赠送的时间数据。它记录上次赠送礼物的游戏世界周期，并计算自上次赠送以来的天数。这支持礼物赠送的冷却机制，防止玩家频繁获取奖励。",
+  "api": [
+    {
+      "name": "GetDaysSinceLastGift",
+      "effect": "计算当前世界周期与上次赠送日期之间的差值并返回天数。无任何副作用。"
+    },
+    {
+      "name": "OnGiftGiven",
+      "effect": "将内部记录的上次赠送日期更新为当前世界周期。无返回值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个包含previousgiftday字段的数据表，用于保存组件状态到存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从给定的数据表中读取previousgiftday字段，恢复组件状态。无返回值。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      47083,
+      18359,
+      23188,
+      13701,
+      51046,
+      15922,
+      22094,
+      18939
+    ],
+    "aspects": [
+      {
+        "aspect": "送礼行为触发描述",
+        "evidence": [
+          {
+            "pageid": 18939,
+            "quote": "玩家可以在[[冬季盛宴树]]旁睡觉以获得礼物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "圣诞树",
+    "礼物",
+    "赠送",
+    "冷却",
+    "世界周期",
+    "天数",
+    "上次赠送",
+    "WinterTree",
+    "Gift",
+    "追踪"
+  ],
+  "gameplay_tags": [
+    "节日",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "86c87192e0897752d9d713adf409de02bbcbe70334d194ca6f3a845e5ae25e9d",
+    "source_bytes": 655,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092094907
+  }
+}

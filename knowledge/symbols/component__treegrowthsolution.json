@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/treegrowthsolution.lua"
+  },
+  "category": "component",
+  "display_name": "treegrowthsolution",
+  "summary": "TreeGrowthSolution 组件管理生长溶液的特效预制体，并参与强制生长目标实体的玩法。它允许玩家使用物品加速植物生长，通过检查目标状态并调用生长机制来实现。使用该物品后，物品会被消耗。",
+  "api": [
+    {
+      "name": "GrowTarget",
+      "effect": "检查目标实体是否可生长（排除有'no_force_grow'、'stump'、'fire'、'burnt'标签的目标），若可生长则生成特效预制体（如果指定），并调用目标的生长逻辑（优先调用override_treegrowthsolution_fn，否则调用growable组件的DoGrowth()）。最后减少使用该组件的实体的堆叠大小（若可堆叠且堆叠中）或移除实体。成功时返回true，否则返回false。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      13261,
+      35415,
+      34792,
+      19676,
+      21683,
+      14648,
+      22539
+    ],
+    "aspects": [
+      {
+        "aspect": "催熟多种植物的能力",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "可以催熟[[石果灌木丛]]、[[浆果丛]]、[[多汁浆果丛]]、[[公牛海带]]、[[仙人掌]]、所有[[农作物]]、[[洞穴苔藓]]、[[洞穴香…"
+          }
+        ]
+      },
+      {
+        "aspect": "植物重新生长的时间描述",
+        "evidence": [
+          {
+            "pageid": 21683,
+            "quote": "神秘植物可以获得 1 个[[小发光浆果]]，之后需要 4 天的时间重新生长。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "生长溶液",
+    "强制生长",
+    "加速生长",
+    "树木",
+    "植物",
+    "消耗品",
+    "特效",
+    "堆叠物品",
+    "园艺",
+    "农业"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bbd925e30ef58b71fe825b532416e90b9a276c71cab7a4f2ab6bba2939ba8943",
+    "source_bytes": 1006,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104351805
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/digester.lua"
+  },
+  "category": "component",
+  "display_name": "digester",
+  "summary": "Digester 组件管理消化周期和自定义过滤函数，通过周期性任务自动消耗实体库存中的物品。它监听 'gotnewitem' 事件以在获得新物品时重启消化任务。该组件主要用于模拟生物或物体的消化过程，参与物品消耗和库存管理的玩法。",
+  "api": [
+    {
+      "name": "TryDigest",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "gotnewitem"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15722,
+      28611,
+      72238,
+      13823,
+      16419,
+      10418,
+      13898,
+      15240
+    ],
+    "aspects": [
+      {
+        "aspect": "再消化电路的消化功能描述",
+        "evidence": [
+          {
+            "pageid": 72238,
+            "quote": "当激活了[[再消化电路]]时，若物品栏中有能令[[再消化电路]]生效的食物（食物种类受领袖的技能树影响），吃掉其中在…"
+          }
+        ]
+      },
+      {
+        "aspect": "巨大洞穴蠕虫咀嚼和消化的动作描述",
+        "evidence": [
+          {
+            "pageid": 28611,
+            "quote": "吞食后，巨大洞穴蠕虫会在钻出地面之后停止移动进行咀嚼和消化动作"
+          }
+        ]
+      },
+      {
+        "aspect": "眼球草消化曼德拉草的行为描述",
+        "evidence": [
+          {
+            "pageid": 13898,
+            "quote": "[[眼球草]]能采摘曼德拉草，随后消化掉物品曼德拉草"
+          }
+        ]
+      },
+      {
+        "aspect": "食人花消化物品的行为描述",
+        "evidence": [
+          {
+            "pageid": 15722,
+            "quote": "食人花每 20 秒进行一次消化，按传输到达的先后顺序消化 1 个物品。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "消化器",
+    "消化",
+    "周期任务",
+    "自动消耗",
+    "过滤函数",
+    "事件监听",
+    "模拟消化"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/7)",
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6879c72c61c9e577b92f71baeb3d5b54c8eed6f5ba1097d5f791e3b97e119e14",
+    "source_bytes": 1022,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788099486532
+  }
+}

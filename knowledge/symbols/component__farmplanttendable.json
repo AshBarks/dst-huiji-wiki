@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/farmplanttendable.lua"
+  },
+  "category": "component",
+  "display_name": "farmplanttendable",
+  "summary": "该组件管理农场植物的可照料状态，通过 `tendable` 布尔值追踪植物是否可被照料。核心玩法中，玩家可以照料植物以促进生长，是农场系统的重要组成部分。",
+  "api": [
+    {
+      "name": "SetTendable",
+      "effect": "设置植物的可照料状态，将 `tendable` 字段设置为给定值，可能改变植物是否可被照料。"
+    },
+    {
+      "name": "TendTo",
+      "effect": "执行照料行为：如果植物可照料（`tendable` 为 true）且存在照料回调函数（`ontendtofn`）并返回 true，则将 `tendable` 设为 false（消耗照料机会），返回 true 表示成功；否则不执行任何操作。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回一个包含当前 `tendable` 值的表，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，从给定数据中恢复 `tendable` 值，用于读档。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21485,
+      14484,
+      14712,
+      13261,
+      18234,
+      21416,
+      10355,
+      24807
+    ],
+    "aspects": [
+      {
+        "aspect": "角色自动照料农作物能力",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "此外沃姆伍德会持续<!--每 0.5 秒进行一次-->[[照料]] 4 {{解释|距离单位}}内的农作物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "照料",
+    "农场植物",
+    "tend",
+    "可照料",
+    "种植",
+    "生长",
+    "farmplant",
+    "tendable"
+  ],
+  "gameplay_tags": [
+    "农场",
+    "种植",
+    "照料"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0f233fd47219bf25525f93f898490d46c77d2fbad6eb39f6018eb0b882a0feab",
+    "source_bytes": 842,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107301630
+  }
+}

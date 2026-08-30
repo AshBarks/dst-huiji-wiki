@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/raindome.lua"
+  },
+  "category": "component",
+  "display_name": "raindome",
+  "summary": "raindome组件管理雨穹顶的半径和启用状态，通过网络变量同步活动半径到客户端。它周期性地更新范围内的实体，为它们添加rainimmunity组件以提供雨天防护，参与生存玩法中的局部天气保护机制。",
+  "api": [
+    {
+      "name": "GetRainDomesAtXZ",
+      "effect": "全局函数，返回在世界坐标(x,z)处、活动半径内的雨穹顶实体列表。执行空间查询并过滤掉距离超出各自半径的实体。"
+    },
+    {
+      "name": "IsUnderRainDomeAtXZ",
+      "effect": "全局函数，检查世界坐标(x,z)是否在任何雨穹顶的活动半径内，返回布尔值。"
+    },
+    {
+      "name": "GetActiveRadius",
+      "effect": "返回当前雨穹顶的活动半径（网络同步值），用于外部查询。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置雨穹顶的基础半径，仅在主模拟器上生效。不直接改变活动半径，需配合Enable/Disable使用。"
+    },
+    {
+      "name": "Enable",
+      "effect": "启用雨穹顶：设置活动半径为基础半径，添加'raindome'标签，开始周期更新，并注册活动半径到全局注册表。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用雨穹顶：设置活动半径为0，移除'raindome'标签，停止周期更新，从全局注册表注销活动半径，并移除所有目标的雨免疫。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体移除时，从全局注册表中注销其当前活动半径。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "_activeradiusdirty"
+  ],
+  "netvars": [
+    "_activeradius"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      19754,
+      21063,
+      16605,
+      14099,
+      20714,
+      22418,
+      14463
+    ],
+    "aspects": [
+      {
+        "aspect": "玩家位于穹顶下的条件描述",
+        "evidence": [
+          {
+            "pageid": 22418,
+            "quote": "如果玩家装备暗影伞、位于暗影伞生成的穹顶之中，可完全免受以下全部影响"
+          }
+        ]
+      },
+      {
+        "aspect": "穹顶展开行为的描述",
+        "evidence": [
+          {
+            "pageid": 19754,
+            "quote": "将暗影伞放在地上并右键打开，会展开暗影穹顶"
+          }
+        ]
+      },
+      {
+        "aspect": "穹顶活动半径的数值标注",
+        "evidence": [
+          {
+            "pageid": 19754,
+            "quote": "能在半径为16距离单位的圆内完全消除降水和酸雨的影响"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "雨穹顶",
+    "雨免疫",
+    "半径",
+    "防护罩",
+    "天气保护",
+    "雨天",
+    "免疫来源",
+    "穹顶"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "防护"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3acc87333544e222229b5ad78d904267b3db2f2ecd4a66c8fbe9325c6775a451",
+    "source_bytes": 5505,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102896239
+  }
+}

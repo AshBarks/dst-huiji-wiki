@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/transparentonsanity.lua"
+  },
+  "category": "component",
+  "display_name": "transparentonsanity",
+  "summary": "该组件管理实体的透明度，基于客户端玩家的理智值或战斗目标关系，使实体在特定条件下变得透明或半透明。它通过每帧更新动画颜色和音量实现平滑过渡，参与饥荒中的幻觉或理智相关玩法。组件仅客户端逻辑，不涉及服务器。",
+  "api": [
+    {
+      "name": "OnEntitySleep",
+      "effect": "停止实体更新，避免不必要的计算。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "启动更新循环，并立即设置透明度以响应状态变化。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "渐变调整alpha值，影响实体可见性和音量。"
+    },
+    {
+      "name": "ForceUpdate",
+      "effect": "瞬间设置alpha值，触发动画颜色和音量更新。"
+    },
+    {
+      "name": "CalcaulteTargetAlpha",
+      "effect": "读取玩家副本数据（如理智值、战斗目标），返回0到most_alpha之间的值。"
+    },
+    {
+      "name": "DoUpdate",
+      "effect": "修改动画颜色和音量，可能触发onalphachangedfn回调；更新实体视觉和音频效果。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "无副作用，仅用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15245,
+      18234,
+      13437,
+      16419,
+      10374,
+      16197,
+      13139,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "树精守卫沉睡效果",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "使[[树精守卫]]沉睡 1000 秒。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "透明度",
+    "理智",
+    "幻觉",
+    "动画颜色",
+    "平滑过渡",
+    "客户端",
+    "战斗目标",
+    "音量",
+    "每帧更新"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "幻觉",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
+    "source_bytes": 2321,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090399096
+  }
+}

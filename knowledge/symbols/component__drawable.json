@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/drawable.lua"
+  },
+  "category": "component",
+  "display_name": "drawable",
+  "summary": "Drawable 组件管理实体的可绘制状态和图像数据，包括前景和背景的图像及图集名称。它通过添加或移除 'drawable' 标签来控制实体是否可被绘制，并支持动态设置和更新视觉外观，常用于装饰物或用户自定义内容。",
+  "api": [
+    {
+      "name": "SetCanDraw",
+      "effect": "设置实体的可绘制状态。如果 candraw 为 true，添加 'drawable' 标签；如果为 false，移除该标签。"
+    },
+    {
+      "name": "CanDraw",
+      "effect": "返回实体当前的可绘制状态，即 candraw 的值。"
+    },
+    {
+      "name": "SetOnDrawnFn",
+      "effect": "设置当实体被绘制时调用的回调函数。回调函数接收参数：inst, imagename, imagesource, atlasname, bgimagename, bgatlasname。"
+    },
+    {
+      "name": "OnDrawn",
+      "effect": "处理绘制事件。将空字符串参数视为 nil，并更新内部图像信息。如果任何图像信息发生变化，则触发回调函数 ondrawnfn。"
+    },
+    {
+      "name": "GetImage",
+      "effect": "返回当前设置的前景图像名（imagename）。"
+    },
+    {
+      "name": "GetAtlas",
+      "effect": "返回当前设置的前景图集名（atlasname）。"
+    },
+    {
+      "name": "GetBGImage",
+      "effect": "返回当前设置的背景图像名（bgimagename）。"
+    },
+    {
+      "name": "GetBGAtlas",
+      "effect": "返回当前设置的背景图集名（bgatlasname）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，移除实体的 'drawable' 标签。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回可保存的数据表，包含 image、atlas、bgimage、bgatlas 字段；如果 imagename 为 nil，则返回 nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据加载图像信息，调用 OnDrawn 方法设置图像。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18075,
+      18524,
+      71471,
+      20119,
+      20438,
+      20674,
+      22522,
+      24901
+    ],
+    "aspects": [
+      {
+        "aspect": "可自定义外观",
+        "evidence": [
+          {
+            "pageid": 71471,
+            "quote": "B.U.D.D.Y.具有可自定义的多种外观"
+          }
+        ]
+      },
+      {
+        "aspect": "外观变化效果",
+        "evidence": [
+          {
+            "pageid": 18524,
+            "quote": "角色的外观会出现越来越多的猴子特征"
+          }
+        ]
+      },
+      {
+        "aspect": "外观更换功能",
+        "evidence": [
+          {
+            "pageid": 18075,
+            "quote": "如果玩家之前更换了一个实体的外观"
+          }
+        ]
+      },
+      {
+        "aspect": "外观类似描述",
+        "evidence": [
+          {
+            "pageid": 24901,
+            "quote": "外观类似于stalagmite"
+          }
+        ]
+      },
+      {
+        "aspect": "外观类型与生成",
+        "evidence": [
+          {
+            "pageid": 20119,
+            "quote": "约束静电有两种外观："
+          }
+        ]
+      },
+      {
+        "aspect": "多种外观描述",
+        "evidence": [
+          {
+            "pageid": 20674,
+            "quote": "鹿角一共有 3 种不同的外观"
+          }
+        ]
+      },
+      {
+        "aspect": "月相外观变化机制",
+        "evidence": [
+          {
+            "pageid": 22522,
+            "quote": "月亮图标的外观将会发生不可逆的变化"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "背景图像",
+    "前景图像",
+    "绘画",
+    "外观",
+    "图像数据",
+    "装饰物",
+    "自定义内容",
+    "视觉外观",
+    "绘制状态",
+    "图像更新"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "595bb8c4e84ecce6f5019e27cbf10b802e6ce2ea97b3c258a4f9e78b9bd35984",
+    "source_bytes": 2360,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096615823
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/maxlightspawner.lua"
+  },
+  "category": "component",
+  "display_name": "maxlightspawner",
+  "summary": "该组件管理灯光实体的生成和所有权，用于在特定实体周围创建最大数量的灯光。它负责生成、保存和恢复灯光状态，参与游戏中的照明或装饰玩法。",
+  "api": [
+    {
+      "name": "TakeOwnership",
+      "effect": "将指定灯光实体添加到组件管理列表，并增加计数，以建立所有权关系。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存所有灯光实体的 GUID 数据，用于游戏存档持久化。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "处理加载数据，兼容旧格式并准备恢复灯光实体。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后恢复灯光实体的所有权关系，确保组件重新接管。"
+    },
+    {
+      "name": "SpawnLight",
+      "effect": "在指定位置生成一个灯光实体，并接管其所有权。"
+    },
+    {
+      "name": "SpawnAllLights",
+      "effect": "如果当前灯光数量小于最大值，在实体周围按设定半径和角度生成所有灯光实体。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15663,
+      21137,
+      13268,
+      14484,
+      18825,
+      20436,
+      24896,
+      60892
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及与组件 component__maxlightspawner 相关的任何能力表达，如灯光生成、所有权控制或保存加载行为；所有内容聚焦于实体生成、掉落、生长、事件等，与灯光能力无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "灯光实体",
+    "灯光上限",
+    "周围生成",
+    "灯光保存",
+    "灯光恢复",
+    "照明玩法",
+    "装饰玩法"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "装饰",
+    "照明"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d079fd03813468d35dbc73f861773ad33b41e23eea259d846b1422ec7535d88f",
+    "source_bytes": 1626,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109531893
+  }
+}

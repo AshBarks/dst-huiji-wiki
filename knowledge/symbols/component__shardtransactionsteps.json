@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/shardtransactionsteps.lua"
+  },
+  "category": "component",
+  "display_name": "shardtransactionsteps",
+  "summary": "组件管理分片间事务的唯一ID和状态，确保数据在服务器分片之间安全传输。参与的核心玩法是物品在分片间的转移，例如通过传送门将物品从一个服务器传送到另一个服务器。",
+  "api": [
+    {
+      "name": "CreateTransaction",
+      "effect": "创建并发送事务到另一个分片：生成唯一事务ID，初始化事务数据（如物品转移时移除物品并保存记录），并将事务状态设置为INITIATE。如果目标分片可用，则触发事务处理流程。副作用：可能移除物品并序列化数据。"
+    },
+    {
+      "name": "OnShardTransactionSteps",
+      "effect": "处理接收到的事务负载：根据事务状态更新事务记录，发送RPC回执（如ACCEPTED或FINALIZED），并最终化已完成的事务。对于物品转移事务，最终化时生成物品或添加到物品存储。副作用：可能发送网络消息，更新事务状态，生成物品或移动物品。"
+    },
+    {
+      "name": "OnShardConnected",
+      "effect": "当分片重新连接时，重新处理该分片的所有未完成事务（状态为INITIATE的事务）。副作用：可能重新发送未完成的事务，触发事务处理。"
+    },
+    {
+      "name": "HandleTransactionInitialization",
+      "effect": "初始化事务数据：对于物品转移事务，移除源物品并保存其记录到事务负载中。副作用：物品从游戏中移除。"
+    },
+    {
+      "name": "HandleTransactionFinalization",
+      "effect": "最终化事务：对于物品转移事务，在目标分片生成物品或添加到物品存储。如果传送门不可用，则根据坐标生成物品。副作用：物品被生成或存储，可能涉及物理传送。"
+    },
+    {
+      "name": "GetShardTransactions",
+      "effect": "获取或创建指定分片的事务表：返回事务数据表，如果不存在则初始化新表（包含uniqueid和finalizedid）。副作用：可能创建新数据表。"
+    },
+    {
+      "name": "ClearFields",
+      "effect": "清空事务负载的字段：移除transactiontype、originshardid、receivershardid和data字段。副作用：事务负载数据被清空。"
+    },
+    {
+      "name": "OnPruneShardTransactionSteps",
+      "effect": "修剪已完成的事务：根据新的最终化ID删除旧事务记录，更新最终化ID。副作用：事务数据被删除。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存事务数据：返回事务表用于持久化。副作用：无。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载事务数据：从保存数据中恢复事务表。副作用：事务数据被替换。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      28744,
+      18359,
+      39366,
+      19129,
+      72441
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未讨论分片事务步骤的创建、处理、连接等能力；内容集中于游戏物品、建筑和机制的行为描述，无底层事务处理表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "分片",
+    "事务",
+    "传送",
+    "物品",
+    "跨服",
+    "数据",
+    "状态",
+    "唯一ID"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "多服务器",
+    "物品传输"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a4b640ceff56ae7ee7a5b4bb73163a84d1d616716e4b5262fceb24252a0a0f3c",
+    "source_bytes": 10647,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788112417352
+  }
+}

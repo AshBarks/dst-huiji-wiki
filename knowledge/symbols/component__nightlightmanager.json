@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/nightlightmanager.lua"
+  },
+  "category": "component",
+  "display_name": "nightlightmanager",
+  "summary": "NightLightManager组件负责管理游戏中的夜光灯实体，存储其位置和节点标签信息。它通过监听事件注册夜光灯并更新数据，用于光照相关的游戏机制。",
+  "api": [
+    {
+      "name": "IsNightLightDataInAnyTag",
+      "effect": "检查夜光灯数据是否包含在任何给定标签中，返回布尔值，无副作用。"
+    },
+    {
+      "name": "GetNightLightsWithFilter",
+      "effect": "使用提供的过滤器函数过滤夜光灯列表，返回符合条件的夜光灯数组，无副作用。"
+    },
+    {
+      "name": "FindClosestNightLightFromListToInst",
+      "effect": "从给定夜光灯列表中找到距离指定实体最近的夜光灯，返回该夜光灯或nil，无副作用。"
+    },
+    {
+      "name": "UpdateNightLightPosition",
+      "effect": "更新指定夜光灯的位置和节点标签数据，修改内部数据表，无其他副作用。"
+    },
+    {
+      "name": "OnRegisterNightLight",
+      "effect": "注册新夜光灯，设置监听事件并更新其位置，修改内部数据表并添加事件监听。"
+    },
+    {
+      "name": "Filter_OnlyInTags",
+      "effect": "静态过滤器函数，检查夜光灯数据是否在指定标签中，返回布尔值，无副作用。"
+    },
+    {
+      "name": "Filter_OnlyOutTags",
+      "effect": "静态过滤器函数，检查夜光灯数据是否不在指定标签中，返回布尔值，无副作用。"
+    },
+    {
+      "name": "Filter_InTagsAndOutTags",
+      "effect": "静态过滤器函数，检查夜光灯数据在指定标签中但不在另一指定标签中，返回布尔值，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_registernightlight",
+    "onremove",
+    "onbuilt",
+    "entitywake",
+    "entitysleep"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65505,
+      52751,
+      16632,
+      34523,
+      24912,
+      28279,
+      10413,
+      15684
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述夜灯实体的属性、行为和生成规则，未提及组件能力如数据标签检查、过滤、查找、位置更新或注册等管理功能。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "夜灯",
+    "光照",
+    "过滤器",
+    "灯光管理",
+    "实体管理",
+    "位置信息",
+    "标签系统",
+    "事件监听",
+    "光照机制"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "照明",
+    "管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d2d7c484fc3388b750a4c7faa3f7ecf17e484e7fe53ff1c00b33a91ad421d88",
+    "source_bytes": 4466,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110313423
+  }
+}

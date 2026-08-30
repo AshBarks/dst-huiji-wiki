@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoeweapon_lunge.lua"
+  },
+  "category": "component",
+  "display_name": "aoeweapon_lunge",
+  "summary": "该组件管理突刺武器的攻击参数，如侧边范围、物理填充和拖尾特效。它用于实现武器的突刺动作，在战斗中对路径上的敌人造成范围伤害并击退物品。组件支持回调函数以在突刺前后执行自定义逻辑。",
+  "api": [
+    {
+      "name": "SetSideRange",
+      "effect": "设置突刺攻击的侧边范围。参数：range（数值）。影响攻击判定的宽度，用于计算路径上的实体是否被命中。"
+    },
+    {
+      "name": "SetOnPreLungeFn",
+      "effect": "设置突刺前的回调函数。参数：fn（函数）。在突刺执行前被调用，接收参数：inst（组件所在实体）、doer（执行者）、startingpos（起始位置）、targetpos（目标位置）。"
+    },
+    {
+      "name": "SetOnLungedFn",
+      "effect": "设置突刺后的回调函数。参数：fn（函数）。在突刺执行后被调用，接收参数：inst（组件所在实体）、doer（执行者）、startingpos（起始位置）、targetpos（目标位置）。"
+    },
+    {
+      "name": "SetTrailFX",
+      "effect": "设置突刺拖尾特效。参数：prefab（预制体名称）、spacing（间距）。在突刺路径上生成特效，用于视觉表现。"
+    },
+    {
+      "name": "SetSound",
+      "effect": "设置突刺时播放的声音路径。参数：path（字符串）。影响突刺音效。"
+    },
+    {
+      "name": "DoLunge",
+      "effect": "执行突刺攻击。参数：doer（执行者实体）、startingpos（起始位置）、targetpos（目标位置）。检查执行者的战斗组件，临时修改武器属性（如攻击磨损和伤害），对路径上的实体进行伤害判定和击退，生成拖尾特效，然后恢复武器属性。返回true表示成功执行，false表示参数无效。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      10374,
+      15022,
+      15539,
+      20058,
+      20150,
+      13156,
+      10379
+    ],
+    "aspects": [
+      {
+        "aspect": "突刺攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "翻滚攻击：它会向目标方向逐渐加速移动，然后进行翻滚撞击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "突刺",
+    "范围攻击",
+    "武器组件",
+    "击退",
+    "特效",
+    "伤害",
+    "战斗系统",
+    "AoE",
+    "突刺动作"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "攻击",
+    "范围伤害"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d6db7cb9bc92d4394d8d9a2bdb7b830d42c9666a8aeb3211f82e24f52965464d",
+    "source_bytes": 8762,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096093236
+  }
+}

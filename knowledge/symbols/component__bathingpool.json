@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/bathingpool.lua"
+  },
+  "category": "component",
+  "display_name": "bathingpool",
+  "summary": "该组件管理浴池实体的数据，包括最大占用者数、半径和占用者列表。核心玩法是控制实体进入和离开浴池，确保占用者数量不超过限制并正确计算位置。它用于实现沐浴或游泳等社交生存互动，实体需在状态图中标记占用状态。",
+  "api": [
+    {
+      "name": "SetRadius",
+      "effect": "设置浴池半径，用于计算占用者位置。"
+    },
+    {
+      "name": "GetRadius",
+      "effect": "返回浴池半径，若未设置则使用实体物理半径。"
+    },
+    {
+      "name": "SetMaxOccupants",
+      "effect": "设置最大占用者数，若超过则移除多余占用者并触发离开事件。"
+    },
+    {
+      "name": "SetOnStartBeingOccupiedBy",
+      "effect": "设置回调函数，在实体开始被浴池占用时调用。"
+    },
+    {
+      "name": "SetOnStopBeingOccupiedBy",
+      "effect": "设置回调函数，在实体停止被浴池占用时调用。"
+    },
+    {
+      "name": "IsOccupant",
+      "effect": "检查给定实体是否在占用者列表中，返回布尔值。"
+    },
+    {
+      "name": "AddOccupant",
+      "effect": "添加实体为占用者，设置onremove和newstate事件监听，并触发开始占用回调。"
+    },
+    {
+      "name": "RemoveOccupant",
+      "effect": "移除实体占用者，清理事件监听并触发停止占用回调。"
+    },
+    {
+      "name": "ForEachOccupant",
+      "effect": "遍历所有占用者，执行给定函数，可传递额外参数，若函数返回true则提前终止。"
+    },
+    {
+      "name": "CheckOccupant",
+      "effect": "检查实体是否在状态图中标记为占用浴池（占用者状态图需设置occupying_bathingpool）。"
+    },
+    {
+      "name": "CheckAvailableSpot",
+      "effect": "检查给定坐标是否有空闲空间（基于半径r），返回布尔值和阻挡实体。"
+    },
+    {
+      "name": "EnterPool",
+      "effect": "尝试让实体进入浴池：检查容量，计算目标位置，推送ms_enterbathingpool事件，验证状态后添加占用者，返回成功状态和原因（如NOSPACE）。"
+    },
+    {
+      "name": "LeavePool",
+      "effect": "让实体离开浴池：验证占用者状态，推送ms_leavebathingpool事件，移除占用者，返回成功状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示占用者数量和最大容量（若有）。"
+    }
+  ],
+  "events_published": [
+    "ms_enterbathingpool",
+    "ms_leavebathingpool"
+  ],
+  "events_listened": [
+    "onremove",
+    "newstate"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18269,
+      70479
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅涉及温泉的掉落物（如月亮碎片、宝石）和建造装饰度要求，未讨论bathingpool组件的能力如占用者管理、半径设置等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "浴池",
+    "进入浴池",
+    "离开浴池",
+    "占用者数",
+    "浴池半径",
+    "位置计算",
+    "占用状态",
+    "社交互动"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "沐浴",
+    "社交",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "00404add7a93e033023ec610662c08f6cdebca3871a0284bd2bba82e188d016b",
+    "source_bytes": 6239,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096336870
+  }
+}

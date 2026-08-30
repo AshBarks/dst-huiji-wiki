@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/slingshotmodder.lua"
+  },
+  "category": "component",
+  "display_name": "slingshotmodder",
+  "summary": "SlingshotModder 组件用于管理弹弓改装过程中的权限验证和状态控制。它通过检查弹弓装备的所有权来决定用户是否有权进行改装，并调用弹弓改装组件来启动或结束改装操作。",
+  "api": [
+    {
+      "name": "StartModding",
+      "effect": "检查目标物品是否具有 linkeditem 组件且装备受限；如果用户不是所有者，返回 false 和 'NOT_MINE' 错误；否则调用 slingshotmods 组件的 Open 方法开始改装，可能打开改装界面。"
+    },
+    {
+      "name": "StopModding",
+      "effect": "调用目标物品的 slingshotmods 组件的 Close 方法结束改装，可能关闭改装界面。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      35409
+    ],
+    "aspects": [
+      {
+        "aspect": "开始改装的界面交互描述",
+        "evidence": [
+          {
+            "pageid": 35409,
+            "quote": "打开[[可靠的弹弓]]的零件界面对其进行改装"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "弹弓改装",
+    "改装权限",
+    "弹弓所有权",
+    "启动改装",
+    "结束改装",
+    "弹弓检查",
+    "自定义改装"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "战斗",
+    "自定义",
+    "物品管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "34af21c139dc09f928575971418001a0f46dce733bff1df064e6b77ab85ee1ad",
+    "source_bytes": 697,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103917270
+  }
+}

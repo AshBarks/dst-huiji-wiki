@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/canopyshadows.lua"
+  },
+  "category": "component",
+  "display_name": "canopyshadows",
+  "summary": "该组件用于管理树冠阴影的生成与移除。它基于实体位置计算并存储阴影坐标，在实体睡眠或唤醒时动态控制阴影的显示与隐藏。通过全局表跟踪阴影瓦片的引用计数，确保多个树冠实体共享阴影时正确管理。参与游戏中光照和环境装饰的核心玩法。",
+  "api": [
+    {
+      "name": "GenerateCanopyShadowPositions",
+      "effect": "计算以实体为中心的圆形范围内的阴影位置，存储在组件内，并增加全局阴影瓦片的引用计数。位置基于随机生成和网格对齐。"
+    },
+    {
+      "name": "RemoveCanopyShadowPositions",
+      "effect": "移除存储的阴影位置，并减少全局阴影瓦片的引用计数；若计数归零则删除全局条目。"
+    },
+    {
+      "name": "SpawnShadows",
+      "effect": "如果实体醒着且阴影未生成，则为每个存储的位置增加全局生成引用计数，若计数从零变为一则调用SpawnLeafCanopy生成阴影实体。"
+    },
+    {
+      "name": "DespawnShadows",
+      "effect": "如果阴影已生成且实体睡眠或忽略睡眠标志，则减少全局生成引用计数，若计数归零则调用DespawnLeafCanopy移除阴影实体。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体被移除时自动调用，执行DespawnShadows(true)和RemoveCanopyShadowPositions来清理所有阴影相关数据。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体进入睡眠状态时自动调用，执行DespawnShadows()移除阴影显示。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体从睡眠唤醒时自动调用，执行SpawnShadows()生成阴影显示。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SHADE_CANOPY_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51287,
+      15675,
+      15663
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与canopyshadows组件能力相关的玩家语言表达。页面仅描述树冠阴影的存在和效果（如覆盖地块、范围），但未涉及生成、移除、休眠或唤醒等具体代码行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "树冠阴影",
+    "阴影管理",
+    "光照控制",
+    "环境效果",
+    "共享阴影",
+    "实体睡眠",
+    "阴影坐标",
+    "组件管理"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "环境",
+    "装饰",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "86d372d34491569cad817d131387b275113be98d384df4d9863f36f14f65ddfe",
+    "source_bytes": 3191,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096409221
+  }
+}

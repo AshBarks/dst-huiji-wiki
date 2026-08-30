@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/carnivalgameshooter.lua"
+  },
+  "category": "component",
+  "display_name": "carnivalgameshooter",
+  "summary": "此组件管理嘉年华射击游戏中炮台的瞄准和射击机制，包括瞄准角度、功率和方向数据。核心玩法涉及玩家通过调整瞄准角度来发射投射物，击中游戏目标以获得奖励。",
+  "api": [
+    {
+      "name": "Initialize",
+      "effect": "将瞄准角度初始化为配置最小值和最大值的中点，设置功率为预设值，并初始化方向为1。此方法调用会重置组件状态。"
+    },
+    {
+      "name": "UpdateAiming",
+      "effect": "根据时间增量和速度更新当前瞄准角度，并在达到角度边界时反转方向。返回当前角度和方向值，供外部系统使用。"
+    },
+    {
+      "name": "SetAim",
+      "effect": "播放瞄准音效，通过实体音效系统发出声音，用于反馈玩家瞄准动作。"
+    },
+    {
+      "name": "Shoot",
+      "effect": "生成一个投射物实体，计算基于当前瞄准角度和炮台旋转的目标位置，设置投射物水平速度和重力参数，然后发射投射物向目标移动。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "CARNIVALGAME_SHOOTING_ANGLE_METER_MIN",
+    "CARNIVALGAME_SHOOTING_ANGLE_METER_MAX",
+    "CARNIVALGAME_SHOOTING_POWER",
+    "CARNIVALGAME_SHOOTING_ANGLE_METER_SPEED",
+    "CARNIVALGAME_SHOOTING_TARGET_ARC_X",
+    "CARNIVALGAME_SHOOTING_TARGET_ARC_R"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      13457,
+      20714,
+      14792,
+      18188,
+      16419,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及component__carnivalgameshooter或其相关能力（如Initialize、UpdateAiming、SetAim、Shoot）。所有页面内容涉及弹弓弹药、天体英雄、交易小店、控制台、雪球发射器、大炮、电路板、独眼巨鹿等实体，与嘉年华游戏射手无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "射击",
+    "瞄准",
+    "投射物",
+    "游戏",
+    "小游戏",
+    "炮台",
+    "目标",
+    "角度",
+    "发射"
+  ],
+  "gameplay_tags": [
+    "嘉年华",
+    "射击",
+    "游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0f06298811a0e3061399481e0847851a859f9e4c30c81677bf6b058444eb9d0b",
+    "source_bytes": 2214,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098853719
+  }
+}

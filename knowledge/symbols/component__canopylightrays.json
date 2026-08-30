@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/canopylightrays.lua"
+  },
+  "category": "component",
+  "display_name": "canopylightrays",
+  "summary": "该组件管理基于实体位置的树冠光线生成与清理，通过随机分布在指定范围内创建光线实体以模拟光影效果。使用引用计数机制确保多个实体可共享同一光线，主要用于增强环境装饰的视觉体验。",
+  "api": [
+    {
+      "name": "SpawnLightrays",
+      "effect": "在实体周围指定范围内随机生成光线实体，增加全局引用计数。生成概率约为10%，基于网格位置计算新坐标。"
+    },
+    {
+      "name": "DespawnLightrays",
+      "effect": "减少全局引用计数，若计数为零则移除对应光线实体，清理组件关联的所有光线位置。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SHADE_CANOPY_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      65605,
+      15259,
+      15535,
+      57263,
+      15663
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及光线射线的生成或消失，与SpawnLightrays和DespawnLightrays相关的能力未在文本中体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "树冠光效",
+    "光影生成",
+    "环境光效",
+    "随机分布",
+    "共享光效",
+    "装饰光影",
+    "清理光影",
+    "视觉装饰"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "装饰",
+    "环境",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c77151a8b6e55a14ac7fbcac4c3ec131e3b105b693e9354147312a93de2e495f",
+    "source_bytes": 1995,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098734617
+  }
+}

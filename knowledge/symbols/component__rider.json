@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/rider.lua"
+  },
+  "category": "component",
+  "display_name": "rider",
+  "summary": "rider组件管理玩家的骑乘状态，包括坐骑实体、鞍具引用和骑行标志。它参与骑乘与下马的核心玩法，处理动画切换、伤害重定向、事件发布及存档加载，确保玩家与坐骑的交互逻辑。",
+  "api": [
+    {
+      "name": "Mount",
+      "effect": "骑上指定坐骑目标。检查骑乘条件（如坐骑未被骑乘、服从性测试），若成功则设置玩家动画为骑乘状态、将坐骑设为玩家子实体、重定向伤害至坐骑、禁用可固定性，并发布'mounted'事件。副作用包括改变玩家外观、设置动态阴影大小、休眠坐骑大脑及声音停止。"
+    },
+    {
+      "name": "Dismount",
+      "effect": "触发下马事件。仅推送'dismount'事件，由状态图或其他系统处理实际下马逻辑。"
+    },
+    {
+      "name": "ActualDismount",
+      "effect": "实际执行下马。恢复玩家动画、移除坐骑子实体、重置伤害重定向、启用可固定性、唤醒坐骑大脑，并发布'dismounted'事件。此方法用于状态图或清理，非正常游戏调用。"
+    },
+    {
+      "name": "IsRiding",
+      "effect": "返回布尔值，表示玩家当前是否正在骑乘坐骑。"
+    },
+    {
+      "name": "GetMount",
+      "effect": "返回当前坐骑实体。若无坐骑则返回nil。"
+    },
+    {
+      "name": "GetSaddle",
+      "effect": "返回当前坐骑上的鞍具实体。若无鞍具则返回nil。"
+    },
+    {
+      "name": "StartTracking",
+      "effect": "开始追踪指定坐骑的鞍具变化。监听坐骑的'saddlechanged'事件，更新自身鞍具引用。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "停止追踪指定坐骑的鞍具变化。移除'saddlechanged'事件监听并清空鞍具引用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存坐骑数据。若坐骑存在且应保存，则返回包含坐骑存档记录的数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载坐骑。若数据有效，则生成坐骑实体并立即骑上。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时清理。取消健康广播任务并停止追踪当前坐骑。"
+    }
+  ],
+  "events_published": [
+    "mountwounded",
+    "refusedmount",
+    "refusedrider",
+    "mounted",
+    "dismount",
+    "dismounted"
+  ],
+  "events_listened": [
+    "saddlechanged"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      13409,
+      15169,
+      15526,
+      52019,
+      15022,
+      15941,
+      23933
+    ],
+    "aspects": [
+      {
+        "aspect": "骑乘权限限制描述",
+        "evidence": [
+          {
+            "pageid": 15169,
+            "quote": "当皮弗娄牛铃在玩家的物品栏中或{{分类|容器}}里时，其他玩家将无法再骑乘这头牛。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "骑乘",
+    "坐骑",
+    "鞍具",
+    "下马",
+    "牛",
+    "战斗",
+    "移动",
+    "伤害重定向",
+    "状态切换"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "骑乘",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "36a5e7f61493f61f06bf33c66cb27d60cb5ba3a24acc6dbadf9f338bc8f0a2bb",
+    "source_bytes": 7470,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091615881
+  }
+}

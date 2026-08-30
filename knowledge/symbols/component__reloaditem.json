@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/reloaditem.lua"
+  },
+  "category": "component",
+  "display_name": "reloaditem",
+  "summary": "ReloadItem 组件在初始化时存储所属实体的引用，没有定义额外数据或功能。源码中无具体行为实现，可能作为基础组件用于扩展或数据持有。",
+  "api": [],
+  "api_note": "纯数据组件,无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15295,
+      18359,
+      13779,
+      23187,
+      14579,
+      18476,
+      16419,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的代码能力/行为语义清单未给出具体条目，且页面摘录内容主要描述物品类别、获取方式或用途（如墙的建造、玩具交易、海鱼生成、装饰品使用、蔬果腐烂、草图制作、电路板功能、熔炉装备），未涉及与 component__reloaditem 相关的重新加载能力或行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "重新加载",
+    "物品",
+    "组件",
+    "实体",
+    "DST",
+    "饥荒",
+    "Lua",
+    "空组件",
+    "基础",
+    "源码"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b0f32d2672723f5725d0b8411a814e21d5b724527db7e455b43fae951978f5a",
+    "source_bytes": 98,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103014249
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hullhealth.lua"
+  },
+  "category": "component",
+  "display_name": "hullhealth",
+  "summary": "该组件管理船体的健康值、泄漏状态和自我退化过程，是船只生存机制的核心。它处理船只碰撞时的伤害分配，生成泄漏指示器表示船体损坏，并定期更新健康值以模拟持续漏水。该组件直接影响船只的耐久性和玩家在水上探索的安全。",
+  "api": [
+    {
+      "name": "GetDamageMult",
+      "effect": "根据类别（如'degradedamage'或'collide'）获取伤害乘数。检查周围实体是否有船体健康缓冲器，若有则返回预定义乘数，否则返回1。"
+    },
+    {
+      "name": "UpdateHealth",
+      "effect": "基于泄漏指示器（静态和动态）的损坏状态计算总伤害，并减少船体健康值。同时根据伤害情况设置或移除实体的'is_leaking'标签。"
+    },
+    {
+      "name": "GetLeakPosition",
+      "effect": "根据索引计算泄漏点在船体上的随机位置，考虑半径和角度方差，返回世界坐标。"
+    },
+    {
+      "name": "GetLeakAngle",
+      "effect": "根据索引返回泄漏点在船体上的固定角度（基于泄漏点数量均匀分布）。"
+    },
+    {
+      "name": "RefreshLeakIndicator",
+      "effect": "刷新指定泄漏点的指示器。如果损坏达到阈值，则生成或更新泄漏实体（'boat_leak'），并设置其状态（小泄漏或中泄漏）。若组件设置为防泄漏则直接返回。"
+    },
+    {
+      "name": "OnCollide",
+      "effect": "处理碰撞事件数据：计算最近泄漏点、碰撞伤害对齐度、速度因素；若伤害足够则分配泄漏损坏和船体健康伤害；可能优先处理船体护甲碰撞。"
+    },
+    {
+      "name": "SetSelfDegrading",
+      "effect": "设置自我退化时间；若时间大于0则启动更新组件，否则停止并移除'is_leaking'标签。"
+    },
+    {
+      "name": "SpawnDegadeDebris",
+      "effect": "在船体周围随机位置生成退化碎片效果（若定义了效果预设）。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定期更新：处理自我退化伤害（基于时间和乘数），并可能生成碎片效果。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存泄漏数据，包括泄漏点索引、损坏值、状态和修复超时时间，返回可序列化的表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载保存的数据：恢复泄漏点损坏值、状态和修复超时，刷新泄漏指示器。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "on_collide"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BOAT.SMALL_LEAK_DMG_THRESHOLD",
+    "BOAT.MED_LEAK_DMG_THRESHOLD",
+    "BOAT.MAX_HULL_HEALTH_DAMAGE",
+    "BOAT_HEALTH_BUFFER_MULT",
+    "BOAT.OARS.MALBATROSS.FORCE",
+    "BOAT.MAX_ALLOWED_VELOCITY"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19940,
+      18234,
+      16185,
+      15903,
+      16633,
+      24866,
+      19118,
+      20058
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 component__hullhealth 相关的代码能力表达，如更新生命值、获取泄漏位置等。只有耐久值或生命值的一般性描述，未体现特定组件行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船体血量",
+    "漏水状态",
+    "自动退化",
+    "碰撞伤害",
+    "漏水指示",
+    "耐久",
+    "航海安全",
+    "修理"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
+    "source_bytes": 9890,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093147123
+  }
+}

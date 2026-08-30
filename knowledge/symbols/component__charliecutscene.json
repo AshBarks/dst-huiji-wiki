@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/charliecutscene.lua"
+  },
+  "category": "component",
+  "display_name": "charliecutscene",
+  "summary": "此组件管理查理修复远古大门过场动画的全程状态与触发，控制动画期间的摄像机视角锁定、查理NPC与查理之手的生成与定位、远古支柱数据的采集，以及修复后世界事件的触发。它通过网络变量同步摄像机状态，并负责在动画完成或中断后恢复世界状态。",
+  "api": [
+    {
+      "name": "ClientLockCamera",
+      "effect": "客户端函数。禁止玩家控制摄像机，设置摄像机移动增益、最终距离和朝向为当前组件记录的值，将视角锁定于动画场景。"
+    },
+    {
+      "name": "ClientUnlockCamera",
+      "effect": "客户端函数。恢复玩家对摄像机的控制权，摄像机的增益值将由焦点组件重置。"
+    },
+    {
+      "name": "Start",
+      "effect": "服务器函数。启动过场动画流程：标记运行状态，推送世界事件以锁定噩梦阶段，禁用大门交易器，采集支柱数据，延迟生成查理NPC并安排修复大门流程，最后通过网络变量同步并锁定客户端摄像机。"
+    },
+    {
+      "name": "Finish",
+      "effect": "服务器函数。结束过场动画流程：取消运行状态标记，推送世界事件以解锁噩梦阶段并触发阴影裂缝开启，根据保存的状态恢复大门交易器，通过网络变量同步并解锁客户端摄像机。"
+    },
+    {
+      "name": "IsGateRepaired",
+      "effect": "服务器函数。返回布尔值，指示远古大门是否已被修复。"
+    },
+    {
+      "name": "FindCharlieHandSpawnPoint",
+      "effect": "服务器函数。基于已采集的远古支柱数据，计算并返回查理之手的生成点坐标（背柱相对点）。"
+    },
+    {
+      "name": "SpawnCharlieHand",
+      "effect": "服务器函数。在计算出的生成点生成‘charlie_hand’实体，并设置其与本大门的相互追踪关系。"
+    },
+    {
+      "name": "SpawnCharlieHandKeystone",
+      "effect": "服务器函数。在计算出的生成点生成‘charlie_hand_keystone’实体，设置追踪关系，并调用其初始化与显示方法。"
+    }
+  ],
+  "events_published": [
+    "charliecutscene",
+    "ms_locknightmarephase",
+    "shadowrift_opened"
+  ],
+  "events_listened": [
+    "iscameralockeddirty"
+  ],
+  "netvars": [
+    "_iscameralocked",
+    "_cameraangle"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13214,
+      13701,
+      20092,
+      21253,
+      10413,
+      15764,
+      24960,
+      33950
+    ],
+    "aspects": [
+      {
+        "aspect": "召唤之手在击败织影者后出现",
+        "evidence": [
+          {
+            "pageid": 21253,
+            "quote": "[[远古织影者]]首次被击败后，召唤之手就会立刻从远古大门所在房间缺损的一角冒出。"
+          }
+        ]
+      },
+      {
+        "aspect": "召唤之手在钥石靠近时出现以重置圣殿",
+        "evidence": [
+          {
+            "pageid": 21253,
+            "quote": "在修复好远古大门之后，当[[钥石]]被玩家携带至距离远古大门 19 单位以内时，召唤之手会出现在远古大门所在的房间中…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "查理",
+    "远古大门",
+    "过场动画",
+    "视角锁定",
+    "查理之手",
+    "远古支柱",
+    "世界事件",
+    "网络同步"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "世界状态",
+    "剧情动画",
+    "战斗触发"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2432f0fcacc2ccef82c46d38980c910c0059fc52f4e1a0b4c7a34904ec85070f",
+    "source_bytes": 13184,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098969296
+  }
+}

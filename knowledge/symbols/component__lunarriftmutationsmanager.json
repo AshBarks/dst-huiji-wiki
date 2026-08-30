@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lunarriftmutationsmanager.lua"
+  },
+  "category": "component",
+  "display_name": "lunarriftmutationsmanager",
+  "summary": "此组件管理月裂突变事件的击败状态和Wagstaff的出现逻辑。它追踪玩家击败的突变怪物（如突变狼、突变熊、突变鹿），并触发Wagstaff NPC来推进任务线。当所有突变被击败时，任务完成并给予奖励。",
+  "api": [
+    {
+      "name": "RefreshDefeatedMutationsTable",
+      "effect": "重置击败突变表和Wagstaff状态，将击败突变数设为总数。"
+    },
+    {
+      "name": "IsWagstaffSpawned",
+      "effect": "检查Wagstaff NPC是否已生成且有效（未消散）。"
+    },
+    {
+      "name": "GetNumDefeatedMutations",
+      "effect": "返回已击败的突变数量。"
+    },
+    {
+      "name": "HasDefeatedAllMutations",
+      "effect": "检查是否所有突变都已被击败。"
+    },
+    {
+      "name": "_CanCorpseMutate",
+      "effect": "检查实体是否可以作为尸体进行突变（内部方法，调用CanLunarRiftMutateFromCorpse）。"
+    },
+    {
+      "name": "TryMutate",
+      "effect": "尝试将实体替换为指定的尸体预制物，并设置旋转（注释表明此方法已不再使用）。"
+    },
+    {
+      "name": "HasDefeatedThisMutation",
+      "effect": "检查特定预制物的突变是否已被击败。"
+    },
+    {
+      "name": "SetMutationDefeated",
+      "effect": "设置一个突变为被击败状态，并触发后续逻辑：如果Wagboss已被击败则给予奖励，否则触发Wagstaff出现或延长尸体存在时间。"
+    },
+    {
+      "name": "TriggerWagstaffAppearance",
+      "effect": "在实体附近生成Wagstaff NPC，并让他谈论突变生物。"
+    },
+    {
+      "name": "ShouldGiveReward",
+      "effect": "检查是否应该给予奖励：任务完成或所有突变击败。"
+    },
+    {
+      "name": "IsTaskCompleted",
+      "effect": "返回任务是否已完成。"
+    },
+    {
+      "name": "OnRewardGiven",
+      "effect": "设置任务完成，推送事件ms_lunarriftmutationsmanager_taskcompleted，并在所有突变击败时刷新表。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存击败突变表和任务完成状态到数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载击败突变表和任务完成状态，并在任务完成时推送事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示击败突变状态和任务完成状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_lunarriftmutationsmanager_taskcompleted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51494,
+      51495,
+      51498,
+      51497,
+      21333,
+      56871,
+      15031,
+      18234
+    ],
+    "aspects": [
+      {
+        "aspect": "任务完成事件",
+        "evidence": [
+          {
+            "pageid": 51498,
+            "quote": "首次完成[[瓦格斯塔夫的变异生物任务]]后"
+          }
+        ]
+      },
+      {
+        "aspect": "变异数量进度提示",
+        "evidence": [
+          {
+            "pageid": 51497,
+            "quote": "提醒玩家当前任务进度"
+          }
+        ]
+      },
+      {
+        "aspect": "奖励给予条件",
+        "evidence": [
+          {
+            "pageid": 51497,
+            "quote": "奖励给玩家 1 个空的火花柜"
+          }
+        ]
+      },
+      {
+        "aspect": "瓦格斯塔夫投影出现触发",
+        "evidence": [
+          {
+            "pageid": 51497,
+            "quote": "颗粒状传输（变异生物）将会在它们的尸体周围出现"
+          }
+        ]
+      },
+      {
+        "aspect": "首次击杀计数规则",
+        "evidence": [
+          {
+            "pageid": 51497,
+            "quote": "重复击杀不计入任务"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Wagstaff",
+    "任务完成",
+    "月裂事件",
+    "击杀奖励",
+    "裂隙怪物",
+    "狼突变",
+    "熊突变",
+    "鹿突变",
+    "NPC触发",
+    "任务线"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "战斗",
+    "任务"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c3a0ecb32adae8e72ca92f94ce972ffa7d1cb6541fdd66db7fe6efb91a12fc5e",
+    "source_bytes": 5073,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109311986
+  }
+}

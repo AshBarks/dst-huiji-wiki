@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldreset.lua"
+  },
+  "category": "component",
+  "display_name": "worldreset",
+  "summary": "worldreset 组件负责管理饥荒联机版中世界重置的倒计时逻辑与相关事件处理。它监控玩家状态，当所有存活玩家变为幽灵时启动重置倒计时，并通过网络变量同步倒计时数据。倒计时结束后，组件触发世界重置操作，执行服务器重启或客户端淡出等流程。",
+  "api": [],
+  "api_note": "纯事件驱动组件，无对外暴露的公开方法",
+  "events_published": [
+    "worldresettick",
+    "showworldreset",
+    "hideworldreset",
+    "master_worldresetupdate"
+  ],
+  "events_listened": [
+    "countdowndirty",
+    "playeractivated",
+    "entercharacterselect",
+    "ms_setworldresettime",
+    "ms_worldreset",
+    "secondary_worldresetupdate"
+  ],
+  "netvars": [
+    "countdown"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      19719,
+      24028,
+      65605,
+      18540,
+      10379,
+      18723,
+      19776,
+      14713
+    ],
+    "aspects": [
+      {
+        "aspect": "世界翻新服务器重启倒计时描述",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "[[森林世界]]的服务器在 30 秒内重启。在倒计时为 25 秒、20 秒、15 秒、10 秒时"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "世界重置",
+    "倒计时",
+    "幽灵",
+    "玩家死亡",
+    "重置对话框",
+    "网络同步",
+    "死亡惩罚",
+    "重启"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c82dc8d95e48a88ea86e50ba33d1319a8be1e0aac5bbc5bce61b6795b8c97736",
+    "source_bytes": 9206,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114368419
+  }
+}

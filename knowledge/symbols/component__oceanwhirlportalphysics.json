@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanwhirlportalphysics.lua"
+  },
+  "category": "component",
+  "display_name": "oceanwhirlportalphysics",
+  "summary": "该组件管理海洋漩涡传送门的物理参数，包括焦距半径、影响范围、拉力与径向强度。它周期性地检测并记忆漩涡范围内的海洋实体或船只，对其施加向心与旋转力，模拟漩涡吸引效果。核心玩法涉及环境互动、陷阱破坏与动态物理威胁，为玩家提供海洋中的危险区域或传送机制。",
+  "api": [
+    {
+      "name": "RecalculateForceExponent",
+      "effect": "根据当前焦距半径和半径重新计算力指数，用于后续拉力计算。无直接副作用。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "启用或禁用组件。启用时，若实体未休眠则启动更新并立即触发检查；禁用时，停止更新并遗忘所有已记忆实体。"
+    },
+    {
+      "name": "SetFocalRadius",
+      "effect": "设置焦距半径（漩涡核心吸引力最强区域的半径），并重新计算力指数。"
+    },
+    {
+      "name": "GetFocalRadius",
+      "effect": "返回当前焦距半径的数值。"
+    },
+    {
+      "name": "SetRadius",
+      "effect": "设置漩涡影响总半径，重新计算力指数，并影响实体检测范围。"
+    },
+    {
+      "name": "GetRadius",
+      "effect": "返回当前影响总半径的数值。"
+    },
+    {
+      "name": "SetPullStrength",
+      "effect": "设置拉力强度，控制实体被拉向漩涡中心的力的大小。"
+    },
+    {
+      "name": "GetPullStrength",
+      "effect": "返回当前拉力强度的数值。"
+    },
+    {
+      "name": "SetRadialStrength",
+      "effect": "设置径向强度，控制实体绕漩涡旋转的力的大小。"
+    },
+    {
+      "name": "GetRadialStrength",
+      "effect": "返回当前径向强度的数值。"
+    },
+    {
+      "name": "SetOnEntityTouchingFocalFn",
+      "effect": "设置回调函数，当实体进入焦距半径内时触发，用于自定义交互逻辑。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时调用，停止组件更新并遗忘所有已记忆实体，以节省性能。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用，若组件已启用则重新启动更新循环。"
+    },
+    {
+      "name": "RememberEntity",
+      "effect": "记忆指定实体，为其添加physicsmodifiedexternally组件并注册移除监听，以便施加物理力。"
+    },
+    {
+      "name": "ForgetEntity",
+      "effect": "遗忘指定实体，移除其物理修改源和事件监听，并可能触发快速冷却计时器。"
+    },
+    {
+      "name": "TryToBreakStaticObject",
+      "effect": "尝试破坏静态物体：若其有健康组件则按固定比例扣减生命值，若可工作则直接摧毁。"
+    },
+    {
+      "name": "ShouldRememberEntity",
+      "effect": "判断实体是否应被记忆：鸟类推送飞走事件并返回false；零质量实体调用破坏函数并返回false；否则返回true。"
+    },
+    {
+      "name": "CheckForEntities",
+      "effect": "扫描漩涡范围内符合条件的实体，根据情况记忆、破坏或传送（如对winchtarget实体进行位置调整或 salvage 处理），并遗忘不在范围内的已记忆实体。"
+    },
+    {
+      "name": "PullEntities",
+      "effect": "对所有记忆实体施加力，基于距离和强度参数计算速度分量，将其拉向漩涡中心并旋转；若实体进入焦距区域则触发回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新函数：管理快速冷却计时器，根据实体记忆状态选择更新频率，周期性地执行实体检查和拉力计算。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "OCEANWHIRLBIGPORTAL_BOAT_PERCENT_DAMAGE_PER_TICK"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20842,
+      19693,
+      60911,
+      18229,
+      34314,
+      45685,
+      57263,
+      16681
+    ],
+    "aspects": [
+      {
+        "aspect": "传送触发距离描述",
+        "evidence": [
+          {
+            "pageid": 60911,
+            "quote": "进入巨型漩涡 4 距离单位范围内的玩家和会漂浮的物品会进入洞穴世界"
+          }
+        ]
+      },
+      {
+        "aspect": "吸入半径及实体检查描述",
+        "evidence": [
+          {
+            "pageid": 60911,
+            "quote": "巨型漩涡会吸入 14 距离单位范围内的可被吸力移动的实体。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "漩涡",
+    "传送门",
+    "漩涡吸引",
+    "物理效果",
+    "海洋漩涡",
+    "船只吸引",
+    "海洋生物",
+    "危险区域"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "环境",
+    "陷阱",
+    "海洋",
+    "物理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "92300b697d5d0c16e69a99c07e974b30af0c9e37e46ed5825a1fdc2ee8a57f31",
+    "source_bytes": 9277,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102354375
+  }
+}

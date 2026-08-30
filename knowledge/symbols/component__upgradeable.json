@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/upgradeable.lua"
+  },
+  "category": "component",
+  "display_name": "upgradeable",
+  "summary": "该组件管理实体的升级状态，包括升级类型、当前阶段、最大阶段数和升级进度。它允许通过消耗特定物品来提升实体的升级计数，达到每阶段阈值后自动进入下一阶段。核心玩法涉及使用升级物品逐步增强实体能力，常用于建筑或工具的进阶系统。",
+  "api": [
+    {
+      "name": "SetOnUpgradeFn",
+      "effect": "设置升级操作后的回调函数，该函数在升级后被调用。"
+    },
+    {
+      "name": "SetCanUpgradeFn",
+      "effect": "设置检查升级条件的回调函数，用于自定义是否允许升级。"
+    },
+    {
+      "name": "GetStage",
+      "effect": "返回当前阶段数值。"
+    },
+    {
+      "name": "SetStage",
+      "effect": "将当前阶段设置为指定数值。"
+    },
+    {
+      "name": "AdvanceStage",
+      "effect": "手动推进阶段到下一阶段，重置升级计数为0，并触发阶段进阶回调（如果已设置）。"
+    },
+    {
+      "name": "CanUpgrade",
+      "effect": "检查当前是否可以升级：验证当前阶段是否小于最大阶段数，并调用自定义检查函数（如果设置）。返回布尔值和可能的原因字符串。"
+    },
+    {
+      "name": "Upgrade",
+      "effect": "执行升级操作：增加升级计数（基于升级物品的升级值），移除一个升级物品（支持堆叠物品），触发升级回调（如果设置）。如果升级计数达到每阶段升级阈值，则自动调用AdvanceStage。返回true表示成功。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含升级计数和阶段数据的表，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载升级计数和阶段状态，恢复组件数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含升级类型、当前阶段、最大阶段数和升级计数的调试信息字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      21485,
+      14484,
+      19802,
+      13897,
+      51046,
+      13261,
+      15832
+    ],
+    "aspects": [
+      {
+        "aspect": "升级次数与材料需求",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "装饰度可以用于解锁新的[[#瓶罐交易|瓶罐交易]]，以及为[[盐晶组合机]]和[[珍珠的茶店]]升级。"
+          }
+        ]
+      },
+      {
+        "aspect": "开花阶段升级效果",
+        "evidence": [
+          {
+            "pageid": 13261,
+            "quote": "最大开花阶段，自动照料的范围从 4 距离单位升级到 6 单位。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "升级",
+    "阶段",
+    "进阶",
+    "改造",
+    "提升",
+    "升级系统",
+    "可升级",
+    "阶段推进"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a720dcee032d32897b181d843baa23eb07722a0df1e104ac8a997732efb9ec90",
+    "source_bytes": 2629,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093428379
+  }
+}

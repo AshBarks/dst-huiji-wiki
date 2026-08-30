@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stunnable.lua"
+  },
+  "category": "component",
+  "display_name": "stunnable",
+  "summary": "该组件管理实体的眩晕状态，通过追踪在5秒周期内受到的伤害来触发眩晕。当累计伤害超过阈值（默认1000）时，实体进入10秒眩晕，并有60秒冷却和阈值抵抗机制。它监听健康值变化事件，是战斗中的控制玩法核心。",
+  "api": [
+    {
+      "name": "Stun",
+      "effect": "触发眩晕：清空伤害记录，设置有效眩晕时间为当前时间加60秒冷却，增加眩晕阈值为当前值加150抵抗值，发布'stunned'事件，并在10秒后发布'stun_finished'事件。副作用：实体进入眩晕状态，影响游戏行为。"
+    },
+    {
+      "name": "TakeDamage",
+      "effect": "处理伤害输入：如果当前时间小于有效眩晕时间，则忽略；否则记录伤害到damage表中，检查在5秒内的累计伤害是否超过stun_threshold，超过则调用Stun方法。副作用：可能触发眩晕。"
+    },
+    {
+      "name": "GetDamageInPeriod",
+      "effect": "获取在5秒时间周期内的总伤害：遍历damage表，累加在最近5秒时间内的伤害值，清理过期记录并返回总伤害。副作用：修改damage表。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "stunned",
+    "stun_finished"
+  ],
+  "events_listened": [
+    "healthdelta"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      16419,
+      14907,
+      14936,
+      15651,
+      14929,
+      15941,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "伤害数值与描述",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "每发吹箭命中时造成 20 点物理伤害"
+          },
+          {
+            "pageid": 14907,
+            "quote": "敌人造成 200 伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "伤害累积机制说明",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "在 5 秒内受到超过 1250 点的伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "眩晕效果触发描述",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "连续旋转 8 秒后会眩晕"
+          },
+          {
+            "pageid": 15651,
+            "quote": "如果龙蝇在 5 秒内受到超过 1250 点的伤害，她将会晕眩 10 秒。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "眩晕",
+    "硬直",
+    "伤害阈值",
+    "冷却时间",
+    "抵抗",
+    "控制效果",
+    "状态效果",
+    "战斗机制"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4673a6e85be83dfd6cd195d131a3bc6894fae40c1985ecb4ef8616146e6fcf96",
+    "source_bytes": 1190,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104109153
+  }
+}

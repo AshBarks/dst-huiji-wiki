@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fishingrod_replica.lua"
+  },
+  "category": "component",
+  "display_name": "fishingrod_replica",
+  "summary": "这是鱼竿的复制组件，管理鱼竿的目标实体、钩鱼状态和捕获状态。它通过网络变量同步数据，用于协调多人游戏中的钓鱼玩法，核心活动是玩家使用鱼竿进行钓鱼。",
+  "api": [
+    {
+      "name": "SetTarget",
+      "effect": "设置鱼竿的目标实体，更新网络变量 _target 以进行客户端和服务器同步。"
+    },
+    {
+      "name": "GetTarget",
+      "effect": "返回当前目标实体的值，无副作用，仅读取网络变量 _target。"
+    },
+    {
+      "name": "SetHookedFish",
+      "effect": "设置鱼竿是否钩住鱼，如果输入参数不为 nil 则设为 true，否则 false，更新网络变量 _hashookedfish 以同步状态。"
+    },
+    {
+      "name": "HasHookedFish",
+      "effect": "检查鱼竿是否钩住了鱼，需满足 _hashookedfish 为 true 且 _target 不为 nil，返回布尔值表示状态。"
+    },
+    {
+      "name": "SetCaughtFish",
+      "effect": "设置鱼竿是否捕获了鱼，如果输入参数不为 nil 则设为 true，否则 false，更新网络变量 _hascaughtfish 以同步状态。"
+    },
+    {
+      "name": "HasCaughtFish",
+      "effect": "返回是否捕获了鱼，读取网络变量 _hascaughtfish 的值，无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "_target",
+    "_hashookedfish",
+    "_hascaughtfish"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      50898,
+      13823,
+      16419,
+      13897,
+      19761,
+      20714
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件能力相关的玩家语言表达。所有页面涉及弹弓弹药、天体英雄、幻灵捕获机、独眼巨鹿、电路板、克劳斯、墨荒及控制台调试命令，唯一提及钓鱼的是控制台命令d_fishing和d_gofishing，但仅描述生成装备和触发动作，未涉及SetTarget、GetTarget等组件能力的行为描述或策略段落。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鱼竿",
+    "钓鱼",
+    "钩鱼",
+    "捕获",
+    "目标",
+    "网络同步",
+    "状态管理",
+    "replica"
+  ],
+  "gameplay_tags": [
+    "钓鱼",
+    "生存",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6072ae0ea964ba094534316704343751966d94d848bd2e46d37fc25d108b5d06",
+    "source_bytes": 833,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107532673
+  }
+}

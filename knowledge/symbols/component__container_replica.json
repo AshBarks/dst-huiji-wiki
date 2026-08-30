@@ -1,0 +1,322 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/container_replica.lua"
+  },
+  "category": "component",
+  "display_name": "container_replica",
+  "summary": "容器的客户端表现组件，负责管理容器在客户端的显示状态、网络同步数据以及物品操作接口。它通过代理网络变量与服务器状态同步，并实现了容器UI的打开/关闭逻辑、物品放入/取出/移动的客户端操作处理。核心玩法是支持玩家查看和交互容器内的物品。",
+  "api": [
+    {
+      "name": "Open",
+      "effect": "在客户端打开容器UI界面。检查_opener和isopen状态，调用ThePlayer.HUD:OpenContainer，并根据ShouldSkipOpenSnd决定是否播放打开音效。副作用：将_isopen状态设为true。"
+    },
+    {
+      "name": "Close",
+      "effect": "在客户端关闭容器UI界面。检查_opener和isopen状态，调用ThePlayer.HUD:CloseContainer，并根据ShouldSkipCloseSnd决定是否播放关闭音效。副作用：将_isopen状态设为false，取消任何挂起的opentask。"
+    },
+    {
+      "name": "CanBeOpened",
+      "effect": "返回容器当前是否可被打开的状态（基于网络变量_cannotbeopened的取反值）。"
+    },
+    {
+      "name": "SetCanBeOpened",
+      "effect": "设置容器是否可被打开的状态。接收一个布尔值，通过网络变量_cannotbeopened进行同步。"
+    },
+    {
+      "name": "ShouldSkipOpenSnd",
+      "effect": "返回打开容器时是否应跳过音效的状态（基于网络变量_skipopensnd）。"
+    },
+    {
+      "name": "SetSkipOpenSnd",
+      "effect": "设置打开容器时是否应跳过音效。接收一个布尔值，通过网络变量_skipopensnd进行同步。"
+    },
+    {
+      "name": "ShouldSkipCloseSnd",
+      "effect": "返回关闭容器时是否应跳过音效的状态（基于网络变量_skipclosesnd）。"
+    },
+    {
+      "name": "SetSkipCloseSnd",
+      "effect": "设置关闭容器时是否应跳过音效。接收一个布尔值，通过网络变量_skipclosesnd进行同步。"
+    },
+    {
+      "name": "GetNumSlots",
+      "effect": "返回容器的槽位数量（从_numslots获取）。"
+    },
+    {
+      "name": "SetNumSlots",
+      "effect": "设置容器的槽位数量。接收一个整数值，赋给_numslots。"
+    },
+    {
+      "name": "CanTakeItemInSlot",
+      "effect": "检查一个物品是否能放入指定槽位（或任意槽位）。考虑物品属性、容器状态（只读、游戏模式）以及自定义itemtestfn。返回布尔值。"
+    },
+    {
+      "name": "AcceptsStacks",
+      "effect": "返回容器是否接受物品堆叠的布尔值（从acceptsstacks属性获取）。"
+    },
+    {
+      "name": "IsSideWidget",
+      "effect": "返回容器UI是否为侧边栏小组件的布尔值（从issidewidget属性获取）。"
+    },
+    {
+      "name": "IsOpenedBy",
+      "effect": "检查指定玩家是否打开了此容器。在客户端，若容器已打开且指定玩家是ThePlayer则返回true。"
+    },
+    {
+      "name": "IsHolding",
+      "effect": "检查容器是否持有指定物品（可通过classified代理查询）。可选检查容器内嵌套容器。"
+    },
+    {
+      "name": "FindItem",
+      "effect": "在容器内查找满足给定测试函数的物品（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "GetItemInSlot",
+      "effect": "获取指定槽位中的物品（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "GetItems",
+      "effect": "获取容器所有槽位及其内容的表格（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "IsEmpty",
+      "effect": "检查容器是否为空（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查容器是否已满（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "Has",
+      "effect": "检查容器是否拥有指定预制物和数量（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "HasItemWithTag",
+      "effect": "检查容器是否拥有带指定标签的物品及数量（通过组件或classified代理查询）。"
+    },
+    {
+      "name": "PutOneOfActiveItemInSlot",
+      "effect": "将当前激活物品的一个放入指定槽位（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "PutAllOfActiveItemInSlot",
+      "effect": "将当前激活物品的全部放入指定槽位（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "TakeActiveItemFromHalfOfSlot",
+      "effect": "从指定槽位取出一半物品作为当前激活物品（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "TakeActiveItemFromCountOfSlot",
+      "effect": "从指定槽位取出指定数量的物品作为当前激活物品（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "TakeActiveItemFromAllOfSlot",
+      "effect": "从指定槽位取出所有物品作为当前激活物品（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "AddOneOfActiveItemToSlot",
+      "effect": "将当前激活物品的一个添加到指定槽位（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "AddAllOfActiveItemToSlot",
+      "effect": "将当前激活物品的全部添加到指定槽位（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "SwapActiveItemWithSlot",
+      "effect": "将当前激活物品与指定槽位物品进行完全交换（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "SwapOneOfActiveItemWithSlot",
+      "effect": "将当前激活物品的一个与指定槽位物品进行交换（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "MoveItemFromAllOfSlot",
+      "effect": "将指定槽位中的所有物品移动到另一个容器（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "MoveItemFromHalfOfSlot",
+      "effect": "将指定槽位中的一半物品移动到另一个容器（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "MoveItemFromCountOfSlot",
+      "effect": "将指定槽位中指定数量的物品移动到另一个容器（通过组件或classified代理执行客户端操作）。"
+    },
+    {
+      "name": "IsBusy",
+      "effect": "返回容器是否正处于忙碌状态（例如，classified正在处理操作）。"
+    },
+    {
+      "name": "EnableInfiniteStackSize",
+      "effect": "启用或禁用容器的无限堆叠功能。通过classified的infinitestacksize网络变量同步。"
+    },
+    {
+      "name": "IsInfiniteStackSize",
+      "effect": "检查容器是否启用了无限堆叠功能。"
+    },
+    {
+      "name": "EnableReadOnlyContainer",
+      "effect": "启用或禁用容器的只读模式。通过classified的readonlycontainer网络变量同步，并刷新所有打开者的UI。"
+    },
+    {
+      "name": "IsReadOnlyContainer",
+      "effect": "检查容器是否处于只读模式。"
+    },
+    {
+      "name": "ShouldPrioritizeContainer",
+      "effect": "根据自定义priorityfn判断该容器是否应被优先用于存放指定物品（考虑物品属性和容器状态）。"
+    },
+    {
+      "name": "GetSpecificSlotForItem",
+      "effect": ""
+    },
+    {
+      "name": "GetWidget",
+      "effect": "返回容器关联的UI小组件（widget）对象。"
+    },
+    {
+      "name": "AttachClassified",
+      "effect": "附加一个网络代理实体(classified)到此容器，用于客户端数据同步。设置移除监听和初始化槽位。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "解除与网络代理实体(classified)的绑定。"
+    },
+    {
+      "name": "AttachOpener",
+      "effect": "附加一个打开者(opener)实体到此容器，触发容器打开逻辑。设置移除监听，并延迟执行OpenContainer。"
+    },
+    {
+      "name": "DetachOpener",
+      "effect": "解除与打开者(opener)实体的绑定，触发容器关闭逻辑。"
+    },
+    {
+      "name": "AddOpener",
+      "effect": "添加一个打开者。根据opencount（多开模式）决定是设置网络目标还是创建独立的container_opener实体。"
+    },
+    {
+      "name": "RemoveOpener",
+      "effect": "移除一个打开者。根据剩余opencount调整网络目标或清理资源。"
+    },
+    {
+      "name": "WidgetSetup",
+      "effect": "初始化容器的UI小组件和相关设置（槽位数、物品测试函数等），并监听库存物品事件。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "容器实体移除时的清理逻辑。在服务器端移除所有相关实体；在客户端断开opener连接。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "itemget",
+    "itemlose",
+    "onputininventory",
+    "ondropped",
+    "onremove"
+  ],
+  "netvars": [
+    "container._cannotbeopened",
+    "container._skipopensnd",
+    "container._skipclosesnd"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14697,
+      18721,
+      14699,
+      65881,
+      15642,
+      28181,
+      51136,
+      13271
+    ],
+    "aspects": [
+      {
+        "aspect": "侧边小部件显示",
+        "evidence": [
+          {
+            "pageid": 14697,
+            "quote": "装备时，背包的物品栏会显示在屏幕右侧"
+          },
+          {
+            "pageid": 18721,
+            "quote": "装备时，坎普斯背包的物品栏会显示在屏幕右侧"
+          },
+          {
+            "pageid": 14699,
+            "quote": "装备时，保鲜背包的物品栏会显示在屏幕右侧"
+          }
+        ]
+      },
+      {
+        "aspect": "打开关闭行为描述",
+        "evidence": [
+          {
+            "pageid": 51136,
+            "quote": "背包会被强制关闭且无法打开"
+          },
+          {
+            "pageid": 28181,
+            "quote": "打开后连接到‘挖洞兔号角储物空间’"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏数量描述",
+        "evidence": [
+          {
+            "pageid": 14697,
+            "quote": "背包提供 8 个物品栏"
+          },
+          {
+            "pageid": 18721,
+            "quote": "坎普斯背包提供 14 个物品栏"
+          },
+          {
+            "pageid": 14699,
+            "quote": "保鲜背包提供 8 个物品栏"
+          },
+          {
+            "pageid": 28181,
+            "quote": "这是一个 12 格物品栏的储物空间"
+          },
+          {
+            "pageid": 13271,
+            "quote": "切斯特提供 9 个物品栏"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "背包",
+    "储物",
+    "容器UI",
+    "物品操作",
+    "客户端表现",
+    "网络变量",
+    "打开关闭",
+    "槽位物品",
+    "物品移动",
+    "界面交互"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 8/10)",
+  "gameplay_tags": [
+    "物品管理",
+    "界面交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+    "source_bytes": 22365,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106256712
+  }
+}

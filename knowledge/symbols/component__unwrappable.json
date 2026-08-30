@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/unwrappable.lua"
+  },
+  "category": "component",
+  "display_name": "unwrappable",
+  "summary": "Unwrappable组件管理物品的包裹和解开数据，允许玩家将多个物品打包成一个包裹实体。它处理物品数据的序列化与反序列化，支持解开延迟和容器预览功能。核心玩法涉及物品存储、运输和解包，常用于打包资源以便携带或交易。",
+  "api": [
+    {
+      "name": "SetOnWrappedFn",
+      "effect": ""
+    },
+    {
+      "name": "SetOnUnwrappedFn",
+      "effect": ""
+    },
+    {
+      "name": "SetUnwrapDelayFn",
+      "effect": ""
+    },
+    {
+      "name": "SetPeekContainer",
+      "effect": ""
+    },
+    {
+      "name": "WrapItems",
+      "effect": ""
+    },
+    {
+      "name": "Unwrap",
+      "effect": ""
+    },
+    {
+      "name": "PeekInContainer",
+      "effect": ""
+    },
+    {
+      "name": "OnSave",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "wrappeditem",
+    "unwrappeditem",
+    "unwrapped"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14696,
+      18359,
+      15715,
+      15817,
+      23187,
+      24170,
+      18493,
+      18551
+    ],
+    "aspects": [
+      {
+        "aspect": "打包功能与好处描述",
+        "evidence": [
+          {
+            "pageid": 14696,
+            "quote": "捆绑包装允许玩家将最多 4 件[[物品]]打包成为 1 个捆绑物资"
+          }
+        ]
+      },
+      {
+        "aspect": "打包时物品联动效果",
+        "evidence": [
+          {
+            "pageid": 15817,
+            "quote": "使用[[捆绑包装]]将岩浆虫尖牙打包后，超级可爱岩浆虫也会被一同打包。"
+          }
+        ]
+      },
+      {
+        "aspect": "解包后物品状态变化",
+        "evidence": [
+          {
+            "pageid": 18551,
+            "quote": "月熠被[[捆绑物资]]打包后再打开会掉到地上"
+          }
+        ]
+      },
+      {
+        "aspect": "解包时触发生物行为",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "被捆绑包装打包的的鼹鼠会在打开包裹时迅速挖掘一个新的鼹鼠丘"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "包裹",
+    "打包",
+    "打开包裹",
+    "预览包裹",
+    "存储物品",
+    "解开延迟",
+    "物品来源"
+  ],
+  "search_terms_note": "pass1 后零命中 5/7,已二次修正(修正后 3/7)",
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8498c4482a22bbb61c96110a0a93b7677302fd088c7713bab0db7c27b182d8ed",
+    "source_bytes": 6976,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113531988
+  }
+}

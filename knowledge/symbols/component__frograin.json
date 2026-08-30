@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/frograin.lua"
+  },
+  "category": "component",
+  "display_name": "frograin",
+  "summary": "该组件是饥荒联机版中管理青蛙雨的核心逻辑。它监控世界天气状态，在春季降雨期间根据概率和玩家位置生成青蛙。组件控制青蛙的生成数量上限、时间间隔，并跟踪已生成的青蛙以管理其存续状态。",
+  "api": [
+    {
+      "name": "SetSpawnTimes",
+      "effect": "设置青蛙生成的时间间隔（最小值和最大值），并强制更新所有活跃玩家的生成调度任务。"
+    },
+    {
+      "name": "SetMaxFrogs",
+      "effect": "设置青蛙生成的最大数量限制（_frogcap），影响同时存在的青蛙上限。"
+    },
+    {
+      "name": "StartTrackingFn",
+      "effect": "开始跟踪指定青蛙实体，保存并覆盖其 persist 标志为 false，监听实体睡眠、移除、进入/退出 limbo 事件以自动管理跟踪。"
+    },
+    {
+      "name": "StartTracking",
+      "effect": "调用 StartTrackingFn 对指定青蛙实体开始跟踪。"
+    },
+    {
+      "name": "StopTrackingFn",
+      "effect": "停止跟踪指定青蛙实体，恢复其 persist 标志，移除相关事件监听。"
+    },
+    {
+      "name": "StopTracking",
+      "effect": "调用 StopTrackingFn 对指定青蛙实体停止跟踪（源码注释表明当前无调用者）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存数据表，包含当前青蛙数量上限（frogcap），用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载青蛙数量上限（frogcap），并强制更新生成状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前青蛙数与上限、更新状态及生成时间间隔。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "israining",
+    "precipitationrate",
+    "ms_playerjoined",
+    "ms_playerleft",
+    "entitysleep",
+    "onremove",
+    "enterlimbo",
+    "exitlimbo"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.FROG_RAIN_DELAY",
+    "TUNING.FROG_RAIN_SPAWN_RADIUS",
+    "TUNING.FROG_RAIN_MAX",
+    "TUNING.FROG_RAIN_MAX_RADIUS",
+    "TUNING.FROG_RAIN_PRECIPITATION",
+    "TUNING.FROG_RAIN_MOISTURE",
+    "TUNING.FROG_RAIN_CHANCE",
+    "TUNING.FROG_RAIN_LOCAL_MIN",
+    "TUNING.FROG_RAIN_LOCAL_MAX",
+    "TUNING.FROG_RAIN_LUNARFROG_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      15357,
+      19917,
+      23956,
+      28179,
+      22707,
+      52138,
+      10418
+    ],
+    "aspects": [
+      {
+        "aspect": "青蛙雨发生概率描述",
+        "evidence": [
+          {
+            "pageid": 19917,
+            "quote": "每次[[降雨]]有 16%<!--FROG_RAIN_CHANCE--> 的概率发生青蛙雨。"
+          }
+        ]
+      },
+      {
+        "aspect": "青蛙雨生成数量描述",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响降雨时发生[[青蛙雨]]的概率和青蛙生成数量。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "青蛙雨",
+    "春季降雨",
+    "青蛙生成",
+    "玩家附近",
+    "数量上限",
+    "生成间隔",
+    "青蛙跟踪",
+    "天气监控",
+    "青蛙雨机制",
+    "存续状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "生存",
+    "天气",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "79ec87592b96279de7fdaccc43bc3159fcb26af56a6b53ca68ad7662ea0165eb",
+    "source_bytes": 7925,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107856910
+  }
+}

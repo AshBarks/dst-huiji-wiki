@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/diseaseable.lua"
+  },
+  "category": "component",
+  "display_name": "diseaseable",
+  "summary": "Diseaseable组件管理实体的疾病状态，控制疾病的发生、传播和视觉效果。当实体患病时，会尝试感染附近的可患病实体，并显示病蝇特效。该组件参与游戏中的疾病传播机制，影响实体的生存。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，取消所有内部任务（视觉效果、传播、延迟、警告），并移除实体的'diseased'和'diseaseable'标签。副作用：清理组件状态，防止残留任务。"
+    },
+    {
+      "name": "IsDiseased",
+      "effect": "返回布尔值，表示实体是否已患病。无副作用，仅读取内部状态。"
+    },
+    {
+      "name": "IsBecomingDiseased",
+      "effect": "返回布尔值，表示实体是否即将患病（处于警告阶段）。无副作用，仅检查警告任务是否存在。"
+    },
+    {
+      "name": "SetDiseasedFn",
+      "effect": "设置当实体患病时调用的回调函数fn。副作用：存储回调函数，用于后续患病事件。"
+    },
+    {
+      "name": "Disease",
+      "effect": "如果实体未患病，立即使其患病。行为：调用OnRemoveFromEntity清理，设置diseased为true，启动传播任务（ScheduleSpread）和视觉效果任务（DoFX），并调用onDiseasedFn回调。副作用：实体状态变为患病，开始传播和视觉效果。"
+    },
+    {
+      "name": "Spread",
+      "effect": "如果实体患病，尝试将疾病传播给附近的一个可患病实体。行为：取消自身传播任务，寻找附近可患病实体，若找到则使其患病，然后重启自身传播任务。副作用：可能传播疾病到其他实体。"
+    },
+    {
+      "name": "RestartNearbySpread",
+      "effect": "重启附近患病实体的传播任务。行为：寻找半径内的患病实体，取消它们的传播任务并重启。副作用：重置附近实体的传播计时。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存数据表，根据状态包含spreadtime、delaytime或warningtime之一。无副作用，仅返回状态数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据恢复状态。行为：根据数据启动相应任务（Disease、StartDelay或StartWarning），并取消现有任务。副作用：恢复组件状态到保存时。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，显示diseased状态、spreadtime、delaytime和warningtime。无副作用，仅用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28621,
+      22707,
+      19802,
+      15551,
+      13379,
+      14484,
+      15415,
+      15642
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未发现与疾病状态、患病、传播或相关机制相关的描述，因此无证据表明component__diseaseable的能力被讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "疾病",
+    "传播",
+    "患病",
+    "瘟疫",
+    "病蝇",
+    "感染",
+    "延迟",
+    "警告",
+    "扩散"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "428d1bafde962e7c42bd1c2d255d2c47a53f45b531b21eea76f57cbf2d0dfd20",
+    "source_bytes": 7907,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106943053
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatcannon.lua"
+  },
+  "category": "component",
+  "display_name": "boatcannon",
+  "summary": "boatcannon组件管理船用大炮的弹药加载和瞄准状态，支持玩家操作大炮进行瞄准和发射。发射时生成指定投射物并施加反冲力，核心玩法涉及海上战斗和远程攻击。",
+  "api": [
+    {
+      "name": "OnSave",
+      "effect": "返回包含当前弹药prefab名称的表（如果已加载）或nil，用于保存组件状态。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从传入的数据表中加载弹药prefab名称，调用LoadAmmo恢复弹药状态。"
+    },
+    {
+      "name": "SetOnStartAimingFn",
+      "effect": "设置瞄准开始时调用的回调函数fn，用于自定义瞄准启动行为。"
+    },
+    {
+      "name": "SetOnStopAimingFn",
+      "effect": "设置瞄准停止时调用的回调函数fn，用于自定义瞄准停止行为。"
+    },
+    {
+      "name": "StartAiming",
+      "effect": "设置操作者为传入的operator，监听其onremove事件以自动停止瞄准，为大炮实体添加occupied标签，并调用onstartfn回调（如果已设置）。"
+    },
+    {
+      "name": "StopAiming",
+      "effect": "停止瞄准，移除大炮实体的occupied标签，调用onstopfn回调（如果已设置），清除操作者引用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，如果存在操作者且其拥有boatcannonuser组件，则调用boatcannonuser:SetCannon(nil)；否则调用StopAiming清理状态。"
+    },
+    {
+      "name": "IsAmmoLoaded",
+      "effect": "返回布尔值，指示当前是否已加载弹药（loadedammo不为nil）。"
+    },
+    {
+      "name": "LoadAmmo",
+      "effect": "设置当前弹药为传入的projectileprefab（可为nil），并推送ammoloaded事件（如果加载）或ammounloaded事件（如果卸载）。"
+    },
+    {
+      "name": "Shoot",
+      "effect": "如果已加载弹药，则生成该弹药prefab的投射物实体，设置其初始位置和朝向，使用complexprojectile组件发射到目标位置；然后移除弹药（调用LoadAmmo(nil)），并对所属船施加反冲力（通过boatphysics:ApplyForce）。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ammoloaded",
+    "ammounloaded"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BOAT.BOATCANNON.PROJECTILE_INITIAL_HEIGHT",
+    "TUNING.BOAT.BOATCANNON.RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      18188,
+      15022,
+      35790,
+      13437,
+      51046,
+      13897,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "填装炮弹操作",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "先用鼠标持有[[炮弹]]点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装"
+          }
+        ]
+      },
+      {
+        "aspect": "射击触发方式",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "再左键点击大炮进…"
+          }
+        ]
+      },
+      {
+        "aspect": "弹药装载状态台词",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "玩家身上没有炮弹填装大炮时："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "船炮",
+    "大炮",
+    "弹药",
+    "发射",
+    "瞄准",
+    "海战",
+    "攻击",
+    "船战",
+    "远程"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "海战"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "042ef0b75ac83b169590e17fbd228d55578483bfce0d3e821d41d1ca891aa322",
+    "source_bytes": 3143,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098329851
+  }
+}

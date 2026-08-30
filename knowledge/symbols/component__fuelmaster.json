@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fuelmaster.lua"
+  },
+  "category": "component",
+  "display_name": "fuelmaster",
+  "summary": "FuelMaster 组件管理燃料相关的奖励乘数和自定义计算函数。它允许通过方法设置乘数和函数，用于调整燃料添加时的奖励效果。核心玩法涉及生存或建造中的资源管理，通过影响燃料效率来增强游戏性。",
+  "api": [
+    {
+      "name": "SetBonusMult",
+      "effect": "设置奖励乘数，用于调整燃料奖励的倍数。副作用是更新组件内部的 bonusmult 值。"
+    },
+    {
+      "name": "SetBonusFn",
+      "effect": "设置一个自定义函数，在计算燃料奖励时被调用以动态调整乘数。副作用是更新组件内部的 bonusfn 函数引用。"
+    },
+    {
+      "name": "GetBonusMult",
+      "effect": "计算并返回燃料奖励的乘数。如果设置了奖励函数（bonusfn），则调用该函数并乘以设置的乘数（bonusmult）；否则直接返回设置的乘数。行为基于当前状态，无持久副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      28610,
+      15539,
+      18216,
+      15922,
+      16197,
+      18572,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件能力 SetBonusMult、SetBonusFn、GetBonusMult 相关的玩家语言表达；这些能力可能涉及内部燃料奖励计算，但页面仅描述燃料类型、燃料值和添加燃料的效果，未讨论奖励乘数或函数。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "燃料",
+    "奖励",
+    "乘数",
+    "加成",
+    "函数",
+    "计算",
+    "效果",
+    "燃料大师"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7cfb3041a3ee5ac665b5615f1ea65e9e6a21e13def572aa3c48b36568e2dd2be",
+    "source_bytes": 437,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107939984
+  }
+}

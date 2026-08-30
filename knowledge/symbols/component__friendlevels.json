@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/friendlevels.lua"
+  },
+  "category": "component",
+  "display_name": "friendlevels",
+  "summary": "该组件管理实体的朋友等级、友好任务和奖励系统。通过完成任务提升等级，触发事件并生成奖励物品。参与核心玩法如社交互动和进度解锁。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用或禁用组件，并设置心情状态为非心情状态。参数 enabled 为布尔值。"
+    },
+    {
+      "name": "SetDefaultRewards",
+      "effect": "设置默认奖励函数，用于任务完成时生成奖励。参数 fn 为函数。"
+    },
+    {
+      "name": "SetLevelRewards",
+      "effect": "设置等级奖励数据，根据等级触发对应奖励。参数 data 为数组。"
+    },
+    {
+      "name": "SetFriendlyTasks",
+      "effect": "设置友好任务数据，定义任务内容与状态。参数 data 为数组。"
+    },
+    {
+      "name": "DoRewards",
+      "effect": "执行排队奖励，根据等级或默认函数生成物品并返回礼物列表。参数 target 为实体。"
+    },
+    {
+      "name": "CompleteTask",
+      "effect": "完成指定任务，若任务未完成且等级未满则增加等级并触发事件；否则可能触发默认奖励。参数 task 为任务标识，doer 为执行者。"
+    },
+    {
+      "name": "CompleteAllTasks",
+      "effect": "依次调用 CompleteTask 完成所有任务。参数 doer 为执行者。"
+    },
+    {
+      "name": "GetLevel",
+      "effect": "返回当前朋友等级。"
+    },
+    {
+      "name": "GetMaxLevel",
+      "effect": "返回最大等级，基于 levelrewards 数组长度。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，包括启用状态、等级、任务完成情况和排队奖励。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，并触发 friend_task_complete 或 friend_level_changed 事件。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，恢复任务完成状态。参数 newents 和 data 为加载数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含任务数量和等级信息。"
+    }
+  ],
+  "events_published": [
+    "friend_level_changed",
+    "friend_task_complete"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      56871,
+      14815,
+      24720,
+      57263,
+      65605,
+      14769,
+      15055
+    ],
+    "aspects": [
+      {
+        "aspect": "任务列表设置",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "寄居蟹隐士有一系列任务"
+          }
+        ]
+      },
+      {
+        "aspect": "任务完成奖励发放",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "任务完成后，珍珠会念完相应台词之后才会送给玩家[[一包谢意]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "好感度级别影响交易解锁",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "在好感度达到 1 级之后，靠近寄居蟹隐士能开启瓶罐交易。"
+          }
+        ]
+      },
+      {
+        "aspect": "好感度级别影响流星雨概率",
+        "evidence": [
+          {
+            "pageid": 15055,
+            "quote": "寄居蟹隐士的好感度，每一级增加 10% 概率。"
+          }
+        ]
+      },
+      {
+        "aspect": "最大好感度级别",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "更多的交易项在好感度达到 3、6、8、9 级时解锁"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "好感度",
+    "任务完成",
+    "等级提升",
+    "状态保存",
+    "奖励物品",
+    "社交互动",
+    "进度解锁",
+    "事件触发"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "社交",
+    "奖励",
+    "成长"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6e5b2fa23325af9192cf7cdcb0a73f0615e923fd9eb010fa140d8357f67da859",
+    "source_bytes": 3532,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100130890
+  }
+}

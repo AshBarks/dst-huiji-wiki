@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/dryingrack.lua"
+  },
+  "category": "component",
+  "display_name": "dryingrack",
+  "summary": "该组件管理一个容器，用于存储待干燥的物品，并控制物品的干燥过程。它根据天气状态（如雨天或酸雨）暂停或调整干燥速度，最终将可干燥物品转化为对应的干燥产品。组件还处理物品的获取、丢失及保存/加载逻辑。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，禁用干燥功能，如果容器与实体不同则清空并移除容器实体。"
+    },
+    {
+      "name": "GetContainer",
+      "effect": "返回组件关联的容器对象。"
+    },
+    {
+      "name": "SetShowItemFn",
+      "effect": "设置一个回调函数，在物品显示于容器槽位时调用，用于更新视觉表现。"
+    },
+    {
+      "name": "SetHideItemFn",
+      "effect": "设置一个回调函数，在物品从容器槽位隐藏时调用，用于更新视觉表现。"
+    },
+    {
+      "name": "GetItemInSlot",
+      "effect": "获取指定槽位的物品，并返回物品、预制体名称和干燥构建文件；如果物品可干燥，使用其干燥构建文件，否则使用默认构建或缓存信息。"
+    },
+    {
+      "name": "EnableDrying",
+      "effect": "启用干燥功能：设置容器为暴露状态，添加 preserver 组件以管理保鲜速率，监听天气事件（如雨天）和免疫事件，并根据当前天气状态决定是否暂停干燥。"
+    },
+    {
+      "name": "DisableDrying",
+      "effect": "禁用干燥功能：设置容器为非暴露状态，移除 preserver 组件，停止监听所有天气和免疫事件，并暂停干燥过程。"
+    },
+    {
+      "name": "OnGetItem",
+      "effect": "当物品放入容器时调用，为可干燥物品启动干燥计时器（如果未暂停），更新干燥信息并调用显示回调；在酸雨中设置物品的酸腐蚀状态。"
+    },
+    {
+      "name": "OnLoseItem",
+      "effect": "当物品从容器移除时调用，停止干燥计时器并保存剩余干燥时间到物品上，清理干燥信息；在酸雨中清除物品的酸腐蚀状态，并调用隐藏回调。"
+    },
+    {
+      "name": "IsExposedToRain",
+      "effect": "检查实体是否暴露在雨中（正在下雨或下酸雨且无雨免疫），返回布尔值。"
+    },
+    {
+      "name": "HasRainImmunity",
+      "effect": "检查实体或其骑手是否具有雨免疫组件，返回布尔值。"
+    },
+    {
+      "name": "SetContainerRainImmunity",
+      "effect": "为容器实体设置或移除雨免疫状态：如果免疫则添加 rainimmunity 组件并添加来源，否则移除来源。"
+    },
+    {
+      "name": "SetContainerIsInAcid",
+      "effect": "设置容器是否处于酸雨中：更新内部状态，如果酸雨则为所有容器物品设置酸腐蚀状态，否则清除。"
+    },
+    {
+      "name": "PauseDrying",
+      "effect": "暂停干燥过程：将所有物品的干燥计时器切换为保存剩余时间状态，并取消活跃任务。"
+    },
+    {
+      "name": "ResumeDrying",
+      "effect": "恢复干燥过程：将所有保存剩余时间的物品重新启动干燥计时器。"
+    },
+    {
+      "name": "OnBurnt",
+      "effect": "当实体被烧毁时调用，立即干燥容器内所有物品并使其弹出，模拟烧毁效果。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "用于处理长时间更新（如睡觉）：根据经过的时间推进或完成干燥过程，并对新完成的物品应用额外更新。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态：如果容器非空，序列化每个槽位物品的干燥剩余时间或构建信息；如果容器与实体不同，则同时保存容器内容。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态：如果容器与实体不同，恢复容器内容并加载干燥信息。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "在加载后传递中调用，如果容器与实体相同，则延迟加载干燥信息以确保容器数据先加载。"
+    },
+    {
+      "name": "LoadInfo_Internal",
+      "effect": "内部方法，根据保存的数据重新设置物品的干燥计时器或构建信息，并调用显示回调。"
+    },
+    {
+      "name": "GetDryingInfoSnapshot",
+      "effect": "获取当前所有物品干燥信息的快照，返回剩余时间或构建信息的映射表。"
+    },
+    {
+      "name": "ApplyDryingInfoSnapshot",
+      "effect": "应用一个干燥信息快照，根据快照恢复或设置物品的干燥计时器和构建信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "itemget",
+    "itemlose",
+    "gainrainimmunity",
+    "loserainimmunity",
+    "riderchanged",
+    "israining",
+    "isacidraining"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ACIDRAIN_PERISHABLE_ROT_PERCENT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      13779,
+      16197,
+      20700,
+      15642,
+      70462,
+      15237,
+      14714
+    ],
+    "aspects": [
+      {
+        "aspect": "容器物品栏提供",
+        "evidence": [
+          {
+            "pageid": 14714,
+            "quote": "晾肉架提供 3 个物品栏"
+          }
+        ]
+      },
+      {
+        "aspect": "晾晒进程启用",
+        "evidence": [
+          {
+            "pageid": 14714,
+            "quote": "位于其中的物品无法堆叠，并且会进入晾晒进程"
+          }
+        ]
+      },
+      {
+        "aspect": "暴露在雨中",
+        "evidence": [
+          {
+            "pageid": 14714,
+            "quote": "与大部分[[容器]]不同，晾肉架不防水。"
+          },
+          {
+            "pageid": 14714,
+            "quote": "在雨中，晾肉架中的物品会[[潮湿]]，腐烂速度比正常快 30%。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "晾肉架",
+    "干燥",
+    "肉干",
+    "酸雨",
+    "暂停",
+    "天气",
+    "容器",
+    "食物",
+    "保存",
+    "制作"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "食物",
+    "制作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a835fd5b4646359cfea17b4e02fece460b0831de8d7141047adba9509f62cede",
+    "source_bytes": 16089,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107056030
+  }
+}

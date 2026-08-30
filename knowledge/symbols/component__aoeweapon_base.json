@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoeweapon_base.lua"
+  },
+  "category": "component",
+  "display_name": "aoeweapon_base",
+  "summary": "该组件管理武器的伤害值、刺激类型、工作标签和回调函数，用于范围攻击和工作交互。它支持攻击目标、破坏可工作物体、拾取物品和投掷物品，通过预命中、命中和未命中回调函数扩展行为。",
+  "api": [
+    {
+      "name": "SetDamage(dmg)",
+      "effect": "设置武器的伤害值为 dmg。副作用：更新 self.damage 变量。"
+    },
+    {
+      "name": "SetStimuli(stimuli)",
+      "effect": "设置攻击的刺激类型为 stimuli。副作用：更新 self.stimuli 变量。"
+    },
+    {
+      "name": "SetWorkActions(...)",
+      "effect": "设置武器的工作动作列表（如 CHOP、HAMMER 等）。副作用：清空并重新设置 self.workactions 为以动作为键的字典，并调用 _CombineTags 更新标签组合。"
+    },
+    {
+      "name": "SetTags(...)",
+      "effect": "设置武器的标签列表（如 '_combat'、'pickable'）。副作用：清空并重新设置 self.tags 为参数列表，并调用 _CombineTags 更新标签组合。"
+    },
+    {
+      "name": "SetNoTags(...)",
+      "effect": "设置武器的排除标签列表（如 'FX'、'DECOR'）。副作用：更新 self.notags 为参数列表。"
+    },
+    {
+      "name": "SetOnPreHitFn(fn)",
+      "effect": "设置预命中回调函数 fn，在命中逻辑执行前调用。副作用：更新 self.onprehitfn 变量。"
+    },
+    {
+      "name": "SetOnHitFn(fn)",
+      "effect": "设置命中回调函数 fn，在成功命中目标后调用。副作用：更新 self.onhitfn 变量。"
+    },
+    {
+      "name": "SetOnMissFn(fn)",
+      "effect": "设置未命中回调函数 fn，在未命中目标时调用。副作用：更新 self.onmissfn 变量。"
+    },
+    {
+      "name": "OnHit(doer, target)",
+      "effect": "执行命中逻辑：先调用预命中回调；然后根据目标类型进行工作破坏、拾取物品或攻击。若成功命中则调用命中回调，否则调用未命中回调。副作用：可能破坏目标、移除树桩、拾取物品或发起攻击。"
+    },
+    {
+      "name": "OnToss(doer, target, sourceposition, basespeed, startradius)",
+      "effect": "执行投掷逻辑：停用目标矿石，设置目标物理位置和速度以实现投掷效果。副作用：可能移动目标位置并设置物理速度，基于地面可通行性测试调整投掷方向。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15903,
+      15022,
+      13409,
+      15225,
+      15922,
+      13406,
+      13602,
+      13606
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏物品和实体的使用效果、行为模式（如耐久消耗、伤害值、攻击范围等），但未直接讨论 weapon 组件的代码能力如 SetDamage、OnToss、OnHit 等函数的设置或调用。描述停留在玩家可观察层面，未涉及组件 API 或行为语义清单中的具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "范围攻击",
+    "武器伤害",
+    "工作交互",
+    "工作标签",
+    "触发事件",
+    "投掷攻击",
+    "伤害类型",
+    "破坏工作",
+    "拾取物品",
+    "未命中"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "战斗",
+    "工作",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3264f4a2f42d39245d438d5c5578e16edf6a56bbcb2b2c4d9aaf61664c232ed1",
+    "source_bytes": 6012,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105227414
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/despawnfader.lua"
+  },
+  "category": "component",
+  "display_name": "despawnfader",
+  "summary": "该组件管理实体的淡出与消失效果，通过网络变量同步客户端和服务器的淡出状态，确保多端一致性。当淡出动画完成时，实体被自动移除，常用于战利品消失、生物死亡等场景，实现平滑的视觉过渡。",
+  "api": [
+    {
+      "name": "FadeOut",
+      "effect": "启动淡出过程：设置淡出值为1，添加'NOCLICK'标签使实体不可点击，停止实体持久化（不再保存到存档），并立即开始更新动画。每帧减少淡出值，调整实体透明度，当淡出值降至0时，服务器端移除实体，客户端停止更新。"
+    }
+  ],
+  "events_published": [
+    "fadedirty"
+  ],
+  "events_listened": [
+    "fadedirty"
+  ],
+  "netvars": [
+    "despawnfader._fade"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      13570,
+      14099,
+      14683,
+      20678,
+      46866,
+      70763,
+      19110
+    ],
+    "aspects": [
+      {
+        "aspect": "消失动画描述",
+        "evidence": [
+          {
+            "pageid": 14099,
+            "quote": "暗影囚牢在持续时间归零的消失动画期间依然可以困住目标"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "消失效果",
+    "淡出效果",
+    "实体消失",
+    "透明度变化",
+    "动画效果",
+    "消失动画",
+    "战利品淡出",
+    "死亡淡出",
+    "平滑过渡"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "059c25af1932a03a505bc52077fa4ed467c4adf52b405fa1bac67cb811fbd49a",
+    "source_bytes": 1533,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096461123
+  }
+}

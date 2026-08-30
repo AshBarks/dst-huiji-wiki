@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldwind.lua"
+  },
+  "category": "component",
+  "display_name": "worldwind",
+  "summary": "该组件管理世界风的速度和角度数据，通过定时随机改变风向来模拟风的变化，并推送事件通知其他系统。它参与游戏的环境模拟玩法，影响与风相关的交互行为。",
+  "api": [
+    {
+      "name": "Start",
+      "effect": "启动组件更新，使风开始定时随机变化。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止组件更新，风不再变化。"
+    },
+    {
+      "name": "GetWindAngle",
+      "effect": "返回当前风的角度（0到360度）。"
+    },
+    {
+      "name": "GetWindVelocity",
+      "effect": "返回当前风的速度（固定值为1）。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前角度和速度信息。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "内部更新函数，定期减少时间计数器，当时间耗尽时随机改变风向并推送 windchange 事件。"
+    }
+  ],
+  "events_published": [
+    "windchange"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14813,
+      24276,
+      14938,
+      35821,
+      13698,
+      13701,
+      13784,
+      15022
+    ],
+    "aspects": [
+      {
+        "aspect": "龙卷风停止触发",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "存在 5 秒后消失。"
+          }
+        ]
+      },
+      {
+        "aspect": "龙卷风启动触发",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "使用天气风向标右键目标即可召唤出一个[[龙卷风]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "龙卷风持续效果",
+        "evidence": [
+          {
+            "pageid": 14813,
+            "quote": "龙卷风会径直移动前往目标位置，到达目标位置后转为随机移动"
+          },
+          {
+            "pageid": 24276,
+            "quote": "龙卷风会每 1/6 秒对附近的所有实体造成 7 点物理伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "风向",
+    "风力",
+    "随机风向",
+    "环境模拟",
+    "风事件",
+    "风角度",
+    "天气变化",
+    "游戏风"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "环境模拟",
+    "天气系统"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f2089d07cd78aba2c4878320245f69a51a2603c46f6467686cf7ce5263dd7d62",
+    "source_bytes": 1118,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788114493708
+  }
+}

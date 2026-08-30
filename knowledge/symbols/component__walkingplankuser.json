@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/walkingplankuser.lua"
+  },
+  "category": "component",
+  "display_name": "walkingplankuser",
+  "summary": "该组件管理实体与行走木板的交互状态，确保木板被移除时自动清理挂载数据。核心玩法涉及在木板上移动，可能用于海上或特殊地形的通行。提供设置和卸载木板的方法，支持实体的移动逻辑。",
+  "api": [
+    {
+      "name": "SetCurrentPlank",
+      "effect": "设置实体当前挂载的木板。如果之前有木板，取消其移除事件监听；如果新木板非空，监听其 \"onremove\" 事件以在木板移除时自动清理 current_plank 状态。"
+    },
+    {
+      "name": "Dismount",
+      "effect": "使实体从当前木板上下来。调用木板的 walkingplank:StopMounting() 停止挂载，并清理 current_plank 和相关事件监听。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16185,
+      24451,
+      35670,
+      65881,
+      24074,
+      18540,
+      15022,
+      18522
+    ],
+    "aspects": [
+      {
+        "aspect": "离开漂浮平台的行为描述",
+        "evidence": [
+          {
+            "pageid": 16185,
+            "quote": "玩家可以通过直接地移动来跳过水面，登上或离开漂浮平台。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "木板",
+    "挂载",
+    "清理",
+    "交互",
+    "移动",
+    "船",
+    "安装",
+    "卸载",
+    "行走",
+    "海上"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 0/10)",
+  "gameplay_tags": [
+    "移动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db56d74ae2fee9a6e594c5549a30014bf779e9dc8834e4be0135557b22f30e3e",
+    "source_bytes": 900,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092078090
+  }
+}

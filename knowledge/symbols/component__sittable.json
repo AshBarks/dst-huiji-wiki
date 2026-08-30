@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sittable.lua"
+  },
+  "category": "component",
+  "display_name": "sittable",
+  "summary": "sittable组件管理实体的占用状态，支持坐等交互行为。它通过occupier属性跟踪占用者，并处理占用者移除或点燃事件。核心玩法涉及玩家或NPC坐到实体上，组件负责状态切换和标签更新。",
+  "api": [
+    {
+      "name": "SetOccupier",
+      "effect": "设置占用者实体。如果占用者变化，移除旧事件监听并添加新监听，推送'becomesittable'或'becomeunsittable'事件，并更新'cansit'标签。"
+    },
+    {
+      "name": "IsOccupied",
+      "effect": "返回布尔值，指示实体是否被占用。无副作用。"
+    },
+    {
+      "name": "IsOccupiedBy",
+      "effect": "返回布尔值，指示实体是否被指定占用者占用。无副作用。"
+    },
+    {
+      "name": "EjectOccupier",
+      "effect": "如果存在占用者，推送'becomeunsittable'事件。注意：此方法不直接清除occupier属性，依赖事件处理。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时调用。清理事件监听，移除'cansit'标签，并推送'becomeunsittable'事件。"
+    }
+  ],
+  "events_published": [
+    "becomesittable",
+    "becomeunsittable"
+  ],
+  "events_listened": [
+    "onremove",
+    "onignite"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      28739,
+      65881,
+      15975,
+      21063,
+      15015,
+      20714,
+      23196
+    ],
+    "aspects": [
+      {
+        "aspect": "从占据状态离开的行为描述",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "即使已经坐在皇家地毯上，皇室练习生仍会像其他鱼人一样产生仇恨并离开皇家地毯战斗。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色坐上物体的行为描述",
+        "evidence": [
+          {
+            "pageid": 28739,
+            "quote": "角色可以左键单击来坐在椅子上。"
+          },
+          {
+            "pageid": 15975,
+            "quote": "会跑向皇家地毯并坐在上面，成为皇室练习生…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "坐",
+    "占用",
+    "弹出",
+    "交互",
+    "状态切换",
+    "标签管理",
+    "火灾事件",
+    "事件监听"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "交互",
+    "状态管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "670331b1491a21c8f2caaec9c3403e1d6bf0d0141edc030cb87271a80184f760",
+    "source_bytes": 1733,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103806146
+  }
+}

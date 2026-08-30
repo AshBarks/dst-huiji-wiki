@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/recipescanner.lua"
+  },
+  "category": "component",
+  "display_name": "recipescanner",
+  "summary": "RecipeScanner组件负责扫描实体以解锁制造配方。它管理扫描回调函数，并与builder组件交互验证和解锁配方，是游戏制造系统的核心扩展，允许玩家通过扫描学习新配方。",
+  "api": [
+    {
+      "name": "SetOnScannedFn",
+      "effect": "设置扫描成功时的回调函数。回调函数会在Scan方法成功后被调用，参数包括扫描器实体、目标实体、执行者实体和配方名称字符串。"
+    },
+    {
+      "name": "Scan",
+      "effect": "扫描目标实体以尝试解锁配方。如果执行者拥有builder组件且目标未标记NOCLICK，则检查目标是否有SCANNABLE_RECIPENAME属性或匹配AllRecipes中的prefab。验证配方是否可学、未学习且非禁止解锁。成功时解锁配方，向目标推送'onrecipescanned'事件，并调用设置的回调函数；失败时返回false和错误代码如'KNOWN'或'CANTLEARN'。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onrecipescanned"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10355,
+      45249,
+      16615,
+      13437,
+      45248,
+      10413,
+      13642
+    ],
+    "aspects": [
+      {
+        "aspect": "扫描后配方解锁",
+        "evidence": [
+          {
+            "pageid": 13642,
+            "quote": "使用[[生物扫描分析仪]]扫描不同的特定生物，可以解锁不同[[电路板]]的配方。"
+          }
+        ]
+      },
+      {
+        "aspect": "扫描时间描述",
+        "evidence": [
+          {
+            "pageid": 16615,
+            "quote": "一般生物需扫描 10 秒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "扫描",
+    "配方",
+    "解锁",
+    "制造",
+    "学习",
+    "扫描仪",
+    "recipe",
+    "scan",
+    "unlock",
+    "配方学习"
+  ],
+  "gameplay_tags": [
+    "制造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "372e1ee40e4f622da7a99712ea51f323da13e0b0575a8deb706875227a2f7404",
+    "source_bytes": 1454,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111702389
+  }
+}

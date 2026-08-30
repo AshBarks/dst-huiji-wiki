@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/lighttweener.lua"
+  },
+  "category": "component",
+  "display_name": "lighttweener",
+  "summary": "组件管理光源的半径、强度、衰减和颜色参数的初始值与目标值，通过时间插值实现平滑过渡。主要用于动态调整光源效果，增强游戏氛围或实现特定视觉变化。",
+  "api": [
+    {
+      "name": "StartTween",
+      "effect": "开始光照渐变过渡。设置光源对象、目标半径、强度、衰减、颜色、过渡时间和结束回调。副作用：启动组件更新，开始渐变过程。"
+    },
+    {
+      "name": "EndTween",
+      "effect": "立即结束渐变，将光照设置为目标值。副作用：停止更新组件，触发回调。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，基于时间插值调整光照参数。副作用：逐步改变光照值，当时间达到时调用EndTween。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      13570,
+      14688,
+      15054,
+      19296,
+      19297,
+      19300,
+      19661
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 StartTween、EndTween、OnUpdate 相关的表达，内容聚焦于工厂设计、昼夜循环、物品属性等，未涉及组件能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "光源渐变",
+    "灯光效果",
+    "动态调整",
+    "平滑过渡",
+    "颜色变化",
+    "强度调节",
+    "半径控制",
+    "衰减设置",
+    "视觉效果"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "装饰",
+    "氛围",
+    "动态效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2aa767b9edc777b2992372b4227d64b614a537af94c6d66a9c4816754d229bb4",
+    "source_bytes": 3253,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101252385
+  }
+}

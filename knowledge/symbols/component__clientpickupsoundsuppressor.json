@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/clientpickupsoundsuppressor.lua"
+  },
+  "category": "component",
+  "display_name": "clientpickupsoundsuppressor",
+  "summary": "该组件用于管理客户端拾取声音的抑制，通过网络变量 `_ignorenext` 控制是否忽略下一个拾取声音。它参与的核心玩法是声音管理，确保在实体刚生成时等特定条件下不播放拾取声音，以优化游戏体验和客户端同步。",
+  "api": [
+    {
+      "name": "IgnoreNextPickupSound",
+      "effect": "设置 `_ignorenext` 网络变量为基于实体存活时间的布尔值（若刚生成则为 true），触发网络同步以忽略下一个拾取声音。副作用：可能导致客户端在下一个拾取事件时将声音设为 'NONE' 并持续2帧后恢复原声。"
+    }
+  ],
+  "events_published": [
+    "clientpickupsoundsuppressor._ignorenext"
+  ],
+  "events_listened": [
+    "clientpickupsoundsuppressor._ignorenext"
+  ],
+  "netvars": [
+    "clientpickupsoundsuppressor._ignorenext"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "客户端拾取音效",
+    "音效抑制",
+    "网络变量控制",
+    "忽略音效",
+    "客户端同步",
+    "拾取音效抑制",
+    "音效管理"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 7/7)",
+  "gameplay_tags": [
+    "声音",
+    "交互",
+    "客户端同步"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0b43ce48df774aaea6b49d958ab29a8686b808362815dc223fcf741fd918256d",
+    "source_bytes": 1389,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096400652
+  }
+}

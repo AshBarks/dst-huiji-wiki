@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/worldroutefollower.lua"
+  },
+  "category": "component",
+  "display_name": "worldroutefollower",
+  "summary": "组件管理实体的世界路线跟随状态，包括路线名称、路线索引、暂停状态和移动参数。它核心玩法是让实体自动沿预设路线移动，处理卡住时的传送逻辑，并支持休眠时的虚拟行走以优化性能。",
+  "api": [
+    {
+      "name": "SetCloseEnoughDist",
+      "effect": "设置足够接近的距离阈值，用于判断实体是否到达路线节点。副作用：更新self.closeenoughdist变量。"
+    },
+    {
+      "name": "SetVirtualWalkingSpeedMult",
+      "effect": "设置虚拟行走速度乘数，影响休眠时传送时间计算。若mult为nil或0则默认为1。副作用：更新self.virtualwalkingspeedmult变量。"
+    },
+    {
+      "name": "SetIsValidPointForRouteFn",
+      "effect": "设置自定义验证函数，用于检查坐标是否适合路线。副作用：更新self.isvalidpointforroutefn回调。"
+    },
+    {
+      "name": "SetPreTeleportFn",
+      "effect": "设置传送前回调函数，若函数返回true则由调用者处理传送。副作用：更新self.preteleportfn回调。"
+    },
+    {
+      "name": "SetPostTeleportFn",
+      "effect": "设置传送后回调函数，在传送完成后调用。副作用：更新self.postteleportfn回调。"
+    },
+    {
+      "name": "SetOnArrivedFn",
+      "effect": "设置到达回调函数，在实体到达路线节点时调用。副作用：更新self.onarrivedfn回调。"
+    },
+    {
+      "name": "GetRouteDestination",
+      "effect": "返回当前路线节点的目的地点。若无路线则返回nil。无副作用。"
+    },
+    {
+      "name": "GetRoute",
+      "effect": "返回当前跟随的路线数据。若无路线则返回nil。无副作用。"
+    },
+    {
+      "name": "IsValidPoint",
+      "effect": "验证坐标是否有效：先调用自定义验证函数，再检查碰撞。若有效返回true，否则返回false。无副作用。"
+    },
+    {
+      "name": "FindValidPointNear",
+      "effect": "在目标点附近查找有效点，若原点有效则返回原点坐标，否则尝试随机偏移。成功返回x,y,z坐标，否则返回nil。无副作用。"
+    },
+    {
+      "name": "TeleportToDestination",
+      "effect": "传送到self.teleportdest点，物理传送或设置位置，然后迭代路线。若休眠则开始虚拟行走。副作用：清除self.teleportdest，调用postteleportfn回调。"
+    },
+    {
+      "name": "TryToTeleportToDestination",
+      "effect": "尝试传送到当前路线目的地，先找有效点，设置self.teleportdest，调用preteleportfn回调，若回调未处理则执行TeleportToDestination。成功返回true，否则返回false。副作用：可能更新self.teleportdest，调用preteleportfn回调。"
+    },
+    {
+      "name": "ShouldIterate",
+      "effect": "检查是否应该迭代路线，若暂停则返回false，否则返回true。无副作用。"
+    },
+    {
+      "name": "IterateRoute",
+      "effect": "迭代到下一个路线节点，若强制或实体足够接近目的地则迭代。迭代成功返回true，否则返回false。副作用：更新self.routeindex，可能重置时间计数器。"
+    },
+    {
+      "name": "SetRouteIndex",
+      "effect": "设置路线索引，计算最大到达时间，重置已用时间。副作用：更新self.routeindex、self.routetimetoarrivemax、self.routetimeelapsed，启动更新组件。"
+    },
+    {
+      "name": "SetPaused",
+      "effect": "设置暂停状态，若暂停则添加修改器，否则移除修改器并重置卡住检测。副作用：更新self.pausedsources，可能调用stuckdetection:Reset()。"
+    },
+    {
+      "name": "FollowRoute",
+      "effect": "开始跟随指定路线，从世界路线系统获取路线数据，设置路线名称和索引。若路线相同则返回true，否则更新路线或停止更新。副作用：更新self.routename、self.route、self.routeindex等，启动或停止更新组件。"
+    },
+    {
+      "name": "TryToStartVirtualWalk",
+      "effect": "尝试开始虚拟行走任务，计算剩余时间并设置传送任务。若已设置则返回false，否则返回true。副作用：创建self.trytoteleporttodestinationtask任务。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数，检查路线状态，处理移动时间、卡住检测和传送逻辑。副作用：可能更新self.routetimeelapsed，调用stuckdetection，尝试传送或迭代路线。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时调用，停止更新组件，尝试开始虚拟行走。副作用：停止更新组件，可能创建传送任务。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用，取消虚拟行走任务，启动更新组件。副作用：取消self.trytoteleporttodestinationtask，启动更新组件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件数据，返回路线名称和索引。若无路线则返回nil。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件数据，调用FollowRoute恢复路线。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含路线信息、索引和传送倒计时。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      17930,
+      24578,
+      39366,
+      19693,
+      20842
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述游戏内物品、建筑和区域的玩法功能（如传送方法、距离数值、耐久恢复），但未涉及代码级组件能力（如路径跟随、虚拟行走、传送函数等）的玩家语言表达。所有提供页面均无对应语义清单中能力的直接或间接描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "自动移动",
+    "暂停状态",
+    "传送",
+    "路线跟随",
+    "预设路线",
+    "移动参数",
+    "休眠状态",
+    "路线索引",
+    "卡住传送",
+    "虚拟行走"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "导航",
+    "移动",
+    "路径跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0cd2505c5698acaf20342e4053656e869af568dc4c3ca7ea19f422a8d5944248",
+    "source_bytes": 12970,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788104969885
+  }
+}

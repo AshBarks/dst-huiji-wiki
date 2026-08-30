@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/abysspillargroup.lua"
+  },
+  "category": "component",
+  "display_name": "abysspillargroup",
+  "summary": "该组件管理一组深渊柱子的生命周期，包括生成、跟踪、坍塌和重置。它存储柱子的生成点坐标，支持通过回调自定义生成和坍塌行为，并具备保存和加载状态的能力。",
+  "api": [
+    {
+      "name": "SetSpawnAtXZFn",
+      "effect": "设置生成柱子的自定义函数。当调用生成柱子时，会使用此函数替代默认行为。"
+    },
+    {
+      "name": "SetCollapseFn",
+      "effect": "设置柱子坍塌时的自定义函数。当柱子坍塌时，会调用此函数。"
+    },
+    {
+      "name": "SetOnAddPillarFn",
+      "effect": "设置添加柱子时的回调函数。当柱子开始被跟踪时，会调用此回调。"
+    },
+    {
+      "name": "SetOnRemovePillarFn",
+      "effect": "设置移除柱子时的回调函数。当柱子停止被跟踪时（如坍塌或删除），会调用此回调。"
+    },
+    {
+      "name": "StartTrackingPillar",
+      "effect": "开始跟踪指定的柱子实体。将柱子添加到跟踪列表，监听其移除事件，并触发添加回调。"
+    },
+    {
+      "name": "StopTrackingPillar",
+      "effect": "停止跟踪指定的柱子实体。从跟踪列表中移除柱子，取消监听移除事件，并触发移除回调。"
+    },
+    {
+      "name": "SpawnPillarAtXZ",
+      "effect": "在指定坐标生成一个深渊柱子。使用自定义生成函数生成柱子，如果成功则开始跟踪该柱子。"
+    },
+    {
+      "name": "AddPillarSpawnPointXZ",
+      "effect": "添加一个柱子生成点的坐标。该坐标存储在生成点列表中，用于后续批量生成。"
+    },
+    {
+      "name": "RespawnAllPillars",
+      "effect": "重新生成所有存储生成点的柱子。遍历生成点列表，调用生成函数并跟踪新柱子。"
+    },
+    {
+      "name": "CollapseAllPillars",
+      "effect": "使所有被跟踪的柱子坍塌。遍历柱子列表，调用自定义坍塌函数（如果设置）。"
+    },
+    {
+      "name": "Clear",
+      "effect": "清除所有生成点和跟踪的柱子。清空生成点列表，停止跟踪并移除所有柱子实体。"
+    },
+    {
+      "name": "HasPillars",
+      "effect": "检查组件是否正在跟踪任何柱子。返回布尔值，表示跟踪列表是否非空。"
+    },
+    {
+      "name": "HasSpawnPoints",
+      "effect": "检查组件是否有存储的生成点。返回布尔值，表示生成点列表是否非空。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态。将生成点列表和柱子实体的引用序列化为可保存的数据，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态。从保存的数据中恢复生成点列表。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，重新关联柱子实体。根据保存的引用重新开始跟踪柱子实体，确保状态恢复完整。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      20092,
+      70704,
+      20714,
+      65881,
+      15724,
+      28179,
+      73427
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及'pillar'或任何与深渊柱子组（abysspillargroup）相关的能力或行为，如柱子的生成、跟踪、崩溃等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "深渊柱子",
+    "柱子组",
+    "生成点",
+    "坍塌",
+    "跟踪",
+    "保存",
+    "加载",
+    "重置",
+    "回调"
+  ],
+  "gameplay_tags": [],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7783d96384792734cf9b927e2c4c5e035c00d929a6d997c3adcd6b682748c729",
+    "source_bytes": 3418,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096025593
+  }
+}

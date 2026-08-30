@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/wanderingroutefollower.lua"
+  },
+  "category": "component",
+  "display_name": "wanderingroutefollower",
+  "summary": "组件管理实体的移动路线，通过定义和插值路径点来引导实体沿着预设路线移动。它存储路线数据，并定期检查以更新实体的期望位置，常用于NPC或敌人的巡逻行为。",
+  "api": [
+    {
+      "name": "InterpolateRoute",
+      "effect": "插值指定路线的坐标点，使其平滑以用于更自然的移动；若路线名无效则清空插值数据。"
+    },
+    {
+      "name": "DefineRoute",
+      "effect": "定义一条路线，接受路线名和坐标点列表，调用InterpolateRoute进行插值处理并存储。"
+    },
+    {
+      "name": "ForgetRoute",
+      "effect": "删除指定路线及其插值数据，停止实体跟随该路线。"
+    },
+    {
+      "name": "SetCurrentRoute",
+      "effect": "设置当前活动路线，若路线名变化则重置状态为空闲，并找到最近点作为起点。"
+    },
+    {
+      "name": "SetRoutePickerFn",
+      "effect": "设置一个函数，该函数在定期更新时被调用以动态选择路线。"
+    },
+    {
+      "name": "GetDesiredPosition",
+      "effect": "返回实体的期望位置，如果没有路线则返回当前位置。"
+    },
+    {
+      "name": "Tick",
+      "effect": "定期执行，调用路线选择函数并打印调试信息。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "处理时间累积，超过10秒周期时调用Tick方法，触发路线检查和更新。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "调用OnUpdate处理长时间更新，确保在跳帧时也能更新。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存路线数据、当前路线名、索引和状态，返回保存数据用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载路线和状态，恢复实体的路线跟随行为。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的调试字符串，包含路线名、索引、状态和下次更新时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13271,
+      28181,
+      70481
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面内容主要描述生物或物品的储物功能、生命回复、跟随行为等，未涉及wanderingroutefollower的任何能力表达，如路线定义、插值、位置获取、更新、保存/加载或调试字符串。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "路线跟踪",
+    "路径节点",
+    "巡逻路径",
+    "导航移动",
+    "生物跟随",
+    "定义路线",
+    "路径插值",
+    "生物巡逻"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "移动",
+    "导航",
+    "巡逻"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cf4dd8195ec1ea5480e6eb1dbdb801db696cd378bb8bce561d9c06d01885d5db",
+    "source_bytes": 5114,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113927690
+  }
+}

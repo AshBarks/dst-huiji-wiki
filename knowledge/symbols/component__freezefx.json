@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/freezefx.lua"
+  },
+  "category": "component",
+  "display_name": "freezefx",
+  "summary": "组件 FireFX 管理实体的火焰视觉效果和声音，通过级别系统控制光照、动画和音效的动态变化。它参与游戏中的火焰表现，增强生存玩法的沉浸感，提供从点燃到熄灭的完整效果。",
+  "api": [
+    {
+      "name": "SetLevel(lev): 设置火焰级别，更新动画、光照和声音。若级别提升且达到阈值，播放大型点燃声音；否则播放小型点燃声音。启用光照并设置强度、半径、衰减和颜色。",
+      "effect": ""
+    },
+    {
+      "name": "Extinguish(): 熄灭火焰，杀死火焰声音，若条件允许则播放熄灭声音和后置动画，返回布尔值指示是否需要延迟移除实体。",
+      "effect": ""
+    },
+    {
+      "name": "SetPercentInLevel(percent): 设置当前级别中的百分比，更新光照半径和强度，实现平滑过渡。",
+      "effect": ""
+    },
+    {
+      "name": "UpdateRadius(): 内部方法，根据当前级别和百分比计算光照半径并设置。",
+      "effect": ""
+    },
+    {
+      "name": "OnUpdate(dt): 每帧更新，计算光照闪烁效果，若启用白天参数则根据昼夜状态调整声音参数。",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "火焰视觉效果",
+    "声音管理",
+    "级别控制",
+    "光照动态",
+    "动画控制",
+    "音效动态",
+    "点燃熄灭",
+    "火焰组件"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "生存",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1983d42ab26ed75c34a47107832520eb62d55b042cea79e5e163383208585019",
+    "source_bytes": 4272,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107839665
+  }
+}

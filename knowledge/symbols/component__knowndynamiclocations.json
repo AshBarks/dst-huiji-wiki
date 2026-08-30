@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/knowndynamiclocations.lua"
+  },
+  "category": "component",
+  "display_name": "knowndynamiclocations",
+  "summary": "该组件用于管理一组命名的动态位置，每个位置可以是固定坐标或跟随可移动平台。它允许实体记忆和检索这些位置，支持通过保存和加载来持久化。核心玩法涉及在游戏世界中标记关键地点、跟踪移动物体或实现基于位置的事件系统。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当实体被移除时自动调用，清理所有位置条目并停止对每个条目平台实体的事件监听，确保资源正确释放。"
+    },
+    {
+      "name": "GetLocation",
+      "effect": "根据名称获取位置坐标（Vector3）。如果名称存在且位置有效，返回其世界坐标；否则返回nil。无副作用。"
+    },
+    {
+      "name": "GetDynamicLocation",
+      "effect": "根据名称获取DynamicPosition对象。如果名称存在，返回该对象；否则返回nil。无副作用。"
+    },
+    {
+      "name": "RememberLocation",
+      "effect": "记忆一个位置，参数包括名称（字符串）、点（Vector3）和可选标志dont_overwrite（布尔）。如果dont_overwrite为false或nil，则先调用ForgetLocation移除现有条目；如果位置坐标包含非法数值（如NaN），则抛出错误。成功时创建或更新位置条目，并设置平台监听（如适用）。"
+    },
+    {
+      "name": "ForgetLocation",
+      "effect": "根据名称移除位置条目，停止对其平台实体的事件监听，并从内部表中删除该条目。无返回值。"
+    },
+    {
+      "name": "WatchPlatformForEntry",
+      "effect": "内部方法，为位置条目设置监听其关联平台实体移除事件的回调。当平台被移除时，将位置转换为世界坐标并清除平台引用。"
+    },
+    {
+      "name": "StopWatchingPlatformForEntry",
+      "effect": "内部方法，移除为位置条目设置的平台监听回调，停止监听关联平台实体的移除事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，列出所有记忆的位置名称和坐标。如果无位置则返回nil。无副作用。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回可保存的数据表，包含所有位置的名称和坐标（x、y、z），y坐标为0时省略。如果无位置则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中恢复位置条目，调用RememberLocation为每个记录项设置位置。如果数据无效则忽略。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "加载后处理，在实体加载完成后为在加载期间创建的位置条目设置动态位置并开始监听平台。清理临时加载标记。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15136,
+      19718
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅介绍紫色月眼的升级用途和虫洞的生成与标记方法，未描述任何与动态位置记忆、获取、监视或保存/加载相关的组件行为，因此无法提取能力证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "位置记忆",
+    "动态坐标",
+    "平台跟随",
+    "地图标记",
+    "保存加载",
+    "地点遗忘",
+    "导航点",
+    "世界坐标"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "53746b436656706b2ffde264bda91cbee78c443c5b72167889b6f2b43c70c09d",
+    "source_bytes": 3434,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109093570
+  }
+}

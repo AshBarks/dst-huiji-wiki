@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/projectedeffects.lua"
+  },
+  "category": "component",
+  "display_name": "projectedeffects",
+  "summary": "该组件管理实体的投影效果，通过控制 alpha 值和平滑过渡来显示或隐藏实体。它使用着色器参数实现视觉上的渐变效果，参与的核心玩法包括建造、破坏或交互时的视觉反馈，使实体逐渐出现或消失。",
+  "api": [
+    {
+      "name": "MakeOpaque",
+      "effect": "立即设置 alpha 为 1，使实体完全不透明，并应用当前着色器参数。"
+    },
+    {
+      "name": "SetDecayTime",
+      "effect": "设置衰减过程的时间持续时间（秒），必须为正数。影响 alpha 从 1 平滑减少到 0 的速度。"
+    },
+    {
+      "name": "SetConstructTime",
+      "effect": "设置构建过程的时间持续时间（秒），必须为正数。影响 alpha 从 0 平滑增加到 1 的速度。"
+    },
+    {
+      "name": "SetCutoffHeight",
+      "effect": "设置着色器的截止高度参数，用于控制显示范围。若传入 0，则自动调整为 -0.01 以避免着色器异常。"
+    },
+    {
+      "name": "SetIntensity",
+      "effect": "设置着色器的强度参数，必须为负数（小于或等于 -0.01）。影响投影效果的强度。"
+    },
+    {
+      "name": "SetOnConstructCallback",
+      "effect": "设置构建完成时的回调函数，当 alpha 平滑增加到 1 时触发。"
+    },
+    {
+      "name": "SetOnDecayCallback",
+      "effect": "设置衰减完成时的回调函数，当 alpha 平滑减少到 0 时触发。"
+    },
+    {
+      "name": "Construct",
+      "effect": "启动构建过程，设置目标 alpha 为 1。若当前 alpha 小于目标，则开始更新组件以平滑过渡。如果已设置永久衰减，则忽略操作。"
+    },
+    {
+      "name": "Decay",
+      "effect": "启动衰减过程，设置目标 alpha 为 0。可选参数 permanent 决定是否永久衰减。若当前 alpha 大于目标，则开始更新组件以平滑过渡。"
+    },
+    {
+      "name": "LockDecay",
+      "effect": "设置衰减锁定状态，当 locked 为 true 时，衰减完成后不触发回调并停止更新。"
+    },
+    {
+      "name": "SetPaused",
+      "effect": "设置暂停状态，paused 为 true 时，OnUpdate 方法不执行，从而暂停 alpha 过渡。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15896,
+      10418,
+      20714,
+      47057,
+      16419,
+      13406,
+      18057,
+      20678
+    ],
+    "aspects": [
+      {
+        "aspect": "宠物特征点数衰减机制",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "顽皮和吃饱的特征点数以每天 0.7 分的速度衰减"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板电荷状态视觉变化",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "电荷不足时，电路板的主体会暗下来"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "投影效果",
+    "alpha",
+    "衰减",
+    "构建",
+    "不透明",
+    "着色器",
+    "显示",
+    "隐藏",
+    "平滑过渡"
+  ],
+  "gameplay_tags": [
+    "视觉效果",
+    "交互",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b7cc5510b38685132ba89002dc83011c764a1cefad84d1d54cfe3a4b9c61151a",
+    "source_bytes": 3079,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097153529
+  }
+}

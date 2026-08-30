@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gravediggable.lua"
+  },
+  "category": "component",
+  "display_name": "gravediggable",
+  "summary": "该组件管理实体是否可被挖掘的状态，通过'gravediggable'标签控制游戏内的挖掘交互。当状态为可挖掘时，玩家可使用工具执行挖掘操作，并可能触发回调函数。组件支持保存与加载状态，参与生存玩法中的资源收集环节。",
+  "api": [
+    {
+      "name": "DigUp",
+      "effect": "处理挖掘交互。若定义了ondug回调，则调用该函数并传入工具(tool)和执行者(doer)，返回成功状态(success)和失败原因(reason)；若未定义则默认返回成功。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      24028,
+      15225,
+      35817,
+      15415,
+      24866,
+      14484,
+      39296
+    ],
+    "aspects": [
+      {
+        "aspect": "坟墓的挖掘状态显示",
+        "evidence": [
+          {
+            "pageid": 24028,
+            "quote": "|图像1文字=未被挖掘"
+          },
+          {
+            "pageid": 24028,
+            "quote": "|图像2文字=已被挖掘"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "挖掘",
+    "坟墓",
+    "可挖掘",
+    "工具使用",
+    "资源获取",
+    "生存交互",
+    "组件功能",
+    "标签系统"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "资源收集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f5cd0907c59490b9f0ac6e5d426d761e1b9818b63916e4d9a5964db61f0cab2",
+    "source_bytes": 938,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100433593
+  }
+}

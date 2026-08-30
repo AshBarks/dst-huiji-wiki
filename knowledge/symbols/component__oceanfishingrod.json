@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oceanfishingrod.lua"
+  },
+  "category": "component",
+  "display_name": "oceanfishingrod",
+  "summary": "该组件管理海洋钓鱼过程中的数据，包括鱼线张力、目标实体和投射物。核心玩法涉及抛竿、控制鱼线张力以成功捕获鱼类，并涉及浮标和鱼饵的配置。",
+  "api": [
+    {
+      "name": "SetDefaults",
+      "effect": "设置默认投射物、抛投基础数据、鱼饵基础数据和默认鱼饵设置，并更新客户端最大抛投距离。"
+    },
+    {
+      "name": "GetLureData",
+      "effect": "返回当前鱼饵数据表。"
+    },
+    {
+      "name": "GetLureFunctions",
+      "effect": "返回当前鱼饵设置中的函数表。"
+    },
+    {
+      "name": "UpdateClientMaxCastDistance",
+      "effect": "基于当前浮标和鱼饵组件数据计算并更新客户端的最大抛投距离。"
+    },
+    {
+      "name": "Cast",
+      "effect": "执行抛竿操作：缓存钓具数据、计算目标点、生成抛射物作为钓鱼目标、覆盖鱼饵动画符号、开始组件更新，并触发oncastfn回调。"
+    },
+    {
+      "name": "GetTensionRating",
+      "effect": "返回当前鱼线张力值（0到1）。"
+    },
+    {
+      "name": "IsLineTensionHigh",
+      "effect": "检查鱼线张力是否高于TUNING.OCEAN_FISHING.LINE_TENSION_HIGH阈值，返回布尔值。"
+    },
+    {
+      "name": "IsLineTensionGood",
+      "effect": "检查鱼线张力是否在良好范围内（高于TUNING.OCEAN_FISHING.LINE_TENSION_GOOD且不高于LINE_TENSION_HIGH），返回布尔值。"
+    },
+    {
+      "name": "IsLineTensionLow",
+      "effect": "检查鱼线张力是否低于或等于TUNING.OCEAN_FISHING.LINE_TENSION_GOOD阈值，返回布尔值。"
+    },
+    {
+      "name": "UpdateTensionRating",
+      "effect": "根据钓鱼目标与玩家的距离、方向和运动状态，计算并更新鱼线张力和松弛度值。"
+    },
+    {
+      "name": "Reel",
+      "effect": "执行收线操作：缩短鱼线距离、更新张力、调用目标的OnReelingIn和OnReelingInPst方法，若张力持续过高则触发鱼线断裂并停止钓鱼。"
+    },
+    {
+      "name": "SetTarget",
+      "effect": "设置新的钓鱼目标：移除前一个目标的事件监听、处理前一个目标的鱼咬状态、设置新目标的初始线距、更新张力、触发newfishingtarget事件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "每帧更新：检查钓鱼者状态、目标有效性、距离，处理鱼线张力变化、松弛度导致的停止、以及目标移动导致的鱼线放出。"
+    },
+    {
+      "name": "CatchFish",
+      "effect": "捕获鱼类：停止组件更新、生成鱼飞向玩家的抛射物、触发鱼被捕获事件、设置鱼的所有者、并触发ondonefishing回调。"
+    },
+    {
+      "name": "StopFishing",
+      "effect": "停止钓鱼：停止组件更新、触发ondonefishing回调、推送钓鱼停止事件给钓鱼者和目标、清理内部状态。"
+    },
+    {
+      "name": "GetExtraStaminaDrain",
+      "effect": "返回当前鱼饵数据中的额外耐力消耗值，默认为0。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含目标、张力、线距以及钓具数据的调试字符串。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.OCEANFISHING_TACKLE.BASE",
+    "TUNING.OCEAN_FISHING.MAX_CAST_DIST",
+    "TUNING.OCEAN_FISHING.LINE_TENSION_HIGH",
+    "TUNING.OCEAN_FISHING.LINE_TENSION_GOOD",
+    "TUNING.OCEAN_FISHING.REELING_SNAP_TENSION",
+    "TUNING.OCEAN_FISHING.START_UNREELING_TENSION",
+    "TUNING.OCEAN_FISHING.MAX_HOOK_DIST"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14683,
+      16605,
+      51529,
+      18853,
+      50898,
+      18359,
+      13779,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "停止钓鱼条件",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "主动移动或其他更换玩家状态的情况会使玩家收回鱼竿"
+          }
+        ]
+      },
+      {
+        "aspect": "抛竿行为描述",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "抛带鱼饵的鱼钩总是会在初始时吸引到附近的鱼"
+          }
+        ]
+      },
+      {
+        "aspect": "收线操作说明",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "按住右键不放可以将鱼饵一直收近"
+          }
+        ]
+      },
+      {
+        "aspect": "钓鱼目标列举",
+        "evidence": [
+          {
+            "pageid": 14683,
+            "quote": "海钓竿可以用来钓海鱼、海洋残骸、龙虾、月光龙虾。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "钓鱼",
+    "鱼线",
+    "张力",
+    "抛竿",
+    "收线",
+    "捕获",
+    "海洋",
+    "浮标",
+    "鱼饵"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "钓鱼",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+    "source_bytes": 16767,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102264352
+  }
+}

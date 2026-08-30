@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstorms.lua"
+  },
+  "category": "component",
+  "display_name": "moonstorms",
+  "summary": "该组件管理月风暴的活动节点、地图标记和风暴级别，用于确定实体或位置是否处于月风暴中，并控制月风暴的生成与结束。它通过网络变量同步风暴节点数据，并在风暴状态变化时发布事件，影响游戏中的环境效果和玩家体验。",
+  "api": [
+    {
+      "name": "convertlist",
+      "effect": "将输入数据表转换为新表，只收集值为true的索引。行为：遍历输入表，将true值对应的索引插入新表。副作用：无直接副作用。"
+    },
+    {
+      "name": "CalcMoonstormLevel",
+      "effect": "计算实体在月风暴中的深度级别，返回值在0到1之间。行为：检查实体位置、是否在海洋中、区域感知组件，计算位置到风暴边缘的深度并归一化。副作用：无直接副作用，依赖实体位置和区域感知。"
+    },
+    {
+      "name": "IsInMoonstorm",
+      "effect": "检查实体是否在月风暴节点内。行为：验证活动风暴节点非空，并检查实体当前区域是否在活动节点中。副作用：无直接副作用。"
+    },
+    {
+      "name": "IsXZInMoonstorm",
+      "effect": "检查给定坐标(x,z)是否在月风暴节点内。行为：获取坐标对应的地图节点ID，并验证是否在活动风暴节点中。副作用：无直接副作用。"
+    },
+    {
+      "name": "IsPointInMoonstorm",
+      "effect": "检查给定点是否在月风暴节点内。行为：获取点的地图节点ID，并验证是否在活动风暴节点中。副作用：无直接副作用。"
+    },
+    {
+      "name": "GetMoonstormLevel",
+      "effect": "获取实体在月风暴中的级别，如果在月风暴中则返回0到1的值，否则返回0。行为：调用IsInMoonstorm和CalcMoonstormLevel并限制范围。副作用：无直接副作用。"
+    },
+    {
+      "name": "AddMoonstormNodes",
+      "effect": "添加指定节点索引为月风暴节点，生成地图标记，并发布事件。行为：设置活动节点列表，在节点中心生成标记物，更新网络变量，推送风暴变化和窗口结束事件。副作用：修改活动节点列表，生成新实体，触发全局事件。"
+    },
+    {
+      "name": "StopMoonstorm",
+      "effect": "停止月风暴，清除所有节点，并根据参数发布事件。行为：调用ClearMoonstormNodes，推送风暴变化事件。副作用：清除活动节点和标记，触发全局事件。"
+    },
+    {
+      "name": "ClearMoonstormNodes",
+      "effect": "清除所有活动月风暴节点和标记。行为：重置活动节点列表，移除所有地图标记。副作用：修改活动节点列表，移除所有标记实体。"
+    },
+    {
+      "name": "GetMoonstormNodes",
+      "effect": "返回当前活动的月风暴节点表。行为：返回活动节点表的引用。副作用：无直接副作用。"
+    },
+    {
+      "name": "GetMoonstormCenter",
+      "effect": "计算并返回月风暴所有活动节点的中心点，如果没有节点则返回nil。行为：遍历活动节点，累加中心坐标并计算平均值。副作用：无直接副作用。"
+    }
+  ],
+  "events_published": [
+    "ms_stormchanged",
+    "ms_moonstormwindowover",
+    "moonstorm_nodes_dirty_relay"
+  ],
+  "events_listened": [
+    "moonstorm_nodes_dirty"
+  ],
+  "netvars": [
+    "moonstorm.moonstorm_nodes"
+  ],
+  "tunables": [
+    "SANDSTORM_FULLY_ENTERED_DEPTH"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      20714,
+      20119,
+      16570,
+      18551,
+      22491,
+      52144,
+      52145
+    ],
+    "aspects": [
+      {
+        "aspect": "调试命令中的停止月亮风暴功能",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "停止[[月亮风暴]]事件"
+          }
+        ]
+      },
+      {
+        "aspect": "风暴区域内的实体检测",
+        "evidence": [
+          {
+            "pageid": 15234,
+            "quote": "风暴内的随机一个玩家"
+          },
+          {
+            "pageid": 52144,
+            "quote": "不会主动离开月亮风暴区域"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "地图标记",
+    "Moonstorm",
+    "活动节点",
+    "风暴生成",
+    "风暴结束",
+    "网络同步",
+    "状态事件",
+    "环境效果",
+    "玩家体验"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "环境",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "16c93ebc79a4ee2b87a3777cbe6326b4af2c0ff8e75a6a1fba66318193b85247",
+    "source_bytes": 5923,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110123972
+  }
+}

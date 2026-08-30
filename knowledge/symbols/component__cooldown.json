@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/cooldown.lua"
+  },
+  "category": "component",
+  "display_name": "cooldown",
+  "summary": "冷却组件管理实体的冷却时间数据，包括充能状态和截止时间。它参与核心玩法，用于控制技能、工具或建筑的使用间隔，防止频繁操作并增加策略性。组件通过任务机制实现自动冷却，并支持回调函数。",
+  "api": [
+    {
+      "name": "StartCharging",
+      "effect": "开始冷却过程。设置状态为未充能，根据指定时间或默认持续时间设置截止时间，取消现有冷却任务并创建新任务在时间到达时完成冷却。如果定义了startchargingfn回调，则调用该回调。"
+    },
+    {
+      "name": "FinishCharging",
+      "effect": "立即完成冷却过程。如果当前正在冷却（有截止时间），则提前结束冷却并设置状态为已充能，调用onchargedfn回调（如果存在）。"
+    },
+    {
+      "name": "GetTimeToCharged",
+      "effect": "返回距离冷却完成所需的剩余时间（秒）。如果已冷却完成或不在冷却状态，返回0。"
+    },
+    {
+      "name": "IsCharged",
+      "effect": "检查组件是否已充能（冷却完成），返回布尔值。"
+    },
+    {
+      "name": "IsCharging",
+      "effect": "检查组件是否正在冷却过程中（未充能且有截止时间），返回布尔值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件当前状态，包括充能状态和剩余冷却时间，返回数据表供系统存储。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存的数据恢复组件状态。如果数据指示已充能，则直接完成冷却；如果有剩余时间，则开始冷却过程。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间未更新的情况，调整冷却截止时间。如果截止时间已过，则完成冷却；否则重新启动冷却任务。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回组件的调试字符串，显示充能状态或剩余冷却时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20092,
+      13701,
+      15922,
+      21634,
+      65881,
+      13409,
+      14938,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "冷却开始行为描述",
+        "evidence": [
+          {
+            "pageid": 21634,
+            "quote": "使奔雷矛进入冷却时间。"
+          },
+          {
+            "pageid": 13409,
+            "quote": "吟唱完后会进入冷却时间。"
+          },
+          {
+            "pageid": 51046,
+            "quote": "攻击方式释放后有 7 ~ 11 秒冷却时间。"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却时间数值标注",
+        "evidence": [
+          {
+            "pageid": 20092,
+            "quote": "并使自身进入持续 20 天的冷却时间"
+          },
+          {
+            "pageid": 13701,
+            "quote": "远古大门需要冷却 20 天才能再次用来召唤"
+          },
+          {
+            "pageid": 21634,
+            "quote": "冲刺冷却时间缩短至 1.5 秒。"
+          },
+          {
+            "pageid": 13409,
+            "quote": "粗鲁插曲、惊心独白的冷却时间为10秒，战士重奏为150秒"
+          },
+          {
+            "pageid": 51046,
+            "quote": "该攻击方式释放后有 7 ~ 11 秒冷却时间。"
+          }
+        ]
+      },
+      {
+        "aspect": "冷却状态检查描述",
+        "evidence": [
+          {
+            "pageid": 21634,
+            "quote": "冲刺没有处于冷却时间中"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "冷却时间",
+    "充能",
+    "CD",
+    "技能冷却",
+    "工具冷却",
+    "等待",
+    "重置",
+    "冷却状态",
+    "冷却完成",
+    "冷却组件"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+    "source_bytes": 2282,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096434448
+  }
+}

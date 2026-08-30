@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hunger_replica.lua"
+  },
+  "category": "component",
+  "display_name": "hunger_replica",
+  "summary": "组件管理实体的饥饿数据，包括当前饥饿值和最大饥饿值。作为replica组件，负责在服务器和客户端之间同步饥饿状态，确保游戏体验一致。参与核心的生存玩法，饥饿值影响玩家行动和生命状态。",
+  "api": [
+    {
+      "name": "AttachClassified",
+      "effect": "附加classified对象到组件，并监听其onremove事件以自动分离。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "分离classified对象，清除相关引用和事件监听。"
+    },
+    {
+      "name": "SetCurrent",
+      "effect": "设置当前饥饿值，通过classified组件的currenthunger网络变量同步到客户端。"
+    },
+    {
+      "name": "SetMax",
+      "effect": "设置最大饥饿值，通过classified组件的maxhunger网络变量同步到客户端。"
+    },
+    {
+      "name": "Max",
+      "effect": "返回最大饥饿值。优先从饥饿组件获取，否则从classified获取，若都不可用则返回默认值100。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前饥饿百分比，计算当前饥饿值除以最大饥饿值。优先从饥饿组件获取，否则从classified获取。"
+    },
+    {
+      "name": "GetCurrent",
+      "effect": "返回当前饥饿值。优先从饥饿组件获取，否则从classified获取，若都不可用则返回默认值100。"
+    },
+    {
+      "name": "IsStarving",
+      "effect": "检查是否饥饿（当前饥饿值小于等于0）。优先从饥饿组件判断，否则从classified判断。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "currenthunger",
+    "maxhunger"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13456,
+      15975,
+      34037,
+      13455,
+      13437,
+      13156,
+      15817,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "饥饿值上限描述",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "鱼人之王具有饥饿值，上限为 200{{饥饿值}}"
+          },
+          {
+            "pageid": 34037,
+            "quote": "升级的暗影槌具备 500 点[[饥饿值]]"
+          },
+          {
+            "pageid": 13455,
+            "quote": "沃比有 50{{饥饿值}} [[饥饿值]]上限"
+          },
+          {
+            "pageid": 15238,
+            "quote": "皮弗娄牛拥有自己的[[饥饿值]]，上限为 375"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值初始值与下降速度",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "刚生成时候具有 50{{饥饿值}} 饥饿值"
+          },
+          {
+            "pageid": 13455,
+            "quote": "初始为 0"
+          },
+          {
+            "pageid": 13456,
+            "quote": "饥饿值会以 9.375{{饥饿值}}/分钟（75{{饥饿值}}/天）的速度下降"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿值百分比触发事件",
+        "evidence": [
+          {
+            "pageid": 34037,
+            "quote": "饥饿值>50%且闲置时"
+          },
+          {
+            "pageid": 15817,
+            "quote": "饥饿值 ≤ 25|{{全角色台词|DST|lavae_pet.STARVING|首选=wx78}}"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿状态后果",
+        "evidence": [
+          {
+            "pageid": 13456,
+            "quote": "在饥饿值降至 0 时，角色每秒损失 1.25 {{生命值}}"
+          },
+          {
+            "pageid": 34037,
+            "quote": "当饥饿值耗尽时，就会开始快速损失耐久"
+          },
+          {
+            "pageid": 15238,
+            "quote": "饥饿值为 0 时不扣除生命值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "饥饿值",
+    "饱食度",
+    "最大饥饿值",
+    "饥饿组件",
+    "服务器同步",
+    "客户端饥饿",
+    "生存玩法",
+    "饥饿数据"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "117a9a5ae513c68353ce36e583968e691ca5b2aba669361b1306c38258ab0771",
+    "source_bytes": 2521,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108707808
+  }
+}

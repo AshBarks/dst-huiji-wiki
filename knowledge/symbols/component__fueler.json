@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/fueler.lua"
+  },
+  "category": "component",
+  "display_name": "fueler",
+  "summary": "Fueler 组件管理实体的燃料类型和燃料值，用于可燃烧物品。当燃料被取用时，它推送 'fueltaken' 事件并执行回调，参与生存游戏中的资源管理核心玩法。",
+  "api": [
+    {
+      "name": "SetOnTakenFn",
+      "effect": "设置一个回调函数，在燃料被取用时执行。副作用：更新内部 ontaken 变量。"
+    },
+    {
+      "name": "Taken",
+      "effect": "当燃料被取用时，推送 'fueltaken' 事件（事件数据包含 taker 为 target），并调用设置的 ontaken 回调函数（如果存在）。副作用：可能触发其他系统响应，如消耗燃料。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体上当前燃料类型对应的标签（例如 'burnable_fuel'）。副作用：更新实体标签状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "fueltaken"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      20496,
+      10374,
+      18216,
+      16057,
+      20061,
+      24544,
+      15170
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本聚焦于燃料的类型、数值、添加、消耗及相关角色或建筑能力，未体现组件 'component__fueler' 的 SetOnTakenFn、Taken 或 OnRemoveFromEntity 等事件处理行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "燃料",
+    "取用",
+    "燃烧",
+    "火堆",
+    "燃料类型",
+    "燃料值",
+    "回调",
+    "事件",
+    "资源"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "663c826290d8e82cdcc21700827283a2d4cbdf61764fb07ab3a1f73c76554e15",
+    "source_bytes": 830,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100261626
+  }
+}

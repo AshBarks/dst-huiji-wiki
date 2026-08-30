@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moistureabsorbersource.lua"
+  },
+  "category": "component",
+  "display_name": "moistureabsorbersource",
+  "summary": "该组件管理物品的干燥速率和应用效果，使其能吸收角色的湿度。它参与饥荒的湿度系统，帮助玩家避免过湿带来的负面影响，在雨天效率会降低。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件的库存物品源关联，确保物品不再被识别为湿度吸收源。"
+    },
+    {
+      "name": "OnItemSourceRemoved",
+      "effect": "若所有者拥有 moistureabsorberuser 组件，则从该组件中移除此物品源，停止其湿度吸收效果。"
+    },
+    {
+      "name": "OnItemSourceNewOwner",
+      "effect": "若新所有者拥有 moisture 组件，则确保其拥有 moistureabsorberuser 组件，并将此物品源添加到该组件中，使其能吸收所有者的湿度。"
+    },
+    {
+      "name": "SetGetDryingRateFn",
+      "effect": "存储自定义函数，后续调用 GetDryingRate 时将使用该函数计算基础速率。"
+    },
+    {
+      "name": "GetDryingRate",
+      "effect": "若已设置 getdryingratefn，则调用该函数计算速率；若传入的 rate 大于 0（表示在雨中），则乘以 TUNING.MOISTUREABSORBER_RAINED_ON_EFFICIENCY_MULT 进行效率衰减。若无函数则返回 0。"
+    },
+    {
+      "name": "SetApplyDryingFn",
+      "effect": "存储自定义函数，后续调用 ApplyDrying 时将执行该函数来实际应用干燥。"
+    },
+    {
+      "name": "ApplyDrying",
+      "effect": "若已设置 applydryingfn，则调用该函数并传入当前速率和时间增量 dt，以更新角色或物品的湿度状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MOISTUREABSORBER_RAINED_ON_EFFICIENCY_MULT"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      70462,
+      16419,
+      13268,
+      16598,
+      13408,
+      14936,
+      16571
+    ],
+    "aspects": [
+      {
+        "aspect": "干燥效果减少潮湿速率",
+        "evidence": [
+          {
+            "pageid": 70462,
+            "quote": "玩家潮湿速率 -0.5"
+          }
+        ]
+      },
+      {
+        "aspect": "干燥速率数值标注",
+        "evidence": [
+          {
+            "pageid": 70462,
+            "quote": "干燥速率为 0.75"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "干燥速率",
+    "干燥效果",
+    "装备效果",
+    "吸湿",
+    "雨天效果",
+    "物品干燥",
+    "湿度控制",
+    "干燥器",
+    "背包干燥"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "物品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "07d60ae7681c4f4db10cf0d1d0d2347f15d229e1d09986dcb0163095d571e9d8",
+    "source_bytes": 1480,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788097003299
+  }
+}

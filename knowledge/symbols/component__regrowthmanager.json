@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/regrowthmanager.lua"
+  },
+  "category": "component",
+  "display_name": "regrowthmanager",
+  "summary": "该组件管理游戏内可再生实体（如胡萝卜、花、兔子洞等）的重生逻辑。它根据时间、季节、天气和玩家距离等条件自动刷新资源，并支持通过模组自定义再生类型。核心玩法涉及资源管理、环境交互和生存策略。",
+  "api": [
+    {
+      "name": "SetRegrowthForType",
+      "signature": "SetRegrowthForType(prefab, regrowtime, product, timemult)",
+      "effect": "为指定预制体设置再生类型，包括再生时间、生成产品和时间乘数。更新内部字典 _regrowthvalues 和 _internaltimes，用于控制再生计时。"
+    },
+    {
+      "name": "LongUpdate",
+      "signature": "LongUpdate(dt)",
+      "effect": "根据传入时间推进所有再生计时器，尝试在满足条件（如玩家距离、地形适宜性）时重生产品。失败时重置计时器并重新排队。"
+    },
+    {
+      "name": "OnSave",
+      "signature": "OnSave()",
+      "effect": "保存当前所有再生计时器的状态，包括产品、剩余时间和位置，用于游戏存档。"
+    },
+    {
+      "name": "OnLoad",
+      "signature": "OnLoad(data)",
+      "effect": "从保存数据中恢复再生计时器状态，重建内部计时列表。"
+    },
+    {
+      "name": "GetDebugString",
+      "signature": "GetDebugString()",
+      "effect": "返回当前再生队列的调试信息，包括计时器数量、时间乘数和下一个重生时间。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "beginregrowth"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.CARROT_REGROWTH_TIME",
+    "TUNING.CARROT_REGROWTH_TIME_MULT",
+    "TUNING.FLOWER_REGROWTH_TIME",
+    "TUNING.FLOWER_REGROWTH_TIME_MULT",
+    "TUNING.RABBITHOLE_REGROWTH_TIME",
+    "TUNING.RABBITHOLE_REGROWTH_TIME_MULT",
+    "TUNING.RABBITHOLE_REGROWTH_TIME_SUMMER_MULT",
+    "TUNING.CATCOONDEN_REGROWTH_TIME",
+    "TUNING.CATCOONDEN_REGROWTH_TIME_SPRING_MULT",
+    "TUNING.CATCOONDEN_REGROWTH_TIME_AUTUMN_MULT",
+    "TUNING.FLOWER_CAVE_REGROWTH_TIME",
+    "TUNING.FLOWER_CAVE_REGROWTH_TIME_MULT",
+    "TUNING.LIGHTFLIER_FLOWER_REGROWTH_TIME",
+    "TUNING.LIGHTFLIER_FLOWER_REGROWTH_TIME_MULT",
+    "TUNING.REEDS_REGROWTH_TIME",
+    "TUNING.REEDS_REGROWTH_TIME_SPRING_MULT",
+    "TUNING.REEDS_REGROWTH_TIME_BASE_MULT",
+    "TUNING.REEDS_REGROWTH_TIME_MULT",
+    "TUNING.CACTUS_REGROWTH_TIME",
+    "TUNING.CACTUS_REGROWTH_TIME_SUMMER_MULT",
+    "TUNING.CACTUS_REGROWTH_TIME_WINTER_MULT",
+    "TUNING.CACTUS_REGROWTH_TIME_BASE_MULT",
+    "TUNING.CACTUS_REGROWTH_RAINING_MULT",
+    "TUNING.CACTUS_REGROWTH_TIME_MULT",
+    "TUNING.CAVE_BANANA_TREE_REGROWTH_TIME",
+    "TUNING.CAVE_BANANA_TREE_REGROWTH_TIME_MULT",
+    "TUNING.MUSHROOM_REGROWTH_TIME",
+    "TUNING.MUSHROOM_REGROWTH_TIME_FAST_MULT",
+    "TUNING.MUSHROOM_REGROWTH_TIME_MULT",
+    "TUNING.MANDRAKE_PLANTED_REGROWTH_TIME",
+    "TUNING.MANDRAKE_PLANTED_REGROWTH_TIME_MULT",
+    "TUNING.REGROWTH_TIME_MULTIPLIER"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      15722,
+      15737,
+      35001,
+      13261,
+      14484,
+      34523,
+      10379
+    ],
+    "aspects": [
+      {
+        "aspect": "再生机制分类描述",
+        "evidence": [
+          {
+            "pageid": 35001,
+            "quote": "再生有四种主要机制，它们的工作方式略有不同：“再生”、“后代再生”、“荒芜再生”和“基础资源再生”。"
+          }
+        ]
+      },
+      {
+        "aspect": "再生速度设置选项",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "| style=\"text-align:center\" |'''再生速度'''"
+          }
+        ]
+      },
+      {
+        "aspect": "杂草生长阶段时间",
+        "evidence": [
+          {
+            "pageid": 14484,
+            "quote": "==生长=="
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "再生",
+    "生长",
+    "资源刷新",
+    "胡萝卜",
+    "花",
+    "兔子洞",
+    "季节影响",
+    "天气条件",
+    "玩家距离",
+    "模组配置"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源管理",
+    "环境交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+    "source_bytes": 12967,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111736044
+  }
+}

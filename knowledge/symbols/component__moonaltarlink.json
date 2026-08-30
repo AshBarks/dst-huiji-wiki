@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonaltarlink.lua"
+  },
+  "category": "component",
+  "display_name": "moonaltarlink",
+  "summary": "该组件管理月球祭坛之间的链接状态，存储关联的祭坛列表。核心玩法涉及通过建立和断开祭坛连接来实现月球相关的事件或建筑系统功能。",
+  "api": [
+    {
+      "name": "EstablishLink",
+      "effect": "建立与给定祭坛列表的链接。计算所有祭坛的平均位置并设置自身位置，链接每个祭坛的moonaltarlinktarget组件（设置其link属性），并调用onlinkfn回调。副作用包括改变自身位置和修改其他组件的link属性。"
+    },
+    {
+      "name": "BreakLink",
+      "effect": "断开所有链接。清空链接列表，将每个祭坛的moonaltarlinktarget.link设为nil，调用onlinkbrokenfn回调。副作用包括清除关联数据和触发断开回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65881,
+      65605,
+      15675,
+      20113,
+      18540,
+      22707,
+      27531
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，没有页面讨论月亮祭坛链接组件（moonaltarlink）的能力。所有页面涉及控制台命令、工厂布局、世界翻新、实体生长、信号弹机制、海盗袭击、猎犬袭击和闪电机制，均未提及EstablishLink或BreakLink相关的行为、数值或策略描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月球祭坛",
+    "链接",
+    "建立",
+    "断开",
+    "位置",
+    "平均",
+    "组件",
+    "回调"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "魔法"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d3990db17b28a5e0a6183d2c652507cdfdebb634be656737614bf8f6fc9d5c80",
+    "source_bytes": 1426,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101740480
+  }
+}

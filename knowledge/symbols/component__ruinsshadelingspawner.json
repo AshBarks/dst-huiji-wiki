@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ruinsshadelingspawner.lua"
+  },
+  "category": "component",
+  "display_name": "ruinsshadelingspawner",
+  "summary": "该组件管理影怪（ruins_shadeling）在噩梦区域椅子上的生成与冷却机制。它通过检查椅子状态、位置条件和冷却时间来决定是否生成影怪，并监听事件以控制影怪的生命周期。核心玩法涉及探索噩梦区域时与椅子交互触发敌人生成。",
+  "api": [
+    {
+      "name": "TrySpawnShadeling(chair)",
+      "effect": "尝试在指定椅子上生成影怪。检查条件：无现有影怪、无冷却任务、椅子有sittable组件且未被占用、位置在Nightmare节点上。如果满足，生成影怪并设置事件监听（ruins_shadeling_looted、onremove、becomeunsittable），将椅子标记为被占用，返回影怪实体；否则返回nil。"
+    },
+    {
+      "name": "LongUpdate(dt)",
+      "effect": "根据经过时间dt调整冷却任务。如果冷却任务存在，取消原任务并重新设置剩余时间（剩余时间-dt）；如果剩余时间小于等于dt，则清空任务。用于同步长时间状态。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ruins_shadeling_looted",
+    "onremove",
+    "becomeunsittable"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "噩梦椅子生成",
+    "影怪冷却时间",
+    "椅子交互触发",
+    "噩梦区域影怪",
+    "影怪刷新机制",
+    "椅子状态影响",
+    "影怪出现条件",
+    "噩梦敌人生成"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "54f6f6501f32fb3290661093b5a927fc0915690e7c5f7e32fb89e0110c896129",
+    "source_bytes": 2236,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111993591
+  }
+}

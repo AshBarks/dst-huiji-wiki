@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/itemmimic.lua"
+  },
+  "category": "component",
+  "display_name": "itemmimic",
+  "summary": "该组件管理一个伪装物品的数据，用于模拟真实物品但会在特定条件下变身成敌人。它监听装备、攻击、工作等事件，控制变身时机，影响玩家的生存和战斗策略。组件支持暂停变身、设置不掉落战利品等功能。",
+  "api": [
+    {
+      "name": "AddPauseSource",
+      "effect": "添加一个暂停源，阻止物品自动变身。取消自动变身计时器，保存剩余时间。"
+    },
+    {
+      "name": "RemovePauseSource",
+      "effect": "移除暂停源，如果没有暂停源，则恢复自动变身计时器。"
+    },
+    {
+      "name": "TurnEvil",
+      "effect": "触发物品变身。将物品从容器中丢出，替换为'revealed'实体，并可能导致目标惊吓和理智下降。"
+    },
+    {
+      "name": "SetNoLoot",
+      "effect": "设置物品变身时不掉落战利品。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，调整自动变身计时器。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存数据，包括noloot和reveal_time_remaining。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据加载状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示自动变身剩余时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "machineturnedon",
+    "machineturnedoff",
+    "percentusedchange",
+    "itemmimic_refreshpausestates",
+    "equipped",
+    "unequipped",
+    "onputininventory",
+    "ondropped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ITEMMIMIC_AUTO_REVEAL_BASE",
+    "ITEMMIMIC_AUTO_REVEAL_RAND"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13437,
+      13406,
+      18234,
+      72238,
+      15245,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及组件 itemmimic 或其代码能力（如 AddPauseSource、TurnEvil、SetNoLoot 等）的任何玩家语言表达。这些能力属于内部实现细节，通常不在游戏文档中描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "物品伪装",
+    "变身",
+    "怪物",
+    "陷阱",
+    "装备",
+    "攻击",
+    "理智",
+    "战利品",
+    "暂停变身",
+    "自动揭示"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2a82fc22eef5b7a9a744276f9be4bc7a1cb090481907ba08f47c9ab2920bdca7",
+    "source_bytes": 10676,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788109003317
+  }
+}

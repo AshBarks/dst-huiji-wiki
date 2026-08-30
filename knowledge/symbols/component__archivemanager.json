@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/archivemanager.lua"
+  },
+  "category": "component",
+  "display_name": "archivemanager",
+  "summary": "该组件管理档案区域的电力开关状态。通过 SwitchPowerOn 方法控制电源启用或禁用，并设置世界状态标签 ARCHIVES_ENERGIZED。在状态变化时推送 arhivepoweron 或 arhivepoweroff 事件。参与核心玩法中的电源管理机制，影响游戏世界状态和玩家交互。",
+  "api": [
+    {
+      "name": "SwitchPowerOn",
+      "effect": "根据 setting 参数切换电力状态：若 setting 为 true 且当前未启用，则启用电力，设置世界状态标签 ARCHIVES_ENERGIZED 为 true，并推送事件 arhivepoweron；若 setting 为 false 且当前已启用，则禁用电力，设置标签为 false，并推送事件 arhivepoweroff。"
+    },
+    {
+      "name": "GetPowerSetting",
+      "effect": "返回当前电力开关状态的布尔值。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "arhivepoweron",
+    "arhivepoweroff"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      21620,
+      18216,
+      13156,
+      47009,
+      51951,
+      20714,
+      14344,
+      21137
+    ],
+    "aspects": [
+      {
+        "aspect": "档案馆开关开启行为",
+        "evidence": [
+          {
+            "pageid": 14344,
+            "quote": "但当玩家开启[[档案馆开关]]后，这些吊灯会在玩家靠近时发光。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "电源",
+    "开关",
+    "档案",
+    "能源",
+    "状态",
+    "电力",
+    "控制",
+    "切换",
+    "获取"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "151516dd47494249e5d6c5f5139affe818362d7b01e8ef5931ca4b21a0416ea6",
+    "source_bytes": 2764,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105253709
+  }
+}

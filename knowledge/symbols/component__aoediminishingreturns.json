@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoediminishingreturns.lua"
+  },
+  "category": "component",
+  "display_name": "aoediminishingreturns",
+  "summary": "该组件用于管理AOE（范围效应）的收益递减效果。它通过SourceModifierList跟踪多个来源的修改器，并在组件从实体移除时重置这些修改器，以平衡游戏中范围伤害或效果的强度。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "调用 self.mult:Reset() 重置所有源修改器，清除累加的收益递减数据。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10413,
+      18211,
+      13602,
+      13701,
+      18783,
+      72981,
+      10379,
+      13261
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与组件 aoediminishingreturns 或 OnRemoveFromEntity 相关的能力描述或行为表达；所有页面仅涉及范围伤害（AoE）的一般描述，但无递减效果或实体移除触发行为的具体说明。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "AOE",
+    "范围伤害",
+    "范围效应",
+    "衰减效果",
+    "效果衰减",
+    "修改器列表",
+    "重置效果",
+    "AOE组件"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "伤害"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "101c7c44c3e7ec4ca4b49c0dd681aa0b1b881434609b59aba3789aabc8094696",
+    "source_bytes": 297,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105105651
+  }
+}

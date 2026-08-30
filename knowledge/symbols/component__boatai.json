@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/boatai.lua"
+  },
+  "category": "component",
+  "display_name": "boatai",
+  "summary": "BoatAI组件管理船只的自动航行AI行为。它定期扫描周围实体，检测是否有升起帆的其他船只，并自动升起自身帆以调整风向进行跟随。这促进了船只间的动态交互和航行玩法。",
+  "api": [],
+  "api_note": "该组件仅通过系统更新自动执行AI逻辑，未提供可供外部主动调用的公共方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      18357,
+      20293,
+      23187,
+      16615,
+      18476,
+      14579,
+      13779
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__boatai 的能力或行为语义；相关页面如自动航行仪仅给出实体介绍，未描述具体功能如自动导航或路径规划。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船只AI",
+    "帆",
+    "风向",
+    "跟随",
+    "航行",
+    "自动",
+    "交互",
+    "距离",
+    "更新",
+    "扫描"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "AI",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0125659fe327159dcfbe09908c1818d4cb3fe39d23a42179daa11b0a49f4b673",
+    "source_bytes": 895,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105645997
+  }
+}

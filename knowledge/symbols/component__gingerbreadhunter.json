@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/gingerbreadhunter.lua"
+  },
+  "category": "component",
+  "display_name": "gingerbreadhunter",
+  "summary": "该组件管理姜饼猎人事件，追踪玩家状态和狩猎进度。它定期在随机玩家附近生成姜饼猪，引导玩家发现面包屑路径。路径终点可能生成姜饼屋或姜饼狼，影响游戏进程。",
+  "api": [
+    {
+      "name": "OnIsDay",
+      "effect": "当世界天数增加时调用；增加内部天数计数，达到周期阈值后启动新狩猎任务，可能取消之前的任务。"
+    },
+    {
+      "name": "OnPlayerJoined",
+      "effect": "当玩家加入时调用；将玩家添加到活动玩家和可用玩家列表中，避免重复添加。"
+    },
+    {
+      "name": "OnPlayerLeft",
+      "effect": "当玩家离开时调用；从活动玩家和可用玩家列表中移除该玩家。"
+    },
+    {
+      "name": "StartNewHunt",
+      "effect": "开始新狩猎：重置狩猎计数，随机选择一个可用玩家，在玩家附近生成一个姜饼猪实体，设置其追踪目标和自动死亡时间。若成功生成则移除该玩家从可用列表，否则重置可用列表。"
+    },
+    {
+      "name": "GenerateCrumbPoints",
+      "effect": "从指定原点生成一定数量的面包屑路径点，确保点不与其他玩家太近；成功生成后增加狩猎计数，失败则打印错误并返回假。"
+    },
+    {
+      "name": "SpawnCrumbTrail",
+      "effect": "根据路径点生成面包屑实体；在最后一个点，若狩猎计数超过最大值，则根据概率生成姜饼屋或姜饼狼，否则生成另一个姜饼猪。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回组件的保存数据，包含hunt_count和days字段，用于持久化状态。"
+    },
+    {
+      "name": "Load",
+      "effect": "从保存数据中恢复hunt_count和days的值，更新组件状态。"
+    },
+    {
+      "name": "LoadPostPass",
+      "effect": "空函数，无实际行为，为标准加载流程占位。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "cycles"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      23186,
+      15724,
+      73427,
+      34523,
+      23192,
+      57310,
+      15677
+    ],
+    "aspects": [
+      {
+        "aspect": "姜饼猪受惊吓生成饼干屑",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "丢下一个[[饼干屑]]"
+          }
+        ]
+      },
+      {
+        "aspect": "姜饼猪狂奔生成饼干屑踪迹",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "每 3 秒丢下一个饼干屑"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "姜饼猎人事件",
+    "追踪玩家",
+    "姜饼猪",
+    "生成点",
+    "狩猎进度",
+    "面包屑",
+    "姜饼屋生成",
+    "姜饼狼生成",
+    "玩家状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "季节性事件",
+    "狩猎",
+    "战斗",
+    "生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5aa3bf8a550896f6c99e11b9705c94cc13a8983cca4c52ef53d413b0ad2ae6c0",
+    "source_bytes": 6682,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108171178
+  }
+}

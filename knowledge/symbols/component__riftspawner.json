@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/riftspawner.lua"
+  },
+  "category": "component",
+  "display_name": "riftspawner",
+  "summary": "该组件是裂隙（Rift）系统的核心控制器，负责管理游戏中所有裂隙的生成、状态维持与移除。它响应世界设置中的难度变化，控制裂隙生成的频率，并处理月影裂隙与暗影裂隙的启用逻辑。组件维护着一个裂隙池，跟踪当前裂隙数量与状态，并为相关玩法（如传送门）提供核心支持。",
+  "api": [
+    {
+      "name": "SpawnRift",
+      "effect": "根据当前启用的裂隙类型（月影或暗影）和定义表，选择一个裂隙预制体。若提供了 `forced_pos` 或生成器找到合适位置，且该位置不靠近已有裂隙（至少 15 格），则生成该预制体并设置其位置。若成功生成，会将其加入管理池并返回该裂隙实体；否则返回 nil。"
+    },
+    {
+      "name": "TryToSpawnRift",
+      "effect": "首先检查当前裂隙总数是否未达到上限（`TUNING.MAXIMUM_RIFTS_COUNT`）。若是，则调用 `SpawnRift` 并返回其结果；否则直接返回 nil。这是一个带数量检查的生成入口。"
+    },
+    {
+      "name": "SetDifficulty",
+      "effect": "根据传入的字符串设置裂隙生成模式（`self.spawnmode`）。若为 'never'，则停止生成计时器；否则更新模式，并可能缩短现有计时器的剩余时间（取现有剩余时间和 `TUNING.RIFTS_SPAWNDELAY` 中的较小值）。"
+    },
+    {
+      "name": "SetEnabledSetting",
+      "effect": "控制月影裂隙（Lunar Rifts）的启用/禁用。若为 'never'，则关闭月影裂隙，禁用对应世界标签，停止生成计时器，并禁用 wagpunk_manager。若为 'always'，则调用 `EnableLunarRifts` 来启用月影裂隙。"
+    },
+    {
+      "name": "SetEnabledSettingCave",
+      "effect": "控制暗影裂隙（Shadow Rifts）的启用/禁用。逻辑与 `SetEnabledSetting` 类似，但针对暗影裂隙及其世界标签。"
+    },
+    {
+      "name": "EnableLunarRifts",
+      "effect": "启用月影裂隙。设置对应世界状态标签为 true，将 `self.lunar_rifts_enabled` 设为 true，并尝试启动生成计时器。同时启用关联的 `wagpunk_manager` 组件。"
+    },
+    {
+      "name": "EnableShadowRifts",
+      "effect": "启用暗影裂隙。设置对应世界状态标签为 true，将 `self.shadow_rifts_enabled` 设为 true，并尝试启动生成计时器。"
+    },
+    {
+      "name": "GetRifts",
+      "effect": "返回当前管理的所有裂隙实体与其预制体名称的映射表（`self.rifts`）。"
+    },
+    {
+      "name": "GetRiftsOfPrefab",
+      "effect": "遍历当前所有裂隙，返回预制体名称与参数 `prefab` 匹配的所有裂隙实体组成的表。若没有匹配的裂隙，返回 nil。"
+    },
+    {
+      "name": "GetRiftsOfType",
+      "effect": "`GetRiftsOfPrefab` 的已废弃别名，为兼容模组而保留。功能完全相同。"
+    },
+    {
+      "name": "GetRiftsOfAffinity",
+      "effect": "遍历当前所有裂隙，返回亲和性（`Affinity`）与参数 `affinity` 匹配的所有裂隙实体组成的表。若没有匹配的裂隙，返回 nil。"
+    },
+    {
+      "name": "GetEnabled",
+      "effect": "返回一个布尔值，指示是否有任何类型的裂隙（月影或暗影）被启用。"
+    },
+    {
+      "name": "GetLunarRiftsEnabled",
+      "effect": "返回一个布尔值，指示月影裂隙是否被启用。"
+    },
+    {
+      "name": "GetShadowRiftsEnabled",
+      "effect": "返回一个布尔值，指示暗影裂隙是否被启用。"
+    },
+    {
+      "name": "IsLunarPortalActive",
+      "effect": "检查当前是否存在任何一个亲和性为月影（LUNAR）的裂隙。返回 true 或 false。"
+    },
+    {
+      "name": "IsShadowPortalActive",
+      "effect": "检查当前是否存在任何一个亲和性为暗影（SHADOW）的裂隙。返回 true 或 false。"
+    },
+    {
+      "name": "RiftIsShadowAffinity",
+      "effect": "根据传入的裂隙实体，查找其预制体定义，并判断其亲和性是否为暗影（SHADOW）。返回 true、false 或 nil（若裂隙无效）。"
+    },
+    {
+      "name": "RiftIsLunarAffinity",
+      "effect": "根据传入的裂隙实体，查找其预制体定义，并判断其亲和性是否为月影（LUNAR）。返回 true、false 或 nil（若裂隙无效）。"
+    },
+    {
+      "name": "TryToStartTimer",
+      "effect": "如果裂隙生成模式不是 'never' 且当前没有活跃的生成计时器，则启动一个 `TUNING.RIFTS_SPAWNDELAY` 时长的计时器，并指示地图开始寻找合适的竞技场点位。"
+    }
+  ],
+  "events_published": [
+    "ms_riftremovedfrompool",
+    "ms_riftaddedtopool"
+  ],
+  "events_listened": [
+    "rifts_setdifficulty",
+    "rifts_settingsenabled",
+    "rifts_settingsenabled_cave",
+    "lunarrift_opened",
+    "shadowrift_opened",
+    "ms_lunarrift_maxsize",
+    "ms_shadowrift_maxsize"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.RIFTS_SPAWNDELAY",
+    "TUNING.MAXIMUM_RIFTS_COUNT",
+    "TUNING.TOTAL_DAY_TIME",
+    "TUNING.SPAWN_RIFTS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23956,
+      34314,
+      23957,
+      13701,
+      20714,
+      65605,
+      15225,
+      52788
+    ],
+    "aspects": [
+      {
+        "aspect": "延迟生成裂隙的控制台命令",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "10秒后生成一堆[[裂隙（月亮）]]"
+          }
+        ]
+      },
+      {
+        "aspect": "立即生成裂隙的控制台命令",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "在光标下生成裂隙"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "裂隙",
+    "生成",
+    "难度",
+    "月影",
+    "暗影",
+    "传送门",
+    "计时器",
+    "亲和性",
+    "世界状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c51253dda3d0e567c2ea24b3514427137c4e9a95b54dcfac88cfa181ed6c28dd",
+    "source_bytes": 15921,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788111925968
+  }
+}

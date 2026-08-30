@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoeweapon_leap.lua"
+  },
+  "category": "component",
+  "display_name": "aoeweapon_leap",
+  "summary": "该组件管理跳跃攻击的范围半径、物理填充参数以及跳跃前后的回调函数。核心玩法是执行跳跃动作，在目标区域对敌人造成范围伤害并抛掷可拾取物品。攻击过程中临时修改武器属性以控制伤害输出。",
+  "api": [
+    {
+      "name": "SetAOERadius",
+      "effect": "设置跳跃攻击的范围半径，影响伤害和抛掷的检测区域。"
+    },
+    {
+      "name": "SetOnPreLeapFn",
+      "effect": "设置跳跃前执行的回调函数，接收实例、执行者、起始位置和目标位置参数。"
+    },
+    {
+      "name": "SetOnLeaptFn",
+      "effect": "设置跳跃后执行的回调函数，接收实例、执行者、起始位置和目标位置参数。"
+    },
+    {
+      "name": "DoLeap",
+      "effect": "执行跳跃攻击：检查参数有效性后，调用跳跃前回调，临时禁用区域伤害和忽略攻击范围，对目标区域内的有效实体造成伤害，抛掷可拾取物品，并调用跳跃后回调。成功返回 true。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14936,
+      15530,
+      15922,
+      22181,
+      34988,
+      15938,
+      72981,
+      13260
+    ],
+    "aspects": [
+      {
+        "aspect": "跳跃后硬直保护描述",
+        "evidence": [
+          {
+            "pageid": 14936,
+            "quote": "并立刻获得 1 秒硬直保护"
+          }
+        ]
+      },
+      {
+        "aspect": "跳跃攻击范围数值标注",
+        "evidence": [
+          {
+            "pageid": 15530,
+            "quote": "攻击范围 = 3（近战）/ 6（跳跃）"
+          }
+        ]
+      },
+      {
+        "aspect": "跳跃能力行为描述",
+        "evidence": [
+          {
+            "pageid": 15530,
+            "quote": "能够发动跳跃攻击"
+          },
+          {
+            "pageid": 22181,
+            "quote": "沃拓克斯可以使用一个灵魂进行“灵魂跳跃”"
+          },
+          {
+            "pageid": 72981,
+            "quote": "新增快速跳跃攻击"
+          },
+          {
+            "pageid": 13260,
+            "quote": "可以跳跃时空"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "跳跃攻击",
+    "AOE武器",
+    "范围伤害",
+    "击退",
+    "物品抛掷",
+    "跳跃",
+    "武器组件"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "范围攻击",
+    "武器"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ad3d9980a1def6d17b5982b4d73107f3ff822f50bd5bab2f36fdd786eb7782bd",
+    "source_bytes": 3299,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105249262
+  }
+}

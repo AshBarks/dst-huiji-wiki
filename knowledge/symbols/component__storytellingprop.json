@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/storytellingprop.lua"
+  },
+  "category": "component",
+  "display_name": "storytellingprop",
+  "summary": "StoryTellingProp组件为实体添加'storytellingprop'标签，用于标识故事叙述相关的道具。在组件移除时，自动清理该标签。它不包含游戏逻辑数据，仅作为标记使用。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      65605,
+      20714,
+      18216,
+      10374,
+      13156,
+      20150,
+      10355
+    ],
+    "aspects": [
+      {
+        "aspect": "讲故事能力触发条件与理智增益效果",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "在[[夜晚]]或者[[洞穴世界]]中，沃尔特可以在燃烧的[[营地火源]]旁边讲故事，获得半径为 4 {{解释|距离单位}}、+10{{理智值"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "故事",
+    "叙述",
+    "道具",
+    "标签",
+    "标记",
+    "组件",
+    "清理",
+    "移除",
+    "添加"
+  ],
+  "gameplay_tags": [
+    "叙事",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "de2a25f2d05151ca911e5072c0a888290a5bef12ceec4038b0d5a934ecd7e1d4",
+    "source_bytes": 315,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093169821
+  }
+}

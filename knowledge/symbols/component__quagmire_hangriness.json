@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/quagmire_hangriness.lua"
+  },
+  "category": "component",
+  "display_name": "quagmire_hangriness",
+  "summary": "该组件管理饥饿度数据，用于控制游戏中的饥饿倒计时机制。它处理饥饿度值的减少和速度增加，影响游戏等级和事件触发。核心玩法涉及饥饿度匹配与不匹配事件，以及通过震动效果提供玩家反馈。",
+  "api": [
+    {
+      "name": "GetCurrent",
+      "effect": "返回当前饥饿度值（0到6000），无副作用。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前饥饿度百分比（0到1），无副作用。"
+    },
+    {
+      "name": "GetLevel",
+      "effect": "返回当前等级（1、2或3），基于饥饿度和速度阈值判定，无副作用。"
+    },
+    {
+      "name": "GetTimeRemaining",
+      "effect": "计算并返回剩余时间（秒），基于当前饥饿度、速度和加速度阈值，无副作用。"
+    },
+    {
+      "name": "Start",
+      "effect": "仅主机模拟下可用。启动饥饿度计时，设置初始饥饿度，触发事件和声音效果，可能导致网络同步。"
+    },
+    {
+      "name": "Stop",
+      "effect": "仅主机模拟下可用。停止饥饿度计时，重置相关状态，触发事件。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "quagmirehangrinessrumbled",
+    "quagmirehangrinessmatched"
+  ],
+  "events_listened": [
+    "levelstartdirty",
+    "rumbleddirty",
+    "matcheddirty"
+  ],
+  "netvars": [
+    "current",
+    "speed",
+    "levelstart",
+    "rumbled",
+    "matched"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20079,
+      13199,
+      72167,
+      18271,
+      73480,
+      19776,
+      51046,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及组件 quagmire_hangriness 或其能力 GetCurrent, GetPercent, GetLevel, GetTimeRemaining, Start, Stop 的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "饥饿度",
+    "倒计时",
+    "匹配",
+    "震动",
+    "等级",
+    "剩余时间",
+    "quagmire",
+    "hangriness",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "挑战",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3526683cf2928972b6fa436c99b0efbd33a37f37887d12110c4f01038c6a9469",
+    "source_bytes": 8890,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102777501
+  }
+}

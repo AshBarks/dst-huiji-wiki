@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/vaultroommanager.lua"
+  },
+  "category": "component",
+  "display_name": "vaultroommanager",
+  "summary": "该组件管理着一个名为‘vaultroom’的特殊区域，维护其房间布局、房间之间的链接状态、传送器实体以及进出该区域的玩家。核心玩法涉及玩家通过大厅进入vaultroom，在多个可随机方向布局的房间中进行探索与解谜，组件负责房间的加载/卸载、传送器的创建与修复、玩家的追踪与传送，以及无人时房间的自动轮换。",
+  "api": [
+    {
+      "name": "GetVaultRoomId",
+      "effect": "返回当前vaultroom的房间ID（字符串）。若无有效房间则返回nil。"
+    },
+    {
+      "name": "SetRoom",
+      "effect": "设置当前激活的房间。参数可为房间索引或ID。将卸载当前房间，更新roomindex，并加载目标房间，包括创建传送器并配置出口。若参数为nil，则重置房间状态并清空出口。"
+    },
+    {
+      "name": "TeleportEntities",
+      "effect": "将传入的实体列表传送到指定标记点（通过标记点名称标识）附近。会对每个实体进行物理传送，并生成传送特效。对玩家实体，还会调整其追踪状态、重置相机、并设置溺水传送点。"
+    },
+    {
+      "name": "GetToOrFromVaultTeleportTargetsFor",
+      "effect": "为指定的‘doer’（通常为玩家）计算传送目标列表。目标包括‘doer’自身、其跟随的宠物（除非被拴住或被持有），以及‘doer’物品栏中所有物品所领导的宠物。返回一个包含这些实体的表格。"
+    },
+    {
+      "name": "PlayDestinationSFX",
+      "effect": "根据标记点名称找到对应的传送器实体，并播放其到达音效（OnArriveFx）。"
+    },
+    {
+      "name": "CancelPendingTeleport",
+      "effect": "取消所有进行中的待定传送序列。移除相关的事件监听，并清空_pendingtp状态表。"
+    },
+    {
+      "name": "NumPlayersInVault",
+      "effect": "返回当前在vaultroom区域内的玩家数量（整数）。"
+    },
+    {
+      "name": "TryToSpawnStaticLayouts",
+      "effect": "尝试在世界中生成Vault_Lobby和Vault_Vault两套静态布局。成功生成后，将self.spawnedlayouts标记为true。若失败则打印错误信息并返回nil。此方法在组件OnPostInit时被调用。"
+    },
+    {
+      "name": "OnPostInit",
+      "effect": "组件的后置初始化函数。若尚未生成静态布局（self.spawnedlayouts为nil），则调用TryToSpawnStaticLayouts进行生成。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个包含当前房间ID和索引的调试字符串，格式为‘Room:<roomid>/<roomindex>’。若无房间则返回‘NO ROOM SET’。"
+    }
+  ],
+  "events_published": [
+    "ms_vaultroom_vault_playerentered",
+    "ms_vaultroom_vault_playerleft"
+  ],
+  "events_listened": [
+    "ms_register_vault_marker",
+    "ms_unregister_vault_marker",
+    "ms_vault_teleporter_channel_start",
+    "ms_vault_teleporter_channel_stop",
+    "ms_vault_teleporter_repair",
+    "ms_vault_teleporter_break",
+    "ms_register_vault_lobby_exit",
+    "ms_register_vault_lobby_exit_target",
+    "arhivepoweron",
+    "arhivepoweroff",
+    "resetvault",
+    "ms_playerjoined"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      65605,
+      20714,
+      34314,
+      34523,
+      52788,
+      14579,
+      18001
+    ],
+    "aspects": [
+      {
+        "aspect": "世界翻新生成静态布局的形式",
+        "evidence": [
+          {
+            "pageid": 65605,
+            "quote": "以世界翻新形式加入的新内容大多以孤立生成的实体或是[[布景]]的形式出现。"
+          }
+        ]
+      },
+      {
+        "aspect": "圣殿传送所需的道具目标",
+        "evidence": [
+          {
+            "pageid": 57263,
+            "quote": "玩家需要穿过[[海洋漩涡布景]]中的[[巨型漩涡]]或使用[[懒人魔杖]]等传送道具才可以到达圣殿。"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家传送至圣殿的方式",
+        "evidence": [
+          {
+            "pageid": 57263,
+            "quote": "玩家需要穿过[[海洋漩涡布景]]中的[[巨型漩涡]]或使用[[懒人魔杖]]等传送道具才可以到达圣殿。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "金库",
+    "大厅",
+    "传送",
+    "房间",
+    "迷宫",
+    "解谜",
+    "方向",
+    "修复",
+    "标记",
+    "生成"
+  ],
+  "gameplay_tags": [
+    "探索",
+    "解谜",
+    "传送",
+    "世界生成"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f0d340623608419e4958b9360e2a6536e72881a70c963e6b68fe2a910e9ce266",
+    "source_bytes": 50470,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113660822
+  }
+}

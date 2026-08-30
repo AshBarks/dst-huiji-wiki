@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moonstormstaticcapturable.lua"
+  },
+  "category": "component",
+  "display_name": "moonstormstaticcapturable",
+  "summary": "该组件管理实体的月亮风暴静态捕获状态，包括启用标志、目标化列表和相关回调函数。它参与与月亮风暴静态捕获器组件的交互，处理目标化、取消目标化和被捕获事件，触发相应回调和事件推送。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除时，移除“moonstormstaticcapturable”标签。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件的启用状态，影响实体是否可被目标化。"
+    },
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件是否启用。"
+    },
+    {
+      "name": "SetOnCaughtFn",
+      "effect": "设置被捕获时的回调函数。"
+    },
+    {
+      "name": "SetOnTargetedFn",
+      "effect": "设置被目标化时的回调函数。"
+    },
+    {
+      "name": "SetOnUntargetedFn",
+      "effect": "设置未被目标化时的回调函数。"
+    },
+    {
+      "name": "IsTargeted",
+      "effect": "检查是否被任何目标化器目标化。"
+    },
+    {
+      "name": "OnTargeted",
+      "effect": "由月亮风暴静态捕获器调用，将调用对象添加到目标化列表；如果是首次目标化，触发回调并推送“moonstormstaticcapturable_targeted”事件。"
+    },
+    {
+      "name": "OnUntargeted",
+      "effect": "由月亮风暴静态捕获器调用，从目标化列表移除调用对象；如果没有目标化，触发回调并推送“moonstormstaticcapturable_untargeted”事件。"
+    },
+    {
+      "name": "OnCaught",
+      "effect": "由月亮风暴静态捕获器调用，向捕获者推送“moonstormstatic_caught”事件，并触发回调。"
+    }
+  ],
+  "events_published": [
+    "moonstormstaticcapturable_targeted",
+    "moonstormstaticcapturable_untargeted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      50898,
+      51221,
+      51498,
+      51494,
+      22522,
+      18853,
+      27531
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件 moonstormstaticcapturable 相关的能力或行为描述。内容主要涉及月亮风暴事件、幻灵捕获机制品及游戏流程，未提及该组件的启用、禁用、捕捉回调等具体能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月亮风暴",
+    "静态电",
+    "捕获",
+    "目标化",
+    "组件",
+    "启用",
+    "回调",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "捕获"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "394d1b10679b0ee621586129307ba2b3c51c7b30b9c6681ca119a24ff5674de8",
+    "source_bytes": 2526,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101866220
+  }
+}

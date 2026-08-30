@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/penguinspawner.lua"
+  },
+  "category": "component",
+  "display_name": "penguinspawner",
+  "summary": "该组件管理企鹅殖民地的生成、追踪和移除，核心玩法为冬季环境事件。它根据玩家位置在水边生成企鹅群，形成殖民地，并可能因月岛区域而变异。组件响应季节变化，冬季激活生成，其他季节清除所有企鹅和殖民地。",
+  "api": [
+    {
+      "name": "AddToColony",
+      "effect": "将企鹅添加到指定殖民地，增加殖民地成员计数，注册死亡和移除事件监听，记录企鹅的巢穴位置，并更新殖民地的变异状态。副作用：企鹅加入殖民地，可能改变小地图图标。"
+    },
+    {
+      "name": "SpawnModeNever",
+      "effect": "废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeLight",
+      "effect": "废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeNormal",
+      "effect": "废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeMed",
+      "effect": "废弃方法，无实际效果。"
+    },
+    {
+      "name": "SpawnModeHeavy",
+      "effect": "废弃方法，无实际效果。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存殖民地数据到表，返回数据表。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载殖民地，生成冰块实体并设置位置。副作用：生成冰块，恢复殖民地状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示企鹅数量、殖民地数量、生成限制等信息。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_playerjoined",
+    "ms_playerleft",
+    "ms_setpenguinnumboulders",
+    "seasontick"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PENGUINS_FLOCK_SIZE",
+    "PENGUINS_MAX_COLONIES",
+    "PENGUINS_MAX_COLONIES_BUFFER",
+    "PENGUINS_SPAWN_INTERVAL",
+    "PENGUINS_DEFAULT_NUM_BOULDERS",
+    "PENGUINS_MIN_DIST_FROM_STRUCTURES",
+    "SPAWN_MOON_PENGULLS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13874,
+      15327,
+      15357
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录仅描述企鹅、鸟类和青蛙的实体行为与生成条件，未提及组件 penguinspawner 的代码能力或行为语义（如 AddToColony、SpawnMode 等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "企鹅",
+    "企鹅殖民地",
+    "冬季生成",
+    "变异企鹅",
+    "冰块岩石",
+    "企鹅营地",
+    "小地图图标",
+    "企鹅刷新"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "事件",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b7a007004ddec112a45a2b764b6231392024f4998d22ea0cd1fe6ac90812438",
+    "source_bytes": 18732,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788110734147
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/coach.lua"
+  },
+  "category": "component",
+  "display_name": "coach",
+  "summary": "该组件管理实体的教练状态，包括启用标志、计时器和灵感任务。它参与的核心玩法是定期为范围内的玩家恢复理智值，并为他们的追随者提供战斗增益，以促进团队合作。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用教练组件，设置启用标志为true，向实体添加'coaching'标签，并启动灵感循环任务。"
+    },
+    {
+      "name": "Disable",
+      "effect": "禁用教练组件，设置启用标志为false，从实体移除'coaching'标签，并取消灵感循环任务。"
+    },
+    {
+      "name": "StartInspiring",
+      "effect": "启动灵感任务，如果尚未启动；任务延迟为TUNING.COACH_TIME_TO_INSPIRE，然后定期执行激励逻辑。"
+    },
+    {
+      "name": "StopInspiring",
+      "effect": "停止并取消灵感任务，将任务句柄设为nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "coach",
+    "cheer"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.COACH_TIME_TO_INSPIRE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      18234,
+      16419,
+      15245,
+      13701,
+      13437,
+      15022,
+      18219
+    ],
+    "aspects": [
+      {
+        "aspect": "战歌吟唱激励",
+        "evidence": [
+          {
+            "pageid": 18219,
+            "quote": "吟唱'''醍醐灌顶华彩（{{En|Clear Minded Cadenza}}）'''时，战歌作用范围内的玩家每次攻击恢复 1{{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板激活增益",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "就能将插入的电路板激活来产生对应的增益。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "教练",
+    "激励",
+    "团队",
+    "理智",
+    "增益",
+    "追随者",
+    "沃尔夫冈",
+    "鼓舞",
+    "协作",
+    "范围"
+  ],
+  "gameplay_tags": [
+    "团队合作",
+    "支持",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6a042991789926617a5b5016cf29ada9fc6eccf838dc4c352df0bb8ba3247637",
+    "source_bytes": 2994,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106122800
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/klaussacklock.lua"
+  },
+  "category": "component",
+  "display_name": "klaussacklock",
+  "summary": "KlausSackLock组件管理Klaus袋子锁的钥匙使用逻辑，通过设置回调函数自定义打开行为。当玩家使用钥匙时，组件会验证钥匙有效性并调用回调，成功后可能消耗钥匙。这参与游戏中解锁特定容器以获取战利品的玩法。",
+  "api": [
+    {
+      "name": "SetOnUseKey",
+      "effect": "设置一个回调函数，用于在使用钥匙时执行自定义逻辑。该函数在UseKey方法中被调用，决定钥匙使用是否成功、失败消息及是否消耗钥匙。"
+    },
+    {
+      "name": "UseKey",
+      "effect": "尝试使用钥匙打开锁。检查钥匙实体是否有效且已设置回调函数，然后调用回调函数处理使用过程。如果回调指示消耗钥匙（consumed为true），则移除钥匙实体（堆叠时减少一个）。返回成功状态（true）或失败状态和消息（false, fail_msg）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      16419,
+      21620,
+      15903,
+      18216,
+      21485,
+      13437,
+      24866
+    ],
+    "aspects": [
+      {
+        "aspect": "使用右键操作哑铃",
+        "evidence": [
+          {
+            "pageid": 15903,
+            "quote": "装备后右键哑铃即可开始举重，再次右键停止举重。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "克劳斯锁",
+    "钥匙使用",
+    "解锁",
+    "袋子锁",
+    "使用钥匙",
+    "消耗",
+    "互动",
+    "Klaus锁"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "811b7d007ad2a8787f321b719b28bc4d5a0344534a66fe209a6b48c69019e19c",
+    "source_bytes": 920,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788101100227
+  }
+}

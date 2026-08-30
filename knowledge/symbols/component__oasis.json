@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/oasis.lua"
+  },
+  "category": "component",
+  "display_name": "oasis",
+  "summary": "组件 oasis 管理一个圆形区域，定义为绿洲。它维护半径参数，并提供方法检查实体是否完全在区域内或计算接近级别。这可以用于游戏中的区域效果，如安全区或触发特定行为。",
+  "api": [
+    {
+      "name": "IsEntityInOasis",
+      "effect": "检查实体是否在绿洲半径范围内，返回 true 或 false。无副作用。"
+    },
+    {
+      "name": "GetProximityLevel",
+      "effect": "基于实体距离绿洲边界的远近和给定范围计算接近级别：1 表示实体在绿洲内，0 表示超出范围，中间值表示接近边界。无副作用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      15022,
+      70704,
+      65881,
+      15415,
+      13701,
+      15225,
+      16419
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未发现对 IsEntityInOasis 或 GetProximityLevel 能力的直接或间接表达；仅提及绿洲沙漠群系但未涉及实体在绿洲中的判断，距离描述均为具体生物或物品的行为应用而非能力讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "绿洲",
+    "区域",
+    "半径",
+    "接近级别",
+    "实体检查",
+    "距离",
+    "范围",
+    "环境区域",
+    "安全区"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "区域"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2e61b2b6667258b1425cd8e62d2d29a1a120bb80f2a447cbb3a448e9d600f127",
+    "source_bytes": 683,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788102107698
+  }
+}

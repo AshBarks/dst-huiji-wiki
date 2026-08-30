@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerlightningtarget.lua"
+  },
+  "category": "component",
+  "display_name": "playerlightningtarget",
+  "summary": "该组件管理玩家实体作为雷击目标的几率和响应行为。它通过基础击中几率和修改器系统控制玩家被雷击的概率，并允许自定义雷击发生时的效果。默认情况下，雷击会对玩家造成伤害，除非玩家处于死亡、无敌或绝缘状态。组件还会在雷击或伤害避免时推送事件，以通知其他游戏系统。",
+  "api": [
+    {
+      "name": "SetHitChance",
+      "effect": "设置玩家作为雷击目标的基础击中几率。参数chance直接赋值给self.hitchance，影响后续的GetHitChance计算。"
+    },
+    {
+      "name": "GetHitChance",
+      "effect": "返回调整后的击中几率。计算方式为self.hitchance乘以self.hitchancemodifiers的当前总和，反映所有来源修改器的累积效果。"
+    },
+    {
+      "name": "SetOnStrikeFn",
+      "effect": "设置雷击发生时执行的自定义函数。参数fn替换默认的onstrikefn，用于自定义雷击行为（如伤害处理或特殊效果）。"
+    },
+    {
+      "name": "DoStrike",
+      "effect": "执行雷击操作：如果onstrikefn不为nil，则调用该函数并传入玩家实体；随后推送'playerlightningtargeted'事件。该方法可能触发伤害或避免伤害，取决于onstrikefn的实现。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "playerlightningtargeted",
+    "lightningdamageavoided"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "PLAYER_LIGHTNING_TARGET_CHANCE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14682,
+      14683,
+      20150
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录内容主要讨论钓鱼竿和战斗机制，未涉及组件 playerlightningtarget 或其相关能力如 SetHitChance 等的表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "雷击几率",
+    "玩家闪电",
+    "伤害免疫",
+    "命中概率",
+    "雷击效果",
+    "雷击事件",
+    "绝缘状态",
+    "玩家状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "60f698c22040774404ce9791e272481f80f0119e724aa2124c06a05e7b6e68e4",
+    "source_bytes": 1134,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091483437
+  }
+}

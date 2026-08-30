@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/useabletargeteditem.lua"
+  },
+  "category": "component",
+  "display_name": "useabletargeteditem",
+  "summary": "UseableTargetedItem 组件管理物品的使用状态，包括是否正在使用、可否自我目标、目标预制件类型和 mounted 使用能力。它允许物品被用于特定目标上，支持定制使用回调函数，并处理物品在物品栏中的禁用状态。核心玩法涉及工具或物品的交互使用，如武器攻击、工具采集等。",
+  "api": [
+    {
+      "name": "SetTargetPrefab",
+      "effect": "设置物品的目标预制件名称，用于标识可使用的目标类型。副作用：添加或移除对应的 prefab_targeter 标签。"
+    },
+    {
+      "name": "SetUseableMounted",
+      "effect": "设置物品是否可在 mounted 状态下使用。副作用：添加或移除 useabletargeteditem_mounted 标签。"
+    },
+    {
+      "name": "SetOnUseFn",
+      "effect": "设置物品开始使用时的回调函数，用于自定义使用行为。无直接副作用，但会在 StartUsingItem 中调用该函数。"
+    },
+    {
+      "name": "SetOnStopUseFn",
+      "effect": "设置物品停止使用时的回调函数，用于自定义停止行为。无直接副作用，但会在 StopUsingItem 中调用该函数。"
+    },
+    {
+      "name": "SetInventoryDisable",
+      "effect": "设置物品在物品栏中是否可禁用。副作用：添加或移除 useabletargeteditem_inventorydisable 标签。"
+    },
+    {
+      "name": "SetCanSelfTarget",
+      "effect": "设置物品是否可以自我目标。副作用：添加或移除 useabletargateditem_canselftarget 标签。"
+    },
+    {
+      "name": "SetUsingItemDoesNotToggleUseability",
+      "effect": "设置使用物品时不切换可用状态。无直接副作用，但影响 StartUsingItem 中的 inuse_targeted 属性设置。"
+    },
+    {
+      "name": "CanInteract",
+      "effect": "返回布尔值，指示物品当前是否可交互（未被使用）。无副作用。"
+    },
+    {
+      "name": "StartUsingItem",
+      "effect": "开始使用物品于目标上，调用设置的使用回调函数，并根据设置切换使用状态。副作用：若成功且物品有效，设置 inuse_targeted 为 true（除非 usingdoesnotoggleuseability 为 true），并可能添加 inuse_targeted 标签。返回 success 和 failreason。"
+    },
+    {
+      "name": "StopUsingItem",
+      "effect": "停止使用物品，重置使用状态，并调用停止回调函数。副作用：设置 inuse_targeted 为 false，并移除 inuse_targeted 标签。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时清理所有相关标签，如 inuse_targeted、useabletargeteditem_inventorydisable、useabletargeteditem_mounted 和 prefab_targeter。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      27531,
+      47009,
+      13897,
+      17930,
+      22144,
+      23198,
+      16057
+    ],
+    "aspects": [
+      {
+        "aspect": "物品使用与目标设置",
+        "evidence": [
+          {
+            "pageid": 17930,
+            "quote": "当第一位玩家右击使用传送塔时，该玩家触摸的传送塔会作为其他传送塔的传送目标"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "物品使用",
+    "工具使用",
+    "交互使用",
+    "自我使用",
+    "选择目标",
+    "使用状态",
+    "骑乘使用",
+    "禁用状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "工具使用",
+    "交互",
+    "物品管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7b6e432662c59d4845fc7ca43fa4f4c220f9ef197ee1efc3fef90fa2ff5baa03",
+    "source_bytes": 3555,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092256010
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playerspeedmult.lua"
+  },
+  "category": "component",
+  "display_name": "playerspeedmult",
+  "summary": "该组件负责管理玩家的移动速度乘数，使用SourceModifierList管理四组乘数：服务器普通乘数、服务器上限乘数、预测普通乘数和预测上限乘数。它参与的核心玩法是动态计算和应用玩家的基础移动速度，支持网络同步和客户端预测，确保速度加成正确生效且不会无限制叠加。",
+  "api": [
+    {
+      "name": "AttachClassified",
+      "effect": "将实体的classified（网络复制实体）组件绑定到本组件，用于读取网络变量。同时监听classified的‘onremove’事件以自动解绑。"
+    },
+    {
+      "name": "DetachClassified",
+      "effect": "解除与classified组件的绑定，清除引用和事件监听。"
+    },
+    {
+      "name": "SetClassified",
+      "effect": "在服务端设置组件的classified引用。此方法会断言当前为服务端模拟。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，重置所有SourceModifierList。在服务端还会取消初始化任务。"
+    },
+    {
+      "name": "SetSpeedMultCap",
+      "effect": "设置最终计算后的速度乘数上限。必须为非负数或nil。如果总乘数超过此值，则会进行调整（衰减非上限部分）以将其限制在上限内。"
+    },
+    {
+      "name": "SetSpeedMult",
+      "effect": "在服务端设置一个普通速度乘数修改器。source可以是实体（作为唯一标识符）或字符串（作为键值）。会先尝试缓存基础速度，然后更新乘数并同步网络变量psm_servermult。"
+    },
+    {
+      "name": "RemoveSpeedMult",
+      "effect": "在服务端移除一个由source指定的普通速度乘数修改器，并同步网络变量psm_servermult。"
+    },
+    {
+      "name": "SetCappedSpeedMult",
+      "effect": "在服务端设置一个带上限约束的速度乘数修改器。会先尝试缓存基础速度，然后更新乘数并同步网络变量psm_cappedservermult。该乘数在最终计算中会与普通乘数相乘，并受multcap限制。"
+    },
+    {
+      "name": "RemoveCappedSpeedMult",
+      "effect": "在服务端移除一个由source指定的带上限约束的速度乘数修改器，并同步网络变量psm_cappedservermult。"
+    },
+    {
+      "name": "SetPredictedSpeedMult",
+      "effect": "在客户端（或服务端）设置一个预测用的普通速度乘数修改器，用于在没有网络同步前进行本地预测计算。"
+    },
+    {
+      "name": "RemovePredictedSpeedMult",
+      "effect": "在客户端（或服务端）移除一个由source指定的预测用普通速度乘数修改器。"
+    },
+    {
+      "name": "SetCappedPredictedSpeedMult",
+      "effect": "在客户端（或服务端）设置一个预测用的带上限约束的速度乘数修改器。"
+    },
+    {
+      "name": "RemoveCappedPredictedSpeedMult",
+      "effect": "在客户端（或服务端）移除一个由source指定的预测用带上限约束的速度乘数修改器。"
+    },
+    {
+      "name": "ApplyRunSpeed_Internal",
+      "effect": "核心计算方法。根据服务端乘数和预测乘数计算最终有效速度乘数，应用速度上限，并将计算结果写入locomotor组件的runspeed（服务端）或predictrunspeed（客户端）。当无预测乘数时，客户端的predictrunspeed会被设为nil。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个包含当前所有乘数值、上限值和基础速度的调试字符串。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "psm_basespeed",
+    "psm_servermult",
+    "psm_cappedservermult"
+  ],
+  "tunables": [
+    "TUNING.WILSON_RUN_SPEED"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51287,
+      13406,
+      15922,
+      18410,
+      20428,
+      13260,
+      16622,
+      18079
+    ],
+    "aspects": [
+      {
+        "aspect": "奔跑状态速度变化",
+        "evidence": [
+          {
+            "pageid": 18079,
+            "quote": "奔跑时其基础速度增加到 8(默认为6)"
+          }
+        ]
+      },
+      {
+        "aspect": "技能速度百分比加成",
+        "evidence": [
+          {
+            "pageid": 13260,
+            "quote": "获得×120%的移动速度加成"
+          }
+        ]
+      },
+      {
+        "aspect": "装备速度百分比影响",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "-15% 移动速度"
+          },
+          {
+            "pageid": 20428,
+            "quote": "提升 10% 移动速度"
+          }
+        ]
+      },
+      {
+        "aspect": "角色速度倍率调整",
+        "evidence": [
+          {
+            "pageid": 13406,
+            "quote": "移动速度增加 10%（6→6.6）"
+          },
+          {
+            "pageid": 13406,
+            "quote": "移除鹿人的 0.9 移动速度倍率"
+          }
+        ]
+      },
+      {
+        "aspect": "速度倍数默认值",
+        "evidence": [
+          {
+            "pageid": 51287,
+            "quote": "“速度倍数”默认为 1"
+          }
+        ]
+      },
+      {
+        "aspect": "道具协同速度提升",
+        "evidence": [
+          {
+            "pageid": 16622,
+            "quote": "可以配合魔光护符和卵石路来进一步提升玩家的移动速度。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "移动速度",
+    "速度叠加",
+    "速度上限",
+    "基础速度",
+    "速度乘数",
+    "玩家速度",
+    "移动加成",
+    "速度倍率"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+    "source_bytes": 7407,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091529279
+  }
+}

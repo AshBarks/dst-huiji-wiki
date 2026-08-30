@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hitchable.lua"
+  },
+  "category": "component",
+  "display_name": "hitchable",
+  "summary": "Hitchable组件用于管理实体的拴住状态，核心玩法涉及将坐骑或动物拴在拴马桩上。它存储拴住目标并控制可拴住性，当有战斗目标时自动解除拴住。组件通过音效和事件处理拴住与解除拴住的行为。",
+  "api": [
+    {
+      "name": "SetHitched(target)",
+      "effect": "设置拴住目标，播放拴住音效，监听'newcombattarget'事件，将canbehitched设为false，存储hitched为目标。副作用：可能触发目标状态变化，当目标获得战斗目标时自动解除拴住。"
+    },
+    {
+      "name": "Unhitch()",
+      "effect": "解除拴住，播放解除音效，移除'newcombattarget'事件监听，将canbehitched设为true，如果hitched目标存在且其hitcher组件的canbehitched为false则调用其Unhitch方法，将hitched设为nil。副作用：可能影响被拴住实体的状态，导致其解除拴系。"
+    },
+    {
+      "name": "GetHitch()",
+      "effect": "返回当前拴住的目标（hitched值）。无副作用。"
+    },
+    {
+      "name": "OnSave()",
+      "effect": "返回空数据表，用于保存组件状态。无实际数据保存。无副作用。"
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": "接收数据参数但未处理，用于加载组件状态。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "newcombattarget"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15601,
+      14815,
+      15022,
+      18219,
+      13701,
+      15551,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本中未发现与拴住（hitch）相关的任何描述或能力体现。所有页面内容集中于角色能力、巨兽行为、战斗机制、掉落物品等，不涉及 hitchable 组件的 SetHitched、Unhitch、GetHitch、OnSave、OnLoad 等行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "坐骑",
+    "音效",
+    "拴系状态",
+    "拴马",
+    "战斗",
+    "解除",
+    "事件",
+    "组件"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "载具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a4eca0002940de68054b1447e92f2d81084e0f0b66e10be5a1b0c9a8b78776ab",
+    "source_bytes": 1189,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788100687133
+  }
+}

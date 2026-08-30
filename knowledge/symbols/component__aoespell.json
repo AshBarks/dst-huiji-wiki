@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoespell.lua"
+  },
+  "category": "component",
+  "display_name": "aoespell",
+  "summary": "AOESpell 组件管理范围法术的施放逻辑和函数，用于处理范围攻击法术。它通过 SetSpellFn 设置法术行为，CastSpell 执行施法并推送事件，CanCast 检查施法条件，包括 spellbook 和 aoetargeting 等组件。该组件参与战斗玩法，负责范围法术的施放与验证。",
+  "api": [
+    {
+      "name": "SetSpellFn",
+      "effect": "设置组件的法术函数为传入的 fn，用于后续施法调用。"
+    },
+    {
+      "name": "CastSpell",
+      "effect": "执行施法，调用已设置的法术函数（传入 inst、doer、pos 参数），如果未设置则跳过。成功后向 doer 推送事件 'oncastaoespell'，并返回 success 和 reason。"
+    },
+    {
+      "name": "CanCast",
+      "effect": "检查是否可以施放法术，验证 spellfn 是否存在、spellbook 组件的可用性（如使用者、燃料状态）、aoetargeting 组件的设置（如是否启用、允许骑乘等），以及地图是否允许在 pos 点施放。"
+    }
+  ],
+  "events_published": [
+    "oncastaoespell"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13602,
+      13606,
+      28751,
+      46847,
+      65881,
+      70704,
+      13406
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 SetSpellFn、CastSpell、CanCast 相关的玩家语言表达，内容集中于实体属性、掉落、攻击伤害和范围描述，未直接涉及法术设置、施放或施放条件的讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "AOE法术",
+    "范围攻击",
+    "施法检查",
+    "法术函数",
+    "oncastaoespell",
+    "法术书",
+    "范围目标",
+    "施法能力",
+    "法术施放"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8ead494d815d4a64a99d34ac3927bb70f9d5b0f0fe0dd6378de606e472d6dba4",
+    "source_bytes": 1911,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788093460873
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stormwatcher.lua"
+  },
+  "category": "component",
+  "display_name": "stormwatcher",
+  "summary": "StormWatcher组件负责管理实体的风暴状态，包括风暴级别(stormlevel)和风暴类型(currentstorm)。它监听世界风暴变化事件，实时更新实体所处风暴数据，并影响移动速度等属性。核心玩法中，风暴作为动态环境挑战，影响玩家的生存与探索体验。",
+  "api": [
+    {
+      "name": "GetStormLevel",
+      "effect": "返回风暴级别数值。如果未提供stormtype或其与当前风暴类型匹配，则返回self.stormlevel；否则返回0。风暴级别为0到1之间的浮点数，表示风暴强度。"
+    },
+    {
+      "name": "GetCurrentStorm",
+      "effect": "返回实体当前所在的风暴类型枚举值。通过查询世界沙尘暴(sandstorms)和月风暴(moonstorms)组件，判断实体位置；若同时在两种风暴中则触发断言错误。"
+    },
+    {
+      "name": "CheckStorms",
+      "effect": "检查当前风暴状态并更新self.currentstorm和self.stormlevel。若风暴类型变化，调用UpdateStormLevel()；若风暴消失，将风暴级别设为0。"
+    },
+    {
+      "name": "UpdateStorms",
+      "effect": "更新风暴状态字典self.currentstorms。根据data.stormtype和data.setting设置对应风暴是否活跃；若有活跃风暴，启动组件更新并监听changearea事件，设置随机延迟；否则停止更新、移除事件监听并清零风暴级别。"
+    },
+    {
+      "name": "UpdateStormLevel",
+      "effect": "根据当前风暴类型从世界组件获取风暴级别并更新self.stormlevel。若为沙尘暴或月风暴，调用对应观察者组件更新并设置移动速度乘数；若风暴结束，移除之前的速度乘数。风暴级别经四舍五入计算为7级离散值。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定时更新函数，减少延迟计时器self.delay；当延迟到期时调用UpdateStormLevel()并重置延迟（风暴级别在0到1之间时延迟0.5秒，否则1秒）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "ms_stormchanged",
+    "changearea"
+  ],
+  "netvars": [
+    "stormlevel",
+    "stormtype"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      51287,
+      51494,
+      51221,
+      24587,
+      13406,
+      15031,
+      27531
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述风暴（如月亮风暴、沙尘暴）的出现、区域效果和玩家互动，但未涉及 stormwatcher 组件的代码级能力（如获取风暴级别、检查风暴、更新风暴等）的具体表达或描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "风暴",
+    "沙尘暴",
+    "月风暴",
+    "风暴等级",
+    "风暴观察者",
+    "环境效果",
+    "移动速度",
+    "生存挑战"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e4914ecc917f874281011e278af089978d19ca97202a8ca356e302ae6d5392c5",
+    "source_bytes": 4624,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788092015407
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/forgerepair.lua"
+  },
+  "category": "component",
+  "display_name": "forgerepair",
+  "summary": "ForgeRepair组件管理修复材料属性，并通过OnRepair方法修复其他实体。当修复成功时，目标实体恢复至满状态，组件自身被消耗。该组件常用于修复护甲、耐久工具和燃料物品，参与锻造或维护玩法。",
+  "api": [
+    {
+      "name": "SetRepairMaterial(material): 设置修复材料类型，并为实体添加或移除对应标签（如forgerepair_material）。",
+      "effect": ""
+    },
+    {
+      "name": "SetOnRepaired(fn): 设置修复成功后的回调函数，触发时传递自身、目标和修复者参数。",
+      "effect": ""
+    },
+    {
+      "name": "OnRepair(target, doer): 修复目标实体。如果目标有armor组件且受损，则设置耐久至100%；如果有finiteuses组件且耐久不足，则设置使用次数至100%；如果有fueled组件且燃料不足，则设置燃料至100%。成功修复后，组件自身消耗（优先使用finiteuses组件减少1次，其次移除堆叠，否则移除实体），并触发回调函数；返回true表示修复成功。",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      22464,
+      34992
+    ],
+    "aspects": [
+      {
+        "aspect": "修复材料指定信息",
+        "evidence": [
+          {
+            "pageid": 34992,
+            "quote": "可修复/指定修复材料"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "修复材料",
+    "修复耐久",
+    "修复护甲",
+    "修复工具",
+    "修复燃料",
+    "锻造玩法",
+    "维护玩法",
+    "满状态修复"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "修复",
+    "工具",
+    "装备",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "831d1b663310e7551690ff9e70d153a6d5b90514f6100c7c43a22c2eb2485fa6",
+    "source_bytes": 1573,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788107799187
+  }
+}

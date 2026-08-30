@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deathloothandler.lua"
+  },
+  "category": "component",
+  "display_name": "deathloothandler",
+  "summary": "该组件用于管理实体死亡时的战利品和等级数据。它提供战利品的存储和获取功能，以及等级的设置和获取。数据可通过存档和加载进行持久化，但不直接控制战利品的实际掉落。",
+  "api": [
+    {
+      "name": "StoreLoot",
+      "effect": "接受一个物品预制体数组，并将它们添加到内部的战利品列表中。"
+    },
+    {
+      "name": "GetLoot",
+      "effect": "返回当前存储的战利品列表。"
+    },
+    {
+      "name": "SetLevel",
+      "effect": "设置等级为传入的数字。"
+    },
+    {
+      "name": "GetLevel",
+      "effect": "返回当前等级值。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "如果等级大于0，返回一个包含等级、战利品和add_component_if_missing标记的表；否则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表中加载等级和战利品，如果数据为nil则使用默认值。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      13779,
+      14579,
+      13606,
+      28744,
+      14938,
+      15722,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与组件能力 StoreLoot, GetLoot, SetLevel, GetLevel, OnSave, OnLoad 相关的玩家语言表达。内容主要涉及物品掉落物配置、生物行为描述和游戏机制，但未讨论等级设置、保存加载或战利品存储的具体能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "死亡",
+    "战利品",
+    "掉落",
+    "等级",
+    "存储",
+    "保存",
+    "物品",
+    "数据"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b9dbde52fad1ac91502e4fb408648e7bc62c4c6a81a5a8c1c0ccdc98845e03ba",
+    "source_bytes": 903,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788106611125
+  }
+}

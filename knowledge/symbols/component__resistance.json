@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/resistance.lua"
+  },
+  "category": "component",
+  "display_name": "resistance",
+  "summary": "Resistance 组件通过标签表管理实体对伤害的抵抗能力。它参与战斗系统，允许实体免疫或减少特定类型的伤害。组件支持通过回调函数自定义抵抗行为和条件。",
+  "api": [
+    {
+      "name": "AddResistance",
+      "effect": ""
+    },
+    {
+      "name": "RemoveResistance",
+      "effect": ""
+    },
+    {
+      "name": "HasResistance",
+      "effect": ""
+    },
+    {
+      "name": "HasResistanceToTag",
+      "effect": ""
+    },
+    {
+      "name": "SetOnResistDamageFn",
+      "effect": ""
+    },
+    {
+      "name": "SetShouldResistFn",
+      "effect": ""
+    },
+    {
+      "name": "ShouldResistDamage",
+      "effect": ""
+    },
+    {
+      "name": "ResistDamage",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "damageresisted"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      20058,
+      15022,
+      20150,
+      13156,
+      10374,
+      15539,
+      13556
+    ],
+    "aspects": [
+      {
+        "aspect": "位面实体抵抗技能获取",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "获得[[位面实体抵抗]]并增加 5 点位面伤害和 15 点位面防御。"
+          }
+        ]
+      },
+      {
+        "aspect": "位面实体抵抗机制引用",
+        "evidence": [
+          {
+            "pageid": 20058,
+            "quote": "===[[位面实体抵抗]]==="
+          }
+        ]
+      },
+      {
+        "aspect": "护盾吸收伤害机制描述",
+        "evidence": [
+          {
+            "pageid": 13556,
+            "quote": "阿比盖尔在受到攻击时，将会有一个护盾将她围住，持续 0.5 秒，在此期间吸收受到的所有伤害。"
+          }
+        ]
+      },
+      {
+        "aspect": "装备抵抗击飞效果描述",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "抵抗击飞效果。"
+          }
+        ]
+      },
+      {
+        "aspect": "角色火焰免疫能力",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛不会受到[[火焰伤害]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "抵抗",
+    "伤害",
+    "标签",
+    "免疫",
+    "防御",
+    "回调",
+    "调试",
+    "攻击",
+    "武器"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e667a498c69c8d492afe765eb4cec7962ba453b5aec28796e4d721fc99ac4e76",
+    "source_bytes": 1387,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788095047234
+  }
+}

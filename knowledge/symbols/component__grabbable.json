@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/grabbable.lua"
+  },
+  "category": "component",
+  "display_name": "grabbable",
+  "summary": "组件 Grabbable 管理实体上的 'grabbable' 标签，用于控制实体是否可以被抓取。它允许通过设置自定义函数来定义抓取条件。该组件已弃用，建议使用 inventoryitem.grabbableoverridetag 替代。",
+  "api": [
+    {
+      "name": "SetCanGrabFn",
+      "effect": "设置一个函数 fn，该函数将在检查是否可以抓取时被调用。行为：存储函数供后续使用。"
+    },
+    {
+      "name": "CanGrab",
+      "effect": "检查实体是否可以被指定的 doer 抓取。行为：如果设置了 cangrabfn，则调用它并返回结果；否则返回 false。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      65605,
+      23187,
+      18476,
+      14579,
+      13779,
+      15295,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "电路板提及自动抓取机功能",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "*[[自动抓取机]]{{待补充}}。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "抓取",
+    "标签",
+    "组件",
+    "弃用",
+    "替代",
+    "物品栏",
+    "自定义",
+    "条件",
+    "实体"
+  ],
+  "search_terms_note": "pass1 后零命中 8/9,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "抓取",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cf0a1f7a819bfa686201a3c2c5908dc5c805947db74308c212505258963a7134",
+    "source_bytes": 642,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108169915
+  }
+}

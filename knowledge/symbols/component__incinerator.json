@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/incinerator.lua"
+  },
+  "category": "component",
+  "display_name": "incinerator",
+  "summary": "该组件管理焚烧行为的回调函数和条件判断，用于实体如焚化炉。它参与核心玩法中销毁物品的过程，通过容器组件处理物品的焚烧，并触发相关声音和事件。组件数据包括焚烧回调函数和物品判断函数，以及焚烧时的临时状态。",
+  "api": [
+    {
+      "name": "SetOnIncinerateFn",
+      "effect": "设置焚烧完成后的回调函数，存储以便在焚烧操作后调用。"
+    },
+    {
+      "name": "SetShouldIncinerateItemFn",
+      "effect": "设置判断物品是否应被焚烧的函数，用于决定哪些物品在焚烧时被销毁。"
+    },
+    {
+      "name": "Incinerate",
+      "effect": "执行焚烧操作。如果实体有容器组件，则销毁容器中满足条件的物品（基于shouldincinerateitemfn），触发物品的onincinerated事件和doer的murdered、killed事件，并播放声音。返回true表示成功，false表示失败（如无容器组件）。"
+    },
+    {
+      "name": "ShouldIncinerateItem",
+      "effect": "检查指定物品是否应该被焚烧。如果设置了shouldincinerateitemfn，则调用它；否则返回true。"
+    },
+    {
+      "name": "OnPreDestroyItemCallbackFn",
+      "effect": "处理物品销毁前的逻辑：播放物品的焚烧或谋杀声音，推送物品的onincinerated事件，以及如果doer存在，推送doer的murdered和killed事件（对于有生命值或可谋杀的物品）。模组可访问此函数。"
+    }
+  ],
+  "events_published": [
+    "onincinerated",
+    "murdered",
+    "killed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      28744,
+      18359,
+      19129,
+      72441,
+      15722,
+      22465,
+      14696,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及与焚烧、销毁物品或焚烧组件（如Incinerate、ShouldIncinerateItem等）相关的玩家语言表达或行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "焚烧",
+    "焚化",
+    "销毁",
+    "物品",
+    "焚化炉",
+    "容器",
+    "声音",
+    "事件",
+    "生存",
+    "建造"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3e408c60727a2b18cfa52d31f2b4c84ae9bdf0a73f1aef2fd9584821d84c61ba",
+    "source_bytes": 2381,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788096885047
+  }
+}

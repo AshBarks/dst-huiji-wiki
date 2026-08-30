@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/catcher.lua"
+  },
+  "category": "component",
+  "display_name": "catcher",
+  "summary": "Catcher 组件用于管理实体捕获抛射物的能力，通过监视列表跟踪接近的抛射物，并在指定距离内触发捕获动作。它参与游戏中的投掷和接收机制，增强角色与环境或敌人的互动。",
+  "api": [
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件启用状态。禁用时移除捕获能力（设置 canact 为 false），如果实体状态标签为 'readytocatch' 则推送 'cancelcatch' 事件。"
+    },
+    {
+      "name": "SetActionDistance",
+      "effect": "设置显示捕获动作的距离，用于触发动作提示。"
+    },
+    {
+      "name": "SetCatchDistance",
+      "effect": "设置实际捕获的距离，当抛射物在此距离内且实体准备就绪时触发捕获。"
+    },
+    {
+      "name": "StartWatching",
+      "effect": "开始监视指定抛射物，将其加入监视列表并启动组件更新，更新 'cancatch' 标签。"
+    },
+    {
+      "name": "StopWatching",
+      "effect": "停止监视指定抛射物，从监视列表移除，更新 'cancatch' 标签，如果列表为空则停止组件更新。"
+    },
+    {
+      "name": "CanCatch",
+      "effect": "返回布尔值，表示是否有抛射物在监视中且组件处于可行动状态。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "在组件从实体移除时调用，移除 'cancatch' 标签。"
+    }
+  ],
+  "events_published": [
+    "cancelcatch",
+    "catch"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15415,
+      15022,
+      65605,
+      50898,
+      70704,
+      15225,
+      15973,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "捕获能力描述",
+        "evidence": [
+          {
+            "pageid": 50898,
+            "quote": "幻灵捕获机可以用于捕获以下目标"
+          }
+        ]
+      },
+      {
+        "aspect": "活动范围距离描述",
+        "evidence": [
+          {
+            "pageid": 15415,
+            "quote": "鱼人会在所属的生物巢穴附近 15 {{解释|距离单位}}范围内活动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "捕获",
+    "抛射物",
+    "接住",
+    "投掷",
+    "距离",
+    "监视",
+    "动作",
+    "能力",
+    "组件",
+    "更新"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0002c685641f1ed1c04b9a9b3f63da5bd0a7535c19c622ee76fde9b30d3f6d69",
+    "source_bytes": 2626,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788090792486
+  }
+}

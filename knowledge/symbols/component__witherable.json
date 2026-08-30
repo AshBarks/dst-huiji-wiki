@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/witherable.lua"
+  },
+  "category": "component",
+  "display_name": "witherable",
+  "summary": "Witherable组件管理植物的枯萎和恢复状态，基于环境温度和降雨自动触发。它影响作物和可采集植物的可用性，参与植物生存的核心玩法。玩家需要监控条件以维持植物健康。",
+  "api": [
+    {
+      "name": "Enable(enable)",
+      "effect": ""
+    },
+    {
+      "name": "IsWithered()",
+      "effect": ""
+    },
+    {
+      "name": "IsProtected()",
+      "effect": ""
+    },
+    {
+      "name": "CanWither()",
+      "effect": ""
+    },
+    {
+      "name": "CanRejuvenate()",
+      "effect": ""
+    },
+    {
+      "name": "ForceWither()",
+      "effect": ""
+    },
+    {
+      "name": "ForceRejuvenate()",
+      "effect": ""
+    },
+    {
+      "name": "DelayWither(delay)",
+      "effect": ""
+    },
+    {
+      "name": "DelayRejuvenate(delay)",
+      "effect": ""
+    },
+    {
+      "name": "Protect(duration)",
+      "effect": ""
+    },
+    {
+      "name": "Start()",
+      "effect": ""
+    },
+    {
+      "name": "Stop()",
+      "effect": ""
+    },
+    {
+      "name": "OnSave()",
+      "effect": ""
+    },
+    {
+      "name": "OnLoad(data)",
+      "effect": ""
+    },
+    {
+      "name": "GetDebugString()",
+      "effect": ""
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "startrain"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MIN_PLANT_WITHER_TEMP",
+    "TUNING.MAX_PLANT_WITHER_TEMP",
+    "TUNING.MIN_PLANT_REJUVENATE_TEMP",
+    "TUNING.MAX_PLANT_REJUVENATE_TEMP",
+    "TUNING.TOTAL_DAY_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51951,
+      21485,
+      18572,
+      13261,
+      16197,
+      19952,
+      18234,
+      52726
+    ],
+    "aspects": [
+      {
+        "aspect": "施肥对高温枯萎的延迟效果",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "施肥的作物采集2次后才能够进入高温"
+          }
+        ]
+      },
+      {
+        "aspect": "枯萎状态视觉表现",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "枯萎的作物有特殊的贴图，无法生长和采集"
+          }
+        ]
+      },
+      {
+        "aspect": "枯萎触发条件描述",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "会因缺少[[肥料]]或[[环境温度]]不适而发生枯萎"
+          }
+        ]
+      },
+      {
+        "aspect": "采集次数与贫瘠枯萎关联",
+        "evidence": [
+          {
+            "pageid": 51951,
+            "quote": "汁浆果丛]]每采集 4 ~ 5 次就会再次进入贫"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "枯萎",
+    "恢复",
+    "温度",
+    "降雨",
+    "保护",
+    "植物",
+    "作物",
+    "延迟",
+    "启用",
+    "禁用"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境互动",
+    "植物管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a7204a688049853010d4fa8dec6dba7f31a167e278e24e4b3669682c38ae68f1",
+    "source_bytes": 9776,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094528126
+  }
+}

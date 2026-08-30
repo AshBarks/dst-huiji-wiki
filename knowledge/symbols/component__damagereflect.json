@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/damagereflect.lua"
+  },
+  "category": "component",
+  "display_name": "damagereflect",
+  "summary": "DamageReflect 组件管理伤害反射功能，存储一个反射伤害函数和一个默认伤害值。它参与战斗系统，在实体受到攻击时计算反射伤害。通过设置自定义函数，可以定制反射伤害的逻辑。",
+  "api": [
+    {
+      "name": "SetReflectDamageFn",
+      "effect": "设置一个自定义函数用于计算反射伤害。行为：接受一个函数参数并存储为内部引用。副作用：更新组件的反射伤害函数，可能影响后续伤害计算。"
+    },
+    {
+      "name": "SetDefaultDamage",
+      "effect": "设置默认反射伤害值。行为：接受一个数值参数并存储为默认伤害。副作用：更新组件的默认伤害值，用于在未设置自定义函数时返回。"
+    },
+    {
+      "name": "GetReflectedDamage",
+      "effect": "计算并返回反射伤害值。行为：如果设置了自定义函数，则调用该函数并返回其结果（damage 和 spdamage）；否则返回默认伤害值。副作用：无直接副作用，但调用自定义函数可能产生额外效果。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      20150,
+      15022,
+      16419,
+      47010,
+      53150,
+      15244,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要讨论伤害计算机制、攻击行为和实体属性，未涉及伤害反射相关的功能或玩家语言表达，如反射伤害设置、默认伤害调整或获取反射伤害的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "伤害反射",
+    "反射伤害",
+    "伤害计算",
+    "战斗组件",
+    "防御机制",
+    "反弹伤害",
+    "伤害设置",
+    "DST组件"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "78bda20ea911b9df2af061e5effb6d2bce439034828bfbf700444dae4fea318a",
+    "source_bytes": 681,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788094685098
+  }
+}

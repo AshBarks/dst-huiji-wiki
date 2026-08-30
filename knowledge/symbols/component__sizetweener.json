@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sizetweener.lua"
+  },
+  "category": "component",
+  "display_name": "sizetweener",
+  "summary": "SizeTweener组件用于管理实体的缩放动画。它通过线性插值将实体从当前大小平滑过渡到目标大小。该组件参与游戏中的视觉动画效果，如装饰性变化或事件触发的动画反馈。",
+  "api": [
+    {
+      "name": "StartTween",
+      "effect": "开始缩放动画。设置初始大小、目标大小、回调和时间，推送'sizetweener_start'事件；若时间大于0则启动实体更新组件进行动画，否则立即结束动画。副作用：启动实体更新以驱动动画。"
+    },
+    {
+      "name": "EndTween",
+      "effect": "结束当前缩放动画。停止实体更新组件，将实体大小设置为目标大小，清理内部状态，推送'sizetweener_end'事件并调用回调函数。副作用：停止实体更新，确保动画终止。"
+    }
+  ],
+  "events_published": [
+    "sizetweener_start",
+    "sizetweener_end"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录专注于游戏生物的沉睡、攻击等行为描述，未提及component__sizetweener组件的StartTween或EndTween能力，也未涉及相关动画过渡的开始或结束表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缩放",
+    "动画",
+    "大小调整",
+    "过渡",
+    "渐变",
+    "视觉效果",
+    "实体变换",
+    "缩放动画"
+  ],
+  "gameplay_tags": [
+    "动画",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "72936db3eefe5a7e737ebb8baa395df82ba19e496209907760c66268e1afe47f",
+    "source_bytes": 1559,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103817286
+  }
+}

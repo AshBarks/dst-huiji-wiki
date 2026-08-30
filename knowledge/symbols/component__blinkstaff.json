@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/blinkstaff.lua"
+  },
+  "category": "component",
+  "display_name": "blinkstaff",
+  "summary": "BlinkStaff组件管理闪烁法杖的数据，包括声音效果和视觉效果预制体。它参与的核心玩法是允许施法者传送到指定点，伴有短暂的无敌状态、声音和视觉效果生成。",
+  "api": [
+    {
+      "name": "SetFX",
+      "effect": "设置闪烁时使用的前后效果预制体。无副作用，仅更新组件数据。"
+    },
+    {
+      "name": "ResetSoundFX",
+      "effect": "将声音效果重置为默认的闪烁声音。无副作用，仅更新组件数据。"
+    },
+    {
+      "name": "SetSoundFX",
+      "effect": "设置自定义的预闪烁和后闪烁声音。无副作用，仅更新组件数据。"
+    },
+    {
+      "name": "SpawnEffect",
+      "effect": "在指定实体位置生成设置的前后效果预制体。副作用：生成预制体并设置其位置到实体世界坐标。"
+    },
+    {
+      "name": "Blink",
+      "effect": "执行闪烁传送。检查传送条件（如地图可通过性、传送是否允许）；若成功，则隐藏施法者、设置无敌、播放预闪烁声音、生成效果，并延迟0.25秒后传送施法者物理体到目标点、恢复状态、播放后闪烁声音。返回true表示成功，false表示失败。副作用：传送施法者、生成效果、播放声音、触发onblinkfn回调。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      57263,
+      18001,
+      16641,
+      17930,
+      19693,
+      24578,
+      39366,
+      20842
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及符号 component__blinkstaff 或相关能力（如 SetFX、Blink 等）的玩家语言表达，页面内容涉及其他实体如圣殿、传送焦点等，与 blinkstaff 无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "闪烁法杖",
+    "传送",
+    "闪烁",
+    "无敌",
+    "声音效果",
+    "视觉效果",
+    "地图传送",
+    "施法者",
+    "法杖效果",
+    "瞬移"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d914ca1f6640de32877f5285149bec9a7be41364e1c539ddd7e9b0d0f40c2746",
+    "source_bytes": 3036,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098221914
+  }
+}

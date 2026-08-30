@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/brush.lua"
+  },
+  "category": "component",
+  "display_name": "brush",
+  "summary": "组件 Brush 在初始化时仅存储实体实例的引用，未定义其他数据管理或行为逻辑。在饥荒联机版中，此类组件可能用于扩展实体的刷毛、清洁或驯服功能，但当前源码未提供具体实现。",
+  "api": [],
+  "api_note": "纯数据组件，无公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      70704,
+      13493,
+      22094,
+      52634,
+      18231,
+      18505,
+      19832
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及与'component__brush'相关的任何能力或行为表达，如刷子功能、装饰交互等。页面内容主要讨论冬季装饰品、蜘蛛工厂、寄居蟹隐士的装饰值、装饰大炮等，但无直接关联证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "刷子",
+    "刷毛",
+    "清洁",
+    "驯服",
+    "动物",
+    "互动",
+    "装饰"
+  ],
+  "gameplay_tags": [
+    "动物互动",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "19f9c88c84697a3569a1cebedf89bcc289bfa9f2fa0c0db46c61706f898ec76e",
+    "source_bytes": 81,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788098699460
+  }
+}

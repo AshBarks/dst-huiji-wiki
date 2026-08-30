@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/slingshotmods.lua"
+  },
+  "category": "component",
+  "display_name": "slingshotmods",
+  "summary": "该组件管理弹弓的改装系统，通过容器存储部件并实现安装、检查和转移功能。它允许玩家基于技能树解锁改装界面，自定义弹弓的外观和性能。核心玩法涉及弹弓的升级和自定义，增强战斗和游戏体验。",
+  "api": [
+    {
+      "name": "CanBeOpenedBy",
+      "effect": "检查指定角色是否能打开改装界面，要求角色激活特定技能且是物品的持有者，返回布尔值。"
+    },
+    {
+      "name": "IsLoading",
+      "effect": "返回组件是否处于数据加载状态，仅在服务器端有效。"
+    },
+    {
+      "name": "HasPartName",
+      "effect": "检查容器中是否有指定名称的部件，返回布尔值，仅在服务器端有效。"
+    },
+    {
+      "name": "HasAnyParts",
+      "effect": "检查容器中是否有任何部件，返回布尔值，仅在服务器端有效。"
+    },
+    {
+      "name": "GetPartBuildAndSymbol",
+      "effect": "获取指定槽位部件的预制物、交换构建和符号，用于外观显示，仅在服务器端有效。"
+    },
+    {
+      "name": "CheckRequiredSkillsForPlayer",
+      "effect": "检查玩家是否满足所有部件所需的技能要求，返回布尔值，仅在服务器端有效。"
+    },
+    {
+      "name": "CreateContainer_Internal",
+      "effect": "创建内部容器实例，设置父实体和网络目标，并监听物品掉落事件，仅在服务器端有效。"
+    },
+    {
+      "name": "TransferPartsTo",
+      "effect": "将当前组件的部件转移到另一个弹弓改装组件，包括容器和事件监听器的迁移，仅在服务器端有效。"
+    },
+    {
+      "name": "Open",
+      "effect": "打开改装界面，如果需要则创建容器，设置网络目标并开始更新组件，返回是否成功，仅在服务器端有效。"
+    },
+    {
+      "name": "Close",
+      "effect": "关闭改装界面，停止更新组件，重置网络目标并推送关闭事件，返回是否成功，仅在服务器端有效。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "更新函数，检查打开者是否处于改装状态，如果不是则关闭界面，仅在服务器端有效。"
+    },
+    {
+      "name": "DropAllPartsWithoutUninstalling",
+      "effect": "掉落所有部件而不触发卸载逻辑，保持部件完整，仅在服务器端有效。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存容器数据用于持久化，返回数据字典和引用列表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载容器数据恢复状态，创建容器并设置加载标志，仅在服务器端有效。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "ms_slingshotmodsclosed"
+  ],
+  "events_listened": [
+    "ondropped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23965,
+      15186,
+      13281,
+      19595,
+      18216,
+      10355,
+      10374,
+      10379
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及 component__slingshotmods 或其相关能力；内容聚焦于技能树、角色更新和游戏机制，未涉及打开、关闭、部件管理等组件行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "弹弓改装",
+    "部件安装",
+    "技能树",
+    "容器管理",
+    "武器升级",
+    "自定义弹弓",
+    "装备改装",
+    "滑索模组"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "战斗",
+    "制造",
+    "自定义"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "64d75e1439083241d37a06cb1d2b2abbc2386885f2c68af120d42ca7b3335691",
+    "source_bytes": 6510,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103965000
+  }
+}

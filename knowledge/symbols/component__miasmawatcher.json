@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/miasmawatcher.lua"
+  },
+  "category": "component",
+  "display_name": "miasmawatcher",
+  "summary": "MiasmaWatcher组件用于监测玩家是否处于瘴气环境中，管理移动速度的减缓效果。当玩家进入瘴气时，组件会添加速度减慢的倍数和相应的debuff；离开时则移除。它还与玩家的视觉状态（如护目镜视觉、幽灵视觉）和骑乘状态互动，以动态调整速度影响。",
+  "api": [
+    {
+      "name": "AddMiasmaSource(src)",
+      "effect": "添加一个瘴气来源。如果首次添加，设置玩家分类变量isinmiasma为true，更新行走速度，并添加debuff 'miasmadebuff'。"
+    },
+    {
+      "name": "RemoveMiasmaSource(src)",
+      "effect": "移除一个瘴气来源。如果移除后没有来源，设置玩家分类变量isinmiasma为false，更新行走速度，并移除debuff 'miasmadebuff'。"
+    },
+    {
+      "name": "IsInMiasma()",
+      "effect": "检查玩家是否处于瘴气中，返回布尔值表示是否有瘴气来源。"
+    },
+    {
+      "name": "ToggleMiasma(active)",
+      "effect": "根据active参数启用或禁用瘴气监测。如果启用且速度倍数小于1，添加速度监听器；如果禁用，移除速度监听器。"
+    },
+    {
+      "name": "SetMiasmaSpeedMultiplier(mult)",
+      "effect": "设置瘴气速度倍数，限制在0到1之间。如果倍数变化，根据启用状态更新速度监听器和行走速度。"
+    },
+    {
+      "name": "UpdateMiasmaWalkSpeed()",
+      "effect": "更新行走速度。如果玩家在瘴气中但有护目镜视觉、幽灵视觉或骑乘状态，则移除速度倍数；否则应用速度倍数。"
+    },
+    {
+      "name": "OnRemoveFromEntity()",
+      "effect": "当组件从实体移除时调用。如果启用且速度倍数小于1，移除速度监听器。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "miasmacloudexists",
+    "gogglevision",
+    "ghostvision",
+    "mounted",
+    "dismounted"
+  ],
+  "netvars": [
+    "isinmiasma"
+  ],
+  "tunables": [
+    "MIASMA_SPEED_MOD"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16570,
+      23956,
+      13455,
+      15327,
+      22707,
+      13437,
+      16569,
+      39366
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 miasmawatcher 组件能力（如添加/移除瘴气源、检测瘴气状态、调整速度等）相关的玩家语言表达。唯一提及'瘴气'的页面 23956 仅描述了瘴气的产生和消失，未涉及组件行为或能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "瘴气",
+    "速度减缓",
+    "debuff",
+    "护目镜",
+    "幽灵视觉",
+    "骑乘",
+    "环境影响",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "86cac0bdd9cfc3896cd89ffbf20c7a838a017e491fd5556933f37bd898e95025",
+    "source_bytes": 3602,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788091390899
+  }
+}

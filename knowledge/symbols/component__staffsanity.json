@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/staffsanity.lua"
+  },
+  "category": "component",
+  "display_name": "staffsanity",
+  "summary": "该组件用于管理法杖使用时对角色理智值的影响。它存储一个乘数来调整施法时理智变化的幅度。通过DoCastingDelta方法在施法时应用这个调整，改变实体的理智值。",
+  "api": [
+    {
+      "name": "SetMultiplier",
+      "effect": "设置理智变化的乘数。行为：将参数mult赋值给self.multiplier。副作用：无，仅更新内部状态。"
+    },
+    {
+      "name": "DoCastingDelta",
+      "effect": "应用施法时的理智变化。行为：如果实体拥有sanity组件，则调用sanity:DoDelta(amount * (self.multiplier or 1))。副作用：改变实体的理智值，增加或减少amount乘以乘数的量。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      15245,
+      13437,
+      13268,
+      51494,
+      10374,
+      16419,
+      16197
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 component__staffsanity 相关的能力表达，如 SetMultiplier 或 DoCastingDelta。内容涉及书籍阅读、理智值机制、角色技能等，但未讨论法杖施法时的理智值变化。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "理智",
+    "法杖",
+    "施法",
+    "魔法",
+    "理智值",
+    "乘数",
+    "sanity",
+    "staff",
+    "casting",
+    "delta"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "魔法",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f3740dc2880583482d7603da0897ec9d6a0678321ddb1eb89e1fbc96a1e339b4",
+    "source_bytes": 353,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113053415
+  }
+}

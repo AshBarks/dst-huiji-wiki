@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hideandseekhidingspot.lua"
+  },
+  "category": "component",
+  "display_name": "hideandseekhidingspot",
+  "summary": "该组件管理饥荒联机版中隐藏点的数据，主要用于Kitcoon（猫浣熊）的捉迷藏游戏。它处理隐藏者的设置、隐藏操作、搜索和释放，确保玩家互动时触发相应事件。",
+  "api": [
+    {
+      "name": "SetHider",
+      "effect": "设置指定实体为隐藏者。如果当前没有隐藏者，则将hider存储并监听其移除事件以自动清理。"
+    },
+    {
+      "name": "HideInSpot",
+      "effect": "将hider实体隐藏在当前点。将hider设为当前实体的子实体并移除场景，生成一个隐藏道具作为视觉表示，道具的动画基于hider，并监听多个交互事件（如采摘、工作、点燃等）以在触发时释放hider。"
+    },
+    {
+      "name": "SearchHidingSpot",
+      "effect": "模拟搜索操作。释放隐藏的hider，将搜索者doer作为发现者，并移除当前组件。"
+    },
+    {
+      "name": "Abort",
+      "effect": "中止隐藏过程。释放隐藏者但不指定搜索者，然后移除组件。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，包括隐藏者的记录，用于游戏保存。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，如果存在隐藏者记录，则生成实体并重新执行隐藏操作。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前隐藏者或错误信息。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，释放隐藏者以确保资源清理。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件被移除时，释放隐藏者，移除全局事件监听，发布'onhidingspotremoved'事件，并清理隐藏道具。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "onhidingspotremoved"
+  ],
+  "events_listened": [
+    "ms_collecthiddenkitcoons",
+    "onremove",
+    "picked",
+    "worked",
+    "onignite",
+    "onopen",
+    "onactivated",
+    "onpickup"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      17848,
+      20714,
+      13701,
+      51046,
+      45248,
+      46847,
+      65881
+    ],
+    "aspects": [
+      {
+        "aspect": "调试命令中的隐藏点生成",
+        "evidence": [
+          {
+            "pageid": 20714,
+            "quote": "在鼠标位置生成所有[[小浣猫]]隐藏点"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "捉迷藏",
+    "隐藏点",
+    "kitcoon",
+    "搜索",
+    "释放",
+    "隐藏者",
+    "道具",
+    "事件",
+    "保存",
+    "加载"
+  ],
+  "gameplay_tags": [
+    "捉迷藏",
+    "互动",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "00f87193f989d5c7a257eaf1f9ff351b3f041ed99da4cf6c326fcd5d03895904",
+    "source_bytes": 4091,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788108470142
+  }
+}

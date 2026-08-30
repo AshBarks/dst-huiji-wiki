@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/yotb_sewer.lua"
+  },
+  "category": "component",
+  "display_name": "yotb_sewer",
+  "summary": "该组件管理一个容器的缝纫过程，允许玩家将多个物品放入容器中以合成特定产品。它通过计时器控制缝纫时间，并处理配方验证、产品生成或拒绝。核心玩法涉及资源收集和物品合成，常见于游戏内的制作系统。",
+  "api": [
+    {
+      "name": "IsDone",
+      "effect": "返回布尔值，指示缝纫过程是否已完成。"
+    },
+    {
+      "name": "IsSewing",
+      "effect": "返回布尔值，指示是否正在进行缝纫。"
+    },
+    {
+      "name": "GetTimeToSew",
+      "effect": "返回剩余缝纫时间（秒），如果未完成且在缝纫则返回正数，否则返回0。"
+    },
+    {
+      "name": "CanSew",
+      "effect": "返回布尔值，检查容器是否已满且可开始缝纫。"
+    },
+    {
+      "name": "StartSewing",
+      "effect": "开始缝纫过程，设置计时器，销毁容器内容，关闭容器，并根据配方验证决定生成产品或触发拒绝。"
+    },
+    {
+      "name": "StopSewing",
+      "effect": "停止缝纫，取消计时器，如果原因指定为'fire'则生成产品并放置在世界中。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含当前状态的数据，用于保存游戏进度。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从提供的数据表中恢复组件状态，重新设置计时器、产品信息和容器状态。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，加速缝纫过程或立即完成如果剩余时间已过。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个调试字符串，显示当前产品、状态和剩余缝纫时间。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "itemget",
+    "onclose",
+    "itemlose",
+    "onopen"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.REJECTION_SEWING_TIME"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13642,
+      15303,
+      51221,
+      13493,
+      45249,
+      15186,
+      15539,
+      10355
+    ],
+    "aspects": [],
+    "no_evidence_reason": "扫描提供的页面摘录，未发现任何与 component__yotb_sewer 相关的能力表达，页面内容主要涉及制作机制、角色能力、任务流程等，与缝纫组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缝纫",
+    "缝纫机",
+    "制作",
+    "衣物",
+    "时间",
+    "容器",
+    "拒绝",
+    "完成"
+  ],
+  "gameplay_tags": [
+    "制作",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e1f7d2d60bdab4b4ae782e87103beae5e12d1121fbee17d43f4f8be0d365c668",
+    "source_bytes": 6917,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788105028029
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/strafer.lua"
+  },
+  "category": "component",
+  "display_name": "strafer",
+  "summary": "strafer组件管理玩家的瞄准状态，通过监听startstrafing和stopstrafing事件切换瞄准模式。它处理玩家输入（手柄或鼠标）以计算移动方向，并更新locomotor的方向，用于战斗中的侧移行为。",
+  "api": [
+    {
+      "name": "IsAiming",
+      "effect": "返回当前瞄准状态（布尔值），无副作用。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件监听的事件回调（startstrafing和stopstrafing），并在客户端重置locomotor的瞄准状态为false。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "检查玩家控制器是否启用，根据输入设备（手柄或鼠标）计算方向角度，更新locomotor的方向，并在客户端发送RPC到服务器以同步方向变化。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "startstrafing",
+    "stopstrafing"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CONTROLLER_DEADZONE_RADIUS"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18188,
+      10413,
+      16597,
+      24834,
+      13606,
+      15022,
+      15651,
+      19113
+    ],
+    "aspects": [
+      {
+        "aspect": "周期性更新描述",
+        "evidence": [
+          {
+            "pageid": 24834,
+            "quote": "称手遥控器充电时耐久恢复速度翻倍，即 +100次/分钟"
+          }
+        ]
+      },
+      {
+        "aspect": "瞄准操作描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "用大炮瞄准时，大炮炮口会朝向角色正面面对的方向"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "瞄准",
+    "玩家输入",
+    "移动方向",
+    "侧向移动",
+    "手柄操作",
+    "瞄准模式",
+    "战斗走位",
+    "移动控制"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "891a6bca725d23f79c2654723f9f6aa302788f342bbdd135c6d129f77b6012e7",
+    "source_bytes": 2703,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788113100398
+  }
+}

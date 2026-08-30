@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/scaler.lua"
+  },
+  "category": "component",
+  "display_name": "scaler",
+  "summary": "Scaler 组件用于管理实体的缩放比例数据。它提供设置缩放的方法，并在缩放改变时应用到实体的变换上。该组件支持保存和加载缩放状态，确保游戏进度中缩放数据的持久化。",
+  "api": [
+    {
+      "name": "ApplyScale",
+      "effect": "应用当前缩放比例到实体的变换。如果定义了 OnApplyScale 回调，则调用它。副作用：改变实体的视觉大小。"
+    },
+    {
+      "name": "SetScale",
+      "effect": "设置缩放比例为指定值，并立即应用到实体。副作用：更新内部缩放数据并改变实体显示。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回包含当前缩放数据的表，用于存档。无直接副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从给定数据加载缩放比例，并应用到实体。副作用：更新缩放并改变实体显示。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      70704,
+      20714,
+      15734,
+      35007,
+      61804,
+      15386,
+      28179
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要涉及游戏实体行为、工厂设计、控制台命令和存档机制等，但未提及组件 scaler 的缩放（ApplyScale/SetScale）或保存/加载（OnSave/OnLoad）能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "缩放",
+    "大小调整",
+    "变换",
+    "保存",
+    "加载",
+    "模型缩放",
+    "实体大小",
+    "视觉效果"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "55b5c4152b0a5633d768908491f963427ad79a5d20bb1c9557c36241583637ef",
+    "source_bytes": 635,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788103136192
+  }
+}

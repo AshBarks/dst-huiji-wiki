@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/primematebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "primematebrain",
+  "summary": "该大脑控制海盗猴（primemate）在船上或陆地上的行为。当船受损且有补丁时它会修船，船毁时尝试弃船逃生；战斗中若目标可达则追击攻击，平时在船上划船、跟随船只或游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 以构建行为树，未定义其他对外方法；文件中的 rowboat/fixboat/shouldfix/DoAbandon/cangettotarget 等为文件内全局函数或局部辅助函数，不属于类 API。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "NO_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取弃船动作的函数 DoAbandon",
+        "节点调试名 'abandon'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "ChattyNode 内，猴子发出 MONKEY_TALK_ABANDON 对话时尝试弃船"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取修船动作的函数 fixboat"
+      ],
+      "context": "优先于攻击和游荡前尝试修船"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取划船动作的函数 rowboat",
+        "节点调试名 'rowing'",
+        "不跑动(nil)",
+        "动作超时 3 秒"
+      ],
+      "context": "在追击节点之后、跟随之前尝试划船"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐 60 秒",
+        "放弃距离 40 世界单位"
+      ],
+      "context": "WhileNode 条件 cangettotarget 满足时（能到达攻击目标）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "获取跟随目标函数(返回当前船)",
+        "最小距离 0",
+        "目标距离 1",
+        "最大距离 2"
+      ],
+      "context": "追击和划船之后跟随船只"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置函数(船或 home)",
+        "最大游荡距离函数(默认 MAX_WANDER_DIST 或船半径-1)",
+        "游荡时间参数表(短走长停)"
+      ],
+      "context": "最后默认游荡行为"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:GetCurrentPlatform() 且船 health:IsDead() 或 inst.abandon 为真",
+      "semantic": "DoAbandon 返回 ABANDON 动作，猴子尝试跳船逃生"
+    },
+    {
+      "condition": "inst 有 boatpatch 物品且所在船有 leaktarget (fixboat 内检查)",
+      "semantic": "执行 REPAIR_LEAK 修船动作"
+    },
+    {
+      "condition": "cangettotarget(inst) 为真 (有战斗目标且同船或距离内)",
+      "semantic": "进入 ChaseAndAttack 追击攻击，时限 60s 距离 40"
+    },
+    {
+      "condition": "inst.components.crewmember:Shouldrow() 且位于船上 (rowboat)",
+      "semantic": "执行 ROW 划船动作"
+    },
+    {
+      "condition": "findwanderpointfn: 在船上则 loc=船位置，否则 home",
+      "semantic": "游荡中心不同（船或标记家）"
+    },
+    {
+      "condition": "findmaxwanderdistfn: 在船上则 dist=船半径-1，否则 MAX_WANDER_DIST",
+      "semantic": "游荡最大距离受船大小限制"
+    }
+  ],
+  "bt_structure": "优先级节点根：1) 恐慌触发 2) 电栅栏恐慌 3) 对话节点内尝试弃船 4) 修船动作 5) 条件节点(能攻击则追击) 6) 划船动作 7) 跟随船只 8) 游荡。整体优先级从高到低，逃生与修船优先于战斗与闲逛。",
+  "wiki": {
+    "scanned_pageids": [
+      18536,
+      15022,
+      18504,
+      34523,
+      18503,
+      72981,
+      15560,
+      18524
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅18524提及大副（prime mate）作为诅咒饰品来源，但未描述其任何行为；其余页面涉及猴子小屋、火药猴、穴居猴、远古戍卫塔等，文本描述的游荡或追击均不涉及 primematebrain 的弃船、修船、划船、跟随船、追逐60秒/40距离、船上游荡等能力，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猴子",
+    "划船",
+    "修船",
+    "弃船",
+    "追击",
+    "游荡",
+    "跟船",
+    "海盗猴"
+  ],
+  "gameplay_tags": [
+    "航海",
+    "战斗",
+    "修理",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2aa867696476bfaded3b385946c37630e28277a9d83080afd05d0023eecb4320",
+    "source_bytes": 6857,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060980219
+  }
+}

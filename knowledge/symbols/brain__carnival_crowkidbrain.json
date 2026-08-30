@@ -1,0 +1,227 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/carnival_crowkidbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "carnival_crowkidbrain",
+  "summary": "该大脑控制嘉年华乌鸦孩子（crowkid）在非飞行状态下的行为。它会根据是否有家、是否受惊、是否观看小游戏、玩家靠近、夜晚营火等情境，采取飞回家、激活装饰、面对玩家聊天、守营火游荡或在家附近游荡等行为。",
+  "api": [],
+  "api_note": "该大脑仅实现 Brain 子类的 OnStart 方法以构建行为树，未定义其他对外调用的方法或字段。",
+  "events_published": [
+    "minigame_spectator_start_outro"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "FACE_PLAYER_DISTSQ",
+    "SHOULDFLYAWAY_CANT_TAGS",
+    "SHOULDFLYAWAY_ONEOF_TAGS",
+    "SEE_DICOR_DIST",
+    "SEE_DICOR_MUST_TAGS",
+    "CAMPFIRE_WANDER_TIMES",
+    "CAMPFIRE_TAGS",
+    "SEE_CAMPFIRE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取正在观看的小游戏实体",
+        "保持面对正在观看的小游戏实体"
+      ],
+      "context": "观看小游戏时（非介绍阶段）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取正在观看的小游戏实体",
+        "保持面对条件为小游戏处于介绍阶段"
+      ],
+      "context": "小游戏介绍阶段"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取附近3米内且有对话冷却的玩家",
+        "保持面对该玩家且距离平方<=9",
+        "面对超时2秒"
+      ],
+      "context": "与玩家交谈分支内"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回正在观看的小游戏的函数",
+        "小游戏要求最小距离函数",
+        "小游戏目标距离函数",
+        "小游戏最大距离函数"
+      ],
+      "context": "观看小游戏时跟随"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁标签为'minigame_participator'",
+        "发现距离5",
+        "安全距离7"
+      ],
+      "context": "躲避小游戏参与者"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "字符串键'CARNIVAL_CROWKID_GAME_GOTO'",
+        "子行为为跟随小游戏"
+      ],
+      "context": "小游戏介绍阶段引导"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "字符串键'CARNIVAL_CROWKID_SCARED'",
+        "子行为为条件满足时飞回家"
+      ],
+      "context": "受惊吓应飞走时"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "根据装饰等级和零食状态返回对话的函数",
+        "子行为为面对玩家2秒",
+        "聊天后基础等待5秒",
+        "随机附加等待10秒"
+      ],
+      "context": "与玩家交谈"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "返回营火对话随机文本的函数",
+        "子行为为在营火位置游荡",
+        "聊天基础等待10秒",
+        "随机附加20秒",
+        "进入初始延迟10秒",
+        "初始随机延迟10秒"
+      ],
+      "context": "夜晚守营火"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "返回环境对话随机文本的函数",
+        "子行为为在家附近游荡(最大12)",
+        "聊天基础等待20秒",
+        "随机附加20秒",
+        "进入初始延迟5秒",
+        "初始随机延迟10秒"
+      ],
+      "context": "默认环境游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回当前营火位置的函数",
+        "营火游荡最大距离(TUNING值)",
+        "游荡时间配置{minwaittime=3}"
+      ],
+      "context": "守营火游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置的函数",
+        "最大游荡距离12"
+      ],
+      "context": "默认在家附近游荡"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "行为树最末 fallback"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "IsHomeless(inst) 无家可归",
+      "semantic": "直接执行飞回家动作，跳过其他行为"
+    },
+    {
+      "condition": "ShouldFlyAway(inst) 应飞走（月雨或附近有敌对标签）",
+      "semantic": "说受惊话并飞回家"
+    },
+    {
+      "condition": "WatchingMinigame(inst) 正在观看小游戏",
+      "semantic": "根据小游戏阶段分支：outro结束抛奖励并面对；intro说引导话并跟随/躲避/面对；普通跟随/躲避/面对"
+    },
+    {
+      "condition": "GetFaceTargetFn 玩家在3米内且冷却结束",
+      "semantic": "面对玩家说装饰相关话题2秒"
+    },
+    {
+      "condition": "WatchCampfireFn(inst) 夜晚且附近有营火",
+      "semantic": "在营火旁游荡并说营火话题"
+    },
+    {
+      "condition": "默认（有家且安全）",
+      "semantic": "在家附近游荡说环境话题，最终站立"
+    }
+  ],
+  "bt_structure": "根优先级节点(非飞行状态): [1.无家可归飞走] -> [2.受惊吓飞走聊天] -> [3.观看小游戏(内含嘉年华游戏outro/intro/普通分支:跟随/躲避/面对)] -> [4.激活装饰] -> [5.面对玩家聊天] -> [6.守营火游荡聊天] -> [7.环境游荡聊天] -> [8.站立]。观看小游戏分支内优先判断outro/intro。",
+  "wiki": {
+    "scanned_pageids": [
+      13551,
+      15091,
+      52634,
+      14589,
+      15239,
+      15594,
+      15682,
+      19769
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为 gestalt、Midsummer Cawnival活动、carnivalcannon_streamer_kit、dustmoth、bunnyman、moose、lightflier、fused_shadeling_bomb，均未讨论 brain__carnival_crowkidbrain 的能力或行为语义（如游荡距离、面对玩家、小游戏参与、营火守夜等），无相关玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "躲避玩家",
+    "嘉年华乌鸦",
+    "激活装饰",
+    "守营火游荡",
+    "观看小游戏",
+    "飞回巢",
+    "附近游荡",
+    "玩家聊天"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "活动",
+    "装饰",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2c7e93fd4e45d72c3d03e5c4e55ab81e20d0e086bf21d59a87059dd623ef8e66",
+    "source_bytes": 11972,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058394031
+  }
+}

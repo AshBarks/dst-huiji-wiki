@@ -1,0 +1,195 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/perdbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "perdbrain",
+  "summary": "该大脑控制火鸡(Perd)的AI行为。夜晚会跑回最近的浆果灌木或家；若处于寻找神龛事件，则围绕神龛吃食、站立徘徊或游荡；平时会安全吃食、远离威胁、采摘浆果并在灌木附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "SEE_FOOD_DIST",
+    "SEE_BUSH_DIST",
+    "SEE_SHRINE_DIST",
+    "MIN_SHRINE_WANDER_DIST",
+    "MAX_SHRINE_WANDER_DIST",
+    "MAX_WANDER_DIST",
+    "SHRINE_LOITER_TIME",
+    "SHRINE_LOITER_TIME_VAR"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取回家动作的函数(GoHomeAction)",
+        "节点调试名'Go Home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "夜晚(not TheWorld.state.isday)时通过 WhileNode 触发"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "随时吃食物动作函数(EatFoodAnytime)",
+        "节点调试名'Eat Food'"
+      ],
+      "context": "寻找神龛分支内优先级最高"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "神龛分支内 ShouldLoiter 条件满足时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(inst)",
+        "神龛位置函数(ShrinePos)",
+        "拴绳最大半径(MAX_SHRINE_WANDER_DIST=6)",
+        "内部返回距离(MIN_SHRINE_WANDER_DIST=4)"
+      ],
+      "context": "神龛分支内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "神龛游荡位置函数(ShrineWanderPos)",
+        "游荡最大距离(MAX_SHRINE_WANDER_DIST - MIN_SHRINE_WANDER_DIST=2)",
+        "等待时间配置表{minwaittime=2, randwaittime=3}"
+      ],
+      "context": "神龛分支内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "安全时吃食物函数(EatFoodWhenSafe)",
+        "节点调试名'Eat Food'"
+      ],
+      "context": "主树中神龛分支之后"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(inst)",
+        "威胁标签'scarytoprey'",
+        "发现距离(SEE_PLAYER_DIST=5)",
+        "安全距离(STOP_RUN_DIST=10)"
+      ],
+      "context": "主树中吃食物后"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "采摘浆果动作函数(PickBerriesAction)",
+        "节点调试名'Pick Berries'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "主树中逃跑后"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "家位置函数(HomePos,即最近灌木)",
+        "最大游荡距离(MAX_WANDER_DIST=80)"
+      ],
+      "context": "主树末尾默认"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not TheWorld.state.isday",
+      "semantic": "夜晚非白天时，以跑动方式执行回家动作(GoHomeAction)"
+    },
+    {
+      "condition": "inst.seekshrine 且 FindShrine 返回非nil",
+      "semantic": "在神龛附近优先吃食物、满足条件时站立徘徊、以神龛为锚点拴绳与游荡"
+    },
+    {
+      "condition": "默认(非夜晚且不寻神龛或找不到神龛)",
+      "semantic": "安全吃食、逃离威胁、摘浆果、以灌木为家自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点: 恐慌触发与电篱恐慌优先; 其次夜晚回家; 若寻找神龛则围绕神龛进行吃食/站立/拴绳/游荡; 否则安全吃食; 然后逃离威胁; 摘浆果; 最后以最近灌木为家自由游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      70633,
+      23211,
+      13642,
+      19266,
+      33823,
+      45250,
+      13701,
+      35559
+    ],
+    "aspects": [
+      {
+        "aspect": "火鸡感知神龛距离标注",
+        "evidence": [
+          {
+            "pageid": 19266,
+            "quote": "火鸡神龛会吸引附近 30 距离单位内的火鸡"
+          }
+        ]
+      },
+      {
+        "aspect": "火鸡接近玩家逃跑行为描述",
+        "evidence": [
+          {
+            "pageid": 19266,
+            "quote": "这些火鸡不再会因为玩家接近而逃跑"
+          }
+        ]
+      },
+      {
+        "aspect": "火鸡食用浆果行为描述",
+        "evidence": [
+          {
+            "pageid": 19266,
+            "quote": "也不会吃神龛附近的浆果"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "火鸡大脑",
+    "回家",
+    "吃浆果",
+    "逃玩家",
+    "神龛",
+    "游荡",
+    "站立",
+    "摘果",
+    "恐慌"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "觅食",
+    "逃跑",
+    "事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7e4be88d0b43584c1361add0e143a5a7955d4d5fbeb8a64bdc099a9c87345423",
+    "source_bytes": 6639,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060619738
+  }
+}

@@ -1,0 +1,542 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/hermitcrabbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "hermitcrabbrain",
+  "summary": "该大脑控制隐士蟹在白天或全夜状态下进行社交、交易、采集、钓鱼、去茶馆等日常活动。夜晚或低友好度时逃离玩家并返回家中，根据天气装备雨伞或外套，并在被幽灵惊吓或传送时优先处理对应状态。整体通过优先级行为树协调聊天、面对、动作执行等节点。",
+  "api": [
+    {
+      "name": "AddActiveTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "RemoveActiveTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "AnyActiveTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "GetFirstTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "ValidateTeaShops",
+      "effect": ""
+    },
+    {
+      "name": "SelectTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "CheckSelectedTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "GetSelectedTeaShopPos",
+      "effect": ""
+    },
+    {
+      "name": "GetSelectedTeaShop",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "START_RUN_DIST",
+    "STOP_RUN_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "SEE_LIGHT_DIST",
+    "TRADE_DIST",
+    "SEE_TREE_DIST",
+    "SEE_TARGET_DIST",
+    "SEE_FOOD_DIST",
+    "SEE_BURNING_HOME_DIST_SQ",
+    "COMFORT_LIGHT_LEVEL",
+    "KEEP_CHOPPING_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天配置(皮肤请求低优先级)",
+        "子行为:立即回家动作"
+      ],
+      "context": "皮肤请求分支"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天配置(交易尝试低优先级)",
+        "子行为:面对交易者"
+      ],
+      "context": "交易尝试分支"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天配置(回家低优先级)",
+        "子行为:条件回家动作"
+      ],
+      "context": "夜晚回家分支"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天配置(恐慌低优先级)",
+        "子行为:恐慌"
+      ],
+      "context": "夜晚恐慌分支"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "实体自身",
+        "聊天配置(幽灵恐慌低优先级)",
+        "子行为:恐慌"
+      ],
+      "context": "被幽灵惊吓分支"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取交易者函数",
+        "保持交易者函数"
+      ],
+      "context": "单独面对交易者"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取面对目标函数(含问候)",
+        "保持面对函数",
+        "面对超时7秒"
+      ],
+      "context": "友好面对玩家"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "标签'player'威胁",
+        "开始距离3",
+        "停止距离5"
+      ],
+      "context": "低友好度逃离玩家"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "标签'player'威胁",
+        "开始距离3",
+        "停止距离5",
+        "过滤非交易者"
+      ],
+      "context": "夜晚逃离玩家"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "猪战斗参数表",
+        "开始距离5",
+        "停止距离8"
+      ],
+      "context": "逃离猪"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "茶馆位置函数",
+        "最大距离(半径+1.5)",
+        "返回距离(半径+1)",
+        "跑步返回"
+      ],
+      "context": "前往茶馆"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置函数",
+        "最大游荡40",
+        "无时间参数",
+        "无方向函数",
+        "无设置函数",
+        "夜晚需光源校验",
+        "不奔跑配置"
+      ],
+      "context": "空闲游荡"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "立即回家动作函数",
+        "名'go home'",
+        "跑动"
+      ],
+      "context": "皮肤请求"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "喂宠物动作函数",
+        "名'feed critter'",
+        "跑动",
+        "超时10"
+      ],
+      "context": "宠物饥饿"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "评论动作函数",
+        "名'comment'",
+        "跑动",
+        "超时10"
+      ],
+      "context": "评论数据"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "收线动作函数",
+        "名'reel'",
+        "跑动"
+      ],
+      "context": "收线"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "收获肉函数",
+        "名'meat harvest'",
+        "跑动"
+      ],
+      "context": "空闲收获肉"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "采浆果函数",
+        "名'berry harvest'",
+        "跑动"
+      ],
+      "context": "空闲采浆果"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "坐椅子函数",
+        "名'sit on chairs'",
+        "跑动"
+      ],
+      "context": "空闲坐椅子"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "钓鱼函数",
+        "名'gone fishing'",
+        "跑动"
+      ],
+      "context": "空闲钓鱼"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "扔瓶子函数",
+        "名'bottle'",
+        "跑动"
+      ],
+      "context": "空闲扔瓶"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "泡温泉函数",
+        "名'soak in hotspring'",
+        "跑动"
+      ],
+      "context": "空闲泡温泉"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "回家动作函数",
+        "名'go home'",
+        "跑动"
+      ],
+      "context": "夜晚回家"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "对话队列函数",
+        "名'finish talking'",
+        "跑动"
+      ],
+      "context": "传送或根节点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "装备伞函数",
+        "名'umbrella'",
+        "跑动"
+      ],
+      "context": "下雨装备伞"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "卸伞函数",
+        "名'stop umbrella'",
+        "跑动"
+      ],
+      "context": "停伞"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "装备外套函数",
+        "名'coat'",
+        "跑动"
+      ],
+      "context": "下雪装备外套"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "卸外套函数",
+        "名'stop coat'",
+        "跑动"
+      ],
+      "context": "停外套"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "丢物品函数",
+        "名'toss item'",
+        "跑动"
+      ],
+      "context": "丢物品"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "恐慌"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "TheWorld.state.isday or inst:AllNightTest()",
+      "semantic": "白天或全夜测试时执行日常行为：皮肤请求回家、喂宠物、去茶馆、评论、交易面对、低友好逃离/高友好面对、收线、空闲采集游荡"
+    },
+    {
+      "condition": "not TheWorld.state.isday and not inst:AllNightTest()",
+      "semantic": "夜晚执行逃离玩家、回家对话、恐慌"
+    },
+    {
+      "condition": "inst.sg.mem.teleporting",
+      "semantic": "传送中优先完成对话队列并等待"
+    },
+    {
+      "condition": "inst.sg:HasStateTag(\"soakin\")",
+      "semantic": "泡温泉时退出温泉或继续对话"
+    },
+    {
+      "condition": "BrainCommon.ShouldTriggerPanic(inst)",
+      "semantic": "被幽灵惊吓触发恐慌对话与恐慌"
+    },
+    {
+      "condition": "RUN_AWAY_FROM_PIG_PARAMS (猪战斗瞄准)",
+      "semantic": "逃离瞄准自身的猪"
+    },
+    {
+      "condition": "TheWorld.state.israining and has_umbrella and not equipped_umbrella",
+      "semantic": "下雨时装备雨伞"
+    },
+    {
+      "condition": "not israining and equipped_umbrella",
+      "semantic": "不下雨时卸下雨伞"
+    },
+    {
+      "condition": "TheWorld.state.issnowing and has_coat and not using_coat",
+      "semantic": "下雪时装备外套"
+    },
+    {
+      "condition": "not issnowing and using_coat",
+      "semantic": "不下雪时卸下外套"
+    },
+    {
+      "condition": "inst.hermitcrab_skinrequest ~= nil and HasValidHome",
+      "semantic": "有皮肤请求且家有有效时聊天并立即回家"
+    },
+    {
+      "condition": "IsPetCritterHungry(inst)",
+      "semantic": "宠物饥饿时喂宠物"
+    },
+    {
+      "condition": "self:SelectTeaShop()",
+      "semantic": "有活跃茶馆时前往茶馆并进入"
+    },
+    {
+      "condition": "inst.comment_data ~= nil",
+      "semantic": "存在评论数据时执行评论或走向位置"
+    },
+    {
+      "condition": "runawaytest(inst) (友好等级低)",
+      "semantic": "低友好度时逃离玩家并问候"
+    },
+    {
+      "condition": "friendlevels.level > UNFRIENDLY_LEVEL",
+      "semantic": "高友好度时面对玩家并问候"
+    },
+    {
+      "condition": "not busy and not alert... Not Acting",
+      "semantic": "空闲时按顺序尝试收获肉、浆果、坐椅、钓鱼、扔瓶、泡温泉、游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点: 传送中处理 > 泡温泉处理 > 幽灵恐慌 > 逃离猪 > 雨伞外套装备 > 丢物品 > 对话队列 > 白天节点 > 夜晚节点。白天节点内优先级: 非强制状态 > 皮肤请求回家 > 喂宠物 > 去茶馆(含退出温泉/拴住/进入) > 评论 > 交易面对聊天 > 单独交易面对 > 低友好逃离/高友好面对 > 收线 > 空闲动作(收获/钓鱼/坐/瓶/温泉/游荡)。夜晚节点: 逃离玩家 > 回家聊天 > 恐慌。",
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      13493,
+      46887,
+      18521,
+      21432,
+      13457,
+      14683,
+      18510
+    ],
+    "aspects": [
+      {
+        "aspect": "回屋途中逃离玩家描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "回屋路径上遭遇玩家会试图远离"
+          }
+        ]
+      },
+      {
+        "aspect": "好感度靠近开启交易描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "靠近寄居蟹隐士能开启瓶罐交易"
+          }
+        ]
+      },
+      {
+        "aspect": "白天岛上散步与各项工作描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "她会在岛上散步，并进行各项工作。"
+          }
+        ]
+      },
+      {
+        "aspect": "装饰度影响黄昏回家描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "装饰度大于 6.67 分，那么寄居蟹隐士在黄昏将不会回家"
+          }
+        ]
+      },
+      {
+        "aspect": "靠近玩家发表意见描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "走到帮她干活的玩家附近发表意见"
+          }
+        ]
+      },
+      {
+        "aspect": "黄昏夜晚回屋行为描述",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "黄昏和夜晚时珍珠会试图回屋"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "隐士蟹",
+    "大脑",
+    "行为树",
+    "交易",
+    "逃跑",
+    "钓鱼",
+    "茶馆",
+    "撑伞",
+    "泡温泉",
+    "喂宠物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "社交",
+    "交易",
+    "休闲"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5bf90fd27cd5e31d57f9d0e4fb0676e09cd08dedad1ec256d81d5f6ad146b8e4",
+    "source_bytes": 31545,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059460515
+  }
+}

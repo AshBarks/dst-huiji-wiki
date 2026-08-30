@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "bloomer",
-  "summary": "Bloomer 组件管理一个带优先级和来源的泛光效果栈（bloomstack）以及子实体继承列表（children），通过 PushBloom 和 PopBloom 控制实体自身及子实体的 AnimState 发光特效。其核心玩法属于视觉表现层，允许不同来源按优先级叠加或覆盖光效，并支持子实体自动继承父实体光效。",
+  "summary": "Bloomer 组件管理一个按优先级排序的 bloom 特效栈（bloomstack）以及附加的子实体（children），用于控制实体及其子物体的泛光渲染效果。通过 PushBloom 和 PopBloom 由不同来源叠加或移除发光特效，并自动同步到自身 AnimState 及子物体，实现装饰性视觉表现。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "清理 bloomstack 中所有来源实体的 onremove 事件监听，并对每个子实体移除监听并调用其 bloomer 组件的 PopBloom（若子有 bloomer）。副作用：解除事件绑定，子实体可能失去光效。"
-    },
-    {
       "name": "AttachChild",
-      "effect": "若 child 尚未附加，记录 child 并监听其 onremove 事件；随后根据当前栈顶 fx 和 priority，对 child 应用 PushBloom（若 child 有 bloomer）或直接设置 AnimState 的 BloomEffectHandle，若栈空则清除 child 光效（或 PopBloom）。副作用：建立光效继承，child 获得当前光效，并注册事件监听。"
+      "effect": "若 child 尚未在 children 表中，则记录 child 并监听其 'onremove' 事件；根据当前生效的 fx，若 fx 存在则对 child 施加相同 bloom 效果（若 child 有 bloomer 组件则调用其 PushBloom，否则设置 child.AnimState 的 BloomEffectHandle），若 fx 不存在且 child 有 bloomer 组件则调用其 PopBloom，否则清除 child.AnimState 的 BloomEffectHandle。副作用：修改 children 表，注册事件监听，可能改变 child 渲染状态。"
     },
     {
       "name": "DetachChild",
-      "effect": "若 child 已附加，移除对 child 的 onremove 监听并从表删除，若 child 有 bloomer 则调用其 PopBloom(self.inst)。副作用：断开继承，child 失去来自本实体的光效推送。"
+      "effect": "若 child 在 children 表中，移除对其 'onremove' 事件的监听，从表中删除；若 child 有 bloomer 组件则调用其 PopBloom(self.inst)。副作用：修改 children 表，注销监听，可能改变 child 的 bloom 状态。"
     },
     {
       "name": "GetCurrentFX",
-      "effect": "返回 bloomstack 栈顶元素的 fx 字符串，若栈空则返回 nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶元素的 fx 字段，若栈空返回 nil。无副作用。"
     },
     {
       "name": "GetCurrentFxAndPriority",
-      "effect": "返回 bloomstack 栈顶元素的 fx 和 priority，若栈空则返回 nil。无副作用。"
+      "effect": "返回 bloomstack 栈顶元素的 fx 和 priority，若栈空返回 nil。无副作用。"
     },
     {
       "name": "OnSetBloomEffectHandle",
-      "effect": "对本实体 AnimState 调用 SetBloomEffectHandle(fx)，并遍历 children：若子有 bloomer 则 PushBloom(self.inst, fx, priority)，否则直接设置其 AnimState 光效。副作用：改变本实体及子实体渲染光效。"
+      "effect": "对 self.inst.AnimState 调用 SetBloomEffectHandle(fx)，并遍历 children：若 child 有 bloomer 组件则调用其 PushBloom(self.inst, fx, priority)，否则对其 AnimState 调用 SetBloomEffectHandle(fx)。副作用：改变自身及子物体的特效。"
     },
     {
       "name": "OnClearBloomEffectHandle",
-      "effect": "对本实体 AnimState 调用 ClearBloomEffectHandle()，并遍历 children：若子有 bloomer 则 PopBloom(self.inst)，否则清除其 AnimState 光效。副作用：清除本实体及子实体光效。"
+      "effect": "对 self.inst.AnimState 调用 ClearBloomEffectHandle()，并遍历 children：若 child 有 bloomer 组件则调用其 PopBloom(self.inst)，否则对其 AnimState 调用 ClearBloomEffectHandle()。副作用：改变自身及子物体的特效。"
     },
     {
       "name": "PushBloom",
-      "effect": "若 source 和 fx 非空，将 source 对应 bloom 项（更新或新建）按 priority 插入有序栈；若 source 是实体实例则监听其 onremove 以自动 PopBloom；若栈顶变化则调用 OnSetBloomEffectHandle 更新光效。副作用：可能改变生效光效，注册事件监听，影响子实体。"
+      "effect": "若 source 和 fx 非 nil，查找 bloomstack 中相同 source 的项并更新或新建 bloom 项（priority 默认0），若 source 是实体实例则监听其 'onremove'；按 priority 降序插入栈（高优先级在栈顶）；若新栈顶与旧栈顶 fx 或 priority 不同，调用 OnSetBloomEffectHandle 更新。副作用：修改 bloomstack，可能注册监听，更新特效。"
     },
     {
       "name": "PopBloom",
-      "effect": "若 source 非空，从栈移除该 source 项，若 source 是实体实例则移除 onremove 监听；若栈顶变化则更新或清除光效。副作用：可能改变光效，解除监听。"
+      "effect": "若 source 非 nil，从 bloomstack 移除该 source 的项，若是实体则注销 'onremove' 监听；移除后若栈顶变为空则调用 OnClearBloomEffectHandle，若栈顶 fx 或 priority 变化则调用 OnSetBloomEffectHandle。副作用：修改 bloomstack，注销监听，更新特效。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "遍历 bloomstack 中实体 source 注销 'onremove' 监听；遍历 children 注销监听并对有 bloomer 的 child 调用 PopBloom(self.inst)。副作用：清理回调，可能改变 child 特效。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述 bloomstack 内容的调试字符串（逆序列出 source 和 fx）。无副作用。"
+      "effect": "返回由 bloomstack 内容组成的调试字符串，无副作用。"
     }
   ],
   "events_published": [],
@@ -68,18 +68,19 @@
       28751
     ],
     "aspects": [],
-    "no_evidence_reason": "仅页面24912提及'泛光效果'一词，但未描述bloomer组件所列能力（如设置/清除句柄、推送/弹出、子节点管理等）的任何行为或数值，其余页面无相关讨论，故页面根本不讨论该符号能力。",
+    "no_evidence_reason": "提供的页面摘录中，仅页面24912提及“泛光效果”但未涉及bloomer组件所列方法（如AttachChild、PushBloom等）的行为或数值；其余页面均描述生物/物品生成、掉落、仇恨距离等，与该组件无关，故页面根本不讨论该符号能力。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "泛光效果",
-    "发光特效",
-    "光效叠加",
-    "子体发光",
-    "光效优先级",
-    "清除泛光",
-    "附加光效"
+    "泛光特效",
+    "泛光优先级",
+    "子物体泛光",
+    "移除泛光",
+    "附加子实体",
+    "泛光渲染"
   ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 6/7)",
   "gameplay_tags": [
     "装饰",
     "特效"
@@ -89,6 +90,6 @@
     "source_sha256": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
     "source_bytes": 4799,
     "model": "hy3-free",
-    "generated_at_ms": 1787933318151
+    "generated_at_ms": 1788063249290
   }
 }

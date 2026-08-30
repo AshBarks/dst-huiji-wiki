@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/crittersbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "crittersbrain",
+  "summary": "该大脑用于小动物(critter)宠物，在拥有主人时根据情境采取行为：主人参与小游戏则观看或远离，附近有战斗则规避并观察主人，找到玩伴则玩耍，平时跟随并面对主人，亲密时蹭主人。无主人时站立不动，跳跃忙碌时短暂等待。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart构建行为树，未定义额外对外方法，行为通过BT节点驱动。",
+  "events_published": [
+    "start_playwithplaymate",
+    "critter_avoidcombat"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "COMBAT_TOO_CLOSE_DIST",
+    "COMBAT_TOO_CLOSE_DIST_SQ",
+    "COMBAT_SAFE_TO_WATCH_FROM_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST_SQ",
+    "COMBAT_TIMEOUT",
+    "MAX_PLAYFUL_FIND_DIST",
+    "MAX_PLAYFUL_KEEP_DIST_FROM_OWNER",
+    "MAX_DOMINANTTRAIT_PLAYFUL_FIND_DIST",
+    "MAX_DOMINANTTRAIT_PLAYFUL_KEEP_DIST_FROM_OWNER",
+    "PLAYFUL_OFFSET",
+    "PLAYMATE_NO_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随目标为正在观看的小游戏实体",
+        "最小允许距离取自小游戏的watchdist_min",
+        "期望保持距离取自小游戏的watchdist_target",
+        "最大允许距离取自小游戏的watchdist_max"
+      ],
+      "context": "拥有者参与小游戏时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "远离标签为minigame_participator的实体",
+        "触发距离5",
+        "安全距离7"
+      ],
+      "context": "拥有者参与小游戏时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为正在观看的小游戏实体",
+        "保持面对条件为小游戏存在（返回非nil）"
+      ],
+      "context": "拥有者参与小游戏时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "远离具有_combat和_health标签且非墙非INLIMBO的实体（通过CombatAvoidanceFindEntityCheck检测）",
+        "触发距离COMBAT_TOO_CLOSE_DIST(5)",
+        "安全距离COMBAT_SAFE_TO_WATCH_FROM_DIST(8)"
+      ],
+      "context": "拥有者存在且检测到需规避战斗时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为拥有者",
+        "保持面对条件为拥有者相同"
+      ],
+      "context": "验证需规避战斗且靠近战斗时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "目标位置为玩伴位置",
+        "最小距离PLAYFUL_OFFSET(2)",
+        "最大距离PLAYFUL_OFFSET(2)"
+      ],
+      "context": "找到玩伴且自身playful时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随目标为拥有者",
+        "最小距离0",
+        "期望距离TARGET_FOLLOW_DIST(4)",
+        "最大距离MAX_FOLLOW_DIST(4.5)"
+      ],
+      "context": "拥有者存在时默认行为"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为拥有者",
+        "保持面对条件为拥有者相同"
+      ],
+      "context": "拥有者存在且未处于逃跑状态时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行LoveOwner动作（蹭拥有者）"
+      ],
+      "context": "拥有者靠近且自身有感情时"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "拥有者存在但其他行为未触发或无拥有者时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag(\"jumping\")",
+      "semantic": "忙碌跳跃状态，等待0.25秒不行动"
+    },
+    {
+      "condition": "WatchingMinigame(inst) 不为nil",
+      "semantic": "优先跟随/远离/面对拥有者参与的小游戏"
+    },
+    {
+      "condition": "CombatAvoidanceFindEntityCheck 检测到需规避战斗",
+      "semantic": "远离战斗相关实体（距离5~8）"
+    },
+    {
+      "condition": "ValidateCombatAvoidance 持续为真",
+      "semantic": "面对拥有者观察战斗"
+    },
+    {
+      "condition": "FindPlaymate 找到玩伴",
+      "semantic": "等待6秒后拴住玩伴并触发玩耍事件"
+    },
+    {
+      "condition": "OwnerIsClose 且 IsAffectionate",
+      "semantic": "等待4秒后执行蹭拥有者动作"
+    },
+    {
+      "condition": "GetOwner(inst) 存在（其他默认）",
+      "semantic": "跟随拥有者（最小0期望4最大4.5）并尝试面对"
+    },
+    {
+      "condition": "无拥有者",
+      "semantic": "站立不动"
+    }
+  ],
+  "bt_structure": "根优先级节点：若跳跃忙碌则等待0.25s；否则若有拥有者则进入拥有者优先级树（观看小游戏分支 > 战斗规避分支 > 玩耍分支 > 跟随拥有者 > 面对拥有者 > 爱意分支 > 站立），无拥有者则站立。观看小游戏内：跟随小游戏 > 远离参与者 > 面对小游戏。战斗规避内：远离战斗实体 > 靠近战斗时面对拥有者。玩耍内：等待后拴住玩伴并玩耍。",
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15022,
+      15601,
+      51046,
+      15225,
+      18219,
+      13897,
+      14815
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面13409,15022,15601,51046,15225,18219,13897,14815均描述其他实体，未出现任何与brain__crittersbrain相关的跟随拥有者、玩伴互动、规避战斗等行为或距离参数的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小动物",
+    "跟随",
+    "躲避",
+    "玩耍",
+    "观看",
+    "战斗",
+    "小游戏",
+    "玩伴",
+    "主人"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "宠物",
+    "战斗规避",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "56becf38beb16086f2cb5b33e158b16df5b4e2080f07d6260c11a8c9724c9b8a",
+    "source_bytes": 9213,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058801708
+  }
+}

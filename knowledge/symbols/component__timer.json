@@ -7,67 +7,67 @@
   },
   "category": "component",
   "display_name": "timer",
-  "summary": "组件 timer 在实体上维护一组命名计时器，记录剩余时间、暂停状态与初始时长等数据。它通过安排定时任务在计时结束时推送 timerdone 事件，并支持暂停、恢复、修改剩余时间以及存读档与长更新，广泛参与技能冷却、状态持续等核心玩法机制。",
+  "summary": "组件 timer 管理实体上的多个命名计时器，记录剩余时间、暂停状态与初始时长等数据。它通过调度任务在计时结束时推送 timerdone 事件，并支持暂停、恢复、保存加载与长更新快进。该组件为游戏中各类需要延时或持续计时的机制（如状态效果、技能冷却）提供基础支撑。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "遍历 self.timers，若条目中 timer 任务非 nil 则调用 Cancel() 取消。副作用：清除实体上所有挂起计时器任务，释放资源。"
+      "effect": "遍历所有定时器，取消其关联的任务（调用 timer:Cancel()），清除任务引用。副作用：实体移除组件时停止所有计时任务。"
     },
     {
       "name": "GetDebugString",
-      "effect": "拼接并返回包含所有计时器名称、剩余时间（GetTimeLeft 或0）、暂停状态（tostring(IsPaused==true)）的多行字符串。无副作用。"
+      "effect": "返回包含所有定时器名称、剩余时间、暂停状态的调试字符串。无副作用。"
     },
     {
       "name": "TimerExists",
-      "effect": "返回 self.timers[name] ~= nil 的布尔结果。无副作用。"
+      "effect": "检查指定名称的定时器是否存在，返回布尔值。无副作用。"
     },
     {
       "name": "StartTimer",
-      "effect": "若 TimerExists(name) 为真则打印警告并直接返回；否则在 self.timers[name] 创建记录，包含 timer=inst:DoTaskInTime(time, OnTimerDone, self, name) 任务、timeleft=time、end_time=GetTime()+time、initial_time=initialtime_override或time、paused=false。若 paused 参数真则调用 PauseTimer(name)。副作用：在实体上注册并启动一个定时任务，若同名已存在则拒绝并日志输出。"
+      "effect": "以给定名称、时长、初始时长覆盖启动定时器；若名称已存在则打印错误并退出；创建定时器记录并调度结束任务；若 paused 为真则立即暂停。副作用：创建计时器任务，可能打印日志。"
     },
     {
       "name": "StopTimer",
-      "effect": "若计时器不存在返回；否则取消其 timer 任务（若有）并置 nil，并将 self.timers[name] 置 nil。副作用：移除该计时器，后续 TimerExists 为假。"
+      "effect": "停止并删除指定定时器，取消其任务并置空引用。若不存在则无操作。副作用：取消任务，移除记录。"
     },
     {
       "name": "IsPaused",
-      "effect": "返回 self:TimerExists(name) and self.timers[name].paused。无副作用。"
+      "effect": "返回指定定时器是否处于暂停状态（不存在则返回 nil）。无副作用。"
     },
     {
       "name": "PauseTimer",
-      "effect": "若计时器不存在或已暂停则返回；否则调用 GetTimeLeft(name) 更新剩余时间，设置 paused=true，取消 timer 任务并置 nil。副作用：计时器暂停倒计时但保留数据。"
+      "effect": "暂停指定定时器，计算剩余时间，取消任务并置空。若未运行或不存在则无操作。副作用：取消任务，修改状态。"
     },
     {
       "name": "ResumeTimer",
-      "effect": "若计时器未暂停则返回；否则设置 paused=false，用 self.timers[name].timeleft 重新安排 DoTaskInTime 任务，更新 end_time=GetTime()+timeleft，返回 true。副作用：恢复倒计时任务。"
+      "effect": "恢复暂停的定时器，重新调度任务，更新结束时间，返回 true。若未暂停则无操作。副作用：创建新任务。"
     },
     {
       "name": "GetTimeLeft",
-      "effect": "若计时器不存在返回 nil；若未暂停则更新 self.timers[name].timeleft = end_time - GetTime() 并返回该值；若暂停直接返回存储的 timeleft。副作用：可能更新内部 timeleft 字段。"
+      "effect": "返回指定定时器剩余时间，若未暂停则更新内部剩余时间计算。无副作用（除更新内部字段）。"
     },
     {
       "name": "SetTimeLeft",
-      "effect": "若计时器不存在返回；若暂停则设置 timeleft=max(0,time)；否则先 PauseTimer 再设 timeleft=max(0,time) 再 ResumeTimer。副作用：改变计时器剩余时间并可能触发内部暂停恢复。"
+      "effect": "设置指定定时器剩余时间（非负），暂停态直接设，非暂停态先暂停再恢复。副作用：可能取消并重建任务。"
     },
     {
       "name": "GetTimeElapsed",
-      "effect": "若计时器存在返回 (initial_time or 0) - GetTimeLeft(name)，否则 nil。无副作用。"
+      "effect": "返回已流逝时间（初始时长减剩余），不存在返回 nil。无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "遍历 self.timers 构建数据表，每项含 timeleft（调用GetTimeLeft）、paused、initial_time；若表非空返回 {timers=data} 否则 nil。无副作用。"
+      "effect": "返回所有定时器的剩余时间、暂停状态、初始时长组成的保存数据表，若无则返回 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "若 data.timers 非空，对每个键值先 StopTimer 再 StartTimer 以传入存储的 timeleft、paused、initial_time 重建计时器。副作用：还原计时器状态。"
+      "effect": "读取数据表，停止同名旧定时器并按数据重启。副作用：重建定时器。"
     },
     {
       "name": "LongUpdate",
-      "effect": "遍历所有计时器，调用 SetTimeLeft(k, GetTimeLeft(k)-dt) 快进时间。副作用：可能使计时器结束并触发 timerdone 事件。"
+      "effect": "对所有定时器快进 dt 时间（减少剩余时间）。副作用：可能触发定时器结束（通过 SetTimeLeft 间接）。"
     },
     {
       "name": "TransferComponent",
-      "effect": "获取 newinst.components.timer，遍历当前 timers，在新组件上以相同名称、剩余时间、暂停状态、初始时间调用 StartTimer。副作用：在新实体上创建对应计时器。"
+      "effect": "将本实体所有定时器按剩余时间和状态转移到新实体组件（为新实体启动相同定时器）。自身定时器未清除。副作用：新实体创建定时器。"
     }
   ],
   "events_published": [
@@ -78,61 +78,78 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13701,
       15922,
       15642,
-      18540,
-      18723,
       35001,
+      13701,
       65605,
-      14938
+      15022,
+      16197,
+      18540
     ],
     "aspects": [
       {
-        "aspect": "世界再生中计时暂停描述",
+        "aspect": "生成倒计时启动描述",
+        "evidence": [
+          {
+            "pageid": 15642,
+            "quote": "为熊獾设置生成倒计时，过程如下"
+          },
+          {
+            "pageid": 35001,
+            "quote": "若不满足其他条件，则重置倒计时。"
+          },
+          {
+            "pageid": 65605,
+            "quote": "服务器在 30 秒内重启。在倒计时为 25 秒"
+          }
+        ]
+      },
+      {
+        "aspect": "计时剩余时间数值标注",
+        "evidence": [
+          {
+            "pageid": 15642,
+            "quote": "计时剩余时间为 0 ~ 150 秒"
+          },
+          {
+            "pageid": 65605,
+            "quote": "倒计时为 25 秒、20 秒、15 秒、10 秒时"
+          },
+          {
+            "pageid": 18540,
+            "quote": "海盗袭击的倒计时会减少"
+          }
+        ]
+      },
+      {
+        "aspect": "计时器存在描述",
         "evidence": [
           {
             "pageid": 35001,
-            "quote": "在冬季和夜晚或有积雪时暂停计时"
+            "quote": "每棵树都有一个计时器，之后它会尝试在附近产生"
           }
         ]
       },
       {
-        "aspect": "巢穴生物再生与下蛋倒计时启动描述",
+        "aspect": "计时器暂停动作描述",
         "evidence": [
           {
-            "pageid": 18723,
-            "quote": "开始一个 5 天的再生倒计时"
+            "pageid": 15642,
+            "quote": "入冬时计时器暂停，此时计时剩余时间为 0 ~ 150 秒"
           },
           {
-            "pageid": 18723,
-            "quote": "开始一个 3 ~ 5 天的下蛋倒计时"
+            "pageid": 35001,
+            "quote": "在[[冬季]]和[[夜晚]]或有积雪时暂停计时。"
           }
         ]
       },
       {
-        "aspect": "巨兽生成倒计时设置及剩余时间更新描述",
+        "aspect": "计时器暂停状态描述",
         "evidence": [
           {
             "pageid": 15642,
-            "quote": "尝试为熊獾设置生成倒计时"
-          },
-          {
-            "pageid": 15642,
-            "quote": "当前计时剩余时间"
-          },
-          {
-            "pageid": 15642,
-            "quote": "更新计时剩余时间为 t 秒"
-          }
-        ]
-      },
-      {
-        "aspect": "服务器重启倒计时剩余显示描述",
-        "evidence": [
-          {
-            "pageid": 65605,
-            "quote": "倒计时为 25 秒、20 秒、15 秒、10 秒"
+            "quote": "入冬时计时器暂停，此时计时剩余时间为 0 ~ 150 秒"
           }
         ]
       }
@@ -140,23 +157,25 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
+    "计时器",
     "倒计时",
     "冷却时间",
     "剩余时间",
-    "计时结束",
     "暂停计时",
-    "技能冷却",
-    "状态持续"
+    "计时完毕",
+    "时间流逝",
+    "组件计时"
   ],
   "gameplay_tags": [
     "生存",
-    "战斗"
+    "战斗",
+    "建造"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
     "source_bytes": 3867,
     "model": "hy3-free",
-    "generated_at_ms": 1787931134796
+    "generated_at_ms": 1788059294051
   }
 }

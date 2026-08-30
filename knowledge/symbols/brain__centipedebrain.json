@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/centipedebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "centipedebrain",
+  "summary": "该大脑控制蜈蚣实体在非冲锋状态下根据战斗情形决策。无战斗目标或攻击未冷却时追击玩家，有目标且冷却中则逃离目标。无领袖且离巢过远时回家，否则跟随领袖、面向玩家或站立。",
+  "api": [],
+  "api_note": "该大脑类仅实现构造函数与 OnStart 方法以构建行为树，未定义其他对外可调用的函数或方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "GO_HOME_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "CHARGE_RANGE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取动作函数 ShouldRoll（实际推送滚袭事件，返回nil）",
+        "节点调试名 Roll",
+        "以跑动方式执行(true)"
+      ],
+      "context": "尝试触发滚袭"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 10 秒",
+        "最远追击 20 距离"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "威胁来源为战斗目标(getfn=GetRunAwayTarget)",
+        "察觉距离 5",
+        "安全距离 8"
+      ],
+      "context": "战斗目标存在且攻击冷却中时躲避"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取回家动作函数 GoHomeAction",
+        "节点调试名 Go Home",
+        "以跑动方式执行(true)"
+      ],
+      "context": "应回家时走向巢穴"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随领袖实体(函数返回follower领袖)",
+        "最小距离 5",
+        "目标距离 7",
+        "最大距离 12"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取面向目标函数(6内玩家)",
+        "保持面向条件函数(8内无notarget)"
+      ]
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "默认 fallback 无条件站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg:HasStateTag(\"charge\")",
+      "semantic": "根节点条件取反，跳过全部内部行为"
+    },
+    {
+      "condition": "self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown()",
+      "semantic": "追击攻击目标，时限10秒距离20"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown()",
+      "semantic": "逃离战斗目标，察觉距5安全距8"
+    },
+    {
+      "condition": "ShouldGoHome(self.inst) (无领袖且离巢距离平方>1)",
+      "semantic": "执行回家行走动作"
+    },
+    {
+      "condition": "inst.components.follower:GetLeader() 存在",
+      "semantic": "跟随领袖保持距离5-12"
+    },
+    {
+      "condition": "GetFaceTargetFn 找到玩家",
+      "semantic": "面向玩家并保持8内"
+    },
+    {
+      "condition": "前述均未触发",
+      "semantic": "StandStill 原地站立"
+    }
+  ],
+  "bt_structure": "根优先级节点(条件:非冲锋状态) -> [PanicTrigger, DoAction(Roll), WhileNode(追击)->ChaseAndAttack, WhileNode(躲避)->RunAway, WhileNode(回家)->DoAction(GoHome), Follow, FaceEntity, StandStill]，各子节点按优先级顺序评估。",
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      72238,
+      13493,
+      13898,
+      17998,
+      18303,
+      10418,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录描述了猪人、附身底盘、寄居蟹、曼德拉草、牛角、聚光灯、WX78、克劳斯等实体的玩家视角行为，但未出现代码能力清单中特定的数值或行为表达（如追击最长10秒最远20距离、察觉距离5安全距离8、跟随最小5目标7最大12、面向6内玩家保持8内无notarget、滚袭事件、回家走向巢穴等），页面文本根本不讨论brain__centipedebrain符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "非冲锋状态",
+    "追击玩家",
+    "回家",
+    "跟随",
+    "蜈蚣脑",
+    "逃离目标",
+    "面向玩家",
+    "原地站立"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b02155257dee517def1929219580c07bfc2ba7f9a772bd939f110414a7a5d471",
+    "source_bytes": 3332,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058502154
+  }
+}

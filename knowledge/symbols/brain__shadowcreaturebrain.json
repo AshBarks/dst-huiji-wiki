@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowcreaturebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowcreaturebrain",
+  "summary": "该大脑控制暗影生物实体在生成时以指定玩家为目标，并根据是否屈服于目标采取不同行为。若不应屈服则追击攻击目标；若屈服则在近距离跟随或发出战斗喊叫进行骚扰，目标在海上时会传送至海上。目标失效或无目标时，实体会跟随或游荡于目标附近。",
+  "api": [
+    {
+      "name": "SetTarget",
+      "effect": ""
+    }
+  ],
+  "events_published": [
+    "teleport_to_sea"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW",
+    "MED_FOLLOW",
+    "MAX_FOLLOW",
+    "HARASS_MIN",
+    "HARASS_MED",
+    "HARASS_MAX"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身(inst)",
+        "追击最长 100 秒"
+      ],
+      "context": "ShouldAttack 返回 true（不应屈服于目标）时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回骚扰目标的函数",
+        "最小允许距离 0 (HARASS_MIN)",
+        "期望保持距离 4 (HARASS_MED)",
+        "最大允许距离 5 (HARASS_MAX)"
+      ],
+      "context": "ShouldHarass 且 ShouldChaseAndHarass 时（骚扰分支内）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回锁定目标 mytarget 的函数",
+        "最小允许距离 5 (MIN_FOLLOW)",
+        "期望保持距离 15 (MED_FOLLOW)",
+        "最大允许距离 30 (MAX_FOLLOW)"
+      ],
+      "context": "根节点默认跟随（前序分支未触发时）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回骚扰目标位置的函数",
+        "离家最大距离 20",
+        "等待时间配置(最小等待0,随机等待0.3)",
+        "返回游荡方向的函数(GetHarassWanderDir)"
+      ],
+      "context": "LoiterAndHarass 分支（_harasstarget 有效）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "返回锁定目标位置或 nil 的函数",
+        "离家最大距离 20"
+      ],
+      "context": "根节点最后自由游荡（无目标时中心为 nil）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "targetatsea(self.inst)",
+      "semantic": "执行 teleport 函数推送 teleport_to_sea 事件，传送至海上"
+    },
+    {
+      "condition": "ShouldAttack(self)",
+      "semantic": "调用 ChaseAndAttack(self.inst, 100) 追击攻击目标"
+    },
+    {
+      "condition": "ShouldHarass(self)",
+      "semantic": "进入优先级节点：若 ShouldChaseAndHarass 则 Follow 骚扰目标(0,4,5)，否则 ActionNode 执行 BattleCry 喊叫并面向目标"
+    },
+    {
+      "condition": "self._harasstarget ~= nil and self._harasstarget:IsValid()",
+      "semantic": "以骚扰目标位置为家 Wander 游荡，最大距离20，自定义方向函数"
+    },
+    {
+      "condition": "self.mytarget ~= nil (闭包中判断)",
+      "semantic": "Follow 跟随 mytarget(5,15,30)，或 Wander 以其位置为中心(最大20)；若为 nil 则 Wander 中心 nil 自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点: 1. PanicTriggerShadowCreature 恐慌触发; 2. IfNode(目标在海上) 传送; 3. WhileNode(不应屈服) 追击攻击; 4. WhileNode(应骚扰) 优先跟随骚扰否则喊叫; 5. WhileNode(骚扰目标有效) 以目标为中心游荡; 6. Follow 锁定目标; 7. Wander 以锁定目标或空为中心游荡",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      45173,
+      72981,
+      24892,
+      24896,
+      15797,
+      16057,
+      51046
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，实体stalker_atrium、vault_pillar_guard_dormant、fruitfly、wagboss_robot均非暗影生物，其游荡/追击/距离描述不匹配shadowcreaturebrain的MIN_FOLLOW等参数；提及暗影生物的页面24892、24896、16057、72981仅涉及巢穴生成、掉落或简单攻击倾向，未体现跟随距离、骚扰距离、追击100秒或游荡离家20等能力表达，故页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影生物",
+    "追击攻击",
+    "骚扰",
+    "传送海上",
+    "游荡",
+    "跟随目标",
+    "屈服",
+    "行为树",
+    "恐慌",
+    "生成玩家"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f9763c6f82500f58f90f22df689efa20f17d5c66e15bbcbd985490a23a6989f",
+    "source_bytes": 4061,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061225843
+  }
+}

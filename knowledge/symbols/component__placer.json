@@ -7,59 +7,63 @@
   },
   "category": "component",
   "display_name": "placer",
-  "summary": "Placer 组件管理放置预览实体的状态数据，包括能否建造标志、测试函数、轴对齐辅助网格及链接实体等。它深度参与建造核心玩法，负责在玩家放置建筑或物品时根据输入更新位置与旋转、执行建造检测并反馈视觉颜色，同时支持轴对齐放置模式与部署辅助触发。",
+  "summary": "Placer 组件管理放置建筑或物品时的预览实体（幽灵）的位置、旋转、对齐方式与建造可行性状态。它参与建造与部署核心玩法，处理鼠标或控制器输入下的网格吸附、轴对齐辅助及部署提示，并联动物品栏图标显示。",
   "api": [
     {
       "name": "OnRemoveEntity",
-      "effect": "实体移除时调用（亦作为 OnRemoveFromEntity 使用）。若 builder 存在且 hide_inv_icon 为真，向 builder 推送 'onplacerhidden' 事件；若 axisalignedhelpers 存在且其 parent 有效，移除该 parent 实体并清空 axisalignedhelpers。副作用：可能移除辅助实体、推送事件。"
+      "effect": "实体被移除时调用：若 self.builder 存在且 self.hide_inv_icon 为真，向 builder 推送 'onplacerhidden' 事件；若 self.axisalignedhelpers 存在且其 parent 有效，移除该 parent 实体并将 self.axisalignedhelpers 置 nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "同 OnRemoveEntity，源码中 Placer.OnRemoveFromEntity = Placer.OnRemoveEntity，功能完全一致。"
     },
     {
       "name": "InitializeAxisAlignedHelpers",
-      "effect": "初始化轴对齐放置辅助。若已有 axisalignedhelpers 且其 parent 有效则先移除；创建基于 TUNING 参数的偏移缓存（floor decal 实体），并监听 ThePlayer 的 'refreshaxisalignedplacementintervals' 事件以重新初始化。副作用：生成辅助实体、添加事件监听。"
+      "effect": "销毁已有的轴对齐辅助父实体（若存在），基于 TUNING.AXISALIGNEDPLACEMENT_INTERVALS 与 TUNING.AXISALIGNEDPLACEMENT_CIRCLESIZE 调用 CreateOffsetCache 生成地板贴花实体群作为辅助，并让辅助父实体监听 ThePlayer 的 'refreshaxisalignedplacementintervals' 事件以重新初始化。"
     },
     {
       "name": "CanStartAxisAlignedPlacementForItem",
-      "effect": "判断给定物品（或 nil 表示结构）能否启用轴对齐放置。检查已知 mod 启用状态、部署模式、可部署性及特定标签，返回布尔值。无副作用，纯查询。"
+      "effect": "接收 item 参数，检查全局 mod 启用状态（首次调用探测 KNOWN_AXISALIGNED_MODS 并缓存于全局 HAS_AXISALIGNED_MOD_ENABLED），依据 item 的部署模式与标签判定是否允许轴对齐放置，返回布尔值；不直接修改组件实例字段（除读取全局）。"
     },
     {
       "name": "SetBuilder",
-      "effect": "设置 builder, recipe, invobject。若为玩家自身，计算轴对齐允许标志与当前开关，可能调用 InitializeAxisAlignedHelpers；若存在 onbuilderset 回调则调用；启动 WallUpdatingComponent 使 OnWallUpdate 被调用。副作用：可能初始化辅助、启动更新、调用回调。"
+      "effect": "设置 self.builder, self.recipe, self.invobject；若 builder 为 ThePlayer，计算 axisalignedplacementallowedbyitem 与 axisalignedplacement（结合 Profile 设置），按需调用 InitializeAxisAlignedHelpers；若存在 self.onbuilderset 回调则调用并传入 inst；启动 inst 的 WallUpdatingComponent 以进行每帧更新。"
     },
     {
       "name": "LinkEntity",
-      "effect": "将传入实体加入 linked 列表，并可设置光照覆盖（默认1）。副作用：修改 linked 表，改变链接实体的渲染光照。"
+      "effect": "将 ent 插入 self.linked 表；若 lightoverride 为 nil 或 >0，调用 ent.AnimState:SetLightOverride(lightoverride or 1) 设置光照覆盖，用于联动预览部件显示。"
     },
     {
       "name": "GetDeployAction",
-      "effect": "若存在 invobject，设置 selected_pos 为自身位置，根据物品标签决定 DEPLOY 或 DEPLOY_FLOATING 动作，返回 BufferedAction；成功时清空 selected_pos。副作用：设置 selected_pos，返回动作对象。"
+      "effect": "若 self.invobject 非空，将 self.selected_pos 设为 inst 当前坐标，根据 invobject 是否含 'boatbuilder' 标签选择 ACTIONS.DEPLOY 或 ACTIONS.DEPLOY_FLOATING，构造 BufferedAction 并返回（成功回调中清空 selected_pos）；无 invobject 时返回 nil。"
     },
     {
       "name": "TestCanBuild",
-      "effect": "测试当前位置能否建造。优先用 override_testfn，否则 testfn，否则默认 true/false；返回 can_build, mouse_blocked。无副作用（仅调用函数）。"
+      "effect": "假定 inst 已处于测试位置，依次优先调用 self.override_testfn、self.testfn 或默认返回 (true, false)，返回 can_build 与 mouse_blocked 两个布尔值；无副作用。"
     },
     {
       "name": "ToggleHideInvIcon",
-      "effect": "根据 hide 参数切换 hide_inv_icon，并向 builder 推送 'onplacerhidden' 或 'onplacershown' 事件（若 builder 存在且非 mouse_blocked）。副作用：改变状态、推送事件。"
+      "effect": "根据 hide 参数修改 self.hide_inv_icon；当状态改变且 self.builder 存在且 not self.mouse_blocked 时，推送 'onplacerhidden' 或 'onplacershown' 事件以切换物品栏图标。"
     },
     {
       "name": "IsAxisAlignedPlacement",
-      "effect": "返回 axisalignedplacement 与 axisalignedplacementtoggle 是否不等。纯查询。"
+      "effect": "返回 (self.axisalignedplacement ~= self.axisalignedplacementtoggle) 的布尔结果，反映当前是否启用轴对齐放置模式。"
     },
     {
       "name": "GetAxisAlignedPlacementTransform",
-      "effect": "根据 intervals 与 worldoffset 计算轴对齐坐标，返回变换后的 x,y,z。纯计算。"
+      "effect": "利用 self.axisalignedhelpers 的 intervals 与 worldoffset 将输入 x,z 吸附至轴对齐网格中心，返回调整后的 x,y,z；ignorescale 为 true 时返回网格索引尺度坐标而非世界尺度。"
     },
     {
       "name": "UpdateAxisAlignedHelpers",
-      "effect": "根据 dt 更新轴对齐辅助的可见性、位置滑动、碰撞测试与视觉颜色。副作用：移动辅助 parent、修改辅助实体动画与颜色、可能改变自身位置（在测试后还原）。"
+      "effect": "根据 self.axisalignedhelpers.visible 与 dt 更新辅助实体群的可见性淡入淡出、位置偏移及逐格建造检测（临时移动 inst 调用 TestCanBuild 后复原），维护内部更新累加器与索引，修改辅助实体动画与颜色。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧（或墙更新）根据输入设备与 snap 设置更新放置器位置旋转，测试建造，触发部署辅助，处理显示隐藏与颜色，更新轴对齐辅助。副作用：广泛，改变 transform、animstate、推送事件、触发 TriggerDeployHelpers。"
+      "effect": "每帧更新：依据输入设备与 snap 类字段（snap_to_tile 等）计算 inst 变换，处理轴对齐切换、船中心旋转、相机偏移旋转，调用 self.onupdatetransform；执行 TestCanBuild 更新 can_build/mouse_blocked 并向 builder 推送显示事件；触发 TriggerDeployHelpers；根据可行性着色显示/隐藏 inst 与 linked 实体；最后调用 UpdateAxisAlignedHelpers。"
     },
     {
       "name": "OnWallUpdate",
-      "effect": "直接调用 OnUpdate，兼容旧 mod 覆盖。副作用同 OnUpdate。"
+      "effect": "直接调用 OnUpdate(dt)，用于兼容旧 mod 重写，行为同 OnUpdate。"
     }
   ],
   "events_published": [
@@ -81,29 +85,30 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      15015,
       21620,
       18216,
       18843,
       24028,
       20113,
       24589,
-      13707,
-      14659
+      13707
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录均描述各实体（发电机、投石机、信号弹、蝴蝶等）的属性、制作、燃料、行为或生成机制，未出现与放置组件（placer）相关的轴对齐辅助、建造检测、部署动作、墙体更新等能力表达。",
+    "no_evidence_reason": "所给页面摘录均描述实体的基础属性、制作、燃料、生命恢复、攻击、生成与行为等，未出现与 placer 组件相关的放置逻辑（如轴对齐放置、测试建造、部署动作、链接实体、隐藏物品栏图标、墙更新等）的表达。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "放置预览",
-    "建造辅助",
-    "轴对齐",
-    "建造测试",
-    "链接实体",
-    "部署动作",
-    "鼠标阻挡",
-    "控制器放置"
+    "放置位置",
+    "幽灵预览",
+    "网格对齐",
+    "轴向对齐",
+    "部署提示",
+    "建造可行",
+    "船边对齐",
+    "旋转对齐"
   ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/8)",
   "gameplay_tags": [
     "建造"
   ],
@@ -112,6 +117,6 @@
     "source_sha256": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
     "source_bytes": 22544,
     "model": "hy3-free",
-    "generated_at_ms": 1787930744817
+    "generated_at_ms": 1788058624567
   }
 }

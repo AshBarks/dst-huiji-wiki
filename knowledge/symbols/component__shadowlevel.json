@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "shadowlevel",
-  "summary": "该组件管理实体的阴影等级数据，存储一个默认等级并允许设置动态等级计算函数。它在挂载时给实体添加“shadowlevel”标签，卸载时移除该标签。外部可通过其方法获取实体当前的阴影等级值。",
+  "summary": "该组件管理实体的暗影等级数据，初始默认等级为1。它支持静态设置默认等级或通过回调函数动态计算当前等级，并为实体添加 \"shadowlevel\" 标签以供其他系统识别。",
   "api": [
     {
       "name": "SetDefaultLevel",
-      "effect": "将组件内部默认阴影等级 self.level 设置为传入的 level 参数，无返回值，仅修改内部状态，无其它副作用。"
+      "effect": "将组件内部字段 self.level 设置为传入的 level 参数，作为无动态函数时的默认等级。无其它副作用。"
     },
     {
       "name": "SetLevelFn",
-      "effect": "设置组件内部用于动态计算阴影等级的函数 self.levelfn 为传入的 fn，无返回值，仅修改内部状态。"
+      "effect": "将组件内部字段 self.levelfn 设置为传入的函数 fn，此后 GetCurrentLevel 将优先调用该函数动态计算等级。无其它副作用。"
     },
     {
       "name": "GetCurrentLevel",
-      "effect": "返回实体当前阴影等级：若 levelfn 不为 nil 则调用 levelfn(self.inst) 并返回其结果，否则返回默认等级 self.level。无副作用。"
+      "effect": "返回当前等级：若 self.levelfn 不为 nil 则调用 self.levelfn(self.inst) 并返回其结果，否则返回 self.level。无副作用（只读）。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时由引擎调用，将实体上的“shadowlevel”标签移除，无返回值。"
+      "effect": "当组件从实体移除时由系统调用，执行 self.inst:RemoveTag(\"shadowlevel\") 移除实体上的 \"shadowlevel\" 标签。"
     }
   ],
   "events_published": [],
@@ -43,7 +43,16 @@
     ],
     "aspects": [
       {
-        "aspect": "等级回退至0级标注",
+        "aspect": "击杀升级条件描述",
+        "evidence": [
+          {
+            "pageid": 34037,
+            "quote": "算作参与击杀 1 次，可为暗影槌升级"
+          }
+        ]
+      },
+      {
+        "aspect": "等级回退至0级描述",
         "evidence": [
           {
             "pageid": 34037,
@@ -55,24 +64,24 @@
     "coverage_status": "partial"
   },
   "search_terms": [
-    "暗影等级",
-    "阴影级别",
-    "暗影标签",
-    "等级函数",
-    "默认等级",
+    "影级",
+    "阴影等级",
+    "暗影级别",
+    "等级数据",
+    "初始等级",
+    "静态等级",
     "当前等级",
-    "动态等级",
-    "影子等级"
+    "影级标签"
   ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 8/8)",
   "gameplay_tags": [
-    "暗影",
-    "生存"
+    "暗影"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
     "source_bytes": 576,
     "model": "hy3-free",
-    "generated_at_ms": 1787933233145
+    "generated_at_ms": 1788063125954
   }
 }

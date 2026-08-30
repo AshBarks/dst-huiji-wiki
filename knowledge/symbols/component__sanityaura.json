@@ -7,23 +7,23 @@
   },
   "category": "component",
   "display_name": "sanityaura",
-  "summary": "该组件管理实体的理智光环（sanity aura）数据与'sanityaura'标签，用于向附近观察者施加理智值增减效果。它存储基础光环强度、可选距离上限及动态计算与衰减函数，参与生存玩法中的精神维持机制。组件在初始化时添加标签，移除时清理标签。",
+  "summary": "该组件管理实体的精神值光环（sanity aura）基础数值、距离衰减与最大影响范围等数据。它通过计算观察者到实体的距离平方与衰减函数，参与游戏中实体对附近角色精神值的持续增减玩法。组件在初始化时为实体添加 'sanityaura' 标签以便系统检索。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'sanityaura' 标签，使实体不再被识别为理智光环源。无其他副作用。"
+      "effect": "当组件从实体移除时，调用 inst:RemoveTag(\"sanityaura\") 移除实体的 sanityaura 标签，使实体不再被识别为精神光环源，无返回值。"
     },
     {
       "name": "GetBaseAura",
-      "effect": "返回不考虑距离衰减的基础理智光环值。若未设置 aurafn 则返回存储的 aura 数值，否则调用 aurafn(inst, observer) 并返回其结果。无副作用。"
+      "effect": "接收 observer 参数，返回不考虑距离衰减的基础光环值：若 self.aurafn 为 nil 则返回 self.aura，否则调用 self.aurafn(self.inst, observer) 并返回其结果。无副作用。"
     },
     {
       "name": "SetBaseAuraName",
-      "effect": "设置组件内部 baseauraname 字段为给定名称，用于标记同源光环（假设同名光环强度相同）。仅修改内部状态，无外部副作用。"
+      "effect": "接收 baseauraname 参数，将内部字段 self.baseauraname 设为该值；根据源码注释，同名光环在系统中会被视为同一来源并合并计算（假设同名光环强度相同）。仅设置字段，无其它副作用。"
     },
     {
       "name": "GetAura",
-      "effect": "计算并返回考虑距离衰减后的理智光环值。先获取观察者到实体的距离平方，若超过 max_distsq 或默认 SANITY_EFFECT_RANGE_SQ 则返回0；否则用基础值除以衰减函数结果或距离平方（至少1）得到光环值。无副作用。"
+      "effect": "接收 observer 参数，计算观察者到实体的距离平方 distsq；若 distsq 小于等于 self.max_distsq 或默认的 SANITY_EFFECT_RANGE_SQ，则返回基础光环值除以衰减系数（优先使用 self.fallofffn 计算结果，否则使用 math.max(1, distsq)），否则返回 0。无副作用。"
     }
   ],
   "events_published": [],
@@ -34,31 +34,39 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      51639,
       13437,
-      14938,
+      65737,
+      13701,
+      19118,
+      19119,
       16419,
-      35217,
-      13379,
-      15022,
-      15183,
-      15237
+      16630
     ],
     "aspects": [
       {
-        "aspect": "基础光环回复效果标注",
+        "aspect": "理智光环名称提及",
         "evidence": [
           {
-            "pageid": 13437,
-            "quote": "讲故事时的理智光环的基础回复效果提升至 25{{理智值}}/分钟。"
+            "pageid": 16419,
+            "quote": "[[理智光环]]"
+          },
+          {
+            "pageid": 65737,
+            "quote": "负面精神光环"
           }
         ]
       },
       {
-        "aspect": "理智光环持续影响与衰减描述",
+        "aspect": "理智光环数值标注",
         "evidence": [
           {
-            "pageid": 35217,
-            "quote": "具有理智光环的实体会对附近的玩家造成持续的理智值/启蒙值影响"
+            "pageid": 16419,
+            "quote": "产生 +4.44{{理智值}}/分钟的[[理智光环]]"
+          },
+          {
+            "pageid": 65737,
+            "quote": "尸体的负面精神光环一般与生物大小正相关"
           }
         ]
       }
@@ -78,15 +86,16 @@
     "note": "裸键 = aura×60(每分钟);aurafn 会被调用取值;为 0 不导出。"
   },
   "search_terms": [
-    "理智光环",
     "精神光环",
-    "光环强度",
-    "衰减范围",
-    "精神距离",
-    "光环标签",
-    "san光环",
-    "观察者距"
+    "理智影响",
+    "观察者",
+    "影响范围",
+    "距离衰减",
+    "光环数值",
+    "光环组件",
+    "光环叠加"
   ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 3/8)",
   "gameplay_tags": [
     "生存",
     "精神"
@@ -96,6 +105,6 @@
     "source_sha256": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
     "source_bytes": 1141,
     "model": "hy3-free",
-    "generated_at_ms": 1787931395135
+    "generated_at_ms": 1788059776349
   }
 }

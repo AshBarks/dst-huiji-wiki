@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/frogbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "frogbrain",
+  "summary": "该大脑驱动青蛙实体在遭遇威胁时优先恐慌，否则会追击攻击附近目标最长8秒。在非白天或冬季时青蛙会跑动返回家园，在清醒状态（月球青蛙或非负夜）下以家为中心游荡，空闲时站立静止。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法以构建行为树，未定义其他可供外部调用的公开方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "MAX_WANDER_DIST",
+    "SEE_TARGET_DIST",
+    "MAX_CHASE_DIST",
+    "MAX_CHASE_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 8 秒（MAX_CHASE_TIME）"
+      ],
+      "context": "无特定条件，位于恐慌触发之后的优先级"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数",
+        "节点调试名称 'go home'",
+        "以跑动方式执行动作"
+      ],
+      "context": "当 ShouldGoHome 条件满足（非白天或冬季）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置的函数",
+        "离家最大距离 20 单位（MAX_WANDER_DIST）"
+      ],
+      "context": "当 ShouldWanderSleepTest 条件满足（islunar 或 非负夜）"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身",
+        "开始站立需有 idle 状态标签",
+        "保持站立无额外限制（nil）"
+      ],
+      "context": "无特定条件，最低优先级"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGoHome(inst) 返回真（非白天或冬季）",
+      "semantic": "执行回家动作（DoAction 跑动方式调用 GoHomeAction）"
+    },
+    {
+      "condition": "inst.islunar 为真 或 世界状态不是夜晚",
+      "semantic": "以家位置为中心、最大游荡距离 20 进行 Wander"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电栅栏恐慌触发 > 追击攻击(最长8秒) > WhileNode(应回家? 跑动回家) > WhileNode(清醒? 以家游荡) > 站立静止(若idle)",
+  "wiki": {
+    "scanned_pageids": [
+      13823,
+      15022,
+      15357,
+      13897,
+      51046,
+      15651,
+      13828,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨距离描述",
+        "evidence": [
+          {
+            "pageid": 15357,
+            "quote": "青蛙具有群体仇恨，群体仇恨范围是 28 距离单位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "青蛙",
+    "攻击",
+    "恐慌",
+    "游荡",
+    "静止",
+    "返回家园",
+    "冬季",
+    "清醒"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d374d73fce170e6c0285e2bbda93047d6fb1c8d464d31b49ae377eb41ab7a41",
+    "source_bytes": 1766,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059033326
+  }
+}

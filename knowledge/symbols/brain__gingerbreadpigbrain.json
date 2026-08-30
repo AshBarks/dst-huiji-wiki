@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/gingerbreadpigbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "gingerbreadpigbrain",
+  "summary": "该大脑控制姜饼猪在恐慌或面对带“scarytoprey”标签且被玩家追逐时逃离玩家至安全距离；若存在拴绳目标且未被追逐，则跑向该目标并保持勒绳距离；平时会面向拴绳目标。",
+  "api": [],
+  "api_note": "该大脑源码仅实现构造函数与OnStart构建行为树，未定义任何额外对外方法或可供外部调用的函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "LEASH_START_DIST",
+    "LEASH_STOP_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体(inst)"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "威胁标签为scarytoprey",
+        "发现猎人距离15",
+        "安全距离50",
+        "仅当被玩家追逐时逃跑的函数",
+        "不跑回家(nil)",
+        "修正悬垂地形(true)"
+      ]
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "获取拴绳目标位置的函数",
+        "最大半径20",
+        "内部返回距离18",
+        "跑步返回(true)"
+      ],
+      "context": "当存在拴绳目标且未被追逐时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取目标函数(仅返回拴绳目标)",
+        "保持面对校验函数"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.chased_by_player and hunter:HasTag(\"scarytoprey\")",
+      "semantic": "RunAway节点生效，以修正悬垂方式逃离玩家至安全距离50"
+    },
+    {
+      "condition": "self.inst.leash_target ~= nil and not self.inst.chased",
+      "semantic": "IfNode内执行Leash跑向拴绳目标，最大半径20内部返回18跑步"
+    },
+    {
+      "condition": "default",
+      "semantic": "FaceEntity面向拴绳目标（若其存在）"
+    }
+  ],
+  "bt_structure": "优先级节点：1) BrainCommon.PanicTrigger通用恐慌；2) RunAway逃离scarytoprey标签猎人(视距15安距50,需chased_by_player,修正悬垂)；3) IfNode(leash_target存在且未chased)→Leash(20,18,跑)；4) FaceEntity面向拴绳目标。",
+  "wiki": {
+    "scanned_pageids": [
+      23186,
+      45173,
+      13701,
+      15415,
+      23192,
+      18939,
+      13897,
+      14099
+    ],
+    "aspects": [
+      {
+        "aspect": "恐慌触发状态描述",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "姜饼猪会受到惊吓，丢下一个饼干屑"
+          }
+        ]
+      },
+      {
+        "aspect": "拴绳保持距离描述",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "试着和玩家保持 18 ~ 20 的距离"
+          }
+        ]
+      },
+      {
+        "aspect": "远离逃跑行为描述",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "朝着远离玩家的方向狂奔"
+          }
+        ]
+      },
+      {
+        "aspect": "逃跑触发距离描述",
+        "evidence": [
+          {
+            "pageid": 23186,
+            "quote": "玩家靠近姜饼猪 15 距离单位以内后"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "姜饼猪",
+    "逃离玩家",
+    "拴绳",
+    "勒绳",
+    "恐慌",
+    "被追逐",
+    "面向",
+    "安全距离",
+    "靠近目标"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cd6f6758fa9fdd9190e592d5127ff0db1edaea85ff0c0c5059a1a72ebb2008db",
+    "source_bytes": 1936,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059171140
+  }
+}

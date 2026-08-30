@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lunarthrall_plant_gestalt_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "lunarthrall_plant_gestalt_brain",
+  "summary": "该大脑控制月球植物姿态实体在 idle 状态下行动。若已锁定植物目标，则依据距离平方选择瞬移寄生、直行靠近或在附近绕行；若未锁定或脱离玩家视野，则传送至植物或在玩家屏幕内随机游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义额外的公开方法；移动逻辑封装在文件局部的 MoveToPointAction 函数中，不对外暴露。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ATTACH_DIST",
+    "CLOSE_DIST",
+    "SCREEN_DIST_SQ",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：实体状态机拥有 idle 标签",
+        "分支名称 move",
+        "内部优先级节点"
+      ],
+      "context": "根节点下的条件包裹"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点列表",
+        "更新间隔 UPDATE_RATE"
+      ],
+      "context": "idle 时执行"
+    },
+    {
+      "ctor": "BrainCommon.PossessChassisNode",
+      "args_semantic": [
+        "实体自身",
+        "更新间隔 UPDATE_RATE"
+      ],
+      "context": "优先级节点中高优先级"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体实例",
+        "MoveToPointAction 决策函数",
+        "动作名 Move",
+        "true 表示立即执行"
+      ],
+      "context": "优先级节点中低优先级"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag(\"idle\")",
+      "semantic": "仅当实体处于 idle 状态时才运行移动与附身逻辑"
+    },
+    {
+      "condition": "inst.plant_target 有效且距离平方 <= ATTACH_DIST^2",
+      "semantic": "将实体瞬移到植物目标位置并进入 infest 寄生状态"
+    },
+    {
+      "condition": "inst.plant_target 有效且距离平方 <= CLOSE_DIST^2",
+      "semantic": "直接走向植物目标所在点"
+    },
+    {
+      "condition": "inst.plant_target 有效且距离平方 > SCREEN_DIST_SQ 且存在 justspawned 计时器",
+      "semantic": "取消追踪植物，转入非追踪分支"
+    },
+    {
+      "condition": "inst.plant_target 有效且其他距离",
+      "semantic": "在植物目标附近随机角度与半径偏移的点移动"
+    },
+    {
+      "condition": "not movetoplant 且无玩家在 SCREEN_DIST_SQ 范围内",
+      "semantic": "通过 spawner 传送到植物或自行移除"
+    },
+    {
+      "condition": "not movetoplant 且有玩家在视野内",
+      "semantic": "以自身为原点随机方向游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(更新率0.25) → WhileNode(条件:实体idle状态) → 优先级节点[ PossessChassisNode(附身处理), DoAction(MoveToPointAction 移动决策) ]",
+  "wiki": {
+    "scanned_pageids": [
+      19676,
+      19110,
+      16657,
+      13701,
+      15238,
+      19287,
+      19722,
+      34557
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面文本中，仅页面19676提及lunarthrall_plant_gestalt实体的生成与寄生机制，未涉及brain__lunarthrall_plant_gestalt_brain的代码能力如距离参数、更新速率、idle状态机、移动行为树等；其余页面无关，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "游荡",
+    "瞬移",
+    "屏幕距离",
+    "随机偏移",
+    "月球植物",
+    "姿态实体",
+    "寄生",
+    "锁定植物",
+    "待机状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e819eda8a6f929293e53e6eac4b2abb228443896eb5b3b9d6b721bea3b4d8775",
+    "source_bytes": 3618,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059782186
+  }
+}

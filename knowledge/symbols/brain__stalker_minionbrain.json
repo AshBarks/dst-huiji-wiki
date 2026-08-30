@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/stalker_minionbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "stalker_minionbrain",
+  "summary": "该大脑控制 stalker 的仆从实体，在 stalker 存在时通过拴绳跟随目标并保持站立。当 stalker 不存在时，仆从在死亡延迟前自由游荡，延迟结束后自行死亡。最高优先级会进行恐慌触发检查。",
+  "api": [],
+  "api_note": "该大脑仅通过 OnStart 方法构建行为树，未定义其他对外调用的方法或字段。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "STALKER_RADIUS",
+    "MINION_RADIUS",
+    "LEASH_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "最高优先级恐慌检查"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "获取 stalker 位置的函数",
+        "拴绳最大半径 LEASH_DIST",
+        "内部返回距离 LEASH_DIST"
+      ],
+      "context": "始终尝试拴绳跟随 stalker"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "当 GetTarget(inst) ~= nil 时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "当 not ShouldDie(self) 时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetTarget(inst) ~= nil",
+      "semantic": "实体在 stalker 存在时站立不动（StandStill）"
+    },
+    {
+      "condition": "not ShouldDie(self)",
+      "semantic": "未到死亡延迟时实体自由游荡（Wander）"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. 恐慌触发；2. 拴绳跟随 stalker（距离 LEASH_DIST）；3. 若存在 stalker 则站立；4. 若未到死亡延迟则游荡；5. 否则执行自杀 ActionNode。",
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      13828,
+      13857,
+      15238,
+      47009,
+      51482
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面摘录均为其他实体（woodie、shadow_knight、hound、babybeefalo、wagdrone_rolling、岩浆傀儡）的行为描述，未提及 stalker 随从大脑相关的跟随 stalker、LEASH_DIST 拴绳、恐慌触发、GetTarget 站立或 not ShouldDie 游荡等能力表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "站立不动",
+    "自由游荡",
+    "跟随目标",
+    "死亡延迟",
+    "恐慌检查",
+    "仆从控制",
+    "自行死亡",
+    "织影者仆从"
+  ],
+  "search_terms_note": "pass1 后零命中 5/7,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f1f6600bca279e96f1961a133b354d5e89668b3b6d4c4d6904a350ccdef1c344",
+    "source_bytes": 1513,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061603746
+  }
+}

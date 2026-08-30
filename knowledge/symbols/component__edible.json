@@ -7,87 +7,87 @@
   },
   "category": "component",
   "display_name": "edible",
-  "summary": "该组件管理食物的可食用数据，包括生命、饥饿、理智增益值、食物类型、香料与温度效果等。它参与进食核心玩法，提供属性计算、食用回调与事件发布，并支持变质与堆叠等机制。",
+  "summary": "Edible 组件管理食物的基础属性，包括生命、饥饿、理智增益值以及食物类型（含次要类型）。它参与进食核心玩法，计算食用者摄入时的实际数值（受变质、香料、食物亲和等影响），并处理食用后的回调、温度效果与实体移除。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "移除实体上的 'badfood' 标签、当前 foodtype 对应的 'edible_'..foodtype 标签、secondaryfoodtype 对应的标签，以及强制移除 'edible_BERRY' 标签。"
-    },
-    {
       "name": "GetWoodiness",
-      "effect": "已废弃。接收 eater 参数但忽略，始终返回 0。"
+      "effect": "已废弃方法，忽略参数 eater 并返回 0。"
     },
     {
       "name": "GetSanity",
-      "effect": "根据 getsanityfn 或 sanityvalue 计算基础理智值；若易腐组件存在且未忽略变质，则根据新鲜度调整（stale 时正数变0，spoiled 时返回 -TUNING.SANITY_SMALL）；若 eater 能处理变质食物则取非负值；最后乘以香料 SANITY 乘数并返回。无组件状态修改。"
+      "effect": "根据 eater 和自身属性（getsanityfn 或 sanityvalue、变质状态、香料、eater 的 eater 组件等）计算并返回该食物提供的理智值；若腐烂且 eater 不能处理腐烂物则返回 -TUNING.SANITY_SMALL 或 0 等。"
     },
     {
       "name": "GetHunger",
-      "effect": "根据 hungervalue 计算基础饥饿值；考虑易腐状态、eater 的 ignoresspoilage、CanProcessSpoiledItem 及 eater 的 stale_hunger/spoiled_hunger 或组件自身对应值作为乘数；若 eater 有 foodaffinity 组件则乘亲和加成；返回最终饥饿值。无组件状态修改。"
+      "effect": "计算并返回食物提供的饥饿值，考虑变质倍数、香料、eater 的食物亲和组件等，返回最终乘值。"
     },
     {
       "name": "GetHealth",
-      "effect": "根据 gethealthfn 或 healthvalue 计算基础生命值；考虑易腐状态、eater 属性及香料 HEALTH 乘数（变质时取消香料来源）；返回最终生命值。无组件状态修改。"
+      "effect": "计算并返回食物提供的生命值，考虑变质倍数、香料、gethealthfn 等，返回最终乘值。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含 foodtype、healthvalue、hungervalue、sanityvalue 的格式化调试字符串。无副作用。"
+      "effect": "返回包含食物类型、生命、饥饿、理智值的调试字符串。"
     },
     {
       "name": "SetOnEatenFn",
-      "effect": "设置 self.oneaten 回调函数为传入的 fn，用于食用时调用。修改组件内部回调状态。"
+      "effect": "设置食物被吃时的回调函数 self.oneaten 为传入的 fn。"
     },
     {
       "name": "SetHandleRemoveFn",
-      "effect": "设置 self.handleremovefn 回调函数为传入的 fn，用于食用后处理实体移除逻辑。修改组件内部回调状态。"
+      "effect": "设置食物被吃后处理移除的回调函数 self.handleremovefn 为传入的 fn。"
     },
     {
       "name": "SetOverrideStackMultiplierFn",
-      "effect": "设置 self.overridestackmultiplierfn 回调函数为传入的 fn，用于覆盖堆叠倍数计算。修改组件内部回调状态。"
+      "effect": "设置堆叠倍数覆盖计算函数 self.overridestackmultiplierfn。"
     },
     {
       "name": "SetForceSpoiledFood",
-      "effect": "若 spoiled 为真，为实体添加 'spoiledfood' 标签并置 self.spoiledfood 为 true；若为假且原先为真，移除标签并置 false。修改实体标签与组件状态。"
+      "effect": "根据参数 spoiled 添加或移除实体的 'spoiledfood' 标签，并设置 self.spoiledfood 标记。"
     },
     {
       "name": "IsSpoiledFood",
-      "effect": "返回 self.spoiledfood 布尔值。无副作用。"
+      "effect": "返回 self.spoiledfood 布尔值，指示是否被强制为腐烂食物。"
     },
     {
       "name": "SetGetHealthFn",
-      "effect": "设置 self.gethealthfn 回调函数为传入的 fn，用于动态计算生命值。修改组件内部回调状态。"
+      "effect": "设置计算生命值的覆盖函数 self.gethealthfn。"
     },
     {
       "name": "SetGetSanityFn",
-      "effect": "设置 self.getsanityfn 回调函数为传入的 fn，用于动态计算理智值。修改组件内部回调状态。"
+      "effect": "设置计算理智值的覆盖函数 self.getsanityfn。"
     },
     {
       "name": "OnEaten",
-      "effect": "调用 self.oneaten 回调（若有）；根据香料调整温度增减与持续时间乘数，若 temperaturedelta 非零且 chill<1 则调用 eater 的 temperature 组件 SetTemperatureInBelly；向实体推送 'oneaten' 事件（带 eater 参数）；若实体有 eatensound 且 eater 有 SoundEmitter 则播放声音。可能间接触发其他系统逻辑。"
+      "effect": "被食用时调用：执行 oneaten 回调，根据香料和温度属性给 eater 的温度组件设置腹部温度，推送 'oneaten' 事件，播放食用音效（若实体有 eatensound 且 eater 有 SoundEmitter）。"
     },
     {
       "name": "HandleEatRemove",
-      "effect": "若实体仍有效，调用 self.handleremovefn（若设置）处理移除；否则若非整堆吃且实体有 stackable 则取一份移除；否则直接移除实体。此函数由 eater 组件内部调用。"
+      "effect": "由 eater 组件内部调用：若实体有效，调用 handleremovefn 或根据 eatwholestack 移除堆叠或整个实体。"
     },
     {
       "name": "GetStackMultiplier",
-      "effect": "若设置了 overridestackmultiplierfn 则调用并返回其结果（或1）；否则若实体有 stackable 则返回堆叠数量；否则返回1。无副作用。"
+      "effect": "返回堆叠倍数：若设置了 overridestackmultiplierfn 则调用之，否则返回实体 stackable 组件的堆叠数量，默认 1。"
     },
     {
       "name": "AddChill",
-      "effect": "若 temperaturedelta > 0 且 self.nochill 不为真，将 self.chill 增加 delta / temperatureduration 并限制在 [0,1]。修改 self.chill 状态。"
+      "effect": "若温度 delta>0 且非 nochill，则按 delta/temperatureduration 增加 self.chill 并限制在 [0,1]。"
     },
     {
       "name": "DiluteChill",
-      "effect": "若条件满足（temperaturedelta>0、self.nochill 不为真、实体有stackable、item有edible组件），根据当前堆叠大小与传入 item 的 chill 重新计算并覆盖 self.chill 为加权平均值。修改 self.chill 状态。"
+      "effect": "若条件满足，根据堆叠数量和传入物品的 chill 稀释当前实体的 chill 值。"
     },
     {
       "name": "OnSave",
-      "effect": "若 self.chill > 0 则返回包含 chill 字段的表，否则返回 nil。无副作用。"
+      "effect": "若 chill>0 则返回包含 chill 的保存表，否则返回 nil。"
     },
     {
       "name": "OnLoad",
-      "effect": "若数据包含 chill 且 temperaturedelta>0 且 self.nochill 不为真，则将 self.chill 设为限制后的数据值。修改 self.chill 状态。"
+      "effect": "从数据加载 chill 值（若温度 delta>0 且非 nochill）。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件移除时调用：移除实体上的 'badfood'、'edible_' 系列标签（包括主副食物类型和 FOODTYPE.BERRY）。"
     }
   ],
   "events_published": [
@@ -110,11 +110,20 @@
       13456,
       15975,
       24540,
-      18572,
-      13261,
-      16419
+      13455,
+      13153,
+      34037
     ],
     "aspects": [
+      {
+        "aspect": "特殊食物食用额外效果描述",
+        "evidence": [
+          {
+            "pageid": 16197,
+            "quote": "一些特殊的食物（例如发光浆果）在食用时会有额外的效果。"
+          }
+        ]
+      },
       {
         "aspect": "食物理智值数值标注",
         "evidence": [
@@ -124,11 +133,7 @@
           },
           {
             "pageid": 13476,
-            "quote": "回血||回饥饿||回理智"
-          },
-          {
-            "pageid": 24540,
-            "quote": "回血||回饥饿||回理智"
+            "quote": "[[炸鱼排]]||40||37.5||5"
           }
         ]
       },
@@ -141,11 +146,7 @@
           },
           {
             "pageid": 13476,
-            "quote": "回血||回饥饿||回理智"
-          },
-          {
-            "pageid": 24540,
-            "quote": "回血||回饥饿||回理智"
+            "quote": "[[炸鱼排]]||40||37.5||5"
           }
         ]
       },
@@ -158,28 +159,7 @@
           },
           {
             "pageid": 13476,
-            "quote": "回血||回饥饿||回理智"
-          },
-          {
-            "pageid": 24540,
-            "quote": "回血||回饥饿||回理智"
-          }
-        ]
-      },
-      {
-        "aspect": "食用特殊效果描述",
-        "evidence": [
-          {
-            "pageid": 16197,
-            "quote": "一些特殊的食物（例如发光浆果）在食用时会有额外的效果。"
-          },
-          {
-            "pageid": 13261,
-            "quote": "食用月亮蘑菇时原地释放催眠孢子云"
-          },
-          {
-            "pageid": 15975,
-            "quote": "其在食用榴莲、海带叶和海带补丁时不会损失生命值"
+            "quote": "[[炸鱼排]]||40||37.5||5"
           }
         ]
       }
@@ -187,17 +167,17 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "食物类型",
-    "回血",
-    "回理智",
+    "食物种类",
+    "生命回复",
+    "理智回复",
     "饥饿值",
     "变质",
     "香料",
-    "体温",
-    "堆叠",
-    "坏食物",
-    "食用"
+    "温度效果",
+    "食用",
+    "变质食物"
   ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 1/9)",
   "gameplay_tags": [
     "生存",
     "食物"
@@ -207,6 +187,6 @@
     "source_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
     "source_bytes": 9322,
     "model": "hy3-free",
-    "generated_at_ms": 1787931498251
+    "generated_at_ms": 1788059907060
   }
 }

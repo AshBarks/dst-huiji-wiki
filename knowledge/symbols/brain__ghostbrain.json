@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/ghostbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "ghostbrain",
+  "summary": "该大脑控制幽灵实体在附近存在存活且可见的角色时，优先跟随目标并保持基于幽灵半径的距离。若没有有效跟随目标，幽灵会自由游荡或等待，随后进入消散状态消失。目标筛选会排除处于limbo或无光环伤害实体，且对幽灵友好角色仅在互相为战斗目标时才跟随。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 生命周期方法以构建行为树，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TARGET_MUST_TAGS",
+    "TARGET_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(inst)",
+        "跟随目标为大脑记录的目标实体(通过函数返回)",
+        "最小允许距离为幽灵半径的0.25倍",
+        "期望保持目标距离为幽灵半径的0.5倍",
+        "最大允许距离为幽灵半径"
+      ],
+      "context": "当 GetFollowTarget 返回不为 nil 时，在 WhileNode 内执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "无跟随目标时，在 ParallelNodeAny 中与等待10秒并行执行，参数全默认即自由游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetFollowTarget(self.inst) ~= nil (存在有效跟随目标)",
+      "semantic": "执行 Follow 行为跟随目标，保持最小/目标/最大距离分别为幽灵半径的0.25/0.5/1倍"
+    },
+    {
+      "condition": "GetFollowTarget(self.inst) == nil (无有效跟随目标)",
+      "semantic": "执行序列：并行等待10秒或自由游荡(Wander)，然后触发消散(dissipate)状态动作"
+    },
+    {
+      "condition": "潜在目标具有 ghostlyfriend 或 abigail 标签",
+      "semantic": "仅当该目标与幽灵互相为战斗目标时才选为跟随目标，否则跳过"
+    },
+    {
+      "condition": "潜在目标无 ghostlyfriend 或 abigail 标签",
+      "semantic": "直接选为跟随目标"
+    }
+  ],
+  "bt_structure": "优先级节点(PriorityNode): 分支1: WhileNode(存在跟随目标) -> Follow 目标保持距离; 分支2: SequenceNode -> ParallelNodeAny(等待10秒 或 Wander自由游荡) 然后 ActionNode 切换至 dissipate 消散状态。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      20426,
+      13857,
+      15225,
+      20428,
+      13761,
+      13823,
+      15539
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及天体英雄、W.A.R.B.I.S.装备、猎犬、暗影傀儡、洞穴蠕虫、独眼巨鹿、弹弓弹药等实体，文本中未出现幽灵半径、目标标签限制、按比例保持跟随距离或自由游荡等brain__ghostbrain组件能力描述，仅含其他实体的独立行为数值，故认为页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "幽灵行为",
+    "幽灵跟随",
+    "幽灵消散",
+    "攻击目标",
+    "跟随距离",
+    "目标选择",
+    "自由游荡",
+    "跟随目标"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "跟随",
+    "游荡",
+    "消散",
+    "亡灵"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c53676cde28d5ebd3752aa2e56474550c2f8a578fc2161b5c334a8425623e311",
+    "source_bytes": 2600,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059160654
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/rockybrain.lua"
+  },
+  "category": "brain",
+  "display_name": "rockybrain",
+  "summary": "该大脑控制石虾（Rocky）在游戏中并行处理受惊吓掉忠诚与举盾防御。面对威胁时触发恐慌逃跑或追击攻击，饥饿时进食或捡拾元素食物，有领导者则跟随，附近有玩家则面向，否则在群体位置附近游荡。",
+  "api": [],
+  "api_note": "RockyBrain 仅重写 Brain 基类的 OnStart 与 OnStop 生命周期回调，未定义其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "epicscare"
+  ],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "WANDER_DIST",
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "DAMAGE_UNTIL_SHIELD",
+    "AVOID_PROJECTILE_ATTACKS",
+    "HIDE_WHEN_SCARED",
+    "SHIELD_TIME",
+    "LOSE_LOYALTY_CHANCE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "UseShield",
+      "args_semantic": [
+        "自身实体",
+        "累计受伤阈值200时举盾",
+        "举盾保持5秒",
+        "启用弹道躲避",
+        "启用被史诗恐惧举盾"
+      ],
+      "context": "并行节点中始终运行"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "最长追逐时间受春天修正(基准20秒)",
+        "放弃距离受春天修正(基准16单位)"
+      ],
+      "context": "无恐慌时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取吃/捡食物动作的函数"
+      ],
+      "context": "无战斗时尝试进食"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "返回领导者的函数",
+        "最小跟随距离4",
+        "目标跟随距离6",
+        "最大跟随距离10"
+      ],
+      "context": "有领导者时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "寻找4内最近玩家函数",
+        "保持6内面向条件函数"
+      ],
+      "context": "无领导者时面向附近玩家"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回herd已知位置的函数",
+        "游荡最大距离16"
+      ],
+      "context": "无其他行为时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag(\"busy\")",
+      "semantic": "EatFoodAction 返回空，不进食不捡拾"
+    },
+    {
+      "condition": "inst.components.inventory:FindItem(可吃)",
+      "semantic": "返回 EAT 缓冲动作"
+    },
+    {
+      "condition": "FindEntity(inst,15,CanPickup,EATFOOD_MUST_TAGS,EATFOOD_CANT_TAGS)",
+      "semantic": "返回 PICKUP 缓冲动作，距离1.5"
+    },
+    {
+      "condition": "GetFaceTargetFn中 target~=nil and not target:HasTag(\"notarget\")",
+      "semantic": "面向最近玩家并保持6内"
+    },
+    {
+      "condition": "epicscare监听触发且ScaredLoseLoyalty延迟到期且概率成功",
+      "semantic": "移除领导者与战斗目标"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25)包含：并行节点(循环掉忠诚+举盾) > 恐慌触发 > 追击攻击(春修) > 进食动作 > 跟随领导 > 面向玩家 > 以herd为家游荡",
+  "wiki": {
+    "scanned_pageids": [
+      15427,
+      15022,
+      72238,
+      34314,
+      15238,
+      34557,
+      72981,
+      13898
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，实体rocky（石虾）的页面15427仅描述生命值、伤害、体型成长及自然生成，未提及追逐、跟随、举盾、进食、面向、游荡等brain行为；其他提及石虾的页面34314、34557仅涉及世界生成数量与虚空面具生成概率，均未讨论rockybrain的能力语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "石虾",
+    "举盾防御",
+    "掉忠诚",
+    "恐慌逃跑",
+    "春天",
+    "追击",
+    "进食",
+    "跟随",
+    "面向玩家",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b32aa9bea16e19a3cfd2b72dfa14e395c1124f31860fa9ce675ebbf07c31c84",
+    "source_bytes": 4303,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060988122
+  }
+}

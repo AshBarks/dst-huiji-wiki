@@ -7,79 +7,80 @@
   },
   "category": "component",
   "display_name": "embarker",
-  "summary": "该组件管理实体登船与离船的目标位置、移动速度及跳跃距离等数据。其核心玩法为控制实体在水上平台与陆地间的移动过渡，包括自动寻路至登船点、物理或传送移动以及取消操作。",
+  "summary": "Embarker 组件管理实体登船与离船的目标位置、移动速度及跳跃状态数据。它参与角色或生物在可行走平台（如船只）与地面之间平滑移动的核心玩法，通过物理马达驱动或直接计算传送完成位移。",
   "api": [
     {
       "name": "UpdateEmbarkingPos",
-      "effect": "计算当前登船/离船目标位置并更新 last_embark_x/z；若剩余距离小于等于本帧移动距离则传送至目标并推送 done_embark_movement 事件；否则若已旅行距离平方超过最大跳跃距离平方则取消并推送事件，否则设置朝向并设定电机速度。"
+      "effect": "根据 dt 计算当前登船/离船目标位置并更新 last_embark_x/z。若剩余距离小于等于本帧可移动距离，则传送实体到目标并推送 done_embark_movement 事件；否则若已移动距离超过最大跳跃距离则调用 Cancel 并推送事件，否则设置实体朝向目标并以 embark_speed 驱动物理马达移动。"
     },
     {
       "name": "SetEmbarkable",
-      "effect": "设置目标 embarkable 实体，更新 last_embark_x/z 为登船位置，强制面向该点，清除 disembark_x/z。"
+      "effect": "设置 self.embarkable 为目标实体，更新 last_embark_x/z 为登船位置，强制实体面朝该点，并清除 disembark_x/z。副作用：修改组件状态并调用 ForceFacePoint。"
     },
     {
       "name": "SetDisembarkPos",
-      "effect": "设置离船坐标，强制面向该点，清除 embarkable 与 last_embark_x/z。"
+      "effect": "设置 disembark_x/z 为指定坐标，强制面朝该点，清除 embarkable 与 last_embark_x/z。副作用：修改状态并调用 ForceFacePoint。"
     },
     {
       "name": "SetDisembarkActionPos",
-      "effect": "调用内部函数 GetDisembarkPosAndDistance 计算离船点并赋值给 disembark_x/z。"
+      "effect": "调用文件内函数 GetDisembarkPosAndDistance 计算离船点，将返回的前两个值设为 disembark_x/z。副作用：仅修改 disembark 坐标，不面朝。"
     },
     {
       "name": "StartMoving",
-      "effect": "若 max_hop_dist_sq 未设置，则停止物理、启动组件更新、计算最大跳跃距离平方与跳跃起点，并推送 start_embark_movement 事件。"
+      "effect": "若 max_hop_dist_sq 未设置，则停止物理，启动组件更新，基于 locomotor 的跳跃距离与速度乘数计算 max_hop_dist_sq（乘1.5后平方），记录 hop_start_pt，并推送 start_embark_movement 事件。副作用：启动更新循环并推送事件。"
     },
     {
       "name": "OnUpdate",
-      "effect": "调用 UpdateEmbarkingPos(dt) 进行每帧更新。"
+      "effect": "组件更新回调，调用 UpdateEmbarkingPos(dt) 推进移动。副作用同 UpdateEmbarkingPos。"
     },
     {
       "name": "HasDestination",
-      "effect": "返回是否存在有效 embarkable 或已设置离船坐标，无副作用。"
+      "effect": "返回布尔值，指示是否存在有效目的地（embarkable 有效或 disembark_x 非 nil）。无副作用。"
     },
     {
       "name": "GetEmbarkPosition",
-      "effect": "返回目标位置 x,z：若有有效 embarkable 则调用其 walkableplatform 组件的 GetEmbarkPosition 方法（传入自身坐标与 self.embarker_min_dist），否则使用 disembark 或 last_embark 或自身位置。"
+      "effect": "返回目标坐标 (x, z)。若 embarkable 有效则调用其 walkableplatform 组件 GetEmbarkPosition（传入自身坐标与 self.embarker_min_dist）获取；否则返回 disembark 或 last_embark 坐标，若均无则返回当前位置。无副作用。"
     },
     {
       "name": "Embark",
-      "effect": "停止物理，直接传送至目标位置，清除所有状态字段，停止组件更新，并调用 locomotor:FinishHopping()。"
+      "effect": "停止物理，直接传送实体到目标登船位置，清除所有状态（embarkable, disembark, last_embark, max_hop_dist_sq, hop_start_pt），停止组件更新并调用 locomotor:FinishHopping()。副作用：立即改变实体位置并结束跳跃状态。"
     },
     {
       "name": "Cancel",
-      "effect": "停止物理，清除所有状态字段，停止组件更新，并调用 locomotor:FinishHopping() 结束跳跃。"
+      "effect": "停止物理，清除所有状态（同 Embark 但无传送），停止组件更新并调用 locomotor:FinishHopping()。无事件推送副作用。"
     }
   ],
   "events_published": [
-    "done_embark_movement",
-    "start_embark_movement"
+    "start_embark_movement",
+    "done_embark_movement"
   ],
   "events_listened": [],
   "netvars": [],
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15239,
-      13857,
-      15237,
-      24762,
-      15915,
-      24364,
-      15246,
-      61235
+      18503,
+      18510,
+      20156,
+      45525,
+      18540,
+      18504,
+      20117,
+      20180
     ],
     "aspects": [],
-    "no_evidence_reason": "提供的页面摘录涉及兔人、猎犬、猪人、蟹卫、伯尼、水獭、蜘蛛、圣殿谜题等实体，内容为其生成、掉落、活动距离、雇佣、攻击等行为，未出现任何与登船(embark)、下船(disembark)、设置可登船、登船位置更新、取消登船等 embarker 组件能力相关的玩家语言描述或数值，故页面根本不讨论该符号的能力。",
+    "no_evidence_reason": "页面摘录均围绕月亮码头布景、女王、码头套装、海盗袭击、火药猴、地皮、码头桩等实体，未出现任何与登船、下船、设置登船位置等 embarker 组件能力或行为相关的描述、数值或策略表达。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "上船移动",
-    "下船位置",
-    "跳船取消",
-    "登船目标",
-    "水域换乘",
-    "平台跳跃",
-    "航行终点"
+    "登船",
+    "离船",
+    "上船",
+    "下船",
+    "跳船",
+    "船只",
+    "位移",
+    "码头"
   ],
   "gameplay_tags": [
     "航行",
@@ -90,6 +91,6 @@
     "source_sha256": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
     "source_bytes": 5385,
     "model": "hy3-free",
-    "generated_at_ms": 1787932660502
+    "generated_at_ms": 1788062106083
   }
 }

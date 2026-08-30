@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wagstaff_npcbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wagstaff_npcbrain",
+  "summary": "该大脑控制瓦格斯塔夫NPC在不同情境下的行为：当处于竞技场时执行复杂竞技场任务（行走、说话、实验、放置笼子）；当有垃圾场或机器线索位置时走向目标并淡出；当处于狩猎阶段时走向线索或站立嘀咕；当玩家尝试交易时面对玩家并说话；其他情况站立不动。",
+  "api": [],
+  "api_note": "该大脑类仅重写 OnStart 以构建行为树，未定义任何额外的对外方法，所有逻辑通过本地函数与引入的 behaviour 节点实现。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "TRADE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取竞技场动作的函数 DoArenaActions",
+        "节点调试名称 'Arena Actions'",
+        "以跑动方式执行动作"
+      ],
+      "context": "实体 prefab 为 wagstaff_npc_wagpunk_arena 时（in_arena 分支）"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "wagstaff 实体实例",
+        "无启动条件函数（无条件进入站立）",
+        "无保持条件函数（无限期保持停止移动）"
+      ],
+      "context": "各优先级分支的 fallback 及子节点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取走向垃圾场动作的函数 ShouldGoToJunkYard",
+        "节点调试名称 'Go to junkyard'",
+        "以跑动方式执行动作"
+      ],
+      "context": "knownlocations 存在 'junk' 时（in_junk 分支）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取走向机器动作的函数 ShouldGoToMachine",
+        "节点调试名称 'Go to machine'",
+        "以跑动方式执行动作"
+      ],
+      "context": "knownlocations 存在 'machine' 时（in_hint 分支）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取走向线索动作的函数 ShouldGoToClue",
+        "节点调试名称 'Go to clue'",
+        "以跑动方式执行动作"
+      ],
+      "context": "hunt_stage 为 'hunt' 且 knownlocations 存在 'clue' 时（in_hunt 分支）"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "wagstaff 实体",
+        "聊天字符串键 'WAGSTAFF_NPC_MUMBLE_1'",
+        "子行为 StandStill 节点（站立时周期聊天）"
+      ],
+      "context": "hunt 阶段且实体不忙碌时（looking around WhileNode）"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "wagstaff 实体",
+        "聊天字符串键 'WAGSTAFF_NPC_ATTEMPT_TRADE'",
+        "子行为 FaceEntity 节点（面对交易者时周期聊天）"
+      ],
+      "context": "根节点中默认交易尝试分支"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "wagstaff 实体",
+        "获取尝试交易玩家的函数 GetTraderFn",
+        "保持面对交易者的函数 KeepTraderFn"
+      ],
+      "context": "作为上述 ChattyNode 的子节点，用于面对交易者"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.prefab == 'wagstaff_npc_wagpunk_arena'",
+      "semantic": "执行 DoArenaActions 定义的竞技场动作（走向指定位置、说话、实验、放置 gestalt 笼等），无动作时站立"
+    },
+    {
+      "condition": "self.inst.components.knownlocations:GetLocation('junk') 存在",
+      "semantic": "走向垃圾场位置并延迟淡出，否则站立"
+    },
+    {
+      "condition": "self.inst.components.knownlocations:GetLocation('machine') 存在",
+      "semantic": "走向机器位置并延迟淡出，否则站立"
+    },
+    {
+      "condition": "self.inst.hunt_stage == 'hunt'",
+      "semantic": "若有线索位置则跑向线索；否则若非忙碌则站立并周期嘀咕；否则站立"
+    },
+    {
+      "condition": "GetTraderFn 返回非 nil（有玩家尝试交易）",
+      "semantic": "面对交易者并周期说尝试交易台词"
+    },
+    {
+      "condition": "默认（上述均不满足）",
+      "semantic": "站立不动"
+    }
+  ],
+  "bt_structure": "根优先级节点按序检查：1) 竞技场 Wagstaff 分支（执行竞技场动作或站立）；2) 垃圾提示分支（走向垃圾或站立）；3) 机器提示分支（走向机器或站立）；4) 狩猎分支（走向线索或嘀咕站立或站立）；5) 面对交易者聊天分支；6) 默认站立。各分支内部优先执行对应 DoAction，失败则 StandStill。",
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      20287,
+      46847,
+      51949,
+      51494,
+      10418,
+      51498,
+      16118
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，仅页面51498涉及与brain关联的实体wagstaff_npc_wagpunk_arena，但文本仅描述任务流程、生成与失踪，未提及任何大脑控制行为（如游荡距离、交易距离、走向垃圾场/机器/线索、站立聊天、面对交易者等）；其余页面讨论其他实体（战争瓦器人、动物足迹、天体后裔、竞技场、瓦格斯塔夫工具、WX78、药剂），未涉及该符号能力。故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "瓦格斯塔夫",
+    "竞技场",
+    "尝试交易",
+    "站立不动",
+    "行为逻辑",
+    "机器线索",
+    "嘀咕",
+    "淡出",
+    "实验",
+    "狩猎"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "任务",
+    "实验",
+    "交易",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "eb1394a1bcf8a9b27f3bcbb8000b828b55f2d917d502fd82142c122850feee04",
+    "source_bytes": 12718,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061809029
+  }
+}

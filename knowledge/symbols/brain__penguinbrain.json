@@ -1,0 +1,227 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/penguinbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "penguinbrain",
+  "summary": "该大脑控制企鹅在玩家靠近蛋时偷取或捡起企鹅蛋，非变异企鹅会逃离带'scarytoprey'标签的威胁。在栖息地时，企鹅会下蛋、捡蛋保暖并围绕蛋有限游荡；有战斗目标时追击攻击，平时觅食、跟随领袖或随机游荡，最终站立。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义其他可供外部调用的独立方法。",
+  "events_published": [
+    "flyaway"
+  ],
+  "events_listened": [
+    "gohome"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "MAX_EGGS",
+    "STOP_RUN_DIST",
+    "SEE_PLAYER_DIST",
+    "SEE_FOOD_DIST",
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "WANDER_DIST_NIGHT",
+    "WANDER_DIST_DAY",
+    "TOOCLOSE",
+    "MIN_TIME_TILL_NEXT_DROP",
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取偷蛋动作的函数 StealAction",
+        "节点调试名'PickUp Egg Action'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "优先级节点中紧随恐慌触发之后，总是尝试执行"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离带'scarytoprey'标签的猎人",
+        "发现距离 SEE_PLAYER_DIST(2.5)",
+        "安全距离 STOP_RUN_DIST(4)",
+        "额外逃跑条件函数 ShouldRunAway",
+        "不跑回家(false)"
+      ],
+      "context": "当实体没有'mutated_penguin'标签时(非变异企鹅)"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 MAX_CHASE_TIME(10)秒",
+        "放弃距离 MAX_CHASE_DIST(15)",
+        "最多攻击15次"
+      ],
+      "context": "当 ShouldAttack 为真(有战斗目标且在追击距离内)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作的函数 EatFoodAction",
+        "节点调试名'Eating Food Action'",
+        "行走执行(false)"
+      ],
+      "context": "无额外条件，总是尝试进食"
+    },
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "无额外条件"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回锚点函数 GetMigrateLeashPos(无队长或战斗目标时返回rookery/home)",
+        "最大拴绳距离 LEASH_MAX_DIST(10)",
+        "内部返回距离 LEASH_RETURN_DIST(5)"
+      ],
+      "context": "无额外条件，用于迁徙回栖息地"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取下蛋动作的函数 LayEggAction",
+        "节点调试名'Laying Egg Action'",
+        "行走执行(false)"
+      ],
+      "context": "当在栖息地、非夜晚、非下蛋中且无队长时(WhileNode)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取捡蛋动作的函数 PickUpEggAction",
+        "节点调试名'Pickup Egg'",
+        "行走执行(false)"
+      ],
+      "context": "当在栖息地、无队长、未持蛋且(冬冷或准备夜)时(WhileNode)"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置函数(返回myegg/rookery/herd)",
+        "最大游荡距离函数 GetWanderDistFn(返回2/3/5)"
+      ],
+      "context": "当 HerdAtRookery 且无队长时(WhileNode)"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "获取领导者函数(返回follower领袖)",
+        "最小跟随距离 MIN_FOLLOW_DIST(1)",
+        "目标跟随距离 TARGET_FOLLOW_DIST(1)",
+        "最大跟随距离 MAX_FOLLOW_DIST(5)"
+      ],
+      "context": "无额外条件，尝试跟随领袖"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置(蛋/rookery/herd/自身坐标)",
+        "最大游荡距离 MAX_WANDER_DIST(5)"
+      ],
+      "context": "无额外条件，默认游荡"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "无额外条件，最终站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "HasStateTag('flight')",
+      "semantic": "执行飞走事件(FlyAway)动作节点"
+    },
+    {
+      "condition": "Not HasTag('mutated_penguin')",
+      "semantic": "仅非变异企鹅执行 RunAway 逃离 scarytoprey 目标"
+    },
+    {
+      "condition": "ShouldAttack (有战斗目标且在 MAX_CHASE_DIST 内)",
+      "semantic": "执行 ChaseAndAttack 追击攻击"
+    },
+    {
+      "condition": "AtRookery 且非夜晚且无队长且非下蛋中",
+      "semantic": "执行 LayEggAction 下蛋"
+    },
+    {
+      "condition": "AtRookery 且无队长且未持蛋且(冬温<=-10或准备夜)",
+      "semantic": "执行 PickUpEggAction 捡蛋保暖"
+    },
+    {
+      "condition": "HerdAtRookery 且无队长",
+      "semantic": "以蛋/栖息地为中心受限游荡(Wander with GetWanderDistFn)"
+    },
+    {
+      "condition": "EventNode 'gohome'",
+      "semantic": "监听回家事件后执行飞走动作"
+    }
+  ],
+  "bt_structure": "优先级节点树：飞行状态 > 恐慌触发 > 电击围栏恐慌 > 偷蛋动作 > 非变异企鹅逃离 > 攻击判定 > 回家事件 > 进食 > 攻击墙 > 迁徙拴绳 > 下蛋 > 捡蛋 > 无队长游荡 > 跟随领袖 > 默认游荡 > 站立",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      72238,
+      13828,
+      15551,
+      15651,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录（15022,13897,51046,72238,13828,15551,15651,15225）均描述天体英雄、克劳斯、战争瓦器人、附身底盘、暗影生物、蜂王、龙蝇、暗影傀儡等实体，文本中无任何企鹅（penguin）相关的偷蛋、下蛋、捡蛋、跟随领袖、逃离猎人、迁徙回栖息地等行为或对应距离数值与节点描述，故页面根本不讨论 brain__penguinbrain 的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "企鹅",
+    "偷蛋",
+    "下蛋",
+    "逃离",
+    "攻击",
+    "游荡",
+    "跟随",
+    "领袖",
+    "进食行为",
+    "站立不动"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 1/10)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "繁殖"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "feb44fb386f9ce756f60acbf08515d7daf8260c3da2fcc0188027c5dcc6d0d35",
+    "source_bytes": 17978,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060559046
+  }
+}

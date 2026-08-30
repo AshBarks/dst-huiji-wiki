@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/grassgatorbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "grassgatorbrain",
+  "summary": "该大脑控制草鳄鱼在非潜水状态下的行为决策。实体会优先响应恐慌与电击栅栏，随后追击攻击目标，或逃离角色标签实体并短暂面对，无威胁时以家或自由点游荡。",
+  "api": [],
+  "api_note": "该大脑类仅实现 OnStart 以组装行为树，未定义其他对外方法，所有逻辑依赖引入的 behaviours 与 BrainCommon。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "WANDER_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "HUNTER_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 6 秒"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "逃离带 character 标签且非 notarget 标签的实体",
+        "察觉距离 8",
+        "安全距离 14"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取 10 距离内非 notarget 玩家（非寻盐时）",
+        "保持面对需计时器存在且 12 距离内",
+        "超时 0.5 秒"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取 10 距离内非 notarget 玩家（非寻盐时）",
+        "保持面对需计时器存在且 12 距离内"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "游荡中心为不在陆地时的 home 位置（否则自由）",
+        "最大游荡距离 SHADE_CANOPY_RANGE-2"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.sg:HasStateTag(\"diving\") 为假",
+      "semantic": "执行内部优先级节点：恐慌触发、电击栅栏恐慌、追击攻击、序列(逃跑+面对)、面对、游荡"
+    },
+    {
+      "condition": "BrainCommon.ShouldSeekSalt(inst) 为真",
+      "semantic": "GetFaceTargetFn 返回 nil 且 KeepFaceTargetFn 返回 false，实体不寻找/保持面对玩家"
+    },
+    {
+      "condition": "实体不在陆地 (isonland 返回假)",
+      "semantic": "Wander 的 homelocation 返回 knownlocations 的 home 点，否则返回 nil 自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25) -> WhileNode(非潜水状态) 内优先级节点(0.25)：依次尝试 BrainCommon.PanicTrigger、BrainCommon.ElectricFencePanicTrigger、ChaseAndAttack(6)、Sequence(RunAway(8,14)+FaceEntity(0.5))、FaceEntity、Wander(SHADE_CANOPY_RANGE-2)",
+  "wiki": {
+    "scanned_pageids": [
+      15258,
+      15022,
+      13897,
+      51046,
+      13828,
+      15551,
+      15651,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "游荡中心与最大距离标注",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "在白天和黄昏，草鳄鱼会在距离自己大树干 26 距离单位的范围（树荫半径减二）内游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "逃离角色察觉与安全距离描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "角色继续靠近到距离小于 8 单位，向反方向逃跑直到距离拉开到 14 单位"
+          }
+        ]
+      },
+      {
+        "aspect": "面对玩家停止警觉距离描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "角色（非notarget）进入草鳄鱼 10 单位内时停止移动并警觉，直到离开其 12 距离单位"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "草鳄鱼",
+    "游荡",
+    "攻击",
+    "逃跑",
+    "面对",
+    "陆地",
+    "恐慌",
+    "电击栅栏"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2e7f4ef42e49051e63ab6cfd92534c23d2a1096707fd2898294adf736e5632f6",
+    "source_bytes": 2342,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059287220
+  }
+}

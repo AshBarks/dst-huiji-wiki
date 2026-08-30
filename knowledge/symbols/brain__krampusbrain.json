@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/krampusbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "krampusbrain",
+  "summary": "坎普斯大脑让实体在生成后针对特定玩家进行活动。它会优先追击攻击玩家，随后周期性地偷取地面物品或砸开箱子，当背包物品达到随机贪婪数量且未忙碌时离开。平时会跟随目标玩家并在其附近游荡，玩家过于靠近时则逃离。",
+  "api": [
+    {
+      "name": "SetTarget",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "TOOCLOSE",
+    "STEAL_MUST_TAGS",
+    "STEAL_CANT_TAGS",
+    "EMPTYCHEST_MUST_TAGS",
+    "MIN_FOLLOW",
+    "MAX_FOLLOW",
+    "MED_FOLLOW",
+    "MIN_RUNAWAY",
+    "MAX_RUNAWAY"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取偷窃动作的函数",
+        "节点调试名称“steal”",
+        "以跑动方式执行动作"
+      ],
+      "context": "尝试偷取地面上的可拾取物品"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取砸箱动作的函数",
+        "节点调试名称“emptychest”",
+        "以跑动方式执行动作"
+      ],
+      "context": "尝试砸开非空宝藏箱"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 100 秒"
+      ],
+      "context": "攻击玩家"
+    },
+    {
+      "ctor": "MinPeriod",
+      "args_semantic": [
+        "实体自身",
+        "子节点两次成功最小间隔 10 秒",
+        "跳过初始等待周期（首次直接执行）",
+        "被限制频率的子节点（偷窃优先节点）"
+      ],
+      "context": "周期性执行偷窃节点"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁来源标签“player”",
+        "发现猎人距离半径 8",
+        "脱离危险安全距离 15"
+      ],
+      "context": "玩家靠近时逃离"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回跟随目标（mytarget）的函数",
+        "最小允许距离 10",
+        "期望保持距离 15",
+        "最大允许距离 20"
+      ],
+      "context": "跟随生成时指定的玩家"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置（目标玩家位置）的函数",
+        "离家最大距离 20"
+      ],
+      "context": "无明确指令时围绕玩家游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "背包物品数 >= 贪婪值 且 实体不在忙碌状态标签",
+      "semantic": "执行离开状态（exit）并判定成功，优先于后续偷窃与跟随游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点：恐慌触发 > 电栅栏恐慌触发 > 追击攻击玩家 > 若物品达贪婪且非忙碌则离开 > 每10秒优先偷物或砸箱 > 逃离玩家 > 跟随目标 > 围绕目标游荡",
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      15399,
+      18721,
+      13897,
+      15022,
+      17817,
+      15238,
+      70704
+    ],
+    "aspects": [
+      {
+        "aspect": "偷窃动作行为体现",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "偷走地面上的绝大部分物品（不包括背包）"
+          }
+        ]
+      },
+      {
+        "aspect": "地面物品偷取描述",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "偷走地面上的绝大部分物品（不包括背包）"
+          }
+        ]
+      },
+      {
+        "aspect": "普通宝箱砸毁限制",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "只能摧毁普通宝箱，不能摧毁任何其它能存放物品的建筑"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家靠近逃离描述",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "接近坎普斯时，它会快速远离玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "砸箱动作行为体现",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "也可以摧毁箱子并偷走掉落的物品"
+          }
+        ]
+      },
+      {
+        "aspect": "禁偷物品类型列举",
+        "evidence": [
+          {
+            "pageid": 15399,
+            "quote": "不会偷走露西斧、薇洛的打火机以及独特物品等"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "坎普斯",
+    "偷物品",
+    "砸箱子",
+    "追击玩家",
+    "逃离玩家",
+    "跟随玩家",
+    "游荡",
+    "贪婪",
+    "离开"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "偷窃",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c935e6725ac7313c397e0b28ca64d420f357423b8a28ffda9b61b5a9900f43df",
+    "source_bytes": 3970,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059652180
+  }
+}

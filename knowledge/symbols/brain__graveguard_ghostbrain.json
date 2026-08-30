@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/graveguard_ghostbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "graveguard_ghostbrain",
+  "summary": "该大脑控制墓卫幽灵（GraveGuard ghost）的决策行为。当检测到有效的活体跟随目标时，幽灵会保持距离跟随；若被请求消散则立刻消散；若找到其他幽灵玩伴则等待后互动玩耍；否则以家为中心游荡直至一天结束消散。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法，逻辑通过内部函数和闭包实现。",
+  "events_published": [
+    "start_playwithghost"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "PLAYFUL_OFFSET",
+    "PLAYMATE_NO_TAGS",
+    "PLAYMATE_ONEOF_TAGS",
+    "TARGET_CANT_TAGS",
+    "TARGET_ONEOF_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回跟随目标的函数",
+        "最小允许距离为幽灵半径的0.25倍",
+        "期望保持距离为幽灵半径的0.5倍",
+        "最大允许距离为幽灵半径"
+      ],
+      "context": "当 GetFollowTarget 返回非空时由 WhileNode 触发"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置的函数",
+        "离家最大距离7"
+      ],
+      "context": "默认分支中与等待一天节点并行"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回玩耍目标相邻1单位位置的函数",
+        "最小距离2",
+        "最大距离2"
+      ],
+      "context": "找到玩伴时优先尝试靠近"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "调用 PlayWithPlaymate 函数发起玩耍事件的动作"
+      ],
+      "context": "玩耍分支中优先级次于 Leash"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "触发实体进入消散状态的动作函数"
+      ],
+      "context": "当 _despawn_queued 为真或一天结束"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待6秒"
+      ],
+      "context": "找到玩伴后等待再进入玩耍优先级"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待一整天时间"
+      ],
+      "context": "默认游荡分支中并行等待"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "玩耍分支中兜底静止"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "GetFollowTarget(self.inst) ~= nil",
+      "semantic": "实体跟随返回的目标，保持幽灵半径0.25~1倍距离"
+    },
+    {
+      "condition": "self.inst._despawn_queued 为真",
+      "semantic": "实体立即进入消散状态"
+    },
+    {
+      "condition": "FindPlaymate(self) 返回真",
+      "semantic": "实体等待6秒后，尝试用 Leash 靠近玩伴至偏移2，否则触发玩耍事件或静止"
+    },
+    {
+      "condition": "上述均不满足（默认）",
+      "semantic": "实体以家为中心半径7游荡，同时等待一整天，时间到则消散"
+    }
+  ],
+  "bt_structure": "优先级节点：1.若跟随目标存在则跟随；2.若标记_despawn_queued则消散；3.若找到玩伴则等待后玩耍/靠近；4.否则并行游荡与等待一天，结束后消散。",
+  "wiki": {
+    "scanned_pageids": [
+      15560,
+      34557,
+      13556,
+      13828,
+      15237,
+      15408
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为穴居猴、虚空面具、阿比盖尔、暗影棋子、猪人、小海象，文本中无幽灵半径、玩耍玩伴标签、消散状态、跟随距离比例、游荡离家最大7单位、等待一整天等对应描述，未体现brain__graveguard_ghostbrain任何能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "跟随生物",
+    "跟随目标",
+    "保持距离",
+    "请求消散",
+    "幽灵玩耍",
+    "家园游荡",
+    "决策行为",
+    "立刻消散"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9daf4b4e6161f542578bc5b1a2129834b6a65030af6ea318bf8e1639c16474ab",
+    "source_bytes": 4681,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059349212
+  }
+}

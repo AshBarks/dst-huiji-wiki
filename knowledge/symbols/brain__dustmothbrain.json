@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/dustmothbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "dustmothbrain",
+  "summary": "尘埃蛾大脑在检测到恐慌或电篱时优先逃跑。当物品栏空时逃离 scarytoprey 标签威胁，平时也逃离非玩家威胁；卡住时会强制短暂游荡脱困。平时依次尝试修复巢穴、吃食物、清理灰尘，否则在家附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他对外方法，动作逻辑通过本地函数与 BrainCommon 模块实现。",
+  "events_published": [
+    "dustmothsearch"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_FOOD_DIST",
+    "SEE_THREAT_DIST",
+    "STOP_RUN_DIST",
+    "EAT_FOOD_DIST",
+    "DUSTOFF_DIST",
+    "STUCK_MAX_TIME",
+    "UNSTUCK_WANDER_DURATION",
+    "SEARCH_ANIM_CHANCE",
+    "NOTAGS",
+    "HUNTERPARAMS_NOPLAYER"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃离标签为 scarytoprey 的实体",
+        "发现威胁距离 3.5",
+        "脱离危险安全距离 6"
+      ],
+      "context": "当物品栏第一格为空时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃离带 scarytoprey 标签且非玩家非 NOCLICK 的实体（HUNTERPARAMS_NOPLAYER）",
+        "发现威胁距离 3.5",
+        "脱离危险安全距离 6"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "以实体当前位置为家中心",
+        "最大游荡距离 10"
+      ],
+      "context": "当强制脱困游荡标志开启时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取修复巢穴动作的函数 RepairDenAction",
+        "节点调试名 RepairDen"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取吃食物动作的函数 EatFoodAction",
+        "节点调试名 EatFood"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取清理灰尘动作的函数 DustOffAction",
+        "节点调试名 DustOff"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "以已知位置 home 为家中心",
+        "最大游荡距离 40"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "物品栏第一格为空 (inventory:GetItemInSlot(1) == nil)",
+      "semantic": "执行逃离 scarytoprey 标签威胁（SEE_THREAT_DIST=3.5, STOP_RUN_DIST=6）"
+    },
+    {
+      "condition": "存在缓冲动作且卡住时间 >= STUCK_MAX_TIME(6) 且未处于忙碌状态",
+      "semantic": "清除缓冲动作并重置卡住计时，开启强制脱困游荡标志，定时关闭"
+    },
+    {
+      "condition": "强制脱困游荡标志 _force_unstuck_wander 为真",
+      "semantic": "以当前位置为中心半径10短暂游荡（UNSTUCK_WANDER_DURATION=4秒）"
+    }
+  ],
+  "bt_structure": "优先级节点树：先处理恐慌触发与电篱恐慌；接着若空手则逃离scarytoprey威胁，否则持续逃离非玩家威胁；然后检测卡住并强制脱困游荡；之后依次尝试修复巢穴、吃食物、清灰；默认在家附近半径40游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      45173,
+      61065,
+      13897,
+      13901,
+      15239,
+      51046,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及 stalker_atrium、巨兽恐慌、vault_torch、klaus、perd、bunnyman、wagboss_robot、mushroombomb_dark 等实体或机制，全文未出现 dustmoth（尘埃蛾）或其 brain 组件特有的修复巢穴、清理灰尘、发现威胁距离3.5、脱离安全距离6、游荡距离10/40 等行为描述；仅 perd 等有其他生物的觅食与受惊逃跑距离但参数不符且非该符号能力，故认为页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "尘埃蛾",
+    "尘蛾脑",
+    "逃跑",
+    "吃食物",
+    "修巢",
+    "清灰",
+    "卡住",
+    "游荡",
+    "恐慌"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98723e9b139970d603fbe11423ad7f18507b07c6658a5890ad155195d219f6c7",
+    "source_bytes": 4598,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058932035
+  }
+}

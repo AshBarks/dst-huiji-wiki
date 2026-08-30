@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wormwood_lightflierbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wormwood_lightflierbrain",
+  "summary": "该大脑控制沃特的发光飞虫（LightFlier）的行为。平时将移动直接驱动关闭并由外部来源更新移动，但在收到恐慌事件、生命值低或靠近电栅栏时会触发恐慌逃跑行为。恐慌时并行执行 Panic 行为并等待 6 秒，同时始终设置其行走速度。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义任何额外的对外方法，所有逻辑封装在行为树节点中。",
+  "events_published": [],
+  "events_listened": [
+    "panic"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "收到 panic 事件时"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待 6 秒"
+      ],
+      "context": "与 Panic 并行执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "事件 \"panic\"",
+      "semantic": "并行执行 Panic(self.inst) 与 WaitNode(6)"
+    },
+    {
+      "condition": "BrainCommon.PanicTrigger 触发",
+      "semantic": "触发恐慌行为（具体条件在 BrainCommon 中）"
+    },
+    {
+      "condition": "BrainCommon.ElectricFencePanicTrigger 触发",
+      "semantic": "触发恐慌行为（靠近电栅栏）"
+    },
+    {
+      "condition": "默认（前述均未触发）",
+      "semantic": "执行 ActionNode 将 locomotor.directdrive 设为 true，移动交由外部更新"
+    }
+  ],
+  "bt_structure": "根优先级节点(.25)包含并行节点：始终执行的ActionNode（设置行走速度与非直接驱动）与次级优先级节点(.25)。次级优先级节点依次为：监听panic事件的节点（并行Panic与等待6秒）、PanicTrigger、ElectricFencePanicTrigger、默认ActionNode（设直接驱动为真）。",
+  "wiki": {
+    "scanned_pageids": [
+      13268,
+      15975,
+      18234,
+      15415,
+      24881,
+      24875,
+      51287,
+      24748
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录关联的实体均为沃特(Wurt)及鱼人相关，未提及沃姆伍德(Wormwood)或发光飞虫(lightflier)，文本中无 brain__wormwood_lightflierbrain 的 Panic 或 WaitNode 行为表达，故不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发光飞虫",
+    "移动速度",
+    "恐慌",
+    "逃跑",
+    "自动移动",
+    "电围栏",
+    "外部移动",
+    "沃特"
+  ],
+  "search_terms_note": "pass1 后零命中 5/7,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ea484c361c4229693c5fa9a003cfaf319a755bceb2cca69fb61311ccab304f30",
+    "source_bytes": 1194,
+    "model": "hy3-free",
+    "generated_at_ms": 1788062103119
+  }
+}

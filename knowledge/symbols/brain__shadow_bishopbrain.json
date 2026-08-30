@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadow_bishopbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadow_bishopbrain",
+  "summary": "该大脑控制暗影主教实体在满足条件时追击攻击玩家，否则面对目标并循环嘲讽，同时自由游荡并在设定时间后消失。行为由优先级节点树调度，优先处理战斗追击。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，构造函数与 OnStart 均为游戏框架回调，无显式对外调用方法。",
+  "events_published": [
+    "despawn"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长无限制（nil）",
+        "放弃距离 40 世界单位"
+      ],
+      "context": "WhileNode 条件 ShouldChase 为真时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标函数：战斗目标或8范围内最近玩家且非notarget",
+        "保持目标函数：目标存活非幽灵非notarget且在15范围内"
+      ],
+      "context": "并行节点中与循环嘲讽同时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置限制（自由游荡）"
+      ],
+      "context": "并行节点中与消失计时同时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldChase(self) 返回真（无目标/不在冷却/目标超出攻击范围+3）",
+      "semantic": "执行 ChaseAndAttack 追击攻击，放弃距离40"
+    },
+    {
+      "condition": "ShouldChase(self) 返回假",
+      "semantic": "并行面对实体与循环嘲讽，并并行等待消失与自由游荡"
+    }
+  ],
+  "bt_structure": "优先级节点：1) WhileNode(ShouldChase) 内 ChaseAndAttack；2) ParallelNode(FaceEntity + LoopNode(Wait3+Action taunt))；3) ParallelNode(SequenceNode(Wait despawn_time+Action despawn) + Wander)。",
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      15022,
+      23956,
+      23957,
+      13260,
+      28179,
+      34003,
+      15915
+    ],
+    "aspects": [
+      {
+        "aspect": "15单位内仇恨目标转换描述",
+        "evidence": [
+          {
+            "pageid": 13828,
+            "quote": "若玩家接近暗影棋子至 15 单位范围内，暗影棋子也会在短暂延迟后将仇恨目标转为玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "自由游荡与消失计时描述",
+        "evidence": [
+          {
+            "pageid": 13828,
+            "quote": "三种暗影棋子在没有目标时会随机游荡，持续无目标或脱离加载范围 30 秒后就会消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "暗影主教",
+    "自由游荡",
+    "攻击距离",
+    "追击玩家",
+    "面向玩家",
+    "嘲讽",
+    "消失"
+  ],
+  "search_terms_note": "pass1 后零命中 4/7,已二次修正(修正后 0/7)",
+  "gameplay_tags": [
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "068ebcb0badb1e0c3f911d27665556b7b5c4378ba285c994f11fcfc2ecf4885c",
+    "source_bytes": 2070,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061074184
+  }
+}

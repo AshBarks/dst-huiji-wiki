@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/minotaurbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "minotaurbrain",
+  "summary": "该大脑控制牛头人（Minotaur）在战斗中根据血量、距离和周围柱子环境，选择跳跃攻击、冲撞攻击或普通追逐攻击。当脱离战斗或离家园过远时，它会返回家园；无目标时它会注视附近玩家或保持站立。若处于跳跃攻击状态则优先完成该动作。",
+  "api": [],
+  "api_note": "该大脑仅重写基类的 OnStart 方法以构建行为树，未定义其他对外公开方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "GO_HOME_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHARGE_DIST",
+    "CHASE_GIVEUP_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "MAX_JUMP_ATTACK_RANGE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取跳跃攻击动作的函数",
+        "节点调试名称'jump'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "shouldjumpattack条件满足时（低血量且目标在范围内无遮挡）"
+    },
+    {
+      "ctor": "ChaseAndRam",
+      "args_semantic": [
+        "实体自身",
+        "最大追逐时间5秒",
+        "放弃距离阈值10",
+        "最大冲锋距离25"
+      ],
+      "context": "shouldramattack条件满足时（有目标且不在柱子旁等）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长3秒",
+        "放弃距离30",
+        "最大攻击次数nil",
+        "战斗目标nil",
+        "以跑动方式执行(true)"
+      ],
+      "context": "默认战斗行为，无特殊条件"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "战斗目标存在且攻击冷却中（Rest节点）"
+    },
+    {
+      "ctor": "PanicTrigger",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "BrainCommon.PanicTrigger提供的恐慌触发节点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数",
+        "节点调试名称'Go Home'",
+        "以行走方式执行(false)"
+      ],
+      "context": "ShouldGoHome条件满足时（离家园过远或无目标远离）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取注视目标函数",
+        "保持注视目标函数"
+      ],
+      "context": "无目标注视阶段"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "最终默认站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag('leapattack')",
+      "semantic": "外层优先节点，确保不在跳跃攻击状态时执行内部行为树"
+    },
+    {
+      "condition": "shouldjumpattack(inst)",
+      "semantic": "血量低于60%且目标在跳跃范围内、无柱子遮挡时，执行跳跃攻击动作"
+    },
+    {
+      "condition": "shouldramattack(inst)",
+      "semantic": "有战斗目标且未近身已冲撞、不在跳跃状态、不靠近柱子时，执行冲撞追逐攻击"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown()",
+      "semantic": "有战斗目标且攻击冷却中时，站立不动等待冷却"
+    },
+    {
+      "condition": "ShouldGoHome(inst)",
+      "semantic": "离家园距离平方大于GO_HOME_DIST平方或无目标且远离时，执行回家行走动作"
+    }
+  ],
+  "bt_structure": "根优先节点(条件:非跳跃攻击状态)包含内部优先级节点：1)若应跳跃攻击则执行跳跃动作；2)若应冲撞攻击则冲撞追逐；3)默认追逐攻击(3秒,跑动)；4)若战斗目标存在且冷却则站立；5)恐慌触发；6)若应回家则回家动作；7)注视附近玩家；8)默认站立。",
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13493,
+      15530,
+      13260,
+      13437,
+      13455,
+      13933,
+      13857
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为猪人、寄居蟹隐士、蜘蛛战士、沃拓克斯、沃尔特、沃比、一角鲸、猎犬等，全文未提及 brain__minotaurbrain 或牛头人相关实体及其行为，无代码能力清单中的表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "牛头人",
+    "跳跃攻击",
+    "冲撞攻击",
+    "回家",
+    "注视玩家",
+    "站立",
+    "战斗冷却",
+    "恐慌触发"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8eaef263e1758971dda545b7685203e823736ee3049da245815709e03029c901",
+    "source_bytes": 5813,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060176038
+  }
+}

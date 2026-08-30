@@ -1,0 +1,292 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadowwaxwellbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadowwaxwellbrain",
+  "summary": "该大脑控制麦斯威尔的影子分身（工人、保护者及旧版分身），在领导者存在时根据 prefab 执行对应行为。它们会参与领导者的跳舞派对与小游戏观看，躲避爆炸物和怪物危险，工人持续工作并拾取物品，保护者追击攻击，旧版分身则砍挖矿或战斗并跟随。当领导者远离生成点过久或闲置超时，分身会寻求消散。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义其他供外部调用的业务方法。",
+  "events_published": [
+    "dance",
+    "seekoblivion"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "KEEP_WORKING_DIST",
+    "SEE_WORK_DIST",
+    "KEEP_DANCING_DIST",
+    "KITING_DIST",
+    "STOP_KITING_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "AVOID_EXPLOSIVE_DIST",
+    "DIG_TAGS",
+    "TOWORK_CANT_TAGS",
+    "ANY_TOWORK_MUSTONE_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回生成点(spawn)的函数",
+        "最大游荡距离(随分支为min(6,半径))",
+        "无",
+        "无",
+        "无",
+        "无",
+        "配置表:不奔跑(should_run=false),游荡半径4(wander_dist=4)"
+      ],
+      "context": "空闲游荡(CreateWanderer)"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "返回观看的小游戏的函数",
+        "最小距离函数(小游戏watchdist_min)",
+        "目标距离函数(小游戏watchdist_target)",
+        "最大距离函数(小游戏watchdist_max)"
+      ],
+      "context": "观看小游戏时跟随"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "标签'minigame_participator'",
+        "发现距离5",
+        "安全距离7"
+      ],
+      "context": "观看小游戏节点内逃离参与者"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取小游戏函数",
+        "保持小游戏函数"
+      ],
+      "context": "观看小游戏时面对"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "带过滤函数(ShouldAvoidExplosive)的爆炸物标签表",
+        "发现距离5(AVOID_EXPLOSIVE_DIST)",
+        "安全距离5(AVOID_EXPLOSIVE_DIST)"
+      ],
+      "context": "避免爆炸物"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "带过滤函数(ShouldRunAway)的怪物/敌对标签表",
+        "发现距离5(RUN_AWAY_DIST)",
+        "安全距离8(STOP_RUN_AWAY_DIST)"
+      ],
+      "context": "逃离危险怪物"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取附近玩家函数(GetFaceTargetFn)",
+        "保持面对玩家函数(KeepFaceTargetFn)"
+      ],
+      "context": "有领导者时面对玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者函数(GetFaceLeaderFn)",
+        "保持面对领导者函数(KeepFaceLeaderFn)"
+      ],
+      "context": "空闲时面对领导者"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "领导者位置函数",
+        "最大拴绳距离2(KEEP_DANCING_DIST)",
+        "返回成功距离2(KEEP_DANCING_DIST)"
+      ],
+      "context": "跳舞派对时拴在领导者旁"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "生成点函数",
+        "最大距离(工作半径+4)",
+        "返回距离(min(6,工作半径))"
+      ],
+      "context": "工人防止追领导者过远"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "返回任意可工作实体动作的函数(砍/挖/矿)"
+      ],
+      "context": "工人持续工作(Keep Working)"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "生成点函数",
+        "最大距离(min(8,工作半径))",
+        "返回距离(min(4,工作半径))"
+      ],
+      "context": "工人低优先级拴在生成点"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "保护者攻击敌人"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "生成点函数",
+        "最大距离(min(8,保护半径))",
+        "返回距离(min(4,保护半径))"
+      ],
+      "context": "保护者低优先级拴在生成点"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "带闪避函数(ShouldKite)的战斗目标标签表",
+        "发现距离3(KITING_DIST)",
+        "安全距离5(STOP_KITING_DIST)"
+      ],
+      "context": "决斗者闪避攻击"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "决斗者追击攻击"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "返回砍树工作动作的函数"
+      ],
+      "context": "旧版工人砍树(Keep Chopping)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "返回挖矿工作动作的函数"
+      ],
+      "context": "旧版工人挖矿(Keep Mining)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "返回挖掘工作动作的函数(带DIG_TAGS)"
+      ],
+      "context": "旧版工人挖掘(Keep Digging)"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者函数",
+        "最小距离0(MIN_FOLLOW_DIST)",
+        "目标距离6(TARGET_FOLLOW_DIST)",
+        "最大距离8(MAX_FOLLOW_DIST)"
+      ],
+      "context": "旧版 fallback 跟随领导者"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.prefab == 'shadowworker'",
+      "semantic": "工人逻辑：优先跳舞/看游戏，避爆避危，持续寻找可工作实体(砍挖矿)并协助拾取，拴在生成点附近游荡，领导者远离时消散。"
+    },
+    {
+      "condition": "self.inst.prefab == 'shadowprotector'",
+      "semantic": "保护者逻辑：优先跳舞/看游戏，避爆，直接追击攻击敌人，拴在防御半径内游荡，领导者远离时消散。"
+    },
+    {
+      "condition": "else (fallback, 包含 shadowduelist/shadowlumber/shadowminer/shadowdigger)",
+      "semantic": "旧版逻辑：跳舞/看游戏，领导者范围内避爆，决斗者闪避并攻击、工人分别砍/挖/掘，否则跟随领导者并面对玩家。"
+    },
+    {
+      "condition": "ShouldDanceParty(inst) 领导者处于跳舞状态",
+      "semantic": "触发跳舞派对分支：拴在领导者旁并推送跳舞事件。"
+    },
+    {
+      "condition": "ShouldWatchMinigame(inst) 领导者参与小游戏",
+      "semantic": "触发观看小游戏分支：跟随并面对小游戏，逃离其他参与者。"
+    }
+  ],
+  "bt_structure": "根优先级节点按 prefab 分三态：工人树（跳舞/看游戏 > 避爆 > 避危 > 工作/拾取/拴住/游荡 > 消散）；保护者树（跳舞/看游戏 > 避爆 > 追击攻击 > 拴住/游荡 > 消散）；旧版树（跳舞/看游戏 > 领导者范围内避爆 > 决斗者闪避攻击/工人工作 > 跟随 > 面对玩家）。叶行为含 Leash/Wander/FaceEntity/RunAway/ChaseAndAttack/DoAction，并辅以 WhileNode 条件守卫。",
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      15724,
+      73427,
+      34523,
+      13898,
+      17998,
+      18303,
+      57310
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及世界翻新、秃鹫、玩家生成点、固定布景、曼德拉草、牛角、聚光灯、地热螨等实体或机制，均未提及 shadowwaxwellbrain 及其相关跟随、游荡、逃离、工作等行为语义，页面文本中不存在该符号能力的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影分身",
+    "暗影工人",
+    "暗影保护者",
+    "旧版分身",
+    "跳舞派对",
+    "小游戏",
+    "生成点",
+    "消散",
+    "挖矿",
+    "跟随"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "召唤物",
+    "工作",
+    "战斗",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dc42a7403ba854b426d9be8617f9b6407047918040f590129de0d96d097b6b90",
+    "source_bytes": 19839,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061277078
+  }
+}

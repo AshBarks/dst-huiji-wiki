@@ -7,91 +7,91 @@
   },
   "category": "component",
   "display_name": "workable",
-  "summary": "该组件管理实体的剩余工作量(workleft)、最大工作量(maxwork)、工作动作(action)及可否工作(workable)等状态数据。它参与饥荒核心的采集与破坏玩法，通过角色执行对应工作动作逐步消耗工作量，归零时触发完成回调与事件，实现资源获取、物体拆除及植物砍伐等交互。",
+  "summary": "该组件管理实体的剩余工作量、最大工作量、工作动作及可否工作等状态数据。它参与砍树、采矿、挖掘等核心采集与破坏玩法，通过响应工作行为递减工作量，并在耗尽时触发完成回调与事件，同时支持保存读取与坚韧工作判定。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体的 workrepairable 标签；若当前有工作动作，移除其对应 <action.id>_workable 标签。副作用：修改实体标签。"
+      "effect": "实体移除时调用，移除实例的 'workrepairable' 标签与当前动作对应的 '_workable' 标签。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含 workleft、maxwork、workable 状态的调试字符串。无副作用。"
+      "effect": "返回包含 workleft、maxwork、workable 状态的调试字符串，无副作用。"
     },
     {
       "name": "SetRequiresToughWork",
-      "effect": "设置内部 tough 属性，影响后续工作是否需要坚韧工人或工具。副作用：修改组件状态。"
+      "effect": "设置 self.tough 为传入值，标记该实体是否需要坚韧工作者才能有效工作。"
     },
     {
       "name": "SetWorkAction",
-      "effect": "设置工作动作 self.action。因元表监听，会移除旧动作对应的 _workable 标签并添加新动作标签（若可工作且剩余工作量>0）。副作用：修改状态与实体标签。"
+      "effect": "设置工作动作 self.action；因属性监听，若当前可工作且工作量>0，会移除旧动作的 '_workable' 标签并添加新动作的 '_workable' 标签。"
     },
     {
       "name": "GetWorkAction",
-      "effect": "返回当前工作动作 self.action。无副作用。"
+      "effect": "返回当前工作动作 self.action。"
     },
     {
       "name": "Destroy",
-      "effect": "若 CanBeWorked() 为真，以 destroyer 为工人、self.workleft 为工作量调用 WorkedBy，立即耗尽工作量。副作用：触发工作与可能的完成逻辑。"
+      "effect": "若 CanBeWorked() 为真，立即以 destroyer 为工作者调用 WorkedBy 并传入全部剩余工作量，触发工作与可能的完成逻辑。"
     },
     {
       "name": "SetWorkable",
-      "effect": "设置 self.workable。元表监听会更新 repairable 组件状态及 _workable 标签。副作用：修改状态、标签及关联组件。"
+      "effect": "设置 self.workable；因属性监听，会更新 repairable 组件状态及动作 '_workable' 标签。"
     },
     {
       "name": "SetWorkLeft",
-      "effect": "设置 self.workable 为 true，并按 maxwork 限制计算赋值 self.workleft。元表监听更新标签等。副作用：修改状态与标签。"
+      "effect": "置 self.workable 为 true，并根据 maxwork 限制（clamp 或取最大值）设置 self.workleft；因属性监听触发标签与修复状态更新。"
     },
     {
       "name": "GetWorkLeft",
-      "effect": "返回当前可工作时剩余工作量，否则返回 0。无副作用。"
+      "effect": "返回当前可工作时剩余工作量，否则返回 0。"
     },
     {
       "name": "CanBeWorked",
-      "effect": "返回 self.workable 且 self.workleft > 0 的布尔值。无副作用。"
+      "effect": "返回 self.workable 且 self.workleft > 0 的布尔值，指示是否可被工作。"
     },
     {
       "name": "SetOnLoadFn",
-      "effect": "若传入函数为 function 则设置 self.onloadfn 回调。副作用：修改回调引用。"
+      "effect": "若 fn 为函数则存储为 self.onloadfn，在 OnLoad 时调用；无立即副作用。"
     },
     {
       "name": "SetMaxWork",
-      "effect": "设置 self.maxwork 为至少 1 的值。元表监听触发 onworkable 更新标签。副作用：修改状态与标签。"
+      "effect": "设置 self.maxwork 为 max(1, work or 10)；因属性监听触发标签与修复状态更新。"
     },
     {
       "name": "OnSave",
-      "effect": "若 savestate 为真，返回包含 maxwork 与 workleft 的表，否则返回空表。无副作用。"
+      "effect": "若 self.savestate 为真，返回包含 maxwork 与 workleft 的表，否则返回空表；无状态修改。"
     },
     {
       "name": "OnLoad",
-      "effect": "从 data 恢复 workleft 与 maxwork，若存在 onloadfn 则调用之。副作用：修改状态并可能触发回调。"
+      "effect": "从 data 读取 workleft 与 maxwork 赋值（触发属性监听），若存在 onloadfn 则调用之。"
     },
     {
       "name": "WorkedBy",
-      "effect": "获取工人手部工具，调用 ShouldRecoil 计算反弹与剩余工作量，再调用 WorkedBy_Internal 执行实际工作。副作用：间接引发工作量扣减与事件。"
+      "effect": "获取 worker 手部装备作为工具，调用 ShouldRecoil 判定反弹与有效工作量，随后调用 WorkedBy_Internal 执行实际工作逻辑。"
     },
     {
       "name": "WorkedBy_Internal",
-      "effect": "应用工作倍率函数，扣减 workleft（处理边界与浮点），记录 lastworktime 与 lastworker，向工人与实体推送 working 与 worked 事件，调用 onwork 回调；若工作量耗尽则调用 onfinish、推送 workfinished 与 finishedwork 事件，若为植物则向世界推送 plantkilled。副作用：修改状态、推送多事件、调用回调。"
+      "effect": "核心工作处理：计算工作量乘子并递减 workleft，记录 lastworktime 与 lastworker，向 worker 推 'working' 事件、向实例推 'worked' 事件并调用 onwork 回调；若工作量耗尽，调用 onfinish 回调，推 'workfinished' 与 'finishedwork' 事件，若实例为健康植物则向世界推 'plantkilled' 事件。"
     },
     {
       "name": "SetOnWorkCallback",
-      "effect": "设置 self.onwork 回调，在工作进行时调用。副作用：修改回调。"
+      "effect": "设置 self.onwork 回调，在工作进行时调用。"
     },
     {
       "name": "SetOnFinishCallback",
-      "effect": "设置 self.onfinish 回调，在工作完成时调用。副作用：修改回调。"
+      "effect": "设置 self.onfinish 回调，在工作量耗尽时调用。"
     },
     {
       "name": "SetWorkMultiplierFn",
-      "effect": "设置 self.workmultiplierfn 倍率函数，影响工作量计算。副作用：修改回调。"
+      "effect": "设置 self.workmultiplierfn，用于在工作时计算工作量乘子。"
     },
     {
       "name": "SetShouldRecoilFn",
-      "effect": "设置 self.shouldrecoilfn 反弹判定函数。副作用：修改回调。"
+      "effect": "设置 self.shouldrecoilfn，用于自定义反弹判定逻辑。"
     },
     {
       "name": "ShouldRecoil",
-      "effect": "依据 shouldrecoilfn 或 tough 属性判定是否反弹及剩余工作量，返回布尔与数值。无副作用。"
+      "effect": "判定是否反弹：若设有 shouldrecoilfn 则用之，否则若 self.tough 且 worker 无 'toughworker' 标签且工具不能做坚韧工作则返回 true 与 0 工作量；否则返回 false 与原工作量。无状态修改。"
     }
   ],
   "events_published": [
@@ -106,45 +106,36 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      14705,
       15225,
-      19749,
-      23202,
-      72238,
-      15022,
-      22249,
-      19825
+      15415,
+      24866,
+      14484,
+      15237,
+      13406,
+      14646,
+      18829
     ],
     "aspects": [
       {
-        "aspect": "工作次数（敲击次数）标注",
+        "aspect": "杂草挖除后行为描述",
         "evidence": [
           {
-            "pageid": 19825,
-            "quote": "玩家每敲击 2 次都会使其外观上的"
+            "pageid": 14484,
+            "quote": "被挖起后，在 2 至 5 天内其附近有一定概"
           }
         ]
       },
       {
-        "aspect": "敲击工作动作描述",
+        "aspect": "杂草植株可挖掘描述",
         "evidence": [
           {
-            "pageid": 19825,
-            "quote": "每次敲击巨大蜂窝有约一半概率掉落"
-          }
-        ]
-      },
-      {
-        "aspect": "敲击触发掉落联动",
-        "evidence": [
-          {
-            "pageid": 19825,
-            "quote": "每次敲击巨大蜂窝有约一半概率掉落 1 个蜂蜜"
+            "pageid": 14484,
+            "quote": "挖掘已长成阶段的必忘我植株"
           }
         ]
       }
     ],
-    "coverage_status": "well_documented"
+    "coverage_status": "partial"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",
@@ -163,25 +154,27 @@
     "note": "仅当 workleft>0 导出;工具分类 CHOP/DIG/HAMMER/MINE/NET → 可砍伐/可挖掘/可锤击/可开采/可网捕(HACK 劈砍属 hackable 键)。"
   },
   "search_terms": [
-    "剩余工作量",
+    "可工作",
+    "工作量",
+    "砍树",
+    "采矿",
+    "挖掘",
+    "拆除",
+    "坚韧工作",
     "工作动作",
-    "可破坏",
-    "坚硬工作",
-    "采集物",
-    "植物杀死",
-    "工具反弹",
-    "工作回调"
+    "弹刀",
+    "修复标记"
   ],
   "gameplay_tags": [
     "生存",
-    "建造",
-    "采集"
+    "采集",
+    "建造"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
     "source_bytes": 5805,
     "model": "hy3-free",
-    "generated_at_ms": 1787930746528
+    "generated_at_ms": 1788058520914
   }
 }

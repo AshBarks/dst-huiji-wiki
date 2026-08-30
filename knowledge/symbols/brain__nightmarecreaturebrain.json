@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/nightmarecreaturebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "nightmarecreaturebrain",
+  "summary": "该大脑控制噩梦生物在战斗中根据是否臣服于影子目标决定攻击或骚扰。若不臣服则直接追击攻击目标；若臣服则标记骚扰目标，在附近跟随或游荡并周期性战斗喊叫；无目标时在家周边游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，无额外对外方法，逻辑封装在本地函数与节点中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW",
+    "MED_FOLLOW",
+    "MAX_FOLLOW",
+    "HARASS_MIN",
+    "HARASS_MED",
+    "HARASS_MAX"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 40 秒"
+      ],
+      "context": "ShouldAttack 返回 true（不臣服于目标）时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回骚扰目标的函数",
+        "最小允许距离 0",
+        "期望保持距离 4",
+        "最大允许距离 5"
+      ],
+      "context": "ShouldHarass 且 ShouldChaseAndHarass 返回 true（移速慢或未靠近）时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回骚扰目标位置的函数",
+        "离家最大距离 20",
+        "等待时间配置(最小0,随机0.3)",
+        "返回游荡方向的函数"
+      ],
+      "context": "_harasstarget 不为 nil 时的 LoiterAndHarass 分支"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置的函数(战争之家或家)",
+        "离家最大距离 20"
+      ],
+      "context": "默认无骚扰目标时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.shadowsubmissive:ShouldSubmitToTarget(self.inst.components.combat.target) 为真",
+      "semantic": "设置 _harasstarget 为当前目标并跳过攻击，转入骚扰逻辑"
+    },
+    {
+      "condition": "ShouldAttack 返回 true（不臣服）",
+      "semantic": "清空 _harasstarget 并执行 ChaseAndAttack 攻击最长40秒"
+    },
+    {
+      "condition": "ShouldHarass 返回 true（_harasstarget 非空且战斗喊叫时间允许）",
+      "semantic": "进入骚扰子树，内部判断追逐或仅喊叫"
+    },
+    {
+      "condition": "ShouldChaseAndHarass 返回 true（移速<5 或未靠近 HARASS_MED）",
+      "semantic": "使用 Follow 以距离0~5跟随骚扰目标"
+    },
+    {
+      "condition": "ShouldChaseAndHarass 返回 false",
+      "semantic": "仅执行 BattleCry 与强制面向目标"
+    },
+    {
+      "condition": "self._harasstarget ~= nil（LoiterAndHarass）",
+      "semantic": "以目标位置为家 Wander，最大20，极短等待，自定义方向"
+    },
+    {
+      "condition": "默认（self._harasstarget 为 nil）",
+      "semantic": "以 knownlocations 的 war_home 或 home 为家 Wander，最大20"
+    }
+  ],
+  "bt_structure": "PriorityNode 根: 1) PanicTriggerShadowCreature 恐慌触发; 2) While(ShouldAttack) ChaseAndAttack; 3) While(ShouldHarass) Priority( While(ShouldChaseAndHarass) Follow : ActionNode(喊叫) ); 4) While(_harasstarget) Wander(目标点); 5) Wander(家点)。",
+  "wiki": {
+    "scanned_pageids": [
+      19110,
+      24896,
+      13847,
+      24892,
+      19802,
+      28445,
+      23956,
+      15934
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要描述梦魇实体的生成位置、束缚解除、掉落物、梦魇循环阶段及一般仇恨表现，未提及任何关于追击时长(如40秒)、跟随/骚扰距离(如0/4/5)、游荡离家距离(20)等代码能力清单中的具体行为参数或函数表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "梦魇生物",
+    "骚扰",
+    "屈服暗影",
+    "战斗叫声",
+    "追逐攻击",
+    "游荡",
+    "梦魇",
+    "跟随"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "战斗",
+    "骚扰",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b947a8860639ae05845960dfc5348a41cf4cbc14e527567570d1c82f8d45f91c",
+    "source_bytes": 2678,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060406598
+  }
+}

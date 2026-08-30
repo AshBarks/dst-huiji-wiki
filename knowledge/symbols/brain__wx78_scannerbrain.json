@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wx78_scannerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wx78_scannerbrain",
+  "summary": "该大脑控制 WX78 扫描仪实体在未完成扫描（无 scanned 状态标签）时，优先执行扫描完成后的返回玩家动作。若无扫描目标则循环尝试寻找，有目标则拴绳跟随并面对目标，同时限制离领导者距离并默认站立。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法，所有逻辑通过行为树节点与本地函数实现。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TARGET_FOLLOW",
+    "MAX_TARGET_FOLLOW"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "返回完成扫描后归队动作的函数"
+      ],
+      "context": "在实体未处于 scanned 状态标签时的优先级最高节点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "尝试寻找扫描目标的函数",
+        "节点调试名'Try To Scan Something'",
+        "否(行走方式)",
+        "超时3秒"
+      ],
+      "context": "当无扫描目标时循环执行"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取扫描目标位置的函数",
+        "获取最大跟随距离的函数(基于扫描距离与半径)",
+        "获取内部返回距离的函数(基于目标半径)"
+      ],
+      "context": "当有扫描目标时优先拴绳跟随"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取扫描目标的函数",
+        "保持面对目标的函数(目标有效则继续)"
+      ],
+      "context": "当有扫描目标时次于拴绳跟随执行"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取领导者(玩家)位置的函数",
+        "拴绳最大半径3",
+        "内部返回距离1.5"
+      ],
+      "context": "在无扫描目标分支之后、站立之前执行"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "上述行为均未执行时站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"scanned\")",
+      "semantic": "执行整体行为树：尝试返回玩家、按有无扫描目标分支处理、跟随领导者、站立"
+    },
+    {
+      "condition": "GetScanTarget(self.inst) == nil",
+      "semantic": "循环执行寻找扫描目标动作并等待缓冲动作清空"
+    },
+    {
+      "condition": "GetScanTarget(self.inst) ~= nil",
+      "semantic": "拴绳跟随扫描目标位置，并面对该目标"
+    }
+  ],
+  "bt_structure": "根优先级节点(条件:未扫描) [ 1.动作:返回玩家(若完成扫描) ; 2.条件(无目标):循环[动作:找目标,等待空] ; 3.条件(有目标):优先级[拴绳跟随,面对] ; 4.拴绳跟随领导者(3,1.5) ; 5.站立 ]",
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      16023,
+      24364,
+      10418,
+      13761,
+      13898,
+      17998,
+      18303
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未体现 scannerbrain 的扫描寻找、归队、拴绳跟随、面对、站立等能力；wx78 页仅提自动抓取机数量上限，无行为语义，故不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "扫描仪",
+    "未扫描",
+    "回到玩家",
+    "寻找",
+    "拴绳",
+    "面对",
+    "主人",
+    "跟随"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "探索",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c396bde9f44032f8a0cde8f94755a6871c936eb0522f95b4ea6be15e174c2906",
+    "source_bytes": 4579,
+    "model": "hy3-free",
+    "generated_at_ms": 1788062204935
+  }
+}

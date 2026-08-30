@@ -7,115 +7,115 @@
   },
   "category": "component",
   "display_name": "eater",
-  "summary": "该组件管理实体的进食能力、饮食组偏好、营养吸收系数及上次进食时间等数据。它参与生存核心玩法，控制实体能否及偏好进食特定食物，计算进食带来的生命、饥饿与理智变化，并触发进食事件与回调。",
+  "summary": "Eater 组件管理实体的进食相关数据，包括可吃与偏好食物组、吸收系数、特殊进食标签及上次进食时间等。它参与生存核心玩法，负责执行吃食物时的属性增减、事件推送、回调触发以及与 edible 等组件的交互。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "调用 clearcaneat 移除实体上与 caneat 列表中各项对应的 '_eater' 标签。"
+      "effect": "组件从实体移除时，清除 self.caneat 列表中所有食物类型对应的 *_eater 标签，移除实体上的相关标签。"
     },
     {
       "name": "SetDiet",
-      "effect": "设置 caneat 与 preferseating 数组（preferseating 缺省同 caneat），因 caneat 属性回调会清除旧饮食标签并添加新标签。"
+      "effect": "设置 self.caneat 与 self.preferseating（若未提供则同 caneat）。因 caneat 字段有变更回调，会移除旧标签并添加新食物类型对应的 *_eater 标签。"
     },
     {
       "name": "SetAbsorptionModifiers",
-      "effect": "设置 healthabsorption、hungerabsorption、sanityabsorption 三个吸收系数，无标签副作用。"
+      "effect": "设置 healthabsorption、hungerabsorption、sanityabsorption 三个数值，影响后续进食时的属性吸收倍率，无标签副作用。"
     },
     {
       "name": "TimeSinceLastEating",
-      "effect": "返回当前时间与 lasteattime 差值，若 lasteattime 为 nil 则返回 nil。"
+      "effect": "返回当前时间与 self.lasteattime 的差值；若 lasteattime 为 nil 则返回 nil。纯查询。"
     },
     {
       "name": "HasBeen",
-      "effect": "返回 lasteattime 为 nil 或距上次进食时间已超过给定时间 time 的布尔值。"
+      "effect": "返回 self.lasteattime 为 nil 或 TimeSinceLastEating() 大于等于给定 time 的布尔值。纯查询。"
     },
     {
       "name": "OnSave",
-      "effect": "若 lasteattime 非空，返回包含 time_since_eat 的表用于存档，否则返回 nil。"
+      "effect": "若 lasteattime 不为 nil，返回包含 time_since_eat 的表用于存档；否则返回 nil。"
     },
     {
       "name": "OnLoad",
-      "effect": "若存档数据含 time_since_eat，则重设 lasteattime 为当前时间减去该值。"
+      "effect": "若读档数据含 time_since_eat，则重设 self.lasteattime 为 GetTime() 减去该值，恢复进食时间记录。"
     },
     {
       "name": "SetCanEatHorrible",
-      "effect": "将 FOODTYPE.HORRIBLE 加入 preferseating 与 caneat，并为实体添加 'HORRIBLE_eater' 标签。"
+      "effect": "向 preferseating 与 caneat 表插入 FOODTYPE.HORRIBLE，并为实体添加 HORRIBLE_eater 标签。"
     },
     {
       "name": "SetCanEatGears",
-      "effect": "将 FOODTYPE.GEARS 加入 preferseating 与 caneat，并添加 'GEARS_eater' 标签。"
+      "effect": "向 preferseating 与 caneat 表插入 FOODTYPE.GEARS，并为实体添加 GEARS_eater 标签。"
     },
     {
       "name": "SetCanEatNitre",
-      "effect": "参数 can_eat 为真时，若未含标签则添加 FOODTYPE.NITRE 至两数组并加 'NITRE_eater' 标签；为假时若含标签则移除数组值与标签。"
+      "effect": "参数 can_eat 为布尔。为 true 且无标签时，插入 FOODTYPE.NITRE 到两表并加 NITRE_eater 标签；为 false 且有标签时，从两表移除并删标签。"
     },
     {
       "name": "SetCanEatRaw",
-      "effect": "将 FOODTYPE.RAW 加入两数组并添加 'RAW_eater' 标签。"
+      "effect": "向 preferseating 与 caneat 表插入 FOODTYPE.RAW，并为实体添加 RAW_eater 标签。"
     },
     {
       "name": "SetPrefersEatingTag",
-      "effect": "将 tag 加入 self.preferseatingtags 数组（首次时初始化数组），用于后续进食偏好检查。"
+      "effect": "设置偏好进食标签：若 self.preferseatingtags 为 nil 则初始化为含 tag 的表，否则插入 tag。"
     },
     {
       "name": "SetStrongStomach",
-      "effect": "参数真时加 'strongstomach' 标签并置 strongstomach=true；假且原为真时移除标签并置 false。"
+      "effect": "参数为真时添加 strongstomach 标签且置字段真；为假且原真时移除标签置假。"
     },
     {
       "name": "SetCanEatRawMeat",
-      "effect": "参数真时加 'eatsrawmeat' 标签并置 eatsrawmeat=true；假且原为真时移除标签并置 false。"
+      "effect": "参数为真时添加 eatsrawmeat 标签且置字段真；为假且原真时移除标签置假。"
     },
     {
       "name": "SetIgnoresSpoilage",
-      "effect": "参数真时加 'ignoresspoilage' 标签并置 ignoresspoilage=true；假且原为真时移除标签并置 false。"
+      "effect": "参数为真时添加 ignoresspoilage 标签且置字段真；为假且原真时移除标签置假。"
     },
     {
       "name": "SetRefusesSpoiledFood",
-      "effect": "参数真时加 'nospoiledfood' 标签并置 nospoiledfood=true；假且原为真时移除标签并置 false。"
+      "effect": "参数为真时添加 nospoiledfood 标签且置字段真；为假且原真时移除标签置假。"
     },
     {
       "name": "SetSpoiledProcessor",
-      "effect": "参数 processor 真时加 'spoiledprocessor' 标签并置 true；allspoiled 真时加 'allspoiledprocessor' 标签并置 true，否则移除该标签；processor 假且原真时移除两标签并置 false。"
+      "effect": "processor 为真时添加 spoiledprocessor 标签并置字段真；allspoiled 为真加 allspoiledprocessor 标签否则移除该标签。processor 为假且原有时移除两标签并置假。"
     },
     {
       "name": "IsSpoiledProcessor",
-      "effect": "返回 self.spoiledprocessor 布尔值。"
+      "effect": "返回 self.spoiledprocessor 布尔值。纯查询。"
     },
     {
       "name": "CanProcessSpoiledItem",
-      "effect": "返回是否为变质处理器且该食物满足变质条件（edible 变质或全变质处理器且 perishable 变质）的布尔值。"
+      "effect": "返回是否为腐烂食物处理器且目标食物处于腐烂状态（edible 腐烂或 allspoiledprocessor 时 perishable 腐烂）的布尔值。纯查询。"
     },
     {
       "name": "SetOnEatFn",
-      "effect": "设置 self.oneatfn 为给定函数 fn，进食时回调。"
+      "effect": "设置 self.oneatfn 为给定函数，在后续 Eat 成功时调用。"
     },
     {
       "name": "DoFoodEffects",
-      "effect": "返回对食物负面效果是否生效的布尔反值：当强胃且怪物肉、或吃生肉且生肉、或存在 foodaffinity 偏好时返回 false，否则 true。"
+      "effect": "返回是否应执行食物效果的布尔（当非强壮胃吃怪物肉、非生肉食用者吃生肉、无食物亲和偏好时为 true）。纯查询。"
     },
     {
       "name": "GetEdibleTags",
-      "effect": "返回 caneat 对应的 'edible_xxx' 标签数组，若 cacheedibletags 非 false 则缓存结果。"
+      "effect": "返回缓存的 cacheedibletags 或根据 caneat 生成的 edible_* 标签数组；若 cacheedibletags 不为 false 则写入缓存。有缓存副作用。"
     },
     {
       "name": "Eat",
-      "effect": "若 PrefersToEat 通过，则计算并施加食物的生命/饥饿/理智变动（考虑吸收系数、食物记忆倍数、整堆吃等），触发 feeder 相关事件，推送 'oneat' 事件，调用 oneatfn，执行 edible 的 OnEaten 与移除，更新 lasteattime 与食物记忆，返回 true。"
+      "effect": "核心进食：若 PrefersToEat 为真，计算倍数与属性增减（血量/饥饿/精神，考虑吸收系数与食物记忆等），调用对应组件 DoDelta；向 inst 推 oneat 事件，向 feeder 推 feedincontainer/feedmount 事件；调用 oneatfn；调用 edible:OnEaten 与 HandleEatRemove 消耗食物；更新 lasteattime 与食物记忆。返回 true，否则无操作返回 nil。"
     },
     {
       "name": "TestFood",
-      "effect": "检查食物是否含有 testvalues 中指定的 'edible_' 标签，有则返回 true，否则 nil。"
+      "effect": "遍历 testvalues，若食物具有对应的 edible_* 标签则返回 true，否则 nil。纯查询。"
     },
     {
       "name": "PrefersToEat",
-      "effect": "综合特殊拒绝规则（水果蛋糕、拒变质、偏好标签）后调用 TestFood 以 preferseating 判断，返回是否偏好进食。"
+      "effect": "判断实体是否偏好吃该食物：特殊拒绝 winter_food4（玩家）、nospoiledfood 且腐烂、preferseatingtags 不匹配，否则用 preferseating 调 TestFood。返回布尔。"
     },
     {
       "name": "CanEat",
-      "effect": "调用 TestFood 以 caneat 判断食物是否可吃，返回布尔值。"
+      "effect": "返回 TestFood(food, self.caneat) 结果，表示实体能否吃该食物。纯查询。"
     },
     {
       "name": "IsTryingToFeedMe",
-      "effect": "检查给定 inst 的缓冲动作或远程交互是否为喂养动作且目标为本实体，返回布尔值。"
+      "effect": "检查给定 inst 的缓冲动作或远程交互，若目标为自身且动作为 FEED 或 FEEDPLAYER 则返回 true。纯查询。"
     }
   ],
   "events_published": [
@@ -128,44 +128,126 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      15237,
-      15832,
       15238,
-      15642,
-      15239,
-      15427,
-      13857,
-      13874
+      18057,
+      15237,
+      15975,
+      13268,
+      15849,
+      15421,
+      15715
     ],
     "aspects": [
       {
-        "aspect": "可怕食物喂食雇佣描述",
+        "aspect": "可怕食物进食许可描述",
         "evidence": [
           {
             "pageid": 15237,
-            "quote": "肉类食物和可怕食物可以雇佣猪人"
+            "quote": "其中{{分类|肉类食物}}和{{分类|可怕食物}}可以雇佣猪人"
+          }
+        ]
+      },
+      {
+        "aspect": "可食用食物判定描述",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "可以喂食{{分类|素食食物"
+          },
+          {
+            "pageid": 18057,
+            "quote": "宠物会接受一切[[常规食物]]"
+          },
+          {
+            "pageid": 15975,
+            "quote": "可以给它喂食{{分类|通用食物}}、{{分类|种子食物}}"
           },
           {
             "pageid": 15237,
-            "quote": "玩家可以使用肉类食物或可怕食物雇佣猪人"
+            "quote": "给予猪人食物。其中{{分类|肉类食物}}和{{分类|可怕食物}}"
+          },
+          {
+            "pageid": 15715,
+            "quote": "可以通过喂食[[:分类:元素食物|元素食物]]来恢复"
           }
         ]
       },
       {
-        "aspect": "可食用食物分类标注",
+        "aspect": "进食行为描述",
         "evidence": [
           {
-            "pageid": 15642,
-            "quote": "熊獾可以食用肉类食物、素食食物和通用食物"
+            "pageid": 15237,
+            "quote": "猪人进食后会进入冷却时间"
+          },
+          {
+            "pageid": 18057,
+            "quote": "吃下任何东西后宠物的的保质期就会刷新"
+          },
+          {
+            "pageid": 15975,
+            "quote": "可以给它喂食{{分类|通用食物}}"
+          },
+          {
+            "pageid": 13268,
+            "quote": "沃特喂食鱼人之王时"
+          },
+          {
+            "pageid": 15849,
+            "quote": "喂食[[小发光浆果]]、[[发光浆果]]等食物时"
+          },
+          {
+            "pageid": 15421,
+            "quote": "在它进食时，玩家只要不在它进食动画间隔时攻击"
+          },
+          {
+            "pageid": 15715,
+            "quote": "可以通过喂食[[:分类:元素食物|元素食物]]来恢复"
+          },
+          {
+            "pageid": 15238,
+            "quote": "喂食一只牛可以让其跟随玩家一段时间"
           }
         ]
       },
       {
-        "aspect": "捡食地上食物行为描述",
+        "aspect": "进食触发效果描述",
         "evidence": [
           {
-            "pageid": 15642,
-            "quote": "熊獾会捡起并吃掉地上的食物"
+            "pageid": 18057,
+            "quote": "吃下任何东西后宠物的的保质期就会刷新"
+          },
+          {
+            "pageid": 15975,
+            "quote": "其在食用[[榴莲]]、[[海带叶]]和[[海带补丁]]时不会损失生命值"
+          },
+          {
+            "pageid": 13268,
+            "quote": "沃特喂食鱼人之王时，鱼人之王的最大饥饿值会提升至 250"
+          }
+        ]
+      },
+      {
+        "aspect": "饮食类别设定描述",
+        "evidence": [
+          {
+            "pageid": 15238,
+            "quote": "可以喂食{{分类|素食食物"
+          },
+          {
+            "pageid": 18057,
+            "quote": "宠物会接受一切[[常规食物]]"
+          },
+          {
+            "pageid": 15975,
+            "quote": "可以给它喂食{{分类|通用食物}}、{{分类|种子食物}}"
+          },
+          {
+            "pageid": 15237,
+            "quote": "给予猪人食物。其中{{分类|肉类食物}}和{{分类|可怕食物}}"
+          },
+          {
+            "pageid": 15715,
+            "quote": "可以通过喂食[[:分类:元素食物|元素食物]]来恢复"
           }
         ]
       }
@@ -173,25 +255,25 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "进食能力",
-    "饮食偏好",
-    "食物吸收",
-    "无视变质",
-    "吃生肉",
-    "吃齿轮",
-    "吃硝石",
-    "上次进食",
-    "食物标签"
+    "进食",
+    "喂食",
+    "食物偏好",
+    "饱食度",
+    "精神值",
+    "血量",
+    "腐烂食物",
+    "生肉",
+    "强壮胃"
   ],
   "gameplay_tags": [
     "生存",
-    "饮食"
+    "进食"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
     "source_bytes": 11787,
     "model": "hy3-free",
-    "generated_at_ms": 1787931640148
+    "generated_at_ms": 1788060192424
   }
 }

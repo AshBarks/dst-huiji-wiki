@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lureplantbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "lureplantbrain",
+  "summary": "该大脑用于诱饵植物（Lureplant）实体。它构建了一个以控制随从为核心行为的优先级行为树，使实体持续尝试控制附近被诱捕的生物。原 StandStill 行为已被注释，不参与实际逻辑。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 方法以组装行为树，未暴露任何对外调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "ControlMinions",
+      "args_semantic": [
+        "自身实体实例"
+      ]
+    }
+  ],
+  "bt_structure": "根优先节点(PriorityNode, 权重0.25)仅包含 ControlMinions 行为，注释掉的 StandStill 不生效。",
+  "wiki": {
+    "scanned_pageids": [
+      15722,
+      72299,
+      16630,
+      20162,
+      13493,
+      15973,
+      20640,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "眼球草生成距离描述",
+        "evidence": [
+          {
+            "pageid": 15722,
+            "quote": "食人花会在周围生长出眼球草，最远不超过食人花约 20 距离单位。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "食人花",
+    "行为树",
+    "大脑",
+    "优先级",
+    "随从",
+    "被诱捕",
+    "生物控制",
+    "核心行为"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "06e7cccaec918e1e17796a2ac081eb6b88f0ca16841d7e4ff1b20997362d30c0",
+    "source_bytes": 369,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059839747
+  }
+}

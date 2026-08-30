@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/smallbirdbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "smallbirdbrain",
+  "summary": "小切大脑让实体在恐慌时逃跑，有领袖时跟随或以领袖为中心游荡。饥饿时优先觅食，有战斗目标则追击，无领袖且非同伴时远离玩家，并会面对交易者。",
+  "api": [
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_CHASE_TIME",
+    "TRADE_DIST",
+    "SEE_FOOD_DIST",
+    "FIND_FOOD_HUNGER_PERCENT",
+    "START_RUN_DIST",
+    "STOP_RUN_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实例自身",
+        "获取交易者：返回领袖若其尝试交易且自身为同伴",
+        "保持条件：目标仍在尝试交易"
+      ],
+      "context": "顶层优先节点中面对交易者"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实例自身",
+        "启动条件：饥饿至 starving 且非 teenbird 且无领袖或领袖非 tallbird"
+      ],
+      "context": "在饥饿觅食序列及默认跟随优先级中"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实例自身",
+        "目标函数：返回领袖",
+        "最小距离 2",
+        "目标距离 5.5",
+        "最大距离 9"
+      ],
+      "context": "在饥饿觅食序列及默认跟随优先级中"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实例自身",
+        "最长追逐时间随季节修正的 10 秒"
+      ],
+      "context": "当拥有战斗目标时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实例自身",
+        "标签 'player'",
+        "开始逃跑距离 4",
+        "停止逃跑距离 6",
+        "条件函数：无领袖且非同伴时对玩家逃跑"
+      ],
+      "context": "顶层远离玩家"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实例自身",
+        "家位置函数：有领袖返回其位置否则 nil",
+        "最大游荡距离 8",
+        "时间参数：最短走0.5随机0.5，最短等6随机3"
+      ],
+      "context": "无领袖时自由游荡或以领袖为中心"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "IsStarving(inst) and CanSeeFood(inst)",
+      "semantic": "极度饥饿且看到食物时，优先等待并站立或跟随然后进食，覆盖战斗"
+    },
+    {
+      "condition": "inst.components.combat.target ~= nil",
+      "semantic": "存在战斗目标时，短暂随机等待后追击攻击"
+    },
+    {
+      "condition": "IsHungry(inst) and CanSeeFood(inst)",
+      "semantic": "饥饿但未至 starving 且看到食物时，较长等待后进食"
+    },
+    {
+      "condition": "ShouldRunAwayFromPlayer(inst, target)",
+      "semantic": "无领袖且非同伴时对玩家逃跑"
+    },
+    {
+      "condition": "ShouldStandStill(inst)",
+      "semantic": "饥饿且无合适领袖时站立不动"
+    },
+    {
+      "condition": "GetLeader(inst) ~= nil",
+      "semantic": "有领袖时跟随或以领袖为中心游荡，无领袖则自由游荡"
+    }
+  ],
+  "bt_structure": "优先级节点：1)恐慌触发 2)电篱恐慌 3)面对交易者 4)饥饿见食物序列(站立/跟随+进食) 5)有目标序列(等待+追击) 6)远离玩家 7)饥饿见食物序列(较长等待+进食) 8)默认站立/跟随 9)游荡(领袖中心)",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15022,
+      45173,
+      13897,
+      15238,
+      51046,
+      72981,
+      13898
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为 stalker_atrium、alterguardian、巨兽恐慌、klaus、babybeefalo、wagboss_robot、vault_pillar_guard、cookedmandrake，均未提及 smallbird 或 brain__smallbirdbrain 的跟随/逃跑/游荡/交易/饥饿等行为及对应数值（如2/5.5/9、4/6、8），无该符号能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "逃离玩家",
+    "站立不动",
+    "小切",
+    "跟随",
+    "觅食",
+    "追击",
+    "游荡",
+    "恐慌",
+    "面对交易者"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "跟随",
+    "觅食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c0155904c44017aae7a24f14c795824b17752bcce19be14a06401384604051ec",
+    "source_bytes": 4678,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061412922
+  }
+}

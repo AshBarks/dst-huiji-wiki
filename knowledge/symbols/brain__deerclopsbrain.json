@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/deerclopsbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "deerclopsbrain",
+  "summary": "该大脑控制巨鹿（Deerclops）在战斗中追击并攻击目标，冷却时则拉近并面对目标。它并行攻击墙壁，并优先锤毁已知的目标基地结构；若需生长冰晶则触发生长事件。当实体想离开时在家的附近游荡，否则在目标基地/家/出生点间游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义其他供外部模块调用的自定义方法。",
+  "events_published": [
+    "doicegrow"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "CHASE_DIST",
+    "CHASE_TIME",
+    "OUTSIDE_CATAPULT_RANGE",
+    "BASEDESTROY_CANT_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "并行节点中始终执行，与开启战斗呐喊并行"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取目标位置的函数 GetTargetPos",
+        "拴绳最大半径(攻击范围 TUNING.DEERCLOPS_ATTACK_RANGE)",
+        "内部返回距离 3"
+      ],
+      "context": "战斗冷却中(WhileNode InCooldown)且被 FailIfSuccessDecorator 包裹"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取目标函数 GetTarget",
+        "保持面对函数 IsTarget"
+      ],
+      "context": "同冷却分支内，在 Leash 失败后尝试"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐时间 20 秒",
+        "放弃距离 32",
+        "最大攻击次数 nil(默认)",
+        "寻找新目标函数 nil",
+        "是否步行 nil(默认奔跑)",
+        "海洋谨慎距离函数 OceanChaseWaryDistance"
+      ],
+      "context": "根优先级节点直接子节点"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取锤击动作函数 BaseDestroy",
+        "节点调试名称 'DestroyBase'",
+        "以跑动方式执行 true"
+      ],
+      "context": "根优先级节点直接子节点"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取家位置函数 GetHomePos",
+        "最大距离 30"
+      ],
+      "context": "WhileNode WantsToLeave 想离开时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取游荡位置函数 GetWanderPos",
+        "最大距离 30",
+        "配置表 {minwwwalktime = 10}"
+      ],
+      "context": "默认游荡分支"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGrowIce(self.inst) 返回真",
+      "semantic": "执行 PushEvent('doicegrow') 让实体生长缺失的冰晶或眼睛冰"
+    },
+    {
+      "condition": "self.inst.components.combat:InCooldown() 返回真",
+      "semantic": "优先用 Leash 将实体拴在目标攻击范围内，并 FaceEntity 面对目标，而非直接追击"
+    },
+    {
+      "condition": "self.inst:WantsToLeave() 返回真",
+      "semantic": "以家位置为中心半径30游荡，试图离开地图"
+    },
+    {
+      "condition": "knownlocations 有 'targetbase' 且 BaseDestroy 找到可锤结构",
+      "semantic": "DoAction 调用 BaseDestroy 返回锤击动作，摧毁基地建筑"
+    }
+  ],
+  "bt_structure": "根优先级节点(权重0.5): 1) WhileNode(ShouldGrowIce)->ActionNode推送doicegrow; 2) ParallelNode: AttackWall 与 开启battlecry; 3) WhileNode(InCooldown)->优先级[FailIfSuccessDecorator(Leash) 然后 FaceEntity]; 4) ChaseAndAttack(20秒,32距,海洋谨慎); 5) DoAction(BaseDestroy,'DestroyBase',跑); 6) WhileNode(WantsToLeave)->Wander(家,30); 7) Wander(游荡点,30,{minwwwalktime=10})",
+  "wiki": {
+    "scanned_pageids": [
+      13823,
+      20152,
+      13701,
+      15922,
+      15022,
+      16197,
+      15303,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "基地寻找与摧毁行为描述",
+        "evidence": [
+          {
+            "pageid": 13823,
+            "quote": "尝试找到仇恨目标的“基地”（距目标 40 距离单位内最近的建筑）。"
+          },
+          {
+            "pageid": 13823,
+            "quote": "它会主动摧毁距自身 40 距离单位内的"
+          }
+        ]
+      },
+      {
+        "aspect": "追逐丢失仇恨时间与距离描述",
+        "evidence": [
+          {
+            "pageid": 13823,
+            "quote": "若追逐目标的时间达到 20 秒或离目标超过 32 距离单位，独眼巨鹿会丢失仇恨。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "巨鹿",
+    "追击",
+    "破坏墙壁",
+    "破坏基地",
+    "冰晶",
+    "游荡",
+    "冷却",
+    "面对目标",
+    "锤毁"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "战斗",
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6338aae6f92e8566d3c1898620c3582676f66a4e22f70ed85e343b9c577be406",
+    "source_bytes": 5720,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058818867
+  }
+}

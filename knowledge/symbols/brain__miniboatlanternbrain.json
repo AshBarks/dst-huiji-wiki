@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/miniboatlanternbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "miniboatlanternbrain",
+  "summary": "该大脑控制迷你船灯笼实体，在实体位于海洋上且燃料组件存在且未耗尽时，以初始记录的家位置为中心进行游荡。游荡使用较短的行走时间和基于当前朝向偏移的自定义方向函数。当不满足海洋与燃料条件时，实体不执行主动移动行为。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的对外调用接口",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WANDER_TIMES"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置（knownlocations 中 'home'）的函数",
+        "离家最大距离（TUNING.MINIBOATLANTERN_WANDER_DIST）",
+        "游荡时间配置表 WANDER_TIMES（minwalktime=1, randwalktime=0.25, minwaittime=0.0, randwaittime=0.0）",
+        "返回基于当前旋转角度偏移的方向函数 getdirectionFn"
+      ],
+      "context": "WhileNode 判断 ShouldMove(inst) 为真时（实体在海洋上、有燃料组件且燃料未空）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldMove(inst) 为真（实体位于海洋点、存在 fueled 组件且燃料未耗尽）",
+      "semantic": "以家位置为中心执行 Wander 游荡行为"
+    },
+    {
+      "condition": "ShouldMove(inst) 为假",
+      "semantic": "行为树中无对应节点，实体不执行主动游荡（可能静止）"
+    }
+  ],
+  "bt_structure": "PriorityNode(0.25) 下挂 WhileNode(ShouldMove) 内嵌 Wander(home函数, TUNING.MINIBOATLANTERN_WANDER_DIST, WANDER_TIMES, getdirectionFn)",
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      16057,
+      18216,
+      18853,
+      65605,
+      15170,
+      20061,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及燃料、噩梦燃料、发电机、海洋拖网捕鱼器、世界翻新、火坑、咩咩雕像、玩具等实体，均未提及 miniboatlantern 实体或其 brain 组件的游荡、返回家位置、离家最大距离、游荡时间配置、基于旋转角度方向移动（需海洋上且有燃料）等行为或数值表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "游荡",
+    "海洋",
+    "燃料",
+    "家位置",
+    "小船灯笼",
+    "朝向偏移",
+    "船用灯",
+    "记录位置",
+    "主动移动",
+    "行走时间"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "照明",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "97ea55469704243220c132175dbe1795f5c27c0588c57e9e36dad8c11f0c4c56",
+    "source_bytes": 1155,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060145529
+  }
+}

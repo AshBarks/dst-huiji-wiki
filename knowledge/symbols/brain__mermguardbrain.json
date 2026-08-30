@@ -1,0 +1,318 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/mermguardbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "mermguardbrain",
+  "summary": "该大脑控制鱼人守卫（merm guard）的 AI 行为。无领导者时它会游荡于家园附近、觅食、拾取盔甲、响应祭品锅召唤，有领导者时则跟随并保持距离并协助劳作。战斗中会追击目标，攻击冷却时躲避，并会在特定情境下返回王座或等待援助。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外方法。",
+  "events_published": [
+    "merm_use_building"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_PLAYER_DIST",
+    "SEE_FOOD_DIST",
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "FACETIME_BASE",
+    "FACETIME_RAND",
+    "TRADE_DIST",
+    "FIND_ARMORY_RANGE",
+    "MIN_FOLLOW_TARGET_DIST",
+    "DEFAULT_FOLLOW_TARGET_DIST",
+    "MAX_FOLLOW_TARGET_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "当应避开电栅栏时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取治疗者函数",
+        "保持治疗者函数"
+      ],
+      "context": "接受治疗时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "拾取盔甲函数",
+        "节点名'collect armor'",
+        "以跑动方式执行"
+      ],
+      "context": "平时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取最近军械库位置函数",
+        "最小距离2.1",
+        "最大距离2",
+        "允许奔跑"
+      ],
+      "context": "需要盔甲且找到军械库时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "收集盔甲函数",
+        "节点名'collect armor'",
+        "以跑动方式执行"
+      ],
+      "context": "需要盔甲且找到军械库时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回战斗目标的函数",
+        "最小允许距离5",
+        "期望保持距离动态计算函数",
+        "最大允许距离15"
+      ],
+      "context": "等待帮助时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取面对目标函数",
+        "保持面对目标函数"
+      ],
+      "context": "等待帮助时或平时"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "等待帮助且需要治疗时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长受季节修正约25秒",
+        "追击最远受季节修正约40单位"
+      ],
+      "context": "无战斗目标或不在攻击冷却时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "通过函数获取战斗目标为猎人的表",
+        "察觉距离5",
+        "安全距离8"
+      ],
+      "context": "有战斗目标且处于攻击冷却时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回国王位置的函数",
+        "最小距离2",
+        "最大距离2",
+        "允许奔跑"
+      ],
+      "context": "需要返回王座时"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "获取被召唤祭品锅位置函数",
+        "最小距离2.1",
+        "最大距离2",
+        "允许奔跑"
+      ],
+      "context": "响应祭品锅召唤时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "应答召唤函数",
+        "节点名'answe call'",
+        "以跑动方式执行"
+      ],
+      "context": "响应祭品锅召唤时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取交易者函数",
+        "保持交易者函数"
+      ],
+      "context": "寻找交易时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "进食动作函数",
+        "节点名'Eat Food'"
+      ],
+      "context": "寻找食物时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身",
+        "返回领导者函数",
+        "最小允许距离3",
+        "期望保持距离动态计算函数",
+        "最大允许距离15",
+        "允许奔跑默认（nil）",
+        "每次评估距离(true)"
+      ],
+      "context": "有领导者时跟随"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "无领导者时家园位置函数",
+        "最大游荡距离15"
+      ],
+      "context": "无领导者时游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence(self.inst)",
+      "semantic": "避开电栅栏"
+    },
+    {
+      "condition": "NeedsArmorAndFoundArmor(self.inst)",
+      "semantic": "前往最近军械库并收集头盔"
+    },
+    {
+      "condition": "self.inst:ShouldWaitForHelp()",
+      "semantic": "跟随战斗目标、面对目标并站立等待治疗"
+    },
+    {
+      "condition": "self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown()",
+      "semantic": "追击并攻击目标"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown()",
+      "semantic": "逃离当前战斗目标"
+    },
+    {
+      "condition": "self.inst.return_to_king",
+      "semantic": "返回国王（王座）位置并移除自身"
+    },
+    {
+      "condition": "shouldanswercall(self.inst)",
+      "semantic": "响应祭品锅召唤前往并应答"
+    },
+    {
+      "condition": "GetLeader(self.inst) ~= nil",
+      "semantic": "跟随领导者后额外面对目标"
+    },
+    {
+      "condition": "GetLeader(self.inst) == nil",
+      "semantic": "以家园为中心游荡、觅食、交易"
+    }
+  ],
+  "bt_structure": "根节点判断跳跃暂停，其下优先级节点依次包含：恐慌触发、避电、面对治疗者、拾取盔甲、需甲寻军械库、等待帮助时跟敌与站立、无冷却追击、冷却逃跑、返王座、协助领导砍挖、应答祭品锅、面对交易者、进食、跟随领导、面对目标、无领导游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15973,
+      24875,
+      13268,
+      24748,
+      24864,
+      20110,
+      24868,
+      15975
+    ],
+    "aspects": [
+      {
+        "aspect": "仇恨目标距离描述",
+        "evidence": [
+          {
+            "pageid": 15973,
+            "quote": "会和仇恨目标保持 5 ~ 15 距离单位"
+          }
+        ]
+      },
+      {
+        "aspect": "军械库跑动取盔甲描述",
+        "evidence": [
+          {
+            "pageid": 24864,
+            "quote": "附近 15 距离单位内没有头部装备的忠诚鱼人守卫会跑向鱼人军械库"
+          }
+        ]
+      },
+      {
+        "aspect": "堡垒附近游荡距离描述",
+        "evidence": [
+          {
+            "pageid": 15973,
+            "quote": "活动范围：所属的鱼人堡垒附近 15 距离单位内"
+          }
+        ]
+      },
+      {
+        "aspect": "返回王座行为描述",
+        "evidence": [
+          {
+            "pageid": 15975,
+            "quote": "回到鱼人之王周围并消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鱼人守卫",
+    "觅食",
+    "攻击冷却",
+    "游荡",
+    "军械库",
+    "捡起盔甲",
+    "跟随首领",
+    "回王座",
+    "祭锅",
+    "协助劳作"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4066dca66663bb7af1018b8f4670586d6a9b8b5cef524f4b970e03f13d7c984d",
+    "source_bytes": 14967,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060055424
+  }
+}

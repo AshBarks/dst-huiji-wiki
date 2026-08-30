@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/shadow_rookbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "shadow_rookbrain",
+  "summary": "该大脑控制暗影 rook 棋子在战斗中根据 ShouldChase 逻辑决定是否追逐攻击目标。当无需追逐时，它会面向最近玩家并周期性嘲讽，同时在最低优先级下自由游荡并等待消失时间后触发 despawn 事件。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 的 OnStart 方法以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [
+    "despawn"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "最长追逐时间无限制(nil)",
+        "放弃距离 40 世界单位"
+      ],
+      "context": "ShouldChase 返回真时由 WhileNode 调用"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取面对目标函数(优先战斗目标或 START_FACE_DIST 内最近玩家)",
+        "保持面对函数(目标存活且不在 KEEP_FACE_DIST 外等)"
+      ],
+      "context": "第二优先级 ParallelNode 中"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [],
+      "context": "第三优先级 ParallelNode 中与消失等待并行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldChase(self) 返回真（无目标/不在冷却/不在攻击距离附近）",
+      "semantic": "执行 ChaseAndAttack 追逐攻击，放弃距离 40，无限时"
+    },
+    {
+      "condition": "ShouldChase 假且处于第二优先级",
+      "semantic": "并行 FaceEntity 面对目标，且循环每 3 秒若实体 idle 则触发 taunt 嘲讽"
+    },
+    {
+      "condition": "最低优先级（前两者未满足）",
+      "semantic": "并行等待 TUNING.SHADOW_CHESSPIECE_DESPAWN_TIME 后推送 despawn 事件，同时 Wander 自由游荡"
+    }
+  ],
+  "bt_structure": "PriorityNode(0.25) 包含: 1) WhileNode(ShouldChase)->ChaseAndAttack; 2) ParallelNode[FaceEntity + LoopNode(Wait3+ActionNode(taunt if idle))]; 3) ParallelNode[SequenceNode(WaitDespawn+ActionNode(despawn)) + Wander]",
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      24027,
+      45248,
+      15651,
+      22522,
+      13785,
+      13874,
+      14465
+    ],
+    "aspects": [],
+    "no_evidence_reason": "给定页面摘录中，与暗影战车(shadow_rook)相关的页面仅涉及暗影棋子总体介绍、雕像唤醒与月相生成(如页13828、24027、45248、22522、13785)，未描述其大脑行为树参数(START_FACE_DIST等)或追逐/面对/徘徊行为；其余页面对应龙蝇、企鸥、大虚影等无关实体，因此无该符号能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影棋子",
+    "追逐攻击",
+    "自由游荡",
+    "行为树",
+    "面向最近玩家",
+    "消失时间",
+    "周期性嘲讽",
+    "暗影大脑"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67f165bf466995eb9541c652c91a40ec87c57969c57ef1b9b300e3cd72d183b4",
+    "source_bytes": 2065,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061170557
+  }
+}

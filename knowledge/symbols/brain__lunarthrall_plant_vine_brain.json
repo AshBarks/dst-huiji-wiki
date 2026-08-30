@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/lunarthrall_plant_vine_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "lunarthrall_plant_vine_brain",
+  "summary": "该大脑控制月球植物藤蔓实体在处于空闲(idle)状态时移动。若有植物目标且在合理距离内，它走向植物并可能在极近距离寄生；若无目标或超出屏幕距离，则在玩家视野内随机漫游，或在没有玩家时传送至植物或移除自身。",
+  "api": [],
+  "api_note": "该大脑仅重写OnStart方法构建行为树，未定义其他对外方法或可被外部调用的函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ATTACH_DIST",
+    "CLOSE_DIST",
+    "SCREEN_DIST_SQ"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点列表",
+        "更新间隔0.25秒"
+      ]
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：实体状态标签含idle",
+        "节点名称\"move\"",
+        "子节点DoAction"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体inst",
+        "动作函数MoveToPointAction",
+        "动作名\"Move\"",
+        "是否立即运行true"
+      ]
+    },
+    {
+      "ctor": "BufferedAction",
+      "args_semantic": [
+        "实体inst",
+        "无目标",
+        "动作ACTIONS.WALKTO",
+        "无物品",
+        "目标位置pos",
+        "无配方",
+        "距离参数0.2"
+      ],
+      "context": "在MoveToPointAction函数末尾返回"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.plant_target存在且dist <= ATTACH_DIST*ATTACH_DIST",
+      "semantic": "实体进入infest寄生状态"
+    },
+    {
+      "condition": "dist <= CLOSE_DIST*CLOSE_DIST (且大于ATTACH_DIST)",
+      "semantic": "直接走向植物目标的世界坐标"
+    },
+    {
+      "condition": "dist > SCREEN_DIST_SQ",
+      "semantic": "放弃走向植物(movetoplant=false)"
+    },
+    {
+      "condition": "有植物目标且距离介于CLOSE_DIST与SCREEN_DIST_SQ之间",
+      "semantic": "计算植物附近的随机角度偏移点作为移动目标"
+    },
+    {
+      "condition": "not movetoplant且视野内无玩家(IsAnyPlayerInRangeSq为假)",
+      "semantic": "若有植物生成器则传送至植物，否则移除实体"
+    },
+    {
+      "condition": "not movetoplant且视野内有玩家",
+      "semantic": "在实体当前位置附近计算随机偏移点漫游"
+    }
+  ],
+  "bt_structure": "根优先级节点(PriorityNode)包含单一WhileNode：当实体状态标签为idle时，执行DoAction调用MoveToPointAction函数计算移动位置（走向植物、寄生、漫游或触发传送/移除）。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13828,
+      19676,
+      20560,
+      47010,
+      52137,
+      53008,
+      65505
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录实体为smallguard_alterguardian_projectile、shadow_knight、致命亮茄寄生、houndmound、alterguardian_phase1_lunarrift、mutatedbird、shadowthrall_centipede_head、洞穴光照等，均未描述brain__lunarthrall_plant_vine_brain（月亮植物藤蔓脑）的附着距离、接近距离、屏幕距离、行为树节点及移动动作等能力，无对应玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "寄生状态",
+    "视野内",
+    "月奴藤蔓",
+    "藤蔓寄生",
+    "随机游荡",
+    "传送至植物",
+    "月奴大脑",
+    "月奴植物"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f02aeed253a8af9eadc071836a694818a8f6f7ffdbfdc608497b5445476a5d61",
+    "source_bytes": 3231,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059814685
+  }
+}

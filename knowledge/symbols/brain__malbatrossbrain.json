@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/malbatrossbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "malbatrossbrain",
+  "summary": "海乌鸦大脑控制其在海洋中的行为，优先在非俯冲状态下执行离开陆地、逃离威胁、凝视与追击玩家、觅食鱼类及攻击拖网等动作。实体会游荡于出生点或记忆的家附近，并在饥饿时寻找鱼类或满载的海洋拖网进食。当近距离遭遇目标且具备俯冲/潜水条件时，会触发相应事件并逃离。",
+  "api": [],
+  "api_note": "该大脑类仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期钩子，未定义其他可供外部直接调用的自定义方法。",
+  "events_published": [
+    "doswoop",
+    "dosplash",
+    "depart"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SEE_DIST",
+    "CHASE_DIST",
+    "CHASE_TIME",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "RETURNTOFIGHT_DIST",
+    "SEE_BAIT_DIST",
+    "DIVE_ATTACK_CHANCE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "检测是否应离开陆地的函数 ShouldLeaveLand",
+        "节点调试名称“leave the land”"
+      ],
+      "context": "始终检查（在 non-swoop 内优先最高）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "猎人参数表（getfn=CheckForFleeAndDive 用于获取俯冲/潜水威胁目标）",
+        "发现猎人距离 RUN_AWAY_DIST=5",
+        "安全距离 STOP_RUN_AWAY_DIST=6"
+      ],
+      "context": "当 CheckForFleeAndDive 返回目标时逃离"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身",
+        "获取战斗凝视目标函数 GetCombatFaceTargetFn",
+        "保持凝视目标函数 KeepCombatFaceTargetFn"
+      ],
+      "context": "有战斗目标且未离开家太远时凝视"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐时间 CHASE_TIME=20 秒",
+        "放弃距离 CHASE_DIST=32 世界单位"
+      ],
+      "context": "凝视后追击攻击"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取吃鱼动作函数 GetEatAction",
+        "节点调试名称“Dive For Fish”"
+      ],
+      "context": "实体饥饿且附近有海洋鱼时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "寻找拖网动作函数 LookForTrawlerAction",
+        "节点调试名称“Attack Fish Trawler”"
+      ],
+      "context": "实体饥饿且附近有满载拖网时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "获取游荡中心函数 GetWanderPos（home 或 spawnpoint）",
+        "最大游荡距离 30",
+        "配置表(最小等待时间 6 秒)"
+      ],
+      "context": "上述行为均未触发时游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"swoop\")",
+      "semantic": "仅当实体不处于俯冲(swoop)状态时，才执行内部优先级节点：离开陆地检测、逃离威胁、凝视、追击、吃鱼、攻击拖网、游荡；若正在俯冲则大脑暂停这些逻辑。"
+    }
+  ],
+  "bt_structure": "根优先级节点(1) -> WhileNode(条件:非俯冲状态, 标签'not swooping') -> 优先级节点(1) [ DoAction(离开陆地) , RunAway(逃离俯冲/潜水目标) , FaceEntity(凝视战斗目标) , ChaseAndAttack(追击20s/32dist) , DoAction(吃鱼) , DoAction(攻击拖网) , Wander(中心home/spawnpoint, 距离30, 最小等待6) ]",
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      15022,
+      13698,
+      72981,
+      13901,
+      15239,
+      15238,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "俯冲攻击概率标注",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "有 33% 的概率是俯冲攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "固定鱼群附近游荡描述",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "在平时，它会在固定鱼群附近四处移动。"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击满载拖网行为",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "邪天翁会主动攻击 15 单位内的装满的海洋拖网捕鱼器"
+          }
+        ]
+      },
+      {
+        "aspect": "潜水捕捉海鱼行为",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "当 15 单位内有海鱼时，邪天翁会潜水捕捉海鱼"
+          }
+        ]
+      },
+      {
+        "aspect": "离开陆地消失描述",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "如果邪天翁来到陆地上，会飞天消失。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "海乌鸦",
+    "大脑",
+    "俯冲",
+    "逃跑",
+    "吃鱼",
+    "拖网",
+    "游荡",
+    "追击",
+    "离开陆地"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "觅食",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1dfb0bccca2ad4a541dbe99b7d5d22c5eef18cf0bb035a5ee1dd2c726d3d7f44",
+    "source_bytes": 9183,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059922410
+  }
+}

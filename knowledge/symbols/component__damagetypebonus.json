@@ -7,31 +7,31 @@
   },
   "category": "component",
   "display_name": "damagetypebonus",
-  "summary": "该组件管理实体针对特定伤害类型标签的加成修正数据与动态回调函数。它参与战斗中的伤害计算流程，通过匹配目标标签和调用回调来提供伤害乘数修正。外部可添加或移除基于来源的加成项以及返回乘数的回调函数来动态调整伤害。",
+  "summary": "该组件管理实体针对特定目标标签的伤害加成修正数据与回调函数。它允许按标签和来源动态叠加百分比增益，并在查询时根据目标标签及回调计算总伤害乘数，直接参与战斗中的伤害结算玩法。",
   "api": [
     {
       "name": "AddBonus",
-      "effect": "为指定标签(tag)下的来源(src)设置百分比加成(pct)，使用key标识。行为：若标签不存在则创建SourceModifierList并存入self.tags，然后调用其SetModifier方法。副作用：修改self.tags表，可能新建修饰符列表并添加或覆盖修饰符。"
+      "effect": "若 self.tags[tag] 不存在则创建 SourceModifierList 并存入该表；随后对对应 modifiers 调用 SetModifier(src, pct, key) 以添加或修改来源修正。副作用：可能新增或更新 self.tags 表中的修正列表。"
     },
     {
       "name": "RemoveBonus",
-      "effect": "移除指定标签(tag)下来源(src)与key对应的修饰符。行为：若标签存在则调用RemoveModifier，若列表空则置self.tags[tag]为nil。副作用：可能修改或清除self.tags中的对应项。"
+      "effect": "若 self.tags[tag] 存在对应列表，调用其 RemoveModifier(src, key) 移除修饰符；若列表变为空则置 self.tags[tag] 为 nil。副作用：可能修改或清除 self.tags 中的项。"
     },
     {
       "name": "AddBonusCallback",
-      "effect": "添加返回乘数的回调函数(fn)。行为：初始化self.bonuscallbacks表（如需），先移除同名函数避免重复，再插入新函数。副作用：修改self.bonuscallbacks数组，增加回调。"
+      "effect": "确保 self.bonuscallbacks 表存在，先调用 RemoveBonusCallback(fn) 移除相同函数，再将 fn 插入数组。副作用：修改 self.bonuscallbacks 数组，增加回调。"
     },
     {
       "name": "RemoveBonusCallback",
-      "effect": "从回调列表中移除指定函数(fn)。行为：若self.bonuscallbacks非空，从数组中删除该函数。副作用：修改self.bonuscallbacks数组。"
+      "effect": "若 self.bonuscallbacks 不为 nil，从数组中移除指定的函数 fn。副作用：修改 self.bonuscallbacks 数组，可能减少回调。"
     },
     {
       "name": "GetBonus",
-      "effect": "计算对目标(target)的总伤害乘数。行为：若target为nil则返回1；否则遍历self.tags，若目标拥有该标签则乘上修饰符值，再遍历bonuscallbacks，乘上各回调返回值（nil视为1）并返回乘积。副作用：无。"
+      "effect": "计算伤害乘数：初始为1；若 target 非 nil，遍历 self.tags，当 target 具有某 tag 时将乘数乘上该 tag 对应 SourceModifierList 的 Get() 值；若 self.bonuscallbacks 存在，遍历每个回调 fn，将乘数乘上 (fn(inst, target) 或 1)。返回最终乘数。无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "生成调试字符串，列出所有标签及其当前修正值。行为：拼接self.tags中各项的字符串。副作用：无。"
+      "effect": "遍历 self.tags 拼接包含标签名与修正值的调试字符串（格式如换行加缩进[tag] value），若无可遍历项则返回 nil。无副作用。"
     }
   ],
   "events_published": [],
@@ -43,15 +43,15 @@
       20150,
       13156,
       10374,
-      10355,
-      13437,
       10379,
       20058,
-      13268
+      10355,
+      13437,
+      72238
     ],
     "aspects": [
       {
-        "aspect": "角色与装备伤害类型加成及倍率描述",
+        "aspect": "伤害类型加成添加描述（角色获得亲和与倍率）",
         "evidence": [
           {
             "pageid": 13156,
@@ -59,7 +59,11 @@
           },
           {
             "pageid": 10374,
-            "quote": "伯尼变为暗影阵营、获得位面实体抵抗并增加5点位面伤害"
+            "quote": "薇洛获得暗影亲和。伯尼！变为暗影阵营、获得位面实体抵抗并增加5点位面伤害"
+          },
+          {
+            "pageid": 10379,
+            "quote": "温蒂的进攻端物理伤害倍率为0.75"
           },
           {
             "pageid": 10355,
@@ -70,16 +74,16 @@
             "quote": "沃尔特获得暗影亲和，受到来自暗影阵营的伤害降低至0.9"
           },
           {
-            "pageid": 13268,
-            "quote": "沃特获得月亮亲和，受到来自月亮阵营的伤害降低至0.9"
-          },
-          {
-            "pageid": 10379,
-            "quote": "温蒂的进攻端物理伤害倍率为0.75"
-          },
-          {
             "pageid": 20058,
             "quote": "部分盔甲所具有的阵营减伤，能减免物理伤害和位面伤害"
+          },
+          {
+            "pageid": 72238,
+            "quote": "响应PVP伤害倍率。对玩家领袖攻击附身底盘随从的情况也有效"
+          },
+          {
+            "pageid": 20150,
+            "quote": "伤害倍率为干燥伤害倍率，一般为×1.5"
           }
         ]
       }
@@ -88,12 +92,17 @@
   },
   "search_terms": [
     "伤害加成",
-    "类型克制",
-    "标签伤害",
     "伤害倍率",
-    "攻击增益",
-    "伤害修正"
+    "伤害类型",
+    "类型加成",
+    "目标标签",
+    "伤害修正",
+    "百分比增益",
+    "总伤害乘数",
+    "伤害结算",
+    "回调函数"
   ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 7/10)",
   "gameplay_tags": [
     "战斗"
   ],
@@ -102,6 +111,6 @@
     "source_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
     "source_bytes": 1631,
     "model": "hy3-free",
-    "generated_at_ms": 1787933145761
+    "generated_at_ms": 1788063031692
   }
 }

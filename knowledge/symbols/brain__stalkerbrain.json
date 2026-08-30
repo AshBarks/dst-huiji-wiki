@@ -1,0 +1,211 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/stalkerbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "stalkerbrain",
+  "summary": "该大脑控制织影者（Stalker）根据不同实体标记（isnpc、atriumstalker、canfight）采取各异行为。在竞技场BOSS形态下会智能释放技能、追击并躲避星之门、空闲时徘徊返回；可战斗形态会施放化石陷阱并追击；默认形态仅周期触发动画并游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义其他可供外部调用的自定义方法。",
+  "events_published": [
+    "skullache",
+    "fallapart",
+    "fossilfeast",
+    "flinch",
+    "fossilsnare",
+    "mindcontrol",
+    "shadowchannelers",
+    "fossilminions",
+    "fossilspikes"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "SKULLACHE_CD",
+    "FALLAPART_CD",
+    "SEE_LURE_DIST",
+    "SAFE_LURE_DIST",
+    "COMBAT_FEAST_DELAY",
+    "CHECK_MINIONS_PERIOD",
+    "RESET_COMBAT_DELAY",
+    "LOITER_GATE_DIST",
+    "LOITER_GATE_RANGE",
+    "IDLE_GATE_TIME",
+    "IDLE_GATE_MAX_DIST",
+    "IDLE_GATE_DIST",
+    "AVOID_GATE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "isnpc 分支基础游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "atriumstalker 分支最终 fallback 游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "游荡中心函数：获取徘徊星之门位置(GetLoiterStargatePos)",
+        "离家最大距离：LOITER_GATE_RANGE(1.5)"
+      ],
+      "context": "atriumstalker 分支并行徘徊"
+    },
+    {
+      "ctor": "ChaseAndAttackAndAvoid",
+      "args_semantic": [
+        "实体自身(inst)",
+        "寻找躲避物函数：获取星之门(GetStargate)",
+        "绕开星之门距离：AVOID_GATE_DIST(6)"
+      ],
+      "context": "atriumstalker 分支追击并躲避星之门"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(inst)",
+        "拴绳锚点函数：获取星之门位置(GetStargatePos)",
+        "拴绳最大半径：IDLE_GATE_MAX_DIST(4)",
+        "内部返回距离：IDLE_GATE_DIST(3)"
+      ],
+      "context": "atriumstalker 分支空闲返回序列"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取面对目标函数：获取空闲星之门(GetIdleStargate)",
+        "保持面对函数：保持空闲星之门(KeepIdleStargate)"
+      ],
+      "context": "atriumstalker 分支空闲面对"
+    },
+    {
+      "ctor": "FindClosest",
+      "args_semantic": [
+        "实体自身(inst)",
+        "搜索半径：SEE_LURE_DIST(20)",
+        "停止安全距离：SAFE_LURE_DIST(5)",
+        "目标必须标签：shadowlure"
+      ],
+      "context": "canfight 分支寻找暗影诱饵"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取面对目标函数：获取暗影诱饵(GetShadowLure)",
+        "保持面对函数：保持暗影诱饵(KeepShadowLure)"
+      ],
+      "context": "canfight 分支面对诱饵"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "canfight 分支追击攻击"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "canfight 分支无目标游荡"
+    },
+    {
+      "ctor": "FindClosest",
+      "args_semantic": [
+        "实体自身(inst)",
+        "搜索半径：SEE_LURE_DIST(20)",
+        "停止安全距离：SAFE_LURE_DIST(5)",
+        "目标必须标签：shadowlure"
+      ],
+      "context": "默认分支寻找暗影诱饵"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取面对目标函数：获取暗影诱饵(GetShadowLure)",
+        "保持面对函数：保持暗影诱饵(KeepShadowLure)"
+      ],
+      "context": "默认分支面对诱饵"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "默认分支游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.isnpc 为真",
+      "semantic": "仅受谈话状态守卫限制的 Wander 游荡，无战斗与技能"
+    },
+    {
+      "condition": "self.inst.atriumstalker 为真",
+      "semantic": "完整 BOSS 行为：丢失竞技场处理、按条件链释放技能(精神控制/陷阱/召唤/进食)、追击并躲避星之门、并行徘徊与拴回星之门面对、最后游荡"
+    },
+    {
+      "condition": "self.inst.canfight 为真",
+      "semantic": "战斗行为：有目标时可能施放化石陷阱、追击攻击、无目标时寻找暗影诱饵面对或游荡"
+    },
+    {
+      "condition": "上述属性均不满足(默认)",
+      "semantic": "被动行为：白天推畏缩事件、周期推头骨痛与散架事件、寻找暗影诱饵面对、游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点按实体形态分派子树：isnpc 仅守卫下 Wander；atriumstalker 优先级为 丢失竞技场>技能释放>进食>追击躲避>并行(徘徊与拴回面对)>Wander；canfight 优先级为 陷阱>追击>并行(诱饵面对或游荡)；默认 优先级为 白天畏缩>周期事件>诱饵面对>Wander。",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      15022,
+      24542,
+      14674,
+      51046,
+      46847,
+      18474,
+      51949
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，与 stalker 相关的页面13701(stalker_atrium)和18474(fossil_stalker)仅提及远古织影者的生成、掉落、大门冷却及拼装位置，未描述 brain__stalkerbrain 的游荡、追击躲避星之门、面对星之门、寻找暗影诱饵等行为语义；其余页面实体无关，故无能力证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "织影者",
+    "星门",
+    "化石",
+    "陷阱",
+    "追击",
+    "躲避",
+    "徘徊",
+    "游荡",
+    "技能释放",
+    "竞技场"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 1/10)",
+  "gameplay_tags": [
+    "战斗",
+    "Boss机制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "860e38677782775af04a68d965840e3fd6c71f0ecff0ce4bb9c95f9a94fa67df",
+    "source_bytes": 11866,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061703450
+  }
+}

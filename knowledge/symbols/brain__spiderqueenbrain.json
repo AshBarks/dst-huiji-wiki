@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/spiderqueenbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "spiderqueenbrain",
+  "summary": "蜘蛛女王大脑在女王存活足够时间且环境合适时，会种植蜘蛛巢或产出幼蛛。遭遇敌人时它会进行限时追击与攻击，否则自由游荡。当受到惊吓或触碰电栅栏时会触发恐慌逃跑。",
+  "api": [
+    {
+      "name": "CanSpawnChild",
+      "effect": ""
+    },
+    {
+      "name": "CanPlantNest",
+      "effect": ""
+    },
+    {
+      "name": "OnStart",
+      "effect": ""
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "BLOCKER_TAGS",
+    "SPIDERDEN_TAGS",
+    "SPIDERQUEEN_TAGS",
+    "MIN_FOLLOW",
+    "MAX_FOLLOW",
+    "MED_FOLLOW"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 60 秒",
+        "放弃距离 40 世界单位",
+        "最大攻击次数无限制(nil)",
+        "不自动寻找新目标(nil)",
+        "移动方式默认(nil)",
+        "海洋距离保持为 WINONA_CATAPULT_MAX_RANGE+MAX_WALKABLE_PLATFORM_RADIUS+WINONA_CATAPULT_KEEP_TARGET_BUFFER+1 世界单位"
+      ],
+      "context": "无条件（优先级靠后）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [],
+      "context": "无条件（优先级最后）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self:CanPlantNest() 返回真（存活时间>SPIDERQUEEN_MINWANDERTIME 且周围无阻挡/蜘蛛巢/女王于最小间距内）",
+      "semantic": "执行 makenest 状态动作种植蜘蛛巢"
+    },
+    {
+      "condition": "self:CanSpawnChild() 返回真（存活>5秒且非busy且增量生产者可生产）",
+      "semantic": "执行 poop_pre 状态动作生成幼蛛"
+    }
+  ],
+  "bt_structure": "优先级节点：恐慌触发 > 电栅栏恐慌触发 > 若能种巢则种巢 > 若能生孩则生孩 > 追击攻击(60秒,40距,海洋距离缓冲) > 自由游荡",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      13828,
+      15551,
+      15651,
+      15922,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有给定页面（15022,13897,51046,13828,15551,15651,15922,13823）的实体均非蜘蛛女王，内容未描述 spiderqueenbrain 的标签、跟随距离、追击60秒、放弃距离40或游荡等行为，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜘蛛女王",
+    "自由游荡",
+    "蜘蛛女王大脑",
+    "种植蜘蛛巢",
+    "生成幼蛛",
+    "追击",
+    "攻击",
+    "恐慌逃跑",
+    "电栅栏"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "战斗",
+    "建造",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "858ead74bc41fc818075c339582c6c36326d32bd94c513c8d747ca5fba986a8b",
+    "source_bytes": 2291,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061513864
+  }
+}

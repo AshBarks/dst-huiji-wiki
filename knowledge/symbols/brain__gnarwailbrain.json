@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/gnarwailbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "gnarwailbrain",
+  "summary": "独角鲸大脑控制独角鲸在海洋中的行为。当角断裂且目标近岸时会恐慌躲避，有水上战斗目标时追击或跟随，有领导者时拴绳跟随船只，有交易者时靠近交易，否则游荡、觅食或投掷物品。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_BOAT_FOLLOW_DIST",
+    "MIN_BOAT_FOLLOW_DIST",
+    "BOAT_TARGET_DISTANCE",
+    "MAX_CHASE_TIME",
+    "TRADE_DISTANCE",
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "SEE_ITEM_DISTANCE",
+    "NOT_TOSSABLE_TAGS",
+    "ONE_OF_TOSSABLE_TAGS",
+    "GNARWAIL_WALK_SQ",
+    "FINDFOOD_CANT_TAGS",
+    "BOAT_TAGS",
+    "WANDER_DISTANCE",
+    "BOAT_CLOSE_ENOUGH_TO_WANDER_AWAY_DISTANCE",
+    "WANDER_TIMES",
+    "WANDER_DATA"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PanicAndAvoid",
+      "args_semantic": [
+        "返回战斗目标作为躲避对象的函数",
+        "试图与躲避目标保持的基准距离 MIN_BOAT_FOLLOW_DIST"
+      ],
+      "context": "角断裂且战斗目标距离小于 MIN_BOAT_FOLLOW_DIST 且目标不在海洋"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "最长追逐时间受季节修正的 MAX_CHASE_TIME(15)秒",
+        "放弃距离受季节修正的 MAX_BOAT_FOLLOW_DIST",
+        "最大攻击次数 2"
+      ],
+      "context": "有有效水上目标且（目标在平台上或不在冷却）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "返回战斗目标（非小生物）的函数",
+        "最小允许距离 MIN_FOLLOW_DIST(6)",
+        "期望保持距离 TARGET_FOLLOW_DIST(7.5)",
+        "最大允许距离 MAX_FOLLOW_DIST(10)",
+        "不允许奔跑(false)"
+      ],
+      "context": "有有效水上目标时跟随"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "返回领导者跟随位置的函数",
+        "返回最大跟随距离的函数",
+        "内部返回距离 0.5",
+        "是否跑步返回的函数"
+      ],
+      "context": "根节点默认执行拴绳跟随领导者"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "返回交易者玩家的函数",
+        "最小允许距离 0",
+        "期望保持距离 2",
+        "最大允许距离 TUNING.MAX_WALKABLE_PLATFORM_RADIUS",
+        "不允许奔跑(false)"
+      ],
+      "context": "附近有试图交易的玩家时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置(nil)",
+        "无最大距离(nil)",
+        "游荡时间配置 WANDER_TIMES(随机等待2)",
+        "获取游荡方向的函数",
+        "无设置方向函数(nil)",
+        "可行走点检验函数",
+        "游荡数据 WANDER_DATA(游荡半径8)"
+      ],
+      "context": "无交易者且不忙碌时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HornIsBroken() and combat.target 距离平方 < MIN_BOAT_FOLLOW_DIST^2 and not target:IsOnOcean(false)",
+      "semantic": "角断裂且目标近岸时恐慌躲避战斗目标"
+    },
+    {
+      "condition": "HasValidWaterTarget(inst)",
+      "semantic": "有不在陆地上的战斗目标时，进入攻击或跟随分支"
+    },
+    {
+      "condition": "combat.target:GetCurrentPlatform() ~= nil or not combat:InCooldown()",
+      "semantic": "目标在平台上或不在攻击冷却时执行追击"
+    },
+    {
+      "condition": "GetTrader(inst) ~= nil",
+      "semantic": "附近有试图交易的玩家时，靠近交易者"
+    },
+    {
+      "condition": "GetTrader(inst) == nil and not inst.sg:HasStateTag('busy')",
+      "semantic": "无交易者且不忙碌时，执行逃跑船只、觅食、投掷、游荡"
+    },
+    {
+      "condition": "not combat:HasTarget()",
+      "semantic": "无战斗目标时寻找食物"
+    },
+    {
+      "condition": "not inst:HornIsBroken() and (无目标或有领导者) and GetNearbyTossTarget ~= nil",
+      "semantic": "角未断且有可投掷物品时尝试投掷"
+    }
+  ],
+  "bt_structure": "根优先级节点：1)角断裂近岸恐慌躲避；2)电栅栏恐慌触发；3)有效水上目标时攻击/跟随/面向；4)拴绳跟随领导者船只；5)有交易者则靠近；6)无交易者不忙时逃跑船只/觅食/投掷/游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15903,
+      20842,
+      51529,
+      19298,
+      24835,
+      51486,
+      10374,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及哑铃、出逃腿靴、浮标、亮茄炸弹、蚊子炸弹、起点塔、薇洛、沃尔夫冈等实体，未提及 gnarwailbrain 或其相关的船只跟随距离、追逐时间、交易距离、游荡数据等任何能力或行为语义，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "独角鲸",
+    "大脑",
+    "角断裂",
+    "恐慌躲避",
+    "水上战斗",
+    "跟随船只",
+    "靠近交易",
+    "游荡",
+    "觅食",
+    "投掷"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "觅食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9c4c648d1a2ba76dce6c1ce595e839cd46852f02b03fde3f6608b198a19736fb",
+    "source_bytes": 10952,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059265076
+  }
+}

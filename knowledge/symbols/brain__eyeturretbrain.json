@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/eyeturretbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "eyeturretbrain",
+  "summary": "该大脑控制眼睛炮塔实体优先进行原地攻击已有战斗目标的行为。当无攻击目标时，若10距离内存在不带“notarget”标签的最近玩家，则转头面对并保持至距离超过15或目标获得该标签。整体表现为固定地点对靠近玩家进行监视与攻击响应。",
+  "api": [],
+  "api_note": "该大脑仅重写父类Brain的OnStart方法以构建行为树，未定义其他对外调用的方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "实体自身(inst)"
+      ],
+      "context": "优先级节点首位，始终尝试执行"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取目标函数：在START_FACE_DIST(10)内找最近玩家且排除notarget标签",
+        "保持目标函数：目标无notarget标签且实体在KEEP_FACE_DIST(15)内"
+      ],
+      "context": "优先级节点次位，当前一节点未触发时尝试"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "target:HasTag(\"notarget\")",
+      "semantic": "获取面对目标时返回nil使FaceEntity失败不转头；保持面对时返回false中断面对"
+    }
+  ],
+  "bt_structure": "优先级节点(PriorityNode, 间隔0.25): 1. StandAndAttack 原地攻击现有目标; 2. FaceEntity 寻找10内无notarget最近玩家转头面对，保持至超15距离或目标带标签。",
+  "wiki": {
+    "scanned_pageids": [
+      15718,
+      15651,
+      13642,
+      14647,
+      15239,
+      15380,
+      15751,
+      16172
+    ],
+    "aspects": [
+      {
+        "aspect": "无法移动自动攻击描述",
+        "evidence": [
+          {
+            "pageid": 15718,
+            "quote": "眼睛炮塔将变成无法移动的部署形态。它会自动攻击"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "眼睛炮塔",
+    "行为树",
+    "附近玩家",
+    "面朝玩家",
+    "原地开火",
+    "优先目标",
+    "监视玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "99ef8d365326c853fd5d41e03f4a72de97cafa73beee9079114f125880132b84",
+    "source_bytes": 777,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059000370
+  }
+}

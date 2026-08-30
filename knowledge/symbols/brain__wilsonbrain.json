@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wilsonbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wilsonbrain",
+  "summary": "该大脑让实体在玩家按住鼠标左键时，以无最大攻击次数限制的方式追击敌人最长5秒。在未按住左键的默认情况下，实体会追击敌人最长5秒且最多攻击1次后放弃。",
+  "api": [],
+  "api_note": "该大脑仅通过 OnStart 方法构建行为树，未定义其他对外调用的方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RUN_THRESH",
+    "MAX_CHASE_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 5 秒"
+      ],
+      "context": "WhileNode条件：玩家控制器存在且按住主键（左键）时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 5 秒",
+        "放弃距离无（nil）",
+        "最大攻击次数 1 次"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "玩家控制器存在且按住主键（左键）",
+      "semantic": "执行 ChaseAndAttack 追击最长 5 秒（无最大攻击次数限制）"
+    },
+    {
+      "condition": "其他情况（未按住左键）",
+      "semantic": "执行 ChaseAndAttack 追击最长 5 秒，放弃距离 nil，最大攻击次数 1 次"
+    }
+  ],
+  "bt_structure": "根优先级节点包含：1) WhileNode(按住左键) -> ChaseAndAttack(最长5秒)；2) ChaseAndAttack(最长5秒, 放弃距离nil, 最大攻击1次)。",
+  "wiki": {
+    "scanned_pageids": [
+      10355,
+      20714,
+      73480,
+      13569,
+      15022,
+      13823,
+      14660,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中无页面讨论brain__wilsonbrain的追击5秒、放弃距离nil、最大攻击1次等能力；威尔逊页仅含胡须与背景，其余页涉及控制台、群系、季节、天体英雄、独眼巨鹿、火炬、世界翻新，均不匹配该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "大脑",
+    "威尔逊",
+    "攻击次数",
+    "鼠标左键",
+    "追击",
+    "行为树",
+    "最大攻击",
+    "5秒",
+    "默认"
+  ],
+  "search_terms_note": "pass1 后零命中 6/7,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d4446160421e994516f0406d25ceb69517fcc35967ee282d6f08f69f4e17d56f",
+    "source_bytes": 581,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061952609
+  }
+}

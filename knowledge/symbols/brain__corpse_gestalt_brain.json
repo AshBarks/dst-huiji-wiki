@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/corpse_gestalt_brain.lua"
+  },
+  "category": "brain",
+  "display_name": "corpse_gestalt_brain",
+  "summary": "该大脑控制尸体幻影实体在空闲时追踪标记的尸体目标。根据与目标的距离平方，实体会附着寄生、直接走向目标或带随机偏移地靠近；若失去目标且不在寄生状态，则在脱离玩家视野后自我移除，否则随机游走直至离开视线消失。",
+  "api": [],
+  "api_note": "该大脑模块仅返回 Brain 子类，重写了 OnStart 构建行为树，未暴露其他对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "ATTACH_DIST_SQ",
+    "CLOSE_DIST_SQ",
+    "SCREEN_DIST_SQ",
+    "CORPSE_TRACK_NAME",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "根节点下的子节点列表（含 WhileNode）",
+        "更新间隔 0.25 秒"
+      ],
+      "context": "行为树根"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：实体状态机含 idle 标签",
+        "节点名 CanMove",
+        "条件满足时执行的子优先级节点"
+      ],
+      "context": "根节点内"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "移动相关子节点列表（PossessChassisNode 与 DoAction）",
+        "更新间隔 0.25 秒"
+      ],
+      "context": "idle 条件内"
+    },
+    {
+      "ctor": "BrainCommon.PossessChassisNode",
+      "args_semantic": [
+        "大脑实例 self",
+        "更新间隔 0.25 秒"
+      ],
+      "context": "idle 内优先级"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体实例",
+        "动作函数 MoveToPointAction",
+        "动作名 Move",
+        "立即执行标志 true"
+      ],
+      "context": "idle 内优先级"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "target 有效 且 距离平方 <= ATTACH_DIST_SQ (1)",
+      "semantic": "将实体位置设为目标位置并进入 infest_corpse 状态寄生尸体"
+    },
+    {
+      "condition": "target 有效 且 距离平方 <= CLOSE_DIST_SQ (64)",
+      "semantic": "直接以目标当前位置为移动点走向目标"
+    },
+    {
+      "condition": "target 有效 且 距离平方 > CLOSE_DIST_SQ",
+      "semantic": "根据朝向目标的角度加随机偏移、半径受距离限制计算新位置靠近"
+    },
+    {
+      "condition": "无目标位置 且 不在 infesting 状态 且 无玩家在视野距离内",
+      "semantic": "实体直接自我移除"
+    },
+    {
+      "condition": "无目标位置 且 不在 infesting 状态 且 有玩家在视野距离内",
+      "semantic": "设定随机方向，计算随机半径偏移位置，走向该位置以脱离视线后消失"
+    },
+    {
+      "condition": "sg:HasStateTag('idle')",
+      "semantic": "仅在此状态下执行移动相关优先级节点"
+    }
+  ],
+  "bt_structure": "根 PriorityNode 包含 WhileNode(条件:实体 idle 状态标签)，其内为 PriorityNode 包含 BrainCommon.PossessChassisNode 与 DoAction(MoveToPointAction 处理追踪尸体或脱屏消失逻辑)。",
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      19075,
+      51494
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面实体为寄居蟹隐士(13493)、桦栗果精(19075)、瓦格斯塔夫工具(51494)，文本描述其外观、交易、散步、攻击、钻地、屏幕指示等行为，未出现与 corpse_gestalt_brain 相关的附着/接近/屏幕距离平方、尸体追踪名、0.25秒更新率、idle标签状态机、CanMove/PossessChassisNode/MoveToPointAction 等行为树能力的玩家语言表达，故页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "随机游走",
+    "空闲状态",
+    "尸体目标",
+    "附着寄生",
+    "离开视线",
+    "自我移除",
+    "偏移靠近",
+    "失去目标"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "054a5f4d685f6454a4ea1259e7a2c82afa6ebb5810442a61b19dd5b3f908a7da",
+    "source_bytes": 2740,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058609295
+  }
+}

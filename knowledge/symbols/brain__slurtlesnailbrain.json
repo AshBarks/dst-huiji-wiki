@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/slurtlesnailbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "slurtlesnailbrain",
+  "summary": "该大脑控制蜗牛实体在累计受伤达到阈值、遭遇弹道或史诗恐惧时举盾缩避，并逃离带有 character 标签的玩家。平时会进食自身或地面食物，或偷取附近玩家与容器的食物；若距上次进食超过容忍时间则跑回巢穴，否则在家附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他对外方法；局部函数 GoHomeAction/EatFoodAction/StealFoodAction 等仅供内部行为树回调使用，不对外暴露。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "DAMAGE_UNTIL_SHIELD",
+    "AVOID_PROJECTILE_ATTACKS",
+    "HIDE_WHEN_SCARED",
+    "SHIELD_TIME",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "SEE_FOOD_DIST",
+    "HUNGER_TOLERANCE",
+    "HUNTER_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "UseShield",
+      "args_semantic": [
+        "自身实体",
+        "触发举盾所需累计受伤阈值为 TUNING.SNURTLE_DAMAGE_UNTIL_SHIELD",
+        "举盾后保持缩避状态 2 秒",
+        "启用因来袭敌对弹道进入盾态",
+        "启用被史诗级恐惧时举盾"
+      ],
+      "context": "优先级最高，随时评估"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "猎人参数：标签含 character 且无 notarget，且目标无 healingsalve_acidbuff 增益",
+        "发现猎人距离 12",
+        "脱离安全距离 14"
+      ],
+      "context": "在举盾与恐慌触发之后"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取动作函数 EatFoodAction（吃库存或捡拾地面食物）"
+      ],
+      "context": "无特殊条件"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取动作函数 StealFoodAction（偷取玩家或容器食物）"
+      ],
+      "context": "无特殊条件"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取动作函数 GoHomeAction（返回巢穴）",
+        "节点调试名 Go Home",
+        "以跑动方式执行"
+      ],
+      "context": "ShouldGoHome 条件满足时（距上次进食 > HUNGER_TOLERANCE）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "家位置函数（取 knownlocations 的 home）",
+        "离家最大距离 40"
+      ],
+      "context": "默认游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGoHome(inst) 即 GetTime() - inst.lastmeal > HUNGER_TOLERANCE",
+      "semantic": "在优先级中插入 WhileNode，当条件满足时执行跑动回家的 DoAction，覆盖普通游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树：举盾防御 > 恐慌触发 > 电篱恐慌 > 逃离角色猎人 > 吃食物 > 偷食物 > (饥饿超时则跑回家) > 在家附近游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      13456,
+      15975,
+      13437,
+      34037,
+      13455,
+      15238,
+      13156,
+      15817
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及饥饿值机制及鱼人之王、沃尔特、暗影槌、沃比、皮弗娄牛、沃尔夫冈、岩浆虫等实体，未包含任何与 slurtlesnailbrain（蜗牛脑）相关的举盾、避弹、受惊缩避、逃跑距离、觅食、偷食、回巢、游荡等行为描述或参数，故无对应能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜗牛大脑",
+    "举盾",
+    "逃跑",
+    "偷食物",
+    "吃食物",
+    "回家",
+    "游荡",
+    "饥饿",
+    "恐慌"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "防御",
+    "觅食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "45a0756ddb0dc85dabf0f1eab9acb41dd7ee21efe06fdd8acfce948847713f75",
+    "source_bytes": 5803,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061372913
+  }
+}

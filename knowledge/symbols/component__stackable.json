@@ -7,63 +7,63 @@
   },
   "category": "component",
   "display_name": "stackable",
-  "summary": "该组件管理实体的堆叠数量（stacksize）与最大堆叠尺寸（maxsize），支持物品的合并、取出与拆分等核心物品管理玩法。可切换忽略上限以实现超限堆叠，并通过 replica 同步网络表现。参与生存资源收集与建造材料整理循环。",
+  "summary": "Stackable 组件管理实体的堆叠数量与最大上限，提供堆叠合并、拆分取出与上限忽略等功能。它参与物品资源管理的核心玩法，通过 replica 同步客户端，并在堆叠变动时推送事件、稀释关联组件属性。",
   "api": [
     {
       "name": "SetIgnoreMaxSize",
-      "effect": "设置是否忽略最大堆叠大小。若 ignoremaxsize 为真且当前 maxsize 非无穷，将原 maxsize 存入 originalmaxsize，设 maxsize 为 math.huge，并调用 replica.stackable:SetIgnoreMaxSize(true)；若为假且有原值则恢复 maxsize、清空 originalmaxsize 并通知 replica 取消忽略。"
+      "effect": "若 ignoremaxsize 为 true 且当前 maxsize 不为无穷大，保存原 maxsize 至 originalmaxsize，将 maxsize 设为无穷大，并调用 replica.stackable:SetIgnoreMaxSize(true)；若为 false 且有原上限记录，则恢复 maxsize 并清除记录，调用 replica 同步。副作用：修改 maxsize 与 originalmaxsize，同步 replica。"
     },
     {
       "name": "IsStack",
-      "effect": "返回 stacksize > 1 的布尔值，指示当前是否为多物品堆叠。"
+      "effect": "返回 self.stacksize > 1 的布尔值。无副作用。"
     },
     {
       "name": "StackSize",
-      "effect": "返回当前 stacksize 数值。"
+      "effect": "返回当前 self.stacksize 数值。无副作用。"
     },
     {
       "name": "IsFull",
-      "effect": "返回 stacksize >= maxsize 的布尔值，指示堆叠是否已满。"
+      "effect": "返回 self.stacksize >= self.maxsize 的布尔值。无副作用。"
     },
     {
       "name": "IsOverStacked",
-      "effect": "返回 stacksize > (originalmaxsize or maxsize) 的布尔值，指示是否超出原始最大堆叠（忽略上限时发生）。"
+      "effect": "返回 self.stacksize > (self.originalmaxsize or self.maxsize) 的布尔值，用于检测超出原上限的堆叠。无副作用。"
     },
     {
       "name": "CanStackWith",
-      "effect": "检查自身与 item 能否堆叠：要求 prefab 与 skinname 相同，且若存在 inst.stackable_CanStackWithFn 则其返回真。返回布尔值。"
+      "effect": "检查 self.inst.prefab 与 item.prefab 相同、skinname 相同，若存在 stackable_CanStackWithFn 回调则要求其返回真，返回是否可堆叠。无副作用。"
     },
     {
       "name": "OnSave",
-      "effect": "若 stacksize 不等于 1，返回包含 stack 字段的表 {stack = stacksize} 用于存档；否则返回 nil。"
+      "effect": "若 self.stacksize ~= 1 则返回 {stack = self.stacksize} 用于存档，否则返回 nil。无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "从 data.stack 读取并设置堆叠大小（限制为 MAXUINT），向自身推送 stacksizechange 事件（oldstacksize=1）。"
+      "effect": "从 data.stack 读取堆叠数（与 MAXUINT 取小）赋给 self.stacksize，并推送 stacksizechange 事件（oldstacksize=1）。副作用：修改堆叠数，触发事件。"
     },
     {
       "name": "SetOnDeStack",
-      "effect": "设置 self.ondestack 回调函数，在 Get 方法拆分堆叠时被执行。"
+      "effect": "设置 self.ondestack 回调函数为 fn，在拆分时调用。无副作用。"
     },
     {
       "name": "SetStackSize",
-      "effect": "将 stacksize 设为 min(sz, MAXUINT) 并触发属性 setter 同步 replica.stackable 与 inventoryitem 拾取位置；向自身推送 stacksizechange 事件（事件内 stacksize 参数为 sz，oldstacksize 为旧值）。"
+      "effect": "将 self.stacksize 设为 sz 与 MAXUINT 的较小值，并推送 stacksizechange 事件；属性 setter 会同步 replica.stackable 大小及 inventoryitem 拾取位置。副作用：修改堆叠数，同步网络与客户端，触发事件。"
     },
     {
       "name": "Get",
-      "effect": "从堆叠取出 num（默认1）个物品。若自身堆叠大于取出数，生成同 prefab/skin 的新实例，减少自身堆叠，设置新实例堆叠，调用 ondestack 回调，并复制 perishable/curseditem/rechargeable/inventoryitem 等组件状态，返回新实例；否则返回自身实例。副作用包括可能生成实体、修改堆叠与触发回调。"
+      "effect": "默认取出 num=1 个。若 stacksize > num_to_get，生成同 prefab 新实体，自身减少堆叠数，新实体设堆叠数，调用 ondestack 回调，并复制 perishable、curseditem、rechargeable、inventoryitem 等组件状态；否则返回自身。副作用：可能生成新实体，修改自身堆叠，触发事件，调用回调，复制属性。"
     },
     {
       "name": "RoomLeft",
-      "effect": "返回 maxsize - stacksize，即剩余可堆叠空间。"
+      "effect": "返回 self.maxsize - self.stacksize 的剩余可堆叠空间。无副作用。"
     },
     {
       "name": "Put",
-      "effect": "将 item 堆叠合并到自身。先经 CanStackWith 检查。计算添加数并稀释自身 perishable/inventoryitem/edible/curseditem 属性；若自身容量足够则移除 item，否则更新 item 剩余堆叠并推送其 stacksizechange 事件。自身堆叠更新并推送 stacksizechange 事件（带 source_pos）。返回未消耗完的 item 或 nil。副作用包括修改双方堆叠、移除实体、属性稀释与事件推送。"
+      "effect": "断言 item 非自身，若 CanStackWith 通过则合并数量，稀释 perishable、inventoryitem、edible、curseditem 等组件；若自身可容纳全部则移除 item，否则 item 剩余退回并推送事件；自身更新堆叠并推送 stacksizechange。副作用：修改双方堆叠，可能移除实体，稀释组件，推送事件，同步 replica。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述堆叠状态与最大尺寸的调试字符串，若曾忽略上限则附加原最大尺寸。"
+      "effect": "返回格式如 'stacksize/maxsize' 或带原上限的调试字符串。无副作用。"
     }
   ],
   "events_published": [
@@ -76,31 +76,22 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      22552,
+      19129,
       15011,
       16584,
-      22552,
+      20427,
       34992,
       15012,
-      15225,
-      16197,
-      20427
+      15225
     ],
     "aspects": [
       {
-        "aspect": "不可堆叠说明",
-        "evidence": [
-          {
-            "pageid": 20427,
-            "quote": "每种物品具有各自的堆叠上限或不可堆叠"
-          }
-        ]
-      },
-      {
-        "aspect": "优先堆叠至上限行为",
+        "aspect": "仆从拾取堆叠至上限",
         "evidence": [
           {
             "pageid": 15225,
-            "quote": "在捡起物品时会优先将物品堆叠至上限或…"
+            "quote": "优先将物品堆叠至上限"
           }
         ]
       },
@@ -112,38 +103,30 @@
             "quote": "石砖的堆叠上限只有10，而石头的堆叠上限为40"
           },
           {
-            "pageid": 22552,
-            "quote": "从 1000 个堆叠的树枝里，一次只能拿取 40 个树枝"
-          },
-          {
             "pageid": 34992,
             "quote": "物品堆叠上限"
           },
           {
-            "pageid": 16197,
-            "quote": "保质期,堆叠上限"
-          },
-          {
             "pageid": 20427,
-            "quote": "每种物品具有各自的堆叠上限或不可堆叠"
-          }
-        ]
-      },
-      {
-        "aspect": "拿取受堆叠上限限制",
-        "evidence": [
-          {
-            "pageid": 15011,
-            "quote": "从箱子拿取物品时，一次最多只能拿取该…"
+            "quote": "各自的堆叠上限或不可堆叠"
           },
           {
             "pageid": 22552,
-            "quote": "单次拿取的物品数量不会超过该物品的堆叠上限"
+            "quote": "一次只能拿取 40 个树枝"
           }
         ]
       },
       {
-        "aspect": "无限堆叠描述",
+        "aspect": "堆叠数量参与湿度计算",
+        "evidence": [
+          {
+            "pageid": 19129,
+            "quote": "（2×冰的堆叠数量）点潮湿度"
+          }
+        ]
+      },
+      {
+        "aspect": "无限堆叠机制描述",
         "evidence": [
           {
             "pageid": 15011,
@@ -154,8 +137,21 @@
             "quote": "升级后的龙鳞宝箱内的物品可以无限堆叠"
           },
           {
+            "pageid": 22552,
+            "quote": "从 1000 个堆叠的树枝里"
+          },
+          {
             "pageid": 15011,
             "quote": "单次快速移动物品的数量可以突破堆叠上限"
+          }
+        ]
+      },
+      {
+        "aspect": "物品可堆叠性说明",
+        "evidence": [
+          {
+            "pageid": 20427,
+            "quote": "各自的堆叠上限或不可堆叠"
           }
         ]
       }
@@ -176,22 +172,25 @@
   "search_terms": [
     "物品堆叠",
     "堆叠上限",
-    "合并物品",
-    "取出物品",
+    "可堆叠",
+    "堆叠数量",
+    "合并堆叠",
     "拆分堆叠",
-    "忽略上限",
-    "堆叠溢出",
-    "堆叠状态"
+    "忽略堆叠",
+    "堆叠空间",
+    "堆叠状态",
+    "堆叠存储"
   ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/10)",
   "gameplay_tags": [
     "生存",
-    "建造"
+    "资源"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
     "source_bytes": 6919,
     "model": "hy3-free",
-    "generated_at_ms": 1787931030863
+    "generated_at_ms": 1788059049515
   }
 }

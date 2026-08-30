@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/crabkingclawbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "crabkingclawbrain",
+  "summary": "该大脑控制蟹王爪的行为。当存在战斗目标且不在冷却时，它会尝试攻击目标。若目标位于平台上，则环绕船只移动并避开蟹王；否则拴在战斗目标附近并避开蟹王。无目标时在出生点周围游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义供外部直接调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WAMDER_DIST",
+    "TARGET_LEASH_DIST",
+    "CRABKING_RADIUS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取攻击动作的函数 AttackTarget",
+        "节点调试名称 'AttackTarget'"
+      ]
+    },
+    {
+      "ctor": "LeashAndAvoid",
+      "args_semantic": [
+        "实体自身",
+        "返回需避开目标(crabking)的函数 findavoidanceobjectfn",
+        "与避开目标保持的距离(CRABKING_RADIUS=5)",
+        "返回环绕船只偏移位置的函数",
+        "允许离家园最大距离(1)",
+        "触发返回家园内部距离阈值(1.5)",
+        "移动时是否奔跑(false)"
+      ],
+      "context": "IfNode 条件 CircleBoat(inst) 返回有效位置时（'circle' 分支）"
+    },
+    {
+      "ctor": "LeashAndAvoid",
+      "args_semantic": [
+        "实体自身",
+        "返回需避开目标(crabking)的函数 findavoidanceobjectfn",
+        "与避开目标保持的距离(CRABKING_RADIUS=5)",
+        "返回战斗目标位置的函数",
+        "允许离家园最大距离(TARGET_LEASH_DIST=3)",
+        "触发返回家园内部距离阈值(5)",
+        "移动时是否奔跑(false)"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回出生点位置的函数",
+        "离家最大距离(WAMDER_DIST=2)",
+        "包含最小行走0.5/随机行走0.5/最小等待1/随机等待5的表"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "CircleBoat(inst) 返回有效位置（存在战斗目标且其有当前平台）",
+      "semantic": "执行 LeashAndAvoid 以环绕船只偏移点为家园、避开 crabking、最大距离1、返回阈值1.5、不奔跑"
+    },
+    {
+      "condition": "无环绕船只但存在战斗目标（优先级后续）",
+      "semantic": "执行 LeashAndAvoid 以战斗目标位置为家园、避开 crabking、最大距离 TARGET_LEASH_DIST=3、返回阈值5、不奔跑"
+    },
+    {
+      "condition": "无战斗目标等默认情况（最低优先级）",
+      "semantic": "执行 Wander 以出生点为家园、游荡距离 WAMDER_DIST=2、短行走长等待"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. DoAction(AttackTarget) 尝试攻击；2. IfNode(CircleBoat) 则 LeashAndAvoid 环绕船；3. LeashAndAvoid 跟随战斗目标；4. Wander 在出生点附近游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      20426,
+      13857,
+      15225,
+      20428,
+      13761,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面均为其他实体（天体英雄、龙蝇、W.A.R.B.I.S.装备、猎犬、暗影傀儡、洞穴蠕虫、独眼巨鹿）的描述，未出现 crabkingclawbrain 相关的 wander 距离、仇恨距离、蟹王半径、避开蟹王、环绕船只等行为或数值表达，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蟹王爪",
+    "攻击目标",
+    "绕船移动",
+    "远离蟹王",
+    "跟随目标",
+    "出生点游荡",
+    "拴住目标",
+    "行为树",
+    "战斗目标"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 6/9)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b359945316d3b6002167dbcc9b75a5dc9a8a42d62fb18c6e483e30b7373e393d",
+    "source_bytes": 2917,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058719351
+  }
+}

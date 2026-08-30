@@ -1,0 +1,256 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/molebatbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "molebatbrain",
+  "summary": "该大脑控制地鼠蝙蝠（MoleBat）的AI行为。平时它会寻找食物、建造或返回鼹鼠丘家园休息，并靠近玩家注视；遭遇战斗目标时追击攻击或冷却时躲避；当地面震动或恐慌触发时陷入恐慌逃跑，且会在巢穴脏乱时清理并可能召唤盟友。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外调用的方法。",
+  "events_published": [
+    "summon"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MOLEHILL_RADIUS",
+    "MOLEHILL_HASTAGS",
+    "MOLEHILL_NONETAGS",
+    "GO_HOME_DSQ",
+    "SEE_FOOD_DIST",
+    "NO_TAGS",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "WANDER_TIMES",
+    "MAX_CLEAN_ATTEMPT_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "恐慌实体自身"
+      ],
+      "context": "当地面震动(_quaking)时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击实体自身",
+        "追击最长 10 秒",
+        "追击最大距离 20"
+      ],
+      "context": "当无战斗目标或不在攻击冷却时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "逃跑实体自身",
+        "通过 getfn 获取战斗目标为猎人",
+        "开始逃跑距离 5",
+        "停止逃跑距离 8"
+      ],
+      "context": "当有战斗目标且处于冷却时躲避"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取清理巢穴动作函数",
+        "节点名'Clean Up Nest'",
+        "以跑动方式执行"
+      ],
+      "context": "当巢穴需要清理(_nest_needs_cleaning)时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取创建鼹鼠丘动作函数",
+        "节点名'Build A Home'",
+        "以跑动方式执行"
+      ],
+      "context": "当需要建家(ShouldBuildHome)时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家睡觉动作函数",
+        "节点名'Sleep At Home'",
+        "以跑动方式执行"
+      ],
+      "context": "当想在家睡觉(ShouldGoSleepAtHome)时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作函数",
+        "节点名'Go Home'",
+        "以跑动方式执行"
+      ],
+      "context": "当离家过远(ShouldGoHome)时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作函数",
+        "节点名'Find and Eat'",
+        "以跑动方式执行"
+      ],
+      "context": "始终尝试（优先级较低）"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "面向实体自身",
+        "获取 6 距离内最近玩家函数",
+        "保持 8 距离内面向函数"
+      ],
+      "context": "无特定条件（优先级低）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "闲逛实体自身",
+        "返回家位置函数",
+        "闲逛半径 40",
+        "闲逛等待时间配置"
+      ],
+      "context": "无特定条件（最低优先级）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst._quaking",
+      "semantic": "执行 Panic 节点恐慌逃跑"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.ShouldSummonAllies ~= nil and self.inst:ShouldSummonAllies()",
+      "semantic": "推送事件召唤盟友"
+    },
+    {
+      "condition": "self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown()",
+      "semantic": "追击并攻击目标"
+    },
+    {
+      "condition": "self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown()",
+      "semantic": "远离战斗目标躲避"
+    },
+    {
+      "condition": "self.inst._nest_needs_cleaning == true",
+      "semantic": "清理洞穴/巢穴"
+    },
+    {
+      "condition": "ShouldBuildHome(self.inst)",
+      "semantic": "创建鼹鼠丘作为家"
+    },
+    {
+      "condition": "ShouldGoSleepAtHome(self.inst)",
+      "semantic": "回家睡觉"
+    },
+    {
+      "condition": "ShouldGoHome(self.inst)",
+      "semantic": "走回家位置"
+    },
+    {
+      "condition": "EatFoodAction 找到符合条件食物",
+      "semantic": "进食"
+    },
+    {
+      "condition": "GetFaceTargetFn 找到玩家",
+      "semantic": "面向玩家"
+    },
+    {
+      "condition": "默认",
+      "semantic": "在家附近闲逛"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25)依次包含：通用恐慌触发、电篱恐慌触发、地震恐慌、召唤盟友、攻击追击、冷却躲避、清理巢穴、建家、回家睡、回家、进食、面向玩家、闲逛。",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15715,
+      51046,
+      23234,
+      13701,
+      45173,
+      13897,
+      15237
+    ],
+    "aspects": [
+      {
+        "aspect": "建造鼹鼠丘行为描述",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "如果鼹鼠没有对应的[[鼹鼠丘]]，则会挖掘一个新的巢穴"
+          },
+          {
+            "pageid": 23234,
+            "quote": "利用鼹鼠建造鼹鼠丘的特性"
+          }
+        ]
+      },
+      {
+        "aspect": "物品栏满返回巢穴行为描述",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "物品栏满后它们就会返回自己的鼹鼠丘并将物品放入其中"
+          }
+        ]
+      },
+      {
+        "aspect": "白天归巢休息行为描述",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "白天则会返回其鼹鼠丘中"
+          }
+        ]
+      },
+      {
+        "aspect": "鼹鼠丘附近活动描述",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "鼹鼠在自己的[[鼹鼠丘]]附近活动"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "地鼠蝙蝠",
+    "鼹鼠丘",
+    "建家",
+    "清理巢穴",
+    "追击",
+    "躲避",
+    "进食",
+    "闲逛",
+    "恐慌"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ae4e350f8415fe7019f0775842450a2af7ae7065d3117fd5a25ff0860d105050",
+    "source_bytes": 6786,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060263738
+  }
+}

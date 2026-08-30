@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/knightbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "knightbrain",
+  "summary": "该大脑控制发条骑士与镀金骑士（约斯骑士）的 AI 行为。无目标时骑士会跟随领导者或返回出生点，有战斗目标时根据冷却状态选择追击攻击或闪避逃跑。镀金骑士额外拥有舞台就座、编队移动与编队游走等群体行为。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他公开方法，所有逻辑封装在本地函数与节点中。",
+  "events_published": [
+    "dojoust"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "GO_HOME_DIST_SQ",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "FOLLOW_MIN_DIST",
+    "FOLLOW_TARGET_DIST",
+    "FOLLOW_MAX_DIST",
+    "GILDED_FORMATION_RANGE",
+    "GILDED_FOLLOW_MIN_DIST",
+    "GILDED_FOLLOW_TARGET_DIST",
+    "GILDED_FOLLOW_MAX_DIST",
+    "WANDER_SWITCH_PERIOD",
+    "CHARLIE_SEAT_RANGE",
+    "SEAT_BLOCKER_RANGE",
+    "SEAT_BLOCKER_RANGE_PADDING",
+    "PRIORITY_NODE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 MAX_CHASE_TIME 秒",
+        "追击最远 CHASE_DIST 距离（镀金用 ENTITY_POPOUT_RADIUS，普通用 MAX_CHASE_DIST）"
+      ],
+      "context": "ShouldAttack(inst) 为真时（有目标且不在闪避冷却）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "威胁源为含 getfn 的表以动态获取当前战斗目标",
+        "开始逃跑距离 RUN_AWAY_DIST",
+        "停止逃跑距离 STOP_RUN_AWAY_DIST"
+      ],
+      "context": "ShouldDodge(inst) 为真时（攻击冷却中需闪避）"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "执行回家动作 GoHomeAction（无目标走向家点）",
+        "调试名 'Go Home'",
+        "以跑动方式执行"
+      ],
+      "context": "ShouldGoHome(inst) 为真时（离家距离平方大于 GO_HOME_DIST_SQ）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随领导者实体",
+        "最小距离动态获取（就座时0.1否则 FOLLOW_MIN_DIST）",
+        "期望目标距离 FOLLOW_TARGET_DIST",
+        "最大允许距离 FOLLOW_MAX_DIST"
+      ],
+      "context": "镀金骑士且领导者处于舞台时（GildedStageSeating 节点）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "跟随领导者实体",
+        "最小距离 FOLLOWER_MIN_DIST（镀金用 GILDED_FOLLOW_MIN_DIST）",
+        "期望目标距离 FOLLOWER_TARGET_DIST（镀金用 GILDED_FOLLOW_TARGET_DIST）",
+        "最大允许距离 FOLLOWER_MAX_DIST（镀金用 GILDED_FOLLOW_MAX_DIST）"
+      ],
+      "context": "通用情况，在特殊编队/舞台节点之后"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [],
+      "context": "多处作为优先级最低节点或编队/舞台节点中的静止状态"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "无家位置(nil)",
+        "无最大距离(nil)",
+        "配置表: 最小行走4秒,随机行走0,最小等待 WANDER_SWITCH_PERIOD-4-1.5秒,随机等待0"
+      ],
+      "context": "镀金骑士且为编队游走领导者时（GildedWander 内）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HasTag('gilded_knight')",
+      "semantic": "切换为镀金骑士参数：追击距离与时间不同，跟随距离更近，并启用舞台就座与编队行为"
+    },
+    {
+      "condition": "gilded and GetLeader(inst)~=nil and AnyHorsemenAllies(inst)",
+      "semantic": "激活编队节点，优先移动到计算出的编队位置并面向领导者"
+    },
+    {
+      "condition": "gilded and leader 有 stageactor 且舞台存在",
+      "semantic": "激活舞台就座节点，优先寻找座位就座并跟随领导者"
+    },
+    {
+      "condition": "ShouldAttack(inst)",
+      "semantic": "进入攻击分支：并行执行追击攻击与冲锋尝试"
+    },
+    {
+      "condition": "ShouldDodge(inst)",
+      "semantic": "进入闪避分支：逃离当前战斗目标"
+    },
+    {
+      "condition": "ShouldGoHome(inst)",
+      "semantic": "进入回家分支：执行走向家点动作"
+    },
+    {
+      "condition": "IsWanderFormationLeader(inst) 为假",
+      "semantic": "编队游走中非领导者：跟随虚拟领导者位置并保持朝向匹配"
+    }
+  ],
+  "bt_structure": "根优先级节点(防跳跃状态)包含：恐慌触发、交易者等待、攻击/闪避/回家/编队/跟随/游荡/站立等子节点。镀金骑士插入舞台就座与编队优先级节点；编队游走根据领导者标志切换自由游荡或跟随。整体为带速率的优先级树。",
+  "wiki": {
+    "scanned_pageids": [
+      15389,
+      70537,
+      70522,
+      16419,
+      70633,
+      18825,
+      70530,
+      70712
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录仅涉及发条骑士、镀金骑士等实体的掉落、生成条件、活动玩法、制作配方及关联物品描述，未提及任何 knightbrain 的 AI 行为参数（如追击/逃跑距离、跟随距离、回家、游走等）或对应行为表达，故无能力证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发条骑士",
+    "镀金骑士",
+    "返回出生点",
+    "追击攻击",
+    "编队移动",
+    "编队游走",
+    "骑士AI",
+    "舞台就坐",
+    "闪避"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "跟随",
+    "编队",
+    "舞台表演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c266a895831731d47d74551f2875eac014089a329cb26e12e0649e3528d8665d",
+    "source_bytes": 13131,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059589693
+  }
+}

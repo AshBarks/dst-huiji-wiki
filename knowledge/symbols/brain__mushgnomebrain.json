@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/mushgnomebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "mushgnomebrain",
+  "summary": "蘑菇侏儒大脑在拥有攻击目标且不在攻击冷却时，会站立攻击目标最多7秒。当检测到自身或对方互为战斗目标等威胁时，它会逃跑远离。在恐慌或触电栅栏时也会触发逃跑行为，其余情况则自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外调用的方法或自定义接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "THREAT_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "不自动寻找新目标（仅攻击已有 combat.target）",
+        "攻击行为最大持续 7 秒"
+      ],
+      "context": "combat:HasTarget() 且 not combat:InCooldown() 时（节点名 Spray Spores）"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身",
+        "威胁筛选参数 THREAT_PARAMS（自身目标或目标自身）",
+        "逃跑保持距离 5",
+        "威胁感知距离 10"
+      ],
+      "context": "存在符合威胁条件的实体时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "默认情况"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数（有目标且不在冷却）",
+        "节点名称 'Spray Spores'",
+        "子行为节点 StandAndAttack"
+      ],
+      "context": "优先级节点内"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点列表",
+        "优先级数值 1"
+      ],
+      "context": "根节点"
+    },
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "优先级第二"
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "优先级第三"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "self.inst.components.combat:HasTarget() and not self.inst.components.combat:InCooldown()",
+      "semantic": "执行 StandAndAttack(self.inst, nil, 7) 站立攻击目标，节点名 Spray Spores"
+    },
+    {
+      "condition": "BrainCommon.PanicTrigger 内部条件（如生命值低）",
+      "semantic": "触发恐慌逃跑行为"
+    },
+    {
+      "condition": "BrainCommon.ElectricFencePanicTrigger 内部条件（接触电栅栏）",
+      "semantic": "触发电栅栏恐慌逃跑"
+    },
+    {
+      "condition": "存在 THREAT_PARAMS.fn 匹配的实体（互为战斗目标）",
+      "semantic": "RunAway 以距离参数 5 和 10 逃离威胁"
+    },
+    {
+      "condition": "默认（上述均未满足）",
+      "semantic": "Wander(self.inst) 无参数自由游荡"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. 当拥有目标且不在冷却时站立攻击(7秒)；2. 恐慌触发逃跑；3. 电栅栏恐慌逃跑；4. 逃离互为战斗目标的威胁(距离5,感知10)；5. 否则自由游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15551,
+      10379,
+      14938,
+      15022,
+      15235,
+      15651,
+      15812,
+      13261
+    ],
+    "aspects": [],
+    "no_evidence_reason": "扫描所有给出的页面摘录（页面15551 beequeen, 10379 wendy, 14938 mushroombomb_dark, 15022 smallguard_alterguardian_projectile, 15235 rabbit, 15651 dragonfly, 15812 deer, 13261 wormwood），未发现与代码能力清单对应的玩家语言表达：如实体不自动寻找新目标仅攻击已有目标、攻击持续7秒(Spray Spores)、威胁感知距离10逃跑保持距离5、默认游荡、PanicTrigger或ElectricFencePanicTrigger等。部分页面提及逃离行为（兔子、鹿、蜂王）但触发条件和距离参数不匹配；无喷孢子或StandAndAttack描述。故判断页面不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蘑菇怪",
+    "原地攻击",
+    "逃离",
+    "受惊逃跑",
+    "攻击冷却",
+    "战斗目标",
+    "触电栅栏",
+    "自由游荡",
+    "行为树"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡",
+    "逃跑"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "be8bc90a9b81bb393ed68b1b7de246f3600d7e0898e4a5f3e2af7a3a0259f63d",
+    "source_bytes": 1211,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060367501
+  }
+}

@@ -7,71 +7,71 @@
   },
   "category": "component",
   "display_name": "playerprox",
-  "summary": "PlayerProx 组件管理实体与玩家之间的距离检测状态数据，包括远近阈值、当前靠近标志及追踪目标等。它支持多种目标检测模式（全体、任意、特定、锁定玩家），通过周期任务在玩家进入或离开范围时调用相应回调。组件参与任何依赖玩家邻近状态判定的玩法逻辑，并支持存活过滤与目标移除处理。",
+  "summary": "该组件管理实体与玩家间的距离检测数据（近/远阈值、目标模式、当前是否靠近等），并周期性执行检测逻辑。它参与的核心玩法包括根据玩家靠近或远离触发回调（如激活怪物或机关），支持多种目标模式（全体/任意/特定/锁定玩家）以适配不同交互需求。",
   "api": [
     {
       "name": "GetDebugString",
-      "effect": "返回当前玩家靠近状态字符串（\"NEAR\" 或 \"FAR\"），无副作用。"
+      "effect": "返回基于 self.isclose 的字符串 'NEAR' 或 'FAR'，无副作用。"
     },
     {
       "name": "SetOnPlayerNear",
-      "effect": "设置玩家进入近距离范围时的回调函数 self.onnear，替换原有回调，无其它副作用。"
+      "effect": "设置 self.onnear 回调函数为传入的 fn，替换原有进入近距离时的回调，无其它副作用。"
     },
     {
       "name": "SetOnPlayerFar",
-      "effect": "设置玩家离开远距离范围时的回调函数 self.onfar，替换原有回调，无其它副作用。"
+      "effect": "设置 self.onfar 回调函数为传入的 fn，替换原有离开远距离时的回调，无其它副作用。"
     },
     {
       "name": "IsPlayerClose",
-      "effect": "返回布尔值 self.isclose，表示当前是否有玩家在近距离内，无副作用。"
+      "effect": "返回 self.isclose 布尔值，表示当前是否有玩家在近距离内或处于锁定靠近状态，无副作用。"
     },
     {
       "name": "SetDist",
-      "effect": "设置近距离阈值 self.near 与远距离阈值 self.far，更新判定距离，不影响任务调度。"
+      "effect": "设置 self.near 与 self.far 距离阈值，影响后续检测范围。"
     },
     {
       "name": "SetLostTargetFn",
-      "effect": "设置目标丢失时调用的回调函数 self.losttargetfn，无其它副作用。"
+      "effect": "设置 self.losttargetfn 函数为传入的 func，当锁定目标实体被移除时调用。"
     },
     {
       "name": "SetPlayerAliveMode",
-      "effect": "设置玩家存活过滤模式 self.alivemode（仅存活/仅死亡/不限），用于范围检测过滤。"
+      "effect": "设置 self.alivemode 字段，用于过滤检测时玩家的存活/死亡/幽灵状态。"
     },
     {
       "name": "Schedule",
-      "effect": "若提供新周期则更新 self.period；停止已有周期任务并创建新的周期性任务调用目标检测模式函数，重启检测。"
+      "effect": "若 new_period 非 nil 则更新 self.period；调用 Stop 取消旧任务后，启动新周期任务 self.task = inst:DoPeriodicTask(self.period, self.targetmode, nil, self)，以周期调用目标模式函数。"
     },
     {
       "name": "ForceUpdate",
-      "effect": "若任务与目标模式存在，立即调用一次目标检测模式函数，可能触发 onnear/onfar 或丢失目标回调，不改变任务调度。"
+      "effect": "若 self.task 与 self.targetmode 均非 nil，立即调用 self.targetmode(self.inst, self) 执行一次检测逻辑。"
     },
     {
       "name": "Stop",
-      "effect": "取消并清空周期性检测任务 self.task，停止检测。"
+      "effect": "若 self.task 非 nil，取消任务并置 nil，停止周期检测。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "实体唤醒时调用 Schedule 重启周期任务，并 ForceUpdate 立即执行一次检测。"
+      "effect": "调用 Schedule 启动周期任务，并调用 ForceUpdate 立即执行一次检测。"
     },
     {
       "name": "OnEntitySleep",
-      "effect": "实体睡眠前调用 ForceUpdate 执行一次检测，然后 Stop 停止周期任务。"
+      "effect": "调用 ForceUpdate 执行一次检测，随后调用 Stop 停止周期任务。"
     },
     {
       "name": "SetTargetMode",
-      "effect": "若未 override 则记录 originaltargetmode；切换 self.targetmode 检测模式，设置目标并重启周期任务；断言特定玩家模式目标非空。"
+      "effect": "若 override 非真则记录 self.originaltargetmode = mode；设置 self.targetmode = mode；调用 SetTarget(target) 设置目标；断言若 mode 为 SpecificPlayer 则 target 非空；调用 Schedule 重启周期任务。"
     },
     {
       "name": "SetTarget",
-      "effect": "移除旧目标上的 \"onremove\" 事件监听，设置新追踪目标 self.target，并为新目标监听 \"onremove\" 以触发目标丢失处理。"
+      "effect": "若原有 self.target 非 nil，移除对其 'onremove' 事件的监听；设置 self.target = target；若 target 非 nil，监听其 'onremove' 事件以触发内部 _ontargetleft 回调。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "实体移除时调用 Stop 停止周期任务（等同于 Stop 方法）。"
+      "effect": "等同于 Stop 方法，取消周期任务。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "实体移出时调用 Stop 停止周期任务（等同于 Stop 方法）。"
+      "effect": "等同于 Stop 方法，取消周期任务。"
     }
   ],
   "events_published": [],
@@ -82,23 +82,41 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      13897,
       13698,
       15054,
       15402,
       15551,
       18232,
       18778,
-      23956,
-      13874
+      23956
     ],
     "aspects": [
       {
-        "aspect": "玩家接近距离阈值标注",
+        "aspect": "玩家接近距离阈值与实体激活",
         "evidence": [
           {
             "pageid": 18232,
-            "quote": "玩家靠近远古哨所 6 距离单位以内"
+            "quote": "如果玩家靠近远古哨所 6 距离单位以内，其中的安保脉冲便离开哨所会出来游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家距离相关目标锁定与丢失",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯主动仇恨 15 距离单位内的玩家目标"
           },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯远离赃物袋 30 单位后立即丢失目标"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家远离距离阈值描述",
+        "evidence": [
           {
             "pageid": 15551,
             "quote": "在玩家远离蜂王 15 距离单位前蜂王优先仇恨玩家"
@@ -106,40 +124,29 @@
         ]
       },
       {
-        "aspect": "玩家远离回归行为描述",
+        "aspect": "玩家邻近现身与远离回归",
         "evidence": [
           {
             "pageid": 18778,
-            "quote": "玩家远离后又会重新回到墓碑里"
-          },
-          {
-            "pageid": 23956,
-            "quote": "如果玩家远离被控制的梦魇裂缝，那么梦魇裂缝离开加载范围后就会被“释放”"
+            "quote": "只有在玩家靠近时才会从中出现。玩家远离后又会重新回到墓碑里。"
           }
         ]
       },
       {
-        "aspect": "玩家靠近触发行为描述",
+        "aspect": "玩家靠近生物行为响应",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "玩家靠近时，海象会站在玩家一定距离处看着玩家，并保持一定距离地跟踪玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家靠近视觉反馈",
         "evidence": [
           {
             "pageid": 15054,
             "quote": "升级前的天体宝球也会在玩家靠近时发出微弱的“光芒”"
-          },
-          {
-            "pageid": 15402,
-            "quote": "玩家靠近时，海象会站在玩家一定距离处看着玩家"
-          },
-          {
-            "pageid": 18232,
-            "quote": "玩家靠近远古哨所 6 距离单位以内"
-          },
-          {
-            "pageid": 18778,
-            "quote": "只有在玩家靠近时才会从中出现"
-          },
-          {
-            "pageid": 13874,
-            "quote": "一旦玩家靠近，企鸥就会冲过去把蛋藏在自己身上"
           }
         ]
       }
@@ -151,21 +158,20 @@
     "玩家远离",
     "范围检测",
     "锁定玩家",
-    "特定玩家",
-    "距离触发",
-    "周期检查",
+    "丢失目标",
+    "周期任务",
     "存活过滤",
-    "目标丢失"
+    "距离阈值"
   ],
   "gameplay_tags": [
     "生存",
-    "建造"
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
     "source_bytes": 6855,
     "model": "hy3-free",
-    "generated_at_ms": 1787932883945
+    "generated_at_ms": 1788062542571
   }
 }

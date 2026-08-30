@@ -7,47 +7,47 @@
   },
   "category": "component",
   "display_name": "talker",
-  "summary": "Talker 组件管理实体说话时的跟随文本、网络广播与忽略状态，并提供 Say 与 Chatter 方法驱动角色对话与 NPC 战斗喊话。它参与玩家交流、战斗呼喊及聊天框同步的核心玩法，通过事件与标签控制说话行为。",
+  "summary": "Talker 组件管理实体说话时的跟随文本气泡、聊天网络广播及 NPC 聊天同步数据。它参与角色对话、战斗喊话、NPC 交互等核心玩法，通过事件与网络变量实现多端同步显示与聊天框回显。",
   "api": [
     {
       "name": "SetOffsetFn",
-      "effect": "设置 self.offset_fn 为传入函数，用于动态计算说话气泡的偏移量；覆盖先前设置。"
+      "effect": "设置组件实例的 offset_fn 属性为给定函数，该函数用于在说话时动态计算跟随文本偏移量。无副作用。"
     },
     {
       "name": "MakeChatter",
-      "effect": "若 self.chatter 为空，则创建包含多个网络变量的 chatter 表（仅主机写入，客户端监听 chatterdirty 事件）；非主机时注册 chatterdirty 事件监听。副作用：初始化网络变量并可能添加事件监听。"
+      "effect": "若 chatter 未初始化，则创建网络变量（strtbl, strid, strtime, forcetext, echotochatpriority）用于 NPC 聊天同步；在非主机端注册 'chatterdirty' 事件监听以触发 OnChatterDirty。副作用：添加网络变量并可能添加事件监听。"
     },
     {
       "name": "Chatter",
-      "effect": "仅主机执行：设置 chatter 网络变量（strtbl, strid, strtime, forcetext, echotochatpriority），取消旧任务并启动新取消任务，立即调用 OnChatterDirty 使客户端解析字符串说话并可能同步到聊天框。副作用：修改网络状态，触发客户端说话与聊天历史记录。"
+      "effect": "仅主机端有效。设置 chatter 网络变量并强制触发一次 OnChatterDirty 以立即显示对话；设置定时任务在1秒后清除聊天字符串。副作用：广播网络变量，可能导致客户端显示说话气泡并可能回显到聊天框；添加/重置 self.chatter.task。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除 chatterdirty 事件监听，主机移除实体 ignoretalking 标签，并调用 ShutUp 停止当前说话。副作用：清理监听与标签，取消说话 widget。"
+      "effect": "移除 'chatterdirty' 事件监听；若为主机端则移除 'ignoretalking' 标签；调用 ShutUp 取消当前说话。副作用：停止说话显示，清理状态。"
     },
     {
       "name": "IgnoreAll",
-      "effect": "在 self.ignoring 表中标记来源，若之前为空则给主机实体添加 ignoretalking 标签，使后续非强制 Say 被忽略。副作用：添加标签并修改忽略表。"
+      "effect": "将 source（或自身）加入 ignoring 表，若之前为空则给实体添加 'ignoretalking' 标签（仅主机）。副作用：实体可能被阻止说话（主机检查 ignoring，客户端检查标签）。"
     },
     {
       "name": "StopIgnoringAll",
-      "effect": "从 self.ignoring 表移除指定来源，若表空则清空并移除主机实体 ignoretalking 标签。副作用：可能移除标签。"
+      "effect": "从 ignoring 表移除 source；若表空则移除 'ignoretalking' 标签（仅主机）。副作用：恢复说话能力。"
     },
     {
       "name": "Say",
-      "effect": "检查世界说话禁用、忽略状态、死亡与睡眠后，取消当前说话，将输入脚本转为行序列并启动线程逐句显示跟随文本、网络广播说话、触发 ontalk 事件，结束后触发 donetalking 事件并调用完成回调。副作用：创建/销毁 FollowText widget，网络广播，推送事件，占用任务线程。"
+      "effect": "根据条件（世界禁用、忽略、死亡、睡眠等）可能拒绝说话；取消当前说话；将脚本字符串或表转换为行序列，启动线程逐行显示跟随文本（气泡）、广播到网络（除非 nobroadcast）、触发 ontalk 事件与 donetalking 事件，并调用回调。副作用：创建 FollowText widget，网络广播对话，推送事件，修改实体状态。"
     },
     {
       "name": "ShutUp",
-      "effect": "调用 CancelSay 销毁说话 widget 与任务，若为主机则清空 chatter 网络变量并取消相关任务。副作用：终止说话表现与网络状态。"
+      "effect": "取消当前说话显示（CancelSay），若为主机且存在 chatter 则清空 strtbl 网络变量并取消 chatter 任务。副作用：停止气泡，清除聊天状态。"
     },
     {
       "name": "IsTalking",
-      "effect": "返回 self.task 是否非 nil，指示实体当前是否正在说话线程中。无副作用。"
+      "effect": "返回 self.task 是否非 nil，即是否正在说话线程中。无副作用。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "实体移除时由组件系统调用 CancelSay，销毁说话 widget 与任务，并可能触发 donetalking 事件与 donetalkingfn。副作用：清理说话资源。"
+      "effect": "等同于 CancelSay 函数：取消说话 widget 和任务，触发 donetalking 事件与回调。副作用：清理说话显示。"
     }
   ],
   "events_published": [
@@ -70,18 +70,18 @@
   ],
   "wiki": {
     "scanned_pageids": [
+      18790,
       45135,
       19110,
       22383,
       15239,
       21432,
       13493,
-      15237,
-      46887
+      15237
     ],
     "aspects": [
       {
-        "aspect": "说话行为描述",
+        "aspect": "发表意见行为描述",
         "evidence": [
           {
             "pageid": 13493,
@@ -93,24 +93,25 @@
     "coverage_status": "partial"
   },
   "search_terms": [
-    "说话气泡",
-    "NPC对话",
-    "战斗喊话",
-    "忽略说话",
-    "停止说话",
-    "跟随文字",
-    "聊天同步",
-    "猴语乱码"
+    "文本气泡",
+    "聊天广播",
+    "角色对话",
+    "NPC交互",
+    "同步显示",
+    "聊天回显",
+    "对话同步",
+    "说话组件"
   ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/8)",
   "gameplay_tags": [
-    "战斗",
-    "交流"
+    "对话",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
     "source_bytes": 11071,
     "model": "hy3-free",
-    "generated_at_ms": 1787932502652
+    "generated_at_ms": 1788061812388
   }
 }

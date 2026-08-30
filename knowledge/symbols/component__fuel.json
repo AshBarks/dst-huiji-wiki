@@ -7,15 +7,15 @@
   },
   "category": "component",
   "display_name": "fuel",
-  "summary": "该组件管理实体的燃料值、燃料类型以及被取走时的回调函数。它通过添加与燃料类型相关的标签（如“<类型>_fuel”）来标识实体可作为燃料，并在被取走时推送事件与执行回调。",
+  "summary": "该组件管理实体的燃料值、燃料类型及被取走时的回调函数。它参与生存与建造玩法中的燃料消耗系统，实体通过动态标签标识燃料类型，并可在被取走时触发回调与事件。",
   "api": [
     {
       "name": "SetOnTakenFn",
-      "effect": "将组件内部字段 ontaken 设为传入的函数 fn，用于燃料被拿走时回调。仅存储函数，无其它副作用。"
+      "effect": "将内部字段 ontaken 设为传入函数 fn，用于后续燃料被取走时调用，无其他副作用。"
     },
     {
       "name": "Taken",
-      "effect": "向实体推送事件 'fueltaken' 并携带 {taker = target} 数据；若 ontaken 已设置，则以 self.inst 和 target 为参数调用该回调。表示燃料被 target 取走并触发后续逻辑。"
+      "effect": "推送事件 'fueltaken'（参数为 {taker = target}），若 ontaken 已设置则调用之（传入 self.inst 与 target）。表示燃料被目标取走，可能引发外部逻辑。"
     }
   ],
   "events_published": [
@@ -26,17 +26,17 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      18216,
+      28610,
+      20496,
       10374,
-      10413,
-      15418,
+      18216,
+      20061,
       21620,
-      14426,
-      14661,
-      14792
+      21416,
+      51388
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录中燃料相关表述均为“添加燃料”、燃料数值或消耗，未出现任何关于燃料被取走（Taken）或设置取走回调（SetOnTakenFn）的玩家语言表达，如“取出燃料”等。",
+    "no_evidence_reason": "提供的页面摘录均描述燃料类型、燃料值、添加燃料、燃烧与燃尽等，未出现任何关于燃料被取走（Taken）或设置取走回调（SetOnTakenFn）的玩家语言表述，如拿走燃料、取出燃料、移除燃料时触发等，故页面不讨论该组件此方面能力。",
     "coverage_status": "no_wiki_mention"
   },
   "auto_maintained": {
@@ -54,23 +54,24 @@
     "note": "导出脚本仅在同时含 inventoryitem 时导出;燃料类型还会生成「<类型>消耗者」分类。"
   },
   "search_terms": [
-    "燃料价值",
-    "燃料种类",
-    "可燃标签",
-    "燃料被取",
-    "燃料回调",
-    "燃料事件",
-    "添加燃料",
-    "生火材料"
+    "燃料值",
+    "燃料类型",
+    "被取走",
+    "生火燃料",
+    "可燃物",
+    "触发回调",
+    "动态标签"
   ],
+  "search_terms_note": "pass1 后零命中 5/7,已二次修正(修正后 3/7)",
   "gameplay_tags": [
-    "生存"
+    "生存",
+    "建造"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
     "source_bytes": 783,
     "model": "hy3-free",
-    "generated_at_ms": 1787931624705
+    "generated_at_ms": 1788060278713
   }
 }

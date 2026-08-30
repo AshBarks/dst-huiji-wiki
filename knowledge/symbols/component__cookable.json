@@ -7,19 +7,19 @@
   },
   "category": "component",
   "display_name": "cookable",
-  "summary": "Cookable 组件管理实体能否被烹饪及相关产物与回调数据，并给实体添加 'cookable' 标签。其核心玩法是在烹饪时触发回调并生成指定的产品预制体，且可能将原实体的易腐新鲜度按比例继承给产品。",
+  "summary": "该组件管理实体的烹饪产物（product）与烹饪完成回调（oncooked）数据，并为实体添加“cookable”标签以标识可烹饪状态。其核心玩法是在烹饪交互中生成对应的熟食预制体，并根据原食材腐败度折算新产物的保鲜度。",
   "api": [
     {
-      "name": "OnRemoveFromEntity",
-      "effect": "当组件从实体移除时，移除实体的 'cookable' 标签，无其他副作用。"
-    },
-    {
       "name": "SetOnCookedFn",
-      "effect": "接收函数 fn 并存储到 self.oncooked，作为烹饪完成时优先调用的回调函数，无返回值。"
+      "effect": "将传入的函数 fn 赋值给内部回调 self.oncooked，用于烹饪完成后调用。仅存储引用，无其它副作用。"
     },
     {
       "name": "Cook",
-      "effect": "执行烹饪：若存在回调则调用 self.oncooked(inst, cooker, chef)；若 self.product 非空则生成对应预制体（支持字符串或函数动态指定），生成成功时若原实体与产品均有 perishable 组件且原实体无 'smallcreature' 标签，则按公式设置产品新鲜度百分比；最终返回生成的产品实体或 nil。"
+      "effect": "执行烹饪逻辑：若设置了 oncooked 回调则调用之（传入 inst, cooker, chef）；若 product 非空，则生成对应预制体（product 可为字符串或函数，函数会传入 inst, cooker, chef 计算预制体名）。生成成功后，若原实体有 perishable 组件且产物也有 perishable 组件，且原实体没有 'smallcreature' 标签，则根据原实体腐败百分比设置产物腐败百分比为 1 - (1 - 原百分比)*0.5。返回生成的产物或 nil。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除 'cookable' 标签，清理组件留下的状态。无其它副作用。"
     }
   ],
   "events_published": [],
@@ -28,22 +28,43 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      13476,
-      24170,
       24540,
+      13476,
       65872,
-      16622,
-      21485,
-      15737,
-      15235
+      13477,
+      13779,
+      20789,
+      13153,
+      17816
     ],
     "aspects": [
       {
-        "aspect": "烹饪产物描述",
+        "aspect": "烹饪后转化描述",
         "evidence": [
           {
-            "pageid": 15235,
-            "quote": "烹饪兔子会获得 1 个[[烤小肉]]。"
+            "pageid": 20789,
+            "quote": "食物在烹饪后会转化为对应的熟食"
+          },
+          {
+            "pageid": 24540,
+            "quote": "热带鱼的鱼度为1.0点，但烤熟后会变成熟小鱼块"
+          }
+        ]
+      },
+      {
+        "aspect": "烹饪行为描述",
+        "evidence": [
+          {
+            "pageid": 24540,
+            "quote": "玩家可以在烹饪锅或便携烹饪锅内放入食材进行烹饪"
+          },
+          {
+            "pageid": 20789,
+            "quote": "用鼠标将物品栏中的食物移到火源上，显示“烹饪”提示时点击即可"
+          },
+          {
+            "pageid": 20789,
+            "quote": "大部分角色烹饪食物需要花费 1 秒"
           }
         ]
       }
@@ -51,15 +72,16 @@
     "coverage_status": "partial"
   },
   "search_terms": [
-    "可烹饪",
+    "烤熟",
+    "料理",
+    "食材",
+    "熟食",
+    "烹饪",
     "烹饪产物",
-    "熟食制作",
-    "保鲜继承",
-    "易腐转移",
-    "小生物",
-    "食物转化",
-    "烤制"
+    "煮熟",
+    "做菜"
   ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 1/8)",
   "gameplay_tags": [
     "生存",
     "烹饪"
@@ -69,6 +91,6 @@
     "source_sha256": "2ae9fb18536e93105b0c0da2376d90c401806ca79d2a6fda87c349af5aec40ed",
     "source_bytes": 1132,
     "model": "hy3-free",
-    "generated_at_ms": 1787932557073
+    "generated_at_ms": 1788061893117
   }
 }

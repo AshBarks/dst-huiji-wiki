@@ -1,0 +1,421 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/pigbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "pigbrain",
+  "summary": "猪人(Pig)大脑在白天会寻找食物、协助砍树、跟随领导者或在无领导者时于家附近游荡并避开玩家。夜晚则逃离蜘蛛与玩家、寻找光源或回家，并在受威胁时恐慌。在战斗、被闹鬼、着火、观看小游戏或比赛等特定情境下，猪人会优先执行对应的攻击、逃避、互动或活动行为。",
+  "api": [],
+  "api_note": "PigBrain 仅重写 Brain 的 OnStart 方法以构建行为树，未定义其他对外方法，所有逻辑封装在 OnStart 内的局部函数中。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "MAX_WANDER_DIST",
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST",
+    "START_RUN_DIST",
+    "STOP_RUN_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "SEE_LIGHT_DIST",
+    "TRADE_DIST",
+    "SEE_TREE_DIST",
+    "SEE_FOOD_DIST",
+    "SEE_BURNING_HOME_DIST_SQ",
+    "COMFORT_LIGHT_LEVEL",
+    "KEEP_CHOPPING_DIST",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "无领导者家位置函数",
+        "最大游荡距离 20"
+      ],
+      "context": "白天无领导者时自由游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "最近光源位置函数",
+        "光源半径函数",
+        "游荡时间配置表(短走长停)"
+      ],
+      "context": "夜晚处于舒适光照下时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者函数",
+        "最小跟随距离 2",
+        "目标跟随距离 5",
+        "最大跟随距离 9"
+      ],
+      "context": "白天且有领导者时"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "观看的小游戏实体",
+        "最小距离函数",
+        "目标距离函数",
+        "最大距离函数"
+      ],
+      "context": "观看小游戏时跟随"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "无领导者家位置",
+        "最大拴绳距离 30",
+        "返回距离 10"
+      ],
+      "context": "白天无领导者时拴在家附近"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃离标签 player 的实体",
+        "察觉距离 3",
+        "安全距离 5"
+      ],
+      "context": "白天或夜晚远离玩家"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃离标签 spider 的实体",
+        "察觉距离 4",
+        "安全距离 8"
+      ],
+      "context": "夜晚逃离蜘蛛"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃离标签 player 的实体",
+        "察觉距离 3",
+        "安全距离 5",
+        "非交易时逃跑条件函数"
+      ],
+      "context": "夜晚额外条件逃离玩家"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "战斗目标获取表",
+        "察觉距离 5",
+        "安全距离 8"
+      ],
+      "context": "战斗冷却中躲避目标"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "敌对猪参数表",
+        "察觉距离 5",
+        "安全距离 8"
+      ],
+      "context": "被其他猪战斗锁定时间"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "逃离标签 minigame_participator",
+        "察觉距离 5",
+        "安全距离 7"
+      ],
+      "context": "观看游戏时远离参与者"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取领导者",
+        "保持领导者面对"
+      ],
+      "context": "有领导者时面对"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取最近玩家",
+        "保持最近玩家面对"
+      ],
+      "context": "白天无领导者时看玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取交易者",
+        "保持交易者面对"
+      ],
+      "context": "尝试交易时面对玩家"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "当前比赛目标",
+        "保持比赛目标面对"
+      ],
+      "context": "比赛时面对裁判或舞台"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "寻找食物动作函数"
+      ],
+      "context": "白天或夜晚找肉吃"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "捡奖品函数",
+        "节点名 collect prize",
+        "跑动执行"
+      ],
+      "context": "比赛时收集奖品"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "回家动作函数",
+        "节点名 go home",
+        "跑动执行"
+      ],
+      "context": "夜晚无光时回家"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "救援领导者函数",
+        "节点名 Rescue Leader",
+        "跑动执行"
+      ],
+      "context": "领导者被钉住时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "给代币函数",
+        "节点名 Giving Token",
+        "跑动执行"
+      ],
+      "context": "忠诚满时给领导者代币"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "自身实体",
+        "聊天键 PIG_TALK_FIND_MEAT",
+        "子行为找食物"
+      ],
+      "context": "找食物时伴随叫声"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "自身实体",
+        "聊天键 PIG_TALK_CONTEST_OOOH",
+        "面对实体子节点",
+        "聊天后等待 5 秒",
+        "随机附加 15 秒"
+      ],
+      "context": "比赛时面对裁判说话"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "着火、闹鬼、家烧、受惊等多种恐慌"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "最长追击 10 秒",
+        "放弃距离 30"
+      ],
+      "context": "无目标或不在冷却时攻击"
+    },
+    {
+      "ctor": "FindLight",
+      "args_semantic": [
+        "自身实体",
+        "搜索光源半径 20",
+        "安全距离计算函数"
+      ],
+      "context": "夜晚找光"
+    },
+    {
+      "ctor": "AvoidElectricFence",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "触电时避电网"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst:HasTag(\"NPC_contestant\")",
+      "semantic": "比赛状态：优先收集奖品、标记木桩、恐慌或面对裁判"
+    },
+    {
+      "condition": "WatchingMinigame(inst)",
+      "semantic": "观看小游戏：跟随小游戏、逃离参与者、找食物或面对小游戏/作弊者"
+    },
+    {
+      "condition": "TheWorld.state.isday",
+      "semantic": "白天：找食物、协助砍树、跟随领导者、无领导者拴家或游荡、逃离玩家"
+    },
+    {
+      "condition": "not TheWorld.state.isday",
+      "semantic": "夜晚：逃离蜘蛛、找食物、逃离玩家、回家、在光旁游荡、找光、恐慌"
+    },
+    {
+      "condition": "components.hauntable.panic",
+      "semantic": "被闹鬼时恐慌"
+    },
+    {
+      "condition": "components.health.takingfiredamage",
+      "semantic": "着火时恐慌"
+    },
+    {
+      "condition": "BrainCommon.ShouldAvoidElectricFence(inst)",
+      "semantic": "触电时避开电网"
+    },
+    {
+      "condition": "战斗有目标且冷却中",
+      "semantic": "躲避战斗目标"
+    },
+    {
+      "condition": "领导者被钉住",
+      "semantic": "救援领导者"
+    },
+    {
+      "condition": "IsHomeOnFire(inst)",
+      "semantic": "家着火恐慌"
+    },
+    {
+      "condition": "not iscaveday or not IsInLight",
+      "semantic": "洞穴夜晚或不在光中时尝试回家"
+    },
+    {
+      "condition": "isnight and IsLightGreaterThan(0.3)",
+      "semantic": "在舒适光线下游荡"
+    },
+    {
+      "condition": "contest_panic 计时器存在",
+      "semantic": "比赛恐慌"
+    },
+    {
+      "condition": "WantsToGivePlayerPigTokenAction(inst)",
+      "semantic": "给领导者猪皮代币"
+    },
+    {
+      "condition": "小游戏类型为 pigking_wrestling",
+      "semantic": "摔跤游戏特殊跟随与欢呼"
+    },
+    {
+      "condition": "GetLeader(inst) 存在",
+      "semantic": "有领导者时面对领导者"
+    },
+    {
+      "condition": "无目标或不在冷却",
+      "semantic": "攻击片刻"
+    }
+  ],
+  "bt_structure": "根优先级节点：紧急处理(恐慌/受惊/着火/触电/战斗攻击躲避/救援/家火/逃离猪) > 交易与给予 > 比赛与观看游戏 > 白天与夜晚日常。白天优先找食/助砍/跟随/拴家/逃玩家/游荡；夜晚优先逃蜘蛛/找食/逃玩家/回家/光下游荡/找光/恐慌。",
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13408,
+      13857,
+      15246,
+      15259,
+      15596,
+      15642,
+      15783
+    ],
+    "aspects": [
+      {
+        "aspect": "猪屋着火恐慌与感知距离描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "所属的猪人能检测 18 单位内的猪屋着火状态，发现猪屋着火会持续慌张乱跑"
+          }
+        ]
+      },
+      {
+        "aspect": "猪屋附近活动与归位距离描述",
+        "evidence": [
+          {
+            "pageid": 15237,
+            "quote": "猪屋附近 30 距离单位范围内活动"
+          },
+          {
+            "pageid": 15237,
+            "quote": "到达猪屋 10 单位范围时恢复正常活动状态"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "猪人大脑",
+    "寻找食物",
+    "跟随领导者",
+    "协助砍树",
+    "逃离蜘蛛",
+    "夜晚回家",
+    "观看小游戏",
+    "猪人战斗",
+    "恐慌状态",
+    "避开玩家"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 5/10)",
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "社交",
+    "活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+    "source_bytes": 16781,
+    "model": "hy3-free",
+    "generated_at_ms": 1788060689651
+  }
+}

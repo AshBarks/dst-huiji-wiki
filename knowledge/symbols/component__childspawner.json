@@ -7,235 +7,235 @@
   },
   "category": "component",
   "display_name": "childspawner",
-  "summary": "该组件负责管理世界中子实体的生成、追踪与回收，包括普通与紧急（基于玩家数量）两类子实体。它维护内部与外部子实体计数、生成与再生周期，并通过回调钩子参与巢穴占据、空巢等核心玩法逻辑。",
+  "summary": "该组件管理实体内部与外部的子实体数量、生成与再生计时，以及紧急增援逻辑。它参与核心玩法包括自动繁衍生物、根据玩家数量紧急召唤、子实体回家与占用状态回调等。",
   "api": [
     {
       "name": "GetTimeToNextSpawn",
-      "effect": "返回 spawnperiod 加减随机方差后的下一次生成等待时间，无副作用。"
+      "effect": "返回基于 spawnperiod 与 spawnvariance 计算的随机下一生成时间，无副作用。"
     },
     {
       "name": "GetTimeToNextRegen",
-      "effect": "返回 regenperiod 加减随机方差后的下一次再生等待时间，无副作用。"
+      "effect": "返回基于 regenperiod 与 regenvariance 计算的随机下一再生时间，无副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除组件时清理：取消所有外部子实体事件监听，取消周期更新任务。副作用：监听与任务移除。"
+      "effect": "移除所有外部子实体的监听器并取消更新任务，用于实体移除组件时清理。"
     },
     {
       "name": "StartRegen",
-      "effect": "启用再生标志，若未达上限则重置再生计时并启动更新。副作用：regening 置真，可能启动更新循环。"
+      "effect": "设置 regening 为 true，若未满则设置再生计时并启动更新循环。"
     },
     {
       "name": "SetRareChild",
-      "effect": "设置稀有子实体 prefab 名与出现几率。副作用：更新 rarechild 与 rarechildchance。"
+      "effect": "设置 rarechild 名称与 rarechildchance 几率，更新组件数据。"
     },
     {
       "name": "StopRegen",
-      "effect": "禁用再生标志并停止更新。副作用：regening 置假。"
+      "effect": "设置 regening 为 false 并尝试停止更新任务，停止再生。"
     },
     {
       "name": "SetSpawnPeriod",
-      "effect": "设置生成周期与方差（默认方差周期0.1倍），重置生成计时。副作用：改变生成参数。"
+      "effect": "设置 spawnperiod 与 spawnvariance 并重置下一生成时间，改变计时参数。"
     },
     {
       "name": "SetRegenPeriod",
-      "effect": "设置再生周期与方差，重置再生计时。副作用：改变再生参数。"
+      "effect": "设置 regenperiod 与 regenvariance 并重置下一再生时间，改变计时参数。"
     },
     {
       "name": "SetEmergencyRadius",
-      "effect": "设置紧急子实体检测的玩家半径。副作用：更新 emergencydetectionradius。"
+      "effect": "设置 emergencydetectionradius 紧急检测半径，更新数据。"
     },
     {
       "name": "IsFull",
-      "effect": "判断当前普通子实体总数是否达到 maxchildren。无副作用。"
+      "effect": "返回内部与外部普通子实体总数是否达到 maxchildren，无副作用。"
     },
     {
       "name": "NumChildren",
-      "effect": "返回外部与内部普通子实体数量之和。无副作用。"
+      "effect": "返回 numchildrenoutside 与 childreninside 之和，无副作用。"
     },
     {
       "name": "IsEmergencyFull",
-      "effect": "判断紧急子实体总数是否达上限。无副作用。"
+      "effect": "返回紧急子实体总数是否达到 maxemergencychildren，无副作用。"
     },
     {
       "name": "NumEmergencyChildren",
-      "effect": "返回外部与内部紧急子实体数量之和。无副作用。"
+      "effect": "返回紧急内外部子实体总数，无副作用。"
     },
     {
       "name": "DoRegen",
-      "effect": "若再生启用，普通未满则内部+1，紧急未满则紧急内部+1。副作用：可能增加 childreninside/emergencychildreninside。"
+      "effect": "若 regening 且未满，普通与紧急内部子实体数各加1，可能触发占用回调。"
     },
     {
       "name": "OnUpdate",
-      "effect": "根据 dt 推进再生与生成计时，触发再生或生成（或排队），并管理更新任务。副作用：可能调用 DoRegen、SpawnChild 等。"
+      "effect": "根据 dt 减少计时，触发再生或生成，并管理更新任务的启停，可能生成实体。"
     },
     {
       "name": "ShouldUpdate",
-      "effect": "返回是否需更新任务（基于生成/再生状态与内部计数）。无副作用。"
+      "effect": "返回是否需要更新循环（生成或再生条件满足），无副作用。"
     },
     {
       "name": "StartUpdate",
-      "effect": "依 useexternaltimer 启动外部计时器或周期任务。副作用：可能创建任务或调用外部函数。"
+      "effect": "根据 useexternaltimer 启动外部计时或周期任务，可能创建任务。"
     },
     {
       "name": "TryStopUpdate",
-      "effect": "依条件停止更新任务或外部计时器。副作用：可能取消任务。"
+      "effect": "根据条件停止更新任务或外部计时，可能取消任务。"
     },
     {
       "name": "StartSpawning",
-      "effect": "启用生成标志，计时清零，启动更新。副作用：spawning 置真，可能开始生成。"
+      "effect": "设置 spawning 为 true，重置生成计时为0并启动更新，开始自动生成。"
     },
     {
       "name": "StopSpawning",
-      "effect": "禁用生成标志并停止更新。副作用：spawning 置假。"
+      "effect": "设置 spawning 为 false 并尝试停止更新，停止自动生成。"
     },
     {
       "name": "SetOccupiedFn",
-      "effect": "设置 onoccupied 回调函数。副作用：改变回调。"
+      "effect": "设置 onoccupied 回调函数引用，存储函数。"
     },
     {
       "name": "SetSpawnedFn",
-      "effect": "设置 onspawned 回调函数。副作用：改变回调。"
+      "effect": "设置 onspawned 回调函数引用，存储函数。"
     },
     {
       "name": "SetOnTakeOwnershipFn",
-      "effect": "设置 ontakeownership 回调函数。副作用：改变回调。"
+      "effect": "设置 ontakeownership 回调函数引用，存储函数。"
     },
     {
       "name": "SetGoHomeFn",
-      "effect": "设置 ongohome 回调函数。副作用：改变回调。"
+      "effect": "设置 ongohome 回调函数引用，存储函数。"
     },
     {
       "name": "SetVacateFn",
-      "effect": "设置 onvacate 回调函数。副作用：改变回调。"
+      "effect": "设置 onvacate 回调函数引用，存储函数。"
     },
     {
       "name": "SetOnChildKilledFn",
-      "effect": "设置 onchildkilledfn 回调函数。副作用：改变回调。"
+      "effect": "设置 onchildkilledfn 回调函数引用，存储函数。"
     },
     {
       "name": "SetOnAddChildFn",
-      "effect": "设置 onaddchild 回调函数。副作用：改变回调。"
+      "effect": "设置 onaddchild 回调函数引用，存储函数。"
     },
     {
       "name": "CountChildrenOutside",
-      "effect": "统计当前外部子实体数量，可借 fn 过滤。无副作用。"
+      "effect": "统计外部有效子实体数量，可传入过滤函数，无副作用。"
     },
     {
       "name": "SetMaxChildren",
-      "effect": "设置最大普通子实体数，重算内部数量并夹紧，重启更新。副作用：改变 maxchildren 与 childreninside。"
+      "effect": "设置 maxchildren 并调整 childreninside，重启更新循环，改变容量与计数。"
     },
     {
       "name": "SetMaxEmergencyChildren",
-      "effect": "设置最大紧急子实体数，重算紧急内部数量并夹紧，重启更新。副作用：改变紧急相关计数。"
+      "effect": "设置 maxemergencychildren 并调整 emergencychildreninside，重启更新，改变容量。"
     },
     {
       "name": "OnSave",
-      "effect": "收集外部/内部子实体 GUID 与状态数据供存档。无副作用（只读）。"
+      "effect": "返回包含子实体GUID、内部计数、状态等数据的表及引用，用于存档，无副作用。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回描述内部/外部计数与计时状态的调试字符串。无副作用。"
+      "effect": "返回描述内部/外部数量、计时与状态的调试字符串，无副作用。"
     },
     {
       "name": "OnLoad",
-      "effect": "从存档数据恢复状态，可能触发占据/ vacate 回调。副作用：重置计数与标志，可能调用回调。"
+      "effect": "从数据恢复内部计数、状态与紧急计数，可能触发占用或空置回调，改变状态。"
     },
     {
       "name": "DoTakeOwnership",
-      "effect": "为子实体记录 home 位置、添加 homeseeker、监听事件并调用 ontakeownership。副作用：修改子实体组件与监听。"
+      "effect": "为子实体设置 home 位置与 homeseeker 组件，添加监听并调用 ontakeownership 回调。"
     },
     {
       "name": "TakeOwnership",
-      "effect": "调用 DoTakeOwnership 并登记为外部普通子实体，停止更新。副作用：子实体被追踪。"
+      "effect": "调用 DoTakeOwnership 并将子实体加入外部表，停止更新，增加外部计数。"
     },
     {
       "name": "TakeEmergencyOwnership",
-      "effect": "类似 TakeOwnership 但登记为外部紧急子实体。副作用：紧急追踪。"
+      "effect": "类似 TakeOwnership 但针对紧急子实体，加入紧急外部表。"
     },
     {
       "name": "LoadPostPass",
-      "effect": "加载后依据存档 GUID 重建子实体归属并启动更新。副作用：重新建立外部子实体联系。"
+      "effect": "根据存档数据重建子实体所有权，启动并更新循环，恢复外部子实体。"
     },
     {
       "name": "GetChildPrefab",
-      "effect": "依几率返回稀有/其他/默认子实体 prefab，可能扣减其他子实体计数。副作用：可能修改 otherchildreninside。"
+      "effect": "根据稀有几率与其他子实体权重决定返回的生成 prefab，可能减少 otherchildreninside 计数。"
     },
     {
       "name": "DoSpawnChild",
-      "effect": "计算生成位置并 SpawnPrefab，设置位置/目标等，调用 onspawned。返回子实体或 nil。副作用：世界中创建实体。"
+      "effect": "计算生成位置并生成指定 prefab 子实体，设置位置与目标，调用 onspawned，在世界上创建实体。"
     },
     {
       "name": "QueueSpawnChild",
-      "effect": "标记 queued_spawn 并停止更新。副作用：设置排队标志。"
+      "effect": "设置 queued_spawn 为 true 并停止更新，标记待生成队列。"
     },
     {
       "name": "OnEntityWake",
-      "effect": "若排队则延迟执行 DoQueuedSpawn。副作用：可能安排任务。"
+      "effect": "若有排队生成，则安排延迟任务执行 DoQueuedSpawn，可能安排任务。"
     },
     {
       "name": "DoQueuedSpawn",
-      "effect": "清除排队标志，若生成中则 SpawnChild 并启动更新。副作用：可能生成子实体。"
+      "effect": "清除队列标记，若 spawning 则生成子实体并重启更新，可能生成实体。"
     },
     {
       "name": "ProcessOtherChildren",
-      "effect": "扣减对应其他子实体计数并刷新权重。副作用：修改 otherchildreninside 等表。"
+      "effect": "调整 otherchildren 计数以匹配内部计数，可能修改异种子实体表。"
     },
     {
       "name": "SpawnChild",
-      "effect": "校验后生成普通子实体，减少内部计数，登记追踪，可能触发 vacate。返回子实体。副作用：生成并追踪。"
+      "effect": "检查条件后生成普通子实体，减少内部计数，接管所有权，可能触发 onvacate 回调。"
     },
     {
       "name": "SpawnEmergencyChild",
-      "effect": "校验后生成紧急子实体，减少紧急内部计数，登记紧急追踪。副作用：生成并追踪。"
+      "effect": "检查条件后生成紧急子实体，减少紧急内部计数并接管，改变计数。"
     },
     {
       "name": "UpdateMaxEmergencyCommit",
-      "effect": "按半径内玩家数计算最大紧急提交数。副作用：更新 maxemergencycommit。"
+      "effect": "根据半径内玩家数计算 maxemergencycommit，更新该值。"
     },
     {
       "name": "TrySpawnEmergencyChild",
-      "effect": "更新提交数并尝试生成紧急子实体。副作用：可能生成。"
+      "effect": "更新提交数并尝试生成紧急子实体，可能生成实体。"
     },
     {
       "name": "TakeInChild",
-      "effect": "推送回家事件，调用 ongohome，移除追踪并销毁子实体，增加内部计数，可能记录异类。副作用：销毁实体，增内部数。"
+      "effect": "让子实体回家，销毁实体并增加内部计数，推送事件，可能记录异种子实体。"
     },
     {
       "name": "GoHome",
-      "effect": "验证后使外部子实体回家（调用 TakeInChild）。返回是否成功。副作用：可能销毁子实体。"
+      "effect": "验证后让指定子实体回家（调用 TakeInChild），可能销毁子实体。"
     },
     {
       "name": "CanSpawnOffscreenOrAwake",
-      "effect": "返回是否允许离屏或唤醒时生成。无副作用。"
+      "effect": "返回是否允许离屏生成或实体唤醒，无副作用。"
     },
     {
       "name": "CanSpawn",
-      "effect": "返回是否满足普通生成条件（有效、内部>0、可生成等）。无副作用。"
+      "effect": "返回是否满足普通生成条件（有效、内部>0、离屏/唤醒、健康、canspawnfn），无副作用。"
     },
     {
       "name": "CanEmergencySpawn",
-      "effect": "返回是否满足紧急生成条件。无副作用。"
+      "effect": "返回是否满足紧急生成条件（有效、允许、紧急内部>0、提交未满等），无副作用。"
     },
     {
       "name": "OnChildKilled",
-      "effect": "移除监听，若追踪则除名并调用 onchildkilledfn，启动更新。副作用：更新追踪状态。"
+      "effect": "移除子实体监听，从外部表移除，触发 onchildkilledfn 并启动更新，清理数据。"
     },
     {
       "name": "ReleaseAllChildren",
-      "effect": "循环释放所有可生成子实体直到失败或不可生成，返回列表。副作用：批量生成。"
+      "effect": "循环释放所有可生成的普通与紧急子实体，返回生成的子实体列表，大量改变计数。"
     },
     {
       "name": "AddChildrenInside",
-      "effect": "增加内部普通子实体数（夹紧），触发占据/增加回调，重启更新。副作用：改变计数与回调。"
+      "effect": "增加内部普通子实体计数（上限最大），触发占用/添加回调，重启更新。"
     },
     {
       "name": "AddEmergencyChildrenInside",
-      "effect": "增加紧急内部计数（夹紧），停止更新。副作用：改变计数。"
+      "effect": "增加紧急内部计数（上限最大），重启更新，改变计数。"
     },
     {
       "name": "LongUpdate",
-      "effect": "直接调用 OnUpdate(dt) 处理长更新。副作用：同 OnUpdate。"
+      "effect": "调用 OnUpdate 处理长更新，同 OnUpdate 副作用。"
     }
   ],
   "events_published": [
@@ -253,85 +253,39 @@
   "wiki": {
     "scanned_pageids": [
       34314,
-      35001,
-      70704,
-      14713,
-      15713,
-      19167,
-      19808,
-      21675
+      34523,
+      65605,
+      20714,
+      52788,
+      14579,
+      13606,
+      24544
     ],
     "aspects": [
       {
-        "aspect": "停止再生描述",
+        "aspect": "子实体被杀死触发治疗描述",
         "evidence": [
           {
-            "pageid": 70704,
-            "quote": "不会再生里面的蜘蛛"
+            "pageid": 13606,
+            "quote": "全部巨钳被杀死，帝王蟹就会开始尝试治疗自己"
           }
         ]
       },
       {
-        "aspect": "再生周期数值标注",
+        "aspect": "生成子实体行为描述",
         "evidence": [
           {
-            "pageid": 14713,
-            "quote": "不足上限时每隔 108 ~ 132 秒会再生 1 只"
-          },
-          {
-            "pageid": 19167,
-            "quote": "若不满则每 27 ~ 33 秒再生 1 只蜜蜂"
-          },
-          {
-            "pageid": 19808,
-            "quote": "数量不满时每 150 秒"
-          },
-          {
-            "pageid": 70704,
-            "quote": "平均一天可以再生4~8次"
-          },
-          {
-            "pageid": 15713,
-            "quote": "需要 15 ~ 20 天才能恢复"
+            "pageid": 13606,
+            "quote": "由帝王蟹生成的巨钳、加农炮塔和浮冰地块"
           }
         ]
       },
       {
-        "aspect": "子代死亡后重生行为描述",
+        "aspect": "离开加载范围子实体消失描述",
         "evidence": [
           {
-            "pageid": 15713,
-            "quote": "浣猫死后 2 分钟会在此重生"
-          }
-        ]
-      },
-      {
-        "aspect": "最大子数量标注",
-        "evidence": [
-          {
-            "pageid": 14713,
-            "quote": "初始会有 4 只蜜蜂（春天为 6 只）"
-          },
-          {
-            "pageid": 19167,
-            "quote": "每个蜂窝能够容纳 5 只蜜蜂或杀人蜂"
-          },
-          {
-            "pageid": 19808,
-            "quote": "每个池塘至多容纳 3 ~ 4 只青蛙/蚊子"
-          },
-          {
-            "pageid": 15713,
-            "quote": "生成 9 次浣猫之后就会倒塌"
-          }
-        ]
-      },
-      {
-        "aspect": "生成速度及数量上限规则描述",
-        "evidence": [
-          {
-            "pageid": 34314,
-            "quote": "影响生成穴居悬蛛的速度和数量上限"
+            "pageid": 13606,
+            "quote": "由帝王蟹生成的巨钳、加农炮塔和浮冰地块都会消失"
           }
         ]
       }
@@ -351,14 +305,15 @@
   },
   "search_terms": [
     "子实体",
-    "巢穴生成",
-    "怪物刷新",
-    "紧急生成",
-    "回巢",
-    "再生",
-    "数量上限",
-    "稀有子代"
+    "生成",
+    "再生计时",
+    "紧急召唤",
+    "自动繁衍",
+    "回家",
+    "占用状态",
+    "数量"
   ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 4/8)",
   "gameplay_tags": [
     "生存",
     "战斗"
@@ -368,6 +323,6 @@
     "source_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
     "source_bytes": 27213,
     "model": "hy3-free",
-    "generated_at_ms": 1787933155405
+    "generated_at_ms": 1788062767453
   }
 }

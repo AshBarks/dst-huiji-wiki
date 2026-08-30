@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/caveventmitebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "caveventmitebrain",
+  "summary": "该大脑驱动洞穴通风口螨虫（Cave Vent Mite）的 AI 行为。实体在受惊、触发恐慌或接触电篱时优先逃离，平时若未锁定目标且脱离冷却则举盾防御，发现目标则追击攻击，附近有可食物品则进食，否则以记住的家位置为中心游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的对外调用接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "SEE_FOOD_DIST",
+    "MAX_WANDER_DIST",
+    "DAMAGE_UNTIL_SHIELD",
+    "SHIELD_TIME",
+    "AVOID_PROJECTILE_ATTACKS",
+    "HIDE_WHEN_SCARED",
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "UseShield",
+      "args_semantic": [
+        "触发举盾所需的累计受伤阈值（DAMAGE_UNTIL_SHIELD）",
+        "举盾后保持缩避状态的持续时间（SHIELD_TIME秒）",
+        "不因来袭敌对弹道进入盾态（AVOID_PROJECTILE_ATTACKS=false）",
+        "被史诗级恐惧时举盾（HIDE_WHEN_SCARED=true）",
+        "自定义配置表（含usecustomanims等）"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "追击最长 MAX_CHASE_TIME 秒"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "获取吃食物动作的函数 EatFoodAction"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "以 GetHome 返回位置为家",
+        "离家最大游荡距离 MAX_WANDER_DIST"
+      ]
+    }
+  ],
+  "bt_structure": "优先级节点树：先处理多种恐慌触发（受惊恐慌、触发恐慌、电篱恐慌），然后举盾防御，接着追击攻击，再执行进食动作，最后以家为中心游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      13701,
+      15922,
+      15022,
+      14907,
+      14936,
+      16197,
+      57310
+    ],
+    "aspects": [
+      {
+        "aspect": "受伤触发缩避阈值标注",
+        "evidence": [
+          {
+            "pageid": 57310,
+            "quote": "每降低25生命值也会缩入地面"
+          }
+        ]
+      },
+      {
+        "aspect": "生成点附近游荡描述",
+        "evidence": [
+          {
+            "pageid": 57310,
+            "quote": "地热螨会在生成点附近游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "缩避状态持续时间标注",
+        "evidence": [
+          {
+            "pageid": 57310,
+            "quote": "缩入地面进行防御，持续10~150秒"
+          }
+        ]
+      },
+      {
+        "aspect": "觅食吃食行为描述",
+        "evidence": [
+          {
+            "pageid": 57310,
+            "quote": "寻找并吃掉附近的肉类食物和可怕食物"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "通风口螨虫",
+    "防御",
+    "追击",
+    "电篱笆",
+    "冷却",
+    "吃食物",
+    "游荡",
+    "恐慌",
+    "受惊",
+    "家位置"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f25bf355bdbd129c420bf0eb7dede475746bb4976075507d86c504f54b26a5d4",
+    "source_bytes": 2722,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058478182
+  }
+}

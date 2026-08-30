@@ -7,139 +7,110 @@
   },
   "category": "component",
   "display_name": "propagator",
-  "summary": "Propagator 组件管理实体的热量、闪点、传播范围与衰减等数据，负责火焰或冷源在实体间的热量传递。它参与核心玩法中的火灾蔓延、物体融化、冰冻解冻以及火焰伤害计算，并受季节与地形属性影响。",
+  "summary": "该组件管理实体的当前热量、燃点、传播范围与热量输出等数据，模拟热源或冷源的热量传递过程。它参与火焰蔓延、解冻冰冻物体、对范围内实体造成火焰伤害等核心生存与战斗玩法，并受季节与地块防火属性调制。",
   "api": [
     {
       "name": "CalculateHeatCap",
-      "effect": "重置 self.heat_this_update 为 0，并根据 flashpoint 与随机缓动函数计算 self.max_heat_this_update，用于限制每帧可加热量。"
+      "effect": "重置当前帧已加热量 heat_this_update 为 0，并根据 flashpoint 与随机三次缓动函数计算本帧最大加热量 max_heat_this_update。修改自身状态无外部副作用。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "调用 StopSpreading(true) 停止传播，调用 OnUpdate(0) 进行清理，并取消存在的 delay 任务。"
+      "effect": "调用 StopSpreading(true) 停止传播并重置热量，立即以 dt=0 调用 OnUpdate 处理状态，取消延迟任务 self.delay。清理组件在实体移除时的更新与延迟。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "若实体有效且自身非制冷加热器，查找周围带 frozen 或 firemelt 标签的实体，向它们推送 stopfiremelt 事件并移除 firemelt 标签。"
+      "effect": "若实体仍有效且非制冷加热器，查找范围内带 frozen 或 firemelt 标签的实体，向其推送 stopfiremelt 事件并移除 firemelt 标签。副作用：修改其他实体的标签与事件状态。"
     },
     {
       "name": "SetOnFlashPoint",
-      "effect": "设置 self.onflashpoint 回调函数为传入的 fn，在达到闪点时调用。"
+      "effect": "设置闪点触发回调函数 self.onflashpoint 为传入的 fn，供热量达到燃点时调用。仅存储函数无立即副作用。"
     },
     {
       "name": "Delay",
-      "effect": "取消已有的 delay 任务（若存在），并调度一个新任务在 time 秒后清除 self.delay 标记，期间阻止加热。"
+      "effect": "取消已有延迟任务后，创建一个新的 time 秒后执行的任务将 self.delay 置 nil。管理组件内部延迟计时器。"
     },
     {
       "name": "StopUpdating",
-      "effect": "调用 CalculateHeatCap 重算热上限，并取消周期更新任务 self.task 以停止更新。"
+      "effect": "调用 CalculateHeatCap 重置加热上限，并取消周期更新任务 self.task 以停止更新循环。停止组件自发更新。"
     },
     {
       "name": "StartUpdating",
-      "effect": "若 self.task 为空，则启动一个以 PROPAGATOR_DT 为间隔的周期任务来调用 OnUpdate 更新逻辑。"
+      "effect": "若周期任务 self.task 不存在，则启动周期为 PROPAGATOR_DT 的任务调用内部更新函数。启动组件更新循环。"
     },
     {
       "name": "StartSpreading",
-      "effect": "记录传播来源 source，将 spreading 设为 true，并启动更新任务以开始向周围传播热量。"
+      "effect": "记录传播源 source，将 spreading 设为 true，并启动更新任务。开始向周围实体传播热量。"
     },
     {
       "name": "StopSpreading",
-      "effect": "清除 source 与 spreading 标志；若 reset 为真，则根据 heatpct 随机重置 currentheat 并清除 pauseheating 暂停标志。"
+      "effect": "清除传播源与 spreading 标志；若 reset 为真，则根据 heatpct 随机重置 currentheat 并清除暂停加热标志 pauseheating。停止传播并可重置热量。"
     },
     {
       "name": "GetHeatResistance",
-      "effect": "根据当前所处地形的 no_fire_spread 或 flashpoint_modifier 属性返回热阻系数（0、计算值或 1），无副作用。"
+      "effect": "根据实体当前地块类型返回热阻系数：防火地块返回 0，有 flashpoint_modifier 的地块返回计算比例，否则返回 1。只读无副作用。"
     },
     {
       "name": "CanSpreadHeat",
-      "effect": "返回当前地形是否允许传播热（非 no_fire_spread），无副作用。"
+      "effect": "返回当前地块是否允许传播热量（非 no_fire_spread）。只读无副作用。"
     },
     {
       "name": "AcceptsHeat",
-      "effect": "返回 public 配置属性 acceptsheat 为真且当前未暂停加热（pauseheating 为假），无副作用。"
+      "effect": "返回自身 acceptsheat 且未处于暂停加热状态 pauseheating 的布尔值。只读无副作用。"
     },
     {
       "name": "AddHeat",
-      "effect": "若处于延迟中、实体带 fireimmune 标签或本帧加热已达上限则忽略；否则按热阻计算加热量累加至 currentheat 与 heat_this_update，若热量非零则启动更新；若超过 flashpoint 则暂停加热，且当来源非控火时触发 onflashpoint 回调。"
+      "effect": "若处于延迟或实体有 fireimmune 标签或本帧加热达上限则返回；否则按热阻计算加热量累加 heat_this_update 与 currentheat，非0时启动更新，超闪点则暂停加热并可能调用 onflashpoint 回调（当源非受控燃烧）。修改热量状态并可能触发闪点事件。"
     },
     {
       "name": "Flash",
-      "effect": "若接受热、未暂停且未延迟，则强制减去并重新添加超过闪点的热量以触发闪点逻辑（调用 AddHeat）。"
+      "effect": "若接受热且未暂停且无限延，则调整 heat_this_update 后强制调用 AddHeat 添加超过闪点的热量以触发燃点。可能导致闪点回调。"
     },
     {
       "name": "OnUpdate",
-      "effect": "重算热上限并衰减 currentheat；若正在传播，搜索范围内实体，向其他 propagator 传热、减少 freezable 冷度、为冰冻/可熔实体加 firemelt 标签与事件，并对范围内生命体造成火焰伤害（含 PVP 修正）；若非传播则清除周围 firemelt 状态，热量归零时停止更新。"
+      "effect": "重算热上限并衰减 currentheat；若 spreading 则查找周围实体，向可传播组件加温、对 freezable 减冷度解冻、对冰冻物体加 firemelt 标签与事件，并在开启伤害时对范围内健康实体造成火焰伤害（含 PVP 修正）；若不 spreading 则清理 firemelt 标签事件，热量归零则停止更新。核心传播与影响逻辑，广泛修改周围实体。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含传播范围、输出、热阻、闪点、延迟、传播状态、接受热与当前热量的调试字符串，无副作用。"
+      "effect": "返回包含范围、输出、热阻、燃点、延迟、传播状态等信息的调试字符串。无副作用。"
     }
   ],
-  "events_published": [],
+  "events_published": [
+    "stopfiremelt",
+    "firemelt"
+  ],
   "events_listened": [],
   "netvars": [],
-  "tunables": [],
+  "tunables": [
+    "TUNING.PVP_DAMAGE_MOD",
+    "TUNING.SPRING_FIRE_RANGE_MOD"
+  ],
   "wiki": {
     "scanned_pageids": [
+      13569,
+      15734,
+      13570,
       20496,
-      10374,
-      20511,
-      70763,
-      15162,
-      15651,
-      16658,
-      65872
+      21137,
+      18410,
+      20700,
+      19952
     ],
-    "aspects": [
-      {
-        "aspect": "可控燃烧不引燃描述",
-        "evidence": [
-          {
-            "pageid": 20496,
-            "quote": "可控燃烧的实体不会引燃附近的可燃物"
-          }
-        ]
-      },
-      {
-        "aspect": "引燃附近可燃物描述",
-        "evidence": [
-          {
-            "pageid": 20496,
-            "quote": "燃烧的实体会引燃附近的其它可燃物。"
-          },
-          {
-            "pageid": 15162,
-            "quote": "当营火燃料高于25%时，会引燃附近的可燃物。"
-          },
-          {
-            "pageid": 16658,
-            "quote": "也会引燃周围的可燃物。"
-          }
-        ]
-      },
-      {
-        "aspect": "灼烧周围实体描述",
-        "evidence": [
-          {
-            "pageid": 20496,
-            "quote": "依然会灼烧周围的实体。"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "well_documented"
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及季节、昼夜、降水、潮湿、燃烧状态、世界温度等，未描述propagator组件的热传播、热容量、加热、闪光等能力；仅提及热源寻找或干燥速率，不体现该组件行为。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "火焰传播",
-    "引燃",
-    "耐热",
+    "火焰蔓延",
     "解冻",
     "火焰伤害",
-    "防熔",
-    "春季范围",
-    "控火",
-    "闪点",
-    "加热"
+    "地块防火",
+    "热量",
+    "燃点",
+    "传播范围",
+    "季节",
+    "热源"
   ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 4/9)",
   "gameplay_tags": [
     "生存",
     "战斗"
@@ -149,6 +120,6 @@
     "source_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
     "source_bytes": 9660,
     "model": "hy3-free",
-    "generated_at_ms": 1787930618108
+    "generated_at_ms": 1788058436373
   }
 }

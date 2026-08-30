@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/koalefantbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "koalefantbrain",
+  "summary": "该大脑控制考拉象的AI行为。在恐慌或触电时优先逃跑，被激怒时短暂追击攻击玩家（最长6秒）。平时会寻找并面对附近玩家，随后保持距离逃离，若无玩家干扰则自由游荡或停留在盐舔处。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 以构建行为树，未定义其他对外方法或可被外部调用的自定义函数。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "WANDER_DIST_DAY",
+    "WANDER_DIST_NIGHT",
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "HUNTER_PARAMS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实例",
+        "追击最长 6 秒"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取面对目标函数（寻找最近玩家）",
+        "保持面对函数（确认玩家未消失且在范围内）",
+        "面对超时 0.5 秒"
+      ],
+      "context": "在序列节点中先于逃跑执行"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "威胁来源为带 character 标签且非 notarget 的实体",
+        "发现威胁距离 6",
+        "脱离危险距离 12"
+      ],
+      "context": "在序列节点中于面对后执行"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取面对目标函数（寻找最近玩家）",
+        "保持面对函数（确认玩家未消失且在范围内）"
+      ],
+      "context": "单独节点，无超时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "BrainCommon.ShouldSeekSalt(inst) 为真",
+      "semantic": "GetFaceTargetFn 返回 nil 且 KeepFaceTargetFn 返回 false，导致 FaceEntity 节点失败，跳过面对与逃跑，转而可能执行 AnchorToSaltlick 锚定盐舔"
+    },
+    {
+      "condition": "BrainCommon.ShouldSeekSalt(inst) 为假",
+      "semantic": "考拉象会寻找并面对最近玩家，在序列中先面对后逃离，或单独面对玩家"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 > 电栅栏恐慌触发 > 追击攻击(最长6秒) > 序列(面对最近玩家后逃离玩家) > 单独面对最近玩家 > 锚定盐舔 > 自由游荡。",
+  "wiki": {
+    "scanned_pageids": [
+      15370,
+      24747,
+      13701,
+      15022,
+      45173,
+      20287,
+      20288,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "主动避开玩家行为描述",
+        "evidence": [
+          {
+            "pageid": 24747,
+            "quote": "考拉象会主动避开玩家和其他生物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "考拉象",
+    "逃跑",
+    "面对玩家",
+    "游荡",
+    "追击",
+    "盐舔",
+    "恐慌",
+    "行为树"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "321c55a94facbf3b6553a50208710c6bdc88a984f196dea1051e82f912067431",
+    "source_bytes": 1591,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059564621
+  }
+}

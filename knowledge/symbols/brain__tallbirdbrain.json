@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/tallbirdbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "tallbirdbrain",
+  "summary": "高脚鸟大脑在白天通常靠近家园游荡、下蛋或在无家时建造新巢；当附近有角色或动物威胁巢穴时会返回防御，夜晚则必定回巢。若被攻击或发现目标，会发起最长受春季修正20秒的追击攻击；遭遇恐慌源或电网时会触发逃跑。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的对外调用接口；文件内的 GoHomeAction 等为 local 函数，不对外暴露。",
+  "events_published": [
+    "makenewnest"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "MAX_WANDER_DIST",
+    "MAX_CHASEAWAY_DIST",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST",
+    "WARN_BEFORE_ATTACK_TIME"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 SpringCombatMod(MAX_CHASE_TIME) 秒（基础20秒，受春季战斗修正）"
+      ],
+      "context": "优先级节点中，在恐慌触发之后、条件分支之前"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：实体有家且家附近存在威胁（角色或动物）",
+        "分支名称“ThreatNearNest”",
+        "子节点：执行防御家园动作"
+      ],
+      "context": "当巢穴附近有威胁时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取防御家园动作的函数（返回 WALKTO 至家）",
+        "节点调试名称“GoHome”",
+        "以跑动方式执行"
+      ],
+      "context": "在 ThreatNearNest 分支内"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：当前不是白天（夜晚）",
+        "分支名称“IsNight”",
+        "子节点：执行回家动作"
+      ],
+      "context": "当游戏处于夜晚时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取回家动作的函数（返回 GOHOME 至家）",
+        "节点调试名称“GoHome”",
+        "以跑动方式执行"
+      ],
+      "context": "在 IsNight 分支内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取下蛋动作的函数（返回 LAYEGG 至家，需家可下蛋）",
+        "节点调试名称“LayEgg”",
+        "以跑动方式执行"
+      ],
+      "context": "无额外包裹，优先级中直接尝试"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件函数：无家且可建新家且未忙碌",
+        "分支名称“Make Nest”",
+        "子节点：推送建新巢事件"
+      ],
+      "context": "当实体可建造新巢时"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行函数：推送“makenewnest”事件"
+      ],
+      "context": "在 Make Nest 分支内"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "返回家位置的函数（从 knownlocations 获取“home”）",
+        "离家最大游荡距离 MAX_WANDER_DIST（16）"
+      ],
+      "context": "优先级末尾默认游荡"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.components.homeseeker 有家且 GetNearbyThreatFn(home) 不为空（附近有角色或动物）",
+      "semantic": "执行防御家园动作（走向家 WALKTO）"
+    },
+    {
+      "condition": "not TheWorld.state.isday（夜晚）",
+      "semantic": "执行回家动作（GOHOME）"
+    },
+    {
+      "condition": "inst.components.homeseeker 有家且 home.readytolay（下蛋就绪）",
+      "semantic": "执行下蛋动作（LAYEGG）"
+    },
+    {
+      "condition": "CanMakeNewNest（无家、CanMakeNewHome、非忙碌）",
+      "semantic": "推送 makenewnest 事件以建造新巢"
+    },
+    {
+      "condition": "ChaseAndAttack 内部检测到可攻击目标",
+      "semantic": "追击攻击目标最长 SpringCombatMod(20) 秒"
+    },
+    {
+      "condition": "默认（无上述特殊条件）",
+      "semantic": "以家为中心游荡，最大距离 16"
+    }
+  ],
+  "bt_structure": "优先级节点树：1) 恐慌触发（含电网恐慌） 2) 追击攻击（最长20秒受春季修正） 3) 若巢穴附近有威胁则防御回家 4) 若夜晚则回家 5) 若可下蛋则下蛋 6) 若可建新巢则建巢 7) 以家为中心游荡（最大16）",
+  "wiki": {
+    "scanned_pageids": [
+      15386,
+      18723,
+      17997,
+      15022,
+      18722,
+      72981,
+      13901,
+      15239
+    ],
+    "aspects": [
+      {
+        "aspect": "主动仇恨触发描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "高脚鸟每隔 0 ~ 3 秒会主动仇恨'非高脚鸟'实体"
+          }
+        ]
+      },
+      {
+        "aspect": "夜晚回巢行为描述",
+        "evidence": [
+          {
+            "pageid": 18723,
+            "quote": "黄昏时高脚鸟会回到鸟巢站立或者卧在鸟巢，到了夜晚会进入睡眠。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "高脚鸟",
+    "下蛋",
+    "游荡",
+    "追击",
+    "返回防御",
+    "夜晚回巢",
+    "建造新巢",
+    "威胁巢穴",
+    "逃跑"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c7fbaca04c15c6c48d5f3c15102ea14c3f096d8195c1d7749a7e0e4762cbb485",
+    "source_bytes": 3328,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061724209
+  }
+}

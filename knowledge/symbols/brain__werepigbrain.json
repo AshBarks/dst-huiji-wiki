@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/werepigbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "werepigbrain",
+  "summary": "该大脑控制狼人猪（WerePig）实体的行为逻辑。当实体陷入恐慌（如受惊、触电或误食呕吐糖浆）时会触发逃跑；若当前战斗目标非攻击性则在安全状态下寻找并跑动进食；否则会追击攻击目标，无目标时则在记录的家位置附近游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 生命周期方法，未定义额外的供外部组件或玩家调用的公开方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "SEE_FOOD_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身",
+        "获取进食动作的函数（寻找10范围内可吃食物）",
+        "节点调试名称'EatMeat'",
+        "以跑动方式执行动作"
+      ],
+      "context": "WhileNode 条件 not TargetIsAggressive(inst) 即目标非攻击性时（SafeToEat）"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "最长追逐时间（秒）经春季修正为 MAX_CHASE_TIME=10",
+        "放弃距离（世界单位）经春季修正为 MAX_CHASE_DIST=30"
+      ],
+      "context": "优先级节点中直接执行（无额外条件）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身",
+        "家位置函数（返回已知位置'home'）",
+        "最大游荡距离 MAX_WANDER_DIST=20"
+      ],
+      "context": "优先级节点中直接执行（无额外条件）"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not TargetIsAggressive(inst)（目标非攻击性或无目标）",
+      "semantic": "在安全状态下执行 DoAction 寻找食物并跑动进食（节点名 EatMeat）"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. 通用恐慌触发 2. 电网恐慌触发 3. 呕吐糖浆恐慌触发 4. 若目标非攻击性则找食物吃 5. 追击攻击（春季修正参数） 6. 以家为中心游荡（最大距离20）",
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      13828,
+      15551,
+      15651,
+      13823,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体分别为 smallguard_alterguardian_projectile、klaus、wagboss_robot、shadow_knight、beequeen、dragonfly、deerclops 及熔炉装备，均不涉及 werepig（狼猪）实体或其 brain 能力；页面文本中未出现与 brain__werepigbrain 相关的游荡距离20、春季修正追逐时间10秒、放弃距离30、寻找10范围内可吃食物(EatMeat)等行为语义的表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "狂暴猪",
+    "找食物",
+    "狼人猪",
+    "进食",
+    "攻击",
+    "游荡",
+    "恐慌",
+    "春季"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "89b70e9b2af9eddb9beeba380143a1d8280467ca9b221c516e6cd7b9cd0e9155",
+    "source_bytes": 1970,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061908439
+  }
+}

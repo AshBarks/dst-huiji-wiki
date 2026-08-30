@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/slurtlebrain.lua"
+  },
+  "category": "brain",
+  "display_name": "slurtlebrain",
+  "summary": "该大脑控制 slurtle 在受到足够伤害、遭遇弹道或恐惧时举盾缩避以自保。在日常中，它会追击攻击靠近的敌人，寻找并吃下或偷取范围内的食物。若距上次进食超过容忍时间则优先跑动回家，无事时则在巢穴附近游荡。",
+  "api": [],
+  "api_note": "SlurtleBrain 仅重写 Brain 基类的 OnStart 方法以构建行为树，未定义其他供外部调用的自定义方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_CHASE_TIME",
+    "MAX_CHASE_DIST",
+    "DAMAGE_UNTIL_SHIELD",
+    "AVOID_PROJECTILE_ATTACKS",
+    "HIDE_WHEN_SCARED",
+    "SHIELD_TIME",
+    "SEE_FOOD_DIST",
+    "HUNGER_TOLERANCE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "UseShield",
+      "args_semantic": [
+        "举盾前需承受伤害阈值 DAMAGE_UNTIL_SHIELD",
+        "举盾持续 2 秒",
+        "启用弹道躲避举盾",
+        "启用恐惧举盾"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "最长追逐 60 秒",
+        "放弃距离 40 世界单位"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "动作函数 EatFoodAction 尝试吃背包或捡地上食物"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "动作函数 StealFoodAction 尝试偷取附近实体食物"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "动作函数 GoHomeAction 返回巢穴",
+        "节点调试名 Go Home",
+        "以跑动方式执行"
+      ],
+      "context": "当 ShouldGoHome 条件满足（距上次进食 > HUNGER_TOLERANCE）"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "家位置取 knownlocations 的 home",
+        "最大游荡距离 40 世界单位"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGoHome(inst) 即 GetTime() - inst.lastmeal > HUNGER_TOLERANCE",
+      "semantic": "在优先级树中通过 WhileNode 插入分支，满足条件时优先执行跑动回家动作而非继续后续游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点依次包含：举盾防御 > 恐慌触发 > 电栅栏恐慌 > 追击攻击 > 吃食物 > 偷食物 > 饥饿超时回家 > 定点游荡",
+  "wiki": {
+    "scanned_pageids": [
+      13456,
+      15975,
+      13437,
+      34037,
+      13455,
+      15238,
+      13156,
+      15817
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有任何页面提及 brain__slurtlebrain 或其关联实体，所有页面实体（饥饿机制、鱼人之王、沃尔特、暗影槌、沃比、皮弗娄牛、沃尔夫冈、岩浆虫宠物）均不包含该符号的追逐、举盾、进食、回家、游荡等能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "举盾",
+    "追击攻击",
+    "偷食物",
+    "吃食物",
+    "回家",
+    "游荡",
+    "恐慌",
+    "电栅栏",
+    "饥饿"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a98f368dbf3dbfd1e0f1a48a58dd8083217fa570efdfa1f3a296a721995bad63",
+    "source_bytes": 6136,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061350336
+  }
+}

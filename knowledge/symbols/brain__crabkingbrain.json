@@ -1,0 +1,176 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/crabkingbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "crabkingbrain",
+  "summary": "该大脑控制蟹王在脱离惰性、施法、修复与生成状态后，通过行为树依次检查治疗、冰冻与召唤爪子的意图。它调用多个条件函数根据生命值、标签及周围实体情况标记后续动作意愿，自身不直接执行移动或攻击。",
+  "api": [],
+  "api_note": "该大脑仅重写了Brain基类的OnStart与OnInitializationComplete方法，这些方法由游戏引擎在实体大脑启动及初始化完成时内部调用，并非提供给外部模块使用的公开API，因此无对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "BOAT_TAG",
+    "TARGET_ONEOF_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "根节点包含的子节点表（含IfNode）",
+        "优先级数值1"
+      ],
+      "context": "行为树根构造"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "条件函数：检查实体是否不处于inert/casting/fixing/spawning状态",
+        "调试名称\"doing\"",
+        "子优先级节点（包含三个DoAction）"
+      ],
+      "context": "根节点下的状态门控"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取治疗意愿动作的函数ShouldHeal",
+        "节点调试名称\"heal\""
+      ],
+      "context": "在实体非惰性等状态时执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取冰冻意愿动作的函数ShouldFreeze",
+        "节点调试名称\"freeze\""
+      ],
+      "context": "在实体非惰性等状态时执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "获取召唤爪子意愿动作的函数ShouldHaveClaws",
+        "节点调试名称\"claws?\""
+      ],
+      "context": "在实体非惰性等状态时执行"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点表（三个DoAction）",
+        "优先级数值1"
+      ],
+      "context": "IfNode内部的优先级节点"
+    },
+    {
+      "ctor": "BT",
+      "args_semantic": [
+        "实体自身(self.inst)",
+        "根节点root"
+      ],
+      "context": "行为树实例构造"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "HasStateTag(\"inert\") or HasStateTag(\"casting\") or HasStateTag(\"fixing\") or HasStateTag(\"spawning\")",
+      "semantic": "大脑不安排任何主动意图检查，等待状态结束"
+    },
+    {
+      "condition": "not HasStateTag(\"inert\") and not HasStateTag(\"casting\") and not HasStateTag(\"fixing\") and not HasStateTag(\"spawning\")",
+      "semantic": "依次执行治疗、冰冻、召唤爪子意图检查"
+    },
+    {
+      "condition": "inst.components.health:GetPercent() < 1 and inst:HasTag(\"icewall\") and not inst.components.timer:TimerExists(\"taunt\")",
+      "semantic": "在函数ShouldHeal中标记wantstoheal治疗意愿"
+    },
+    {
+      "condition": "not inst:HasTag(\"icewall\") and inst.damagetotal <= -TUNING.CRABKING_FREEZE_THRESHOLD and inst.components.health:GetPercent() <= TUNING.CRABKING_STAGE1_THRESHOLD and 附近有船或合法目标",
+      "semantic": "在函数ShouldFreeze中标记wantstofreeze冰冻意愿"
+    },
+    {
+      "condition": "not inst:HasTag(\"icewall\") and not inst.arms and not inst.components.timer:TimerExists(\"taunt\") and not inst.sg:HasStateTag(\"casting\")",
+      "semantic": "在函数ShouldHaveClaws中标记wantstosummonclaws召唤爪子意愿"
+    }
+  ],
+  "bt_structure": "根优先级节点(优先级1) -> 若实体不处于inert/casting/fixing/spawning状态(条件节点'doing') -> 内部优先级节点(优先级1) 依次执行: DoAction(heal) -> DoAction(freeze) -> DoAction(claws?)；若条件不满足则整树空转。",
+  "wiki": {
+    "scanned_pageids": [
+      20511,
+      15022,
+      15225,
+      18234,
+      23924,
+      13897,
+      15651,
+      13606
+    ],
+    "aspects": [
+      {
+        "aspect": "低温冰冻施法描述",
+        "evidence": [
+          {
+            "pageid": 23924,
+            "quote": "他会施法降低附近的温度并冰冻附近的实体"
+          }
+        ]
+      },
+      {
+        "aspect": "巨钳生成归属描述",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "由帝王蟹生成的[[巨钳]]"
+          }
+        ]
+      },
+      {
+        "aspect": "生命值低于阈值尝试治疗",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "帝王蟹就会开始尝试治疗自己"
+          },
+          {
+            "pageid": 13606,
+            "quote": "巨钳全部死亡的12秒后开始治疗"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "蟹王",
+    "治疗",
+    "冰冻",
+    "召唤",
+    "冰墙",
+    "船只",
+    "行为树",
+    "意愿",
+    "行为优先级",
+    "状态标签"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 1/10)",
+  "gameplay_tags": [
+    "战斗",
+    "BOSS机制",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67b7c4384310f3c25fa9431d97de94ea7f41ecf34c7053d06938366e37968294",
+    "source_bytes": 3919,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058705759
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/gestalt_guard_evolvedbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "gestalt_guard_evolvedbrain",
+  "summary": "该大脑控制进化态傀儡守护者（Gestalt Guard Evolved）在非忙碌（busy）状态下与战斗目标交战。若有有效目标，它会计算距离并优先尝试传送相位，再根据近、中、远范围依次尝试对应攻击；若无目标，则无条件站立静止。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 方法以构建行为树，未定义额外的对外公开方法供实体或其他模块调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身实例（self.inst）"
+      ],
+      "context": "当没有战斗目标（hastarget 为假）且实体非 busy 状态时执行，因未传入 startfn/keepfn 故无条件进入并无限期保持站立"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"busy\")",
+      "semantic": "仅当实体不处于 busy 状态标签时才运行后续行为树逻辑，否则大脑不执行任何动作（处于 busy 状态守卫）。"
+    },
+    {
+      "condition": "hastarget() (即 combat.target 存在且有效，已计算距离)",
+      "semantic": "若有战斗目标，进入战斗优先级节点，依次尝试传送、根据距离远近使用不同攻击；若无目标，则执行 StandStill 无条件站立。"
+    },
+    {
+      "condition": "distancetotarget < TUNING.GESTALT_EVOLVED_CLOSE_RANGE",
+      "semantic": "距离目标小于近战范围时，尝试近距离攻击 TryAttack_Close。"
+    },
+    {
+      "condition": "distancetotarget < TUNING.GESTALT_EVOLVED_MID_RANGE",
+      "semantic": "距离目标小于中程范围时，尝试中距离攻击 TryAttack_Mid。"
+    },
+    {
+      "condition": "distancetotarget < TUNING.GESTALT_EVOLVED_FAR_RANGE",
+      "semantic": "距离目标小于远程序列时，尝试远距离攻击 TryAttack_Far。"
+    },
+    {
+      "condition": "self.inst._should_teleport (在 startcombatphase 函数中)",
+      "semantic": "若实体标记需要传送，优先尝试传送接近目标，失败则尝试传送躲避攻击，成功则中断后续节点。"
+    }
+  ],
+  "bt_structure": "根优先级节点（权重0.5）：WhileNode 判断非 busy 状态，内部优先级节点（权重0.5）先执行计算目标距离的动作（失败装饰），然后 IfNode 判断是否有目标：有目标则进入战斗子优先级节点（先 ConditionNode 尝试传送相位，再按近/中/远范围 IfNode 尝试对应攻击，最后尝试传送拉近）；无目标则 StandStill 无条件站立。busy 状态时根节点直接跳过，不做任何事。",
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      19297
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录分别为熔炉模式装备列表与亮茄魔杖物品描述，全文未提及任何实体在无战斗目标且非busy时保持站立的行为，也未涉及brain__gestalt_guard_evolvedbrain符号。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "傀儡守护者",
+    "传送相位",
+    "站立静止",
+    "非忙碌状态",
+    "近中远攻击",
+    "交战行为",
+    "有效目标"
+  ],
+  "search_terms_note": "pass1 后零命中 7/7,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1f0d8b797999ad781931dc10a6f1060d3171d1d4f744e7f203c15b0800a62389",
+    "source_bytes": 2808,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059081124
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/carnival_hostbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "carnival_hostbrain",
+  "summary": "该大脑控制嘉年华主持人实体，在非飞走状态下根据情境切换行为。当玩家激活原型机时主持人会面对玩家；观看小游戏时根据类型和阶段进行跟随、远离参与者、面对或尾声抛洒奖励；无特定任务时在家附近游荡并随机播报。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 构建行为树，未定义其他对外方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "GIVE_PLAZAKIT_DIST",
+    "GIVE_PLAZAKIT_GIVE_DIST",
+    "MAX_LEASH_DIST",
+    "INNER_LEASH_DIST",
+    "MAX_WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为正在使用原型机的玩家函数",
+        "保持面对该玩家的函数"
+      ],
+      "context": "原型机被激活时"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为正在观看的小游戏函数",
+        "保持目标为正在观看的小游戏函数"
+      ],
+      "context": "观看小游戏时面对"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "获取目标为正在观看的小游戏函数",
+        "保持条件为小游戏处于开场"
+      ],
+      "context": "观看小游戏开场时"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "返回家位置的函数",
+        "离家最大游荡距离 15"
+      ],
+      "context": "未建立广场或默认闲逛"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "远离标签为 minigame_participator 的实体",
+        "开始逃跑距离 5",
+        "安全距离 7"
+      ],
+      "context": "观看小游戏时优先远离参与者"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "获取跟随目标(小游戏)的函数",
+        "最小跟随距离由小游戏组件提供",
+        "目标跟随距离由小游戏组件提供",
+        "最大跟随距离由小游戏组件提供"
+      ],
+      "context": "观看小游戏时跟随"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "获取聊天文本的函数",
+        "子优先行为节点",
+        "聊天延迟 5 秒",
+        "聊天时间 10 秒"
+      ],
+      "context": "观看游乐场游戏时聊天"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "字符串键 CARNIVAL_HOST_OTHERGAME_TALK",
+        "子优先行为节点",
+        "聊天延迟 5 秒",
+        "聊天时间 10 秒"
+      ],
+      "context": "观看其他游戏时聊天"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "字符串键 CARNIVAL_HOST_ANNOUNCE_CARNIVAL",
+        "游荡行为节点",
+        "聊天延迟 5 秒",
+        "聊天时间 10 秒"
+      ],
+      "context": "未建立广场时公告"
+    },
+    {
+      "ctor": "ChattyNode",
+      "args_semantic": [
+        "获取随机公告文本的函数",
+        "游荡行为节点",
+        "聊天延迟 15 秒",
+        "聊天时间 30 秒"
+      ],
+      "context": "默认闲逛公告"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行游戏结束发奖动作的函数",
+        "动作名 TossRward"
+      ],
+      "context": "小游戏尾声时"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.sg:HasStateTag(\"flight\")",
+      "semantic": "非飞走状态下才执行所有主要行为"
+    },
+    {
+      "condition": "WatchingMinigame(inst) 非空",
+      "semantic": "进入观看小游戏分支，根据类型与阶段决定跟随、面对或发奖"
+    },
+    {
+      "condition": "gametype == \"carnivalgame\"",
+      "semantic": "作为游乐场游戏，尾声时抛奖面对，否则聊天中跟随或远离"
+    },
+    {
+      "condition": "IsWatchingMinigameOutro(inst)",
+      "semantic": "游戏尾声执行 OnEndOfGame 抛洒奖励并面对小游戏"
+    },
+    {
+      "condition": "IsWatchingMinigameIntro(inst)",
+      "semantic": "游戏开场优先跟随小游戏、远离参与者并面对"
+    },
+    {
+      "condition": "prototyper.doers 非空 (GetFaceTargetFn)",
+      "semantic": "面对正在使用原型机的玩家"
+    },
+    {
+      "condition": "not hassold_plaza or not hasbeento_plaza",
+      "semantic": "未出售或未去过广场时播报嘉年华公告并游荡"
+    }
+  ],
+  "bt_structure": "根优先节点(非飞走) -> [观看小游戏分支, 面对原型机玩家, 无广场公告游荡, 默认公告游荡]。观看小游戏分支内：优先 carnivalgame 处理(尾声发奖面对/否则聊天下跟随远离面对) 与其他游戏处理(开场跟随远离面对/否则聊天下跟随远离面对)。",
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      72238,
+      13898,
+      17998,
+      18303,
+      10418,
+      13457,
+      13700
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均关于其他实体（皮弗娄牛、附身底盘、曼德拉草、牛角、聚光灯、WX-78、交易小店、骨架），未提及嘉年华主持人相关的广场、小游戏、原型机、发奖等行为，故无该符号能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华主持人",
+    "游荡",
+    "面向玩家",
+    "小游戏",
+    "发放奖励",
+    "嘉年华原型",
+    "播报",
+    "跟随"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "建造",
+    "装饰",
+    "活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fdc54af345197ad0cc064588d8a30038fa4c085f270e62f4072cc7d9128cd4da",
+    "source_bytes": 6010,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058404705
+  }
+}

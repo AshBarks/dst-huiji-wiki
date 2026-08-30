@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/brightmare_gestaltinvaderbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "brightmare_gestaltinvaderbrain",
+  "summary": "该大脑控制亮晶晶入侵者实体，在拥有入侵目标（瓦格斯塔夫NPC）时拴绳靠近并攻击，丢失目标或过远时自杀。具备吐唾沫标签的实体会对战斗目标远程攻击或近身站立等待，平时会破坏玩家骷髅与墙壁并追击攻击附近目标，失控时恐慌。",
+  "api": [],
+  "api_note": "源码中 MoonBeastBrain 仅实现了 Brain 基类的 OnStart 方法以构建行为树，未定义其他供外部模块调用的公开函数或方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "WORK_DIST",
+    "LOST_DIST",
+    "RETURN_DIST",
+    "BASE_DIST",
+    "LOST_TIME",
+    "AGGRO_TIME",
+    "PETRIFY_TIME",
+    "PETRIFY_TIME_VAR"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "实体自身",
+        "追击最长 100 秒"
+      ],
+      "context": ""
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回入侵目标当前坐标的函数",
+        "拴绳最大半径 3（WORK_DIST）",
+        "内部返回距离 3（WORK_DIST）"
+      ],
+      "context": "InvadeTarget 分支内优先级最高"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身",
+        "返回入侵目标位置的函数（无目标则nil）",
+        "拴绳最大半径 15（RETURN_DIST）",
+        "内部返回距离 6（BASE_DIST）"
+      ],
+      "context": "根优先级后续"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": ""
+    },
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "实体自身"
+      ],
+      "context": "SequenceNode 中与破坏骷髅和重置冷却组合"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身（省略 startfn/keepfn，无条件进入并无限期保持停止）"
+      ],
+      "context": "waittospit 分支"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身（省略 startfn/keepfn，无条件进入并无限期保持停止）"
+      ],
+      "context": "InvadeTarget 分支内优先级最低"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "LostInvadeTarget(self) 返回真（丢失入侵目标超时 LOST_TIME 或距离>LOST_DIST）",
+      "semantic": "执行 ActionNode 调用 health:Kill() 使实体自杀"
+    },
+    {
+      "condition": "shouldspit(self.inst) 返回真（有 gestalt_invader_spitter 标签且战斗目标存在且无 spit_cooldown 计时）",
+      "semantic": "DoAction 执行 spit 函数进行 TOSS 远程攻击"
+    },
+    {
+      "condition": "shouldwaittospit(self.inst) 返回真（spitter 且目标距离平方<=16）",
+      "semantic": "StandStill 无条件站立静止等待"
+    },
+    {
+      "condition": "ShouldTargetInvadeTarget(self.inst) 返回真（有 wagstaff_npc 标签入侵目标且距上次被攻击>AGGRO_TIME）",
+      "semantic": "优先 Leash 至目标位置 WORK_DIST，然后 AttackInvadeTarget（空操作），最后 StandStill"
+    },
+    {
+      "condition": "默认根节点后续（前述 WhileNode 均假）",
+      "semantic": "SequenceNode 破坏骷髅+AttackWall+重置冷却；之后 ChaseAndAttack(100)；Leash 返回入侵目标位置；Panic"
+    }
+  ],
+  "bt_structure": "PriorityNode 根: BrainCommon.PanicTrigger -> WhileNode(LostInvadeTarget) 自杀 -> WhileNode(shouldspit) 吐唾沫 -> WhileNode(shouldwaittospit) 站立 -> SequenceNode(破骷髅,攻墙,重置冷却) -> WhileNode(ShouldTargetInvadeTarget) 优先(拴绳靠近,攻击,站立) -> ChaseAndAttack(100) -> Leash(返回目标) -> Panic",
+  "wiki": {
+    "scanned_pageids": [
+      51494,
+      51498,
+      10418,
+      51046,
+      15022,
+      46847,
+      13701,
+      15031
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及的实体（瓦格斯塔夫工具、战争瓦器人、WX78、天体英雄/后裔、远古织影者、颗粒状传输）均未描述该大脑符号的追击最长100秒、WORK_DIST=3/RETURN_DIST=15/BASE_DIST=6的拴绳与返回入侵目标、Panic、AttackWall、StandStill等行为；文本中出现的追击距离（20/30/12单位）与清单数值不符，且无“入侵目标”概念表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "亮晶晶入侵者",
+    "破坏墙壁",
+    "追击",
+    "远程攻击",
+    "站立",
+    "牵引",
+    "瓦格斯塔夫",
+    "恐慌"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "战斗",
+    "入侵",
+    "破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4d699ed421dc591757c6737f92ee79a25399e33e011f1c2d2438896e9ff6b095",
+    "source_bytes": 4484,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058289752
+  }
+}

@@ -7,43 +7,43 @@
   },
   "category": "component",
   "display_name": "debuff",
-  "summary": "组件 Debuff 管理实体上的减益效果实例，存储效果名称、目标及各类回调函数引用。它参与核心玩法中状态效果的附加、持续延长、跟随目标部位与移除分离逻辑，通常与 debuffable 组件协同工作。",
+  "summary": "组件 debuff 管理实体作为减益效果时的名称、目标及各类回调钩子，包括附加、移除、延长与改变跟随符号的函数。它参与游戏中负面状态的施加与生命周期维护，通常由 debuffable 组件驱动调用。",
   "api": [
     {
       "name": "SetAttachedFn",
-      "effect": "设置附加回调函数 onattachedfn 的引用，仅存储函数，无其它副作用。"
+      "effect": "将传入函数设为 onattachedfn 回调，无其它副作用。"
     },
     {
       "name": "SetDetachedFn",
-      "effect": "设置分离回调函数 ondetachedfn 的引用，仅存储函数，无其它副作用。"
+      "effect": "将传入函数设为 ondetachedfn 回调，无其它副作用。"
     },
     {
       "name": "SetExtendedFn",
-      "effect": "设置延长回调函数 onextendedfn 的引用，仅存储函数，无其它副作用。"
+      "effect": "将传入函数设为 onextendedfn 回调，无其它副作用。"
     },
     {
       "name": "SetChangeFollowSymbolFn",
-      "effect": "设置改变跟随符号回调函数 onchangefollowsymbolfn 的引用，仅存储函数，无其它副作用。"
+      "effect": "将传入函数设为 onchangefollowsymbolfn 回调，无其它副作用。"
     },
     {
       "name": "Stop",
-      "effect": "若当前已关联目标(self.target)，则调用目标的 RemoveDebuff 方法以自身 name 移除该 debuff，间接触发分离流程。"
+      "effect": "若 self.target 存在，调用其 RemoveDebuff(self.name) 请求移除减益，可能触发 OnDetach 清理。"
     },
     {
       "name": "AttachTo",
-      "effect": "由 debuffable 组件调用。设置 name 与 target 属性，若存在 onattachedfn 则调用之，传入 inst、target、followsymbol、followoffset、data、buffer，完成效果附加。"
+      "effect": "仅供 debuffable 调用。记录减益名与目标，若设了 onattachedfn 则调用之传入相关参数，建立附加关系。"
     },
     {
       "name": "OnDetach",
-      "effect": "由 debuffable 组件调用。暂存当前 target，清空 name 与 target 属性，若存在 ondetachedfn 则调用之，传入 inst 与原 target，解除关联并执行分离逻辑。"
+      "effect": "仅供 debuffable 调用。清空名称与目标引用，若设了 ondetachedfn 则调用之传入原目标，完成分离。"
     },
     {
       "name": "Extend",
-      "effect": "若存在 onextendedfn 则调用，传入 inst、self.target、followsymbol、followoffset、data、buffer，用于刷新或延长效果（具体逻辑由回调定义）。"
+      "effect": "若设了 onextendedfn 则调用之传入当前目标与参数，用于延长或刷新减益。"
     },
     {
       "name": "ChangeFollowSymbol",
-      "effect": "由 debuffable 组件调用。若存在 onchangefollowsymbolfn 则调用，传入 inst、self.target、followsymbol、followoffset，用于更新效果跟随目标部位的符号。"
+      "effect": "仅供 debuffable 调用。若设了 onchangefollowsymbolfn 则调用之传入新符号与偏移，更新跟随表现。"
     }
   ],
   "events_published": [],
@@ -52,28 +52,42 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      20714,
-      13156,
-      15587,
-      18838,
-      15539
+      15539,
+      13152,
+      18493,
+      19754,
+      20033
     ],
-    "aspects": [],
-    "no_evidence_reason": "页面摘录仅出现“减益效果”名词描述（如沃尔夫冈弱小状态、鬼魂全局减益），未体现 debuff 组件的附加、脱离、延长、停止、改变跟随等具体能力或行为语义。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "负面效果赋予描述",
+        "evidence": [
+          {
+            "pageid": 20033,
+            "quote": "赋予该生物“泻根中毒”的负面效果"
+          },
+          {
+            "pageid": 15539,
+            "quote": "施加 2 层[[冰冻]]效果"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "减益效果",
-    "负面状态",
-    "状态附加",
-    "状态移除",
-    "效果延长",
-    "跟随符号",
-    "目标实体",
-    "回调配置"
+    "附加减益",
+    "移除减益",
+    "延长减益",
+    "减益图标",
+    "回调钩子",
+    "结束减益",
+    "清除目标",
+    "负面效果"
   ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 7/8)",
   "gameplay_tags": [
-    "减益",
+    "战斗",
     "生存"
   ],
   "related_symbols": [],
@@ -81,6 +95,6 @@
     "source_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
     "source_bytes": 1753,
     "model": "hy3-free",
-    "generated_at_ms": 1787933354078
+    "generated_at_ms": 1788063318477
   }
 }

@@ -1,0 +1,263 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/walrusbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "walrusbrain",
+  "summary": "海象大脑让海象实体根据是否有领导者及环境状态采取不同行为。无领导者时，它会以家为锚点拴绳活动、逃离威胁、跟随最近玩家、在夜晚或受惊时跑回家、吃地面上的肉；有领导者时则安静跟随领导者并攻击战斗目标，最后游荡或面对目标。",
+  "api": [],
+  "api_note": "该大脑仅重写 OnStart 构建行为树，未定义其他对外方法",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RUN_START_DIST",
+    "RUN_STOP_DIST",
+    "SEE_FOOD_DIST",
+    "MAX_WANDER_DIST",
+    "MAX_CHASE_TIME",
+    "MIN_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TARGET_FOLLOW_DIST",
+    "MAX_PLAYER_STALK_DISTANCE",
+    "LEASH_RETURN_DIST",
+    "LEASH_MAX_DIST",
+    "MIN_FOLLOW_LEADER",
+    "MAX_FOLLOW_LEADER",
+    "TARGET_FOLLOW_LEADER",
+    "START_FACE_DIST",
+    "KEEP_FACE_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实例",
+        "无领导者时返回家位置的函数",
+        "拴绳最大半径 80",
+        "内部返回距离 40"
+      ]
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "识别猎人的标签表（角色或怪物，排除海象等）",
+        "察觉威胁距离 5",
+        "脱离危险距离 15"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作的函数",
+        "节点名 'Go Home Scared'",
+        "以跑动方式执行"
+      ],
+      "context": "ShouldGoHomeScared 条件（无 taunt_attack 标签或领导者无效且无可跟随者）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "获取领导者函数",
+        "最小跟随距离 2",
+        "目标跟随距离 3",
+        "最大跟随距离 4",
+        "只走不跑"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实例",
+        "最长追逐时间 10 秒"
+      ],
+      "context": "CanAttackNow 条件（无战斗目标或不在冷却）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "获取战斗目标函数",
+        "最小距离 8",
+        "目标距离 11.5",
+        "最大距离 15",
+        "允许奔跑"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作的函数",
+        "节点名 'Go Home Night'"
+      ],
+      "context": "ShouldGoHomeAtNight 条件（夜晚、无领导者、有家、无战斗目标）"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实例",
+        "获取无领导者时最近玩家函数",
+        "最小距离 8",
+        "目标距离 11.5",
+        "最大距离 15",
+        "只走不跑"
+      ]
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取吃食物动作的函数",
+        "节点名 'Eat Food'"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取最近玩家函数",
+        "保持面对条件函数"
+      ]
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实例",
+        "获取领导者函数",
+        "保持领导者函数"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "获取家位置函数",
+        "最大游荡距离 40"
+      ]
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "ShouldGoHomeScared(inst) 为 true（无 taunt_attack 标签或跟随者为0，且领导者不存在或无效）",
+      "semantic": "以跑动方式执行回家动作"
+    },
+    {
+      "condition": "CanAttackNow(inst) 为 true（无战斗目标或不在攻击冷却）",
+      "semantic": "追逐并攻击目标，最长 10 秒"
+    },
+    {
+      "condition": "ShouldGoHomeAtNight(inst) 为 true（夜晚、无领导者、有家、无战斗目标）",
+      "semantic": "以走路方式执行回家动作"
+    },
+    {
+      "condition": "GetNoLeaderLeashPos 中无 flare_summoned 标签且领导者为空",
+      "semantic": "将家位置作为拴绳锚点，否则不拴绳"
+    },
+    {
+      "condition": "GetNoLeaderFollowTarget 中领导者为空",
+      "semantic": "跟随最近玩家，否则不跟随"
+    }
+  ],
+  "bt_structure": "优先级节点树：恐慌触发 -> 电栅栏恐慌 -> 无领导者拴家 -> 逃离猎人 -> 受惊回家 -> 跟随领导者 -> 可攻击时追逐 -> 跟随战斗目标 -> 夜晚回家 -> 无领导者跟随玩家 -> 吃食物 -> 面对玩家 -> 面对领导者 -> 游荡",
+  "wiki": {
+    "scanned_pageids": [
+      15402,
+      20510,
+      15408,
+      13857,
+      15022,
+      20113,
+      34314,
+      48895
+    ],
+    "aspects": [
+      {
+        "aspect": "受威胁远离玩家",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "玩家靠近时，海象会尝试快速远离玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "外部游荡行为",
+        "evidence": [
+          {
+            "pageid": 15408,
+            "quote": "小海象会带着仍未死亡猎犬在外面游荡"
+          }
+        ]
+      },
+      {
+        "aspect": "无领导者跟随玩家",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "保持一定距离地跟踪玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "注视玩家行为描述",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "站在玩家一定距离处看着玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "追击攻击玩家",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "海象会不断追击玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "逃回营地行为",
+        "evidence": [
+          {
+            "pageid": 15408,
+            "quote": "它会逃回海象营地并消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "海象",
+    "攻击目标",
+    "逃离威胁",
+    "跟随领导者",
+    "受惊跑回",
+    "夜晚跑回",
+    "面对目标",
+    "拴绳活动",
+    "吃食物",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 6/10)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "27ccf4d642de5375f5d75b605492a6d858ccd7ac47758a15e5cb0eb25349012e",
+    "source_bytes": 5077,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061850021
+  }
+}

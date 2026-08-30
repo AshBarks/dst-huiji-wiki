@@ -7,103 +7,103 @@
   },
   "category": "component",
   "display_name": "freezable",
-  "summary": "该组件管理实体的冻结状态（正常、冻结、解冻中）、冷量值、抗冻性与磨损时间等数据，并负责施加冰冻色调与碎裂特效。核心玩法上，它使实体能被冰冻以停止行动（如战斗中的敌人或玩家），并通过受击或时间推移解除冻结，参与战斗控制与生存挑战。",
+  "summary": "该组件管理实体的冻结状态、寒冷值与抗性数据，控制冻结、融化与寒冷消退过程。参与核心玩法包括通过累积寒冷使生物进入冰冻停滞状态，以及受击伤害打破冻结等战斗互动。",
   "api": [
     {
       "name": "OnRemoveFromEntity",
-      "effect": "移除实体的 'attacked' 事件监听与 'freezable' 标签，取消可能存在的 diminishingtask 与 wearofftask 定时任务，清理组件残留状态。"
+      "effect": "移除实体上的 'attacked' 事件监听与 'freezable' 标签，取消可能存在的 diminishingtask 与 wearofftask 定时任务。"
     },
     {
       "name": "SetResistance",
-      "effect": "设置组件的抗冻性 resistance 为传入参数 resist，该值用于计算冻结所需的冷量阈值（ResolveResistance），无其它副作用。"
+      "effect": "设置基础冻结抗性 self.resistance 为传入值，影响后续寒冷值累积到冻结的阈值。"
     },
     {
       "name": "SetDefaultWearOffTime",
-      "effect": "设置 self.wearofftime 为传入的 wearofftime，作为默认磨损（解冻）计时时长。"
+      "effect": "设置默认寒冷消退时间 self.wearofftime。"
     },
     {
       "name": "AddShatterFX",
-      "effect": "将传入的 prefab、offset 坐标与 followsymbol 组装为特效数据插入 self.fxdata 表，供后续 SpawnShatterFX 使用，无立即副作用。"
+      "effect": "将碎裂特效 prefab 及偏移、跟随符号信息插入 self.fxdata 表，供后续 SpawnShatterFX 使用。"
     },
     {
       "name": "SetShatterFXLevel",
-      "effect": "设置 self.fxlevel 为传入的 level（percent 参数未被使用），影响后续 SpawnShatterFX 中生成的特效等级。"
+      "effect": "设置碎裂特效等级 self.fxlevel（参数 percent 未被使用）。"
     },
     {
       "name": "SpawnShatterFX",
-      "effect": "遍历 self.fxdata，为每个数据生成对应 prefab 实体，依据 follow 决定跟随符号或作为子物体挂载，并设置 shatterfx 等级；副作用是在世界中生成特效实体。"
+      "effect": "遍历 fxdata 生成对应 prefab 实体，作为子物体或跟随符号，并调用其 shatterfx 组件设置等级；会在世界中创建实体。"
     },
     {
       "name": "IsFrozen",
-      "effect": "返回 self.state 是否为 FROZEN 或 THAWING 的布尔值，无副作用。"
+      "effect": "返回当前状态是否为 FROZEN 或 THAWING 的布尔值。"
     },
     {
       "name": "IsThawing",
-      "effect": "返回 self.state 是否为 THAWING 的布尔值，无副作用。"
+      "effect": "返回当前状态是否为 THAWING 的布尔值。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回包含当前状态、冷量、抗性、额外抗性及衰减任务剩余时间的调试字符串，无副作用。"
+      "effect": "返回包含状态、寒冷值、抗性、额外抗性及衰减任务剩余时间的调试字符串。"
     },
     {
       "name": "SetRedirectFn",
-      "effect": "设置 self.redirectfn 为传入函数，后续 AddColdness 会优先调用该函数以重定向冷量添加逻辑。"
+      "effect": "设置重定向函数 self.redirectfn，后续 AddColdness 会优先调用该函数，若返回 true 则拦截默认逻辑。"
     },
     {
       "name": "AddColdness",
-      "effect": "若 redirectfn 存在且返回真则直接返回；否则增加 self.coldness，当 coldness>0 时根据当前冻结状态与抗性判定调用 Freeze 或 StartWearingOff，并更新实体色调。副作用：可能改变冻结状态、启动磨损任务、改变颜色。"
+      "effect": "增加或减少寒冷值；若 redirectfn 拦截则返回。寒冷值大于0时根据抗性与状态可能触发 Freeze 或 StartWearingOff，并更新色调；可能改变冻结状态与启动定时任务。"
     },
     {
       "name": "StartWearingOff",
-      "effect": "取消已有 wearofftask，创建新的定时任务在 ResolveWearOffTime(wearofftime or self.wearofftime) 秒后调用 WearOff 函数，安排未来状态衰减。"
+      "effect": "取消已有 wearofftask，并启动新定时任务在指定时间后调用 WearOff 函数，使寒冷逐渐消退或状态转变。"
     },
     {
       "name": "GetTimeToWearOff",
-      "effect": "返回 wearofftask 的剩余时间或 nil，无副作用。"
+      "effect": "返回 wearofftask 的剩余时间或 nil（若无任务）。"
     },
     {
       "name": "UpdateTint",
-      "effect": "根据实体冻结状态与冷量百分比，通过 colouradder 组件或 AnimState 设置附加冰冻蓝色调；副作用是改变实体渲染颜色。"
+      "effect": "根据冻结状态与寒冷百分比，通过 colouradder 或 AnimState 设置实体附加颜色（冰霜蓝），改变外观色调。"
     },
     {
       "name": "SetExtraResist",
-      "effect": "设置 self.extraresist 并限制在 [0, resistance*2.5] 范围；若值大于0则启动周期衰减任务，否则取消该任务。影响总抗性与磨损时间计算。"
+      "effect": "设置额外抗性 self.extraresist 并限制在 [0, resistance*2.5]；若大于0则启动周期性衰减任务，否则取消该任务。"
     },
     {
       "name": "ResolveResistance",
-      "effect": "返回考虑 extraresist 后的总抗性值（min(resistance*2.5, resistance+extraresist) 或原 resistance），无副作用。"
+      "effect": "返回考虑 extraresist 后的总抗性值（基础抗性加额外抗性，封顶2.5倍）。"
     },
     {
       "name": "ResolveWearOffTime",
-      "effect": "返回考虑 extraresist 缩放后的磨损时间（原时间乘以夹紧系数），无副作用。"
+      "effect": "返回考虑 extraresist 缩减后的消退时间，额外抗性越高时间越短，最低为原时间0.1倍。"
     },
     {
       "name": "GetFreezePercent",
-      "effect": "返回 self.coldness 除以 ResolveResistance() 的比值，表示冻结进度，无副作用。"
+      "effect": "返回当前寒冷值占总抗性的比例，用于色调混合等。"
     },
     {
       "name": "Freeze",
-      "effect": "若实体可见且未死亡，调用 onfreezefn（若设置），重启衰减任务，设 state=FROZEN，启动磨损，更新色调，停止大脑与移动并清除战斗目标；若状态改变推送 'freeze' 事件，且若启用 diminishingreturns 则增加 extraresist。副作用：冻结实体、推送事件、中断 AI。"
+      "effect": "若实体可见且未死亡，调用 onfreezefn，重启额外抗性衰减，设置状态为 FROZEN，启动消退计时，更新色调，停止大脑与移动并清除战斗目标；若状态改变则推送 'freeze' 事件，若启用递减返回则增加额外抗性。强制冻结实体。"
     },
     {
       "name": "Unfreeze",
-      "effect": "若处于冻结态，设 state=NORMAL 并清零 coldness 与 damagetotal，生成碎裂特效，更新色调；若未死亡则重启大脑、推送 'unfreeze' 事件、使战斗攻击空白 0.3 秒。副作用：解除冻结、生成特效、推送事件。"
+      "effect": "若处于冻结态，重置状态为 NORMAL、寒冷值与伤害累计为0，生成碎裂特效，更新色调；若未死亡则重启大脑、推送 'unfreeze' 事件并令战斗组件短暂禁用攻击。解除冻结。"
     },
     {
       "name": "Thaw",
-      "effect": "若处于冻结态且未死亡，设 state=THAWING，清零 coldness，推送 'onthaw' 事件，启动缩放后的磨损计时。副作用：进入解冻中状态并推送事件。"
+      "effect": "若处于冻结态且未死亡，设置状态为 THAWING，寒冷值清零，推送 'onthaw' 事件，并启动消退计时。开始融化。"
     },
     {
       "name": "Reset",
-      "effect": "设 state=NORMAL 且 coldness=0，更新色调；不推送任何事件。副作用：清除冻结状态与冷量。"
+      "effect": "直接将状态设为 NORMAL、寒冷值清零并更新色调，不推送任何事件。强制重置冻结数据。"
     },
     {
       "name": "OnSave",
-      "effect": "若 extraresist 存在且大于0，返回保留一位小数的 {extraresist=...} 表，否则返回 nil，用于存档。"
+      "effect": "若 extraresist 存在且大于0，返回包含四舍五入后 extraresist 的存档表，否则返回 nil。"
     },
     {
       "name": "OnLoad",
-      "effect": "若载入数据中包含 extraresist，则调用 SetExtraResist 恢复该值，副作用是重建额外抗性与衰减任务。"
+      "effect": "若读档数据含 extraresist，则调用 SetExtraResist 恢复额外抗性。"
     }
   ],
   "events_published": [
@@ -119,88 +119,21 @@
   "wiki": {
     "scanned_pageids": [
       20511,
+      21137,
       23924,
       13823,
       13897,
       65881,
       19287,
-      73231,
       19808
     ],
     "aspects": [
       {
-        "aspect": "冰冻/冻结状态判定描述",
-        "evidence": [
-          {
-            "pageid": 13897,
-            "quote": "生物被冰冻之后仇恨会重置"
-          },
-          {
-            "pageid": 65881,
-            "quote": "看大副是否会被冰冻，若会"
-          },
-          {
-            "pageid": 19287,
-            "quote": "冰眼结晶器可以使被冰冻的致命亮茄无法自然解冻"
-          },
-          {
-            "pageid": 73231,
-            "quote": "对冰冻目标的伤害倍率"
-          }
-        ]
-      },
-      {
-        "aspect": "冰冻抗性数值与机制描述",
+        "aspect": "冰冻层数施加描述",
         "evidence": [
           {
             "pageid": 20511,
-            "quote": "冰冻抗性决定了生物要受到多少层冰冻效果才会被冻结"
-          },
-          {
-            "pageid": 23924,
-            "quote": "帝王蟹的冰冻抗性会随蓝宝石的数量增加而增强"
-          },
-          {
-            "pageid": 73231,
-            "quote": "1 + (冰冻层数/冰冻抗性) × 0.25"
-          }
-        ]
-      },
-      {
-        "aspect": "冻结实体行为描述",
-        "evidence": [
-          {
-            "pageid": 23924,
-            "quote": "他会施法降低附近的温度并冰冻附近的实体"
-          },
-          {
-            "pageid": 13897,
-            "quote": "如果将红宝石鹿冻结，蓝宝石鹿点燃"
-          },
-          {
-            "pageid": 65881,
-            "quote": "一般使用雪球发射器冰冻或者睡前故事催眠鸟"
-          },
-          {
-            "pageid": 19287,
-            "quote": "致命亮茄与它的钻地藤蔓及其所有节段共享冰冻"
-          },
-          {
-            "pageid": 73231,
-            "quote": "热能工具攻击冰冻和冻结的目标会造成额外伤害"
-          },
-          {
-            "pageid": 19808,
-            "quote": "池塘和沼泽池塘就会结冰"
-          }
-        ]
-      },
-      {
-        "aspect": "增加冰冻层数行为描述",
-        "evidence": [
-          {
-            "pageid": 20511,
-            "quote": "可以造成增加冰冻层数的行为，包括："
+            "quote": "有些道具能够对它们施加冰冻，当施加冰冻的层数到达"
           },
           {
             "pageid": 20511,
@@ -208,37 +141,75 @@
           },
           {
             "pageid": 13897,
-            "quote": "爆发前每帧施加 0.1 层冰冻，爆发后每帧施加 目标冰冻抗性 + 1 层冰冻"
+            "quote": "爆发后每帧施加 目标冰冻抗性 + 1 层冰冻"
           }
         ]
       },
       {
-        "aspect": "解冻与自然解冻行为描述",
+        "aspect": "冰冻抗性机制与数值描述",
+        "evidence": [
+          {
+            "pageid": 20511,
+            "quote": "冰冻抗性决定了生物要受到多少层冰冻效果才会被冻结"
+          },
+          {
+            "pageid": 20511,
+            "quote": "每种生物都有不同的冰冻抗性"
+          },
+          {
+            "pageid": 23924,
+            "quote": "帝王蟹的冰冻抗性会随蓝宝石的数量增加而增强"
+          }
+        ]
+      },
+      {
+        "aspect": "冻结状态与施加行为描述",
+        "evidence": [
+          {
+            "pageid": 23924,
+            "quote": "他会施法降低附近的温度并冰冻附近的实体"
+          },
+          {
+            "pageid": 13897,
+            "quote": "如果将红宝石鹿冻结，蓝宝石鹿点燃，克劳斯将无法指挥"
+          },
+          {
+            "pageid": 19287,
+            "quote": "致命亮茄在瘫痪期间被冰冻并解冻会立即结束瘫痪"
+          },
+          {
+            "pageid": 65881,
+            "quote": "鸟受到伤害解冻会被立即冰冻"
+          },
+          {
+            "pageid": 19808,
+            "quote": "位于森林世界的池塘和沼泽池塘就会结冰"
+          }
+        ]
+      },
+      {
+        "aspect": "解冻、融化与自然解冻描述",
         "evidence": [
           {
             "pageid": 13897,
             "quote": "红宝石鹿免疫火焰伤害且解冻速度翻倍"
           },
           {
-            "pageid": 13897,
-            "quote": "同时冰冻层数自然削减的速度"
-          },
-          {
             "pageid": 19287,
-            "quote": "致命亮茄受到攻击、解除冰冻或触电后"
-          },
-          {
-            "pageid": 19287,
-            "quote": "致命亮茄在瘫痪期间被冰冻并解冻会立即结束"
+            "quote": "冰眼结晶器可以使被冰冻的致命亮茄无法自然解冻"
           },
           {
             "pageid": 19808,
             "quote": "每当池塘解冻时，会再次生成植物"
+          },
+          {
+            "pageid": 21137,
+            "quote": "迷你冰川有高大、中等、矮小、融化和干涸五种状态"
           }
         ]
       },
       {
-        "aspect": "额外冰冻抗性累积描述",
+        "aspect": "额外冰冻抗性提升描述",
         "evidence": [
           {
             "pageid": 13897,
@@ -264,25 +235,24 @@
     "note": "freezable_diminishingreturns 为布尔标记(有递减收益时导出)。"
   },
   "search_terms": [
-    "冰冻",
-    "冻结状态",
-    "耐寒抗性",
+    "冻住",
+    "寒冷值",
+    "冰抗",
+    "碎冰",
     "解冻",
-    "碎冰特效",
-    "冷量积累",
-    "消融时间",
-    "冻结程度",
-    "额外抵抗"
+    "融化",
+    "冰冻",
+    "冻僵"
   ],
   "gameplay_tags": [
-    "战斗",
-    "生存"
+    "生存",
+    "战斗"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
     "source_bytes": 10247,
     "model": "hy3-free",
-    "generated_at_ms": 1787931331143
+    "generated_at_ms": 1788059603842
   }
 }

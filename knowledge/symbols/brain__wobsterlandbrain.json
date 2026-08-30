@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wobsterlandbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "wobsterlandbrain",
+  "summary": "该大脑控制陆地上的龙虾（Wobster）实体行为。当实体未处于跳跃状态时，优先检测附近是否有可跳入海洋的点并跳海；若没有则尝试寻找远处海洋逃逸点并拴引过去；若均失败则在无家状态下有限距离自由游荡。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 方法构建行为树，未定义其他可被外部调用的公开方法或函数，所有逻辑封装在本地函数与行为树节点中。",
+  "events_published": [
+    "onhop"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MAX_WANDER_DISTANCE",
+    "OCEAN_SEARCH_DISTANCE",
+    "HOP_DISTANCE",
+    "WANDER_TIMES"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点表：包含跳守卫 WhileNode"
+      ],
+      "context": "根节点"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件：实体状态机不具有 'jumping' 标签",
+        "节点名 '<Jump Guard>'",
+        "子优先级节点"
+      ],
+      "context": "根守卫"
+    },
+    {
+      "ctor": "PriorityNode",
+      "args_semantic": [
+        "子节点表：IfNode, NotDecorator, WhileNode, Wander"
+      ],
+      "context": "守卫内优先级调度"
+    },
+    {
+      "ctor": "IfNode",
+      "args_semantic": [
+        "条件：find_nearby_hop_point 找到附近跳海点",
+        "节点名 'Close Enough To Hop Into The Ocean!'",
+        "动作节点：执行 hop_into_the_ocean"
+      ],
+      "context": "最高优先级分支"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "动作函数：hop_into_the_ocean 推送 onhop 事件并清除点"
+      ],
+      "context": "IfNode 内部跳海动作"
+    },
+    {
+      "ctor": "NotDecorator",
+      "args_semantic": [
+        "被装饰的动作节点：执行 find_ocean_position 寻找海洋位置"
+      ],
+      "context": "第二优先级（尝试寻找海洋点）"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "动作函数：find_ocean_position 计算并存储海洋逃逸点"
+      ],
+      "context": "被 NotDecorator 包裹的寻找动作"
+    },
+    {
+      "ctor": "WhileNode",
+      "args_semantic": [
+        "条件：get_ocean_position 返回非 nil",
+        "节点名 'Escaping To The Ocean'",
+        "子节点 Leash 拴引"
+      ],
+      "context": "第三优先级海洋逃逸"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取海洋逃逸位置的函数 get_ocean_position",
+        "拴住距离 0.5",
+        "返回距离 0.5"
+      ],
+      "context": "Escaping To The Ocean 分支"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "家位置为 nil（自由游荡）",
+        "最大游荡距离 MAX_WANDER_DISTANCE=5",
+        "游荡时间配置 WANDER_TIMES(行走3+随机1,等待0+随机0.1)"
+      ],
+      "context": "默认游荡分支"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "inst.sg:HasStateTag('jumping') 为假",
+      "semantic": "整体行为树执行前提，跳跃时暂停陆地逻辑"
+    },
+    {
+      "condition": "find_nearby_hop_point(inst) 返回 true",
+      "semantic": "最高优先：直接执行 hop_into_the_ocean 跳入海洋并推送 onhop 事件"
+    },
+    {
+      "condition": "find_nearby_hop_point 为假但执行 find_ocean_position 后（NotDecorator包裹）",
+      "semantic": "尝试计算远处海洋逃逸点并存储，不阻断后续"
+    },
+    {
+      "condition": "get_ocean_position(inst) ~= nil",
+      "semantic": "第三优先：通过 Leash 以 0.5 距离拴引实体前往海洋逃逸点"
+    },
+    {
+      "condition": "上述海洋相关条件均不满足",
+      "semantic": "最低优先：Wander 以 nil 家位置、最大距离 5 自由游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(守卫:非跳跃状态) -> 内部优先级节点: [1.若附近有跳海点则跳海; 2.尝试寻找海洋逃逸点(取反装饰); 3.若存在逃逸点则 Leash 拴引至海洋; 4.否则 Wander 自由游荡(距离5)]",
+  "wiki": {
+    "scanned_pageids": [
+      15973,
+      13476,
+      17816,
+      22516,
+      24540,
+      65872,
+      15415,
+      18944
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均关于鱼人守卫、鱼人、烹饪料理、地块等实体，未提及brain__wobsterlandbrain的MAX_WANDER_DISTANCE、OCEAN_SEARCH_DISTANCE、HOP_DISTANCE、WANDER_TIMES及跳海/海洋逃逸行为树能力；merm页面的跳跃描述属鱼人而非该符号，故无证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "自由游荡",
+    "优先级",
+    "陆地龙虾",
+    "跳海点",
+    "逃逸点",
+    "跳跃状态",
+    "无家状态",
+    "龙虾大脑"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "17e5d7facc9d57607edca149d165b5d9103225fc7ed09eaa713774145ec15782",
+    "source_bytes": 2977,
+    "model": "hy3-free",
+    "generated_at_ms": 1788062036870
+  }
+}

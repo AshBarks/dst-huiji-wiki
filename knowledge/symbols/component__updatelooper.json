@@ -7,63 +7,59 @@
   },
   "category": "component",
   "display_name": "updatelooper",
-  "summary": "该组件为实体管理多种通用更新循环函数列表，包括每帧更新、长更新、墙体更新与后更新。它解决了 DoPeriodicTask(0) 无法精确每帧触发的问题，允许实体安全地添加或移除持续回调。这些循环参与游戏底层逻辑驱动，支撑各类玩法的动态行为。",
+  "summary": "该组件为实体管理多种通用的更新循环回调函数列表，包括每帧更新、长更新、墙体更新与后置更新。它解决了 DoPeriodicTask(0) 无法精确每帧触发的问题，通过引擎更新钩子按帧或特定阶段调用已注册的函数，支撑各类游戏逻辑的稳定循环执行。",
   "api": [
     {
-      "name": "AddOnUpdateFn",
-      "effect": "接收函数 fn 并将其加入 self.onupdatefns 数组；若加入前数组为空，则调用 self.inst:StartUpdatingComponent(self) 使实体开始每帧更新。副作用：可能启动组件更新循环。"
-    },
-    {
-      "name": "RemoveOnUpdateFn",
-      "effect": "接收函数 fn；若 self.onupdatefns 非空，则将 fn 加入 self.OnUpdatesToRemove 待移除列表，实际移除推迟至下次 OnUpdate 执行。副作用：无立即移除，仅标记延迟移除。"
-    },
-    {
-      "name": "OnUpdate",
-      "effect": "引擎每帧调用，参数 dt 为帧时间。首先处理 OnUpdatesToRemove 列表，将其中函数从 onupdatefns 移除，若移除后列表空则调用 self.inst:StopUpdatingComponent(self)；随后逆序遍历 onupdatefns 并以 (self.inst, dt) 调用每个函数。副作用：可能停止更新组件并执行用户回调。"
-    },
-    {
-      "name": "AddLongUpdateFn",
-      "effect": "将函数 fn 直接插入 self.longupdatefns 数组，无启动副作用。行为：追加长更新回调。"
-    },
-    {
-      "name": "RemoveLongUpdateFn",
-      "effect": "若 self.longupdatefns 非空，将 fn 加入 self.OnLongUpdatesToRemove 列表，实际移除在下次 LongUpdate 处理。副作用：延迟移除标记。"
-    },
-    {
-      "name": "LongUpdate",
-      "effect": "引擎长更新时调用，参数 dt。先处理 OnLongUpdatesToRemove 列表移除对应函数，随后逆序调用 longupdatefns 中每个函数 (self.inst, dt)。副作用：执行用户长更新回调。"
-    },
-    {
-      "name": "AddOnWallUpdateFn",
-      "effect": "将 fn 加入 self.onwallupdatefns；若原数组为空，调用 self.inst:StartWallUpdatingComponent(self) 启动墙体更新。副作用：可能开启墙更新循环。"
-    },
-    {
-      "name": "RemoveOnWallUpdateFn",
-      "effect": "若 onwallupdatefns 非空，将 fn 加入 self.OnWallUpdatesToRemove 延迟移除列表，在下次 OnWallUpdate 处理。副作用：仅标记。"
-    },
-    {
-      "name": "OnWallUpdate",
-      "effect": "引擎墙体更新调用，参数 dt。若 TheNet:IsServerPaused() 则直接返回；否则处理 OnWallUpdatesToRemove 移除函数，若列表空则 StopWallUpdatingComponent；然后正序调用 onwallupdatefns 中函数 (self.inst, dt)。副作用：可能停止墙更新并执行回调。"
-    },
-    {
-      "name": "AddPostUpdateFn",
-      "effect": "将 fn 加入 self.postupdatefns；若原数组为空，设置模块局部表 _PostUpdates[self.inst] = self.postupdatefns 以注册到全局后更新循环。副作用：将实体加入全局后更新遍历。"
-    },
-    {
-      "name": "RemovePostUpdateFn",
-      "effect": "在 postupdatefns 中查找 fn 并移除；若正处于全局后更新循环 (_IsPostUpdating 为真) 则仅置该位置为 nil，否则立即压缩数组；若数组空则清除 _PostUpdates[self.inst]。副作用：可能注销全局后更新注册。"
-    },
-    {
       "name": "OnRemoveFromEntity",
-      "effect": "调用 self.inst:StopUpdatingComponent(self) 和 self.inst:StopWallUpdatingComponent(self)，并置 _PostUpdates[self.inst] = nil。副作用：停止所有相关更新并清理全局表。"
+      "effect": "实体移除组件时调用；停止实体的更新组件与墙更新组件，并删除全局表 _PostUpdates 中该实体的条目。"
     },
     {
       "name": "OnRemoveEntity",
-      "effect": "置 _PostUpdates[self.inst] = nil 清理后更新注册。副作用：仅清理全局表项。"
+      "effect": "实体移除时调用；删除全局表 _PostUpdates 中该实体的条目。"
     },
     {
-      "name": "UpdateLooper_PostUpdate",
-      "effect": "全局函数，每帧后由游戏调用。遍历模块局部表 _PostUpdates，对每个实例的 postupdatefns 正序调用函数 (inst)（跳过 nil），若发现 nil 或移除则压缩数组，空则注销。副作用：驱动所有实体的后更新回调执行。"
+      "name": "AddOnUpdateFn",
+      "effect": "将函数 fn 加入 self.onupdatefns 列表；若加入前列表长度为0，则调用 inst:StartUpdatingComponent(self) 启动每帧更新。"
+    },
+    {
+      "name": "RemoveOnUpdateFn",
+      "effect": "若 self.onupdatefns 非空，将 fn 加入 self.OnUpdatesToRemove 列表，留待 OnUpdate 中实际移除；不立即移除。"
+    },
+    {
+      "name": "AddLongUpdateFn",
+      "effect": "将函数 fn 加入 self.longupdatefns 列表；不触发任何启动逻辑。"
+    },
+    {
+      "name": "RemoveLongUpdateFn",
+      "effect": "若 self.longupdatefns 非空，将 fn 加入 self.OnLongUpdatesToRemove 列表，留待 LongUpdate 中实际移除。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "若有待移除项则先从 onupdatefns 移除对应函数，若列表因此为空则停止更新组件；随后逆序调用 onupdatefns 中的每个函数，传入 inst 与 dt。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "若有待移除项则先从 longupdatefns 移除对应函数；随后逆序调用 longupdatefns 中的每个函数，传入 inst 与 dt。"
+    },
+    {
+      "name": "AddOnWallUpdateFn",
+      "effect": "将函数 fn 加入 self.onwallupdatefns 列表；若加入前列表长度为0，则调用 inst:StartWallUpdatingComponent(self) 启动墙更新。"
+    },
+    {
+      "name": "RemoveOnWallUpdateFn",
+      "effect": "若 self.onwallupdatefns 非空，将 fn 加入 self.OnWallUpdatesToRemove 列表，留待 OnWallUpdate 中实际移除。"
+    },
+    {
+      "name": "OnWallUpdate",
+      "effect": "若服务器暂停则直接返回；否则处理待移除项（若列表空则停止墙更新），然后正序调用 onwallupdatefns 中的每个函数，传入 inst 与 dt。"
+    },
+    {
+      "name": "AddPostUpdateFn",
+      "effect": "将函数 fn 追加到 self.postupdatefns；若追加前列表长度为0，则设置全局表 _PostUpdates[inst] = self.postupdatefns 以注册后置更新。"
+    },
+    {
+      "name": "RemovePostUpdateFn",
+      "effect": "在 postupdatefns 中查找 fn 并移除；若正处于后置更新循环中则仅置 nil 延迟清理，否则立即压缩列表；若列表为空则清除 _PostUpdates[inst] 条目。"
     }
   ],
   "events_published": [],
@@ -72,65 +68,31 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      57263,
-      15539,
-      45135,
-      19110,
-      22249,
-      22383,
-      28611,
-      22181
+      20714,
+      23187,
+      18476,
+      14579,
+      15295,
+      13779,
+      15922,
+      15022
     ],
-    "aspects": [
-      {
-        "aspect": "周期恢复生命值描述",
-        "evidence": [
-          {
-            "pageid": 22383,
-            "quote": "每秒恢复 25 {{生命值}}"
-          }
-        ]
-      },
-      {
-        "aspect": "定时甩落寄生暗影行为",
-        "evidence": [
-          {
-            "pageid": 19110,
-            "quote": "每隔一段时间会将其中一只寄生暗影甩到地上"
-          }
-        ]
-      },
-      {
-        "aspect": "灵魂诱饵持续时间消失机制",
-        "evidence": [
-          {
-            "pageid": 22181,
-            "quote": "2 秒的持续时间结束后也会自动消失"
-          }
-        ]
-      },
-      {
-        "aspect": "间隔生命值阈值触发行为",
-        "evidence": [
-          {
-            "pageid": 22383,
-            "quote": "生命值在 5000 ~ 7500 时，每隔 16 秒，就"
-          }
-        ]
-      }
-    ],
-    "coverage_status": "well_documented"
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录包含控制台指令、实体信息框、物品属性、生成间隔描述等，但未出现任何与updatelooper组件能力（如OnUpdate、LongUpdate、WallUpdate、PostUpdate、移除回调等）对应的玩家语言描述或行为证据，无法将所列代码能力映射到页面文本。",
+    "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
-    "每帧更新",
-    "持续回调",
-    "实体循环",
-    "墙体更新",
     "长更新",
-    "后更新",
-    "更新函数",
-    "逻辑循环"
+    "帧更新",
+    "循环",
+    "墙更新",
+    "后置",
+    "回调",
+    "精确",
+    "实体",
+    "更新器"
   ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 4/9)",
   "gameplay_tags": [
     "通用"
   ],
@@ -139,6 +101,6 @@
     "source_sha256": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
     "source_bytes": 5168,
     "model": "hy3-free",
-    "generated_at_ms": 1787931788970
+    "generated_at_ms": 1788060513077
   }
 }

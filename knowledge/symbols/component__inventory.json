@@ -7,175 +7,175 @@
   },
   "category": "component",
   "display_name": "inventory",
-  "summary": "该组件管理实体的物品栏格子、装备槽、主动手持物品以及溢出容器（如背包）。它参与核心生存玩法，包括物品拾取存放、装备穿戴与卸下、伤害减免计算、死亡掉落以及客户端界面交互。",
+  "summary": "该组件管理实体的背包槽位、装备槽、活动物品及溢出容器等数据。它参与物品拾取、装备、丢弃、伤害减免计算、存档读档以及玩家死亡掉落等核心生存与战斗玩法。",
   "api": [
     {
       "name": "EnableDropOnDeath",
-      "effect": "启用死亡掉落：设置 dropondeath 为 true 并监听实体 death 事件。"
+      "effect": "若 dropondeath 为 false，设为 true 并监听实体 death 事件以触发死亡掉落。"
     },
     {
       "name": "DisableDropOnDeath",
-      "effect": "禁用死亡掉落：设置 dropondeath 为 false 并移除 death 事件监听。"
+      "effect": "若 dropondeath 为 true，设为 false 并移除 death 事件监听，阻止死亡掉落。"
     },
     {
       "name": "OnRemoveFromEntity",
-      "effect": "组件移除时调用，等同 DisableDropOnDeath 移除死亡掉落监听。"
+      "effect": "组件移除时调用，等效于 DisableDropOnDeath，停止死亡掉落监听。"
     },
     {
       "name": "NumItems",
-      "effect": "返回 itemslots 表中键值对数量，即非堆叠计数的物品格数。"
+      "effect": "返回 itemslots 中物品格数（不计算堆叠数量）。"
     },
     {
       "name": "NumStackedItems",
-      "effect": "遍历 itemslots 累加各物品堆叠大小，返回总堆叠数。"
+      "effect": "返回 itemslots 中所有物品按堆叠大小累计的总数量。"
     },
     {
       "name": "TransferInventory",
-      "effect": "将自身物品栏与装备槽中 persists 为真的物品转移给接收者库存，主动物品也给予；受限制装备入包。"
+      "effect": "将自身持久化物品、装备与活动物品转移给接收者库存，忽略不持久化物品。"
     },
     {
       "name": "SwapEquipment",
-      "effect": "与另一实体库存交换指定或所有装备槽物品，处理限制与入包。"
+      "effect": "与另一实体库存交换指定或所有装备槽物品，处理装备限制与入包逻辑。"
     },
     {
       "name": "OnSave",
-      "effect": "返回物品、装备、主动物品的存档记录与引用表供序列化。"
+      "effect": "返回物品栏、装备、活动物品的存档记录与引用表供序列化。"
     },
     {
       "name": "CanTakeItemInSlot",
-      "effect": "判断物品能否放入指定格子，检查容器许可、游戏模式、锁定格等。"
+      "effect": "判断物品能否放入指定背包槽，考虑容器限制、槽位锁定与边界。"
     },
     {
       "name": "AcceptsStacks",
-      "effect": "返回 acceptsstacks 布尔值，表示是否接受堆叠。"
+      "effect": "返回该库存是否接受物品堆叠。"
     },
     {
       "name": "IgnoresCanGoInContainer",
-      "effect": "返回 ignorescangoincontainer 布尔值，表示是否忽略物品入容器限制。"
+      "effect": "返回是否忽略物品 cangoincontainer 属性限制。"
     },
     {
       "name": "IsThiefProof",
-      "effect": "返回 thiefproof 字段（可能 nil），表示是否防偷。"
+      "effect": "返回 thiefproof 字段值（可能未初始化为 nil）。"
     },
     {
       "name": "OnLoad",
-      "effect": "从存档数据生成物品并放入对应格子、装备或主动物品，处理迁移宠物。"
+      "effect": "从存档数据生成物品并放入对应槽位或装备，处理迁移宠物标记。"
     },
     {
       "name": "DropActiveItem",
-      "effect": "丢弃当前主动物品并置空主动物品，返回丢弃物。"
+      "effect": "丢弃当前活动物品并置空，返回被丢弃实体。"
     },
     {
       "name": "ReturnActiveActionItem",
-      "effect": "将主动物品放回库存，临时忽略满格与溢出限制，用于动作返还。"
+      "effect": "将活动物品放回库存（强制忽略满溢），用于动作执行后返还。"
     },
     {
       "name": "HasAnyEquipment",
-      "effect": "检查 equipslots 是否非空，返回布尔。"
+      "effect": "返回 equipslots 是否非空。"
     },
     {
       "name": "IsWearingArmor",
-      "effect": "遍历装备槽检查是否存在 armor 组件，返回布尔。"
+      "effect": "返回是否有装备带有 armor 组件。"
     },
     {
       "name": "ArmorHasTag",
-      "effect": "遍历装备槽检查护甲物品是否带指定标签，返回布尔。"
+      "effect": "返回装备中是否有带指定标签的护甲。"
     },
     {
       "name": "EquipHasTag",
-      "effect": "遍历装备槽检查物品是否带指定标签，返回布尔。"
+      "effect": "返回装备中是否有带指定标签的物品。"
     },
     {
       "name": "EquipHasSpDefenseForType",
-      "effect": "遍历装备槽检查对指定精神伤害类型是否有防御，返回布尔。"
+      "effect": "返回是否有装备对指定特殊伤害类型有防御值。"
     },
     {
       "name": "IsHeavyLifting",
-      "effect": "返回 heavylifting 状态，表示是否举重。"
+      "effect": "返回是否因身体装备重型物品而举重。"
     },
     {
       "name": "IsFloaterHeld",
-      "effect": "返回 floaterheld 状态或 false，表示是否持浮空物。"
+      "effect": "返回是否手持带 playerfloater 组件的物品。"
     },
     {
       "name": "ApplyDamage",
-      "effect": "计算装备抗性/护甲吸收伤害，扣除护甲耐久，返回剩余物理与精神伤害。"
+      "effect": "计算装备抗性、护甲吸收伤害与特殊伤害防御，扣除护甲耐久，返回剩余普通与特殊伤害。"
     },
     {
       "name": "GetActiveItem",
-      "effect": "返回当前 activeitem 引用。"
+      "effect": "返回当前手持活动物品引用。"
     },
     {
       "name": "IsItemEquipped",
-      "effect": "遍历装备槽匹配物品，返回所在槽名或 nil。"
+      "effect": "若物品已装备则返回其装备槽名，否则 nil。"
     },
     {
       "name": "SelectActiveItemFromEquipSlot",
-      "effect": "卸下装备槽物品设为主动物品，原主动物品尝试放回格子。"
+      "effect": "卸下指定装备槽物品并设为活动物品，旧活动物品尝试入包。"
     },
     {
       "name": "CombineActiveStackWithSlot",
-      "effect": "将主动堆叠物品与指定格或装备槽物品合并，处理堆叠增减。"
+      "effect": "将活动堆叠物品与指定槽位物品合并堆叠（可单件或整堆）。"
     },
     {
       "name": "SelectActiveItemFromSlot",
-      "effect": "从格子取出物品为主动物品，原主动物品放回该格，触发事件。"
+      "effect": "从背包槽取出物品为活动物品，原活动物品放入该槽。"
     },
     {
       "name": "ReturnActiveItem",
-      "effect": "将主动物品放回指定格或丢弃，可处理半堆返回。"
+      "effect": "将活动物品放回背包指定槽或背包，可只放回部分堆叠。"
     },
     {
       "name": "GetNumSlots",
-      "effect": "返回 maxslots 最大格子数。"
+      "effect": "返回背包最大槽位数 maxslots。"
     },
     {
       "name": "GetItemSlot",
-      "effect": "遍历 itemslots 返回物品所在格子号。"
+      "effect": "返回指定物品所在的背包槽序号。"
     },
     {
       "name": "IsHolding",
-      "effect": "检查主动、装备或格子中是否包含该物品（可递归容器）。"
+      "effect": "判断实体是否持有该物品（含活动、装备、背包及其内部容器）。"
     },
     {
       "name": "FindItem",
-      "effect": "在格子、主动物品及溢出容器中查找首个满足条件的物品并返回。"
+      "effect": "在背包、活动物品及溢出容器中查找首个满足条件的物品。"
     },
     {
       "name": "FindItems",
-      "effect": "返回格子、装备、主动及溢出容器中所有满足条件的物品数组。"
+      "effect": "返回背包、装备、活动物品及溢出容器中满足条件的所有物品。"
     },
     {
       "name": "ForEachItem",
-      "effect": "对格子、装备、主动及溢出容器每个物品执行回调。"
+      "effect": "遍历背包、装备、活动物品及溢出容器每个物品执行函数。"
     },
     {
       "name": "ForEachWetableItem",
-      "effect": "对格子、装备、主动物品（可淋湿）执行回调。"
+      "effect": "遍历背包、装备、活动物品（可淋湿）执行函数。"
     },
     {
       "name": "ForEachEquipment",
-      "effect": "对每个装备槽物品执行回调。"
+      "effect": "遍历所有装备槽物品执行函数。"
     },
     {
       "name": "ForEachItemSlot",
-      "effect": "对每个格子物品执行回调。"
+      "effect": "遍历背包每个槽位物品执行函数。"
     },
     {
       "name": "RemoveItemBySlot",
-      "effect": "移除指定格子物品并返回，触发移除事件。"
+      "effect": "按背包槽序号移除物品并返回该物品。"
     },
     {
       "name": "DropItem",
-      "effect": "从所有者移除物品生成掉落，设置位置并触发 dropitem 事件，返回掉落物。"
+      "effect": "从所有者移除物品生成到世界或指定坐标，触发 dropitem 事件。"
     },
     {
       "name": "ForceNoInsulated",
-      "effect": "设置 force_no_insulation 以强制取消电力绝缘。"
+      "effect": "设置 force_no_insulation 以强制否定电力绝缘。"
     },
     {
       "name": "IsInsulated",
-      "effect": "检查装备或外部修饰是否提供电力绝缘，返回布尔。"
+      "effect": "返回是否对电力绝缘（检查装备与外部修饰）。"
     },
     {
       "name": "GetEquippedItem",
@@ -183,103 +183,103 @@
     },
     {
       "name": "GetItemInSlot",
-      "effect": "返回指定格子当前物品。"
+      "effect": "返回指定背包槽物品。"
     },
     {
       "name": "GetFirstItemInAnySlot",
-      "effect": "返回首个非空格子物品或 nil。"
+      "effect": "返回第一个非空背包槽物品。"
     },
     {
       "name": "IsFull",
-      "effect": "检查所有格子是否被占满，返回布尔。"
+      "effect": "返回背包所有槽是否均被占用。"
     },
     {
       "name": "GetNextAvailableSlot",
-      "effect": "计算物品可放入的下一个可用格子及容器（自身/溢出/特殊），返回槽与容器。"
+      "effect": "计算物品可放入的下一个可用槽位及容器（含溢出与专用）。"
     },
     {
       "name": "CanAcceptCount",
-      "effect": "计算库存及溢出容器能接受该物品的最大数量。"
+      "effect": "计算库存能接受该物品堆叠的最大数量。"
     },
     {
       "name": "GiveActiveItem",
-      "effect": "将物品设为主动物品，若已有则先放回，触发 itemget 等事件。"
+      "effect": "将物品设为活动物品，触发拾取与 newactiveitem 事件。"
     },
     {
       "name": "GiveItem",
-      "effect": "将物品放入库存，处理堆叠、溢出、特殊容器、满格丢弃，触发 gotnewitem 等事件。"
+      "effect": "将物品放入背包/装备/溢出/专用容器，处理堆叠、满溢、事件推送与丢弃。"
     },
     {
       "name": "Unequip",
-      "effect": "卸下装备槽物品，触发 unequip 事件，更新举重/浮空状态。"
+      "effect": "卸下指定装备槽物品，更新举重/浮漂状态并推送 unequip 事件。"
     },
     {
       "name": "SetActiveItem",
-      "effect": "设置主动物品并触发 newactiveitem 事件，不可入容器则丢弃。"
+      "effect": "设置活动物品并推送 newactiveitem，若不可入容器则丢弃。"
     },
     {
       "name": "Equip",
-      "effect": "将物品装备到对应槽，处理旧装备、举重逻辑，触发 equip 事件与套装更新。"
+      "effect": "将物品装备到对应槽，处理旧装备、举重、溢出容器与事件。"
     },
     {
       "name": "RemoveItem",
-      "effect": "从格子/主动/装备/溢出/打开容器移除物品，返回被移除物品。"
+      "effect": "从背包/活动/装备/溢出/打开容器移除物品，可整堆或单件。"
     },
     {
       "name": "GetOverflowContainer",
-      "effect": "返回身体装备的容器组件（若可打开）作为溢出容器，否则 nil。"
+      "effect": "返回身体槽且可打开的容器组件作为溢出背包。"
     },
     {
       "name": "GetSpecializedContainers",
-      "effect": "返回物品栏中标记为特殊口袋容器的列表。"
+      "effect": "返回背包中标记为专用优先的容器组件列表。"
     },
     {
       "name": "IsSpecializedContainer",
-      "effect": "检查给定容器是否为物品栏中特殊容器且有效。"
+      "effect": "判断给定容器是否为当前背包中的有效专用容器。"
     },
     {
       "name": "Has",
-      "effect": "统计指定 prefab 物品数量（可查所有容器），返回是否足够与总数。"
+      "effect": "统计持有指定 prefab 数量（可选所有容器），返回是否足够与总数。"
     },
     {
       "name": "HasItemThatMatches",
-      "effect": "按函数匹配物品统计数量，返回是否足够与总数。"
+      "effect": "按函数匹配统计物品数量，返回是否足够与总数。"
     },
     {
       "name": "HasItemWithTag",
-      "effect": "统计带标签物品数量，返回是否足够与总数。"
+      "effect": "按标签统计物品数量，返回是否足够与总数。"
     },
     {
       "name": "GetItemsWithTag",
-      "effect": "返回所有带标签物品列表（含溢出）。"
+      "effect": "返回带指定标签的所有物品列表。"
     },
     {
       "name": "GetItemByName",
-      "effect": "返回指定 prefab 物品及所需数量的表（可查容器）。"
+      "effect": "按 prefab 名获取物品及数量映射表。"
     },
     {
       "name": "GetCraftingIngredient",
-      "effect": "返回制作所需材料物品及数量的表，优先打开容器。"
+      "effect": "返回制作所需物品及数量映射（优先打开容器、小堆优先）。"
     },
     {
       "name": "ConsumeByName",
-      "effect": "按名称消耗指定数量物品，减少堆叠或移除。"
+      "effect": "按 prefab 名消耗指定数量物品（含堆叠拆分）。"
     },
     {
       "name": "DropEverythingWithTag",
-      "effect": "丢弃所有带标签物品及容器内对应物品。"
+      "effect": "丢弃所有带指定标签的物品及容器内对应物品。"
     },
     {
       "name": "DropEverythingByFilter",
-      "effect": "按过滤函数丢弃物品及容器内匹配物。"
+      "effect": "按过滤函数丢弃物品及容器内匹配物品。"
     },
     {
       "name": "DropEverything",
-      "effect": "丢弃全部物品（可选死亡/保留装备），触发掉落。"
+      "effect": "死亡或强制时丢弃几乎所有物品（可选保留装备）。"
     },
     {
       "name": "DropEquipped",
-      "effect": "丢弃装备（可选保留背包或防卸装备）。"
+      "effect": "丢弃装备（可选保留背包或防卸物品）。"
     },
     {
       "name": "DestroyContents",
@@ -287,35 +287,35 @@
     },
     {
       "name": "BurnNonpotatableInContainer",
-      "effect": "将容器中不可煮物品替换为灰烬。"
+      "effect": "将给定容器中不可煮物品替换为灰烬。"
     },
     {
       "name": "ReferenceAllItems",
-      "effect": "返回物品栏、装备及溢出容器所有物品引用列表。"
+      "effect": "返回背包、装备及溢出容器中所有物品实例列表。"
     },
     {
       "name": "GetDebugString",
-      "effect": "返回调试用物品栏描述字符串。"
+      "effect": "返回调试用字符串描述物品栏内容。"
     },
     {
       "name": "IsOpenedBy",
-      "effect": "检查库存是否被指定实体打开且可见。"
+      "effect": "判断库存是否被指定实体打开且可见。"
     },
     {
       "name": "Show",
-      "effect": "显示库存界面（若已打开），设置可见标记。"
+      "effect": "显示库存界面（若已打开），推送 replica 显示与 HUD。"
     },
     {
       "name": "Open",
-      "effect": "打开库存界面，打开溢出容器，设置打开与可见标记。"
+      "effect": "打开库存界面，打开溢出容器并显示 HUD 控件。"
     },
     {
       "name": "Hide",
-      "effect": "隐藏库存界面，收回主动物品，关闭非持久容器。"
+      "effect": "隐藏库存界面，返回活动物品并关闭非保持打开容器。"
     },
     {
       "name": "Close",
-      "effect": "关闭库存界面，收回主动物品，关闭溢出与打开容器。"
+      "effect": "关闭库存，返回活动物品，关闭溢出与所有打开容器。"
     },
     {
       "name": "CloseAllChestContainers",
@@ -323,127 +323,127 @@
     },
     {
       "name": "PutOneOfActiveItemInSlot",
-      "effect": "将主动物品取一个放入指定空格子。"
+      "effect": "将活动物品中的一个放入指定空槽。"
     },
     {
       "name": "PutAllOfActiveItemInSlot",
-      "effect": "将主动物品全部放入指定空格子。"
+      "effect": "将活动物品全部放入指定空槽。"
     },
     {
       "name": "TakeActiveItemFromHalfOfSlot",
-      "effect": "从格子取一半堆叠作为主动物品。"
+      "effect": "从背包槽取一半堆叠作为活动物品。"
     },
     {
       "name": "TakeActiveItemFromCountOfSlot",
-      "effect": "从格子取指定数量作为主动物品。"
+      "effect": "从背包槽取指定数量堆叠作为活动物品。"
     },
     {
       "name": "TakeActiveItemFromAllOfSlot",
-      "effect": "从格子取全部物品作为主动物品。"
+      "effect": "从背包槽取全部物品作为活动物品。"
     },
     {
       "name": "AddOneOfActiveItemToSlot",
-      "effect": "将主动物品一个叠加到格子物品。"
+      "effect": "将活动物品中的一个叠加到指定槽物品。"
     },
     {
       "name": "AddAllOfActiveItemToSlot",
-      "effect": "将主动物品全部叠加到格子物品。"
+      "effect": "将活动物品全部叠加到指定槽物品。"
     },
     {
       "name": "SwapActiveItemWithSlot",
-      "effect": "主动物品与格子物品交换位置。"
+      "effect": "交换活动物品与指定背包槽物品。"
     },
     {
       "name": "CanAccessItem",
-      "effect": "检查物品是否可被当前界面访问（在库存或打开容器）。"
+      "effect": "判断物品是否可被当前库存界面访问（持有或容器打开）。"
     },
     {
       "name": "UseItemFromInvTile",
-      "effect": "从物品栏格子使用物品，推送对应动作给 locomotor。"
+      "effect": "根据动作码使用背包或活动物品触发玩家动作。"
     },
     {
       "name": "ControllerUseItemOnItemFromInvTile",
-      "effect": "手柄用主动物品对格子物品使用，推送动作。"
+      "effect": "手柄用活动物品对背包物品执行使用动作。"
     },
     {
       "name": "ControllerUseItemOnSelfFromInvTile",
-      "effect": "手柄对自身使用格子物品，推送装备/卸下动作。"
+      "effect": "手柄用物品对自身执行装备/卸下/使用动作。"
     },
     {
       "name": "ControllerUseItemOnSceneFromInvTile",
-      "effect": "手柄对场景目标使用格子物品，推送使用动作。"
+      "effect": "手柄用物品对场景目标执行使用动作。"
     },
     {
       "name": "InspectItemFromInvTile",
-      "effect": "检查格子物品，推送 LOOKAT 动作。"
+      "effect": "检视背包物品触发 LOOKAT 动作。"
     },
     {
       "name": "DropItemFromInvTile",
-      "effect": "从格子丢弃物品（可单堆），推送 DROP 动作。"
+      "effect": "从背包格丢弃物品（可单件）并推送动作。"
     },
     {
       "name": "CastSpellBookFromInv",
-      "effect": "从物品施放法术书，推送 CAST_SPELLBOOK 动作。"
+      "effect": "从物品或自身施放法术书技能。"
     },
     {
       "name": "EquipActiveItem",
-      "effect": "将当前主动物品装备到对应空槽。"
+      "effect": "将当前活动物品装备到对应空槽。"
     },
     {
       "name": "EquipActionItem",
-      "effect": "装备手部动作物品，处理堆叠拆分。"
+      "effect": "装备动作物品（手部），处理堆叠拆分。"
     },
     {
       "name": "SwapEquipWithActiveItem",
-      "effect": "用主动物品交换对应装备槽物品。"
+      "effect": "用活动物品交换对应装备槽物品。"
     },
     {
       "name": "TakeActiveItemFromEquipSlot",
-      "effect": "从装备槽取物品到主动手（无格则丢弃）。"
+      "effect": "从装备槽取物品为活动物品（无背包则丢弃）。"
     },
     {
       "name": "TakeActiveItemFromEquipSlotID",
-      "effect": "按 ID 从装备槽取物品到主动手。"
+      "effect": "按装备槽 ID 从装备槽取物品为活动物品。"
     },
     {
       "name": "MoveItemFromAllOfSlot",
-      "effect": "将格子全部物品移到指定容器，处理建造目标槽。"
+      "effect": "将背包槽全部物品移到指定容器。"
     },
     {
       "name": "MoveItemFromHalfOfSlot",
-      "effect": "将格子一半物品移到指定容器。"
+      "effect": "将背包槽一半物品移到指定容器。"
     },
     {
       "name": "MoveItemFromCountOfSlot",
-      "effect": "将格子指定数量物品移到指定容器。"
+      "effect": "将背包槽指定数量物品移到指定容器。"
     },
     {
       "name": "GetEquippedMoistureRate",
-      "effect": "返回装备（或指定槽）的湿度速率与最大值。"
+      "effect": "返回指定或全体装备提供的湿度与最大湿度。"
     },
     {
       "name": "GetWaterproofness",
-      "effect": "返回装备（或指定槽）的防水性总和。"
+      "effect": "返回装备提供的防水效能总和。"
     },
     {
       "name": "IsWaterproof",
-      "effect": "检查防水性是否大于等于1。"
+      "effect": "返回是否完全防水（防水效能>=1）。"
     },
     {
       "name": "TransferComponent",
-      "effect": "清空胡子并调用 TransferInventory 转移库存到新实体。"
+      "effect": "转移库存内容到新实体（先清空胡子）。"
     },
     {
       "name": "GetOpenContainerProxyFor",
-      "effect": "返回与给定主容器对应的打开代理容器。"
+      "effect": "返回对应主容器的打开代理容器实体。"
     }
   ],
   "events_published": [
     "itemlose",
-    "dropitem",
     "itemget",
     "gotnewitem",
     "newactiveitem",
+    "dropitem",
     "unequip",
     "setoverflow",
     "equip",
@@ -457,40 +457,31 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      20714,
       14697,
-      18721,
-      19129,
-      27530,
-      72238,
-      14699,
-      19776,
-      15722
+      20700,
+      22459,
+      28457,
+      71461,
+      14812,
+      15225
     ],
     "aspects": [
       {
-        "aspect": "检查物品栏含特定条件食物描述",
+        "aspect": "物品拾取与堆叠行为描述",
         "evidence": [
           {
-            "pageid": 72238,
-            "quote": "若物品栏中有生命值属性不小于 8 且食用后溢出生命值不超过生命值上限 10% 的食物"
+            "pageid": 15225,
+            "quote": "优先将物品堆叠至上限"
           }
         ]
       },
       {
-        "aspect": "溺水掉落物品机制类比玩家描述",
+        "aspect": "物品栏与装备栏内物品影响描述",
         "evidence": [
           {
-            "pageid": 72238,
-            "quote": "溺水动作与掉落物品机制与玩家一样"
-          }
-        ]
-      },
-      {
-        "aspect": "物品传输至生物物品栏描述",
-        "evidence": [
-          {
-            "pageid": 15722,
-            "quote": "眼球草会吞噬物品并传输到食人花的物品栏。"
+            "pageid": 22459,
+            "quote": "穿戴者物品栏和装备栏中物品的腐烂速度加快 50%"
           }
         ]
       },
@@ -502,73 +493,42 @@
             "quote": "背包提供 8 个[[物品栏]]"
           },
           {
-            "pageid": 18721,
-            "quote": "坎普斯背包提供 14 个[[物品栏]]"
+            "pageid": 71461,
+            "quote": "底盘本身是一个有 15 个物品栏的[[容器]]"
           },
           {
-            "pageid": 27530,
-            "quote": "基本物品栏具有 15 个栏位"
-          },
-          {
-            "pageid": 15722,
-            "quote": "食人花具有 15 个[[物品栏]]"
-          },
-          {
-            "pageid": 14699,
-            "quote": "保鲜背包提供 8 个[[物品栏]]"
+            "pageid": 15225,
+            "quote": "暗影仆从拥有 1 格[[物品栏]]"
           }
         ]
       },
       {
-        "aspect": "物品栏满载导致新物品销毁描述",
+        "aspect": "物品栏空位状态描述",
         "evidence": [
           {
-            "pageid": 15722,
-            "quote": "若食人花的物品栏已满，任何新传输到达的物品都会立即销毁。"
+            "pageid": 15225,
+            "quote": "如果召唤者物品栏有空位"
           }
         ]
       },
       {
-        "aspect": "物品栏防水倍率影响新鲜度描述",
+        "aspect": "穿戴装备行为描述",
         "evidence": [
           {
-            "pageid": 19129,
-            "quote": "玩家的物品栏/背包栏，每秒失去 [腐蚀速率×（100%-防水倍率）]*100% 的新鲜度"
-          }
-        ]
-      },
-      {
-        "aspect": "生物从自身物品栏装备武器描述",
-        "evidence": [
-          {
-            "pageid": 72238,
-            "quote": "附身底盘会尝试装备物品栏中的武器"
-          }
-        ]
-      },
-      {
-        "aspect": "背包内物品腐烂减速描述",
-        "evidence": [
-          {
-            "pageid": 14699,
-            "quote": "能使放置在里面的物品减缓 50% 的[[腐烂]]速度"
-          }
-        ]
-      },
-      {
-        "aspect": "装备背包合并至玩家物品栏描述",
-        "evidence": [
-          {
-            "pageid": 14697,
-            "quote": "装备时，背包的物品栏会显示在屏幕右侧，成为玩家物品栏的一部分"
+            "pageid": 20714,
+            "quote": "给玩家穿戴指定服装"
           },
           {
-            "pageid": 18721,
-            "quote": "装备时，坎普斯背包的物品栏会显示在屏幕右侧，成为玩家物品栏的一部分"
+            "pageid": 71461,
+            "quote": "穿戴着原本的头部装备、手部装备和身体装备"
           },
           {
-            "pageid": 14699,
-            "quote": "装备时，保鲜背包的物品栏会显示在屏幕右侧，成为玩家物品栏的一部分"
+            "pageid": 14812,
+            "quote": "鳞甲装备后可以使玩家免疫任何形式的火焰伤害"
+          },
+          {
+            "pageid": 20700,
+            "quote": "防水装备在穿戴时能为玩家提供防水效果"
           }
         ]
       }
@@ -576,26 +536,27 @@
     "coverage_status": "well_documented"
   },
   "search_terms": [
-    "物品栏",
-    "背包",
+    "掉落全部",
+    "防水性能",
+    "物品堆叠",
+    "背包槽位",
     "装备槽",
-    "掉落物",
-    "堆叠",
-    "护甲",
-    "绝缘",
-    "容器",
-    "主动物品"
+    "活动物品",
+    "伤害减免",
+    "溢出容器",
+    "穿戴"
   ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 4/9)",
   "gameplay_tags": [
     "生存",
     "战斗",
-    "建造"
+    "物品管理"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
     "source_bytes": 91041,
     "model": "hy3-free",
-    "generated_at_ms": 1787931945745
+    "generated_at_ms": 1788060759232
   }
 }

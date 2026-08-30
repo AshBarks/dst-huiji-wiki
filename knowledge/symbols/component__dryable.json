@@ -7,43 +7,43 @@
   },
   "category": "component",
   "display_name": "dryable",
-  "summary": "该组件用于标记实体具有可干燥特性，并管理干燥后产物、干燥所需时间及对应的动画构建文件等数据。它参与游戏的晾晒与食物干燥保存玩法，使实体能够被干燥处理并转化为指定产品。",
+  "summary": "该组件管理实体可干燥相关的数据，包括干燥产物、干燥时间、构建文件及干后构建文件。它在游戏中用于标记实体可被干燥处理（如通过晒肉架风干食物），并供其他系统查询干燥参数以执行干燥逻辑。",
   "api": [
     {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，移除实体上的 'dryable' 标签，无其他副作用。"
+    },
+    {
       "name": "SetProduct",
-      "effect": "设置干燥后产物的 prefab 名称（self.product），无返回值。"
+      "effect": "设置组件内部 product 字段为传入值，无额外副作用。"
     },
     {
       "name": "GetProduct",
-      "effect": "返回当前设置的干燥后产物（self.product）。"
+      "effect": "返回组件内部 product 字段的当前值。"
     },
     {
       "name": "SetDryTime",
-      "effect": "设置干燥所需时间（self.drytime），无返回值。"
+      "effect": "设置组件内部 drytime 字段为传入的时间值，无额外副作用。"
     },
     {
       "name": "GetDryTime",
-      "effect": "返回当前设置的干燥所需时间（self.drytime）。"
+      "effect": "返回组件内部 drytime 字段的当前值。"
     },
     {
       "name": "SetBuildFile",
-      "effect": "设置干燥相关动画构建文件名称（self.buildfile），无返回值。"
+      "effect": "设置组件内部 buildfile 字段为传入的构建文件名，无额外副作用。"
     },
     {
       "name": "GetBuildFile",
-      "effect": "返回当前设置的动画构建文件（self.buildfile）。"
+      "effect": "返回组件内部 buildfile 字段的当前值。"
     },
     {
       "name": "SetDriedBuildFile",
-      "effect": "设置干燥完成后专用的动画构建文件（self.dried_buildfile），无返回值。"
+      "effect": "设置组件内部 dried_buildfile 字段为传入的干后构建文件名，无额外副作用。"
     },
     {
       "name": "GetDriedBuildFile",
-      "effect": "返回干燥完成后的动画构建文件；若未单独设置则返回普通构建文件（self.buildfile 或 nil）。"
-    },
-    {
-      "name": "OnRemoveFromEntity",
-      "effect": "组件从实体移除时调用，移除实体的 \"dryable\" 标签。"
+      "effect": "返回组件内部 dried_buildfile 字段的值；若其为 nil，则返回 buildfile 字段的值。"
     }
   ],
   "events_published": [],
@@ -52,29 +52,61 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
+      14714,
+      46866,
+      13493,
+      70347,
+      13476,
       14484,
-      17948,
-      18077,
-      18179,
-      20538,
-      18031,
-      16643,
-      16638
+      51205,
+      18031
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录主要描述实体的烹饪属性、掉落、生长时间或兑换用途，未出现任何关于干燥时间、干燥产品、建造文件、干燥后建造文件或移除实体时行为的数值或描述，尽管部分实体名含'dried'或'干'但文本无对应组件能力表达。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "干燥后外观差异描述",
+        "evidence": [
+          {
+            "pageid": 70347,
+            "quote": "晾晒完成的[[海带叶]]会呈现出与在晾肉架内晾晒完成后的不同外观"
+          }
+        ]
+      },
+      {
+        "aspect": "晾晒产物转化描述",
+        "evidence": [
+          {
+            "pageid": 14714,
+            "quote": "转变为对应的晾晒产物"
+          },
+          {
+            "pageid": 18031,
+            "quote": "在[[晾肉架]]上晾干蛙腿，就会变成[[小肉干]]"
+          }
+        ]
+      },
+      {
+        "aspect": "晾晒计时重置描述",
+        "evidence": [
+          {
+            "pageid": 14714,
+            "quote": "将快晾晒好的物品从晾肉架上取出再放回去会重新计时"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
   },
   "search_terms": [
-    "可干燥",
-    "晒干",
-    "晾制",
-    "干燥时间",
-    "干燥产物",
-    "干制文件",
-    "晾晒标签",
-    "干燥动画"
+    "风干",
+    "晾肉架",
+    "干货",
+    "晒肉架",
+    "风干时间",
+    "风干产物",
+    "风干食物",
+    "可风干"
   ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 5/8)",
   "gameplay_tags": [
     "生存"
   ],
@@ -83,6 +115,6 @@
     "source_sha256": "91f6430ae20b9466cf0c3a688f5be2923bef4d18c31423922ca650ed40ef24a2",
     "source_bytes": 911,
     "model": "hy3-free",
-    "generated_at_ms": 1787932972824
+    "generated_at_ms": 1788062633767
   }
 }

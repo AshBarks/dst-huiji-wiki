@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/slurperbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "slurperbrain",
+  "summary": "该大脑控制 Slurper 实体在游戏中优先响应恐慌和电栅栏恐慌而逃跑。否则会追击并攻击附近目标，最长追逐60秒、放弃距离100世界单位。无战斗时，它以已知家园位置为中心在20单位内游荡。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 的 OnStart 方法以构建行为树，未定义其他对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "behaviour_invocations": [
+    {
+      "ctor": "BrainCommon.PanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ]
+    },
+    {
+      "ctor": "BrainCommon.ElectricFencePanicTrigger",
+      "args_semantic": [
+        "自身实体"
+      ]
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 60 秒",
+        "放弃距离 100 世界单位"
+      ]
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回已知位置'home'的函数作为家的位置",
+        "离家最大距离 20"
+      ]
+    }
+  ],
+  "bt_structure": "优先级节点树：1) 恐慌触发；2) 电栅栏恐慌触发；3) 追击攻击(最长60秒,放弃距离100)；4) 以家位置为中心游荡(最大距离20)。",
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      13493,
+      15651,
+      20678,
+      24762,
+      10419,
+      13199,
+      13437
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所给页面实体为 pigman、hermitcrab、dragonfly、messagebottleempty、crabking_mob、walter 及无关简介页，全文未出现 slurper 或 brain__slurperbrain 符号，且行为数值（猪屋30单位、龙蝇仇恨15单位、雇佣2.5天等）与清单的追击60秒/弃距100/离家20/电栅栏恐慌不符，页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "吞噬者",
+    "追击攻击",
+    "四处游荡",
+    "恐慌触发",
+    "电栅栏",
+    "回家",
+    "行为树",
+    "大脑"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8f0bcc6e0e460283e9ee36a8d8e66642cbb8f46db111d767f8de3542b5b9349b",
+    "source_bytes": 653,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061276262
+  }
+}

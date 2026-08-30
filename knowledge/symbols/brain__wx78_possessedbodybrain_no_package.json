@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/wx78_possessedbodybrain_no_package.lua"
+  },
+  "category": "brain",
+  "display_name": "wx78_possessedbodybrain_no_package",
+  "summary": "该大脑用于控制 WX78 被附身的躯体实体。在任何情境下，它都会让实体无条件进入并无限期保持站立静止状态，不进行移动或任何其他行为。其行为树仅由单一的 StandStill 节点构成，更新速率为 0.5 秒。",
+  "api": [],
+  "api_note": "该大脑仅重写 Brain 基类的 OnStart 与 OnStop 生命周期方法以构建行为树，未定义任何额外的对外调用方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "UPDATE_RATE"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "实体自身(inst)，未传入启动与保持条件函数故无条件站立"
+      ],
+      "context": "无条件"
+    }
+  ],
+  "bt_structure": "根优先级节点(PriorityNode, 更新率0.5)仅包含单一子节点 StandStill，使实体永久静止。",
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      72238,
+      10418,
+      20162,
+      20719,
+      15225,
+      13139,
+      71461
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中实体 wx78_possessedbody (页72238) 与 wx78_backupbody (页71461) 描述了附身底盘跟随玩家、装备武器协同攻击、溺水机制等，未出现任何关于实体站立、静止或无条件站立的行为描述；其余页面涉及电路板、WX-78、附身座狼、暗影傀儡等，均不讨论该大脑符号的 StandStill 能力，故认为页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "傀儡",
+    "被附身的躯体",
+    "站立静止",
+    "静止状态",
+    "不移动",
+    "WX78",
+    "躯体实体",
+    "附身"
+  ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4c2daf5a4ec9988bf6d3bb77fe589aff573669dd3485f805126c53e2b5ade61e",
+    "source_bytes": 769,
+    "model": "hy3-free",
+    "generated_at_ms": 1788062124195
+  }
+}

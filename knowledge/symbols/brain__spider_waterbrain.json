@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/spider_waterbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "spider_waterbrain",
+  "summary": "该大脑控制水蜘蛛实体，在平时会追击攻击敌人，并在无领导者且未迷惑时攻击墙壁。根据防御状态，它会以不同距离跟随领导者或优先吃鱼、吃食物；有领导者时面对领导者，洞穴白天或地震时回家，平时在记住的家附近游荡并可能与交易者互动。",
+  "api": [],
+  "api_note": "该大脑仅重写了 Brain 基类的 OnStart 与 OnInitializationComplete 方法以构建行为树和初始化家位置，未定义额外的对外调用接口供外部模块使用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TRADE_DIST",
+    "TRADE_DIST_SQ",
+    "EATFOOD_CANT_TAGS",
+    "SEE_FOOD_DIST",
+    "SEE_FISH_DISTANCE",
+    "OCEANFISH_TAGS",
+    "MAX_CHASE_TIME",
+    "DEF_MIN_FOLLOW_DIST",
+    "DEF_TARGET_FOLLOW_DIST",
+    "DEF_MAX_FOLLOW_DIST",
+    "AGG_MIN_FOLLOW_DIST",
+    "AGG_TARGET_FOLLOW_DIST",
+    "AGG_MAX_FOLLOW_DIST",
+    "MAX_WANDER_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "AttackWall",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "当未迷惑(bedazzled)且无领导者时"
+    },
+    {
+      "ctor": "ChaseAndAttack",
+      "args_semantic": [
+        "自身实体",
+        "追击最长 SpringCombatMod(MAX_CHASE_TIME=8) 秒（受季节战斗修正）"
+      ],
+      "context": "根优先级中直接执行"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "返回领导者的函数",
+        "最小跟随距离2",
+        "目标跟随距离5",
+        "最大跟随距离8"
+      ],
+      "context": "当实体 defensive 为真时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取吃鱼动作的函数 EatFishAction",
+        "节点调试名'Try Eating A Fish'",
+        "未指定跑动(默认)",
+        "动作超时15秒"
+      ],
+      "context": "当非防御状态时优先节点内"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取吃食物动作的函数 EatFoodAction",
+        "节点调试名'Try Eating Food'",
+        "未指定跑动(默认)",
+        "动作超时15秒"
+      ],
+      "context": "当非防御状态时优先节点内，吃鱼之后"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "返回领导者的函数",
+        "最小跟随距离2",
+        "目标跟随距离6",
+        "最大跟随距离10"
+      ],
+      "context": "当非防御状态时，吃鱼吃食物之后"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "获取面对目标(领导者)函数",
+        "保持面对目标函数"
+      ],
+      "context": "当存在领导者时"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取调查动作的函数 InvestigateAction"
+      ],
+      "context": "根优先级中直接执行"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "获取回家动作的函数 GoHomeAction"
+      ],
+      "context": "当洞穴白天或地震且非召唤且未在调查计时器时(WhileNode内)"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "寻找交易者函数 GetTraderFn",
+        "保持交易者函数 KeepTraderFn"
+      ],
+      "context": "根优先级中直接执行"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "返回家位置的函数(knownlocations中'home')",
+        "最大游荡距离32"
+      ],
+      "context": "根优先级中最后执行"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not self.inst.bedazzled and GetLeader(self.inst) == nil",
+      "semantic": "执行 AttackWall 攻击墙壁"
+    },
+    {
+      "condition": "self.inst.defensive",
+      "semantic": "以较近距离(2/5/8)跟随领导者"
+    },
+    {
+      "condition": "not self.inst.defensive",
+      "semantic": "优先尝试吃鱼、吃食物，然后以较远距离(2/6/10)跟随领导者"
+    },
+    {
+      "condition": "GetLeader(self.inst) ~= nil",
+      "semantic": "面对领导者"
+    },
+    {
+      "condition": "(TheWorld.state.iscaveday or self.inst._quaking) and not self.inst.summoned and not self.inst.components.timer:TimerExists('investigating')",
+      "semantic": "执行回家动作 GoHomeAction"
+    }
+  ],
+  "bt_structure": "优先级节点：恐慌触发(受惊/电击) -> 无领导者且未迷惑则攻击墙壁 -> 追击攻击(最长约8秒受季节修正) -> 若防御则近距跟随领导者 -> 若非防御则优先吃鱼、吃食物后远距跟随 -> 有领导者则面对之 -> 执行调查动作 -> 白天/地震且非召唤未调查则回家 -> 面对交易者 -> 在家附近游荡(最大32)。",
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      13493,
+      46887,
+      18521,
+      21432,
+      13457,
+      15022,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为玩具、寄居蟹隐士、流浪商人、猪王、大霜鲨、交易小店、天体英雄、猪人，均未提及 spider_waterbrain 或其能力清单中的交易距离、吃鱼动作、跟随距离、游荡距离32、追击8秒等行为描述或数值，页面根本不讨论该符号能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水蜘蛛",
+    "追击",
+    "吃鱼",
+    "跟随",
+    "攻击墙",
+    "回家",
+    "游荡",
+    "交易",
+    "领导者"
+  ],
+  "search_terms_note": "pass1 后零命中 9/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "游荡",
+    "跟随"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a8095a3c8ed431750f518897720878d358372c371ec49df2f7537d7d07d31d59",
+    "source_bytes": 6917,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061520944
+  }
+}

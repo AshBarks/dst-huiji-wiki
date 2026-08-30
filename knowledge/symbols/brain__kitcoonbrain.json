@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/kitcoonbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "kitcoonbrain",
+  "summary": "该大脑控制小猫熊（Kitcoon）的 AI 行为。当被领养（有主人）时，它会跟随主人、规避附近战斗、与同类玩耍、观看小游戏并在贴近时亲昵；无主时则追随玩具、徘徊巢穴、躲避天敌或自由游荡。若巢穴着火或存在恐慌计时，它会陷入恐慌逃跑。",
+  "api": [],
+  "api_note": "该大脑仅实现 OnStart 以构造行为树，未暴露任何自定义公开方法，逻辑全在本地函数与节点中。",
+  "events_published": [
+    "critter_avoidcombat",
+    "start_playwithplaymate",
+    "on_played_with"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TARGET_FOLLOW_DIST",
+    "MAX_FOLLOW_DIST",
+    "TOY_FOLLOW_DIST",
+    "MAX_TOY_FOLLOW_DIST",
+    "COMBAT_TOO_CLOSE_DIST",
+    "COMBAT_TOO_CLOSE_DIST_SQ",
+    "COMBAT_SAFE_TO_WATCH_FROM_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST_SQ",
+    "COMBAT_TIMEOUT",
+    "PLAYFUL_OFFSET",
+    "AVOID_SCARY_DIST",
+    "AVOID_SCARY_STOP",
+    "DEN_WANDER_DIST",
+    "DEN_LEASH_MAX_DIST",
+    "DEN_LEASH_RETURN_DIST",
+    "MAX_PLAYFUL_FIND_DIST",
+    "MAX_PLAYFUL_KEEP_DIST"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "返回观看的小游戏函数",
+        "最小距离函数",
+        "目标距离函数",
+        "最大距离函数"
+      ],
+      "context": "主人参与小游戏时跟随"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "标签 minigame_participator",
+        "远离5",
+        "停止7"
+      ],
+      "context": "看小游戏时远离参与者"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "返回小游戏函数",
+        "返回小游戏函数"
+      ],
+      "context": "看小游戏时面对"
+    },
+    {
+      "ctor": "StandStill",
+      "args_semantic": [
+        "自身实体",
+        "IsBeingNamed",
+        "IsBeingNamed"
+      ],
+      "context": "被命名时静止"
+    },
+    {
+      "ctor": "Panic",
+      "args_semantic": [
+        "自身实体"
+      ],
+      "context": "巢穴燃烧或恐慌计时存在时"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "含_combat,_health标签及检测函数的表",
+        "过近5",
+        "安全8"
+      ],
+      "context": "有主人时规避战斗"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "GetOwner",
+        "KeepFaceTargetFn"
+      ],
+      "context": "战斗规避验证时面对主人"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "GetOwner",
+        "最小0",
+        "目标2.5",
+        "最大4.5",
+        "允许奔跑"
+      ],
+      "context": "有主人时跟随"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "自身实体",
+        "GetOwner",
+        "KeepFaceTargetFn"
+      ],
+      "context": "未奔跑时面对主人"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "自身实体",
+        "GetFollowToy",
+        "最小0",
+        "目标0.5",
+        "最大1.0",
+        "允许奔跑"
+      ],
+      "context": "无主时跟随玩具"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "GetDenPos",
+        "最大14",
+        "返回5",
+        "奔跑"
+      ],
+      "context": "无主时拴巢穴"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实体",
+        "含scarytoprey标签表",
+        "远离6",
+        "停止10"
+      ],
+      "context": "无主时避恐"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "PlayAction",
+        "play",
+        "false",
+        "5"
+      ],
+      "context": "无主时玩耍"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "GetDenPos",
+        "最大10",
+        "{minwalk2,randwalk3,minwait2,randwait4}"
+      ],
+      "context": "无主巢穴游荡"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实体",
+        "nil",
+        "nil",
+        "{minwalk2,randwalk3,minwait5,randwait8}"
+      ],
+      "context": "无主自由游荡"
+    },
+    {
+      "ctor": "Leash",
+      "args_semantic": [
+        "自身实体",
+        "返回玩伴位置函数",
+        "偏移2",
+        "偏移2"
+      ],
+      "context": "找到玩伴时靠近"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "执行PlayWithPlaymate函数"
+      ],
+      "context": "找到玩伴时玩耍"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待4秒"
+      ],
+      "context": "主人靠近时等待"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实体",
+        "LoveOwner"
+      ],
+      "context": "主人靠近等待后亲昵"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "WatchingMinigame(inst)",
+      "semantic": "优先处理小游戏相关跟随、远离、面对"
+    },
+    {
+      "condition": "FindPlaymate(self)",
+      "semantic": "拴住玩伴并触发玩耍动作"
+    },
+    {
+      "condition": "ShouldPanic(inst)",
+      "semantic": "执行恐慌逃跑行为"
+    },
+    {
+      "condition": "GetOwner(inst)",
+      "semantic": "进入有主人逻辑：战斗规避、看游戏、玩伴、跟随、面对、亲昵"
+    },
+    {
+      "condition": "ValidateCombatAvoidance(self)",
+      "semantic": "持续面对主人直至脱离战斗"
+    },
+    {
+      "condition": "OwnerIsClose(inst)",
+      "semantic": "等待后执行亲昵主人动作"
+    },
+    {
+      "condition": "默认无主",
+      "semantic": "跟随玩具、拴巢穴、避恐、玩耍、玩伴、游荡"
+    }
+  ],
+  "bt_structure": "根优先级节点(0.25)：1)被命名静止；2)恐慌则逃；3)有主人优先级(战斗规避跑、看游戏、玩伴、跟随、面对、亲昵等待)；4)无主跟随玩具；5)拴巢穴；6)避恐；7)玩耍；8)玩伴；9)巢穴游荡；10)自由游荡。看游戏与玩伴由WhileNode动态插入。",
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      45173,
+      51046,
+      15238,
+      13897,
+      14099,
+      15022,
+      15246
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录实体为远古织影者、巨兽恐慌机制、战争瓦器人、小皮弗娄牛、克劳斯、暗影秘典、天体英雄、蜘蛛等，仅页面45173在巨兽恐慌效果中提及“小浣猫恐慌 5 秒”，但未描述 kitcoonbrain 自身的跟随、玩具互动、战斗规避、避恐、巢穴拴系、玩耍、游荡等行为或距离参数；其余页面均未提及 kitcoon（小浣猫）或其 brain 组件能力，故页面根本不讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小猫熊",
+    "跟随玩家",
+    "躲避战斗",
+    "亲近",
+    "观看小游戏",
+    "寻找同伴",
+    "玩耍",
+    "恐慌",
+    "游荡"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 5/9)",
+  "gameplay_tags": [
+    "宠物互动",
+    "战斗规避",
+    "游荡"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e0f24151d9cfdad6f1dfc9f91526099442cb0236498190cacfad783938636678",
+    "source_bytes": 12390,
+    "model": "hy3-free",
+    "generated_at_ms": 1788059470053
+  }
+}

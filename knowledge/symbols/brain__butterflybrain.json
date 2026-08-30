@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/butterflybrain.lua"
+  },
+  "category": "brain",
+  "display_name": "butterflybrain",
+  "summary": "蝴蝶大脑控制蝴蝶实体在游戏中的行为。当附近出现带有scarytoprey标签且未激活虫木抗虫技能的威胁时，蝴蝶会逃离。夜晚或采集花粉足够时，蝴蝶跑回最近花朵家中；平时寻找花朵并在花周围游荡。",
+  "api": [],
+  "api_note": "该大脑仅继承Brain基类并在OnStart中构建行为树，未定义额外的对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "RUN_AWAY_DIST",
+    "STOP_RUN_AWAY_DIST",
+    "POLLINATE_FLOWER_DIST",
+    "SEE_FLOWER_DIST",
+    "MAX_WANDER_DIST",
+    "FLOWER_TAGS"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "自身实例",
+        "逃跑参数表(标签为scarytoprey且非虫木技能激活者)",
+        "发现威胁距离5",
+        "脱离危险安全距离10"
+      ],
+      "context": "优先级节点中直接调用，无额外条件"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作的函数GoHomeAction",
+        "节点调试名'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "条件为夜晚(not TheWorld.state.isday)"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "自身实例",
+        "获取回家动作的函数GoHomeAction",
+        "节点调试名'go home'",
+        "以跑动方式执行(true)"
+      ],
+      "context": "条件为采集花粉足够(self.inst.components.pollinator:HasCollectedEnough())"
+    },
+    {
+      "ctor": "FindFlower",
+      "args_semantic": [
+        "自身实例"
+      ],
+      "context": "优先级节点中直接调用"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "自身实例",
+        "家位置函数NearestFlowerPos(返回最近花位置)",
+        "最大游荡距离20"
+      ],
+      "context": "优先级节点中直接调用"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "not TheWorld.state.isday",
+      "semantic": "执行DoAction调用GoHomeAction跑动回家"
+    },
+    {
+      "condition": "self.inst.components.pollinator:HasCollectedEnough()",
+      "semantic": "执行DoAction调用GoHomeAction跑动回家"
+    }
+  ],
+  "bt_structure": "优先级节点树：1. BrainCommon.PanicTrigger恐慌触发；2. BrainCommon.ElectricFencePanicTrigger电栅栏恐慌；3. RunAway逃离标签scarytoprey且非虫木技能者(距5逃10安)；4. IfNode夜晚则DoAction跑回家；5. IfNode花粉足够则DoAction跑回家；6. FindFlower找花；7. Wander在最近花位置周围游荡(最大20距)。",
+  "wiki": {
+    "scanned_pageids": [
+      13707,
+      53270,
+      13570,
+      15237,
+      51046,
+      13493,
+      13701,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面13707仅描述蝴蝶生成、掉落与捕捉，未提逃跑/找花/采粉/游荡/回家等brain行为；其他页面仅将蝴蝶作为材料或无关实体，均无butterflybrain能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蝴蝶",
+    "逃离",
+    "寻找花朵",
+    "采集花粉",
+    "威胁",
+    "游荡",
+    "回家",
+    "夜晚",
+    "恐慌"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "生存",
+    "采集",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ecece38d9bb86923259a0cd9e2409564b530dcdbd893ab0e613686cc72a6ae2c",
+    "source_bytes": 1955,
+    "model": "hy3-free",
+    "generated_at_ms": 1788058306702
+  }
+}

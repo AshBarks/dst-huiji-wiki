@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p5-brain",
+  "reference": {
+    "kind": "brain",
+    "path": "brains/smallghostbrain.lua"
+  },
+  "category": "brain",
+  "display_name": "smallghostbrain",
+  "summary": "小幽灵大脑控制小幽灵实体在跟随领导者时根据情境采取不同行为。当领导者附近有丢失玩具时，它会优先拾取、提示位置或紧密跟随搜索。当附近有战斗威胁时，它会逃离并保持安全距离观察；无领导者且无家时则会游荡并最终消散。",
+  "api": [],
+  "api_note": "该大脑仅覆盖 Brain 基类的 OnStart 方法以构建行为树，未定义其他对外可调用的公开方法或接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MIN_HINT_DSQ",
+    "MAX_HINT_DSQ",
+    "COMBAT_TOO_CLOSE_DIST",
+    "COMBAT_TOO_CLOSE_DIST_SQ",
+    "COMBAT_SAFE_TO_WATCH_FROM_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST",
+    "COMBAT_SAFE_TO_WATCH_FROM_MAX_DIST_SQ",
+    "COMBAT_TIMEOUT",
+    "COMBAT_YES_TAGS",
+    "COMBAT_NO_TAGS",
+    "GRAVESTONE_WANDER_TIMES"
+  ],
+  "behaviour_invocations": [
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "拾取附近丢失玩具的动作函数(pickup_lost_toy)",
+        "行为标签'Find Nearby Lost Toys'",
+        "是否强制重新评估(true)"
+      ],
+      "context": "最高优先级：尝试捡起领导者附近的丢失玩具"
+    },
+    {
+      "ctor": "RunAway",
+      "args_semantic": [
+        "实体自身(inst)",
+        "战斗回避数据(标签_combat/_health, 排除wall/INLIMBO, 判定函数)",
+        "过近触发距离(5)",
+        "安全观察距离(8)"
+      ],
+      "context": "战斗回避分支：当实体过近时逃离战斗"
+    },
+    {
+      "ctor": "FaceEntity",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取跟随目标函数(get_follow_target)",
+        "保持面向判定(KeepFacingTarget)"
+      ],
+      "context": "当处于战斗附近且验证回避时，面向领导者"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "测试结束提示状态的函数(test_for_finished_hinting)",
+        "节点名'Finish Hinting Test'"
+      ],
+      "context": "失败如果成功装饰：检查是否应结束提示"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "尝试触发玩具搜索语音的函数(try_toy_search_speech)",
+        "节点名'Start Searching Leader Speech'"
+      ],
+      "context": "玩具在搜索范围内时的子分支"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取跟随目标函数(get_follow_target)",
+        "最小距离0.5",
+        "目标距离1.5",
+        "最大距离3.0"
+      ],
+      "context": "玩具在搜索范围内时紧密跟随"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "游荡中心点取领导者位置函数(toy_nearby_wander_home)",
+        "最大游荡距离10.0",
+        "墓石游荡时间配置(GRAVESTONE_WANDER_TIMES)",
+        "游荡角度朝向玩具函数(toy_nearby_wander_angle)"
+      ],
+      "context": "玩具在搜索范围内时以领导者为中心游荡"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "清除语音标志函数(self.inst._has_done_speech=false)",
+        "节点名'Clear Speech Flag'"
+      ],
+      "context": "离开搜索范围后清除语音标记"
+    },
+    {
+      "ctor": "Follow",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取跟随目标函数(get_follow_target)",
+        "最小距离0.0",
+        "目标距离1.0",
+        "最大距离6.0",
+        "允许奔跑(true)"
+      ],
+      "context": "常规状态下跟随领导者"
+    },
+    {
+      "ctor": "DoAction",
+      "args_semantic": [
+        "实体自身(inst)",
+        "获取提示位置动作函数(get_hint_location)",
+        "行为标签'Give a Hint'"
+      ],
+      "context": "常规跟随后给予玩具位置提示"
+    },
+    {
+      "ctor": "WaitNode",
+      "args_semantic": [
+        "等待时间10秒"
+      ],
+      "context": "并行节点中等待"
+    },
+    {
+      "ctor": "Wander",
+      "args_semantic": [
+        "实体自身(inst)",
+        "家或领导者位置函数",
+        "最大游荡距离6.0",
+        "墓石游荡时间配置(GRAVESTONE_WANDER_TIMES)"
+      ],
+      "context": "无领导者时游荡或返回家的并行行为"
+    },
+    {
+      "ctor": "ActionNode",
+      "args_semantic": [
+        "若无家和领导者则切换消散状态的函数"
+      ],
+      "context": "序列节点末尾检查消散"
+    }
+  ],
+  "context_branches": [
+    {
+      "condition": "test_for_toy_in_search_range(inst) 为 true (领导者 MIN_HINT_DSQ 内有玩具)",
+      "semantic": "进入搜索模式：触发搜索语音，以0.5/1.5/3.0距离紧密跟随，并以领导者为中心、朝玩具方向游荡(半径10)。"
+    },
+    {
+      "condition": "validate_combat_avoidance(self) 为 true (附近有战斗目标且在安全观察距离内)",
+      "semantic": "停止逃跑并面向领导者静止观察，避免卷入战斗。"
+    },
+    {
+      "condition": "test_for_finished_hinting 检测到提示结束或超出范围",
+      "semantic": "清除提示状态，使后续行为不再视为提示中。"
+    },
+    {
+      "condition": "get_follow_target(inst) == nil 且 knownlocations 无 home",
+      "semantic": "在等待/游荡后执行消散(dissipate)状态，实体消失。"
+    }
+  ],
+  "bt_structure": "根优先级节点依次：拾取丢失玩具 -> 战斗回避(逃跑或面向领导者) -> 结束提示测试 -> 若玩具近则搜索(语音+紧跟+游荡) -> 清除语音 -> 常规跟随 -> 给提示 -> 等待/游荡(可能消散)。",
+  "wiki": {
+    "scanned_pageids": [],
+    "aspects": [],
+    "no_evidence_reason": "未路由到任何页面,且全文检索零命中",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小幽灵大脑",
+    "跟随领导者",
+    "拾取玩具",
+    "提示位置",
+    "战斗威胁",
+    "游荡消散",
+    "紧密跟随"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 7/7)",
+  "gameplay_tags": [
+    "跟随",
+    "探索",
+    "战斗回避"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4609b6cb7c20269f868f5fea310cb8fbe99bd8598164ff2448609968ec46de6d",
+    "source_bytes": 10851,
+    "model": "hy3-free",
+    "generated_at_ms": 1788061448310
+  }
+}

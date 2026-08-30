@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/armor.lua"
+  },
+  "category": "component",
+  "display_name": "armor",
+  "summary": "Armor组件管理护甲的耐久度、伤害吸收率和特殊属性，参与战斗中的伤害减免机制。当护甲受损时，它会触发事件并可能修复自身或移除，支持自定义的完成和修复行为。",
+  "api": [
+    {
+      "name": "SetOnFinished",
+      "effect": "设置护甲耐久耗尽时的回调函数。当护甲条件降至0时调用此函数。"
+    },
+    {
+      "name": "SetKeepOnFinished",
+      "effect": "设置护甲耐久耗尽后是否保留。若设为false（或未传参），护甲在条件为0时将被移除。"
+    },
+    {
+      "name": "InitCondition",
+      "effect": "初始化护甲的条件值和吸收百分比，并设置最大条件值。"
+    },
+    {
+      "name": "InitIndestructible",
+      "effect": "初始化护甲为不可摧毁状态，仅设置吸收百分比，无法通过正常方式减少条件值。"
+    },
+    {
+      "name": "IsIndestructible",
+      "effect": "返回护甲是否为不可摧毁状态。"
+    },
+    {
+      "name": "IsDamaged",
+      "effect": "返回护甲是否已受损（当前条件小于最大条件）。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回当前护甲条件占最大条件的百分比。"
+    },
+    {
+      "name": "SetTags",
+      "effect": "设置护甲的标签列表，用于抵抗特定标签的攻击者或武器。"
+    },
+    {
+      "name": "AddWeakness",
+      "effect": "添加一个弱点标签及对应的额外伤害值。若伤害值小于等于0，则移除该弱点。"
+    },
+    {
+      "name": "RemoveWeakness",
+      "effect": "移除指定标签的弱点。"
+    },
+    {
+      "name": "SetAbsorption",
+      "effect": "设置护甲的伤害吸收百分比。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "根据给定的百分比设置护甲当前条件值（基于最大条件计算）。"
+    },
+    {
+      "name": "SetCondition",
+      "effect": "设置护甲的当前条件值，触发\"percentusedchange\"事件。若条件降至0，调用onfinished回调，并可能移除护甲。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存护甲数据，返回当前条件值（若与最大条件不同）。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载护甲数据，恢复条件值。"
+    },
+    {
+      "name": "CanResist",
+      "effect": "检查护甲是否能抵抗给定的攻击者或武器（基于标签匹配）。若未设置标签则总是返回true。"
+    },
+    {
+      "name": "GetAbsorption",
+      "effect": "获取护甲对给定攻击者或武器的吸收百分比。若能抵抗则返回吸收值，否则返回nil。"
+    },
+    {
+      "name": "GetBonusDamage",
+      "effect": "获取护甲对给定攻击者或武器的额外伤害值（基于弱点标签）。若无匹配或弱点则返回0。"
+    },
+    {
+      "name": "TakeDamage",
+      "effect": "使护甲承受伤害，条件值减少（受conditionlossmultipliers影响）。触发\"armordamaged\"事件，若条件降至0可能移除护甲。"
+    },
+    {
+      "name": "Repair",
+      "effect": "修复护甲，增加条件值。若设置了onrepair回调则调用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前条件和最大条件。"
+    }
+  ],
+  "events_published": [
+    "percentusedchange",
+    "armorbroke",
+    "armordamaged"
+  ],
+  "events_listened": [
+    "percentusedchange"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      19940,
+      16185,
+      18234,
+      15903,
+      47009,
+      19830,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "盔甲伤害计算中的防御作用",
+        "evidence": [
+          {
+            "pageid": 20058,
+            "quote": "对于物理伤害，$最终防御端伤害 = f_{位面实体抵抗}(最终攻击端伤害 × (100% – 盔甲阵营减伤) × (100% – 盔甲防御最高…)"
+          }
+        ]
+      },
+      {
+        "aspect": "盔甲基础属性描述",
+        "evidence": [
+          {
+            "pageid": 20058,
+            "quote": "所有盔甲都具有'''防御'''和'''耐久'''的属性。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "装备/防御",
+      "耐久(护甲型)",
+      "分类:盔甲"
+    ],
+    "code_fields": [
+      "armor_absorb_percent",
+      "armor_maxcondition"
+    ],
+    "overridable_fields": [],
+    "note": "absorb_percent 显示为百分比;maxcondition 作为「耐久」的护甲兜底分支。"
+  },
+  "search_terms": [
+    "护甲",
+    "耐久",
+    "吸收",
+    "修复",
+    "弱点",
+    "抵抗",
+    "标签",
+    "不可摧毁",
+    "百分比",
+    "损坏"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b971904ace836fba10b647a56bc30101e34d6aa5331cc0198675bcbf358df22e",
+    "source_bytes": 4441,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087275097
+  }
+}

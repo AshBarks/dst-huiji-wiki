@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/insulator.lua"
+  },
+  "category": "component",
+  "display_name": "insulator",
+  "summary": "Insulator组件管理实体的绝缘值（insulation）和季节类型（type），用于调节实体在不同季节的适应性，如冬季保暖或夏季隔热。它提供方法设置季节类型和绝缘值，支持游戏中与温度相关的生存玩法。",
+  "api": [
+    {
+      "name": "SetSummer",
+      "effect": "将绝缘器的季节类型设置为夏季（SEASONS.SUMMER），无副作用。"
+    },
+    {
+      "name": "SetWinter",
+      "effect": "将绝缘器的季节类型设置为冬季（SEASONS.WINTER），无副作用。"
+    },
+    {
+      "name": "GetType",
+      "effect": "返回当前季节类型，无副作用。"
+    },
+    {
+      "name": "IsType",
+      "effect": "检查给定类型是否与当前季节类型匹配，返回布尔值，无副作用。"
+    },
+    {
+      "name": "SetInsulation",
+      "effect": "设置绝缘值为给定值，无副作用。"
+    },
+    {
+      "name": "GetInsulation",
+      "effect": "返回绝缘值和当前季节类型，无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      13569,
+      19952,
+      10355,
+      13823,
+      60885,
+      22094,
+      14695
+    ],
+    "aspects": [
+      {
+        "aspect": "暖石自带的保暖与隔热值描述",
+        "evidence": [
+          {
+            "pageid": 14695,
+            "quote": "暖石自带 120 点保暖值和 120 点隔热值，仅用于暖石自身自身温度计算。"
+          }
+        ]
+      },
+      {
+        "aspect": "胡须提供的保暖与隔热值描述",
+        "evidence": [
+          {
+            "pageid": 10355,
+            "quote": "能够提供[[保暖值]]和负[[隔热值]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "装备/隔热",
+      "装备/保暖",
+      "分类:隔热装备",
+      "分类:保暖装备"
+    ],
+    "code_fields": [
+      "insulator_type",
+      "insulator_insulation"
+    ],
+    "overridable_fields": [],
+    "note": "type=summer 显示隔热、winter 显示保暖。"
+  },
+  "search_terms": [
+    "绝缘",
+    "保暖",
+    "隔热",
+    "冬季",
+    "夏季",
+    "季节",
+    "温度",
+    "适应",
+    "Insulator",
+    "insulation"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "季节适应",
+    "环境交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d1f80810cc39df282f981aa5a9c195a757f9ee10d4c040dcd8480365727d5a9b",
+    "source_bytes": 533,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088691098
+  }
+}

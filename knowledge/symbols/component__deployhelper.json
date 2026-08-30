@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/deployhelper.lua"
+  },
+  "category": "component",
+  "display_name": "deployhelper",
+  "summary": "deployhelper组件用于管理可部署物体（如家具、建筑）的辅助显示功能，例如建造时的预览图或范围提示。它维护一个全局列表，在可部署物体靠近时触发附近符合过滤条件的实体显示辅助效果，并通过延迟机制自动停止显示。该组件还支持按配方名称或自定义键值进行过滤，以精确控制哪些物体响应哪些放置操作。",
+  "api": [
+    {
+      "name": "AddRecipeFilter",
+      "effect": "添加一个配方名称过滤器。只有当触发源匹配此过滤器中的配方时，该辅助器才会被激活。"
+    },
+    {
+      "name": "AddKeyFilter",
+      "effect": "添加一个键值过滤器。只有当触发源的`deployhelper_key`匹配此过滤器中的键值时，该辅助器才会被激活。"
+    },
+    {
+      "name": "StartHelper",
+      "effect": "尝试启动辅助显示。如果组件未处于延迟状态且实体未休眠，则开始一个2秒的延迟计时器，开始墙更新循环，并调用`onenablehelper`回调通知启用。无论是否启动延迟，总会调用`onstarthelper`回调。"
+    },
+    {
+      "name": "StopHelper",
+      "effect": "停止辅助显示。清除延迟计时器，停止墙更新循环，并调用`onenablehelper`回调通知禁用。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      21620,
+      18216,
+      18843,
+      21285,
+      14792,
+      24962,
+      18303
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述饥荒游戏中建筑实体的功能、燃料消耗、生命值恢复等，未提及与component__deployhelper相关的代码能力如配方过滤、按键过滤或启动/停止帮助者等玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "部署辅助",
+    "建筑预览",
+    "放置范围",
+    "建造提示",
+    "辅助放置",
+    "预览功能",
+    "范围显示",
+    "部署提示",
+    "建筑放置"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 8/9)",
+  "gameplay_tags": [
+    "建造",
+    "视觉反馈"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
+    "source_bytes": 2551,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088310733
+  }
+}

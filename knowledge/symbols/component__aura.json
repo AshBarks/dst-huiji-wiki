@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aura.lua"
+  },
+  "category": "component",
+  "display_name": "aura",
+  "summary": "aura组件管理半径、激活状态和周期性检查逻辑，用于实现范围性的战斗效果或状态应用。它通过周期性调用区域攻击来检测并应用光环效果，并在状态变化时推送事件。参与的核心玩法包括战斗中的范围伤害、毒素光环或其他持续性区域效果。",
+  "api": [
+    {
+      "name": "Enable",
+      "effect": "启用或禁用光环。当启用时，创建周期性任务执行OnTick；禁用时取消任务，并在正在应用时推送'stopaura'事件。"
+    },
+    {
+      "name": "OnTick",
+      "effect": "每周期执行。先调用pretickfn（如果设置），然后通过combat组件执行区域攻击，根据是否应用效果推送'startaura'或'stopaura'事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含半径、激活状态等的调试字符串，无副作用。"
+    }
+  ],
+  "events_published": [
+    "startaura",
+    "stopaura"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      16419,
+      13437,
+      15022,
+      14938,
+      15183,
+      35217,
+      13701
+    ],
+    "aspects": [
+      {
+        "aspect": "电路板激活启用增益",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "就能将插入的电路板激活来产生对应的增益。"
+          }
+        ]
+      },
+      {
+        "aspect": "骨灰罐激活启用光环",
+        "evidence": [
+          {
+            "pageid": 15183,
+            "quote": "当骨灰罐被激活时，同世界上的学习了“二级受佑姐妹骨灰罐”的[[温蒂]]和温蒂附近 25 {{解释|距离单位}}内的玩家受到[[疯狂光环]]的影响降低25%。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "光环",
+    "范围攻击",
+    "持续伤害",
+    "范围效果",
+    "中毒光环",
+    "战斗范围",
+    "周期性伤害",
+    "状态施加"
+  ],
+  "search_terms_note": "pass1 后零命中 5/8,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗",
+    "状态效果",
+    "区域效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "22a56638ab92c17639466c95afd4767004e87a1904c23199e587361c0e20333d",
+    "source_bytes": 1802,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087742479
+  }
+}

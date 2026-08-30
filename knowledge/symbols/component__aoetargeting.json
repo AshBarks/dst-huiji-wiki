@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/aoetargeting.lua"
+  },
+  "category": "component",
+  "display_name": "aoetargeting",
+  "summary": "AOETargeting组件管理范围效果（AOE）的定位数据，用于处理攻击、技能或物品施放时的范围选择机制。它控制瞄准准星的显示与参数、目标有效性验证，并支持多人游戏中的状态同步。该组件参与核心战斗和法术施放玩法。",
+  "api": [
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件当前启用状态（布尔值），无副作用。"
+    },
+    {
+      "name": "SetEnabled",
+      "effect": "设置组件启用状态，仅在主服务器模拟时有效；改变状态会触发'enableddirty'事件（在客户端），并调用OnEnabledDirty函数更新准星。"
+    },
+    {
+      "name": "SetTargetFX",
+      "effect": "设置目标效果预制体（prefab），用于在目标位置生成视觉反馈。"
+    },
+    {
+      "name": "SetAlwaysValid",
+      "effect": "设置目标是否总是视为有效（忽略验证条件），参数为布尔值。"
+    },
+    {
+      "name": "SetAllowWater",
+      "effect": "设置是否允许在水域中瞄准，参数为布尔值。"
+    },
+    {
+      "name": "SetAllowRiding",
+      "effect": "设置是否允许骑乘时瞄准，参数为布尔值。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "设置AOE效果的范围半径，影响目标选择距离。"
+    },
+    {
+      "name": "GetRange",
+      "effect": "返回当前设置的范围半径值。"
+    },
+    {
+      "name": "SetDeployRadius",
+      "effect": "设置部署半径，可能影响物品放置或效果范围。"
+    },
+    {
+      "name": "SetShouldRepeatCastFn",
+      "effect": "设置重复施放判断函数，用于决定是否允许连续施放AOE效果。"
+    },
+    {
+      "name": "CanRepeatCast",
+      "effect": "检查是否设置了重复施放函数（返回布尔值），无副作用。"
+    },
+    {
+      "name": "ShouldRepeatCast",
+      "effect": "调用重复施放函数判断是否应该重复施放，返回布尔值；若未设置函数则返回false。"
+    },
+    {
+      "name": "StartTargeting",
+      "effect": "开始瞄准：若实体无reticule组件则添加该组件，复制reticule属性，并刷新玩家控制器的准星显示；仅当玩家拥有该物品时生效。"
+    },
+    {
+      "name": "StopTargeting",
+      "effect": "停止瞄准：移除reticule组件，并刷新玩家控制器的准星显示（清空或重置）。"
+    },
+    {
+      "name": "SpawnTargetFXAt",
+      "effect": "在指定位置生成目标效果预制体：处理DynamicPosition和平台实体；若成功则返回生成的特效实体，否则返回nil。"
+    }
+  ],
+  "events_published": [
+    "enableddirty"
+  ],
+  "events_listened": [
+    "enableddirty"
+  ],
+  "netvars": [
+    "enabled"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      10413,
+      15922,
+      13701,
+      15186,
+      16419,
+      23965,
+      13260
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述角色属性、技能树、物品效果和敌人行为，未提及与区域目标选择、范围设置、目标效果或重复施法等组件能力相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "AOE",
+    "范围效果",
+    "瞄准",
+    "定位",
+    "范围选择",
+    "目标验证",
+    "施放",
+    "战斗",
+    "技能",
+    "多人游戏"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗",
+    "法术",
+    "目标定位"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "988acc93e42056c2c561faf8a6364061ace3b3f194308e7c43f8e889fd2035d9",
+    "source_bytes": 4135,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087930028
+  }
+}

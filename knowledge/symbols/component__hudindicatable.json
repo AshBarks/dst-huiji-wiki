@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/hudindicatable.lua"
+  },
+  "category": "component",
+  "display_name": "hudindicatable",
+  "summary": "该组件用于管理实体的HUD指示功能，通过世界组件hudindicatablemanager进行注册和注销。它支持自定义追踪条件，决定是否对特定查看者显示实体在HUD上的指示。核心玩法涉及在饥荒联机版中追踪玩家、物品或目标的位置，辅助生存、探索和协作。",
+  "api": [
+    {
+      "name": "SetShouldTrackFunction",
+      "effect": "设置一个自定义函数，用于判断是否追踪当前实体。该函数会被shouldtrackfn存储，后续调用ShouldTrack时使用。无副作用。"
+    },
+    {
+      "name": "ShouldTrack",
+      "effect": "调用已设置的追踪函数，传入当前实体和指定查看者(viewer)，返回布尔值表示是否应该为该查看者追踪此实体。无副作用。"
+    },
+    {
+      "name": "UnRegisterWithWorldComponent",
+      "effect": "如果世界组件hudindicatablemanager存在，则调用其UnRegisterItem方法注销当前实体，并推送unregister_hudindicatable事件。如果世界组件不存在，则无操作。"
+    },
+    {
+      "name": "RegisterWithWorldComponent",
+      "effect": "如果世界组件hudindicatablemanager存在，则调用其RegisterItem方法注册当前实体。如果世界组件不存在，则无操作。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时自动调用，执行UnRegisterWithWorldComponent以注销实体。可能触发事件推送。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "unregister_hudindicatable"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      47083,
+      57263,
+      51494,
+      51495,
+      52144
+    ],
+    "aspects": [
+      {
+        "aspect": "HUD位置箭头指示",
+        "evidence": [
+          {
+            "pageid": 51494,
+            "quote": "装备星象护目镜时，若瓦格斯塔夫在附近，屏幕边缘会有瓦格斯塔夫的头像箭头指示他的位置。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "HUD指示",
+    "实体追踪",
+    "世界组件",
+    "自定义追踪",
+    "显示位置",
+    "玩家指示",
+    "联机协作"
+  ],
+  "search_terms_note": "pass1 后零命中 4/7,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "协作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a410d2f8ad63f114ce153f1044622baa15f0f1a0c739f6830a4e1a19041afc01",
+    "source_bytes": 1081,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089672986
+  }
+}

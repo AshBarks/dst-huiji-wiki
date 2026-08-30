@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/ghostlyelixirable.lua"
+  },
+  "category": "component",
+  "display_name": "ghostlyelixirable",
+  "summary": "该组件管理实体是否可被鬼魂灵药施加的状态，通过添加和移除'ghostlyelixirable'标签来标识。它提供方法以确定灵药应用的目标实体，允许覆盖默认行为。组件参与鬼魂灵药系统，支持玩家或实体对可施加目标使用灵药以实现增益效果。",
+  "api": [
+    {
+      "name": "GetApplyToTarget",
+      "effect": "获取鬼魂灵药的应用目标。如果定义了overrideapplytotargetfn覆盖函数，则调用该函数并返回其结果；否则直接返回当前实体。无直接副作用，但目标选择可能改变应用结果。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "在组件从实体移除时自动调用，移除实体的'ghostlyelixirable'标签，从而更新实体状态。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15186,
+      18188,
+      35360,
+      28181,
+      34557,
+      10379,
+      10418,
+      13281
+    ],
+    "aspects": [
+      {
+        "aspect": "增益在实体移除或死亡时结束",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "如果阿比盖尔死亡，增益效果就会立即结束。"
+          },
+          {
+            "pageid": 35360,
+            "quote": "如果角色死亡或摘下幽魂…增益效果结束。"
+          }
+        ]
+      },
+      {
+        "aspect": "增益应用到目标",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "温蒂可以右键使用灵体草药，为她的[[阿比盖尔]]提供增益。"
+          },
+          {
+            "pageid": 10379,
+            "quote": "对阿比盖尔使用和通过[[幽魂花冠]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鬼魂灵药系统",
+    "灵药目标",
+    "增益效果",
+    "标签标识",
+    "状态管理",
+    "玩家使用",
+    "应用实体",
+    "灵药施加"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "魔法",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bb758ccf3b85a8ee8259c2733f418009793112afb90807e4e65ce80c47ddc83b",
+    "source_bytes": 459,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089740862
+  }
+}

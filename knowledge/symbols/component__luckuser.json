@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/luckuser.lua"
+  },
+  "category": "component",
+  "display_name": "luckuser",
+  "summary": "LuckUser组件管理实体的运气值，通过SourceModifierList动态调整运气值。运气值主要影响猎犬攻击机制，负运气会增加猎犬目标权重并启用偷猎犬，正运气则移除这些效果，从而参与生存玩法。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，重置所有运气修改器并更新运气值，移除对houndedtarget组件的影响。"
+    },
+    {
+      "name": "GetLuck",
+      "effect": "返回实体的当前运气值，由所有来源修改器的累加结果决定。"
+    },
+    {
+      "name": "SetLuckSource",
+      "effect": "设置一个运气值来源，如果值为0则移除该来源；否则添加修改器到luckmodifiers列表并调用_UpdateLuck_Internal更新运气值，可能修改houndedtarget组件的权重和偷猎犬设置。"
+    },
+    {
+      "name": "RemoveLuckSource",
+      "effect": "移除指定来源的运气修改器并调用_UpdateLuck_Internal更新运气值，可能移除对houndedtarget组件的修改。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的运气值调试字符串，用于调试输出。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13857,
+      22707,
+      20560,
+      15539,
+      20162,
+      16419,
+      15922,
+      16356
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与组件 luckuser 相关的能力表达，如幸运值、幸运来源设置或调试字符串。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "运气",
+    "猎犬",
+    "偷猎犬",
+    "权重",
+    "生存",
+    "攻击机制",
+    "调整",
+    "效果"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 2/8)",
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "61bb661768e8333af008675a1415d958d1fa7ff8a6aa592bea9de120b57ac2fb",
+    "source_bytes": 1727,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088754996
+  }
+}

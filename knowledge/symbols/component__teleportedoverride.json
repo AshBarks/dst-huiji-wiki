@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/teleportedoverride.lua"
+  },
+  "category": "component",
+  "display_name": "teleportedoverride",
+  "summary": "TeleportedOverride组件用于管理实体传送行为的覆盖逻辑。它维护两个函数：一个用于获取传送目标实体，另一个用于获取传送位置坐标。这些函数在传送事件中被调用，允许游戏或模组自定义传送目的地，从而影响传送相关的核心玩法。",
+  "api": [
+    {
+      "name": "GetDestTarget",
+      "effect": ""
+    },
+    {
+      "name": "SetDestTargetFn",
+      "effect": ""
+    },
+    {
+      "name": "GetDestPosition",
+      "effect": ""
+    },
+    {
+      "name": "SetDestPositionFn",
+      "effect": ""
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      15022,
+      39366,
+      57263,
+      15539,
+      16641,
+      18001,
+      17930
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本描述的是游戏内传送相关实体和机制的整体功能，没有提及代码组件如GetDestTarget、SetDestTargetFn、GetDestPosition、SetDestPositionFn等能力的具体表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送",
+    "目标",
+    "位置",
+    "覆盖",
+    "自定义传送",
+    "传送函数",
+    "位置函数",
+    "teleport",
+    "override",
+    "dest"
+  ],
+  "gameplay_tags": [
+    "传送",
+    "自定义",
+    "冒险"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
+    "source_bytes": 504,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088263381
+  }
+}

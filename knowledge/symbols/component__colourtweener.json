@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/colourtweener.lua"
+  },
+  "category": "component",
+  "display_name": "colourtweener",
+  "summary": "ColourTweener组件用于管理实体颜色的渐变动画，存储初始颜色和目标颜色，并通过插值实现平滑过渡。它参与核心玩法中的视觉效果，常用于装饰和动画效果。",
+  "api": [
+    {
+      "name": "IsTweening",
+      "effect": "返回布尔值，指示实体是否正在进行颜色渐变动画，无副作用。"
+    },
+    {
+      "name": "EndTween",
+      "effect": "立即结束当前颜色渐变，将实体动画状态设置为目标颜色值，如果设置了回调则调用该回调，推送colourtweener_end事件，并停止更新组件。"
+    },
+    {
+      "name": "StartTween",
+      "effect": "开始一个新的颜色渐变动画，指定目标颜色、持续时间、结束回调和是否使用墙壁更新。它会设置初始颜色（从当前动画状态获取），启动更新组件，并推送colourtweener_start事件。如果持续时间为0，则立即结束渐变。"
+    },
+    {
+      "name": "DoUpdate",
+      "effect": "更新函数，根据传入的时间增量dt计算渐变进度，插值计算当前颜色并设置到动画状态，如果时间达到指定持续时间则结束渐变。"
+    }
+  ],
+  "events_published": [
+    "colourtweener_start",
+    "colourtweener_end"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述实体战斗行为和状态（如沉睡、动画、距离等），未提及颜色调整动画组件或其相关行为描述（如IsTweening、EndTween、StartTween、DoUpdate）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "动画",
+    "视觉效果",
+    "平滑过渡",
+    "动画效果",
+    "渐变",
+    "颜色过渡",
+    "实体动画"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 2/7)",
+  "gameplay_tags": [
+    "装饰",
+    "视觉效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "56fef1abd28e4ce224eeac01559e67bb15358117a6df452786da1057acdadb30",
+    "source_bytes": 2714,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087370502
+  }
+}

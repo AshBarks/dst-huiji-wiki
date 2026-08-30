@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/periodicspawner.lua"
+  },
+  "category": "component",
+  "display_name": "periodicspawner",
+  "summary": "PeriodicSpawner 组件负责管理周期性生成预制件的定时任务和相关参数，包括基础时间、随机方差、生成密度、间距限制等。它通过检查密度条件、位置、屏幕外状态和自定义测试函数来控制生成行为，并支持将生成物作为浮木处理。该组件是世界中资源或生物自动刷新的核心机制，常用于生存玩法中的动态环境管理。",
+  "api": [
+    {
+      "name": "SetPrefab",
+      "effect": "设置要生成的预制件，参数可以是字符串或函数，确保预制件存在后更新组件状态。"
+    },
+    {
+      "name": "SetRandomTimes",
+      "effect": "设置基础时间和随机时间方差，并可选择是否重置当前生成计时器；若无重置参数则默认重启。"
+    },
+    {
+      "name": "SetDensityInRange",
+      "effect": "设置生成范围和密度，用于检查范围内同类实体数量以控制生成。"
+    },
+    {
+      "name": "SetMinimumSpacing",
+      "effect": "设置最小间距，确保生成点与附近同类实体保持指定距离。"
+    },
+    {
+      "name": "SetOnlySpawnOffscreen",
+      "effect": "设置是否仅在实体屏幕外时生成，控制生成的可见性条件。"
+    },
+    {
+      "name": "SetOnSpawnFn",
+      "effect": "设置生成后的回调函数，在成功生成预制件后执行自定义逻辑。"
+    },
+    {
+      "name": "SetSpawnTestFn",
+      "effect": "设置生成测试函数，在生成前检查条件，返回布尔值决定是否允许生成。"
+    },
+    {
+      "name": "SetGetSpawnPointFn",
+      "effect": "设置获取生成点的函数，自定义生成位置，若返回空则生成失败并重试。"
+    },
+    {
+      "name": "SetIgnoreFlotsamGenerator",
+      "effect": "设置是否忽略浮木生成器，控制生成物是否作为浮木处理。"
+    },
+    {
+      "name": "SetDensityFilterFn",
+      "effect": "设置密度过滤函数，在密度检查时用于识别哪些实体计入密度计算。"
+    },
+    {
+      "name": "Start",
+      "effect": "开始或重启周期生成，可选覆盖时间；若无覆盖则使用随机时间计算，并取消现有任务。"
+    },
+    {
+      "name": "SafeStart",
+      "effect": "安全开始生成，仅在当前无目标时间时启动，避免重复任务。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止周期生成，清除目标时间和取消任务。"
+    },
+    {
+      "name": "TrySpawn",
+      "effect": "尝试生成预制件，检查所有条件（如有效性、屏幕外、测试函数、密度等），成功则生成实体并返回状态和重试时间。"
+    },
+    {
+      "name": "DoSpawn",
+      "effect": "执行生成逻辑并重启计时器，调用 TrySpawn 后根据结果重新调度。"
+    },
+    {
+      "name": "ForceNextSpawn",
+      "effect": "强制立即生成预制件，等同于 DoSpawn 方法，无参数。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，调整生成时间以适应时间流逝，若剩余时间则触发生成或重启。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存组件状态，返回剩余生成时间用于持久化，若无任务则返回空。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载组件状态，恢复生成计时器从保存的时间开始。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示下次生成剩余时间和预制件名称，用于开发调试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      24663,
+      15238,
+      15587,
+      15677,
+      15370,
+      15380,
+      15566
+    ],
+    "aspects": [
+      {
+        "aspect": "在玩家附近随机位置生成实体",
+        "evidence": [
+          {
+            "pageid": 15677,
+            "quote": "则在此玩家周围 2 ~ 20 距离单位内生成一只蘑菇地精"
+          }
+        ]
+      },
+      {
+        "aspect": "生成点周期性检测玩家存在",
+        "evidence": [
+          {
+            "pageid": 15677,
+            "quote": "生成点每 20 秒检查周围 20 距离单位内是否有处于月亮蘑菇林中的玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "生成点数量限制与死亡冷却",
+        "evidence": [
+          {
+            "pageid": 15677,
+            "quote": "每个蘑菇地精生成点同时只能拥有 1 只蘑菇地精，蘑菇地精死亡 1 天后才能够生成新的蘑菇地精"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "周期性生成",
+    "生成密度",
+    "间距限制",
+    "屏幕外生成",
+    "预制件刷新",
+    "浮木刷新",
+    "资源生成",
+    "自动刷新",
+    "动态刷新"
+  ],
+  "search_terms_note": "pass1 后零命中 9/10,已二次修正(修正后 7/9)",
+  "gameplay_tags": [
+    "生存",
+    "生成",
+    "世界"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+    "source_bytes": 6900,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087189303
+  }
+}

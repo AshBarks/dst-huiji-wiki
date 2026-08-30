@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/foodaffinity.lua"
+  },
+  "category": "component",
+  "display_name": "foodaffinity",
+  "summary": "该组件为实体提供基于食物预制物、食物类型或标签的饥饿值加成管理。它通过存储不同的加成数据，在实体进食时计算并可能提供额外的饥饿恢复量。组件支持调味食物的基础预制物判定，是角色个性化食物收益和资源管理的核心机制。",
+  "api": [
+    {
+      "name": "AddTagAffinity",
+      "effect": "添加一个标签亲和性。当实体吃下带有指定标签的食物时，将获得指定的饥饿值加成。若该标签已存在，则覆盖其加成值。"
+    },
+    {
+      "name": "AddPrefabAffinity",
+      "effect": "添加一个预制物亲和性。当实体吃下指定预制物的食物时，将获得指定的饥饿值加成。支持调味食物，会自动检查基础预制物。若该预制物已存在，则覆盖其加成值。"
+    },
+    {
+      "name": "AddFoodtypeAffinity",
+      "effect": "添加一个食物类型亲和性。当实体吃下指定食物类型的食物时，将获得指定的饥饿值加成。若该食物类型已存在，则覆盖其加成值。"
+    },
+    {
+      "name": "RemoveTagAffinity",
+      "effect": "移除指定标签的亲和性加成。"
+    },
+    {
+      "name": "RemovePrefabAffinity",
+      "effect": "移除指定预制物的亲和性加成。"
+    },
+    {
+      "name": "RemoveFoodtypeAffinity",
+      "effect": "移除指定食物类型的亲和性加成。"
+    },
+    {
+      "name": "HasAffinity",
+      "effect": "检查指定食物是否对该实体具有任何亲和性（预制物、食物类型或标签）。返回布尔值。"
+    },
+    {
+      "name": "GetFoodBasePrefab",
+      "effect": "获取指定食物的基准预制物名称。如果该食物是调味版本，则返回其原始基础食物的预制物名称；否则返回其自身预制物名称。"
+    },
+    {
+      "name": "HasPrefabAffinity",
+      "effect": "检查指定食物（或其基础预制物）是否存在预制物亲和性加成。返回布尔值。"
+    },
+    {
+      "name": "GetAffinity",
+      "effect": "获取指定食物能为实体提供的最大饥饿值加成。它会收集所有匹配的预制物、食物类型和标签加成值，然后返回其中最大的一个。如果没有匹配项，则返回 nil。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      20150,
+      16197,
+      10355,
+      10374,
+      13437,
+      20714,
+      24875
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及食物亲和力组件的能力表达，如添加、移除或查询食物类型、标签或预制物的亲和力。提及的亲和力均为阵营亲和（暗影、月亮），而非食物相关；食物页面仅描述类型和属性，无亲和力机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "饥饿值增益",
+    "食物预制物",
+    "食物类型",
+    "标签",
+    "进食效果",
+    "调味判定",
+    "资源管理",
+    "角色个性化"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 5/8)",
+  "gameplay_tags": [
+    "生存",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "474a609f0b70628f838cc0018d4e8f279652a58207a6f4a19dae1872dce41f71",
+    "source_bytes": 3060,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089780258
+  }
+}

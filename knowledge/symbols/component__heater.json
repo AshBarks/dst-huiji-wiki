@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/heater.lua"
+  },
+  "category": "component",
+  "display_name": "heater",
+  "summary": "heater组件管理实体的热量属性，包括基础热量、装备热量和携带热量，支持放热和吸热两种模式。它通过计算热量值和衰减影响游戏中的温度平衡，是生存玩法中温度管理的核心机制之一。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "在组件从实体移除时调用，移除实体上的'HASHEATER'标签。"
+    },
+    {
+      "name": "SetThermics",
+      "effect": "设置组件的放热(exothermic)和吸热(endothermic)属性，影响热量行为。"
+    },
+    {
+      "name": "IsEndothermic",
+      "effect": "返回组件是否处于吸热模式（endothermic），纯查询无副作用。"
+    },
+    {
+      "name": "IsExothermic",
+      "effect": "返回组件是否处于放热模式（exothermic），纯查询无副作用。"
+    },
+    {
+      "name": "SetShouldFalloff",
+      "effect": "设置热量是否应该衰减，通过内部变量 stop_falloff 控制。"
+    },
+    {
+      "name": "ShouldFalloff",
+      "effect": "返回热量是否衰减（基于 stop_falloff 变量），纯查询无副作用。"
+    },
+    {
+      "name": "SetHeatRadiusCutoff",
+      "effect": "设置热量影响的半径截止值，用于控制热量传播范围。"
+    },
+    {
+      "name": "GetHeatRadiusCutoff",
+      "effect": "获取当前设置的热量半径截止值，纯查询无副作用。"
+    },
+    {
+      "name": "GetHeat",
+      "effect": "获取实体的热量值；如果 heatfn 函数存在，则调用 heatfn 返回结果，否则返回 heat 属性值。无副作用。"
+    },
+    {
+      "name": "GetHeatRate",
+      "effect": "获取热量变化率；如果 heatratefn 函数存在，则调用 heatratefn 返回结果，否则返回 heatrate 属性或默认值1。无副作用。"
+    },
+    {
+      "name": "GetEquippedHeat",
+      "effect": "获取装备热量值；如果 equippedheatfn 函数存在，则调用 equippedheatfn 返回结果，否则返回 equippedheat 属性值。无副作用。"
+    },
+    {
+      "name": "GetCarriedHeat",
+      "effect": "获取携带热量值和乘数；如果 carriedheatfn 函数存在，则调用 carriedheatfn 返回结果，否则返回 carriedheat 属性，并始终携带 carriedheatmultiplier 乘数。无副作用。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回组件状态的调试字符串，包括热量、携带热量、装备热量以及放热和吸热模式。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18572,
+      52726,
+      20700,
+      14695,
+      19952,
+      15734,
+      10355,
+      60885
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有直接或间接描述 component__heater 的代码能力或行为语义。所有内容涉及温度机制、热源物品或生物行为，但未提及 heater 组件的具体功能如设置热力学、获取热量、热半径等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "auto_maintained": {
+    "source": "Module:AutoInfobox",
+    "fields": [
+      "分类:冷源",
+      "分类:热源"
+    ],
+    "code_fields": [
+      "heater_endothermic",
+      "heater_exothermic"
+    ],
+    "overridable_fields": [],
+    "note": "布尔标记键。"
+  },
+  "search_terms": [
+    "热量",
+    "温度",
+    "取暖",
+    "保暖",
+    "热源",
+    "冷源",
+    "衰减",
+    "半径",
+    "装备热量",
+    "携带热量"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
+    "source_bytes": 2119,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087843913
+  }
+}

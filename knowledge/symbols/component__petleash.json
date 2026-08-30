@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/petleash.lua"
+  },
+  "category": "component",
+  "display_name": "petleash",
+  "summary": "PetLeash组件管理实体的宠物系统，控制宠物的生成与消散，维护宠物列表和数量上限。它支持按预制体单独限制宠物数量，并处理宠物移除事件，确保玩家不能拥有超过限制的宠物。该组件参与宠物跟随和战斗玩法，常用于生存模式中的宠物管理。",
+  "api": [
+    {
+      "name": "SetPetPrefab",
+      "effect": "设置默认宠物预制体名称，用于后续生成宠物。"
+    },
+    {
+      "name": "SetOnSpawnFn",
+      "effect": "设置生成宠物时的回调函数，函数接收宠物生成时的实体作为参数。"
+    },
+    {
+      "name": "SetOnDespawnFn",
+      "effect": "设置消散宠物时的回调函数，函数接收宠物消散时的实体作为参数。"
+    },
+    {
+      "name": "SetOnRemovedFn",
+      "effect": "设置宠物被移除时的回调函数，函数接收宠物移除时的实体作为参数。"
+    },
+    {
+      "name": "SetMaxPets",
+      "effect": "设置宠物总数上限，超过限制时无法生成新宠物。"
+    },
+    {
+      "name": "GetMaxPets",
+      "effect": "返回当前宠物总数上限值。"
+    },
+    {
+      "name": "GetNumPets",
+      "effect": "返回当前宠物总数。"
+    },
+    {
+      "name": "IsFull",
+      "effect": "检查宠物总数是否达到上限，返回布尔值。"
+    },
+    {
+      "name": "IsPetAPrefabLimitedOne",
+      "effect": "检查指定预制体是否受单独数量限制，返回布尔值。"
+    },
+    {
+      "name": "SetMaxPetsForPrefab",
+      "effect": "设置指定预制体的最大宠物数量，用于单独限制该预制体的宠物。"
+    },
+    {
+      "name": "GetMaxPetsForPrefab",
+      "effect": "返回指定预制体的最大宠物数量，如果未设置则返回0。"
+    },
+    {
+      "name": "GetNumPetsForPrefab",
+      "effect": "返回指定预制体的当前宠物数量，如果未设置则返回0。"
+    },
+    {
+      "name": "GetNumReservedPetsForPrefab",
+      "effect": "返回指定预制体的预留宠物数量，用于预留宠物位，如果未设置则返回0。"
+    },
+    {
+      "name": "GetPetsWithPrefab",
+      "effect": "返回指定预制体的所有宠物列表，如果没有则返回nil。"
+    },
+    {
+      "name": "IsFullForPrefab",
+      "effect": "检查指定预制体的宠物数量（包括预留）是否达到上限，返回布尔值。"
+    },
+    {
+      "name": "ReservePetWithPrefab",
+      "effect": "为指定预制体预留一个宠物位，增加预留计数，用于临时锁定宠物位。"
+    },
+    {
+      "name": "UnreservePetWithPrefab",
+      "effect": "取消指定预制体的一个预留宠物位，减少预留计数，如果计数归零则移除预留。"
+    },
+    {
+      "name": "HasPetWithTag",
+      "effect": "检查宠物列表中是否有带指定标签的宠物，返回布尔值。"
+    },
+    {
+      "name": "GetPets",
+      "effect": "返回宠物字典，键值对为宠物实体。"
+    },
+    {
+      "name": "IsPet",
+      "effect": "检查指定实体是否是当前宠物，返回布尔值。"
+    },
+    {
+      "name": "SpawnPetAt",
+      "effect": "在指定坐标生成宠物，使用指定预制体或默认预制体，并遵守数量限制；生成后调用onspawnfn回调，宠物位置设置到坐标。"
+    },
+    {
+      "name": "AttachPet",
+      "effect": "将外部实体附加为宠物，遵守数量限制，并监听其移除事件；成功附加返回true，否则返回false。"
+    },
+    {
+      "name": "DetachPet",
+      "effect": "将指定宠物从列表中移除，但不消散宠物实体，并取消监听其移除事件。"
+    },
+    {
+      "name": "DespawnPet",
+      "effect": "消散指定宠物，调用ondespawnfn回调或直接移除宠物实体。"
+    },
+    {
+      "name": "DespawnAllPets",
+      "effect": "消散所有宠物，逐个调用DespawnPet。"
+    },
+    {
+      "name": "DespawnAllPetsWithPrefab",
+      "effect": "消散指定预制体的所有宠物，逐个调用DespawnPet。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存宠物数据到存档，返回包含宠物记录的数据表，如果没有宠物则返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档加载宠物数据，生成宠物并附加到列表，调用onspawnfn回调。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时，清理所有宠物监听事件，避免内存泄漏。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "当实体被移除时，自动调用DespawnAllPets消散所有宠物。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65605,
+      20714,
+      34523,
+      18057,
+      52788,
+      14579,
+      13606
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中，唯一涉及宠物的页面18057描述了宠物的领养、饥饿状态和特征，但未提及petleash组件的具体能力如设置最大宠物数、生成/ despawn回调等。其他页面不涉及宠物管理内容。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宠物",
+    "生成",
+    "消散",
+    "限制",
+    "跟随",
+    "管理",
+    "预制体",
+    "标签",
+    "数量",
+    "预留"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "96b20c0ab3e82b70f8dceecfdfa3bec009f1649742960ec435b4cecb95f304fd",
+    "source_bytes": 8118,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087614153
+  }
+}

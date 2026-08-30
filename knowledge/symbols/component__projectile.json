@@ -1,0 +1,206 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/projectile.lua"
+  },
+  "category": "component",
+  "display_name": "projectile",
+  "summary": "该组件管理投射物的飞行轨迹、目标追踪、命中判定和事件回调，用于实现游戏中的远程攻击机制。它处理投射物的发射、运动更新、碰撞检测以及与目标交互时的各种效果，包括被抓取、延迟显示和卡住检测等行为。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时清理资源：移除‘projectile’标签（除非存在complexprojectile组件）、移除‘catchable’标签、取消延迟显示任务和延迟任务、停止追踪延迟持有者。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，格式为‘target: [目标], owner [拥有者]’，用于调试信息显示。"
+    },
+    {
+      "name": "SetSpeed",
+      "effect": "设置投射物的飞行速度。如果投射物已投掷，会立即更新物理速度。"
+    },
+    {
+      "name": "SetStimuli",
+      "effect": "设置投射物的刺激类型，用于攻击时的额外效果（如元素伤害）。"
+    },
+    {
+      "name": "SetRange",
+      "effect": "设置投射物的最大飞行范围。超出范围时投射物会未命中。"
+    },
+    {
+      "name": "SetHitDist",
+      "effect": "设置投射物的命中判定距离，用于计算是否命中目标。"
+    },
+    {
+      "name": "SetOnThrownFn",
+      "effect": "设置投掷回调函数，在投射物被投掷时触发。"
+    },
+    {
+      "name": "SetOnHitFn",
+      "effect": "设置命中回调函数，在投射物命中目标后触发。"
+    },
+    {
+      "name": "SetOnPreHitFn",
+      "effect": "设置预命中回调函数，在投射物命中目标前触发。"
+    },
+    {
+      "name": "SetOnCaughtFn",
+      "effect": "设置被抓住回调函数，在投射物被抓取时触发。"
+    },
+    {
+      "name": "SetOnMissFn",
+      "effect": "设置未命中回调函数，在投射物未命中目标时触发。"
+    },
+    {
+      "name": "SetCanCatch",
+      "effect": "设置投射物是否可被抓取。如果启用且目标有catcher组件，会开始监视抓取。"
+    },
+    {
+      "name": "SetHoming",
+      "effect": "设置投射物是否追踪目标。启用时飞行中会持续调整方向朝向目标。"
+    },
+    {
+      "name": "SetLaunchOffset",
+      "effect": "设置投射物的发射偏移量，基于攻击者面朝方向调整初始位置。"
+    },
+    {
+      "name": "IsThrown",
+      "effect": "返回投射物是否已投掷（即目标是否已设置）。"
+    },
+    {
+      "name": "SetLaunchAngle",
+      "effect": "设置投射物的发射角度（单位为度），否则会自动面向目标。"
+    },
+    {
+      "name": "Throw",
+      "effect": "投掷投射物：设置拥有者、目标、起始位置和目的地，调整物理属性和方向，开始更新组件，推送‘onthrown’和‘hostileprojectile’事件，触发投掷回调，若可抓取则让目标开始监视。"
+    },
+    {
+      "name": "Catch",
+      "effect": "处理投射物被抓取：停止追踪延迟持有者，停止投射物运动和更新，触发被抓取回调。"
+    },
+    {
+      "name": "Miss",
+      "effect": "处理投射物未命中：停止追踪延迟持有者，停止投射物，触发未命中回调，并确定攻击者（可能为拥有者的拥有者）。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止投射物：恢复物理碰撞，移除‘activeprojectile’标签，停止更新，清除目标和拥有者数据，取消相关任务。"
+    },
+    {
+      "name": "Hit",
+      "effect": "处理投射物命中目标：确定攻击者和武器，停止投射物，触发预命中回调，执行攻击（可能忽略攻击范围），触发命中回调。"
+    },
+    {
+      "name": "DelayVisibility",
+      "effect": "延迟投射物显示：隐藏实体并记录延迟位置，追踪延迟持有者，设置定时任务在指定时间后显示。"
+    },
+    {
+      "name": "SetBounced",
+      "effect": "设置投射物是否已弹跳，用于记录弹跳状态。"
+    },
+    {
+      "name": "IsBounced",
+      "effect": "返回投射物是否已弹跳。"
+    }
+  ],
+  "events_published": [
+    "onthrown",
+    "hostileprojectile"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      19297,
+      51046,
+      15922,
+      35790,
+      19110,
+      28751,
+      52726
+    ],
+    "aspects": [
+      {
+        "aspect": "击中效果与伤害描述",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "命中目标能造成 17 点物理伤害"
+          },
+          {
+            "pageid": 52726,
+            "quote": "热追踪导弹落地后会进行一个半径 1.2 距离单位的范围攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "弹跳机制描述",
+        "evidence": [
+          {
+            "pageid": 19297,
+            "quote": "亮茄魔杖的射弹在击中目标后会向 12 距离单位内的其他实体弹射，能在实体之间弹射 4 次"
+          },
+          {
+            "pageid": 28751,
+            "quote": "亮茄魔杖的弹射攻击只能在狞笑显形攻击的时候才能弹射到其身上"
+          }
+        ]
+      },
+      {
+        "aspect": "追踪功能描述",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "吹箭可以追踪敌人造成 20 点物理伤害"
+          },
+          {
+            "pageid": 52726,
+            "quote": "追踪攻击检测温度最高的目标"
+          }
+        ]
+      },
+      {
+        "aspect": "飞行速度与范围描述",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "所有发射的弹弓弹药的基础飞行速度为 25"
+          },
+          {
+            "pageid": 35790,
+            "quote": "弹弓的攻击范围由 10 增加至 11"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "投射物",
+    "远程攻击",
+    "追踪",
+    "命中",
+    "飞行",
+    "弹射",
+    "未命中",
+    "可抓取",
+    "延迟显示",
+    "卡住检测"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "远程"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+    "source_bytes": 16338,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087584330
+  }
+}

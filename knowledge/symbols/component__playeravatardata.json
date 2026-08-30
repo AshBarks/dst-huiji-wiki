@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/playeravatardata.lua"
+  },
+  "category": "component",
+  "display_name": "playeravatardata",
+  "summary": "玩家头像数据组件管理玩家的名字、皮肤、年龄和装备等外观信息，用于在游戏客户端和服务器之间同步数据。它通过网络变量确保多人游戏中其他玩家能正确显示角色外观，支持玩家个性化定制和装备更换。",
+  "api": [
+    {
+      "name": "SetAllowEmptyName",
+      "effect": "设置是否允许玩家名字为空。当参数为false时，名字不能为空；否则允许空名字。影响GetData方法的返回值。"
+    },
+    {
+      "name": "SetAllowBurnt",
+      "effect": "设置是否允许玩家处于烧焦状态。当参数为false时，烧焦状态下GetData返回nil；否则允许。"
+    },
+    {
+      "name": "AddNameData",
+      "effect": "初始化名字和prefab的网络变量。如果未初始化，则创建net_string变量并设置hasdata和savestrings标志。"
+    },
+    {
+      "name": "AddBaseSkinData",
+      "effect": "初始化基础皮肤的网络变量。如果未初始化，则创建net_string变量并设置hasdata和saveskins标志。"
+    },
+    {
+      "name": "AddClothingData",
+      "effect": "初始化服装皮肤的网络变量，包括身体、手、腿和脚的皮肤。如果未初始化，则创建net_string变量并设置hasdata和saveskins标志。"
+    },
+    {
+      "name": "AddAgeData",
+      "effect": "初始化年龄的网络变量。如果未初始化，则创建net_ushortint变量并设置hasdata和savenumbers标志。"
+    },
+    {
+      "name": "AddEquipData",
+      "effect": "初始化装备的网络变量数组。如果未初始化，则根据装备槽数量创建net_string变量数组并设置hasdata和saveequip标志。"
+    },
+    {
+      "name": "AddPlayerData",
+      "effect": "调用AddNameData、AddBaseSkinData、AddClothingData、AddAgeData和AddEquipData方法，一次性添加所有玩家数据。"
+    },
+    {
+      "name": "GetData",
+      "effect": "返回玩家数据表，包含名字、皮肤、年龄和装备信息。如果无数据或条件不满足（如名字为空且不允许空名字，或玩家烧焦且不允许烧焦），则返回nil。总是返回新表以供外部修改。"
+    },
+    {
+      "name": "SetData",
+      "effect": "根据传入的client_obj对象设置所有网络变量的值。如果对象为nil，则使用默认值（如空字符串或0）。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "收集可保存的数据（基于savestrings、saveskins、savenumbers和saveequip标志）并返回数据表。对于装备数据，将装备槽数字ID转换为名称字符串。如果无数据可保存，返回nil。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从加载的数据中恢复网络变量。处理装备数据时，将装备槽名称转换回数字ID，并存储不支持的装备槽数据。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [
+    "playeravatardata.name",
+    "playeravatardata.prefab",
+    "playeravatardata.base_skin",
+    "playeravatardata.body_skin",
+    "playeravatardata.hand_skin",
+    "playeravatardata.legs_skin",
+    "playeravatardata.feet_skin",
+    "playeravatardata.playerage",
+    "playeravatardata.equip"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      15873
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述稻草人的游戏机制（如替换鸟类），未涉及玩家头像数据组件的任何能力表达，如数据设置、保存加载或皮肤相关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "头像数据",
+    "皮肤定制",
+    "装备同步",
+    "外观管理",
+    "网络同步",
+    "角色显示",
+    "名字管理",
+    "年龄显示"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 8/8)",
+  "gameplay_tags": [
+    "装饰",
+    "社交",
+    "角色定制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5484de89206b573ff6e34197227b0378eec13209a07225e0585a00ade0924959",
+    "source_bytes": 6664,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088292041
+  }
+}

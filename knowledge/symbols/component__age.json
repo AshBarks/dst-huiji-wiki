@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/age.lua"
+  },
+  "category": "component",
+  "display_name": "age",
+  "summary": "该组件管理实体的年龄数据，以秒为单位存储并计算天数。它支持年龄的暂停和恢复，通过周期任务同步年龄到网络。在核心生存玩法中，记录玩家生存天数并触发相关成就和进度通知。",
+  "api": [
+    {
+      "name": "GetAge",
+      "effect": "计算并返回实体当前年龄（秒），基于保存年龄、暂停时间等。"
+    },
+    {
+      "name": "GetAgeInDays",
+      "effect": "返回实体年龄（天，向下取整）。"
+    },
+    {
+      "name": "GetDisplayAgeInDays",
+      "effect": "返回实体显示年龄（天，向下取整加1）。"
+    },
+    {
+      "name": "PauseAging",
+      "effect": "暂停年龄增长，记录当前时间到last_pause_time并取消周期同步任务。"
+    },
+    {
+      "name": "ResumeAging",
+      "effect": "恢复年龄增长，计算暂停时长累加到paused_time，清除last_pause_time并重启周期同步。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回一个表，包含age（当前年龄）和ispaused（暂停状态），用于保存数据。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载年龄和暂停状态，根据状态重启或取消周期同步。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回格式化的年龄字符串（秒或天），用于调试显示。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "处理长时间更新，将时间增量dt加到saved_age，如果暂停则加到paused_time，否则重启周期同步。"
+    },
+    {
+      "name": "CancelPeriodicSync",
+      "effect": "取消周期同步任务并立即调用syncage函数同步年龄到网络。"
+    },
+    {
+      "name": "RestartPeriodicSync",
+      "effect": "取消现有周期任务并设置新的周期任务，定期同步年龄。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "setowner"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      14484
+    ],
+    "aspects": [
+      {
+        "aspect": "杂草生长阶段时间单位以游戏天数标注",
+        "evidence": [
+          {
+            "pageid": 14484,
+            "quote": "各类杂草的各阶段生长到下一阶段所需的时间如下表(单位：[[昼夜循环|游戏天数]])："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "实体年龄",
+    "游戏天数",
+    "年龄暂停",
+    "年龄恢复",
+    "网络同步",
+    "成就解锁",
+    "年龄存储",
+    "周期更新"
+  ],
+  "search_terms_note": "pass1 后零命中 8/10,已二次修正(修正后 7/8)",
+  "gameplay_tags": [
+    "生存",
+    "成就"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3a71e829481c9e1eaf373ef935b2c88d5d358de98c9187f8dc6a4c49df398f18",
+    "source_bytes": 2840,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088633069
+  }
+}

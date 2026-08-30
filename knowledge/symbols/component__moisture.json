@@ -1,0 +1,285 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/moisture.lua"
+  },
+  "category": "component",
+  "display_name": "moisture",
+  "summary": "湿度组件管理实体的湿度值，影响潮湿状态和干燥速率。它与环境降雨、装备防水性、温度等因素交互，实时计算湿度变化。组件还处理强制干燥和湿度宣布，参与核心生存玩法。",
+  "api": [
+    {
+      "name": "ForceDry",
+      "effect": "根据force参数设置或移除强制干燥源。为true时，将湿度设为0、速率归零、停止组件更新，并记录干燥源；为false时，移除指定干燥源。若来源非自身，则监听onremove事件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，包含当前湿度、速率（区分睡袋干燥、降雨、装备、干燥等）。"
+    },
+    {
+      "name": "AnnounceMoisture",
+      "effect": "根据旧段数和新段数的变化，通过talker组件宣布湿度状态（如潮湿、湿透）。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "改变湿度值，范围限制在0到maxmoisture。若非强制干燥，更新潮湿状态，并可选宣布湿度变化。推送moisturedelta事件。"
+    },
+    {
+      "name": "SetMoistureLevel",
+      "effect": "直接设置湿度值，范围限制在0到maxmoisture。更新潮湿状态，并推送moisturedelta事件。"
+    },
+    {
+      "name": "IsWet",
+      "effect": "返回布尔值，表示实体是否潮湿（湿度段数>=2）。"
+    },
+    {
+      "name": "GetMaxMoisture",
+      "effect": "返回最大湿度值。"
+    },
+    {
+      "name": "GetMoisture",
+      "effect": "返回当前湿度值。"
+    },
+    {
+      "name": "GetMoisturePercent",
+      "effect": "返回湿度百分比（当前湿度除以最大湿度）。"
+    },
+    {
+      "name": "GetWaterproofInventory",
+      "effect": "返回库存防水性状态（已弃用），或是否强制干燥。"
+    },
+    {
+      "name": "IsForceDry",
+      "effect": "返回布尔值，表示是否处于强制干燥状态。"
+    },
+    {
+      "name": "SetWaterproofInventory",
+      "effect": "设置库存防水性（已弃用），建议使用ForceDry代替。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "根据百分比计算目标湿度，并调用DoDelta改变湿度。"
+    },
+    {
+      "name": "SetInherentWaterproofness",
+      "effect": "设置固有防水性值。"
+    },
+    {
+      "name": "GetSegs",
+      "effect": "返回湿度段数（整数部分和小数部分），用于UI显示。"
+    },
+    {
+      "name": "_GetMoistureRateAssumingRain",
+      "effect": "内部方法，计算假设降雨时的湿度率，考虑免疫、防水性等因素。"
+    },
+    {
+      "name": "GetMoistureRate",
+      "effect": "获取当前湿度变化率，考虑降雨、浮动物、浴池等因素。"
+    },
+    {
+      "name": "GetWaterproofness",
+      "effect": "返回总防水性（库存、固有、修改器），范围0到1。"
+    },
+    {
+      "name": "IsInBathingPool",
+      "effect": "返回布尔值，表示实体是否在浴池中。"
+    },
+    {
+      "name": "GetEquippedMoistureRate",
+      "effect": "获取装备带来的湿度率，根据干燥率和最大湿度调整。"
+    },
+    {
+      "name": "GetDryingRate",
+      "effect": "获取干燥率，基于加热器功率、局部温度、湿度等因素。"
+    },
+    {
+      "name": "GetSleepingBagDryingRate",
+      "effect": "获取睡袋干燥率，如果实体在使用睡袋。"
+    },
+    {
+      "name": "GetRate",
+      "effect": "返回当前速率（湿度变化尝试的速率）。"
+    },
+    {
+      "name": "GetRateScale",
+      "effect": "返回速率缩放等级（基于实际增量）。"
+    },
+    {
+      "name": "AddRateBonus",
+      "effect": "添加外部速率奖励到修改器列表。"
+    },
+    {
+      "name": "RemoveRateBonus",
+      "effect": "从修改器列表移除指定速率奖励。"
+    },
+    {
+      "name": "GetRateBonus",
+      "effect": "返回当前总速率奖励。"
+    },
+    {
+      "name": "GetDesiccantBonus",
+      "effect": "获取干燥剂奖励，通过moistureabsorberuser组件计算。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "组件更新函数，计算湿度率、干燥率、装备率等，更新速率缩放，并应用湿度变化。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新，调用OnUpdate。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存湿度值。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "加载湿度值。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "转移组件到新实体，设置湿度百分比。"
+    }
+  ],
+  "events_published": [
+    "moisturedelta"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [
+    "maxmoisture",
+    "moisture",
+    "moistureratescale"
+  ],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      20700,
+      18572,
+      20704,
+      15922,
+      70462,
+      13268,
+      16598,
+      19952
+    ],
+    "aspects": [
+      {
+        "aspect": "下雨潮湿速率计算",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "天气潮湿速率：下雨导致的潮湿度上升速率"
+          }
+        ]
+      },
+      {
+        "aspect": "干燥剂减湿速率",
+        "evidence": [
+          {
+            "pageid": 70462,
+            "quote": "玩家潮湿速率 -0.5"
+          }
+        ]
+      },
+      {
+        "aspect": "强制干燥效果",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "食用[[蓝带鱼排]]后在效果时间内潮湿度将锁定不变。<!--forcedrysources-->"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度值对理智影响",
+        "evidence": [
+          {
+            "pageid": 13268,
+            "quote": "满潮湿度时会 + {{tooltip|4.4|实为 40/9}} {{理智值}}/分钟"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度百分比阈值",
+        "evidence": [
+          {
+            "pageid": 16598,
+            "quote": "若装备者为[[角色]]且[[潮湿度]]低于 50"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿度触发语音",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "潮湿度达到 20%|{{全角色台词|dst|code=ANNOUNCE_DAMP}}"
+          }
+        ]
+      },
+      {
+        "aspect": "潮湿状态判定条件",
+        "evidence": [
+          {
+            "pageid": 20704,
+            "quote": "当潮湿度 ≥ 40 时，实体潮湿。"
+          }
+        ]
+      },
+      {
+        "aspect": "装备潮湿速率提供",
+        "evidence": [
+          {
+            "pageid": 16598,
+            "quote": "装备潮湿速率"
+          }
+        ]
+      },
+      {
+        "aspect": "装备潮湿速率数值",
+        "evidence": [
+          {
+            "pageid": 16598,
+            "quote": "提供每秒 1 {{潮湿度}}的[[装备潮湿速率]]"
+          }
+        ]
+      },
+      {
+        "aspect": "防水效果影响描述",
+        "evidence": [
+          {
+            "pageid": 20700,
+            "quote": "受[[#防水和防雨|防雨效果]]影响"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "湿度",
+    "潮湿",
+    "干燥",
+    "防水",
+    "温度",
+    "降雨",
+    "装备",
+    "湿滑",
+    "睡眠袋",
+    "强制干燥"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+    "source_bytes": 12473,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088802760
+  }
+}

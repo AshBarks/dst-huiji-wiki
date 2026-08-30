@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pinnable.lua"
+  },
+  "category": "component",
+  "display_name": "pinnable",
+  "summary": "Pinnable组件管理实体被固定（如粘液）的状态，阻止其移动和攻击。该组件通过时间衰减和受击减少来解除固定状态，核心玩法涉及战斗控制，如暂时禁用敌人行动。",
+  "api": [
+    {
+      "name": "SetDefaultWearOffTime",
+      "effect": "设置固定效果的默认持续时间，更新内部wearofftime值。"
+    },
+    {
+      "name": "SpawnShatterFX",
+      "effect": "根据剩余固定时间比例生成对应的破碎视觉特效，作为子实体添加到当前实体。"
+    },
+    {
+      "name": "IsStuck",
+      "effect": "返回布尔值，表示实体当前是否处于固定状态。"
+    },
+    {
+      "name": "IsValidPinTarget",
+      "effect": "检查实体是否可被固定：需满足canbepinned为真、未固定、且超过冷却时间。"
+    },
+    {
+      "name": "StartWearingOff",
+      "effect": "启动或重置固定效果的消失计时器，到时自动解除固定。"
+    },
+    {
+      "name": "Stick",
+      "effect": "将实体固定：停止其大脑、战斗和移动，播放动画符号，并推送'pinned'事件。需满足可固定条件。"
+    },
+    {
+      "name": "UpdateStuckStatus",
+      "effect": "更新固定状态：根据剩余时间调整动画符号，若剩余时间耗尽则解除固定。"
+    },
+    {
+      "name": "RemainingRatio",
+      "effect": "计算固定效果剩余时间的比例，考虑时间流逝和受击扣减。"
+    },
+    {
+      "name": "Unstick",
+      "effect": "解除实体固定：恢复其大脑和行为，清除动画符号，生成破碎特效，并推送'onunpin'事件。"
+    }
+  ],
+  "events_published": [
+    "pinned",
+    "onunpin"
+  ],
+  "events_listened": [
+    "unpinned",
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PINNABLE_WEAR_OFF_TIME",
+    "PINNABLE_ATTACK_WEAR_OFF"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15539,
+      15922,
+      47009,
+      14929,
+      15551,
+      34523,
+      13556
+    ],
+    "aspects": [
+      {
+        "aspect": "坦克龟翻转控制行为",
+        "evidence": [
+          {
+            "pageid": 14929,
+            "quote": "髓棘矛的技能可以将坦克龟翻转，可以很好的控制住坦克龟或打断坦克龟技能。翻转持续 10 秒，期间坦克龟无法"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "固定",
+    "粘液",
+    "pinned",
+    "移动停止",
+    "攻击失效",
+    "特效",
+    "持续时间",
+    "目标",
+    "解除",
+    "状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e1cb87054fce8232224d4a597cdad69ddb056222fe70b4535174ea6dd893bd36",
+    "source_bytes": 4632,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088914126
+  }
+}

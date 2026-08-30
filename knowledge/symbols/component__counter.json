@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/counter.lua"
+  },
+  "category": "component",
+  "display_name": "counter",
+  "summary": "Counter 组件管理实体上的多个命名计数器，每个计数器由字符串标识，提供增减、设置和清除等操作。它支持数据持久化保存，并可标记计数器为临时不保存。该组件常用于跟踪游戏中的各种数值，例如任务进度或资源计数。",
+  "api": [
+    {
+      "name": "GetCount",
+      "effect": "返回指定计数器的当前值，如果计数器不存在则返回0。"
+    },
+    {
+      "name": "Set",
+      "effect": "将指定计数器设置为给定的值。"
+    },
+    {
+      "name": "Clear",
+      "effect": "移除指定计数器，将其值设置为nil。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "对指定计数器应用增量 delta，如果结果为0则移除该计数器。"
+    },
+    {
+      "name": "Increment",
+      "effect": "增加指定计数器，默认增量为1；magnitude 参数可选，指定增量。"
+    },
+    {
+      "name": "Decrement",
+      "effect": "减少指定计数器，默认减量为1；magnitude 参数可选，指定减量。"
+    },
+    {
+      "name": "IncrementToZero",
+      "effect": "如果计数器当前为负值，增加它至零，但增加量不超过 magnitude 或1。"
+    },
+    {
+      "name": "DecrementToZero",
+      "effect": "如果计数器当前为正值，减少它至零，但减少量不超过 magnitude 或1。"
+    },
+    {
+      "name": "DoNotSave",
+      "effect": "标记指定计数器为不保存，用于临时计数器，在保存时排除。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存所有计数器数据，排除标记为不保存的计数器，返回包含计数器数据的表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从给定数据加载计数器，覆盖现有的计数器数据。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回一个字符串，显示所有计数器的名称和值，用于调试信息。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      72392,
+      70482,
+      72393
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本未提及 component__counter 相关的任何能力表达，如 GetCount、Set、Increment 等。所有内容仅描述实体的制作数量、行为绑定和间隔，不涉及计数器组件的操作或语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "命名标识",
+    "调整计数",
+    "设置清除",
+    "数据持久化",
+    "数值跟踪",
+    "游戏计数"
+  ],
+  "search_terms_note": "pass1 后零命中 10/10,已二次修正(修正后 6/6)",
+  "gameplay_tags": [
+    "生存",
+    "任务"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f1929b4264795f6416f6c9c368a21df157a2bd47f0618f8eb0712674194042b8",
+    "source_bytes": 2578,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088077083
+  }
+}

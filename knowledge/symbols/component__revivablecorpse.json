@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/revivablecorpse.lua"
+  },
+  "category": "component",
+  "display_name": "revivablecorpse",
+  "summary": "该组件管理可复活尸体的状态数据，包括复活速度乘数、复活健康百分比和复活条件判断。它参与饥荒联机版的核心玩法，允许玩家在死亡后变为尸体，由其他玩家复活，从而实现团队合作与生存延续。",
+  "api": [
+    {
+      "name": "SetCanBeRevivedByFn",
+      "effect": "设置一个自定义函数用于判断实体是否可以被指定复活者复活。该函数在CanBeRevivedBy中调用，仅影响复活条件逻辑。"
+    },
+    {
+      "name": "CanBeRevivedBy",
+      "effect": "检查实体是否可以被给定的复活者复活。返回true如果实体有'corpse'标签且自定义函数（如果存在）返回true。用于客户端或服务器端判断复活可行性。"
+    },
+    {
+      "name": "SetReviveSpeedMult",
+      "effect": "仅在服务器端设置基础复活速度乘数，影响复活过程的速度。参数mult为乘数值。"
+    },
+    {
+      "name": "SetReviveSpeedMultForTag",
+      "effect": "仅在服务器端设置针对特定标签的复活速度乘数。参数tag为标签名，mult为乘数值；如果mult为nil或1，则移除该标签的乘数设置。影响GetReviveSpeedMult的计算。"
+    },
+    {
+      "name": "GetReviveSpeedMult",
+      "effect": "仅在服务器端获取复活速度乘数。返回基础乘数乘以所有复活者拥有的标签对应的乘数，用于实际复活速度计算。"
+    },
+    {
+      "name": "SetCorpse",
+      "effect": "仅在服务器端设置或移除实体的'corpse'标签。参数corpse为布尔值，true时添加标签，false时移除标签。影响CanBeRevivedBy和其他基于标签的逻辑。"
+    },
+    {
+      "name": "Revive",
+      "effect": "仅在服务器端执行复活操作，推送'respawnfromcorpse'事件，事件数据包含复活者信息。触发后续复活处理逻辑。"
+    },
+    {
+      "name": "SetReviveHealthPercent",
+      "effect": "仅在服务器端设置复活后健康百分比。参数percent为百分比值，影响复活时的初始健康状态。"
+    },
+    {
+      "name": "GetReviveHealthPercent",
+      "effect": "仅在服务器端获取复活后健康百分比。返回当前设置的百分比值，用于复活时的健康计算。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "respawnfromcorpse"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65737,
+      52138,
+      18410,
+      13406,
+      13700,
+      18357,
+      65456
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及与组件 revivablecorpse 相关的能力表达，如尸体复活速度、复活生命值、可复活状态设置等；内容主要围绕尸体存在、变异机制、世界规则及其他无关游戏系统。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "复活",
+    "尸体",
+    "死亡",
+    "健康",
+    "速度",
+    "标签",
+    "乘数",
+    "函数",
+    "事件",
+    "合作"
+  ],
+  "gameplay_tags": [
+    "死亡",
+    "复活",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d641ca2a89fa38bcb1a53c480b454e54ef221e47999bd32fea38c20924b1376a",
+    "source_bytes": 2483,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089888860
+  }
+}

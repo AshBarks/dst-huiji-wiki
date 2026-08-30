@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/areaaware.lua"
+  },
+  "category": "component",
+  "display_name": "areaaware",
+  "summary": "areaaware组件负责监控实体在游戏世界中的位置，跟踪其所在区域的变化，并发布相关事件。它管理当前区域的索引和详细数据（如区域ID、类型、中心点、多边形和标签），同时支持监控特定地砖类型的进入和离开，用于触发与区域或地砖相关的玩法逻辑。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，停止位置更新任务并移除对'done_embark_movement'事件的监听，以清理资源。"
+    },
+    {
+      "name": "UpdatePosition",
+      "effect": "根据给定坐标（x, y, z）更新实体位置。检查区域索引变化，若变化则更新current_area和current_area_data，并发布'changearea'事件传递区域数据。若watch_tiles非空，还会检测地砖类型变化，发布动态事件（如'on_sometile_tile'）通知进入或离开特定地砖。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定期被系统调用，获取实体当前位置，若与上次位置的距离平方超过updatedistsq阈值，则调用UpdatePosition更新，并记录新位置。"
+    },
+    {
+      "name": "SetUpdateDist",
+      "effect": "设置更新距离阈值（dist），内部转换为平方值（dist*dist）存储在updatedistsq中，用于控制位置更新的频率。"
+    },
+    {
+      "name": "GetCurrentArea",
+      "effect": "返回当前区域数据（current_area_data），这是一个表包含id、type、center、poly、tags字段，若未在有效区域内则返回nil。"
+    },
+    {
+      "name": "CurrentlyInTag",
+      "effect": "检查当前区域数据中是否包含指定标签（tag），返回布尔值。若当前区域数据为nil或无标签，则返回false。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前区域的ID、类型、索引和标签信息。若无有效节点，则输出当前坐标信息。"
+    },
+    {
+      "name": "StartCheckingPosition",
+      "effect": "启动一个定期任务（周期为checkinterval或默认checkinterval），周期调用UpdatePosition以更新位置。"
+    },
+    {
+      "name": "StartWatchingTile",
+      "effect": "开始监控指定地砖类型（tile_id）的变化。初始化watch_tiles表（若不存在）并设置该地砖为未进入状态，后续位置更新时将检测该地砖的进入和离开事件。"
+    },
+    {
+      "name": "StopWatchingTile",
+      "effect": "停止监控指定地砖类型（tile_id），从watch_tiles表中移除该条目。若watch_tiles变为空表，则置为nil。"
+    }
+  ],
+  "events_published": [
+    "changearea"
+  ],
+  "events_listened": [
+    "done_embark_movement"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      51221,
+      10419,
+      34794,
+      18838,
+      70864,
+      18509,
+      72353,
+      10379
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录集中于游戏玩法、物品描述和角色特性，未提及或暗示areaaware组件的代码能力如位置更新、区域检测、监视行为等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "区域检测",
+    "位置监控",
+    "地砖变化",
+    "事件触发",
+    "生存玩法",
+    "探索",
+    "环境感知",
+    "组件管理"
+  ],
+  "search_terms_note": "pass1 后零命中 6/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "生存",
+    "探索",
+    "环境交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bd03826b733e4b35b9314bd3c5193107eb6b1c7a2d5641ec09033480a6db2683",
+    "source_bytes": 3739,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089621579
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sanity.lua"
+  },
+  "category": "component",
+  "display_name": "sanity",
+  "summary": "理智组件管理角色的理智值（sanity）和狂乱值（lunacy），控制角色处于清醒、疯狂或启迪状态。它根据环境光照、光环效果、装备和时间计算理智变化率，并触发状态变化事件。核心玩法涉及理智值的维持与管理，影响角色的生存和战斗能力。",
+  "api": [
+    {
+      "name": "IsSane",
+      "effect": "根据当前理智模式和诱导状态，返回角色是否处于清醒状态。"
+    },
+    {
+      "name": "IsInsane",
+      "effect": "在疯狂模式下，返回角色是否处于疯狂状态（未清醒且无诱导狂乱）。"
+    },
+    {
+      "name": "IsEnlightened",
+      "effect": "在启迪模式下，返回角色是否处于启迪状态（未清醒且无诱导疯狂）。"
+    },
+    {
+      "name": "IsCrazy",
+      "effect": "已弃用，等同于 IsInsane 方法。"
+    },
+    {
+      "name": "SetSanityMode",
+      "effect": "已弃用，用于设置理智模式。"
+    },
+    {
+      "name": "IsInsanityMode",
+      "effect": "返回当前理智模式是否为疯狂模式。"
+    },
+    {
+      "name": "IsLunacyMode",
+      "effect": "返回当前理智模式是否为启迪模式。"
+    },
+    {
+      "name": "GetSanityMode",
+      "effect": "返回当前理智模式值。"
+    },
+    {
+      "name": "UpdateMode_Internal",
+      "effect": "内部方法，根据狂乱源更新理智模式，并推送模式变化事件。"
+    },
+    {
+      "name": "EnableLunacy",
+      "effect": "设置是否启用启迪模式，通过源修改器管理，并更新模式。"
+    },
+    {
+      "name": "AddSanityPenalty",
+      "effect": "添加理智惩罚，通过键值对管理，重新计算总惩罚。"
+    },
+    {
+      "name": "RemoveSanityPenalty",
+      "effect": "移除指定键的理智惩罚，并重新计算总惩罚。"
+    },
+    {
+      "name": "RecalculatePenalty",
+      "effect": "重新计算总理智惩罚，上限为最大理智值的95%（最小理智为5）。"
+    },
+    {
+      "name": "AddSanityAuraImmunity",
+      "effect": "添加对特定标签光环的免疫，通过源修改器管理。"
+    },
+    {
+      "name": "RemoveSanityAuraImmunity",
+      "effect": "移除对特定标签光环的免疫。"
+    },
+    {
+      "name": "SetFullAuraImmunity",
+      "effect": "设置是否完全免疫所有光环效果。"
+    },
+    {
+      "name": "SetNegativeAuraImmunity",
+      "effect": "设置是否免疫所有负面光环效果。"
+    },
+    {
+      "name": "SetPlayerGhostImmunity",
+      "effect": "设置是否免疫玩家幽灵的理智消耗。"
+    },
+    {
+      "name": "SetLightDrainImmune",
+      "effect": "设置是否免疫光照对理智的消耗。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存当前理智值、清醒状态和模式到数据表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据表加载理智值、清醒状态和模式。"
+    },
+    {
+      "name": "GetPenaltyPercent",
+      "effect": "返回当前理智惩罚百分比。"
+    },
+    {
+      "name": "GetRealPercent",
+      "effect": "返回当前理智值占最大理智值的真实百分比。"
+    },
+    {
+      "name": "GetPercent",
+      "effect": "返回理智百分比，考虑诱导状态（诱导疯狂时为0，诱导狂乱时为1减惩罚）。"
+    },
+    {
+      "name": "GetPercentWithPenalty",
+      "effect": "返回考虑惩罚后的理智百分比。"
+    },
+    {
+      "name": "SetPercent",
+      "effect": "设置理智值为指定百分比，并可选择是否随时间变化。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前理智值、最大值、变化率、惩罚和模式。"
+    },
+    {
+      "name": "SetMax",
+      "effect": "设置最大理智值，并将当前理智值设为相同值。"
+    },
+    {
+      "name": "SetCurrent",
+      "effect": "设置当前理智值。"
+    },
+    {
+      "name": "GetMaxWithPenalty",
+      "effect": "返回考虑惩罚后的最大理智值。"
+    },
+    {
+      "name": "GetRateScale",
+      "effect": "返回当前理智变化率的缩放级别。"
+    },
+    {
+      "name": "SetInducedInsanity",
+      "effect": "设置诱导疯狂状态，通过源管理，并推送诱导疯狂事件。"
+    },
+    {
+      "name": "SetInducedLunacy",
+      "effect": "设置诱导狂乱状态，通过源管理，并推送诱导狂乱事件。"
+    },
+    {
+      "name": "DoDelta",
+      "effect": "应用理智值变化，可选择是否随时间变化；计算状态变化并推送相关事件。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "内部更新方法，每帧调用，重新计算理智变化率并应用变化。"
+    },
+    {
+      "name": "RecalcGhostDrain",
+      "effect": "重新计算幽灵对理智的消耗倍率。"
+    },
+    {
+      "name": "GetAuraMultipliers",
+      "effect": "返回光环效果的乘数，结合负面光环乘数和修饰符。"
+    },
+    {
+      "name": "Recalc",
+      "effect": "内部重新计算方法，综合装备、湿度、光照、光环和幽灵消耗计算理智变化率。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将理智组件转移到新实例，并设置相同的理智百分比。"
+    },
+    {
+      "name": "LongUpdate",
+      "effect": "长时间更新方法，等同于 OnUpdate。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "sanitydelta",
+    "gosane",
+    "goinsane",
+    "goenlightened",
+    "sanitymodechanged",
+    "inducedinsanity",
+    "inducedlunacy"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SANITY_BECOME_INSANE_THRESH",
+    "TUNING.SANITY_BECOME_SANE_THRESH",
+    "TUNING.SANITY_BECOME_ENLIGHTENED_THRESH",
+    "TUNING.SANITY_LOSE_ENLIGHTENMENT_THRESH",
+    "TUNING.SANITY_DAY_GAIN",
+    "TUNING.SANITY_NIGHT_LIGHT",
+    "TUNING.SANITY_NIGHT_MID",
+    "TUNING.SANITY_NIGHT_DARK",
+    "TUNING.SANITY_LUNACY_DAY_GAIN",
+    "TUNING.SANITY_LUNACY_NIGHT_LIGHT",
+    "TUNING.SANITY_LUNACY_NIGHT_MID",
+    "TUNING.SANITY_LUNACY_NIGHT_DARK",
+    "TUNING.MOISTURE_SANITY_PENALTY_MAX",
+    "TUNING.SANITY_HIGH_LIGHT",
+    "TUNING.SANITY_LOW_LIGHT",
+    "TUNING.SANITY_GHOST_PLAYER_DRAIN",
+    "TUNING.MAX_SANITY_GHOST_PLAYER_DRAIN_MULT",
+    "TUNING.SANITY_DAPPERNESS",
+    "TUNING.SANITY_AURA_SEACH_RANGE"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      13437,
+      15245,
+      15022,
+      18234,
+      13156,
+      10374,
+      16419
+    ],
+    "aspects": [
+      {
+        "aspect": "书籍阅读消耗理智值",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "每次阅读消耗 33.4% 的耐久，消耗 50{{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "启蒙值光环效果描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "理智光环 = 100{{启蒙值}}/分钟<br>战斗时：400{{启蒙值}}/分钟"
+          }
+        ]
+      },
+      {
+        "aspect": "外部实体影响理智值",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "部分[[物品]]，具有[[理智光环]]的生物、建筑，潮湿状态等因素会影响理智值。"
+          }
+        ]
+      },
+      {
+        "aspect": "技能基于理智值触发效果",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "伯尼在薇洛的[[理智值]]低于 30% 时就会变为伯尼！"
+          }
+        ]
+      },
+      {
+        "aspect": "技能增强理智光环回复",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "讲故事时的理智光环的基础回复效果提升至 25{{理智值}}/分钟"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击行为增加启蒙值",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "击中目标提高 10 点[[启蒙值]]"
+          }
+        ]
+      },
+      {
+        "aspect": "火源恢复理智值效果",
+        "evidence": [
+          {
+            "pageid": 10374,
+            "quote": "薇洛靠近火时会逐渐恢复理智。火越大，恢复理智的速度就越快。"
+          }
+        ]
+      },
+      {
+        "aspect": "特定角色阅读书籍恢复理智值",
+        "evidence": [
+          {
+            "pageid": 18234,
+            "quote": "由[[沃特]]阅读时，只会恢复50{{理智值}}"
+          }
+        ]
+      },
+      {
+        "aspect": "环境因素导致理智值下降",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "在[[黄昏]]、[[夜晚]]、[[洞穴]]、[[黑暗]]、有[[玩家鬼魂]]的环境中，理智值会下降。"
+          }
+        ]
+      },
+      {
+        "aspect": "理智值功能描述",
+        "evidence": [
+          {
+            "pageid": 15245,
+            "quote": "理智值代表着角色的精神健康，以一个大脑作为图标{{理智值}}，显示在屏幕右上角"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板增加理智值上限",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "每激活一个，增加 40{{理智值}}上限。"
+          }
+        ]
+      },
+      {
+        "aspect": "电路板提供理智光环",
+        "evidence": [
+          {
+            "pageid": 16419,
+            "quote": "激活一个时，产生 +4.44{{理智值}}/分钟的[[理智光环]]"
+          }
+        ]
+      },
+      {
+        "aspect": "装备减少理智值扣除",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "装备松树先锋队帽子时因受伤而扣除的理智值降低至25%"
+          }
+        ]
+      },
+      {
+        "aspect": "角色理智值下降倍率",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "对于[[疯狂光环]]：沃尔夫冈基础掉理智倍率为 1.1 倍"
+          }
+        ]
+      },
+      {
+        "aspect": "角色理智值初始设定",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "|理智值 = 200"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "理智",
+    "狂乱",
+    "启迪",
+    "状态",
+    "光环",
+    "免疫",
+    "时间",
+    "光照",
+    "装备"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "70302ca4dea6a57692b41375f46d28bd75bcf0f900a859fe97370d8dff544494",
+    "source_bytes": 21467,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089060620
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/skinner.lua"
+  },
+  "category": "component",
+  "display_name": "skinner",
+  "summary": "该组件管理实体的皮肤、服装和外观模式数据。它负责根据皮肤名称、服装组合及特殊状态（如猴之诅咒）来更新实体的动画状态机，实现外观的显示与切换。其核心玩法围绕玩家角色的个性化装饰展开。",
+  "api": [
+    {
+      "name": "SetSkinMode",
+      "effect": "设置实体的皮肤模式（如正常、幽灵、狼人形态等），并调用内部函数应用对应的外观到动画状态机。会触发外观更新。"
+    },
+    {
+      "name": "SetSkinName",
+      "effect": "设置实体的基准皮肤名称，并从皮肤预制体数据中加载所有皮肤模式的构建信息。若存在匹配的胡须皮肤，会同步设置。设置完成后默认会调用 SetSkinMode 应用外观。"
+    },
+    {
+      "name": "SetClothing",
+      "effect": "为实体装备指定的有效服装物品。会触发“unequipskinneditem”事件（如果旧服装存在）和“equipskinneditem”事件，并尝试解锁成就“equip_skin_clothing”。设置后会更新外观模式。"
+    },
+    {
+      "name": "GetClothing",
+      "effect": "返回一个包含实体当前基准皮肤和各槽位服装名称的表。"
+    },
+    {
+      "name": "GetSkinMode",
+      "effect": "返回实体当前的皮肤模式字符串。"
+    },
+    {
+      "name": "HideAllClothing",
+      "effect": "根据传入的动画状态机，清除所有已装备服装的符号覆盖，但不修改组件内部的服装数据。"
+    },
+    {
+      "name": "ClearAllClothing",
+      "effect": "移除实体所有槽位的服装，并重新应用外观模式。"
+    },
+    {
+      "name": "ClearClothing",
+      "effect": "移除指定槽位的服装，并重新应用外观模式。"
+    },
+    {
+      "name": "SetMonkeyCurse",
+      "effect": "设置猴之诅咒等级，用于应用猴化的外观（如猴爪、猴尾）。设置后会重新应用外观模式。"
+    },
+    {
+      "name": "GetMonkeyCurse",
+      "effect": "返回实体当前的猴之诅咒等级。"
+    },
+    {
+      "name": "ClearMonkeyCurse",
+      "effect": "清除实体的猴之诅咒状态，并重新应用外观模式。"
+    },
+    {
+      "name": "SetupNonPlayerData",
+      "effect": "将实体设置为非玩家数据（皮肤名设为“NON_PLAYER”），并应用“NO_BASE”皮肤模式，通常用于移除或禁用皮肤系统。"
+    },
+    {
+      "name": "CopySkinsFromPlayer",
+      "effect": "从指定玩家实体复制完整的皮肤数据（包括基准皮肤、服装、猴之诅咒和皮肤模式）到当前实体，并更新外观。同时保存被复制玩家的ID和预制体信息。"
+    },
+    {
+      "name": "SwapCopiedPlayerSkins",
+      "effect": "在两个持有已复制玩家数据的实体之间交换完整的皮肤数据，用于实现类似“变身”或外观互换的功能。"
+    },
+    {
+      "name": "GetCopiedPlayerData",
+      "effect": "返回通过 CopySkinsFromPlayer 方法保存的被复制玩家的预制体和用户ID数据。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "序列化组件的皮肤名称、服装、猴之诅咒、皮肤模式和已复制玩家数据，用于存档。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从存档数据中恢复皮肤名称、服装、猴之诅咒和已复制玩家数据。会校验玩家所有权（如非游戏进行中或拥有该物品），若无效则重置为默认皮肤。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [
+    "unequipskinneditem",
+    "equipskinneditem"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      18057,
+      15526,
+      13493,
+      70704,
+      18075,
+      15011,
+      13268
+    ],
+    "aspects": [
+      {
+        "aspect": "扫把外观更换功能",
+        "evidence": [
+          {
+            "pageid": 18075,
+            "quote": "如果玩家之前更换了一个实体的外观，对另一个相同种类的实体使用，会将其外观更换为当前清洁扫把最近一次对此类…"
+          }
+        ]
+      },
+      {
+        "aspect": "牛皮肤更换功能",
+        "evidence": [
+          {
+            "pageid": 15526,
+            "quote": "皮弗娄牛美妆台可以用于给[[皮弗娄牛]]更换[[皮肤]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "皮肤",
+    "服装",
+    "外观",
+    "换装",
+    "外观切换",
+    "服装搭配",
+    "特殊外观",
+    "动画更新",
+    "装饰"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/9)",
+  "gameplay_tags": [
+    "装饰",
+    "角色"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "92c53ec61f4a3783d299160853a55102e6b9faa3c4c894afcf73e7700ff77515",
+    "source_bytes": 28265,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087105548
+  }
+}

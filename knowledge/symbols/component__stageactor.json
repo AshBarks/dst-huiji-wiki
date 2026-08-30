@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/stageactor.lua"
+  },
+  "category": "component",
+  "display_name": "stageactor",
+  "summary": "StageActor 组件管理实体的舞台表演能力，允许它们讲述故事或独白，影响附近听众。它跟踪之前表演过的剧目以避免重复，并在故事结束时触发事件。组件通过 talker 组件进行语音输出，并在特定距离内检测舞台监听器。",
+  "api": [
+    {
+      "name": "performedplay",
+      "effect": "将剧目 ID 记录到 previous_acts 表中，用于后续避免重复表演。"
+    },
+    {
+      "name": "performplay",
+      "effect": "从 STRINGS.STAGEACTOR 中选择一个随机剧目，考虑之前表演过的剧目以避免重复，返回故事数据结构（包含 style、id、lines）。"
+    },
+    {
+      "name": "SetOnStoryBeginFn",
+      "effect": "设置故事开始时的回调函数，用于自定义开始逻辑。"
+    },
+    {
+      "name": "SetOnStoryOverFn",
+      "effect": "设置故事结束时的回调函数，用于自定义结束逻辑。"
+    },
+    {
+      "name": "IsTellingStory",
+      "effect": "返回布尔值，表示当前实体是否正在讲故事。"
+    },
+    {
+      "name": "AbortStory",
+      "effect": "中止当前故事，调用 OnDone 清理资源，并使用 talker 组件显示中止原因或关闭语音。"
+    },
+    {
+      "name": "OnDone",
+      "effect": "完成故事讲述，移除事件监听、取消周期任务、调用 onstoryoverfn 回调，并清空 story 数据。"
+    },
+    {
+      "name": "OnStoryTick",
+      "effect": "在故事 tick 时调用 story 中的 ontickfn 回调，用于周期性更新。"
+    },
+    {
+      "name": "TellStory",
+      "effect": "开始讲述故事，设置 story 数据，准备台词并通过 talker 组件输出，监听事件触发 play_performed，调用开始回调。"
+    },
+    {
+      "name": "SetStage",
+      "effect": "设置 stage 属性，用于关联舞台位置。"
+    },
+    {
+      "name": "GetStage",
+      "effect": "返回 stage 属性，获取当前舞台位置。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "返回保存的数据，包括 previous_acts 表。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从数据加载 previous_acts 表，恢复之前表演的剧目记录。"
+    },
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "组件从实体移除时，移除 stageactor 标签。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [
+    "donetalking",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      16174,
+      34792,
+      13409,
+      70534,
+      13437,
+      34793,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "剧本放置与剧目选择",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "所放置的剧本决定了舞台上能够演出的特殊剧目"
+          }
+        ]
+      },
+      {
+        "aspect": "表演中断描述",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "表演中断"
+          }
+        ]
+      },
+      {
+        "aspect": "表演时嘲鸫出现",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "在表演剧目时出现在舞台上方"
+          }
+        ]
+      },
+      {
+        "aspect": "表演时间限制",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "舞台幕布落下，在 3~6 天内无法再次进行"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "舞台",
+    "故事",
+    "独白",
+    "表演",
+    "剧情",
+    "对话",
+    "剧目",
+    "讲述",
+    "中止",
+    "tick"
+  ],
+  "gameplay_tags": [
+    "剧情",
+    "对话",
+    "表演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "18f4784713c3d9bff3f4b1a31894031b285169aec46762035ae16b351fb779be",
+    "source_bytes": 4574,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788088446357
+  }
+}

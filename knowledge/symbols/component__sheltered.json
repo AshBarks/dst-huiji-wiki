@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/sheltered.lua"
+  },
+  "category": "component",
+  "display_name": "sheltered",
+  "summary": "该组件管理实体是否处于庇护状态，包括在树冠下或靠近庇护物。它维护庇护等级、冷却时间等数据，核心玩法是提供避雨或避暑的庇护，影响实体在天气变化时的行为，如宣布庇护状态。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "当组件从实体移除时调用，设置庇护状态为 false 并停止更新，确保实体不再被标记为庇护。"
+    },
+    {
+      "name": "Start",
+      "effect": "启动组件更新，调整冷却时间并开始定期检查庇护状态。如果之前停止过，会恢复更新周期。"
+    },
+    {
+      "name": "Stop",
+      "effect": "停止组件更新，设置停止时间并强制设置庇护状态为 false，使实体暂时不受庇护保护。"
+    },
+    {
+      "name": "SetSheltered",
+      "effect": "设置庇护状态，如果实体被骑乘且庇护等级低于2，则强制未庇护。通过网络副本同步状态，推送 'sheltered' 事件，并可能通过 talker 组件宣布庇护状态，受冷却时间和天气条件限制。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "定期更新函数，检查实体是否在树冠下（通过 canopytrees 变量）或附近有庇护物（半径2单位内），然后调用 SetSheltered 更新状态。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示组件启动/停止状态及庇护状态，用于开发调试。"
+    }
+  ],
+  "events_published": [
+    "sheltered"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WATERPROOFNESS_SMALLMED",
+    "TUNING.TOTAL_DAY_TIME",
+    "TUNING.OVERHEAT_TEMP"
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13701,
+      51097,
+      15922,
+      45173,
+      15022,
+      16197,
+      14813,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及代码能力/行为语义清单中的任何能力（OnRemoveFromEntity, Start, Stop, SetSheltered, OnUpdate, GetDebugString）的玩家语言表达；页面内容主要描述实体行为、掉落、机制等，未涉及这些组件能力的讨论。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "庇护",
+    "避雨",
+    "树冠",
+    "遮阳",
+    "天气",
+    "舒适",
+    "冷却",
+    "shelter",
+    "canopy",
+    "rain"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7a050b2d7439bf3a3f9e84c543b2aee74d4c6c4d7f9617d0ee86fa87cbc46bac",
+    "source_bytes": 3036,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089042528
+  }
+}

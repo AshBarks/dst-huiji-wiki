@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/pointofinterest.lua"
+  },
+  "category": "component",
+  "display_name": "pointofinterest",
+  "summary": "兴趣点组件管理实体在游戏世界中的视觉指示器（如底座和标记）和HUD提示，根据玩家距离和条件控制显示与隐藏。它处理指示器的创建、动画效果（如脉冲和环）以及移除，帮助玩家导航和发现游戏中的重要地点。",
+  "api": [
+    {
+      "name": "TryStartUpdating",
+      "effect": "检查实体是否在剪贴簿中且等级低于2，若满足则设置内部更新标志并启动组件更新，用于管理指示器的生命周期。"
+    },
+    {
+      "name": "SetShouldShowFn",
+      "effect": "设置一个函数用于控制指示器是否显示，该函数在每次更新时被调用以决定显示条件；无其他副作用。"
+    },
+    {
+      "name": "SetHeight",
+      "effect": "设置指示器在世界中的高度偏移值，影响标记跟随的位置；无其他副作用。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时调用，移除所有指示器并停止更新，清理视觉元素。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时调用，尝试重新启动更新过程，可能重新创建指示器。"
+    },
+    {
+      "name": "RemoveHudIndicator",
+      "effect": "如果HUD指示器正在显示，则从玩家HUD中移除目标指示器，使HUD提示消失。"
+    },
+    {
+      "name": "CreateWorldIndicator",
+      "effect": "在实体上创建世界视觉指示器（底座和标记子实体），若未创建且未在移除状态中；将标记设置为跟随底座指定位置。"
+    },
+    {
+      "name": "TriggerPulse",
+      "effect": "触发脉冲动画效果，播放声音并将标记动画切换为“dark”，启动移除脉冲过程；影响视觉和声音反馈。"
+    },
+    {
+      "name": "TriggerRemove",
+      "effect": "移除HUD指示器并触发脉冲效果，结合两个操作以处理指示器的移除动画。"
+    },
+    {
+      "name": "RemoveEverything",
+      "effect": "停止组件更新，移除所有子实体（如环、标记、底座），彻底清理指示器相关视觉元素。"
+    },
+    {
+      "name": "ShouldShowHudIndicator",
+      "effect": "根据距离平方检查是否在HUD指示器显示范围内，返回布尔值；纯检查，无副作用。"
+    },
+    {
+      "name": "UpdateRing",
+      "effect": "更新环实体的缩放和透明度动画，若缩放超过阈值则移除该环；影响环的视觉状态。"
+    },
+    {
+      "name": "UpdateRemovePulse",
+      "effect": "更新移除脉冲动画，逐步调整标记和环的缩放与透明度，最终触发完全移除；管理复杂的动画序列。"
+    },
+    {
+      "name": "OnUpdate",
+      "effect": "主更新函数，根据条件创建或移除世界指示器，更新HUD提示，并处理移除脉冲动画；综合管理所有指示器的显示逻辑。"
+    },
+    {
+      "name": "OnRemoveEntity",
+      "effect": "实体移除时调用，移除HUD指示器并清理所有世界指示器，确保完全移除组件痕迹。"
+    },
+    {
+      "name": "DebugForceShowIndicator",
+      "effect": "调试用方法，强制创建世界指示器并启动更新，绕过正常条件检查以方便测试。"
+    }
+  ],
+  "api_note": "",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      52788,
+      70756,
+      15896,
+      51489,
+      20714,
+      24030,
+      47057,
+      21421
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中主要讨论兴趣点布景的生成机制、调试命令、实体信息和其他游戏内容，未涉及代码能力清单中的任何能力表达，如TryStartUpdating、OnEntitySleep等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "兴趣点",
+    "指示器",
+    "POI",
+    "地图标记",
+    "HUD",
+    "显示",
+    "隐藏",
+    "脉冲效果",
+    "环动画",
+    "视觉反馈"
+  ],
+  "gameplay_tags": [
+    "导航",
+    "探索",
+    "UI提示"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+    "source_bytes": 7916,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089523002
+  }
+}

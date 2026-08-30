@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/acidinfusible.lua"
+  },
+  "category": "component",
+  "display_name": "acidinfusible",
+  "summary": "该组件管理实体在酸雨环境下的状态变化。当世界处于酸雨且实体没有雨免疫时，实体被'注入'，从而应用伤害、受伤和速度乘数，并触发烟雾特效。组件通过监听世界状态和实体事件动态更新注入状态。",
+  "api": [
+    {
+      "name": "OnRemoveFromEntity",
+      "effect": "移除组件时清理监听的世界状态和实体事件，并取消初始化任务。"
+    },
+    {
+      "name": "SetDamageMultiplier",
+      "effect": "设置酸雨注入时的伤害乘数。如果当前已注入且实体有combat组件，立即更新外部伤害乘数。"
+    },
+    {
+      "name": "SetDamageTakenMultiplier",
+      "effect": "设置酸雨注入时的受伤乘数。如果当前已注入且实体有combat组件，立即更新外部受伤乘数。"
+    },
+    {
+      "name": "SetSpeedMultiplier",
+      "effect": "设置酸雨注入时的速度乘数。如果当前已注入且实体有locomotor组件，立即更新外部速度乘数。"
+    },
+    {
+      "name": "SetMultipliers",
+      "effect": "批量设置伤害、受伤和速度乘数。参数为表，包含DAMAGE、DAMAGE_TAKEN和SPEED键，对应调用SetDamageMultiplier、SetDamageTakenMultiplier和SetSpeedMultiplier。"
+    },
+    {
+      "name": "SetOnInfuseFn",
+      "effect": "设置实体被注入时的回调函数。在OnInfuse方法中调用。"
+    },
+    {
+      "name": "SetOnUninfuseFn",
+      "effect": "设置实体移除注入时的回调函数。在OnUninfuse方法中调用。"
+    },
+    {
+      "name": "SetUseRainImmunity",
+      "effect": "设置是否考虑雨免疫状态。如果值改变，立即重新评估注入状态。"
+    },
+    {
+      "name": "SetFXLevel",
+      "effect": "设置烟雾特效的等级。如果特效已存在，则更新其等级。"
+    },
+    {
+      "name": "IsInfused",
+      "effect": "返回布尔值，表示实体当前是否处于酸雨注入状态。"
+    },
+    {
+      "name": "OnInfuse",
+      "effect": "当实体被注入时调用。应用速度、伤害和受伤乘数到locomotor和combat组件，并生成烟雾特效。如果有设置回调函数，则执行它。"
+    },
+    {
+      "name": "OnUninfuse",
+      "effect": "当实体移除注入时调用。移除速度、伤害和受伤乘数的修改，并移除烟雾特效。如果有设置回调函数，则执行它。"
+    },
+    {
+      "name": "OnInfusedDirty",
+      "effect": "根据酸雨状态和雨免疫情况，更新注入状态。如果酸雨且没有免疫，则调用OnInfuse；否则调用OnUninfuse。"
+    },
+    {
+      "name": "SpawnFX",
+      "effect": "生成烟雾特效作为实体的子实体，并设置其等级。如果已有特效，则先移除。"
+    },
+    {
+      "name": "KillFX",
+      "effect": "移除烟雾特效。如果特效存在且有效，则延迟移除以完成动画。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回调试字符串，显示当前注入状态（true或false）。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "isacidraining",
+    "gainrainimmunity",
+    "loserainimmunity"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      13409,
+      18410,
+      13406,
+      18357,
+      15022,
+      22418,
+      14938
+    ],
+    "aspects": [
+      {
+        "aspect": "酸雨对生物体型的改变",
+        "evidence": [
+          {
+            "pageid": 22418,
+            "quote": "在淋酸雨一段时间后都会瞬间变回最小尺寸，即 0.75 倍的体型、56.25 点伤害、2250 点生命值"
+          }
+        ]
+      },
+      {
+        "aspect": "酸雨对生物视觉效果的添加",
+        "evidence": [
+          {
+            "pageid": 22418,
+            "quote": "冒出黄色的烟雾效果以表示它们受到了酸雨的影响"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "酸雨",
+    "注入",
+    "伤害乘数",
+    "速度",
+    "免疫",
+    "烟雾",
+    "战斗",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
+    "source_bytes": 7187,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788089544539
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p4",
+  "reference": {
+    "kind": "component",
+    "path": "components/debuffable.lua"
+  },
+  "category": "component",
+  "display_name": "debuffable",
+  "summary": "debuffable组件管理实体的减益效果列表，通过添加和移除debuff实体来影响游戏状态。它支持debuff的附着、跟随符号设置、以及保存加载功能，核心参与战斗和生存玩法中的状态效果管理。",
+  "api": [
+    {
+      "name": "IsEnabled",
+      "effect": "返回组件当前是否启用。无副作用。"
+    },
+    {
+      "name": "Enable",
+      "effect": "设置组件启用状态。禁用时，会移除所有当前debuffs。有副作用：改变启用状态并可能移除debuffs。"
+    },
+    {
+      "name": "RemoveOnDespawn",
+      "effect": "移除所有不保留的debuffs（基于debuff组件的keepondespawn属性）。副作用：移除特定debuffs。"
+    },
+    {
+      "name": "SetFollowSymbol",
+      "effect": "设置debuff跟随的符号和偏移向量。副作用：更新所有现有debuffs的跟随设置。"
+    },
+    {
+      "name": "HasDebuff",
+      "effect": "检查是否有指定名称的debuff。无副作用。"
+    },
+    {
+      "name": "GetDebuff",
+      "effect": "获取指定名称的debuff实体实例。无副作用。"
+    },
+    {
+      "name": "AddDebuff",
+      "effect": "添加指定名称的debuff。如果debuff已存在，则扩展其数据；否则生成新debuff实体。副作用：生成或扩展debuff实体，触发ondebuffadded回调。"
+    },
+    {
+      "name": "RemoveDebuff",
+      "effect": "移除指定名称的debuff。副作用：移除debuff实体，触发ondebuffremoved回调，并可能调用debuff组件的OnDetach方法。"
+    },
+    {
+      "name": "OnSave",
+      "effect": "保存所有debuffs的数据用于持久化。无副作用。"
+    },
+    {
+      "name": "OnLoad",
+      "effect": "从保存数据中加载debuffs。副作用：生成debuff实体并注册。"
+    },
+    {
+      "name": "TransferComponent",
+      "effect": "将组件数据转移到另一个实例的新组件。副作用：复制debuffs到目标实例的debuffable组件。"
+    },
+    {
+      "name": "GetDebugString",
+      "effect": "返回包含debuff数量和名称的调试字符串。无副作用。"
+    }
+  ],
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      10418,
+      15327,
+      72393,
+      72830,
+      15186,
+      15539,
+      16278
+    ],
+    "aspects": [
+      {
+        "aspect": "减益效果公告",
+        "evidence": [
+          {
+            "pageid": 72830,
+            "quote": "感到灼烧1|{{全角色台词|dst|code=ANNOUNCE_MITEGLAND_DEBUFF.1|首选=WALTER}}"
+          }
+        ]
+      },
+      {
+        "aspect": "减益效果施加",
+        "evidence": [
+          {
+            "pageid": 15539,
+            "quote": "冰冻弹药（{{en|Freeze Rounds}}）命中目标不会造成伤害，但可以施加 2 层[[冰冻]]效果"
+          }
+        ]
+      },
+      {
+        "aspect": "减益状态获取",
+        "evidence": [
+          {
+            "pageid": 13156,
+            "quote": "当沃尔夫冈的力量值低于 25 时会进入弱小状态。在这个形态下沃尔夫冈获得巨大的减益效果。"
+          }
+        ]
+      },
+      {
+        "aspect": "减益附加与移除台词",
+        "evidence": [
+          {
+            "pageid": 16278,
+            "quote": "获得|{{全角色台词|dst|code=ANNOUNCE_ATTACH_BUFF_SLEEPRESISTANCE|首选=woodie}}"
+          },
+          {
+            "pageid": 16278,
+            "quote": "失去|{{全角色台词|dst|code=ANNOUNCE_DETACH_BUFF_SLEEPRESISTANCE|首选=woodie}}"
+          }
+        ]
+      },
+      {
+        "aspect": "增益与减益获取",
+        "evidence": [
+          {
+            "pageid": 10418,
+            "quote": "WX-78 食用任意新鲜度的食物都被视为新鲜食物，获得满额的增益与减益。"
+          }
+        ]
+      },
+      {
+        "aspect": "增益效果覆盖",
+        "evidence": [
+          {
+            "pageid": 15186,
+            "quote": "学习了“药效强劲”技能的[[温蒂]]使用除[[#灵魂万灵药|灵魂万灵药]]以外的灵体草药时，药效持续时间增加至原本的 2 倍。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "减益",
+    "debuff",
+    "中毒",
+    "状态效果",
+    "负面效果",
+    "buff",
+    "持续伤害",
+    "效果管理",
+    "debuff管理",
+    "实体效果"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "状态效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+    "source_bytes": 4733,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788087436376
+  }
+}

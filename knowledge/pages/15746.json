@@ -5,6 +5,12 @@
   "inputs": {
     "wikitext_sha256": "3eab2c29086810d6b24c91fb0f0246c0b5e44e2514b3b9251881846729831e42",
     "symbol_doc_shas": {
+      "behaviours/doaction.lua": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
+      "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
+      "behaviours/runaway.lua": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+      "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/cookiecutterbrain.lua": "71080059313f6e38ed934862cf45412f2fdbbfab0039d83376116ed8d251b590",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -18,20 +24,79 @@
     }
   },
   "symbols": {
+    "behaviours/doaction.lua": {
+      "aspects_ignored": [
+        "抛锚减速行为描述",
+        "起锚下锚时长标注",
+        "锚定动作名称标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/leash.lua": {
+      "aspects_ignored": [
+        "受惊停止移动描述",
+        "最大游荡距离标注",
+        "游荡中心（家位置）描述",
+        "返回后恢复活动的距离标注",
+        "返回或朝向目标移动描述",
+        "逃离或慌张奔跑描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/runaway.lua": {
+      "aspects_ignored": [
+        "受击逃离奔跑方向描述",
+        "感知与仇恨距离描述",
+        "角色发出逃离指令描述",
+        "返回驻点行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/standstill.lua": {
+      "aspects_ignored": [
+        "实体静止与停止移动描写"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/cookiecutterbrain.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "3 秒",
+          "region_id": "15746:section:2",
+          "matched": "brains/cookiecutterbrain.lua: SCATTER_DIST=3"
+        },
+        {
+          "raw": "3 分钟",
+          "region_id": "15746:section:3",
+          "matched": "brains/cookiecutterbrain.lua: SCATTER_DIST=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -42,9 +107,11 @@
     },
     "components/eater.lua": {
       "aspects_ignored": [
-        "可怕食物喂食雇佣描述",
-        "可食用食物分类标注",
-        "捡食地上食物行为描述"
+        "可怕食物进食许可描述",
+        "可食用食物判定描述",
+        "进食行为描述",
+        "进食触发效果描述",
+        "饮食类别设定描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -54,8 +121,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -63,13 +130,11 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -77,8 +142,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -90,15 +156,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -107,11 +169,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -121,8 +184,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -130,15 +193,17 @@
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
-        "催眠与睡意施加描述",
-        "实体入睡与睡眠状态描述",
-        "实体唤醒条件与醒后行为描述",
-        "睡眠点使用条件限制描述"
+        "催眠效果范围描述",
+        "冬眠状态描述",
+        "唤醒与重新入睡行为描述",
+        "清醒与睡眠时长数值标注",
+        "生物睡眠与清醒周期描述",
+        "睡眠阻断与条件限制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

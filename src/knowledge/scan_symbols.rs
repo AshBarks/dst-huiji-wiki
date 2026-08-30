@@ -13,7 +13,7 @@ use crate::knowledge::types::{
 use crate::llm::{LlmConfig, LlmStreamEvent};
 use crate::service::Reporter;
 use crate::update::CorpusPageView;
-use crate::update::{build_atlas_from_dir, top_symbols, IndexArtifact};
+use crate::update::{build_atlas_from_dir, IndexArtifact};
 use futures_util::StreamExt;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
@@ -168,29 +168,61 @@ pub struct ScanSymbolsParams {
 
 /// P1 选择:top_symbols(变体引用数降序)过滤出 component 文件型符号,
 /// 附带磁盘源码路径与字节数。
+/// component 直接扫 components/ 目录(与 brain/behaviour 同模式):
+/// 314 个从未被 prefab 引用的组件(管理器/子组件)不在反向边里,
+/// top_symbols 口径会漏;反向边仅作排序信号(变体数降序)。
 fn pick_components(
     scripts_root: &Path,
     index: &IndexArtifact,
     limit: usize,
 ) -> Vec<(SymbolRefKey, PathBuf, usize)> {
-    top_symbols(index, limit.max(64) * 4)
-        .into_iter()
-        .filter_map(|sym| match sym {
-            crate::update::SymbolRef::File { path } if path.starts_with("components/") => {
-                let full = scripts_root.join(&path);
-                let bytes = std::fs::metadata(&full).ok()?.len() as usize;
-                Some((
-                    SymbolRefKey {
-                        kind: "component".to_string(),
-                        path,
-                    },
-                    full,
-                    bytes,
-                ))
+    let dir = scripts_root.join("components");
+    let mut entries: Vec<(usize, String, SymbolRefKey, PathBuf, usize)> = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("lua") {
+                continue;
             }
-            _ => None,
-        })
+            let Some(name) = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(str::to_string)
+            else {
+                continue;
+            };
+            let rel = format!("components/{name}.lua");
+            let full = scripts_root.join(&rel);
+            let bytes = std::fs::metadata(&full)
+                .map(|m| m.len() as usize)
+                .unwrap_or(0);
+            let variants = index
+                .reverse
+                .get(&rel)
+                .map(|vs| {
+                    vs.iter()
+                        .filter_map(|v| v.rsplit('#').next())
+                        .collect::<std::collections::HashSet<_>>()
+                        .len()
+                })
+                .unwrap_or(0);
+            entries.push((
+                variants,
+                name.clone(),
+                SymbolRefKey {
+                    kind: "component".to_string(),
+                    path: rel,
+                },
+                full,
+                bytes,
+            ));
+        }
+    }
+    entries.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    entries
+        .into_iter()
         .take(limit)
+        .map(|(_, _, key, full, bytes)| (key, full, bytes))
         .collect()
 }
 
@@ -2024,13 +2056,14 @@ mod tests {
 
     #[test]
     fn pick_symbols_falls_back_to_component() {
-        // 未识别类别应安全回退到 component 选择逻辑。
+        // 未识别类别应安全回退到 component 选择逻辑(目录扫描,无反向边也可入选)。
         let root = temp_dir("fallback");
         std::fs::create_dir_all(root.join("components")).unwrap();
         std::fs::write(root.join("components/health.lua"), "Health = Class").unwrap();
         let index = IndexArtifact::default();
         let picked = pick_symbols(&root, &index, "unknown", 10, None);
-        assert!(picked.is_empty()); // 无 reverse 边，component 也没有候选
+        assert_eq!(picked.len(), 1); // 目录扫描覆盖未被引用的组件
+        assert_eq!(picked[0].0.path, "components/health.lua");
         let _ = std::fs::remove_dir_all(&root);
     }
 

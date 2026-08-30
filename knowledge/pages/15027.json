@@ -11,13 +11,18 @@
   },
   "symbols": {
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",

@@ -12,10 +12,10 @@
     "components/edible.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
+        "特殊食物食用额外效果描述",
         "食物理智值数值标注",
         "食物生命值数值标注",
-        "食物饥饿值数值标注",
-        "食用特殊效果描述"
+        "食物饥饿值数值标注"
       ],
       "route": "direct",
       "detail_level": "summary",

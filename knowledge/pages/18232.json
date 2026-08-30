@@ -48,11 +48,9 @@
     "components/childspawner.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "停止再生描述",
-        "再生周期数值标注",
-        "子代死亡后重生行为描述",
-        "最大子数量标注",
-        "生成速度及数量上限规则描述"
+        "子实体被杀死触发治疗描述",
+        "生成子实体行为描述",
+        "离开加载范围子实体消失描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -62,8 +60,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -71,15 +70,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -89,41 +84,30 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "玩家接近距离阈值标注",
+          "aspect": "玩家接近距离阈值与实体激活",
           "evidence": [
             {
               "pageid": 18232,
-              "quote": "玩家靠近远古哨所 6 距离单位以内"
-            }
-          ]
-        },
-        {
-          "aspect": "玩家靠近触发行为描述",
-          "evidence": [
-            {
-              "pageid": 18232,
-              "quote": "玩家靠近远古哨所 6 距离单位以内"
+              "quote": "如果玩家靠近远古哨所 6 距离单位以内，其中的安保脉冲便离开哨所会出来游荡"
             }
           ]
         }
       ],
       "aspects_ignored": [
-        "玩家远离回归行为描述"
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
-      "detail_level": "detailed"
+      "detail_level": "summary"
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "detailed"
+  "page_detail_level": "summary"
 }

@@ -13,8 +13,9 @@
   "symbols": {
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -22,18 +23,25 @@
     },
     "components/pickable.lua": {
       "aspects_ignored": [
-        "再生与重新生长计时",
-        "施肥恢复与促生长",
-        "移植后状态变化",
-        "荒芜枯萎状态描述",
-        "采集与收获行为",
-        "采集次数消耗限制"
+        "卡住状态描述",
+        "收获次数与耗尽枯萎",
+        "施肥恢复生长与解除枯萎",
+        "枯萎与正常挖掘掉落差异",
+        "枯萎状态与采集限制描述",
+        "生长阶段与重新生长时间",
+        "移植与种植行为"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/trader.lua": {
+      "aspects_ignored": [
+        "交易接受条件描述",
+        "夜间交易功能禁用描述",
+        "好感度解锁交易功能描述",
+        "拒绝交易反馈效果提及"
+      ],
       "route": "direct",
       "detail_level": "stub"
     }

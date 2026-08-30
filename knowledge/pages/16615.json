@@ -18,6 +18,10 @@
   },
   "symbols": {
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -27,11 +31,8 @@
     },
     "components/follower.lua": {
       "aspects_ignored": [
-        "停止跟随行为描述",
-        "忠诚度百分比标注",
-        "忠诚时间获取描述",
-        "绑定玩家跟随描述",
-        "跟随距离保持描述"
+        "忠诚时间数值标注",
+        "设定领导者跟随描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -39,8 +40,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -48,8 +49,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -57,15 +59,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -78,10 +76,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -91,12 +90,6 @@
       }
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

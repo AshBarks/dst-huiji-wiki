@@ -5,6 +5,12 @@
   "inputs": {
     "wikitext_sha256": "0b0e890b41d119204dcc35ad4f650f4e77612e4f93bff0fe16850ad0a0c8d90d",
     "symbol_doc_shas": {
+      "behaviours/faceentity.lua": "87a6d3ae64d036056a0afd5848658c0fa31c0a1e854785e959d91cd5928789d6",
+      "behaviours/follow.lua": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
+      "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/wobybigbrain.lua": "116ce0c2af77f01bc33f0194dcaffe3bde43f1511f7ed7e47ef9cf6610a9e403",
+      "brains/wobysmallbrain.lua": "87a18a05cf1397a1e3f996beeb50ae5857a0d75dda0acc5dd9e9b3afdfa4ccbb",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/container.lua": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
@@ -22,14 +28,112 @@
     }
   },
   "symbols": {
+    "behaviours/faceentity.lua": {
+      "aspects_ignored": [
+        "停止移动行为描述",
+        "警觉状态行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/follow.lua": {
+      "aspects_ignored": [
+        "主动远离目标描述",
+        "解除追随停止移动描述",
+        "跨平台跳跃能力说明",
+        "追随保持距离范围标注",
+        "追随目标对象描述",
+        "靠近追随目标行为"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/leash.lua": {
+      "aspects_ignored": [
+        "受惊停止移动描述",
+        "最大游荡距离标注",
+        "游荡中心（家位置）描述",
+        "返回后恢复活动的距离标注",
+        "返回或朝向目标移动描述",
+        "逃离或慌张奔跑描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/wobybigbrain.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "8 点",
+          "region_id": "13455:intro:3",
+          "matched": "brains/wobybigbrain.lua: COMBAT_TIMEOUT=8"
+        },
+        {
+          "raw": "3个",
+          "region_id": "13455:section:1",
+          "matched": "brains/wobybigbrain.lua: WORK_MIN_DISTANCE=3"
+        },
+        {
+          "raw": "3秒",
+          "region_id": "13455:section:1",
+          "matched": "brains/wobybigbrain.lua: WORK_MIN_DISTANCE=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "brains/wobysmallbrain.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "跟随主人行为描述",
+          "evidence": [
+            {
+              "pageid": 13455,
+              "quote": "她只会跟随沃尔特行动"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "9 个",
+          "region_id": "13455:intro:3",
+          "matched": "brains/wobysmallbrain.lua: MAX_DOMINANTTRAIT_PLAYFUL_KEEP_DIST_FROM_OWNER=9"
+        },
+        {
+          "raw": "5 秒",
+          "region_id": "13455:intro:3",
+          "matched": "brains/wobysmallbrain.lua: COMBAT_TOO_CLOSE_DIST=5"
+        },
+        {
+          "raw": "8 点",
+          "region_id": "13455:intro:3",
+          "matched": "brains/wobysmallbrain.lua: COMBAT_SAFE_TO_WATCH_FROM_DIST=8"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -42,14 +146,12 @@
     "components/container.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "侧边物品栏显示",
-        "存放特定物品能力",
-        "容器内特定物品状态影响",
-        "打开后物品掉落",
-        "打开状态限制使用",
-        "无限堆叠允许",
+        "容器打开权限限制",
+        "拿取物品数量限制描述",
+        "无限堆叠启用描述",
         "物品栏槽位数量标注",
-        "翻找拿回物品"
+        "破坏后掉落所有物品描述",
+        "防盗贼保护描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -59,11 +161,10 @@
     },
     "components/drownable.lua": {
       "aspects_ignored": [
-        "海洋地块溺水位置判定",
+        "水域与虚空溺水触发条件描述",
         "溺水潮湿度惩罚标注",
-        "溺水物品掉落联动",
-        "溺水触发条件描述",
-        "虚空地块溺水判定描述"
+        "溺水物品掉落行为描述",
+        "溺水生命与理智损失数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -71,9 +172,11 @@
     },
     "components/eater.lua": {
       "aspects_ignored": [
-        "可怕食物喂食雇佣描述",
-        "可食用食物分类标注",
-        "捡食地上食物行为描述"
+        "可怕食物进食许可描述",
+        "可食用食物判定描述",
+        "进食行为描述",
+        "进食触发效果描述",
+        "饮食类别设定描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -85,11 +188,8 @@
     },
     "components/follower.lua": {
       "aspects_ignored": [
-        "停止跟随行为描述",
-        "忠诚度百分比标注",
-        "忠诚时间获取描述",
-        "绑定玩家跟随描述",
-        "跟随距离保持描述"
+        "忠诚时间数值标注",
+        "设定领导者跟随描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -97,12 +197,11 @@
     },
     "components/freezable.lua": {
       "aspects_ignored": [
-        "冰冻/冻结状态判定描述",
-        "冰冻抗性数值与机制描述",
-        "冻结实体行为描述",
-        "增加冰冻层数行为描述",
-        "解冻与自然解冻行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "冻结状态与施加行为描述",
+        "解冻、融化与自然解冻描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -110,8 +209,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -119,8 +218,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -134,7 +234,25 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "奔跑速度数值标注",
+          "aspect": "冲刺与快速奔跑行为描述",
+          "evidence": [
+            {
+              "pageid": 13455,
+              "quote": "大沃比进行冲刺后，大沃比会立刻进入快速奔跑状态"
+            }
+          ]
+        },
+        {
+          "aspect": "移动速度倍率影响描述",
+          "evidence": [
+            {
+              "pageid": 13455,
+              "quote": "沃比在奔跑的移速 +1"
+            }
+          ]
+        },
+        {
+          "aspect": "移动速度数值标注",
           "evidence": [
             {
               "pageid": 13455,
@@ -143,7 +261,7 @@
           ]
         },
         {
-          "aspect": "疾跑状态触发描述",
+          "aspect": "行走累积转奔跑行为描述",
           "evidence": [
             {
               "pageid": 13455,
@@ -153,23 +271,19 @@
         }
       ],
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "随机游荡行为描述"
+        "奔跑速度手动置空说明"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
-        "催眠与睡意施加描述",
-        "实体入睡与睡眠状态描述",
-        "实体唤醒条件与醒后行为描述",
-        "睡眠点使用条件限制描述"
+        "催眠效果范围描述",
+        "冬眠状态描述",
+        "唤醒与重新入睡行为描述",
+        "清醒与睡眠时长数值标注",
+        "生物睡眠与清醒周期描述",
+        "睡眠阻断与条件限制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -178,10 +292,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

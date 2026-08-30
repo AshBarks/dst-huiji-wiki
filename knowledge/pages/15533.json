@@ -16,11 +16,9 @@
     "components/childspawner.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "停止再生描述",
-        "再生周期数值标注",
-        "子代死亡后重生行为描述",
-        "最大子数量标注",
-        "生成速度及数量上限规则描述"
+        "子实体被杀死触发治疗描述",
+        "生成子实体行为描述",
+        "离开加载范围子实体消失描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -30,8 +28,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -39,13 +37,11 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -53,8 +49,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -62,9 +59,8 @@
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

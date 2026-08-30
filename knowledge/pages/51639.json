@@ -12,9 +12,12 @@
     "components/playerprox.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "玩家接近距离阈值标注",
-        "玩家远离回归行为描述",
-        "玩家靠近触发行为描述"
+        "玩家接近距离阈值与实体激活",
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
       "detail_level": "summary",

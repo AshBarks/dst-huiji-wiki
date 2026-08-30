@@ -15,11 +15,9 @@
     "components/childspawner.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "停止再生描述",
-        "再生周期数值标注",
-        "子代死亡后重生行为描述",
-        "最大子数量标注",
-        "生成速度及数量上限规则描述"
+        "子实体被杀死触发治疗描述",
+        "生成子实体行为描述",
+        "离开加载范围子实体消失描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -29,8 +27,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -38,11 +37,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -52,9 +52,8 @@
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

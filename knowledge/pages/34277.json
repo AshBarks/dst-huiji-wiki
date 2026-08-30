@@ -14,11 +14,9 @@
     "components/childspawner.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "停止再生描述",
-        "再生周期数值标注",
-        "子代死亡后重生行为描述",
-        "最大子数量标注",
-        "生成速度及数量上限规则描述"
+        "子实体被杀死触发治疗描述",
+        "生成子实体行为描述",
+        "离开加载范围子实体消失描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -28,8 +26,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -37,9 +36,12 @@
     },
     "components/playerprox.lua": {
       "aspects_ignored": [
-        "玩家接近距离阈值标注",
-        "玩家远离回归行为描述",
-        "玩家靠近触发行为描述"
+        "玩家接近距离阈值与实体激活",
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
       "detail_level": "stub",

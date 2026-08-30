@@ -10,12 +10,6 @@
   },
   "symbols": {
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

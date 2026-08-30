@@ -5,6 +5,10 @@
   "inputs": {
     "wikitext_sha256": "98d33201d3b0e30758c9cb7c21427d67c3e48f3c73f8bc3ea630c48f58707c1a",
     "symbol_doc_shas": {
+      "behaviours/faceentity.lua": "87a6d3ae64d036056a0afd5848658c0fa31c0a1e854785e959d91cd5928789d6",
+      "behaviours/runaway.lua": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/fruitdragonbrain.lua": "2d819d065c8695f771a3103b91403f75def0c224eadc348f6f49f86831a658d2",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
@@ -19,19 +23,81 @@
     }
   },
   "symbols": {
+    "behaviours/faceentity.lua": {
+      "aspects_ignored": [
+        "停止移动行为描述",
+        "警觉状态行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/runaway.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "受击逃离奔跑方向描述",
+        "感知与仇恨距离描述",
+        "角色发出逃离指令描述",
+        "返回驻点行为描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 秒",
+          "region_id": "15734:section:1",
+          "matched": "behaviours/runaway.lua: radius=6"
+        }
+      ],
+      "route": "two_hop",
+      "detail_level": "summary"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/fruitdragonbrain.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "12 单位",
+          "region_id": "15734:section:1",
+          "matched": "brains/fruitdragonbrain.lua: MAX_CHASE_DIST=12"
+        },
+        {
+          "raw": "4 单位",
+          "region_id": "15734:section:1",
+          "matched": "brains/fruitdragonbrain.lua: TARGET_FOLLOW_DIST=4"
+        },
+        {
+          "raw": "15 单位",
+          "region_id": "15734:section:1",
+          "matched": "brains/fruitdragonbrain.lua: CHALLENGE_LOST_STOP_RUN_AWAY_DIST=15"
+        },
+        {
+          "raw": "4 单位",
+          "region_id": "15734:section:1",
+          "matched": "brains/fruitdragonbrain.lua: TARGET_FOLLOW_DIST=4"
+        },
+        {
+          "raw": "15 单位",
+          "region_id": "15734:section:1",
+          "matched": "brains/fruitdragonbrain.lua: CHALLENGE_LOST_STOP_RUN_AWAY_DIST=15"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/combat.lua": {
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -39,28 +105,30 @@
     },
     "components/drownable.lua": {
       "aspects_ignored": [
-        "海洋地块溺水位置判定",
+        "水域与虚空溺水触发条件描述",
         "溺水潮湿度惩罚标注",
-        "溺水物品掉落联动",
-        "溺水触发条件描述",
-        "虚空地块溺水判定描述"
+        "溺水物品掉落行为描述",
+        "溺水生命与理智损失数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [
-        "冰冻/冻结状态判定描述",
-        "冰冻抗性数值与机制描述",
-        "冻结实体行为描述",
-        "增加冰冻层数行为描述",
-        "解冻与自然解冻行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "冻结状态与施加行为描述",
+        "解冻、融化与自然解冻描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -68,8 +136,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -77,13 +145,11 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -93,8 +159,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -102,15 +169,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -119,11 +182,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -133,15 +197,39 @@
       }
     },
     "components/sleeper.lua": {
-      "mention_source": "llm_verdict",
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "清醒与睡眠时长数值标注",
+          "evidence": [
+            {
+              "pageid": 15734,
+              "quote": "在白天，沙拉蝾螈的清醒时间为 20 ~ 30 秒"
+            },
+            {
+              "pageid": 15734,
+              "quote": "沙拉蝾螈的小睡时间为 15 ~ 25 秒"
+            }
+          ]
+        },
+        {
+          "aspect": "生物睡眠与清醒周期描述",
+          "evidence": [
+            {
+              "pageid": 15734,
+              "quote": "天黑会入睡直到天亮。睡眠时，每秒恢复 5 生命值。"
+            }
+          ]
+        }
+      ],
       "aspects_ignored": [
-        "催眠与睡意施加描述",
-        "实体入睡与睡眠状态描述",
-        "实体唤醒条件与醒后行为描述",
-        "睡眠点使用条件限制描述"
+        "催眠效果范围描述",
+        "冬眠状态描述",
+        "唤醒与重新入睡行为描述",
+        "睡眠阻断与条件限制描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
+      "detail_level": "detailed",
       "llm_verdict": {
         "semantic_consistent": true
       }
@@ -149,10 +237,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

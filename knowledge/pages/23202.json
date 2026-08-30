@@ -19,12 +19,15 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -34,8 +37,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -43,8 +46,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -52,11 +56,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -68,20 +73,18 @@
     },
     "components/playerprox.lua": {
       "aspects_ignored": [
-        "玩家接近距离阈值标注",
-        "玩家远离回归行为描述",
-        "玩家靠近触发行为描述"
+        "玩家接近距离阈值与实体激活",
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/propagator.lua": {
-      "aspects_ignored": [
-        "可控燃烧不引燃描述",
-        "引燃附近可燃物描述",
-        "灼烧周围实体描述"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
@@ -89,10 +92,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -103,9 +107,8 @@
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

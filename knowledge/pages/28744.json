@@ -5,6 +5,8 @@
   "inputs": {
     "wikitext_sha256": "b8a7908e1478c4ead6adfc8c0c0b81ba124efb48ec16f0d88c8aa2a81a365c61",
     "symbol_doc_shas": {
+      "behaviours/runaway.lua": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+      "brains/itemmimic_revealedbrain.lua": "0c095baaebcc04edd396bc97cac9edaee88fb9b6fc3b6ad9bcc139edc243ca93",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
@@ -15,15 +17,81 @@
     }
   },
   "symbols": {
+    "behaviours/runaway.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "受击逃离奔跑方向描述",
+        "感知与仇恨距离描述",
+        "角色发出逃离指令描述",
+        "返回驻点行为描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 单位",
+          "region_id": "28744:section:1",
+          "matched": "behaviours/runaway.lua: radius=6"
+        }
+      ],
+      "route": "two_hop",
+      "detail_level": "summary"
+    },
+    "brains/itemmimic_revealedbrain.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "刚生成恐慌乱跑描述",
+          "evidence": [
+            {
+              "pageid": 28744,
+              "quote": "当拟态蠕虫刚从拟态物品中显形时，它会恐慌地乱跑 5 秒钟。"
+            }
+          ]
+        },
+        {
+          "aspect": "察觉威胁与脱离安全距离标注",
+          "evidence": [
+            {
+              "pageid": 28744,
+              "quote": "当有玩家进入拟态蠕虫 4 {{解释|距离单位}}内范围内时，它们将会向反方向逃跑直到距离拉开到 6 单位。"
+            }
+          ]
+        },
+        {
+          "aspect": "拴绳游荡范围标注",
+          "evidence": [
+            {
+              "pageid": 28744,
+              "quote": "由[[备份底盘]]生成的拟态蠕虫只会在生成它的备份底盘附近 4 {{解释|距离单位}}内游荡"
+            }
+          ]
+        },
+        {
+          "aspect": "随机游荡行为描述",
+          "evidence": [
+            {
+              "pageid": 28744,
+              "quote": "拟态蠕虫会随机地游荡，如果周围有符合其[[#拟态条件|拟态条件]]的物品"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 单位",
+          "region_id": "28744:section:1",
+          "matched": "brains/itemmimic_revealedbrain.lua: AVOID_PLAYER_STOP=6"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -38,15 +106,11 @@
     "components/locomotor.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -57,11 +121,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -72,9 +137,12 @@
     "components/playerprox.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "玩家接近距离阈值标注",
-        "玩家远离回归行为描述",
-        "玩家靠近触发行为描述"
+        "玩家接近距离阈值与实体激活",
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -85,8 +153,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -95,10 +163,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

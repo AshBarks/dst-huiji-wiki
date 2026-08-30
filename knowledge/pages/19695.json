@@ -5,6 +5,11 @@
   "inputs": {
     "wikitext_sha256": "651306384652a5af55e4bf2a521b08f33719ccf7e25def074cc9ab271009a902",
     "symbol_doc_shas": {
+      "behaviours/faceentity.lua": "87a6d3ae64d036056a0afd5848658c0fa31c0a1e854785e959d91cd5928789d6",
+      "behaviours/findfarmplant.lua": "6ff129453c55e95ee57610b340c7e19397d0def619fed90df4b13ddf55d315ab",
+      "behaviours/follow.lua": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/friendlyfruitflybrain.lua": "47dd560d2497476e7d2fd25df6bdb164b05f4ee7ee938a3258429950b14a213b",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -21,14 +26,80 @@
     }
   },
   "symbols": {
+    "behaviours/faceentity.lua": {
+      "aspects_ignored": [
+        "停止移动行为描述",
+        "警觉状态行为描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/findfarmplant.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "20 点",
+          "region_id": "19695:intro:1",
+          "matched": "behaviours/findfarmplant.lua: SEE_DIST=20"
+        }
+      ],
+      "route": "two_hop",
+      "detail_level": "summary"
+    },
+    "behaviours/follow.lua": {
+      "aspects_ignored": [
+        "主动远离目标描述",
+        "解除追随停止移动描述",
+        "跨平台跳跃能力说明",
+        "追随保持距离范围标注",
+        "追随目标对象描述",
+        "靠近追随目标行为"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/friendlyfruitflybrain.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "跟随友好果蝇果描述",
+          "evidence": [
+            {
+              "pageid": 19695,
+              "quote": "友好果蝇会跟随友好果蝇果。"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "20 点",
+          "region_id": "19695:intro:1",
+          "matched": "brains/friendlyfruitflybrain.lua: MAX_WANDER_DIST=20"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -36,17 +107,13 @@
     },
     "components/combat.lua": {
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -58,11 +125,8 @@
     },
     "components/follower.lua": {
       "aspects_ignored": [
-        "停止跟随行为描述",
-        "忠诚度百分比标注",
-        "忠诚时间获取描述",
-        "绑定玩家跟随描述",
-        "跟随距离保持描述"
+        "忠诚时间数值标注",
+        "设定领导者跟随描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -70,12 +134,11 @@
     },
     "components/freezable.lua": {
       "aspects_ignored": [
-        "冰冻/冻结状态判定描述",
-        "冰冻抗性数值与机制描述",
-        "冻结实体行为描述",
-        "增加冰冻层数行为描述",
-        "解冻与自然解冻行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "冻结状态与施加行为描述",
+        "解冻、融化与自然解冻描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -83,8 +146,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -92,13 +155,11 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -106,8 +167,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -115,15 +177,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -131,11 +189,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -143,8 +202,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -152,10 +211,12 @@
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
-        "催眠与睡意施加描述",
-        "实体入睡与睡眠状态描述",
-        "实体唤醒条件与醒后行为描述",
-        "睡眠点使用条件限制描述"
+        "催眠效果范围描述",
+        "冬眠状态描述",
+        "唤醒与重新入睡行为描述",
+        "清醒与睡眠时长数值标注",
+        "生物睡眠与清醒周期描述",
+        "睡眠阻断与条件限制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -170,5 +231,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

@@ -14,8 +14,8 @@
   "symbols": {
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -23,8 +23,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -33,10 +34,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -46,39 +48,13 @@
       }
     },
     "components/workable.lua": {
-      "mention_source": "pass2_evidence",
-      "aspects_covered": [
-        {
-          "aspect": "工作次数（敲击次数）标注",
-          "evidence": [
-            {
-              "pageid": 19825,
-              "quote": "玩家每敲击 2 次都会使其外观上的"
-            }
-          ]
-        },
-        {
-          "aspect": "敲击工作动作描述",
-          "evidence": [
-            {
-              "pageid": 19825,
-              "quote": "每次敲击巨大蜂窝有约一半概率掉落"
-            }
-          ]
-        },
-        {
-          "aspect": "敲击触发掉落联动",
-          "evidence": [
-            {
-              "pageid": 19825,
-              "quote": "每次敲击巨大蜂窝有约一半概率掉落 1 个蜂蜜"
-            }
-          ]
-        }
+      "aspects_ignored": [
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
-      "detail_level": "detailed"
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "detailed"
+  "page_detail_level": "summary"
 }

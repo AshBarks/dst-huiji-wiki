@@ -16,8 +16,8 @@
   "symbols": {
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -25,8 +25,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -34,8 +35,13 @@
     },
     "components/leader.lua": {
       "aspects_ignored": [
-        "领袖受击联动随从仇恨",
-        "领袖锁定新目标联动随从仇恨"
+        "物品作为领袖的追随物机制",
+        "生物成为玩家追随者描述",
+        "追随者与领袖间距离保持描述",
+        "领袖受攻击时随从仇恨响应",
+        "领袖新目标引发随从仇恨",
+        "领袖死亡致随从消亡",
+        "领袖生成时随从数量配置"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -44,11 +50,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -59,12 +66,13 @@
     },
     "components/pickable.lua": {
       "aspects_ignored": [
-        "再生与重新生长计时",
-        "施肥恢复与促生长",
-        "移植后状态变化",
-        "荒芜枯萎状态描述",
-        "采集与收获行为",
-        "采集次数消耗限制"
+        "卡住状态描述",
+        "收获次数与耗尽枯萎",
+        "施肥恢复生长与解除枯萎",
+        "枯萎与正常挖掘掉落差异",
+        "枯萎状态与采集限制描述",
+        "生长阶段与重新生长时间",
+        "移植与种植行为"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -74,9 +82,8 @@
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

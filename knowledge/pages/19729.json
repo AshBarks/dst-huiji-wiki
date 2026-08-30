@@ -17,12 +17,15 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -30,8 +33,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -39,8 +42,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -49,11 +53,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -66,21 +71,35 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "再生与重新生长计时",
+          "aspect": "收获次数与耗尽枯萎",
           "evidence": [
             {
               "pageid": 19729,
-              "quote": "并让植株回到初生阶段"
+              "quote": "移植的石果灌木丛有3次收获次数，收获3次后会枯萎"
             }
           ]
         },
         {
-          "aspect": "施肥恢复与促生长",
+          "aspect": "施肥恢复生长与解除枯萎",
           "evidence": [
             {
               "pageid": 19729,
               "quote": "移植后需要对植株进行施肥"
-            },
+            }
+          ]
+        },
+        {
+          "aspect": "枯萎状态与采集限制描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "收获3次后会枯萎需要再次施肥"
+            }
+          ]
+        },
+        {
+          "aspect": "生长阶段与重新生长时间",
+          "evidence": [
             {
               "pageid": 19729,
               "quote": "初生阶段：刚施肥的植株或重新开始生长的植株"
@@ -88,60 +107,31 @@
           ]
         },
         {
-          "aspect": "移植后状态变化",
+          "aspect": "移植与种植行为",
           "evidence": [
             {
               "pageid": 19729,
-              "quote": "重新种植于地面。移植后需要施肥"
-            }
-          ]
-        },
-        {
-          "aspect": "荒芜枯萎状态描述",
-          "evidence": [
-            {
-              "pageid": 19729,
-              "quote": "收获 3 次后会枯萎需要再次施肥"
-            }
-          ]
-        },
-        {
-          "aspect": "采集与收获行为",
-          "evidence": [
-            {
-              "pageid": 19729,
-              "quote": "此时收获可以获得 3 个石果"
-            }
-          ]
-        },
-        {
-          "aspect": "采集次数消耗限制",
-          "evidence": [
-            {
-              "pageid": 19729,
-              "quote": "移植的石果灌木丛有 3 次收获次数"
+              "quote": "石果灌木丛可以用铲子挖出来，重新种植于地面"
             }
           ]
         }
+      ],
+      "aspects_ignored": [
+        "卡住状态描述",
+        "枯萎与正常挖掘掉落差异"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/propagator.lua": {
-      "aspects_ignored": [
-        "可控燃烧不引燃描述",
-        "引燃附近可燃物描述",
-        "灼烧周围实体描述"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

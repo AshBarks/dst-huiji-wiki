@@ -12,16 +12,17 @@
   "symbols": {
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub"
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",

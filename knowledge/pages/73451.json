@@ -5,6 +5,9 @@
   "inputs": {
     "wikitext_sha256": "0e684f06978496dc220b81503dbf803d6112d347e39dbe70f22a9e26ce2f01df",
     "symbol_doc_shas": {
+      "behaviours/chaseandattack.lua": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/vault_crawlerbrain.lua": "4990fe850b797331fc85fa67866b487eea602a4d8d9a119524583d6aaee401e5",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
@@ -17,19 +20,43 @@
     }
   },
   "symbols": {
+    "behaviours/chaseandattack.lua": {
+      "aspects_ignored": [
+        "丢失仇恨脱离战斗",
+        "仇恨目标锁定描述",
+        "原地静止行为",
+        "寻找其他目标行为",
+        "尝试攻击造成伤害",
+        "战斗咆哮发现玩家",
+        "最大追逐时间描述",
+        "追击攻击距离范围",
+        "靠近点位加入追击",
+        "高速移动压制追击"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/vault_crawlerbrain.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -37,7 +64,7 @@
     },
     "components/damagetypebonus.lua": {
       "aspects_ignored": [
-        "角色与装备伤害类型加成及倍率描述"
+        "伤害类型加成添加描述（角色获得亲和与倍率）"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -45,12 +72,11 @@
     },
     "components/freezable.lua": {
       "aspects_ignored": [
-        "冰冻/冻结状态判定描述",
-        "冰冻抗性数值与机制描述",
-        "冻结实体行为描述",
-        "增加冰冻层数行为描述",
-        "解冻与自然解冻行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "冻结状态与施加行为描述",
+        "解冻、融化与自然解冻描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -58,8 +84,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -68,13 +94,11 @@
     "components/health.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -84,8 +108,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -97,27 +122,17 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

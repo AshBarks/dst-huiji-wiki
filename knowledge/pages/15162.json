@@ -18,12 +18,15 @@
     "components/burnable.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -33,14 +36,29 @@
       }
     },
     "components/fueled.lua": {
-      "mention_source": "llm_verdict",
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "燃料分段阈值与等级描述",
+          "evidence": [
+            {
+              "pageid": 15162,
+              "quote": "|燃料 < 25%|"
+            },
+            {
+              "pageid": 15162,
+              "quote": "|25% ≤ 燃料 < 50%|"
+            }
+          ]
+        }
+      ],
       "aspects_ignored": [
-        "摧毁时剩余燃料掉落描述",
-        "最大燃料储量标注",
-        "添加燃料数值加成描述",
-        "添加燃料行为描述",
-        "燃料消耗与补满机制描述",
-        "燃料耗尽状态描述"
+        "满燃料与最大储量描述",
+        "燃料效率倍数描述",
+        "燃料消耗与燃烧持续描述",
+        "燃料物品添加与接受描述",
+        "空燃料状态标注",
+        "组件移除时燃料物掉落描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -51,8 +69,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -60,8 +78,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -72,35 +91,18 @@
       "detail_level": "stub"
     },
     "components/propagator.lua": {
-      "mention_source": "pass2_evidence",
-      "aspects_covered": [
-        {
-          "aspect": "引燃附近可燃物描述",
-          "evidence": [
-            {
-              "pageid": 15162,
-              "quote": "当营火燃料高于25%时，会引燃附近的可燃物。"
-            }
-          ]
-        }
-      ],
-      "aspects_ignored": [
-        "可控燃烧不引燃描述",
-        "灼烧周围实体描述"
-      ],
       "route": "direct",
-      "detail_level": "summary"
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "detailed"
+  "page_detail_level": "summary"
 }

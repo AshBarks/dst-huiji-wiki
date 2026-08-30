@@ -24,20 +24,35 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/deployable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "物品放置行为描述",
+          "evidence": [
+            {
+              "pageid": 21620,
+              "quote": "将物品形式的宝石发电机放置为建筑形态"
+            }
+          ]
+        }
+      ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary"
     },
     "components/floater.lua": {
       "route": "direct",
@@ -47,57 +62,54 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "摧毁时剩余燃料掉落描述",
+          "aspect": "满燃料与最大储量描述",
           "evidence": [
             {
               "pageid": 21620,
-              "quote": "被摧毁时会掉落其中消耗不足 1 单位电力的宝石"
+              "quote": "因此最多储存 60 单位的电力。"
             }
           ]
         },
         {
-          "aspect": "最大燃料储量标注",
-          "evidence": [
-            {
-              "pageid": 21620,
-              "quote": "最多储存 60 单位的电力"
-            }
-          ]
-        },
-        {
-          "aspect": "添加燃料行为描述",
-          "evidence": [
-            {
-              "pageid": 21620,
-              "quote": "可以放置最多 3 个宝石作为燃料"
-            }
-          ]
-        },
-        {
-          "aspect": "燃料消耗与补满机制描述",
+          "aspect": "燃料消耗与燃烧持续描述",
           "evidence": [
             {
               "pageid": 21620,
               "quote": "以由上至下的顺序消耗其中的宝石（即后放置的先消耗）"
-            },
+            }
+          ]
+        },
+        {
+          "aspect": "燃料物品添加与接受描述",
+          "evidence": [
             {
               "pageid": 21620,
-              "quote": "每次填入新宝石时，都会重新补满上一个宝石被消耗的电力"
+              "quote": "为其添加燃料、将其用作[[蓄电池]]充电的薇诺娜玩家相绑定"
+            }
+          ]
+        },
+        {
+          "aspect": "组件移除时燃料物掉落描述",
+          "evidence": [
+            {
+              "pageid": 21620,
+              "quote": "宝石发电机被摧毁时会掉落其中消耗不足 1 单位电力的宝石。"
             }
           ]
         }
       ],
       "aspects_ignored": [
-        "添加燃料数值加成描述",
-        "燃料耗尽状态描述"
+        "燃料分段阈值与等级描述",
+        "燃料效率倍数描述",
+        "空燃料状态标注"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -105,8 +117,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -114,12 +127,10 @@
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
-        "物品丢弃与放置描述",
-        "物品持有状态描述",
-        "物品温度范围与初始值标注",
-        "物品温度降低描述",
-        "物品潮湿度增加描述",
-        "物品被拾取与放入物品栏描述"
+        "物品拾取与丢弃行为描述",
+        "物品沉没行为描述",
+        "物品温度数值及变化描述",
+        "物品潮湿度数值描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -128,11 +139,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -146,21 +158,17 @@
       "detail_level": "stub"
     },
     "components/propagator.lua": {
-      "aspects_ignored": [
-        "可控燃烧不引燃描述",
-        "引燃附近可燃物描述",
-        "灼烧周围实体描述"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/timer.lua": {
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -169,25 +177,24 @@
       }
     },
     "components/trader.lua": {
+      "aspects_ignored": [
+        "交易接受条件描述",
+        "夜间交易功能禁用描述",
+        "好感度解锁交易功能描述",
+        "拒绝交易反馈效果提及"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",

@@ -14,37 +14,42 @@
   "symbols": {
     "components/damagetypebonus.lua": {
       "aspects_ignored": [
-        "角色与装备伤害类型加成及倍率描述"
+        "伤害类型加成添加描述（角色获得亲和与倍率）"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/debuff.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "负面效果赋予描述",
+          "evidence": [
+            {
+              "pageid": 15539,
+              "quote": "施加 2 层[[冰冻]]效果"
+            }
+          ]
+        }
+      ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary"
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
-        "位面伤害倍率描述",
-        "位面伤害加成数值标注",
-        "位面伤害基础值公式描述"
+        "位面伤害加成效果描述",
+        "位面基础伤害数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

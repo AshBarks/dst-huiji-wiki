@@ -5,6 +5,9 @@
   "inputs": {
     "wikitext_sha256": "1cd5f92204b874fec93faa63ef5a913a87bfdaf60fcd29b86956b5cb70b8d6dc",
     "symbol_doc_shas": {
+      "behaviours/chaseandattack.lua": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/klausbrain.lua": "ea1b1943611f0a6bec2acb2f9ff149cb6fe6fae89b2cd76afb5c2047bf58d4aa",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
@@ -20,14 +23,92 @@
     }
   },
   "symbols": {
+    "behaviours/chaseandattack.lua": {
+      "aspects_ignored": [
+        "丢失仇恨脱离战斗",
+        "仇恨目标锁定描述",
+        "原地静止行为",
+        "寻找其他目标行为",
+        "尝试攻击造成伤害",
+        "战斗咆哮发现玩家",
+        "最大追逐时间描述",
+        "追击攻击距离范围",
+        "靠近点位加入追击",
+        "高速移动压制追击"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/klausbrain.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "丢失目标返回家位置守卫描述",
+          "evidence": [
+            {
+              "pageid": 13897,
+              "quote": "丢失目标后克劳斯会返回赃物袋守卫、探查"
+            }
+          ]
+        },
+        {
+          "aspect": "仇恨范围内追击攻击描述",
+          "evidence": [
+            {
+              "pageid": 13897,
+              "quote": "主动仇恨 15 距离单位内的玩家目标，发现玩家目标后会试图接近发动攻击"
+            }
+          ]
+        },
+        {
+          "aspect": "脱离战斗短暂反击延迟描述",
+          "evidence": [
+            {
+              "pageid": 13897,
+              "quote": "受到攻击时在短暂时间内依然会进行反击"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "10 单位",
+          "region_id": "13897:section:1",
+          "matched": "brains/klausbrain.lua: RESET_COMBAT_DELAY=10"
+        },
+        {
+          "raw": "10 单位",
+          "region_id": "13897:section:1",
+          "matched": "brains/klausbrain.lua: RESET_COMBAT_DELAY=10"
+        },
+        {
+          "raw": "10 秒",
+          "region_id": "13897:section:2",
+          "matched": "brains/klausbrain.lua: RESET_COMBAT_DELAY=10"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -36,17 +117,13 @@
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -57,11 +134,10 @@
     },
     "components/drownable.lua": {
       "aspects_ignored": [
-        "海洋地块溺水位置判定",
+        "水域与虚空溺水触发条件描述",
         "溺水潮湿度惩罚标注",
-        "溺水物品掉落联动",
-        "溺水触发条件描述",
-        "虚空地块溺水判定描述"
+        "溺水物品掉落行为描述",
+        "溺水生命与理智损失数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -71,47 +147,34 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "冰冻/冻结状态判定描述",
+          "aspect": "冰冻层数施加描述",
           "evidence": [
             {
               "pageid": 13897,
-              "quote": "生物被冰冻之后仇恨会重置"
+              "quote": "爆发后每帧施加 目标冰冻抗性 + 1 层冰冻"
             }
           ]
         },
         {
-          "aspect": "冻结实体行为描述",
+          "aspect": "冻结状态与施加行为描述",
           "evidence": [
             {
               "pageid": 13897,
-              "quote": "如果将红宝石鹿冻结，蓝宝石鹿点燃"
+              "quote": "如果将红宝石鹿冻结，蓝宝石鹿点燃，克劳斯将无法指挥"
             }
           ]
         },
         {
-          "aspect": "增加冰冻层数行为描述",
-          "evidence": [
-            {
-              "pageid": 13897,
-              "quote": "爆发前每帧施加 0.1 层冰冻，爆发后每帧施加 目标冰冻抗性 + 1 层冰冻"
-            }
-          ]
-        },
-        {
-          "aspect": "解冻与自然解冻行为描述",
+          "aspect": "解冻、融化与自然解冻描述",
           "evidence": [
             {
               "pageid": 13897,
               "quote": "红宝石鹿免疫火焰伤害且解冻速度翻倍"
-            },
-            {
-              "pageid": 13897,
-              "quote": "同时冰冻层数自然削减的速度"
             }
           ]
         },
         {
-          "aspect": "额外冰冻抗性累积描述",
+          "aspect": "额外冰冻抗性提升描述",
           "evidence": [
             {
               "pageid": 13897,
@@ -121,20 +184,18 @@
         }
       ],
       "aspects_ignored": [
-        "冰冻抗性数值与机制描述"
+        "冰冻抗性机制与数值描述"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -142,8 +203,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -155,15 +217,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -172,11 +230,12 @@
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -187,8 +246,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -196,10 +255,12 @@
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
-        "催眠与睡意施加描述",
-        "实体入睡与睡眠状态描述",
-        "实体唤醒条件与醒后行为描述",
-        "睡眠点使用条件限制描述"
+        "催眠效果范围描述",
+        "冬眠状态描述",
+        "唤醒与重新入睡行为描述",
+        "清醒与睡眠时长数值标注",
+        "生物睡眠与清醒周期描述",
+        "睡眠阻断与条件限制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -208,10 +269,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

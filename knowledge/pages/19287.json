@@ -20,12 +20,15 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -38,17 +41,13 @@
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -58,6 +57,10 @@
       }
     },
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -65,54 +68,39 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "冰冻/冻结状态判定描述",
+          "aspect": "冻结状态与施加行为描述",
+          "evidence": [
+            {
+              "pageid": 19287,
+              "quote": "致命亮茄在瘫痪期间被冰冻并解冻会立即结束瘫痪"
+            }
+          ]
+        },
+        {
+          "aspect": "解冻、融化与自然解冻描述",
           "evidence": [
             {
               "pageid": 19287,
               "quote": "冰眼结晶器可以使被冰冻的致命亮茄无法自然解冻"
             }
           ]
-        },
-        {
-          "aspect": "冻结实体行为描述",
-          "evidence": [
-            {
-              "pageid": 19287,
-              "quote": "致命亮茄与它的钻地藤蔓及其所有节段共享冰冻"
-            }
-          ]
-        },
-        {
-          "aspect": "解冻与自然解冻行为描述",
-          "evidence": [
-            {
-              "pageid": 19287,
-              "quote": "致命亮茄受到攻击、解除冰冻或触电后"
-            },
-            {
-              "pageid": 19287,
-              "quote": "致命亮茄在瘫痪期间被冰冻并解冻会立即结束"
-            }
-          ]
         }
       ],
       "aspects_ignored": [
-        "冰冻抗性数值与机制描述",
-        "增加冰冻层数行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -120,8 +108,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -129,11 +118,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -142,9 +132,8 @@
     "components/planardamage.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "位面伤害倍率描述",
-        "位面伤害加成数值标注",
-        "位面伤害基础值公式描述"
+        "位面伤害加成效果描述",
+        "位面基础伤害数值标注"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -157,10 +146,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

@@ -5,26 +5,53 @@
   "inputs": {
     "wikitext_sha256": "53bf480e50b7029d0bcd2b684e698ce5545ae8e7460407bfb46791da4b4213d8",
     "symbol_doc_shas": {
+      "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
+      "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
+      "brains/tornadobrain.lua": "ad37baebc7db73ad120574f390fa1f6f7b78c4f0d01a4723c83c77849d44db99",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7"
     }
   },
   "symbols": {
+    "behaviours/leash.lua": {
+      "aspects_ignored": [
+        "受惊停止移动描述",
+        "最大游荡距离标注",
+        "游荡中心（家位置）描述",
+        "返回后恢复活动的距离标注",
+        "返回或朝向目标移动描述",
+        "逃离或慌张奔跑描述"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "behaviours/wander.lua": {
+      "aspects_ignored": [
+        "游荡家园中心点描述",
+        "游荡最大距离数值标注"
+      ],
+      "route": "two_hop",
+      "detail_level": "stub"
+    },
+    "brains/tornadobrain.lua": {
+      "aspects_ignored": [
+        "到达目标后随机移动说明",
+        "径直移动前往目标位置说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/knownlocations.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",

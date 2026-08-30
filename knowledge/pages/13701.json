@@ -16,63 +16,66 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "丢失仇恨与脱离战斗",
+          "aspect": "战斗咆哮描述",
+          "evidence": [
+            {
+              "pageid": 13701,
+              "quote": "会发出咆哮表示发现玩家；每当有新玩家加入战斗，织影者都会再咆哮一次"
+            }
+          ]
+        },
+        {
+          "aspect": "目标锁定与仇恨机制描述",
           "evidence": [
             {
               "pageid": 13701,
               "quote": "若仇恨目标离开了远古大门所在房间，织影者会立即丢失仇恨"
-            },
-            {
-              "pageid": 13701,
-              "quote": "在远古大门范围内没有仇恨目标后，远古织影者会游荡"
-            }
-          ]
-        },
-        {
-          "aspect": "仇恨目标距离与追击",
-          "evidence": [
-            {
-              "pageid": 13701,
-              "quote": "距离织影者小于 9 单位或距离远古大门小于 7 单位的玩家"
-            }
-          ]
-        },
-        {
-          "aspect": "攻击冷却时间描述",
-          "evidence": [
-            {
-              "pageid": 13701,
-              "quote": "三个技能会分别进入 5 秒、4 秒与 5 秒的冷却"
             }
           ]
         }
       ],
       "aspects_ignored": [
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/entitytracker.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "追踪实体行为描述",
+          "evidence": [
+            {
+              "pageid": 13701,
+              "quote": "也会仇恨攻击他的实体"
+            }
+          ]
+        },
+        {
+          "aspect": "遗忘实体行为描述",
+          "evidence": [
+            {
+              "pageid": 13701,
+              "quote": "织影者会立即丢失仇恨"
+            }
+          ]
+        }
+      ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "detailed"
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -80,8 +83,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",

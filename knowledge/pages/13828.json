@@ -15,48 +15,24 @@
   },
   "symbols": {
     "components/combat.lua": {
-      "mention_source": "pass2_evidence",
-      "aspects_covered": [
-        {
-          "aspect": "攻击范围数值标注",
-          "evidence": [
-            {
-              "pageid": 13828,
-              "quote": "|攻击范围= 2.3 / 3.91 / 5.75"
-            },
-            {
-              "pageid": 13828,
-              "quote": "|攻击范围= 4 / 6 / 8"
-            },
-            {
-              "pageid": 13828,
-              "quote": "|攻击范围   = 8 / 9.6 / 12.8"
-            }
-          ]
-        }
-      ],
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
-      "detail_level": "summary"
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
-        "海洋地块溺水位置判定",
+        "水域与虚空溺水触发条件描述",
         "溺水潮湿度惩罚标注",
-        "溺水物品掉落联动",
-        "溺水触发条件描述",
-        "虚空地块溺水判定描述"
+        "溺水物品掉落行为描述",
+        "溺水生命与理智损失数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -64,52 +40,36 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/locomotor.lua": {
-      "mention_source": "pass2_evidence",
-      "aspects_covered": [
-        {
-          "aspect": "随机游荡行为描述",
-          "evidence": [
-            {
-              "pageid": 13828,
-              "quote": "没有目标时会随机游荡"
-            }
-          ]
-        }
-      ],
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
-      "detail_level": "summary"
+      "detail_level": "stub"
     },
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -120,13 +80,13 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "detailed"
+  "page_detail_level": "summary"
 }

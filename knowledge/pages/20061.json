@@ -18,29 +18,51 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/fueled.lua": {
-      "mention_source": "llm_verdict",
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "燃料物品添加与接受描述",
+          "evidence": [
+            {
+              "pageid": 20061,
+              "quote": "*添加燃料时不会提供额外的燃料值。"
+            }
+          ]
+        },
+        {
+          "aspect": "空燃料状态标注",
+          "evidence": [
+            {
+              "pageid": 20061,
+              "quote": "|无燃料|"
+            }
+          ]
+        }
+      ],
       "aspects_ignored": [
-        "摧毁时剩余燃料掉落描述",
-        "最大燃料储量标注",
-        "添加燃料数值加成描述",
-        "添加燃料行为描述",
-        "燃料消耗与补满机制描述",
-        "燃料耗尽状态描述"
+        "满燃料与最大储量描述",
+        "燃料分段阈值与等级描述",
+        "燃料效率倍数描述",
+        "燃料消耗与燃烧持续描述",
+        "组件移除时燃料物掉落描述"
       ],
       "route": "direct",
-      "detail_level": "summary",
+      "detail_level": "detailed",
       "llm_verdict": {
         "wording": "具有更高的 240 点燃料值上限",
         "semantic_consistent": true
@@ -48,8 +70,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -57,8 +79,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -66,11 +89,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -82,8 +106,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -91,14 +115,13 @@
     },
     "components/workable.lua": {
       "aspects_ignored": [
-        "工作次数（敲击次数）标注",
-        "敲击工作动作描述",
-        "敲击触发掉落联动"
+        "杂草挖除后行为描述",
+        "杂草植株可挖掘描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

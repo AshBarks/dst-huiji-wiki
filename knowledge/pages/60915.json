@@ -13,8 +13,8 @@
   "symbols": {
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -22,14 +22,21 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/trader.lua": {
+      "aspects_ignored": [
+        "交易接受条件描述",
+        "夜间交易功能禁用描述",
+        "好感度解锁交易功能描述",
+        "拒绝交易反馈效果提及"
+      ],
       "route": "direct",
       "detail_level": "stub"
     }

@@ -19,23 +19,23 @@
   "symbols": {
     "components/combat.lua": {
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -43,7 +43,16 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "医疗与食物回复生命值描述",
+          "aspect": "单次承伤上限标注",
+          "evidence": [
+            {
+              "pageid": 34003,
+              "quote": "具有200生命值的单次承伤上限"
+            }
+          ]
+        },
+        {
+          "aspect": "生命值持续恢复（再生）描述",
           "evidence": [
             {
               "pageid": 34003,
@@ -52,29 +61,27 @@
           ]
         },
         {
-          "aspect": "单次承伤上限标注",
+          "aspect": "生命值数值与上限标注",
           "evidence": [
             {
               "pageid": 34003,
-              "quote": "还具有有 200 {{生命值}}的单次承伤上限"
+              "quote": "具有200生命值"
             }
           ]
         }
       ],
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值损失与组件计算描述"
       ],
       "route": "direct",
       "detail_level": "detailed"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -82,15 +89,11 @@
     },
     "components/inventory.lua": {
       "aspects_ignored": [
-        "检查物品栏含特定条件食物描述",
-        "溺水掉落物品机制类比玩家描述",
-        "物品传输至生物物品栏描述",
+        "物品拾取与堆叠行为描述",
+        "物品栏与装备栏内物品影响描述",
         "物品栏槽位数量标注",
-        "物品栏满载导致新物品销毁描述",
-        "物品栏防水倍率影响新鲜度描述",
-        "生物从自身物品栏装备武器描述",
-        "背包内物品腐烂减速描述",
-        "装备背包合并至玩家物品栏描述"
+        "物品栏空位状态描述",
+        "穿戴装备行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -98,11 +101,12 @@
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
-        "地震掉落物生成描述",
-        "巨兽击杀额外掉落标注",
-        "怪物死亡几率掉落描述",
-        "树木破坏烧毁掉落标注",
-        "蜘蛛击杀掉落物说明"
+        "击杀掉落物数值标注",
+        "季节条件额外掉落",
+        "概率掉落标注",
+        "礼物刷新与冷却描述",
+        "赃物袋战利品生成与变化",
+        "随机掉落行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -110,9 +114,8 @@
     },
     "components/planardamage.lua": {
       "aspects_ignored": [
-        "位面伤害倍率描述",
-        "位面伤害加成数值标注",
-        "位面伤害基础值公式描述"
+        "位面伤害加成效果描述",
+        "位面基础伤害数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -120,8 +123,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -130,10 +133,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",

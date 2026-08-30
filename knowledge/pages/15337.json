@@ -10,6 +10,12 @@
   },
   "symbols": {
     "components/trader.lua": {
+      "aspects_ignored": [
+        "交易接受条件描述",
+        "夜间交易功能禁用描述",
+        "好感度解锁交易功能描述",
+        "拒绝交易反馈效果提及"
+      ],
       "route": "direct",
       "detail_level": "stub"
     }

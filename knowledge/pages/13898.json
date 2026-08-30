@@ -25,12 +25,15 @@
   "symbols": {
     "components/burnable.lua": {
       "aspects_ignored": [
-        "可控燃烧机制与视觉效果",
-        "可燃物分类标注",
-        "灭火与消防机制",
-        "燃烧时间与烧毁结果",
-        "燃烧状态与引燃野火",
-        "闷烧状态与扑灭行为"
+        "可控燃烧状态定义",
+        "点燃行为描述",
+        "燃尽产物与烧毁表现",
+        "燃烧持续时长描述",
+        "燃烧状态传递",
+        "燃烧视觉效果弱化",
+        "野火自发触发条件",
+        "闷烧与熄灭机制",
+        "防火与燃烧免疫标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -38,17 +41,13 @@
     },
     "components/combat.lua": {
       "aspects_ignored": [
-        "丢失仇恨与脱离战斗",
-        "仇恨目标距离与追击",
         "伤害数值标注",
-        "召唤物协同攻击目标",
-        "对玩家伤害倍率描述",
-        "战吼行为描述",
-        "攻击冷却时间描述",
-        "攻击范围数值标注",
-        "睡眠状态触发",
-        "脱战重定目标",
-        "范围伤害技能描述"
+        "战斗咆哮描述",
+        "攻击范围与距离描述",
+        "攻击行为描述",
+        "攻击间隔描述",
+        "目标锁定与仇恨机制描述",
+        "范围伤害描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -56,7 +55,8 @@
     },
     "components/cookable.lua": {
       "aspects_ignored": [
-        "烹饪产物描述"
+        "烹饪后转化描述",
+        "烹饪行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -64,10 +64,10 @@
     },
     "components/edible.lua": {
       "aspects_ignored": [
+        "特殊食物食用额外效果描述",
         "食物理智值数值标注",
         "食物生命值数值标注",
-        "食物饥饿值数值标注",
-        "食用特殊效果描述"
+        "食物饥饿值数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -78,25 +78,32 @@
       "detail_level": "stub"
     },
     "components/follower.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "设定领导者跟随描述",
+          "evidence": [
+            {
+              "pageid": 13898,
+              "quote": "曼德拉草会作为随从跟随采摘者玩家"
+            }
+          ]
+        }
+      ],
       "aspects_ignored": [
-        "停止跟随行为描述",
-        "忠诚度百分比标注",
-        "忠诚时间获取描述",
-        "绑定玩家跟随描述",
-        "跟随距离保持描述"
+        "忠诚时间数值标注"
       ],
       "route": "direct",
-      "detail_level": "stub",
+      "detail_level": "summary",
       "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
-        "冰冻/冻结状态判定描述",
-        "冰冻抗性数值与机制描述",
-        "冻结实体行为描述",
-        "增加冰冻层数行为描述",
-        "解冻与自然解冻行为描述",
-        "额外冰冻抗性累积描述"
+        "冰冻层数施加描述",
+        "冰冻抗性机制与数值描述",
+        "冻结状态与施加行为描述",
+        "解冻、融化与自然解冻描述",
+        "额外冰冻抗性提升描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -104,13 +111,11 @@
     },
     "components/health.lua": {
       "aspects_ignored": [
-        "制作消耗生命值描述",
-        "医疗与食物回复生命值描述",
         "单次承伤上限标注",
-        "实体最大生命值标注",
-        "持续回复与自我治疗描述",
-        "火焰伤害减半描述",
-        "生命值归零导致死亡描述"
+        "生命值归零导致死亡",
+        "生命值持续恢复（再生）描述",
+        "生命值损失与组件计算描述",
+        "生命值数值与上限标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -118,8 +123,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -127,12 +133,10 @@
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
-        "物品丢弃与放置描述",
-        "物品持有状态描述",
-        "物品温度范围与初始值标注",
-        "物品温度降低描述",
-        "物品潮湿度增加描述",
-        "物品被拾取与放入物品栏描述"
+        "物品拾取与丢弃行为描述",
+        "物品沉没行为描述",
+        "物品温度数值及变化描述",
+        "物品潮湿度数值描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -140,15 +144,11 @@
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -156,34 +156,30 @@
     },
     "components/pickable.lua": {
       "aspects_ignored": [
-        "再生与重新生长计时",
-        "施肥恢复与促生长",
-        "移植后状态变化",
-        "荒芜枯萎状态描述",
-        "采集与收获行为",
-        "采集次数消耗限制"
+        "卡住状态描述",
+        "收获次数与耗尽枯萎",
+        "施肥恢复生长与解除枯萎",
+        "枯萎与正常挖掘掉落差异",
+        "枯萎状态与采集限制描述",
+        "生长阶段与重新生长时间",
+        "移植与种植行为"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/propagator.lua": {
-      "aspects_ignored": [
-        "可控燃烧不引燃描述",
-        "引燃附近可燃物描述",
-        "灼烧周围实体描述"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     },
     "components/stackable.lua": {
       "aspects_ignored": [
-        "不可堆叠说明",
-        "优先堆叠至上限行为",
+        "仆从拾取堆叠至上限",
         "堆叠上限数值标注",
-        "拿取受堆叠上限限制",
-        "无限堆叠描述"
+        "堆叠数量参与湿度计算",
+        "无限堆叠机制描述",
+        "物品可堆叠性说明"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -191,15 +187,14 @@
     },
     "components/tradable.lua": {
       "aspects_ignored": [
-        "交易价值与回报标注",
-        "交易对象与限制描述",
-        "交易物解锁条件",
-        "可交易状态说明"
+        "交易价值换算与换取数值标注",
+        "可交易属性与交易价值条件描述",
+        "可交易物品给予触发效果描述"
       ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

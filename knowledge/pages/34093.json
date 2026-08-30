@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "ef223b0ae9b8723501bc50c9b35ff1f8ef1ba8bcbc9647da0b67bbd1ce5c40a8",
     "symbol_doc_shas": {
+      "brains/waveyjoneshandbrain.lua": "37b22fcc90d9dc2568c1e23cceea19abc61c35d227dd814d971f0ad5ccfddeaa",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
@@ -14,21 +15,38 @@
     }
   },
   "symbols": {
+    "brains/waveyjoneshandbrain.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "3次",
+          "region_id": "34093:intro:3",
+          "matched": "brains/waveyjoneshandbrain.lua: minwaittime=3"
+        },
+        {
+          "raw": "3次",
+          "region_id": "34093:intro:3",
+          "matched": "brains/waveyjoneshandbrain.lua: minwaittime=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/entitytracker.lua": {
+      "aspects_ignored": [
+        "追踪实体行为描述",
+        "遗忘实体行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
-        "主动靠近目标描述",
-        "冲刺速度描述",
-        "减速抵抗描述",
-        "奔跑速度数值标注",
-        "奔跑速度禁用标注（手写n/a）",
-        "旋转攻击移速描述",
-        "水陆自由移动描述",
-        "疾跑状态触发描述",
-        "随机游荡行为描述"
+        "冲刺与快速奔跑行为描述",
+        "奔跑速度手动置空说明",
+        "移动速度倍率影响描述",
+        "移动速度数值标注",
+        "行走累积转奔跑行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -36,9 +54,12 @@
     },
     "components/playerprox.lua": {
       "aspects_ignored": [
-        "玩家接近距离阈值标注",
-        "玩家远离回归行为描述",
-        "玩家靠近触发行为描述"
+        "玩家接近距离阈值与实体激活",
+        "玩家距离相关目标锁定与丢失",
+        "玩家远离距离阈值描述",
+        "玩家邻近现身与远离回归",
+        "玩家靠近生物行为响应",
+        "玩家靠近视觉反馈"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -46,8 +67,8 @@
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
-        "基础光环回复效果标注",
-        "理智光环持续影响与衰减描述"
+        "理智光环名称提及",
+        "理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -56,10 +77,11 @@
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "世界再生中计时暂停描述",
-        "巢穴生物再生与下蛋倒计时启动描述",
-        "巨兽生成倒计时设置及剩余时间更新描述",
-        "服务器重启倒计时剩余显示描述"
+        "生成倒计时启动描述",
+        "计时剩余时间数值标注",
+        "计时器存在描述",
+        "计时器暂停动作描述",
+        "计时器暂停状态描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -69,16 +91,10 @@
       }
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

@@ -19,20 +19,29 @@
       "mention_source": "pass2_evidence",
       "aspects_covered": [
         {
-          "aspect": "打开状态限制使用",
+          "aspect": "容器打开权限限制",
           "evidence": [
             {
               "pageid": 72441,
-              "quote": "若扩展储存单元未打开，则不能直接将其中的物品用于制作"
-            },
-            {
-              "pageid": 72441,
-              "quote": "每次只能打开一个扩展储存单元"
+              "quote": "若电量不足无法打开的扩展储存单元"
             }
           ]
         },
         {
-          "aspect": "无限堆叠允许",
+          "aspect": "拿取物品数量限制描述",
+          "evidence": [
+            {
+              "pageid": 72441,
+              "quote": "从其中拿取物品时，一次最多只"
+            },
+            {
+              "pageid": 72441,
+              "quote": "每次翻找到的数量最多为该物品的最大堆叠数"
+            }
+          ]
+        },
+        {
+          "aspect": "无限堆叠启用描述",
           "evidence": [
             {
               "pageid": 72441,
@@ -45,25 +54,14 @@
           "evidence": [
             {
               "pageid": 72441,
-              "quote": "扩展储存单元提供 1 个物品栏"
-            }
-          ]
-        },
-        {
-          "aspect": "翻找拿回物品",
-          "evidence": [
-            {
-              "pageid": 72441,
-              "quote": "翻找坍缩储存单元可以拿回其中的物品"
+              "quote": "提供 1 个物品栏"
             }
           ]
         }
       ],
       "aspects_ignored": [
-        "侧边物品栏显示",
-        "存放特定物品能力",
-        "容器内特定物品状态影响",
-        "打开后物品掉落"
+        "破坏后掉落所有物品描述",
+        "防盗贼保护描述"
       ],
       "route": "direct",
       "detail_level": "detailed"
@@ -74,8 +72,8 @@
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
-        "作祟引发生物恐慌描述",
-        "实体被作祟互动描述"
+        "作祟交互与能力描述",
+        "恐慌行为描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -83,8 +81,9 @@
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
-        "检视描述台词标注",
-        "检视状态区分描述"
+        "图鉴条目检查状态标注",
+        "打蜡后显示名称前缀",
+        "检查后显示详细特性"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -93,12 +92,10 @@
     "components/inventoryitem.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
-        "物品丢弃与放置描述",
-        "物品持有状态描述",
-        "物品温度范围与初始值标注",
-        "物品温度降低描述",
-        "物品潮湿度增加描述",
-        "物品被拾取与放入物品栏描述"
+        "物品拾取与丢弃行为描述",
+        "物品沉没行为描述",
+        "物品温度数值及变化描述",
+        "物品潮湿度数值描述"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -109,12 +106,13 @@
     },
     "components/pickable.lua": {
       "aspects_ignored": [
-        "再生与重新生长计时",
-        "施肥恢复与促生长",
-        "移植后状态变化",
-        "荒芜枯萎状态描述",
-        "采集与收获行为",
-        "采集次数消耗限制"
+        "卡住状态描述",
+        "收获次数与耗尽枯萎",
+        "施肥恢复生长与解除枯萎",
+        "枯萎与正常挖掘掉落差异",
+        "枯萎状态与采集限制描述",
+        "生长阶段与重新生长时间",
+        "移植与种植行为"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -123,12 +121,6 @@
       }
     },
     "components/updatelooper.lua": {
-      "aspects_ignored": [
-        "周期恢复生命值描述",
-        "定时甩落寄生暗影行为",
-        "灵魂诱饵持续时间消失机制",
-        "间隔生命值阈值触发行为"
-      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

@@ -63,11 +63,16 @@
       "llm_verdict": {}
     },
     "components/upgrader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "电路板改装技能升级能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "叠上限。例如，从 1000 个堆叠的树枝里，一",
+        "semantic_consistent": true
+      }
     }
   },
   "page_detail_level": "summary"

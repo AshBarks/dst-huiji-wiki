@@ -39,11 +39,16 @@
       "llm_verdict": {}
     },
     "components/instrument.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "范围设置能力体现"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "候选证据描述了 `wolfgang_whistle`（沃尔夫冈哨子）对随从的攻击力增益效果，该物品位于组件影响变体列表中。代码管理的“触发播放事件”在此体现为对随从的增益。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

@@ -1,0 +1,44 @@
+[
+  {
+    "pageid": 15399,
+    "path": "components/burnable.lua",
+    "class": "A_routing",
+    "note": "人工核实(2026-08-31):句子是击杀掉落表(怪物肉/木炭/坎普斯背包),事实属 lootdropper/prefab 层,与 burnable 燃烧语义无关——路由过近似"
+  },
+  {
+    "pageid": 15897,
+    "path": "components/inventoryitem.lua",
+    "class": "A_routing",
+    "note": "人工核实(2026-08-31):'提供 6 个物品栏'是容器容量,事实属同页 container 组件,非 inventoryitem——路由过近似"
+  },
+  {
+    "pageid": 15935,
+    "path": "components/transparentonsanity.lua",
+    "class": "A_routing",
+    "note": "人工核实(2026-08-31):'理智光环 = -100'是理智光环信息框行,属同页 sanityaura 组件;transparentonsanity 管理低理智透明化,语义无关——路由过近似"
+  },
+  {
+    "pageid": 16057,
+    "path": "components/useabletargeteditem.lua",
+    "class": "A_routing",
+    "note": "人工核实(2026-08-31):'斯威尔初始自带 6 个噩梦燃料'是角色初始物品表(prefab 层)事实,与 useabletargeteditem 使用逻辑无关——路由过近似"
+  },
+  {
+    "pageid": 15677,
+    "path": "components/sanityaura.lua",
+    "class": "B_variant_gap",
+    "note": "人工核实(2026-08-31):理智光环值来自 aurafn(CalcSanityAura 动态计算,-25/战斗 -40),代码无静态常量,页面正确——文档侧变体缺口(与 sanityaura 文档回流配套)"
+  },
+  {
+    "pageid": 19785,
+    "path": "components/sanityaura.lua",
+    "class": "B_variant_gap",
+    "note": "人工核实(2026-08-31):理智光环 -40/分钟来自 aurafn 动态计算,活树变体不在文档证据覆盖内,页面正确——文档侧变体缺口(与 sanityaura 文档回流配套)"
+  },
+  {
+    "pageid": 24881,
+    "path": "components/spellcaster.lua",
+    "class": "D_manual",
+    "note": "人工核实(2026-08-31):页面描述的'生成沼泽地块/召唤暗影触手'正是施法(cast)的使用效果,与 spellcaster 语义一致,审计 verdict 疑似误判;分类学暂无误报类,保守保留人工复看"
+  }
+]

@@ -81,8 +81,29 @@
       "detail_level": "detailed"
     },
     "components/amphibiouscreature.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "离开海洋的行为描述",
+          "evidence": [
+            {
+              "pageid": 13602,
+              "quote": "跳上船发动三连范围攻击"
+            }
+          ]
+        },
+        {
+          "aspect": "进入海洋的行为描述",
+          "evidence": [
+            {
+              "pageid": 13602,
+              "quote": "跳回水中"
+            }
+          ]
+        }
+      ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "detailed"
     },
     "components/combat.lua": {
       "aspects_ignored": [

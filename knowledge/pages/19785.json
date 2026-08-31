@@ -98,7 +98,18 @@
       "llm_verdict": {}
     },
     "components/sanityaura.lua": {
-      "mention_source": "llm_verdict",
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "变体理智光环数值标注",
+          "evidence": [
+            {
+              "pageid": 19785,
+              "quote": "|理智光环 = -40{{理智值}}/分钟"
+            }
+          ]
+        }
+      ],
       "aspects_ignored": [
         "理智光环名称提及",
         "理智光环数值标注"

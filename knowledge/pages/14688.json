@@ -140,14 +140,19 @@
         "水源装水行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/wateryprotection.lua": {
       "aspects_ignored": [
         "防水效果减免限制"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述水球效果，包括增加湿度、降低温度和防火，与wateryprotection组件的水保护效果完全一致。"
+      }
     },
     "components/weapon.lua": {
       "aspects_ignored": [

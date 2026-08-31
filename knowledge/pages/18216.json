@@ -29,7 +29,10 @@
         "蓄电池功能定义"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容讨论硝石发电机，未涉及电池组件或相关变异体。"
+      }
     },
     "components/burnable.lua": {
       "aspects_ignored": [

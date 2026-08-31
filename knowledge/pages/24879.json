@@ -68,7 +68,11 @@
         "爆炸伤害类型描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "该页面描述蛞蝓龟窝的生成机制和蛞蝓龟的特性。尽管提及对实体造成50点伤害，但这是蛞蝓龟的普通攻击行为，并非由`explosive.lua`组件管理的爆炸机制触发。页面未涉及爆炸相关属性或机制。"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

@@ -64,7 +64,10 @@
         "慌张乱跑行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面涉及胡萝卜鼠赛跑但未提及恐慌行为"
+      }
     },
     "behaviours/runaway.lua": {
       "aspects_ignored": [

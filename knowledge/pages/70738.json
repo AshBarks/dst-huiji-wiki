@@ -27,7 +27,11 @@
         "非自然传送门物品数量上限行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面无任何候选数值事实或文本信息，无法判断是否提及或与该代码符号相关。"
+      }
     }
   },
   "page_detail_level": "stub"

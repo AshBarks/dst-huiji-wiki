@@ -7,49 +7,62 @@
   },
   "category": "component",
   "display_name": "amphibiouscreature",
-  "summary": "此组件用于管理两栖生物在陆地和水域之间的状态转换。它跟踪实体的当前位置环境，自动切换对应的动画库并触发相关回调函数。组件参与生物的移动机制，确保它们在水陆环境中正确表现动画和行为。",
+  "summary": "该组件管理两栖生物在陆地和水域之间的状态切换。它追踪生物的当前位置，根据是否在水中改变动画银行和标签状态。组件提供设置动画和切换回调的方法，参与生物与环境的互动玩法。",
   "api": [
     {
+      "name": "OnRemoveFromEntity",
+      "effect": "从实体移除组件时，清理死亡事件监听。"
+    },
+    {
+      "name": "OnEntitySleep",
+      "effect": "实体休眠时，停止组件更新以节省性能。"
+    },
+    {
+      "name": "OnEntityWake",
+      "effect": "实体唤醒时，如果未死亡，开始组件更新。"
+    },
+    {
       "name": "SetBanks",
-      "effect": "设置陆地和水域对应的动画库名。副作用：更新组件的 land_bank 和 ocean_bank 属性。"
+      "effect": "设置陆地和海洋的动画银行，参数为陆地银行和海洋银行。"
     },
     {
       "name": "SetTransitionDistance",
-      "effect": "设置水陆转换的距离阈值。副作用：更新组件的 transitiondistance 属性。"
+      "effect": "设置水中与陆地切换的检测距离。"
     },
     {
       "name": "GetTransitionDistance",
-      "effect": "获取当前水陆转换的距离阈值。返回 transitiondistance 的值。"
+      "effect": "返回当前切换距离。"
     },
     {
       "name": "OnUpdate",
-      "effect": "每帧更新检查实体位置是否在陆地或水域。如果环境变化且不在跳跃状态，调用 OnEnterOcean 或 OnExitOcean 触发转换。"
+      "effect": "每次更新时检查生物位置，如果水中状态变化，则调用进入或退出海洋的函数。"
     },
     {
       "name": "ShouldTransition",
-      "effect": "根据指定坐标检查是否应该触发环境转换。返回布尔值：如果在水中则检查是否到达陆地，反之亦然。"
+      "effect": "根据指定位置判断是否应该切换水中状态，返回布尔值。"
     },
     {
       "name": "OnEnterOcean",
-      "effect": "触发进入水域行为。副作用：切换水域动画库，设置 in_water 为 true，添加 'swimming' 标签，并调用 enterwaterfn 回调函数（如果已设置）。"
+      "effect": "进入海洋时，设置海洋动画银行，添加'游泳'标签，并调用进入水的回调函数。"
     },
     {
       "name": "OnExitOcean",
-      "effect": "触发退出水域行为。副作用：切换陆地动画库，设置 in_water 为 false，移除 'swimming' 标签，并调用 exitwaterfn 回调函数（如果已设置）。"
+      "effect": "退出海洋时，设置陆地动画银行，移除'游泳'标签，并调用退出水的回调函数。"
     },
     {
       "name": "SetEnterWaterFn",
-      "effect": "设置进入水域时调用的回调函数。副作用：更新组件的 enterwaterfn 属性。"
+      "effect": "设置进入水时的回调函数，参数为函数。"
     },
     {
       "name": "SetExitWaterFn",
-      "effect": "设置退出水域时调用的回调函数。副作用：更新组件的 exitwaterfn 属性。"
+      "effect": "设置退出水时的回调函数，参数为函数。"
     },
     {
       "name": "GetDebugString",
-      "effect": "获取调试信息字符串，返回当前是否在水中的状态。"
+      "effect": "返回调试字符串，显示生物是否在水中。"
     }
   ],
+  "api_note": "",
   "events_published": [],
   "events_listened": [
     "death"
@@ -58,40 +71,58 @@
   "tunables": [],
   "wiki": {
     "scanned_pageids": [
-      65605,
-      18853,
-      20315,
-      15327,
-      18359,
-      34954,
-      18572,
-      22707
+      15259,
+      15935,
+      13857,
+      13602,
+      24364,
+      16356,
+      15269,
+      23210
     ],
-    "aspects": [],
-    "no_evidence_reason": "提供的页面摘录未提及amphibiouscreature组件或其能力清单中的任何行为语义，如过渡距离设置、进入/退出海洋函数等，页面主题集中于世界翻新、物品、海洋区域、鸟类、玩具、溺水、温度和袭击，未涉及该组件的具体能力表达。",
-    "coverage_status": "no_wiki_mention"
+    "aspects": [
+      {
+        "aspect": "离开海洋的行为描述",
+        "evidence": [
+          {
+            "pageid": 13602,
+            "quote": "跳上船发动三连范围攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "进入海洋的行为描述",
+        "evidence": [
+          {
+            "pageid": 13602,
+            "quote": "跳回水中"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
   },
   "search_terms": [
-    "两栖",
-    "水陆",
-    "游泳",
-    "陆地",
-    "海洋",
-    "动画切换",
-    "环境",
-    "地形",
-    "生物移动",
-    "生存"
+    "两栖生物",
+    "水中移动",
+    "陆地行走",
+    "游泳行为",
+    "动画变化",
+    "标签作用",
+    "状态回调",
+    "互动系统"
   ],
+  "search_terms_note": "pass1 后零命中 7/8,已二次修正(修正后 6/8)",
   "gameplay_tags": [
     "生存",
-    "移动"
+    "生物",
+    "环境互动"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "6d7a2c3108cd3888853236d61ceda5e68563a51528a78ea33616fc5f798003e7",
     "source_bytes": 2698,
     "model": "mimo-v2.5",
-    "generated_at_ms": 1788090474694
+    "generated_at_ms": 1788184435899
   }
 }

@@ -104,7 +104,11 @@
         "卡住回避行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面内容为某生物/物品在不同季节的刷新数据表，是纯粹的静态数据，不涉及动态行为。"
+      }
     },
     "components/talker.lua": {
       "aspects_ignored": [

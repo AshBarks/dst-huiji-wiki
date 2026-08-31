@@ -3,7 +3,7 @@
   "pageid": 19718,
   "title": "虫洞",
   "inputs": {
-    "wikitext_sha256": "4f822a8fef75dfa2b554995a630ef3f3a9ffca67fbf2935be54ac95568ddbd9d",
+    "wikitext_sha256": "409bec84beea7019961bc145c30c5863cd2fe2ff8a3c78cd4b0583dabb949b11",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",

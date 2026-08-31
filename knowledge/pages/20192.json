@@ -66,11 +66,17 @@
       "llm_verdict": {}
     },
     "components/preserver.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "保鲜率乘数效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "一个[[容器]]，提供 6 个物品栏，只能收纳",
+        "semantic_consistent": false,
+        "note": "提到容器，可能为受影响变体之一，但未明确保鲜或温度控制"
+      }
     }
   },
   "page_detail_level": "summary"

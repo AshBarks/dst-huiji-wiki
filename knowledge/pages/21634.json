@@ -135,7 +135,10 @@
         "开花阶段升级效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据涉及武器耐久、冲刺冷却和伤害，未提及升级状态或阶段。"
+      }
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",

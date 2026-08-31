@@ -214,7 +214,8 @@
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -230,7 +231,11 @@
         "防护偷窃能力描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "暴躁箱子主动寻找物品，与偷窃语义一致。"
+      }
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

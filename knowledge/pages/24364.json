@@ -66,6 +66,10 @@
       "detail_level": "stub"
     },
     "components/amphibiouscreature.lua": {
+      "aspects_ignored": [
+        "离开海洋的行为描述",
+        "进入海洋的行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -230,7 +234,11 @@
         "防护偷窃能力描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "水獭掠夺者描述捡起物品、冷却和优先级，与偷窃语义一致。"
+      }
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

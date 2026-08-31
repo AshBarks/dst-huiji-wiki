@@ -286,7 +286,10 @@
         "动物舔舐频率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面核心描述伏特羊的充电机制、攻击行为及掉落，未提及该实体可受舔盐（saltlicker）组件影响。"
+      }
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

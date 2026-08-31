@@ -267,7 +267,11 @@
         "卡住回避行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面内容为寄居蟹隐士的任务流程和条件，与实体的移动或卡住回避行为无关。"
+      }
     },
     "components/talker.lua": {
       "mention_source": "pass2_evidence",

@@ -111,7 +111,8 @@
         "雪球发射器的灭火功能说明"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/snowmandecor.lua": {
       "route": "direct",
@@ -144,7 +145,8 @@
         "水源装水行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
   "page_detail_level": "summary"

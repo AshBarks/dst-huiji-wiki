@@ -105,7 +105,10 @@
         "开花阶段升级效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据显示掉落物品和事件内容，未涉及升级机制或代码符号相关概念。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

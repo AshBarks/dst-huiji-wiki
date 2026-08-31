@@ -105,12 +105,16 @@
       "detail_level": "detailed"
     },
     "components/aura.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "电路板激活启用增益",
         "骨灰罐激活启用光环"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/combat.lua": {
       "mention_source": "llm_verdict",

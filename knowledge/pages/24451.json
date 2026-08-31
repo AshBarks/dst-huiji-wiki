@@ -49,6 +49,7 @@
       }
     },
     "components/boatring.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "旋转器数量影响旋转速度",
         "旋转方向显示提示",
@@ -57,7 +58,12 @@
         "船的半径描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "崩溃掉落 3 个[[木板]]",
+        "semantic_consistent": true,
+        "note": "普通船的崩溃掉落机制被提及。"
+      }
     },
     "components/boatringdata.lua": {
       "route": "direct",
@@ -126,7 +132,10 @@
         "生命值随时间恢复的描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/hull.lua": {
       "mention_source": "pass2_evidence",

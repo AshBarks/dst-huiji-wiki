@@ -112,12 +112,17 @@
       "llm_verdict": {}
     },
     "components/herdmember.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "兽群位置决定机制",
         "兽群再生规则"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "企鸥群包含 6 ~ 11 只企鸥。",
+        "semantic_consistent": true
+      }
     },
     "components/homeseeker.lua": {
       "aspects_ignored": [
@@ -138,7 +143,10 @@
         "饥饿值状态触发语音台词"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面涉及 penguin，但未提及饥饿值相关机制。"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -218,5 +226,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

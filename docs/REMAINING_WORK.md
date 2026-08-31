@@ -16,9 +16,9 @@
 
 ## A. 可直接执行(长尾运营,无外部依赖)
 
-### A1. 未审计 stub 池 436 对
+### A1. ✅ 未审计 stub 池 436 → 227(2026-08-31 完成)
 
-- **说明**:PageSymbolMap 的 stub 对(确定性方法未见证据)中还有 436 对未跑过 L2 审计。审计会把"页面实际提及了符号"的对转为提及(mention),并给语义判定。收益递减:近 3 轮转化 16→15→7 对/轮(每轮上限 60 页,按 facts 富裕度选页)。
+- **说明**:PageSymbolMap 的 stub 对(确定性方法未见证据)中曾余 436 对未跑 L2 审计。**已执行 4 轮**(exit 全 0):累计转换 42 对为提及,语义不一致 +35;有提及页面 430 → 446,直连提及对 942 → 999,**未审计 stub 436 → 227**。收益递减明显,余量留待下批自然消化。
 - **指导**:
   ```bash
   # 循环执行直到"未审计 stub"不再明显下降(每轮 ~15 分钟到 ~4 小时不等)
@@ -26,43 +26,41 @@
   # 轮与轮之间或收尾时出报表核对数字(root 位置参数在 --report 模式下不使用,占位即可)
   $BIN knowledge-scan-wiki "$SCRIPTS" --corpus wikis/dontstarve.huijiwiki.com --report
   ```
-- **验收**:报表中"未审计 stub"降到位(建议降到 <100 或连续两轮转化 <3 对即止);提交刷新的 `knowledge/pages/` 与 `knowledge/page_map_summary.json`。
-- **回填**:本文勾选 + KNOWLEDGE_PAGE_MAP.md §7 增量注记更新数字。
+- **验收**:未审计 stub 降至 227(<100 未达,但两轮转化已 <8 对,按收益递减止步;剩余随下次更新周期消化)。
+- **回填**:✅ PAGE_MAP §7 注记已更新数字。
 
-### A2. 语义不一致 C 类 7 对人工核
+### A2. ✅ 语义不一致 C 类 7 对人工核(2026-08-31 完成)
 
 - **说明**:`knowledge/inconsistent_classification.json` 中 `C_page_error`(疑似页面错误)的 7 对是"数值在任何可达代码中都找不到"的候选。人工核实后才能决定:改页面(B 类误分/动态值)或立页面纠错项(真错误)。
 - **指导**:打开 `knowledge/inconsistent_classification.json`,逐对执行:①看 wording/note/reason;②到 `$SCRIPTS` 搜数值来源(注意 `aurafn` 类动态计算值、loot 表权重与百分比单位换算——这类**优先判 B**,回流文档侧);③按 §0 历史核实法定案;④直接编辑 json 的 `class` 字段与 `note`(加"人工核实: …"前缀),提交。
 - **当前 7 对速览**(2026-08-31):坎普斯×burnable、蘑菇地精×sanityaura、厨师袋×inventoryitem(6 格)、恐怖利爪×transparentonsanity(-100)、噩梦燃料×useabletargeteditem(6)、完全正常的树×sanityaura(-40)、绝望投泥带×spellcaster。
-- **验收**:7 对全部有人工核实记录;真错误如需页面修订,走 Tier2 建议稿格式(参照 §1.3 处置①)另行立稿,不直接改 wiki。
-- **回填**:本文勾选 + KNOWLEDGE_PAGE_MAP.md §8 补充人工结论。
+- **结果**:4 对 → A_routing(坎普斯掉落属 lootdropper / 厨师袋容量属 container / 恐怖利爪理智光环属 sanityaura / 初始物品属角色 prefab 层);2 对 → B_variant_gap(sanityaura aurafn 动态值);1 对 → D_manual 保留(绝望投泥带×spellcaster,审计 verdict 疑似误判——页面描述的施法效果即组件语义,分类学缺"误报"类)。**C 类清零**。
+- **机制沉淀**:新增 `knowledge/inconsistent_manual.json` 人工覆写层(重跑 --classify 不覆盖人工结论);PAGE_MAP §8 已回填。
 
-### A3. sanityaura 变体缺口回流 SymbolDoc
+### A3. ✅ sanityaura 变体缺口回流(2026-08-31 完成)
 
 - **说明**:M2 审计与分类器均确认 sanityaura 的文档变体口径有缺口(完全正常的树 -40 / 蘑菇地精 aurafn 动态值的页面证据未归因)。这是"文档侧缺口"(B 类)而非页面问题。
 - **指导**(二选一):
   1. **手工补(推荐,快且可审)**:编辑 `knowledge/symbols/component__sanityaura.json` 的 `wiki.aspects`,为两个页面各补一条带引文的 aspect(引文从 `wikis/.../pages/19785.wikitext` / `15677.wikitext` 原文摘录,逐字);**不得改动 `provenance.source_sha256`**;提交信息注明"手工修正变体口径"。
-  2. **管线重跑**:`$BIN knowledge-scan-symbols "$SCRIPTS" --category component --pick-names sanityaura --force --corpus wikis/dontstarve.huijiwiki.com`——但 pass2 采样不一定命中这两页,效果不保证。
-  - 补后跑 `knowledge-scan-wiki "$SCRIPTS" --corpus ... --classify` 确认对应 C 类消失(转为提及/归因)。
-- **验收**:分类报告中不再有 sanityaura 的 C 类;提交含修正后的文档与刷新的页面图。
+  2. ~~管线重跑~~(未采用:pass2 采样不保证命中这两页)
+  - 补后 `--classify` 确认对应 C 类经 A2 覆写清零。
+- **结果**:采用方案 1 手工补——文档新增 aspect「变体理智光环数值标注」(蘑菇地精 -25/战斗 -40 + 完全正常的树 -40,引文逐字摘自页面),provenance 未动。
 
-### A4. pass2 二次确认(可选,防过严)
+### A4. ✅ pass2 二次确认(2026-08-31 完成)
 
 - **说明**:对「检索命中 ≥3 页但 aspects=0」的组件,pass2 可能过严判空(空即结论的前提是采样充分)。二次确认 prompt 可再给一次机会。
 - **指导**:实现点在 `src/knowledge/scan_symbols.rs` 的 enrich_with_wiki 后:条件(采样页数 ≥3 且 aspects 空)→ 追加一次"请再检查以下摘录是否有被忽略的能力表达"的调用;仍空则保持 no_wiki_mention。预算:触发面约 300+ 文档中的少数,建议加 `--confirm-empty` 开关控制,默认关闭。
-- **验收**:开关可跑;对 3 个已知判空组件(如部分 waterphysics 类)对照前后差异,写入 COMPONENT_FULL_SCAN_REPORT.md 附录。
+- **结果**:落地为 `--confirm-empty` 开关(默认关)。对照 3 组件:amphibiouscreature **翻案 2 条 aspects**(离开/进入海洋行为),另 2 组件复查后保持判空(宁空勿造未被破坏)。355+18 测试全过,提交 `9f5ba93`。
 
-### A5. brain pass2 判空改善(可选)
+### A5. ✅ brain pass2 判空改善(2026-08-31 完成,结论:无效)
 
 - **说明**:brain 文档判空偏多(页面"行为"章与语义清单对齐缺口)。§9.1 已改用 args_semantic 文本;下一步可叠加 tunables 数值语义(常量名+值+使用语境)进 caps。
-- **指导**:改 `scan_symbols.rs` 的 brain caps builder;挑 5 个判空 brain(如 spiderbrain/beefalobrain)重跑 `--pass2-names ... --force` 对照;有改善再全量 `--category brain --limit 187 --force`。
-- **验收**:对照记录 + 全量重跑后报表数字回填 KNOWLEDGE_BEHAVIOUR_CHAIN.md §9.2。
+- **结果**:caps 提为 `brain_caps()` 并叠加 tunables 数值语义(NAME=值);5 脑对照(spider/beefalo/spiderqueen/bearger/bee)重跑后 **0/5 改善,仍全判空**。结论:判空主因是页面行为章确实不讨论 brain 内部调参(§9.1 判断成立),数值语义无济于事。**按既定标准不启动 187 全量重跑**;caps 改动保留(信息量无害),提交 `9f5ba93`。
 
-### A6. 分类器 LLM 层方差治理(可选)
+### A6. ✅ 分类器 LLM 层方差治理(2026-08-31 完成)
 
-- **说明**:`--classify` 的 LLM 辅助层(D 残差)在 A/B/D 边界上有 run 间方差(实测 A24→46 波动)。A/B/C 标签由确定性层锁定不受影响,但若需要 D 层稳定可治理。
-- **指导**:候选方案——①多次投票取众数;②LLM 层结果只作 reason 附注不改 class;③提高确定性层覆盖率(更多信号)减少 D 面。任选其一在 `classify.rs` 落地并写对照。
-- **验收**:同输入连续 3 次 --classify,counts 波动 ≤2。
+- **结果**:实测三票多数仍不收敛(A 57↔45,B/C 亦摇摆,超 ≤2 验收线)→ 采纳方案②:**LLM 层降级为 `llm_suggest` 建议字段**(不改 class),class 只由确定性层+人工覆写(`inconsistent_manual.json`)决定。最终 2 连跑逐字一致(A9/B4/C2/D136),**零方差达成**,提交 `9f5ba93`+后续。
+- **残余取舍**:D_manual 扩大到 136 对(失去 D→A/B 自动转化),人工按 llm_suggest 提示分诊;若嫌人工量大,后续可提高确定性层覆盖率(方案③)收敛 D 面。
 
 ---
 

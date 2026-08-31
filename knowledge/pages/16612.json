@@ -19,11 +19,16 @@
   },
   "symbols": {
     "components/boatpatch.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "补丁类型列举"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面候选证据显示制作配方消耗木板和针刺，与boatpatch物品的制作逻辑一致。"
+      }
     },
     "components/burnable.lua": {
       "aspects_ignored": [
@@ -110,5 +115,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -61,7 +61,10 @@
         "治疗能力的行为触发条件"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

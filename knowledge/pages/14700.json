@@ -77,11 +77,17 @@
       "llm_verdict": {}
     },
     "components/preserver.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "保鲜率乘数效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "种子袋提供 14 个物品栏",
+        "semantic_consistent": false,
+        "note": "提到了种子袋（受影响变体 seedpouch），但未涉及保鲜率乘数或温度敏感性功能"
+      }
     }
   },
   "page_detail_level": "summary"

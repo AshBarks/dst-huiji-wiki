@@ -32,7 +32,10 @@
         "蓄电池功能定义"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容主要讨论宝石发电机，未直接提及电池组件或相关变异体，可能缺失电池相关讨论。"
+      }
     },
     "components/burnable.lua": {
       "aspects_ignored": [

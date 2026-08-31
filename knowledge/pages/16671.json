@@ -59,12 +59,17 @@
       "llm_verdict": {}
     },
     "components/upgrader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "电路板改装技能升级能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "装时带有可以燃烧 4.5 分钟的燃料，可以通过",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

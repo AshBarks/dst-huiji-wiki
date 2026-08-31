@@ -28,13 +28,18 @@
       "llm_verdict": {}
     },
     "components/healer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "治疗效果的角色特定修改",
         "治疗物品的效果描述",
         "治疗能力的行为触发条件"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "生命值}}/秒，持续 10 秒",
+        "semantic_consistent": true
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -72,5 +77,5 @@
       }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

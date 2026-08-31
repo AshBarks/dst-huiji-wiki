@@ -97,7 +97,10 @@
         "开花阶段升级效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据提及物品栏和耐久性，未显示升级相关的内容或进阶机制。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

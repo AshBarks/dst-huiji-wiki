@@ -112,7 +112,10 @@
         "讲故事能力触发条件与理智增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

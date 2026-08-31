@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at_ms": 1788176705806,
+  "generated_at_ms": 1788185770653,
   "totals": {
     "pages": 758,
-    "pages_with_mention": 430,
+    "pages_with_mention": 446,
     "pairs": 7704,
     "mentioned_by_source": {
-      "pass2_evidence": 245,
+      "pass2_evidence": 248,
       "fact_match": 76,
-      "llm_verdict": 682
+      "llm_verdict": 736
     },
-    "stub_pairs": 6701,
-    "stub_unaudited": 436
+    "stub_pairs": 6644,
+    "stub_unaudited": 227
   },
   "symbols": {
     "behaviours/attackwall.lua": {
@@ -144,7 +144,7 @@
       "routed": 7,
       "mentioned": 0,
       "stub": 7,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -171,8 +171,8 @@
       "routed": 6,
       "mentioned": 0,
       "stub": 6,
-      "stub_unaudited": 6,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 3,
       "detailed": 0,
       "summary": 0
     },
@@ -970,11 +970,11 @@
     },
     "components/amphibiouscreature.lua": {
       "routed": 9,
-      "mentioned": 0,
-      "stub": 9,
-      "stub_unaudited": 0,
+      "mentioned": 1,
+      "stub": 8,
+      "stub_unaudited": 8,
       "inconsistent": 0,
-      "detailed": 0,
+      "detailed": 1,
       "summary": 0
     },
     "components/anchor.lua": {
@@ -1042,12 +1042,12 @@
     },
     "components/aura.lua": {
       "routed": 3,
-      "mentioned": 0,
-      "stub": 3,
-      "stub_unaudited": 3,
+      "mentioned": 3,
+      "stub": 0,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 3
     },
     "components/bait.lua": {
       "routed": 39,
@@ -1098,7 +1098,7 @@
       "routed": 3,
       "mentioned": 0,
       "stub": 3,
-      "stub_unaudited": 3,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -1222,12 +1222,12 @@
     },
     "components/boatpatch.lua": {
       "routed": 4,
-      "mentioned": 0,
-      "stub": 4,
-      "stub_unaudited": 4,
+      "mentioned": 2,
+      "stub": 2,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/boatphysics.lua": {
       "routed": 8,
@@ -1249,12 +1249,12 @@
     },
     "components/boatring.lua": {
       "routed": 7,
-      "mentioned": 1,
-      "stub": 6,
-      "stub_unaudited": 6,
+      "mentioned": 5,
+      "stub": 2,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
-      "summary": 0
+      "summary": 4
     },
     "components/boatringdata.lua": {
       "routed": 7,
@@ -1314,7 +1314,7 @@
       "routed": 305,
       "mentioned": 20,
       "stub": 285,
-      "stub_unaudited": 5,
+      "stub_unaudited": 0,
       "inconsistent": 1,
       "detailed": 2,
       "summary": 18
@@ -1458,7 +1458,7 @@
       "routed": 4,
       "mentioned": 0,
       "stub": 4,
-      "stub_unaudited": 4,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -1528,12 +1528,12 @@
     },
     "components/cooker.lua": {
       "routed": 7,
-      "mentioned": 0,
-      "stub": 7,
-      "stub_unaudited": 7,
+      "mentioned": 1,
+      "stub": 6,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/cookiecutterdrill.lua": {
       "routed": 1,
@@ -1852,12 +1852,12 @@
     },
     "components/explosive.lua": {
       "routed": 5,
-      "mentioned": 0,
-      "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "mentioned": 3,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 3,
       "detailed": 0,
-      "summary": 0
+      "summary": 3
     },
     "components/explosiveresist.lua": {
       "routed": 22,
@@ -1926,7 +1926,7 @@
       "routed": 65,
       "mentioned": 24,
       "stub": 41,
-      "stub_unaudited": 5,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 24
@@ -2248,12 +2248,12 @@
     },
     "components/healer.lua": {
       "routed": 7,
-      "mentioned": 1,
-      "stub": 6,
-      "stub_unaudited": 6,
-      "inconsistent": 0,
+      "mentioned": 3,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 4,
       "detailed": 0,
-      "summary": 1
+      "summary": 3
     },
     "components/health.lua": {
       "routed": 158,
@@ -2268,8 +2268,8 @@
       "routed": 7,
       "mentioned": 0,
       "stub": 7,
-      "stub_unaudited": 7,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 7,
       "detailed": 0,
       "summary": 0
     },
@@ -2320,12 +2320,12 @@
     },
     "components/herdmember.lua": {
       "routed": 8,
-      "mentioned": 2,
-      "stub": 6,
-      "stub_unaudited": 6,
+      "mentioned": 3,
+      "stub": 5,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
-      "summary": 1
+      "summary": 2
     },
     "components/hideandseeker.lua": {
       "routed": 1,
@@ -2392,12 +2392,12 @@
     },
     "components/hull.lua": {
       "routed": 7,
-      "mentioned": 2,
-      "stub": 5,
-      "stub_unaudited": 5,
+      "mentioned": 5,
+      "stub": 2,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
-      "summary": 1
+      "summary": 4
     },
     "components/hullhealth.lua": {
       "routed": 7,
@@ -2412,7 +2412,7 @@
       "routed": 9,
       "mentioned": 5,
       "stub": 4,
-      "stub_unaudited": 4,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 3,
       "summary": 2
@@ -2446,12 +2446,12 @@
     },
     "components/instrument.lua": {
       "routed": 6,
-      "mentioned": 0,
-      "stub": 6,
-      "stub_unaudited": 6,
+      "mentioned": 5,
+      "stub": 1,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 5
     },
     "components/insulator.lua": {
       "routed": 12,
@@ -2464,12 +2464,12 @@
     },
     "components/inventory.lua": {
       "routed": 66,
-      "mentioned": 5,
-      "stub": 61,
-      "stub_unaudited": 6,
+      "mentioned": 7,
+      "stub": 59,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 5
+      "summary": 7
     },
     "components/inventoryitem.lua": {
       "routed": 417,
@@ -2653,12 +2653,12 @@
     },
     "components/machine.lua": {
       "routed": 7,
-      "mentioned": 0,
-      "stub": 7,
-      "stub_unaudited": 7,
+      "mentioned": 4,
+      "stub": 3,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 4
     },
     "components/madsciencelab.lua": {
       "routed": 1,
@@ -3022,12 +3022,12 @@
     },
     "components/periodicspawner.lua": {
       "routed": 7,
-      "mentioned": 2,
-      "stub": 5,
-      "stub_unaudited": 5,
+      "mentioned": 5,
+      "stub": 2,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
-      "summary": 1
+      "summary": 4
     },
     "components/perishable.lua": {
       "routed": 60,
@@ -3193,12 +3193,12 @@
     },
     "components/powerload.lua": {
       "routed": 6,
-      "mentioned": 1,
-      "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "mentioned": 6,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 3,
       "detailed": 0,
-      "summary": 1
+      "summary": 6
     },
     "components/preservative.lua": {
       "routed": 1,
@@ -3211,12 +3211,12 @@
     },
     "components/preserver.lua": {
       "routed": 8,
-      "mentioned": 1,
-      "stub": 7,
-      "stub_unaudited": 7,
-      "inconsistent": 0,
+      "mentioned": 6,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 4,
       "detailed": 0,
-      "summary": 1
+      "summary": 6
     },
     "components/projectedeffects.lua": {
       "routed": 1,
@@ -3258,7 +3258,7 @@
       "routed": 26,
       "mentioned": 8,
       "stub": 18,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 8
@@ -3310,12 +3310,12 @@
     },
     "components/rechargeable.lua": {
       "routed": 6,
-      "mentioned": 1,
-      "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "mentioned": 5,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
       "detailed": 0,
-      "summary": 1
+      "summary": 5
     },
     "components/reloaditem.lua": {
       "routed": 1,
@@ -3411,7 +3411,7 @@
       "routed": 4,
       "mentioned": 0,
       "stub": 4,
-      "stub_unaudited": 4,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -3573,8 +3573,8 @@
       "routed": 5,
       "mentioned": 0,
       "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 4,
       "detailed": 0,
       "summary": 0
     },
@@ -3708,7 +3708,7 @@
       "routed": 7,
       "mentioned": 0,
       "stub": 7,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -3753,7 +3753,7 @@
       "routed": 5,
       "mentioned": 0,
       "stub": 5,
-      "stub_unaudited": 5,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -3823,12 +3823,12 @@
     },
     "components/storytellingprop.lua": {
       "routed": 6,
-      "mentioned": 0,
-      "stub": 6,
-      "stub_unaudited": 6,
-      "inconsistent": 0,
+      "mentioned": 1,
+      "stub": 5,
+      "stub_unaudited": 0,
+      "inconsistent": 5,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/stretcher.lua": {
       "routed": 1,
@@ -3843,8 +3843,8 @@
       "routed": 6,
       "mentioned": 0,
       "stub": 6,
-      "stub_unaudited": 6,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 6,
       "detailed": 0,
       "summary": 0
     },
@@ -3951,8 +3951,8 @@
       "routed": 8,
       "mentioned": 0,
       "stub": 8,
-      "stub_unaudited": 8,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 4,
       "detailed": 0,
       "summary": 0
     },
@@ -3987,7 +3987,7 @@
       "routed": 66,
       "mentioned": 7,
       "stub": 59,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 16,
       "detailed": 1,
       "summary": 6
@@ -4068,7 +4068,7 @@
       "routed": 4,
       "mentioned": 0,
       "stub": 4,
-      "stub_unaudited": 4,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -4093,12 +4093,12 @@
     },
     "components/upgrader.lua": {
       "routed": 7,
-      "mentioned": 0,
-      "stub": 7,
-      "stub_unaudited": 7,
+      "mentioned": 4,
+      "stub": 3,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 4
     },
     "components/useableequippeditem.lua": {
       "routed": 1,
@@ -4140,7 +4140,7 @@
       "routed": 6,
       "mentioned": 0,
       "stub": 6,
-      "stub_unaudited": 6,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -4212,7 +4212,7 @@
       "routed": 7,
       "mentioned": 0,
       "stub": 7,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -4221,8 +4221,8 @@
       "routed": 4,
       "mentioned": 0,
       "stub": 4,
-      "stub_unaudited": 4,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
       "detailed": 0,
       "summary": 0
     },
@@ -4327,12 +4327,12 @@
     },
     "components/worldmigrator.lua": {
       "routed": 5,
-      "mentioned": 0,
-      "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "mentioned": 1,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 4,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/worldroutefollower.lua": {
       "routed": 1,
@@ -4624,12 +4624,12 @@
     },
     "stategraphs/SGboat.lua": {
       "routed": 7,
-      "mentioned": 2,
-      "stub": 5,
-      "stub_unaudited": 5,
-      "inconsistent": 0,
+      "mentioned": 5,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
       "detailed": 0,
-      "summary": 2
+      "summary": 5
     },
     "stategraphs/SGboatcannon.lua": {
       "routed": 1,
@@ -6047,6 +6047,20 @@
   },
   "inconsistencies": [
     {
+      "pageid": 13493,
+      "title": "寄居蟹隐士",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为寄居蟹隐士的任务流程和条件，与实体的移动或卡住回避行为无关。"
+    },
+    {
+      "pageid": 13603,
+      "title": "海草",
+      "symbol": "behaviours/standandattack.lua",
+      "wording": null,
+      "note": "页面描述海草的生长和掉落等非战斗行为，与攻击语义不一致。"
+    },
+    {
       "pageid": 13603,
       "title": "海草",
       "symbol": "components/waterphysics.lua",
@@ -6089,11 +6103,25 @@
       "note": "页面描述尘蛾的生成与行为，无交易相关内容。"
     },
     {
+      "pageid": 14671,
+      "title": "蜂蜜药膏",
+      "symbol": "components/healer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
       "pageid": 14688,
       "title": "水球",
       "symbol": "components/equippable.lua",
       "wording": "被水球砸中会增加 20 点[[潮湿度]]或[[物品潮湿度]]",
       "note": null
+    },
+    {
+      "pageid": 14700,
+      "title": "种子袋",
+      "symbol": "components/preserver.lua",
+      "wording": "种子袋提供 14 个物品栏",
+      "note": "提到了种子袋（受影响变体 seedpouch），但未涉及保鲜率乘数或温度敏感性功能"
     },
     {
       "pageid": 14712,
@@ -6115,6 +6143,34 @@
       "symbol": "components/spellcaster.lua",
       "wording": null,
       "note": "页面提及了受影响物品‘trident’(刺耳三叉)，但描述内容为该物品的使用耐久与效果，未描述其作为施法工具的能力或组件功能。"
+    },
+    {
+      "pageid": 15162,
+      "title": "营火",
+      "symbol": "components/storytellingprop.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15170,
+      "title": "火坑",
+      "symbol": "components/storytellingprop.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15171,
+      "title": "吸热营火",
+      "symbol": "components/storytellingprop.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15172,
+      "title": "吸热火坑",
+      "symbol": "components/storytellingprop.lua",
+      "wording": null,
+      "note": null
     },
     {
       "pageid": 15235,
@@ -6152,6 +6208,13 @@
       "note": "页面描述溯源表与时空裂缝功能，与交易无关。"
     },
     {
+      "pageid": 15357,
+      "title": "青蛙",
+      "symbol": "components/thief.lua",
+      "wording": null,
+      "note": "无候选数值事实，无法判断与 thief 组件的关联。"
+    },
+    {
       "pageid": 15399,
       "title": "坎普斯",
       "symbol": "components/burnable.lua",
@@ -6173,6 +6236,13 @@
       "note": "页面为蜘蛛战斗数据，未涉及交易。"
     },
     {
+      "pageid": 15551,
+      "title": "蜂王",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为蜂王的掉落表，未提及该实体的移动机制或卡住回避。"
+    },
+    {
       "pageid": 15555,
       "title": "穴居悬蛛",
       "symbol": "components/trader.lua",
@@ -6185,6 +6255,27 @@
       "symbol": "components/acidinfusible.lua",
       "wording": "酸雨期间，额外：{{Pic|32|硝石}}×1（20%）<br>{{Pic|32|洞穴蝙蝠翅膀}}×1（50%）<br>{{Pic|32|鸟粪}}×1（30%）<br>{{Pic|32|怪物肉}}×1（20%）",
       "note": "页面提及酸雨额外掉落，但未描述代码相关的体型改变或视觉效果添加。"
+    },
+    {
+      "pageid": 15587,
+      "title": "蛞蝓龟",
+      "symbol": "components/explosive.lua",
+      "wording": null,
+      "note": "该页面描述蛞蝓龟的基础行为与掉落，未涉及任何爆炸伤害（如爆炸范围、伤害数值）或与`explosive.lua`组件管理的爆炸机制相关的直接描述。蛞蝓龟可能受到爆炸影响，但此页面本身并未讨论此方面。"
+    },
+    {
+      "pageid": 15587,
+      "title": "蛞蝓龟",
+      "symbol": "components/thief.lua",
+      "wording": null,
+      "note": "蛞蝓龟有食物行为和产生黏液，但未明确描述偷取物品的语义。"
+    },
+    {
+      "pageid": 15642,
+      "title": "熊獾",
+      "symbol": "components/thief.lua",
+      "wording": null,
+      "note": "页面描述熊獾的行为和掉落，但未提及偷窃机制或 thief 组件。"
     },
     {
       "pageid": 15651,
@@ -6201,6 +6292,13 @@
       "note": "页面描述实体“龙蝇”（Dragonfly），该实体在受影响变体列表中。代码符号适用于它，但页面提供的证据文本（刷新机制、掉落物）未具体描述与拴绳行为相关的游荡、返回机制等核心方面。"
     },
     {
+      "pageid": 15651,
+      "title": "龙蝇",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为龙蝇的掉落表和基础信息，未涉及其移动或卡住回避的动态行为。"
+    },
+    {
       "pageid": 15677,
       "title": "蘑菇地精",
       "symbol": "components/sanityaura.lua",
@@ -6213,6 +6311,20 @@
       "symbol": "components/activatable.lua",
       "wording": null,
       "note": null
+    },
+    {
+      "pageid": 15722,
+      "title": "食人花",
+      "symbol": "components/shelf.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15724,
+      "title": "秃鹫",
+      "symbol": "behaviours/standandattack.lua",
+      "wording": null,
+      "note": "页面描述秃鹫的生成和进食，未涉及战斗攻击行为。"
     },
     {
       "pageid": 15737,
@@ -6269,6 +6381,20 @@
       "symbol": "behaviours/attackwall.lua",
       "wording": null,
       "note": "页面描述恐怖之眼的生成和掉落信息，但未提及攻击墙壁行为；实体eyeofterror在受影响列表中。"
+    },
+    {
+      "pageid": 15832,
+      "title": "恐怖之眼",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为实体(恐怖之眼)的掉落表和技能伤害数值，未提及任何关于实体移动、卡住或回避行为的核心机制。"
+    },
+    {
+      "pageid": 15851,
+      "title": "鸟笼",
+      "symbol": "components/shelf.lua",
+      "wording": null,
+      "note": null
     },
     {
       "pageid": 15897,
@@ -6337,6 +6463,20 @@
       "pageid": 16661,
       "title": "夹夹绞盘",
       "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 16661,
+      "title": "夹夹绞盘",
+      "symbol": "components/shelf.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17850,
+      "title": "蚊子血囊",
+      "symbol": "components/healer.lua",
       "wording": null,
       "note": null
     },
@@ -6420,6 +6560,13 @@
     {
       "pageid": 17995,
       "title": "蜘蛛腺",
+      "symbol": "components/healer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17995,
+      "title": "蜘蛛腺",
       "symbol": "components/inspectable.lua",
       "wording": null,
       "note": null
@@ -6483,6 +6630,13 @@
     {
       "pageid": 18853,
       "title": "海洋拖网捕鱼器",
+      "symbol": "components/preserver.lua",
+      "wording": "海洋拖网捕鱼器有 4 个物品栏，可以放入",
+      "note": "提到了海洋拖网捕鱼器（受影响变体 ocean_trawler），但未涉及保鲜功能"
+    },
+    {
+      "pageid": 18853,
+      "title": "海洋拖网捕鱼器",
       "symbol": "components/waterphysics.lua",
       "wording": null,
       "note": "页面仅提到物品栏，未涉及水体物理管理内容。"
@@ -6493,6 +6647,13 @@
       "symbol": "components/trader.lua",
       "wording": null,
       "note": "页面为华丽基座解谜说明，不涉及交易功能。"
+    },
+    {
+      "pageid": 19298,
+      "title": "亮茄炸弹",
+      "symbol": "components/explosive.lua",
+      "wording": null,
+      "note": "该页面提及了某种实体（可能为“舞台之手”）对可锤击实体造成作业伤害，其中提到“10次作业”。此伤害描述与`explosive.lua`管理的爆炸“作业”伤害类型在形式上相关，但该页面未明确说明此伤害来源于爆炸机制。`explosive.lua`可能提供了此伤害计算的基础函数，但页面语义未明确指向爆炸。"
     },
     {
       "pageid": 19340,
@@ -6537,6 +6698,13 @@
       "note": "页面讨论兔人生成与胡萝卜相关性，未提及兔人的交易功能。"
     },
     {
+      "pageid": 20192,
+      "title": "极地熊獾桶",
+      "symbol": "components/preserver.lua",
+      "wording": "一个[[容器]]，提供 6 个物品栏，只能收纳",
+      "note": "提到容器，可能为受影响变体之一，但未明确保鲜或温度控制"
+    },
+    {
       "pageid": 20287,
       "title": "可疑的土堆",
       "symbol": "components/activatable.lua",
@@ -6551,6 +6719,20 @@
       "note": "页面描述boat_grass的掉落信息，未提及船只物理行为"
     },
     {
+      "pageid": 20291,
+      "title": "草筏",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 20437,
+      "title": "明眼青蛙",
+      "symbol": "components/thief.lua",
+      "wording": null,
+      "note": "蛙类击落物品，但未描述主动偷取行为，与 thief 组件语义不一致。"
+    },
+    {
       "pageid": 20560,
       "title": "猎犬丘",
       "symbol": "components/health.lua",
@@ -6563,6 +6745,20 @@
       "symbol": "components/activatable.lua",
       "wording": null,
       "note": null
+    },
+    {
+      "pageid": 22181,
+      "title": "灵魂",
+      "symbol": "components/rechargeable.lua",
+      "wording": null,
+      "note": "页面讨论 Wortox 的灵魂生成机制，未提及充电或冷却状态。"
+    },
+    {
+      "pageid": 22383,
+      "title": "拾荒疯猪",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为某个实体的攻击伤害、掉落物和战利品池规则，完全未描述其移动或寻路行为。"
     },
     {
       "pageid": 22556,
@@ -6614,6 +6810,13 @@
       "note": "页面描述boat_ice的掉落信息，未提及船只物理行为"
     },
     {
+      "pageid": 24074,
+      "title": "冰船",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
       "pageid": 24090,
       "title": "海盗单桅帆船",
       "symbol": "components/boatphysics.lua",
@@ -6621,11 +6824,32 @@
       "note": "页面描述boat_pirate的掉落信息，未提及船只物理行为"
     },
     {
+      "pageid": 24090,
+      "title": "海盗单桅帆船",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
       "pageid": 24451,
       "title": "船",
       "symbol": "components/boatphysics.lua",
       "wording": null,
       "note": "页面描述boat的掉落信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24451,
+      "title": "船",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 24578,
+      "title": "传送伞",
+      "symbol": "components/powerload.lua",
+      "wording": "每天消耗 1 单位的电力",
+      "note": "页面提及传送伞的电力消耗，但未描述空闲状态，与代码语义不完全一致。"
     },
     {
       "pageid": 24589,
@@ -6637,9 +6861,23 @@
     {
       "pageid": 24589,
       "title": "水獭掠夺者窝点",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
       "symbol": "components/waterphysics.lua",
       "wording": null,
       "note": "页面描述水獭窝的掉落和再生，无水体物理相关机制。"
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
+      "symbol": "stategraphs/SGboat.lua",
+      "wording": null,
+      "note": "页面涉及掉落物如海带叶、藤壶，但与代码符号的船只崩溃掉落不匹配"
     },
     {
       "pageid": 24764,
@@ -6647,6 +6885,34 @@
       "symbol": "components/boatphysics.lua",
       "wording": null,
       "note": "页面描述boat_ancient的掉落和货舱信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24764,
+      "title": "古董船",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 24834,
+      "title": "称手遥控器",
+      "symbol": "components/powerload.lua",
+      "wording": "每天消耗 1 单位的电力",
+      "note": "页面提及遥控器的电力消耗，但未描述设备空闲状态，与代码语义不完全一致。"
+    },
+    {
+      "pageid": 24842,
+      "title": "薇机人",
+      "symbol": "components/powerload.lua",
+      "wording": "每天消耗 1 单位的电力",
+      "note": "页面提及存储机器人的电力消耗，但未描述空闲状态，与代码语义不完全一致。"
+    },
+    {
+      "pageid": 24879,
+      "title": "蛞蝓龟窝",
+      "symbol": "components/explosive.lua",
+      "wording": null,
+      "note": "该页面描述蛞蝓龟窝的生成机制和蛞蝓龟的特性。尽管提及对实体造成50点伤害，但这是蛞蝓龟的普通攻击行为，并非由`explosive.lua`组件管理的爆炸机制触发。页面未涉及爆炸相关属性或机制。"
     },
     {
       "pageid": 24880,
@@ -6677,6 +6943,20 @@
       "note": null
     },
     {
+      "pageid": 33991,
+      "title": "胡萝卜鼠健身房",
+      "symbol": "components/shelf.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 34272,
+      "title": "被堵住的洞穴",
+      "symbol": "components/worldmigrator.lua",
+      "wording": null,
+      "note": "页面内容片段显示“开采后变为洞”，但未提及任何与世界迁移门户、传送功能或跨世界数据相关的机制，因此与该代码符号无关联。"
+    },
+    {
       "pageid": 35413,
       "title": "双尾心",
       "symbol": "components/spellcaster.lua",
@@ -6684,11 +6964,39 @@
       "note": "页面描述了受影响物品‘wortox_reviver’(沃拓克斯的复活器)的属性(生命值、灵魂消耗)和被动效果，但未描述其主动施放法术的施法能力或组件控制的功能。"
     },
     {
+      "pageid": 35670,
+      "title": "龙蝇船",
+      "symbol": "components/healthsyncer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 39298,
+      "title": "扑腾绷带",
+      "symbol": "components/healer.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 39307,
+      "title": "便携营火",
+      "symbol": "components/storytellingprop.lua",
+      "wording": null,
+      "note": null
+    },
+    {
       "pageid": 45135,
       "title": "小丑",
       "symbol": "components/activatable.lua",
       "wording": null,
       "note": null
+    },
+    {
+      "pageid": 46887,
+      "title": "流浪商人",
+      "symbol": "components/stuckdetection.lua",
+      "wording": null,
+      "note": "页面内容为某生物/物品在不同季节的刷新数据表，是纯粹的静态数据，不涉及动态行为。"
     },
     {
       "pageid": 51097,
@@ -6719,11 +7027,46 @@
       "note": "页面描述黄金浮标，与船只物理行为无关"
     },
     {
+      "pageid": 52138,
+      "title": "水晶冠秃鹫",
+      "symbol": "behaviours/standandattack.lua",
+      "wording": null,
+      "note": "页面提到攻击和原地眩晕，但未明确描述战斗中的原地停止行为。"
+    },
+    {
+      "pageid": 52631,
+      "title": "雪球",
+      "symbol": "components/wateryprotection.lua",
+      "wording": null,
+      "note": "页面讨论雪球生成机制，涉及土壤水分和环境温度，但未直接涉及wateryprotection组件的水保护效果（如湿度增加、温度降低等）。"
+    },
+    {
+      "pageid": 60911,
+      "title": "巨型漩涡",
+      "symbol": "components/worldmigrator.lua",
+      "wording": null,
+      "note": "页面内容涉及“中心区域”、“船耐久”、“潮湿度”、“引燃”等概念，与代码符号components/worldmigrator.lua管理的世界迁移门户核心功能无关。"
+    },
+    {
+      "pageid": 61070,
+      "title": "海洋漂浮物",
+      "symbol": "components/worldmigrator.lua",
+      "wording": null,
+      "note": "页面内容涉及“远古圣殿”和物品翻找机制，与代码符号components/worldmigrator.lua管理的世界迁移门户核心功能无关。"
+    },
+    {
       "pageid": 70479,
       "title": "珍珠的温泉",
       "symbol": "components/trader.lua",
       "wording": null,
       "note": "页面讨论装饰度与温泉配方，不涉及交易系统。"
+    },
+    {
+      "pageid": 70738,
+      "title": "自动化朋友传送门",
+      "symbol": "components/worldmigrator.lua",
+      "wording": null,
+      "note": "页面无任何候选数值事实或文本信息，无法判断是否提及或与该代码符号相关。"
     },
     {
       "pageid": 71461,
@@ -6738,6 +7081,13 @@
       "symbol": "behaviours/chaseandattack.lua",
       "wording": null,
       "note": null
+    },
+    {
+      "pageid": 72441,
+      "title": "扩展储存单元",
+      "symbol": "components/preserver.lua",
+      "wording": "一个[[容器]]，提供 1 个物品栏。当空间扩",
+      "note": "提到容器，可能为受影响变体之一，但未明确保鲜或温度控制"
     },
     {
       "pageid": 72986,

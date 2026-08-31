@@ -38,11 +38,16 @@
       }
     },
     "components/explosive.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "爆炸伤害类型描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "该页面描述了石果被打开（爆炸）时的效果（对所有实体造成50点伤害，对可锤击实体造成1次作业），这符合`explosive.lua`组件管理的爆炸伤害与建筑伤害机制。石果的打开效果可能通过触发爆炸相关代码实现。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",

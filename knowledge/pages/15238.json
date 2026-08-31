@@ -563,7 +563,8 @@
         "兽群再生规则"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hitchable.lua": {
       "route": "direct",
@@ -723,12 +724,16 @@
         "动物舔舐频率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面主要介绍弗娄牛的掉落、剃毛、生成粪肥等行为，未提及舔盐（saltlicker）相关机制。"
+      }
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",

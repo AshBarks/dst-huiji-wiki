@@ -69,9 +69,22 @@
             "quote": "尸体的负面精神光环一般与生物大小正相关"
           }
         ]
+      },
+      {
+        "aspect": "变体理智光环数值标注",
+        "evidence": [
+          {
+            "pageid": 15677,
+            "quote": "|理智光环 = -25{{理智值}}/分钟<br>战斗时：-40{{理智值}}/分钟"
+          },
+          {
+            "pageid": 19785,
+            "quote": "|理智光环 = -40{{理智值}}/分钟"
+          }
+        ]
       }
     ],
-    "coverage_status": "partial"
+    "coverage_status": "well_documented"
   },
   "auto_maintained": {
     "source": "Module:AutoInfobox",

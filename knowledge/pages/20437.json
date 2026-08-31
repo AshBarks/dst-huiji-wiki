@@ -146,7 +146,11 @@
         "防护偷窃能力描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "蛙类击落物品，但未描述主动偷取行为，与 thief 组件语义不一致。"
+      }
     },
     "stategraphs/SGfrog.lua": {
       "aspects_ignored": [

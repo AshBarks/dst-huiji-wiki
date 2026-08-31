@@ -89,6 +89,7 @@
       "llm_verdict": {}
     },
     "components/rechargeable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "充电操作描述",
         "充电状态效果",
@@ -98,7 +99,12 @@
         "技能冷却状态"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "挥舞第85次时，阴郁回旋镖会",
+        "semantic_consistent": true,
+        "note": "页面描述了回旋镖的使用次数限制，可能与充电状态相关。"
+      }
     },
     "components/shadowlevel.lua": {
       "mention_source": "llm_verdict",

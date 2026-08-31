@@ -40,12 +40,16 @@
       "detail_level": "stub"
     },
     "components/cooker.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "烹饪操作步骤描述",
         "烹饪锅的烹饪功能描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -128,5 +132,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -90,7 +90,10 @@
         "慌张乱跑行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面提及鹿的迁徙但未提及恐慌行为"
+      }
     },
     "behaviours/runaway.lua": {
       "aspects_ignored": [
@@ -275,7 +278,10 @@
         "动物舔舐频率描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面介绍无眼鹿的生成、迁徙、掉落及淘气值等，未涉及舔盐（saltlicker）相关状态或机制。"
+      }
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

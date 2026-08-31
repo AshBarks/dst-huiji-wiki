@@ -172,7 +172,10 @@
         "装饰放置功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面讨论杂草生长和必忘我等变体，但未提及代码符号 vasedecoration 或其相关功能。"
+      }
     }
   },
   "page_detail_level": "stub"

@@ -133,7 +133,8 @@
         "将目标共享给所有士兵"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -258,7 +259,8 @@
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -282,7 +284,11 @@
         "卡住回避行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面内容为实体(恐怖之眼)的掉落表和技能伤害数值，未提及任何关于实体移动、卡住或回避行为的核心机制。"
+      }
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

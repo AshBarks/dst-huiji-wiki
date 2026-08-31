@@ -105,7 +105,10 @@
         "慌张乱跑行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面提及兔王淘气值但未提及恐慌行为"
+      }
     },
     "behaviours/standstill.lua": {
       "aspects_ignored": [
@@ -259,7 +262,8 @@
         "穿戴装备行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -313,7 +317,8 @@
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -378,7 +383,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "stategraphs/SGcozy_bunnyman.lua": {
       "route": "direct",

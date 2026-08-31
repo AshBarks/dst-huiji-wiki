@@ -57,11 +57,17 @@
       "detail_level": "stub"
     },
     "components/preserver.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "保鲜率乘数效果描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "度也会更快，最多 3 天（冬天要更长一点",
+        "semantic_consistent": true,
+        "note": "提及温度或腐烂速率变化，与代码语义中温度变化速率倍率一致"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -75,5 +81,5 @@
       }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

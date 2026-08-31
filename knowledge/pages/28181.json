@@ -62,11 +62,16 @@
       "llm_verdict": {}
     },
     "components/instrument.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "范围设置能力体现"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "候选证据描述了 `rabbitkinghorn` 或 `rabbitkinghorn_chest`（兔王号角）的耐久消耗机制，这些物品位于组件影响变体列表中。代码管理的“乐器的播放数据”包括了使用次数/耐久度。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

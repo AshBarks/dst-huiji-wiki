@@ -75,11 +75,16 @@
       }
     },
     "components/explosive.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "爆炸伤害类型描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "该页面详细描述了火药的爆炸效果（对所有实体造成200点伤害，对可锤击实体造成10次作业），这直接对应了`explosive.lua`组件管理的爆炸伤害与建筑伤害机制。`gunpowder`（火药）是受影响的变体之一。"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

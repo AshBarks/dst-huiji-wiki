@@ -32,7 +32,11 @@
         "目标锁定行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述秃鹫的生成和进食，未涉及战斗攻击行为。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

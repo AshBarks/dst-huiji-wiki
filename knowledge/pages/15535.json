@@ -83,7 +83,10 @@
         "猪屋生成猪人行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

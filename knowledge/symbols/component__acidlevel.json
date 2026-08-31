@@ -7,121 +7,117 @@
   },
   "category": "component",
   "display_name": "acidlevel",
-  "summary": "该组件管理实体的酸性值（acid level），在酸雨发生时周期性触发，对实体造成生命伤害、腐蚀装备和腐坏物品。核心玩法涉及在酸雨环境中的生存挑战，玩家需应对酸雨带来的持续威胁和资源损耗。",
+  "summary": "acidlevel组件管理实体的酸度水平数据，最大值为100，当前值随酸雨事件动态变化。它响应世界酸雨和普通雨状态，周期性地对装备耐久度、物品腐烂速度和玩家生命值造成伤害，并支持自定义覆盖函数。该组件是饥荒联机版中环境危害系统的核心部分，影响生存策略。",
   "api": [
     {
-      "name": "SetIgnoreAcidRainTicks",
-      "effect": "设置是否忽略酸雨的周期性伤害。若从允许切换为忽略，会触发停止酸雨的回调；若从忽略切换为允许，会触发生效酸雨的回调。影响酸雨伤害的计时器状态。"
+      "name": "SetIgnoreAcidRainTicks(ignoreacidrainticks)",
+      "effect": "设置是否忽略酸雨伤害刻度。若从允许变为忽略，则触发onstopisacidrainingfn回调；若从忽略变为允许，则触发onstartisacidrainingfn回调。改变ignoreacidrainticks字段值。"
     },
     {
-      "name": "SetOverrideAcidRainTickFn",
-      "effect": "设置一个覆盖函数，用于自定义酸雨tick时的伤害计算。覆盖函数返回0可跳过默认行为，返回负值可实现治疗效果。"
+      "name": "SetOverrideAcidRainTickFn(fn)",
+      "effect": "设置一个覆盖函数，用于自定义酸雨伤害行为。函数参数为实体和默认伤害值，返回值可修改伤害；返回0则跳过默认行为。"
     },
     {
-      "name": "GetOverrideAcidRainTickFn",
-      "effect": "获取当前设置的酸雨tick覆盖函数。"
+      "name": "GetOverrideAcidRainTickFn()",
+      "effect": "返回当前设置的覆盖函数，若未设置则返回nil。"
     },
     {
-      "name": "OnIsAcidRaining",
-      "effect": "监听世界酸雨状态变化。当酸雨开始时，启动周期性任务（周期为ACIDRAIN_DAMAGE_TIME），触发酸雨伤害；当酸雨停止时，取消任务并触发停止回调。"
+      "name": "OnIsAcidRaining(isacidraining)",
+      "effect": "当世界酸雨状态变化时调用。若酸雨开始，启动周期性酸雨伤害任务；若酸雨结束，取消该任务。触发对应的开始或停止回调函数。"
     },
     {
-      "name": "OnIsRaining",
-      "effect": "监听世界普通雨状态变化。当雨开始时，启动周期性任务降低酸性值；当雨停止时，取消任务并触发停止回调。"
+      "name": "OnIsRaining(israining)",
+      "effect": "当世界普通雨状态变化时调用。若雨开始，启动周期性任务减少酸度；若雨结束，取消该任务。触发对应的开始或停止回调函数。"
     },
     {
-      "name": "SetOnStartIsAcidRainingFn",
-      "effect": "设置酸雨开始时的回调函数，在酸雨状态变为true时触发。"
+      "name": "SetOnStartIsAcidRainingFn(fn)",
+      "effect": "设置酸雨开始时的回调函数，当酸雨开始时自动调用。"
     },
     {
-      "name": "SetOnStopIsAcidRainingFn",
-      "effect": "设置酸雨停止时的回调函数，在酸雨状态变为false时触发。"
+      "name": "SetOnStopIsAcidRainingFn(fn)",
+      "effect": "设置酸雨结束时的回调函数，当酸雨结束时自动调用。"
     },
     {
-      "name": "SetOnStartIsRainingFn",
-      "effect": "设置普通雨开始时的回调函数，在雨状态变为true时触发。"
+      "name": "SetOnStartIsRainingFn(fn)",
+      "effect": "设置普通雨开始时的回调函数，当普通雨开始时自动调用。"
     },
     {
-      "name": "SetOnStopIsRainingFn",
-      "effect": "设置普通雨停止时的回调函数，在雨状态变为false时触发。"
+      "name": "SetOnStopIsRainingFn(fn)",
+      "effect": "设置普通雨结束时的回调函数，当普通雨结束时自动调用。"
     },
     {
-      "name": "DoDelta",
-      "effect": "改变实体的酸性值，值被限制在0到max之间。推送acidleveldelta事件，包含旧百分比和新百分比。"
+      "name": "DoDelta(delta)",
+      "effect": "调整酸度水平，新值钳制在0到最大值之间。推送acidleveldelta事件，包含旧百分比和新百分比。"
     },
     {
-      "name": "GetPercent",
-      "effect": "返回当前酸性值占最大值的百分比。"
+      "name": "GetPercent()",
+      "effect": "返回当前酸度占最大值的百分比（0到1之间）。"
     },
     {
-      "name": "SetPercent",
-      "effect": "设置酸性值为指定百分比对应的值，内部调用DoDelta。"
+      "name": "SetPercent(percent)",
+      "effect": "设置酸度百分比，通过DoDelta方法调整当前酸度值。"
     },
     {
-      "name": "OnSave",
-      "effect": "保存组件数据，返回包含current字段的表。"
+      "name": "OnSave()",
+      "effect": "返回包含当前酸度值的表，用于数据保存。"
     },
     {
-      "name": "OnLoad",
-      "effect": "从数据表加载酸性值，若数据存在且与当前值不同，调用DoDelta调整。"
+      "name": "OnLoad(data)",
+      "effect": "从数据表加载酸度值，若与当前值不同则通过DoDelta调整。"
     },
     {
-      "name": "GetDebugString",
-      "effect": "返回调试字符串，显示当前酸性值与最大值。"
+      "name": "GetDebugString()",
+      "effect": "返回格式化的调试字符串，显示当前酸度和最大酸度（如“50.00 / 100.00”）。"
     }
   ],
-  "api_note": "",
   "events_published": [
     "acidleveldelta"
   ],
-  "events_listened": [
-    "isacidraining",
-    "israining"
-  ],
+  "events_listened": [],
   "netvars": [],
   "tunables": [
-    "TUNING.ACIDRAIN_DAMAGE_TIME",
-    "TUNING.ACIDRAIN_DAMAGE_PER_SECOND",
-    "TUNING.ACIDRAIN_DAMAGE_FUELED_SCALER",
-    "TUNING.ACIDRAIN_PERISHABLE_ROT_PERCENT"
+    "ACIDRAIN_DAMAGE_TIME",
+    "ACIDRAIN_DAMAGE_PER_SECOND",
+    "ACIDRAIN_PERISHABLE_ROT_PERCENT",
+    "ACIDRAIN_DAMAGE_FUELED_SCALER"
   ],
   "wiki": {
     "scanned_pageids": [
-      22418,
-      20496,
-      10413,
-      15295,
-      19754,
-      21499,
-      15753,
-      16669
+      15922,
+      20058,
+      15022,
+      15244,
+      20150,
+      10374,
+      18410,
+      19129
     ],
     "aspects": [],
-    "no_evidence_reason": "页面摘录主要描述酸雨的机制、对玩家和生物的影响，以及相关物品的免疫效果，但未涉及代码能力如SetIgnoreAcidRainTicks、GetPercent、OnIsAcidRaining等的具体行为或玩家语言表达。",
+    "no_evidence_reason": "页面文本中提到了酸雨的影响（如伤害倍率、物品腐蚀），但没有描述酸级别组件的具体能力或行为表达，如数值调整、状态事件或函数调用。",
     "coverage_status": "no_wiki_mention"
   },
   "search_terms": [
     "酸雨",
-    "酸性值",
-    "腐蚀",
-    "装备损坏",
-    "生命伤害",
-    "天气伤害",
-    "腐坏",
-    "防护",
-    "免疫"
+    "酸度",
+    "伤害",
+    "装备",
+    "腐烂",
+    "生命",
+    "雨",
+    "免疫",
+    "耐久",
+    "水分"
   ],
   "gameplay_tags": [
     "生存",
-    "天气",
-    "伤害",
-    "腐蚀"
+    "战斗",
+    "环境"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "b55675ac0d6da72b4728d18a02739cdce1d0d8da3298791e48de0dfb2d51def8",
     "source_bytes": 9921,
     "model": "mimo-v2.5",
-    "generated_at_ms": 1788088550510
+    "generated_at_ms": 1788184459653
   }
 }

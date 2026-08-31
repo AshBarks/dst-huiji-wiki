@@ -96,16 +96,24 @@
         "生命值随时间恢复的描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/hull.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "船半径数值描述",
         "船崩溃掉落行为描述",
         "船部署过程描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "崩溃掉落 3 个[[木板]]",
+        "semantic_consistent": true
+      }
     },
     "components/hullhealth.lua": {
       "route": "direct",
@@ -156,11 +164,16 @@
       }
     },
     "stategraphs/SGboat.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "船体崩溃掉落物标注"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "崩溃掉落 3 个[[木板]]",
+        "semantic_consistent": true
+      }
     }
   },
   "page_detail_level": "detailed"

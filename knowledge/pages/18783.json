@@ -3,7 +3,7 @@
   "pageid": 18783,
   "title": "大触手",
   "inputs": {
-    "wikitext_sha256": "fc8937b32ca4c01245763216dee0e0d8a96d605baee7948b897df2f7646c8dd6",
+    "wikitext_sha256": "c99b9f52a5a3e0acc55024a58be886601ad375224511ad6a1c9f3cb51b7a56b3",
     "symbol_doc_shas": {
       "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
@@ -114,7 +114,8 @@
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",

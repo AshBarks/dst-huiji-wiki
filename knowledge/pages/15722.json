@@ -123,6 +123,7 @@
       "llm_verdict": {}
     },
     "components/inventory.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品拾取与堆叠行为描述",
         "物品栏与装备栏内物品影响描述",
@@ -131,7 +132,11 @@
         "穿戴装备行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "食人花具有 15 个[[物品栏]]",
+        "semantic_consistent": true
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -179,7 +184,10 @@
         "桌上放置家具装饰的功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -199,5 +207,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

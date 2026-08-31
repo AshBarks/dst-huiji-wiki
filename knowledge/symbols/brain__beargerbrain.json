@@ -7,17 +7,9 @@
   },
   "category": "brain",
   "display_name": "beargerbrain",
-  "summary": "熊獾大脑在实体未处于跳跃或踉跄状态时，按优先级决策行为。当存在合适战斗目标时会冲锋或追击，靠近玩家基地时会偷吃食物和破坏容器，无目标时按季节在出生点附近游荡。",
-  "api": [
-    {
-      "name": "OnStart",
-      "effect": ""
-    },
-    {
-      "name": "OnInitializationComplete",
-      "effect": ""
-    }
-  ],
+  "summary": "熊獾大脑控制熊獾在游戏中的行为，使其在夏季返回出生点并倾向于寻找蜂蜜相关食物，在秋季长途游荡并攻击玩家基地的结构。它会在追逐目标时使用冲撞攻击，优先处理蜂蜜物品，并在没有优先目标时进行游荡或站立不动。",
+  "api": [],
+  "api_note": "该大脑没有定义额外的对外方法；仅作为行为树容器，在实体初始化时启动行为逻辑。",
   "events_published": [],
   "events_listened": [],
   "netvars": [],
@@ -26,147 +18,121 @@
     "GIVE_UP_DIST",
     "MAX_CHARGE_DIST",
     "SEE_FOOD_DIST",
-    "SEE_STRUCTURE_DIST",
-    "BASE_TAGS",
-    "NO_TAGS",
-    "PICKABLE_FOODS",
-    "BEEHIVE_TAGS",
-    "OUTSIDE_CATAPULT_RANGE"
+    "SEE_STRUCTURE_DIST"
   ],
   "behaviour_invocations": [
     {
       "ctor": "ChaseAndRam",
       "args_semantic": [
-        "实体自身",
-        "最大追逐时间 8 秒",
-        "放弃距离阈值 20",
+        "熊獾实例",
+        "追击最长 8 秒",
+        "放弃距离 20",
         "最大冲锋距离 60"
       ],
-      "context": "WhileNode 'Charge Behaviours': 战斗目标存在且非蜂巢且(正在奔跑或处于 InRamDistance 判定距离)"
+      "context": "当有攻击目标且目标非蜂巢，熊獾在奔跑或目标在冲撞距离内时"
     },
     {
       "ctor": "ChaseAndAttack",
       "args_semantic": [
-        "实体自身",
-        "最长追逐时间 TUNING.BEARGER_MAX_CHASE_TIME",
-        "放弃距离 60 世界单位",
-        "最大攻击次数 nil",
-        "寻找新目标函数 nil",
-        "步行 true(移动慢)",
-        "海洋距离测试函数 OceanDistanceTest"
+        "熊獾实例",
+        "追击最长时间由 TUNING.BEARGER_MAX_CHASE_TIME 决定",
+        "放弃距离 60",
+        "最大攻击次数默认",
+        "寻找新目标函数无",
+        "步行模式假",
+        "海洋距离测试函数"
       ],
-      "context": "根优先级节点中，冲锋行为之后"
+      "context": "当需要追击和攻击非蜂巢目标时"
     },
     {
       "ctor": "DoAction",
       "args_semantic": [
-        "实体自身",
-        "获取进食动作函数 EatFoodAction"
+        "熊獾实例",
+        "获取吃食物动作的函数 EatFoodAction",
+        "默认节点名",
+        "默认超时",
+        "默认运行方式"
       ],
-      "context": "WhileNode 'At Base' 内优先执行，以及其后再次执行"
+      "context": "在熊獾位于玩家基地附近或通用情况下尝试进食时"
     },
     {
       "ctor": "DoAction",
       "args_semantic": [
-        "实体自身",
-        "获取偷取食物动作函数 StealFoodAction"
+        "熊獾实例",
+        "获取偷食物动作的函数 StealFoodAction",
+        "默认节点名",
+        "默认超时",
+        "默认运行方式"
       ],
-      "context": "WhileNode 'At Base' 内优先执行，以及其后再次执行"
+      "context": "在熊獾位于玩家基地附近或通用情况下尝试偷取食物时"
     },
     {
       "ctor": "DoAction",
       "args_semantic": [
-        "实体自身",
-        "获取攻击蜂巢动作函数 AttackHiveAction",
-        "节点调试名 'AttackHive'",
-        "跑动方式 nil",
-        "超时 7 秒"
+        "熊獾实例",
+        "获取攻击蜂巢动作的函数 AttackHiveAction",
+        "节点名 'AttackHive'",
+        "超时 nil",
+        "运行方式 7"
       ],
-      "context": "根优先级中，偷食物之后"
+      "context": "当没有其他优先行为时，尝试攻击蜂巢"
     },
     {
       "ctor": "Wander",
       "args_semantic": [
-        "实体自身",
-        "家位置函数 GetHome(夏天返回 spawnpoint 否则 nil)",
-        "最大距离函数 GetTargetDistance(按季节返回不同游荡距离)",
-        "游荡时间配置表{minwalktime=2,randwalktime=3,minwaittime=.1,randwaittime=.6}",
-        "方向获取函数 GetWanderDirection",
-        "方向设置函数 SetWanderDirection"
+        "熊獾实例",
+        "家位置函数 GetHome（夏季返回出生点）",
+        "距离函数 GetTargetDistance（根据季节调整）",
+        "时间表：最小行走时间 2、随机行走时间 3、最小等待时间 0.1、随机等待时间 0.6",
+        "获取方向函数 GetWanderDirection",
+        "设置方向函数 SetWanderDirection"
       ],
-      "context": "根优先级中，偷食物之后、StandStill 之前"
+      "context": "当没有其他优先行为时进行游荡"
     },
     {
       "ctor": "StandStill",
       "args_semantic": [
-        "实体自身"
+        "熊獾实例"
       ],
-      "context": "根优先级末尾"
+      "context": "作为最后的行为选择，站立不动"
     }
   ],
   "context_branches": [
     {
-      "condition": "inst:HasTag('lunar_aligned') 为假 (非变异)",
-      "semantic": "执行 BrainCommon.PanicTrigger 恐慌触发节点"
+      "condition": "self.inst:HasTag('lunar_aligned') 为假（即未变异）",
+      "semantic": "触发恐慌行为，逃离威胁"
     },
     {
-      "condition": "combat.target 存在且非 beehive 且 (sg 有 running 或 InRamDistance 为真)",
-      "semantic": "进入 ChaseAndRam 冲锋撞击行为而非普通追击"
+      "condition": "有攻击目标且目标非蜂巢，熊獾在奔跑或目标在冲撞距离内，且 ground pound 计时器未激活或 canrunningbutt 为真",
+      "semantic": "使用 ChaseAndRam 进行冲撞追逐攻击，优先于普通攻击"
     },
     {
-      "condition": "ShouldEatFoodFn 为真 (附近至少2个 structure 即 seenbase)",
-      "semantic": "优先执行 EatFoodAction 和 StealFoodAction 进食偷食"
-    },
-    {
-      "condition": "季节为 summer",
-      "semantic": "GetHome 返回 spawnpoint，GetTargetDistance 返回 BEARGER_SHORT_TRAVEL 短途游荡"
-    },
-    {
-      "condition": "季节为 autumn",
-      "semantic": "GetTargetDistance 返回 BEARGER_LONG_TRAVEL 长途游荡"
-    },
-    {
-      "condition": "目标不在陆地时",
-      "semantic": "ChaseAndAttack 使用 OceanDistanceTest 函数计算保持的海洋距离"
+      "condition": "ShouldEatFoodFn 返回真，即熊獾位于玩家基地附近（周围有至少两个结构）",
+      "semantic": "优先执行吃食物和偷食物行为，专注于蜂蜜相关物品"
     }
   ],
-  "bt_structure": "根优先级节点(0.25) -> 忙碌状态守卫WhileNode(非跳跃/踉跄) -> 内部优先级节点(0.25): [IfNode(非变异)恐慌, WhileNode(冲锋条件)ChaseAndRam, ChaseAndAttack, WhileNode(在基地)优先级[吃,偷], 吃, 偷, 攻蜂巢DoAction, Wander, StandStill]",
-  "wiki": {
-    "scanned_pageids": [
-      15642,
-      20154,
-      13569,
-      13570,
-      21137,
-      18410,
-      13823,
-      20192
-    ],
-    "aspects": [],
-    "no_evidence_reason": "页面15642(bearger)仅含生成机制、掉落与外观，未描述brain的追逐/攻击/进食/偷窃/游荡等行为；页面20154(mutatedbearger)行为如随机前进、攻击蜂窝但不匹配beargerbrain清单具体语义；其余页面讨论季节、昼夜、冰川、降水、deerclops、物品等，均未体现beargerbrain能力，故无证据。",
-    "coverage_status": "no_wiki_mention"
-  },
+  "bt_structure": "行为树根为优先级节点，首先检查熊獾是否处于忙碌状态（跳跃或僵直）。在非忙碌状态下，按优先级依次：若未变异则触发恐慌；若满足冲撞条件则使用 ChaseAndRam 进行冲撞攻击；执行 ChaseAndAttack 追击攻击；若位于玩家基地附近则优先吃食物和偷食物；否则尝试通用吃食物、偷食物、攻击蜂巢；最后进行游荡或站立不动。",
   "search_terms": [
     "熊獾",
-    "冲锋",
-    "吃食物",
-    "偷食物",
-    "砸蜂巢",
-    "游荡",
-    "恐慌",
-    "基地",
-    "季节"
+    "Boss",
+    "破坏",
+    "冲撞攻击",
+    "蜂蜜食物",
+    "结构攻击",
+    "秋季游荡",
+    "夏季返回"
   ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/8)",
   "gameplay_tags": [
     "战斗",
-    "生存",
+    "觅食",
     "破坏"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "752df336e1a779ba9f525d56e102b022b711aea919c80f1104f7132e2e84b523",
     "source_bytes": 12354,
-    "model": "hy3-free",
-    "generated_at_ms": 1787935250494
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788184994607
   }
 }

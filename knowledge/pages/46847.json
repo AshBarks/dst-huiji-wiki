@@ -3,7 +3,7 @@
   "pageid": 46847,
   "title": "天体后裔",
   "inputs": {
-    "wikitext_sha256": "29e37325c4f7ee9918277df3432a7b74def9a5946630edf8c8e628a70f31c153",
+    "wikitext_sha256": "414c4de9af330745b5b0736da77000d0a9e7809c62738562a732d0c11d0536ca",
     "symbol_doc_shas": {
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/alterguardian_phase4_lunarriftbrain.lua": "47a55773c4642e13cab2f6392cdb3ebda9cf9d133e62223376575a9b2da71309",
@@ -169,7 +169,8 @@
       "mention_source": "llm_verdict",
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "summary",

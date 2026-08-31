@@ -43,6 +43,10 @@
       }
     },
     "components/amphibiouscreature.lua": {
+      "aspects_ignored": [
+        "离开海洋的行为描述",
+        "进入海洋的行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -223,7 +227,8 @@
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "stub",

@@ -75,12 +75,17 @@
       "llm_verdict": {}
     },
     "components/upgrader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "电路板改装技能升级能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "一直持续到此后第 3 天开始时。  避雷导线",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

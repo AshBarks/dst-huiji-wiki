@@ -78,7 +78,11 @@
         "爆炸伤害类型描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "该页面描述蛞蝓龟的基础行为与掉落，未涉及任何爆炸伤害（如爆炸范围、伤害数值）或与`explosive.lua`组件管理的爆炸机制相关的直接描述。蛞蝓龟可能受到爆炸影响，但此页面本身并未讨论此方面。"
+      }
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -176,7 +180,8 @@
         "生成点数量限制与死亡冷却"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/thief.lua": {
       "aspects_ignored": [
@@ -184,7 +189,11 @@
         "防护偷窃能力描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "蛞蝓龟有食物行为和产生黏液，但未明确描述偷取物品的语义。"
+      }
     },
     "stategraphs/SGslurtle.lua": {
       "mention_source": "pass2_evidence",

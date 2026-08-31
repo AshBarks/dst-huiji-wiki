@@ -63,6 +63,7 @@
       "llm_verdict": {}
     },
     "components/rechargeable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "充电操作描述",
         "充电状态效果",
@@ -72,7 +73,12 @@
         "技能冷却状态"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "有的投泥带会进入 1 天的冷却<!--代码中re",
+        "semantic_consistent": true,
+        "note": "页面直接引用了 rechargeable 组件讨论冷却机制。"
+      }
     },
     "components/reticule.lua": {
       "route": "direct",
@@ -106,5 +112,5 @@
       }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

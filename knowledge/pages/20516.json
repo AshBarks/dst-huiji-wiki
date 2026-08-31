@@ -51,11 +51,16 @@
       "llm_verdict": {}
     },
     "components/instrument.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "范围设置能力体现"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "候选证据描述了 `houndwhistle`（猎犬哨子）的效果，该物品位于组件影响变体列表中。代码管理的“影响范围内其他实体”在此体现为对猎犬的增益（延长追随时间）。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

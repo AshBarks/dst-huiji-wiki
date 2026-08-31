@@ -24,7 +24,10 @@
         "补丁类型列举"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选证据，基于当前信息判断页面未提及boatpatch相关实体或机制。"
+      }
     },
     "components/deployable.lua": {
       "aspects_ignored": [

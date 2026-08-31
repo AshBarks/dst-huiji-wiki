@@ -21,12 +21,16 @@
       "llm_verdict": {}
     },
     "components/worldmigrator.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "非自然传送门物品数量上限行为"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "页面内容片段“玩家可以由此进”与cave_entrance（洞穴入口）或migration_portal（迁移门户）等受影响变体的功能（允许玩家进入/迁移）高度相关，强烈暗示页面在描述此类交互。但现有片段信息不完整，无法确定语义细节是否完全一致。"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

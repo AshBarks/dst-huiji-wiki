@@ -100,7 +100,10 @@
         "装饰放置功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面讨论发光浆果和小发光浆果，可能涉及受影响变体，但未直接提及代码符号 vasedecoration。"
+      }
     }
   },
   "page_detail_level": "stub"

@@ -280,7 +280,8 @@
       "mention_source": "llm_verdict",
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "summary",
@@ -330,7 +331,11 @@
         "防护偷窃能力描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述熊獾的行为和掉落，但未提及偷窃机制或 thief 组件。"
+      }
     },
     "components/timer.lua": {
       "mention_source": "pass2_evidence",

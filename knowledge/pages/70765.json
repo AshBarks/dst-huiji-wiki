@@ -39,7 +39,10 @@
         "耐久耗尽状态与伤害描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，基于影响列表推断页面未提及或缺失相关耐久度语义"
+      }
     },
     "components/floater.lua": {
       "route": "direct",

@@ -93,7 +93,10 @@
         "桌上放置家具装饰的功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

@@ -159,7 +159,10 @@
         "饥饿值状态触发语音台词"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面涉及 tallbird 和 smallbird，但未提及饥饿值。"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

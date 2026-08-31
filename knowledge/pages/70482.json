@@ -83,6 +83,10 @@
       "detail_level": "detailed"
     },
     "components/amphibiouscreature.lua": {
+      "aspects_ignored": [
+        "离开海洋的行为描述",
+        "进入海洋的行为描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },

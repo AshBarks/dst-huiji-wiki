@@ -93,11 +93,17 @@
       "llm_verdict": {}
     },
     "components/powerload.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "设备空闲状态描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "每天消耗 1 单位的电力",
+        "semantic_consistent": false,
+        "note": "页面提及传送伞的电力消耗，但未描述空闲状态，与代码语义不完全一致。"
+      }
     },
     "components/remoteteleporter.lua": {
       "route": "direct",

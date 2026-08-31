@@ -20,7 +20,10 @@
         "补丁类型列举"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面讨论'可靠的胶布'(sewing_tape)用于修复物品耐久，未提及船只补丁或相关术语。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",

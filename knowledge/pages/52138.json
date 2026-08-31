@@ -34,7 +34,11 @@
         "目标锁定行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面提到攻击和原地眩晕，但未明确描述战斗中的原地停止行为。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

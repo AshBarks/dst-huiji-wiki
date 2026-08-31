@@ -31,7 +31,8 @@
         "防火与燃烧免疫标注"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/equippable.lua": {
       "aspects_ignored": [

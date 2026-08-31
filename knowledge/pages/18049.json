@@ -146,7 +146,10 @@
         "装饰放置功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，页面可能不涉及代码符号 vasedecoration 或其相关变体。"
+      }
     }
   },
   "page_detail_level": "stub"

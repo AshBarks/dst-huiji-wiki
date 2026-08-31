@@ -641,6 +641,7 @@ mod tests {
                 pass2_names,
                 pick_names,
                 refresh_auto,
+                confirm_empty,
             } => {
                 assert_eq!(root, PathBuf::from("scripts"));
                 assert_eq!(category, "component");
@@ -656,6 +657,7 @@ mod tests {
                 assert_eq!(pass2_names, None);
                 assert_eq!(pick_names, None);
                 assert!(!refresh_auto);
+                assert!(!confirm_empty);
             }
             _ => panic!("Expected KnowledgeScanSymbols command"),
         }

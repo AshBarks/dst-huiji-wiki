@@ -47,11 +47,16 @@
       "llm_verdict": {}
     },
     "components/explosive.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "爆炸伤害类型描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "该页面提及了某种实体（可能为“舞台之手”）对可锤击实体造成作业伤害，其中提到“10次作业”。此伤害描述与`explosive.lua`管理的爆炸“作业”伤害类型在形式上相关，但该页面未明确说明此伤害来源于爆炸机制。`explosive.lua`可能提供了此伤害计算的基础函数，但页面语义未明确指向爆炸。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -138,5 +143,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

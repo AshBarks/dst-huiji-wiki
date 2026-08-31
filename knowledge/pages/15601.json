@@ -33,7 +33,10 @@
         "目标锁定行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面仅包含蚁狮相关掉落信息，未描述攻击行为或原地站立机制。"
+      }
     },
     "brains/antlionbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -140,7 +143,8 @@
       "mention_source": "llm_verdict",
       "aspects_ignored": [
         "理智光环名称提及",
-        "理智光环数值标注"
+        "理智光环数值标注",
+        "变体理智光环数值标注"
       ],
       "route": "direct",
       "detail_level": "summary",

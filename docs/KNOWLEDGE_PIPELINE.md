@@ -1,7 +1,7 @@
 # Knowledge Pipeline 设计(符号知识文档驱动)
 
-> 状态:M1 扩量至 50 份 SymbolDoc(2026-08-28);pass2 已加入版本过滤/章节过滤/重试容错;待全量 force 刷新与人工 review 后进入 M2。
-> 决策记录:knowledge/ 入库 git;文档正文中文;a 阶段先 component;b 暂只做实体/prefab 页(系统机制页挂起);目标 1/3 输出建议清单而非代写内容;并发策略待 pilot 后定,当前串行。
+> 状态(2026-08-31):**四类符号全量 1281 份**——component 815(p4)/ behaviour 29(p4-behaviour)/ brain 187(p5-brain)/ stategraph 250(p6-stategraph);M2 PageSymbolMap 全量 + 审计 5 轮(未审计 stub 436);M3 v1.2 + Tier2 复核闭环落地。并发 `--concurrency 2~4` 已落地,模型 mimo-v2.5 @ zen/go/v1。
+> 决策记录:knowledge/ 入库 git;文档正文中文;b 阶段先做实体/prefab 页(系统机制页挂起);目标 1/3 输出建议清单而非代写内容。
 > 决策记录(2026-08-28 补):a 阶段类别扩展**方案 B** 已定案——behaviours 全量(词典层)+ brains pilot 先行,stategraph 延后;细化见 [KNOWLEDGE_BEHAVIOUR_CHAIN.md](KNOWLEDGE_BEHAVIOUR_CHAIN.md)。
 
 ## 1. 意图(与产品构想的映射)
@@ -150,9 +150,9 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 ### M1 收尾(剩余项)
 1. ~~**全量刷新主库**~~:已用版本过滤+章节过滤+并行逻辑完成,`auto_maintained` 已注入并经 v2 冷数据 `--refresh-auto` 同步
 2. ~~**人工 review 重点 diff**~~:inventoryitem / lootdropper / workable / floater / inspectable / hauntable 的 ds 证据清除已确认
-3. **全量重扫(prompt_rev p4)**:pass2 新增 AutoInfobox 字段级轻量提示后,主库文档仍为 p3 生成;待择机 `--limit 50 --force` 重扫,重点观察 floater / lootdropper 等 AutoInfobox 组件的 aspects/no_evidence_reason 变化
-4. **search_terms 质量杠杆**(可选):每个 API 条目强制 1~2 个词;对 0 命中组件允许模型二次修正检索词重试一次
-5. **二次确认**(可选):pass2 对「检索命中但判空」的组件做二次确认 prompt(仅当命中页 ≥3 且 aspects=0,防过严)
+3. ~~**全量重扫(prompt_rev p4)**~~:已完成——815 份 component 全量经 mimo-v2.5 重扫为 p4(AutoInfobox 字段级提示生效),报告见 COMPONENT_FULL_SCAN_REPORT.md
+4. ~~**search_terms 质量杠杆**~~:已落地(零命中验证 + 单次改写 + 恶化回滚),实测触发 48%,零命中组件占比 56%→42%
+5. **二次确认**(可选,未做):pass2 对「检索命中 ≥3 页但 aspects=0」的组件做二次确认 prompt,防过严
 
 > 当前 `output/knowledge_compare/` 为 8 组件对照临时产物,不入库;确认后可用它作为全量刷新前的预期样本。
 

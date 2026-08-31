@@ -42,7 +42,7 @@
 - 代码:`brains/houndbrain.lua:224` `ChaseAndAttack(self.inst, 100)`;而 ChaseAndAttack 构造子为 `(inst, max_chase_time, give_up_dist, max_attacks, …)`(`behaviours/chaseandattack.lua:1`),即 **100 是追击时长上限(秒)**,give_up_dist 为 nil;
 - 索敌距离实际来自 `prefabs/hound.lua:198` retargetfn 的 `FindEntity(inst, TUNING.HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10)`(tuning.lua:1481/1488);
 - **1a 词典交叉印证(2026-08-28)**:houndbrain 文档 `behaviour_invocations` 按语境分支记录——野生无家 `ChaseAndAttack(inst, 100)` → "追击最长 100 秒";有家 `(inst, 10, 20)` → "追击最长 10 秒 + 放弃距离 20"。三条页面句与代码的映射:①"野生 100 单位" ↔ max_chase_time=100 秒(**疑似把时间误读为距离**);②"有丘 20 单位" ↔ give_up_dist=20(确是距离,但来源更可能是 give_up_dist 而非索敌距离);③"海象营地 10 单位" ↔ HOUND_FOLLOWER_TARGET_DIST=10(确是距离)。
-- **历史核实结论(2026-08-30,定案)**:对全部 40 个快照(2025-03-12 → 2026-05-29)逐版本比对,`SEE_DIST=30 / SIT_BOY_DIST=10 / SHARE_TARGET_DIST=30 / HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10` 与三处 ChaseAndAttack 调用(`10`、`10,20`、`100`)**横跨 14 个月零变化**。页面的"100 单位"不可能来自任何历史版本的代码——**定案为时间误读为距离**:野生猎犬的 100 是 `max_chase_time`(追击时长上限,秒),页面写成"仇恨范围 100 单位"系误读;其余两条(20/10)数字恰好是真实距离(索敌/放弃距离),无需修正数值但表述口径可校准。处置:①猎犬页行为章"野生 100 单位"句应改为追击时长表述——**修订建议稿已出(2026-08-31,人工已核,Tier2 格式)**:旧句"`*完全野生的猎犬仇恨范围为 100 单位。`" → 新句"`*完全野生的猎犬的索敌范围为 20 单位,追击同一目标最多持续 100 秒,超时后放弃追击。`"(索敌距离依据 `prefabs/hound.lua` retargetfn 的 `TUNING.HOUND_TARGET_DIST=20`;100 依据 `houndbrain.lua:224` `ChaseAndAttack(self.inst, 100)` 的 max_chase_time;wiki 实际编辑待执行);②UPDATE_IMPACT_PLAN §4.2.4 语境分句范例**已修正(2026-08-31)**——"完全野生仇恨 100"从语境数值并列例中剔除(删除线标注时间误读定案),并加约束"语境值入 context 维度前须核实数值语义来源常量";③F3 旧值回查锚点排查(该句不再适合作为距离类锚点)。
+- **历史核实结论(2026-08-30,定案)**:对全部 40 个快照(2025-03-12 → 2026-05-29)逐版本比对,`SEE_DIST=30 / SIT_BOY_DIST=10 / SHARE_TARGET_DIST=30 / HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10` 与三处 ChaseAndAttack 调用(`10`、`10,20`、`100`)**横跨 14 个月零变化**。页面的"100 单位"不可能来自任何历史版本的代码——**定案为时间误读为距离**:野生猎犬的 100 是 `max_chase_time`(追击时长上限,秒),页面写成"仇恨范围 100 单位"系误读;其余两条(20/10)数字恰好是真实距离(索敌/放弃距离),无需修正数值但表述口径可校准。处置:①猎犬页行为章"野生 100 单位"句应改为追击时长表述——**修订建议稿已出(2026-08-31,人工已核,Tier2 格式)**:旧句"`*完全野生的猎犬仇恨范围为 100 单位。`" → 新句"`*完全野生的猎犬的索敌范围为 20 单位,追击同一目标最多持续 100 秒,超时后放弃追击。`"(索敌距离依据 `prefabs/hound.lua` retargetfn 的 `TUNING.HOUND_TARGET_DIST=20`;100 依据 `houndbrain.lua:224` `ChaseAndAttack(self.inst, 100)` 的 max_chase_time;**经拍板(2026-08-31)不做猎犬页 wiki 实际修改**,建议稿仅存档备查);②UPDATE_IMPACT_PLAN §4.2.4 语境分句范例**已修正(2026-08-31)**——"完全野生仇恨 100"从语境数值并列例中剔除(删除线标注时间误读定案),并加约束"语境值入 context 维度前须核实数值语义来源常量";③F3 旧值回查锚点排查(该句不再适合作为距离类锚点)。
 - **教训**:behaviour 词典文档(`ctor_params`)正是为此而设——本例的语义锚点即来自 1a 词典。
 
 ## 2. 四类符号的性质差异(为什么不能一套模板套四次)
@@ -140,9 +140,9 @@ prompt 注入:brain pass1 附带**本 brain 实际调用的** behaviour 构造�
 1. ✅ `scan_symbols.rs`:类别分派(pick 泛化)+ brain / behaviour prompt 模板 + brain 注入 behaviour 参数语义;
 2. ✅ `types.rs`:类别载荷可选字段(behaviour:ctor_params / effects / success_fail_conditions;brain:behaviour_invocations / context_branches;tunables 重定义说明);
 3. ✅ 校验:brain 的 behaviour_invocations 与 atlas behaviour_calls 报告级交叉核对;behaviour 空参数规则;
-4. ✅ 跑批次 1a(29/29 入库)→ 1b(3/3 入库);人工 review 待做(对照猎犬/蜘蛛/皮弗娄牛"行为"章);
-5. ⬜ 回填 KNOWLEDGE_PIPELINE §8 进度与本文状态;
-6. ⬜ (独立工作项)§1.3 "100 单位"疑点核实,结论回填本文与 UPDATE_IMPACT_PLAN(若属实)。
+4. ✅ 跑批次 1a(29/29 入库)→ 1b(3/3 入库);人工 review 以 §1.3 猎犬深度核实 + 全量审计接力替代专项 review,四类全量推广(187 brain / 250 SG);
+5. ✅ 回填 KNOWLEDGE_PIPELINE §8/§9 进度与本文状态(2026-08-31);
+6. ✅ (独立工作项)§1.3 "100 单位"疑点核实:历史快照定案(`56a8139`),修订建议稿(`ad14c4a`)、UPDATE_IMPACT_PLAN §4.2.4 范例修正(`eadb623`);猎犬页 wiki 实际修改经拍板不做。
 
 ### 9.1 pilot 实测记录(2026-08-28)
 

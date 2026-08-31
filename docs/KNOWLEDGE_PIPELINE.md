@@ -173,9 +173,9 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 3. 系统机制页(蜘蛛/冬季等专题)是否纳入 → 待解禁后评估路由扩展
 
 ### M3(构想 c 增量)
-1. `knowledge sync`:update-scan 变更集 → sha 驱动脏文档重扫 → 与 PageSymbolMap 交叉 → 页面修订建议清单
-2. `page-assist`(目标 1/3):新页面组织建议 / 手工编辑的 symbol 归因,输出建议清单(不代写)
-3. 并发策略:pilot 通过后决定(候选:2~4 并发 + 全局 QPS 上限 + 失败退避)
+1. `knowledge sync`:update-scan 变更集 → sha 驱动脏文档重扫 → 与 PageSymbolMap 交叉 → 页面修订建议清单(v1~v1.2 + Tier2 复核闭环已落地,见 [KNOWLEDGE_SYNC.md](KNOWLEDGE_SYNC.md))
+2. ~~`page-assist`(目标 1/3)~~:目标 1 缺口榜(`--all`)+ **目标 3 编辑归因(`--attribute`,2026-08-31)** 已落地——页面区域 × SymbolDoc 确定性归因(D1 region 锚点 / aspect 引文 bigram / search_terms 术语),输出建议清单(不代写)
+3. ~~并发策略~~:`--concurrency 2~4` 已落地并在全量扫描中验证
 
 ### 观察项
 - inventoryitem 类「广谱组件」(数百变体)与「窄谱组件」的 aspects 产出率差异,指导文档粒度是否需要按实体页聚合二次加工

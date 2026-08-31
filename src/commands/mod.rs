@@ -225,6 +225,12 @@ pub enum Commands {
         /// 输出 JSON 而非 Markdown
         #[arg(long)]
         json: bool,
+        /// 目标 3:编辑归因模式(区域 × SymbolDoc;需 --corpus)
+        #[arg(long)]
+        attribute: bool,
+        /// wiki 语料根目录(归因模式必需)
+        #[arg(long)]
+        corpus: Option<PathBuf>,
     },
     /// M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)
     KnowledgeSync {

@@ -269,6 +269,8 @@ pub async fn run(args: Commands) -> Result<()> {
             page,
             all,
             json,
+            attribute,
+            corpus,
         } => {
             execute(
                 JobKind::PageAssist {
@@ -276,6 +278,8 @@ pub async fn run(args: Commands) -> Result<()> {
                     page: page.clone(),
                     all,
                     json,
+                    attribute,
+                    corpus: opt_path_to_string(&corpus)?,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

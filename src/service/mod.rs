@@ -224,6 +224,11 @@ pub enum JobKind {
         all: bool,
         #[serde(default)]
         json: bool,
+        /// 目标 3:编辑归因模式(需 corpus)
+        #[serde(default)]
+        attribute: bool,
+        #[serde(default)]
+        corpus: Option<String>,
     },
     /// M3:代码变更 → 脏文档 → 页面锚点交叉(确定性;--rescan 级联 LLM 重扫)
     KnowledgeSync {
@@ -547,6 +552,8 @@ async fn execute_job_inner(
             page,
             all,
             json,
+            attribute,
+            corpus,
         } => {
             crate::knowledge::run_page_assist(
                 &crate::knowledge::PageAssistParams {
@@ -554,6 +561,8 @@ async fn execute_job_inner(
                     page: page.clone(),
                     all: *all,
                     json: *json,
+                    attribute: *attribute,
+                    corpus: corpus.clone(),
                 },
                 reporter,
             )

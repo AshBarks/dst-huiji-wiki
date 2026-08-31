@@ -15,6 +15,10 @@ pub struct PageAssistParams {
     pub all: bool,
     /// 输出 JSON 而非 Markdown
     pub json: bool,
+    /// 目标 3:编辑归因模式(区域 × SymbolDoc 术语/锚点归因;需 --corpus)
+    pub attribute: bool,
+    /// wiki 语料根目录(归因模式取页面 wikitext 与分区域)
+    pub corpus: Option<String>,
 }
 
 pub async fn run_page_assist(
@@ -35,6 +39,20 @@ pub async fn run_page_assist(
     let map = find_map(&pages_dir, page)?
         .ok_or_else(|| Error::Config(format!("未找到页面 {page} 的归因图")))?;
 
+    if params.attribute {
+        let corpus = params.corpus.as_ref().ok_or_else(|| {
+            Error::Config("--attribute 需要 --corpus 提供页面 wikitext".to_string())
+        })?;
+        let rows = attribute_page(&map, Path::new(&params.knowledge_dir), Path::new(corpus))?;
+        if params.json {
+            let body = serde_json::to_string_pretty(&rows)?;
+            println!("{body}");
+        } else {
+            print!("{}", render_attribution(&map, &rows));
+        }
+        return Ok(serde_json::json!({ "mode": "page_assist_attribute", "pageid": map.pageid }));
+    }
+
     if params.json {
         let body = serde_json::to_string_pretty(&map)?;
         println!("{body}");
@@ -43,6 +61,171 @@ pub async fn run_page_assist(
 
     print!("{}", render_markdown(&map));
     Ok(serde_json::json!({ "mode": "page_assist", "pageid": map.pageid }))
+}
+
+/// 单区域归因行。
+#[derive(Debug, serde::Serialize)]
+pub struct AttributionRow {
+    pub region_id: String,
+    pub kind: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// (符号路径, 分数, 证据)按分数降序,至多 3 条
+    pub symbols: Vec<AttributedSymbol>,
+}
+
+#[derive(Debug, serde::Serialize)]
+pub struct AttributedSymbol {
+    pub path: String,
+    pub score: i32,
+    pub evidence: Vec<String>,
+}
+
+/// 目标 3:页面区域 × SymbolDoc 归因(确定性,零 LLM)。
+///
+/// 信号:①D1 数值锚点的 region_id 直连(+3);②aspects 引文与区域文本
+/// bigram 重叠 ≥0.5(+2);③fact raw 原句包含于区域文本(+3);④文档
+/// search_terms 命中区域文本(+1/词,至多 +2)。分数 >0 才归因。
+fn attribute_page(
+    map: &PageSymbolMap,
+    knowledge_root: &Path,
+    corpus_root: &Path,
+) -> Result<Vec<AttributionRow>> {
+    use crate::corpus::segment;
+    use crate::knowledge::classify::bigram_dice;
+    use crate::knowledge::types::SymbolDoc;
+
+    let wikitext =
+        std::fs::read_to_string(corpus_root.join(format!("pages/{}.wikitext", map.pageid)))
+            .map_err(|_| {
+                Error::Config(format!(
+                    "语料缺少页面 wikitext:{}",
+                    corpus_root
+                        .join(format!("pages/{}.wikitext", map.pageid))
+                        .display()
+                ))
+            })?;
+    // 符号文档:path → doc(只查本页涉及的)
+    let mut docs: std::collections::HashMap<String, SymbolDoc> = Default::default();
+    for entry in std::fs::read_dir(knowledge_root.join("symbols"))?
+        .collect::<std::io::Result<Vec<std::fs::DirEntry>>>()?
+    {
+        let p = entry.path();
+        if p.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        if let Ok(Some(doc)) = crate::knowledge::store::load_doc(&p) {
+            if map.symbols.contains_key(&doc.reference.path) {
+                docs.insert(doc.reference.path.clone(), doc);
+            }
+        }
+    }
+    let regions = segment::segment(map.pageid, &wikitext);
+    let mut rows = Vec::new();
+    for region in &regions {
+        let text = &wikitext[region.start_byte..region.end_byte];
+        let norm_text = text.to_lowercase();
+        let mut scored: Vec<AttributedSymbol> = Vec::new();
+        for (path, entry) in &map.symbols {
+            let mut score = 0i32;
+            let mut evidence: Vec<String> = Vec::new();
+            for fm in &entry.fact_matches {
+                if fm.region_id == region.id {
+                    score += 3;
+                    evidence.push(format!("数值锚点:{}", fm.matched));
+                } else if !fm.raw.is_empty() && text.contains(fm.raw.trim()) {
+                    score += 3;
+                    evidence.push(format!("原句命中:{}", fm.matched));
+                }
+            }
+            for aspect in &entry.aspects_covered {
+                for ev in &aspect.evidence {
+                    if let Some(q) = &ev.quote {
+                        if bigram_dice(q, text) >= 0.5 {
+                            score += 2;
+                            evidence.push(format!("aspect 引文:{}", aspect.aspect));
+                            break;
+                        }
+                    }
+                }
+            }
+            if let Some(doc) = docs.get(path) {
+                let mut term_hits = 0i32;
+                for term in &doc.search_terms {
+                    let t = term.trim().to_lowercase();
+                    if t.len() >= 2 && norm_text.contains(&t) {
+                        term_hits += 1;
+                    }
+                }
+                if term_hits > 0 {
+                    score += term_hits.min(2);
+                    evidence.push(format!("术语命中 {term_hits} 个"));
+                }
+            }
+            if score > 0 {
+                evidence.truncate(3);
+                scored.push(AttributedSymbol {
+                    path: path.clone(),
+                    score,
+                    evidence,
+                });
+            }
+        }
+        scored.sort_by(|a, b| b.score.cmp(&a.score).then(a.path.cmp(&b.path)));
+        scored.truncate(3);
+        if scored.is_empty() {
+            continue;
+        }
+        rows.push(AttributionRow {
+            region_id: region.id.clone(),
+            kind: region.kind.to_string(),
+            title: region.title.clone(),
+            symbols: scored,
+        });
+    }
+    Ok(rows)
+}
+
+/// 归因表渲染:区域 → 符号(分数)+ 证据。
+fn render_attribution(map: &PageSymbolMap, rows: &[AttributionRow]) -> String {
+    let mut out = String::new();
+    out.push_str(&format!(
+        "# 编辑归因:《{}》(pageid {})
+
+页面符号 {} 个;区域归因 {} 条(编辑该区域时参考对应 SymbolDoc;输出仅建议,不代写)。
+
+",
+        map.title,
+        map.pageid,
+        map.symbols.len(),
+        rows.len()
+    ));
+    out.push_str(
+        "| 区域 | 章节 | 归因符号(分数) | 证据 |
+|---|---|---|---|
+",
+    );
+    for r in rows {
+        let title = r.title.as_deref().unwrap_or("-");
+        let syms = r
+            .symbols
+            .iter()
+            .map(|s| format!("`{}`({})", s.path, s.score))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let ev = r
+            .symbols
+            .iter()
+            .flat_map(|s| s.evidence.iter().take(1).cloned())
+            .collect::<Vec<_>>()
+            .join("; ");
+        out.push_str(&format!(
+            "| `{}` ({}) | {title} | {syms} | {ev} |
+",
+            r.region_id, r.kind
+        ));
+    }
+    out
 }
 
 /// 全库缺口榜:按符号聚合 stub/未覆盖 aspects,按页面聚合缺口规模。
@@ -325,6 +508,38 @@ mod tests {
         assert!(health_in_cover < gap_pos, "health 是提及对,应在已覆盖节");
         assert!(combat_pos > gap_pos);
         assert!(md.contains("仇恨距离描述、攻击间隔标注、攻击范围描述"));
+    }
+
+    /// 目标 3:临时语料+文档树上的端到端归因(search_terms 信号)
+    #[test]
+    fn attribute_page_by_search_terms() {
+        let dir = std::env::temp_dir().join(format!("kn-attr-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("knowledge/symbols")).unwrap();
+        std::fs::create_dir_all(dir.join("knowledge/pages")).unwrap();
+        std::fs::create_dir_all(dir.join("corpus/pages")).unwrap();
+        let wikitext = "== 行为 ==\n完全野生的猎犬会搜寻肉类食物。\n";
+        std::fs::write(dir.join("corpus/pages/13857.wik"), wikitext).ok();
+        std::fs::write(dir.join("corpus/pages/13857.wikitext"), wikitext).unwrap();
+        let key = crate::knowledge::types::SymbolRefKey {
+            kind: "brain".into(),
+            path: "brains/houndbrain.lua".into(),
+        };
+        let llm_json = r#"{"category":"brain","display_name":"houndbrain","summary":"猎犬大脑","search_terms":["搜寻","肉类食物"],"gameplay_tags":[]}"#;
+        let llm: crate::knowledge::types::SymbolDocLlm = serde_json::from_str(llm_json).unwrap();
+        let doc = crate::knowledge::types::assemble(&llm, &key, "sha", 1, None, "m", "p5-brain");
+        let doc_path = dir.join("knowledge/symbols/brain__houndbrain.json");
+        std::fs::write(&doc_path, serde_json::to_string(&doc).unwrap()).unwrap();
+        let map_json = r#"{"schema_version":1,"pageid":13857,"title":"猎犬","inputs":{"wikitext_sha256":"x","symbol_doc_shas":{}},"symbols":{"brains/houndbrain.lua":{"route":"direct","detail_level":"detailed","fact_matches":[],"aspects_covered":[],"aspects_ignored":[]}},"page_detail_level":null}"#;
+        std::fs::write(dir.join("knowledge/pages/13857.json"), map_json).unwrap();
+
+        let map = find_map(&dir.join("knowledge/pages"), "猎犬")
+            .unwrap()
+            .unwrap();
+        let rows = attribute_page(&map, &dir.join("knowledge"), &dir.join("corpus")).unwrap();
+        assert_eq!(rows.len(), 1, "仅行为章应有归因");
+        assert_eq!(rows[0].symbols[0].path, "brains/houndbrain.lua");
+        assert!(rows[0].symbols[0].evidence[0].contains("术语命中"));
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

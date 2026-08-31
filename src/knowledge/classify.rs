@@ -52,9 +52,9 @@ fn extract_numbers(text: &str) -> Vec<String> {
         }
     };
     for ch in text.chars() {
-        if ch.is_ascii_digit() {
-            cur.push(ch);
-        } else if ch == '.' && !cur.is_empty() && cur.chars().all(|c| c.is_ascii_digit()) {
+        let takes = ch.is_ascii_digit()
+            || (ch == '.' && !cur.is_empty() && cur.chars().all(|c| c.is_ascii_digit()));
+        if takes {
             cur.push(ch);
         } else {
             flush(&mut cur, &mut out);
@@ -73,7 +73,7 @@ fn normalize(text: &str) -> String {
 }
 
 /// 字符 bigram Dice 系数(0~1):两串归一后重叠度。
-fn bigram_dice(a: &str, b: &str) -> f64 {
+pub(crate) fn bigram_dice(a: &str, b: &str) -> f64 {
     let norm_a = normalize(a);
     let norm_b = normalize(b);
     if norm_a.chars().count() < 2 || norm_b.chars().count() < 2 {
@@ -184,7 +184,7 @@ fn prefab_source<'a>(
 }
 
 /// 在常量表里找与 numbers 相等的第一个命中。
-fn first_match<'a>(constants: &'a [(String, f64)], numbers: &[String]) -> Option<(String, f64)> {
+fn first_match(constants: &[(String, f64)], numbers: &[String]) -> Option<(String, f64)> {
     constants
         .iter()
         .filter(|(_, v)| matchable(*v) && numbers.contains(&trim_num(*v)))

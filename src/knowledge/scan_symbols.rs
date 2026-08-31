@@ -890,7 +890,7 @@ async fn process_one_component(
         }
         Err(e) => {
             outcome.failed += 1;
-            reporter.log(format!("生成失败(raw 已归档):{e}"));
+            reporter.log(format!("生成失败:{e}"));
         }
     }
 

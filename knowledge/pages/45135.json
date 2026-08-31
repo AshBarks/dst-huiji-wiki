@@ -5,14 +5,27 @@
   "inputs": {
     "wikitext_sha256": "745ff2e8255719434bc49d7f51f0038db71df52e839afcafc785660f5e7bf025",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGbalatro_machine.lua": "9024b0ff19474569b017a50c3bf8a717786a22dcc8e26777bf64bc0f9bba47e9"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -35,6 +48,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/talker.lua": {
       "aspects_ignored": [
@@ -62,6 +79,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGbalatro_machine.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

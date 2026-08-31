@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwave_med.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwave_med",
+  "summary": "该状态图驱动饥荒联机版中的波浪实体，如海浪或风暴波。状态组织简单，从升起状态开始，进入空闲状态，最终下降消失，通过动画事件和超时机制控制实体生命周期。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅通过状态转换驱动实体行为。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "rise",
+    "idle",
+    "lower"
+  ],
+  "state_notes": [
+    {
+      "state": "rise",
+      "note": "波浪升起状态，播放出现动画并触发音效，之后自动进入空闲状态。"
+    },
+    {
+      "state": "idle",
+      "note": "波浪空闲状态，激活碰撞，持续时间默认5秒（可由idle_time配置），超时后准备下降消失。"
+    },
+    {
+      "state": "lower",
+      "note": "波浪下降状态，播放消失动画，停止循环音效，并移除实体结束波浪生命周期。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34093,
+      13406,
+      14816,
+      14935,
+      13156,
+      14929,
+      14936,
+      15022
+    ],
+    "aspects": [
+      {
+        "aspect": "波浪出现的音效触发",
+        "evidence": [
+          {
+            "pageid": 34093,
+            "quote": "出现前会伴随有诡异的音效"
+          }
+        ]
+      },
+      {
+        "aspect": "波浪消散与重生机制",
+        "evidence": [
+          {
+            "pageid": 34093,
+            "quote": "使其消散，经过10秒后重新出现"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "波浪",
+    "海浪",
+    "升起",
+    "空闲",
+    "下降",
+    "动画",
+    "音效",
+    "碰撞",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "075c81feeafb0b5b60db1b29b40b48b7ce170840e975fd4d586cb395af2a1c1a",
+    "source_bytes": 1688,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146623270
+  }
+}

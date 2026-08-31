@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcanarypoisoned.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcanarypoisoned",
+  "summary": "该状态图驱动中毒的金丝雀实体，模拟其挣扎、恢复或爆炸的死亡过程。整体状态组织以idle_loop为初始状态，金丝雀在中毒后持续循环，根据环境条件可能触发恢复变回正常金丝雀，或进入爆炸状态释放毒爆并死亡。",
+  "api": [],
+  "api_note": "状态图为内部逻辑驱动，无对外暴露的API方法。",
+  "events_published": [
+    "poisonburst"
+  ],
+  "events_listened": [
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_loop",
+    "dropped",
+    "hit",
+    "fall",
+    "death",
+    "explode_pre",
+    "explode",
+    "recover_pre",
+    "recover",
+    "recover_transform"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_loop",
+      "note": "金丝雀中毒后的挣扎循环状态，每次循环结束时根据鸟或毒蘑菇生成器条件判断是否恢复或爆炸。"
+    },
+    {
+      "state": "hit",
+      "note": "金丝雀被攻击时的硬直状态，播放hit动画并短暂无敌，结束后返回idle状态。"
+    },
+    {
+      "state": "death",
+      "note": "金丝雀死亡状态，停止物理碰撞并掉落战利品，无法被拾取。"
+    },
+    {
+      "state": "explode",
+      "note": "金丝雀爆炸状态，对半径3单位内带absorbpoison标签的生物施加毒爆效果，并掉落羽毛。"
+    },
+    {
+      "state": "recover",
+      "note": "金丝雀恢复状态，播放恢复动画并最终变回正常金丝雀实体。"
+    },
+    {
+      "state": "recover_transform",
+      "note": "恢复转换状态，金丝雀变回正常前掉落4-6根羽毛，并设置persist为false以移除自身。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15327,
+      19751,
+      35216,
+      16197,
+      13261,
+      13698,
+      13606,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及中毒金丝雀的具体状态或行为描述，仅涉及鸟类一般信息或掉落物，未体现idle_loop、hit、death、explode、recover或recover_transform的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "金丝雀",
+    "中毒",
+    "爆炸",
+    "恢复",
+    "羽毛",
+    "状态图",
+    "挣扎",
+    "毒爆",
+    "死亡",
+    "变回"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "407b7537a40367c808663d69e54fee4828445d02ee59e1f8e6fe185d93e79844",
+    "source_bytes": 10764,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136268685
+  }
+}

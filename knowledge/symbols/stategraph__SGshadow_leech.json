@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadow_leech.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadow_leech",
+  "summary": "该状态图驱动影水蛭（shadow_leech）实体，整体状态组织采用事件驱动机制，涵盖生成、攻击、死亡、跳跃附着等核心行为，通过状态标签和时间线控制无敌帧、动画窗口等细节。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外API方法，所有行为由内部状态和事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "jump",
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawn_delay",
+    "spawn",
+    "hit",
+    "appear",
+    "death",
+    "jump_pre",
+    "jump",
+    "flail",
+    "flail_pst",
+    "attached",
+    "flung"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn_delay",
+      "note": "生成前延迟状态，实体隐藏且无敌，倒计时结束（默认随机秒数）后进入生成状态，用于协调出现时机。"
+    },
+    {
+      "state": "spawn",
+      "note": "播放生成动画，第35帧后解除无敌和不可攻击状态，随后转入待机，初始阶段玩家无法互动。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时触发，实体消失并播放死亡音效，动画结束后随机传送至附近（优先朝向影主方向），重新出现前短暂无敌。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，实体消失并掉落战利品，播放死亡音效，标记为不可点击且不保存数据，动画结束后移除。"
+    },
+    {
+      "state": "jump",
+      "note": "跳跃攻击状态，高速移动（最大速度16.5），第11-12帧尝试附着目标，第15帧后无敌结束并恢复碰撞，可被攻击。"
+    },
+    {
+      "state": "attached",
+      "note": "附着状态，实体停止移动、无敌并播放吸食音效，目标中断时解除附着，影响影主实体行为。"
+    },
+    {
+      "state": "flung",
+      "note": "被甩开状态，向后高速移动（速度-10可乘系数），初始无敌，第18帧后无敌结束并恢复碰撞，动画结束后进入挣扎状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      20714,
+      34523,
+      65605,
+      52788,
+      57263,
+      14579,
+      22611
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 stategraph__SGshadow_leech 相关的能力表达；所有页面内容涉及自定义世界选项、控制台命令、布景生成、世界翻新、兴趣点生成、圣殿区域、巨型蔬果、月雹机制等，均未提及该特定实体的生成、攻击、死亡、跳跃、附着或被甩开等行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影水蛭",
+    "跳跃攻击",
+    "附着",
+    "吸食",
+    "死亡",
+    "生成",
+    "无敌帧",
+    "传送",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "怪物",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a923ea33d0e2f9637a930ec683722574b975edb32076d4286e59727ff3d94d3f",
+    "source_bytes": 9991,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788156283638
+  }
+}

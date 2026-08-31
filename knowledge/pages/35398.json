@@ -9,7 +9,9 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c"
+      "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
+      "stategraphs/SGlunarplanttentacle.lua": "57bf512e791f5c0647cb7cca54349797cf8f97cf82816aaf748ef098aecebd3f"
     }
   },
   "symbols": {
@@ -76,6 +78,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGlunarplanttentacle.lua": {
+      "aspects_ignored": [
+        "触手攻击行为描述",
+        "触手破土动画描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

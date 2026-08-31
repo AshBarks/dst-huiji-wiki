@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfarmplow.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfarmplow",
+  "summary": "该状态图驱动农场犁(farmplow)实体，管理其放置与钻地操作。整体状态组织简单，仅包含两个状态：初始状态place播放放置动画，随后自动进入drilling状态执行循环钻地动画直至超时完成。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅管理内部状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FARM_PLOW_DRILL_TIME"
+  ],
+  "states": [
+    "place",
+    "drilling"
+  ],
+  "state_notes": [
+    {
+      "state": "place",
+      "note": "当农场犁被放置时进入，播放放置动画，短暂等待（动画长度加0.5秒）后自动进入钻地状态。"
+    },
+    {
+      "state": "drilling",
+      "note": "当place状态结束后进入，播放循环钻地动画和闲置音效，持续配置的钻地时间（默认TUNING.FARM_PLOW_DRILL_TIME）后触发OnFinishedDrilling事件，完成耕地操作。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24866,
+      51494,
+      24862,
+      13493,
+      19287,
+      51221,
+      65881,
+      51498
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及实体'stategraph__SGfarmplow'相关的放置动画、钻地行为或任何对应的能力描述。页面内容涉及其他工具、建筑、生物和教程，与农场犁无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "农场犁",
+    "放置",
+    "钻地",
+    "耕地",
+    "动画",
+    "超时",
+    "完成",
+    "工具",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "农场",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "625a26593ba43279343596de9c51fec01a01bb6c109c2a43f6fe1b888d0c124b",
+    "source_bytes": 1188,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145215889
+  }
+}

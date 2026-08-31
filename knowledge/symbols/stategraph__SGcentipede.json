@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcentipede.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcentipede",
+  "summary": "该状态图驱动饥荒联机版中的蜈蚣（Centipede）实体，具体为远古蜈蚣（Archive Centipede）。整体状态组织包括空闲、嘲讽、生成、滚动攻击（开始、滚动、停止）、范围攻击，以及由通用状态处理器添加的行走、睡眠、战斗等状态。状态通过事件驱动转换，处理移动、攻击和受击等行为。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法。",
+  "events_published": [
+    "attackstart"
+  ],
+  "events_listened": [
+    "rollattack",
+    "locomote",
+    "sleep",
+    "freeze",
+    "attack",
+    "attacked",
+    "death",
+    "fallinvoid"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ARCHIVE_CENTIPEDE.AOE_RANGE",
+    "ARCHIVE_CENTIPEDE.AOE_DAMAGE",
+    "ARCHIVE_CENTIPEDE.DAMAGE",
+    "ARCHIVE_CENTIPEDE.ATTACK_RANGE"
+  ],
+  "states": [
+    "idle",
+    "taunt",
+    "spawn",
+    "roll_start",
+    "roll",
+    "roll_stop",
+    "atk_aoe"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，在进入时检查范围内是否有敌人，若有则直接进入范围攻击状态（atk_aoe）。"
+    },
+    {
+      "state": "roll_start",
+      "note": "滚动攻击准备阶段，停止移动并转向目标，播放预动画后进入高速滚动状态（roll）。"
+    },
+    {
+      "state": "roll",
+      "note": "高速滚动状态，移动速度为15，对路径上的敌人造成接触伤害，持续一段时间后进入停止状态（roll_stop）。"
+    },
+    {
+      "state": "atk_aoe",
+      "note": "范围攻击状态，在动画第25帧触发，对范围内所有敌方单位造成AOE伤害，伤害值为TUNING.ARCHIVE_CENTIPEDE.AOE_DAMAGE。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14322,
+      53008,
+      10413,
+      15601,
+      60885,
+      13567,
+      18211,
+      19740
+    ],
+    "aspects": [
+      {
+        "aspect": "范围攻击伤害描述",
+        "evidence": [
+          {
+            "pageid": 14322,
+            "quote": "头部攻击一次造成 40 点单体伤害，随后跳位}}内的生物造成 20 点范围伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蜈蚣",
+    "Centipede",
+    "AOE",
+    "滚动攻击",
+    "范围伤害",
+    "远古蜈蚣",
+    "Archive Centipede",
+    "战斗状态",
+    "移动状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "71087e1dca12b6a44b84d8f2bb3f2977a04d05a36904f839e019a3bc32e80299",
+    "source_bytes": 12105,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136789099
+  }
+}

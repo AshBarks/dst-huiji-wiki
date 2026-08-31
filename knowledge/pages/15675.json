@@ -6,10 +6,14 @@
     "wikitext_sha256": "361b1b82235145124e413efdf8de94b67b7720d0b519c4041a31a59ce233f2f4",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/canopyshadows.lua": "86d372d34491569cad817d131387b275113be98d384df4d9863f36f14f65ddfe",
+      "components/distancefade.lua": "9f5eba113e0793c42ae7a14ad49d309c1ba96995b5f3eb9c7e5050758ab1df44",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lightningblocker.lua": "ee4d7d395e8abc905cd1ca3791dccf001bed538e9463a85f5207edfbf91d26bd",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -30,6 +34,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/canopyshadows.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/distancefade.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -39,6 +51,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/lightningblocker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -72,6 +88,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsalty_dog.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsalty_dog",
+  "summary": "状态图 `SGsalty_dog` 驱动一个名为“咸狗”的宠物/伴侣实体。其整体组织以召唤出现、待机、交互和消失为核心循环，包含受击、死亡等战斗状态，以及捡拾、给予等互动动作。",
+  "api": [],
+  "api_note": "源码中未定义任何通过 PushEvent 调用的状态图对外公共方法，所有行为均由状态图内部事件处理器和动作处理程序驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "summon",
+    "desummon",
+    "saltshake",
+    "despawn"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "hit",
+    "saltshake",
+    "summon",
+    "desummon",
+    "pickup",
+    "pickup_pst_success",
+    "pickup_pst_fail",
+    "give",
+    "despawn"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认待机状态，播放循环动画。可随时被其他状态中断。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，会播放受击动画和音效，期间停止移动。结束后回到待机。"
+    },
+    {
+      "state": "saltshake",
+      "note": "特殊动作，摇动身体并有概率在多个帧点掉落盐（ShedSalt），最后必定掉落全部盐（ShedAllSalt）。"
+    },
+    {
+      "state": "summon",
+      "note": "召唤状态，通过事件触发。实体会伴随水花效果从玩家（帽子）处出现并移动到指定位置，之后设置 readytogather 标志。"
+    },
+    {
+      "state": "desummon",
+      "note": "收回状态，掉落携带物品后执行跳跃动画消失，最终返回玩家（帽子）处或移除自身。"
+    },
+    {
+      "state": "pickup",
+      "note": "捡拾物品状态，实体会跳跃向目标物品。若在动画结束前距离足够则执行捡拾，否则进入失败状态。"
+    },
+    {
+      "state": "give",
+      "note": "给予物品状态，播放递交动画，在特定帧执行缓冲的给予动作。"
+    },
+    {
+      "state": "despawn",
+      "note": "强制消失状态，设置超时后移除实体，无法被中断。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      15022,
+      18057,
+      18234,
+      15651,
+      13606,
+      13701,
+      13897
+    ],
+    "aspects": [
+      {
+        "aspect": "强制消失行为",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "离开加载范围后，克劳斯会在 10 秒后消失"
+          }
+        ]
+      },
+      {
+        "aspect": "捡拾物品行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影仆从会拾取物品"
+          }
+        ]
+      },
+      {
+        "aspect": "给予物品行为",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "会等待战斗结束， 6 秒后重新将物品递给"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置状态描述",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "在召唤者位于施法范围外且傀儡处于闲置时，傀儡会于 10 秒后死亡"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "咸狗",
+    "盐狗",
+    "宠物",
+    "撒盐",
+    "捡拾",
+    "召唤",
+    "消失",
+    "受击",
+    "死亡",
+    "宠物互动"
+  ],
+  "gameplay_tags": [
+    "宠物/伙伴",
+    "互动",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b3e78a64f95e214e9d2ac3119b3a2abc08ce494e13fcdcc3372cf24db31bfbec",
+    "source_bytes": 15932,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140427736
+  }
+}

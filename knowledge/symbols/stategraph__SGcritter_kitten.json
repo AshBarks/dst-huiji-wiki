@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_kitten.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_kitten",
+  "summary": "该状态图驱动饥荒联机版中的宠物小猫（critter_kitten）实体，基于宠物系统通用框架构建。状态组织采用模块化方式，通过调用预定义函数添加空闲、表情、移动、进食、互动等多种行为状态，以处理宠物日常活动与玩家交互。",
+  "api": [],
+  "api_note": "该状态图未定义对外公共方法，所有行为通过事件和内部状态逻辑驱动。",
+  "events_published": [],
+  "events_listened": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "randomemotes",
+    "cute",
+    "petemote",
+    "combatemote",
+    "playwithothercritter",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "sleep",
+    "hop",
+    "sinkandwashashore",
+    "voidfall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "宠物默认空闲状态，等待指令或自然触发行为。通常为待机动画，持续播放直到其他事件中断。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，当宠物饥饿时触发。表现为播放进食动画和音效，完成后恢复其他状态。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿状态，宠物显示不安行为并可能发出求助音效。提示玩家需要喂食，否则影响心情。"
+    },
+    {
+      "state": "combatemote",
+      "note": "战斗表情状态，当宠物遭遇威胁或参与战斗时触发。表现为威慑动作（如嘶嘶声），提供短暂硬直或无敌帧。"
+    },
+    {
+      "state": "playwithothercritter",
+      "note": "与其他宠物玩耍状态，触发社交互动。表现为追逐或扑跳动画，增加宠物友好度。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "依偎状态，玩家抚摸宠物时触发。表现为蹭腿动画和音效，提升宠物忠诚度。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，宠物在夜晚或疲劳时进入。表现为躺下和打呼，期间无法交互，但可恢复精力。"
+    },
+    {
+      "state": "hop",
+      "note": "跳跃状态，宠物移动方式之一。用于越过障碍或快速位移，影响移动速度和动画表现。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13456,
+      15975,
+      13437,
+      34037,
+      13455,
+      13156,
+      15238
+    ],
+    "aspects": [
+      {
+        "aspect": "饥饿状态描述",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物在低保质期时会进入饥饿状态，饥饿状态下的宠物会发出叫声并表现相应的动画，但不喂食也不会饿死。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小猫",
+    "宠物",
+    "critter",
+    "kitten",
+    "饥饿",
+    "进食",
+    "互动",
+    "睡眠",
+    "表情",
+    "玩耍"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "互动",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "96adbe3dbab377a1d003e2a05780ad7aae627afc5ea88fc2b71d98bb8ca8f380",
+    "source_bytes": 4220,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144666264
+  }
+}

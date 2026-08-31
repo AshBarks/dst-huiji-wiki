@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGyotb_stage.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGyotb_stage",
+  "summary": "此状态图驱动“年度盛宴舞台”实体，管理其开关状态、主持人的到达与离开，以及比赛准备的就绪阶段。整体状态分为关闭、开放和忙碌三种模式，通过事件驱动在这些模式间切换。",
+  "api": [],
+  "api_note": "该状态图未定义任何公共接口方法，其行为完全由游戏事件和内部逻辑驱动。",
+  "events_published": [
+    "yotb_advance_queue"
+  ],
+  "events_listened": [
+    "trader_arrives",
+    "trader_leaves",
+    "contestdisabled",
+    "contestenabled",
+    "ontalk",
+    "onflourishend",
+    "onflourishstart",
+    "yotb_throwprizes",
+    "animover",
+    "donetalking"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle_closed",
+    "hit_closed",
+    "hit_ready",
+    "idle_closed_ready",
+    "idle_closed_ready_sparkle",
+    "idle_closed_ready_pre",
+    "arrive",
+    "idle_open",
+    "flourish_start",
+    "talk",
+    "thinking",
+    "flourish_end",
+    "idle_closed_ready_pst",
+    "idle_closed_ready_reset",
+    "throwprizes",
+    "leave",
+    "place"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_closed_ready",
+      "note": "比赛准备就绪的待机状态。舞台关闭但显示“准备就绪”动画，会随机间隔后播放闪烁特效，通常在主持人离开且比赛启用时进入。"
+    },
+    {
+      "state": "arrive",
+      "note": "主持人（皮弗娄牛）到达舞台的状态。播放到达动画，期间舞台视为“开放”和“忙碌”，完成后通常进入开放待机状态。"
+    },
+    {
+      "state": "leave",
+      "note": "主持人离开舞台的状态。播放离开动画，完成后根据比赛是否启用，会重置到“准备就绪”或进入“准备就绪结束”状态。"
+    },
+    {
+      "state": "talk",
+      "note": "主持人说话的循环状态。处于“开放”模式，播放说话动画和音效，等待对话结束或动画循环完毕后返回开放待机。"
+    },
+    {
+      "state": "thinking",
+      "note": "主持人思考状态。播放思考动画和音效，状态结束后通常返回开放待机并推进队列。"
+    },
+    {
+      "state": "throwprizes",
+      "note": "投掷奖品状态。处于“忙碌”和“开放”模式，在动画特定时间点会调用组件投掷比赛奖品，完成后返回开放待机。"
+    },
+    {
+      "state": "place",
+      "note": "放置舞台的状态。仅在放置舞台时触发，根据比赛是否启用，完成后进入“准备就绪前奏”或“关闭”状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15238,
+      52019,
+      15526,
+      18825,
+      15169,
+      16174,
+      52107,
+      18521
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未讨论符号 stategraph__SGyotb_stage 的具体能力或行为语义，如主持人状态（到达、离开、说话、思考、投掷奖品）、舞台待机动画或放置触发，而是聚焦于实体基本信息、生成、掉落和功能描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "舞台",
+    "比赛",
+    "主持人",
+    "盛宴",
+    "准备就绪",
+    "投掷奖品",
+    "放置",
+    "年度盛宴",
+    "皮弗娄牛"
+  ],
+  "gameplay_tags": [
+    "比赛/活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ed3a314cddccba588c996f7e6b5e4c2027e7968d90f2ee870e0cb8a0a3ecb11c",
+    "source_bytes": 10607,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143957641
+  }
+}

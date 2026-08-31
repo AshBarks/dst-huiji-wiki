@@ -5,21 +5,66 @@
   "inputs": {
     "wikitext_sha256": "9cb6e89f59186dca34a9e62cfe4651a03b7e6438c4e11f1890578ad70471dee4",
     "symbol_doc_shas": {
+      "components/boatdrifter.lua": "773f614a323ccadd3a7e402ceec3d8268eab3210bcf1fa39114058956e304dc3",
+      "components/boatphysics.lua": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "components/boatring.lua": "05372466a036f15a2cc4d3c2ad9889aa4aa20fa927442a462cb46296c0106c90",
+      "components/boatringdata.lua": "d778be4e769cf38d57edb0aff9f3dd5392630858ce93ba5ca7abf94fa7744eac",
+      "components/boattrail.lua": "f1963d3fdae30297eb5c40786b350c337cac626642ba0c7b2c564163cf7b6570",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthsyncer.lua": "8342f5e9968eab4bd293dd0f2abcebe3b2758e1fd68852960257525eed2642fc",
+      "components/hull.lua": "60efbabca64250ec317a3277bbc7b10e88ef1cbe6ea54debce9034f345a2a6f1",
+      "components/hullhealth.lua": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/repairable.lua": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "components/reticule.lua": "388e612488b82e7fb0d430aab94edf25e4f305cd610f7cc5d5fbc040dbb0ce01",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
+      "components/searchable.lua": "9bd1104f228689f290ff47947e8ec77f53efbb41b163dba106a41fcf642df89e",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/walkableplatform.lua": "c63f80c0ebad972c6a16c17c966649d3b6bc2e4d20e105b3957d82f0a7601b3a",
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
       "stategraphs/SGboat.lua": "51fffde5a39ef3f5172094a53ee60bbbe71e8249828723fedd793bc478ad949e"
     }
   },
   "symbols": {
+    "components/boatdrifter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatphysics.lua": {
+      "aspects_ignored": [
+        "一角鲸角的加速效果",
+        "锚的减速作用描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatring.lua": {
+      "aspects_ignored": [
+        "旋转器数量影响旋转速度",
+        "旋转方向显示提示",
+        "旋转方向设置操作",
+        "船崩溃掉落机制",
+        "船的半径描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatringdata.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boattrail.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -73,7 +118,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -95,6 +141,27 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthsyncer.lua": {
+      "aspects_ignored": [
+        "生命值百分比在游戏机制中的应用",
+        "生命值随时间恢复的描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hull.lua": {
+      "aspects_ignored": [
+        "船半径数值描述",
+        "船崩溃掉落行为描述",
+        "船部署过程描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hullhealth.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -139,6 +206,46 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/repairable.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复",
+        "发条装置修复方法",
+        "支柱修复可能性",
+        "漂浮平台漏洞修复",
+        "绝望石装备耐久恢复",
+        "螨地爬修复状态转换"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/reticule.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/searchable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "窝点搜索机制",
+          "evidence": [
+            {
+              "pageid": 24589,
+              "quote": "窝点中有物品时，玩家可以搜索窝点，每次会获得一个物品。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "地图搜索宝藏",
+        "控制台搜索命令"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -154,6 +261,21 @@
         "wording": "窝点需要6天再生下一只",
         "semantic_consistent": true
       }
+    },
+    "components/walkableplatform.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "stategraphs/SGboat.lua": {
       "aspects_ignored": [

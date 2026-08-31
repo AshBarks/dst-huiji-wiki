@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_drone_zap.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_drone_zap",
+  "summary": "该状态图驱动 WX78 的电击无人机（wx78_drone_zap）实体，用于执行攻击和移动任务。整体状态组织从部署（deploy）开始，随后进入空闲悬停、移动（包括开始、持续、停止）和攻击等状态。状态之间通过事件处理器（如移动和攻击）进行转换，并始终更新悬停或着陆物理效果。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，主要通过事件处理器（如 locomote 和 doattack）控制状态转换。",
+  "events_published": [
+    "ms_drone_zap_fired"
+  ],
+  "events_listened": [
+    "locomote",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WX78.ZAPDRONE_SPEED"
+  ],
+  "states": [
+    "deploy",
+    "collapse",
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "attack"
+  ],
+  "state_notes": [
+    {
+      "state": "deploy",
+      "note": "部署时无人机从底部升起，播放部署动画并启动悬停机制，状态标签为'busy'阻止其他行动。"
+    },
+    {
+      "state": "collapse",
+      "note": "收起时无人机执行着陆动画，停止悬停并着陆到地面，状态标签为'busy'且播放关闭音效。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态无人机悬停在空中保持静止，状态标签为'idle'，持续更新悬停高度。"
+    },
+    {
+      "state": "run_start",
+      "note": "移动开始时无人机加速并切换到跑步动画，状态标签为'moving'和'running'，速度从0逐渐增加。"
+    },
+    {
+      "state": "run",
+      "note": "持续移动状态无人机以最大速度飞行，状态标签为'moving'和'running'，播放循环跑步动画并更新悬停。"
+    },
+    {
+      "state": "run_stop",
+      "note": "停止移动时无人机减速并返回空闲状态，状态标签为'idle'，播放停止动画和音效。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击时无人机进入攻击动画序列，状态标签为'attack'和'busy'，发射电击弹道并产生视觉闪烁效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      15022,
+      51046,
+      20719,
+      13897,
+      15922,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有涉及无人机（如 WX-78 的无人机 zap）的部署、收起、空闲、移动或攻击等状态行为的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "电击无人机",
+    "WX78",
+    "无人机",
+    "攻击",
+    "移动",
+    "悬停",
+    "部署",
+    "收起",
+    "zap drone",
+    "drone"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "62d17389ed3e23b3cc592ff41cb147e30a6943e2ba4d7bc14f1a58ac371073e5",
+    "source_bytes": 14976,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143743130
+  }
+}

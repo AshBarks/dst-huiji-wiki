@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "98a02ccb3f77d6fe49d9ad2923e3f8cff2132f3dd2adda69736bc23215ec51f7",
     "symbol_doc_shas": {
+      "components/curseditem.lua": "22023a5deb5783a7705c5a5e97133d3d9f9f4d580a0249c3de9b5792298cddc8",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -14,6 +15,10 @@
     }
   },
   "symbols": {
+    "components/curseditem.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/floater.lua": {
       "route": "direct",
       "detail_level": "stub"

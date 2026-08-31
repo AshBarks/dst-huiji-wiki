@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_wings.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_wings",
+  "summary": "该状态图驱动饥荒联机版中的暗影仆从翅膀部分实体。整体状态组织包括出生、空闲、行走、受击、死亡和施法等状态，通过事件处理协调攻击和团队协作行为。",
+  "api": [],
+  "api_note": "源码中未定义任何对外公共API方法，所有功能通过状态图内部事件和状态管理实现。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawn",
+    "death",
+    "hit",
+    "cast"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认空闲状态，实体停止移动并播放循环动画，玩家可观察到其待机行为。"
+    },
+    {
+      "state": "spawndelay",
+      "note": "出生延迟状态，实体临时无敌、不可见且不可点击，持续指定延迟时间，玩家无法交互。"
+    },
+    {
+      "state": "spawn",
+      "note": "出生动画状态，实体在动画前45帧拥有无敌帧，动画结束后移除无敌并正常参与战斗。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画后在第32帧掉落战利品，之后实体被移除。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，实体停止移动播放受击动画，第12帧可被打断或进入攻击状态。"
+    },
+    {
+      "state": "cast",
+      "note": "施法攻击状态，实体发射多个投射物攻击目标，并设置团队攻击冷却时间为1.5秒。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      13897,
+      15022,
+      15651,
+      15225,
+      51046,
+      14938,
+      13606
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及实体 stategraph__SGshadowthrall_wings，也未讨论其 idle、spawndelay、spawn、death、hit、cast 等能力的任何表现，页面内容主要涉及其他实体（如克劳斯、龙蝇等）的通用描述，无相关证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影仆从",
+    "翅膀",
+    "施法",
+    "攻击",
+    "无敌",
+    "死亡",
+    "掉落",
+    "shadowthrall",
+    "wings",
+    "cast"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌对"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d0fef6038189ab40c9500def1f2fe61c86d398424ab758ad5ddbaf136013a1ff",
+    "source_bytes": 10799,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140835979
+  }
+}

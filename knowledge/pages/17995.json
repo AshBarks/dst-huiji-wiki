@@ -8,6 +8,7 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/healer.lua": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
@@ -45,6 +46,15 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/healer.lua": {
+      "aspects_ignored": [
+        "治疗效果的角色特定修改",
+        "治疗物品的效果描述",
+        "治疗能力的行为触发条件"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -52,7 +62,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

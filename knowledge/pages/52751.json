@@ -5,7 +5,9 @@
   "inputs": {
     "wikitext_sha256": "2fd6f93c116f905dd98b00df0b92e83b32ae4c5f68ea83eb14ca6da2ef74152c",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/carnivaldecor.lua": "b56c643945f5426e0794ab24429a0e0316b15caf83bf8d64ca6eb74d6ab43bb0",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
@@ -15,6 +17,17 @@
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -30,6 +43,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/carnivaldecor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -71,7 +88,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -83,5 +101,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -15,7 +15,8 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGprimemate.lua": "f86b59856dfa580c56e11e504934c127090793f02f671b42c557d37b90365f45"
     }
   },
   "symbols": {
@@ -52,7 +53,10 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "候选证据为'一同沉没，并产生 6 个[[海浪]]。'，未直接提及 entitytracker.lua 组件或其受影响变体（如 crabking 等），且海浪不在受影响变体列表中。"
+      }
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -131,6 +135,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGprimemate.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

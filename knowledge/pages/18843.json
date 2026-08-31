@@ -7,11 +7,14 @@
     "symbol_doc_shas": {
       "behaviours/standandattack.lua": "995bf5ae03ba814828f14b2c671533a933e3fb355b5225d1418fea267ef1b8bf",
       "brains/winonacatapultbrain.lua": "0e5d5c74900118af3330bf3cc7e027076a87cddded7dda70c035c194566ca74e",
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/circuitnode.lua": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
@@ -20,10 +23,14 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/portablestructure.lua": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
+      "components/powerload.lua": "f4b458a7925207c32ce307b007d9cb73c5bb0d197280537d2c8d0e66ddb17d0b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGwinona_catapult.lua": "c6aad27b4a4dc37a667c11bdcbfad7db820d7884fef3a87268913588dd022fba"
     }
   },
   "symbols": {
@@ -53,6 +60,22 @@
       "route": "direct",
       "detail_level": "summary"
     },
+    "components/activatable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "投石机建造后激活状态描述",
+          "evidence": [
+            {
+              "pageid": 18843,
+              "quote": "刚建造、放置的投石机处于激活状态，处于激活状态的投石机会在没有攻击目标"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -68,6 +91,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/circuitnode.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/colouradder.lua": {
       "route": "direct",
@@ -102,6 +129,11 @@
       "aspects_ignored": [
         "物品放置行为描述"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/deployhelper.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -189,10 +221,25 @@
         "note": "片段截断，推测为位面伤害"
       }
     },
+    "components/portablestructure.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/powerload.lua": {
+      "aspects_ignored": [
+        "设备空闲状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
@@ -225,6 +272,22 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwinona_catapult.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "受击伤害数值",
+          "evidence": [
+            {
+              "pageid": 18843,
+              "quote": "薇诺娜的投石机每受到一次锤击就会受到 100 点伤害。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

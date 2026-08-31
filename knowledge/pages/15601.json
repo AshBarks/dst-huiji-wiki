@@ -14,9 +14,14 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/sinkholespawner.lua": "c254a5ba0cc4a24460b1a7ecf6aae17235fc852ce66a78242f3ab5007c47098f",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "components/unevenground.lua": "69ff0df36d500177a2a7e5c63594cef28098ce9632c29a25adc7a531602a32e6",
+      "components/worldsettingstimer.lua": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+      "stategraphs/SGantlion.lua": "9a0e1fd3fbfde157f920f783b4958c2984e4062a029c191aca3751985e73674f",
+      "stategraphs/SGantlion_angry.lua": "10ef245d3f0b0b348ecbc9b2a74293531350a44a78d24390f5c0067e1b9ff265"
     }
   },
   "symbols": {
@@ -144,6 +149,22 @@
         "semantic_consistent": true
       }
     },
+    "components/sinkholespawner.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "坑洞生成行为描述",
+          "evidence": [
+            {
+              "pageid": 15601,
+              "quote": "否则它会生气而在森林世界产生[[#坑|坑]]"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -181,7 +202,60 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/unevenground.lua": {
+      "route": "direct",
       "detail_level": "stub"
+    },
+    "components/worldsettingstimer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGantlion.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "返回地下行为描述",
+          "evidence": [
+            {
+              "pageid": 15601,
+              "quote": "当[[世界湿度]]大于 0 时，蚁狮会缩回地下"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "玩具贡品效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "stategraphs/SGantlion_angry.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "死亡掉落战利品",
+          "evidence": [
+            {
+              "pageid": 15601,
+              "quote": "|掉落 = {{Pic|32|沙之石}}×6，{{Pic|32|肉}}×4，{{Pic|32|石头}}×2"
+            }
+          ]
+        },
+        {
+          "aspect": "闲置等待进贡状态",
+          "evidence": [
+            {
+              "pageid": 15601,
+              "quote": "平时蚁狮就待在它生成的地方等待玩家的进贡，只能被检查不能被攻击。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

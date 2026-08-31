@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "9f41b1777f3ff9df54d91905e2d9162ec45febb8c2d21a2a1445e92ad1d4ceeb",
     "symbol_doc_shas": {
+      "components/fan.lua": "8ea5b6878474755ab4012150b9f69976b72bf026c1f38d3a21e118faf8b814db",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -13,6 +14,10 @@
     }
   },
   "symbols": {
+    "components/fan.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/finiteuses.lua": {
       "aspects_ignored": [
         "耐久度百分比描述",

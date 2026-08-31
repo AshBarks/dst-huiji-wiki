@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "3271796b2ec19046e37a1fd2381ba24eecce14ea1366ce27bfeb761e9ed8e959",
     "symbol_doc_shas": {
+      "components/armor.lua": "b971904ace836fba10b647a56bc30101e34d6aa5331cc0198675bcbf358df22e",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -13,6 +14,14 @@
     }
   },
   "symbols": {
+    "components/armor.lua": {
+      "aspects_ignored": [
+        "盔甲伤害计算中的防御作用",
+        "盔甲基础属性描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [

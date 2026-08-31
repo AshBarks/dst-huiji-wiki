@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGspore.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGspore",
+  "summary": "该状态图驱动孢子实体，整体状态组织包括飞行移动、降落、起飞、闲置和死亡等基本行为状态，由事件如移动和死亡触发状态切换。",
+  "api": [],
+  "api_note": "源码中没有定义对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "moving",
+    "death",
+    "idle",
+    "land",
+    "land_idle",
+    "takeoff"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "孢子死亡时播放降落动画，移除物理碰撞，45帧后关闭灯光和阴影，动画结束后实体被移除。"
+    },
+    {
+      "state": "idle",
+      "note": "孢子闲置时悬浮播放循环动画，超时后根据移动意愿切换到移动或保持闲置。"
+    },
+    {
+      "state": "land",
+      "note": "孢子降落时停止移动，播放降落动画，动画结束后进入地面闲置状态。"
+    },
+    {
+      "state": "land_idle",
+      "note": "孢子在地面静止时播放闲置动画，保持不动。"
+    },
+    {
+      "state": "takeoff",
+      "note": "孢子起飞时播放起飞动画，14帧后启用灯光和阴影并播放声音，动画结束后进入闲置状态。"
+    },
+    {
+      "state": "moving",
+      "note": "孢子移动时持续播放飞行循环动画，向前行走。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14938,
+      14712,
+      21499,
+      19765,
+      20502,
+      15677,
+      13261,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未描述孢子（SGspore）的动画或状态行为，如死亡、闲置、降落、起飞、移动等；内容集中于孢子作为掉落物、种植物或生成物，而非其内部行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "孢子",
+    "蘑菇",
+    "飞行",
+    "降落",
+    "死亡",
+    "闲置",
+    "状态图",
+    "动画",
+    "灯光",
+    "物理碰撞"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境",
+    "照明"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b053b450c38c47a98fcd3b645dd4344d2789c2e6c1ef4eb2f5a7d48b12007aeb",
+    "source_bytes": 3220,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141392360
+  }
+}

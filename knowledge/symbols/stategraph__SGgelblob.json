@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgelblob.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgelblob",
+  "summary": "该状态图驱动名为'gelblob'的胶状粘液怪实体。整体状态组织方式基于常见怪物状态，包括闲置、生成、受击、死亡等，并添加了摇晃、吐痰和大小变化等特殊状态。状态之间通过事件和动画完成转换，处理了无敌帧、硬直和理智光环等游戏机制。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法（如公共函数或接口），所有逻辑由状态图内部事件和动画驱动处理。",
+  "events_published": [],
+  "events_listened": [
+    "electrocute",
+    "attacked",
+    "death",
+    "jiggle"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawn",
+    "hit",
+    "jiggle",
+    "spit",
+    "shrink_med",
+    "shrink_small",
+    "grow_med",
+    "grow_big",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体闲置时播放循环动画和声音，处于可旋转状态，无特殊效果。"
+    },
+    {
+      "state": "spawndelay",
+      "note": "生成前延迟阶段，实体不可见、无敌、无攻击性，持续时间可配置（默认1秒），期间理智光环归零。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成动画阶段，有临时无敌帧和不可攻击标签；阴影逐渐变大，理智光环从-小到-中变化，动画完成后变为可攻击状态。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画和声音；第6帧后添加'caninterrupt'标签，允许中断，动画完成后返回闲置。"
+    },
+    {
+      "state": "jiggle",
+      "note": "摇晃状态，由'jiggle'事件触发，需未死亡且非忙时；播放摇晃动画，第6帧后可中断，动画完成后返回闲置。"
+    },
+    {
+      "state": "spit",
+      "note": "吐痰状态，播放吐痰前动画和声音，处于忙状态，动画完成后返回闲置，可能关联攻击行为。"
+    },
+    {
+      "state": "shrink_med",
+      "note": "缩小到中等大小状态，播放缩小动画和声音；第8帧后可中断，动画完成后返回闲置，实体尺寸属性更新为'_med'。"
+    },
+    {
+      "state": "grow_big",
+      "note": "增长到大状态，播放增长动画和声音；第8帧后可中断，动画完成后返回闲置，实体尺寸属性更新为'_big'。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，实体尺寸强制为'_small'，播放死亡动画和声音；第10帧后禁用阴影，动画完成后实体被移除。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      16419,
+      34003,
+      15922,
+      52142,
+      15729,
+      13437,
+      27531
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及stategraph__SGgelblob的具体状态能力（如闲置动画、生成延迟、受击行为等）的玩家语言表达；仅讨论了掉落、台词引用和生成机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "胶状物",
+    "gelblob",
+    "生成动画",
+    "受击硬直",
+    "大小变化",
+    "吐痰攻击",
+    "电击",
+    "死亡动画",
+    "怪物行为",
+    "理智光环"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "怪物",
+    "状态变化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9a00580f8a28283affa91b5d7a29be73c0bfc40912cda204f0117fb9d6dfd378",
+    "source_bytes": 8044,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137810723
+  }
+}

@@ -5,16 +5,33 @@
   "inputs": {
     "wikitext_sha256": "cd4b31d6464fe2375099aa2aa9cf5dde24a3a773dd6b32f47bf906f83e9ce150",
     "symbol_doc_shas": {
+      "components/aoespell.lua": "8ead494d815d4a64a99d34ac3927bb70f9d5b0f0fe0dd6378de606e472d6dba4",
+      "components/aoetargeting.lua": "988acc93e42056c2c561faf8a6364061ace3b3f194308e7c43f8e889fd2035d9",
+      "components/circuitnode.lua": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/powerload.lua": "f4b458a7925207c32ce307b007d9cb73c5bb0d197280537d2c8d0e66ddb17d0b",
+      "components/spellbook.lua": "1c4692155a1e232c3106086045045da6db9a30dfcf866cd0491ed21a0b3046a1",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
     }
   },
   "symbols": {
+    "components/aoespell.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/aoetargeting.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/circuitnode.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/colouradder.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -70,6 +87,23 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/powerload.lua": {
+      "aspects_ignored": [
+        "设备空闲状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/spellbook.lua": {
+      "aspects_ignored": [
+        "法术书使用条件限制",
+        "法术书制作能力",
+        "法术书施法效果描述",
+        "法术书施法距离描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/updatelooper.lua": {
       "route": "direct",

@@ -9,15 +9,22 @@
       "behaviours/follow.lua": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/abigailbrain.lua": "8f768e42ec18dc344a92ea9e260a36667574acf1481277ab1875c476dfe6f8b2",
+      "components/aura.lua": "22a56638ab92c17639466c95afd4767004e87a1904c23199e587361c0e20333d",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+      "components/damagetyperesist.lua": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+      "components/debuffable.lua": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "components/fader.lua": "f89e28d9dea0c2d6064445a15d9f2f6f180dbd2418838c5fbda34911a14ef778",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+      "components/ghostlyelixirable.lua": "bb758ccf3b85a8ee8259c2733f418009793112afb90807e4e65ce80c47ddc83b",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planardefense.lua": "ce1136a734d94897c73a3b2d89ccafacbe87662d3b37d9bbf568fe7a68fc4dee",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGabigail.lua": "c4bc1ea9a4a4fcf9327286d2b7d2e061c6a3692cb47f8385f66a4b5fe1a77f79"
     }
   },
   "symbols": {
@@ -97,6 +104,14 @@
       "route": "direct",
       "detail_level": "detailed"
     },
+    "components/aura.lua": {
+      "aspects_ignored": [
+        "电路板激活启用增益",
+        "骨灰罐激活启用光环"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -127,6 +142,30 @@
         "semantic_consistent": true
       }
     },
+    "components/damagetyperesist.lua": {
+      "aspects_ignored": [
+        "电路板技能物理伤害减免效果",
+        "装备伤害减免能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/debuffable.lua": {
+      "aspects_ignored": [
+        "减益效果公告",
+        "减益效果施加",
+        "减益状态获取",
+        "减益附加与移除台词",
+        "增益与减益获取",
+        "增益效果覆盖"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/follower.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -139,6 +178,14 @@
         "wording": "保持在[[温蒂]]附近 1 ~ 5 距离单位，激怒状态下则是 3 ~ 10 单位",
         "semantic_consistent": true
       }
+    },
+    "components/ghostlyelixirable.lua": {
+      "aspects_ignored": [
+        "增益在实体移除或死亡时结束",
+        "增益应用到目标"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -182,6 +229,18 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/planardefense.lua": {
+      "aspects_ignored": [
+        "伤害减免描述",
+        "减伤百分比",
+        "击飞抵御行为",
+        "基础防御增加",
+        "物理伤害减免",
+        "防御百分比提供"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "aspects_ignored": [
         "生成倒计时启动描述",
@@ -203,6 +262,11 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGabigail.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

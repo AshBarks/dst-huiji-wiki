@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlightninggoat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlightninggoat",
+  "summary": "该状态图驱动饥荒联机版中的闪电山羊实体。状态组织以空闲、移动、嘲讽、放电和受电击为核心，通过事件驱动状态转换，并利用通用函数添加战斗、死亡、冻结和睡眠状态。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，所有行为由内部状态和事件处理驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "taunt",
+    "bleet",
+    "discharge",
+    "electrocute",
+    "shocked"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，闪电山羊播放循环动画并随机咀嚼音效，带电时发出雅各布天梯音效，超时后进入叫声状态。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，移动时播放跳跃音效，带电时也有特殊音效，移动速度在启动和停止间变化。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，标记为忙碌，播放嘲讽动画和音效，可能用于触发仇恨或战斗行为。"
+    },
+    {
+      "state": "discharge",
+      "note": "放电状态，闪电山羊失去带电状态，播放电击音效和动画，结束后切换回空闲。"
+    },
+    {
+      "state": "shocked",
+      "note": "受电击状态，标记为忙碌，播放电击动画和声音，执行缓冲动作后返回空闲，影响战斗硬直。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      16419,
+      13437,
+      10355,
+      13779,
+      14579,
+      15295,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录涉及熔炉装备、电路板、角色、海鱼、巨型蔬果、墙、玩具等实体，未发现任何关于闪电山羊（SGlightninggoat）能力或行为的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "闪电山羊",
+    "带电",
+    "放电",
+    "嘲讽",
+    "受击",
+    "电击",
+    "雅各布天梯",
+    "生物行为",
+    "状态图",
+    "DST"
+  ],
+  "gameplay_tags": [
+    "生物",
+    "战斗",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4da2f2195fdf0b8bbec0de06a4121b0dce0cb4f89830ebf3d45e58a2feefa1e5",
+    "source_bytes": 9749,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138548676
+  }
+}

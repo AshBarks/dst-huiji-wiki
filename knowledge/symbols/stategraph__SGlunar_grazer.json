@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlunar_grazer.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlunar_grazer",
+  "summary": "此状态图驱动‘月光进食者’（Lunar Grazer）这一游荡的敌对生物实体。其核心行为围绕移动、攻击（吞噬）、消失与重生展开，并引入了基于生命值阈值的强制消失机制（‘融化’），以及被‘眼壳萌眼’捕获时的特殊消失逻辑。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法（如 `function inst:XXX()`），状态图内部行为由事件驱动。",
+  "events_published": [
+    "devour",
+    "melt",
+    "splat",
+    "spawn_actual",
+    "hit",
+    "melt_fade",
+    "splat_fade"
+  ],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "minhealth",
+    "lunar_grazer_despawn",
+    "captured",
+    "captured_despawn",
+    "lunar_grazer_respawn",
+    "locomote",
+    "animover",
+    "gestaltcapturable_targeted"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.LUNAR_GRAZER_MELT_HEALTH_THRESHOLD"
+  ],
+  "states": [
+    "idle",
+    "spawndelay",
+    "dissipated",
+    "spawn",
+    "spawn_actual",
+    "splat",
+    "splat_pst",
+    "splat_fade",
+    "melt",
+    "melt_fade",
+    "captured_despawn",
+    "hit",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "devour"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "待机状态，周期性播放‘idle’动画并生成云迹（Trail）。玩家可观测到其原地存在的基本行为。"
+    },
+    {
+      "state": "devour",
+      "note": "核心攻击状态。面向目标并播放吞噬动画，在动画中段对目标造成一次伤害。对睡眠中的目标有击退和设置云保护的特殊效果。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。播放受击动画，若生命值低于‘LUNAR_GRAZER_MELT_HEALTH_THRESHOLD’阈值，则立即触发强制消失（‘melt’状态）。"
+    },
+    {
+      "state": "melt",
+      "note": "强制消失（融化）的起始状态。播放坠落动画，期间无敌且无法被选中。通常由生命值过低或特定事件（如被移除）触发。"
+    },
+    {
+      "state": "splat",
+      "note": "强制消失（瘫裂）的起始状态。播放瘫裂动画，通常由生命值降至最低（‘minhealth’事件）触发。"
+    },
+    {
+      "state": "dissipated",
+      "note": "实体消失后的‘残骸’状态。本体隐藏，仅显示散落的碎石，可缓慢回复生命值。等待‘重生’事件以重新进入‘spawn’状态。"
+    },
+    {
+      "state": "spawn",
+      "note": "重生的前奏。碎石从散落位置聚拢到中心，为实体重组做准备。期间无敌且无法被选中。"
+    },
+    {
+      "state": "spawn_actual",
+      "note": "实体从碎石中重组出现的动画。动画结束后，移除无敌和不可攻击标签，恢复战斗能力。"
+    },
+    {
+      "state": "walk_start",
+      "note": "行走准备状态，从‘idle’转入。播放行走前摇动画，可在此状态下响应攻击指令（‘queueattack’）。"
+    },
+    {
+      "state": "walk",
+      "note": "持续行走状态。循环播放行走动画，移动中周期性生成云迹，并可在特定动画帧响应攻击指令。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      21137,
+      16625,
+      13701,
+      15022,
+      23956,
+      34003,
+      34314,
+      23957
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及符号 stategraph__SGlunar_grazer 或其相关能力，所有页面讨论的是其他实体或机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "游荡",
+    "吞噬",
+    "消失",
+    "重生",
+    "融化",
+    "眼壳萌眼",
+    "强制消失",
+    "生命阈值"
+  ],
+  "search_terms_note": "pass1 后零命中 7/11,已二次修正(修正后 3/8)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "143a5bb1613356b0930aa760a40ea42836aec11c2eeedbd8b684e345bae1014d",
+    "source_bytes": 23941,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138579653
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGrabbit.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGrabbit",
+  "summary": "此状态图 `stategraph__SGrabbit` 驱动饥荒联机版中的兔子实体。其状态组织主要基于事件驱动，通过监听攻击、移动、陷阱等事件，在预定义的状态间进行切换，实现兔子的闲置、逃跑、进食、眩晕和死亡等核心行为。",
+  "api": [],
+  "api_note": "该状态图不提供直接对外调用的 API 方法。其行为完全由内部事件和动作处理器驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "trapped",
+    "locomote",
+    "stunbomb"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "look",
+    "idle",
+    "action",
+    "eat",
+    "hop",
+    "run",
+    "run_loop",
+    "death",
+    "fall",
+    "stunned",
+    "trapped",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "hop",
+      "note": "兔子的基础移动状态。当兔子决定移动（但不是奔跑）时进入，表现为缓慢跳跃前进并伴有“hop”音效。持续时间随机，超时后会重新进入跳动状态。"
+    },
+    {
+      "state": "run",
+      "note": "兔子的逃跑状态。当受到惊吓或玩家靠近时触发，兔子会尖叫并快速奔跑。此状态是兔子逃离威胁的主要表现。"
+    },
+    {
+      "state": "eat",
+      "note": "兔子的进食状态。当执行吃动作（如吃胡萝卜）时进入，播放固定的进食动画和循环，持续 2-6 秒后完成动作并回到空闲。"
+    },
+    {
+      "state": "stunned",
+      "note": "兔子被眩晕后的状态，例如被手杖击中。兔子会停止移动并播放眩晕动画，持续约 4-8 秒（随机值）。在此状态下，兔子可以被玩家拾取。"
+    },
+    {
+      "state": "trapped",
+      "note": "兔子被捕获（如放入陷阱）时的状态。兔子会立即停止所有动作并进入眩晕动画，持续 1 秒后恢复空闲。此状态带有 `noelectrocute` 标签，不会被电击。"
+    },
+    {
+      "state": "hit",
+      "note": "兔子受到攻击时的受击硬直状态。播放受击动画和音效，提供短暂的无敌帧和硬直时间，之后立即恢复空闲。"
+    },
+    {
+      "state": "death",
+      "note": "兔子的死亡状态。播放死亡动画，移除物理碰撞，并掉落死亡战利品（如兔肉）。死亡原因（凶手）会被记录在 `causeofdeath` 字段。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      28179,
+      28611,
+      34523,
+      34314,
+      13761,
+      19740,
+      15235
+    ],
+    "aspects": [
+      {
+        "aspect": "进食行为描述",
+        "evidence": [
+          {
+            "pageid": 15235,
+            "quote": "兔子会靠近 20 {{解释|距离单位}}内的可以作为[[诱饵物品]]的[[素食食物]]并在足够近后进食。"
+          }
+        ]
+      },
+      {
+        "aspect": "逃跑行为描述",
+        "evidence": [
+          {
+            "pageid": 15235,
+            "quote": "兔子会逃离{{分类|猎物惊吓者}}"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "兔子",
+    "逃跑",
+    "惊吓",
+    "兔子肉",
+    "陷阱",
+    "耳朵",
+    "洞穴",
+    "胡萝卜",
+    "影怪",
+    "月圆"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "动物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "50910959d768441a04d7c16e08b443c6ec5877d64778ecd67c28b374f92c05a5",
+    "source_bytes": 9098,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140238183
+  }
+}

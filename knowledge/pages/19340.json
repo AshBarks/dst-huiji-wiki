@@ -6,6 +6,7 @@
     "wikitext_sha256": "c54034581a42c69f79e7b61efcc623b1183605db29ae1dd085b20c387b7d96cb",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/explosive.lua": "f4d39182518429468cafc7e886ece85a22a857194ed2eeb3fdf2fb06f4829aa5",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -35,6 +36,13 @@
         "wording": "[19340:infobox:1] 特殊互动/燃烧时间=3 ~ 6",
         "semantic_consistent": true
       }
+    },
+    "components/explosive.lua": {
+      "aspects_ignored": [
+        "爆炸伤害类型描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/floater.lua": {
       "route": "direct",

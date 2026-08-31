@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGspat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGspat",
+  "summary": "该状态图驱动名为'spat'的实体，可能是一种游戏中的生物。整体状态组织以idle为核心，通过事件和定时器触发不同行为状态，包括随机移动、攻击和死亡等。状态图处理了攻击、冻结、电击等多种事件，实现实体的复杂行为逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，所有行为通过事件和状态驱动，无需额外API。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "heardhorn",
+    "loseloyalty"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawn_shake",
+    "shake",
+    "bellow",
+    "matingcall",
+    "graze",
+    "alert",
+    "attack",
+    "launchprojectile",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体静止时随机触发吃草、吼叫或摇动行为。"
+    },
+    {
+      "state": "spawn_shake",
+      "note": "实体生成时有短暂无敌和隐形，播放摇动动画防止攻击。"
+    },
+    {
+      "state": "shake",
+      "note": "实体摇动身体，无特殊效果，可能用于状态过渡。"
+    },
+    {
+      "state": "bellow",
+      "note": "实体吼叫，可被号角声触发，支持计数重复播放。"
+    },
+    {
+      "state": "matingcall",
+      "note": "实体发出交配召唤声音，播放特定动画。"
+    },
+    {
+      "state": "graze",
+      "note": "实体吃草，持续一段时间后返回idle状态。"
+    },
+    {
+      "state": "alert",
+      "note": "实体进入警觉状态，播放好奇声音和警觉动画。"
+    },
+    {
+      "state": "attack",
+      "note": "实体进行近战攻击，在动画中造成伤害，有攻击延迟。"
+    },
+    {
+      "state": "launchprojectile",
+      "note": "实体发射投射物（如鼻涕弹），造成远程伤害，有发射音效。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡，播放死亡动画，移除碰撞并掉落战利品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      13897,
+      15022,
+      15651,
+      51046,
+      20511,
+      15225,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "死亡掉落物说明",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "掉落 = {{Pic|32|木炭}}×1，{{Pic|32|怪物肉}}×1"
+          },
+          {
+            "pageid": 51046,
+            "quote": "掉落={{Pic|32|废料}}×1，{{Pic|32|战争瓦器"
+          }
+        ]
+      },
+      {
+        "aspect": "近战攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+          },
+          {
+            "pageid": 15651,
+            "quote": "攻击间隔 = 4（暴怒时3）"
+          },
+          {
+            "pageid": 51046,
+            "quote": "攻击间隔=3.5"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "spat",
+    "攻击",
+    "吼叫",
+    "无敌",
+    "死亡",
+    "吃草",
+    "投射物",
+    "冻结",
+    "电击",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生物行为",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a21e7b5243dce13a509c7f0a3ea6df0b9fdc022436a8e29e711f0c68a2c69b4b",
+    "source_bytes": 7941,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141253168
+  }
+}

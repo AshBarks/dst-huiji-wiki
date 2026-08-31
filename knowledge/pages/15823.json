@@ -6,12 +6,15 @@
     "wikitext_sha256": "0642e753d56bb3aa39ffc2f1274b5cdedd3c83a928c60bffc3c8a505d29b63c8",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/channelcastable.lua": "983381c14e224de108dec49f8384c092bb1268eab2b61c5791548eeac84a678e",
+      "components/cooker.lua": "6da76890dee84a843f72420a4e9ba15cb810d8d6f6791c2bba680476380a2c02",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/lighter.lua": "66259314cba3d5b37fc74d2b2a424767632d301c47db620de76f3effbca05456",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -31,6 +34,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/channelcastable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/cooker.lua": {
+      "aspects_ignored": [
+        "烹饪操作步骤描述",
+        "烹饪锅的烹饪功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -90,6 +105,16 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/lighter.lua": {
+      "aspects_ignored": [
+        "打火机作为烹饪火源",
+        "打火机制作与范围属性",
+        "打火机点燃生物行为",
+        "打火机触发可控燃烧"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmoonstormstatic.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmoonstormstatic",
+  "summary": "该状态图驱动饥荒联机版中月亮风暴相关的静态实体（如月亮风暴效果或可捕捉物体）。状态图仅有两个状态：idle和moving，通过事件处理移动和被目标锁定的行为。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图通过事件和状态内部管理。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "moonstormstaticcapturable_targeted",
+    "moonstormstaticcapturable_untargeted"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "moving",
+    "idle"
+  ],
+  "state_notes": [
+    {
+      "state": "moving",
+      "note": "实体正在移动，通过locomotor组件行走。当有移动意图且未被目标锁定时进入此状态。"
+    },
+    {
+      "state": "idle",
+      "note": "实体闲置状态，初始状态。随机超时（0.25至0.5秒）后检查是否要移动；若被目标锁定则保持静止。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15234,
+      19129,
+      51494,
+      51221,
+      51046,
+      22522,
+      24875,
+      27531
+    ],
+    "aspects": [
+      {
+        "aspect": "移动速度与游荡行为描述",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "行走速度=2"
+          },
+          {
+            "pageid": 51046,
+            "quote": "战争瓦器人会被激活并四处游荡。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月亮风暴",
+    "静态物",
+    "移动状态",
+    "闲置状态",
+    "被锁定",
+    "状态图",
+    "行走",
+    "停止",
+    "事件处理",
+    "locomotor"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "65e344ca2715b72e06c3cf1f157b78d0e2e623cf5a8ae582d7b490fc9baae6b0",
+    "source_bytes": 1586,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139437828
+  }
+}

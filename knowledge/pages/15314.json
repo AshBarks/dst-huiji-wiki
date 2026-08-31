@@ -25,6 +25,7 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/pollinator.lua": "037802dff41946abdb493bb825bb25ad189c7ede219f70ba632acd20d2de2cae",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
@@ -265,6 +266,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/pollinator.lua": {
+      "aspects_ignored": [
+        "授粉行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

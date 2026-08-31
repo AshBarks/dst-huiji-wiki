@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcookiecutter.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcookiecutter",
+  "summary": "此状态图驱动生物“cookiecutter”（啃船怪），一种海洋生物。其状态组织围绕水下移动、水面跳跃以及在船上钻洞攻击这三个核心行为展开，并处理死亡、受击和特殊状态如睡眠与电击。",
+  "api": [],
+  "api_note": "该状态图为生物内部状态机，未定义直接供外部游戏逻辑调用的API方法。",
+  "events_published": [],
+  "events_listened": [
+    "electrocute",
+    "attacked",
+    "onsink",
+    "gohome",
+    "death",
+    "gotosleep",
+    "teleported",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "resurface",
+    "gohome",
+    "death",
+    "death_boat",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "eat",
+    "jump_pre",
+    "jumping",
+    "jump_pst_water",
+    "jump_pst_boat",
+    "drill",
+    "drill_pst",
+    "drill_hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "水下待机动画状态，是多数状态的起始和结束点。"
+    },
+    {
+      "state": "resurface",
+      "note": "生物重新浮出水面。动画期间无敌且不可选中，动画结束约9帧后解除无敌和攻击标签。"
+    },
+    {
+      "state": "gohome",
+      "note": "生物开始执行“回家”逻辑，播放离开动画后调用返回巢穴函数。"
+    },
+    {
+      "state": "death",
+      "note": "在水中的死亡状态，播放死亡动画并掉落战利品。"
+    },
+    {
+      "state": "death_boat",
+      "note": "在船上的死亡状态，播放特定死亡动画并掉落战利品，期间移除物理碰撞。"
+    },
+    {
+      "state": "jump_pre",
+      "note": "跳跃前摇，无敌且不可攻击。前摇结束时播放水花动画并进入跳跃状态。"
+    },
+    {
+      "state": "jumping",
+      "note": "核心跳跃攻击状态。生物离开水面，期间无敌。跳跃中会对接地目标进行一次范围伤害，落地后根据位置转入船上钻洞或水下状态。"
+    },
+    {
+      "state": "jump_pst_boat",
+      "note": "跳跃至船上的后摇状态。播放撞击动画和音效，无敌持续至动画结束，随后转入钻洞状态。"
+    },
+    {
+      "state": "drill",
+      "note": "持续钻洞攻击状态。播放钻洞循环动画并产生木屑特效，对船只造成持续伤害。钻洞组件完成后自动结束。"
+    },
+    {
+      "state": "drill_pst",
+      "note": "钻洞完成后的状态。约3帧后结算钻洞伤害，随后隐藏生物，延迟后重新浮出水面（resurface）并寻找新位置。"
+    },
+    {
+      "state": "drill_hit",
+      "note": "受击后发动的反击状态。播放受击和攻击动画，在约25帧时对周围进行范围攻击，攻击后转回钻洞状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      51046,
+      13897,
+      15651,
+      15225,
+      14907,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述熔炉模式装备、天体英雄、战争瓦器人、克劳斯、龙蝇、暗影傀儡、地狱独眼巨猪和蜂王等实体的行为，这些实体均不涉及水下待机、浮出水面、跳跃攻击、钻洞等能力，与符号的能力清单不匹配。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "啃船怪",
+    "钻船",
+    "跳跃",
+    "水下",
+    "攻击",
+    "死亡",
+    "啃咬",
+    "硬直",
+    "动画"
+  ],
+  "gameplay_tags": [
+    "海洋",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "50b3bc3b05819875c9696a28a2e0dc3c88bdac4e817d5227ad264e0c4e5a92f7",
+    "source_bytes": 21316,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136939730
+  }
+}

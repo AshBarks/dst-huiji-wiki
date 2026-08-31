@@ -5,16 +5,43 @@
   "inputs": {
     "wikitext_sha256": "650c0529bdb7e2b74ada41bdeecae1b12b5d53809b51b31edb5d90295c13bbe4",
     "symbol_doc_shas": {
+      "components/boatrotator.lua": "afdc54ef7a09cdf78db0005c472bd034cc9b156755afe6ba8c9173da4471b6d6",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGboatrotator.lua": "0c6f909b02fb490c059ce9380c5aaf8c248cc2b21d13c440c6607d3bc2ad66b7"
     }
   },
   "symbols": {
+    "components/boatrotator.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "平台绑定要求",
+          "evidence": [
+            {
+              "pageid": 19113,
+              "quote": "只有建在漂浮平台上的转向舵才能对平台及船上建筑进行旋转"
+            }
+          ]
+        },
+        {
+          "aspect": "旋转方向控制",
+          "evidence": [
+            {
+              "pageid": 19113,
+              "quote": "对转向舵用鼠标左击能使平台逆时针旋转，用鼠标右击能使平台顺时针旋转"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -80,7 +107,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGboatrotator.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

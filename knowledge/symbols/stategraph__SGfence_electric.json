@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfence_electric.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfence_electric",
+  "summary": "该状态图驱动名为‘fence_electric’的实体（电栅栏）。其核心逻辑围绕电栅栏的连接过程展开，状态组织为尝试连接、循环寻找、连接完成或断开，以及通用的闲置、放置和受击状态。",
+  "api": [],
+  "api_note": "该状态图本身不定义任何对外API方法。其行为由内部状态和监听的事件（如‘start_linking’、‘end_linking’）驱动。",
+  "events_published": [],
+  "events_listened": [
+    "start_linking",
+    "end_linking",
+    "disconnect_links",
+    "animover",
+    "linked_to"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "linking_pre",
+    "linking_loop",
+    "linking_pst",
+    "disconnect",
+    "place",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "电栅栏的默认待机状态。会根据自身是否已连接其他栅栏，播放‘idle_on’（已连接，有持续电流）或‘idle’（未连接）的动画。"
+    },
+    {
+      "state": "linking_loop",
+      "note": "尝试寻找并建立连接的循环状态。会播放持续的连接动画和音效，并不断调用查找连接器的逻辑。一旦找到目标或接收到‘linked_to’事件，将进入连接完成状态。"
+    },
+    {
+      "state": "place",
+      "note": "电栅栏被玩家放置时的状态。播放放置动画，状态标签为‘busy’，期间不可进行其他操作。"
+    },
+    {
+      "state": "hit",
+      "note": "电栅栏受到攻击或伤害时的状态。播放受击动画，状态标签为‘busy’。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      20719,
+      10418,
+      73480,
+      16615,
+      16438,
+      45439,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及电栅栏（stategraph__SGfence_electric）的任何能力或行为，所有内容均围绕WX-78、电路板、扫描仪、提取器等其他实体，无idle、linking_loop、place、hit状态的相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "电栅栏",
+    "电墙",
+    "电路",
+    "连接",
+    "放电",
+    "防御工事",
+    "隔断",
+    "MOD",
+    "合成"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "电路",
+    "防御"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ee1406233336a557cbb71b69a982479d33071e63186d7fbfd76780278cd8f97b",
+    "source_bytes": 4636,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137518143
+  }
+}

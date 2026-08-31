@@ -7,7 +7,9 @@
     "symbol_doc_shas": {
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/useabletargeteditem.lua": "7b6e432662c59d4845fc7ca43fa4f4c220f9ef197ee1efc3fef90fa2ff5baa03",
+      "components/writeable.lua": "4bc6a4dd2931cdf949ed9e01730ef3f12e71d6a1c9905bf110a2ebc33eb4509b"
     }
   },
   "symbols": {
@@ -22,7 +24,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -34,6 +39,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/useabletargeteditem.lua": {
+      "aspects_ignored": [
+        "物品使用与目标设置"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/writeable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

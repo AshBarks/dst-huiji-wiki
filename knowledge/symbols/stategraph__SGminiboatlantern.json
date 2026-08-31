@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGminiboatlantern.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGminiboatlantern",
+  "summary": "该状态图驱动小型船只灯笼（miniboatlantern）实体。整体状态组织以空闲状态为核心，并通过通用模块添加行走状态，处理移动和事件响应如停止浮动或关闭。",
+  "api": [],
+  "api_note": "该状态图未定义公共 API 方法，仅内部使用。",
+  "events_published": [],
+  "events_listened": [
+    "floater_stopfloating",
+    "onturnoff"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当实体停止移动或触发特定事件（如停止浮动、关闭）时进入此状态。表现播放基于位置（海洋或地面）的空闲动画，不移动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      35675,
+      65605,
+      18853,
+      28611,
+      35615,
+      13406,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及符号 stategraph__SGminiboatlantern 或其相关实体，也没有讨论 idle 状态或空闲行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "灯笼",
+    "小型船只",
+    "浮动",
+    "海洋",
+    "地面",
+    "静止",
+    "移动",
+    "状态图",
+    "miniboatlantern"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "照明"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "811317f502abc8ac89a46fde5879722db537b9e98793130b70f5c452dd264837",
+    "source_bytes": 944,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139050204
+  }
+}

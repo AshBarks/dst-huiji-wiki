@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsharkboi_water.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsharkboi_water",
+  "summary": "该状态图驱动名为'sharkboi_water'的水生实体（可能是鲨鱼男孩的水生变体）。整体状态组织基于移动行为，包括空闲、行走和奔跑三种主要模式，每种模式有启动、循环和停止的过渡状态。状态通过监听'locomote'事件来响应玩家的移动输入，并触发相应的动画和音效。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法或公共接口。",
+  "events_published": [],
+  "events_listened": [
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认空闲状态，当实体无移动输入时进入，播放空闲动画。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，当实体需要移动时进入，播放行走循环动画并伴有溅水音效。"
+    },
+    {
+      "state": "walk_stop",
+      "note": "停止行走状态，进入后播放停止动画，并有物理减速效果，模拟惯性滑动。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，当实体需要快速移动时进入，播放奔跑动画，产生尾流特效并伴有音效。"
+    },
+    {
+      "state": "run_stop",
+      "note": "停止奔跑状态，进入后播放停止动画，立即停止移动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15022,
+      13406,
+      51287,
+      16419,
+      13437,
+      34003,
+      28611
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及实体 'SGsharkboi_water' 或其相关状态图；所有页面涉及其他实体和机制，未体现 idle、walk、walk_stop、run、run_stop 的行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水生",
+    "移动",
+    "行走",
+    "奔跑",
+    "尾流",
+    "溅水",
+    "减速",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "水生",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "86ff2e1c952638026614415c90b978c6f9ffc2128f2dcb8366ae7ea8e649ea3f",
+    "source_bytes": 5887,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141057851
+  }
+}

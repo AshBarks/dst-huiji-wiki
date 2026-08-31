@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpigelite.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpigelite",
+  "summary": "该状态图驱动名为“pigelite”的猪人精英实体，整体状态组织包括基础移动（行走和奔跑）、战斗交互（攻击、受击、击退）、道具拾取（普通拾取和扑向拾取），以及小游戏相关的姿势序列（pose和endpose）。状态转换基于玩家指令、战斗事件、道具交互和小游戏进度触发。",
+  "api": [],
+  "api_note": "源码中未定义公共API函数表，所有行为均通过状态图内部事件和状态处理。",
+  "events_published": [
+    "knockbackdropped",
+    "propsmashed",
+    "attacked",
+    "knockback"
+  ],
+  "events_listened": [
+    "locomote",
+    "attacked",
+    "knockback",
+    "pickprop",
+    "diveitem",
+    "matchover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "PIG_ELITE_HIT_RECOVERY",
+    "KNOCKBACK_DROP_ITEM_HEIGHT_HIGH",
+    "KNOCKBACK_DROP_ITEM_HEIGHT_LOW",
+    "KNOCKBACK_DELAY_INTERACTION_HIGH",
+    "KNOCKBACK_DELAY_INTERACTION_LOW",
+    "KNOCKBACK_DELAY_PLAYER_INTERACTION_HIGH",
+    "KNOCKBACK_DELAY_PLAYER_INTERACTION_LOW"
+  ],
+  "states": [
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "hit",
+    "knockback",
+    "attack",
+    "pickprop",
+    "dive",
+    "flipout",
+    "pose",
+    "endpose_pre",
+    "endpose_loop",
+    "endpose_jump"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体站立不动，可能手持道具。进入条件为无移动或动作指令，播放循环闲置动画。"
+    },
+    {
+      "state": "attack",
+      "note": "使用手持道具进行范围攻击，在动画第7帧触发AOE伤害并击飞目标，可能击碎道具。第19帧后退出攻击状态。"
+    },
+    {
+      "state": "pickprop",
+      "note": "拾取附近道具，丢弃当前手持物品。进入条件为收到“pickprop”事件且非忙碌状态，拾取距离为1.1码。"
+    },
+    {
+      "state": "dive",
+      "note": "扑向地面物品进行拾取，有滑动动画和物理速度，期间可拾取物品但可能被击退中断。进入条件为收到“diveitem”事件且物品在4.6码内。"
+    },
+    {
+      "state": "knockback",
+      "note": "被击退状态，可能丢失手持道具和小游戏道具，有物理击飞效果，持续约35帧。进入条件为受到击退事件，期间禁睡眠、冻结和电击。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画和猪叫声，记录受击时间用于控制恢复间隔（基于TUNING.PIG_ELITE_HIT_RECOVERY）。"
+    },
+    {
+      "state": "pose",
+      "note": "小游戏姿势状态，无敌且禁攻击，等待“introover”事件后转为空闲。进入条件为姿势开始事件，质量设为5000。"
+    },
+    {
+      "state": "endpose_pre",
+      "note": "小游戏结束前准备姿势，丢弃道具并可能触发对话，对话内容基于国王评分。进入条件为收到“matchover”事件且处于空闲状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      13897,
+      15922,
+      13828,
+      15651,
+      15551,
+      15938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均为其他实体（如天体英雄、战争瓦器人、克劳斯等）的页面，未提及 stategraph__SGpigelite 或与其相关的能力描述。清单中的能力（如idle、attack等）在页面中没有针对该符号的表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猪人精英",
+    "攻击",
+    "击退",
+    "拾取道具",
+    "扑向物品",
+    "小游戏",
+    "无敌状态",
+    "范围伤害",
+    "道具破碎",
+    "姿势"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "小游戏",
+    "拾取"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e021d733167acb654b1c0d75f7c9914b02935d477e446a43824334fdb2fd4668",
+    "source_bytes": 31476,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145620749
+  }
+}

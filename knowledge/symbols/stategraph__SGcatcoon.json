@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcatcoon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcatcoon",
+  "summary": "该状态图驱动猫浣熊（catcoon）实体。状态组织包括基础移动、特定行为如吐毛球和扑击攻击，以及响应事件的状态转换。通过CommonStates添加标准战斗、睡眠和冻结等状态。",
+  "api": [],
+  "api_note": "该状态图主要处理内部状态转换和动画，没有对外暴露API方法。",
+  "events_published": [],
+  "events_listened": [
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CATCOON_MELEE_RANGE",
+    "CATCOON_ATTACK_CONNECT_CHANCE",
+    "CATCOON_PICKUP_ITEM_CHANCE"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "gohome_raining",
+    "gohome",
+    "hairball_hack",
+    "hairball_hack_loop",
+    "hairball",
+    "pawground",
+    "pawgroundaction",
+    "pounceplayaction",
+    "hiss",
+    "pounceattack",
+    "pounceplay"
+  ],
+  "state_notes": [
+    {
+      "state": "gohome_raining",
+      "note": "当下雨时，猫浣熊会进入此状态，播放吼叫动画并执行回家动作，标记为忙碌状态。"
+    },
+    {
+      "state": "gohome",
+      "note": "猫浣熊回家的普通状态，播放动作动画并执行缓冲动作，可能用于返回巢穴。"
+    },
+    {
+      "state": "hairball",
+      "note": "猫浣熊吐毛球的关键状态，有几率掉落物品给玩家，并可能触发后续动作如捡拾。"
+    },
+    {
+      "state": "pounceattack",
+      "note": "远程攻击状态，猫浣熊扑向目标进行攻击，有几率对小型生物触发吼叫，攻击判定在时间线中执行。"
+    },
+    {
+      "state": "pounceplay",
+      "note": "玩耍时的扑击攻击状态，针对特定目标如气球或鸟，攻击连接概率较高，并可能触发吼叫。"
+    },
+    {
+      "state": "pawgroundaction",
+      "note": "互动玩耍状态，猫浣熊用爪子拍打地面，执行缓冲动作，通常用于玩家互动。"
+    },
+    {
+      "state": "pounceplayaction",
+      "note": "跳跃玩耍状态，猫浣熊跳向目标进行互动，移动时禁用地面速度并设置电机速度。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      51046,
+      14938,
+      14579,
+      15651,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录全部涉及其他游戏实体（如天体英雄、克劳斯、战争瓦器人等），未提及猫浣熊（SGcatcoon）的任何状态行为或能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猫浣熊",
+    "吐毛球",
+    "攻击",
+    "扑击",
+    "玩耍",
+    "回家",
+    "下雨",
+    "互动",
+    "掉落",
+    "毛球"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "互动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "45e7a4001d22675ed53847b1c67665ace2c372452c6475514c1f728fa4fe5027",
+    "source_bytes": 19973,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136640481
+  }
+}

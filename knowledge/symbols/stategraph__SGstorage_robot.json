@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGstorage_robot.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGstorage_robot",
+  "summary": "该状态图驱动饥荒联机版中的存储机器人实体。状态组织包括空闲、拾取、存储、维修和损坏等核心状态，以及行走状态，确保机器人能执行资源收集、存储和维修任务。整体状态转换处理移动、交互和事件响应。",
+  "api": [],
+  "api_note": "该状态图主要用于内部状态管理，未定义对外API方法。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "pickup",
+    "store",
+    "repairing_pre",
+    "repairing",
+    "breaking",
+    "idle_broken"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "机器人空闲状态，停止燃料消耗，播放待机动画，可能发出中性语音。进入条件为机器人不忙时，动画循环后重置。"
+    },
+    {
+      "state": "pickup",
+      "note": "机器人拾取物品时，播放拾取动画，执行拾取动作，期间临时无敌（质量设为99999），并有概率发出语音。"
+    },
+    {
+      "state": "store",
+      "note": "机器人存储物品时，播放卸货动画，执行存储动作，关闭所有容器，期间无敌。退出时恢复移动能力。"
+    },
+    {
+      "state": "repairing_pre",
+      "note": "机器人维修前准备状态，播放维修准备动画，为维修阶段做准备。"
+    },
+    {
+      "state": "repairing",
+      "note": "机器人维修状态，播放维修动画，执行维修过程。"
+    },
+    {
+      "state": "breaking",
+      "note": "机器人损坏状态，丢弃所有物品，播放损坏动画，并发出语音。进入后转换为损坏空闲状态。"
+    },
+    {
+      "state": "idle_broken",
+      "note": "机器人损坏后的空闲状态，静止不动，无声音，用于损坏后等待。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      28610,
+      16057,
+      13847,
+      18216,
+      15225,
+      19830,
+      14816,
+      14935
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及stategraph__SGstorage_robot实体或其相关能力如空闲、拾取、存储、维修、损坏等，所有内容均围绕燃料、遗迹、发电机、暗影傀儡、损坏发条装置、鳄鱼指挥官、酸蚀蝎等其他实体展开。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "存储机器人",
+    "拾取",
+    "存储",
+    "维修",
+    "损坏",
+    "行走",
+    "燃料",
+    "无敌帧",
+    "声音",
+    "动画"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4b386c728e831553ae93eb8bd77639308f1511d6835d4d8c065e2276ab1e856b",
+    "source_bytes": 7901,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141626122
+  }
+}

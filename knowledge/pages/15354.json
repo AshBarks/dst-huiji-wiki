@@ -7,7 +7,8 @@
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210"
     }
   },
   "symbols": {
@@ -42,6 +43,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

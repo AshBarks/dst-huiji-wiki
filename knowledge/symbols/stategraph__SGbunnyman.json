@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbunnyman.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbunnyman",
+  "summary": "该状态图驱动饥荒联机版中的兔人（bunnyman）实体。整体状态组织基于常见状态处理，包括攻击、死亡、闲置、移动和特殊动作等状态，通过事件和动作处理器响应游戏内行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，仅包含内部状态和事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "cheer",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BUNNYMAN_PANIC_THRESH",
+    "BUNNYMAN_MAX_STUN_LOCKS"
+  ],
+  "states": [
+    "funnyidle",
+    "death",
+    "abandon",
+    "attack",
+    "eat",
+    "hit",
+    "cheer"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当兔人有攻击目标时进入，播放攻击动画并在第13帧执行攻击造成伤害，标签为'attack'和'busy'。"
+    },
+    {
+      "state": "death",
+      "note": "健康值降至0时进入，播放死亡动画，可能掉落物品或触发寄生虫事件，标签为'busy'。"
+    },
+    {
+      "state": "hit",
+      "note": "受击时进入，播放受击动画并产生硬直，更新受击恢复延迟，标签为'busy'。"
+    },
+    {
+      "state": "eat",
+      "note": "执行进食动作时进入，播放动画并在第20帧执行缓冲动作，标签为'busy'。"
+    },
+    {
+      "state": "cheer",
+      "note": "响应欢呼事件时进入，播放快乐动画，通常由领导呼唤触发，标签为'busy'。"
+    },
+    {
+      "state": "abandon",
+      "note": "被领导抛弃时进入，播放抛弃动画，可能改变行为，标签为'busy'。"
+    },
+    {
+      "state": "funnyidle",
+      "note": "闲置状态，根据健康值（低于恐慌阈值）、忠诚度（低于0.05）和战斗状态显示不同动画，如愤怒或快乐，标签为'busy'。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15239,
+      15973,
+      15022,
+      51046,
+      15551,
+      13897,
+      15651
+    ],
+    "aspects": [
+      {
+        "aspect": "死亡掉落物品描述",
+        "evidence": [
+          {
+            "pageid": 15239,
+            "quote": "当兔人被杀死时：怪物肉×1, 胡须×2"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "兔人",
+    "攻击",
+    "死亡",
+    "饥饿",
+    "忠诚",
+    "欢呼",
+    "动画",
+    "状态图",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fb7c8ce6928a12f6f5c529c4040c7f81e55de7c2959191891b536ad9ecb50848",
+    "source_bytes": 8328,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136274241
+  }
+}

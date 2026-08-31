@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGchest_mimic.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGchest_mimic",
+  "summary": "该状态图驱动饥荒联机版中的模仿宝箱（chest_mimic）实体。整体状态组织以事件驱动为主，包括空闲、攻击、嘲讽、死亡、拾取、生成和进食等核心状态，同时整合了行走、受伤和冻结等通用状态，形成完整的动作循环。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外API方法，所有行为通过状态和事件内部驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "taunt",
+    "taunt_loop",
+    "taunt_pst",
+    "death",
+    "pickup",
+    "spawn",
+    "eat_loop",
+    "walk",
+    "hit",
+    "eat",
+    "eat_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体空闲时随机播放动画（idle1或idle2），用于状态过渡，无特殊效果。"
+    },
+    {
+      "state": "attack",
+      "note": "实体执行攻击，在动画第18帧造成伤害，攻击后有33%几率进入嘲讽状态。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡时播放死亡动画，移除碰撞体，掉落战利品和背包物品。"
+    },
+    {
+      "state": "spawn",
+      "note": "实体生成时可能从宝箱打开动画开始，在动画第38或42帧造成伤害并触发攻击。"
+    },
+    {
+      "state": "eat",
+      "note": "实体进食的初始状态，播放攻击动画，在第18帧执行进食动作并进入咀嚼循环。"
+    },
+    {
+      "state": "hit",
+      "note": "实体受攻击时进入短暂硬直，播放受伤动画，有“hit”标签限制其他动作。"
+    },
+    {
+      "state": "taunt",
+      "note": "实体嘲讽时播放循环动画（2-4次），播放挑衅音效，用于吸引玩家注意。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      34523,
+      34314,
+      15651,
+      51046,
+      20714,
+      13606
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面中未提及与 stategraph__SGchest_mimic 相关的实体或能力，所有提供的页面摘录均涉及其他游戏机制或实体，如熔炉装备、天体英雄、布景、世界生成、龙蝇、战争瓦器人、控制台和帝王蟹。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "模仿宝箱",
+    "chest mimic",
+    "攻击",
+    "嘲讽",
+    "死亡",
+    "生成",
+    "进食",
+    "受伤",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "陷阱",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "770fcf2023d2688e7d61919cf0cf80881da2c800100cba7f2c75bdd3513d2687",
+    "source_bytes": 10174,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136966329
+  }
+}

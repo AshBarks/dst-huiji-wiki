@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdeciduoustree.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdeciduoustree",
+  "summary": "该状态图驱动饥荒联机版中的落叶树实体，特别是其怪物化形态。状态组织包括攻击准备、攻击、空闲、燃烧等状态，通过事件如电击或砍伐触发转换。整体上，状态图管理树在不同情境下的行为，如被玩家砍伐后变为怪物时的攻击行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，行为由内部状态和事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "electrocute"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "gnash_pre",
+    "gnash",
+    "gnash_pst",
+    "chop_pst",
+    "gnash_idle",
+    "burning_pre",
+    "burning",
+    "burning_pst",
+    "empty"
+  ],
+  "state_notes": [
+    {
+      "state": "gnash_pre",
+      "note": "当树处于怪物状态时，进入攻击准备阶段，播放摇晃动画。如果由事件触发且允许跳过准备，则直接进入攻击状态。"
+    },
+    {
+      "state": "gnash",
+      "note": "树进入攻击状态，播放愤怒动画和声音，对玩家造成威胁。攻击后可能返回准备或空闲状态。"
+    },
+    {
+      "state": "gnash_pst",
+      "note": "攻击后状态，根据40%概率决定再次准备攻击或进入空闲状态。"
+    },
+    {
+      "state": "chop_pst",
+      "note": "砍树后状态，如果树是怪物，根据60%概率准备攻击或空闲。"
+    },
+    {
+      "state": "gnash_idle",
+      "note": "攻击后空闲状态，树会检查是否有目标；若无，继续空闲；若有，再次准备攻击。播放随机声音。"
+    },
+    {
+      "state": "burning",
+      "note": "当树被点燃时进入燃烧状态，播放受伤声音和动画，持续燃烧并循环。"
+    },
+    {
+      "state": "empty",
+      "note": "树处于非怪物状态时的默认状态，无特殊行为，作为初始状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      20496,
+      10374,
+      15539,
+      13897,
+      15922,
+      15651,
+      51046
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及落叶树的状态图或相关能力描述（如怪物状态、攻击阶段、燃烧状态等），内容主要涉及其他实体（如天体英雄、燃烧机制、角色薇洛、弹弓弹药、克劳斯、熔炉模式、龙蝇、战争瓦器人）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "落叶树",
+    "怪物",
+    "攻击",
+    "燃烧",
+    "砍树",
+    "愤怒",
+    "火",
+    "目标",
+    "空闲"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c3a7f0244e65bd5da312170671ef21198bb6b9cd79049380c806bc7b2b8d3392",
+    "source_bytes": 6227,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145217903
+  }
+}

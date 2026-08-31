@@ -17,7 +17,8 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGcrabking_mob.lua": "ec0502ffacf7fc7d3c0e0ad601bfcfec36173c4dfdfa00fe6920f03c4e34d0c0"
     }
   },
   "symbols": {
@@ -182,6 +183,14 @@
         "wording": "特殊互动/催眠抗",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGcrabking_mob.lua": {
+      "aspects_ignored": [
+        "嘲讽状态与时长",
+        "死亡后重生与掉落战利品"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

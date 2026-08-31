@@ -21,7 +21,8 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
+      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+      "stategraphs/SGwalrus.lua": "fa363ba6f72cb47df159ded211f757eea1df8a913b0151df78d0a15eb5fdf564"
     }
   },
   "symbols": {
@@ -236,6 +237,15 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwalrus.lua": {
+      "aspects_ignored": [
+        "吹箭远程攻击",
+        "战吼吸引仇恨",
+        "死亡掉落战利品"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

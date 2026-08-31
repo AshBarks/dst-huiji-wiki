@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGantchovies.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGantchovies",
+  "summary": "该状态图驱动名为'antchovies'的实体，可能为蚂蚁类生物。状态图定义了三个状态：空闲、被捕获在网中和从网中释放，整体组织基于事件触发，从空闲状态开始循环。玩家可通过网捕获和释放实体，状态变化由动画和事件控制。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅管理内部状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "on_caught_in_net",
+    "on_release_from_net"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "caught_in_net",
+    "released_from_net"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，播放循环动画'caught_idle_loop'。当实体被网捕获时（事件'on_caught_in_net'），转到'caught_in_net'状态。"
+    },
+    {
+      "state": "caught_in_net",
+      "note": "被捕获在网中状态，播放循环动画'catch_loop'。当实体被释放时（事件'on_release_from_net'），转到'released_from_net'状态。"
+    },
+    {
+      "state": "released_from_net",
+      "note": "从网中释放状态，先播放'caught_idle_pre'动画，然后循环播放'caught_idle_loop'动画。该状态无活动事件处理器，用于恢复到空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      50898,
+      51046,
+      13701,
+      15434,
+      15022,
+      51221,
+      45248
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中均未提及 stategraph__SGantchovies 实体或与其相关的网捕获、释放状态行为，如动画循环或事件处理。所有页面内容涉及其他实体（如海洋拖网捕鱼器、幻灵捕获机等），未体现该符号的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "antchovies",
+    "蚂蚁",
+    "捕获",
+    "释放",
+    "网",
+    "空闲动画",
+    "事件触发",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9688a61bd3adc49e86b1e445806a73445b8670f791ea66b837c7d1fd3d256ed4",
+    "source_bytes": 1112,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144018230
+  }
+}

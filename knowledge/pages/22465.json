@@ -5,7 +5,9 @@
   "inputs": {
     "wikitext_sha256": "e29cd05018f13584dd251ef159671cf4166376de62c30a9363caf32e9c0f9174",
     "symbol_doc_shas": {
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/forgerepairable.lua": "ba3397a6bead07c908a34a88fc1446cf3e055f2bdf179e94a2ff0b27b30cb041",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -13,10 +15,15 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGstorage_robot.lua": "4b386c728e831553ae93eb8bd77639308f1511d6835d4d8c065e2276ab1e856b"
     }
   },
   "symbols": {
+    "components/deployhelper.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/drownable.lua": {
       "aspects_ignored": [
         "水域与虚空溺水触发条件描述",
@@ -27,6 +34,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/forgerepairable.lua": {
+      "aspects_ignored": [
+        "使用材料恢复耐久"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/fueled.lua": {
       "mention_source": "llm_verdict",
@@ -110,6 +124,11 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGstorage_robot.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

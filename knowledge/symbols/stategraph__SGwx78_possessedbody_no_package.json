@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_possessedbody_no_package.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_possessedbody_no_package",
+  "summary": "该状态图驱动麦克斯（Maxwell）的暗影随从（Shadow Maxwells），即游戏中被称为“仆从”或“小黑人”的NPC实体。它管理这些随从的生成、待机、移动、攻击、采集、工作、受击、死亡等全部核心行为。整体采用经典的状态机模式，通过状态转换、事件响应和动画播放来组织其复杂的交互逻辑。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外方法，状态切换和逻辑完全由内部事件和系统驱动。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "spawn",
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "attack",
+    "death",
+    "take",
+    "give",
+    "hit",
+    "stunned",
+    "chop_start",
+    "chop",
+    "mine_start",
+    "mine",
+    "mine_recoil",
+    "attack_recoil",
+    "dig_start",
+    "dig",
+    "dance",
+    "dolongaction",
+    "doshortaction",
+    "jumpout"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "暗影随从生成时的初始状态。拥有“无敌”和“无法攻击”标签，播放生成动画，动画完成后进入idle状态。"
+    },
+    {
+      "state": "attack",
+      "note": "核心攻击状态。根据装备的不同（如拳头、鞭子、口袋表、书、斧头等）会播放不同动画并设置不同的攻击冷却时间（如鞭子17帧，书19帧）。对目标造成伤害。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态。播放死亡动画后，实体将被移除（Remove）从游戏世界中。"
+    },
+    {
+      "state": "take",
+      "note": "执行“拾取”或“检查陷阱”等交互的状态。停止移动，播放拾取动画，并在特定帧（第6帧）执行缓冲动作。"
+    },
+    {
+      "state": "give",
+      "note": "执行“给予”或“丢弃”物品的状态。停止移动，播放给予动画，并在第14帧执行缓冲动作。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。播放受击动画，停止移动，第3帧后移除“忙碌”标签，允许后续状态转换。"
+    },
+    {
+      "state": "mine_recoil",
+      "note": "采矿或攻击后的后退硬直状态。播放后退动画，实体被向后推（物理速度覆盖），第23帧后可中断，可用于连续动作。"
+    },
+    {
+      "state": "attack_recoil",
+      "note": "特定攻击后的后退硬直状态（逻辑同 mine_recoil），播放攻击后退动画，实体被向后推。"
+    },
+    {
+      "state": "dig",
+      "note": "执行挖掘动作的循环状态。播放挖掘循环动画，在第15帧执行挖掘动作并播放音效，第35帧后可尝试重复挖掘。"
+    },
+    {
+      "state": "dance",
+      "note": "跳舞状态。如果大脑（brain）提供了舞蹈数据，则播放指定序列；否则播放默认跳舞动画。用于娱乐或任务。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15225,
+      15022,
+      13897,
+      15651,
+      51046,
+      15551,
+      13556
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击间隔与伤害数值",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "命中:攻击时以 14 帧的攻击间隔发射远程的吹箭，吹箭可以追踪敌人造成 20 点物理伤害；不易吸引敌人的仇恨。"
+          },
+          {
+            "pageid": 13897,
+            "quote": "上下文:克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害，对玩家的伤害减半。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "麦克斯",
+    "暗影随从",
+    "小黑人",
+    "攻击",
+    "采集",
+    "工作",
+    "硬直",
+    "死亡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "采集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "96f005e61353136a559641c7cd6f9be7b96da85f29aefecbd9a5c16a48cea9ff",
+    "source_bytes": 36770,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146814402
+  }
+}

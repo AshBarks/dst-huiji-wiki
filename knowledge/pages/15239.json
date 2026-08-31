@@ -15,6 +15,7 @@
       "behaviours/runaway.lua": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/bunnymanbrain.lua": "2de494a99e243f24d9621121ea45f2778f500862e0af72909df92950e7b759b8",
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
@@ -30,11 +31,14 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGbunnyman.lua": "fb7c8ce6928a12f6f5c529c4040c7f81e55de7c2959191891b536ad9ecb50848"
     }
   },
   "symbols": {
@@ -181,6 +185,17 @@
       ],
       "route": "direct",
       "detail_level": "detailed"
+    },
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面片段仅显示掉落物信息，未提及酸雨相关状态变化。"
+      }
     },
     "components/bloomer.lua": {
       "route": "direct",
@@ -338,6 +353,14 @@
         "semantic_consistent": true
       }
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -359,6 +382,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/talker.lua": {
       "aspects_ignored": [
@@ -390,7 +417,24 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGbunnyman.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "死亡掉落物品描述",
+          "evidence": [
+            {
+              "pageid": 15239,
+              "quote": "当兔人被杀死时：怪物肉×1, 胡须×2"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

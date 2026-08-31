@@ -5,15 +5,79 @@
   "inputs": {
     "wikitext_sha256": "b83fc80159809e9a70927e151e2c0c46d4db527d9b833a2388656591f792d748",
     "symbol_doc_shas": {
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/oceanwhirlportalphysics.lua": "92300b697d5d0c16e69a99c07e974b30af0c9e37e46ed5825a1fdc2ee8a57f31",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/wateryprotection.lua": "9f09221e5ef081253e0e4d659bbd49ac61faf3512b849c80929ab8aec74d091d",
+      "components/worldmigrator.lua": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951"
     }
   },
   "symbols": {
+    "components/oceanwhirlportalphysics.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "传送触发距离描述",
+          "evidence": [
+            {
+              "pageid": 60911,
+              "quote": "进入巨型漩涡 4 距离单位范围内的玩家和会漂浮的物品会进入洞穴世界"
+            }
+          ]
+        },
+        {
+          "aspect": "吸入半径及实体检查描述",
+          "evidence": [
+            {
+              "pageid": 60911,
+              "quote": "巨型漩涡会吸入 14 距离单位范围内的可被吸力移动的实体。"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "4单位",
+          "region_id": "60911:intro:1",
+          "matched": "components/oceanwhirlportalphysics.lua: DEFAULT_RADIUS=4"
+        },
+        {
+          "raw": "4单位",
+          "region_id": "60911:intro:1",
+          "matched": "components/oceanwhirlportalphysics.lua: DEFAULT_PULLSTRENGTH=4"
+        },
+        {
+          "raw": "5点",
+          "region_id": "60911:intro:1",
+          "matched": "components/oceanwhirlportalphysics.lua: TICK_FAST_COOLDOWN=5"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/wateryprotection.lua": {
+      "aspects_ignored": [
+        "防水效果减免限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/worldmigrator.lua": {
+      "aspects_ignored": [
+        "非自然传送门物品数量上限行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

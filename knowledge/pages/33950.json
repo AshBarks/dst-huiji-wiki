@@ -20,6 +20,9 @@
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "components/yotc_racecompetitor.lua": "b33dd9c45d2abdf76a028f5ac8970ee610e959c2d547433a46e6fb11c56d06b6",
+      "components/yotc_racestart.lua": "da89de23be9ccb9bffafdf5e6d2671bbe630541b572085293fb23962d657b4c7",
+      "components/yotc_racestats.lua": "fc269164cb6d2870eaaf11bcc6cdfb6ea888c0083753d373d6b52b9c962492d0",
       "stategraphs/SGcarrat.lua": "3aee486429c4d79298d153052822a139204749526f39b419bc2d5ccab5c3262d"
     }
   },
@@ -167,6 +170,37 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/yotc_racecompetitor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/yotc_racestart.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "比赛结束条件描述",
+          "evidence": [
+            {
+              "pageid": 33950,
+              "quote": "当所有的胡萝卜鼠（不包含查理的胡萝卜鼠）到达终点线时，比赛结束。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "比赛启动行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/yotc_racestats.lua": {
+      "aspects_ignored": [
+        "方向舵控制方向",
+        "装备移动速度属性"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "stategraphs/SGcarrat.lua": {
       "aspects_ignored": [
         "伪装成种植状态描述",
@@ -176,5 +210,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtornado.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtornado",
+  "summary": "该状态图驱动龙卷风实体，整体基于运动和破坏行为组织，包括生成、空闲、行走、奔跑、停止和消失状态，核心机制是移动过程中持续破坏周围目标。",
+  "api": [],
+  "api_note": "该状态图无直接对外API，所有行为由状态、事件和内部函数（如destroystuff）驱动，玩家无法通过脚本直接调用状态切换。",
+  "events_published": [],
+  "events_listened": [
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TORNADO_DAMAGE",
+    "PVP_DAMAGE_MOD"
+  ],
+  "states": [
+    "empty",
+    "idle",
+    "spawn",
+    "despawn",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，龙卷风停止移动并执行破坏效果，对范围内生物造成伤害并攻击可工作物体。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成状态，龙卷风开始向前奔跑，触发移动和初始破坏行为。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，龙卷风缓慢移动，周期性破坏周围目标，伤害值基于龙卷风配置。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，龙卷风快速移动，破坏频率更高，适合追击或快速清理。"
+    },
+    {
+      "state": "despawn",
+      "note": "消失状态，龙卷风播放结束动画后移除，通常由持续时间或事件触发。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13409,
+      15539,
+      15922,
+      34314,
+      10374,
+      13156,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及龙卷风（stategraph__SGtornado）或其相关状态（如idle、spawn、walk、run、despawn）的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "龙卷风",
+    "伤害",
+    "破坏",
+    "移动",
+    "生成",
+    "消失",
+    "行走",
+    "奔跑",
+    "战斗",
+    "环境"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "42a1c49c83c19340633f783b9a760b3e585e6c162a761c7187acf37ad1f8f670",
+    "source_bytes": 7707,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141908130
+  }
+}

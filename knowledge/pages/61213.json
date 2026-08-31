@@ -6,7 +6,8 @@
     "wikitext_sha256": "d79aa72a4fe868ba0b96b29d5ca0667def9cffff3d87d70e6f55270622c74a51",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/teleporter.lua": "fec8be3bcd9b9216e9a2df12abee06d92bee8dad29bbdd91a51bf501a97101ef"
     }
   },
   "symbols": {
@@ -31,6 +32,16 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/teleporter.lua": {
+      "aspects_ignored": [
+        "传送漂浮平台",
+        "传送目标能力",
+        "多人传送目标设置",
+        "玩家传送命令"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

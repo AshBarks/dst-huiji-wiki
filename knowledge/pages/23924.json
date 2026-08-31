@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "3331d658f8029418dc61eebc3a049cbcb83c6c1f84de9fc1cc306f1d65f2678f",
     "symbol_doc_shas": {
+      "components/boatdrag.lua": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
@@ -14,10 +15,16 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGcrabkingclaw.lua": "4eca9bc7fbd576d0d84665570e5e9e78cc2ff31e9ce52111d6b529b9d51fb521"
     }
   },
   "symbols": {
+    "components/boatdrag.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -54,7 +61,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "mention_source": "pass2_evidence",
@@ -160,6 +168,10 @@
         "semantic_consistent": true
       }
     },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "aspects_ignored": [
         "生成倒计时启动描述",
@@ -173,6 +185,10 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGcrabkingclaw.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

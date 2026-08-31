@@ -11,12 +11,14 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/homeseeker.lua": "73e9cdafed333fdd0d28f07002449ad012379677e2943d6ccd18afcc300a747f",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGperd.lua": "26d5fd373edf6dd410cdb63e32eaff202db6538f7350582ece5edf66f4a68998"
     }
   },
   "symbols": {
@@ -97,6 +99,14 @@
         "note": "火鸡页面，未提及"
       }
     },
+    "components/homeseeker.lua": {
+      "aspects_ignored": [
+        "昼夜回屋行为",
+        "超出范围返回猪屋"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -175,6 +185,10 @@
         "wording": "此效果有为期1天的冷却时间",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGperd.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

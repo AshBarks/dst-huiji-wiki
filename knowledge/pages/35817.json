@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "2c07978d468413ce3c2ea63410e3843aa94fba84ad0e7a9cd17a59860737fee9",
     "symbol_doc_shas": {
+      "components/aura.lua": "22a56638ab92c17639466c95afd4767004e87a1904c23199e587361c0e20333d",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -12,10 +13,19 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGghost.lua": "d5f3683466a4de962152e5c74e43354d0af747c61490a3b6e32ad30f1850820d"
     }
   },
   "symbols": {
+    "components/aura.lua": {
+      "aspects_ignored": [
+        "电路板激活启用增益",
+        "骨灰罐激活启用光环"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -103,6 +113,15 @@
         "夜间交易功能禁用描述",
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGghost.lua": {
+      "aspects_ignored": [
+        "aura伤害与愤怒状态切换",
+        "击退机制中的幽灵实体"
       ],
       "route": "direct",
       "detail_level": "stub"

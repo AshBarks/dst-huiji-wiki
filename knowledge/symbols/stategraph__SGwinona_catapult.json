@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwinona_catapult.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwinona_catapult",
+  "summary": "这个状态图驱动温妮娜的投石机（Winona Catapult）实体。整体状态组织方式以空闲状态为核心，通过事件触发转换到攻击、受伤、死亡等状态。状态图处理投石机的放置、部署、电源开关和攻击逻辑，包括队列管理和元素电池消耗。",
+  "api": [],
+  "api_note": "源码中未定义对外API方法，状态图仅处理内部状态转换和事件响应。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "dovolley",
+    "doelementalvolley",
+    "attacked",
+    "togglepower",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "WINONA_CATAPULT_VOLLEY_QUEUE_SIZE",
+    "WINONA_CATAPULT_ATTACK_POWER_COST",
+    "WINONA_CATAPULT_MEGA_SHADOW_POWER_COST",
+    "WINONA_CATAPULT_MEGA_LUNAR_POWER_COST",
+    "WINONA_CATAPULT_MIN_RANGE",
+    "WINONA_CATAPULT_MAX_RANGE",
+    "WINONA_CATAPULT_AOE_RADIUS",
+    "SKILLS.WINONA.CATAPULT_AOE_RADIUS_MULT"
+  ],
+  "states": [
+    "place",
+    "deploy",
+    "idle",
+    "powerup",
+    "powerdown",
+    "hit",
+    "attack",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "place",
+      "note": "玩家放置投石机时进入，播放放置动画并禁止点击，完成后可进行连接和攻击。"
+    },
+    {
+      "state": "deploy",
+      "note": "部署投石机时触发，播放部署动画，期间不可攻击，完成后进入空闲。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，投石机等待攻击指令，可旋转，并尝试执行队列中的攻击。"
+    },
+    {
+      "state": "powerup",
+      "note": "投石机电源开启时的过渡状态，播放启动动画，完成后进入空闲。"
+    },
+    {
+      "state": "powerdown",
+      "note": "投石机电源关闭时的过渡状态，播放关闭动画，清空攻击队列。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时进入受伤状态，有短暂硬直时间（caninterrupt），然后恢复空闲。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，播放攻击动画，发射投射物，消耗电池能量，攻击间隔后可继续攻击。"
+    },
+    {
+      "state": "death",
+      "note": "投石机生命值归零时进入死亡状态，播放销毁动画，不可再交互。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      18843,
+      13897,
+      51046,
+      15651,
+      70704,
+      13828,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "受击伤害数值",
+        "evidence": [
+          {
+            "pageid": 18843,
+            "quote": "薇诺娜的投石机每受到一次锤击就会受到 100 点伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "投石机",
+    "温妮娜",
+    "攻击",
+    "齐射",
+    "电池",
+    "范围",
+    "影月",
+    "元素",
+    "自动防御"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c6aad27b4a4dc37a667c11bdcbfad7db820d7884fef3a87268913588dd022fba",
+    "source_bytes": 20327,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142757863
+  }
+}

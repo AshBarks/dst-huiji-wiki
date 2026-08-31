@@ -5,21 +5,28 @@
   "inputs": {
     "wikitext_sha256": "3b352f720da2dda345ad26f637a76b9692f3fc595b15441aa5da2d2ca67dd98a",
     "symbol_doc_shas": {
+      "components/boatrace_proximitychecker.lua": "401c324ddb86de830d03939779aac7489b0956a31e1fe4eb9c42fa9dd1576db0",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/boatrace_proximitychecker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/entitytracker.lua": {
       "aspects_ignored": [
         "追踪实体行为描述",
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -54,6 +61,17 @@
       "llm_verdict": {
         "note": "可能为carnival_plaza_kit"
       }
+    },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

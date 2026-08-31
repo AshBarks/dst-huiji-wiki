@@ -8,11 +8,13 @@
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/gestaltcage.lua": "e30207e1ae49b78b4baaaf7658202b7150d7d4b85c1f67058aa00c725cfb7cc8",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/useabletargeteditem.lua": "7b6e432662c59d4845fc7ca43fa4f4c220f9ef197ee1efc3fef90fa2ff5baa03",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -22,7 +24,8 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -36,6 +39,14 @@
       "llm_verdict": {}
     },
     "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/gestaltcage.lua": {
+      "aspects_ignored": [
+        "化石笼子捕获行为描述",
+        "弹药命中目标伤害描述"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -82,6 +93,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/useabletargeteditem.lua": {
+      "aspects_ignored": [
+        "物品使用与目标设置"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

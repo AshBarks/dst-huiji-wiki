@@ -1,0 +1,186 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowwaxwell.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowwaxwell",
+  "summary": "该状态图驱动的是麦克斯威尔通过暗影操控技能生成的“暗影仆从”（shadowmaxwell/shadow worker）。整体状态组织方式为标准DST状态图，定义了从生成、空闲、移动、战斗、工作（伐木、挖矿、挖掘）到死亡消失的一系列状态，状态转换由事件（如被攻击、下达攻击指令）和条件（如目标存在、技能冷却）驱动。",
+  "api": [],
+  "api_note": "该状态图未定义额外的对外Lua方法；其行为完全通过状态、事件和组件驱动。",
+  "events_published": [
+    "startlongaction"
+  ],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SHADOWWAXWELL_PROTECTOR_ACTIVE_LEADER_RANGE",
+    "TUNING.SHADOWWAXWELL_PROTECTOR_ATTACK_PERIOD_INACTIVE_LEADER",
+    "TUNING.SHADOWWAXWELL_PROTECTOR_ATTACK_PERIOD",
+    "TUNING.SHADOWWAXWELL_SHADOWSTRIKE_COOLDOWN_INACTIVE_LEADER",
+    "TUNING.SHADOWWAXWELL_SHADOWSTRIKE_COOLDOWN",
+    "TUNING.SHADOWWAXWELL_PROTECTOR_SHADOW_LEADER_RADIUS",
+    "TUNING.SHADOWWAXWELL_PROTECTOR_DAMAGE",
+    "TUNING.SHADOWWAXWELL_PROTECTOR_DAMAGE_BONUS_PER_LEVEL",
+    "TUNING.SHADOWWAXWELL_SHADOWSTRIKE_DAMAGE_MULT"
+  ],
+  "states": [
+    "spawn",
+    "quickspawn",
+    "quickdespawn",
+    "idle",
+    "ready_pre",
+    "ready",
+    "ready_pst",
+    "run_start",
+    "run",
+    "run_stop",
+    "attack",
+    "death",
+    "take",
+    "give",
+    "hit",
+    "stunned",
+    "chop_start",
+    "chop",
+    "mine_start",
+    "mine",
+    "mine_recoil",
+    "attack_recoil",
+    "dig_start",
+    "dig",
+    "dance",
+    "dolongaction",
+    "doshortaction",
+    "jumpout",
+    "disappear",
+    "appear",
+    "lunge_pre",
+    "lunge_loop",
+    "lunge_pst",
+    "item_out_chop",
+    "item_out_mine",
+    "item_out_dig",
+    "item_out"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "影子生成的初始状态，播放生成动画并产生水花效果，期间处于无敌（temp_invincible）和不可攻击状态。"
+    },
+    {
+      "state": "attack",
+      "note": "普通近战攻击状态。在动画第8帧移除“即将攻击”标签并造成伤害，攻击后根据是否为目标者（protector）决定是否进入待机准备姿势。攻击动画结束后有短暂硬直（第12帧移除busy标签）。"
+    },
+    {
+      "state": "disappear",
+      "note": "受击或主动消失状态。被攻击时（非死亡或无敌）会触发此状态，产生消失特效，传送到攻击者附近随机可行走位置，期间无敌且可相位穿透。"
+    },
+    {
+      "state": "appear",
+      "note": "从消失状态重新出现的动画，结束后无敌和相位状态解除，恢复正常碰撞。"
+    },
+    {
+      "state": "lunge_loop",
+      "note": "“影袭”技能的核心突进状态。影子高速突向目标，期间无敌，接触目标时造成一次强化伤害（伤害倍率由TUNING.SHADOWWAXWELL_SHADOWSTRIKE_DAMAGE_MULT定义）并触发特效。攻击或动画完成后进入收招。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并产生消失特效后移除实体。"
+    },
+    {
+      "state": "chop",
+      "note": "持续伐木状态，可自动重复对同一目标进行砍伐。动画第2帧执行砍伐动作，第14帧尝试重复操作。"
+    },
+    {
+      "state": "mine",
+      "note": "持续挖矿状态。动画第7帧产生挖矿特效并执行动作，如果目标具有后坐力（recoil），会进入mine_recoil状态被弹开。"
+    },
+    {
+      "state": "mine_recoil",
+      "note": "挖矿击中带反冲目标后的硬直状态，影子被向后弹飞，有物理速度模拟，期间不可行动。"
+    },
+    {
+      "state": "hit",
+      "note": "普通受击硬直状态，播放受击动画，第3帧解除“忙碌”标签，可快速恢复行动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15225,
+      13406,
+      15415,
+      24866,
+      14484,
+      14646,
+      16657,
+      52788
+    ],
+    "aspects": [
+      {
+        "aspect": "受击瞬移机制",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影角斗士有单次承伤上限与受击瞬移"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击范围描述",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "后方 ± 15° 扇形的 4 ~ 5 {{解释|距离单位}}的"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡状态提及",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "这部分上限会在暗影傀儡死亡时返还"
+          }
+        ]
+      },
+      {
+        "aspect": "突刺攻击提及",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "暗影傀儡因死亡、受击瞬移、突刺攻击等原因脱离战斗"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "暗影仆从",
+    "麦克斯威尔",
+    "影子战士",
+    "瞬移",
+    "影袭",
+    "伐木",
+    "挖矿",
+    "挖掘",
+    "死亡消失",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "采集"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2d865866dc390d8fc8542a05fe91ec30d3486546e8e18bf41108b7ba27260b13",
+    "source_bytes": 41598,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146382182
+  }
+}

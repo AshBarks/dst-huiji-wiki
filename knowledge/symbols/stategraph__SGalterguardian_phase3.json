@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGalterguardian_phase3.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGalterguardian_phase3",
+  "summary": "该状态图驱动远古守护者第三阶段（alterguardian_phase3）的行为，包括生成、闲置、多种攻击模式和死亡。状态组织基于动画事件和自定义逻辑，如攻击冷却、距离判断和陷阱生成，通过事件处理器响应伤害和攻击指令。",
+  "api": [],
+  "api_note": "状态图主要控制实体的动画和状态转换，没有直接暴露对外API，行为通过事件和组件交互实现。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "locomote",
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ALTERGUARDIAN_PHASE3_STAB_RANGE",
+    "TUNING.ALTERGUARDIAN_PHASE3_SUMMONRSQ",
+    "TUNING.ALTERGUARDIAN_PHASE3_MAX_STUN_LOCKS",
+    "TUNING.ALTERGUARDIAN_PHASE3_GOHOMEDSQ",
+    "TUNING.ALTERGUARDIAN_PHASE3_TRAP_MINRANGE",
+    "TUNING.ALTERGUARDIAN_PHASE3_TRAP_MAXRANGE",
+    "TUNING.ALTERGUARDIAN_PHASE3_TRAP_CD",
+    "TUNING.ALTERGUARDIAN_PHASE3_SUMMONCOOLDOWN",
+    "TUNING.ALTERGUARDIAN_PHASE3_SUMMONMAXLOOPS",
+    "TUNING.ALTERGUARDIAN_PHASE3_RUNAWAY_BLOCK_TIME",
+    "TUNING.ALTERGUARDIAN_SPAWN_LARGE_GESTALT_PROJECTILE_CHANCE"
+  ],
+  "states": [
+    "spawn",
+    "idle",
+    "atk_stab",
+    "atk_summon_pre",
+    "atk_summon_loop",
+    "atk_summon_pst",
+    "atk_traps",
+    "atk_beam",
+    "atk_sweep",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "生成状态，Boss无敌并播放生成动画，逐步增强光照效果，动画结束后进入闲置状态。"
+    },
+    {
+      "state": "idle",
+      "note": "闲置状态，Boss停止移动，播放空闲动画，等待攻击或移动指令。"
+    },
+    {
+      "state": "atk_stab",
+      "note": "近战戳刺攻击，对目标造成伤害，有攻击动画和音效，完成后返回闲置。"
+    },
+    {
+      "state": "atk_summon_loop",
+      "note": "召唤循环状态，Boss生成幻影攻击附近玩家，有范围检测和最大循环次数（TUNING.ALTERGUARDIAN_PHASE3_SUMMONMAXLOOPS），循环结束或无玩家时退出。"
+    },
+    {
+      "state": "atk_traps",
+      "note": "陷阱攻击，从天空生成两批陷阱，有最小/最大范围（ALTERGUARDIAN_PHASE3_TRAP_MINRANGE/MAXRANGE）和冷却时间（TRAP_CD），根据现有陷阱数量决定是否触发。"
+    },
+    {
+      "state": "atk_beam",
+      "note": "远程光束攻击，发射三重激光，跟踪玩家位置，每束激光造成范围伤害并有二次爆炸效果。"
+    },
+    {
+      "state": "atk_sweep",
+      "note": "横扫激光攻击，在扇形区域生成多道激光，覆盖大面积，有伤害和镜头震动效果。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，Boss移除物理碰撞，播放死亡动画，触发世界事件' moonboss_defeated'并掉落战利品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15248,
+      24542,
+      14674,
+      15022,
+      14676,
+      19905,
+      14099,
+      15235
+    ],
+    "aspects": [
+      {
+        "aspect": "生成事件描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "天体英雄将会伴随几颗[[流星]]坠落，击毁月亮虹吸器并摧毁附近所有的建筑。"
+          }
+        ]
+      },
+      {
+        "aspect": "陷阱攻击描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "伤害=150（皇冠攻击/激光/默认）<br>50（陷阱从天而降）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "远古守护者",
+    "第三阶段",
+    "Boss战",
+    "召唤幻影",
+    "陷阱",
+    "光束攻击",
+    "横扫激光",
+    "死亡掉落",
+    "无敌生成"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4434f251d1811b7b4574fe27d12cea8dfedfeaabaa53914949a413d42314e853",
+    "source_bytes": 41189,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135386877
+  }
+}

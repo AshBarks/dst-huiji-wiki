@@ -21,15 +21,19 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/homeseeker.lua": "73e9cdafed333fdd0d28f07002449ad012379677e2943d6ccd18afcc300a747f",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "components/yotc_racecompetitor.lua": "b33dd9c45d2abdf76a028f5ac8970ee610e959c2d547433a46e6fb11c56d06b6",
+      "components/yotc_racestats.lua": "fc269164cb6d2870eaaf11bcc6cdfb6ea888c0083753d373d6b52b9c962492d0",
       "stategraphs/SGcarrat.lua": "3aee486429c4d79298d153052822a139204749526f39b419bc2d5ccab5c3262d"
     }
   },
@@ -198,7 +202,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -236,6 +241,14 @@
         "wording": "召唤 3 天后未死亡则会变回",
         "semantic_consistent": false
       }
+    },
+    "components/homeseeker.lua": {
+      "aspects_ignored": [
+        "昼夜回屋行为",
+        "超出范围返回猪屋"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -287,6 +300,14 @@
         "semantic_consistent": true
       }
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/pickable.lua": {
       "aspects_ignored": [
         "卡住状态描述",
@@ -337,6 +358,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/yotc_racecompetitor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/yotc_racestats.lua": {
+      "aspects_ignored": [
+        "方向舵控制方向",
+        "装备移动速度属性"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "stategraphs/SGcarrat.lua": {
       "mention_source": "pass2_evidence",

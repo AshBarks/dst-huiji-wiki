@@ -7,7 +7,8 @@
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwagdrone_flying.lua": "23637ff1c19f0c15663ae9e49876eabf9f06c89f74dd38d6e17fed71f432c96f"
     }
   },
   "symbols": {
@@ -41,6 +42,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwagdrone_flying.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

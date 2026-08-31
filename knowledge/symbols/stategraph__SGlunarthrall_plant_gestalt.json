@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlunarthrall_plant_gestalt.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlunarthrall_plant_gestalt",
+  "summary": "该状态图驱动名为“月光狂花植物幽影”(lunarthrall_plant_gestalt)的实体。其状态组织围绕生成、寄生植物/尸体、移动和坠落等核心行为，大部分状态包含无敌帧或不可攻击标签。",
+  "api": [],
+  "api_note": "此状态图为内部AI驱动，没有定义任何对外的API方法。",
+  "events_published": [],
+  "events_listened": [
+    "gestaltcapturable_targeted"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawn",
+    "infest",
+    "infest_corpse",
+    "spawn_hail",
+    "walk",
+    "walk_start",
+    "walk_stop",
+    "possess_chassis"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "幽影生成的初始动画状态，期间拥有无敌帧(noattack标签)并禁用被捕获(gestaltcapturable)能力。"
+    },
+    {
+      "state": "infest",
+      "note": "核心状态，幽影播放寄生动画。在特定帧(如第25帧)禁用自身，触发寄生目标植物或启动尸体的月蚀变异，并最终被移除。"
+    },
+    {
+      "state": "infest_corpse",
+      "note": "专门用于寄生尸体的状态。根据尸体体型播放不同动画，在动画特定帧(第19帧)触发尸体的月蚀变异，随后被移除。"
+    },
+    {
+      "state": "spawn_hail",
+      "note": "作为“月蚀流星”的生成与坠落状态，初始随机旋转，随后速度在几个关键帧(第3、9、18帧)分段加速，动画结束后立即被移除。"
+    },
+    {
+      "state": "possess_chassis",
+      "note": "附着底盘的状态，由CommonStates生成。播放特定的附着动画（infest_corpse_small）并播放音效。"
+    },
+    {
+      "state": "walk",
+      "note": "移动状态，会生成拖尾特效(gestalt_trail)。进入时会播放音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      72238,
+      71461,
+      20162,
+      20714,
+      34314,
+      65605,
+      34523,
+      52788
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与 stategraph__SGlunarthrall_plant_gestalt 相关的幽影生成、寄生、月蚀变异、流星坠落、附着底盘或移动拖尾等能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月光狂花",
+    "幽影",
+    "寄生",
+    "附身",
+    "生成",
+    "移动",
+    "尸体",
+    "底盘",
+    "无敌",
+    "月蚀"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "变形"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "959fdcc00fdd9580e75bcc0944f116b2e352551ea8f87f5bc2989ad6d35bfec1",
+    "source_bytes": 7684,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134638464
+  }
+}

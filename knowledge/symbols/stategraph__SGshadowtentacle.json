@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowtentacle.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowtentacle",
+  "summary": "该状态图驱动影触手（Shadow Tentacle）实体，主要用于战斗场景。整体状态组织以战斗循环为核心，从隐身闲置状态触发嘲讽，进入攻击准备、攻击执行和攻击后状态，最终可死亡移除。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "newcombattarget",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "taunt",
+    "attack_pre",
+    "attack",
+    "attack_post",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "影触手处于隐身状态，等待新战斗目标触发嘲讽。"
+    },
+    {
+      "state": "taunt",
+      "note": "影触手现身并嘲讽，吸引敌人目标，约0.75秒后尝试攻击。"
+    },
+    {
+      "state": "attack_pre",
+      "note": "影触手开始攻击准备动画，随后进入攻击状态。"
+    },
+    {
+      "state": "attack",
+      "note": "影触手执行攻击，在动画第7帧和第17帧造成伤害，并转移仇恨至拥有者。"
+    },
+    {
+      "state": "attack_post",
+      "note": "影触手攻击后播放结束动画，动画结束后被移除。"
+    },
+    {
+      "state": "death",
+      "note": "影触手死亡，播放死亡动画并移除物理碰撞体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13409,
+      15651,
+      51046,
+      13556,
+      15539,
+      20150
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及影触手（SGshadowtentacle）或其相关行为，包括隐身、嘲讽、攻击准备、攻击、攻击后处理或死亡等能力描述，因此无法提取玩家语言表达的证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影触手",
+    "攻击",
+    "嘲讽",
+    "隐身",
+    "死亡",
+    "伤害",
+    "仇恨",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7bfc7b41d5d6736b243b4b39adf26c4c924f4eb45437229423ce404dc930d8b1",
+    "source_bytes": 3072,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140648264
+  }
+}

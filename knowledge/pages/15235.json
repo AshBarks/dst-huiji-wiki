@@ -25,7 +25,8 @@
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "stategraphs/SGrabbit.lua": "50910959d768441a04d7c16e08b443c6ec5877d64778ecd67c28b374f92c05a5"
     }
   },
   "symbols": {
@@ -54,7 +55,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/rabbitbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -288,6 +290,31 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGrabbit.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "进食行为描述",
+          "evidence": [
+            {
+              "pageid": 15235,
+              "quote": "兔子会靠近 20 {{解释|距离单位}}内的可以作为[[诱饵物品]]的[[素食食物]]并在足够近后进食。"
+            }
+          ]
+        },
+        {
+          "aspect": "逃跑行为描述",
+          "evidence": [
+            {
+              "pageid": 15235,
+              "quote": "兔子会逃离{{分类|猎物惊吓者}}"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

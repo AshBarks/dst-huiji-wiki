@@ -10,6 +10,8 @@
       "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/wormbrain.lua": "05c418c1b5b24e79edd3108718ba1f00e42a03424e5721521c6b62c8f5b73503",
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
@@ -23,7 +25,8 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "stategraphs/SGworm.lua": "67e092055a9852d5e90b3d69592dad1efbf98b73eff04516ca6a6beb4b7fa830"
     }
   },
   "symbols": {
@@ -77,6 +80,28 @@
     "brains/wormbrain.lua": {
       "route": "direct",
       "detail_level": "stub"
+    },
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容围绕掉落和特殊事件，无酸雨信息。"
+      }
+    },
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "components/burnable.lua": {
       "aspects_ignored": [
@@ -243,6 +268,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGworm.lua": {
+      "aspects_ignored": [
+        "攻击行为描述",
+        "死亡掉落物列表"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

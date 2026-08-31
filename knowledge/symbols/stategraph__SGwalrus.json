@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwalrus.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwalrus",
+  "summary": "该状态图驱动海象（walrus）实体，适用于饥荒联机版中的敌对生物。整体状态组织基于通用状态框架，定义了海象的战斗、移动、受伤、死亡等行为，事件驱动状态转换，支持近战和远程攻击模式。",
+  "api": [],
+  "api_note": "状态图通常不直接暴露公共API，而是通过事件系统和游戏组件进行交互，因此无对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "newcombattarget",
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WALRUS_MELEE_RANGE",
+    "TUNING.WALRUS_MAX_STUN_LOCKS"
+  ],
+  "states": [
+    "death",
+    "taunt_newtarget",
+    "taunt_attack",
+    "funny_idle",
+    "attack",
+    "blowdart",
+    "eat",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "进入条件：海象生命值归零时触发。表现：播放死亡动画，掉落战利品并移除碰撞体。数值配置：无特殊无敌帧或硬直。"
+    },
+    {
+      "state": "taunt_newtarget",
+      "note": "进入条件：获得新战斗目标且未处于攻击或忙碌状态。表现：播放挑衅动画和音效，用于仇恨吸引。数值配置：无直接伤害，可中断敌人行动。"
+    },
+    {
+      "state": "taunt_attack",
+      "note": "进入条件：doattack事件触发且海象标记为嘲讽攻击类型。表现：重置攻击计时器并播放挑衅动画，为后续攻击做准备。数值配置：无伤害输出窗口。"
+    },
+    {
+      "state": "funny_idle",
+      "note": "进入条件：闲idle状态随机进入。表现：根据海象类型和战斗状态播放不同动画（如快乐、生气、害怕）。数值配置：无伤害或硬直，纯视觉反馈。"
+    },
+    {
+      "state": "attack",
+      "note": "进入条件：doattack事件且目标在近战范围内。表现：播放攻击动画，在20帧后执行伤害判定。数值配置：近战伤害，范围由TUNING.WALRUS_MELEE_RANGE定义，有短暂攻击窗口。"
+    },
+    {
+      "state": "blowdart",
+      "note": "进入条件：doattack事件且目标不在近战范围内。表现：播放吹箭动画，17帧播放音效，20帧执行攻击。数值配置：远程伤害，有弹道延迟和射程。"
+    },
+    {
+      "state": "eat",
+      "note": "进入条件：执行EAT动作时触发。表现：播放吃动画，在10帧执行动作并移除忙碌标签。数值配置：无伤害，可恢复生命或饥饿值。"
+    },
+    {
+      "state": "hit",
+      "note": "进入条件：被攻击事件且海象未死亡。表现：播放受伤动画，更新击退延迟以防连续硬直。数值配置：有短暂无敌帧，受TUNING.WALRUS_MAX_STUN_LOCKS影响。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13897,
+      16419,
+      34557,
+      15402,
+      15651,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "吹箭远程攻击",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "使用吹箭向玩家发动长距离打击"
+          }
+        ]
+      },
+      {
+        "aspect": "战吼吸引仇恨",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "海象会首先战吼，示意寒冰猎犬攻击玩家"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落战利品",
+        "evidence": [
+          {
+            "pageid": 15402,
+            "quote": "掉落 = {{Pic|32|肉}}×1，{{Pic|32|id=blowdart_pipe}}×1<br>{{Pic|32|海象牙}}×1（50%）<br>{{Pic|32|贝雷帽}}×1（25%）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "海象",
+    "攻击",
+    "吹箭",
+    "嘲讽",
+    "死亡",
+    "受伤",
+    "闲idle",
+    "仇恨",
+    "移动",
+    "生物"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa363ba6f72cb47df159ded211f757eea1df8a913b0151df78d0a15eb5fdf564",
+    "source_bytes": 7542,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135043730
+  }
+}

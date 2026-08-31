@@ -16,19 +16,28 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/despawnfader.lua": "059c25af1932a03a505bc52077fa4ed467c4adf52b405fa1bac67cb811fbd49a",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "components/epicscare.lua": "7f7320d22c417ee3ed36b4ca96831c6c1bd6879381e6c7a54c7b8bedae1fc406",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/grouptargeter.lua": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthtrigger.lua": "3c64da771e8432f013164d37af0a50d1b38b9530ff95927c51b04a9878d38119",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/stuckdetection.lua": "4bbc06274fa46b7280daf844797f1a3ac84d9b7ca8525974be0e5a8d33146172",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGdaywalker2.lua": "b7df7a62b43dc3413f156e2eecf71f0af95eda1ff307b9326bf958e865a3a0e0",
+      "stategraphs/SGdaywalker2_buried.lua": "9b14fc8fd3c7229c7b68dbfe6773c3560441d1ae049c900eb4575d92dc0328a0"
     }
   },
   "symbols": {
@@ -37,12 +46,16 @@
       "detail_level": "stub"
     },
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述蒂克翁（ticoon），该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/leash.lua": {
       "aspects_ignored": [
@@ -54,7 +67,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据文本涉及战斗数值、掉落物、蓝图权重，未提及与拴绳行为相关的实体活动区域限制或返回机制。实体可能与受影响变体列表中的机器人类型（如 wagboss_robot, wagdrone_rolling）有关联，但证据不直接指向该行为代码。"
+      }
     },
     "behaviours/leashandavoid.lua": {
       "aspects_ignored": [
@@ -82,7 +98,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/daywalker2brain.lua": {
       "mention_source": "pass2_evidence",
@@ -181,6 +198,13 @@
         "semantic_consistent": true
       }
     },
+    "components/despawnfader.lua": {
+      "aspects_ignored": [
+        "消失动画描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/drownable.lua": {
       "aspects_ignored": [
         "水域与虚空溺水触发条件描述",
@@ -211,6 +235,21 @@
       "route": "direct",
       "detail_level": "summary"
     },
+    "components/epicscare.lua": {
+      "aspects_ignored": [
+        "咆哮产生巨兽恐慌效果的范围与持续时间描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -223,6 +262,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/grouptargeter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/health.lua": {
       "aspects_ignored": [
         "单次承伤上限标注",
@@ -234,6 +277,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthtrigger.lua": {
+      "aspects_ignored": [
+        "生命值变化转移触发"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -296,6 +346,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/stuckdetection.lua": {
+      "aspects_ignored": [
+        "卡住回避行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -305,6 +362,10 @@
       "llm_verdict": {
         "note": "wagstaff系列实体，无说话描述"
       }
+    },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [
@@ -319,6 +380,110 @@
       "llm_verdict": {}
     },
     "components/updatelooper.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGdaywalker2.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "冲撞攻击伤害描述",
+          "evidence": [
+            {
+              "pageid": 22383,
+              "quote": "冲撞 50"
+            }
+          ]
+        },
+        {
+          "aspect": "击败后掉落奖励描述",
+          "evidence": [
+            {
+              "pageid": 22383,
+              "quote": "如果拾荒疯猪在装备钻头时被击败或被传送，会掉落 6% ~ 20% 随机耐久的[[拾荒尖帽]]。"
+            }
+          ]
+        },
+        {
+          "aspect": "垃圾球投掷伤害描述",
+          "evidence": [
+            {
+              "pageid": 22383,
+              "quote": "抛出垃圾球 30"
+            }
+          ]
+        },
+        {
+          "aspect": "激光炮攻击伤害描述",
+          "evidence": [
+            {
+              "pageid": 22383,
+              "quote": "激光炮 80 ~ 240"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "5 秒",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_TIMEOUT=5"
+        },
+        {
+          "raw": "5 秒",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_THRESHOLD=5"
+        },
+        {
+          "raw": "5 次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_TIMEOUT=5"
+        },
+        {
+          "raw": "5 次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_THRESHOLD=5"
+        },
+        {
+          "raw": "3 次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: dist=3"
+        },
+        {
+          "raw": "3 次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: scorchscale=3"
+        },
+        {
+          "raw": "5秒",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_TIMEOUT=5"
+        },
+        {
+          "raw": "5秒",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_THRESHOLD=5"
+        },
+        {
+          "raw": "5次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_TIMEOUT=5"
+        },
+        {
+          "raw": "5次",
+          "region_id": "22383:section:3",
+          "matched": "stategraphs/SGdaywalker2.lua: TRAMPLE_THRESHOLD=5"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "stategraphs/SGdaywalker2_buried.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

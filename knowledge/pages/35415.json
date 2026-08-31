@@ -5,13 +5,24 @@
   "inputs": {
     "wikitext_sha256": "75dde65cb9913c42eb407e00fb0ffe52530cb0abc6385d62b9b567e47849fd99",
     "symbol_doc_shas": {
+      "components/attunable.lua": "d1c253a6f763aa0c4fc597444a8ef4a6774ce196227528105eb672b76c5cca40",
+      "components/fader.lua": "f89e28d9dea0c2d6064445a15d9f2f6f180dbd2418838c5fbda34911a14ef778",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/attunable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -19,7 +30,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -33,6 +45,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/placer.lua": {
       "route": "direct",

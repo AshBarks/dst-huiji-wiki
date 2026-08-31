@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadow_rook.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadow_rook",
+  "summary": "该状态图驱动饥荒联机版中的暗影车（shadow_rook）实体，一种暗影棋子敌人。状态图基于共享模块SGshadow_chesspieces，定义了核心攻击和传送攻击状态，并添加了空闲、升级、嘲讽、受击、死亡等通用状态。整体状态通过传送和范围攻击机制组织，强调战斗中的无敌帧和硬直窗口。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，所有逻辑内置于状态内部。",
+  "events_published": [],
+  "events_listened": [
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "attack",
+    "attack_teleport",
+    "idle_loop",
+    "transform",
+    "taunt",
+    "hit",
+    "disappear",
+    "death",
+    "appear"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "玩家或目标触发攻击时进入，暗影车开始攻击动画，在动画中途获得无敌状态以准备传送攻击。"
+    },
+    {
+      "state": "attack_teleport",
+      "note": "传送至目标位置后，立即进行范围攻击，攻击时短暂无敌，之后移除硬直状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      15022,
+      15922,
+      13409,
+      51046,
+      13897,
+      57263,
+      18001
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅提供 shadow_rook 的攻击间隔和攻击范围数值，未描述其攻击动画、无敌状态或传送攻击等行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影车",
+    "攻击",
+    "传送",
+    "无敌帧",
+    "范围攻击",
+    "shadow_rook",
+    "棋子",
+    "战斗",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5f350d3a26b8a2ad2c6c8ca48b08b33dd973f195a92d9cfbb7fab98af5e7e8a2",
+    "source_bytes": 3817,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146286334
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmolebat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmolebat",
+  "summary": "该状态图驱动饥荒联机版中的鼹鼠蝙蝠（molebat）实体，通过状态机管理其行为，包括闲置、移动、战斗、进食、打盹和特殊事件响应。状态组织方式利用常见状态模块简化行走、睡眠、战斗等通用逻辑，同时自定义了如召唤盟友、掉落和破坏鼹鼠丘等独特状态。",
+  "api": [],
+  "api_note": "该状态图未暴露对外 API 方法，仅管理内部状态转换和事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attack",
+    "attacked",
+    "death",
+    "summon",
+    "corpse_chomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "sniff_idle",
+    "startnap",
+    "taunt",
+    "summon_ally",
+    "fall",
+    "eat_start",
+    "make_molehill",
+    "break_molehill"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "闲置状态，molebat 坐着休息，有15%几率转为嗅探状态，玩家可观察到其静态行为。"
+    },
+    {
+      "state": "summon_ally",
+      "note": "召唤盟友状态，当收到“summon”事件时触发，molebat 停止移动并呼叫其他盟友，有特定动画和音效窗口。"
+    },
+    {
+      "state": "fall",
+      "note": "掉落状态，从洞穴顶部掉落，期间标记为“noattack”和“noelectrocute”，提供无敌帧，落地后恢复行动。"
+    },
+    {
+      "state": "eat_start",
+      "note": "进食状态，开始吃东西动作，在动画早期执行缓冲动作，可能恢复生命或获得增益，播放吃食音效。"
+    },
+    {
+      "state": "make_molehill",
+      "note": "制造鼹鼠丘状态，构建巢穴，在动画期间执行建造动作，用于藏身或繁殖，有超时机制。"
+    },
+    {
+      "state": "break_molehill",
+      "note": "破坏鼹鼠丘状态，对目标推送“suckedup”事件，破坏巢穴并可能掉落物品，有特定音效。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，播放嘲讽动画和音效，可能用于吸引玩家注意或激怒，持续时间短。"
+    },
+    {
+      "state": "attack",
+      "note": "战斗攻击状态，由通用战斗状态添加，在攻击动画10帧后造成伤害，玩家需躲避攻击范围。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，被击败时播放死亡音效和动画，molebat 移除并可能触发后续事件。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      14579,
+      14938,
+      13779,
+      13606,
+      15922,
+      18359,
+      14486
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及molebat或其相关能力，所有页面涉及其他实体如薇格弗德、蔬果、蟾蜍、海鱼、帝王蟹、玩具和作物，未讨论stategraph__SGmolebat的行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鼹鼠蝙蝠",
+    "molebat",
+    "洞穴生物",
+    "掉落",
+    "召唤盟友",
+    "进食",
+    "破坏鼹鼠丘",
+    "制造鼹鼠丘",
+    "战斗",
+    "死亡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索",
+    "资源"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "db1bf0644e67fa6dd77c4496695ae6e5667713bb2f1a31bfdb114e0c126e6035",
+    "source_bytes": 10457,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139214519
+  }
+}

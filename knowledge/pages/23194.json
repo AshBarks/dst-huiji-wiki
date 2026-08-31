@@ -6,13 +6,16 @@
     "wikitext_sha256": "8aae44e5e4d33aa8d23bc4bb043008fd1afbe51e1f1e3c87b4addfd41dc2f43f",
     "symbol_doc_shas": {
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/fueler.lua": "663c826290d8e82cdcc21700827283a2d4cbdf61764fb07ab3a1f73c76554e15",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGcarnival_crowkid.lua": "ab66419169d6a410554aa847a2400b56a19049fe67cd097c6286ccd0f8887e1e"
     }
   },
   "symbols": {
@@ -27,6 +30,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/fueler.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -63,6 +70,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -90,12 +105,22 @@
       }
     },
     "components/trader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易接受条件描述",
         "夜间交易功能禁用描述",
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "它们将给予",
+        "semantic_consistent": true,
+        "note": "页面描述了“给予”奖票的行为，这是交易组件的核心功能之一。"
+      }
+    },
+    "stategraphs/SGcarnival_crowkid.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

@@ -11,26 +11,46 @@
       "behaviours/runtodist.lua": "d61b9fb92552a964bb5a66b9531d23ed323bd1addf978e4d1cd4eab2dcbe6973",
       "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
       "brains/wx78_possessedbodybrain.lua": "f81432364ec76e1e49aea1ae54c252eda475e7002071aff64356b0839fee13cf",
+      "components/areaaware.lua": "bd03826b733e4b35b9314bd3c5193107eb6b1c7a2d5641ec09033480a6db2683",
       "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/container_transform.lua": "5ad0f7b24b36a44d3b4bc2a7256099b50b8a786e1383d5d9d6f8c38aac9b692d",
       "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+      "components/damagetyperesist.lua": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+      "components/debuffable.lua": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/efficientuser.lua": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
       "components/embarker.lua": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/hunger.lua": "6eb4e59a49fca0a8018c66497d0dfbab4ddcbd23ec2408aa7c8afcf29439a36f",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
+      "components/linkeditem.lua": "276b16be1504daacc7ec337232c1e7ab6b0348cc1af48c7f5500b5a9c9572ce9",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/luckuser.lua": "61bb661768e8333af008675a1415d958d1fa7ff8a6aa592bea9de120b57ac2fb",
+      "components/maprevealable.lua": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
+      "components/pinnable.lua": "e1cb87054fce8232224d4a597cdad69ddb056222fe70b4535174ea6dd893bd36",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planardefense.lua": "ce1136a734d94897c73a3b2d89ccafacbe87662d3b37d9bbf568fe7a68fc4dee",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
+      "components/sanity.lua": "70302ca4dea6a57692b41375f46d28bd75bcf0f900a859fe97370d8dff544494",
+      "components/sheltered.lua": "7a050b2d7439bf3a3f9e84c543b2aee74d4c6c4d7f9617d0ee86fa87cbc46bac",
+      "components/skinner.lua": "92c53ec61f4a3783d299160853a55102e6b9faa3c4c894afcf73e7700ff77515",
+      "components/slipperyfeet.lua": "28a8e92c38ed121910b8c6ef78c9492f2d0fe6ee5adcc856fe5985bb6683e4c7",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "components/upgrademoduleowner.lua": "4871832cf2ffb4ecfde8cecacfedc994a9b082893421ed171067de8e281c0c92",
+      "components/wx78_abilitycooldowns.lua": "5011dcdf287b88a101fc9d28b6d4b65ed9cfa13b3d3d9a5b6b895450cf184d53",
+      "components/wx78_shield.lua": "7c46a09b5dac86821c83a644b65c67d717c034fe6a486deadb428afc8683b033",
+      "stategraphs/SGwx78_possessedbody.lua": "0983b697f60169dde4804cc7d0c69d1f0ebcc03875c4120191642f2814be9332"
     }
   },
   "symbols": {
@@ -48,7 +68,10 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -65,7 +88,8 @@
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/runtodist.lua": {
       "route": "two_hop",
@@ -133,6 +157,10 @@
       "route": "direct",
       "detail_level": "detailed"
     },
+    "components/areaaware.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/bloomer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -190,6 +218,10 @@
       "detail_level": "detailed",
       "llm_verdict": {}
     },
+    "components/container_transform.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/damagetypebonus.lua": {
       "mention_source": "pass2_evidence",
       "aspects_covered": [
@@ -206,6 +238,26 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {}
+    },
+    "components/damagetyperesist.lua": {
+      "aspects_ignored": [
+        "电路板技能物理伤害减免效果",
+        "装备伤害减免能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/debuffable.lua": {
+      "aspects_ignored": [
+        "减益效果公告",
+        "减益效果施加",
+        "减益状态获取",
+        "减益附加与移除台词",
+        "增益与减益获取",
+        "增益效果覆盖"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/drownable.lua": {
       "aspects_ignored": [
@@ -229,6 +281,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/efficientuser.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/embarker.lua": {
       "route": "direct",
@@ -276,6 +332,18 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/hunger.lua": {
+      "aspects_ignored": [
+        "饥饿值上限数值描述",
+        "饥饿值下降速率描述",
+        "饥饿值初始值设定",
+        "饥饿值归零时生命值影响",
+        "饥饿值特殊行为覆盖描述",
+        "饥饿值状态触发语音台词"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -322,6 +390,15 @@
       "detail_level": "summary",
       "llm_verdict": {}
     },
+    "components/linkeditem.lua": {
+      "aspects_ignored": [
+        "所有者绑定管理",
+        "技能树改变响应",
+        "直接所有者影响"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/locomotor.lua": {
       "aspects_ignored": [
         "冲刺与快速奔跑行为描述",
@@ -347,11 +424,92 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/luckuser.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/maprevealable.lua": {
+      "aspects_ignored": [
+        "全局地图图标设置",
+        "放置物品标记地图位置",
+        "生物刷新点地图标识"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pinnable.lua": {
+      "aspects_ignored": [
+        "坦克龟翻转控制行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/planardamage.lua": {
       "aspects_ignored": [
         "位面伤害加成效果描述",
         "位面基础伤害数值标注"
       ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planardefense.lua": {
+      "aspects_ignored": [
+        "伤害减免描述",
+        "减伤百分比",
+        "击飞抵御行为",
+        "基础防御增加",
+        "物理伤害减免",
+        "防御百分比提供"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sanity.lua": {
+      "aspects_ignored": [
+        "书籍阅读消耗理智值",
+        "启蒙值光环效果描述",
+        "外部实体影响理智值",
+        "技能基于理智值触发效果",
+        "技能增强理智光环回复",
+        "攻击行为增加启蒙值",
+        "火源恢复理智值效果",
+        "特定角色阅读书籍恢复理智值",
+        "环境因素导致理智值下降",
+        "理智值功能描述",
+        "电路板增加理智值上限",
+        "电路板提供理智光环",
+        "装备减少理智值扣除",
+        "角色理智值下降倍率",
+        "角色理智值初始设定"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/sheltered.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/skinner.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "扫把外观更换功能",
+        "牛皮肤更换功能"
+      ],
+      "fact_matches": [
+        {
+          "raw": "3 秒",
+          "region_id": "72238:section:3",
+          "matched": "components/skinner.lua: feet_cuff_size=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/slipperyfeet.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -378,6 +536,29 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/upgrademoduleowner.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/wx78_abilitycooldowns.lua": {
+      "aspects_ignored": [
+        "冷却时间界面显示"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/wx78_shield.lua": {
+      "aspects_ignored": [
+        "护盾回复速率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGwx78_possessedbody.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

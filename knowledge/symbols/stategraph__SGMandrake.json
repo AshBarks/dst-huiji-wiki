@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGMandrake.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGMandrake",
+  "summary": "该状态图驱动饥荒联机版中的曼德拉草实体。整体状态组织包括空闲、死亡、物品、地面、被拾取、种植和受击等基本状态，并通过事件处理响应攻击和死亡事件，同时集成了行走、冻结和电击等常见状态。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，状态转换由实体组件和事件系统驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "item",
+    "ground",
+    "picked",
+    "plant",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "进入条件：无其他活动时；表现：播放空闲动画和周期性声音；状态可旋转。"
+    },
+    {
+      "state": "death",
+      "note": "进入条件：生命值归零；表现：播放死亡动画和声音，若燃烧则熄灭；超时21帧后触发烹饪效果。"
+    },
+    {
+      "state": "item",
+      "note": "进入条件：作为物品时；表现：播放对象动画，标记为忙碌和可电击。"
+    },
+    {
+      "state": "ground",
+      "note": "进入条件：种植在地面；表现：播放地面动画，标记为忙碌和可电击。"
+    },
+    {
+      "state": "picked",
+      "note": "进入条件：被玩家拔出；表现：播放拔出动画和声音；之后根据是否有物品标签进入死亡或空闲状态。"
+    },
+    {
+      "state": "plant",
+      "note": "进入条件：种植曼德拉草；表现：播放种植动画和声音；随后转到地面状态。"
+    },
+    {
+      "state": "hit",
+      "note": "进入条件：被攻击时未被电击；表现：播放受击动画和声音；之后回到空闲状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13898,
+      15722,
+      15225,
+      28744,
+      18359,
+      19129,
+      72441,
+      72238
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面13898涉及曼德拉草的基本信息和采摘提示，但未描述其状态图中的具体行为（如空闲动画、死亡效果、种植状态等），其他页面与SGMandrake无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "曼德拉草",
+    "死亡",
+    "受击",
+    "种植",
+    "拔出",
+    "地面",
+    "物品",
+    "空闲"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "种植"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fe3ff2e727ddd8c05270365f01d192663c93918cf3e6d6517810d4e5a1816585",
+    "source_bytes": 4374,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135201632
+  }
+}

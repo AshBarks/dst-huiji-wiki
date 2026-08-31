@@ -14,8 +14,10 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/mast.lua": "b79aa769a7baa42a94f7980e8a943b633161534718ad72e4849129c2ee8eab7d",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/upgradeable.lua": "a720dcee032d32897b181d843baa23eb07722a0df1e104ac8a997732efb9ec90",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -41,7 +43,8 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -108,6 +111,40 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/mast.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "帆初始收起状态",
+          "evidence": [
+            {
+              "pageid": 18357,
+              "quote": "刚建造好的飞翼风帆处于收起状态。"
+            }
+          ]
+        },
+        {
+          "aspect": "帆展开操作交互",
+          "evidence": [
+            {
+              "pageid": 18357,
+              "quote": "如果想更快地展开帆布，在展开时将鼠标停留在桅杆上"
+            }
+          ]
+        },
+        {
+          "aspect": "最高速度提供数值",
+          "evidence": [
+            {
+              "pageid": 18357,
+              "quote": "展开的桅杆、飞翼风帆、龙翼桅杆分别能提供 2.5、4、2.5 单位的最高速度。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -116,6 +153,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/upgradeable.lua": {
+      "aspects_ignored": [
+        "升级次数与材料需求",
+        "开花阶段升级效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -127,5 +172,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwobsterland.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwobsterland",
+  "summary": "该状态图驱动饥荒联机版中的陆地Wobster实体。整体状态组织基于事件驱动的有限状态机，处理移动、受伤、死亡等行为。状态包括跳跃、眩晕硬直和死亡动画，通过通用处理器响应睡眠、冻结等事件。",
+  "api": [],
+  "api_note": "源码中未定义对外方法，所有行为通过状态机事件和通用处理器处理。",
+  "events_published": [],
+  "events_listened": [
+    "sleep_ex",
+    "wake_ex",
+    "freeze_ex",
+    "electrocute",
+    "attacked",
+    "death",
+    "locomote",
+    "onhop",
+    "stunbomb"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "stunned",
+    "hop",
+    "hop_pst",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "stunned",
+      "note": "Wobster被眩晕炸弹击中时进入，暂时无法行动，播放眩晕循环动画，持续约5秒（5±2），期间可被玩家拾取。"
+    },
+    {
+      "state": "hop",
+      "note": "Wobster执行跳跃移动时进入，快速位移并播放跳跃动画，跳入水中会触发水中状态，移动中忽略可行走平台。"
+    },
+    {
+      "state": "hop_pst",
+      "note": "跳跃完成后的短暂过渡状态，播放结束动画，然后自动返回闲置状态。"
+    },
+    {
+      "state": "death",
+      "note": "Wobster死亡时触发，播放死亡动画并移除实体，根据配置掉落战利品或生成物品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      15651,
+      51046,
+      13897,
+      14907,
+      15225,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及Wobster实体或其相关状态（如眩晕、跳跃、过渡状态或死亡行为），因此无法找到能力表达的证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Wobster",
+    "陆地",
+    "跳跃",
+    "眩晕",
+    "死亡",
+    "攻击",
+    "移动",
+    "状态图",
+    "硬直",
+    "动画"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d5f284b8ff5ce7655f16ce590d6a72b7e1314c4c32eeefe78b7728f026403fed",
+    "source_bytes": 6259,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135136073
+  }
+}

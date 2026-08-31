@@ -12,20 +12,27 @@
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/sharkboibrain.lua": "7c4de9ccd13b2322239d117f919940079fe1c600a81e67dfc4cfbd3b6d6ea4d3",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/grouptargeter.lua": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGsharkboi.lua": "745cb321dcb188b4f1f587a441ad84687cddc455dce4168b698a8704cf87da8b"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -39,19 +46,27 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "大霜鲨",
+        "semantic_consistent": true
+      }
     },
     "behaviours/chattynode.lua": {
       "route": "two_hop",
       "detail_level": "stub"
     },
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述大霜鲨（sharkboi），该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/leash.lua": {
       "aspects_ignored": [
@@ -63,7 +78,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据文本涉及冰钓洞、平台生成、交易等，可能与“大霜鲨”（sharkboi）有关联，但未提及与拴绳行为相关的游荡或返回机制。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -71,7 +89,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/sharkboibrain.lua": {
       "mention_source": "fact_match",
@@ -99,6 +118,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -110,6 +137,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/grouptargeter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -160,6 +191,18 @@
         "semantic_consistent": true
       }
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -183,6 +226,10 @@
         "note": "sharkboi相关，无说话描述"
       }
     },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "aspects_ignored": [
         "生成倒计时启动描述",
@@ -198,6 +245,7 @@
       }
     },
     "components/trader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易接受条件描述",
         "夜间交易功能禁用描述",
@@ -205,7 +253,11 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "换取 2 个出逃腿靴，否则只能够换取 1 个，第一次给予足够时，最多可以交易 5 次",
+        "semantic_consistent": true
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -215,7 +267,41 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGsharkboi.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "击败后重生机制",
+          "evidence": [
+            {
+              "pageid": 21432,
+              "quote": "大霜鲨被击败并脱离加载范围后，20 天后会随冰钓洞重新生成"
+            }
+          ]
+        },
+        {
+          "aspect": "生成动画描述",
+          "evidence": [
+            {
+              "pageid": 21432,
+              "quote": "在钓上第 3 条斑鱼时，大霜鲨会从冰钓洞下方跃起到附近的浮冰地块上"
+            }
+          ]
+        },
+        {
+          "aspect": "空闲状态描述",
+          "evidence": [
+            {
+              "pageid": 21432,
+              "quote": "默认情况下，大霜鲨对玩家是中立的，只是四处走动。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

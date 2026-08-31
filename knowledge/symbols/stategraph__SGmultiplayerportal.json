@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmultiplayerportal.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmultiplayerportal",
+  "summary": "该状态图驱动饥荒联机版中的多人门户实体（multiplayer_portal），负责管理其待机动画、传送激活序列以及构造阶段的外观变化。整体状态组织以idle为核心，可随机触发趣味动画或进入传送准备、传送循环、传送后状态，对于构造类门户则有专门的建造阶段状态，最终生成月岩门户并移除自身。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅通过内部状态和事件驱动实体行为。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "funnyidle",
+    "spawn_pre",
+    "spawn_loop",
+    "spawn_pst",
+    "placeconstruction",
+    "constructed",
+    "constructionphase2",
+    "constructionphase3",
+    "constructionphase4"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "门户默认待机状态，播放idle_loop动画，每帧动画结束时有30%概率触发funnyidle状态。"
+    },
+    {
+      "state": "funnyidle",
+      "note": "idle时随机触发，播放idle_eyescratch动画，为玩家提供趣味性表现，持续约30帧后返回idle。"
+    },
+    {
+      "state": "spawn_pre",
+      "note": "传送激活准备阶段，播放pre_fx动画并启动spawning_loop音效，标记为open，为传送过程做准备。"
+    },
+    {
+      "state": "spawn_loop",
+      "note": "传送激活循环阶段，播放fx动画和持续音效，表示传送过程进行中，持续约55帧后进入spawn_pst。"
+    },
+    {
+      "state": "spawn_pst",
+      "note": "传送后阶段，播放pst_fx动画，在12帧后移除busy标签，约22帧后返回idle状态。"
+    },
+    {
+      "state": "placeconstruction",
+      "note": "构造门户初始放置状态，播放place动画和音效，完成后自动返回idle。"
+    },
+    {
+      "state": "constructed",
+      "note": "构造完成状态，播放bounce动画和shake音效，标记为busy和construction，完成后返回idle。"
+    },
+    {
+      "state": "constructionphase2",
+      "note": "建造阶段2，控制外观显示stage2，播放shatterfx1动画，更新内部构造阶段标记为2。"
+    },
+    {
+      "state": "constructionphase3",
+      "note": "建造阶段3，控制外观显示stage3，播放shatterfx2动画，更新内部构造阶段标记为3，并禁用vines音效。"
+    },
+    {
+      "state": "constructionphase4",
+      "note": "最终建造阶段，播放final_reveal动画，添加NOCLICK标签，动画结束后生成multiplayer_portal_moonrock实体并移除当前门户。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19693,
+      20842,
+      18229,
+      34314,
+      45685,
+      16681,
+      18251,
+      19680
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 stategraph__SGmultiplayerportal 的任何具体状态、动画、音效或行为描述，如 idle、funnyidle、spawn_pre 等。页面内容主要描述传送门实体的游戏功能、制作配方、世界规则和叙事背景，而非底层代码组件的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "传送门",
+    "建造过程",
+    "待机动画",
+    "传送动画",
+    "月岩门户",
+    "状态管理",
+    "动画序列"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 4/7)",
+  "gameplay_tags": [
+    "传送",
+    "建造",
+    "多人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2a188b8db026a28b8ce16bd88b511e85782104a43de52e3722501967369f7c6d",
+    "source_bytes": 9283,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139723761
+  }
+}

@@ -10,6 +10,7 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/npc_talker.lua": "421ee0046a38e7b022a37abbd02cb33f57e6c699ac6a37f530f2f1f6a2fd3e4a",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
@@ -68,6 +69,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/npc_talker.lua": {
+      "aspects_ignored": [
+        "交互时言语表达",
+        "台词触发条件"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -100,7 +109,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "stategraphs/SGwagstaff_npc.lua": {
       "mention_source": "fact_match",

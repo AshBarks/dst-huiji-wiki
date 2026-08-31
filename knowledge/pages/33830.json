@@ -7,6 +7,7 @@
     "symbol_doc_shas": {
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/inventoryitemholder.lua": "8b3b3116039a9e753a907fee0a734d6501694fd3d279547ad4773c65c8f54c3d",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
@@ -28,6 +29,11 @@
         "打蜡后显示名称前缀",
         "检查后显示详细特性"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/inventoryitemholder.lua": {
       "route": "direct",
       "detail_level": "stub"
     },

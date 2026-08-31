@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "5c13d6c529e47d636c4e023bd903da8e77ff0d5eaa97cc5c368fab8b261dd396",
     "symbol_doc_shas": {
+      "components/boatleak.lua": "5bf0bd082808e5d4dbc57e2977fccbf2a99cfa3d9f9d1e77940b379a1f0b8f79",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
@@ -12,6 +13,27 @@
     }
   },
   "symbols": {
+    "components/boatleak.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "漏洞修复工具与修复后持续时间",
+          "evidence": [
+            {
+              "pageid": 16185,
+              "quote": "漏洞可以使用船补丁、可靠的胶布、树果酱或海带补丁来修复，其中海带补丁修复后会在一段时间后再度破掉"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "可靠的胶布的修补功能",
+        "海带补丁的临时修复与消失时间",
+        "船补丁的修复能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -50,5 +72,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

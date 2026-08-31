@@ -3,12 +3,15 @@
   "pageid": 19718,
   "title": "虫洞",
   "inputs": {
-    "wikitext_sha256": "c2ff481e277afabe2b7300799321dce1f8ecc6e7170e650ea15013060fbe74d6",
+    "wikitext_sha256": "4f822a8fef75dfa2b554995a630ef3f3a9ffca67fbf2935be54ac95568ddbd9d",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/roseinspectable.lua": "590f3a3e46759adfbe0d9d60b62ab5b311c0fd95c5d7d3ee849800d66e7fb3b1",
+      "components/teleporter.lua": "fec8be3bcd9b9216e9a2df12abee06d92bee8dad29bbdd91a51bf501a97101ef",
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGwormhole.lua": "a243086517575b4e74dafae205f01438f5442a346924a5ccef5db64cec92fa13"
     }
   },
   "symbols": {
@@ -47,6 +50,20 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/roseinspectable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/teleporter.lua": {
+      "aspects_ignored": [
+        "传送漂浮平台",
+        "传送目标能力",
+        "多人传送目标设置",
+        "玩家传送命令"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -55,8 +72,34 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGwormhole.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "虫洞打开状态描述",
+          "evidence": [
+            {
+              "pageid": 19718,
+              "quote": "张开的虫洞"
+            }
+          ]
+        },
+        {
+          "aspect": "虫洞闭合状态描述",
+          "evidence": [
+            {
+              "pageid": 19718,
+              "quote": "闭合的虫洞"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

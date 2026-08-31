@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGalterguardian_phase2.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGalterguardian_phase2",
+  "summary": "该状态图驱动远古守护者第二阶段(Alter Guardian Phase 2)实体。整体状态组织方式包括出生(spawn)、空闲(idle)和多种攻击状态，通过事件如doattack触发劈砍、尖刺、旋转、召唤等攻击，并设有死亡状态以触发阶段转换。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API，行为通过事件和状态管理控制。",
+  "events_published": [
+    "phasetransition"
+  ],
+  "events_listened": [
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ALTERGUARDIAN_PHASE2_CHOP_RANGE",
+    "ALTERGUARDIAN_PHASE2_SPIN_RANGE",
+    "ALTERGUARDIAN_PHASE2_SPIN_SPEED",
+    "ALTERGUARDIAN_PHASE2_SPINCD",
+    "ALTERGUARDIAN_PHASE2_SPIKECOOLDOWN",
+    "ALTERGUARDIAN_PHASE2_SUMMONCOOLDOWN",
+    "ALTERGUARDIAN_PHASE2_SPIKEDAMAGE",
+    "ALTERGUARDIAN_PHASE2_SPINMIN",
+    "ALTERGUARDIAN_PHASE2_SPINMAX"
+  ],
+  "states": [
+    "spawn",
+    "idle",
+    "atk_chop",
+    "atk_spike",
+    "atk_spike_pst",
+    "spin_pre",
+    "spin_loop",
+    "spin_pst",
+    "atk_summon",
+    "antiboat_attack",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "出生状态，实体无敌并播放召唤动画，玩家无法攻击；动画结束后进入空闲。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，实体停止移动并播放待机动画，可能触发攻击事件。"
+    },
+    {
+      "state": "atk_chop",
+      "note": "近战劈砍攻击，实体停止移动并面对目标，在动画第22帧造成伤害并震动屏幕。"
+    },
+    {
+      "state": "atk_spike",
+      "note": "地面尖刺攻击，有冷却时间(spike_cd)，实体循环播放刺击动画并在2.25-2.5秒后结束，对附近玩家造成伤害。"
+    },
+    {
+      "state": "spin_pre",
+      "note": "旋转攻击预备，实体开始追踪目标并生成拖尾特效，32帧后进入旋转循环。"
+    },
+    {
+      "state": "spin_loop",
+      "note": "旋转攻击循环，实体高速移动并造成范围伤害，可破坏物体或击杀玩家；若击中玩家则提前结束循环。"
+    },
+    {
+      "state": "spin_pst",
+      "note": "旋转攻击后摇，实体停止旋转并启动冷却(spin_cd)，期间有最后一次范围伤害判定。"
+    },
+    {
+      "state": "atk_summon",
+      "note": "召唤小守护者，有冷却时间(summon_cd)，连续召唤两次，每次生成5个投影体攻击目标。"
+    },
+    {
+      "state": "antiboat_attack",
+      "note": "针对船的攻击，实体追踪目标位置并在刺击后对船造成伤害并制造漏水。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，实体播放死亡动画并掉落战利品，10秒后触发phasetransition事件进行阶段转换。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15248,
+      13897,
+      15022,
+      14929,
+      13701,
+      16352,
+      24901,
+      45249
+    ],
+    "aspects": [
+      {
+        "aspect": "旋转攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "旋转：追逐当前目标并旋转它的腿部来进行攻击，{{解释|摧毁}}沿途的实体并造成范围伤害。"
+          },
+          {
+            "pageid": 14929,
+            "quote": "旋转攻击：缩壳并原地旋转，随后快速撞向目标，对 2 距离内所有敌人造成 50 伤害。"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡后阶段转换",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "第一阶段的克劳斯被击杀时不掉落任何物品；它会用[[重生护符]]复活并进入第二阶段"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落生成",
+        "evidence": [
+          {
+            "pageid": 15248,
+            "quote": "远古守护者死后会在原地生成一个[[大号华丽箱子]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "远古守护者",
+    "第二阶段",
+    "旋转攻击",
+    "召唤小守护者",
+    "劈砍攻击",
+    "尖刺攻击",
+    "反船攻击",
+    "AOE伤害",
+    "无敌帧",
+    "阶段转换"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d4ef1c1ea74887a2c6f65322904481175318baf512e288b1b5ba929ef78c164f",
+    "source_bytes": 34204,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135371324
+  }
+}

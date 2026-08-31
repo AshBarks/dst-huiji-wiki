@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGballoonheld.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGballoonheld",
+  "summary": "该状态图驱动名为'balloonheld'的实体，代表玩家持有的气球。状态组织基于持有者的奔跑状态，从静止开始，根据奔跑状态切换到奔跑循环、启动和停止过渡，并包含气球泄气状态以处理游戏机制更新。",
+  "api": [],
+  "api_note": "该状态图未定义公共API方法，所有行为通过内部状态和事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "animover",
+    "sg_update_running_state"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "start_running",
+    "running",
+    "stop_running",
+    "deflate"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "静止状态，气球播放待机动画，等待玩家奔跑状态更新。进入条件：初始或停止奔跑后，表现稳定。"
+    },
+    {
+      "state": "start_running",
+      "note": "启动奔跑状态，播放奔跑准备动画，作为从静止到奔跑的过渡。进入条件：开始奔跑时触发。"
+    },
+    {
+      "state": "running",
+      "note": "奔跑状态，气球播放循环奔跑动画并播放音效，可能提供速度加成效果。进入条件：持有者持续奔跑，表现循环。"
+    },
+    {
+      "state": "stop_running",
+      "note": "停止奔跑状态，播放停止动画，短暂硬直后返回静止。进入条件：停止奔跑时，过渡时间短。"
+    },
+    {
+      "state": "deflate",
+      "note": "气球泄气状态，播放泄气动画并更新气球符号，可能影响游戏效果。进入条件：气球泄气事件触发，动画后根据状态恢复。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      13156,
+      16251,
+      15922,
+      13406,
+      14936,
+      18357,
+      47009
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录中均未提及气球持有状态的静止、奔跑、停止或泄气等行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "气球",
+    "奔跑",
+    "泄气",
+    "持有",
+    "速度",
+    "动画",
+    "状态",
+    "音效",
+    "过渡",
+    "符号"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "移动",
+    "增益"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98b4c8f3ffc62bcefe3521cf7f2509211115cab7a59cba0dd31e20228f203945",
+    "source_bytes": 2987,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135616841
+  }
+}

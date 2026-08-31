@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGeyeofterror_mini.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGeyeofterror_mini",
+  "summary": "该状态图驱动名为“迷你眼怪”（eyeofterror_mini）的飞行怪物，是饥荒联机版中的敌对实体。整体状态组织基于常见状态处理器，包括待机、嘲讽、受击、死亡、攻击、进食等核心状态，并通过公共函数扩展睡眠、冻结、电击、行走、出现、初始化和尸体状态，以管理其飞行行为和战斗交互。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，仅用于驱动迷你眼怪的内部状态逻辑。",
+  "events_published": [
+    "on_landed",
+    "on_no_longer_landed"
+  ],
+  "events_listened": [
+    "sleep",
+    "wake",
+    "freeze",
+    "electrocute",
+    "locomote",
+    "attack",
+    "attacked",
+    "death",
+    "corpse_chomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "taunt",
+    "hit",
+    "death",
+    "attack",
+    "eat",
+    "sleep",
+    "wake",
+    "frozen",
+    "electrocute",
+    "walk",
+    "appear",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "攻击状态，迷你眼怪执行冲刺攻击，在第5帧设置速度、第14帧造成伤害，玩家需躲避；攻击后有33%几率触发嘲讽。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，迷你眼怪落地执行进食动作，可能恢复生命或拾取物品，期间无敌帧在落地时结束，完成后有几率嘲讽。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，迷你眼怪播放死亡动画并移除物理碰撞，掉落战利品；第31帧降低飞行状态以模拟落地。"
+    },
+    {
+      "state": "appear",
+      "note": "出现状态，迷你眼怪从地面出现，第19帧开始飞行，第93帧前保持无敌（busy标签），玩家无法攻击。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，迷你眼怪播放受击动画并停止移动，产生硬直效果，期间可能无法行动。"
+    },
+    {
+      "state": "frozen",
+      "note": "冻结状态，迷你眼怪被冰冻效果影响，无法移动或攻击，由公共处理器管理。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，迷你眼怪播放嘲讽动画并播放音效，可能作为攻击或进食后的衔接状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      70763,
+      51046,
+      15551,
+      20511
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及迷你眼怪（SGeyeofterror_mini）的任何能力或行为描述；所有页面均涉及其他实体如克劳斯、龙蝇、蜂王等，与迷你眼怪无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "迷你眼怪",
+    "恐惧之眼",
+    "攻击",
+    "死亡",
+    "出现",
+    "进食",
+    "冻结",
+    "电击",
+    "嘲讽",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "怪物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "27a7581ed0e6de75ecd28ef87c6f90024411f09e1bbebafbbf50a604ac497533",
+    "source_bytes": 7367,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137429018
+  }
+}

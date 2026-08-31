@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGruinsnightmare.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGruinsnightmare",
+  "summary": "该状态图驱动饥荒联机版中的遗迹噩梦（Ruins Nightmare）实体，它是一种出现在地下遗迹的敌对暗影生物。整体状态组织方式为事件驱动的有限状态机，包括闲置、攻击、受击、特殊攻击、出现、消失等状态，通过受击、攻击指令和动画完成等事件触发转换。",
+  "api": [],
+  "api_note": "该状态图是内部状态管理机制，没有对外暴露的API方法；所有交互通过事件和组件接口进行。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "reappear",
+    "locomote",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "RUINSNIGHTMARE_HORNATTACK_CHANCE"
+  ],
+  "states": [
+    "idle",
+    "attack",
+    "hit",
+    "horn_attack",
+    "taunt",
+    "appear",
+    "death",
+    "disappear",
+    "action"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "闲置状态，当无目标或等待时进入。会尝试丢弃目标或主动消失，播放闲置动画。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，收到攻击指令时进入。播放攻击动画，有冲锋效果；攻击可能被反射触发受击。"
+    },
+    {
+      "state": "horn_attack",
+      "note": "特殊角攻击状态，受击时有概率触发。消失并传送到附近，然后召唤双角攻击目标。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，被攻击或攻击反射时进入。立即消失并传送到随机位置，然后重新出现。"
+    },
+    {
+      "state": "appear",
+      "note": "出现状态，从消失或传送后重新出现时进入。播放出现动画，短暂无敌。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，生命值归零时进入。消失并掉落战利品，之后被移除。"
+    },
+    {
+      "state": "disappear",
+      "note": "消失状态，主动消失或死亡后进入。播放消失动画，添加不可点击标签，之后移除。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，丢弃目标后进入。播放嘲讽动画，可能伴随声音。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      72981,
+      24892,
+      24896,
+      13701,
+      16057,
+      24748,
+      13551
+    ],
+    "aspects": [
+      {
+        "aspect": "受击状态描述",
+        "evidence": [
+          {
+            "pageid": 24748,
+            "quote": "暗影鱼人受击硬直时，会像暗影生物一样，传送到附近 20 × 20 正方形范围内的任一可站立的位置"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击状态描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "开始攻击房间中的所有目标"
+          },
+          {
+            "pageid": 13551,
+            "quote": "虚影不再躲避玩家，并将发起攻击"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置状态描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "这些远古戍卫塔会站在原地不动，不主动攻击任何目标"
+          },
+          {
+            "pageid": 13551,
+            "quote": "它只会游荡并躲避玩家"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "暗影生物",
+    "攻击行为",
+    "受击硬直",
+    "特殊攻击",
+    "生成消失",
+    "仇恨机制",
+    "物品掉落",
+    "无敌帧"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "战斗",
+    "敌对生物",
+    "遗迹"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b356916d52f6aef4dcef9f523a99c2f719abfe4c5950d19174dba43df435cf9f",
+    "source_bytes": 14754,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145952313
+  }
+}

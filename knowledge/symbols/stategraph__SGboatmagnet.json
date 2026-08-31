@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatmagnet.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatmagnet",
+  "summary": "该状态图驱动饥荒联机版中的磁铁船（boatmagnet）实体。状态图从 idle 状态开始，响应启动/停止拉动等事件，管理搜索信标、配对、拉动和烧毁等状态，通过动画和音效反馈玩家行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，所有交互通过事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "boatmagnet_pull_start",
+    "boatmagnet_pull_stop",
+    "worked_off",
+    "worked",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "worked",
+    "worked_off",
+    "place",
+    "search_pre",
+    "search_loop",
+    "success",
+    "fail",
+    "pull_pre",
+    "pull",
+    "pull_pst",
+    "burnt"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "磁铁船静止状态，根据是否配对信标播放激活或普通动画，响应工作事件进入受击状态。"
+    },
+    {
+      "state": "place",
+      "note": "放置磁铁船时的动画，第27帧后添加 caninterrupt 标签，可被工作事件中断进入 worked_off 状态。"
+    },
+    {
+      "state": "search_loop",
+      "note": "搜索信标循环状态，持续播放动画和音效，寻找最近信标；成功则配对并进入 success，失败则进入 fail。"
+    },
+    {
+      "state": "success",
+      "note": "配对信标成功，播放成功动画和音效，随后自动进入拉动准备状态（pull_pre）。"
+    },
+    {
+      "state": "fail",
+      "note": "配对信标失败，播放失败动画和音效，完成后返回 idle 状态。"
+    },
+    {
+      "state": "pull",
+      "note": "拉动状态，循环播放动画和音效，表示磁铁正在持续拉动船只；响应工作事件可进入受击状态。"
+    },
+    {
+      "state": "pull_pst",
+      "note": "拉动后处理状态，播放结束动画；若配对失效则追加失败动画，完成后返回 idle。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      20293,
+      14907,
+      14929,
+      14936,
+      15941,
+      14811,
+      14816
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有讨论磁铁船（stategraph__SGboatmagnet）的能力或行为。页面内容主要涉及熔炉模式的生物行为描述（如页面14907、14929、14936、15941、14811、14816）和自动航行仪物品的介绍（页面20293），但未提及磁铁船的状态图、动画、状态转换、信标配对或拉动等具体信息。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "磁铁船",
+    "信标配对",
+    "拉动",
+    "搜索",
+    "自动航行",
+    "工作动画",
+    "状态切换",
+    "烧毁",
+    "硬直",
+    "音效"
+  ],
+  "gameplay_tags": [
+    "航行",
+    "自动化"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ea6a88c2153d83488e75d87439d1856ccbc4f0c1056791c68bb2118470f7751b",
+    "source_bytes": 8061,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136054049
+  }
+}

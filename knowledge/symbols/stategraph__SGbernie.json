@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbernie.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbernie",
+  "summary": "该状态图驱动饥荒联机版中的Bernie实体，即温蒂的玩偶宠物。它定义了Bernie的闲置、移动、嘲讽、受击、死亡、激活和非激活等状态。状态组织基于事件驱动的状态机，允许Bernie响应游戏事件并执行相应行为。",
+  "api": [],
+  "api_note": "该状态图没有对外方法，因为它是内部状态机，用于控制Bernie的行为。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_nodir",
+    "taunt",
+    "hit",
+    "death",
+    "activate",
+    "deactivate"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "Bernie 闲置状态，循环播放动画，玩家可见其站立不动。"
+    },
+    {
+      "state": "idle_nodir",
+      "note": "Bernie 无方向性闲置状态，在激活后使用，短暂播放动画后恢复标准闲置。"
+    },
+    {
+      "state": "taunt",
+      "note": "Bernie 执行嘲讽动作，有4秒冷却时间，可能吸引敌人注意。"
+    },
+    {
+      "state": "hit",
+      "note": "Bernie 被攻击时短暂硬直，播放受击动画。"
+    },
+    {
+      "state": "death",
+      "note": "Bernie 死亡后播放死亡动画并变为非活动状态，不再响应。"
+    },
+    {
+      "state": "activate",
+      "note": "Bernie 从非活动状态被激活时坐起来，进入闲置。"
+    },
+    {
+      "state": "deactivate",
+      "note": "Bernie 进入非活动状态，播放坐下动画。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10379,
+      15915,
+      13556,
+      34792,
+      15922,
+      13156,
+      47009
+    ],
+    "aspects": [
+      {
+        "aspect": "嘲讽动作描述",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "半径距离小于等于 12 单位时伯尼会嘲讽附近"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "Bernie",
+    "温蒂",
+    "玩偶",
+    "嘲讽",
+    "受击",
+    "死亡",
+    "激活",
+    "停用",
+    "移动",
+    "状态"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "66246fa5c46853ac701cdc664de6a902bc87c3f8e03b344ff3e7a195c70cb514",
+    "source_bytes": 6759,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135774868
+  }
+}

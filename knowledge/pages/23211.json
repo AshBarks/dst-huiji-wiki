@@ -11,6 +11,7 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -77,6 +78,19 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/prototyper.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述了神龛，多个神龛（如 yotr_rabbitshrine）是受 prototyper 组件管理的原型制作者。证据未直接提及 'prototyper' 组件或原型制作系统机制。"
+      }
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -85,7 +99,11 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述火炬与神龛，无交易内容。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

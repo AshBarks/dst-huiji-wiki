@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcharlie_stage_post.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcharlie_stage_post",
+  "summary": "该状态图驱动饥荒联机版中的查理舞台布景实体，整体状态组织为一个有限状态机，包括关闭、打开、叙述等核心状态。通过监听'ontalk'事件触发叙述状态，实现舞台的动画和音效表现，初始状态为打开闲置。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，仅通过事件驱动状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "ontalk",
+    "animover",
+    "donetalking",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle_closed",
+    "open",
+    "idle_open",
+    "narrator_on",
+    "idle_open_on",
+    "narrate",
+    "stinger",
+    "narrator_off",
+    "close"
+  ],
+  "state_notes": [
+    {
+      "state": "narrate",
+      "note": "当实体收到'ontalk'事件时进入此状态，播放叙述动画和声音，持续时间1.5到2秒，超时后返回闲置状态。"
+    },
+    {
+      "state": "stinger",
+      "note": "播放特殊音效序列，用于舞台效果，如场景转换或强调，事件队列结束后返回闲置。"
+    },
+    {
+      "state": "open",
+      "note": "舞台打开动画，从关闭状态转换而来，播放打开声音，完成后进入打开闲置状态。"
+    },
+    {
+      "state": "close",
+      "note": "舞台关闭动画，播放关闭声音，完成后返回关闭闲置状态。"
+    },
+    {
+      "state": "idle_open",
+      "note": "舞台打开后的闲置状态，是初始状态，等待事件触发或状态转换。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      18825,
+      24543,
+      52788,
+      24542,
+      65605,
+      24544,
+      13214
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述舞台实体的生成、基本交互（如表演）和冷却机制，未涉及SGcharlie_stage_post的具体能力如叙述动画、音效序列、打开/关闭动画或闲置状态。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "查理",
+    "舞台",
+    "布景",
+    "叙述",
+    "动画",
+    "音效",
+    "事件",
+    "状态图",
+    "触发"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "叙事",
+    "表演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "615248a46fb4e0e01c3cd05af5ef4460889a0199762cb3c64ae2b9b03b4a485e",
+    "source_bytes": 4743,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136868336
+  }
+}

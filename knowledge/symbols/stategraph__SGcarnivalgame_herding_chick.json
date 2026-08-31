@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_herding_chick.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_herding_chick",
+  "summary": "该状态图驱动饥荒联机版嘉年华游戏中的牧羊鸡实体。整体状态组织包括闲置、启动跳跃、到达家成功、关闭失败，以及移动状态（走和跑），响应游戏事件和动画行为。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外API方法。",
+  "events_published": [
+    "carnivalgame_herding_gothome"
+  ],
+  "events_listened": [
+    "carnivalgame_herding_arivedhome",
+    "carnivalgame_turnoff",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "launched",
+    "arived_home",
+    "turn_off"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "小鸡闲置状态，等待被启动或关闭。进入条件为无其他操作时，播放闲置动画。"
+    },
+    {
+      "state": "launched",
+      "note": "小鸡被启动状态，进行跳跃移动。进入条件为被启动事件触发，播放跑动画，落地后返回闲置状态。"
+    },
+    {
+      "state": "arived_home",
+      "note": "小鸡到达家状态，表示游戏胜利。进入条件为收到到达家事件，播放胜利动画和音效，最终消失并产生礼花效果。"
+    },
+    {
+      "state": "turn_off",
+      "note": "小鸡关闭状态，表示游戏失败。进入条件为收到关闭事件，播放失败动画和音效，最终消失。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13457,
+      65605,
+      13406,
+      15022,
+      14815,
+      13260,
+      14710,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及实体 stategraph__SGcarnivalgame_herding_chick 或其相关能力（如小鸡的闲置、启动、到达家、关闭状态）。所有页面讨论交易小游戏、世界翻新、角色、巨兽、游戏模式或猪人，与小鸡嘉年华游戏无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小鸡",
+    "嘉年华",
+    "牧羊",
+    "游戏",
+    "移动",
+    "跳跃",
+    "回家",
+    "失败",
+    "动画",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "嘉年华",
+    "小游戏",
+    "牧羊"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "253802314df50704dccc5976e7c15a073b5234ab6993cdde53dd783588d64641",
+    "source_bytes": 3287,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136475814
+  }
+}

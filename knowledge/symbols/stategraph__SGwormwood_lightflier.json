@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwormwood_lightflier.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwormwood_lightflier",
+  "summary": "该状态图驱动饥荒联机版中的光虫（Lightflier）实体，它是植物人（Wormwood）的飞行伙伴。状态图基于通用处理器组织，包括空闲、行动、受惊等基本状态，并整合了行走、睡眠、战斗和冻结等扩展行为，形成完整的行为循环。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，仅处理内部状态转换和事件响应，依赖通用状态处理器管理行为。",
+  "events_published": [],
+  "events_listened": [
+    "startled"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "startled"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，光虫停止物理运动并播放行走循环动画，可被事件触发转换到其他状态，是默认待命状态。"
+    },
+    {
+      "state": "action",
+      "note": "执行动作状态，光虫播放空闲循环动画并立即执行缓冲动作（如采集或交互），完成后自动返回空闲状态。"
+    },
+    {
+      "state": "startled",
+      "note": "受惊状态，光虫播放受击动画并短暂硬直，期间无法进行其他动作，动画结束后返回空闲状态，常由环境事件触发。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      15022,
+      13897,
+      15651,
+      51046,
+      15225,
+      15551,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及‘光虫’或相关状态描述（如空闲、执行动作、受惊），所有页面均讨论其他实体（如Wormwood、Klaus、Dragonfly等），未涉及stategraph__SGwormwood_lightflier的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "光虫",
+    "Lightflier",
+    "Wormwood",
+    "飞行",
+    "睡眠",
+    "受惊",
+    "攻击",
+    "死亡",
+    "伙伴"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b25ff58d0e5e289e02f26ca42669e0d6b4486c6cc6575ee36f50bbe0c96bf38a",
+    "source_bytes": 3318,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143579246
+  }
+}

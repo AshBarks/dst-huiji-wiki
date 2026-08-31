@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "pageid": 14461,
+  "title": "远古小合奏机",
+  "inputs": {
+    "wikitext_sha256": "97476f42478863fb1cde83e889751c5392fa837390cc64ae410cf52fdcae3b50",
+    "symbol_doc_shas": {
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141"
+    }
+  },
+  "symbols": {
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

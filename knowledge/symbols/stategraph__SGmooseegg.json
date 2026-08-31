@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmooseegg.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmooseegg",
+  "summary": "该状态图驱动骡子蛋(mooseegg)实体，管理其从着陆到孵化的生命周期状态。整体状态组织包括着陆、完整蛋状态、空巢状态、受击、破裂和孵化过程，通过动画、音效和游戏逻辑驱动玩法交互。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，仅管理骡子蛋的内部状态和动画逻辑。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [
+    "MOOSE_EGG_NUM_MOSSLINGS"
+  ],
+  "states": [
+    "land",
+    "idle_full",
+    "idle_empty",
+    "hit",
+    "crack",
+    "hatch"
+  ],
+  "state_notes": [
+    {
+      "state": "land",
+      "note": "蛋着陆时播放'lay'动画和音效，表示初始放置或移动到位置，触发后进入完整蛋状态。"
+    },
+    {
+      "state": "idle_full",
+      "note": "蛋处于完整状态，有闲置动画和随机生成的巢特效，玩家可交互（MakeWorkable），名字可能随机显示。"
+    },
+    {
+      "state": "idle_empty",
+      "note": "蛋孵化后的空巢状态，播放巢动画，不可工作，名字显示为巢，表示孵化完成。"
+    },
+    {
+      "state": "hit",
+      "note": "蛋被击中时播放受击动画和特效，然后自动返回完整状态，表示短暂硬直窗口。"
+    },
+    {
+      "state": "crack",
+      "note": "蛋开始破裂，播放破裂动画和音效；如果处于睡眠则直接孵化，否则触发后续孵化状态。"
+    },
+    {
+      "state": "hatch",
+      "note": "蛋孵化过程，播放动画和音效，生成多个小骡子(mossling)，最终进入空巢状态；孵化有延迟动画窗口。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70704,
+      17997,
+      15434,
+      15386,
+      13476,
+      18723,
+      24540,
+      15594
+    ],
+    "aspects": [
+      {
+        "aspect": "孵化过程描述",
+        "evidence": [
+          {
+            "pageid": 15594,
+            "quote": "蛋会在 2 天后自动孵化出 5 只[[麋鹿鹅幼崽]]"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "骡子蛋",
+    "孵化",
+    "破裂",
+    "小骡子",
+    "着陆",
+    "空闲",
+    "受击",
+    "巢",
+    "蛋",
+    "Herd"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "繁殖",
+    "自然"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9e8fc4ff6727f877df216f687f531b33449ad8158a1f7ad7b98161e1942b47ae",
+    "source_bytes": 4479,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139560669
+  }
+}

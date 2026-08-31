@@ -6,9 +6,13 @@
     "wikitext_sha256": "9c2dbfb6eaca36973cf22f94aac9758d94931d0759c510fab40539b29fe3cccd",
     "symbol_doc_shas": {
       "components/container.lua": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "components/cooker.lua": "6da76890dee84a843f72420a4e9ba15cb810d8d6f6791c2bba680476380a2c02",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heater.lua": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
+      "components/incinerator.lua": "3e408c60727a2b18cfa52d31f2b4c84ae9bdf0a73f1aef2fd9584821d84c61ba",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -31,6 +35,14 @@
         "semantic_consistent": true
       }
     },
+    "components/cooker.lua": {
+      "aspects_ignored": [
+        "烹饪操作步骤描述",
+        "烹饪锅的烹饪功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -39,6 +51,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/incinerator.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -64,6 +84,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/placer.lua": {
       "route": "direct",

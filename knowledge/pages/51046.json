@@ -3,20 +3,30 @@
   "pageid": 51046,
   "title": "战争瓦器人",
   "inputs": {
-    "wikitext_sha256": "63251ed12f419bec16b41756793e92accff5a86fb1b28f23d33d1916c96ba7eb",
+    "wikitext_sha256": "175f0a96b8bd526d551fdc2efa317444db64166aa8c553acfee3ce2e0d76b644",
     "symbol_doc_shas": {
       "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/wagboss_robotbrain.lua": "8c5a6f4f5206c9c01a019a6a136e7427a7e900ff941a731ccb99859aadf6e7e1",
+      "components/colouraddersync.lua": "cf08a17a6b9dd2322f2463b514de21512c2b4f36cc54e590ddd2fec0e534e566",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/commander.lua": "3aded4fd8f830889ee9600dfc0d82a4cdc1f559fc1ccee572f3def729f86e047",
+      "components/dpstracker.lua": "27577aec8d5033ac41094693e5d3039677b8336cb66e1f28077b6a1f5e45f2cd",
+      "components/epicscare.lua": "7f7320d22c417ee3ed36b4ca96831c6c1bd6879381e6c7a54c7b8bedae1fc406",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
+      "components/grouptargeter.lua": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthtrigger.lua": "3c64da771e8432f013164d37af0a50d1b38b9530ff95927c51b04a9878d38119",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwagboss_robot.lua": "24ca0a3000a9b840a11c65144f3539767e677e4b70d1b06231ea76de8e6acccc"
     }
   },
   "symbols": {
@@ -30,7 +40,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述“战争瓦器人”（Wagdrone），该实体在受影响变体列表中。但提供的证据文本（爆炸抗性、掉落物、生成机制）未提及与拴绳行为相关的游荡或返回描述。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -38,7 +51,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/wagboss_robotbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -97,6 +111,10 @@
       "route": "direct",
       "detail_level": "detailed"
     },
+    "components/colouraddersync.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -115,6 +133,44 @@
         "semantic_consistent": true
       }
     },
+    "components/commander.lua": {
+      "aspects_ignored": [
+        "处理沉睡状态",
+        "将目标共享给所有士兵"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/dpstracker.lua": {
+      "aspects_ignored": [
+        "控制台调试命令的DPS测试功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/epicscare.lua": {
+      "aspects_ignored": [
+        "咆哮产生巨兽恐慌效果的范围与持续时间描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/explosiveresist.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "爆炸抗性",
+        "semantic_consistent": true
+      }
+    },
+    "components/grouptargeter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/health.lua": {
       "aspects_ignored": [
         "单次承伤上限标注",
@@ -126,6 +182,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthtrigger.lua": {
+      "aspects_ignored": [
+        "生命值变化转移触发"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -173,6 +236,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "aspects_ignored": [
         "生成倒计时启动描述",
@@ -193,12 +264,60 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwagboss_robot.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "3 个",
+          "region_id": "51046:intro:1",
+          "matched": "stategraphs/SGwagboss_robot.lua: NUM_MISSILES=3"
+        },
+        {
+          "raw": "3 个",
+          "region_id": "51046:intro:1",
+          "matched": "stategraphs/SGwagboss_robot.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 个",
+          "region_id": "51046:section:1",
+          "matched": "stategraphs/SGwagboss_robot.lua: NUM_MISSILES=3"
+        },
+        {
+          "raw": "3 个",
+          "region_id": "51046:section:1",
+          "matched": "stategraphs/SGwagboss_robot.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "18 单位",
+          "region_id": "51046:section:2",
+          "matched": "stategraphs/SGwagboss_robot.lua: MISSILE_TARGET_RANGE=18"
+        },
+        {
+          "raw": "18 单位",
+          "region_id": "51046:section:2",
+          "matched": "stategraphs/SGwagboss_robot.lua: ORBITAL_STRIKE_TARGET_RANGE_SQ=18"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "51046:section:2",
+          "matched": "stategraphs/SGwagboss_robot.lua: NUM_MISSILES=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "51046:section:2",
+          "matched": "stategraphs/SGwagboss_robot.lua: AOE_RANGE_PADDING=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwalkingplank.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwalkingplank",
+  "summary": "该状态图驱动饥荒联机版中的行走木板（walkingplank）实体，用于管理木板的伸出、收回及交互状态。整体状态组织基于事件驱动转换，从初始收回状态开始，通过触发事件在伸出、收回、占用和弃船等状态间切换。状态图控制木板的可交互性和动画表现。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，所有行为由内部事件和状态转换驱动。",
+  "events_published": [],
+  "events_listened": [
+    "start_extending",
+    "start_retracting",
+    "start_mounting",
+    "start_abandoning",
+    "stop_mounting",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "retracted",
+    "retracting",
+    "extended",
+    "mounted",
+    "extending",
+    "abandon_ship"
+  ],
+  "state_notes": [
+    {
+      "state": "retracted",
+      "note": "木板处于收回状态，玩家可交互（添加'interactable'标签），触发'start_extending'事件时会伸出。"
+    },
+    {
+      "state": "extended",
+      "note": "木板伸出状态，玩家可交互，支持触发'start_mounting'上船或'start_abandoning'弃船事件。"
+    },
+    {
+      "state": "mounted",
+      "note": "木板被占用状态（如玩家在木板上），不可交互，触发'stop_mounting'事件后返回伸出状态。"
+    },
+    {
+      "state": "abandon_ship",
+      "note": "弃船状态，持续2秒超时后自动返回伸出状态，用于紧急离开船只。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18503,
+      16185,
+      24451,
+      18510,
+      18540,
+      65881,
+      20156,
+      34523
+    ],
+    "aspects": [
+      {
+        "aspect": "弃船操作描述",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "对跳板右键“弃船”并主动溺水。"
+          }
+        ]
+      },
+      {
+        "aspect": "跳板伸出与上船行为描述",
+        "evidence": [
+          {
+            "pageid": 24451,
+            "quote": "船上有一个跳板，玩家可以把它伸长并站上去，对跳板右键“弃船”并主动溺水。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "行走木板",
+    "码头",
+    "伸出",
+    "收回",
+    "交互",
+    "上下船",
+    "弃船",
+    "动画",
+    "状态图",
+    "船"
+  ],
+  "gameplay_tags": [
+    "运输",
+    "交互",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ba5ec5323967e8edd57664045a930025d92f3019cf27fd3f11fa2f43ba59f75b",
+    "source_bytes": 2794,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146480599
+  }
+}

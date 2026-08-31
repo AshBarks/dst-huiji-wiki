@@ -7,6 +7,7 @@
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/hudindicatable.lua": "a410d2f8ad63f114ce153f1044622baa15f0f1a0c739f6830a4e1a19041afc01",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
@@ -14,6 +15,7 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "stategraphs/SGwagstaff_npc.lua": "d9e094deddfff319a69cdd58c1c5793866b602ae3d96ae066d3f492c6244661e"
@@ -45,6 +47,22 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/hudindicatable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "HUD位置箭头指示",
+          "evidence": [
+            {
+              "pageid": 51494,
+              "quote": "装备星象护目镜时，若瓦格斯塔夫在附近，屏幕边缘会有瓦格斯塔夫的头像箭头指示他的位置。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -118,6 +136,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -142,7 +164,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "stategraphs/SGwagstaff_npc.lua": {
       "route": "direct",

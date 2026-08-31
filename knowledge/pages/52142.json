@@ -7,6 +7,7 @@
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/electricconnector.lua": "56ba99fb92fd689e55d7b2cbfd9981b63b2746bd8d54d4f73171b8b9cacda7d2",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
@@ -15,7 +16,8 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGfence_electric.lua": "ee1406233336a557cbb71b69a982479d33071e63186d7fbfd76780278cd8f97b"
     }
   },
   "symbols": {
@@ -42,7 +44,42 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/electricconnector.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "电场形成依赖连接",
+          "evidence": [
+            {
+              "pageid": 52142,
+              "quote": "连接的麻刺节点之间会形成麻刺电场"
+            }
+          ]
+        },
+        {
+          "aspect": "电气连接启动行为",
+          "evidence": [
+            {
+              "pageid": 52142,
+              "quote": "部署后可以对其左键“打开连接”"
+            }
+          ]
+        },
+        {
+          "aspect": "节点连接距离描述",
+          "evidence": [
+            {
+              "pageid": 52142,
+              "quote": "与 10 {{解释|距离单位}}内的其他麻刺节点连接"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/floater.lua": {
       "route": "direct",
@@ -127,7 +164,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGfence_electric.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

@@ -6,13 +6,17 @@
     "wikitext_sha256": "26db0cb2de2eb422354a8b0fa903f381c6b5ef699fc7774812343907bc3847cd",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/drawable.lua": "595bb8c4e84ecce6f5019e27cbf10b802e6ce2ea97b3c258a4f9e78b9bd35984",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "components/furnituredecor.lua": "8270c89c0d09a2795ab017ea2d0171eb553b0785ab155c5e9550439da504c292",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a"
+      "components/machine.lua": "98d3f3d5546fc76b1a04a21f2f740517198e9da8d7e7e46af574f0af0512123d",
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/vase.lua": "d54538cde6721beedd84eb74226d4cc4c513ef822412530f0532c8fe5996f6f1"
     }
   },
   "symbols": {
@@ -32,6 +36,19 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/drawable.lua": {
+      "aspects_ignored": [
+        "可自定义外观",
+        "外观变化效果",
+        "外观更换功能",
+        "外观类似描述",
+        "外观类型与生成",
+        "多种外观描述",
+        "月相外观变化机制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/floater.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -49,6 +66,22 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/furnituredecor.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "装饰物品放置功能",
+          "evidence": [
+            {
+              "pageid": 20438,
+              "quote": "装饰物品是用[[锯马]]解锁制造的可以放在[[桌子]]上的物品。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -93,11 +126,49 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/machine.lua": {
+      "aspects_ignored": [
+        "交互操作描述",
+        "冷却时间机制描述",
+        "激活状态变化描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/vase.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "花瓶中花朵的枯萎时间",
+          "evidence": [
+            {
+              "pageid": 20438,
+              "quote": "插荧光果和发光浆果会在 10 天后枯萎。"
+            }
+          ]
+        },
+        {
+          "aspect": "花瓶的装饰摆放",
+          "evidence": [
+            {
+              "pageid": 20438,
+              "quote": "可以通过鼠标左键来把它摆放到桌子上。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "花瓶中花朵的放置操作",
+        "花瓶的光照功能"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

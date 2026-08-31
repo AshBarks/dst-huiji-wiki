@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwagdrone_rolling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwagdrone_rolling",
+  "summary": "该状态图驱动饥荒联机版中的 'wagdrone_rolling' 实体，即一个滚动无人机。它管理无人机在移动模式和静止模式之间的行为切换，包括移动、攻击、受击、损坏、修复和变形等状态。状态组织基于事件驱动，通过事件处理器触发状态转换，并包含范围攻击和碰撞检测逻辑。",
+  "api": [],
+  "api_note": "该状态图通过事件处理驱动，没有直接暴露的 API 方法，所有行为由内部事件处理器管理。",
+  "events_published": [
+    "spinning_recoil"
+  ],
+  "events_listened": [
+    "locomote",
+    "attacked",
+    "minhealth",
+    "activate",
+    "deactivate",
+    "despawn",
+    "transform_to_stationary",
+    "transform_to_mobile",
+    "forced_spinning_recoil"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.WAGDRONE_ROLLING_REGEN_AMOUNT",
+    "TUNING.WAGDRONE_ROLLING_REGEN_PERIOD",
+    "TUNING.WAGDRONE_ROLLING_HARDARMOR_BOUNCE_CHANCE"
+  ],
+  "states": [
+    "idle",
+    "idle_wobble",
+    "wobble",
+    "hit",
+    "broken",
+    "broken_idle",
+    "repair",
+    "turnoff",
+    "off_idle",
+    "turnon",
+    "transform_to_stationary",
+    "run_start",
+    "run",
+    "run_stop",
+    "stationary_idle",
+    "stationary_hit",
+    "stationary_broken",
+    "stationary_broken_idle",
+    "stationary_repair",
+    "transform_to_mobile"
+  ],
+  "state_notes": [
+    {
+      "state": "hit",
+      "note": "受击状态，播放 hit1 动画，有短暂硬直（第8帧后可被中断），结束后进入 wobble 状态。"
+    },
+    {
+      "state": "broken",
+      "note": "损坏状态，无法攻击和被中断，关闭碰撞和大脑控制，之后进入 broken_idle 状态。"
+    },
+    {
+      "state": "broken_idle",
+      "note": "损坏后空闲状态，有生命恢复（TUNING.WAGDRONE_ROLLING_REGEN_AMOUNT），修复满血后进入 repair 状态。"
+    },
+    {
+      "state": "repair",
+      "note": "修复状态，播放 repair1 动画，完成后恢复为 wobble 状态，无人机开始自我修复。"
+    },
+    {
+      "state": "run",
+      "note": "移动攻击状态，执行范围攻击 DoSpinningAOE，对周围实体造成工作或伤害，有速度减慢和反冲机制。"
+    },
+    {
+      "state": "transform_to_stationary",
+      "note": "从移动变形为静止状态，改变阴影大小和物理质量，添加 stationary 标签并连接光束。"
+    },
+    {
+      "state": "stationary_idle",
+      "note": "静止模式空闲状态，播放 idle2 动画，连接光束，可被事件触发变形回移动模式。"
+    },
+    {
+      "state": "stationary_hit",
+      "note": "静止模式受击状态，播放 hit2 动画，有硬直后恢复连接光束，结束后回到 stationary_idle。"
+    },
+    {
+      "state": "off_idle",
+      "note": "关闭状态，实体关闭，无法攻击，碰撞和大脑控制关闭，可被工作（如锤击），LED 灯关闭。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      15022,
+      13897,
+      13828,
+      15651,
+      15551,
+      15922,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未出现与stategraph__SGwagdrone_rolling相关的实体或行为描述，所有页面讨论的是其他巨兽或怪物（如战争瓦器人、天体英雄、克劳斯等），未涉及清单中的任何状态或能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "无人机",
+    "滚动",
+    "攻击",
+    "变形",
+    "静止",
+    "修复",
+    "损坏",
+    "关闭",
+    "范围伤害",
+    "光束"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "机械"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "478976eb444dc25e1d8a907ddcb1658f064bf624f0da58e182478253cde12f65",
+    "source_bytes": 39773,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142214568
+  }
+}

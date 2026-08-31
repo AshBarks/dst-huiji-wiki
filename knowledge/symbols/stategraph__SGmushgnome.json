@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmushgnome.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmushgnome",
+  "summary": "该状态图驱动饥荒联机版中的蘑菇侏儒（mushgnome）实体，一种洞穴生物。状态组织包括基础状态如死亡、树、恐慌，以及攻击序列（前摇、攻击、后摇）、受击、生成，并通过通用处理器添加行走、空闲、冻结、电击、睡眠等状态。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，所有行为由状态图内部事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "step",
+    "freeze",
+    "electrocute",
+    "death",
+    "sleep",
+    "wake",
+    "attacked",
+    "doattack",
+    "spawn",
+    "locomote",
+    "voidfall"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "death",
+    "tree",
+    "panic",
+    "flaunt",
+    "attack_pre",
+    "attack",
+    "attack_pst",
+    "hit",
+    "spawn"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "当生命值耗尽时进入，播放死亡动画并掉落战利品，身体倒下有音效，同时停止周期性生成器。"
+    },
+    {
+      "state": "panic",
+      "note": "在燃烧时触发，播放恐慌动画，进入忙碌状态；当不再燃烧且状态持续超过0.3秒后，返回空闲状态。"
+    },
+    {
+      "state": "flaunt",
+      "note": "当有目标且移动时触发，播放炫耀动画和音效，完成后开始行走，用于攻击前的威吓。"
+    },
+    {
+      "state": "attack_pre",
+      "note": "攻击前摇状态，停止移动，播放准备动画和音效，标签包含攻击和忙碌，之后自动进入攻击状态。"
+    },
+    {
+      "state": "attack",
+      "note": "主要攻击状态，持续约2-2.5秒，向随机方向发射12个孢子，期间有旋转音效和攻击开始调用，结束后进入后摇。"
+    },
+    {
+      "state": "attack_pst",
+      "note": "攻击后摇状态，播放收尾动画和音效，完成后返回空闲状态，标签包含攻击和忙碌。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，停止移动，播放受击动画和音效，更新受击恢复延迟，标签包含受击和忙碌，完成后返回空闲。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成状态，播放生成动画，期间有无敌标签（noattack、noelectrocute），在动画中段移除无敌，完成后返回空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15677,
+      13606,
+      15022,
+      24748,
+      13701,
+      15783,
+      16419
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面 15677 描述了蘑菇地精的生成条件和基本行为（如产生孢子、防御攻击），但未具体提及代码能力清单中的任何状态（如死亡动画、恐慌状态、炫耀动画、攻击状态序列等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蘑菇怪",
+    "mushgnome",
+    "攻击动画",
+    "死亡动画",
+    "恐慌状态",
+    "受击硬直",
+    "生成动画",
+    "树伪装",
+    "洞穴生物"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生成",
+    "攻击"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "73224a64c1a1749a4dba9ff46ce0bcbd9d849875af8c004752ded8032e89d556",
+    "source_bytes": 11703,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139742277
+  }
+}

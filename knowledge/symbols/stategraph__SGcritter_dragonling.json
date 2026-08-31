@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_dragonling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_dragonling",
+  "summary": "该状态图驱动饥荒联机版中的龙蝇幼崽（dragonling）实体。状态图通过常见状态函数组织，包括闲置、随机表情、战斗表情、进食、饥饿、亲昵、行走、抚摸表情和睡眠等状态。整体处理飞行效果，如着陆和起飞，并响应进食、避免战斗和特质改变事件。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，所有行为由状态和事件驱动，通过状态机内部逻辑处理。",
+  "events_published": [],
+  "events_listened": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "emote_random",
+    "emote_cute",
+    "combat_emote",
+    "play_with_other_critter",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "pet_emote",
+    "sleep"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础闲置状态，龙蝇幼崽在无其他行为时停留，会随机触发表情动画。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，宠物播放咀嚼音效，表示正在消耗食物，持续到进食完成。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，宠物停止飞行并着陆，播放睡眠音效，直到被唤醒时恢复飞行。"
+    },
+    {
+      "state": "combat_emote",
+      "note": "战斗表情状态，播放战斗音效，可能表示宠物处于攻击或警戒状态，但无直接攻击行为。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿状态，播放愤怒音效，提示宠物需要喂食，否则可能影响行为。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "亲昵状态，播放亲昵音效，表示宠物与玩家互动，增加友好度。"
+    },
+    {
+      "state": "pet_emote",
+      "note": "抚摸表情状态，宠物被抚摸时着陆并播放声音，短暂停留后恢复飞行。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13409,
+      13456,
+      15975,
+      34037,
+      13156,
+      13437,
+      13455
+    ],
+    "aspects": [
+      {
+        "aspect": "饥饿状态行为描述",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物在低保质期时会进入饥饿状态，饥饿状态下的宠物会发出叫声并表现相应的动画"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "龙蝇幼崽",
+    "宠物",
+    "飞行",
+    "进食",
+    "睡眠",
+    "表情",
+    "战斗",
+    "亲昵",
+    "饥饿",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "表情",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4ae2ff4594c381dfa051212034b1d174992ea021702bb17ca3ebb51baf4d4e4e",
+    "source_bytes": 8472,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144357208
+  }
+}

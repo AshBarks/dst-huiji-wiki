@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgnarwail.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgnarwail",
+  "summary": "该状态图驱动饥荒联机版中的gnarwail（尖牙鲸）实体。它管理gnarwail的多种行为状态，包括待机、移动、攻击船只、身体冲击、进食和死亡等。状态组织基于事件触发和条件转换，以适应战斗、生存和海洋环境中的游戏玩法。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图通过事件处理器和组件交互驱动gnarwail行为，无需直接调用。",
+  "events_published": [],
+  "events_listened": [
+    "onfedbyplayer",
+    "doattack",
+    "locomote",
+    "attacked",
+    "freeze",
+    "electrocute",
+    "death",
+    "sleep",
+    "wake",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "GNARWAIL.TARGET_DISTANCE",
+    "MAX_WALKABLE_PLATFORM_RADIUS",
+    "GNARWAIL.BODY_SLAM_ATTACK_DISTANCESQ",
+    "GNARWAIL.BOAT_ATTACK_DELAY",
+    "GNARWAIL.DAMAGE",
+    "GNARWAIL.HORN_BOAT_DAMAGE",
+    "GNARWAIL.DIVE_SPEED",
+    "GNARWAIL.WALK_SPEED"
+  ],
+  "states": [
+    "idle",
+    "emerge",
+    "headbang_idle",
+    "headbang",
+    "death",
+    "boat_attack",
+    "finish_boat_attack",
+    "body_slam_pre",
+    "body_slam",
+    "eat",
+    "chewing",
+    "refuse",
+    "toss_pre",
+    "toss",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "fin_taunt",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "boat_attack",
+      "note": "gnarwail攻击船只时进入。潜入水中后延迟突刺目标船体，对船和乘客造成伤害，触发条件为目标在船上且距离足够。"
+    },
+    {
+      "state": "body_slam",
+      "note": "执行身体冲击攻击。潜入水中后快速冲向目标位置，造成范围伤害并生成水浪，用于攻击陆地或水上目标。"
+    },
+    {
+      "state": "eat",
+      "note": "玩家喂食gnarwail时进入。播放咀嚼动画，执行进食动作，可能影响其友好度或行为。"
+    },
+    {
+      "state": "death",
+      "note": "生命值为零时触发。播放死亡动画，移除物理碰撞，掉落战利品如鱼或角。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时进入，产生短暂硬直和击退动画，期间可能无法执行其他动作。"
+    },
+    {
+      "state": "emerge",
+      "note": "从水中出现的状态，带有无敌帧（noattack标签）和攻击取消窗口，用于安全返回水面。"
+    },
+    {
+      "state": "run",
+      "note": "快速移动状态，当gnarwail奔跑时使用，若目标距离远会触发身体冲击以接近。"
+    },
+    {
+      "state": "body_slam_pre",
+      "note": "身体冲击的准备阶段，潜入水中并调整位置，延迟后跳转到冲击状态，用于攻击准备。"
+    },
+    {
+      "state": "finish_boat_attack",
+      "note": "完成船只攻击，生成角攻击物并造成伤害，移除gnarwail实体。"
+    },
+    {
+      "state": "toss",
+      "note": "抛掷目标状态，若目标在海上则执行抛掷动作，可能将物体或生物扔出。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      15539,
+      13156,
+      10374,
+      20150,
+      20058,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及 gnarwail 实体，因此无法找到其代码能力/行为语义清单中描述的任何玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "尖牙鲸",
+    "gnarwail",
+    "攻击船只",
+    "身体冲击",
+    "进食",
+    "死亡",
+    "移动",
+    "海洋生物",
+    "碰撞",
+    "伤害"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d96919044e657877720d772496a64b5520635ee2cd458a252828b3578557f24a",
+    "source_bytes": 30545,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138074632
+  }
+}

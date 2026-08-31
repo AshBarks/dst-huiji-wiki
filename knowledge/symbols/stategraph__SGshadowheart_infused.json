@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowheart_infused.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowheart_infused",
+  "summary": "该状态图驱动一个名为“影之心注入”（shadowheart_infused）的实体，可能指受影之心影响的生物或物品。状态图组织了从跳跃移动（hop）到闲置（idle）的过渡，包括被击晕（stunned）和被困住（trapped）的状态，并处理了下沉和被冲上岸的事件。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，所有状态转换通过事件和状态管理处理。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "trapped",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "hop",
+    "stunned",
+    "trapped",
+    "idle",
+    "hop_pst",
+    "sink",
+    "fallinvoid",
+    "washashore"
+  ],
+  "state_notes": [
+    {
+      "state": "hop",
+      "note": "实体通过跳跃动画移动，在动画帧中前进并播放声音，循环直至停止移动。"
+    },
+    {
+      "state": "stunned",
+      "note": "实体被击晕，停止移动，播放循环动画约2-4秒，期间可被拾起。"
+    },
+    {
+      "state": "trapped",
+      "note": "实体被困住，类似击晕但仅持续1秒，由陷阱事件触发。"
+    },
+    {
+      "state": "idle",
+      "note": "实体闲置，播放闲置动画，可响应旋转指令。"
+    },
+    {
+      "state": "washashore",
+      "note": "实体从水中被冲上岸时进入此状态，表现为击晕效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      15022,
+      22181,
+      34037,
+      13406,
+      51287,
+      14816,
+      14929
+    ],
+    "aspects": [
+      {
+        "aspect": "闲置状态动画描述",
+        "evidence": [
+          {
+            "pageid": 14816,
+            "quote": "当处于闲置状态时，播放插旗动画。"
+          },
+          {
+            "pageid": 14929,
+            "quote": "当处于闲置状态时，播放防御动画。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "影之心",
+    "注入",
+    "跳跃",
+    "移动",
+    "击晕",
+    "被困",
+    "闲置",
+    "冲岸",
+    "下沉",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "生存",
+    "状态图"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d7e32ba18267a9c1d7d310f5d3ac79f79fdc634e0edaee5560077a28f075e7f0",
+    "source_bytes": 3045,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140581707
+  }
+}

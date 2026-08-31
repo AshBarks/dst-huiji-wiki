@@ -9,13 +9,16 @@
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/groundpounder.lua": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/maprevealable.lua": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGminotaur.lua": "c3526a5495b13345f551ed8b385f2c597ce7c193694e1f3dd23b83027f9fbddc"
     }
   },
   "symbols": {
@@ -76,6 +79,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/groundpounder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/health.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -133,6 +140,15 @@
         "semantic_consistent": true
       }
     },
+    "components/maprevealable.lua": {
+      "aspects_ignored": [
+        "全局地图图标设置",
+        "放置物品标记地图位置",
+        "生物刷新点地图标识"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -157,6 +173,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGminotaur.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

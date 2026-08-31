@@ -5,23 +5,51 @@
   "inputs": {
     "wikitext_sha256": "fe2d56cc9269b8bca1fab2551da99d6df36a33e1565d0cc23ed36e87f48778e8",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
+      "components/cattoy.lua": "2fa3ad4983b0b47f7c17b8a6955fdc967a8c4c559998d8b340eb49fe0a00176c",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "components/fader.lua": "f89e28d9dea0c2d6064445a15d9f2f6f180dbd2418838c5fbda34911a14ef778",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/maprevealable.lua": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwx78_scanner.lua": "373d3045a52aa2338a8215d2d653d9bc5b3b27c10fb4ec2b57b7804fb84f51bf"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
+    "components/cattoy.lua": {
+      "aspects_ignored": [
+        "猫玩具被触发时的动画播放行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/entitytracker.lua": {
       "aspects_ignored": [
         "追踪实体行为描述",
         "遗忘实体行为描述"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/fader.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -69,6 +97,15 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/maprevealable.lua": {
+      "aspects_ignored": [
+        "全局地图图标设置",
+        "放置物品标记地图位置",
+        "生物刷新点地图标识"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -93,6 +130,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwx78_scanner.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

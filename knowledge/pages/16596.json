@@ -5,6 +5,8 @@
   "inputs": {
     "wikitext_sha256": "3c91f1c9841bc5f336c5eab44e5ade25a69ea9c36631479debef8e5b4caf79af",
     "symbol_doc_shas": {
+      "components/anchor.lua": "db9e3d3178bbf9a83182b4242b1773d83b2c0dbacacfd0eb980e3b7583cf72cb",
+      "components/boatdrag.lua": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -16,6 +18,44 @@
     }
   },
   "symbols": {
+    "components/anchor.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "深度对锚操作时间的影响",
+          "evidence": [
+            {
+              "pageid": 16596,
+              "quote": "在不同深度的[[水面地块]]上，起锚和下锚所需的时间不同"
+            }
+          ]
+        },
+        {
+          "aspect": "起锚下锚时间数值",
+          "evidence": [
+            {
+              "pageid": 16596,
+              "quote": "起锚的时间为 2 秒，下锚 0.66 秒。"
+            }
+          ]
+        },
+        {
+          "aspect": "锚的减速效果",
+          "evidence": [
+            {
+              "pageid": 16596,
+              "quote": "建在漂浮平台上的锚可以为抛锚以使其大幅减速。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/boatdrag.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",

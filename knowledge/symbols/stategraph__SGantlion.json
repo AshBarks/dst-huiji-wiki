@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGantlion.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGantlion",
+  "summary": "该状态图驱动蚂蚁狮实体，管理其从待机到交互的多种行为。整体状态组织基于玩家贡品交互和愤怒等级，通过事件触发状态转换，涵盖喂食、战斗准备、进入/离开世界以及制造天坑攻击等流程。",
+  "api": [],
+  "api_note": "该状态图专注于蚂蚁狮的内部行为逻辑，没有定义或暴露可供外部调用的API方法。",
+  "events_published": [],
+  "events_listened": [
+    "onacceptfighttribute",
+    "onaccepttribute",
+    "onrefusetribute",
+    "antlion_leaveworld",
+    "onsinkholesstarted",
+    "onsinkholesfinished"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_unhappy",
+    "rocktribute",
+    "hightributeresponse",
+    "refusetribute",
+    "trinkettribute",
+    "fighttribute",
+    "enterworld",
+    "leaveworld",
+    "sinkhole_pre",
+    "sinkhole_loop",
+    "sinkhole_pst",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_unhappy",
+      "note": "当蚂蚁狮愤怒等级高时进入此待机状态，播放咆哮动画并发出不满声音，表示对当前环境不满。"
+    },
+    {
+      "state": "rocktribute",
+      "note": "玩家给予岩石贡品时触发，蚂蚁狮播放进食动画，持续约85帧，期间无敌，完成后根据愤怒等级决定进入满足或返回待机。"
+    },
+    {
+      "state": "hightributeresponse",
+      "note": "愤怒等级较低时，给予足够贡品后进入此状态，播放满足动画并发出愉悦声音，提升蚂蚁狮好感度。"
+    },
+    {
+      "state": "refusetribute",
+      "note": "当玩家给予不满意的贡品时触发，蚂蚁狮播放不悦动画，持续约48帧后解除忙碌状态，表示拒绝贡品。"
+    },
+    {
+      "state": "trinkettribute",
+      "note": "玩家给予护身符贡品时触发，蚂蚁狮播放进食和吐出动画，约80帧后给予奖励（如玩具），期间无敌且不可冻结。"
+    },
+    {
+      "state": "fighttribute",
+      "note": "玩家给予战斗贡品时触发，蚂蚁狮播放进食动画后立即苏醒并解除冻结，开始攻击目标玩家。"
+    },
+    {
+      "state": "enterworld",
+      "note": "蚂蚁狮从地下进入世界时触发，播放出现动画并破坏周围可工作物体，推开物品，期间无敌且不可移动。"
+    },
+    {
+      "state": "leaveworld",
+      "note": "蚂蚁狮返回地下时触发，播放消失动画，约35帧后禁用物理碰撞并移除实体，期间无敌。"
+    },
+    {
+      "state": "sinkhole_pre",
+      "note": "蚂蚁狮开始制造天坑攻击时触发，播放施法前动画，伴随音效和屏幕震动，约32帧后进入循环攻击。"
+    },
+    {
+      "state": "sinkhole_loop",
+      "note": "蚂蚁狮持续制造天坑时触发，循环播放攻击动画并间歇性震动屏幕，直到攻击结束。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      18359,
+      13602,
+      15601,
+      15238,
+      13606,
+      15055,
+      18219
+    ],
+    "aspects": [
+      {
+        "aspect": "玩具贡品效果描述",
+        "evidence": [
+          {
+            "pageid": 18359,
+            "quote": "给予[[蚁狮]]能减缓蚁狮愤怒 0.66 天，同时换来 1 个[[沙之石]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "返回地下行为描述",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "当[[世界湿度]]大于 0 时，蚁狮会缩回地下"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蚂蚁狮",
+    "贡品",
+    "岩石",
+    "护身符",
+    "天坑",
+    "愤怒",
+    "战斗",
+    "进入世界",
+    "离开世界",
+    "喂食"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "贡品系统",
+    "环境破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9a0e1fd3fbfde157f920f783b4958c2984e4062a029c191aca3751985e73674f",
+    "source_bytes": 19866,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135491206
+  }
+}

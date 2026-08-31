@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmoonspore.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmoonspore",
+  "summary": "该状态图驱动‘月蘑菇孢子’实体，控制其从起飞到空闲的飞行循环，以及预爆和爆开的生命周期。状态组织包括初始起飞、空闲等待、预爆准备和最终爆开，通过事件触发延迟或立即行为。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图仅处理内部状态转换和事件。",
+  "events_published": [
+    "popped"
+  ],
+  "events_listened": [
+    "pop",
+    "preparedpop"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "pre_pop",
+    "pop",
+    "idle",
+    "takeoff"
+  ],
+  "state_notes": [
+    {
+      "state": "pre_pop",
+      "note": "当孢子收到‘preparedpop’事件时进入此状态，播放‘rumble’动画26帧后自动进入爆开状态，是一个短暂的准备阶段。"
+    },
+    {
+      "state": "pop",
+      "note": "爆开状态，播放爆炸动画，在第4帧关闭灯光和阴影并触发‘popped’事件，动画结束后移除实体。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，循环播放飞行等待动画，超时后重新进入空闲，孢子可旋转。"
+    },
+    {
+      "state": "takeoff",
+      "note": "起飞状态，播放‘cough_out’动画，在第14帧启用灯光、阴影并播放降落音效，然后进入空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及孢子实体或其相关能力（pre_pop、pop、idle、takeoff），所有页面内容均涉及熔炉模式中其他生物（如鳄鱼指挥官、酸蚀蝎等）的沉睡状态、动画时间、触发距离等行为描述，与孢子的状态图无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月蘑菇孢子",
+    "爆开",
+    "飞行",
+    "起飞",
+    "状态图",
+    "SGmoonspore",
+    "孢子行为",
+    "动画",
+    "事件触发"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "生物行为"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c3358544e562968391a5564d4aa7fd4f7d10f8cee5b3b1104653bedbcfb6f896",
+    "source_bytes": 2324,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139437058
+  }
+}

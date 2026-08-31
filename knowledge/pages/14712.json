@@ -6,6 +6,7 @@
     "wikitext_sha256": "858bab1c3f4f0f05a0180862164de048f92dda47a7e7bdf3ebb0af414d148242",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/harvestable.lua": "af98716bcc699861045b9ffd665161e68965122ed3063765b4bb44a37e7bae99",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
@@ -31,6 +32,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/harvestable.lua": {
+      "aspects_ignored": [
+        "收获时机控制",
+        "收获概率机制",
+        "收获速度提升",
+        "枯萎状态禁用",
+        "生长阶段描述",
+        "魔法催熟效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -81,7 +94,11 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述蘑菇农场成长周期，与交易无关。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

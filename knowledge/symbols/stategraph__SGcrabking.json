@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcrabking.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcrabking",
+  "summary": "该状态图驱动饥荒联机版中的螃蟹王（Crabking）实体，管理其战斗、治疗和召唤行为。整体状态组织以默认的 idle 和 inert 状态为核心，通过事件触发转换到嘲讽、施法、修复和召唤等状态，支持玩家交互和战斗阶段变化。",
+  "api": [],
+  "api_note": "该状态图未定义对外 API 方法，所有函数均为内部实现或事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "activate",
+    "ck_taunt",
+    "socket",
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CRABKING_REGEN",
+    "CRABKING_REGEN_BUFF",
+    "CRABKING_CAST_TIME_FREEZE",
+    "CRABKING_STACK_SUMMON_DELAY"
+  ],
+  "states": [
+    "idle",
+    "taunt",
+    "taunt_loop",
+    "taunt_pst",
+    "inert",
+    "inert_blink",
+    "inert_pst",
+    "disappear",
+    "reappear",
+    "socket",
+    "cast_pre",
+    "cast_loop",
+    "cast_pst",
+    "spawnclaws",
+    "spawnstacks",
+    "fix_pre",
+    "fix_loop",
+    "fix_lostrock",
+    "fix_pst",
+    "hit_light"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "螃蟹王的默认状态，会检查并转换到嘲讽、施法或修复等状态；受击时可能转为轻度受击状态。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，螃蟹王进行挑衅动作，可能吸引玩家注意或触发特定事件；循环播放嘲讽动画直到计时结束。"
+    },
+    {
+      "state": "cast_loop",
+      "note": "施法循环状态，螃蟹王施展冰冻法术，产生波浪攻击并推开附近船只；持续直到附近无船只或计时结束。"
+    },
+    {
+      "state": "fix_loop",
+      "note": "修复循环状态，螃蟹王持续治疗自身并可能失去岩石；在特定动画帧内受击会触发失去岩石机制。"
+    },
+    {
+      "state": "spawnclaws",
+      "note": "召唤钳子状态，螃蟹王召唤钳子手臂进行攻击；播放动画后生成钳子实体。"
+    },
+    {
+      "state": "spawnstacks",
+      "note": "召唤海堆状态，螃蟹王召唤海堆作为障碍物；有冷却时间限制连续召唤。"
+    },
+    {
+      "state": "hit_light",
+      "note": "轻度受击状态，螃蟹王受击后播放短暂受击动画，无硬直效果；通常快速返回 idle 状态。"
+    },
+    {
+      "state": "inert",
+      "note": "休眠状态，螃蟹王处于不活跃状态，无法攻击；可能随机转为闪烁状态或被激活。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13606,
+      23924,
+      13260,
+      19954,
+      24027,
+      15922,
+      15965,
+      18502
+    ],
+    "aspects": [
+      {
+        "aspect": "施法攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 23924,
+            "quote": "帝王蟹每隔 25 秒会召唤数个喷泉对附近 25 个单位范围内所有的"
+          }
+        ]
+      },
+      {
+        "aspect": "沉睡形态描述",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "玩家可以给沉睡形态的帝王蟹嵌入 9 颗{{tooltip|宝石|包括[[红宝石]]、[[蓝宝石]]、[[紫宝石]]、[[橙宝石]]、[[黄宝石]]、[[绿宝石]]和[[彩虹宝石]]}}或[[珍珠的珍珠]]来唤醒他。"
+          },
+          {
+            "pageid": 23924,
+            "quote": "它可以在[[海洋]]里以沉睡形态被找到"
+          }
+        ]
+      },
+      {
+        "aspect": "自我治疗行为描述",
+        "evidence": [
+          {
+            "pageid": 13606,
+            "quote": "当帝王蟹的生命值低于 10800 后，每损失 1500 生命值或全部巨钳被杀死，帝王蟹就会{{tooltip|开始尝试治疗自己|巨钳全部死亡的12秒后开始治疗。"
+          },
+          {
+            "pageid": 23924,
+            "quote": "当帝王蟹的生命值低于85%时，他每40秒会开拾起掉落的岩石来修复自己的外壳，恢复生命值，每次修复会持续10秒"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "螃蟹王",
+    "Crabking",
+    "冰冻法术",
+    "治疗",
+    "召唤钳子",
+    "海堆",
+    "休眠",
+    "嘲讽",
+    "修复"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss",
+    "治疗",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d7aafbd27fd477566fffb14df81976239c2534295672dd48bc22ef9d7210a17f",
+    "source_bytes": 29716,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137025947
+  }
+}

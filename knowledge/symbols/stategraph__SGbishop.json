@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbishop.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbishop",
+  "summary": "该状态图驱动‘主教’这一远古守卫敌人。整体状态组织围绕其攻击模式（蓄力瞄准、发射激光）、受击硬直与特殊眩晕机制（可被手杖吸收）展开，并通过状态标签控制移动与交互能力。",
+  "api": [],
+  "api_note": "源码中未定义任何对外暴露的方法（如通过 inst.xxx 调用的函数）。",
+  "events_published": [],
+  "events_listened": [
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "taunt",
+    "ruinsrespawn",
+    "hit",
+    "attack",
+    "attack_shoot",
+    "stun_pre",
+    "shock_to_stun",
+    "stun_loop",
+    "stun_hit",
+    "stun_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "主教的待机状态，可以旋转面朝。播放‘idle_loop’动画，是其他状态结束后回归的默认状态。"
+    },
+    {
+      "state": "taunt",
+      "note": "主教的挑衅/战吼状态，会面对当前目标。持续一段时间（约39帧后解除‘busy’），通常发生在被激怒或发起攻击前。"
+    },
+    {
+      "state": "hit",
+      "note": "主教受击后的硬直状态。持续约8帧，期间有短暂的无敌或不可被打断时间。若在此状态中接到攻击指令，会取消硬直并转入攻击状态。"
+    },
+    {
+      "state": "attack",
+      "note": "主教的攻击蓄力阶段。会生成并追踪一个目标光圈（bishop_targeting_fx），持续约1秒（SetTimeout(1)）。期间主教头部会发光，蓄力结束后自动进入‘attack_shoot’状态发射激光。"
+    },
+    {
+      "state": "attack_shoot",
+      "note": "主教发射激光（bishop_charge2_fx）的实际伤害阶段。激光在动画第1帧生成，发射后主教有一个短暂的后摇（约12帧后可被中断），随后恢复可行动状态。"
+    },
+    {
+      "state": "stun_pre",
+      "note": "主教进入眩晕状态的初始阶段（如被薇薇安的恐惧或其他强力控制命中）。会播放倒地动画，此时主教短暂免疫电击，并可被手杖敲击以吸收为友方。"
+    },
+    {
+      "state": "shock_to_stun",
+      "note": "主教在眩晕过程中受到电击，会转入此状态。表现为被电后重新进入眩晕倒地状态，而非直接解除眩晕。"
+    },
+    {
+      "state": "stun_loop",
+      "note": "主教的眩晕持续阶段。在此状态下，主教倒地不动，会周期性地增加‘stunhits’计数（每12帧）。这是玩家用暗影手杖将其吸收为友方单位的主要时机。"
+    },
+    {
+      "state": "stun_hit",
+      "note": "处于眩晕中的主教再次受到攻击。会播放受击动画并增加‘stunhits’计数。当计数达到4次时，会提前结束眩晕（转到‘stun_pst’），否则回到‘stun_loop’。"
+    },
+    {
+      "state": "stun_pst",
+      "note": "主教从眩晕中恢复的过渡状态。动画结束后主教重新站起，清除眩晕标签并恢复行动。若眩晕未被打断足够次数（stunhits < 4），此状态中仍有短暂可中断窗口。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13421,
+      15922,
+      15022,
+      13828,
+      15832,
+      20058,
+      16622,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要涉及实体介绍、掉落物品或通用机制，未描述主教的待机、攻击、受击、眩晕等状态行为或能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "主教",
+    "远古守卫",
+    "激光",
+    "眩晕",
+    "手杖",
+    "吸收",
+    "无敌帧",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌对生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a57cd87433884c366f96e81df96052d6087dc430f70d906d8a3a4bae1a471391",
+    "source_bytes": 20809,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135987475
+  }
+}

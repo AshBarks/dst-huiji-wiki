@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGticoon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGticoon",
+  "summary": "该状态图驱动饥荒联机版中的蒂库恩(ticoon)实体，一种类似猫的生物。整体状态组织方式以空闲(idle)为基础，通过事件和条件触发行走、搜索、等待、攻击、死亡等状态。状态图使用通用处理器处理睡眠、冻结、电击等常见行为，并定义了特定于蒂库恩的交互状态如嘶吼和快乐完成。",
+  "api": [],
+  "api_note": "该状态图没有定义对外公共方法，所有行为由内部状态转换和事件处理器驱动。",
+  "events_published": [],
+  "events_listened": [
+    "ticoon_getattention",
+    "ticoon_abandoned",
+    "ticoon_kitcoonfound",
+    "oneat"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "searching",
+    "annoyed",
+    "waiting",
+    "waiting_loop",
+    "happy_done",
+    "hiss",
+    "despawn",
+    "despawn_loop",
+    "eat"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蒂库恩未执行任务时进入此状态，播放空闲动画并可能延迟消失。如果 persist 为 false 且无战斗目标，会直接进入消失状态。"
+    },
+    {
+      "state": "searching",
+      "note": "当蒂库恩追踪目标时进入，播放搜索动画并触发音效。动画结束后可能触发玩家对话消息，然后返回空闲状态。"
+    },
+    {
+      "state": "waiting",
+      "note": "蒂库恩等待玩家时进入，播放跟随前动画并设置为六面方向。动画结束后转入等待循环状态，期间玩家可能收到等待提示。"
+    },
+    {
+      "state": "waiting_loop",
+      "note": "蒂库恩持续等待玩家的循环状态，播放跟随循环动画。每隔一段时间玩家会说等待语音，直到玩家离开或任务变化。"
+    },
+    {
+      "state": "happy_done",
+      "note": "蒂库恩成功找到目标后进入，播放快乐动画序列，表示任务完成。动画结束后返回空闲状态并延迟消失。"
+    },
+    {
+      "state": "hiss",
+      "note": "当蒂库恩需要吸引注意或警告时进入，播放嘶吼动画序列。由特定事件如获取注意或被抛弃触发，动画后返回空闲。"
+    },
+    {
+      "state": "eat",
+      "note": "蒂库恩吃东西时进入，播放吃动画并播放拾取音效。动画结束后返回空闲状态。"
+    },
+    {
+      "state": "despawn",
+      "note": "蒂库恩消失时进入，播放睡眠前动画并设置 persist 为 false，使其不再保存。动画后转入消失循环状态。"
+    },
+    {
+      "state": "annoyed",
+      "note": "蒂库恩被激怒时进入，播放跟随愤怒动画。动画中玩家会说获取注意的语音，之后返回空闲状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15415,
+      13897,
+      15651,
+      51046,
+      15551,
+      15225,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中均未提及'蒂库恩'或其相关状态（如idle、searching等），所有页面讨论的是其他实体（如天体英雄、鱼人、克劳斯等）的能力，与蒂库恩无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蒂库恩",
+    "ticoon",
+    "追随",
+    "寻找",
+    "嘶吼",
+    "攻击",
+    "死亡",
+    "睡眠",
+    "消失",
+    "等待"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3b20a7fd0ad9c8ca6248912d2a74248c63c5657aa6444f0146150a5322be0ec9",
+    "source_bytes": 12784,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141832944
+  }
+}

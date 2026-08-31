@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGkrampus.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGkrampus",
+  "summary": "该状态图驱动饥荒联机版中的Krampus（查理怪）实体。整体状态组织采用StateGraph系统，定义了闲置、攻击、破坏、受击、挑衅、死亡、退出和偷窃等核心状态，处理日常行为、战斗交互、偷窃动作及特殊事件响应。",
+  "api": [],
+  "api_note": "该状态图没有定义额外的对外方法，行为完全通过事件监听、状态转换和内部逻辑控制。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "hammer",
+    "hit",
+    "taunt",
+    "death",
+    "exit",
+    "steal"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "Krampus闲置时播放随机咆哮声，有33%几率触发；动画循环中可能随机进入挑衅状态。"
+    },
+    {
+      "state": "attack",
+      "note": "Krampus执行攻击动作，在动画第18帧对目标造成伤害，有预备动画和踢击音效，攻击后返回闲置。"
+    },
+    {
+      "state": "hammer",
+      "note": "Krampus执行破坏动作，用于锤击行为（如破坏设施），播放攻击音效，动画与攻击类似。"
+    },
+    {
+      "state": "hit",
+      "note": "Krampus被击中后进入硬直状态，播放受伤动画，更新受击恢复延迟，之后返回闲置。"
+    },
+    {
+      "state": "taunt",
+      "note": "Krampus播放挑衅动画和声音，通常在闲置时随机触发，可能吸引玩家注意。"
+    },
+    {
+      "state": "death",
+      "note": "Krampus死亡时播放死亡动画，掉落战利品，移除物理碰撞，处理尸体交互。"
+    },
+    {
+      "state": "exit",
+      "note": "Krampus进入退出状态后变为无敌，播放消失动画，停止脑部活动，最终被移除，常关联偷窃后离开。"
+    },
+    {
+      "state": "steal",
+      "note": "Krampus执行偷窃动作，从玩家身上抢夺物品，播放偷窃音效，动画包括预备和投掷。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13897,
+      51046,
+      15225,
+      13828,
+      13556,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未讨论stategraph__SGkrampus（坎普斯）的能力或行为语义。页面13897中提及克劳斯外观类似坎普斯，但仅限于外观描述，未涉及坎普斯的闲置、攻击、偷窃等具体能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "克拉普斯",
+    "查理怪",
+    "偷窃",
+    "攻击",
+    "死亡",
+    "无敌",
+    "退出",
+    "偷东西",
+    "圣诞怪"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "偷窃"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "26fdf3bfcbd1c83ecdad977a4f0fff2fc2de53d225efb5ea759a708c4d834d3d",
+    "source_bytes": 7585,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138417786
+  }
+}

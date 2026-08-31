@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGvault_pillar_guard.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGvault_pillar_guard",
+  "summary": "该状态图驱动‘金库柱子守卫’（vault_pillar_guard）实体，是饥荒联机版中的敌对生物。状态组织基于常见战斗状态，包括激活、移动、多种攻击模式（如连续拳击、跳砸、旋转攻击）、受击、死亡和眩晕状态，状态转换通过事件和条件触发。",
+  "api": [],
+  "api_note": "状态图无对外API，仅内部驱动实体行为状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "doattack",
+    "ms_pillarguard_quickjump",
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [
+    "VAULT_PILLAR_GUARD_HIT_RECOVERY",
+    "VAULT_PILLAR_GUARD_STAGGER_DAMAGE_MULT",
+    "VAULT_PILLAR_GUARD_QUICKJUMP_CD",
+    "VAULT_PILLAR_GUARD_ATTACK_PERIOD",
+    "VAULT_PILLAR_GUARD_SPIN_CD"
+  ],
+  "states": [
+    "idle",
+    "activate",
+    "hit",
+    "death",
+    "attack1",
+    "attack1_pst",
+    "attack2",
+    "attack2_pst",
+    "attack3",
+    "attack3_pst",
+    "spin_pre",
+    "spin_loop",
+    "spin_pst",
+    "stun_pre",
+    "stun_idle",
+    "stun_hit",
+    "stun_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "activate",
+      "note": "实体从柱子中激活出现，期间无敌并播放动画，无法被攻击或冻结。"
+    },
+    {
+      "state": "attack1",
+      "note": "第一阶段攻击，向前跳跃进行范围拳击，造成伤害并可能击退目标。"
+    },
+    {
+      "state": "attack2",
+      "note": "第二阶段攻击，类似攻击1但更强，为终结攻击做准备。"
+    },
+    {
+      "state": "attack3",
+      "note": "终结攻击，跳向目标并砸地，造成大范围伤害和击飞效果，有硬直和眩晕风险。"
+    },
+    {
+      "state": "spin_pre",
+      "note": "旋转攻击预备，进入无敌状态并开始旋转动画。"
+    },
+    {
+      "state": "spin_loop",
+      "note": "旋转攻击循环，持续对周围目标造成伤害，有攻击间隔和冷却时间。"
+    },
+    {
+      "state": "stun_pre",
+      "note": "眩晕状态开始，实体受到伤害增加，玩家可趁机攻击。"
+    },
+    {
+      "state": "stun_idle",
+      "note": "眩晕持续状态，实体无法行动，受到伤害增加，持续时间由计时器控制。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，实体有短暂硬直，可被中断或反击。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放动画并掉落战利品，实体被移除。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15651,
+      34988,
+      72981,
+      16419,
+      14929,
+      15022,
+      14936
+    ],
+    "aspects": [
+      {
+        "aspect": "旋转攻击描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "新增一种旋转攻击，半径 5.6 距离单位，连续旋转两圈，造成击退效果，有 16 秒冷却时间"
+          }
+        ]
+      },
+      {
+        "aspect": "激活出现",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "四个远古之塔将一起被激活为远古戍卫塔。"
+          }
+        ]
+      },
+      {
+        "aspect": "眩晕状态与伤害加成",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "会使远古戍卫塔眩晕 15 秒，眩晕期间受到伤害 1.5 倍。"
+          }
+        ]
+      },
+      {
+        "aspect": "终结攻击跳跃",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "新增快速跳跃攻击，在 8 距离单位的范围内，守卫无需普攻连击就会直接…"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "金库柱子守卫",
+    "旋转攻击",
+    "眩晕",
+    "跳跃攻击",
+    "激活状态",
+    "敌对生物",
+    "攻击模式",
+    "范围伤害",
+    "击飞"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "战斗",
+    "守卫",
+    "地牢"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e4813dafe3aecbbdfcec226bca56ca23d2723efb190958a5312d13933bcc9bf1",
+    "source_bytes": 42733,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142001747
+  }
+}

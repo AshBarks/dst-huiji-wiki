@@ -9,6 +9,7 @@
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
@@ -20,7 +21,8 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
+      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+      "stategraphs/SGmalbatross.lua": "f63f76896b60e4306ef22b7498b7fb6552050a91ffd2629942a0085c57f11d38"
     }
   },
   "symbols": {
@@ -98,7 +100,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -106,6 +109,14 @@
         "绝缘状态判定描述",
         "装备时状态效果描述",
         "装备理智影响描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -240,6 +251,52 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmalbatross.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "四处移动的闲置行为",
+          "evidence": [
+            {
+              "pageid": 13698,
+              "quote": "在平时，它会在固定鱼群附近四处移动。"
+            }
+          ]
+        },
+        {
+          "aspect": "潜水捕鱼状态与概率",
+          "evidence": [
+            {
+              "pageid": 13698,
+              "quote": "邪天翁会潜水捕捉海鱼，入水时会制造出一圈[[波浪]]；其每次潜水只有 50% 的概率捉到鱼"
+            }
+          ]
+        },
+        {
+          "aspect": "飞天消失的返回行为",
+          "evidence": [
+            {
+              "pageid": 13698,
+              "quote": "如果邪天翁来到陆地上，会飞天消失。"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "4 次",
+          "region_id": "13698:section:1",
+          "matched": "stategraphs/SGmalbatross.lua: ATTACK_WAVE_SPEED=4"
+        },
+        {
+          "raw": "4 单位",
+          "region_id": "13698:section:1",
+          "matched": "stategraphs/SGmalbatross.lua: ATTACK_WAVE_SPEED=4"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

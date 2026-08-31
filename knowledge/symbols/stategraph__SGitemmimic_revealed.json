@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGitemmimic_revealed.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGitemmimic_revealed",
+  "summary": "该状态图驱动物品模仿者（item mimic）的已揭示状态实体，整体状态组织包括空闲、跳跃移动、尝试模仿和行走等状态，通过事件和动作处理响应玩家交互，如鼻蹭动作触发模仿尝试。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅内部处理事件和动作。",
+  "events_published": [],
+  "events_listened": [
+    "jump",
+    "death",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "jump_pre",
+    "try_mimic_pre",
+    "try_mimic",
+    "walk_start",
+    "walk",
+    "walk_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当实体停止移动或无行动时进入，表现为静止不动，是默认待机状态。"
+    },
+    {
+      "state": "jump_pre",
+      "note": "当收到跳跃事件且非忙碌时进入，实体会播放跳跃动画并移动到随机位置，移动中短暂无敌。"
+    },
+    {
+      "state": "try_mimic",
+      "note": "当玩家对实体执行鼻蹭动作后进入，实体尝试模仿目标物品，若成功则生成模仿物并消失，否则返回空闲。"
+    },
+    {
+      "state": "walk",
+      "note": "当实体需要移动时进入，表现为行走动画和循环声音，支持方向旋转。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      22181,
+      15225,
+      15303,
+      13260,
+      15651,
+      50903,
+      13606,
+      28734
+    ],
+    "aspects": [
+      {
+        "aspect": "静止不动行为描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "自然状态下龙蝇会一直呆在原地不动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "物品模仿者",
+    "揭示状态",
+    "跳跃",
+    "模仿",
+    "行走",
+    "死亡",
+    "鼻蹭动作",
+    "随机移动",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "伪装",
+    "移动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "626e773590706723aeb6a30d2461dace1f6fd74751b50803c22837471815f5b0",
+    "source_bytes": 5620,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138277633
+  }
+}

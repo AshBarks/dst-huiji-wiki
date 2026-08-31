@@ -18,7 +18,8 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",

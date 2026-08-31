@@ -7,12 +7,15 @@
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heavyobstacleusetarget.lua": "5a2ef569266913598ff897fd4e5e497cb4b96e32ce86123785f96b0ea3f3d5f5",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/mightygym.lua": "c627f0067905269b3df3de2a120c61b45dedbc23a8fa465d94cf130c994c05bb",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGmighty_gym.lua": "8ac6bea6a1b1f08b78b76e3067126c25ad296de1141aac0f47a6e04698756e93"
     }
   },
   "symbols": {
@@ -40,6 +43,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heavyobstacleusetarget.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -80,6 +87,58 @@
         "semantic_consistent": true
       }
     },
+    "components/mightygym.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "力量值提升机制描述",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "即可成功增加一次力量值"
+            }
+          ]
+        },
+        {
+          "aspect": "自动QTE技能描述",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "QTE小游戏将自动进行"
+            }
+          ]
+        },
+        {
+          "aspect": "配重放置条件说明",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "放置两个配重的健身房才能进行锻炼。"
+            }
+          ]
+        },
+        {
+          "aspect": "锻炼停止操作描述",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "右键可以停止锻炼，从健身房中跳出来。"
+            }
+          ]
+        },
+        {
+          "aspect": "锻炼启动方式描述",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "鼠标左键单击即可进入健身房锻炼。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -97,7 +156,23 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmighty_gym.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "配重放置描述",
+          "evidence": [
+            {
+              "pageid": 15904,
+              "quote": "健身房上可以放置两个[[:分类:重物|重物]]作为配重"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

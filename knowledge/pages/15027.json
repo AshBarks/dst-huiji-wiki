@@ -6,7 +6,9 @@
     "wikitext_sha256": "c1301bda58196d0a10e05b583bb70eba99cdc7976a4eb6c1bca63619c89baddc",
     "symbol_doc_shas": {
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/moonaltarlink.lua": "d3990db17b28a5e0a6183d2c652507cdfdebb634be656737614bf8f6fc9d5c80",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141"
     }
   },
   "symbols": {
@@ -16,7 +18,10 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实。"
+      }
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -27,6 +32,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/moonaltarlink.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbird.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbird",
+  "summary": "该状态图名为'bird'，驱动饥荒联机版中的鸟类实体。它管理鸟类的基本行为状态，如闲逛、啄食、飞行和受击，并支持变异鸟的攻击和飞行行为。状态组织采用常见处理器处理睡眠、冻结、电击和死亡等，并定义了特定于鸟类的交互状态。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，该状态图仅用于内部状态管理。",
+  "events_published": [
+    "on_landed",
+    "on_no_longer_landed"
+  ],
+  "events_listened": [
+    "gotosleep",
+    "freeze",
+    "electrocute",
+    "death",
+    "attacked",
+    "flyaway",
+    "onignite",
+    "trapped",
+    "stunbomb",
+    "swoop_at_target",
+    "locomote",
+    "corpsechomped",
+    "stop_honey_ammo_afflicted",
+    "stop_gelblob_ammo_afflicted"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BIRD_LEAVINGS_CHANCE"
+  ],
+  "states": [
+    "idle",
+    "death",
+    "caw",
+    "distress_pre",
+    "distress",
+    "delay_glide",
+    "glide",
+    "switch",
+    "peck",
+    "flyaway",
+    "hop",
+    "hit",
+    "fall",
+    "trapped",
+    "stunned",
+    "corpse_fall",
+    "lunar_eat",
+    "swoop_attack_in",
+    "swoop_attack",
+    "swoop_attack_out",
+    "mutated_glide_pre",
+    "mutated_glide_loop",
+    "mutated_glide_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "鸟类的默认状态，持续1到2秒随机时间，之后根据概率进入其他状态如啄食、飞行或叫声。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画，移除物理碰撞，掉落战利品，触发尸体处理。"
+    },
+    {
+      "state": "peck",
+      "note": "啄食状态，可能执行缓冲动作如进食，变异鸟在此状态播放特殊效果和声音。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞走状态，触发时鸟类起飞离开，有概率在起飞时留下粪便；在陷阱区域内无法逃脱，会转为下落状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击状态，若鸟类在空中则转为下落，否则播放受击动画，之后根据燃烧状态进入紧张或飞走。"
+    },
+    {
+      "state": "fall",
+      "note": "下落状态，从高处坠落，落地后进入眩晕状态，期间无法移动。"
+    },
+    {
+      "state": "stunned",
+      "note": "眩晕状态，持续6秒左右随机时间，期间鸟类可被玩家拾取，结束后飞走。"
+    },
+    {
+      "state": "swoop_attack",
+      "note": "变异鸟的俯冲攻击状态，接触目标时造成伤害，之后飞离。"
+    },
+    {
+      "state": "lunar_eat",
+      "note": "月球进食状态，用于月球相关鸟类进食行为，播放特殊效果和声音，执行缓冲动作。"
+    },
+    {
+      "state": "trapped",
+      "note": "受困状态，持续1秒后自动飞走，通常由陷阱触发。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15386,
+      65881,
+      15327,
+      15651,
+      15977,
+      15022,
+      15851,
+      18723
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及与代码能力/行为语义清单中任何状态（如idle、death、peck等）直接相关的玩家语言表达。页面内容主要描述实体生成、掉落、仇恨行为、工厂策略等，而非鸟类状态图的具体行为细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鸟",
+    "飞行",
+    "啄食",
+    "攻击",
+    "死亡",
+    "眩晕",
+    "月球鸟",
+    "变异鸟",
+    "受困",
+    "战利品"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9f04b52522427a76dc65876b6729376f7e73d740838815c64cffbc39b58c4e43",
+    "source_bytes": 28461,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135987191
+  }
+}

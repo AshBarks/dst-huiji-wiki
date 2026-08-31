@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcozy_bunnyman.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcozy_bunnyman",
+  "summary": "该状态图驱动舒适兔人（cozy_bunnyman）实体，是游戏中一种友好但可能敌对的生物。整体状态组织包括基础待机、移动、战斗、交互、特殊事件（如枕头大战）以及生成/消失，依赖通用状态模块扩展行走、跑步、睡眠等行为。",
+  "api": [],
+  "api_note": "该状态图不定义对外方法，所有行为通过状态转换、事件和组件交互驱动。",
+  "events_published": [],
+  "events_listened": [
+    "gobacktocave",
+    "cheer",
+    "disappoint",
+    "dance",
+    "reject",
+    "question",
+    "hide",
+    "digtolocation",
+    "raiseobject",
+    "pillowfight_ringout",
+    "doattack",
+    "pillowfight_ended",
+    "knockback",
+    "gotyotrtoken",
+    "cheating"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BUNNYMAN_MAX_STUN_LOCKS",
+    "BUNNYMAN_PANIC_THRESH"
+  ],
+  "states": [
+    "idle",
+    "cheer",
+    "dance",
+    "disappoint",
+    "creepy",
+    "reject",
+    "funnyidle",
+    "death",
+    "abandon",
+    "attack",
+    "attack_object_pre_idle",
+    "attack_object",
+    "eat",
+    "disgust",
+    "hit",
+    "spawn_pre",
+    "spawn_loop",
+    "spawn_pst",
+    "despawn",
+    "hide",
+    "alert",
+    "digtolocation",
+    "knockback",
+    "pickup",
+    "gottoken"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认待机状态，兔人站立并随机播放耳朵摩擦动画（5%概率），否则循环播放标准动画。"
+    },
+    {
+      "state": "attack",
+      "note": "普通攻击状态，在动画13帧时造成伤害并移除攻击标签，有硬直窗口。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画，停止物理并移除碰撞体，立即掉落战利品。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画并触发声音，更新硬直恢复延迟，进入短暂无敌帧。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，根据食物类型执行不同效果，如吃兔毛球会触发厌恶动画并移除物品。"
+    },
+    {
+      "state": "hide",
+      "note": "躲藏状态，兔人消失并恢复全部生命值，隐藏期间避开敌对生物，一段时间后自动重新生成。"
+    },
+    {
+      "state": "knockback",
+      "note": "击退状态，播放大受击动画，根据击退者计算速度和方向进行物理位移，有跳跃标签。"
+    },
+    {
+      "state": "digtolocation",
+      "note": "传送状态，播放一系列挖掘和生成动画，用于枕头大战等事件中传送兔人到指定位置。"
+    },
+    {
+      "state": "pickup",
+      "note": "拾取状态，处理拾取、丢弃等动作，对身体枕头等特殊物品有额外交互逻辑。"
+    },
+    {
+      "state": "gottoken",
+      "note": "获得代币状态，播放受击后开心动画，显示文本并可能触发对话。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15973,
+      13456,
+      15975,
+      13268,
+      34037,
+      13437,
+      13455,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及兔人（bunnyman）或与符号 stategraph__SGcozy_bunnyman 相关的任何能力描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "舒适兔人",
+    "兔人攻击",
+    "躲藏",
+    "枕头大战",
+    "忠诚",
+    "饥饿",
+    "代币",
+    "击退",
+    "拾取",
+    "死亡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "社交",
+    "生存",
+    "节日"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e8c4fd56af50eeae9f93209579c8f9f7289fbd77dc676bd7f9906a483572e7fc",
+    "source_bytes": 32783,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137012068
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgingerdeadpig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgingerdeadpig",
+  "summary": "该状态图驱动饥荒联机版中的姜饼猪（gingerbreadpig）实体，通常出现在冬季盛宴活动中。状态图整体组织了实体的空闲、死亡和行走相关行为，通过状态切换实现简单的生物行为逻辑。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "walk_start",
+    "walk",
+    "walk_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "进入时停止物理移动，播放爬行循环动画，表示姜饼猪处于待机状态。"
+    },
+    {
+      "state": "death",
+      "note": "进入时播放死亡动画，立即停止移动并移除物理碰撞器，伴随特定音效，最终实体消失。"
+    },
+    {
+      "state": "walk_start",
+      "note": "进入时启动向前行走，播放爬行循环动画并触发脚步声，表示开始移动。"
+    },
+    {
+      "state": "walk",
+      "note": "进入时持续播放爬行循环动画并设置超时，超时后会强制转为死亡状态，行走中伴有脚步声音效。"
+    },
+    {
+      "state": "walk_stop",
+      "note": "进入时停止移动并播放爬行死亡动画，但动画结束后会立即切换回行走开始状态，用于停止后快速恢复移动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18939,
+      22094,
+      23186,
+      13493,
+      19832,
+      23187,
+      13823,
+      21285
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本描述了姜饼猪的生成和行为逻辑（如距离保持、受惊吓反应），但未提及状态机中的具体能力如idle、death、walk_start、walk或walk_stop的动画、音效、超时等机制表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "姜饼猪",
+    "死亡动画",
+    "冬季盛宴",
+    "音效",
+    "行走行为",
+    "行为状态",
+    "联机版生物",
+    "碰撞检测"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/8)",
+  "gameplay_tags": [
+    "生物行为",
+    "冬季盛宴活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c20a1dc69c2c1316e46c837e186a4e2b81b1beaca28461963abc4d1040ed448e",
+    "source_bytes": 3815,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137925948
+  }
+}

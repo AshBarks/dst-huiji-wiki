@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmosquito.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmosquito",
+  "summary": "该状态图驱动饥荒联机版中的蚊子实体，控制其移动、攻击、受伤和死亡等行为。状态组织基于有限状态机，通过事件处理器响应被攻击、移动等事件，并实现了吸血过量爆炸等特殊机制。",
+  "api": [],
+  "api_note": "状态图未暴露直接API方法，其行为完全通过事件和状态转换驱动，外部交互依赖事件系统。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MOSQUITO_BURST_RANGE",
+    "MOSQUITO_BURST_DAMAGE"
+  ],
+  "states": [
+    "splat",
+    "death",
+    "action",
+    "moving",
+    "idle",
+    "attack",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当蚊子执行攻击动作时进入，播放攻击动画并造成叮咬伤害，是蚊子的主要战斗状态。"
+    },
+    {
+      "state": "death",
+      "note": "蚊子生命值降至零时进入，若吸血过量则转为爆炸状态，否则播放死亡动画并掉落战利品。"
+    },
+    {
+      "state": "splat",
+      "note": "蚊子因吸血过量死亡时触发，爆炸并对周围敌对单位造成范围伤害，属于特殊死亡机制。"
+    },
+    {
+      "state": "hit",
+      "note": "蚊子受到攻击时进入，播放受伤动画和音效，提供伤害反馈并短暂硬直。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13897,
+      51046,
+      15551,
+      70763,
+      15225,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录中均未提及蚊子（mosquito）或其相关能力（如攻击、死亡、爆炸、受击），页面内容涉及其他实体（如天体英雄、龙蝇、克劳斯等），无蚊子能力的玩家语言表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蚊子",
+    "攻击",
+    "爆炸",
+    "吸血",
+    "死亡",
+    "受伤",
+    "移动",
+    "睡眠",
+    "冻结",
+    "电击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4e8e8e9efcd5da53a706c6306c30b24adb5abf8cfedad247620b13aab600bcf",
+    "source_bytes": 6184,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139675551
+  }
+}

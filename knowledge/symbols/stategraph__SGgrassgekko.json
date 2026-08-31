@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgrassgekko.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgrassgekko",
+  "summary": "该状态图驱动饥荒联机版中的草地壁虎（grass gecko）实体，管理其动画和行为状态。状态组织包括闲置、移动、受惊逃跑、尾巴再生和从地面出现等基本行为，并通过通用处理器处理睡眠、冻结、电击、攻击和死亡等状态。整体模拟了草地壁虎的日常活动和反应机制，如丢弃尾巴以供玩家收集草资源。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图仅用于内部行为驱动和动画控制。",
+  "events_published": [],
+  "events_listened": [
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "locomote",
+    "sink",
+    "fallinvoid",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GRASSGEKKO_REGROW_TIME"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "scare",
+    "run",
+    "run_stop",
+    "regrow_tail",
+    "emerge"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "草地壁虎的静止状态，循环播放闲置动画。进入条件为未移动或受惊后停止，玩家靠近或威胁可能导致其切换到逃跑状态。"
+    },
+    {
+      "state": "scare",
+      "note": "受惊逃跑状态，草地壁虎会丢弃尾巴并快速奔跑。进入条件为被惊吓或从睡眠中醒来并想要奔跑，丢弃的尾巴可被玩家拾取为草资源，再生期间无敌。"
+    },
+    {
+      "state": "regrow_tail",
+      "note": "尾巴再生状态，草地壁虎播放再生动画并重新长出尾巴。进入条件为尾巴丢弃后计时结束，再生期间显示尾巴模型并设置状态为忙碌。"
+    },
+    {
+      "state": "emerge",
+      "note": "出现状态，草地壁虎从地面冒出。进入条件为刷新或重新生成时，玩家远离时可能随机方向出现，播放出现动画和音效。"
+    },
+    {
+      "state": "run",
+      "note": "快速移动状态，草地壁虎奔跑逃离威胁。玩家追逐或惊吓时触发，移动速度较快，持续播放奔跑动画和脚步声。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      34037,
+      13606,
+      15225,
+      50903,
+      13260,
+      28611
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及草地壁虎（SGgrassgekko）或其相关能力状态，内容涉及天体英雄、龙蝇、暗影槌、帝王蟹、暗影傀儡、死亡机制、沃拓克斯、巨大洞穴蠕虫等其他游戏实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "草地壁虎",
+    "grass gecko",
+    "尾巴再生",
+    "逃跑",
+    "受惊",
+    "草资源",
+    "出现",
+    "移动",
+    "闲置",
+    "死亡"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源收集",
+    "生物行为"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2ab5e11d3ac94bcac3ec340b8e7bce3d7c22f982f94c8c206d371d600f15b5e0",
+    "source_bytes": 9496,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138165227
+  }
+}

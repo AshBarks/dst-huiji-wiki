@@ -7,11 +7,16 @@
     "symbol_doc_shas": {
       "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
       "brains/wx78_shadowdrone_debufferbrain.lua": "bc7a2210a43f24eaf515ba244fb7805bf000293417eb09a8b44c93d1b74ce1f9",
+      "components/cattoy.lua": "2fa3ad4983b0b47f7c17b8a6955fdc967a8c4c559998d8b340eb49fe0a00176c",
+      "components/counter.lua": "f1929b4264795f6416f6c9c368a21df157a2bd47f0618f8eb0712674194042b8",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
-      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/maprevealable.lua": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
+      "components/transparentondrones.lua": "f346eeb437b0ac06b8eda584f38fee7869c05d1ebd8ba90c554e2962a60e1421",
+      "stategraphs/SGwx78_shadowdrone_debuffer.lua": "400efb3ae210e510febce801c200270441a722047e61c1464fd2d08828ef116d"
     }
   },
   "symbols": {
@@ -25,7 +30,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容涉及“破绽放大机”的制作和使用，与实体行为代码（如拴绳）无关。"
+      }
     },
     "brains/wx78_shadowdrone_debufferbrain.lua": {
       "mention_source": "fact_match",
@@ -38,6 +46,17 @@
       ],
       "route": "direct",
       "detail_level": "summary"
+    },
+    "components/cattoy.lua": {
+      "aspects_ignored": [
+        "猫玩具被触发时的动画播放行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/counter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/follower.lua": {
       "aspects_ignored": [
@@ -86,6 +105,23 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/maprevealable.lua": {
+      "aspects_ignored": [
+        "全局地图图标设置",
+        "放置物品标记地图位置",
+        "生物刷新点地图标识"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/transparentondrones.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGwx78_shadowdrone_debuffer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

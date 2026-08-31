@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcattoy_mouse.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcattoy_mouse",
+  "summary": "这个状态图驱动一个猫玩具老鼠实体，整体状态组织简单，主要包括空闲和跑步两种基本行为。通过常见处理器处理移动逻辑，并在状态切换时播放相应音效。状态图以空闲状态为默认状态。",
+  "api": [],
+  "api_note": "该状态图未定义公共 API 方法，仅用于内部状态管理。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "run_pre2"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当实体静止时进入此状态，播放待机动画，通常无特殊效果或数值配置。"
+    },
+    {
+      "state": "run_pre2",
+      "note": "当实体收到移动命令开始跑步时进入此状态，播放跑步起始动画和循环音效，随后过渡到跑步状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述‘沉睡’状态（受催眠时播放动画并进入睡眠），未提及实体静止时的通用待机动画（idle）或跑步起始动画及音效（run_pre2）相关表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猫玩具",
+    "老鼠",
+    "跑步",
+    "空闲",
+    "状态图",
+    "动画",
+    "音效",
+    "宠物互动"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6e9b067dec0b38e4e82e97f3fd676cafb13726fa9f31db8accd013b29b4535a1",
+    "source_bytes": 556,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136692674
+  }
+}

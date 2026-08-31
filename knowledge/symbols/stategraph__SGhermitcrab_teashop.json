@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGhermitcrab_teashop.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGhermitcrab_teashop",
+  "summary": "该状态图驱动饥荒联机版中的茶摊实体（hermitcrab_teashop）。它通过响应游戏事件在 idle、hit 和 place 三个状态间切换，整体组织简洁，默认状态为 idle。状态转换主要由建造和击中事件触发，并根据实体标签（如 burnt 或 abandoned）显示不同动画表现。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外暴露的API方法，仅用于内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "onbuilt",
+    "worked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "hit",
+    "place"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "茶摊的默认空闲状态。根据实体是否被烧毁（burnt）或废弃（abandoned）播放不同动画，用于显示茶摊的常规外观。"
+    },
+    {
+      "state": "hit",
+      "note": "当茶摊被玩家或事件击中（worked）时进入，但需未被烧毁且不忙。播放击中动画，并触发关联的海龟蟹（hermitcrab）实体进入 hit_teashop 状态。"
+    },
+    {
+      "state": "place",
+      "note": "茶摊被建造时进入的状态，带有 busy 标签。播放放置动画和特定音效，表示茶摊的安装过程。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70704,
+      23187,
+      13493,
+      65881,
+      15022,
+      19222,
+      28738,
+      52634
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及茶摊（teashop）实体或其空闲、被击中、建造状态的相关描述，所有页面内容均与茶摊能力无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "茶摊",
+    "放置",
+    "击中",
+    "空闲",
+    "海龟蟹",
+    "茶站",
+    "建造",
+    "装饰",
+    "NPC互动"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "装饰",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7fbe1be1714fc18f7be1615063b6e3cd792c9f571fa701902a192ef25381426f",
+    "source_bytes": 1566,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138232741
+  }
+}

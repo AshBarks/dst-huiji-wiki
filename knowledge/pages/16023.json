@@ -24,17 +24,23 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/questowner.lua": "caf79527828831081f19417e902fa5d4f9799800c4ec381b190bb8357e8d461f",
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGticoon.lua": "3b20a7fd0ad9c8ca6248912d2a74248c63c5657aa6444f0146150a5322be0ec9"
     }
   },
   "symbols": {
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述掉落物包含猫尾，可能对应友好果蝇（friendlyfruitfly）。该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/follow.lua": {
       "aspects_ignored": [
@@ -58,7 +64,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为掉落物表格，与实体行为代码（如拴绳）无关。"
+      }
     },
     "behaviours/standstill.lua": {
       "aspects_ignored": [
@@ -73,7 +82,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/ticoonbrain.lua": {
       "route": "direct",
@@ -142,7 +152,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/follower.lua": {
       "aspects_ignored": [
@@ -224,6 +235,13 @@
         "semantic_consistent": true
       }
     },
+    "components/questowner.lua": {
+      "aspects_ignored": [
+        "任务完成机制与效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -236,6 +254,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGticoon.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

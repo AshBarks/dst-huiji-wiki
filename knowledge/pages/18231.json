@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "c2cbac3833a5b38cda0bd65452ec92fb5fcf1bd068ae456e2fa350febe296e4a",
     "symbol_doc_shas": {
+      "components/bedazzler.lua": "63548f3ed7eabc144cf16b5def9a7459be6b44b82977883116d2270b9cc27ee8",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -15,6 +16,31 @@
     }
   },
   "symbols": {
+    "components/bedazzler.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "装饰效果的影响描述",
+          "evidence": [
+            {
+              "pageid": 18231,
+              "quote": "装饰后蛛网地块都会缩小至 4 {{解释|距离单位}}之内"
+            }
+          ]
+        },
+        {
+          "aspect": "装饰物品的使用对象限制",
+          "evidence": [
+            {
+              "pageid": 18231,
+              "quote": "蛛巢装饰套装只能使用在蜘蛛巢上"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -83,5 +109,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

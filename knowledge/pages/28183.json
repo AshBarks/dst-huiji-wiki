@@ -11,6 +11,7 @@
       "behaviours/panic.lua": "56884d4d3f3014d08a2f6483e216a2d7f7eb44df8fe4578571a8452985a68696",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/rabbitking_bunnymanbrain.lua": "f148b16f84d834390166a1a3939af8c06ff5747a11e402c47071e4fad42b3175",
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
@@ -22,9 +23,11 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832"
+      "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "stategraphs/SGrabbitking_bunnyman.lua": "78ae97dd375114bfa109dfdf415e861568346a6f6dda781f07ccce64307c7976"
     }
   },
   "symbols": {
@@ -42,7 +45,10 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "behaviours/chattynode.lua": {
       "route": "two_hop",
@@ -73,7 +79,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/rabbitking_bunnymanbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -90,6 +97,17 @@
       ],
       "route": "direct",
       "detail_level": "summary"
+    },
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选事实，无法确定是否提及酸雨。"
+      }
     },
     "components/bloomer.lua": {
       "route": "direct",
@@ -185,7 +203,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -211,6 +230,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -241,6 +268,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGrabbitking_bunnyman.lua": {
+      "aspects_ignored": [
+        "奔跑移动描述",
+        "攻击伤害与行为描述",
+        "死亡掉落物品",
+        "睡眠状态行为",
+        "闲置状态触发机制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

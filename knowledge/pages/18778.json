@@ -10,9 +10,11 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
+      "components/questowner.lua": "caf79527828831081f19417e902fa5d4f9799800c4ec381b190bb8357e8d461f",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGsmallghost.lua": "9d1b5bc7d01703b8291c4336e31f7637d6801e4f8c04e866d8485e654bcc73e8"
     }
   },
   "symbols": {
@@ -73,6 +75,13 @@
       "route": "direct",
       "detail_level": "summary"
     },
+    "components/questowner.lua": {
+      "aspects_ignored": [
+        "任务完成机制与效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -100,8 +109,34 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGsmallghost.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "出现机制描述",
+          "evidence": [
+            {
+              "pageid": 18778,
+              "quote": "只有在玩家靠近时才会从中出现"
+            }
+          ]
+        },
+        {
+          "aspect": "空闲状态行为描述",
+          "evidence": [
+            {
+              "pageid": 18778,
+              "quote": "小惊吓平时会待在墓碑里"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

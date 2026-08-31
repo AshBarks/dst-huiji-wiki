@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_feedchicks_nest.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_feedchicks_nest",
+  "summary": "该状态图驱动喂小鸡嘉年华游戏中的鸟巢实体，控制其放置、开启、关闭和饥饿状态。状态从放置开始进入默认关闭状态，响应开启事件后进入待机，当需要喂食时触发饥饿状态循环，喂食后返回待机或关闭。",
+  "api": [],
+  "api_note": "该状态图通过事件驱动，无直接对外API方法。",
+  "events_published": [
+    "carnivalgame_feedchicks_available"
+  ],
+  "events_listened": [
+    "carnivalgame_turnon",
+    "carnivalgame_feedchicks_hungry",
+    "animover",
+    "carnivalgame_turnoff",
+    "carnivalgame_feedchicks_feed"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle_off",
+    "turn_on",
+    "turn_off",
+    "idle_on",
+    "hungry_pre",
+    "hungry_loop",
+    "hungry_fed",
+    "hungry_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_off",
+      "note": "鸟巢关闭状态，可检查，响应开启事件后进入开启流程。"
+    },
+    {
+      "state": "idle_on",
+      "note": "鸟巢开启状态，等待饥饿事件触发进入饥饿状态。"
+    },
+    {
+      "state": "hungry_loop",
+      "note": "饥饿循环状态，启用喂食功能，有持续时间限制，超时或未喂食则结束。"
+    },
+    {
+      "state": "hungry_fed",
+      "note": "喂食成功状态，播放动画并发出可用事件，然后返回待机或关闭。"
+    },
+    {
+      "state": "hungry_pst",
+      "note": "饥饿后状态，可能表示喂食失败或超时，发出可用事件并返回待机或关闭。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      18723,
+      14792,
+      15386,
+      65881,
+      61065,
+      23956,
+      23957
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及嘉年华游戏或喂食小鸡鸟巢的状态与行为描述，主要讨论高脚鸟巢、雪球发射器、裂隙循环等无关实体，未体现符号 stategraph__SGcarnivalgame_feedchicks_nest 的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鸟巢",
+    "喂小鸡",
+    "嘉年华游戏",
+    "饥饿状态",
+    "喂食窗口",
+    "状态图",
+    "关闭",
+    "开启",
+    "超时"
+  ],
+  "gameplay_tags": [
+    "嘉年华",
+    "迷你游戏",
+    "喂食"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dfa3cc1725e63de035f3011079ad21e293d337b0183d7ad69b422b732f168780",
+    "source_bytes": 4887,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136450969
+  }
+}

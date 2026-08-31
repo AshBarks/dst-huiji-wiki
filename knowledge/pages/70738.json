@@ -5,7 +5,8 @@
   "inputs": {
     "wikitext_sha256": "addd30aa12c47cad38be1b84c976fb4186da28bf2c5ab6f5e8d7d1c7a7e6e7c4",
     "symbol_doc_shas": {
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/worldmigrator.lua": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951"
     }
   },
   "symbols": {
@@ -14,6 +15,13 @@
         "图鉴条目检查状态标注",
         "打蜡后显示名称前缀",
         "检查后显示详细特性"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/worldmigrator.lua": {
+      "aspects_ignored": [
+        "非自然传送门物品数量上限行为"
       ],
       "route": "direct",
       "detail_level": "stub"

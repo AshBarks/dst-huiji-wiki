@@ -5,11 +5,23 @@
   "inputs": {
     "wikitext_sha256": "4f39607d85865c5330bed18316bde911871f956985beb876246a8dc88873ee6a",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/projectedeffects.lua": "b7cc5510b38685132ba89002dc83011c764a1cefad84d1d54cfe3a4b9c61151a"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -17,7 +29,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -31,6 +44,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/projectedeffects.lua": {
+      "aspects_ignored": [
+        "宠物特征点数衰减机制",
+        "电路板电荷状态视觉变化"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

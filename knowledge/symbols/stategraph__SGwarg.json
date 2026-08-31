@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwarg.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwarg",
+  "summary": "该状态图驱动巨猎犬（Warg）实体，包括普通、黏土和突变版本。整体状态组织基于有限状态机，覆盖了移动、攻击、召唤、受击、死亡以及特殊事件如结冰、电击和硬直等行为。",
+  "api": [],
+  "api_note": "源码中未定义对外方法，状态图通过事件驱动和内部函数管理行为，无需外部API调用。",
+  "events_published": [],
+  "events_listened": [
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnFreeze",
+    "OnElectrocute",
+    "OnDeath",
+    "OnLocomote",
+    "attacked",
+    "doattack",
+    "dohowl",
+    "heardwhistle",
+    "chomp",
+    "becomestatue",
+    "OnCorpseChomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MUTATED_WARG_COLDFIRE_TEMPERATURE",
+    "TUNING.MUTATED_WARG_FLAMETHROWER_DAMAGE",
+    "TUNING.MUTATED_WARG_FLAMETHROWER_CD",
+    "TUNING.MUTATED_WARG_STAGGER_TIME",
+    "TUNING.WARG_DAMAGE"
+  ],
+  "states": [
+    "idle",
+    "hit",
+    "spawn_shake",
+    "death",
+    "attack",
+    "chomp_pre",
+    "chomp_pre_from_loop",
+    "chomp_pre_timeline_from_frame1",
+    "chomp_loop",
+    "chomp_pst",
+    "howl",
+    "attack_icing",
+    "gingerbread_intro",
+    "statue",
+    "reanimatestatue",
+    "transformstatue",
+    "flamethrower_pre",
+    "flamethrower_loop",
+    "flamethrower_pst",
+    "stagger_pre",
+    "stagger_idle",
+    "stagger_hit",
+    "stagger_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "巨猎犬的静止状态，播放循环动画和叫声。可能被事件触发进入其他状态，如硬直或嚎叫。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击后短暂硬直，持续约9帧后恢复行动，可被打断。受击后优先检查硬直或嚎叫事件。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品。黏土版本有破碎音效和特效移除。"
+    },
+    {
+      "state": "attack",
+      "note": "普通近战攻击，在第11帧造成伤害，第20帧后可被硬直打断。攻击目标需在范围内。"
+    },
+    {
+      "state": "howl",
+      "note": "召唤猎犬的嚎叫动作，持续约45帧。玩家使用吹笛可干扰，使其停止召唤或重置计数。"
+    },
+    {
+      "state": "flamethrower_pre",
+      "note": "突变版本喷火攻击的准备阶段，调整方向并切换八面动画。伤害配置为TUNING.MUTATED_WARG_FLAMETHROWER_DAMAGE。"
+    },
+    {
+      "state": "flamethrower_loop",
+      "note": "喷火持续阶段，左右扫射造成范围伤害和降温效果。冷却时间由TUNING.MUTATED_WARG_FLAMETHROWER_CD控制。"
+    },
+    {
+      "state": "stagger_pre",
+      "note": "硬直准备状态，由特定伤害触发（如等离子伤害）。持续TUNING.MUTATED_WARG_STAGGER_TIME时间，期间巨猎犬无法行动。"
+    },
+    {
+      "state": "chomp_loop",
+      "note": "咬人攻击的循环阶段，最多循环4次，每次造成伤害。可被硬直或嚎叫打断。"
+    },
+    {
+      "state": "statue",
+      "note": "黏土版本的雕像状态，变为无敌且不可选中。可通过事件重新激活，如玩家攻击或世界事件。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65456,
+      20162,
+      24875,
+      15922,
+      15751,
+      34314,
+      20514,
+      20287
+    ],
+    "aspects": [
+      {
+        "aspect": "啃咬攻击行为",
+        "evidence": [
+          {
+            "pageid": 15751,
+            "quote": "座狼使用啃咬攻击，其攻击范围较大。"
+          }
+        ]
+      },
+      {
+        "aspect": "雕像状态特性",
+        "evidence": [
+          {
+            "pageid": 20514,
+            "quote": "生成时它们都处于雕像状态，雕像状态下它们是无敌的、不会成为其他生物的仇恨目标且无法被推动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "巨猎犬",
+    "座狼",
+    "召唤猎犬",
+    "火焰喷射",
+    "硬直",
+    "雕像状态",
+    "姜饼攻击",
+    "冰霜吐息",
+    "变异",
+    "死亡掉落"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "召唤",
+    "突变",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e6454d71bf06cd63610a19bc54afed159149f91045c4612aa09d49a97aff0f57",
+    "source_bytes": 43840,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146584261
+  }
+}

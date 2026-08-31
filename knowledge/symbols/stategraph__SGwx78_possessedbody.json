@@ -1,0 +1,191 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_possessedbody.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_possessedbody",
+  "summary": "该状态图驱动饥荒联机版中WX-78机器人的“被附身身体”实体。整体状态组织方式包含基础动作状态（如移动、攻击、工作）和特殊事件状态（如生成、死亡、冻结、被吞噬），状态转换由事件和条件控制，覆盖了实体从出现到消亡的主要行为。",
+  "api": [],
+  "api_note": "状态图无对外API，其状态转换和逻辑完全由内部事件处理器、动作处理器和状态定义控制，玩家或外部实体不直接调用方法。",
+  "events_published": [
+    "wonteatfood",
+    "knockback",
+    "spitout"
+  ],
+  "events_listened": [
+    "locomote",
+    "death",
+    "freeze",
+    "pinned",
+    "equip",
+    "unequip",
+    "attacked",
+    "doattack",
+    "possessed",
+    "become_dormant",
+    "toolbroke",
+    "armorbroke",
+    "knockback",
+    "feetslipped",
+    "repelled",
+    "snared",
+    "startled",
+    "devoured",
+    "suspended",
+    "recoil_off",
+    "emote"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.HUNGRY_THRESH",
+    "TUNING.RETURN_ITEM_TO_FEEDER_RANGE",
+    "TUNING.KNOCKBACK_DROP_ITEM_HEIGHT_HIGH",
+    "TUNING.KNOCKBACK_DROP_ITEM_HEIGHT_LOW",
+    "TUNING.KNOCKBACK_DELAY_INTERACTION_HIGH",
+    "TUNING.KNOCKBACK_DELAY_INTERACTION_LOW",
+    "TUNING.KNOCKBACK_DELAY_PLAYER_INTERACTION_HIGH",
+    "TUNING.KNOCKBACK_DELAY_PLAYER_INTERACTION_LOW",
+    "TUNING.WILSON_EMBARK_SPEED_BOOST",
+    "TUNING.WILSON_EMBARK_SPEED_MIN",
+    "TUNING.WILSON_EMBARK_SPEED_MAX"
+  ],
+  "states": [
+    "spawn",
+    "idle",
+    "funnyidle",
+    "run_start",
+    "run",
+    "run_stop",
+    "item_hat",
+    "item_in",
+    "item_out",
+    "attack",
+    "blowdart",
+    "death",
+    "despawn",
+    "take",
+    "give",
+    "hit",
+    "frozen",
+    "thaw",
+    "stunned",
+    "chop_start",
+    "chop",
+    "mine_start",
+    "mine",
+    "mine_recoil",
+    "hammer_start",
+    "hammer",
+    "attack_recoil",
+    "dig_start",
+    "dig",
+    "till_start",
+    "till",
+    "dolongaction",
+    "doshortaction",
+    "eat",
+    "quickeat",
+    "refuseeat",
+    "toolbroke",
+    "armorbroke",
+    "repelled",
+    "knockback",
+    "knockback_pst",
+    "knockbacklanded",
+    "slip",
+    "slip_fall_loop",
+    "slip_fall_pst",
+    "soakin_pre",
+    "soakin_jump",
+    "soakin",
+    "soakin_jumpout",
+    "soakin_cancel",
+    "startle",
+    "devoured",
+    "suspended"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "实体生成时的初始状态，播放底盘启动动画，播放多个机械音效，之后移除“nointerrupt”标签并过渡到空闲状态。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，实体停止移动并循环播放空闲动画，定时触发“funnyidle”状态以显示随机行为。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，根据手持装备播放不同攻击动画（如工具拳、鞭子、书本），有冷却时间，攻击后可能触发反冲状态。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放底盘关闭动画，根据理智值决定精神逃跑或死亡，之后尝试替换为备用身体。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中状态，播放硬直动画并播放受伤音效，有短暂无敌帧（约6-10帧），之后返回空闲。"
+    },
+    {
+      "state": "knockback",
+      "note": "击退状态，被击飞时播放跳跃动画，可能掉落装备，有物理位移和着陆检测。"
+    },
+    {
+      "state": "eat",
+      "note": "吃食物状态，播放进食动画，暂停饥饿值恢复，根据食物类型播放不同音效，进食完成后返回空闲。"
+    },
+    {
+      "state": "frozen",
+      "note": "被冻结状态，覆盖冻结动画，实体无法行动，持续至解冻或触发 thaw 状态。"
+    },
+    {
+      "state": "devoured",
+      "note": "被吞噬状态，隐藏实体并跟随攻击者，无法行动，可被吐出触发击退。"
+    },
+    {
+      "state": "soakin",
+      "note": "泡澡状态，在温泉中浸泡，隐藏物品并禁用物理碰撞，可通过移动或事件退出。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      15022,
+      13897,
+      15651,
+      51046,
+      15922,
+      20511,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及符号 stategraph__SGwx78_possessedbody 对应的实体行为状态（如生成、空闲、攻击等），仅涉及 WX-78 角色的基本介绍和模块化升级机制，或其他实体的能力描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "WX-78",
+    "机器人",
+    "被附身",
+    "状态图",
+    "攻击",
+    "死亡",
+    "冻结",
+    "击退",
+    "吃食物",
+    "泡澡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "工作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0983b697f60169dde4804cc7d0c69d1f0ebcc03875c4120191642f2814be9332",
+    "source_bytes": 154504,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143810036
+  }
+}

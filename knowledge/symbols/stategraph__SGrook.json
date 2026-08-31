@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGrook.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGrook",
+  "summary": "该状态图驱动‘rook’（石笋）实体，一种饥荒联机版中的敌对机械生物。整体状态组织基于事件驱动，涵盖闲置、移动、冲击攻击、受击和眩晕等核心行为，通过状态标签和事件处理器实现状态切换与行为逻辑。",
+  "api": [],
+  "api_note": "状态图是内部行为逻辑，无对外API方法；所有交互通过状态标签、事件和组件实现。",
+  "events_published": [
+    "attackstart"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "taunt",
+    "runningattack",
+    "ruinsrespawn",
+    "hit",
+    "stun_pre",
+    "shock_to_stun",
+    "stun_loop",
+    "stun_hit",
+    "stun_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "run",
+      "note": "状态标签为‘running’，表示rook快速奔跑移动，会持续对前方敌人造成冲击伤害，移动中可被中断或取消奔跑。"
+    },
+    {
+      "state": "runningattack",
+      "note": "冲击攻击状态，对范围内敌人造成伤害，若未命中则可能停止奔跑；有短暂无敌帧和硬直窗口。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，rook停止移动并播放受击动画，有短暂硬直，但可快速反击攻击者。"
+    },
+    {
+      "state": "run_stop",
+      "note": "奔跑停止状态，rook播放减速动画，有跳跃标签和硬直，速度逐渐降低至停止。"
+    },
+    {
+      "state": "stun_pre",
+      "note": "眩晕前奏状态，rook被眩晕时进入，有短暂无敌帧，可被玩家攻击打断或继续眩晕。"
+    },
+    {
+      "state": "stun_loop",
+      "note": "眩晕循环状态，rook持续眩晕倒地，可被攻击累积眩晕次数，超过4次后恢复。"
+    },
+    {
+      "state": "stun_hit",
+      "note": "眩晕中受击状态，增加眩晕次数，若次数达到4则进入恢复阶段，否则继续眩晕。"
+    },
+    {
+      "state": "stun_pst",
+      "note": "眩晕恢复状态，rook逐渐起身，有短暂无敌帧和硬直，恢复后切换至闲置状态。"
+    },
+    {
+      "state": "taunt",
+      "note": "挑衅状态，rook面向目标发出挑衅声音，有短暂可打断窗口，通常在奔跑后触发。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      15651,
+      20150,
+      15539,
+      13556,
+      20058,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及'rook'或'SGrook'实体，所有页面讨论其他实体如天体英雄、龙蝇、阿比盖尔等，未涉及清单中描述的奔跑、攻击、眩晕等状态行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "石笋",
+    "rook",
+    "机械",
+    "冲击",
+    "眩晕",
+    "奔跑",
+    "攻击",
+    "硬直",
+    "状态图",
+    "伤害"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8c6fe80c8722216c8f5c64c09ed4d47a1801e9a783747c04ac8118d408ba1a78",
+    "source_bytes": 23797,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145939940
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGvault_crawler.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGvault_crawler",
+  "summary": "该状态图驱动名为'vault_crawler'（宝库爬行者）的实体。状态图组织了实体的生成、闲置、移动、攻击、受伤和隐藏行为，通过事件处理响应生命值低、死亡、攻击和受伤等事件，其中隐藏状态提供伤害吸收和物理变化。",
+  "api": [],
+  "api_note": "该状态图没有定义显式的对外公共方法，主要处理内部状态转换和事件响应。",
+  "events_published": [],
+  "events_listened": [
+    "minhealth",
+    "death",
+    "doattack",
+    "attacked",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "VAULT_CRAWLER_ROLLING_SPEED"
+  ],
+  "states": [
+    "idle",
+    "spawn",
+    "hit",
+    "taunt",
+    "attack",
+    "hide_pre",
+    "hide_idle",
+    "hide_roll",
+    "socketed",
+    "hide_roll_pst",
+    "hide_hit",
+    "hide_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "生成时临时无敌，播放生成动画，第41帧移除hiding和nofreeze标签，第42帧移除noattack和temp_invincible，第45帧添加caninterrupt，可被中断。"
+    },
+    {
+      "state": "hit",
+      "note": "受伤硬直状态，有恢复延迟，第14帧后可隐藏或攻击，生命值低时切换到hide_pre。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，追踪目标并跳跃攻击，第7帧停止追踪，第11帧跳跃并设置物理速度，第13帧执行攻击，攻击后物理减速。"
+    },
+    {
+      "state": "hide_pre",
+      "note": "隐藏预备状态，第20帧获得100%伤害吸收，物理半径减小且变为无质量，可被推动。"
+    },
+    {
+      "state": "hide_idle",
+      "note": "持续隐藏状态，保持伤害吸收和物理属性，超时3秒后退出到hide_pst。"
+    },
+    {
+      "state": "hide_roll",
+      "note": "滚动隐藏状态，物理变为高质量、无碰撞，寻找插座进行插入，滚动时播放循环音效。"
+    },
+    {
+      "state": "hide_pst",
+      "note": "退出隐藏状态，第10帧恢复75%生命值并重置物理，第13帧可被中断。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      51046,
+      13897,
+      13828,
+      15551,
+      15651,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及 stategraph__SGvault_crawler 或其相关能力，内容涉及其他实体如 alterguardian、wagboss_robot、klaus 等，与代码能力清单中的生成、受伤、攻击、隐藏等状态无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "宝库爬行者",
+    "隐藏",
+    "滚动",
+    "攻击",
+    "无敌",
+    "受伤",
+    "硬直",
+    "插座",
+    "移动"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "隐藏",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f50371890681fa090ba942d5340c52728f1190383cd1f68be167ba7246f2ad2c",
+    "source_bytes": 19001,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141933661
+  }
+}

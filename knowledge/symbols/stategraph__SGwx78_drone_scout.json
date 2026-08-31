@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_drone_scout.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_drone_scout",
+  "summary": "该状态图驱动名为 wx78_drone_scout 的无人机侦察兵实体，可能关联 WX-78 角色。整体状态组织从 idle 开始，deploy 状态用于部署启动，随后返回 idle，状态更新中包含悬浮动画逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，仅处理内部状态转换和行为。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "deploy",
+    "idle"
+  ],
+  "state_notes": [
+    {
+      "state": "deploy",
+      "note": "部署状态：进入时播放部署动画并停止物理运动，发出启动音效，状态更新中执行悬浮逻辑。玩家可观察到无人机从地面升起并悬停，为侦察准备。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态：持续播放空闲动画并悬浮，悬浮高度和周期由参数控制，提供稳定的侦察位置，玩家可感知其持续悬停行为。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      16419,
+      16615,
+      47009,
+      51046,
+      16438,
+      23965,
+      71461
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与符号 stategraph__SGwx78_drone_scout 相关的能力表达；相关实体页面如 wx78_scanner 描述了部署飞行，但未明确体现清单中的部署动画、音效、悬浮逻辑或空闲状态行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "无人机",
+    "侦察兵",
+    "deploy",
+    "idle",
+    "悬浮",
+    "部署",
+    "空闲",
+    "WX-78",
+    "drone scout",
+    "beep_turnon"
+  ],
+  "gameplay_tags": [
+    "侦察",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "35ed15eac9f057e83869235c7b71d8f7ed8b7c9173ee62c95592e410e6af24a5",
+    "source_bytes": 1913,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143660191
+  }
+}

@@ -6,10 +6,12 @@
     "wikitext_sha256": "7f89a0842316dc5a52ec5c488fa54588ee1c06fefc5ff5760410e28a70542a50",
     "symbol_doc_shas": {
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "components/fencerotator.lua": "e39cfb9a2f2c79af952009952c945a3f2326bfb4e212f55dd4f8652a984b9fc5",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/joustsource.lua": "267eae918bbeab975c02d87ef873fd8a3e07ba669510aedade5604fcc98b0e76",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -21,6 +23,10 @@
         "装备时状态效果描述",
         "装备理智影响描述"
       ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fencerotator.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -58,6 +64,16 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/joustsource.lua": {
+      "aspects_ignored": [
+        "仇恨距离检测",
+        "命中效果描述",
+        "攻击范围数值",
+        "移动速度描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

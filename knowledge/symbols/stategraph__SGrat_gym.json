@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGrat_gym.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGrat_gym",
+  "summary": "该状态图名为'rat_gym'，驱动饥荒联机版中的训练设施实体（如胡萝卜鼠健身房）。整体状态组织从空闲(idle)开始，可根据玩家或游戏事件切换到训练(active)、休息(sleep)、被击(hit)或烧毁(burnt)等状态。状态图处理训练计时器，并在不同prefab（如方向、反应、速度、耐力训练器）播放相应音效和动画。",
+  "api": [],
+  "api_note": "源码中未定义对外方法函数，状态图仅通过事件和组件交互，无独立API。",
+  "events_published": [],
+  "events_listened": [
+    "onbuilt",
+    "onburnt",
+    "hit",
+    "ratupdate",
+    "endtraining",
+    "starttraining",
+    "rest",
+    "endrest"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "burnt",
+    "idle2",
+    "place",
+    "active_pre",
+    "active_loop",
+    "active_pst",
+    "hit",
+    "sleep_pre",
+    "sleep",
+    "sleep_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，根据是否有训练对象播放不同动画（'idle'或'idle_rat'）；有5%概率切换到idle2动画，否则循环。"
+    },
+    {
+      "state": "burnt",
+      "note": "烧毁状态，表示设施损坏无法互动，播放'burnt'动画。"
+    },
+    {
+      "state": "active_pre",
+      "note": "训练准备阶段，播放开始动画和音效，进入标签'active'表示训练即将开始。"
+    },
+    {
+      "state": "active_loop",
+      "note": "训练进行中，播放循环动画和声音；标签'active'表示训练状态，退出时停止音效。"
+    },
+    {
+      "state": "active_pst",
+      "note": "训练结束阶段，播放结束动画和音效，之后返回idle状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中状态，播放受击动画和音效；有'hit'标签防止重复进入，完成后返回idle。"
+    },
+    {
+      "state": "sleep_pre",
+      "note": "休息前状态，播放准备动画，暂停训练计时器；标签'sleep'表示即将休息。"
+    },
+    {
+      "state": "sleep",
+      "note": "休息中状态，播放睡眠动画并暂停训练计时器；循环播放直到结束休息事件。"
+    },
+    {
+      "state": "sleep_pst",
+      "note": "休息后状态，根据计时器是否存在决定进入训练(active_pre)或空闲(idle)。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      33991,
+      23932,
+      33950,
+      15904,
+      13156,
+      33823,
+      20044
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 stategraph__SGrat_gym 的具体状态行为描述，如 idle、burnt、active_pre、active_loop、active_pst、hit、sleep_pre、sleep、sleep_pst 等动画、音效或状态切换内容。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "健身房",
+    "训练",
+    "胡萝卜鼠",
+    "休息",
+    "烧毁",
+    "状态图",
+    "事件处理",
+    "动画音效",
+    "计时器"
+  ],
+  "gameplay_tags": [
+    "训练",
+    "设施",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e5a508e346d461832b3979e693d9a90cfba39027b637cfd557bc4d168e273248",
+    "source_bytes": 10185,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145807245
+  }
+}

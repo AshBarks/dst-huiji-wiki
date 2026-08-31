@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcharlie_heckler.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcharlie_heckler",
+  "summary": "该状态图驱动实体为'charlie_heckler'，即查理起哄者，用于饥荒联机版中的舞台表演场景。整体状态组织基于事件驱动，包括闲置、到达、离开、对话和给予等状态，模拟实体的表演互动行为。状态转换主要由玩家事件（如对话、到达）和动画完成触发。",
+  "api": [],
+  "api_note": "该状态图没有定义公开的API方法，所有行为通过事件监听和状态转换驱动。",
+  "events_published": [],
+  "events_listened": [
+    "ontalk",
+    "arrive",
+    "leave",
+    "give",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_arrived",
+    "arrive",
+    "leave",
+    "away",
+    "talkto",
+    "give"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体闲置状态，添加NOCLICK标签使玩家无法点击，常用于等待事件或检查是否已退出舞台。"
+    },
+    {
+      "state": "idle_arrived",
+      "note": "实体到达后闲置状态，有概率触发对话或给予剧本，与玩家互动相关。"
+    },
+    {
+      "state": "arrive",
+      "note": "实体到达舞台时的状态，播放动画和音效，表示表演开始。"
+    },
+    {
+      "state": "leave",
+      "note": "实体离开舞台时的状态，添加NOCLICK防止玩家交互，结束后进入隐藏。"
+    },
+    {
+      "state": "away",
+      "note": "实体隐藏状态，表示已离开但尚未完全移除，通常无玩家交互。"
+    },
+    {
+      "state": "talkto",
+      "note": "实体对话状态，根据参数显示不同情绪动画和音效，如兴奋、失望或大笑。"
+    },
+    {
+      "state": "give",
+      "note": "实体给予物品状态，可能将剧本投掷给玩家，触发任务或事件。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18825,
+      18359,
+      13214,
+      13493,
+      16174,
+      20714,
+      34792,
+      70633
+    ],
+    "aspects": [
+      {
+        "aspect": "到达神龛行为",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "供奉发条骑士神龛，嘲鸫会降落在上面。"
+          }
+        ]
+      },
+      {
+        "aspect": "对话互动描述",
+        "evidence": [
+          {
+            "pageid": 18825,
+            "quote": "嘲鸫会降临到[[发条骑士神龛]]上与玩家对话。"
+          }
+        ]
+      },
+      {
+        "aspect": "离开舞台行为",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "当舞台剧表演开始的时候，站在神龛上的嘲鸫会告知自己将要参与并飞走。"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置状态描述",
+        "evidence": [
+          {
+            "pageid": 70633,
+            "quote": "====发呆（闲置）===="
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "查理",
+    "起哄者",
+    "舞台",
+    "表演",
+    "状态图",
+    "闲置",
+    "到达",
+    "离开",
+    "对话",
+    "给予"
+  ],
+  "search_terms_note": "pass1 后零命中 7/9,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "社交",
+    "表演"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fa394d154d8538af06997fc018f0d3c64c257b2f28ea6162d620945851236988",
+    "source_bytes": 7622,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136777670
+  }
+}

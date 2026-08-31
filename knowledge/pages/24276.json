@@ -9,7 +9,8 @@
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/tornadobrain.lua": "ad37baebc7db73ad120574f390fa1f6f7b78c4f0d01a4723c83c77849d44db99",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
-      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7"
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "stategraphs/SGtornado.lua": "42a1c49c83c19340633f783b9a760b3e585e6c162a761c7187acf37ad1f8f670"
     }
   },
   "symbols": {
@@ -23,7 +24,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述“龙卷风”（Tornado），该实体在受影响变体列表中。证据文本提到了伤害、存在时间，未提及与拴绳行为相关的游荡或返回机制。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -31,7 +35,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/tornadobrain.lua": {
       "aspects_ignored": [
@@ -58,6 +63,10 @@
       "llm_verdict": {
         "note": "实体不在受影响变体列表"
       }
+    },
+    "stategraphs/SGtornado.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

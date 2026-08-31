@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpenguin.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpenguin",
+  "summary": "该状态图驱动饥荒联机版中的企鹅实体。它组织了企鹅的多种行为状态，包括移动、攻击、进食、死亡等，通过事件系统在状态间转换，以响应玩家交互和环境变化。",
+  "api": [],
+  "api_note": "源码中未定义对外方法，状态图通过事件和组件内部逻辑驱动。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "locomote",
+    "flyaway"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "eat_pre",
+    "eat_loop",
+    "pickup",
+    "action",
+    "migrate",
+    "death",
+    "appear",
+    "landing",
+    "taunt",
+    "attack",
+    "flyaway",
+    "runningattack"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "企鹅空闲站立状态，播放空闲动画，是默认待机状态。"
+    },
+    {
+      "state": "attack",
+      "note": "企鹅攻击状态，播放攻击动画并造成伤害，有攻击前摇和后摇硬直。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "企鹅进食状态，吃食物时播放进食动画，被攻击会掉落食物。"
+    },
+    {
+      "state": "pickup",
+      "note": "企鹅拾取物品状态，捡起地面上的食物或物品，被攻击会掉落。"
+    },
+    {
+      "state": "death",
+      "note": "企鹅死亡状态，播放死亡动画并掉落战利品，移除碰撞。"
+    },
+    {
+      "state": "flyaway",
+      "note": "企鹅飞走状态，因惊吓飞离，有飞行物理设置并最终移除实体。"
+    },
+    {
+      "state": "migrate",
+      "note": "企鹅迁徙状态，移动到新地点，通常与回家或搬运物品相关。"
+    },
+    {
+      "state": "run",
+      "note": "企鹅奔跑状态，快速移动，有滑行音效和循环动画。"
+    },
+    {
+      "state": "taunt",
+      "note": "企鹅嘲讽状态，播放嘲讽动画和音效，可能影响周围生物。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13897,
+      15551,
+      15922,
+      51046,
+      20511,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及企鹅或与stategraph__SGpenguin相关的能力表达，所有页面均涉及其他实体如天体英雄、龙蝇、克劳斯等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "企鹅",
+    "移动",
+    "攻击",
+    "进食",
+    "死亡",
+    "飞走",
+    "迁徙",
+    "嘲讽",
+    "睡眠",
+    "冻结"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "37c61b36576619e04e88964c5ea83f5e9bdd368059d318b35ac39a86e555ecac",
+    "source_bytes": 21630,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134748887
+  }
+}

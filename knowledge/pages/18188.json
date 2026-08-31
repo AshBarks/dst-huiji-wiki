@@ -5,18 +5,56 @@
   "inputs": {
     "wikitext_sha256": "f793b42d519680cb1c65d0903c4a0388465138a21780d42063b6adca0376ff9f",
     "symbol_doc_shas": {
+      "components/boatcannon.lua": "042ef0b75ac83b169590e17fbd228d55578483bfce0d3e821d41d1ca891aa322",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/reticule.lua": "388e612488b82e7fb0d430aab94edf25e4f305cd610f7cc5d5fbc040dbb0ce01",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGboatcannon.lua": "03f1cf5473af7464bc97f86b02ef3e29221bd94365f1e9c503aebf65cb6d0baf"
     }
   },
   "symbols": {
+    "components/boatcannon.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "填装炮弹操作",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "先用鼠标持有[[炮弹]]点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装"
+            }
+          ]
+        },
+        {
+          "aspect": "射击触发方式",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "再左键点击大炮进…"
+            }
+          ]
+        },
+        {
+          "aspect": "弹药装载状态台词",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "玩家身上没有炮弹填装大炮时："
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -49,7 +87,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -72,6 +111,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/reticule.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [
@@ -103,7 +150,41 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGboatcannon.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "射击操作描述",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "再左键点击大炮进…"
+            }
+          ]
+        },
+        {
+          "aspect": "装填操作描述",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "先用鼠标持有[[炮弹]]点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装"
+            }
+          ]
+        },
+        {
+          "aspect": "默认待机状态描述",
+          "evidence": [
+            {
+              "pageid": 18188,
+              "quote": "在大炮没有使用时，它还有一个默认的发射方向。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

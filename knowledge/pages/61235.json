@@ -5,13 +5,31 @@
   "inputs": {
     "wikitext_sha256": "b6cf8c2ba45ff8e261255e809dcb83da3eb51d4d656dc9fc77f2bd0d336959bf",
     "symbol_doc_shas": {
+      "components/abysspillargroup.lua": "7783d96384792734cf9b927e2c4c5e035c00d929a6d997c3adcd6b682748c729",
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/embarker.lua": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7"
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "stategraphs/SGabysspillar_minion.lua": "6ef3b7af70c8ac7505f15d5c219d272e2807ad5818db6d2354bec7dda205f8ee"
     }
   },
   "symbols": {
+    "components/abysspillargroup.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
+    },
     "components/embarker.lua": {
       "mention_source": "fact_match",
       "fact_matches": [
@@ -30,7 +48,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -53,6 +72,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGabysspillar_minion.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

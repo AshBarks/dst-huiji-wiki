@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_puckdrop_station.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_puckdrop_station",
+  "summary": "该状态图驱动饥荒联机版中嘉年华小游戏'弹珠投递站'（carnivalgame_puckdrop_station）实体，控制游戏从初始化、启动、循环选择门、小球掉落、具体游戏播放、得分结算到奖励生成的完整流程。状态组织基于有限状态机，通过事件驱动状态转换，包括过渡动画状态和核心玩法状态。",
+  "api": [],
+  "api_note": "该状态图未定义对外 API 方法，所有游戏逻辑封装在状态内部的事件处理和转换中，无法直接从外部调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle_off",
+    "turn_on",
+    "cycle_doors",
+    "drop_ball",
+    "gameover",
+    "spawn_rewards",
+    "spawn_rewards_x2",
+    "no_rewards",
+    "turn_off",
+    "play_door1_game1",
+    "play_door1_game2",
+    "play_door1_game3",
+    "play_door1_game4",
+    "play_door1_game5",
+    "play_door2_game1",
+    "play_door2_game2",
+    "play_door2_game3",
+    "play_door2_game4",
+    "play_door2_game5",
+    "play_door3_game1",
+    "play_door3_game2",
+    "play_door3_game3",
+    "play_door3_game4",
+    "play_door3_game5"
+  ],
+  "state_notes": [
+    {
+      "state": "turn_on",
+      "note": "启动游戏，播放启动动画和音效，将机器从关闭状态切换到待机状态，准备开始游戏。"
+    },
+    {
+      "state": "cycle_doors",
+      "note": "循环选择门编号（1-3），每次循环门编号加一，为小球掉落路径做准备，直到收到停止信号。"
+    },
+    {
+      "state": "drop_ball",
+      "note": "掉落小球，触发具体游戏播放，记录兴奋度，并根据当前门编号进入对应游戏状态。"
+    },
+    {
+      "state": "gameover",
+      "note": "游戏结束，根据小球落点（左/中/右）计算分数，若落点为中心则分数翻倍，然后进入奖励生成状态。"
+    },
+    {
+      "state": "spawn_rewards",
+      "note": "生成普通奖励，播放对应动画和循环音效，奖励基于游戏得分产生。"
+    },
+    {
+      "state": "spawn_rewards_x2",
+      "note": "生成双倍奖励，对应小球落点为中心的情况，播放特殊动画和音效。"
+    },
+    {
+      "state": "no_rewards",
+      "note": "无奖励状态，当游戏得分为零时进入，播放对应动画，不生成奖励。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      27531,
+      65881,
+      13493,
+      13457,
+      14426,
+      13199,
+      23202,
+      14463
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未涉及 stategraph__SGcarnivalgame_puckdrop_station 的能力或行为语义；页面内容涵盖闪电、工厂、寄居蟹、交易小店、提灯、暴食、捉迷藏游戏和蘑菇灯，与 puck drop 嘉年华游戏无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "弹珠游戏",
+    "嘉年华",
+    "puck drop",
+    "小游戏",
+    "车站",
+    "奖励",
+    "得分",
+    "落点",
+    "循环门"
+  ],
+  "gameplay_tags": [
+    "小游戏",
+    "嘉年华",
+    "弹珠",
+    "得分"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d0285a7bbb83a721ed2bff8348ebace4dd68ece8ab064b2082bc2ab7546c5270",
+    "source_bytes": 12594,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136544744
+  }
+}

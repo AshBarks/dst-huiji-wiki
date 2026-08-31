@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGslurper.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGslurper",
+  "summary": "该状态图驱动名为“舔食者”（slurper）的游戏实体，一种敌对生物。它以空闲状态为核心，通过事件触发移动、攻击、受击和死亡等行为。状态设计包括特殊攻击如偷取玩家头部装备，体现了其战斗特性。",
+  "api": [],
+  "api_note": "状态图没有定义对外方法，所有行为通过内部状态转换和事件驱动，由游戏引擎自动管理。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "rumble",
+    "taunt",
+    "burp",
+    "headslurp",
+    "headslurpmiss",
+    "attack",
+    "hit",
+    "death",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "ruinsrespawn"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认待机状态，随机有15%概率触发隆隆声动画，表现为停止移动并播放循环动画。"
+    },
+    {
+      "state": "headslurp",
+      "note": "跳跃攻击状态，舔食者跳向目标并尝试偷取或装备头部物品，进入条件为攻击时目标有效且在附近。"
+    },
+    {
+      "state": "attack",
+      "note": "滚动攻击状态，高速接近目标并造成伤害，若目标在附近且满足条件可触发头戴攻击（headslurp）。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态，停止移动并播放受伤动画，持续短暂时间后返回空闲。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，停止一切行为，移除碰撞并播放死亡动画，最后掉落战利品。"
+    },
+    {
+      "state": "burp",
+      "note": "打嗝动画，通常在成功偷取帽子后触发，无实际效果，仅播放动画和声音。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽动画，无特殊效果，常在未命中（headslurpmiss）后触发，播放特定声音。"
+    },
+    {
+      "state": "ruinsrespawn",
+      "note": "重生状态，仅播放生成动画，用于遗迹等特定场景的刷新。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      15651,
+      13897,
+      51046,
+      15551,
+      15225,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及或描述 stategraph__SGslurper 的任何能力或行为语义，所有内容涉及其他实体（如龙蝇、克劳斯、蜂王等）的攻击、仇恨或掉落，与 SGslurper 无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "舔食者",
+    "攻击",
+    "滚动",
+    "偷帽子",
+    "死亡",
+    "移动",
+    "硬直",
+    "嘲讽",
+    "打嗝"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e972550c414bf7fb89e08f5369809e752d6e9bec49a52f99ffa6279570031e36",
+    "source_bytes": 10880,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141138180
+  }
+}

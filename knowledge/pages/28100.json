@@ -5,13 +5,19 @@
   "inputs": {
     "wikitext_sha256": "cdfd91dcb24079bb8c933098a238e2d8da488260464fa0f6b0c64d5b79947b49",
     "symbol_doc_shas": {
+      "components/highlightchild.lua": "151e60b6a21f45cd11aef0db4be7aeb52505c8929a8464b21105f232fdad440b",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/stretcher.lua": "fa23df9bf418b4ba8a7c0dd78a1a31fc721797e94b2fd0c798d8bcb6780baa91"
     }
   },
   "symbols": {
+    "components/highlightchild.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/knownlocations.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -49,6 +55,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/stretcher.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

@@ -5,12 +5,28 @@
   "inputs": {
     "wikitext_sha256": "374a08e41da2dc73f9ade59af1902e7bb17ea35db285a8812561977e2e29ecfc",
     "symbol_doc_shas": {
+      "components/bathbombable.lua": "d162a19fb75c10b0e44b425f4ec0b1b90802a674c34079ba5a73e18577b9953b",
+      "components/bathingpool.lua": "00404add7a93e033023ec610662c08f6cdebca3871a0284bd2bba82e188d016b",
+      "components/heater.lua": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/bathbombable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/bathingpool.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/heater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -33,6 +49,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "mention_source": "llm_verdict",

@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwanderingtrader.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwanderingtrader",
+  "summary": "该状态图驱动游荡商人实体，控制其空闲、移动、交易、说话、传送和隐藏等行为。整体状态组织基于内部记忆（如交易状态）和事件触发，表现出放松缓慢的移动风格，状态转换通常较为迟缓。",
+  "api": [],
+  "api_note": "该状态图主要处理游荡商人的内部状态转换，没有定义暴露给外部的公共API方法。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "hop",
+    "sink",
+    "fallinvoid",
+    "dotrade",
+    "arrive"
+  ],
+  "netvars": [],
+  "tunables": [
+    "RESEARCH_MACHINE_DIST"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "trading_start",
+    "trading",
+    "trading_stop",
+    "dotrade",
+    "talking",
+    "teleport",
+    "arrive",
+    "hide",
+    "hiding"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "商人初始或停止移动后的站立状态，播放idle动画；如果玩家靠近且有库存，可能自动触发交易开始。"
+    },
+    {
+      "state": "walk",
+      "note": "商人移动状态，行走时速度在特定帧降低至0.35倍，实现缓慢移动效果，移动中会检查是否进入交易状态。"
+    },
+    {
+      "state": "trading_start",
+      "note": "交易开始状态，商人播放揭示动画并设置revealed标签，如果玩家在附近且有库存则进入交易；否则可能隐藏。"
+    },
+    {
+      "state": "trading",
+      "note": "交易中状态，循环播放交易动画，等待玩家交互；如果内部记忆trading为假则退出交易。"
+    },
+    {
+      "state": "trading_stop",
+      "note": "交易停止状态，播放交易结束动画，根据是否实际交易触发不同对话（如成功或无交易），并可能进入隐藏。"
+    },
+    {
+      "state": "dotrade",
+      "note": "执行交易状态，商人播放给予动画，触发交易事件和对话声音，交易完成后返回交易状态。"
+    },
+    {
+      "state": "talking",
+      "note": "说话状态，商人持续播放说话动画和循环声音，设置revealed标签，用于对话或事件触发时的表达。"
+    },
+    {
+      "state": "teleport",
+      "note": "传送状态，商人播放消失动画，动画中途隐藏（设置invisible标签和NOCLICK），用于场景传送或消失。"
+    },
+    {
+      "state": "arrive",
+      "note": "出现状态，商人从隐形状态播放出现动画，动画中显示阴影并移除标签，表示进入场景或传送后现身。"
+    },
+    {
+      "state": "hide",
+      "note": "隐藏状态，商人播放消失动画，动画中途隐藏，用于自愿隐藏或场景移除。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18001,
+      57263,
+      16641,
+      46887,
+      18359,
+      13493,
+      17930,
+      24578
+    ],
+    "aspects": [
+      {
+        "aspect": "传送行为描述",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "他就会传送到旅行路径上的一个随机检查点"
+          }
+        ]
+      },
+      {
+        "aspect": "出现状态描述",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "比赛结束以后再在原地重新出现"
+          }
+        ]
+      },
+      {
+        "aspect": "隐藏状态描述",
+        "evidence": [
+          {
+            "pageid": 46887,
+            "quote": "会让流浪商人暂时消失"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "游荡商人",
+    "交易",
+    "出现",
+    "消失",
+    "说话",
+    "传送",
+    "隐藏",
+    "缓慢移动",
+    "库存",
+    "商人对话"
+  ],
+  "gameplay_tags": [
+    "交易",
+    "移动",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "af59e8464960d9044dc5f7a0f67e1faa4d79f91ef1455ae806db276be724d957",
+    "source_bytes": 13631,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142206646
+  }
+}

@@ -21,7 +21,8 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "stategraphs/SGmole.lua": "3a1ddd6a063cf71bdf5831d1108291f6cc199bde1d81ddfcb1990cf024b9806e"
     }
   },
   "symbols": {
@@ -50,7 +51,10 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述鼹鼠但未提及游荡行为"
+      }
     },
     "brains/molebrain.lua": {
       "mention_source": "fact_match",
@@ -241,6 +245,49 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmole.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "制作鼹鼠丘行为",
+          "evidence": [
+            {
+              "pageid": 15715,
+              "quote": "挖掘一个新的巢穴"
+            }
+          ]
+        },
+        {
+          "aspect": "地下移动方式",
+          "evidence": [
+            {
+              "pageid": 15715,
+              "quote": "在地下移动的方式与洞穴蠕虫相似"
+            }
+          ]
+        },
+        {
+          "aspect": "死亡掉落物品",
+          "evidence": [
+            {
+              "pageid": 15715,
+              "quote": "掉落 = {{Pic|32|小肉}}×1"
+            }
+          ]
+        },
+        {
+          "aspect": "返回巢穴行为",
+          "evidence": [
+            {
+              "pageid": 15715,
+              "quote": "白天则会返回其鼹鼠丘中"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

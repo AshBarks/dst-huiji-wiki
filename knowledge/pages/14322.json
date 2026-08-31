@@ -16,7 +16,8 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGcentipede.lua": "71087e1dca12b6a44b84d8f2bb3f2977a04d05a36904f839e019a3bc32e80299"
     }
   },
   "symbols": {
@@ -161,7 +162,23 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGcentipede.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "范围攻击伤害描述",
+          "evidence": [
+            {
+              "pageid": 14322,
+              "quote": "头部攻击一次造成 40 点单体伤害，随后跳位}}内的生物造成 20 点范围伤害。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

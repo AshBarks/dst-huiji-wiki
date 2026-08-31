@@ -8,7 +8,9 @@
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/trap.lua": "8bd660e63d2c27a255d9a8da56ff2e34a419286cd48b5098492350b7283f8f0a",
+      "stategraphs/SGtrap.lua": "04a2abbe9b8489a770ace438c2ef5a5e66cb2a0e9dcd8d1585b8f11d1f73fcb7"
     }
   },
   "symbols": {
@@ -49,7 +51,48 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/trap.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "战利品生成说明",
+          "evidence": [
+            {
+              "pageid": 14676,
+              "quote": "在捕鸟陷阱中留下随机 1 个该鸟的掉落物。"
+            }
+          ]
+        },
+        {
+          "aspect": "收获操作描述",
+          "evidence": [
+            {
+              "pageid": 14676,
+              "quote": "由于收获捕鸟陷阱时实际上是生成了一个新的鸟或掉落物。"
+            }
+          ]
+        },
+        {
+          "aspect": "空闲状态表述",
+          "evidence": [
+            {
+              "pageid": 14676,
+              "quote": "放在地上且未触发的捕鸟陷阱"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "陷阱触发机制"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "stategraphs/SGtrap.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

@@ -14,13 +14,15 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/herdmember.lua": "98d932c9bb82412871e32014f29df654569ec0083906560457c9983dbec10787",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGgrassgekko.lua": "2ab5e11d3ac94bcac3ec340b8e7bce3d7c22f982f94c8c206d371d600f15b5e0"
     }
   },
   "symbols": {
@@ -58,7 +60,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/grassgekkobrain.lua": {
       "mention_source": "fact_match",
@@ -167,6 +170,25 @@
       "llm_verdict": {
         "note": "草壁虎页面，未提及健康相关"
       }
+    },
+    "components/herdmember.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "兽群位置决定机制",
+          "evidence": [
+            {
+              "pageid": 15753,
+              "quote": "壁虎群的位置则由群中的所有无仇恨目标的个体共同决定"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "兽群再生规则"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -292,6 +314,10 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGgrassgekko.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatmeter.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatmeter",
+  "summary": "SGboatmeter 状态图用于控制饥荒联机版中船用仪表的显示状态，初始为关闭状态。它通过监听 open_meter 和 close_meter 事件来切换打开和关闭动画，管理仪表的可见性和漏水数据更新。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，仅通过内部事件处理状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "close_meter",
+    "open_meter"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "open",
+    "open_pre",
+    "open_pst",
+    "close_pre",
+    "close_pst",
+    "closed"
+  ],
+  "state_notes": [
+    {
+      "state": "closed",
+      "note": "仪表处于关闭状态，所有UI部件隐藏，玩家无法看到仪表。"
+    },
+    {
+      "state": "open",
+      "note": "仪表完全打开，显示背景、徽章、图标和漏水动画，并实时更新漏水状态。"
+    },
+    {
+      "state": "open_pre",
+      "note": "播放打开仪表的前半部分动画，触发animover事件后进入后半部分。"
+    },
+    {
+      "state": "open_pst",
+      "note": "播放打开仪表的后半部分动画，显示UI部件，然后进入完全打开状态。"
+    },
+    {
+      "state": "close_pre",
+      "note": "播放关闭仪表的前半部分动画，触发animover事件后进入后半部分。"
+    },
+    {
+      "state": "close_pst",
+      "note": "播放关闭仪表的后半部分动画，隐藏UI部件，然后进入完全关闭状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      61065,
+      34523,
+      20714,
+      47083,
+      10379,
+      14816,
+      14935,
+      14929
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提到与 SGboatmeter 相关的任何内容，所有页面讨论的是其他游戏实体和机制，如谜题、布景、控制台、礼物、角色和生物行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船表",
+    "仪表",
+    "漏水",
+    "关闭",
+    "打开",
+    "动画",
+    "状态图",
+    "显示",
+    "隐藏",
+    "事件"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4eb7557584d805deb9edcdba897d9502991a94e031f75a07bfe7b3f10af675dc",
+    "source_bytes": 2504,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144125716
+  }
+}

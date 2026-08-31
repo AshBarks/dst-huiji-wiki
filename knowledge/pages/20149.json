@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "f109eb584e597719c0133eaa0fc45eac7f448b5acd2405df16e43b3fd529dae0",
     "symbol_doc_shas": {
+      "components/blowinwind.lua": "18b191c67bc2479413f2ca5200ba1a7c8cdfbcdf7fe6e24771255da20a35473d",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -15,6 +16,14 @@
     }
   },
   "symbols": {
+    "components/blowinwind.lua": {
+      "aspects_ignored": [
+        "周期性更新行为",
+        "方向变化行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",

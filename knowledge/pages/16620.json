@@ -10,7 +10,9 @@
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/insulator.lua": "d1f80810cc39df282f981aa5a9c195a757f9ee10d4c040dcd8480365727d5a9b",
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/waterproofer.lua": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46"
     }
   },
   "symbols": {
@@ -62,12 +64,28 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/insulator.lua": {
+      "aspects_ignored": [
+        "暖石自带的保暖与隔热值描述",
+        "胡须提供的保暖与隔热值描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
         "物品拾取与丢弃行为描述",
         "物品沉没行为描述",
         "物品温度数值及变化描述",
         "物品潮湿度数值描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/waterproofer.lua": {
+      "aspects_ignored": [
+        "防水效果对潮湿速率的影响"
       ],
       "route": "direct",
       "detail_level": "stub",

@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadow_trap.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadow_trap",
+  "summary": "该状态图驱动影子陷阱（shadow_trap）实体，是一个可触发的陷阱，用于在游戏环境中生成影子生物。状态从生成开始，经过空闲、接近检测、激活、触发和驱散阶段，最终消失。",
+  "api": [],
+  "api_note": "该状态图为内部状态机，没有定义公共API方法。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "spawn",
+    "idle",
+    "near_idle_pre",
+    "near_idle",
+    "near_idle_pst",
+    "activate",
+    "activating_loop",
+    "trigger",
+    "dispell"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "生成时播放动画，可能在水面产生溅水效果。"
+    },
+    {
+      "state": "idle",
+      "note": "陷阱空闲状态，可以检测玩家靠近和激活。"
+    },
+    {
+      "state": "near_idle_pre",
+      "note": "玩家靠近时进入，开始触发前动画和音效。"
+    },
+    {
+      "state": "near_idle",
+      "note": "玩家持续靠近时循环播放触发音效和动画。"
+    },
+    {
+      "state": "activate",
+      "note": "陷阱激活，开始紧张动画，启用目标特效。"
+    },
+    {
+      "state": "activating_loop",
+      "note": "激活循环，持续紧张阶段，直到触发。"
+    },
+    {
+      "state": "trigger",
+      "note": "陷阱触发，播放爆炸动画，生成影子生物和特效。"
+    },
+    {
+      "state": "dispell",
+      "note": "陷阱被驱散，播放消失动画后移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24542,
+      15022,
+      16419,
+      34523,
+      20714,
+      65605,
+      52788,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 stategraph__SGshadow_trap 或其相关能力；所有页面讨论的是陷阱布景、天体英雄、电路板、布景生成等主题，未涉及该符号的具体行为语义（如生成动画、陷阱激活等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "陷阱",
+    "触发",
+    "激活",
+    "爆炸",
+    "驱散",
+    "生成",
+    "空闲",
+    "接近检测",
+    "消失"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 1/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "陷阱"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1da234bccfe16f9b8f0ae07a998d2179533092b4d05c756227ec7cef2a221ae8",
+    "source_bytes": 5809,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140557035
+  }
+}

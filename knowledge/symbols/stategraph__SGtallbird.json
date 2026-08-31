@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtallbird.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtallbird",
+  "summary": "该状态图驱动饥荒联机版中的高脚鸟(tallbird)实体，包括其幼年形态(teenbird)。整体状态组织基于事件驱动，通过定义多种状态如闲置、攻击、受击、产卵、筑巢、成长等，利用事件监听和动作处理实现在不同行为状态间的平滑转换。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，所有行为通过状态图事件和组件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "makenewnest"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "death",
+    "idle",
+    "idle_blink",
+    "idle_peep",
+    "idle_taunt",
+    "lay",
+    "makenest",
+    "taunt",
+    "attack",
+    "peck",
+    "hit",
+    "gohome",
+    "eat",
+    "growup"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础闲置状态，成年高脚鸟直接播放idle动画；幼年高脚鸟有定时器，随机触发peep或blink动画，模拟饥饿或眨眼行为。"
+    },
+    {
+      "state": "attack",
+      "note": "成年高脚鸟的攻击状态，播放攻击前摇和攻击动画，在动画12帧时造成伤害，攻击后短暂移除busy标签，允许其他行动。"
+    },
+    {
+      "state": "peck",
+      "note": "幼年高脚鸟特有攻击，啄击目标，在动画13帧时造成伤害，并可能触发目标显示“被啄”的对话。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，高脚鸟受伤时播放受击动画，有短暂硬直，之后恢复到idle状态。"
+    },
+    {
+      "state": "lay",
+      "note": "产卵状态，高脚鸟播放产卵动画，在65帧时执行产卵动作，之后返回idle。"
+    },
+    {
+      "state": "makenest",
+      "note": "筑巢状态，高脚鸟尝试筑巢，如果成功则进入睡眠，否则返回idle。"
+    },
+    {
+      "state": "growup",
+      "note": "成长状态，幼年高脚鸟成长为成年形态，播放成长动画，完成后调用SpawnAdult函数生成成年高脚鸟。"
+    },
+    {
+      "state": "gohome",
+      "note": "回家状态，高脚鸟移动到巢穴并进入睡眠状态。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，高脚鸟播放偷取动画，在11帧时执行进食动作，可能消耗或获取食物。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15386,
+      15022,
+      15922,
+      51046,
+      13897,
+      15238,
+      13456,
+      18723
+    ],
+    "aspects": [
+      {
+        "aspect": "产卵倒计时描述",
+        "evidence": [
+          {
+            "pageid": 18723,
+            "quote": "鸟蛋时，开始一个 3 ~ 5 天的下蛋倒计时"
+          }
+        ]
+      },
+      {
+        "aspect": "回巢与睡眠行为描述",
+        "evidence": [
+          {
+            "pageid": 18723,
+            "quote": "黄昏时高脚鸟会回到鸟巢站立或者卧在鸟巢，到了夜晚会进入睡眠。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "高脚鸟",
+    "攻击",
+    "产卵",
+    "筑巢",
+    "成长",
+    "啄击",
+    "受击",
+    "睡眠",
+    "饥饿",
+    "幼鸟"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "73b9abd074bee806e3770e3fca1b582aa8f42d7481cab08707d2cb8f3f86a8db",
+    "source_bytes": 11771,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134940016
+  }
+}

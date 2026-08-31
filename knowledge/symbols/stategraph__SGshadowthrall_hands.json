@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_hands.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_hands",
+  "summary": "该状态图驱动饥荒联机版中的影怪实体“shadowthrall_hands”（影怪之手）。整体状态组织方式为典型的状态机，包括生成、空闲、移动（行走和奔跑）、攻击、被击和死亡等状态，其中奔跑状态可进行范围攻击并协调队友。",
+  "api": [],
+  "api_note": "状态图不对外提供API方法，仅控制实体内部状态转换，由游戏引擎自动调用。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "locomote",
+    "attacked",
+    "animover",
+    "fallinvoid",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SHADOWTHRALL_HANDS_ATTACK_RANGE"
+  ],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawn",
+    "death",
+    "hit",
+    "run_start",
+    "run",
+    "run_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "生成时具有临时无敌帧（temp_invincible）和不可攻击（noattack）标签，动画播放“appear”并伴随阴影缩放效果，持续约46帧后解除限制。"
+    },
+    {
+      "state": "death",
+      "note": "死亡时播放死亡动画和音效，在约53帧后掉落战利品并移除实体，玩家可通过击杀获取资源。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中后进入硬直状态（busy标签），播放“hit”动画，约12-14帧内可被中断（caninterrupt），之后可能衔接攻击。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态进行范围攻击（AOE），在动画帧8-13对前方区域造成伤害并击退敌人，同时协调队友攻击冷却，最多循环4次后停止。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      14907,
+      14929,
+      14936,
+      15938,
+      15941,
+      14811,
+      14816
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及实体 SGshadowthrall_hands 或其相关行为（如生成、死亡、受击、奔跑等），页面内容主要讨论其他实体（如地狱独眼巨猪、坦克龟等）的行为，与该符号无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影怪之手",
+    "奔跑攻击",
+    "范围伤害",
+    "团队协作",
+    "生成动画",
+    "死亡掉落",
+    "硬直",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "影怪",
+    "团队"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f346e94b015dd8c92695a1f4fed9ce206a31df893592cf57ae308466ccd1adf8",
+    "source_bytes": 16563,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140670522
+  }
+}

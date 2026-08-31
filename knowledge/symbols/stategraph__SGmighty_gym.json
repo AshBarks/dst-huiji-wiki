@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmighty_gym.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmighty_gym",
+  "summary": "状态图 `mighty_gym` 驱动力量健身房实体，处理其动画状态转换。整体状态组织方式包括空闲、被击中、放置重量和锻炼后状态，通过播放动画和事件驱动转场，无复杂战斗或生存逻辑。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "hit",
+    "place_weight",
+    "workout_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体处于空闲状态，持续播放空闲动画，无特殊效果。"
+    },
+    {
+      "state": "hit",
+      "note": "当实体被击中时，播放被击中的动画，随后自动返回空闲状态，可能代表短暂硬直。"
+    },
+    {
+      "state": "place_weight",
+      "note": "当玩家放置重量到健身房的槽位时，根据槽位数据播放对应动画，完成后转为空闲。"
+    },
+    {
+      "state": "workout_pst",
+      "note": "锻炼结束后的状态，根据锻炼程度播放不同动画，并停止循环锻炼声音，随后返回空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15904,
+      13156,
+      33991,
+      23932,
+      13642,
+      28103,
+      13493,
+      15737
+    ],
+    "aspects": [
+      {
+        "aspect": "配重放置描述",
+        "evidence": [
+          {
+            "pageid": 15904,
+            "quote": "健身房上可以放置两个[[:分类:重物|重物]]作为配重"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "健身房",
+    "力量训练",
+    "锻炼动作",
+    "放置重物",
+    "受伤状态",
+    "空闲状态",
+    "状态机",
+    "完成动画"
+  ],
+  "search_terms_note": "pass1 后零命中 8/8,已二次修正(修正后 6/8)",
+  "gameplay_tags": [
+    "建造",
+    "训练"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8ac6bea6a1b1f08b78b76e3067126c25ad296de1141aac0f47a6e04698756e93",
+    "source_bytes": 1466,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138889047
+  }
+}

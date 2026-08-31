@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_shadowdrone_debuffer.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_shadowdrone_debuffer",
+  "summary": "该状态图驱动wx78的阴影无人机（减速版本）。它组织了无人机的生成、跟随主人移动、扫描目标施加减速效果、停用和重新激活等状态，通过事件驱动状态转换，实现无人机的辅助战斗行为。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，所有行为通过事件和状态内部逻辑驱动。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "spawned",
+    "despawn",
+    "deactivate",
+    "ms_wx_shadowdrone_scan"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WX78.SHADOWDRONE_DEBUFFER_RUNSPEED_BOOSTED",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_DEBUFFER_RUNSPEED",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_DEBUFFER_WALKSPEED",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_FOLLOW_RADIUS"
+  ],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawned",
+    "despawn",
+    "deactivate",
+    "reactivate",
+    "run_start",
+    "run",
+    "run_stop",
+    "scan_start",
+    "scanning",
+    "scan_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "无人机空闲状态，静止待命，可随机播放动画帧。进入条件为无移动或扫描指令，玩家可见无人机悬浮。"
+    },
+    {
+      "state": "spawndelay",
+      "note": "生成延迟状态，无人机隐藏并传送至主人附近，等待生成完成。进入条件为生成事件，有延迟配置。"
+    },
+    {
+      "state": "spawned",
+      "note": "生成后出现状态，播放弹跳动画，动态阴影缩放显示。进入条件为spawndelay结束，表现无人机实体化。"
+    },
+    {
+      "state": "despawn",
+      "note": "消失状态，播放死亡动画并移除实体，可能掉落物品。进入条件为 despawn 事件，无人机永久移除。"
+    },
+    {
+      "state": "deactivate",
+      "note": "停用状态，播放停用动画，无人机暂时失活但未移除。进入条件为 deactivate 事件，结束后可重新激活。"
+    },
+    {
+      "state": "reactivate",
+      "note": "重新激活状态，播放复活动画，无人机恢复活动。进入条件为 deactivate 后超时，表现无人机重启。"
+    },
+    {
+      "state": "run",
+      "note": "移动状态，无人机跟随主人行走或奔跑，速度根据主人位置动态调整。进入条件为移动事件，表现跟随行为。"
+    },
+    {
+      "state": "scan_start",
+      "note": "扫描开始状态，无人机转向目标并播放扫描前奏动画。进入条件为扫描事件且有目标，表现扫描启动。"
+    },
+    {
+      "state": "scanning",
+      "note": "扫描中状态，无人机持续面对目标施加减速效果，播放循环扫描动画。进入条件为 scan_start 结束且目标在范围内，表现减速debuff。"
+    },
+    {
+      "state": "scan_stop",
+      "note": "扫描结束状态，无人机停止扫描并返回空闲。进入条件为目标超出范围或死亡，表现扫描终止。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      15539,
+      20719,
+      65605,
+      16615,
+      20714,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及无人机（drone）或其行为状态如空闲、生成、扫描等。所有内容围绕电路板、扫描分析仪、世界翻新等机制，与实体stategraph__SGwx78_shadowdrone_debuffer的能力表达无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "阴影无人机",
+    "减速",
+    "扫描",
+    "跟随",
+    "wx78",
+    "debuffer",
+    "生成",
+    "消失",
+    "移动",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "400efb3ae210e510febce801c200270441a722047e61c1464fd2d08828ef116d",
+    "source_bytes": 16027,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143890626
+  }
+}

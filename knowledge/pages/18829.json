@@ -10,7 +10,10 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/possessedaxe.lua": "7e7e3604c35df33aca2359f1ef77b64842b4681d68991d93b1a825e6d14296ac",
+      "components/sentientaxe.lua": "d2371d5b3a9b39ba190c4251965d701305a4ba3ff6dec361ce844bf304d02c17",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "components/tool.lua": "ec086e8fd11cf1ca93b1a47894028dd2b9a27df57fe508ab3c42a313f7fb0ada",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -60,6 +63,59 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/possessedaxe.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "斧头状态恢复",
+          "evidence": [
+            {
+              "pageid": 18829,
+              "quote": "同时原有的露西斧会转变为普通斧头"
+            }
+          ]
+        },
+        {
+          "aspect": "玩家绑定行为",
+          "evidence": [
+            {
+              "pageid": 18829,
+              "quote": "每个露西斧都对应一名伍迪玩家。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/sentientaxe.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "露西斧的对话内容",
+          "evidence": [
+            {
+              "pageid": 18829,
+              "quote": "内容大多为怂恿伍迪砍树或和他闲聊"
+            }
+          ]
+        },
+        {
+          "aspect": "露西斧的语音功能",
+          "evidence": [
+            {
+              "pageid": 18829,
+              "quote": "露西斧会用红色的字体说话，台词位于角色下方与角色本身台词区分。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "伍迪的诅咒变身描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -67,6 +123,19 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/tool.lua": {
+      "aspects_ignored": [
+        "倒走表使用效果",
+        "巨兽攻击行为优先级",
+        "弹药技能解锁使用",
+        "战歌恢复生命效果",
+        "武器攻击伤害与条件",
+        "玩具交易功能",
+        "电路板激活增益设置"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [
@@ -80,5 +149,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

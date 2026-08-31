@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgrassgator.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgrassgator",
+  "summary": "该状态图驱动饥荒联机版中的草鳄鱼实体，处理其日常行为、战斗和特殊互动。状态组织包括空闲、移动、攻击、潜水、掉落物品和死亡等核心状态，以及通过通用状态处理器添加的行走、跑步等基础状态。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外方法，仅用于内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "startfalling",
+    "shed",
+    "diveandrelocate"
+  ],
+  "netvars": [],
+  "tunables": [
+    "GRASSGATOR_SHEDTIME_SET",
+    "GRASSGATOR_SHEDTIME_VAR"
+  ],
+  "states": [
+    "idle",
+    "shake",
+    "bellow",
+    "graze",
+    "alert",
+    "attack",
+    "death",
+    "shed",
+    "fall_pre",
+    "fall",
+    "land",
+    "land_on_ground",
+    "dive",
+    "dive_loop",
+    "surface"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "草鳄鱼的闲置状态，随机计时后可能进入bellow或shake状态，或触发shed掉落树枝。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，播放攻击动画并在第15帧造成伤害，有攻击标签防止中断。"
+    },
+    {
+      "state": "shed",
+      "note": "掉落树枝状态，在8帧后掉落一个twigs，并启动计时器控制下次掉落间隔。"
+    },
+    {
+      "state": "dive",
+      "note": "潜水状态，草鳄鱼潜入水下，逐渐变得不可见和不可攻击，为重新定位做准备。"
+    },
+    {
+      "state": "surface",
+      "note": "浮出水面状态，从水下出现，播放动画并逐渐恢复攻击和移动能力。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画，掉落战利品并移除物理碰撞，若在水中则播放死亡待机动画。"
+    },
+    {
+      "state": "fall",
+      "note": "下落状态，从空中下落，根据高度判断落入水中或地面，有影子警告效果。"
+    },
+    {
+      "state": "land",
+      "note": "落入水中状态，生成水波效果并播放入水音效。"
+    },
+    {
+      "state": "alert",
+      "note": "警觉状态，播放警觉动画和音效，可能由玩家接近或事件触发。"
+    },
+    {
+      "state": "graze",
+      "note": "吃草状态，播放吃草动画并持续一段时间后返回idle。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15258,
+      34557,
+      15022,
+      16419,
+      13897,
+      15651,
+      51046,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "警觉行为描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "当有角色进入草鳄鱼 10 单位内范围内时，草鳄鱼会停止移动并警觉"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置游荡行为描述",
+        "evidence": [
+          {
+            "pageid": 15258,
+            "quote": "在白天和黄昏，草鳄鱼会在距离自己大树干 26 距离单位的范围内游荡。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "草鳄鱼",
+    "grassgator",
+    "攻击",
+    "潜水",
+    "掉落树枝",
+    "死亡",
+    "两栖",
+    "生物",
+    "水下",
+    "水面"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "af0527c27d3a8d2ca319662254617261b8ac4cd16715c220238acd773c754aaf",
+    "source_bytes": 19068,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138053658
+  }
+}

@@ -5,16 +5,26 @@
   "inputs": {
     "wikitext_sha256": "1d25785bb30aead8dda8f9bfa7219bdc2f48e04550dbd3601f7de88a3a328ed9",
     "symbol_doc_shas": {
+      "components/boatphysics.lua": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/boatphysics.lua": {
+      "aspects_ignored": [
+        "一角鲸角的加速效果",
+        "锚的减速作用描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "aspects_ignored": [
         "伤害数值标注",
@@ -76,6 +86,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

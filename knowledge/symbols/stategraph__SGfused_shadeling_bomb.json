@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfused_shadeling_bomb.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfused_shadeling_bomb",
+  "summary": "该状态图驱动名为'fused_shadeling_bomb'的融合影怪炸弹实体。状态图通过事件和状态标签组织状态转换，包括移动、空闲、生成和弹跳等行为，起始状态为'bounce'。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外方法，主要管理内部状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "walk",
+    "bounce",
+    "idle_ground",
+    "spawn",
+    "idle"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "当实体生成时进入此状态，播放生成动画并启动计时器，计时结束后可能切换到其他状态。"
+    },
+    {
+      "state": "walk",
+      "note": "实体移动时进入此状态，播放行走动画并持续声音，超时后循环播放。"
+    },
+    {
+      "state": "idle",
+      "note": "实体空闲时进入此状态，可以旋转，播放空闲动画。"
+    },
+    {
+      "state": "bounce",
+      "note": "实体弹跳或处于忙碌状态，有'busy'标签，可能与攻击或特殊行为相关。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65605,
+      20714,
+      34314,
+      34523,
+      52788,
+      14579,
+      24544,
+      18359
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均讨论游戏一般机制（如世界翻新、控制台、世界生成、布景、物品等），未提及实体stategraph__SGfused_shadeling_bomb或其状态行为（spawn、walk、idle、bounce）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "融合影怪炸弹",
+    "影怪炸弹",
+    "炸弹",
+    "影怪",
+    "移动",
+    "空闲",
+    "弹跳",
+    "生成",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c27f47f923cd8409f7722b61d87b7efa2c6d7af9e394ab7b342dd8119c84825e",
+    "source_bytes": 1682,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137779586
+  }
+}

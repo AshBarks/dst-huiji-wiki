@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_centipede.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_centipede",
+  "summary": "该状态图驱动影怪百足虫(shadowthrall_centipede)实体。状态基于标签系统组织，如'busy'、'idle'、'moving'等，管理待机、移动、攻击、死亡等行为。状态图处理实体与控制器的身体段同步，例如在移动或挣扎时协调所有段。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，所有交互通过事件处理和内部函数完成。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "locomote",
+    "grow_segment",
+    "start_struggle",
+    "attacked",
+    "fallinvoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "hit",
+    "eat",
+    "death",
+    "struggle_pre",
+    "struggle_loop",
+    "struggle_pst",
+    "grow"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体待机状态，当头部不控制或不移动时保持动画循环。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时进入的硬直状态，播放受击动画和音效，短暂停止移动。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，在动画第30帧执行进食行为，头部可能播放循环声音。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品，同步到所有身体段。"
+    },
+    {
+      "state": "struggle_pre",
+      "note": "挣扎前奏状态，解除无敌状态，准备挣扎动画并播放声音。"
+    },
+    {
+      "state": "struggle_loop",
+      "note": "挣扎循环状态，持续播放挣扎动画三次后进入后继状态。"
+    },
+    {
+      "state": "struggle_pst",
+      "note": "挣扎后恢复状态，重新获得无敌性并返回待机。"
+    },
+    {
+      "state": "grow",
+      "note": "生长状态，用于增加身体段，播放生长动画并有特殊声音。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      51046,
+      15238,
+      15225,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及'stategraph__SGshadowthrall_centipede'或其相关能力表达；页面内容涉及其他实体如克劳斯、龙蝇、暗影傀儡等，但未涉及影之仆从蜈蚣的状态行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影怪",
+    "百足虫",
+    "饥饿",
+    "挣扎",
+    "生长",
+    "死亡",
+    "攻击",
+    "硬直",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b7feaa978925d0958c92522f799b9863070627bd871f28847f60767b6801c7d3",
+    "source_bytes": 12171,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134852509
+  }
+}

@@ -6,10 +6,14 @@
     "wikitext_sha256": "a2241946beee77cce297596c93f5e4a1e483068cce094d349d324992a5457f97",
     "symbol_doc_shas": {
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "components/guardian.lua": "a103a6e27f5262f4c62afd517ba8587bbc1e2aeb51a3f248b6f3bcc75a6e4aa6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/herd.lua": "d5e7d85fda8205a145c7411dd3b97ec7562e8acdb030b09c6e01693b4be49b1a",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGmooseegg.lua": "9e8fc4ff6727f877df216f687f531b33449ad8158a1f7ad7b98161e1942b47ae"
     }
   },
   "symbols": {
@@ -17,6 +21,15 @@
       "aspects_ignored": [
         "追踪实体行为描述",
         "遗忘实体行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/guardian.lua": {
+      "aspects_ignored": [
+        "召唤暗影傀儡行为",
+        "暗影傀儡死亡解散行为"
       ],
       "route": "direct",
       "detail_level": "stub"
@@ -30,6 +43,16 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/herd.lua": {
+      "aspects_ignored": [
+        "草鳄鱼游荡范围描述",
+        "蝴蝶聚集策略描述",
+        "面具生物兽群脱离描述",
+        "鸟群落点控制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -39,6 +62,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
@@ -68,6 +99,13 @@
         "wording": "被锤击4次后",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGmooseegg.lua": {
+      "aspects_ignored": [
+        "孵化过程描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

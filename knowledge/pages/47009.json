@@ -12,7 +12,8 @@
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwagdrone_rolling.lua": "478976eb444dc25e1d8a907ddcb1658f064bf624f0da58e182478253cde12f65"
     }
   },
   "symbols": {
@@ -26,7 +27,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据文本涉及制造、掉落物、建造等，实体可能与“螨地爬”（可能为 wagdrone 变体）有关联，但未提及拴绳行为或活动区域限制。"
+      }
     },
     "behaviours/standstill.lua": {
       "mention_source": "pass2_evidence",
@@ -108,6 +112,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwagdrone_rolling.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

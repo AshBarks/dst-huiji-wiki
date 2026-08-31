@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatbumper.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatbumper",
+  "summary": "该状态图驱动船挡板（boatbumper）实体，用于保护船只免受碰撞。状态图组织包括空闲、放置、击中、变更等级和死亡等状态，通过动画结束事件进行转换，实现挡板的放置、交互和生命周期管理。",
+  "api": [],
+  "api_note": "该状态图没有定义对外 API 方法。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "place",
+    "hit",
+    "changegrade",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "挡板处于静止状态，播放空闲动画，等待碰撞或交互事件。"
+    },
+    {
+      "state": "place",
+      "note": "挡板被放置时进入，播放放置动画，短暂忙碌状态，完成后转为空闲。"
+    },
+    {
+      "state": "hit",
+      "note": "挡板受到碰撞时触发，播放击中动画并生成命中特效，短暂忙碌后可能转为空闲。"
+    },
+    {
+      "state": "changegrade",
+      "note": "挡板升级或降级时播放相应动画，有时间线在帧6切换动画，最终转为空闲。"
+    },
+    {
+      "state": "death",
+      "note": "挡板被破坏时进入，播放降级动画并永久移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      47009,
+      13156,
+      14929,
+      51951,
+      14935,
+      14936,
+      14816,
+      21137
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，所有实体（如螨地爬、沃尔夫冈、坦克龟等）的内容均未提及`stategraph__SGboatbumper`或与其相关的挡板状态（idle、place、hit、changegrade、death），页面讨论的是其他游戏实体和机制，与挡板组件无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船挡板",
+    "防撞",
+    "碰撞",
+    "升级",
+    "降级",
+    "放置",
+    "破坏",
+    "动画",
+    "状态",
+    "生存"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5a1cfa49686e165eb84fb30bfb71f5ef7fc04aaa94b385ce2775bbabe2793d64",
+    "source_bytes": 2808,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144120218
+  }
+}

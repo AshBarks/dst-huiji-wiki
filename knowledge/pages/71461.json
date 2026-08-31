@@ -5,19 +5,34 @@
   "inputs": {
     "wikitext_sha256": "d5bc271b70e25c5339381b1fddfa8febb5d8ebd05a976dcf76ac639d659c87be",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/container.lua": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "components/globaltrackingicon.lua": "f28aa73049d777da6182e37d06d4f6b7d4abbada0c61577c105646909fe99600",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
+      "components/linkeditem.lua": "276b16be1504daacc7ec337232c1e7ab6b0348cc1af48c7f5500b5a9c9572ce9",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/upgrademoduleowner.lua": "4871832cf2ffb4ecfde8cecacfedc994a9b082893421ed171067de8e281c0c92",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/combat.lua": {
       "aspects_ignored": [
         "伤害数值标注",
@@ -47,6 +62,13 @@
       "llm_verdict": {
         "wording": "底盘本身是一个有 15 个物品栏的容器"
       }
+    },
+    "components/globaltrackingicon.lua": {
+      "aspects_ignored": [
+        "仇恨追踪的开始与停止条件"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "mention_source": "pass2_evidence",
@@ -104,6 +126,34 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/linkeditem.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "所有者绑定管理",
+          "evidence": [
+            {
+              "pageid": 71461,
+              "quote": "如果备份底盘断开了与所有者的绑定，或所有者改变了技能树取消了暗影仆从技能"
+            }
+          ]
+        },
+        {
+          "aspect": "技能树改变响应",
+          "evidence": [
+            {
+              "pageid": 71461,
+              "quote": "所有者改变了技能树取消了暗影仆从技能"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "直接所有者影响"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/lootdropper.lua": {
       "aspects_ignored": [
         "击杀掉落物数值标注",
@@ -136,6 +186,10 @@
         "wording": "每过2~2.5分钟；每过8~9分钟生成特性",
         "semantic_consistent": true
       }
+    },
+    "components/upgrademoduleowner.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

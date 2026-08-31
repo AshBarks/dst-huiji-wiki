@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_parasite.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_parasite",
+  "summary": "该状态图驱动饥荒联机版中的影子仆人寄生体实体。整体状态组织基于空闲、受击、行走和奔跑状态，通过公共处理器响应移动和受击事件，状态切换以动画完成为触发点。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法或函数接口，状态图仅通过内部事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体默认空闲状态，播放idle动画并可旋转。通常在无其他事件或动画结束后进入。"
+    },
+    {
+      "state": "hit",
+      "note": "实体被攻击时进入，停止移动并播放受击动画。带有busy标签，在动画期间有硬直效果，动画结束后返回空闲状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      14929,
+      14936,
+      14816,
+      14907,
+      14935,
+      15941
+    ],
+    "aspects": [
+      {
+        "aspect": "受击硬直机制描述",
+        "evidence": [
+          {
+            "pageid": 14929,
+            "quote": "受击硬直：当受到伤害且处于闲置状态时，播放硬直动画，并立刻获得 1 秒硬直保护。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "影子仆人",
+    "寄生体",
+    "状态图",
+    "空闲",
+    "受击",
+    "移动",
+    "行走",
+    "奔跑",
+    "动画",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0aed4ced9e6396dd73e0d63f066868ecc3844876da8a19c21d756d263318478b",
+    "source_bytes": 1404,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140782710
+  }
+}

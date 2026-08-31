@@ -5,18 +5,50 @@
   "inputs": {
     "wikitext_sha256": "c05f4f835726e8e15af8348a0ac78085c1ed2f291eb136a257aea03c92ff17c8",
     "symbol_doc_shas": {
+      "components/boatpatch.lua": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/fertilizer.lua": "0fbb8c30a25201a06be76e1e6a814fc2428c1fab002db51607a6570e08a957a7",
+      "components/fertilizerresearchable.lua": "a8bdc0eb291cacccf45f328e5d61ddd613885a18b5f598bf522b57e5f3aa4042",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
-      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1"
+      "components/repairer.lua": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/treegrowthsolution.lua": "bbd925e30ef58b71fe825b532416e90b9a276c71cab7a4f2ab6bba2939ba8943"
     }
   },
   "symbols": {
+    "components/boatpatch.lua": {
+      "aspects_ignored": [
+        "补丁类型列举"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/deployable.lua": {
       "aspects_ignored": [
         "物品放置行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/fertilizer.lua": {
+      "aspects_ignored": [
+        "土壤营养提升描述",
+        "施肥动作加速描述",
+        "植物收成恢复描述",
+        "生命值恢复量描述",
+        "蘑菇农场恢复描述",
+        "高温枯萎解除描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fertilizerresearchable.lua": {
+      "aspects_ignored": [
+        "肥料研究信息收集"
       ],
       "route": "direct",
       "detail_level": "stub"
@@ -55,6 +87,17 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/repairer.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复机制",
+        "支柱修复耐久描述",
+        "漏洞修复方法描述",
+        "物品修复功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -66,6 +109,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/treegrowthsolution.lua": {
+      "aspects_ignored": [
+        "催熟多种植物的能力",
+        "植物重新生长的时间描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

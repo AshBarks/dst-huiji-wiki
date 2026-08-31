@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlureplant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlureplant",
+  "summary": "这个状态图驱动饥荒联机版中的诱饵植物（Lure Plant）实体。它定义了诱饵植物从生成、隐藏、展示诱饵、受击到死亡的完整状态循环。状态组织基于标签如'vine'和'hiding'，控制植物在藤蔓状态和休眠状态之间的转换，核心行为围绕诱饵的显示与隐藏展开。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，所有状态转换和行为完全由内部事件和状态标签驱动。",
+  "events_published": [
+    "hidebait",
+    "freshspawn"
+  ],
+  "events_listened": [
+    "death",
+    "attacked",
+    "worked",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idleout",
+    "idlein",
+    "emerge",
+    "hibernate",
+    "taunt",
+    "hidebait",
+    "showbait",
+    "hitin",
+    "hithibernate",
+    "hitout",
+    "death",
+    "deathvine",
+    "picked",
+    "spawn"
+  ],
+  "state_notes": [
+    {
+      "state": "hidebait",
+      "note": "当诱饵植物隐藏诱饵时进入此状态，播放关闭动画，期间有短暂无敌帧（noelectrocute标签），动画结束后恢复到隐藏状态。"
+    },
+    {
+      "state": "showbait",
+      "note": "植物从隐藏中出现并展示诱饵，播放动画吸引敌人，动画前几帧有无敌帧，结束后进入挑衅状态。"
+    },
+    {
+      "state": "hitin",
+      "note": "在藤蔓状态下受击时进入，播放受击动画，结束后返回隐藏状态，代表植物在内部被攻击的硬直。"
+    },
+    {
+      "state": "hitout",
+      "note": "在外部状态下受击时进入，播放受击动画，结束后触发隐藏诱饵事件，代表植物暴露时受到攻击。"
+    },
+    {
+      "state": "death",
+      "note": "在休眠状态下的死亡，移除物理碰撞并播放死亡动画，伴有死亡音效。"
+    },
+    {
+      "state": "deathvine",
+      "note": "在藤蔓状态下的死亡，移除物理碰撞并播放死亡动画，额外播放藤蔓收回音效。"
+    },
+    {
+      "state": "picked",
+      "note": "当被玩家采摘时进入，播放采摘动画并收回藤蔓，期间有短暂无敌帧，结束后进入休眠状态。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成时进入，播放从地面长出的生长动画，期间有短暂无敌帧，结束后进入休眠状态并触发新鲜生成事件。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34523,
+      34314,
+      20714,
+      52788,
+      65605,
+      14579,
+      15722,
+      24544
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅描述了食人花的生成机制、诱饵行为和生长过程的一般描述，未提及具体的状态动画、无敌帧、受击硬直、死亡或采摘等代码级别的行为语义表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "诱饵植物",
+    "Lure Plant",
+    "隐藏",
+    "诱饵",
+    "受击",
+    "死亡",
+    "电击",
+    "藤蔓",
+    "休眠",
+    "生成"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a19011771347408ea9e7d2662e51505707d451481d8fa033f663495fcf0ccbfc",
+    "source_bytes": 9171,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138711876
+  }
+}

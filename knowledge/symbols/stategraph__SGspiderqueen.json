@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGspiderqueen.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGspiderqueen",
+  "summary": "该状态图驱动蜘蛛女王（Spider Queen）实体。整体状态组织包括空闲、攻击、受击、嘲讽、筑巢、出生、排泄和死亡等核心状态，并通过通用状态扩展行走、睡眠、冻结等行为。状态转换主要由事件如受击和攻击命令驱动，状态标签用于控制打断逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外方法，它只处理蜘蛛女王的内部状态逻辑和转换。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "hit",
+    "taunt",
+    "makenest",
+    "birth",
+    "poop_pre",
+    "poop_loop",
+    "poop_pst",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蜘蛛女王的空闲状态，会随机播放短尖叫声。可被攻击或事件打断，是大多数状态的结束点。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，停止移动并播放攻击动画。在动画第28帧执行攻击伤害，攻击期间标签为“busy”不可打断。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画并更新攻击恢复延迟。受击后返回空闲状态，有短暂硬直。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，发出尖叫声，用于吸引玩家或触发行为。标签为“busy”，期间不可打断。"
+    },
+    {
+      "state": "makenest",
+      "note": "筑巢状态，播放茧化动画并生成蜘蛛巢。标签包含“nointerrupt”，期间无敌且不可打断，动画结束后移除自身并生成巢。"
+    },
+    {
+      "state": "birth",
+      "note": "出生状态，从蜘蛛巢中出现，播放出现动画和音效。标签为“nointerrupt”，完成后进入空闲状态。"
+    },
+    {
+      "state": "poop_loop",
+      "note": "排泄循环状态，核心生产蜘蛛状态。在动画中多次尝试生产，直到无法生产时结束循环。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品。移除物理碰撞，结束后处理尸体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70704,
+      15022,
+      15434,
+      15922,
+      13897,
+      15651,
+      51046,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未涉及蜘蛛女王的具体行为状态（如空闲、攻击、受击、嘲讽、筑巢、出生、排泄、死亡）的描述，仅提及生成和击杀的游戏策略。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜘蛛女王",
+    "攻击",
+    "受击",
+    "筑巢",
+    "排泄",
+    "死亡",
+    "嘲讽",
+    "出生",
+    "蜘蛛巢",
+    "战利品"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6f02ee6609e2db80fd4e6d78778c475f9b5a6528f70ba02868c5693adbef4af4",
+    "source_bytes": 12297,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141342114
+  }
+}

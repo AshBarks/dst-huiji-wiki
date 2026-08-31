@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmermking.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmermking",
+  "summary": "该状态图驱动鱼人国王（Merm King）实体，其核心行为围绕闲置、进食、交易、召唤守卫等展开。状态组织以基础状态为核心，通过通用模块扩展了战斗、死亡、被电击等通用行为。状态图负责处理玩家交互触发的特殊动画（如获取王冠、三叉戟）和逻辑。",
+  "api": [],
+  "api_note": "状态图本身未定义任何可供外部直接调用的方法。其逻辑由实体脚本通过`inst.sg:GoToState()`、发送事件（如`call_guards`）或监听事件（如`oncreated`）来驱动。",
+  "events_published": [],
+  "events_listened": [
+    "oncreated",
+    "call_guards",
+    "animqueueover",
+    "animover",
+    "animdone"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "eat",
+    "oncreated",
+    "trade",
+    "call_guards",
+    "refuse",
+    "electrocute",
+    "combat",
+    "death",
+    "get_trident",
+    "get_crown",
+    "get_pauldron",
+    "init"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础闲置状态，鱼人国王在此状态播放循环待机动画。大多数状态结束后都会回归此状态。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，由`EAT`动作触发。播放一组进食动画序列，并伴随咀嚼音效，咀嚼次数由传入数据决定。期间处于忙碌状态。"
+    },
+    {
+      "state": "trade",
+      "note": "交易状态，在特定帧执行`TradeItem()`逻辑（如给予玩家物品）。播放“给予”动画，完成后回归闲置。"
+    },
+    {
+      "state": "call_guards",
+      "note": "召唤守卫状态，由事件触发。播放召唤动画，并在动画中期调用`CallGuards`函数以召唤鱼人侍卫。是国王的核心功能之一。"
+    },
+    {
+      "state": "refuse",
+      "note": "拒绝交易状态，播放“拒绝”动画和音效，通常在交易条件不满足时由脚本逻辑触发进入。"
+    },
+    {
+      "state": "combat",
+      "note": "战斗状态（通过通用模块`AddCombatStates`添加）。包含被攻击硬直和攻击动画，硬直期间播放受击音效。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态（通过通用模块`AddCombatStates`添加）。播放死亡动画和音效，并生成尸体。"
+    },
+    {
+      "state": "get_trident",
+      "note": "获取三叉戟状态（通过`AddSimpleState`添加）。播放“给予”动画，并在特定帧替换动画符号为三叉戟外观。"
+    },
+    {
+      "state": "get_crown",
+      "note": "获取王冠状态（通过`AddSimpleState`添加）。播放“给予”动画，并在特定帧替换动画符号为王冠外观。"
+    },
+    {
+      "state": "oncreated",
+      "note": "创建状态，在鱼人国王生成时进入。播放登场动画、生成特效和音效，随后转入闲置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      46887,
+      13493,
+      18521,
+      15303,
+      17945,
+      13606,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未包含与鱼人国王相关的实体或行为描述，所有提供的页面都是关于其他游戏实体（如猪王、流浪商人、寄居蟹隐士等）的，因此无法找到代码能力/行为语义清单中列出的状态的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鱼人国王",
+    "鱼人侍卫",
+    "召唤守卫",
+    "交易",
+    "进食",
+    "死亡",
+    "王冠",
+    "三叉戟",
+    "被电击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3d2795336734fd026feed06cb8359a0f0902184cff39c3eb089648e872129f84",
+    "source_bytes": 6045,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138813943
+  }
+}

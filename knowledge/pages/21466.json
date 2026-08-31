@@ -6,11 +6,14 @@
     "wikitext_sha256": "f9eb79e7daa66ff7b15baeba1d0499ce2b612494a215085bb32d704fe7f1accf",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/halloweenmoonmutable.lua": "bf53efa7e2c2e223ceb8439da228c2eeb3f786edcf9ae31d363ba7f3a85a28fd",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/waxable.lua": "fe13e66e049d2d832b2d132f7ac1d0bde2dd009719b67462e25119bf8bfeef5c",
+      "components/witherable.lua": "a7204a688049853010d4fa8dec6dba7f31a167e278e24e4b3669682c38ae68f1",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -30,6 +33,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/halloweenmoonmutable.lua": {
+      "aspects_ignored": [
+        "月亮变异转化机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -84,6 +94,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/waxable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/witherable.lua": {
+      "aspects_ignored": [
+        "施肥对高温枯萎的延迟效果",
+        "枯萎状态视觉表现",
+        "枯萎触发条件描述",
+        "采集次数与贫瘠枯萎关联"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

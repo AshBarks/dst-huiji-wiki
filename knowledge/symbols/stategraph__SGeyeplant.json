@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGeyeplant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGeyeplant",
+  "summary": "该状态图驱动饥荒联机版中的眼植物（eyeplant）实体。它通过定义生成、空闲、攻击、吃等多个状态，管理眼植物的行为和动画。状态转换由事件和动作处理器触发，采用有限状态机组织。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法。",
+  "events_published": [
+    "ontrapped"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "spawn",
+    "idle",
+    "action",
+    "alert",
+    "hit",
+    "attack",
+    "death",
+    "eat_enter",
+    "eat_loop",
+    "walk_start"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "生成状态，眼植物从地面冒出，播放生成动画后进入空闲状态。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，眼植物待机并可旋转，等待玩家或其他事件触发。"
+    },
+    {
+      "state": "action",
+      "note": "执行动作状态，用于处理采集等动作，完成后返回空闲。"
+    },
+    {
+      "state": "alert",
+      "note": "警觉状态，眼植物发现目标后转向并播放观察动画，直到丢失目标。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中状态，播放受击动画后立即转为攻击状态，有短暂硬直。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，眼植物向目标发动攻击，造成伤害并播放音效，若目标在范围内则连续攻击。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并移除碰撞体，眼植物消失。"
+    },
+    {
+      "state": "eat_enter",
+      "note": "进入吃状态，眼植物执行采集动作，触发目标被陷阱事件并播放音效。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "吃循环状态，眼植物持续进食，受击或电击时掉落所有物品，超时后返回空闲。"
+    },
+    {
+      "state": "walk_start",
+      "note": "行走开始状态，用于移动，但主要播放空闲动画并执行缓冲动作。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      52788,
+      34557,
+      34314,
+      24544,
+      34523,
+      20714,
+      65605,
+      14579
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有页面摘录均未提及'眼植物'或任何与状态图SGeyeplant相关的行为描述，内容涉及兴趣点布景、虚空面具、世界选项等其他游戏实体和机制。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "眼植物",
+    "eyeplant",
+    "攻击状态",
+    "状态图",
+    "饥荒",
+    "生物",
+    "死亡",
+    "进食",
+    "生成"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "怪物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7d16fc66bca294ae4e823aef48cd70e9f5042c4a8966a83a1a3c7f95459d2fe4",
+    "source_bytes": 6263,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137484945
+  }
+}

@@ -6,6 +6,7 @@
     "wikitext_sha256": "981193d27b7e96ec243dcf80680cbd6333dc700892d9ba4e0a666b7f66e195b3",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/repairable.lua": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -20,6 +21,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/repairable.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复",
+        "发条装置修复方法",
+        "支柱修复可能性",
+        "漂浮平台漏洞修复",
+        "绝望石装备耐久恢复",
+        "螨地爬修复状态转换"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [

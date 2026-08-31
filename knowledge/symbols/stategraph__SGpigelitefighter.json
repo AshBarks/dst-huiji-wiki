@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpigelitefighter.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpigelitefighter",
+  "summary": "该状态图 `SGpigelitefighter` 驱动的是联机版中的猪人精英战士（如吟游诗人随从或战斗型雇佣兵）实体。其状态组织涵盖了完整的战斗循环（攻击、受击）、生命阶段（出生、死亡）、基础行为（闲置、移动、睡眠）以及特定的场景交互（跳跃、离场消失）。状态切换逻辑较为常规，通过通用处理器响应大部分事件，并包含独特的出生（`spawnin`）和离场（`despawn`）演出动画。",
+  "api": [],
+  "api_note": "源码中未定义任何对外暴露的自定义函数（如特定 `inst:MyMethod()`）。该状态图主要通过监听事件（如攻击、受击）和运行时组件（如 `combat`, `locomotor`）来驱动行为。",
+  "events_published": [],
+  "events_listened": [
+    "despawn",
+    "onsink",
+    "attack",
+    "freeze",
+    "electrocute",
+    "sleep",
+    "wake",
+    "locomote",
+    "attacked",
+    "death",
+    "hop"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "hit",
+    "death",
+    "spawnin",
+    "despawn",
+    "walk",
+    "run",
+    "sleep",
+    "frozen",
+    "electrocute",
+    "hop",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础待机状态。若实体处于睡眠中，则会切换至 `sleep` 状态。"
+    },
+    {
+      "state": "attack",
+      "note": "执行一套三连击（`atk_combo`）。在动画的第12、18、31帧触发三次 `DoAttack` 判定，攻击期间带有‘busy’标签（硬直）。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。播放受击动画并伴随音效，期间无法进行其他操作（‘busy’标签）。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态。播放死亡动画，移除物理碰撞体，播放特定音效。"
+    },
+    {
+      "state": "spawnin",
+      "note": "出生/登场状态。实体从空中飞入并摆出固定姿势（有4种变体）。期间处于无敌状态（‘nofreeze’, ‘nosleep’, ‘noattack’等标签），物理质量大幅增加（`POSING_MASS=200`），落地后会触发一句闲聊（`PIG_ELITE_FIGHTER_INTRO`）。"
+    },
+    {
+      "state": "despawn",
+      "note": "离场消失状态。实体执行一个‘超级跳’动画后被移除。期间处于无敌状态，会触发一句离场闲聊（`PIG_ELITE_FIGHTER_OUTRO`）。"
+    },
+    {
+      "state": "sleep",
+      "note": "由 `CommonStates.AddSleepExStates` 添加的睡眠状态。进入时会获得‘caninterrupt’标签，可在第35帧听到猪的呼噜声。"
+    },
+    {
+      "state": "hop",
+      "note": "由 `CommonStates.AddHopStates` 添加的跳跃/上下船状态。使用特定动画集（`boat_jump`），可能用于在船与码头间跳跃。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15022,
+      15601,
+      18219,
+      72981,
+      14815,
+      14938,
+      14907
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击连击行为描述",
+        "evidence": [
+          {
+            "pageid": 72981,
+            "quote": "远古戍卫塔进行基础攻击时，若攻击后目标仍然在攻击角度内，就会追加连击，最多连续攻击三次"
+          },
+          {
+            "pageid": 14907,
+            "quote": "进攻姿态：攻击会向目标发起连续拳。攻击会根据剩余生命进行连击"
+          }
+        ]
+      },
+      {
+        "aspect": "睡眠状态描述",
+        "evidence": [
+          {
+            "pageid": 14907,
+            "quote": "沉睡：当受到催眠效果时，播放沉睡动画，并进入睡眠状态。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "猪人战士",
+    "猪人精英",
+    "战斗",
+    "连击",
+    "出场动画",
+    "离场",
+    "睡眠",
+    "跳跃"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "NPC"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "333a519007d06080c8761d84b7158580b7e5e54d022fc2a58162b3d18c202258",
+    "source_bytes": 9058,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145653845
+  }
+}

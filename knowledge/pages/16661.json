@@ -5,18 +5,38 @@
   "inputs": {
     "wikitext_sha256": "7c7f99b7ae5335c599de1ce734799d2379dd2f418edaca1717b9b5edf674058f",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
+      "components/boatdrag.lua": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heavyobstacleusetarget.lua": "5a2ef569266913598ff897fd4e5e497cb4b96e32ce86123785f96b0ea3f3d5f5",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/shelf.lua": "2d504f43096aa12dfdebecf010c08d475d550ca95ea844710fb2c4ffd653f9a4",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/winch.lua": "18c2b1043284f0e6b59c64943dcf51382be395c8cb6930f80d3127e2aabccb25",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGwinch.lua": "cee7219fe18e76295973947a6a9fd75cee67cdac38f484d6ae4d503dd8135c36"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
+    "components/boatdrag.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -41,6 +61,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heavyobstacleusetarget.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -86,6 +110,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/shelf.lua": {
+      "aspects_ignored": [
+        "桌上放置家具装饰的功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -93,6 +124,10 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/winch.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -104,6 +139,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwinch.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

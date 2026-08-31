@@ -15,6 +15,7 @@
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/snowmandecor.lua": "2ce33cc33d748750ad7ba32b6fcc29afe81f23abef76f901a731621a079a8999",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
@@ -76,7 +77,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -112,6 +114,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/snowmandecor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/stackable.lua": {
       "aspects_ignored": [

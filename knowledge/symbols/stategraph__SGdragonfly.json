@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdragonfly.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdragonfly",
+  "summary": "该状态图驱动龙蝇（Dragonfly）实体，一个具有飞行和地面形态的Boss怪物。整体状态组织围绕其战斗行为展开，包括飞行移动、攻击、被击倒、变身火龙、睡眠和死亡等状态，通过事件驱动进行转换。",
+  "api": [],
+  "api_note": "该状态图无对外公开的API方法，所有行为控制通过内部事件处理和状态转换实现。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "stunned",
+    "stun_finished",
+    "spawnlavae",
+    "transform"
+  ],
+  "netvars": [],
+  "tunables": [
+    "DRAGONFLY_POUND_CD",
+    "DRAGONFLY_FLYING_HIT_RECOVERY",
+    "DRAGONFLY_HIT_RECOVERY"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "hit",
+    "knockdown",
+    "knockdown_idle",
+    "knockdown_hit",
+    "knockdown_pst",
+    "flyaway",
+    "attack",
+    "transform_fire",
+    "transform_normal",
+    "pound_pre",
+    "pound",
+    "pound_post",
+    "lavae",
+    "sleep",
+    "sleeping",
+    "wake",
+    "death",
+    "land"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "龙蝇发动近战攻击，对目标造成伤害；怒火状态下攻击附带火焰伤害，并产生火焰特效。"
+    },
+    {
+      "state": "knockdown",
+      "note": "龙蝇被击倒在地，进入地面虚弱状态，持续一段时间后可恢复；期间能受到伤害并触发掉落追踪。"
+    },
+    {
+      "state": "transform_fire",
+      "note": "龙蝇变身为火龙形态，动画播放火焰特效，之后攻击力增强并召唤岩浆虫。"
+    },
+    {
+      "state": "pound",
+      "note": "龙蝇发动地面猛击，对附近区域造成范围伤害，并有冷却时间；怒火状态下此攻击更频繁。"
+    },
+    {
+      "state": "lavae",
+      "note": "龙蝇通过呕吐动画产卵，召唤岩浆虫辅助战斗，产卵后返回闲置状态。"
+    },
+    {
+      "state": "sleep",
+      "note": "龙蝇降落并进入睡眠过程，动画较长，玩家可趁机攻击或准备；睡眠后进入持续睡觉状态。"
+    },
+    {
+      "state": "death",
+      "note": "龙蝇死亡，播放死亡动画并掉落战利品，之后消失。"
+    },
+    {
+      "state": "flyaway",
+      "note": "龙蝇逃离战场，变得无敌并快速飞离，通常在特定条件下触发。"
+    },
+    {
+      "state": "hit",
+      "note": "龙蝇被攻击时产生短暂硬直，可中断当前动作；硬直期间有恢复延迟，影响连续受击。"
+    },
+    {
+      "state": "knockdown_idle",
+      "note": "龙蝇倒地后的闲置状态，地面标签激活，可被攻击或触发恢复；若受电击则保持地面状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      13406,
+      15022,
+      13897,
+      51046,
+      15225,
+      15551,
+      46847
+    ],
+    "aspects": [
+      {
+        "aspect": "暴怒状态下攻击间隔与范围数值",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "命中:|攻击间隔 = 4（暴怒时3）"
+          },
+          {
+            "pageid": 15651,
+            "quote": "命中:|攻击范围 = 4（暴怒时6）"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡后重生时间与掉落物描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "龙蝇死亡后，20 天后在刷新点重新生成。"
+          },
+          {
+            "pageid": 15651,
+            "quote": "龙蝇的掉落物："
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "龙蝇",
+    "火龙",
+    "击倒",
+    "猛击",
+    "产卵",
+    "睡眠",
+    "死亡",
+    "飞行",
+    "攻击",
+    "变身"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9010b40d79cc1d94263c75084f429d43d41149c970feffab835e2475627ad8fd",
+    "source_bytes": 32844,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137324930
+  }
+}

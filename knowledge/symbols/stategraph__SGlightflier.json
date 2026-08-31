@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlightflier.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlightflier",
+  "summary": "该状态图驱动名为'lightflier'的实体，推测为一种飞行发光生物如光飞虫。状态组织基于默认的idle状态，通过事件触发action、startled、go_home等状态，并使用通用处理器添加行走、睡眠、战斗等扩展状态。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外方法，所有行为通过状态机内部管理。",
+  "events_published": [],
+  "events_listened": [
+    "startled"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "startled",
+    "go_home"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认状态，实体播放walk_loop动画，可旋转。进入时停止物理，动画结束后回到自身循环。"
+    },
+    {
+      "state": "action",
+      "note": "执行缓冲动作（如采集）时进入，播放idle_loop动画并执行动作，完成后回到idle。"
+    },
+    {
+      "state": "startled",
+      "note": "被惊吓事件触发，播放hit动画，有busy标签阻止其他动作，动画结束后回到idle。"
+    },
+    {
+      "state": "go_home",
+      "note": "执行GOHOME动作时进入，播放sleep_pre动画，20帧后尝试执行回家动作，若目标无效则回到idle。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18778,
+      35817,
+      16671,
+      10379,
+      15237,
+      18483,
+      17813,
+      20046
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 stategraph__SGlightflier 相关的状态行为描述；所有页面仅涉及实体的一般行为、交互或物品效果，未提及 idle、action、startled 或 go_home 等状态的动画或具体行为细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "光飞虫",
+    "Lightflier",
+    "飞行生物",
+    "状态图",
+    "回家",
+    "惊吓",
+    "动作",
+    "发光",
+    "照明",
+    "idle"
+  ],
+  "gameplay_tags": [
+    "生物",
+    "飞行",
+    "战斗",
+    "动作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fd8a2b9bb9337879395e271b96a21dad64bc10dfd5c404653a964ae449398476",
+    "source_bytes": 4149,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138515065
+  }
+}

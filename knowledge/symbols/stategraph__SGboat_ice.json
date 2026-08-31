@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboat_ice.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboat_ice",
+  "summary": "该状态图驱动饥荒联机版中的冰船实体，管理其从放置到沉没的生命周期。状态包括放置、闲置、准备破碎、破碎动画和战利品生成，根据血量变化和死亡事件进行状态切换。整体以闲置状态为默认，受伤和死亡触发破碎流程。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法或API函数，仅包含状态图内部的状态和事件处理逻辑。",
+  "events_published": [
+    "abandon_ship",
+    "onpresink"
+  ],
+  "events_listened": [
+    "animover",
+    "healthdelta",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle",
+    "ready_to_snap",
+    "snapping",
+    "popping"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "冰船的闲置状态，根据血量等级显示不同动画。血量变化时，若等级改变则播放破碎过渡动画后回到对应等级闲置，死亡时进入准备破碎状态。"
+    },
+    {
+      "state": "ready_to_snap",
+      "note": "船只死亡后进入准备破碎状态，标签为dead，通知平台上所有实体放弃船只，短暂延迟后进入破碎动画。"
+    },
+    {
+      "state": "snapping",
+      "note": "破碎动画状态，播放连续破碎声音和特效，玩家收到即将沉没警告，动画结束后进入沉没状态生成战利品。"
+    },
+    {
+      "state": "popping",
+      "note": "沉没状态，生成船只战利品并执行移除函数，彻底删除冰船实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14929,
+      14935,
+      14936,
+      24074,
+      13606,
+      14811,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅描述冰船的生成、基本属性和掉落物（如生命值为0时崩溃掉落冰），但未提及闲置状态、破碎动画、沉没状态等具体行为或状态转换。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "冰船",
+    "放置",
+    "闲置",
+    "破碎",
+    "沉没",
+    "战利品",
+    "血量",
+    "状态图",
+    "动画",
+    "声音"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "建造",
+    "旅行"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0b0f728f6c1876f9531a829761413faf30747c16d814aeff31427d699e72cf84",
+    "source_bytes": 6222,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144036899
+  }
+}

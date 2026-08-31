@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfruitdragon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfruitdragon",
+  "summary": "该状态图驱动饥荒联机版中的果蝇龙（fruitdragon）实体。整体状态组织基于commonstates模块，包括空闲、攻击、挑战攻击序列、受击、死亡等基础状态。状态通过事件如攻击指令、受击和睡眠进行转换，支持果蝇龙的战斗和生存行为。",
+  "api": [],
+  "api_note": "状态图主要定义实体内部状态逻辑，不对外提供API方法。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "wake_up_to_challenge",
+    "lostfruitdragonchallenge"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FRUITDRAGON.FIREATTACK_COOLDOWN",
+    "FRUITDRAGON.FIREATTACK_HIT_RANGE",
+    "FRUITDRAGON.FIREATTACK_DAMAGE"
+  ],
+  "states": [
+    "idle",
+    "do_ripen",
+    "do_unripen",
+    "attack",
+    "attack_fire",
+    "challenge_attack_pre",
+    "challenge_attack",
+    "challenge_attack_pst",
+    "challenge_win",
+    "challenge_lose"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当果蝇龙进行普通攻击时进入。播放攻击动画，在动画第22帧造成近战伤害，第28帧解除忙碌状态。攻击冷却由战斗组件控制。"
+    },
+    {
+      "state": "attack_fire",
+      "note": "当果蝇龙成熟且火焰攻击冷却完毕时进入火焰攻击。动画第16帧启用光源，第20帧对范围内生物造成火焰伤害并点燃可燃物。伤害值为TUNING.FRUITDRAGON.FIREATTACK_DAMAGE，冷却时间由TUNING.FRUITDRAGON.FIREATTACK_COOLDOWN决定。"
+    },
+    {
+      "state": "challenge_attack_pre",
+      "note": "当果蝇龙攻击另一个果蝇龙时进入挑战准备状态。播放准备动画，为后续挑战攻击做铺垫。"
+    },
+    {
+      "state": "challenge_attack",
+      "note": "从挑战准备进入，进行多次循环攻击。循环次数随机1-3次，在动画第5帧若循环结束则造成伤害，根据剩余循环次数重复或进入后续状态。"
+    },
+    {
+      "state": "challenge_win",
+      "note": "挑战胜利时进入，播放胜利动画，表示在挑战中获胜。"
+    },
+    {
+      "state": "challenge_lose",
+      "note": "挑战失败或受击时进入，播放受击动画，表示在挑战中失败。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      15651,
+      13897,
+      51046,
+      15225,
+      15551,
+      15734
+    ],
+    "aspects": [
+      {
+        "aspect": "普通攻击伤害值标注",
+        "evidence": [
+          {
+            "pageid": 15734,
+            "quote": "伤害 = 普通：30{{hr}}成熟：50（普通攻击）<br>25（火焰喷射）"
+          }
+        ]
+      },
+      {
+        "aspect": "普通攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15734,
+            "quote": "沙拉蝾螈以近战啃咬的形式进行普通攻击。"
+          }
+        ]
+      },
+      {
+        "aspect": "火焰攻击伤害值标注",
+        "evidence": [
+          {
+            "pageid": 15734,
+            "quote": "伤害 = 普通：30{{hr}}成熟：50（普通攻击）<br>25（火焰喷射）"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "果蝇龙",
+    "攻击",
+    "火焰攻击",
+    "挑战攻击",
+    "受击",
+    "死亡",
+    "睡眠",
+    "成熟",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "096a45604d491437adc7371c260cb338698d39efa1db574cb46057998a84d311",
+    "source_bytes": 11485,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137676637
+  }
+}

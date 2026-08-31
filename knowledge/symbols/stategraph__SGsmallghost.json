@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsmallghost.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsmallghost",
+  "summary": "该状态图驱动饥荒联机版中的小幽灵（Small Ghost）实体，它是温迪的伙伴。整体状态组织基于常见状态处理，包括空闲、移动、任务相关状态和互动状态，通过事件触发转换以响应游戏玩法。",
+  "api": [],
+  "api_note": "该状态图没有定义对外 API，因为它是小幽灵实体的内部状态机，由游戏系统调用，不提供直接玩家接口。",
+  "events_published": [
+    "detachchild"
+  ],
+  "events_listened": [
+    "death",
+    "ghostplaywithme"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_to_sad",
+    "appear",
+    "disappear",
+    "dissipate",
+    "pickup",
+    "quest_begin",
+    "quest_abandoned",
+    "quest_finished",
+    "hint",
+    "play"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "小幽灵的默认空闲状态，根据是否在执行任务播放不同动画（如 idle 或 idle_sad），玩家可通过任务系统影响其状态。"
+    },
+    {
+      "state": "appear",
+      "note": "小幽灵出现时的状态，有说话和嚎叫效果，持续短暂时间后根据任务状态转为空闲或悲伤空闲。"
+    },
+    {
+      "state": "dissipate",
+      "note": "小幽灵消散状态，通常由死亡事件触发，播放消散动画后移除实体，是不可中断的。"
+    },
+    {
+      "state": "pickup",
+      "note": "小幽灵拾取玩具时的状态，播放快乐动画并执行拾取动作，伴随音效，是任务进展的一部分。"
+    },
+    {
+      "state": "quest_begin",
+      "note": "任务开始时的状态，小幽灵播放快乐动画表示任务启动，不可攻击或中断。"
+    },
+    {
+      "state": "quest_abandoned",
+      "note": "任务放弃时的状态，小幽灵播放悲伤动画，任务中断后转回空闲。"
+    },
+    {
+      "state": "quest_finished",
+      "note": "任务完成时的状态，小幽灵播放完成动画后移除，伴随嚎叫音效，触发 detachchild 事件。"
+    },
+    {
+      "state": "hint",
+      "note": "小幽灵提示玩家时的状态，可能重复播放快乐动画并让玩家说话，直到提示结束，常用于指引互动。"
+    },
+    {
+      "state": "play",
+      "note": "小幽灵与玩家玩耍时的状态，面向目标播放快乐动画，响应 ghostplaywithme 事件，是互动玩法的一部分。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      51497,
+      51221,
+      18234,
+      15975,
+      51498,
+      15225,
+      18778
+    ],
+    "aspects": [
+      {
+        "aspect": "出现机制描述",
+        "evidence": [
+          {
+            "pageid": 18778,
+            "quote": "只有在玩家靠近时才会从中出现"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲状态行为描述",
+        "evidence": [
+          {
+            "pageid": 18778,
+            "quote": "小惊吓平时会待在墓碑里"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小幽灵",
+    "温迪",
+    "幽灵伙伴",
+    "任务",
+    "拾取",
+    "玩耍",
+    "提示",
+    "消散",
+    "出现",
+    "idle"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "伙伴",
+    "任务",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9d1b5bc7d01703b8291c4336e31f7637d6801e4f8c04e866d8485e654bcc73e8",
+    "source_bytes": 8773,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141229331
+  }
+}

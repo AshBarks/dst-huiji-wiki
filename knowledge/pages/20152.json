@@ -8,14 +8,17 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGdeerclops.lua": "de3c0b610ae23cd372aee9f22f3c11f9f39096802eaaaa2fdc91b12e66a99c22"
     }
   },
   "symbols": {
@@ -74,6 +77,14 @@
         "溺水潮湿度惩罚标注",
         "溺水物品掉落行为描述",
         "溺水生命与理智损失数值标注"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -147,6 +158,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -171,6 +186,51 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGdeerclops.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "激光攻击伤害与效果描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "3 层",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 层",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: num=3"
+        },
+        {
+          "raw": "6 单位",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: MAX_ICESPIKE_SFX=6"
+        },
+        {
+          "raw": "3 层",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 层",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: num=3"
+        },
+        {
+          "raw": "6 单位",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: MAX_ICESPIKE_SFX=6"
+        },
+        {
+          "raw": "6 秒",
+          "region_id": "20152:section:1",
+          "matched": "stategraphs/SGdeerclops.lua: MAX_ICESPIKE_SFX=6"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

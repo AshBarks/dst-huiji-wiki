@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGantlion_angry.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGantlion_angry",
+  "summary": "该状态图驱动愤怒的蚁狮实体，是饥荒联机版中的一个强大 boss 级生物。状态组织包括待机、受击、死亡、召唤沙刺攻击、召唤沙墙、嘲讽和进食等核心状态，并通过事件如 doattack、attacked 触发转换。整体以战斗行为为主，涉及攻击、防御和恢复机制。",
+  "api": [],
+  "api_note": "该状态图未提供对外API，所有行为通过事件和组件交互控制。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "freeze",
+    "electrocute",
+    "sleep",
+    "wake",
+    "doattack",
+    "attacked",
+    "eatrocks",
+    "antlionstopfighting",
+    "corpse_chomped",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ANTLION_CAST_RANGE",
+    "TUNING.ANTLION_CAST_MAX_RANGE",
+    "TUNING.ANTLION_DEAGGRO_DIST",
+    "TUNING.ANTLION_SPEED_UP",
+    "TUNING.ANTLION_MIN_ATTACK_PERIOD",
+    "TUNING.ANTLION_MAX_ATTACK_PERIOD",
+    "TUNING.ANTLION_EAT_HEALING",
+    "TUNING.ANTLION_SLOW_DOWN",
+    "TUNING.ANTLION_HIT_RECOVERY",
+    "TUNING.ANTLION_WALL_CD",
+    "TUNING.SANITYAURA_MED"
+  ],
+  "states": [
+    "idle",
+    "hit",
+    "death",
+    "summonspikes",
+    "summonspikes_pst",
+    "summonwall",
+    "taunt",
+    "eat"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蚁狮闲置状态，等待玩家或其他事件触发行为，无特殊表现，是状态转换的起点。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时进入，有短暂硬直（14帧），之后可能立即反击目标，触发硬直恢复延迟。"
+    },
+    {
+      "state": "death",
+      "note": "生命值为0时触发，播放死亡动画，掉落战利品，移除精神光环效果，并逐渐消失。"
+    },
+    {
+      "state": "summonspikes",
+      "note": "当目标在攻击范围内时触发，在目标位置生成6-7个沙刺攻击，有跟踪机制，攻击速度随时间加快。"
+    },
+    {
+      "state": "summonwall",
+      "note": "当沙刺冷却中时触发，生成19个沙墙围困玩家，开始冷却计时器，攻击动画较长。"
+    },
+    {
+      "state": "eat",
+      "note": "蚁狮生命值低下时可能触发，进食恢复生命值（每次TUNING.ANTLION_EAT_HEALING），并减慢攻击速度，可被中断。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，通过事件触发，播放嘲讽动画和声音，持续28帧，无直接伤害效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15225,
+      18359,
+      15922,
+      15601,
+      15651,
+      13897,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "死亡掉落战利品",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "|掉落 = {{Pic|32|沙之石}}×6，{{Pic|32|肉}}×4，{{Pic|32|石头}}×2"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置等待进贡状态",
+        "evidence": [
+          {
+            "pageid": 15601,
+            "quote": "平时蚁狮就待在它生成的地方等待玩家的进贡，只能被检查不能被攻击。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蚁狮",
+    "愤怒",
+    "沙刺",
+    "沙墙",
+    "召唤",
+    "攻击",
+    "进食",
+    "硬直",
+    "死亡",
+    "嘲讽"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "10ef245d3f0b0b348ecbc9b2a74293531350a44a78d24390f5c0067e1b9ff265",
+    "source_bytes": 18994,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135569433
+  }
+}

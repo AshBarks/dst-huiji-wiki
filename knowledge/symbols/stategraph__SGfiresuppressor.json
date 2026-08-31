@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfiresuppressor.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfiresuppressor",
+  "summary": "该状态图驱动灭火器实体，用于自动检测并扑灭火灾。整体状态组织包括开关机、待机、灯光、射击和受击状态，初始状态为关机待机。状态通过事件如'turn_on'和'putoutfire'切换，实现灭火功能。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图仅通过事件响应驱动行为，无自定义API接口。",
+  "events_published": [],
+  "events_listened": [
+    "putoutfire"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "turn_on",
+    "turn_off",
+    "idle_on",
+    "idle_off",
+    "light_on",
+    "light_off",
+    "idle_light_on",
+    "turn_on_light",
+    "spin_up",
+    "shoot",
+    "spin_down",
+    "place",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "spin_up",
+      "note": "进入条件：收到'putoutfire'事件且处于'idle'标签状态；表现：播放'launch_pre'动画准备射击，然后转入shoot状态。"
+    },
+    {
+      "state": "shoot",
+      "note": "进入条件：从spin_up状态转入；表现：播放'launch'动画，6帧后发射灭火剂投射物，8帧后触发火灾检测，射击后转入spin_down。"
+    },
+    {
+      "state": "hit",
+      "note": "进入条件：受击事件触发；表现：根据是否开灯和开机播放不同受击动画，然后转入对应待机状态（如idle_on或idle_off）。"
+    },
+    {
+      "state": "idle_on",
+      "note": "进入条件：开机后或从其他状态转入；表现：播放'idle_on_loop'循环动画和待机音效，持续监控火灾。"
+    },
+    {
+      "state": "idle_off",
+      "note": "进入条件：关机状态或初始状态；表现：播放'idle_off'动画，无待机音效，等待开机指令。"
+    },
+    {
+      "state": "light_on",
+      "note": "进入条件：紧急模式开启时；表现：播放'light_on'动画并启用警告音，表示灭火器处于高警戒状态。"
+    },
+    {
+      "state": "idle_light_on",
+      "note": "进入条件：灯光模式下待机；表现：播放'idle_light_loop'循环动画和待机音效，持续发出警告声音。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      14792,
+      16419,
+      18188,
+      15022,
+      18843,
+      24842,
+      47009
+    ],
+    "aspects": [
+      {
+        "aspect": "关闭状态控制",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "玩家可以手动控制雪球发射器开启或关闭。"
+          }
+        ]
+      },
+      {
+        "aspect": "开启状态监控火灾",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "开启的雪球发射器能够发射雪球扑灭 15 {{解释|距离单位}}内所有火焰和闷烧的实体"
+          }
+        ]
+      },
+      {
+        "aspect": "紧急模式触发与灭火",
+        "evidence": [
+          {
+            "pageid": 14792,
+            "quote": "雪球发射器便会进入紧急模式并且开始发射雪球灭火"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "灭火器",
+    "灭火",
+    "射击",
+    "紧急",
+    "灯光",
+    "受击",
+    "待机",
+    "状态图",
+    "火灾检测"
+  ],
+  "gameplay_tags": [
+    "防御",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f22656bef29ca51a2c0bff592b4de3296d8bd082415e866cd01f6b3df9354c6b",
+    "source_bytes": 8038,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137564081
+  }
+}

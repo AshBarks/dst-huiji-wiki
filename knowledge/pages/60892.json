@@ -6,6 +6,7 @@
     "wikitext_sha256": "d4910bb97423fb267cfdca7557d92bec9a31ecdab3913ad4097f1d61fc83b5af",
     "symbol_doc_shas": {
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heater.lua": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
@@ -21,6 +22,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

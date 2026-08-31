@@ -8,6 +8,7 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/distancefade.lua": "9f5eba113e0793c42ae7a14ad49d309c1ba96995b5f3eb9c7e5050758ab1df44",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -68,6 +69,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/distancefade.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [

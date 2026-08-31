@@ -5,11 +5,19 @@
   "inputs": {
     "wikitext_sha256": "4f5b34728fe36aa1eebb7d960a7d58fbdc5ca629977550f29ee2e0c99245934b",
     "symbol_doc_shas": {
+      "components/fishable.lua": "7ce90f3d6ce52b38bdf46fa6ff0af663f28bee3ea9b1837d8d133f2d5315b5e1",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/oasis.lua": "2e61b2b6667258b1425cd8e62d2d29a1a120bb80f2a447cbb3a448e9d600f127",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157"
     }
   },
   "symbols": {
+    "components/fishable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -30,6 +38,21 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/oasis.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

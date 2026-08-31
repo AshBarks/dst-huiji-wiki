@@ -9,6 +9,7 @@
       "behaviours/doaction.lua": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/sharkbrain.lua": "e6f84cee9680fbbff88359f0e881a759bc726057541a95d0aa30ca7678421dab",
+      "components/amphibiouscreature.lua": "6d7a2c3108cd3888853236d61ceda5e68563a51528a78ea33616fc5f798003e7",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
@@ -19,7 +20,8 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGshark.lua": "72d86855ad048ba97fb9620442d084eaf7e960f8072f0e52d66c52ed0596cb1e"
     }
   },
   "symbols": {
@@ -37,7 +39,8 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -54,7 +57,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/sharkbrain.lua": {
       "mention_source": "fact_match",
@@ -72,6 +76,10 @@
       ],
       "route": "direct",
       "detail_level": "detailed"
+    },
+    "components/amphibiouscreature.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/combat.lua": {
       "aspects_ignored": [
@@ -206,6 +214,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGshark.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

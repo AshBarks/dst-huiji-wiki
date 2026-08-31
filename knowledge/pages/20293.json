@@ -5,6 +5,8 @@
   "inputs": {
     "wikitext_sha256": "c1b92df790a0b180e62c046d629be06c12d7719a79c4031bbd3fcbe68355f8a6",
     "symbol_doc_shas": {
+      "components/boatmagnet.lua": "c782b41089cd13fd9fcbfe07c2adf7b0a35e0ed35c03fd02c777346c2fd3157c",
+      "components/boatmagnetbeacon.lua": "976abebf61658dbebf534149f1f710211fab9ffdea17a68867c591786ce0f72c",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -13,10 +15,20 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGboatmagnet.lua": "ea6a88c2153d83488e75d87439d1856ccbc4f0c1056791c68bb2118470f7751b",
+      "stategraphs/SGboatmagnetbeacon.lua": "e346830a2bfba2b514e151af73d1eaedba887501d0e32823317f91db182ea838"
     }
   },
   "symbols": {
+    "components/boatmagnet.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatmagnetbeacon.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -53,7 +65,8 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -96,6 +109,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGboatmagnet.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGboatmagnetbeacon.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

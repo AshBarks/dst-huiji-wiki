@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGoceanfish.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGoceanfish",
+  "summary": "该状态图驱动饥荒联机版中的海洋鱼类实体（如海洋鱼）。整体状态组织方式基于状态机，包括基础移动状态（idle、arrive、leave）和互动状态（进食、钓鱼咬钩、跳跃出水、射击扑火），通过事件触发状态转换，实现鱼类的行为逻辑。",
+  "api": [],
+  "api_note": "源码中未定义对外API方法，状态图通过事件和状态转换驱动行为，无直接暴露接口。",
+  "events_published": [],
+  "events_listened": [
+    "dobreach",
+    "doleave",
+    "oceanfishing_stoppedfishing",
+    "putoutfire"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "arrive",
+    "leave",
+    "eat",
+    "bitehook_pre",
+    "bitehook_loop",
+    "bitehook_escape",
+    "breach",
+    "launched_out_of_water",
+    "shoot"
+  ],
+  "state_notes": [
+    {
+      "state": "arrive",
+      "note": "鱼出现状态，播放'spawn_in'动画，表示鱼到达指定位置并开始存在。"
+    },
+    {
+      "state": "leave",
+      "note": "鱼离开状态，播放'spawn_out'动画后移除实体，常用于消失或时间到触发。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，鱼跳跃出水吃食物，若在船下则直接执行动作，表现有溅水动画和无敌帧。"
+    },
+    {
+      "state": "bitehook_pre",
+      "note": "咬钩准备状态，鱼被钓钩吸引时进入挣扎准备动画，触发钓鱼互动。"
+    },
+    {
+      "state": "bitehook_loop",
+      "note": "咬钩循环状态，鱼持续挣扎，有基础挣扎时间配置（set_hook_time），玩家需及时拉钩。"
+    },
+    {
+      "state": "bitehook_escape",
+      "note": "咬钩逃脱状态，鱼试图逃离钓钩，触发跳跃动画并可能断开钓线，影响钓鱼成功。"
+    },
+    {
+      "state": "breach",
+      "note": "跳跃出水状态，鱼跳出水面，用于触发事件如dobreach，表现有溅水特效和物理位移。"
+    },
+    {
+      "state": "shoot",
+      "note": "射击状态，鱼喷射水柱扑灭火焰，检测火灾位置并响应，有溅水动画和射击音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16197,
+      13779,
+      15642,
+      15237,
+      13260,
+      15415,
+      20789,
+      19129
+    ],
+    "aspects": [
+      {
+        "aspect": "海鱼出现描述",
+        "evidence": [
+          {
+            "pageid": 13779,
+            "quote": "当玩家位于[[海洋|海]]边或海上时，每隔 15 ~ 60 秒就会有一群新的海鱼出现在玩家附近。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海洋鱼",
+    "跳跃",
+    "钓鱼",
+    "咬钩",
+    "逃脱",
+    "扑火",
+    "游泳",
+    "动画",
+    "状态机",
+    "食物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "钓鱼",
+    "海洋生物",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "85427994881c685ef5bad14518acefe51cff6e4c0bd42ac9061ee403271945a0",
+    "source_bytes": 10070,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145459187
+  }
+}

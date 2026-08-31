@@ -12,15 +12,19 @@
       "brains/lightninggoatbrain.lua": "0f9666c9738751776b5dd35dabf0944ca858211422ca746ba5e711a41ec4adf6",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/electricattacks.lua": "a9e09b1c689954a04e6ad8f7fcb041d8d1d1b70ae5fb3f6d54b2b03083fa251d",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/herdmember.lua": "98d932c9bb82412871e32014f29df654569ec0083906560457c9983dbec10787",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/saltlicker.lua": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGlightninggoat.lua": "4da2f2195fdf0b8bbec0de06a4121b0dce0cb4f89830ebf3d45e58a2feefa1e5"
     }
   },
   "symbols": {
@@ -44,6 +48,7 @@
       "detail_level": "summary"
     },
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -57,7 +62,11 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "伏特羊",
+        "semantic_consistent": true
+      }
     },
     "behaviours/runaway.lua": {
       "aspects_ignored": [
@@ -157,6 +166,15 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/electricattacks.lua": {
+      "aspects_ignored": [
+        "电击传播机制描述",
+        "电击触发机制描述",
+        "触电抗性初始值描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -191,6 +209,31 @@
       "llm_verdict": {
         "note": "伏特羊页面，未提及"
       }
+    },
+    "components/herdmember.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "兽群位置决定机制",
+          "evidence": [
+            {
+              "pageid": 15729,
+              "quote": "羊群的位置由群中的所有无仇恨目标的个体共同决定"
+            }
+          ]
+        },
+        {
+          "aspect": "兽群再生规则",
+          "evidence": [
+            {
+              "pageid": 15729,
+              "quote": "不满 6 只时，羊群在加载范围外会每 1.5 ~ 2 天再生一只新的伏特羊。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -235,6 +278,13 @@
         "semantic_consistent": true
       }
     },
+    "components/saltlicker.lua": {
+      "aspects_ignored": [
+        "动物舔舐频率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -263,6 +313,10 @@
         "wording": "每1.5~2天再生；每过6~8秒调整；充电状态3天",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGlightninggoat.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

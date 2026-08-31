@@ -9,6 +9,7 @@
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/moonstormstaticcatcher.lua": "e21d3ed9afefd3cc5ddc5f19a4d774346e5f87bf38df01503dddd6f76d332a11",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1"
     }
   },
@@ -35,7 +36,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -47,6 +51,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/moonstormstaticcatcher.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/stackable.lua": {
       "aspects_ignored": [

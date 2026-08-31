@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmerm.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmerm",
+  "summary": "该状态图驱动饥荒联机版中的鱼人（merm）实体。它通过定义多个状态如空闲、攻击、受击等来管理鱼人的行为。状态之间通过事件和动作处理器进行切换，支持战斗、资源收集和特殊能力如变为鱼人国王或月相突变。",
+  "api": [],
+  "api_note": "该状态图不提供直接对外 API 方法，其行为通过事件和动作处理器驱动。",
+  "events_published": [
+    "oncandidatekingarrived"
+  ],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "attackdodged",
+    "onarrivedatthrone",
+    "getup",
+    "mutated",
+    "demutated",
+    "onmermkingcreated_anywhere",
+    "onmermkingdestroyed_anywhere",
+    "cheer",
+    "win_yotb",
+    "merm_lunar_revive",
+    "merm_use_building",
+    "shadowmerm_spawn"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MERM_LOW_LOYALTY_WARNING_PERCENT",
+    "MERM_MAX_STUN_LOCKS",
+    "MERMKING_TRIDENTBUFF_TRIPLEHIT_DAMAGECHANGE",
+    "MERMKING_CROWNBUFF_DODGE_SPEED"
+  ],
+  "states": [
+    "funnyidle",
+    "idle_sit",
+    "sitdown",
+    "getup",
+    "transform_to_king",
+    "chop",
+    "mine",
+    "hammer",
+    "buff",
+    "debuff",
+    "eat",
+    "cheer",
+    "disapproval",
+    "win_yotb",
+    "revive_lunar",
+    "use_tool",
+    "use_building",
+    "shadow_spawn",
+    "shadow_loyaltyover",
+    "tri_attack",
+    "dodge_attack",
+    "hit_shadow",
+    "appear",
+    "lunar_transform",
+    "lunar_revert",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "鱼人对目标发起普通攻击，播放攻击动画并在动画中途造成伤害，然后返回空闲状态。"
+    },
+    {
+      "state": "tri_attack",
+      "note": "鱼人发动三连击，多次攻击目标，由鱼人国王buff触发，有额外伤害调整。"
+    },
+    {
+      "state": "hit",
+      "note": "鱼人受到攻击时播放受击动画，可能产生硬直，如果是月相鱼人还会触发荆棘伤害。"
+    },
+    {
+      "state": "death",
+      "note": "鱼人死亡，播放死亡动画并掉落物品，或特殊处理如暗影寄生复活。"
+    },
+    {
+      "state": "dodge_attack",
+      "note": "鱼人闪避攻击，跳跃到安全位置，有无敌帧和移动速度提升。"
+    },
+    {
+      "state": "buff",
+      "note": "鱼人获得增益效果，当鱼人国王被创建时触发，播放特效和音效。"
+    },
+    {
+      "state": "debuff",
+      "note": "鱼人失去增益效果，当鱼人国王被摧毁时触发，播放特定动画。"
+    },
+    {
+      "state": "transform_to_king",
+      "note": "鱼人变为鱼人国王，需要特定条件并播放变换动画，触发世界事件。"
+    },
+    {
+      "state": "lunar_transform",
+      "note": "鱼人变为月相突变形态，播放变换动画并切换外观，与月相事件相关。"
+    },
+    {
+      "state": "funnyidle",
+      "note": "鱼人的空闲动画，根据忠诚度或状态显示饥饿或愤怒表情，否则返回普通空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      24748,
+      15225,
+      13268,
+      13828,
+      15975,
+      13701,
+      15022,
+      15973
+    ],
+    "aspects": [
+      {
+        "aspect": "死亡后生成暗影鱼人",
+        "evidence": [
+          {
+            "pageid": 24748,
+            "quote": "学习了“暗影复活鱼人”技能的沃特所雇佣的鱼人死亡时会生成暗影鱼人"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "鱼人",
+    "攻击",
+    "受击",
+    "死亡",
+    "闪避",
+    "国王",
+    "月相",
+    "暗影",
+    "buff",
+    "debuff"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c06e99cfbe4e73b7ef29b5f1305cb552131c09f726fb90a6067b8c20d673c01",
+    "source_bytes": 34288,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145513268
+  }
+}

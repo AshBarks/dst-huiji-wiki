@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtentacle.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtentacle",
+  "summary": "该状态图驱动饥荒联机版中的触手(tentacle)实体，整体状态组织从隐藏的地面移动(rumble)开始，包括准备攻击的挑衅(taunt)、完整的攻击序列(attack_pre, attack, attack_post)、被击中的硬直(hit)和死亡(death)。状态转换通过事件(如被攻击、新战斗目标)和超时控制，体现了触手从出现到攻击再到消失的循环行为。",
+  "api": [],
+  "api_note": "源码中未定义任何公共API方法，状态图仅内部使用。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "freeze",
+    "electrocute",
+    "newcombattarget",
+    "death",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "rumble",
+    "idle",
+    "taunt",
+    "attack_pre",
+    "attack",
+    "attack_post",
+    "death",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "rumble",
+      "note": "触手在地面下移动的隐藏状态，玩家听到隆隆声但看不到实体，随机时间后进入idle。"
+    },
+    {
+      "state": "idle",
+      "note": "触手完全隐藏的静止状态，无动作，随机时间后进入rumble准备出现。"
+    },
+    {
+      "state": "taunt",
+      "note": "触手出现并挑衅，播放破土动画，若目标存在则尝试攻击，否则退回idle。"
+    },
+    {
+      "state": "attack_pre",
+      "note": "触手攻击前的准备阶段，播放出现动画和音效，启动攻击计时。"
+    },
+    {
+      "state": "attack",
+      "note": "触手执行两次攻击，分别在7帧和17帧造成伤害，攻击后若目标存在则继续攻击，否则进入attack_post。"
+    },
+    {
+      "state": "attack_post",
+      "note": "触手攻击后消失的动画阶段，播放消失音效后返回idle。"
+    },
+    {
+      "state": "death",
+      "note": "触手死亡状态，播放死亡动画、音效并掉落战利品，移除物理碰撞。"
+    },
+    {
+      "state": "hit",
+      "note": "触手被攻击时的硬直状态，播放受击动画和音效，短暂无法行动后转为攻击状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      70763,
+      15651,
+      51046,
+      15551,
+      18783
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与stategraph__SGtentacle相关的行为状态表达，如rumble、idle、taunt等；页面仅提及大触手被攻击时生成小触手的机制，未描述小触手的具体行为状态。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "触手",
+    "攻击",
+    "死亡",
+    "隐藏",
+    "挑衅",
+    "电击",
+    "冻结",
+    "硬直",
+    "战利品",
+    "破土"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3105c2b0dde916236d839a2edd8de0355a6121858e47a9f9210ee1ca559616b9",
+    "source_bytes": 7103,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141704122
+  }
+}

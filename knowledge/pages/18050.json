@@ -5,16 +5,29 @@
   "inputs": {
     "wikitext_sha256": "b30194eede6555e1931633b378973a48ad189c969cdaea88280d0187009bedf0",
     "symbol_doc_shas": {
+      "components/aoespell.lua": "8ead494d815d4a64a99d34ac3927bb70f9d5b0f0fe0dd6378de606e472d6dba4",
+      "components/aoetargeting.lua": "988acc93e42056c2c561faf8a6364061ace3b3f194308e7c43f8e889fd2035d9",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/ghostlyelixirable.lua": "bb758ccf3b85a8ee8259c2733f418009793112afb90807e4e65ce80c47ddc83b",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a"
+      "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/spellbook.lua": "1c4692155a1e232c3106086045045da6db9a30dfcf866cd0491ed21a0b3046a1",
+      "components/summoningitem.lua": "c4816435d00dc1f42a2402ef935fc9e05434b07edc7bc18a088401e7e1456cad"
     }
   },
   "symbols": {
+    "components/aoespell.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/aoetargeting.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -32,6 +45,14 @@
       "llm_verdict": {}
     },
     "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/ghostlyelixirable.lua": {
+      "aspects_ignored": [
+        "增益在实体移除或死亡时结束",
+        "增益应用到目标"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -86,6 +107,24 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/spellbook.lua": {
+      "aspects_ignored": [
+        "法术书使用条件限制",
+        "法术书制作能力",
+        "法术书施法效果描述",
+        "法术书施法距离描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/summoningitem.lua": {
+      "aspects_ignored": [
+        "书籍魔法效果召唤描述",
+        "暗影傀儡召唤方式与资源消耗描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

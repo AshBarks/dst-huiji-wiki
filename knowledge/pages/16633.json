@@ -14,7 +14,9 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/oar.lua": "5ed14794c4f70b432e0f53209f807e3828ed5f11aaa3f9caf8a002cbb38ebb41",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/waterproofer.lua": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -108,10 +110,30 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/oar.lua": {
+      "aspects_ignored": [
+        "漂浮平台划动行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/waterproofer.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "防水效果对潮湿速率的影响"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "玩家将被溅到水获得 9 点{{潮湿度}}",
+        "semantic_consistent": true,
+        "note": "页面提及潮湿但未明确讨论防水效果"
+      }
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",
@@ -129,5 +151,5 @@
       }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

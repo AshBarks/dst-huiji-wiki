@@ -3,7 +3,7 @@
   "pageid": 20154,
   "title": "装甲熊獾",
   "inputs": {
-    "wikitext_sha256": "7626c5dc1a7fd12bab7d48179ec9c08b3c75fbf6510424aaa075edcbfdb25cd6",
+    "wikitext_sha256": "0de72b4cfa958838ed64b4d87ea6bd94352c3da0203b593a4b16dede05bd93e6",
     "symbol_doc_shas": {
       "behaviours/chaseandattack.lua": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
       "behaviours/chaseandram.lua": "ff84e7e0f2e40283098ce27bfc45febacb33a2870a891287716984b382fe56be",
@@ -13,14 +13,18 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/groundpounder.lua": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/shedder.lua": "95bbf2ed4804754ea29039c1a3d4887676bb118902e551d5b7746d111331986b",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "stategraphs/SGbearger.lua": "8a086f8e324b0e27bad57b536be7d842303000417ee2c635efd0c98a1e765700"
     }
@@ -143,6 +147,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -154,6 +166,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/groundpounder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "mention_source": "llm_verdict",
@@ -221,6 +237,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -233,6 +253,18 @@
         "wording": "理智值}}/分",
         "semantic_consistent": true
       }
+    },
+    "components/shedder.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "4 单位",
+          "region_id": "20154:section:1",
+          "matched": "components/shedder.lua: speed=4"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/timer.lua": {
       "aspects_ignored": [

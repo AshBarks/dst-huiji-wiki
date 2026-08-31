@@ -11,18 +11,24 @@
       "brains/vault_pillar_guardbrain.lua": "9786670019a978ee3f4801fa163935b85850037f41e9a553275cce0574476082",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/damagetypebonus.lua": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+      "components/damagetyperesist.lua": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthtrigger.lua": "3c64da771e8432f013164d37af0a50d1b38b9530ff95927c51b04a9878d38119",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGvault_pillar_guard.lua": "e4813dafe3aecbbdfcec226bca56ca23d2723efb190958a5312d13933bcc9bf1"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -36,15 +42,23 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "戍卫塔",
+        "semantic_consistent": true
+      }
     },
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述守卫塔实体，该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -52,7 +66,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/vault_pillar_guardbrain.lua": {
       "aspects_ignored": [
@@ -88,6 +103,24 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/damagetyperesist.lua": {
+      "aspects_ignored": [
+        "电路板技能物理伤害减免效果",
+        "装备伤害减免能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容可能描述某种受 explosive_resist 组件影响的生物（根据“铥矿”等掉落物和战斗描述，可能为远古守卫或类似生物）。然而，在提供的片段中，页面未提及该生物拥有爆炸抗性、抗性机制或其工作方式，这些是该组件提供的关键属性。"
+      }
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -120,6 +153,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthtrigger.lua": {
+      "aspects_ignored": [
+        "生命值变化转移触发"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -163,6 +203,10 @@
         "semantic_consistent": true
       }
     },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -178,6 +222,16 @@
         "wording": "普通攻击有16秒冷却",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGvault_pillar_guard.lua": {
+      "aspects_ignored": [
+        "旋转攻击描述",
+        "激活出现",
+        "眩晕状态与伤害加成",
+        "终结攻击跳跃"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

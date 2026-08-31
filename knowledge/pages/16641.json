@@ -12,6 +12,7 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/shadowlevel.lua": "478422c5110718d22b3bfcfa134d8f7e424cc91f6f8e9d42a87180d14335708d",
+      "components/spellcaster.lua": "d0b02e9d4f6dafb17b759298485a895445572708414a4b0e20a2e7b04b70bec5",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
   },
@@ -82,6 +83,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/spellcaster.lua": {
+      "aspects_ignored": [
+        "使用物品施放增益效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/tradable.lua": {
       "aspects_ignored": [

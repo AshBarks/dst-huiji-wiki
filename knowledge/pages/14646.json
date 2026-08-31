@@ -11,6 +11,7 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/terraformer.lua": "5ebc97583da1f36e8f4ad6d94ae343023642d16a0b9c38232fa31cdeb16c521c",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -72,6 +73,15 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/terraformer.lua": {
+      "aspects_ignored": [
+        "园艺锄犁地工具功能描述",
+        "耕地机部署与地块转化",
+        "鱼人挖掘与犁地行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

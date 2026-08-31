@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpowdermonkey.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpowdermonkey",
+  "summary": "该状态图驱动火药猴（powdermonkey）实体，是饥荒联机版海难DLC中猴岛相关的敌对生物。整体状态组织采用状态机模式，定义了空闲、行动、战斗、移动等多种状态，并通过事件驱动状态转换，处理如攻击、划船、偷窃等行为。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，所有行为通过内部状态和事件驱动，无需外部直接调用。",
+  "events_published": [],
+  "events_listened": [
+    "victory",
+    "cheer",
+    "onsink",
+    "locomote",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "attack",
+    "death",
+    "hop",
+    "sink",
+    "fallinvoid",
+    "sleep",
+    "corpse_chomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "hammer",
+    "empty",
+    "victory",
+    "victory_pst",
+    "eat",
+    "taunt",
+    "row",
+    "dive",
+    "steal",
+    "dive_pst_land"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当火药猴没有执行其他动作时进入此状态，播放空闲动画，有几率在玩家附近触发嘲讽或转向。"
+    },
+    {
+      "state": "action",
+      "note": "通用行动状态，用于执行如装填大炮等交互动作，状态有'busy'标签可中断，执行后返回空闲。"
+    },
+    {
+      "state": "victory",
+      "note": "火药猴胜利时触发，播放胜利动画并发出欢呼声，可能触发船员集体庆祝并说出胜利台词。"
+    },
+    {
+      "state": "row",
+      "note": "划船状态，控制火药猴划船移动，有溅水效果和声音，循环划船直到停止或随机嘲讽。"
+    },
+    {
+      "state": "dive",
+      "note": "潜水状态，火药猴从船上跳入水中，改变碰撞掩码在空中飞行，之后可能消失或落地。"
+    },
+    {
+      "state": "steal",
+      "note": "偷窃状态，执行偷窃动作，使用攻击动画，成功后执行偷窃行为并发出音效。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，火药猴进行嘲讽并说出台词，根据船的状态选择不同对话，如撤退或战斗。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      13897,
+      15922,
+      13828,
+      15551,
+      15651,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均围绕其他实体（如天体英雄、战争瓦器人、克劳斯等）展开，未涉及火药猴（SGpowdermonkey）的任何能力或行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "火药猴",
+    "猴岛",
+    "偷窃",
+    "攻击",
+    "划船",
+    "胜利",
+    "潜水",
+    "嘲讽",
+    "状态图",
+    "海难"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "交互",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2207884aa353bdd94c8fee8623195733184690f889ab1e314a640f63122fdaf3",
+    "source_bytes": 17555,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140230691
+  }
+}

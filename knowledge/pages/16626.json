@@ -6,6 +6,7 @@
     "wikitext_sha256": "6e9961de6c18646b24ea0b7477a2fc2705f86ee241561f7119672e9a3e12d28b",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/halloweenmoonmutable.lua": "bf53efa7e2c2e223ceb8439da228c2eeb3f786edcf9ae31d363ba7f3a85a28fd",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
@@ -28,6 +29,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/halloweenmoonmutable.lua": {
+      "aspects_ignored": [
+        "月亮变异转化机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

@@ -7,8 +7,11 @@
     "symbol_doc_shas": {
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/moonstormstaticbrain.lua": "bba1f216c5390daa8b39f417797816b4497fcdf47b5f79b682e1286bfe20a676",
+      "components/hudindicatable.lua": "a410d2f8ad63f114ce153f1044622baa15f0f1a0c739f6830a4e1a19041afc01",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7"
+      "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/moonstormstaticcapturable.lua": "394d1b10679b0ee621586129307ba2b3c51c7b30b9c6681ca119a24ff5674de8",
+      "stategraphs/SGmoonstormstatic.lua": "65e344ca2715b72e06c3cf1f157b78d0e2e623cf5a8ae582d7b490fc9baae6b0"
     }
   },
   "symbols": {
@@ -18,9 +21,17 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/moonstormstaticbrain.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hudindicatable.lua": {
+      "aspects_ignored": [
+        "HUD位置箭头指示"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -31,7 +42,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -44,6 +58,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/moonstormstaticcapturable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGmoonstormstatic.lua": {
+      "aspects_ignored": [
+        "移动速度与游荡行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

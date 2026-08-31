@@ -14,7 +14,9 @@
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/groundpounder.lua": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
@@ -22,7 +24,9 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/shedder.lua": "95bbf2ed4804754ea29039c1a3d4887676bb118902e551d5b7746d111331986b",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/thief.lua": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "stategraphs/SGbearger.lua": "8a086f8e324b0e27bad57b536be7d842303000417ee2c635efd0c98a1e765700"
     }
@@ -185,6 +189,14 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -196,6 +208,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/groundpounder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -273,6 +289,10 @@
         "semantic_consistent": true
       }
     },
+    "components/shedder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "mention_source": "pass2_evidence",
       "aspects_covered": [
@@ -303,6 +323,14 @@
       ],
       "route": "direct",
       "detail_level": "detailed"
+    },
+    "components/thief.lua": {
+      "aspects_ignored": [
+        "偷窃物品行为描述",
+        "防护偷窃能力描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "pass2_evidence",

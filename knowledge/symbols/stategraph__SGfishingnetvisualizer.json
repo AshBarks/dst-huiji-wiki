@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfishingnetvisualizer.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfishingnetvisualizer",
+  "summary": "该状态图驱动饥荒联机版中的钓鱼网可视化器实体，用于模拟钓鱼网从抛出到收回的完整视觉过程。整体状态组织为线性流程，依次经过抛出(casting)、打开(opening)、拉回(retrieving)和最终拾取(final_pickup)，由组件方法更新进度并触发状态转换。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，仅处理内部状态转换和动画更新，通过组件方法实现逻辑。",
+  "events_published": [],
+  "events_listened": [
+    "play_throw_pst",
+    "begin_opening",
+    "animover",
+    "begin_final_pickup"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "casting",
+    "opening",
+    "retrieving",
+    "final_pickup"
+  ],
+  "state_notes": [
+    {
+      "state": "casting",
+      "note": "进入条件：钓鱼网抛出时触发；表现：播放抛出动画并循环，持续更新移动至目标位置；玩家感知：钓鱼网准备并执行抛出动作，动画伴随移动。"
+    },
+    {
+      "state": "opening",
+      "note": "进入条件：抛出结束事件触发；表现：生成溅射特效，动画结束后自动转到拉回状态；玩家感知：钓鱼网落入水中打开，产生溅射效果。"
+    },
+    {
+      "state": "retrieving",
+      "note": "进入条件：打开动画结束触发；表现：面朝投掷者播放拉回动画，持续直到拾取事件；玩家感知：钓鱼网被拉回，动画循环直至完成。"
+    },
+    {
+      "state": "final_pickup",
+      "note": "进入条件：拉回过程中触发拾取事件；表现：开始最终拾取过程，可能关联物品收集；玩家感知：钓鱼网完成动作并拾取物品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13567,
+      45439,
+      19595,
+      13785,
+      14935,
+      15225,
+      23965,
+      14816
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及'钓鱼网'或相关状态图'stategraph__SGfishingnetvisualizer'的能力描述。页面内容主要涉及游戏更新系列、其他实体行为（如酸蚀蝎、暗影傀儡、鳄鱼指挥官），与钓鱼网无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "钓鱼网",
+    "可视化",
+    "状态图",
+    "抛出",
+    "拉回",
+    "溅射",
+    "拾取",
+    "动画",
+    "更新",
+    "组件"
+  ],
+  "gameplay_tags": [
+    "钓鱼",
+    "生存",
+    "工具"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e0985747124f175a47d11bcce56b57df14f8c53ed47fefeba2d0d277f503ef00",
+    "source_bytes": 2465,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137584422
+  }
+}

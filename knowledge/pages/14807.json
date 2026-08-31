@@ -11,6 +11,7 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/projectile.lua": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
@@ -71,6 +72,16 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/projectile.lua": {
+      "aspects_ignored": [
+        "击中效果与伤害描述",
+        "弹跳机制描述",
+        "追踪功能描述",
+        "飞行速度与范围描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

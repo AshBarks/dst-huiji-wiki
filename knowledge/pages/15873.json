@@ -10,7 +10,10 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/playeravatardata.lua": "5484de89206b573ff6e34197227b0378eec13209a07225e0585a00ade0924959",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/skinner.lua": "92c53ec61f4a3783d299160853a55102e6b9faa3c4c894afcf73e7700ff77515",
+      "components/wardrobe.lua": "fd4947b266324b3aa37a565a8130c2ed8c05694c1cc6360ec6bf0e1ca6dfdc9d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -67,10 +70,26 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/playeravatardata.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/skinner.lua": {
+      "aspects_ignored": [
+        "扫把外观更换功能",
+        "牛皮肤更换功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/wardrobe.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

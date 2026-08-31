@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_lunarmothling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_lunarmothling",
+  "summary": "该状态图驱动饥荒联机版(DST)中的宠物伴侣实体“月蛾幼崽”。它通过调用通用宠物状态模块和添加自定义事件处理，来定义该实体的基础行为、互动与动画。整体状态组织以idle为起始状态，管理其飞行、着陆、休息、进食、玩耍等多种行为状态间的转换。",
+  "api": [],
+  "api_note": "此状态图不直接提供任何对外API方法，所有行为由状态机内部根据事件和条件自动驱动。",
+  "events_published": [],
+  "events_listened": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "randomemote1",
+    "randomemote2",
+    "randomemote_nuzzle",
+    "emote_cute",
+    "combat_pre",
+    "combat_loop",
+    "combat_pst",
+    "play_active",
+    "play_passive",
+    "play_inactive",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "pet",
+    "sleep_start",
+    "sleeping",
+    "wake"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "月蛾幼崽的基础待机状态，会以3:2:1的权重随机播放三种不同速度的扇翅动画，并播放对应音效。"
+    },
+    {
+      "state": "emote_cute",
+      "note": "月蛾幼崽的“可爱”互动表情，触发时会先着陆，完成动作后重新飞起，并伴有特殊音效。"
+    },
+    {
+      "state": "combat_pre",
+      "note": "战斗准备/战斗结束状态，月蛾幼崽会在战斗前着陆，战斗结束后（pst）在短暂延迟后重新飞起。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，月蛾幼崽在进食前会着陆，进行多次循环进食音效后，才重新飞起。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿状态，当宠物饥饿时进入，会播放一个表示痛苦或焦急的音效。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "依偎/撒娇状态，月蛾幼崽会着陆并发出音效，进行持续一段时间的依偎动作后重新飞起。"
+    },
+    {
+      "state": "sleep_start",
+      "note": "睡眠准备状态，进入时会播放准备音效，着陆，并最终停止扇翅的飞行音效。"
+    },
+    {
+      "state": "pet",
+      "note": "被玩家抚摸时的互动状态，会播放多个连续的可爱音效，结束后恢复飞行状态。"
+    },
+    {
+      "state": "play_passive",
+      "note": "与其他生物互动的被动方状态，月蛾幼崽会着陆，播放互动音效和叫声，互动结束后飞起。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      13456,
+      15975,
+      34037,
+      13455,
+      13437,
+      13156,
+      18057
+    ],
+    "aspects": [
+      {
+        "aspect": "饥饿状态表现描述",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物在低保质期时会进入饥饿状态，饥饿状态下的宠物会发出叫声并表现相应的动画"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月蛾幼崽",
+    "宠物伴侣",
+    "飞行",
+    "着陆",
+    "休息",
+    "互动",
+    "战斗",
+    "进食",
+    "饥饿",
+    "抚摸"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ea33f4d88f67450b67902f7a88c798cdaa5820d8627593bd55651a3e2b5f4572",
+    "source_bytes": 8250,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144868249
+  }
+}

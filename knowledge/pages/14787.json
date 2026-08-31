@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "ed5f99706f1513f38dceae36e457908be7b8dacde383ef98d5d40d40c51c9717",
     "symbol_doc_shas": {
+      "components/battery.lua": "3470072afa447e1d5541734c69fefaf19edd09a461ae131f675bc1e85908eb81",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
@@ -13,6 +14,14 @@
     }
   },
   "symbols": {
+    "components/battery.lua": {
+      "aspects_ignored": [
+        "蓄电池充电使用效果",
+        "蓄电池功能定义"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",

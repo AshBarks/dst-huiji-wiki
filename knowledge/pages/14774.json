@@ -9,8 +9,10 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/papereraser.lua": "27521563b6c8e3c45d658ede4c277c076a406042321a67fc488e654fd49b60f2",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -63,6 +65,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/papereraser.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -71,6 +77,19 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/prototyper.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面提到了制图桌（cartographydesk），它是受 prototyper 组件管理的原型制作者。证据未直接提及 'prototyper' 组件或原型制作系统机制。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -82,5 +101,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

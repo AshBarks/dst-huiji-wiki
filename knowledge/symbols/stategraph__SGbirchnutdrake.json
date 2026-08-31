@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbirchnutdrake.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbirchnutdrake",
+  "summary": "该状态图驱动饥荒联机版中的 Birchnut Drake（桦树果飞龙）实体，管理其从出生到消失的完整生命周期。状态组织包括地面待机、跳跃攻击、死亡和退出等阶段，通过动画和事件触发状态转换。整体设计强调战斗行为，如攻击时机和无敌窗口，并整合了移动和状态效果处理。",
+  "api": [],
+  "api_note": "该状态图为内部状态机，不暴露公共 API 方法，所有逻辑通过状态和事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "exit",
+    "gotosleep",
+    "freeze",
+    "electrocute",
+    "doattack",
+    "attacked",
+    "death",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawn",
+    "ground_idle",
+    "enter",
+    "exit_pre",
+    "exit",
+    "attack_leap"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "出生状态，实体从地下钻出，期间不可见且无法被攻击或电击，有音效和动画表现。"
+    },
+    {
+      "state": "enter",
+      "note": "进入状态，实体从地面完全显现，在动画第2帧后可见，第12帧后可被攻击，有短暂无敌窗口。"
+    },
+    {
+      "state": "attack_leap",
+      "note": "跳跃攻击状态，实体向目标跳跃并在第12帧造成伤害，攻击期间有物理速度提升和音效。"
+    },
+    {
+      "state": "exit",
+      "note": "退出状态，实体钻回地面并最终移除，期间不可见且无法攻击，有特定音效和物理碰撞器移除。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13606,
+      15225,
+      15303,
+      50903,
+      28611,
+      51287
+    ],
+    "aspects": [
+      {
+        "aspect": "出生时从地下钻出的行为",
+        "evidence": [
+          {
+            "pageid": 28611,
+            "quote": "巨大洞穴蠕虫初始生成时只有一个头部体段，随着头部不断钻入地面再钻出"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "桦树果飞龙",
+    "出生",
+    "跳跃攻击",
+    "无敌帧",
+    "死亡",
+    "移动",
+    "退出",
+    "状态图",
+    "攻击动画",
+    "SGbirchnutdrake"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "765510abd1a16d802338a26b6c1872cde0a8870223cea90ec561852068ea357b",
+    "source_bytes": 7808,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135920679
+  }
+}

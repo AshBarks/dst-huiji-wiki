@@ -9,8 +9,10 @@
       "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/pollyrogerbrain.lua": "f5507a4019660432455edf709cfa317a607112e9349bb96d2567a32996615352",
+      "components/amphibiouscreature.lua": "6d7a2c3108cd3888853236d61ceda5e68563a51528a78ea33616fc5f798003e7",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/counter.lua": "f1929b4264795f6416f6c9c368a21df157a2bd47f0618f8eb0712674194042b8",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
       "components/embarker.lua": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
@@ -20,7 +22,8 @@
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGsalty_dog.lua": "b3e78a64f95e214e9d2ac3119b3a2abc08ce494e13fcdcc3372cf24db31bfbec"
     }
   },
   "symbols": {
@@ -79,6 +82,10 @@
       "route": "direct",
       "detail_level": "detailed"
     },
+    "components/amphibiouscreature.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -108,6 +115,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/counter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/eater.lua": {
       "aspects_ignored": [
@@ -220,6 +231,16 @@
         "wording": "当咸狗在海域游泳 1 分钟，咸狗身上就会附着 1 个盐晶...咸狗需要 1 天的时间才能重生",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGsalty_dog.lua": {
+      "aspects_ignored": [
+        "强制消失行为",
+        "捡拾物品行为",
+        "给予物品行为",
+        "闲置状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

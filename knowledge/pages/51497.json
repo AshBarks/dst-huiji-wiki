@@ -6,6 +6,7 @@
     "wikitext_sha256": "6ba0be6307d0083f11e7db53efadf54abc7058784a9906f839f5361f01e10c16",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/npc_talker.lua": "421ee0046a38e7b022a37abbd02cb33f57e6c699ac6a37f530f2f1f6a2fd3e4a",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "stategraphs/SGwagstaff_npc.lua": "d9e094deddfff319a69cdd58c1c5793866b602ae3d96ae066d3f492c6244661e"
     }
@@ -20,6 +21,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/npc_talker.lua": {
+      "aspects_ignored": [
+        "交互时言语表达",
+        "台词触发条件"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/talker.lua": {
       "aspects_ignored": [

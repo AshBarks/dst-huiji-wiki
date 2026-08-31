@@ -9,7 +9,8 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
-      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1"
+      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/waterproofer.lua": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46"
     }
   },
   "symbols": {
@@ -33,7 +34,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -53,6 +57,14 @@
         "堆叠数量参与湿度计算",
         "无限堆叠机制描述",
         "物品可堆叠性说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/waterproofer.lua": {
+      "aspects_ignored": [
+        "防水效果对潮湿速率的影响"
       ],
       "route": "direct",
       "detail_level": "stub",

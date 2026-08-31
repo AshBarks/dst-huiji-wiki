@@ -6,6 +6,7 @@
     "wikitext_sha256": "4599dbfa479f0d5e67f38a2e15ef92b261d5a9525060d5e282f92a6f6e591bd7",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/camerafade.lua": "2d9488c86a047a6173ac0ac916b89800aec47ab4ac902ad27b9feab2ffed6594",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -30,6 +31,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/camerafade.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/floater.lua": {
       "route": "direct",

@@ -5,11 +5,23 @@
   "inputs": {
     "wikitext_sha256": "81129fe02e6f67e82d6bccf6904f1db7fbca9d374e57f05033d86ff65bfe920f",
     "symbol_doc_shas": {
+      "components/globaltrackingicon.lua": "f28aa73049d777da6182e37d06d4f6b7d4abbada0c61577c105646909fe99600",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/mapdeliverable.lua": "02a1a7541c0dd2aec5e9a063f5d6d85c0bce67eb041a3f1a55ea6da6aaeba384",
+      "components/maprevealer.lua": "a3c02c6a4c69e8348d6d0f09f90e80ccd517c1cae315e0cc9569e808bd11d822",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwx78_drone_scout.lua": "35ed15eac9f057e83869235c7b71d8f7ed8b7c9173ee62c95592e410e6af24a5"
     }
   },
   "symbols": {
+    "components/globaltrackingicon.lua": {
+      "aspects_ignored": [
+        "仇恨追踪的开始与停止条件"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -20,11 +32,42 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/mapdeliverable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/maprevealer.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "绑定制作玩家描述",
+          "evidence": [
+            {
+              "pageid": 72353,
+              "quote": "旋翼测绘机会与制作它的玩家相绑定"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "为玩家揭示地图描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwx78_drone_scout.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

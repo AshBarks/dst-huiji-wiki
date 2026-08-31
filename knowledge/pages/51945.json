@@ -8,6 +8,7 @@
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lunarsupernovablocker.lua": "97ed2d7e66a39147e6adbd7a3df1eebde58bf0df75d7c8f34dd099dc88738dc0",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
     }
   },
@@ -22,7 +23,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -33,6 +35,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/lunarsupernovablocker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/updatelooper.lua": {
       "route": "direct",

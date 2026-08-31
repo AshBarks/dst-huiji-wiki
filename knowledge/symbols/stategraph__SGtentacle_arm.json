@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtentacle_arm.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtentacle_arm",
+  "summary": "该状态图驱动触手手臂实体，常见于触手怪的附属部分。整体状态组织基于玩家接近、战斗事件和主触手指令，在等待、钻出、攻击、缩回、死亡等状态间转换，通过事件处理器和动画时间线控制行为。",
+  "api": [],
+  "api_note": "状态图未定义显式对外方法，交互完全通过事件系统（如PushEvent/ListenForEvent）进行。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "newcombattarget",
+    "death",
+    "emerge",
+    "retract",
+    "full_retreat",
+    "freeze",
+    "electrocute"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack_idle",
+    "emerge",
+    "attack",
+    "retract",
+    "death",
+    "full_retreat",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "触手手臂在地下等待，玩家靠近时尝试钻出；若未接近，会定期触发完全撤退或随机超时检测。"
+    },
+    {
+      "state": "attack_idle",
+      "note": "钻出后处于攻击待命状态，播放闲置动画，当有战斗目标时会转为攻击状态。"
+    },
+    {
+      "state": "emerge",
+      "note": "触手手臂从地下钻出的动画，播放音效，完成后根据目标或撤退指令进入攻击或缩回状态。"
+    },
+    {
+      "state": "attack",
+      "note": "执行攻击动作，在动画第7帧和第17帧各造成一次伤害，攻击结束后返回待命或撤退。"
+    },
+    {
+      "state": "retract",
+      "note": "触手手臂缩回地下的动画，播放音效，完成后可能返回等待状态或完全移除实体。"
+    },
+    {
+      "state": "death",
+      "note": "触手手臂死亡，播放死亡动画和音效，实体被销毁。"
+    },
+    {
+      "state": "full_retreat",
+      "note": "完全撤退状态，由主触手召唤，播放缩回动画后实体被移除，用于强制隐藏。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时的硬直状态，播放受击动画和音效，之后返回攻击待命状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      13409,
+      15022,
+      15225,
+      51046,
+      13897,
+      15651,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及触手手臂或相关能力描述，所有内容涉及其他实体如角色、装备或不同生物。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "触手手臂",
+    "小触手",
+    "钻出",
+    "攻击",
+    "缩回",
+    "死亡",
+    "硬直",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c433ef72b7dd61751d731abf21d8aca5960718aef2a6488cc5d93225098d96b4",
+    "source_bytes": 7711,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141848789
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGworm.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGworm",
+  "summary": "该状态图驱动饥荒联机版中的蠕虫实体，管理其挖洞、引诱、攻击、移动和死亡等行为。状态组织以idle挖洞状态为基础，包含action拾取/吃东西、attack攻击、lure引诱以及行走和受击等常见状态。",
+  "api": [],
+  "api_note": "源码中未定义对外API方法，所有行为由状态图内部事件处理驱动。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "doattack",
+    "attacked",
+    "dolure",
+    "freeze",
+    "electrocute",
+    "death",
+    "sleep"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SANITYAURA_SMALL",
+    "WORM_LURE_TIME",
+    "WORM_LURE_VARIANCE"
+  ],
+  "states": [
+    "idle_enter",
+    "idle",
+    "idle_exit",
+    "action",
+    "eat",
+    "taunt",
+    "attack_pre",
+    "attack",
+    "death",
+    "hit",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "lure_enter",
+    "lure",
+    "lure_exit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蠕虫处于挖洞状态，不可见且带有dirt标签，玩家无法直接攻击或互动。"
+    },
+    {
+      "state": "action",
+      "note": "蠕虫执行拾取动作，在10帧后进入nohit无敌帧，并在15帧时造成伤害并返回idle。"
+    },
+    {
+      "state": "eat",
+      "note": "蠕虫吃东西，动画较长，在60帧后进入nohit状态并执行动作，有特定音效和灭除火焰。"
+    },
+    {
+      "state": "attack",
+      "note": "蠕虫攻击玩家，在25帧时造成伤害，带有nohit标签，攻击后自动返回idle状态。"
+    },
+    {
+      "state": "death",
+      "note": "蠕虫死亡，播放死亡动画并掉落战利品，移除物理碰撞。"
+    },
+    {
+      "state": "hit",
+      "note": "蠕虫受击，播放受伤动画并带有hit标签，有短暂硬直后返回idle。"
+    },
+    {
+      "state": "lure_enter",
+      "note": "蠕虫进入引诱状态，改变物理和清醒光环以吸引玩家，有特定动画和音效。"
+    },
+    {
+      "state": "lure",
+      "note": "蠕虫在引诱状态中持续一段时间（基于TUNING配置），期间可能被玩家拾取，之后自动退出。"
+    },
+    {
+      "state": "walk",
+      "note": "蠕虫在地下行走，播放移动动画和脚步声，用于跟踪玩家或移动位置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      28611,
+      15651,
+      15539,
+      13556,
+      20150,
+      13761
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 13761,
+            "quote": "玩家接近它 2 ~ 5 {{解释|距离单位}}时，则会在 2 ~ 5 秒后攻击玩家。"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落物列表",
+        "evidence": [
+          {
+            "pageid": 13761,
+            "quote": "掉落 = {{Pic|32|怪物肉}}×4，{{Pic|32|发光浆果}}×1"
+          },
+          {
+            "pageid": 28611,
+            "quote": "掉落={{Pic|32|怪物肉}}×3，{{Pic|32|发光浆果}}×1，{{Pic|32|巨大洞穴蠕虫雕塑草图}}×1"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蠕虫",
+    "引诱",
+    "攻击",
+    "无敌帧",
+    "硬直",
+    "挖洞",
+    "掉落",
+    "伤害",
+    "移动",
+    "死亡"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "诱捕",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "67e092055a9852d5e90b3d69592dad1efbf98b73eff04516ca6a6beb4b7fa830",
+    "source_bytes": 15631,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135181811
+  }
+}

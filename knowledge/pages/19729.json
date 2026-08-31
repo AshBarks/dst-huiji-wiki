@@ -6,11 +6,15 @@
     "wikitext_sha256": "28f0691003ed7ee49133daf7943652ec1a15c87680cb64b0723e986ddc1d0c88",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/growable.lua": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/simplemagicgrower.lua": "8d519b151572cfdda650c3ba47a212387ad4d08cb6badc6b8ff6b3abd122ee9c",
+      "components/waxable.lua": "fe13e66e049d2d832b2d132f7ac1d0bde2dd009719b67462e25119bf8bfeef5c",
+      "components/witherable.lua": "a7204a688049853010d4fa8dec6dba7f31a167e278e24e4b3669682c38ae68f1",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -30,6 +34,43 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/growable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "生长启动描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "重新开始生长的植株"
+            }
+          ]
+        },
+        {
+          "aspect": "生长速度与持续时间描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "该阶段会持续 9 ~ 11 分钟，之后植株成长至预备阶段。"
+            }
+          ]
+        },
+        {
+          "aspect": "生长阶段列举与描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "石果灌木丛的生长存在下列几个阶段：<br>初生阶段→预备阶段→成熟阶段→过熟阶段"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "魔法催熟效果描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -127,6 +168,45 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/simplemagicgrower.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "生长阶段描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "植株成长至预备阶段"
+            }
+          ]
+        },
+        {
+          "aspect": "重新生长描述",
+          "evidence": [
+            {
+              "pageid": 19729,
+              "quote": "重新开始生长的植株"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/waxable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/witherable.lua": {
+      "aspects_ignored": [
+        "施肥对高温枯萎的延迟效果",
+        "枯萎状态视觉表现",
+        "枯萎触发条件描述",
+        "采集次数与贫瘠枯萎关联"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

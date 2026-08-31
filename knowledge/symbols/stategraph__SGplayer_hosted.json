@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGplayer_hosted.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGplayer_hosted",
+  "summary": "该状态图驱动饥荒联机版中的玩家实体（hosted玩家）。它通过定义一系列状态（如空闲、攻击、死亡等）来管理玩家行为，并通过事件和动画触发状态转换，以响应游戏中的交互和动作。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，其行为完全通过状态、事件和组件驱动。",
+  "events_published": [
+    "ms_closepopups"
+  ],
+  "events_listened": [
+    "intro",
+    "attacked",
+    "animover",
+    "animqueueover",
+    "onthaw",
+    "unfreeze",
+    "startlongaction"
+  ],
+  "netvars": [
+    "hosted_userid"
+  ],
+  "tunables": [
+    "WILSON_EMBARK_SPEED_BOOST",
+    "WILSON_EMBARK_SPEED_MIN",
+    "WILSON_EMBARK_SPEED_MAX"
+  ],
+  "states": [
+    "idle",
+    "intro",
+    "death",
+    "eat",
+    "dolongaction",
+    "attack",
+    "run_start",
+    "run",
+    "run_stop",
+    "hit",
+    "abyss_fall",
+    "abyss_drop",
+    "abyss_drop_pst",
+    "jumpin_pre",
+    "jumpin",
+    "jumpout",
+    "frozen",
+    "thaw"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "玩家处于空闲状态，停止移动并播放循环动画，可响应旋转输入。"
+    },
+    {
+      "state": "intro",
+      "note": "玩家进入世界时的初始状态，播放介绍动画后转为空闲，用于新玩家加入或重生。"
+    },
+    {
+      "state": "death",
+      "note": "玩家死亡后丢弃所有物品，生成骨架记录死亡信息，并播放死亡动画后移除实体。"
+    },
+    {
+      "state": "attack",
+      "note": "玩家发起攻击，动画为punch，攻击命中在6帧后，期间有短暂无敌帧。"
+    },
+    {
+      "state": "hit",
+      "note": "玩家受到攻击时进入硬直状态，持续约6-10帧，无法行动并播放受击动画。"
+    },
+    {
+      "state": "eat",
+      "note": "玩家吃东西时播放进食动画，持续一段时间后恢复空闲。"
+    },
+    {
+      "state": "dolongaction",
+      "note": "玩家进行长时间动作（如制作），有超时机制，期间显示动作进度条。"
+    },
+    {
+      "state": "frozen",
+      "note": "玩家被冻结时无法移动和操作，播放冻结动画，直到解冻或状态改变。"
+    },
+    {
+      "state": "abyss_fall",
+      "note": "玩家掉入虚空时触发，有无敌帧并自动传送回地面，播放掉落动画。"
+    },
+    {
+      "state": "jumpin",
+      "note": "玩家跳入传送门（如虫洞）时加速移动，播放跳跃动画并触发传送逻辑。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      13642,
+      15225,
+      18001,
+      45249
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本主要描述怪物、建筑和制作机制，未提及玩家状态图的具体行为，如空闲、进入、死亡、攻击等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "玩家状态",
+    "攻击",
+    "死亡",
+    "吃东西",
+    "冻结",
+    "传送",
+    "掉落",
+    "硬直",
+    "制作",
+    "空闲"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "制作",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a1b6b6c0e8a7320b2c1beef960c6318ecb36b05171d2766560b2cfcd28f3223d",
+    "source_bytes": 33132,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140101352
+  }
+}

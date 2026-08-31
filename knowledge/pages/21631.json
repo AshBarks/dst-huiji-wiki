@@ -6,6 +6,7 @@
     "wikitext_sha256": "2c0d61702507bf6e8adb8fb4a0fc78d6c6af7e4a462bb23b93fa47614a816639",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/disappears.lua": "170d23ccac1feb27770f93476c600de0cd2178732b0c9dc146c43d2e05c50e03",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -31,6 +32,19 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/disappears.lua": {
+      "aspects_ignored": [
+        "小虚影的冲刺后消失",
+        "弹弓弹药的飞行后消失",
+        "恶液的定时消失",
+        "机缘兔子的离开范围消失",
+        "流浪商人的活动期间消失",
+        "灵魂的延迟消失",
+        "裂隙消失时的连锁消失"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/floater.lua": {
       "route": "direct",

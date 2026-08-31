@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGperd.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGperd",
+  "summary": "该状态图驱动饥荒联机版中的火鸡（Perd）实体，管理其行为状态包括空闲、攻击、进食、死亡等。状态组织基于状态图模式，通过事件系统响应玩家交互和游戏内行为，如攻击、移动和冻结。",
+  "api": [],
+  "api_note": "状态图通常不直接暴露API，行为由内部事件和组件驱动，无对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "gobble_idle",
+    "death",
+    "appear",
+    "attack",
+    "eat",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "火鸡执行攻击动作，20帧后造成伤害，攻击动画期间无法移动。"
+    },
+    {
+      "state": "death",
+      "note": "火鸡死亡时播放动画，掉落战利品并移除碰撞体，触发死亡事件。"
+    },
+    {
+      "state": "hit",
+      "note": "火鸡被攻击时的硬直状态，播放受伤动画并短暂停止移动，无无敌帧。"
+    },
+    {
+      "state": "eat",
+      "note": "火鸡吃食物时，10帧后执行进食动作，移除忙状态标签，可能用于喂食玩法。"
+    },
+    {
+      "state": "gobble_idle",
+      "note": "火鸡空闲时的特殊状态，播放 gobble 动画和声音，持续循环直到其他事件触发。"
+    },
+    {
+      "state": "appear",
+      "note": "火鸡出现时的状态，播放出现动画和尖叫声，用于生成或刷新实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      14579,
+      15022,
+      13606,
+      18359,
+      15651,
+      34314,
+      34523
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与火鸡能力相关的描述，仅在世界规则选项中提及'火鸡之年'，未涉及具体行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "火鸡",
+    "攻击",
+    "死亡",
+    "吃食物",
+    "掉落",
+    "硬直",
+    "动画",
+    "空闲",
+    "生成",
+    "Perd"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "26d5fd373edf6dd410cdb63e32eaff202db6538f7350582ece5edf66f4a68998",
+    "source_bytes": 6353,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140008786
+  }
+}

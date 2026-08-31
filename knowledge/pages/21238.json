@@ -10,7 +10,9 @@
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "stategraphs/SGbigshadowtentacle.lua": "b050f013d40cf9b2484355000bdd874baef1763949130f3ade9012ce9891182b",
+      "stategraphs/SGshadowtentacle.lua": "7bfc7b41d5d6736b243b4b39adf26c4c924f4eb45437229423ce404dc930d8b1"
     }
   },
   "symbols": {
@@ -88,6 +90,29 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGbigshadowtentacle.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "攻击行为描述",
+          "evidence": [
+            {
+              "pageid": 21238,
+              "quote": "暗影触手出现时，会对目标进行连续两次攻击，之后消失。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "攻击前摇描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "stategraphs/SGshadowtentacle.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

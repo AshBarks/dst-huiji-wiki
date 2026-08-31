@@ -6,10 +6,12 @@
     "wikitext_sha256": "5433faaa185848b2c5746d0e6a0f6dcbb62ba25f6a9999dd9e54b9e37ae1ad0e",
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/deckcontainer.lua": "38da0b2ba39c2a712ea5dcb18e9310a42467dfa6ae25fb27ee8154764979ac41",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/playingcard.lua": "e22399f8c97aa637c2e46cb968c7df1a4ad43ede0731c31e464d6d6e91e4833f"
     }
   },
   "symbols": {
@@ -30,6 +32,10 @@
         "wording": "牌堆生命值与受到攻击",
         "semantic_consistent": true
       }
+    },
+    "components/deckcontainer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/floater.lua": {
       "route": "direct",
@@ -75,6 +81,22 @@
         "wording": "放入物品栏",
         "semantic_consistent": true
       }
+    },
+    "components/playingcard.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "花色与点数属性描述",
+          "evidence": [
+            {
+              "pageid": 45154,
+              "quote": "每张扑克牌都有自己的花色和点数，一共有4种花色和13种点数组合的52种扑克牌"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

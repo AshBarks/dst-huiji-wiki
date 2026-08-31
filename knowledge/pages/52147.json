@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "7f37d6e013f5d9b63f8ed6a28e600b392096f873a619a29b08e3f3cda56f40d0",
     "symbol_doc_shas": {
+      "components/constructionsite.lua": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -13,12 +14,17 @@
     }
   },
   "symbols": {
+    "components/constructionsite.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/deployable.lua": {
       "aspects_ignored": [
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",

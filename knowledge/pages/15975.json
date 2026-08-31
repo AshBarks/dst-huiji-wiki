@@ -8,14 +8,17 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/foodaffinity.lua": "474a609f0b70628f838cc0018d4e8f279652a58207a6f4a19dae1872dce41f71",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/hunger.lua": "6eb4e59a49fca0a8018c66497d0dfbab4ddcbd23ec2408aa7c8afcf29439a36f",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGmermking.lua": "3d2795336734fd026feed06cb8359a0f0902184cff39c3eb089648e872129f84"
     }
   },
   "symbols": {
@@ -100,6 +103,10 @@
       "detail_level": "detailed",
       "llm_verdict": {}
     },
+    "components/foodaffinity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -120,6 +127,45 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/hunger.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "饥饿值上限数值描述",
+          "evidence": [
+            {
+              "pageid": 15975,
+              "quote": "鱼人之王具有饥饿值，上限为 200{{饥饿值}}"
+            }
+          ]
+        },
+        {
+          "aspect": "饥饿值下降速率描述",
+          "evidence": [
+            {
+              "pageid": 15975,
+              "quote": "饥饿值会以 25{{饥饿值}}/天 的速度下降"
+            }
+          ]
+        },
+        {
+          "aspect": "饥饿值初始值设定",
+          "evidence": [
+            {
+              "pageid": 15975,
+              "quote": "刚生成时候具有 50{{饥饿值}} 饥饿值"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "饥饿值归零时生命值影响",
+        "饥饿值特殊行为覆盖描述",
+        "饥饿值状态触发语音台词"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -192,6 +238,14 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面内容为鱼人王相关机制，未涉及交易系统。"
+      }
+    },
+    "stategraphs/SGmermking.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

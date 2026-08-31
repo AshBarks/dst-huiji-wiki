@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwaveyjoneshand_art.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwaveyjoneshand_art",
+  "summary": "该状态图控制波浪琼斯手（Wavey Jones Hand）的动画和行为状态。它组织了从出现、闲置、移动到攻击和受困的完整状态流程，通过状态切换实现交互表现。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "in",
+    "idle",
+    "premoving",
+    "moving",
+    "short_action",
+    "loop_action_anchor",
+    "loop_action_anchor_pst",
+    "scared",
+    "trapped",
+    "trapped_pst",
+    "scared_relocate"
+  ],
+  "state_notes": [
+    {
+      "state": "in",
+      "note": "进入状态，播放初始手伸出动画，完成后进入idle。"
+    },
+    {
+      "state": "idle",
+      "note": "闲置状态，播放循环待机动画，可旋转。"
+    },
+    {
+      "state": "premoving",
+      "note": "预备移动状态，播放爬行动画前摇。"
+    },
+    {
+      "state": "moving",
+      "note": "移动状态，播放爬行动画循环并伴有持续移动音效。"
+    },
+    {
+      "state": "short_action",
+      "note": "短攻击状态，播放攻击动画序列，在特定帧触发父实体事件。"
+    },
+    {
+      "state": "loop_action_anchor",
+      "note": "持续攻击状态，播放连续攻击动画循环。"
+    },
+    {
+      "state": "scared",
+      "note": "害怕状态，播放害怕动画后移除实体。"
+    },
+    {
+      "state": "trapped",
+      "note": "被困状态，播放挣扎动画和随机音效。"
+    },
+    {
+      "state": "trapped_pst",
+      "note": "被困后状态，播放挣扎结束动画并返回idle。"
+    },
+    {
+      "state": "scared_relocate",
+      "note": "害怕重定位状态，播放害怕动画后重置位置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      51046,
+      13828,
+      18783,
+      13379,
+      35790
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 stategraph__SGwaveyjoneshand_art 相关的能力表达；所有页面讨论其他实体（如天体英雄、克劳斯、触手等）的行为，未涉及该状态图的特定状态（如 idle、moving、攻击动画）或相关描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "波浪琼斯",
+    "手",
+    "攻击",
+    "移动",
+    "害怕",
+    "被困",
+    "海洋",
+    "敌人"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5b5e61fbec3c29b8867e02da6a8eb7c23c500746a211db072e1dfbddbaae9bc5",
+    "source_bytes": 6293,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142434374
+  }
+}

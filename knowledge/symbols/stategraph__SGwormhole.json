@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwormhole.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwormhole",
+  "summary": "该状态图驱动虫洞实体，控制其开关状态和视觉表现。整体状态组织基于动画播放和事件触发，包括空闲、打开、开启中和关闭中四个状态，用于管理虫洞的交互状态和动画过渡。",
+  "api": [],
+  "api_note": "源码中没有定义任何对外暴露的API方法，状态图仅处理内部状态转换和动画控制。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "open",
+    "opening",
+    "closing"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "虫洞处于关闭状态，玩家无法交互，播放空闲循环动画，位于世界背景层。"
+    },
+    {
+      "state": "open",
+      "note": "虫洞完全打开，玩家可以跳入进行传送，持续播放打开循环动画和音效，位于地面层。"
+    },
+    {
+      "state": "opening",
+      "note": "虫洞正在打开的过渡动画，从关闭状态切换到打开状态，播放打开前动画和音效，期间切换动画层。"
+    },
+    {
+      "state": "closing",
+      "note": "虫洞正在关闭的过渡动画，从打开状态切换回关闭状态，播放关闭后动画和音效，期间切换动画层。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      39366,
+      19718,
+      57263,
+      18001,
+      16641,
+      17930,
+      24962,
+      51949
+    ],
+    "aspects": [
+      {
+        "aspect": "虫洞打开状态描述",
+        "evidence": [
+          {
+            "pageid": 19718,
+            "quote": "张开的虫洞"
+          }
+        ]
+      },
+      {
+        "aspect": "虫洞闭合状态描述",
+        "evidence": [
+          {
+            "pageid": 19718,
+            "quote": "闭合的虫洞"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "虫洞",
+    "传送",
+    "teleport",
+    "wormhole",
+    "打开",
+    "关闭",
+    "状态图",
+    "动画",
+    "音效",
+    "idle"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a243086517575b4e74dafae205f01438f5442a346924a5ccef5db64cec92fa13",
+    "source_bytes": 1643,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143270508
+  }
+}

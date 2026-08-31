@@ -14,17 +14,22 @@
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210"
     }
   },
   "symbols": {
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述暗影生物，可能对应影魔（shadow_leech）或阴影仆从（shadowthrall）系实体，这些实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/leash.lua": {
       "aspects_ignored": [
@@ -36,7 +41,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为掉落物信息，与实体行为代码（如拴绳）无关。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -44,7 +52,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/shadow_leechbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -82,7 +91,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -133,6 +143,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

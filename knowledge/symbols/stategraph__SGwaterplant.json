@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwaterplant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwaterplant",
+  "summary": "该状态图驱动饥荒联机版中的水生植物（waterplant）实体。整体状态组织基于事件驱动，包括空闲、攻击、阶段切换、睡眠、冻结等多种状态，以响应游戏中的各种交互。",
+  "api": [],
+  "api_note": "源码中未定义对外方法，所有交互通过事件和状态图内部处理。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "newcombattarget",
+    "spray_cloud",
+    "barnacle_grown"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "barnacle_grow",
+    "death",
+    "attack",
+    "switch_to_flower",
+    "switch_to_bud",
+    "hit",
+    "sleep",
+    "sleeping",
+    "wake",
+    "taunt",
+    "frozen",
+    "thaw",
+    "cloud"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "植物空闲状态，循环播放动画，伴有呼吸声效。"
+    },
+    {
+      "state": "attack",
+      "note": "植物攻击状态，有攻击前摇动画，在特定帧造成伤害。"
+    },
+    {
+      "state": "death",
+      "note": "植物死亡，掉落贝壳等物品，并变回岩石形态。"
+    },
+    {
+      "state": "hit",
+      "note": "植物受击，播放受击动画并发出音效，短暂硬直后根据状态恢复。"
+    },
+    {
+      "state": "switch_to_flower",
+      "note": "植物从阶段2切换到阶段3（花阶段），动画期间有无敌帧（noelectrocute标签）。"
+    },
+    {
+      "state": "switch_to_bud",
+      "note": "植物从阶段3切换到阶段2（芽阶段），动画期间有无敌帧。"
+    },
+    {
+      "state": "sleep",
+      "note": "植物进入睡眠状态，播放睡眠前置动画，可能被唤醒或继续睡眠。"
+    },
+    {
+      "state": "frozen",
+      "note": "植物被冻结，显示冻结动画，解冻后根据是否有目标和阶段切换到相应状态。"
+    },
+    {
+      "state": "cloud",
+      "note": "植物释放喷雾云，播放动画并生成云，临时切换到阶段2，结束后恢复。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      15551,
+      51046,
+      17979,
+      20511
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及实体 stategraph__SGwaterplant 或与其相关的能力，页面内容涉及其他游戏实体和机制（如熔炉模式装备、天体英雄、克劳斯、龙蝇、蜂王、战争瓦器人、贝壳钟、冰冻机制）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水生植物",
+    "攻击",
+    "死亡",
+    "睡眠",
+    "冻结",
+    "阶段切换",
+    "贝壳",
+    "喷雾云",
+    "硬直",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fb1d01c64891e22ff15dbb5c100ea529da8b99df0eebb65f8c684c049769fa21",
+    "source_bytes": 13983,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142339957
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcaveventmite.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcaveventmite",
+  "summary": "该状态图驱动洞穴裂隙小虫（Cave Vent Mite）实体。整体状态组织包括基本移动、攻击（普通和吹气）、护盾防御、死亡产生瘴气以及睡眠等。状态通过事件触发转换，如受击、攻击指令和环境互动。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，其行为完全通过状态转换和事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "locomote",
+    "spawn",
+    "entershield",
+    "exitshield",
+    "hop",
+    "sleep",
+    "freeze",
+    "electrocute",
+    "sink",
+    "voidfall",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.CAVE_MITE_BLOW_HEAT_RATE",
+    "TUNING.CAVE_MITE_BLOW_DISTANCE",
+    "TUNING.CAVE_MITE_BLOW_DISTANCE_SQ_MIN",
+    "TUNING.CAVE_MITE_BLOW_DISTANCE_SQ",
+    "TUNING.CAVE_MITE_BLOW_COOLDOWN",
+    "TUNING.CAVE_MITE_SHIELD_COOLDOWN",
+    "TUNING.CAVE_MITE_SHIELD_COOLDOWN_VARIANCE"
+  ],
+  "states": [
+    "death",
+    "premoving",
+    "moving",
+    "idle",
+    "eat",
+    "eat_loop",
+    "taunt",
+    "attack",
+    "blow_attack",
+    "hit",
+    "shield_pre",
+    "shield",
+    "shield_vent",
+    "shield_hit",
+    "shield_end",
+    "spawn"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品。在动画第一帧产生瘴气并短暂吹气效果，影响周围生物温度。"
+    },
+    {
+      "state": "attack",
+      "note": "普通攻击状态，对目标造成伤害。动画中伴有吹气效果，可加热或解冻附近生物，具体取决于环境温度和湿度。"
+    },
+    {
+      "state": "blow_attack",
+      "note": "特殊吹气攻击状态，有冷却时间。产生较大范围吹气，加热或解冻生物，并可能生成瘴气云。"
+    },
+    {
+      "state": "shield",
+      "note": "护盾状态，小虫进入隐藏或无敌状态，免疫电击，持续数秒后可能主动攻击或释放吹气。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成状态，小虫从裂隙中出现，初始有短暂无敌时间（约25帧），动画后可行动。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，小虫短暂硬直（约10帧）后恢复空闲，期间可被中断。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      20714,
+      34523,
+      52788,
+      65605,
+      14579,
+      15922,
+      23956
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 stategraph__SGcaveventmite 相关的能力表达；所有页面内容聚焦于世界选项、控制台命令、布景生成、世界翻新、装备及暗影裂隙机制，但未涉及该实体的具体行为、状态描述或玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "洞穴裂隙小虫",
+    "护盾",
+    "吹气攻击",
+    "瘴气",
+    "死亡",
+    "生成",
+    "硬直",
+    "无敌",
+    "温度影响",
+    "攻击冷却"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "05e8cb69a2d20ba1037ae18c207ace30f64c8ff01ed0ecb86bad4a5528986cc4",
+    "source_bytes": 18537,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136711096
+  }
+}

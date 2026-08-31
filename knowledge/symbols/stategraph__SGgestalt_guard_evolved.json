@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgestalt_guard_evolved.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgestalt_guard_evolved",
+  "summary": "该状态图驱动‘进化守卫幻象’实体，管理其闲置、移动、攻击、传送和死亡等行为状态。状态组织基于事件驱动，响应攻击、伤害和特殊事件，通过动画和时间线控制行为流程。整体以 idle 状态为基础，根据事件切换到攻击、传送或死亡等状态。",
+  "api": [],
+  "api_note": "该状态图没有定义外部API方法，所有行为通过事件和内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "OnLocomote",
+    "spawned",
+    "death",
+    "doattack",
+    "doattack_mid",
+    "doattack_far",
+    "attacked",
+    "teleport"
+  ],
+  "netvars": [],
+  "tunables": [
+    "GESTALT_ATTACK_HIT_RANGE_SQ",
+    "GESTALT_ATTACK_DAMAGE_SANITY",
+    "GESTALT_EVOLVED_ATTACK_DAMAGE_GROGGINESS",
+    "GESTALT_EVOLVED_ATTACK_DAMAGE_KO_TIME",
+    "GESTALT_EVOLVED_TELEPORT_TIME_INVISIBLE"
+  ],
+  "states": [
+    "idle",
+    "spawned",
+    "emerge",
+    "death",
+    "attack",
+    "attack_mid",
+    "attack_far",
+    "hit",
+    "teleport",
+    "teleporting"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体闲置状态，播放空闲动画和循环声音，可被攻击或移动事件中断。"
+    },
+    {
+      "state": "spawned",
+      "note": "实体生成时播放出现动画，期间标记为忙碌，无法攻击或移动，动画结束后返回闲置。"
+    },
+    {
+      "state": "emerge",
+      "note": "实体出现动画，类似生成，可能用于传送后重现，期间同样忙碌且无法攻击。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡时播放变异动画，掉落战利品，如果与主人关联则分离宠物，最终被移除。"
+    },
+    {
+      "state": "attack",
+      "note": "近战攻击状态，实体跳跃向前，在动画第15帧至25帧期间对范围内目标造成伤害和击晕效果，有短暂攻击窗口。"
+    },
+    {
+      "state": "attack_mid",
+      "note": "中程攻击，播放召唤动画，在第8帧触发攻击函数对目标造成伤害。"
+    },
+    {
+      "state": "attack_far",
+      "note": "远程攻击，播放爆炸动画，在第24帧触发攻击函数对远处目标造成伤害。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中时播放被击动画，但不设忙碌标签，因此可立即反击，动画后返回闲置。"
+    },
+    {
+      "state": "teleport",
+      "note": "开始传送，播放融化动画，然后进入隐藏传送状态。"
+    },
+    {
+      "state": "teleporting",
+      "note": "传送中实体隐藏，持续一段时间后在目标位置出现，期间无法攻击或被攻击。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      51046,
+      15651,
+      18001,
+      57263,
+      15225,
+      13828
+    ],
+    "aspects": [
+      {
+        "aspect": "闲置状态描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "自然状态下龙蝇会一直呆在原地不动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "进化守卫幻象",
+    "幻象守卫",
+    "gestalt",
+    "攻击",
+    "传送",
+    "死亡",
+    "出现",
+    "击晕",
+    "幻象攻击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌人",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8de9d40cbedb781568f074955cf0311d9b1d27edeef6ef9fe4d23bdc27dfb372",
+    "source_bytes": 10880,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137852069
+  }
+}

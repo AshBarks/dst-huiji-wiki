@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmonkeyqueen.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmonkeyqueen",
+  "summary": "该状态图驱动饥荒联机版中的猴子女王实体，整体状态组织以空闲(idle)为核心，通过事件处理玩家交互如给予物品、移除诅咒、睡眠等，状态转换涉及动画、音效和游戏逻辑。",
+  "api": [],
+  "api_note": "源码中没有定义对外API方法，状态图通过内部状态转换和事件处理工作。",
+  "events_published": [],
+  "events_listened": [
+    "stopcursechanneling"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MONKEY_QUEEN_GRACE_TIME"
+  ],
+  "states": [
+    "idle",
+    "getitem",
+    "happy",
+    "removecurse",
+    "removecurse_channel",
+    "removecurse_success",
+    "removecurse_fail",
+    "sleep",
+    "sleeping",
+    "wake",
+    "refuse"
+  ],
+  "state_notes": [
+    {
+      "state": "getitem",
+      "note": "当玩家给予猴子女王香蕉时进入，根据香蕉类型显示动画，若玩家有猴子诅咒则触发移除诅咒流程，否则给予蓝图奖励。"
+    },
+    {
+      "state": "removecurse",
+      "note": "开始移除诅咒的准备阶段，播放动画并生成诅咒代币道具，为后续施法做准备。"
+    },
+    {
+      "state": "removecurse_channel",
+      "note": "持续施法状态，带有“channel”标签，播放循环动画和音效，可通过外部事件中断并进入成功或失败状态。"
+    },
+    {
+      "state": "sleep",
+      "note": "猴子女王进入睡眠的过渡状态，播放预备动画，之后进入持续睡眠循环。"
+    },
+    {
+      "state": "wake",
+      "note": "从睡眠中唤醒的状态，播放结束动画并说出台词，之后返回空闲。"
+    },
+    {
+      "state": "refuse",
+      "note": "拒绝交互的状态，播放不满动画，可能用于处理无效或负面互动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18510,
+      18830,
+      18524,
+      20715,
+      13406,
+      19687,
+      15186,
+      19813
+    ],
+    "aspects": [
+      {
+        "aspect": "去除诅咒的描述",
+        "evidence": [
+          {
+            "pageid": 18524,
+            "quote": "想要摆脱诅咒饰品，玩家可以将[[香蕉]]送给[[月亮码头女王]]以去除诅咒，每个香蕉会去除 4 个诅咒饰品。"
+          }
+        ]
+      },
+      {
+        "aspect": "女王的睡眠状态描述",
+        "evidence": [
+          {
+            "pageid": 18510,
+            "quote": "女王一般在吊床上睡觉，在玩家或带着[[香蕉]]的[[火药猴]]靠近她时醒来。"
+          }
+        ]
+      },
+      {
+        "aspect": "玩家给予香蕉时的交易行为",
+        "evidence": [
+          {
+            "pageid": 18510,
+            "quote": "在玩家的物品栏中有[[诅咒饰品]]时，每次交易能够减少 4 个诅咒饰品，并且赋予 4 分钟（即游戏中的半天时间）的通行权。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "猴子女王",
+    "香蕉",
+    "诅咒",
+    "移除诅咒",
+    "蓝图",
+    "睡眠",
+    "唤醒",
+    "拒绝",
+    "monkey queen"
+  ],
+  "gameplay_tags": [
+    "交互",
+    "事件驱动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "69a53a171efc01ed2fc43be7d71e3da8ff29584a6f4f2645f4d22bd3b46e41e6",
+    "source_bytes": 11347,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139293602
+  }
+}

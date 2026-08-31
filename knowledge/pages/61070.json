@@ -6,8 +6,10 @@
     "wikitext_sha256": "325111ec9221168a71daf658306309d60746a81901d9818e354d99b878bf0242",
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/itemstore.lua": "c3e9c058dc2b2a7d1f7bec79271cd57ce970cd054a25cf4b17f0b087201e6870",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902"
+      "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "components/worldmigrator.lua": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951"
     }
   },
   "symbols": {
@@ -20,6 +22,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/itemstore.lua": {
+      "aspects_ignored": [
+        "物品存取行为描述",
+        "物品栏容量描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -50,6 +60,13 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "components/worldmigrator.lua": {
+      "aspects_ignored": [
+        "非自然传送门物品数量上限行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

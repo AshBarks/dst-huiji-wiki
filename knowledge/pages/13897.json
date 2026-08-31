@@ -10,20 +10,28 @@
       "brains/klausbrain.lua": "ea1b1943611f0a6bec2acb2f9ff149cb6fe6fae89b2cd76afb5c2047bf58d4aa",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/commander.lua": "3aded4fd8f830889ee9600dfc0d82a4cdc1f559fc1ccee572f3def729f86e047",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/epicscare.lua": "7f7320d22c417ee3ed36b4ca96831c6c1bd6879381e6c7a54c7b8bedae1fc406",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/grouptargeter.lua": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthtrigger.lua": "3c64da771e8432f013164d37af0a50d1b38b9530ff95927c51b04a9878d38119",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGklaus.lua": "9103173c4edeb14c54ecc5670b38cec3564f509a43db4d5bd975c739587cddbe"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -37,7 +45,11 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "克劳斯",
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -45,7 +57,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/klausbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -132,12 +145,35 @@
         "semantic_consistent": true
       }
     },
+    "components/commander.lua": {
+      "aspects_ignored": [
+        "处理沉睡状态",
+        "将目标共享给所有士兵"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/drownable.lua": {
       "aspects_ignored": [
         "水域与虚空溺水触发条件描述",
         "溺水潮湿度惩罚标注",
         "溺水物品掉落行为描述",
         "溺水生命与理智损失数值标注"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/epicscare.lua": {
+      "aspects_ignored": [
+        "咆哮产生巨兽恐慌效果的范围与持续时间描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -189,6 +225,10 @@
       "route": "direct",
       "detail_level": "detailed"
     },
+    "components/grouptargeter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/health.lua": {
       "aspects_ignored": [
         "单次承伤上限标注",
@@ -200,6 +240,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthtrigger.lua": {
+      "aspects_ignored": [
+        "生命值变化转移触发"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -266,6 +313,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -281,6 +332,22 @@
         "wording": "距离单位以内产生 5 ~ 6 秒的巨兽恐慌效果",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGklaus.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "普通攻击伤害描述",
+          "evidence": [
+            {
+              "pageid": 13897,
+              "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

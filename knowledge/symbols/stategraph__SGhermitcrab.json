@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGhermitcrab.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGhermitcrab",
+  "summary": "该状态图驱动饥荒联机版中的渔夫蟹（hermitcrab）实体，整体状态组织以空闲、移动、工作、钓鱼、社交互动和特殊场景（如茶摊、温泉）为核心。通过事件和动作处理器响应玩家行为、环境变化及NPC逻辑，支持友好度系统和多样化交互。",
+  "api": [],
+  "api_note": "状态图通过事件处理器和动作处理器响应游戏逻辑，未定义显式的对外API方法。",
+  "events_published": [
+    "ontalk",
+    "donetalking",
+    "wonteatfood",
+    "tossitem",
+    "use_pocket_scale",
+    "hermitcrab_startbrewing",
+    "enter_teashop",
+    "leave_teashop",
+    "ms_hermitcrab_wants_to_teleport",
+    "ms_enterbathingpool",
+    "ms_leavebathingpool",
+    "onsatinchair"
+  ],
+  "events_listened": [
+    "freeze",
+    "locomote",
+    "blocked",
+    "snared",
+    "repelled",
+    "equip",
+    "unequip",
+    "ontalk",
+    "toolbroke",
+    "umbrellaranout",
+    "itemranout",
+    "armorbroke",
+    "fishingcancel",
+    "emote",
+    "wonteatfood",
+    "oceanfishing_stoppedfishing",
+    "eat_food",
+    "tossitem",
+    "use_pocket_scale",
+    "dance",
+    "teleported",
+    "enter_teashop",
+    "leave_teashop",
+    "hermitcrab_startbrewing",
+    "sink",
+    "fallinvoid",
+    "hop",
+    "electrocute",
+    "catch",
+    "cancelcatch",
+    "fishingnibble",
+    "fishingstrain",
+    "fishingcatch",
+    "fishingloserod",
+    "fishingcancel",
+    "animover",
+    "animqueueover",
+    "timeout",
+    "onremove",
+    "becomeunsittable",
+    "performaction",
+    "ms_sync_chair_rocking"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.HERMITCRAB",
+    "TUNING.HERMITCRAB_HOTSPRING_SOAK_TIME",
+    "TUNING.HERMITCRAB_HOTSPRING_HAPPY_SOAK_TIME",
+    "TUNING.HERMITCRAB_DECOR_HAPPY_SCORE",
+    "TUNING.HERMITCRAB_DANCE_RANGE"
+  ],
+  "states": [
+    "idle",
+    "alert",
+    "funnyidle_tap_pre",
+    "funnyidle_tap",
+    "funnyidle_tap_pst",
+    "funnyidle_clack_pre",
+    "funnyidle_clack",
+    "funnyidle_clack_pst",
+    "funnyidle_tango_pre",
+    "funnyidle_tango",
+    "funnyidle_tango_pst",
+    "dancebusy",
+    "dancebusy_clack",
+    "dancebusy_pst",
+    "bow",
+    "bow_loop",
+    "bow_pst",
+    "bow_pst2",
+    "chop_start",
+    "chop",
+    "mine_start",
+    "mine",
+    "hammer_start",
+    "hammer",
+    "dig_start",
+    "dig",
+    "bugnet_start",
+    "bugnet",
+    "fishing_ocean_pre",
+    "fishing_pre",
+    "fishing",
+    "fishing_pst",
+    "fishing_nibble",
+    "fishing_strain",
+    "catchfish",
+    "loserod",
+    "eat",
+    "quickeat",
+    "refuseeat",
+    "talk",
+    "talkto",
+    "unsaddle",
+    "heavylifting_start",
+    "heavylifting_stop",
+    "heavylifting_item_hat",
+    "heavylifting_drop",
+    "dostandingaction",
+    "doshortaction",
+    "dosilentshortaction",
+    "domediumaction",
+    "dolongaction",
+    "harvest",
+    "dojostleaction",
+    "use_pocket_scale",
+    "tossitem",
+    "throw",
+    "toss",
+    "catch_pre",
+    "catch",
+    "walk_start",
+    "walk",
+    "sitting",
+    "sit_jumpoff",
+    "idle_teashop",
+    "hit_teashop",
+    "arrive_teashop",
+    "talk_teashop",
+    "brewing_teashop",
+    "throwtea_teashop",
+    "leave_teashop",
+    "soakin_pre",
+    "soakin_jump",
+    "soakin",
+    "soakin_jumpout",
+    "soakin_cancel",
+    "gohome"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "渔夫蟹空闲状态，可能触发随机动作如鞠躬或舞蹈，与玩家友好度相关。进入条件为无忙碌标签，玩家可观察其待机动画。"
+    },
+    {
+      "state": "eat",
+      "note": "吃东西状态，恢复饥饿值，分快速进食（quickeat）和普通进食。动画和音效根据食物类型调整，进食期间无敌帧较短。"
+    },
+    {
+      "state": "fishing",
+      "note": "钓鱼核心状态，渔夫蟹持竿等待鱼上钩，后续可能进入咬钩（fishing_nibble）或拉扯（fishing_strain）阶段。成功捕获或丢失钓竿影响产出。"
+    },
+    {
+      "state": "talkto",
+      "note": "对话状态，执行缓冲动作并播放对话动画，推进友好度任务或触发聊天。玩家接近时渔夫蟹可能投掷物品。"
+    },
+    {
+      "state": "brewing_teashop",
+      "note": "茶摊泡茶状态，渔夫蟹制作茶产品并抛向玩家，触发交易事件。动画包含预备和完成阶段，影响茶摊原型制作。"
+    },
+    {
+      "state": "soakin",
+      "note": "温泉浸泡状态，渔夫蟹在温泉中休息，获得持续增益。玩家需保持距离，离开会触发跳跃退出动画。"
+    },
+    {
+      "state": "bow",
+      "note": "鞠躬状态，当检测到玩家穿戴皇室装备时触发，播放鞠躬动画并可能伴随对话。动画循环直到目标离开范围。"
+    },
+    {
+      "state": "heavylifting_start",
+      "note": "开始搬运重物状态，装备重型物品后触发，播放拾取动画，影响移动速度和后续状态。"
+    },
+    {
+      "state": "harvest",
+      "note": "收获状态，处理可收获目标（如肉类），播放建造动画，完成后可能触发友好度聊天。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13493,
+      70479,
+      14486,
+      18269,
+      14712,
+      14683,
+      14674,
+      16684
+    ],
+    "aspects": [
+      {
+        "aspect": "散步与工作行为",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "她会在岛上散步，并进行各项工作。"
+          }
+        ]
+      },
+      {
+        "aspect": "触发额外对话",
+        "evidence": [
+          {
+            "pageid": 13493,
+            "quote": "将[[开裂珍珠]]送回给寄居蟹隐士将会触发额外的对话。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "渔夫蟹",
+    "钓鱼",
+    "茶摊",
+    "温泉",
+    "对话",
+    "友好度",
+    "搬运",
+    "鞠躬",
+    "进食",
+    "收获"
+  ],
+  "gameplay_tags": [
+    "交互",
+    "钓鱼",
+    "社交",
+    "温泉"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9a4ef0249e17aa7a8c3067bc80ddced8758210540de679daec8a95975651a8f2",
+    "source_bytes": 182666,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138191165
+  }
+}

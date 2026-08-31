@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdaywalker.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdaywalker",
+  "summary": "状态图 `SGdaywalker` 驱动饥荒联机版中的‘daywalker’实体（一个敌对生物或Boss）。整体状态组织分为三个阶段：Phase 1（挣扎、疲倦等状态，受链条束缚）、Phase 2（自由战斗状态，包括扑击、猛击等攻击）以及被击败状态。状态通过事件如受击、攻击命令等触发转换，管理实体的移动、攻击、恢复和特殊行为（如摆脱水蛭附着）。",
+  "api": [],
+  "api_note": "该状态图不暴露公共API方法；实体行为通过事件监听（如'doattack'）和状态转换驱动，符合饥荒状态图设计模式。",
+  "events_published": [
+    "knockback"
+  ],
+  "events_listened": [
+    "doattack",
+    "electrocute",
+    "attacked",
+    "leechattached",
+    "roar",
+    "minhealth",
+    "teleported"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.DAYWALKER_HIT_RECOVERY",
+    "TUNING.DAYWALKER_FATIGUE_TIRED_MIN_TIME",
+    "TUNING.DAYWALKER_FATIGUE_TIRED_MAX_TIME",
+    "TUNING.DAYWALKER_HEALTH_REGEN",
+    "TUNING.DAYWALKER_HEALTH",
+    "TUNING.DAYWALKER_COMBAT_TIRED_HEALTH_REGEN",
+    "TUNING.DAYWALKER_COMBAT_HEALTH_REGEN_PERIOD",
+    "TUNING.DAYWALKER_POUNCE_DAMAGE",
+    "TUNING.DAYWALKER_XCLAW_DAMAGE",
+    "TUNING.DAYWALKER_FATIGUE.POUNCE_HIT",
+    "TUNING.DAYWALKER_FATIGUE.POUNCE_MISS",
+    "TUNING.DAYWALKER_FATIGUE.SLAM_HIT",
+    "TUNING.DAYWALKER_DAMAGE",
+    "TUNING.DAYWALKER_SLAM_DAMAGE",
+    "TUNING.DAYWALKER_SLAM_SINKHOLERADIUS",
+    "TUNING.DAYWALKER_ROAR_CD",
+    "TUNING.DAYWALKER_STALK_CD"
+  ],
+  "states": [
+    "transition",
+    "tired_pre",
+    "tired",
+    "tired_hit",
+    "tired_stand",
+    "struggle_idle",
+    "struggle1",
+    "struggle1_pst",
+    "struggle2",
+    "shrug1",
+    "shrug2",
+    "shrug_pst",
+    "collide",
+    "attach",
+    "idle",
+    "hit",
+    "attack_pounce_pre",
+    "attack_pounce",
+    "attack_pounce_pst",
+    "attack_pounce_pst_tired",
+    "attack_slam_pre",
+    "attack_slam",
+    "taunt",
+    "defeat",
+    "defeat_idle_pre",
+    "defeat_idle"
+  ],
+  "state_notes": [
+    {
+      "state": "tired",
+      "note": "daywalker进入疲倦状态，被链条束缚，开始恢复生命值或准备战斗；在非敌对时回复大量生命，敌对时可能转为潜行。"
+    },
+    {
+      "state": "attack_pounce",
+      "note": "daywalker发动扑击攻击，快速冲向目标并造成范围伤害；命中后可能触发猛击或恢复，未命中则增加疲倦。"
+    },
+    {
+      "state": "struggle1",
+      "note": "daywalker挣扎状态，尝试摆脱水蛭附着，会进行范围攻击和移动；动画中可能撞击柱子以摆脱附着。"
+    },
+    {
+      "state": "attack_slam",
+      "note": "daywalker猛击攻击，蓄力后砸向地面，造成大范围伤害并生成坑洞；命中敌人可恢复状态，有无敌帧窗口。"
+    },
+    {
+      "state": "hit",
+      "note": "daywalker受击状态，产生硬直，期间可能反击或进入疲倦；玩家近战攻击会重置疲倦恢复计时器。"
+    },
+    {
+      "state": "tired_stand",
+      "note": "daywalker疲倦站立，可能咆哮或开始潜行；若被攻击可触发猛击，否则逐渐恢复战斗状态。"
+    },
+    {
+      "state": "taunt",
+      "note": "daywalker嘲讽状态，惊吓附近玩家并重置攻击冷却；用于过渡或威慑，不影响攻击。"
+    },
+    {
+      "state": "defeat",
+      "note": "daywalker被击败，播放倒地动画并掉落战利品；移除影子标签，进入无攻击状态。"
+    },
+    {
+      "state": "collide",
+      "note": "daywalker碰撞状态，被水蛭附着时撞击柱子，可能摆脱部分附着；有击退效果和范围伤害。"
+    },
+    {
+      "state": "attach",
+      "note": "daywalker附着状态，水蛭附着时播放特定动画，期间减少可被攻击窗口；尝试脱离需通过挣扎。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19110,
+      22383,
+      70763,
+      15022,
+      46847,
+      45249,
+      21432,
+      52142
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要涉及 daywalker 的生成条件、掉落物和基本信息，未描述其具体战斗能力或状态变化，如疲倦、攻击、挣扎等行为在文本中没有体现。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "daywalker",
+    "扑击",
+    "挣扎",
+    "疲倦",
+    "水蛭",
+    "电击",
+    "嘲讽",
+    "击败",
+    "猛击",
+    "潜行"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "345d74df368d6b15a1d91aca3ec204d220251749cdd43959f183d748c39d8ba6",
+    "source_bytes": 63164,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137135237
+  }
+}

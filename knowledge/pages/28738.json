@@ -5,11 +5,28 @@
   "inputs": {
     "wikitext_sha256": "f37ea3286ef2b44af07e528c32979d7f7531a5ff23002c062a4d43f71cc98d83",
     "symbol_doc_shas": {
+      "components/furnituredecortaker.lua": "ed10b9e0024e028141995849264640de47ebdcabbfc3f2a6bc247498dd191a67",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
     }
   },
   "symbols": {
+    "components/furnituredecortaker.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "桌子接受装饰的能力描述",
+          "evidence": [
+            {
+              "pageid": 28738,
+              "quote": "木圆桌上可以放置[[家具装饰]]。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -26,8 +43,9 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

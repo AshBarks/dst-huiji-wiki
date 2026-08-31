@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsquid.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsquid",
+  "summary": "该状态图定义了名为'鱿鱼'（squid）的两栖生物的完整行为状态机，驱动其在水中的待机、攻击、吞噬鱼类、跳跃移动、被鱼钩钓起挣扎等行为。状态组织以常见事件处理器和动作处理器为核心，包含了从生成、战斗、交互到死亡的完整生命周期。",
+  "api": [],
+  "api_note": "该状态图为内部行为定义文件，不暴露任何直接供外部调用的Lua方法。所有交互均通过游戏事件（如attacked, doattack）和组件（如combat, oceanfishable）触发。",
+  "events_published": [
+    "attacked"
+  ],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "doink",
+    "spawn",
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SQUID_LIGHT_DOWN_RADIUS",
+    "SQUID_LIGHT_DOWN_INTENSITY",
+    "SQUID_LIGHT_DOWN_FALLOFF",
+    "SQUID_LIGHT_UP_RADIUS",
+    "SQUID_LIGHT_UP_INTENSITY",
+    "SQUID_LIGHT_UP_FALLOFF",
+    "SQUID_RUNSPEED"
+  ],
+  "states": [
+    "idle",
+    "spawn",
+    "despawn",
+    "attack",
+    "shoot",
+    "eat",
+    "gobble",
+    "gobble_success",
+    "gobble_fail",
+    "hit",
+    "taunt",
+    "fling",
+    "fling_pst",
+    "death",
+    "forcesleep",
+    "bitehook_pre",
+    "bitehook_loop",
+    "bitehook_jump",
+    "breach",
+    "run_start",
+    "run",
+    "run_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "鱿鱼的基本待机状态。播放随机待机动画，在特定动画（如 idle3）期间，其眼部的光源会周期性熄灭和亮起，伴有音效。"
+    },
+    {
+      "state": "attack",
+      "note": "近战攻击状态。在攻击动画的第10、18、26帧造成三次伤害判定。如果在水中，攻击起始会生成绿色溅水特效。攻击结束后有概率进入嘲讽状态。"
+    },
+    {
+      "state": "shoot",
+      "note": "远程攻击状态。鱿鱼会朝目标喷射墨汁（ink）投射物，攻击后会触发一个持续10-13秒的'墨汁冷却'计时器。"
+    },
+    {
+      "state": "gobble",
+      "note": "吞噬行为的核心准备状态。鱿鱼会潜入水中并快速冲向鱼类目标。根据成功率，成功则进入'gobble_success'，失败则进入'gobble_fail'。吞噬成功后可能反向被鱼钩钩住。"
+    },
+    {
+      "state": "gobble_fail",
+      "note": "吞噬失败后的状态。鱿鱼会重新选择同鱼群中的另一条鱼作为目标，然后自动过渡到嘲讽状态。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。鱿鱼停止移动并播放受击动画，动画结束后会返回待机状态。"
+    },
+    {
+      "state": "fling",
+      "note": "跳跃移动状态。鱿鱼会进行一段有固定时长的跳跃，期间持续检测并处理在陆地与海洋之间的切换（调用amphibiouscreature相关方法）。跳跃结束会进入'fling_pst'。"
+    },
+    {
+      "state": "breach",
+      "note": "跃出水面的动画状态。通常由钓鱼挣扎（bitehook_jump）或其它逻辑触发，播放跃出并落回水中的动画。"
+    },
+    {
+      "state": "bitehook_loop",
+      "note": "被鱼钩钩住后的挣扎状态。鱿鱼会持续一段时间（3-3.5秒），在此期间若鱼钩脱离或计时结束，会跳入'bitehook_jump'状态尝试挣脱。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      18783,
+      13897,
+      13379,
+      15922,
+      13828,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均涉及其他实体（如天体英雄、战争瓦器人、大触手等），未提及鱿鱼（squid）或其状态图SGsquid的任何行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鱿鱼",
+    "深海",
+    "喷墨",
+    "钓鱼",
+    "攻击",
+    "吞噬",
+    "嘲讽",
+    "跳跃",
+    "触手",
+    "挣扎"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "51af7b113be5682d3e4351b3df909b54c617bb1b789857296adcddb102de9f5d",
+    "source_bytes": 35868,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141402574
+  }
+}

@@ -5,12 +5,23 @@
   "inputs": {
     "wikitext_sha256": "2b3bc1f644092ebe7995410a0e75e4add62974139c514e0b8f09043546f0a4c3",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [

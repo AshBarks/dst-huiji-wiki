@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowcreature.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowcreature",
+  "summary": "该状态图驱动饥荒联机版中的影怪实体，如恐怖之喙或暗影爬行者。整体状态组织包括出现、空闲、攻击、受击、嘲讽、死亡、消失和传送等，处理战斗、移动和特殊事件逻辑。",
+  "api": [],
+  "api_note": "该状态图未定义公共API方法，所有交互通过事件和状态切换处理，无对外接口。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death",
+    "doattack",
+    "teleport_to_sea",
+    "dispelsanityshadowcreature"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "hit",
+    "taunt",
+    "appear",
+    "death",
+    "disappear",
+    "action",
+    "teleport_to_sea"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "影怪空闲状态，循环播放动画并尝试丢弃目标或消失，是无战斗时的默认状态。"
+    },
+    {
+      "state": "attack",
+      "note": "影怪攻击状态，播放攻击动画并在第16帧造成伤害，有几率触发攻击反射，结束后可能嘲讽或重置目标。"
+    },
+    {
+      "state": "hit",
+      "note": "影怪受击后瞬移，播放消失动画后随机传送到附近位置并重新出现，规避连续伤害。"
+    },
+    {
+      "state": "taunt",
+      "note": "影怪嘲讽状态，播放嘲讽动画并可能用于重新定位目标，影响战斗节奏。"
+    },
+    {
+      "state": "appear",
+      "note": "影怪出现状态，播放出现动画后转入空闲，用于初始生成或瞬移后重新登场。"
+    },
+    {
+      "state": "death",
+      "note": "影怪死亡状态，播放消失动画并掉落战利品，最终移除实体，无法被点击。"
+    },
+    {
+      "state": "disappear",
+      "note": "影怪被驱散或强制消失，播放动画并移除，期间无敌且无法被点击，常见于驱散效果。"
+    },
+    {
+      "state": "action",
+      "note": "影怪执行缓冲动作（如回家），播放动画后返回空闲状态，用于非战斗行为。"
+    },
+    {
+      "state": "teleport_to_sea",
+      "note": "影怪传送到海上时触发，播放动画后与海洋恐怖交换并移除，涉及特殊事件机制。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      15651,
+      51046,
+      15922,
+      15225,
+      15551,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及影怪（shadow creature）的行为状态（如空闲、攻击、瞬移等），所有页面讨论的实体（如天体英雄、克劳斯、龙蝇、暗影傀儡等）均非影怪，且未体现影怪的特定能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影怪",
+    "暗影生物",
+    "恐怖之喙",
+    "攻击",
+    "死亡",
+    "瞬移",
+    "嘲讽",
+    "消失",
+    "驱散",
+    "移动"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "敌对生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "17c23c8321061c33e092e174018b95c0fe307a457f6e459f11a74fff1e429762",
+    "source_bytes": 9370,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146265086
+  }
+}

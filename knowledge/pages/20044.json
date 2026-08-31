@@ -8,7 +8,9 @@
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/instrument.lua": "562cd70967a8e8084c7037e74a0b54d70cca34bcaaf1efa470e142619070fc45",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/tool.lua": "ec086e8fd11cf1ca93b1a47894028dd2b9a27df57fe508ab3c42a313f7fb0ada",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
   },
@@ -36,6 +38,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/instrument.lua": {
+      "aspects_ignored": [
+        "范围设置能力体现"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
         "物品拾取与丢弃行为描述",
@@ -46,6 +55,19 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/tool.lua": {
+      "aspects_ignored": [
+        "倒走表使用效果",
+        "巨兽攻击行为优先级",
+        "弹药技能解锁使用",
+        "战歌恢复生命效果",
+        "武器攻击伤害与条件",
+        "玩具交易功能",
+        "电路板激活增益设置"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/tradable.lua": {
       "aspects_ignored": [

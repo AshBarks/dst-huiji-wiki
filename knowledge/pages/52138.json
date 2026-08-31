@@ -20,6 +20,7 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "stategraphs/SGbuzzard.lua": "73d92e9bd4f3d300850fbdf16c5c5b6b754511d39b6fee8d8d56901573e27be2"
     }
@@ -192,6 +193,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

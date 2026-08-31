@@ -8,6 +8,7 @@
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "components/explosive.lua": "f4d39182518429468cafc7e886ece85a22a857194ed2eeb3fdf2fb06f4829aa5",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
@@ -15,7 +16,10 @@
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
-      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/periodicspawner.lua": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+      "components/thief.lua": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
+      "stategraphs/SGslurtle.lua": "8d046ebf249aff8b97f592e80d07d7524afc4941f8f0a798130f64676ffa2e19"
     }
   },
   "symbols": {
@@ -68,6 +72,13 @@
         "wording": "蛞蝓龟每进食 6 点饥饿值也会产生 1 个黏液",
         "semantic_consistent": true
       }
+    },
+    "components/explosive.lua": {
+      "aspects_ignored": [
+        "爆炸伤害类型描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -157,6 +168,39 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "components/periodicspawner.lua": {
+      "aspects_ignored": [
+        "在玩家附近随机位置生成实体",
+        "生成点周期性检测玩家存在",
+        "生成点数量限制与死亡冷却"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/thief.lua": {
+      "aspects_ignored": [
+        "偷窃物品行为描述",
+        "防护偷窃能力描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGslurtle.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "缩壳防御描述",
+          "evidence": [
+            {
+              "pageid": 15587,
+              "quote": "蛞蝓龟连续受到超过 150 点伤害后会缩入壳中，获得 95% 的[[减伤]]。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

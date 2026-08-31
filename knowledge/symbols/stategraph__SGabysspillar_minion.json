@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGabysspillar_minion.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGabysspillar_minion",
+  "summary": "该状态图驱动深渊柱子的仆从（abysspillar_minion）实体，负责其待机、激活、停用、移动和跳跃等行为。状态组织基于CommonHandlers和自定义状态，以idle为默认状态，通过事件触发状态转换。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外API方法；所有行为由状态和事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "deactivate"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "activate",
+    "deactivate",
+    "deactivate_delay",
+    "run_start",
+    "run",
+    "run_stop",
+    "jump_pre",
+    "jump_loop",
+    "jump_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "待机状态，实体播放idle_on动画并循环播放音效，可旋转但保持静止。"
+    },
+    {
+      "state": "activate",
+      "note": "激活状态，播放turn_on_pst动画和跳跃着陆音效，完成后回到idle状态。"
+    },
+    {
+      "state": "deactivate",
+      "note": "停用开始状态，播放turn_off_pre动画，添加溺水忽略标签，准备进入消失流程。"
+    },
+    {
+      "state": "deactivate_delay",
+      "note": "停用延迟状态，短暂延迟（0.25-0.4秒）后尝试返回大柱子或移除实体。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，实体向前移动，播放idle_on动画，标签为移动中和奔跑。"
+    },
+    {
+      "state": "jump_pre",
+      "note": "跳跃前状态，播放跳跃准备动画。"
+    },
+    {
+      "state": "jump_loop",
+      "note": "跳跃中状态，播放跳跃循环动画。"
+    },
+    {
+      "state": "jump_pst",
+      "note": "跳跃后状态，播放落地动画和音效，完成后回到idle状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      15022,
+      13260,
+      10418,
+      18001,
+      22181,
+      28611,
+      20719
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及与 stategraph__SGabysspillar_minion 相关的任何能力或行为。页面内容涉及其他实体（如电路板、天体英雄、角色等），未讨论特定状态图的 idle、activate、deactivate、deactivate_delay、run、jump_pre、jump_loop、jump_pst 等状态。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "深渊柱子",
+    "仆从",
+    "激活",
+    "停用",
+    "移动",
+    "跳跃",
+    "闲置",
+    "消失",
+    "minion"
+  ],
+  "gameplay_tags": [
+    "环境",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6ef3b7af70c8ac7505f15d5c219d272e2807ad5818db6d2354bec7dda205f8ee",
+    "source_bytes": 3576,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135285554
+  }
+}

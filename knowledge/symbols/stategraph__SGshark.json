@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshark.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshark",
+  "summary": "该状态图驱动饥荒联机版中的鲨鱼实体。整体状态组织方式涵盖了鲨鱼的各种行为，包括移动、攻击、进食、休息和死亡等，通过事件驱动和状态转换来模拟鲨鱼的动态行为。",
+  "api": [],
+  "api_note": "该状态图主要处理内部状态转换，没有定义对外可调用的API方法。",
+  "events_published": [
+    "leap"
+  ],
+  "events_listened": [
+    "leap",
+    "dobite",
+    "attacked",
+    "doattack",
+    "dive_eat"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "bite",
+    "rest",
+    "attack",
+    "gobble",
+    "hit",
+    "leap",
+    "leap_pst",
+    "death",
+    "eat_pre",
+    "eat_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "bite",
+      "note": "鲨鱼进行多次咬击攻击，每次咬击有短暂硬直窗口，攻击后可能接休息状态。"
+    },
+    {
+      "state": "attack",
+      "note": "鲨鱼对单个目标进行攻击，造成伤害后进入短暂冷却，并触发距离计时器。"
+    },
+    {
+      "state": "leap",
+      "note": "鲨鱼跳跃状态，用于快速移动或跃向目标，跳跃期间有无敌帧和特殊碰撞设置，可触发地面震动。"
+    },
+    {
+      "state": "eat_pre",
+      "note": "鲨鱼进食前的准备状态，播放潜水动画，然后瞬移到食物位置进行进食。"
+    },
+    {
+      "state": "eat_pst",
+      "note": "鲨鱼进食后的状态，移除食物并播放咀嚼动画，伴有水花特效和声音。"
+    },
+    {
+      "state": "death",
+      "note": "鲨鱼死亡状态，播放死亡动画并掉落战利品，移除物理碰撞。"
+    },
+    {
+      "state": "hit",
+      "note": "鲨鱼被击中状态，短暂硬直并播放受击动画，之后恢复待机。"
+    },
+    {
+      "state": "rest",
+      "note": "鲨鱼攻击后的休息状态，短暂延迟后尝试跳跃到水中，准备下一次行动。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      70763,
+      51046,
+      13897,
+      15651,
+      15225,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及鲨鱼或 stategraph__SGshark 相关的实体描述，所有页面涉及其他游戏元素（如装备、其他巨兽、机制等），无鲨鱼能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鲨鱼",
+    "攻击",
+    "跳跃",
+    "进食",
+    "死亡",
+    "硬直",
+    "休眠",
+    "电击",
+    "水花特效"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "72d86855ad048ba97fb9620442d084eaf7e960f8072f0e52d66c52ed0596cb1e",
+    "source_bytes": 22271,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140889695
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_scanner.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_scanner",
+  "summary": "该状态图驱动饥荒联机版中的 WX-78 扫描器实体。整体状态组织为从空闲状态开始，通过部署、关闭或扫描成功事件触发启动、扫描循环和关闭等状态转换，实现扫描器的启停、扫描和数据生成行为。",
+  "api": [],
+  "api_note": "状态图通过事件系统响应输入，无显式对外方法；实体行为由事件驱动和内部状态控制。",
+  "events_published": [
+    "on_landed",
+    "on_no_longer_landed",
+    "turn_on_finished"
+  ],
+  "events_listened": [
+    "deployed",
+    "turn_off",
+    "scan_success"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "turn_on",
+    "turn_off",
+    "turn_off_idle",
+    "scan_success"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "扫描器启动后的待机状态，播放空闲或扫描循环动画；如果玩家在扫描范围内，自动切换为扫描动画。"
+    },
+    {
+      "state": "turn_on",
+      "note": "由部署事件触发，播放启动动画，影子从零逐渐放大至正常大小，从地面升起。"
+    },
+    {
+      "state": "turn_off",
+      "note": "由关闭事件触发，可能由被击中或玩家操作引起；播放关闭动画，根据数据可变化为物品或成功物品，并播放音效。"
+    },
+    {
+      "state": "scan_success",
+      "note": "由扫描成功事件触发，播放成功动画，生成扫描数据，随后进入关闭状态并变化为成功物品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      16615,
+      20719,
+      72441,
+      18359,
+      28744,
+      19129
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面仅列出扫描器的状态台词（如待机、部署、扫描完毕）和扫描时间等基本信息，未描述状态图行为如启动动画、扫描循环动画、关闭变化或音效等具体能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "扫描器",
+    "WX78",
+    "扫描",
+    "启动",
+    "关闭",
+    "成功",
+    "物品",
+    "数据",
+    "影子",
+    "动画"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "科技"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "373d3045a52aa2338a8215d2d653d9bc5b3b27c10fb4ec2b57b7804fb84f51bf",
+    "source_bytes": 7872,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143825788
+  }
+}

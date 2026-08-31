@@ -26,7 +26,9 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/saltlicker.lua": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "stategraphs/SGdeer.lua": "fef913f55123779d8111857839adb50a5b254122aefd053021b811de61c52f2d"
     }
@@ -180,7 +182,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -260,6 +263,13 @@
         "semantic_consistent": true
       }
     },
+    "components/saltlicker.lua": {
+      "aspects_ignored": [
+        "动物舔舐频率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -272,6 +282,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [

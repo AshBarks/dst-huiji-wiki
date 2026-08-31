@@ -7,19 +7,22 @@
   },
   "category": "stategraph",
   "display_name": "SGlavae",
-  "summary": "该状态图驱动 DST 联机版中的熔岩怪（Lavae）实体，管理其从待机、进食、攻击到冻结/解冻/死亡的全部行为循环。状态组织以 idle 为根节点，按饥饿度、战斗、互动和环境冻结等条件分支到多个子状态，整体围绕生存互动与战斗表现展开。",
+  "summary": "该状态图驱动名为“lavae”的生物，可能是一种熔岩生物（如小火龙）。整体状态组织涵盖了空闲、攻击、移动、死亡、冻结等行为，通过动画、事件和物理处理日常活动、战斗和环境互动。",
   "api": [],
-  "api_note": "该状态图未定义任何对外方法，所有行为均通过状态机内部转换和事件驱动完成，无自定义API暴露。",
+  "api_note": "源码中未定义任何对外方法（如公开函数或接口），状态图通过事件和内部逻辑驱动，无需外部API。",
   "events_published": [
     "inevitabledeath"
   ],
   "events_listened": [
     "attacked",
     "death",
-    "animqueueover",
-    "animover",
+    "sleep",
+    "freeze",
+    "attack",
     "unfreeze",
-    "onthaw"
+    "onthaw",
+    "animover",
+    "animqueueover"
   ],
   "netvars": [],
   "tunables": [],
@@ -47,68 +50,110 @@
   "state_notes": [
     {
       "state": "idle",
-      "note": "基础待机状态，随机超时（2~4秒）后根据饥饿度百分比切换至饥饿/啄食/旋转/跳跃等子动画状态。"
+      "note": "空闲状态，随机播放动画。根据饥饿度百分比可能转入饥饿、微饿或开心状态，否则循环空闲。"
     },
     {
       "state": "attack",
-      "note": "攻击状态含跳跃时间线（第16帧起跳、第21帧攻击、第23帧落地），标签含busy与jumping，动画结束后转入taunt。"
-    },
-    {
-      "state": "frozen",
-      "note": "被冻结时视为死亡（SetIsDead true）并触发不可战胜的inevitabledeath事件，客户端将不再锁定该实体。"
-    },
-    {
-      "state": "thaw_break",
-      "note": "冻结破碎死亡状态，播放shatter碎裂动画，掉落冰冻专属战利品表（lavae_frozen）。"
+      "note": "攻击状态，有跳跃动画和伤害输出。在特定帧（如21帧）触发攻击，带有无敌帧和硬直标签，攻击后转为挑衅。"
     },
     {
       "state": "death",
-      "note": "普通死亡状态，播放death动画，掉落战利品表（lavae_lava），并移除物理碰撞体。"
+      "note": "死亡状态，停止物理并播放死亡动画。掉落战利品（来自普通或冻结掉落表），并移除碰撞体。"
     },
     {
-      "state": "walk",
-      "note": "行走状态周期性（每3秒）生成岩浆移动特效（lavae_move_fx），环境雪量或湿度达标时额外播放嘶嘶声。"
+      "state": "frozen",
+      "note": "被冻结状态，标记为“frozen”并播放冻结动画。解冻时会死亡，死亡前标记为不可避免的死亡。"
     },
     {
-      "state": "eat",
-      "note": "进食状态通过动作处理器执行，含eat_pre/eat_loop/eat_pst三段动画，第20帧和第35帧分别播放进食与快乐音效。"
-    },
-    {
-      "state": "nuzzle",
-      "note": "蹭蹭互动动作状态，播放nuzzle动画及音效后执行缓冲动作并回到idle。"
+      "state": "thaw",
+      "note": "解冻状态，播放解冻动画。解冻事件直接触发死亡，表示解冻后无法存活。"
     },
     {
       "state": "hungry",
-      "note": "饥饿度≤25%时由idle超时进入，播放hungry动画和beg乞食音效，动画结束后回idle。"
+      "note": "饥饿状态，播放饥饿动画（如乞求动作）。在空闲状态低饥饿度（≤25%）时随机进入，表示生物需要食物。"
     },
     {
-      "state": "gohome",
-      "note": "回家动作状态，播放taunt动画，第6帧播放跳跃与taunt音效，第17帧播放落地音效，动画结束后执行缓冲动作。"
+      "state": "peckish",
+      "note": "微饿状态，播放特定动画（idle4）。在空闲状态饥饿度在25%-50%时随机进入，表示轻度饥饿。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，持续播放行走循环动画。有移动效果生成和声音，根据环境（如雪地）播放额外音效。"
     }
   ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      51046,
+      13897,
+      13156,
+      15922,
+      20511,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "冻结机制描述",
+        "evidence": [
+          {
+            "pageid": 20511,
+            "quote": "游戏中的角色和许多生物都拥有该机制，有些道具能够对它们施加[[#冰冻抗性与冰冻层数|冰冻]]，当施加冰冻的层数到达…"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击状态描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡状态描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "龙蝇死亡后，20 天后在刷新点重新生成。"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲状态描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "自然状态下龙蝇会一直呆在原地不动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
   "search_terms": [
-    "熔岩怪",
+    "熔岩蜥蜴",
+    "攻击",
     "冻结",
-    "碎裂",
-    "乞食",
-    "蹭蹭",
-    "进食",
-    "待机",
-    "战斗",
-    "岩浆",
-    "解冻"
+    "死亡",
+    "饥饿",
+    "移动",
+    "状态",
+    "动画",
+    "事件",
+    "行为"
   ],
   "gameplay_tags": [
-    "战斗",
     "生存",
-    "互动",
-    "冰冻"
+    "战斗",
+    "移动"
   ],
   "related_symbols": [],
   "provenance": {
     "source_sha256": "6f8c4ec0bc6cfb4bdc107b0834c48d0d4c02ffbfb1b5e751a993a93bf45a720b",
     "source_bytes": 14852,
-    "model": "ling-3.0-flash-fin-free",
-    "generated_at_ms": 1788080956095
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788156231985
   }
 }

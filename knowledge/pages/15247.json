@@ -12,12 +12,14 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/incrementalproducer.lua": "9a73396d86c91a138b61293d182627ac83d64603f1053cf34862cc6c587279de",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGspiderqueen.lua": "6f02ee6609e2db80fd4e6d78778c475f9b5a6528f70ba02868c5693adbef4af4"
     }
   },
   "symbols": {
@@ -107,14 +109,47 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/incrementalproducer.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "蜘蛛生成概率变体描述",
+          "evidence": [
+            {
+              "pageid": 15247,
+              "quote": "有 45% 概率改为生成[[护士蜘蛛]]"
+            }
+          ]
+        },
+        {
+          "aspect": "蜘蛛生成频率描述",
+          "evidence": [
+            {
+              "pageid": 15247,
+              "quote": "蜘蛛女王会以每 10 秒一只的速度生成[[蜘"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "农田杂物生成数量描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/inspectable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "图鉴条目检查状态标注",
         "打蜡后显示名称前缀",
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "蜘蛛帽",
+        "semantic_consistent": true
+      }
     },
     "components/leader.lua": {
       "aspects_ignored": [
@@ -179,7 +214,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGspiderqueen.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

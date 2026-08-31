@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_shooting_button.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_shooting_button",
+  "summary": "该状态图驱动嘉年华射击游戏中的按钮或目标实体，管理其放置、开启、关闭和射击等状态。状态通过事件如'carnivalgame_turnon'和'carnivalgame_turnoff'进行转换，整体组织为基于动画和音效的有限状态机。",
+  "api": [],
+  "api_note": "该状态图没有定义对外 API 方法，主要通过内部事件驱动状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "carnivalgame_turnon",
+    "carnivalgame_turnoff",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle_off",
+    "turn_on",
+    "turn_off",
+    "idle_on",
+    "shoot"
+  ],
+  "state_notes": [
+    {
+      "state": "place",
+      "note": "当按钮被放置时进入此状态，播放放置动画和音效，完成后转到关闭空闲状态。"
+    },
+    {
+      "state": "idle_off",
+      "note": "按钮处于关闭空闲状态，播放关闭动画，无法被玩家交互。"
+    },
+    {
+      "state": "turn_on",
+      "note": "按钮正在启动，播放启动动画和音效，完成后根据内部标志决定是否关闭或进入开启空闲状态。"
+    },
+    {
+      "state": "turn_off",
+      "note": "按钮正在关闭，播放关闭动画，完成后转到关闭空闲状态。"
+    },
+    {
+      "state": "idle_on",
+      "note": "按钮处于开启空闲状态，循环播放待机动画，等待射击事件或关闭信号。"
+    },
+    {
+      "state": "shoot",
+      "note": "按钮被按下触发射击，播放按下动画，完成后返回开启空闲状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14794
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面内容是关于火腿棒的装备伤害和新鲜度属性，与射击按钮的状态图能力（如放置、空闲、启动、关闭、射击等）无关，未提及任何相关表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华游戏",
+    "射击游戏",
+    "按钮实体",
+    "状态转换",
+    "开启事件",
+    "关闭事件",
+    "射击状态"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 6/7)",
+  "gameplay_tags": [
+    "嘉年华",
+    "射击",
+    "游戏",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a3c992d025b273ba28edb65e800f355f733065e8427930f5ad7752b2b21d2aa3",
+    "source_bytes": 2384,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136544087
+  }
+}

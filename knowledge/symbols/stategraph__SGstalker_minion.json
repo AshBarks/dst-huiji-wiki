@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGstalker_minion.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGstalker_minion",
+  "summary": "该状态图驱动饥荒联机版中的暗影仆从（stalker minion）实体。它通过事件在idle、walk、emerge、emerge2和death等状态间切换，控制仆从的空闲、移动、出现和死亡行为，初始状态为idle。",
+  "api": [],
+  "api_note": "状态图未定义对外方法，所有逻辑均通过事件和内部状态处理。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "death",
+    "stalkerconsumed",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "walk",
+    "emerge",
+    "emerge2",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "仆从处于空闲状态，播放idle动画，可响应locomote事件进入移动或等待指令。"
+    },
+    {
+      "state": "walk",
+      "note": "仆从根据移动指令行走或停止，播放walk动画并发出脚步音效，支持移动中停止和恢复。"
+    },
+    {
+      "state": "emerge",
+      "note": "仆从从地面出现，播放spawn动画，有无敌帧（emergeimmunetime），并在出现时触发伤害函数DoDamage破坏周围物品或生物。"
+    },
+    {
+      "state": "death",
+      "note": "仆从被击败时播放hit动画，禁用物理和NOCLICK标签，之后移除实体，无掉落物。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      15539,
+      13156,
+      10374,
+      20150,
+      20058,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面语料中未涉及stategraph__SGstalker_minion的讨论，所有摘录均关于其他实体（如天体英雄、龙蝇）或通用游戏机制（如攻击、伤害），无任何与仆从能力idle/walk/emerge/death相关的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影仆从",
+    "stalker",
+    "仆从",
+    "emerge",
+    "出现",
+    "死亡",
+    "移动",
+    "伤害",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "仆从",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4f56394906b8439c3ab06a6dea066066551fc4fa194702e6a717fa9ee794833",
+    "source_bytes": 9604,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141600674
+  }
+}

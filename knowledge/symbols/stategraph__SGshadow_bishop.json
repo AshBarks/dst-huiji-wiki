@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadow_bishop.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadow_bishop",
+  "summary": "该状态图驱动饥荒联机版中的影子主教实体。状态组织基于影子棋子通用模块，添加了攻击序列（包括初始攻击、循环攻击、攻击后撤）和通用行为如闲置、升级、嘲讽、受击、死亡、出现。初始状态为出现动画，覆盖了影子主教的主要战斗和移动行为。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外API方法，所有行为由内部状态机驱动，无需外部接口调用。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "attack",
+    "attack_loop",
+    "attack_loop_pst",
+    "attack_pst",
+    "idle_loop",
+    "transform",
+    "taunt",
+    "hit",
+    "disappear",
+    "death",
+    "appear"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "进入攻击状态，停止移动，播放攻击前摇动画，并获得无敌帧（SetInvincible(true)），准备发起攻击。"
+    },
+    {
+      "state": "attack_loop",
+      "note": "持续攻击循环状态，保持无敌，周期性执行区域攻击（DoSwarmAttack），追踪目标移动，持续约130帧后超时结束。"
+    },
+    {
+      "state": "attack_loop_pst",
+      "note": "攻击循环后撤状态，停止无敌，计算安全位置传送并播放后撤动画，为下次攻击调整站位。"
+    },
+    {
+      "state": "attack_pst",
+      "note": "攻击后结束状态，移除无敌和忙碌标签，之后根据条件进入闲置或嘲讽状态。"
+    },
+    {
+      "state": "idle_loop",
+      "note": "闲置状态，影子主教待机，等待下一个行为触发，通常为非战斗状态。"
+    },
+    {
+      "state": "transform",
+      "note": "升级状态，影子主教进化，可能提升属性或行为，使用指定动画和音效。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，可能用于挑衅玩家或触发特殊行为，播放嘲讽动画和音效。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，影子主教被攻击时的反应，播放受击动画并可能打断当前行为。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，影子主教死亡时播放消失动画和多重音效，彻底移除实体。"
+    },
+    {
+      "state": "appear",
+      "note": "出现状态，影子主教生成或重生时的初始动画，作为状态图起点。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13828,
+      15022,
+      13897,
+      51046,
+      15922,
+      13556,
+      15551,
+      15651
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面 13828 仅提供 shadow_bishop 的攻击间隔和攻击范围数值属性，未描述任何行为状态或能力语义，如动画、无敌帧或状态转换。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "暗影主教",
+    "攻击",
+    "无敌帧",
+    "攻击序列",
+    "循环攻击",
+    "攻击后撤",
+    "死亡动画",
+    "出现动画",
+    "嘲讽",
+    "升级"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗",
+    "敌人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "95130a46a53948ba19f26a04a070fc5e0ad1dcc8948bf71fcd3aa5826bb42f4f",
+    "source_bytes": 9296,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146085372
+  }
+}

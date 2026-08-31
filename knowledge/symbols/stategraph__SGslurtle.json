@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGslurtle.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGslurtle",
+  "summary": "该状态图驱动饥荒联机版中的蜗牛（Slurtle）实体。它定义了蜗牛从普通移动、战斗、进食、进入龟壳防御到被盐腐蚀死亡的全过程。状态组织混合了通过公共函数添加的通用行为状态（如走、跑、攻击、死亡）与针对其独特行为（如抢夺食物、壳防御、盐腐蚀）的自定义状态。",
+  "api": [],
+  "api_note": "该状态图主要由内部事件、状态转换和组件交互驱动，未定义公开的外部调用方法。",
+  "events_published": [],
+  "events_listened": [
+    "entershield",
+    "exitshield",
+    "death",
+    "attacked",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SLURTLE_SHELL_ABSORB"
+  ],
+  "states": [
+    "idle",
+    "taunt",
+    "action",
+    "shield",
+    "shield_end",
+    "eat_pre",
+    "eat_loop",
+    "steal",
+    "salt_death_pre",
+    "salt_death_loop",
+    "salt_death_pst",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "attack",
+    "death",
+    "attack_cooldown",
+    "hit",
+    "freeze",
+    "frozen",
+    "electrocute",
+    "electrocute_stun",
+    "electrocute_pst",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蜗牛的基础待机状态。播放idle动画并伴有间歇性的环境音效。若处于盐腐蚀溶解中（mem.dissolving）则会直接转入盐腐蚀死亡状态。"
+    },
+    {
+      "state": "steal",
+      "note": "蜗牛主动抢夺（攻击）食物或物品的状态。播放攻击动画，并在指定帧执行抓取动作（PerformBufferedAction）。标记为\"attack\"和\"busy\"。"
+    },
+    {
+      "state": "shield",
+      "note": "蜗牛缩进壳中进行防御的状态。在此状态下，蜗牛获得由TUNING.SLURTLE_SHELL_ABSORB定义的极高伤害吸收率，并添加\"shell\"标签。期间蜗牛被标记为\"busy\"和\"hiding\"，无法移动。"
+    },
+    {
+      "state": "shield_end",
+      "note": "蜗牛从壳中钻出的过渡状态。播放\"emerge\"动画，完成后转入idle。标记为\"busy\"。"
+    },
+    {
+      "state": "eat_pre",
+      "note": "蜗牛拾取食物的前置动作状态。播放\"eat_pre\"动画，并在动画中段执行拾取动作。标记为\"busy\"。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "蜗牛持续进食的状态。循环播放进食动画，持续2至5秒。若在此期间受到攻击，会掉落食物并退出状态。超时后会记录进餐时间并完成进食动作。标记为\"busy\"。"
+    },
+    {
+      "state": "attack",
+      "note": "由公共函数添加的普通攻击状态。在攻击时间线上执行战斗组件的DoAttack方法，造成伤害。攻击动画和受击动画会根据是否处于壳中（\"shield\"）状态而变化（\"hit_shield\"或\"hit_out\"）。"
+    },
+    {
+      "state": "death",
+      "note": "蜗牛的常规死亡状态。播放死亡动画，并在1帧后播放死亡音效。根据死亡原因可能生成尸体状态（Corpse State）。"
+    },
+    {
+      "state": "salt_death_pre",
+      "note": "盐腐蚀死亡的前置状态。当蜗牛被盐标记（通过事件触发或状态记忆）时，会进入此状态，停止移动并开始播放溶解动画。标记为\"dissolving\"和\"hiding\"。"
+    },
+    {
+      "state": "salt_death_loop",
+      "note": "盐腐蚀死亡的持续伤害状态。循环播放溶解动画，并在此状态下每秒持续受到200点\"salt\"类型伤害。会播放持续的盐蚀音效。标记为\"dissolving\"。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20058,
+      15022,
+      17979,
+      13897,
+      15587,
+      15651,
+      15922,
+      51046
+    ],
+    "aspects": [
+      {
+        "aspect": "缩壳防御描述",
+        "evidence": [
+          {
+            "pageid": 15587,
+            "quote": "蛞蝓龟连续受到超过 150 点伤害后会缩入壳中，获得 95% 的[[减伤]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蜗牛",
+    "Slurtle",
+    "壳",
+    "防御",
+    "盐",
+    "死亡",
+    "攻击",
+    "掉落物",
+    "进食",
+    "钻壳"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "防御"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d046ebf249aff8b97f592e80d07d7524afc4941f8f0a798130f64676ffa2e19",
+    "source_bytes": 10889,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134874713
+  }
+}

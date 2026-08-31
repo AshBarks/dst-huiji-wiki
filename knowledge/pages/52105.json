@@ -16,7 +16,9 @@
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "components/yotb_stager.lua": "d95b849671000ee43385bcecfedcecd333cb131c45802b70c083f4b63fbb0147",
+      "stategraphs/SGyotb_stage.lua": "ed3a314cddccba588c996f7e6b5e4c2027e7968d90f2ee870e0cb8a0a3ecb11c"
     }
   },
   "symbols": {
@@ -37,11 +39,16 @@
       "llm_verdict": {}
     },
     "components/deployable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "单位内放置至少 4 个[[皮弗娄牛舞台]]",
+        "semantic_consistent": true
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -133,6 +140,18 @@
       "llm_verdict": {
         "note": "皮弗娄牛舞台(yotb_stage)，受影响未提及"
       }
+    },
+    "components/yotb_stager.lua": {
+      "aspects_ignored": [
+        "比赛开启条件列举",
+        "裁判评选标准陈述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGyotb_stage.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

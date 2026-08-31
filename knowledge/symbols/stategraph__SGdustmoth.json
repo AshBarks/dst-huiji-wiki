@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdustmoth.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdustmoth",
+  "summary": "此状态图（StateGraph）驱动的是饥荒联机版中的“dustmoth”（尘螨）实体，一种被玩家驯服后可协助清理环境灰尘的宠物。其整体状态组织以行为逻辑为核心，通过玩家交互、环境事件和内部状态机触发不同状态，主要涵盖空闲、移动、清理灰尘（dustoff）、修复巢穴（repair_den）、拾取、进食以及受击/死亡等通用状态。",
+  "api": [],
+  "api_note": "该状态图源码未定义任何对外（如mod或实体脚本可调用的）方法。所有行为均通过状态图内部逻辑、事件和动作处理器驱动。",
+  "events_published": [],
+  "events_listened": [
+    "dustmothsearch",
+    "onrefuseitem",
+    "dustmothden_repaired",
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "sneeze",
+    "dustoff_pre",
+    "dustoff_loop",
+    "dustoff_pst",
+    "repair_den_pre",
+    "repair_den_loop",
+    "repair_den_pst",
+    "pickup",
+    "eat",
+    "search",
+    "refuseitem",
+    "walk",
+    "walk_start",
+    "walk_stop",
+    "hit",
+    "death",
+    "electrocute",
+    "sleep",
+    "sleeping",
+    "wake"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "尘螨的默认待机状态。若玩家给予蓝图物品（_giveblueprint标记），会立即被打断并进入“sneeze”状态以掉落蓝图。"
+    },
+    {
+      "state": "sneeze",
+      "note": "打喷嚏动画，带有“busy”标签。如果由给予蓝图触发，会在动画播放到第36帧时执行TryToDropBlueprint掉落蓝图。"
+    },
+    {
+      "state": "dustoff_pre",
+      "note": "清理灰尘的前置状态。进入时有20%（SNEEZE_CHANCE）概率先转为“sneeze”。若成功，会为目标移除“dustable”标签并启动重置计时器，然后进入清理循环。"
+    },
+    {
+      "state": "dustoff_loop",
+      "note": "清理灰尘的循环动画状态。循环次数为4-7次随机（4 + math.random(3)），期间播放清理音效。循环结束后进入“dustoff_pst”。"
+    },
+    {
+      "state": "repair_den_pre",
+      "note": "修复巢穴的前置状态。播放“clean_pre”动画，若目标有效则进入修复循环，否则结束。"
+    },
+    {
+      "state": "repair_den_loop",
+      "note": "核心的修复巢穴循环状态。仅在尘螨已充能（inst._charged）时执行。会播放清理动画，持续7-14次（随机5-9次循环，每次循环为两次播放），并调用目标的_start_repairing_fn。若移动超过一定距离（2.25单位平方）或目标被移除，则中断修复。"
+    },
+    {
+      "state": "pickup",
+      "note": "拾取物品状态。播放“pickup”动画，并在第16帧执行缓冲动作（如拾取食物）。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态。播放“eat”动画，并在动画结束时执行缓冲动作（消耗食物）。"
+    },
+    {
+      "state": "search",
+      "note": "搜索状态，由“dustmothsearch”事件触发。播放“idle2”动画并发出咕哝声，结束后返回“idle”。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      18830,
+      13493,
+      21632,
+      14589,
+      20516,
+      18510,
+      22503
+    ],
+    "aspects": [
+      {
+        "aspect": "待机游荡行为",
+        "evidence": [
+          {
+            "pageid": 14589,
+            "quote": "尘蛾会在他们的整洁洞穴附近游荡，缓慢蠕动"
+          }
+        ]
+      },
+      {
+        "aspect": "打喷嚏行为",
+        "evidence": [
+          {
+            "pageid": 14589,
+            "quote": "有概率会被上面的灰尘呛到而打喷嚏"
+          }
+        ]
+      },
+      {
+        "aspect": "清理灰尘行为",
+        "evidence": [
+          {
+            "pageid": 14589,
+            "quote": "用他们的翅膀清扫远古月亮雕像、远古月符石以及远古哨所上的灰尘"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "dustmoth",
+    "打喷嚏",
+    "蓝图",
+    "巡逻",
+    "灰尘蛾",
+    "清理灰尘",
+    "修巢",
+    "宠物",
+    "驯服"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "采集/维护",
+    "合作/社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "538486e764ca245ce71df1ebab98ab328810dbd1fc60efe5788db7da1b81c9bd",
+    "source_bytes": 16509,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137343600
+  }
+}

@@ -7,9 +7,12 @@
     "symbol_doc_shas": {
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heavyobstaclephysics.lua": "38a15ca57f3f8865d6874733c314980d5683fcd78006d4378c9e68360232bb20",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/submersible.lua": "dd99e89ec3845777543befb9dfa698869fbf876830696e3f70bdd2745996fec9",
+      "components/symbolswapdata.lua": "ff6571899b4b4c6cc24dd72dc07e8735d2c693da2be43447c42385ad6ffceacf",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -34,6 +37,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heavyobstaclephysics.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -79,6 +86,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/submersible.lua": {
+      "aspects_ignored": [
+        "实体从加载范围移除事件",
+        "潜水或下水行为描述",
+        "着陆事件响应",
+        "获取水中物体方法"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/symbolswapdata.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",

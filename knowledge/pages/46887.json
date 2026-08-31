@@ -9,10 +9,16 @@
       "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
       "behaviours/wander.lua": "f493bad89253537e0d6baf5ea35c053cd2bff78d2abc90f3709ca72dea75eae7",
       "brains/wanderingtraderbrain.lua": "b1a57f2c2fcad701b1aa8fa247a6dddec6ef58bdf55ab0c87860352a6392c55b",
+      "components/craftingstation.lua": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
+      "components/stuckdetection.lua": "4bbc06274fa46b7280daf844797f1a3ac84d9b7ca8525974be0e5a8d33146172",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/worldroutefollower.lua": "0cd2505c5698acaf20342e4053656e869af568dc4c3ca7ea19f422a8d5944248",
+      "stategraphs/SGwanderingtrader.lua": "af59e8464960d9044dc5f7a0f67e1faa4d79f91ef1455ae806db276be724d957"
     }
   },
   "symbols": {
@@ -22,7 +28,8 @@
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/leash.lua": {
       "aspects_ignored": [
@@ -34,7 +41,10 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为季节性生物生成表格，与实体行为代码（如拴绳）无关。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -42,9 +52,17 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/wanderingtraderbrain.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/craftingstation.lua": {
+      "aspects_ignored": [
+        "制作站配方解锁机制"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -70,6 +88,24 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/prototyper.lua": {
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为季节性的数据表格，无证据表明与任何原型制作者或 prototyper 组件相关。"
+      }
+    },
+    "components/stuckdetection.lua": {
+      "aspects_ignored": [
+        "卡住回避行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -79,6 +115,10 @@
       "llm_verdict": {
         "note": "仅季节表格，未对应受影响实体"
       }
+    },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [
@@ -91,7 +131,45 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/worldroutefollower.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGwanderingtrader.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "传送行为描述",
+          "evidence": [
+            {
+              "pageid": 46887,
+              "quote": "他就会传送到旅行路径上的一个随机检查点"
+            }
+          ]
+        },
+        {
+          "aspect": "出现状态描述",
+          "evidence": [
+            {
+              "pageid": 46887,
+              "quote": "比赛结束以后再在原地重新出现"
+            }
+          ]
+        },
+        {
+          "aspect": "隐藏状态描述",
+          "evidence": [
+            {
+              "pageid": 46887,
+              "quote": "会让流浪商人暂时消失"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmonkey.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmonkey",
+  "summary": "该状态图驱动饥荒联机版中的猴子实体。整体状态组织基于状态机，包括空闲、动作、进食、挑衅和投掷等状态，通过事件处理和动作执行管理猴子的行为逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义公共API方法，主要通过事件和内部状态机驱动行为。",
+  "events_published": [],
+  "events_listened": [
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "eat",
+    "taunt",
+    "throw"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "猴子默认空闲状态，播放循环动画和声音，偶尔在战斗目标为玩家时可能以低概率触发挑衅。"
+    },
+    {
+      "state": "action",
+      "note": "执行拾取、偷窃等交互动作时进入，播放交互动画，完成后执行缓冲动作并返回空闲。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，播放进食动画和声音，在特定帧执行进食动作，进食后返回空闲。"
+    },
+    {
+      "state": "taunt",
+      "note": "当战斗目标为玩家且随机触发，进入忙碌状态播放挑衅动画和声音，期间有击打音效，持续一段时间后返回空闲。"
+    },
+    {
+      "state": "throw",
+      "note": "当有弹药且目标不在近战范围时进行投掷攻击，播放投掷动画，在第14帧执行攻击并播放声音，攻击后返回空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      13493,
+      13567,
+      13409,
+      18825,
+      61804,
+      28739,
+      18357
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与stategraph__SGmonkey相关的任何能力表达证据。所有页面内容涉及其他实体或主题，如控制台命令、寄居蟹隐士、角色薇格弗德、舞台、家具和桅杆等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猴子",
+    "偷窃",
+    "投掷攻击",
+    "挑衅",
+    "进食",
+    "状态机",
+    "动作",
+    "战斗",
+    "交互",
+    "AI"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "79e8d3eeff00eda136e42bf28466b4b86559a834b5d77e50beaed8b92f563b51",
+    "source_bytes": 6776,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139304888
+  }
+}

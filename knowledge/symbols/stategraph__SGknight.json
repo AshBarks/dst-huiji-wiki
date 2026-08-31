@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGknight.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGknight",
+  "summary": "该状态图(SGknight)驱动饥荒联机版中的发条骑士(clockwork knight)实体。其状态组织围绕着基本的待机、移动、攻击，以及一套核心的冲锋(joust)攻击系统和眩晕(stun)系统展开，体现了该怪物高机动性、强力但可被控制的特点。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外供调用的API方法，其行为完全由内部事件系统和状态转换驱动。",
+  "events_published": [
+    "joust_collide"
+  ],
+  "events_listened": [
+    "doattack",
+    "dojoust",
+    "despawn",
+    "spawned",
+    "joust_collide"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "taunt",
+    "ruinsrespawn",
+    "hit",
+    "attack",
+    "joust_pre",
+    "joust_loop",
+    "joust_pst",
+    "joust_collide",
+    "stun_pre",
+    "shock_to_stun",
+    "stun_loop",
+    "stun_hit",
+    "stun_pst",
+    "despawn",
+    "spawned"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础待机状态，可被移动或攻击指令中断。表现为播放idle_loop动画，期间会发出待机音效。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，表现为面向目标并播放特定动画和音效。期间有短暂硬直，之后恢复可行动。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。播放受击动画，并更新受击恢复延迟。若上次处于眩晕状态，则会直接进入stun_hit。状态中途可中断进行攻击或冲锋。"
+    },
+    {
+      "state": "attack",
+      "note": "普通攻击状态。播放攻击动画，在动画第14帧执行伤害判定，第28帧后取消‘忙碌’标签，可衔接其他状态。"
+    },
+    {
+      "state": "joust_pre",
+      "note": "冲锋准备状态。骑士会锁定目标、调整朝向并开始加速，为冲锋蓄力。期间会持续追踪目标方向（但转向角度有限）。"
+    },
+    {
+      "state": "joust_loop",
+      "note": "冲锋循环状态。骑士处于高速移动状态，期间持续对路径上的敌人造成伤害并击退。碰撞到其他‘jousting’单位会触发碰撞状态。最多循环3次。"
+    },
+    {
+      "state": "joust_pst",
+      "note": "冲锋结束状态。冲锋动能逐渐衰减直至停止，骑士恢复正常朝向。此状态后有短暂硬直。"
+    },
+    {
+      "state": "joust_collide",
+      "note": "冲锋碰撞状态。通常由两个冲锋中的骑士相撞触发，表现为被弹开并伴有硬直动画。此状态无法被睡眠中断。"
+    },
+    {
+      "state": "stun_loop",
+      "note": "眩晕循环状态，表现为倒地不起。在此状态期间，骑士受到攻击(stun_hit)会累计眩晕打击次数(stunhits)。若累计达到4次，将提前退出眩晕。"
+    },
+    {
+      "state": "stun_hit",
+      "note": "眩晕中的受击状态，是延长眩晕时间的主要手段。每次进入都会增加‘stunhits’计数，当计数≥4时，会直接转入眩晕恢复(stun_pst)。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15389,
+      70522,
+      15941,
+      14936,
+      16419,
+      34988,
+      15938
+    ],
+    "aspects": [
+      {
+        "aspect": "冲锋行为描述",
+        "evidence": [
+          {
+            "pageid": 15941,
+            "quote": "低头向目标发起冲锋，对接触到的所有敌人造成 150 伤害，附带击退。"
+          }
+        ]
+      },
+      {
+        "aspect": "受击硬直状态",
+        "evidence": [
+          {
+            "pageid": 15938,
+            "quote": "播放硬直动画，并立刻获得 1 秒硬直保护。"
+          },
+          {
+            "pageid": 34988,
+            "quote": "进入 11 帧的硬直状态。"
+          }
+        ]
+      },
+      {
+        "aspect": "硬直战吼嘲讽行为",
+        "evidence": [
+          {
+            "pageid": 14936,
+            "quote": "播放嘲讽动画。"
+          },
+          {
+            "pageid": 15938,
+            "quote": "播放嘲讽动画。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "发条骑士",
+    "冲锋",
+    "眩晕",
+    "joust",
+    "clockwork",
+    "硬直",
+    "击退",
+    "骑枪"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "机械"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c424bb2b23c8c644cd5f203b38bda6c7fd40b281813a29c1acdbe40f61d03b5b",
+    "source_bytes": 28561,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145327263
+  }
+}

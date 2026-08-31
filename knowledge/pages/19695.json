@@ -27,12 +27,16 @@
   },
   "symbols": {
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "提及格罗姆（glommer），该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/findfarmplant.lua": {
       "mention_source": "fact_match",
@@ -64,7 +68,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/friendlyfruitflybrain.lua": {
       "mention_source": "pass2_evidence",

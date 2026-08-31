@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_perdling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_perdling",
+  "summary": "状态图 SGcritter_perdling 驱动 DST 中的 perding 小型宠物生物。整体状态组织通过添加通用状态和自定义表情，覆盖空闲、移动、交互及生存行为，如行走、进食、战斗和睡眠。初始状态为 idle，状态转换由事件和动作处理器驱动。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图仅处理内部状态和事件。",
+  "events_published": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid"
+  ],
+  "events_listened": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "emote1",
+    "emote2",
+    "cute",
+    "pet",
+    "combat",
+    "play",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "sleep",
+    "hop",
+    "sink",
+    "wash_ashore",
+    "void_fall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，宠物会随机播放表情动画（如嗅探或挥舞翅膀），并播放音效。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，当玩家移动时宠物跟随，播放脚步声和翅膀拍打音效。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，当宠物饥饿或被喂食时触发，有吃食前兆动画和音效。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿状态，宠物发出 distress 音效提示玩家需要喂食，可能影响行为。"
+    },
+    {
+      "state": "combat",
+      "note": "战斗表情状态，在宠物参与战斗或躲避攻击时触发，播放战斗相关动画。"
+    },
+    {
+      "state": "play",
+      "note": "与其他宠物玩耍状态，增加社交互动，有 active 动画和 distress 音效。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "蹭玩家状态，可能增加友好度或触发抚摸反馈，播放蹭人音效。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，宠物休息并恢复体力，有睡着、睡眠循环和醒来动画及音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13409,
+      13456,
+      15975,
+      15238,
+      34037,
+      13437,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "进食行为与保质期刷新",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物会接受一切[[常规食物]]。吃下任何东西后宠物的的保质期就会刷新。"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿状态叫声动画",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物在低保质期时会进入饥饿状态，饥饿状态下的宠物会发出叫声并表现相应的动画"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "宠物",
+    "perdling",
+    "饥饿",
+    "喂食",
+    "睡眠",
+    "行走",
+    "表情",
+    "战斗",
+    "玩耍",
+    "蹭人"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "生存",
+    "社交",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b469b8bb258c46fdd232c31075e2a93b3478f7c79adb1ca9cc35cd102d13bee3",
+    "source_bytes": 4244,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788156821882
+  }
+}

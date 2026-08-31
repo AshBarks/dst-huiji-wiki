@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfused_shadeling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfused_shadeling",
+  "summary": "该状态图驱动名为 'fused_shadeling' 的实体，是一个具有攻击性和特殊移动能力的暗影生物。状态组织包括基础状态如空闲、死亡，以及战斗状态如攻击、受击、嘲讽，还有跳跃和传送机制。状态转换由事件触发，并包含动画和音效事件处理。",
+  "api": [],
+  "api_note": "状态图不暴露公共 API 方法，仅用于内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "try_jump",
+    "do_despawn",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "FUSED_SHADELING_JUMP_COOLDOWN",
+    "FUSED_SHADELING_JUMPSPEED"
+  ],
+  "states": [
+    "idle",
+    "death",
+    "jump_pre",
+    "jump",
+    "jump_pst",
+    "spawn_delay",
+    "attack",
+    "hit",
+    "taunt",
+    "teleport_pre",
+    "teleport",
+    "appear",
+    "appear_pst",
+    "despawn_pre",
+    "despawn"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "攻击状态，播放攻击动画，在第14帧对目标造成伤害。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，有50%概率触发传送，若被光源武器击中则必然传送。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，播放嘲讽动画并发出声音，在第21帧后可被击中打断。"
+    },
+    {
+      "state": "jump_pre",
+      "note": "跳跃准备状态，设置跳跃冷却并调整朝向，为跳跃做准备。"
+    },
+    {
+      "state": "jump",
+      "note": "跳跃中状态，禁用碰撞并快速移动，处于无敌状态。"
+    },
+    {
+      "state": "jump_pst",
+      "note": "跳跃后状态，尝试攻击目标，否则返回空闲。"
+    },
+    {
+      "state": "teleport",
+      "note": "传送状态，生成快速引信炸弹并传送到附近位置。"
+    },
+    {
+      "state": "spawn_delay",
+      "note": "生成延迟状态，实体暂时无敌且不可见，等待指定时间后出现。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，生成爆炸炸弹并掉落战利品，最终移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      57263,
+      15922,
+      18001,
+      13897,
+      13828,
+      16641
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击帧数描述",
+        "evidence": [
+          {
+            "pageid": 15922,
+            "quote": "攻击时以 14 帧的攻击间隔发射远程的吹箭，吹箭可以追踪敌人造成 20 点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "跳跃攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 51046,
+            "quote": "连跳：启迪战争瓦器人原地跳跃 2 ~ 3 次，每次对附近 3.3 单位的实体造成 50 物理和 10 位面伤害并[[击退]]。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "融合暗影",
+    "fused_shadeling",
+    "跳跃",
+    "传送",
+    "攻击",
+    "受击",
+    "嘲讽",
+    "死亡炸弹",
+    "生成延迟"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "暗影",
+    "传送"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2a8eba4a31f42fcf4ed412a5105e77ab337b0c3acae17d6996963914a4f38db5",
+    "source_bytes": 14256,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137684175
+  }
+}

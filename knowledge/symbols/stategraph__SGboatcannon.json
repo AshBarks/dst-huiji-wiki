@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatcannon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatcannon",
+  "summary": "该状态图驱动饥荒联机版中的船炮实体，整体状态组织包括待机、装弹、射击、放置和受击五个核心状态，表示船炮在不同玩家操作下的行为切换。状态通过弹药加载/卸载事件触发转换，并配合动画和声音反馈操作效果。",
+  "api": [],
+  "api_note": "该状态图不定义独立的对外方法，其行为由boatcannon组件驱动，状态切换完全依赖事件和动画触发。",
+  "events_published": [],
+  "events_listened": [
+    "ammoloaded",
+    "ammounloaded"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "load",
+    "shoot",
+    "place",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "船炮的默认待机状态，播放循环动画，表示无操作时的静止状态，玩家可随时触发装弹或射击。"
+    },
+    {
+      "state": "load",
+      "note": "装填弹药状态，播放装弹动画并播放装弹声音，期间船炮标记为忙碌（不能进行其他操作），在1帧后切换弹药符号模拟装填完成。"
+    },
+    {
+      "state": "shoot",
+      "note": "射击状态，播放开火动画并播放射击声音，标记为忙碌和射击中，在7帧后执行射击组件方法，10帧后自动卸载弹药，动画结束后回到待机。"
+    },
+    {
+      "state": "place",
+      "note": "放置船炮状态，播放放置动画和声音，标记为忙碌，动画结束后自动回到待机状态，用于玩家部署船炮时的过渡表现。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放被击中动画和声音，标记为忙碌，动画结束后自动回到待机状态，表示船炮受到伤害时的短暂硬直反馈。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18188,
+      18211,
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907
+    ],
+    "aspects": [
+      {
+        "aspect": "射击操作描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "再左键点击大炮进…"
+          }
+        ]
+      },
+      {
+        "aspect": "装填操作描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "先用鼠标持有[[炮弹]]点击大炮或玩家物品栏中拥有炮弹时直接右键点击大炮填装"
+          }
+        ]
+      },
+      {
+        "aspect": "默认待机状态描述",
+        "evidence": [
+          {
+            "pageid": 18188,
+            "quote": "在大炮没有使用时，它还有一个默认的发射方向。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "船炮",
+    "射击",
+    "装弹",
+    "放置",
+    "被击中",
+    "猴子岛",
+    "炮弹",
+    "动画",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "03f1cf5473af7464bc97f86b02ef3e29221bd94365f1e9c503aebf65cb6d0baf",
+    "source_bytes": 3150,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136055351
+  }
+}

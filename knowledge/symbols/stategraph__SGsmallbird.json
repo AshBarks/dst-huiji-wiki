@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsmallbird.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsmallbird",
+  "summary": "该状态图驱动饥荒联机版中的小鸟成长鸟实体。整体状态组织基于状态机，包括闲置、攻击、死亡、孵化、成长等多个状态，通过事件和时间线进行切换。",
+  "api": [],
+  "api_note": "该状态图没有定义公共 API 方法，状态切换完全通过事件和内部逻辑处理。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_blink",
+    "idle_peep",
+    "death",
+    "hatch",
+    "growup",
+    "taunt",
+    "attack",
+    "hit",
+    "eat"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "小鸟闲置状态，随机播放眨眼或鸣叫动画，可能呼唤新领袖。进入条件：无其他动作时。"
+    },
+    {
+      "state": "attack",
+      "note": "小鸟攻击状态，停止移动并发起攻击，伤害在12帧后造成。进入条件：收到'doattack'事件且未忙碌。"
+    },
+    {
+      "state": "death",
+      "note": "小鸟死亡状态，播放死亡动画并掉落战利品。进入条件：生命值降至0。"
+    },
+    {
+      "state": "hatch",
+      "note": "小鸟孵化状态，从蛋中孵化，播放孵化动画和音效。进入条件：蛋孵化时触发。"
+    },
+    {
+      "state": "growup",
+      "note": "小鸟成长状态，播放成长动画，最终生成青少年鸟。进入条件：小鸟成长到一定阶段。"
+    },
+    {
+      "state": "hit",
+      "note": "小鸟被击中状态，播放受伤动画并硬直。进入条件：被攻击且未死亡时。"
+    },
+    {
+      "state": "eat",
+      "note": "小鸟进食状态，播放吃东西动画，执行缓冲动作。进入条件：执行进食动作时。"
+    },
+    {
+      "state": "taunt",
+      "note": "小鸟嘲讽状态，播放叫唤动画，可能吸引注意。进入条件：战斗目标存在时。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      18057,
+      13437,
+      15022,
+      16419,
+      15386,
+      15539,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "孵化来源描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "自[[高脚鸟蛋]]中孵化而来"
+          }
+        ]
+      },
+      {
+        "aspect": "成长时间描述",
+        "evidence": [
+          {
+            "pageid": 15386,
+            "quote": "10 天后小鸟将会成长为小高"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小鸟",
+    "孵化",
+    "成长",
+    "攻击",
+    "死亡",
+    "伙伴",
+    "宠物",
+    "陪伴",
+    "状态图",
+    "DST"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e9d919d11e410b93e8d30d595a1a6fb16754e9e912f143ced73f45f06bde25a4",
+    "source_bytes": 9519,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141143992
+  }
+}

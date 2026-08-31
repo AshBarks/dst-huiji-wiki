@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "b56f19cf3826e46c48c1a4da7be9847147d7f32d1cef96f94e290d5d6f9c4714",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
@@ -14,12 +15,24 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
+      "components/stageactor.lua": "18f4784713c3d9bff3f4b1a31894031b285169aec46762035ae16b351fb779be",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/bloomer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -60,7 +73,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实"
+      }
     },
     "components/inventory.lua": {
       "aspects_ignored": [
@@ -94,6 +110,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/stageactor.lua": {
+      "aspects_ignored": [
+        "剧本放置与剧目选择",
+        "表演中断描述",
+        "表演时嘲鸫出现",
+        "表演时间限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/talker.lua": {
       "aspects_ignored": [

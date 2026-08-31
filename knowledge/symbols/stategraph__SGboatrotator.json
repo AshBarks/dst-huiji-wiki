@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatrotator.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatrotator",
+  "summary": "该状态图驱动名为'boatrotator'的实体，可能是一个船上的旋转器装置。整体状态包括空闲、放置、被击中、开启和关闭，状态转换基于实体方向、事件触发（如被工作）和动画结束。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，所有行为通过状态图事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "worked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "place",
+    "hit",
+    "on",
+    "off"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，根据旋转方向播放对应的静止动画，无特殊机制。"
+    },
+    {
+      "state": "place",
+      "note": "放置状态，当实体被放置时进入，播放放置动画和音效。完成后根据旋转方向决定进入on或idle状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中状态，当实体被工作（如攻击）时进入，播放被击中动画和音效。结束后自动返回idle状态。"
+    },
+    {
+      "state": "on",
+      "note": "开启状态，当实体开启时进入，播放开启动画和音效。完成后返回idle状态。"
+    },
+    {
+      "state": "off",
+      "note": "关闭状态，当实体关闭时进入，播放关闭动画和音效，并重置旋转方向为0。完成后返回idle状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      65881,
+      34314,
+      46847,
+      15022,
+      16594,
+      14936,
+      18188,
+      14792
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 stategraph__SGboatrotator 相关的能力或行为描述。内容涉及其他游戏元素，如工厂、世界规则、巨兽和方向舵，但未提及船旋转器的状态图（如 idle、place、hit、on、off 状态）的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船旋转器",
+    "放置",
+    "被击中",
+    "开启",
+    "关闭",
+    "状态图",
+    "动画",
+    "音效",
+    "方向"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "装饰",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0c6f909b02fb490c059ce9380c5aaf8c248cc2b21d13c440c6607d3bc2ad66b7",
+    "source_bytes": 3062,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136205009
+  }
+}

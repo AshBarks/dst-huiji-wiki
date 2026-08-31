@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwagdrone_flying.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwagdrone_flying",
+  "summary": "该状态图驱动实体为wagdrone_flying，即一种飞行无人机单位。状态图整体以空闲状态为起点，通过事件响应在移动、攻击和开关状态间转换。状态组织包括空闲悬浮、地面关闭、飞行移动和攻击动作，支持玩家控制和交互。",
+  "api": [],
+  "api_note": "该状态图为内部状态机，没有定义对外公开的方法或函数。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "doattack",
+    "activate",
+    "deactivate",
+    "despawn"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "turnoff",
+    "off_idle",
+    "turnon",
+    "run_start",
+    "run",
+    "run_stop",
+    "attack"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "无人机正常悬浮状态，允许玩家控制移动和攻击，状态标签含canrotate，可响应移动事件。"
+    },
+    {
+      "state": "off_idle",
+      "note": "无人机关闭状态，停留在地面，可被玩家互动（如修理），但无法攻击或移动，状态标签含nointerrupt。"
+    },
+    {
+      "state": "turnoff",
+      "note": "从开启到关闭的过渡动画，期间状态忙碌，无法进行其他行动，触发后无人机降落。"
+    },
+    {
+      "state": "turnon",
+      "note": "从关闭到开启的过渡动画，期间状态忙碌，完成后进入悬浮状态，触发悬浮高度变化。"
+    },
+    {
+      "state": "run",
+      "note": "无人机飞行移动状态，持续动画和音效，响应移动事件，悬浮高度有波动，状态标签含moving和running。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，执行攻击动作序列，包括充能、发射和恢复阶段，状态标签含busy，期间无敌或硬直，攻击后返回空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      51046,
+      15022,
+      13897,
+      13828,
+      15651,
+      15551,
+      15922,
+      13823
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与无人机（wagdrone）状态或行为相关的描述；仅页面 51046 提及'骇入无人机'，但未涉及其 idle、off_idle、turnoff、turnon、run、attack 等能力细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "wagdrone",
+    "无人机",
+    "飞行状态",
+    "攻击",
+    "开关",
+    "idle",
+    "run",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "飞行",
+    "机械"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "23637ff1c19f0c15663ae9e49876eabf9f06c89f74dd38d6e17fed71f432c96f",
+    "source_bytes": 18881,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142080359
+  }
+}

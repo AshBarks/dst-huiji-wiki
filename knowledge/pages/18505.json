@@ -6,7 +6,8 @@
     "wikitext_sha256": "0a7c5768981abd08ed9a9effd66420f872e5d0f16d0e6708077e5ffda077fa7a",
     "symbol_doc_shas": {
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d"
     }
   },
   "symbols": {
@@ -24,6 +25,15 @@
         "图鉴条目检查状态标注",
         "打蜡后显示名称前缀",
         "检查后显示详细特性"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/prototyper.lua": {
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
       ],
       "route": "direct",
       "detail_level": "stub"

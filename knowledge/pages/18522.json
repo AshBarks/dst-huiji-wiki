@@ -20,7 +20,9 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/thief.lua": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGprimemate.lua": "f86b59856dfa580c56e11e504934c127090793f02f671b42c557d37b90365f45"
     }
   },
   "symbols": {
@@ -190,6 +192,14 @@
         "note": "海盗相关，疑似sharkboi/prime_mate，无说话"
       }
     },
+    "components/thief.lua": {
+      "aspects_ignored": [
+        "偷窃物品行为描述",
+        "防护偷窃能力描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "aspects_ignored": [
         "生成倒计时启动描述",
@@ -203,6 +213,10 @@
       "llm_verdict": {
         "note": "页面提及海盗袭击与诅咒饰品，未提及计时机制"
       }
+    },
+    "stategraphs/SGprimemate.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

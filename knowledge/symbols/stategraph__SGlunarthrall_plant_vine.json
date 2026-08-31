@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlunarthrall_plant_vine.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlunarthrall_plant_vine",
+  "summary": "该状态图驱动饥荒联机版中的月球荆棘植物藤蔓实体（lunarthrall_plant_vine）。状态组织以初始隐藏状态（nub_idle）为基准，通过事件触发转换为出现、攻击、受伤、死亡等状态。整体处理藤蔓的移动、攻击行为、生命周期管理及冻结同步等游戏逻辑。",
+  "api": [],
+  "api_note": "状态图本身不定义对外方法，而是通过事件处理器和状态转换处理游戏逻辑，外部通过触发事件（如doattack、moveforward）交互。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "death",
+    "moveback",
+    "moveforward",
+    "emerge",
+    "animover",
+    "electrocute"
+  ],
+  "netvars": [],
+  "tunables": [
+    "LUNARTHRALL_PLANT_MOVEDIST",
+    "LUNARTHRALL_PLANT_ATTACK_PERIOD",
+    "LUNARTHRALL_PLANT_VINE_ATTACK_RANGE"
+  ],
+  "states": [
+    "idle",
+    "emerge",
+    "retract",
+    "attack",
+    "hit",
+    "death",
+    "nub_spawn",
+    "nub_idle",
+    "nub_reverse",
+    "nub_forward",
+    "nub_retract",
+    "sync_frozen",
+    "sync_thaw"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当藤蔓处于出现状态（emerged）且收到攻击指令时进入；播放攻击动画，启动攻击冷却计时器，对范围内目标造成伤害。"
+    },
+    {
+      "state": "hit",
+      "note": "当藤蔓被攻击时进入；播放受伤动画，根据藤蔓类型（如弱藤蔓）可能返回隐藏或出现状态。"
+    },
+    {
+      "state": "death",
+      "note": "当藤蔓生命值为零时进入；播放死亡动画，通知父植物藤蔓被杀死，可能触发间接伤害动画。"
+    },
+    {
+      "state": "emerge",
+      "note": "当藤蔓从隐藏中出现时进入；播放出现动画，击退周围物品，并在动画中段可被中断。"
+    },
+    {
+      "state": "retract",
+      "note": "当藤蔓收回时进入；播放收回动画，熄灭燃烧状态，根据情况传送回前一位置或生成新段。"
+    },
+    {
+      "state": "nub_spawn",
+      "note": "当藤蔓向前移动时生成新段；播放生成动画，可能设置为弱藤蔓状态，触发尾巴移动和击退效果。"
+    },
+    {
+      "state": "nub_retract",
+      "note": "当藤蔓收回时；播放收回动画，触发尾巴反向移动或传送回原位置，有声音效果。"
+    },
+    {
+      "state": "sync_frozen",
+      "note": "当藤蔓被冻结时进入；同步冻结状态到所有尾巴，播放冻结动画，取消尾巴移动任务。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      13409,
+      13897,
+      15651,
+      51046,
+      15225,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及 `stategraph__SGlunarthrall_plant_vine` 或其相关能力，页面内容涉及其他实体（如天体英雄、蜂王等），与藤蔓无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月球荆棘",
+    "藤蔓",
+    "攻击",
+    "冻结",
+    "收回",
+    "死亡",
+    "出现",
+    "移动",
+    "战斗",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0223dc1e543c84d540e0560b3dee3f8bc7dad791d07c055d9b976ea6ea4e2949",
+    "source_bytes": 18883,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134680343
+  }
+}

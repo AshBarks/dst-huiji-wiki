@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGglommer.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGglommer",
+  "summary": "该状态图驱动饥荒联机版中的实体'glommer'（咯姆）。状态组织基于常见行为如闲置、移动、战斗和状态效果，通过事件和时间线进行状态转换。整体结构包括显式定义的状态和通过CommonStates添加的标准状态。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，所有功能通过事件和状态转换内部处理。",
+  "events_published": [],
+  "events_listened": [
+    "animover",
+    "onthaw",
+    "unfreeze"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "goo",
+    "bored",
+    "frozen",
+    "thaw",
+    "flyaway"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "闲置状态，实体停止移动，播放idle_loop动画，有25%概率播放闲置声音。当动画结束时，有5%概率进入'bored'状态，否则返回idle。"
+    },
+    {
+      "state": "goo",
+      "note": "吐出燃料状态，进入时隐藏燃料实体，播放place动画，30帧后显示燃料。用于咯姆生产月光糖。"
+    },
+    {
+      "state": "bored",
+      "note": "无聊状态，播放弹跳动画，期间多次落地和升起，有声音效果。动画结束后返回idle。"
+    },
+    {
+      "state": "frozen",
+      "note": "冻结状态，实体被冰冻，停止移动，播放frozen动画并覆盖冰冻效果。停止扇动翅膀，等待解冻事件。"
+    },
+    {
+      "state": "thaw",
+      "note": "解冻状态，播放解冻动画，覆盖冰冻效果，播放解冻声音。解冻完成后根据是否有hit状态进入hit或idle。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞走状态，当咯姆执行回家动作时触发。播放行走动画，设置飞行速度，一段时间后移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20511,
+      13897,
+      15651,
+      15022,
+      51046,
+      15922,
+      15225,
+      15551
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及咯姆（Glommer）或其相关能力，所有页面讨论其他游戏机制或实体（如冰冻机制、克劳斯、龙蝇等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "咯姆",
+    "飞行",
+    "冰冻",
+    "解冻",
+    "攻击",
+    "死亡",
+    "状态",
+    "声音",
+    "动画",
+    "燃料"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "生物",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "29b709a53de9b1fa0df1b10241e59520a4426151698727d6f297384210af925e",
+    "source_bytes": 7827,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137982108
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatmagnetbeacon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatmagnetbeacon",
+  "summary": "这个状态图驱动饥荒联机版中的'船磁铁信标'实体，管理其开关、激活、停用和受击等状态。状态组织基于事件触发，初始状态为'idle'，通过'onturnon'事件进入激活流程，并包含放置、受击等过渡状态。",
+  "api": [],
+  "api_note": "该状态图不定义对外方法，所有状态转换由内部事件处理（如onturnon）和动画事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "onturnon"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "place",
+    "hit",
+    "activate",
+    "active",
+    "deactivate"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "信标处于空闲状态，播放闲置动画。被击中时播放受击动画并返回空闲，表示信标未激活时的基本状态。"
+    },
+    {
+      "state": "place",
+      "note": "信标放置时播放放置动画，动画结束后自动返回空闲状态，仅用于放置瞬间的表现。"
+    },
+    {
+      "state": "hit",
+      "note": "信标受击状态，根据信标是否关闭播放不同动画（hit_inactive或hit_active），动画结束后返回空闲。"
+    },
+    {
+      "state": "activate",
+      "note": "信标激活前状态，播放准备动画。激活过程中被击中，若动画帧数小于7则被打断并重置，否则继续激活。"
+    },
+    {
+      "state": "active",
+      "note": "信标激活中状态，播放循环动画，被击中时播放受击动画并继续循环，表示信标持续运行时的行为。"
+    },
+    {
+      "state": "deactivate",
+      "note": "信标停用过程，播放结束动画。停用过程中被击中，若动画帧数小于9则受影响，否则继续停用；动画结束后返回空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      18001,
+      20719,
+      14816,
+      14929,
+      14935,
+      18843
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及'boat magnet beacon'或类似信标实体，所有页面内容围绕电路板、角色、传送焦点、熔炉生物和投石机等其他游戏实体展开，无相关能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "船磁铁信标",
+    "信标",
+    "激活",
+    "停用",
+    "受击",
+    "空闲",
+    "放置",
+    "动画",
+    "状态图",
+    "磁铁"
+  ],
+  "gameplay_tags": [
+    "设备",
+    "开关",
+    "导航"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e346830a2bfba2b514e151af73d1eaedba887501d0e32823317f91db182ea838",
+    "source_bytes": 3687,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136134794
+  }
+}

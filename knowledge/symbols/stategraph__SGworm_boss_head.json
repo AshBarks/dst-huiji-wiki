@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGworm_boss_head.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGworm_boss_head",
+  "summary": "该状态图驱动饥荒联机版中的蠕虫Boss头部实体。它通过事件驱动的状态机管理头部的出现、进食、嘲讽、受击和死亡等行为。状态转换由事件（如死亡、受击）和动画完成事件触发，与主蠕虫实体的开发物状态和移动逻辑同步。",
+  "api": [],
+  "api_note": "源码中未定义对外方法，所有函数（如IsDevouring、DoChew）均为状态图内部使用，无公开API。",
+  "events_published": [
+    "death_ended"
+  ],
+  "events_listened": [
+    "death",
+    "death_ended",
+    "deathunderground",
+    "attacked",
+    "sync_electrocute",
+    "worm_boss_move",
+    "taunt"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "emerge_taunt",
+    "emerge",
+    "eat",
+    "spit",
+    "swallow",
+    "taunt",
+    "idle",
+    "move",
+    "hit",
+    "sync_electrocute",
+    "death",
+    "death_loop",
+    "death_ended",
+    "death_underground"
+  ],
+  "state_notes": [
+    {
+      "state": "emerge",
+      "note": "头部从地下出现，根据是否有食物播放不同动画（空腹或饱食），出现后可被电磁攻击。"
+    },
+    {
+      "state": "eat",
+      "note": "咀嚼阶段，对开发物（如玩家）持续造成伤害，咀嚼过程可被电磁攻击打断并触发后续行为。"
+    },
+    {
+      "state": "spit",
+      "note": "吐出阶段，将所有吞噬的物品吐出，吐出动画完成后可被电磁攻击。"
+    },
+    {
+      "state": "swallow",
+      "note": "吞咽阶段，触发消化过程并同步主蠕虫状态，吞咽动画期间对开发物造成伤害。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽阶段，播放嘲讽动画并恢复主蠕虫状态，通常用于吸引或挑衅玩家。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲阶段，循环播放待机动画，等待事件触发状态转换。"
+    },
+    {
+      "state": "move",
+      "note": "移动阶段，头部移除并更新主蠕虫移动状态，期间免疫电磁攻击。"
+    },
+    {
+      "state": "hit",
+      "note": "受击阶段，播放受击动画并累加硬直计数，连续受击3次后解除忙碌状态。"
+    },
+    {
+      "state": "sync_electrocute",
+      "note": "电击阶段，播放电击动画并持续一定时间，期间计数硬直并可被后续攻击打断。"
+    },
+    {
+      "state": "death",
+      "note": "死亡开始阶段，触发死亡动画并吐出所有开发物，后续进入死亡循环或结束。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      70763,
+      15022,
+      14907,
+      15651,
+      16419,
+      13606,
+      14929
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及 stategraph__SGworm_boss_head 或与其直接相关的实体、行为描述；页面内容涉及熔炉模式装备、触电机制、天体英雄、地狱独眼巨猪、龙蝇、电路板、帝王蟹、坦克龟等其他游戏元素，无证据显示讨论该符号的能力。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蠕虫Boss",
+    "头部状态",
+    "出现",
+    "进食",
+    "嘲讽",
+    "死亡",
+    "电击",
+    "硬直",
+    "移动",
+    "吞咽"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ddc9722d46afa713805d5ac6bdf0af2339dd17ef0edcdda7326eff5ad87d1b90",
+    "source_bytes": 16511,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143212505
+  }
+}

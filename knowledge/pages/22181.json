@@ -7,8 +7,11 @@
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/rechargeable.lua": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+      "components/soul.lua": "118f992db9f475295773e46bd3e0db3897caf21fdf6b9cb3cdfb104a37de7e17",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/waterproofer.lua": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46"
     }
   },
   "symbols": {
@@ -33,6 +36,65 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/rechargeable.lua": {
+      "aspects_ignored": [
+        "充电操作描述",
+        "充电状态效果",
+        "充能武器机制",
+        "冷却时间描述",
+        "冷却缩减效果",
+        "技能冷却状态"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/soul.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "灵魂吸引与消失时限",
+          "evidence": [
+            {
+              "pageid": 22181,
+              "quote": "若灵魂生成后 10 秒没有受到吸引，就会自行消失；若灵魂受到吸引流动 6 秒后依然没有接触到沃拓克斯，也会消失。"
+            }
+          ]
+        },
+        {
+          "aspect": "灵魂生成条件",
+          "evidence": [
+            {
+              "pageid": 22181,
+              "quote": "当有实体在[[沃拓克斯]]周围 20 {{解释|距离单位}}范围内死亡或在物品栏内被谋杀时，就会额外生成[[灵魂]]。"
+            }
+          ]
+        },
+        {
+          "aspect": "灵魂释放治疗玩家",
+          "evidence": [
+            {
+              "pageid": 22181,
+              "quote": "沃拓克斯可以释放灵魂治疗 8 单位内的玩家（[[旺达]]除外）并为范围内的所有沃拓克斯恢复 2.5 {{理智值}}。"
+            }
+          ]
+        },
+        {
+          "aspect": "灵魂食用恢复饥饿扣除理智",
+          "evidence": [
+            {
+              "pageid": 22181,
+              "quote": "[[沃拓克斯]]可以食用灵魂，回复 25 {{饥饿值}}，默认扣除 5 {{理智值}}。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "灵魂罐存储灵魂",
+        "灵魂罐技能要求"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -48,7 +110,15 @@
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub"
+    },
+    "components/waterproofer.lua": {
+      "aspects_ignored": [
+        "防水效果对潮湿速率的影响"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

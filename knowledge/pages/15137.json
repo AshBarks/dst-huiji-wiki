@@ -5,14 +5,20 @@
   "inputs": {
     "wikitext_sha256": "41c7ece7919779a7a310db4cab549b7084054cd9877a80cd61e56c5978e92514",
     "symbol_doc_shas": {
+      "components/ghostgestalter.lua": "7a412d168543ec69f793e231364928462982c38a723ec63648da4e6d368cb96e",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGmoondial.lua": "0f31950be871024e344fc693993cd6d3993009dd3c25f2b50c00d00354508b5d"
     }
   },
   "symbols": {
+    "components/ghostgestalter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -57,7 +63,23 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmoondial.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "月相查看功能描述",
+          "evidence": [
+            {
+              "pageid": 15137,
+              "quote": "它的功能是查看[[月相]]，当前日期的月相会通过月晷内的水反射出来。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

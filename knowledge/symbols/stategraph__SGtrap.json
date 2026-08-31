@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtrap.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtrap",
+  "summary": "该状态图驱动饥荒联机版中的陷阱实体，如兔子陷阱。状态组织基于事件驱动，包括待机、装满、空闲和触发状态，通过捕获、收获等事件进行转换。",
+  "api": [],
+  "api_note": "该状态图不提供外部API方法，仅处理陷阱的内部状态逻辑和事件响应。",
+  "events_published": [],
+  "events_listened": [
+    "ondropped",
+    "springtrap",
+    "harvesttrap",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "full",
+    "empty",
+    "sprung"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "陷阱处于待机状态，播放闲置动画，等待玩家放置或触发事件。"
+    },
+    {
+      "state": "full",
+      "note": "陷阱捕获猎物后进入，循环播放满状态动画和音效，表示有战利品，玩家可收获。"
+    },
+    {
+      "state": "empty",
+      "note": "陷阱触发但未捕获猎物，播放侧边动画，玩家可重置陷阱。"
+    },
+    {
+      "state": "sprung",
+      "note": "陷阱被触发时的过渡状态，播放触发前动画，短暂不可拾取，随后根据是否有战利品转到full或empty。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14674,
+      65605,
+      24542,
+      15022,
+      34557,
+      51046,
+      14676,
+      15337
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未发现与 stategraph__SGtrap 状态（idle, full, empty, sprung）相关的任何玩家语言表达，如动画、音效、状态切换或行为描述。页面主要介绍陷阱的基本功能、捕捉对象或关联实体，但未涉及具体状态语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "陷阱",
+    "兔子陷阱",
+    "捕猎",
+    "触发",
+    "收获",
+    "战利品",
+    "闲置",
+    "装满",
+    "空"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "捕猎"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "04a2abbe9b8489a770ace438c2ef5a5e66cb2a0e9dcd8d1585b8f11d1f73fcb7",
+    "source_bytes": 2287,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135005571
+  }
+}

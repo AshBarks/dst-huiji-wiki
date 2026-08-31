@@ -5,6 +5,8 @@
   "inputs": {
     "wikitext_sha256": "7901b69287964a67b1dde5665a0a2a04e99606452498a6fca16f85028da6a4ee",
     "symbol_doc_shas": {
+      "components/constructionsite.lua": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
+      "components/hudindicatable.lua": "a410d2f8ad63f114ce153f1044622baa15f0f1a0c739f6830a4e1a19041afc01",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
@@ -14,6 +16,17 @@
     }
   },
   "symbols": {
+    "components/constructionsite.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hudindicatable.lua": {
+      "aspects_ignored": [
+        "HUD位置箭头指示"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -21,7 +34,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/locomotor.lua": {
       "aspects_ignored": [
@@ -63,7 +79,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "stategraphs/SGwagstaff_npc.lua": {
       "route": "direct",

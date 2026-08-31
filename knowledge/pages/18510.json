@@ -7,10 +7,12 @@
     "symbol_doc_shas": {
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGmonkeyqueen.lua": "69a53a171efc01ed2fc43be7d71e3da8ff29584a6f4f2645f4d22bd3b46e41e6"
     }
   },
   "symbols": {
@@ -41,6 +43,10 @@
         "semantic_consistent": true
       }
     },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -68,6 +74,7 @@
       }
     },
     "components/trader.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "交易接受条件描述",
         "夜间交易功能禁用描述",
@@ -75,13 +82,46 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "每次交易能够减少",
+        "semantic_consistent": true,
+        "note": "页面明确提及“交易”并描述其效果，与 trader 组件功能直接相关。"
+      }
     },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmonkeyqueen.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "女王的睡眠状态描述",
+          "evidence": [
+            {
+              "pageid": 18510,
+              "quote": "女王一般在吊床上睡觉，在玩家或带着[[香蕉]]的[[火药猴]]靠近她时醒来。"
+            }
+          ]
+        },
+        {
+          "aspect": "玩家给予香蕉时的交易行为",
+          "evidence": [
+            {
+              "pageid": 18510,
+              "quote": "在玩家的物品栏中有[[诅咒饰品]]时，每次交易能够减少 4 个诅咒饰品，并且赋予 4 分钟（即游戏中的半天时间）的通行权。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "去除诅咒的描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

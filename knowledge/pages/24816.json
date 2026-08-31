@@ -6,6 +6,7 @@
     "wikitext_sha256": "47c2560b8fa19d8516b3e668ff69549535e7eb2937e4139280faed71be41d39e",
     "symbol_doc_shas": {
       "components/bait.lua": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
+      "components/boatpatch.lua": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/edible.lua": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -15,12 +16,20 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/repairer.lua": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
   },
   "symbols": {
     "components/bait.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatpatch.lua": {
+      "aspects_ignored": [
+        "补丁类型列举"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -105,6 +114,17 @@
       "llm_verdict": {}
     },
     "components/propagator.lua": {
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/repairer.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复机制",
+        "支柱修复耐久描述",
+        "漏洞修复方法描述",
+        "物品修复功能描述"
+      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

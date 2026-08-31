@@ -13,6 +13,7 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/minigame.lua": "32af91555b92937fd240a4ece3477286f0fdf6fe681b90ce1efa91c9d683eedf",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a"
     }
@@ -39,7 +40,8 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/entitytracker.lua": {
       "aspects_ignored": [
@@ -47,7 +49,10 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -73,7 +78,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -85,6 +93,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/minigame.lua": {
+      "aspects_ignored": [
+        "小游戏自动完成技能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/placer.lua": {
       "route": "direct",

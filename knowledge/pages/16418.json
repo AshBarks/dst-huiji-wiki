@@ -9,6 +9,7 @@
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -56,6 +57,17 @@
         "wording": "infobox掉落:月亮碎片×3,石头×2,月光龙虾×2等",
         "semantic_consistent": true
       }
+    },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

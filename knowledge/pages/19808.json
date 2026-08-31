@@ -5,20 +5,32 @@
   "inputs": {
     "wikitext_sha256": "6574b296bd6755db47b025061d578603e7ea36ae087492b66c18f898fd1abc6d",
     "symbol_doc_shas": {
+      "components/acidlevel.lua": "b55675ac0d6da72b4728d18a02739cdce1d0d8da3298791e48de0dfb2d51def8",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/fishable.lua": "7ce90f3d6ce52b38bdf46fa6ff0af663f28bee3ea9b1837d8d133f2d5315b5e1",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/slipperyfeettarget.lua": "5bc04010576e230eaef1a41e9b78fd638f698be7ede8acf15453f0e4e5e7fb6d",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/acidlevel.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/childspawner.lua": {
       "aspects_ignored": [
         "子实体被杀死触发治疗描述",
         "生成子实体行为描述",
         "离开加载范围子实体消失描述"
       ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fishable.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -57,6 +69,17 @@
         "wording": "破坏掉落 2 ~ 4 个[[硝石]]",
         "semantic_consistent": true
       }
+    },
+    "components/slipperyfeettarget.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

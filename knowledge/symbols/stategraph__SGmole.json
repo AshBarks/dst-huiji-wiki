@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmole.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmole",
+  "summary": "该状态图驱动饥荒联机版中的鼹鼠实体，管理其地面与地下的行为切换。状态基于事件驱动，包括探头、偷取诱饵、移动、受伤、死亡等核心状态，并集成了通用状态如睡眠、冻结和电击。",
+  "api": [],
+  "api_note": "该状态图未定义对外API，所有行为通过事件和状态内部处理。",
+  "events_published": [],
+  "events_listened": [
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "trapped",
+    "locomote",
+    "stunbomb",
+    "corpse_chomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "enter",
+    "peek",
+    "steal_pre_under",
+    "steal_pre_above",
+    "steal",
+    "exit",
+    "idle",
+    "walk_pre",
+    "walk",
+    "walk_pst",
+    "gohome",
+    "make_molehill",
+    "death",
+    "fall",
+    "stunned",
+    "stunned_pst",
+    "hit",
+    "sleep",
+    "sleeping",
+    "wake"
+  ],
+  "state_notes": [
+    {
+      "state": "peek",
+      "note": "鼹鼠定期从地面探头观察，间隔约20±5秒，表现为短暂钻出地面。"
+    },
+    {
+      "state": "steal",
+      "note": "鼹鼠偷取诱饵时，执行拾取动作并播放音效，是偷取过程的核心状态。"
+    },
+    {
+      "state": "hit",
+      "note": "鼹鼠受普通攻击时，播放受击动画并短暂硬直。"
+    },
+    {
+      "state": "death",
+      "note": "鼹鼠死亡时，播放死亡动画，掉落物品和战利品。"
+    },
+    {
+      "state": "stunned",
+      "note": "鼹鼠被锤子击中或眩晕炸弹击中时，进入眩晕状态，可被玩家拾起，持续约6±2秒。"
+    },
+    {
+      "state": "idle",
+      "note": "鼹鼠空闲状态，在地面时播放嗅探动画，在地下时静止不动。"
+    },
+    {
+      "state": "walk",
+      "note": "鼹鼠在地下移动，播放移动动画和粒子效果。"
+    },
+    {
+      "state": "exit",
+      "note": "鼹鼠从地面返回地下，播放退出动画。"
+    },
+    {
+      "state": "gohome",
+      "note": "鼹鼠执行回家动作，返回巢穴。"
+    },
+    {
+      "state": "make_molehill",
+      "note": "鼹鼠制作鼹鼠丘，从地下钻出并完成动作。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15715,
+      34557,
+      16419,
+      52788,
+      13847,
+      34314,
+      10374,
+      16615
+    ],
+    "aspects": [
+      {
+        "aspect": "制作鼹鼠丘行为",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "挖掘一个新的巢穴"
+          }
+        ]
+      },
+      {
+        "aspect": "地下移动方式",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "在地下移动的方式与洞穴蠕虫相似"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落物品",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "掉落 = {{Pic|32|小肉}}×1"
+          }
+        ]
+      },
+      {
+        "aspect": "返回巢穴行为",
+        "evidence": [
+          {
+            "pageid": 15715,
+            "quote": "白天则会返回其鼹鼠丘中"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鼹鼠",
+    "偷诱饵",
+    "钻地",
+    "地洞",
+    "死亡",
+    "眩晕",
+    "锤子",
+    "拾取",
+    "生物",
+    "移动"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3a1ddd6a063cf71bdf5831d1108291f6cc199bde1d81ddfcb1990cf024b9806e",
+    "source_bytes": 20356,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139196577
+  }
+}

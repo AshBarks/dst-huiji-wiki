@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbat",
+  "summary": "该状态图 (SGbat) 驱动蝙蝠 (Bat) 实体，一种会飞行的敌对生物。状态组织以 `idle` (待机飞行) 为核心，围绕飞行、进食 (包括特殊啃食硝石行为)、战斗、死亡等行为展开，并通过 `CommonStates` 系列函数扩展了行走 (飞行)、睡眠、战斗、冻结、触电等通用状态。",
+  "api": [],
+  "api_note": "状态图 (StateGraph) 本身不暴露 API 方法。其行为由注册的事件 (events)、标签 (tags) 和内部状态转换逻辑定义。",
+  "events_published": [],
+  "events_listened": [
+    "fly_back"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "flyaway",
+    "flyback",
+    "taunt",
+    "eat_enter",
+    "eat_loop",
+    "chew_ground",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "sleep_start",
+    "sleeping",
+    "sleep_stop",
+    "attack",
+    "attacked",
+    "death",
+    "frozen",
+    "electrocute"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "蝙蝠的待机状态，持续播放 `fly_loop` 飞行动画并伴有振翅音效。这是大多数状态的终点和起点。"
+    },
+    {
+      "state": "flyaway",
+      "note": "蝙蝠的飞离状态，触发条件如回家到陷坑。进入后无敌、隐藏阴影，并以约 10 的垂直速度向上飞行，最终消失。"
+    },
+    {
+      "state": "flyback",
+      "note": "蝙蝠的飞回状态，由 `fly_back` 事件触发 (如陷坑召唤)。进入后无敌，从高空 (y=15) 以约 10 的速度垂直降落，落地后恢复状态。"
+    },
+    {
+      "state": "chew_ground",
+      "note": "蝙蝠啃食硝石的特殊进食状态。播放较长的咀嚼动画序列 (`chew_pre`、多次 `chew_loop`、`chew_pst`)，期间会掉落并咀嚼食物。"
+    },
+    {
+      "state": "eat_enter",
+      "note": "蝙蝠拾取并开始进食食物的初始状态。播放 `eat` 动画，并在特定帧执行拾取动作 (带音效)。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "蝙蝠的咀嚼循环状态。持续播放 `eat_loop` 动画，持续约 1-3 秒后执行进食动作。若在此状态被打，会掉落食物。"
+    },
+    {
+      "state": "taunt",
+      "note": "蝙蝠的挑衅状态，播放 `taunt` 动画和声音。可能是吸引玩家或其它生物的行为表现。"
+    },
+    {
+      "state": "attack",
+      "note": "蝙蝠的攻击状态，由 `CommonStates.AddCombatStates` 生成。在攻击动画第 11 帧执行一次伤害判定 (DoAttack)，并伴有啃咬音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      13828,
+      15566,
+      51046,
+      15651,
+      15922,
+      22418
+    ],
+    "aspects": [
+      {
+        "aspect": "啃食硝石行为",
+        "evidence": [
+          {
+            "pageid": 15566,
+            "quote": "蝙蝠抢夺后会取出 1 个硝石并被吃下"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "蝙蝠",
+    "飞行",
+    "洞穴怪物",
+    "攻击",
+    "掉落物",
+    "硝石",
+    "飞行状态",
+    "无敌",
+    "坠落",
+    "挑衅"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "飞行",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a85a68df3f2c01bc0e97212ec98f7721aa1351c6f11fd0f810a7b49509caec26",
+    "source_bytes": 13305,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135677485
+  }
+}

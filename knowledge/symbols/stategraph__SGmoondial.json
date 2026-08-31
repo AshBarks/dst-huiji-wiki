@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmoondial.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmoondial",
+  "summary": "该状态图（SGmoondial）驱动游戏内建筑‘月相盘’的状态机。其状态根据当前世界月相、是否处于远古遗迹（isalterawake）状态以及实体自身是否被玻璃覆盖（is_glassed）而动态变化。主要状态包括普通空闲、被攻击、放置以及与远古遗迹解锁相关的玻璃化状态循环。",
+  "api": [],
+  "api_note": "该状态图（StateGraph）本身不提供直接的对外API方法，其行为完全由内置的事件监听器（events）和状态逻辑驱动。",
+  "events_published": [],
+  "events_listened": [
+    "worked",
+    "onbuilt"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "next",
+    "hit",
+    "placed",
+    "glassed_pre",
+    "glassed_idle",
+    "glassed_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "月相盘的主要空闲状态。播放对应当前世界月相的动画。在满月时，会持续播放环境音效。是大多数状态结束后回归的状态。"
+    },
+    {
+      "state": "hit",
+      "note": "当月相盘被玩家或生物敲击（worked事件）时进入。播放受击动画。如果月相盘已被玻璃覆盖，则播放特定的“hit_glassed”动画。动画结束后回归空闲或玻璃化空闲状态。"
+    },
+    {
+      "state": "placed",
+      "note": "月相盘被建造（onbuilt事件）后首次出现的放置动画状态。播放放置动画及音效。动画结束后进入空闲或玻璃化准备状态。"
+    },
+    {
+      "state": "glassed_pre",
+      "note": "进入玻璃化状态的准备过渡状态。当世界未处于远古遗迹状态时（isalterawake为假），会立即跳过动画直接进入glassed_pst状态掉落月玻璃。否则播放进入玻璃化的过渡动画。"
+    },
+    {
+      "state": "glassed_idle",
+      "note": "月相盘处于被玻璃覆盖的空闲状态。在远古遗迹期间，会播放玻璃化的动画和特殊音效。若远古遗迹状态结束，则会跳转到glassed_pst状态以结束玻璃化。"
+    },
+    {
+      "state": "glassed_pst",
+      "note": "玻璃化状态结束的后摇状态。在播放结束动画约10帧后，会掉落一个‘月玻璃’物品，并将实体的玻璃化标记（is_glassed）重置为false。动画结束后回归普通idle状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      22522,
+      45249,
+      19825,
+      15137,
+      45248,
+      15022,
+      14467,
+      21620
+    ],
+    "aspects": [
+      {
+        "aspect": "月相查看功能描述",
+        "evidence": [
+          {
+            "pageid": 15137,
+            "quote": "它的功能是查看[[月相]]，当前日期的月相会通过月晷内的水反射出来。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月相盘",
+    "月相",
+    "玻璃",
+    "玻璃化",
+    "满月",
+    "月玻璃",
+    "远古遗迹",
+    "放置",
+    "敲击"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "信息"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0f31950be871024e344fc693993cd6d3993009dd3c25f2b50c00d00354508b5d",
+    "source_bytes": 4903,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139357281
+  }
+}

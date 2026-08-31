@@ -7,7 +7,10 @@
     "symbol_doc_shas": {
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/minigame.lua": "32af91555b92937fd240a4ece3477286f0fdf6fe681b90ce1efa91c9d683eedf",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGpigking.lua": "1c85e7f2c52ce5b0a4d89d697840329c153303d96cd415a288a4a07fec13e74d"
     }
   },
   "symbols": {
@@ -29,6 +32,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/minigame.lua": {
+      "aspects_ignored": [
+        "小游戏自动完成技能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/trader.lua": {
       "mention_source": "pass2_evidence",
@@ -58,6 +72,25 @@
       ],
       "route": "direct",
       "detail_level": "detailed"
+    },
+    "stategraphs/SGpigking.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "夜晚睡觉无法交易",
+          "evidence": [
+            {
+              "pageid": 18521,
+              "quote": "在夜晚它会睡觉而无法进行交易。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "摔跤比赛生成精英猪"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

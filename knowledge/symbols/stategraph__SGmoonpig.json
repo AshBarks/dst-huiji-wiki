@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmoonpig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmoonpig",
+  "summary": "该状态图驱动实体“月猪”（moonpig），是猪人的一种月球变体，常见于月球相关事件。整体状态组织以闲置为默认，通过事件触发战斗、移动、死亡、嚎叫和特殊工作（如攻击月基）等状态，支持基础行为如攻击硬直和无敌帧。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，只处理内部状态转换和事件响应。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "giveuptarget",
+    "newcombattarget",
+    "workmoonbase",
+    "OnStep",
+    "OnLocomote",
+    "OnSleep",
+    "OnFreeze",
+    "OnElectrocute",
+    "OnAttack",
+    "OnAttacked",
+    "OnIpecacPoop"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.GARGOYLE_REANIMATE_DELAY"
+  ],
+  "states": [
+    "death",
+    "howl",
+    "idle",
+    "attack",
+    "run_start",
+    "run",
+    "run_stop",
+    "hit",
+    "workmoonbase",
+    "reanimate"
+  ],
+  "state_notes": [
+    {
+      "state": "death",
+      "note": "月猪死亡时播放死亡动画，移除物理碰撞并掉落战利品。有复活延迟设置（TUNING.GARGOYLE_REANIMATE_DELAY），动画暂停后恢复。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态有前摇动画，在16帧时执行攻击，攻击后有30%概率嚎叫，否则返回闲置。涉及战斗目标丢失或切换。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态播放受击动画并停止移动，产生硬直效果，通过CommonHandlers.UpdateHitRecoveryDelay控制恢复延迟。"
+    },
+    {
+      "state": "workmoonbase",
+      "note": "特殊工作状态，用于攻击月基（moonbase），使用攻击动画，在16帧对月基造成工作效果并生成特效，完成后可能嚎叫。"
+    },
+    {
+      "state": "howl",
+      "note": "嚎叫状态播放嚎叫动画和音效，常在战斗目标丢失或攻击后触发，持续约20帧后返回闲置。"
+    },
+    {
+      "state": "idle",
+      "note": "闲置状态为默认状态，播放循环动画，允许实体旋转，是多数状态转换的终点。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态有起跑和循环动画，伴有脚步声，通过超时机制维持移动，停止时播放停止动画并返回闲置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      51046,
+      15225,
+      15551,
+      13556
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有提及月猪（SGmoonpig）或其能力描述，所有内容涉及其他实体如天体英雄、克劳斯、龙蝇等，与月猪无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "月猪",
+    "moonpig",
+    "嚎叫",
+    "攻击",
+    "奔跑",
+    "死亡",
+    "月基工作",
+    "受击",
+    "硬直",
+    "无敌帧"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "生存",
+    "月球事件"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "337e2cf3b308baa027495f0f85d03544beeeca09bdd023490429e30a3f935008",
+    "source_bytes": 8953,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139369752
+  }
+}

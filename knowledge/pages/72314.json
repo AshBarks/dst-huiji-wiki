@@ -5,17 +5,29 @@
   "inputs": {
     "wikitext_sha256": "ea7cfaf01f20f66560e97931c8bb7f3c8a780b7d6f3fff91921c3fcded2c66c5",
     "symbol_doc_shas": {
+      "components/batteryuser.lua": "92620bffb443f3f42b378f67a8b979b90156443cc9b4c99a811d17482ec5867f",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
-      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
+      "components/useableequippeditem.lua": "4044a9c503ac4aa9b508754d4fda0d8c536bd70866dd0eb49aa7d1d840d63d92",
+      "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+      "stategraphs/SGwx78_drone_zap.lua": "62d17389ed3e23b3cc592ff41cb147e30a6943e2ba4d7bc14f1a58ac371073e5"
     }
   },
   "symbols": {
+    "components/batteryuser.lua": {
+      "aspects_ignored": [
+        "充电恢复效果",
+        "充电机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "aspects_ignored": [
         "步行速度倍数获取描述",
@@ -73,10 +85,21 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/useableequippeditem.lua": {
+      "aspects_ignored": [
+        "使用物品行为的玩家语言描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",
@@ -92,6 +115,10 @@
         "wording": "电流会持续存在 0.6 秒，在此期间对进入",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGwx78_drone_zap.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

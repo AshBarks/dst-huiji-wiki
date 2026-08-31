@@ -5,13 +5,20 @@
   "inputs": {
     "wikitext_sha256": "0c7db107cc5cfad91f1adeba0688e89cee533440cf6da8b18b0a31945d35ff39",
     "symbol_doc_shas": {
+      "components/bottler.lua": "a3b1fd7227eff565d21a66715031c8b1af88a16ecc9cff08c5d99eb391a98569",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
-      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1"
+      "components/mapspotrevealer.lua": "fdf62552d5449c6db05289262c3b6e2cfc283b0b04d62c93391dc043c7e9b97f",
+      "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/waterproofer.lua": "ab05540e167d5d76d7b151d1c6868d4c9c3543bfca66f4b1271509af719dfc46"
     }
   },
   "symbols": {
+    "components/bottler.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/floater.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -37,6 +44,22 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/mapspotrevealer.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "地图位置揭露描述",
+          "evidence": [
+            {
+              "pageid": 20678,
+              "quote": "揭露[[隐士小岛]]的位置"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -50,7 +73,15 @@
       "llm_verdict": {
         "note": "空瓶子(messagebottleempty)相关，未提堆叠"
       }
+    },
+    "components/waterproofer.lua": {
+      "aspects_ignored": [
+        "防水效果对潮湿速率的影响"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

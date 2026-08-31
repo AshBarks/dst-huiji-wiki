@@ -6,6 +6,7 @@
     "wikitext_sha256": "ae113e22dd5f1aed39cf984b433d880380fca2b0ca3efbcda8f6c4ead6c12886",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/erasablepaper.lua": "7885026d9710fcc4ef9508bd84f6844b62fa462382ba0d8e705bbf265eb4d4a4",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -25,6 +26,13 @@
         "野火自发触发条件",
         "闷烧与熄灭机制",
         "防火与燃烧免疫标注"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/erasablepaper.lua": {
+      "aspects_ignored": [
+        "擦除物品动作描述"
       ],
       "route": "direct",
       "detail_level": "stub"

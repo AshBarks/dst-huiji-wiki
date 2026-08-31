@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmoose.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmoose",
+  "summary": "该状态图驱动名为'moose'的实体，对应饥荒联机版中的鸭子龙（Moose/Goose）。状态图以idle为初始状态，组织了驼鹿的移动、攻击、进食、产卵和飞行等行为，通过事件和状态标签进行状态切换。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，所有逻辑均通过内部函数和事件处理实现。",
+  "events_published": [
+    "ms_forceprecipitation",
+    "ms_sendlightningstrike"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "twitch",
+    "preen",
+    "hop",
+    "action",
+    "eat_loop",
+    "eat_pst",
+    "taunt",
+    "glide",
+    "flyaway",
+    "disarm",
+    "layegg2"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "驼鹿站立不动的初始状态，随机触发梳理或抽搐动画，超时后进入这些状态。"
+    },
+    {
+      "state": "hop",
+      "note": "驼鹿跳跃前进的移动状态，有着陆时的相机震动效果，超时后继续跳跃。"
+    },
+    {
+      "state": "glide",
+      "note": "驼鹿在空中滑翔的飞行状态，缓慢下降，用于初始出现或从空中降落，着陆后进入idle。"
+    },
+    {
+      "state": "flyaway",
+      "note": "驼鹿起飞飞走的状态，由玩家触发后离开地图，期间有翅膀拍打音效。"
+    },
+    {
+      "state": "disarm",
+      "note": "驼鹿的缴械攻击状态，击落玩家手中的物品，有10秒冷却时间，并伴随镜头震动。"
+    },
+    {
+      "state": "layegg2",
+      "note": "驼鹿产卵状态，产下鸭子龙蛋并引发闪电和降雨，蛋会在附近生成。"
+    },
+    {
+      "state": "action",
+      "note": "驼鹿执行拾取、收割等一般动作的状态，播放动画并执行缓冲动作。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "驼鹿持续进食的状态，播放进食动画，超时后结束进食。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      23187,
+      13897,
+      13828,
+      15594,
+      65881,
+      15386
+    ],
+    "aspects": [
+      {
+        "aspect": "产卵与降雨闪电效果",
+        "evidence": [
+          {
+            "pageid": 15594,
+            "quote": "麋鹿鹅下蛋前会强制降雨，下蛋时会在蛋的位置引一道闪电。"
+          }
+        ]
+      },
+      {
+        "aspect": "缴械攻击能力",
+        "evidence": [
+          {
+            "pageid": 15594,
+            "quote": "麋鹿鹅还拥有缴械技能，可以震飞玩家的手部装备。缴械冷却时间为10秒。"
+          }
+        ]
+      },
+      {
+        "aspect": "飞走离开巢穴状态",
+        "evidence": [
+          {
+            "pageid": 15594,
+            "quote": "麋鹿鹅在蛋孵化之后便会飞走，离开巢穴。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "驼鹿",
+    "鸭子龙",
+    "Moose",
+    "Boss",
+    "产卵",
+    "缴械",
+    "飞行",
+    "滑翔",
+    "攻击",
+    "蛋"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss",
+    "生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3224fb3e4b0cd828c7fe67af8a9c51252d9c5e37369f9d295e748f5dc77fd0c4",
+    "source_bytes": 14931,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139577517
+  }
+}

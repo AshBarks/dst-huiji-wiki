@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGotter.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGotter",
+  "summary": "状态图SGotter驱动饥荒联机版中的水獭(otter)实体。整体状态组织方式包括基础行为如空闲、移动、进食，以及通过CommonStates添加的通用状态如攻击、死亡、睡眠等，使用事件处理器响应移动、战斗、环境变化等交互。",
+  "api": [],
+  "api_note": "状态图SGotter没有定义对外API方法，状态管理通过内部事件和组件实现。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "sleep",
+    "wake",
+    "attack",
+    "attacked",
+    "death",
+    "hop",
+    "freeze",
+    "electrocute",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "eat",
+    "toss_fish",
+    "idle",
+    "run_pre",
+    "run_loop",
+    "run_pst",
+    "eat_pre",
+    "eat_fail",
+    "taunt",
+    "pickup",
+    "drop",
+    "gohome",
+    "steal",
+    "attack",
+    "death",
+    "sleep_pre",
+    "sleep_loop",
+    "sleep_pst",
+    "hop_pre",
+    "hop",
+    "hop_pst",
+    "frozen_pre",
+    "frozen_loop",
+    "frozen_pst",
+    "electrocute",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "eat",
+      "note": "水獭进食状态，玩家喂食食物时触发，播放吃动画并恢复饥饿值，期间不可移动。"
+    },
+    {
+      "state": "toss_fish",
+      "note": "水獭投掷鱼的特殊攻击，用于远程攻击目标，触发条件为玩家指令或AI行为，播放投掷动画。"
+    },
+    {
+      "state": "attack",
+      "note": "水獭近战攻击状态，对目标造成伤害，触发攻击动画和音效，攻击帧在第15帧造成伤害。"
+    },
+    {
+      "state": "death",
+      "note": "水獭死亡状态，生命值归零时触发，播放死亡动画并产生尸体，在水中死亡有特殊动画。"
+    },
+    {
+      "state": "idle",
+      "note": "水獭空闲状态，无行动时自动进入，播放待机动画，是多数行为的过渡状态。"
+    },
+    {
+      "state": "run_pre",
+      "note": "水獭奔跑准备状态，开始移动时触发，播放奔跑前动画，陆地有音效，水中无音效。"
+    },
+    {
+      "state": "sleep",
+      "note": "水獭睡眠状态，通过睡眠事件触发，播放睡眠动画，期间恢复生命和精神，被攻击会惊醒。"
+    },
+    {
+      "state": "hop",
+      "note": "水獭水陆跳跃状态，用于切换环境，跳跃时产生水花特效，陆地和水中表现不同。"
+    },
+    {
+      "state": "frozen",
+      "note": "水獭被冻结状态，被冰冻效果触发，无法行动，播放冻结动画，持续一段时间后解除。"
+    },
+    {
+      "state": "steal",
+      "note": "水獭偷窃状态，对玩家或容器执行偷窃动作，触发攻击动画并尝试偷取物品，失败时清除动作。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13897,
+      24589,
+      51046,
+      15551,
+      15922,
+      20511
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述其他实体的行为，如天体英雄、龙蝇、克劳斯等；唯一与水獭相关的页面24589仅涉及水獭掠夺者窝点的生成和结构，未提及水獭的具体行为能力（如进食、投掷鱼、攻击、死亡、空闲、奔跑准备、睡眠、跳跃、冻结或偷窃等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水獭",
+    "otter",
+    "吃",
+    "攻击",
+    "移动",
+    "死亡",
+    "睡眠",
+    "跳跃",
+    "冻结",
+    "偷窃"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗",
+    "生物",
+    "水陆两栖"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b0446c9c6ff13e84eb67390a1408fe3389d3322a35dc4756ef32e96af031ac22",
+    "source_bytes": 8022,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140011036
+  }
+}

@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "cceacde62061db004db64d5bc02a3a6df641002468a9d1d48ea4fffbae6e46ac",
     "symbol_doc_shas": {
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
@@ -13,6 +14,7 @@
       "components/embarker.lua": "79f253a01c0fec52a375f1ac6f10466dff3aa9bf6755ff686b28a530e0cd051c",
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/halloweenmoonmutable.lua": "bf53efa7e2c2e223ceb8439da228c2eeb3f786edcf9ae31d363ba7f3a85a28fd",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -23,11 +25,23 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "stategraphs/SGspider.lua": "0de56046bf0501f25e25e1eb7523b2a1accfbdd8fcc18feb4c9e7a838179bfdf"
     }
   },
   "symbols": {
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面片段较少，未提及酸雨相关状态。"
+      }
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -119,6 +133,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/halloweenmoonmutable.lua": {
+      "aspects_ignored": [
+        "月亮变异转化机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -225,6 +246,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -233,7 +258,11 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面为蜘蛛战斗属性，无交易功能描述。"
+      }
     },
     "stategraphs/SGspider.lua": {
       "route": "direct",

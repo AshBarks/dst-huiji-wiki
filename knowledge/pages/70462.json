@@ -8,7 +8,8 @@
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/moistureabsorbersource.lua": "07d60ae7681c4f4db10cf0d1d0d2347f15d229e1d09986dcb0163095d571e9d8"
     }
   },
   "symbols": {
@@ -43,7 +44,32 @@
       ],
       "route": "direct",
       "detail_level": "stub"
+    },
+    "components/moistureabsorbersource.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "干燥效果减少潮湿速率",
+          "evidence": [
+            {
+              "pageid": 70462,
+              "quote": "玩家潮湿速率 -0.5"
+            }
+          ]
+        },
+        {
+          "aspect": "干燥速率数值标注",
+          "evidence": [
+            {
+              "pageid": 70462,
+              "quote": "干燥速率为 0.75"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

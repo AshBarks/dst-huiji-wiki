@@ -17,6 +17,7 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/occupier.lua": "15fb5a85efc7d4244ea59ab1482785285abd8c38ddb44417ad6d24187ce32f2d",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
@@ -72,7 +73,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -159,6 +161,15 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "components/occupier.lua": {
+      "aspects_ignored": [
+        "独奏乐器雇佣随从设置所有权",
+        "附身底盘的跟随所有者",
+        "随从与领袖的基本关系"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [

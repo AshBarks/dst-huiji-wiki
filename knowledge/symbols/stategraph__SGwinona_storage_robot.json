@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwinona_storage_robot.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwinona_storage_robot",
+  "summary": "这个状态图驱动饥荒联机版中Winona的存储机器人实体，用于自动化物品存储和搬运。状态组织包括电源管理（开/关机）、空闲、移动（跑动）以及具体动作状态（拾取、存储），整体通过状态切换实现机器人的行为逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外方法，所有行为由状态内部事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "onfueldsectionchanged",
+    "sleepmode"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "poweron",
+    "poweroff",
+    "pickup",
+    "store"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当燃料充足且无睡眠需求时进入，机器人停止移动并播放空闲动画，切换到无面朝向以减少资源消耗，播放循环空闲音效。"
+    },
+    {
+      "state": "poweron",
+      "note": "作为初始状态或从关机状态激活时进入，播放开机动画并设置忙碌标签防止中断，动画结束后自动切换到空闲状态。"
+    },
+    {
+      "state": "poweroff",
+      "note": "当燃料耗尽或收到睡眠模式事件时进入，播放关机动画，动画完成后调用OnDeactivateRobot关闭机器人实体。"
+    },
+    {
+      "state": "pickup",
+      "note": "当机器人执行拾取动作时进入，播放拾取动画并短暂移动到目标位置，在第10帧执行实际拾取，完成后返回空闲。"
+    },
+    {
+      "state": "store",
+      "note": "当机器人执行存储动作时进入，播放存放动画，物理质量临时设为0以执行动作，之后恢复并关闭所有容器。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15737,
+      16637,
+      19097,
+      53270,
+      65533,
+      24842
+    ],
+    "aspects": [
+      {
+        "aspect": "自动拾取功能描述",
+        "evidence": [
+          {
+            "pageid": 53270,
+            "quote": "可以配合[[薇机人]]或[[瓦器人]]自动拾取掉落物。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "Winona机器人",
+    "存储机器人",
+    "自动拾取",
+    "物品存储",
+    "开关机",
+    "状态图",
+    "机器人行为",
+    "搬运物品",
+    "电源管理"
+  ],
+  "gameplay_tags": [
+    "建造",
+    "自动化",
+    "资源管理"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "033d75f49ce005755d53c90e2975528cace6eca308f3a3ea1fdf885c2a52ffab",
+    "source_bytes": 6005,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142706738
+  }
+}

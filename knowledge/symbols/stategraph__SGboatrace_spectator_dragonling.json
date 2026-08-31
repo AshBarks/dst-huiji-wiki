@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatrace_spectator_dragonling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatrace_spectator_dragonling",
+  "summary": "该状态图驱动一个龙虾（dragonling）实体，作为饥荒联机版船赛活动中的观众。状态组织包括空闲、行走基础状态以及自定义情感表达和飞行状态，用于表现观众的互动动画和场景转换。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，主要用于驱动实体内部状态动画和行为，不暴露公共接口。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "emote_checkpoint",
+    "emote_collision",
+    "fly_away_pre",
+    "fly_away",
+    "fly_in"
+  ],
+  "state_notes": [
+    {
+      "state": "emote_checkpoint",
+      "note": "当龙虾在检查点位置时触发，播放可爱动画并伴有眨眼和挥动音效，持续一段时间后自动返回空闲状态。"
+    },
+    {
+      "state": "emote_collision",
+      "note": "当龙虾发生碰撞时触发，播放苦恼动画和愤怒音效，表现不满情绪，动画结束后返回空闲。"
+    },
+    {
+      "state": "fly_away_pre",
+      "note": "飞走前的预备状态，播放火焰表情动画和特殊音效，作为飞走的前置动作，完成后进入飞走状态。"
+    },
+    {
+      "state": "fly_away",
+      "note": "飞走状态，龙虾以固定方向飞离场景，3.5秒后自动移除，期间标记为不可冻结或睡眠。"
+    },
+    {
+      "state": "fly_in",
+      "note": "飞入状态，龙虾从空中降落到地面，通过物理速度控制下落，落地后返回空闲状态，实现从高处进入场景的效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15985,
+      23927,
+      14816,
+      14935,
+      14929,
+      14936,
+      14811,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要描述了龙虾（Wobster）的通用游戏行为，如生成、活动时段和烹饪用途，但未涉及 stategraph__SGboatrace_spectator_dragonling 特定状态图中的动画或状态行为（如检查点动画、碰撞反应、飞行动作等），因此无法从页面中检索到相关能力的玩家语言表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "龙虾",
+    "观众",
+    "船赛",
+    "情感表达",
+    "飞走",
+    "飞入",
+    "动画",
+    "音效",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4e58efea9bedaecb4d3892c6d7c09592c86851d81defb26f9631331483d4ed86",
+    "source_bytes": 4466,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136149364
+  }
+}

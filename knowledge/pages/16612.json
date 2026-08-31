@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "230d047ae7bf82a1820de77daf675fd9e2c0b719b10256263f6839a3dbe63d81",
     "symbol_doc_shas": {
+      "components/boatpatch.lua": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
@@ -12,10 +13,18 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/repairer.lua": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1"
     }
   },
   "symbols": {
+    "components/boatpatch.lua": {
+      "aspects_ignored": [
+        "补丁类型列举"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -73,6 +82,17 @@
       "llm_verdict": {}
     },
     "components/propagator.lua": {
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/repairer.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复机制",
+        "支柱修复耐久描述",
+        "漏洞修复方法描述",
+        "物品修复功能描述"
+      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

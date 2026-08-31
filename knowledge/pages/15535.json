@@ -11,6 +11,7 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/spawner.lua": "3bd56cdc82534bcdd6e044a66fc32daddcb947fd96cd6a72c0f49e0274c60ad5",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -71,6 +72,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/spawner.lua": {
+      "aspects_ignored": [
+        "世界规则生成速度配置",
+        "固定布景生成数量设定",
+        "机缘兔子概率生成条件",
+        "猪人回归猪屋行为",
+        "猪人死亡后重生机制",
+        "猪屋生成猪人行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

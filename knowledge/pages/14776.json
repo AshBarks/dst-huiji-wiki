@@ -6,12 +6,14 @@
     "wikitext_sha256": "08c9939fee15dede413b739bade55a81eef79fe5f4b611432187b09de0be7ef5",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/craftingstation.lua": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/pickable.lua": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -32,6 +34,22 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/craftingstation.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "制作站配方解锁机制",
+          "evidence": [
+            {
+              "pageid": 14776,
+              "quote": "玩家可以将[[草图]]给予陶轮来解锁新的雕塑"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -90,6 +108,17 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/prototyper.lua": {
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据仅提及制造需要的材料，未明确指向任何特定原型制作者或 prototyper 组件。"
+      }
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -98,7 +127,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -110,5 +140,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

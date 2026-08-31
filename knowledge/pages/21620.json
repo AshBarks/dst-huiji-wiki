@@ -5,8 +5,11 @@
   "inputs": {
     "wikitext_sha256": "eefc6f4c31cefec657372fa80cebbd0a764900a4fba3c4813e2dd76550225c16",
     "symbol_doc_shas": {
+      "components/battery.lua": "3470072afa447e1d5541734c69fefaf19edd09a461ae131f675bc1e85908eb81",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/circuitnode.lua": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -14,6 +17,7 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/portablestructure.lua": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
@@ -22,6 +26,14 @@
     }
   },
   "symbols": {
+    "components/battery.lua": {
+      "aspects_ignored": [
+        "蓄电池充电使用效果",
+        "蓄电池功能定义"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -38,6 +50,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/circuitnode.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/deployable.lua": {
       "mention_source": "pass2_evidence",
       "aspects_covered": [
@@ -53,6 +69,10 @@
       ],
       "route": "direct",
       "detail_level": "summary"
+    },
+    "components/deployhelper.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/floater.lua": {
       "route": "direct",
@@ -157,6 +177,10 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/portablestructure.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
@@ -184,7 +208,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/updatelooper.lua": {
       "route": "direct",

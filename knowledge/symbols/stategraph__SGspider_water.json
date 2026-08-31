@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGspider_water.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGspider_water",
+  "summary": "该状态图（SGspider_water）驱动饥荒联机版中的“水蜘蛛”实体。它整合了该生物的基础移动（陆地/水中）、攻击、进食、变异（被蜘蛛突变剂触发）等行为逻辑，并处理了其在水中特有的游泳与突进行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外部公开的API方法。其行为主要由游戏引擎通过事件（如“attacked”、“doattack”）和组件交互来驱动。",
+  "events_published": [
+    "attacked",
+    "doattack",
+    "locomote",
+    "trapped",
+    "mutate"
+  ],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "locomote",
+    "trapped",
+    "mutate",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SPIDER_WATER_OCEANFLOATSPEED",
+    "TUNING.SPIDER_WATER_OCEANDASHSPEED",
+    "TUNING.SPIDER_WATER_EATCD",
+    "TUNING.SPIDER_WATER_RUNSPEED"
+  ],
+  "states": [
+    "idle",
+    "death",
+    "premoving",
+    "moving",
+    "eat",
+    "eat_loop",
+    "taunt",
+    "investigate",
+    "attack",
+    "hit",
+    "dropper_enter",
+    "trapped",
+    "mutate",
+    "mutate_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "水蜘蛛的默认待机状态。有一定几率（30%）会进入“taunt”状态发出叫声。"
+    },
+    {
+      "state": "attack",
+      "note": "水蜘蛛的攻击状态。在动画第16帧造成伤害，是它对敌人发起攻击的核心状态。"
+    },
+    {
+      "state": "eat",
+      "note": "水蜘蛛的进食起始状态。在水中会溅起水花，并在动画结束时判断是否成功获取食物（包括直接移除海洋鱼类）。"
+    },
+    {
+      "state": "mutate",
+      "note": "水蜘蛛触发“变异”事件后的状态。播放变异动画并生成特效，之后会调用 do_mutate 函数将自身替换为突变后的蜘蛛。"
+    },
+    {
+      "state": "hit",
+      "note": "水蜘蛛受到攻击时的硬直状态。播放受击动画并短暂停止移动，之后回到待机状态。"
+    },
+    {
+      "state": "trapped",
+      "note": "水蜘蛛被困住（如陷阱）的状态。播放蜷缩动画并持续1秒，此期间不可被电击。"
+    },
+    {
+      "state": "moving",
+      "note": "水蜘蛛的持续移动状态。在水中会先以浮游速度前进，并在特定帧后加速突进（dash）并产生尾迹，突进后速度逐渐衰减。"
+    },
+    {
+      "state": "eat_loop",
+      "note": "水蜘蛛成功获取食物后的咀嚼循环状态。持续1-2秒后进入待机。"
+    },
+    {
+      "state": "investigate",
+      "note": "水蜘蛛对物品（如鱼）进行调查（或回家）的状态，播放与“taunt”相同的动画。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      65456,
+      24875,
+      51046,
+      13897,
+      15551,
+      13828
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及水蜘蛛（stategraph__SGspider_water）或其相关状态、行为，所有内容涉及其他游戏实体（如天体英雄、变异鱼人、战争瓦器人等），因此无法提取该符号的能力表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水蜘蛛",
+    "水中移动",
+    "攻击",
+    "进食",
+    "变异",
+    "硬直",
+    "突进"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "516cc164a3e1b8f03f638469b93ca9b647a1528c6848a24a5c7a5a853e8938e0",
+    "source_bytes": 19791,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146360389
+  }
+}

@@ -5,14 +5,32 @@
   "inputs": {
     "wikitext_sha256": "e947b56f5fc0ab641325e870210e901371fe84441d53ed1cccd9fdcdcdcdd423",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
+      "components/carnivaldecorranker.lua": "fa1476ae941eec9fefdb4d028b8473064d89f2c9efdcb7390c3024bf1505a98d",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
+    "components/carnivaldecorranker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/childspawner.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -23,6 +41,10 @@
       "route": "direct",
       "detail_level": "summary",
       "llm_verdict": {}
+    },
+    "components/deployhelper.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -48,6 +70,10 @@
       "llm_verdict": {}
     },
     "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/savedrotation.lua": {
       "route": "direct",
       "detail_level": "stub"
     },

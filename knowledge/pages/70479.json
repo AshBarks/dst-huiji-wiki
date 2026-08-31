@@ -5,17 +5,34 @@
   "inputs": {
     "wikitext_sha256": "aea40950f0aa0aeabb31a5a955f900d19adcb41ea68c12bab9de7b2e6e64bd2d",
     "symbol_doc_shas": {
+      "components/bathbombable.lua": "d162a19fb75c10b0e44b425f4ec0b1b90802a674c34079ba5a73e18577b9953b",
+      "components/bathingpool.lua": "00404add7a93e033023ec610662c08f6cdebca3871a0284bd2bba82e188d016b",
+      "components/constructionsite.lua": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heater.lua": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/bathbombable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/bathingpool.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/constructionsite.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -24,6 +41,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -76,12 +97,23 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面讨论装饰度与温泉配方，不涉及交易系统。"
+      }
     },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

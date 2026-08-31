@@ -36,11 +36,16 @@
       "llm_verdict": {}
     },
     "components/deployable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "蜘蛛卵可种植于地面",
+        "semantic_consistent": true
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -112,5 +117,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

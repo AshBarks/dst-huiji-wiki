@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmalbatross.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmalbatross",
+  "summary": "状态图驱动饥荒联机版中的Malbatross（一种海洋Boss生物）。整体状态组织方式通过事件驱动，定义了Malbatross的闲置、移动、攻击、潜水、死亡等多种行为状态，覆盖其从出现到死亡的完整生命周期。",
+  "api": [],
+  "api_note": "状态图完全通过内部事件和状态驱动，无显式对外API方法。",
+  "events_published": [],
+  "events_listened": [
+    "depart",
+    "dosplash",
+    "doswoop",
+    "death",
+    "doattack",
+    "OnLocomote",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnFreeze",
+    "OnElectrocute",
+    "OnAttacked",
+    "OnCorpseChomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.MALBATROSS_BOAT_DAMAGE",
+    "TUNING.MALBATROSS_BOAT_PUSH",
+    "TUNING.MALBATROSS_EATSUCCESS_CHANCE",
+    "TUNING.MALBATROSS_MISSFISH_TIME.MIN",
+    "TUNING.MALBATROSS_MISSFISH_TIME.MAX",
+    "TUNING.MALBATROSS_NOTHUNGRY_TIME.MIN",
+    "TUNING.MALBATROSS_NOTHUNGRY_TIME.MAX"
+  ],
+  "states": [
+    "idle",
+    "arrive",
+    "depart",
+    "eat_dive",
+    "hammer",
+    "nofish",
+    "eatfish",
+    "gohome",
+    "taunt",
+    "death_ocean",
+    "swoop_pre",
+    "swoop_loop",
+    "swoop_pst",
+    "wavesplash",
+    "combatdive",
+    "combatdive_pst",
+    "alert"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "Malbatross的基础闲置状态，停留在水面上生成涟漪和拍翅音效，用于等待或观察玩家，触发条件如动画结束或无其他行为。"
+    },
+    {
+      "state": "eat_dive",
+      "note": "Malbatross潜水捕鱼状态，尝试吃鱼时进入，成功则吃鱼，失败则返回水面；有无敌帧（noattack标签），掉落水中产生水花和波浪。"
+    },
+    {
+      "state": "combatdive",
+      "note": "Malbatross战斗潜水状态，在战斗中用于躲避或重新定位，结束后会重新出现并可能准备攻击；有短暂无敌时间（noattack标签）。"
+    },
+    {
+      "state": "swoop_loop",
+      "note": "Malbatross俯冲循环状态，快速飞行并造成范围伤害，有碰撞检测（对树木、桅杆、生物）和速度设置（15单位/秒），持续1秒后结束。"
+    },
+    {
+      "state": "wavesplash",
+      "note": "Malbatross波浪攻击状态，发动攻击时产生波浪伤害船只或玩家，攻击时机在动画29帧，有长攻击标签（longattack）并生成三道波浪。"
+    },
+    {
+      "state": "death_ocean",
+      "note": "Malbatross海洋死亡状态，在水中死亡时播放动画，掉落24根羽毛和战利品，产生大水花和波浪，有特定掉落概率和时间线。"
+    },
+    {
+      "state": "gohome",
+      "note": "Malbatross返回状态，触发时播放嘲讽动画并清除位置记忆，可能用于重置战斗或吸引玩家注意力。"
+    },
+    {
+      "state": "taunt",
+      "note": "Malbatross嘲讽状态，播放动画和音效（包括吼叫），在战斗中用于威慑玩家，触发条件如被攻击或执行回家动作。"
+    },
+    {
+      "state": "alert",
+      "note": "Malbatross警觉状态，用于准备攻击或观察玩家，有概率触发嘲讽或波浪攻击，基于计时器和战斗目标决定后续行为。"
+    },
+    {
+      "state": "swoop_pre",
+      "note": "Malbatross俯冲预备状态，锁定目标并准备俯冲，持续调整朝向，进入条件为目标有效且触发俯冲事件，为swoop_loop做准备。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15651,
+      13897,
+      51046,
+      15922,
+      15225,
+      13698,
+      15551
+    ],
+    "aspects": [
+      {
+        "aspect": "四处移动的闲置行为",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "在平时，它会在固定鱼群附近四处移动。"
+          }
+        ]
+      },
+      {
+        "aspect": "潜水捕鱼状态与概率",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "邪天翁会潜水捕捉海鱼，入水时会制造出一圈[[波浪]]；其每次潜水只有 50% 的概率捉到鱼"
+          }
+        ]
+      },
+      {
+        "aspect": "飞天消失的返回行为",
+        "evidence": [
+          {
+            "pageid": 13698,
+            "quote": "如果邪天翁来到陆地上，会飞天消失。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Malbatross",
+    "俯冲",
+    "死亡掉落",
+    "嘲讽",
+    "攻击",
+    "潜水",
+    "移动",
+    "闲置",
+    "死亡"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 0/9)",
+  "gameplay_tags": [
+    "战斗",
+    "海洋",
+    "Boss"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f63f76896b60e4306ef22b7498b7fb6552050a91ffd2629942a0085c57f11d38",
+    "source_bytes": 32390,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138854698
+  }
+}

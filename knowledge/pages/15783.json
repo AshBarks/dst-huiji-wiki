@@ -19,18 +19,25 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/maprevealable.lua": "7b00ba474d1ca65f41bf6d98b748ac1f4a115dc123068138ff6ec7cd31fac736",
+      "components/periodicspawner.lua": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGglommer.lua": "29b709a53de9b1fa0df1b10241e59520a4426151698727d6f297384210af925e"
     }
   },
   "symbols": {
     "behaviours/faceentity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "停止移动行为描述",
         "警觉状态行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "note": "描述格罗姆（glommer），该实体在受影响变体列表中。片段中未提及 faceentity 行为。"
+      }
     },
     "behaviours/follow.lua": {
       "aspects_ignored": [
@@ -50,7 +57,10 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面有行为部分但未涉及游荡"
+      }
     },
     "brains/glommerbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -190,6 +200,24 @@
         "semantic_consistent": true
       }
     },
+    "components/maprevealable.lua": {
+      "aspects_ignored": [
+        "全局地图图标设置",
+        "放置物品标记地图位置",
+        "生物刷新点地图标识"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/periodicspawner.lua": {
+      "aspects_ignored": [
+        "在玩家附近随机位置生成实体",
+        "生成点周期性检测玩家存在",
+        "生成点数量限制与死亡冷却"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -211,6 +239,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGglommer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

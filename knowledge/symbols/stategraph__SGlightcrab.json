@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlightcrab.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlightcrab",
+  "summary": "该状态图驱动名为'lightcrab'的实体（可能是一种发光的螃蟹）。整体状态组织包括默认休息、进食、死亡、生成、击晕、被困、受击等核心状态，并通过通用模块添加移动、睡眠等状态，以处理实体的基本行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，仅用于内部状态管理。",
+  "events_published": [],
+  "events_listened": [
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "locomote",
+    "trapped",
+    "stunbomb",
+    "corpse_chomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "eat",
+    "death",
+    "portal_spawn",
+    "stunned",
+    "trapped",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认休息状态，停止移动并随机播放休息动画，可旋转。"
+    },
+    {
+      "state": "eat",
+      "note": "播放进食动画，有12.5%概率执行吃动作后返回休息。"
+    },
+    {
+      "state": "death",
+      "note": "播放死亡动画，移除碰撞并掉落战利品，实体死亡。"
+    },
+    {
+      "state": "portal_spawn",
+      "note": "用于从传送门生成，有多种状态标签，播放受击动画直到落地。"
+    },
+    {
+      "state": "stunned",
+      "note": "被击晕状态，持续6±2秒，期间可拾取。"
+    },
+    {
+      "state": "trapped",
+      "note": "被困状态，持续1秒，之后恢复。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中时播放受击动画和音效，然后返回休息。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15651,
+      15225,
+      50903,
+      13606,
+      15303,
+      28734,
+      15237,
+      18532
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所提供的页面摘录中没有提及 stategraph__SGlightcrab 或其相关能力表达，内容均围绕其他实体如龙蝇、暗影傀儡、死亡机制等展开。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "发光螃蟹",
+    "lightcrab",
+    "击晕",
+    "死亡",
+    "进食",
+    "传送门生成",
+    "被困",
+    "被击中"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "63b2179cc606df3a89163e5dae1b2a24dff72e333f8ed1c225bf372c691fdc91",
+    "source_bytes": 7369,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138433103
+  }
+}

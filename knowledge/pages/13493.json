@@ -6,23 +6,40 @@
     "wikitext_sha256": "b1ee46757693e0340247a2f3dc7a4f5372b99f36b48aef522b39c78a4c0632e8",
     "symbol_doc_shas": {
       "components/bloomer.lua": "9f51e698f8a26b5790d561b2ddaed751ebded17a2cbe25f4f0492b3fc8d78663",
+      "components/craftingstation.lua": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/friendlevels.lua": "6e5b2fa23325af9192cf7cdcb0a73f0615e923fd9eb010fa140d8357f67da859",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
+      "components/npc_talker.lua": "421ee0046a38e7b022a37abbd02cb33f57e6c699ac6a37f530f2f1f6a2fd3e4a",
+      "components/petleash.lua": "96b20c0ab3e82b70f8dceecfdfa3bec009f1649742960ec435b4cecb95f304fd",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
+      "components/stuckdetection.lua": "4bbc06274fa46b7280daf844797f1a3ac84d9b7ca8525974be0e5a8d33146172",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGhermitcrab.lua": "9a4ef0249e17aa7a8c3067bc80ddced8758210540de679daec8a95975651a8f2"
     }
   },
   "symbols": {
     "components/bloomer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/craftingstation.lua": {
+      "aspects_ignored": [
+        "制作站配方解锁机制"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -59,7 +76,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -72,6 +90,52 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/friendlevels.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "任务列表设置",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "寄居蟹隐士有一系列任务"
+            }
+          ]
+        },
+        {
+          "aspect": "任务完成奖励发放",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "任务完成后，珍珠会念完相应台词之后才会送给玩家[[一包谢意]]。"
+            }
+          ]
+        },
+        {
+          "aspect": "好感度级别影响交易解锁",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "在好感度达到 1 级之后，靠近寄居蟹隐士能开启瓶罐交易。"
+            }
+          ]
+        },
+        {
+          "aspect": "最大好感度级别",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "更多的交易项在好感度达到 3、6、8、9 级时解锁"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "好感度级别影响流星雨概率"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -143,6 +207,67 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/npc_talker.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "交互时言语表达",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "她会走到帮她干活的玩家附近发表意见。"
+            }
+          ]
+        },
+        {
+          "aspect": "台词触发条件",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "低好感度（0 ~ 3）"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/petleash.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/prototyper.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述了蟹隐士（hermitcrab）的任务，蟹隐士是受 prototyper 组件管理的原型制作者之一。证据未直接提及 'prototyper' 组件或原型制作系统机制。"
+      }
+    },
+    "components/stuckdetection.lua": {
+      "aspects_ignored": [
+        "卡住回避行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "mention_source": "pass2_evidence",
       "aspects_covered": [
@@ -158,6 +283,10 @@
       ],
       "route": "direct",
       "detail_level": "summary"
+    },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [
@@ -193,6 +322,43 @@
       ],
       "route": "direct",
       "detail_level": "summary"
+    },
+    "stategraphs/SGhermitcrab.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "散步与工作行为",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "她会在岛上散步，并进行各项工作。"
+            }
+          ]
+        },
+        {
+          "aspect": "触发额外对话",
+          "evidence": [
+            {
+              "pageid": 13493,
+              "quote": "将[[开裂珍珠]]送回给寄居蟹隐士将会触发额外的对话。"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 个",
+          "region_id": "13493:section:2",
+          "matched": "stategraphs/SGhermitcrab.lua: stun_frames=6"
+        },
+        {
+          "raw": "6 个",
+          "region_id": "13493:section:2",
+          "matched": "stategraphs/SGhermitcrab.lua: stun_frames=6"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

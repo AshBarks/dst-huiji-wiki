@@ -12,6 +12,7 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/shelf.lua": "2d504f43096aa12dfdebecf010c08d475d550ca95ea844710fb2c4ffd653f9a4",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
@@ -87,6 +88,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/shelf.lua": {
+      "aspects_ignored": [
+        "桌上放置家具装饰的功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -111,7 +119,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [

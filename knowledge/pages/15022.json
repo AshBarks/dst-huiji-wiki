@@ -7,6 +7,7 @@
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -14,9 +15,13 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/teleportedoverride.lua": "60e013cde6064d95ac9b5f667c9efcc17c8bfe66639360e24ae096fb6ff6cd9f",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
-      "stategraphs/SGalterguardian_phase1.lua": "c0d0a544fe810f8467422fb4f719448cf8a5a6d7b49ca01d19f887914d2bfc2a"
+      "stategraphs/SGalterguardian_phase1.lua": "c0d0a544fe810f8467422fb4f719448cf8a5a6d7b49ca01d19f887914d2bfc2a",
+      "stategraphs/SGalterguardian_phase2.lua": "d4ef1c1ea74887a2c6f65322904481175318baf512e288b1b5ba929ef78c164f",
+      "stategraphs/SGalterguardian_phase3.lua": "4434f251d1811b7b4574fe27d12cea8dfedfeaabaa53914949a413d42314e853"
     }
   },
   "symbols": {
@@ -74,6 +79,14 @@
         "溺水潮湿度惩罚标注",
         "溺水物品掉落行为描述",
         "溺水生命与理智损失数值标注"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
       ],
       "route": "direct",
       "detail_level": "stub",
@@ -180,6 +193,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/teleportedoverride.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -195,6 +212,13 @@
         "wording": "该能力释放后有 8.5 秒冷却时间",
         "semantic_consistent": true
       }
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -247,6 +271,225 @@
           "raw": "3 秒",
           "region_id": "15022:section:9",
           "matched": "stategraphs/SGalterguardian_phase1.lua: AOE_RANGE_PADDING=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "stategraphs/SGalterguardian_phase2.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "旋转攻击行为描述",
+          "evidence": [
+            {
+              "pageid": 15022,
+              "quote": "旋转：追逐当前目标并旋转它的腿部来进行攻击，{{解释|摧毁}}沿途的实体并造成范围伤害。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "死亡后阶段转换",
+        "死亡掉落生成"
+      ],
+      "fact_matches": [
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        },
+        {
+          "raw": "5 秒",
+          "region_id": "15022:section:9",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: NUM_SMALLGUARDS=5"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:9",
+          "matched": "stategraphs/SGalterguardian_phase2.lua: AOE_RANGE_PADDING=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "stategraphs/SGalterguardian_phase3.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "生成事件描述",
+          "evidence": [
+            {
+              "pageid": 15022,
+              "quote": "天体英雄将会伴随几颗[[流星]]坠落，击毁月亮虹吸器并摧毁附近所有的建筑。"
+            }
+          ]
+        },
+        {
+          "aspect": "陷阱攻击描述",
+          "evidence": [
+            {
+              "pageid": 15022,
+              "quote": "伤害=150（皇冠攻击/激光/默认）<br>50（陷阱从天而降）"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "4 单位",
+          "region_id": "15022:section:1",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_TRAP_COUNT_FOR_RESPAWN=4"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:2",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: NUM_STEPS=10"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:2",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: BASE_NUM_ANGULAR_STEPS=10"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: NUM_STEPS=10"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: BASE_NUM_ANGULAR_STEPS=10"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "4个",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_TRAP_COUNT_FOR_RESPAWN=4"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "4 个",
+          "region_id": "15022:section:6",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_TRAP_COUNT_FOR_RESPAWN=4"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 单位",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: NUM_STEPS=10"
+        },
+        {
+          "raw": "10 点",
+          "region_id": "15022:section:7",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: BASE_NUM_ANGULAR_STEPS=10"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:9",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: MIN_SWEEP_DISTANCE=3"
+        },
+        {
+          "raw": "3 秒",
+          "region_id": "15022:section:9",
+          "matched": "stategraphs/SGalterguardian_phase3.lua: LUCKFORMULA_RECIPROCAL=3"
         }
       ],
       "route": "direct",

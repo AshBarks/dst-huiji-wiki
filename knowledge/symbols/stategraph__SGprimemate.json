@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGprimemate.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGprimemate",
+  "summary": "该状态图驱动饥荒联机版中猴子岛的“primemate”（猴子）实体。它通过事件处理器响应攻击、命令、溺水等事件，并管理实体行为状态转换。状态包括空闲、执行动作、划船、进食、挑衅、跳水等，整体采用有限状态机模式，结合通用状态处理行走、睡眠和战斗。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法（如公共函数或接口），状态图仅通过事件和状态转换驱动实体行为。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "sleep",
+    "doattack",
+    "command",
+    "onsink",
+    "cheer",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "row",
+    "eat",
+    "taunt",
+    "dive",
+    "dive_pst_land",
+    "cheer"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，实体停止移动并播放循环动画。有低概率（5%）在目标为玩家且无忙碌时自动进入挑衅状态。"
+    },
+    {
+      "state": "action",
+      "note": "执行缓冲动作状态，如捡起物品或修理船。播放拾取动画，完成后立即执行动作并返回空闲，期间有“busy”标签防止中断。"
+    },
+    {
+      "state": "row",
+      "note": "划船状态，自动装备猴子船桨（如果未装备），播放划船动画序列。在动画帧中执行划船动作，完成后回到空闲。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态，播放吃动画并发出进食音效。退出时执行吃动作，然后返回空闲。"
+    },
+    {
+      "state": "taunt",
+      "note": "挑衅状态，播放愤怒动画并随机说出一句猴子命令。用于威胁或吸引玩家注意，无直接伤害，期间有“busy”标签。"
+    },
+    {
+      "state": "dive",
+      "note": "跳水状态，用于潜入水中。调整朝向后播放跳水动画，中途改变碰撞掩码。如果落地则着陆，否则掉落物品并移除实体（模拟溺水）。"
+    },
+    {
+      "state": "dive_pst_land",
+      "note": "跳水后着陆状态，播放从水中上岸的动画。短暂播放脚步声后返回空闲，期间有“busy”标签。"
+    },
+    {
+      "state": "cheer",
+      "note": "欢呼状态，播放增益动画（buff）。用于庆祝或响应特定事件，无其他效果，期间有“busy”和“cheering”标签。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      13409,
+      20511,
+      15225,
+      15651,
+      13606,
+      13701,
+      13897
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录均未提及猴子实体或 stategraph__SGprimemate 的相关行为（如空闲、划船、挑衅等），内容涉及触电、冰冻、角色能力、巨兽行为等其他主题，与清单中的能力语义无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猴子",
+    "挑衅",
+    "划船",
+    "跳水",
+    "空闲",
+    "战斗",
+    "死亡",
+    "冻结",
+    "触电",
+    "猴子岛"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "行动",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f86b59856dfa580c56e11e504934c127090793f02f671b42c557d37b90365f45",
+    "source_bytes": 11762,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134823774
+  }
+}

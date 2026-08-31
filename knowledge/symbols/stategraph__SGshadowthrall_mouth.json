@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_mouth.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_mouth",
+  "summary": "该状态图（SGshadowthrall_mouth）驱动“影怪·口中”这一实体。状态图以“idle”为起始点，组织了包括普通攻击、跳跃攻击、潜行伏击、受击和死亡在内的核心行为逻辑。状态切换主要通过战斗事件（如doattack、attacked）和移动事件（locomote）驱动，体现了其作为潜行伏击型敌人的特点。",
+  "api": [],
+  "api_note": "源码中未定义任何对外暴露的API方法，所有逻辑均由内部事件和状态切换驱动。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "hit",
+    "death",
+    "taunt",
+    "leap_pre",
+    "leap",
+    "land",
+    "bite_pre",
+    "bite_loop",
+    "bite_final",
+    "bite_pst",
+    "spawndelay",
+    "stealth_idle",
+    "stealth_move",
+    "stealth_smile",
+    "stealth_bite",
+    "stealth_pst",
+    "stealth_on",
+    "stealth_hit",
+    "stealth_hit_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "leap_pre",
+      "note": "跳跃攻击的准备阶段。若目标存在，会转向并追踪目标位置，动画结束时开始跳跃，进入无敌状态（跳跃期间无法被选中）。"
+    },
+    {
+      "state": "leap",
+      "note": "空中跳跃阶段。实体本体隐藏，由一个“分身”执行跳跃动画，期间拥有“temp_invincible”标签。跳跃结束后进入着陆阶段。"
+    },
+    {
+      "state": "land",
+      "note": "跳跃攻击着陆阶段。着陆时对周围小范围（半径1.2）造成一次高额伤害和击退，并重置攻击伤害。若目标在近战范围内，可能直接衔接撕咬攻击。"
+    },
+    {
+      "state": "bite_loop",
+      "note": "核心撕咬攻击循环阶段。对前方扇形小范围造成伤害，最多连续撕咬5次（MAX_BITES）。攻击期间会向前快速突进并逐渐减速。"
+    },
+    {
+      "state": "bite_final",
+      "note": "撕咬攻击的最终一击。动作与循环撕咬类似，但完成后会进入收尾状态（bite_pst），是攻击序列的结束。"
+    },
+    {
+      "state": "stealth_idle",
+      "note": "潜行状态下的静止阶段。实体完全隐藏，不可见，但可移动。是潜行序列的起点，从spawndelay或stealth_pst进入。"
+    },
+    {
+      "state": "stealth_move",
+      "note": "潜行状态下的移动阶段。实体保持隐藏并向前行走，用于在潜行状态下接近目标。"
+    },
+    {
+      "state": "stealth_smile",
+      "note": "潜行攻击的发动阶段。实体会瞬间传送到目标位置附近，并开始追踪目标移动，准备进行潜行撕咬。"
+    },
+    {
+      "state": "stealth_bite",
+      "note": "潜行状态下的撕咬攻击。在追踪动画中对小范围（半径1.5）造成一次伤害。攻击完成后解除潜行。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14936,
+      15922,
+      34988,
+      15938,
+      34003,
+      15530,
+      14907,
+      34557
+    ],
+    "aspects": [
+      {
+        "aspect": "跳跃攻击描述",
+        "evidence": [
+          {
+            "pageid": 15530,
+            "quote": "能够发动跳跃攻击，但是攻击频率却比普通蜘蛛低得多。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "影怪",
+    "口中",
+    "跳跃攻击",
+    "连续撕咬",
+    "潜行",
+    "突袭",
+    "击退",
+    "无敌帧",
+    "暗影伤害",
+    "伏击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8af203ea167bcb20fadadb2f98522a45babf5408f4c8d3574369f6f74c22d2e8",
+    "source_bytes": 27523,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140719759
+  }
+}

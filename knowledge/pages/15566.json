@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "566a8136138ede490a61e1015c33ae1d262f706c4f894b42679dbc1d37cc20cf",
     "symbol_doc_shas": {
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/eater.lua": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
@@ -17,10 +18,28 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/periodicspawner.lua": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/teamattacker.lua": "21a39a23f95420973196f4c0c081cd71c98df11ebd634479660b0cfdacc40944",
+      "components/thief.lua": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
+      "stategraphs/SGbat.lua": "a85a68df3f2c01bc0e97212ec98f7721aa1351c6f11fd0f810a7b49509caec26"
     }
   },
   "symbols": {
+    "components/acidinfusible.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "酸雨期间，额外：{{Pic|32|硝石}}×1（20%）<br>{{Pic|32|洞穴蝙蝠翅膀}}×1（50%）<br>{{Pic|32|鸟粪}}×1（30%）<br>{{Pic|32|怪物肉}}×1（20%）",
+        "semantic_consistent": false,
+        "note": "页面提及酸雨额外掉落，但未描述代码相关的体型改变或视觉效果添加。"
+      }
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -157,6 +176,15 @@
         "semantic_consistent": true
       }
     },
+    "components/periodicspawner.lua": {
+      "aspects_ignored": [
+        "在玩家附近随机位置生成实体",
+        "生成点周期性检测玩家存在",
+        "生成点数量限制与死亡冷却"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -169,7 +197,47 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/teamattacker.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "飞回洞穴行为",
+          "evidence": [
+            {
+              "pageid": 15566,
+              "quote": "蝙蝠会在白天来临时飞回洞穴入口并消失"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/thief.lua": {
+      "aspects_ignored": [
+        "偷窃物品行为描述",
+        "防护偷窃能力描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGbat.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "啃食硝石行为",
+          "evidence": [
+            {
+              "pageid": 15566,
+              "quote": "蝙蝠抢夺后会取出 1 个硝石并被吃下"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

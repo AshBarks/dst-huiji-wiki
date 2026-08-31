@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbeequeen.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbeequeen",
+  "summary": "该状态图驱动蜂后（Bee Queen）实体，是游戏中的Boss级敌人。它通过事件驱动的状态机组织蜂后的行为，包括移动、攻击、召唤护卫、尖叫警报和死亡。整体状态转换依赖于玩家交互、自身指令和游戏逻辑，呈现为动态的战斗状态流程。",
+  "api": [],
+  "api_note": "该状态图是蜂后的内部行为定义，不提供公共API供外部调用，所有逻辑封装在状态和事件处理中。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "screech",
+    "spawnguards",
+    "focustarget",
+    "flee"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BEEQUEEN_HIT_RECOVERY",
+    "BEEQUEEN_MAX_STUN_LOCKS",
+    "BEEQUEEN_MIN_GUARDS_PER_SPAWN",
+    "BEEQUEEN_MAX_GUARDS_PER_SPAWN",
+    "BEEQUEEN_TOTAL_GUARDS",
+    "BEEQUEEN_FOCUSTARGET_RANGE",
+    "BEEGUARD_SQUAD_SIZE",
+    "SANITYAURA_HUGE"
+  ],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "emerge",
+    "flyaway",
+    "hit",
+    "death",
+    "screech",
+    "attack",
+    "spawnguards",
+    "focustarget",
+    "focustarget_loop",
+    "focustarget_loop2",
+    "focustarget_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "emerge",
+      "note": "蜂后出现时进入，拥有短暂无敌帧（约54帧），播放出现动画并触发尖叫警报，震慑周围玩家，之后开始扇动翅膀飞行。"
+    },
+    {
+      "state": "screech",
+      "note": "尖叫状态，蜂后停止移动发出尖叫，触发屏幕震动和恐惧效果（范围5），警报所有护卫蜂，是重要的控制技能窗口。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，蜂后对目标发动一次攻击，造成伤害，攻击前有准备动画，攻击后有短暂硬直，可被中断。"
+    },
+    {
+      "state": "spawnguards",
+      "note": "召唤护卫状态，蜂后停止移动生成若干护卫蜂（数量2-3只，最多10只），之后护卫围绕蜂后形成防线，冷却时间可配置。"
+    },
+    {
+      "state": "focustarget",
+      "note": "焦点目标状态，蜂后指挥护卫攻击特定玩家或实体，增加精神光环（-TUNING.SANITYAURA_HUGE），持续约3次循环，是强化攻击模式。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，蜂后播放死亡动画，期间尖叫警报，之后掉落战利品并消失，标记蜂巢已被击败。"
+    },
+    {
+      "state": "hit",
+      "note": "被击中状态，蜂后停止移动播放受击动画，有硬直时间（约10帧），可中断并快速恢复攻击，但受最大硬直锁限制。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞走状态，蜂后起飞逃离，进入无敌状态，清除焦点目标并命令护卫逃跑，最终移除实体，用于脱战或特殊事件。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，蜂后检查是否有待执行动作（如尖叫、飞走），否则播放呼吸动画，是状态转换的中心节点。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15303,
+      15225,
+      15651,
+      19761,
+      50903,
+      13606,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及蜂后或其相关状态图行为，页面内容涉及熔炉模式、旺达、暗影傀儡、龙蝇、墨荒、死亡机制、帝王蟹、地狱独眼巨猪等其他实体。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜂后",
+    "尖叫",
+    "召唤护卫",
+    "焦点目标",
+    "飞行",
+    "无敌",
+    "硬直",
+    "死亡",
+    "战利品",
+    "振翅"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战",
+    "召唤",
+    "飞行"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b5ba6629663a5f6bcd5a4ef95509298bfc7d7370d8edc1705f8060f104994618",
+    "source_bytes": 32233,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135760047
+  }
+}

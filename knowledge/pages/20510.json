@@ -6,7 +6,9 @@
     "wikitext_sha256": "2f7749ff2115d2db4875261d8b1be029299be01097c5af267f642cc7f3871989",
     "symbol_doc_shas": {
       "components/follower.lua": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/homeseeker.lua": "73e9cdafed333fdd0d28f07002449ad012379677e2943d6ccd18afcc300a747f",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/worldsettingstimer.lua": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a"
     }
   },
   "symbols": {
@@ -19,6 +21,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/homeseeker.lua": {
+      "aspects_ignored": [
+        "昼夜回屋行为",
+        "超出范围返回猪屋"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -28,6 +38,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/worldsettingstimer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

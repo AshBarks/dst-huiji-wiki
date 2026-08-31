@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdaywalker_imprisoned.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdaywalker_imprisoned",
+  "summary": "该状态图用于驱动‘暗夜行者’实体处于‘被囚禁’阶段的行为。它以idle状态为初始和归宿，在idle状态中随机进行基础挣扎，并根据‘石柱共振’事件触发一系列复杂的挣扎动画。整个状态流程最终可以导向‘挣脱锁链’的链式断裂事件，从而结束囚禁状态。",
+  "api": [],
+  "api_note": "此状态图为内部驱动，未暴露任何公共方法。",
+  "events_published": [
+    "daywalkerchainbreak"
+  ],
+  "events_listened": [
+    "pillarvibrating",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "transition",
+    "idle",
+    "struggle1",
+    "struggle2",
+    "struggle3",
+    "struggle3_loop_a",
+    "struggle3_loop_b",
+    "struggle3_loop_c",
+    "struggle3_pst",
+    "chain_break_pre",
+    "chain_break"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "暗夜行者的初始待机状态。若附近有石柱共振，会立刻转入高强度挣扎；否则会周期性发出声音，并根据玩家距离随机进入普通挣扎或继续待机。"
+    },
+    {
+      "state": "struggle3",
+      "note": "响应‘石柱振动’事件或高强度挣扎的预备状态。播放挣扎前摇动画，过程中会获得‘noelectrocute’标签，使其对电击免疫。"
+    },
+    {
+      "state": "struggle3_loop_b",
+      "note": "高强度挣扎的核心循环状态。在此状态中，会根据当前存活的共振石柱数量判断是否触发‘破链’判定，为挣脱做准备。"
+    },
+    {
+      "state": "chain_break",
+      "note": "最终挣脱状态。播放锁链断裂动画和特效，期间对玩家不可点击，并在动画结束时触发‘daywalkerchainbreak’事件并生成水蛭，完成逃脱。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19110,
+      70456,
+      22383,
+      61235,
+      45249,
+      13779,
+      19120,
+      20714
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录未讨论符号 stategraph__SGdaywalker_imprisoned 的具体能力表达。daywalker 页面描述了生成和束缚解除，但未涉及待机状态、石柱共振响应、挣扎循环或挣脱动画等细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Daywalker",
+    "囚禁",
+    "挣扎",
+    "锁链",
+    "挣脱",
+    "石柱",
+    "共振",
+    "无敌帧"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 1/8)",
+  "gameplay_tags": [
+    "Boss战",
+    "状态控制"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0810592c01584bf5038d5875d50778ec2873739c695b6ccd0530612238e55b3b",
+    "source_bytes": 13274,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137235984
+  }
+}

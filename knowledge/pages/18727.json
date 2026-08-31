@@ -5,12 +5,23 @@
   "inputs": {
     "wikitext_sha256": "f5c3e86a950b313697e6b0291502905455030b9a4ce37a5625cbe15f3cbece66",
     "symbol_doc_shas": {
+      "components/cooldown.lua": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
+      "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141"
     }
   },
   "symbols": {
+    "components/cooldown.lua": {
+      "aspects_ignored": [
+        "冷却开始行为描述",
+        "冷却时间数值标注",
+        "冷却状态检查描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -42,6 +53,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

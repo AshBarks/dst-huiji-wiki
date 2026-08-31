@@ -14,8 +14,11 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/periodicspawner.lua": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+      "components/saltlicker.lua": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGkoalefant.lua": "b7dc7c7e26a2c60ad2952a16bce2f122387b18f2fab33756dd63246eb21b4c81"
     }
   },
   "symbols": {
@@ -138,6 +141,22 @@
         "semantic_consistent": true
       }
     },
+    "components/periodicspawner.lua": {
+      "aspects_ignored": [
+        "在玩家附近随机位置生成实体",
+        "生成点周期性检测玩家存在",
+        "生成点数量限制与死亡冷却"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/saltlicker.lua": {
+      "aspects_ignored": [
+        "动物舔舐频率描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -166,6 +185,16 @@
         "wording": "每40~60秒生成粪肥",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGkoalefant.lua": {
+      "aspects_ignored": [
+        "冰冻状态机制描述",
+        "攻击行为描述",
+        "死亡与重生机制描述",
+        "触电状态机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

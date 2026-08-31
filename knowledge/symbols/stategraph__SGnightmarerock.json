@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGnightmarerock.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGnightmarerock",
+  "summary": "该状态图驱动“噩梦岩石”实体，控制其在场景中的显示与隐藏切换。状态组织为一个有限状态机，主要处理岩石从隐藏到出现、从出现到隐藏的动画过渡，以及其激活与未激活两种基础外观。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外调用的方法。其所有状态转换均由内部事件（如动画完成`animover`）和实体属性（如`inst.conceal`）驱动。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "raise",
+    "lower",
+    "conceal",
+    "concealed",
+    "reveal"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "基础状态，岩石根据`inst.active`属性显示为“激活”或“未激活”两种不同外观。这是玩家最常观察到的静态状态。"
+    },
+    {
+      "state": "raise",
+      "note": "执行“升起”动画，使岩石变为激活状态。播放特定音效并生成`sanity_raise`特效实体，标志着一次状态激活。动画结束后会进入`conceal`或`idle`状态。"
+    },
+    {
+      "state": "lower",
+      "note": "执行“降下”动画，使岩石变为未激活状态。播放特定音效并生成`sanity_lower`特效实体，标志着一次状态去激活。动画结束后会进入`conceal`或`idle`状态。"
+    },
+    {
+      "state": "conceal",
+      "note": "执行“隐藏”动画。若由`raise`状态直接进入（参数`from_raise`为`true`），会播放“降下至隐藏”动画和音效；否则播放标准隐藏动画和音效。动画结束后进入`concealed`或`reveal`状态。"
+    },
+    {
+      "state": "concealed",
+      "note": "完全隐藏状态，实体被设置为不可见（`inst:Hide()`）。这是隐藏流程的终点，直到触发显示。离开此状态时实体恢复可见。"
+    },
+    {
+      "state": "reveal",
+      "note": "执行“显现”动画，使隐藏的岩石重新显示出来。播放特定音效。动画结束后会进入`conceal`（若仍有隐藏队列）或`idle`状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      15245,
+      13437,
+      16419,
+      16197,
+      10374,
+      13139,
+      13268
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及 stategraph__SGnightmarerock 或任何与岩石升起、降下、隐藏、激活状态相关的内容。所有页面都是关于其他实体如书籍、理智值、角色和食物，与目标实体的能力表达无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "噩梦岩石",
+    "暗影岩石",
+    "理智",
+    "隐藏",
+    "动画",
+    "声音特效",
+    "状态切换",
+    "玩家互动"
+  ],
+  "gameplay_tags": [
+    "理智",
+    "互动",
+    "环境"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5df017cbbd0e913779451a2b59ef4a5d266571a24a62aea649d86db0cf9957f8",
+    "source_bytes": 3288,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134683868
+  }
+}

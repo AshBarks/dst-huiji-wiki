@@ -12,7 +12,8 @@
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGmoonspore.lua": "c3358544e562968391a5564d4aa7fd4f7d10f8cee5b3b1104653bedbcfb6f896"
     }
   },
   "symbols": {
@@ -126,6 +127,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmoonspore.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

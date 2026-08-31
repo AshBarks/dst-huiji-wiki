@@ -5,21 +5,37 @@
   "inputs": {
     "wikitext_sha256": "cadd380bb635c41c50585b0830c28e0491f7b48feeb00be65a67788e84868f9b",
     "symbol_doc_shas": {
+      "components/colourtweener.lua": "56fef1abd28e4ce224eeac01559e67bb15358117a6df452786da1057acdadb30",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heavyobstaclephysics.lua": "38a15ca57f3f8865d6874733c314980d5683fcd78006d4378c9e68360232bb20",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
+      "components/projectile.lua": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+      "components/pushable.lua": "d15ace2d19acbe57b1c5818158850fdcdf2114d2699266d9d4f6bd2a69e6f3aa",
+      "components/smotherer.lua": "5df4004ab0d2793779a224c378ac4c42af1534fbd6b8c695a20fa3f9b6cd18b2",
+      "components/snowballmelting.lua": "f19dc89f3d915f55fb0dcd43f797d1543f95bf8d153dcd5cb14ff11220c6e76f",
+      "components/snowmandecoratable.lua": "c9efa3713af47248d3cd0773de1eab91629c606fa885526736f5abc199fbeb03",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/submersible.lua": "dd99e89ec3845777543befb9dfa698869fbf876830696e3f70bdd2745996fec9",
+      "components/symbolswapdata.lua": "ff6571899b4b4c6cc24dd72dc07e8735d2c693da2be43447c42385ad6ffceacf",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
+      "components/wateryprotection.lua": "9f09221e5ef081253e0e4d659bbd49ac61faf3512b849c80929ab8aec74d091d",
+      "components/waxable.lua": "fe13e66e049d2d832b2d132f7ac1d0bde2dd009719b67462e25119bf8bfeef5c",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
   "symbols": {
+    "components/colourtweener.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "aspects_ignored": [
         "步行速度倍数获取描述",
@@ -43,6 +59,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heavyobstaclephysics.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -100,6 +120,87 @@
       "route": "direct",
       "detail_level": "summary"
     },
+    "components/projectile.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "击中效果与伤害描述",
+        "弹跳机制描述",
+        "追踪功能描述",
+        "飞行速度与范围描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "4 单位",
+          "region_id": "52631:intro:1",
+          "matched": "components/projectile.lua: STUCKCHECK_2D_DIST_TO_NONMOVING_TARGET=4"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/pushable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/smotherer.lua": {
+      "aspects_ignored": [
+        "书籍魔法灭火效果描述",
+        "角色薇洛的扑烟能力描述",
+        "雪球发射器的灭火功能说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/snowballmelting.lua": {
+      "mention_source": "fact_match",
+      "fact_matches": [
+        {
+          "raw": "5 秒",
+          "region_id": "52631:intro:1",
+          "matched": "components/snowballmelting.lua: MELTING_CHECK_TIME_VARIANCE=5"
+        },
+        {
+          "raw": "5 个",
+          "region_id": "52631:section:1",
+          "matched": "components/snowballmelting.lua: MELTING_CHECK_TIME_VARIANCE=5"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
+    "components/snowmandecoratable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "雪人堆叠层数描述",
+          "evidence": [
+            {
+              "pageid": 52631,
+              "quote": "雪人最多搭 6 层，雪球算 1 层"
+            }
+          ]
+        }
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 层",
+          "region_id": "52631:section:1",
+          "matched": "components/snowmandecoratable.lua: MAX_STACK_HEIGHT=6"
+        },
+        {
+          "raw": "3 层",
+          "region_id": "52631:section:1",
+          "matched": "components/snowmandecoratable.lua: stackheight=3"
+        },
+        {
+          "raw": "3 个",
+          "region_id": "52631:section:1",
+          "matched": "components/snowmandecoratable.lua: stackheight=3"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -111,6 +212,28 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/submersible.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "实体从加载范围移除事件",
+        "潜水或下水行为描述",
+        "着陆事件响应",
+        "获取水中物体方法"
+      ],
+      "fact_matches": [
+        {
+          "raw": "6 层",
+          "region_id": "52631:section:1",
+          "matched": "components/submersible.lua: CHECK_SPACING=6"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/symbolswapdata.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -126,6 +249,24 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/wateryprotection.lua": {
+      "aspects_ignored": [
+        "防水效果减免限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/waxable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [
@@ -148,5 +289,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

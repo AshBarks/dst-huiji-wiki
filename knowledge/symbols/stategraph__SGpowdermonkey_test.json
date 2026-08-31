@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpowdermonkey_test.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpowdermonkey_test",
+  "summary": "该状态图驱动名为'powdermonkey_test'的实体，可能是一个测试用的海盗猴子生物。整体状态组织方式为：定义了闲置、执行动作、进食、挑衅和投掷攻击等核心状态，并通过通用状态库补充了行走、睡眠、战斗等扩展状态，形成完整的行为循环。",
+  "api": [],
+  "api_note": "源码未定义任何对外API方法，所有行为均通过状态图内部逻辑驱动。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "freeze",
+    "attacked",
+    "death",
+    "hop",
+    "sink",
+    "fallinvoid",
+    "sleep",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [
+    "MONKEY_MELEE_RANGE"
+  ],
+  "states": [
+    "idle",
+    "action",
+    "eat",
+    "taunt",
+    "throw"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "猴子处于闲置状态，播放闲置动画；若战斗目标为玩家，有5%概率触发挑衅状态。"
+    },
+    {
+      "state": "action",
+      "note": "猴子执行交互动作（如拾取、偷窃），播放交互动画后执行缓冲动作并返回闲置。"
+    },
+    {
+      "state": "eat",
+      "note": "猴子进食食物，播放进食动画并在特定时间执行进食动作，随后返回闲置。"
+    },
+    {
+      "state": "taunt",
+      "note": "猴子进入挑衅状态，标记为忙碌，播放挑衅动画并连续捶胸以嘲讽目标。"
+    },
+    {
+      "state": "throw",
+      "note": "猴子进行投掷攻击，标记为攻击和忙碌；若无弹药则返回闲置，否则在动画帧对目标造成伤害。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18540,
+      15022,
+      15903,
+      51046,
+      13897,
+      13828,
+      15651,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中，关于火药猴的描述仅限于其在海盗袭击中的生成数量，未提及任何具体行为能力如闲置、攻击、进食、挑衅或投掷。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猴子",
+    "海盗",
+    "投掷",
+    "攻击",
+    "挑衅",
+    "进食",
+    "闲置",
+    "状态图",
+    "powdermonkey"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "交互"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab81330e90c2834da32a2975e17fa6faf5baedb8975bb94fca764bea839569f0",
+    "source_bytes": 7503,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145781493
+  }
+}

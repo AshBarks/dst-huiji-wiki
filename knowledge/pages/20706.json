@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "pageid": 20706,
+  "title": "波浪",
+  "inputs": {
+    "wikitext_sha256": "c96bef5428e7a3313ff723a7e1a6cbe3df90f5b3c7d6a24cf4ded185a2f2ae9a",
+    "symbol_doc_shas": {
+      "components/boattrail.lua": "f1963d3fdae30297eb5c40786b350c337cac626642ba0c7b2c564163cf7b6570",
+      "stategraphs/SGwave.lua": "338ff90ff05485e160225a74f1de48c067905e50426421d136bb03a1f91e7a70"
+    }
+  },
+  "symbols": {
+    "components/boattrail.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGwave.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    }
+  },
+  "page_detail_level": "stub"
+}

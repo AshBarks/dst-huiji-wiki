@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwagboss_robot.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwagboss_robot",
+  "summary": "该状态图驱动 `wagboss_robot`（机械远古/Boss）实体。状态组织以闲置、激活、失控为初始阶段，涵盖多种攻击模式（跺脚、跳跃、导弹、信号），以及受击、死亡等生命阶段状态。整体呈现一个复杂、分阶段的大型敌人行为逻辑。",
+  "api": [],
+  "api_note": "该状态图为内部驱动，未定义或暴露可供外部脚本直接调用的公开方法。",
+  "events_published": [
+    "ms_wagboss_robot_turnoff",
+    "ms_wagboss_robot_losecontrol"
+  ],
+  "events_listened": [
+    "locomote",
+    "attacked",
+    "doattack",
+    "activate",
+    "losecontrol",
+    "deactivate",
+    "death",
+    "animover",
+    "entitywake",
+    "reveal"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "off",
+    "activate",
+    "losecontrol",
+    "taunt",
+    "tantrum_pre",
+    "tantrum_loop",
+    "tantrum_pst",
+    "hit",
+    "stomp",
+    "leap_pre",
+    "leap",
+    "leap_pst",
+    "missiles_pre",
+    "missiles_pre2",
+    "missiles",
+    "missiles_idle",
+    "missiles_hit",
+    "missiles_pst",
+    "signal_pre",
+    "signal_loop",
+    "signal_pst",
+    "death",
+    "turnoff",
+    "walk_start",
+    "walk",
+    "walk_stop"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "待机状态。Boss在此状态下可被激活，且为多数攻击的起始/结束点。播放闲置动画并设置超时自动循环。"
+    },
+    {
+      "state": "off",
+      "note": "关闭/潜伏状态。Boss初始可能在此状态，玩家靠近或触发‘activate’事件后进入‘activate’状态。无法被攻击，且占用空间。"
+    },
+    {
+      "state": "activate",
+      "note": "激活过程。播放一段较长的启动动画，期间无敌且不可打断。动画结束才进入可攻击的闲置状态。"
+    },
+    {
+      "state": "losecontrol",
+      "note": "失控阶段。Boss会切换至友好敌对模式，并在动画后恢复敌对。该状态会触发世界事件，可能开启Boss战剧情。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽攻击。执行一次踢击，对前方扇形区域造成AOE伤害。攻击期间短暂无敌（nointerrupt）。"
+    },
+    {
+      "state": "tantrum_loop",
+      "note": "狂暴践踏循环。Boss连续进行多次践踏攻击，每次践踏均为范围伤害，且启动时短暂无敌。攻击次数由前置状态传入。"
+    },
+    {
+      "state": "stomp",
+      "note": "跺脚攻击。近距离范围AOE伤害，并击飞、破坏附近可破坏物。攻击动画较长，但可被打断。"
+    },
+    {
+      "state": "leap",
+      "note": "跳跃攻击的空中阶段。Boss飞向目标点，期间无敌、无碰撞。撞击地面（leap_pst）时造成范围伤害。"
+    },
+    {
+      "state": "missiles",
+      "note": "导弹攻击。Boss发射3枚导弹，优先锁定附近‘热源’（如火源、玩家），并会周期性重新瞄准（TryRetargetMissiles）。"
+    },
+    {
+      "state": "signal_loop",
+      "note": "信号攻击循环。Boss持续释放信号，可能执行‘hackdrones’（招募无人机）或‘orbitalstrike’（轨道打击）等特殊技能。"
+    },
+    {
+      "state": "death",
+      "note": "死亡动画。Boss播放死亡动画，最后会召唤影怪‘alterguardian_phase4_lunarrift’作为下一阶段。掉落战利品并释放所有无人机。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      16419,
+      10418,
+      18001,
+      20719,
+      52634,
+      72441,
+      18843,
+      15183
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及符号 stategraph__SGwagboss_robot 或其相关能力，所有页面讨论其他游戏实体如电路板、传送焦点、大炮等，无 Boss 状态描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "远古机械",
+    "Boss战",
+    "攻击模式",
+    "导弹攻击",
+    "跳跃攻击",
+    "践踏攻击",
+    "范围伤害",
+    "激活",
+    "死亡阶段"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "24ca0a3000a9b840a11c65144f3539767e677e4b70d1b06231ea76de8e6acccc",
+    "source_bytes": 75363,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142012256
+  }
+}

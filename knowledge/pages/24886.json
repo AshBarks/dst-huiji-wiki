@@ -5,7 +5,8 @@
   "inputs": {
     "wikitext_sha256": "3035d079b90e0dddeeb7d32c90d359e17ee27c8f9300dec6dca19329179217e4",
     "symbol_doc_shas": {
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "stategraphs/SGnightmarerock.lua": "5df017cbbd0e913779451a2b59ef4a5d266571a24a62aea649d86db0cf9957f8"
     }
   },
   "symbols": {
@@ -15,6 +16,11 @@
         "打蜡后显示名称前缀",
         "检查后显示详细特性"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGnightmarerock.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

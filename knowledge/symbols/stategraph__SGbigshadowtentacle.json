@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbigshadowtentacle.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbigshadowtentacle",
+  "summary": "该状态图驱动大暗影触手（bigshadowtentacle）实体，控制其出现、消失、待机和攻击行为。整体状态从到达（arrive）开始，进入空闲（idle）状态等待目标，当检测到敌人时触发攻击准备（attack_pre）并进入攻击（attack）状态，攻击后通过攻击后（attack_post）移除实体。状态转移依赖事件和动画完成。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外方法，所有逻辑通过内部状态和事件处理。",
+  "events_published": [],
+  "events_listened": [
+    "arrive",
+    "leave"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "arrive",
+    "leave",
+    "idle",
+    "attack_pre",
+    "attack",
+    "attack_post"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，触手隐身并播放循环动画，等待攻击目标。当有目标且尝试攻击时，会转移到攻击准备状态。"
+    },
+    {
+      "state": "attack_pre",
+      "note": "攻击准备状态，播放攻击前动画并发出声音，开始攻击计时。动画结束后进入攻击状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，播放攻击循环动画，在动画的第7帧和第17帧造成伤害。攻击完成后根据是否有目标决定继续攻击或进入攻击后状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18783,
+      15248,
+      52497,
+      21238,
+      16666,
+      35790,
+      14803,
+      15764
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击前摇描述",
+        "evidence": [
+          {
+            "pageid": 16666,
+            "quote": "暗影触手的攻击距离较短，且攻击前摇较长。"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 21238,
+            "quote": "暗影触手出现时，会对目标进行连续两次攻击，之后消失。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "大触手",
+    "暗影触手",
+    "触手攻击",
+    "消失动画",
+    "敌人检测",
+    "攻击准备",
+    "攻击状态",
+    "出现效果",
+    "攻击后",
+    "状态图"
+  ],
+  "search_terms_note": "pass1 后零命中 5/9,已二次修正(修正后 4/10)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b050f013d40cf9b2484355000bdd874baef1763949130f3ade9012ce9891182b",
+    "source_bytes": 3483,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135849269
+  }
+}

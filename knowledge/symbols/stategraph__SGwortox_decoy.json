@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwortox_decoy.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwortox_decoy",
+  "summary": "该状态图驱动 Wortox 的 decoy（诱饵/分身）实体。整体状态从 idle 开始，通过死亡事件触发后续状态，包括爆炸或消散效果。状态组织基于时间超时和事件响应，最终移除实例。",
+  "api": [],
+  "api_note": "该状态图没有定义对外 API 方法。",
+  "events_published": [],
+  "events_listened": [
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "startexplosion",
+    "doexplosion",
+    "startfizzle",
+    "dofizzle"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "初始状态，decoy 随机跳舞或空闲，死亡时间由 TUNING.SKILLS.WORTOX.SOULDECOY_DURATION 决定，超时后自动进入死亡状态。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，触发 OnDeath() 方法，并根据 decoyexplodes 标志决定进入爆炸或消散序列。"
+    },
+    {
+      "state": "startexplosion",
+      "note": "爆炸序列开始，播放大笑动画，在帧18生成爆炸效果和颜色渐变。"
+    },
+    {
+      "state": "doexplosion",
+      "note": "执行爆炸，调用 DoExplosion() 方法后立即移除实例。"
+    },
+    {
+      "state": "startfizzle",
+      "note": "消散序列开始，根据过期标志播放慢鼓掌或死亡动画，在帧18生成消散效果。"
+    },
+    {
+      "state": "dofizzle",
+      "note": "执行消散，调用 DoFizzle() 方法后立即移除实例。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13260,
+      22181,
+      35412,
+      35216,
+      34557,
+      15722,
+      15651,
+      13606
+    ],
+    "aspects": [
+      {
+        "aspect": "灵魂诱饵消失伤害描述",
+        "evidence": [
+          {
+            "pageid": 35216,
+            "quote": "学习了“三级灵魂替身”的[[沃拓克斯]]所留下的[[灵魂诱饵]]消失时造成的伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "wortox",
+    "decoy",
+    "诱饵",
+    "分身",
+    "爆炸",
+    "消散",
+    "死亡",
+    "灵魂",
+    "舞蹈",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "辅助",
+    "效果"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3e6fb01a6a65e9e1cba1cce32578b6f5a1a065565971732ddb351ea19049790a",
+    "source_bytes": 4792,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143659549
+  }
+}

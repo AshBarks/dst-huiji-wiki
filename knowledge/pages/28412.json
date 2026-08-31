@@ -15,7 +15,8 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGminiboatlantern.lua": "811317f502abc8ac89a46fde5879722db537b9e98793130b70f5c452dd264837"
     }
   },
   "symbols": {
@@ -126,6 +127,10 @@
         "wording": "时间为耐久耗尽前 10 秒",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGminiboatlantern.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

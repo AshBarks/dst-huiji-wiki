@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcrabkingclaw.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcrabkingclaw",
+  "summary": "该状态图驱动‘螃蟹国王的爪子’实体，管理其从水中出现、攻击目标、受击和消失的完整行为循环。状态组织以idle为核心，连接emerge、attack、hit和submerge等状态，并集成移动和状态效果处理。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，行为完全通过事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "doattack",
+    "emerge",
+    "submerge"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "emerge",
+    "submerge",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "emerge",
+      "note": "爪子从水中出现，初始不可见且临时无敌，动画后变为可见并可被攻击。"
+    },
+    {
+      "state": "submerge",
+      "note": "爪子潜入水中，变得无敌并不可见，最终被移除。"
+    },
+    {
+      "state": "attack",
+      "note": "爪子进行扇形攻击，对范围内敌人造成伤害，攻击后有短暂硬直。"
+    },
+    {
+      "state": "hit",
+      "note": "爪子受击时播放硬直动画，短暂停止行动。"
+    },
+    {
+      "state": "death",
+      "note": "爪子死亡时播放死亡动画，移除物理碰撞并掉落战利品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15259,
+      13606,
+      13779,
+      15651,
+      23957,
+      15022,
+      13260
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面 13606 仅提及帝王蟹生成的巨钳被杀死时触发治疗，但未描述巨钳的出现、潜入、攻击、受击或死亡等具体能力行为；其他页面未涉及。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "螃蟹国王爪子",
+    "爪子攻击",
+    "出现",
+    "消失",
+    "无敌",
+    "硬直",
+    "死亡",
+    "战利品",
+    "扇形范围",
+    "水中"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4eca9bc7fbd576d0d84665570e5e9e78cc2ff31e9ce52111d6b529b9d51fb521",
+    "source_bytes": 9135,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137129808
+  }
+}

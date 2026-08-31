@@ -5,12 +5,30 @@
   "inputs": {
     "wikitext_sha256": "9578a06c6a6e34c667e35768c6d3d5c4cc58c99e897413d75f28a2252230ac39",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
+      "components/carnivalgameshooter.lua": "0f06298811a0e3061399481e0847851a859f9e4c30c81677bf6b058444eb9d0b",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/objectspawner.lua": "544052a579d454e39c881de43d6bb2193df78c8f91139580a79954af7ee29011",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGcarnivalgame_puckdrop_station.lua": "d0285a7bbb83a721ed2bff8348ebace4dd68ece8ab064b2082bc2ab7546c5270"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
+    "components/carnivalgameshooter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -21,6 +39,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/objectspawner.lua": {
+      "aspects_ignored": [
+        "游戏存档与回档功能",
+        "自动对象生成描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/placer.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -29,6 +55,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGcarnivalgame_puckdrop_station.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

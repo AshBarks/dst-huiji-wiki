@@ -8,6 +8,8 @@
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
+      "components/repairable.lua": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -47,6 +49,29 @@
         "wording": "被彻底摧毁，掉落 2 个[[铥矿]]，各有 50% 概率掉落 1 个[[烂电线]]、[[石头]]",
         "semantic_consistent": true
       }
+    },
+    "components/prototyper.lua": {
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述伪科学站，但 '伪科学站' 并非 'Affected variants' 列表中的实体。该页面内容与给定代码符号无关。"
+      }
+    },
+    "components/repairable.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复",
+        "发条装置修复方法",
+        "支柱修复可能性",
+        "漂浮平台漏洞修复",
+        "绝望石装备耐久恢复",
+        "螨地爬修复状态转换"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "mention_source": "llm_verdict",

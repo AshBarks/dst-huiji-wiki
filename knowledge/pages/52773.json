@@ -11,9 +11,13 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/migrationpetsoverrider.lua": "719236aa93af22911776d1b1d63459e6f9702fe5840cb8292904327701345656",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
+      "stategraphs/SGgestalt_guard_evolved.lua": "8de9d40cbedb781568f074955cf0311d9b1d27edeef6ef9fe4d23bdc27dfb372"
     }
   },
   "symbols": {
@@ -97,6 +101,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/migrationpetsoverrider.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/planardamage.lua": {
       "aspects_ignored": [
         "位面伤害加成效果描述",
@@ -105,6 +113,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [
@@ -126,6 +138,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGgestalt_guard_evolved.lua": {
+      "aspects_ignored": [
+        "闲置状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGeyeturret.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGeyeturret",
+  "summary": "该状态图驱动实体'eyeturret'（眼球炮塔），主要状态包括idle、death、hit、attack，通过事件处理响应死亡、攻击和受击，整体组织为基础状态与战斗状态结合，并包含冻结和触电等通用状态。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，所有逻辑通过状态和事件内部处理。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "doattack",
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "hit",
+    "attack"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "普通待机状态，实体可旋转，播放循环待机动画，无特殊玩家交互。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡状态，播放死亡动画并掉落战利品，移除物理碰撞体，玩家无法干预。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画后返回idle，短暂硬直窗口，影响战斗节奏。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，触发灯光效果并播放攻击动画和音效，在动画第22帧执行伤害并播放射击音效，玩家可观察攻击前摇。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15718,
+      13606,
+      24748,
+      13701,
+      15022,
+      16419,
+      17970
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 stategraph__SGeyeturret 相关的能力描述。页面 15718 提到 eyeturret 但仅为信息框模板，无行为语义；其他页面与该实体无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "眼球炮塔",
+    "eyeturret",
+    "攻击状态",
+    "死亡动画",
+    "受击硬直",
+    "冻结效果",
+    "触电效果",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "防御"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "648d920f800278000643beacbd4f1428b987bd1374425be855164c9a668496db",
+    "source_bytes": 2669,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137504052
+  }
+}

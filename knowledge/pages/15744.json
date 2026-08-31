@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "5ca87004dca0e38ef2477a5fecde554b50a743f227fa4f4f320d3e76c9d57ec1",
     "symbol_doc_shas": {
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/drownable.lua": "949ea56c891cfcef5b9957bc064e3d3c781a79752ee42e44cda6eb0064e4f8e3",
@@ -22,11 +23,23 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
       "stategraphs/SGspider.lua": "0de56046bf0501f25e25e1eb7523b2a1accfbdd8fcc18feb4c9e7a838179bfdf"
     }
   },
   "symbols": {
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面涉及召唤机制和掉落，未提及酸雨。"
+      }
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -217,6 +230,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -225,7 +242,11 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面为月晶蜘蛛战斗数据，未提及交易。"
+      }
     },
     "stategraphs/SGspider.lua": {
       "route": "direct",

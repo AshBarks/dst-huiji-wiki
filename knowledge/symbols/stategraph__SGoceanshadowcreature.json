@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGoceanshadowcreature.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGoceanshadowcreature",
+  "summary": "该状态图驱动名为'oceanshadowcreature'的海洋暗影生物。整体状态组织包括空闲、攻击、传送、嘲讽、出现、消失和死亡等状态，通过事件如'boatteleport'和'doattack'触发转换。实体在海洋上出现，可传送至船边或陆地，并与玩家战斗。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法；所有交互通过事件处理器处理。",
+  "events_published": [],
+  "events_listened": [
+    "boatteleport",
+    "death",
+    "doattack",
+    "teleport_to_land",
+    "dispelsanityshadowcreature"
+  ],
+  "netvars": [],
+  "tunables": [
+    "OCEANHORROR.ATTACH_OFFSET_PADDING"
+  ],
+  "states": [
+    "idle",
+    "attack",
+    "boatteleport",
+    "taunt",
+    "appear",
+    "death",
+    "disappear",
+    "action",
+    "teleport_to_land"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当实体有攻击目标且未被忙状态时进入，播放攻击动画并在第17帧造成伤害，有短暂硬直窗口。"
+    },
+    {
+      "state": "boatteleport",
+      "note": "当实体在船上传送时进入，消失后重新出现在船边或海面，传送半径取决于船平台大小，玩家可能被突袭。"
+    },
+    {
+      "state": "death",
+      "note": "当实体被击杀时进入，播放死亡动画并掉落战利品，之后移除实体，玩家可安全拾取。"
+    },
+    {
+      "state": "disappear",
+      "note": "当实体被驱散或决定离开时进入，播放消失动画并移除，玩家无法点击，常用于理智影怪消失。"
+    },
+    {
+      "state": "teleport_to_land",
+      "note": "当实体传送到陆地时进入，播放动画后生成传送特效，并与另一生物交换位置，可能用于逃离或转移。"
+    },
+    {
+      "state": "taunt",
+      "note": "当实体嘲讽玩家时进入，播放嘲讽动画，可能吸引玩家注意或触发战斗。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      13897,
+      15225,
+      15651,
+      57263,
+      18001,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 15022,
+            "quote": "攻击范围=3.5"
+          },
+          {
+            "pageid": 51046,
+            "quote": "启迪战争瓦器人的战吼动作也会对附近的目标造成 50 物理和 10 位面伤害并[[击退]]。"
+          },
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+          },
+          {
+            "pageid": 15651,
+            "quote": "龙蝇主动仇恨 15 {{解释|距离单位}}内的玩家"
+          },
+          {
+            "pageid": 15922,
+            "quote": "攻击时以 14 帧的攻击间隔发射远程的吹箭"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "海洋阴影",
+    "暗影生物",
+    "传送",
+    "攻击",
+    "死亡",
+    "驱散",
+    "嘲讽",
+    "船战"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "海洋"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4692a1bf12f0bf460f383dc6d41330b7019baaf82f752c2266b64c743c52bb28",
+    "source_bytes": 12045,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139858235
+  }
+}

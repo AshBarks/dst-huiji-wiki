@@ -5,16 +5,30 @@
   "inputs": {
     "wikitext_sha256": "fc8937b32ca4c01245763216dee0e0d8a96d605baee7948b897df2f7646c8dd6",
     "symbol_doc_shas": {
+      "components/acidinfusible.lua": "f36aede29d5c9d2d336c3a93aeef7bb3db481080a3871a3b42166aad7976c3fd",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/teleporter.lua": "fec8be3bcd9b9216e9a2df12abee06d92bee8dad29bbdd91a51bf501a97101ef",
+      "stategraphs/SGtentacle_arm.lua": "c433ef72b7dd61751d731abf21d8aca5960718aef2a6488cc5d93225098d96b4"
     }
   },
   "symbols": {
+    "components/acidinfusible.lua": {
+      "aspects_ignored": [
+        "酸雨对生物体型的改变",
+        "酸雨对生物视觉效果的添加"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述触手生成和掉落，缺少酸雨影响。"
+      }
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -105,6 +119,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/teleporter.lua": {
+      "aspects_ignored": [
+        "传送漂浮平台",
+        "传送目标能力",
+        "多人传送目标设置",
+        "玩家传送命令"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGtentacle_arm.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

@@ -5,15 +5,25 @@
   "inputs": {
     "wikitext_sha256": "2bfe2314313879959a96dfe9e5f2b60857c6155b704d2050388fde2e7378e54a",
     "symbol_doc_shas": {
+      "components/aura.lua": "22a56638ab92c17639466c95afd4767004e87a1904c23199e587361c0e20333d",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e"
+      "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "stategraphs/SGghost.lua": "d5f3683466a4de962152e5c74e43354d0af747c61490a3b6e32ad30f1850820d"
     }
   },
   "symbols": {
+    "components/aura.lua": {
+      "aspects_ignored": [
+        "电路板激活启用增益",
+        "骨灰罐激活启用光环"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/combat.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -83,7 +93,31 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGghost.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "aura伤害与愤怒状态切换",
+          "evidence": [
+            {
+              "pageid": 19719,
+              "quote": "幽灵不会攻击，但它会每隔 1.2 秒对周围 1.5 {{解释|距离单位}}以内除幽灵以外的所有[[生物]]造成伤害。此时它会变成红色来显示危险。"
+            },
+            {
+              "pageid": 19719,
+              "quote": "<!--我还是头一次知道有aura这么个组件-->"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "击退机制中的幽灵实体"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "summary"

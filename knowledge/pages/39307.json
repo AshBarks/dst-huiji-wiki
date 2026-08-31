@@ -6,6 +6,7 @@
     "wikitext_sha256": "6a0bc6a1e353e316887d6d8dc2727ef867c2cb98398efabd533b84fcd9a7d0a9",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/cooker.lua": "6da76890dee84a843f72420a4e9ba15cb810d8d6f6791c2bba680476380a2c02",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
@@ -14,7 +15,9 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/portablestructure.lua": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/storytellingprop.lua": "de2a25f2d05151ca911e5072c0a888290a5bef12ceec4038b0d5a934ecd7e1d4",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -39,12 +42,21 @@
         "semantic_consistent": true
       }
     },
+    "components/cooker.lua": {
+      "aspects_ignored": [
+        "烹饪操作步骤描述",
+        "烹饪锅的烹饪功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/deployable.lua": {
       "aspects_ignored": [
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -114,6 +126,10 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/portablestructure.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "mention_source": "llm_verdict",
       "route": "direct",
@@ -122,6 +138,13 @@
         "wording": "来时带有可以燃烧 1.5 分钟的燃料",
         "semantic_consistent": true
       }
+    },
+    "components/storytellingprop.lua": {
+      "aspects_ignored": [
+        "讲故事能力触发条件与理智增益效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

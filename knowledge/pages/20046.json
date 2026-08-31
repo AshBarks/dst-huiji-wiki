@@ -12,7 +12,8 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/vasedecoration.lua": "556092b91f4145e85f37ad0d344dc647e54707c320e282c06274fa1c802807c6"
     }
   },
   "symbols": {
@@ -92,6 +93,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/vasedecoration.lua": {
+      "aspects_ignored": [
+        "发光效果描述",
+        "装饰放置功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

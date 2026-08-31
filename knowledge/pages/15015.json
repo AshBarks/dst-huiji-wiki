@@ -11,7 +11,9 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/savedrotation.lua": "ab510a0d62f81445cb3b45af6b52fea8364951090b96478496a6a8d9fde7f360",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "components/writeable.lua": "4bc6a4dd2931cdf949ed9e01730ef3f12e71d6a1c9905bf110a2ebc33eb4509b"
     }
   },
   "symbols": {
@@ -72,6 +74,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/savedrotation.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/workable.lua": {
       "aspects_ignored": [
         "杂草挖除后行为描述",
@@ -80,6 +86,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/writeable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

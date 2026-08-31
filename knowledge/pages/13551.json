@@ -6,9 +6,11 @@
     "wikitext_sha256": "32b9e08669718ddfa7b618827aa33672ac2e4b5889f84285d033f45c75284b11",
     "symbol_doc_shas": {
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/gestaltcapturable.lua": "1fa5c9f7185e67940107838233a9b350cd95d6cd2b11efc6b08b7414707f0cab",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
       "stategraphs/SGbrightmare_gestalt.lua": "79e3e20fb28fda0aa5aeb9ecce6f319974aadff7f1e711e6c93935e180bc3531"
     }
   },
@@ -30,6 +32,25 @@
         "wording": "被虚影催眠会睡觉6秒",
         "semantic_consistent": true
       }
+    },
+    "components/gestaltcapturable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "捕获行为描述",
+          "evidence": [
+            {
+              "pageid": 13551,
+              "quote": "虚影可以用[[幻灵捕获机]]捕获，以用于建造[[螨地爬]]"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "级别状态标注"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -63,6 +84,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "stategraphs/SGbrightmare_gestalt.lua": {
       "mention_source": "pass2_evidence",

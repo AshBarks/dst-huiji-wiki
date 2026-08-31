@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGgingerbreadpig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGgingerbreadpig",
+  "summary": "该状态图驱动姜饼猪实体，用于饥荒联机版冬季盛宴活动。状态包括闲置、死亡、受惊、受伤等，基于状态机组织，处理动画、音效和事件响应如被攻击或玩家靠近。",
+  "api": [],
+  "api_note": "源码中未定义对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death",
+    "onplayernear"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "death",
+    "scared",
+    "hit"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体无动作时进入，播放闲置动画，若被追赶则显示疲劳循环动画，伴有呼吸音效。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡时进入，播放死亡动画并停止移动，若被追赶或靠近玩家则掉落战利品，移除碰撞体。"
+    },
+    {
+      "state": "scared",
+      "note": "玩家靠近时触发进入，播放受惊动画并停止移动，开始掉落面包屑，退出时标记已被玩家追赶。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击且未死亡时进入，播放受伤动画并停止移动，伴有受击音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13897,
+      15651,
+      15225,
+      51046,
+      13606,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未包含任何与'stategraph__SGgingerbreadpig'相关的文本，所有页面讨论的是其他实体（如天体英雄、克劳斯、龙蝇等），未提及该符号的能力或行为表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "姜饼猪",
+    "冬季盛宴",
+    "攻击",
+    "逃跑",
+    "掉落",
+    "死亡",
+    "受伤",
+    "闲置"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "活动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fd2954292ff11ec8d56fdd0dab1914b9271566037db831146ce18b4ceda19ebe",
+    "source_bytes": 4886,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137893863
+  }
+}

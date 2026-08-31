@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGklaus.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGklaus",
+  "summary": "该状态图驱动饥荒联机版中的Boss实体克劳斯（Klaus）。整体状态组织包括空闲、攻击、指挥鹿、大笑、转换形态等多种状态，通过事件触发和状态转换实现其复杂行为，涵盖了战斗、复活、暴怒等机制。",
+  "api": [],
+  "api_note": "源码中未定义任何公共API方法，所有逻辑均通过状态图内部状态转换和事件处理实现。",
+  "events_published": [
+    "dropkey"
+  ],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "chomp",
+    "enrage",
+    "transition",
+    "death",
+    "freeze",
+    "electrocute",
+    "sleep",
+    "wake",
+    "sink",
+    "fallinvoid",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "KLAUS_HEALTH_REZ",
+    "KLAUS_COMMAND_CD"
+  ],
+  "states": [
+    "idle",
+    "hit",
+    "death",
+    "resurrect",
+    "resurrect_pst",
+    "taunt",
+    "taunt_roar",
+    "attack",
+    "quickattack",
+    "attack_chomp",
+    "command_pre",
+    "command_loop",
+    "command_pst",
+    "laugh_pre",
+    "laugh_loop",
+    "laugh_pst",
+    "transition",
+    "transition_loop",
+    "transition_pst",
+    "transition_enrage"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "克劳斯的空闲状态，在未进行其他动作时播放待机动画。会检查是否有待执行的转换或大笑事件，并尝试触发啃咬攻击。"
+    },
+    {
+      "state": "hit",
+      "note": "克劳斯被攻击时的硬直状态，播放受击动画并播放音效。硬直结束后，根据情况转换到攻击、大笑或其他状态。"
+    },
+    {
+      "state": "attack",
+      "note": "克劳斯的普通攻击状态，播放双爪攻击动画。攻击分为两段伤害，在动画帧16和27时触发攻击判定，攻击期间具有无敌帧（nosleep/nofreeze）。"
+    },
+    {
+      "state": "attack_chomp",
+      "note": "克劳斯的啃咬攻击状态，具有突进效果。计算与目标的距离，在动画中跃向目标并造成伤害，攻击后根据目标距离决定是否接续快速攻击。有冷却时间（chomp_cd）。"
+    },
+    {
+      "state": "command_pre",
+      "note": "克劳斯指挥鹿的准备状态，停止移动并播放指挥预备动画。会挑选可施法的鹿并触发其施法事件，随后进入指挥循环状态。"
+    },
+    {
+      "state": "command_loop",
+      "note": "克劳斯指挥鹿的循环状态，持续播放指挥动画。会检查鹿的施法状态，指挥结束后进入指挥结束状态，并触发指挥冷却（command_cd）。"
+    },
+    {
+      "state": "laugh_pre",
+      "note": "克劳斯大笑的预备状态，播放大笑预备动画。此状态可被中断，用于减少大笑剩余次数（laughsremaining），影响后续行为。"
+    },
+    {
+      "state": "transition",
+      "note": "克劳斯的形态转换开始状态，根据事件执行暴怒（enrage）或召唤帮助（callforhelp）。播放转换预备动画，转换期间具有无敌帧，并触发召唤鹿的逻辑。"
+    },
+    {
+      "state": "transition_enrage",
+      "note": "克劳斯暴怒转换的完成状态，播放暴怒动画并激活暴怒状态（inst.enraged=true）。暴怒后攻击力提升，并触发摄像头震动效果。"
+    },
+    {
+      "state": "death",
+      "note": "克劳斯的死亡状态。根据是否解锁（Unchained）决定掉落钥匙或触发复活流程。死亡时播放死亡动画，解锁后掉落战利品并消失。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13897,
+      13823,
+      15651,
+      20152,
+      15594,
+      23187,
+      15022,
+      15812
+    ],
+    "aspects": [
+      {
+        "aspect": "普通攻击伤害描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "克劳斯",
+    "Boss",
+    "攻击",
+    "啃咬",
+    "指挥",
+    "鹿",
+    "暴怒",
+    "死亡",
+    "复活",
+    "大笑"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9103173c4edeb14c54ecc5670b38cec3564f509a43db4d5bd975c739587cddbe",
+    "source_bytes": 38802,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138313761
+  }
+}

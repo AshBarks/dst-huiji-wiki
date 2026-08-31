@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_shooting_target.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_shooting_target",
+  "summary": "该状态图驱动饥荒联机版中嘉年华射击游戏的靶子实体。它通过事件控制靶子的开启、关闭、友方/敌方激活及被击中等状态。整体状态组织基于事件驱动，包括待机动画和激活动画的切换。",
+  "api": [],
+  "api_note": "该状态图不对外提供API方法，所有交互通过事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "carnivalgame_turnon",
+    "carnivalgame_target_startround",
+    "carnivalgame_endofround",
+    "carnivalgame_shooting_target_hit",
+    "carnivalgame_turnoff"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle_off",
+    "turn_on",
+    "idle_on",
+    "turn_off",
+    "friendly_activate",
+    "friendly_activate_hit",
+    "friendly_activate_pst",
+    "enemy_activate",
+    "enemy_activate_hit_pst",
+    "enemy_activate_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "friendly_activate",
+      "note": "当游戏回合开始且为友方目标时激活，显示友好目标动画，玩家应避免射击友方。"
+    },
+    {
+      "state": "enemy_activate",
+      "note": "当游戏回合开始且为敌方目标时激活，显示敌方动画，玩家射击可得分。"
+    },
+    {
+      "state": "friendly_activate_hit",
+      "note": "友方目标被击中时进入，播放被击中动画和音效，通常伴随惩罚。"
+    },
+    {
+      "state": "enemy_activate_hit_pst",
+      "note": "敌方目标被击中后进入，播放被击中动画和音效，通常伴随得分。"
+    },
+    {
+      "state": "idle_on",
+      "note": "目标处于激活待机状态，循环播放动画，等待被击中或回合结束。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13156,
+      47009,
+      51951,
+      14929,
+      14936,
+      14935,
+      15022,
+      21137
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 stategraph__SGcarnivalgame_shooting_target 相关的能力表达；所有页面涉及其他实体（如沃尔夫冈、螨地爬、坦克龟等）和游戏机制（如枯萎、迷你冰川），不涉及嘉年华射击游戏的目标激活、被击中或待机动画等行为描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "嘉年华",
+    "射击游戏",
+    "靶子",
+    "友方激活",
+    "敌方激活",
+    "动画",
+    "事件",
+    "状态",
+    "待机",
+    "击中"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,已二次修正(修正后 3/10)",
+  "gameplay_tags": [
+    "嘉年华",
+    "射击",
+    "游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "057d170ba3e933e95f37147bd3e82f2703d04792c526667ca14ffd7aa3cea738",
+    "source_bytes": 5452,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136616905
+  }
+}

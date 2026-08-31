@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlunarplanttentacle.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlunarplanttentacle",
+  "summary": "该状态图驱动“月亮植物触手”实体，一种由玩家召唤的战斗触手。整体状态组织以空闲、嘲讽、攻击和死亡为核心，通过事件如死亡和新战斗目标触发状态转换。攻击状态分为普通攻击和快速攻击，并包含仇恨转移机制，死亡后实体被移除。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，仅处理内部状态和事件。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "newcombattarget"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "taunt",
+    "death",
+    "attack",
+    "quickattack",
+    "attack_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "初始状态，播放触手破土动画并保持隐形，通常作为待机或生成点。"
+    },
+    {
+      "state": "taunt",
+      "note": "当有新战斗目标时进入，播放动画并持续尝试攻击；若目标消失则转为攻击后状态。"
+    },
+    {
+      "state": "death",
+      "note": "死亡时触发，播放死亡动画并移除物理碰撞，实体即将消失。"
+    },
+    {
+      "state": "attack",
+      "note": "普通攻击状态，在第15帧执行攻击，若目标攻击触手且能攻击所有者，则仇恨转向所有者。"
+    },
+    {
+      "state": "quickattack",
+      "note": "快速攻击状态，攻击帧更早（第8帧），仇恨转移逻辑类似普通攻击。"
+    },
+    {
+      "state": "attack_pst",
+      "note": "攻击后状态，播放后退动画，退出时自动移除触手实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13897,
+      15225,
+      15651,
+      18783,
+      51046,
+      13379,
+      15922
+    ],
+    "aspects": [
+      {
+        "aspect": "触手攻击行为描述",
+        "evidence": [
+          {
+            "pageid": 13379,
+            "quote": "触手会从地下伸出发起攻击，在0.33秒内连续攻击目标两次，造成累计68伤害。"
+          }
+        ]
+      },
+      {
+        "aspect": "触手破土动画描述",
+        "evidence": [
+          {
+            "pageid": 13379,
+            "quote": "原本触手位置的气泡会暂时消失，然后触手的一部分短暂的凸出地面"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月亮植物",
+    "触手",
+    "攻击",
+    "死亡",
+    "嘲讽",
+    "快速攻击",
+    "仇恨转移",
+    "Owner",
+    "召唤物"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "召唤"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "57bf512e791f5c0647cb7cca54349797cf8f97cf82816aaf748ef098aecebd3f",
+    "source_bytes": 3013,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138608621
+  }
+}

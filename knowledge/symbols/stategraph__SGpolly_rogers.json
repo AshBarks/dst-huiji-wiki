@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpolly_rogers.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpolly_rogers",
+  "summary": "该状态图驱动“Polly Rogers”（一种鹦鹉）实体，常见于猴子岛区域。整体状态组织基于 CommonHandlers 处理通用事件如攻击、死亡、睡眠等，并定义了飞行、地面闲置、物品交互、攻击受击、移动和消失等多种状态，以响应玩家行为和环境变化。",
+  "api": [],
+  "api_note": "该状态图没有定义公共 API 方法，所有行为通过内部状态和事件处理实现。",
+  "events_published": [
+    "on_no_longer_landed",
+    "on_landed"
+  ],
+  "events_listened": [
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "flyaway",
+    "locomote",
+    "despawn",
+    "corpsechomped",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "take",
+    "give",
+    "idle_ground",
+    "peck",
+    "switch",
+    "hop",
+    "caw",
+    "hit",
+    "death",
+    "flyaway",
+    "glide",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "despawn"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "飞行状态，播放扇翅动画和循环飞行声音，持续直到触发移动或其他事件。"
+    },
+    {
+      "state": "idle_ground",
+      "note": "地面闲置状态，移除飞行标签，随机触发啄食、转身、跳跃或鸣叫等行为，增加玩家互动趣味。"
+    },
+    {
+      "state": "take",
+      "note": "拾取物品动作，播放动画并在第7帧执行缓冲动作（如拾取陷阱或物品），完成后返回idle状态。"
+    },
+    {
+      "state": "give",
+      "note": "给予物品动作，播放动画并在第4帧执行缓冲动作（如给予玩家物品），完成后返回idle状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击状态，移除飞行标签，播放受击动画和声音，硬直期间返回idle地面状态，玩家可趁机互动。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，停止移动，播放死亡动画，移除物理碰撞并掉落战利品，尸体可被啃食。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞走状态，清除库存物品，播放起飞动画，设置向上物理速度，2秒后可能移除实体或返回帽子，用于逃离威胁。"
+    },
+    {
+      "state": "glide",
+      "note": "滑翔状态，用于从飞行降落到地面，检测高度并自动切换到idle地面状态，确保平稳着陆。"
+    },
+    {
+      "state": "walk",
+      "note": "移动状态，根据是否奔跑设置移动速度（走或跑），播放行走动画并循环，是主要的移动方式。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18359,
+      15922,
+      15022,
+      13897,
+      15651,
+      15225,
+      51046,
+      14938
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与stategraph__SGpolly_rogers相关的飞行状态、地面闲置、拾取/给予动作、被攻击、死亡、飞走、滑翔或移动等行为描述，所有页面讨论的是其他游戏实体（如玩具、熔炉装备、巨兽等），无直接证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "鹦鹉",
+    "Polly Rogers",
+    "飞走",
+    "地面行为",
+    "攻击",
+    "死亡",
+    "掉落",
+    "猴子岛",
+    "拾取",
+    "给予"
+  ],
+  "gameplay_tags": [
+    "生物",
+    "生存",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f0389a3fe861197cad62579b8e80cfdc31f98aee34ca395f5b015fd6adcf470e",
+    "source_bytes": 17786,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140177833
+  }
+}

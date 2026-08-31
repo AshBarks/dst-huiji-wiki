@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfissure.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfissure",
+  "summary": "该状态图驱动名为'fissure'的可开关实体，可能是一种裂缝或传送门类机关。状态组织以空闲状态为基础，通过超时设置实现在关闭和开启状态之间的自动过渡，整体结构简单，仅包含四个状态。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，仅通过内部状态转换和事件处理器管理行为。",
+  "events_published": [],
+  "events_listened": [
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle_off",
+    "idle_turnoff",
+    "idle_on",
+    "idle_turnon"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_off",
+      "note": "实体处于关闭状态，玩家无法与之交互，表现为静止的空闲状态。"
+    },
+    {
+      "state": "idle_turnoff",
+      "note": "进入关闭过渡状态，持续4秒超时，期间播放关闭动画并调用turnoff函数。"
+    },
+    {
+      "state": "idle_on",
+      "note": "实体处于开启状态，可能允许玩家使用或触发效果，表现为活动的空闲状态。"
+    },
+    {
+      "state": "idle_turnon",
+      "note": "进入开启过渡状态，持续4秒超时，期间播放开启动画并调用turnon函数。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20714,
+      23187,
+      18476,
+      14579,
+      15022,
+      15295,
+      13779,
+      34314
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中没有讨论与 stategraph__SGfissure 相关的实体开关状态、过渡动画或行为语义。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "裂缝",
+    "开关机",
+    "状态图",
+    "动画",
+    "超时",
+    "关闭",
+    "开启",
+    "空闲",
+    "实体",
+    "机关"
+  ],
+  "gameplay_tags": [
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c7715558c69103b8065896928afdb911f75c096187f3736901b0b8e052612960",
+    "source_bytes": 1107,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145315591
+  }
+}

@@ -6,11 +6,13 @@
     "wikitext_sha256": "69369f26c66aabffe9d1ea856418502759b24b1a51182bda9ec81c2fb66c4442",
     "symbol_doc_shas": {
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "components/gravediggable.lua": "6f5cd0907c59490b9f0ac6e5d426d761e1b9818b63916e4d9a5964db61f0cab2",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/upgradeable.lua": "a720dcee032d32897b181d843baa23eb07722a0df1e104ac8a997732efb9ec90",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -24,6 +26,26 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/gravediggable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "坟墓的挖掘状态显示",
+          "evidence": [
+            {
+              "pageid": 24028,
+              "quote": "|图像1文字=未被挖掘"
+            },
+            {
+              "pageid": 24028,
+              "quote": "|图像2文字=已被挖掘"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -76,6 +98,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/upgradeable.lua": {
+      "aspects_ignored": [
+        "升级次数与材料需求",
+        "开花阶段升级效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

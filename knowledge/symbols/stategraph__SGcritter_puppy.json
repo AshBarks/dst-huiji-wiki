@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_puppy.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_puppy",
+  "summary": "该状态图（SGcritter_puppy）驱动的是玩家可拥有的“小狗伴侣”宠物实体。它主要复用并扩展了通用伴侣状态图（SGcritter_common）中的状态，通过定义表情动画、互动逻辑和行走睡眠等行为，构建了小狗伴侣的日常活动模式。整体状态组织基于通用伴侣框架，补充了特定于小狗的音效和动画。",
+  "api": [],
+  "api_note": "源码未定义任何对外（public）方法。所有状态逻辑均通过事件驱动（如OnEat）或通用状态机函数封装在状态图内部。",
+  "events_published": [],
+  "events_listened": [
+    "OnEat",
+    "OnAvoidCombat",
+    "OnTraitChanged",
+    "OnSleepEx",
+    "OnWakeEx",
+    "OnLocomote",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "emote_scratch",
+    "emote_play_dead",
+    "cute",
+    "pet_emote",
+    "combat_emote",
+    "play_with_other_critter_active",
+    "play_with_other_critter_passive",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "sleep",
+    "sleep_stop",
+    "hop",
+    "sink",
+    "wash_ashore",
+    "void_fall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "小狗伴侣的基础待机状态，会随机触发挠痒、装死等闲置表情动画。"
+    },
+    {
+      "state": "pet_emote",
+      "note": "当玩家使用抚摸动作时触发的特殊表情状态，表现为摇尾巴并伴随连续的尾巴音效。"
+    },
+    {
+      "state": "combat_emote",
+      "note": "进入战斗准备或威胁展示时播放的预备/循环动画，伴有吠叫和喘息声。"
+    },
+    {
+      "state": "play_with_other_critter",
+      "note": "两只不同宠物靠近时可能触发的互动状态，分为主动和被动方，会播放低吼或喘息声。"
+    },
+    {
+      "state": "eat",
+      "note": "当伴侣饥饿值较低时，会尝试寻找并食用食物来恢复饥饿值。"
+    },
+    {
+      "state": "hungry",
+      "note": "伴侣饥饿值降至特定阈值时触发的状态，会通过吠叫向玩家提示饥饿。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "伴侣对玩家使用“蹭一蹭”动作时的状态，可恢复玩家的生命与理智，并伴有亲昵的音效。"
+    },
+    {
+      "state": "walk",
+      "note": "伴侣的移动状态，会播放行走动画和脚步声，通常跟随玩家或执行其他移动指令。"
+    },
+    {
+      "state": "sleep",
+      "note": "伴侣的睡眠状态，会播放打鼾声。睡眠期间无法执行其他动作，且可能被惊醒。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13409,
+      13456,
+      15975,
+      34037,
+      13437,
+      13455,
+      13156
+    ],
+    "aspects": [
+      {
+        "aspect": "宠物进食行为描述",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物会接受一切[[常规食物]]。吃下任何东西后宠物的的保质期就会刷新。"
+          }
+        ]
+      },
+      {
+        "aspect": "饥饿状态与叫声提示",
+        "evidence": [
+          {
+            "pageid": 18057,
+            "quote": "宠物在低保质期时会进入饥饿状态，饥饿状态下的宠物会发出叫声并表现相应的动画。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小狗伴侣",
+    "宠物",
+    "伙伴",
+    "跟随",
+    "互动",
+    "抚摸",
+    "战斗",
+    "饥饿",
+    "表情"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "陪伴"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "aa7f7f39d6b5e01c90388a14a420ee741f543ccfdaff027744cd5fb343168d39",
+    "source_bytes": 6383,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788145061579
+  }
+}

@@ -17,16 +17,20 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/herdmember.lua": "98d932c9bb82412871e32014f29df654569ec0083906560457c9983dbec10787",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sizetweener.lua": "72936db3eefe5a7e737ebb8baa395df82ba19e496209907760c66268e1afe47f",
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGmossling.lua": "6d3b4f6b6e66985447abbc9038b8ffc24fcd4339f518c95480f7ed9a719dac76"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -40,7 +44,11 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "麋鹿鹅",
+        "semantic_consistent": true
+      }
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -71,7 +79,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/mosslingbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -195,6 +204,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/herdmember.lua": {
+      "aspects_ignored": [
+        "兽群位置决定机制",
+        "兽群再生规则"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -251,6 +268,10 @@
         "semantic_consistent": true
       }
     },
+    "components/sizetweener.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sleeper.lua": {
       "aspects_ignored": [
         "催眠效果范围描述",
@@ -263,6 +284,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmossling.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

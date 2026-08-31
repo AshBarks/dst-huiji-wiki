@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwobybig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwobybig",
+  "summary": "该状态图（SGwobybig）驱动饥荒联机版中角色沃尔特的宠物大沃比（Woby Big）。它定义了大沃比在各种情境下的行为状态，包括闲置、移动、交互、战斗、坐下、变形（变回小沃比）等，并通过事件和动作处理器来驱动这些状态间的转换。",
+  "api": [],
+  "api_note": "该状态图（StateGraph）本身不定义对外的API方法。其行为由状态机内部逻辑和监听的事件驱动，外部通常通过触发事件（如“transform”、“showrack”）或设置组件（如rideable）来间接影响状态。",
+  "events_published": [],
+  "events_listened": [
+    "transform",
+    "showrack",
+    "showalignmentchange",
+    "start_sitting",
+    "oneat",
+    "OnStep",
+    "OnLocomote",
+    "OnSleep",
+    "OnFreeze",
+    "OnHop",
+    "OnSink",
+    "OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "despawn",
+    "bark_idle",
+    "shake",
+    "eat",
+    "sit",
+    "cower",
+    "actual_cower",
+    "scratch",
+    "transform",
+    "alert",
+    "actual_alert",
+    "sit_alert_tailwag",
+    "actual_sit_alert_tailwag",
+    "actual_sit_alert_tailwag_loop",
+    "sit_alert",
+    "actual_sit_alert",
+    "run_start",
+    "run",
+    "run_stop",
+    "pickup",
+    "give",
+    "dolongaction",
+    "bash_jump",
+    "bash_collide",
+    "bash_miss",
+    "sitting",
+    "actual_sitting",
+    "sitting_cower",
+    "actual_sitting_cower_pre",
+    "actual_sitting_cower_loop",
+    "rack_appear"
+  ],
+  "state_notes": [
+    {
+      "state": "transform",
+      "note": "大沃比在满足特定条件（如饥饿过低）时变回小形态的过场动画状态。期间无敌，动态阴影会缩小，结束后会扣除一定饥饿值（TUNING.WOBY_FORCE_TRANSFORM_HUNGER），若拥有耐力则扣除量减少。"
+    },
+    {
+      "state": "pickup",
+      "note": "执行“沃比拾取”（WOBY_PICKUP）动作时的状态。沃比会执行一个跳跃动画扑向目标物品，期间有物理速度控制，并在靠近目标时尝试完成动作。"
+    },
+    {
+      "state": "dolongaction",
+      "note": "执行需要持续一段时间的动作，如挖掘（WOBY_PLAY）、开采（STORE）或采集。动画为“觅食”循环，若目标是容器则会保持其打开状态，动作完成或中断后退出。"
+    },
+    {
+      "state": "bash_jump",
+      "note": "沃比攻击树木（CHOP）或矿石（MINE）时的起始状态。沃比会执行跳跃攻击动画，并在跳跃过程中对可工作目标进行一次判定，若命中则进入“bash_collide”状态。"
+    },
+    {
+      "state": "bash_collide",
+      "note": "沃比攻击命中后的碰撞状态。播放撞击动画并产生后退的物理位移，同时会消耗一定饥饿值（TUNING.SKILLS.WALTER.WOBY_TASK_AID_HUNGER，受耐力属性影响）。"
+    },
+    {
+      "state": "sitting",
+      "note": "大沃比从移动或其它状态进入坐下的过渡状态。会根据之前状态（如奔跑、蜷缩）播放不同的衔接动画，最终进入“actual_sitting”状态。"
+    },
+    {
+      "state": "sitting_cower",
+      "note": "大沃比从移动或蜷缩状态进入坐姿蜷缩的过渡状态。根据来源状态播放不同衔接动画，最终进入实际的蜷缩循环动画。"
+    },
+    {
+      "state": "alert",
+      "note": "玩家准备骑乘大沃比时的预备状态。沃比会立起耳朵、身体前倾并进入警戒循环动画，表示已准备好被骑乘。"
+    },
+    {
+      "state": "rack_appear",
+      "note": "当显示晾肉架（由事件“showrack”触发）时的状态。沃比会执行一个展开晾肉架的特殊动画。"
+    },
+    {
+      "state": "sitting_cower",
+      "note": "触发“start_sitting”事件且`isCower`为真时进入的状态。沃比会从坐姿转为蜷缩防御姿态，并伴有呜咽声。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13437,
+      13455,
+      15022,
+      15238,
+      51046,
+      13897,
+      15539,
+      13456
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录主要涉及沃尔特、沃比基本属性和其他生物，但未具体描述大沃比（SGwobybig）状态图中的能力行为，如变换、拾取、攻击状态、坐姿等。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "沃比",
+    "大沃比",
+    "变形",
+    "坐下",
+    "蜷缩",
+    "拾取",
+    "攻击",
+    "饥饿",
+    "骑乘",
+    "沃尔特"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "战斗",
+    "生存",
+    "骑乘"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "64e2a7072955e15f56c45888f748aa70d863414d30934616e5cf6ef69a493e3e",
+    "source_bytes": 44000,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143000642
+  }
+}

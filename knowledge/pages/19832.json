@@ -8,6 +8,7 @@
       "components/entitytracker.lua": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/klaussacklock.lua": "811b7d007ad2a8787f321b719b28bc4d5a0344534a66fe209a6b48c69019e19c",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c"
     }
   },
@@ -18,7 +19,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -38,6 +40,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/klaussacklock.lua": {
+      "aspects_ignored": [
+        "使用右键操作哑铃"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/lootdropper.lua": {
       "mention_source": "llm_verdict",

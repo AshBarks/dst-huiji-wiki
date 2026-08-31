@@ -13,6 +13,7 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/repairer.lua": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
@@ -69,7 +70,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -83,6 +87,17 @@
       "llm_verdict": {}
     },
     "components/propagator.lua": {
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/repairer.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复机制",
+        "支柱修复耐久描述",
+        "漏洞修复方法描述",
+        "物品修复功能描述"
+      ],
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}

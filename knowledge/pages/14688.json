@@ -5,17 +5,41 @@
   "inputs": {
     "wikitext_sha256": "478ff004cb5576a5dab18e7322466747bc4f30b1a2df3355ecb99ba83d289952",
     "symbol_doc_shas": {
+      "components/complexprojectile.lua": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
+      "components/reticule.lua": "388e612488b82e7fb0d430aab94edf25e4f305cd610f7cc5d5fbc040dbb0ce01",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157",
+      "components/wateryprotection.lua": "9f09221e5ef081253e0e4d659bbd49ac61faf3512b849c80929ab8aec74d091d",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
   "symbols": {
+    "components/complexprojectile.lua": {
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "大炮射程与发射后坐力效果",
+        "弹弓弹药飞行速度与最大距离标注",
+        "弹弓皮筋对飞行速度的倍率调整",
+        "投掷技能发射与命中伤害",
+        "炮弹伤害类型说明",
+        "雪球发射器发射与作用范围描述"
+      ],
+      "fact_matches": [
+        {
+          "raw": "30 秒",
+          "region_id": "14688:intro:1",
+          "matched": "components/complexprojectile.lua: angle=30"
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/equippable.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -95,6 +119,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/reticule.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -106,6 +134,20 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/wateryprotection.lua": {
+      "aspects_ignored": [
+        "防水效果减免限制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "aspects_ignored": [

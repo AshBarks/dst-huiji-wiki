@@ -5,6 +5,8 @@
   "inputs": {
     "wikitext_sha256": "6d41a353c0d87f45e23a7e08f521b27d7da878665eb0e05185f57f0f62417c94",
     "symbol_doc_shas": {
+      "components/anchor.lua": "db9e3d3178bbf9a83182b4242b1773d83b2c0dbacacfd0eb980e3b7583cf72cb",
+      "components/boatdrag.lua": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
@@ -16,6 +18,19 @@
     }
   },
   "symbols": {
+    "components/anchor.lua": {
+      "aspects_ignored": [
+        "深度对锚操作时间的影响",
+        "起锚下锚时间数值",
+        "锚的减速效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/boatdrag.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -47,7 +62,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [

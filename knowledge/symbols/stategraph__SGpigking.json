@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpigking.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpigking",
+  "summary": "该状态图驱动猪王（Pig King）实体。状态包括空闲、交易时的投掷硬币和快乐反应、拒绝交易的不满状态、睡眠与唤醒，以及小游戏启动时的介绍动画序列。整体组织以玩家交互和小游戏触发为核心，状态间通过动画完成事件和超时转换。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法（如API函数），状态图仅通过内部状态转换和事件处理驱动行为。",
+  "events_published": [],
+  "events_listened": [
+    "onremove"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "cointoss",
+    "happy",
+    "unimpressed",
+    "sleep",
+    "wake",
+    "intro",
+    "intro2",
+    "intro3",
+    "intro4"
+  ],
+  "state_notes": [
+    {
+      "state": "cointoss",
+      "note": "玩家给予物品时进入，猪王投掷硬币，设置快乐状态持续5秒。"
+    },
+    {
+      "state": "happy",
+      "note": "交易成功后播放快乐动画和音效，表现猪王满意。"
+    },
+    {
+      "state": "unimpressed",
+      "note": "交易失败或不满意时进入，猪王拒绝交易，取消快乐状态。"
+    },
+    {
+      "state": "sleep",
+      "note": "猪王睡眠状态，禁用交易组件，无法进行交互。"
+    },
+    {
+      "state": "intro",
+      "note": "小游戏启动序列开始，播放介绍动画，启用摄像头聚焦。"
+    },
+    {
+      "state": "intro3",
+      "note": "介绍序列中生成四只精英猪，触发小游戏战斗序列。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18521,
+      18359,
+      65872,
+      28571,
+      46887,
+      13493,
+      13199,
+      19730
+    ],
+    "aspects": [
+      {
+        "aspect": "夜晚睡觉无法交易",
+        "evidence": [
+          {
+            "pageid": 18521,
+            "quote": "在夜晚它会睡觉而无法进行交易。"
+          }
+        ]
+      },
+      {
+        "aspect": "摔跤比赛生成精英猪",
+        "evidence": [
+          {
+            "pageid": 28571,
+            "quote": "开启摔跤游戏时，四只精英猪会被猪王同时召唤出来。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "猪王",
+    "交易",
+    "硬币",
+    "快乐",
+    "不满意",
+    "睡眠",
+    "小游戏",
+    "精英猪",
+    "介绍动画"
+  ],
+  "gameplay_tags": [
+    "交易",
+    "小游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1c85e7f2c52ce5b0a4d89d697840329c153303d96cd415a288a4a07fec13e74d",
+    "source_bytes": 7940,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140076375
+  }
+}

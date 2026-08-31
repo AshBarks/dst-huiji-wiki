@@ -13,7 +13,8 @@
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGitemmimic_revealed.lua": "626e773590706723aeb6a30d2461dace1f6fd74751b50803c22837471815f5b0"
     }
   },
   "symbols": {
@@ -175,6 +176,13 @@
         "wording": "每经过10~20秒；1~2天后显形为拟态",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGitemmimic_revealed.lua": {
+      "aspects_ignored": [
+        "静止不动行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

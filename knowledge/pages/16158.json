@@ -14,7 +14,9 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/portablestructure.lua": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/stewer.lua": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -53,7 +55,8 @@
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/floater.lua": {
       "route": "direct",
@@ -108,10 +111,23 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/portablestructure.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/stewer.lua": {
+      "aspects_ignored": [
+        "开始烹饪的条件",
+        "烹饪状态与倒计时台词",
+        "食谱记录烹饪时间"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/workable.lua": {
       "aspects_ignored": [

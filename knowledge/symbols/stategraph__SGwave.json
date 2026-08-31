@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwave.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwave",
+  "summary": "该状态图驱动波浪实体，控制其从升起、闲置到降低的完整生命周期。整体状态从'rise'开始，可能进入'idle'闲置等待，最终通过'lower'降低并移除实体。状态通过'waveactive'属性标记波浪的活跃状态，影响游戏环境交互。",
+  "api": [],
+  "api_note": "状态图没有定义对外方法，主要通过状态转换和内部事件驱动波浪行为。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "rise",
+    "instant_rise",
+    "idle",
+    "lower"
+  ],
+  "state_notes": [
+    {
+      "state": "rise",
+      "note": "波浪升起状态，播放'appear'动画并在10帧后设置waveactive为true，动画结束后转至idle。玩家可见波浪逐渐显现并进入活跃状态。"
+    },
+    {
+      "state": "instant_rise",
+      "note": "立即升起状态，直接设置waveactive为true并播放动画到第10帧，跳过升起过程，动画结束后转至idle。用于快速生成波浪。"
+    },
+    {
+      "state": "idle",
+      "note": "闲置状态，保持waveactive为true，播放idle动画并设置超时时间（默认5秒），超时后转至lower。波浪在水面停留等待消失。"
+    },
+    {
+      "state": "lower",
+      "note": "降低状态，播放'disappear'动画并在20帧后设置waveactive为false，动画结束后移除实体。波浪逐渐消失并从游戏中移除。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34093,
+      14816,
+      14929,
+      14935,
+      14936,
+      13156,
+      14811,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中，所有行为描述均针对其他生物（如鳄鱼指挥官、坦克龟等），没有涉及波浪实体或'stategraph__SGwave'的状态行为表达。页面34093仅提及'波浪·琼斯'名称，无行为细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "波浪",
+    "海浪",
+    "升起",
+    "降低",
+    "闲置",
+    "wave",
+    "动画",
+    "状态图",
+    "waveactive",
+    "idle_time"
+  ],
+  "gameplay_tags": [
+    "环境",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "338ff90ff05485e160225a74f1de48c067905e50426421d136bb03a1f91e7a70",
+    "source_bytes": 1633,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142304611
+  }
+}

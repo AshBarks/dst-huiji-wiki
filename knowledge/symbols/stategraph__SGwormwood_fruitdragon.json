@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwormwood_fruitdragon.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwormwood_fruitdragon",
+  "summary": "该状态图驱动饥荒联机版中的水果龙（fruit_dragon）实体，它是虫木（Wormwood）的召唤物。整体状态组织基于常见状态处理器，定义了空闲、攻击、行走、奔跑、睡眠、受击、死亡以及冰冻、电击、沉没、虚空坠落等特殊状态，通过事件驱动状态转换。",
+  "api": [],
+  "api_note": "该状态图为内部状态机，无对外暴露的 API 方法。",
+  "events_published": [],
+  "events_listened": [
+    "sleep",
+    "freeze",
+    "electrocute",
+    "death",
+    "locomote",
+    "sink",
+    "fallinvoid",
+    "doattack",
+    "attacked"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack",
+    "hit",
+    "death",
+    "walk",
+    "run",
+    "sleep",
+    "frozen",
+    "electrocute",
+    "sink",
+    "voidfall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "空闲状态，水果龙静止播放 idle 动画，无特殊行为，可随时被打断进入其他状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，水果龙停止移动并播放攻击动画，在第22帧执行攻击，28帧后移除“忙碌”标签，可被受击打断。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，水果龙被攻击时进入，播放受击音效，通常可被打断，除非处于电击或忙碌状态。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，水果龙生命值归零时触发，播放死亡动画和音效，实体被移除。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，水果龙进入睡眠后播放睡眠动画和循环音效，醒来时播放伸展音效，期间无法行动。"
+    },
+    {
+      "state": "frozen",
+      "note": "冰冻状态，水果龙被冰冻时无法移动和行动，持续时间取决于冰冻来源。"
+    },
+    {
+      "state": "electrocute",
+      "note": "电击状态，水果龙被电击时进入特殊状态，无法进行其他动作，持续时间由电击效果决定。"
+    },
+    {
+      "state": "sink",
+      "note": "沉没状态，水果龙在水中沉没时进入，可能涉及沉没和上岸动画，通常无法移动。"
+    },
+    {
+      "state": "voidfall",
+      "note": "掉入虚空状态，水果龙坠入虚空时触发，播放坠落动画并移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      15922,
+      52142,
+      10418,
+      16419,
+      15022,
+      14907,
+      14929
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及水果龙或其相关能力表达，所有页面内容均涉及其他实体或机制（如触电、装备、WX-78角色等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "水果龙",
+    "虫木召唤物",
+    "攻击动画",
+    "受击硬直",
+    "睡眠",
+    "冰冻效果",
+    "电击",
+    "沉没",
+    "虚空坠落"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "召唤物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "98d27cd17f9b89b7c5498cdb9473cd7d87eaa97af1edaf2afff40a6d44af67b9",
+    "source_bytes": 4109,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143554977
+  }
+}

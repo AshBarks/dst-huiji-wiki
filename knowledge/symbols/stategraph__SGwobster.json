@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwobster.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwobster",
+  "summary": "状态图 SGwobster 驱动饥荒联机版中的龙虾（Wobster）实体，主要处理其与玩家钓鱼交互的行为。整体状态组织包括生成、空闲、移动、被钩住挣扎、逃脱、被抛出水面等，通过事件和状态转换实现钓鱼循环和归巢逻辑。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，所有行为通过内部状态和事件处理。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "bitehook_pre",
+    "bitehook_loop",
+    "bitehook_escape",
+    "launched_out_of_water",
+    "hop_pst",
+    "spawn_in",
+    "idle",
+    "enter_home"
+  ],
+  "state_notes": [
+    {
+      "state": "bitehook_pre",
+      "note": "玩家钩住龙虾时进入，龙虾停止移动并播放挣扎动画，等待钩子连接，标记为“忙碌”状态。"
+    },
+    {
+      "state": "bitehook_loop",
+      "note": "龙虾被钩住后的循环挣扎状态，有2-2.5秒随机超时，若未及时拉起则可能挣脱，反之回到空闲。"
+    },
+    {
+      "state": "bitehook_escape",
+      "note": "龙虾逃脱钩子的状态，播放跳跃动画并产生水花效果，若在水下则隐藏动画层，之后清除钩子连接。"
+    },
+    {
+      "state": "launched_out_of_water",
+      "note": "龙虾被抛出水面时的状态，播放跳跃循环动画，可能由玩家行动触发。"
+    },
+    {
+      "state": "spawn_in",
+      "note": "龙虾生成时的状态，播放生成动画和洞穴音效，初始状态，之后进入空闲。"
+    },
+    {
+      "state": "idle",
+      "note": "龙虾空闲状态，待机行为，可转换到其他状态如移动或交互。"
+    },
+    {
+      "state": "enter_home",
+      "note": "龙虾进入家（洞）的状态，通过“回家”动作触发，标记为“忙碌”，播放短暂动画。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      34314,
+      65605,
+      20714,
+      34523,
+      52788,
+      15985,
+      14579,
+      24544
+    ],
+    "aspects": [
+      {
+        "aspect": "挣脱钩子行为描述",
+        "evidence": [
+          {
+            "pageid": 15985,
+            "quote": "龙虾十分愚蠢，什么都吃（甚至空钩也吃），并且几乎不会挣..."
+          }
+        ]
+      },
+      {
+        "aspect": "生成速度与数量配置",
+        "evidence": [
+          {
+            "pageid": 34314,
+            "quote": "影响[[龙虾窝]]生成[[龙虾]]的速度和数量上限。"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲活动时间描述",
+        "evidence": [
+          {
+            "pageid": 15985,
+            "quote": "仅在黄昏和夜晚才会离开巢穴闲逛。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "龙虾",
+    "钩子",
+    "钓鱼",
+    "挣扎",
+    "逃脱",
+    "跳跃",
+    "生成",
+    "回家",
+    "海洋生物"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "资源"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e458784b442ee1dbf248967a12f3a397d3e097df343223730dd777859f674560",
+    "source_bytes": 7457,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135084021
+  }
+}

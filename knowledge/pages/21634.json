@@ -5,6 +5,9 @@
   "inputs": {
     "wikitext_sha256": "cfdee6e33ee6892a17fb9558d9fe8f8c5b32e6d2b4162db93d48f2b9141c9907",
     "symbol_doc_shas": {
+      "components/aoespell.lua": "8ead494d815d4a64a99d34ac3927bb70f9d5b0f0fe0dd6378de606e472d6dba4",
+      "components/aoetargeting.lua": "988acc93e42056c2c561faf8a6364061ace3b3f194308e7c43f8e889fd2035d9",
+      "components/aoeweapon_lunge.lua": "d6db7cb9bc92d4394d8d9a2bdb7b830d42c9666a8aeb3211f82e24f52965464d",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -12,10 +15,27 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/rechargeable.lua": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+      "components/upgradeable.lua": "a720dcee032d32897b181d843baa23eb07722a0df1e104ac8a997732efb9ec90",
       "components/weapon.lua": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267"
     }
   },
   "symbols": {
+    "components/aoespell.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/aoetargeting.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/aoeweapon_lunge.lua": {
+      "aspects_ignored": [
+        "突刺攻击行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "aspects_ignored": [
         "步行速度倍数获取描述",
@@ -85,6 +105,37 @@
       "llm_verdict": {
         "semantic_consistent": true
       }
+    },
+    "components/rechargeable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "充能武器机制",
+          "evidence": [
+            {
+              "pageid": 21634,
+              "quote": "每击中一个目标恢复充能奔雷矛 2% 耐久"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "充电操作描述",
+        "充电状态效果",
+        "冷却时间描述",
+        "冷却缩减效果",
+        "技能冷却状态"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/upgradeable.lua": {
+      "aspects_ignored": [
+        "升级次数与材料需求",
+        "开花阶段升级效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",

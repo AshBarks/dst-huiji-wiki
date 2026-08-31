@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGsharkboi.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGsharkboi",
+  "summary": "该状态图驱动实体 sharkboi（鲨鱼男孩），一个在冰原出没的敌对生物。整体状态组织围绕战斗、移动和特殊攻击展开，包括近战连击、鱼雷冲撞、跳跃挖掘和冰上游泳等模式，并在被击败后可转化为交易NPC。",
+  "api": [],
+  "api_note": "状态图本身不定义对外方法，所有行为通过事件处理和内部状态转换驱动，因此无API。",
+  "events_published": [],
+  "events_listened": [
+    "Freeze",
+    "SleepEx",
+    "WakeEx",
+    "electrocute",
+    "locomote",
+    "attacked",
+    "minhealth",
+    "doattack",
+    "ontalk",
+    "trade",
+    "onrefuseitem"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SHARKBOI_MELEE_RANGE",
+    "SHARKBOI_TORPEDO_CD",
+    "SHARKBOI_STANDING_DIVE_CD",
+    "SHARKBOI_FINSPEED"
+  ],
+  "states": [
+    "idle",
+    "talk",
+    "talk_pst",
+    "refuse",
+    "give",
+    "spawn",
+    "hit",
+    "attack1",
+    "attack1_pst",
+    "attack2",
+    "attack2_pst",
+    "attack2_delay",
+    "attack3",
+    "ice_summon",
+    "torpedo_pre",
+    "torpedo_jump",
+    "torpedo",
+    "torpedo_climb",
+    "torpedo_dizzy",
+    "torpedo_pst",
+    "standing_dive_jump_pre",
+    "dive_jump_delay",
+    "dive_jump_pre",
+    "dive_jump",
+    "dive_dig_pre",
+    "dive_dig_loop",
+    "dive_dig_hit",
+    "dive_dig_pst",
+    "dive_dig_stun",
+    "fin_idle",
+    "fin_start",
+    "fin",
+    "fin_stop",
+    "defeat",
+    "defeat_loop",
+    "defeat_hit",
+    "defeat_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体空闲状态，可旋转，是大多数行为的起点，若生命值低于阈值则转入击败状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击后的短暂硬直，持续约11帧，硬直结束后可能衔接攻击或恢复，有无敌帧。"
+    },
+    {
+      "state": "attack1",
+      "note": "近战攻击第一段，造成240度范围伤害，若目标仍在前方可连击到attack2。"
+    },
+    {
+      "state": "torpedo_pre",
+      "note": "准备鱼雷攻击，持续追踪目标，有短暂无敌帧和加速进入，是鱼雷连招的起点。"
+    },
+    {
+      "state": "dive_jump",
+      "note": "跳跃到目标位置的空中阶段，有范围伤害，落地后触发挖掘效果，期间无敌。"
+    },
+    {
+      "state": "defeat",
+      "note": "被击败状态，停止攻击并尝试交易，生命值降至最低后可被玩家交互。"
+    },
+    {
+      "state": "fin",
+      "note": "冰上游泳状态，移动时持续造成小范围伤害并破坏障碍物，有专用动画和音效。"
+    },
+    {
+      "state": "torpedo",
+      "note": "鱼雷冲撞循环阶段，高速移动并持续造成范围伤害和挖掘，持续约1秒后眩晕。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成动画，有短暂无敌和击飞效果，播放出场音效和水花特效。"
+    },
+    {
+      "state": "dive_dig_hit",
+      "note": "挖掘状态中被攻击的硬直，累计3次攻击后进入眩晕状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      21432,
+      15022,
+      15922,
+      20511,
+      13897,
+      51046,
+      20152,
+      13606
+    ],
+    "aspects": [
+      {
+        "aspect": "击败后重生机制",
+        "evidence": [
+          {
+            "pageid": 21432,
+            "quote": "大霜鲨被击败并脱离加载范围后，20 天后会随冰钓洞重新生成"
+          }
+        ]
+      },
+      {
+        "aspect": "生成动画描述",
+        "evidence": [
+          {
+            "pageid": 21432,
+            "quote": "在钓上第 3 条斑鱼时，大霜鲨会从冰钓洞下方跃起到附近的浮冰地块上"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲状态描述",
+        "evidence": [
+          {
+            "pageid": 21432,
+            "quote": "默认情况下，大霜鲨对玩家是中立的，只是四处走动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "鲨鱼男孩",
+    "攻击",
+    "鱼雷",
+    "挖掘",
+    "冰",
+    "击败",
+    "交易",
+    "游泳",
+    "无敌帧",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "745cb321dcb188b4f1f587a441ad84687cddc455dce4168b698a8704cf87da8b",
+    "source_bytes": 71268,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141021834
+  }
+}

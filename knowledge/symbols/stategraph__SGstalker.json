@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGstalker.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGstalker",
+  "summary": "该状态图驱动饥荒联机版中的遗迹守护者（Stalker）Boss，包括森林和远古遗迹两种变体。整体状态组织围绕基础移动、多种攻击方式（如普通攻击、陷阱、地刺、召唤、精神控制）、死亡动画、以及特殊行为（如进食、返回石门）展开。状态通过事件和状态标签（如“busy”、“attack”）进行管理和转换，控制了Boss的战斗节奏与行为逻辑。",
+  "api": [],
+  "api_note": "状态图主要通过事件（EventHandler）和内部逻辑驱动实体行为，未定义对外暴露的控制函数。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "doattack",
+    "fossilsnare",
+    "fossilspikes",
+    "shadowchannelers",
+    "fossilminions",
+    "fossilfeast",
+    "mindcontrol",
+    "attacked",
+    "roar",
+    "flinch",
+    "skullache",
+    "fallapart",
+    "ontalk"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "resurrect",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "hit",
+    "death",
+    "death2",
+    "death3",
+    "death3_pst",
+    "taunt",
+    "attack",
+    "snare",
+    "spikes",
+    "summon_channelers_pre",
+    "summon_channelers_loop",
+    "summon_channelers_pst",
+    "summon_minions_pre",
+    "summon_minions_loop",
+    "summon_minion_pst",
+    "eat_pre",
+    "eat_idle",
+    "eat_loop",
+    "eat_pst",
+    "mindcontrol_pre",
+    "mindcontrol_loop",
+    "mindcontrol_pst",
+    "flinch",
+    "flinch_loop",
+    "skullache",
+    "fallapart",
+    "idle_gate",
+    "idle_gate_loop",
+    "idle_gate_pst",
+    "talk_stance_pre",
+    "talk_stance_idle",
+    "talk_stance_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "taunt",
+      "note": "Boss进行咆哮，对附近玩家造成恐惧效果（epicscare），并伴有短暂硬直。"
+    },
+    {
+      "state": "attack",
+      "note": "Boss执行普通近战攻击，在攻击动画中途（约32帧）对目标造成伤害。"
+    },
+    {
+      "state": "snare",
+      "note": "Boss进行陷阱攻击，对半径3.5范围内的敌人造成范围伤害，并根据传入的目标参数召唤束缚陷阱。"
+    },
+    {
+      "state": "spikes",
+      "note": "Boss召唤地刺，先生成地刺特效，短暂延迟后对半径3.5范围内的敌人造成范围伤害。"
+    },
+    {
+      "state": "summon_minions_pre",
+      "note": "Boss准备召唤小怪，此状态持续约6次攻击，每次受击会减少召唤次数。动画结束后召唤6只小怪并进入循环。"
+    },
+    {
+      "state": "mindcontrol_pre",
+      "note": "Boss开始准备精神控制，持续约4个循环，动画结束后进入精神控制循环。"
+    },
+    {
+      "state": "eat_pre",
+      "note": "Boss开始进食状态，根据是否受伤以及附近是否有小怪（minions）决定是否进入进食循环以恢复生命。"
+    },
+    {
+      "state": "death3",
+      "note": "远古遗迹守护者的特殊死亡动画，会锁定摄像机，播放长动画，最终死亡并触发遗迹变化，掉落战利品和一朵玫瑰。"
+    },
+    {
+      "state": "flinch",
+      "note": "Boss因特定事件（如受伤）进入硬直/呻吟状态，带有“delaydeath”标签，会延迟其死亡判定。"
+    },
+    {
+      "state": "skullache",
+      "note": "Boss出现“头痛”状态，同样带有“delaydeath”标签，播放特定动画并延迟死亡判定。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15225,
+      18234,
+      15248,
+      24542,
+      14674,
+      13701,
+      15751
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及任何与清单能力直接相关的行为描述或数值，如咆哮、陷阱攻击、地刺、召唤小怪、精神控制、进食、特殊死亡动画、硬直或头痛状态。页面仅概述了远古守护者的攻击行为和阶段，但未涉及具体能力细节。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "远古守护者",
+    "陷阱",
+    "地刺",
+    "精神控制",
+    "召唤",
+    "死亡动画",
+    "进食",
+    "硬直状态",
+    "返回石门"
+  ],
+  "search_terms_note": "pass1 后零命中 6/10,已二次修正(修正后 2/9)",
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8749ae66992aad985628b93407a039de3a4a59722bb2f9b7115ad24c376f117c",
+    "source_bytes": 60718,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146438329
+  }
+}

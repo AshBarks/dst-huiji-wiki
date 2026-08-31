@@ -12,8 +12,12 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
+      "components/repairer.lua": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+      "components/smotherer.lua": "5df4004ab0d2793779a224c378ac4c42af1534fbd6b8c695a20fa3f9b6cd18b2",
+      "components/snowmandecor.lua": "2ce33cc33d748750ad7ba32b6fcc29afe81f23abef76f901a731621a079a8999",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/watersource.lua": "c21f2563a23c488a87720a1746db3d46105741ea9d9ee84b995929999a154157"
     }
   },
   "symbols": {
@@ -85,6 +89,34 @@
         "semantic_consistent": true
       }
     },
+    "components/repairer.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "书籍耐久自动回复机制",
+        "支柱修复耐久描述",
+        "漏洞修复方法描述",
+        "物品修复功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "为[[冰帽]]回复 25%（2 天）[[新鲜度]]、[[鸟嘴壶]]回复 1 次耐久",
+        "semantic_consistent": true
+      }
+    },
+    "components/smotherer.lua": {
+      "aspects_ignored": [
+        "书籍魔法灭火效果描述",
+        "角色薇洛的扑烟能力描述",
+        "雪球发射器的灭火功能说明"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/snowmandecor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -106,6 +138,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/watersource.lua": {
+      "aspects_ignored": [
+        "水源装水行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

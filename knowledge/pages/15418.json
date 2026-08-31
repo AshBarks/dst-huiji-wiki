@@ -20,10 +20,14 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/spawnfader.lua": "0edd01d3037594c7ae73e19837b1e8d0f5d4a1a809632039018920744b134581",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
+      "components/werebeast.lua": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+      "stategraphs/SGpig.lua": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
       "stategraphs/SGwerepig.lua": "5f85b6bab91ae9bdf5a61dd807a1628d9544bb61e8148a259dceee96c561db19"
     }
   },
@@ -185,6 +189,14 @@
         "semantic_consistent": true
       }
     },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -207,6 +219,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/spawnfader.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/talker.lua": {
       "aspects_ignored": [
         "发表意见行为描述"
@@ -224,6 +240,22 @@
         "好感度解锁交易功能描述",
         "拒绝交易反馈效果提及"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/werebeast.lua": {
+      "aspects_ignored": [
+        "变身值控制机制",
+        "变身时长技能修改",
+        "变身状态切换台词",
+        "变身触发条件描述",
+        "月相指示与变身关联"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGpig.lua": {
       "route": "direct",
       "detail_level": "stub"
     },

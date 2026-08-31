@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwobysmall.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwobysmall",
+  "summary": "该状态图驱动沃尔特的宠物狗小沃比（小形态）。整体状态组织以基础闲置、行走为核心，通过事件响应玩家交互（如拾取、给予）和环境变化（如变身、坐下）。状态包括特殊动作如挖掘、打开容器，以及表情和战斗状态。",
+  "api": [],
+  "api_note": "状态图未定义公共API方法，主要通过事件和内部状态驱动行为。",
+  "events_published": [],
+  "events_listened": [
+    "eat",
+    "avoidcombat",
+    "traitchanged",
+    "sleep",
+    "wake",
+    "locomote",
+    "hop",
+    "sink",
+    "fallinvoid",
+    "transform",
+    "showrack",
+    "showalignmentchange",
+    "start_sitting"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "transform",
+    "despawn",
+    "pickup",
+    "pickup_pst_success",
+    "pickup_pst_fail",
+    "give",
+    "dolongaction",
+    "sitting",
+    "rack_appear"
+  ],
+  "state_notes": [
+    {
+      "state": "transform",
+      "note": "进入条件：收到“transform”事件触发；表现：播放从小沃比变身大沃比的动画，添加“transforming”标签，播放吼叫音效，动态阴影变大。"
+    },
+    {
+      "state": "pickup",
+      "note": "进入条件：执行WOBY_PICKUP动作（如拾取物品）；表现：跳跃动画，物理移动向目标，有成功/失败后续状态，关键窗口在动画帧内检测目标距离。"
+    },
+    {
+      "state": "give",
+      "note": "进入条件：执行GIVEALLTOPLAYER动作（给玩家物品）；表现：播放给予动画，在特定帧执行动作并播放音效。"
+    },
+    {
+      "state": "dolongaction",
+      "note": "进入条件：执行WOBY_PICK或STORE动作（如挖掘、打开容器）；表现：播放挖掘或容器动画循环，有默认超时（1.5秒），可能打开容器或执行挖掘。"
+    },
+    {
+      "state": "sitting",
+      "note": "进入条件：收到“start_sitting”事件且非忙碌状态；表现：坐下动画，可旋转，从行走状态过渡时播放额外脚步声。"
+    },
+    {
+      "state": "rack_appear",
+      "note": "进入条件：收到“showrack”事件且非跳跃/变身状态；表现：播放架子出现动画和音效，关联沃尔特的晾肉架功能。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13406,
+      13456,
+      15250,
+      15975,
+      13437,
+      13455,
+      15225,
+      34037
+    ],
+    "aspects": [
+      {
+        "aspect": "小沃比形态晾肉架功能描述",
+        "evidence": [
+          {
+            "pageid": 13455,
+            "quote": "在沃比处于小沃比形态时其中物品晾干进程会暂停。"
+          }
+        ]
+      },
+      {
+        "aspect": "沃比拾取物品行为描述",
+        "evidence": [
+          {
+            "pageid": 13437,
+            "quote": "沃比会为她的背包收集物品，并为主人沃尔特拾取弹药。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "小沃比",
+    "变身",
+    "拾取",
+    "挖掘",
+    "坐下",
+    "架子",
+    "沃尔特宠物",
+    "饥饿",
+    "表情",
+    "行走"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "战斗",
+    "互动",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "26b62be026e4bc5aeadcf55d7713bcfaa540556718e05f957284e481953128ba",
+    "source_bytes": 21858,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142944389
+  }
+}

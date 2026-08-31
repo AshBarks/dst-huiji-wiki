@@ -6,6 +6,7 @@
     "wikitext_sha256": "7d343eaeec215885cd80c33c57cf0bd3deb92c2ee65de7e817d00462e465899b",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/compostingbin.lua": "87ce2833d2d7eeccbee4ab1f4f1bc957990cebfd86264e225f06402075323854",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
@@ -32,6 +33,49 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/compostingbin.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "具体产出时间数值",
+          "evidence": [
+            {
+              "pageid": 14580,
+              "quote": "210 秒左右就会产出一个"
+            }
+          ]
+        },
+        {
+          "aspect": "堆肥产出比例说明",
+          "evidence": [
+            {
+              "pageid": 14580,
+              "quote": "每 2 件物品能够让堆肥桶产出 1 个堆肥"
+            }
+          ]
+        },
+        {
+          "aspect": "容量上限描述",
+          "evidence": [
+            {
+              "pageid": 14580,
+              "quote": "堆肥桶能够容纳 6 件物品"
+            }
+          ]
+        },
+        {
+          "aspect": "状态影响产出时间",
+          "evidence": [
+            {
+              "pageid": 14580,
+              "quote": "产出堆肥的时间取决于堆肥桶当前的状态"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -117,5 +161,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

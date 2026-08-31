@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGmossling.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGmossling",
+  "summary": "该状态图驱动名为Mossling（饿孵鸟）的敌对生物。整体状态组织包括闲置、动作执行、攻击、飞行和孵化等多种状态，通过事件和动作处理器触发状态转换。核心状态为旋转攻击模式，可能引发雷电打击，并具备无敌帧等特殊行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，主要通过事件和内部状态管理驱动行为。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "flyaway",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "eat_loop",
+    "eat_pst",
+    "taunt",
+    "meep",
+    "flyaway",
+    "hatch",
+    "spin_pre",
+    "spin_loop",
+    "spin_pst",
+    "spin_pst_loop",
+    "spin_pst_loop_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "闲置状态，若Mossling有目标且随机触发（25%概率），可能进入嘲讽状态。"
+    },
+    {
+      "state": "action",
+      "note": "执行动作状态，用于拾取、收获等行为，播放吃东西动画，持续1-3秒，结束后返回闲置。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，在闲置时随机播放，吸引玩家注意，有翅膀拍打声，动画结束后返回闲置。"
+    },
+    {
+      "state": "meep",
+      "note": "召唤守护状态，当执行召唤守护者动作时，发出鸣叫声并执行缓冲动作。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞离状态，当Mossling被召唤守护或距离玩家过远时，飞走并消失，无法被电击，移除动态阴影。"
+    },
+    {
+      "state": "hatch",
+      "note": "孵化状态，从蛋中孵化出来，有特定动画和声音，移动后停止，结束后返回闲置。"
+    },
+    {
+      "state": "spin_pre",
+      "note": "旋转准备状态，进入旋转攻击前的预备动作，熄灭自身火焰，初始化旋转计数器。"
+    },
+    {
+      "state": "spin_loop",
+      "note": "旋转攻击状态，Mossling疯狂旋转，每70帧造成一次伤害，可能召唤雷电（10%概率）。无敌于电击，体型增大，持续直到附近无玩家或旋转超过2次。"
+    },
+    {
+      "state": "spin_pst_loop_pst",
+      "note": "旋转后恢复状态，眩晕动画后恢复正常行为，返回闲置。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      15922,
+      10374,
+      15022,
+      13156,
+      20058,
+      20150,
+      13556
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录涉及其他实体和机制，如弹弓弹药、角色能力、伤害计算等，但没有一个页面提到Mossling或与stategraph__SGmossling相关的能力表达，因此无法找到证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "饿孵鸟",
+    "Mossling",
+    "旋转攻击",
+    "雷电",
+    "飞行",
+    "孵化",
+    "嘲讽",
+    "敌对",
+    "伤害",
+    "无敌"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "敌对生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d3b4f6b6e66985447abbc9038b8ffc24fcd4339f518c95480f7ed9a719dac76",
+    "source_bytes": 12750,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139663276
+  }
+}

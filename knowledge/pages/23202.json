@@ -5,9 +5,13 @@
   "inputs": {
     "wikitext_sha256": "eb2df1c45e4efa0a9b43d407cb6c857ed4a5ad37eeacb695f14a47f1b954d26e",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/hideandseeker.lua": "14d2a2ccde2adf5dcf3059733039549e0e291ae9a4cbda631dccdc36cf77b3c7",
+      "components/hideandseekgame.lua": "e463a64ccc447b2ff91d9a2ece5b3386b4a314fb1ce38920469444c7571d8c2e",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/kitcoonden.lua": "2c93743801acb3441207de530b1a061ad8438e0f36cd3843f7087908a0a6a67f",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
@@ -17,6 +21,17 @@
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",
@@ -44,6 +59,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/hideandseeker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hideandseekgame.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -53,6 +76,26 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/kitcoonden.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "制作与刷新小猫的行为描述",
+          "evidence": [
+            {
+              "pageid": 23202,
+              "quote": "[quantity] 龛]]附近可以花费 1 个[[幸运金块]]制作小"
+            },
+            {
+              "pageid": 23202,
+              "quote": "[interval] 一次。托儿所周围 5~30 距离内需要有至少"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -115,5 +158,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

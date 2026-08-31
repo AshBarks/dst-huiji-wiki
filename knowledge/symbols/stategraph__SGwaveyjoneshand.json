@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwaveyjoneshand.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwaveyjoneshand",
+  "summary": "该状态图驱动实体“波浪琼斯的手”，一个与船相关的敌对生物。状态组织围绕移动、执行船具操作（如升降帆和锚）以及应对陷阱等行为，整体以空闲为默认状态。",
+  "api": [],
+  "api_note": "该状态图未定义对外方法，主要管理内部状态转换和事件响应，不提供外部接口。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "trapped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "in",
+    "idle",
+    "premoving",
+    "moving",
+    "short_action",
+    "loop_action_anchor",
+    "loop_action_anchor_pst",
+    "trapped",
+    "trapped_pst",
+    "scared_relocate"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体空闲状态，可被玩家接近或触发事件，此时可旋转方向，是大多数行为的起点。"
+    },
+    {
+      "state": "moving",
+      "note": "实体移动中，通常跟踪玩家或目标，进入条件为locomote事件且需要移动，是战斗中的常见状态。"
+    },
+    {
+      "state": "short_action",
+      "note": "执行短促动作如操作船具（灭火、旋转船等），完成后返回空闲，期间保持忙碌，可能触发笑声。"
+    },
+    {
+      "state": "loop_action_anchor",
+      "note": "执行持续动作如升降锚，进入后停止移动并执行缓冲动作，期间忙碌，需外部事件结束。"
+    },
+    {
+      "state": "trapped",
+      "note": "被陷阱困住，停止移动1秒，计时结束后可能逃跑，进入条件为trapped事件，玩家可利用此窗口。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      18357,
+      15922,
+      13409,
+      65881,
+      18783,
+      16185,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录均未提及符号 stategraph__SGwaveyjoneshand 或与之相关的实体行为能力；页面内容涉及其他游戏实体，如天体英雄、薇格弗德等，但无任何与该符号匹配的能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "波浪琼斯",
+    "手",
+    "敌人",
+    "船",
+    "锚",
+    "帆",
+    "陷阱",
+    "移动",
+    "战斗"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "航海"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "417379f688562bb1103e7315e17e547d167af4b6094fe1d0bd1be7680d4bdf6a",
+    "source_bytes": 6192,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142506713
+  }
+}

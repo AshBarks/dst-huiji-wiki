@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnival_host.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnival_host",
+  "summary": "该状态图驱动饥荒联机版中的嘉年华主持人（Corvus）实体。整体状态组织方式为状态图模式，包含空闲、飞行、滑翔、着陆、说话和宣布等状态，通过响应事件和动作来管理实体的移动、对话和特殊行为，主要用于夏季庆典等活动中。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外公共API方法，所有行为由状态图内部事件、状态标签和组件（如locomotor、sound）驱动。",
+  "events_published": [],
+  "events_listened": [
+    "ontalk"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "flyaway",
+    "glide",
+    "land",
+    "talk",
+    "announce"
+  ],
+  "state_notes": [
+    {
+      "state": "flyaway",
+      "note": "进入飞行状态，播放起飞动画并设置飞行速度，1秒后进入滑翔状态；飞行中具有'nosleep'和'nofreeze'标签，表示不受睡眠和冻结影响。"
+    },
+    {
+      "state": "glide",
+      "note": "从高空滑翔至家附近随机可行走位置，持续下落直至接近地面（y<0.1）时着陆；初始高度设为30，传送后以负速度下落。"
+    },
+    {
+      "state": "land",
+      "note": "播放着陆动画，完成后自动返回空闲状态，标志飞行结束。"
+    },
+    {
+      "state": "talk",
+      "note": "播放随机对话动画（dialog1-3）并播放说话音效，用于NPC日常对话；动画结束后返回空闲，可能受玩家交互触发。"
+    },
+    {
+      "state": "announce",
+      "note": "播放欢迎动画并播放音效，用于特殊宣布场合（如庆典开场）；与'ontalk'事件相关，但根据状态切换到'announce'或'talk'。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15539,
+      13406,
+      35790,
+      13152,
+      10379,
+      13493,
+      15237,
+      15922
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未涉及符号 `stategraph__SGcarnival_host` 的能力或行为。页面内容聚焦于其他游戏元素，如弹弓弹药、角色特性（伍迪、韦斯、温蒂）、NPC行为（寄居蟹隐士、猪人）及熔炉模式技能，与狂欢节主持人状态图无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Corvus",
+    "嘉年华",
+    "主持人",
+    "飞行",
+    "滑翔",
+    "说话",
+    "宣布",
+    "夏季庆典",
+    "状态模式"
+  ],
+  "search_terms_note": "pass1 后零命中 6/9,已二次修正(修正后 3/9)",
+  "gameplay_tags": [
+    "活动NPC",
+    "飞行",
+    "对话",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8d8b1d3983377c512466a9e1ca93fde084eb5b8a23dc906231fa6d9250ad7976",
+    "source_bytes": 5423,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136389400
+  }
+}

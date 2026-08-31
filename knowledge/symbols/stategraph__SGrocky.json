@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGrocky.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGrocky",
+  "summary": "状态图SGrocky驱动岩石龙虾（Rocky Lobster）实体。整体状态组织通过状态机管理怪物行为，包括空闲、移动、攻击、防御、死亡等多种状态切换。关键状态如防御状态可吸收伤害并回复生命值，攻击状态执行伤害计算。",
+  "api": [],
+  "api_note": "该状态图没有暴露对外方法，主要用于内部状态管理和行为控制。",
+  "events_published": [],
+  "events_listened": [
+    "OnLocomote",
+    "OnFreeze",
+    "OnAttack",
+    "OnAttacked",
+    "OnDeath",
+    "OnSleep",
+    "gotosleep",
+    "entershield",
+    "exitshield",
+    "OnCorpseChomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "ROCKY_MIN_SCALE",
+    "ROCKY_MAX_SCALE",
+    "ROCKY_ABSORB",
+    "ROCKY_REGEN_AMOUNT",
+    "ROCKY_REGEN_PERIOD"
+  ],
+  "states": [
+    "idle_tendril",
+    "eat",
+    "taunt",
+    "rocklick",
+    "shield_start",
+    "shield",
+    "shield_end",
+    "attack",
+    "hit",
+    "death",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "sleep_start",
+    "sleep",
+    "sleep_stop",
+    "frozen",
+    "idle",
+    "parasite_revive",
+    "corpse",
+    "init"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "攻击状态：岩石龙虾执行攻击动画并造成伤害，有攻击前摇和伤害计算时间点。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态：显示受击反应动画，播放受伤音效，停止移动。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态：播放死亡动画，移除碰撞并掉落战利品，特殊条件下可能被寄生复活。"
+    },
+    {
+      "state": "shield",
+      "note": "防御状态：吸收伤害（ROCKY_ABSORB），回复生命值（ROCKY_REGEN_AMOUNT），持续3秒后循环。"
+    },
+    {
+      "state": "rocklick",
+      "note": "舔石头状态：用于拾取或舔舐物品，执行缓冲动作，播放攻击音效。"
+    },
+    {
+      "state": "eat",
+      "note": "进食状态：播放进食动画和音效，执行缓冲动作后返回空闲。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态：播放嘲讽动画，吸引玩家注意，持续短时间后返回空闲。"
+    },
+    {
+      "state": "idle_tendril",
+      "note": "空闲状态：基础状态，播放触手动画，间歇播放音效，可旋转。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      20058,
+      13897,
+      15922,
+      15225,
+      15651,
+      51046,
+      20511
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未涉及岩石龙虾（SGrocky）的任何能力或行为描述，所有页面讨论的是其他实体（如天体英雄、克劳斯、龙蝇等），与符号关联的能力清单无对应玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "岩石龙虾",
+    "攻击",
+    "防御",
+    "死亡",
+    "舔石头",
+    "嘲讽",
+    "睡觉",
+    "冻结",
+    "拾取",
+    "盾牌"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "e9c3daa83cf6e9421c7c0f974206876a1d03c0b83df708e88625494ea4aaaf4f",
+    "source_bytes": 12660,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140332211
+  }
+}

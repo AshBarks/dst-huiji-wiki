@@ -5,15 +5,26 @@
   "inputs": {
     "wikitext_sha256": "b2d0aba1d1676099dad18938a7bd1a673714e7c339ea39ec5791962f89e7f9e1",
     "symbol_doc_shas": {
+      "components/container_proxy.lua": "eb9273270e54a68933606922d72f6fb4d9d1c6e2a355ccbccb1b75b014fa4262",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/instrument.lua": "562cd70967a8e8084c7037e74a0b54d70cca34bcaaf1efa470e142619070fc45",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/tool.lua": "ec086e8fd11cf1ca93b1a47894028dd2b9a27df57fe508ab3c42a313f7fb0ada"
     }
   },
   "symbols": {
+    "components/container_proxy.lua": {
+      "aspects_ignored": [
+        "冰箱打开关闭状态对腐烂的影响",
+        "谜之火焰的打开状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/finiteuses.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -50,6 +61,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/instrument.lua": {
+      "aspects_ignored": [
+        "范围设置能力体现"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
         "物品拾取与丢弃行为描述",
@@ -76,6 +94,19 @@
         "wording": "式巢穴会在倒计时 150 秒后消失",
         "semantic_consistent": true
       }
+    },
+    "components/tool.lua": {
+      "aspects_ignored": [
+        "倒走表使用效果",
+        "巨兽攻击行为优先级",
+        "弹药技能解锁使用",
+        "战歌恢复生命效果",
+        "武器攻击伤害与条件",
+        "玩具交易功能",
+        "电路板激活增益设置"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

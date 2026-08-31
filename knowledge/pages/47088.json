@@ -5,10 +5,28 @@
   "inputs": {
     "wikitext_sha256": "cd77aa317a1699fd8f73df4bcdf6f99278ee8a8d5b809b725a268651ba741293",
     "symbol_doc_shas": {
-      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696"
+      "components/craftingstation.lua": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
+      "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d"
     }
   },
   "symbols": {
+    "components/craftingstation.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "制作站配方解锁机制",
+          "evidence": [
+            {
+              "pageid": 47088,
+              "quote": "靠近时可以制作[[制作#制造|制造]]分类中的物品"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -16,8 +34,22 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
+    },
+    "components/prototyper.lua": {
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选证据，基于代码语义和受影响变体推断页面可能缺失相关描述"
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

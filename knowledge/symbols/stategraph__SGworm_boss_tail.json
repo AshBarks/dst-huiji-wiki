@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGworm_boss_tail.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGworm_boss_tail",
+  "summary": "该状态图驱动饥荒联机版中蠕虫Boss的尾巴实体，控制其待机、吐出攻击、受击、电击和死亡等行为。整体状态以空闲为基础，通过事件触发转换到攻击或受击状态，并包含死亡清理逻辑。",
+  "api": [],
+  "api_note": "该状态图没有定义对外方法，所有行为通过事件处理程序（如spit、death）驱动，无公共API。",
+  "events_published": [],
+  "events_listened": [
+    "spit",
+    "death",
+    "attacked",
+    "sync_electrocute"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle_pre",
+    "idle",
+    "spit",
+    "hit",
+    "sync_electrocute",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle_pre",
+      "note": "初始预备状态，播放' tail_idle_pre '动画后转换到空闲状态，作为过渡动画。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲循环状态，持续播放' tail_idle_loop '动画，尾巴处于非忙碌状态可旋转。"
+    },
+    {
+      "state": "spit",
+      "note": "吐出攻击状态，尾巴播放' tail_spit '动画和音效，在14帧后执行吐出操作（SpitAll），完成后返回空闲。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，尾巴被攻击时播放' tail_hit '动画，产生硬直效果，动画结束后返回空闲。"
+    },
+    {
+      "state": "sync_electrocute",
+      "note": "电击状态，尾巴被电击时进入，播放循环' tail_shock_loop '动画，有超时设置，期间带有' busy '标签可能免疫其他事件。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，尾巴播放' tail_idle_pst '动画并处理污垢动画，完成后添加' notarget '标签并移除实体，结束行为。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      70763,
+      14907,
+      14929,
+      14936,
+      14816,
+      14935,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及stategraph__SGworm_boss_tail或其相关能力；所有页面讨论其他实体（如熔炉装备、触电机制、地狱独眼巨猪等）的通用行为或机制，未涉及该符号的尾巴状态描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "巨型蠕虫",
+    "尾巴",
+    "喷吐攻击",
+    "受击硬直",
+    "电击",
+    "死亡动画",
+    "状态机",
+    "动画",
+    "事件触发",
+    "硬直"
+  ],
+  "search_terms_note": "pass1 后零命中 7/10,已二次修正(修正后 2/10)",
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "3349b3930774038d580aea651697c0c6c2b4e729060e0f9ca64e027669e2f579",
+    "source_bytes": 3831,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143226970
+  }
+}

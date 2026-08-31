@@ -5,14 +5,26 @@
   "inputs": {
     "wikitext_sha256": "4dec2ccaa27f447fe429e8f40d50b051e3ab1ee691ba9ff5cf575a8adebe162c",
     "symbol_doc_shas": {
+      "components/armor.lua": "b971904ace836fba10b647a56bc30101e34d6aa5331cc0198675bcbf358df22e",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
+      "components/forgerepairable.lua": "ba3397a6bead07c908a34a88fc1446cf3e055f2bdf179e94a2ff0b27b30cb041",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
-      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b"
+      "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/planardefense.lua": "ce1136a734d94897c73a3b2d89ccafacbe87662d3b37d9bbf568fe7a68fc4dee",
+      "components/targettracker.lua": "daaba3792dee92a7391bb8f442383ff1956bafc4dfbb16eec4fb625d489bc00b"
     }
   },
   "symbols": {
+    "components/armor.lua": {
+      "aspects_ignored": [
+        "盔甲伤害计算中的防御作用",
+        "盔甲基础属性描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -29,6 +41,13 @@
       }
     },
     "components/floater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/forgerepairable.lua": {
+      "aspects_ignored": [
+        "使用材料恢复耐久"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -61,6 +80,22 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/planardefense.lua": {
+      "aspects_ignored": [
+        "伤害减免描述",
+        "减伤百分比",
+        "击飞抵御行为",
+        "基础防御增加",
+        "物理伤害减免",
+        "防御百分比提供"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/targettracker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

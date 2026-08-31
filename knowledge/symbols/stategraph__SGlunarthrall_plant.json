@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGlunarthrall_plant.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGlunarthrall_plant",
+  "summary": "月塔植物状态图驱动饥荒联机版中的月塔植物实体，管理其从出生、闲置、攻击到死亡的全流程状态。状态组织包括基础状态如闲置和攻击，以及特殊状态如疲惫循环和冰冻处理，状态转换由事件触发并考虑无敌帧和硬直机制。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，状态图仅处理内部状态转换和事件响应。",
+  "events_published": [],
+  "events_listened": [
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "animover",
+    "unfreeze",
+    "onthaw"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "spawn",
+    "hit",
+    "attack",
+    "death",
+    "tired_pre",
+    "tired",
+    "tired_wake",
+    "tired_pst",
+    "frozen",
+    "thaw"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "植物闲置状态，持续播放闲置动画，可被旋转，等待下一步行为。"
+    },
+    {
+      "state": "spawn",
+      "note": "出生状态，播放出生动画，前50帧免疫电击，完成后转入闲置。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击状态，如果处于疲惫状态则播放疲惫被攻击动画，否则直接转入攻击状态，玩家需注意硬直窗口。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，播放攻击动画，在动画第4-6帧进行范围攻击（AOE），造成伤害并击退敌人，有伤害范围配置。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画，移除碰撞体，实体消失，无法再被攻击。"
+    },
+    {
+      "state": "tired_pre",
+      "note": "疲惫前置状态，植物进入疲惫，移除反击标签，为后续疲惫状态做准备。"
+    },
+    {
+      "state": "tired",
+      "note": "疲惫状态，植物循环播放疲惫动画，移除反击标签，可能被唤醒进入更活跃状态。"
+    },
+    {
+      "state": "tired_pst",
+      "note": "疲惫后置状态，植物恢复，重置藤蔓限制，动画完成后立即转入攻击状态。"
+    },
+    {
+      "state": "frozen",
+      "note": "冰冻状态，植物被冰冻，播放冰冻动画并同步冰冻到藤蔓，解冻后进入被攻击状态，玩家可利用此窗口。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      20511,
+      15022,
+      13897,
+      15651,
+      51046,
+      15922,
+      19287,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "冰冻解除后的反击行为",
+        "evidence": [
+          {
+            "pageid": 19287,
+            "quote": "致命亮茄受到攻击、解除[[冰冻]]或[[触电]]后，会发动一次对周遭的反击，对 4 距离单位内所有生物造成 100 点物理伤害 + 30 点位面伤害。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月塔植物",
+    "攻击",
+    "疲惫",
+    "冰冻",
+    "范围攻击",
+    "击退",
+    "出生",
+    "死亡",
+    "藤蔓",
+    "反击"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "4f68796d18726f14ca7d5bb78721e2f76b3fc614ce4ac2490b1ba59bec73bc1b",
+    "source_bytes": 14289,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788138733796
+  }
+}

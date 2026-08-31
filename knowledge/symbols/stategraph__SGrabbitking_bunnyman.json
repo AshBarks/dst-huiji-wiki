@@ -1,0 +1,171 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGrabbitking_bunnyman.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGrabbitking_bunnyman",
+  "summary": "该状态图驱动兔人王兔人（rabbitking_bunnyman）实体，负责其行为状态管理。整体状态包括基础状态如待机、攻击、受击、死亡，以及挖掘相关状态如挖掘消失、挖掘移动和挖掘到达。通过通用处理器响应移动、睡眠、冻结等事件，确保实体行为连贯。",
+  "api": [],
+  "api_note": "状态图通过事件处理器响应游戏事件，不提供直接API方法。",
+  "events_published": [],
+  "events_listened": [
+    "burrowaway",
+    "burrowto",
+    "burrowarrive",
+    "animover",
+    "corpsechomped"
+  ],
+  "netvars": [],
+  "tunables": [
+    "BUNNYMAN_MAX_STUN_LOCKS"
+  ],
+  "states": [
+    "burrowaway",
+    "burrowto",
+    "burrowarrive",
+    "burrowarrive_pst",
+    "idle",
+    "death",
+    "attack",
+    "hit",
+    "walk",
+    "run",
+    "sleep",
+    "frozen",
+    "electrocute",
+    "sink",
+    "washashore",
+    "voidfall",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "待机状态，实体停止移动并播放闲置动画；如果有挖掘队列则转为挖掘状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，开始攻击动画，在动画特定帧造成伤害并移除攻击标签，有短暂无敌帧。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画并短暂硬直，更新攻击恢复延迟。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画并掉落战利品。"
+    },
+    {
+      "state": "burrowaway",
+      "note": "挖掘消失状态，实体进入无敌并最终移除自身，用于快速逃离。"
+    },
+    {
+      "state": "burrowto",
+      "note": "挖掘移动状态，实体传送至指定目的地后进入到达状态。"
+    },
+    {
+      "state": "burrowarrive",
+      "note": "挖掘到达状态，实体从挖掘中出现，有隐形和无敌帧，逐步解除限制。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，播放脚步声并移动，速度较慢。"
+    },
+    {
+      "state": "run",
+      "note": "奔跑状态，播放脚步声并快速移动。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，播放睡眠声音并进入睡眠，可能被攻击唤醒。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15239,
+      15551,
+      13897,
+      15651,
+      15225,
+      51046,
+      13828
+    ],
+    "aspects": [
+      {
+        "aspect": "奔跑移动描述",
+        "evidence": [
+          {
+            "pageid": 15551,
+            "quote": "朝远离目标的方向跑一段距离"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击伤害与行为描述",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "克劳斯的普通攻击会连续攻击两下，造成 150（75 × 2）点物理伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡掉落物品",
+        "evidence": [
+          {
+            "pageid": 13897,
+            "quote": "掉落 = {{Pic|32|木炭}}×1，{{Pic|32|怪物肉}}×1"
+          }
+        ]
+      },
+      {
+        "aspect": "睡眠状态行为",
+        "evidence": [
+          {
+            "pageid": 15239,
+            "quote": "如果兔屋被摧毁则会躺在地上睡觉"
+          }
+        ]
+      },
+      {
+        "aspect": "闲置状态触发机制",
+        "evidence": [
+          {
+            "pageid": 15225,
+            "quote": "在召唤者位于施法范围外且傀儡处于闲置时，傀儡会于 10 秒后死亡"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "兔人王",
+    "兔人",
+    "挖掘",
+    "攻击",
+    "死亡",
+    "移动",
+    "睡眠",
+    "冻结",
+    "出现",
+    "消失"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "移动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "78ae97dd375114bfa109dfdf415e861568346a6f6dda781f07ccce64307c7976",
+    "source_bytes": 10372,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140360889
+  }
+}

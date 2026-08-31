@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwx78_shadowdrone_harvester.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwx78_shadowdrone_harvester",
+  "summary": "该状态图驱动饥荒联机版中WX78角色的影子无人机收获者（Shadow Drone Harvester），一个跟随玩家的辅助实体。状态组织基于有限状态机，核心状态包括空闲、移动、执行收获和给予动作，以及生成、销毁和停用流程，整体管理其跟随、交互和生命周期行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法，仅处理内部状态转换和行为逻辑。",
+  "events_published": [],
+  "events_listened": [
+    "locomote",
+    "spawned",
+    "despawn",
+    "deactivate"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.SKILLS.WX78.SHADOWDRONE_HARVESTER_SPEED",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_HARVESTER_SPEED_BOOSTED",
+    "TUNING.SKILLS.WX78.SHADOWDRONE_FOLLOW_RADIUS"
+  ],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawned",
+    "despawn",
+    "deactivate",
+    "reactivate",
+    "run_start",
+    "run",
+    "run_stop",
+    "take",
+    "give"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "无人机处于空闲状态，停止移动并播放空闲动画，可能准备跟随主人或进行交互。"
+    },
+    {
+      "state": "take",
+      "note": "执行拾取动作，如采集资源或检查陷阱，在动画播放中完成动作并返回空闲状态。"
+    },
+    {
+      "state": "give",
+      "note": "执行给予动作，传递物品给玩家或存储，成功后应用使用效果并返回空闲状态。"
+    },
+    {
+      "state": "run",
+      "note": "持续移动状态，速度根据主人速度和距离动态调整，实现平滑跟随效果。"
+    },
+    {
+      "state": "deactivate",
+      "note": "停用状态，无人机临时关闭，播放特定动画后自动进入重新激活状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10418,
+      16419,
+      18359,
+      20719,
+      13493,
+      20714,
+      14486,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面文本摘录均未提及'stategraph__SGwx78_shadowdrone_harvester'或相关无人机的行为描述，因此无法检索到代码能力/行为语义清单中的任何玩家语言表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影子无人机",
+    "WX78",
+    "收获者",
+    "跟随",
+    "移动",
+    "给予",
+    "拾取",
+    "停用"
+  ],
+  "gameplay_tags": [
+    "跟随",
+    "收集",
+    "辅助"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "978f48185ab2df8a6bba49ca2da5558b8efe9d1ddefd7f9d0a434a6605c1ece0",
+    "source_bytes": 14083,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143940512
+  }
+}

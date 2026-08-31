@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnivalgame_memory_card.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnivalgame_memory_card",
+  "summary": "该状态图驱动嘉年华游戏中的记忆卡实体，负责处理卡片的放置、开关机、显示提示和揭示等状态。整体状态组织方式为基于事件响应的状态机，通过动画和声音来表现游戏逻辑和玩家交互。",
+  "api": [],
+  "api_note": "该状态图没有定义任何对外API方法，其行为完全由内部事件和状态驱动。",
+  "events_published": [
+    "carnivalgame_memory_cardrevealed"
+  ],
+  "events_listened": [
+    "carnivalgame_turnon",
+    "carnivalgame_memory_cardstartround",
+    "carnivalgame_memory_revealcard",
+    "carnivalgame_turnoff",
+    "carnivalgame_endofround",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "place",
+    "idle_off",
+    "turn_on",
+    "turn_off",
+    "idle_on",
+    "hint_good",
+    "hint_bad",
+    "reveal_good",
+    "reveal_good_pst",
+    "reveal_bad",
+    "reveal_bad_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "turn_on",
+      "note": "当收到开机事件时进入，播放开机动画，之后根据条件进入关机或待机运行状态。"
+    },
+    {
+      "state": "idle_on",
+      "note": "游戏运行中的待机状态，循环播放动画，监听关机事件，等待玩家操作或游戏结束。"
+    },
+    {
+      "state": "hint_good",
+      "note": "显示正确卡片提示，播放特定动画和声音，动画结束后自动回到待机运行状态。"
+    },
+    {
+      "state": "hint_bad",
+      "note": "显示错误卡片提示，播放特定动画和声音，动画结束后自动回到待机运行状态。"
+    },
+    {
+      "state": "reveal_good",
+      "note": "揭示正确卡片，播放揭示动画和声音，延迟后触发卡片揭示事件，并等待回合结束或关机。"
+    },
+    {
+      "state": "reveal_bad",
+      "note": "揭示错误卡片，播放揭示动画和声音，延迟后触发卡片揭示事件，并等待回合结束或关机。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18234,
+      14935,
+      14816,
+      14929,
+      14936,
+      14907,
+      15938,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录全部是关于《饥荒：联机版》中其他实体（如书籍、生物）的描述，没有涉及记忆卡片游戏或状态图SGcarnivalgame_memory_card的任何能力表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "记忆卡",
+    "嘉年华游戏",
+    "记忆游戏",
+    "揭示卡片",
+    "提示",
+    "开机",
+    "关机",
+    "动画",
+    "声音",
+    "游戏状态"
+  ],
+  "gameplay_tags": [
+    "小游戏",
+    "记忆游戏",
+    "嘉年华",
+    "娱乐"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "bda9aa80c85a5bbe08c96a6705987ea65daa5cd55c3bea741445d88d698dc415",
+    "source_bytes": 5675,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136499515
+  }
+}

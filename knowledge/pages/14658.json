@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "8df36b23a6955f3799eda03f03dd6242c518ec1f90463cb9711603c826cdd7d2",
     "symbol_doc_shas": {
+      "components/brush.lua": "19f9c88c84697a3569a1cebedf89bcc289bfa9f2fa0c0db46c61706f898ec76e",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -15,6 +16,10 @@
     }
   },
   "symbols": {
+    "components/brush.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/equippable.lua": {
       "aspects_ignored": [
         "步行速度倍数获取描述",

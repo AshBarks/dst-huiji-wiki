@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbalatro_machine.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbalatro_machine",
+  "summary": "该状态图驱动 balatro_machine 实体，即巴利特罗机器（吉姆博机器）。整体状态组织方式简单，包含待机（idle）和说话（talk）两个状态，基于玩家接近距离和奖励状态触发状态切换，用于模拟机器的吸引和交互行为。",
+  "api": [],
+  "api_note": "源码中没有定义任何对外API方法，该状态图仅处理内部状态切换和事件响应。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "talk"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "机器进入待机状态，播放idle动画。如果奖励进行中，则保持idle；否则，检查玩家距离，若玩家接近（距离小于8单位）且beckon计时器未启动，则切换到talk状态并触发beckon行为。"
+    },
+    {
+      "state": "talk",
+      "note": "机器进入说话状态，随机播放talk1到talk3动画和声音，动画结束后自动回到idle状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19110,
+      13152,
+      15237,
+      24842,
+      47009,
+      13406,
+      13493,
+      18829
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未包含与 stategraph__SGbalatro_machine 相关的实体或能力表达，所有页面讨论的是其他游戏实体如怪物、角色或物品。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "balatro机器",
+    "吉姆博",
+    "待机",
+    "说话",
+    "玩家距离",
+    "beckon",
+    "奖励状态",
+    "动画播放",
+    "状态切换"
+  ],
+  "gameplay_tags": [
+    "娱乐",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9024b0ff19474569b017a50c3bf8a717786a22dcc8e26777bf64bc0f9bba47e9",
+    "source_bytes": 1513,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135572969
+  }
+}

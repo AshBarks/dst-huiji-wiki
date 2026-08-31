@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGberniebig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGberniebig",
+  "summary": "该状态图驱动饥荒联机版中的伯尼大形态实体（Bernie Big），即伯尼玩具被激活后的巨型战斗形态。整体状态组织以激活和停用为生命周期核心，围绕攻击、受击、死亡等战斗状态展开，并通过通用处理器添加行走、奔跑等移动状态，实现实体的完整行为循环。",
+  "api": [],
+  "api_note": "源码中没有定义对外调用的API方法，所有行为通过内部状态图和事件处理驱动，玩家或模组需通过触发状态事件（如doattack）间接控制。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "doattack",
+    "attacked",
+    "animover",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle_nodir",
+    "attack",
+    "taunt",
+    "hit",
+    "death",
+    "activate",
+    "deactivate"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "当伯尼大形态接收到攻击指令时进入。播放攻击动画，在第23帧对目标造成伤害，攻击前有音效预示。攻击后摇中在第38帧可被中断，适合连续战斗。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击命中时进入，播放受击动画和音效。有短暂硬直，在第4帧后可尝试反击或恢复，受攻击恢复延迟机制影响。"
+    },
+    {
+      "state": "death",
+      "note": "生命值归零时进入，播放死亡动画伴随阴影缩小效果。动画结束后实体调用GoInactive进入非活动状态，期间无敌。"
+    },
+    {
+      "state": "activate",
+      "note": "伯尼从玩具形态被激活时进入，播放变大动画和阴影从小到大的过渡。动画结束后进入无方向空闲状态，准备战斗。"
+    },
+    {
+      "state": "deactivate",
+      "note": "伯尼被停用时进入，播放变小动画，期间设为无敌以防打断。动画结束后实体非活动，阴影恢复正常大小。"
+    },
+    {
+      "state": "idle",
+      "note": "空闲状态，伯尼待机并循环播放动画，可旋转方向。当没有其他动作时自动进入，为移动或攻击做准备。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，播放嘲讽动画和音效序列，可能吸引敌人注意。在第30帧后可被中断，用于战斗策略调整。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      16419,
+      15915,
+      10374,
+      15022,
+      51046,
+      14486,
+      14579
+    ],
+    "aspects": [
+      {
+        "aspect": "嘲讽行为触发",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "半径距离小于等于 12 单位时伯尼会嘲讽附近"
+          }
+        ]
+      },
+      {
+        "aspect": "活跃状态触发条件",
+        "evidence": [
+          {
+            "pageid": 15915,
+            "quote": "当有玩家[[理智值]]小于等于 15% 时，自身为中心半径 20 {{解释|距离单位}}范围内的伯尼会变成活跃状态。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "伯尼",
+    "变大",
+    "攻击",
+    "死亡",
+    "激活",
+    "停用",
+    "硬直",
+    "嘲讽",
+    "玩具",
+    "巨型"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "28788bae238f0b8a2906f01be0bb0514c42a833ed6a543008bca8abf19c9566e",
+    "source_bytes": 18804,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135825657
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadowthrall_horns.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadowthrall_horns",
+  "summary": "该状态图驱动敌对生物“影怪-大角”（shadowthrall_horns），它是影子三人组（大角、手、翅）的核心成员。整体状态组织涵盖了从生成、移动、攻击、受击到死亡的完整行为循环，其核心攻击手段为可造成范围伤害的“跳跃”和“拍击”，并具有吞噬玩家的特殊机制。",
+  "api": [],
+  "api_note": "状态图为内部行为驱动模块，源码中未定义对外公开的方法接口。",
+  "events_published": [
+    "knockback",
+    "devoured"
+  ],
+  "events_listened": [
+    "doattack",
+    "animover",
+    "attacked",
+    "death",
+    "startrunning",
+    "stoprunning",
+    "spitout"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SHADOWTHRALL_HORNS_DEVOUR_RADIUS",
+    "SHADOWTHRALL_HORNS_BISHIBASHI_RANGE",
+    "SHADOWTHRALL_HORNS_BISHIBASHI_WIDTH",
+    "SHADOWTHRALL_HORNS_FACEPLANT_RADIUS",
+    "SHADOWTHRALL_HORNS_WALKSPEED"
+  ],
+  "states": [
+    "idle",
+    "spawndelay",
+    "spawn",
+    "death",
+    "hit",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "jump",
+    "jump_pst",
+    "spit",
+    "slap"
+  ],
+  "state_notes": [
+    {
+      "state": "spawndelay",
+      "note": "生成前的延迟等待阶段，此时实体完全隐藏且处于无敌状态（temp_invincible, invisible），物理碰撞被关闭。"
+    },
+    {
+      "state": "spawn",
+      "note": "生成动画阶段，前47帧拥有无敌帧（temp_invincible），落地时（第47帧）对范围内目标造成一次范围伤害并破坏可工作物。"
+    },
+    {
+      "state": "hit",
+      "note": "受击硬直状态。如果硬直期间接收到“doattack”指令，会将指令存储并在硬直结束后优先执行攻击，而非直接返回idle。"
+    },
+    {
+      "state": "walk",
+      "note": "移动状态，移动速度为TUNING.SHADOWTHRALL_HORNS_WALKSPEED。在动画周期内有轻微的加速和减速过程，使移动更自然。"
+    },
+    {
+      "state": "jump",
+      "note": "核心的跳跃攻击状态。跳向目标并造成落地范围伤害，有概率触发“吞噬”（devour）机制，将玩家或可吞噬目标含入口中。跳跃期间进入nointerrupt状态，并协调队友攻击。"
+    },
+    {
+      "state": "spit",
+      "note": "吞噬后的咀嚼与吐出状态。会持续对被吞噬的目标造成伤害（DoChew），并在动画结束时将其吐出（DoSpitOut）。"
+    },
+    {
+      "state": "slap",
+      "note": "范围拍击攻击状态，动画期间会进行多次（5次）扇形范围打击（DoAOESlap）。攻击时会根据目标位置自动调整朝向（八方向）。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态。播放死亡动画，动画中移除物理碰撞，动画结束前掉落战利品并最终移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23957,
+      23956,
+      15922,
+      34314,
+      65456,
+      19595,
+      65881,
+      13701
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面文本主要描述裂隙循环、变异机制和远古织影者行为，未提及 `SGshadowthrall_horns` 状态图所定义的生成、攻击、移动等能力的具体玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "影怪",
+    "大角",
+    "跳跃攻击",
+    "范围拍击",
+    "吞噬",
+    "无敌帧",
+    "硬直",
+    "团队",
+    "裂隙"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌对生物",
+    "裂隙"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "2220753d7dda4cc209e460be5b758fa111f628ea7cec26acb15d11c4497950d6",
+    "source_bytes": 26280,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788140691146
+  }
+}

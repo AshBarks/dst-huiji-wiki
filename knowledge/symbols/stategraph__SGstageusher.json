@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGstageusher.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGstageusher",
+  "summary": "该状态图驱动 stageusher 实体，管理其日常行为如空闲、移动、攻击和灭火。状态组织基于常见状态处理器，区分站立和坐下的状态转换，通过事件驱动响应攻击、受伤和姿势变化。",
+  "api": [],
+  "api_note": "该状态图主要处理内部状态转换和行为逻辑，未暴露特定的 API 方法供外部调用。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "standup",
+    "sitdown"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "standup",
+    "sitdown",
+    "attack",
+    "attack_loop",
+    "hit",
+    "extinguish",
+    "extinguish_standing"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "进入空闲状态时停止移动，根据是否站立播放不同动画；如果着火则切换到灭火状态，有姿势变化请求时响应。"
+    },
+    {
+      "state": "standup",
+      "note": "站立状态播放 'awake_pre' 动画，伴随音效，动画结束后根据是否移动切换到行走或空闲。"
+    },
+    {
+      "state": "sitdown",
+      "note": "坐下状态播放 'sleep' 动画，动画结束后切回空闲状态。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态开始攻击目标，播放 'sleep' 动画，在特定帧尝试攻击，成功则进入攻击循环，否则站立。"
+    },
+    {
+      "state": "attack_loop",
+      "note": "攻击循环状态播放 'idle_loop_01' 动画，有10秒超时，事件 'handfinished' 触发站立。"
+    },
+    {
+      "state": "hit",
+      "note": "受伤状态根据是否站立播放 'awake_hit' 或 'hit' 动画，伴随音效，动画结束后切换到空闲。"
+    },
+    {
+      "state": "extinguish",
+      "note": "灭火状态（坐下时）播放 'extinguish' 动画，20帧后灭火，动画结束后切换到空闲。"
+    },
+    {
+      "state": "extinguish_standing",
+      "note": "灭火状态（站立时）播放一系列动画：sleep、extinguish、awake_pre，有多个音效点，动画队列结束后切换到空闲。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      51046,
+      13897,
+      13828,
+      15922,
+      15651,
+      15551,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中均未提及 stategraph__SGstageusher 或其相关能力；所有内容都是关于其他实体（如天体英雄、战争瓦器人、克劳斯等）的行为描述，不涉及该符号。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "stageusher",
+    "舞台助手",
+    "攻击",
+    "受伤",
+    "灭火",
+    "站立",
+    "坐下",
+    "移动",
+    "状态图"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "装饰"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "290be2d016159bf3f04e9fa188861e5d2cb9567bb54b1985c2c1c9c5b14d09d9",
+    "source_bytes": 9650,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141506336
+  }
+}

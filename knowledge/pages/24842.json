@@ -7,8 +7,10 @@
     "symbol_doc_shas": {
       "behaviours/standstill.lua": "a6f81340fa31baa69b158d6ca514fca492e5ce6dbde7688a6fa7d51b5919f4d5",
       "brains/storage_robotbrain.lua": "5090d960cbc2f89fec434e96c3eba7d6cf41b0a1c9cc26e411af53b541ee644c",
+      "components/circuitnode.lua": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fueled.lua": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -18,7 +20,9 @@
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
-      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4"
+      "components/powerload.lua": "f4b458a7925207c32ce307b007d9cb73c5bb0d197280537d2c8d0e66ddb17d0b",
+      "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
+      "stategraphs/SGwinona_storage_robot.lua": "033d75f49ce005755d53c90e2975528cace6eca308f3a3ea1fdf885c2a52ffab"
     }
   },
   "symbols": {
@@ -38,6 +42,10 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/circuitnode.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/colouradder.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -46,6 +54,11 @@
       "aspects_ignored": [
         "物品放置行为描述"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/deployhelper.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -137,10 +150,24 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/powerload.lua": {
+      "aspects_ignored": [
+        "设备空闲状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/updatelooper.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGwinona_storage_robot.lua": {
+      "aspects_ignored": [
+        "自动拾取功能描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

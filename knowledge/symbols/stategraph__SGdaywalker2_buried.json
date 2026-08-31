@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdaywalker2_buried.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdaywalker2_buried",
+  "summary": "这个状态图驱动 Daywalker2（可能指垃圾怪）在被埋状态下的行为。状态组织包括静止、挣扎、尝试挣脱和取消挣脱，通过动画循环和事件（如电击）触发状态转换，模拟实体从地下挣扎而出的过程。",
+  "api": [],
+  "api_note": "该状态图未定义任何对外方法，所有逻辑通过状态内部函数和事件处理实现。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "transition",
+    "idle",
+    "struggle",
+    "tryemerge",
+    "cancelemerge"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "被埋时的静止状态，播放埋藏持握动画，随机循环 2-5 次后自动转为挣扎状态，作为基础待机。"
+    },
+    {
+      "state": "struggle",
+      "note": "挣扎状态，播放埋藏动画并触发声音，有概率根据玩家距离播放对话，可能摇晃附近的垃圾堆。"
+    },
+    {
+      "state": "tryemerge",
+      "note": "尝试挣脱状态，有电击免疫标签，播放连续动画并强制对话，模拟努力挣脱地面的阶段。"
+    },
+    {
+      "state": "cancelemerge",
+      "note": "取消挣脱状态，播放收尾动画后返回 idle，用于中断尝试挣脱过程。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      70763,
+      22383,
+      14816,
+      14929,
+      14935,
+      14936,
+      10418,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 stategraph__SGdaywalker2_buried 相关的能力描述。唯一相关的页面 22383 仅提及'受困'状态台词，未涉及静止、挣扎、尝试挣脱或取消挣脱等具体行为，其他页面均无关。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "Daywalker2",
+    "垃圾怪",
+    "埋藏",
+    "挣扎",
+    "挣脱",
+    "电击",
+    "被埋",
+    "状态图",
+    "动画",
+    "声音"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "环境互动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "9b14fc8fd3c7229c7b68dbfe6773c3560441d1ae049c900eb4575d92dc0328a0",
+    "source_bytes": 4022,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137191340
+  }
+}

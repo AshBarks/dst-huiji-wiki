@@ -6,14 +6,19 @@
     "wikitext_sha256": "f87c96cc76cd78c5d71b50628c06ca580c9aa16319f65a4db59e724111b5153c",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/craftingstation.lua": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/lightpostpartner.lua": "45d5bb6cf66dc97d5b720747f4566551df591d58f01536ab26b716298f087b92",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/playerprox.lua": "696ba091ab56526d3f8034b4ffc320c8f08abddff4809859fc179b8ba04fb5d3",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
+      "components/repairable.lua": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
       "components/trader.lua": "6fdd1de548f9defcdced42b3fd58b24ec077c2dcaad3028c75a7c2e72defde3e",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGhermitcrab_teashop.lua": "7fbe1be1714fc18f7be1615063b6e3cd792c9f571fa701902a192ef25381426f"
     }
   },
   "symbols": {
@@ -33,6 +38,13 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/craftingstation.lua": {
+      "aspects_ignored": [
+        "制作站配方解锁机制"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -51,6 +63,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/lightpostpartner.lua": {
+      "aspects_ignored": [
+        "灯柱数量影响行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -87,6 +106,32 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/prototyper.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "装饰度达到 25 点，才能在[[珍珠]]处...配方就会再...",
+        "semantic_consistent": true,
+        "note": "页面直接描述了原型制作者的解锁条件（对应 prototyper 管理的开启状态），与组件语义一致。"
+      }
+    },
+    "components/repairable.lua": {
+      "aspects_ignored": [
+        "书籍耐久自动回复",
+        "发条装置修复方法",
+        "支柱修复可能性",
+        "漂浮平台漏洞修复",
+        "绝望石装备耐久恢复",
+        "螨地爬修复状态转换"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/trader.lua": {
       "aspects_ignored": [
         "交易接受条件描述",
@@ -95,7 +140,8 @@
         "拒绝交易反馈效果提及"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -105,7 +151,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGhermitcrab_teashop.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

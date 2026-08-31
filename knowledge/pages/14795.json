@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "1ba4e21f029448d617b3a7cb2c0827103ce8ee636e244598895d648aab9b547e",
     "symbol_doc_shas": {
+      "components/batteryuser.lua": "92620bffb443f3f42b378f67a8b979b90156443cc9b4c99a811d17482ec5867f",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/equippable.lua": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
@@ -16,6 +17,14 @@
     }
   },
   "symbols": {
+    "components/batteryuser.lua": {
+      "aspects_ignored": [
+        "充电恢复效果",
+        "充电机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",

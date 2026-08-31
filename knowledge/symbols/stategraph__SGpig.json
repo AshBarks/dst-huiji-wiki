@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGpig.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGpig",
+  "summary": "该状态图驱动饥荒联机版中的猪（pig）实体。它定义了猪的各种行为状态，如空闲、攻击、死亡等，并通过事件处理来切换状态，实现猪的动态行为逻辑。",
+  "api": [],
+  "api_note": "该状态图主要用于内部状态管理，不暴露公共 API。",
+  "events_published": [],
+  "events_listened": [
+    "transformnormal",
+    "doaction",
+    "cheer",
+    "win_yotb"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "funnyidle",
+    "death",
+    "abandon",
+    "transformNormal",
+    "attack",
+    "chop",
+    "eat",
+    "hit",
+    "dropitem",
+    "cheer",
+    "win_yotb"
+  ],
+  "state_notes": [
+    {
+      "state": "funnyidle",
+      "note": "猪在空闲时根据忠诚度、时间、战斗状态等播放不同动画，如饥饿、愤怒或害怕，表现玩家语义下的情绪变化。"
+    },
+    {
+      "state": "death",
+      "note": "猪死亡时播放死亡动画，移除碰撞并掉落战利品，玩家可见战利品掉落效果。"
+    },
+    {
+      "state": "attack",
+      "note": "猪攻击目标时播放攻击动画，并在动画第13帧造成伤害，体现战斗行为。"
+    },
+    {
+      "state": "chop",
+      "note": "猪执行砍树动作，播放攻击动画并在第13帧执行动作，反映跟随玩家时的资源采集行为。"
+    },
+    {
+      "state": "eat",
+      "note": "猪进食时播放进食动画，在第10帧执行吃食物动作并播放咀嚼音效，表现进食行为。"
+    },
+    {
+      "state": "hit",
+      "note": "猪被攻击时播放受击动画，更新硬直恢复延迟，体现受击反馈。"
+    },
+    {
+      "state": "transformNormal",
+      "note": "狼人猪变回普通猪，播放变身动画，然后进入睡眠状态，表现形态转换和恢复机制。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15237,
+      19110,
+      22383,
+      15421,
+      15973,
+      34523,
+      18521,
+      15022
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录主要描述猪相关实体的生成、掉落物、活动范围、变变条件等静态属性，未涉及具体的行为动画、状态转换或事件处理（如 funnyidle、death 动画、attack 动画等）的表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "猪",
+    "跟随",
+    "攻击",
+    "砍树",
+    "进食",
+    "死亡",
+    "忠诚",
+    "变回",
+    "空闲动画"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存",
+    "合作"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+    "source_bytes": 10738,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134777484
+  }
+}

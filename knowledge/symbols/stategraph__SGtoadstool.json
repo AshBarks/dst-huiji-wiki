@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGtoadstool.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGtoadstool",
+  "summary": "毒蘑菇(toadstool)是饥荒联机版中的一个Boss敌人，状态图控制其整体行为。状态组织包括入场、移动、多种攻击（砸地、释放孢子和蘑菇炸弹）、施法召唤孢子云、遁地逃跑等，通过事件如攻击和受击触发，具有无敌帧和硬直机制。",
+  "api": [],
+  "api_note": "状态图主要通过事件处理器响应游戏事件，没有对外暴露的API方法。",
+  "events_published": [
+    "ms_miniquake"
+  ],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "roar",
+    "startchanneling",
+    "flee",
+    "timerdone"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "surface",
+    "burrow",
+    "hit",
+    "death",
+    "roar",
+    "channel_pre",
+    "channel",
+    "channel_hit",
+    "channel_roar",
+    "channel_pst",
+    "sporebomb",
+    "mushroombomb",
+    "pound_pre",
+    "pound",
+    "pound_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "surface",
+      "note": "Boss入场时处于无敌状态，播放出现动画，随后准备咆哮。"
+    },
+    {
+      "state": "burrow",
+      "note": "Boss遁地逃跑，进入无敌状态并消失，用于脱离战斗。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击后硬直状态，播放受击动画，可被后续攻击中断。"
+    },
+    {
+      "state": "roar",
+      "note": "咆哮状态，恐惧附近玩家，触发摄像机震动和效果。"
+    },
+    {
+      "state": "channel",
+      "note": "施法状态，持续施放孢子云，降低周围玩家理智，有持续时间。"
+    },
+    {
+      "state": "sporebomb",
+      "note": "释放孢子炸弹攻击，有冷却时间，造成范围伤害。"
+    },
+    {
+      "state": "mushroombomb",
+      "note": "释放蘑菇炸弹攻击，可连锁释放，有冷却时间。"
+    },
+    {
+      "state": "pound_pre",
+      "note": "砸地攻击预备阶段，加速攻击频率，减少冷却时间。"
+    },
+    {
+      "state": "pound",
+      "note": "砸地攻击，造成范围震动和破坏周围物品。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      23187,
+      15922,
+      45249,
+      15415,
+      14907,
+      13701,
+      15938,
+      23924
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未找到与 `stategraph__SGtoadstool` 相关的实体或能力描述。所有提供的页面涉及冬季盛宴装饰品、熔炉模式装备、雕塑、鱼人、地狱独眼巨猪、远古织影者、大熔炉猪战士和帝王蟹，但没有一个页面讨论 toadstool 的能力，如 surface、burrow、hit、roar、channel、sporebomb、mushroombomb、pound_pre 或 pound。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "毒蘑菇",
+    "Boss",
+    "孢子炸弹",
+    "蘑菇炸弹",
+    "砸地",
+    "遁地",
+    "咆哮",
+    "施法",
+    "无敌",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss",
+    "地下城"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c009b9c7bfce6715a8f87da0597918c597401d1c1ec8bd76b70d167390e1d422",
+    "source_bytes": 34947,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134955106
+  }
+}

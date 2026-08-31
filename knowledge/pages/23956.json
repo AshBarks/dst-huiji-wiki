@@ -7,7 +7,9 @@
     "symbol_doc_shas": {
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/groundpounder.lua": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
+      "components/riftthralltype.lua": "304158c9d43a0aea87149df7f937a65a693a8d68a5b99990a1ae7841ef2e1157",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
     }
   },
@@ -62,6 +64,10 @@
         "semantic_consistent": true
       }
     },
+    "components/groundpounder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -71,6 +77,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/riftthralltype.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "aspects_ignored": [

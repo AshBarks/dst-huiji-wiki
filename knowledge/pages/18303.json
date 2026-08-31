@@ -6,14 +6,19 @@
     "wikitext_sha256": "d8b6627ebdd7586fcf575c0350518dc3b9cb07a2a12a63471701d9aaf73d7c1e",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/circuitnode.lua": "9e0bba8cb6721beb4c8a8bd74562113039b687da704d46e50cb15ba25c7cebd8",
       "components/colouradder.lua": "32d05575036b71e3ae9178001602779db221fb2838443c28e9a58906c6bd97b6",
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/deployhelper.lua": "c8882f4a7ae446690aec25d829a4873a63554a3799a8c2f983af111362e2e036",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/heater.lua": "ad518e5682176bd5a3e195f777ea50458273ed1632cf25ff4fd0ac4600767ae4",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/portablestructure.lua": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
+      "components/powerload.lua": "f4b458a7925207c32ce307b007d9cb73c5bb0d197280537d2c8d0e66ddb17d0b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
@@ -36,6 +41,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/circuitnode.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/colouradder.lua": {
       "route": "direct",
       "detail_level": "stub"
@@ -44,6 +53,11 @@
       "aspects_ignored": [
         "物品放置行为描述"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/deployhelper.lua": {
       "route": "direct",
       "detail_level": "stub"
     },
@@ -59,6 +73,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/heater.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -98,6 +116,26 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/portablestructure.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/powerload.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "设备空闲状态描述",
+          "evidence": [
+            {
+              "pageid": 18303,
+              "quote": "薇诺娜的聚光灯每天消耗 0.5 单位的电力，待机状态"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
@@ -118,5 +156,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

@@ -5,16 +5,48 @@
   "inputs": {
     "wikitext_sha256": "b54e7f69e206a92e3520de0f62fad84d2a672d291f7caad77ff571f638ce6349",
     "symbol_doc_shas": {
+      "components/activatable.lua": "47767fd508082411670e9167dfa16926cf50d470b27631b4ed11df72d878b54a",
+      "components/boatrace_proximitychecker.lua": "401c324ddb86de830d03939779aac7489b0956a31e1fe4eb9c42fa9dd1576db0",
+      "components/complexprojectile.lua": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/updatelooper.lua": "7c6957c2fc7f4740abd1dee94f82f40124da8ea771dd190a9e94e34a03778ed4",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/waterphysics.lua": "92f886d3a383b0a1617a47a2d2007ce6e379cc7d3a2682e2b67061f2d044d63d",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "stategraphs/SGboatrace_start.lua": "1a5429727698c721764ffd639891e218cff987e835c71fdbf2436eafabd16f94"
     }
   },
   "symbols": {
+    "components/activatable.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "投石机建造后激活状态描述"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
+    },
+    "components/boatrace_proximitychecker.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/complexprojectile.lua": {
+      "aspects_ignored": [
+        "大炮射程与发射后坐力效果",
+        "弹弓弹药飞行速度与最大距离标注",
+        "弹弓皮筋对飞行速度的倍率调整",
+        "投掷技能发射与命中伤害",
+        "炮弹伤害类型说明",
+        "雪球发射器发射与作用范围描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -74,6 +106,17 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/waterphysics.lua": {
+      "aspects_ignored": [
+        "平台移动与登台机制",
+        "溺水时浮动装置保护",
+        "漩涡传送平台能力",
+        "生成空间限制规则",
+        "碰撞伤害吸收功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/workable.lua": {
       "aspects_ignored": [
         "杂草挖除后行为描述",
@@ -82,7 +125,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGboatrace_start.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

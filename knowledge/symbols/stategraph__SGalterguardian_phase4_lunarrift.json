@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGalterguardian_phase4_lunarrift.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGalterguardian_phase4_lunarrift",
+  "summary": "该状态图驱动名为'alterguardian_phase4_lunarrift'的月相守护者Boss实体。整体状态组织方式包括待机、挑衅、攻击（猛击、冲刺、超新星）和死亡序列，通过事件和计时器触发状态转换，以控制其战斗行为和动画表现。",
+  "api": [],
+  "api_note": "该状态图是内部行为定义，没有暴露给外部的API方法。",
+  "events_published": [
+    "ms_wagstaff_arena_oneshot",
+    "ms_wagboss_alter_defeated",
+    "wagboss_defeated"
+  ],
+  "events_listened": [
+    "doattack",
+    "animover",
+    "animqueueover",
+    "hit",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.ALTERGUARDIAN_PHASE4_SUPERNOVA_CD",
+    "TUNING.ALTERGUARDIAN_LUNAR_SUPERNOVA_PLANAR_DAMAGE",
+    "TUNING.ALTERGUARDIAN_PHASE4_LUNARRIFT_DAMAGE",
+    "TUNING.ALTERGUARDIAN_PHASE4_LUNARRIFT_PLANAR_DAMAGE"
+  ],
+  "states": [
+    "idle",
+    "idle_nofaced",
+    "spawn",
+    "hit",
+    "taunt",
+    "slam",
+    "dash_pre",
+    "dash_loop",
+    "dash_pst",
+    "supernova",
+    "supernova_charging",
+    "supernova_burst_pre",
+    "supernova_burst_loop",
+    "supernova_burst_pst",
+    "death",
+    "quickdefeated",
+    "defeated",
+    "finale",
+    "selfdestruct"
+  ],
+  "state_notes": [
+    {
+      "state": "spawn",
+      "note": "Boss生成时进入，播放生成动画，期间无敌且不可攻击，完成后可被玩家攻击。"
+    },
+    {
+      "state": "taunt",
+      "note": "Boss挑衅玩家，触发领域扩张，为后续攻击做准备，有短暂无敌帧并可能启动剧情。"
+    },
+    {
+      "state": "slam",
+      "note": "Boss执行猛击，造成范围伤害并击退玩家，可摧毁环境物体，有两次攻击波和裂缝生成。"
+    },
+    {
+      "state": "dash_loop",
+      "note": "Boss冲刺移动，持续对路径上的敌人造成范围伤害，期间无敌，追踪目标并造成碰撞伤害。"
+    },
+    {
+      "state": "supernova_burst_loop",
+      "note": "Boss释放超新星，持续对范围内敌人造成高额伤害，附带燃烧效果，有冷却时间。"
+    },
+    {
+      "state": "death",
+      "note": "Boss死亡序列开始，根据剧情触发不同死亡动画，可能生成瓦格斯塔夫NPC并触发事件。"
+    },
+    {
+      "state": "finale",
+      "note": "Boss最终死亡阶段，与瓦格斯塔夫NPC交互，播放自毁动画，触发战利品掉落和世界事件。"
+    },
+    {
+      "state": "hit",
+      "note": "Boss被击中时进入，有短暂硬直和反击窗口，可能触发后续攻击选择。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      46847,
+      15337,
+      51494,
+      15022,
+      23956,
+      24896,
+      51498,
+      14936
+    ],
+    "aspects": [
+      {
+        "aspect": "死亡演出描述",
+        "evidence": [
+          {
+            "pageid": 46847,
+            "quote": "首次击杀天体后裔后将触发特殊的死亡演出，额外掉落 1 个[[手套]]和 1 个[[剪贴板]]；"
+          }
+        ]
+      },
+      {
+        "aspect": "猛击攻击描述",
+        "evidence": [
+          {
+            "pageid": 46847,
+            "quote": "猛击：进行一次战吼，在 24 单位以内产生 5 ~ 6 秒的[[巨兽恐慌]]效果。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "月相守护者",
+    "Boss战",
+    "猛击",
+    "冲刺",
+    "超新星",
+    "死亡动画",
+    "领域扩张",
+    "瓦格斯塔夫",
+    "裂缝",
+    "击退"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "Boss战",
+    "环境破坏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "8aeffaac1f4dcb98ca6ae87fa32bd3caa283820b42d29fe6f45c1a4305d58e54",
+    "source_bytes": 51955,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135475555
+  }
+}

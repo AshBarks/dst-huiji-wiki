@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwinch.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwinch",
+  "summary": "状态图 'winch' 驱动绞盘实体，用于管理其升降状态。整体组织为事件驱动的状态机，从 'raised' 初始状态开始，响应交互事件在抬起、降低和地面接触等状态间转换，涉及动画和声音效果。",
+  "api": [],
+  "api_note": "该状态图没有定义直接的对外方法，所有交互通过事件系统驱动。",
+  "events_published": [],
+  "events_listened": [
+    "start_lowering_winch",
+    "start_raising_winch",
+    "winch_fully_lowered",
+    "winch_fully_raised",
+    "workinghit",
+    "claw_interact_ground",
+    "animqueueover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "raised",
+    "lowered_ground",
+    "raising_ground",
+    "lowered",
+    "raising",
+    "raising_pst",
+    "lowering",
+    "lowering_pst"
+  ],
+  "state_notes": [
+    {
+      "state": "raised",
+      "note": "绞盘初始抬起状态，播放空闲动画。玩家可通过交互事件触发降低操作。"
+    },
+    {
+      "state": "lowered_ground",
+      "note": "绞盘降低并接触地面状态，添加标签并播放落地动画。玩家可使其升起。"
+    },
+    {
+      "state": "lowered",
+      "note": "绞盘降低悬空状态，播放下降后空闲动画，表示物品已放入水中。"
+    },
+    {
+      "state": "raising",
+      "note": "绞盘升起中状态，根据物品是否重播放不同动画和声音效果，处理打捞过程。"
+    },
+    {
+      "state": "lowering",
+      "note": "绞盘降低中状态，播放下降动画和声音，开始打捞或放置物品。"
+    },
+    {
+      "state": "raising_pst",
+      "note": "绞盘完全升起后的过渡状态，触发相机抖动效果，表示物品已到达船上。"
+    },
+    {
+      "state": "lowering_pst",
+      "note": "绞盘完全降低后的过渡状态，根据是否有物品播放成功或失败动画，影响后续状态。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      14816,
+      14935,
+      14936,
+      14907,
+      14929,
+      15938,
+      14811,
+      15941
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及绞盘（SGwinch）相关状态或行为，内容聚焦于其他生物（如鳄鱼指挥官、战猪等）的沉睡、攻击等战斗动画。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "绞盘",
+    "升降",
+    "状态图",
+    "动画",
+    "声音",
+    "交互",
+    "打捞",
+    "地面"
+  ],
+  "gameplay_tags": [
+    "工具",
+    "建造"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "cee7219fe18e76295973947a6a9fd75cee67cdac38f484d6ae4d503dd8135c36",
+    "source_bytes": 6089,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788142593269
+  }
+}

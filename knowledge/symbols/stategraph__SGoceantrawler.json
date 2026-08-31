@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGoceantrawler.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGoceantrawler",
+  "summary": "该状态图驱动海洋拖网机实体，管理其在游戏中的动画和状态转换。状态组织基于拖网机的升降、捕获物品和过载等行为，通过容器内容状态（空/满/中等）和降低状态来触发不同动画。",
+  "api": [],
+  "api_note": "源码中未定义任何对外方法，仅管理状态动画和内部状态转换。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "place",
+    "hit",
+    "lower",
+    "raise",
+    "catch",
+    "catch_pst",
+    "overload",
+    "overload_pst1",
+    "overload_pst2"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "拖网机的基础空闲状态，根据容器内容（空/满/中等）和是否降低播放不同动画，如降低时显示捕获量。"
+    },
+    {
+      "state": "hit",
+      "note": "拖网机受击状态，根据降低状态和容器内容播放受击动画，伴随音效，通常为短暂硬直。"
+    },
+    {
+      "state": "lower",
+      "note": "降低拖网状态，将拖网机设置为已降低，播放降低动画并可能开始捕获过程。"
+    },
+    {
+      "state": "raise",
+      "note": "提升拖网状态，将拖网机设置为未降低，播放提升动画，通常用于结束捕获或操作。"
+    },
+    {
+      "state": "catch",
+      "note": "捕获物品状态，播放捕获动画和摇晃音效，表示拖网正在获取海洋资源。"
+    },
+    {
+      "state": "overload",
+      "note": "过载状态，当捕获物品过多时触发，播放过载动画，之后进入后续状态逐步恢复正常。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18853,
+      21620,
+      22181,
+      16419,
+      15922,
+      28738,
+      13260,
+      19222
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅页面18853与海洋拖网捕鱼器相关，但该页面仅介绍其基本功能和捕获提示，未涉及状态图行为如idle、hit、lower、raise、catch或overload的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "海洋拖网",
+    "捕捞",
+    "升降动画",
+    "过载",
+    "容器状态",
+    "受击",
+    "放置",
+    "idle动画"
+  ],
+  "search_terms_note": "pass1 后零命中 4/8,改写尝试更差已回退",
+  "gameplay_tags": [
+    "海洋",
+    "捕捞",
+    "结构"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "6d1a8d30600efc609bec392dbdd58f148d56020a036c82ceea9fc52a0071f2d4",
+    "source_bytes": 6459,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139867806
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_bulbin.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_bulbin",
+  "summary": "SGcritter_bulbin 状态图用于驱动名为 bulbin 的宠物小生物实体。它基于通用宠物状态图框架，通过函数调用组织了包括空闲、移动、进食、睡眠和特殊表情在内的多种状态，状态转换由随机表情和交互事件触发。",
+  "api": [],
+  "api_note": "该状态图没有定义对外API方法，所有状态转换由内部事件、随机表情和时间线驱动，无需外部调用。",
+  "events_published": [],
+  "events_listened": [
+    "SGCritterEvents.OnEat",
+    "SGCritterEvents.OnAvoidCombat",
+    "SGCritterEvents.OnTraitChanged",
+    "CommonHandlers.OnSleepEx",
+    "CommonHandlers.OnWakeEx",
+    "CommonHandlers.OnLocomote",
+    "CommonHandlers.OnHop",
+    "CommonHandlers.OnSink",
+    "CommonHandlers.OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "whistle",
+    "roll",
+    "cute",
+    "pet",
+    "combat",
+    "play",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "sleep",
+    "hop",
+    "sink",
+    "voidfall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "宠物的空闲状态，通常会随机播放表情动画，如吹哨或翻滚，保持待机行为。"
+    },
+    {
+      "state": "eat",
+      "note": "宠物进食状态，当宠物饥饿时触发，播放进食动画和音效，持续一段时间。"
+    },
+    {
+      "state": "sleep",
+      "note": "宠物睡眠状态，进入睡眠后会定期播放打呼噜音效，期间无法互动。"
+    },
+    {
+      "state": "roll",
+      "note": "宠物翻滚状态，会随机选择方向翻滚数次，期间快速移动并播放滚动音效，具有移动能力。"
+    },
+    {
+      "state": "walk",
+      "note": "宠物行走状态，跟随玩家移动时触发，有脚步音效，用于路径移动。"
+    },
+    {
+      "state": "hop",
+      "note": "宠物跳跃状态，用于跨越障碍或跳跃移动，播放跳跃动画和音效。"
+    },
+    {
+      "state": "cute",
+      "note": "宠物可爱表情状态，会播放可爱动画并伴随叫声，触发于特定时机或玩家互动。"
+    },
+    {
+      "state": "pet",
+      "note": "宠物被抚摸状态，玩家互动时触发，播放高兴动画和音效，增加友好度。"
+    },
+    {
+      "state": "combat",
+      "note": "宠物战斗状态，当参与战斗时触发，播放攻击动画，可能伴随攻击音效。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "宠物蹭蹭状态，与玩家或其他生物互动时触发，播放蹭蹭动画和音效，增强社交行为。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13409,
+      15022,
+      14936,
+      15601,
+      14938,
+      18219,
+      14815,
+      15225
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及与宠物状态相关的能力表达，所有页面内容涉及游戏角色、Boss或物品，而非宠物行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小宠物",
+    "bulbin",
+    "翻滚",
+    "进食",
+    "睡眠",
+    "可爱",
+    "抚摸",
+    "战斗",
+    "行走",
+    "跳跃"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "社交"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c2186b9a8781bde0833ce60d30609690aa945e1949559bc327793c7a13ff82b5",
+    "source_bytes": 5389,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144238004
+  }
+}

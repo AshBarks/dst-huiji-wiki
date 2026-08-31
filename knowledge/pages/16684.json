@@ -5,6 +5,7 @@
   "inputs": {
     "wikitext_sha256": "4134ccdb4e67f68912ea3000ce4bb976b9135423bc0037d1fcc6a176e69cee55",
     "symbol_doc_shas": {
+      "components/bathbomb.lua": "20e0b0389606642224e20f3484b9e637828306ab41bbe8cd43028add287448cc",
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
@@ -17,6 +18,10 @@
     }
   },
   "symbols": {
+    "components/bathbomb.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/burnable.lua": {
       "aspects_ignored": [
         "可控燃烧状态定义",

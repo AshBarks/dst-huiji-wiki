@@ -13,7 +13,10 @@
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a"
+      "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
+      "components/shadowsubmissive.lua": "fcfcd6254a2cccafe205be2030ae5c4b821b19fb1c2a227bf001a9c2b8634d67",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
+      "stategraphs/SGoceanshadowcreature.lua": "4692a1bf12f0bf460f383dc6d41330b7019baaf82f752c2266b64c743c52bb28"
     }
   },
   "symbols": {
@@ -40,7 +43,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/oceanshadowcreaturebrain.lua": {
       "route": "direct",
@@ -112,6 +116,24 @@
         "wording": "理智光环 = -100",
         "semantic_consistent": true
       }
+    },
+    "components/shadowsubmissive.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGoceanshadowcreature.lua": {
+      "aspects_ignored": [
+        "攻击行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

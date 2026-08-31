@@ -13,6 +13,7 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/terraformer.lua": "5ebc97583da1f36e8f4ad6d94ae343023642d16a0b9c38232fa31cdeb16c521c",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
@@ -35,11 +36,16 @@
       "llm_verdict": {}
     },
     "components/deployable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品放置行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "成为建筑形态、种植",
+        "semantic_consistent": true
+      }
     },
     "components/finiteuses.lua": {
       "aspects_ignored": [
@@ -92,6 +98,26 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/terraformer.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "耕地机部署与地块转化",
+          "evidence": [
+            {
+              "pageid": 14711,
+              "quote": "物品形态的耕地机可以被部署在任意一块可进行{{解释|种植}}且不是[[#农田地块|农田地块]]的[[地块]]上成为建筑形态"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "园艺锄犁地工具功能描述",
+        "鱼人挖掘与犁地行为"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -118,5 +144,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

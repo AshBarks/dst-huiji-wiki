@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGabigail.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGabigail",
+  "summary": "该状态图驱动阿比盖尔（Abigail）实体，她是温蒂的幽灵姐妹，主要通过事件驱动在不同行为状态间切换。状态图组织了阿比盖尔的召唤、攻击、移动、消散、变形及与玩家的互动等核心行为，是其战斗与辅助能力的基础。",
+  "api": [],
+  "api_note": "状态图本身不直接暴露对外API，其行为主要通过游戏引擎的事件系统（如 PushEvent, ListenForEvent）和组件交互进行驱动。",
+  "events_published": [
+    "onareaattackother",
+    "do_ghost_scare"
+  ],
+  "events_listened": [
+    "doattack",
+    "startaura",
+    "stopaura",
+    "attacked",
+    "dance",
+    "gestalt_mutate",
+    "start_playwithghost",
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "attack_start",
+    "appear",
+    "dance",
+    "hit",
+    "dissipate",
+    "dissipated",
+    "ghostlybond_levelup",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "abigail_attack_start",
+    "abigail_attack_loop",
+    "abigail_attack_end",
+    "escape",
+    "escape_end",
+    "scare",
+    "abigail_transform_pre",
+    "abigail_transform",
+    "gestalt_attack",
+    "gestalt_loop_attack",
+    "gestalt_loop_homing_attack",
+    "gestalt_pst_attack",
+    "haunt_pre",
+    "haunt",
+    "play"
+  ],
+  "state_notes": [
+    {
+      "state": "appear",
+      "note": "阿比盖尔被召唤时的初始状态，播放出现动画。此状态为无敌状态，动画结束后启用攻击光环，并通知玩家召唤完成。"
+    },
+    {
+      "state": "dissipate",
+      "note": "阿比盖尔被收回或死亡时的消散状态。此状态为无敌且无法被攻击，动画结束后进入最终消散状态或直接移除实体。"
+    },
+    {
+      "state": "abigail_attack_start",
+      "note": "温蒂使用闪现攻击技能的起始状态。阿比盖尔准备向目标位置冲刺，进入无敌并启动范围伤害逻辑，是连招的开始。"
+    },
+    {
+      "state": "gestalt_loop_homing_attack",
+      "note": "阿比盖尔在暗影形态（ Gestalt）下的追踪冲刺攻击状态。她会自动寻找并攻击范围内的敌人，造成伤害并附加减益效果，伤害受攻击等级和阶段影响。"
+    },
+    {
+      "state": "ghostlybond_levelup",
+      "note": "阿比盖尔与温蒂的纽带等级提升状态。播放花朵变化动画并产生特效，通常伴随攻击等级提升和能力变化。"
+    },
+    {
+      "state": "play",
+      "note": "阿比盖尔与玩家（通常是温蒂）进行玩耍互动的状态。她会面向玩家播放舞蹈动画，属于社交互动行为。"
+    },
+    {
+      "state": "scare",
+      "note": "阿比盖尔执行惊吓行为的状态。会播放特殊动画、音效并触发“幽灵惊吓”事件，可能对周围生物产生影响。"
+    },
+    {
+      "state": "abigail_transform_pre",
+      "note": "阿比盖尔在普通形态与暗影形态之间转换的预备状态。根据目标形态播放动画前半段，并在退出时执行形态切换。"
+    },
+    {
+      "state": "escape",
+      "note": "阿比盖尔进入短暂无敌逃跑的状态。播放特定动画后转入跑动状态，用于规避伤害或调整位置。"
+    },
+    {
+      "state": "dissipated",
+      "note": "阿比盖尔消散后的最终状态，通知玩家纽带回收完成。若已死亡，会将生命值恢复至1点。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10379,
+      13556,
+      18050,
+      18778,
+      35817,
+      15186,
+      24028,
+      19719
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录虽涉及阿比盖尔的召唤、收回、升级和攻击行为，但未具体描述状态图中的 appear、dissipate、ghostlybond_levelup 等状态的动画、无敌、特效或事件触发等细节，缺乏直接匹配的玩家语言表达证据。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "阿比盖尔",
+    "温蒂的妹妹",
+    "幽灵",
+    "攻击光环",
+    "闪现攻击",
+    "消散",
+    "舞蹈",
+    "升级",
+    "形态转换",
+    "惊吓"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "社交",
+    "幽灵",
+    "伙伴"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c4bc1ea9a4a4fcf9327286d2b7d2e061c6a3692cb47f8385f66a4b5fe1a77f79",
+    "source_bytes": 41432,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135248204
+  }
+}

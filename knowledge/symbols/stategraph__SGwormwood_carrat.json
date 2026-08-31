@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwormwood_carrat.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwormwood_carrat",
+  "summary": "状态图驱动名为 'wormwood_carrat' 的实体，这是一个与沃姆伍德角色相关的胡萝卜伙伴或物品。整体状态组织基于通用状态处理器，包括闲置、移动、交互（拾取、给予）和多种状态变化（睡眠、冻结、电击、眩晕、死亡等），以响应游戏事件如攻击、死亡和特殊效果。",
+  "api": [],
+  "api_note": "该状态图没有定义公共 API 方法，仅处理内部状态和事件响应，所有交互通过游戏事件和状态切换实现。",
+  "events_published": [],
+  "events_listened": [
+    "sleep",
+    "wake",
+    "freeze",
+    "electrocute",
+    "attacked",
+    "death",
+    "locomote",
+    "sink",
+    "fallinvoid",
+    "stunbomb"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idle2",
+    "pickup",
+    "give",
+    "stunned",
+    "death",
+    "sleep",
+    "wake",
+    "frozen",
+    "electrocute",
+    "hit",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "run_start",
+    "run",
+    "run_stop",
+    "sink",
+    "wash_ashore",
+    "void_fall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体闲置时默认状态，播放 idle1 动画，有随机概率切换到 idle2 状态以播放声音或变换动画。"
+    },
+    {
+      "state": "pickup",
+      "note": "执行拾取动作时进入，物理碰撞关闭，播放吃动画，第9帧执行缓冲动作（如捡起物品），动作完成后返回闲置。"
+    },
+    {
+      "state": "give",
+      "note": "执行给予或丢弃动作时进入，物理碰撞关闭，播放丢失动画，第7帧执行缓冲动作，动作完成后返回闲置。"
+    },
+    {
+      "state": "stunned",
+      "note": "被眩晕炸弹事件（stunbomb）触发，播放眩晕循环动画，持续随机时间（约4-8秒），期间无法执行其他动作。"
+    },
+    {
+      "state": "death",
+      "note": "实体生命值归零时进入，播放死亡动画，移除物理碰撞，并掉落战利品，标志实体终结。"
+    },
+    {
+      "state": "sleep",
+      "note": "通过睡眠事件进入，播放睡眠动画和声音，可能使实体暂时失去活动能力，直至被唤醒或事件结束。"
+    },
+    {
+      "state": "frozen",
+      "note": "被冻结事件（如冰冻效果）触发，实体无法移动或执行动作，可能持续一段时间或直至解冻。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击事件（OnAttacked）触发，播放受伤反应动画，可能短暂硬直，反映实体受到伤害。"
+    },
+    {
+      "state": "walk",
+      "note": "实体行走移动状态，播放脚步声动画，由 locomote 事件在需要移动时切换进入，速度较慢。"
+    },
+    {
+      "state": "run",
+      "note": "实体奔跑移动状态，播放奔跑动画和声音，由 locomote 事件在需要快速移动时切换进入，速度较快。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13261,
+      15737,
+      33991,
+      33950,
+      18359,
+      23932,
+      16626,
+      13493
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面文本仅提供实体基本信息、生成方式、活动描述和物品信息，未包含任何状态行为（如动画、状态切换或具体能力执行）的玩家语言表达。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "wormwood",
+    "carrat",
+    "胡萝卜",
+    "沃姆伍德",
+    "移动",
+    "拾取",
+    "给予",
+    "眩晕",
+    "死亡",
+    "闲置"
+  ],
+  "gameplay_tags": [
+    "生存",
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "d6cb3df7a1dbf777c6e5a03a92cae1d950b762025cb12ea2adedc5f5ca90c3ec",
+    "source_bytes": 6387,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788143435211
+  }
+}

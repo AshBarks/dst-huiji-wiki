@@ -6,16 +6,32 @@
     "wikitext_sha256": "8c826d60517cb68c5a972fd3d83904bca9097dac26a4070b8d5056e0b4a3dfd2",
     "symbol_doc_shas": {
       "components/bait.lua": "652801fd7640ad63aa54870205044e3a72205660251f702a3514de57f123986b",
+      "components/disappears.lua": "170d23ccac1feb27770f93476c600de0cd2178732b0c9dc146c43d2e05c50e03",
       "components/edible.lua": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
+      "components/named.lua": "1cdee32bfc222c9378ce1507091b48837561d2d13f734d780e44a6729b96679e",
+      "components/snowmandecor.lua": "2ce33cc33d748750ad7ba32b6fcc29afe81f23abef76f901a731621a079a8999",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
       "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
     }
   },
   "symbols": {
     "components/bait.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/disappears.lua": {
+      "aspects_ignored": [
+        "小虚影的冲刺后消失",
+        "弹弓弹药的飞行后消失",
+        "恶液的定时消失",
+        "机缘兔子的离开范围消失",
+        "流浪商人的活动期间消失",
+        "灵魂的延迟消失",
+        "裂隙消失时的连锁消失"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },
@@ -59,6 +75,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/named.lua": {
+      "aspects_ignored": [
+        "名称设置",
+        "随机名称生成"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/snowmandecor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/stackable.lua": {
       "aspects_ignored": [

@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGminotaur.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGminotaur",
+  "summary": "该状态图驱动游戏中的Boss实体“远古犀牛”（Minotaur）。整体组织上，状态图控制其战斗行为（如冲锋、跺脚、跳跃攻击）、基础移动、受击与死亡动画，以及关键的“眩晕”机制。其核心玩法围绕着利用特定攻击（如冲锋撞墙）使其陷入可被攻击的眩晕状态展开。",
+  "api": [],
+  "api_note": "该状态图为内部状态驱动文件，未定义可由外部脚本（如AI、任务脚本）直接调用的公共API方法。其交互主要通过实体组件（如combat）和事件系统（PushEvent）进行。",
+  "events_published": [
+    "attackstart"
+  ],
+  "events_listened": [
+    "collision_stun",
+    "land_stun",
+    "attacked",
+    "doattack",
+    "dostomp",
+    "doleapattack",
+    "endstun",
+    "locomote",
+    "fallinvoid",
+    "sleep",
+    "freeze",
+    "electrocute",
+    "attack",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "run_start",
+    "run",
+    "run_stop",
+    "taunt",
+    "runningattack",
+    "attack",
+    "hit",
+    "death",
+    "stomp",
+    "bite",
+    "leap_attack_pre",
+    "leap_attack",
+    "leap_attack_pst",
+    "stun",
+    "stun_loop",
+    "stun_hit",
+    "stun_pst",
+    "walk_start",
+    "walk_loop",
+    "walk_stop",
+    "sleep_start",
+    "sleep_loop",
+    "sleep_pst",
+    "frozen",
+    "electrocute",
+    "electrocute_loop",
+    "electrocute_pst",
+    "voidfall",
+    "init",
+    "corpse"
+  ],
+  "state_notes": [
+    {
+      "state": "run",
+      "note": "远古犀牛进行长距离冲刺的状态。奔跑期间会累积“chargecount”计时，此计时器决定了后续眩晕状态的持续时间（最长6秒）。奔跑状态可被中断，中断后会执行一次攻击（run_stop）。"
+    },
+    {
+      "state": "stun",
+      "note": "眩晕状态的起始，由“collision_stun”等事件触发。会根据触发类型（普通碰撞、着地碰撞）播放不同动画，并根据累计的chargecount启动一个定时器（endstun），持续时间至少1.5秒，期间其行为树被暂停（StopBrain），是玩家主要的输出窗口。"
+    },
+    {
+      "state": "stomp",
+      "note": "原地跺脚攻击状态。会触发地面冲击（GroundPound）并震飞周围物品。攻击期间短暂免疫电击。由AI的“dostomp”事件触发。"
+    },
+    {
+      "state": "leap_attack",
+      "note": "跳跃攻击的空中阶段。会计算从起跳点到目标点的飞行速度，并在落地时触发地面冲击。着地后若成功则进入落地后摇（leap_attack_pst），若失败（例如悬空）则进入眩晕状态。攻击有冷却时间（TUNING.MINOTAUR_LEAP_CD）。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态。会停止移动，播放死亡动画并掉落战利品。核心逻辑是生成一个“minotaurchestspawner”宝箱生成器，并标记为“NOCLICK”以防止被提前拾取或攻击。"
+    },
+    {
+      "state": "hit",
+      "note": "普通受击状态。会播放受击动画并更新受击恢复延迟（HitRecoveryDelay），防止短时间内连续受击触发硬直。"
+    },
+    {
+      "state": "bite",
+      "note": "一次指定目标的单次撕咬攻击。与普通攻击（attack）不同，它允许指定攻击目标。由AI调用，会在动画的第16帧造成伤害。"
+    },
+    {
+      "state": "taunt",
+      "note": "挑衅/咆哮状态，通常发生在跳跃攻击成功落地之后。播放特定动画和音效，不造成伤害，是一个短暂的硬直时间。"
+    },
+    {
+      "state": "stun_hit",
+      "note": "在眩晕状态期间受到攻击时进入的状态。播放一个额外的受击动画，然后返回眩晕循环（stun_loop），相当于眩晕状态下的受击硬直。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      46847,
+      15941,
+      15022,
+      21634,
+      15651,
+      14811,
+      14907
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提供与代码能力/行为语义清单（如run、stun、stomp等）相匹配的玩家语言表达；内容主要描述其他实体（如天体后裔、龙蝇等）或不完整的行为描述（如犀牛兄弟的冲刺和硬直战吼，但无具体状态机制细节）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "远古犀牛",
+    "冲刺",
+    "眩晕",
+    "跳跃攻击",
+    "跺脚",
+    "地动山摇",
+    "硬直",
+    "Boss战",
+    "冲锋",
+    "眩晕时间"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "c3526a5495b13345f551ed8b385f2c597ce7c193694e1f3dd23b83027f9fbddc",
+    "source_bytes": 23599,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788139117001
+  }
+}

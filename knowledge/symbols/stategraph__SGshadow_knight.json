@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGshadow_knight.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGshadow_knight",
+  "summary": "该状态图驱动暗影骑士(Shadow Knight)实体，它是暗影棋子之一，在游戏中作为敌对生物出现。整体状态组织方式包括基础状态如闲置、攻击、受击，以及特殊状态如嘲讽、变身和死亡，通过状态转换和事件处理实现动态行为，部分状态从公共库添加。",
+  "api": [],
+  "api_note": "该状态图未定义对外API方法；其行为完全由内部状态和事件驱动。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "attack",
+    "attack_short",
+    "attack_long",
+    "taunt",
+    "idle_loop",
+    "transform",
+    "hit",
+    "disappear",
+    "death",
+    "appear"
+  ],
+  "state_notes": [
+    {
+      "state": "attack",
+      "note": "攻击准备状态，进入后停止移动并播放预备动画。根据与目标距离自动切换到短攻击或长攻击状态。"
+    },
+    {
+      "state": "attack_short",
+      "note": "短距离攻击状态，动画帧3时造成伤害，快速但范围较小。完成后移除忙碌标签并可能返回闲置。"
+    },
+    {
+      "state": "attack_long",
+      "note": "长距离攻击状态，动画帧5时造成伤害，范围更广但准备时间稍长。完成后移除忙碌标签并可能返回闲置。"
+    },
+    {
+      "state": "taunt",
+      "note": "嘲讽状态，持续多段触发，动画帧30时唤醒周围雕像并触发史诗惊吓。可能切换攻击目标到附近其他玩家。"
+    },
+    {
+      "state": "idle_loop",
+      "note": "闲置循环状态，基础待机行为，等待攻击、嘲讽或其他事件触发。"
+    },
+    {
+      "state": "transform",
+      "note": "升级/变身状态，当暗影骑士达到特定等级（如20、61、91）时触发，播放变身动画并可能进化形态。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，受到攻击时产生硬直，持续一定帧数（约13帧）后恢复，动画帧0时处理伤害。"
+    },
+    {
+      "state": "death",
+      "note": "进化死亡状态，播放多段死亡音效和动画，最终消失并可能掉落战利品。"
+    },
+    {
+      "state": "appear",
+      "note": "出现状态，从消失或生成时触发，播放出现动画以进入游戏世界。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      13406,
+      13828,
+      13897,
+      15651,
+      51046,
+      15225
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击范围数值描述",
+        "evidence": [
+          {
+            "pageid": 13828,
+            "quote": "攻击范围= 4 / 6 / 8"
+          }
+        ]
+      },
+      {
+        "aspect": "攻击间隔数值标注",
+        "evidence": [
+          {
+            "pageid": 13828,
+            "quote": "攻击间隔 = 15 / 14 / 12"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "暗影骑士",
+    "Shadow Knight",
+    "攻击",
+    "嘲讽",
+    "雕像苏醒",
+    "死亡",
+    "变身",
+    "受击",
+    "硬直",
+    "出现"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "敌人",
+    "暗影生物"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "5753feb3270539007eab8ef24c9ee2a2781803555323a5dfb239a483b8791433",
+    "source_bytes": 5390,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146157492
+  }
+}

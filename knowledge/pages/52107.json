@@ -6,8 +6,10 @@
     "wikitext_sha256": "1e9cc6afd7aa7f4d0285a8c6f12411253a4df5016f919768ac88fe3de890613a",
     "symbol_doc_shas": {
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/hitcher.lua": "dd00b11c0317868624e69ea736cdf2b77a5150ed29b6751d8c79b8b6f1f530d5",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/markable.lua": "2f33bad9c3a8d219d5a86ad8dbc23055a11c24561e5885b0d67f06e30dfb6c21",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/talker.lua": "408036b29616cac2d6cc0db3b6f8defd356d46f1905d31f86903a86ea7151832",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
@@ -23,6 +25,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/hitcher.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -30,7 +36,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，无法判断页面是否提及或依赖inspectable组件。"
+      }
     },
     "components/lootdropper.lua": {
       "aspects_ignored": [
@@ -44,6 +53,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/markable.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/placer.lua": {
       "route": "direct",

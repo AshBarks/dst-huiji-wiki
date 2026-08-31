@@ -15,8 +15,11 @@
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/snowmandecor.lua": "2ce33cc33d748750ad7ba32b6fcc29afe81f23abef76f901a731621a079a8999",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/upgrader.lua": "481e37e4d96a7cceda274a0c53d417dcc12e44eff90da2039732083e65144f48",
+      "components/vasedecoration.lua": "556092b91f4145e85f37ad0d344dc647e54707c320e282c06274fa1c802807c6"
     }
   },
   "symbols": {
@@ -43,7 +46,8 @@
         "晾晒计时重置描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/edible.lua": {
       "aspects_ignored": [
@@ -114,6 +118,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/snowmandecor.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/stackable.lua": {
       "aspects_ignored": [
         "仆从拾取堆叠至上限",
@@ -135,6 +143,21 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/upgrader.lua": {
+      "aspects_ignored": [
+        "电路板改装技能升级能力"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/vasedecoration.lua": {
+      "aspects_ignored": [
+        "发光效果描述",
+        "装饰放置功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

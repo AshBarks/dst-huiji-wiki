@@ -3,7 +3,7 @@
   "pageid": 28179,
   "title": "兔王",
   "inputs": {
-    "wikitext_sha256": "7a5949dd0ff1d3eddad8909b6327332c41475e61a64d3b58a6e0186ce4d401fd",
+    "wikitext_sha256": "e79cb7002647cc8990509157aa8837f8724be2b9a96e7fc44da6b68cb7a76da1",
     "symbol_doc_shas": {
       "behaviours/doaction.lua": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
       "behaviours/faceentity.lua": "87a6d3ae64d036056a0afd5848658c0fa31c0a1e854785e959d91cd5928789d6",
@@ -24,6 +24,7 @@
       "components/leader.lua": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/prototyper.lua": "4d5f744981a079241008dfc46fba81822a7851fdb26f5ed3f344767398a09d3d",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
       "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
@@ -262,6 +263,19 @@
       "llm_verdict": {
         "wording": "掉落 = {{Pic|32|胡须}}×2，{{Pic|32|怪物肉}}×1，{{Pic|32|兔王棍}}×1",
         "semantic_consistent": true
+      }
+    },
+    "components/prototyper.lua": {
+      "mention_source": "llm_verdict",
+      "aspects_ignored": [
+        "原型工具激活行为",
+        "技术树获取能力"
+      ],
+      "route": "direct",
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述了兔王（rabbitking variants），这些兔王是受 prototyper 组件管理的原型制作者。证据未直接提及 'prototyper' 组件或原型制作系统机制。"
       }
     },
     "components/sanityaura.lua": {

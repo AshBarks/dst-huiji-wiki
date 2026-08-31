@@ -14,8 +14,10 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/periodicspawner.lua": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "stategraphs/SGmushgnome.lua": "73224a64c1a1749a4dba9ff46ce0bcbd9d849875af8c004752ded8032e89d556"
     }
   },
   "symbols": {
@@ -134,6 +136,40 @@
         "semantic_consistent": true
       }
     },
+    "components/periodicspawner.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "在玩家附近随机位置生成实体",
+          "evidence": [
+            {
+              "pageid": 15677,
+              "quote": "则在此玩家周围 2 ~ 20 距离单位内生成一只蘑菇地精"
+            }
+          ]
+        },
+        {
+          "aspect": "生成点周期性检测玩家存在",
+          "evidence": [
+            {
+              "pageid": 15677,
+              "quote": "生成点每 20 秒检查周围 20 距离单位内是否有处于月亮蘑菇林中的玩家"
+            }
+          ]
+        },
+        {
+          "aspect": "生成点数量限制与死亡冷却",
+          "evidence": [
+            {
+              "pageid": 15677,
+              "quote": "每个蘑菇地精生成点同时只能拥有 1 只蘑菇地精，蘑菇地精死亡 1 天后才能够生成新的蘑菇地精"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/sanityaura.lua": {
       "mention_source": "llm_verdict",
       "aspects_ignored": [
@@ -160,7 +196,11 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "stategraphs/SGmushgnome.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

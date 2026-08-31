@@ -8,7 +8,9 @@
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
-      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
+      "components/pointofinterest.lua": "3612a6e025fb5d2f3e17533c6dbf6337fe48baf7e71ebc8030288c7e999f2141",
+      "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "components/worldmigrator.lua": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951"
     }
   },
   "symbols": {
@@ -50,6 +52,10 @@
         "note": "可能为cave_entrance"
       }
     },
+    "components/pointofinterest.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/workable.lua": {
       "aspects_ignored": [
         "杂草挖除后行为描述",
@@ -60,6 +66,13 @@
       "llm_verdict": {
         "note": "洞穴入口(cave_entrance)，开采描述，受影响未提及"
       }
+    },
+    "components/worldmigrator.lua": {
+      "aspects_ignored": [
+        "非自然传送门物品数量上限行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

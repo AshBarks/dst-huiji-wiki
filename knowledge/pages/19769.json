@@ -17,12 +17,17 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
+      "stategraphs/SGfused_shadeling.lua": "2a8eba4a31f42fcf4ed412a5105e77ab337b0c3acae17d6996963914a4f38db5",
+      "stategraphs/SGfused_shadeling_bomb.lua": "c27f47f923cd8409f7722b61d87b7efa2c6d7af9e394ab7b342dd8119c84825e"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -36,9 +41,14 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "速爆炸弹",
+        "semantic_consistent": false
+      }
     },
     "behaviours/leash.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "受惊停止移动描述",
         "最大游荡距离标注",
@@ -48,7 +58,11 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述“融合暗影”（fused_shadeling），该实体在受影响变体列表中。证据文本提到了生成、爆炸、追逐等行为，与拴绳行为的“返回”或“追逐”有微弱关联，但未明确描述“家位置”、“游荡距离”等核心概念。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -56,7 +70,8 @@
         "游荡最大距离数值标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/fused_shadelingbrain.lua": {
       "route": "direct",
@@ -86,7 +101,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/health.lua": {
       "aspects_ignored": [
@@ -158,6 +174,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -182,6 +202,25 @@
         "wording": "速爆炸弹生成1.17秒后爆炸；4秒后自爆",
         "semantic_consistent": true
       }
+    },
+    "components/transparentonsanity.lua": {
+      "aspects_ignored": [
+        "树精守卫沉睡效果"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGfused_shadeling.lua": {
+      "aspects_ignored": [
+        "攻击帧数描述",
+        "跳跃攻击行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGfused_shadeling_bomb.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

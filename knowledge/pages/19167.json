@@ -3,7 +3,7 @@
   "pageid": 19167,
   "title": "蜂窝",
   "inputs": {
-    "wikitext_sha256": "7f5b17b3f43a0456962609074df1449db7133c5a3926318addfebffd7a74a993",
+    "wikitext_sha256": "db78784364b901ff20ab21b86c57f4147376bded8b0f13fb5fc549ef7bd68ea6",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
       "components/childspawner.lua": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",

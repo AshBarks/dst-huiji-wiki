@@ -1,0 +1,201 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGdaywalker2.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGdaywalker2",
+  "summary": "该状态图驱动Daywalker 2实体，管理其空闲、移动、战斗、拾取物品和被击败的各种状态。状态转换由玩家交互、事件触发和内部条件控制，整体组织基于状态标签和事件处理器，以实现复杂的行为逻辑。",
+  "api": [],
+  "api_note": "状态图主要管理内部状态转换，不暴露对外API方法，所有行为由状态和事件驱动。",
+  "events_published": [],
+  "events_listened": [
+    "freeze",
+    "gotosleep",
+    "onwakeup",
+    "ontalk",
+    "doattack",
+    "electrocute",
+    "attacked",
+    "roar",
+    "minhealth",
+    "teleported",
+    "rummage",
+    "tackle"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.DAYWALKER2_ATTACK_RANGE",
+    "TUNING.DAYWALKER2_CANNON_ATTACK_RANGE",
+    "TUNING.DAYWALKER2_TACKLE_RANGE",
+    "TUNING.DAYWALKER_HIT_RECOVERY",
+    "TUNING.DAYWALKER2_MULTIWIELD_CD",
+    "TUNING.DAYWALKER2_ATTACK_SWING_DAMAGE",
+    "TUNING.DAYWALKER2_TACKLE_DAMAGE",
+    "TUNING.DAYWALKER_POUNCE_DAMAGE",
+    "TUNING.DAYWALKER_XCLAW_DAMAGE",
+    "TUNING.DAYWALKER_ROAR_CD",
+    "TUNING.DAYWALKER_STALK_CD",
+    "TUNING.DAYWALKER2_CANNON_FAR_DAMAGE_MULT",
+    "TUNING.DAYWALKER2_CANNON_NEAR_DAMAGE_MULT",
+    "TUNING.ALTERGUARDIAN_PHASE3_LASERDAMAGE",
+    "TUNING.ALTERGUARDIAN_PLAYERDAMAGEPERCENT",
+    "TUNING.DAYWALKER_DAMAGE"
+  ],
+  "states": [
+    "transition",
+    "idle",
+    "emerge",
+    "talk",
+    "talk_pst",
+    "angry",
+    "angry_pst",
+    "angry_taunt",
+    "hit",
+    "dropitem",
+    "rummage",
+    "rummage_hit",
+    "rummage_pst",
+    "lift_object",
+    "lift_spike",
+    "lift_spike2",
+    "lift_spike3",
+    "lift_cannon",
+    "lift_cannon2",
+    "attack_swing",
+    "attack_swing_pst",
+    "cannon_pre",
+    "cannon",
+    "throw_pre",
+    "throw_loop",
+    "throw",
+    "throw_pst",
+    "tackle_pre",
+    "tackle_loop",
+    "tackle_lift",
+    "tackle_collide",
+    "tackle_pst",
+    "attack_pounce_pre",
+    "attack_pounce",
+    "attack_pounce_pst",
+    "taunt",
+    "defeat",
+    "defeat_idle_pre",
+    "defeat_idle"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "实体在空闲时可能进入跟踪状态，如果玩家靠近会触发愤怒或攻击行为。"
+    },
+    {
+      "state": "attack_swing",
+      "note": "当装备物品时，实体使用挥舞攻击，造成伤害并可能击退敌人，有无敌帧和硬直窗口。"
+    },
+    {
+      "state": "cannon",
+      "note": "发射激光束攻击，伤害随距离变化，具有范围效果和击退，准备阶段会追踪目标。"
+    },
+    {
+      "state": "tackle_loop",
+      "note": "冲锋状态，高速移动并对路径上的敌人造成伤害，同时破坏障碍物，有碰撞检测和硬直。"
+    },
+    {
+      "state": "defeat",
+      "note": "当生命值低时被击败，实体倒地并掉落装备，进入虚弱状态，无法被攻击。"
+    },
+    {
+      "state": "rummage",
+      "note": "从垃圾堆中翻找物品，可能获得武器或道具，过程中可被中断，有特定动画窗口。"
+    },
+    {
+      "state": "taunt",
+      "note": "吼叫并恐吓玩家，触发追逐状态，有范围吓退效果和冷却时间。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，播放受击动画并更新硬直延迟，可被打断或衔接攻击。"
+    },
+    {
+      "state": "throw",
+      "note": "投掷垃圾球攻击，追踪目标位置并造成范围伤害，有准备和收尾动画。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      22383,
+      15941,
+      19110,
+      15022,
+      13437,
+      15225,
+      72238
+    ],
+    "aspects": [
+      {
+        "aspect": "冲撞攻击伤害描述",
+        "evidence": [
+          {
+            "pageid": 22383,
+            "quote": "冲撞 50"
+          }
+        ]
+      },
+      {
+        "aspect": "击败后掉落奖励描述",
+        "evidence": [
+          {
+            "pageid": 22383,
+            "quote": "如果拾荒疯猪在装备钻头时被击败或被传送，会掉落 6% ~ 20% 随机耐久的[[拾荒尖帽]]。"
+          }
+        ]
+      },
+      {
+        "aspect": "垃圾球投掷伤害描述",
+        "evidence": [
+          {
+            "pageid": 22383,
+            "quote": "抛出垃圾球 30"
+          }
+        ]
+      },
+      {
+        "aspect": "激光炮攻击伤害描述",
+        "evidence": [
+          {
+            "pageid": 22383,
+            "quote": "激光炮 80 ~ 240"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "Daywalker",
+    "挥舞攻击",
+    "激光炮",
+    "冲锋",
+    "拾取",
+    "击败",
+    "吼叫",
+    "垃圾堆",
+    "装备",
+    "硬直"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "探索",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "b7df7a62b43dc3413f156e2eecf71f0af95eda1ff307b9326bf958e865a3a0e0",
+    "source_bytes": 75799,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137213033
+  }
+}

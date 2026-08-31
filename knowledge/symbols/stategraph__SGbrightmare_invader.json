@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbrightmare_invader.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbrightmare_invader",
+  "summary": "此状态图驱动名为 gestalt 的生物，可能属于 Brightmare 入侵者系列。整体状态组织基于常见状态机，包括空闲、出现、攻击、射击和死亡等状态，通过事件和动画驱动，支持近战与远程攻击。",
+  "api": [],
+  "api_note": "该状态图未定义公共接口方法，主要由事件和状态驱动，外部通过事件交互。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "arrive",
+    "doattack"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "emerge",
+    "death",
+    "attack",
+    "shoot",
+    "walk"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "生物处于空闲状态，播放 idle 动画并可旋转，是默认等待状态。"
+    },
+    {
+      "state": "emerge",
+      "note": "生物出现状态，具有 busy 和 noattack 标签，播放 emerge 动画，动画结束后转到 idle，可能从传送点生成。"
+    },
+    {
+      "state": "death",
+      "note": "生物死亡状态，播放 melt 动画后实体被移除，期间为 busy 和 noattack。"
+    },
+    {
+      "state": "attack",
+      "note": "近战攻击状态，播放 mutate 动画，在30帧时执行攻击伤害并移除 busy 标签。"
+    },
+    {
+      "state": "shoot",
+      "note": "远程攻击状态，播放 attack 动画，在24帧时发射抛射物，并启动3-6秒随机冷却计时器。"
+    },
+    {
+      "state": "walk",
+      "note": "行走状态，播放行走动画并生成拖尾轨迹（SpawnTrail），用于移动时的视觉效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      13409,
+      51046,
+      15651,
+      13897,
+      15225,
+      15551,
+      13828
+    ],
+    "aspects": [
+      {
+        "aspect": "攻击伤害描述",
+        "evidence": [
+          {
+            "pageid": 15551,
+            "quote": "蜂王的攻击造成 120 点伤害"
+          }
+        ]
+      },
+      {
+        "aspect": "死亡事件描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "龙蝇死亡后，20 天后在刷新点重新生成。"
+          },
+          {
+            "pageid": 15225,
+            "quote": "暗影傀儡受到召唤者的攻击会立即死亡"
+          }
+        ]
+      },
+      {
+        "aspect": "移动拖尾效果",
+        "evidence": [
+          {
+            "pageid": 15551,
+            "quote": "移动时，它会在身后流下'''[[#蜂蜜尾迹|蜂蜜尾迹]]'''。"
+          }
+        ]
+      },
+      {
+        "aspect": "空闲状态描述",
+        "evidence": [
+          {
+            "pageid": 15651,
+            "quote": "自然状态下龙蝇会一直呆在原地不动。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "well_documented"
+  },
+  "search_terms": [
+    "gestalt",
+    "影怪",
+    "出现",
+    "攻击",
+    "射击",
+    "死亡",
+    "移动",
+    "战斗",
+    "brightmare",
+    "入侵者"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生物",
+    "敌人"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "0f8f76df339ff41d4e1ffe83525833cb0b8c56ca1dd758375206d9f0c8b86d33",
+    "source_bytes": 4665,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144219765
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_eyeofterror.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_eyeofterror",
+  "summary": "该状态图驱动饥荒联机版中的宠物实体“迷你恐怖之眼”。整体状态组织基于常见宠物行为，通过调用 SGCritterStates 和 CommonStates 函数添加空闲、表情、吃东西、睡觉等状态，以处理宠物的互动和生存需求。",
+  "api": [],
+  "api_note": "源码中未定义对外API方法。",
+  "events_published": [
+    "on_landed",
+    "on_no_longer_landed"
+  ],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "randomemotes",
+    "emote_cute",
+    "petemote",
+    "combatemote",
+    "playwithothercritter",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "sleepex"
+  ],
+  "state_notes": [
+    {
+      "state": "eat",
+      "note": "宠物吃东西状态，在22帧时着陆播放进食音效，84帧后重新飞起。"
+    },
+    {
+      "state": "hungry",
+      "note": "饥饿状态，播放 distress 音效，表示宠物需要喂食。"
+    },
+    {
+      "state": "petemote",
+      "note": "被玩家抚摸状态，着陆播放音效，33帧后重新飞起。"
+    },
+    {
+      "state": "sleepex",
+      "note": "睡觉状态，开始睡觉时着陆，醒来后重新飞起，播放睡眠音效。"
+    },
+    {
+      "state": "combatemote",
+      "note": "战斗表情状态，播放 combat 音效，可能用于展示攻击意图。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "蹭脸互动状态，6帧时着陆，45帧后重新飞起，播放音效。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15832,
+      13456,
+      15975,
+      13437,
+      34037,
+      13455,
+      15238,
+      13156
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中未提及 stategraph__SGcritter_eyeofterror 的任何能力或行为，如吃东西、饥饿、被抚摸、睡觉、战斗表情、蹭脸等状态。页面内容涉及其他实体（如恐怖之眼、鱼人之王、沃尔特等）或通用机制（如饥饿值），与代码能力/行为语义清单无直接关联。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "恐怖之眼",
+    "迷你宠物",
+    "吃东西",
+    "睡觉",
+    "表情",
+    "饥饿",
+    "飞行",
+    "互动"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "baf6750f88a558cdd2687122ee15ebafbb7f6648678e59532b801a61ff763d57",
+    "source_bytes": 3965,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788144410745
+  }
+}

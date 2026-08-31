@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcrabking_cannontower.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcrabking_cannontower",
+  "summary": "该状态图驱动蟹王加农炮塔（crabking_cannontower）实体，是其行为状态的核心控制逻辑。整体状态组织包括出生、空闲、装弹、射击、被攻击、突破相关状态和死亡状态，通过事件触发状态转换，突破状态系列涉及对船只的破坏行为。",
+  "api": [],
+  "api_note": "该状态图未定义对外公共方法，所有交互通过事件触发和状态转换实现。",
+  "events_published": [],
+  "events_listened": [
+    "ck_loadcannon",
+    "ck_shootcannon",
+    "ck_spawn",
+    "ck_breach",
+    "attacked",
+    "death"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CRABKING_CANNONTOWER_HULL_SMASH_DAMAGE"
+  ],
+  "states": [
+    "idle",
+    "spawn",
+    "hit",
+    "load",
+    "shoot",
+    "breach_pre",
+    "breach",
+    "breach_thrust",
+    "breach_pst",
+    "breach_spawn",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "炮塔空闲状态，根据是否装弹播放不同动画；若未装弹，会触发测试重新装填。"
+    },
+    {
+      "state": "spawn",
+      "note": "炮塔生成时进入，播放生成动画和音效，完成后转入空闲状态。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击时进入，根据是否装弹播放受击动画，完成后返回空闲状态。"
+    },
+    {
+      "state": "load",
+      "note": "装弹事件触发时进入，播放装弹循环动画和音效，完成后进入装弹空闲状态。"
+    },
+    {
+      "state": "shoot",
+      "note": "射击事件触发时进入，播放射击动画和音效，完成后进入未装弹空闲状态。"
+    },
+    {
+      "state": "breach_pre",
+      "note": "突破事件触发时进入，触发相机垂直抖动，播放准备动画，为突破攻击做前置。"
+    },
+    {
+      "state": "breach",
+      "note": "突破准备完成后进入，播放循环动画，持续2+随机秒；若船只消失则返回生成状态。"
+    },
+    {
+      "state": "breach_thrust",
+      "note": "突破循环后进入，播放攻击动画，并在8帧时对接触的船只造成伤害（配置值：CRABKING_CANNONTOWER_HULL_SMASH_DAMAGE），同时触发相机侧向抖动。"
+    },
+    {
+      "state": "breach_pst",
+      "note": "从突破状态被攻击或死亡时进入，播放后动画，设置炮塔为临时存在并移除，同时可能产生船只漏洞。"
+    },
+    {
+      "state": "death",
+      "note": "死亡时进入，播放破碎动画，掉落战利品，移除物理碰撞，并生成子实体（crabking_mob）。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      13606,
+      15022,
+      34314,
+      15539,
+      13156,
+      15651,
+      15922,
+      10374
+    ],
+    "aspects": [],
+    "no_evidence_reason": "页面摘录中仅提及加农炮塔作为帝王蟹生成的实体，但未描述其具体状态或行为（如空闲、射击、死亡等）。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蟹王",
+    "加农炮",
+    "炮塔",
+    "突破",
+    "装弹",
+    "射击",
+    "死亡",
+    "漏洞",
+    "伤害",
+    "生成"
+  ],
+  "gameplay_tags": [
+    "战斗"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "dcbe1cb3ffb09cf2a01971c22b9f947e03aa86ce54892e116754f222d78343e4",
+    "source_bytes": 8845,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788137068872
+  }
+}

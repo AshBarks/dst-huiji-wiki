@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGstagehand.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGstagehand",
+  "summary": "该状态图驱动舞台助手（stagehand）实体，一个可互动的装饰性生物。整体状态组织围绕初始隐藏、闲置（包括隐藏和站立）、受击反应、放弃工作、死亡等生命周期，控制其动画、移动和互动行为。",
+  "api": [],
+  "api_note": "状态图未定义外部API方法，所有状态转换和事件处理均为内部逻辑。",
+  "events_published": [],
+  "events_listened": [
+    "death",
+    "worked",
+    "onignite",
+    "locomote"
+  ],
+  "netvars": [],
+  "tunables": [
+    "SEG_TIME",
+    "STAGEHAND_HITS_TO_GIVEUP"
+  ],
+  "states": [
+    "initialstate",
+    "death",
+    "idle",
+    "idle_hiding",
+    "hide",
+    "standup",
+    "hit",
+    "extinguish",
+    "giveup"
+  ],
+  "state_notes": [
+    {
+      "state": "hit",
+      "note": "当玩家使用工具工作（如敲击）时触发，播放受击动画并减少剩余打击次数，若次数耗尽则进入放弃状态。"
+    },
+    {
+      "state": "giveup",
+      "note": "当打击次数降为0时，实体放弃工作，播放熄灭动画并掉落蓝图，随后恢复工作能力或进入隐藏。"
+    },
+    {
+      "state": "idle_hiding",
+      "note": "实体隐藏时的闲置状态，在黄昏或夜晚可能随机播放偷看动画，表现其隐蔽行为。"
+    },
+    {
+      "state": "standup",
+      "note": "实体从隐藏状态站起，播放站起动画，完成后启用物理碰撞并可能移动或进入常规闲置。"
+    },
+    {
+      "state": "extinguish",
+      "note": "当实体着火时触发，播放熄灭火动画，中途调用熄灭组件移除燃烧状态。"
+    },
+    {
+      "state": "death",
+      "note": "实体死亡时触发，停止物理碰撞、掉落战利品并生成坍缩特效，随后移除实体。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18830,
+      16174,
+      15651,
+      13606,
+      15022,
+      15225,
+      13406,
+      15303
+    ],
+    "aspects": [
+      {
+        "aspect": "敲击间隔与剩余工作描述",
+        "evidence": [
+          {
+            "pageid": 16174,
+            "quote": "锤击间隔不能多于 15 秒，否则其剩余工作"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "舞台助手",
+    "stagehand",
+    "隐藏",
+    "偷看",
+    "蓝图",
+    "打击",
+    "放弃",
+    "熄灭",
+    "死亡",
+    "移动"
+  ],
+  "gameplay_tags": [
+    "装饰",
+    "互动"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "a46ae76751a86f9bad4443c677e0380900ea1f115e89816e55017eabd9f35913",
+    "source_bytes": 11564,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788141495360
+  }
+}

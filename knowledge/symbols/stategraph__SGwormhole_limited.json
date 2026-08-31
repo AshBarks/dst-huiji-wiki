@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGwormhole_limited.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGwormhole_limited",
+  "summary": "该状态图驱动饥荒联机版中的虫洞实体。整体状态以闲置状态为基础，通过超时和动画事件转换到咳嗽、开启、关闭和死亡状态。状态转换模拟虫洞的呼吸、开关和生命周期，主要由玩家交互或外部事件触发。",
+  "api": [],
+  "api_note": "源码中未定义任何对外API方法，状态图仅处理内部状态转换。",
+  "events_published": [],
+  "events_listened": [
+    "animover"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "idlecough",
+    "open",
+    "opening",
+    "closing",
+    "death"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "虫洞的默认状态，表现为呼吸动画，随机时间后可能咳嗽。进入条件：虫洞初始或关闭后。"
+    },
+    {
+      "state": "open",
+      "note": "虫洞开启状态，玩家可进入进行传送。进入条件：从开启过程完成。"
+    },
+    {
+      "state": "death",
+      "note": "虫洞死亡状态，播放死亡动画后移除。进入条件：被外部事件摧毁。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      19718,
+      57263,
+      18001,
+      16641,
+      17930,
+      15303,
+      51949,
+      24578
+    ],
+    "aspects": [
+      {
+        "aspect": "虫洞开启传送功能描述",
+        "evidence": [
+          {
+            "pageid": 19718,
+            "quote": "*使用虫洞可以快速摆脱正在仇恨你的生物"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "虫洞",
+    "传送",
+    "开关",
+    "生病",
+    "死亡",
+    "呼吸",
+    "动画",
+    "状态图",
+    "wormhole"
+  ],
+  "gameplay_tags": [
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "f9b6479881524b4c10ec5c5c6e39f25d3dcc531cca6167403245130bfb37b5c1",
+    "source_bytes": 2810,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788146861386
+  }
+}

@@ -1,36 +1,45 @@
 {
   "schema_version": 1,
-  "generated_at_ms": 1788019601209,
+  "generated_at_ms": 1788157911923,
   "totals": {
-    "pages": 756,
-    "pages_with_mention": 360,
-    "pairs": 6071,
+    "pages": 758,
+    "pages_with_mention": 419,
+    "pairs": 7703,
     "mentioned_by_source": {
-      "pass2_evidence": 83,
-      "fact_match": 30,
-      "llm_verdict": 588
+      "pass2_evidence": 246,
+      "fact_match": 75,
+      "llm_verdict": 644
     },
-    "stub_pairs": 5370,
-    "stub_unaudited": 187
+    "stub_pairs": 6738,
+    "stub_unaudited": 741
   },
   "symbols": {
     "behaviours/attackwall.lua": {
-      "routed": 5,
-      "mentioned": 0,
-      "stub": 5,
-      "stub_unaudited": 5,
+      "routed": 8,
+      "mentioned": 1,
+      "stub": 7,
+      "stub_unaudited": 7,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "behaviours/chaseandattack.lua": {
-      "routed": 16,
-      "mentioned": 4,
-      "stub": 12,
+      "routed": 42,
+      "mentioned": 22,
+      "stub": 20,
+      "stub_unaudited": 0,
+      "inconsistent": 7,
+      "detailed": 0,
+      "summary": 22
+    },
+    "behaviours/chaseandattackandavoid.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 4
+      "summary": 0
     },
     "behaviours/chaseandram.lua": {
       "routed": 2,
@@ -42,31 +51,49 @@
       "summary": 0
     },
     "behaviours/chattynode.lua": {
-      "routed": 1,
+      "routed": 4,
       "mentioned": 0,
-      "stub": 1,
+      "stub": 4,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
     },
     "behaviours/doaction.lua": {
-      "routed": 11,
+      "routed": 25,
       "mentioned": 0,
-      "stub": 11,
-      "stub_unaudited": 0,
+      "stub": 25,
+      "stub_unaudited": 14,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
     },
     "behaviours/faceentity.lua": {
-      "routed": 11,
-      "mentioned": 0,
-      "stub": 11,
+      "routed": 31,
+      "mentioned": 16,
+      "stub": 15,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
+      "summary": 16
+    },
+    "behaviours/findclosest.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
       "summary": 0
+    },
+    "behaviours/findfarmplant.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
     },
     "behaviours/findflower.lua": {
       "routed": 1,
@@ -78,67 +105,94 @@
       "summary": 1
     },
     "behaviours/follow.lua": {
-      "routed": 7,
+      "routed": 14,
       "mentioned": 3,
-      "stub": 4,
-      "stub_unaudited": 0,
+      "stub": 11,
+      "stub_unaudited": 7,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 3
     },
     "behaviours/leash.lua": {
-      "routed": 13,
-      "mentioned": 1,
-      "stub": 12,
+      "routed": 34,
+      "mentioned": 5,
+      "stub": 29,
+      "stub_unaudited": 0,
+      "inconsistent": 3,
+      "detailed": 0,
+      "summary": 5
+    },
+    "behaviours/leashandavoid.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "behaviours/minperiod.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 1
+      "summary": 0
     },
     "behaviours/panic.lua": {
-      "routed": 5,
+      "routed": 7,
       "mentioned": 0,
-      "stub": 5,
-      "stub_unaudited": 5,
+      "stub": 7,
+      "stub_unaudited": 7,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
     },
     "behaviours/runaway.lua": {
-      "routed": 6,
-      "mentioned": 1,
-      "stub": 5,
-      "stub_unaudited": 5,
+      "routed": 18,
+      "mentioned": 7,
+      "stub": 11,
+      "stub_unaudited": 11,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 1
+      "summary": 7
+    },
+    "behaviours/runtodist.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "behaviours/standandattack.lua": {
-      "routed": 3,
+      "routed": 6,
       "mentioned": 0,
-      "stub": 3,
-      "stub_unaudited": 3,
+      "stub": 6,
+      "stub_unaudited": 6,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
     },
     "behaviours/standstill.lua": {
-      "routed": 9,
-      "mentioned": 0,
-      "stub": 9,
-      "stub_unaudited": 0,
+      "routed": 21,
+      "mentioned": 1,
+      "stub": 20,
+      "stub_unaudited": 11,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "behaviours/wander.lua": {
-      "routed": 24,
-      "mentioned": 3,
-      "stub": 21,
+      "routed": 63,
+      "mentioned": 4,
+      "stub": 59,
       "stub_unaudited": 0,
       "inconsistent": 1,
       "detailed": 0,
-      "summary": 3
+      "summary": 4
     },
     "brains/abigailbrain.lua": {
       "routed": 1,
@@ -266,6 +320,51 @@
       "detailed": 1,
       "summary": 0
     },
+    "brains/chest_mimicbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/cookiecutterbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/cozy_bunnymanbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/daywalker2brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/daywalkerbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
     "brains/deerbrain.lua": {
       "routed": 1,
       "mentioned": 1,
@@ -284,6 +383,42 @@
       "detailed": 0,
       "summary": 0
     },
+    "brains/dragonflybrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/eyeofterror_minibrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/friendlyfruitflybrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/fruitdragonbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
     "brains/fruitflybrain.lua": {
       "routed": 1,
       "mentioned": 1,
@@ -293,6 +428,42 @@
       "detailed": 1,
       "summary": 0
     },
+    "brains/fused_shadelingbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/glommerbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/grassgekkobrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/hostedbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
     "brains/houndbrain.lua": {
       "routed": 3,
       "mentioned": 2,
@@ -300,6 +471,123 @@
       "stub_unaudited": 1,
       "inconsistent": 0,
       "detailed": 2,
+      "summary": 0
+    },
+    "brains/itemmimic_revealedbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/killerbeebrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/klausbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/lavaepetbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/lightninggoatbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/lunar_grazer_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/molebrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/moonstormstaticbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/moosebrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/mosquitobrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/mosslingbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/oceanshadowcreaturebrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/otterbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
       "summary": 0
     },
     "brains/pollyrogerbrain.lua": {
@@ -311,6 +599,24 @@
       "detailed": 2,
       "summary": 0
     },
+    "brains/rabbitbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/rabbitking_bunnymanbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
     "brains/rabbitkingbrain.lua": {
       "routed": 1,
       "mentioned": 1,
@@ -320,7 +626,259 @@
       "detailed": 1,
       "summary": 0
     },
+    "brains/shadow_leechbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/shadowheart_infusedbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/shadowthrall_centipede_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/shadowthrall_hands_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/shadowthrall_horns_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/shadowthrall_mouth_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/shadowthrall_parasite_brain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/shadowthrall_wings_brain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/sharkboibrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/sharkbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/spatbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/squidbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/stagehandbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/stageusherbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/storage_robotbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/ticoonbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "brains/toadstoolbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/tornadobrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/vault_crawlerbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/vault_pillar_guardbrain.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/wagboss_robotbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/wagdrone_rollingbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/wanderingtraderbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/wargbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/waterplantbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "brains/waveyjoneshandbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/winonacatapultbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/wobybigbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/wobysmallbrain.lua": {
       "routed": 1,
       "mentioned": 1,
       "stub": 0,
@@ -338,10 +896,253 @@
       "detailed": 0,
       "summary": 0
     },
+    "brains/wx78_possessedbodybrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "brains/wx78_shadowdrone_debufferbrain.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "brains/wx78_shadowdrone_harvesterbrain.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/abysspillargroup.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/acidinfusible.lua": {
+      "routed": 18,
+      "mentioned": 1,
+      "stub": 17,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/acidlevel.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/activatable.lua": {
+      "routed": 23,
+      "mentioned": 11,
+      "stub": 12,
+      "stub_unaudited": 0,
+      "inconsistent": 15,
+      "detailed": 0,
+      "summary": 11
+    },
+    "components/amorphous.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/amphibiouscreature.lua": {
+      "routed": 9,
+      "mentioned": 0,
+      "stub": 9,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/anchor.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/aoespell.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/aoetargeting.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/aoeweapon_lunge.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/areaaware.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/armor.lua": {
+      "routed": 14,
+      "mentioned": 0,
+      "stub": 14,
+      "stub_unaudited": 14,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/attunable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/aura.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/bait.lua": {
       "routed": 39,
       "mentioned": 0,
       "stub": 39,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/balloonmaker.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/bathbomb.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/bathbombable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/bathingpool.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/battery.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/batteryuser.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/beard.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/bedazzler.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/beefalometrics.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/blinkstaff.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
@@ -356,23 +1157,266 @@
       "detailed": 0,
       "summary": 0
     },
-    "components/burnable.lua": {
-      "routed": 305,
-      "mentioned": 19,
-      "stub": 286,
-      "stub_unaudited": 5,
-      "inconsistent": 1,
+    "components/blowinwind.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
       "detailed": 0,
-      "summary": 19
+      "summary": 0
     },
-    "components/childspawner.lua": {
-      "routed": 24,
-      "mentioned": 22,
+    "components/boatcannon.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/boatdrag.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatdrifter.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatleak.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/boatmagnet.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatmagnetbeacon.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatpatch.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatphysics.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 8,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatrace_proximitychecker.lua": {
+      "routed": 2,
+      "mentioned": 0,
       "stub": 2,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 6,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatring.lua": {
+      "routed": 7,
+      "mentioned": 1,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/boatringdata.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/boatrotator.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/boattrail.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/bottler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/brush.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/brushable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/burnable.lua": {
+      "routed": 305,
+      "mentioned": 20,
+      "stub": 285,
+      "stub_unaudited": 5,
+      "inconsistent": 1,
+      "detailed": 2,
+      "summary": 18
+    },
+    "components/camerafade.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/canopylightrays.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/canopyshadows.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/carnivaldecor.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/carnivaldecorranker.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/carnivalgameshooter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/cattoy.lua": {
+      "routed": 4,
+      "mentioned": 1,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/channelable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/channelcastable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/childspawner.lua": {
+      "routed": 24,
+      "mentioned": 19,
+      "stub": 5,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 3,
       "summary": 16
+    },
+    "components/circuitnode.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/colouradder.lua": {
       "routed": 22,
@@ -383,43 +1427,223 @@
       "detailed": 0,
       "summary": 0
     },
-    "components/combat.lua": {
-      "routed": 157,
-      "mentioned": 66,
-      "stub": 91,
-      "stub_unaudited": 0,
-      "inconsistent": 0,
-      "detailed": 3,
-      "summary": 63
-    },
-    "components/container.lua": {
-      "routed": 32,
-      "mentioned": 26,
-      "stub": 6,
-      "stub_unaudited": 0,
-      "inconsistent": 0,
-      "detailed": 4,
-      "summary": 22
-    },
-    "components/cookable.lua": {
-      "routed": 28,
-      "mentioned": 7,
-      "stub": 21,
-      "stub_unaudited": 0,
-      "inconsistent": 0,
-      "detailed": 0,
-      "summary": 7
-    },
-    "components/damagetypebonus.lua": {
-      "routed": 13,
-      "mentioned": 4,
+    "components/colouraddersync.lua": {
+      "routed": 9,
+      "mentioned": 0,
       "stub": 9,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 4
+      "summary": 0
+    },
+    "components/colourtweener.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/combat.lua": {
+      "routed": 157,
+      "mentioned": 65,
+      "stub": 92,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 5,
+      "summary": 60
+    },
+    "components/commander.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/complexprojectile.lua": {
+      "routed": 10,
+      "mentioned": 1,
+      "stub": 9,
+      "stub_unaudited": 9,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/compostingbin.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/constructionsite.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/container.lua": {
+      "routed": 32,
+      "mentioned": 23,
+      "stub": 9,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 2,
+      "summary": 21
+    },
+    "components/container_proxy.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/container_transform.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/cookable.lua": {
+      "routed": 28,
+      "mentioned": 6,
+      "stub": 22,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 6
+    },
+    "components/cooker.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/cookiecutterdrill.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/cooldown.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/counter.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/craftingstation.lua": {
+      "routed": 6,
+      "mentioned": 3,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 3
+    },
+    "components/crittertraits.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/curseditem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/damagereflect.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/damagetracker.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/damagetypebonus.lua": {
+      "routed": 13,
+      "mentioned": 5,
+      "stub": 8,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 5
+    },
+    "components/damagetyperesist.lua": {
+      "routed": 11,
+      "mentioned": 0,
+      "stub": 11,
+      "stub_unaudited": 11,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/debuff.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/debuffable.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/deckcontainer.lua": {
       "routed": 1,
       "mentioned": 0,
       "stub": 1,
@@ -430,8 +1654,89 @@
     },
     "components/deployable.lua": {
       "routed": 54,
+      "mentioned": 7,
+      "stub": 47,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 7
+    },
+    "components/deployhelper.lua": {
+      "routed": 11,
       "mentioned": 0,
-      "stub": 54,
+      "stub": 11,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/despawnfader.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/digester.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/disappears.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/distancefade.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/domesticatable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/dpstracker.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/drawable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/drawingtool.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
@@ -448,21 +1753,21 @@
     },
     "components/dryable.lua": {
       "routed": 19,
-      "mentioned": 0,
-      "stub": 19,
+      "mentioned": 1,
+      "stub": 18,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/eater.lua": {
       "routed": 69,
-      "mentioned": 14,
-      "stub": 55,
-      "stub_unaudited": 0,
+      "mentioned": 16,
+      "stub": 53,
+      "stub_unaudited": 1,
       "inconsistent": 0,
-      "detailed": 1,
-      "summary": 13
+      "detailed": 4,
+      "summary": 12
     },
     "components/edible.lua": {
       "routed": 81,
@@ -472,6 +1777,33 @@
       "inconsistent": 0,
       "detailed": 0,
       "summary": 4
+    },
+    "components/efficientuser.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/electricattacks.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/electricconnector.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
     },
     "components/embarker.lua": {
       "routed": 28,
@@ -484,9 +1816,18 @@
     },
     "components/entitytracker.lua": {
       "routed": 47,
-      "mentioned": 0,
-      "stub": 47,
+      "mentioned": 2,
+      "stub": 45,
       "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
+    },
+    "components/epicscare.lua": {
+      "routed": 9,
+      "mentioned": 0,
+      "stub": 9,
+      "stub_unaudited": 9,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -500,6 +1841,87 @@
       "detailed": 0,
       "summary": 19
     },
+    "components/erasablepaper.lua": {
+      "routed": 4,
+      "mentioned": 1,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/explosive.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/explosiveresist.lua": {
+      "routed": 22,
+      "mentioned": 1,
+      "stub": 21,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/fader.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fan.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fencerotator.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fertilizer.lua": {
+      "routed": 10,
+      "mentioned": 0,
+      "stub": 10,
+      "stub_unaudited": 10,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fertilizerresearchable.lua": {
+      "routed": 10,
+      "mentioned": 0,
+      "stub": 10,
+      "stub_unaudited": 10,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fillable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/finiteuses.lua": {
       "routed": 65,
       "mentioned": 24,
@@ -508,6 +1930,33 @@
       "inconsistent": 0,
       "detailed": 0,
       "summary": 24
+    },
+    "components/firedetector.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/fishable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/fishingrod.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/floater.lua": {
       "routed": 362,
@@ -518,14 +1967,68 @@
       "detailed": 0,
       "summary": 0
     },
+    "components/flotationdevice.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/follower.lua": {
       "routed": 45,
       "mentioned": 5,
       "stub": 40,
-      "stub_unaudited": 0,
+      "stub_unaudited": 2,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 5
+    },
+    "components/followerherder.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/foodaffinity.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/forcecompostable.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/forgerepairable.lua": {
+      "routed": 11,
+      "mentioned": 0,
+      "stub": 11,
+      "stub_unaudited": 11,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/formationfollower.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/freezable.lua": {
       "routed": 106,
@@ -535,6 +2038,15 @@
       "inconsistent": 0,
       "detailed": 3,
       "summary": 1
+    },
+    "components/friendlevels.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
     },
     "components/fuel.lua": {
       "routed": 79,
@@ -547,21 +2059,201 @@
     },
     "components/fueled.lua": {
       "routed": 49,
-      "mentioned": 21,
-      "stub": 28,
-      "stub_unaudited": 0,
+      "mentioned": 20,
+      "stub": 29,
+      "stub_unaudited": 1,
       "inconsistent": 0,
-      "detailed": 3,
-      "summary": 18
+      "detailed": 5,
+      "summary": 15
     },
-    "components/hauntable.lua": {
-      "routed": 584,
-      "mentioned": 6,
-      "stub": 578,
+    "components/fueler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 6
+      "summary": 0
+    },
+    "components/furnituredecor.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/furnituredecortaker.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/gestaltcage.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/gestaltcapturable.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/ghostgestalter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/ghostlyelixirable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/globaltrackingicon.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/gravediggable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/gravedigger.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/groomer.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/groundpounder.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/grouptargeter.lua": {
+      "routed": 10,
+      "mentioned": 0,
+      "stub": 10,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/growable.lua": {
+      "routed": 5,
+      "mentioned": 3,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 3,
+      "summary": 0
+    },
+    "components/guardian.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/halloweenmoonmutable.lua": {
+      "routed": 17,
+      "mentioned": 0,
+      "stub": 17,
+      "stub_unaudited": 17,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/halloweenpotionmoon.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/harvestable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hatchable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hauntable.lua": {
+      "routed": 584,
+      "mentioned": 7,
+      "stub": 577,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 7
+    },
+    "components/healer.lua": {
+      "routed": 7,
+      "mentioned": 1,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
     },
     "components/health.lua": {
       "routed": 158,
@@ -569,35 +2261,278 @@
       "stub": 125,
       "stub_unaudited": 0,
       "inconsistent": 4,
+      "detailed": 3,
+      "summary": 30
+    },
+    "components/healthsyncer.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/healthtrigger.lua": {
+      "routed": 10,
+      "mentioned": 0,
+      "stub": 10,
+      "stub_unaudited": 10,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/heater.lua": {
+      "routed": 9,
+      "mentioned": 0,
+      "stub": 9,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/heavyobstaclephysics.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/heavyobstacleusetarget.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/herd.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/herdmember.lua": {
+      "routed": 8,
+      "mentioned": 2,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
       "detailed": 1,
-      "summary": 32
+      "summary": 1
+    },
+    "components/hideandseeker.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hideandseekgame.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/highlightchild.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hitchable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hitcher.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/homeseeker.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 8,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hudindicatable.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/hull.lua": {
+      "routed": 7,
+      "mentioned": 2,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
+    },
+    "components/hullhealth.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/hunger.lua": {
+      "routed": 9,
+      "mentioned": 5,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 3,
+      "summary": 2
+    },
+    "components/incinerator.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/incrementalproducer.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
     },
     "components/inspectable.lua": {
       "routed": 735,
-      "mentioned": 8,
-      "stub": 727,
-      "stub_unaudited": 130,
-      "inconsistent": 0,
+      "mentioned": 7,
+      "stub": 728,
+      "stub_unaudited": 14,
+      "inconsistent": 18,
       "detailed": 1,
-      "summary": 7
+      "summary": 6
+    },
+    "components/instrument.lua": {
+      "routed": 6,
+      "mentioned": 0,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/insulator.lua": {
+      "routed": 12,
+      "mentioned": 0,
+      "stub": 12,
+      "stub_unaudited": 12,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/inventory.lua": {
       "routed": 66,
-      "mentioned": 7,
-      "stub": 59,
-      "stub_unaudited": 4,
+      "mentioned": 5,
+      "stub": 61,
+      "stub_unaudited": 6,
       "inconsistent": 0,
-      "detailed": 2,
+      "detailed": 0,
       "summary": 5
     },
     "components/inventoryitem.lua": {
       "routed": 417,
       "mentioned": 30,
       "stub": 387,
-      "stub_unaudited": 0,
+      "stub_unaudited": 1,
       "inconsistent": 1,
       "detailed": 1,
       "summary": 29
+    },
+    "components/inventoryitemholder.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/itemstore.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/itemweigher.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/joustsource.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/kitcoonden.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/klaussacklock.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/knownlocations.lua": {
       "routed": 105,
@@ -610,21 +2545,66 @@
     },
     "components/leader.lua": {
       "routed": 21,
-      "mentioned": 2,
-      "stub": 19,
+      "mentioned": 3,
+      "stub": 18,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 2
+      "summary": 3
+    },
+    "components/leaderrollcall.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/lighter.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/lightningblocker.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/lightpostpartner.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/linkeditem.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
     },
     "components/locomotor.lua": {
       "routed": 160,
-      "mentioned": 22,
-      "stub": 138,
-      "stub_unaudited": 0,
+      "mentioned": 19,
+      "stub": 141,
+      "stub_unaudited": 3,
       "inconsistent": 0,
-      "detailed": 3,
-      "summary": 19
+      "detailed": 2,
+      "summary": 17
     },
     "components/lootdropper.lua": {
       "routed": 312,
@@ -632,8 +2612,422 @@
       "stub": 191,
       "stub_unaudited": 0,
       "inconsistent": 0,
+      "detailed": 1,
+      "summary": 120
+    },
+    "components/luckitem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
       "detailed": 0,
-      "summary": 121
+      "summary": 0
+    },
+    "components/luckuser.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/lunarplant_tentacle_weapon.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/lunarsupernovablocker.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/machine.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/madsciencelab.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/mapdeliverable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/maprecorder.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/maprevealable.lua": {
+      "routed": 9,
+      "mentioned": 0,
+      "stub": 9,
+      "stub_unaudited": 9,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/maprevealer.lua": {
+      "routed": 2,
+      "mentioned": 2,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 2
+    },
+    "components/mapspotrevealer.lua": {
+      "routed": 2,
+      "mentioned": 2,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 2
+    },
+    "components/markable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/markable_proxy.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/mast.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/maxhealer.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/mightygym.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/migrationpetowner.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/migrationpetsoverrider.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/mine.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/minigame.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/minionspawner.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/moisture.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/moistureabsorbersource.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/moonaltarlink.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/moonbeastspawner.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/moonrelic.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/moonstormstaticcapturable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/moonstormstaticcatcher.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/murderable.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/nabbag.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/named.lua": {
+      "routed": 18,
+      "mentioned": 0,
+      "stub": 18,
+      "stub_unaudited": 18,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/nonslipgritsource.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/npc_talker.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/oar.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/oasis.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/objectspawner.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/occupiable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/occupier.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/oceanfishable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/oceanfishingrod.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/oceanfishingtackle.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/oceanthrowable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/oceantrawler.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/oceanwhirlportalphysics.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/papereraser.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/periodicspawner.lua": {
+      "routed": 7,
+      "mentioned": 2,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
     },
     "components/perishable.lua": {
       "routed": 60,
@@ -644,14 +3038,32 @@
       "detailed": 1,
       "summary": 10
     },
+    "components/petleash.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/pickable.lua": {
       "routed": 30,
       "mentioned": 15,
       "stub": 15,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 1,
-      "summary": 14
+      "detailed": 2,
+      "summary": 13
+    },
+    "components/pinnable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/placer.lua": {
       "routed": 133,
@@ -664,12 +3076,57 @@
     },
     "components/planardamage.lua": {
       "routed": 33,
-      "mentioned": 9,
-      "stub": 24,
+      "mentioned": 7,
+      "stub": 26,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 6
+    },
+    "components/planardefense.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 8,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/planarentity.lua": {
+      "routed": 23,
+      "mentioned": 0,
+      "stub": 23,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 9
+      "summary": 0
+    },
+    "components/playbill_lecturn.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/playeravatardata.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/playerfloater.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/playerprox.lua": {
       "routed": 29,
@@ -677,17 +3134,296 @@
       "stub": 19,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 2,
-      "summary": 8
+      "detailed": 0,
+      "summary": 10
+    },
+    "components/playingcard.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/pocketwatch_dismantler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/pointofinterest.lua": {
+      "routed": 15,
+      "mentioned": 0,
+      "stub": 15,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/pollinator.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/portablestructure.lua": {
+      "routed": 11,
+      "mentioned": 0,
+      "stub": 11,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/possessedaxe.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/powerload.lua": {
+      "routed": 6,
+      "mentioned": 1,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/preservative.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/preserver.lua": {
+      "routed": 8,
+      "mentioned": 1,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/projectedeffects.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/projectile.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
     },
     "components/propagator.lua": {
       "routed": 205,
-      "mentioned": 7,
-      "stub": 198,
+      "mentioned": 6,
+      "stub": 199,
       "stub_unaudited": 0,
       "inconsistent": 2,
       "detailed": 0,
-      "summary": 7
+      "summary": 6
+    },
+    "components/prophider.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/prototyper.lua": {
+      "routed": 26,
+      "mentioned": 8,
+      "stub": 18,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 8
+    },
+    "components/pushable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/questowner.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/raindome.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/rainimmunity.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/rampingspawner.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/rechargeable.lua": {
+      "routed": 6,
+      "mentioned": 1,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/reloaditem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/remoteteleporter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/repairable.lua": {
+      "routed": 15,
+      "mentioned": 0,
+      "stub": 15,
+      "stub_unaudited": 15,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/repairer.lua": {
+      "routed": 25,
+      "mentioned": 2,
+      "stub": 23,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 2
+    },
+    "components/repellent.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/resistance.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/reticule.lua": {
+      "routed": 22,
+      "mentioned": 0,
+      "stub": 22,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/rideable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/riftthralltype.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/roseinspectable.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/saltlicker.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/sanity.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/sanityaura.lua": {
       "routed": 84,
@@ -698,23 +3434,356 @@
       "detailed": 0,
       "summary": 11
     },
+    "components/savedrotation.lua": {
+      "routed": 19,
+      "mentioned": 0,
+      "stub": 19,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/savedscale.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/scaler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/scenariorunner.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/scrapbookable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/searchable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/selfstacker.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/sentientaxe.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/setbonus.lua": {
+      "routed": 6,
+      "mentioned": 0,
+      "stub": 6,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/sewing.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/shadowlevel.lua": {
       "routed": 30,
       "mentioned": 2,
       "stub": 28,
       "stub_unaudited": 0,
       "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
+    },
+    "components/shadowsubmissive.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/shaveable.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/shaver.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/shedder.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/shelf.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/sheltered.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/simplebook.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/simplemagicgrower.lua": {
+      "routed": 2,
+      "mentioned": 2,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
+    },
+    "components/sinkholespawner.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/sisturnregistry.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/sittable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/sizetweener.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/skinner.lua": {
+      "routed": 4,
+      "mentioned": 2,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
       "detailed": 0,
       "summary": 2
     },
+    "components/skinner_beefalo.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/sleeper.lua": {
       "routed": 84,
-      "mentioned": 8,
-      "stub": 76,
+      "mentioned": 7,
+      "stub": 77,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 4,
+      "summary": 3
+    },
+    "components/sleepingbag.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/slingshotmodder.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 2,
-      "summary": 6
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/slipperyfeet.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/slipperyfeettarget.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/smotherer.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/snowballmelting.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/snowmandecor.lua": {
+      "routed": 22,
+      "mentioned": 0,
+      "stub": 22,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/snowmandecoratable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/soul.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/spawner.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/spawnfader.lua": {
+      "routed": 23,
+      "mentioned": 0,
+      "stub": 23,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/spellbook.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/spellcaster.lua": {
+      "routed": 13,
+      "mentioned": 0,
+      "stub": 13,
+      "stub_unaudited": 13,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/stackable.lua": {
       "routed": 184,
@@ -725,6 +3794,96 @@
       "detailed": 0,
       "summary": 5
     },
+    "components/stageactor.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/steeringwheel.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/stewer.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/storytellingprop.lua": {
+      "routed": 6,
+      "mentioned": 0,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/stretcher.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/stuckdetection.lua": {
+      "routed": 6,
+      "mentioned": 0,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/stunnable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/submersible.lua": {
+      "routed": 4,
+      "mentioned": 1,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/summoningitem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/symbolswapdata.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/talker.lua": {
       "routed": 32,
       "mentioned": 1,
@@ -734,28 +3893,163 @@
       "detailed": 0,
       "summary": 1
     },
+    "components/targettracker.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/teamattacker.lua": {
+      "routed": 3,
+      "mentioned": 1,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/teleportedoverride.lua": {
+      "routed": 16,
+      "mentioned": 0,
+      "stub": 16,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/teleporter.lua": {
+      "routed": 4,
+      "mentioned": 1,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/temperature.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/terraformer.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/thief.lua": {
+      "routed": 8,
+      "mentioned": 0,
+      "stub": 8,
+      "stub_unaudited": 8,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "components/timer.lua": {
       "routed": 116,
       "mentioned": 67,
       "stub": 49,
       "stub_unaudited": 0,
       "inconsistent": 0,
+      "detailed": 1,
+      "summary": 66
+    },
+    "components/tool.lua": {
+      "routed": 13,
+      "mentioned": 0,
+      "stub": 13,
+      "stub_unaudited": 13,
+      "inconsistent": 0,
       "detailed": 0,
-      "summary": 67
+      "summary": 0
     },
     "components/tradable.lua": {
       "routed": 143,
-      "mentioned": 4,
-      "stub": 139,
-      "stub_unaudited": 0,
+      "mentioned": 3,
+      "stub": 140,
+      "stub_unaudited": 1,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 4
+      "summary": 3
     },
     "components/trader.lua": {
       "routed": 66,
+      "mentioned": 7,
+      "stub": 59,
+      "stub_unaudited": 7,
+      "inconsistent": 16,
+      "detailed": 1,
+      "summary": 6
+    },
+    "components/transparentondrones.lua": {
+      "routed": 1,
       "mentioned": 0,
-      "stub": 66,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/transparentonsanity.lua": {
+      "routed": 10,
+      "mentioned": 0,
+      "stub": 10,
+      "stub_unaudited": 10,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/trap.lua": {
+      "routed": 2,
+      "mentioned": 2,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 1
+    },
+    "components/trapfumaroleburning.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/treegrowthsolution.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/unevenground.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/uniqueid.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
@@ -763,12 +4057,192 @@
     },
     "components/updatelooper.lua": {
       "routed": 38,
-      "mentioned": 3,
-      "stub": 35,
+      "mentioned": 0,
+      "stub": 38,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/upgradeable.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/upgrademoduleowner.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/upgrademoduleremover.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
-      "summary": 2
+      "summary": 0
+    },
+    "components/upgrader.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/useableequippeditem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/useableitem.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/useabletargeteditem.lua": {
+      "routed": 11,
+      "mentioned": 0,
+      "stub": 11,
+      "stub_unaudited": 11,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/vase.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "components/vasedecoration.lua": {
+      "routed": 6,
+      "mentioned": 0,
+      "stub": 6,
+      "stub_unaudited": 6,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/vault_teleporter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/vaultorbteleportdestination.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/vaultorbteleporter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/walkableplatform.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wardrobe.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/waterphysics.lua": {
+      "routed": 18,
+      "mentioned": 1,
+      "stub": 17,
+      "stub_unaudited": 17,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/waterproofer.lua": {
+      "routed": 19,
+      "mentioned": 1,
+      "stub": 18,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/watersource.lua": {
+      "routed": 7,
+      "mentioned": 0,
+      "stub": 7,
+      "stub_unaudited": 7,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wateryprotection.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 4,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wax.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/waxable.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/weapon.lua": {
       "routed": 62,
@@ -776,17 +4250,179 @@
       "stub": 43,
       "stub_unaudited": 2,
       "inconsistent": 0,
+      "detailed": 2,
+      "summary": 17
+    },
+    "components/weighable.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
       "detailed": 0,
-      "summary": 19
+      "summary": 0
+    },
+    "components/werebeast.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/winch.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/winter_treeseed.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wintersfeasttable.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/witherable.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 3,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wobyrack.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "components/workable.lua": {
       "routed": 171,
-      "mentioned": 11,
-      "stub": 160,
+      "mentioned": 10,
+      "stub": 161,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 10
+    },
+    "components/worldmigrator.lua": {
+      "routed": 5,
+      "mentioned": 0,
+      "stub": 5,
+      "stub_unaudited": 5,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/worldroutefollower.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 1,
-      "summary": 10
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/worldsettingstimer.lua": {
+      "routed": 3,
+      "mentioned": 0,
+      "stub": 3,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/writeable.lua": {
+      "routed": 4,
+      "mentioned": 0,
+      "stub": 4,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wx78_abilitycooldowns.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/wx78_shield.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/yotb_sewer.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/yotb_stager.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/yotc_racecompetitor.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "components/yotc_racestart.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "components/yotc_racestats.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 2,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     },
     "stategraphs/SGBeefalo.lua": {
       "routed": 1,
@@ -797,10 +4433,64 @@
       "detailed": 1,
       "summary": 0
     },
+    "stategraphs/SGMandrake.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGabigail.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGabysspillar_minion.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGalterguardian_phase1.lua": {
       "routed": 2,
       "mentioned": 1,
       "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGalterguardian_phase2.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGalterguardian_phase3.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGalterguardian_phase4_lunarrift.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 1,
@@ -814,6 +4504,42 @@
       "inconsistent": 0,
       "detailed": 1,
       "summary": 0
+    },
+    "stategraphs/SGantlion.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGantlion_angry.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGbalatro_machine.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGbat.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
     },
     "stategraphs/SGbearger.lua": {
       "routed": 2,
@@ -833,6 +4559,60 @@
       "detailed": 0,
       "summary": 1
     },
+    "stategraphs/SGbeequeen.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGbernie.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGberniebig.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGbigshadowtentacle.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGbirchnutdrake.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGbird.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGbird_mutant.lua": {
       "routed": 1,
       "mentioned": 1,
@@ -851,6 +4631,60 @@
       "detailed": 0,
       "summary": 2
     },
+    "stategraphs/SGboatcannon.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGboatmagnet.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGboatmagnetbeacon.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGboatrace_spectator_dragonling.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGboatrace_start.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGboatrotator.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGbrightmare_gestalt.lua": {
       "routed": 2,
       "mentioned": 1,
@@ -859,6 +4693,15 @@
       "inconsistent": 0,
       "detailed": 1,
       "summary": 0
+    },
+    "stategraphs/SGbunnyman.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
     },
     "stategraphs/SGbutterfly.lua": {
       "routed": 2,
@@ -878,6 +4721,42 @@
       "detailed": 0,
       "summary": 2
     },
+    "stategraphs/SGcanarypoisoned.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcarnival_crowkid.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcarnival_host.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcarnivalgame_puckdrop_station.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGcarrat.lua": {
       "routed": 2,
       "mentioned": 1,
@@ -885,6 +4764,150 @@
       "stub_unaudited": 1,
       "inconsistent": 0,
       "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGcattoy_mouse.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcaveventmite.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcentipede.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGcharlie_heckler.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGchest_mimic.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGchester.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcookiecutter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcozy_bunnyman.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcrabking.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGcrabking_cannontower.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcrabking_mob.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGcrabkingclaw.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGdaywalker.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGdaywalker2.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGdaywalker2_buried.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGdaywalker_imprisoned.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
       "summary": 0
     },
     "stategraphs/SGdeer.lua": {
@@ -896,6 +4919,33 @@
       "detailed": 0,
       "summary": 0
     },
+    "stategraphs/SGdeerclops.lua": {
+      "routed": 2,
+      "mentioned": 2,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 2,
+      "summary": 0
+    },
+    "stategraphs/SGdragonfly.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGdustmoth.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
     "stategraphs/SGeyeofterror.lua": {
       "routed": 1,
       "mentioned": 0,
@@ -903,6 +4953,60 @@
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGeyeofterror_mini.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGeyeplant.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGfence_electric.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGfiresuppressor.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGfrog.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGfruitdragon.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
       "summary": 0
     },
     "stategraphs/SGfruitfly.lua": {
@@ -914,6 +5018,96 @@
       "detailed": 1,
       "summary": 0
     },
+    "stategraphs/SGfused_shadeling.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGfused_shadeling_bomb.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGgelblob.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGgestalt_guard_evolved.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGghost.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGgingerbreadpig.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGglommer.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGgrassgekko.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGhermitcrab.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGhermitcrab_teashop.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGhound.lua": {
       "routed": 4,
       "mentioned": 0,
@@ -921,6 +5115,375 @@
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGitemmimic_revealed.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGklaus.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGkoalefant.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGkrampus.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlavae.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGlightflier.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlightninggoat.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlunar_grazer.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlunarplanttentacle.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlunarthrall_plant.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGlunarthrall_plant_vine.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGlureplant.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmalbatross.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGmermking.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmighty_gym.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGminiboatlantern.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGminotaur.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmole.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGmolebat.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmonkeyqueen.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGmoondial.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGmoonpig.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmoonspore.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmoonstormstatic.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmoose.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGmooseegg.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmosquito.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmossling.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGmushgnome.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGnightmarerock.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGoceanshadowcreature.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGoceantrawler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGotter.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGpenguin.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGperd.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGpig.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGpigking.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGplayer_hosted.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGpolly_rogers.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGprimemate.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGrabbit.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
       "summary": 0
     },
     "stategraphs/SGrabbitking.lua": {
@@ -932,10 +5495,334 @@
       "detailed": 0,
       "summary": 1
     },
+    "stategraphs/SGrabbitking_bunnyman.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGrocky.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGsalty_dog.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowheart_infused.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowtentacle.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowthrall_centipede.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGshadowthrall_hands.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowthrall_horns.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowthrall_mouth.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGshadowthrall_parasite.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadowthrall_wings.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshark.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGsharkboi.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGslurper.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGslurtle.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGsmallbird.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGsmallghost.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGspat.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGspider.lua": {
       "routed": 8,
       "mentioned": 0,
       "stub": 8,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGspiderqueen.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGspore.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGsquid.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGstagehand.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGstageusher.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGstorage_robot.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtallbird.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtentacle.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtentacle_arm.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGticoon.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtoadstool.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtornado.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGtrap.lua": {
+      "routed": 2,
+      "mentioned": 0,
+      "stub": 2,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGvault_crawler.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGvault_pillar_guard.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwagboss_robot.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwagdrone_flying.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwagdrone_rolling.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
       "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
@@ -950,6 +5837,51 @@
       "detailed": 0,
       "summary": 1
     },
+    "stategraphs/SGwalrus.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwanderingtrader.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwaterplant.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwave.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwaveyjoneshand.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
     "stategraphs/SGwerepig.lua": {
       "routed": 3,
       "mentioned": 1,
@@ -958,15 +5890,187 @@
       "inconsistent": 0,
       "detailed": 1,
       "summary": 0
+    },
+    "stategraphs/SGwinch.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwinona_catapult.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGwinona_storage_robot.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwobster.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwobsterland.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwobybig.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwobysmall.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 1
+    },
+    "stategraphs/SGworm.lua": {
+      "routed": 2,
+      "mentioned": 1,
+      "stub": 1,
+      "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwormhole.lua": {
+      "routed": 1,
+      "mentioned": 1,
+      "stub": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 1,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_drone_scout.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_drone_zap.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_possessedbody.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_scanner.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_shadowdrone_debuffer.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGwx78_shadowdrone_harvester.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGyotb_stage.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
     }
   },
   "inconsistencies": [
+    {
+      "pageid": 13762,
+      "title": "洞穴蜘蛛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为蜘蛛掉落物列表，未涉及交易机制。"
+    },
+    {
+      "pageid": 14340,
+      "title": "知识饮水机",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 14589,
+      "title": "尘蛾",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述尘蛾的生成与行为，无交易相关内容。"
+    },
     {
       "pageid": 14688,
       "title": "水球",
       "symbol": "components/equippable.lua",
       "wording": "被水球砸中会增加 20 点[[潮湿度]]或[[物品潮湿度]]",
       "note": null
+    },
+    {
+      "pageid": 14712,
+      "title": "蘑菇农场",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述蘑菇农场成长周期，与交易无关。"
     },
     {
       "pageid": 14785,
@@ -983,6 +6087,27 @@
       "note": null
     },
     {
+      "pageid": 15269,
+      "title": "海黾",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为蜘蛛战斗属性，无交易机制描述。"
+    },
+    {
+      "pageid": 15326,
+      "title": "蚊子",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15337,
+      "title": "溯源表",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述溯源表与时空裂缝功能，与交易无关。"
+    },
+    {
       "pageid": 15399,
       "title": "坎普斯",
       "symbol": "components/burnable.lua",
@@ -990,11 +6115,53 @@
       "note": "击杀掉落木炭非燃烧所致，实体不在受影响列表"
     },
     {
+      "pageid": 15530,
+      "title": "蜘蛛战士",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面内容为蜘蛛战斗数据，未涉及交易机制。"
+    },
+    {
+      "pageid": 15532,
+      "title": "喷吐蜘蛛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为蜘蛛战斗数据，未涉及交易。"
+    },
+    {
+      "pageid": 15555,
+      "title": "穴居悬蛛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为蜘蛛战斗属性，无交易功能描述。"
+    },
+    {
+      "pageid": 15566,
+      "title": "洞穴蝙蝠",
+      "symbol": "components/acidinfusible.lua",
+      "wording": "酸雨期间，额外：{{Pic|32|硝石}}×1（20%）<br>{{Pic|32|洞穴蝙蝠翅膀}}×1（50%）<br>{{Pic|32|鸟粪}}×1（30%）<br>{{Pic|32|怪物肉}}×1（20%）",
+      "note": "页面提及酸雨额外掉落，但未描述代码相关的体型改变或视觉效果添加。"
+    },
+    {
+      "pageid": 15651,
+      "title": "龙蝇",
+      "symbol": "behaviours/leash.lua",
+      "wording": null,
+      "note": "页面描述实体“龙蝇”（Dragonfly），该实体在受影响变体列表中。代码符号适用于它，但页面提供的证据文本（刷新机制、掉落物）未具体描述与拴绳行为相关的游荡、返回机制等核心方面。"
+    },
+    {
       "pageid": 15677,
       "title": "蘑菇地精",
       "symbol": "components/sanityaura.lua",
       "wording": "理智值/分钟",
       "note": "实体疑似不在受影响变体列表"
+    },
+    {
+      "pageid": 15713,
+      "title": "空心树桩",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
     },
     {
       "pageid": 15737,
@@ -1011,10 +6178,192 @@
       "note": null
     },
     {
+      "pageid": 15744,
+      "title": "破碎蜘蛛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为月晶蜘蛛战斗数据，未提及交易。"
+    },
+    {
+      "pageid": 15746,
+      "title": "饼干切割机",
+      "symbol": "behaviours/leash.lua",
+      "wording": null,
+      "note": "页面描述“饼干切割机”（Cookiecutter），该实体在受影响变体列表中。证据文本提到了生成点和再生距离单位，这与拴绳行为的活动区域概念有潜在关联，但未明确描述“中心位置（家）”、“游荡”、“返回”等代码核心语义。"
+    },
+    {
+      "pageid": 15817,
+      "title": "超级可爱岩浆虫",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述超级岩浆虫的孵化与属性，与交易无关。"
+    },
+    {
       "pageid": 15897,
       "title": "厨师袋",
       "symbol": "components/inventoryitem.lua",
       "wording": "品]]。  厨师袋提供 6 个[[物品栏]]，并且能",
+      "note": null
+    },
+    {
+      "pageid": 15965,
+      "title": "护士蜘蛛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述护士蜘蛛的治疗技能，未提及交易功能。"
+    },
+    {
+      "pageid": 15975,
+      "title": "鱼人之王",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面内容为鱼人王相关机制，未涉及交易系统。"
+    },
+    {
+      "pageid": 16174,
+      "title": "舞台之手",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": "变身海狸人",
+      "note": null
+    },
+    {
+      "pageid": 16615,
+      "title": "生物扫描分析仪",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 16632,
+      "title": "暗夜灯",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 16661,
+      "title": "夹夹绞盘",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17920,
+      "title": "木头",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17924,
+      "title": "脓鼻涕",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17926,
+      "title": "犬牙",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17930,
+      "title": "懒人传送塔",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17947,
+      "title": "肥料包",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17964,
+      "title": "猫尾",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17972,
+      "title": "海象牙",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17974,
+      "title": "触手皮",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17975,
+      "title": "外壳碎片",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17984,
+      "title": "格罗姆的黏液",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17985,
+      "title": "蜜脾",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17995,
+      "title": "蜘蛛腺",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 17999,
+      "title": "针刺树",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 18032,
+      "title": "腐烂鸟蛋",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 18043,
+      "title": "守护者之角",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 18049,
+      "title": "荧光果",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 18074,
+      "title": "堆肥",
+      "symbol": "components/inspectable.lua",
+      "wording": null,
       "note": null
     },
     {
@@ -1025,11 +6374,32 @@
       "note": null
     },
     {
+      "pageid": 19272,
+      "title": "华丽基座",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面为华丽基座解谜说明，不涉及交易功能。"
+    },
+    {
       "pageid": 19340,
       "title": "蛞蝓龟黏液",
       "symbol": "components/propagator.lua",
       "wording": "特殊互动/燃烧时间=3 ~ 6",
       "note": null
+    },
+    {
+      "pageid": 19769,
+      "title": "熔合暗影",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": "速爆炸弹",
+      "note": null
+    },
+    {
+      "pageid": 19769,
+      "title": "熔合暗影",
+      "symbol": "behaviours/leash.lua",
+      "wording": null,
+      "note": "页面描述“融合暗影”（fused_shadeling），该实体在受影响变体列表中。证据文本提到了生成、爆炸、追逐等行为，与拴绳行为的“返回”或“追逐”有微弱关联，但未明确描述“家位置”、“游荡距离”等核心概念。"
     },
     {
       "pageid": 19785,
@@ -1039,10 +6409,136 @@
       "note": "活树不在受影响变体列表"
     },
     {
+      "pageid": 19786,
+      "title": "蔷薇狼",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 20111,
+      "title": "兔洞",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面讨论兔人生成与胡萝卜相关性，未提及兔人的交易功能。"
+    },
+    {
+      "pageid": 20287,
+      "title": "可疑的土堆",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": "页面提及土堆（dirtpile），但未涉及激活状态描述"
+    },
+    {
       "pageid": 20560,
       "title": "猎犬丘",
       "symbol": "components/health.lua",
       "wording": "猎犬死亡后",
+      "note": null
+    },
+    {
+      "pageid": 22095,
+      "title": "鸦年华树",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 22556,
+      "title": "假人",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 23196,
+      "title": "鸦年华游戏",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 23202,
+      "title": "小浣猫托儿所",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 23211,
+      "title": "座狼神龛",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面描述火炬与神龛，无交易内容。"
+    },
+    {
+      "pageid": 24964,
+      "title": "藏物箱",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 28183,
+      "title": "皇家兔子警卫",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 45135,
+      "title": "小丑",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 51097,
+      "title": "舒适的兔人",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 51486,
+      "title": "起点塔",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 70479,
+      "title": "珍珠的温泉",
+      "symbol": "components/trader.lua",
+      "wording": null,
+      "note": "页面讨论装饰度与温泉配方，不涉及交易系统。"
+    },
+    {
+      "pageid": 71461,
+      "title": "备份底盘",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 72238,
+      "title": "附身底盘",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 72986,
+      "title": "净化间",
+      "symbol": "components/activatable.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 73451,
+      "title": "辉光象鼻虫",
+      "symbol": "behaviours/chaseandattack.lua",
+      "wording": null,
       "note": null
     }
   ]

@@ -11,6 +11,7 @@
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
+      "components/storytellingprop.lua": "de2a25f2d05151ca911e5072c0a888290a5bef12ceec4038b0d5a934ecd7e1d4",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -85,6 +86,13 @@
       "llm_verdict": {}
     },
     "components/placer.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/storytellingprop.lua": {
+      "aspects_ignored": [
+        "讲故事能力触发条件与理智增益效果"
+      ],
       "route": "direct",
       "detail_level": "stub"
     },

@@ -6,6 +6,8 @@
     "wikitext_sha256": "52b5561ff3ea1ad8ecdc189a424b29346f07dc38d2fcf06a434c8de3c4f95e35",
     "symbol_doc_shas": {
       "components/deployable.lua": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "components/fertilizer.lua": "0fbb8c30a25201a06be76e1e6a814fc2428c1fab002db51607a6570e08a957a7",
+      "components/fertilizerresearchable.lua": "a8bdc0eb291cacccf45f328e5d61ddd613885a18b5f598bf522b57e5f3aa4042",
       "components/finiteuses.lua": "ee931698ba0dcba8215c920a5e2f5f260e2e3a74cd906f7ed414d444821831b1",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
@@ -18,6 +20,26 @@
     "components/deployable.lua": {
       "aspects_ignored": [
         "物品放置行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "components/fertilizer.lua": {
+      "aspects_ignored": [
+        "土壤营养提升描述",
+        "施肥动作加速描述",
+        "植物收成恢复描述",
+        "生命值恢复量描述",
+        "蘑菇农场恢复描述",
+        "高温枯萎解除描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/fertilizerresearchable.lua": {
+      "aspects_ignored": [
+        "肥料研究信息收集"
       ],
       "route": "direct",
       "detail_level": "stub"

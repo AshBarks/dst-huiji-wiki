@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcarnival_crowkid.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcarnival_crowkid",
+  "summary": "该状态图驱动饥荒联机版中的嘉年华小鸟（carnival_crowkid）实体，主要用于嘉年华活动期间的旁观者行为。整体状态组织包括空闲、进食、坐下、飞行、奖励发放和小游戏反应状态，基于小游戏的事件、玩家互动和环境触发不同行为。",
+  "api": [],
+  "api_note": "该状态图主要处理内部状态转换，没有对外暴露的API方法。",
+  "events_published": [],
+  "events_listened": [
+    "minigame_spectator_start_outro",
+    "ontalk"
+  ],
+  "netvars": [],
+  "tunables": [
+    "CARNIVAL_CROWKID_CAMPFIRE_SIT_DIST"
+  ],
+  "states": [
+    "idle",
+    "eat_popcorn",
+    "eat_corntea",
+    "campfire_sit",
+    "campfire_sit2",
+    "glide",
+    "flyaway",
+    "talkto",
+    "give_reward",
+    "minigame_boo",
+    "minigame_cheer",
+    "minigame_over_cheer",
+    "minigame_over_cheer_loop",
+    "minigame_over_cheer_pst",
+    "minigame_over_boo",
+    "activate"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "默认空闲状态，播放循环动画，可能触发进食、坐下或小游戏反应。进入条件：无动作时；表现：随机延迟后转换状态，如小游戏兴奋或非兴奋时切换到欢呼或嘘声。"
+    },
+    {
+      "state": "give_reward",
+      "note": "奖励发放状态，玩家给予燃料或激活后触发。表现：说话动画，然后掉落3-7张奖励票和一个游戏代币给玩家，基于数值配置num_rewards计算。"
+    },
+    {
+      "state": "minigame_cheer",
+      "note": "小游戏欢呼状态，当小游戏兴奋时触发。表现：播放欢呼动画，循环次数基于兴奋持续时间（<2秒时可能循环2次），播放开心音效。"
+    },
+    {
+      "state": "minigame_boo",
+      "note": "小游戏嘘声状态，当小游戏不兴奋时触发。表现：播放嘘声动画，循环次数基于不兴奋时间（>10秒时循环2-3次），播放沮丧音效。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞走状态，用于回家动作。表现：起飞动画，然后移除实体，玩家无法再互动；在飞行中设置物理速度并最终删除。"
+    },
+    {
+      "state": "eat_popcorn",
+      "note": "进食爆米花状态，玩家喂食爆米花后触发。表现：吃爆米花动画，播放咀嚼音效，完成后返回空闲状态。"
+    },
+    {
+      "state": "activate",
+      "note": "激活状态，玩家执行激活动作后触发。表现：欢呼动画，然后执行缓冲动作（如启动小游戏），播放开心音效。"
+    },
+    {
+      "state": "minigame_over_cheer",
+      "note": "小游戏结束欢呼状态，游戏胜利后触发。表现：循环欢呼动画，播放开心音效，直到玩家离开或状态结束。"
+    },
+    {
+      "state": "minigame_over_boo",
+      "note": "小游戏结束嘘声状态，游戏失败后触发。表现：嘘声动画，播放沮丧音效，循环直到玩家离开。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15386,
+      13493,
+      13457,
+      15238,
+      18057,
+      14426,
+      13199,
+      15237
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录内容涉及高脚鸟、寄居蟹隐士、交易小游戏、皮弗娄牛、宠物、提灯、暴食模式和猪人等实体，但无任何页面讨论与代码能力/行为语义清单相关的具体表达，如空闲状态、奖励票掉落、小游戏欢呼/嘘声、飞走、吃爆米花、激活等行为。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小鸟",
+    "嘉年华",
+    "空闲",
+    "进食",
+    "坐下",
+    "飞行",
+    "奖励",
+    "小游戏",
+    "反应",
+    "喂食"
+  ],
+  "search_terms_note": "pass1 后零命中 5/10,已二次修正(修正后 0/10)",
+  "gameplay_tags": [
+    "嘉年华",
+    "互动",
+    "小游戏"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "ab66419169d6a410554aa847a2400b56a19049fe67cd097c6286ccd0f8887e1e",
+    "source_bytes": 16910,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136345580
+  }
+}

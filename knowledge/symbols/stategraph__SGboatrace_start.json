@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGboatrace_start.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGboatrace_start",
+  "summary": "该状态图驱动饥荒联机版中的船赛起始柱（boatrace_start）实体，用于控制其在游戏中的动画和声音状态切换。整体状态组织以初始关闭状态为起点，包含放置、激活、受击、胜利、奖品发放、保险丝控制和重置等过程，状态之间通过动画结束事件切换。",
+  "api": [],
+  "api_note": "该状态图未定义对外公开的方法（如PushEvent或函数接口），仅用于内部状态管理和动画控制。",
+  "events_published": [],
+  "events_listened": [],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle_off",
+    "place",
+    "hit",
+    "on",
+    "idle_on",
+    "win",
+    "prize",
+    "checkpoint_throw",
+    "reset",
+    "fuse_off",
+    "fuse_on"
+  ],
+  "state_notes": [
+    {
+      "state": "place",
+      "note": "当玩家放置起始柱时进入此状态，播放放置动画和声音效果，动画结束后切换回关闭状态。"
+    },
+    {
+      "state": "on",
+      "note": "起始柱被点燃或激活时进入，播放点燃动画和声音，随后切换到持续点燃状态，用于启动船赛。"
+    },
+    {
+      "state": "hit",
+      "note": "起始柱受到攻击时进入，播放受击动画，动画结束后切换回关闭状态，无特殊效果。"
+    },
+    {
+      "state": "win",
+      "note": "比赛胜利时触发此状态，播放烟花动画和胜利声音，通知游戏结束并调用胜利回调。"
+    },
+    {
+      "state": "prize",
+      "note": "发放奖品时进入，播放奖品投掷动画和声音，动画结束后调用奖品回调，可能生成奖励物品。"
+    },
+    {
+      "state": "fuse_off",
+      "note": "保险丝关闭状态，控制起始柱的保险丝，有循环火花声音，用于准备点燃过程，动画结束后调用保险丝关闭回调。"
+    },
+    {
+      "state": "fuse_on",
+      "note": "保险丝打开状态，点燃保险丝，按特定时间点播放声音，动画结束后调用保险丝打开回调，最终触发点燃效果。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      10374,
+      14816,
+      14929,
+      14935,
+      15941,
+      20092,
+      14907,
+      14936
+    ],
+    "aspects": [],
+    "no_evidence_reason": "所有提供的页面摘录均未提及船赛、起始柱或与 stategraph__SGboatrace_start 相关的状态（如放置、点燃、受击、胜利、奖品、保险丝等），内容涉及角色能力、熔炉模式生物行为、遗迹机制等无关主题。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "起始柱",
+    "船赛",
+    "点燃",
+    "奖品",
+    "保险丝",
+    "胜利",
+    "放置",
+    "重置",
+    "动画",
+    "受击"
+  ],
+  "gameplay_tags": [
+    "比赛",
+    "起始",
+    "奖品"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "1a5429727698c721764ffd639891e218cff987e835c71fdbf2436eafabd16f94",
+    "source_bytes": 5190,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788136195988
+  }
+}

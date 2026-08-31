@@ -20,8 +20,12 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/planardamage.lua": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+      "components/planarentity.lua": "3003bcb4a1df9b01772e69351e1eb728d84640ea7012b18b6f8ba234f8f7aa31",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/scenariorunner.lua": "113cd7848f23d0460354c93497207cbd3b633f2d7a50e2e872e6625902a4f812",
+      "components/thief.lua": "a901d1a438aef0519e9af000deea088398f12618bae21ed1eae897d7845261a9",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGchest_mimic.lua": "770fcf2023d2688e7d61919cf0cf80881da2c800100cba7f2c75bdd3513d2687"
     }
   },
   "symbols": {
@@ -97,7 +101,8 @@
         "遗忘实体行为描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/freezable.lua": {
       "aspects_ignored": [
@@ -202,6 +207,10 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/planarentity.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/sanityaura.lua": {
       "aspects_ignored": [
         "理智光环名称提及",
@@ -210,6 +219,18 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/scenariorunner.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/thief.lua": {
+      "aspects_ignored": [
+        "偷窃物品行为描述",
+        "防护偷窃能力描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
@@ -226,6 +247,10 @@
         "wording": "暴躁箱子每隔5~7秒寻找；被打开2.5秒后显形",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGchest_mimic.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "detailed"

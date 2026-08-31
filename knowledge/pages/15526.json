@@ -6,11 +6,14 @@
     "wikitext_sha256": "6be6d782b6772d7a99534d93a1e47e225f1cdd8cc07669d9bbe863f22d85758b",
     "symbol_doc_shas": {
       "components/burnable.lua": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "components/groomer.lua": "3c60a3c3f3f8d36d2f794591229e72d7c71fe4719113c4fc68d4b5f40bc0b815",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
+      "components/hitcher.lua": "dd00b11c0317868624e69ea736cdf2b77a5150ed29b6751d8c79b8b6f1f530d5",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/placer.lua": "ce7a25a9c055cc188091264ca42d9b088f2046fd9f0e266f1d822bea2a35dfdb",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/skinner.lua": "92c53ec61f4a3783d299160853a55102e6b9faa3c4c894afcf73e7700ff77515",
       "components/workable.lua": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733"
     }
   },
@@ -31,6 +34,31 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/groomer.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "皮肤更换功能描述",
+          "evidence": [
+            {
+              "pageid": 15526,
+              "quote": "皮弗娄牛美妆台可以用于给皮弗娄牛更换皮肤。"
+            }
+          ]
+        },
+        {
+          "aspect": "绑定占用者过程描述",
+          "evidence": [
+            {
+              "pageid": 15526,
+              "quote": "可以将皮弗娄牛绑到美妆台上，此时牛会主动来到美妆台旁边并停止移动。"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -39,6 +67,10 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/hitcher.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -72,6 +104,25 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/skinner.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "牛皮肤更换功能",
+          "evidence": [
+            {
+              "pageid": 15526,
+              "quote": "皮弗娄牛美妆台可以用于给[[皮弗娄牛]]更换[[皮肤]]。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "扫把外观更换功能"
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
     "components/workable.lua": {
       "aspects_ignored": [
         "杂草挖除后行为描述",
@@ -82,5 +133,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "detailed"
 }

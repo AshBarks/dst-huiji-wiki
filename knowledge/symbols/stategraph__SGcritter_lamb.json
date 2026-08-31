@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGcritter_lamb.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGcritter_lamb",
+  "summary": "该状态图驱动名为“critter_lamb”的小羊宠物实体。整体状态组织方式是通过调用SGCritterStates和CommonStates的模块化函数来添加各种状态，如闲置、移动、进食、睡眠等，以响应游戏事件和玩家交互。",
+  "api": [],
+  "api_note": "源码中未定义任何API方法，仅包含状态图定义。",
+  "events_published": [],
+  "events_listened": [
+    "SGCritterEvents.OnEat",
+    "SGCritterEvents.OnAvoidCombat",
+    "SGCritterEvents.OnTraitChanged",
+    "CommonHandlers.OnSleepEx",
+    "CommonHandlers.OnWakeEx",
+    "CommonHandlers.OnLocomote",
+    "CommonHandlers.OnHop",
+    "CommonHandlers.OnSink",
+    "CommonHandlers.OnFallInVoid"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "random_emote",
+    "cute",
+    "pet_emote",
+    "combat_emote",
+    "play_with_other_critter",
+    "eat",
+    "hungry",
+    "nuzzle",
+    "walk",
+    "sleep",
+    "hop",
+    "sink",
+    "fall"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "宠物闲置状态，随机播放表情动画，是默认状态。"
+    },
+    {
+      "state": "eat",
+      "note": "宠物进食状态，当宠物饥饿且附近有食物时触发，播放进食动画和声音，恢复饥饿值。"
+    },
+    {
+      "state": "hungry",
+      "note": "宠物饥饿状态，表现愤怒动画，提示玩家需要喂食，否则可能影响心情或行为。"
+    },
+    {
+      "state": "walk",
+      "note": "移动状态，宠物跟随玩家或自主移动，播放行走动画和脚步声。"
+    },
+    {
+      "state": "sleep",
+      "note": "睡眠状态，宠物需要休息，可能恢复生命或精神，期间无法互动。"
+    },
+    {
+      "state": "play_with_other_critter",
+      "note": "与其他宠物玩耍状态，增强互动性，提升宠物快乐度。"
+    },
+    {
+      "state": "nuzzle",
+      "note": "依偎状态，宠物靠近玩家时触发，表现亲昵动画，可能增加玩家与宠物的亲密度。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      18057,
+      13456,
+      15975,
+      13437,
+      15238,
+      13156,
+      13455,
+      34037
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中没有提及小羊（SGcritter_lamb）或其相关能力表达，页面内容主要涉及其他实体（如宠物通用机制、饥饿值、鱼人之王、角色等）而未讨论小羊的具体行为或状态。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "小羊",
+    "宠物",
+    "饥饿",
+    "睡觉",
+    "玩耍",
+    "依偎",
+    "行走",
+    "进食",
+    "表情",
+    "移动"
+  ],
+  "gameplay_tags": [
+    "宠物",
+    "互动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "fe7cf2c76bc3b844a043b767247eab47835e5342a2966aa42b42a654675bc7b8",
+    "source_bytes": 4290,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788157730368
+  }
+}

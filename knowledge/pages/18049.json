@@ -9,13 +9,15 @@
       "components/edible.lua": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
       "components/floater.lua": "46bbc086174e2ac0a6dc8724b6e14245452211221a3ff0df7fb4ef14ed5bddc6",
       "components/fuel.lua": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
+      "components/halloweenmoonmutable.lua": "bf53efa7e2c2e223ceb8439da228c2eeb3f786edcf9ae31d363ba7f3a85a28fd",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventoryitem.lua": "111475990df4b6029eb968f51e45460bd0bc6071eae5477f3b2361fa99fac19b",
       "components/perishable.lua": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
       "components/stackable.lua": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
-      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150"
+      "components/tradable.lua": "a9382bfee6f17b5c90bb555c765c5e443bf44fbe721a377946a5bd985676b150",
+      "components/vasedecoration.lua": "556092b91f4145e85f37ad0d344dc647e54707c320e282c06274fa1c802807c6"
     }
   },
   "symbols": {
@@ -54,6 +56,13 @@
       "route": "direct",
       "detail_level": "stub"
     },
+    "components/halloweenmoonmutable.lua": {
+      "aspects_ignored": [
+        "月亮变异转化机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/hauntable.lua": {
       "aspects_ignored": [
         "作祟交互与能力描述",
@@ -70,7 +79,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [
@@ -124,6 +136,14 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/vasedecoration.lua": {
+      "aspects_ignored": [
+        "发光效果描述",
+        "装饰放置功能"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "stub"

@@ -10,20 +10,31 @@
       "behaviours/leash.lua": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
       "brains/dragonflybrain.lua": "49cccd7836c2ea9f5ae90b39f15d7525d1d90eed9c3d758c1137385d4048a930",
       "components/combat.lua": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "components/damagetracker.lua": "908a100a821d31b0e8fda50ffb7a3c4997fb37585f911ee0c925a2bb8ba5d640",
+      "components/explosiveresist.lua": "cbfc420cade15cfdccf38a878bab5ae5737f74be4607e4014461bc2e349f6091",
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "components/groundpounder.lua": "28d9e9ff5014069a36a6744d9a746e60b7016c029d1211d040f8439571a17048",
+      "components/grouptargeter.lua": "2c3a035ce84fdf1405c9110be4068ccad521a49284e5945fa14822ac96880056",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/healthtrigger.lua": "3c64da771e8432f013164d37af0a50d1b38b9530ff95927c51b04a9878d38119",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
+      "components/moisture.lua": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
       "components/propagator.lua": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "components/rampingspawner.lua": "5c72fcf8452e323fd7ca476d034287281610e29058bcdb52da20d23b43aa8fa5",
       "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
-      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b"
+      "components/stuckdetection.lua": "4bbc06274fa46b7280daf844797f1a3ac84d9b7ca8525974be0e5a8d33146172",
+      "components/stunnable.lua": "4673a6e85be83dfd6cd195d131a3bc6894fae40c1985ecb4ef8616146e6fcf96",
+      "components/timer.lua": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "stategraphs/SGdragonfly.lua": "9010b40d79cc1d94263c75084f429d43d41149c970feffab835e2475627ad8fd"
     }
   },
   "symbols": {
     "behaviours/chaseandattack.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "丢失仇恨脱离战斗",
         "仇恨目标锁定描述",
@@ -37,7 +48,10 @@
         "高速移动压制追击"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "龙蝇"
+      }
     },
     "behaviours/doaction.lua": {
       "aspects_ignored": [
@@ -49,6 +63,7 @@
       "detail_level": "stub"
     },
     "behaviours/leash.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "受惊停止移动描述",
         "最大游荡距离标注",
@@ -58,7 +73,11 @@
         "逃离或慌张奔跑描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述实体“龙蝇”（Dragonfly），该实体在受影响变体列表中。代码符号适用于它，但页面提供的证据文本（刷新机制、掉落物）未具体描述与拴绳行为相关的游荡、返回机制等核心方面。"
+      }
     },
     "brains/dragonflybrain.lua": {
       "mention_source": "pass2_evidence",
@@ -90,6 +109,30 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/damagetracker.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "伤害阈值事件触发",
+          "evidence": [
+            {
+              "pageid": 15651,
+              "quote": "龙蝇需要受到超过 100 点伤害才会解除冰冻"
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "summary"
+    },
+    "components/explosiveresist.lua": {
+      "aspects_ignored": [
+        "爆炸抗性的触发机制描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
     "components/freezable.lua": {
       "aspects_ignored": [
         "冰冻层数施加描述",
@@ -102,6 +145,14 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/groundpounder.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/grouptargeter.lua": {
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/health.lua": {
       "aspects_ignored": [
         "单次承伤上限标注",
@@ -113,6 +164,13 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/healthtrigger.lua": {
+      "aspects_ignored": [
+        "生命值变化转移触发"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/inspectable.lua": {
       "aspects_ignored": [
@@ -169,10 +227,30 @@
         "semantic_consistent": true
       }
     },
+    "components/moisture.lua": {
+      "aspects_ignored": [
+        "下雨潮湿速率计算",
+        "干燥剂减湿速率",
+        "强制干燥效果",
+        "潮湿度值对理智影响",
+        "潮湿度百分比阈值",
+        "潮湿度触发语音",
+        "潮湿状态判定条件",
+        "装备潮湿速率提供",
+        "装备潮湿速率数值",
+        "防水效果影响描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/propagator.lua": {
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/rampingspawner.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     },
     "components/sleeper.lua": {
       "aspects_ignored": [
@@ -186,6 +264,41 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/stuckdetection.lua": {
+      "aspects_ignored": [
+        "卡住回避行为描述"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/stunnable.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "伤害累积机制说明",
+          "evidence": [
+            {
+              "pageid": 15651,
+              "quote": "在 5 秒内受到超过 1250 点的伤害"
+            }
+          ]
+        },
+        {
+          "aspect": "眩晕效果触发描述",
+          "evidence": [
+            {
+              "pageid": 15651,
+              "quote": "如果龙蝇在 5 秒内受到超过 1250 点的伤害，她将会晕眩 10 秒。"
+            }
+          ]
+        }
+      ],
+      "aspects_ignored": [
+        "伤害数值与描述"
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     },
     "components/timer.lua": {
       "mention_source": "llm_verdict",
@@ -202,6 +315,39 @@
         "wording": "龙蝇死亡后，20 天后在刷新点重新生",
         "semantic_consistent": true
       }
+    },
+    "stategraphs/SGdragonfly.lua": {
+      "mention_source": "pass2_evidence",
+      "aspects_covered": [
+        {
+          "aspect": "暴怒状态下攻击间隔与范围数值",
+          "evidence": [
+            {
+              "pageid": 15651,
+              "quote": "命中:|攻击间隔 = 4（暴怒时3）"
+            },
+            {
+              "pageid": 15651,
+              "quote": "命中:|攻击范围 = 4（暴怒时6）"
+            }
+          ]
+        },
+        {
+          "aspect": "死亡后重生时间与掉落物描述",
+          "evidence": [
+            {
+              "pageid": 15651,
+              "quote": "龙蝇死亡后，20 天后在刷新点重新生成。"
+            },
+            {
+              "pageid": 15651,
+              "quote": "龙蝇的掉落物："
+            }
+          ]
+        }
+      ],
+      "route": "direct",
+      "detail_level": "detailed"
     }
   },
   "page_detail_level": "detailed"

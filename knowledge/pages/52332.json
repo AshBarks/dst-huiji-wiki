@@ -11,13 +11,18 @@
       "components/freezable.lua": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
       "components/hauntable.lua": "06a88f51c2d692e98f6682a83c337c3d59d693f66ce0eaef196941c0fbce1432",
       "components/health.lua": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "components/herdmember.lua": "98d932c9bb82412871e32014f29df654569ec0083906560457c9983dbec10787",
+      "components/homeseeker.lua": "73e9cdafed333fdd0d28f07002449ad012379677e2943d6ccd18afcc300a747f",
+      "components/hunger.lua": "6eb4e59a49fca0a8018c66497d0dfbab4ddcbd23ec2408aa7c8afcf29439a36f",
       "components/inspectable.lua": "d93f259d5a9b14401cceb084a1727711ac4d06085e30f72e3d0af0c97066f696",
       "components/inventory.lua": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
       "components/knownlocations.lua": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42"
+      "components/sleeper.lua": "3c9b32d48f17b00cba72228ab4b4a4c9edbd9b1913612ae01ee34a66e5592b42",
+      "components/teamattacker.lua": "21a39a23f95420973196f4c0c081cd71c98df11ebd634479660b0cfdacc40944",
+      "stategraphs/SGpenguin.lua": "37c61b36576619e04e88964c5ea83f5e9bdd368059d318b35ac39a86e555ecac"
     }
   },
   "symbols": {
@@ -96,6 +101,34 @@
       "detail_level": "stub",
       "llm_verdict": {}
     },
+    "components/herdmember.lua": {
+      "aspects_ignored": [
+        "兽群位置决定机制",
+        "兽群再生规则"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/homeseeker.lua": {
+      "aspects_ignored": [
+        "昼夜回屋行为",
+        "超出范围返回猪屋"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "components/hunger.lua": {
+      "aspects_ignored": [
+        "饥饿值上限数值描述",
+        "饥饿值下降速率描述",
+        "饥饿值初始值设定",
+        "饥饿值归零时生命值影响",
+        "饥饿值特殊行为覆盖描述",
+        "饥饿值状态触发语音台词"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
     "components/inspectable.lua": {
       "aspects_ignored": [
         "图鉴条目检查状态标注",
@@ -172,6 +205,17 @@
       "route": "direct",
       "detail_level": "stub",
       "llm_verdict": {}
+    },
+    "components/teamattacker.lua": {
+      "aspects_ignored": [
+        "飞回洞穴行为"
+      ],
+      "route": "direct",
+      "detail_level": "stub"
+    },
+    "stategraphs/SGpenguin.lua": {
+      "route": "direct",
+      "detail_level": "stub"
     }
   },
   "page_detail_level": "summary"

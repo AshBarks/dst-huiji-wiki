@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGbeeguard.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGbeeguard",
+  "summary": "该状态图驱动饥荒联机版中的蜜蜂守卫（beeguard）实体。整体状态以idle为核心，通过事件触发生成、移动、战斗和死亡等行为，状态间通过标签和事件处理器转换，包含无敌帧和硬直等机制。",
+  "api": [],
+  "api_note": "该状态图通过事件和组件控制行为，未定义显式对外方法。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "attacked",
+    "flee"
+  ],
+  "netvars": [],
+  "tunables": [
+    "TUNING.BEEGUARD_GUARD_RANGE",
+    "TUNING.BEEGUARD_SPEED"
+  ],
+  "states": [
+    "idle",
+    "spawnin",
+    "walk_start",
+    "walk",
+    "walk_stop",
+    "flyaway",
+    "hit",
+    "death",
+    "attack"
+  ],
+  "state_notes": [
+    {
+      "state": "spawnin",
+      "note": "生成状态，蜜蜂守卫出现时处于无敌且不可点击，播放生成动画，沿水平方向移动后移除无敌并允许点击。"
+    },
+    {
+      "state": "flyaway",
+      "note": "飞行逃离状态，无敌并向上飞走，移动后自动移除实体，用于逃离战斗。"
+    },
+    {
+      "state": "hit",
+      "note": "受击状态，停止移动播放受击动画，有短暂硬直帧，可被攻击事件打断并转入攻击状态。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，停止移动播放死亡动画，掉落战利品并移除物理碰撞，结束实体存在。"
+    },
+    {
+      "state": "attack",
+      "note": "攻击状态，停止移动播放攻击动画，在动画中期帧造成伤害，有硬直窗口可被打断。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15922,
+      15022,
+      34523,
+      15651,
+      34314,
+      20714,
+      51046,
+      65605
+    ],
+    "aspects": [],
+    "no_evidence_reason": "提供的页面摘录中未提及'蜜蜂守卫'或'stategraph__SGbeeguard'，也没有涉及其生成、飞行、受击、死亡或攻击等状态的描述。",
+    "coverage_status": "no_wiki_mention"
+  },
+  "search_terms": [
+    "蜜蜂守卫",
+    "蜂卫",
+    "攻击",
+    "无敌",
+    "死亡",
+    "生成",
+    "飞走",
+    "受击",
+    "硬直",
+    "战利品"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "7652a0f0e9f77a90023d25fc205a398f41072559d097d9aff564813976763c5e",
+    "source_bytes": 10641,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788135719580
+  }
+}

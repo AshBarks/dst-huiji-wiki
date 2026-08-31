@@ -151,6 +151,9 @@ pub struct ClassifiedPair {
     /// LLM 辅助分类理由(仅 D 类 residual 二层分类产出)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
+    /// LLM 建议类别(仅建议;class 由确定性层+人工覆写决定,零方差)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub llm_suggest: Option<String>,
     /// 命中证据:"path: NAME=v"
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evidence: Option<String>,
@@ -331,6 +334,7 @@ pub async fn run_classify(
             wording: wording.clone(),
             note: verdict.note.clone(),
             reason: None,
+            llm_suggest: None,
             evidence: signals
                 .sibling_match
                 .or(signals.prefab_match)
@@ -536,12 +540,16 @@ async fn llm_classify_manual(pairs: &mut [ClassifiedPair], reporter: &dyn Report
             };
             let idx = batch[index - 1];
             let pair = &mut pairs[idx];
-            pair.class = class;
+            // 只落 llm_suggest 建议字段:class 由确定性层+人工覆写决定,
+            // 保证报告零方差(实测三票也无法稳定 A/B 边界,见 REMAINING_WORK A6)
+            pair.llm_suggest = Some(class.to_string());
             pair.reason = (!reason.is_empty()).then_some(reason);
             done += 1;
         }
     }
-    reporter.log(format!("LLM 辅助分类完成 {done} 对(三票多数)"));
+    reporter.log(format!(
+        "LLM 建议产出 {done} 对(不改 class,人工按 suggest 分诊)"
+    ));
 }
 
 #[cfg(test)]

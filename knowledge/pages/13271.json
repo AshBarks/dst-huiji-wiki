@@ -158,7 +158,8 @@
         "生物刷新点地图标识"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sleeper.lua": {
       "aspects_ignored": [

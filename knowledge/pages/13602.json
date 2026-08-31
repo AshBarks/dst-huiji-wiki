@@ -49,7 +49,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

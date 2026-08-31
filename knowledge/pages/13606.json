@@ -75,7 +75,10 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "帝王蟹(crabking)为受影响变体，但页面内容仅涉及重生和掉落，未提及复杂抛物线轨迹或发射相关方面。"
+      }
     },
     "components/entitytracker.lua": {
       "aspects_ignored": [

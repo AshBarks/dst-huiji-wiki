@@ -64,7 +64,10 @@
         "靠近追随目标行为"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实"
+      }
     },
     "behaviours/panic.lua": {
       "aspects_ignored": [
@@ -237,7 +240,8 @@
         "随机名称生成"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/sanityaura.lua": {
       "aspects_ignored": [

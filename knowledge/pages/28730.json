@@ -54,7 +54,10 @@
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述了一个可能使用物品施加的效果(雇佣)，但未明确提及任何受影响的变体物品或组件。"
+      }
     },
     "components/stackable.lua": {
       "aspects_ignored": [

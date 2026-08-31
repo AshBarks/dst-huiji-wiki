@@ -74,7 +74,10 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容关于烹饪龙虾，与受影响变体(wobster_sheller等)的投射物飞行无关。"
+      }
     },
     "components/cookable.lua": {
       "aspects_ignored": [
@@ -117,7 +120,10 @@
         "月亮变异转化机制描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面未提及月亮变异转化机制"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

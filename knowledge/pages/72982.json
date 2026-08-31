@@ -109,7 +109,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面为战利品掉落概率列表及简单的攻击描述，与伤害抗性组件无关。"
+      }
     },
     "components/explosiveresist.lua": {
       "aspects_ignored": [
@@ -159,7 +162,8 @@
         "生命值变化转移触发"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

@@ -50,7 +50,10 @@
         "靠近追随目标行为"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面讨论超级可爱岩浆虫（lavae_pet）但未提及跟随行为"
+      }
     },
     "brains/lavaepetbrain.lua": {
       "mention_source": "pass2_evidence",
@@ -265,26 +268,12 @@
       }
     },
     "stategraphs/SGlavae.lua": {
-      "mention_source": "pass2_evidence",
-      "aspects_covered": [
-        {
-          "aspect": "冻结后立即死亡行为",
-          "evidence": [
-            {
-              "pageid": 15817,
-              "quote": "被冻结后，其会立即死亡"
-            }
-          ]
-        },
-        {
-          "aspect": "饥饿值阈值描述",
-          "evidence": [
-            {
-              "pageid": 15817,
-              "quote": "|饥饿值 ≤ 25|"
-            }
-          ]
-        }
+      "mention_source": "fact_match",
+      "aspects_ignored": [
+        "冻结机制描述",
+        "攻击状态描述",
+        "死亡状态描述",
+        "空闲状态描述"
       ],
       "fact_matches": [
         {
@@ -294,7 +283,7 @@
         }
       ],
       "route": "direct",
-      "detail_level": "detailed"
+      "detail_level": "summary"
     }
   },
   "page_detail_level": "detailed"

@@ -79,11 +79,17 @@
       "llm_verdict": {}
     },
     "components/useabletargeteditem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品使用与目标设置"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "斯威尔]]初始自带 6 个噩梦燃料",
+        "semantic_consistent": false,
+        "note": "页面讨论噩梦燃料的获取来源，未涉及使用状态。"
+      }
     },
     "components/waterproofer.lua": {
       "aspects_ignored": [
@@ -94,5 +100,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

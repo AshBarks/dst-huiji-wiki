@@ -49,6 +49,7 @@
       "llm_verdict": {}
     },
     "components/fertilizer.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "土壤营养提升描述",
         "施肥动作加速描述",
@@ -58,14 +59,21 @@
         "高温枯萎解除描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "营养砖",
+        "semantic_consistent": true
+      }
     },
     "components/fertilizerresearchable.lua": {
       "aspects_ignored": [
         "肥料研究信息收集"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面讨论营养砖的保质期、腐烂和燃料值，未提及肥料研究。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",
@@ -156,5 +164,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

@@ -21,7 +21,8 @@
         "盔甲基础属性描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -53,7 +54,10 @@
         "检查后显示详细特性"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选数值事实，基于代码符号影响范围推断页面未提及检查组件相关信息"
+      }
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

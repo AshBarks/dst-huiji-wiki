@@ -40,7 +40,11 @@
         "攻击墙体行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述鹿的生成和属性，但未提及攻击墙壁行为；实体deer在受影响列表中。"
+      }
     },
     "behaviours/chaseandattack.lua": {
       "aspects_ignored": [
@@ -96,7 +100,10 @@
         "返回驻点行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为‘无眼鹿’的生成、迁徙与群体机制，未提及逃跑行为或威胁检测逻辑。"
+      }
     },
     "behaviours/standstill.lua": {
       "aspects_ignored": [

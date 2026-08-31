@@ -35,7 +35,10 @@
         "月亮变异转化机制描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面未提及月亮变异转化机制"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [

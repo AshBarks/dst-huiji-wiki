@@ -79,11 +79,16 @@
       "detail_level": "stub"
     },
     "components/spellcaster.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述了受影响物品‘wurt_swampitem_shadow’的使用效果(生成沼泽地块、召唤暗影触手)，但其描述为投掷或使用后的效果，而非使用该物品施放法术的施法能力或组件代码逻辑。"
+      }
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",

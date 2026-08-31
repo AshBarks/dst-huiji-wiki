@@ -85,11 +85,16 @@
       "llm_verdict": {}
     },
     "components/spellcaster.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面明确描述了受影响物品‘telestaff’(传送法杖)的施法效果，与组件管理施法能力(设置施法函数、目标、位置)的语义一致。"
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [

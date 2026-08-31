@@ -165,11 +165,16 @@
       "llm_verdict": {}
     },
     "components/epicscare.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "咆哮产生巨兽恐慌效果的范围与持续时间描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "离单位}}以内产生 5 ~ 6 秒的[[巨兽恐慌]]效果",
+        "semantic_consistent": true
+      }
     },
     "components/explosiveresist.lua": {
       "aspects_ignored": [
@@ -246,7 +251,8 @@
         "生命值变化转移触发"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

@@ -40,7 +40,11 @@
         "攻击墙体行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述实体掉落和伤害，可能与squid相关，但未提及攻击墙壁行为；实体squid在受影响列表中。"
+      }
     },
     "behaviours/chaseandattack.lua": {
       "aspects_ignored": [
@@ -66,7 +70,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

@@ -23,7 +23,10 @@
         "盔甲基础属性描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述移动速度提升，与护甲组件无关。"
+      }
     },
     "components/equippable.lua": {
       "mention_source": "llm_verdict",
@@ -49,7 +52,8 @@
         "使用材料恢复耐久"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -91,7 +95,8 @@
         "防御百分比提供"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/targettracker.lua": {
       "route": "direct",

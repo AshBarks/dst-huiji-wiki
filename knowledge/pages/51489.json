@@ -71,7 +71,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面提到部署检查点套装，可能涉及水上部署，但证据不足。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

@@ -37,7 +37,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/runaway.lua": {
       "aspects_ignored": [
@@ -47,7 +50,10 @@
         "返回驻点行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面仅包含‘胡须兔’的掉落物与生成信息，未描述其逃跑行为、威胁检测或相关AI逻辑。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

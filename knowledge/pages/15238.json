@@ -58,7 +58,11 @@
         "攻击墙体行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述牛的生成和剃毛等行为，但未提及攻击墙壁行为；实体beefalo在受影响列表中。"
+      }
     },
     "behaviours/chaseandattack.lua": {
       "aspects_ignored": [
@@ -675,7 +679,8 @@
         "随机名称生成"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/periodicspawner.lua": {
       "mention_source": "fact_match",

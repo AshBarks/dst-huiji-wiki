@@ -25,7 +25,8 @@
         "盔甲基础属性描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/damagetyperesist.lua": {
       "aspects_ignored": [
@@ -33,7 +34,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面无候选事实，无法判断关联性。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -97,7 +101,8 @@
         "防御百分比提供"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/setbonus.lua": {
       "route": "direct",

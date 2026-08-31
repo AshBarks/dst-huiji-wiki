@@ -95,7 +95,10 @@
         "返回驻点行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为‘蜜蜂’的采集、仇恨与蜂巢机制，未提及逃跑行为或相关AI逻辑。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

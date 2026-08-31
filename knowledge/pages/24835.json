@@ -28,7 +28,10 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面无相关候选事实，与代码符号无关。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [

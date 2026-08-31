@@ -40,7 +40,11 @@
         "攻击墙体行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述恐怖之眼的生成和掉落信息，但未提及攻击墙壁行为；实体eyeofterror在受影响列表中。"
+      }
     },
     "behaviours/chaseandattack.lua": {
       "mention_source": "llm_verdict",
@@ -70,7 +74,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -141,11 +148,16 @@
       "llm_verdict": {}
     },
     "components/epicscare.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "咆哮产生巨兽恐慌效果的范围与持续时间描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "距离单位以内产生 5 ~ 6 秒的[[巨兽恐慌]]效果",
+        "semantic_consistent": true
+      }
     },
     "components/explosiveresist.lua": {
       "aspects_ignored": [

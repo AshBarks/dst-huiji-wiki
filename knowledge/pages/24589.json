@@ -44,7 +44,11 @@
         "锚的减速作用描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面内容涉及水獭和海带，与船只物理行为无关"
+      }
     },
     "components/boatring.lua": {
       "aspects_ignored": [
@@ -216,7 +220,8 @@
         "螨地爬修复状态转换"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/reticule.lua": {
       "route": "direct",
@@ -275,7 +280,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述水獭窝的掉落和再生，无水体物理相关机制。"
+      }
     },
     "stategraphs/SGboat.lua": {
       "aspects_ignored": [

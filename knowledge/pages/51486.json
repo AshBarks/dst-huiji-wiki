@@ -36,6 +36,7 @@
       "detail_level": "stub"
     },
     "components/complexprojectile.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "大炮射程与发射后坐力效果",
         "弹弓弹药飞行速度与最大距离标注",
@@ -45,7 +46,12 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "挥舞双手抛出 3 个[[比赛检查点套装]",
+        "semantic_consistent": true,
+        "note": "涉及抛出动作，与投掷技能发射相关，但未明确提及复杂抛物线轨迹细节。"
+      }
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -107,6 +113,7 @@
       "llm_verdict": {}
     },
     "components/waterphysics.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "平台移动与登台机制",
         "溺水时浮动装置保护",
@@ -115,7 +122,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面明确要求浮标处于水面，涉及生成空间限制规则，与水体物理语义一致。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [
@@ -131,5 +142,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

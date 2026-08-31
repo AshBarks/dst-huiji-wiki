@@ -34,7 +34,11 @@
         "锚的减速作用描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述boat_ice的掉落信息，未提及船只物理行为"
+      }
     },
     "components/boatring.lua": {
       "aspects_ignored": [
@@ -113,7 +117,8 @@
         "螨地爬修复状态转换"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/reticule.lua": {
       "route": "direct",
@@ -136,7 +141,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述冰船在水上，涉及崩溃掉落，与水体物理相关。"
+      }
     },
     "stategraphs/SGboat.lua": {
       "aspects_ignored": [

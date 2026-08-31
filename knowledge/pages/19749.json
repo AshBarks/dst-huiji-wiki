@@ -65,7 +65,8 @@
         "使用材料恢复耐久"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -143,6 +144,7 @@
       "llm_verdict": {}
     },
     "components/tool.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "倒走表使用效果",
         "巨兽攻击行为优先级",
@@ -153,7 +155,11 @@
         "电路板激活增益设置"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述了工具（虚空风衣镰刀）的使用效果（伤害提升、触发虚空风），与tool组件管理工具效果值的职责相关。"
+      }
     },
     "components/weapon.lua": {
       "mention_source": "llm_verdict",

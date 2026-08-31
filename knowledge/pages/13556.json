@@ -148,7 +148,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述阿比盖尔的攻击方式、距离与护盾（'吸收受'），但未具体说明其伤害抗性数据、标签或对应的代码组件机制。"
+      }
     },
     "components/debuffable.lua": {
       "aspects_ignored": [
@@ -230,6 +233,7 @@
       "detail_level": "stub"
     },
     "components/planardefense.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "伤害减免描述",
         "减伤百分比",
@@ -239,7 +243,11 @@
         "防御百分比提供"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "位面防御",
+        "semantic_consistent": true
+      }
     },
     "components/timer.lua": {
       "aspects_ignored": [

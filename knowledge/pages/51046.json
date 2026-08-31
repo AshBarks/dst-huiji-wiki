@@ -153,7 +153,10 @@
         "咆哮产生巨兽恐慌效果的范围与持续时间描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "可能涉及受影响变体（如 daywalker 或 wagboss_robot），但证据片段未明确对应或提及 EpicScare"
+      }
     },
     "components/explosiveresist.lua": {
       "mention_source": "llm_verdict",
@@ -188,7 +191,8 @@
         "生命值变化转移触发"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

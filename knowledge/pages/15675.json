@@ -98,7 +98,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面提到浮平台撞毁，涉及水体交互的平台移动机制，但未直接提及水体物理术语。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

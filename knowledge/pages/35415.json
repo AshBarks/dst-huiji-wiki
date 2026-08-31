@@ -52,7 +52,8 @@
         "随机名称生成"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/placer.lua": {
       "route": "direct",

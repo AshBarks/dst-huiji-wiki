@@ -60,7 +60,10 @@
         "靠近追随目标行为"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据片段过短，无法确认是否涉及受影响变体"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

@@ -35,7 +35,8 @@
         "实体静止与停止移动描写"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [
@@ -122,11 +123,17 @@
       "detail_level": "stub"
     },
     "components/transparentonsanity.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "树精守卫沉睡效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "理智光环 = -100",
+        "semantic_consistent": false,
+        "note": "提及理智值但语义不一致，代码符号管理实体透明度，而此处是实体影响玩家理智"
+      }
     },
     "stategraphs/SGoceanshadowcreature.lua": {
       "aspects_ignored": [
@@ -136,5 +143,5 @@
       "detail_level": "stub"
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

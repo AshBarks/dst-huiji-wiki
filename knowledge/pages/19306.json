@@ -115,7 +115,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述生命回复与催眠效果，未涉及伤害抗性或减免。"
+      }
     },
     "components/entitytracker.lua": {
       "aspects_ignored": [

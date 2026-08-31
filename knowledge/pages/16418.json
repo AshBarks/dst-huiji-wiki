@@ -67,7 +67,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面关注月光玻璃窝的生物生成，无水体物理内容。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

@@ -71,11 +71,16 @@
       "detail_level": "stub"
     },
     "components/spellcaster.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面提及了受影响物品‘trident’(刺耳三叉)，但描述内容为该物品的使用耐久与效果，未描述其作为施法工具的能力或组件功能。"
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -103,5 +108,5 @@
       }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

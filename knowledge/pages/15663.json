@@ -131,7 +131,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面提到浮木桩，可能涉及水体环境下的物体交互，与水体物理间接相关。"
+      }
     },
     "components/workable.lua": {
       "aspects_ignored": [

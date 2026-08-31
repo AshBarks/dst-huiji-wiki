@@ -44,7 +44,8 @@
         "实体静止与停止移动描写"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/shadowheart_infusedbrain.lua": {
       "mention_source": "fact_match",

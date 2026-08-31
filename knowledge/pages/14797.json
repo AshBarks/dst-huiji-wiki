@@ -18,12 +18,17 @@
   },
   "symbols": {
     "components/armor.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "盔甲伤害计算中的防御作用",
         "盔甲基础属性描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "最弱的盔甲，仅有 158 点耐久值和 60% 防御",
+        "semantic_consistent": true
+      }
     },
     "components/burnable.lua": {
       "aspects_ignored": [
@@ -96,5 +101,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

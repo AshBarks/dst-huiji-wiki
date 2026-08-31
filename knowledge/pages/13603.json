@@ -255,7 +255,11 @@
         "碰撞伤害吸收功能"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述海草生长和掉落，未涉及水体物理属性如反弹系数或碰撞。"
+      }
     },
     "components/weapon.lua": {
       "aspects_ignored": [

@@ -85,12 +85,17 @@
       "llm_verdict": {}
     },
     "components/useabletargeteditem.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "物品使用与目标设置"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "使用后铃铛会进入 15 天的冷却时间",
+        "semantic_consistent": true
+      }
     }
   },
-  "page_detail_level": "stub"
+  "page_detail_level": "summary"
 }

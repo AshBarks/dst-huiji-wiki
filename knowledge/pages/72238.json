@@ -80,7 +80,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/faceentity.lua": {
       "aspects_ignored": [
@@ -100,7 +103,8 @@
         "实体静止与停止移动描写"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "brains/wx78_possessedbodybrain.lua": {
       "mention_source": "pass2_evidence",
@@ -245,7 +249,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述装备效果与机关操作，与伤害抗性组件无关。"
+      }
     },
     "components/debuffable.lua": {
       "aspects_ignored": [
@@ -435,7 +442,8 @@
         "生物刷新点地图标识"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/pinnable.lua": {
       "aspects_ignored": [
@@ -462,7 +470,8 @@
         "防御百分比提供"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/planarentity.lua": {
       "route": "direct",

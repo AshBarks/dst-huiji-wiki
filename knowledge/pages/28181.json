@@ -96,6 +96,7 @@
       }
     },
     "components/tool.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "倒走表使用效果",
         "巨兽攻击行为优先级",
@@ -106,8 +107,12 @@
         "电路板激活增益设置"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面明确提到了工具消耗耐久以及耐久耗尽后的表现，直接对应tool组件监听耐久度变化并推送事件的核心功能。"
+      }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

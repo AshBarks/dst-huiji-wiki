@@ -62,6 +62,7 @@
       }
     },
     "components/repairable.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "书籍耐久自动回复",
         "发条装置修复方法",
@@ -71,7 +72,11 @@
         "螨地爬修复状态转换"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "修复成为完整",
+        "semantic_consistent": true
+      }
     },
     "components/workable.lua": {
       "mention_source": "llm_verdict",
@@ -87,5 +92,5 @@
       }
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

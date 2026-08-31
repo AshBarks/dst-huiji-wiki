@@ -45,7 +45,10 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "火炬(torch)为受影响变体，但页面内容仅关注耐久消耗，未提及其作为投掷物的飞行行为。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [

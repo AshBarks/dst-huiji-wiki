@@ -101,7 +101,8 @@
         "生物刷新点地图标识"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "stategraphs/SGwx78_shadowdrone_harvester.lua": {
       "route": "direct",

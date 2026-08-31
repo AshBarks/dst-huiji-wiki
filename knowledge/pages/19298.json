@@ -30,7 +30,10 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容涉及锤击和作业，与复杂抛物线投射物无关。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [

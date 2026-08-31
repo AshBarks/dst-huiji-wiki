@@ -1,25 +1,25 @@
 {
   "schema_version": 1,
-  "generated_at_ms": 1788157911923,
+  "generated_at_ms": 1788176705806,
   "totals": {
     "pages": 758,
-    "pages_with_mention": 419,
-    "pairs": 7703,
+    "pages_with_mention": 430,
+    "pairs": 7704,
     "mentioned_by_source": {
-      "pass2_evidence": 246,
-      "fact_match": 75,
-      "llm_verdict": 644
+      "pass2_evidence": 245,
+      "fact_match": 76,
+      "llm_verdict": 682
     },
-    "stub_pairs": 6738,
-    "stub_unaudited": 741
+    "stub_pairs": 6701,
+    "stub_unaudited": 436
   },
   "symbols": {
     "behaviours/attackwall.lua": {
       "routed": 8,
       "mentioned": 1,
       "stub": 7,
-      "stub_unaudited": 7,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 7,
       "detailed": 0,
       "summary": 1
     },
@@ -63,8 +63,8 @@
       "routed": 25,
       "mentioned": 0,
       "stub": 25,
-      "stub_unaudited": 14,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 2,
       "detailed": 0,
       "summary": 0
     },
@@ -108,7 +108,7 @@
       "routed": 14,
       "mentioned": 3,
       "stub": 11,
-      "stub_unaudited": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 3
@@ -153,7 +153,7 @@
       "routed": 18,
       "mentioned": 7,
       "stub": 11,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 7
@@ -180,7 +180,7 @@
       "routed": 21,
       "mentioned": 1,
       "stub": 20,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 1
@@ -1024,12 +1024,12 @@
     },
     "components/armor.lua": {
       "routed": 14,
-      "mentioned": 0,
-      "stub": 14,
-      "stub_unaudited": 14,
+      "mentioned": 2,
+      "stub": 12,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/attunable.lua": {
       "routed": 2,
@@ -1233,8 +1233,8 @@
       "routed": 8,
       "mentioned": 0,
       "stub": 8,
-      "stub_unaudited": 8,
-      "inconsistent": 0,
+      "stub_unaudited": 0,
+      "inconsistent": 7,
       "detailed": 0,
       "summary": 0
     },
@@ -1465,12 +1465,12 @@
     },
     "components/complexprojectile.lua": {
       "routed": 10,
-      "mentioned": 1,
-      "stub": 9,
-      "stub_unaudited": 9,
+      "mentioned": 3,
+      "stub": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 1
+      "summary": 3
     },
     "components/compostingbin.lua": {
       "routed": 1,
@@ -1620,7 +1620,7 @@
       "routed": 11,
       "mentioned": 0,
       "stub": 11,
-      "stub_unaudited": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -1825,12 +1825,12 @@
     },
     "components/epicscare.lua": {
       "routed": 9,
-      "mentioned": 0,
-      "stub": 9,
-      "stub_unaudited": 9,
+      "mentioned": 2,
+      "stub": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/equippable.lua": {
       "routed": 123,
@@ -1897,18 +1897,18 @@
     },
     "components/fertilizer.lua": {
       "routed": 10,
-      "mentioned": 0,
-      "stub": 10,
-      "stub_unaudited": 10,
+      "mentioned": 2,
+      "stub": 8,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/fertilizerresearchable.lua": {
       "routed": 10,
       "mentioned": 0,
       "stub": 10,
-      "stub_unaudited": 10,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -2014,12 +2014,12 @@
     },
     "components/forgerepairable.lua": {
       "routed": 11,
-      "mentioned": 0,
-      "stub": 11,
-      "stub_unaudited": 11,
+      "mentioned": 1,
+      "stub": 10,
+      "stub_unaudited": 2,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/formationfollower.lua": {
       "routed": 1,
@@ -2205,7 +2205,7 @@
       "routed": 17,
       "mentioned": 0,
       "stub": 17,
-      "stub_unaudited": 17,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -2277,7 +2277,7 @@
       "routed": 10,
       "mentioned": 0,
       "stub": 10,
-      "stub_unaudited": 10,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -2374,12 +2374,12 @@
     },
     "components/homeseeker.lua": {
       "routed": 8,
-      "mentioned": 0,
-      "stub": 8,
-      "stub_unaudited": 8,
+      "mentioned": 1,
+      "stub": 7,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/hudindicatable.lua": {
       "routed": 3,
@@ -2439,7 +2439,7 @@
       "routed": 735,
       "mentioned": 7,
       "stub": 728,
-      "stub_unaudited": 14,
+      "stub_unaudited": 0,
       "inconsistent": 18,
       "detailed": 1,
       "summary": 6
@@ -2455,12 +2455,12 @@
     },
     "components/insulator.lua": {
       "routed": 12,
-      "mentioned": 0,
-      "stub": 12,
-      "stub_unaudited": 12,
+      "mentioned": 1,
+      "stub": 11,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/inventory.lua": {
       "routed": 66,
@@ -2691,7 +2691,7 @@
       "routed": 9,
       "mentioned": 0,
       "stub": 9,
-      "stub_unaudited": 9,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -2889,7 +2889,7 @@
       "routed": 18,
       "mentioned": 0,
       "stub": 18,
-      "stub_unaudited": 18,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -3085,12 +3085,12 @@
     },
     "components/planardefense.lua": {
       "routed": 8,
-      "mentioned": 0,
-      "stub": 8,
-      "stub_unaudited": 8,
+      "mentioned": 2,
+      "stub": 6,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/planarentity.lua": {
       "routed": 23,
@@ -3337,12 +3337,12 @@
     },
     "components/repairable.lua": {
       "routed": 15,
-      "mentioned": 0,
-      "stub": 15,
-      "stub_unaudited": 15,
+      "mentioned": 2,
+      "stub": 13,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 2
     },
     "components/repairer.lua": {
       "routed": 25,
@@ -3778,12 +3778,12 @@
     },
     "components/spellcaster.lua": {
       "routed": 13,
-      "mentioned": 0,
-      "stub": 13,
-      "stub_unaudited": 13,
-      "inconsistent": 0,
+      "mentioned": 8,
+      "stub": 5,
+      "stub_unaudited": 0,
+      "inconsistent": 5,
       "detailed": 0,
-      "summary": 0
+      "summary": 8
     },
     "components/stackable.lua": {
       "routed": 184,
@@ -3967,12 +3967,12 @@
     },
     "components/tool.lua": {
       "routed": 13,
-      "mentioned": 0,
-      "stub": 13,
-      "stub_unaudited": 13,
+      "mentioned": 10,
+      "stub": 3,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
-      "summary": 0
+      "summary": 10
     },
     "components/tradable.lua": {
       "routed": 143,
@@ -4003,12 +4003,12 @@
     },
     "components/transparentonsanity.lua": {
       "routed": 10,
-      "mentioned": 0,
-      "stub": 10,
-      "stub_unaudited": 10,
-      "inconsistent": 0,
+      "mentioned": 1,
+      "stub": 9,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
       "detailed": 0,
-      "summary": 0
+      "summary": 1
     },
     "components/trap.lua": {
       "routed": 2,
@@ -4120,12 +4120,12 @@
     },
     "components/useabletargeteditem.lua": {
       "routed": 11,
-      "mentioned": 0,
-      "stub": 11,
-      "stub_unaudited": 11,
-      "inconsistent": 0,
+      "mentioned": 3,
+      "stub": 8,
+      "stub_unaudited": 0,
+      "inconsistent": 1,
       "detailed": 0,
-      "summary": 0
+      "summary": 3
     },
     "components/vase.lua": {
       "routed": 2,
@@ -4192,12 +4192,12 @@
     },
     "components/waterphysics.lua": {
       "routed": 18,
-      "mentioned": 1,
-      "stub": 17,
-      "stub_unaudited": 17,
-      "inconsistent": 0,
+      "mentioned": 2,
+      "stub": 16,
+      "stub_unaudited": 0,
+      "inconsistent": 6,
       "detailed": 0,
-      "summary": 1
+      "summary": 2
     },
     "components/waterproofer.lua": {
       "routed": 19,
@@ -5159,8 +5159,8 @@
       "stub": 0,
       "stub_unaudited": 0,
       "inconsistent": 0,
-      "detailed": 1,
-      "summary": 0
+      "detailed": 0,
+      "summary": 1
     },
     "stategraphs/SGlightflier.lua": {
       "routed": 1,
@@ -5518,6 +5518,15 @@
       "mentioned": 0,
       "stub": 1,
       "stub_unaudited": 1,
+      "inconsistent": 0,
+      "detailed": 0,
+      "summary": 0
+    },
+    "stategraphs/SGshadow_leech.lua": {
+      "routed": 1,
+      "mentioned": 0,
+      "stub": 1,
+      "stub_unaudited": 0,
       "inconsistent": 0,
       "detailed": 0,
       "summary": 0
@@ -6038,11 +6047,32 @@
   },
   "inconsistencies": [
     {
+      "pageid": 13603,
+      "title": "海草",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面描述海草生长和掉落，未涉及水体物理属性如反弹系数或碰撞。"
+    },
+    {
+      "pageid": 13641,
+      "title": "鱿鱼",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面描述实体掉落和伤害，可能与squid相关，但未提及攻击墙壁行为；实体squid在受影响列表中。"
+    },
+    {
       "pageid": 13762,
       "title": "洞穴蜘蛛",
       "symbol": "components/trader.lua",
       "wording": null,
       "note": "页面为蜘蛛掉落物列表，未涉及交易机制。"
+    },
+    {
+      "pageid": 13857,
+      "title": "猎犬",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面描述猎犬（hound, firehound, icehound）的掉落和生成，但未提及攻击墙壁行为；相关实体在受影响列表中。"
     },
     {
       "pageid": 14340,
@@ -6080,11 +6110,25 @@
       "note": null
     },
     {
+      "pageid": 14814,
+      "title": "刺耳三叉戟",
+      "symbol": "components/spellcaster.lua",
+      "wording": null,
+      "note": "页面提及了受影响物品‘trident’(刺耳三叉)，但描述内容为该物品的使用耐久与效果，未描述其作为施法工具的能力或组件功能。"
+    },
+    {
       "pageid": 15235,
       "title": "兔子",
       "symbol": "components/health.lua",
       "wording": "死时，三选一",
       "note": null
+    },
+    {
+      "pageid": 15238,
+      "title": "皮弗娄牛",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面描述牛的生成和剃毛等行为，但未提及攻击墙壁行为；实体beefalo在受影响列表中。"
     },
     {
       "pageid": 15269,
@@ -6145,6 +6189,13 @@
     {
       "pageid": 15651,
       "title": "龙蝇",
+      "symbol": "behaviours/doaction.lua",
+      "wording": null,
+      "note": null
+    },
+    {
+      "pageid": 15651,
+      "title": "龙蝇",
       "symbol": "behaviours/leash.lua",
       "wording": null,
       "note": "页面描述实体“龙蝇”（Dragonfly），该实体在受影响变体列表中。代码符号适用于它，但页面提供的证据文本（刷新机制、掉落物）未具体描述与拴绳行为相关的游荡、返回机制等核心方面。"
@@ -6192,6 +6243,20 @@
       "note": "页面描述“饼干切割机”（Cookiecutter），该实体在受影响变体列表中。证据文本提到了生成点和再生距离单位，这与拴绳行为的活动区域概念有潜在关联，但未明确描述“中心位置（家）”、“游荡”、“返回”等代码核心语义。"
     },
     {
+      "pageid": 15801,
+      "title": "恐怖猎犬",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面直接描述mutatedhound的掉落和生成，但未提及攻击墙壁行为；实体在受影响列表中。"
+    },
+    {
+      "pageid": 15812,
+      "title": "无眼鹿",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面描述鹿的生成和属性，但未提及攻击墙壁行为；实体deer在受影响列表中。"
+    },
+    {
       "pageid": 15817,
       "title": "超级可爱岩浆虫",
       "symbol": "components/trader.lua",
@@ -6199,11 +6264,25 @@
       "note": "页面描述超级岩浆虫的孵化与属性，与交易无关。"
     },
     {
+      "pageid": 15832,
+      "title": "恐怖之眼",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面描述恐怖之眼的生成和掉落信息，但未提及攻击墙壁行为；实体eyeofterror在受影响列表中。"
+    },
+    {
       "pageid": 15897,
       "title": "厨师袋",
       "symbol": "components/inventoryitem.lua",
       "wording": "品]]。  厨师袋提供 6 个[[物品栏]]，并且能",
       "note": null
+    },
+    {
+      "pageid": 15935,
+      "title": "恐怖利爪",
+      "symbol": "components/transparentonsanity.lua",
+      "wording": "理智光环 = -100",
+      "note": "提及理智值但语义不一致，代码符号管理实体透明度，而此处是实体影响玩家理智"
     },
     {
       "pageid": 15965,
@@ -6220,11 +6299,25 @@
       "note": "页面内容为鱼人王相关机制，未涉及交易系统。"
     },
     {
+      "pageid": 16057,
+      "title": "噩梦燃料",
+      "symbol": "components/useabletargeteditem.lua",
+      "wording": "斯威尔]]初始自带 6 个噩梦燃料",
+      "note": "页面讨论噩梦燃料的获取来源，未涉及使用状态。"
+    },
+    {
       "pageid": 16174,
       "title": "舞台之手",
       "symbol": "behaviours/chaseandattack.lua",
       "wording": "变身海狸人",
       "note": null
+    },
+    {
+      "pageid": 16418,
+      "title": "月光玻璃窝",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面关注月光玻璃窝的生物生成，无水体物理内容。"
     },
     {
       "pageid": 16615,
@@ -6332,6 +6425,13 @@
       "note": null
     },
     {
+      "pageid": 17996,
+      "title": "一角鲸的角",
+      "symbol": "components/spellcaster.lua",
+      "wording": null,
+      "note": "页面描述了受影响物品‘gnarwail_horn’(喇叭角)的使用消耗耐久和演奏效果，但未明确描述其作为施法工具的能力或组件控制的法术类型/条件。"
+    },
+    {
       "pageid": 17999,
       "title": "针刺树",
       "symbol": "components/inspectable.lua",
@@ -6367,11 +6467,25 @@
       "note": null
     },
     {
+      "pageid": 18235,
+      "title": "盐堆",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面描述盐堆的生长和掉落，未涉及水体物理属性。"
+    },
+    {
       "pageid": 18783,
       "title": "大触手",
       "symbol": "components/health.lua",
       "wording": "击杀大触手后",
       "note": null
+    },
+    {
+      "pageid": 18853,
+      "title": "海洋拖网捕鱼器",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面仅提到物品栏，未涉及水体物理管理内容。"
     },
     {
       "pageid": 19272,
@@ -6430,6 +6544,13 @@
       "note": "页面提及土堆（dirtpile），但未涉及激活状态描述"
     },
     {
+      "pageid": 20291,
+      "title": "草筏",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述boat_grass的掉落信息，未提及船只物理行为"
+    },
+    {
       "pageid": 20560,
       "title": "猎犬丘",
       "symbol": "components/health.lua",
@@ -6465,11 +6586,81 @@
       "note": null
     },
     {
+      "pageid": 23210,
+      "title": "黏土猎犬",
+      "symbol": "behaviours/attackwall.lua",
+      "wording": null,
+      "note": "页面涉及猎犬相关物品（如犬牙），但未提及攻击墙壁行为；相关猎犬实体在受影响列表中。"
+    },
+    {
       "pageid": 23211,
       "title": "座狼神龛",
       "symbol": "components/trader.lua",
       "wording": null,
       "note": "页面描述火炬与神龛，无交易内容。"
+    },
+    {
+      "pageid": 23927,
+      "title": "龙虾窝",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面关注龙虾窝的生物生成，未提及水体物理管理内容。"
+    },
+    {
+      "pageid": 24074,
+      "title": "冰船",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述boat_ice的掉落信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24090,
+      "title": "海盗单桅帆船",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述boat_pirate的掉落信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24451,
+      "title": "船",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述boat的掉落信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面内容涉及水獭和海带，与船只物理行为无关"
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
+      "symbol": "components/waterphysics.lua",
+      "wording": null,
+      "note": "页面描述水獭窝的掉落和再生，无水体物理相关机制。"
+    },
+    {
+      "pageid": 24764,
+      "title": "古董船",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述boat_ancient的掉落和货舱信息，未提及船只物理行为"
+    },
+    {
+      "pageid": 24880,
+      "title": "光芒投泥带",
+      "symbol": "components/spellcaster.lua",
+      "wording": null,
+      "note": "页面描述了受影响物品‘wurt_swampitem_lunar’的使用效果(生成沼泽地块)，但其描述为投掷或使用后的效果，而非使用该物品施放法术的施法能力。"
+    },
+    {
+      "pageid": 24881,
+      "title": "绝望投泥带",
+      "symbol": "components/spellcaster.lua",
+      "wording": null,
+      "note": "页面描述了受影响物品‘wurt_swampitem_shadow’的使用效果(生成沼泽地块、召唤暗影触手)，但其描述为投掷或使用后的效果，而非使用该物品施放法术的施法能力或组件代码逻辑。"
     },
     {
       "pageid": 24964,
@@ -6486,6 +6677,13 @@
       "note": null
     },
     {
+      "pageid": 35413,
+      "title": "双尾心",
+      "symbol": "components/spellcaster.lua",
+      "wording": null,
+      "note": "页面描述了受影响物品‘wortox_reviver’(沃拓克斯的复活器)的属性(生命值、灵魂消耗)和被动效果，但未描述其主动施放法术的施法能力或组件控制的功能。"
+    },
+    {
       "pageid": 45135,
       "title": "小丑",
       "symbol": "components/activatable.lua",
@@ -6500,11 +6698,25 @@
       "note": null
     },
     {
+      "pageid": 51097,
+      "title": "舒适的兔人",
+      "symbol": "behaviours/doaction.lua",
+      "wording": null,
+      "note": null
+    },
+    {
       "pageid": 51486,
       "title": "起点塔",
       "symbol": "components/activatable.lua",
       "wording": null,
       "note": null
+    },
+    {
+      "pageid": 51529,
+      "title": "黄金浮标",
+      "symbol": "components/boatphysics.lua",
+      "wording": null,
+      "note": "页面描述黄金浮标，与船只物理行为无关"
     },
     {
       "pageid": 70479,

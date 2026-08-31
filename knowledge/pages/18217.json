@@ -55,6 +55,7 @@
       }
     },
     "components/complexprojectile.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "大炮射程与发射后坐力效果",
         "弹弓弹药飞行速度与最大距离标注",
@@ -64,7 +65,12 @@
         "雪球发射器发射与作用范围描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "wording": "到达落点后能对 1.5 距离单位内的生物造成伤害",
+        "semantic_consistent": true,
+        "note": "直接描述投掷物落点伤害，与代码语义中的投掷技能发射与命中伤害一致。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [

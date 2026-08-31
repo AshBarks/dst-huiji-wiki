@@ -15,7 +15,8 @@
       "components/locomotor.lua": "0b2caeb6fcbd29780a7332afdc772e31c0741bbabad4e5ad5e2b143f75244ca7",
       "components/lootdropper.lua": "3f8a52357380d3c9265cc54eb30c4286ce4d727aa19b76ce3f56fdfded9f732c",
       "components/sanityaura.lua": "018cfeead591144db8ca8db3d28bd2d534f572c4e3deb6e9d398807b4fd75b0a",
-      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210"
+      "components/transparentonsanity.lua": "531fad43bbafbe5222b32e5f113f9db308416f66040f5cebc3438b3520213210",
+      "stategraphs/SGshadow_leech.lua": "a923ea33d0e2f9637a930ec683722574b975edb32076d4286e59727ff3d94d3f"
     }
   },
   "symbols": {
@@ -148,6 +149,11 @@
       "aspects_ignored": [
         "树精守卫沉睡效果"
       ],
+      "route": "direct",
+      "detail_level": "stub",
+      "llm_verdict": {}
+    },
+    "stategraphs/SGshadow_leech.lua": {
       "route": "direct",
       "detail_level": "stub"
     }

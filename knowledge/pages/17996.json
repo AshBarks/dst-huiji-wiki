@@ -86,11 +86,16 @@
       "detail_level": "stub"
     },
     "components/spellcaster.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": false,
+        "note": "页面描述了受影响物品‘gnarwail_horn’(喇叭角)的使用消耗耐久和演奏效果，但未明确描述其作为施法工具的能力或组件控制的法术类型/条件。"
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [
@@ -103,5 +108,5 @@
       "llm_verdict": {}
     }
   },
-  "page_detail_level": "summary"
+  "page_detail_level": "detailed"
 }

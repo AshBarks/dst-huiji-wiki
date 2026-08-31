@@ -33,7 +33,10 @@
         "锚定动作名称标注"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "semantic_consistent": true
+      }
     },
     "behaviours/runaway.lua": {
       "aspects_ignored": [
@@ -43,7 +46,10 @@
         "返回驻点行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为‘鼹鼠’的掉落物、生成与用途，未提及逃跑行为或相关AI逻辑。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

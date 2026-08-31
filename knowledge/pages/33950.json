@@ -74,7 +74,10 @@
         "返回驻点行为描述"
       ],
       "route": "two_hop",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面内容为‘胡萝卜赛跑’的赛事规则（起点、终点、检查点），与逃跑AI逻辑无关。"
+      }
     },
     "behaviours/wander.lua": {
       "aspects_ignored": [

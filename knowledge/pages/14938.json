@@ -147,7 +147,10 @@
         "咆哮产生巨兽恐慌效果的范围与持续时间描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "涉及受影响变体 toadstool，但证据片段未提及 EpicScare 或巨兽恐慌效果"
+      }
     },
     "components/explosiveresist.lua": {
       "aspects_ignored": [
@@ -194,7 +197,8 @@
         "生命值变化转移触发"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inspectable.lua": {
       "aspects_ignored": [

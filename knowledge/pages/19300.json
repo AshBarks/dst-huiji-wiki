@@ -27,7 +27,10 @@
         "盔甲基础属性描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "证据涉及伤害和禁锢效果，但未提及耐久度或伤害吸收。"
+      }
     },
     "components/colouraddersync.lua": {
       "route": "direct",
@@ -43,7 +46,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述反击伤害（位面伤害）与控制效果，与防御性伤害抗性无关。"
+      }
     },
     "components/equippable.lua": {
       "aspects_ignored": [
@@ -65,7 +71,8 @@
         "使用材料恢复耐久"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/hauntable.lua": {
       "aspects_ignored": [
@@ -111,7 +118,8 @@
         "防御百分比提供"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/setbonus.lua": {
       "route": "direct",

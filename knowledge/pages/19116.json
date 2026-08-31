@@ -72,7 +72,8 @@
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/stackable.lua": {
       "aspects_ignored": [
@@ -91,7 +92,8 @@
         "物品使用与目标设置"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/waterproofer.lua": {
       "aspects_ignored": [

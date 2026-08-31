@@ -84,7 +84,10 @@
         "装备伤害减免能力"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "页面描述生物的重新活动与生命值，未涉及伤害抗性。"
+      }
     },
     "components/freezable.lua": {
       "aspects_ignored": [

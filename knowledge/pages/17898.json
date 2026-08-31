@@ -44,14 +44,18 @@
         "高温枯萎解除描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/fertilizerresearchable.lua": {
       "aspects_ignored": [
         "肥料研究信息收集"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {
+        "note": "无候选证据，可能不涉及肥料研究相关内容。"
+      }
     },
     "components/floater.lua": {
       "route": "direct",

@@ -90,11 +90,16 @@
       "llm_verdict": {}
     },
     "components/spellcaster.lua": {
+      "mention_source": "llm_verdict",
       "aspects_ignored": [
         "使用物品施放增益效果"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "summary",
+      "llm_verdict": {
+        "semantic_consistent": true,
+        "note": "页面描述了受影响物品‘moonstaff’(唤月者魔杖)的施法效果(召唤矮星、提供照明)，与组件管理施法能力的语义一致。"
+      }
     },
     "components/tradable.lua": {
       "aspects_ignored": [

@@ -71,7 +71,8 @@
         "胡须提供的保暖与隔热值描述"
       ],
       "route": "direct",
-      "detail_level": "stub"
+      "detail_level": "stub",
+      "llm_verdict": {}
     },
     "components/inventoryitem.lua": {
       "aspects_ignored": [

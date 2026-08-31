@@ -225,8 +225,8 @@ pub enum Commands {
     },
     /// M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)
     KnowledgeSync {
-        /// 旧快照(时间戳或目录名,SnapshotStore 口径)
-        old: String,
+        /// 旧快照(时间戳或目录名,SnapshotStore 口径;--review 复核模式可省略)
+        old: Option<String>,
         /// 新快照(时间戳、目录名,或 "current" 表示当前 scripts 树)
         #[arg(default_value = "current")]
         new: String,
@@ -245,6 +245,9 @@ pub enum Commands {
         /// Tier2:起草页面修订建议(需 --corpus 与 LLM 配置)
         #[arg(long)]
         draft: bool,
+        /// Tier2 复核:裁决文件路径(对既有报告的建议逐条 approve/reject)
+        #[arg(long)]
+        review: Option<PathBuf>,
     },
     /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
     KnowledgeScanWiki {

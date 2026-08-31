@@ -285,16 +285,18 @@ pub async fn run(args: Commands) -> Result<()> {
             limit,
             corpus,
             draft,
+            review,
         } => {
             execute(
                 JobKind::KnowledgeSync {
-                    old: old.clone(),
+                    old: old.clone().unwrap_or_default(),
                     new: new.clone(),
                     knowledge_dir: path_to_string(&knowledge_dir)?,
                     rescan,
                     limit,
                     corpus: opt_path_to_string(&corpus)?,
                     draft,
+                    review: opt_path_to_string(&review)?,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

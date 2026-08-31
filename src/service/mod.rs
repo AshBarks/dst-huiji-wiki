@@ -241,6 +241,9 @@ pub enum JobKind {
         /// Tier2:起草页面修订建议(需 corpus + LLM)
         #[serde(default)]
         draft: bool,
+        /// Tier2 复核:裁决文件路径(对既有报告的建议逐条 approve/reject)
+        #[serde(default)]
+        review: Option<String>,
     },
     /// M2a:PageSymbolMap 确定性骨架(本地,不写 wiki、不调 LLM)
     KnowledgeScanWiki {
@@ -517,6 +520,7 @@ async fn execute_job_inner(
             limit,
             corpus,
             draft,
+            review,
         } => {
             crate::knowledge::run_knowledge_sync(
                 &crate::knowledge::SyncParams {
@@ -527,6 +531,7 @@ async fn execute_job_inner(
                     limit: *limit,
                     corpus: corpus.clone(),
                     draft: *draft,
+                    review: review.clone(),
                 },
                 reporter,
             )

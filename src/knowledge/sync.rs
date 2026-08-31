@@ -3,7 +3,8 @@
 //!
 //! v1 最小闭环(方案拍板,见 docs/KNOWLEDGE_SYNC.md):独立命令、确定性、
 //! 零 LLM;`--rescan` 时级联调用 knowledge-scan-symbols 重扫脏文档。
-//! Tier2 表述改写起草延后。
+//! v1.1 接入 tuning/prefab 交叉与 Tier2 `--draft` 起草;v1.2 起草 prompt
+//! 注入常量使用上下文与同值竞争常量提示,并以 `--review` 完成人工复核闭环。
 
 use crate::error::{Error, Result};
 use crate::knowledge::scan_wiki::{extract_named_constants, trim_num, PageSymbolMap};
@@ -31,33 +32,36 @@ pub struct SyncParams {
     pub corpus: Option<String>,
     /// Tier2:按常量差异与旧值锚点起草页面修订建议(需 corpus + LLM)
     pub draft: bool,
+    /// 复核裁决文件路径:对既有 sync_report.json 的建议逐条 approve/reject,
+    /// 产出仅含 approve 项的应用清单(不重跑 diff 与起草)
+    pub review: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct ConstantChange {
     pub name: String,
     pub old: String,
     pub new: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct PageAnchor {
     pub pageid: i64,
     pub title: String,
     /// precise = 页面数值与旧常量精确匹配(旧值锚点);context = 仅提及
     pub kind: String,
     /// precise 锚点的页面原文(raw)与匹配常量
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub anchors: Vec<AnchorDetail>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct AnchorDetail {
     pub raw: String,
     pub matched: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct DirtyDoc {
     pub path: String,
     pub category: String,
@@ -66,27 +70,27 @@ pub struct DirtyDoc {
     pub stub_page_count: usize,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct TuningChange {
     pub key: String,
     pub old: String,
     pub new: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct PrefabChange {
     pub path: String,
     pub variants: Vec<String>,
     pub pages: Vec<PageBrief>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct PageBrief {
     pub pageid: i64,
     pub title: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct SyncReport {
     pub old: String,
     pub new: String,
@@ -107,8 +111,11 @@ pub struct SyncReport {
 }
 
 /// Tier2 起草产物:一条页面修订建议(仅建议,人工审阅)。
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize)]
 pub struct DraftSuggestion {
+    /// 稳定建议 id(单次 --draft 运行内唯一,复核文件按此裁决)
+    #[serde(default)]
+    pub id: String,
     pub path: String,
     pub pageid: i64,
     pub title: String,
@@ -166,6 +173,11 @@ pub async fn run_knowledge_sync(
     params: &SyncParams,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
+    // 复核模式:不重跑 diff/起草,回读既有报告 + 人工裁决 → 应用清单
+    if let Some(review_path) = &params.review {
+        let report_path = Path::new("output/knowledge/sync_report.json");
+        return run_review(Path::new(review_path), report_path, reporter);
+    }
     let store = SnapshotStore::from_env()?;
     let resolve = |id: &str| -> std::path::PathBuf {
         if id == "current" {
@@ -426,12 +438,16 @@ pub async fn run_knowledge_sync(
         reporter.stage("Tier2 起草修订建议");
         drafts = draft_revision_suggestions(
             &dirty_docs,
+            &new_root,
             Path::new(corpus),
             &config,
             params.limit,
             reporter,
         )
         .await;
+        if !drafts.is_empty() {
+            write_review_template(&drafts, reporter)?;
+        }
     }
 
     let mut rescan_summary = None;
@@ -511,6 +527,7 @@ const DRAFT_EXAMPLE: &str = r#"{"suggestions":[{"pageid":123,"old_sentence":"原
 
 async fn draft_revision_suggestions(
     dirty_docs: &[DirtyDoc],
+    new_root: &Path,
     corpus_root: &Path,
     config: &crate::llm::LlmConfig,
     limit: usize,
@@ -552,14 +569,44 @@ async fn draft_revision_suggestions(
         if grounding.is_empty() {
             continue;
         }
+        // v1.2:注入常量使用上下文(新源码引用行)与同值竞争常量提示,
+        // 供起草时消歧"同值异义"锚点(如 SEE_DIST=30 vs SHARE_TARGET_DIST=30)
+        let new_src = std::fs::read_to_string(new_root.join(&doc.path)).unwrap_or_default();
         let consts: Vec<String> = doc
             .constant_changes
             .iter()
-            .map(|c| format!("{}: {} → {}", c.name, c.old, c.new))
+            .map(|c| {
+                let usage = constant_usage_lines(&new_src, &c.name);
+                let usage_txt = if usage.is_empty() {
+                    "-".to_string()
+                } else {
+                    usage.join(" ; ")
+                };
+                let comp = competing_constants(&new_src, c);
+                let comp_txt = if comp.is_empty() {
+                    "无".to_string()
+                } else {
+                    comp.iter()
+                        .map(|(n, ls)| {
+                            let ls_txt = if ls.is_empty() {
+                                "-".to_string()
+                            } else {
+                                ls.join(" ; ")
+                            };
+                            format!("{n}(使用行: {ls_txt})")
+                        })
+                        .collect::<Vec<_>>()
+                        .join("; ")
+                };
+                format!(
+                    "- {}: {} → {}(新代码使用上下文:`{}`);同值竞争常量:{}",
+                    c.name, c.old, c.new, usage_txt, comp_txt
+                )
+            })
             .collect();
         let prompt = format!(
-            "代码更新导致以下常量变化:\n{}\n\n受影响页面的相关原文:\n{grounding}\n请为每条原文起草修订后的句子(数值/表述与新代码一致,保持页面行文风格)。只输出一个 JSON 对象,形如:{example}\n只覆盖上面列出的页面。",
-            consts.join(";"),
+            "代码更新导致以下常量变化(附新代码使用上下文与同值竞争常量提示):\n{}\n\n受影响页面的相关原文:\n{grounding}\n请仅为数值语义确实来自上述变更常量的原文句起草修订(数值/表述与新代码一致,保持页面行文风格);判断依据是使用上下文的语义(例如使用行体现\"寻找食物\"时,只有描述寻找食物的句子可改)。若某句的数值语义来自同值竞争常量且该常量未变更,或你无法从使用上下文确证该句数值来自变更常量,则不要为该句输出建议——宁可漏掉也不要改错。只输出一个 JSON 对象,形如:{example}\n只覆盖上面列出的页面。",
+            consts.join("\n"),
             example = DRAFT_EXAMPLE,
         );
         reporter.log(format!("起草 {}:{}", doc.path, doc.mentioned_pages.len()));
@@ -603,7 +650,9 @@ async fn draft_revision_suggestions(
             if pageid == 0 || new_sentence.is_empty() {
                 continue;
             }
+            let id = format!("D{:03}", drafts.len() + 1);
             drafts.push(DraftSuggestion {
+                id,
                 path: doc.path.clone(),
                 pageid,
                 title: titles.get(&pageid).cloned().unwrap_or_default(),
@@ -629,6 +678,198 @@ fn chrono_free_stamp() -> u64 {
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs())
         .unwrap_or(0)
+}
+
+/// 常量在源码中的使用行(≤2 行,trim 后原文)。
+fn constant_usage_lines(src: &str, name: &str) -> Vec<String> {
+    src.lines()
+        .filter(|l| l.contains(name))
+        .map(|l| l.trim().to_string())
+        .take(2)
+        .collect()
+}
+
+/// 同值竞争常量:与变更常量旧值相等的其它命名常量(页面同数值可能源自它们)。
+fn competing_constants(src: &str, changed: &ConstantChange) -> Vec<(String, Vec<String>)> {
+    extract_named_constants(src)
+        .into_iter()
+        .map(|(n, v)| (n, trim_num(v)))
+        .filter(|(n, v)| *n != changed.name && *v == changed.old)
+        .map(|(n, _)| {
+            let usage = constant_usage_lines(src, &n);
+            (n, usage)
+        })
+        .collect()
+}
+
+/// 复核裁决文件中的一条记录(--draft 生成模板,人工改 decision/note)。
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+struct ReviewEntry {
+    id: String,
+    decision: String,
+    #[serde(default)]
+    note: String,
+}
+
+/// --draft 收尾:落盘复核裁决模板 draft_review.json(全部 pending)。
+fn write_review_template(drafts: &[DraftSuggestion], reporter: &dyn Reporter) -> Result<()> {
+    let entries: Vec<serde_json::Value> = drafts
+        .iter()
+        .map(|d| {
+            serde_json::json!({
+                "id": d.id,
+                "decision": "pending",
+                "note": "",
+                "path": d.path,
+                "pageid": d.pageid,
+                "title": d.title,
+                "old_sentence": d.old_sentence,
+                "new_sentence": d.new_sentence,
+                "reason": d.reason,
+            })
+        })
+        .collect();
+    let path = Path::new("output/knowledge/draft_review.json");
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(path, serde_json::to_string_pretty(&entries)?)?;
+    reporter.log(format!(
+        "复核模板已写出 {},请人工填写 decision(approve/reject)后以 --review 回读",
+        path.display()
+    ));
+    Ok(())
+}
+
+/// 复核模式:回读 sync_report.json + 裁决文件 → 仅含 approve 项的应用清单。
+fn run_review(
+    review_path: &Path,
+    report_path: &Path,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    reporter.stage("Tier2 复核裁决");
+    let raw = std::fs::read_to_string(report_path).map_err(|_| {
+        Error::Config(format!(
+            "复核模式需要既有报告 {},请先运行 --draft 生成",
+            report_path.display()
+        ))
+    })?;
+    let report: SyncReport =
+        serde_json::from_str(&raw).map_err(|e| Error::Config(format!("既有报告解析失败: {e}")))?;
+    if report.drafts.is_empty() {
+        return Err(Error::Config(
+            "既有报告中无起草建议(drafts 为空),无需复核".to_string(),
+        ));
+    }
+    let entries: Vec<ReviewEntry> =
+        serde_json::from_str(&std::fs::read_to_string(review_path).map_err(|e| {
+            Error::Config(format!("裁决文件读取失败 {}: {e}", review_path.display()))
+        })?)
+        .map_err(|e| Error::Config(format!("裁决文件解析失败: {e}")))?;
+    let mut decisions: BTreeMap<String, (String, String)> = BTreeMap::new();
+    let known: BTreeSet<String> = report.drafts.iter().map(|d| d.id.clone()).collect();
+    for e in entries {
+        let decision = match e.decision.trim().to_lowercase().as_str() {
+            "approve" | "approved" => "approve".to_string(),
+            "reject" | "rejected" => "reject".to_string(),
+            other => {
+                reporter.log(format!(
+                    "裁决 {} 非法值 `{other}`(需 approve/reject),按 pending 处理",
+                    e.id
+                ));
+                "pending".to_string()
+            }
+        };
+        if !known.contains(&e.id) {
+            reporter.log(format!("裁决 {} 不在既有报告建议中,忽略", e.id));
+            continue;
+        }
+        decisions.insert(e.id, (decision, e.note));
+    }
+    let approved = report
+        .drafts
+        .iter()
+        .filter(|d| decisions.get(&d.id).map(|(x, _)| x.as_str()) == Some("approve"))
+        .count();
+    let rejected = report
+        .drafts
+        .iter()
+        .filter(|d| decisions.get(&d.id).map(|(x, _)| x.as_str()) == Some("reject"))
+        .count();
+    let md = render_apply_list(&report.old, &report.new, &report.drafts, &decisions);
+    let out_path = Path::new("output/knowledge/sync_apply_list.md");
+    if let Some(parent) = out_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(out_path, &md)?;
+    reporter.log(format!(
+        "复核完成:approve {approved} / reject {rejected} / 未裁决 {},应用清单 {}(wiki 编辑仍需人工执行)",
+        report.drafts.len() - approved - rejected,
+        out_path.display()
+    ));
+    Ok(serde_json::json!({
+        "drafts": report.drafts.len(),
+        "approved": approved,
+        "rejected": rejected,
+        "pending": report.drafts.len() - approved - rejected,
+        "apply_list": out_path.display().to_string(),
+    }))
+}
+
+/// 应用清单渲染:仅列 approve 项(old/new 句对 + 理由 + 审阅注记)。
+fn render_apply_list(
+    old: &str,
+    new: &str,
+    drafts: &[DraftSuggestion],
+    decisions: &BTreeMap<String, (String, String)>,
+) -> String {
+    let mut out = String::from("# Tier2 修订建议 · 应用清单(仅含 approve 项)\n\n");
+    out.push_str(&format!("对比区间:{old} → {new};wiki 编辑需人工执行。\n\n"));
+    let mut approved_count = 0usize;
+    for d in drafts {
+        let Some((decision, note)) = decisions.get(&d.id) else {
+            continue;
+        };
+        if decision != "approve" {
+            continue;
+        }
+        approved_count += 1;
+        out.push_str(&format!(
+            "## {} · 页面《{}》(pageid {})· {}\n\
+             - 旧句:`{}`\n\
+             - 新句:`{}`\n\
+             - 理由:{}\n\
+             - 审阅注记:{}\n\n",
+            d.id,
+            d.title,
+            d.pageid,
+            d.path,
+            d.old_sentence,
+            d.new_sentence,
+            if d.reason.is_empty() { "-" } else { &d.reason },
+            if note.is_empty() { "-" } else { note },
+        ));
+    }
+    let rejected: Vec<&DraftSuggestion> = drafts
+        .iter()
+        .filter(|d| decisions.get(&d.id).map(|(x, _)| x.as_str()) == Some("reject"))
+        .collect();
+    if !rejected.is_empty() {
+        out.push_str("## 已驳回(留痕,不应用)\n\n");
+        for d in rejected {
+            let note = decisions.get(&d.id).map(|(_, n)| n.as_str()).unwrap_or("-");
+            out.push_str(&format!(
+                "- {} · 《{}》(pageid {}):{}\n",
+                d.id,
+                d.title,
+                d.pageid,
+                if note.is_empty() { "-" } else { note },
+            ));
+        }
+        out.push('\n');
+    }
+    out.push_str(&format!("合计 approve {approved_count} 条。\n"));
+    out
 }
 
 fn tuning_val_text(v: &crate::update::index::tuning::TuningVal) -> String {
@@ -714,6 +955,114 @@ mod tests {
         assert!(!is_dirty(&doc, &dir), "sha 匹配生成时内容 → 不脏");
         std::fs::write(dir.join("components/health.lua"), "local X = 2").unwrap();
         assert!(is_dirty(&doc, &dir), "内容变化 → 脏");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    /// v1.2:使用行提取与同值竞争常量识别(SEE_DIST vs SHARE_TARGET_DIST 场景)
+    #[test]
+    fn constant_usage_and_competing() {
+        let src = "local SEE_DIST = 30\n\
+                   local ret = FindEntity(inst, SEE_DIST, nil, {\"_combat\"})\n\
+                   local SHARE_TARGET_DIST = 30\n\
+                   local OTHER = 30";
+        let usage = constant_usage_lines(src, "SEE_DIST");
+        assert_eq!(usage.len(), 2, "定义行 + 使用行都应命中");
+        assert!(usage[0].starts_with("local SEE_DIST"));
+        let changed = ConstantChange {
+            name: "SEE_DIST".into(),
+            old: "30".into(),
+            new: "33".into(),
+        };
+        let comp = competing_constants(src, &changed);
+        let names: Vec<&str> = comp.iter().map(|(n, _)| n.as_str()).collect();
+        assert_eq!(names.len(), 2, "SHARE_TARGET_DIST 与 OTHER 同值竞争");
+        assert!(names.contains(&"SHARE_TARGET_DIST"));
+        assert!(names.contains(&"OTHER"));
+        assert!(!names.contains(&"SEE_DIST"), "变更常量自身不算竞争");
+    }
+
+    /// Tier2 闭环:应用清单只渲染 approve 项正文,reject 项仅留痕
+    #[test]
+    fn apply_list_renders_approved_only() {
+        let mk = |id: &str, old: &str, new: &str| DraftSuggestion {
+            id: id.into(),
+            path: "brains/houndbrain.lua".into(),
+            pageid: 1,
+            title: "猎犬".into(),
+            old_sentence: old.into(),
+            new_sentence: new.into(),
+            reason: "常量 SEE_DIST 30→33".into(),
+        };
+        let drafts = vec![mk("D001", "旧A", "新A"), mk("D002", "旧B", "新B")];
+        let mut decisions = BTreeMap::new();
+        decisions.insert(
+            "D001".to_string(),
+            (
+                "approve".to_string(),
+                "数值语义确认来自 SEE_DIST".to_string(),
+            ),
+        );
+        decisions.insert(
+            "D002".to_string(),
+            (
+                "reject".to_string(),
+                "来自竞争常量 SHARE_TARGET_DIST".to_string(),
+            ),
+        );
+        let md = render_apply_list("20260501", "current", &drafts, &decisions);
+        assert!(md.contains("D001"), "approve 项应出现");
+        assert!(md.contains("新A"), "approve 项新句应出现");
+        assert!(md.contains("数值语义确认来自 SEE_DIST"), "审阅注记应出现");
+        assert!(!md.contains("新B"), "reject 项正文不应出现");
+        assert!(md.contains("已驳回"), "reject 项应留痕");
+        assert!(md.contains("来自竞争常量 SHARE_TARGET_DIST"));
+        assert!(md.contains("合计 approve 1 条"));
+    }
+
+    /// Tier2 闭环:run_review 回读既有报告 + 裁决文件 → 应用清单
+    #[test]
+    fn review_flow_reads_report_and_decisions() {
+        let dir = std::env::temp_dir().join(format!("kn-review-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let report = SyncReport {
+            old: "20260501".into(),
+            new: "current".into(),
+            changed_files: 1,
+            symbol_changes: 1,
+            other_changes: 0,
+            dirty_docs: vec![],
+            added_symbols: vec![],
+            removed_symbols: vec![],
+            other_files: vec![],
+            tuning_changes: vec![],
+            prefab_changes: vec![],
+            drafts: vec![DraftSuggestion {
+                id: "D001".into(),
+                path: "brains/houndbrain.lua".into(),
+                pageid: 42,
+                title: "猎犬".into(),
+                old_sentence: "旧".into(),
+                new_sentence: "新".into(),
+                reason: "r".into(),
+            }],
+            rescan: None,
+        };
+        let report_path = dir.join("sync_report.json");
+        std::fs::write(&report_path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
+        let review_path = dir.join("review.json");
+        std::fs::write(
+            &review_path,
+            r#"[{"id":"D001","decision":"approve","note":"确认"},{"id":"D999","decision":"approve"}]"#,
+        )
+        .unwrap();
+        let reporter = crate::service::CaptureReporter::new(true);
+        let out = run_review(&review_path, &report_path, &reporter).unwrap();
+        assert_eq!(out["approved"], 1);
+        assert_eq!(out["rejected"], 0);
+        assert_eq!(out["pending"], 0);
+        let md = std::fs::read_to_string("output/knowledge/sync_apply_list.md").unwrap();
+        assert!(md.contains("D001"));
+        assert!(md.contains("确认"));
         let _ = std::fs::remove_dir_all(dir);
     }
 }

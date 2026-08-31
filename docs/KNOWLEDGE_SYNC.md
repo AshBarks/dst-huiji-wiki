@@ -32,6 +32,20 @@ knowledge sync --old 202604271353 [--new current] [--rescan] [--limit 20]
 - **Tier2 `--draft` 已落地**:每带 precise 锚点的脏文档一次 LLM 调用,以页面原文行为 grounding,产出 old/new 句对 + 理由(仅入报告,不写 wiki);
 - **实测发现的重要 caveat**:D1 锚点按数值精确匹配,同值异义常量会造成错锚——模拟 SEE_DIST 30→33 的起草中,猎犬页"群体仇恨 30 单位"实际来自 `prefabs/hound.lua: SHARE_TARGET_DIST=30`(未变更),而真正的 SEE_DIST 锚点句("主动寻找 30 距离单位内的肉类食物")反而可能漏掉。**Tier2 输出必须人工审阅**;改进方向 = 起草 prompt 注入常量的使用上下文(代码引用行)与同值竞争常量提示。
 
+## 3.2 v1.2 锚点细化 + 复核闭环(2026-08-31)
+
+- **v1.2 已落地**(§3.1 拍板方向):起草 prompt 按 §3.1 注入(a)每个变更常量在新源码中的使用行(≤2 行)、(b)同文件内与旧值相等的**同值竞争常量**及其使用行;并追加保守指令"无法从使用上下文确证则不输出建议——宁可漏掉也不要改错"。
+- **SEE_DIST 30→33 模拟实测**(sim 树仅改 `brains/houndbrain.lua:16`,LLM mimo-v2.5):
+  - 第一轮(注入上下文,无保守指令):产出 2 条建议,**均为错锚**——"瞬移回家 30"(houndbrain 无对应常量)与"群体仇恨 30"(跨文件 `prefabs/hound.lua` 的 SHARE_TARGET_DIST=30);
+  - 第二轮(追加保守指令):**0 条建议**,两个错锚全被抑制;
+  - 结论:使用上下文 + 保守指令能抑制同文件可消歧的错锚;**跨文件同值常量(prefab 侧)仍可能漏网**——这正是人工复核兜底存在的理由。
+- **复核闭环已落地**(Tier2 输出仅入报告 → 人工裁决 → 应用清单):
+  1. `--draft` 收尾自动写出裁决模板 `output/knowledge/draft_review.json`(每条建议带稳定 id D001…,decision=pending);
+  2. 人工编辑 decision(approve/reject)+ note;
+  3. `knowledge-sync --review output/knowledge/draft_review.json` 回读既有 `sync_report.json`(不重跑 diff/起草,不需要快照参数),产出 `output/knowledge/sync_apply_list.md`:approve 项含旧/新句 + 理由 + 审阅注记,reject 项留痕(含驳回理由);
+  4. wiki 实际编辑仍由人工按清单执行(项目确认策略,自动写 wiki 不在范围内)。
+  - 闭环演示(同上模拟):D001/D002 双 reject,驳回理由留痕于应用清单。
+
 ## 4. 边界与取舍
 
 - tuning.lua / prefab 变更 → 页面的交叉在 v1.1 接入(需要 tuning 表对比与 variant 路由);

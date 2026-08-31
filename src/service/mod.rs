@@ -214,6 +214,9 @@ pub enum JobKind {
         /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有文档的 auto_maintained
         #[serde(default)]
         refresh_auto: bool,
+        /// pass2 二次确认(采样 ≥3 页但判空时复查)
+        #[serde(default)]
+        confirm_empty: bool,
     },
     /// page-assist:给定页面输出覆盖缺口建议清单(本地,不调 LLM)
     PageAssist {
@@ -503,6 +506,7 @@ async fn execute_job_inner(
             pass2_names,
             pick_names,
             refresh_auto,
+            confirm_empty,
         } => {
             crate::knowledge::run_scan_symbols(
                 &crate::knowledge::ScanSymbolsParams {
@@ -517,6 +521,7 @@ async fn execute_job_inner(
                     pass2_names: pass2_names.clone(),
                     pick_names: pick_names.clone(),
                     refresh_auto: *refresh_auto,
+                    confirm_empty: *confirm_empty,
                 },
                 reporter,
             )

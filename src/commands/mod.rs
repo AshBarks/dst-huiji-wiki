@@ -211,6 +211,9 @@ pub enum Commands {
         /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
         #[arg(long)]
         refresh_auto: bool,
+        /// pass2 二次确认:采样 ≥3 页但判空时追加一次复查(防过严)
+        #[arg(long)]
+        confirm_empty: bool,
     },
     /// page-assist:给定页面输出覆盖缺口建议清单(读 PageSymbolMap,不调 LLM)
     PageAssist {

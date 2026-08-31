@@ -341,6 +341,8 @@ pub async fn run_classify(
 
     // 二层:D 类 residual 批量 LLM 辅助分类(审计 note 已含归因语义)
     llm_classify_manual(&mut pairs, reporter).await;
+    // 三层:人工复核覆写(最后应用,自动层不覆盖人工结论)
+    apply_manual_overrides(knowledge_root, &mut pairs, reporter);
 
     pairs.sort_by(|a, b| {
         (a.class, a.pageid, a.path.as_str()).cmp(&(b.class, b.pageid, b.path.as_str()))
@@ -365,6 +367,56 @@ pub async fn run_classify(
         out_path.display()
     ));
     Ok(out)
+}
+
+/// 人工复核覆写文件(`knowledge/inconsistent_manual.json`):自动层重跑
+/// 不会覆盖人工结论。条目:{pageid, path, class, note}。
+fn apply_manual_overrides(
+    knowledge_root: &Path,
+    pairs: &mut [ClassifiedPair],
+    reporter: &dyn Reporter,
+) {
+    #[derive(serde::Deserialize)]
+    struct Override {
+        pageid: i64,
+        path: String,
+        class: String,
+        #[serde(default)]
+        note: String,
+    }
+    let path = knowledge_root.join("inconsistent_manual.json");
+    let Ok(raw) = std::fs::read_to_string(&path) else {
+        return;
+    };
+    let Ok(entries) = serde_json::from_str::<Vec<Override>>(&raw) else {
+        reporter.log("人工覆写文件解析失败,忽略".to_string());
+        return;
+    };
+    let mut applied = 0usize;
+    for o in &entries {
+        let class = match o.class.as_str() {
+            "A_routing" => CLASS_ROUTING,
+            "B_variant_gap" => CLASS_VARIANT,
+            "C_page_error" => CLASS_PAGE_ERROR,
+            "D_manual" => CLASS_MANUAL,
+            _ => {
+                reporter.log(format!("覆写 {} 非法 class `{}`,忽略", o.pageid, o.class));
+                continue;
+            }
+        };
+        if let Some(p) = pairs
+            .iter_mut()
+            .find(|p| p.pageid == o.pageid && p.path == o.path)
+        {
+            p.class = class;
+            if !o.note.is_empty() {
+                p.note = Some(o.note.clone());
+            }
+            p.reason = Some("人工核实覆写".to_string());
+            applied += 1;
+        }
+    }
+    reporter.log(format!("人工覆写应用 {} 条({})", applied, path.display()));
 }
 
 /// 二层分类:对确定性层判为 D_manual 的对,批量 LLM 复核(25 条/批)。
@@ -410,22 +462,8 @@ async fn llm_classify_manual(pairs: &mut [ClassifiedPair], reporter: &dyn Report
         let prompt = format!(
             "页面图审计判定的「语义不一致」对需要分类:\n{CLASS_DOC}\n\n待分类(按 index):\n{listing}\n请对每条给出 class 与简短中文理由。只输出一个 JSON 对象,形如:{{\"items\":[{{\"index\":1,\"class\":\"A_routing\",\"reason\":\"句子描述掉落,属 lootdropper\"}}]}}"
         );
-        reporter.log(format!("LLM 辅助分类 {} 对", batch.len()));
-        let raw = match config.complete_streaming(SYSTEM, &prompt, |_| {}).await {
-            Ok(t) => t,
-            Err(e) => {
-                reporter.log(format!("LLM 辅助分类失败,本批保持人工:{e}"));
-                continue;
-            }
-        };
-        let trimmed = raw.trim();
-        let (Some(a), Some(b)) = (trimmed.find('{'), trimmed.rfind('}')) else {
-            reporter.log("LLM 辅助分类输出无 JSON,本批保持人工".to_string());
-            continue;
-        };
-        if a >= b {
-            continue;
-        }
+        reporter.log(format!("LLM 辅助分类 {} 对(三票多数)", batch.len()));
+        // 三票多数:同批独立调用 3 次,≥2 票一致才改判,否则保持人工
         #[derive(serde::Deserialize)]
         struct Item {
             index: usize,
@@ -438,29 +476,72 @@ async fn llm_classify_manual(pairs: &mut [ClassifiedPair], reporter: &dyn Report
             #[serde(default)]
             items: Vec<Item>,
         }
-        let Ok(p) = serde_json::from_str::<Payload>(&trimmed[a..=b]) else {
-            reporter.log("LLM 辅助分类输出无法解析,本批保持人工".to_string());
-            continue;
-        };
-        for item in p.items {
-            if item.index == 0 || item.index > batch.len() {
-                continue;
+        let parse = |raw: &str| -> Option<Vec<(usize, String, String)>> {
+            let trimmed = raw.trim();
+            let (a, b) = (trimmed.find('{')?, trimmed.rfind('}')?);
+            if a >= b {
+                return None;
             }
-            let idx = batch[item.index - 1];
-            let class = match item.class.as_str() {
+            let p: Payload = serde_json::from_str(&trimmed[a..=b]).ok()?;
+            Some(
+                p.items
+                    .into_iter()
+                    .filter(|i| i.index >= 1 && i.index <= batch.len())
+                    .map(|i| (i.index, i.class, i.reason))
+                    .collect(),
+            )
+        };
+        let mut votes: BTreeMap<usize, Vec<(String, String)>> = BTreeMap::new();
+        let mut ok_runs = 0usize;
+        for _ in 0..3 {
+            match config.complete_streaming(SYSTEM, &prompt, |_| {}).await {
+                Ok(raw) => {
+                    if let Some(items) = parse(&raw) {
+                        ok_runs += 1;
+                        for (index, class, reason) in items {
+                            votes.entry(index).or_default().push((class, reason));
+                        }
+                    }
+                }
+                Err(e) => {
+                    reporter.log(format!("LLM 辅助分类单次失败(计入缺票):{e}"));
+                }
+            }
+        }
+        if ok_runs == 0 {
+            reporter.log("LLM 辅助分类三次均失败,本批保持人工".to_string());
+            continue;
+        }
+        for (index, vs) in votes {
+            let mut tally: BTreeMap<String, (usize, String)> = BTreeMap::new();
+            for (class, reason) in vs {
+                let e = tally.entry(class).or_insert((0, String::new()));
+                e.0 += 1;
+                if e.1.is_empty() {
+                    e.1 = reason;
+                }
+            }
+            let Some((class, (n, reason))) = tally.into_iter().max_by_key(|(_, (n, _))| *n) else {
+                continue;
+            };
+            if n < 2 {
+                continue; // 无多数 → 保持人工
+            }
+            let class = match class.as_str() {
                 "A_routing" => CLASS_ROUTING,
                 "B_variant_gap" => CLASS_VARIANT,
                 "C_page_error" => CLASS_PAGE_ERROR,
                 "D_manual" => CLASS_MANUAL,
                 _ => continue,
             };
+            let idx = batch[index - 1];
             let pair = &mut pairs[idx];
             pair.class = class;
-            pair.reason = (!item.reason.is_empty()).then_some(item.reason);
+            pair.reason = (!reason.is_empty()).then_some(reason);
+            done += 1;
         }
-        done += batch.len();
     }
-    reporter.log(format!("LLM 辅助分类完成 {} 对", done));
+    reporter.log(format!("LLM 辅助分类完成 {done} 对(三票多数)"));
 }
 
 #[cfg(test)]

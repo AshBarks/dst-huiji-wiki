@@ -5,6 +5,7 @@
 
 use crate::error::{Error, Result};
 use crate::knowledge::auto_infobox::AutoInfoboxIndex;
+use crate::knowledge::scan_wiki::{extract_named_constants, trim_num};
 use crate::knowledge::store::{doc_path, is_fresh, load_doc, sha256_hex, write_atomic};
 use crate::knowledge::types::{
     assemble, prompt_rev_for, SymbolDoc, SymbolDocLlm, SymbolRefKey, WikiAspect, WikiEvidence,
@@ -164,6 +165,8 @@ pub struct ScanSymbolsParams {
     pub pick_names: Option<Vec<String>>,
     /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
     pub refresh_auto: bool,
+    /// pass2 二次确认(可选防过严):采样 ≥3 页但判空时追加一次复查(REMAINING_WORK A4)
+    pub confirm_empty: bool,
 }
 
 /// P1 选择:目录扫描(反向边仅作排序信号),覆盖全部 component 文件,
@@ -466,6 +469,7 @@ struct ComponentShared<'a> {
     cache: Option<&'a WikiTextCache>,
     config: &'a LlmConfig,
     raw_dir: &'a Path,
+    confirm_empty: bool,
     auto_infobox: &'a AutoInfoboxIndex,
     /// 仅对指定文件名词干跑 pass2;None = 全部。
     pass2_names: Option<&'a [String]>,
@@ -558,6 +562,7 @@ pub async fn run_scan_symbols(
                 cache: cache.as_ref(),
                 config: &config,
                 raw_dir: &raw_dir,
+                confirm_empty: params.confirm_empty,
                 auto_infobox: &auto_infobox,
                 pass2_names: params.pass2_names.as_deref(),
             };
@@ -750,6 +755,8 @@ async fn process_one_component(
                                 cache: shared.cache,
                                 sample: shared.sample,
                                 prompt_rev: shared.prompt_rev,
+                                confirm_empty: shared.confirm_empty,
+                                constants: source_constants(&source),
                             },
                             shared.raw_dir,
                             reporter,
@@ -857,6 +864,8 @@ async fn process_one_component(
                             cache: shared.cache,
                             sample: shared.sample,
                             prompt_rev: shared.prompt_rev,
+                            confirm_empty: shared.confirm_empty,
+                            constants: source_constants(&source),
                         },
                         shared.raw_dir,
                         reporter,
@@ -1424,6 +1433,10 @@ struct WikiContext<'a> {
     cache: Option<&'a WikiTextCache>,
     sample: usize,
     prompt_rev: &'static str,
+    /// pass2 二次确认开关(A4)
+    confirm_empty: bool,
+    /// 本符号文件的命名常量(brain caps 数值语义,A5)
+    constants: Vec<(String, f64)>,
 }
 
 /// 单次 pass2 LLM 调用 + 容错解析;失败由调用方决定重试/降级。
@@ -1623,6 +1636,40 @@ fn parse_search_terms_payload(raw: &str) -> Option<Vec<String>> {
     None
 }
 
+/// brain pass2 caps(§9.1):裸 ctor 名对不上页面语言,用 invocation 的
+/// 参数语义文本作锚点(依赖 1a behaviour 词典);tunables 叠加数值语义
+/// (常量名=值,A5 改善判空对齐缺口)。
+fn brain_caps(doc: &SymbolDoc, constants: &[(String, f64)]) -> Vec<String> {
+    let mut parts: Vec<String> = Vec::new();
+    for t in &doc.tunables {
+        let value = constants
+            .iter()
+            .find(|(n, _)| n == t)
+            .map(|(_, v)| trim_num(*v));
+        match value {
+            Some(v) => parts.push(format!("{t}={v}")),
+            None => parts.push(t.clone()),
+        }
+    }
+    for b in &doc.behaviour_invocations {
+        let mut entry = b.ctor.clone();
+        if !b.args_semantic.is_empty() {
+            entry.push_str(": ");
+            entry.push_str(&b.args_semantic.join("; "));
+        }
+        if let Some(ctx) = &b.context {
+            entry.push_str(&format!("({})", ctx));
+        }
+        parts.push(entry);
+    }
+    parts
+}
+
+/// 本符号源码的命名常量(brain caps 数值语义用)。
+fn source_constants(source: &[u8]) -> Vec<(String, f64)> {
+    extract_named_constants(&String::from_utf8_lossy(source))
+}
+
 async fn enrich_with_wiki(
     config: &LlmConfig,
     doc: &mut SymbolDoc,
@@ -1708,24 +1755,7 @@ async fn enrich_with_wiki(
             parts.extend(doc.effects.clone());
             parts
         }
-        "brain" => {
-            // 裸 ctor 名对不上页面语言;用 invocation 的参数语义文本作锚点
-            // (依赖 1a behaviour 词典,见行为链文档 §9.1)。
-            let mut parts: Vec<String> = Vec::new();
-            parts.extend(doc.tunables.iter().cloned());
-            for b in &doc.behaviour_invocations {
-                let mut entry = b.ctor.clone();
-                if !b.args_semantic.is_empty() {
-                    entry.push_str(": ");
-                    entry.push_str(&b.args_semantic.join("; "));
-                }
-                if let Some(ctx) = &b.context {
-                    entry.push_str(&format!("({})", ctx));
-                }
-                parts.push(entry);
-            }
-            parts
-        }
+        "brain" => brain_caps(doc, &ctx.constants),
         "stategraph" => {
             // SG 的 api 基本为空,裸状态名也不是页面语言;
             // 用 state_notes 的玩家语义作锚点(受击硬直/惊吓/变身等)。
@@ -1804,6 +1834,52 @@ async fn enrich_with_wiki(
         .filter(|a| !a.evidence.is_empty())
         .collect();
     aspects.sort_by(|a, b| a.aspect.cmp(&b.aspect));
+
+    // A4 二次确认(可选防过严):采样充分但判空时,以更全面标准复查一次。
+    // 仍空则维持判空(宁空勿造不变)。
+    if ctx.confirm_empty && pageids.len() >= 3 && aspects.is_empty() {
+        reporter.log("二次确认:采样 ≥3 页但判空,追加一次复查".to_string());
+        let confirm_prompt = format!(
+            "{prompt}\n\n注意:上一次判定认为页面未表达该符号的能力。请以更全面的标准复查:若页面确以任何方式表达这些能力(包括数值、行为描述、策略段落、信息框参数),输出对应 aspects(证据要求不变);若确实没有,再次输出空数组并给出 no_evidence_reason。"
+        );
+        if let Ok(llm2) = generate_wiki_once(
+            config,
+            &format!("{}__confirm", key.doc_id()),
+            &confirm_prompt,
+            raw_dir,
+            reporter,
+            ctx.prompt_rev,
+        )
+        .await
+        {
+            let mut aspects2: Vec<WikiAspect> = llm2
+                .aspects
+                .into_iter()
+                .map(|mut a| {
+                    a.evidence
+                        .retain(|e: &WikiEvidence| allowed.contains(&e.pageid));
+                    a
+                })
+                .filter(|a| !a.evidence.is_empty())
+                .collect();
+            aspects2.sort_by(|a, b| a.aspect.cmp(&b.aspect));
+            if !aspects2.is_empty() {
+                reporter.log(format!("二次确认翻案:发现 {} 条 aspects", aspects2.len()));
+                let coverage_status = match aspects2.len() {
+                    0 => unreachable!(),
+                    1 | 2 => "partial",
+                    _ => "well_documented",
+                };
+                doc.wiki = Some(WikiSection {
+                    scanned_pageids: pageids.clone(),
+                    aspects: aspects2,
+                    no_evidence_reason: None,
+                    coverage_status: coverage_status.to_string(),
+                });
+                return Ok(());
+            }
+        }
+    }
 
     let coverage_status = match aspects.len() {
         0 => "no_wiki_mention",
@@ -2047,6 +2123,32 @@ mod tests {
         assert_eq!(picked.len(), 1, "只应剩下 SGhound");
         assert_eq!(picked[0].0.path, "stategraphs/SGhound.lua");
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// A5:brain caps 把 tunables 渲染为 NAME=值(源码常量匹配时)
+    #[test]
+    fn brain_caps_render_tunable_values() {
+        let llm_json = r#"{"category":"brain","display_name":"t","summary":"s","tunables":["SEE_DIST","NO_VALUE_CONST"],"behaviour_invocations":[{"ctor":"ChaseAndAttack","args_semantic":["追击最长 100 秒"]}],"search_terms":[],"gameplay_tags":[]}"#;
+        let llm: SymbolDocLlm = serde_json::from_str(llm_json).unwrap();
+        let key = SymbolRefKey {
+            kind: "brain".into(),
+            path: "brains/tbrain.lua".into(),
+        };
+        let doc = assemble(&llm, &key, "sha", 1, None, "m", "p5-brain");
+        let caps = brain_caps(&doc, &[("SEE_DIST".into(), 30.0)]);
+        assert!(
+            caps.contains(&"SEE_DIST=30".to_string()),
+            "有值常量应带 =值"
+        );
+        assert!(
+            caps.contains(&"NO_VALUE_CONST".to_string()),
+            "无值常量保持原名"
+        );
+        assert!(
+            caps.iter()
+                .any(|c| c.starts_with("ChaseAndAttack: 追击最长 100 秒")),
+            "invocation 语义文本保留"
+        );
     }
 
     #[test]

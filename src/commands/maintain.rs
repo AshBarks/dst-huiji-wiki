@@ -243,6 +243,7 @@ pub async fn run(args: Commands) -> Result<()> {
             pass2_names,
             pick_names,
             refresh_auto,
+            confirm_empty,
         } => {
             execute(
                 JobKind::KnowledgeScanSymbols {
@@ -257,6 +258,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     pass2_names,
                     pick_names,
                     refresh_auto,
+                    confirm_empty,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

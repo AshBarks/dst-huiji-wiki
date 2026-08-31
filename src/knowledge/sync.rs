@@ -479,6 +479,7 @@ pub async fn run_knowledge_sync(
                 pass2_names: None,
                 pick_names: Some(stems),
                 refresh_auto: false,
+                confirm_empty: false,
             };
             let out = crate::knowledge::run_scan_symbols(&params, reporter).await?;
             results.insert(category.to_string(), out);

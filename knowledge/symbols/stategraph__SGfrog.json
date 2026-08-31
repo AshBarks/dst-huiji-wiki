@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "prompt_rev": "p6-stategraph",
+  "reference": {
+    "kind": "stategraph",
+    "path": "stategraphs/SGfrog.lua"
+  },
+  "category": "stategraph",
+  "display_name": "SGfrog",
+  "summary": "该状态图驱动饥荒联机版中的青蛙实体。青蛙的状态组织包括静止、跳跃移动、攻击、受伤和死亡等基本行为，通过事件如攻击、移动和受伤来触发状态转换。",
+  "api": [],
+  "api_note": "该状态图没有暴露公共API方法，仅处理内部状态转换和事件。",
+  "events_published": [],
+  "events_listened": [
+    "doattack",
+    "locomote",
+    "attacked",
+    "trapped"
+  ],
+  "netvars": [],
+  "tunables": [],
+  "states": [
+    "idle",
+    "action",
+    "aggressivehop",
+    "hop",
+    "attack",
+    "fall",
+    "hit",
+    "death",
+    "trapped"
+  ],
+  "state_notes": [
+    {
+      "state": "idle",
+      "note": "当青蛙不移动时进入静止状态，播放 idle 或 idle2 动画（月相相关），根据周围同类数量调整叫声大小，并随机超时。"
+    },
+    {
+      "state": "hop",
+      "note": "青蛙跳跃移动状态，执行跳跃动画，在动画帧5开始移动，帧20停止并播放音效。"
+    },
+    {
+      "state": "attack",
+      "note": "青蛙攻击状态，播放攻击动画，在帧25执行攻击伤害，并播放攻击音效。"
+    },
+    {
+      "state": "hit",
+      "note": "被攻击后的硬直状态，播放 hit 动画，更新硬直恢复延迟，防止连续受伤。"
+    },
+    {
+      "state": "death",
+      "note": "死亡状态，播放死亡动画，移除物理碰撞并掉落战利品。"
+    },
+    {
+      "state": "trapped",
+      "note": "被陷阱困住的状态，播放攻击预备动画，超时1秒后恢复 idle。"
+    },
+    {
+      "state": "fall",
+      "note": "从高处坠落状态，播放坠落动画，落地后播放音效并转 idle。"
+    },
+    {
+      "state": "action",
+      "note": "执行缓冲动作状态，如回家，播放 idle 动画并执行动作。"
+    }
+  ],
+  "wiki": {
+    "scanned_pageids": [
+      15022,
+      15922,
+      15357,
+      13897,
+      51046,
+      15651,
+      15225,
+      13556
+    ],
+    "aspects": [
+      {
+        "aspect": "硬直抵抗描述",
+        "evidence": [
+          {
+            "pageid": 15357,
+            "quote": "青蛙不能被无限硬直。"
+          }
+        ]
+      }
+    ],
+    "coverage_status": "partial"
+  },
+  "search_terms": [
+    "青蛙",
+    "跳跃",
+    "攻击",
+    "死亡",
+    "硬直",
+    "音效",
+    "战利品",
+    "陷阱",
+    "坠落",
+    "月相"
+  ],
+  "gameplay_tags": [
+    "战斗",
+    "移动",
+    "生存"
+  ],
+  "related_symbols": [],
+  "provenance": {
+    "source_sha256": "29995a2722c3e8927537e3f4a814c1a9af4782de65ff4269a36684e4181b70d8",
+    "source_bytes": 8457,
+    "model": "mimo-v2.5",
+    "generated_at_ms": 1788134512632
+  }
+}

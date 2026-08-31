@@ -42,7 +42,7 @@
 - 代码:`brains/houndbrain.lua:224` `ChaseAndAttack(self.inst, 100)`;而 ChaseAndAttack 构造子为 `(inst, max_chase_time, give_up_dist, max_attacks, …)`(`behaviours/chaseandattack.lua:1`),即 **100 是追击时长上限(秒)**,give_up_dist 为 nil;
 - 索敌距离实际来自 `prefabs/hound.lua:198` retargetfn 的 `FindEntity(inst, TUNING.HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10)`(tuning.lua:1481/1488);
 - **1a 词典交叉印证(2026-08-28)**:houndbrain 文档 `behaviour_invocations` 按语境分支记录——野生无家 `ChaseAndAttack(inst, 100)` → "追击最长 100 秒";有家 `(inst, 10, 20)` → "追击最长 10 秒 + 放弃距离 20"。三条页面句与代码的映射:①"野生 100 单位" ↔ max_chase_time=100 秒(**疑似把时间误读为距离**);②"有丘 20 单位" ↔ give_up_dist=20(确是距离,但来源更可能是 give_up_dist 而非索敌距离);③"海象营地 10 单位" ↔ HOUND_FOLLOWER_TARGET_DIST=10(确是距离)。
-- **结论倾向**:三条中两条数字恰好真是距离,一条疑似时间误读——正是"brain 位置参数语义无权威出处时人和 LLM 都会猜"的实例。正式核实(历史版本比对/游戏实测)仍归 UPDATE_IMPACT_PLAN L1 人工比对项;核实后处置:①猎犬页行为章纠错;②UPDATE_IMPACT_PLAN §4.2.4 语境分句范例修正;③F3 旧值回查锚点排查。
+- **历史核实结论(2026-08-30,定案)**:对全部 40 个快照(2025-03-12 → 2026-05-29)逐版本比对,`SEE_DIST=30 / SIT_BOY_DIST=10 / SHARE_TARGET_DIST=30 / HOUND_TARGET_DIST=20 / HOUND_FOLLOWER_TARGET_DIST=10` 与三处 ChaseAndAttack 调用(`10`、`10,20`、`100`)**横跨 14 个月零变化**。页面的"100 单位"不可能来自任何历史版本的代码——**定案为时间误读为距离**:野生猎犬的 100 是 `max_chase_time`(追击时长上限,秒),页面写成"仇恨范围 100 单位"系误读;其余两条(20/10)数字恰好是真实距离(索敌/放弃距离),无需修正数值但表述口径可校准。处置:①猎犬页行为章"野生 100 单位"句应改为追击时长表述(页面修订建议已可由 knowledge-sync --draft 生成);②UPDATE_IMPACT_PLAN §4.2.4 语境分句范例需修正;③F3 旧值回查锚点排查(该句不再适合作为距离类锚点)。
 - **教训**:behaviour 词典文档(`ctor_params`)正是为此而设——本例的语义锚点即来自 1a 词典。
 
 ## 2. 四类符号的性质差异(为什么不能一套模板套四次)

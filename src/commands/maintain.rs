@@ -314,6 +314,7 @@ pub async fn run(args: Commands) -> Result<()> {
             audit_batch_pages,
             audit_batch_max_chars,
             report,
+            classify,
         } => {
             execute(
                 JobKind::KnowledgeScanWiki {
@@ -326,6 +327,7 @@ pub async fn run(args: Commands) -> Result<()> {
                     audit_batch_pages,
                     audit_batch_max_chars,
                     report,
+                    classify,
                 },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,

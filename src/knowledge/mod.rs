@@ -6,6 +6,7 @@
 //! - [`scan_wiki`]:M2a — PageSymbolMap 确定性骨架(路由/反转/数值配对)
 
 pub mod auto_infobox;
+pub mod classify;
 pub mod page_assist;
 pub mod scan_symbols;
 pub mod scan_wiki;
@@ -13,6 +14,7 @@ pub mod store;
 pub mod sync;
 pub mod types;
 
+pub use classify::{run_classify, ClassSignals};
 pub use page_assist::{run_page_assist, PageAssistParams};
 pub use scan_symbols::{run_scan_symbols, ScanSymbolsParams};
 pub use scan_wiki::{run_scan_wiki, ScanWikiParams};

@@ -48,6 +48,10 @@ knowledge sync --old 202604271353 [--new current] [--rescan] [--limit 20]
 
 ## 4. 边界与取舍
 
+- M3 消费页面图前须先跑 `knowledge-scan-wiki --classify`(见
+  [KNOWLEDGE_PAGE_MAP.md](KNOWLEDGE_PAGE_MAP.md) §8):A_routing 对从修订
+  候选中剔除,B_variant_gap 回流文档侧,仅 C_page_error 进人工纠错清单。
+
 - tuning.lua / prefab 变更 → 页面的交叉在 v1.1 接入(需要 tuning 表对比与 variant 路由);
 - `Removed` 符号文件 → 文档标记待下线,不在 v1 自动处理;
 - 文档不存在的新符号 → 归 M1 扩量范畴,报告中单列(added_symbols)。

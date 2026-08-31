@@ -44,6 +44,8 @@ pub struct ScanWikiParams {
     pub audit_batch_max_chars: usize,
     /// M2c:不重建地图,直接聚合 knowledge/pages/*.json 出报表
     pub report: bool,
+    /// M2 收尾:语义不一致对三分类(确定性,见 classify 模块)
+    pub classify: bool,
 }
 
 /// 单个 (page, symbol) 对的归因条目(落盘 schema v1)。
@@ -185,6 +187,15 @@ pub async fn run_scan_wiki(
 
     if params.report {
         return run_page_map_report(knowledge_root, reporter);
+    }
+    if params.classify {
+        return crate::knowledge::classify::run_classify(
+            scripts_root,
+            knowledge_root,
+            corpus_root,
+            reporter,
+        )
+        .await;
     }
 
     reporter.stage("构建代码关联索引");

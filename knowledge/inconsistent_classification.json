@@ -1,0 +1,809 @@
+{
+  "schema_version": 1,
+  "counts": {
+    "A_routing": 24,
+    "B_variant_gap": 26,
+    "C_page_error": 7,
+    "D_manual": 44
+  },
+  "pairs": [
+    {
+      "pageid": 13603,
+      "title": "海草",
+      "path": "components/waterphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述海草生长和掉落，未涉及水体物理属性如反弹系数或碰撞。",
+      "reason": "页面描述生长和掉落，未涉及水体物理，应属其它组件"
+    },
+    {
+      "pageid": 13857,
+      "title": "猎犬",
+      "path": "behaviours/attackwall.lua",
+      "class": "A_routing",
+      "note": "页面描述猎犬（hound, firehound, icehound）的掉落和生成，但未提及攻击墙壁行为；相关实体在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为，与attackwall.lua不匹配"
+    },
+    {
+      "pageid": 14589,
+      "title": "尘蛾",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面描述尘蛾的生成与行为，无交易相关内容。",
+      "reason": "页面描述尘蛾生成行为，与trader.lua交易组件不匹配"
+    },
+    {
+      "pageid": 14688,
+      "title": "水球",
+      "path": "components/equippable.lua",
+      "class": "A_routing",
+      "wording": "被水球砸中会增加 20 点[[潮湿度]]或[[物品潮湿度]]",
+      "numbers": [
+        "20"
+      ]
+    },
+    {
+      "pageid": 14785,
+      "title": "火药",
+      "path": "components/propagator.lua",
+      "class": "A_routing",
+      "wording": "特殊互动/燃烧时间=3 ~ 6",
+      "numbers": [
+        "3",
+        "6"
+      ]
+    },
+    {
+      "pageid": 15235,
+      "title": "兔子",
+      "path": "components/health.lua",
+      "class": "A_routing",
+      "wording": "死时，三选一",
+      "reason": "原句指死亡时行为，应属lootdropper或死亡逻辑，非health.lua"
+    },
+    {
+      "pageid": 15269,
+      "title": "海黾",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面为蜘蛛战斗属性，无交易机制描述。",
+      "reason": "页面为战斗属性，无交易描述，非trader"
+    },
+    {
+      "pageid": 15532,
+      "title": "喷吐蜘蛛",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面为蜘蛛战斗数据，未涉及交易。",
+      "reason": "页面为蜘蛛战斗数据，与trader.lua交易组件不匹配"
+    },
+    {
+      "pageid": 15555,
+      "title": "穴居悬蛛",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面为蜘蛛战斗属性，无交易功能描述。",
+      "reason": "页面描述蜘蛛战斗属性，但代码文件为trader.lua，交易功能描述缺失"
+    },
+    {
+      "pageid": 15737,
+      "title": "胡萝卜鼠",
+      "path": "components/health.lua",
+      "class": "A_routing",
+      "wording": "召唤 3 天后未死亡则会变回",
+      "evidence": "brains/carratbrain.lua: AVOID_PLAYER_DIST=3",
+      "numbers": [
+        "3"
+      ]
+    },
+    {
+      "pageid": 15744,
+      "title": "破碎蜘蛛",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面为月晶蜘蛛战斗数据，未提及交易。",
+      "reason": "页面为战斗数据，与trader.lua交易组件不匹配"
+    },
+    {
+      "pageid": 15817,
+      "title": "超级可爱岩浆虫",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面描述超级岩浆虫的孵化与属性，与交易无关。",
+      "reason": "页面描述孵化与属性，应属其它组件，非trader"
+    },
+    {
+      "pageid": 15965,
+      "title": "护士蜘蛛",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面描述护士蜘蛛的治疗技能，未提及交易功能。",
+      "reason": "页面描述治疗技能，未提及交易功能，非trader"
+    },
+    {
+      "pageid": 15975,
+      "title": "鱼人之王",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面内容为鱼人王相关机制，未涉及交易系统。",
+      "reason": "页面内容不涉及交易，应属其它机制，非trader"
+    },
+    {
+      "pageid": 16418,
+      "title": "月光玻璃窝",
+      "path": "components/waterphysics.lua",
+      "class": "A_routing",
+      "note": "页面关注月光玻璃窝的生物生成，无水体物理内容。",
+      "reason": "页面关注生物生成，无水体物理内容，非waterphysics"
+    },
+    {
+      "pageid": 18853,
+      "title": "海洋拖网捕鱼器",
+      "path": "components/waterphysics.lua",
+      "class": "A_routing",
+      "note": "页面仅提到物品栏，未涉及水体物理管理内容。",
+      "reason": "页面仅提到物品栏，与waterphysics.lua水体物理组件不匹配"
+    },
+    {
+      "pageid": 19272,
+      "title": "华丽基座",
+      "path": "components/trader.lua",
+      "class": "A_routing",
+      "note": "页面为华丽基座解谜说明，不涉及交易功能。",
+      "reason": "页面为解谜说明，与trader.lua交易组件不匹配"
+    },
+    {
+      "pageid": 20287,
+      "title": "可疑的土堆",
+      "path": "components/activatable.lua",
+      "class": "A_routing",
+      "note": "页面提及土堆（dirtpile），但未涉及激活状态描述",
+      "reason": "页面未涉及激活状态描述，与activatable.lua不匹配"
+    },
+    {
+      "pageid": 24074,
+      "title": "冰船",
+      "path": "components/boatphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述boat_ice的掉落信息，未提及船只物理行为",
+      "reason": "页面描述掉落信息，应属lootdropper，非boatphysics"
+    },
+    {
+      "pageid": 24090,
+      "title": "海盗单桅帆船",
+      "path": "components/boatphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述boat_pirate的掉落信息，未提及船只物理行为",
+      "reason": "页面描述掉落信息，应属lootdropper组件，非boatphysics"
+    },
+    {
+      "pageid": 24451,
+      "title": "船",
+      "path": "components/boatphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述boat的掉落信息，未提及船只物理行为",
+      "reason": "页面描述掉落信息，应属lootdropper，非boatphysics"
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
+      "path": "components/boatphysics.lua",
+      "class": "A_routing",
+      "note": "页面内容涉及水獭和海带，与船只物理行为无关",
+      "reason": "页面内容与boatphysics.lua船只物理组件不匹配"
+    },
+    {
+      "pageid": 24589,
+      "title": "水獭掠夺者窝点",
+      "path": "components/waterphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述水獭窝的掉落和再生，无水体物理相关机制。",
+      "reason": "页面内容与waterphysics.lua水体物理组件不匹配"
+    },
+    {
+      "pageid": 51529,
+      "title": "黄金浮标",
+      "path": "components/boatphysics.lua",
+      "class": "A_routing",
+      "note": "页面描述黄金浮标，与船只物理行为无关",
+      "reason": "页面描述浮标，与船只物理无关"
+    },
+    {
+      "pageid": 13641,
+      "title": "鱿鱼",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述实体掉落和伤害，可能与squid相关，但未提及攻击墙壁行为；实体squid在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为，但实体在代码文件受影响列表中"
+    },
+    {
+      "pageid": 13762,
+      "title": "洞穴蜘蛛",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面为蜘蛛掉落物列表，未涉及交易机制。",
+      "reason": "页面未涉及交易机制"
+    },
+    {
+      "pageid": 14712,
+      "title": "蘑菇农场",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述蘑菇农场成长周期，与交易无关。",
+      "reason": "页面未涉及交易功能"
+    },
+    {
+      "pageid": 14814,
+      "title": "刺耳三叉戟",
+      "path": "components/spellcaster.lua",
+      "class": "B_variant_gap",
+      "note": "页面提及了受影响物品‘trident’(刺耳三叉)，但描述内容为该物品的使用耐久与效果，未描述其作为施法工具的能力或组件功能。",
+      "reason": "页面未描述spellcaster.lua施法组件的施法能力"
+    },
+    {
+      "pageid": 15238,
+      "title": "皮弗娄牛",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述牛的生成和剃毛等行为，但未提及攻击墙壁行为；实体beefalo在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为"
+    },
+    {
+      "pageid": 15337,
+      "title": "溯源表",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述溯源表与时空裂缝功能，与交易无关。",
+      "reason": "页面未涉及交易功能"
+    },
+    {
+      "pageid": 15530,
+      "title": "蜘蛛战士",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面内容为蜘蛛战斗数据，未涉及交易机制。",
+      "reason": "页面未涉及交易机制"
+    },
+    {
+      "pageid": 15566,
+      "title": "洞穴蝙蝠",
+      "path": "components/acidinfusible.lua",
+      "class": "B_variant_gap",
+      "wording": "酸雨期间，额外：{{Pic|32|硝石}}×1（20%）<br>{{Pic|32|洞穴蝙蝠翅膀}}×1（50%）<br>{{Pic|32|鸟粪}}×1（30%）<br>{{Pic|32|怪物肉}}×1（20%）",
+      "note": "页面提及酸雨额外掉落，但未描述代码相关的体型改变或视觉效果添加。",
+      "numbers": [
+        "32",
+        "20",
+        "50",
+        "30"
+      ]
+    },
+    {
+      "pageid": 15651,
+      "title": "龙蝇",
+      "path": "behaviours/leash.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述实体“龙蝇”（Dragonfly），该实体在受影响变体列表中。代码符号适用于它，但页面提供的证据文本（刷新机制、掉落物）未具体描述与拴绳行为相关的游荡、返回机制等核心方面。",
+      "reason": "实体在变体列表中，但页面未描述拴绳行为核心概念"
+    },
+    {
+      "pageid": 15746,
+      "title": "饼干切割机",
+      "path": "behaviours/leash.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述“饼干切割机”（Cookiecutter），该实体在受影响变体列表中。证据文本提到了生成点和再生距离单位，这与拴绳行为的活动区域概念有潜在关联，但未明确描述“中心位置（家）”、“游荡”、“返回”等代码核心语义。",
+      "reason": "实体在变体列表中，但页面未描述拴绳行为核心概念"
+    },
+    {
+      "pageid": 15801,
+      "title": "恐怖猎犬",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面直接描述mutatedhound的掉落和生成，但未提及攻击墙壁行为；实体在受影响列表中。",
+      "reason": "页面未描述代码中存在的攻击墙壁行为"
+    },
+    {
+      "pageid": 15812,
+      "title": "无眼鹿",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述鹿的生成和属性，但未提及攻击墙壁行为；实体deer在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为，但实体在代码文件受影响列表中"
+    },
+    {
+      "pageid": 15832,
+      "title": "恐怖之眼",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述恐怖之眼的生成和掉落信息，但未提及攻击墙壁行为；实体eyeofterror在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为"
+    },
+    {
+      "pageid": 17996,
+      "title": "一角鲸的角",
+      "path": "components/spellcaster.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述了受影响物品‘gnarwail_horn’(喇叭角)的使用消耗耐久和演奏效果，但未明确描述其作为施法工具的能力或组件控制的法术类型/条件。",
+      "reason": "页面未明确描述施法能力"
+    },
+    {
+      "pageid": 18235,
+      "title": "盐堆",
+      "path": "components/waterphysics.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述盐堆的生长和掉落，未涉及水体物理属性。",
+      "reason": "页面未涉及水体物理属性，但代码文件相关"
+    },
+    {
+      "pageid": 19340,
+      "title": "蛞蝓龟黏液",
+      "path": "components/propagator.lua",
+      "class": "B_variant_gap",
+      "wording": "特殊互动/燃烧时间=3 ~ 6",
+      "numbers": [
+        "3",
+        "6"
+      ]
+    },
+    {
+      "pageid": 19769,
+      "title": "熔合暗影",
+      "path": "behaviours/leash.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述“融合暗影”（fused_shadeling），该实体在受影响变体列表中。证据文本提到了生成、爆炸、追逐等行为，与拴绳行为的“返回”或“追逐”有微弱关联，但未明确描述“家位置”、“游荡距离”等核心概念。",
+      "reason": "实体在变体列表中，但页面未描述拴绳行为核心概念"
+    },
+    {
+      "pageid": 20111,
+      "title": "兔洞",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面讨论兔人生成与胡萝卜相关性，未提及兔人的交易功能。",
+      "reason": "页面未提及交易功能"
+    },
+    {
+      "pageid": 20291,
+      "title": "草筏",
+      "path": "components/boatphysics.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述boat_grass的掉落信息，未提及船只物理行为",
+      "reason": "页面未提及船只物理行为"
+    },
+    {
+      "pageid": 23210,
+      "title": "黏土猎犬",
+      "path": "behaviours/attackwall.lua",
+      "class": "B_variant_gap",
+      "note": "页面涉及猎犬相关物品（如犬牙），但未提及攻击墙壁行为；相关猎犬实体在受影响列表中。",
+      "reason": "页面未提及攻击墙壁行为，但实体在代码文件受影响列表中"
+    },
+    {
+      "pageid": 23211,
+      "title": "座狼神龛",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述火炬与神龛，无交易内容。",
+      "reason": "页面未涉及交易内容"
+    },
+    {
+      "pageid": 23927,
+      "title": "龙虾窝",
+      "path": "components/waterphysics.lua",
+      "class": "B_variant_gap",
+      "note": "页面关注龙虾窝的生物生成，未提及水体物理管理内容。",
+      "reason": "页面未提及水体物理管理"
+    },
+    {
+      "pageid": 24764,
+      "title": "古董船",
+      "path": "components/boatphysics.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述boat_ancient的掉落和货舱信息，未提及船只物理行为",
+      "reason": "页面未提及船只物理行为"
+    },
+    {
+      "pageid": 24880,
+      "title": "光芒投泥带",
+      "path": "components/spellcaster.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述了受影响物品‘wurt_swampitem_lunar’的使用效果(生成沼泽地块)，但其描述为投掷或使用后的效果，而非使用该物品施放法术的施法能力。",
+      "reason": "页面未描述spellcaster.lua施法组件的施法能力"
+    },
+    {
+      "pageid": 35413,
+      "title": "双尾心",
+      "path": "components/spellcaster.lua",
+      "class": "B_variant_gap",
+      "note": "页面描述了受影响物品‘wortox_reviver’(沃拓克斯的复活器)的属性(生命值、灵魂消耗)和被动效果，但未描述其主动施放法术的施法能力或组件控制的功能。",
+      "reason": "页面未描述spellcaster.lua施法组件的施法能力"
+    },
+    {
+      "pageid": 70479,
+      "title": "珍珠的温泉",
+      "path": "components/trader.lua",
+      "class": "B_variant_gap",
+      "note": "页面讨论装饰度与温泉配方，不涉及交易系统。",
+      "reason": "页面未涉及交易系统"
+    },
+    {
+      "pageid": 15399,
+      "title": "坎普斯",
+      "path": "components/burnable.lua",
+      "class": "C_page_error",
+      "wording": "掉落 = 怪物肉×1，木炭×2，坎普斯背包×1（1%）",
+      "note": "击杀掉落木炭非燃烧所致，实体不在受影响列表",
+      "reason": "击杀掉落木炭非燃烧所致，实体不在burnable组件受影响列表"
+    },
+    {
+      "pageid": 15677,
+      "title": "蘑菇地精",
+      "path": "components/sanityaura.lua",
+      "class": "C_page_error",
+      "wording": "理智值/分钟",
+      "note": "实体疑似不在受影响变体列表",
+      "reason": "实体疑似不在sanityaura组件受影响变体列表"
+    },
+    {
+      "pageid": 15897,
+      "title": "厨师袋",
+      "path": "components/inventoryitem.lua",
+      "class": "C_page_error",
+      "wording": "品]]。  厨师袋提供 6 个[[物品栏]]，并且能",
+      "numbers": [
+        "6"
+      ]
+    },
+    {
+      "pageid": 15935,
+      "title": "恐怖利爪",
+      "path": "components/transparentonsanity.lua",
+      "class": "C_page_error",
+      "wording": "理智光环 = -100",
+      "note": "提及理智值但语义不一致，代码符号管理实体透明度，而此处是实体影响玩家理智",
+      "numbers": [
+        "100"
+      ]
+    },
+    {
+      "pageid": 16057,
+      "title": "噩梦燃料",
+      "path": "components/useabletargeteditem.lua",
+      "class": "C_page_error",
+      "wording": "斯威尔]]初始自带 6 个噩梦燃料",
+      "note": "页面讨论噩梦燃料的获取来源，未涉及使用状态。",
+      "numbers": [
+        "6"
+      ]
+    },
+    {
+      "pageid": 19785,
+      "title": "完全正常的树",
+      "path": "components/sanityaura.lua",
+      "class": "C_page_error",
+      "wording": "理智光环 = -40",
+      "note": "活树不在受影响变体列表",
+      "numbers": [
+        "40"
+      ]
+    },
+    {
+      "pageid": 24881,
+      "title": "绝望投泥带",
+      "path": "components/spellcaster.lua",
+      "class": "C_page_error",
+      "note": "页面描述了受影响物品‘wurt_swampitem_shadow’的使用效果(生成沼泽地块、召唤暗影触手)，但其描述为投掷或使用后的效果，而非使用该物品施放法术的施法能力或组件代码逻辑。",
+      "reason": "页面描述使用效果，而非施法能力组件代码逻辑"
+    },
+    {
+      "pageid": 14340,
+      "title": "知识饮水机",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 15326,
+      "title": "蚊子",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 15651,
+      "title": "龙蝇",
+      "path": "behaviours/doaction.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 15713,
+      "title": "空心树桩",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 15737,
+      "title": "胡萝卜鼠",
+      "path": "behaviours/wander.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 16174,
+      "title": "舞台之手",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "wording": "变身海狸人",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 16615,
+      "title": "生物扫描分析仪",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 16632,
+      "title": "暗夜灯",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 16661,
+      "title": "夹夹绞盘",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17920,
+      "title": "木头",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17924,
+      "title": "脓鼻涕",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 17926,
+      "title": "犬牙",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17930,
+      "title": "懒人传送塔",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 17947,
+      "title": "肥料包",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 17964,
+      "title": "猫尾",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 17972,
+      "title": "海象牙",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17974,
+      "title": "触手皮",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17975,
+      "title": "外壳碎片",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17984,
+      "title": "格罗姆的黏液",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 17985,
+      "title": "蜜脾",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 17995,
+      "title": "蜘蛛腺",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 17999,
+      "title": "针刺树",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 18032,
+      "title": "腐烂鸟蛋",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 18043,
+      "title": "守护者之角",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 18049,
+      "title": "荧光果",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 18074,
+      "title": "堆肥",
+      "path": "components/inspectable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 18783,
+      "title": "大触手",
+      "path": "components/health.lua",
+      "class": "D_manual",
+      "wording": "击杀大触手后",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 19769,
+      "title": "熔合暗影",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "wording": "速爆炸弹",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 19786,
+      "title": "蔷薇狼",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 20560,
+      "title": "猎犬丘",
+      "path": "components/health.lua",
+      "class": "D_manual",
+      "wording": "猎犬死亡后",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 22095,
+      "title": "鸦年华树",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 22556,
+      "title": "假人",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 23196,
+      "title": "鸦年华游戏",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 23202,
+      "title": "小浣猫托儿所",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 24964,
+      "title": "藏物箱",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 28183,
+      "title": "皇家兔子警卫",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 45135,
+      "title": "小丑",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    },
+    {
+      "pageid": 51097,
+      "title": "舒适的兔人",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 51097,
+      "title": "舒适的兔人",
+      "path": "behaviours/doaction.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 51486,
+      "title": "起点塔",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 71461,
+      "title": "备份底盘",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "无审计信息，无法判定"
+    },
+    {
+      "pageid": 72238,
+      "title": "附身底盘",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "reason": "无审计理由，无法判定"
+    },
+    {
+      "pageid": 72986,
+      "title": "净化间",
+      "path": "components/activatable.lua",
+      "class": "D_manual",
+      "reason": "信息不足，无法判定"
+    },
+    {
+      "pageid": 73451,
+      "title": "辉光象鼻虫",
+      "path": "behaviours/chaseandattack.lua",
+      "class": "D_manual",
+      "reason": "审计理由为空，无法判定是否不一致"
+    }
+  ]
+}

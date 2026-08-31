@@ -277,6 +277,9 @@ pub enum Commands {
         /// M2c:不重建地图,聚合现有 knowledge/pages 出报表(summary.json)
         #[arg(long)]
         report: bool,
+        /// M2 收尾:语义不一致对三分类(确定性)
+        #[arg(long)]
+        classify: bool,
     },
     /// 启动 WebUI 服务器
     Serve {

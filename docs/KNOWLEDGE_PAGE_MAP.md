@@ -75,3 +75,20 @@
 - D1 只做 quantity↔命名常量的精确相等匹配,松匹配(区间/百分比/单位换算)留给 L2 或 update 侧 F3;
 - pass2 未采样到的页面即使真实提及了符号,D0 也探不到——这正是 M2b L2 的存在意义,M2a 的"stub"语义是「确定性方法未见证据」而非「页面一定没写」;
 - `pages_without_prefab`(2566 页)与系统机制专题页不在本图范围(与 M1 路由同口径)。
+
+## 8. 语义不一致三分类(--classify,2026-08-31)
+
+§7 教训①的落地:对 `semantic_consistent=false` 的对做消费前分类,命令
+`knowledge-scan-wiki --classify`(聚合模式,不重建地图),产物
+`knowledge/inconsistent_classification.json`。
+
+- **确定性层**:verdict wording 抽数值 → 与「本符号文件 / 同页兄弟符号文件 /
+  页面 prefab 文件」常量匹配,再叠 prefab 字面量交叉(属性赋值如 aura=-40);
+  兄弟引文 bigram 重叠 ≥0.5 也判路由过近似。
+- **LLM 辅助层**:确定性判 D_manual 的残差批量送审(25 条/批,审计 note 为
+  证据),失败保持人工。
+- **四类语义**:A_routing 路由过近似(M3 剔除)/ B_variant_gap 变体或跨文件
+  缺口(回流 SymbolDoc 修正)/ C_page_error 疑似页面错误(人工纠错候选,
+  含 aurafn 类动态计算值,人核时优先判 B)/ D_manual 无法判定。
+- 首跑 101 对:A 24 / B 26 / C 7 / D 44。LLM 层存在 run 间方差(A/B/D 边界
+  摇摆),A/B/C 标签由确定性层锁定不受影响。

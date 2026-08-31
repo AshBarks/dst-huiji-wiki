@@ -482,6 +482,8 @@ dst-huiji-wiki symbol-annotate <scripts-root> \
 
 ### 6.3 下一步计划
 
+> 跨计划剩余项统一清单见 [REMAINING_WORK.md](REMAINING_WORK.md)(含本节各项的执行指引)。
+
 1. **Page→Symbol 实跑**：用真实 LLM 或人工标注跑一轮高引用 symbol，生成实际 `symbol_coverage`，验证 missing / inconsistent 质量；
 2. **四档 region tier 落地**：把 draft/flag/ignore/Tier0-only 写入 region/证据包，接入 `grade` 与 Prompt；
 3. **Code→Page 方向**：基于 Page→Symbol 标注结果实现“代码变更 → 页面生成/修订”；

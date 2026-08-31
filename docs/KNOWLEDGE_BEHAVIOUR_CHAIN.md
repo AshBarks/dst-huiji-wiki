@@ -181,10 +181,10 @@ prompt 注入:brain pass1 附带**本 brain 实际调用的** behaviour 构造�
 - `CtorParam.name` 别名(param_name/param)、`default` 原生布尔/数字→文本、`ApiEntry` 裸字符串→{name, effect:""};prompt 逐字段写明 JSON 形状。
 - `pick_brains` 从 top_symbols(反向边枚举)改为直接扫 `brains/` 目录:spider/beefalo 等动态 SetBrain 的 brain 在 atlas 中无 Brain 边,原逻辑选不到;反向边降级为排序信号。新增 `--pick-names`。
 
-## 10. 开放问题
+## 10. 开放问题(2026-08-31 状态回填)
 
-1. brain `bt_structure` 粒度(完整树 vs 意图摘要)——pilot 后按 LLM 输出质量定;
-2. behaviour_invocations 的 args 解析分工:behaviour_calls 已能解析部分字面量/FnRef,Unknown 形态靠 LLM 读源码;两路交叉核对的不一致阈值待定;
-3. brains/ 中 4 个 helper(braincommon 等)是被 brain require 的"子词典",性质接近 behaviour——是否单独建 doc,观察项;
-4. SG doc_id 命名(SG 前缀去留)——SG 重开时定;
-5. §1.3 疑点的核实方法(读历史快照脚本 / 实际游戏测试)——归入 UPDATE_IMPACT_PLAN 的 L1 人工比对类工作。
+1. ~~brain `bt_structure` 粒度~~ **已由全量实践定形**:意图摘要式(tunables / behaviour_invocations / context_branches),187 份全量产出质量可审;
+2. behaviour_invocations 的 args 解析分工:behaviour_calls 已能解析部分字面量/FnRef,Unknown 形态靠 LLM 读源码;两路交叉核对的不一致阈值待定(**仍开放**,随 M3 消费需要再定);
+3. brains/ 中 4 个 helper(braincommon 等)是被 brain require 的"子词典",性质接近 behaviour——是否单独建 doc,**仍开放**,判断标准见 [REMAINING_WORK.md](REMAINING_WORK.md);
+4. ~~SG doc_id 命名~~ **已定**:保留 SG 前缀(`stategraph__SGhound`),250 份全量一致;
+5. ~~§1.3 疑点核实~~ **已结案**:40 快照历史核实定案(`56a8139`),建议稿与范例修正(`ad14c4a`/`eadb623`),猎犬页编辑经拍板不做。

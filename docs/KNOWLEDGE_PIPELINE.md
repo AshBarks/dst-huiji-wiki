@@ -147,6 +147,8 @@ output/knowledge/raw/         # 不入库:LLM 原始响应 + 执行元数据
 
 ## 9. 后续计划
 
+> 全部未完成项的清单与执行指引统一维护在 [REMAINING_WORK.md](REMAINING_WORK.md);本节保留里程碑叙述。
+
 ### M1 收尾(剩余项)
 1. ~~**全量刷新主库**~~:已用版本过滤+章节过滤+并行逻辑完成,`auto_maintained` 已注入并经 v2 冷数据 `--refresh-auto` 同步
 2. ~~**人工 review 重点 diff**~~:inventoryitem / lootdropper / workable / floater / inspectable / hauntable 的 ds 证据清除已确认

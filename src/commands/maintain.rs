@@ -129,7 +129,12 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
-        Commands::CorpusFetch { full, dir, dry_run } => {
+        Commands::CorpusFetch {
+            full,
+            dir,
+            dry_run,
+            rc,
+        } => {
             // Corpus jobs never write the wiki; DryRun only suppresses local
             // disk writes (enumerate + reconcile + report).
             let mode = if dry_run {
@@ -141,6 +146,7 @@ pub async fn run(args: Commands) -> Result<()> {
                 JobKind::CorpusSync {
                     full,
                     dir: opt_path_to_string(&dir)?,
+                    rc,
                 },
                 mode,
                 None,

@@ -12,6 +12,7 @@ pub mod facts;
 pub mod join;
 pub mod model;
 pub mod prefab_index;
+pub mod rc;
 pub mod segment;
 pub mod store;
 
@@ -477,7 +478,7 @@ fn manifest_summary(manifest: &CorpusManifest, root: &Path) -> serde_json::Value
     obj
 }
 
-fn now_compact_tag() -> String {
+pub fn now_compact_tag() -> String {
     // Local-time-ish tag derived from epoch seconds is enough for archive dirs.
     let secs = SystemTime::now()
         .duration_since(UNIX_EPOCH)

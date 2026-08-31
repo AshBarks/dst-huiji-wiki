@@ -151,6 +151,9 @@ pub enum JobKind {
         full: bool,
         #[serde(default)]
         dir: Option<String>,
+        /// recentchanges 增量通道(§12);缺省仍为枚举对账
+        #[serde(default)]
+        rc: bool,
     },
     /// Rebuild derived corpus indexes from the local corpus tree
     /// (docs/CORPUS_CODE_ATLAS_CONTRACT.md). Local-only, no wiki traffic.
@@ -459,8 +462,8 @@ async fn execute_job_inner(
         JobKind::PrefabOverrides { input, output } => {
             run_prefab_overrides(input, opt_path(output), reporter).await
         }
-        JobKind::CorpusSync { full, dir } => {
-            run_corpus_sync(*full, dir.as_deref(), reporter, mode).await
+        JobKind::CorpusSync { full, dir, rc } => {
+            run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
         }
         JobKind::CorpusIndex { dir, join } => {
             run_corpus_index(dir.as_deref(), join.as_deref(), reporter, mode).await
@@ -1408,6 +1411,7 @@ async fn run_prefab_overrides(
 
 async fn run_corpus_sync(
     full: bool,
+    rc: bool,
     dir: Option<&str>,
     reporter: &dyn Reporter,
     mode: WriteMode,
@@ -1416,6 +1420,10 @@ async fn run_corpus_sync(
     // know host/headers. Login is deliberately skipped — this job never edits.
     let client = WikiClient::from_env()?;
     let base_dir = PathBuf::from(dir.unwrap_or("wikis"));
+    if rc {
+        return crate::corpus::rc::sync_rc(&client, &base_dir, mode == WriteMode::DryRun, reporter)
+            .await;
+    }
     crate::corpus::sync(
         &client,
         &base_dir,

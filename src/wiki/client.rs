@@ -176,6 +176,28 @@ pub struct PageRevisionContent {
     pub missing: bool,
 }
 
+/// One `list=recentchanges` row (corpus RC 增量通道,见 WIKI_CORPUS_PLAN §12)。
+/// 日志事件字段按本站实测扁平化在 rc 行上(logtype/logaction/logparams)。
+#[derive(Debug, Clone)]
+pub struct RecentChange {
+    pub rcid: i64,
+    pub rc_type: String,
+    pub pageid: Option<i64>,
+    pub title: Option<String>,
+    pub timestamp: String,
+    pub user: Option<String>,
+    pub sha1: Option<String>,
+    pub oldlen: Option<i64>,
+    pub newlen: Option<i64>,
+    pub revid: Option<i64>,
+    pub old_revid: Option<i64>,
+    pub comment: Option<String>,
+    pub bot_flag: bool,
+    pub log_type: Option<String>,
+    pub log_action: Option<String>,
+    pub log_params: Option<serde_json::Value>,
+}
+
 #[derive(Debug, Clone)]
 pub struct EditResult {
     pub result: String,
@@ -458,6 +480,73 @@ struct RawInfoFullResponse {
 /// prop=info` batch. Unlike plain `list=allpages` on this wiki's MediaWiki
 /// (1.38), the info-prop page set reliably carries `touched`, `len`, `new`
 /// and the redirect flag — all required for touched-based incremental sync.
+/// 解析 `list=recentchanges` 响应:rc 行 + `continue.rccontinue` 续传键。
+fn parse_recentchanges_response(body: &Value) -> Result<(Vec<RecentChange>, Option<String>)> {
+    let rows = body
+        .get("query")
+        .and_then(|q| q.get("recentchanges"))
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
+    let mut out = Vec::with_capacity(rows.len());
+    for row in rows {
+        let rcid = row.get("rcid").and_then(|v| v.as_i64()).unwrap_or(0);
+        let timestamp = row
+            .get("timestamp")
+            .and_then(|v| v.as_str())
+            .unwrap_or_default()
+            .to_string();
+        if rcid == 0 || timestamp.is_empty() {
+            continue;
+        }
+        let bot_flag = row
+            .get("flags")
+            .and_then(|v| v.as_str())
+            .map(|f| f.contains('B'))
+            .unwrap_or(false);
+        out.push(RecentChange {
+            rcid,
+            rc_type: row
+                .get("type")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            pageid: row.get("pageid").and_then(|v| v.as_i64()),
+            title: row
+                .get("title")
+                .and_then(|v| v.as_str())
+                .map(str::to_string),
+            timestamp,
+            user: row.get("user").and_then(|v| v.as_str()).map(str::to_string),
+            sha1: row.get("sha1").and_then(|v| v.as_str()).map(str::to_string),
+            oldlen: row.get("oldlen").and_then(|v| v.as_i64()),
+            newlen: row.get("newlen").and_then(|v| v.as_i64()),
+            revid: row.get("revid").and_then(|v| v.as_i64()),
+            old_revid: row.get("old_revid").and_then(|v| v.as_i64()),
+            comment: row
+                .get("comment")
+                .and_then(|v| v.as_str())
+                .map(str::to_string),
+            bot_flag,
+            log_type: row
+                .get("logtype")
+                .and_then(|v| v.as_str())
+                .map(str::to_string),
+            log_action: row
+                .get("logaction")
+                .and_then(|v| v.as_str())
+                .map(str::to_string),
+            log_params: row.get("logparams").cloned(),
+        });
+    }
+    let next = body
+        .get("continue")
+        .and_then(|c| c.get("rccontinue"))
+        .and_then(|v| v.as_str())
+        .map(str::to_string);
+    Ok((out, next))
+}
+
 fn parse_allpages_info_entries(body: &Value) -> Result<(Vec<PageListingEntry>, Option<String>)> {
     let parsed: RawInfoFullResponse =
         serde_json::from_value(body.clone()).map_err(|e| Error::WikiApi(e.to_string()))?;
@@ -989,6 +1078,48 @@ impl WikiClient {
             }
         }
         Ok(entries)
+    }
+
+    /// Fetches main-namespace recent changes newer than `start` (MediaWiki
+    /// timestamp), following `rccontinue` to exhaustion. RC 增量通道的 API
+    /// 面:参数形态与本站实测结论见 docs/WIKI_CORPUS_PLAN.md §12.2。
+    pub async fn recentchanges(&self, start: &str) -> Result<Vec<RecentChange>> {
+        let mut out = Vec::new();
+        let mut cont: Option<String> = None;
+        loop {
+            let mut params: Vec<(String, String)> = vec![
+                ("action".to_string(), "query".to_string()),
+                ("list".to_string(), "recentchanges".to_string()),
+                ("rcdir".to_string(), "newer".to_string()),
+                ("rcstart".to_string(), start.to_string()),
+                ("rctype".to_string(), "edit|new|log".to_string()),
+                ("rcnamespace".to_string(), "0".to_string()),
+                (
+                    "rcprop".to_string(),
+                    "title|timestamp|ids|sizes|sha1|user|flags|comment|loginfo".to_string(),
+                ),
+                ("rclimit".to_string(), "max".to_string()),
+                ("format".to_string(), "json".to_string()),
+            ];
+            if let Some(c) = &cont {
+                params.push(("rccontinue".to_string(), c.clone()));
+            }
+            let params_ref: Vec<(&str, &str)> = params
+                .iter()
+                .map(|(k, v)| (k.as_str(), v.as_str()))
+                .collect();
+
+            let response = self.get(&params_ref).await?;
+            let body: Value = response.json().await?;
+            let (batch, next) = parse_recentchanges_response(&body)?;
+            out.extend(batch);
+
+            match next {
+                Some(c) => cont = Some(c),
+                None => break,
+            }
+        }
+        Ok(out)
     }
 
     /// Fetches current-revision wikitext, revision sha1 and visible category

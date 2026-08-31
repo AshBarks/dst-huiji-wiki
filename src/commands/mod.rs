@@ -107,6 +107,9 @@ pub enum Commands {
         /// 只枚举与对账出报告，不写任何本地文件
         #[arg(long)]
         dry_run: bool,
+        /// recentchanges 增量通道(检查点缺失/过期自动回落枚举对账)
+        #[arg(long)]
+        rc: bool,
     },
     /// 快照差异 + 关联影响评估（M1，只读）：产出 impact.json 与 changes.patch
     UpdateScan {

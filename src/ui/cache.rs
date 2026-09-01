@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -17,7 +17,8 @@ pub struct FrameCacheEntry {
     pub offset: (i64, i64),
 }
 
-const FRAME_CACHE_BUDGET_BYTES: usize = 512 * 1024 * 1024;
+pub(super) const FRAME_CACHE_BUDGET_BYTES: usize = 512 * 1024 * 1024;
+pub(super) const MAX_FRAME_CACHE_BUDGET_BYTES: usize = 1536 * 1024 * 1024;
 
 pub struct LoadedData {
     pub canonical: PathBuf,
@@ -132,10 +133,14 @@ impl App {
 
     fn insert_cached_frame(&mut self, fi: usize, entry: FrameCacheEntry) {
         let bytes = entry.image.width() as usize * entry.image.height() as usize * 4;
-        self.frame_cache.insert(fi, entry);
+        if let Some(old) = self.frame_cache.insert(fi, entry) {
+            let old_bytes = old.image.width() as usize * old.image.height() as usize * 4;
+            self.frame_cache_bytes = self.frame_cache_bytes.saturating_sub(old_bytes);
+        }
+        self.frame_cache_order.retain(|&x| x != fi);
         self.frame_cache_order.push_back(fi);
         self.frame_cache_bytes += bytes;
-        while self.frame_cache_bytes > FRAME_CACHE_BUDGET_BYTES
+        while self.frame_cache_bytes > self.frame_cache_budget
             && self.frame_cache.len() > 1
             && let Some(old) = self.frame_cache_order.pop_front()
         {
@@ -174,13 +179,27 @@ impl App {
         if build_list.is_empty() {
             return;
         }
-        self.animation_bounds = dst_anim_tool::render::compute_animation_bounds(
+        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
             &anim.frames,
             &build_list,
             1.0,
             (0.0, 0.0),
             &self.disabled_elements,
         );
+        if let Some(union) = &bounds {
+            let mut total: u64 = 0;
+            for pf in prepared.iter().flatten() {
+                let (snapped, _, _) = dst_anim_tool::render::snap_frame_bounds(&pf.bounds, union);
+                let w = (snapped.right - snapped.left).ceil().max(1.0) as u64;
+                let h = (snapped.bottom - snapped.top).ceil().max(1.0) as u64;
+                total += w * h * 4;
+            }
+            self.frame_cache_budget = total.clamp(
+                FRAME_CACHE_BUDGET_BYTES as u64,
+                MAX_FRAME_CACHE_BUDGET_BYTES as u64,
+            ) as usize;
+        }
+        self.animation_bounds = bounds;
     }
 
     pub fn start_background_render(&mut self) {
@@ -205,6 +224,7 @@ impl App {
             return;
         }
         let start_frame = (self.active_frame_idx + 1) % total_frames;
+        let already_cached: HashSet<usize> = self.frame_cache.keys().copied().collect();
         let stop_flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let stop_flag_clone = stop_flag.clone();
         let (sender, receiver) =
@@ -214,6 +234,7 @@ impl App {
             (0..total_frames)
                 .into_par_iter()
                 .map(|offset| (start_frame + offset) % total_frames)
+                .filter(|fi| !already_cached.contains(fi))
                 .take_any_while(|_| !stop_flag_clone.load(std::sync::atomic::Ordering::Relaxed))
                 .for_each(|fi| {
                     if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
@@ -245,7 +266,7 @@ impl App {
         });
     }
 
-    pub fn poll_background_results(&mut self, ctx: &egui::Context) {
+    pub fn poll_background_results(&mut self, _ctx: &egui::Context) {
         let Some(bg) = self.bg_renderer.as_ref() else {
             return;
         };
@@ -262,20 +283,12 @@ impl App {
             }
         }
         for (recv_gen, fi, img, off_x, off_y) in received {
-            if recv_gen == current_gen {
-                let img_arc = Arc::new(img);
-                let size = [img_arc.width() as usize, img_arc.height() as usize];
-                let color_image = egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
-                let texture = ctx.load_texture(
-                    format!("cached_frame_{fi}"),
-                    color_image,
-                    egui::TextureOptions::LINEAR,
-                );
+            if recv_gen == current_gen && !self.frame_cache.contains_key(&fi) {
                 self.insert_cached_frame(
                     fi,
                     FrameCacheEntry {
-                        image: img_arc,
-                        texture: Some(texture),
+                        image: Arc::new(img),
+                        texture: None,
                         offset: (off_x, off_y),
                     },
                 );
@@ -728,5 +741,71 @@ impl App {
 
     pub fn is_loading(&self) -> bool {
         self.bg_loader.as_ref().is_some_and(|l| l.pending > 0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn entry(w: u32, h: u32) -> FrameCacheEntry {
+        FrameCacheEntry {
+            image: Arc::new(image::RgbaImage::new(w, h)),
+            texture: None,
+            offset: (0, 0),
+        }
+    }
+
+    #[test]
+    fn insert_replaces_without_double_counting() {
+        let mut app = App::new(None);
+        app.frame_cache_budget = 1024 * 1024;
+        app.insert_cached_frame(0, entry(10, 10));
+        let after_first = app.frame_cache_bytes;
+        app.insert_cached_frame(0, entry(10, 10));
+        assert_eq!(
+            app.frame_cache_bytes, after_first,
+            "re-inserting the same frame must not double-count its bytes"
+        );
+        assert_eq!(app.frame_cache.len(), 1);
+        assert_eq!(app.frame_cache_order.len(), 1, "no stale deque entries");
+    }
+
+    #[test]
+    fn insert_evicts_oldest_when_over_budget() {
+        let mut app = App::new(None);
+        let per_frame = 10u32 * 10 * 4;
+        app.frame_cache_budget = per_frame as usize * 3;
+        for i in 0..10 {
+            app.insert_cached_frame(i, entry(10, 10));
+        }
+        assert!(app.frame_cache_bytes <= app.frame_cache_budget);
+        assert_eq!(app.frame_cache.len(), 3, "only the 3 most recent fit");
+        for i in 0..7 {
+            assert!(
+                !app.frame_cache.contains_key(&i),
+                "frame {i} should have been evicted"
+            );
+        }
+        for i in 7..10 {
+            assert!(app.frame_cache.contains_key(&i));
+        }
+    }
+
+    #[test]
+    fn reinsert_after_eviction_stays_accounted() {
+        let mut app = App::new(None);
+        let per_frame = 10u32 * 10 * 4;
+        app.frame_cache_budget = per_frame as usize * 3;
+        for i in 0..10 {
+            app.insert_cached_frame(i, entry(10, 10));
+        }
+        app.insert_cached_frame(0, entry(10, 10));
+        assert_eq!(app.frame_cache.len(), 3);
+        assert!(
+            app.frame_cache_bytes <= app.frame_cache_budget,
+            "bytes must stay within budget after re-inserting an evicted frame"
+        );
+        assert!(app.frame_cache.contains_key(&0));
     }
 }

@@ -8,7 +8,7 @@ Rust rewrite of a JS-based Don't Starve Together (DST) animation file extraction
 
 ```
 cargo build          # compile
-cargo test           # run all tests (106 per-module #[test])
+cargo test           # run all tests (115 per-module #[test])
 cargo clippy         # lint — run before committing
 cargo fmt            # format — run before committing
 cargo fmt -- --check # format check (non-destructive)

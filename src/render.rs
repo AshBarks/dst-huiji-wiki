@@ -595,6 +595,29 @@ fn render_into(
                 for cy in y_start..y_end {
                     let oy = (cy - dest_y) as f32;
                     let py = oy + min_cy;
+                    let src_y_edge_l =
+                        (x_start as f32 - dest_x as f32 + min_cx) * inv_b + py * inv_d - dy;
+                    let src_y_edge_r =
+                        (x_end as f32 - dest_x as f32 + min_cx) * inv_b + py * inv_d - dy;
+                    let mut sy_lo = src_y_edge_l.min(src_y_edge_r).round() as i64 - 1;
+                    let mut sy_hi = src_y_edge_l.max(src_y_edge_r).round() as i64 + 1;
+                    if sy_hi < 0 || sy_lo >= sh as i64 {
+                        continue;
+                    }
+                    if let Some(spans) = &elem.spans {
+                        sy_lo = sy_lo.max(0);
+                        sy_hi = sy_hi.min(sh as i64 - 1);
+                        let mut any_content = false;
+                        for s in sy_lo..=sy_hi {
+                            if spans.rows[s as usize].is_some() {
+                                any_content = true;
+                                break;
+                            }
+                        }
+                        if !any_content {
+                            continue;
+                        }
+                    }
                     let dst_row = (cy - row_base) as usize * cw * 4;
                     let mut src_x =
                         (x_start as f32 - dest_x as f32 + min_cx) * inv_a + py * inv_c - dx;

@@ -147,6 +147,7 @@ zip = "2"
 - `render_frame_with_elements()`：直接使用预计算数据，跳过 symbol 查找
 - `composite_pixel`：`src_a == 0` / `src_a == 255` / `dst_a == 0` 快速路径
 - 仿射变换：恒等变换快速路径 + 均匀缩放路径 + 通用路径
+- 通用路径按行做 span 预拒绝：逆映射该行两端源 y 坐标，整行对应源行全部透明时跳过（避免大旋转精灵的无效扫描）
 
 ### 阶段 7 — CLI 串联 ✅
 
@@ -177,9 +178,11 @@ dst-anim-tool preview [-i <input>...]
 
 **关键实现点**：
 - `PreparedFrame` move 到线程，避免 clone 整个 `BuildFile` + `AnimFile`
-- 后台渲染线程 + mpsc 通道异步传回帧图像
+- 后台渲染线程 + mpsc 通道异步传回帧图像（只渲染缺失帧，避免重复渲染）
 - 帧缓存 `HashMap<usize, FrameCacheEntry>` 含 CPU image + GPU texture
-- rayon `par_iter` 并行渲染导出帧
+- **缓存预算自适应动画规模**：按每帧 snapped 边界精确求和，`clamp(总占用, 512MB, 1536MB)`，保证整段动画可驻留缓存
+- egui 纹理**延迟创建**：后台只缓存图像，纹理在帧首次显示时创建，避免一次性大规模 GPU 上传阻塞 UI
+- 帧图像按需替换（字节账目正确、LRU 队列去重），重复播放 loop 2+ 全部命中缓存，无主线程重渲染
 
 ---
 
@@ -187,7 +190,7 @@ dst-anim-tool preview [-i <input>...]
 
 | 层级 | 方式 | 说明 |
 |------|------|------|
-| 单元测试 | `#[test]` 在各模块（63 个） | 读写器、哈希、DXT 解码、枚举转换、XOR 往返、GIF 量化 |
+| 单元测试 | `#[test]` 在各模块（115 个） | 读写器、哈希、DXT 解码、枚举转换、XOR 往返、GIF 量化、帧缓存账目 |
 | 集成测试 | 模块内 `#[test]` 用真实文件 | 用 `data/` 中的 .zip/.dyn 端到端验证 |
 | 样本数据 | `data/` 目录（gitignored） | 符号链接到 DST 游戏文件 |
 

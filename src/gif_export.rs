@@ -25,51 +25,83 @@ pub fn export_gif_with_bg(
 
     let max_width = frames.iter().map(|f| f.width()).max().unwrap_or(1);
     let max_height = frames.iter().map(|f| f.height()).max().unwrap_or(1);
-    let width = max_width as u16;
-    let height = max_height as u16;
-    let frame_delay = (100.0 / frame_rate).round().max(1.0) as u16;
-
-    let mut encoder = gif::Encoder::new(output, width, height, &[])?;
-    encoder.set_repeat(gif::Repeat::Infinite)?;
-
-    let mut quantize_ctx = QuantizeContext::new();
-
+    let mut writer = GifWriter::new(output, max_width as u16, max_height as u16, frame_rate, bg)?;
     for frame in frames {
-        let mut pixels: Vec<u8> =
-            Vec::with_capacity((max_width as usize) * (max_height as usize) * 4);
+        writer.write_frame(frame, 0, 0)?;
+    }
+    Ok(())
+}
+
+pub struct GifWriter<W: Write> {
+    encoder: gif::Encoder<W>,
+    quantize_ctx: QuantizeContext,
+    width: u16,
+    height: u16,
+    frame_delay: u16,
+    bg: [u8; 3],
+    pixels: Vec<u8>,
+}
+
+impl<W: Write> GifWriter<W> {
+    pub fn new(output: W, width: u16, height: u16, frame_rate: f32, bg: [u8; 3]) -> Result<Self> {
+        let frame_delay = (100.0 / frame_rate).round().max(1.0) as u16;
+        let mut encoder = gif::Encoder::new(output, width, height, &[])?;
+        encoder.set_repeat(gif::Repeat::Infinite)?;
+        Ok(Self {
+            encoder,
+            quantize_ctx: QuantizeContext::new(),
+            width,
+            height,
+            frame_delay,
+            bg,
+            pixels: Vec::new(),
+        })
+    }
+
+    pub fn write_frame(&mut self, frame: &image::RgbaImage, off_x: i64, off_y: i64) -> Result<()> {
+        let max_width = self.width as usize;
+        let max_height = self.height as usize;
+        self.pixels.clear();
         let fw = frame.width() as usize;
         let fh = frame.height() as usize;
         let raw: &[u8] = frame.as_raw();
+        let off_x = off_x.max(0) as usize;
+        let off_y = off_y.max(0) as usize;
 
-        for y in 0..max_height as usize {
-            if y < fh {
-                let row_start = y * fw * 4;
-                let row_end = row_start + fw * 4;
-                pixels.extend_from_slice(&raw[row_start..row_end]);
-                let remaining = (max_width as usize - fw) * 4;
-                pixels.extend(std::iter::repeat_n(0, remaining));
+        for y in 0..max_height {
+            if y >= off_y && y < off_y + fh {
+                let fy = y - off_y;
+                let x_off = off_x.min(max_width);
+                let copy_w = fw.min(max_width - x_off);
+                if x_off > 0 {
+                    self.pixels.extend(std::iter::repeat_n(0, x_off * 4));
+                }
+                let row_start = fy * fw * 4;
+                self.pixels
+                    .extend_from_slice(&raw[row_start..row_start + copy_w * 4]);
+                let remaining = max_width - x_off - copy_w;
+                self.pixels.extend(std::iter::repeat_n(0, remaining * 4));
             } else {
-                pixels.extend(std::iter::repeat_n(0, max_width as usize * 4));
+                self.pixels.extend(std::iter::repeat_n(0, max_width * 4));
             }
         }
 
-        let (palette, indices) = quantize_ctx.quantize(&pixels, bg);
+        let (palette, indices) = self.quantize_ctx.quantize(&self.pixels, self.bg);
 
         let gif_frame = gif::Frame {
-            width,
-            height,
+            width: self.width,
+            height: self.height,
             buffer: std::borrow::Cow::Owned(indices),
             palette: Some(palette),
             transparent: Some(0),
-            delay: frame_delay,
+            delay: self.frame_delay,
             dispose: gif::DisposalMethod::Background,
             ..Default::default()
         };
 
-        encoder.write_frame(&gif_frame)?;
+        self.encoder.write_frame(&gif_frame)?;
+        Ok(())
     }
-
-    Ok(())
 }
 
 const TRANSPARENT_ALPHA_THRESHOLD: u8 = 128;

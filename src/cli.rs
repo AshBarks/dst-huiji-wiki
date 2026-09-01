@@ -2,6 +2,7 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use clap::Subcommand;
+use rayon::prelude::*;
 
 #[derive(clap::Parser)]
 #[command(name = "dst-anim-tool", about = "DST animation file extraction tool")]
@@ -147,7 +148,7 @@ fn write_symbol_frames(
     let sym_dir = output_dir.join(&safe_name);
     std::fs::create_dir_all(&sym_dir)?;
     for frame in &symbol.frames {
-        if let Some(img) = frame.image_ref() {
+        if let Some(img) = dst_anim_tool::atlas::rebuild_frame_canvas(frame) {
             let out_path = sym_dir.join(format!("frame_{}.png", frame.frame_num));
             img.save(&out_path).map_err(|e| {
                 dst_anim_tool::error::Error::Io(std::io::Error::other(e.to_string()))
@@ -289,8 +290,11 @@ fn cmd_render(
         &HashSet::new(),
     );
 
-    for (i, pf) in prepared.iter().enumerate() {
-        if let Some(pf) = pf {
+    prepared.par_iter().enumerate().try_for_each(
+        |(i, pf)| -> dst_anim_tool::error::Result<()> {
+            let Some(pf) = pf else {
+                return Ok(());
+            };
             let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
             if let Some(rendered) = dst_anim_tool::render::render_frame_with_elements(
                 &pf.elements,
@@ -304,8 +308,9 @@ fn cmd_render(
                 })?;
                 println!("{}", out_path.display());
             }
-        }
-    }
+            Ok(())
+        },
+    )?;
     Ok(())
 }
 

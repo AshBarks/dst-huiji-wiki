@@ -19,6 +19,18 @@ pub struct BuildAtlasRef {
     pub name: String,
 }
 
+#[derive(Clone, Copy)]
+pub struct RowSpan {
+    pub start: usize,
+    pub end: usize,
+    pub opaque: bool,
+}
+
+pub struct SpriteSpans {
+    pub rows: Box<[Option<RowSpan>]>,
+    pub fully_opaque: bool,
+}
+
 #[derive(Clone)]
 pub struct BuildFrame {
     pub frame_num: u32,
@@ -28,6 +40,11 @@ pub struct BuildFrame {
     pub height: f32,
     pub verts: Vec<BuildVert>,
     pub image: Option<Arc<image::RgbaImage>>,
+    pub dest_x: i64,
+    pub dest_y: i64,
+    pub canvas_w: f32,
+    pub canvas_h: f32,
+    pub spans: Option<Arc<SpriteSpans>>,
 }
 
 impl BuildFrame {
@@ -163,6 +180,11 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
                 height,
                 verts: frame_verts,
                 image: None,
+                dest_x: 0,
+                dest_y: 0,
+                canvas_w: 0.0,
+                canvas_h: 0.0,
+                spans: None,
             });
         }
         frames.sort_by_key(|f| f.frame_num);

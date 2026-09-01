@@ -59,9 +59,12 @@ pub struct App {
     last_frame_time: Instant,
     frame_texture: Option<egui::TextureHandle>,
     rendered_image: Option<Arc<image::RgbaImage>>,
+    frame_offset: (i64, i64),
     needs_re_render: bool,
     error_message: Option<String>,
     frame_cache: HashMap<usize, FrameCacheEntry>,
+    frame_cache_bytes: usize,
+    frame_cache_order: std::collections::VecDeque<usize>,
     cache_gen: u64,
     cache_anim_key: (usize, usize, usize),
     cache_dirty: bool,
@@ -92,9 +95,12 @@ impl App {
             last_frame_time: Instant::now(),
             frame_texture: None,
             rendered_image: None,
+            frame_offset: (0, 0),
             needs_re_render: false,
             error_message: None,
             frame_cache: HashMap::new(),
+            frame_cache_bytes: 0,
+            frame_cache_order: std::collections::VecDeque::new(),
             cache_gen: 0,
             cache_anim_key: (0, 0, 0),
             cache_dirty: false,
@@ -239,10 +245,10 @@ impl App {
             return;
         }
 
-        let cached_frames: HashMap<usize, Arc<image::RgbaImage>> = self
+        let cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))> = self
             .frame_cache
             .iter()
-            .map(|(&fi, entry)| (fi, entry.image.clone()))
+            .map(|(&fi, entry)| (fi, (entry.image.clone(), entry.offset)))
             .collect();
 
         let receiver = export::start_gif_export_thread(
@@ -295,10 +301,10 @@ impl App {
             return;
         }
 
-        let cached_frames: HashMap<usize, Arc<image::RgbaImage>> = self
+        let cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))> = self
             .frame_cache
             .iter()
-            .map(|(&fi, entry)| (fi, entry.image.clone()))
+            .map(|(&fi, entry)| (fi, (entry.image.clone(), entry.offset)))
             .collect();
 
         let receiver = export::start_png_export_thread(
@@ -371,6 +377,10 @@ impl eframe::App for App {
                 }
             }
             ctx.request_repaint();
+        }
+
+        if self.bg_renderer.is_some() || self.is_loading() {
+            ctx.request_repaint_after(Duration::from_millis(33));
         }
 
         if self.needs_re_render {

@@ -2,17 +2,22 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use rayon::prelude::*;
+
 use dst_anim_tool::archive::{BinType, parse_dyn, parse_zip};
 use dst_anim_tool::atlas::gather_atlas_images;
 use dst_anim_tool::ktex::parse_ktex;
-use dst_anim_tool::render::{render_frame, render_frame_with_elements};
+use dst_anim_tool::render::{render_frame_with_elements, render_frame_with_elements_par};
 
 use super::{AnimEntry, App, AtlasEntry, BuildEntry, TexMeta};
 
 pub struct FrameCacheEntry {
     pub image: Arc<image::RgbaImage>,
     pub texture: Option<egui::TextureHandle>,
+    pub offset: (i64, i64),
 }
+
+const FRAME_CACHE_BUDGET_BYTES: usize = 512 * 1024 * 1024;
 
 pub struct LoadedData {
     pub canonical: PathBuf,
@@ -37,7 +42,7 @@ pub struct BackgroundLoader {
 }
 
 pub struct BackgroundRenderer {
-    pub receiver: std::sync::mpsc::Receiver<(u64, usize, image::RgbaImage)>,
+    pub receiver: std::sync::mpsc::Receiver<(u64, usize, image::RgbaImage, i64, i64)>,
     pub stop_flag: Arc<std::sync::atomic::AtomicBool>,
     _thread_handle: Option<std::thread::JoinHandle<()>>,
 }
@@ -115,12 +120,31 @@ impl App {
     pub fn invalidate_cache(&mut self) {
         self.cache_gen = self.cache_gen.wrapping_add(1);
         self.frame_cache.clear();
+        self.frame_cache_order.clear();
+        self.frame_cache_bytes = 0;
         self.animation_bounds = None;
         if let Some(bg) = self.bg_renderer.as_mut() {
             bg.stop();
         }
         self.cache_dirty = false;
         self.needs_re_render = true;
+    }
+
+    fn insert_cached_frame(&mut self, fi: usize, entry: FrameCacheEntry) {
+        let bytes = entry.image.width() as usize * entry.image.height() as usize * 4;
+        self.frame_cache.insert(fi, entry);
+        self.frame_cache_order.push_back(fi);
+        self.frame_cache_bytes += bytes;
+        while self.frame_cache_bytes > FRAME_CACHE_BUDGET_BYTES
+            && self.frame_cache.len() > 1
+            && let Some(old) = self.frame_cache_order.pop_front()
+        {
+            if let Some(old_entry) = self.frame_cache.remove(&old) {
+                let old_bytes =
+                    old_entry.image.width() as usize * old_entry.image.height() as usize * 4;
+                self.frame_cache_bytes = self.frame_cache_bytes.saturating_sub(old_bytes);
+            }
+        }
     }
 
     pub fn current_cache_key(&self) -> (usize, usize, usize) {
@@ -183,24 +207,35 @@ impl App {
         let start_frame = (self.active_frame_idx + 1) % total_frames;
         let stop_flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let stop_flag_clone = stop_flag.clone();
-        let (sender, receiver) = std::sync::mpsc::channel::<(u64, usize, image::RgbaImage)>();
+        let (sender, receiver) =
+            std::sync::mpsc::channel::<(u64, usize, image::RgbaImage, i64, i64)>();
 
         let handle = std::thread::spawn(move || {
-            for offset in 0..total_frames {
-                if stop_flag_clone.load(std::sync::atomic::Ordering::Relaxed) {
-                    return;
-                }
-                let fi = (start_frame + offset) % total_frames;
-                if let Some(pf) = &prepared.get(fi).and_then(|p| p.as_ref()) {
-                    let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
-                    if let Some(rendered) =
-                        render_frame_with_elements(&pf.elements, render_bounds, 1.0, (0.0, 0.0))
-                        && sender.send((cache_gen_val, fi, rendered.image)).is_err()
-                    {
-                        return;
+            (0..total_frames)
+                .into_par_iter()
+                .map(|offset| (start_frame + offset) % total_frames)
+                .take_any_while(|_| !stop_flag_clone.load(std::sync::atomic::Ordering::Relaxed))
+                .for_each(|fi| {
+                    if let Some(pf) = prepared.get(fi).and_then(|p| p.as_ref()) {
+                        let (render_bounds, off_x, off_y) = match &bounds {
+                            Some(union) => {
+                                let (snapped, ox, oy) =
+                                    dst_anim_tool::render::snap_frame_bounds(&pf.bounds, union);
+                                (snapped, ox, oy)
+                            }
+                            None => (pf.bounds.clone(), 0i64, 0i64),
+                        };
+                        if let Some(rendered) = render_frame_with_elements(
+                            &pf.elements,
+                            &render_bounds,
+                            1.0,
+                            (0.0, 0.0),
+                        ) && sender
+                            .send((cache_gen_val, fi, rendered.image, off_x, off_y))
+                            .is_err()
+                        {}
                     }
-                }
-            }
+                });
         });
 
         self.bg_renderer = Some(BackgroundRenderer {
@@ -215,33 +250,35 @@ impl App {
             return;
         };
         let current_gen = self.cache_gen;
+        let mut received: Vec<(u64, usize, image::RgbaImage, i64, i64)> = Vec::new();
         loop {
             match bg.receiver.try_recv() {
-                Ok((recv_gen, fi, img)) => {
-                    if recv_gen == current_gen {
-                        let img_arc = Arc::new(img);
-                        let size = [img_arc.width() as usize, img_arc.height() as usize];
-                        let color_image =
-                            egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
-                        let texture = ctx.load_texture(
-                            format!("cached_frame_{fi}"),
-                            color_image,
-                            egui::TextureOptions::LINEAR,
-                        );
-                        self.frame_cache.insert(
-                            fi,
-                            FrameCacheEntry {
-                                image: img_arc,
-                                texture: Some(texture),
-                            },
-                        );
-                    }
-                }
+                Ok(item) => received.push(item),
                 Err(std::sync::mpsc::TryRecvError::Empty) => break,
                 Err(std::sync::mpsc::TryRecvError::Disconnected) => {
                     self.bg_renderer = None;
                     break;
                 }
+            }
+        }
+        for (recv_gen, fi, img, off_x, off_y) in received {
+            if recv_gen == current_gen {
+                let img_arc = Arc::new(img);
+                let size = [img_arc.width() as usize, img_arc.height() as usize];
+                let color_image = egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
+                let texture = ctx.load_texture(
+                    format!("cached_frame_{fi}"),
+                    color_image,
+                    egui::TextureOptions::LINEAR,
+                );
+                self.insert_cached_frame(
+                    fi,
+                    FrameCacheEntry {
+                        image: img_arc,
+                        texture: Some(texture),
+                        offset: (off_x, off_y),
+                    },
+                );
             }
         }
     }
@@ -273,6 +310,7 @@ impl App {
             if entry.texture.is_some() {
                 self.frame_texture = entry.texture.clone();
                 self.rendered_image = Some(entry.image.clone());
+                self.frame_offset = entry.offset;
                 self.needs_re_render = false;
                 return;
             } else {
@@ -286,6 +324,7 @@ impl App {
                 );
                 self.frame_texture = Some(texture.clone());
                 self.rendered_image = Some(entry.image.clone());
+                self.frame_offset = entry.offset;
                 self.frame_cache
                     .get_mut(&self.active_frame_idx)
                     .unwrap()
@@ -304,14 +343,47 @@ impl App {
             return;
         }
 
-        if let Some(rendered) = render_frame(
+        let elements = dst_anim_tool::render::compute_frame_elements(
             anim_frame,
             &build_list,
             1.0,
-            (0.0, 0.0),
-            self.animation_bounds.as_ref(),
             &self.disabled_elements,
-        ) {
+        );
+        let Some(elements) = elements else {
+            self.frame_texture = None;
+            self.rendered_image = None;
+            self.needs_re_render = false;
+            return;
+        };
+
+        let (render_bounds, offset) = match self.animation_bounds.as_ref() {
+            Some(union) => match dst_anim_tool::render::compute_bounds_from_elements(
+                &elements,
+                1.0,
+                (0.0, 0.0),
+            ) {
+                Some(fb) => {
+                    let (snapped, ox, oy) = dst_anim_tool::render::snap_frame_bounds(&fb, union);
+                    (snapped, (ox, oy))
+                }
+                None => (union.clone(), (0, 0)),
+            },
+            None => {
+                let fb =
+                    dst_anim_tool::render::compute_bounds_from_elements(&elements, 1.0, (0.0, 0.0))
+                        .unwrap_or(dst_anim_tool::render::BoundingBox {
+                            left: 0.0,
+                            top: 0.0,
+                            right: 1.0,
+                            bottom: 1.0,
+                        });
+                (fb, (0, 0))
+            }
+        };
+
+        if let Some(rendered) =
+            render_frame_with_elements_par(&elements, &render_bounds, 1.0, (0.0, 0.0))
+        {
             let img_arc = Arc::new(rendered.image);
             let size = [img_arc.width() as usize, img_arc.height() as usize];
             let color_image = egui::ColorImage::from_rgba_unmultiplied(size, img_arc.as_raw());
@@ -322,11 +394,13 @@ impl App {
             );
             self.frame_texture = Some(texture.clone());
             self.rendered_image = Some(img_arc.clone());
-            self.frame_cache.insert(
+            self.frame_offset = offset;
+            self.insert_cached_frame(
                 self.active_frame_idx,
                 FrameCacheEntry {
                     image: img_arc,
                     texture: Some(texture),
+                    offset,
                 },
             );
         } else {

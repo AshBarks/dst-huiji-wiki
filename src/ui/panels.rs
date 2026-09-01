@@ -683,14 +683,42 @@ impl App {
         egui::CentralPanel::default().show(ctx, |ui| {
             if let Some(texture) = &self.frame_texture {
                 let avail = ui.available_size();
-                let img_size = texture.size_vec2();
-                let scale_x = avail.x / img_size.x;
-                let scale_y = avail.y / img_size.y;
-                let scale = scale_x.min(scale_y).min(1.0);
-                let display_size = img_size * scale;
-                ui.centered_and_justified(|ui| {
-                    ui.image((texture.id(), display_size));
-                });
+                if let Some(bounds) = &self.animation_bounds {
+                    let union_w = (bounds.right - bounds.left).ceil().max(1.0);
+                    let union_h = (bounds.bottom - bounds.top).ceil().max(1.0);
+                    let scale_x = avail.x / union_w;
+                    let scale_y = avail.y / union_h;
+                    let scale = scale_x.min(scale_y).min(1.0);
+                    let size = egui::vec2(union_w * scale, union_h * scale);
+                    ui.centered_and_justified(|ui| {
+                        let (rect, _) = ui.allocate_exact_size(size, egui::Sense::hover());
+                        let img_size = texture.size_vec2();
+                        let pos = rect.min
+                            + egui::vec2(
+                                self.frame_offset.0 as f32 * scale,
+                                self.frame_offset.1 as f32 * scale,
+                            );
+                        let img_rect = egui::Rect::from_min_size(
+                            pos,
+                            egui::vec2(img_size.x * scale, img_size.y * scale),
+                        );
+                        ui.painter().image(
+                            texture.id(),
+                            img_rect,
+                            egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                            egui::Color32::WHITE,
+                        );
+                    });
+                } else {
+                    let img_size = texture.size_vec2();
+                    let scale_x = avail.x / img_size.x;
+                    let scale_y = avail.y / img_size.y;
+                    let scale = scale_x.min(scale_y).min(1.0);
+                    let display_size = img_size * scale;
+                    ui.centered_and_justified(|ui| {
+                        ui.image((texture.id(), display_size));
+                    });
+                }
             } else {
                 ui.centered_and_justified(|ui| {
                     ui.label(

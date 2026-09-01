@@ -1,6 +1,9 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::build_file::{BuildFile, BuildVert};
+use rayon::prelude::*;
+
+use crate::build_file::{BuildFile, BuildFrame, BuildVert, RowSpan, SpriteSpans};
 use crate::error::Result;
 use crate::ktex::parse_ktex;
 
@@ -32,7 +35,12 @@ fn calc_xy_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
     (min_x, max_x, min_y, max_y)
 }
 
-fn paste(canvas: &mut image::RgbaImage, sprite: &image::RgbaImage, dest_x: i64, dest_y: i64) {
+pub(crate) fn paste(
+    canvas: &mut image::RgbaImage,
+    sprite: &image::RgbaImage,
+    dest_x: i64,
+    dest_y: i64,
+) {
     let cw = canvas.width() as usize;
     let ch = canvas.height() as i64;
     let sw = sprite.width() as usize;
@@ -61,8 +69,60 @@ fn paste(canvas: &mut image::RgbaImage, sprite: &image::RgbaImage, dest_x: i64, 
     }
 }
 
+fn compute_spans(img: &image::RgbaImage) -> SpriteSpans {
+    let w = img.width() as usize;
+    let h = img.height() as usize;
+    let raw = img.as_raw();
+    let mut rows = Vec::with_capacity(h);
+    let mut fully_opaque = true;
+    for y in 0..h {
+        let row = &raw[y * w * 4..(y + 1) * w * 4];
+        let mut start = None;
+        let mut end = 0usize;
+        let mut opaque = true;
+        for (x, px) in row.chunks_exact(4).enumerate() {
+            if px[3] != 0 {
+                if start.is_none() {
+                    start = Some(x);
+                }
+                end = x + 1;
+                if px[3] != 255 {
+                    opaque = false;
+                }
+            }
+        }
+        match start {
+            Some(s) => {
+                fully_opaque = fully_opaque && opaque && s == 0 && end == w;
+                rows.push(Some(RowSpan {
+                    start: s,
+                    end,
+                    opaque,
+                }));
+            }
+            None => rows.push(None),
+        }
+    }
+    SpriteSpans {
+        rows: rows.into_boxed_slice(),
+        fully_opaque,
+    }
+}
+
+pub fn rebuild_frame_canvas(frame: &BuildFrame) -> Option<image::RgbaImage> {
+    let sprite = frame.image_ref()?;
+    let mut canvas =
+        image::RgbaImage::new(frame.canvas_w.round() as u32, frame.canvas_h.round() as u32);
+    paste(&mut canvas, sprite, frame.dest_x, frame.dest_y);
+    Some(canvas)
+}
+
 pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]) -> Result<()> {
-    for symbol in &mut build.symbols {
+    type CropKey = (u32, u32, u32, u32, u32, u32, u32);
+    type CropEntry = (Arc<image::RgbaImage>, Arc<SpriteSpans>);
+    let crop_cache: std::sync::Mutex<HashMap<CropKey, CropEntry>> =
+        std::sync::Mutex::new(HashMap::new());
+    build.symbols.par_iter_mut().for_each(|symbol| {
         for frame in &mut symbol.frames {
             let verts = &frame.verts;
             if verts.is_empty() || verts.len() < 6 {
@@ -92,33 +152,53 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]
                 continue;
             }
 
-            let mut sprite =
-                image::imageops::crop_imm(atlas_img, src_x, src_y, src_w, src_h).to_image();
-
             let expected_w = (max_x - min_x).round().max(1.0) as u32;
             let expected_h = (max_y - min_y).round().max(1.0) as u32;
-            if sprite.width() != expected_w || sprite.height() != expected_h {
-                sprite = image::imageops::resize(
-                    &sprite,
-                    expected_w,
-                    expected_h,
-                    image::imageops::FilterType::Triangle,
-                );
-            }
+
+            let key = (
+                atlas_idx as u32,
+                src_x,
+                src_y,
+                src_w,
+                src_h,
+                expected_w,
+                expected_h,
+            );
+            let entry = if let Some(cached) = crop_cache.lock().unwrap().get(&key) {
+                cached.clone()
+            } else {
+                let mut sprite =
+                    image::imageops::crop_imm(atlas_img, src_x, src_y, src_w, src_h).to_image();
+                if sprite.width() != expected_w || sprite.height() != expected_h {
+                    sprite = image::imageops::resize(
+                        &sprite,
+                        expected_w,
+                        expected_h,
+                        image::imageops::FilterType::Triangle,
+                    );
+                }
+                let spans = compute_spans(&sprite);
+                let pair = (Arc::new(sprite), Arc::new(spans));
+                let mut cache = crop_cache.lock().unwrap();
+                cache.entry(key).or_insert_with(|| pair.clone()).clone()
+            };
 
             let pivot_x = frame.x - (frame.width / 2.0).floor();
             let pivot_y = frame.y - (frame.height / 2.0).floor();
             let dest_x = (min_x - pivot_x).round() as i64;
             let dest_y = (min_y - pivot_y).round() as i64;
 
-            let canvas_w = frame.width.round().max(1.0) as u32;
-            let canvas_h = frame.height.round().max(1.0) as u32;
-            let mut canvas = image::RgbaImage::new(canvas_w, canvas_h);
-            paste(&mut canvas, &sprite, dest_x, dest_y);
+            let canvas_w = frame.width.round().max(1.0);
+            let canvas_h = frame.height.round().max(1.0);
 
-            frame.image = Some(Arc::new(canvas));
+            frame.image = Some(entry.0.clone());
+            frame.spans = Some(entry.1.clone());
+            frame.dest_x = dest_x;
+            frame.dest_y = dest_y;
+            frame.canvas_w = canvas_w;
+            frame.canvas_h = canvas_h;
         }
-    }
+    });
     Ok(())
 }
 
@@ -317,6 +397,11 @@ mod tests {
                     height: 10.0,
                     verts: Vec::new(),
                     image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
                 }],
                 frame_index: HashMap::new(),
             }],
@@ -354,6 +439,11 @@ mod tests {
                     height: 10.0,
                     verts,
                     image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
                 }],
                 frame_index: HashMap::new(),
             }],

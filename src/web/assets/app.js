@@ -54,6 +54,10 @@ async function render(path) {
     await loadMeta();
     const found = routes.find(([seg]) => seg === head) || routes[0];
     main.innerHTML = "";
+    if (head === "jobs") {
+      const [, id] = path.split("/");
+      if (id) { await pageJobDetail(main, id); return; }
+    }
     await found[2](main, path);
   } catch (e) {
     main.innerHTML = `<div class="panel" style="color:var(--err)">加载失败：${esc(e.message)}</div>`;
@@ -166,13 +170,13 @@ const JOB_FIELDS = {
   "map_recipes": [["input", "recipes.lua 路径"], ["po_file", "PO 文件（可选）"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
   "maintain_item_table": [],
   "maintain_dst_recipes": [],
-  "maintain_copyclip": [["type", "类型：rbtl / tech / filters / names（留空=全部）"]],
+  "maintain_copy_clip": [["type", "类型：rbtl / tech / filters / names（留空=全部）"]],
   "prefab_overrides": [["input", "Lua 文件路径"]],
 };
 const JOB_LABELS = {
   parse_po: "parse-po 解析 PO", map_names: "map-names 名称映射", map_recipes: "map-recipes 配方映射",
   maintain_item_table: "维护物品表 → 维基", maintain_dst_recipes: "维护配方表 → 维基",
-  maintain_copyclip: "维护模块常量 → 维基", prefab_overrides: "预制体重定向解析",
+  maintain_copy_clip: "维护模块常量 → 维基", prefab_overrides: "预制体重定向解析",
 };
 
 async function pageJobs(main) {

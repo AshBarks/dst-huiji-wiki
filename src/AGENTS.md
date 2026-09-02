@@ -40,6 +40,12 @@ src/
 │   └── config.rs         # TOML config for module constants
 ├── scripts_sync/         # scripts.zip 同步 (update_scripts.py 移植)
 │   ├── mod.rs            # sync(): 版本检测→staging 解压→快照归档→版本记录
+│   ├── images/           # 图片管线 images-sync: 两源盘点→解压→内置解码→切割→差异历史
+│   │   ├── mod.rs        # run() 编排 + ImagesSyncParams + 对账清理
+│   │   ├── scan.rs       # zip+loose 两源扫描 → 合并视图 (xml↔tex 联接)
+│   │   ├── ktex.rs       # KTEX 容器解析 + DXT1/3/5/RGB 解码(texpresso) + 反预乘
+│   │   ├── split.rs      # ktools atlas XML 解析 + UV 裁剪 (v 轴翻转)
+│   │   └── history.rs    # CAS 对象仓 + manifest + diff 纯函数
 │   └── state.rs          # dst_version.txt 状态文件 + 版本对比纯函数
 ├── context.rs            # DstContext (lazy ZIP archive + wiki client + env)
 ├── error.rs              # Error enum (14 variants) + Result<T> alias

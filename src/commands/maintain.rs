@@ -147,6 +147,19 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::ImagesSync {
+            force,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::ImagesSync { force, dry_run },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
         Commands::CorpusFetch {
             full,
             dir,

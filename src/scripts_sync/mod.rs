@@ -10,9 +10,10 @@
 //! 4. move the staged tree into place (rolling back the rename on failure),
 //!    then record the new version in the state file
 //!
-//! The image pipeline (`images.zip` / ktech / atlas splitting) is
-//! intentionally not ported.
+//! The image pipeline (images.zip / built-in KTEX decode / atlas splitting)
+//! lives in the [`images`] submodule (`images-sync`).
 
+pub mod images;
 pub mod state;
 
 use crate::error::{Error, Result};
@@ -163,7 +164,7 @@ pub fn sync(params: &SyncParams, reporter: &dyn Reporter) -> Result<serde_json::
 }
 
 /// Reads `<dst_root>/version.txt` (written by the game updater).
-fn read_new_version(dst_root: &Path) -> Result<String> {
+pub fn read_new_version(dst_root: &Path) -> Result<String> {
     let path = dst_root.join("version.txt");
     std::fs::read_to_string(&path)
         .map_err(|e| {

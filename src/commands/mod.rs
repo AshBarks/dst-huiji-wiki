@@ -111,6 +111,18 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地操作)
+    ImagesSync {
+        /// 忽略增量与幂等检查,全量重跑
+        #[arg(long)]
+        force: bool,
+        /// 只盘点并报告计划,不写任何文件
+        #[arg(long)]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
     CorpusFetch {
         /// 忽略增量对账，全量重抓所有页面
@@ -331,6 +343,7 @@ impl Commands {
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
+            Commands::ImagesSync { .. } => "images-sync",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",
@@ -594,6 +607,48 @@ mod tests {
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected ScriptsSync command"),
+        }
+    }
+
+    #[test]
+    fn test_images_sync_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "images-sync"]).unwrap();
+        match args.command {
+            Commands::ImagesSync {
+                force,
+                dry_run,
+                report_json,
+            } => {
+                assert!(!force);
+                assert!(!dry_run);
+                assert!(report_json.is_none());
+            }
+            _ => panic!("Expected ImagesSync command"),
+        }
+    }
+
+    #[test]
+    fn test_images_sync_command_with_flags() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "images-sync",
+            "--force",
+            "--dry-run",
+            "--report-json",
+            "report.json",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::ImagesSync {
+                force,
+                dry_run,
+                report_json,
+            } => {
+                assert!(force);
+                assert!(dry_run);
+                assert_eq!(report_json, Some(PathBuf::from("report.json")));
+            }
+            _ => panic!("Expected ImagesSync command"),
         }
     }
 

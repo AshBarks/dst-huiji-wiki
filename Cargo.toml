@@ -17,6 +17,11 @@ tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.13", features = ["json", "cookies", "query", "form"] }
 dotenvy = "0.15"
 zip = "8"
+# 图片管线:PNG 解码/裁剪(split) + KTEX 容器解码(内置 ktech 等价实现) + atlas XML 布局解析
+image = { version = "0.25", default-features = false, features = ["png"] }
+roxmltree = "0.20"
+# libsquish 的纯 Rust 移植(MIT):KTEX 的 DXT1/3/5 块解码
+texpresso = "2"
 toml = { version = "0.8", features = ["parse", "display"] }
 similar = "3"
 regex = "1"

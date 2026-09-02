@@ -138,6 +138,17 @@ pub enum JobKind {
         #[serde(default)]
         state_path: Option<String>,
     },
+    /// 处理游戏图片资源（scripts-sync 的图片下半段）：两源盘点 → 解压
+    /// images.zip → 内置 KTEX 解码（ktex-rs）→ 按 xml 切割，最终产物入
+    /// 差异历史。纯本地操作，无 wiki 流量。
+    ImagesSync {
+        /// 忽略增量与幂等检查，全量重跑。
+        #[serde(default)]
+        force: bool,
+        /// 只盘点并报告计划，不写任何文件。
+        #[serde(default)]
+        dry_run: bool,
+    },
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
@@ -353,6 +364,7 @@ impl JobKind {
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
+            JobKind::ImagesSync { .. } => "images-sync",
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
@@ -490,6 +502,7 @@ async fn execute_job_inner(
             dry_run,
             state_path,
         } => run_scripts_sync(*force, *dry_run, state_path.as_deref(), reporter).await,
+        JobKind::ImagesSync { force, dry_run } => run_images_sync(*force, *dry_run, reporter).await,
         JobKind::CorpusSync { full, dir, rc } => {
             run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
         }
@@ -1457,6 +1470,30 @@ async fn run_scripts_sync(
         &crate::scripts_sync::SyncParams {
             dst_root,
             state_path: state_path.map(PathBuf::from),
+            force,
+            dry_run,
+        },
+        reporter,
+    )
+}
+
+/// `images-sync`: process the game image pipeline. Local-only; never
+/// touches the wiki.
+async fn run_images_sync(
+    force: bool,
+    dry_run: bool,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let dst_root = std::env::var("DST__ROOT")
+        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let out_dir = std::env::var("KTOOLS__OUT_DIR")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(PathBuf::from);
+    crate::scripts_sync::images::run(
+        &crate::scripts_sync::images::ImagesSyncParams {
+            dst_root,
+            out_dir,
             force,
             dry_run,
         },

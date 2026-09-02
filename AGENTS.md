@@ -46,9 +46,9 @@ dst-huiji-wiki/
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs |
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
-| Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; images/ktech flow not ported |
+| Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
-| Add environment config | `.env.example` → `.env` | HUIJI__* and DST__ROOT vars |
+| Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync) vars |
 
 ## CODE MAP
 
@@ -70,6 +70,8 @@ dst-huiji-wiki/
 | `TechReport` | Struct | src/models/tech_report.rs | Compares parsed vs wiki tech levels |
 | `Error` | Enum | src/error.rs | 14 variants (Io, PoParse, Http, WikiApi, Zip, etc.) |
 | `SyncParams` / `sync()` | Struct / Fn | src/scripts_sync/mod.rs | scripts.zip 同步入口:版本检测→staging 解压→快照归档→版本记录 |
+| `images::run()` / `ImagesSyncParams` | Fn / Struct | src/scripts_sync/images/mod.rs | 图片管线 images-sync:两源盘点→解压 images.zip→内置 KTEX 解码(ktex-rs)→xml 切割;最终产物入 CAS 差异历史 |
+| `ObjectStore` / `Manifest` / `diff_final_maps` | Struct / Fn | src/scripts_sync/images/history.rs | 内容寻址对象仓 + 每 build 全量清单 + 相邻 diff 纯函数 |
 
 ## CONVENTIONS
 - **Edition 2021**, stable Rust only, no nightly features

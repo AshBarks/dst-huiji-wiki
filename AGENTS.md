@@ -31,7 +31,7 @@ Modules (all in `src/`):
 | `xor.rs` | XOR stream cipher — key `[141..148]`, permutation `[5,3,6,7,4,2,0,1]`, sequential block processing |
 | `ktex.rs` | KTEX texture — PreCave/PostCave spec bit fields, hand-rolled DXT1/3/5 → RGBA decode with bulk row copy for full blocks |
 | `anim.rs` | anim.bin parser — pre-scan to locate hash table, then full parse |
-| `build_file.rs` | build.bin parser — two-pass: skip symbols → read verts → re-read symbols; `BuildSymbol.frame_index` for O(1) frame lookup |
+| `build_file.rs` | build.bin parser — two-pass: skip symbols → read verts → re-read symbols; `BuildSymbol.frame_for_anim_frame()` for duration-range frame lookup |
 | `archive.rs` | .zip/.dyn dispatcher — .dyn detection (first 2 bytes != "PK"), XOR decrypt then unzip; `Arc<Vec<u8>>` shared tex data; `OnceCell`-cached `tex_files()` |
 | `atlas.rs` | splitAtlas — UV→pixel crop, V-flip (`srcY = (1-maxV)*h`), 6-vert groups, pivot-centered paste |
 | `render.rs` | Frame composition — zIndex-sorted element overlay with 2×2 transform matrix; pre-computed `ElementData` + `PreparedFrame` for batch rendering |
@@ -68,6 +68,6 @@ Modules (all in `src/`):
 - `un_premultiply_alpha` uses integer `div_ceil()` instead of float division
 - GIF quantization uses `QuantizeContext` with `Box<[u16; 64³]>` lookup table, reused across frames
 - `Ktex::to_image_rgba()` directly produces `image::RgbaImage` (no intermediate custom struct)
-- `BuildSymbol.frame_index: HashMap<u32, usize>` provides O(1) frame lookup in render hot path
+- `BuildSymbol.frame_for_anim_frame()` matches the JS `getFrame` semantics: a build frame covers anim frames `[frame_num, frame_num + duration - 1]` — exact match via `frame_index: HashMap<u32, usize>` first, then binary search (`partition_point`) on frames sorted by frame_num; discarding `duration` caused intermittent missing fx symbols (e.g. `p3_fx_ball_centre`)
 - `Error` enum uses specific variants (`MissingCompanion`, `MissingData`, `InvalidValue`) instead of generic `UnknownFormat`
 - UI background render / GIF export move `PreparedFrame` data to threads instead of cloning entire `BuildFile` + `AnimFile`

@@ -391,6 +391,7 @@ mod tests {
                 name: "empty_sym".into(),
                 frames: vec![BuildFrame {
                     frame_num: 0,
+                    duration: 1,
                     x: 0.0,
                     y: 0.0,
                     width: 10.0,
@@ -433,6 +434,7 @@ mod tests {
                 name: "bad_idx".into(),
                 frames: vec![BuildFrame {
                     frame_num: 0,
+                    duration: 1,
                     x: 0.0,
                     y: 0.0,
                     width: 10.0,

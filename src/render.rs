@@ -34,9 +34,9 @@ fn find_symbol_frame<'a>(
         }
         if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower)
             && let Some(symbol) = br.build.symbols.get(sym_idx)
-            && let Some(&fi) = symbol.frame_index.get(&frame_num)
+            && let Some(frame) = symbol.frame_for_anim_frame(frame_num)
         {
-            return Some(&symbol.frames[fi]);
+            return Some(frame);
         }
     }
     None
@@ -696,6 +696,7 @@ mod tests {
                 name: symbol_name.into(),
                 frames: vec![BuildFrame {
                     frame_num,
+                    duration: 1,
                     x: 0.0,
                     y: 0.0,
                     width: sprite_w,
@@ -1603,6 +1604,7 @@ mod tests {
                     name: "s1".into(),
                     frames: vec![BuildFrame {
                         frame_num: 0,
+                        duration: 1,
                         x: 5.0,
                         y: 5.0,
                         width: 10.0,
@@ -1621,6 +1623,7 @@ mod tests {
                     name: "s2".into(),
                     frames: vec![BuildFrame {
                         frame_num: 0,
+                        duration: 1,
                         x: 5.0,
                         y: 5.0,
                         width: 10.0,

@@ -34,6 +34,7 @@ pub struct SpriteSpans {
 #[derive(Clone)]
 pub struct BuildFrame {
     pub frame_num: u32,
+    pub duration: u32,
     pub x: f32,
     pub y: f32,
     pub width: f32,
@@ -58,6 +59,19 @@ pub struct BuildSymbol {
     pub name: String,
     pub frames: Vec<BuildFrame>,
     pub frame_index: HashMap<u32, usize>,
+}
+
+impl BuildSymbol {
+    pub fn frame_for_anim_frame(&self, frame_num: u32) -> Option<&BuildFrame> {
+        if let Some(&fi) = self.frame_index.get(&frame_num) {
+            return Some(&self.frames[fi]);
+        }
+        let idx = self.frames.partition_point(|f| f.frame_num <= frame_num);
+        self.frames[..idx]
+            .iter()
+            .rev()
+            .find(|f| frame_num < f.frame_num + f.duration)
+    }
 }
 
 #[derive(Clone)]
@@ -148,7 +162,7 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
         let mut frames = Vec::with_capacity(frame_count as usize);
         for _ in 0..frame_count {
             let frame_num = reader.read_le_u32()?;
-            let _duration = reader.read_le_u32()?;
+            let duration = reader.read_le_u32()?;
             let pivot_x = reader.read_le_f32()?;
             let pivot_y = reader.read_le_f32()?;
             let width = reader.read_le_f32()?;
@@ -174,6 +188,7 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
                 .collect();
             frames.push(BuildFrame {
                 frame_num,
+                duration,
                 x: pivot_x,
                 y: pivot_y,
                 width,
@@ -370,6 +385,136 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn frame_for_anim_frame_exact_match() {
+        let symbol = BuildSymbol {
+            name: "sym".into(),
+            frames: vec![
+                BuildFrame {
+                    frame_num: 4,
+                    duration: 4,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
+                },
+                BuildFrame {
+                    frame_num: 20,
+                    duration: 2,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
+                },
+            ],
+            frame_index: HashMap::from([(4, 0), (20, 1)]),
+        };
+        assert_eq!(symbol.frame_for_anim_frame(4).unwrap().frame_num, 4);
+        assert_eq!(symbol.frame_for_anim_frame(20).unwrap().frame_num, 20);
+    }
+
+    #[test]
+    fn frame_for_anim_frame_range_match() {
+        let symbol = BuildSymbol {
+            name: "sym".into(),
+            frames: vec![
+                BuildFrame {
+                    frame_num: 0,
+                    duration: 4,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
+                },
+                BuildFrame {
+                    frame_num: 4,
+                    duration: 4,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
+                },
+                BuildFrame {
+                    frame_num: 8,
+                    duration: 2,
+                    x: 0.0,
+                    y: 0.0,
+                    width: 10.0,
+                    height: 10.0,
+                    verts: Vec::new(),
+                    image: None,
+                    dest_x: 0,
+                    dest_y: 0,
+                    canvas_w: 10.0,
+                    canvas_h: 10.0,
+                    spans: None,
+                },
+            ],
+            frame_index: HashMap::from([(0, 0), (4, 1), (8, 2)]),
+        };
+        assert_eq!(symbol.frame_for_anim_frame(1).unwrap().frame_num, 0);
+        assert_eq!(symbol.frame_for_anim_frame(3).unwrap().frame_num, 0);
+        assert_eq!(symbol.frame_for_anim_frame(5).unwrap().frame_num, 4);
+        assert_eq!(symbol.frame_for_anim_frame(7).unwrap().frame_num, 4);
+        assert_eq!(symbol.frame_for_anim_frame(9).unwrap().frame_num, 8);
+        assert!(symbol.frame_for_anim_frame(10).is_none());
+        assert!(symbol.frame_for_anim_frame(2).is_some());
+    }
+
+    #[test]
+    fn frame_for_anim_frame_before_first() {
+        let symbol = BuildSymbol {
+            name: "sym".into(),
+            frames: vec![BuildFrame {
+                frame_num: 4,
+                duration: 4,
+                x: 0.0,
+                y: 0.0,
+                width: 10.0,
+                height: 10.0,
+                verts: Vec::new(),
+                image: None,
+                dest_x: 0,
+                dest_y: 0,
+                canvas_w: 10.0,
+                canvas_h: 10.0,
+                spans: None,
+            }],
+            frame_index: HashMap::from([(4, 0)]),
+        };
+        assert!(symbol.frame_for_anim_frame(0).is_none());
+        assert!(symbol.frame_for_anim_frame(3).is_none());
+        assert!(symbol.frame_for_anim_frame(7).is_some());
     }
 
     #[test]

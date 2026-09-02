@@ -124,6 +124,20 @@ pub enum JobKind {
         #[serde(default)]
         output: Option<String>,
     },
+    /// Sync the game `scripts` tree after an update: archive the old tree as
+    /// a snapshot, extract the new `scripts.zip`, record the version.
+    /// Local-only; no wiki traffic.
+    ScriptsSync {
+        /// Sync even when the recorded version matches.
+        #[serde(default)]
+        force: bool,
+        /// Report the planned actions without touching any file.
+        #[serde(default)]
+        dry_run: bool,
+        /// Version state file (defaults to ./dst_version.txt).
+        #[serde(default)]
+        state_path: Option<String>,
+    },
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
@@ -338,6 +352,7 @@ impl JobKind {
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
+            JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
@@ -470,6 +485,11 @@ async fn execute_job_inner(
         JobKind::PrefabOverrides { input, output } => {
             run_prefab_overrides(input, opt_path(output), reporter).await
         }
+        JobKind::ScriptsSync {
+            force,
+            dry_run,
+            state_path,
+        } => run_scripts_sync(*force, *dry_run, state_path.as_deref(), reporter).await,
         JobKind::CorpusSync { full, dir, rc } => {
             run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
         }
@@ -1422,6 +1442,27 @@ async fn run_prefab_overrides(
 // ---------------------------------------------------------------------------
 // Corpus harvesting (wiki read-only, no game dir required)
 // ---------------------------------------------------------------------------
+
+/// `scripts-sync`: archive the live scripts tree as a snapshot and extract
+/// the new `scripts.zip`. Local-only; never touches the wiki.
+async fn run_scripts_sync(
+    force: bool,
+    dry_run: bool,
+    state_path: Option<&str>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let dst_root = std::env::var("DST__ROOT")
+        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    crate::scripts_sync::sync(
+        &crate::scripts_sync::SyncParams {
+            dst_root,
+            state_path: state_path.map(PathBuf::from),
+            force,
+            dry_run,
+        },
+        reporter,
+    )
+}
 
 async fn run_corpus_sync(
     full: bool,

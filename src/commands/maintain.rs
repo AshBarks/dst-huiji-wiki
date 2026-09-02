@@ -129,6 +129,24 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::ScriptsSync {
+            force,
+            dry_run,
+            state,
+            report_json,
+        } => {
+            execute(
+                JobKind::ScriptsSync {
+                    force,
+                    dry_run,
+                    state_path: opt_path_to_string(&state)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
         Commands::CorpusFetch {
             full,
             dir,

@@ -96,6 +96,21 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// 同步更新后的游戏 scripts:归档旧树为快照、解压新 scripts.zip(纯本地操作)
+    ScriptsSync {
+        /// 忽略版本一致,强制同步
+        #[arg(long)]
+        force: bool,
+        /// 只报告将要执行的动作,不修改任何文件
+        #[arg(long)]
+        dry_run: bool,
+        /// 版本状态文件路径(默认 ./dst_version.txt)
+        #[arg(long)]
+        state: Option<PathBuf>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
     CorpusFetch {
         /// 忽略增量对账，全量重抓所有页面
@@ -315,6 +330,7 @@ impl Commands {
             Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
+            Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",
@@ -530,6 +546,54 @@ mod tests {
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected MaintainItemTable command"),
+        }
+    }
+
+    #[test]
+    fn test_scripts_sync_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "scripts-sync"]).unwrap();
+        match args.command {
+            Commands::ScriptsSync {
+                force,
+                dry_run,
+                state,
+                report_json,
+            } => {
+                assert!(!force);
+                assert!(!dry_run);
+                assert!(state.is_none());
+                assert!(report_json.is_none());
+            }
+            _ => panic!("Expected ScriptsSync command"),
+        }
+    }
+
+    #[test]
+    fn test_scripts_sync_command_with_flags() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "scripts-sync",
+            "--force",
+            "--dry-run",
+            "--state",
+            "ver.txt",
+            "--report-json",
+            "report.json",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::ScriptsSync {
+                force,
+                dry_run,
+                state,
+                report_json,
+            } => {
+                assert!(force);
+                assert!(dry_run);
+                assert_eq!(state, Some(PathBuf::from("ver.txt")));
+                assert_eq!(report_json, Some(PathBuf::from("report.json")));
+            }
+            _ => panic!("Expected ScriptsSync command"),
         }
     }
 

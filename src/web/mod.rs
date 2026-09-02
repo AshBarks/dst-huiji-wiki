@@ -54,6 +54,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/", get(index_handler))
         .route("/static/app.js", get(app_js_handler))
         .route("/static/style.css", get(style_css_handler))
+        .route("/static/split/{dir}/{name}", get(api_data::split_asset))
         .nest("/api", api)
         .fallback(not_found)
         .layer(middleware::from_fn(log_requests))
@@ -77,9 +78,32 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
 
 async fn config() -> impl IntoResponse {
     let snapshots = dst_huiji_wiki::DstContext::list_snapshots();
+
+    let state_path = dst_huiji_wiki::scripts_sync::state::default_state_path();
+    let recorded_version = dst_huiji_wiki::scripts_sync::state::read_last_version(&state_path)
+        .ok()
+        .flatten();
+    let detected_version = std::env::var("DST__ROOT").ok().and_then(|root| {
+        dst_huiji_wiki::scripts_sync::read_new_version(std::path::Path::new(&root)).ok()
+    });
+    let scripts_up_to_date = recorded_version.is_some()
+        && detected_version.is_some()
+        && recorded_version.as_deref() == detected_version.as_deref();
+
     Json(serde_json::json!({
         "dst_root_set": std::env::var("DST__ROOT").is_ok(),
+        "env": {
+            "DST__ROOT": std::env::var("DST__ROOT").ok(),
+            "KTOOLS__OUT_DIR": std::env::var("KTOOLS__OUT_DIR").ok(),
+        },
         "snapshots": snapshots,
+        "scripts_sync": {
+            "state_path": state_path.display().to_string(),
+            "recorded_version": recorded_version,
+            "detected_version": detected_version,
+            "up_to_date": scripts_up_to_date,
+            "ready": detected_version.is_some(),
+        },
         "version": env!("CARGO_PKG_VERSION"),
     }))
 }

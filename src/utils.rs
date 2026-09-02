@@ -7,10 +7,21 @@ fn normalize_lines(s: &str) -> String {
 pub fn diff_lines(old: &str, new: &str) -> String {
     let old_normalized = normalize_lines(old);
     let new_normalized = normalize_lines(new);
+    unified_diff(&old_normalized, &new_normalized)
+}
 
+/// Like [`diff_lines`], but preserves whitespace/indentation exactly.
+///
+/// Use this when the diff is part of an interactive preview where trailing
+/// spaces or indentation changes are meaningful (e.g. copyclip page diffs).
+pub fn diff_lines_preserve_whitespace(old: &str, new: &str) -> String {
+    unified_diff(old, new)
+}
+
+fn unified_diff(old: &str, new: &str) -> String {
     let diff = TextDiff::configure()
         .algorithm(Algorithm::Histogram)
-        .diff_lines(&old_normalized, &new_normalized);
+        .diff_lines(old, new);
 
     diff.unified_diff()
         .context_radius(3)
@@ -83,6 +94,13 @@ mod tests {
     fn test_diff_lines_whitespace_trim() {
         let result = diff_lines("line1  \nline2\t\nline3", "line1\n  line2  \nline3");
         assert!(!result.contains("@@"), "expected no hunks after trim");
+    }
+
+    #[test]
+    fn test_diff_lines_preserve_whitespace_shows_indent_changes() {
+        let result = diff_lines_preserve_whitespace("a\n  b\nc", "a\n\tb\nc");
+        assert!(result.contains("-  b"), "expected removed old indentation");
+        assert!(result.contains("+\tb"), "expected added new indentation");
     }
 
     #[test]

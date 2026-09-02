@@ -64,7 +64,9 @@ label{display:block;margin:8px 0 3px;color:var(--muted);font-size:13px}
 svg .edge{stroke:#39435a;stroke-width:1.6;fill:none}
 svg .node circle{stroke-width:2}
 svg .node text{fill:var(--text);font-size:11px;text-anchor:middle}
-#tooltip{position:fixed;display:none;pointer-events:none;background:#000c;border:1px solid var(--line);
+#tooltip{position:fixed;display:none;pointer-events:none;background-color:rgba(0,0,0,.82);
+  background-image:url('/static/split/skilltree/skill_icon_textbox.png');
+  background-size:100% 100%;background-repeat:no-repeat;border:1px solid var(--line);
   padding:10px 12px;border-radius:10px;max-width:340px;z-index:50;font-size:13px}
 .pager{display:flex;gap:8px;align-items:center;margin-top:10px}
 .diff-added{color:var(--ok)} .diff-removed{color:var(--err)} .diff-changed{color:var(--warn)}

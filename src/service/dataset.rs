@@ -322,6 +322,11 @@ pub fn load_skill_tree(
                 "group": n.group,
                 "root": n.root,
                 "connects": n.connects,
+                "icon": n.icon,
+                "lock": n.lock,
+                "locks": n.locks,
+                "lock_open": n.lock_open,
+                "tags": n.tags,
                 "title": strings.by_ctxt.get(&title_key),
                 "desc": strings.by_ctxt.get(&desc_key),
             })

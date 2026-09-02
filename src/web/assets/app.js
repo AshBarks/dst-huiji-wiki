@@ -139,6 +139,14 @@ async function pageDashboard(main) {
   let jobs = [];
   try { jobs = (await getJSON("/api/jobs")).jobs.slice(0, 6); } catch {}
   const snaps = (await getJSON("/api/snapshots")).snapshots.length;
+  const cfg = await getJSON("/api/config");
+  const ss = cfg.scripts_sync || {};
+  const scriptsDisabled = !ss.ready || ss.up_to_date;
+  const scriptsStatus = !ss.ready
+    ? "无法读取 version.txt，请检查 DST__ROOT"
+    : ss.up_to_date
+      ? `已是最新版本：${esc(ss.detected_version)}`
+      : `记录 ${esc(ss.recorded_version || "无")} → 检测 ${esc(ss.detected_version)}，可同步`;
 
   main.innerHTML = `
     <div class="card-row">
@@ -147,6 +155,13 @@ async function pageDashboard(main) {
       <div class="card"><div class="num">${META.po_total_entries}</div><span class="muted">翻译条目</span></div>
       <div class="card"><div class="num">${META.tuning_count}</div><span class="muted">TUNING 常量</span></div>
       <div class="card"><div class="num">${snaps}</div><span class="muted">历史快照</span></div>
+    </div>
+    <div class="panel">
+      <h2>快捷操作</h2>
+      <div class="row">
+        <button class="btn" id="quickScriptsSync" ${scriptsDisabled ? "disabled" : ""}>scripts-sync 同步游戏脚本</button>
+        <span class="muted">${scriptsStatus}</span>
+      </div>
     </div>
     <div class="panel">
       <h2>最近任务</h2>
@@ -161,6 +176,13 @@ async function pageDashboard(main) {
     <div class="panel muted">
       数据来源：<b>${esc(META.label)}</b>${currentSnapshot ? `（快照 ${esc(currentSnapshot)}）` : ""}
     </div>`;
+
+  const quickSyncBtn = $("#quickScriptsSync");
+  if (quickSyncBtn) quickSyncBtn.onclick = async () => {
+    if (!confirm("将执行 scripts-sync 同步游戏脚本（真实本地操作）。确定继续？")) return;
+    const j = await postJSON("/api/jobs", { kind: "scripts_sync" });
+    location.hash = `#/jobs/${j.id}`;
+  };
 }
 
 /* ---------------- jobs ---------------- */
@@ -169,34 +191,22 @@ async function pageDashboard(main) {
 // Local-only jobs (wiki: false) gate their own disk writes via JobKind
 // fields of the same shape; the global checkbox is hidden for them.
 const JOB_DEFS = {
-  parse_po: {
-    label: "parse-po 解析 PO",
-    fields: [["input", "PO 文件路径"], ["category", "类别过滤（可选）"]],
-  },
-  map_names: {
-    label: "map-names 名称映射",
-    fields: [["input", "PO 文件路径"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
-  },
-  map_recipes: {
-    label: "map-recipes 配方映射",
-    fields: [["input", "recipes.lua 路径"], ["po_file", "PO 文件（可选）"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
-  },
   maintain_item_table: { label: "维护物品表 → 维基", wiki: true },
   maintain_dst_recipes: { label: "维护配方表 → 维基", wiki: true },
   maintain_copy_clip: {
     label: "维护模块常量 → 维基", wiki: true,
-    fields: [["type", "类型：rbtl / tech / filters / names（留空=全部）"]],
+    fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
   prefab_overrides: {
     label: "预制体重定向解析",
-    fields: [["input", "Lua 文件路径"]],
+    fields: [{ k: "input", label: "Lua 文件路径" }],
   },
   scripts_sync: {
     label: "scripts-sync 同步游戏脚本",
     fields: [
       { k: "force", type: "check", label: "强制重新同步（版本相同也执行）" },
       { k: "dry_run", type: "check", label: "演练：只报告计划、不动任何文件" },
-      { k: "state_path", label: "版本状态文件（可选，默认 ./dst_version.txt）" },
+      { k: "state_path", label: "版本状态文件（可选，默认 ./dst_version.txt）", default: "./dst_version.txt" },
     ],
   },
   images_sync: {
@@ -228,20 +238,27 @@ async function pageJobs(main) {
     </div>`;
 
   const kindSel = $("#jobKind");
+  const hasDryRunField = (def) => (def.fields || []).some(f => (Array.isArray(f) ? f[0] : f.k) === "dry_run");
   const renderFields = () => {
     const def = JOB_DEFS[kindSel.value];
     $("#dryRunRow").style.display = def.wiki ? "" : "none";
     $("#jobFields").innerHTML = (def.fields || [])
       .map(f => {
         const [k, label] = Array.isArray(f) ? f : [f.k, f.label];
+        const defaultValue = !Array.isArray(f) && typeof f.default === "function"
+          ? f.default()
+          : (!Array.isArray(f) ? (f.default || "") : "");
         if (!Array.isArray(f) && f.type === "check")
           return `<label style="display:flex;align-items:center;gap:6px;margin:6px 0;color:var(--text)">
-            <input type="checkbox" data-field="${k}"> ${esc(label)}</label>`;
-        return `<label>${esc(label)}<input style="width:100%" data-field="${k}"></label>`;
+            <input type="checkbox" data-field="${k}" ${defaultValue ? "checked" : ""}> ${esc(label)}</label>`;
+        return `<label>${esc(label)}<input style="width:100%" data-field="${k}" value="${esc(defaultValue)}"></label>`;
       }).join("");
+    const hasDryRun = hasDryRunField(def);
     $("#jobHint").textContent = def.wiki
       ? "涉及维基写入的任务在维基干跑下只生成 diff 预览；取消勾选并经确认后直接写入。"
-      : "纯本地任务不写维基；其参数中的“演练”勾选决定是否真实改动本地文件。";
+      : hasDryRun
+        ? "纯本地任务不写维基；其参数中的“演练”勾选决定是否真实改动本地文件。"
+        : "纯本地任务不写维基，直接在本地执行。";
   };
   kindSel.onchange = renderFields;
   renderFields();
@@ -256,9 +273,12 @@ async function pageJobs(main) {
     });
     if (def.wiki) {
       if (!body.wiki_dry_run && !confirm("已关闭维基干跑：任务可能直接修改维基页面。确定继续？")) return;
-    } else if (!body.dry_run) {
-      // Local task without the rehearsal checkbox => real disk changes.
+    } else if (hasDryRunField(def) && !body.dry_run) {
+      // Local task has an explicit rehearsal switch and it is off => real writes.
       if (!confirm(`${def.label} 将真实执行本地文件操作（非演练）。确定继续？`)) return;
+    } else if (!hasDryRunField(def)) {
+      // Local task without a rehearsal switch always performs real local I/O.
+      if (!confirm(`${def.label} 将真实执行本地文件操作。确定继续？`)) return;
     }
     try {
       const j = await postJSON("/api/jobs", body);
@@ -354,9 +374,17 @@ async function pageJobDetail(main, id) {
   renderHead(head);
   for (const ev of head.logs || []) appendEv(ev);
   for (const d of head.diffs || []) appendDiff(d);
+  const terminal = ["success", "failed", "cancelled"].includes(head.status);
+  if (terminal) {
+    doneSeen = true;
+  }
 
-  if (!doneSeen && !["success", "failed", "cancelled"].includes(head.status)) {
-    const es = new EventSource(`/api/jobs/${id}/events`);
+  if (!doneSeen && !terminal) {
+    // Ask the SSE stream to skip the events we already rendered from the
+    // REST detail response. This prevents duplicated logs/diffs after a
+    // refresh while still replaying any events that arrived in between.
+    const seenCount = (head.logs || []).length;
+    const es = new EventSource(`/api/jobs/${id}/events?since=${seenCount}`);
     es.onmessage = (msg) => {
       try { appendEv(JSON.parse(msg.data)); } catch {}
       if (doneSeen) { es.close(); refreshHead(); }
@@ -415,8 +443,8 @@ async function pageRecipes(main) {
 async function pageTranslations(main) {
   main.innerHTML = `
     <div class="panel"><h2>分类进度（点击查看条目）</h2><div id="tchart"></div></div>
-    <div class="panel" id="tdetail" style="display:none">
-      <h2 id="ttitle"></h2>
+    <div class="panel">
+      <h2 id="ttitle">全部条目</h2>
       <div class="row">
         <input id="tq" placeholder="搜索…" style="width:220px">
         <select id="ttf"><option value="">全部</option><option value="yes">已翻译</option><option value="no">未翻译</option></select>
@@ -458,14 +486,14 @@ async function pageTranslations(main) {
 
   document.querySelectorAll("#tchart g.bar-wrap").forEach(g => g.onclick = async () => {
     st.cat = g.dataset.cat; st.page = 0;
-    $("#tdetail").style.display = "";
     $("#ttitle").textContent = `分类：${st.cat}`;
     await loadEntries();
-    $("#tdetail").scrollIntoView({ behavior: "smooth" });
+    document.querySelector("#ttitle").scrollIntoView({ behavior: "smooth" });
   });
   let deb;
   $("#tq").oninput = (e) => { clearTimeout(deb); deb = setTimeout(() => { st.q = e.target.value.trim(); st.page = 0; loadEntries(); }, 250); };
   $("#ttf").onchange = (e) => { st.tf = e.target.value; st.page = 0; loadEntries(); };
+  await loadEntries();
 }
 
 /* ---------------- skill trees ---------------- */
@@ -477,58 +505,228 @@ async function pageSkills(main) {
         <label style="margin:0">角色</label>
         <select id="charSel">${chars.map(c => `<option>${esc(c)}</option>`).join("")}</select>
         <span class="muted">布局坐标来自游戏源码（pos/connects），1:1 还原游戏内界面。</span>
+        <span class="muted" id="skillXp"></span>
+        <button class="btn secondary" id="resetSkillBtn">重置洞察</button>
       </div>
+      <p class="muted" style="margin:6px 0 0">点击“可选”技能学习；lock 节点按条件自动解锁；重置洞察会清空已学技能。</p>
     </div>
     <div class="panel"><div id="skwrap"></div></div>
     <div id="tooltip"></div>`;
 
   const sel = $("#charSel");
   sel.value = chars.includes("wilson") ? "wilson" : chars[0];
-  const draw = async () => {
-    const tree = await getJSON(`/api/viz/skilltree?character=${sel.value}`);
+
+  const TOTAL_XP = 15;
+  let tree = null;
+  let skills = {};
+  let locks = {};
+  let parents = {};
+  let activatedSkills = new Set();
+
+  const iconUrl = (icon) => icon ? `/static/split/skilltree_icons/${encodeURIComponent(icon)}.png` : "";
+  const skillAsset = (name) => `/static/split/skilltree/${encodeURIComponent(name)}.png`;
+  const ICON_SIZE = 28;
+  const ICON_BUTTON_SIZE = 32;
+  const LOCK_SIZE = ICON_SIZE * 0.8; // wiki JS: lock button = 28 * 0.8
+  const FOCUS_SIZE = 40;
+
+  function buildMaps(nodes) {
+    skills = {};
+    locks = {};
+    parents = {};
+    for (const n of nodes) {
+      if (n.lock) {
+        locks[n.name] = n;
+      } else {
+        skills[n.name] = n;
+        parents[n.name] = [];
+      }
+    }
+    for (const n of nodes) {
+      if (n.lock) continue;
+      for (const c of (n.connects || [])) {
+        if (parents[c]) parents[c].push(n.name);
+      }
+    }
+  }
+
+  function remainingXp() {
+    return TOTAL_XP - activatedSkills.size;
+  }
+
+  function countTags(tag) {
+    let count = 0;
+    for (const name of activatedSkills) {
+      const skill = skills[name];
+      if (skill && skill.tags && skill.tags.includes(tag)) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  function evalLockCond(cond) {
+    if (cond === true || cond === false || typeof cond === "number" || typeof cond === "string") {
+      return cond;
+    }
+    if (typeof cond !== "object" || cond === null) {
+      return false;
+    }
+    if (cond.Achievement) {
+      // 外部成就类条件在本地默认视为已解锁。
+      return true;
+    }
+    for (const key in cond) {
+      const val = cond[key];
+      switch (key) {
+        case "GreaterThan": return evalLockCond(val.left) > evalLockCond(val.right);
+        case "GreaterOrEqThan": return evalLockCond(val.left) >= evalLockCond(val.right);
+        case "LessThan": return evalLockCond(val.left) < evalLockCond(val.right);
+        case "LessOrEqThan": return evalLockCond(val.left) <= evalLockCond(val.right);
+        case "Eq": return evalLockCond(val.left) === evalLockCond(val.right);
+        case "And": return evalLockCond(val.left) && evalLockCond(val.right);
+        case "Or": return evalLockCond(val.left) || evalLockCond(val.right);
+        case "Not": return !evalLockCond(val);
+        case "CountTags": return countTags(val);
+        case "CountSkills": return activatedSkills.size;
+        case "ActivatedSkill": return activatedSkills.has(val);
+        case "Add": return evalLockCond(val.left) + evalLockCond(val.right);
+        default: return false;
+      }
+    }
+    return false;
+  }
+
+  function isLockOpen(name) {
+    const lock = locks[name];
+    // 未显式给出条件时默认视为已解锁，避免外部成就/未知条件把整条线路锁死。
+    if (!lock || lock.lock_open === undefined || lock.lock_open === null) return true;
+    return evalLockCond(lock.lock_open);
+  }
+
+  function canLearn(name) {
+    const skill = skills[name];
+    if (!skill || activatedSkills.has(name)) return false;
+    if (remainingXp() <= 0) return false;
+    if (skill.root) return true;
+    if (skill.locks && skill.locks.some(l => !isLockOpen(l))) return false;
+    const ps = parents[name] || [];
+    if (ps.length > 0 && !ps.some(p => activatedSkills.has(p))) return false;
+    return true;
+  }
+
+  function statusOf(name) {
+    if (activatedSkills.has(name)) return "selected";
+    return canLearn(name) ? "selectable" : "unselected";
+  }
+
+  function render() {
+    if (!tree) return;
     const nodes = tree.nodes;
-    if (!nodes.length) { $("#skwrap").innerHTML = '<p class="muted">该角色暂无技能树数据。</p>'; return; }
-    const xs = nodes.flatMap(n => [n.x]); const ys = nodes.flatMap(n => [n.y]);
-    const pad = 40, minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad;
-    const minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+    if (!nodes.length) {
+      $("#skwrap").innerHTML = '<p class="muted">该角色暂无技能树数据。</p>';
+      return;
+    }
+    const WIDTH = 600;
+    const HEIGHT = 540;
+    const SVG_HEIGHT = 460;
+    const X_SCALE = 1;
+    const X_OFFSET = -2;
+    const Y_SCALE = 1.157;
+    const Y_OFFSET = 50 + 30 - 20;
+    const yScale = ["wendy", "wortox"].includes(sel.value.toLowerCase()) ? 1 : Y_SCALE;
+    const px = (x) => WIDTH / 2 + X_SCALE * (X_OFFSET + x);
+    const py = (y) => HEIGHT / 2 - yScale * (y - Y_OFFSET);
     const byName = Object.fromEntries(nodes.map(n => [n.name, n]));
-    const palette = ["#4da3ff","#3fb96e","#e0a83c","#9a7de0","#e05c5c","#4ec9d4","#d4874e","#7dc46a"];
-    const groupColor = {}; tree.groups.forEach((g, i) => groupColor[g] = palette[i % palette.length]);
 
     const edges = [];
-    for (const n of nodes) for (const c of n.connects) {
-      const m = byName[c]; if (!m) continue;
-      edges.push(`<line class="edge" x1="${n.x}" y1="${-n.y}" x2="${m.x}" y2="${-m.y}"/>`);
+    for (const n of nodes) for (const c of (n.connects || [])) {
+      const m = byName[c];
+      if (!m) continue;
+      edges.push(`<line class="edge" x1="${px(n.x)}" y1="${py(n.y)}" x2="${px(m.x)}" y2="${py(m.y)}"/>`);
     }
+
+    const charBg = skillAsset(`${sel.value}_background`);
+    const genericBg = skillAsset("background");
+
     const dots = nodes.map(n => {
-      const color = n.group ? groupColor[n.group] : "#888";
       const title = n.title || n.name;
+      const x = px(n.x);
+      const y = py(n.y);
+      const size = n.lock ? LOCK_SIZE : ICON_BUTTON_SIZE;
+      const bgName = n.lock
+        ? (isLockOpen(n.name) ? "unlocked" : "locked_skill")
+        : statusOf(n.name);
+      const focusName = n.lock ? "frame_octagon" : "frame";
+      const glyph = `<image href="${esc(skillAsset(bgName))}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>` +
+        (n.lock || !n.icon ? "" : `<image href="${esc(iconUrl(n.icon))}" x="${x - ICON_SIZE / 2}" y="${y - ICON_SIZE / 2}" width="${ICON_SIZE}" height="${ICON_SIZE}" preserveAspectRatio="xMidYMid meet"/>`) +
+        `<image class="node-focus" href="${esc(skillAsset(focusName))}" x="${x - FOCUS_SIZE / 2}" y="${y - FOCUS_SIZE / 2}" width="${FOCUS_SIZE}" height="${FOCUS_SIZE}" style="display:none" preserveAspectRatio="xMidYMid meet"/>`;
       return `<g class="node" data-name="${esc(n.name)}"
         data-title="${esc(title)}" data-desc="${esc(n.desc || "")}"
-        data-group="${esc(n.group || "")}">
-        <circle cx="${n.x}" cy="${-n.y}" r="${n.root ? 13 : 9}"
-          fill="${color}${n.root ? "" : "55"}" stroke="${color}"/>
-        <text x="${n.x}" y="${-n.y + (n.root ? 28 : 24)}">${esc(String(title).slice(0, 12))}</text>
+        data-group="${esc(n.group || "")}" data-icon="${esc(n.icon || "")}" data-lock="${n.lock}">
+        ${glyph}
+        <text x="${x}" y="${y + (n.root ? 28 : 24)}">${esc(String(title).slice(0, 12))}</text>
       </g>`;
     }).join("");
 
     $("#skwrap").innerHTML =
-      `<svg viewBox="${minX} ${-maxY} ${maxX - minX} ${maxY - minY}" width="100%" style="background:#151923;border-radius:10px">
+      `<svg viewBox="0 0 ${WIDTH} ${SVG_HEIGHT}" width="100%" style="display:block;width:100%;height:auto;aspect-ratio:${WIDTH} / ${SVG_HEIGHT};background:#151923;border-radius:10px">
+        <image href="${esc(genericBg)}" x="0" y="0" width="${WIDTH}" height="${HEIGHT}" preserveAspectRatio="xMidYMid meet"/>
+        <image href="${esc(charBg)}" x="0" y="0" width="${WIDTH}" height="${HEIGHT}" preserveAspectRatio="xMidYMid meet"/>
         ${edges.join("")}${dots}</svg>`;
+
+    $("#skillXp").textContent = `剩余洞察：${remainingXp()}`;
 
     const tip = $("#tooltip");
     document.querySelectorAll("#skwrap .node").forEach(nd => {
-      nd.addEventListener("mousemove", (e) => {
-        tip.style.display = "block";
-        tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY + 14) + "px";
-        tip.innerHTML = `<b>${esc(nd.dataset.title)}</b><br>
-          ${nd.dataset.desc ? esc(nd.dataset.desc) + "<br>" : ""}
-          <span class="muted"><code>${esc(nd.dataset.name)}</code>${nd.dataset.group ? " · " + esc(nd.dataset.group) : ""}</span>`;
+      const focusEle = nd.querySelector(".node-focus");
+      const name = nd.dataset.name;
+      const isLock = nd.dataset.lock === "true";
+
+      nd.addEventListener("click", () => {
+        if (!isLock && canLearn(name)) {
+          activatedSkills.add(name);
+          render();
+        }
       });
-      nd.addEventListener("mouseleave", () => tip.style.display = "none");
+
+      nd.addEventListener("mousemove", (e) => {
+        if (focusEle) focusEle.style.display = "inline";
+        tip.style.display = "block";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY + 14) + "px";
+        const tooltipIcon = nd.dataset.icon
+          ? iconUrl(nd.dataset.icon)
+          : isLock ? skillAsset(isLockOpen(name) ? "unlocked" : "locked_skill") : "";
+        const iconHtml = tooltipIcon
+          ? `<img src="${esc(tooltipIcon)}" style="width:44px;height:44px;float:left;margin-right:8px;border-radius:6px">`
+          : "";
+        tip.innerHTML = `<div style="overflow:hidden">${iconHtml}<b>${esc(nd.dataset.title)}</b><br>
+          ${nd.dataset.desc ? esc(nd.dataset.desc) + "<br>" : ""}
+          ${isLock ? `<span class="muted">${isLockOpen(name) ? "已解锁" : "未解锁"}</span><br>` : ""}
+          <span class="muted"><code>${esc(nd.dataset.name)}</code>${nd.dataset.group ? " · " + esc(nd.dataset.group) : ""}</span></div>`;
+      });
+
+      nd.addEventListener("mouseleave", () => {
+        if (focusEle) focusEle.style.display = "none";
+        tip.style.display = "none";
+      });
     });
+  }
+
+  async function draw() {
+    tree = await getJSON(`/api/viz/skilltree?character=${sel.value}`);
+    buildMaps(tree.nodes);
+    activatedSkills.clear();
+    render();
+  }
+
+  sel.onchange = () => { draw(); };
+  $("#resetSkillBtn").onclick = () => {
+    activatedSkills.clear();
+    render();
   };
-  sel.onchange = draw;
+
   await draw();
 }
 

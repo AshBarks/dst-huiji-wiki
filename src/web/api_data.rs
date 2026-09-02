@@ -1,8 +1,9 @@
 //! Data browse / visualization endpoints backed by the in-memory dataset.
 
 use super::state::AppState;
-use axum::extract::{Query, State};
-use axum::http::StatusCode;
+use axum::extract::{Path, Query, State};
+use axum::http::{header, StatusCode};
+use axum::response::IntoResponse;
 use axum::Json;
 use dst_huiji_wiki::error::Result;
 use std::collections::HashMap;
@@ -200,6 +201,36 @@ pub async fn constants(
         "page_size": page_size,
         "items": filtered.into_iter().skip(start).take(page_size).collect::<Vec<_>>(),
     })))
+}
+
+/// GET /static/split/{dir}/{name}
+///
+/// Serves PNG assets extracted by `images-sync` from the current split tree.
+/// Only the fixed `skilltree` and `skilltree_icons` directories are allowed.
+pub async fn split_asset(
+    Path((dir, name)): Path<(String, String)>,
+) -> std::result::Result<axum::response::Response, StatusCode> {
+    if !matches!(dir.as_str(), "skilltree" | "skilltree_icons")
+        || name.contains('/')
+        || name.contains('\\')
+        || name.contains("..")
+    {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+
+    let out_dir = std::env::var("KTOOLS__OUT_DIR")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or_else(|| "output/ktools".to_string());
+    let path = std::path::Path::new(&out_dir)
+        .join("current/split")
+        .join(&dir)
+        .join(&name);
+    let bytes = tokio::fs::read(&path)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+
+    Ok(([(header::CONTENT_TYPE, "image/png")], bytes).into_response())
 }
 
 /// GET /api/viz/skilltree?character=wilson

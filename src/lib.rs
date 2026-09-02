@@ -21,4 +21,4 @@ pub use copyclip::{
 };
 pub use error::{Error, Result};
 pub use models::TechReport;
-pub use utils::{count_diff_stats, diff_lines};
+pub use utils::{count_diff_stats, diff_lines, diff_lines_preserve_whitespace};

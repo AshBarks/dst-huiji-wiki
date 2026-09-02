@@ -1,13 +1,14 @@
 //! Job submission / tracking endpoints (including the SSE event stream).
 
 use super::state::AppState;
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::Json;
 use dst_huiji_wiki::service::{JobEvent, JobKind};
 use futures_util::stream::{self, Stream};
 use futures_util::StreamExt;
+use std::collections::HashMap;
 use std::convert::Infallible;
 use std::sync::Arc;
 use std::time::Duration;
@@ -43,7 +44,11 @@ pub async fn submit(
     // Wiki-touching jobs default to wiki-dry-run; explicit confirmation flips it.
     let handle = state
         .jobs
-        .submit(req.kind, req.wiki_dry_run, Some(Arc::clone(&state.datasets)))
+        .submit(
+            req.kind,
+            req.wiki_dry_run,
+            Some(Arc::clone(&state.datasets)),
+        )
         .await;
     Ok(Json(handle.summary().await))
 }
@@ -91,20 +96,31 @@ fn event_to_sse(ev: JobEvent) -> Event {
 
 /// GET /api/jobs/:id/events — live SSE stream of job events.
 ///
-/// The stream replays buffered history first, then follows live events,
-/// terminating right after the terminal `Done` marker.
+/// The stream replays buffered history first (skipping `since` already-seen
+/// events when provided), then follows live events, terminating right after
+/// the terminal `Done` marker.
 pub async fn events(
     State(state): State<Arc<AppState>>,
     Path(id): Path<String>,
+    Query(q): Query<HashMap<String, String>>,
 ) -> std::result::Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, StatusCode> {
     let id = parse_uuid(&id)?;
     let job = state.jobs.get(id).await.ok_or(StatusCode::NOT_FOUND)?;
+    let since = q
+        .get("since")
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(0);
 
     // Subscribe before reading status so no events are missed.
     let rx = job.reporter.subscribe();
     let already_terminal = job.status().await.is_terminal();
 
-    let replay: Vec<JobEvent> = job.reporter.snapshot_logs();
+    let replay: Vec<JobEvent> = job
+        .reporter
+        .snapshot_logs()
+        .into_iter()
+        .skip(since)
+        .collect();
     let replay_stream = stream::iter(replay.into_iter().map(|ev| Ok(event_to_sse(ev))));
 
     let live: std::pin::Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>> = {

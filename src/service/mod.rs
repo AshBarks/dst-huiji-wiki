@@ -2162,7 +2162,7 @@ async fn output_copyclip_result_with_update(
     }
 
     reporter.log("--- 检测到变化 ---".to_string());
-    let diff = crate::diff_lines(target_content, updated_content);
+    let diff = crate::diff_lines_preserve_whitespace(target_content, updated_content);
     let (added, removed) = crate::count_diff_stats(&diff);
     reporter.diff(page_title, &diff, added, removed);
 

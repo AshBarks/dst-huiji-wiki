@@ -52,14 +52,16 @@ git log 显示审计发布后有一轮系统性修复，逐项核对：
 | `parse-po` | PO→JSON/终端预览 | 否 | 纯本地，稳定 |
 | `map-names` | NAMES 条目→ItemTable JSON schema，支持 compare/merge | 否（只产文件） | merge 语义依赖人工提供历史文件，易用性一般 |
 | `map-recipes` | recipes.lua→DSTRecipes JSON | 否 | for 循环展开正确；po_file 可选补充 desc |
-| `maintain-item-table` | 全量重建 ItemTable.tabx 并推送 | diff 后交互确认 | ✅ 有变更才写；❌ 确认只能交互，无 --yes/--dry-run 分离 |
+| `maintain-item-table` | 全量重建 ItemTable.tabx 并推送 | diff 后写 | ✅ 有变更才写；✅ `--yes`/`--dry-run`/`--report-json` 完备 |
 | `maintain-dst-recipes` | 同上 + 科技树对比报告 | 同上 | 同上；TechReport 是很好的雏形 |
 | `maintain-copy-clip` | 4 类常量 COPYCLIP 标记替换 | 同上 | 标记机制幂等、diff 友好，设计好 |
-| `prefab-overrides` | AST 提取 prefab 名覆盖表 | 否 | 最复杂解析器；测试占比仅 ~16% |
+| `prefab-overrides` | AST 提取 prefab 名覆盖表 | 否 | 最复杂解析器；测试占比高 |
+| `scripts-sync` | 游戏更新后归档旧 scripts 树并解压新版 | 否 | 纯本地；原子 staging + 归档；快照命名供下游消费 |
+| `images-sync` | 两源盘点 → 内置 KTEX 解码 → atlas 切割 → CAS 差异历史 | 否 | 纯本地；增量幂等；partial 不作 diff 基线；decoder 字段变更触发全量重处理 |
 
 共性观察：
 - **幂等性**：所有写操作都先拉历史比对，"No changes detected" 即跳过——这是正确的基线设计；
-- **产物可检视**：`-o` 可落盘人工复核后再手动推，是当前事实上的 dry-run，但没有与推送路径统一成显式模式；
+- **产物可检视**：`--dry-run` 只产出 diff/报告不写 wiki，`--report-json` 机器可读，两者已成为所有维护命令的标配；
 - **溯源**：写入数据带 `"sources": "Extract data from patch <build>"`，值得保持并推广到报告。
 
 ---

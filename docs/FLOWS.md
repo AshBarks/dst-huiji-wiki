@@ -1,5 +1,22 @@
 # 命令流程
 
+## scripts-sync 同步流程（纯本地）
+从环境变量中读取`DST__ROOT`，验证DST目录是否存在。
+- 读取`<DST>/version.txt`与状态文件`dst_version.txt`对比版本；一致则跳过（`--force` 可强制）
+- 解压`data/databundles/scripts.zip`到`incoming_<时间戳>`暂存目录（原子性：成功前不动现存树）
+- 将现存`scripts/`树重命名为`scripts_<yyyymmddhhmm>`快照（`DstContext::list_snapshots` 消费此命名）
+- 暂存树移入原位（失败回滚归档），写入新版本到状态文件
+
+## images-sync 图片管线流程（纯本地）
+从环境变量中读取`DST__ROOT`与`KTOOLS__OUT_DIR`（缺省`output/ktools`），验证两源存在。
+- **两源盘点**：直读`data/databundles/images.zip`条目（不解压）+ 递归遍历`data/images/`散装目录，按 base 名合并 xml↔tex（同名冲突以 loose 为准，遗留 png 仅计数）
+- **解压**`images.zip`到`current/unzipped/`（每轮清空重建）
+- **解码+切割**：内置 KTEX 解码器（ktex-rs，DXT1/3/5/RGB，翻转+反预乘）解码 mipmap 0，按 atlas XML 的 UV 坐标（v 轴翻转、inclusive 边界）裁出独立 sprite 到`current/split/<atlas>/`
+- **独立图**：无同名 xml 的 tex 解码为`current/decoded/<base>.png`
+- **差异历史**：最终产物（切片+独立图）按内容 hash 入`history/objects/`（CAS，跨版本去重）；每 build 一份`history/manifests/<build>.json`记录全量清单 + 相对上一完整版本的 added/removed/changed + 输入 hash
+- **增量**：输入 hash 与 manifest 一致且产物在盘则跳过；解码器版本变更等效`--force`全量重处理；失败文件清理旧产物，partial 运行不作为下个 diff 基线
+- **对账**：`current/` 只保留本次保证的产物（移除陈旧文件与空目录）
+
 ## ItemTable维护流程
 从环境变量中读取`DST__ROOT`，验证DST目录是否存在。
 - 从DST目录中读取`data/databundles/scripts.zip`文件。

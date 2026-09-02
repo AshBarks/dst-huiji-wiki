@@ -10,6 +10,7 @@
 ## 功能
 
 - **游戏数据解析**: 解析配方（recipes.lua）、PO 翻译文件、Lua 脚本（含预制体重定向解析与技能树提取）
+- **游戏资源同步**: 游戏更新后同步 scripts 树为快照（`scripts-sync`），并处理图片资源（`images-sync`：两源盘点 → 内置 KTEX 解码 → atlas 切割 → 差异历史）
 - **数据映射**: 将游戏数据映射为维基 JSON schema，支持对比与合并历史数据
 - **维基客户端**: 与灰机维基 API 交互，支持登录、页面编辑等操作（节流 + 重试）
 - **CopyClip 维护**: 基于标记替换更新维基 Lua 模块（科技常量、制作分类等）
@@ -58,6 +59,7 @@ cp .env.example .env
 | `HUIJI__PASSWORD` | 灰机维基密码 | `your-password` |
 | `HUIJI__X_AUTHKEY` | 灰机维基站点认证密钥 | `site-authkey` |
 | `DST__ROOT` | DST 游戏根目录路径 | `/path/to/Don't Starve Together` |
+| `KTOOLS__OUT_DIR` | 可选，图片管线产物根目录（`current/` 工作集 + `history/` 差异历史，缺省 `./output/ktools`） | `/mnt/data/ktool_output` |
 | `WIKI__QPS` | 可选，维基 API 每秒请求数上限（默认 1） | `1` |
 | `WIKI__MAX_RETRIES` | 可选，403/429/5xx 退避重试次数（默认 3） | `3` |
 | `LLM__API_KEY` | 可选，LLM API 密钥（未配置时 LLM 相关命令跳过模型调用） | `sk-...` |
@@ -314,6 +316,49 @@ cargo run --release -- maintain-copy-clip -t filters --dry-run --report-json rep
 
 ---
 
+#### `scripts-sync` - 同步游戏 scripts 树
+
+游戏更新后归档旧 scripts 树为 `scripts_<时间戳>` 快照，解压新的 `scripts.zip` 并记录版本（纯本地操作，`update-scan`/`knowledge-*` 依赖快照命名）。
+
+```bash
+cargo run --release -- scripts-sync [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--force` | 忽略版本一致，强制同步 |
+| `--dry-run` | 只报告将要执行的动作，不修改任何文件 |
+| `--state <FILE>` | 版本状态文件路径（默认 `./dst_version.txt`） |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
+
+---
+
+#### `images-sync` - 处理游戏图片资源
+
+处理 `data/databundles/images.zip` 与 `data/images/` 两源（散装目录中的遗留 png 仅计数、绝不读取/写入）的图片资源：解压 → 内置 KTEX 解码（DXT1/3/5/RGB，无需外部 ktools）→ 按 atlas XML 切割为独立 sprite，最终产物进入内容寻址差异历史（纯本地操作）。
+
+```bash
+cargo run --release -- images-sync [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--force` | 忽略增量与幂等检查，全量重跑 |
+| `--dry-run` | 只盘点并报告计划，不写任何文件 |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
+
+**产物布局**（`KTOOLS__OUT_DIR`，缺省 `./output/ktools`）：
+
+```text
+current/{unzipped,split,decoded}/   最新 build 工作集（下游消费入口）
+history/objects/<h[:2]>/<h>.png     内容寻址对象仓，仅最终产物，跨版本去重
+history/manifests/<build>.json      每 build 全量清单 + 相邻 diff + 输入 hash
+```
+
+**增量与历史**：输入 hash 不变且产物在盘则跳过；每次运行记录相对上一完整版本的 added/removed/changed（差异细化到单个 sprite）；`--force` 或解码器版本变更时全量重处理。
+
+---
+
 #### `corpus-fetch` - 抓取维基语料
 
 抓取维基主命名空间全量语料到本地 `wikis/<host>/` 目录（gitignore，不入仓库）。
@@ -515,6 +560,9 @@ src/
 ├── copyclip/             # 维基模块内容更新（标记替换）
 ├── corpus/               # 语料抓取、派生索引（prefab 注册表/区域/facts）
 ├── knowledge/            # 知识库管线（SymbolDoc 扫描、页面映射、同步）
+├── scripts_sync/         # 游戏资源同步
+│   ├── mod.rs            # scripts.zip 同步（版本检测→快照归档→解压）
+│   └── images/           # images-sync 图片管线（两源扫描/内置 KTEX 解码/切割/差异历史）
 ├── update/               # 快照差异、影响评估、代码关联索引（atlas）
 ├── context.rs            # DstContext（zip 归档、维基客户端、环境变量）
 ├── error.rs              # 错误枚举 + Result<T>

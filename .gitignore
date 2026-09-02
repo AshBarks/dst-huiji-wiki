@@ -10,3 +10,4 @@
 build.log
 *.log
 .scratch/
+/dst_version.txt

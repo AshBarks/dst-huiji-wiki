@@ -791,8 +791,7 @@ fn translate_lock_body(
         Some(Cond::Unknown) | None => Cond::True,
         Some(other) => other,
     };
-    // Unknown guards (e.g. HasTag preconditions) are dropped, matching the
-    // wiki's hand-written conditions.
+    // Unknown guards（无法静态识别的前提）被丢弃，锁按已解锁处理。
     let mut value = value;
     for guard in guards.into_iter().rev() {
         if guard.contains_unknown() {
@@ -1205,9 +1204,17 @@ fn translate_call_expr(
     if head.ends_with("CountSkills") {
         return Cond::CountSkills;
     }
-    // HasTag guards are dropped (the wiki's evaluator has no HasTag and its
-    // own data omits these preconditions).
+    // HasTag(prefabname, "T", activatedskills) ≡ "至少一个已激活技能带该
+    // 标签" ≡ CountTags(T) >= 1（上一版把该前提丢弃，导致暗影/月亮沃比
+    // 这类锁少了冲刺小狗已激活的前提）。
     if head.ends_with("HasTag") {
+        if let Some(tag) = args.get(1).and_then(eval_string) {
+            return Cond::Cmp(
+                "GreaterOrEqThan",
+                Box::new(Cond::CountTags(tag)),
+                Box::new(Cond::Number(1.0)),
+            );
+        }
         return Cond::Unknown;
     }
     if let Some(block) = ctx.local_fns.get(head.as_str()) {
@@ -1792,13 +1799,30 @@ local skills = {
 }
 "#;
         let tree = parse_skill_tree(source, "t").unwrap();
+        // woby_shadow_lock：HasTag(woby_dash) 前提 + BasicShadow… 的
+        // CountTags(lunar_favor)==0，两者 AND。
+        let woby_expected = serde_json::json!({
+            "And": {
+                "left": { "GreaterOrEqThan": { "left": { "CountTags": "woby_dash" }, "right": 1 } },
+                "right": { "Eq": { "left": { "CountTags": "lunar_favor" }, "right": 0 } }
+            }
+        });
+        let node = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "woby_shadow_lock")
+            .unwrap();
+        assert_eq!(node.lock_open, Some(woby_expected));
+        // direct_ref_lock 没有 HasTag 守卫，只剩 allegiance 条件。
         let expected = serde_json::json!({
             "Eq": { "left": { "CountTags": "lunar_favor" }, "right": 0 }
         });
-        for name in ["woby_shadow_lock", "direct_ref_lock"] {
-            let node = tree.nodes.iter().find(|n| n.name == name).unwrap();
-            assert_eq!(node.lock_open, Some(expected.clone()), "{}", name);
-        }
+        let node = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "direct_ref_lock")
+            .unwrap();
+        assert_eq!(node.lock_open, Some(expected));
         let guarded = tree
             .nodes
             .iter()

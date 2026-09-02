@@ -557,7 +557,7 @@ async function pageSkills(main) {
   let skills = {};   // name -> node（icon 存在的节点）
   let locks = {};    // name -> node（lock_open 节点）
   let parents = {};  // skill -> 直接父技能（connects 指向它的技能）
-  let lockParents = {}; // skill -> connects 指向它的锁
+
   let activatedSkills = new Set();
   let focusing = null;
   // 每个节点的渲染引用
@@ -574,18 +574,23 @@ async function pageSkills(main) {
   const py = (y) => HEIGHT / 2 - yScale() * (y - Y_OFFSET);
 
   function buildMaps(nodes) {
-    skills = {}; locks = {}; parents = {}; lockParents = {};
+    skills = {}; locks = {}; parents = {};
     for (const n of nodes) {
       if (n.icon) skills[n.name] = n;
       else if (n.lock_open !== undefined) locks[n.name] = n;
     }
     for (const n of nodes) {
       if (skills[n.name]) parents[n.name] = [];
-      if (locks[n.name]) lockParents[n.name] = [];
     }
     for (const n of nodes) for (const c of (n.connects || [])) {
       if (skills[n.name] && parents[c]) parents[c].push(n.name);
-      if (locks[n.name] && lockParents[c]) lockParents[c].push(n.name);
+      // 与零件:Skilltree.js 相同：锁的 connects 子技能把该锁并入自己的
+      // locks（"只有一个lock的skill会没有locks"），进入 must_have_all_of。
+      if (locks[n.name] && skills[c]) {
+        const child = skills[c];
+        child.locks = child.locks || [];
+        if (!child.locks.includes(n.name)) child.locks.push(n.name);
+      }
     }
   }
 
@@ -633,24 +638,21 @@ async function pageSkills(main) {
     return !!evalLockCond(lock.lock_open);
   }
 
-  // 游戏内 RefreshTree 的状态机：
-  // - 带 locks 的技能：所有锁打开即可学习（不需要父技能激活）；
-  // - 其余技能：root、已学技能的 connects、已开锁的 connects 任一满足即可。
+  // 可学条件与零件:Skilltree.js / 游戏激活校验（ValidateCharacterData 的
+  // must_have_one_of / must_have_all_of）一致：
+  //   root，或（所有 locks 打开 且 有父技能被激活——无父技能视为可达）。
+  // 注意：skilltreebuilder 的显示循环虽然对带 locks 的技能只检查锁，
+  // 但真正学习要过服务端校验，父技能激活（或父为已开锁）仍是前提。
   function statusOf(name) {
     const skill = skills[name];
     if (!skill) return null;
     if (skill.infographic) return "selected";
     if (activatedSkills.has(name)) return "selected";
     if (remainingXp() <= 0) return "unselected";
-    let activatable;
-    if (skill.locks && skill.locks.length) {
-      activatable = skill.locks.every(l => isLockOpen(l));
-    } else {
-      activatable = skill.root
-        || (parents[name] || []).some(p => activatedSkills.has(p))
-        || (lockParents[name] || []).some(l => isLockOpen(l));
-    }
-    return activatable ? "selectable" : "unselected";
+    const unlocked = !(skill.locks || []).some(l => !isLockOpen(l));
+    const reachable = !(parents[name] || []).length
+      || parents[name].some(p => activatedSkills.has(p));
+    return (skill.root || (unlocked && reachable)) ? "selectable" : "unselected";
   }
 
   function canLearn(name) {

@@ -3,13 +3,13 @@
 **Scope**: All library code. Binary entrypoint is a thin shell.
 
 ## OVERVIEW
-8 public modules (lib.rs) + 1 binary-only module (main.rs:commands). Standalone files at root: `context.rs`, `error.rs`, `utils.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`.
+10 public modules (lib.rs) + 1 binary-only module (main.rs:commands). Standalone files at root: `context.rs`, `error.rs`, `utils.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`, `corpus/`, `knowledge/`, `llm/`, `update/`, `scripts_sync/`, `service/`.
 
 ## STRUCTURE
 ```
 src/
 ├── main.rs               # bin: mod commands + dispatch to commands::run()
-├── lib.rs                # 8 pub mod declarations + pub use of key types
+├── lib.rs                # 10 pub mod declarations + pub use of key types
 ├── commands/             # binary-only (NOT in lib.rs)
 │   ├── mod.rs            # Args (clap derive) + Commands enum + run() dispatcher
 │   └── maintain.rs       # 7+ command handlers (743 lines)
@@ -38,6 +38,9 @@ src/
 ├── copyclip/             # marker-based wiki module content updater
 │   ├── mod.rs            # CopyClipProcessor
 │   └── config.rs         # TOML config for module constants
+├── scripts_sync/         # scripts.zip 同步 (update_scripts.py 移植)
+│   ├── mod.rs            # sync(): 版本检测→staging 解压→快照归档→版本记录
+│   └── state.rs          # dst_version.txt 状态文件 + 版本对比纯函数
 ├── context.rs            # DstContext (lazy ZIP archive + wiki client + env)
 ├── error.rs              # Error enum (14 variants) + Result<T> alias
 └── utils.rs              # diff_lines() only (unified-diff utility)
@@ -55,10 +58,11 @@ src/
 | Understand file vs directory modules | `src/` root | context.rs/error.rs/utils.rs = single files; everything else = directory |
 | Find where a concrete mapper lives | `src/mapping/mappers/` | Each mapper is its own file |
 | Update CopyClip wiki module config | `src/copyclip/config.rs` | TOML-based module/page mappings |
+| Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync`; snapshot naming must stay `scripts_<yyyymmddhhmm>` for `DstContext::list_snapshots` |
 
 ## LOCAL CONVENTIONS
 - **Module files**: `mod.rs` only in directory modules. No other files contain `mod` declarations.
-- **lib.rs discipline**: Only 8 public modules. No inline code, no mod tests. Declarations + re-exports only.
+- **lib.rs discipline**: Declarations + re-exports only. No inline code, no mod tests.
 - **commands exclusion**: `commands` stays out of lib.rs to keep clap deps out of the library crate.
 - **Re-export policy**: Only the types external consumers need. Internal types stay `pub(crate)` or private.
 

@@ -12,7 +12,7 @@ Rust CLI tool for maintaining the Don't Starve Together (DST) Huiji Wiki. Parses
 dst-huiji-wiki/
 ├── src/
 │   ├── main.rs              # Binary entry (tokio + clap dispatch)
-│   ├── lib.rs               # Library root (8 public modules)
+│   ├── lib.rs               # Library root (10 public modules)
 │   ├── commands/            # CLI arg definitions + all handlers
 │   ├── web/                 # WebUI server (binary-only; axum routes, JobManager, embedded SPA assets)
 │   ├── parser/              # Game data parsers (Lua, PO, recipes, prefab overrides)
@@ -23,6 +23,7 @@ dst-huiji-wiki/
 │   │   └── mappers/         # Concrete mappers (PoEntryMapper, RecipeMapper)
 │   ├── wiki/                # MediaWiki API client
 │   ├── copyclip/            # Wiki module content updater (marker-based replacement)
+│   ├── scripts_sync/        # scripts.zip 同步:版本检测→归档旧树→解压新树 (update_scripts.py 移植)
 │   ├── context.rs           # DstContext (zip archive, wiki client, env setup)
 │   ├── error.rs             # Error enum (thiserror) + Result<T>
 │   └── utils.rs             # diff_lines utility
@@ -45,6 +46,7 @@ dst-huiji-wiki/
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs |
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
+| Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; images/ktech flow not ported |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
 | Add environment config | `.env.example` → `.env` | HUIJI__* and DST__ROOT vars |
 
@@ -67,6 +69,7 @@ dst-huiji-wiki/
 | `PoEntry` / `PoFile` | Struct | src/models/po.rs | PO translation entry + file container |
 | `TechReport` | Struct | src/models/tech_report.rs | Compares parsed vs wiki tech levels |
 | `Error` | Enum | src/error.rs | 14 variants (Io, PoParse, Http, WikiApi, Zip, etc.) |
+| `SyncParams` / `sync()` | Struct / Fn | src/scripts_sync/mod.rs | scripts.zip 同步入口:版本检测→staging 解压→快照归档→版本记录 |
 
 ## CONVENTIONS
 - **Edition 2021**, stable Rust only, no nightly features
@@ -93,11 +96,12 @@ dst-huiji-wiki/
 - `DstContext`: lazily opens ZIP archives of game scripts, provides unified access to PO files and Lua sources
 - `RecipeParser`: handles Lua for-loops (numeric + generic/ipairs) to expand recipe definitions at parse time
 - `PrefabOverrideParser`: deep AST walking across function boundaries, tracks local variables and parameters to resolve prefab name overrides
+- `scripts_sync`: staging-first sync (extract to `incoming_<ts>` → rename live tree to snapshot → move staged tree in place, rollback on failure); timestamp collision degrades to a clear error + hint, no auto-suffix
 
 ## COMMANDS
 ```bash
 cargo build --release              # Build binary
-cargo test                         # Run all 168 inline tests
+cargo test                         # Run all 370 inline tests
 cargo fmt --check                  # Check formatting
 cargo clippy -- -D warnings        # Lint (CI uses this)
 cargo run --release -- --help      # Show CLI help

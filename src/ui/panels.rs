@@ -182,6 +182,7 @@ impl App {
                                         self.active_frame_idx = 0;
                                         self.playing = false;
                                         self.disabled_elements.clear();
+                                        self.animation_disabled_symbols.clear();
                                         self.cache_dirty = true;
                                         self.needs_re_render = true;
                                     }
@@ -198,6 +199,7 @@ impl App {
                 self.active_bank_idx = 0;
                 self.active_anim_inner_idx = 0;
                 self.disabled_elements.clear();
+                self.animation_disabled_symbols.clear();
                 self.cache_dirty = true;
                 self.needs_re_render = true;
             } else if idx <= self.active_anim_idx {
@@ -205,6 +207,7 @@ impl App {
                 self.active_bank_idx = 0;
                 self.active_anim_inner_idx = 0;
                 self.disabled_elements.clear();
+                self.animation_disabled_symbols.clear();
                 self.cache_dirty = true;
                 self.needs_re_render = true;
             }
@@ -679,6 +682,36 @@ impl App {
             return;
         }
 
+        let mut show_all = false;
+        let mut hide_all = false;
+        ui.horizontal(|ui| {
+            if ui
+                .small_button("All")
+                .on_hover_text("Show all symbols in this animation")
+                .clicked()
+            {
+                show_all = true;
+            }
+            if ui
+                .small_button("None")
+                .on_hover_text("Hide all symbols in this animation")
+                .clicked()
+            {
+                hide_all = true;
+            }
+            ui.label(
+                egui::RichText::new(format!(
+                    "{} hidden",
+                    symbol_names
+                        .iter()
+                        .filter(|s| self.animation_disabled_symbols.contains(s.as_str()))
+                        .count()
+                ))
+                .small()
+                .color(egui::Color32::GRAY),
+            );
+        });
+
         let eligible_builds: Vec<(usize, &str, bool)> = self
             .builds
             .iter()
@@ -687,7 +720,10 @@ impl App {
             .map(|(idx, e)| (idx, e.source_name.as_str(), false))
             .collect();
 
+        let mut symbol_toggles: Vec<(String, bool)> = Vec::new();
+
         for sym_lower in &symbol_names {
+            let is_hidden = self.animation_disabled_symbols.contains(sym_lower.as_str());
             let mut winner_build_idx: Option<usize> = None;
             let mut all_providers: Vec<(usize, &str)> = Vec::new();
 
@@ -710,52 +746,92 @@ impl App {
                 }
             }
 
-            egui::CollapsingHeader::new(sym_lower.as_str())
-                .id_salt(format!("sym_dep_{}", sym_lower))
-                .default_open(false)
-                .show(ui, |ui| {
-                    if all_providers.is_empty() {
-                        ui.label(
-                            egui::RichText::new("missing — no build provides this symbol")
+            ui.horizontal(|ui| {
+                let mut visible = !is_hidden;
+                if ui.checkbox(&mut visible, "").changed() {
+                    symbol_toggles.push((sym_lower.clone(), visible));
+                }
+                let (color, label) = if is_hidden {
+                    (egui::Color32::GRAY, format!("{} (hidden)", sym_lower))
+                } else {
+                    (egui::Color32::LIGHT_BLUE, sym_lower.clone())
+                };
+                egui::CollapsingHeader::new(egui::RichText::new(label).color(color))
+                    .id_salt(format!("sym_dep_{}", sym_lower))
+                    .default_open(false)
+                    .show(ui, |ui| {
+                        if all_providers.is_empty() {
+                            ui.label(
+                                egui::RichText::new("missing — no build provides this symbol")
+                                    .small()
+                                    .color(egui::Color32::RED),
+                            );
+                            return;
+                        }
+
+                        for (build_idx, source_name) in &all_providers {
+                            let build = self.builds[*build_idx].build.as_ref().unwrap();
+                            let sym = build
+                                .symbol_index
+                                .get(sym_lower.as_str())
+                                .and_then(|&si| build.symbols.get(si));
+                            let frame_count = sym.map(|s| s.frames.len()).unwrap_or(0);
+                            let is_disabled = self.builds[*build_idx]
+                                .disabled_symbols
+                                .contains(sym_lower.as_str());
+                            let is_winner = winner_build_idx == Some(*build_idx);
+
+                            let (color, suffix) = if is_hidden {
+                                (egui::Color32::GRAY, " (hidden in animation)")
+                            } else if is_disabled {
+                                (egui::Color32::YELLOW, " (disabled)")
+                            } else if is_winner {
+                                (egui::Color32::LIGHT_BLUE, "")
+                            } else {
+                                (egui::Color32::GRAY, " (shadowed)")
+                            };
+
+                            ui.label(
+                                egui::RichText::new(format!(
+                                    "  {} [{} frames] from {}{}",
+                                    if is_winner { "\u{2500}" } else { "\u{2514}" },
+                                    frame_count,
+                                    source_name,
+                                    suffix,
+                                ))
                                 .small()
-                                .color(egui::Color32::RED),
-                        );
-                        return;
-                    }
+                                .color(color),
+                            );
+                        }
+                    });
+            });
+        }
 
-                    for (build_idx, source_name) in &all_providers {
-                        let build = self.builds[*build_idx].build.as_ref().unwrap();
-                        let sym = build
-                            .symbol_index
-                            .get(sym_lower.as_str())
-                            .and_then(|&si| build.symbols.get(si));
-                        let frame_count = sym.map(|s| s.frames.len()).unwrap_or(0);
-                        let is_disabled = self.builds[*build_idx]
-                            .disabled_symbols
-                            .contains(sym_lower.as_str());
-                        let is_winner = winner_build_idx == Some(*build_idx);
-
-                        let (color, suffix) = if is_disabled {
-                            (egui::Color32::YELLOW, " (disabled)")
-                        } else if is_winner {
-                            (egui::Color32::LIGHT_BLUE, "")
-                        } else {
-                            (egui::Color32::GRAY, " (shadowed)")
-                        };
-
-                        ui.label(
-                            egui::RichText::new(format!(
-                                "  {} [{} frames] from {}{}",
-                                if is_winner { "\u{2500}" } else { "\u{2514}" },
-                                frame_count,
-                                source_name,
-                                suffix,
-                            ))
-                            .small()
-                            .color(color),
-                        );
-                    }
-                });
+        if show_all && !self.animation_disabled_symbols.is_empty() {
+            self.animation_disabled_symbols.clear();
+            self.cache_dirty = true;
+            self.needs_re_render = true;
+        }
+        if hide_all {
+            let mut changed = false;
+            for sym in &symbol_names {
+                if self.animation_disabled_symbols.insert(sym.clone()) {
+                    changed = true;
+                }
+            }
+            if changed {
+                self.cache_dirty = true;
+                self.needs_re_render = true;
+            }
+        }
+        for (sym, enabled) in symbol_toggles {
+            if enabled {
+                self.animation_disabled_symbols.remove(&sym);
+            } else {
+                self.animation_disabled_symbols.insert(sym);
+            }
+            self.cache_dirty = true;
+            self.needs_re_render = true;
         }
     }
 

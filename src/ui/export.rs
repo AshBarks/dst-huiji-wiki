@@ -124,6 +124,7 @@ pub fn start_gif_export_thread(
     build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))>,
     disabled_elements: HashSet<(String, String)>,
+    disabled_symbols: HashSet<String>,
 ) -> mpsc::Receiver<GifExportResult> {
     let (bounds, prepared) = prepare_animation_frames(
         &anim.frames,
@@ -131,6 +132,7 @@ pub fn start_gif_export_thread(
         1.0,
         (0.0, 0.0),
         &disabled_elements,
+        &disabled_symbols,
     );
     let frame_rate = anim.frame_rate;
 
@@ -191,6 +193,7 @@ pub fn start_png_export_thread(
     build_list: &[dst_anim_tool::render::BuildRef<'_>],
     cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))>,
     disabled_elements: HashSet<(String, String)>,
+    disabled_symbols: HashSet<String>,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {
     let (bounds, prepared) = prepare_animation_frames(
@@ -199,6 +202,7 @@ pub fn start_png_export_thread(
         1.0,
         (0.0, 0.0),
         &disabled_elements,
+        &disabled_symbols,
     );
     let frame_rate = anim.frame_rate;
 

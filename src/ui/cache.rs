@@ -185,6 +185,7 @@ impl App {
             1.0,
             (0.0, 0.0),
             &self.disabled_elements,
+            &self.animation_disabled_symbols,
         );
         if let Some(union) = &bounds {
             let mut total: u64 = 0;
@@ -217,6 +218,7 @@ impl App {
             1.0,
             (0.0, 0.0),
             &self.disabled_elements,
+            &self.animation_disabled_symbols,
         );
         let cache_gen_val = self.cache_gen;
         let total_frames = anim.frames.len();
@@ -361,6 +363,7 @@ impl App {
             &build_list,
             1.0,
             &self.disabled_elements,
+            &self.animation_disabled_symbols,
         );
         let Some(elements) = elements else {
             self.frame_texture = None;
@@ -669,6 +672,7 @@ impl App {
             self.active_anim_inner_idx = 0;
             self.active_frame_idx = 0;
             self.disabled_elements.clear();
+            self.animation_disabled_symbols.clear();
         }
 
         if !data.decoded_textures.is_empty() {

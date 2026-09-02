@@ -73,6 +73,7 @@ pub struct App {
     bg_loader: Option<BackgroundLoader>,
     animation_bounds: Option<BoundingBox>,
     disabled_elements: HashSet<(String, String)>,
+    animation_disabled_symbols: HashSet<String>,
     collapse_pending: bool,
     #[cfg(feature = "gif")]
     gif_export: Option<BackgroundGifExport>,
@@ -111,6 +112,7 @@ impl App {
             bg_loader: None,
             animation_bounds: None,
             disabled_elements: HashSet::new(),
+            animation_disabled_symbols: HashSet::new(),
             collapse_pending: false,
             #[cfg(feature = "gif")]
             gif_export: None,
@@ -260,6 +262,7 @@ impl App {
             &build_list,
             cached_frames,
             self.disabled_elements.clone(),
+            self.animation_disabled_symbols.clone(),
         );
         self.gif_export = Some(BackgroundGifExport { receiver, path });
     }
@@ -316,6 +319,7 @@ impl App {
             &build_list,
             cached_frames,
             self.disabled_elements.clone(),
+            self.animation_disabled_symbols.clone(),
             dir,
         );
         self.png_export = Some(BackgroundPngExport { receiver });
@@ -349,6 +353,7 @@ impl App {
         self.active_frame_idx = 0;
         self.playing = false;
         self.disabled_elements.clear();
+        self.animation_disabled_symbols.clear();
         self.cache_dirty = true;
         self.needs_re_render = true;
     }

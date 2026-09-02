@@ -300,6 +300,7 @@ fn cmd_render(
         1.0,
         (0.0, 0.0),
         &HashSet::new(),
+        &HashSet::new(),
     );
 
     prepared.par_iter().enumerate().try_for_each(

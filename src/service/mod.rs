@@ -1996,7 +1996,9 @@ async fn output_json_result_with_update(
     }
 
     reporter.log("--- 检测到变化 ---".to_string());
-    reporter.log(crate::diff_lines(&historical_json, &new_json));
+    let diff = crate::diff_lines(&historical_json, &new_json);
+    let (added, removed) = crate::count_diff_stats(&diff);
+    reporter.diff(page_title, &diff, added, removed);
 
     // Only Interactive mode consults the reporter; AutoConfirm/DryRun must
     // not block on stdin in unattended runs.
@@ -2082,7 +2084,9 @@ async fn output_copyclip_result_with_update(
     }
 
     reporter.log("--- 检测到变化 ---".to_string());
-    reporter.log(crate::diff_lines(target_content, updated_content));
+    let diff = crate::diff_lines(target_content, updated_content);
+    let (added, removed) = crate::count_diff_stats(&diff);
+    reporter.diff(page_title, &diff, added, removed);
 
     if let Some(output_path) = output {
         std::fs::write(&output_path, updated_content)?;

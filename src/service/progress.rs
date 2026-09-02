@@ -22,6 +22,8 @@ pub trait Reporter: Send + Sync {
     fn log(&self, msg: String);
     /// A major phase transition (used as progress milestones).
     fn stage(&self, name: &str);
+    /// A structured wiki-write diff preview for one page.
+    fn diff(&self, page: &str, text: &str, added: usize, removed: usize);
     /// Ask whether a wiki write should be performed.
     fn confirm(&self, prompt: &str) -> bool;
 }
@@ -51,6 +53,11 @@ impl Reporter for StdoutReporter {
 
     fn stage(&self, name: &str) {
         println!("\n========== {} ==========", name);
+    }
+
+    fn diff(&self, page: &str, text: &str, added: usize, removed: usize) {
+        println!("\n--- diff: {} (+{} -{}) ---", page, added, removed);
+        println!("{}", text);
     }
 
     fn confirm(&self, prompt: &str) -> bool {
@@ -92,6 +99,15 @@ pub enum JobEvent {
         seq: u64,
         ts_ms: u64,
         name: String,
+    },
+    /// Structured wiki-write diff preview for one page.
+    Diff {
+        seq: u64,
+        ts_ms: u64,
+        page: String,
+        text: String,
+        added: usize,
+        removed: usize,
     },
     /// Terminal marker pushed exactly once when the job finishes.
     Done {
@@ -183,6 +199,17 @@ impl Reporter for CaptureReporter {
             seq: self.next_seq(),
             ts_ms: now_ms(),
             name: name.to_string(),
+        });
+    }
+
+    fn diff(&self, page: &str, text: &str, added: usize, removed: usize) {
+        self.push(JobEvent::Diff {
+            seq: self.next_seq(),
+            ts_ms: now_ms(),
+            page: page.to_string(),
+            text: text.to_string(),
+            added,
+            removed,
         });
     }
 

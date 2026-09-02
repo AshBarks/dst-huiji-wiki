@@ -3,7 +3,7 @@
 //! Jobs run as tokio tasks; output is captured by a [`CaptureReporter`]
 //! which also broadcasts events to live SSE subscribers.
 
-use dst_huiji_wiki::service::{execute_job, CaptureReporter, JobKind};
+use dst_huiji_wiki::service::{execute_job, CaptureReporter, JobEvent, JobKind};
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -40,6 +40,8 @@ pub fn now_ms() -> u64 {
 pub struct JobHandle {
     pub id: Uuid,
     pub kind: JobKind,
+    /// Whether this job ran in dry-run mode (wiki writes skipped).
+    pub dry_run: bool,
     pub status: RwLock<JobStatus>,
     pub created_at_ms: u64,
     pub started_at_ms: Mutex<Option<u64>>,
@@ -60,6 +62,7 @@ impl JobHandle {
             "id": self.id.to_string(),
             "kind": self.kind.name(),
             "touches_wiki": self.kind.touches_wiki(),
+            "dry_run": self.dry_run,
             "status": *self.status.read().await,
             "created_at_ms": self.created_at_ms,
             "started_at_ms": *self.started_at_ms.lock().await,
@@ -74,6 +77,28 @@ impl JobHandle {
             v["params"] = obj;
         }
         v["logs"] = serde_json::to_value(self.reporter.snapshot_logs()).unwrap_or_default();
+        // Structured per-page wiki diffs, in emission order.
+        let diffs: Vec<serde_json::Value> = self
+            .reporter
+            .snapshot_logs()
+            .into_iter()
+            .filter_map(|ev| match ev {
+                JobEvent::Diff {
+                    page,
+                    text,
+                    added,
+                    removed,
+                    ..
+                } => Some(serde_json::json!({
+                    "page": page,
+                    "text": text,
+                    "added": added,
+                    "removed": removed,
+                })),
+                _ => None,
+            })
+            .collect();
+        v["diffs"] = serde_json::to_value(diffs).unwrap_or_default();
         if let Some(r) = self.result_json.lock().await.as_ref() {
             v["result"] = r.clone();
         }
@@ -101,20 +126,21 @@ impl JobManager {
 
     /// Submits a job and spawns it on the tokio runtime.
     ///
-    /// `auto_confirm` answers wiki-write prompts: `false` for dry-runs
-    /// (writes are skipped), `true` when the user explicitly opted in via UI.
+    /// `dry_run` answers wiki-write prompts: `true` skips all writes
+    /// (only diffs are produced), `false` applies them directly.
     pub async fn submit(
         &self,
         kind: JobKind,
-        auto_confirm: bool,
+        dry_run: bool,
         datasets: Option<Arc<DatasetInvalidator>>,
     ) -> Arc<JobHandle> {
         let id = Uuid::new_v4();
-        let reporter = Arc::new(CaptureReporter::new(auto_confirm));
+        let reporter = Arc::new(CaptureReporter::new(!dry_run));
 
         let handle = Arc::new(JobHandle {
             id,
             kind: kind.clone(),
+            dry_run,
             status: RwLock::new(JobStatus::Queued),
             created_at_ms: now_ms(),
             started_at_ms: Mutex::new(None),

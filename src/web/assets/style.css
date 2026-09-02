@@ -42,6 +42,21 @@ label{display:block;margin:8px 0 3px;color:var(--muted);font-size:13px}
 .log{background:#0c0f15;border:1px solid var(--line);border-radius:10px;padding:12px;
   font:12px/1.5 ui-monospace,Consolas,monospace;height:420px;overflow:auto;white-space:pre-wrap;word-break:break-all}
 .log .stage{color:var(--accent);font-weight:700;display:block;margin-top:8px}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+  padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.diff-card{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.diff-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--panel2);
+  border-bottom:1px solid var(--line);font-size:13px}
+.diff-head .spacer{flex:1}
+.diff-body{margin:0;padding:10px 12px;background:#0c0f15;overflow:auto;max-height:380px;
+  font:12px/1.5 ui-monospace,Consolas,monospace;white-space:pre}
+.diff-body .d-add{background:rgba(63,185,110,.12);color:var(--ok)}
+.diff-body .d-del{background:rgba(224,92,92,.12);color:var(--err)}
+.diff-body .d-hunk{color:var(--purple)}
+.diff-body .d-head{color:var(--accent);font-weight:700}
+.btn.mini{padding:3px 10px;font-size:12px}
 .chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
   padding:1px 8px;border-radius:99px;margin:1px 3px;font-size:12px;cursor:pointer}
 .chip:hover{border-color:var(--accent);color:var(--accent)}

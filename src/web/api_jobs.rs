@@ -37,10 +37,9 @@ pub async fn submit(
     Json(req): Json<SubmitJobRequest>,
 ) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
     // Wiki-touching jobs default to dry-run; explicit confirmation flips it.
-    let auto_confirm = !req.dry_run;
     let handle = state
         .jobs
-        .submit(req.kind, auto_confirm, Some(Arc::clone(&state.datasets)))
+        .submit(req.kind, req.dry_run, Some(Arc::clone(&state.datasets)))
         .await;
     Ok(Json(handle.summary().await))
 }

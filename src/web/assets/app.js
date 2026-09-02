@@ -69,6 +69,34 @@ function statusBadge(status) {
   return `<span class="badge b-${esc(status)}">${esc(status)}</span>`;
 }
 
+function elFromHtml(html) {
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+function diffCardHtml(d) {
+  const lines = (d.text || "").split("\n").map(l => {
+    let cls = "";
+    if (l.startsWith("+++") || l.startsWith("---")) cls = "d-head";
+    else if (l.startsWith("@@")) cls = "d-hunk";
+    else if (l.startsWith("+")) cls = "d-add";
+    else if (l.startsWith("-")) cls = "d-del";
+    return `<div class="${cls}">${esc(l)}</div>`;
+  }).join("");
+  return `
+    <div class="diff-card">
+      <div class="diff-head">
+        <code>${esc(d.page)}</code>
+        <span class="badge b-ok">+${d.added}</span>
+        <span class="badge b-err">-${d.removed}</span>
+        <span class="spacer"></span>
+        <button class="btn secondary mini" data-copy>复制</button>
+      </div>
+      <pre class="diff-body">${lines}</pre>
+    </div>`;
+}
+
 function snapshotSelect(onChangeId) {
   return `<select id="${onChangeId}" title="数据版本">
     <option value="">最新</option>
@@ -197,7 +225,7 @@ async function pageJobs(main) {
           ? ((j.finished_at_ms - j.started_at_ms) / 1000).toFixed(1) + "s"
           : (j.status === "running" ? "进行中…" : "—");
         return `<tr style="cursor:pointer" onclick="location.hash='#/jobs/${j.id}'">
-          <td>${statusBadge(j.status)}</td><td><code>${esc(j.kind)}</code></td>
+          <td>${statusBadge(j.status)}</td><td>${j.touches_wiki && j.dry_run ? '<span class="badge b-warn">干跑</span> ' : ""}<code>${esc(j.kind)}</code></td>
           <td>${fmtTime(j.created_at_ms)}</td><td>${dur}</td>
           <td class="muted">${j.event_count} 条日志</td></tr>`;
       }).join("") || '<tr><td colspan="5" class="muted">暂无任务</td></tr>'}</tbody></table>`;
@@ -209,30 +237,74 @@ async function pageJobs(main) {
 async function pageJobDetail(main, id) {
   main.innerHTML = `
     <div class="panel" id="jdHead"></div>
-    <div class="panel"><div class="log" id="jdLog"></div></div>`;
+    <div class="panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="log">日志</button>
+        <button class="tab" data-tab="diff" id="tabDiff">Diff 预览</button>
+      </div>
+      <div class="log" id="jdLog"></div>
+      <div id="jdDiffs" style="display:none"></div>
+    </div>`;
   const logEl = $("#jdLog");
+  const diffEl = $("#jdDiffs");
+  const tabDiffBtn = $("#tabDiff");
+  const tabBtns = main.querySelectorAll(".tab");
   let doneSeen = false;
+  let diffCount = 0;
+
+  tabBtns.forEach(b => b.onclick = () => {
+    tabBtns.forEach(x => x.classList.toggle("active", x === b));
+    const showDiff = b.dataset.tab === "diff";
+    logEl.style.display = showDiff ? "none" : "";
+    diffEl.style.display = showDiff ? "" : "none";
+  });
+
+  const appendDiff = (d) => {
+    diffCount++;
+    tabDiffBtn.textContent = `Diff 预览 (${diffCount})`;
+    diffEl.appendChild(elFromHtml(diffCardHtml(d)));
+    const copyBtn = diffEl.lastElementChild.querySelector("[data-copy]");
+    if (copyBtn) copyBtn.onclick = () => navigator.clipboard.writeText(d.text);
+  };
 
   const appendEv = (ev) => {
     if (ev.type === "log") logEl.textContent += ev.text + "\n";
     else if (ev.type === "stage") logEl.textContent += `\n========== ${ev.name} ==========\n`;
+    else if (ev.type === "diff") appendDiff(ev);
     else if (ev.type === "done") doneSeen = true;
     logEl.scrollTop = logEl.scrollHeight;
   };
 
-  const head = await getJSON(`/api/jobs/${id}`);
-  $("#jdHead").innerHTML = `
+  const renderHead = (h) => {
+    const canApprove = h.touches_wiki && h.dry_run && h.status === "success";
+    $("#jdHead").innerHTML = `
     <div class="row">
-      <h2 style="margin:0"><code>${esc(head.kind)}</code> ${statusBadge(head.status)}</h2>
+      <h2 style="margin:0"><code>${esc(h.kind)}</code> ${statusBadge(h.status)}</h2>
+      ${canApprove ? `<button class="btn" id="approveBtn">批准并真实写入</button>` : ""}
       <button class="btn danger" id="cancelBtn">取消任务</button>
       <button class="btn secondary" onclick="location.hash='#/jobs'">返回列表</button>
     </div>
-    ${head.error ? `<p style="color:var(--err)">错误：${esc(head.error)}</p>` : ""}
-    <details><summary class="muted">任务参数</summary><pre>${esc(JSON.stringify(head.params, null, 2))}</pre></details>
-    ${head.result ? `<details open><summary>执行结果</summary><pre>${esc(JSON.stringify(head.result, null, 2))}</pre></details>` : ""}`;
-  $("#cancelBtn").onclick = async () => { await postJSON(`/api/jobs/${id}/cancel`); };
+    ${h.error ? `<p style="color:var(--err)">错误：${esc(h.error)}</p>` : ""}
+    <details><summary class="muted">任务参数</summary><pre>${esc(JSON.stringify(h.params, null, 2))}</pre></details>
+    ${h.result ? `<details open><summary>执行结果</summary><pre>${esc(JSON.stringify(h.result, null, 2))}</pre></details>` : ""}`;
+    const cb = $("#cancelBtn");
+    if (cb) cb.onclick = async () => { await postJSON(`/api/jobs/${id}/cancel`); };
+    if (cb) cb.disabled = !["queued", "running"].includes(h.status);
+    const ab = $("#approveBtn");
+    if (ab) ab.onclick = async () => {
+      if (!confirm("将使用相同参数真实写入维基页面（不再走干跑）。确定继续？")) return;
+      ab.disabled = true;
+      try {
+        const j = await postJSON("/api/jobs", Object.assign({}, h.params, { dry_run: false }));
+        location.hash = `#/jobs/${j.id}`;
+      } catch (e) { ab.disabled = false; alert("提交失败：" + e.message); }
+    };
+  };
 
+  const head = await getJSON(`/api/jobs/${id}`);
+  renderHead(head);
   for (const ev of head.logs || []) appendEv(ev);
+  for (const d of head.diffs || []) appendDiff(d);
 
   if (!doneSeen && !["success", "failed", "cancelled"].includes(head.status)) {
     const es = new EventSource(`/api/jobs/${id}/events`);
@@ -243,13 +315,7 @@ async function pageJobDetail(main, id) {
     es.onerror = () => { if (doneSeen) es.close(); };
   } else { doneSeen = true; }
 
-  async function refreshHead() {
-    const h = await getJSON(`/api/jobs/${id}`);
-    const badge = $("#jdHead .badge");
-    if (badge) badge.outerHTML = statusBadge(h.status);
-    const cb = $("#cancelBtn"); if (cb) cb.disabled = !["queued", "running"].includes(h.status);
-  }
-  refreshHead();
+  async function refreshHead() { renderHead(await getJSON(`/api/jobs/${id}`)); }
 }
 
 /* ---------------- recipes & ingredients ---------------- */

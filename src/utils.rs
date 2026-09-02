@@ -19,6 +19,25 @@ pub fn diff_lines(old: &str, new: &str) -> String {
         .to_string()
 }
 
+/// Counts added/removed content lines in a unified diff produced by
+/// [`diff_lines`]. `---`/`+++` headers and `@@` hunk markers are excluded.
+pub fn count_diff_stats(diff: &str) -> (usize, usize) {
+    let mut added = 0;
+    let mut removed = 0;
+    for line in diff.lines() {
+        if let Some(rest) = line.strip_prefix('+') {
+            if !rest.starts_with('+') {
+                added += 1;
+            }
+        } else if let Some(rest) = line.strip_prefix('-') {
+            if !rest.starts_with('-') {
+                removed += 1;
+            }
+        }
+    }
+    (added, removed)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -108,5 +127,21 @@ mod tests {
         let result = diff_lines("斧头描述", "斧头说明");
         assert!(result.contains("-斧头描述"), "expected -斧头描述");
         assert!(result.contains("+斧头说明"), "expected +斧头说明");
+    }
+
+    #[test]
+    fn test_count_diff_stats() {
+        let diff = diff_lines("a\nb\nc\nd", "a\nx\nc\ny");
+        let (added, removed) = count_diff_stats(&diff);
+        assert_eq!(added, 2);
+        assert_eq!(removed, 2);
+    }
+
+    #[test]
+    fn test_count_diff_stats_headers_ignored() {
+        let diff = "--- old\n+++ new\n@@ -1 +1 @@\n-a\n+added\n context\n";
+        let (added, removed) = count_diff_stats(diff);
+        assert_eq!(added, 1);
+        assert_eq!(removed, 1);
     }
 }

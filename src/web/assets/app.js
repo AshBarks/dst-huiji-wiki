@@ -164,19 +164,48 @@ async function pageDashboard(main) {
 }
 
 /* ---------------- jobs ---------------- */
-const JOB_FIELDS = {
-  "parse_po": [["input", "PO 文件路径"], ["category", "类别过滤（可选）"]],
-  "map_names": [["input", "PO 文件路径"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
-  "map_recipes": [["input", "recipes.lua 路径"], ["po_file", "PO 文件（可选）"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
-  "maintain_item_table": [],
-  "maintain_dst_recipes": [],
-  "maintain_copy_clip": [["type", "类型：rbtl / tech / filters / names（留空=全部）"]],
-  "prefab_overrides": [["input", "Lua 文件路径"]],
-};
-const JOB_LABELS = {
-  parse_po: "parse-po 解析 PO", map_names: "map-names 名称映射", map_recipes: "map-recipes 配方映射",
-  maintain_item_table: "维护物品表 → 维基", maintain_dst_recipes: "维护配方表 → 维基",
-  maintain_copy_clip: "维护模块常量 → 维基", prefab_overrides: "预制体重定向解析",
+// Each entry: label; wiki: true => the job edits wiki pages, so the global
+// "wiki dry-run" checkbox applies and dry_run=false needs an extra confirm.
+// Local-only jobs (wiki: false) gate their own disk writes via JobKind
+// fields of the same shape; the global checkbox is hidden for them.
+const JOB_DEFS = {
+  parse_po: {
+    label: "parse-po 解析 PO",
+    fields: [["input", "PO 文件路径"], ["category", "类别过滤（可选）"]],
+  },
+  map_names: {
+    label: "map-names 名称映射",
+    fields: [["input", "PO 文件路径"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
+  },
+  map_recipes: {
+    label: "map-recipes 配方映射",
+    fields: [["input", "recipes.lua 路径"], ["po_file", "PO 文件（可选）"], ["version", "版本号（可选）"], ["compare", "对比文件（可选）"]],
+  },
+  maintain_item_table: { label: "维护物品表 → 维基", wiki: true },
+  maintain_dst_recipes: { label: "维护配方表 → 维基", wiki: true },
+  maintain_copy_clip: {
+    label: "维护模块常量 → 维基", wiki: true,
+    fields: [["type", "类型：rbtl / tech / filters / names（留空=全部）"]],
+  },
+  prefab_overrides: {
+    label: "预制体重定向解析",
+    fields: [["input", "Lua 文件路径"]],
+  },
+  scripts_sync: {
+    label: "scripts-sync 同步游戏脚本",
+    fields: [
+      { k: "force", type: "check", label: "强制重新同步（版本相同也执行）" },
+      { k: "dry_run", type: "check", label: "演练：只报告计划、不动任何文件" },
+      { k: "state_path", label: "版本状态文件（可选，默认 ./dst_version.txt）" },
+    ],
+  },
+  images_sync: {
+    label: "images-sync 处理游戏图片",
+    fields: [
+      { k: "force", type: "check", label: "忽略增量与幂等检查，全量重跑" },
+      { k: "dry_run", type: "check", label: "演练：只盘点并报告计划、不写文件" },
+    ],
+  },
 };
 
 async function pageJobs(main) {
@@ -184,14 +213,14 @@ async function pageJobs(main) {
     <div class="panel">
       <h2>提交新任务</h2>
       <div class="row">
-        <select id="jobKind">${Object.entries(JOB_LABELS)
-          .map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
-        <label style="margin:0;display:flex;align-items:center;gap:6px;color:var(--text)">
-          <input type="checkbox" id="dryRun" checked> 干跑模式（不写入维基）</label>
+        <select id="jobKind">${Object.entries(JOB_DEFS)
+          .map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select>
+        <label id="dryRunRow" style="margin:0;display:flex;align-items:center;gap:6px;color:var(--text)">
+          <input type="checkbox" id="dryRun" checked> 维基干跑（不写入维基，仅出 diff）</label>
         <button class="btn" id="submitJob">提交任务</button>
       </div>
       <div id="jobFields"></div>
-      <p class="muted">涉及维基写入的任务在干跑模式下只会生成 diff 预览；取消勾选后将在页面确认过参数的前提下直接执行写入。</p>
+      <p class="muted" id="jobHint"></p>
     </div>
     <div class="panel">
       <h2>任务列表</h2>
@@ -200,21 +229,37 @@ async function pageJobs(main) {
 
   const kindSel = $("#jobKind");
   const renderFields = () => {
-    const fields = JOB_FIELDS[kindSel.value] || [];
-    $("#jobFields").innerHTML = fields
-      .map(([k, label]) => `<label>${esc(label)}<input style="width:100%" data-field="${k}"></label>`)
-      .join("");
+    const def = JOB_DEFS[kindSel.value];
+    $("#dryRunRow").style.display = def.wiki ? "" : "none";
+    $("#jobFields").innerHTML = (def.fields || [])
+      .map(f => {
+        const [k, label] = Array.isArray(f) ? f : [f.k, f.label];
+        if (!Array.isArray(f) && f.type === "check")
+          return `<label style="display:flex;align-items:center;gap:6px;margin:6px 0;color:var(--text)">
+            <input type="checkbox" data-field="${k}"> ${esc(label)}</label>`;
+        return `<label>${esc(label)}<input style="width:100%" data-field="${k}"></label>`;
+      }).join("");
+    $("#jobHint").textContent = def.wiki
+      ? "涉及维基写入的任务在维基干跑下只生成 diff 预览；取消勾选并经确认后直接写入。"
+      : "纯本地任务不写维基；其参数中的“演练”勾选决定是否真实改动本地文件。";
   };
   kindSel.onchange = renderFields;
   renderFields();
 
   $("#submitJob").onclick = async () => {
-    const body = { kind: kindSel.value, dry_run: $("#dryRun").checked };
+    const def = JOB_DEFS[kindSel.value];
+    const body = { kind: kindSel.value };
+    if (def.wiki) body.wiki_dry_run = $("#dryRun").checked;
     document.querySelectorAll("#jobFields input[data-field]").forEach(i => {
-      const v = i.value.trim();
-      if (v !== "") body[i.dataset.field] = v;
+      if (i.type === "checkbox") { if (i.checked) body[i.dataset.field] = true; }
+      else { const v = i.value.trim(); if (v !== "") body[i.dataset.field] = v; }
     });
-    if (!body.dry_run && !confirm("已关闭干跑模式：任务可能直接修改维基页面。确定继续？")) return;
+    if (def.wiki) {
+      if (!body.wiki_dry_run && !confirm("已关闭维基干跑：任务可能直接修改维基页面。确定继续？")) return;
+    } else if (!body.dry_run) {
+      // Local task without the rehearsal checkbox => real disk changes.
+      if (!confirm(`${def.label} 将真实执行本地文件操作（非演练）。确定继续？`)) return;
+    }
     try {
       const j = await postJSON("/api/jobs", body);
       location.hash = `#/jobs/${j.id}`;
@@ -229,7 +274,7 @@ async function pageJobs(main) {
           ? ((j.finished_at_ms - j.started_at_ms) / 1000).toFixed(1) + "s"
           : (j.status === "running" ? "进行中…" : "—");
         return `<tr style="cursor:pointer" onclick="location.hash='#/jobs/${j.id}'">
-          <td>${statusBadge(j.status)}</td><td>${j.touches_wiki && j.dry_run ? '<span class="badge b-warn">干跑</span> ' : ""}<code>${esc(j.kind)}</code></td>
+          <td>${statusBadge(j.status)}</td><td>${j.touches_wiki && j.wiki_dry_run ? '<span class="badge b-warn">维基干跑</span> ' : ""}<code>${esc(j.kind)}</code></td>
           <td>${fmtTime(j.created_at_ms)}</td><td>${dur}</td>
           <td class="muted">${j.event_count} 条日志</td></tr>`;
       }).join("") || '<tr><td colspan="5" class="muted">暂无任务</td></tr>'}</tbody></table>`;
@@ -280,7 +325,7 @@ async function pageJobDetail(main, id) {
   };
 
   const renderHead = (h) => {
-    const canApprove = h.touches_wiki && h.dry_run && h.status === "success";
+    const canApprove = h.touches_wiki && h.wiki_dry_run && h.status === "success";
     $("#jdHead").innerHTML = `
     <div class="row">
       <h2 style="margin:0"><code>${esc(h.kind)}</code> ${statusBadge(h.status)}</h2>
@@ -296,10 +341,10 @@ async function pageJobDetail(main, id) {
     if (cb) cb.disabled = !["queued", "running"].includes(h.status);
     const ab = $("#approveBtn");
     if (ab) ab.onclick = async () => {
-      if (!confirm("将使用相同参数真实写入维基页面（不再走干跑）。确定继续？")) return;
+      if (!confirm("将使用相同参数真实写入维基页面（不再走维基干跑）。确定继续？")) return;
       ab.disabled = true;
       try {
-        const j = await postJSON("/api/jobs", Object.assign({}, h.params, { dry_run: false }));
+        const j = await postJSON("/api/jobs", Object.assign({}, h.params, { wiki_dry_run: false }));
         location.hash = `#/jobs/${j.id}`;
       } catch (e) { ab.disabled = false; alert("提交失败：" + e.message); }
     };

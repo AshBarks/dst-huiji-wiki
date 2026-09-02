@@ -18,9 +18,13 @@ use uuid::Uuid;
 pub struct SubmitJobRequest {
     #[serde(flatten)]
     pub kind: JobKind,
-    /// When true (default), wiki writes are answered "no" (dry-run).
+    /// When true (default), every wiki write the job proposes is refused
+    /// (dry-run against the wiki). Only wiki-touching kinds are affected:
+    /// local-only kinds (scripts_sync, images_sync, …) gate their own disk
+    /// writes through `JobKind` fields of the same name — which stay
+    /// reachable precisely because this field is *not* named `dry_run`.
     #[serde(default = "default_true")]
-    pub dry_run: bool,
+    pub wiki_dry_run: bool,
 }
 
 fn default_true() -> bool {
@@ -36,10 +40,10 @@ pub async fn submit(
     State(state): State<Arc<AppState>>,
     Json(req): Json<SubmitJobRequest>,
 ) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
-    // Wiki-touching jobs default to dry-run; explicit confirmation flips it.
+    // Wiki-touching jobs default to wiki-dry-run; explicit confirmation flips it.
     let handle = state
         .jobs
-        .submit(req.kind, req.dry_run, Some(Arc::clone(&state.datasets)))
+        .submit(req.kind, req.wiki_dry_run, Some(Arc::clone(&state.datasets)))
         .await;
     Ok(Json(handle.summary().await))
 }

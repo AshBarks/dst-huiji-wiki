@@ -40,8 +40,10 @@ pub fn now_ms() -> u64 {
 pub struct JobHandle {
     pub id: Uuid,
     pub kind: JobKind,
-    /// Whether this job ran in dry-run mode (wiki writes skipped).
-    pub dry_run: bool,
+    /// Whether wiki writes are refused for this job (auto-"no" to any
+    /// confirm). Only meaningful for wiki-touching kinds; local-only jobs
+    /// gate their own disk behavior through their `JobKind` fields.
+    pub wiki_dry_run: bool,
     pub status: RwLock<JobStatus>,
     pub created_at_ms: u64,
     pub started_at_ms: Mutex<Option<u64>>,
@@ -62,7 +64,7 @@ impl JobHandle {
             "id": self.id.to_string(),
             "kind": self.kind.name(),
             "touches_wiki": self.kind.touches_wiki(),
-            "dry_run": self.dry_run,
+            "wiki_dry_run": self.wiki_dry_run,
             "status": *self.status.read().await,
             "created_at_ms": self.created_at_ms,
             "started_at_ms": *self.started_at_ms.lock().await,
@@ -126,21 +128,24 @@ impl JobManager {
 
     /// Submits a job and spawns it on the tokio runtime.
     ///
-    /// `dry_run` answers wiki-write prompts: `true` skips all writes
-    /// (only diffs are produced), `false` applies them directly.
+    /// `wiki_dry_run` refuses every wiki write the job proposes (`true`
+    /// skips all writes so only diffs are produced, `false` applies them
+    /// directly). Local-only job kinds never consult this: their own
+    /// `JobKind` fields (e.g. `ScriptsSync.dry_run`) decide how much they
+    /// touch the disk.
     pub async fn submit(
         &self,
         kind: JobKind,
-        dry_run: bool,
+        wiki_dry_run: bool,
         datasets: Option<Arc<DatasetInvalidator>>,
     ) -> Arc<JobHandle> {
         let id = Uuid::new_v4();
-        let reporter = Arc::new(CaptureReporter::new(!dry_run));
+        let reporter = Arc::new(CaptureReporter::new(!wiki_dry_run));
 
         let handle = Arc::new(JobHandle {
             id,
             kind: kind.clone(),
-            dry_run,
+            wiki_dry_run,
             status: RwLock::new(JobStatus::Queued),
             created_at_ms: now_ms(),
             started_at_ms: Mutex::new(None),

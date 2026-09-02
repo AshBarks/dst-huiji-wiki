@@ -86,11 +86,30 @@ impl App {
                     ui.separator();
                     self.show_build_section(ui);
                 });
+                self.collapse_pending = false;
             });
     }
 
     pub fn show_anim_section(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Animations");
+        ui.horizontal(|ui| {
+            ui.heading("Animations");
+            if !self.anims.is_empty() {
+                if ui
+                    .small_button("Collapse")
+                    .on_hover_text("Collapse all expanded animations")
+                    .clicked()
+                {
+                    self.collapse_anims();
+                }
+                if ui
+                    .small_button("Clear")
+                    .on_hover_text("Remove all loaded animations")
+                    .clicked()
+                {
+                    self.clear_anims();
+                }
+            }
+        });
 
         if self.anims.is_empty() {
             ui.label("No animations loaded");
@@ -115,6 +134,7 @@ impl App {
             egui::CollapsingHeader::new(header)
                 .id_salt(format!("anim_{idx}"))
                 .default_open(is_active)
+                .open(self.collapse_pending.then_some(false))
                 .show(ui, |ui| {
                     ui.horizontal(|ui| {
                         let mut en = self.anims[idx].enabled;
@@ -149,6 +169,7 @@ impl App {
                         egui::CollapsingHeader::new(&bank_name)
                             .id_salt(format!("anim_{idx}_bank_{bank_idx}"))
                             .default_open(false)
+                            .open(self.collapse_pending.then_some(false))
                             .show(ui, |ui| {
                                 for (anim_inner_idx, anim_name) in &animations {
                                     let is_selected = is_active
@@ -191,7 +212,25 @@ impl App {
     }
 
     pub fn show_build_section(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Builds");
+        ui.horizontal(|ui| {
+            ui.heading("Builds");
+            if !self.builds.is_empty() {
+                if ui
+                    .small_button("Collapse")
+                    .on_hover_text("Collapse all expanded builds")
+                    .clicked()
+                {
+                    self.collapse_builds();
+                }
+                if ui
+                    .small_button("Clear")
+                    .on_hover_text("Remove all loaded builds")
+                    .clicked()
+                {
+                    self.clear_builds();
+                }
+            }
+        });
 
         if self.builds.is_empty() {
             ui.label("No builds loaded");
@@ -210,6 +249,7 @@ impl App {
         let builds_len = self.builds.len();
         let mut new_enabled: Vec<(usize, bool)> = Vec::new();
         let mut swap_actions: Vec<(usize, usize)> = Vec::new();
+        let mut reorder_actions: Vec<(usize, usize)> = Vec::new();
         let mut remove_indices: Vec<usize> = Vec::new();
         let mut symbol_toggles: Vec<(usize, String, bool)> = Vec::new();
         let mut browse_dyn: Option<usize> = None;
@@ -240,145 +280,177 @@ impl App {
                 egui::Color32::PLACEHOLDER
             };
 
-            egui::CollapsingHeader::new(egui::RichText::new(header).color(header_color))
-                .id_salt(format!("build_{idx}"))
-                .default_open(!*has_build || assigned.is_none())
-                .show(ui, |ui| {
-                    ui.horizontal(|ui| {
-                        if *has_build {
-                            let mut enabled = self.builds[idx].enabled;
-                            if ui.checkbox(&mut enabled, "Enabled").changed() {
-                                new_enabled.push((idx, enabled));
+            let build_body = |ui: &mut egui::Ui| {
+                egui::CollapsingHeader::new(egui::RichText::new(header).color(header_color))
+                    .id_salt(format!("build_{idx}"))
+                    .default_open(!*has_build || assigned.is_none())
+                    .open(self.collapse_pending.then_some(false))
+                    .show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            if *has_build {
+                                ui.dnd_drag_source(egui::Id::new(("build_drag", idx)), idx, |ui| {
+                                    ui.add(
+                                        egui::Label::new(egui::RichText::new("\u{2630}").strong())
+                                            .sense(egui::Sense::drag()),
+                                    )
+                                    .on_hover_text("Drag to reorder");
+                                });
+                            }
+                            if *has_build {
+                                let mut enabled = self.builds[idx].enabled;
+                                if ui.checkbox(&mut enabled, "Enabled").changed() {
+                                    new_enabled.push((idx, enabled));
+                                }
+                            }
+                            if *has_build && idx > 0 && ui.small_button("Up").clicked() {
+                                swap_actions.push((idx, idx - 1));
+                            }
+                            if *has_build
+                                && idx + 1 < builds_len
+                                && ui.small_button("Down").clicked()
+                            {
+                                swap_actions.push((idx, idx + 1));
+                            }
+                            if ui.small_button("X").clicked() {
+                                remove_indices.push(idx);
+                            }
+                        });
+
+                        if *has_build && assigned.is_none() {
+                            ui.label(
+                                egui::RichText::new("No atlas — needs a .dyn atlas file")
+                                    .small()
+                                    .color(egui::Color32::YELLOW),
+                            );
+                            if ui.small_button("Browse .dyn...").clicked() {
+                                browse_dyn = Some(idx);
                             }
                         }
-                        if *has_build && idx > 0 && ui.small_button("Up").clicked() {
-                            swap_actions.push((idx, idx - 1));
-                        }
-                        if *has_build && idx + 1 < builds_len && ui.small_button("Down").clicked() {
-                            swap_actions.push((idx, idx + 1));
-                        }
-                        if ui.small_button("X").clicked() {
-                            remove_indices.push(idx);
-                        }
-                    });
 
-                    if *has_build && assigned.is_none() {
-                        ui.label(
-                            egui::RichText::new("No atlas — needs a .dyn atlas file")
-                                .small()
-                                .color(egui::Color32::YELLOW),
-                        );
-                        if ui.small_button("Browse .dyn...").clicked() {
-                            browse_dyn = Some(idx);
+                        if !has_build && assigned.is_some() {
+                            ui.label(
+                                egui::RichText::new("No build — needs a .zip build file")
+                                    .small()
+                                    .color(egui::Color32::YELLOW),
+                            );
+                            if ui.small_button("Browse .zip...").clicked() {
+                                browse_zip = Some(idx);
+                            }
+                            if let Some(atlas_idx) = assigned
+                                && let Some(Some(atlas_entry)) = self.atlas_entries.get(*atlas_idx)
+                            {
+                                for tm in &atlas_entry.tex_meta {
+                                    ui.label(
+                                        egui::RichText::new(format!(
+                                            "{} ({}x{} {:?})",
+                                            tm.name, tm.width, tm.height, tm.pixel_format
+                                        ))
+                                        .small()
+                                        .color(egui::Color32::LIGHT_BLUE),
+                                    );
+                                }
+                            }
                         }
-                    }
 
-                    if !has_build && assigned.is_some() {
-                        ui.label(
-                            egui::RichText::new("No build — needs a .zip build file")
-                                .small()
-                                .color(egui::Color32::YELLOW),
-                        );
-                        if ui.small_button("Browse .zip...").clicked() {
-                            browse_zip = Some(idx);
-                        }
-                        if let Some(atlas_idx) = assigned
-                            && let Some(Some(atlas_entry)) = self.atlas_entries.get(*atlas_idx)
-                        {
-                            for tm in &atlas_entry.tex_meta {
+                        if *has_build {
+                            if let Some(atlas_idx) = assigned
+                                && let Some(Some(ae)) = self.atlas_entries.get(*atlas_idx)
+                            {
+                                ui.label(
+                                    egui::RichText::new(format!("Atlas: {}", ae.source_name))
+                                        .small()
+                                        .italics(),
+                                );
+                                for tm in &ae.tex_meta {
+                                    ui.label(
+                                        egui::RichText::new(format!(
+                                            "{} ({}x{} {:?})",
+                                            tm.name, tm.width, tm.height, tm.pixel_format
+                                        ))
+                                        .small()
+                                        .color(egui::Color32::LIGHT_BLUE),
+                                    );
+                                }
+                            }
+
+                            if let Some(build) = &self.builds[idx].build {
                                 ui.label(
                                     egui::RichText::new(format!(
-                                        "{} ({}x{} {:?})",
-                                        tm.name, tm.width, tm.height, tm.pixel_format
+                                        "Build: {} (v{})",
+                                        build.name, build.version
                                     ))
-                                    .small()
-                                    .color(egui::Color32::LIGHT_BLUE),
-                                );
-                            }
-                        }
-                    }
-
-                    if *has_build {
-                        if let Some(atlas_idx) = assigned
-                            && let Some(Some(ae)) = self.atlas_entries.get(*atlas_idx)
-                        {
-                            ui.label(
-                                egui::RichText::new(format!("Atlas: {}", ae.source_name))
                                     .small()
                                     .italics(),
-                            );
-                            for tm in &ae.tex_meta {
-                                ui.label(
-                                    egui::RichText::new(format!(
-                                        "{} ({}x{} {:?})",
-                                        tm.name, tm.width, tm.height, tm.pixel_format
-                                    ))
-                                    .small()
-                                    .color(egui::Color32::LIGHT_BLUE),
                                 );
-                            }
-                        }
 
-                        if let Some(build) = &self.builds[idx].build {
-                            ui.label(
-                                egui::RichText::new(format!(
-                                    "Build: {} (v{})",
-                                    build.name, build.version
-                                ))
-                                .small()
-                                .italics(),
-                            );
+                                if !build.atlases.is_empty() {
+                                    egui::CollapsingHeader::new(
+                                        egui::RichText::new(format!(
+                                            "Atlases ({})",
+                                            build.atlases.len()
+                                        ))
+                                        .small(),
+                                    )
+                                    .id_salt(format!("build_{idx}_atlases"))
+                                    .default_open(false)
+                                    .open(self.collapse_pending.then_some(false))
+                                    .show(ui, |ui| {
+                                        for atlas in &build.atlases {
+                                            ui.label(
+                                                egui::RichText::new(format!("  {}", atlas.name))
+                                                    .small(),
+                                            );
+                                        }
+                                    });
+                                }
 
-                            if !build.atlases.is_empty() {
                                 egui::CollapsingHeader::new(
                                     egui::RichText::new(format!(
-                                        "Atlases ({})",
-                                        build.atlases.len()
+                                        "Symbols ({})",
+                                        build.symbols.len()
                                     ))
                                     .small(),
                                 )
-                                .id_salt(format!("build_{idx}_atlases"))
+                                .id_salt(format!("build_{idx}_symbols"))
                                 .default_open(false)
+                                .open(self.collapse_pending.then_some(false))
                                 .show(ui, |ui| {
-                                    for atlas in &build.atlases {
-                                        ui.label(
-                                            egui::RichText::new(format!("  {}", atlas.name))
-                                                .small(),
-                                        );
+                                    for symbol in &build.symbols {
+                                        let key = symbol.name.to_lowercase();
+                                        let is_enabled =
+                                            !self.builds[idx].disabled_symbols.contains(&key);
+                                        let mut toggle = is_enabled;
+                                        if ui
+                                            .checkbox(
+                                                &mut toggle,
+                                                format!(
+                                                    "{} ({} frames)",
+                                                    symbol.name,
+                                                    symbol.frames.len()
+                                                ),
+                                            )
+                                            .changed()
+                                        {
+                                            symbol_toggles.push((idx, key, toggle));
+                                        }
                                     }
                                 });
                             }
-
-                            egui::CollapsingHeader::new(
-                                egui::RichText::new(format!("Symbols ({})", build.symbols.len()))
-                                    .small(),
-                            )
-                            .id_salt(format!("build_{idx}_symbols"))
-                            .default_open(false)
-                            .show(ui, |ui| {
-                                for symbol in &build.symbols {
-                                    let key = symbol.name.to_lowercase();
-                                    let is_enabled =
-                                        !self.builds[idx].disabled_symbols.contains(&key);
-                                    let mut toggle = is_enabled;
-                                    if ui
-                                        .checkbox(
-                                            &mut toggle,
-                                            format!(
-                                                "{} ({} frames)",
-                                                symbol.name,
-                                                symbol.frames.len()
-                                            ),
-                                        )
-                                        .changed()
-                                    {
-                                        symbol_toggles.push((idx, key, toggle));
-                                    }
-                                }
-                            });
                         }
-                    }
-                });
+                    });
+            };
+
+            if *has_build {
+                let frame = egui::Frame::none()
+                    .fill(egui::Color32::TRANSPARENT)
+                    .inner_margin(egui::Margin::symmetric(2.0, 1.0));
+                let (_, dropped) = ui.dnd_drop_zone::<usize, _>(frame, build_body);
+                if let Some(from) = dropped {
+                    reorder_actions.push((*from, idx));
+                }
+            } else {
+                build_body(ui);
+            }
         }
 
         for (idx, enabled) in new_enabled {
@@ -387,6 +459,14 @@ impl App {
         }
         for (a, b) in swap_actions {
             self.builds.swap(a, b);
+            need_re_render = true;
+        }
+        for (from, to) in reorder_actions {
+            if from == to {
+                continue;
+            }
+            let item = self.builds.remove(from);
+            self.builds.insert(to, item);
             need_re_render = true;
         }
         for (idx, key, enabled) in symbol_toggles {

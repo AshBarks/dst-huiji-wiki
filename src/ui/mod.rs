@@ -73,6 +73,7 @@ pub struct App {
     bg_loader: Option<BackgroundLoader>,
     animation_bounds: Option<BoundingBox>,
     disabled_elements: HashSet<(String, String)>,
+    collapse_pending: bool,
     #[cfg(feature = "gif")]
     gif_export: Option<BackgroundGifExport>,
     #[cfg(feature = "gif")]
@@ -110,6 +111,7 @@ impl App {
             bg_loader: None,
             animation_bounds: None,
             disabled_elements: HashSet::new(),
+            collapse_pending: false,
             #[cfg(feature = "gif")]
             gif_export: None,
             #[cfg(feature = "gif")]
@@ -337,6 +339,34 @@ impl App {
                 self.png_export = None;
             }
         }
+    }
+
+    fn clear_anims(&mut self) {
+        self.anims.clear();
+        self.active_anim_idx = 0;
+        self.active_bank_idx = 0;
+        self.active_anim_inner_idx = 0;
+        self.active_frame_idx = 0;
+        self.playing = false;
+        self.disabled_elements.clear();
+        self.cache_dirty = true;
+        self.needs_re_render = true;
+    }
+
+    fn clear_builds(&mut self) {
+        self.builds.clear();
+        self.atlas_entries.clear();
+        self.loaded_paths.clear();
+        self.cache_dirty = true;
+        self.needs_re_render = true;
+    }
+
+    fn collapse_anims(&mut self) {
+        self.collapse_pending = true;
+    }
+
+    fn collapse_builds(&mut self) {
+        self.collapse_pending = true;
     }
 }
 

@@ -44,6 +44,13 @@ pub enum Commands {
         input: PathBuf,
         output_dir: PathBuf,
     },
+    Search {
+        #[arg(short, long)]
+        dir: PathBuf,
+        symbol: String,
+        #[arg(long)]
+        case_sensitive: bool,
+    },
     Preview {
         #[arg(short, long)]
         input: Option<Vec<PathBuf>>,
@@ -69,6 +76,11 @@ pub fn run(cli: Cli) -> dst_anim_tool::error::Result<()> {
             Commands::Info { input } => cmd_info(&input),
             Commands::Decrypt { input, output } => cmd_decrypt(&input, &output),
             Commands::Decode { input, output_dir } => cmd_decode(&input, &output_dir),
+            Commands::Search {
+                dir,
+                symbol,
+                case_sensitive,
+            } => cmd_search(&dir, &symbol, case_sensitive),
             Commands::Preview { input } => cmd_preview(input),
         },
     }
@@ -428,6 +440,69 @@ fn cmd_decode(input: &Path, output_dir: &Path) -> dst_anim_tool::error::Result<(
     Ok(())
 }
 
+fn is_archive_path(path: &Path) -> bool {
+    matches!(
+        path.extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_lowercase()
+            .as_str(),
+        "zip" | "dyn" | "bin"
+    )
+}
+
+fn collect_archives(dir: &Path, out: &mut Vec<PathBuf>) -> std::io::Result<()> {
+    for entry in std::fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            collect_archives(&path, out)?;
+        } else if is_archive_path(&path) {
+            out.push(path);
+        }
+    }
+    Ok(())
+}
+
+fn search_file(
+    path: &Path,
+    symbol: &str,
+    case_sensitive: bool,
+) -> dst_anim_tool::error::Result<bool> {
+    let data = std::fs::read(path)?;
+    let archive = dst_anim_tool::archive::parse_file_by_path(path, &data)?;
+    let Some(build) = archive.build else {
+        return Ok(false);
+    };
+    Ok(build.symbols.iter().any(|s| {
+        if case_sensitive {
+            s.name == symbol
+        } else {
+            s.name.eq_ignore_ascii_case(symbol)
+        }
+    }))
+}
+
+fn cmd_search(dir: &Path, symbol: &str, case_sensitive: bool) -> dst_anim_tool::error::Result<()> {
+    if !dir.is_dir() {
+        return Err(dst_anim_tool::error::Error::Other(format!(
+            "not a directory: {}",
+            dir.display()
+        )));
+    }
+
+    let mut files = Vec::new();
+    collect_archives(dir, &mut files)?;
+    files
+        .par_iter()
+        .for_each(|path| match search_file(path, symbol, case_sensitive) {
+            Ok(true) => println!("{}", path.display()),
+            Ok(false) => {}
+            Err(e) => eprintln!("{}: {e}", path.display()),
+        });
+    Ok(())
+}
+
 fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> dst_anim_tool::error::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([1200.0, 800.0]),
@@ -490,5 +565,42 @@ mod tests {
         assert!(!archive.tex_sources.is_empty());
         let build = archive.build.unwrap();
         assert_eq!(build.name, "abigail_ice");
+    }
+
+    #[test]
+    fn search_file_finds_symbol() {
+        let path = std::path::PathBuf::from("data/anim/abigail_flower.zip");
+        assert!(search_file(&path, "petal1", false).unwrap());
+        assert!(search_file(&path, "Petal1", false).unwrap());
+        assert!(!search_file(&path, "Petal1", true).unwrap());
+        assert!(search_file(&path, "petal1", true).unwrap());
+        assert!(!search_file(&path, "nonexistent", false).unwrap());
+    }
+
+    #[test]
+    fn collect_archives_recursive() {
+        let tmp = std::env::temp_dir().join(format!(
+            "dst_anim_tool_test_{}_{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let sub = tmp.join("nested");
+        std::fs::create_dir_all(&sub).unwrap();
+        let src = std::path::PathBuf::from("data/anim/abigail_flower.zip");
+        std::fs::copy(&src, tmp.join("a.zip")).unwrap();
+        std::fs::copy(&src, sub.join("b.dyn")).unwrap();
+        std::fs::write(tmp.join("readme.txt"), b"hello").unwrap();
+
+        let mut files = Vec::new();
+        collect_archives(&tmp, &mut files).unwrap();
+        files.sort();
+        assert_eq!(files.len(), 2);
+        assert_eq!(files[0].file_name().unwrap(), "a.zip");
+        assert_eq!(files[1].file_name().unwrap(), "b.dyn");
+
+        std::fs::remove_dir_all(&tmp).unwrap();
     }
 }

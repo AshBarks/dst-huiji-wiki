@@ -127,6 +127,13 @@ Features:
 - Multi-build layering with atlas assignment
 - Background frame pre-rendering
 
+> **Note (Linux/Wayland)**: File drag-and-drop relies on the underlying windowing library (winit). winit currently does **not** implement file drag-and-drop reception on Wayland sessions (see [rust-windowing/winit#1881](https://github.com/rust-windowing/winit/issues/1881), long-standing), so dragging files onto the window has no effect under native Wayland. Alternatives:
+> - Click the **Open File** button to pick files
+> - Pass files via CLI: `dst-anim-tool preview <files...>`
+> - Run under XWayland (temporary workaround): `env -u WAYLAND_DISPLAY dst-anim-tool preview`
+>
+> Drag-and-drop works normally on X11 / XWayland / Windows / macOS.
+
 ## Supported File Types
 
 | Type | Extension | Description |

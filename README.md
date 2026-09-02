@@ -9,11 +9,15 @@
 
 ## 功能
 
-- **配方解析**: 解析游戏中的配方数据（recipes.lua）
-- **PO 文件解析**: 解析 gettext 格式的翻译文件
-- **Lua 解析**: 解析 Lua 脚本文件，提取游戏数据
-- **维基客户端**: 与灰机维基 API 交互，支持登录、页面编辑等操作
-- **数据映射**: 将游戏数据映射为维基所需的格式
+- **游戏数据解析**: 解析配方（recipes.lua）、PO 翻译文件、Lua 脚本（含预制体重定向解析与技能树提取）
+- **数据映射**: 将游戏数据映射为维基 JSON schema，支持对比与合并历史数据
+- **维基客户端**: 与灰机维基 API 交互，支持登录、页面编辑等操作（节流 + 重试）
+- **CopyClip 维护**: 基于标记替换更新维基 Lua 模块（科技常量、制作分类等）
+- **语料抓取**: 抓取维基主命名空间全量语料到本地（`corpus-fetch`），并重建派生索引（prefab 注册表等）
+- **快照差异与影响评估**: 对比两个游戏脚本快照，产出 impact.json / changes.patch（`update-scan`）
+- **代码关联索引**: 构建代码→页面关联索引（`update-index`），支撑 Page→Symbol 标注（`symbol-annotate`）
+- **知识库管线**: 基于 LLM 生成符号知识文档（SymbolDoc）、页面映射骨架与同步（`knowledge-*`），并给出页面覆盖缺口建议（`page-assist`）
+- **WebUI**: 网页控制台提交任务、实时日志、数据浏览（见下文）
 
 ## 依赖
 
@@ -56,6 +60,10 @@ cp .env.example .env
 | `DST__ROOT` | DST 游戏根目录路径 | `/path/to/Don't Starve Together` |
 | `WIKI__QPS` | 可选，维基 API 每秒请求数上限（默认 1） | `1` |
 | `WIKI__MAX_RETRIES` | 可选，403/429/5xx 退避重试次数（默认 3） | `3` |
+| `LLM__API_KEY` | 可选，LLM API 密钥（未配置时 LLM 相关命令跳过模型调用） | `sk-...` |
+| `LLM__BASE_URL` | 可选，LLM API 地址（默认 `https://api.openai.com/v1`） | `https://api.openai.com/v1` |
+| `LLM__MODEL` | 可选，LLM 模型名（默认 `gpt-4o-mini`） | `gpt-4o-mini` |
+| `LLM__TIMEOUT_SECS` | 可选，单次请求超时秒数（默认 120） | `300` |
 
 #### 获取灰机维基认证信息
 
@@ -190,6 +198,21 @@ cargo run --release -- map-recipes -i recipes.lua --po-file chinese_s.po -o reci
 
 ---
 
+#### `prefab-overrides` - 解析预制体重定向
+
+从 Lua 文件中提取预制体名称重定向（工厂模式、控制流等）。
+
+```bash
+cargo run --release -- prefab-overrides [OPTIONS] --input <FILE>
+```
+
+| 参数 | 简写 | 说明 |
+|------|------|------|
+| `--input <FILE>` | `-i` | 输入的 Lua 文件路径（必需） |
+| `--output <FILE>` | `-o` | 输出的 JSON 文件路径（可选） |
+
+---
+
 #### `maintain-item-table` - 维护物品表
 
 从 DST 游戏文件提取名称数据并更新到维基。
@@ -289,20 +312,214 @@ cargo run --release -- maintain-copy-clip -t rbtl
 cargo run --release -- maintain-copy-clip -t filters --dry-run --report-json report.json
 ```
 
+---
+
+#### `corpus-fetch` - 抓取维基语料
+
+抓取维基主命名空间全量语料到本地 `wikis/<host>/` 目录（gitignore，不入仓库）。
+
+```bash
+cargo run --release -- corpus-fetch [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--full` | 忽略增量对账，全量重抓所有页面 |
+| `--dir <DIR>` | 语料根目录（默认 `wikis`） |
+| `--dry-run` | 只枚举与对账出报告，不写任何本地文件 |
+| `--rc` | recentchanges 增量通道（检查点缺失/过期自动回落枚举对账） |
+
+---
+
+#### `update-index` - 构建代码关联索引
+
+扫描游戏脚本，构建代码→页面关联索引（基础设施 A），缓存到 `output/atlas/<build>/`。
+
+```bash
+cargo run --release -- update-index <ROOT> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<ROOT>` | 游戏脚本根目录（当前树或快照目录） |
+| `--out <DIR>` | 输出目录（默认 `output/atlas/<build 号>/`） |
+
+---
+
+#### `update-scan` - 快照差异与影响评估（只读）
+
+对比两个游戏脚本快照，产出 `impact.json` 与 `changes.patch`。
+
+```bash
+cargo run --release -- update-scan <OLD> <NEW> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<OLD>` | 旧快照（时间戳或目录名） |
+| `<NEW>` | 新快照（时间戳、目录名，或 `current` 表示当前 scripts 树） |
+| `--out <DIR>` | 输出目录（默认 `output/scan/<old>_<new>/`） |
+| `--corpus <DIR>` | 语料 host 根目录（`wikis/<host>/`），提供时附加 Layer B 定级摘要 |
+| `--annotate <FILE>` | 输出 fn 标注骨架（prefabs 前 50 文件 + hound.lua） |
+
+---
+
+#### `corpus-index` - 重建语料派生索引
+
+从本地语料树重建派生索引（prefab 注册表、区域、facts 等），纯本地操作。
+
+```bash
+cargo run --release -- corpus-index [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--dir <DIR>` | 语料根目录（默认 `wikis`，其下需恰好一个 host 树） |
+| `--join <FILE>` | 代码侧 index.json 路径，额外产出 join_report.json 校准报告 |
+| `--dry-run` | 只构建并报告统计，不写工件 |
+
+---
+
+#### `symbol-annotate` - Page→Symbol 标注
+
+生成高引用 symbol 证据包和 Prompt；可选读取已有 LLM 输出并生成跨页一致性报告（纯本地，不写 wiki）。
+
+```bash
+cargo run --release -- symbol-annotate <ROOT> --corpus <DIR> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<ROOT>` | 游戏脚本根目录（当前树或快照目录） |
+| `--corpus <DIR>` | 语料 host 根目录（`wikis/<host>/`） |
+| `--limit <N>` | 只处理引用量最高的前 N 个 symbol（默认 20） |
+| `--verdicts <FILE>` | 可选的 LLM/人工标注结果文件（JSON 数组或 SymbolAnnotationResponse） |
+| `--llm` | 配置了 `LLM__API_KEY` 时直接调用大模型生成标注；未配置则跳过 |
+| `--batch-pages <N>` | LLM 分批大小（默认 40，0 = 不按页数设限） |
+| `--batch-max-chars <N>` | 每批渲染输入的字节预算（默认 32000） |
+| `--skip-no-fact-pages` | 零候选证据的页面不送 LLM，本地合成 low-confidence missing 判定 |
+| `--out <DIR>` | 输出目录（默认 `output/symbol-annotate/`） |
+
+---
+
+#### `knowledge-scan-symbols` - 符号知识文档扫描（M1）
+
+LLM 阅读符号源码，产出/更新 SymbolDoc 知识文档（`knowledge/` 目录）。
+
+```bash
+cargo run --release -- knowledge-scan-symbols <ROOT> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<ROOT>` | 游戏脚本根目录（当前树或快照目录） |
+| `--category <STRING>` | 符号类别：`component` / `brain` / `behaviour`（默认 `component`） |
+| `--knowledge-dir <DIR>` | 知识文档根目录（默认 `knowledge`） |
+| `--corpus <DIR>` | 语料 host 根目录，提供则启用 pass2 语料归因（link-wiki） |
+| `--sample-pages <N>` | pass2 每符号采样的页面数（默认 8） |
+| `--limit <N>` | 只处理引用量最高的前 N 个符号（默认 20） |
+| `--concurrency <N>` | 并行处理的组件数（默认 1 = 串行） |
+| `--force` | 忽略 sha/prompt_rev 一致性，强制重扫 |
+| `--refresh-auto` | 不调 LLM，仅用 AutoInfobox 冷数据刷新现有文档的 auto_maintained |
+| `--confirm-empty` | pass2 二次确认：采样 ≥3 页但判空时追加一次复查 |
+| `--pass2-names <LIST>` | 仅对指定文件名词干跑 pass2（逗号分隔） |
+| `--pick-names <LIST>` | 仅选取指定文件名词干的符号（逗号分隔） |
+
+---
+
+#### `knowledge-scan-wiki` - 页面映射骨架（M2a）
+
+构建 PageSymbolMap 确定性骨架（路由/反转/数值配对，不调 LLM）。
+
+```bash
+cargo run --release -- knowledge-scan-wiki <ROOT> --corpus <DIR> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<ROOT>` | 游戏脚本根目录（当前树或快照目录） |
+| `--corpus <DIR>` | 语料 host 根目录（必需） |
+| `--knowledge-dir <DIR>` | 知识文档根目录（默认 `knowledge`） |
+| `--audit` | M2b：对确定性零证据对跑 LLM 审计（收编 symbol-annotate verdict） |
+| `--audit-symbols <LIST>` | 审计符号词干（逗号分隔），默认按缺口取前 10 |
+| `--audit-max-pages <N>` | 每符号送审页数上限（默认 60） |
+| `--audit-batch-pages <N>` | LLM 每批页数上限（默认 20） |
+| `--audit-batch-max-chars <N>` | LLM 每批字符数上限（默认 24000） |
+| `--report` | M2c：不重建地图，聚合现有 knowledge/pages 出报表（summary.json） |
+| `--classify` | M2 收尾：语义不一致对三分类（确定性） |
+
+---
+
+#### `knowledge-sync` - 知识同步（M3）
+
+代码变更 → 脏 SymbolDoc → 页面锚点交叉（确定性）。
+
+```bash
+cargo run --release -- knowledge-sync [OLD] [NEW] [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<OLD>` | 旧快照（时间戳或目录名；`--review` 复核模式可省略） |
+| `<NEW>` | 新快照（默认 `current` 表示当前 scripts 树） |
+| `--knowledge-dir <DIR>` | 知识文档根目录（默认 `knowledge`） |
+| `--rescan` | 级联重扫脏文档（调 LLM；默认仅输出清单） |
+| `--limit <N>` | 详列的脏文档数上限（默认 20） |
+| `--corpus <DIR>` | 语料 host 根目录，提供则启用 prefab→页面交叉 |
+| `--draft` | Tier2：起草页面修订建议（需 `--corpus` 与 LLM 配置） |
+| `--review <FILE>` | Tier2 复核：裁决文件路径（对既有报告的建议逐条 approve/reject） |
+
+---
+
+#### `page-assist` - 页面覆盖缺口建议
+
+给定页面输出覆盖缺口建议清单（读 PageSymbolMap，不调 LLM）。
+
+```bash
+cargo run --release -- page-assist [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--page <ID|TITLE>` | 页面 id（纯数字）或标题（精确匹配） |
+| `--all` | 全库缺口榜（忽略 `--page`） |
+| `--json` | 输出 JSON 而非 Markdown |
+| `--knowledge-dir <DIR>` | 知识文档根目录（默认 `knowledge`） |
+| `--attribute` | 编辑归因模式（区域 × SymbolDoc，需 `--corpus`） |
+| `--corpus <DIR>` | 语料根目录（归因模式必需） |
+
+---
+
+#### `serve` - 启动 WebUI
+
+见上文 [WebUI（网页控制台）](#webui网页控制台)。
+
 ## 项目结构
 
 ```
 src/
-├── parser/          # 游戏代码解析模块
-│   ├── lua.rs       # Lua 文件解析
-│   ├── po.rs        # PO 文件解析
-│   └── recipe.rs    # 配方解析
-├── wiki/            # 维基维护模块
-│   └── client.rs    # 维基客户端
-├── models/          # 数据模型
-├── mapping/         # 数据映射
-├── copyclip/        # CopyClip 功能
-└── commands/        # 命令行接口
+├── main.rs               # 二进制入口（clap 分发）
+├── lib.rs                # 库根（8 个公共模块 + 关键类型再导出）
+├── commands/             # CLI 参数定义（Commands 枚举）+ 全部命令处理器
+├── service/              # 任务执行引擎（JobKind、WriteMode、进度、快照对比）
+├── web/                  # WebUI 服务器（axum，仅二进制模块）
+├── parser/               # 游戏代码解析模块
+│   ├── lua.rs            # Lua 变量/字段定位
+│   ├── po.rs             # PO 文件解析（nom）
+│   ├── recipe.rs         # 配方解析（full_moon AST）
+│   ├── skilltree.rs      # 技能树提取（pos/connects 坐标 + 常量折叠）
+│   └── prefab_override/  # 预制体重定向解析
+├── models/               # 数据模型（Recipe、PoEntry、TechReport）
+├── mapping/              # 数据→维基映射框架（WikiMapper 特征 + MappingBuilder）
+├── wiki/                 # MediaWiki API 客户端
+├── copyclip/             # 维基模块内容更新（标记替换）
+├── corpus/               # 语料抓取、派生索引（prefab 注册表/区域/facts）
+├── knowledge/            # 知识库管线（SymbolDoc 扫描、页面映射、同步）
+├── update/               # 快照差异、影响评估、代码关联索引（atlas）
+├── context.rs            # DstContext（zip 归档、维基客户端、环境变量）
+├── error.rs              # 错误枚举 + Result<T>
+├── llm.rs                # LLM 客户端（标注/知识文档生成）
+└── utils.rs              # diff_lines 工具
 ```
 
 ## 许可证

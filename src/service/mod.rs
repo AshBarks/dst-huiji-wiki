@@ -1,5 +1,6 @@
 pub mod dataset;
 pub mod progress;
+pub mod skilltree_wiki;
 pub mod snapshot_diff;
 
 pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutReporter};
@@ -114,6 +115,16 @@ pub enum JobKind {
     MaintainCopyClip {
         #[serde(default)]
         r#type: Option<String>,
+        #[serde(default)]
+        output: Option<String>,
+        #[serde(default)]
+        snapshot: Option<String>,
+    },
+    /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
+    /// defs JSON（保留页内 metainfo 与 icon_url）。`character` 为子串过滤。
+    SkillTreeWiki {
+        #[serde(default)]
+        character: Option<String>,
         #[serde(default)]
         output: Option<String>,
         #[serde(default)]
@@ -362,6 +373,7 @@ impl JobKind {
             JobKind::MaintainItemTable { .. } => "maintain-item-table",
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
+            JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
@@ -384,6 +396,7 @@ impl JobKind {
             JobKind::MaintainItemTable { .. }
                 | JobKind::MaintainDstRecipes { .. }
                 | JobKind::MaintainCopyClip { .. }
+                | JobKind::SkillTreeWiki { .. }
         )
     }
 }
@@ -496,6 +509,20 @@ async fn execute_job_inner(
         }
         JobKind::PrefabOverrides { input, output } => {
             run_prefab_overrides(input, opt_path(output), reporter).await
+        }
+        JobKind::SkillTreeWiki {
+            character,
+            output,
+            snapshot,
+        } => {
+            skilltree_wiki::run_skilltree_wiki(
+                character.clone(),
+                output.clone(),
+                snapshot.clone(),
+                reporter,
+                mode,
+            )
+            .await
         }
         JobKind::ScriptsSync {
             force,

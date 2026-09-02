@@ -235,7 +235,7 @@ fn load_dataset(snapshot: Option<String>) -> Result<Arc<Dataset>> {
 }
 
 /// Lists available skill tree characters from the prefabs directory.
-fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>> {
+pub fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>> {
     // Snapshot mode: scan the directory directly.
     if let Some(snapshot) = &ctx.snapshot {
         let dir = std::path::Path::new(&ctx.dst_root)
@@ -327,6 +327,12 @@ pub fn load_skill_tree(
                 "locks": n.locks,
                 "lock_open": n.lock_open,
                 "tags": n.tags,
+                "onactivate": n.onactivate,
+                "ondeactivate": n.ondeactivate,
+                "defaultfocus": n.defaultfocus,
+                "infographic": n.infographic,
+                "forced_focus": n.forced_focus,
+                "button_decorations": n.button_decorations,
                 "title": strings.by_ctxt.get(&title_key),
                 "desc": strings.by_ctxt.get(&desc_key),
             })

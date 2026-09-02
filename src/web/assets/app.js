@@ -197,6 +197,13 @@ const JOB_DEFS = {
     label: "维护模块常量 → 维基", wiki: true,
     fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
+  skilltree_wiki: {
+    label: "维护技能树子页面 → 维基", wiki: true,
+    fields: [
+      { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
+      { k: "output", label: "产物目录（可选，写 <Char>.lua 文件）" },
+    ],
+  },
   prefab_overrides: {
     label: "预制体重定向解析",
     fields: [{ k: "input", label: "Lua 文件路径" }],
@@ -504,78 +511,100 @@ async function pageSkills(main) {
       <div class="row">
         <label style="margin:0">角色</label>
         <select id="charSel">${chars.map(c => `<option>${esc(c)}</option>`).join("")}</select>
-        <span class="muted">布局坐标来自游戏源码（pos/connects），1:1 还原游戏内界面。</span>
+        <span class="muted">布局与交互 1:1 还原游戏内界面（参考零件:Skilltree.js）。</span>
         <span class="muted" id="skillXp"></span>
-        <button class="btn secondary" id="resetSkillBtn">重置洞察</button>
       </div>
-      <p class="muted" style="margin:6px 0 0">点击“可选”技能学习；lock 节点按条件自动解锁；重置洞察会清空已学技能。</p>
+      <p class="muted" style="margin:6px 0 0">点击技能/锁查看详情；可选技能可通过“学习”按钮或空格键点亮；双击背景或“重置洞察”清空已学技能；lock 节点按学习情况与外部条件自动解锁。</p>
     </div>
-    <div class="panel"><div id="skwrap"></div></div>
-    <div id="tooltip"></div>`;
+    <div class="panel"><div id="skwrap"></div>
+      <div class="skilltree-info" id="skInfo">
+        <b id="skTitle"></b>
+        <p id="skDesc" class="muted"></p>
+      </div>
+    </div>`;
 
   const sel = $("#charSel");
   sel.value = chars.includes("wilson") ? "wilson" : chars[0];
 
-  const TOTAL_XP = 15;
-  let tree = null;
-  let skills = {};
-  let locks = {};
-  let parents = {};
-  let activatedSkills = new Set();
-
-  const iconUrl = (icon) => icon ? `/static/split/skilltree_icons/${encodeURIComponent(icon)}.png` : "";
-  const skillAsset = (name) => `/static/split/skilltree/${encodeURIComponent(name)}.png`;
+  // 常量与零件:Skilltree.js 完全一致。
+  const WIDTH = 600;
+  const HEIGHT = 540;
+  const SVG_HEIGHT = 460;
+  const X_SCALE = 1;
+  const X_OFFSET = -2;          // 原始文件中背景图 bg_tree xoffset 2
+  const Y_SCALE = 1.157;        // 原始文件高度 756 缩到 460 的补偿
+  const Y_OFFSET = 50 + 30 - 20;// tree yoffset -50 + panel -30 + bg_tree -20
   const ICON_SIZE = 28;
   const ICON_BUTTON_SIZE = 32;
-  const LOCK_SIZE = ICON_SIZE * 0.8; // wiki JS: lock button = 28 * 0.8
-  const FOCUS_SIZE = 40;
+  const LOCK_SIZE = 28 * 0.8;
+  const SKILL_FOCUS_SIZE = 40;
+  const LOCK_FOCUS_SIZE = 40;
+  const TOTAL_XP = 15;
+  const XP_SIZE = 50;
+  const X_XP = 1;
+  const Y_XP = 215 - 50 + 20;
+  const buttonWidth = 180;
+  const buttonHeight = 43;
+  const buttonLeftX = WIDTH / 2 - 40 - buttonWidth;
+  const buttonRightX = WIDTH / 2 + 40;
+  const buttonY = HEIGHT - 170;
+
+  const skillAsset = (name) => `/static/split/skilltree/${encodeURIComponent(name)}.png`;
+  const reduxAsset = (name) => `/static/split/global_redux/${encodeURIComponent(name)}.png`;
+  const iconUrl = (icon) => `/static/split/skilltree_icons/${encodeURIComponent(icon)}.png`;
+
+  let tree = null;
+  let skills = {};   // name -> node（icon 存在的节点）
+  let locks = {};    // name -> node（lock_open 节点）
+  let parents = {};  // skill -> 直接父技能（connects 指向它的技能）
+  let lockParents = {}; // skill -> connects 指向它的锁
+  let activatedSkills = new Set();
+  let focusing = null;
+  // 每个节点的渲染引用
+  let gfx = {};      // name -> {bg, icon, isLock, infographic, x, y}
+  let skillFocusEle = null;
+  let lockFocusEle = null;
+  let learnBtn = null;       // {normal, hover, down, learned, text}
+  let resetBtn = null;
+
+  function yScale() {
+    return ["wendy", "wortox"].includes(sel.value.toLowerCase()) ? 1 : Y_SCALE;
+  }
+  const px = (x) => WIDTH / 2 + X_SCALE * (X_OFFSET + x);
+  const py = (y) => HEIGHT / 2 - yScale() * (y - Y_OFFSET);
 
   function buildMaps(nodes) {
-    skills = {};
-    locks = {};
-    parents = {};
+    skills = {}; locks = {}; parents = {}; lockParents = {};
     for (const n of nodes) {
-      if (n.lock) {
-        locks[n.name] = n;
-      } else {
-        skills[n.name] = n;
-        parents[n.name] = [];
-      }
+      if (n.icon) skills[n.name] = n;
+      else if (n.lock_open !== undefined) locks[n.name] = n;
     }
     for (const n of nodes) {
-      if (n.lock) continue;
-      for (const c of (n.connects || [])) {
-        if (parents[c]) parents[c].push(n.name);
-      }
+      if (skills[n.name]) parents[n.name] = [];
+      if (locks[n.name]) lockParents[n.name] = [];
+    }
+    for (const n of nodes) for (const c of (n.connects || [])) {
+      if (skills[n.name] && parents[c]) parents[c].push(n.name);
+      if (locks[n.name] && lockParents[c]) lockParents[c].push(n.name);
     }
   }
 
-  function remainingXp() {
-    return TOTAL_XP - activatedSkills.size;
-  }
+  const remainingXp = () => TOTAL_XP - activatedSkills.size;
 
   function countTags(tag) {
     let count = 0;
     for (const name of activatedSkills) {
       const skill = skills[name];
-      if (skill && skill.tags && skill.tags.includes(tag)) {
-        count += 1;
-      }
+      if (skill && skill.tags && skill.tags.includes(tag)) count += 1;
     }
     return count;
   }
 
+  // lock_open 声明式条件求值（与零件:Skilltree.js 的 checkLockOpen 一致）。
   function evalLockCond(cond) {
-    if (cond === true || cond === false || typeof cond === "number" || typeof cond === "string") {
-      return cond;
-    }
-    if (typeof cond !== "object" || cond === null) {
-      return false;
-    }
-    if (cond.Achievement) {
-      // 外部成就类条件在本地默认视为已解锁。
-      return true;
-    }
+    if (cond === true || cond === false || typeof cond === "number" || typeof cond === "string") return cond;
+    if (typeof cond !== "object" || cond === null) return false;
+    if (cond.Achievement) return true; // 外部成就类条件在本地默认视为已解锁。
     for (const key in cond) {
       const val = cond[key];
       switch (key) {
@@ -599,137 +628,294 @@ async function pageSkills(main) {
 
   function isLockOpen(name) {
     const lock = locks[name];
-    // 未显式给出条件时默认视为已解锁，避免外部成就/未知条件把整条线路锁死。
+    // 未显式给出条件时默认视为已解锁：外部成就等条件本地无法验证。
     if (!lock || lock.lock_open === undefined || lock.lock_open === null) return true;
-    return evalLockCond(lock.lock_open);
+    return !!evalLockCond(lock.lock_open);
+  }
+
+  // 游戏内 RefreshTree 的状态机：
+  // - 带 locks 的技能：所有锁打开即可学习（不需要父技能激活）；
+  // - 其余技能：root、已学技能的 connects、已开锁的 connects 任一满足即可。
+  function statusOf(name) {
+    const skill = skills[name];
+    if (!skill) return null;
+    if (skill.infographic) return "selected";
+    if (activatedSkills.has(name)) return "selected";
+    if (remainingXp() <= 0) return "unselected";
+    let activatable;
+    if (skill.locks && skill.locks.length) {
+      activatable = skill.locks.every(l => isLockOpen(l));
+    } else {
+      activatable = skill.root
+        || (parents[name] || []).some(p => activatedSkills.has(p))
+        || (lockParents[name] || []).some(l => isLockOpen(l));
+    }
+    return activatable ? "selectable" : "unselected";
   }
 
   function canLearn(name) {
-    const skill = skills[name];
-    if (!skill || activatedSkills.has(name)) return false;
-    if (remainingXp() <= 0) return false;
-    if (skill.root) return true;
-    if (skill.locks && skill.locks.some(l => !isLockOpen(l))) return false;
-    const ps = parents[name] || [];
-    if (ps.length > 0 && !ps.some(p => activatedSkills.has(p))) return false;
-    return true;
+    return skills[name] && !skills[name].infographic && statusOf(name) === "selectable";
   }
 
-  function statusOf(name) {
-    if (activatedSkills.has(name)) return "selected";
-    return canLearn(name) ? "selectable" : "unselected";
+  function setBg(g, name, hover) {
+    const href = skillAsset(hover ? name + "_over" : name);
+    if (g._href !== href) { g.bg.setAttribute("href", href); g._href = href; }
+  }
+
+  function svgImg(href, x, y, w, h, extra) {
+    return `<image href="${esc(href)}" x="${x}" y="${y}" width="${w}" height="${h}" ${extra || ""}preserveAspectRatio="xMidYMid meet"/>`;
+  }
+
+  function infoTitle(name) {
+    const n = tree.nodes.find(m => m.name === name);
+    if (!n) return name;
+    if (n.icon) return n.title || n.name;
+    return isLockOpen(name) ? "已解锁路径" : "路径锁定";
+  }
+
+  function updateInfoPanel() {
+    const titleEle = $("#skTitle"), descEle = $("#skDesc");
+    if (!focusing) {
+      titleEle.textContent = "";
+      descEle.textContent = "点击技能查看详情。";
+      return;
+    }
+    const n = tree.nodes.find(m => m.name === focusing);
+    titleEle.textContent = infoTitle(focusing);
+    descEle.textContent = (n && n.desc) || "";
+  }
+
+  // 对应零件:Skilltree.js 的 switchLearnButton：左下按钮随焦点状态切换。
+  function switchLearnButton() {
+    const st = focusing ? statusOf(focusing) : null;
+    if (st === "selected" && !(focusing && skills[focusing] && skills[focusing].infographic)) {
+      learnBtn.text.textContent = "已掌握技能";
+      learnBtn.text.style.display = "";
+      learnBtn.learned.style.display = "inline";
+      learnBtn.normal.style.display = "none";
+      learnBtn.hover.style.display = "none";
+      learnBtn.down.style.display = "none";
+    } else if (st === "selectable") {
+      learnBtn.text.textContent = "学习";
+      learnBtn.text.style.display = "";
+      learnBtn.learned.style.display = "none";
+      learnBtn.normal.style.display = "inline";
+    } else {
+      learnBtn.text.style.display = "none";
+      learnBtn.learned.style.display = "none";
+      learnBtn.normal.style.display = "none";
+      learnBtn.hover.style.display = "none";
+      learnBtn.down.style.display = "none";
+    }
+  }
+
+  function learnFocused() {
+    if (focusing && canLearn(focusing)) {
+      activatedSkills.add(focusing);
+      update();
+    }
+  }
+
+  function resetSkills() {
+    activatedSkills.clear();
+    update();
+  }
+
+  function update() {
+    if (!tree) return;
+    // 先更新锁，再更新技能（与游戏 RefreshTree 的顺序一致）。
+    for (const name in locks) {
+      const g = gfx[name];
+      if (!g) continue;
+      setBg(g, isLockOpen(name) ? "unlocked" : "locked_skill", g._hover);
+    }
+    for (const name in skills) {
+      const g = gfx[name];
+      if (!g) continue;
+      setBg(g, statusOf(name) || "unselected", g._hover);
+    }
+    $("#skillXp").textContent = `剩余洞察：${remainingXp()}`;
+    const xpEle = $("#skXpNum");
+    if (xpEle) xpEle.textContent = String(remainingXp());
+    switchLearnButton();
+    updateInfoPanel();
   }
 
   function render() {
-    if (!tree) return;
     const nodes = tree.nodes;
     if (!nodes.length) {
       $("#skwrap").innerHTML = '<p class="muted">该角色暂无技能树数据。</p>';
       return;
     }
-    const WIDTH = 600;
-    const HEIGHT = 540;
-    const SVG_HEIGHT = 460;
-    const X_SCALE = 1;
-    const X_OFFSET = -2;
-    const Y_SCALE = 1.157;
-    const Y_OFFSET = 50 + 30 - 20;
-    const yScale = ["wendy", "wortox"].includes(sel.value.toLowerCase()) ? 1 : Y_SCALE;
-    const px = (x) => WIDTH / 2 + X_SCALE * (X_OFFSET + x);
-    const py = (y) => HEIGHT / 2 - yScale * (y - Y_OFFSET);
     const byName = Object.fromEntries(nodes.map(n => [n.name, n]));
 
-    const edges = [];
-    for (const n of nodes) for (const c of (n.connects || [])) {
-      const m = byName[c];
-      if (!m) continue;
-      edges.push(`<line class="edge" x1="${px(n.x)}" y1="${py(n.y)}" x2="${px(m.x)}" y2="${py(m.y)}"/>`);
+    // 背景与连线（连接线由背景画承载，与零件:Skilltree.js 一致，不另画）。
+    const genericBg = skillAsset("background");
+    const charBg = skillAsset(`${sel.value}_background`);
+
+    // 图层顺序（SVG 按文档顺序绘制）：bg → textbox → icon-bg → icon → focus → button。
+    const parts = [];
+    parts.push(svgImg(genericBg, 0, 0, WIDTH, HEIGHT));
+    parts.push(svgImg(charBg, 0, 0, WIDTH, HEIGHT));
+
+    // XP 面板（游戏 root.xp 在 (3,215)，换算同上）。
+    const x_xp = WIDTH / 2 + X_XP;
+    const y_xp = HEIGHT / 2 - Y_XP * yScale();
+    parts.push(svgImg(skillAsset("skill_icon_textbox_white"), x_xp - XP_SIZE / 2, y_xp - XP_SIZE / 2, XP_SIZE, XP_SIZE));
+    parts.push(`<text id="skXpNum" x="${x_xp}" y="${y_xp + 7}" text-anchor="middle" font-size="20" fill="white" class="unselectable">${remainingXp()}</text>`);
+    parts.push(`<text x="${x_xp + 30}" y="${y_xp + 7}" font-size="15" fill="white" class="unselectable">剩余洞察</text>`);
+
+    // 每个节点的状态底图 + 图标。
+    gfx = {};
+    for (const n of nodes) {
+      const isLock = !n.icon;
+      if (!isLock && !skills[n.name]) continue;
+      if (isLock && !locks[n.name]) continue;
+      const x = px(n.x), y = py(n.y);
+      const size = n.infographic ? ICON_BUTTON_SIZE : (isLock ? LOCK_SIZE : ICON_BUTTON_SIZE);
+      const bgName = n.infographic ? "infographic_on" : (isLock ? (isLockOpen(n.name) ? "unlocked" : "locked_skill") : statusOf(n.name) || "unselected");
+      parts.push(`<g class="node" data-name="${esc(n.name)}">`);
+      parts.push(`<image data-role="bg" href="${esc(skillAsset(bgName))}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`);
+      if (n.icon) {
+        parts.push(`<image data-role="icon" href="${esc(iconUrl(n.icon))}" x="${x - ICON_SIZE / 2}" y="${y - ICON_SIZE / 2}" width="${ICON_SIZE}" height="${ICON_SIZE}" preserveAspectRatio="xMidYMid meet"/>`);
+      }
+      parts.push(`</g>`);
+      gfx[n.name] = { bg: null, icon: null, isLock, infographic: !!n.infographic, x, y, _hover: false, _href: skillAsset(bgName) };
     }
 
-    const charBg = skillAsset(`${sel.value}_background`);
-    const genericBg = skillAsset("background");
+    // 焦点框。
+    parts.push(`<image data-role="skillFocus" href="${esc(skillAsset("frame"))}" width="${SKILL_FOCUS_SIZE}" height="${SKILL_FOCUS_SIZE}" style="display:none" pointer-events="none" preserveAspectRatio="xMidYMid meet"/>`);
+    parts.push(`<image data-role="lockFocus" href="${esc(skillAsset("frame_octagon"))}" width="${LOCK_FOCUS_SIZE}" height="${LOCK_FOCUS_SIZE}" style="display:none" pointer-events="none" preserveAspectRatio="xMidYMid meet"/>`);
 
-    const dots = nodes.map(n => {
-      const title = n.title || n.name;
-      const x = px(n.x);
-      const y = py(n.y);
-      const size = n.lock ? LOCK_SIZE : ICON_BUTTON_SIZE;
-      const bgName = n.lock
-        ? (isLockOpen(n.name) ? "unlocked" : "locked_skill")
-        : statusOf(n.name);
-      const focusName = n.lock ? "frame_octagon" : "frame";
-      const glyph = `<image href="${esc(skillAsset(bgName))}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>` +
-        (n.lock || !n.icon ? "" : `<image href="${esc(iconUrl(n.icon))}" x="${x - ICON_SIZE / 2}" y="${y - ICON_SIZE / 2}" width="${ICON_SIZE}" height="${ICON_SIZE}" preserveAspectRatio="xMidYMid meet"/>`) +
-        `<image class="node-focus" href="${esc(skillAsset(focusName))}" x="${x - FOCUS_SIZE / 2}" y="${y - FOCUS_SIZE / 2}" width="${FOCUS_SIZE}" height="${FOCUS_SIZE}" style="display:none" preserveAspectRatio="xMidYMid meet"/>`;
-      return `<g class="node" data-name="${esc(n.name)}"
-        data-title="${esc(title)}" data-desc="${esc(n.desc || "")}"
-        data-group="${esc(n.group || "")}" data-icon="${esc(n.icon || "")}" data-lock="${n.lock}">
-        ${glyph}
-        <text x="${x}" y="${y + (n.root ? 28 : 24)}">${esc(String(title).slice(0, 12))}</text>
-      </g>`;
-    }).join("");
+    // 底部按钮（左：学习；右：重置洞察）。
+    const btnSrcs = { normal: reduxAsset("button_carny_long_normal"), hover: reduxAsset("button_carny_long_hover"), down: reduxAsset("button_carny_long_down") };
+    parts.push(`<image data-role="learnLearned" pointer-events="none" href="${esc(skillAsset("skilltree_backgroundart"))}" x="${buttonLeftX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" style="display:none" preserveAspectRatio="xMidYMid meet"/>`);
+    for (const k of ["normal", "hover", "down"]) {
+      parts.push(`<image data-role="learn${k}" pointer-events="none" href="${esc(btnSrcs[k])}" x="${buttonLeftX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" preserveAspectRatio="xMidYMid meet"/>`);
+    }
+    parts.push(`<text data-role="learnText" pointer-events="none" class="st-button-text" x="${buttonLeftX + buttonWidth / 2}" y="${buttonY + buttonHeight / 2 + 6}" text-anchor="middle">学习</text>`);
+    parts.push(`<rect data-role="learnProxy" x="${buttonLeftX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" fill="transparent" style="cursor:pointer"/>`);
+    for (const k of ["normal", "hover", "down"]) {
+      parts.push(`<image data-role="reset${k}" pointer-events="none" href="${esc(btnSrcs[k])}" x="${buttonRightX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" ${k === "normal" ? "" : 'style="display:none"'} preserveAspectRatio="xMidYMid meet"/>`);
+    }
+    parts.push(`<text data-role="resetText" pointer-events="none" class="st-button-text" x="${buttonRightX + buttonWidth / 2}" y="${buttonY + buttonHeight / 2 + 6}" text-anchor="middle">重置洞察</text>`);
+    parts.push(`<rect data-role="resetProxy" x="${buttonRightX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" fill="transparent" style="cursor:pointer"/>`);
 
     $("#skwrap").innerHTML =
       `<svg viewBox="0 0 ${WIDTH} ${SVG_HEIGHT}" width="100%" style="display:block;width:100%;height:auto;aspect-ratio:${WIDTH} / ${SVG_HEIGHT};background:#151923;border-radius:10px">
-        <image href="${esc(genericBg)}" x="0" y="0" width="${WIDTH}" height="${HEIGHT}" preserveAspectRatio="xMidYMid meet"/>
-        <image href="${esc(charBg)}" x="0" y="0" width="${WIDTH}" height="${HEIGHT}" preserveAspectRatio="xMidYMid meet"/>
-        ${edges.join("")}${dots}</svg>`;
+        ${parts.join("")}</svg>`;
 
-    $("#skillXp").textContent = `剩余洞察：${remainingXp()}`;
-
-    const tip = $("#tooltip");
-    document.querySelectorAll("#skwrap .node").forEach(nd => {
-      const focusEle = nd.querySelector(".node-focus");
-      const name = nd.dataset.name;
-      const isLock = nd.dataset.lock === "true";
-
-      nd.addEventListener("click", () => {
-        if (!isLock && canLearn(name)) {
-          activatedSkills.add(name);
-          render();
-        }
+    const svg = $("#skwrap svg");
+    for (const name in gfx) {
+      const g = gfx[name];
+      const ele = svg.querySelector(`g.node[data-name="${CSS.escape(name)}"]`);
+      g.bg = ele.querySelector('[data-role="bg"]');
+      g.icon = ele.querySelector('[data-role="icon"]');
+      ele.style.cursor = "pointer";
+      ele.addEventListener("mouseenter", () => {
+        g._hover = true;
+        const n = byName[name];
+        const base = g.infographic ? "infographic_on" : (g.isLock ? (isLockOpen(name) ? "unlocked" : "locked_skill") : statusOf(name) || "unselected");
+        setBg(g, base, true);
+        g.bg.parentElement.insertBefore(g.bg, g.icon || null);
       });
-
-      nd.addEventListener("mousemove", (e) => {
-        if (focusEle) focusEle.style.display = "inline";
-        tip.style.display = "block";
-        tip.style.left = (e.clientX + 14) + "px";
-        tip.style.top = (e.clientY + 14) + "px";
-        const tooltipIcon = nd.dataset.icon
-          ? iconUrl(nd.dataset.icon)
-          : isLock ? skillAsset(isLockOpen(name) ? "unlocked" : "locked_skill") : "";
-        const iconHtml = tooltipIcon
-          ? `<img src="${esc(tooltipIcon)}" style="width:44px;height:44px;float:left;margin-right:8px;border-radius:6px">`
-          : "";
-        tip.innerHTML = `<div style="overflow:hidden">${iconHtml}<b>${esc(nd.dataset.title)}</b><br>
-          ${nd.dataset.desc ? esc(nd.dataset.desc) + "<br>" : ""}
-          ${isLock ? `<span class="muted">${isLockOpen(name) ? "已解锁" : "未解锁"}</span><br>` : ""}
-          <span class="muted"><code>${esc(nd.dataset.name)}</code>${nd.dataset.group ? " · " + esc(nd.dataset.group) : ""}</span></div>`;
+      ele.addEventListener("mouseleave", () => {
+        g._hover = false;
+        const base = g.infographic ? "infographic_on" : (g.isLock ? (isLockOpen(name) ? "unlocked" : "locked_skill") : statusOf(name) || "unselected");
+        setBg(g, base, false);
       });
+      ele.addEventListener("click", () => focusNode(name));
+      // 游戏内双击技能按钮即学习。
+      ele.addEventListener("dblclick", () => { if (canLearn(name)) { activatedSkills.add(name); update(); } });
+    }
 
-      nd.addEventListener("mouseleave", () => {
-        if (focusEle) focusEle.style.display = "none";
-        tip.style.display = "none";
-      });
+    skillFocusEle = svg.querySelector('[data-role="skillFocus"]');
+    lockFocusEle = svg.querySelector('[data-role="lockFocus"]');
+    learnBtn = {
+      normal: svg.querySelector('[data-role="learnnormal"]'),
+      hover: svg.querySelector('[data-role="learnhover"]'),
+      down: svg.querySelector('[data-role="learndown"]'),
+      learned: svg.querySelector('[data-role="learnLearned"]'),
+      text: svg.querySelector('[data-role="learnText"]'),
+    };
+    resetBtn = {
+      normal: svg.querySelector('[data-role="resetnormal"]'),
+      hover: svg.querySelector('[data-role="resethover"]'),
+      down: svg.querySelector('[data-role="resetdown"]'),
+      text: svg.querySelector('[data-role="resetText"]'),
+    };
+
+    const learnProxy = svg.querySelector('[data-role="learnProxy"]');
+    learnProxy.addEventListener("click", learnFocused);
+    learnProxy.addEventListener("mouseenter", () => {
+      if (focusing && statusOf(focusing) === "selectable") {
+        learnBtn.normal.style.display = "none";
+        learnBtn.hover.style.display = "inline";
+      }
     });
+    learnProxy.addEventListener("mouseleave", () => {
+      if (focusing && statusOf(focusing) === "selectable") {
+        learnBtn.hover.style.display = "none";
+        learnBtn.normal.style.display = "inline";
+      }
+    });
+    const resetProxy = svg.querySelector('[data-role="resetProxy"]');
+    resetProxy.addEventListener("click", resetSkills);
+    resetProxy.addEventListener("mouseenter", () => {
+      resetBtn.normal.style.display = "none"; resetBtn.hover.style.display = "inline";
+    });
+    resetProxy.addEventListener("mouseleave", () => {
+      resetBtn.hover.style.display = "none"; resetBtn.normal.style.display = "inline";
+    });
+
+    // 双击背景重置（对应 wiki 版本的 dblclick reset）。
+    svg.querySelector(`image[href="${CSS.escape(skillAsset(`${sel.value}_background`))}"]`)?.addEventListener("dblclick", resetSkills);
+
+    // 默认焦点（defaultfocus，控制器起点；缺失则取第一个根节点）。
+    const defaultNode = nodes.find(n => n.defaultfocus) || nodes.find(n => n.root);
+    if (defaultNode) focusNode(defaultNode.name, true);
+    update();
   }
+
+  function focusNode(name, silentScroll) {
+    if (focusing !== name) {
+      focusing = name;
+      const g = gfx[name];
+      if (g) {
+        const focusEle = g.isLock ? lockFocusEle : skillFocusEle;
+        const other = g.isLock ? skillFocusEle : lockFocusEle;
+        const size = g.isLock ? LOCK_FOCUS_SIZE : SKILL_FOCUS_SIZE;
+        focusEle.setAttribute("x", g.x - size / 2);
+        focusEle.setAttribute("y", g.y - size / 2);
+        focusEle.style.display = "inline";
+        other.style.display = "none";
+      }
+    }
+    if (!silentScroll) update();
+    else { switchLearnButton(); updateInfoPanel(); }
+  }
+
+  // 空格键学习当前焦点（对应 wiki 版本的 onKeydownSVG）。
+  if (window.__skillKeyHandler) document.removeEventListener("keydown", window.__skillKeyHandler);
+  window.__skillKeyHandler = (event) => {
+    if (event.code !== "Space" || !tree) return;
+    if (focusing && canLearn(focusing)) learnFocused();
+    event.preventDefault();
+  };
+  document.addEventListener("keydown", window.__skillKeyHandler);
 
   async function draw() {
     tree = await getJSON(`/api/viz/skilltree?character=${sel.value}`);
-    buildMaps(tree.nodes);
+    buildMaps(tree.nodes || []);
     activatedSkills.clear();
+    focusing = null;
     render();
   }
 
   sel.onchange = () => { draw(); };
-  $("#resetSkillBtn").onclick = () => {
-    activatedSkills.clear();
-    render();
-  };
 
   await draw();
 }
-
 /* ---------------- constants ---------------- */
 async function pageConstants(main) {
   main.innerHTML = `

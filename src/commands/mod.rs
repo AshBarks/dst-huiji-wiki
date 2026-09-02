@@ -90,6 +90,29 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
+    /// defs JSON 并维护维基子页面（保留页内 metainfo/icon_url）
+    #[command(name = "skilltree-wiki")]
+    SkillTreeWiki {
+        /// 只处理名字包含该子串的角色（如 walter）
+        #[arg(short, long)]
+        character: Option<String>,
+        /// 同时把每个子页面内容写到该目录（<Char>.lua）
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 使用指定 scripts 快照（默认当前 scripts 树）
+        #[arg(long)]
+        snapshot: Option<String>,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     PrefabOverrides {
         #[arg(short, long)]
         input: PathBuf,
@@ -341,6 +364,7 @@ impl Commands {
             Commands::MaintainItemTable { .. } => "maintain-item-table",
             Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
+            Commands::SkillTreeWiki { .. } => "skilltree-wiki",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",

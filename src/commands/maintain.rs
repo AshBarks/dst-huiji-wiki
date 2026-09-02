@@ -118,6 +118,25 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::SkillTreeWiki {
+            character,
+            output,
+            snapshot,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::SkillTreeWiki {
+                    character,
+                    output: opt_path_to_string(&output)?,
+                    snapshot,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
         Commands::PrefabOverrides { input, output } => {
             execute(
                 JobKind::PrefabOverrides {

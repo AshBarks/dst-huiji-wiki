@@ -206,12 +206,14 @@ pub async fn constants(
 /// GET /static/split/{dir}/{name}
 ///
 /// Serves PNG assets extracted by `images-sync` from the current split tree.
-/// Only the fixed `skilltree` and `skilltree_icons` directories are allowed.
+/// Only the fixed skilltree-related directories are allowed.
 pub async fn split_asset(
     Path((dir, name)): Path<(String, String)>,
 ) -> std::result::Result<axum::response::Response, StatusCode> {
-    if !matches!(dir.as_str(), "skilltree" | "skilltree_icons")
-        || name.contains('/')
+    if !matches!(
+        dir.as_str(),
+        "skilltree" | "skilltree_icons" | "global_redux"
+    ) || name.contains('/')
         || name.contains('\\')
         || name.contains("..")
     {

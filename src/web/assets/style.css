@@ -68,6 +68,12 @@ svg .node text{fill:var(--text);font-size:11px;text-anchor:middle}
   background-image:url('/static/split/skilltree/skill_icon_textbox.png');
   background-size:100% 100%;background-repeat:no-repeat;border:1px solid var(--line);
   padding:10px 12px;border-radius:10px;max-width:340px;z-index:50;font-size:13px}
+.skilltree-info{margin-top:10px;padding:10px 14px;border:1px solid var(--line);
+  border-radius:10px;background:#1a1f2e;min-height:64px}
+.skilltree-info b{font-size:15px}
+.skilltree-info p{margin:6px 0 0;white-space:pre-line}
+.st-button-text{fill:#2b2320;font-size:18px;font-weight:600;pointer-events:none}
+text.unselectable{user-select:none;pointer-events:none}
 .pager{display:flex;gap:8px;align-items:center;margin-top:10px}
 .diff-added{color:var(--ok)} .diff-removed{color:var(--err)} .diff-changed{color:var(--warn)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}

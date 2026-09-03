@@ -113,6 +113,22 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 把技能树数据导出为本地 JSON 文件（纯本地，不访问维基）
+    #[command(name = "skilltree-export")]
+    SkillTreeExport {
+        /// 只处理名字包含该子串的角色（如 walter）
+        #[arg(short, long)]
+        character: Option<String>,
+        /// 输出目录（默认 output/skilltree），每个角色写入 <角色>.json
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 使用指定 scripts 快照（默认当前 scripts 树）
+        #[arg(long)]
+        snapshot: Option<String>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     PrefabOverrides {
         #[arg(short, long)]
         input: PathBuf,
@@ -365,6 +381,7 @@ impl Commands {
             Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::SkillTreeWiki { .. } => "skilltree-wiki",
+            Commands::SkillTreeExport { .. } => "skilltree-export",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",
@@ -941,6 +958,36 @@ mod tests {
         for t in types {
             let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-copy-clip", "-t", t]);
             assert!(args.is_ok(), "Failed to parse type: {}", t);
+        }
+    }
+
+    #[test]
+    fn test_skilltree_export_command() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "skilltree-export",
+            "-c",
+            "walter",
+            "-o",
+            "output/skilltree",
+            "--report-json",
+            "report.json",
+        ]);
+        assert!(args.is_ok());
+        let args = args.unwrap();
+        match args.command {
+            Commands::SkillTreeExport {
+                character,
+                output,
+                snapshot,
+                report_json,
+            } => {
+                assert_eq!(character, Some("walter".to_string()));
+                assert_eq!(output, Some(PathBuf::from("output/skilltree")));
+                assert!(snapshot.is_none());
+                assert_eq!(report_json, Some(PathBuf::from("report.json")));
+            }
+            _ => panic!("Expected SkillTreeExport command"),
         }
     }
 

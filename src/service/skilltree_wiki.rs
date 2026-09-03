@@ -304,6 +304,63 @@ pub async fn run_skilltree_wiki(
     }))
 }
 
+/// `skilltree-export` 任务入口：把技能树数据导出为本地 JSON 文件。
+///
+/// 纯本地操作，不读取/写入维基；需要 `DST__ROOT` 且已解压 scripts
+/// （或指定快照目录）。每个角色输出一个 `<角色>.json`。
+pub async fn run_skilltree_export(
+    character: Option<String>,
+    output: Option<PathBuf>,
+    snapshot: Option<String>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let all_characters = super::dataset::list_skill_characters_local(snapshot.as_deref())?;
+    let characters: Vec<String> = match &character {
+        Some(filter) => {
+            let filter = filter.to_lowercase();
+            let matched: Vec<String> = all_characters
+                .iter()
+                .filter(|c| c.to_lowercase().contains(&filter))
+                .cloned()
+                .collect();
+            if matched.is_empty() {
+                return Err(crate::Error::Config(format!(
+                    "未找到匹配的角色技能树：{}（可用：{}）",
+                    filter,
+                    all_characters.join(", ")
+                )));
+            }
+            matched
+        }
+        None => all_characters,
+    };
+
+    let output_dir = output.unwrap_or_else(|| PathBuf::from("output/skilltree"));
+    std::fs::create_dir_all(&output_dir)?;
+    reporter.log(format!(
+        "待处理角色（{}）：{}",
+        characters.len(),
+        characters.join(", ")
+    ));
+    reporter.log(format!("输出目录：{}", output_dir.display()));
+
+    let strings_data = load_skill_strings(snapshot.as_deref())?;
+    let mut files = Vec::new();
+    for ch in &characters {
+        let data = super::dataset::load_skill_tree(snapshot.as_deref(), ch, &strings_data)?;
+        let file = output_dir.join(format!("{}.json", ch));
+        std::fs::write(&file, serde_json::to_string_pretty(&data)?)?;
+        reporter.log(format!("已导出 {:?}", file));
+        files.push(file.to_string_lossy().to_string());
+    }
+
+    Ok(serde_json::json!({
+        "output": output_dir.to_string_lossy(),
+        "characters": characters,
+        "files": files,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

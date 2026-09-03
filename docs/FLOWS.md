@@ -17,6 +17,23 @@
 - **增量**：输入 hash 与 manifest 一致且产物在盘则跳过；解码器版本变更等效`--force`全量重处理；失败文件清理旧产物，partial 运行不作为下个 diff 基线
 - **对账**：`current/` 只保留本次保证的产物（移除陈旧文件与空目录）
 
+## skilltree-export 技能树本地导出流程（纯本地）
+从环境变量中读取`DST__ROOT`，验证`data/databundles/scripts/prefabs/`（或快照目录）存在。
+- 扫描`skilltree_<char>.lua`获得全部角色（支持`--character`子串过滤）
+- 解析`languages/chinese_s.po`中的`STRINGS.SKILLTREE.*`中文标题/描述
+- 解析每个角色的技能树，生成包含`character`/`groups`/`nodes`的 JSON
+- 写入`--output`目录（默认`output/skilltree`），每个角色一个`<角色>.json`
+- 纯本地操作，不访问维基，不需要`HUIJI__*`凭据
+
+## skilltree-wiki 技能树子页面维护流程
+从环境变量中读取`DST__ROOT`，验证DST目录存在。
+- 扫描`skilltree_<char>.lua`获得全部角色（支持`--character`子串过滤）
+- 解析`languages/chinese_s.po`中的技能树中文标题/描述
+- 从维基获取`模块:Skilltree/<Char>`现有页面，保留`metainfo`与旧`defs`中的`icon_url`
+- 组装子页面`defs` JSON并用`return [[ ... ]]`包裹为页面内容
+- `--output`可同时把每个子页面内容写到本地目录（`<Char>.lua`）
+- 按`--yes`/`--dry-run`/交互确认决定是否写入维基
+
 ## ItemTable维护流程
 从环境变量中读取`DST__ROOT`，验证DST目录是否存在。
 - 从DST目录中读取`data/databundles/scripts.zip`文件。

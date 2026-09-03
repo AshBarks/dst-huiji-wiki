@@ -316,6 +316,67 @@ cargo run --release -- maintain-copy-clip -t filters --dry-run --report-json rep
 
 ---
 
+#### `skilltree-wiki` - 维护技能树子页面
+
+从 DST 游戏文件提取角色技能树，组装为 `模块:Skilltree/<Char>` 子页面的
+`defs` JSON 并维护维基页面（保留页内 `metainfo` 与 `icon_url`）。
+
+```bash
+cargo run --release -- skilltree-wiki [OPTIONS]
+```
+
+| 参数 | 简写 | 说明 |
+|------|------|------|
+| `--character <STRING>` | `-c` | 只处理名字包含该子串的角色（如 walter） |
+| `--output <DIR>` | `-o` | 同时把每个子页面内容写到该目录（`<Char>.lua`） |
+| `--snapshot <NAME>` | | 使用指定 scripts 快照（默认当前 scripts 树） |
+| `--yes` | | 跳过确认，直接写入维基（无人值守） |
+| `--dry-run` | | 只生成产物与 diff，不写入维基（与 `--yes` 互斥） |
+| `--report-json <FILE>` | | 将机器可读的执行报告写入该文件 |
+
+**说明：** 此命令需要配置 `DST__ROOT`。`--output` 用于把每个角色的子页面内容
+同时导出到本地，便于离线检视或后续手工处理。
+
+**示例：**
+
+```bash
+# 导出全部角色技能树子页面到本地目录（同时按交互确认是否写维基）
+cargo run --release -- skilltree-wiki -o output/skilltree
+
+# 只处理 walter，并只做 dry-run 查看 diff
+cargo run --release -- skilltree-wiki -c walter --dry-run -o output/skilltree
+```
+
+---
+
+#### `skilltree-export` - 导出技能树数据到本地
+
+纯本地导出技能树解析结果（含中文标题/描述、坐标、连接、锁与标签等），
+不访问维基，也不要求 `HUIJI__*` 凭据。
+
+```bash
+cargo run --release -- skilltree-export [OPTIONS]
+```
+
+| 参数 | 简写 | 说明 |
+|------|------|------|
+| `--character <STRING>` | `-c` | 只处理名字包含该子串的角色（如 walter） |
+| `--output <DIR>` | `-o` | 输出目录（默认 `output/skilltree`），每个角色写入 `<角色>.json` |
+| `--snapshot <NAME>` | | 使用指定 scripts 快照（默认当前 scripts 树） |
+| `--report-json <FILE>` | | 将机器可读的执行报告写入该文件 |
+
+**示例：**
+
+```bash
+# 导出全部角色技能树 JSON 到 output/skilltree
+cargo run --release -- skilltree-export
+
+# 导出 walter 到指定目录
+cargo run --release -- skilltree-export -c walter -o output/skilltree
+```
+
+---
+
 #### `scripts-sync` - 同步游戏 scripts 树
 
 游戏更新后归档旧 scripts 树为 `scripts_<时间戳>` 快照，解压新的 `scripts.zip` 并记录版本（纯本地操作，`update-scan`/`knowledge-*` 依赖快照命名）。

@@ -137,6 +137,24 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::SkillTreeExport {
+            character,
+            output,
+            snapshot,
+            report_json,
+        } => {
+            execute(
+                JobKind::SkillTreeExport {
+                    character,
+                    output: opt_path_to_string(&output)?,
+                    snapshot,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
         Commands::PrefabOverrides { input, output } => {
             execute(
                 JobKind::PrefabOverrides {

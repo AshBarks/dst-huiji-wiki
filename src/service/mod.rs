@@ -130,6 +130,15 @@ pub enum JobKind {
         #[serde(default)]
         snapshot: Option<String>,
     },
+    /// 把技能树数据导出为本地 JSON 文件；纯本地，不访问维基。
+    SkillTreeExport {
+        #[serde(default)]
+        character: Option<String>,
+        #[serde(default)]
+        output: Option<String>,
+        #[serde(default)]
+        snapshot: Option<String>,
+    },
     PrefabOverrides {
         input: String,
         #[serde(default)]
@@ -374,6 +383,7 @@ impl JobKind {
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
+            JobKind::SkillTreeExport { .. } => "skilltree-export",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
@@ -521,6 +531,19 @@ async fn execute_job_inner(
                 snapshot.clone(),
                 reporter,
                 mode,
+            )
+            .await
+        }
+        JobKind::SkillTreeExport {
+            character,
+            output,
+            snapshot,
+        } => {
+            skilltree_wiki::run_skilltree_export(
+                character.clone(),
+                opt_path(output),
+                snapshot.clone(),
+                reporter,
             )
             .await
         }

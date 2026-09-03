@@ -278,6 +278,43 @@ pub fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>>
     Ok(chars)
 }
 
+/// Lists available skill tree characters from local extracted scripts only.
+///
+/// Unlike [`list_skill_characters`], this does not construct a wiki client,
+/// so it can be used by local-only export jobs that should not require
+/// `HUIJI__*` credentials.
+pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>> {
+    let dst_root = std::env::var("DST__ROOT")
+        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let bundles = std::path::Path::new(&dst_root).join("data/databundles");
+    let dir = match snapshot {
+        Some(snap) => bundles.join(snap).join("prefabs"),
+        None => bundles.join("scripts").join("prefabs"),
+    };
+
+    let mut chars = Vec::new();
+    let entries = std::fs::read_dir(&dir).map_err(|e| {
+        Error::Io(std::io::Error::other(format!(
+            "read skilltree prefabs dir {}: {}",
+            dir.to_string_lossy(),
+            e
+        )))
+    })?;
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if let Some(rest) = name.strip_prefix("skilltree_") {
+            if let Some(char_name) = rest.strip_suffix(".lua") {
+                if char_name != "defs" {
+                    chars.push(char_name.to_string());
+                }
+            }
+        }
+    }
+    chars.sort();
+    chars.dedup();
+    Ok(chars)
+}
+
 fn count_tuning_keys(source: &str) -> usize {
     source
         .lines()

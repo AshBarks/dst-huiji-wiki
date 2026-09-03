@@ -198,11 +198,18 @@ const JOB_DEFS = {
     label: "维护模块常量 → 维基", wiki: true,
     fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
-  skilltree_wiki: {
+  skill_tree_wiki: {
     label: "维护技能树子页面 → 维基", wiki: true,
     fields: [
       { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
       { k: "output", label: "产物目录（可选，写 <Char>.lua 文件）" },
+    ],
+  },
+  skill_tree_export: {
+    label: "技能树数据导出到本地",
+    fields: [
+      { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
+      { k: "output", label: "输出目录（可选，默认 output/skilltree）" },
     ],
   },
   prefab_overrides: {

@@ -36,6 +36,7 @@ const routes = [
   ["recipes", "配方/材料", pageRecipes],
   ["translations", "翻译", pageTranslations],
   ["skills", "技能树", pageSkills],
+  ["icons", "物品图标", pageInventoryIcons],
   ["constants", "常量", pageConstants],
   ["snapshots", "快照对比", pageSnapshots],
 ];
@@ -918,6 +919,141 @@ async function pageSkills(main) {
 
   await draw();
 }
+/* ---------------- inventory icons ---------------- */
+async function pageInventoryIcons(main) {
+  main.innerHTML = `
+    <div class="panel">
+      <div class="row">
+        <div class="tabs" style="margin:0">
+          <button class="tab active" data-sort="name">按文件名</button>
+          <button class="tab" data-sort="history">按加入历史</button>
+        </div>
+        <input id="iq" placeholder="搜索文件名 / 中文名 / 英文名…" style="width:250px">
+        <span class="muted" id="icount"></span>
+      </div>
+      <p class="muted" style="margin:8px 0 0">点击图标查看历代版本（内容寻址历史，来自 images-sync manifest）。</p>
+    </div>
+    <div class="panel">
+      <div id="igrid" class="icon-grid"></div>
+      <div id="isentinel" class="muted" style="text-align:center;padding:8px">加载中…</div>
+    </div>
+    <div id="ivOverlay" class="iv-overlay" style="display:none">
+      <div class="iv-panel">
+        <div class="row" style="justify-content:space-between">
+          <h2 id="ivTitle" style="margin:0"></h2>
+          <button class="btn secondary" id="ivClose">关闭</button>
+        </div>
+        <div id="ivList"></div>
+      </div>
+    </div>`;
+
+  const fmtDate = (ms) => ms ? new Date(ms).toLocaleString() : "";
+  const groupKey = (it) => st.sort === "name"
+    ? (/[a-z]/.test(it.file[0]) ? it.file[0].toUpperCase() : "#")
+    : it.first_build;
+
+  const st = { sort: "name", q: "", page: 0, size: 120, loading: false, done: false, lastGroup: null };
+
+  const loadMore = async () => {
+    if (st.loading || st.done) return;
+    st.loading = true;
+    try {
+      const p = new URLSearchParams({ sort: st.sort, q: st.q, page: st.page, page_size: st.size });
+      const r = await getJSON(`/api/data/inventoryicons?${p}`);
+      $("#icount").textContent = `共 ${r.total} 个图标 · 数据源 build ${r.latest_build ?? "—"}`;
+      const grid = $("#igrid");
+      for (const it of r.items) {
+        const gk = groupKey(it);
+        if (gk !== st.lastGroup) {
+          st.lastGroup = gk;
+          const label = st.sort === "name" ? gk
+            : `Build ${it.first_build}${it.first_synced_at ? ` · ${fmtDate(it.first_synced_at)}` : ""}`;
+          grid.insertAdjacentHTML("beforeend", `<div class="icon-divider">${esc(label)}</div>`);
+        }
+        const names = [it.name_zh, it.name_en].filter(Boolean).join(" / ");
+        grid.insertAdjacentHTML("beforeend", `
+          <figure class="icon-card" data-file="${esc(it.file)}">
+            <img loading="lazy" width="64" height="64"
+              src="/static/split/inventoryimages/${encodeURIComponent(it.file)}" alt="${esc(it.file)}">
+            <figcaption>
+              <code>${esc(it.file.replace(/\.png$/, ""))}</code>
+              ${names ? `<span class="muted">${esc(names)}</span>` : ""}
+            </figcaption>
+          </figure>`);
+      }
+      st.page += 1;
+      st.done = grid.querySelectorAll(".icon-card").length >= r.total;
+      $("#isentinel").textContent = st.done ? "已全部加载" : "继续滚动加载…";
+    } catch (e) {
+      $("#isentinel").textContent = `加载失败：${e.message}`;
+    } finally {
+      st.loading = false;
+    }
+    maybeMore();
+  };
+
+  // 页尾不足一屏时继续取，直到填满或加载完
+  const maybeMore = () => {
+    if (st.done || st.loading) return;
+    requestAnimationFrame(() => {
+      const r = $("#isentinel").getBoundingClientRect();
+      if (r.top < window.innerHeight + 300) loadMore();
+    });
+  };
+
+  const reset = () => {
+    st.page = 0; st.lastGroup = null; st.done = false;
+    $("#igrid").innerHTML = "";
+    $("#isentinel").textContent = "加载中…";
+    loadMore();
+  };
+
+  main.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+    if (b.dataset.sort === st.sort) return;
+    st.sort = b.dataset.sort;
+    main.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === b));
+    reset();
+  });
+
+  let deb;
+  $("#iq").oninput = (e) => {
+    clearTimeout(deb);
+    deb = setTimeout(() => { st.q = e.target.value.trim(); reset(); }, 250);
+  };
+
+  const io = new IntersectionObserver((es) => {
+    if (es.some(e => e.isIntersecting)) loadMore();
+  }, { rootMargin: "300px" });
+  io.observe($("#isentinel"));
+
+  // 历代版本抽屉
+  const overlay = $("#ivOverlay");
+  $("#ivClose").onclick = () => { overlay.style.display = "none"; };
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.style.display = "none"; };
+  $("#igrid").addEventListener("click", async (e) => {
+    const card = e.target.closest(".icon-card");
+    if (!card) return;
+    const file = card.dataset.file;
+    $("#ivTitle").textContent = file;
+    $("#ivList").innerHTML = '<p class="muted">加载中…</p>';
+    overlay.style.display = "flex";
+    try {
+      const r = await getJSON(`/api/data/inventoryicons/versions?file=${encodeURIComponent(file)}`);
+      $("#ivList").innerHTML = r.versions.map((v, i) => `
+        <div class="icon-ver">
+          <img loading="lazy" width="64" height="64" src="/static/objects/${esc(v.hash)}" alt="">
+          <div>
+            <b>Build ${esc(v.build)}</b>${v.synced_at ? `<span class="muted"> · ${fmtDate(v.synced_at)}</span>` : ""}
+            ${i === 0 && r.present ? ' <span class="badge b-success">当前</span>' : ""}
+          </div>
+          <code class="muted" style="margin-left:auto">${esc(v.hash.slice(0, 12))}…</code>
+        </div>`).join("") || '<p class="muted">无历史记录。</p>';
+    } catch (err) {
+      $("#ivList").innerHTML = `<p style="color:var(--err)">加载失败：${esc(err.message)}</p>`;
+    }
+  });
+}
+
 /* ---------------- constants ---------------- */
 async function pageConstants(main) {
   main.innerHTML = `

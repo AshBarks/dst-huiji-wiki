@@ -1,11 +1,12 @@
 //! Data browse / visualization endpoints backed by the in-memory dataset.
 
-use super::state::AppState;
+use super::state::{ktools_out_dir, AppState};
 use axum::extract::{Path, Query, State};
 use axum::http::{header, StatusCode};
 use axum::response::IntoResponse;
 use axum::Json;
 use dst_huiji_wiki::error::Result;
+use dst_huiji_wiki::scripts_sync::images::icons::{compare_entries, IconEntry, IconSort};
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -203,16 +204,140 @@ pub async fn constants(
     })))
 }
 
+/// GET /api/data/inventoryicons — 物品图标网格（文件名/加入历史两种排序）。
+pub async fn inventoryicons(
+    State(state): State<Arc<AppState>>,
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let index = state.icons_index().await.map_err(err_status)?;
+    let sort = match q.get("sort").map(String::as_str) {
+        Some("history") => IconSort::History,
+        _ => IconSort::Name,
+    };
+    let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
+
+    // 翻译为 best-effort：数据集（游戏 zip）不可用时仍可浏览图标。
+    let names = inventory_names(&state).await;
+
+    struct Row<'a> {
+        entry: &'a IconEntry,
+        name_en: Option<String>,
+        name_zh: Option<String>,
+    }
+    // 文件名 stem 大写 → STRINGS.NAMES 键（abigail_flower.png → ABIGAIL_FLOWER）。
+    let lookup = |e: &IconEntry| {
+        names.get(
+            e.file
+                .strip_suffix(".png")
+                .unwrap_or(&e.file)
+                .to_ascii_uppercase()
+                .as_str(),
+        )
+    };
+    let mut rows: Vec<Row> = index
+        .entries
+        .iter()
+        .filter(|e| {
+            if ql.is_empty() {
+                return true;
+            }
+            e.file.contains(&ql)
+                || lookup(e)
+                    .is_some_and(|(en, zh)| en.to_lowercase().contains(&ql) || zh.contains(&ql))
+        })
+        .map(|e| {
+            let (name_en, name_zh) = match lookup(e) {
+                Some((en, zh)) => (Some(en.clone()), (!zh.is_empty()).then(|| zh.clone())),
+                None => (None, None),
+            };
+            Row {
+                entry: e,
+                name_en,
+                name_zh,
+            }
+        })
+        .collect();
+    rows.sort_by(|a, b| compare_entries(a.entry, b.entry, sort));
+
+    let total = rows.len();
+    let (page, page_size) = page_params(&q);
+    let start = page.saturating_mul(page_size);
+    let items: Vec<serde_json::Value> = rows
+        .into_iter()
+        .skip(start)
+        .take(page_size)
+        .map(|r| {
+            serde_json::json!({
+                "file": r.entry.file,
+                "first_build": r.entry.first_build,
+                "first_synced_at": r.entry.first_synced_at,
+                "name_en": r.name_en,
+                "name_zh": r.name_zh,
+            })
+        })
+        .collect();
+
+    Ok(Json(serde_json::json!({
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "latest_build": index.latest_build,
+        "latest_synced_at": index.latest_synced_at,
+        "items": items,
+    })))
+}
+
+/// GET /api/data/inventoryicons/versions?file=xxx.png — 图标历代版本（自新向旧）。
+pub async fn inventoryicon_versions(
+    State(state): State<Arc<AppState>>,
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let file = q.get("file").map(String::as_str).unwrap_or_default();
+    if !file.ends_with(".png") || file.contains('/') || file.contains('\\') || file.contains("..") {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let index = state.icons_index().await.map_err(err_status)?;
+    let Some(versions) = index.version_history(file) else {
+        return Err(StatusCode::NOT_FOUND);
+    };
+    Ok(Json(serde_json::json!({
+        "file": file,
+        "present": index.contains(file),
+        "versions": versions,
+    })))
+}
+
+/// 文件名 stem（大写）→ (英文 msgid, 中文 msgstr)，取自 STRINGS.NAMES.* 条目。
+async fn inventory_names(state: &AppState) -> HashMap<String, (String, String)> {
+    match state.datasets.get_or_load(None).await {
+        Ok(ds) => ds
+            .po_entries
+            .iter()
+            .filter_map(|e| {
+                let key = e.msgctxt.as_ref()?.strip_prefix("STRINGS.NAMES.")?;
+                Some((
+                    key.to_ascii_uppercase(),
+                    (e.msgid.clone(), e.msgstr.trim().to_string()),
+                ))
+            })
+            .collect(),
+        Err(e) => {
+            tracing::warn!("数据集加载失败，物品图标将不含名称翻译: {}", e);
+            HashMap::new()
+        }
+    }
+}
+
 /// GET /static/split/{dir}/{name}
 ///
 /// Serves PNG assets extracted by `images-sync` from the current split tree.
-/// Only the fixed skilltree-related directories are allowed.
+/// Only the fixed skilltree-related / inventoryimages directories are allowed.
 pub async fn split_asset(
     Path((dir, name)): Path<(String, String)>,
 ) -> std::result::Result<axum::response::Response, StatusCode> {
     if !matches!(
         dir.as_str(),
-        "skilltree" | "skilltree_icons" | "global_redux"
+        "skilltree" | "skilltree_icons" | "global_redux" | "inventoryimages"
     ) || name.contains('/')
         || name.contains('\\')
         || name.contains("..")
@@ -220,11 +345,7 @@ pub async fn split_asset(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let out_dir = std::env::var("KTOOLS__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .unwrap_or_else(|| "output/ktools".to_string());
-    let path = std::path::Path::new(&out_dir)
+    let path = ktools_out_dir()
         .join("current/split")
         .join(&dir)
         .join(&name);
@@ -232,7 +353,40 @@ pub async fn split_asset(
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
-    Ok(([(header::CONTENT_TYPE, "image/png")], bytes).into_response())
+    // current 树随 build 更新（同名文件内容可能变化），缓存适度。
+    Ok(png_response(bytes, "public, max-age=86400"))
+}
+
+/// PNG 响应（带缓存头；`cache_control` 由调用方按内容可变性选择）。
+fn png_response(bytes: Vec<u8>, cache_control: &'static str) -> axum::response::Response {
+    (
+        [
+            (header::CONTENT_TYPE, "image/png"),
+            (header::CACHE_CONTROL, cache_control),
+        ],
+        bytes,
+    )
+        .into_response()
+}
+
+/// GET /static/objects/{hash} — 按内容 sha256 取回 CAS 中的历史版本图片。
+pub async fn object_asset(
+    Path(hash): Path<String>,
+) -> std::result::Result<axum::response::Response, StatusCode> {
+    let hash = hash.to_ascii_lowercase();
+    if hash.len() != 64 || !hash.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let path = ktools_out_dir()
+        .join("history/objects")
+        .join(&hash[..2])
+        .join(&hash);
+    let bytes = tokio::fs::read(&path)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+
+    // 内容寻址：hash 即内容，可永久缓存。
+    Ok(png_response(bytes, "public, max-age=31536000, immutable"))
 }
 
 /// GET /api/viz/skilltree?character=wilson

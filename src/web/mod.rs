@@ -43,6 +43,11 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/data/ingredients", get(api_data::ingredients))
         .route("/data/po/entries", get(api_data::po_entries))
         .route("/data/constants", get(api_data::constants))
+        .route("/data/inventoryicons", get(api_data::inventoryicons))
+        .route(
+            "/data/inventoryicons/versions",
+            get(api_data::inventoryicon_versions),
+        )
         .route("/viz/skilltree", get(api_data::skilltree))
         .route("/snapshots", get(api_data::snapshots))
         .route("/diff/recipes", get(api_data::diff_recipes))
@@ -55,6 +60,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/static/app.js", get(app_js_handler))
         .route("/static/style.css", get(style_css_handler))
         .route("/static/split/{dir}/{name}", get(api_data::split_asset))
+        .route("/static/objects/{hash}", get(api_data::object_asset))
         .nest("/api", api)
         .fallback(not_found)
         .layer(middleware::from_fn(log_requests))

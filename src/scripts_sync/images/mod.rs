@@ -33,6 +33,7 @@
 //! ```
 
 pub mod history;
+pub mod icons;
 pub mod ktex;
 pub mod scan;
 pub mod split;
@@ -449,6 +450,7 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
         diff,
         inputs: scan.input_hashes(),
         stats: stats.clone(),
+        synced_at: Some(history::now_ms()),
     };
     let manifest_path = manifests.save(&manifest)?;
     reporter.log(format!(

@@ -74,6 +74,18 @@ pub struct Manifest {
     /// 阶段统计（ktech/split 处理量、失败、missing/conflict/stale 计数等）。
     #[serde(default)]
     pub stats: BTreeMap<String, u64>,
+    /// 保存时刻（unix 毫秒）；旧 manifest 无此字段为 `None`，
+    /// 下游（如 WebUI 图标历史）可用 manifest 文件 mtime 兜底。
+    #[serde(default)]
+    pub synced_at: Option<u64>,
+}
+
+/// 当前 unix 时间（毫秒）。
+pub fn now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
 }
 
 /// 纯函数：比较两份最终产物清单，产出 added/removed/changed。
@@ -247,7 +259,7 @@ fn parse_manifest_file(path: &Path) -> Result<Manifest> {
 }
 
 /// 数值排序键：数字 build 按数值，非数字按字典序（数字优先）。
-fn numeric_key(build: &str) -> (u8, u64, String) {
+pub(super) fn numeric_key(build: &str) -> (u8, u64, String) {
     match build.parse::<u64>() {
         Ok(n) => (0, n, String::new()),
         Err(_) => (1, 0, build.to_string()),
@@ -370,6 +382,7 @@ mod tests {
             diff: Diff::default(),
             inputs: BTreeMap::from([("tex/a".into(), "h".into())]),
             stats: BTreeMap::from([("sprites".into(), 1)]),
+            synced_at: Some(1234567890),
         }
     }
 
@@ -383,6 +396,7 @@ mod tests {
         let loaded = store.load("100").unwrap().unwrap();
         assert_eq!(loaded.build, "100");
         assert!(loaded.complete);
+        assert_eq!(loaded.synced_at, Some(1234567890));
         assert_eq!(
             loaded.products.get("split/a/1.png").map(String::as_str),
             Some("h")

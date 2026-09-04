@@ -187,6 +187,14 @@ pub enum JobKind {
         #[serde(default)]
         zip: Option<String>,
     },
+    /// 构建 prefab 与动画文件的关联索引（纯本地，不做皮肤关联）。
+    AnimIndex {
+        scripts: String,
+        #[serde(default)]
+        anim: Option<String>,
+        #[serde(default)]
+        out: Option<String>,
+    },
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
@@ -407,6 +415,7 @@ impl JobKind {
             JobKind::ImagesSync { .. } => "images-sync",
             JobKind::AnimSync { .. } => "anim-sync",
             JobKind::AnimDiff { .. } => "anim-diff",
+            JobKind::AnimIndex { .. } => "anim-index",
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
@@ -587,6 +596,9 @@ async fn execute_job_inner(
                 reporter,
             )
             .await
+        }
+        JobKind::AnimIndex { scripts, anim, out } => {
+            run_anim_index(scripts, opt_path(anim), opt_path(out), reporter).await
         }
         JobKind::CorpusSync { full, dir, rc } => {
             run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
@@ -1622,6 +1634,24 @@ async fn run_anim_diff(
             new_dir,
             only: zip,
             parse_all: false,
+        },
+        reporter,
+    )
+}
+
+/// `anim-index`: build a prefab ↔ animation-file association index.
+/// Local-only; no wiki traffic.
+async fn run_anim_index(
+    scripts: &str,
+    anim: Option<PathBuf>,
+    out: Option<PathBuf>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    crate::scripts_sync::anim::index::run_index(
+        &crate::scripts_sync::anim::index::AnimIndexParams {
+            scripts_root: PathBuf::from(scripts),
+            anim_root: anim,
+            out,
         },
         reporter,
     )

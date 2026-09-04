@@ -193,6 +193,20 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 构建 prefab 与动画文件的关联索引（纯本地，不做皮肤关联）
+    AnimIndex {
+        /// 游戏脚本根目录（当前树或快照目录）
+        scripts: PathBuf,
+        /// 动画资源目录；缺省由 scripts 路径推导为 ../data/anim
+        #[arg(long)]
+        anim: Option<PathBuf>,
+        /// 输出 JSON 文件路径（默认 output/anim-index.json）
+        #[arg(short, long)]
+        out: Option<PathBuf>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
     CorpusFetch {
         /// 忽略增量对账，全量重抓所有页面
@@ -418,6 +432,7 @@ impl Commands {
             Commands::ImagesSync { .. } => "images-sync",
             Commands::AnimSync { .. } => "anim-sync",
             Commands::AnimDiff { .. } => "anim-diff",
+            Commands::AnimIndex { .. } => "anim-index",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",

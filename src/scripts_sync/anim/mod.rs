@@ -8,6 +8,7 @@
 pub mod archive;
 pub mod diff;
 pub mod history;
+pub mod index;
 pub mod normalize;
 pub mod snapshot;
 

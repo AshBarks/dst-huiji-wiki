@@ -462,6 +462,29 @@ cargo run --release -- anim-diff <OLD_DIR> <NEW_DIR> [OPTIONS]
 
 ---
 
+#### `anim-index` - 构建 prefab 与动画文件关联索引
+
+扫描 `scripts/prefabs` 中的 `Asset("ANIM", ...)` / `Asset("DYNAMIC_ANIM", ...)`，建立 `prefab 变体 -> 动画文件` 的静态关联，并与 `data/anim` 对账。支持展开常见工厂函数（`MakeAxe`、`makeassets`、`makeassetlist` 等），并对命中的动画包解析 `anim.bin` / `build.bin`，建立 `prefab -> bank/animation` 内容级索引。纯本地操作，不做皮肤相关 `.dyn` / `PKGREF` 关联。
+
+```bash
+cargo run --release -- anim-index <SCRIPTS_ROOT> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--anim <DIR>` | 动画资源目录；缺省由 scripts 路径推导为 `../data/anim` |
+| `--out <FILE>` | 输出 JSON 文件路径，默认 `output/anim-index.json` |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
+
+**产物**：`output/anim-index.json`，内容包含：
+
+- `prefabs`：每个 prefab 变体关联的动画文件，以及从 `anim.bin` / `build.bin` 聚合出的 `banks` / `animations` / `builds` / `symbols` / `atlases`；
+- `anim_files`：每个动画文件的反向引用列表与内容摘要；
+- `unresolved`：动态/无法静态解析的 Asset 引用，带文件与行号；
+- `stats`：文件数、引用数、唯一动画数、缺失数等摘要。
+
+---
+
 #### `corpus-fetch` - 抓取维基语料
 
 抓取维基主命名空间全量语料到本地 `wikis/<host>/` 目录（gitignore，不入仓库）。

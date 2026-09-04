@@ -235,6 +235,24 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::AnimIndex {
+            scripts,
+            anim,
+            out,
+            report_json,
+        } => {
+            execute(
+                JobKind::AnimIndex {
+                    scripts: path_to_string(&scripts)?,
+                    anim: opt_path_to_string(&anim)?,
+                    out: opt_path_to_string(&out)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
         Commands::CorpusFetch {
             full,
             dir,

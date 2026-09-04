@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use rayon::prelude::*;
-
 use crate::build_file::{BuildFile, BuildFrame, BuildVert, RowSpan, SpriteSpans};
 use crate::error::Result;
 use crate::ktex::parse_ktex;
@@ -122,7 +120,7 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]
     type CropEntry = (Arc<image::RgbaImage>, Arc<SpriteSpans>);
     let crop_cache: std::sync::Mutex<HashMap<CropKey, CropEntry>> =
         std::sync::Mutex::new(HashMap::new());
-    build.symbols.par_iter_mut().for_each(|symbol| {
+    build.symbols.iter_mut().for_each(|symbol| {
         for frame in &mut symbol.frames {
             let verts = &frame.verts;
             if verts.is_empty() || verts.len() < 6 {

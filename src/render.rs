@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+#[cfg(any(feature = "cli", feature = "gui"))]
 use rayon::prelude::*;
 
 use crate::anim::AnimFrame;
@@ -335,8 +336,10 @@ pub fn render_frame_with_elements(
     Some(RenderedFrame { image: canvas })
 }
 
+#[cfg(any(feature = "cli", feature = "gui"))]
 const BAND_ROWS: usize = 64;
 
+#[cfg(any(feature = "cli", feature = "gui"))]
 pub fn render_frame_with_elements_par(
     elements_data: &[ElementData],
     bounds: &BoundingBox,
@@ -1445,6 +1448,7 @@ mod tests {
         }
     }
 
+    #[cfg(any(feature = "cli", feature = "gui"))]
     #[test]
     fn par_render_matches_sequential() {
         use crate::archive::parse_zip;

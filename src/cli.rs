@@ -51,6 +51,7 @@ pub enum Commands {
         #[arg(long)]
         case_sensitive: bool,
     },
+    #[cfg(feature = "gui")]
     Preview {
         #[arg(short, long)]
         input: Option<Vec<PathBuf>>,
@@ -59,7 +60,18 @@ pub enum Commands {
 
 pub fn run(cli: Cli) -> dst_anim_tool::error::Result<()> {
     match cli.command {
-        None => cmd_preview(None),
+        None => {
+            #[cfg(feature = "gui")]
+            {
+                cmd_preview(None)
+            }
+            #[cfg(not(feature = "gui"))]
+            {
+                Err(dst_anim_tool::error::Error::Other(
+                    "preview command requires the 'gui' feature".to_string(),
+                ))
+            }
+        }
         Some(command) => match command {
             Commands::Split {
                 input,
@@ -81,6 +93,7 @@ pub fn run(cli: Cli) -> dst_anim_tool::error::Result<()> {
                 symbol,
                 case_sensitive,
             } => cmd_search(&dir, &symbol, case_sensitive),
+            #[cfg(feature = "gui")]
             Commands::Preview { input } => cmd_preview(input),
         },
     }
@@ -504,6 +517,7 @@ fn cmd_search(dir: &Path, symbol: &str, case_sensitive: bool) -> dst_anim_tool::
     Ok(())
 }
 
+#[cfg(feature = "gui")]
 fn cmd_preview(inputs: Option<Vec<PathBuf>>) -> dst_anim_tool::error::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([1200.0, 800.0]),

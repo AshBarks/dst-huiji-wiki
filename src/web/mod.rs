@@ -52,6 +52,8 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/snapshots", get(api_data::snapshots))
         .route("/diff/recipes", get(api_data::diff_recipes))
         .route("/diff/po", get(api_data::diff_po))
+        .route("/anim/manifests", get(api_data::anim_manifests))
+        .route("/anim/diff", get(api_data::anim_diff))
         .route("/config", get(config))
         .with_state(Arc::clone(&app_state));
 

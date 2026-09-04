@@ -473,6 +473,65 @@ pub async fn diff_po(
     Ok(Json(value))
 }
 
+/// ANIM__OUT_DIR，缺省 `output/anim`。
+fn anim_out_dir() -> std::path::PathBuf {
+    std::env::var("ANIM__OUT_DIR")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from("output/anim"))
+}
+
+/// GET /api/anim/manifests — 列出动画历史 manifest。
+pub async fn anim_manifests() -> Json<serde_json::Value> {
+    let store = dst_huiji_wiki::scripts_sync::anim::history::ManifestStore::new(
+        anim_out_dir().join("history/manifests"),
+    );
+    let labels = store.list_labels().unwrap_or_default();
+    Json(serde_json::json!({ "manifests": labels }))
+}
+
+/// GET /api/anim/diff?from=<label>&to=<label>&zip=<rel>
+pub async fn anim_diff(Query(q): Q) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let from = sanitize_anim_label(q.get("from"))?;
+    let to = sanitize_anim_label(q.get("to"))?;
+    let only = q.get("zip").filter(|s| !s.is_empty()).map(String::as_str);
+    let only = only.map(sanitize_anim_rel).transpose()?;
+
+    let out = anim_out_dir();
+    let old =
+        dst_huiji_wiki::scripts_sync::anim::load_history_files(&out, &from).map_err(err_status)?;
+    let new =
+        dst_huiji_wiki::scripts_sync::anim::load_history_files(&out, &to).map_err(err_status)?;
+    let diff = dst_huiji_wiki::scripts_sync::anim::diff::diff_directories(
+        &from,
+        &to,
+        &old,
+        &new,
+        only.as_deref(),
+        false,
+    )
+    .map_err(err_status)?;
+    Ok(Json(
+        serde_json::to_value(diff).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+    ))
+}
+
+fn sanitize_anim_label(v: Option<&String>) -> std::result::Result<String, StatusCode> {
+    let s = v.ok_or(StatusCode::BAD_REQUEST)?.clone();
+    if s.is_empty() || s.contains("..") || s.contains('/') || s.contains('\\') {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    Ok(s)
+}
+
+fn sanitize_anim_rel(v: &str) -> std::result::Result<String, StatusCode> {
+    if v.is_empty() || v.contains("..") || v.contains('\\') {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    Ok(v.to_string())
+}
+
 fn sanitize_snapshot(v: Option<&String>) -> std::result::Result<String, StatusCode> {
     let s = v.ok_or(StatusCode::BAD_REQUEST)?.clone();
     if s.is_empty() || s.contains("..") || s.contains('/') || s.contains('\\') {

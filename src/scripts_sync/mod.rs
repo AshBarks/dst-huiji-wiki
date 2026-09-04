@@ -13,6 +13,7 @@
 //! The image pipeline (images.zip / built-in KTEX decode / atlas splitting)
 //! lives in the [`images`] submodule (`images-sync`).
 
+pub mod anim;
 pub mod images;
 pub mod state;
 

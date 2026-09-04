@@ -169,6 +169,24 @@ pub enum JobKind {
         #[serde(default)]
         dry_run: bool,
     },
+    /// 动画历史同步：更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR。
+    AnimSync {
+        #[serde(default)]
+        force: bool,
+        #[serde(default)]
+        dry_run: bool,
+        #[serde(default)]
+        label: Option<String>,
+        #[serde(default)]
+        out: Option<String>,
+    },
+    /// 对比两个动画目录的 zip/dyn 结构化 diff。
+    AnimDiff {
+        old: String,
+        new: String,
+        #[serde(default)]
+        zip: Option<String>,
+    },
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
@@ -387,6 +405,8 @@ impl JobKind {
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
+            JobKind::AnimSync { .. } => "anim-sync",
+            JobKind::AnimDiff { .. } => "anim-diff",
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
@@ -553,6 +573,21 @@ async fn execute_job_inner(
             state_path,
         } => run_scripts_sync(*force, *dry_run, state_path.as_deref(), reporter).await,
         JobKind::ImagesSync { force, dry_run } => run_images_sync(*force, *dry_run, reporter).await,
+        JobKind::AnimSync {
+            force,
+            dry_run,
+            label,
+            out,
+        } => run_anim_sync(*force, *dry_run, label.clone(), opt_path(out), reporter).await,
+        JobKind::AnimDiff { old, new, zip } => {
+            run_anim_diff(
+                PathBuf::from(old),
+                PathBuf::from(new),
+                zip.clone(),
+                reporter,
+            )
+            .await
+        }
         JobKind::CorpusSync { full, dir, rc } => {
             run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
         }
@@ -1546,6 +1581,47 @@ async fn run_images_sync(
             out_dir,
             force,
             dry_run,
+        },
+        reporter,
+    )
+}
+
+/// `anim-sync`: archive current `data/anim` into `ANIM__OUT_DIR` after a game
+/// update. Local-only; never touches the wiki.
+async fn run_anim_sync(
+    force: bool,
+    dry_run: bool,
+    label: Option<String>,
+    out: Option<PathBuf>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let dst_root = std::env::var("DST__ROOT")
+        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    crate::scripts_sync::anim::run_sync(
+        &crate::scripts_sync::anim::AnimSyncParams {
+            dst_root,
+            out_dir: out,
+            label,
+            force,
+            dry_run,
+        },
+        reporter,
+    )
+}
+
+/// `anim-diff`: compare two animation directories. Local-only.
+async fn run_anim_diff(
+    old_dir: PathBuf,
+    new_dir: PathBuf,
+    zip: Option<String>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    crate::scripts_sync::anim::run_diff(
+        &crate::scripts_sync::anim::AnimDiffParams {
+            old_dir,
+            new_dir,
+            only: zip,
+            parse_all: false,
         },
         reporter,
     )

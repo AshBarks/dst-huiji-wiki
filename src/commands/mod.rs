@@ -162,6 +162,37 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 动画历史同步:更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR
+    AnimSync {
+        /// 忽略幂等检查,强制重新扫描/归档
+        #[arg(long)]
+        force: bool,
+        /// 只盘点并报告计划,不写任何文件
+        #[arg(long)]
+        dry_run: bool,
+        /// 版本标签(默认 DST__ROOT/version.txt)
+        #[arg(long)]
+        label: Option<String>,
+        /// 历史根目录(默认 $ANIM__OUT_DIR 或 output/anim)
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
+    /// 对比两个动画目录的 zip/dyn 结构化 diff
+    AnimDiff {
+        /// 旧动画目录
+        old: PathBuf,
+        /// 新动画目录
+        new: PathBuf,
+        /// 只对比指定相对路径,如 dynamic/abigail_ice.dyn
+        #[arg(long)]
+        zip: Option<String>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
     CorpusFetch {
         /// 忽略增量对账，全量重抓所有页面
@@ -385,6 +416,8 @@ impl Commands {
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",
+            Commands::AnimSync { .. } => "anim-sync",
+            Commands::AnimDiff { .. } => "anim-diff",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",
@@ -690,6 +723,56 @@ mod tests {
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected ImagesSync command"),
+        }
+    }
+
+    #[test]
+    fn test_anim_sync_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "anim-sync"]).unwrap();
+        match args.command {
+            Commands::AnimSync {
+                force,
+                dry_run,
+                label,
+                out,
+                report_json,
+            } => {
+                assert!(!force);
+                assert!(!dry_run);
+                assert!(label.is_none());
+                assert!(out.is_none());
+                assert!(report_json.is_none());
+            }
+            _ => panic!("Expected AnimSync command"),
+        }
+    }
+
+    #[test]
+    fn test_anim_diff_command() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "anim-diff",
+            "old_anim",
+            "new_anim",
+            "--zip",
+            "dynamic/abigail_ice.dyn",
+            "--report-json",
+            "anim-diff.json",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::AnimDiff {
+                old,
+                new,
+                zip,
+                report_json,
+            } => {
+                assert_eq!(old, PathBuf::from("old_anim"));
+                assert_eq!(new, PathBuf::from("new_anim"));
+                assert_eq!(zip, Some("dynamic/abigail_ice.dyn".to_string()));
+                assert_eq!(report_json, Some(PathBuf::from("anim-diff.json")));
+            }
+            _ => panic!("Expected AnimDiff command"),
         }
     }
 

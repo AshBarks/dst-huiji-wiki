@@ -60,6 +60,7 @@ cp .env.example .env
 | `HUIJI__X_AUTHKEY` | 灰机维基站点认证密钥 | `site-authkey` |
 | `DST__ROOT` | DST 游戏根目录路径 | `/path/to/Don't Starve Together` |
 | `KTOOLS__OUT_DIR` | 可选，图片管线产物根目录（`current/` 工作集 + `history/` 差异历史，缺省 `./output/ktools`） | `/mnt/data/ktool_output` |
+| `ANIM__OUT_DIR` | 可选，动画历史管线产物根目录（`history/` 差异历史，缺省 `./output/anim`） | `/mnt/data/anim_history` |
 | `WIKI__QPS` | 可选，维基 API 每秒请求数上限（默认 1） | `1` |
 | `WIKI__MAX_RETRIES` | 可选，403/429/5xx 退避重试次数（默认 3） | `3` |
 | `LLM__API_KEY` | 可选，LLM API 密钥（未配置时 LLM 相关命令跳过模型调用） | `sk-...` |
@@ -98,6 +99,7 @@ cargo run --release -- serve --host 0.0.0.0 --port 9000   # 自定义监听
 | 技能树 | 直接使用游戏内 `pos/connects` 坐标 1:1 还原角色技能树（含中文标题） |
 | 常量 | TUNING 表 5000+ 常量搜索浏览 |
 | 快照对比 | 任选两个 `scripts_日期` 快照对比新增/移除/修改的配方与翻译 |
+| 动画对比 | 任选两个 anim-sync 历史版本对比 zip/dyn 文件级与结构化 diff |
 
 安全说明：默认只绑定 `127.0.0.1`；涉及维基写入的任务在页面中默认勾选"干跑模式"，
 取消勾选并确认后才会真实编辑页面。
@@ -417,6 +419,46 @@ history/manifests/<build>.json      每 build 全量清单 + 相邻 diff + 输�
 ```
 
 **增量与历史**：输入 hash 不变且产物在盘则跳过；每次运行记录相对上一完整版本的 added/removed/changed（差异细化到单个 sprite）；`--force` 或解码器版本变更时全量重处理。
+
+---
+
+#### `anim-sync` - 动画历史同步
+
+游戏更新完成后运行，扫描当前 `data/anim`（含 `dynamic/*.dyn`），把原始动画包归档到内容寻址历史，并生成相对上一版本的 diff。
+
+```bash
+cargo run --release -- anim-sync [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--force` | 忽略幂等检查，强制重新扫描/归档 |
+| `--dry-run` | 只盘点并报告计划，不写任何文件 |
+| `--label <LABEL>` | 版本标签，默认取 `DST__ROOT/version.txt` |
+| `--out <DIR>` | 历史根目录，默认 `$ANIM__OUT_DIR` 或 `./output/anim` |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
+
+**产物布局**（`ANIM__OUT_DIR`，缺省 `./output/anim`）：
+
+```text
+history/objects/<h[:2]>/<sha256>.zip|.dyn   内容寻址原始动画包
+history/manifests/<label>.json              每版本全量清单 + 相邻 diff
+```
+
+---
+
+#### `anim-diff` - 动画目录结构化对比
+
+对比两个动画目录中的 `.zip` / `.dyn`，输出文件级和解析后的结构化 diff。
+
+```bash
+cargo run --release -- anim-diff <OLD_DIR> <NEW_DIR> [OPTIONS]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--zip <REL>` | 只对比指定相对路径，如 `dynamic/abigail_ice.dyn` |
+| `--report-json <FILE>` | 将机器可读的执行报告写入该文件 |
 
 ---
 

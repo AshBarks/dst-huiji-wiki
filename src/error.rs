@@ -55,6 +55,9 @@ pub enum Error {
     #[error("Configuration error: {0}")]
     Config(String),
 
+    #[error("Animation parse error: {0}")]
+    AnimTool(#[from] dst_anim_tool::error::Error),
+
     #[error("Zip archive error: {0}")]
     Zip(#[from] zip::result::ZipError),
 

@@ -197,6 +197,44 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::AnimSync {
+            force,
+            dry_run,
+            label,
+            out,
+            report_json,
+        } => {
+            execute(
+                JobKind::AnimSync {
+                    force,
+                    dry_run,
+                    label,
+                    out: opt_path_to_string(&out)?,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
+        Commands::AnimDiff {
+            old,
+            new,
+            zip,
+            report_json,
+        } => {
+            execute(
+                JobKind::AnimDiff {
+                    old: path_to_string(&old)?,
+                    new: path_to_string(&new)?,
+                    zip,
+                },
+                // Local-only job: never touches the wiki.
+                WriteMode::AutoConfirm,
+                report_json,
+            )
+            .await?;
+        }
         Commands::CorpusFetch {
             full,
             dir,

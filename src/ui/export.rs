@@ -7,7 +7,8 @@ use rayon::prelude::*;
 
 use dst_anim_tool::gif_export::{GifWriter, ffmpeg_gif_from_sequence};
 use dst_anim_tool::render::{
-    prepare_animation_frames, render_frame_with_elements, snap_frame_bounds,
+    SymbolOverrideMap, prepare_animation_frames_with_overrides, render_frame_with_elements,
+    snap_frame_bounds,
 };
 
 pub enum GifExportResult {
@@ -125,14 +126,16 @@ pub fn start_gif_export_thread(
     cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))>,
     disabled_elements: HashSet<(String, String)>,
     disabled_symbols: HashSet<String>,
+    symbol_overrides: SymbolOverrideMap,
 ) -> mpsc::Receiver<GifExportResult> {
-    let (bounds, prepared) = prepare_animation_frames(
+    let (bounds, prepared) = prepare_animation_frames_with_overrides(
         &anim.frames,
         build_list,
         1.0,
         (0.0, 0.0),
         &disabled_elements,
         &disabled_symbols,
+        &symbol_overrides,
     );
     let frame_rate = anim.frame_rate;
 
@@ -194,15 +197,17 @@ pub fn start_png_export_thread(
     cached_frames: HashMap<usize, (Arc<image::RgbaImage>, (i64, i64))>,
     disabled_elements: HashSet<(String, String)>,
     disabled_symbols: HashSet<String>,
+    symbol_overrides: SymbolOverrideMap,
     output_dir: PathBuf,
 ) -> mpsc::Receiver<PngExportResult> {
-    let (bounds, prepared) = prepare_animation_frames(
+    let (bounds, prepared) = prepare_animation_frames_with_overrides(
         &anim.frames,
         build_list,
         1.0,
         (0.0, 0.0),
         &disabled_elements,
         &disabled_symbols,
+        &symbol_overrides,
     );
     let frame_rate = anim.frame_rate;
 

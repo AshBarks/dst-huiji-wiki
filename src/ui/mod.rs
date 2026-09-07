@@ -74,6 +74,8 @@ pub struct App {
     animation_bounds: Option<BoundingBox>,
     disabled_elements: HashSet<(String, String)>,
     animation_disabled_symbols: HashSet<String>,
+    symbol_overrides: dst_anim_tool::render::SymbolOverrideMap,
+    symbol_map_source: Option<String>,
     collapse_pending: bool,
     #[cfg(feature = "gif")]
     gif_export: Option<BackgroundGifExport>,
@@ -113,6 +115,8 @@ impl App {
             animation_bounds: None,
             disabled_elements: HashSet::new(),
             animation_disabled_symbols: HashSet::new(),
+            symbol_overrides: dst_anim_tool::render::SymbolOverrideMap::new(),
+            symbol_map_source: None,
             collapse_pending: false,
             #[cfg(feature = "gif")]
             gif_export: None,
@@ -263,6 +267,7 @@ impl App {
             cached_frames,
             self.disabled_elements.clone(),
             self.animation_disabled_symbols.clone(),
+            self.symbol_overrides.clone(),
         );
         self.gif_export = Some(BackgroundGifExport { receiver, path });
     }
@@ -320,6 +325,7 @@ impl App {
             cached_frames,
             self.disabled_elements.clone(),
             self.animation_disabled_symbols.clone(),
+            self.symbol_overrides.clone(),
             dir,
         );
         self.png_export = Some(BackgroundPngExport { receiver });
@@ -343,6 +349,32 @@ impl App {
                 self.png_export = None;
             }
         }
+    }
+
+    fn load_symbol_map(&mut self, path: &Path) {
+        match std::fs::read_to_string(path)
+            .map_err(|e| e.to_string())
+            .and_then(|text| dst_anim_tool::render::parse_symbol_map(&text))
+        {
+            Ok(map) => {
+                self.symbol_overrides = map;
+                self.symbol_map_source = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .map(|n| n.to_string());
+                self.invalidate_cache();
+            }
+            Err(e) => {
+                self.error_message =
+                    Some(format!("Failed to load symbol map {}: {e}", path.display()));
+            }
+        }
+    }
+
+    fn clear_symbol_map(&mut self) {
+        self.symbol_overrides = dst_anim_tool::render::SymbolOverrideMap::new();
+        self.symbol_map_source = None;
+        self.invalidate_cache();
     }
 
     fn clear_anims(&mut self) {

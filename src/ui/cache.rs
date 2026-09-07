@@ -179,13 +179,14 @@ impl App {
         if build_list.is_empty() {
             return;
         }
-        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
+        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames_with_overrides(
             &anim.frames,
             &build_list,
             1.0,
             (0.0, 0.0),
             &self.disabled_elements,
             &self.animation_disabled_symbols,
+            &self.symbol_overrides,
         );
         if let Some(union) = &bounds {
             let mut total: u64 = 0;
@@ -212,13 +213,14 @@ impl App {
             return;
         }
 
-        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
+        let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames_with_overrides(
             &anim.frames,
             &build_list,
             1.0,
             (0.0, 0.0),
             &self.disabled_elements,
             &self.animation_disabled_symbols,
+            &self.symbol_overrides,
         );
         let cache_gen_val = self.cache_gen;
         let total_frames = anim.frames.len();
@@ -358,12 +360,13 @@ impl App {
             return;
         }
 
-        let elements = dst_anim_tool::render::compute_frame_elements(
+        let elements = dst_anim_tool::render::compute_frame_elements_with_overrides(
             anim_frame,
             &build_list,
             1.0,
             &self.disabled_elements,
             &self.animation_disabled_symbols,
+            &self.symbol_overrides,
         );
         let Some(elements) = elements else {
             self.frame_texture = None;

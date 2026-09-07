@@ -16,6 +16,29 @@ impl App {
                     }
                 }
 
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("Symbol Map", &["toml", "txt"])
+                    .pick_file()
+                {
+                    self.load_symbol_map(&path);
+                }
+
+                if self.symbol_map_source.is_some()
+                    && ui
+                        .small_button("Clear Map")
+                        .on_hover_text("Remove the loaded symbol override map")
+                        .clicked()
+                {
+                    self.clear_symbol_map();
+                }
+                if let Some(src) = &self.symbol_map_source {
+                    ui.label(
+                        egui::RichText::new(format!("map: {src}"))
+                            .small()
+                            .color(egui::Color32::from_rgb(120, 200, 120)),
+                    );
+                }
+
                 ui.add_enabled_ui(self.rendered_image.is_some(), |ui| {
                     if ui.button("Export PNG").clicked()
                         && let Some(img) = &self.rendered_image

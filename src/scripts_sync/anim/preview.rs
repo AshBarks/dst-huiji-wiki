@@ -5,7 +5,10 @@
 //! to PNG frames, and exports either a GIF or a PNG sequence zip.
 
 use crate::error::{Error, Result};
-use dst_anim_tool::render::{prepare_animation_frames, render_frame_with_elements, BuildRef};
+use dst_anim_tool::render::{
+    prepare_animation_frames_with_overrides, render_frame_with_elements, BuildRef,
+    SymbolOverrideMap,
+};
 use rayon::prelude::*;
 use serde::Serialize;
 use std::collections::{BTreeSet, HashMap, HashSet};
@@ -40,6 +43,11 @@ pub struct RenderParams {
     /// Skin texture package (`dynamic/<build>.dyn`). When omitted, the
     /// stem-paired `<stem>.dyn` next to `skin_zip` is used automatically.
     pub skin_dyn: Option<String>,
+    /// 改名重映射 `(anim_symbol, build, src_symbol)`，对应
+    /// `AnimState:OverrideSymbol(sym, build, src_sym)`（`build` 为空串表示
+    /// 无 build 提示）。按 symbol 提取的索引
+    /// （`parser::anim_override::SymbolRemapIndex`）可直接转换传入。
+    pub symbol_overrides: Vec<(String, String, String)>,
     pub bank: String,
     pub animation: String,
     pub format: RenderFormat,
@@ -58,6 +66,102 @@ struct LoadedBuild {
     name: String,
     build: dst_anim_tool::build_file::BuildFile,
     disabled_symbols: HashSet<String>,
+}
+
+/// Build the renderer's [`SymbolOverrideMap`] from `(anim_symbol, build,
+/// src_symbol)` specs. All names are lowercased by the map, matching the
+/// lowercase lookup keys used in `anim.bin` elements.
+fn build_symbol_override_map(specs: &[(String, String, String)]) -> SymbolOverrideMap {
+    let mut map = SymbolOverrideMap::new();
+    for (symbol, build, src_symbol) in specs {
+        map.insert(symbol, build, src_symbol);
+    }
+    map
+}
+
+/// Load archives providing builds referenced by overrides but absent from the
+/// loaded set. The override build is only reached through the explicit build
+/// hint in `find_symbol_frame`, so appending it does not change any other
+/// lookup order.
+fn ensure_override_builds_loaded(
+    anim_root: &Path,
+    specs: &[(String, String, String)],
+    builds: &mut Vec<LoadedBuild>,
+) -> Result<()> {
+    let existing: HashSet<String> = builds.iter().map(|b| b.build.name.to_lowercase()).collect();
+    let missing: HashSet<String> = specs
+        .iter()
+        .filter(|(_, build, _)| !build.is_empty() && !existing.contains(&build.to_lowercase()))
+        .map(|(_, build, _)| build.to_lowercase())
+        .collect();
+    if missing.is_empty() {
+        return Ok(());
+    }
+    let found = find_archives_with_build_names(anim_root, &missing)?;
+    for (name, path) in found {
+        if let Some(loaded) = load_build_from_archive(&path, name)? {
+            builds.push(loaded);
+        }
+    }
+    Ok(())
+}
+
+/// Scan the anim tree once for archives whose build name is in `wanted`.
+/// Returns `(rel_path, path)` pairs, at most one per wanted name, in
+/// lexicographic rel-path order for determinism.
+fn find_archives_with_build_names(
+    anim_root: &Path,
+    wanted: &HashSet<String>,
+) -> Result<Vec<(String, PathBuf)>> {
+    let mut files = Vec::new();
+    collect_anim_files(anim_root, &mut files)?;
+    files.par_sort();
+    let found: Vec<(String, PathBuf)> = files
+        .par_iter()
+        .filter_map(|path| {
+            let data = std::fs::read(path).ok()?;
+            let archive = dst_anim_tool::archive::parse_file_by_path(path, &data).ok()?;
+            let build = archive.build.as_ref()?;
+            let name = build.name.to_lowercase();
+            wanted.contains(&name).then(|| (name, path.clone()))
+        })
+        .collect();
+    let mut picked: HashMap<String, PathBuf> = HashMap::new();
+    for (name, path) in found {
+        picked.entry(name).or_insert(path);
+    }
+    let mut out: Vec<(String, PathBuf)> = picked
+        .into_values()
+        .map(|path| {
+            let rel = path
+                .strip_prefix(anim_root)
+                .map(|p| p.to_string_lossy().replace('\\', "/"))
+                .unwrap_or_default();
+            (rel, path)
+        })
+        .collect();
+    out.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(out)
+}
+
+/// Parse the `symbol_overrides` query parameter: a CSV of
+/// `anim_symbol:build:src_symbol` (build may be empty, meaning "no build
+/// hint"; the 2-part form `anim_symbol:src_symbol` also means no hint).
+pub fn parse_symbol_overrides(raw: &str) -> Vec<(String, String, String)> {
+    raw.split(',')
+        .filter_map(|pair| {
+            let mut parts = pair.trim().splitn(3, ':');
+            let symbol = parts.next()?.trim().to_lowercase();
+            if symbol.is_empty() {
+                return None;
+            }
+            let second = parts.next()?.trim().to_string();
+            match parts.next() {
+                Some(src) => Some((symbol, second, src.trim().to_string())),
+                None => Some((symbol, String::new(), second)),
+            }
+        })
+        .collect()
 }
 
 /// Load the skin package (build `.zip` + paired `.dyn` textures) as a build.
@@ -128,6 +232,26 @@ fn load_skin_build(
     Ok(Some(LoadedBuild {
         name: zip_rel,
         build,
+        disabled_symbols: HashSet::new(),
+    }))
+}
+
+/// Load one archive file as a [`LoadedBuild`], decoding and splitting its
+/// atlases. Returns `Ok(None)` when the archive has no build.bin.
+fn load_build_from_archive(path: &Path, name: String) -> Result<Option<LoadedBuild>> {
+    let data = std::fs::read(path)?;
+    let mut archive = dst_anim_tool::archive::parse_file_by_path(path, &data)?;
+    if archive.build.is_none() {
+        return Ok(None);
+    }
+    let tex = archive.tex_files().clone();
+    let atlases = archive.build.as_ref().unwrap().atlases.clone();
+    let atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(&atlases, &tex);
+    let build = archive.build.as_mut().unwrap();
+    dst_anim_tool::atlas::split_atlas(build, &atlas)?;
+    Ok(Some(LoadedBuild {
+        name,
+        build: archive.build.take().unwrap(),
         disabled_symbols: HashSet::new(),
     }))
 }
@@ -213,22 +337,9 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
         if !path.is_file() {
             continue;
         }
-        let data = std::fs::read(&path)?;
-        let mut archive = dst_anim_tool::archive::parse_file_by_path(&path, &data)?;
-        if archive.build.is_none() {
-            continue;
+        if let Some(loaded) = load_build_from_archive(&path, file.clone())? {
+            builds.push(loaded);
         }
-        let tex = archive.tex_files().clone();
-        let atlases = archive.build.as_ref().unwrap().atlases.clone();
-        let atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(&atlases, &tex);
-        let build = archive.build.as_mut().unwrap();
-        dst_anim_tool::atlas::split_atlas(build, &atlas)?;
-        let build = archive.build.take().unwrap();
-        builds.push(LoadedBuild {
-            name: file.clone(),
-            build,
-            disabled_symbols: HashSet::new(),
-        });
     }
     if builds.is_empty() {
         return Err(Error::Config(format!(
@@ -247,6 +358,10 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
     )? {
         builds.insert(0, skin);
     }
+
+    // Overrides redirect lookups to builds that may not be among the provided
+    // files; scan the anim tree for archives providing them and append.
+    ensure_override_builds_loaded(&params.anim_root, &params.symbol_overrides, &mut builds)?;
 
     let disabled_builds: HashSet<&str> =
         params.disabled_builds.iter().map(|s| s.as_str()).collect();
@@ -284,13 +399,14 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
         return Err(Error::Config("all builds are disabled".to_string()));
     }
 
-    let (bounds, prepared) = prepare_animation_frames(
+    let (bounds, prepared) = prepare_animation_frames_with_overrides(
         &animation.frames,
         &build_refs,
         1.0,
         (0.0, 0.0),
         &HashSet::new(),
         &HashSet::new(),
+        &build_symbol_override_map(&params.symbol_overrides),
     );
 
     let mut frames = Vec::new();
@@ -468,18 +584,9 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
         if !path.is_file() {
             continue;
         }
-        let fdata = std::fs::read(&path)?;
-        let mut farch = dst_anim_tool::archive::parse_file_by_path(&path, &fdata)?;
-        if farch.build.is_none() {
-            continue;
+        if let Some(loaded) = load_build_from_archive(&path, file.clone())? {
+            build_info.push(build_info_json(file, &loaded.build));
         }
-        let tex = farch.tex_files().clone();
-        let atlases = farch.build.as_ref().unwrap().atlases.clone();
-        let atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(&atlases, &tex);
-        let build = farch.build.as_mut().unwrap();
-        dst_anim_tool::atlas::split_atlas(build, &atlas)?;
-        let build = farch.build.as_ref().unwrap();
-        build_info.push(build_info_json(file, build));
     }
 
     Ok(serde_json::json!({
@@ -619,6 +726,81 @@ mod tests {
             "dynamic/abigail_ice.dyn"
         );
         assert_eq!(paired_dyn_candidate("wilson_ice.zip"), "wilson_ice.dyn");
+    }
+
+    #[test]
+    fn parse_symbol_overrides_specs() {
+        assert!(parse_symbol_overrides("").is_empty());
+        assert!(parse_symbol_overrides(" , ").is_empty());
+        assert_eq!(
+            parse_symbol_overrides("swap_hat:hat_beehive:swap_hat"),
+            vec![(
+                "swap_hat".to_string(),
+                "hat_beehive".to_string(),
+                "swap_hat".to_string()
+            )]
+        );
+        // 空 build 段与两段形式都表示“无 build 提示”。
+        assert_eq!(
+            parse_symbol_overrides("face::skin_face, torso:skin_torso"),
+            vec![
+                ("face".to_string(), String::new(), "skin_face".to_string()),
+                ("torso".to_string(), String::new(), "skin_torso".to_string()),
+            ]
+        );
+        // 非法段（缺 src）被丢弃，symbol 归一小写。
+        assert_eq!(
+            parse_symbol_overrides("swap_hat, Swap_Face:mybuild:skin_face"),
+            vec![(
+                "swap_face".to_string(),
+                "mybuild".to_string(),
+                "skin_face".to_string()
+            )]
+        );
+    }
+
+    #[test]
+    fn override_map_build_lowercases_via_tool() {
+        let map = build_symbol_override_map(&[(
+            "Swap_Hat".to_string(),
+            "Hat_Beehive".to_string(),
+            "swap_hat".to_string(),
+        )]);
+        assert_eq!(map.len(), 1);
+        let o = map.get("swap_hat").unwrap();
+        assert_eq!(o.build, "hat_beehive");
+        assert_eq!(o.symbol, "swap_hat");
+    }
+
+    #[test]
+    fn ensure_override_builds_noop_without_specs() {
+        let root = std::env::temp_dir();
+        let mut builds: Vec<LoadedBuild> = Vec::new();
+        ensure_override_builds_loaded(&root, &[], &mut builds).unwrap();
+        assert!(builds.is_empty());
+    }
+
+    #[test]
+    fn ensure_override_builds_noop_when_builds_loaded() {
+        let root = std::env::temp_dir();
+        let specs = vec![(
+            "swap_hat".to_string(),
+            "hat_beehive".to_string(),
+            "swap_hat".to_string(),
+        )];
+        let mut builds = vec![LoadedBuild {
+            name: "hat.zip".to_string(),
+            build: dst_anim_tool::build_file::BuildFile {
+                version: 0,
+                name: "hat_beehive".to_string(),
+                symbols: Vec::new(),
+                atlases: Vec::new(),
+                symbol_index: std::collections::HashMap::new(),
+            },
+            disabled_symbols: HashSet::new(),
+        }];
+        ensure_override_builds_loaded(&root, &specs, &mut builds).unwrap();
+        assert_eq!(builds.len(), 1);
     }
 
     #[test]

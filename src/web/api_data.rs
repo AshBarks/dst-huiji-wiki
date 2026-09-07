@@ -790,6 +790,10 @@ pub async fn anim_assets_render(
                 .collect::<std::collections::HashMap<_, _>>()
         })
         .unwrap_or_default();
+    let symbol_overrides = q
+        .get("symbol_overrides")
+        .map(|raw| dst_huiji_wiki::scripts_sync::anim::preview::parse_symbol_overrides(raw))
+        .unwrap_or_default();
 
     let output = tokio::task::spawn_blocking(move || {
         dst_huiji_wiki::scripts_sync::anim::preview::render_animation(
@@ -801,6 +805,7 @@ pub async fn anim_assets_render(
                 symbol_builds,
                 skin_zip,
                 skin_dyn,
+                symbol_overrides,
                 bank,
                 animation,
                 format,
@@ -856,6 +861,7 @@ pub async fn anim_assets_info(
                 symbol_builds: std::collections::HashMap::new(),
                 skin_zip,
                 skin_dyn,
+                symbol_overrides: Vec::new(),
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Gif,
@@ -900,6 +906,10 @@ pub async fn anim_assets_preview(
                 .collect::<std::collections::HashMap<_, _>>()
         })
         .unwrap_or_default();
+    let symbol_overrides = q
+        .get("symbol_overrides")
+        .map(|raw| dst_huiji_wiki::scripts_sync::anim::preview::parse_symbol_overrides(raw))
+        .unwrap_or_default();
 
     let anim_root = anim_root_from_index_or_env()?;
     let value = tokio::task::spawn_blocking(move || {
@@ -912,6 +922,7 @@ pub async fn anim_assets_preview(
                 symbol_builds,
                 skin_zip,
                 skin_dyn,
+                symbol_overrides,
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Png,

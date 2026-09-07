@@ -32,6 +32,14 @@ pub struct RenderParams {
     pub hidden_symbols: Vec<String>,
     /// Lowercase symbol -> chosen build file.
     pub symbol_builds: HashMap<String, String>,
+    /// Skin build package (`dynamic/<build>.zip`), when rendering with a skin.
+    /// Loaded before every other build so skin symbols override the base
+    /// build and missing skin symbols fall back to it (game `SetSkin`
+    /// semantics, see docs/ANIM_SKIN_PREVIEW_PLAN.md §8).
+    pub skin_zip: Option<String>,
+    /// Skin texture package (`dynamic/<build>.dyn`). When omitted, the
+    /// stem-paired `<stem>.dyn` next to `skin_zip` is used automatically.
+    pub skin_dyn: Option<String>,
     pub bank: String,
     pub animation: String,
     pub format: RenderFormat,
@@ -42,6 +50,110 @@ pub struct RenderOutput {
     pub bytes: Vec<u8>,
     pub content_type: &'static str,
     pub filename: String,
+}
+
+/// One loaded build (already atlas-split), either from the base files or
+/// from the selected skin package.
+struct LoadedBuild {
+    name: String,
+    build: dst_anim_tool::build_file::BuildFile,
+    disabled_symbols: HashSet<String>,
+}
+
+/// Load the skin package (build `.zip` + paired `.dyn` textures) as a build.
+///
+/// Pairing rule (docs/ANIM_SKIN_PREVIEW_PLAN.md §6.2): the `.zip` and `.dyn`
+/// are stem-paired. When `skin_dyn` is omitted, the `<stem>.dyn` next to
+/// `skin_zip` is used automatically when it exists. Returns `Ok(None)` when
+/// no skin was requested.
+fn load_skin_build(
+    anim_root: &Path,
+    skin_zip: Option<&str>,
+    skin_dyn: Option<&str>,
+) -> Result<Option<LoadedBuild>> {
+    let Some(zip_rel) = skin_zip.map(str::trim).filter(|s| !s.is_empty()) else {
+        return Ok(None);
+    };
+    let zip_rel = normalize_file_argument(zip_rel)?;
+    let zip_path = anim_root.join(&zip_rel);
+    if !zip_path.is_file() {
+        return Err(Error::Config(format!(
+            "skin build file not found: {}",
+            zip_path.display()
+        )));
+    }
+    let zip_data = std::fs::read(&zip_path)?;
+    let mut archive = dst_anim_tool::archive::parse_file_by_path(&zip_path, &zip_data)?;
+
+    let dyn_rel = match skin_dyn.map(str::trim).filter(|s| !s.is_empty()) {
+        Some(d) => Some(normalize_file_argument(d)?),
+        None => {
+            // Auto-pair: same stem, same directory as the zip.
+            let candidate = paired_dyn_candidate(&zip_rel);
+            anim_root.join(&candidate).is_file().then_some(candidate)
+        }
+    };
+    if let Some(dyn_rel) = dyn_rel {
+        let dyn_path = anim_root.join(&dyn_rel);
+        if !dyn_path.is_file() {
+            return Err(Error::Config(format!(
+                "skin texture file not found: {}",
+                dyn_path.display()
+            )));
+        }
+        let dyn_data = std::fs::read(&dyn_path)?;
+        let dyn_archive = dst_anim_tool::archive::parse_file_by_path(&dyn_path, &dyn_data)?;
+        archive.merge(dyn_archive);
+    }
+
+    let atlases = archive
+        .build
+        .as_ref()
+        .map(|b| b.atlases.clone())
+        .unwrap_or_default();
+    let tex = archive.tex_files().clone();
+    let atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(&atlases, &tex);
+    if !atlases.is_empty() && atlas.is_empty() {
+        return Err(Error::Config(format!(
+            "skin build {zip_rel} has atlases but no decodable tex (companion .dyn missing?)"
+        )));
+    }
+    let Some(build) = archive.build.as_mut() else {
+        return Err(Error::Config(format!(
+            "skin package has no build.bin: {zip_rel}"
+        )));
+    };
+    dst_anim_tool::atlas::split_atlas(build, &atlas)?;
+    let build = archive.build.take().unwrap();
+    Ok(Some(LoadedBuild {
+        name: zip_rel,
+        build,
+        disabled_symbols: HashSet::new(),
+    }))
+}
+
+/// The stem-paired `.dyn` path for a skin build `.zip`
+/// (`dynamic/foo.zip` -> `dynamic/foo.dyn`).
+fn paired_dyn_candidate(zip_rel: &str) -> String {
+    let path = std::path::Path::new(zip_rel);
+    let stem = path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or_default();
+    match path.parent().and_then(|p| p.to_str()) {
+        Some(dir) if !dir.is_empty() => format!("{dir}/{stem}.dyn"),
+        _ => format!("{stem}.dyn"),
+    }
+}
+
+/// Serialize one loaded build for the `info` endpoint response.
+fn build_info_json(file: &str, build: &dst_anim_tool::build_file::BuildFile) -> serde_json::Value {
+    serde_json::json!({
+        "file": file,
+        "name": build.name,
+        "symbols": build.symbols.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
+        "atlases": build.atlases.iter().map(|a| a.name.clone()).collect::<Vec<_>>(),
+    })
 }
 
 /// Render a selected animation and return GIF or PNG-sequence zip bytes.
@@ -95,11 +207,6 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
             ))
         })?;
 
-    struct LoadedBuild {
-        name: String,
-        build: dst_anim_tool::build_file::BuildFile,
-        disabled_symbols: HashSet<String>,
-    }
     let mut builds: Vec<LoadedBuild> = Vec::new();
     for file in &safe_files {
         let path = params.anim_root.join(file);
@@ -128,6 +235,17 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
             "no build.bin found in any provided file for {}",
             selected
         )));
+    }
+
+    // The skin build is loaded first so its symbols override the base build
+    // while missing skin symbols still fall back to the base (first-match
+    // resolution, matching the game's SetSkin semantics).
+    if let Some(skin) = load_skin_build(
+        &params.anim_root,
+        params.skin_zip.as_deref(),
+        params.skin_dyn.as_deref(),
+    )? {
+        builds.insert(0, skin);
     }
 
     let disabled_builds: HashSet<&str> =
@@ -199,6 +317,11 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
 /// Render a selected animation and return GIF or PNG-sequence zip bytes.
 pub fn render_animation(params: &RenderParams) -> Result<RenderOutput> {
     let rendered = render_animation_frames(params)?;
+    // Prefix the skin stem so skinned exports are distinguishable.
+    let base = match params.skin_zip.as_deref().map(safe_file_base) {
+        Some(skin) => format!("{skin}-{}", safe_file_base(&rendered.selected)),
+        None => safe_file_base(&rendered.selected),
+    };
     match params.format {
         RenderFormat::Gif => {
             let mut out = Vec::new();
@@ -206,11 +329,7 @@ pub fn render_animation(params: &RenderParams) -> Result<RenderOutput> {
             Ok(RenderOutput {
                 bytes: out,
                 content_type: "image/gif",
-                filename: format!(
-                    "{}-{}.gif",
-                    safe_file_base(&rendered.selected),
-                    rendered.animation_name
-                ),
+                filename: format!("{}-{}.gif", base, rendered.animation_name),
             })
         }
         RenderFormat::Png => {
@@ -218,11 +337,7 @@ pub fn render_animation(params: &RenderParams) -> Result<RenderOutput> {
             Ok(RenderOutput {
                 bytes,
                 content_type: "application/zip",
-                filename: format!(
-                    "{}-{}-frames.zip",
-                    safe_file_base(&rendered.selected),
-                    rendered.animation_name
-                ),
+                filename: format!("{}-{}-frames.zip", base, rendered.animation_name),
             })
         }
     }
@@ -334,6 +449,20 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
         .collect();
 
     let mut build_info = Vec::new();
+    // Skin build first so the UI treats it as the default symbol provider.
+    if let Some(skin) = load_skin_build(
+        &params.anim_root,
+        params.skin_zip.as_deref(),
+        params.skin_dyn.as_deref(),
+    )? {
+        build_info.push(serde_json::json!({
+            "file": skin.name,
+            "name": skin.build.name,
+            "skin": true,
+            "symbols": skin.build.symbols.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
+            "atlases": skin.build.atlases.iter().map(|a| a.name.clone()).collect::<Vec<_>>(),
+        }));
+    }
     for file in &safe_files {
         let path = params.anim_root.join(file);
         if !path.is_file() {
@@ -350,12 +479,7 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
         let build = farch.build.as_mut().unwrap();
         dst_anim_tool::atlas::split_atlas(build, &atlas)?;
         let build = farch.build.as_ref().unwrap();
-        build_info.push(serde_json::json!({
-            "file": file,
-            "name": build.name,
-            "symbols": build.symbols.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
-            "atlases": build.atlases.iter().map(|a| a.name.clone()).collect::<Vec<_>>(),
-        }));
+        build_info.push(build_info_json(file, build));
     }
 
     Ok(serde_json::json!({
@@ -486,5 +610,50 @@ mod tests {
     fn safe_base() {
         assert_eq!(safe_file_base("hound.zip"), "hound");
         assert_eq!(safe_file_base("dynamic/foo.zip"), "foo");
+    }
+
+    #[test]
+    fn skin_dyn_candidate_pairs_by_stem() {
+        assert_eq!(
+            paired_dyn_candidate("dynamic/abigail_ice.zip"),
+            "dynamic/abigail_ice.dyn"
+        );
+        assert_eq!(paired_dyn_candidate("wilson_ice.zip"), "wilson_ice.dyn");
+    }
+
+    #[test]
+    fn skin_loader_none_when_not_requested() {
+        let root = std::env::temp_dir();
+        let loaded = load_skin_build(&root, None, None).unwrap();
+        assert!(loaded.is_none());
+        let loaded = load_skin_build(&root, Some("  "), None).unwrap();
+        assert!(loaded.is_none());
+    }
+
+    #[test]
+    fn skin_loader_rejects_missing_zip() {
+        let root = std::env::temp_dir().join(format!("skin_load_{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let err = match load_skin_build(&root, Some("dynamic/nope.zip"), None) {
+            Err(e) => e,
+            Ok(_) => panic!("expected missing-file error"),
+        };
+        assert!(err.to_string().contains("skin build file not found"));
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    #[test]
+    fn skin_loader_rejects_explicit_missing_dyn() {
+        let root = std::env::temp_dir().join(format!("skin_load_dyn_{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        // A zip that is not a valid DST archive: the missing-file check for an
+        // explicitly requested dyn runs before parsing, so point both at
+        // nonexistent paths to validate the explicit-dyn branch.
+        let err = match load_skin_build(&root, Some("missing.zip"), Some("missing.dyn")) {
+            Err(e) => e,
+            Ok(_) => panic!("expected missing-file error"),
+        };
+        assert!(err.to_string().contains("skin build file not found"));
+        std::fs::remove_dir_all(&root).ok();
     }
 }

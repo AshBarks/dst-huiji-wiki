@@ -195,6 +195,16 @@ pub enum JobKind {
         #[serde(default)]
         out: Option<String>,
     },
+    /// 解析 skinprefabs.lua 生成 base_prefab → skins 皮肤索引（纯本地）。
+    SkinIndex {
+        /// 游戏脚本根目录；缺省取 DST__ROOT/data/databundles/scripts。
+        #[serde(default)]
+        scripts: Option<String>,
+        #[serde(default)]
+        anim: Option<String>,
+        #[serde(default)]
+        out: Option<String>,
+    },
     /// Harvest the wiki main namespace into the local corpus tree
     /// (docs/WIKI_CORPUS_PLAN.md). Read-only against the wiki; `full`
     /// ignores `touched`-based incremental skipping.
@@ -416,6 +426,7 @@ impl JobKind {
             JobKind::AnimSync { .. } => "anim-sync",
             JobKind::AnimDiff { .. } => "anim-diff",
             JobKind::AnimIndex { .. } => "anim-index",
+            JobKind::SkinIndex { .. } => "skin-index",
             JobKind::CorpusSync { .. } => "corpus-sync",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
@@ -599,6 +610,9 @@ async fn execute_job_inner(
         }
         JobKind::AnimIndex { scripts, anim, out } => {
             run_anim_index(scripts, opt_path(anim), opt_path(out), reporter).await
+        }
+        JobKind::SkinIndex { scripts, anim, out } => {
+            run_skin_index(scripts.as_deref(), opt_path(anim), opt_path(out), reporter)
         }
         JobKind::CorpusSync { full, dir, rc } => {
             run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
@@ -1650,6 +1664,33 @@ async fn run_anim_index(
     crate::scripts_sync::anim::index::run_index(
         &crate::scripts_sync::anim::index::AnimIndexParams {
             scripts_root: PathBuf::from(scripts),
+            anim_root: anim,
+            out,
+        },
+        reporter,
+    )
+}
+
+/// `skin-index`: parse `prefabs/skinprefabs.lua` and pair skin builds with
+/// `data/anim/dynamic` zip/dyn packages. Local-only; no wiki traffic.
+fn run_skin_index(
+    scripts: Option<&str>,
+    anim: Option<PathBuf>,
+    out: Option<PathBuf>,
+    reporter: &dyn Reporter,
+) -> Result<serde_json::Value> {
+    let scripts_root = match scripts.map(PathBuf::from) {
+        Some(p) => p,
+        None => crate::scripts_sync::anim::skin_index::default_scripts_root().ok_or_else(|| {
+            Error::EnvVarNotFound(
+                "scripts root not provided and DST__ROOT/data/databundles/scripts not found"
+                    .to_string(),
+            )
+        })?,
+    };
+    crate::scripts_sync::anim::skin_index::run_skin_index(
+        &crate::scripts_sync::anim::skin_index::SkinIndexParams {
+            scripts_root,
             anim_root: anim,
             out,
         },

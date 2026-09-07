@@ -59,6 +59,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
             "/anim/assets/prefab/{name}",
             get(api_data::anim_assets_prefab),
         )
+        .route("/anim/assets/skins", get(api_data::anim_assets_skins))
         .route("/anim/assets/render", get(api_data::anim_assets_render))
         .route("/anim/assets/info", get(api_data::anim_assets_info))
         .route("/anim/assets/preview", get(api_data::anim_assets_preview))

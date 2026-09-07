@@ -532,11 +532,55 @@ fn load_anim_index_value() -> std::result::Result<serde_json::Value, StatusCode>
     serde_json::from_str(&text).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
+/// Default `skin-index.json` path; can be overridden with `SKIN_INDEX`.
+fn skin_index_path() -> std::path::PathBuf {
+    std::env::var("SKIN_INDEX")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from("output/skin-index.json"))
+}
+
+/// Load `skin-index.json`; `Ok(None)` when the artifact has not been built.
+fn load_skin_index_optional() -> std::result::Result<Option<serde_json::Value>, StatusCode> {
+    let path = skin_index_path();
+    let Ok(text) = std::fs::read_to_string(&path) else {
+        return Ok(None);
+    };
+    serde_json::from_str(&text)
+        .map(Some)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+}
+
+/// `base_prefab -> [SkinEntry, ...]` from the skin index, if available.
+fn skin_index_prefab_skins(
+    index: &serde_json::Value,
+) -> serde_json::Map<String, serde_json::Value> {
+    index
+        .get("prefab_skins")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default()
+}
+
+/// Keep only renderable skins (zip + dyn both paired) of a skin group.
+fn renderable_skins(entries: &[serde_json::Value]) -> Vec<serde_json::Value> {
+    entries
+        .iter()
+        .filter(|e| e.get("zip").is_some() && e.get("dyn").is_some())
+        .cloned()
+        .collect()
+}
+
 /// GET /api/anim/assets/prefabs?q=hound
 pub async fn anim_assets_prefabs(
     Query(q): Q,
 ) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
     let index = load_anim_index_value()?;
+    let skin_counts = load_skin_index_optional()?
+        .as_ref()
+        .map(skin_index_prefab_skins)
+        .unwrap_or_default();
     let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
     let items: Vec<serde_json::Value> = index
         .get("prefabs")
@@ -561,6 +605,18 @@ pub async fn anim_assets_prefabs(
                 })
                 .take(200)
                 .cloned()
+                .map(|mut r| {
+                    if let Some(name) = r.get("prefab_name").and_then(|v| v.as_str()) {
+                        if let Some(skins) = skin_counts
+                            .get(name)
+                            .and_then(|v| v.as_array())
+                            .map(|group| renderable_skins(group).len())
+                        {
+                            r["skin_count"] = serde_json::json!(skins);
+                        }
+                    }
+                    r
+                })
                 .collect()
         })
         .unwrap_or_default();
@@ -649,11 +705,51 @@ pub async fn anim_assets_prefab(
         }
     }
 
+    // Union of renderable skins across the matched prefab names.
+    let skin_skins = load_skin_index_optional()?
+        .map(|index| skin_index_prefab_skins(&index))
+        .unwrap_or_default();
+    let mut skins: Vec<serde_json::Value> = Vec::new();
+    let mut skin_seen = std::collections::BTreeSet::new();
+    for item in &items {
+        if let Some(name) = item.get("prefab_name").and_then(|v| v.as_str()) {
+            if let Some(group) = skin_skins.get(name).and_then(|v| v.as_array()) {
+                for skin in renderable_skins(group) {
+                    if let Some(s) = skin.get("skin").and_then(|v| v.as_str()) {
+                        if skin_seen.insert(s.to_string()) {
+                            skins.push(skin);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Ok(Json(serde_json::json!({
         "items": items,
         "files": files,
         "build_files": build_files,
+        "skins": skins,
     })))
+}
+
+/// GET /api/anim/assets/skins?prefab=abigail
+/// Renderable skins (zip + dyn paired) for a base prefab from `skin-index.json`.
+pub async fn anim_assets_skins(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let prefab = q
+        .get("prefab")
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .ok_or(StatusCode::BAD_REQUEST)?;
+    let index = load_skin_index_optional()?.ok_or(StatusCode::NOT_FOUND)?;
+    let skins = skin_index_prefab_skins(&index)
+        .get(prefab)
+        .and_then(|v| v.as_array())
+        .map(|group| renderable_skins(group))
+        .unwrap_or_default();
+    Ok(Json(serde_json::json!({ "skins": skins })))
 }
 
 /// GET /api/anim/assets/render?file=...&bank=...&animation=...&format=gif|png
@@ -682,6 +778,7 @@ pub async fn anim_assets_render(
     let anim_root = anim_root_from_index_or_env()?;
     let disabled_builds = split_csv(q.get("disabled_builds"));
     let hidden_symbols = split_csv(q.get("hidden_symbols"));
+    let (skin_zip, skin_dyn) = skin_query_params(&q);
     let symbol_builds = q
         .get("symbol_builds")
         .map(|raw| {
@@ -702,6 +799,8 @@ pub async fn anim_assets_render(
                 disabled_builds,
                 hidden_symbols,
                 symbol_builds,
+                skin_zip,
+                skin_dyn,
                 bank,
                 animation,
                 format,
@@ -744,6 +843,7 @@ pub async fn anim_assets_info(
     }
     let bank = q.get("bank").cloned().ok_or(StatusCode::BAD_REQUEST)?;
     let animation = q.get("animation").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let (skin_zip, skin_dyn) = skin_query_params(&q);
 
     let anim_root = anim_root_from_index_or_env()?;
     let value = tokio::task::spawn_blocking(move || {
@@ -754,6 +854,8 @@ pub async fn anim_assets_info(
                 disabled_builds: Vec::new(),
                 hidden_symbols: Vec::new(),
                 symbol_builds: std::collections::HashMap::new(),
+                skin_zip,
+                skin_dyn,
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Gif,
@@ -786,6 +888,7 @@ pub async fn anim_assets_preview(
     let animation = q.get("animation").cloned().ok_or(StatusCode::BAD_REQUEST)?;
     let disabled_builds = split_csv(q.get("disabled_builds"));
     let hidden_symbols = split_csv(q.get("hidden_symbols"));
+    let (skin_zip, skin_dyn) = skin_query_params(&q);
     let symbol_builds = q
         .get("symbol_builds")
         .map(|raw| {
@@ -807,6 +910,8 @@ pub async fn anim_assets_preview(
                 disabled_builds,
                 hidden_symbols,
                 symbol_builds,
+                skin_zip,
+                skin_dyn,
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Png,
@@ -847,6 +952,16 @@ fn split_csv(v: Option<&String>) -> Vec<String> {
             .collect()
     })
     .unwrap_or_default()
+}
+
+/// Optional `skin_zip` / `skin_dyn` query parameters for the render endpoints.
+/// Empty values are treated as absent; `skin_dyn` may be omitted so the
+/// backend auto-pairs the stem `<stem>.dyn` next to the skin zip.
+fn skin_query_params(
+    q: &std::collections::HashMap<String, String>,
+) -> (Option<String>, Option<String>) {
+    let trim_opt = |v: Option<&String>| v.map(|s| s.trim().to_string()).filter(|s| !s.is_empty());
+    (trim_opt(q.get("skin_zip")), trim_opt(q.get("skin_dyn")))
 }
 
 fn anim_root_from_index_or_env() -> std::result::Result<std::path::PathBuf, StatusCode> {

@@ -11,6 +11,7 @@ pub mod history;
 pub mod index;
 pub mod normalize;
 pub mod preview;
+pub mod skin_index;
 pub mod snapshot;
 
 use crate::error::Result;

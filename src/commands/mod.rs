@@ -207,6 +207,22 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 解析 skinprefabs.lua 生成 base_prefab → skins 皮肤索引（纯本地）
+    #[command(name = "skin-index")]
+    SkinIndex {
+        /// 游戏脚本根目录（当前树或快照目录）；缺省取 DST__ROOT/data/databundles/scripts
+        #[arg(long)]
+        scripts: Option<PathBuf>,
+        /// 动画资源目录；缺省由 scripts 路径推导为 ../data/anim
+        #[arg(long)]
+        anim: Option<PathBuf>,
+        /// 输出 JSON 文件路径（默认 output/skin-index.json）
+        #[arg(short, long)]
+        out: Option<PathBuf>,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
     CorpusFetch {
         /// 忽略增量对账，全量重抓所有页面
@@ -433,6 +449,7 @@ impl Commands {
             Commands::AnimSync { .. } => "anim-sync",
             Commands::AnimDiff { .. } => "anim-diff",
             Commands::AnimIndex { .. } => "anim-index",
+            Commands::SkinIndex { .. } => "skin-index",
             Commands::CorpusFetch { .. } => "corpus-fetch",
             Commands::UpdateIndex { .. } => "update-index",
             Commands::UpdateScan { .. } => "update-scan",

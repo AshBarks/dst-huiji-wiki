@@ -250,6 +250,14 @@ const JOB_DEFS = {
       { k: "zip", label: "只对比某个相对路径（可选，如 dynamic/abigail_ice.dyn）" },
     ],
   },
+  skin_index: {
+    label: "skin-index 生成皮肤动画索引",
+    fields: [
+      { k: "scripts", label: "游戏脚本根目录（留空=DST__ROOT/data/databundles/scripts）" },
+      { k: "anim", label: "动画资源目录（可选，默认由 scripts 推导）" },
+      { k: "out", label: "输出 JSON（可选，默认 output/skin-index.json）" },
+    ],
+  },
 };
 
 async function pageJobs(main) {
@@ -1126,6 +1134,8 @@ async function pageAnimAssets(main) {
     disabledBuilds: new Set(),
     candidateBuilds: [],
     extraBuilds: new Set(),
+    skins: [],
+    selectedSkin: null,
     previewTimer: null,
   };
 
@@ -1160,7 +1170,7 @@ async function pageAnimAssets(main) {
       <div class="row" style="justify-content:space-between;align-items:center">
         <div>
           <code>${esc(file)}</code>
-          ${items.map(i => `<span class="chip">${esc(i.prefab_name || "?")}</span>`).join("")}
+          ${items.map(i => `<span class="chip">${esc(i.prefab_name || "?")}${i.skin_count ? ` <span class="muted">· skins ${i.skin_count}</span>` : ""}</span>`).join("")}
           <span class="muted">(${(items[0].anims || []).length} 动画文件 / ${(items[0].related_files || []).length} build 文件)</span>
         </div>
         <button class="btn secondary" data-open="${esc(file)}">进入预览</button>
@@ -1185,10 +1195,13 @@ async function pageAnimAssets(main) {
     state.disabledBuilds.clear();
     state.candidateBuilds = [];
     state.extraBuilds.clear();
+    state.skins = [];
+    state.selectedSkin = null;
     const r = await apiJSON(`/api/anim/assets/prefab/${encodeURIComponent(file)}`);
     state.prefabItems = r.items || [];
     state.fileInfo = r.files || [];
     state.buildFiles = r.build_files || {};
+    state.skins = r.skins || [];
     for (const item of state.prefabItems) {
       for (const a of (item.anims || [])) {
         const p = a.normalized;
@@ -1292,7 +1305,11 @@ async function pageAnimAssets(main) {
     state.selectedAnim = anim;
     state.info = null;
     const files = state.relatedFiles.concat(state.animFiles.filter(f => f !== file)).concat([file]);
-    const url = `/api/anim/assets/info?files=${encodeURIComponent(files.join(","))}&bank=${encodeURIComponent(bank)}&animation=${encodeURIComponent(anim)}`;
+    const skinQ = state.selectedSkin
+      ? `&skin_zip=${encodeURIComponent(state.selectedSkin.zip || "")}` +
+        (state.selectedSkin.dyn ? `&skin_dyn=${encodeURIComponent(state.selectedSkin.dyn)}` : "")
+      : "";
+    const url = `/api/anim/assets/info?files=${encodeURIComponent(files.join(","))}&bank=${encodeURIComponent(bank)}&animation=${encodeURIComponent(anim)}${skinQ}`;
     state.info = await apiJSON(url);
     renderAnimationDetail();
   }
@@ -1307,6 +1324,16 @@ async function pageAnimAssets(main) {
     main.innerHTML = `
       <div style="display:grid;grid-template-columns:280px 1fr 320px;gap:12px;height:calc(100vh - 120px);min-height:520px">
         <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+          <div class="panel" style="margin:0">
+            <div class="row" style="justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Skin</h3>
+              <span class="muted">${state.skins.length} 可用</span>
+            </div>
+            <select id="skinSel" style="width:100%">
+              <option value="">无皮肤</option>
+              ${state.skins.map(s => `<option value="${esc(s.skin)}" ${state.selectedSkin && state.selectedSkin.skin === s.skin ? "selected" : ""}>${esc(s.skin)}</option>`).join("")}
+            </select>
+          </div>
           <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
             <div class="row" style="justify-content:space-between;align-items:center">
               <h3 style="margin:0">Animations</h3>
@@ -1362,6 +1389,18 @@ async function pageAnimAssets(main) {
       </div>`;
 
     $("#backToPrefab").onclick = () => renderList();
+
+    // Skin switch: re-fetch info + preview with the selected skin package.
+    const skinSel = $("#skinSel");
+    if (skinSel) {
+      skinSel.onchange = () => {
+        const v = skinSel.value;
+        state.selectedSkin = v ? (state.skins.find(s => s.skin === v) || null) : null;
+        // Re-load the current animation so Symbol Dependencies and the
+        // preview both pick up the skin build (kept across animation switches).
+        openAnimation(state.selectedFile, state.selectedBank, state.selectedAnim);
+      };
+    }
 
     // Left: animation list
     const animList = [];
@@ -1538,7 +1577,7 @@ async function pageAnimAssets(main) {
                       data-sym-build="${esc(sym)}" ${effectiveChosen === b.file ? "checked" : ""}
                       ${state.disabledBuilds.has(b.file) ? "disabled" : ""}>
                     <code>${esc(b.file)}</code>
-                    <span class="muted">${b.name}</span>
+                    <span class="muted">${esc(b.name)}${b.skin ? " · skin" : ""}</span>
                   </label>`).join("")}
               </div>
             </details>
@@ -1578,6 +1617,10 @@ async function pageAnimAssets(main) {
       if (state.hiddenSymbols.size) params.set("hidden_symbols", Array.from(state.hiddenSymbols).join(","));
       const sb = Object.entries(state.symbolBuilds).map(([s,b]) => `${s}:${b}`).join(",");
       if (sb) params.set("symbol_builds", sb);
+      if (state.selectedSkin) {
+        params.set("skin_zip", state.selectedSkin.zip || "");
+        if (state.selectedSkin.dyn) params.set("skin_dyn", state.selectedSkin.dyn);
+      }
       return params.toString();
     };
 

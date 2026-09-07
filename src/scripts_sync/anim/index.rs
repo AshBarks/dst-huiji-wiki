@@ -6,7 +6,8 @@
 //! them to prefab variants through `Prefab(name, fn, assets, deps)`, verify
 //! existence against `data/anim`, and report dynamic/unresolved forms.
 //!
-//! Skin-related `.dyn`/`PKGREF` mapping is intentionally out of scope for now.
+//! Skin-related `.dyn`/`PKGREF` mapping lives in the sibling `skin_index`
+//! module (`prefabs/skinprefabs.lua` → `prefab_skins` index).
 
 use crate::error::Result;
 use crate::service::Reporter;
@@ -1618,7 +1619,7 @@ struct ScannedFile {
     skipped_pkgref_dyn: usize,
 }
 
-fn line_of(source: &str, byte: usize) -> u32 {
+pub(crate) fn line_of(source: &str, byte: usize) -> u32 {
     source.as_bytes()[..byte.min(source.len())]
         .iter()
         .filter(|b| **b == b'\n')
@@ -1626,7 +1627,8 @@ fn line_of(source: &str, byte: usize) -> u32 {
         + 1
 }
 
-fn string_literal_text(raw: &str) -> String {
+/// Extract the text of a Lua string literal (`"x"`, `'x'`, `[[x]]`).
+pub(crate) fn string_literal_text(raw: &str) -> String {
     let t = raw.trim();
     for q in ['"', '\''] {
         if let Some(inner) = t.strip_prefix(q).and_then(|s| s.strip_suffix(q)) {

@@ -1437,22 +1437,59 @@ async function pageAnimAssets(main) {
       };
     });
 
-    // Left: build list
+    // Left: build list — each build expands to its full symbol list with a
+    // client-side filter; the checkbox stays on the summary row (clicks on it
+    // must not toggle the disclosure).
     $("#leftBuilds").innerHTML = builds.map(b => {
       const disabled = state.disabledBuilds.has(b.file);
-      return `<div style="padding:2px 0;line-height:1.3;display:flex;align-items:center;gap:6px">
-        <input type="checkbox" data-build-toggle="${esc(b.file)}" ${disabled ? "" : "checked"}>
-        <code>${esc(b.file)}</code>
-        <span class="muted">${(b.symbols || []).length}s / ${(b.atlases || []).length}a</span>
-      </div>`;
+      const syms = b.symbols || [];
+      return `<details data-build-details="${esc(b.file)}" style="padding:2px 0;line-height:1.3">
+        <summary style="cursor:pointer;display:flex;align-items:center;gap:6px" title="${esc(syms.join(", "))}">
+          <input type="checkbox" data-build-toggle="${esc(b.file)}" ${disabled ? "" : "checked"}>
+          <code style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.file)}</code>
+          <span class="muted">${syms.length}s / ${(b.atlases || []).length}a</span>
+        </summary>
+        <div style="margin:4px 0 6px 22px">
+          <input type="text" placeholder="过滤 symbol…" data-build-filter="${esc(b.file)}" style="width:100%">
+          <div class="muted" style="font-size:12px;margin-top:2px">atlases: ${(b.atlases || []).map(esc).join(", ") || "—"}</div>
+          <div data-build-symbols style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;max-height:180px;overflow-y:auto">
+            ${syms.map(s => `<span class="chip" style="font-size:11px">${esc(s)}</span>`).join("") || '<span class="muted">无 symbol</span>'}
+          </div>
+        </div>
+      </details>`;
     }).join("") || '<p class="muted">无 build</p>';
     $("#leftBuilds").querySelectorAll("[data-build-toggle]").forEach(chk => {
+      // Clicking the checkbox must not also toggle the <details> disclosure.
+      chk.addEventListener("click", e => e.stopPropagation());
       chk.onchange = () => {
         const path = chk.dataset.buildToggle;
         if (chk.checked) state.disabledBuilds.delete(path);
         else state.disabledBuilds.add(path);
         renderSymbolDeps();
         schedulePreviewRefresh();
+      };
+    });
+    // Symbol filter inside each expanded build.
+    $("#leftBuilds").querySelectorAll("[data-build-filter]").forEach(inp => {
+      inp.oninput = () => {
+        const q = inp.value.trim().toLowerCase();
+        const details = inp.closest("details");
+        const chips = details.querySelectorAll("[data-build-symbols] .chip");
+        let shown = 0;
+        chips.forEach(c => {
+          const hit = !q || c.textContent.toLowerCase().includes(q);
+          c.style.display = hit ? "" : "none";
+          if (hit) shown++;
+        });
+        let counter = details.querySelector("[data-build-filter-count]");
+        if (!counter) {
+          counter = document.createElement("span");
+          counter.className = "muted";
+          counter.style.fontSize = "12px";
+          counter.setAttribute("data-build-filter-count", "");
+          details.querySelector("[data-build-symbols]").before(counter);
+        }
+        counter.textContent = q ? `${shown} / ${chips.length}` : "";
       };
     });
 

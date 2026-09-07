@@ -60,6 +60,10 @@ label{display:block;margin:8px 0 3px;color:var(--muted);font-size:13px}
 .chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
   padding:1px 8px;border-radius:99px;margin:1px 3px;font-size:12px;cursor:pointer}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
+/* Builds 列表折叠行：flex summary 会丢失原生三角标记，用旋转箭头替代 */
+details[data-build-details]>summary{list-style:none}
+details[data-build-details]>summary::before{content:"▸";flex:0 0 auto;color:var(--muted);transition:transform .15s}
+details[data-build-details][open]>summary::before{transform:rotate(90deg)}
 .bar-wrap{margin:6px 0}
 svg .edge{stroke:#39435a;stroke-width:1.6;fill:none}
 svg .node circle{stroke-width:2}

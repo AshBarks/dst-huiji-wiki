@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 #[cfg(any(feature = "cli", feature = "gui"))]
 use rayon::prelude::*;
@@ -9,6 +9,163 @@ use crate::build_file::BuildFile;
 pub struct BuildRef<'a> {
     pub build: &'a BuildFile,
     pub disabled_symbols: &'a HashSet<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SymbolOverride {
+    pub build: String,
+    pub symbol: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SymbolOverrideMap {
+    entries: HashMap<String, SymbolOverride>,
+}
+
+impl SymbolOverrideMap {
+    pub fn new() -> Self {
+        Self {
+            entries: HashMap::new(),
+        }
+    }
+
+    pub fn insert(&mut self, anim_symbol: &str, build: &str, replacement_symbol: &str) {
+        self.entries.insert(
+            anim_symbol.to_lowercase(),
+            SymbolOverride {
+                build: build.to_lowercase(),
+                symbol: replacement_symbol.to_lowercase(),
+            },
+        );
+    }
+
+    pub fn get(&self, anim_symbol_lower: &str) -> Option<&SymbolOverride> {
+        self.entries.get(anim_symbol_lower)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+}
+
+fn parse_toml_string_value(raw: &str) -> Option<String> {
+    let trimmed = raw.trim();
+    let bytes = trimmed.as_bytes();
+    if bytes.len() >= 2
+        && ((bytes[0] == b'"' && bytes[bytes.len() - 1] == b'"')
+            || (bytes[0] == b'\'' && bytes[bytes.len() - 1] == b'\''))
+    {
+        Some(trimmed[1..trimmed.len() - 1].to_string())
+    } else {
+        None
+    }
+}
+
+pub fn parse_symbol_map(input: &str) -> Result<SymbolOverrideMap, String> {
+    let mut map = SymbolOverrideMap::new();
+    let mut current: Option<(Option<String>, Option<String>)> = None;
+    let mut seen_symbol: Option<String> = None;
+
+    for (line_no, raw_line) in input.lines().enumerate() {
+        let line = raw_line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let line_no = line_no + 1;
+        if let Some(rest) = line.strip_prefix("[[") {
+            if let Some((build, replacement)) = current.take() {
+                flush_symbol_override(&mut map, seen_symbol.take(), build, replacement, line_no)?;
+            }
+            if !rest.trim_end().starts_with("symbol_override]]") {
+                return Err(format!("line {line_no}: unknown table {line}"));
+            }
+            current = Some((None, None));
+            continue;
+        }
+        if let Some((key_eq, _)) = line.split_once('=') {
+            let key = key_eq.trim().to_lowercase();
+            let value = line
+                .split_once('=')
+                .and_then(|(_, v)| parse_toml_string_value(v))
+                .ok_or_else(|| format!("line {line_no}: expected quoted string value"))?;
+            match key.as_str() {
+                "symbol" => {
+                    if seen_symbol.is_some() {
+                        return Err(format!("line {line_no}: duplicate 'symbol'"));
+                    }
+                    seen_symbol = Some(value);
+                }
+                "build" => {
+                    if let Some(entry) = current.as_mut() {
+                        if entry.0.is_some() {
+                            return Err(format!("line {line_no}: duplicate 'build'"));
+                        }
+                        entry.0 = Some(value);
+                    } else {
+                        return Err(format!(
+                            "line {line_no}: 'build' outside [[symbol_override]]"
+                        ));
+                    }
+                }
+                "replace_with" | "replacement" => {
+                    if let Some(entry) = current.as_mut() {
+                        if entry.1.is_some() {
+                            return Err(format!("line {line_no}: duplicate 'replace_with'"));
+                        }
+                        entry.1 = Some(value);
+                    } else {
+                        return Err(format!(
+                            "line {line_no}: 'replace_with' outside [[symbol_override]]"
+                        ));
+                    }
+                }
+                _ => {
+                    return Err(format!("line {line_no}: unknown key '{key}'"));
+                }
+            }
+            continue;
+        }
+        return Err(format!("line {line_no}: unparseable line '{line}'"));
+    }
+
+    if let Some((build, replacement)) = current.take() {
+        flush_symbol_override(
+            &mut map,
+            seen_symbol.take(),
+            build,
+            replacement,
+            input.lines().count(),
+        )?;
+    } else if seen_symbol.is_some() {
+        return Err("orphaned 'symbol' key".to_string());
+    }
+
+    Ok(map)
+}
+
+fn flush_symbol_override(
+    map: &mut SymbolOverrideMap,
+    seen_symbol: Option<String>,
+    build: Option<String>,
+    replacement: Option<String>,
+    line_no: usize,
+) -> Result<(), String> {
+    let Some(symbol) = seen_symbol else {
+        return Err(format!(
+            "line {line_no}: [[symbol_override]] missing 'symbol'"
+        ));
+    };
+    let Some(replacement) = replacement else {
+        return Err(format!(
+            "line {line_no}: [[symbol_override]] for '{symbol}' missing 'replace_with'"
+        ));
+    };
+    map.insert(&symbol, build.as_deref().unwrap_or(""), replacement.trim());
+    Ok(())
 }
 
 #[derive(Debug, Clone)]
@@ -28,9 +185,15 @@ fn find_symbol_frame<'a>(
     build_list: &[BuildRef<'a>],
     symbol_name_lower: &str,
     frame_num: u32,
+    build_hint: Option<&str>,
 ) -> Option<&'a crate::build_file::BuildFrame> {
     for br in build_list {
         if br.disabled_symbols.contains(symbol_name_lower) {
+            continue;
+        }
+        if let Some(hint) = build_hint
+            && br.build.name.to_lowercase() != hint
+        {
             continue;
         }
         if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower)
@@ -68,6 +231,25 @@ pub fn compute_frame_elements(
     disabled_elements: &HashSet<(String, String)>,
     disabled_symbols: &HashSet<String>,
 ) -> Option<Vec<ElementData>> {
+    compute_frame_elements_with_overrides(
+        anim_frame,
+        build_list,
+        scale,
+        disabled_elements,
+        disabled_symbols,
+        &SymbolOverrideMap::new(),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn compute_frame_elements_with_overrides(
+    anim_frame: &AnimFrame,
+    build_list: &[BuildRef<'_>],
+    scale: f32,
+    disabled_elements: &HashSet<(String, String)>,
+    disabled_symbols: &HashSet<String>,
+    overrides: &SymbolOverrideMap,
+) -> Option<Vec<ElementData>> {
     let mut elements_data: Vec<ElementData> = Vec::new();
     for element in &anim_frame.elements {
         if disabled_symbols.contains(&element.symbol_lower)
@@ -77,7 +259,12 @@ pub fn compute_frame_elements(
         {
             continue;
         }
-        let bf = find_symbol_frame(build_list, &element.symbol_lower, element.frame_num);
+        let (build_hint, lookup_symbol) = match overrides.get(&element.symbol_lower) {
+            Some(o) if o.build.is_empty() => (None, o.symbol.as_str()),
+            Some(o) => (Some(o.build.as_str()), o.symbol.as_str()),
+            None => (None, element.symbol_lower.as_str()),
+        };
+        let bf = find_symbol_frame(build_list, lookup_symbol, element.frame_num, build_hint);
         if let Some(bf) = bf {
             let Some(sprite) = &bf.image else {
                 continue;
@@ -165,6 +352,27 @@ pub fn prepare_animation_frames(
     disabled_elements: &HashSet<(String, String)>,
     disabled_symbols: &HashSet<String>,
 ) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
+    prepare_animation_frames_with_overrides(
+        frames,
+        build_list,
+        scale,
+        offset,
+        disabled_elements,
+        disabled_symbols,
+        &SymbolOverrideMap::new(),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn prepare_animation_frames_with_overrides(
+    frames: &[AnimFrame],
+    build_list: &[BuildRef<'_>],
+    scale: f32,
+    offset: (f32, f32),
+    disabled_elements: &HashSet<(String, String)>,
+    disabled_symbols: &HashSet<String>,
+    overrides: &SymbolOverrideMap,
+) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
     let mut prepared: Vec<Option<PreparedFrame>> = Vec::with_capacity(frames.len());
     let mut union_top = f32::INFINITY;
     let mut union_left = f32::INFINITY;
@@ -172,12 +380,13 @@ pub fn prepare_animation_frames(
     let mut union_right = f32::NEG_INFINITY;
 
     for frame in frames {
-        if let Some(elements) = compute_frame_elements(
+        if let Some(elements) = compute_frame_elements_with_overrides(
             frame,
             build_list,
             scale,
             disabled_elements,
             disabled_symbols,
+            overrides,
         ) && let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset)
         {
             union_left = union_left.min(bounds.left);
@@ -214,15 +423,16 @@ pub fn compute_animation_bounds(
     disabled_elements: &HashSet<(String, String)>,
     disabled_symbols: &HashSet<String>,
 ) -> Option<BoundingBox> {
-    let (bounds, _) = prepare_animation_frames(
+    prepare_animation_frames_with_overrides(
         frames,
         build_list,
         scale,
         offset,
         disabled_elements,
         disabled_symbols,
-    );
-    bounds
+        &SymbolOverrideMap::new(),
+    )
+    .0
 }
 
 fn span_dest_range(
@@ -856,7 +1066,7 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = find_symbol_frame(&build_list, "sym", 0);
+        let result = find_symbol_frame(&build_list, "sym", 0, None);
         assert!(result.is_some());
         assert_eq!(result.unwrap().frame_num, 0);
     }
@@ -869,7 +1079,7 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = find_symbol_frame(&build_list, "nonexistent", 0);
+        let result = find_symbol_frame(&build_list, "nonexistent", 0, None);
         assert!(result.is_none());
     }
 
@@ -881,7 +1091,7 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        let result = find_symbol_frame(&build_list, "sym", 99);
+        let result = find_symbol_frame(&build_list, "sym", 99, None);
         assert!(result.is_none());
     }
 
@@ -902,7 +1112,7 @@ mod tests {
                 disabled_symbols: &empty,
             },
         ];
-        let result = find_symbol_frame(&build_list, "sym", 0);
+        let result = find_symbol_frame(&build_list, "sym", 0, None);
         assert!(result.is_some());
         assert_eq!(
             result.unwrap().image.as_ref().unwrap().width(),
@@ -1783,5 +1993,183 @@ mod tests {
             build.symbols[0].frames[0].dest_y,
             build.symbols[1].frames[0].dest_y
         );
+    }
+
+    #[test]
+    fn parse_symbol_map_basic() {
+        let input = r#"
+# comment
+[[symbol_override]]
+symbol = "swap_object"
+build = "Swap_Axe"
+replace_with = "swap_axe"
+
+[[symbol_override]]
+symbol = "fx_swap"
+build = "abigail_vial_fx"
+replace_with = 'fx_regen_02'
+"#;
+        let map = parse_symbol_map(input).unwrap();
+        assert_eq!(map.len(), 2);
+        let o = map.get("swap_object").unwrap();
+        assert_eq!(o.build, "swap_axe");
+        assert_eq!(o.symbol, "swap_axe");
+        let o = map.get("fx_swap").unwrap();
+        assert_eq!(o.build, "abigail_vial_fx");
+        assert_eq!(o.symbol, "fx_regen_02");
+    }
+
+    #[test]
+    fn parse_symbol_map_empty_build() {
+        let input = "[[symbol_override]]\nsymbol = \"a\"\nreplace_with = \"b\"\n";
+        let map = parse_symbol_map(input).unwrap();
+        let o = map.get("a").unwrap();
+        assert_eq!(o.build, "");
+        assert_eq!(o.symbol, "b");
+    }
+
+    #[test]
+    fn parse_symbol_map_errors() {
+        assert!(parse_symbol_map("[[symbol_override]]\nsymbol = \"a\"\n").is_err());
+        assert!(parse_symbol_map("[[other]]\n").is_err());
+        assert!(parse_symbol_map("[[symbol_override]]\nsymbol = \"a\"\nfoo = \"x\"\n").is_err());
+        assert!(parse_symbol_map("[[symbol_override]]\nsymbol = \"a\"\nsymbol = \"b\"\n").is_err());
+        assert!(parse_symbol_map("symbol = \"a\"\n").is_err());
+        assert!(parse_symbol_map("[[symbol_override]]\nsymbol = a\n").is_err());
+        assert!(parse_symbol_map("[[symbol_override]]\nreplace_with = \"a\"\n").is_err());
+    }
+
+    #[test]
+    fn symbol_override_map_insert_lowercases() {
+        let mut map = SymbolOverrideMap::new();
+        map.insert("SWAP_OBJECT", "Swap_Axe", "Swap_Axe");
+        let o = map.get("swap_object").unwrap();
+        assert_eq!(o.build, "swap_axe");
+        assert_eq!(o.symbol, "swap_axe");
+    }
+
+    #[test]
+    fn find_symbol_frame_override_hint_selects_named_build() {
+        let empty = HashSet::new();
+        let mut b1 = make_build_with_symbol("sym", 0, image::RgbaImage::new(4, 4));
+        b1.name = "build_a".into();
+        let mut b2 = make_build_with_symbol("other", 0, image::RgbaImage::new(6, 6));
+        b2.name = "build_b".into();
+        let build_list = vec![
+            BuildRef {
+                build: &b1,
+                disabled_symbols: &empty,
+            },
+            BuildRef {
+                build: &b2,
+                disabled_symbols: &empty,
+            },
+        ];
+        assert!(find_symbol_frame(&build_list, "other", 0, Some("build_b")).is_some());
+        assert!(find_symbol_frame(&build_list, "other", 0, Some("build_a")).is_none());
+        assert!(find_symbol_frame(&build_list, "other", 0, Some("build_c")).is_none());
+        assert!(find_symbol_frame(&build_list, "other", 0, None).is_some());
+    }
+
+    #[test]
+    fn compute_frame_elements_with_overrides_replaces_symbol() {
+        let empty_symbols = HashSet::new();
+        let empty_elements = HashSet::new();
+
+        let element = AnimElement {
+            z_index: 0.0,
+            symbol: "swap_object".into(),
+            symbol_lower: "swap_object".into(),
+            layer_name: "LAYER".into(),
+            frame_num: 0,
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 0.0,
+            ty: 0.0,
+        };
+        let anim_frame = make_anim_frame(vec![element]);
+
+        let mut body = make_build_with_symbol("body", 0, image::RgbaImage::new(4, 4));
+        body.name = "body_build".into();
+        let mut weapon = make_build_with_symbol("axe", 0, image::RgbaImage::new(8, 8));
+        weapon.name = "weapon_build".into();
+        let build_list = vec![
+            BuildRef {
+                build: &body,
+                disabled_symbols: &empty_symbols,
+            },
+            BuildRef {
+                build: &weapon,
+                disabled_symbols: &empty_symbols,
+            },
+        ];
+
+        let without = compute_frame_elements_with_overrides(
+            &anim_frame,
+            &build_list,
+            1.0,
+            &empty_elements,
+            &empty_symbols,
+            &SymbolOverrideMap::new(),
+        );
+        assert!(without.is_none());
+
+        let mut overrides = SymbolOverrideMap::new();
+        overrides.insert("swap_object", "weapon_build", "axe");
+        let with = compute_frame_elements_with_overrides(
+            &anim_frame,
+            &build_list,
+            1.0,
+            &empty_elements,
+            &empty_symbols,
+            &overrides,
+        )
+        .unwrap();
+        assert_eq!(with.len(), 1);
+        assert_eq!(with[0].sprite.width(), 8);
+        assert_eq!(with[0].sprite.height(), 8);
+    }
+
+    #[test]
+    fn compute_frame_elements_with_overrides_same_name_replacement() {
+        let empty_symbols = HashSet::new();
+        let empty_elements = HashSet::new();
+
+        let element = AnimElement {
+            z_index: 0.0,
+            symbol: "swap_object".into(),
+            symbol_lower: "swap_object".into(),
+            layer_name: "LAYER".into(),
+            frame_num: 0,
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 0.0,
+            ty: 0.0,
+        };
+        let anim_frame = make_anim_frame(vec![element]);
+
+        let weapon = make_build_with_symbol("axe", 0, image::RgbaImage::new(8, 8));
+        let build_list = vec![BuildRef {
+            build: &weapon,
+            disabled_symbols: &empty_symbols,
+        }];
+
+        let mut overrides = SymbolOverrideMap::new();
+        overrides.insert("swap_object", "", "axe");
+        let with = compute_frame_elements_with_overrides(
+            &anim_frame,
+            &build_list,
+            1.0,
+            &empty_elements,
+            &empty_symbols,
+            &overrides,
+        )
+        .unwrap();
+        assert_eq!(with.len(), 1);
+        assert_eq!(with[0].sprite.width(), 8);
     }
 }

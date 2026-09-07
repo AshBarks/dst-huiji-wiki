@@ -326,7 +326,41 @@ GET /api/anim/assets/preview
 3. `dynamic/*.zip` 与 `*.dyn` 的配对接近完整，但仍需处理缺文件情况；
 4. 一个 build 可能被多个 skin prefab 复用；
 5. 皮肤可能会覆盖部分 symbol，而不是完整替代 build；
-6. 需要决定 skin 是作为“额外 build 候选”还是作为“覆盖当前 build”。
+6. 需要决定 skin 是作为“额外 build 候选”还是作为“覆盖当前 build”；
+7. **symbol 匹配方式（同名 vs 间接映射）**——见 §8.1。
+
+### 8.1 symbol 同名匹配 vs 间接映射（2026-09 调研结论）
+
+**数据文件层面只有同名匹配。** `anim.bin` 帧元素只存 symbol 名哈希
+（Klei hash，小写名）+ 帧号 + layer/z；`build.bin` 的 symbols 表存名字
+与帧。引擎与 `dst-anim-tool`（render.rs `find_symbol_frame`）都按哈希
+相等在当前生效 build 列表中查找，找不到即渲染为空。资源文件本身不含
+任何映射表。
+
+**间接映射只存在于引擎运行时 API，由 Lua 驱动**（脚本中
+`OverrideSymbol/OverrideSkinSymbol/ClearOverrideSymbol` 共 1516 处调用）：
+
+| API | 机制 | 实例 |
+|---|---|---|
+| `AnimState:SetSkin(skin_build, def_build)` | 整包替换 + 缺 symbol 回退 `def_build` | `wolfgang.lua` `SetSkin(player.gym_skin, "mighty_gym")` |
+| `AnimState:OverrideSymbol(sym, build, src_sym)` | 单 symbol 跨 build 重定向，**名字可不同** | `skinner.lua` 猴子诅咒 `OverrideSymbol(sym, "wonkey", sym)` |
+| `AnimState:OverrideSkinSymbol(sym, build, src_sym)` | 同上，作用于皮肤层栈，显式改名映射 | `skinner.lua` `OverrideSkinSymbol("torso_pelvis", base_skin, "torso")`（torso 填 pelvis 槽） |
+| `CLOTHING[name].symbol_overrides_*` | 数据驱动的改名表，按角色/形态变化 | `skinner.lua` `src_sym = src_symbols[sym] or sym`；Wolfgang `mighty_skin` 下 `arm_upper`→`arm_upper_skin`；`symbol_overrides_by_character[prefab]` 每角色不同 |
+| `AnimState:AddOverrideBuild(build)` | 追加覆盖 build，符号优先级更高 | `player_common_extensions.lua` `AddOverrideBuild("player_hit_darkness")` |
+| `SetSymbolExchange(a, b)` | 交换两 symbol 的渲染层级（不改名） | `skinner.lua` 裙/衣掖边共 5 种排序 |
+| `HideSymbol` / `ShowSymbol` | 隐藏/显示 | `symbol_hides`、wormwood 藏脚 hack |
+
+**对本项目的含义：**
+
+- 现有 Symbol Dependencies 的同名匹配是正确的：skin build（SetSkin
+  路径）的设计约定即与 base build 同名、缺 symbol 回退；preview 的
+  first-match + skin build 置顶已对齐该语义。
+- 精确复刻“游戏内实际渲染”无法仅凭资源文件：玩家 + 衣服组合依赖
+  `skinner.lua` / `clothing.lua` 的 override 表，目标 symbol → 源
+  symbol 的改名映射是运行时、按角色/形态动态决定的。
+- 若未来要做“角色 + 衣服”组合预览，需解析 `clothing.lua` 的
+  `symbol_overrides*` 表并模拟 `skinner.lua` 的执行顺序——独立于
+  skin 索引的另一条管线。
 
 初步建议：
 

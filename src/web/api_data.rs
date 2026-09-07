@@ -542,6 +542,42 @@ fn anim_remap_index_path() -> std::path::PathBuf {
         .unwrap_or_else(|| anim_index_path().with_file_name("anim-remap-index.json"))
 }
 
+/// GET /api/anim/remap-manifests — 列出重映射索引快照。
+pub async fn anim_remap_manifests() -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let dir = dst_huiji_wiki::scripts_sync::anim::remap_history::remap_history_dir();
+    let labels = dst_huiji_wiki::scripts_sync::anim::remap_history::list_remap_labels(&dir)
+        .map_err(err_status)?;
+    let manifests = labels
+        .iter()
+        .filter_map(|label| {
+            dst_huiji_wiki::scripts_sync::anim::remap_history::load_remap_snapshot(&dir, label)
+                .ok()
+                .as_ref()
+                .map(dst_huiji_wiki::scripts_sync::anim::remap_history::remap_snapshot_summary)
+        })
+        .collect::<Vec<_>>();
+    Ok(Json(serde_json::json!({ "manifests": manifests })))
+}
+
+/// GET /api/anim/remap-diff?from=&to= — 对比两份重映射快照。
+pub async fn anim_remap_diff(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let from = q.get("from").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let to = q.get("to").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let dir = dst_huiji_wiki::scripts_sync::anim::remap_history::remap_history_dir();
+    let old = dst_huiji_wiki::scripts_sync::anim::remap_history::load_remap_snapshot(&dir, &from)
+        .map_err(err_status)?;
+    let new = dst_huiji_wiki::scripts_sync::anim::remap_history::load_remap_snapshot(&dir, &to)
+        .map_err(err_status)?;
+    let diff = dst_huiji_wiki::scripts_sync::anim::remap_history::diff_remap_indexes(&old, &new);
+    Ok(Json(
+        serde_json::to_value(diff)
+            .map_err(dst_huiji_wiki::error::Error::Json)
+            .map_err(err_status)?,
+    ))
+}
+
 /// GET /api/anim/assets/remaps?symbols=a,b,c
 ///
 /// Remap entries from `anim-remap-index.json` (Tier-A static AnimState

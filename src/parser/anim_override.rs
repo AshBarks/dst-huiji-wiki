@@ -29,11 +29,11 @@ use crate::error::{Error, Result};
 use full_moon::ast;
 use full_moon::node::Node;
 use full_moon::visitors::Visitor;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// 产生符号重映射的引擎 API。
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum OverrideApi {
     /// `AnimState:OverrideSymbol(sym, build, src_sym)`
     OverrideSymbol,
@@ -43,8 +43,19 @@ pub enum OverrideApi {
     ClearOverrideSymbol,
 }
 
+impl OverrideApi {
+    /// 与 Lua 方法名一致的 API 名。
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            OverrideApi::OverrideSymbol => "OverrideSymbol",
+            OverrideApi::OverrideSkinSymbol => "OverrideSkinSymbol",
+            OverrideApi::ClearOverrideSymbol => "ClearOverrideSymbol",
+        }
+    }
+}
+
 /// 提取可信度。
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Confidence {
     /// 三个参数均为字符串字面量的直接调用。
@@ -74,7 +85,7 @@ pub struct SymbolOverrideCall {
 
 /// 一条聚合后的重映射规则。名字统一 lowercase（与 `anim.bin` 元素的
 /// `symbol_lower` 及 `dst-anim-tool` 渲染查找一致）。
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SymbolRemapEntry {
     pub build: String,
     pub src_symbol: String,

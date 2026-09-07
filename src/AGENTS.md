@@ -40,6 +40,11 @@ src/
 │   └── config.rs         # TOML config for module constants
 ├── scripts_sync/         # scripts.zip 同步 (update_scripts.py 移植)
 │   ├── mod.rs            # sync(): 版本检测→staging 解压→快照归档→版本记录
+│   ├── anim/             # anim-sync/anim-diff + anim-index + 重映射管线
+│   │   ├── remap_history.rs # 重映射快照(history/remaps/<label>.json)+结构化 diff
+│   │   ├── index.rs      # anim-index: prefab↔动画索引 + anim-remap-index.json(Tier A/B/C)
+│   │   ├── preview.rs    # 渲染端点后端(SymbolOverrideMap/skin/override build 自动加载)
+│   │   └── ...
 │   ├── images/           # 图片管线 images-sync: 两源盘点→解压→内置解码→切割→差异历史
 │   │   ├── mod.rs        # run() 编排 + ImagesSyncParams + 对账清理
 │   │   ├── scan.rs       # zip+loose 两源扫描 → 合并视图 (xml↔tex 联接)

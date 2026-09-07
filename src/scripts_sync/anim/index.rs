@@ -421,8 +421,22 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     };
 
     let remap_path = out_path.with_file_name("anim-remap-index.json");
+    // label 取 DST version.txt（与 anim-sync manifest 同源）；
+    // scripts_root = <dst>/data/databundles/scripts → dst 根 = 三层祖先。
+    let dst_root = params
+        .scripts_root
+        .ancestors()
+        .nth(3)
+        .map(Path::to_path_buf);
+    let label = dst_root
+        .as_deref()
+        .and_then(|d| crate::scripts_sync::read_new_version(d).ok())
+        .unwrap_or_else(|| "unknown".to_string());
     let remap_artifact = serde_json::json!({
         "schema_version": 1,
+        "label": label,
+        "parser_version": super::PARSER_VERSION,
+        "generated_at": super::history::now_ms(),
         "scripts_root": params.scripts_root.display().to_string(),
         "stats": {
             "calls": remap_calls.len(),
@@ -434,6 +448,12 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         "clothing": clothing_index,
     });
     std::fs::write(&remap_path, serde_json::to_string_pretty(&remap_artifact)?)?;
+
+    // 版本快照：供 remap-diff 对比（同 label 覆盖，确定性输出保证幂等）。
+    let snapshot_path = super::remap_history::save_remap_snapshot(
+        &super::remap_history::remap_history_dir(),
+        &remap_artifact,
+    )?;
 
     reporter.log(format!(
         "prefab 文件 {} / 变体记录 {} / 动画引用 {} / 唯一动画 {} / unresolved {}",
@@ -450,6 +470,10 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         remap_entries,
         remap_calls.len(),
         remap_path.display()
+    ));
+    reporter.log(format!(
+        "重映射快照 {}（label {label}）",
+        snapshot_path.display()
     ));
 
     Ok(serde_json::json!({
@@ -468,6 +492,8 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             "symbols": remap_index.len(),
             "entries": remap_entries,
             "clothing": clothing_index.len(),
+            "label": label,
+            "snapshot": snapshot_path,
             "output": remap_path,
         },
         "output": out_path,

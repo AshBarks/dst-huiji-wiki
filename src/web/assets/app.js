@@ -1934,7 +1934,7 @@ async function pageSnapshots(main) {
       <div class="row">
         <label style="margin:0">从</label><select id="fromSel">${snapshotOptions()}</select>
         <label style="margin:0">到</label><select id="toSel">${snapshotOptions()}</select>
-        <select id="diffKind"><option value="recipes">配方</option><option value="po">翻译</option></select>
+        <select id="diffKind"><option value="recipes">配方</option><option value="po">翻译</option><option value="remaps">重映射</option></select>
         <button class="btn" id="runDiff">开始对比</button>
       </div>
       <p class="muted">对比两个 scripts 快照目录之间的差异。首次对比需要解析两份数据，可能需要数秒。</p>
@@ -1947,12 +1947,22 @@ async function pageSnapshots(main) {
   }
 
   const fromSel = $("#fromSel"), toSel = $("#toSel");
-  const snaps = (await getJSON("/api/snapshots")).snapshots.map(s => s.name);
-  const mkOption = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  fromSel.innerHTML = snaps.map(mkOption).join("");
-  toSel.innerHTML = snaps.map(mkOption).join("");
-  if (snaps.length >= 1) toSel.selectedIndex = 0;
-  if (snaps.length > 1) fromSel.selectedIndex = 1;
+  const loadOptions = async (kind) => {
+    let names;
+    if (kind === "remaps") {
+      names = ((await getJSON("/api/anim/remap-manifests")).manifests || []).map(m => m.label);
+    } else {
+      // recipes/po 对比的是 scripts 快照目录
+      names = (await getJSON("/api/snapshots")).snapshots.map(s => s.name);
+    }
+    const mkOption = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+    fromSel.innerHTML = names.map(mkOption).join("");
+    toSel.innerHTML = names.map(mkOption).join("");
+    if (names.length >= 1) toSel.selectedIndex = 0;
+    if (names.length > 1) fromSel.selectedIndex = 1;
+  };
+  await loadOptions("recipes");
+  $("#diffKind").onchange = () => loadOptions($("#diffKind").value).catch(() => {});
 
   $("#runDiff").onclick = async () => {
     const kind = $("#diffKind").value;
@@ -1960,9 +1970,61 @@ async function pageSnapshots(main) {
     $("#diffOut").innerHTML = '<p class="muted">对比中…</p>';
     try {
       const d = await getJSON(url);
-      if (kind === "recipes") renderRecipesDiff(d); else renderPoDiff(d);
+      if (kind === "recipes") renderRecipesDiff(d);
+      else if (kind === "remaps") renderRemapDiff(d);
+      else renderPoDiff(d);
     } catch (e) { $("#diffOut").innerHTML = `<div class="panel" style="color:var(--err)">失败：${esc(e.message)}</div>`; }
   };
+
+  function renderRemapDiff(d) {
+    const chip = (cls, text) => `<span class="chip ${cls}">${esc(text)}</span>`;
+    const entryLabel = (e) => `${e.symbol} ← ${e.build}/${e.src_symbol} (${e.api})`;
+    const key = (e) => `${e.symbol}|${e.build}|${e.src_symbol}|${e.api}`;
+    $("#diffOut").innerHTML = `
+      ${d.parser_version_changed ? '<div class="panel" style="border-color:var(--warn)"><span class="badge b-warn">解析器版本不同</span><span class="muted"> 本 diff 混有解析器升级带来的差异（如 static ↔ resolved），结论需人工甄别。</span></div>' : ""}
+      <div class="card-row">
+        <div class="card"><div class="num diff-added">${d.symbols_added.length}</div><span class="muted">新增 symbol</span></div>
+        <div class="card"><div class="num diff-removed">${d.symbols_removed.length}</div><span class="muted">移除 symbol</span></div>
+        <div class="card"><div class="num diff-added">${d.entries_added.length}</div><span class="muted">新增条目</span></div>
+        <div class="card"><div class="num diff-removed">${d.entries_removed.length}</div><span class="muted">移除条目</span></div>
+        <div class="card"><div class="num diff-changed">${d.prefabs_changed.length + d.confidence_changed.length + d.clothing_changed.length}</div><span class="muted">其他变更</span></div>
+      </div>
+      <div class="panel">
+        <h2>条目级变更</h2>
+        ${d.entries_added.length ? `<div style="margin:4px 0">${d.entries_added.map(e => chip("diff-added", `+ ${entryLabel(e)}`)).join(" ")}</div>` : ""}
+        ${d.entries_removed.length ? `<div style="margin:4px 0">${d.entries_removed.map(e => chip("diff-removed", `- ${entryLabel(e)}`)).join(" ")}</div>` : ""}
+        ${(d.entries_added.length + d.entries_removed.length) === 0 ? '<p class="muted">无条目级变更。</p>' : ""}
+      </div>
+      ${d.prefabs_changed.length ? `
+      <div class="panel">
+        <h2>来源（prefab）变更</h2>
+        <table><thead><tr><th>条目</th><th>新增来源</th><th>移除来源</th></tr></thead><tbody>
+        ${d.prefabs_changed.map(c => `<tr><td><code>${esc(entryLabel(c.entry))}</code></td>
+          <td>${c.added.map(a => chip("diff-added", a)).join(" ") || "—"}</td>
+          <td>${c.removed.map(a => chip("diff-removed", a)).join(" ") || "—"}</td></tr>`).join("")}
+        </tbody></table></div>` : ""}
+      ${d.confidence_changed.length ? `
+      <div class="panel">
+        <h2>置信度变更</h2>
+        <table><thead><tr><th>条目</th><th>变化</th></tr></thead><tbody>
+        ${d.confidence_changed.map(c => `<tr><td><code>${esc(entryLabel(c.entry))}</code></td>
+          <td><span class="chip">${esc(c.old)}</span> → <span class="chip ${c.new === "resolved" ? "diff-changed" : "diff-added"}">${esc(c.new)}</span></td></tr>`).join("")}
+        </tbody></table></div>` : ""}
+      <div class="panel">
+        <h2>Clothing 数据表</h2>
+        <div style="margin:4px 0">
+          ${d.clothing_added.map(n => chip("diff-added", `+ ${n}`)).join(" ")}
+          ${d.clothing_removed.map(n => chip("diff-removed", `- ${n}`)).join(" ")}
+          ${d.clothing_changed.map(c => chip("diff-changed", `~ ${c.name}`)).join(" ")}
+          ${(d.clothing_added.length + d.clothing_removed.length + d.clothing_changed.length) === 0 ? '<p class="muted">无变更。</p>' : ""}
+        </div>
+        ${d.clothing_changed.length ? `<details><summary>${d.clothing_changed.length} 条明细</summary>
+          <table><thead><tr><th>名称</th><th>变更前后</th></tr></thead><tbody>
+          ${d.clothing_changed.map(c => `<tr><td><code>${esc(c.name)}</code></td><td><details><summary>查看</summary><div style="display:flex;gap:12px"><pre style="max-width:420px;overflow:auto">${esc(JSON.stringify(c.old, null, 1))}</pre><pre style="max-width:420px;overflow:auto">${esc(JSON.stringify(c.new, null, 1))}</pre></div></details></td></tr>`).join("")}
+          </tbody></table></details>` : ""}
+      </div>
+      <div class="panel muted">总量：symbol ${d.totals.from_symbols} → ${d.totals.to_symbols}，条目 ${d.totals.from_entries} → ${d.totals.to_entries}，clothing ${d.totals.from_clothing} → ${d.totals.to_clothing}</div>`;
+  }
 
   function renderRecipesDiff(d) {
     $("#diffOut").innerHTML = `

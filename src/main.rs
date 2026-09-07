@@ -7,6 +7,13 @@ fn main() {
     #[cfg(feature = "cli")]
     {
         use clap::Parser;
+        tracing_subscriber::fmt()
+            .with_env_filter(
+                tracing_subscriber::EnvFilter::from_default_env()
+                    .add_directive(tracing::Level::WARN.into()),
+            )
+            .with_target(false)
+            .init();
         let cli = cli::Cli::parse();
         if let Err(e) = cli::run(cli) {
             eprintln!("error: {e}");

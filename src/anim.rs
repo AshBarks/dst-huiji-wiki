@@ -114,6 +114,8 @@ pub fn parse_anim(data: &[u8]) -> Result<AnimFile> {
     reader.seek(24);
     let mut file = AnimFile::new();
     file.version = version;
+    // 避免同一 hash 逐帧重复告警。
+    let mut warned_hashes = std::collections::HashSet::new();
 
     for _ in 0..num_banks {
         let name_len = reader.read_le_i32()? as usize;
@@ -162,10 +164,15 @@ pub fn parse_anim(data: &[u8]) -> Result<AnimFile> {
             let mut elements = Vec::with_capacity(num_elements as usize);
             for _ in 0..num_elements {
                 let symbol_hash = reader.read_le_u32()?;
-                let symbol_name = hash_map
-                    .get(&symbol_hash)
-                    .cloned()
-                    .unwrap_or_else(|| symbol_hash.to_string());
+                let symbol_name = hash_map.get(&symbol_hash).cloned().unwrap_or_else(|| {
+                    if warned_hashes.insert(symbol_hash) {
+                        tracing::warn!(
+                            "anim '{anim_name}': symbol hash {symbol_hash} missing from hash \
+                             table, using numeric fallback"
+                        );
+                    }
+                    symbol_hash.to_string()
+                });
                 let frame_num = reader.read_le_u32()?;
                 let layer_hash = reader.read_le_u32()?;
                 let layer_name = hash_map

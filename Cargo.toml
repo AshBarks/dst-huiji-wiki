@@ -8,7 +8,7 @@ default = ["gui", "cli", "gif"]
 # GUI 预览（eframe/egui/rfd）；GUI 内部使用 rayon 并行渲染，因此隐含启用 cli/rayon。
 gui = ["dep:eframe", "dep:egui", "dep:rfd", "cli"]
 # CLI 参数解析与并行遍历（clap/rayon）。
-cli = ["dep:clap", "dep:rayon"]
+cli = ["dep:clap", "dep:rayon", "dep:tracing-subscriber"]
 # GIF 导出（gif/which）。
 gif = ["dep:gif", "dep:which"]
 
@@ -21,6 +21,8 @@ image = { version = "0.25", default-features = false, features = ["png"] }
 rfd = { version = "0.15", optional = true }
 rayon = { version = "1.10", optional = true }
 thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
 which = { version = "7", optional = true }
 zip = "2"
 

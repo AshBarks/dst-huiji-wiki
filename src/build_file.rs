@@ -155,10 +155,13 @@ pub fn parse_build(data: &[u8]) -> Result<BuildFile> {
     for _ in 0..num_symbols {
         let symbol_hash = reader.read_le_u32()?;
         let frame_count = reader.read_le_u32()?;
-        let symbol_name = hash_map
-            .get(&symbol_hash)
-            .cloned()
-            .unwrap_or_else(|| symbol_hash.to_string());
+        let symbol_name = hash_map.get(&symbol_hash).cloned().unwrap_or_else(|| {
+            tracing::warn!(
+                "build '{name}': symbol hash {symbol_hash} missing from hash table, \
+                 using numeric fallback"
+            );
+            symbol_hash.to_string()
+        });
         let mut frames = Vec::with_capacity(frame_count as usize);
         for _ in 0..frame_count {
             let frame_num = reader.read_le_u32()?;

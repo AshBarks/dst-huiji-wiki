@@ -113,6 +113,8 @@ pub struct PrefabAnimRecord {
     pub prefab_name: Option<String>,
     pub asset_var: Option<String>,
     pub anims: Vec<AnimRef>,
+    /// Related non-anim build/package files (PKGREF `.zip`) useful for rendering.
+    pub related_files: Vec<String>,
     pub unresolved: Vec<UnresolvedRef>,
     pub content: AnimContent,
 }
@@ -186,6 +188,7 @@ pub struct AnimIndexArtifact {
     pub stats: AnimIndexStats,
     pub prefabs: Vec<PrefabAnimRecord>,
     pub anim_files: BTreeMap<String, AnimFileUsage>,
+    pub build_files: BTreeMap<String, AnimContent>,
     pub unresolved: Vec<GlobalUnresolvedRef>,
 }
 
@@ -323,6 +326,18 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     let unresolved_refs = unresolved.len();
     let prefab_variants = prefab_records.len();
 
+    let mut build_files: BTreeMap<String, AnimContent> = BTreeMap::new();
+    for record in &prefab_records {
+        for rel in &record.related_files {
+            if build_files.contains_key(rel) {
+                continue;
+            }
+            if let Ok(c) = load_anim_content(&anim_root, rel) {
+                build_files.insert(rel.clone(), c);
+            }
+        }
+    }
+
     let artifact = AnimIndexArtifact {
         schema_version: 1,
         scripts_root: params.scripts_root.display().to_string(),
@@ -340,6 +355,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         },
         prefabs: prefab_records,
         anim_files,
+        build_files,
         unresolved,
     };
 
@@ -432,6 +448,7 @@ impl<'s> Scanner<'s> {
                         prefab_name: None,
                         asset_var: None,
                         anims: Vec::new(),
+                        related_files: Vec::new(),
                         unresolved: vec![UnresolvedRef {
                             kind: "PARSE_ERROR".to_string(),
                             raw: format!("{:?}", e),
@@ -1069,11 +1086,20 @@ impl<'s> Scanner<'s> {
         };
         let line = self.line(call);
         if kind == "PKGREF" {
-            // Skin/dyn references are intentionally out of scope for now.
+            // Skin `.dyn` references are intentionally out of scope for now,
+            // but `.zip` build/package references are useful for rendering.
             if let ast::Expression::String(s) = &args[1] {
-                if string_literal_text(&s.to_string()).ends_with(".dyn") {
+                let path = string_literal_text(&s.to_string());
+                if path.ends_with(".dyn") {
                     self.skipped_pkgref_dyn += 1;
+                    return None;
                 }
+                return Some(AssetEntry {
+                    kind,
+                    raw_path: path.clone(),
+                    line,
+                    normalized: Some(normalize_asset_path("PKGREF", &path)),
+                });
             }
             return None;
         }
@@ -1134,6 +1160,7 @@ impl<'s> Scanner<'s> {
         for template in &factory.templates {
             let prefab_name = self.resolve_template_name(&template.name, &bindings);
             let mut anims = Vec::new();
+            let mut related_files = Vec::new();
             let mut unresolved = Vec::new();
             let mut asset_var = None;
 
@@ -1143,6 +1170,7 @@ impl<'s> Scanner<'s> {
                         self.push_resolved_arg_as_assets(
                             arg,
                             &mut anims,
+                            &mut related_files,
                             &mut unresolved,
                             &mut asset_var,
                         );
@@ -1175,7 +1203,7 @@ impl<'s> Scanner<'s> {
                 TemplateAssets::Inline(entries) => {
                     let (concrete, unrs) = self.resolve_template_entries(entries, &bindings);
                     for e in concrete {
-                        self.push_asset_entry(&e, &mut anims, &mut unresolved);
+                        self.push_asset_entry(&e, &mut anims, &mut related_files, &mut unresolved);
                     }
                     unresolved.extend(unrs);
                 }
@@ -1193,6 +1221,7 @@ impl<'s> Scanner<'s> {
                 prefab_name,
                 asset_var,
                 anims,
+                related_files,
                 unresolved,
                 content: AnimContent::default(),
             });
@@ -1266,6 +1295,7 @@ impl<'s> Scanner<'s> {
         &mut self,
         arg: &ResolvedArg,
         anims: &mut Vec<AnimRef>,
+        related_files: &mut Vec<String>,
         unresolved: &mut Vec<UnresolvedRef>,
         asset_var: &mut Option<String>,
     ) {
@@ -1274,7 +1304,7 @@ impl<'s> Scanner<'s> {
                 *asset_var = Some(v.clone());
                 if let Some(entries) = self.asset_tables.get(v) {
                     for entry in entries {
-                        self.push_asset_entry(entry, anims, unresolved);
+                        self.push_asset_entry(entry, anims, related_files, unresolved);
                     }
                 } else {
                     unresolved.push(UnresolvedRef {
@@ -1286,7 +1316,7 @@ impl<'s> Scanner<'s> {
             }
             ResolvedArg::Table(entries) => {
                 for entry in entries {
-                    self.push_asset_entry(entry, anims, unresolved);
+                    self.push_asset_entry(entry, anims, related_files, unresolved);
                 }
             }
             ResolvedArg::Str(s) => {
@@ -1491,6 +1521,7 @@ impl<'s> Scanner<'s> {
         };
 
         let mut anims = Vec::new();
+        let mut related_files = Vec::new();
         let mut unresolved = Vec::new();
         let mut asset_var = None;
 
@@ -1500,7 +1531,12 @@ impl<'s> Scanner<'s> {
                 asset_var = Some(var.clone());
                 if let Some(entries) = self.asset_tables.get(&var) {
                     for entry in entries {
-                        self.push_asset_entry(entry, &mut anims, &mut unresolved);
+                        self.push_asset_entry(
+                            entry,
+                            &mut anims,
+                            &mut related_files,
+                            &mut unresolved,
+                        );
                     }
                 } else {
                     unresolved.push(UnresolvedRef {
@@ -1512,13 +1548,13 @@ impl<'s> Scanner<'s> {
             }
             ast::Expression::TableConstructor(table) => {
                 for entry in self.parse_asset_table(table) {
-                    self.push_asset_entry(&entry, &mut anims, &mut unresolved);
+                    self.push_asset_entry(&entry, &mut anims, &mut related_files, &mut unresolved);
                 }
             }
             ast::Expression::FunctionCall(call) => {
                 let (entries, unrs) = self.eval_asset_factory_call(call);
                 for entry in entries {
-                    self.push_asset_entry(&entry, &mut anims, &mut unresolved);
+                    self.push_asset_entry(&entry, &mut anims, &mut related_files, &mut unresolved);
                 }
                 unresolved.extend(unrs);
             }
@@ -1536,6 +1572,7 @@ impl<'s> Scanner<'s> {
             prefab_name,
             asset_var,
             anims,
+            related_files,
             unresolved,
             content: AnimContent::default(),
         });
@@ -1546,16 +1583,22 @@ impl<'s> Scanner<'s> {
         &self,
         entry: &AssetEntry,
         anims: &mut Vec<AnimRef>,
+        related_files: &mut Vec<String>,
         unresolved: &mut Vec<UnresolvedRef>,
     ) {
         match &entry.normalized {
-            Some(normalized) => anims.push(AnimRef {
-                kind: entry.kind.clone(),
-                path: entry.raw_path.clone(),
-                normalized: normalized.clone(),
-                exists: false, // filled later by run_index
-            }),
-            None => unresolved.push(UnresolvedRef {
+            Some(normalized) if entry.kind == "ANIM" || entry.kind == "DYNAMIC_ANIM" => {
+                anims.push(AnimRef {
+                    kind: entry.kind.clone(),
+                    path: entry.raw_path.clone(),
+                    normalized: normalized.clone(),
+                    exists: false, // filled later by run_index
+                });
+            }
+            Some(normalized) if entry.kind == "PKGREF" => {
+                related_files.push(normalized.clone());
+            }
+            Some(_) | None => unresolved.push(UnresolvedRef {
                 kind: entry.kind.clone(),
                 raw: entry.raw_path.clone(),
                 line: entry.line,
@@ -1838,6 +1881,24 @@ return Prefab("foo", fn, assets)
         let p = &scanned.prefabs[0];
         assert_eq!(p.anims.len(), 1);
         assert_eq!(p.anims[0].normalized, "base.zip");
+    }
+
+    #[test]
+    fn pkgref_zip_is_related_file() {
+        let src = r#"
+local assets = {
+    Asset("PKGREF", "anim/base_build.zip"),
+    Asset("ANIM", "anim/anim_only.zip"),
+}
+local function fn() end
+return Prefab("foo", fn, assets)
+"#;
+        let scanned = scan_src(src);
+        assert_eq!(scanned.prefabs.len(), 1);
+        let p = &scanned.prefabs[0];
+        assert_eq!(p.anims.len(), 1);
+        assert_eq!(p.anims[0].normalized, "anim_only.zip");
+        assert_eq!(p.related_files, vec!["base_build.zip"]);
     }
 
     #[test]

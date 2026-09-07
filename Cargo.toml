@@ -7,7 +7,7 @@ edition = "2021"
 nom = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
-dst-anim-tool = { path = "../dst-anim-tool", default-features = false }
+dst-anim-tool = { path = "../dst-anim-tool", default-features = false, features = ["gif"] }
 thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -26,6 +26,7 @@ texpresso = "2"
 toml = { version = "0.8", features = ["parse", "display"] }
 similar = "3"
 regex = "1"
+rayon = "1"
 
 # WebUI (axum server + job management)
 axum = { version = "0.8", features = ["macros"] }

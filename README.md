@@ -478,10 +478,12 @@ cargo run --release -- anim-index <SCRIPTS_ROOT> [OPTIONS]
 
 **产物**：`output/anim-index.json`，内容包含：
 
-- `prefabs`：每个 prefab 变体关联的动画文件，以及从 `anim.bin` / `build.bin` 聚合出的 `banks` / `animations` / `builds` / `symbols` / `atlases`；
+- `prefabs`：每个 prefab 变体关联的动画文件、相关 build/package 文件，以及从 `anim.bin` / `build.bin` 聚合出的 `banks` / `animations` / `builds` / `symbols` / `atlases`；
 - `anim_files`：每个动画文件的反向引用列表与内容摘要；
 - `unresolved`：动态/无法静态解析的 Asset 引用，带文件与行号；
 - `stats`：文件数、引用数、唯一动画数、缺失数等摘要。
+
+WebUI 提供“动画素材”页面，可按 prefab 检索并预览/导出 GIF 或 PNG 序列。
 
 ---
 

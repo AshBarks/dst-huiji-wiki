@@ -517,6 +517,354 @@ pub async fn anim_diff(Query(q): Q) -> std::result::Result<Json<serde_json::Valu
     ))
 }
 
+/// Default `anim-index.json` path; can be overridden with `ANIM_INDEX`.
+fn anim_index_path() -> std::path::PathBuf {
+    std::env::var("ANIM_INDEX")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from("output/anim-index.json"))
+}
+
+fn load_anim_index_value() -> std::result::Result<serde_json::Value, StatusCode> {
+    let path = anim_index_path();
+    let text = std::fs::read_to_string(&path).map_err(|_| StatusCode::NOT_FOUND)?;
+    serde_json::from_str(&text).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+}
+
+/// GET /api/anim/assets/prefabs?q=hound
+pub async fn anim_assets_prefabs(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let index = load_anim_index_value()?;
+    let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
+    let items: Vec<serde_json::Value> = index
+        .get("prefabs")
+        .and_then(|v| v.as_array())
+        .map(|rows| {
+            rows.iter()
+                .filter(|r| {
+                    if ql.is_empty() {
+                        return true;
+                    }
+                    let name = r
+                        .get("prefab_name")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_lowercase();
+                    let file = r
+                        .get("prefab_file")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("")
+                        .to_lowercase();
+                    name.contains(&ql) || file.contains(&ql)
+                })
+                .take(200)
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+
+    Ok(Json(serde_json::json!({
+        "total": items.len(),
+        "items": items,
+    })))
+}
+
+/// GET /api/anim/assets/prefab/{name}
+pub async fn anim_assets_prefab(
+    Path(name): Path<String>,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let index = load_anim_index_value()?;
+    let name_l = name.to_lowercase();
+    let items: Vec<serde_json::Value> = index
+        .get("prefabs")
+        .and_then(|v| v.as_array())
+        .map(|rows| {
+            rows.iter()
+                .filter(|r| {
+                    r.get("prefab_name")
+                        .and_then(|v| v.as_str())
+                        .map(|n| n.eq_ignore_ascii_case(&name))
+                        .unwrap_or(false)
+                        || r.get("prefab_file")
+                            .and_then(|v| v.as_str())
+                            .map(|f| f.to_lowercase().contains(&name_l))
+                            .unwrap_or(false)
+                })
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+
+    if items.is_empty() {
+        return Err(StatusCode::NOT_FOUND);
+    }
+
+    let anim_files = index
+        .get("anim_files")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default();
+    let build_files = index
+        .get("build_files")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default();
+
+    let mut seen = std::collections::BTreeSet::new();
+    let mut files = Vec::new();
+    for item in &items {
+        if let Some(anims) = item.get("anims").and_then(|v| v.as_array()) {
+            for a in anims {
+                if let Some(path) = a.get("normalized").and_then(|v| v.as_str()) {
+                    if seen.insert(path.to_string()) {
+                        let content = anim_files
+                            .get(path)
+                            .and_then(|v| v.get("content").cloned().or_else(|| Some(v.clone())))
+                            .or_else(|| build_files.get(path).cloned())
+                            .unwrap_or(serde_json::json!({}));
+                        files.push(serde_json::json!({ "path": path, "content": content }));
+                    }
+                }
+            }
+        }
+        if let Some(related) = item.get("related_files").and_then(|v| v.as_array()) {
+            for path_val in related {
+                if let Some(path) = path_val.as_str() {
+                    if seen.insert(path.to_string()) {
+                        let content = build_files
+                            .get(path)
+                            .cloned()
+                            .or_else(|| {
+                                anim_files.get(path).and_then(|v| {
+                                    v.get("content").cloned().or_else(|| Some(v.clone()))
+                                })
+                            })
+                            .unwrap_or(serde_json::json!({}));
+                        files.push(serde_json::json!({ "path": path, "content": content }));
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(Json(serde_json::json!({
+        "items": items,
+        "files": files,
+        "build_files": build_files,
+    })))
+}
+
+/// GET /api/anim/assets/render?file=...&bank=...&animation=...&format=gif|png
+pub async fn anim_assets_render(
+    Query(q): Q,
+) -> std::result::Result<axum::response::Response, StatusCode> {
+    let files: Vec<String> = q
+        .get("files")
+        .cloned()
+        .ok_or(StatusCode::BAD_REQUEST)?
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if files.is_empty() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let bank = q.get("bank").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let animation = q.get("animation").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let format = match q.get("format").map(String::as_str) {
+        Some("gif") => dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Gif,
+        Some("png") => dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Png,
+        _ => return Err(StatusCode::BAD_REQUEST),
+    };
+
+    let anim_root = anim_root_from_index_or_env()?;
+    let disabled_builds = split_csv(q.get("disabled_builds"));
+    let hidden_symbols = split_csv(q.get("hidden_symbols"));
+    let symbol_builds = q
+        .get("symbol_builds")
+        .map(|raw| {
+            raw.split(',')
+                .filter_map(|pair| {
+                    let (sym, build) = pair.split_once(':')?;
+                    Some((sym.trim().to_lowercase(), build.trim().to_string()))
+                })
+                .collect::<std::collections::HashMap<_, _>>()
+        })
+        .unwrap_or_default();
+
+    let output = tokio::task::spawn_blocking(move || {
+        dst_huiji_wiki::scripts_sync::anim::preview::render_animation(
+            &dst_huiji_wiki::scripts_sync::anim::preview::RenderParams {
+                anim_root,
+                files,
+                disabled_builds,
+                hidden_symbols,
+                symbol_builds,
+                bank,
+                animation,
+                format,
+            },
+        )
+    })
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .map_err(err_status)?;
+
+    let mut response = output.bytes.into_response();
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        header::HeaderValue::from_static(output.content_type),
+    );
+    if let Ok(disposition) =
+        header::HeaderValue::from_str(&format!("attachment; filename=\"{}\"", output.filename))
+    {
+        response
+            .headers_mut()
+            .insert(header::CONTENT_DISPOSITION, disposition);
+    }
+    Ok(response)
+}
+
+/// GET /api/anim/assets/info?files=...&bank=...&animation=...
+pub async fn anim_assets_info(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let files: Vec<String> = q
+        .get("files")
+        .cloned()
+        .ok_or(StatusCode::BAD_REQUEST)?
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if files.is_empty() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let bank = q.get("bank").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let animation = q.get("animation").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+
+    let anim_root = anim_root_from_index_or_env()?;
+    let value = tokio::task::spawn_blocking(move || {
+        dst_huiji_wiki::scripts_sync::anim::preview::animation_info(
+            &dst_huiji_wiki::scripts_sync::anim::preview::RenderParams {
+                anim_root,
+                files,
+                disabled_builds: Vec::new(),
+                hidden_symbols: Vec::new(),
+                symbol_builds: std::collections::HashMap::new(),
+                bank,
+                animation,
+                format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Gif,
+            },
+        )
+    })
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .map_err(err_status)?;
+    Ok(Json(value))
+}
+
+/// GET /api/anim/assets/preview?files=...&bank=...&animation=...
+/// Returns base64 PNG frames for browser-side animation preview.
+pub async fn anim_assets_preview(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let files: Vec<String> = q
+        .get("files")
+        .cloned()
+        .ok_or(StatusCode::BAD_REQUEST)?
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if files.is_empty() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let bank = q.get("bank").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let animation = q.get("animation").cloned().ok_or(StatusCode::BAD_REQUEST)?;
+    let disabled_builds = split_csv(q.get("disabled_builds"));
+    let hidden_symbols = split_csv(q.get("hidden_symbols"));
+    let symbol_builds = q
+        .get("symbol_builds")
+        .map(|raw| {
+            raw.split(',')
+                .filter_map(|pair| {
+                    let (sym, build) = pair.split_once(':')?;
+                    Some((sym.trim().to_lowercase(), build.trim().to_string()))
+                })
+                .collect::<std::collections::HashMap<_, _>>()
+        })
+        .unwrap_or_default();
+
+    let anim_root = anim_root_from_index_or_env()?;
+    let value = tokio::task::spawn_blocking(move || {
+        dst_huiji_wiki::scripts_sync::anim::preview::render_animation_preview_json(
+            &dst_huiji_wiki::scripts_sync::anim::preview::RenderParams {
+                anim_root,
+                files,
+                disabled_builds,
+                hidden_symbols,
+                symbol_builds,
+                bank,
+                animation,
+                format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Png,
+            },
+        )
+    })
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .map_err(err_status)?;
+    Ok(Json(value))
+}
+
+/// GET /api/anim/assets/find-builds?symbols=a,b,c
+/// Search `data/anim` for build files providing the requested symbols.
+pub async fn anim_assets_find_builds(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let symbols = split_csv(q.get("symbols"));
+    if symbols.is_empty() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let anim_root = anim_root_from_index_or_env()?;
+    let builds = tokio::task::spawn_blocking(move || {
+        dst_huiji_wiki::scripts_sync::anim::preview::find_builds_for_symbols(&anim_root, &symbols)
+    })
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .map_err(err_status)?;
+
+    Ok(Json(serde_json::json!({ "builds": builds })))
+}
+
+fn split_csv(v: Option<&String>) -> Vec<String> {
+    v.map(|s| {
+        s.split(',')
+            .map(|x| x.trim().to_string())
+            .filter(|x| !x.is_empty())
+            .collect()
+    })
+    .unwrap_or_default()
+}
+
+fn anim_root_from_index_or_env() -> std::result::Result<std::path::PathBuf, StatusCode> {
+    if let Ok(index) = load_anim_index_value() {
+        if let Some(root) = index
+            .get("anim_root")
+            .and_then(|v| v.as_str())
+            .filter(|s| !s.is_empty())
+        {
+            return Ok(std::path::PathBuf::from(root));
+        }
+    }
+    if let Ok(root) = std::env::var("DST__ROOT") {
+        return Ok(std::path::PathBuf::from(root).join("data/anim"));
+    }
+    Err(StatusCode::NOT_FOUND)
+}
+
 fn sanitize_anim_label(v: Option<&String>) -> std::result::Result<String, StatusCode> {
     let s = v.ok_or(StatusCode::BAD_REQUEST)?.clone();
     if s.is_empty() || s.contains("..") || s.contains('/') || s.contains('\\') {

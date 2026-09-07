@@ -54,6 +54,18 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/diff/po", get(api_data::diff_po))
         .route("/anim/manifests", get(api_data::anim_manifests))
         .route("/anim/diff", get(api_data::anim_diff))
+        .route("/anim/assets/prefabs", get(api_data::anim_assets_prefabs))
+        .route(
+            "/anim/assets/prefab/{name}",
+            get(api_data::anim_assets_prefab),
+        )
+        .route("/anim/assets/render", get(api_data::anim_assets_render))
+        .route("/anim/assets/info", get(api_data::anim_assets_info))
+        .route("/anim/assets/preview", get(api_data::anim_assets_preview))
+        .route(
+            "/anim/assets/find-builds",
+            get(api_data::anim_assets_find_builds),
+        )
         .route("/config", get(config))
         .with_state(Arc::clone(&app_state));
 

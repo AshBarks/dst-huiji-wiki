@@ -10,6 +10,7 @@ pub mod diff;
 pub mod history;
 pub mod index;
 pub mod normalize;
+pub mod preview;
 pub mod snapshot;
 
 use crate::error::Result;

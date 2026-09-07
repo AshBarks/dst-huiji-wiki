@@ -10,6 +10,8 @@
 //! module (`prefabs/skinprefabs.lua` → `prefab_skins` index).
 
 use crate::error::Result;
+use crate::parser::anim_override::{parse_anim_overrides_in, SymbolOverrideCall, SymbolRemapIndex};
+use crate::parser::clothing_overrides::{parse_clothing_overrides, ClothingEntry};
 use crate::service::Reporter;
 use full_moon::ast;
 use full_moon::node::Node;
@@ -230,6 +232,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     let mut unresolved = Vec::new();
     let mut prefab_file_count = 0usize;
     let mut skipped_pkgref_dyn = 0usize;
+    let mut remap_calls: Vec<SymbolOverrideCall> = Vec::new();
 
     let mut content_cache: BTreeMap<String, AnimContent> = BTreeMap::new();
     let mut files: Vec<PathBuf> = Vec::new();
@@ -247,6 +250,17 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         let file_index = scanner.scan(rel.clone());
         prefab_file_count += 1;
         skipped_pkgref_dyn += file_index.skipped_pkgref_dyn;
+
+        // Tier-A 提取：AnimState 符号重映射调用（静态常量三元组）。整文件
+        // 解析失败时静默跳过——Scanner 已把 PARSE_ERROR 记进 unresolved。
+        let stem = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or_default()
+            .to_string();
+        if let Ok(mut calls) = parse_anim_overrides_in(&source, Some(&stem)) {
+            remap_calls.append(&mut calls);
+        }
 
         for mut record in file_index.prefabs {
             // Resolve existence now that we know anim_root.
@@ -369,6 +383,35 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     }
     std::fs::write(&out_path, serde_json::to_string_pretty(&artifact)?)?;
 
+    // Tier-A 重映射索引产物：anim-index.json 的伴生文件，供 WebUI 的
+    // override 选择器与渲染端点查询。
+    let remap_index = SymbolRemapIndex::from_calls(&remap_calls);
+    let remap_entries: usize = remap_index.symbols.values().map(Vec::len).sum();
+
+    // Tier-B：clothing.lua 数据表（脚本根目录，不在 prefabs/ 下）。
+    let clothing_path = params.scripts_root.join("clothing.lua");
+    let clothing_index: BTreeMap<String, ClothingEntry> = if clothing_path.is_file() {
+        let source = std::fs::read_to_string(&clothing_path)?;
+        parse_clothing_overrides(&source)?
+    } else {
+        BTreeMap::new()
+    };
+
+    let remap_path = out_path.with_file_name("anim-remap-index.json");
+    let remap_artifact = serde_json::json!({
+        "schema_version": 1,
+        "scripts_root": params.scripts_root.display().to_string(),
+        "stats": {
+            "calls": remap_calls.len(),
+            "symbols": remap_index.len(),
+            "entries": remap_entries,
+            "clothing": clothing_index.len(),
+        },
+        "symbols": remap_index.symbols,
+        "clothing": clothing_index,
+    });
+    std::fs::write(&remap_path, serde_json::to_string_pretty(&remap_artifact)?)?;
+
     reporter.log(format!(
         "prefab 文件 {} / 变体记录 {} / 动画引用 {} / 唯一动画 {} / unresolved {}",
         artifact.stats.prefab_files,
@@ -378,6 +421,13 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         artifact.stats.unresolved_refs,
     ));
     reporter.log(format!("已写入 {}", out_path.display()));
+    reporter.log(format!(
+        "重映射：{} symbol / {} 条目（{} 次调用），已写入 {}",
+        remap_index.len(),
+        remap_entries,
+        remap_calls.len(),
+        remap_path.display()
+    ));
 
     Ok(serde_json::json!({
         "schema_version": artifact.schema_version,
@@ -390,6 +440,13 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         "missing_anim_paths": artifact.stats.missing_anim_paths,
         "multi_anim_files": artifact.stats.multi_anim_files,
         "skipped_pkgref_dyn": artifact.stats.skipped_pkgref_dyn,
+        "symbol_overrides": {
+            "calls": remap_calls.len(),
+            "symbols": remap_index.len(),
+            "entries": remap_entries,
+            "clothing": clothing_index.len(),
+            "output": remap_path,
+        },
         "output": out_path,
     }))
 }

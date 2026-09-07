@@ -532,6 +532,121 @@ fn load_anim_index_value() -> std::result::Result<serde_json::Value, StatusCode>
     serde_json::from_str(&text).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
+/// Default `anim-remap-index.json` path: sibling of the anim index (or
+/// `ANIM_REMAP_INDEX` override).
+fn anim_remap_index_path() -> std::path::PathBuf {
+    std::env::var("ANIM_REMAP_INDEX")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| anim_index_path().with_file_name("anim-remap-index.json"))
+}
+
+/// GET /api/anim/assets/remaps?symbols=a,b,c
+///
+/// Remap entries from `anim-remap-index.json` (Tier-A static AnimState
+/// override calls), optionally filtered to the animation's symbols. Degrades
+/// to an empty index when the artifact has not been built.
+pub async fn anim_assets_remaps(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let path = anim_remap_index_path();
+    let index = match std::fs::read_to_string(&path) {
+        Ok(text) => serde_json::from_str::<serde_json::Value>(&text)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+        Err(_) => serde_json::json!({ "symbols": {} }),
+    };
+    let symbols = index
+        .get("symbols")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default();
+    let filtered = match q.get("symbols") {
+        None => symbols,
+        Some(raw) => {
+            let wanted: std::collections::HashSet<String> = raw
+                .split(',')
+                .map(|s| s.trim().to_lowercase())
+                .filter(|s| !s.is_empty())
+                .collect();
+            symbols
+                .into_iter()
+                .filter(|(k, _)| wanted.contains(k))
+                .collect()
+        }
+    };
+    Ok(Json(serde_json::json!({ "symbols": filtered })))
+}
+
+/// GET /api/anim/assets/clothing-overrides
+///
+/// Tier-B clothing.lua 数据：
+/// - 无 `name`：返回衣物摘要列表（可 `q=` 过滤，最多 50 条）；
+/// - 有 `name`（可带 `character=`、`skintype=`）：按 skinner.lua 规则解析出
+///   anim symbol → 源 symbol 的覆盖表，并给出可直接使用的
+///   `symbol_overrides` CSV（`sym:build:src,...`）。
+pub async fn anim_assets_clothing_overrides(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let path = anim_remap_index_path();
+    let index: serde_json::Value = match std::fs::read_to_string(&path) {
+        Ok(text) => serde_json::from_str(&text).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+        Err(_) => serde_json::json!({}),
+    };
+    let clothing = index
+        .get("clothing")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default();
+
+    match q.get("name").map(|s| s.trim().to_lowercase()) {
+        Some(name) => {
+            let raw = clothing.get(&name).ok_or(StatusCode::NOT_FOUND)?;
+            let entry: dst_huiji_wiki::parser::clothing_overrides::ClothingEntry =
+                serde_json::from_value(raw.clone())
+                    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+            let character = q
+                .get("character")
+                .map(|s| s.as_str())
+                .filter(|s| !s.trim().is_empty());
+            let skintype = q
+                .get("skintype")
+                .map(|s| s.as_str())
+                .filter(|s| !s.trim().is_empty());
+            let resolved = entry.resolve_overrides(&name, character, skintype);
+            let csv = resolved
+                .overrides
+                .iter()
+                .map(|(sym, src)| format!("{sym}:{}:{src}", resolved.build))
+                .collect::<Vec<_>>()
+                .join(",");
+            Ok(Json(serde_json::json!({
+                "name": name,
+                "build": resolved.build,
+                "overrides": resolved.overrides,
+                "symbol_overrides": csv,
+            })))
+        }
+        None => {
+            let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
+            let items: Vec<serde_json::Value> = clothing
+                .iter()
+                .filter(|(name, _)| ql.is_empty() || name.to_lowercase().contains(&ql))
+                .take(50)
+                .map(|(name, e)| {
+                    serde_json::json!({
+                        "name": name,
+                        "type": e.get("clothing_type"),
+                        "symbols": e.get("symbol_overrides").and_then(|v| v.as_array()).map(Vec::len).unwrap_or(0),
+                        "characters": e.get("symbol_overrides_by_character").and_then(|v| v.as_object()).map(|o| o.len()).unwrap_or(0),
+                    })
+                })
+                .collect();
+            Ok(Json(serde_json::json!({ "items": items })))
+        }
+    }
+}
+
 /// Default `skin-index.json` path; can be overridden with `SKIN_INDEX`.
 fn skin_index_path() -> std::path::PathBuf {
     std::env::var("SKIN_INDEX")

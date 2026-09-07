@@ -67,6 +67,11 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
             "/anim/assets/find-builds",
             get(api_data::anim_assets_find_builds),
         )
+        .route("/anim/assets/remaps", get(api_data::anim_assets_remaps))
+        .route(
+            "/anim/assets/clothing-overrides",
+            get(api_data::anim_assets_clothing_overrides),
+        )
         .route("/config", get(config))
         .with_state(Arc::clone(&app_state));
 

@@ -12,6 +12,9 @@ src/parser/
 ├── anim_override.rs     # AnimState 符号重映射提取（Tier A）：OverrideSymbol/
 │                        #   OverrideSkinSymbol/ClearOverrideSymbol 常量调用 →
 │                        #   SymbolRemapIndex（喂 dst-anim-tool SymbolOverrideMap）
+├── clothing_overrides.rs # clothing.lua CLOTHING 数据表（Tier B）：symbol_overrides/
+│                        #   by_character/skintype 变体 → resolve_overrides() 复刻
+│                        #   skinner.lua 的 src_sym 合成规则
 ├── lua.rs               # LuaParser — 3 generic AST queries:
 │                        #   locate_variable, locate_field_assignment,
 │                        #   locate_variable_range. Returns VariableLocation/
@@ -44,6 +47,7 @@ src/parser/
 | Task | Location | Notes |
 |------|----------|-------|
 | Extract symbol remap calls | `anim_override.rs` → `parse_anim_overrides_in` | Only string-literal args; groups via `SymbolRemapIndex::from_calls` |
+| Extract clothing symbol tables | `clothing_overrides.rs` → `parse_clothing_overrides` | `CLOTHING = {...}`; resolve via `ClothingEntry::resolve_overrides(name, character, skintype)` |
 | Add a new Lua data parser | `src/parser/<name>.rs` | Full_moon AST, re-export in mod.rs |
 | Query Lua var/field locations | `lua.rs` → `LuaParser::locate_*` | Generic, returns byte-offset locations |
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |

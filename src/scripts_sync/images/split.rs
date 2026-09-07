@@ -13,6 +13,11 @@
 use crate::error::{Error, Result};
 use image::DynamicImage;
 
+/// 切割/裁剪逻辑版本；写入 manifest 的 `split_version`，与当前值不一致时
+/// 触发全量重切割（与解码器版本切换同语义）。修改本文件的坐标或解析逻辑
+/// 时必须递增。
+pub const SPLIT_VERSION: &str = "1";
+
 /// 一个 sprite 区域（像素坐标，已含 v 轴翻转）。
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpriteRegion {

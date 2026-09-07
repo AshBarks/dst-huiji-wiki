@@ -63,6 +63,10 @@ pub struct Manifest {
     /// 与当前不一致时触发全量重处理（旧 manifest 无此字段按空串处理）。
     #[serde(default)]
     pub decoder: String,
+    /// 切割/裁剪逻辑版本（[`crate::scripts_sync::images::split::SPLIT_VERSION`]）；
+    /// 与当前不一致时触发全量重切割（旧 manifest 无此字段按空串处理）。
+    #[serde(default)]
+    pub split_version: String,
     /// 最终产物：路径（相对 `current/`）→ sha256。
     pub products: FinalMap,
     /// 相对 [`Manifest::parent_build`] 的差异。
@@ -241,6 +245,33 @@ impl ManifestStore {
         }
         Ok(best)
     }
+
+    /// 已记录的最大数值 build（文件名 `<build>.json`，含 partial manifest；
+    /// 非数字文件名忽略）。用于 build 回退检测：新 build 低于任何已记录
+    /// build 时，管线应拒绝操作以免产出脏 diff。
+    pub fn latest_recorded_build(&self) -> Result<Option<String>> {
+        if !self.dir.exists() {
+            return Ok(None);
+        }
+        let mut best: Option<(u64, String)> = None;
+        for entry in std::fs::read_dir(&self.dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("json") {
+                continue;
+            }
+            let Some(stem) = path.file_stem().and_then(|s| s.to_str()) else {
+                continue;
+            };
+            if let Ok(n) = stem.parse::<u64>() {
+                let is_better = best.as_ref().map(|(b, _)| n > *b).unwrap_or(true);
+                if is_better {
+                    best = Some((n, stem.to_string()));
+                }
+            }
+        }
+        Ok(best.map(|(_, build)| build))
+    }
 }
 
 fn parse_manifest_file(path: &Path) -> Result<Manifest> {
@@ -378,6 +409,7 @@ mod tests {
             parent_build: None,
             complete,
             decoder: "ktex-rs/1".into(),
+            split_version: "1".into(),
             products: BTreeMap::from([("split/a/1.png".into(), "h".into())]),
             diff: Diff::default(),
             inputs: BTreeMap::from([("tex/a".into(), "h".into())]),
@@ -439,6 +471,24 @@ mod tests {
         let parent = store.load_parent("2000").unwrap().unwrap();
         // 1000 > 900 数值序（字典序会错选 900）。
         assert_eq!(parent.build, "1000");
+        std::fs::remove_dir_all(&ws).ok();
+    }
+
+    #[test]
+    fn test_latest_recorded_build_includes_partial_and_ignores_non_numeric() {
+        let ws = std::env::temp_dir().join(format!("ktool_latest_{}", std::process::id()));
+        std::fs::remove_dir_all(&ws).ok();
+        let store = ManifestStore::new(ws.join("manifests"));
+        assert_eq!(store.latest_recorded_build().unwrap(), None);
+        store.save(&sample_manifest("100", true)).unwrap();
+        store.save(&sample_manifest("300", false)).unwrap(); // partial 也算已记录
+        store.save(&sample_manifest("200", true)).unwrap();
+        // stray 非数字文件名不参与
+        std::fs::write(ws.join("manifests").join("not-a-build.json"), "x").unwrap();
+        assert_eq!(
+            store.latest_recorded_build().unwrap().as_deref(),
+            Some("300")
+        );
         std::fs::remove_dir_all(&ws).ok();
     }
 }

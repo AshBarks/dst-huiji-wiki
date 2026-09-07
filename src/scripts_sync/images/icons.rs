@@ -173,6 +173,7 @@ mod tests {
             parent_build: None,
             complete,
             decoder: "ktex-rs/1".into(),
+            split_version: "1".into(),
             products: products
                 .iter()
                 .map(|(p, h)| (p.to_string(), h.to_string()))

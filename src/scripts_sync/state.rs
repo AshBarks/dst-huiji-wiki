@@ -37,6 +37,19 @@ pub fn needs_update(last: Option<&str>, new: &str) -> bool {
     last != Some(new)
 }
 
+/// Whether `new` is numerically lower than a previously recorded version.
+///
+/// Used by the asset pipelines (scripts/images/anim) to detect a game build
+/// *rollback*: processing a lower build on top of history from a higher one
+/// would produce dirty diffs, so callers must refuse. Non-numeric versions
+/// cannot be ordered and never count as rollback.
+pub fn is_rollback(new: &str, recorded: &str) -> bool {
+    match (new.parse::<u64>(), recorded.parse::<u64>()) {
+        (Ok(new), Ok(recorded)) => new < recorded,
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -70,5 +83,17 @@ mod tests {
         assert!(!needs_update(Some("747465"), "747465"));
         // Empty record counts as a (bogus) version, still triggers sync.
         assert!(needs_update(Some(""), "747465"));
+    }
+
+    #[test]
+    fn test_is_rollback_truth_table() {
+        assert!(is_rollback("100", "200"));
+        assert!(!is_rollback("200", "100"));
+        assert!(!is_rollback("200", "200"));
+        // 首次运行（无记录）不算回退。
+        assert!(!is_rollback("200", ""));
+        // 非数字版本无法排序，不判回退。
+        assert!(!is_rollback("abc", "200"));
+        assert!(!is_rollback("200", "abc"));
     }
 }

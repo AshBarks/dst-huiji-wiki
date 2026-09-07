@@ -17,12 +17,16 @@
 //!
 //! 增量与正确性规则：
 //! - 输入 hash 与 parent manifest 一致且产物在盘 → 跳过；
-//! - **解码器版本变更**（manifest.decoder ≠ [`ktex::DECODER_VERSION`]）时
-//!   等效 `--force`：全量重解码，diff 相对旧解码器基线如实反映；
+//! - **解码器版本变更**（manifest.decoder ≠ [`ktex::DECODER_VERSION`]）或
+//!   **切割逻辑版本变更**（manifest.split_version ≠
+//!   [`split::SPLIT_VERSION`]）时等效 `--force`：全量重处理，diff 相对旧
+//!   基线如实反映；
 //! - 失败文件不计入 manifest，partial 不作为下个 diff 基线（避免"因失败
 //!   消失"被误判为 removed）；`current/` 恒等于最近一次运行的真实产物；
 //! - manifest 的 products 清单**从零构建**（复用条目显式从 parent 搬运），
-//!   保证源里消失的 atlas 不会残留。
+//!   保证源里消失的 atlas 不会残留；
+//! - **build 回退**（当前 build 数值低于任何已记录 build 的 manifest）时
+//!   拒绝操作（即使 `--force`），报告 `rollback_skipped`，不写任何文件。
 //!
 //! 输出布局（`KTOOLS__OUT_DIR`，缺省 `output/ktools`）：
 //!
@@ -44,6 +48,8 @@ use crate::scripts_sync::images::history::{
 };
 use crate::scripts_sync::images::ktex::{DecodeOptions, DECODER_VERSION};
 use crate::scripts_sync::images::scan::{scan, ScanResult, UNZIP_DIR_NAME};
+use crate::scripts_sync::images::split::SPLIT_VERSION;
+use crate::scripts_sync::state;
 use crate::service::Reporter;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
@@ -133,21 +139,47 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
         layout.root.display()
     ));
 
+    // build 回退：当前 build 低于任何已记录 build 时拒绝操作，避免用旧
+    // 版输入覆盖新版历史（即使 --force 也不放行；dry-run 同样直接返回）。
+    if let Some(recorded) = manifests.latest_recorded_build()? {
+        if state::is_rollback(&build, &recorded) {
+            let msg = format!(
+                "检测到 build 回退：当前 {build} 低于已记录的 {recorded}，\
+                 为避免污染产物历史，本次不执行任何操作。\
+                 请确认 DST__ROOT 指向正确的游戏安装（或删除多余的 manifest 后重试）"
+            );
+            reporter.log(msg.clone());
+            return Ok(serde_json::json!({
+                "status": "rollback_skipped",
+                "build": build,
+                "recorded_build": recorded,
+                "message": msg,
+                "out_dir": layout.root.display().to_string(),
+            }));
+        }
+    }
+
     // 解码器版本变更（含当前 build 的旧 manifest）→ 等效 force。
-    let decoder_changed = existing
-        .as_ref()
-        .or(parent.as_ref())
+    let versioned = existing.as_ref().or(parent.as_ref());
+    let decoder_changed = versioned
         .map(|m| m.decoder != DECODER_VERSION)
         .unwrap_or(false);
-    let effective_force = params.force || decoder_changed;
+    // 切割逻辑版本变更 → 同样等效 force（否则未变的 atlas 会复用旧逻辑
+    // 切出的切片，新旧产物混用两套切割规则）。
+    let splitter_changed = versioned
+        .map(|m| m.split_version != SPLIT_VERSION)
+        .unwrap_or(false);
+    let effective_force = params.force || decoder_changed || splitter_changed;
     if decoder_changed {
         reporter.log(format!(
             "解码器已从 {:?} 切换到 {DECODER_VERSION}，本次全量重处理",
-            existing
-                .as_ref()
-                .or(parent.as_ref())
-                .map(|m| m.decoder.as_str())
-                .unwrap_or("")
+            versioned.map(|m| m.decoder.as_str()).unwrap_or("")
+        ));
+    }
+    if splitter_changed {
+        reporter.log(format!(
+            "切割逻辑已从 {:?} 切换到 {SPLIT_VERSION}，本次全量重切割",
+            versioned.map(|m| m.split_version.as_str()).unwrap_or("")
         ));
     }
 
@@ -181,6 +213,7 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
             parent.as_ref(),
             &scan,
             decoder_changed,
+            splitter_changed,
         );
     }
 
@@ -437,6 +470,7 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
         ("removed_stale_split", removed_split as u64),
         ("removed_stale_decoded", removed_decoded as u64),
         ("decoder_switched", u64::from(decoder_changed)),
+        ("splitter_switched", u64::from(splitter_changed)),
     ]
     .into_iter()
     .map(|(k, v)| (k.to_string(), v))
@@ -446,6 +480,7 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
         parent_build: parent.as_ref().map(|m| m.build.clone()),
         complete,
         decoder: DECODER_VERSION.to_string(),
+        split_version: SPLIT_VERSION.to_string(),
         products,
         diff,
         inputs: scan.input_hashes(),
@@ -471,6 +506,7 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
         &manifest,
         Some(&failures),
         decoder_changed,
+        splitter_changed,
     ))
 }
 
@@ -523,6 +559,7 @@ fn reconcile_dir(root: &Path, keep: &BTreeSet<String>) -> Result<usize> {
 }
 
 /// dry-run：盘点 + 依据 parent manifest 估算各阶段工作量，不写任何文件。
+#[allow(clippy::too_many_arguments)]
 fn dry_run_report(
     params: &ImagesSyncParams,
     reporter: &dyn Reporter,
@@ -531,12 +568,16 @@ fn dry_run_report(
     parent: Option<&Manifest>,
     scan: &ScanResult,
     decoder_changed: bool,
+    splitter_changed: bool,
 ) -> Result<serde_json::Value> {
     reporter.stage("dry-run 计划（不修改任何文件）");
     if decoder_changed {
         reporter.log(format!("解码器将切换到 {DECODER_VERSION}，全量重处理"));
     }
-    let effective_force = params.force || decoder_changed;
+    if splitter_changed {
+        reporter.log(format!("切割逻辑将切换到 {SPLIT_VERSION}，全量重切割"));
+    }
+    let effective_force = params.force || decoder_changed || splitter_changed;
     let inputs = parent.map(|m| &m.inputs);
     let tex_to_decode = scan
         .all_tex
@@ -572,6 +613,8 @@ fn dry_run_report(
         "parent_build": parent.map(|m| m.build.as_str()),
         "decoder": DECODER_VERSION,
         "decoder_switched": decoder_changed,
+        "splitter": SPLIT_VERSION,
+        "splitter_switched": splitter_changed,
         "out_dir": layout.root.display().to_string(),
         "scan": {
             "atlases": scan.atlases.len(),
@@ -596,6 +639,7 @@ fn up_to_date_report(build: &str, layout: &Layout, manifest: &Manifest) -> serde
         "status": "up_to_date",
         "build": build,
         "decoder": DECODER_VERSION,
+        "splitter": SPLIT_VERSION,
         "out_dir": layout.root.display().to_string(),
         "final_products": manifest.products.len(),
         "diff_summary": {
@@ -617,6 +661,7 @@ fn report_json(
     manifest: &Manifest,
     failures: Option<&[Failure]>,
     decoder_changed: bool,
+    splitter_changed: bool,
 ) -> serde_json::Value {
     serde_json::json!({
         "status": status,
@@ -624,6 +669,8 @@ fn report_json(
         "parent_build": parent_build,
         "decoder": DECODER_VERSION,
         "decoder_switched": decoder_changed,
+        "splitter": SPLIT_VERSION,
+        "splitter_switched": splitter_changed,
         "out_dir": layout.root.display().to_string(),
         "scan": {
             "atlases": scan.atlases.len(),
@@ -952,6 +999,59 @@ mod tests {
         let m: Manifest =
             serde_json::from_str(&std::fs::read_to_string(&manifest_path).unwrap()).unwrap();
         assert_eq!(m.decoder, DECODER_VERSION);
+        std::fs::remove_dir_all(&ws).ok();
+    }
+
+    #[test]
+    fn test_run_old_split_version_manifest_triggers_reprocess() {
+        let ws = std::env::temp_dir().join(format!("ktool_run6_{}", std::process::id()));
+        std::fs::remove_dir_all(&ws).ok();
+        let dst = make_dst(&ws);
+        let out = ws.join("out");
+        let rep = TestReporter::default();
+        run(&params(&dst, &out, false, false), &rep).unwrap();
+
+        // 伪造旧切割逻辑 manifest（split_version 字段被改掉）→ 不应 up_to_date
+        let manifest_path = out.join("history/manifests/100.json");
+        let mut m: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&manifest_path).unwrap()).unwrap();
+        m["split_version"] = serde_json::json!("old-split/0");
+        std::fs::write(&manifest_path, serde_json::to_string(&m).unwrap()).unwrap();
+
+        let report = run(&params(&dst, &out, false, false), &rep).unwrap();
+        assert_eq!(report["status"], "synced", "{report}");
+        assert_eq!(report["splitter_switched"], true);
+        // manifest 已记录当前切割逻辑版本
+        let m: Manifest =
+            serde_json::from_str(&std::fs::read_to_string(&manifest_path).unwrap()).unwrap();
+        assert_eq!(m.split_version, SPLIT_VERSION);
+        std::fs::remove_dir_all(&ws).ok();
+    }
+
+    #[test]
+    fn test_run_rollback_refuses_even_with_force() {
+        let ws = std::env::temp_dir().join(format!("ktool_run7_{}", std::process::id()));
+        std::fs::remove_dir_all(&ws).ok();
+        let dst = make_dst(&ws);
+        let out = ws.join("out");
+        let rep = TestReporter::default();
+        run(&params(&dst, &out, false, false), &rep).unwrap();
+
+        // 模拟 build 回退：version.txt 降到 50
+        write_file(&dst.join("version.txt"), b"50\n");
+        for (force, dry_run) in [(false, false), (true, false), (false, true)] {
+            let report = run(&params(&dst, &out, force, dry_run), &rep).unwrap();
+            assert_eq!(report["status"], "rollback_skipped", "{report}");
+            assert_eq!(report["recorded_build"], "100");
+        }
+        // 磁盘无任何写入：无 50.json，current/ 仍是 build 100 产物
+        assert!(!out.join("history/manifests/50.json").exists());
+        assert!(out.join("current/decoded/baz.png").exists());
+        assert!(out.join("current/split/foo/s1.png").exists());
+        // 恢复 build 100 → 幂等 up_to_date（回退尝试未留下脏数据）
+        write_file(&dst.join("version.txt"), b"100\n");
+        let report = run(&params(&dst, &out, false, false), &rep).unwrap();
+        assert_eq!(report["status"], "up_to_date");
         std::fs::remove_dir_all(&ws).ok();
     }
 

@@ -197,6 +197,33 @@ impl ManifestStore {
         Ok(labels)
     }
 
+    /// 已记录的最大数值 label（文件名 `<label>.json`；非数字文件名忽略）。
+    /// 用于版本回退检测：新 label 低于任何已记录 label 时，同步应拒绝操作
+    /// 以免产出脏 diff。
+    pub fn latest_recorded_label(&self) -> Result<Option<String>> {
+        if !self.dir.exists() {
+            return Ok(None);
+        }
+        let mut best: Option<(u64, String)> = None;
+        for entry in std::fs::read_dir(&self.dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("json") {
+                continue;
+            }
+            let Some(stem) = path.file_stem().and_then(|s| s.to_str()) else {
+                continue;
+            };
+            if let Ok(n) = stem.parse::<u64>() {
+                let is_better = best.as_ref().map(|(b, _)| n > *b).unwrap_or(true);
+                if is_better {
+                    best = Some((n, stem.to_string()));
+                }
+            }
+        }
+        Ok(best.map(|(_, label)| label))
+    }
+
     /// 加载最近一份完整且非当前 label 的 manifest 作为 diff 基线。
     pub fn load_parent(&self, current_label: &str) -> Result<Option<Manifest>> {
         if !self.dir.exists() {

@@ -34,7 +34,7 @@ Modules (all in `src/`):
 | `build_file.rs` | build.bin parser — two-pass: skip symbols → read verts → re-read symbols; `BuildSymbol.frame_for_anim_frame()` for duration-range frame lookup |
 | `archive.rs` | .zip/.dyn dispatcher — .dyn detection (first 2 bytes != "PK"), XOR decrypt then unzip; `Arc<Vec<u8>>` shared tex data; `OnceCell`-cached `tex_files()` |
 | `atlas.rs` | splitAtlas — UV→pixel crop, V-flip (`srcY = (1-maxV)*h`), 6-vert groups, pivot-centered paste |
-| `render.rs` | Frame composition — zIndex-sorted element overlay with 2×2 transform matrix; pre-computed `ElementData` + `PreparedFrame` for batch rendering |
+| `render.rs` | Frame composition — zIndex-sorted element overlay with 2×2 transform matrix; pre-computed `ElementData` + `PreparedFrame` for batch rendering; `SymbolOverrideMap` + `parse_symbol_map()` for engine-style `OverrideSymbol` remapping (TOML `[[symbol_override]]` blocks) |
 | `gif_export.rs` | GIF encoding — 6-bit color quantization with `QuantizeContext` (reusable `Box<[u16; 64³]>` lookup table), optional ffmpeg-based GIF from PNG sequence |
 | `ui/mod.rs` | egui GUI — `App` struct, file loading, archive integration, export coordination |
 | `ui/cache.rs` | Frame caching, background rendering, animation navigation |
@@ -71,3 +71,5 @@ Modules (all in `src/`):
 - `BuildSymbol.frame_for_anim_frame()` matches the JS `getFrame` semantics: a build frame covers anim frames `[frame_num, frame_num + duration - 1]` — exact match via `frame_index: HashMap<u32, usize>` first, then binary search (`partition_point`) on frames sorted by frame_num; discarding `duration` caused intermittent missing fx symbols (e.g. `p3_fx_ball_centre`)
 - `Error` enum uses specific variants (`MissingCompanion`, `MissingData`, `InvalidValue`) instead of generic `UnknownFormat`
 - UI background render / GIF export move `PreparedFrame` data to threads instead of cloning entire `BuildFile` + `AnimFile`
+- `SymbolOverrideMap` mirrors the engine's `AnimState:OverrideSymbol`: anim placeholder symbols (`swap_object`, `fx_swap`) map to `(build_name, replacement_symbol)`; `build = ""` falls back to same-name lookup across the build_list; explicit build names restrict lookup to that build
+- `render --build <file>...` loads extra build archives; anim-only inputs (e.g. `player_actions_axe.zip`) are valid when builds come from `--build`

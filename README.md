@@ -51,18 +51,46 @@ dst-anim-tool split -i data/anim/abigail_flower.zip output/split
 Render a specific animation as a sequence of composed PNG frames.
 
 ```sh
-dst-anim-tool render -i <input> [--skin <skin-file>] <bank_name>/<animation_name> <output-dir>
+dst-anim-tool render -i <input> [--skin <skin-file>] [--build <extra-build>...] [--symbol-map <toml-file>] <bank_name>/<animation_name> <output-dir>
 ```
 
 - Uses anim.bin elements + build.bin sprites + atlas textures
 - Each frame is composited from multiple elements with transform matrices
 - Output: `output-dir/frame_000.png`, `frame_001.png`, ...
 - `--skin`: overlay a skin for alternate textures
+- `--build`: load extra build archives (weapon/fx builds for symbol overrides)
+- `--symbol-map`: TOML file mapping anim placeholder symbols to other builds' symbols, matching the engine's `AnimState:OverrideSymbol` behavior
 
 Use `list` to discover available animation names.
 
 ```sh
 dst-anim-tool render -i data/anim/abigail_flower.zip abigail_flower/idle_1 output/render
+```
+
+#### symbol override map
+
+Anim banks often reference placeholder symbols (e.g. `swap_object`, `fx_swap`) that
+do not exist in any build; at runtime the game remaps them via
+`AnimState:OverrideSymbol(anim_symbol, build_name, symbol_name)`. Pass a TOML file
+to reproduce this:
+
+```toml
+[[symbol_override]]
+symbol = "swap_object"        # symbol referenced by the anim elements
+build = "swap_axe"            # build providing the replacement ("" = search all loaded builds)
+replace_with = "swap_axe"     # replacement symbol name
+
+[[symbol_override]]
+symbol = "fx_swap"
+build = "abigail_vial_fx"
+replace_with = "fx_regen_02"
+```
+
+```sh
+dst-anim-tool render -i data/anim/player_actions_axe.zip \
+  --build data/anim/wilson.zip data/anim/swap_axe.zip \
+  --symbol-map map.toml \
+  -- wilson/chop_loop_side output/render
 ```
 
 ### list

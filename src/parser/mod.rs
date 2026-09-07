@@ -1,9 +1,14 @@
+pub mod anim_override;
 pub mod lua;
 pub mod po;
 pub mod prefab_override;
 pub mod recipe;
 pub mod skilltree;
 
+pub use anim_override::{
+    parse_anim_overrides, parse_anim_overrides_in, Confidence, OverrideApi, SymbolOverrideCall,
+    SymbolRemapEntry, SymbolRemapIndex,
+};
 pub use lua::{
     extract_field_assignment, extract_field_assignment_range, extract_variable,
     extract_variable_range, FieldLocation, LuaParser, VariableLocation, VariableRange,

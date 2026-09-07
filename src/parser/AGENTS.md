@@ -9,6 +9,9 @@ src/parser/
 ├── mod.rs               # Re-exports: LuaParser, PoParser, RecipeParser,
 │                        #   PrefabOverrideParser + convenience fns
 │                        #   (parse_recipes_from_file, parse_prefab_overrides)
+├── anim_override.rs     # AnimState 符号重映射提取（Tier A）：OverrideSymbol/
+│                        #   OverrideSkinSymbol/ClearOverrideSymbol 常量调用 →
+│                        #   SymbolRemapIndex（喂 dst-anim-tool SymbolOverrideMap）
 ├── lua.rs               # LuaParser — 3 generic AST queries:
 │                        #   locate_variable, locate_field_assignment,
 │                        #   locate_variable_range. Returns VariableLocation/
@@ -40,6 +43,7 @@ src/parser/
 
 | Task | Location | Notes |
 |------|----------|-------|
+| Extract symbol remap calls | `anim_override.rs` → `parse_anim_overrides_in` | Only string-literal args; groups via `SymbolRemapIndex::from_calls` |
 | Add a new Lua data parser | `src/parser/<name>.rs` | Full_moon AST, re-export in mod.rs |
 | Query Lua var/field locations | `lua.rs` → `LuaParser::locate_*` | Generic, returns byte-offset locations |
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |

@@ -1134,6 +1134,9 @@ async function pageAnimAssets(main) {
     info: null,
     hiddenSymbols: new Set(),
     symbolBuilds: {},
+    remaps: {},
+    remapChoice: {},
+    clothingSymbols: new Set(),
     disabledBuilds: new Set(),
     candidateBuilds: [],
     extraBuilds: new Set(),
@@ -1195,6 +1198,9 @@ async function pageAnimAssets(main) {
     state.buildFiles = {};
     state.hiddenSymbols.clear();
     state.symbolBuilds = {};
+    state.remaps = {};
+    state.remapChoice = {};
+    state.clothingSymbols.clear();
     state.disabledBuilds.clear();
     state.candidateBuilds = [];
     state.extraBuilds.clear();
@@ -1314,6 +1320,14 @@ async function pageAnimAssets(main) {
       : "";
     const url = `/api/anim/assets/info?files=${encodeURIComponent(files.join(","))}&bank=${encodeURIComponent(bank)}&animation=${encodeURIComponent(anim)}${skinQ}`;
     state.info = await apiJSON(url);
+    // Fetch static AnimState override candidates (anim-remap-index) for the
+    // animation's symbols; degrade silently when the artifact is missing.
+    state.remaps = {};
+    try {
+        const syms = (state.info.symbols || []).join(",");
+        const r = await apiJSON(`/api/anim/assets/remaps${syms ? `?symbols=${encodeURIComponent(syms)}` : ""}`);
+        state.remaps = r.symbols || {};
+    } catch (e) { /* no remap artifact — selector stays hidden */ }
     renderAnimationDetail();
   }
 
@@ -1336,6 +1350,21 @@ async function pageAnimAssets(main) {
               <option value="">无皮肤</option>
               ${state.skins.map(s => `<option value="${esc(s.skin)}" ${state.selectedSkin && state.selectedSkin.skin === s.skin ? "selected" : ""}>${esc(s.skin)}</option>`).join("")}
             </select>
+          </div>
+          <div class="panel" style="margin:0">
+            <h3 style="margin:0 0 4px">衣物覆盖</h3>
+            <input id="clothingName" list="clothingNames" placeholder="衣物名，如 body_onepiece3_beach" style="width:100%">
+            <datalist id="clothingNames"></datalist>
+            <input id="clothingChar" list="characterNames" placeholder="角色（可空 = default）" style="width:100%;margin-top:4px">
+            <datalist id="characterNames">
+              <option value="default">default</option>
+              ${["wilson","willow","wolfgang","wickerbottom","wes","maxwell","waxwell","wagstaff","walter","wanda","warly","webber","wendy","wortox","wormwood","wurt","woodie","wathgrithr","winona","wx78","walani","woodlegs","wilba","woodcutter"].map(c => `<option value="${c}">${c}</option>`).join("")}
+            </datalist>
+            <div class="row" style="margin-top:4px;gap:4px">
+              <button class="btn" id="applyClothing">应用覆盖</button>
+              <button class="btn link" id="clearClothing">清除</button>
+            </div>
+            <div id="clothingMsg" class="muted" style="font-size:12px;margin-top:2px"></div>
           </div>
           <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
             <div class="row" style="justify-content:space-between;align-items:center">
@@ -1605,6 +1634,16 @@ async function pageAnimAssets(main) {
         const chosen = state.symbolBuilds[sym] || "";
         const defaultChosen = providers.find(b => !state.disabledBuilds.has(b.file));
         const effectiveChosen = chosen || (defaultChosen ? defaultChosen.file : "");
+        const remaps = state.remaps[sym] || [];
+        const remapChoice = String(state.remapChoice[sym] ?? "");
+        const remapHtml = remaps.length === 0 ? "" : `
+                <div style="margin:4px 0;display:flex;align-items:center;gap:6px">
+                  <span class="muted">↳ override</span>
+                  <select data-sym-remap="${esc(sym)}" style="flex:1">
+                    <option value="">— 不覆盖 —</option>
+                    ${remaps.map((r, i) => `<option value="${i}" ${remapChoice === String(i) ? "selected" : ""}>${esc(r.build || "*")} › ${esc(r.src_symbol)}${r.prefabs && r.prefabs.length ? ` (${esc(r.prefabs[0])})` : ""}</option>`).join("")}
+                  </select>
+                </div>`;
         return `
           <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
             <input type="checkbox" data-sym-toggle="${esc(sym)}" ${hidden ? "" : "checked"}>
@@ -1619,6 +1658,7 @@ async function pageAnimAssets(main) {
                     <code>${esc(b.file)}</code>
                     <span class="muted">${esc(b.name)}${b.skin ? " · skin" : ""}</span>
                   </label>`).join("")}
+                ${remapHtml}
               </div>
             </details>
           </div>`;
@@ -1641,8 +1681,59 @@ async function pageAnimAssets(main) {
           schedulePreviewRefresh();
         };
       });
+      main.querySelectorAll("[data-sym-remap]").forEach(sel => {
+        sel.onchange = () => {
+          const sym = sel.dataset.symRemap;
+          const idx = sel.value === "" ? null : parseInt(sel.value);
+          if (idx === null) delete state.remapChoice[sym];
+          else state.remapChoice[sym] = idx;
+          renderSymbolDeps();
+          schedulePreviewRefresh();
+        };
+      });
     };
     renderSymbolDeps();
+
+    // Clothing overrides (Tier-B): resolve a CLOTHING[name] entry into symbol
+    // overrides and merge them into the same remap-choice mechanism.
+    apiJSON("/api/anim/assets/clothing-overrides").then(r => {
+      const dl = $("#clothingNames");
+      if (dl) dl.innerHTML = (r.items || []).map(i => `<option value="${esc(i.name)}">${esc(i.type || "")} · ${i.symbols} symbols</option>`).join("");
+    }).catch(() => {});
+    $("#applyClothing").onclick = async () => {
+      const name = $("#clothingName").value.trim().toLowerCase();
+      if (!name) { $("#clothingMsg").textContent = "请输入衣物名"; return; }
+      const ch = $("#clothingChar").value.trim();
+      try {
+        const r = await apiJSON(`/api/anim/assets/clothing-overrides?name=${encodeURIComponent(name)}${ch ? `&character=${encodeURIComponent(ch)}` : ""}`);
+        const overrides = r.overrides || {};
+        for (const sym of state.clothingSymbols) {
+          delete state.remaps[sym];
+          delete state.remapChoice[sym];
+        }
+        state.clothingSymbols.clear();
+        for (const [sym, src] of Object.entries(overrides)) {
+          state.remaps[sym] = [{ build: r.build, src_symbol: src, api: "OverrideSkinSymbol", prefabs: [name] }];
+          state.remapChoice[sym] = 0;
+          state.clothingSymbols.add(sym);
+        }
+        $("#clothingMsg").textContent = `已应用 ${Object.keys(overrides).length} 个覆盖（build: ${r.build}）`;
+        renderSymbolDeps();
+        schedulePreviewRefresh();
+      } catch (e) {
+        $("#clothingMsg").textContent = "失败：" + e.message;
+      }
+    };
+    $("#clearClothing").onclick = () => {
+      for (const sym of state.clothingSymbols) {
+        delete state.remaps[sym];
+        delete state.remapChoice[sym];
+      }
+      state.clothingSymbols.clear();
+      $("#clothingMsg").textContent = "已清除衣物覆盖";
+      renderSymbolDeps();
+      schedulePreviewRefresh();
+    };
 
     const buildRenderParams = (format) => {
       const extra = Array.from(state.extraBuilds).filter(f => f !== state.selectedFile);
@@ -1657,6 +1748,11 @@ async function pageAnimAssets(main) {
       if (state.hiddenSymbols.size) params.set("hidden_symbols", Array.from(state.hiddenSymbols).join(","));
       const sb = Object.entries(state.symbolBuilds).map(([s,b]) => `${s}:${b}`).join(",");
       if (sb) params.set("symbol_builds", sb);
+      const so = Object.entries(state.remapChoice).map(([sym, idx]) => {
+        const r = (state.remaps[sym] || [])[idx];
+        return r ? `${sym}:${r.build || ""}:${r.src_symbol}` : null;
+      }).filter(Boolean).join(",");
+      if (so) params.set("symbol_overrides", so);
       if (state.selectedSkin) {
         params.set("skin_zip", state.selectedSkin.zip || "");
         if (state.selectedSkin.dyn) params.set("skin_dyn", state.selectedSkin.dyn);

@@ -251,8 +251,8 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         prefab_file_count += 1;
         skipped_pkgref_dyn += file_index.skipped_pkgref_dyn;
 
-        // Tier-A 提取：AnimState 符号重映射调用（静态常量三元组）。整文件
-        // 解析失败时静默跳过——Scanner 已把 PARSE_ERROR 记进 unresolved。
+        // Tier-A/C 提取：AnimState 符号重映射调用（常量三元组 + 变量追踪）。
+        // 整文件解析失败时静默跳过——Scanner 已把 PARSE_ERROR 记进 unresolved。
         let stem = path
             .file_stem()
             .and_then(|s| s.to_str())
@@ -303,6 +303,29 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             }
             if !record.anims.is_empty() || !record.unresolved.is_empty() {
                 prefab_records.push(record);
+            }
+        }
+    }
+
+    // Tier-C 覆盖面：重映射调用也大量存在于 stategraphs（SG*.lua）与
+    // components（skinner 等）。这些目录不做 prefab 结构扫描，仅提取调用。
+    for dir_name in ["stategraphs", "components"] {
+        let dir = params.scripts_root.join(dir_name);
+        if !dir.is_dir() {
+            continue;
+        }
+        let mut extra_files = Vec::new();
+        collect_lua_files(&dir, &mut extra_files)?;
+        extra_files.sort();
+        for path in &extra_files {
+            let source = std::fs::read_to_string(path)?;
+            let stem = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or_default()
+                .to_string();
+            if let Ok(mut calls) = parse_anim_overrides_in(&source, Some(&stem)) {
+                remap_calls.append(&mut calls);
             }
         }
     }

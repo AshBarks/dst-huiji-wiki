@@ -9,9 +9,10 @@ src/parser/
 ├── mod.rs               # Re-exports: LuaParser, PoParser, RecipeParser,
 │                        #   PrefabOverrideParser + convenience fns
 │                        #   (parse_recipes_from_file, parse_prefab_overrides)
-├── anim_override.rs     # AnimState 符号重映射提取（Tier A）：OverrideSymbol/
-│                        #   OverrideSkinSymbol/ClearOverrideSymbol 常量调用 →
-│                        #   SymbolRemapIndex（喂 dst-anim-tool SymbolOverrideMap）
+├── anim_override.rs     # AnimState 符号重映射提取（Tier A/C）：OverrideSymbol/
+│                        #   OverrideSkinSymbol/ClearOverrideSymbol 常量调用（static）
+│                        #   + 变量追踪（local 常量 / `..` 拼接 / `or` 回退 / alias
+│                        #   receiver → resolved）→ SymbolRemapIndex
 ├── clothing_overrides.rs # clothing.lua CLOTHING 数据表（Tier B）：symbol_overrides/
 │                        #   by_character/skintype 变体 → resolve_overrides() 复刻
 │                        #   skinner.lua 的 src_sym 合成规则

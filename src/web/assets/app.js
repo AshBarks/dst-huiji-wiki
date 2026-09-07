@@ -1641,7 +1641,7 @@ async function pageAnimAssets(main) {
                   <span class="muted">↳ override</span>
                   <select data-sym-remap="${esc(sym)}" style="flex:1">
                     <option value="">— 不覆盖 —</option>
-                    ${remaps.map((r, i) => `<option value="${i}" ${remapChoice === String(i) ? "selected" : ""}>${esc(r.build || "*")} › ${esc(r.src_symbol)}${r.prefabs && r.prefabs.length ? ` (${esc(r.prefabs[0])})` : ""}</option>`).join("")}
+                    ${remaps.map((r, i) => `<option value="${i}" ${remapChoice === String(i) ? "selected" : ""}>${r.confidence === "resolved" ? "≈ " : ""}${esc(r.build || "*")} › ${esc(r.src_symbol)}${r.prefabs && r.prefabs.length ? ` (${esc(r.prefabs[0])})` : ""}</option>`).join("")}
                   </select>
                 </div>`;
         return `

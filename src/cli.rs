@@ -25,6 +25,10 @@ pub enum Commands {
         input: Vec<PathBuf>,
         #[arg(short, long)]
         skin: Option<PathBuf>,
+        #[arg(long, value_name = "FILE")]
+        symbol_map: Option<PathBuf>,
+        #[arg(long, value_name = "FILE", num_args = 1..)]
+        build: Vec<PathBuf>,
         anim_path: String,
         output_dir: PathBuf,
     },
@@ -81,9 +85,18 @@ pub fn run(cli: Cli) -> dst_anim_tool::error::Result<()> {
             Commands::Render {
                 input,
                 skin,
+                symbol_map,
+                build,
                 anim_path,
                 output_dir,
-            } => cmd_render(&input, skin.as_deref(), &anim_path, &output_dir),
+            } => cmd_render(
+                &input,
+                skin.as_deref(),
+                symbol_map.as_deref(),
+                &build,
+                &anim_path,
+                &output_dir,
+            ),
             Commands::List { input } => cmd_list(&input),
             Commands::Info { input } => cmd_info(&input),
             Commands::Decrypt { input, output } => cmd_decrypt(&input, &output),
@@ -238,19 +251,28 @@ fn cmd_split(
 fn cmd_render(
     inputs: &[PathBuf],
     skin: Option<&Path>,
+    symbol_map: Option<&Path>,
+    extra_builds: &[PathBuf],
     anim_path: &str,
     output_dir: &Path,
 ) -> dst_anim_tool::error::Result<()> {
+    let overrides: dst_anim_tool::render::SymbolOverrideMap = match symbol_map {
+        Some(path) => {
+            let text = std::fs::read_to_string(path)?;
+            dst_anim_tool::render::parse_symbol_map(&text)
+                .map_err(dst_anim_tool::error::Error::Other)?
+        }
+        None => dst_anim_tool::render::SymbolOverrideMap::new(),
+    };
+    if !overrides.is_empty() {
+        println!("symbol overrides: {} entries", overrides.len());
+    }
+
     let mut base_archive = dst_anim_tool::archive::load_archives(inputs)?;
     let anim = base_archive
         .anim
         .as_ref()
         .ok_or_else(|| dst_anim_tool::error::Error::MissingData("anim.bin".to_string()))?;
-    if base_archive.build.is_none() {
-        return Err(dst_anim_tool::error::Error::MissingData(
-            "build.bin".to_string(),
-        ));
-    }
 
     let parts: Vec<&str> = anim_path.splitn(2, '/').collect();
     let bank_name = parts[0];
@@ -275,16 +297,15 @@ fn cmd_render(
         }
     };
 
-    {
+    let mut build_list: Vec<dst_anim_tool::build_file::BuildFile> = Vec::new();
+
+    if let Some(mut base_build) = base_archive.build.take() {
         let base_tex = base_archive.tex_files();
-        let base_build = base_archive.build.as_ref().unwrap();
         let base_atlas =
             dst_anim_tool::atlas::decode_atlas_images_from_tex(&base_build.atlases, base_tex);
-        dst_anim_tool::atlas::split_atlas(base_archive.build.as_mut().unwrap(), &base_atlas)?;
+        dst_anim_tool::atlas::split_atlas(&mut base_build, &base_atlas)?;
+        build_list.push(base_build);
     }
-
-    let mut build_list: Vec<dst_anim_tool::build_file::BuildFile> =
-        vec![base_archive.build.unwrap()];
 
     if let Some(skin_path) = skin {
         let mut skin_archive = load_skin_archive(skin_path)?;
@@ -294,6 +315,41 @@ fn cmd_render(
             dst_anim_tool::atlas::decode_atlas_images_from_tex(&skin_build.atlases, &skin_tex);
         dst_anim_tool::atlas::split_atlas(skin_build, &skin_atlas)?;
         build_list.insert(0, skin_archive.build.unwrap());
+    }
+
+    for extra in extra_builds {
+        let ext = extra
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_lowercase();
+        let mut archive = if ext == "dyn" {
+            load_skin_archive(extra)?
+        } else {
+            dst_anim_tool::archive::load_archives(std::slice::from_ref(extra))?
+        };
+        if archive.build.is_none() {
+            return Err(dst_anim_tool::error::Error::MissingData(format!(
+                "build.bin in {}",
+                extra.display()
+            )));
+        }
+        let tex = archive.tex_files().clone();
+        let build = archive.build.as_mut().unwrap();
+        let atlas = dst_anim_tool::atlas::decode_atlas_images_from_tex(&build.atlases, &tex);
+        dst_anim_tool::atlas::split_atlas(build, &atlas)?;
+        build_list.push(archive.build.unwrap());
+        println!(
+            "extra build: {} ({})",
+            build_list.last().unwrap().name,
+            extra.display()
+        );
+    }
+
+    if build_list.is_empty() {
+        return Err(dst_anim_tool::error::Error::MissingData(
+            "build.bin".to_string(),
+        ));
     }
 
     let animation = &base_archive.anim.as_ref().unwrap().banks[bank_idx].animations[anim_idx];
@@ -307,13 +363,14 @@ fn cmd_render(
         .collect();
     std::fs::create_dir_all(output_dir)?;
 
-    let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames(
+    let (bounds, prepared) = dst_anim_tool::render::prepare_animation_frames_with_overrides(
         &animation.frames,
         &bl,
         1.0,
         (0.0, 0.0),
         &HashSet::new(),
         &HashSet::new(),
+        &overrides,
     );
 
     prepared.par_iter().enumerate().try_for_each(

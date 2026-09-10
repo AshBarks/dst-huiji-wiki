@@ -14,6 +14,7 @@ use serde::Serialize;
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::io::{Cursor, Write};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, OnceLock};
 
 /// Export format requested by the user.
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
@@ -106,38 +107,90 @@ fn ensure_override_builds_loaded(
     Ok(())
 }
 
-/// Scan the anim tree once for archives whose build name is in `wanted`.
+type BuildNameIndex = HashMap<String, PathBuf>;
+type BuildNameCache = Mutex<HashMap<PathBuf, ((usize, u64), Arc<BuildNameIndex>)>>;
+
+/// 进程级构建名索引缓存：避免 `ensure_override_builds_loaded` 每次未命中
+/// 都全树解析 `data/anim`。键为动画树路径，失效信号为文件数 + 最大 mtime。
+static BUILD_NAME_CACHE: OnceLock<BuildNameCache> = OnceLock::new();
+
+/// 动画树签名（zip/dyn 文件数 + 最大 mtime 毫秒）。
+fn anim_tree_signature(anim_root: &Path) -> (usize, u64) {
+    let mut files = Vec::new();
+    if collect_anim_files(anim_root, &mut files).is_err() {
+        return (0, 0);
+    }
+    let max_mtime = files
+        .iter()
+        .filter_map(|path| {
+            std::fs::metadata(path)
+                .and_then(|m| m.modified())
+                .ok()
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_millis() as u64)
+        })
+        .max()
+        .unwrap_or(0);
+    (files.len(), max_mtime)
+}
+
+/// 全树扫描 `build.bin` 名 → 归档路径；同名取排序后第一个文件。
+fn scan_build_name_index(anim_root: &Path) -> Result<BuildNameIndex> {
+    let mut files = Vec::new();
+    collect_anim_files(anim_root, &mut files)?;
+    files.par_sort();
+    let entries: Vec<(String, PathBuf)> = files
+        .par_iter()
+        .filter_map(|path| {
+            let data = std::fs::read(path).ok()?;
+            let archive = dst_anim_tool::archive::parse_file_by_path(path, &data).ok()?;
+            let build = archive.build.as_ref()?;
+            Some((build.name.to_lowercase(), path.clone()))
+        })
+        .collect();
+    let mut index = BuildNameIndex::new();
+    for (name, path) in entries {
+        index.entry(name).or_insert(path);
+    }
+    Ok(index)
+}
+
+/// 取（或重建）构建名索引，签名未变时命中缓存。
+fn build_name_index(anim_root: &Path) -> Result<Arc<BuildNameIndex>> {
+    let cache_key = anim_root.to_path_buf();
+    let signature = anim_tree_signature(anim_root);
+    let cache = BUILD_NAME_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+    {
+        let guard = cache.lock().unwrap_or_else(|e| e.into_inner());
+        if let Some((cached_signature, index)) = guard.get(&cache_key) {
+            if *cached_signature == signature {
+                return Ok(Arc::clone(index));
+            }
+        }
+    }
+    let index = Arc::new(scan_build_name_index(anim_root)?);
+    let mut guard = cache.lock().unwrap_or_else(|e| e.into_inner());
+    guard.insert(cache_key, (signature, Arc::clone(&index)));
+    Ok(index)
+}
+
+/// Look up archives whose `build.bin` name is in `wanted`.
 /// Returns `(rel_path, path)` pairs, at most one per wanted name, in
 /// lexicographic rel-path order for determinism.
 fn find_archives_with_build_names(
     anim_root: &Path,
     wanted: &HashSet<String>,
 ) -> Result<Vec<(String, PathBuf)>> {
-    let mut files = Vec::new();
-    collect_anim_files(anim_root, &mut files)?;
-    files.par_sort();
-    let found: Vec<(String, PathBuf)> = files
-        .par_iter()
-        .filter_map(|path| {
-            let data = std::fs::read(path).ok()?;
-            let archive = dst_anim_tool::archive::parse_file_by_path(path, &data).ok()?;
-            let build = archive.build.as_ref()?;
-            let name = build.name.to_lowercase();
-            wanted.contains(&name).then(|| (name, path.clone()))
-        })
-        .collect();
-    let mut picked: HashMap<String, PathBuf> = HashMap::new();
-    for (name, path) in found {
-        picked.entry(name).or_insert(path);
-    }
-    let mut out: Vec<(String, PathBuf)> = picked
-        .into_values()
-        .map(|path| {
+    let index = build_name_index(anim_root)?;
+    let mut out: Vec<(String, PathBuf)> = wanted
+        .iter()
+        .filter_map(|name| {
+            let path = index.get(name)?;
             let rel = path
                 .strip_prefix(anim_root)
                 .map(|p| p.to_string_lossy().replace('\\', "/"))
                 .unwrap_or_default();
-            (rel, path)
+            Some((rel, path.clone()))
         })
         .collect();
     out.sort_by(|a, b| a.0.cmp(&b.0));
@@ -801,6 +854,20 @@ mod tests {
         }];
         ensure_override_builds_loaded(&root, &specs, &mut builds).unwrap();
         assert_eq!(builds.len(), 1);
+    }
+
+    #[test]
+    fn build_name_index_hits_cache_until_signature_changes() {
+        let root =
+            std::env::temp_dir().join(format!("build_name_index_cache_{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let first = build_name_index(&root).unwrap();
+        let second = build_name_index(&root).unwrap();
+        assert!(Arc::ptr_eq(&first, &second));
+        std::fs::write(root.join("probe.zip"), b"not an archive").unwrap();
+        let third = build_name_index(&root).unwrap();
+        assert!(!Arc::ptr_eq(&second, &third));
+        std::fs::remove_dir_all(&root).ok();
     }
 
     #[test]

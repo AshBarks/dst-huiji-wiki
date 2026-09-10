@@ -5,6 +5,10 @@
 //! assigns one giant table `TUNING = { KEY = expr, ... }`. Values reference
 //! those locals through arithmetic. World-option overrides (`tuning_override`)
 //! are explicitly out of scope; anything non-scalar is recorded as skipped.
+//!
+//! `build_tuning_leaves` additionally walks nested sub-tables and returns
+//! numeric leaves keyed by dotted path (`SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD`),
+//! which parsers use to resolve `TUNING.*` references in game scripts.
 
 use std::collections::BTreeMap;
 
@@ -75,29 +79,19 @@ fn eval_num(expr: &ast::Expression, locals: &BTreeMap<String, f64>) -> Option<f6
     }
 }
 
-/// Builds the tuning table from tuning.lua source text.
-pub fn build_tuning(source: &str) -> Result<TuningTable> {
-    let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
-
-    // Locate `function Tune(overrides)` and its body.
-    let tune_body = ast.nodes().stmts().find_map(|stmt| match stmt {
+/// Locates the body of `function Tune(overrides)`.
+fn find_tune_block(ast: &ast::Ast) -> Option<&ast::Block> {
+    ast.nodes().stmts().find_map(|stmt| match stmt {
         ast::Stmt::FunctionDeclaration(decl) if decl.name().to_string() == "Tune" => {
             Some(decl.body().block())
         }
         _ => None,
-    });
+    })
+}
 
-    let mut table = TuningTable::default();
-    let Some(tune_block) = tune_body else {
-        table.skipped.push(SkippedEntry {
-            key: None,
-            reason: "function Tune not found".to_string(),
-        });
-        return Ok(table);
-    };
-
-    // Pass A: fold numeric locals to a fixpoint (forward references through
-    // arithmetic are rare but the fixpoint is cheap).
+/// Folds numeric locals to a fixpoint (forward references through arithmetic
+/// are rare but the fixpoint is cheap).
+fn fold_tune_locals(tune_block: &ast::Block) -> BTreeMap<String, f64> {
     let mut locals: BTreeMap<String, f64> = BTreeMap::new();
     for _ in 0..8 {
         let mut changed = false;
@@ -119,9 +113,12 @@ pub fn build_tuning(source: &str) -> Result<TuningTable> {
             break;
         }
     }
+    locals
+}
 
-    // Pass B: locate `TUNING = { ... }` inside Tune.
-    let big_table = tune_block.stmts().find_map(|stmt| match stmt {
+/// Locates `TUNING = { ... }` inside the `Tune` body.
+fn find_tuning_table(tune_block: &ast::Block) -> Option<&ast::TableConstructor> {
+    tune_block.stmts().find_map(|stmt| match stmt {
         ast::Stmt::Assignment(assign) => {
             let names: Vec<_> = assign.variables().iter().collect();
             let exprs: Vec<_> = assign.expressions().iter().collect();
@@ -135,7 +132,74 @@ pub fn build_tuning(source: &str) -> Result<TuningTable> {
                 })
         }
         _ => None,
-    });
+    })
+}
+
+/// Recursively flattens numeric leaves of a `TUNING` sub-table into dotted
+/// paths (`SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD`). Strings and non-foldable
+/// expressions are ignored.
+fn flatten_numeric_leaves(
+    table: &ast::TableConstructor,
+    prefix: &str,
+    locals: &BTreeMap<String, f64>,
+    out: &mut BTreeMap<String, f64>,
+) {
+    for field in table.fields() {
+        let ast::Field::NameKey { key, value, .. } = field else {
+            continue;
+        };
+        let key_text = key.token().to_string();
+        let path = if prefix.is_empty() {
+            key_text
+        } else {
+            format!("{prefix}.{key_text}")
+        };
+        match value {
+            ast::Expression::TableConstructor(t) => {
+                flatten_numeric_leaves(t, &path, locals, out);
+            }
+            _ => {
+                if let Some(v) = eval_num(value, locals) {
+                    out.insert(path, v);
+                }
+            }
+        }
+    }
+}
+
+/// Numeric leaves of the game's `TUNING` table **including nested tables**,
+/// keyed by dotted path without the `TUNING.` prefix (e.g.
+/// `SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD`). Lets parsers resolve `TUNING.*`
+/// references found in game scripts.
+pub fn build_tuning_leaves(source: &str) -> Result<BTreeMap<String, f64>> {
+    let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
+    let Some(tune_block) = find_tune_block(&ast) else {
+        return Ok(BTreeMap::new());
+    };
+    let locals = fold_tune_locals(tune_block);
+    let Some(table_ctor) = find_tuning_table(tune_block) else {
+        return Ok(BTreeMap::new());
+    };
+    let mut out = BTreeMap::new();
+    flatten_numeric_leaves(table_ctor, "", &locals, &mut out);
+    Ok(out)
+}
+
+/// Builds the tuning table from tuning.lua source text.
+pub fn build_tuning(source: &str) -> Result<TuningTable> {
+    let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
+
+    let mut table = TuningTable::default();
+    let Some(tune_block) = find_tune_block(&ast) else {
+        table.skipped.push(SkippedEntry {
+            key: None,
+            reason: "function Tune not found".to_string(),
+        });
+        return Ok(table);
+    };
+
+    let locals = fold_tune_locals(tune_block);
+    let big_table = find_tuning_table(tune_block);
 
     let Some(table_ctor) = big_table else {
         table.skipped.push(SkippedEntry {
@@ -254,5 +318,56 @@ Tune()
         assert!(t.values.is_empty());
         assert_eq!(t.skipped.len(), 1);
         assert!(t.skipped[0].reason.contains("Tune"));
+    }
+
+    #[test]
+    fn nested_numeric_leaves_resolve_with_dotted_paths() {
+        let leaves = build_tuning_leaves(MINI_TUNING).unwrap();
+        assert_eq!(leaves.get("HOUND_DAMAGE"), Some(&20.0));
+        assert_eq!(leaves.get("SEG_TIME"), Some(&30.0));
+        // 嵌套表里引用了未定义局部量（day_time）的叶子无法求值。
+        assert_eq!(leaves.get("GROWTIME.base"), None);
+        // 字符串/不可求值表达式不会出现在结果里。
+        assert!(!leaves.contains_key("A_STRING"));
+        assert!(!leaves.contains_key("DEPENDS_ON_OVERRIDE"));
+    }
+
+    #[test]
+    fn nested_leaves_walk_skill_subtables() {
+        let src = r#"
+TUNING = {}
+
+function Tune(overrides)
+    local seg_time = 30
+    TUNING =
+    {
+        SKILLS =
+        {
+            WORTOX =
+            {
+                TIPPED_BALANCE_THRESHOLD = 3,
+                NICE_SANITY_MULT = 1 + 1,
+            },
+        },
+        HOUND_DAMAGE = 20,
+    }
+end
+
+Tune()
+"#;
+        let leaves = build_tuning_leaves(src).unwrap();
+        assert_eq!(
+            leaves.get("SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD"),
+            Some(&3.0)
+        );
+        assert_eq!(leaves.get("SKILLS.WORTOX.NICE_SANITY_MULT"), Some(&2.0));
+        assert_eq!(leaves.get("HOUND_DAMAGE"), Some(&20.0));
+        assert!(!leaves.contains_key("SKILLS"));
+    }
+
+    #[test]
+    fn nested_leaves_tolerate_missing_tune() {
+        let leaves = build_tuning_leaves("local x = 1\n").unwrap();
+        assert!(leaves.is_empty());
     }
 }

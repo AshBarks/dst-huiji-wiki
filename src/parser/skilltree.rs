@@ -82,6 +82,10 @@ struct SkillTable {
 struct ScanCtx<'a> {
     constants: &'a BTreeMap<String, f64>,
     local_fns: &'a BTreeMap<String, &'a ast::Block>,
+    /// `Table.field` -> function body, e.g.
+    /// `CUSTOM_FUNCTIONS.CalculateInclination`. Used to resolve character
+    /// custom lock helpers without hard-coding their bodies.
+    table_fns: &'a BTreeMap<String, &'a ast::Block>,
 }
 
 /// Parses a `skilltree_<character>.lua` source into a structured tree.
@@ -95,21 +99,43 @@ struct ScanCtx<'a> {
 ///
 /// `lock_open` closures are translated into the declarative JSON condition
 /// language used by the wiki (`CountTags` / `CountSkills` / comparisons /
-/// `And`/`Or`/`Not`). Conditions that cannot be resolved statically (external
-/// achievements, custom functions) fall back to "open", mirroring the wiki's
-/// own handling; the condition text is documented in the skill description.
+/// `And`/`Or`/`Not`, plus `Inclination` for Wortox's nice/naughty balance).
+/// Conditions that cannot be resolved statically (external achievements,
+/// custom functions) fall back to "open", mirroring the wiki's own handling;
+/// the condition text is documented in the skill description.
 pub fn parse_skill_tree(source: &str, character: &str) -> Result<SkillTree> {
+    parse_skill_tree_with_tuning(source, character, &BTreeMap::new())
+}
+
+/// Same as [`parse_skill_tree`], but resolves `TUNING.*` references found in
+/// the skill source (e.g. Wortox's inclination threshold). `tuning` maps
+/// dotted keys **without** the `TUNING.` prefix to numeric values, as
+/// produced by `update::index::tuning::build_tuning_leaves`.
+pub fn parse_skill_tree_with_tuning(
+    source: &str,
+    character: &str,
+    tuning: &BTreeMap<String, f64>,
+) -> Result<SkillTree> {
     let ast = full_moon::parse(source).map_err(crate::Error::LuaParse)?;
 
     let mut constants = BTreeMap::new();
     collect_numeric_locals(ast.nodes().stmts(), &mut constants);
+    // TUNING.* lookups share the constants map; keys keep the full
+    // expression text (`TUNING.SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD`).
+    for (key, value) in tuning {
+        constants.insert(format!("TUNING.{}", key), *value);
+    }
 
     let mut local_fns: BTreeMap<String, &ast::Block> = BTreeMap::new();
     collect_local_functions(ast.nodes().stmts(), &mut local_fns);
 
+    let mut table_fns: BTreeMap<String, &ast::Block> = BTreeMap::new();
+    collect_table_functions(ast.nodes().stmts(), &mut table_fns);
+
     let ctx = ScanCtx {
         constants: &constants,
         local_fns: &local_fns,
+        table_fns: &table_fns,
     };
 
     let mut scan = ScanState::default();
@@ -138,11 +164,12 @@ pub fn parse_skill_tree(source: &str, character: &str) -> Result<SkillTree> {
                 tags.push(group.clone());
             }
         }
-        let icon = if lock {
-            None
-        } else {
-            def.icon.or_else(|| Some(name.clone()))
-        };
+        // 显式声明的 icon 一律保留：信息板锁（如沃拓克斯的天秤好/坏倾向）
+        // 既有 lock_open 又有 icon，游戏里图标同样显示；只有没有显式 icon
+        // 的锁才保持无图标，普通技能则回退为同名图标。
+        let icon = def
+            .icon
+            .or_else(|| if lock { None } else { Some(name.clone()) });
         nodes.push(SkillNode {
             name,
             x,
@@ -355,6 +382,15 @@ fn eval_number(expr: &ast::Expression, constants: &BTreeMap<String, f64>) -> Opt
         ast::Expression::Number(n) => n.token().to_string().trim().parse::<f64>().ok(),
         ast::Expression::Var(ast::Var::Name(name)) => {
             constants.get(&name.token().to_string()).copied()
+        }
+        // `TUNING.SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD` 等点路径常量。
+        ast::Expression::Var(ast::Var::Expression(var_expr)) => {
+            let text: String = var_expr
+                .to_string()
+                .chars()
+                .filter(|c| !c.is_whitespace())
+                .collect();
+            constants.get(&text).copied()
         }
         ast::Expression::Parentheses { expression, .. } => eval_number(expression, constants),
         ast::Expression::UnaryOperator { unop, expression } => {
@@ -880,6 +916,15 @@ enum Cond {
     And(Box<Cond>, Box<Cond>),
     Or(Box<Cond>, Box<Cond>),
     Not(Box<Cond>),
+    /// 沃拓克斯天秤倾向：`nice`/`naughty` 为两侧计数表达式，`affinity`
+    /// 求值出 `"lunar"`/`"shadow"` 时为对应阵营加成一次，`threshold` 为
+    /// 倾斜阈值；整体求值为 `"nice"`/`"naughty"`/`nil`。
+    Inclination {
+        nice: Box<Cond>,
+        naughty: Box<Cond>,
+        affinity: Box<Cond>,
+        threshold: f64,
+    },
 }
 
 impl Cond {
@@ -903,6 +948,14 @@ impl Cond {
                 l.contains_unknown() || r.contains_unknown()
             }
             Cond::Not(x) => x.contains_unknown(),
+            Cond::Inclination {
+                nice,
+                naughty,
+                affinity,
+                ..
+            } => {
+                nice.contains_unknown() || naughty.contains_unknown() || affinity.contains_unknown()
+            }
             _ => false,
         }
     }
@@ -1067,6 +1120,19 @@ fn cond_to_json(cond: &Cond) -> serde_json::Value {
             "Or": { "left": cond_to_json(l), "right": cond_to_json(r) }
         }),
         Cond::Not(x) => serde_json::json!({ "Not": cond_to_json(x) }),
+        Cond::Inclination {
+            nice,
+            naughty,
+            affinity,
+            threshold,
+        } => serde_json::json!({
+            "Inclination": {
+                "nice": cond_to_json(nice),
+                "naughty": cond_to_json(naughty),
+                "affinity": cond_to_json(affinity),
+                "threshold": number_to_json(*threshold),
+            }
+        }),
     }
 }
 
@@ -1100,7 +1166,9 @@ fn translate_expr(
             translate_expr(expression, ctx, vars, depth, visiting)
         }
         ast::Expression::Var(var) => translate_var(var, ctx, vars, depth, visiting),
-        ast::Expression::FunctionCall(call) => translate_call_expr(call, ctx, depth, visiting),
+        ast::Expression::FunctionCall(call) => {
+            translate_call_expr(call, ctx, vars, depth, visiting)
+        }
         ast::Expression::BinaryOperator { lhs, binop, rhs } => {
             let l = translate_expr(lhs, ctx, vars, depth, visiting);
             let r = translate_expr(rhs, ctx, vars, depth, visiting);
@@ -1190,6 +1258,7 @@ fn translate_var(
 fn translate_call_expr(
     call: &ast::FunctionCall,
     ctx: &ScanCtx<'_>,
+    vars: &HashMap<String, Cond>,
     depth: usize,
     visiting: &mut HashSet<String>,
 ) -> Cond {
@@ -1217,6 +1286,30 @@ fn translate_call_expr(
         }
         return Cond::Unknown;
     }
+    // 沃拓克斯天秤：`CUSTOM_FUNCTIONS.CalculateInclination(nice, naughty,
+    // affinitytype) == "nice"`。把两侧计数、阵营表达式与阈值提取成声明式
+    // `Inclination`，前端按同一套规则求值，无需复刻 Lua 闭包。
+    if head.ends_with("CalculateInclination") {
+        let (Some(nice), Some(naughty), Some(affinity)) = (args.first(), args.get(1), args.get(2))
+        else {
+            return Cond::Unknown;
+        };
+        let nice = translate_expr(nice, ctx, vars, depth, visiting);
+        let naughty = translate_expr(naughty, ctx, vars, depth, visiting);
+        let affinity = translate_expr(affinity, ctx, vars, depth, visiting);
+        if nice.contains_unknown() || naughty.contains_unknown() || affinity.contains_unknown() {
+            return Cond::Unknown;
+        }
+        let Some(threshold) = find_inclination_threshold(&head, ctx) else {
+            return Cond::Unknown;
+        };
+        return Cond::Inclination {
+            nice: Box::new(nice),
+            naughty: Box::new(naughty),
+            affinity: Box::new(affinity),
+            threshold,
+        };
+    }
     if let Some(block) = ctx.local_fns.get(head.as_str()) {
         let key = head.clone();
         if visiting.contains(&key) {
@@ -1228,6 +1321,29 @@ fn translate_call_expr(
         return result;
     }
     Cond::Unknown
+}
+
+/// Scans a known custom-function body for the inclination threshold
+/// (`if math.abs(diff) >= TUNING.X then`), resolving the bound through the
+/// shared constants map.
+fn find_inclination_threshold(head: &str, ctx: &ScanCtx<'_>) -> Option<f64> {
+    let block = ctx.table_fns.get(head)?;
+    for stmt in block.stmts() {
+        if let ast::Stmt::If(if_stmt) = stmt {
+            if let ast::Expression::BinaryOperator { lhs, binop, rhs } = if_stmt.condition() {
+                if matches!(binop, ast::BinOp::GreaterThanEqual(_)) && is_math_abs(lhs) {
+                    if let Some(value) = eval_number(rhs, ctx.constants) {
+                        return Some(value);
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+fn is_math_abs(expr: &ast::Expression) -> bool {
+    matches!(expr, ast::Expression::FunctionCall(call) if call_head(call) == "math.abs")
 }
 
 /// Callee head text of a call, e.g. `SkillTreeFns.CreateSkillCountLock`.
@@ -1376,6 +1492,92 @@ fn collect_local_functions<'a>(
     }
 }
 
+/// Records `Table.field = function ... end` entries of one table constructor
+/// and recurses into the function bodies.
+fn collect_table_ctor_functions<'a>(
+    var: &str,
+    table: &'a ast::TableConstructor,
+    table_fns: &mut BTreeMap<String, &'a ast::Block>,
+) {
+    for field in table.fields() {
+        if let ast::Field::NameKey {
+            key,
+            value: ast::Expression::Function(func),
+            ..
+        } = field
+        {
+            let key = format!("{}.{}", var, key.token());
+            table_fns.insert(key, func.body().block());
+            collect_table_functions(func.body().block().stmts(), table_fns);
+        }
+    }
+}
+
+/// Registers functions held in table fields (any nesting level), e.g.
+/// `local CUSTOM_FUNCTIONS = { CalculateInclination = function(...) end }`.
+/// Keys are dotted (`CUSTOM_FUNCTIONS.CalculateInclination`).
+fn collect_table_functions<'a>(
+    stmts: impl Iterator<Item = &'a ast::Stmt>,
+    table_fns: &mut BTreeMap<String, &'a ast::Block>,
+) {
+    for stmt in stmts {
+        match stmt {
+            ast::Stmt::LocalAssignment(assignment) => {
+                for (name, expr) in assignment
+                    .names()
+                    .iter()
+                    .zip(assignment.expressions().iter())
+                {
+                    let ast::Expression::TableConstructor(t) = expr else {
+                        continue;
+                    };
+                    collect_table_ctor_functions(&name.token().to_string(), t, table_fns);
+                }
+            }
+            // `local CUSTOM_FUNCTIONS;CUSTOM_FUNCTIONS = { ... }` 是常见的
+            // 前向声明 + 普通赋值写法，这里同样收表内函数。
+            ast::Stmt::Assignment(assignment) => {
+                for (var, expr) in assignment
+                    .variables()
+                    .iter()
+                    .zip(assignment.expressions().iter())
+                {
+                    let ast::Var::Name(name) = var else {
+                        continue;
+                    };
+                    let ast::Expression::TableConstructor(t) = expr else {
+                        continue;
+                    };
+                    collect_table_ctor_functions(&name.token().to_string(), t, table_fns);
+                }
+            }
+            ast::Stmt::LocalFunction(func) => {
+                collect_table_functions(func.body().block().stmts(), table_fns);
+            }
+            ast::Stmt::FunctionDeclaration(func) => {
+                collect_table_functions(func.body().block().stmts(), table_fns);
+            }
+            ast::Stmt::Do(stmt) => collect_table_functions(stmt.block().stmts(), table_fns),
+            ast::Stmt::If(stmt) => {
+                collect_table_functions(stmt.block().stmts(), table_fns);
+                if let Some(else_ifs) = stmt.else_if() {
+                    for branch in else_ifs {
+                        collect_table_functions(branch.block().stmts(), table_fns);
+                    }
+                }
+                if let Some(block) = stmt.else_block() {
+                    collect_table_functions(block.stmts(), table_fns);
+                }
+            }
+            ast::Stmt::NumericFor(stmt) => collect_table_functions(stmt.block().stmts(), table_fns),
+            ast::Stmt::GenericFor(stmt) => collect_table_functions(stmt.block().stmts(), table_fns),
+            ast::Stmt::While(stmt) => collect_table_functions(stmt.block().stmts(), table_fns),
+            ast::Stmt::Repeat(stmt) => collect_table_functions(stmt.block().stmts(), table_fns),
+            _ => {}
+        }
+    }
+}
+
 /// Attempts to interpret a keyed table entry as a skill node (fallback path
 /// for unusual files without a recognizable `skills` table).
 #[allow(dead_code)]
@@ -1385,9 +1587,11 @@ fn try_parse_skill(
     constants: &BTreeMap<String, f64>,
 ) -> Option<SkillNode> {
     let local_fns = BTreeMap::new();
+    let table_fns = BTreeMap::new();
     let ctx = ScanCtx {
         constants,
         local_fns: &local_fns,
+        table_fns: &table_fns,
     };
     let def = raw_def_from_table(table, &ctx)?;
     let (x, y) = def.pos?;
@@ -1405,7 +1609,7 @@ fn try_parse_skill(
         group: def.group,
         root: def.root,
         connects: def.connects,
-        icon: if lock { None } else { def.icon },
+        icon: def.icon,
         lock,
         locks: def.locks,
         lock_open: def.lock_open,
@@ -1921,5 +2125,96 @@ local skills = {
             inf.forced_focus,
             Some(serde_json::json!({ "left": "a", "right": "b" }))
         );
+    }
+
+    const WORTOX_INCLINATION: &str = r#"
+local CUSTOM_FUNCTIONS;CUSTOM_FUNCTIONS = {
+    CalculateInclination = function(nice, naughty, affinitytype)
+        local diff = nice - naughty
+        if affinitytype then
+            if diff < 0 then
+                diff = diff - 1
+            elseif diff > 0 then
+                diff = diff + 1
+            end
+        end
+        if math.abs(diff) >= TUNING.SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD then
+            if nice > naughty then
+                return "nice"
+            else
+                return "naughty"
+            end
+        end
+        return nil
+    end,
+}
+
+local skills = {
+    wortox_inclination_meter = {
+        pos = {4, 202},
+        group = "neutral",
+        root = true,
+        infographic = true,
+        icon = "wortox_scales",
+        button_decorations = { init = function() end },
+    },
+    wortox_inclination_nice = {
+        pos = {-166, 230},
+        group = "neutral",
+        root = true,
+        infographic = true,
+        icon = "wortox_inclination_nice",
+        lock_open = function(prefabname, activatedskills, readonly)
+            local nice = SkillTreeFns.CountTags(prefabname, "nice", activatedskills)
+            local naughty = SkillTreeFns.CountTags(prefabname, "naughty", activatedskills)
+            local affinitytype = activatedskills and (activatedskills["wortox_allegiance_lunar"] and "lunar" or activatedskills["wortox_allegiance_shadow"] and "shadow") or nil
+            return CUSTOM_FUNCTIONS.CalculateInclination(nice, naughty, affinitytype) == "nice"
+        end,
+    },
+}
+"#;
+
+    #[test]
+    fn test_inclination_condition_uses_tuning_threshold() {
+        let tuning = BTreeMap::from([("SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD".to_string(), 3.0)]);
+        let tree = parse_skill_tree_with_tuning(WORTOX_INCLINATION, "wortox", &tuning).unwrap();
+        let node = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "wortox_inclination_nice")
+            .unwrap();
+        // 信息板锁保留显式 icon（游戏里图标照常显示）。
+        assert!(node.lock);
+        assert!(node.infographic);
+        assert_eq!(node.icon.as_deref(), Some("wortox_inclination_nice"));
+
+        let lock_open = node.lock_open.as_ref().unwrap();
+        assert_eq!(lock_open["Eq"]["right"], serde_json::json!("nice"));
+        let inclination = &lock_open["Eq"]["left"]["Inclination"];
+        assert_eq!(
+            inclination["nice"],
+            serde_json::json!({ "CountTags": "nice" })
+        );
+        assert_eq!(
+            inclination["naughty"],
+            serde_json::json!({ "CountTags": "naughty" })
+        );
+        assert_eq!(inclination["threshold"], serde_json::json!(3));
+        let affinity = inclination["affinity"].to_string();
+        assert!(affinity.contains("wortox_allegiance_lunar"));
+        assert!(affinity.contains("lunar"));
+        assert!(affinity.contains("wortox_allegiance_shadow"));
+    }
+
+    #[test]
+    fn test_inclination_without_tuning_stays_open() {
+        let tree = parse_skill_tree(WORTOX_INCLINATION, "wortox").unwrap();
+        let node = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "wortox_inclination_nice")
+            .unwrap();
+        // 阈值无法解析时退回“视为解锁”，不产生半截条件。
+        assert_eq!(node.lock_open, Some(serde_json::json!(true)));
     }
 }

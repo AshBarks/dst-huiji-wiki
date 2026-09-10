@@ -5,7 +5,7 @@
 
 use crate::error::{Error, Result};
 use crate::models::Recipe;
-use crate::parser::{parse_skill_tree, PoParser, RecipeParser};
+use crate::parser::{parse_skill_tree_with_tuning, PoParser, RecipeParser};
 use serde::Serialize;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
@@ -331,6 +331,14 @@ fn count_tuning_keys(source: &str) -> usize {
         .count()
 }
 
+/// Parses `tuning.lua` numeric leaves (dotted keys without the `TUNING.`
+/// prefix) so parsers can resolve `TUNING.*` references. Includes nested
+/// tables, e.g. `SKILLS.WORTOX.TIPPED_BALANCE_THRESHOLD`.
+pub fn load_tuning_numbers(snapshot: Option<&str>) -> Result<BTreeMap<String, f64>> {
+    let source = read_game_file(snapshot, "tuning.lua")?;
+    crate::update::index::tuning::build_tuning_leaves(&source)
+}
+
 /// Parses one character's skill tree, enriching nodes with zh titles/descs.
 pub fn load_skill_tree(
     ctx_snapshot: Option<&str>,
@@ -341,7 +349,8 @@ pub fn load_skill_tree(
         ctx_snapshot,
         &format!("prefabs/skilltree_{}.lua", character),
     )?;
-    let tree = parse_skill_tree(&content, character)?;
+    let tuning = load_tuning_numbers(ctx_snapshot)?;
+    let tree = parse_skill_tree_with_tuning(&content, character, &tuning)?;
 
     let upper_char = character.to_uppercase();
     let prefix = format!("STRINGS.SKILLTREE.{}.", upper_char);

@@ -20,4 +20,4 @@ pub use prefab_override::{
     parse_prefab_overrides, OverrideValue, PrefabNameOverride, PrefabOverrideParser, SourceLocation,
 };
 pub use recipe::{parse_recipes_from_file, parse_recipes_from_str, RecipeParser};
-pub use skilltree::{parse_skill_tree, SkillNode, SkillTree};
+pub use skilltree::{parse_skill_tree, parse_skill_tree_with_tuning, SkillNode, SkillTree};

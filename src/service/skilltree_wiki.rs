@@ -8,7 +8,7 @@
 use super::dataset::{load_skill_strings, read_game_file};
 use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::Result;
-use crate::parser::skilltree::{parse_skill_tree, SkillNode};
+use crate::parser::skilltree::{parse_skill_tree_with_tuning, SkillNode};
 use crate::service::progress::Reporter;
 use crate::wiki::WikiClient;
 use std::path::PathBuf;
@@ -154,7 +154,8 @@ async fn maintain_character(
 ) -> Result<(String, usize, usize)> {
     let page_title = page_title(character);
     let content = read_game_file(None, &format!("prefabs/skilltree_{}.lua", character))?;
-    let tree = parse_skill_tree(&content, character)?;
+    let tuning = super::dataset::load_tuning_numbers(None)?;
+    let tree = parse_skill_tree_with_tuning(&content, character, &tuning)?;
 
     let page = client.get_page(&page_title).await.ok();
     let existing = page

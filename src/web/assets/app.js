@@ -565,37 +565,46 @@ async function pageSkills(main) {
   const sel = $("#charSel");
   sel.value = chars.includes("wilson") ? "wilson" : chars[0];
 
-  // 常量与零件:Skilltree.js 完全一致。
+  // 坐标体系与游戏 widgets/redux/skilltreewidget.lua 与 skilltreebuilder.lua
+  // 一致：SVG 视口 = 部件根坐标（向右 +x，游戏 y 向上 → 视口 y 取负）。
+  //   - 弹窗背景 background.tex 600x460 @ (0,-20)（playerinfopopupscreen.MakeBG）
+  //   - 角色背景 625x384 原图按 521x320 绘制 @ (5,50)（skilltreewidget.lua）
+  //   - 技能树 root 在 (0,-50)，buildbuttons 再偏移 -30 ⇒ 节点画面位置 (x, y-80)
+  //   - 洞察面板 root.xp = (3,215)，同样受 root 偏移影响 ⇒ 画面 (3,165)
   const WIDTH = 600;
-  const HEIGHT = 540;
   const SVG_HEIGHT = 460;
-  const X_SCALE = 1;
-  const X_OFFSET = -2;          // 原始文件中背景图 bg_tree xoffset 2
-  const Y_SCALE = 1.157;        // 原始文件高度 756 缩到 460 的补偿
-  const Y_OFFSET = 50 + 30 - 20;// tree yoffset -50 + panel -30 + bg_tree -20
-  const ICON_SIZE = 28;
-  const ICON_BUTTON_SIZE = 32;
-  const LOCK_SIZE = 28 * 0.8;
-  const SKILL_FOCUS_SIZE = 40;
+  const VIEW_TOP = -210;                        // 游戏 y=210（背景上沿）→ 视口顶部
+  const BG_ART_W = 521, BG_ART_H = 320;         // BG_WIDTH_INGAME / BG_HEIGHT_INGAME
+  const BG_X = 5 - BG_ART_W / 2;
+  const BG_Y = -(50 + BG_ART_H / 2);
+  const NODE_Y_OFFSET = -80;                    // panel -30 + tree -50
+  const ICON_SIZE = 28;                         // TILESIZE-4
+  const INFO_ICON_SIZE = 27;                    // TILESIZE_INFOGRAPHIC
+  const ICON_BUTTON_SIZE = 32;                  // TILESIZE
+  const INFO_BUTTON_SIZE = (ICON_BUTTON_SIZE - 5) * Math.SQRT2;
+  const INFO_FRAME_SIZE = INFO_BUTTON_SIZE * (80 / 64) - 4;
+  const LOCK_SIZE = ICON_BUTTON_SIZE * 0.8;     // 锁按钮 SetScale(0.8)
+  const SKILL_FOCUS_SIZE = 40;                  // TILESIZE_FRAME
   const LOCK_FOCUS_SIZE = 40;
   const TOTAL_XP = 15;
   const XP_SIZE = 50;
-  const X_XP = 1;
-  const Y_XP = 215 - 50 + 20;
+  const XP_X = 3;
+  const XP_Y = 215 - 50;                        // root.xp (3,215) + tree -50
   const buttonWidth = 180;
   const buttonHeight = 43;
-  const buttonLeftX = WIDTH / 2 - 40 - buttonWidth;
-  const buttonRightX = WIDTH / 2 + 40;
-  const buttonY = HEIGHT - 170;
+  const buttonLeftX = -130 - buttonWidth / 2;
+  const buttonRightX = 130 - buttonWidth / 2;
+  const buttonY = 150;                          // 游戏坐标 y=-150（背景下沿之下）
 
   const skillAsset = (name) => `/static/split/skilltree/${encodeURIComponent(name)}.png`;
   const reduxAsset = (name) => `/static/split/global_redux/${encodeURIComponent(name)}.png`;
   const iconUrl = (icon) => `/static/split/skilltree_icons/${encodeURIComponent(icon)}.png`;
 
   let tree = null;
-  let skills = {};   // name -> node（icon 存在的节点）
-  let locks = {};    // name -> node（lock_open 节点）
-  let parents = {};  // skill -> 直接父技能（connects 指向它的技能）
+  let nodeByName = {}; // name -> node
+  let skills = {};     // name -> node（icon 存在的节点；含信息板）
+  let locks = {};      // name -> node（lock_open 节点；含信息板锁）
+  let parents = {};    // skill -> 直接父技能（connects 指向它的技能）
 
   let activatedSkills = new Set();
   let focusing = null;
@@ -606,23 +615,31 @@ async function pageSkills(main) {
   let learnBtn = null;       // {normal, hover, down, learned, text}
   let resetBtn = null;
 
-  function yScale() {
-    return ["wendy", "wortox"].includes(sel.value.toLowerCase()) ? 1 : Y_SCALE;
-  }
-  const px = (x) => WIDTH / 2 + X_SCALE * (X_OFFSET + x);
-  const py = (y) => HEIGHT / 2 - yScale() * (y - Y_OFFSET);
+  // 节点画面位置 = (x, y + NODE_Y_OFFSET)，再翻转到 SVG 视口。
+  const px = (x) => x;
+  const py = (y) => -(y + NODE_Y_OFFSET);
+
+  // API 对所有非锁节点也序列化 lock_open:null，必须显式排除 null。
+  const isLockNode = (n) => !!n && n.lock_open !== undefined && n.lock_open !== null;
+
+  // 可学习的普通技能（锁与信息板都不吃洞察点，与游戏 rpc_id 规则一致）。
+  const learnable = (name) => {
+    const n = skills[name];
+    return !!n && !isLockNode(n) && !n.infographic;
+  };
 
   function buildMaps(nodes) {
-    skills = {}; locks = {}; parents = {};
+    nodeByName = {}; skills = {}; locks = {}; parents = {};
     for (const n of nodes) {
+      nodeByName[n.name] = n;
       if (n.icon) skills[n.name] = n;
-      else if (n.lock_open !== undefined) locks[n.name] = n;
+      if (isLockNode(n)) locks[n.name] = n;
     }
     for (const n of nodes) {
-      if (skills[n.name]) parents[n.name] = [];
+      if (learnable(n.name)) parents[n.name] = [];
     }
     for (const n of nodes) for (const c of (n.connects || [])) {
-      if (skills[n.name] && parents[c]) parents[c].push(n.name);
+      if (learnable(n.name) && parents[c]) parents[c].push(n.name);
       // 与零件:Skilltree.js 相同：锁的 connects 子技能把该锁并入自己的
       // locks（"只有一个lock的skill会没有locks"），进入 must_have_all_of。
       if (locks[n.name] && skills[c]) {
@@ -664,10 +681,46 @@ async function pageSkills(main) {
         case "CountSkills": return activatedSkills.size;
         case "ActivatedSkill": return activatedSkills.has(val);
         case "Add": return evalLockCond(val.left) + evalLockCond(val.right);
+        case "Inclination": {
+          const state = inclinationState(val);
+          return state ? state.side : null;
+        }
         default: return false;
       }
     }
     return false;
+  }
+
+  // 沃拓克斯天秤：复刻 skilltree_wortox.lua 的 CUSTOM_FUNCTIONS.CalculateInclination。
+  // affinity 生效时先向所选阵营修正一档，再做阈值比较。
+  // 返回 null 或 { nice, naughty, diff, side, threshold, affinity }。
+  function inclinationState(inc) {
+    if (!inc || typeof inc !== "object") return null;
+    const nice = Number(evalLockCond(inc.nice)) || 0;
+    const naughty = Number(evalLockCond(inc.naughty)) || 0;
+    let diff = nice - naughty;
+    const affinity = evalLockCond(inc.affinity);
+    if (affinity) {
+      if (diff < 0) diff -= 1;
+      else if (diff > 0) diff += 1;
+    }
+    const threshold = Number(inc.threshold) || 0;
+    const side = threshold > 0 && Math.abs(diff) >= threshold
+      ? (diff > 0 ? "nice" : "naughty")
+      : null;
+    return { nice, naughty, diff, side, threshold, affinity: affinity || null };
+  }
+
+  // 从任一天秤锁节点取回 Inclination 条件（nice/naughty 两侧共享参数）。
+  function findInclination() {
+    for (const n of tree.nodes) {
+      const inc = n.lock_open
+        && n.lock_open.Eq
+        && n.lock_open.Eq.left
+        && n.lock_open.Eq.left.Inclination;
+      if (inc) return inc;
+    }
+    return null;
   }
 
   function isLockOpen(name) {
@@ -677,6 +730,22 @@ async function pageSkills(main) {
     return !!evalLockCond(lock.lock_open);
   }
 
+  // 节点底图（与游戏 RefreshTree 的分支顺序一致）：
+  //   锁 → 信息板锁 on/off，普通锁 unlocked/locked
+  //   信息板 → infographic
+  //   普通技能 → selected/selectable/unselected
+  function baseTexture(name) {
+    const n = nodeByName[name];
+    if (!n) return "unselected";
+    if (isLockNode(n)) {
+      const open = isLockOpen(name);
+      if (n.infographic) return open ? "infographic_on" : "infographic_off";
+      return open ? "unlocked" : "locked";
+    }
+    if (n.infographic) return "infographic";
+    return statusOf(name) || "unselected";
+  }
+
   // 可学条件与零件:Skilltree.js / 游戏激活校验（ValidateCharacterData 的
   // must_have_one_of / must_have_all_of）一致：
   //   root，或（所有 locks 打开 且 有父技能被激活——无父技能视为可达）。
@@ -684,8 +753,7 @@ async function pageSkills(main) {
   // 但真正学习要过服务端校验，父技能激活（或父为已开锁）仍是前提。
   function statusOf(name) {
     const skill = skills[name];
-    if (!skill) return null;
-    if (skill.infographic) return "selected";
+    if (!skill || !learnable(name)) return null;
     if (activatedSkills.has(name)) return "selected";
     if (remainingXp() <= 0) return "unselected";
     const unlocked = !(skill.locks || []).some(l => !isLockOpen(l));
@@ -695,7 +763,7 @@ async function pageSkills(main) {
   }
 
   function canLearn(name) {
-    return skills[name] && !skills[name].infographic && statusOf(name) === "selectable";
+    return learnable(name) && statusOf(name) === "selectable";
   }
 
   function setBg(g, name, hover) {
@@ -703,15 +771,19 @@ async function pageSkills(main) {
     if (g._href !== href) { g.bg.setAttribute("href", href); g._href = href; }
   }
 
-  function svgImg(href, x, y, w, h, extra) {
-    return `<image href="${esc(href)}" x="${x}" y="${y}" width="${w}" height="${h}" ${extra || ""}preserveAspectRatio="xMidYMid meet"/>`;
+  function svgImg(href, x, y, w, h, par) {
+    return `<image href="${esc(href)}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="${par || "xMidYMid meet"}"/>`;
   }
 
   function infoTitle(name) {
-    const n = tree.nodes.find(m => m.name === name);
+    const n = nodeByName[name];
     if (!n) return name;
-    if (n.icon) return n.title || n.name;
-    return isLockOpen(name) ? "已解锁路径" : "路径锁定";
+    // 对应 skilltreebuilder.lua 的 gettitle：只有非信息板的锁才显示
+    // 解锁/锁定文案，信息板（含天秤好/坏倾向）始终显示自己的标题。
+    if (isLockNode(n) && !n.infographic) {
+      return isLockOpen(name) ? "已解锁路径" : "路径锁定";
+    }
+    return n.title || n.name;
   }
 
   function updateInfoPanel() {
@@ -729,7 +801,7 @@ async function pageSkills(main) {
   // 对应零件:Skilltree.js 的 switchLearnButton：左下按钮随焦点状态切换。
   function switchLearnButton() {
     const st = focusing ? statusOf(focusing) : null;
-    if (st === "selected" && !(focusing && skills[focusing] && skills[focusing].infographic)) {
+    if (st === "selected") {
       learnBtn.text.textContent = "已掌握技能";
       learnBtn.text.style.display = "";
       learnBtn.learned.style.display = "inline";
@@ -764,22 +836,51 @@ async function pageSkills(main) {
 
   function update() {
     if (!tree) return;
-    // 先更新锁，再更新技能（与游戏 RefreshTree 的顺序一致）。
-    for (const name in locks) {
+    // 与游戏 RefreshTree 一致：统一按当前状态刷新所有已渲染节点底图。
+    for (const name in gfx) {
       const g = gfx[name];
-      if (!g) continue;
-      setBg(g, isLockOpen(name) ? "unlocked" : "locked_skill", g._hover);
-    }
-    for (const name in skills) {
-      const g = gfx[name];
-      if (!g) continue;
-      setBg(g, statusOf(name) || "unselected", g._hover);
+      setBg(g, baseTexture(name), g._hover);
     }
     $("#skillXp").textContent = `剩余洞察：${remainingXp()}`;
     const xpEle = $("#skXpNum");
     if (xpEle) xpEle.textContent = String(remainingXp());
+    updateBalance();
     switchLearnButton();
     updateInfoPanel();
+  }
+
+  // 刷新沃拓克斯天秤读数（圆点 = 好/坏计数按阈值分档，与 UpdateToken 一致）。
+  function updateBalance() {
+    const layer = $("#skBalance");
+    if (!layer) return;
+    const inc = findInclination();
+    const state = inc ? inclinationState(inc) : null;
+    if (!state) { layer.style.display = "none"; return; }
+    layer.style.display = "";
+    const setDots = (role, count) => {
+      layer.querySelectorAll(`circle[data-role="${role}"]`).forEach(c => {
+        const index = Number(c.dataset.i) + 1;
+        const on = count >= index;
+        c.setAttribute("fill", on
+          ? (role === "niceDot" ? "#e8c76a" : "#c96f5a")
+          : "rgba(255,255,255,0.25)");
+      });
+    };
+    // 与 UpdateToken 相同：diff 超出阈值时全部点亮（overcharged 只多发光）。
+    setDots("niceDot", state.diff);
+    setDots("naughtyDot", -state.diff);
+    const text = layer.querySelector('[data-role="balanceText"]');
+    const base = `好 ${state.nice} : ${state.naughty} 坏`;
+    if (state.side === "nice") {
+      text.textContent = `${base} · 好孩子倾向`;
+      text.setAttribute("fill", "#e8c76a");
+    } else if (state.side === "naughty") {
+      text.textContent = `${base} · 淘气包倾向`;
+      text.setAttribute("fill", "#c96f5a");
+    } else {
+      text.textContent = base;
+      text.setAttribute("fill", "rgba(255,255,255,0.7)");
+    }
   }
 
   function render() {
@@ -788,40 +889,60 @@ async function pageSkills(main) {
       $("#skwrap").innerHTML = '<p class="muted">该角色暂无技能树数据。</p>';
       return;
     }
-    const byName = Object.fromEntries(nodes.map(n => [n.name, n]));
+    const inclination = findInclination();
+    const meter = nodes.find(n => n.button_decorations && n.infographic);
 
-    // 背景与连线（连接线由背景画承载，与零件:Skilltree.js 一致，不另画）。
+    // 背景与连线（连接线由角色背景画承载，与游戏一致，不另画）。
+    // 全屏弹窗背景 600x460 @ (0,-20)（playerinfopopupscreen.MakeBG）；
+    // 角色背景按游戏 skilltreewidget.lua 的 521x320 @ (5,50) 绘制。
     const genericBg = skillAsset("background");
     const charBg = skillAsset(`${sel.value}_background`);
 
     // 图层顺序（SVG 按文档顺序绘制）：bg → textbox → icon-bg → icon → focus → button。
     const parts = [];
-    parts.push(svgImg(genericBg, 0, 0, WIDTH, HEIGHT));
-    parts.push(svgImg(charBg, 0, 0, WIDTH, HEIGHT));
+    parts.push(svgImg(genericBg, -WIDTH / 2, VIEW_TOP, WIDTH, SVG_HEIGHT, "none"));
+    parts.push(svgImg(charBg, BG_X, BG_Y, BG_ART_W, BG_ART_H, "none"));
 
-    // XP 面板（游戏 root.xp 在 (3,215)，换算同上）。
-    const x_xp = WIDTH / 2 + X_XP;
-    const y_xp = HEIGHT / 2 - Y_XP * yScale();
+    // 洞察面板（游戏 root.xp 在 (3,215)，沃拓克斯的天秤装饰会把它移到 x=0）。
+    const x_xp = inclination ? 0 : XP_X;
+    const y_xp = -XP_Y;
     parts.push(svgImg(skillAsset("skill_icon_textbox_white"), x_xp - XP_SIZE / 2, y_xp - XP_SIZE / 2, XP_SIZE, XP_SIZE));
     parts.push(`<text id="skXpNum" x="${x_xp}" y="${y_xp + 7}" text-anchor="middle" font-size="20" fill="white" class="unselectable">${remainingXp()}</text>`);
     parts.push(`<text x="${x_xp + 30}" y="${y_xp + 7}" font-size="15" fill="white" class="unselectable">剩余洞察</text>`);
 
-    // 每个节点的状态底图 + 图标。
+    // 每个节点的状态底图 + 图标（信息板按钮/图标另有尺寸）。
     gfx = {};
     for (const n of nodes) {
-      const isLock = !n.icon;
-      if (!isLock && !skills[n.name]) continue;
-      if (isLock && !locks[n.name]) continue;
+      if (!n.icon && !isLockNode(n)) continue;
+      const isLock = isLockNode(n);
       const x = px(n.x), y = py(n.y);
-      const size = n.infographic ? ICON_BUTTON_SIZE : (isLock ? LOCK_SIZE : ICON_BUTTON_SIZE);
-      const bgName = n.infographic ? "infographic_on" : (isLock ? (isLockOpen(n.name) ? "unlocked" : "locked_skill") : statusOf(n.name) || "unselected");
+      const size = n.infographic
+        ? INFO_BUTTON_SIZE
+        : (isLock ? LOCK_SIZE : ICON_BUTTON_SIZE);
+      const iconSize = n.infographic ? INFO_ICON_SIZE : ICON_SIZE;
+      const bgName = baseTexture(n.name);
       parts.push(`<g class="node" data-name="${esc(n.name)}">`);
       parts.push(`<image data-role="bg" href="${esc(skillAsset(bgName))}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`);
       if (n.icon) {
-        parts.push(`<image data-role="icon" href="${esc(iconUrl(n.icon))}" x="${x - ICON_SIZE / 2}" y="${y - ICON_SIZE / 2}" width="${ICON_SIZE}" height="${ICON_SIZE}" preserveAspectRatio="xMidYMid meet"/>`);
+        parts.push(`<image data-role="icon" href="${esc(iconUrl(n.icon))}" x="${x - iconSize / 2}" y="${y - iconSize / 2}" width="${iconSize}" height="${iconSize}" preserveAspectRatio="xMidYMid meet"/>`);
       }
       parts.push(`</g>`);
       gfx[n.name] = { bg: null, icon: null, isLock, infographic: !!n.infographic, x, y, _hover: false, _href: skillAsset(bgName) };
+    }
+
+    // 沃拓克斯天秤读数：游戏用 wortox_balance 动画摆砝码，这里以等价的
+    // 圆点 + 文本呈现好/坏计数与阈值（数量、修正规则与游戏一致）。
+    if (inclination && meter) {
+      const threshold = Number(inclination.threshold) || 0;
+      const mx = px(meter.x), my = py(meter.y);
+      const dotY = my + INFO_BUTTON_SIZE / 2 + 12;
+      parts.push(`<g id="skBalance" pointer-events="none" style="display:none">`);
+      for (let i = 0; i < threshold; i++) {
+        parts.push(`<circle data-role="niceDot" data-i="${i}" cx="${mx - 16 - i * 11}" cy="${dotY}" r="4" fill="rgba(255,255,255,0.25)"/>`);
+        parts.push(`<circle data-role="naughtyDot" data-i="${i}" cx="${mx + 16 + i * 11}" cy="${dotY}" r="4" fill="rgba(255,255,255,0.25)"/>`);
+      }
+      parts.push(`<text data-role="balanceText" class="unselectable" x="${mx}" y="${dotY + 20}" text-anchor="middle" font-size="13"></text>`);
+      parts.push(`</g>`);
     }
 
     // 焦点框。
@@ -843,7 +964,7 @@ async function pageSkills(main) {
     parts.push(`<rect data-role="resetProxy" x="${buttonRightX}" y="${buttonY}" width="${buttonWidth}" height="${buttonHeight}" fill="transparent" style="cursor:pointer"/>`);
 
     $("#skwrap").innerHTML =
-      `<svg viewBox="0 0 ${WIDTH} ${SVG_HEIGHT}" width="100%" style="display:block;width:100%;height:auto;aspect-ratio:${WIDTH} / ${SVG_HEIGHT};background:#151923;border-radius:10px">
+      `<svg viewBox="${-WIDTH / 2} ${VIEW_TOP} ${WIDTH} ${SVG_HEIGHT}" width="100%" style="display:block;width:100%;height:auto;aspect-ratio:${WIDTH} / ${SVG_HEIGHT};background:#151923;border-radius:10px">
         ${parts.join("")}</svg>`;
 
     const svg = $("#skwrap svg");
@@ -855,15 +976,12 @@ async function pageSkills(main) {
       ele.style.cursor = "pointer";
       ele.addEventListener("mouseenter", () => {
         g._hover = true;
-        const n = byName[name];
-        const base = g.infographic ? "infographic_on" : (g.isLock ? (isLockOpen(name) ? "unlocked" : "locked_skill") : statusOf(name) || "unselected");
-        setBg(g, base, true);
+        setBg(g, baseTexture(name), true);
         g.bg.parentElement.insertBefore(g.bg, g.icon || null);
       });
       ele.addEventListener("mouseleave", () => {
         g._hover = false;
-        const base = g.infographic ? "infographic_on" : (g.isLock ? (isLockOpen(name) ? "unlocked" : "locked_skill") : statusOf(name) || "unselected");
-        setBg(g, base, false);
+        setBg(g, baseTexture(name), false);
       });
       ele.addEventListener("click", () => focusNode(name));
       // 游戏内双击技能按钮即学习。
@@ -923,11 +1041,23 @@ async function pageSkills(main) {
       focusing = name;
       const g = gfx[name];
       if (g) {
-        const focusEle = g.isLock ? lockFocusEle : skillFocusEle;
-        const other = g.isLock ? skillFocusEle : lockFocusEle;
-        const size = g.isLock ? LOCK_FOCUS_SIZE : SKILL_FOCUS_SIZE;
+        const n = nodeByName[name] || {};
+        const isInfo = !!n.infographic;
+        // 信息板即使带 lock_open 也用八角形以外的信息板边框（游戏里
+        // infographic 的 frame 优先级高于 lock_open）。
+        const useLockFrame = g.isLock && !isInfo;
+        const focusEle = useLockFrame ? lockFocusEle : skillFocusEle;
+        const other = useLockFrame ? skillFocusEle : lockFocusEle;
+        const size = useLockFrame
+          ? LOCK_FOCUS_SIZE
+          : (isInfo ? INFO_FRAME_SIZE : SKILL_FOCUS_SIZE);
+        if (!useLockFrame) {
+          focusEle.setAttribute("href", skillAsset(isInfo ? "frame_infographic" : "frame"));
+        }
         focusEle.setAttribute("x", g.x - size / 2);
         focusEle.setAttribute("y", g.y - size / 2);
+        focusEle.setAttribute("width", size);
+        focusEle.setAttribute("height", size);
         focusEle.style.display = "inline";
         other.style.display = "none";
       }

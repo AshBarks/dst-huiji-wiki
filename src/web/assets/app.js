@@ -52,6 +52,7 @@ async function render(path) {
     `<a href="#/${seg}" class="${seg === head ? "active" : ""}">${label}</a>`).join("");
 
   const main = $("#app");
+  main.classList.toggle("wide", head === "anim-assets");
   main.innerHTML = `<p class="muted">加载中…</p>`;
   try {
     await loadMeta();
@@ -1136,6 +1137,7 @@ async function pageAnimAssets(main) {
     symbolBuilds: {},
     remaps: {},
     remapChoice: {},
+    remapOptOut: new Set(),
     clothingSymbols: new Set(),
     disabledBuilds: new Set(),
     candidateBuilds: [],
@@ -1200,6 +1202,7 @@ async function pageAnimAssets(main) {
     state.symbolBuilds = {};
     state.remaps = {};
     state.remapChoice = {};
+    state.remapOptOut = new Set();
     state.clothingSymbols.clear();
     state.disabledBuilds.clear();
     state.candidateBuilds = [];
@@ -1327,6 +1330,9 @@ async function pageAnimAssets(main) {
         const syms = (state.info.symbols || []).join(",");
         const r = await apiJSON(`/api/anim/assets/remaps${syms ? `?symbols=${encodeURIComponent(syms)}` : ""}`);
         state.remaps = r.symbols || {};
+        for (const entries of Object.values(state.remaps)) {
+          for (const e of entries) e.source = "tier_a";
+        }
     } catch (e) { /* no remap artifact — selector stays hidden */ }
     renderAnimationDetail();
   }
@@ -1339,8 +1345,8 @@ async function pageAnimAssets(main) {
     const frames = info.frames || [];
 
     main.innerHTML = `
-      <div style="display:grid;grid-template-columns:280px 1fr 320px;gap:12px;height:calc(100vh - 120px);min-height:520px">
-        <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+      <div class="anim-detail-grid">
+        <div class="anim-col-left">
           <div class="panel" style="margin:0">
             <div class="row" style="justify-content:space-between;align-items:center">
               <h3 style="margin:0">Skin</h3>
@@ -1366,14 +1372,14 @@ async function pageAnimAssets(main) {
             </div>
             <div id="clothingMsg" class="muted" style="font-size:12px;margin-top:2px"></div>
           </div>
-          <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
+          <div class="panel anim-side-panel">
             <div class="row" style="justify-content:space-between;align-items:center">
               <h3 style="margin:0">Animations</h3>
               <button class="btn link" id="collapseAnims">折叠全部</button>
             </div>
             <div id="leftAnims" style="overflow-y:auto;flex:1;min-height:0"></div>
           </div>
-          <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
+          <div class="panel anim-side-panel">
             <div class="row" style="justify-content:space-between;align-items:center">
               <h3 style="margin:0">Builds</h3>
               <button class="btn link" id="findMissingBuilds">补齐缺失 Symbol</button>
@@ -1390,7 +1396,7 @@ async function pageAnimAssets(main) {
             <div id="candidateBuilds" style="overflow-y:auto;max-height:35%;min-height:0"></div>
           </div>
         </div>
-        <div class="panel" style="display:flex;flex-direction:column;min-height:0;margin:0">
+        <div class="panel anim-col-center">
           <div class="row" style="justify-content:space-between;align-items:center">
             <button class="btn secondary" id="backToPrefab">返回搜索</button>
             <b><code>${esc(info.bank)} / ${esc(info.animation)}</code></b>
@@ -1402,15 +1408,15 @@ async function pageAnimAssets(main) {
             <button class="btn secondary" id="exportPng">导出 PNG 序列</button>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
-          <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
+        <div class="anim-col-right">
+          <div class="panel anim-side-panel">
             <h3>当前帧详情</h3>
             <div style="margin-bottom:6px">
               <input type="range" id="frameRange" min="0" max="${Math.max(0, frames.length - 1)}" value="0" style="width:100%">
             </div>
             <div id="frameDetail" style="overflow-y:auto;flex:1;min-height:0"></div>
           </div>
-          <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:0">
+          <div class="panel anim-side-panel">
             <div class="row" style="justify-content:space-between;align-items:center">
               <h3 style="margin:0">Symbol Dependencies</h3>
               <button class="btn link" id="collapseSymbols">折叠全部</button>
@@ -1451,14 +1457,11 @@ async function pageAnimAssets(main) {
     $("#leftAnims").innerHTML = Object.entries(groupedAnims).map(([file, items]) => `
       <details ${file === state.selectedFile ? "open" : ""} style="margin-bottom:2px">
         <summary style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><code>${esc(file)}</code></summary>
-        <div style="margin-left:14px">
+        <div style="margin-left:10px">
           ${items.map(x => {
             const active = x.file === state.selectedFile && x.bank === state.selectedBank && x.anim === state.selectedAnim;
-            return `<div style="padding:1px 0;line-height:1.2">
-              <button class="btn link ${active ? 'active' : ''}" data-switch="${esc(x.file)}|${esc(x.bank)}|${esc(x.anim)}" style="text-align:left;width:100%">
-                ${esc(x.bank)} / ${esc(x.anim)}
-              </button>
-            </div>`;
+            const label = `${x.bank} / ${x.anim}`;
+            return `<button class="btn link anim-item ${active ? 'active' : ''}" data-switch="${esc(x.file)}|${esc(x.bank)}|${esc(x.anim)}" title="${esc(label)}">${esc(label)}</button>`;
           }).join("")}
         </div>
       </details>`).join("") || '<p class="muted">无动画</p>';
@@ -1475,13 +1478,13 @@ async function pageAnimAssets(main) {
     $("#leftBuilds").innerHTML = builds.map(b => {
       const disabled = state.disabledBuilds.has(b.file);
       const syms = b.symbols || [];
-      return `<details data-build-details="${esc(b.file)}" style="padding:2px 0;line-height:1.3">
-        <summary style="cursor:pointer;display:flex;align-items:center;gap:6px" title="${esc(syms.join(", "))}">
+      return `<details data-build-details="${esc(b.file)}" style="padding:1px 0">
+        <summary class="list-row" style="cursor:pointer" title="${esc(syms.join(", "))}">
           <input type="checkbox" data-build-toggle="${esc(b.file)}" ${disabled ? "" : "checked"}>
-          <code style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.file)}</code>
-          <span class="muted">${syms.length}s / ${(b.atlases || []).length}a</span>
+          <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
+          <span class="list-meta">${syms.length}s / ${(b.atlases || []).length}a</span>
         </summary>
-        <div style="margin:4px 0 6px 22px">
+        <div style="margin:4px 0 6px 18px">
           <input type="text" placeholder="过滤 symbol…" data-build-filter="${esc(b.file)}" style="width:100%">
           <div class="muted" style="font-size:12px;margin-top:2px">atlases: ${(b.atlases || []).map(esc).join(", ") || "—"}</div>
           <div data-build-symbols style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;max-height:180px;overflow-y:auto">
@@ -1537,10 +1540,10 @@ async function pageAnimAssets(main) {
         : list.map(b => {
             const checked = state.extraBuilds.has(b.file);
             const disabled = state.disabledBuilds.has(b.file);
-            return `<div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+            return `<div class="list-row">
               <input type="checkbox" data-candidate-toggle="${esc(b.file)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
-              <code>${esc(b.file)}</code>
-              <span class="muted">${(b.matched_symbols || []).join(",")}</span>
+              <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
+              <span class="list-meta" title="${esc((b.matched_symbols || []).join(", "))}">${(b.matched_symbols || []).join(",")}</span>
             </div>`;
           }).join("");
       $("#candidateBuilds").querySelectorAll("[data-candidate-toggle]").forEach(chk => {
@@ -1626,6 +1629,27 @@ async function pageAnimAssets(main) {
     };
 
     // Right: symbol dependencies (re-rendered on state changes to stay consistent)
+    const isTierA = (e) => e.source !== "clothing";
+    const providersFor = (sym) =>
+      builds.concat((state.candidateBuilds || []).filter(b => state.extraBuilds.has(b.file)))
+        .filter(b => (b.symbols || []).some(x => x.toLowerCase() === sym.toLowerCase()));
+    const enabledProvidersFor = (sym) =>
+      providersFor(sym).filter(b => !state.disabledBuilds.has(b.file));
+    const autoRemapIdx = (sym) => {
+      if (state.hiddenSymbols.has(sym)) return -1;
+      if (Object.prototype.hasOwnProperty.call(state.remapChoice, sym)) return -1;
+      if (state.remapOptOut.has(sym)) return -1;
+      if (enabledProvidersFor(sym).length > 0) return -1;
+      return (state.remaps[sym] || []).findIndex(e => isTierA(e) && e.confidence === "static");
+    };
+    const effectiveRemapIdx = (sym) => {
+      if (Object.prototype.hasOwnProperty.call(state.remapChoice, sym)) {
+        const idx = state.remapChoice[sym];
+        return idx >= 0 && idx < (state.remaps[sym] || []).length ? idx : -1;
+      }
+      return autoRemapIdx(sym);
+    };
+
     const renderSymbolDeps = () => {
       const allBuilds = builds.concat((state.candidateBuilds || []).filter(b => state.extraBuilds.has(b.file)));
       const symHtml = symbolSet.map(sym => {
@@ -1635,28 +1659,32 @@ async function pageAnimAssets(main) {
         const defaultChosen = providers.find(b => !state.disabledBuilds.has(b.file));
         const effectiveChosen = chosen || (defaultChosen ? defaultChosen.file : "");
         const remaps = state.remaps[sym] || [];
-        const remapChoice = String(state.remapChoice[sym] ?? "");
+        const autoIdx = autoRemapIdx(sym);
+        const activeIdx = effectiveRemapIdx(sym);
         const remapHtml = remaps.length === 0 ? "" : `
-                <div style="margin:4px 0;display:flex;align-items:center;gap:6px">
-                  <span class="muted">↳ override</span>
-                  <select data-sym-remap="${esc(sym)}" style="flex:1">
-                    <option value="">— 不覆盖 —</option>
-                    ${remaps.map((r, i) => `<option value="${i}" ${remapChoice === String(i) ? "selected" : ""}>${r.confidence === "resolved" ? "≈ " : ""}${esc(r.build || "*")} › ${esc(r.src_symbol)}${r.prefabs && r.prefabs.length ? ` (${esc(r.prefabs[0])})` : ""}</option>`).join("")}
+                <div style="margin:3px 0;display:flex;align-items:center;gap:6px">
+                  <span class="muted" style="font-size:11px">↳ 映射候选</span>
+                  <select data-sym-remap="${esc(sym)}" style="flex:1;font-size:12px;padding:4px 6px">
+                    <option value="" ${activeIdx < 0 ? "selected" : ""}>— 不覆盖 —</option>
+                    ${remaps.map((r, i) => `<option value="${i}" ${activeIdx === i ? "selected" : ""}>${i === autoIdx ? "auto · " : ""}${r.confidence === "resolved" ? "≈ " : ""}${esc(r.build || "*")} › ${esc(r.src_symbol)} · ${esc(r.api || "")}${r.prefabs && r.prefabs.length ? ` (${esc(r.prefabs[0])})` : ""}</option>`).join("")}
                   </select>
-                </div>`;
+                </div>
+                ${autoIdx >= 0 ? '<div class="muted" style="font-size:11px">无同名 provider，自动采用 static 映射</div>' : ""}`;
         return `
-          <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+          <div class="list-row">
             <input type="checkbox" data-sym-toggle="${esc(sym)}" ${hidden ? "" : "checked"}>
-            <details style="flex:1">
-              <summary style="cursor:pointer"><code>${esc(sym)}</code> ${hidden ? '<span class="badge b-warn">hidden</span>' : ""}</summary>
-              <div style="margin-left:14px;padding:4px 0">
+            <details style="flex:1;min-width:0">
+              <summary style="cursor:pointer;display:flex;align-items:center;gap:4px">
+                <code class="list-name" title="${esc(sym)}">${esc(sym)}</code>${hidden ? '<span class="badge b-warn">hidden</span>' : ""}${autoIdx >= 0 ? '<span class="badge b-ok">auto-map</span>' : ""}
+              </summary>
+              <div style="margin-left:10px;padding:2px 0">
                 ${providers.length === 0 ? '<span class="muted">missing — no build provides this symbol</span>' : providers.map(b => `
-                  <label style="display:flex;align-items:center;gap:6px;padding:2px 0">
+                  <label style="display:flex;align-items:center;gap:6px;padding:1px 0;font-size:12px">
                     <input type="radio" name="sym-${esc(sym)}" value="${esc(b.file)}"
                       data-sym-build="${esc(sym)}" ${effectiveChosen === b.file ? "checked" : ""}
                       ${state.disabledBuilds.has(b.file) ? "disabled" : ""}>
-                    <code>${esc(b.file)}</code>
-                    <span class="muted">${esc(b.name)}${b.skin ? " · skin" : ""}</span>
+                    <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
+                    <span class="list-meta">${esc(b.name)}${b.skin ? " · skin" : ""}</span>
                   </label>`).join("")}
                 ${remapHtml}
               </div>
@@ -1676,7 +1704,10 @@ async function pageAnimAssets(main) {
       });
       main.querySelectorAll("[data-sym-build]").forEach(radio => {
         radio.onchange = () => {
-          state.symbolBuilds[radio.dataset.symBuild] = radio.value;
+          const sym = radio.dataset.symBuild;
+          state.symbolBuilds[sym] = radio.value;
+          delete state.remapChoice[sym];
+          state.remapOptOut.delete(sym);
           renderSymbolDeps();
           schedulePreviewRefresh();
         };
@@ -1684,9 +1715,13 @@ async function pageAnimAssets(main) {
       main.querySelectorAll("[data-sym-remap]").forEach(sel => {
         sel.onchange = () => {
           const sym = sel.dataset.symRemap;
-          const idx = sel.value === "" ? null : parseInt(sel.value);
-          if (idx === null) delete state.remapChoice[sym];
-          else state.remapChoice[sym] = idx;
+          if (sel.value === "") {
+            delete state.remapChoice[sym];
+            state.remapOptOut.add(sym);
+          } else {
+            state.remapOptOut.delete(sym);
+            state.remapChoice[sym] = parseInt(sel.value);
+          }
           renderSymbolDeps();
           schedulePreviewRefresh();
         };
@@ -1713,8 +1748,9 @@ async function pageAnimAssets(main) {
         }
         state.clothingSymbols.clear();
         for (const [sym, src] of Object.entries(overrides)) {
-          state.remaps[sym] = [{ build: r.build, src_symbol: src, api: "OverrideSkinSymbol", prefabs: [name] }];
+          state.remaps[sym] = [{ build: r.build, src_symbol: src, api: "OverrideSkinSymbol", prefabs: [name], source: "clothing" }];
           state.remapChoice[sym] = 0;
+          state.remapOptOut.delete(sym);
           state.clothingSymbols.add(sym);
         }
         $("#clothingMsg").textContent = `已应用 ${Object.keys(overrides).length} 个覆盖（build: ${r.build}）`;
@@ -1748,11 +1784,24 @@ async function pageAnimAssets(main) {
       if (state.hiddenSymbols.size) params.set("hidden_symbols", Array.from(state.hiddenSymbols).join(","));
       const sb = Object.entries(state.symbolBuilds).map(([s,b]) => `${s}:${b}`).join(",");
       if (sb) params.set("symbol_builds", sb);
-      const so = Object.entries(state.remapChoice).map(([sym, idx]) => {
+      const so = [];
+      const seen = new Set();
+      for (const sym of symbolSet) {
+        if (state.hiddenSymbols.has(sym)) continue;
+        const idx = effectiveRemapIdx(sym);
+        if (idx < 0) continue;
         const r = (state.remaps[sym] || [])[idx];
-        return r ? `${sym}:${r.build || ""}:${r.src_symbol}` : null;
-      }).filter(Boolean).join(",");
-      if (so) params.set("symbol_overrides", so);
+        if (r) {
+          so.push(`${sym}:${r.build || ""}:${r.src_symbol}`);
+          seen.add(sym);
+        }
+      }
+      for (const [sym, idx] of Object.entries(state.remapChoice)) {
+        if (seen.has(sym)) continue;
+        const r = (state.remaps[sym] || [])[idx];
+        if (r) so.push(`${sym}:${r.build || ""}:${r.src_symbol}`);
+      }
+      if (so.length) params.set("symbol_overrides", so.join(","));
       if (state.selectedSkin) {
         params.set("skin_zip", state.selectedSkin.zip || "");
         if (state.selectedSkin.dyn) params.set("skin_dyn", state.selectedSkin.dyn);

@@ -16,9 +16,10 @@ impl App {
                     }
                 }
 
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("Symbol Map", &["toml", "txt"])
-                    .pick_file()
+                if ui.button("Load Symbol Map").clicked()
+                    && let Some(path) = rfd::FileDialog::new()
+                        .add_filter("Symbol Map", &["toml", "txt"])
+                        .pick_file()
                 {
                     self.load_symbol_map(&path);
                 }

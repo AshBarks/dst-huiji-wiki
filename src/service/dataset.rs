@@ -379,6 +379,7 @@ pub fn load_skill_tree(
                 "infographic": n.infographic,
                 "forced_focus": n.forced_focus,
                 "button_decorations": n.button_decorations,
+                "decorations": n.decorations,
                 "title": strings.by_ctxt.get(&title_key),
                 "desc": strings.by_ctxt.get(&desc_key),
             })
@@ -388,6 +389,7 @@ pub fn load_skill_tree(
     Ok(serde_json::json!({
         "character": tree.character,
         "groups": tree.groups(),
+        "background": tree.background,
         "nodes": nodes,
     }))
 }

@@ -91,13 +91,14 @@ pub enum Commands {
         report_json: Option<PathBuf>,
     },
     /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
-    /// defs JSON 并维护维基子页面（保留页内 metainfo/icon_url）
+    /// defs JSON 并维护维基子页面（保留页内 metainfo/icon_url；--output 同时
+    /// 写出 Skilltree.js 渲染器与图片清单）
     #[command(name = "skilltree-wiki")]
     SkillTreeWiki {
         /// 只处理名字包含该子串的角色（如 walter）
         #[arg(short, long)]
         character: Option<String>,
-        /// 同时把每个子页面内容写到该目录（<Char>.lua）
+        /// 同时把每个子页面内容与 Skilltree.js 写到该目录（<Char>.lua、Skilltree.js）
         #[arg(short, long)]
         output: Option<PathBuf>,
         /// 使用指定 scripts 快照（默认当前 scripts 树）

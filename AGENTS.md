@@ -48,6 +48,7 @@ dst-huiji-wiki/
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
+| Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; must stay in sync with `src/web/assets/app.js` skilltree section |
 | Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync) vars |
 
 ## CODE MAP

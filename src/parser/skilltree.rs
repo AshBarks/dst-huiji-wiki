@@ -23,6 +23,23 @@ pub struct SkillNode {
     pub infographic: bool,
     pub forced_focus: Option<serde_json::Value>,
     pub button_decorations: bool,
+    /// 静态装饰图（`button_decorations` 的 `CreateShelfDecor` 形式，如
+    /// 薇诺娜的货架）；动态装饰（沃拓克斯天秤）仍只给标记。
+    pub decorations: Vec<SkillDecoration>,
+}
+
+/// 一张静态装饰图，位置为游戏部件根坐标（已应用 `CreateShelfDecor` 里的
+/// `y - 50` 偏移），渲染时按图片中心对齐。
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SkillDecoration {
+    pub img: String,
+    pub pos: [f64; 2],
+    /// `ScaleToSize(width, height)`；与 `scale` 互斥。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<[f64; 2]>,
+    /// `SetScale(scale)`（按原图尺寸缩放）。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scale: Option<f64>,
 }
 
 /// A full character skill tree.
@@ -30,6 +47,15 @@ pub struct SkillNode {
 pub struct SkillTree {
     pub character: String,
     pub nodes: Vec<SkillNode>,
+    /// `BACKGROUND_SETTINGS`（目前只有薇诺娜显式设置）。
+    pub background: Option<BackgroundSettings>,
+}
+
+/// 角色背景的展示设置（`skilltree_<char>.lua` 的 `BACKGROUND_SETTINGS`）。
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct BackgroundSettings {
+    /// 前端是否给背景叠金色 tint；`Some(false)` 表示显式关闭。
+    pub tint_bright: Option<bool>,
 }
 
 impl SkillTree {
@@ -64,6 +90,16 @@ struct RawSkillDef {
     infographic: bool,
     forced_focus: Option<serde_json::Value>,
     button_decorations: bool,
+    decorations: Vec<RawDecoration>,
+}
+
+/// 解析阶段的静态装饰图定义。
+#[derive(Debug, Clone)]
+struct RawDecoration {
+    img: String,
+    pos: (f64, f64),
+    size: Option<(f64, f64)>,
+    scale: Option<f64>,
 }
 
 impl RawSkillDef {
@@ -86,6 +122,8 @@ struct ScanCtx<'a> {
     /// `CUSTOM_FUNCTIONS.CalculateInclination`. Used to resolve character
     /// custom lock helpers without hard-coding their bodies.
     table_fns: &'a BTreeMap<String, &'a ast::Block>,
+    /// 局部变量名 -> 静态装饰列表（`CreateShelfDecor({...})` 赋值）。
+    decorations: &'a BTreeMap<String, Vec<RawDecoration>>,
 }
 
 /// Parses a `skilltree_<character>.lua` source into a structured tree.
@@ -132,10 +170,14 @@ pub fn parse_skill_tree_with_tuning(
     let mut table_fns: BTreeMap<String, &ast::Block> = BTreeMap::new();
     collect_table_functions(ast.nodes().stmts(), &mut table_fns);
 
+    let mut decorations: BTreeMap<String, Vec<RawDecoration>> = BTreeMap::new();
+    collect_decorations(ast.nodes().stmts(), &constants, &mut decorations);
+
     let ctx = ScanCtx {
         constants: &constants,
         local_fns: &local_fns,
         table_fns: &table_fns,
+        decorations: &decorations,
     };
 
     let mut scan = ScanState::default();
@@ -170,6 +212,16 @@ pub fn parse_skill_tree_with_tuning(
         let icon = def
             .icon
             .or_else(|| if lock { None } else { Some(name.clone()) });
+        let decorations = def
+            .decorations
+            .into_iter()
+            .map(|d| SkillDecoration {
+                img: d.img,
+                pos: [d.pos.0, d.pos.1],
+                size: d.size.map(|(w, h)| [w, h]),
+                scale: d.scale,
+            })
+            .collect();
         nodes.push(SkillNode {
             name,
             x,
@@ -188,13 +240,55 @@ pub fn parse_skill_tree_with_tuning(
             infographic: def.infographic,
             forced_focus: def.forced_focus,
             button_decorations: def.button_decorations,
+            decorations,
         });
     }
 
     Ok(SkillTree {
         character: character.to_string(),
         nodes,
+        background: parse_background_settings(ast.nodes().stmts()),
     })
+}
+
+/// Reads the top-level `BACKGROUND_SETTINGS = { tint_bright = ... }` table.
+/// Non-table (or table) tint values both mean "tint enabled"; only an
+/// explicit `false` disables it. `None` means the file has no settings.
+fn parse_background_settings<'a>(
+    stmts: impl Iterator<Item = &'a ast::Stmt>,
+) -> Option<BackgroundSettings> {
+    for stmt in stmts {
+        let ast::Stmt::LocalAssignment(assignment) = stmt else {
+            continue;
+        };
+        for (name, expr) in assignment
+            .names()
+            .iter()
+            .zip(assignment.expressions().iter())
+        {
+            if name.token().to_string() != "BACKGROUND_SETTINGS" {
+                continue;
+            }
+            let ast::Expression::TableConstructor(t) = expr else {
+                continue;
+            };
+            let mut settings = BackgroundSettings::default();
+            for field in t.fields() {
+                if field_name(field).as_deref() != Some("tint_bright") {
+                    continue;
+                }
+                settings.tint_bright = match field_value(field) {
+                    Some(ast::Expression::Symbol(s)) if s.token().to_string() == "false" => {
+                        Some(false)
+                    }
+                    Some(_) => Some(true),
+                    None => None,
+                };
+            }
+            return Some(settings);
+        }
+    }
+    None
 }
 
 #[derive(Default)]
@@ -660,7 +754,16 @@ fn raw_def_from_table(table: &ast::TableConstructor, ctx: &ScanCtx<'_>) -> Optio
                     }
                 }
             }
-            "button_decorations" => def.button_decorations = true,
+            "button_decorations" => {
+                def.button_decorations = true;
+                // 静态货架装饰：`button_decorations = CreateShelfDecor(...)`
+                // 赋给的局部变量名。
+                if let ast::Expression::Var(ast::Var::Name(name)) = value {
+                    if let Some(list) = ctx.decorations.get(&name.token().to_string()) {
+                        def.decorations = list.clone();
+                    }
+                }
+            }
             _ => {}
         }
     }
@@ -1578,6 +1681,112 @@ fn collect_table_functions<'a>(
     }
 }
 
+/// Collects `local X = CreateShelfDecor({ { imagename = ..., x = ..., y = ... } })`
+/// static decoration lists (Winona's shelves).
+fn collect_decorations<'a>(
+    stmts: impl Iterator<Item = &'a ast::Stmt>,
+    constants: &BTreeMap<String, f64>,
+    out: &mut BTreeMap<String, Vec<RawDecoration>>,
+) {
+    for stmt in stmts {
+        match stmt {
+            ast::Stmt::LocalAssignment(assignment) => {
+                for (name, expr) in assignment
+                    .names()
+                    .iter()
+                    .zip(assignment.expressions().iter())
+                {
+                    let ast::Expression::FunctionCall(call) = expr else {
+                        continue;
+                    };
+                    if !call_head(call).ends_with("CreateShelfDecor") {
+                        continue;
+                    }
+                    if let Some(list) = parse_shelf_decor_call(call, constants) {
+                        out.insert(name.token().to_string(), list);
+                    }
+                }
+            }
+            ast::Stmt::LocalFunction(func) => {
+                collect_decorations(func.body().block().stmts(), constants, out);
+            }
+            ast::Stmt::FunctionDeclaration(func) => {
+                collect_decorations(func.body().block().stmts(), constants, out);
+            }
+            ast::Stmt::Do(stmt) => collect_decorations(stmt.block().stmts(), constants, out),
+            ast::Stmt::If(stmt) => {
+                collect_decorations(stmt.block().stmts(), constants, out);
+                if let Some(else_ifs) = stmt.else_if() {
+                    for branch in else_ifs {
+                        collect_decorations(branch.block().stmts(), constants, out);
+                    }
+                }
+                if let Some(block) = stmt.else_block() {
+                    collect_decorations(block.stmts(), constants, out);
+                }
+            }
+            ast::Stmt::NumericFor(stmt) => {
+                collect_decorations(stmt.block().stmts(), constants, out)
+            }
+            ast::Stmt::GenericFor(stmt) => {
+                collect_decorations(stmt.block().stmts(), constants, out)
+            }
+            ast::Stmt::While(stmt) => collect_decorations(stmt.block().stmts(), constants, out),
+            ast::Stmt::Repeat(stmt) => collect_decorations(stmt.block().stmts(), constants, out),
+            _ => {}
+        }
+    }
+}
+
+/// Parses the first argument of `CreateShelfDecor(...)`:
+/// `{ { imagename, width, height, scale, x, y }, ... }`. Applies the
+/// helper's `SetPosition(data.x, data.y - 50)` offset so the emitted position
+/// is already in widget coordinates.
+fn parse_shelf_decor_call(
+    call: &ast::FunctionCall,
+    constants: &BTreeMap<String, f64>,
+) -> Option<Vec<RawDecoration>> {
+    let arg = call_args(call)?.into_iter().next()?;
+    let ast::Expression::TableConstructor(outer) = arg else {
+        return None;
+    };
+    let mut list = Vec::new();
+    for field in outer.fields() {
+        let ast::Field::NoKey(ast::Expression::TableConstructor(t)) = field else {
+            continue;
+        };
+        let (mut img, mut width, mut height, mut scale, mut x, mut y) =
+            (None, None, None, None, None, None);
+        for f in t.fields() {
+            let (Some(key), Some(value)) = (field_name(f), field_value(f)) else {
+                continue;
+            };
+            match key.as_str() {
+                "imagename" => img = eval_string(value),
+                "width" => width = eval_number(value, constants),
+                "height" => height = eval_number(value, constants),
+                "scale" => scale = eval_number(value, constants),
+                "x" => x = eval_number(value, constants),
+                "y" => y = eval_number(value, constants),
+                _ => {}
+            }
+        }
+        let (Some(img), Some(x), Some(y)) = (img, x, y) else {
+            continue;
+        };
+        list.push(RawDecoration {
+            img: img.trim_end_matches(".tex").to_string(),
+            pos: (x, y - 50.0),
+            size: match (width, height) {
+                (Some(w), Some(h)) => Some((w, h)),
+                _ => None,
+            },
+            scale,
+        });
+    }
+    Some(list)
+}
+
 /// Attempts to interpret a keyed table entry as a skill node (fallback path
 /// for unusual files without a recognizable `skills` table).
 #[allow(dead_code)]
@@ -1588,10 +1797,12 @@ fn try_parse_skill(
 ) -> Option<SkillNode> {
     let local_fns = BTreeMap::new();
     let table_fns = BTreeMap::new();
+    let decorations = BTreeMap::new();
     let ctx = ScanCtx {
         constants,
         local_fns: &local_fns,
         table_fns: &table_fns,
+        decorations: &decorations,
     };
     let def = raw_def_from_table(table, &ctx)?;
     let (x, y) = def.pos?;
@@ -1620,6 +1831,7 @@ fn try_parse_skill(
         infographic: def.infographic,
         forced_focus: def.forced_focus,
         button_decorations: def.button_decorations,
+        decorations: Vec::new(),
     })
 }
 
@@ -2216,5 +2428,87 @@ local skills = {
             .unwrap();
         // 阈值无法解析时退回“视为解锁”，不产生半截条件。
         assert_eq!(node.lock_open, Some(serde_json::json!(true)));
+    }
+
+    const WINONA_DECOR: &str = r#"
+local SHELF_WIDTH = 520
+
+local function CreateShelfDecor(shelfdata)
+    return {
+        init = function(button, root, fromfrontend) end,
+        onlocked = function(button) end,
+        onunlocked = function(button) end,
+    }
+end
+
+local WINONA_SHELF_LOCK_DECOR_LOW = CreateShelfDecor({{
+    imagename = "winona_background1.tex",
+    width = SHELF_WIDTH,
+    height = 90,
+    x = -3,
+    y = -18,
+}})
+
+local WINONA_DECOR_WAGSTAFF = CreateShelfDecor({{
+    imagename = "winona_background4.tex",
+    scale = 0.65,
+    x = 3,
+    y = 219,
+}})
+
+local BACKGROUND_SETTINGS = {
+    tint_bright = false,
+    tint_dim = false,
+}
+
+local skills = {
+    winona_lowshelf_lock = {
+        pos = {-220, 20},
+        root = true,
+        tags = {"lock"},
+        lock_open = function(prefabname, activatedskills, readonly)
+            return SkillTreeFns.CountTags(prefabname, "lowshelf", activatedskills) > 2
+        end,
+        button_decorations = WINONA_SHELF_LOCK_DECOR_LOW,
+    },
+    winona_wagstaff_2 = {
+        icon = "winona_wagstaff_2",
+        pos = {110, 60},
+        button_decorations = WINONA_DECOR_WAGSTAFF,
+    },
+}
+"#;
+
+    #[test]
+    fn test_winona_shelf_decorations_and_background_settings() {
+        let tree = parse_skill_tree(WINONA_DECOR, "winona").unwrap();
+        let low = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "winona_lowshelf_lock")
+            .unwrap();
+        assert!(low.button_decorations);
+        assert_eq!(low.decorations.len(), 1);
+        let dec = &low.decorations[0];
+        assert_eq!(dec.img, "winona_background1");
+        // CreateShelfDecor 里的 SetPosition(x, y-50)。
+        assert_eq!(dec.pos, [-3.0, -68.0]);
+        assert_eq!(dec.size, Some([520.0, 90.0]));
+        assert_eq!(dec.scale, None);
+
+        let wagstaff = tree
+            .nodes
+            .iter()
+            .find(|n| n.name == "winona_wagstaff_2")
+            .unwrap();
+        let dec = &wagstaff.decorations[0];
+        assert_eq!(dec.img, "winona_background4");
+        assert_eq!(dec.pos, [3.0, 169.0]);
+        assert_eq!(dec.size, None);
+        assert_eq!(dec.scale, Some(0.65));
+
+        // 背景设置：tint_bright = false。
+        let background = tree.background.as_ref().unwrap();
+        assert_eq!(background.tint_bright, Some(false));
     }
 }

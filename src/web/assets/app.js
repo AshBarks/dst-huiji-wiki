@@ -610,6 +610,7 @@ async function pageSkills(main) {
   let focusing = null;
   // 每个节点的渲染引用
   let gfx = {};      // name -> {bg, icon, isLock, infographic, x, y}
+  let decoGfx = {};  // name -> [decoration <image>]
   let skillFocusEle = null;
   let lockFocusEle = null;
   let learnBtn = null;       // {normal, hover, down, learned, text}
@@ -834,6 +835,16 @@ async function pageSkills(main) {
     update();
   }
 
+  // 装饰图亮度：未激活/未解锁的节点装饰调暗（对应游戏 button_decorations
+  // 的 onlocked tint；解锁/掌握后恢复原色）。
+  function updateDecoBrightness() {
+    for (const name in decoGfx) {
+      const n = nodeByName[name];
+      const bright = (n && isLockNode(n) && isLockOpen(name)) || statusOf(name) === "selected";
+      for (const el of decoGfx[name]) el.style.filter = bright ? "" : "brightness(0.5)";
+    }
+  }
+
   function update() {
     if (!tree) return;
     // 与游戏 RefreshTree 一致：统一按当前状态刷新所有已渲染节点底图。
@@ -841,6 +852,7 @@ async function pageSkills(main) {
       const g = gfx[name];
       setBg(g, baseTexture(name), g._hover);
     }
+    updateDecoBrightness();
     $("#skillXp").textContent = `剩余洞察：${remainingXp()}`;
     const xpEle = $("#skXpNum");
     if (xpEle) xpEle.textContent = String(remainingXp());
@@ -898,9 +910,28 @@ async function pageSkills(main) {
     const genericBg = skillAsset("background");
     const charBg = skillAsset(`${sel.value}_background`);
 
-    // 图层顺序（SVG 按文档顺序绘制）：bg → textbox → icon-bg → icon → focus → button。
+    // 图层顺序（SVG 按文档顺序绘制）：popup bg → decoration → char bg →
+    // textbox → icon-bg → icon → focus → button。
     const parts = [];
+
+    // 弹窗背景在游戏里由父屏幕绘制（playerinfopopupscreen.MakeBG），位于
+    // 整个技能树部件之下，因此先画。
     parts.push(svgImg(genericBg, -WIDTH / 2, VIEW_TOP, WIDTH, SVG_HEIGHT, "none"));
+
+    // 角色装饰图（薇诺娜货架等多背景）：画在角色背景之前，透过背景透明区显示。
+    decoGfx = {};
+    for (const n of nodes) {
+      for (const d of (n.decorations || [])) {
+        const cx = px(d.pos[0]), cy = py(d.pos[1]);
+        if (d.size) {
+          const [w, h] = d.size;
+          parts.push(`<image class="decoration" data-name="${esc(n.name)}" href="${esc(skillAsset(d.img))}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" preserveAspectRatio="none"/>`);
+        } else {
+          // 无显式尺寸：按原图 × scale，挂载后探测自然宽高再定位。
+          parts.push(`<image class="decoration" data-name="${esc(n.name)}" data-scaled="1" data-scale="${d.scale || 1}" data-cx="${cx}" data-cy="${cy}" href="${esc(skillAsset(d.img))}" style="display:none"/>`);
+        }
+      }
+    }
     parts.push(svgImg(charBg, BG_X, BG_Y, BG_ART_W, BG_ART_H, "none"));
 
     // 洞察面板（游戏 root.xp 在 (3,215)，沃拓克斯的天秤装饰会把它移到 x=0）。
@@ -986,6 +1017,28 @@ async function pageSkills(main) {
       ele.addEventListener("click", () => focusNode(name));
       // 游戏内双击技能按钮即学习。
       ele.addEventListener("dblclick", () => { if (canLearn(name)) { activatedSkills.add(name); update(); } });
+    }
+
+    // 装饰图：无显式尺寸的按原图 × scale 探测后居中；并按技能归组以便
+    // 随解锁/学习状态调暗。
+    for (const el of svg.querySelectorAll("image.decoration[data-scaled]")) {
+      const probe = new Image();
+      probe.onload = () => {
+        const scale = Number(el.dataset.scale) || 1;
+        const w = probe.naturalWidth * scale;
+        const h = probe.naturalHeight * scale;
+        el.setAttribute("x", Number(el.dataset.cx) - w / 2);
+        el.setAttribute("y", Number(el.dataset.cy) - h / 2);
+        el.setAttribute("width", w);
+        el.setAttribute("height", h);
+        el.style.display = "";
+        updateDecoBrightness();
+      };
+      probe.src = el.getAttribute("href");
+    }
+    for (const el of svg.querySelectorAll("image.decoration")) {
+      const name = el.dataset.name;
+      (decoGfx[name] = decoGfx[name] || []).push(el);
     }
 
     skillFocusEle = svg.querySelector('[data-role="skillFocus"]');

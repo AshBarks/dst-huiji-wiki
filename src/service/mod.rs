@@ -121,7 +121,8 @@ pub enum JobKind {
         snapshot: Option<String>,
     },
     /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
-    /// defs JSON（保留页内 metainfo 与 icon_url）。`character` 为子串过滤。
+    /// defs JSON（保留页内 metainfo 与 icon_url；`output` 同时写出
+    /// Skilltree.js 渲染器与图片清单）。`character` 为子串过滤。
     SkillTreeWiki {
         #[serde(default)]
         character: Option<String>,

@@ -4,14 +4,23 @@
 //! （与灰机维基 `模块:Skilltree` 前端零件:Skilltree.js 消费的格式一致）。
 //! 更新已有子页面时保留页内 `metainfo`（以及旧 defs 里的 `icon_url`，
 //! 那是维基站内上传图片后才有的地址，本地无法生成）。
+//!
+//! `metainfo` 里除 `imgs` 外还写入 `render`（游戏部件几何：背景矩形、
+//! 节点偏移、XP 位置、背景 tint），渲染器据此布局而无需硬编码常量；
+//! `imgs` 会与角色所需图片清单合并（缺失键留空并计入报告），方便手工
+//! 上传后回填。`--output` 目录同时写出 `Skilltree.js`（更新版渲染器，
+//! 复制到维基 `零件:Skilltree.js`）。
 
 use super::dataset::{load_skill_strings, read_game_file};
 use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::Result;
-use crate::parser::skilltree::{parse_skill_tree_with_tuning, SkillNode};
+use crate::parser::skilltree::{parse_skill_tree_with_tuning, SkillNode, SkillTree};
 use crate::service::progress::Reporter;
 use crate::wiki::WikiClient;
 use std::path::PathBuf;
+
+/// 维基渲染器源码（`零件:Skilltree.js`），随 `--output` 写出供手工上传。
+pub const SKILLTREE_WIDGET_JS: &str = include_str!("assets/skilltree_widget.js");
 
 /// 一级命名空间内的子页面标题，例如 `模块:Skilltree/Walter`。
 fn page_title(character: &str) -> String {
@@ -21,6 +30,84 @@ fn page_title(character: &str) -> String {
         Some(h) => format!("模块:Skilltree/{}{}", h, chars.as_str()),
         None => "模块:Skilltree".to_string(),
     }
+}
+
+/// 与 `零件:Skilltree.js` 的 `capitalize` 保持一致（仅首字母大写）。
+fn capitalize(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(head) => head.to_uppercase().collect::<String>() + chars.as_str(),
+        None => String::new(),
+    }
+}
+
+/// 所有技能树都需要的通用图片（键名与维基已上传文件一致）。
+const COMMON_IMGS: &[&str] = &[
+    "Frame",
+    "Frame_octagon",
+    "Selectable",
+    "Selectable_over",
+    "Selected",
+    "Selected_over",
+    "Unselected",
+    "Unselected_over",
+    "Locked_skill",
+    "Locked_over",
+    "Unlocked",
+    "Unlocked_over",
+    "Skill_icon_textbox_white",
+    "Skilltree_backgroundart",
+    "Button_carny_long_normal",
+    "Button_carny_long_hover",
+    "Button_carny_long_down",
+];
+
+/// 含信息板（infographic）的树才需要的图片。
+const INFOGRAPHIC_IMGS: &[&str] = &[
+    "Frame_infographic",
+    "Infographic",
+    "Infographic_over",
+    "Infographic_on",
+    "Infographic_on_over",
+    "Infographic_off",
+    "Infographic_off_over",
+];
+
+/// 该角色模块需要登记的 `metainfo.imgs` 键（含角色背景与装饰图）。
+fn expected_img_keys(tree: &SkillTree) -> Vec<String> {
+    let mut keys: Vec<String> = COMMON_IMGS.iter().map(|s| s.to_string()).collect();
+    keys.push(format!("{}_background", capitalize(&tree.character)));
+    if tree.nodes.iter().any(|n| n.infographic) {
+        keys.extend(INFOGRAPHIC_IMGS.iter().map(|s| s.to_string()));
+    }
+    let mut decorations: Vec<String> = tree
+        .nodes
+        .iter()
+        .flat_map(|n| n.decorations.iter().map(|d| capitalize(&d.img)))
+        .collect();
+    decorations.sort();
+    decorations.dedup();
+    keys.extend(decorations);
+    keys
+}
+
+/// 渲染器读取的游戏部件几何（与 `widgets/redux/skilltreewidget.lua` 和
+/// `skilltreebuilder.lua` 对应）。
+fn render_meta(tree: &SkillTree) -> serde_json::Value {
+    let tint = tree
+        .background
+        .as_ref()
+        .and_then(|b| b.tint_bright)
+        .unwrap_or(true);
+    serde_json::json!({
+        "bg": {
+            "pos": [5, 50],
+            "size": [521, 320],
+            "tint": tint,
+        },
+        "node_offset": [0, -80],
+        "xp": { "pos": [3, 165] },
+    })
 }
 
 /// 把一个 SkillNode 转成子页面 defs 里的一个条目。
@@ -79,6 +166,12 @@ fn def_to_json(
     if node.button_decorations {
         obj.insert("button_decorations".into(), serde_json::json!(true));
     }
+    if !node.decorations.is_empty() {
+        obj.insert(
+            "decorations".into(),
+            serde_json::to_value(&node.decorations).unwrap_or(serde_json::Value::Null),
+        );
+    }
     serde_json::Value::Object(obj)
 }
 
@@ -91,13 +184,24 @@ fn parse_page_json(content: &str) -> Option<serde_json::Value> {
     serde_json::from_str(inner).ok()
 }
 
+/// 页面组装结果：内容 + 缺失资源报告（供 CLI 输出与 `--report-json`）。
+struct BuiltPage {
+    content: serde_json::Value,
+    missing_imgs: Vec<String>,
+    missing_icon_urls: Vec<String>,
+}
+
 /// 用新提取的 defs 组装子页面内容；已有页面保留 metainfo 与 icon_url。
+///
+/// `metainfo.imgs` 按所需键合并：已有 URL 保留，缺失键写入空串并在报告里
+/// 列出（上传后下次运行会自动保留站内填好的 URL）。其余旧 `metainfo` 键
+/// （如未来新增的配置）原样保留。
 fn build_page_content(
-    nodes: &[SkillNode],
+    tree: &SkillTree,
     strings: &std::collections::BTreeMap<String, String>,
-    character: &str,
     existing: Option<&serde_json::Value>,
-) -> serde_json::Value {
+) -> BuiltPage {
+    let character = tree.character.as_str();
     let upper_char = character.to_uppercase();
     let prefix = format!("STRINGS.SKILLTREE.{}.", upper_char);
 
@@ -107,33 +211,77 @@ fn build_page_content(
         .cloned()
         .unwrap_or_default();
 
+    let mut missing_icon_urls = Vec::new();
     let mut defs = serde_json::Map::new();
-    for node in nodes {
+    for node in &tree.nodes {
         let title_key = format!("{}{}_TITLE", prefix, node.name.to_uppercase());
         let desc_key = format!("{}{}_DESC", prefix, node.name.to_uppercase());
         let mut def = def_to_json(node, strings.get(&title_key), strings.get(&desc_key));
         // 维基侧维护的 icon_url（站内图片地址）原样保留。
-        if let Some(icon_url) = old_defs.get(&node.name).and_then(|d| d.get("icon_url")) {
-            if let Some(obj) = def.as_object_mut() {
-                obj.insert("icon_url".into(), icon_url.clone());
+        match old_defs.get(&node.name).and_then(|d| d.get("icon_url")) {
+            Some(icon_url) => {
+                if let Some(obj) = def.as_object_mut() {
+                    obj.insert("icon_url".into(), icon_url.clone());
+                }
             }
+            None if node.icon.is_some() => missing_icon_urls.push(node.name.clone()),
+            None => {}
         }
         defs.insert(node.name.clone(), def);
     }
 
+    // --- metainfo：合并 imgs 清单 + 渲染几何 ---
+    let old_metainfo = existing
+        .and_then(|v| v.get("metainfo"))
+        .and_then(|m| m.as_object())
+        .cloned()
+        .unwrap_or_default();
+    let old_imgs = old_metainfo
+        .get("imgs")
+        .and_then(|m| m.as_object())
+        .cloned()
+        .unwrap_or_default();
+
+    let mut imgs = serde_json::Map::new();
+    let mut missing_imgs = Vec::new();
+    for key in expected_img_keys(tree) {
+        match old_imgs.get(&key) {
+            Some(url) if !url.as_str().unwrap_or("").is_empty() => {
+                imgs.insert(key, url.clone());
+            }
+            _ => {
+                missing_imgs.push(key.clone());
+                imgs.insert(key, serde_json::json!(""));
+            }
+        }
+    }
+    // 保留页面上额外登记、但不在清单里的图片键。
+    for (k, v) in &old_imgs {
+        if !imgs.contains_key(k) {
+            imgs.insert(k.clone(), v.clone());
+        }
+    }
+
+    let mut metainfo = old_metainfo;
+    metainfo.insert("imgs".into(), serde_json::Value::Object(imgs));
+    metainfo.insert("render".into(), render_meta(tree));
+
     let mut page = serde_json::Map::new();
     page.insert("defs".into(), serde_json::Value::Object(defs));
-    // 保留旧页面的其余顶层键（metainfo.imgs 等）；新页面给空 imgs。
+    page.insert("metainfo".into(), serde_json::Value::Object(metainfo));
+    // 保留旧页面的其余顶层键，尊重站内后续扩展。
     if let Some(existing_obj) = existing.and_then(|v| v.as_object()) {
         for (k, v) in existing_obj {
-            if k != "defs" {
+            if k != "defs" && k != "metainfo" {
                 page.insert(k.clone(), v.clone());
             }
         }
-    } else {
-        page.insert("metainfo".into(), serde_json::json!({ "imgs": {} }));
     }
-    serde_json::Value::Object(page)
+    BuiltPage {
+        content: serde_json::Value::Object(page),
+        missing_imgs,
+        missing_icon_urls,
+    }
 }
 
 fn wrap_page(json: &serde_json::Value) -> Result<String> {
@@ -143,7 +291,16 @@ fn wrap_page(json: &serde_json::Value) -> Result<String> {
     ))
 }
 
-/// 单个角色的完整维护流程，返回 ("status", added, removed)。
+/// 单个角色的维护结果。
+struct CharacterOutcome {
+    status: String,
+    added: usize,
+    removed: usize,
+    missing_imgs: Vec<String>,
+    missing_icon_urls: Vec<String>,
+}
+
+/// 单个角色的完整维护流程。
 async fn maintain_character(
     client: &WikiClient,
     reporter: &dyn Reporter,
@@ -151,7 +308,7 @@ async fn maintain_character(
     character: &str,
     strings: &std::collections::BTreeMap<String, String>,
     output_dir: Option<&PathBuf>,
-) -> Result<(String, usize, usize)> {
+) -> Result<CharacterOutcome> {
     let page_title = page_title(character);
     let content = read_game_file(None, &format!("prefabs/skilltree_{}.lua", character))?;
     let tuning = super::dataset::load_tuning_numbers(None)?;
@@ -163,8 +320,24 @@ async fn maintain_character(
         .and_then(|p| p.content.as_deref())
         .and_then(parse_page_json);
 
-    let new_json = build_page_content(&tree.nodes, strings, character, existing.as_ref());
-    let new_content = wrap_page(&new_json)?;
+    let built = build_page_content(&tree, strings, existing.as_ref());
+    let new_content = wrap_page(&built.content)?;
+
+    if !built.missing_imgs.is_empty() {
+        reporter.log(format!(
+            "{}：待上传图片 {} 个：{}",
+            page_title,
+            built.missing_imgs.len(),
+            built.missing_imgs.join(", ")
+        ));
+    }
+    if !built.missing_icon_urls.is_empty() {
+        reporter.log(format!(
+            "{}：待补 icon_url 的技能 {} 个",
+            page_title,
+            built.missing_icon_urls.len()
+        ));
+    }
 
     if let Some(dir) = output_dir {
         std::fs::create_dir_all(dir)?;
@@ -176,13 +349,22 @@ async fn maintain_character(
         reporter.log(format!("已写产物 {:?}", file));
     }
 
+    let mut outcome = CharacterOutcome {
+        status: String::new(),
+        added: 0,
+        removed: 0,
+        missing_imgs: built.missing_imgs,
+        missing_icon_urls: built.missing_icon_urls,
+    };
+
     let old_content = page
         .as_ref()
         .and_then(|p| p.content.clone())
         .unwrap_or_default();
     if !old_content.trim().is_empty() && old_content.trim() == new_content.trim() {
         reporter.log(format!("{}：未检测到变化。", page_title));
-        return Ok(("no_changes".into(), 0, 0));
+        outcome.status = "no_changes".into();
+        return Ok(outcome);
     }
 
     let (added, removed) = if old_content.trim().is_empty() {
@@ -194,6 +376,8 @@ async fn maintain_character(
         reporter.diff(&page_title, &diff, added, removed);
         (added, removed)
     };
+    outcome.added = added;
+    outcome.removed = removed;
 
     let confirmed = if mode == WriteMode::Interactive {
         reporter.confirm(&format!("更新维基页面 {}？", page_title))
@@ -203,7 +387,7 @@ async fn maintain_character(
     match decide_write(mode, confirmed) {
         WriteDecision::Skip(reason) => {
             reporter.log(format!("已跳过更新 {}（{}）。", page_title, reason));
-            Ok((reason.to_string(), added, removed))
+            outcome.status = reason.to_string();
         }
         WriteDecision::Apply => {
             let basetimestamp = page.as_ref().and_then(|p| p.last_rev_timestamp.clone());
@@ -220,9 +404,10 @@ async fn maintain_character(
                 "{}：已写入（oldrev={:?} newrev={:?}）。",
                 page_title, edit.oldrevid, edit.newrevid
             ));
-            Ok(("updated".into(), added, removed))
+            outcome.status = "updated".into();
         }
     }
+    Ok(outcome)
 }
 
 /// `skilltree-wiki` 任务入口：提取全部（或指定）角色的技能树并维护子页面。
@@ -268,13 +453,24 @@ pub async fn run_skilltree_wiki(
     let strings_data = load_skill_strings(snapshot.as_deref())?;
     let output_dir = output.as_ref().map(PathBuf::from);
 
+    // 输出目录里额外放一份更新版渲染器，供手工上传到 零件:Skilltree.js。
+    if let Some(dir) = output_dir.as_ref() {
+        std::fs::create_dir_all(dir)?;
+        let widget = dir.join("Skilltree.js");
+        std::fs::write(&widget, SKILLTREE_WIDGET_JS)?;
+        reporter.log(format!(
+            "已写渲染器 {:?}（复制到维基 零件:Skilltree.js）",
+            widget
+        ));
+    }
+
     let mut updated = 0usize;
     let mut no_changes = 0usize;
     let mut skipped = 0usize;
     let mut results = Vec::new();
     for ch in &characters {
         reporter.stage(&format!("模块:Skilltree/{}", ch));
-        let (status, added, removed) = maintain_character(
+        let outcome = maintain_character(
             &client,
             reporter,
             mode,
@@ -283,7 +479,7 @@ pub async fn run_skilltree_wiki(
             output_dir.as_ref(),
         )
         .await?;
-        match status.as_str() {
+        match outcome.status.as_str() {
             "updated" => updated += 1,
             "no_changes" => no_changes += 1,
             _ => skipped += 1,
@@ -291,9 +487,11 @@ pub async fn run_skilltree_wiki(
         results.push(serde_json::json!({
             "character": ch,
             "page": page_title(ch),
-            "status": status,
-            "added": added,
-            "removed": removed,
+            "status": outcome.status,
+            "added": outcome.added,
+            "removed": outcome.removed,
+            "missing_imgs": outcome.missing_imgs,
+            "missing_icon_urls": outcome.missing_icon_urls,
         }));
     }
 
@@ -381,16 +579,15 @@ mod tests {
         assert!(parse_page_json("bad content").is_none());
     }
 
-    #[test]
-    fn test_build_page_content_preserves_metainfo_and_icon_url() {
-        let nodes: Vec<SkillNode> = vec![SkillNode {
-            name: "walter_ammo_bag".into(),
+    fn sample_node(name: &str, icon: Option<&str>, infographic: bool) -> SkillNode {
+        SkillNode {
+            name: name.into(),
             x: -159.1,
             y: 14.5,
             group: Some("slingshotammo".into()),
             root: false,
             connects: vec![],
-            icon: Some("walter_ammo_bag".into()),
+            icon: icon.map(str::to_string),
             lock: false,
             locks: vec!["walter_ammo_lock".into()],
             lock_open: None,
@@ -398,10 +595,28 @@ mod tests {
             onactivate: true,
             ondeactivate: false,
             defaultfocus: false,
-            infographic: false,
+            infographic,
             forced_focus: None,
             button_decorations: false,
-        }];
+            decorations: vec![],
+        }
+    }
+
+    fn sample_tree(nodes: Vec<SkillNode>) -> SkillTree {
+        SkillTree {
+            character: "walter".into(),
+            nodes,
+            background: None,
+        }
+    }
+
+    #[test]
+    fn test_build_page_content_preserves_metainfo_and_icon_url() {
+        let tree = sample_tree(vec![sample_node(
+            "walter_ammo_bag",
+            Some("walter_ammo_bag"),
+            false,
+        )]);
         let existing: serde_json::Value = serde_json::json!({
             "defs": {
                 "walter_ammo_bag": {
@@ -409,7 +624,7 @@ mod tests {
                     "icon_url": "https://example.com/Walter_ammo_bag.png"
                 }
             },
-            "metainfo": { "imgs": { "Frame": "https://example.com/Frame.png" } }
+            "metainfo": { "imgs": { "Frame": "https://example.com/Frame.png", "Extra_manual": "https://example.com/Extra.png" } }
         });
         let mut strings = std::collections::BTreeMap::new();
         strings.insert(
@@ -417,16 +632,72 @@ mod tests {
             "弹药囤积者".to_string(),
         );
 
-        let page = build_page_content(&nodes, &strings, "walter", Some(&existing));
+        let built = build_page_content(&tree, &strings, Some(&existing));
+        let page = &built.content;
         let def = &page["defs"]["walter_ammo_bag"];
         assert_eq!(def["icon_url"], "https://example.com/Walter_ammo_bag.png");
         assert_eq!(def["title"], "弹药囤积者");
         assert_eq!(def["onactivate"], true);
-        assert!(page["metainfo"]["imgs"]["Frame"].is_string());
+        // 已有 URL 保留；手工添加的额外键也保留。
+        assert_eq!(
+            page["metainfo"]["imgs"]["Frame"],
+            "https://example.com/Frame.png"
+        );
+        assert_eq!(
+            page["metainfo"]["imgs"]["Extra_manual"],
+            "https://example.com/Extra.png"
+        );
+        // 清单里缺少的键写入空串并进入报告。
+        assert_eq!(page["metainfo"]["imgs"]["Walter_background"], "");
+        assert!(built
+            .missing_imgs
+            .contains(&"Walter_background".to_string()));
+        assert!(built.missing_imgs.contains(&"Selected".to_string()));
+        assert!(!built.missing_imgs.contains(&"Frame".to_string()));
+        // 渲染几何随 metainfo 输出，默认 tint 开启。
+        assert_eq!(page["metainfo"]["render"]["bg"]["size"][0], 521);
+        assert_eq!(page["metainfo"]["render"]["bg"]["tint"], true);
+        // 技能图标已上传，无缺失 icon_url。
+        assert!(built.missing_icon_urls.is_empty());
 
-        // 新页面没有旧内容：给空 metainfo，无 icon_url。
-        let fresh = build_page_content(&nodes, &strings, "walter", None);
-        assert!(fresh["metainfo"]["imgs"].as_object().unwrap().is_empty());
-        assert!(fresh["defs"]["walter_ammo_bag"].get("icon_url").is_none());
+        // 新页面：icon_url 缺失计入报告。
+        let fresh = build_page_content(&tree, &strings, None);
+        assert!(fresh
+            .missing_icon_urls
+            .contains(&"walter_ammo_bag".to_string()));
+        assert!(fresh.content["defs"]["walter_ammo_bag"]
+            .get("icon_url")
+            .is_none());
+    }
+
+    #[test]
+    fn test_expected_img_keys_include_infographic_and_decorations() {
+        let mut tree = sample_tree(vec![sample_node(
+            "wortox_scales",
+            Some("wortox_scales"),
+            true,
+        )]);
+        tree.character = "wortox".into();
+        tree.nodes[0].decorations = vec![crate::parser::skilltree::SkillDecoration {
+            img: "winona_background1".into(),
+            pos: [-3.0, -68.0],
+            size: Some([520.0, 90.0]),
+            scale: None,
+        }];
+        tree.background = Some(crate::parser::skilltree::BackgroundSettings {
+            tint_bright: Some(false),
+        });
+        let keys = expected_img_keys(&tree);
+        assert!(keys.contains(&"Wortox_background".to_string()));
+        assert!(keys.contains(&"Frame_infographic".to_string()));
+        assert!(keys.contains(&"Infographic_off".to_string()));
+        assert!(keys.contains(&"Winona_background1".to_string()));
+
+        let built = build_page_content(&tree, &std::collections::BTreeMap::new(), None);
+        assert_eq!(built.content["metainfo"]["render"]["bg"]["tint"], false);
+        assert_eq!(
+            built.content["defs"]["wortox_scales"]["decorations"][0]["img"],
+            "winona_background1"
+        );
     }
 }

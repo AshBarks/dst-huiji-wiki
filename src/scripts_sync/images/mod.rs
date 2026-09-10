@@ -268,7 +268,10 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
             for path in parent_final.keys() {
                 if let Some(rel) = path.strip_prefix(&prefix) {
                     products.insert(path.clone(), parent_final[path].clone());
-                    expected_split.insert(rel.to_string());
+                    // expected_split 以当前 split 根为基准（`<dir>/<file>`），
+                    // 与对账 reconcile_dir 的 keep 键一致，否则复用切片的目录
+                    // 会在对账阶段被误判为陈旧而整体删除。
+                    expected_split.insert(format!("{dir_name}/{rel}"));
                     reused_any = true;
                 }
             }
@@ -921,6 +924,12 @@ mod tests {
         assert_eq!(manifest.diff.added.len(), 2, "{:?}", manifest.diff);
         assert_eq!(manifest.diff.changed.len(), 1);
         assert_eq!(manifest.diff.changed[0].path, "decoded/baz.png");
+        // 复用 atlas 的切片必须在增量对账后仍留在盘上（曾因 expected_split
+        // 用 basename 而整目录被误删）。
+        assert!(out.join("current/split/foo/s1.png").exists());
+        assert!(out.join("current/split/foo/s2.png").exists());
+        assert!(out.join("current/split/bar/s1.png").exists());
+        assert!(out.join("current/split/qux/s1.png").exists());
         // 旧 manifest 与对象仍可访问（历史不丢）
         assert!(out.join("history/manifests/100.json").exists());
         std::fs::remove_dir_all(&ws).ok();

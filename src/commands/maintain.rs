@@ -155,6 +155,29 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::UploadImage {
+            path,
+            name,
+            description,
+            comment,
+            ignore_warnings,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::UploadImage {
+                    path: path_to_string(&path)?,
+                    name,
+                    description,
+                    comment,
+                    ignore_warnings,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
         Commands::PrefabOverrides { input, output } => {
             execute(
                 JobKind::PrefabOverrides {

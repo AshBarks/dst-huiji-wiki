@@ -148,6 +148,21 @@ pub struct PageBrief {
     pub missing: bool,
 }
 
+/// One `File:` page returned by `prop=imageinfo&iiprop=url|size`.
+///
+/// `title` is the canonical wiki title (first letter upper-cased,
+/// underscores displayed as spaces); for a file redirect it names the
+/// redirect page while `url` points at the target file.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileInfo {
+    pub title: String,
+    /// Direct media URL; `None` when the file is missing (or has no version).
+    pub url: Option<String>,
+    /// Pixel dimensions of the current file version.
+    pub size: Option<(u32, u32)>,
+    pub missing: bool,
+}
+
 /// One entry of a namespace enumeration (`list=allpages`).
 ///
 /// Carries the fields required for touched-based incremental syncing.
@@ -206,6 +221,17 @@ pub struct EditResult {
     pub newrevid: Option<i64>,
     pub oldrevid: Option<i64>,
     pub reason: Option<String>,
+}
+
+/// One successful `action=upload` result.
+#[derive(Debug, Clone)]
+pub struct UploadResult {
+    /// Canonical file name (without the `File:` prefix).
+    pub filename: String,
+    /// MediaWiki upload status, normally `Success`.
+    pub result: String,
+    /// Direct URL of the uploaded (current) file version.
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -278,6 +304,47 @@ struct QueryRevision {
 }
 
 #[derive(Debug, Deserialize)]
+struct UploadResponse {
+    upload: Option<UploadInfo>,
+}
+
+#[derive(Debug, Deserialize)]
+struct UploadInfo {
+    result: Option<String>,
+    filename: Option<String>,
+    imageinfo: Option<Value>,
+    warnings: Option<Value>,
+}
+
+/// Maps a MediaWiki upload API error code to an [`Error`].
+fn map_upload_error(code: &str, info: &str, filename: &str) -> Error {
+    match code {
+        "ratelimited" => Error::RateLimited(info.to_string()),
+        "assertuserfailed" | "notloggedin" | "mustbeloggedin" | "badtoken" => {
+            Error::AuthExpired(format!("{}: {}", code, info))
+        }
+        other => Error::UploadFailed(format!("{}: {} ({})", other, info, filename)),
+    }
+}
+
+/// Best-effort MIME type from the file extension (MediaWiki validates too).
+fn mime_for_path(path: &std::path::Path) -> &'static str {
+    match path
+        .extension()
+        .and_then(|e| e.to_str())
+        .map(str::to_ascii_lowercase)
+        .as_deref()
+    {
+        Some("png") => "image/png",
+        Some("jpg" | "jpeg") => "image/jpeg",
+        Some("gif") => "image/gif",
+        Some("webp") => "image/webp",
+        Some("svg") => "image/svg+xml",
+        _ => "application/octet-stream",
+    }
+}
+
+#[derive(Debug, Deserialize)]
 struct EditResponse {
     edit: Option<EditInfo>,
 }
@@ -306,7 +373,7 @@ struct ApiErrorBody {
 fn map_api_error(code: &str, info: &str, title: &str) -> Error {
     match code {
         "editconflict" => Error::EditConflict(title.to_string()),
-        "assertuserfailed" | "notloggedin" | "badtoken" => {
+        "assertuserfailed" | "notloggedin" | "mustbeloggedin" | "badtoken" => {
             Error::AuthExpired(format!("{}: {}", code, info))
         }
         "ratelimited" => Error::RateLimited(info.to_string()),
@@ -346,6 +413,18 @@ fn compute_backoff(base: Duration, attempt: u32, retry_after: Option<Duration>) 
 fn parse_retry_after(headers: &reqwest::header::HeaderMap) -> Option<Duration> {
     let v = headers.get(reqwest::header::RETRY_AFTER)?.to_str().ok()?;
     v.trim().parse::<u64>().ok().map(Duration::from_secs)
+}
+
+/// Milliseconds since the Unix epoch, used as the `_` cache-buster parameter.
+///
+/// huijiwiki's CDN caches anonymous API GETs for hours and re-uploads/page
+/// edits do not reliably purge those entries, so maintenance reads append a
+/// unique value to get a fresh response.
+fn cache_buster() -> String {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis().to_string())
+        .unwrap_or_default()
 }
 
 /// Splits titles into MediaWiki-sized chunks, preserving order and duplicates.
@@ -404,6 +483,107 @@ fn parse_pages_info_response(body: &Value) -> Result<Vec<PageBrief>> {
             missing: p.missing,
         })
         .collect())
+}
+
+/// Canonicalises a file name the way MediaWiki titles do: optional
+/// `File:`/`文件:` prefix, first character upper-cased, underscores displayed
+/// as spaces (`infographic_over.png` → `File:Infographic over.png`).
+pub fn file_title(name: &str) -> String {
+    let bare = name
+        .strip_prefix("File:")
+        .or_else(|| name.strip_prefix("文件:"))
+        .unwrap_or(name);
+    let mut chars = bare.chars();
+    match chars.next() {
+        Some(head) => format!(
+            "File:{}{}",
+            head.to_uppercase(),
+            chars.as_str().replace('_', " ")
+        ),
+        None => "File:".to_string(),
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct RawNormalizedTitle {
+    from: String,
+    to: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawImageInfoItem {
+    url: Option<String>,
+    width: Option<u32>,
+    height: Option<u32>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawFilePage {
+    title: String,
+    #[serde(default, deserialize_with = "de_bc_bool")]
+    missing: bool,
+    imageinfo: Option<Vec<RawImageInfoItem>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawFileQuery {
+    #[serde(default)]
+    normalized: Option<Vec<RawNormalizedTitle>>,
+    pages: Option<HashMap<String, RawFilePage>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawFileResponse {
+    query: Option<RawFileQuery>,
+}
+
+/// Extracts one [`FileInfo`] per requested name, in the same order.
+///
+/// MediaWiki answers one page per title (missing files carry `missing`) and
+/// reports title normalisations (first-letter case, underscore/space) in
+/// `query.normalized`; both are applied so callers can zip the result with
+/// their input.
+fn parse_files_info_response(body: &Value, requested: &[&str]) -> Result<Vec<FileInfo>> {
+    let parsed: RawFileResponse =
+        serde_json::from_value(body.clone()).map_err(|e| Error::WikiApi(e.to_string()))?;
+    let query = parsed
+        .query
+        .ok_or_else(|| Error::WikiApi("No file query in response".to_string()))?;
+    let normalized: HashMap<String, String> = query
+        .normalized
+        .unwrap_or_default()
+        .into_iter()
+        .map(|n| (n.from, n.to))
+        .collect();
+    let pages = query
+        .pages
+        .ok_or_else(|| Error::WikiApi("No pages in response".to_string()))?;
+    let by_title: HashMap<String, RawFilePage> =
+        pages.into_values().map(|p| (p.title.clone(), p)).collect();
+
+    let mut out = Vec::with_capacity(requested.len());
+    for name in requested {
+        let sent = file_title(name);
+        let canonical = normalized.get(&sent).cloned().unwrap_or(sent);
+        out.push(match by_title.get(&canonical) {
+            Some(page) => {
+                let first = page.imageinfo.as_ref().and_then(|items| items.first());
+                FileInfo {
+                    title: page.title.clone(),
+                    url: first.and_then(|item| item.url.clone()),
+                    size: first.and_then(|item| item.width.zip(item.height)),
+                    missing: page.missing || page.imageinfo.is_none(),
+                }
+            }
+            None => FileInfo {
+                title: canonical,
+                url: None,
+                size: None,
+                missing: true,
+            },
+        });
+    }
+    Ok(out)
 }
 
 #[derive(Debug, Deserialize)]
@@ -905,6 +1085,7 @@ impl WikiClient {
     }
 
     pub async fn get_page(&self, title: &str) -> Result<PageInfo> {
+        let nonce = cache_buster();
         let params = [
             ("action", "query"),
             ("prop", "revisions"),
@@ -912,6 +1093,7 @@ impl WikiClient {
             ("rvlimit", "1"),
             ("titles", title),
             ("format", "json"),
+            ("_", nonce.as_str()),
         ];
 
         let response = self.get(&params).await?;
@@ -967,11 +1149,13 @@ impl WikiClient {
         let mut out = Vec::with_capacity(titles.len());
         for chunk in chunk_titles(titles, TITLES_PER_QUERY) {
             let joined = chunk.join("|");
+            let nonce = cache_buster();
             let params = [
                 ("action", "query"),
                 ("prop", "info"),
                 ("titles", joined.as_str()),
                 ("format", "json"),
+                ("_", nonce.as_str()),
             ];
             let response = self.get(&params).await?;
             let body: Value = response.json().await?;
@@ -984,6 +1168,61 @@ impl WikiClient {
     pub async fn page_exists(&self, title: &str) -> Result<bool> {
         let pages = self.get_pages_meta(std::slice::from_ref(&title)).await?;
         Ok(pages.first().is_some_and(|p| !p.missing))
+    }
+
+    /// Batch-queries `File:` pages via `prop=imageinfo&iiprop=url|size`.
+    ///
+    /// Returns one [`FileInfo`] per input name, in the same order. Names may
+    /// omit the `File:` prefix and may use underscores/any first-letter case:
+    /// MediaWiki normalises the first letter to upper case and displays
+    /// underscores as spaces (e.g. `infographic_over.png` ⇔
+    /// `File:Infographic over.png`). File redirects (renamed uploads) resolve
+    /// to the target file's URL. Batches of [`TITLES_PER_QUERY`] are throttled
+    /// like any other read.
+    ///
+    /// Every batch carries a unique `_` nonce: huijiwiki's CDN caches
+    /// anonymous API GETs for hours and file uploads do not purge that cache,
+    /// so a plain repeated query would report the pre-upload size/URL.
+    pub async fn get_files_info(&self, names: &[&str]) -> Result<Vec<FileInfo>> {
+        let mut out = Vec::with_capacity(names.len());
+        for chunk in chunk_titles(names, TITLES_PER_QUERY) {
+            let joined = chunk
+                .iter()
+                .map(|name| file_title(name))
+                .collect::<Vec<_>>()
+                .join("|");
+            let nonce = cache_buster();
+            let params = [
+                ("action", "query"),
+                ("prop", "imageinfo"),
+                ("iiprop", "url|size"),
+                ("titles", joined.as_str()),
+                ("format", "json"),
+                ("_", nonce.as_str()),
+            ];
+            let response = self.get(&params).await?;
+            let body: Value = response.json().await?;
+            out.extend(parse_files_info_response(&body, &chunk)?);
+        }
+        Ok(out)
+    }
+
+    /// Convenience check for whether a single `File:` page exists.
+    pub async fn file_exists(&self, name: &str) -> Result<bool> {
+        Ok(self
+            .get_files_info(std::slice::from_ref(&name))
+            .await?
+            .first()
+            .is_some_and(|f| !f.missing))
+    }
+
+    /// Convenience getter for one file's direct URL (`None` if missing).
+    pub async fn get_file_url(&self, name: &str) -> Result<Option<String>> {
+        Ok(self
+            .get_files_info(std::slice::from_ref(&name))
+            .await?
+            .first()
+            .and_then(|f| f.url.clone()))
     }
 
     /// Lists page titles of a namespace via `list=allpages`, following
@@ -1254,6 +1493,107 @@ impl WikiClient {
         Ok(result)
     }
 
+    /// Uploads a local file via `action=upload` (multipart).
+    ///
+    /// `file_name` defaults to the local file name; `description` is written
+    /// to the file description page (`text`) and `comment` becomes the upload
+    /// log comment. Passing `ignore_warnings = true` sends `ignorewarnings=1`
+    /// so an existing file can be re-uploaded without the duplicate warning.
+    /// Requires a logged-in client.
+    pub async fn upload_file(
+        &self,
+        path: &std::path::Path,
+        file_name: Option<&str>,
+        description: Option<&str>,
+        comment: Option<&str>,
+        ignore_warnings: bool,
+    ) -> Result<UploadResult> {
+        if !self.logged_in {
+            return Err(Error::AuthExpired("upload requires login".to_string()));
+        }
+
+        let filename = match file_name {
+            Some(name) => name.to_string(),
+            None => path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .ok_or_else(|| Error::InvalidPath(path.display().to_string()))?
+                .to_string(),
+        };
+        let bytes = tokio::fs::read(path).await?;
+        let csrf_token = self.get_csrf_token().await?;
+        let mime = mime_for_path(path);
+        let url = self.config.api_url();
+
+        let response = self
+            .send_with_retry(false, || {
+                let part = reqwest::multipart::Part::bytes(bytes.clone())
+                    .file_name(filename.clone())
+                    .mime_str(mime)
+                    .unwrap_or_else(|_| {
+                        reqwest::multipart::Part::bytes(bytes.clone()).file_name(filename.clone())
+                    });
+                let mut form = reqwest::multipart::Form::new()
+                    .text("action", "upload")
+                    .text("format", "json")
+                    .text("filename", filename.clone())
+                    .text("token", csrf_token.clone())
+                    .text("assert", "user")
+                    .text("ignorewarnings", if ignore_warnings { "1" } else { "0" })
+                    .part("file", part);
+                if let Some(desc) = description {
+                    form = form.text("text", desc.to_string());
+                }
+                if let Some(note) = comment {
+                    form = form.text("comment", note.to_string());
+                }
+                self.client
+                    .post(&url)
+                    .header("X-authkey", &self.config.x_authkey)
+                    .multipart(form)
+            })
+            .await?;
+
+        let body: Value = response.json().await?;
+        if let Some(err) = body.get("error") {
+            let parsed: ApiErrorBody =
+                serde_json::from_value(err.clone()).unwrap_or(ApiErrorBody {
+                    code: String::new(),
+                    info: "unknown error shape".to_string(),
+                });
+            tracing::warn!(code = %parsed.code, info = %parsed.info, file = filename, "wiki upload rejected");
+            return Err(map_upload_error(&parsed.code, &parsed.info, &filename));
+        }
+
+        let upload: UploadInfo = serde_json::from_value(body)
+            .ok()
+            .and_then(|r: UploadResponse| r.upload)
+            .ok_or_else(|| Error::WikiApi("No upload response received".to_string()))?;
+
+        if upload.result.as_deref() != Some("Success") {
+            return Err(Error::UploadFailed(format!(
+                "{} {}",
+                upload.result.unwrap_or_else(|| "Unknown".to_string()),
+                upload.warnings.map(|w| w.to_string()).unwrap_or_default()
+            )));
+        }
+
+        tracing::info!(
+            "Uploaded file '{}'",
+            upload.filename.as_deref().unwrap_or(&filename)
+        );
+        Ok(UploadResult {
+            filename: upload.filename.unwrap_or(filename),
+            result: upload.result.unwrap_or_default(),
+            url: upload
+                .imageinfo
+                .as_ref()
+                .and_then(|info| info.get("url"))
+                .and_then(|v| v.as_str())
+                .map(str::to_string),
+        })
+    }
+
     pub async fn append_to_page(
         &self,
         title: &str,
@@ -1397,6 +1737,94 @@ mod tests {
         let missing = briefs.iter().find(|b| b.title == "不存在的页").unwrap();
         assert!(missing.missing);
         assert!(missing.pageid.is_none());
+    }
+
+    #[test]
+    fn test_mime_for_path() {
+        assert_eq!(mime_for_path(std::path::Path::new("a.PNG")), "image/png");
+        assert_eq!(mime_for_path(std::path::Path::new("a.jpg")), "image/jpeg");
+        assert_eq!(mime_for_path(std::path::Path::new("a.jpeg")), "image/jpeg");
+        assert_eq!(mime_for_path(std::path::Path::new("a.gif")), "image/gif");
+        assert_eq!(
+            mime_for_path(std::path::Path::new("a.bin")),
+            "application/octet-stream"
+        );
+    }
+
+    #[test]
+    fn test_map_upload_error_codes() {
+        assert!(matches!(
+            map_upload_error("ratelimited", "slow", "a.png"),
+            Error::RateLimited(_)
+        ));
+        assert!(matches!(
+            map_upload_error("mustbeloggedin", "x", "a.png"),
+            Error::AuthExpired(_)
+        ));
+        assert!(matches!(
+            map_upload_error("fileexists-no-change", "dup", "a.png"),
+            Error::UploadFailed(_)
+        ));
+    }
+
+    #[test]
+    fn test_file_title_normalizes() {
+        assert_eq!(
+            file_title("infographic_over.png"),
+            "File:Infographic over.png"
+        );
+        assert_eq!(file_title("File:Frame.png"), "File:Frame.png");
+        assert_eq!(file_title("文件:Frame.png"), "File:Frame.png");
+        assert_eq!(file_title("Wortox_scales"), "File:Wortox scales");
+        assert_eq!(file_title(""), "File:");
+    }
+
+    #[test]
+    fn test_parse_files_info_response() {
+        let body = serde_json::json!({
+            "batchcomplete": "",
+            "query": {
+                "normalized": [
+                    {"from": "File:infographic_over.png", "to": "File:Infographic over.png"}
+                ],
+                "pages": {
+                    "100": {
+                        "pageid": 100, "ns": 6, "title": "File:Infographic over.png",
+                        "imagerepository": "local",
+                        "imageinfo": [{
+                            "url": "https://example.com/Infographic_over.png",
+                            "width": 64, "height": 64
+                        }]
+                    },
+                    "-1": {"ns": 6, "title": "File:Not uploaded.png", "missing": ""}
+                }
+            }
+        });
+        let infos =
+            parse_files_info_response(&body, &["File:infographic_over.png", "not_uploaded.png"])
+                .unwrap();
+        assert_eq!(infos.len(), 2);
+        // Canonical title + direct URL, aligned with the input order.
+        assert_eq!(infos[0].title, "File:Infographic over.png");
+        assert_eq!(
+            infos[0].url.as_deref(),
+            Some("https://example.com/Infographic_over.png")
+        );
+        assert_eq!(infos[0].size, Some((64, 64)));
+        assert!(!infos[0].missing);
+        // Missing files carry the BC empty-string flag and no URL.
+        assert!(infos[1].missing);
+        assert!(infos[1].url.is_none());
+        assert!(infos[1].size.is_none());
+        assert_eq!(infos[1].title, "File:Not uploaded.png");
+        // Duplicate inputs still yield one aligned entry per input.
+        let dup = parse_files_info_response(
+            &body,
+            &["File:infographic_over.png", "File:infographic_over.png"],
+        )
+        .unwrap();
+        assert_eq!(dup.len(), 2);
+        assert!(!dup[1].missing);
     }
 
     #[test]
@@ -1596,6 +2024,41 @@ mod tests {
             Err(e) => {
                 eprintln!("Login failed: {:?}", e);
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_files_info_live() {
+        dotenvy::dotenv().ok();
+
+        let client = match WikiClient::from_env() {
+            Ok(c) => c,
+            Err(_) => {
+                eprintln!("Skipping test: environment variables not set");
+                return;
+            }
+        };
+
+        // `Frame.png` 长期存在于站内；下划线/大小写归一化应能命中它。
+        match client
+            .get_files_info(&["File:frame.png", "File:肯定不存在的图片XYZ.png"])
+            .await
+        {
+            Ok(infos) => {
+                assert_eq!(infos.len(), 2);
+                assert!(!infos[0].missing);
+                assert!(infos[0].url.as_deref().unwrap_or("").starts_with("http"));
+                assert!(infos[0].size.is_some(), "iiprop=size should be parsed");
+                assert!(infos[1].missing);
+                assert!(infos[1].url.is_none());
+                assert!(!client.file_exists("肯定不存在的图片XYZ.png").await.unwrap());
+                assert!(client
+                    .get_file_url("Frame.png")
+                    .await
+                    .unwrap()
+                    .is_some_and(|u| u.starts_with("http")));
+            }
+            Err(e) => eprintln!("Error querying file info: {:?}", e),
         }
     }
 

@@ -33,11 +33,21 @@
 - 组装子页面`defs` JSON并用`return [[ ... ]]`包裹为页面内容；`defs` 额外提取
   `decorations`（薇诺娜货架等多背景图，含位置/尺寸/缩放）
 - `metainfo.render` 写入游戏部件几何（背景矩形/节点偏移/XP 位置/背景 tint），
-  渲染器据此布局；`metainfo.imgs` 与角色所需图片清单合并，缺失键留空并
-  在日志/`--report-json`里报告（手工上传后回填 URL，下次运行自动保留）
+  渲染器据此布局；`metainfo.imgs` 与角色所需图片清单合并，再用
+  `prop=imageinfo&iiprop=url` 批量查回站内已上传图片的真实 URL（含
+  `defs[].icon_url`，首字母/下划线归一化由 client 处理），只有确实缺失的
+  键才留空并在日志/`--report-json`里报告（手工上传后下次运行自动回填）
 - `--output`可同时把每个子页面内容写到本地目录（`<Char>.lua`），并写出
   更新版渲染器`Skilltree.js`（复制到维基`零件:Skilltree.js`）
 - 按`--yes`/`--dry-run`/交互确认决定是否写入维基
+
+## upload-image 图片上传流程
+- 读取本地图片与 `HUIJI__*` 凭据，登录维基
+- 按素材目录自动填文件描述分类：`skilltree/`→`[[分类:技能树素材]]`、
+  `skilltree_icons/`→`[[分类:技能树图标]]`、`inventoryimages/`→`[[分类:物品栏图标]]`
+- `action=upload`（multipart）上传，`--name` 可指定站内文件名；同名重传需
+  `--ignore-warnings`（`ignorewarnings=1`，且账号要有 `reupload` 权限）
+- `--yes`/`--dry-run`/交互确认复用 `service::WriteMode` 决策
 
 ## ItemTable维护流程
 从环境变量中读取`DST__ROOT`，验证DST目录是否存在。

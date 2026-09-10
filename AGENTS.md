@@ -49,6 +49,7 @@ dst-huiji-wiki/
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
 | Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; must stay in sync with `src/web/assets/app.js` skilltree section |
+| Upload an image | `src/service/upload_image.rs` | `upload-image` CLI; auto description by dir (`skilltree/`→技能树素材, `skilltree_icons/`→技能树图标, `inventoryimages/`→物品栏图标); `--ignore-warnings` for re-upload (needs `reupload` right) |
 | Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync) vars |
 
 ## CODE MAP
@@ -64,7 +65,7 @@ dst-huiji-wiki/
 | `PrefabOverrideParser` | Struct | src/parser/prefab_override/parser.rs | Extracts prefab name overrides from Lua (factory patterns, control flow) |
 | `LuaParser` | Struct | src/parser/lua.rs | Generic Lua variable/field location extraction |
 | `PoParser` | Struct | src/parser/po.rs | Nom-based PO file parser |
-| `WikiClient` | Struct | src/wiki/client.rs | MediaWiki API: login, get_page, edit_page, append/prepend |
+| `WikiClient` | Struct | src/wiki/client.rs | MediaWiki API: login, get_page, edit_page, append/prepend, get_files_info (imageinfo), upload_file (multipart) |
 | `CopyClipProcessor` | Struct | src/copyclip/mod.rs | Marker-based content replacement in wiki modules |
 | `Recipe` | Struct | src/models/recipe/mod.rs | Game recipe: name, ingredients, tech, options |
 | `PoEntry` / `PoFile` | Struct | src/models/po.rs | PO translation entry + file container |
@@ -115,6 +116,7 @@ cargo run --release -- --help      # Show CLI help
 - WikiClient: global throttle (default 1 QPS, `WIKI__QPS`) + retry on 403/429/GET-5xx (`WIKI__MAX_RETRIES`); POST only retries WAF-level 403/429
 - Edits carry `basetimestamp` + `assert=user`; conflicts surface as `Error::EditConflict`
 - Batch APIs: `get_pages_meta` (≤50 titles), `page_exists`, `list_all_pages` (continuation-aware)
+- File lookup: `get_files_info`/`file_exists`/`get_file_url` via `prop=imageinfo&iiprop=url` (≤50 File: titles); `file_title` mirrors MediaWiki title normalization (first letter upper-cased, `_`≡space, `File:`/`文件:` prefix)
 - Error variants RateLimited/PageNotFound/AuthExpired/EditConflict + `Error::is_retryable()` for automated branching
 - Maintenance commands accept `--yes` (auto-confirm writes), `--dry-run` (no wiki writes, artifacts still written), `--report-json <path>` (machine-readable report); service-level enum is `service::WriteMode` with pure decision fn `decide_write`
 - Structured logging: `cli_run` span (uuid run_id, command) wraps every invocation; `job` and `wiki_edit` (page, oldrevid/newrevid) spans inside service

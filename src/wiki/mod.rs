@@ -1,6 +1,6 @@
 mod client;
 
 pub use client::{
-    EditResult, PageBrief, PageInfo, PageListingEntry, PageRevisionContent, RateLimitCfg,
-    RecentChange, WikiClient, WikiConfig, TITLES_PER_QUERY,
+    file_title, EditResult, FileInfo, PageBrief, PageInfo, PageListingEntry, PageRevisionContent,
+    RateLimitCfg, RecentChange, WikiClient, WikiConfig, TITLES_PER_QUERY,
 };

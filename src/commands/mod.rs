@@ -130,6 +130,34 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 上传本地图片到维基（同名重传请加 --ignore-warnings；按 skilltree/
+    /// skilltree_icons/ inventoryimages/ 目录自动补分类描述）
+    #[command(name = "upload-image")]
+    UploadImage {
+        /// 本地图片路径
+        path: PathBuf,
+        /// 维基文件名（默认取路径文件名）
+        #[arg(long)]
+        name: Option<String>,
+        /// 文件描述 wikitext（默认按素材目录自动填分类）
+        #[arg(long)]
+        description: Option<String>,
+        /// 上传注释
+        #[arg(long)]
+        comment: Option<String>,
+        /// 忽略上传警告（同名重传时使用）
+        #[arg(long)]
+        ignore_warnings: bool,
+        /// 跳过确认，直接上传
+        #[arg(long)]
+        yes: bool,
+        /// 只报告将执行的操作，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     PrefabOverrides {
         #[arg(short, long)]
         input: PathBuf,
@@ -444,6 +472,7 @@ impl Commands {
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
             Commands::SkillTreeWiki { .. } => "skilltree-wiki",
             Commands::SkillTreeExport { .. } => "skilltree-export",
+            Commands::UploadImage { .. } => "upload-image",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",
@@ -1133,5 +1162,36 @@ mod tests {
         let args = Args::try_parse_from(["dst-huiji-wiki", "parse-po", "-i", "test.po"]).unwrap();
         let debug_str = format!("{:?}", args);
         assert!(debug_str.contains("ParsePo"));
+    }
+
+    #[test]
+    fn test_upload_image_command() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "upload-image",
+            "a.png",
+            "--name",
+            "A.png",
+            "--ignore-warnings",
+            "--dry-run",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::UploadImage {
+                path,
+                name,
+                ignore_warnings,
+                dry_run,
+                yes,
+                ..
+            } => {
+                assert_eq!(path, PathBuf::from("a.png"));
+                assert_eq!(name.as_deref(), Some("A.png"));
+                assert!(ignore_warnings);
+                assert!(dry_run);
+                assert!(!yes);
+            }
+            _ => panic!("Expected UploadImage command"),
+        }
     }
 }

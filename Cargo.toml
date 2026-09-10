@@ -15,7 +15,7 @@ clap = { version = "4", features = ["derive"] }
 full_moon = { version = "2.2", features = ["lua52"] }
 
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.13", features = ["json", "cookies", "query", "form"] }
+reqwest = { version = "0.13", features = ["json", "cookies", "query", "form", "multipart"] }
 dotenvy = "0.15"
 zip = "8"
 # 图片管线:PNG 解码/裁剪(split) + KTEX 容器解码(内置 ktech 等价实现) + atlas XML 布局解析

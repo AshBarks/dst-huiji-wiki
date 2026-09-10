@@ -2,6 +2,7 @@ pub mod dataset;
 pub mod progress;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
+pub mod upload_image;
 
 pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutReporter};
 
@@ -139,6 +140,18 @@ pub enum JobKind {
         output: Option<String>,
         #[serde(default)]
         snapshot: Option<String>,
+    },
+    /// 上传本地图片到维基（按素材目录自动补分类；同名重传可忽略警告）。
+    UploadImage {
+        path: String,
+        #[serde(default)]
+        name: Option<String>,
+        #[serde(default)]
+        description: Option<String>,
+        #[serde(default)]
+        comment: Option<String>,
+        #[serde(default)]
+        ignore_warnings: bool,
     },
     PrefabOverrides {
         input: String,
@@ -421,6 +434,7 @@ impl JobKind {
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
             JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
             JobKind::SkillTreeExport { .. } => "skilltree-export",
+            JobKind::UploadImage { .. } => "upload-image",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
@@ -448,6 +462,7 @@ impl JobKind {
                 | JobKind::MaintainDstRecipes { .. }
                 | JobKind::MaintainCopyClip { .. }
                 | JobKind::SkillTreeWiki { .. }
+                | JobKind::UploadImage { .. }
         )
     }
 }
@@ -585,6 +600,24 @@ async fn execute_job_inner(
                 opt_path(output),
                 snapshot.clone(),
                 reporter,
+            )
+            .await
+        }
+        JobKind::UploadImage {
+            path,
+            name,
+            description,
+            comment,
+            ignore_warnings,
+        } => {
+            upload_image::run_upload_image(
+                std::path::Path::new(path),
+                name.as_deref(),
+                description.as_deref(),
+                comment.as_deref(),
+                *ignore_warnings,
+                reporter,
+                mode,
             )
             .await
         }

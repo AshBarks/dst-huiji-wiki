@@ -52,6 +52,9 @@ pub enum Error {
     #[error("Wiki edit failed: {0}")]
     EditFailed(String),
 
+    #[error("Wiki upload failed: {0}")]
+    UploadFailed(String),
+
     #[error("Configuration error: {0}")]
     Config(String),
 

@@ -7,9 +7,13 @@
 //!
 //! `metainfo` 里除 `imgs` 外还写入 `render`（游戏部件几何：背景矩形、
 //! 节点偏移、XP 位置、背景 tint），渲染器据此布局而无需硬编码常量；
-//! `imgs` 会与角色所需图片清单合并（缺失键留空并计入报告），方便手工
-//! 上传后回填。`--output` 目录同时写出 `Skilltree.js`（更新版渲染器，
-//! 复制到维基 `零件:Skilltree.js`）。
+//! `imgs` 会与角色所需图片清单合并（缺失键留空并计入报告），随后用
+//! `prop=imageinfo&iiprop=url|size` 批量查回已上传图片的真实 URL（含
+//! `defs[].icon_url`），只有站内确实没有的才留在报告里待手工上传；
+//! 角色背景图还会校验是否为游戏原图尺寸（625×384），站内历史上的
+//! 拉伸放大版（852×756 / 852×653）会计入 `img_size_warnings`。
+//! `--output` 目录同时写出 `Skilltree.js`（更新版渲染器，复制到维基
+//! `零件:Skilltree.js`）。
 
 use super::dataset::{load_skill_strings, read_game_file};
 use super::{decide_write, WriteDecision, WriteMode};
@@ -61,6 +65,31 @@ const COMMON_IMGS: &[&str] = &[
     "Button_carny_long_hover",
     "Button_carny_long_down",
 ];
+
+/// 历史遗留的“逻辑键名 ≠ 站内文件名”映射（键 → 文件主干）。
+///
+/// 现有子页面里 `Button_carny_long_*` 三个键指向 `Button_long_*.png`，
+/// 新页面自动回填 URL 时需要按实际文件名查询。
+const IMG_FILE_ALIASES: &[(&str, &str)] = &[
+    ("Button_carny_long_normal", "Button_long_normal"),
+    ("Button_carny_long_hover", "Button_long_hover"),
+    ("Button_carny_long_down", "Button_long_down"),
+];
+
+/// 游戏角色背景原图的尺寸（`widgets/redux/skilltreewidget.lua` 断言值）。
+///
+/// 站内早期上传过 852×756 / 852×653 的拉伸放大版，旧渲染器用 Y_SCALE
+/// 硬编码适配；新渲染器按游戏几何 521×320 绘制，这些图会明显偏小。
+const GAME_BG_SIZE: (u32, u32) = (625, 384);
+
+/// 逻辑图片键对应的站内文件名主干（不含扩展名）。
+fn img_file_stem(key: &str) -> &str {
+    IMG_FILE_ALIASES
+        .iter()
+        .find(|(k, _)| *k == key)
+        .map(|(_, stem)| *stem)
+        .unwrap_or(key)
+}
 
 /// 含信息板（infographic）的树才需要的图片。
 const INFOGRAPHIC_IMGS: &[&str] = &[
@@ -291,6 +320,193 @@ fn wrap_page(json: &serde_json::Value) -> Result<String> {
     ))
 }
 
+fn set_img_url(content: &mut serde_json::Value, key: &str, url: String) {
+    if let Some(imgs) = content
+        .get_mut("metainfo")
+        .and_then(|m| m.get_mut("imgs"))
+        .and_then(|i| i.as_object_mut())
+    {
+        imgs.insert(key.to_string(), serde_json::json!(url));
+    }
+}
+
+fn set_icon_url(content: &mut serde_json::Value, node: &str, url: String) {
+    if let Some(def) = content
+        .get_mut("defs")
+        .and_then(|d| d.get_mut(node))
+        .and_then(|d| d.as_object_mut())
+    {
+        def.insert("icon_url".into(), serde_json::json!(url));
+    }
+}
+
+/// 背景图尺寸不符时给出的警告文案；尺寸正确或未知时返回 `None`。
+fn bg_size_warning(file: &str, size: Option<(u32, u32)>) -> Option<String> {
+    match size {
+        Some(actual) if actual != GAME_BG_SIZE => Some(format!(
+            "{} 实际 {}×{}，游戏原图应为 {}×{}；重传 images-sync 产物 \
+             split/skilltree/{} 即可修复",
+            file, actual.0, actual.1, GAME_BG_SIZE.0, GAME_BG_SIZE.1, file
+        )),
+        _ => None,
+    }
+}
+
+/// 站内地址与模块里保存的背景 URL 不一致时返回新地址（文件被移动/重命名）。
+fn background_url_update(stored: Option<&str>, current: Option<&str>) -> Option<String> {
+    match (stored, current) {
+        (Some(stored), Some(current)) if !stored.is_empty() && stored != current => {
+            Some(current.to_string())
+        }
+        // 旧值为空（历史缺失）时由 check_background 负责回填。
+        _ => None,
+    }
+}
+
+/// 解析并校验角色背景图：回填/刷新 URL + 检查是否为游戏原图尺寸（625×384）。
+///
+/// 背景图单独查询，无论模块里是否已有 URL（历史 URL 可能指向被移动的
+/// 文件）；解析成功会从 `missing_imgs` 移除该键。查询失败只告警不中断。
+async fn check_background(
+    client: &WikiClient,
+    tree: &SkillTree,
+    built: &mut BuiltPage,
+    reporter: &dyn Reporter,
+    page_title: &str,
+) -> Vec<String> {
+    let key = format!("{}_background", capitalize(&tree.character));
+    let file = format!("{}.png", key);
+    match client.get_files_info(&[file.as_str()]).await {
+        Ok(infos) => {
+            let Some(info) = infos
+                .first()
+                .filter(|info| !info.missing && info.url.is_some())
+            else {
+                return Vec::new();
+            };
+            if let Some(url) = info.url.clone() {
+                let stored = built
+                    .content
+                    .get("metainfo")
+                    .and_then(|m| m.get("imgs"))
+                    .and_then(|i| i.get(&key))
+                    .and_then(|v| v.as_str());
+                if background_url_update(stored, Some(&url)).is_some() {
+                    set_img_url(&mut built.content, &key, url);
+                    reporter.log(format!("{}：背景 URL 已刷新为 {}", page_title, file));
+                }
+                built.missing_imgs.retain(|k| k != &key);
+            }
+            match bg_size_warning(&file, info.size) {
+                Some(w) => {
+                    reporter.log(format!("{}：警告：{}", page_title, w));
+                    vec![w]
+                }
+                None => Vec::new(),
+            }
+        }
+        Err(e) => {
+            reporter.log(format!("警告：查询背景信息失败：{}", e));
+            Vec::new()
+        }
+    }
+}
+
+/// 用维基图片 API 回填缺失的 `metainfo.imgs` URL 与 `defs[].icon_url`。
+///
+/// 只对旧页面里没有 URL 的键发起查询（≤50 个一批）；首字母大写、下划线
+/// 等价空格等标题归一化由 [`WikiClient::get_files_info`] 处理。查询失败
+/// 只告警不中断，缺失项留待手工上传后下次运行回填。
+async fn fill_missing_urls(
+    client: &WikiClient,
+    tree: &SkillTree,
+    built: &mut BuiltPage,
+    reporter: &dyn Reporter,
+    page_title: &str,
+) {
+    if !built.missing_imgs.is_empty() {
+        // 背景键由 check_background 单独处理（回填/刷新 + 尺寸校验）。
+        let (backgrounds, others): (Vec<String>, Vec<String>) = built
+            .missing_imgs
+            .iter()
+            .cloned()
+            .partition(|key| key.ends_with("_background"));
+        let mut still_missing = backgrounds;
+        if !others.is_empty() {
+            let names: Vec<String> = others
+                .iter()
+                .map(|key| format!("{}.png", img_file_stem(key)))
+                .collect();
+            let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+            match client.get_files_info(&refs).await {
+                Ok(infos) => {
+                    let mut filled = 0usize;
+                    for (key, info) in others.iter().zip(infos) {
+                        match info.url {
+                            Some(url) => {
+                                set_img_url(&mut built.content, key, url);
+                                filled += 1;
+                            }
+                            None => still_missing.push(key.clone()),
+                        }
+                    }
+                    if filled > 0 {
+                        reporter.log(format!("{}：已回填 {} 个图片 URL", page_title, filled));
+                    }
+                }
+                Err(e) => {
+                    reporter.log(format!("警告：查询图片信息失败：{}", e));
+                    still_missing.extend(others);
+                }
+            }
+        }
+        built.missing_imgs = still_missing;
+    }
+
+    if !built.missing_icon_urls.is_empty() {
+        let icon_of: std::collections::HashMap<&str, &str> = tree
+            .nodes
+            .iter()
+            .filter_map(|n| n.icon.as_deref().map(|icon| (n.name.as_str(), icon)))
+            .collect();
+        let candidates: Vec<&String> = built
+            .missing_icon_urls
+            .iter()
+            .filter(|name| icon_of.contains_key(name.as_str()))
+            .collect();
+        let names: Vec<String> = candidates
+            .iter()
+            .map(|name| format!("{}.png", icon_of[name.as_str()]))
+            .collect();
+        let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+        match client.get_files_info(&refs).await {
+            Ok(infos) => {
+                let mut still_missing = Vec::new();
+                let mut filled = 0usize;
+                for (name, info) in candidates.into_iter().zip(infos) {
+                    match info.url {
+                        Some(url) => {
+                            set_icon_url(&mut built.content, name, url);
+                            filled += 1;
+                        }
+                        None => still_missing.push(name.clone()),
+                    }
+                }
+                for name in &built.missing_icon_urls {
+                    if !icon_of.contains_key(name.as_str()) {
+                        still_missing.push(name.clone());
+                    }
+                }
+                built.missing_icon_urls = still_missing;
+                if filled > 0 {
+                    reporter.log(format!("{}：已回填 {} 个图标 URL", page_title, filled));
+                }
+            }
+            Err(e) => reporter.log(format!("警告：查询图标信息失败：{}", e)),
+        }
+    }
+}
+
 /// 单个角色的维护结果。
 struct CharacterOutcome {
     status: String,
@@ -298,6 +514,7 @@ struct CharacterOutcome {
     removed: usize,
     missing_imgs: Vec<String>,
     missing_icon_urls: Vec<String>,
+    img_size_warnings: Vec<String>,
 }
 
 /// 单个角色的完整维护流程。
@@ -320,7 +537,10 @@ async fn maintain_character(
         .and_then(|p| p.content.as_deref())
         .and_then(parse_page_json);
 
-    let built = build_page_content(&tree, strings, existing.as_ref());
+    let mut built = build_page_content(&tree, strings, existing.as_ref());
+    fill_missing_urls(client, &tree, &mut built, reporter, &page_title).await;
+    let img_size_warnings =
+        check_background(client, &tree, &mut built, reporter, &page_title).await;
     let new_content = wrap_page(&built.content)?;
 
     if !built.missing_imgs.is_empty() {
@@ -355,6 +575,7 @@ async fn maintain_character(
         removed: 0,
         missing_imgs: built.missing_imgs,
         missing_icon_urls: built.missing_icon_urls,
+        img_size_warnings,
     };
 
     let old_content = page
@@ -410,6 +631,14 @@ async fn maintain_character(
     Ok(outcome)
 }
 
+/// 只有可能写入的模式才需要登录；dry-run 全程只读，允许匿名。
+///
+/// 注意：客户端必须在登录后才克隆进任务，因为 `WikiClient::logged_in`
+/// 是值字段，克隆不会共享后续的状态变更。
+fn should_login(mode: WriteMode) -> bool {
+    mode != WriteMode::DryRun
+}
+
 /// `skilltree-wiki` 任务入口：提取全部（或指定）角色的技能树并维护子页面。
 pub async fn run_skilltree_wiki(
     character: Option<String>,
@@ -421,6 +650,13 @@ pub async fn run_skilltree_wiki(
     let dst_root = std::env::var("DST__ROOT")
         .map_err(|e| crate::Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
     let mut ctx = crate::DstContext::new(dst_root, snapshot.clone())?;
+
+    // dry-run 只读不写，允许匿名；其余模式必须先登录（编辑时 assert=user）。
+    if should_login(mode) {
+        reporter.stage("登录维基");
+        ctx.wiki_mut().login().await?;
+    }
+    // 必须在登录后克隆：`logged_in` 是值字段，克隆不会共享后续状态变更。
     let client = ctx.wiki().clone();
 
     let all_characters = super::dataset::list_skill_characters(&mut ctx)?;
@@ -492,6 +728,7 @@ pub async fn run_skilltree_wiki(
             "removed": outcome.removed,
             "missing_imgs": outcome.missing_imgs,
             "missing_icon_urls": outcome.missing_icon_urls,
+            "img_size_warnings": outcome.img_size_warnings,
         }));
     }
 
@@ -699,5 +936,49 @@ mod tests {
             built.content["defs"]["wortox_scales"]["decorations"][0]["img"],
             "winona_background1"
         );
+    }
+
+    #[test]
+    fn test_should_login_only_for_write_modes() {
+        assert!(!should_login(WriteMode::DryRun));
+        assert!(should_login(WriteMode::AutoConfirm));
+        assert!(should_login(WriteMode::Interactive));
+    }
+
+    #[test]
+    fn test_img_file_stem_alias() {
+        assert_eq!(img_file_stem("Winona_background1"), "Winona_background1");
+        assert_eq!(img_file_stem("Infographic_off"), "Infographic_off");
+        assert_eq!(
+            img_file_stem("Button_carny_long_normal"),
+            "Button_long_normal"
+        );
+        assert_eq!(img_file_stem("Button_carny_long_down"), "Button_long_down");
+    }
+
+    #[test]
+    fn test_background_url_update() {
+        // 地址变化（文件被移动/重命名）时返回新地址。
+        assert_eq!(
+            background_url_update(Some("https://old/a.png"), Some("https://new/a.png")).as_deref(),
+            Some("https://new/a.png")
+        );
+        // 一致、旧值为空或站内缺失时都不动。
+        assert!(background_url_update(Some("https://x/a.png"), Some("https://x/a.png")).is_none());
+        assert!(background_url_update(Some(""), Some("https://x/a.png")).is_none());
+        assert!(background_url_update(None, Some("https://x/a.png")).is_none());
+        assert!(background_url_update(Some("https://old/a.png"), None).is_none());
+    }
+
+    #[test]
+    fn test_bg_size_warning() {
+        // 游戏原图与未知尺寸都不告警。
+        assert!(bg_size_warning("Wilson_background.png", Some((625, 384))).is_none());
+        assert!(bg_size_warning("Wilson_background.png", None).is_none());
+        // 站内历史拉伸放大版会告警并带实际尺寸。
+        let w = bg_size_warning("Wilson_background.png", Some((852, 756))).unwrap();
+        assert!(w.contains("852×756"), "{}", w);
+        assert!(w.contains("625×384"), "{}", w);
+        assert!(w.contains("Wilson_background.png"), "{}", w);
     }
 }

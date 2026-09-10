@@ -723,6 +723,48 @@ fn renderable_skins(entries: &[serde_json::Value]) -> Vec<serde_json::Value> {
         .collect()
 }
 
+/// `AnimContent.builds` 非空表示该归档提供 build.bin。
+fn content_has_build(content: &serde_json::Value) -> bool {
+    content
+        .get("builds")
+        .and_then(|v| v.as_array())
+        .map(|a| !a.is_empty())
+        .unwrap_or(false)
+}
+
+/// 一个 prefab 记录引用的文件里，实际带 build.bin 的归档数量。
+fn prefab_build_file_count(
+    record: &serde_json::Value,
+    anim_files: &serde_json::Map<String, serde_json::Value>,
+    build_files: &serde_json::Map<String, serde_json::Value>,
+) -> usize {
+    let mut paths: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    if let Some(anims) = record.get("anims").and_then(|v| v.as_array()) {
+        for a in anims {
+            if let Some(p) = a.get("normalized").and_then(|v| v.as_str()) {
+                paths.insert(p.to_string());
+            }
+        }
+    }
+    if let Some(related) = record.get("related_files").and_then(|v| v.as_array()) {
+        for p in related {
+            if let Some(p) = p.as_str() {
+                paths.insert(p.to_string());
+            }
+        }
+    }
+    paths
+        .iter()
+        .filter(|p| {
+            anim_files
+                .get(*p)
+                .map(|v| content_has_build(v.get("content").unwrap_or(v)))
+                .unwrap_or(false)
+                || build_files.get(*p).map(content_has_build).unwrap_or(false)
+        })
+        .count()
+}
+
 /// GET /api/anim/assets/prefabs?q=hound
 pub async fn anim_assets_prefabs(
     Query(q): Q,
@@ -731,6 +773,16 @@ pub async fn anim_assets_prefabs(
     let skin_counts = load_skin_index_optional()?
         .as_ref()
         .map(skin_index_prefab_skins)
+        .unwrap_or_default();
+    let anim_files = index
+        .get("anim_files")
+        .and_then(|v| v.as_object())
+        .cloned()
+        .unwrap_or_default();
+    let build_files = index
+        .get("build_files")
+        .and_then(|v| v.as_object())
+        .cloned()
         .unwrap_or_default();
     let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
     let items: Vec<serde_json::Value> = index
@@ -766,6 +818,8 @@ pub async fn anim_assets_prefabs(
                             r["skin_count"] = serde_json::json!(skins);
                         }
                     }
+                    r["build_file_count"] =
+                        serde_json::json!(prefab_build_file_count(&r, &anim_files, &build_files));
                     r
                 })
                 .collect()
@@ -1087,7 +1141,8 @@ pub async fn anim_assets_preview(
 }
 
 /// GET /api/anim/assets/find-builds?symbols=a,b,c
-/// Search `data/anim` for build files providing the requested symbols.
+/// Search `data/anim` for builds that can serve the requested symbols, by
+/// same-name provider or via a Tier-A symbol map entry.
 pub async fn anim_assets_find_builds(
     Query(q): Q,
 ) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
@@ -1097,13 +1152,50 @@ pub async fn anim_assets_find_builds(
     }
     let anim_root = anim_root_from_index_or_env()?;
     let builds = tokio::task::spawn_blocking(move || {
-        dst_huiji_wiki::scripts_sync::anim::preview::find_builds_for_symbols(&anim_root, &symbols)
+        let remaps = load_remap_index();
+        dst_huiji_wiki::scripts_sync::anim::preview::find_builds_for_symbols(
+            &anim_root,
+            &symbols,
+            remaps.as_ref(),
+        )
     })
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
     .map_err(err_status)?;
 
     Ok(Json(serde_json::json!({ "builds": builds })))
+}
+
+/// Tier-A 符号表（`anim-remap-index.json`）；产物缺失时返回 None。
+fn load_remap_index() -> Option<dst_huiji_wiki::parser::anim_override::SymbolRemapIndex> {
+    let text = std::fs::read_to_string(anim_remap_index_path()).ok()?;
+    let artifact: dst_huiji_wiki::scripts_sync::anim::remap_history::RemapArtifact =
+        serde_json::from_str(&text).ok()?;
+    Some(dst_huiji_wiki::parser::anim_override::SymbolRemapIndex {
+        symbols: artifact.symbols,
+    })
+}
+
+/// GET /api/anim/assets/files?q=&limit=
+/// 手动导入：按相对路径检索 `data/anim` 下的 zip/dyn 归档。
+pub async fn anim_assets_files(
+    Query(q): Q,
+) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
+    let query = q.get("q").cloned().unwrap_or_default();
+    let limit = q
+        .get("limit")
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(200)
+        .min(1000);
+    let anim_root = anim_root_from_index_or_env()?;
+    let files = tokio::task::spawn_blocking(move || {
+        dst_huiji_wiki::scripts_sync::anim::preview::list_archives(&anim_root, &query, limit)
+    })
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .map_err(err_status)?;
+
+    Ok(Json(serde_json::json!({ "files": files })))
 }
 
 fn split_csv(v: Option<&String>) -> Vec<String> {

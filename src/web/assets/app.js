@@ -1121,6 +1121,8 @@ async function pageConstants(main) {
 /* ---------------- animation assets ---------------- */
 async function pageAnimAssets(main) {
   const state = {
+    source: "prefab",
+    tab: "prefab",
     q: "",
     items: [],
     prefabFile: null,
@@ -1145,9 +1147,33 @@ async function pageAnimAssets(main) {
     skins: [],
     selectedSkin: null,
     previewTimer: null,
+    manualQ: "",
+    manualResults: [],
+    manualChecked: new Set(),
+    manualPrimary: null,
+    manualFiles: [],
   };
 
   async function apiJSON(url) { return getJSON(url); }
+
+  main.innerHTML = `
+    <div class="panel" style="margin-bottom:12px;padding:10px 12px">
+      <div class="tabs" style="margin:0">
+        <button class="tab active" data-asset-tab="prefab">Prefab 检索</button>
+        <button class="tab" data-asset-tab="manual">手动文件</button>
+      </div>
+    </div>
+    <div id="animPane"></div>`;
+  const view = () => $("#animPane");
+  main.querySelectorAll("[data-asset-tab]").forEach(btn => {
+    btn.onclick = () => {
+      state.tab = btn.dataset.assetTab;
+      main.querySelectorAll("[data-asset-tab]").forEach(x =>
+        x.classList.toggle("active", x === btn));
+      if (state.tab === "prefab") renderList();
+      else renderManual();
+    };
+  });
 
   async function search() {
     const kw = state.q.trim();
@@ -1158,7 +1184,7 @@ async function pageAnimAssets(main) {
   }
 
   function renderList() {
-    main.innerHTML = `
+    view().innerHTML = `
       <div class="panel">
         <h2>动画素材检索</h2>
         <div class="row">
@@ -1175,11 +1201,13 @@ async function pageAnimAssets(main) {
       (groups[key] = groups[key] || []).push(item);
     }
     $("#assetResults").innerHTML = Object.entries(groups).map(([file, items]) => `
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <div>
-          <code>${esc(file)}</code>
-          ${items.map(i => `<span class="chip">${esc(i.prefab_name || "?")}${i.skin_count ? ` <span class="muted">· skins ${i.skin_count}</span>` : ""}</span>`).join("")}
-          <span class="muted">(${(items[0].anims || []).length} 动画文件 / ${(items[0].related_files || []).length} build 文件)</span>
+      <div class="result-row">
+        <div class="result-main">
+          <div class="result-file"><code>${esc(file)}</code></div>
+          <div class="result-meta">
+            ${items.map(i => `<span class="chip">${esc(i.prefab_name || "?")}${i.skin_count ? ` <span class="muted">· skins ${i.skin_count}</span>` : ""}</span>`).join("")}
+            <span class="muted">(${(items[0].anims || []).length} 动画文件 / ${items[0].build_file_count || 0} build 文件)</span>
+          </div>
         </div>
         <button class="btn secondary" data-open="${esc(file)}">进入预览</button>
       </div>`).join("") || '<p class="muted">未找到匹配 prefab。</p>';
@@ -1192,6 +1220,7 @@ async function pageAnimAssets(main) {
   }
 
   async function openPrefab(file) {
+    state.source = "prefab";
     state.prefabFile = file;
     state.prefabItems = [];
     state.animFiles = [];
@@ -1251,7 +1280,11 @@ async function pageAnimAssets(main) {
       return (c.banks || []).length > 0 || (c.animations || []).length > 0;
     });
     const relatedFiles = state.relatedFiles;
-    main.innerHTML = `
+    const buildFileCount = relatedFiles
+      .concat(animFiles)
+      .filter(path => (fileContent(path).builds || []).length > 0)
+      .length;
+    view().innerHTML = `
       <div class="panel">
         <div class="row">
           <button class="btn secondary" id="backToList">返回搜索</button>
@@ -1260,7 +1293,7 @@ async function pageAnimAssets(main) {
       </div>
       <div class="card-row">
         <div class="card"><div class="num">${animFiles.length}</div><span class="muted">动画文件</span></div>
-        <div class="card"><div class="num">${relatedFiles.length}</div><span class="muted">Build/package 文件</span></div>
+        <div class="card"><div class="num">${buildFileCount}</div><span class="muted">Build 文件</span></div>
       </div>
       <div class="panel">
         <h2>Animations 按文件</h2>
@@ -1269,13 +1302,13 @@ async function pageAnimAssets(main) {
           const banks = c.banks || [];
           const animations = c.animations || [];
           const banksHtml = banks.map(b => `
-            <div style="margin-left:12px">
+            <div style="margin:2px 0 4px 10px">
               <b>${esc(b)}</b>
-              <div style="margin-left:12px">${animations.map(a => `
+              <div style="margin-left:10px;display:flex;flex-wrap:wrap;gap:4px">${animations.map(a => `
                 <button class="btn link" data-play="${esc(path)}|${esc(b)}|${esc(a)}">${esc(a)}</button>
               `).join("") || '<span class="muted">无动画</span>'}</div>
             </div>`).join("");
-          return `<div class="row" style="align-items:flex-start"><code>${esc(path)}</code><div>${banksHtml || '<span class="muted">无 banks</span>'}</div></div>`;
+          return `<div class="file-block"><code>${esc(path)}</code><div style="margin-top:4px">${banksHtml || '<span class="muted">无 banks</span>'}</div></div>`;
         }).join("") || '<p class="muted">无动画文件</p>'}
       </div>
       <div class="panel">
@@ -1284,9 +1317,9 @@ async function pageAnimAssets(main) {
           const c = fileContent(path);
           if (!c.builds && !c.symbols && !c.atlases) return "";
           const disabled = state.disabledBuilds.has(path);
-          return `<div class="row" style="align-items:flex-start">
-            <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" data-build-toggle="${esc(path)}" ${disabled ? "" : "checked"}> <code>${esc(path)}</code></label>
-            <div class="muted">
+          return `<div class="file-block">
+            <label style="display:flex;align-items:center;gap:6px;margin:0"><input type="checkbox" data-build-toggle="${esc(path)}" ${disabled ? "" : "checked"}> <code>${esc(path)}</code></label>
+            <div class="muted" style="margin-top:4px">
               ${(c.builds || []).map(x => `build: ${esc(x)}`).join(", ")}
               <div>symbols: ${(c.symbols || []).slice(0, 50).map(esc).join(", ") || "—"}</div>
               <div>atlases: ${(c.atlases || []).map(esc).join(", ") || "—"}</div>
@@ -1296,13 +1329,13 @@ async function pageAnimAssets(main) {
       </div>`;
 
     $("#backToList").onclick = () => { state.prefabFile = null; renderList(); };
-    main.querySelectorAll("[data-play]").forEach(btn => {
+    view().querySelectorAll("[data-play]").forEach(btn => {
       btn.onclick = () => {
         const [file, bank, anim] = btn.dataset.play.split("|");
         openAnimation(file, bank, anim);
       };
     });
-    main.querySelectorAll("[data-build-toggle]").forEach(chk => {
+    view().querySelectorAll("[data-build-toggle]").forEach(chk => {
       chk.onchange = () => {
         const path = chk.dataset.buildToggle;
         if (chk.checked) state.disabledBuilds.delete(path);
@@ -1311,12 +1344,19 @@ async function pageAnimAssets(main) {
     });
   }
 
+  function sessionFiles(primary) {
+    const base = state.source === "manual"
+      ? state.manualFiles.slice()
+      : state.relatedFiles.concat(state.animFiles.filter(f => f !== primary));
+    return base.filter(f => f !== primary).concat([primary]);
+  }
+
   async function openAnimation(file, bank, anim) {
     state.selectedFile = file;
     state.selectedBank = bank;
     state.selectedAnim = anim;
     state.info = null;
-    const files = state.relatedFiles.concat(state.animFiles.filter(f => f !== file)).concat([file]);
+    const files = sessionFiles(file);
     const skinQ = state.selectedSkin
       ? `&skin_zip=${encodeURIComponent(state.selectedSkin.zip || "")}` +
         (state.selectedSkin.dyn ? `&skin_dyn=${encodeURIComponent(state.selectedSkin.dyn)}` : "")
@@ -1344,7 +1384,7 @@ async function pageAnimAssets(main) {
     const builds = info.builds || [];
     const frames = info.frames || [];
 
-    main.innerHTML = `
+    view().innerHTML = `
       <div class="anim-detail-grid">
         <div class="anim-col-left">
           <div class="panel" style="margin:0">
@@ -1398,7 +1438,7 @@ async function pageAnimAssets(main) {
         </div>
         <div class="panel anim-col-center">
           <div class="row" style="justify-content:space-between;align-items:center">
-            <button class="btn secondary" id="backToPrefab">返回搜索</button>
+            <button class="btn secondary" id="backToPrefab">${state.source === "manual" ? "返回手动文件" : "返回搜索"}</button>
             <b><code>${esc(info.bank)} / ${esc(info.animation)}</code></b>
           </div>
           <div id="animPreview" style="flex:1;width:100%;height:100%;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(#fff 0 25%, #eee 0 50%) 0 0/16px 16px;border:1px solid var(--border);margin:8px 0;position:relative"></div>
@@ -1426,7 +1466,7 @@ async function pageAnimAssets(main) {
         </div>
       </div>`;
 
-    $("#backToPrefab").onclick = () => renderList();
+    $("#backToPrefab").onclick = () => (state.source === "manual" ? renderManual() : renderList());
 
     // Skin switch: re-fetch info + preview with the selected skin package.
     const skinSel = $("#skinSel");
@@ -1540,10 +1580,18 @@ async function pageAnimAssets(main) {
         : list.map(b => {
             const checked = state.extraBuilds.has(b.file);
             const disabled = state.disabledBuilds.has(b.file);
+            const via = b.via === "symbol_map"
+              ? '<span class="badge b-ok">map</span>'
+              : b.via === "both"
+                ? '<span class="badge b-ok">map+同名</span>'
+                : "";
+            const matched = (b.matched_symbols || []).join(",")
+              || (b.remaps || []).map(r => `${r.symbol}→${r.src_symbol}`).join(",");
             return `<div class="list-row">
               <input type="checkbox" data-candidate-toggle="${esc(b.file)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
               <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
-              <span class="list-meta" title="${esc((b.matched_symbols || []).join(", "))}">${(b.matched_symbols || []).join(",")}</span>
+              ${via}
+              <span class="list-meta" title="${esc(matched)}">${esc(matched)}</span>
             </div>`;
           }).join("");
       $("#candidateBuilds").querySelectorAll("[data-candidate-toggle]").forEach(chk => {
@@ -1563,9 +1611,11 @@ async function pageAnimAssets(main) {
       $("#candidateBuilds").innerHTML = '<p class="muted">搜索中…</p>';
       try {
         const r = await apiJSON(`/api/anim/assets/find-builds?symbols=${encodeURIComponent(missingSymbols.join(","))}`);
-        state.candidateBuilds = r.builds || [];
-        // Auto-check all found candidates so missing symbols are filled immediately.
-        for (const b of state.candidateBuilds) state.extraBuilds.add(b.file);
+        const known = new Set(state.candidateBuilds.map(b => b.file));
+        for (const b of r.builds || []) {
+          if (!known.has(b.file)) { state.candidateBuilds.push(b); known.add(b.file); }
+          state.extraBuilds.add(b.file);
+        }
         renderCandidates();
         renderSymbolDeps();
         schedulePreviewRefresh();
@@ -1574,6 +1624,23 @@ async function pageAnimAssets(main) {
       }
     };
     $("#findMissingBuilds").onclick = loadCandidates;
+
+    // 单个 symbol 的按需扫描：同名 provider ∪ symbol map 目标 build。
+    const scanSymbolBuilds = async (sym) => {
+      try {
+        const r = await apiJSON(`/api/anim/assets/find-builds?symbols=${encodeURIComponent(sym)}`);
+        const known = new Set(state.candidateBuilds.map(b => b.file));
+        for (const b of r.builds || []) {
+          if (!known.has(b.file)) { state.candidateBuilds.push(b); known.add(b.file); }
+          state.extraBuilds.add(b.file);
+        }
+        renderCandidates();
+        renderSymbolDeps();
+        schedulePreviewRefresh();
+      } catch (e) {
+        alert("扫描失败：" + e.message);
+      }
+    };
     renderCandidates();
 
     // Select all / none / invert for candidate builds
@@ -1601,10 +1668,10 @@ async function pageAnimAssets(main) {
 
     // Collapse all two-level lists
     $("#collapseAnims").onclick = () => {
-      main.querySelectorAll("#leftAnims details").forEach(d => d.open = false);
+      view().querySelectorAll("#leftAnims details").forEach(d => d.open = false);
     };
     $("#collapseSymbols").onclick = () => {
-      main.querySelectorAll("#symbolDeps details").forEach(d => d.open = false);
+      view().querySelectorAll("#symbolDeps details").forEach(d => d.open = false);
     };
 
     // Right: frame detail renderer
@@ -1675,7 +1742,8 @@ async function pageAnimAssets(main) {
             <input type="checkbox" data-sym-toggle="${esc(sym)}" ${hidden ? "" : "checked"}>
             <details style="flex:1;min-width:0">
               <summary style="cursor:pointer;display:flex;align-items:center;gap:4px">
-                <code class="list-name" title="${esc(sym)}">${esc(sym)}</code>${hidden ? '<span class="badge b-warn">hidden</span>' : ""}${autoIdx >= 0 ? '<span class="badge b-ok">auto-map</span>' : ""}
+                <code class="list-name" style="flex:0 1 auto" title="${esc(sym)}">${esc(sym)}</code>${hidden ? '<span class="badge b-warn">hidden</span>' : ""}${autoIdx >= 0 ? '<span class="badge b-ok">auto-map</span>' : ""}
+                <button class="btn link" data-sym-scan="${esc(sym)}" title="扫描含该 symbol（同名 ∪ symbol map）的可用 build">扫描 build</button>
               </summary>
               <div style="margin-left:10px;padding:2px 0">
                 ${providers.length === 0 ? '<span class="muted">missing — no build provides this symbol</span>' : providers.map(b => `
@@ -1693,7 +1761,7 @@ async function pageAnimAssets(main) {
       }).join("");
       $("#symbolDeps").innerHTML = symHtml || '<p class="muted">无 symbol 依赖</p>';
 
-      main.querySelectorAll("[data-sym-toggle]").forEach(chk => {
+      view().querySelectorAll("[data-sym-toggle]").forEach(chk => {
         chk.onchange = () => {
           const sym = chk.dataset.symToggle;
           if (chk.checked) state.hiddenSymbols.delete(sym);
@@ -1702,7 +1770,7 @@ async function pageAnimAssets(main) {
           schedulePreviewRefresh();
         };
       });
-      main.querySelectorAll("[data-sym-build]").forEach(radio => {
+      view().querySelectorAll("[data-sym-build]").forEach(radio => {
         radio.onchange = () => {
           const sym = radio.dataset.symBuild;
           state.symbolBuilds[sym] = radio.value;
@@ -1712,7 +1780,7 @@ async function pageAnimAssets(main) {
           schedulePreviewRefresh();
         };
       });
-      main.querySelectorAll("[data-sym-remap]").forEach(sel => {
+      view().querySelectorAll("[data-sym-remap]").forEach(sel => {
         sel.onchange = () => {
           const sym = sel.dataset.symRemap;
           if (sel.value === "") {
@@ -1725,6 +1793,13 @@ async function pageAnimAssets(main) {
           renderSymbolDeps();
           schedulePreviewRefresh();
         };
+      });
+      view().querySelectorAll("[data-sym-scan]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          scanSymbolBuilds(btn.dataset.symScan);
+        });
       });
     };
     renderSymbolDeps();
@@ -1773,7 +1848,7 @@ async function pageAnimAssets(main) {
 
     const buildRenderParams = (format) => {
       const extra = Array.from(state.extraBuilds).filter(f => f !== state.selectedFile);
-      const files = extra.concat(state.relatedFiles).concat(state.animFiles.filter(f => f !== state.selectedFile)).concat([state.selectedFile]);
+      const files = extra.concat(sessionFiles(state.selectedFile));
       const params = new URLSearchParams({
         files: files.join(","),
         bank: state.selectedBank,
@@ -1875,8 +1950,159 @@ async function pageAnimAssets(main) {
   }
 
 
+  /* ---------------- manual file source ---------------- */
+  async function renderManual() {
+    view().innerHTML = `
+      <div class="panel">
+        <h2>手动文件导入</h2>
+        <div class="row">
+          <input id="manualQ" placeholder="按文件名搜索，如 wilson / player_actions_axe / dynamic…" style="width:360px" value="${esc(state.manualQ)}">
+          <button class="btn" id="manualSearch">搜索</button>
+          <span class="muted" id="manualCount"></span>
+        </div>
+        <p class="muted">勾选参与渲染的归档；带 <span class="badge b-ok">anim</span> 的可设为主文件。symbol map 与候选扫描进入详情后与 prefab 线共用同一套逻辑。</p>
+      </div>
+      <div class="panel" id="manualResults"></div>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <h2 style="margin:0">已选文件</h2>
+          <button class="btn" id="manualPreview">进入预览</button>
+        </div>
+        <div id="manualSelected"></div>
+      </div>`;
+    $("#manualSearch").onclick = manualSearch;
+    $("#manualQ").addEventListener("input", e => { state.manualQ = e.target.value; });
+    $("#manualQ").addEventListener("keydown", e => { if (e.key === "Enter") manualSearch(); });
+    $("#manualPreview").onclick = enterManualPreview;
+    if (state.manualResults.length === 0) await manualSearch();
+    else { renderManualResults(); renderManualSelected(); }
+  }
+
+  async function manualSearch() {
+    const box = $("#manualResults");
+    if (box) box.innerHTML = '<p class="muted">搜索中…</p>';
+    try {
+      const q = state.manualQ.trim();
+      const r = await apiJSON(`/api/anim/assets/files?q=${encodeURIComponent(q)}&limit=200`);
+      state.manualResults = r.files || [];
+      renderManualResults();
+    } catch (e) {
+      if (box) box.innerHTML = `<p style="color:var(--err)">失败：${esc(e.message)}</p>`;
+    }
+  }
+
+  function manualResultMeta(path) {
+    return state.manualResults.find(f => f.path === path) || {};
+  }
+
+  function renderManualResults() {
+    const box = $("#manualResults");
+    if (!box) return;
+    $("#manualCount").textContent = `共 ${state.manualResults.length} 条`;
+    box.innerHTML = state.manualResults.map(f => {
+      const checked = state.manualChecked.has(f.path);
+      const primary = state.manualPrimary === f.path;
+      return `<div class="list-row">
+        <input type="checkbox" data-manual-check="${esc(f.path)}" ${checked ? "checked" : ""}>
+        <code class="list-name" title="${esc(f.path)}">${esc(f.path)}</code>
+        ${f.has_anim ? '<span class="badge b-ok">anim</span>' : ""}
+        ${f.build_name ? `<span class="list-meta" title="build: ${esc(f.build_name)}">build: ${esc(f.build_name)}</span>` : ""}
+        ${f.has_anim ? `<label class="muted" style="display:flex;align-items:center;gap:3px;margin:0;font-size:11px"><input type="radio" name="manualPrimary" value="${esc(f.path)}" ${primary ? "checked" : ""}>主文件</label>` : ""}
+      </div>`;
+    }).join("") || '<p class="muted">未找到文件。</p>';
+    box.querySelectorAll("[data-manual-check]").forEach(chk => {
+      chk.onchange = () => {
+        if (chk.checked) state.manualChecked.add(chk.dataset.manualCheck);
+        else {
+          state.manualChecked.delete(chk.dataset.manualCheck);
+          if (state.manualPrimary === chk.dataset.manualCheck) state.manualPrimary = null;
+        }
+        renderManualResults();
+      };
+    });
+    box.querySelectorAll('input[name="manualPrimary"]').forEach(radio => {
+      radio.onchange = () => {
+        state.manualPrimary = radio.value;
+        state.manualChecked.add(radio.value);
+        renderManualSelected();
+      };
+    });
+  }
+
+  function renderManualSelected() {
+    const box = $("#manualSelected");
+    if (!box) return;
+    const selected = Array.from(state.manualChecked);
+    box.innerHTML = selected.length === 0
+      ? '<p class="muted">尚未选择文件。</p>'
+      : selected.map(path => {
+          const meta = manualResultMeta(path);
+          return `<div class="list-row">
+            <span class="list-name" title="${esc(path)}"><code>${esc(path)}</code></span>
+            ${state.manualPrimary === path ? '<span class="badge b-ok">主文件</span>' : (meta.has_anim ? '<span class="badge b-warn">可设主文件</span>' : "")}
+            <button class="btn link" data-manual-remove="${esc(path)}">移除</button>
+          </div>`;
+        }).join("");
+    box.querySelectorAll("[data-manual-remove]").forEach(btn => {
+      btn.onclick = () => {
+        const path = btn.dataset.manualRemove;
+        state.manualChecked.delete(path);
+        if (state.manualPrimary === path) state.manualPrimary = null;
+        renderManualResults();
+      };
+    });
+  }
+
+  function flattenBanks(meta) {
+    const banks = (meta.banks || []).map(b => b.name);
+    const animations = [];
+    for (const b of meta.banks || []) for (const a of b.animations || []) animations.push(a);
+    return { banks, animations };
+  }
+
+  async function enterManualPreview() {
+    let primary = state.manualPrimary;
+    if (!primary || !state.manualChecked.has(primary)) {
+      const hit = state.manualResults.find(f => state.manualChecked.has(f.path) && f.has_anim);
+      primary = hit ? hit.path : null;
+    }
+    if (!primary) { alert("请勾选并指定一个含 anim 的主文件"); return; }
+    state.manualPrimary = primary;
+    const meta = manualResultMeta(primary);
+    const firstBank = (meta.banks || [])[0] || {};
+    const bank = firstBank.name;
+    const anim = (firstBank.animations || [])[0];
+    if (!bank || !anim) { alert("主文件没有可预览的 bank/animation"); return; }
+    state.source = "manual";
+    state.manualFiles = Array.from(state.manualChecked);
+    if (!state.manualFiles.includes(primary)) state.manualFiles.push(primary);
+
+    state.animFiles = [];
+    state.relatedFiles = [];
+    state.fileInfo = [];
+    state.hiddenSymbols.clear();
+    state.symbolBuilds = {};
+    state.remaps = {};
+    state.remapChoice = {};
+    state.remapOptOut = new Set();
+    state.clothingSymbols.clear();
+    state.disabledBuilds.clear();
+    state.candidateBuilds = [];
+    state.extraBuilds.clear();
+    state.skins = [];
+    state.selectedSkin = null;
+    for (const path of state.manualFiles) {
+      const flat = flattenBanks(manualResultMeta(path));
+      state.fileInfo.push({ path, content: flat });
+      if ((flat.banks || []).length || (flat.animations || []).length) state.animFiles.push(path);
+      else state.relatedFiles.push(path);
+    }
+    if (!state.animFiles.includes(primary)) state.animFiles.unshift(primary);
+    await openAnimation(primary, bank, anim);
+  }
+
   // Initial load
-  main.innerHTML = '<div class="panel"><p class="muted">加载中…</p></div>';
+  view().innerHTML = '<div class="panel"><p class="muted">加载中…</p></div>';
   await search();
 }
 

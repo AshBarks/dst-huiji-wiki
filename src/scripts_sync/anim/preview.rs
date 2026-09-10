@@ -5,13 +5,14 @@
 //! to PNG frames, and exports either a GIF or a PNG sequence zip.
 
 use crate::error::{Error, Result};
+use crate::parser::anim_override::SymbolRemapIndex;
 use dst_anim_tool::render::{
     prepare_animation_frames_with_overrides, render_frame_with_elements, BuildRef,
     SymbolOverrideMap,
 };
 use rayon::prelude::*;
 use serde::Serialize;
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::{Cursor, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -107,12 +108,35 @@ fn ensure_override_builds_loaded(
     Ok(())
 }
 
-type BuildNameIndex = HashMap<String, PathBuf>;
-type BuildNameCache = Mutex<HashMap<PathBuf, ((usize, u64), Arc<BuildNameIndex>)>>;
+/// 单个归档的索引元数据。
+struct ArchiveMeta {
+    path: PathBuf,
+    build_name: Option<String>,
+    has_anim: bool,
+    banks: Vec<ArchiveBank>,
+    /// 小写 symbol 列表（来自 build.bin）。
+    symbols: Vec<String>,
+}
 
-/// 进程级构建名索引缓存：避免 `ensure_override_builds_loaded` 每次未命中
-/// 都全树解析 `data/anim`。键为动画树路径，失效信号为文件数 + 最大 mtime。
-static BUILD_NAME_CACHE: OnceLock<BuildNameCache> = OnceLock::new();
+struct ArchiveBank {
+    name: String,
+    animations: Vec<String>,
+}
+
+/// 全树归档索引：一次扫描同时服务 override build 自动加载、同名/映射
+/// 候选扫描与手动文件检索。
+#[derive(Default)]
+struct AnimArchiveIndex {
+    archives: Vec<ArchiveMeta>,
+    by_name: HashMap<String, Vec<usize>>,
+    by_symbol: HashMap<String, Vec<usize>>,
+}
+
+type ArchiveIndexCache = Mutex<HashMap<PathBuf, ((usize, u64), Arc<AnimArchiveIndex>)>>;
+
+/// 进程级归档索引缓存：避免重复全树解析 `data/anim`。键为动画树路径，
+/// 失效信号为文件数 + 最大 mtime。
+static ARCHIVE_INDEX_CACHE: OnceLock<ArchiveIndexCache> = OnceLock::new();
 
 /// 动画树签名（zip/dyn 文件数 + 最大 mtime 毫秒）。
 fn anim_tree_signature(anim_root: &Path) -> (usize, u64) {
@@ -134,32 +158,74 @@ fn anim_tree_signature(anim_root: &Path) -> (usize, u64) {
     (files.len(), max_mtime)
 }
 
-/// 全树扫描 `build.bin` 名 → 归档路径；同名取排序后第一个文件。
-fn scan_build_name_index(anim_root: &Path) -> Result<BuildNameIndex> {
+fn rel_path(anim_root: &Path, path: &Path) -> String {
+    path.strip_prefix(anim_root)
+        .map(|p| p.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default()
+}
+
+fn scan_archive_index(anim_root: &Path) -> Result<AnimArchiveIndex> {
     let mut files = Vec::new();
     collect_anim_files(anim_root, &mut files)?;
     files.par_sort();
-    let entries: Vec<(String, PathBuf)> = files
+    let entries: Vec<ArchiveMeta> = files
         .par_iter()
         .filter_map(|path| {
             let data = std::fs::read(path).ok()?;
             let archive = dst_anim_tool::archive::parse_file_by_path(path, &data).ok()?;
-            let build = archive.build.as_ref()?;
-            Some((build.name.to_lowercase(), path.clone()))
+            let build_name = archive.build.as_ref().map(|b| b.name.to_lowercase());
+            let symbols = archive
+                .build
+                .as_ref()
+                .map(|b| {
+                    b.symbols
+                        .iter()
+                        .map(|s| s.name.to_lowercase())
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
+            let banks = archive
+                .anim
+                .as_ref()
+                .map(|anim| {
+                    anim.banks
+                        .iter()
+                        .map(|bank| ArchiveBank {
+                            name: bank.name.clone(),
+                            animations: bank.animations.iter().map(|a| a.name.clone()).collect(),
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
+            Some(ArchiveMeta {
+                path: path.clone(),
+                build_name,
+                has_anim: !banks.is_empty(),
+                banks,
+                symbols,
+            })
         })
         .collect();
-    let mut index = BuildNameIndex::new();
-    for (name, path) in entries {
-        index.entry(name).or_insert(path);
+    let mut index = AnimArchiveIndex {
+        archives: entries,
+        ..AnimArchiveIndex::default()
+    };
+    for (idx, meta) in index.archives.iter().enumerate() {
+        if let Some(name) = &meta.build_name {
+            index.by_name.entry(name.clone()).or_default().push(idx);
+        }
+        for symbol in &meta.symbols {
+            index.by_symbol.entry(symbol.clone()).or_default().push(idx);
+        }
     }
     Ok(index)
 }
 
-/// 取（或重建）构建名索引，签名未变时命中缓存。
-fn build_name_index(anim_root: &Path) -> Result<Arc<BuildNameIndex>> {
+/// 取（或重建）归档索引，签名未变时命中缓存。
+fn archive_index(anim_root: &Path) -> Result<Arc<AnimArchiveIndex>> {
     let cache_key = anim_root.to_path_buf();
     let signature = anim_tree_signature(anim_root);
-    let cache = BUILD_NAME_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+    let cache = ARCHIVE_INDEX_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
     {
         let guard = cache.lock().unwrap_or_else(|e| e.into_inner());
         if let Some((cached_signature, index)) = guard.get(&cache_key) {
@@ -168,7 +234,7 @@ fn build_name_index(anim_root: &Path) -> Result<Arc<BuildNameIndex>> {
             }
         }
     }
-    let index = Arc::new(scan_build_name_index(anim_root)?);
+    let index = Arc::new(scan_archive_index(anim_root)?);
     let mut guard = cache.lock().unwrap_or_else(|e| e.into_inner());
     guard.insert(cache_key, (signature, Arc::clone(&index)));
     Ok(index)
@@ -181,19 +247,46 @@ fn find_archives_with_build_names(
     anim_root: &Path,
     wanted: &HashSet<String>,
 ) -> Result<Vec<(String, PathBuf)>> {
-    let index = build_name_index(anim_root)?;
+    let index = archive_index(anim_root)?;
     let mut out: Vec<(String, PathBuf)> = wanted
         .iter()
         .filter_map(|name| {
-            let path = index.get(name)?;
-            let rel = path
-                .strip_prefix(anim_root)
-                .map(|p| p.to_string_lossy().replace('\\', "/"))
-                .unwrap_or_default();
-            Some((rel, path.clone()))
+            let &first = index.by_name.get(name)?.first()?;
+            let path = &index.archives[first].path;
+            Some((rel_path(anim_root, path), path.clone()))
         })
         .collect();
     out.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(out)
+}
+
+/// 手动文件检索：按相对路径子串过滤 `data/anim` 下的 zip/dyn。
+pub fn list_archives(
+    anim_root: &Path,
+    query: &str,
+    limit: usize,
+) -> Result<Vec<serde_json::Value>> {
+    let index = archive_index(anim_root)?;
+    let q = query.trim().to_lowercase();
+    let mut out = Vec::new();
+    for meta in &index.archives {
+        let rel = rel_path(anim_root, &meta.path);
+        if !q.is_empty() && !rel.to_lowercase().contains(&q) {
+            continue;
+        }
+        out.push(serde_json::json!({
+            "path": rel,
+            "build_name": meta.build_name,
+            "has_anim": meta.has_anim,
+            "banks": meta.banks.iter().map(|b| serde_json::json!({
+                "name": b.name,
+                "animations": b.animations,
+            })).collect::<Vec<_>>(),
+        }));
+        if out.len() >= limit {
+            break;
+        }
+    }
     Ok(out)
 }
 
@@ -654,45 +747,97 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
     }))
 }
 
-/// Search all animation archives under `anim_root` for build files that
-/// provide any of the requested symbols.
+/// Search animation archives for builds that can serve the requested symbols,
+/// either by providing them directly (same-name) or through a Tier-A symbol
+/// map entry (`anim symbol -> build/src_symbol`). Entries carry `via` and
+/// `remaps` provenance so the UI can distinguish the two sources.
 pub fn find_builds_for_symbols(
     anim_root: &Path,
     symbols: &[String],
+    remaps: Option<&SymbolRemapIndex>,
 ) -> Result<Vec<serde_json::Value>> {
-    let wanted: HashSet<&str> = symbols.iter().map(|s| s.as_str()).collect();
-    let mut files = Vec::new();
-    collect_anim_files(anim_root, &mut files)?;
-    files.par_sort();
-
-    let found: Vec<serde_json::Value> = files
-        .par_iter()
-        .filter_map(|path| {
-            let data = std::fs::read(path).ok()?;
-            let archive = dst_anim_tool::archive::parse_file_by_path(path, &data).ok()?;
-            let build = archive.build.as_ref()?;
-            let matched: Vec<String> = build
-                .symbols
-                .iter()
-                .map(|s| s.name.clone())
-                .filter(|name| wanted.iter().any(|w| name.eq_ignore_ascii_case(w)))
-                .collect();
-            if matched.is_empty() {
-                return None;
-            }
-            let rel = path
-                .strip_prefix(anim_root)
-                .map(|p| p.to_string_lossy().replace('\\', "/"))
-                .unwrap_or_default();
-            Some(serde_json::json!({
-                "file": rel,
-                "name": build.name,
-                "symbols": build.symbols.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
-                "atlases": build.atlases.iter().map(|a| a.name.clone()).collect::<Vec<_>>(),
-                "matched_symbols": matched,
-            }))
-        })
+    let index = archive_index(anim_root)?;
+    let wanted: BTreeSet<String> = symbols
+        .iter()
+        .map(|s| s.trim().to_lowercase())
+        .filter(|s| !s.is_empty())
         .collect();
+    type Slot = (BTreeSet<String>, BTreeMap<String, serde_json::Value>);
+    let mut matched: BTreeMap<usize, Slot> = BTreeMap::new();
+
+    for symbol in &wanted {
+        if let Some(indices) = index.by_symbol.get(symbol) {
+            for &ai in indices {
+                matched.entry(ai).or_default().0.insert(symbol.clone());
+            }
+        }
+    }
+    if let Some(remaps) = remaps {
+        for symbol in &wanted {
+            let Some(entries) = remaps.get(symbol) else {
+                continue;
+            };
+            for entry in entries {
+                let src = entry.src_symbol.to_lowercase();
+                let targets: Vec<usize> = if entry.build.is_empty() {
+                    index.by_symbol.get(&src).cloned().unwrap_or_default()
+                } else {
+                    index
+                        .by_name
+                        .get(&entry.build.to_lowercase())
+                        .cloned()
+                        .unwrap_or_default()
+                };
+                for ai in targets {
+                    if !index.archives[ai].symbols.contains(&src) {
+                        continue;
+                    }
+                    let remap = serde_json::json!({
+                        "symbol": symbol,
+                        "build": entry.build,
+                        "src_symbol": entry.src_symbol,
+                        "api": entry.api,
+                        "confidence": entry.confidence,
+                        "prefabs": entry.prefabs,
+                    });
+                    let key = format!(
+                        "{}|{}|{}|{:?}",
+                        symbol, entry.build, entry.src_symbol, entry.api
+                    );
+                    matched.entry(ai).or_default().1.entry(key).or_insert(remap);
+                }
+            }
+        }
+    }
+
+    let mut found = Vec::new();
+    for (ai, (same_name, remap_map)) in matched {
+        let meta = &index.archives[ai];
+        let Ok(data) = std::fs::read(&meta.path) else {
+            continue;
+        };
+        let Some(build) = dst_anim_tool::archive::parse_file_by_path(&meta.path, &data)
+            .ok()
+            .and_then(|archive| archive.build)
+        else {
+            continue;
+        };
+        let remaps: Vec<serde_json::Value> = remap_map.into_values().collect();
+        let via = match (same_name.is_empty(), remaps.is_empty()) {
+            (false, true) => "same_name",
+            (true, false) => "symbol_map",
+            _ => "both",
+        };
+        found.push(serde_json::json!({
+            "file": rel_path(anim_root, &meta.path),
+            "name": build.name,
+            "symbols": build.symbols.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
+            "atlases": build.atlases.iter().map(|a| a.name.clone()).collect::<Vec<_>>(),
+            "matched_symbols": same_name.into_iter().collect::<Vec<_>>(),
+            "via": via,
+            "remaps": remaps,
+        }));
+    }
     Ok(found)
 }
 
@@ -857,15 +1002,14 @@ mod tests {
     }
 
     #[test]
-    fn build_name_index_hits_cache_until_signature_changes() {
-        let root =
-            std::env::temp_dir().join(format!("build_name_index_cache_{}", std::process::id()));
+    fn archive_index_hits_cache_until_signature_changes() {
+        let root = std::env::temp_dir().join(format!("archive_index_cache_{}", std::process::id()));
         std::fs::create_dir_all(&root).unwrap();
-        let first = build_name_index(&root).unwrap();
-        let second = build_name_index(&root).unwrap();
+        let first = archive_index(&root).unwrap();
+        let second = archive_index(&root).unwrap();
         assert!(Arc::ptr_eq(&first, &second));
         std::fs::write(root.join("probe.zip"), b"not an archive").unwrap();
-        let third = build_name_index(&root).unwrap();
+        let third = archive_index(&root).unwrap();
         assert!(!Arc::ptr_eq(&second, &third));
         std::fs::remove_dir_all(&root).ok();
     }

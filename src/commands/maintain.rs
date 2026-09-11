@@ -178,6 +178,31 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::UploadIcons {
+            build,
+            file,
+            title,
+            include_existing,
+            ignore_warnings,
+            comment,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::UploadIcons {
+                    build,
+                    file,
+                    title,
+                    only_missing: !include_existing,
+                    ignore_warnings,
+                    comment,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
         Commands::PrefabOverrides { input, output } => {
             execute(
                 JobKind::PrefabOverrides {
@@ -210,10 +235,15 @@ pub async fn run(args: Commands) -> Result<()> {
         Commands::ImagesSync {
             force,
             dry_run,
+            skip_wiki_status,
             report_json,
         } => {
             execute(
-                JobKind::ImagesSync { force, dry_run },
+                JobKind::ImagesSync {
+                    force,
+                    dry_run,
+                    skip_wiki_status,
+                },
                 // Local-only job: never touches the wiki.
                 WriteMode::AutoConfirm,
                 report_json,

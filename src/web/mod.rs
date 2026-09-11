@@ -48,6 +48,10 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
             "/data/inventoryicons/versions",
             get(api_data::inventoryicon_versions),
         )
+        .route(
+            "/data/inventoryicons/title",
+            post(api_data::set_inventoryicon_title),
+        )
         .route("/viz/skilltree", get(api_data::skilltree))
         .route("/snapshots", get(api_data::snapshots))
         .route("/diff/recipes", get(api_data::diff_recipes))

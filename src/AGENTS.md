@@ -50,6 +50,7 @@ src/
 │   │   ├── scan.rs       # zip+loose 两源扫描 → 合并视图 (xml↔tex 联接)
 │   │   ├── ktex.rs       # KTEX 容器解析 + DXT1/3/5/RGB 解码(texpresso) + 反预乘
 │   │   ├── split.rs      # ktools atlas XML 解析 + UV 裁剪 (v 轴翻转)
+│   │   ├── meta.rs       # 物品图标元数据: icon_meta.json + 文件名映射表 + 五态标题/状态
 │   │   └── history.rs    # CAS 对象仓 + manifest + diff 纯函数
 │   └── state.rs          # dst_version.txt 状态文件 + 版本对比纯函数
 ├── context.rs            # DstContext (lazy ZIP archive + wiki client + env)

@@ -2,14 +2,27 @@
 
 use crate::web::jobs::JobManager;
 use dst_huiji_wiki::scripts_sync::images::icons::{build_icons_index, IconsIndex};
+use dst_huiji_wiki::scripts_sync::images::meta::{self as icon_meta, IconMeta};
 use dst_huiji_wiki::service::dataset::{DatasetCache, SkillStringsData};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::time::UNIX_EPOCH;
 use tokio::sync::Mutex;
 
 /// (manifests 目录签名, 缓存的图标索引)。
 type IconsIndexCache = Option<((usize, u64), Arc<IconsIndex>)>;
+
+/// 图标元数据文件签名（存在 / 长度 / mtime 毫秒）。
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct FileSignature {
+    exists: bool,
+    len: u64,
+    mtime_ms: u64,
+}
+
+/// (icon_meta.json 签名, 缓存的图标元数据)。
+type IconMetaCache = Option<(FileSignature, Arc<IconMeta>)>;
 
 #[derive(Default)]
 pub struct AppState {
@@ -21,6 +34,8 @@ pub struct AppState {
     diff_cache: Mutex<HashMap<String, serde_json::Value>>,
     /// Cached inventory-icons index, invalidated by the manifests dir signature.
     icons_index: Mutex<IconsIndexCache>,
+    /// Cached icon metadata (names + wiki status), invalidated by file signature.
+    icon_meta: Mutex<IconMetaCache>,
 }
 
 /// `KTOOLS__OUT_DIR`（缺省 `output/ktools`）——images-sync 产物根目录。
@@ -34,6 +49,27 @@ pub fn ktools_out_dir() -> PathBuf {
 
 fn icons_manifests_dir() -> PathBuf {
     ktools_out_dir().join("history/manifests")
+}
+
+/// 文件签名（存在 / 长度 / mtime 毫秒），作派生 JSON 缓存键。
+fn file_signature(path: &Path) -> FileSignature {
+    match std::fs::metadata(path) {
+        Ok(m) => FileSignature {
+            exists: true,
+            len: m.len(),
+            mtime_ms: m
+                .modified()
+                .ok()
+                .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0),
+        },
+        Err(_) => FileSignature {
+            exists: false,
+            len: 0,
+            mtime_ms: 0,
+        },
+    }
 }
 
 /// manifests 目录签名（json 文件数 + 最大 mtime 毫秒），作图标索引缓存键。
@@ -67,6 +103,7 @@ impl AppState {
             skill_strings: Mutex::new(HashMap::new()),
             diff_cache: Mutex::new(HashMap::new()),
             icons_index: Mutex::new(None),
+            icon_meta: Mutex::new(None),
         }
     }
 
@@ -98,6 +135,37 @@ impl AppState {
         }
         *cache = Some((sig, Arc::clone(&index)));
         Ok(index)
+    }
+
+    /// 物品图标元数据（名称 + 维基上传状态，images-sync 产物）缓存。
+    /// 文件缺失时返回空元数据；由 `icon_meta.json` 签名（长度+mtime）失效。
+    pub async fn icon_meta(&self) -> dst_huiji_wiki::error::Result<Arc<IconMeta>> {
+        let out_dir = ktools_out_dir();
+        let path = icon_meta::meta_path(&out_dir);
+        let sig = file_signature(&path);
+        {
+            let cache = self.icon_meta.lock().await;
+            if let Some((k, v)) = cache.as_ref() {
+                if *k == sig {
+                    return Ok(Arc::clone(v));
+                }
+            }
+        }
+        let meta = tokio::task::spawn_blocking(move || icon_meta::load(&out_dir))
+            .await
+            .map_err(|e| {
+                dst_huiji_wiki::error::Error::Config(format!("icon meta loader panicked: {}", e))
+            })??;
+        let meta = Arc::new(meta);
+        let mut cache = self.icon_meta.lock().await;
+        // Double-check after the blocking computation.
+        if let Some((k, v)) = cache.as_ref() {
+            if *k == sig {
+                return Ok(Arc::clone(v));
+            }
+        }
+        *cache = Some((sig, Arc::clone(&meta)));
+        Ok(meta)
     }
 
     pub async fn skill_strings(

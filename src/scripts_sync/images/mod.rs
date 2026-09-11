@@ -39,6 +39,7 @@
 pub mod history;
 pub mod icons;
 pub mod ktex;
+pub mod meta;
 pub mod scan;
 pub mod split;
 

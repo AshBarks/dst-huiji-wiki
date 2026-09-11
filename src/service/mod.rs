@@ -2,6 +2,7 @@ pub mod dataset;
 pub mod progress;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
+pub mod upload_icons;
 pub mod upload_image;
 
 pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutReporter};
@@ -16,7 +17,7 @@ use crate::wiki::{EditResult, WikiClient};
 use crate::{DstContext, TechReport};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tracing::Instrument;
 
 /// How a job may write to the wiki.
@@ -174,7 +175,7 @@ pub enum JobKind {
     },
     /// 处理游戏图片资源（scripts-sync 的图片下半段）：两源盘点 → 解压
     /// images.zip → 内置 KTEX 解码（ktex-rs）→ 按 xml 切割，最终产物入
-    /// 差异历史。纯本地操作，无 wiki 流量。
+    /// 差异历史。结束后刷新图标元数据（名称表 + 维基上传状态查询）。
     ImagesSync {
         /// 忽略增量与幂等检查，全量重跑。
         #[serde(default)]
@@ -182,6 +183,33 @@ pub enum JobKind {
         /// 只盘点并报告计划，不写任何文件。
         #[serde(default)]
         dry_run: bool,
+        /// 跳过维基上传状态查询（默认查询；凭据缺失时自动跳过）。
+        #[serde(default)]
+        skip_wiki_status: bool,
+    },
+    /// 上传物品栏图标到维基：标题取映射表（按本地文件名）或
+    /// `STRINGS.NAMES` 英文名 + `.png`（描述固定 `[[分类:物品栏图标]]`）；
+    /// 批量默认仅上传维基缺失的（需先运行 images-sync 生成
+    /// `history/icon_meta.json`）；`file` + `title` 为手动指定文件名上传。
+    UploadIcons {
+        /// 只上传首次加入该 build 的图标。
+        #[serde(default)]
+        build: Option<String>,
+        /// 只上传单个图标文件名（如 `axe.png`，优先于 `build`）。
+        #[serde(default)]
+        file: Option<String>,
+        /// 手动指定 wiki 文件名（需配合 `file`；写入映射表并上传）。
+        #[serde(default)]
+        title: Option<String>,
+        /// 批量时仅上传维基上尚不存在的图标。
+        #[serde(default)]
+        only_missing: bool,
+        /// 同名重传发送 `ignorewarnings=1`。
+        #[serde(default)]
+        ignore_warnings: bool,
+        /// 上传注释。
+        #[serde(default)]
+        comment: Option<String>,
     },
     /// 动画历史同步：更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR。
     AnimSync {
@@ -435,6 +463,7 @@ impl JobKind {
             JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
             JobKind::SkillTreeExport { .. } => "skilltree-export",
             JobKind::UploadImage { .. } => "upload-image",
+            JobKind::UploadIcons { .. } => "upload-icons",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
@@ -463,6 +492,7 @@ impl JobKind {
                 | JobKind::MaintainCopyClip { .. }
                 | JobKind::SkillTreeWiki { .. }
                 | JobKind::UploadImage { .. }
+                | JobKind::UploadIcons { .. }
         )
     }
 }
@@ -626,7 +656,33 @@ async fn execute_job_inner(
             dry_run,
             state_path,
         } => run_scripts_sync(*force, *dry_run, state_path.as_deref(), reporter).await,
-        JobKind::ImagesSync { force, dry_run } => run_images_sync(*force, *dry_run, reporter).await,
+        JobKind::ImagesSync {
+            force,
+            dry_run,
+            skip_wiki_status,
+        } => run_images_sync(*force, *dry_run, *skip_wiki_status, reporter).await,
+        JobKind::UploadIcons {
+            build,
+            file,
+            title,
+            only_missing,
+            ignore_warnings,
+            comment,
+        } => {
+            upload_icons::run_upload_icons(
+                &upload_icons::UploadIconsParams {
+                    build: build.clone(),
+                    file: file.clone(),
+                    title: title.clone(),
+                    only_missing: *only_missing,
+                    ignore_warnings: *ignore_warnings,
+                    comment: comment.clone(),
+                },
+                reporter,
+                mode,
+            )
+            .await
+        }
         JobKind::AnimSync {
             force,
             dry_run,
@@ -1622,11 +1678,13 @@ async fn run_scripts_sync(
     )
 }
 
-/// `images-sync`: process the game image pipeline. Local-only; never
-/// touches the wiki.
+/// `images-sync`: process the game image pipeline. Local-only image work;
+/// afterwards refreshes `history/icon_meta.json` (names from the game PO
+/// files and, unless skipped, wiki upload status via read-only queries).
 async fn run_images_sync(
     force: bool,
     dry_run: bool,
+    skip_wiki_status: bool,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     let dst_root = std::env::var("DST__ROOT")
@@ -1635,15 +1693,42 @@ async fn run_images_sync(
         .ok()
         .filter(|s| !s.trim().is_empty())
         .map(PathBuf::from);
-    crate::scripts_sync::images::run(
+    let mut report = crate::scripts_sync::images::run(
         &crate::scripts_sync::images::ImagesSyncParams {
-            dst_root,
-            out_dir,
+            dst_root: dst_root.clone(),
+            out_dir: out_dir.clone(),
             force,
             dry_run,
         },
         reporter,
-    )
+    )?;
+
+    let status = report
+        .get("status")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default()
+        .to_string();
+    if !dry_run && status != "rollback_skipped" {
+        let out = out_dir
+            .clone()
+            .unwrap_or_else(upload_icons::out_dir_from_env);
+        match upload_icons::refresh_icon_meta(
+            Path::new(&dst_root),
+            &out,
+            force,
+            !skip_wiki_status,
+            reporter,
+        )
+        .await
+        {
+            Ok(summary) => report["icon_meta"] = summary,
+            Err(e) => {
+                reporter.log(format!("图标元数据刷新失败：{e}"));
+                report["icon_meta_error"] = serde_json::json!(e.to_string());
+            }
+        }
+    }
+    Ok(report)
 }
 
 /// `anim-sync`: archive current `data/anim` into `ANIM__OUT_DIR` after a game

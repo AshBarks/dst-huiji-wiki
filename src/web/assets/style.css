@@ -127,17 +127,22 @@ code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-size:12px}
 /* 物品图标板块 */
 .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .icon-divider{grid-column:1/-1;margin-top:8px;padding:6px 2px 4px;border-bottom:1px solid var(--line);
-  color:var(--muted);font-size:13px;font-weight:600}
+  color:var(--muted);font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;justify-content:space-between}
 .icon-card{margin:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
   padding:10px 8px;text-align:center;cursor:pointer}
 .icon-card:hover{border-color:var(--accent)}
 .icon-card img{display:block;margin:0 auto;image-rendering:pixelated}
 .icon-card figcaption{margin-top:6px;font-size:12px}
 .icon-card figcaption span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.b-muted{background:var(--panel2);color:var(--muted)}
 .iv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:flex;
   align-items:center;justify-content:center}
 .iv-panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;
   width:min(520px,92vw);max-height:80vh;overflow:auto}
+.iv-actions{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:6px;font-size:13px}
+.iv-actions .badge{margin-left:6px}
 .icon-ver{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
 .icon-ver:last-child{border-bottom:none}
 .icon-ver img{image-rendering:pixelated;background:#0c0f15;border-radius:6px}
+.iv-editor{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.iv-editor input{width:100%;box-sizing:border-box}

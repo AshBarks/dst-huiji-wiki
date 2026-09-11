@@ -179,13 +179,50 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
-    /// 处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地操作)
+    /// 处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地图片操作),
+    /// 结束后刷新图标元数据并查询维基上传状态(可用 --skip-wiki-status 跳过)
     ImagesSync {
         /// 忽略增量与幂等检查,全量重跑
         #[arg(long)]
         force: bool,
         /// 只盘点并报告计划,不写任何文件
         #[arg(long)]
+        dry_run: bool,
+        /// 跳过维基上传状态查询（无凭据/离线时使用）
+        #[arg(long)]
+        skip_wiki_status: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
+    /// 上传物品栏图标到维基（标题取映射表或 STRINGS.NAMES 英文名 + .png，
+    /// 描述 [[分类:物品栏图标]]；批量默认仅上传维基缺失的，需先运行
+    /// images-sync；--file + --title 手动指定站内文件名）
+    #[command(name = "upload-icons")]
+    UploadIcons {
+        /// 只上传首次加入该 build 的图标
+        #[arg(long)]
+        build: Option<String>,
+        /// 只上传单个图标文件名（如 axe.png；优先于 --build）
+        #[arg(long)]
+        file: Option<String>,
+        /// 手动指定上传的 wiki 文件名（需配合 --file；会写入映射表）
+        #[arg(long)]
+        title: Option<String>,
+        /// 连同维基上已存在的图标一起上传（默认只上传缺失的）
+        #[arg(long)]
+        include_existing: bool,
+        /// 同名重传时忽略上传警告（ignorewarnings=1；按标题存在性自动启用）
+        #[arg(long)]
+        ignore_warnings: bool,
+        /// 上传注释
+        #[arg(long)]
+        comment: Option<String>,
+        /// 跳过确认，直接上传
+        #[arg(long)]
+        yes: bool,
+        /// 只报告将执行的操作，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
         dry_run: bool,
         /// 将机器可读的执行报告（JSON）写入该文件
         #[arg(long)]
@@ -473,6 +510,7 @@ impl Commands {
             Commands::SkillTreeWiki { .. } => "skilltree-wiki",
             Commands::SkillTreeExport { .. } => "skilltree-export",
             Commands::UploadImage { .. } => "upload-image",
+            Commands::UploadIcons { .. } => "upload-icons",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",
@@ -753,10 +791,12 @@ mod tests {
             Commands::ImagesSync {
                 force,
                 dry_run,
+                skip_wiki_status,
                 report_json,
             } => {
                 assert!(!force);
                 assert!(!dry_run);
+                assert!(!skip_wiki_status);
                 assert!(report_json.is_none());
             }
             _ => panic!("Expected ImagesSync command"),
@@ -770,6 +810,7 @@ mod tests {
             "images-sync",
             "--force",
             "--dry-run",
+            "--skip-wiki-status",
             "--report-json",
             "report.json",
         ])
@@ -778,13 +819,97 @@ mod tests {
             Commands::ImagesSync {
                 force,
                 dry_run,
+                skip_wiki_status,
                 report_json,
             } => {
                 assert!(force);
                 assert!(dry_run);
+                assert!(skip_wiki_status);
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected ImagesSync command"),
+        }
+    }
+
+    #[test]
+    fn test_upload_icons_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "upload-icons"]).unwrap();
+        match args.command {
+            Commands::UploadIcons {
+                build,
+                file,
+                title,
+                include_existing,
+                ignore_warnings,
+                comment,
+                yes,
+                dry_run,
+                report_json,
+            } => {
+                assert!(build.is_none());
+                assert!(file.is_none());
+                assert!(title.is_none());
+                assert!(!include_existing);
+                assert!(!ignore_warnings);
+                assert!(comment.is_none());
+                assert!(!yes);
+                assert!(!dry_run);
+                assert!(report_json.is_none());
+            }
+            _ => panic!("Expected UploadIcons command"),
+        }
+    }
+
+    #[test]
+    fn test_upload_icons_command_with_flags() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "upload-icons",
+            "--build",
+            "751350",
+            "--include-existing",
+            "--ignore-warnings",
+            "--comment",
+            "同步",
+            "--yes",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::UploadIcons {
+                build,
+                include_existing,
+                ignore_warnings,
+                comment,
+                yes,
+                ..
+            } => {
+                assert_eq!(build.as_deref(), Some("751350"));
+                assert!(include_existing);
+                assert!(ignore_warnings);
+                assert_eq!(comment.as_deref(), Some("同步"));
+                assert!(yes);
+            }
+            _ => panic!("Expected UploadIcons command"),
+        }
+    }
+
+    #[test]
+    fn test_upload_icons_command_manual_title() {
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "upload-icons",
+            "--file",
+            "multitool_axe_pickaxe.png",
+            "--title",
+            "Pick-Axe.png",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::UploadIcons { file, title, .. } => {
+                assert_eq!(file.as_deref(), Some("multitool_axe_pickaxe.png"));
+                assert_eq!(title.as_deref(), Some("Pick-Axe.png"));
+            }
+            _ => panic!("Expected UploadIcons command"),
         }
     }
 

@@ -230,8 +230,20 @@ const JOB_DEFS = {
   images_sync: {
     label: "images-sync 处理游戏图片",
     fields: [
-      { k: "force", type: "check", label: "忽略增量与幂等检查，全量重跑" },
+      { k: "force", type: "check", label: "忽略增量与幂等检查，全量重跑（并重查上传状态）" },
       { k: "dry_run", type: "check", label: "演练：只盘点并报告计划、不写文件" },
+      { k: "skip_wiki_status", type: "check", label: "跳过维基上传状态查询（离线/无凭据）" },
+    ],
+  },
+  upload_icons: {
+    label: "upload-icons 上传物品栏图标 → 维基", wiki: true,
+    fields: [
+      { k: "build", label: "只上传首次加入该 build 的图标（留空=全部有英文名的）" },
+      { k: "file", label: "只上传单个文件名（如 axe.png，优先于 build）" },
+      { k: "title", label: "手动指定 wiki 文件名（需配合 file，如 Pick-Axe.png；会写入映射表）" },
+      { k: "only_missing", type: "check", default: true, label: "仅上传维基缺失的（批量）" },
+      { k: "ignore_warnings", type: "check", label: "同名重传忽略警告（ignorewarnings=1）" },
+      { k: "comment", label: "上传注释（可选）" },
     ],
   },
   anim_sync: {
@@ -1149,10 +1161,18 @@ async function pageInventoryIcons(main) {
           <button class="tab active" data-sort="name">按文件名</button>
           <button class="tab" data-sort="history">按加入历史</button>
         </div>
+        <select id="istat" title="按状态过滤">
+          <option value="all">全部状态</option>
+          <option value="uploaded">已上传</option>
+          <option value="missing">未上传</option>
+          <option value="unknown">状态未知</option>
+          <option value="unuploadable">无法上传</option>
+          <option value="unnamed">无英文名</option>
+        </select>
         <input id="iq" placeholder="搜索文件名 / 中文名 / 英文名…" style="width:250px">
         <span class="muted" id="icount"></span>
       </div>
-      <p class="muted" style="margin:8px 0 0">点击图标查看历代版本（内容寻址历史，来自 images-sync manifest）。</p>
+      <p class="muted" style="margin:8px 0 0">点击图标查看历代版本并在弹窗内上传；可手动填写 wiki 文件名并保存映射（默认 config/icon_title_overrides.json）。中文/英文名与上传状态由 images-sync 刷新。</p>
     </div>
     <div class="panel">
       <div id="igrid" class="icon-grid"></div>
@@ -1173,25 +1193,60 @@ async function pageInventoryIcons(main) {
     ? (/[a-z]/.test(it.file[0]) ? it.file[0].toUpperCase() : "#")
     : it.first_build;
 
-  const st = { sort: "name", q: "", page: 0, size: 120, loading: false, done: false, lastGroup: null };
+  const STATUS_LABELS = {
+    uploaded: "已上传", missing: "未上传", unknown: "状态未知",
+    unuploadable: "无法上传", unnamed: "无英文名",
+  };
+  const iconBadge = (it) => {
+    if (!it.status) return "";
+    if (it.status === "uploaded") return '<span class="badge b-success">已上传</span>';
+    if (it.status === "missing") return '<span class="badge b-err">未上传</span>';
+    if (it.status === "unuploadable") return `<span class="badge b-warn" title="${esc(it.note || "")}">无法上传</span>`;
+    if (it.status === "unknown") return '<span class="badge b-muted">状态未知</span>';
+    return `<span class="badge b-muted">${esc(STATUS_LABELS[it.status] || it.status)}</span>`;
+  };
+
+  const st = { sort: "name", q: "", status: "all", page: 0, size: 120, loading: false, done: false, lastGroup: null, builds: {} };
+
+  // 过滤下拉显示各状态数量（叠加搜索；由服务端统计）。
+  const refreshStatusOptions = (counts) => {
+    const sel = $("#istat");
+    if (!sel || !counts) return;
+    const total = Object.values(counts).reduce((a, b) => a + (b || 0), 0);
+    for (const opt of sel.options) {
+      const n = opt.value === "all" ? total : (counts[opt.value] || 0);
+      opt.textContent = `${STATUS_LABELS[opt.value] || "全部状态"} ${n}`;
+    }
+  };
 
   const loadMore = async () => {
     if (st.loading || st.done) return;
     st.loading = true;
     try {
-      const p = new URLSearchParams({ sort: st.sort, q: st.q, page: st.page, page_size: st.size });
+      const p = new URLSearchParams({ sort: st.sort, q: st.q, status: st.status, page: st.page, page_size: st.size });
       const r = await getJSON(`/api/data/inventoryicons?${p}`);
-      $("#icount").textContent = `共 ${r.total} 个图标 · 数据源 build ${r.latest_build ?? "—"}`;
+      $("#icount").textContent = `共 ${r.total} 个图标 · 数据源 build ${r.latest_build ?? "—"}${r.meta_build ? ` · 元数据 build ${r.meta_build}` : ""}`;
+      refreshStatusOptions(r.status_counts);
+      if (r.builds) st.builds = r.builds;
       const grid = $("#igrid");
       for (const it of r.items) {
         const gk = groupKey(it);
         if (gk !== st.lastGroup) {
           st.lastGroup = gk;
-          const label = st.sort === "name" ? gk
-            : `Build ${it.first_build}${it.first_synced_at ? ` · ${fmtDate(it.first_synced_at)}` : ""}`;
-          grid.insertAdjacentHTML("beforeend", `<div class="icon-divider">${esc(label)}</div>`);
+          if (st.sort === "name") {
+            grid.insertAdjacentHTML("beforeend", `<div class="icon-divider">${esc(gk)}</div>`);
+          } else {
+            const b = st.builds[gk] || {};
+            const canBatch = (b.missing || 0) > 0;
+            grid.insertAdjacentHTML("beforeend", `
+              <div class="icon-divider">
+                <span>Build ${esc(it.first_build)}${it.first_synced_at ? ` · ${fmtDate(it.first_synced_at)}` : ""} · 有名称 ${b.named || 0}/${b.total || 0}${b.missing ? ` · 缺 ${b.missing}` : ""}</span>
+                ${canBatch ? `<button class="btn secondary mini" data-batch-build="${esc(gk)}">批量上传缺失 ${b.missing} 个</button>` : ""}
+              </div>`);
+          }
         }
         const names = [it.name_zh, it.name_en].filter(Boolean).join(" / ");
+        const badge = iconBadge(it);
         grid.insertAdjacentHTML("beforeend", `
           <figure class="icon-card" data-file="${esc(it.file)}">
             <img loading="lazy" width="64" height="64"
@@ -1199,6 +1254,7 @@ async function pageInventoryIcons(main) {
             <figcaption>
               <code>${esc(it.file.replace(/\.png$/, ""))}</code>
               ${names ? `<span class="muted">${esc(names)}</span>` : ""}
+              ${badge ? `<span>${badge}</span>` : ""}
             </figcaption>
           </figure>`);
       }
@@ -1236,6 +1292,8 @@ async function pageInventoryIcons(main) {
     reset();
   });
 
+  $("#istat").onchange = (e) => { st.status = e.target.value; reset(); };
+
   let deb;
   $("#iq").oninput = (e) => {
     clearTimeout(deb);
@@ -1247,20 +1305,45 @@ async function pageInventoryIcons(main) {
   }, { rootMargin: "300px" });
   io.observe($("#isentinel"));
 
-  // 历代版本抽屉
+  // 历代版本 + 上传/映射编辑抽屉
   const overlay = $("#ivOverlay");
   $("#ivClose").onclick = () => { overlay.style.display = "none"; };
   overlay.onclick = (e) => { if (e.target === overlay) overlay.style.display = "none"; };
-  $("#igrid").addEventListener("click", async (e) => {
-    const card = e.target.closest(".icon-card");
-    if (!card) return;
-    const file = card.dataset.file;
+
+  const openDetail = async (file) => {
     $("#ivTitle").textContent = file;
     $("#ivList").innerHTML = '<p class="muted">加载中…</p>';
     overlay.style.display = "flex";
     try {
       const r = await getJSON(`/api/data/inventoryicons/versions?file=${encodeURIComponent(file)}`);
-      $("#ivList").innerHTML = r.versions.map((v, i) => `
+      const names = [r.name_zh, r.name_en].filter(Boolean).join(" / ");
+      const exists = !!(r.wiki && r.wiki.exists === true);
+      const statusBadge = iconBadge(r);
+      const source = r.title_source === "override" ? "映射" : r.title_source === "auto" ? "自动" : "无";
+      const target = r.wiki_title
+        ? `<div class="muted">当前生效：<code>${esc(r.wiki_title)}</code>（${source}）</div>`
+        : "";
+      const link = r.wiki && r.wiki.url
+        ? `<div class="muted" style="word-break:break-all">当前文件：<a href="${esc(r.wiki.url)}" target="_blank" rel="noopener">${esc(r.wiki.url)}</a></div>`
+        : "";
+      const editor = `
+        <div class="iv-editor">
+          <input id="ivName" value="${esc(r.title || "")}" placeholder="维基文件名，如 Pick-Axe.png">
+          <div class="row" style="gap:6px;flex-wrap:wrap">
+            <button class="btn" id="ivUpload"${r.present ? "" : " disabled"}>${exists ? "重新上传（覆盖）" : "上传到维基"}</button>
+            <button class="btn secondary" id="ivSaveMap">保存映射</button>
+            ${r.title_source === "override" ? '<button class="btn secondary" id="ivClearMap">恢复自动命名</button>' : ""}
+          </div>
+          ${r.present ? "" : '<div class="muted">该图标不在当前 build 产物中，无法上传。</div>'}
+        </div>`;
+      const head = `
+        <div class="iv-actions">
+          <div>${names ? `<b>${esc(names)}</b>` : '<span class="muted">未找到 STRINGS.NAMES 名称</span>'} ${statusBadge}</div>
+          ${target}
+          ${link}
+          ${editor}
+        </div>`;
+      $("#ivList").innerHTML = head + (r.versions.map((v, i) => `
         <div class="icon-ver">
           <img loading="lazy" width="64" height="64" src="/static/objects/${esc(v.hash)}" alt="">
           <div>
@@ -1268,10 +1351,65 @@ async function pageInventoryIcons(main) {
             ${i === 0 && r.present ? ' <span class="badge b-success">当前</span>' : ""}
           </div>
           <code class="muted" style="margin-left:auto">${esc(v.hash.slice(0, 12))}…</code>
-        </div>`).join("") || '<p class="muted">无历史记录。</p>';
+        </div>`).join("") || '<p class="muted">无历史记录。</p>');
+
+      const readTitle = () => ($("#ivName").value || "").trim();
+      const ub = $("#ivUpload");
+      if (ub) ub.onclick = async () => {
+        const title = readTitle();
+        if (!title) { alert("请先填写维基文件名"); return; }
+        const msg = `将上传 ${file} 到 File:${title}${exists ? "（同名已存在则覆盖重传）" : ""}，并保存到映射表。确定继续？`;
+        if (!confirm(msg)) return;
+        ub.disabled = true;
+        try {
+          const j = await postJSON("/api/jobs", {
+            kind: "upload_icons", file, title, wiki_dry_run: false,
+          });
+          location.hash = `#/jobs/${j.id}`;
+        } catch (err) { ub.disabled = false; alert("提交失败：" + err.message); }
+      };
+      const saveBtn = $("#ivSaveMap");
+      if (saveBtn) saveBtn.onclick = async () => {
+        const title = readTitle();
+        if (!title) { alert("请先填写维基文件名"); return; }
+        saveBtn.disabled = true;
+        try {
+          await postJSON("/api/data/inventoryicons/title", { file, title });
+          reset();
+          await openDetail(file);
+        } catch (err) { saveBtn.disabled = false; alert("保存失败：" + err.message); }
+      };
+      const clearBtn = $("#ivClearMap");
+      if (clearBtn) clearBtn.onclick = async () => {
+        if (!confirm(`清除 ${file} 的映射并恢复自动命名？`)) return;
+        clearBtn.disabled = true;
+        try {
+          await postJSON("/api/data/inventoryicons/title", { file, title: null });
+          reset();
+          await openDetail(file);
+        } catch (err) { clearBtn.disabled = false; alert("清除失败：" + err.message); }
+      };
     } catch (err) {
       $("#ivList").innerHTML = `<p style="color:var(--err)">加载失败：${esc(err.message)}</p>`;
     }
+  };
+
+  $("#igrid").addEventListener("click", async (e) => {
+    const batchBtn = e.target.closest("[data-batch-build]");
+    if (batchBtn) {
+      const build = batchBtn.dataset.batchBuild;
+      const b = st.builds[build] || {};
+      if (!confirm(`将向维基上传 Build ${build} 组中缺失的 ${b.missing || 0} 个图标（同名标题会自动去重）。确定继续？`)) return;
+      batchBtn.disabled = true;
+      try {
+        const j = await postJSON("/api/jobs", { kind: "upload_icons", build, only_missing: true, wiki_dry_run: false });
+        location.hash = `#/jobs/${j.id}`;
+      } catch (err) { batchBtn.disabled = false; alert("提交失败：" + err.message); }
+      return;
+    }
+    const card = e.target.closest(".icon-card");
+    if (!card) return;
+    openDetail(card.dataset.file);
   });
 }
 

@@ -7,7 +7,8 @@ use axum::response::IntoResponse;
 use axum::Json;
 use dst_huiji_wiki::error::Result;
 use dst_huiji_wiki::scripts_sync::images::icons::{compare_entries, IconEntry, IconSort};
-use std::collections::HashMap;
+use dst_huiji_wiki::scripts_sync::images::meta::{self as icon_meta, WikiStatus};
+use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 type Q = Query<HashMap<String, String>>;
@@ -204,60 +205,128 @@ pub async fn constants(
     })))
 }
 
-/// GET /api/data/inventoryicons — 物品图标网格（文件名/加入历史两种排序）。
+/// GET /api/data/inventoryicons — 物品图标网格（文件名/加入历史两种排序，
+/// 支持按五态过滤：已上传/未上传/状态未知/无法上传/无英文名）。
 pub async fn inventoryicons(
     State(state): State<Arc<AppState>>,
     Query(q): Q,
 ) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
     let index = state.icons_index().await.map_err(err_status)?;
+    let meta = state.icon_meta().await.map_err(err_status)?;
     let sort = match q.get("sort").map(String::as_str) {
         Some("history") => IconSort::History,
         _ => IconSort::Name,
     };
     let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
+    let status_filter = q.get("status").map(String::as_str).unwrap_or("all");
 
-    // 翻译为 best-effort：数据集（游戏 zip）不可用时仍可浏览图标。
-    let names = inventory_names(&state).await;
+    // 元数据缺失时回退到数据集动态解析（旧行为）：翻译 best-effort，数据集
+    // （游戏 zip）不可用时仍可浏览图标。
+    let fallback = if meta.icons.is_empty() {
+        inventory_names(&state).await
+    } else {
+        HashMap::new()
+    };
 
-    struct Row<'a> {
-        entry: &'a IconEntry,
+    struct Resolved {
         name_en: Option<String>,
         name_zh: Option<String>,
+        title: Option<String>,
+        title_source: Option<icon_meta::TitleSource>,
+        uploadable: bool,
+        note: Option<String>,
+        status: &'static str,
+        wiki_uploaded: Option<bool>,
+        wiki_title: Option<String>,
     }
-    // 文件名 stem 大写 → STRINGS.NAMES 键（abigail_flower.png → ABIGAIL_FLOWER）。
-    let lookup = |e: &IconEntry| {
-        names.get(
-            e.file
-                .strip_suffix(".png")
-                .unwrap_or(&e.file)
-                .to_ascii_uppercase()
-                .as_str(),
-        )
+
+    let resolve = |e: &IconEntry| -> Resolved {
+        if let Some(m) = meta.icons.get(&e.file) {
+            let exists = m.wiki.as_ref().and_then(|w| w.exists);
+            return Resolved {
+                name_en: m.name_en.clone(),
+                name_zh: m.name_zh.clone(),
+                title: m.title.clone(),
+                title_source: m.title_source,
+                uploadable: m.uploadable,
+                note: m.note.clone(),
+                status: icon_status(m.title.as_deref(), m.name_en.as_deref(), exists),
+                wiki_uploaded: exists,
+                wiki_title: m.title.as_deref().map(|t| format!("File:{t}")),
+            };
+        }
+        let key = icon_meta::file_stem_key(&e.file);
+        let (name_en, name_zh) = match fallback.get(&key) {
+            Some((en, zh)) => (Some(en.clone()), (!zh.is_empty()).then(|| zh.clone())),
+            None => (None, None),
+        };
+        let title = name_en.as_deref().and_then(icon_meta::auto_title);
+        let status = icon_status(title.as_deref(), name_en.as_deref(), None);
+        Resolved {
+            name_en,
+            name_zh,
+            title_source: title.as_ref().map(|_| icon_meta::TitleSource::Auto),
+            uploadable: title.is_some(),
+            wiki_title: title.as_deref().map(|t| format!("File:{t}")),
+            title,
+            note: None,
+            status,
+            wiki_uploaded: None,
+        }
     };
-    let mut rows: Vec<Row> = index
+
+    let mut rows: Vec<(&IconEntry, Resolved)> = index
         .entries
         .iter()
-        .filter(|e| {
-            if ql.is_empty() {
-                return true;
-            }
-            e.file.contains(&ql)
-                || lookup(e)
-                    .is_some_and(|(en, zh)| en.to_lowercase().contains(&ql) || zh.contains(&ql))
-        })
-        .map(|e| {
-            let (name_en, name_zh) = match lookup(e) {
-                Some((en, zh)) => (Some(en.clone()), (!zh.is_empty()).then(|| zh.clone())),
-                None => (None, None),
-            };
-            Row {
-                entry: e,
-                name_en,
-                name_zh,
-            }
+        .map(|e| (e, resolve(e)))
+        .filter(|(e, r)| {
+            e.file.to_lowercase().contains(&ql)
+                || r.name_en
+                    .as_deref()
+                    .is_some_and(|en| en.to_lowercase().contains(&ql))
+                || r.name_zh.as_deref().is_some_and(|zh| zh.contains(&ql))
         })
         .collect();
-    rows.sort_by(|a, b| compare_entries(a.entry, b.entry, sort));
+
+    // 状态计数在状态过滤前统计（叠加搜索），供筛选项显示数量。
+    let mut status_counts = BTreeMap::from([
+        ("uploaded", 0usize),
+        ("missing", 0usize),
+        ("unknown", 0usize),
+        ("unuploadable", 0usize),
+        ("unnamed", 0usize),
+    ]);
+    for (_, r) in &rows {
+        if let Some(c) = status_counts.get_mut(r.status) {
+            *c += 1;
+        }
+    }
+
+    if status_filter != "all" {
+        rows.retain(|(_, r)| r.status == status_filter);
+    }
+    rows.sort_by(|a, b| compare_entries(a.0, b.0, sort));
+
+    // 历史排序分组汇总：每个 build 组的图标数 / 有名称数 / 维基缺失数。
+    #[derive(Default, serde::Serialize)]
+    struct BuildSummary {
+        total: usize,
+        named: usize,
+        missing: usize,
+    }
+    let mut builds: BTreeMap<String, BuildSummary> = BTreeMap::new();
+    for e in &index.entries {
+        let summary = builds.entry(e.first_build.clone()).or_default();
+        summary.total += 1;
+        if let Some(m) = meta.icons.get(&e.file) {
+            if m.name_en.is_some() {
+                summary.named += 1;
+            }
+            if m.uploadable && m.wiki.as_ref().and_then(|w| w.exists) == Some(false) {
+                summary.missing += 1;
+            }
+        }
+    }
 
     let total = rows.len();
     let (page, page_size) = page_params(&q);
@@ -266,13 +335,20 @@ pub async fn inventoryicons(
         .into_iter()
         .skip(start)
         .take(page_size)
-        .map(|r| {
+        .map(|(e, r)| {
             serde_json::json!({
-                "file": r.entry.file,
-                "first_build": r.entry.first_build,
-                "first_synced_at": r.entry.first_synced_at,
+                "file": e.file,
+                "first_build": e.first_build,
+                "first_synced_at": e.first_synced_at,
                 "name_en": r.name_en,
                 "name_zh": r.name_zh,
+                "title": r.title,
+                "title_source": r.title_source,
+                "uploadable": r.uploadable,
+                "note": r.note,
+                "status": r.status,
+                "wiki_uploaded": r.wiki_uploaded,
+                "wiki_title": r.wiki_title,
             })
         })
         .collect();
@@ -283,8 +359,22 @@ pub async fn inventoryicons(
         "page_size": page_size,
         "latest_build": index.latest_build,
         "latest_synced_at": index.latest_synced_at,
+        "meta_build": meta.build,
+        "status_counts": status_counts,
+        "builds": builds,
         "items": items,
     })))
+}
+
+/// 五态判定：有效标题 + 上传状态；无标题时区分有英文名/无英文名。
+fn icon_status(title: Option<&str>, name_en: Option<&str>, exists: Option<bool>) -> &'static str {
+    match (title, exists) {
+        (Some(_), Some(true)) => "uploaded",
+        (Some(_), Some(false)) => "missing",
+        (Some(_), None) => "unknown",
+        (None, _) if name_en.is_some() => "unuploadable",
+        (None, _) => "unnamed",
+    }
 }
 
 /// GET /api/data/inventoryicons/versions?file=xxx.png — 图标历代版本（自新向旧）。
@@ -300,11 +390,206 @@ pub async fn inventoryicon_versions(
     let Some(versions) = index.version_history(file) else {
         return Err(StatusCode::NOT_FOUND);
     };
+
+    let meta = state.icon_meta().await.map_err(err_status)?;
+    let (name_en, name_zh, title, title_source, uploadable, note, wiki) = match meta.icons.get(file)
+    {
+        Some(m) => (
+            m.name_en.clone(),
+            m.name_zh.clone(),
+            m.title.clone(),
+            m.title_source,
+            m.uploadable,
+            m.note.clone(),
+            m.wiki.clone(),
+        ),
+        // 元数据未生成时回退数据集解析；仅在该文件确实不可命名时才有成本。
+        None if meta.icons.is_empty() => {
+            let names = inventory_names(&state).await;
+            let key = icon_meta::file_stem_key(file);
+            match names.get(&key) {
+                Some((en, zh)) => {
+                    let title = icon_meta::auto_title(en);
+                    (
+                        Some(en.clone()),
+                        (!zh.is_empty()).then(|| zh.clone()),
+                        title,
+                        Some(icon_meta::TitleSource::Auto),
+                        true,
+                        None,
+                        None,
+                    )
+                }
+                None => (None, None, None, None, false, None, None),
+            }
+        }
+        None => (None, None, None, None, false, None, None),
+    };
+    let status = icon_status(
+        title.as_deref(),
+        name_en.as_deref(),
+        wiki.as_ref().and_then(|w| w.exists),
+    );
+    let wiki_title = title.as_deref().map(|t| format!("File:{t}"));
+
     Ok(Json(serde_json::json!({
         "file": file,
         "present": index.contains(file),
         "versions": versions,
+        "name_en": name_en,
+        "name_zh": name_zh,
+        "title": title,
+        "title_source": title_source,
+        "uploadable": uploadable,
+        "note": note,
+        "status": status,
+        "wiki_title": wiki_title,
+        "wiki": wiki_status_json(wiki.as_ref()),
     })))
+}
+
+/// POST /api/data/inventoryicons/title — 设置/清除图标的 wiki 文件名映射。
+///
+/// 请求体 `{ "file": "x.png", "title": "Pick-Axe.png" }`；`title` 为空或
+/// `null` 时清除映射（恢复自动标题）。映射写入 `icon_title_overrides.json`
+/// 并立即更新 `icon_meta.json`；标题变化时旧上传状态失效，并 best-effort
+/// 查询一次新标题的维基状态。
+pub async fn set_inventoryicon_title(
+    State(state): State<Arc<AppState>>,
+    Json(req): Json<IconTitleEditRequest>,
+) -> std::result::Result<Json<serde_json::Value>, ApiError> {
+    let file = req.file.trim().to_string();
+    if !icon_meta::is_icon_file_name(&file) {
+        return Err(bad_request(format!("无效的图标文件名：{file}")));
+    }
+    let index = state
+        .icons_index()
+        .await
+        .map_err(|e| internal_error(e.to_string()))?;
+    if !index.contains(&file) {
+        return Err(bad_request(format!("当前图标清单中没有 {file}")));
+    }
+    let title = match req
+        .title
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        Some(raw) => {
+            Some(icon_meta::normalize_explicit_title(raw).map_err(|e| bad_request(e.to_string()))?)
+        }
+        None => None,
+    };
+
+    let path = icon_meta::overrides_path();
+    let mut overrides =
+        icon_meta::load_overrides(&path).map_err(|e| internal_error(e.to_string()))?;
+    let changed = match &title {
+        Some(t) => overrides.get(&file) != Some(t.as_str()),
+        None => overrides.remove(&file).is_some(),
+    };
+    if let Some(t) = &title {
+        overrides.insert(&file, t);
+    }
+    if changed {
+        icon_meta::save_overrides(&path, &overrides).map_err(|e| internal_error(e.to_string()))?;
+    }
+
+    let out_dir = ktools_out_dir();
+    let mut meta = (*state
+        .icon_meta()
+        .await
+        .map_err(|e| internal_error(e.to_string()))?)
+    .clone();
+    let entry = meta
+        .icons
+        .entry(file.clone())
+        .or_insert_with(|| icon_meta::IconMetaEntry {
+            name_en: None,
+            name_zh: None,
+            title: None,
+            title_source: None,
+            uploadable: false,
+            note: None,
+            wiki: None,
+        });
+    icon_meta::refresh_entry_title(entry, &file, &overrides);
+    // 无英文名且无标题的空条目没有保留价值，直接移除。
+    if meta
+        .icons
+        .get(&file)
+        .is_some_and(|e| e.name_en.is_none() && e.title.is_none())
+    {
+        meta.icons.remove(&file);
+    }
+    // best-effort 查询新标题状态（凭据缺失/网络失败时保持“状态未知”）。
+    if title.is_some() {
+        if let Err(e) = dst_huiji_wiki::service::upload_icons::query_wiki_status(
+            &mut meta,
+            std::slice::from_ref(&file),
+        )
+        .await
+        {
+            tracing::warn!("查询 {} 的维基状态失败: {}", file, e);
+        }
+    }
+    icon_meta::save(&out_dir, &meta).map_err(|e| internal_error(e.to_string()))?;
+
+    let entry = meta.icons.get(&file);
+    let name_en = entry.and_then(|e| e.name_en.clone());
+    let title = entry.and_then(|e| e.title.clone());
+    let wiki = entry.and_then(|e| e.wiki.clone());
+    let status = icon_status(
+        title.as_deref(),
+        name_en.as_deref(),
+        wiki.as_ref().and_then(|w| w.exists),
+    );
+    Ok(Json(serde_json::json!({
+        "file": file,
+        "title": title,
+        "title_source": entry.and_then(|e| e.title_source),
+        "status": status,
+        "wiki_title": title.as_deref().map(|t| format!("File:{t}")),
+        "wiki": wiki_status_json(wiki.as_ref()),
+        "overrides_path": path.display().to_string(),
+    })))
+}
+
+/// 映射编辑请求体。
+#[derive(Debug, serde::Deserialize)]
+pub struct IconTitleEditRequest {
+    pub file: String,
+    #[serde(default)]
+    pub title: Option<String>,
+}
+
+/// Web UI 的可读错误（`(status, {"error": msg})`）。
+type ApiError = (StatusCode, Json<serde_json::Value>);
+
+fn bad_request(msg: impl Into<String>) -> ApiError {
+    (
+        StatusCode::BAD_REQUEST,
+        Json(serde_json::json!({ "error": msg.into() })),
+    )
+}
+
+fn internal_error(msg: impl Into<String>) -> ApiError {
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(serde_json::json!({ "error": msg.into() })),
+    )
+}
+
+/// `WikiStatus` → API JSON（`None` 表示尚未查询）。
+fn wiki_status_json(status: Option<&WikiStatus>) -> Option<serde_json::Value> {
+    status.map(|w| {
+        serde_json::json!({
+            "exists": w.exists,
+            "title": w.title,
+            "url": w.url,
+            "checked_at": w.checked_at,
+        })
+    })
 }
 
 /// 文件名 stem（大写）→ (英文 msgid, 中文 msgstr)，取自 STRINGS.NAMES.* 条目。
@@ -1278,4 +1563,26 @@ where
     let a = dst_huiji_wiki::service::dataset::read_game_file(Some(&from), rel)?;
     let b = dst_huiji_wiki::service::dataset::read_game_file(Some(&to), rel)?;
     compute(&a, &b)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_icon_status_five_states() {
+        assert_eq!(
+            icon_status(Some("A.png"), Some("A"), Some(true)),
+            "uploaded"
+        );
+        assert_eq!(
+            icon_status(Some("A.png"), Some("A"), Some(false)),
+            "missing"
+        );
+        assert_eq!(icon_status(Some("A.png"), Some("A"), None), "unknown");
+        assert_eq!(icon_status(None, Some("A"), None), "unuploadable");
+        assert_eq!(icon_status(None, None, None), "unnamed");
+        // 无英文名但有映射标题 → 按上传状态归类
+        assert_eq!(icon_status(Some("Skin.png"), None, Some(false)), "missing");
+    }
 }

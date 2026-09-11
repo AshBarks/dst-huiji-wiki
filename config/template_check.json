@@ -1,0 +1,15 @@
+{
+  "tech_whitelist": [
+    "MAGIC_ONE",
+    "CITY",
+    "HOME_TWO",
+    "OBSIDIAN_TWO",
+    "HERMITCRABSHOP_LOST",
+    "HERMITCRABTEA_LOST",
+    "WANDERINGTRADERSHOP_LOST"
+  ],
+  "crafting_filter_ignore": [],
+  "crafting_cn_alias": {},
+  "station_alias_fallback": {},
+  "lost_station_policy": "report"
+}

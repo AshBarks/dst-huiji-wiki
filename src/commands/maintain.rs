@@ -118,6 +118,51 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::MaintainTemplateCheck {
+            output,
+            snapshot,
+            skip_icon_status,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainTemplateCheck {
+                    output: opt_path_to_string(&output)?,
+                    snapshot,
+                    skip_icon_status,
+                },
+                // Read-only job: never touches the wiki.
+                WriteMode::DryRun,
+                report_json,
+            )
+            .await?;
+        }
+        Commands::MaintainStrings {
+            version,
+            snapshot,
+            output,
+            offline,
+            bucket_count,
+            rebalance,
+            limit,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainStrings {
+                    version,
+                    snapshot,
+                    output: opt_path_to_string(&output)?,
+                    offline,
+                    bucket_count,
+                    rebalance,
+                    limit,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
         Commands::SkillTreeWiki {
             character,
             output,

@@ -34,17 +34,32 @@ pub fn default_rules() -> Vec<Tier0Rule> {
             jobs: vec![
                 "map-recipes".to_string(),
                 "maintain-dst-recipes".to_string(),
+                "maintain-template-check".to_string(),
             ],
         },
         Tier0Rule {
-            prefix: "recipe_filter".to_string(),
-            label: "配方过滤".to_string(),
-            jobs: vec!["maintain-dst-recipes".to_string()],
+            prefix: "recipes_filter.lua".to_string(),
+            label: "配方过滤 / 制作分类".to_string(),
+            jobs: vec![
+                "maintain-copyclip".to_string(),
+                "maintain-template-check".to_string(),
+            ],
+        },
+        Tier0Rule {
+            prefix: "constants.lua".to_string(),
+            label: "科技常量（TECH）".to_string(),
+            jobs: vec![
+                "maintain-copyclip".to_string(),
+                "maintain-template-check".to_string(),
+            ],
         },
         Tier0Rule {
             prefix: "tuning.lua".to_string(),
-            label: "TUNING 数值（进入 F2 数值提取）".to_string(),
-            jobs: vec![],
+            label: "TUNING 数值（制作站树 + F2 数值提取）".to_string(),
+            jobs: vec![
+                "maintain-copyclip".to_string(),
+                "maintain-template-check".to_string(),
+            ],
         },
         Tier0Rule {
             prefix: "strings".to_string(),

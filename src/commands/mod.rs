@@ -90,6 +90,58 @@ pub enum Commands {
         #[arg(long)]
         report_json: Option<PathBuf>,
     },
+    /// 只读检查 模板:Tech/dst 与 模板:制作栏图标 对游戏数据的覆盖率
+    /// （可选把可粘贴片段写入 --output；不写维基）
+    #[command(name = "maintain-template-check")]
+    MaintainTemplateCheck {
+        /// 把可粘贴的补录片段写入该文件
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 使用指定 scripts 快照（默认当前 scripts 树）
+        #[arg(long)]
+        snapshot: Option<String>,
+        /// 跳过 live 图标存在性查询（只用 images-sync 的 icon_meta.json）
+        #[arg(long)]
+        skip_icon_status: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
+    /// 解析游戏 strings.pot / chinese_s.po，生成 模块:<V> Strings CN/EN <NN>
+    /// 桶页与 Data:<V>_Strings_Index.json；逐桶语义对比后只写变化页，索引最后写
+    #[command(name = "maintain-strings")]
+    MaintainStrings {
+        /// 版本前缀（页面名与索引名），默认 DST
+        #[arg(long, default_value = "DST")]
+        version: String,
+        /// 使用指定 scripts 快照（默认当前 scripts 树）
+        #[arg(long)]
+        snapshot: Option<String>,
+        /// 本地产物输出目录（默认 output/strings/<VERSION>）
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 跳过现网对比（无维基流量）
+        #[arg(long)]
+        offline: bool,
+        /// 无现有索引时的等分桶数
+        #[arg(long, default_value_t = 100)]
+        bucket_count: usize,
+        /// 忽略现有索引边界，强制等量重切
+        #[arg(long)]
+        rebalance: bool,
+        /// Canary：最多写入 N 个桶页且不更新索引（0 = 不限制）
+        #[arg(long, default_value_t = 0)]
+        limit: usize,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只生成产物与对比，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
     /// defs JSON 并维护维基子页面（保留页内 metainfo/icon_url；--output 同时
     /// 写出 Skilltree.js 渲染器与图片清单）
@@ -548,6 +600,8 @@ impl Commands {
             Commands::MaintainItemTable { .. } => "maintain-item-table",
             Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
             Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
+            Commands::MaintainTemplateCheck { .. } => "maintain-template-check",
+            Commands::MaintainStrings { .. } => "maintain-strings",
             Commands::SkillTreeWiki { .. } => "skilltree-wiki",
             Commands::SkillTreeExport { .. } => "skilltree-export",
             Commands::UploadImage { .. } => "upload-image",
@@ -1237,6 +1291,7 @@ mod tests {
             vec!["maintain-item-table"],
             vec!["maintain-dst-recipes"],
             vec!["maintain-copy-clip"],
+            vec!["maintain-strings"],
         ] {
             let mut argv = vec!["dst-huiji-wiki"];
             argv.extend_from_slice(&cmd);

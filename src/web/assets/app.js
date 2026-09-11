@@ -201,6 +201,13 @@ const JOB_DEFS = {
     label: "维护模块常量 → 维基", wiki: true,
     fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
+  maintain_template_check: {
+    label: "检查模板数据覆盖（只读）",
+    fields: [
+      { k: "output", label: "可粘贴片段输出文件（可选，如 output/template_snippets.txt）" },
+      { k: "skip_icon_status", type: "check", label: "跳过 live 图标存在性查询（只用本地 icon_meta）" },
+    ],
+  },
   skill_tree_wiki: {
     label: "维护技能树子页面 → 维基", wiki: true,
     fields: [

@@ -8,8 +8,9 @@ All data shapes: PO translation entries, recipe definitions, tech comparison rep
 ## STRUCTURE
 ```
 src/models/
-├── mod.rs            # 4 pub mod decls, re-exports 8 types
+├── mod.rs            # 5 pub mod decls, re-exports key types
 ├── po.rs             # PoEntry + PoFile (PO/Gettext data)
+├── strings.rs        # 模块:Strings 数据:key 大写归一 + 角色表合并 + 分桶/索引 + Lua 渲染/转义 + diff
 ├── tech_report.rs    # TechReport (tech level diff)
 └── recipe/
     ├── mod.rs        # Recipe struct + re-exports sub-models
@@ -23,6 +24,7 @@ src/models/
 | File | Types | Key info |
 |------|-------|----------|
 | `po.rs` | PoEntry, PoFile | category() extracts NAMES/ACTIONS/CHARACTERS/RECIPE_DESC/UI from msgctxt. entity_name() strips STRINGS.NAMES. prefix. PoFile has filter_by_category() + get_entity_names() |
+| `strings.rs` | StringValue, WikiStringKey, BucketPlan, MapDiff, ... | wiki_string_key(): STRINGS. 前缀剥离 + ASCII 大写归一 + CHARACTERS.<speaker> 移入小写角色表键（GENERIC→wilson）；build_language_map/plan_equal_count/plan_with_boundaries/validate_plan/render_module/diff_values |
 | `tech_report.rs` | TechReport | from_recipes() builds from Recipe slice. parse_wiki_lua_data() parses Lua 'TECH.*' entries. compare_with_wiki() computes diff. generate_report() formats text output |
 | `recipe/mod.rs` | Recipe | name + ingredients(Vec<Ingredient>) + tech + options + source_file/line. Builder: with_options(), with_source() |
 | `recipe/context.rs` | RecipeContext | Hardcoded maps: tech_constants (SCIENCE_ONE..SHADOW_THREE), character_ingredients, tech_ingredients, tuning_constants. Resolvers: resolve_tech(), resolve_ingredient(), resolve_tuning() |

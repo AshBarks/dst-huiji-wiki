@@ -71,6 +71,7 @@ src/
 | Find where a concrete mapper lives | `src/mapping/mappers/` | Each mapper is its own file |
 | Update CopyClip wiki module config | `src/copyclip/config.rs` | TOML-based module/page mappings |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync`; snapshot naming must stay `scripts_<yyyymmddhhmm>` for `DstContext::list_snapshots` |
+| 维护 模块:Strings 桶页 | `src/service/strings_wiki.rs` | `maintain-strings`：PO key 大写归一 + CHARACTERS 角色表合并 → 分桶 → 语义对比后只写变化页、索引最后写（`--dry-run` 只读）；纯逻辑在 `src/models/strings.rs`，桶页解析在 `src/parser/strings_data.rs` |
 
 ## LOCAL CONVENTIONS
 - **Module files**: `mod.rs` only in directory modules. No other files contain `mod` declarations.

@@ -95,3 +95,11 @@
 - 制作站别名派生（D2）：解析`constants.lua TECH`（常量→科技树键）、`tuning.lua TUNING.PROTOTYPER_TREES`（原型→科技树键，条目名即 PO 站筛键）、`recipes.lua`（配方 tech），把科技树键与站筛键不同名的别名补进 `crafting_stations`（如 `CARNIVAL_GOLFPROPS`→`CARNIVALGAME_GOLFGAME`、`VAULT_REFINE`→`VAULT_REFINER_PEDESTAL`），避免 wiki 端 `模块:DSTRecipe.get_recipe_filter_cn` assert
 - 粘贴到获取的页面内容的`[[`和`]]`之间
 - 输出粘贴后的字符串
+
+## 模板数据覆盖检查流程（maintain-template-check，只读）
+从环境变量中读取`DST__ROOT`，读取`constants.lua`/`tuning.lua`/`recipes.lua`/`recipes_filter.lua`与`chinese_s.po`，并用client获取`模板:Tech/dst`、`模板:制作栏图标`、`模块:RenderRecsByIngre/Data`、`模块:Constants/CraftingNames`。
+- 科技：recipes 在用 ⊄ 模板（error，生成片段）> constants 已定义 ⊄ 模板（warn）> 模板独有键按 `config/template_check.json` 的 `tech_whitelist` 兜底（info）
+- 制作栏：PO 分类/制作站中文名 ⊄ 模板 `filter|dst` 分支 case 键（error，生成片段；站图标经 `PROTOTYPER_DEFS.icon_image` + `config/icon_title_overrides.json` 反查）
+- 图标：分支内 `{{inv|X}}` 的 File 存在性（`history/icon_meta.json` 优先，`--skip-icon-status` 可离线；`%27` 类错误写法会给出解码建议）
+- 别名：tuning 派生别名 ⊄ 线上 CraftingNames（提示可用 `maintain-copy-clip --type names` 写入）；TECH 多键（如 LOST）只报告
+- 产出：控制台报告、`--report-json`、`--output` 可粘贴片段文件；永不写维基

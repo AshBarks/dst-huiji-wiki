@@ -22,6 +22,9 @@ src/parser/
 │                        #   FieldLocation/VariableRange structs.
 ├── po.rs                # PoParser — nom-based gettext PO parser.
 │                        #   Returns PoFile with header + Vec<PoEntry>.
+├── strings_data.rs      # parse_strings_module — 模块:<V> Strings 桶页
+│                        #   `return {...}` 数据解析(full_moon) + Lua 字符串
+│                        #   反转义(unescape_lua_string)。
 ├── recipe.rs            # RecipeParser — parses Recipe{} calls from Lua.
 │                        #   Expands for-loops (numeric + generic/ipairs)
 │                        #   at parse time. Uses RecipeContext for
@@ -52,6 +55,7 @@ src/parser/
 | Add a new Lua data parser | `src/parser/<name>.rs` | Full_moon AST, re-export in mod.rs |
 | Query Lua var/field locations | `lua.rs` → `LuaParser::locate_*` | Generic, returns byte-offset locations |
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |
+| 解析 模块:Strings 桶页 | `strings_data.rs` → `parse_strings_module` | 纯数据 `return {...}`；支持字符串/角色表与 Lua 转义还原 |
 | Tweak recipe parsing | `recipe.rs` → `RecipeParser` | Handles for-loop expansion; check extract_recipes() |
 | Fix prefab name extraction | `prefab_override/parser.rs` | Most complex file. Search by: collect_definitions, walk_block, resolve_override |
 | Add a new override value variant | `prefab_override/types.rs` | `OverrideValue` enum |

@@ -3,6 +3,8 @@ pub mod prefab_overrides;
 pub mod progress;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
+pub mod strings_wiki;
+pub mod template_check;
 pub mod upload_icons;
 pub mod upload_image;
 
@@ -123,6 +125,40 @@ pub enum JobKind {
         output: Option<String>,
         #[serde(default)]
         snapshot: Option<String>,
+    },
+    /// 只读检查 `模板:Tech/dst` 与 `模板:制作栏图标` 对游戏数据的覆盖率；
+    /// 输出控制台报告、`--report-json` 与可粘贴片段（`output`）。不写维基。
+    MaintainTemplateCheck {
+        #[serde(default)]
+        output: Option<String>,
+        #[serde(default)]
+        snapshot: Option<String>,
+        #[serde(default)]
+        skip_icon_status: bool,
+    },
+    /// `maintain-strings`：解析游戏 `strings.pot`/`chinese_s.po`，变换为
+    /// `模块:<V> Strings <LANG> <NN>` 桶页与 `Data:<V>_Strings_Index.json`，
+    /// 并与现网逐桶对比；只写有变化的桶页，最后写索引（DryRun 只产本地报告）。
+    MaintainStrings {
+        /// 版本前缀（页面名与索引名），如 `DST`。
+        #[serde(default = "default_strings_version")]
+        version: String,
+        #[serde(default)]
+        snapshot: Option<String>,
+        #[serde(default)]
+        output: Option<String>,
+        /// 跳过现网对比（无维基流量）。
+        #[serde(default)]
+        offline: bool,
+        /// 无现有索引时的等分桶数。
+        #[serde(default = "default_strings_buckets")]
+        bucket_count: usize,
+        /// 忽略现有索引边界，强制等量重切。
+        #[serde(default)]
+        rebalance: bool,
+        /// Canary：最多写入 N 个桶页且不更新索引；0 = 不限制。
+        #[serde(default)]
+        limit: usize,
     },
     /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
     /// defs JSON（保留页内 metainfo 与 icon_url；`output` 同时写出
@@ -489,6 +525,14 @@ fn default_symbol_batch_max_chars() -> usize {
     crate::update::DEFAULT_BATCH_MAX_CHARS
 }
 
+fn default_strings_version() -> String {
+    "DST".to_string()
+}
+
+fn default_strings_buckets() -> usize {
+    strings_wiki::DEFAULT_BUCKETS
+}
+
 impl JobKind {
     /// Human readable name used in job listings.
     pub fn name(&self) -> &'static str {
@@ -499,6 +543,8 @@ impl JobKind {
             JobKind::MaintainItemTable { .. } => "maintain-item-table",
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
             JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
+            JobKind::MaintainTemplateCheck { .. } => "maintain-template-check",
+            JobKind::MaintainStrings { .. } => "maintain-strings",
             JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
             JobKind::SkillTreeExport { .. } => "skilltree-export",
             JobKind::UploadImage { .. } => "upload-image",
@@ -532,6 +578,7 @@ impl JobKind {
             JobKind::MaintainItemTable { .. }
                 | JobKind::MaintainDstRecipes { .. }
                 | JobKind::MaintainCopyClip { .. }
+                | JobKind::MaintainStrings { .. }
                 | JobKind::SkillTreeWiki { .. }
                 | JobKind::UploadImage { .. }
                 | JobKind::UploadIcons { .. }
@@ -539,7 +586,7 @@ impl JobKind {
     }
 }
 
-fn make_ctx(snapshot: &Option<String>) -> Result<DstContext> {
+pub(crate) fn make_ctx(snapshot: &Option<String>) -> Result<DstContext> {
     let dst_root = std::env::var("DST__ROOT")
         .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
     DstContext::new(dst_root, snapshot.clone())
@@ -640,6 +687,45 @@ async fn execute_job_inner(
                 r#type.as_deref(),
                 opt_path(output),
                 snapshot.clone(),
+                reporter,
+                mode,
+            )
+            .await
+        }
+        JobKind::MaintainTemplateCheck {
+            output,
+            snapshot,
+            skip_icon_status,
+        } => {
+            template_check::run(
+                &template_check::TemplateCheckParams {
+                    output: opt_path(output),
+                    snapshot: snapshot.clone(),
+                    skip_icon_status: *skip_icon_status,
+                },
+                reporter,
+            )
+            .await
+        }
+        JobKind::MaintainStrings {
+            version,
+            snapshot,
+            output,
+            offline,
+            bucket_count,
+            rebalance,
+            limit,
+        } => {
+            strings_wiki::run(
+                &strings_wiki::StringsWikiParams {
+                    version: version.clone(),
+                    snapshot: snapshot.clone(),
+                    output: opt_path(output),
+                    offline: *offline,
+                    bucket_count: *bucket_count,
+                    rebalance: *rebalance,
+                    limit: *limit,
+                },
                 reporter,
                 mode,
             )

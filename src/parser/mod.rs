@@ -7,6 +7,7 @@ pub mod prefab_override;
 pub mod prefab_variants;
 pub mod recipe;
 pub mod skilltree;
+pub mod strings_data;
 
 pub use anim_override::{
     parse_anim_overrides, parse_anim_overrides_in, Confidence, OverrideApi, SymbolOverrideCall,
@@ -29,3 +30,4 @@ pub use prefab_variants::{
 };
 pub use recipe::{parse_recipes_from_file, parse_recipes_from_str, RecipeParser};
 pub use skilltree::{parse_skill_tree, parse_skill_tree_with_tuning, SkillNode, SkillTree};
+pub use strings_data::{parse_strings_module, unescape_lua_string};

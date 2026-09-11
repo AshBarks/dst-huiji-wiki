@@ -44,13 +44,15 @@ dst-huiji-wiki/
 | Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here (throttle+retry in `send_with_retry`) |
 | Change write/confirm policy | `src/service/mod.rs` (`WriteMode`, `decide_write`) | CLI maps --yes/--dry-run to WriteMode |
 | Add a data model | `src/models/` | Add struct + serde derives |
-| Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs |
+| Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs; `--type names` also derives CraftingNames station aliases from `constants.lua`/`tuning.lua` (`parse_*` in `src/parser/crafting.rs`, logic in `src/models/crafting_alias.rs`) |
+| Check 模板:Tech/dst & 模板:制作栏图标 coverage | `src/service/template_check.rs` | `maintain-template-check` CLI/Web job (read-only); config `config/template_check.json` (tech whitelist / CN alias / station fallback); snippets via `--output` |
+| 维护 模块:Strings 桶页 | `src/service/strings_wiki.rs` | `maintain-strings`：解析 pot/po → key 大写归一 + 角色表合并 → 沿用现有索引边界分桶 → 逐桶语义对比后只写变化页，索引最后写（`--dry-run` 只产报告，`--limit N` canary 不写索引）；`src/models/strings.rs`（变换/分桶/渲染）、`src/parser/strings_data.rs`（桶页解析） |
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusSync` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
 | Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
 | Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; must stay in sync with `src/web/assets/app.js` skilltree section |
 | Upload an image | `src/service/upload_image.rs` | `upload-image` CLI; auto description by dir (`skilltree/`→技能树素材, `skilltree_icons/`→技能树图标, `inventoryimages/`→物品栏图标); `--ignore-warnings` for re-upload (needs `reupload` right) |
-| Upload inventory icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual); WebUI 物品图标页五态过滤 + 弹窗编辑映射; override table `config/icon_title_overrides.json` (local file name → wiki file name), applied by `images-sync` into `history/icon_meta.json` |
+| Upload inventory icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting`); WebUI 物品图标页来源切换 + 五态过滤 + 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name), applied by `images-sync` into `history/icon_meta.json` |
 | Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync), ICON__TITLE_OVERRIDES vars |
 
 ## CODE MAP

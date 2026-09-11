@@ -164,6 +164,44 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// 扫描目录下全部 Lua 文件解析预制体重定向并合并（纯本地操作；
+    /// 目录缺省为 DST__ROOT/data/databundles/scripts/prefabs）
+    #[command(name = "prefab-overrides-dir")]
+    PrefabOverridesDir {
+        /// Lua 目录路径（缺省 DST__ROOT/data/databundles/scripts/prefabs）
+        #[arg(short, long)]
+        input: Option<PathBuf>,
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+    /// 只读审计 模块:ItemTable/PrefabOverrides：线上条目 × 本地推导做
+    /// key/target 存在性验证，输出可推导/需人工补丁/可疑三张清单
+    #[command(name = "prefab-overrides-audit")]
+    PrefabOverridesAudit {
+        /// 游戏脚本根目录（缺省 DST__ROOT/data/databundles/scripts）
+        #[arg(long)]
+        scripts: Option<PathBuf>,
+        /// 线上页面原文文件（离线审计；缺省从维基拉取，只读）
+        #[arg(long)]
+        wiki_file: Option<PathBuf>,
+        /// 审计报告 JSON 输出路径
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+    /// 维护 模块:ItemTable/PrefabOverrides（只读 diff，不写维基）：本地推导
+    /// 与线上页面合并对比，产出更新/新增清单与本地页面文本
+    #[command(name = "maintain-prefab-overrides")]
+    MaintainPrefabOverrides {
+        /// 游戏脚本根目录（缺省 DST__ROOT/data/databundles/scripts）
+        #[arg(long)]
+        scripts: Option<PathBuf>,
+        /// 线上页面原文文件（离线对比；缺省从维基拉取，只读）
+        #[arg(long)]
+        wiki_file: Option<PathBuf>,
+        /// 产物目录：PrefabOverrides.lua + diff.json
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
     /// 同步更新后的游戏 scripts:归档旧树为快照、解压新 scripts.zip(纯本地操作)
     ScriptsSync {
         /// 忽略版本一致,强制同步
@@ -512,6 +550,9 @@ impl Commands {
             Commands::UploadImage { .. } => "upload-image",
             Commands::UploadIcons { .. } => "upload-icons",
             Commands::PrefabOverrides { .. } => "prefab-overrides",
+            Commands::PrefabOverridesDir { .. } => "prefab-overrides-dir",
+            Commands::PrefabOverridesAudit { .. } => "prefab-overrides-audit",
+            Commands::MaintainPrefabOverrides { .. } => "maintain-prefab-overrides",
             Commands::ScriptsSync { .. } => "scripts-sync",
             Commands::ImagesSync { .. } => "images-sync",
             Commands::AnimSync { .. } => "anim-sync",
@@ -1258,6 +1299,111 @@ mod tests {
                 assert_eq!(report_json, Some(PathBuf::from("report.json")));
             }
             _ => panic!("Expected SkillTreeExport command"),
+        }
+    }
+
+    #[test]
+    fn test_prefab_overrides_dir_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "prefab-overrides-dir"]).unwrap();
+        match args.command {
+            Commands::PrefabOverridesDir { input, output } => {
+                assert!(input.is_none());
+                assert!(output.is_none());
+            }
+            _ => panic!("Expected PrefabOverridesDir command"),
+        }
+
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "prefab-overrides-dir",
+            "-i",
+            "scripts/prefabs",
+            "-o",
+            "overrides.json",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::PrefabOverridesDir { input, output } => {
+                assert_eq!(input, Some(PathBuf::from("scripts/prefabs")));
+                assert_eq!(output, Some(PathBuf::from("overrides.json")));
+            }
+            _ => panic!("Expected PrefabOverridesDir command"),
+        }
+    }
+
+    #[test]
+    fn test_prefab_overrides_audit_command_defaults() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "prefab-overrides-audit"]).unwrap();
+        match args.command {
+            Commands::PrefabOverridesAudit {
+                scripts,
+                wiki_file,
+                output,
+            } => {
+                assert!(scripts.is_none());
+                assert!(wiki_file.is_none());
+                assert!(output.is_none());
+            }
+            _ => panic!("Expected PrefabOverridesAudit command"),
+        }
+
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "prefab-overrides-audit",
+            "--scripts",
+            "/scripts",
+            "--wiki-file",
+            "page.wiki",
+            "-o",
+            "audit.json",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::PrefabOverridesAudit {
+                scripts,
+                wiki_file,
+                output,
+            } => {
+                assert_eq!(scripts, Some(PathBuf::from("/scripts")));
+                assert_eq!(wiki_file, Some(PathBuf::from("page.wiki")));
+                assert_eq!(output, Some(PathBuf::from("audit.json")));
+            }
+            _ => panic!("Expected PrefabOverridesAudit command"),
+        }
+    }
+
+    #[test]
+    fn test_maintain_prefab_overrides_command() {
+        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-prefab-overrides"]).unwrap();
+        match args.command {
+            Commands::MaintainPrefabOverrides {
+                scripts,
+                wiki_file,
+                output,
+            } => {
+                assert!(scripts.is_none());
+                assert!(wiki_file.is_none());
+                assert!(output.is_none());
+            }
+            _ => panic!("Expected MaintainPrefabOverrides command"),
+        }
+
+        let args = Args::try_parse_from([
+            "dst-huiji-wiki",
+            "maintain-prefab-overrides",
+            "--scripts",
+            "/scripts",
+            "--wiki-file",
+            "page.wiki",
+            "-o",
+            "output/prefab_overrides",
+        ])
+        .unwrap();
+        match args.command {
+            Commands::MaintainPrefabOverrides { output, .. } => {
+                assert_eq!(output, Some(PathBuf::from("output/prefab_overrides")));
+            }
+            _ => panic!("Expected MaintainPrefabOverrides command"),
         }
     }
 

@@ -1,4 +1,5 @@
 pub mod dataset;
+pub mod prefab_overrides;
 pub mod progress;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
@@ -11,7 +12,7 @@ use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
 use crate::models::PoEntry;
 use crate::parser::{
-    extract_field_assignment_range, parse_prefab_overrides, OverrideValue, RecipeParser,
+    extract_field_assignment_range, RecipeParser,
 };
 use crate::wiki::{EditResult, WikiClient};
 use crate::{DstContext, TechReport};
@@ -156,6 +157,39 @@ pub enum JobKind {
     },
     PrefabOverrides {
         input: String,
+        #[serde(default)]
+        output: Option<String>,
+    },
+    /// 扫描目录下全部 Lua 文件解析预制体重定向并合并（纯本地）。
+    PrefabOverridesDir {
+        /// Lua 目录；缺省 `DST__ROOT/data/databundles/scripts/prefabs`。
+        #[serde(default)]
+        input: Option<String>,
+        #[serde(default)]
+        output: Option<String>,
+    },
+    /// 只读审计 模块:ItemTable/PrefabOverrides：线上条目 × 本地推导做
+    /// key/target 存在性验证，产出可推导/需人工补丁/可疑三张清单。
+    PrefabOverridesAudit {
+        /// 游戏脚本根目录；缺省 `DST__ROOT/data/databundles/scripts`。
+        #[serde(default)]
+        scripts: Option<String>,
+        /// 线上页面原文文件；缺省从维基拉取（只读）。
+        #[serde(default)]
+        wiki_file: Option<String>,
+        #[serde(default)]
+        output: Option<String>,
+    },
+    /// 维护 模块:ItemTable/PrefabOverrides（当前只读）：本地推导渲染后与
+    /// 线上 merge-preserving diff，产出更新/新增清单与本地页面文本，不写维基。
+    MaintainPrefabOverrides {
+        /// 游戏脚本根目录；缺省 `DST__ROOT/data/databundles/scripts`。
+        #[serde(default)]
+        scripts: Option<String>,
+        /// 线上页面原文文件；缺省从维基拉取（只读）。
+        #[serde(default)]
+        wiki_file: Option<String>,
+        /// 产物目录：`PrefabOverrides.lua` + `diff.json`。
         #[serde(default)]
         output: Option<String>,
     },
@@ -465,6 +499,9 @@ impl JobKind {
             JobKind::UploadImage { .. } => "upload-image",
             JobKind::UploadIcons { .. } => "upload-icons",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
+            JobKind::PrefabOverridesDir { .. } => "prefab-overrides-dir",
+            JobKind::PrefabOverridesAudit { .. } => "prefab-overrides-audit",
+            JobKind::MaintainPrefabOverrides { .. } => "maintain-prefab-overrides",
             JobKind::ScriptsSync { .. } => "scripts-sync",
             JobKind::ImagesSync { .. } => "images-sync",
             JobKind::AnimSync { .. } => "anim-sync",
@@ -604,7 +641,37 @@ async fn execute_job_inner(
             .await
         }
         JobKind::PrefabOverrides { input, output } => {
-            run_prefab_overrides(input, opt_path(output), reporter).await
+            prefab_overrides::run_prefab_overrides(input, opt_path(output), reporter).await
+        }
+        JobKind::PrefabOverridesDir { input, output } => {
+            prefab_overrides::run_prefab_overrides_dir(input.as_deref(), opt_path(output), reporter)
+                .await
+        }
+        JobKind::PrefabOverridesAudit {
+            scripts,
+            wiki_file,
+            output,
+        } => {
+            prefab_overrides::audit::run_prefab_overrides_audit(
+                scripts.as_deref(),
+                wiki_file.as_deref(),
+                opt_path(output),
+                reporter,
+            )
+            .await
+        }
+        JobKind::MaintainPrefabOverrides {
+            scripts,
+            wiki_file,
+            output,
+        } => {
+            prefab_overrides::maintain::run_maintain_prefab_overrides(
+                scripts.as_deref(),
+                wiki_file.as_deref(),
+                opt_path(output),
+                reporter,
+            )
+            .await
         }
         JobKind::SkillTreeWiki {
             character,
@@ -1604,53 +1671,6 @@ async fn run_map_recipes(
     }
 
     finish_json_output(&wiki_data, output, reporter)
-}
-
-async fn run_prefab_overrides(
-    input: &str,
-    output: Option<PathBuf>,
-    reporter: &dyn Reporter,
-) -> Result<serde_json::Value> {
-    reporter.stage("解析预制体重定向");
-    let lua_content = std::fs::read_to_string(input)?;
-    let overrides = parse_prefab_overrides(&lua_content)?;
-
-    reporter.log(format!("找到 {} 条预制体重定向", overrides.len()));
-
-    let mut mapping: BTreeMap<String, serde_json::Value> = BTreeMap::new();
-    for override_info in overrides {
-        let prefab_name = override_info.prefab_name;
-        let override_value = match override_info.override_name {
-            OverrideValue::Static(s) => serde_json::json!({
-                "override_name": s,
-                "type": "static"
-            }),
-            OverrideValue::Dynamic(s) => serde_json::json!({
-                "override_name": s,
-                "type": "dynamic"
-            }),
-            OverrideValue::Unknown => serde_json::json!({
-                "override_name": null,
-                "type": "unknown"
-            }),
-        };
-        mapping.insert(prefab_name, override_value);
-    }
-
-    let json_output = serde_json::to_string_pretty(&mapping)?;
-
-    if let Some(output_path) = output {
-        std::fs::write(&output_path, &json_output)?;
-        reporter.log(format!(
-            "已写入 {} 条映射到 {:?}",
-            mapping.len(),
-            output_path
-        ));
-        Ok(serde_json::json!({ "overrides": mapping.len(), "output": output_path }))
-    } else {
-        reporter.log(json_output);
-        Ok(serde_json::json!({ "overrides": mapping.len() }))
-    }
 }
 
 // ---------------------------------------------------------------------------

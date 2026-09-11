@@ -500,7 +500,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     }))
 }
 
-fn collect_lua_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
+pub(crate) fn collect_lua_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();

@@ -214,6 +214,51 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::PrefabOverridesDir { input, output } => {
+            execute(
+                JobKind::PrefabOverridesDir {
+                    input: opt_path_to_string(&input)?,
+                    output: opt_path_to_string(&output)?,
+                },
+                WriteMode::Interactive,
+                None,
+            )
+            .await?;
+        }
+        Commands::PrefabOverridesAudit {
+            scripts,
+            wiki_file,
+            output,
+        } => {
+            execute(
+                JobKind::PrefabOverridesAudit {
+                    scripts: opt_path_to_string(&scripts)?,
+                    wiki_file: opt_path_to_string(&wiki_file)?,
+                    output: opt_path_to_string(&output)?,
+                },
+                // Read-only job: never writes the wiki.
+                WriteMode::AutoConfirm,
+                None,
+            )
+            .await?;
+        }
+        Commands::MaintainPrefabOverrides {
+            scripts,
+            wiki_file,
+            output,
+        } => {
+            execute(
+                JobKind::MaintainPrefabOverrides {
+                    scripts: opt_path_to_string(&scripts)?,
+                    wiki_file: opt_path_to_string(&wiki_file)?,
+                    output: opt_path_to_string(&output)?,
+                },
+                // Dry-run only: never writes the wiki.
+                WriteMode::DryRun,
+                None,
+            )
+            .await?;
+        }
         Commands::ScriptsSync {
             force,
             dry_run,

@@ -216,8 +216,28 @@ const JOB_DEFS = {
     ],
   },
   prefab_overrides: {
-    label: "预制体重定向解析",
+    label: "预制体重定向解析（单文件）",
     fields: [{ k: "input", label: "Lua 文件路径" }],
+  },
+  prefab_overrides_dir: {
+    label: "预制体重定向解析（目录）",
+    fields: [{ k: "input", label: "Lua 目录路径（留空 = DST__ROOT/data/databundles/scripts/prefabs）" }],
+  },
+  prefab_overrides_audit: {
+    label: "预制体重定向审计（只读）",
+    fields: [
+      { k: "scripts", label: "游戏脚本根目录（留空 = DST__ROOT/data/databundles/scripts）" },
+      { k: "wiki_file", label: "线上页面原文文件（可选，留空 = 在线拉取）" },
+      { k: "output", label: "审计报告 JSON 输出（可选）" },
+    ],
+  },
+  maintain_prefab_overrides: {
+    label: "维护预制体重定向（只读 diff）",
+    fields: [
+      { k: "scripts", label: "游戏脚本根目录（留空 = DST__ROOT/data/databundles/scripts）" },
+      { k: "wiki_file", label: "线上页面原文文件（可选，留空 = 在线拉取）" },
+      { k: "output", label: "产物目录（可选：PrefabOverrides.lua + diff.json）" },
+    ],
   },
   scripts_sync: {
     label: "scripts-sync 同步游戏脚本",

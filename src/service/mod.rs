@@ -10,14 +10,15 @@ pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutRepor
 
 use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
-use crate::models::PoEntry;
+use crate::models::{derive_station_aliases, PoEntry, StationAliasInputs, StationAliasReport};
 use crate::parser::{
-    extract_field_assignment_range, RecipeParser,
+    extract_field_assignment_range, parse_crafting_filter_lists, parse_prototyper_trees,
+    parse_tech_constants, RecipeParser,
 };
 use crate::wiki::{EditResult, WikiClient};
 use crate::{DstContext, TechReport};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use tracing::Instrument;
 
@@ -2222,6 +2223,48 @@ async fn maintain_crafting_filters(
     .await
 }
 
+/// 读取游戏侧四张表并派生 CraftingNames 需要补的制作站别名。
+///
+/// 派生链：`constants.lua TECH` → 科技树键 →（`tuning.lua`
+/// `PROTOTYPER_TREES` 反查）→ 条目名（即 PO 站筛键，如
+/// `CARNIVALGAME_GOLFGAME`）。任一步读文件/解析失败即返回 `Err`，
+/// 由调用方决定降级。
+fn derive_crafting_station_aliases(
+    ctx: &mut DstContext,
+    known_station_keys: &BTreeSet<String>,
+) -> Result<StationAliasReport> {
+    let constants = ctx.read_script_file("scripts/constants.lua")?;
+    let tuning = ctx.read_script_file("scripts/tuning.lua")?;
+    let recipes_source = ctx.read_script_file("scripts/recipes.lua")?;
+    let filters_source = ctx.read_script_file("scripts/recipes_filter.lua")?;
+
+    let tech_constants = parse_tech_constants(&constants)?;
+    let prototyper_trees = parse_prototyper_trees(&tuning)?;
+    let filter_lists = parse_crafting_filter_lists(&filters_source)?;
+
+    let mut parser = RecipeParser::new();
+    let recipes = parser.parse(&recipes_source, Some("scripts/recipes.lua"))?;
+    let recipe_techs: BTreeMap<String, String> = recipes
+        .iter()
+        .map(|r| (r.name.clone(), r.tech.clone()))
+        .collect();
+
+    let station_recipes = filter_lists
+        .get("CRAFTING_STATION")
+        .cloned()
+        .unwrap_or_default();
+    let fallback = BTreeMap::new();
+
+    Ok(derive_station_aliases(&StationAliasInputs {
+        tech_constants: &tech_constants,
+        prototyper_trees: &prototyper_trees,
+        known_station_keys,
+        station_recipes: &station_recipes,
+        recipe_techs: &recipe_techs,
+        fallback: &fallback,
+    }))
+}
+
 async fn maintain_crafting_names(
     ctx: &mut DstContext,
     output: Option<PathBuf>,
@@ -2256,6 +2299,50 @@ async fn maintain_crafting_names(
                 );
             }
         }
+    }
+
+    // D2：补制作站别名。游戏侧科技树键与 PO 站筛键不同名时（如
+    // CARNIVAL_GOLFPROPS ↔ CARNIVALGAME_GOLFGAME），wiki 端
+    // `模块:DSTRecipe.get_recipe_filter_cn` 会 assert，必须在
+    // crafting_stations 里保留一个别名键。派生失败只警告，不阻断生成。
+    let known_station_keys: BTreeSet<String> = crafting_stations.keys().cloned().collect();
+    let mut alias_added = Vec::new();
+    match derive_crafting_station_aliases(ctx, &known_station_keys) {
+        Ok(report) => {
+            for alias in &report.aliases {
+                if crafting_stations.contains_key(&alias.tree_key) {
+                    continue;
+                }
+                if let Some(target) = crafting_stations.get(&alias.filter_key).cloned() {
+                    crafting_stations.insert(alias.tree_key.clone(), target);
+                    alias_added.push(format!("{}→{}", alias.tree_key, alias.filter_key));
+                }
+            }
+            if !alias_added.is_empty() {
+                reporter.log(format!(
+                    "已补 {} 条制作站别名：{}",
+                    alias_added.len(),
+                    alias_added.join(", ")
+                ));
+            }
+            for u in &report.unresolved {
+                let total = u.sample_recipes.len();
+                let samples = u.sample_recipes.iter().take(5).cloned().collect::<Vec<_>>();
+                let suffix = if total > samples.len() {
+                    format!(" …（共 {} 条）", total)
+                } else {
+                    String::new()
+                };
+                reporter.log(format!(
+                    "警告：制作站别名未决 {}（{:?}），样例配方：{}{}",
+                    u.tree_key,
+                    u.reason,
+                    samples.join(", "),
+                    suffix
+                ));
+            }
+        }
+        Err(e) => reporter.log(format!("警告：制作站别名派生失败：{e}")),
     }
 
     let stations_len = crafting_stations.len();

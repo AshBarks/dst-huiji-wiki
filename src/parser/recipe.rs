@@ -80,22 +80,71 @@ impl RecipeParser {
 
     fn extract_prototyper_defs(&mut self, ast: &Ast, _filename: Option<&str>) {
         for stmt in ast.nodes().stmts() {
-            if let ast::Stmt::Assignment(assignment) = stmt {
-                let var_list = assignment.variables();
-                let expr_list = assignment.expressions();
+            let ast::Stmt::Assignment(assignment) = stmt else {
+                continue;
+            };
+            let var_list = assignment.variables();
+            let expr_list = assignment.expressions();
 
-                for (var, expr) in var_list.iter().zip(expr_list.iter()) {
-                    if let ast::Var::Expression(var_expr) = var {
-                        let prefix = var_expr.prefix().to_string();
-                        if prefix == "PROTOTYPER_DEFS" {
-                            if let Some(name) = self.get_var_expr_key(var_expr) {
-                                if let ast::Expression::TableConstructor(table) = expr {
-                                    let def = self.parse_prototyper_def(&name, table);
+            for (var, expr) in var_list.iter().zip(expr_list.iter()) {
+                match var {
+                    // 真实 recipes.lua 形态：`PROTOTYPER_DEFS = { name = {...} }`
+                    ast::Var::Name(name) => {
+                        if name.token().to_string() != "PROTOTYPER_DEFS" {
+                            continue;
+                        }
+                        if let ast::Expression::TableConstructor(table) = expr {
+                            for field in table.fields() {
+                                if let ast::Field::NameKey {
+                                    key,
+                                    value: ast::Expression::TableConstructor(def_table),
+                                    ..
+                                } = field
+                                {
+                                    let def = self
+                                        .parse_prototyper_def(&key.token().to_string(), def_table);
                                     self.context.prototyper_defs.push(def);
                                 }
                             }
                         }
                     }
+                    // 兼容形态：`PROTOTYPER_DEFS.name = {...}` 与别名赋值
+                    // `PROTOTYPER_DEFS.wargshrine = PROTOTYPER_DEFS.perdshrine`
+                    ast::Var::Expression(var_expr) => {
+                        if var_expr.prefix().to_string().trim() != "PROTOTYPER_DEFS" {
+                            continue;
+                        }
+                        let Some(name) = self.get_var_expr_key(var_expr) else {
+                            continue;
+                        };
+                        match expr {
+                            ast::Expression::TableConstructor(table) => {
+                                let def = self.parse_prototyper_def(&name, table);
+                                self.context.prototyper_defs.push(def);
+                            }
+                            ast::Expression::Var(ast::Var::Expression(src_expr)) => {
+                                if src_expr.prefix().to_string().trim() != "PROTOTYPER_DEFS" {
+                                    continue;
+                                }
+                                let Some(base) = self.get_var_expr_key(src_expr) else {
+                                    continue;
+                                };
+                                if let Some(existing) = self
+                                    .context
+                                    .prototyper_defs
+                                    .iter()
+                                    .find(|d| d.name == base)
+                                    .cloned()
+                                {
+                                    let mut alias = existing;
+                                    alias.name = name;
+                                    self.context.prototyper_defs.push(alias);
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    _ => {}
                 }
             }
         }
@@ -122,13 +171,18 @@ impl RecipeParser {
         for field in table.fields() {
             if let ast::Field::NameKey { key, value, .. } = field {
                 let key_str = key.token().to_string();
+                // `filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.X` 是点路径
+                // 表达式，`eval_expression` 只认字面量，这里单独按原文提取。
+                if key_str == "filter_text" {
+                    def.filter_text = self.extract_expr_var_path(value);
+                    continue;
+                }
                 if let Some(str_val) = self.eval_expression(value) {
                     match key_str.as_str() {
                         "icon_atlas" => def.icon_atlas = Some(str_val),
                         "icon_image" => def.icon_image = Some(str_val),
                         "is_crafting_station" => def.is_crafting_station = Some(str_val == "true"),
                         "action_str" => def.action_str = Some(str_val),
-                        "filter_text" => def.filter_text = Some(str_val),
                         _ => {}
                     }
                 }
@@ -136,6 +190,16 @@ impl RecipeParser {
         }
 
         def
+    }
+
+    /// 提取 `STRINGS.UI.CRAFTING_STATION_FILTERS.X` 这类点路径表达式的原文。
+    fn extract_expr_var_path(&self, expr: &ast::Expression) -> Option<String> {
+        match expr {
+            ast::Expression::Var(ast::Var::Expression(var_expr)) => {
+                Some(var_expr.to_string().trim().to_string())
+            }
+            _ => None,
+        }
     }
 
     fn extract_recipes(&self, ast: &Ast, filename: Option<&str>) -> Result<Vec<Recipe>> {
@@ -903,6 +967,45 @@ pub fn parse_recipes_from_str(source: &str, filename: Option<&str>) -> Result<Ve
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_prototyper_def_fields() {
+        let source = r#"PROTOTYPER_DEFS =
+{
+    perdshrine = {icon_atlas = CRAFTING_ICONS_ATLAS, icon_image = "station_perd_offering.tex", is_crafting_station = true, action_str = "OFFERING", filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.YOT_SHRINE_DOFFERING},
+    carnivalgame_golfgame = {icon_atlas = CRAFTING_ICONS_ATLAS, icon_image = "station_carnivalgame_golfprops.tex", is_crafting_station = true, action_str = "OPERATE", filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.CARNIVALGAME_GOLFGAME},
+}
+PROTOTYPER_DEFS.wargshrine = PROTOTYPER_DEFS.perdshrine
+"#;
+        let mut parser = RecipeParser::new();
+        parser.parse(source, None).unwrap();
+        let defs = &parser.context().prototyper_defs;
+        assert_eq!(defs.len(), 3);
+        assert_eq!(defs[0].name, "perdshrine");
+        assert_eq!(
+            defs[0].filter_text.as_deref(),
+            Some("STRINGS.UI.CRAFTING_STATION_FILTERS.YOT_SHRINE_DOFFERING")
+        );
+        let golf = defs
+            .iter()
+            .find(|d| d.name == "carnivalgame_golfgame")
+            .unwrap();
+        assert_eq!(
+            golf.icon_image.as_deref(),
+            Some("station_carnivalgame_golfprops.tex")
+        );
+        assert_eq!(golf.is_crafting_station, Some(true));
+        assert_eq!(
+            golf.filter_text.as_deref(),
+            Some("STRINGS.UI.CRAFTING_STATION_FILTERS.CARNIVALGAME_GOLFGAME")
+        );
+        // 别名继承被引用定义
+        let alias = defs.iter().find(|d| d.name == "wargshrine").unwrap();
+        assert_eq!(
+            alias.filter_text.as_deref(),
+            Some("STRINGS.UI.CRAFTING_STATION_FILTERS.YOT_SHRINE_DOFFERING")
+        );
+    }
 
     #[test]
     fn test_parse_simple_recipe() {

@@ -92,5 +92,6 @@
 ### CraftingNames
 - 用client获取`模块:Constants/CraftingNames`页面的内容
 - PoEntry解析chinese_s.po文件后，过滤msgctxt以`STRINGS.UI.CRAFTING_STATION_FILTERS.`开头和`STRINGS.UI.CRAFTING_FILTERS.`开头的项，整理成examples/crafting_names.json示例的json形式
+- 制作站别名派生（D2）：解析`constants.lua TECH`（常量→科技树键）、`tuning.lua TUNING.PROTOTYPER_TREES`（原型→科技树键，条目名即 PO 站筛键）、`recipes.lua`（配方 tech），把科技树键与站筛键不同名的别名补进 `crafting_stations`（如 `CARNIVAL_GOLFPROPS`→`CARNIVALGAME_GOLFGAME`、`VAULT_REFINE`→`VAULT_REFINER_PEDESTAL`），避免 wiki 端 `模块:DSTRecipe.get_recipe_filter_cn` assert
 - 粘贴到获取的页面内容的`[[`和`]]`之间
 - 输出粘贴后的字符串

@@ -241,6 +241,9 @@ pub enum Commands {
         /// 只上传首次加入该 build 的图标
         #[arg(long)]
         build: Option<String>,
+        /// 只上传指定来源的图标：inventory（物品栏）或 crafting（制作栏）
+        #[arg(long)]
+        source: Option<String>,
         /// 只上传单个图标文件名（如 axe.png；优先于 --build）
         #[arg(long)]
         file: Option<String>,
@@ -878,6 +881,7 @@ mod tests {
         match args.command {
             Commands::UploadIcons {
                 build,
+                source,
                 file,
                 title,
                 include_existing,
@@ -888,6 +892,7 @@ mod tests {
                 report_json,
             } => {
                 assert!(build.is_none());
+                assert!(source.is_none());
                 assert!(file.is_none());
                 assert!(title.is_none());
                 assert!(!include_existing);

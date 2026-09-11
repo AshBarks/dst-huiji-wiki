@@ -1,15 +1,16 @@
-//! `upload-icons`：物品栏图标上传（单个 / 按 build 批量 / 手动指定文件名）。
+//! `upload-icons`：图标上传（单个 / 按 build / 按来源批量 / 手动指定文件名）。
 //!
 //! 数据来源：
 //! - 文件与名称：`history/icon_meta.json`（images-sync 生成的生效标题 +
-//!   上传状态）与 `current/split/inventoryimages/<file>`（当前图标内容）；
+//!   上传状态）与 `current/split/<source.dir>/<file>`（当前图标内容）；
 //! - 生效标题：`config/icon_title_overrides.json` 映射表（按本地文件名）
 //!   优先，其次 `STRINGS.NAMES` 英文名自动生成（MediaWiki 归一化）；
 //! - 手动上传：`file` + `title` 同时给出时绕过映射/自动标题，直接把输入
 //!   （去 `File:` 前缀、补 `.png`、MediaWiki 归一化）写入映射表并上传；
-//! - 选择：`file` 单个 > `build`（首次加入该 build 的图标）> 全部可上传；
-//!   批量默认仅上传 wiki 上不存在的（`only_missing`），显式指定的单个文件
-//!   始终上传（是否覆盖自动按标题存在性决定）；
+//! - 选择：`file` 单个 > `build`（首次加入该 build 的图标）> `source`
+//!   （物品栏 / 制作栏）> 全部可上传；批量默认仅上传 wiki 上不存在的
+//!   （`only_missing`），显式指定的单个文件始终上传（是否覆盖自动按标题
+//!   存在性决定）；
 //! - 同名标题去重：多个图标命中同一标题时只上传第一个，其余记录在
 //!   `title_conflicts`。
 //!
@@ -21,7 +22,9 @@ use super::progress::Reporter;
 use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::{Error, Result};
 use crate::scripts_sync::images::history::now_ms;
-use crate::scripts_sync::images::icons::build_icons_index;
+use crate::scripts_sync::images::icons::{
+    build_icons_index, default_source, icon_source, IconSource, ICON_SOURCES,
+};
 use crate::scripts_sync::images::meta::{self as icon_meta, IconMeta};
 use crate::wiki::WikiClient;
 use serde_json::{json, Value};
@@ -31,8 +34,28 @@ use std::path::{Path, PathBuf};
 
 /// 物品栏图标的固定描述分类。
 pub const ICON_CATEGORY: &str = "[[分类:物品栏图标]]";
-/// 未显式指定时的上传注释。
+/// 制作栏图标的固定描述分类。
+pub const CRAFTING_ICON_CATEGORY: &str = "[[分类:制作栏图标]]";
+/// 未显式指定时的上传注释（物品栏图标）。
 pub const UPLOAD_COMMENT: &str = "物品栏图标同步（images-sync）";
+/// 未显式指定时的上传注释（制作栏图标）。
+pub const CRAFTING_UPLOAD_COMMENT: &str = "制作栏图标同步（images-sync）";
+
+/// 来源对应的描述分类。
+pub fn icon_category(source_id: &str) -> &'static str {
+    match source_id {
+        "crafting" => CRAFTING_ICON_CATEGORY,
+        _ => ICON_CATEGORY,
+    }
+}
+
+/// 来源对应的默认上传注释。
+pub fn upload_comment(source_id: &str) -> &'static str {
+    match source_id {
+        "crafting" => CRAFTING_UPLOAD_COMMENT,
+        _ => UPLOAD_COMMENT,
+    }
+}
 
 /// `KTOOLS__OUT_DIR`（缺省 `output/ktools`）。
 pub fn out_dir_from_env() -> PathBuf {
@@ -52,6 +75,8 @@ pub struct UploadIconsParams {
     pub file: Option<String>,
     /// 手动指定上传的 wiki 文件名（需配合 `file`）；写入映射表并绕过自动标题。
     pub title: Option<String>,
+    /// 只上传指定来源（`inventory` / `crafting`）；`None` = 全部来源。
+    pub source: Option<String>,
     /// 批量时仅上传 wiki 上尚不存在的；对单个 `file` 不生效。
     pub only_missing: bool,
     /// 同名重传发送 `ignorewarnings=1`。
@@ -77,7 +102,11 @@ pub async fn refresh_icon_meta(
         reporter.log("暂无完整 manifest，跳过图标元数据刷新".to_string());
         return Ok(json!({ "status": "no_manifest" }));
     };
-    let files: Vec<String> = index.entries.iter().map(|e| e.file.clone()).collect();
+    let files: Vec<(String, String)> = index
+        .entries
+        .iter()
+        .map(|e| (e.file.clone(), e.source.clone()))
+        .collect();
     let names = icon_meta::read_name_maps(dst_root)?;
     let overrides = icon_meta::load_overrides(&icon_meta::overrides_path())?;
     if names.is_empty() && overrides.is_empty() {
@@ -133,6 +162,11 @@ pub async fn refresh_icon_meta(
         .values()
         .filter(|e| e.name_en.is_some() && !e.uploadable)
         .count();
+    let mut by_source: BTreeMap<String, usize> = BTreeMap::new();
+    for entry in meta.icons.values() {
+        let source = entry.source.as_deref().unwrap_or("inventory");
+        *by_source.entry(source.to_string()).or_default() += 1;
+    }
     reporter.log(format!(
         "图标元数据：条目 {entries}（命名 {named} / 可上传 {uploadable}）/ 无法上传 {unuploadable} / 缺失 {missing} / 未查 {unknown}，映射表 {} → {}",
         overrides.len(),
@@ -149,6 +183,7 @@ pub async fn refresh_icon_meta(
         "unuploadable": unuploadable,
         "missing": missing,
         "unknown": unknown,
+        "by_source": by_source,
         "wiki_checked": wiki_checked,
         "wiki_error": wiki_error,
         "path": path.display().to_string(),
@@ -204,14 +239,16 @@ pub async fn query_wiki_status(meta: &mut IconMeta, files: &[String]) -> Result<
 
 /// 选择待上传文件（纯函数，按文件名升序）。
 ///
-/// `file` 优先于 `build`；两者都为空时返回全部可上传图标。`only_missing`
-/// 的过滤发生在状态查询之后（见 [`run_upload_icons`]）。手动标题路径由
-/// [`run_upload_icons`] 单独处理，不走本函数。
+/// `file` 优先于 `build`，`source` 在最外层过滤；都为 `None` 时返回全部
+/// 可上传图标。`only_missing` 的过滤发生在状态查询之后（见
+/// [`run_upload_icons`]）。手动标题路径由 [`run_upload_icons`] 单独处理，
+/// 不走本函数。
 pub fn select_files(
     meta: &IconMeta,
     file: Option<&str>,
     build: Option<&str>,
     first_build: Option<&BTreeMap<String, String>>,
+    source: Option<&str>,
 ) -> Result<Vec<String>> {
     if let Some(file) = file {
         let Some(entry) = meta.icons.get(file) else {
@@ -237,7 +274,11 @@ pub fn select_files(
         let out: Vec<String> = meta
             .icons
             .iter()
-            .filter(|(f, e)| e.uploadable && map.get(*f).map(String::as_str) == Some(build))
+            .filter(|(f, e)| {
+                e.uploadable
+                    && map.get(*f).map(String::as_str) == Some(build)
+                    && source_matches(e, source)
+            })
             .map(|(f, _)| f.clone())
             .collect();
         return Ok(out);
@@ -246,9 +287,17 @@ pub fn select_files(
     Ok(meta
         .icons
         .iter()
-        .filter(|(_, e)| e.uploadable)
+        .filter(|(_, e)| e.uploadable && source_matches(e, source))
         .map(|(f, _)| f.clone())
         .collect())
+}
+
+/// 来源过滤：`None` 全部通过；旧元数据无 `source` 视为物品栏图标。
+fn source_matches(entry: &icon_meta::IconMetaEntry, source: Option<&str>) -> bool {
+    match source {
+        None => true,
+        Some(want) => entry.source.as_deref().unwrap_or("inventory") == want,
+    }
 }
 
 /// 同名标题去重：保留第一个文件，其余记入 `conflicts`。
@@ -279,18 +328,22 @@ fn dedupe_by_title(meta: &IconMeta, files: Vec<String>) -> (Vec<String>, Vec<Val
 }
 
 /// 校验手动上传的本地图标文件：裸文件名 + 当前 split 产物中存在。
-fn validate_icon_file(out_dir: &Path, file: &str) -> Result<()> {
+/// 返回命中的来源（用于定位上传目录与描述分类）。
+fn validate_icon_file(out_dir: &Path, file: &str) -> Result<&'static IconSource> {
     if !icon_meta::is_icon_file_name(file) {
         return Err(Error::Config(format!("无效的图标文件名：{file}")));
     }
-    let path = out_dir.join("current/split/inventoryimages").join(file);
-    if !path.exists() {
-        return Err(Error::Config(format!(
-            "当前 images-sync 产物中没有 {file}（{}），请先运行 images-sync",
-            path.display()
-        )));
+    for source in ICON_SOURCES {
+        let path = out_dir.join("current/split").join(source.dir).join(file);
+        if path.exists() {
+            return Ok(source);
+        }
     }
-    Ok(())
+    let dirs: Vec<&str> = ICON_SOURCES.iter().map(|s| s.dir).collect();
+    Err(Error::Config(format!(
+        "当前 images-sync 产物中没有 {file}（已查 {}），请先运行 images-sync",
+        dirs.join(" / ")
+    )))
 }
 
 /// 把手动标题应用到内存中的条目（不存在则新建）。
@@ -306,6 +359,7 @@ fn apply_manual_title(
         .or_insert_with(|| icon_meta::IconMetaEntry {
             name_en: None,
             name_zh: None,
+            source: None,
             title: None,
             title_source: None,
             uploadable: false,
@@ -323,7 +377,7 @@ pub async fn run_upload_icons(
     mode: WriteMode,
 ) -> Result<Value> {
     let out_dir = out_dir_from_env();
-    reporter.stage("物品栏图标上传");
+    reporter.stage("图标上传");
 
     let mut meta = icon_meta::load(&out_dir)?;
     if meta.icons.is_empty() {
@@ -339,7 +393,7 @@ pub async fn run_upload_icons(
         .as_deref()
         .map(icon_meta::normalize_explicit_title)
         .transpose()?;
-    let manual_pending = if let Some(title) = manual_title.clone() {
+    let (manual_pending, manual_source) = if let Some(title) = manual_title.clone() {
         let Some(file) = params.file.clone() else {
             return Err(Error::Config(
                 "手动标题需要同时指定 file（WebUI 弹窗或 --file + --title）".to_string(),
@@ -348,10 +402,10 @@ pub async fn run_upload_icons(
         if params.build.is_some() {
             return Err(Error::Config("title 与 build 不能同时指定".to_string()));
         }
-        validate_icon_file(&out_dir, &file)?;
-        (file, title)
+        let source = validate_icon_file(&out_dir, &file)?;
+        ((file, title), Some(source))
     } else {
-        (String::new(), String::new())
+        ((String::new(), String::new()), None)
     };
 
     let first_build = if params.file.is_none() && params.build.is_some() {
@@ -372,6 +426,11 @@ pub async fn run_upload_icons(
         // 仅映射表中不存在同名映射时写入（Apply 阶段落盘）。
         overrides.insert(&file, title);
         apply_manual_title(&mut meta, &overrides, &file, title);
+        if let Some(source) = manual_source {
+            if let Some(entry) = meta.icons.get_mut(&file) {
+                entry.source = Some(source.id.to_string());
+            }
+        }
         vec![file]
     } else {
         select_files(
@@ -379,6 +438,7 @@ pub async fn run_upload_icons(
             params.file.as_deref(),
             params.build.as_deref(),
             first_build.as_ref(),
+            params.source.as_deref(),
         )?
     };
     if selected.is_empty() {
@@ -443,7 +503,7 @@ pub async fn run_upload_icons(
         .collect();
 
     let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm(&format!("上传 {} 个物品栏图标到维基？", selected.len()))
+        reporter.confirm(&format!("上传 {} 个图标到维基？", selected.len()))
     } else {
         false
     };
@@ -480,8 +540,6 @@ pub async fn run_upload_icons(
             reporter.log("登录维基".to_string());
             client.login().await?;
 
-            let dir = out_dir.join("current/split/inventoryimages");
-            let comment = params.comment.as_deref().unwrap_or(UPLOAD_COMMENT);
             let mut uploaded = Vec::new();
             let mut failed = Vec::new();
             for (i, file) in selected.iter().enumerate() {
@@ -491,6 +549,17 @@ pub async fn run_upload_icons(
                     failed.push(json!({ "file": file, "error": "无法生成标题" }));
                     continue;
                 }
+                let source = entry
+                    .source
+                    .as_deref()
+                    .and_then(icon_source)
+                    .unwrap_or_else(default_source);
+                let dir = out_dir.join("current/split").join(source.dir);
+                let category = icon_category(source.id);
+                let comment = params
+                    .comment
+                    .as_deref()
+                    .unwrap_or_else(|| upload_comment(source.id));
                 // 已存在则自动覆盖重传（ignorewarnings=1），无需前端猜测。
                 let exists = entry.wiki.as_ref().and_then(|w| w.exists) == Some(true);
                 let ignore_warnings = params.ignore_warnings || exists;
@@ -506,7 +575,7 @@ pub async fn run_upload_icons(
                     .upload_file(
                         &path,
                         Some(&title),
-                        Some(ICON_CATEGORY),
+                        Some(category),
                         Some(comment),
                         ignore_warnings,
                     )
@@ -581,6 +650,7 @@ mod tests {
                 IconMetaEntry {
                     name_en: Some((*name_en).to_string()),
                     name_zh: None,
+                    source: Some("inventory".to_string()),
                     title,
                     title_source: Some(icon_meta::TitleSource::Auto),
                     uploadable: *uploadable,
@@ -599,8 +669,18 @@ mod tests {
         let img = dir.join("current/split/inventoryimages");
         std::fs::create_dir_all(&img).unwrap();
         std::fs::write(img.join("skin.png"), b"png").unwrap();
+        let craft = dir.join("current/split/crafting_menu_icons");
+        std::fs::create_dir_all(&craft).unwrap();
+        std::fs::write(craft.join("filter_tool.png"), b"png").unwrap();
 
-        validate_icon_file(&dir, "skin.png").unwrap();
+        assert_eq!(
+            validate_icon_file(&dir, "skin.png").unwrap().id,
+            "inventory"
+        );
+        assert_eq!(
+            validate_icon_file(&dir, "filter_tool.png").unwrap().id,
+            "crafting"
+        );
         assert!(validate_icon_file(&dir, "nope.png").is_err());
         assert!(validate_icon_file(&dir, "../evil.png").is_err());
 
@@ -635,15 +715,15 @@ mod tests {
         ]);
         // 单个
         assert_eq!(
-            select_files(&meta, Some("axe.png"), None, None).unwrap(),
+            select_files(&meta, Some("axe.png"), None, None, None).unwrap(),
             vec!["axe.png".to_string()]
         );
         // 单个不可上传 → 错误
-        assert!(select_files(&meta, Some("placeholder.png"), None, None).is_err());
-        assert!(select_files(&meta, Some("missing.png"), None, None).is_err());
+        assert!(select_files(&meta, Some("placeholder.png"), None, None, None).is_err());
+        assert!(select_files(&meta, Some("missing.png"), None, None, None).is_err());
         // 无筛选 → 全部可上传
         assert_eq!(
-            select_files(&meta, None, None, None).unwrap(),
+            select_files(&meta, None, None, None, None).unwrap(),
             vec!["axe.png".to_string(), "gold.png".to_string()]
         );
         // 按 build（first_build 映射把 gold 归到 200）
@@ -651,15 +731,29 @@ mod tests {
         map.insert("axe.png".to_string(), "100".to_string());
         map.insert("gold.png".to_string(), "200".to_string());
         assert_eq!(
-            select_files(&meta, None, Some("200"), Some(&map)).unwrap(),
+            select_files(&meta, None, Some("200"), Some(&map), None).unwrap(),
             vec!["gold.png".to_string()]
         );
         assert_eq!(
-            select_files(&meta, None, Some("999"), Some(&map)).unwrap(),
+            select_files(&meta, None, Some("999"), Some(&map), None).unwrap(),
             Vec::<String>::new()
         );
         // 缺索引 → 错误
-        assert!(select_files(&meta, None, Some("200"), None).is_err());
+        assert!(select_files(&meta, None, Some("200"), None, None).is_err());
+    }
+
+    #[test]
+    fn test_select_files_filters_by_source() {
+        let mut meta = meta_with(&[("axe.png", "Axe", true), ("filter_tool.png", "Tools", true)]);
+        meta.icons.get_mut("filter_tool.png").unwrap().source = Some("crafting".to_string());
+        assert_eq!(
+            select_files(&meta, None, None, None, Some("crafting")).unwrap(),
+            vec!["filter_tool.png".to_string()]
+        );
+        assert_eq!(
+            select_files(&meta, None, None, None, Some("inventory")).unwrap(),
+            vec!["axe.png".to_string()]
+        );
     }
 
     #[test]
@@ -703,7 +797,7 @@ mod tests {
             title: None,
             url: None,
         });
-        let mut selected = select_files(&meta, None, None, None).unwrap();
+        let mut selected = select_files(&meta, None, None, None, None).unwrap();
         selected.retain(|f| {
             meta.icons
                 .get(f)

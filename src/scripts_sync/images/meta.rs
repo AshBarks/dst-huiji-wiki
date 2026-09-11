@@ -176,6 +176,10 @@ pub struct IconMetaEntry {
     /// 中文名；无翻译或 msgstr 为空时省略。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name_zh: Option<String>,
+    /// 来源标识（[`crate::scripts_sync::images::icons::IconSource::id`]）；
+    /// 旧元数据没有该字段时为 `None`（视为物品栏图标）。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
     /// 生效的维基文件名（含 `.png`，无 `File:` 前缀）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
@@ -507,15 +511,17 @@ fn invalid_note(name_en: &str) -> String {
 
 /// 由当前图标文件清单构建元数据；`previous` 中生效标题未变的条目的 wiki
 /// 状态会保留（避免每次 images-sync 重查全部标题）。
+///
+/// `files` 为 `(文件名, 来源标识)` 对（来源见 `images::icons::ICON_SOURCES`）。
 pub fn build_meta(
     build: &str,
-    files: impl IntoIterator<Item = String>,
+    files: impl IntoIterator<Item = (String, String)>,
     names: &NameMaps,
     overrides: &IconTitleOverrides,
     previous: &IconMeta,
 ) -> IconMeta {
     let mut icons = BTreeMap::new();
-    for file in files {
+    for (file, source) in files {
         let key = file_stem_key(&file);
         let name_en = names.en.get(&key).cloned();
         let (title, title_source) = effective_title(&file, name_en.as_deref(), overrides);
@@ -537,6 +543,7 @@ pub fn build_meta(
             IconMetaEntry {
                 name_en,
                 name_zh: names.zh.get(&key).cloned(),
+                source: Some(source),
                 title,
                 title_source,
                 uploadable,
@@ -700,14 +707,17 @@ msgstr ""
         assert!(load_overrides(&dir.join("none.json")).unwrap().is_empty());
     }
 
-    fn files(list: &[&str]) -> Vec<String> {
-        list.iter().map(|s| s.to_string()).collect()
+    fn files(list: &[&str]) -> Vec<(String, String)> {
+        list.iter()
+            .map(|s| (s.to_string(), "inventory".to_string()))
+            .collect()
     }
 
     fn entry(name_en: Option<&str>, title: Option<&str>) -> IconMetaEntry {
         IconMetaEntry {
             name_en: name_en.map(str::to_string),
             name_zh: None,
+            source: Some("inventory".to_string()),
             title: title.map(str::to_string),
             title_source: title.map(|_| TitleSource::Auto),
             uploadable: title.is_some(),
@@ -811,6 +821,32 @@ msgstr ""
         assert!(skin.uploadable && skin.note.is_none());
         // 无英文名且无映射 → 不收录
         assert!(!meta.icons.contains_key("other.png"));
+    }
+
+    #[test]
+    fn test_build_meta_records_source() {
+        let maps = parse_name_maps(ZH_PO, Some(EN_POT)).unwrap();
+        let mut ov = IconTitleOverrides::default();
+        ov.insert("filter_tool.png", "Tools Filter.png");
+        let meta = build_meta(
+            "1",
+            vec![
+                ("axe.png".to_string(), "inventory".to_string()),
+                ("filter_tool.png".to_string(), "crafting".to_string()),
+            ],
+            &maps,
+            &ov,
+            &IconMeta::default(),
+        );
+        assert_eq!(meta.icons["axe.png"].source.as_deref(), Some("inventory"));
+        assert_eq!(
+            meta.icons["filter_tool.png"].source.as_deref(),
+            Some("crafting")
+        );
+        assert_eq!(
+            meta.icons["filter_tool.png"].title.as_deref(),
+            Some("Tools Filter.png")
+        );
     }
 
     #[test]

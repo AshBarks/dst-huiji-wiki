@@ -180,6 +180,7 @@ pub async fn run(args: Commands) -> Result<()> {
         }
         Commands::UploadIcons {
             build,
+            source,
             file,
             title,
             include_existing,
@@ -192,6 +193,7 @@ pub async fn run(args: Commands) -> Result<()> {
             execute(
                 JobKind::UploadIcons {
                     build,
+                    source,
                     file,
                     title,
                     only_missing: !include_existing,

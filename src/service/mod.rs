@@ -221,14 +221,18 @@ pub enum JobKind {
         #[serde(default)]
         skip_wiki_status: bool,
     },
-    /// 上传物品栏图标到维基：标题取映射表（按本地文件名）或
-    /// `STRINGS.NAMES` 英文名 + `.png`（描述固定 `[[分类:物品栏图标]]`）；
-    /// 批量默认仅上传维基缺失的（需先运行 images-sync 生成
-    /// `history/icon_meta.json`）；`file` + `title` 为手动指定文件名上传。
+    /// 上传图标到维基：标题取映射表（按本地文件名）或 `STRINGS.NAMES`
+    /// 英文名 + `.png`（描述按来源：物品栏 `[[分类:物品栏图标]]` / 制作栏
+    /// `[[分类:制作栏图标]]`）；批量默认仅上传维基缺失的（需先运行
+    /// images-sync 生成 `history/icon_meta.json`）；`file` + `title` 为
+    /// 手动指定文件名上传。
     UploadIcons {
         /// 只上传首次加入该 build 的图标。
         #[serde(default)]
         build: Option<String>,
+        /// 只上传指定来源（`inventory` / `crafting`）；缺省全部来源。
+        #[serde(default)]
+        source: Option<String>,
         /// 只上传单个图标文件名（如 `axe.png`，优先于 `build`）。
         #[serde(default)]
         file: Option<String>,
@@ -730,6 +734,7 @@ async fn execute_job_inner(
         } => run_images_sync(*force, *dry_run, *skip_wiki_status, reporter).await,
         JobKind::UploadIcons {
             build,
+            source,
             file,
             title,
             only_missing,
@@ -739,6 +744,7 @@ async fn execute_job_inner(
             upload_icons::run_upload_icons(
                 &upload_icons::UploadIconsParams {
                     build: build.clone(),
+                    source: source.clone(),
                     file: file.clone(),
                     title: title.clone(),
                     only_missing: *only_missing,

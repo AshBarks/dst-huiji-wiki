@@ -256,9 +256,10 @@ const JOB_DEFS = {
     ],
   },
   upload_icons: {
-    label: "upload-icons 上传物品栏图标 → 维基", wiki: true,
+    label: "upload-icons 上传图标 → 维基", wiki: true,
     fields: [
       { k: "build", label: "只上传首次加入该 build 的图标（留空=全部有英文名的）" },
+      { k: "source", label: "只上传指定来源：inventory（物品栏）/ crafting（制作栏），留空=全部" },
       { k: "file", label: "只上传单个文件名（如 axe.png，优先于 build）" },
       { k: "title", label: "手动指定 wiki 文件名（需配合 file，如 Pick-Axe.png；会写入映射表）" },
       { k: "only_missing", type: "check", default: true, label: "仅上传维基缺失的（批量）" },
@@ -1177,7 +1178,12 @@ async function pageInventoryIcons(main) {
   main.innerHTML = `
     <div class="panel">
       <div class="row">
-        <div class="tabs" style="margin:0">
+        <div class="tabs" style="margin:0" id="isrcTabs">
+          <button class="tab active" data-source="all" data-label="全部来源">全部来源</button>
+          <button class="tab" data-source="inventory" data-label="物品栏图标">物品栏图标</button>
+          <button class="tab" data-source="crafting" data-label="制作栏图标">制作栏图标</button>
+        </div>
+        <div class="tabs" style="margin:0" id="isortTabs">
           <button class="tab active" data-sort="name">按文件名</button>
           <button class="tab" data-sort="history">按加入历史</button>
         </div>
@@ -1226,7 +1232,7 @@ async function pageInventoryIcons(main) {
     return `<span class="badge b-muted">${esc(STATUS_LABELS[it.status] || it.status)}</span>`;
   };
 
-  const st = { sort: "name", q: "", status: "all", page: 0, size: 120, loading: false, done: false, lastGroup: null, builds: {} };
+  const st = { sort: "name", source: "all", q: "", status: "all", page: 0, size: 120, loading: false, done: false, lastGroup: null, builds: {} };
 
   // 过滤下拉显示各状态数量（叠加搜索；由服务端统计）。
   const refreshStatusOptions = (counts) => {
@@ -1239,14 +1245,28 @@ async function pageInventoryIcons(main) {
     }
   };
 
+  // 来源标签显示各来源图标总数。
+  const refreshSourceTabs = (sources) => {
+    const tabs = $("#isrcTabs");
+    if (!tabs || !sources) return;
+    const total = sources.reduce((a, x) => a + (x.total || 0), 0);
+    tabs.querySelectorAll(".tab").forEach((b) => {
+      const n = b.dataset.source === "all"
+        ? total
+        : (sources.find((x) => x.id === b.dataset.source)?.total || 0);
+      b.textContent = `${b.dataset.label} ${n}`;
+    });
+  };
+
   const loadMore = async () => {
     if (st.loading || st.done) return;
     st.loading = true;
     try {
-      const p = new URLSearchParams({ sort: st.sort, q: st.q, status: st.status, page: st.page, page_size: st.size });
+      const p = new URLSearchParams({ sort: st.sort, source: st.source, q: st.q, status: st.status, page: st.page, page_size: st.size });
       const r = await getJSON(`/api/data/inventoryicons?${p}`);
       $("#icount").textContent = `共 ${r.total} 个图标 · 数据源 build ${r.latest_build ?? "—"}${r.meta_build ? ` · 元数据 build ${r.meta_build}` : ""}`;
       refreshStatusOptions(r.status_counts);
+      refreshSourceTabs(r.sources);
       if (r.builds) st.builds = r.builds;
       const grid = $("#igrid");
       for (const it of r.items) {
@@ -1267,10 +1287,11 @@ async function pageInventoryIcons(main) {
         }
         const names = [it.name_zh, it.name_en].filter(Boolean).join(" / ");
         const badge = iconBadge(it);
+        const srcDir = it.source === "crafting" ? "crafting_menu_icons" : "inventoryimages";
         grid.insertAdjacentHTML("beforeend", `
           <figure class="icon-card" data-file="${esc(it.file)}">
             <img loading="lazy" width="64" height="64"
-              src="/static/split/inventoryimages/${encodeURIComponent(it.file)}" alt="${esc(it.file)}">
+              src="/static/split/${srcDir}/${encodeURIComponent(it.file)}" alt="${esc(it.file)}">
             <figcaption>
               <code>${esc(it.file.replace(/\.png$/, ""))}</code>
               ${names ? `<span class="muted">${esc(names)}</span>` : ""}
@@ -1305,10 +1326,17 @@ async function pageInventoryIcons(main) {
     loadMore();
   };
 
-  main.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+  main.querySelectorAll("#isortTabs .tab").forEach(b => b.onclick = () => {
     if (b.dataset.sort === st.sort) return;
     st.sort = b.dataset.sort;
-    main.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === b));
+    main.querySelectorAll("#isortTabs .tab").forEach(x => x.classList.toggle("active", x === b));
+    reset();
+  });
+
+  main.querySelectorAll("#isrcTabs .tab").forEach(b => b.onclick = () => {
+    if (b.dataset.source === st.source) return;
+    st.source = b.dataset.source;
+    main.querySelectorAll("#isrcTabs .tab").forEach(x => x.classList.toggle("active", x === b));
     reset();
   });
 
@@ -1422,7 +1450,9 @@ async function pageInventoryIcons(main) {
       if (!confirm(`将向维基上传 Build ${build} 组中缺失的 ${b.missing || 0} 个图标（同名标题会自动去重）。确定继续？`)) return;
       batchBtn.disabled = true;
       try {
-        const j = await postJSON("/api/jobs", { kind: "upload_icons", build, only_missing: true, wiki_dry_run: false });
+        const payload = { kind: "upload_icons", build, only_missing: true, wiki_dry_run: false };
+        if (st.source !== "all") payload.source = st.source;
+        const j = await postJSON("/api/jobs", payload);
         location.hash = `#/jobs/${j.id}`;
       } catch (err) { batchBtn.disabled = false; alert("提交失败：" + err.message); }
       return;

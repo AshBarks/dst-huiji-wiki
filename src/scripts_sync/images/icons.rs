@@ -1,5 +1,6 @@
-//! 物品图标浏览索引：面向 WebUI「物品图标」板块，从 manifests 历史推导
-//! `split/inventoryimages/` 下每个图标的「首次加入 build」与「历代版本」。
+//! 图标浏览索引：面向 WebUI「物品图标」板块，从 manifests 历史推导各
+//! split 来源（物品栏图标 / 制作栏图标）下每个图标的「首次加入 build」与
+//! 「历代版本」。
 //!
 //! 语义约定：
 //! - 只统计 `complete == true` 的 manifest（与 diff 基线策略一致——partial
@@ -16,14 +17,52 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::path::Path;
 
-/// inventoryimages 在 manifest products 里的路径前缀。
-pub const ICONS_PREFIX: &str = "split/inventoryimages/";
+/// 一个图标来源：`current/split/<dir>/` 下的一类 atlas 切片。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IconSource {
+    /// 稳定标识（API 参数/元数据用），如 `inventory`。
+    pub id: &'static str,
+    /// manifest products 路径前缀，如 `split/inventoryimages/`。
+    pub prefix: &'static str,
+    /// split 目录名，如 `inventoryimages`。
+    pub dir: &'static str,
+    /// 展示名，如 `物品栏图标`。
+    pub label: &'static str,
+}
+
+/// 受管理的图标来源（顺序即 WebUI 展示顺序）。
+pub const ICON_SOURCES: &[IconSource] = &[
+    IconSource {
+        id: "inventory",
+        prefix: "split/inventoryimages/",
+        dir: "inventoryimages",
+        label: "物品栏图标",
+    },
+    IconSource {
+        id: "crafting",
+        prefix: "split/crafting_menu_icons/",
+        dir: "crafting_menu_icons",
+        label: "制作栏图标",
+    },
+];
+
+/// 按稳定标识查来源。
+pub fn icon_source(id: &str) -> Option<&'static IconSource> {
+    ICON_SOURCES.iter().find(|s| s.id == id)
+}
+
+/// 缺省来源（旧元数据没有 `source` 字段时）。
+pub fn default_source() -> &'static IconSource {
+    &ICON_SOURCES[0]
+}
 
 /// 一个当前存在的图标条目。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct IconEntry {
     /// 文件名（如 `abigail_flower.png`）。
     pub file: String,
+    /// 来源标识（[`IconSource::id`]），如 `inventory` / `crafting`。
+    pub source: String,
     /// 当前内容 sha256（最新完整 manifest 的 products）。
     pub hash: String,
     /// 首次加入的 build 号。
@@ -88,6 +127,13 @@ impl IconsIndex {
     }
 }
 
+/// 把 manifest product 路径（`split/<dir>/<file>`）匹配到图标来源。
+fn source_of_product(path: &str) -> Option<(&'static IconSource, &str)> {
+    ICON_SOURCES
+        .iter()
+        .find_map(|source| path.strip_prefix(source.prefix).map(|file| (source, file)))
+}
+
 /// 汇总 manifests 目录，产出图标索引。目录不存在时返回空索引。
 pub fn build_icons_index(manifests_dir: &Path) -> Result<IconsIndex> {
     let store = ManifestStore::new(manifests_dir);
@@ -117,7 +163,7 @@ pub fn build_icons_index(manifests_dir: &Path) -> Result<IconsIndex> {
     let mut versions: HashMap<String, Vec<IconVersion>> = HashMap::new();
     for m in &manifests {
         for (path, hash) in &m.products {
-            let Some(file) = path.strip_prefix(ICONS_PREFIX) else {
+            let Some((_, file)) = source_of_product(path) else {
                 continue;
             };
             first_seen
@@ -138,12 +184,13 @@ pub fn build_icons_index(manifests_dir: &Path) -> Result<IconsIndex> {
     let mut entries: Vec<IconEntry> = Vec::new();
     if let Some(latest) = latest {
         for (path, hash) in &latest.products {
-            let Some(file) = path.strip_prefix(ICONS_PREFIX) else {
+            let Some((source, file)) = source_of_product(path) else {
                 continue;
             };
             if let Some((build, at)) = first_seen.get(file) {
                 entries.push(IconEntry {
                     file: file.to_string(),
+                    source: source.id.to_string(),
                     hash: hash.clone(),
                     first_build: build.clone(),
                     first_synced_at: *at,
@@ -248,6 +295,7 @@ mod tests {
         assert_eq!(a.first_build, "100");
         assert_eq!(a.first_synced_at, Some(1000));
         assert_eq!(a.hash, "h2");
+        assert_eq!(a.source, "inventory");
         let c = idx.entries.iter().find(|e| e.file == "c.png").unwrap();
         assert_eq!(c.first_build, "200");
 
@@ -266,9 +314,47 @@ mod tests {
     }
 
     #[test]
+    fn test_crafting_source_tracked() {
+        let ws = std::env::temp_dir().join(format!("icons_src_{}", std::process::id()));
+        std::fs::remove_dir_all(&ws).ok();
+        let dir = ws.join("manifests");
+        let store = ManifestStore::new(&dir);
+        store
+            .save(&manifest(
+                "100",
+                true,
+                &[
+                    ("split/inventoryimages/axe.png", "h1"),
+                    ("split/crafting_menu_icons/filter_tool.png", "h2"),
+                    ("split/crafting_menu_icons/station_carpentry.png", "h3"),
+                ],
+            ))
+            .unwrap();
+
+        let idx = build_icons_index(&dir).unwrap();
+        let axe = idx.entries.iter().find(|e| e.file == "axe.png").unwrap();
+        assert_eq!(axe.source, "inventory");
+        let filter = idx
+            .entries
+            .iter()
+            .find(|e| e.file == "filter_tool.png")
+            .unwrap();
+        assert_eq!(filter.source, "crafting");
+        let station = idx
+            .entries
+            .iter()
+            .find(|e| e.file == "station_carpentry.png")
+            .unwrap();
+        assert_eq!(station.source, "crafting");
+
+        std::fs::remove_dir_all(&ws).ok();
+    }
+
+    #[test]
     fn test_compare_entries_sorts() {
         let e = |file: &str, build: &str| IconEntry {
             file: file.into(),
+            source: "inventory".into(),
             hash: "h".into(),
             first_build: build.into(),
             first_synced_at: None,

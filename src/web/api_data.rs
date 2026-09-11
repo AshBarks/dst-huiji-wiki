@@ -6,7 +6,9 @@ use axum::http::{header, StatusCode};
 use axum::response::IntoResponse;
 use axum::Json;
 use dst_huiji_wiki::error::Result;
-use dst_huiji_wiki::scripts_sync::images::icons::{compare_entries, IconEntry, IconSort};
+use dst_huiji_wiki::scripts_sync::images::icons::{
+    compare_entries, IconEntry, IconSort, ICON_SOURCES,
+};
 use dst_huiji_wiki::scripts_sync::images::meta::{self as icon_meta, WikiStatus};
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -205,8 +207,9 @@ pub async fn constants(
     })))
 }
 
-/// GET /api/data/inventoryicons — 物品图标网格（文件名/加入历史两种排序，
-/// 支持按五态过滤：已上传/未上传/状态未知/无法上传/无英文名）。
+/// GET /api/data/inventoryicons — 图标网格（文件名/加入历史两种排序，
+/// 支持按来源过滤：inventory 物品栏 / crafting 制作栏 / all，按五态过滤：
+/// 已上传/未上传/状态未知/无法上传/无英文名）。
 pub async fn inventoryicons(
     State(state): State<Arc<AppState>>,
     Query(q): Q,
@@ -219,6 +222,8 @@ pub async fn inventoryicons(
     };
     let ql = q.get("q").map(|s| s.to_lowercase()).unwrap_or_default();
     let status_filter = q.get("status").map(String::as_str).unwrap_or("all");
+    let source_filter = q.get("source").map(String::as_str).unwrap_or("all");
+    let source_ok = |e: &IconEntry| source_filter == "all" || e.source == source_filter;
 
     // 元数据缺失时回退到数据集动态解析（旧行为）：翻译 best-effort，数据集
     // （游戏 zip）不可用时仍可浏览图标。
@@ -278,6 +283,7 @@ pub async fn inventoryicons(
     let mut rows: Vec<(&IconEntry, Resolved)> = index
         .entries
         .iter()
+        .filter(|e| source_ok(e))
         .map(|e| (e, resolve(e)))
         .filter(|(e, r)| {
             e.file.to_lowercase().contains(&ql)
@@ -316,6 +322,9 @@ pub async fn inventoryicons(
     }
     let mut builds: BTreeMap<String, BuildSummary> = BTreeMap::new();
     for e in &index.entries {
+        if !source_ok(e) {
+            continue;
+        }
         let summary = builds.entry(e.first_build.clone()).or_default();
         summary.total += 1;
         if let Some(m) = meta.icons.get(&e.file) {
@@ -328,6 +337,22 @@ pub async fn inventoryicons(
         }
     }
 
+    // 各来源图标总数（供前端来源切换标签展示）。
+    let mut source_counts: BTreeMap<&str, usize> = BTreeMap::new();
+    for e in &index.entries {
+        *source_counts.entry(e.source.as_str()).or_default() += 1;
+    }
+    let sources: Vec<serde_json::Value> = ICON_SOURCES
+        .iter()
+        .map(|s| {
+            serde_json::json!({
+                "id": s.id,
+                "label": s.label,
+                "total": source_counts.get(s.id).copied().unwrap_or(0),
+            })
+        })
+        .collect();
+
     let total = rows.len();
     let (page, page_size) = page_params(&q);
     let start = page.saturating_mul(page_size);
@@ -338,6 +363,7 @@ pub async fn inventoryicons(
         .map(|(e, r)| {
             serde_json::json!({
                 "file": e.file,
+                "source": e.source,
                 "first_build": e.first_build,
                 "first_synced_at": e.first_synced_at,
                 "name_en": r.name_en,
@@ -360,6 +386,8 @@ pub async fn inventoryicons(
         "latest_build": index.latest_build,
         "latest_synced_at": index.latest_synced_at,
         "meta_build": meta.build,
+        "source": source_filter,
+        "sources": sources,
         "status_counts": status_counts,
         "builds": builds,
         "items": items,
@@ -392,39 +420,41 @@ pub async fn inventoryicon_versions(
     };
 
     let meta = state.icon_meta().await.map_err(err_status)?;
-    let (name_en, name_zh, title, title_source, uploadable, note, wiki) = match meta.icons.get(file)
-    {
-        Some(m) => (
-            m.name_en.clone(),
-            m.name_zh.clone(),
-            m.title.clone(),
-            m.title_source,
-            m.uploadable,
-            m.note.clone(),
-            m.wiki.clone(),
-        ),
-        // 元数据未生成时回退数据集解析；仅在该文件确实不可命名时才有成本。
-        None if meta.icons.is_empty() => {
-            let names = inventory_names(&state).await;
-            let key = icon_meta::file_stem_key(file);
-            match names.get(&key) {
-                Some((en, zh)) => {
-                    let title = icon_meta::auto_title(en);
-                    (
-                        Some(en.clone()),
-                        (!zh.is_empty()).then(|| zh.clone()),
-                        title,
-                        Some(icon_meta::TitleSource::Auto),
-                        true,
-                        None,
-                        None,
-                    )
+    let (name_en, name_zh, source, title, title_source, uploadable, note, wiki) =
+        match meta.icons.get(file) {
+            Some(m) => (
+                m.name_en.clone(),
+                m.name_zh.clone(),
+                m.source.clone(),
+                m.title.clone(),
+                m.title_source,
+                m.uploadable,
+                m.note.clone(),
+                m.wiki.clone(),
+            ),
+            // 元数据未生成时回退数据集解析；仅在该文件确实不可命名时才有成本。
+            None if meta.icons.is_empty() => {
+                let names = inventory_names(&state).await;
+                let key = icon_meta::file_stem_key(file);
+                match names.get(&key) {
+                    Some((en, zh)) => {
+                        let title = icon_meta::auto_title(en);
+                        (
+                            Some(en.clone()),
+                            (!zh.is_empty()).then(|| zh.clone()),
+                            None,
+                            title,
+                            Some(icon_meta::TitleSource::Auto),
+                            true,
+                            None,
+                            None,
+                        )
+                    }
+                    None => (None, None, None, None, None, false, None, None),
                 }
-                None => (None, None, None, None, false, None, None),
             }
-        }
-        None => (None, None, None, None, false, None, None),
-    };
+            None => (None, None, None, None, None, false, None, None),
+        };
     let status = icon_status(
         title.as_deref(),
         name_en.as_deref(),
@@ -438,6 +468,7 @@ pub async fn inventoryicon_versions(
         "versions": versions,
         "name_en": name_en,
         "name_zh": name_zh,
+        "source": source,
         "title": title,
         "title_source": title_source,
         "uploadable": uploadable,
@@ -495,6 +526,11 @@ pub async fn set_inventoryicon_title(
         icon_meta::save_overrides(&path, &overrides).map_err(|e| internal_error(e.to_string()))?;
     }
 
+    let source_id = index
+        .entries
+        .iter()
+        .find(|e| e.file == file)
+        .map(|e| e.source.clone());
     let out_dir = ktools_out_dir();
     let mut meta = (*state
         .icon_meta()
@@ -507,12 +543,16 @@ pub async fn set_inventoryicon_title(
         .or_insert_with(|| icon_meta::IconMetaEntry {
             name_en: None,
             name_zh: None,
+            source: source_id.clone(),
             title: None,
             title_source: None,
             uploadable: false,
             note: None,
             wiki: None,
         });
+    if entry.source.is_none() {
+        entry.source = source_id;
+    }
     icon_meta::refresh_entry_title(entry, &file, &overrides);
     // 无英文名且无标题的空条目没有保留价值，直接移除。
     if meta
@@ -546,6 +586,7 @@ pub async fn set_inventoryicon_title(
     );
     Ok(Json(serde_json::json!({
         "file": file,
+        "source": entry.and_then(|e| e.source.clone()),
         "title": title,
         "title_source": entry.and_then(|e| e.title_source),
         "status": status,
@@ -622,7 +663,11 @@ pub async fn split_asset(
 ) -> std::result::Result<axum::response::Response, StatusCode> {
     if !matches!(
         dir.as_str(),
-        "skilltree" | "skilltree_icons" | "global_redux" | "inventoryimages"
+        "skilltree"
+            | "skilltree_icons"
+            | "global_redux"
+            | "inventoryimages"
+            | "crafting_menu_icons"
     ) || name.contains('/')
         || name.contains('\\')
         || name.contains("..")

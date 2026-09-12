@@ -70,7 +70,7 @@ pub async fn run_upload_image(
             Ok(serde_json::json!({ "status": reason, "file": filename }))
         }
         WriteDecision::Apply => {
-            let mut client = WikiClient::from_env()?;
+            let client = WikiClient::from_env()?;
             reporter.log("登录维基".to_string());
             client.login().await?;
             let result = client

@@ -679,8 +679,7 @@ async fn maintain_character(
 
 /// 只有可能写入的模式才需要登录；dry-run 全程只读，允许匿名。
 ///
-/// 注意：客户端必须在登录后才克隆进任务，因为 `WikiClient::logged_in`
-/// 是值字段，克隆不会共享后续的状态变更。
+/// 登录态经 `WikiClient` 内部 Arc 共享，克隆时机不再影响可见性。
 fn should_login(mode: WriteMode) -> bool {
     mode != WriteMode::DryRun
 }
@@ -701,7 +700,6 @@ pub async fn run_skilltree_wiki(
         reporter.stage("登录维基");
         ctx.wiki_mut().login().await?;
     }
-    // 必须在登录后克隆：`logged_in` 是值字段，克隆不会共享后续状态变更。
     let client = ctx.wiki().clone();
 
     let all_characters = super::dataset::list_skill_characters(&mut ctx)?;

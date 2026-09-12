@@ -361,7 +361,7 @@ pub(crate) async fn read_page_raw(wiki_file: Option<&str>) -> Result<String> {
     match wiki_file {
         Some(path) => Ok(std::fs::read_to_string(path)?),
         None => {
-            let mut client = WikiClient::from_env()?;
+            let client = WikiClient::from_env()?;
             client.login().await?;
             client
                 .get_page(PAGE_TITLE)

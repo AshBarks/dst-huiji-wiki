@@ -52,9 +52,9 @@ pub async fn run(
             "maintain-wikitext 需要至少一个 --set 或 --remove".to_string(),
         ));
     }
-    let mut ctx = make_ctx(&None)?;
+    let ctx = make_ctx(&None)?;
     reporter.stage("登录维基");
-    ctx.wiki_mut().login().await?;
+    ctx.wiki().login().await?;
 
     let mut results: Vec<PageResult> = Vec::new();
     let mut new_texts: Vec<(String, String)> = Vec::new();

@@ -2137,9 +2137,9 @@ async fn run_corpus_fetch(
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
-    // Anonymous reads suffice; the client only needs the HUIJI__* config to
-    // know host/headers. Login is deliberately skipped — this job never edits.
-    let client = WikiClient::from_env()?;
+    // 唯一允许匿名读的作业（读旧缓存可接受）；其余作业读也要求登录。
+    // Login is deliberately skipped — this job never edits.
+    let client = WikiClient::from_env_readonly()?;
     let base_dir = PathBuf::from(dir.unwrap_or("wikis"));
     if rc {
         return crate::corpus::rc::sync_rc(&client, &base_dir, mode == WriteMode::DryRun, reporter)
@@ -2187,7 +2187,7 @@ async fn run_maintain_item_table(
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");
-    ctx.wiki_mut().login().await?;
+    ctx.wiki().login().await?;
 
     reporter.stage("解析 chinese_s.po");
     let po_file = ctx.parse_po_file("scripts/languages/chinese_s.po")?;
@@ -2251,7 +2251,7 @@ async fn run_maintain_dst_recipes(
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");
-    ctx.wiki_mut().login().await?;
+    ctx.wiki().login().await?;
 
     reporter.stage("解析 recipes.lua");
     let recipes_string = ctx.read_script_file("scripts/recipes.lua")?;
@@ -2329,7 +2329,7 @@ async fn run_maintain_copyclip(
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");
-    ctx.wiki_mut().login().await?;
+    ctx.wiki().login().await?;
 
     let types_to_run: Vec<String> = if let Some(t) = r#type {
         vec![t.to_lowercase()]

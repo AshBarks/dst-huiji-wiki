@@ -284,7 +284,7 @@ pub async fn run(
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");
-    ctx.wiki_mut().login().await?;
+    ctx.wiki().login().await?;
 
     reporter.stage("读取游戏数据");
     let constants = ctx.read_script_file("scripts/constants.lua")?;

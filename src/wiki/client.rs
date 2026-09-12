@@ -102,6 +102,16 @@ impl WikiConfig {
         Ok(Self::new(DEFAULT_WIKI_HOST, username, password, x_authkey))
     }
 
+    /// 只读配置：不要求 `HUIJI__USERNAME/PASSWORD`；`HUIJI__X_AUTHKEY`
+    /// 存在则仍随请求发送。供 corpus-fetch 等明确接受匿名读（可能命中
+    /// 站点缓存）的只读作业，避免纯读取被迫持有登录三件套。
+    pub fn from_env_readonly() -> Self {
+        let username = env::var("HUIJI__USERNAME").unwrap_or_default();
+        let password = env::var("HUIJI__PASSWORD").unwrap_or_default();
+        let x_authkey = env::var("HUIJI__X_AUTHKEY").unwrap_or_default();
+        Self::new(DEFAULT_WIKI_HOST, username, password, x_authkey)
+    }
+
     pub fn host(&self) -> &str {
         &self.host
     }
@@ -238,7 +248,9 @@ pub struct UploadResult {
 pub struct WikiClient {
     client: Client,
     config: WikiConfig,
-    logged_in: bool,
+    /// 登录态经 Arc 共享：克隆的 client（如 WebUI/服务层先 clone 后登录的
+    /// 用法）同步可见，不再依赖“必须在登录后克隆”的人工不变量。
+    logged_in: Arc<std::sync::atomic::AtomicBool>,
     /// Timestamp of the most recently reserved request slot. Shared behind an
     /// Arc so clones of the client throttle against the same global budget.
     rate: Arc<Mutex<std::time::Instant>>,
@@ -841,7 +853,7 @@ impl WikiClient {
         Ok(Self {
             client,
             config,
-            logged_in: false,
+            logged_in: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             rate: Arc::new(Mutex::new(
                 std::time::Instant::now() - RateLimitCfg::default().min_interval,
             )),
@@ -854,6 +866,12 @@ impl WikiClient {
         Ok(Self::new(config)?.with_rate_cfg(RateLimitCfg::from_env()))
     }
 
+    /// 匿名只读客户端（见 [`WikiConfig::from_env_readonly`]）。
+    pub fn from_env_readonly() -> Result<Self> {
+        let config = WikiConfig::from_env_readonly();
+        Ok(Self::new(config)?.with_rate_cfg(RateLimitCfg::from_env()))
+    }
+
     /// Overrides the throttling/retry configuration (mainly for tests).
     pub fn with_rate_cfg(mut self, cfg: RateLimitCfg) -> Self {
         self.rate_cfg = cfg;
@@ -861,7 +879,16 @@ impl WikiClient {
     }
 
     pub fn is_logged_in(&self) -> bool {
-        self.logged_in
+        self.logged_in.load(std::sync::atomic::Ordering::Relaxed)
+    }
+
+    /// 写操作（edit/upload）执行前统一调用：未登录则先登录。
+    /// 服务端 `assert=user` 失败仍会映射为 `Error::AuthExpired` 兜底。
+    pub async fn ensure_login(&self) -> Result<()> {
+        if self.is_logged_in() {
+            return Ok(());
+        }
+        self.login().await
     }
 
     pub fn config(&self) -> &WikiConfig {
@@ -980,7 +1007,7 @@ impl WikiClient {
             .ok_or_else(|| Error::WikiApi("Failed to get login token".to_string()))
     }
 
-    pub async fn login(&mut self) -> Result<()> {
+    pub async fn login(&self) -> Result<()> {
         let token = self.get_login_token().await?;
 
         let url = self.config.api_url();
@@ -1006,7 +1033,8 @@ impl WikiClient {
         if let Some(result) = login_resp.result {
             match result.result.as_str() {
                 "Success" | "success" => {
-                    self.logged_in = true;
+                    self.logged_in
+                        .store(true, std::sync::atomic::Ordering::Relaxed);
                     tracing::info!(
                         "Logged in as user: {}",
                         result.lgusername.unwrap_or_default()
@@ -1395,10 +1423,7 @@ impl WikiClient {
         minor: Option<bool>,
         basetimestamp: Option<&str>,
     ) -> Result<EditResult> {
-        if !self.logged_in {
-            return Err(Error::EditFailed("Not logged in".to_string()));
-        }
-
+        self.ensure_login().await?;
         let csrf_token = self.get_csrf_token().await?;
 
         let mut all_params: Vec<(&str, String)> = vec![
@@ -1508,9 +1533,7 @@ impl WikiClient {
         comment: Option<&str>,
         ignore_warnings: bool,
     ) -> Result<UploadResult> {
-        if !self.logged_in {
-            return Err(Error::AuthExpired("upload requires login".to_string()));
-        }
+        self.ensure_login().await?;
 
         let filename = match file_name {
             Some(name) => name.to_string(),
@@ -1645,6 +1668,39 @@ mod tests {
     use super::*;
 
     const TEST_PAGE: &str = "用户讨论:2199AshBark";
+
+    #[test]
+    fn clone_shares_login_state() {
+        let client = WikiClient::new(WikiConfig::new(
+            DEFAULT_WIKI_HOST,
+            "user",
+            "pass",
+            "authkey",
+        ))
+        .unwrap();
+        assert!(!client.is_logged_in());
+        let clone = client.clone();
+        client
+            .logged_in
+            .store(true, std::sync::atomic::Ordering::Relaxed);
+        assert!(clone.is_logged_in(), "克隆必须共享登录态");
+        assert!(client.is_logged_in());
+    }
+
+    #[test]
+    fn readonly_config_tolerates_missing_credentials() {
+        // 只读配置：无凭据也能构造（corpus-fetch 匿名读路径）。
+        let config = WikiConfig::from_env_readonly();
+        assert!(!config.host.is_empty());
+        // 完整配置：缺任何一个凭据都报 EnvVarNotFound（读也要求登录）。
+        let had = std::env::var("HUIJI__USERNAME").is_ok();
+        if !had {
+            std::env::remove_var("HUIJI__USERNAME");
+            let result = WikiConfig::from_env();
+            std::env::remove_var("HUIJI__USERNAME");
+            assert!(matches!(result, Err(Error::EnvVarNotFound(_))));
+        }
+    }
 
     #[test]
     fn test_config_from_env_missing() {
@@ -2005,7 +2061,7 @@ mod tests {
     async fn test_login_and_get_page() {
         dotenvy::dotenv().ok();
 
-        let mut client = match WikiClient::from_env() {
+        let client = match WikiClient::from_env() {
             Ok(c) => c,
             Err(_) => {
                 eprintln!("Skipping test: environment variables not set");

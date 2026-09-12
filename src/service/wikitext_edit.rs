@@ -9,7 +9,7 @@
 use super::make_ctx;
 use crate::error::{Error, Result};
 use crate::platform::progress::Reporter;
-use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
+use crate::platform::progress::{WriteDecision, WriteMode};
 use crate::wikitext::Wikicode;
 use serde::Serialize;
 
@@ -183,12 +183,8 @@ async fn process_page(
     let (added, removed) = crate::count_diff_stats(&diff);
     reporter.diff(title, &diff, added, removed);
 
-    let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm("更新维基页面？")
-    } else {
-        false
-    };
-    match decide_write(mode, confirmed) {
+    let writer = crate::service::wiki_write::WikiWriter::new(client, reporter, mode);
+    match writer.decide("更新维基页面？") {
         WriteDecision::Skip(reason) => {
             new_texts.push((title.to_string(), new_text));
             Ok(PageResult {
@@ -204,13 +200,16 @@ async fn process_page(
             })
         }
         WriteDecision::Apply => {
-            let edit = super::apply_wiki_edit(
-                client,
-                title,
-                &new_text,
-                page.last_rev_timestamp.as_deref(),
-            )
-            .await?;
+            let edit = writer
+                .edit_page(&crate::service::wiki_write::PageEdit {
+                    title,
+                    new_content: &new_text,
+                    old_content: Some(&original),
+                    basetimestamp: page.last_rev_timestamp.as_deref(),
+                    preserve_whitespace: false,
+                    summary: "Update via dst-huiji-wiki tool",
+                })
+                .await?;
             Ok(PageResult {
                 page: title.to_string(),
                 status: "updated",

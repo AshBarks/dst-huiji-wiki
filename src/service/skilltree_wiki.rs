@@ -19,7 +19,7 @@ use super::dataset::{load_skill_strings, read_game_file};
 use crate::error::Result;
 use crate::parser::skilltree::{parse_skill_tree_with_tuning, SkillNode, SkillTree};
 use crate::platform::progress::Reporter;
-use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
+use crate::platform::progress::WriteMode;
 use crate::wiki::WikiClient;
 use std::path::PathBuf;
 
@@ -628,52 +628,26 @@ async fn maintain_character(
         .as_ref()
         .and_then(|p| p.content.clone())
         .unwrap_or_default();
-    if !old_content.trim().is_empty() && old_content.trim() == new_content.trim() {
-        reporter.log(format!("{}：未检测到变化。", page_title));
-        outcome.status = "no_changes".into();
-        return Ok(outcome);
-    }
+    let old_is_empty = old_content.trim().is_empty();
+    let changed = !(old_content.trim() == new_content.trim() && !old_is_empty);
 
-    let (added, removed) = if old_content.trim().is_empty() {
-        reporter.log(format!("{}：页面不存在，将创建。", page_title));
-        (new_content.lines().count(), 0)
-    } else {
-        let diff = crate::diff_lines_preserve_whitespace(&old_content, &new_content);
-        let (added, removed) = crate::count_diff_stats(&diff);
-        reporter.diff(&page_title, &diff, added, removed);
-        (added, removed)
+    let writer = crate::service::wiki_write::WikiWriter::new(client, reporter, mode);
+    let edit = crate::service::wiki_write::PageEdit {
+        title: &page_title,
+        new_content: &new_content,
+        old_content: if old_is_empty {
+            None
+        } else {
+            Some(&old_content)
+        },
+        basetimestamp: page.as_ref().and_then(|p| p.last_rev_timestamp.as_deref()),
+        preserve_whitespace: true,
+        summary: "Update skilltree defs via dst-huiji-wiki tool",
     };
-    outcome.added = added;
-    outcome.removed = removed;
-
-    let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm(&format!("更新维基页面 {}？", page_title))
-    } else {
-        false
-    };
-    match decide_write(mode, confirmed) {
-        WriteDecision::Skip(reason) => {
-            reporter.log(format!("已跳过更新 {}（{}）。", page_title, reason));
-            outcome.status = reason.to_string();
-        }
-        WriteDecision::Apply => {
-            let basetimestamp = page.as_ref().and_then(|p| p.last_rev_timestamp.clone());
-            let edit = client
-                .edit_page(
-                    &page_title,
-                    &new_content,
-                    Some("Update skilltree defs via dst-huiji-wiki tool"),
-                    false,
-                    basetimestamp.as_deref(),
-                )
-                .await?;
-            reporter.log(format!(
-                "{}：已写入（oldrev={:?} newrev={:?}）。",
-                page_title, edit.oldrevid, edit.newrevid
-            ));
-            outcome.status = "updated".into();
-        }
-    }
+    let result = writer.propose(&edit, changed).await?;
+    outcome.added = result.added;
+    outcome.removed = result.removed;
+    outcome.status = result.status;
     Ok(outcome)
 }
 

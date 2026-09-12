@@ -21,7 +21,7 @@ use crate::models::{
 };
 use crate::parser::{parse_strings_module, PoParser};
 use crate::platform::progress::Reporter;
-use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
+use crate::platform::progress::{WriteDecision, WriteMode};
 use crate::wiki::WikiClient;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
@@ -875,12 +875,11 @@ async fn apply_edits(
         requests.iter().filter(|r| r.kind == "stale").count(),
         usize::from(index_pending),
     );
-    let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm(&format!("将写入 {pending} 个页面（{scope}），继续？"))
-    } else {
-        false
-    };
-    if let WriteDecision::Skip(reason) = decide_write(mode, confirmed) {
+    // 批量语义：一次确认覆盖全部待写页（WikiWriter 唯一确认策略出口）。
+    let writer = crate::service::wiki_write::WikiWriter::new(client, reporter, mode);
+    if let WriteDecision::Skip(reason) =
+        writer.decide(&format!("将写入 {pending} 个页面（{scope}），继续？"))
+    {
         reporter.log(format!("已跳过写入（{reason}）"));
         let mut outcomes = pre_failed;
         for request in &requests {
@@ -915,7 +914,7 @@ async fn apply_edits(
     }
     let attempted = requests.len();
     for (i, request) in requests.iter().enumerate() {
-        match edit_one(client, request).await {
+        match edit_one(&writer, request).await {
             Ok(outcome) => {
                 applied += 1;
                 reporter.log(format!(
@@ -947,7 +946,7 @@ async fn apply_edits(
             ));
             outcomes.push(skipped_outcome(request, "blocked_by_failures"));
         } else {
-            match edit_one(client, request).await {
+            match edit_one(&writer, request).await {
                 Ok(outcome) => {
                     index_updated = true;
                     reporter.log(format!(
@@ -977,15 +976,19 @@ async fn apply_edits(
     })
 }
 
-async fn edit_one(client: &WikiClient, request: &EditRequest) -> Result<EditOutcome> {
-    let edit = client
-        .edit_page(
-            &request.title,
-            &request.text,
-            Some(&request.comment),
-            false,
-            request.base_timestamp.as_deref(),
-        )
+async fn edit_one(
+    writer: &crate::service::wiki_write::WikiWriter<'_>,
+    request: &EditRequest,
+) -> Result<EditOutcome> {
+    let edit = writer
+        .edit_page(&crate::service::wiki_write::PageEdit {
+            title: &request.title,
+            new_content: &request.text,
+            old_content: None,
+            basetimestamp: request.base_timestamp.as_deref(),
+            preserve_whitespace: false,
+            summary: &request.comment,
+        })
         .await?;
     Ok(EditOutcome {
         title: request.title.clone(),

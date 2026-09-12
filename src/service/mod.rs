@@ -6,6 +6,7 @@ pub mod strings_wiki;
 pub mod template_check;
 pub mod upload_icons;
 pub mod upload_image;
+pub mod wiki_write;
 pub mod wikitext_edit;
 
 use crate::error::{Error, Result};
@@ -15,8 +16,8 @@ use crate::parser::{
     extract_field_assignment_range, parse_crafting_filter_lists, parse_prototyper_trees,
     parse_tech_constants, RecipeParser,
 };
-use crate::platform::progress::{decide_write, Reporter, WriteDecision, WriteMode};
-use crate::wiki::{EditResult, WikiClient};
+use crate::platform::progress::{Reporter, WriteMode};
+use crate::wiki::WikiClient;
 use crate::{DstContext, TechReport};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -2783,81 +2784,20 @@ async fn output_json_result_with_update(
         }
     };
 
-    if new_json.trim() == historical_json.trim() {
-        reporter.log("未检测到变化。".to_string());
-        return Ok(serde_json::json!({ "status": "no_changes" }));
-    }
-
-    reporter.log("--- 检测到变化 ---".to_string());
-    let diff = crate::diff_lines(&historical_json, &new_json);
-    let (added, removed) = crate::count_diff_stats(&diff);
-    reporter.diff(page_title, &diff, added, removed);
-
-    // Only Interactive mode consults the reporter; AutoConfirm/DryRun must
-    // not block on stdin in unattended runs.
-    let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm("更新维基页面？")
-    } else {
-        false
+    let writer = wiki_write::WikiWriter::new(client, reporter, mode);
+    let edit = wiki_write::PageEdit {
+        title: page_title,
+        new_content: &new_json,
+        old_content: Some(&historical_json),
+        basetimestamp: page.last_rev_timestamp.as_deref(),
+        preserve_whitespace: false,
+        summary: "Update via dst-huiji-wiki tool",
     };
-    match decide_write(mode, confirmed) {
-        WriteDecision::Skip(reason) => {
-            reporter.log(format!("已跳过更新维基页面（{}）。", reason));
-            Ok(serde_json::json!({ "status": reason, "page": page_title }))
-        }
-        WriteDecision::Apply => {
-            reporter.log(format!("正在更新维基页面: {}", page_title));
-
-            let edit_result = apply_wiki_edit(
-                client,
-                page_title,
-                &new_json,
-                page.last_rev_timestamp.as_deref(),
-            )
-            .await?;
-
-            Ok(serde_json::json!(
-                { "status": "updated", "page": page_title, "newrevid": edit_result.newrevid }))
-        }
-    }
-}
-
-/// Applies one wiki edit inside a structured-log span.
-///
-/// The edit carries `basetimestamp` (from the revision we based our change on)
-/// so MediaWiki rejects it with `editconflict` instead of silently
-/// overwriting concurrent edits.
-async fn apply_wiki_edit(
-    client: &WikiClient,
-    page_title: &str,
-    text: &str,
-    basetimestamp: Option<&str>,
-) -> Result<EditResult> {
-    let span = tracing::info_span!("wiki_edit", page = %page_title);
-    async move {
-        let edit_result = client
-            .edit_page(
-                page_title,
-                text,
-                Some("Update via dst-huiji-wiki tool"),
-                false,
-                basetimestamp,
-            )
-            .await;
-
-        match &edit_result {
-            Ok(r) => tracing::info!(
-                oldrevid = r.oldrevid,
-                newrevid = r.newrevid,
-                "wiki edit applied"
-            ),
-            Err(e) => tracing::warn!(error = %e, "wiki edit failed"),
-        }
-
-        edit_result
-    }
-    .instrument(span)
-    .await
+    let outcome = writer
+        .propose(&edit, new_json.trim() != historical_json.trim())
+        .await?;
+    Ok(serde_json::json!(
+        { "status": outcome.status, "page": page_title, "newrevid": outcome.newrevid }))
 }
 
 async fn output_copyclip_result_with_update(
@@ -2868,51 +2808,29 @@ async fn output_copyclip_result_with_update(
     output: Option<PathBuf>,
     base_timestamp: Option<String>,
 ) -> Result<serde_json::Value> {
-    let client = ctx.client;
-    let reporter = ctx.reporter;
-    let mode = ctx.mode;
     if target_content == updated_content {
-        reporter.log("未检测到变化。".to_string());
+        ctx.reporter.log("未检测到变化。".to_string());
         return Ok(serde_json::json!({ "status": "no_changes" }));
     }
 
-    reporter.log("--- 检测到变化 ---".to_string());
-    let diff = crate::diff_lines_preserve_whitespace(target_content, updated_content);
-    let (added, removed) = crate::count_diff_stats(&diff);
-    reporter.diff(page_title, &diff, added, removed);
-
     if let Some(output_path) = output {
-        std::fs::write(&output_path, updated_content)?;
-        reporter.log(format!("已写入更新内容到 {:?}", output_path));
+        crate::platform::fs::write_text_atomic(&output_path, updated_content)?;
+        ctx.reporter
+            .log(format!("已写入更新内容到 {:?}", output_path));
     }
 
-    // Only Interactive mode consults the reporter; AutoConfirm/DryRun must
-    // not block on stdin in unattended runs.
-    let confirmed = if mode == WriteMode::Interactive {
-        reporter.confirm("更新维基页面？")
-    } else {
-        false
+    let writer = wiki_write::WikiWriter::new(ctx.client, ctx.reporter, ctx.mode);
+    let edit = wiki_write::PageEdit {
+        title: page_title,
+        new_content: updated_content,
+        old_content: Some(target_content),
+        basetimestamp: base_timestamp.as_deref(),
+        preserve_whitespace: true,
+        summary: "Update via dst-huiji-wiki tool",
     };
-    match decide_write(mode, confirmed) {
-        WriteDecision::Skip(reason) => {
-            reporter.log(format!("已跳过更新维基页面（{}）。", reason));
-            Ok(serde_json::json!({ "status": reason, "page": page_title }))
-        }
-        WriteDecision::Apply => {
-            reporter.log(format!("正在更新维基页面: {}", page_title));
-
-            let edit_result = apply_wiki_edit(
-                client,
-                page_title,
-                updated_content,
-                base_timestamp.as_deref(),
-            )
-            .await?;
-
-            Ok(serde_json::json!(
-                { "status": "updated", "page": page_title, "newrevid": edit_result.newrevid }))
-        }
-    }
+    let outcome = writer.propose(&edit, true).await?;
+    Ok(serde_json::json!(
+        { "status": outcome.status, "page": page_title, "newrevid": outcome.newrevid }))
 }
 
 #[cfg(test)]
@@ -3077,6 +2995,7 @@ mod tests {
 
     #[test]
     fn test_decide_write_table() {
+        use crate::platform::progress::{decide_write, WriteDecision};
         use WriteMode::{AutoConfirm, DryRun, Interactive};
 
         // DryRun never writes, regardless of confirmation.

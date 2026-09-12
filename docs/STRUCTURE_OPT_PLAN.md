@@ -36,13 +36,19 @@
 | 阶段 | 项 | 状态 | 提交 |
 |---|---|---|---|
 | 前置 | 遗留 wikitext 功能独立落库（非本计划内容，为保证每阶段提交干净） | ✅ | 886f1bf |
-| P0 | 计划/进度文档建立 | ✅ | （本提交） |
-| P0.1 | main.rs：dotenvy 提前到 tracing init 之前（`.env` 的 RUST_LOG 生效） | ⬜ | |
-| P0.2 | `TreeDiff::to_patch` 改用 whitespace-preserving diff，whitespace-only 变更不再产出空 patch | ⬜ | |
-| P0.3 | skilltree 覆盖风险：get_page 非 PageNotFound 错误不再吞掉；页面 JSON 解析失败跳过并告警（不再丢失 metainfo/icon_url 覆盖写）；`--snapshot` 传入 read_game_file/load_tuning_numbers | ⬜ | |
-| P0.4 | 任务完成后失效 `skill_strings` + `diff_cache`（diff_cache 加容量上限） | ⬜ | |
-| P0.5 | JobManager 资源锁（同类任务互斥 + wiki 写串行）+ 取消仅对排队中任务生效 | ⬜ | |
-| P0.6 | 契约测试：JobKind.name()==serde tag、CLI 名集合==JobKind 名集合、前端 JOB_DEFS keys ⊆ serde tags；修 maintain-copyclip/corpus-sync 两处漂移 | ⬜ | |
+| P0 | 计划/进度文档建立 | ✅ | 8a60017 |
+| P0.1 | main.rs：dotenvy 提前到 tracing init 之前（`.env` 的 RUST_LOG 生效） | ✅ | fa07d52 |
+| P0.2 | `TreeDiff::to_patch` 改用 whitespace-preserving diff，whitespace-only 变更不再产出空 patch | ✅ | fa07d52 + c89f874 |
+| P0.3 | skilltree 覆盖风险：get_page 仅 PageNotFound 走新建（fetch_failed 跳过）；页面 JSON 解析失败跳过（page_content_unparsable）；`--snapshot` 透传 | ✅ | 32e05fe |
+| P0.4 | 任务终态失效 `datasets` + `skill_strings` + `diff_cache`；diff_cache 64 条上限按序淘汰 | ✅ | e45f3f7 |
+| P0.5 | JobManager 资源锁（同类互斥 + wiki 写全局串行）；硬取消移除，仅排队中可取消（queued→running/cancelled 原子判定）；移除 tokio-util | ✅ | e45f3f7 |
+| P0.6 | 契约测试 ×4（name 唯一且==serde tag、touches_wiki 集合、前端 JOB_DEFS ⊆ serde tags、CLI 名==JobKind 名）；修漂移 CorpusSync→CorpusFetch、maintain-copy-clip、SkilltreeWiki/Export | ✅ | a49769d |
+
+### P0 收尾状态（2026-09-12）
+
+- `cargo test`：626 lib + 41 bin 全绿；`cargo fmt --check` / `cargo clippy --all-targets` 干净。
+- 未执行任何线上 wiki 写操作；全部验证为单测与本地构建。
+- 契约测试直接抓到并修复了第三处漂移（SkillTree serde tag），证明该层有效。
 
 ## P0 验证方式
 

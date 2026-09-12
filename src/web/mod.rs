@@ -6,6 +6,7 @@ pub mod assets;
 pub mod jobs;
 pub mod state;
 
+use axum::extract::Path;
 use axum::http::{header, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
@@ -85,6 +86,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
     let router = Router::new()
         .route("/", get(index_handler))
         .route("/static/app.js", get(app_js_handler))
+        .route("/static/js/{*file}", get(js_module_handler))
         .route("/static/style.css", get(style_css_handler))
         .route("/static/split/{dir}/{name}", get(api_data::split_asset))
         .route("/static/objects/{hash}", get(api_data::object_asset))
@@ -142,24 +144,52 @@ async fn config() -> impl IntoResponse {
 
 async fn index_handler() -> impl IntoResponse {
     (
-        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        [
+            (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
         assets::INDEX_HTML,
     )
 }
 
 async fn app_js_handler() -> impl IntoResponse {
     (
-        [(
-            header::CONTENT_TYPE,
-            "application/javascript; charset=utf-8",
-        )],
+        [
+            (
+                header::CONTENT_TYPE,
+                "application/javascript; charset=utf-8",
+            ),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
         assets::APP_JS,
     )
 }
 
+/// ES module 静态文件（`/static/js/{file}`，白名单查表）。
+async fn js_module_handler(
+    Path(file): Path<String>,
+) -> std::result::Result<impl IntoResponse, StatusCode> {
+    match assets::JS_MODULES.iter().find(|(name, _)| *name == file) {
+        Some((_, body)) => Ok((
+            [
+                (
+                    header::CONTENT_TYPE,
+                    "application/javascript; charset=utf-8",
+                ),
+                (header::CACHE_CONTROL, "no-cache"),
+            ],
+            *body,
+        )),
+        None => Err(StatusCode::NOT_FOUND),
+    }
+}
+
 async fn style_css_handler() -> impl IntoResponse {
     (
-        [(header::CONTENT_TYPE, "text/css; charset=utf-8")],
+        [
+            (header::CONTENT_TYPE, "text/css; charset=utf-8"),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
         assets::STYLE_CSS,
     )
 }

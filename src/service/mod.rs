@@ -851,12 +851,12 @@ mod tests {
     /// 保证 WebUI 提交的每个任务都能被 `/api/jobs` 反序列化。
     #[test]
     fn contract_frontend_job_defs_keys_are_valid_serde_tags() {
-        const APP_JS: &str = include_str!("../web/assets/app.js");
-        let start = APP_JS
+        const JOBS_JS: &str = include_str!("../web/assets/js/jobs.js");
+        let start = JOBS_JS
             .find("const JOB_DEFS = {")
-            .expect("app.js 缺少 JOB_DEFS 定义");
-        let block_end = start + APP_JS[start..].find("\n};").expect("JOB_DEFS 块未闭合");
-        let block = &APP_JS[start..block_end];
+            .expect("jobs.js 缺少 JOB_DEFS 定义");
+        let block_end = start + JOBS_JS[start..].find("\n};").expect("JOB_DEFS 块未闭合");
+        let block = &JOBS_JS[start..block_end];
 
         let tags: std::collections::BTreeSet<String> = JobKind::all_variants()
             .iter()

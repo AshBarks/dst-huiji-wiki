@@ -11,6 +11,7 @@ pub mod fact;
 pub mod grade;
 pub mod impact;
 pub mod index;
+pub mod jobs;
 pub mod rules;
 pub mod snapshot;
 pub mod state;

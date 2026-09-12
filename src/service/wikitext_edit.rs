@@ -6,9 +6,10 @@
 //!
 //! `--dry-run` 下只产报告，绝不写维基。
 
-use super::progress::Reporter;
-use super::{decide_write, make_ctx, WriteDecision, WriteMode};
+use super::make_ctx;
 use crate::error::{Error, Result};
+use crate::platform::progress::Reporter;
+use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
 use crate::wikitext::Wikicode;
 use serde::Serialize;
 

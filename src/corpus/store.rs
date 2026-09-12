@@ -84,14 +84,12 @@ impl CorpusStore {
     pub fn save_meta(&self, meta: &BTreeMap<i64, PageMeta>) -> Result<()> {
         std::fs::create_dir_all(&self.root)?;
         let target = self.root.join("meta.jsonl");
-        let tmp = self.root.join("meta.jsonl.tmp");
         let mut body = String::with_capacity(256 * meta.len());
         for m in meta.values() {
             body.push_str(&serde_json::to_string(m)?);
             body.push('\n');
         }
-        std::fs::write(&tmp, body)?;
-        std::fs::rename(&tmp, &target)?;
+        crate::platform::fs::write_text_atomic(&target, &body)?;
         Ok(())
     }
 

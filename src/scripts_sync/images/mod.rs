@@ -44,6 +44,7 @@ pub mod scan;
 pub mod split;
 
 use crate::error::{Error, Result};
+use crate::platform::progress::Reporter;
 use crate::scripts_sync::images::history::{
     diff_final_maps, FinalMap, Manifest, ManifestStore, ObjectStore,
 };
@@ -51,7 +52,6 @@ use crate::scripts_sync::images::ktex::{DecodeOptions, DECODER_VERSION};
 use crate::scripts_sync::images::scan::{scan, ScanResult, UNZIP_DIR_NAME};
 use crate::scripts_sync::images::split::SPLIT_VERSION;
 use crate::scripts_sync::state;
-use crate::service::Reporter;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::BufReader;
@@ -699,8 +699,8 @@ fn report_json(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::platform::progress::Reporter;
     use crate::scripts_sync::images::ktex::{KtexHeader, MipmapMeta};
-    use crate::service::Reporter;
     use image::Rgba;
     use std::sync::Mutex;
 

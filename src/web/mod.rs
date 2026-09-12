@@ -116,15 +116,14 @@ async fn config() -> impl IntoResponse {
     let recorded_version = dst_huiji_wiki::scripts_sync::state::read_last_version(&state_path)
         .ok()
         .flatten();
-    let detected_version = std::env::var("DST__ROOT").ok().and_then(|root| {
-        dst_huiji_wiki::scripts_sync::read_new_version(std::path::Path::new(&root)).ok()
-    });
+    let detected_version = dst_huiji_wiki::platform::config::dst_root_opt()
+        .and_then(|root| dst_huiji_wiki::scripts_sync::read_new_version(&root).ok());
     let scripts_up_to_date = recorded_version.is_some()
         && detected_version.is_some()
         && recorded_version.as_deref() == detected_version.as_deref();
 
     Json(serde_json::json!({
-        "dst_root_set": std::env::var("DST__ROOT").is_ok(),
+        "dst_root_set": dst_huiji_wiki::platform::config::dst_root_opt().is_some(),
         "env": {
             "DST__ROOT": std::env::var("DST__ROOT").ok(),
             "KTOOLS__OUT_DIR": std::env::var("KTOOLS__OUT_DIR").ok(),

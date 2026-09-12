@@ -12,7 +12,7 @@ use crate::knowledge::types::{
     WikiLinkLlm, WikiSection, SCHEMA_VERSION,
 };
 use crate::llm::{LlmConfig, LlmStreamEvent};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::update::CorpusPageView;
 use crate::update::{build_atlas_from_dir, IndexArtifact};
 use futures_util::StreamExt;
@@ -2236,7 +2236,7 @@ mod tests {
         write_component_doc(&root, "bait", false); // 冷数据无 bait → 保持 None
 
         let idx = AutoInfoboxIndex::load(&root).unwrap();
-        let reporter = crate::service::progress::CaptureReporter::new(true);
+        let reporter = crate::platform::progress::CaptureReporter::new(true);
         let out = refresh_auto_maintained(&root, &idx, &reporter).unwrap();
         assert_eq!(out["updated"], 1);
         assert_eq!(out["unchanged"], 1);

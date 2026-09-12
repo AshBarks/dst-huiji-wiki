@@ -18,7 +18,7 @@ pub mod images;
 pub mod state;
 
 use crate::error::{Error, Result};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -53,6 +53,15 @@ pub fn sync(params: &SyncParams, reporter: &dyn Reporter) -> Result<serde_json::
         .state_path
         .clone()
         .unwrap_or_else(state::default_state_path);
+    // 状态文件在 live 树替换完成**之后**写入；提前校验其父目录可创建/可写，
+    // 避免整棵树换完才发现无法记录版本（下次同步会误判为未更新）。
+    crate::platform::fs::ensure_parent(&state_path)?;
+    if state_path.exists() {
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&state_path)
+            .map_err(crate::Error::Io)?;
+    }
 
     reporter.stage("DST scripts 同步检查");
     let new_version = read_new_version(dst)?;

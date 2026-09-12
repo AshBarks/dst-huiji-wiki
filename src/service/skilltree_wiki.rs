@@ -16,10 +16,10 @@
 //! `零件:Skilltree.js`）。
 
 use super::dataset::{load_skill_strings, read_game_file};
-use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::Result;
 use crate::parser::skilltree::{parse_skill_tree_with_tuning, SkillNode, SkillTree};
-use crate::service::progress::Reporter;
+use crate::platform::progress::Reporter;
+use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
 use crate::wiki::WikiClient;
 use std::path::PathBuf;
 
@@ -693,8 +693,7 @@ pub async fn run_skilltree_wiki(
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| crate::Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     let mut ctx = crate::DstContext::new(dst_root, snapshot.clone())?;
 
     // dry-run 只读不写，允许匿名；其余模式必须先登录（编辑时 assert=user）。

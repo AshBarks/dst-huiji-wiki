@@ -10,9 +10,9 @@
 //! 纯只读：离线 `--wiki-file` 时不产生任何网络访问。
 
 use crate::error::{Error, Result};
+use crate::platform::progress::Reporter;
 use crate::scripts_sync::anim::index::collect_lua_files;
 use crate::scripts_sync::anim::skin_index::default_scripts_root;
-use crate::service::progress::Reporter;
 use crate::wiki::WikiClient;
 use regex::Regex;
 use serde::Serialize;

@@ -13,7 +13,7 @@ use crate::error::{Error, Result};
 use crate::knowledge::store::sha256_hex;
 use crate::knowledge::types::SymbolDoc;
 use crate::llm::{LlmConfig, LlmStreamEvent};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::update::grade::CorpusPageView;
 use crate::update::index::build_atlas_from_dir;
 use crate::update::symbol_page::{

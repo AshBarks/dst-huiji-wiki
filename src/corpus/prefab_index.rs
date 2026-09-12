@@ -146,9 +146,7 @@ pub fn save_registry(root: &Path, registry: &PrefabRegistry) -> Result<std::path
     let dir = root.join("index");
     std::fs::create_dir_all(&dir)?;
     let target = dir.join("pages_by_prefab.json");
-    let tmp = dir.join(".pages_by_prefab.json.tmp");
-    std::fs::write(&tmp, serde_json::to_string_pretty(registry)?)?;
-    std::fs::rename(&tmp, &target)?;
+    crate::platform::fs::write_json_atomic(&target, registry)?;
     Ok(target)
 }
 

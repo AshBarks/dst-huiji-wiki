@@ -1,7 +1,60 @@
+//! 进度上报与写入策略（平台层，业务无关）。
+//!
+//! [`Reporter`] 是所有 job 的进度出口：CLI 用 [`StdoutReporter`]，
+//! WebUI 用 [`CaptureReporter`]（事件环形缓冲 + SSE 广播）。
+//! [`WriteMode`]/[`WriteDecision`]/[`decide_write`] 是 wiki 写入的统一
+//! 决策函数，供所有维护流程复用。
+
 use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::broadcast;
+
+/// How a job may write to the wiki.
+///
+/// - `Interactive`: ask via [`Reporter::confirm`] before every write (CLI default).
+/// - `AutoConfirm`: apply writes without asking (`--yes`).
+/// - `DryRun`: never write; artifacts can still be written to `--output`
+///   files so the diff can be reviewed offline (`--dry-run`).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WriteMode {
+    #[default]
+    Interactive,
+    AutoConfirm,
+    DryRun,
+}
+
+impl WriteMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            WriteMode::Interactive => "interactive",
+            WriteMode::AutoConfirm => "auto_confirm",
+            WriteMode::DryRun => "dry_run",
+        }
+    }
+}
+
+/// Terminal decision for one wiki-write opportunity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WriteDecision {
+    Apply,
+    /// Do not write; the payload explains why (machine-readable).
+    Skip(&'static str),
+}
+
+/// Pure decision function shared by every wiki-write path.
+///
+/// Note that `confirmed` is only consulted in `Interactive` mode: the
+/// reporter has already answered the prompt by the time this runs.
+pub fn decide_write(mode: WriteMode, confirmed: bool) -> WriteDecision {
+    match mode {
+        WriteMode::DryRun => WriteDecision::Skip("dry_run"),
+        WriteMode::AutoConfirm => WriteDecision::Apply,
+        WriteMode::Interactive if confirmed => WriteDecision::Apply,
+        WriteMode::Interactive => WriteDecision::Skip("declined"),
+    }
+}
 
 /// How a reporter answers interactive "update wiki page?" prompts.
 #[derive(Debug, Clone, Copy, PartialEq)]

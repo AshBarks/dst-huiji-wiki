@@ -20,7 +20,7 @@ pub use model::{ClassConfidence, CorpusManifest, GameClass, PageMeta};
 pub use store::CorpusStore;
 
 use crate::error::{Error, Result};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::wiki::{PageListingEntry, WikiClient, TITLES_PER_QUERY};
 use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
@@ -387,9 +387,7 @@ fn save_json<T: serde::Serialize>(
     let dir = root.join("index");
     std::fs::create_dir_all(&dir)?;
     let target = dir.join(name);
-    let tmp = dir.join(format!(".{name}.tmp"));
-    std::fs::write(&tmp, serde_json::to_string_pretty(value)?)?;
-    std::fs::rename(&tmp, &target)?;
+    crate::platform::fs::write_json_atomic(&target, value)?;
     Ok(target)
 }
 
@@ -398,9 +396,7 @@ fn save_lines(root: &Path, name: &str, body: &str) -> Result<std::path::PathBuf>
     let dir = root.join("index");
     std::fs::create_dir_all(&dir)?;
     let target = dir.join(name);
-    let tmp = dir.join(format!(".{name}.tmp"));
-    std::fs::write(&tmp, body)?;
-    std::fs::rename(&tmp, &target)?;
+    crate::platform::fs::write_text_atomic(&target, body)?;
     Ok(target)
 }
 

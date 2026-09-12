@@ -14,12 +14,12 @@
 //! 本作业永不写维基。
 
 use super::make_ctx;
-use super::progress::Reporter;
 use crate::error::{Error, Result};
 use crate::models::{derive_station_aliases, StationAliasInputs, TechReport};
 use crate::parser::{
     parse_crafting_filter_lists, parse_prototyper_trees, parse_tech_constants, RecipeParser,
 };
+use crate::platform::progress::Reporter;
 use crate::wikitext::{switch_cases, templates_in, Template, Wikicode};
 use crate::DstContext;
 use serde::{Deserialize, Serialize};
@@ -29,8 +29,9 @@ use std::path::{Path, PathBuf};
 /// 检查配置（可选；文件缺失时用默认值）。
 pub const CONFIG_PATH: &str = "config/template_check.json";
 /// 图标本地文件名 → 维基文件名映射（复用 images-sync 的表）。
-pub const ICON_OVERRIDES_PATH: &str = "config/icon_title_overrides.json";
-
+///
+/// 路径统一走 `platform::config::icon_title_overrides_path()`
+/// （`ICON__TITLE_OVERRIDES` 优先，缺省 `config/icon_title_overrides.json`）。
 const TECH_TEMPLATE_TITLE: &str = "模板:Tech/dst";
 const CRAFTING_TEMPLATE_TITLE: &str = "模板:制作栏图标";
 const RENDERRECS_TITLE: &str = "模块:RenderRecsByIngre/Data";
@@ -82,13 +83,13 @@ fn load_config() -> Result<TemplateCheckConfig> {
 
 /// 本地图标文件名（含 `.png`）→ 维基文件名。
 fn load_icon_titles() -> Result<BTreeMap<String, String>> {
-    let path = Path::new(ICON_OVERRIDES_PATH);
+    let path = crate::platform::config::icon_title_overrides_path();
     if !path.exists() {
         return Ok(BTreeMap::new());
     }
-    let text = std::fs::read_to_string(path)?;
+    let text = std::fs::read_to_string(&path)?;
     serde_json::from_str(&text)
-        .map_err(|e| Error::Config(format!("解析 {ICON_OVERRIDES_PATH} 失败：{e}")))
+        .map_err(|e| Error::Config(format!("解析 {} 失败：{e}", path.display())))
 }
 
 // ---------------------------------------------------------------------------
@@ -846,11 +847,7 @@ async fn check_icon_files(
     reporter: &dyn Reporter,
 ) -> Result<(Vec<IconIssue>, Vec<String>)> {
     // 本地 icon_meta 索引：归一化标题 → exists。
-    let out_dir = std::env::var("KTOOLS__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("output/ktools"));
+    let out_dir = crate::platform::config::ktools_out_dir();
     let mut meta_titles: BTreeMap<String, bool> = BTreeMap::new();
     if let Ok(meta) = crate::scripts_sync::images::meta::load(&out_dir) {
         for entry in meta.icons.values() {

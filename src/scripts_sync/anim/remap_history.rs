@@ -20,12 +20,7 @@ use std::path::{Path, PathBuf};
 
 /// 快照目录：`ANIM__OUT_DIR`（缺省 `output/anim`）/ `history/remaps`。
 pub fn remap_history_dir() -> PathBuf {
-    std::env::var("ANIM__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("output/anim"))
-        .join("history/remaps")
+    crate::platform::config::anim_out_dir().join("history/remaps")
 }
 
 /// 反序列化的重映射索引快照。

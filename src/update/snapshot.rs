@@ -31,8 +31,7 @@ impl SnapshotStore {
 
     /// Default store from the `DST__ROOT` env var (`<root>/data/databundles`).
     pub fn from_env() -> Result<Self> {
-        let game_root = std::env::var("DST__ROOT")
-            .map_err(|_| crate::error::Error::EnvVarNotFound("DST__ROOT".to_string()))?;
+        let game_root = crate::platform::config::dst_root_str()?;
         Ok(Self::new(
             Path::new(&game_root).join("data").join("databundles"),
         ))

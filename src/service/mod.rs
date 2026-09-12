@@ -1,6 +1,5 @@
 pub mod dataset;
 pub mod prefab_overrides;
-pub mod progress;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
 pub mod strings_wiki;
@@ -9,8 +8,6 @@ pub mod upload_icons;
 pub mod upload_image;
 pub mod wikitext_edit;
 
-pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutReporter};
-
 use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
 use crate::models::{derive_station_aliases, PoEntry, StationAliasInputs, StationAliasReport};
@@ -18,58 +15,13 @@ use crate::parser::{
     extract_field_assignment_range, parse_crafting_filter_lists, parse_prototyper_trees,
     parse_tech_constants, RecipeParser,
 };
+use crate::platform::progress::{decide_write, Reporter, WriteDecision, WriteMode};
 use crate::wiki::{EditResult, WikiClient};
 use crate::{DstContext, TechReport};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use tracing::Instrument;
-
-/// How a job may write to the wiki.
-///
-/// - `Interactive`: ask via [`Reporter::confirm`] before every write (CLI default).
-/// - `AutoConfirm`: apply writes without asking (`--yes`).
-/// - `DryRun`: never write; artifacts can still be written to `--output`
-///   files so the diff can be reviewed offline (`--dry-run`).
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum WriteMode {
-    #[default]
-    Interactive,
-    AutoConfirm,
-    DryRun,
-}
-
-impl WriteMode {
-    pub fn name(self) -> &'static str {
-        match self {
-            WriteMode::Interactive => "interactive",
-            WriteMode::AutoConfirm => "auto_confirm",
-            WriteMode::DryRun => "dry_run",
-        }
-    }
-}
-
-/// Terminal decision for one wiki-write opportunity.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WriteDecision {
-    Apply,
-    /// Do not write; the payload explains why (machine-readable).
-    Skip(&'static str),
-}
-
-/// Pure decision function shared by every wiki-write path.
-///
-/// Note that `confirmed` is only consulted in `Interactive` mode: the
-/// reporter has already answered the prompt by the time this runs.
-fn decide_write(mode: WriteMode, confirmed: bool) -> WriteDecision {
-    match mode {
-        WriteMode::DryRun => WriteDecision::Skip("dry_run"),
-        WriteMode::AutoConfirm => WriteDecision::Apply,
-        WriteMode::Interactive if confirmed => WriteDecision::Apply,
-        WriteMode::Interactive => WriteDecision::Skip("declined"),
-    }
-}
 
 /// Everything the WebUI (or CLI) needs to describe one unit of work.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -823,8 +775,7 @@ impl JobKind {
 }
 
 pub(crate) fn make_ctx(snapshot: &Option<String>) -> Result<DstContext> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     DstContext::new(dst_root, snapshot.clone())
 }
 
@@ -1458,7 +1409,7 @@ async fn run_update_scan(
 
     if let Some(graded) = &graded_layer_b {
         let path = out_dir.join("layer_b_rows.json");
-        std::fs::write(&path, serde_json::to_string_pretty(graded)?)?;
+        crate::platform::fs::write_json_atomic(&path, &graded)?;
         let drafts = graded
             .iter()
             .filter(|g| g.tier == crate::update::GradeTier::SuggestDraft)
@@ -1471,7 +1422,7 @@ async fn run_update_scan(
             .filter(|g| g.tier == crate::update::GradeTier::CreateCheck)
             .collect();
         let cc_json = out_dir.join("create_check.json");
-        std::fs::write(&cc_json, serde_json::to_string_pretty(&create_checks)?)?;
+        crate::platform::fs::write_json_atomic(&cc_json, &create_checks)?;
         let mut cc_md = String::from("# Create-Check 清单\n\n");
         for g in &create_checks {
             cc_md.push_str(&format!(
@@ -1507,12 +1458,12 @@ async fn run_update_scan(
         "tuning_changed": report.tuning.changed.len(),
         "tier0_hits": tier0.len(),
     });
-    std::fs::write(
-        out_dir.join("impact.json"),
-        serde_json::to_string_pretty(&serde_json::json!({
+    crate::platform::fs::write_json_atomic(
+        &out_dir.join("impact.json"),
+        &serde_json::json!({
             "report": report,
             "tier0": tier0,
-        }))?,
+        }),
     )?;
     let patch = diff.to_patch(&old_root, &new_root)?;
     std::fs::write(out_dir.join("changes.patch"), &patch)?;
@@ -1554,9 +1505,9 @@ async fn run_update_index(
     std::fs::create_dir_all(&out_dir)?;
 
     let index_path = out_dir.join("index.json");
-    std::fs::write(&index_path, serde_json::to_string_pretty(&atlas.index)?)?;
+    crate::platform::fs::write_json_atomic(&index_path, &atlas.index)?;
     let tuning_path = out_dir.join("tuning.json");
-    std::fs::write(&tuning_path, serde_json::to_string_pretty(&atlas.tuning)?)?;
+    crate::platform::fs::write_json_atomic(&tuning_path, &atlas.tuning)?;
 
     reporter.log(format!(
         "{} 文件 / {} 边 / {} 行为实参 / TUNING 标量 {}",
@@ -1645,7 +1596,7 @@ async fn run_symbol_annotate(
     std::fs::create_dir_all(&out_dir)?;
 
     let packs_path = out_dir.join("symbol_packs.json");
-    std::fs::write(&packs_path, serde_json::to_string_pretty(&packs)?)?;
+    crate::platform::fs::write_json_atomic(&packs_path, &packs)?;
 
     let mut prompts = String::from("# Symbol Annotation Prompts\n\n");
     for pack in &packs {
@@ -1834,7 +1785,7 @@ async fn run_symbol_annotate(
                     ));
                 }
                 let verdicts_path = out_dir.join("symbol_verdicts.json");
-                std::fs::write(&verdicts_path, serde_json::to_string_pretty(&responses)?)?;
+                crate::platform::fs::write_json_atomic(&verdicts_path, &responses)?;
                 reporter.log(format!(
                     "LLM 标注完成 {} 个 symbol → {}",
                     responses.len(),
@@ -1849,7 +1800,7 @@ async fn run_symbol_annotate(
     if let Some(responses) = llm_responses {
         let reports = crate::update::build_coverage_reports(&responses);
         let cov_json = out_dir.join("symbol_coverage.json");
-        std::fs::write(&cov_json, serde_json::to_string_pretty(&reports)?)?;
+        crate::platform::fs::write_json_atomic(&cov_json, &reports)?;
         let mut md = String::from("# Symbol Coverage 报告\n\n");
         for r in &reports {
             md.push_str(&crate::update::render_coverage_report_md(r));
@@ -1890,8 +1841,7 @@ async fn run_parse_po(
     reporter.log(format!("共 {} 条目", entries.len()));
 
     if let Some(output_path) = output {
-        let json = serde_json::to_string_pretty(&entries)?;
-        std::fs::write(&output_path, json)?;
+        crate::platform::fs::write_json_atomic(&output_path, &entries)?;
         reporter.log(format!("已写入 {} 条目到 {:?}", entries.len(), output_path));
         Ok(serde_json::json!({ "entries": entries.len(), "output": output_path }))
     } else {
@@ -2034,8 +1984,7 @@ async fn run_scripts_sync(
     state_path: Option<&str>,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     crate::scripts_sync::sync(
         &crate::scripts_sync::SyncParams {
             dst_root,
@@ -2056,12 +2005,8 @@ async fn run_images_sync(
     skip_wiki_status: bool,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
-    let out_dir = std::env::var("KTOOLS__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(PathBuf::from);
+    let dst_root = crate::platform::config::dst_root_str()?;
+    let out_dir = Some(crate::platform::config::ktools_out_dir());
     let mut report = crate::scripts_sync::images::run(
         &crate::scripts_sync::images::ImagesSyncParams {
             dst_root: dst_root.clone(),
@@ -2109,8 +2054,7 @@ async fn run_anim_sync(
     out: Option<PathBuf>,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     crate::scripts_sync::anim::run_sync(
         &crate::scripts_sync::anim::AnimSyncParams {
             dst_root,
@@ -2763,7 +2707,7 @@ fn finish_json_output(
 ) -> Result<serde_json::Value> {
     if let Some(output_path) = output {
         let json = WikiDataConverter::to_json_string(wiki_data)?;
-        std::fs::write(&output_path, json)?;
+        crate::platform::fs::write_text_atomic(&output_path, &json)?;
         reporter.log(format!(
             "已写入 {} 条记录到 {:?}",
             wiki_data.data.len(),

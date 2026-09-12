@@ -41,11 +41,7 @@ impl ScanState {
 
     pub fn save(&self, dir: &Path) -> crate::Result<()> {
         std::fs::create_dir_all(dir)?;
-        let path = dir.join("state.json");
-        let tmp = dir.join("state.json.tmp");
-        std::fs::write(&tmp, serde_json::to_string_pretty(self)?)?;
-        std::fs::rename(&tmp, &path)?;
-        Ok(())
+        crate::platform::fs::write_json_atomic(&dir.join("state.json"), self)
     }
 
     pub fn mark_stage(&mut self, name: &str, done: bool, dir: &Path) -> crate::Result<()> {

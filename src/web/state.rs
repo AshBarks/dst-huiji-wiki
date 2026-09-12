@@ -50,11 +50,7 @@ pub struct AppState {
 
 /// `KTOOLS__OUT_DIR`（缺省 `output/ktools`）——images-sync 产物根目录。
 pub fn ktools_out_dir() -> PathBuf {
-    std::env::var("KTOOLS__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .unwrap_or_else(|| "output/ktools".to_string())
-        .into()
+    dst_huiji_wiki::platform::config::ktools_out_dir()
 }
 
 fn icons_manifests_dir() -> PathBuf {

@@ -3,7 +3,7 @@
 
 use crate::error::{Error, Result};
 use crate::knowledge::scan_wiki::PageSymbolMap;
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use std::collections::BTreeMap;
 use std::path::Path;
 

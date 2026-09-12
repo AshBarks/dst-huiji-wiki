@@ -15,7 +15,8 @@
 //!   the status write lock, so they can never interleave.
 
 use super::state::AppState;
-use dst_huiji_wiki::service::{execute_job, CaptureReporter, JobEvent, JobKind};
+use dst_huiji_wiki::platform::progress::{CaptureReporter, JobEvent};
+use dst_huiji_wiki::service::{execute_job, JobKind};
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};

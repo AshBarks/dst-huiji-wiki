@@ -70,11 +70,7 @@ impl IconTitleOverrides {
 
 /// 映射表路径：`ICON__TITLE_OVERRIDES`（非空时）否则 [`OVERRIDES_DEFAULT_PATH`]。
 pub fn overrides_path() -> PathBuf {
-    std::env::var("ICON__TITLE_OVERRIDES")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from(OVERRIDES_DEFAULT_PATH))
+    crate::platform::config::icon_title_overrides_path()
 }
 
 /// 读取映射表；文件不存在时返回空表（不是错误）。
@@ -118,15 +114,7 @@ pub fn load_overrides(path: &Path) -> Result<IconTitleOverrides> {
 
 /// 原子写入映射表（先写临时文件再重命名）。
 pub fn save_overrides(path: &Path, overrides: &IconTitleOverrides) -> Result<PathBuf> {
-    if let Some(parent) = path.parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)?;
-        }
-    }
-    let json = serde_json::to_string_pretty(overrides)?;
-    let tmp = path.with_extension("json.tmp");
-    std::fs::write(&tmp, json)?;
-    std::fs::rename(&tmp, path)?;
+    crate::platform::fs::write_json_atomic(path, overrides)?;
     Ok(path.to_path_buf())
 }
 

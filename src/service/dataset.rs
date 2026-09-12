@@ -140,7 +140,9 @@ impl Dataset {
 /// Loads a [`Dataset`] from game files for the given snapshot (None = latest).
 fn load_dataset(snapshot: Option<String>) -> Result<Arc<Dataset>> {
     let mut ctx = crate::DstContext::new(
-        std::env::var("DST__ROOT").unwrap_or_default(),
+        crate::platform::config::dst_root_opt()
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_default(),
         snapshot.clone(),
     )?;
 
@@ -284,8 +286,7 @@ pub fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>>
 /// so it can be used by local-only export jobs that should not require
 /// `HUIJI__*` credentials.
 pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     let bundles = std::path::Path::new(&dst_root).join("data/databundles");
     let dir = match snapshot {
         Some(snap) => bundles.join(snap).join("prefabs"),
@@ -396,8 +397,7 @@ pub fn load_skill_tree(
 
 /// Reads an arbitrary file under the scripts root honouring snapshot choice.
 pub fn read_game_file(snapshot: Option<&str>, rel_path: &str) -> Result<String> {
-    let dst_root = std::env::var("DST__ROOT")
-        .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+    let dst_root = crate::platform::config::dst_root_str()?;
     let bundles = std::path::Path::new(&dst_root).join("data/databundles");
 
     if let Some(snap) = snapshot {

@@ -13,8 +13,8 @@
 //!   `abigail_flower_ice`）。
 
 use crate::error::{Error, Result};
+use crate::platform::progress::Reporter;
 use crate::scripts_sync::anim::index::{line_of, string_literal_text};
-use crate::service::Reporter;
 use full_moon::ast;
 use full_moon::node::Node;
 use serde::{Deserialize, Serialize};
@@ -103,7 +103,9 @@ pub struct SkinIndexParams {
 
 /// `DST__ROOT` 下的缺省脚本根目录（存在时返回）。
 pub fn default_scripts_root() -> Option<PathBuf> {
-    let root = std::env::var("DST__ROOT").ok()?;
+    let root = crate::platform::config::dst_root_opt()?
+        .to_string_lossy()
+        .into_owned();
     let dir = PathBuf::from(root.trim()).join("data/databundles/scripts");
     dir.is_dir().then_some(dir)
 }

@@ -22,13 +22,13 @@ pub mod skin_index;
 pub mod snapshot;
 
 use crate::error::Result;
+use crate::platform::progress::Reporter;
 use crate::scripts_sync::anim::diff::diff_directories;
 use crate::scripts_sync::anim::history::{
     diff_file_maps, now_ms, AnimFileEntry, Manifest, ManifestStore, ObjectStore,
 };
 use crate::scripts_sync::anim::snapshot::{scan_anim_dir, AnimFileKind, FileEntry};
 use crate::scripts_sync::state;
-use crate::service::Reporter;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
@@ -77,13 +77,10 @@ pub fn run_sync(params: &AnimSyncParams, reporter: &dyn Reporter) -> Result<serd
     let label = params.label.clone().unwrap_or_else(|| {
         crate::scripts_sync::read_new_version(dst).unwrap_or_else(|_| "unknown".to_string())
     });
-    let out_root = params.out_dir.clone().unwrap_or_else(|| {
-        std::env::var("ANIM__OUT_DIR")
-            .ok()
-            .filter(|s| !s.trim().is_empty())
-            .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from("output/anim"))
-    });
+    let out_root = params
+        .out_dir
+        .clone()
+        .unwrap_or_else(crate::platform::config::anim_out_dir);
     let objects = ObjectStore::new(out_root.join("history/objects"));
     let manifests = ManifestStore::new(out_root.join("history/manifests"));
     let parent = manifests.load_parent(&label)?;

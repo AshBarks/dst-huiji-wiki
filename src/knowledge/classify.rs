@@ -17,7 +17,7 @@
 
 use crate::error::Result;
 use crate::knowledge::scan_wiki::{extract_named_constants, trim_num, PageSymbolMap};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::update::build_atlas_from_dir;
 use crate::update::grade::CorpusPageView;
 use serde::Serialize;

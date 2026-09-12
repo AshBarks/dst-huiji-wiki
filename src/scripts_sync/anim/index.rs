@@ -12,7 +12,7 @@
 use crate::error::Result;
 use crate::parser::anim_override::{parse_anim_overrides_in, SymbolOverrideCall, SymbolRemapIndex};
 use crate::parser::clothing_overrides::{parse_clothing_overrides, ClothingEntry};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use full_moon::ast;
 use full_moon::node::Node;
 use serde::Serialize;

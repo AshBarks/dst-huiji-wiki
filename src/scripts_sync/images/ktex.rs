@@ -607,15 +607,12 @@ mod tests {
     #[ignore = "需要本机 DST 与 ktech 产物（KTOOLS__OUT_DIR/current/kteched）"]
     fn conformance_against_ktech_output() {
         use std::path::PathBuf;
-        let Ok(dst_root) = std::env::var("DST__ROOT") else {
+        let Some(dst_root) = crate::platform::config::dst_root_opt() else {
             eprintln!("DST__ROOT 未设置，跳过");
             return;
         };
-        let Ok(out_dir) = std::env::var("KTOOLS__OUT_DIR") else {
-            eprintln!("KTOOLS__OUT_DIR 未设置，跳过");
-            return;
-        };
-        let out = PathBuf::from(&out_dir);
+        let out_dir = crate::platform::config::ktools_out_dir();
+        let out = out_dir;
         let kteched = out.join("current/kteched");
         let unzipped = out.join("current/unzipped");
         if !kteched.is_dir() {

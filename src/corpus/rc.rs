@@ -10,7 +10,7 @@ use crate::corpus::classify;
 use crate::corpus::model::PageMeta;
 use crate::corpus::store::CorpusStore;
 use crate::error::{Error, Result};
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::wiki::{RecentChange, WikiClient};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};

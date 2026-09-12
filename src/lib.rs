@@ -7,6 +7,7 @@ pub mod llm;
 pub mod mapping;
 pub mod models;
 pub mod parser;
+pub mod platform;
 pub mod scripts_sync;
 pub mod service;
 pub mod update;

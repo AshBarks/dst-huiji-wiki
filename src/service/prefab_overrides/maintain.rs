@@ -12,7 +12,7 @@
 use super::audit::{parse_wiki_overrides, read_page_raw, resolve_scripts_root, PAGE_TITLE};
 use super::derive_from_scripts_root;
 use crate::error::Result;
-use crate::service::progress::Reporter;
+use crate::platform::progress::Reporter;
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};

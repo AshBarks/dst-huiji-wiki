@@ -10,7 +10,7 @@ use crate::error::{Error, Result};
 use crate::knowledge::scan_wiki::{extract_named_constants, trim_num, PageSymbolMap};
 use crate::knowledge::store::sha256_hex;
 use crate::knowledge::types::SymbolDoc;
-use crate::service::Reporter;
+use crate::platform::progress::Reporter;
 use crate::update::build_atlas_from_dir;
 use crate::update::diffdata::{DiffStatus, TreeDiff};
 use crate::update::snapshot::SnapshotStore;
@@ -1056,7 +1056,7 @@ mod tests {
             r#"[{"id":"D001","decision":"approve","note":"确认"},{"id":"D999","decision":"approve"}]"#,
         )
         .unwrap();
-        let reporter = crate::service::CaptureReporter::new(true);
+        let reporter = crate::platform::CaptureReporter::new(true);
         let out = run_review(&review_path, &report_path, &reporter).unwrap();
         assert_eq!(out["approved"], 1);
         assert_eq!(out["rejected"], 0);

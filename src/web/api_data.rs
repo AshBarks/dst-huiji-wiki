@@ -805,11 +805,7 @@ pub async fn diff_po(
 
 /// ANIM__OUT_DIR，缺省 `output/anim`。
 fn anim_out_dir() -> std::path::PathBuf {
-    std::env::var("ANIM__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(std::path::PathBuf::from)
-        .unwrap_or_else(|| std::path::PathBuf::from("output/anim"))
+    dst_huiji_wiki::platform::config::anim_out_dir()
 }
 
 /// GET /api/anim/manifests — 列出动画历史 manifest。
@@ -1558,8 +1554,8 @@ fn anim_root_from_index_or_env() -> std::result::Result<std::path::PathBuf, Stat
             return Ok(std::path::PathBuf::from(root));
         }
     }
-    if let Ok(root) = std::env::var("DST__ROOT") {
-        return Ok(std::path::PathBuf::from(root).join("data/anim"));
+    if let Some(root) = dst_huiji_wiki::platform::config::dst_root_opt() {
+        return Ok(root.join("data/anim"));
     }
     Err(StatusCode::NOT_FOUND)
 }

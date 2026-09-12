@@ -20,13 +20,7 @@ pub fn doc_path(root: &Path, key: &SymbolRefKey) -> PathBuf {
 
 /// 原子写入(tmp + rename),父目录自动创建。
 pub fn write_atomic(path: &Path, body: &str) -> Result<()> {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    let tmp = path.with_extension("json.tmp");
-    std::fs::write(&tmp, body)?;
-    std::fs::rename(&tmp, path)?;
-    Ok(())
+    crate::platform::fs::write_text_atomic(path, body)
 }
 
 /// 读取已有文档;不存在 → Ok(None);存在但解析失败 → 报错(人工修复)。

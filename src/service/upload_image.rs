@@ -7,9 +7,9 @@
 //!
 //! 同名重传需 `ignore_warnings`（MediaWiki `ignorewarnings=1`）。
 
-use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::{Error, Result};
-use crate::service::progress::Reporter;
+use crate::platform::progress::Reporter;
+use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
 use crate::wiki::WikiClient;
 use std::path::Path;
 

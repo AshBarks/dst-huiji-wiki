@@ -1,9 +1,8 @@
 //! Thin CLI wrappers around the shared service layer.
 
 use super::Commands;
-use dst_huiji_wiki::service::{
-    execute_job_with_mode, ConfirmMode, JobKind, StdoutReporter, WriteMode,
-};
+use dst_huiji_wiki::platform::progress::{ConfirmMode, StdoutReporter, WriteMode};
+use dst_huiji_wiki::service::{execute_job_with_mode, JobKind};
 use dst_huiji_wiki::Result;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};

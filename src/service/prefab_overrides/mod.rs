@@ -12,13 +12,13 @@
 pub mod audit;
 pub mod maintain;
 
-use super::progress::Reporter;
 use crate::error::{Error, Result};
 use crate::parser::{
     parse_bobbers, parse_indexed_variants, parse_literal_registrations, parse_oversized_waxed,
     parse_prefab_overrides, parse_spiced_foods, parse_spike_sizes, parse_winter_ornaments,
     spice_names_from_source, OverrideValue, PrefabVariant, LITERAL_FAMILIES,
 };
+use crate::platform::progress::Reporter;
 use crate::scripts_sync::anim::index::collect_lua_files;
 use crate::scripts_sync::anim::skin_index::default_scripts_root;
 use serde::Deserialize;

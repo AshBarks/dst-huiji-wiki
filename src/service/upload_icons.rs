@@ -18,9 +18,9 @@
 //! 名称总是重建并应用映射表；wiki 状态只查询缺状态或强制重查的条目，凭据
 //! 缺失时保留旧状态并报告 `wiki_error`。
 
-use super::progress::Reporter;
-use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::{Error, Result};
+use crate::platform::progress::Reporter;
+use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
 use crate::scripts_sync::images::history::now_ms;
 use crate::scripts_sync::images::icons::{
     build_icons_index, default_source, icon_source, IconSource, ICON_SOURCES,
@@ -59,11 +59,7 @@ pub fn upload_comment(source_id: &str) -> &'static str {
 
 /// `KTOOLS__OUT_DIR`（缺省 `output/ktools`）。
 pub fn out_dir_from_env() -> PathBuf {
-    std::env::var("KTOOLS__OUT_DIR")
-        .ok()
-        .filter(|s| !s.trim().is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("output/ktools"))
+    crate::platform::config::ktools_out_dir()
 }
 
 /// 一次 [`run_upload_icons`] 调用的参数。

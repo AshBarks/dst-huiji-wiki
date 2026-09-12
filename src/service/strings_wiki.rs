@@ -14,14 +14,14 @@
 //! `resolve_character` 一致）。
 
 use super::dataset::read_game_file;
-use super::progress::Reporter;
-use super::{decide_write, WriteDecision, WriteMode};
 use crate::error::{Error, Result};
 use crate::models::{
     build_language_map, diff_values, plan_equal_count, plan_with_boundaries, render_module,
     validate_plan, BucketPlan, IndexEntry, MapDiff, StringValue, StringsIndexFile,
 };
 use crate::parser::{parse_strings_module, PoParser};
+use crate::platform::progress::Reporter;
+use crate::platform::progress::{decide_write, WriteDecision, WriteMode};
 use crate::wiki::WikiClient;
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};

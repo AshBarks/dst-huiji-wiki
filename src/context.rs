@@ -25,8 +25,7 @@ pub struct DstContext {
 
 impl DstContext {
     pub fn from_env() -> Result<Self> {
-        let dst_root = std::env::var("DST__ROOT")
-            .map_err(|e| Error::EnvVarNotFound(format!("DST__ROOT: {}", e)))?;
+        let dst_root = crate::platform::config::dst_root_str()?;
         Self::new(dst_root, None)
     }
 
@@ -80,9 +79,10 @@ impl DstContext {
     /// sorted from newest to oldest.
     pub fn list_snapshots() -> Vec<SnapshotInfo> {
         let mut result = Vec::new();
-        let Ok(dst_root) = std::env::var("DST__ROOT") else {
+        let Some(dst_root) = crate::platform::config::dst_root_opt() else {
             return result;
         };
+        let dst_root = dst_root.to_string_lossy().into_owned();
         let bundles = Self::databundles_dir(Path::new(&dst_root));
         let Ok(entries) = std::fs::read_dir(&bundles) else {
             return result;

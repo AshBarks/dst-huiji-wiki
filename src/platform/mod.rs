@@ -7,6 +7,7 @@
 
 pub mod config;
 pub mod fs;
+pub mod game_source;
 pub mod progress;
 
 pub use progress::{

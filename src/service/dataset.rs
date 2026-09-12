@@ -286,23 +286,11 @@ pub fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>>
 /// so it can be used by local-only export jobs that should not require
 /// `HUIJI__*` credentials.
 pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>> {
-    let dst_root = crate::platform::config::dst_root_str()?;
-    let bundles = std::path::Path::new(&dst_root).join("data/databundles");
-    let dir = match snapshot {
-        Some(snap) => bundles.join(snap).join("prefabs"),
-        None => bundles.join("scripts").join("prefabs"),
-    };
+    let entries = crate::platform::game_source::GameSource::from_env(snapshot.map(str::to_string))?
+        .list_dir("prefabs")?;
 
     let mut chars = Vec::new();
-    let entries = std::fs::read_dir(&dir).map_err(|e| {
-        Error::Io(std::io::Error::other(format!(
-            "read skilltree prefabs dir {}: {}",
-            dir.to_string_lossy(),
-            e
-        )))
-    })?;
-    for entry in entries.flatten() {
-        let name = entry.file_name().to_string_lossy().to_string();
+    for name in entries {
         if let Some(rest) = name.strip_prefix("skilltree_") {
             if let Some(char_name) = rest.strip_suffix(".lua") {
                 if char_name != "defs" {
@@ -396,36 +384,11 @@ pub fn load_skill_tree(
 }
 
 /// Reads an arbitrary file under the scripts root honouring snapshot choice.
+///
+/// 统一走 [`crate::platform::game_source::GameSource`]（snapshot → live →
+/// scripts.zip）；未指定 snapshot 且解压树缺失时回退读取 zip。
 pub fn read_game_file(snapshot: Option<&str>, rel_path: &str) -> Result<String> {
-    let dst_root = crate::platform::config::dst_root_str()?;
-    let bundles = std::path::Path::new(&dst_root).join("data/databundles");
-
-    if let Some(snap) = snapshot {
-        let path = bundles.join(snap).join(rel_path);
-        return std::fs::read_to_string(&path).map_err(|e| {
-            Error::Io(std::io::Error::other(format!(
-                "read {}: {}",
-                path.to_string_lossy(),
-                e
-            )))
-        });
-    }
-
-    let live = bundles.join("scripts").join(rel_path);
-    if live.exists() {
-        return std::fs::read_to_string(&live).map_err(|e| {
-            Error::Io(std::io::Error::other(format!(
-                "read {}: {}",
-                live.to_string_lossy(),
-                e
-            )))
-        });
-    }
-
-    Err(Error::Config(format!(
-        "file not found in extracted scripts (consider extracting scripts.zip): {}",
-        rel_path
-    )))
+    crate::platform::game_source::GameSource::from_env(snapshot.map(str::to_string))?.read(rel_path)
 }
 
 /// Parses the SKILLTREE-related PO entries for zh lookups.

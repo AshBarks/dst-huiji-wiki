@@ -26,7 +26,6 @@ use crate::parser::PoParser;
 use crate::scripts_sync::images::history::now_ms;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 
 /// 元数据在产物根目录下的相对路径。
@@ -340,31 +339,8 @@ pub fn read_name_maps(dst_root: &Path) -> Result<NameMaps> {
 }
 
 fn read_game_text(dst_root: &Path, rel: &str) -> Result<String> {
-    let live = dst_root.join("data/databundles/scripts").join(rel);
-    if live.exists() {
-        return std::fs::read_to_string(&live).map_err(|e| {
-            Error::Io(std::io::Error::new(
-                e.kind(),
-                format!("读取 {}: {}", live.display(), e),
-            ))
-        });
-    }
-
-    let zip_path = dst_root.join("data/databundles/scripts.zip");
-    let file = std::fs::File::open(&zip_path).map_err(|e| {
-        Error::Io(std::io::Error::new(
-            e.kind(),
-            format!("打开 {}: {}", zip_path.display(), e),
-        ))
-    })?;
-    let mut archive = zip::ZipArchive::new(BufReader::new(file))?;
-    let entry = format!("scripts/{rel}");
-    let mut f = archive
-        .by_name(&entry)
-        .map_err(|e| Error::ArchiveFileNotFound(format!("{entry}: {e}")))?;
-    let mut content = String::new();
-    f.read_to_string(&mut content)?;
-    Ok(content)
+    // 统一走 GameSource（live → scripts.zip）；snapshot 语义由调用方决定。
+    crate::platform::game_source::GameSource::new(dst_root.to_path_buf(), None)?.read(rel)
 }
 
 // -- 标题与元数据构建 ---------------------------------------------------------

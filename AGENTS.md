@@ -35,14 +35,14 @@ dst-huiji-wiki/
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Add a new CLI command | `src/commands/mod.rs` (enum) → `src/commands/maintain.rs` (handler) | Handlers are thin wrappers over `service::execute_job` |
-| Add a new job type (CLI+Web) | `src/service/mod.rs` (`JobKind`) | Add variant + run fn; CLI wrapper comes free |
+| Add a new CLI command | `src/service/job_spec.rs` (JobSpec 行) + `src/commands/mod.rs` (CLI_EXT 行 + `job_from_matches` 构造臂) | 子命令由 clap builder 从 JobSpec+CLI_EXT 生成；参数 schema 声明在 spec |
+| Add a new job type (CLI+Web) | `src/service/kind.rs` (variant) + `src/service/job_spec.rs` (spec 行) + `src/commands/mod.rs` (CLI_EXT 行 + 构造臂) | 契约测试强制四处一致（name/serde tag/CLI 旗标/前端 JOB_DEFS）|
 | Change WebUI behavior | `src/web/` | Binary-only module like commands; assets in `src/web/assets/` embedded via include_str! |
-| Add a data browse endpoint | `src/web/api_data.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |
+| Add a data browse endpoint | `src/web/api_data/{dataset,icons,assets,anim}.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |
 | Parse a new Lua data type | `src/parser/` | Add new module, re-export in mod.rs |
 | Add a new wiki data mapping | `src/mapping/mappers/` | Implement WikiMapper trait |
 | Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here (throttle+retry in `send_with_retry`) |
-| Change write/confirm policy | `src/service/mod.rs` (`WriteMode`, `decide_write`) | CLI maps --yes/--dry-run to WriteMode |
+| Change write/confirm policy | `src/platform/progress.rs` (`WriteMode`, `decide_write`) + `src/service/wiki_write.rs` (`WikiWriter`) | CLI --yes/--dry-run → WriteMode；写站流程统一走 WikiWriter（确认/decide_write/basetimestamp/span）|
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs; `--type names` also derives CraftingNames station aliases from `constants.lua`/`tuning.lua` (`parse_*` in `src/parser/crafting.rs`, logic in `src/models/crafting_alias.rs`) |
 | Check 模板:Tech/dst & 模板:制作栏图标 coverage | `src/service/template_check.rs` | `maintain-template-check` CLI/Web job (read-only); config `config/template_check.json` (tech whitelist / CN alias / station fallback); snippets via `--output` |
@@ -61,7 +61,9 @@ dst-huiji-wiki/
 | Symbol | Type | Location | Role |
 |--------|------|----------|------|
 | `DstContext` | Struct | src/context.rs | App context: zip archive, wiki client, env vars |
-| `Commands` | Enum | src/commands/mod.rs | 7 CLI subcommands (clap derive) |
+| `JobKind` / `JobSpec` | Enum / 静态表 | src/service/kind.rs + src/service/job_spec.rs | 作业参数变体 + canonical name/wiki_access/resources/params 声明源 |
+| `WikiWriter` | Struct | src/service/wiki_write.rs | 写站流程唯一实现（diff/确认/decide_write/basetimestamp） |
+| `platform::*` | Module | src/platform/ | progress（Reporter/WriteMode）、config（env 路径集中）、fs（原子写）、game_source（snapshot→live→zip） |
 | `WikiMapper` | Trait | src/mapping/mapper.rs | Core mapping interface: schema + rules + merge |
 | `MappingBuilder<T>` | Struct | src/mapping/builder.rs | Fluent builder for field mappings + merge strategies |
 | `WikiDataConverter` | Struct | src/mapping/converter.rs | Orchestrates mapping: parse → convert → compare → merge |
@@ -109,7 +111,7 @@ dst-huiji-wiki/
 ## COMMANDS
 ```bash
 cargo build --release              # Build binary
-cargo test                         # Run all 370 inline tests
+cargo test                         # Run all ~640 lib + ~20 bin inline tests
 cargo fmt --check                  # Check formatting
 cargo clippy -- -D warnings        # Lint (CI uses this)
 cargo run --release -- --help      # Show CLI help
@@ -125,7 +127,7 @@ cargo run --release -- --help      # Show CLI help
 - Maintenance commands accept `--yes` (auto-confirm writes), `--dry-run` (no wiki writes, artifacts still written), `--report-json <path>` (machine-readable report); service-level enum is `service::WriteMode` with pure decision fn `decide_write`
 - Structured logging: `cli_run` span (uuid run_id, command) wraps every invocation; `job` and `wiki_edit` (page, oldrevid/newrevid) spans inside service
 - `examples/` contains game data (.po, .lua) + a Python login script, NOT Rust examples — `cargo run --example` finds nothing
-- `src/commands/maintain.rs` is 743 lines with all 7+ command handlers — the largest non-parser file
+- `src/commands/mod.rs` is builder-generated CLI from JobSpec + CLI_EXT tables (no derive enum)
 - `src/parser/prefab_override/parser.rs` is 2657 lines — the most complex file in the project
 - CI cross-compiles to 4 targets (Linux x86_64, macOS x86_64 + aarch64, Windows x86_64)
 - Wiki API tests skip gracefully if `.env` not configured (won't fail in CI)

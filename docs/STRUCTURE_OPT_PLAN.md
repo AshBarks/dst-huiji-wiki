@@ -127,3 +127,28 @@
   - `DstContext` 与 GameSource 并存（语义均正确）；
   - upload 的 multipart 流程未纳入 WikiWriter（确认策略已复用）；
   - workspace 拆分（仅在编译时间/边界成为实际痛点时考虑）。
+
+## 进度台账（P4 收尾）
+
+P3 收尾后复核发现的非阻塞遗留，2026-09-12 拍板一并清理（parser 仅机械拆分，不做遍历器算法统一）。
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P4.0 | AGENTS 文档回补：根 `AGENTS.md` / `src/AGENTS.md` / `src/mapping/AGENTS.md` 去除已删除的 MappingBuilder、过期 commands/anim-index 结构 | ⏳ | — |
+| P4.1 | 原子写补全：生产 `std::fs::write`（service + scripts_sync/anim + images/history）统一改 `platform::fs`；`images/history.rs` 父目录 expect 改 `ensure_parent` | ⏳ | — |
+| P4.2 | unwrap 清理：仅修可触发点 `images/scan.rs`（非 UTF-8 stem）、`update/consts.rs`（file_name None）、`corpus/join.rs`（guarded unwrap 重写） | ⏳ | — |
+| P4.3 | Web 作业运行时隔离：`web/jobs.rs` 作业移到独立线程 + 线程内 current-thread runtime，不再占用 axum worker；`write_mode_for()` 让 wiki 干跑走 `WriteMode::DryRun`（报告 status 由 `declined` 修为 `dry_run`） | ⏳ | — |
+| P4.4 | Web 边界测试：SSE `seq > since` 过滤抽纯函数并单测；补缓存失效与 JobManager 锁语义断言 | ⏳ | — |
+| P4.5 | `DstContext` 组合 `GameSource`：统一 snapshot(严格)→live→zip 读取；删除 `archive`/`open_scripts_zip`/`read_zip_file` | ⏳ | — |
+| P4.6 | parser 机械拆分（不改算法，先建语料差分安全网）：prefab_override parser.rs 按职责分文件、skilltree.rs 拆目录模块 | ⏳ | — |
+
+**P4 硬约束**：仍不进行任何线上 wiki 写操作；验证为单测 / dry-run / 本地构建。
+
+### P4 拍板（2026-09-12 第四轮）
+
+| 问题 | 决策 |
+|---|---|
+| 范围 | 关闭 A–E 非结构遗留 + 统一 DstContext/GameSource + parser 机械拆分 |
+| Web 作业隔离 | 独立线程 + 每线程 current-thread runtime（规避 Runtime 跨 async drop） |
+| unwrap 严格度 | 只修可触发的 3 处，其余不变量安全保留 |
+| parser 拆分深度 | 只做机械拆分，算法不动；upload multipart→WikiWriter 与 workspace 拆分仍不做 |

@@ -19,7 +19,7 @@ dst-huiji-wiki/
 │   │   └── prefab_override/ # Complex Lua AST walker (2657-line parser.rs)
 │   ├── models/              # Data models (Recipe, PoEntry, TechReport)
 │   │   └── recipe/          # Recipe sub-models (ingredient, options, prototyper, context)
-│   ├── mapping/             # Data→wiki mapping framework (WikiMapper trait + builder)
+│   ├── mapping/             # Data→wiki mapping framework (WikiMapper trait + 字段名对齐 diff/merge)
 │   │   └── mappers/         # Concrete mappers (PoEntryMapper, RecipeMapper)
 │   ├── wiki/                # MediaWiki API client
 │   ├── copyclip/            # Wiki module content updater (marker-based replacement)
@@ -65,8 +65,7 @@ dst-huiji-wiki/
 | `WikiWriter` | Struct | src/service/wiki_write.rs | 写站流程唯一实现（diff/确认/decide_write/basetimestamp） |
 | `platform::*` | Module | src/platform/ | progress（Reporter/WriteMode）、config（env 路径集中）、fs（原子写）、game_source（snapshot→live→zip） |
 | `WikiMapper` | Trait | src/mapping/mapper.rs | Core mapping interface: schema + rules + merge |
-| `MappingBuilder<T>` | Struct | src/mapping/builder.rs | Fluent builder for field mappings + merge strategies |
-| `WikiDataConverter` | Struct | src/mapping/converter.rs | Orchestrates mapping: parse → convert → compare → merge |
+| `WikiDataConverter` | Struct | src/mapping/converter.rs | Orchestrates mapping: parse → convert → compare → merge（diff/merge 按字段名对齐，显式 `key_field`）|
 | `RecipeParser` | Struct | src/parser/recipe.rs | Parses Recipe{} calls from Lua via full_moon AST |
 | `PrefabOverrideParser` | Struct | src/parser/prefab_override/parser.rs | Extracts prefab name overrides from Lua (factory patterns, control flow) |
 | `LuaParser` | Struct | src/parser/lua.rs | Generic Lua variable/field location extraction |
@@ -90,7 +89,7 @@ dst-huiji-wiki/
 - **Dependencies**: major version only (no pinning), semver-compatible ranges
 - **`serde_json` with `preserve_order`** — JSON output maintains insertion order
 - **`full_moon` with `lua52`** — Lua 5.2 dialect for DST game scripts
-- **CLI args**: clap derive macros; `r#type` raw identifier for `--type` flag in copyclip
+- **CLI args**: clap **builder** generated from `JobSpec` + `CLI_EXT` tables (no derive enum); `r#type` raw identifier for `--type` flag in copyclip
 
 ## ANTI-PATTERNS (THIS PROJECT)
 - **DO NOT** add `rustfmt.toml` or `clippy.toml` — project uses Rust defaults
@@ -101,7 +100,7 @@ dst-huiji-wiki/
 
 ## UNIQUE STYLES
 - `WikiMapper` trait: declarative mapping via `FieldMapping` enum (Direct/Transformed/Computed/Constant/Default/Ignored) + `MergeStrategy` (Overwrite/PreserveHistory/Merge/Custom)
-- `MappingBuilder<T>`: fluent API with generics — field mapping rules composed via `.map_direct()`, `.map_transformed()`, `.map_computed()`, etc.
+- `mapping::converter`: diff/merge 按【字段名】在两侧 schema 各自定位并对齐（不依赖字段下标/位置）；`compare_data`/`merge_new_records` 必须显式传入 `T::key_field()`
 - `CopyClipProcessor`: marker-based content replacement (`--BEGIN/--END`) in wiki Lua modules
 - `DstContext`: lazily opens ZIP archives of game scripts, provides unified access to PO files and Lua sources
 - `RecipeParser`: handles Lua for-loops (numeric + generic/ipairs) to expand recipe definitions at parse time

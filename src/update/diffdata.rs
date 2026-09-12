@@ -307,8 +307,14 @@ mod tests {
         let td = TreeDiff::diff_trees(&old, &new).unwrap();
         assert_eq!(td.files.len(), 1);
         let patch = td.to_patch(&old, &new).unwrap();
-        assert!(patch.contains("-return a"), "patch should show removed line: {patch}");
-        assert!(patch.contains("+    return a"), "patch should show added line: {patch}");
+        assert!(
+            patch.contains("-return a"),
+            "patch should show removed line: {patch}"
+        );
+        assert!(
+            patch.contains("+    return a"),
+            "patch should show added line: {patch}"
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

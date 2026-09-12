@@ -35,7 +35,10 @@ pub fn collect_brain_consts(root: &Path) -> Result<Vec<ConstFact>> {
         let Ok(src) = std::fs::read_to_string(&p) else {
             continue;
         };
-        let file = format!("brains/{}", p.file_name().unwrap().to_string_lossy());
+        let Some(name) = p.file_name() else {
+            continue;
+        };
+        let file = format!("brains/{}", name.to_string_lossy());
         for (i, line) in src.lines().enumerate() {
             if line.trim_start().starts_with("--") {
                 continue;

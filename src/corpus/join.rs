@@ -136,16 +136,16 @@ pub fn build_join_report(
         }
         // naming drift: exactly one squash-equal counterpart
         let sq = squash(variant);
-        let hits = code_squash.get(&sq);
-        if !sq.is_empty() && matches!(hits, Some(v) if v.len() == 1) {
-            let suggestion = hits.unwrap()[0].clone();
-            dangling.push(DanglingVariant {
-                variant: variant.clone(),
-                pageids: pageids.clone(),
-                bucket: DanglingBucket::NamingDrift,
-                suggestion: Some(suggestion),
-            });
-            continue;
+        if !sq.is_empty() {
+            if let Some([suggestion]) = code_squash.get(&sq).map(Vec::as_slice) {
+                dangling.push(DanglingVariant {
+                    variant: variant.clone(),
+                    pageids: pageids.clone(),
+                    bucket: DanglingBucket::NamingDrift,
+                    suggestion: Some((*suggestion).clone()),
+                });
+                continue;
+            }
         }
         unresolved.insert(variant.clone());
     }

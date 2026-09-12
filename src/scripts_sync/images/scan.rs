@@ -125,11 +125,14 @@ pub fn scan(zip_path: &Path, loose_dir: &Path, zip_out_dir: &Path) -> Result<Sca
             match ext.as_str() {
                 "png" => loose_png += 1,
                 "tex" | "xml" => {
-                    let base = path
+                    let Some(base) = path
                         .file_stem()
                         .and_then(|s| s.to_str())
-                        .expect("UTF-8 file stem")
-                        .to_string();
+                        .map(str::to_string)
+                    else {
+                        tracing::warn!(path = %path.display(), "跳过非 UTF-8 文件名的 tex/xml");
+                        return Ok(());
+                    };
                     let hash = crate::scripts_sync::images::history::hash_file(path)?;
                     if ext == "tex" {
                         loose_tex.insert(base, (path.to_path_buf(), hash));

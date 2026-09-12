@@ -2,8 +2,10 @@
 //!
 //! Produces per-file [`FileDiff`] with line-range hunks (no context lines —
 //! the ranges feed hunk→prefab attribution in M1b) plus a human-readable
-//! unified patch. Line diffing uses `similar`'s Histogram algorithm, matching
-//! `crate::utils::diff_lines`.
+//! unified patch. Line diffing uses `similar`'s Histogram algorithm; the
+//! patch is whitespace-preserving so whitespace-only changes (which
+//! [`TreeDiff::diff_trees`] reports as `Modified`) still produce hunks
+//! instead of an empty `changes.patch` section.
 
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -94,15 +96,18 @@ impl TreeDiff {
                 DiffStatus::Modified => {
                     let old = read_lossy(&old_root.join(&file.path))?;
                     let new = read_lossy(&new_root.join(&file.path))?;
-                    out.push_str(&crate::utils::diff_lines(&old, &new));
+                    // Whitespace-preserving: extract_hunks treats indentation
+                    // changes as modifications, so the patch must show them
+                    // too instead of emitting an empty section.
+                    out.push_str(&crate::utils::diff_lines_preserve_whitespace(&old, &new));
                 }
                 DiffStatus::Added => {
                     let new = read_lossy(&new_root.join(&file.path))?;
-                    out.push_str(&crate::utils::diff_lines("", &new));
+                    out.push_str(&crate::utils::diff_lines_preserve_whitespace("", &new));
                 }
                 DiffStatus::Removed => {
                     let old = read_lossy(&old_root.join(&file.path))?;
-                    out.push_str(&crate::utils::diff_lines(&old, ""));
+                    out.push_str(&crate::utils::diff_lines_preserve_whitespace(&old, ""));
                 }
             }
             if !out.ends_with('\n') {
@@ -286,6 +291,24 @@ mod tests {
         assert!(patch.contains("+++ b/m.lua"));
         assert!(patch.contains("-a"));
         assert!(patch.contains("+b"));
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn whitespace_only_change_produces_nonempty_patch() {
+        let tmp = std::env::temp_dir().join(format!("dst_diff_ws_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&tmp);
+        let old = tmp.join("old");
+        let new = tmp.join("new");
+        // Only indentation differs: diff_trees reports Modified (extract_hunks
+        // sees it), so the patch must show the change rather than go empty.
+        write_tree(&old, &[("w.lua", "local a = 1\nreturn a\n")]);
+        write_tree(&new, &[("w.lua", "local a = 1\n    return a\n")]);
+        let td = TreeDiff::diff_trees(&old, &new).unwrap();
+        assert_eq!(td.files.len(), 1);
+        let patch = td.to_patch(&old, &new).unwrap();
+        assert!(patch.contains("-return a"), "patch should show removed line: {patch}");
+        assert!(patch.contains("+    return a"), "patch should show added line: {patch}");
         let _ = std::fs::remove_dir_all(&tmp);
     }
 }

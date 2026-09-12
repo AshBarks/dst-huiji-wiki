@@ -6,8 +6,9 @@ use tracing::Instrument;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    // dotenv must run before tracing init so RUST_LOG from .env is honored.
     dotenvy::dotenv().ok();
+    tracing_subscriber::fmt::init();
 
     let args = commands::Args::parse();
     let run_id = uuid::Uuid::new_v4();

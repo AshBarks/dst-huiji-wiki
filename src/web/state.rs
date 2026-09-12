@@ -265,11 +265,17 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn invalidate_job_caches_clears_diff_cache() {
+    async fn invalidate_job_caches_clears_diff_cache_and_skill_strings() {
         let st = AppState::new();
         st.cached_diff("a|b|c".into(), || Ok(serde_json::json!(1)))
             .await
             .unwrap();
+        st.skill_strings
+            .lock()
+            .await
+            .insert(None, Arc::new(SkillStringsData::default()));
+        assert!(!st.skill_strings.lock().await.is_empty());
+
         st.invalidate_job_caches().await;
         assert!(st.diff_cache.lock().await.map.is_empty());
         assert!(st.skill_strings.lock().await.is_empty());

@@ -463,6 +463,38 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn same_kind_job_waits_for_kind_lock_then_runs() {
+        let mgr = JobManager::new();
+        // 手动占住 scripts-sync 的同类锁，模拟一个正在运行的作业。
+        let permit = mgr.kind_lock("scripts-sync").await;
+        let guard = permit.lock().await;
+
+        let h = mgr
+            .submit(
+                JobKind::ScriptsSync {
+                    force: false,
+                    dry_run: true,
+                    state_path: None,
+                },
+                true,
+                None,
+            )
+            .await;
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        // 同类锁被占用期间必须保持 Queued，不得开跑。
+        assert_eq!(h.status().await, JobStatus::Queued);
+
+        drop(guard);
+        for _ in 0..200 {
+            if h.status().await.is_terminal() {
+                break;
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(25)).await;
+        }
+        assert!(h.status().await.is_terminal());
+    }
+
+    #[tokio::test]
     async fn submitted_job_reaches_terminal_state() {
         // 端到端：submit → worker 拿锁 → 执行（文件缺失 → 失败）→ 终态。
         let mgr = JobManager::new();

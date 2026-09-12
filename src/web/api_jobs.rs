@@ -124,6 +124,15 @@ fn event_seq(ev: &JobEvent) -> u64 {
     }
 }
 
+/// replay 侧过滤：只保留 `seq > since` 的事件，与 live 侧同一判据
+/// （避免订阅-快照之间产生的事件在两侧重复）。
+fn filter_events_since(events: impl IntoIterator<Item = JobEvent>, since: u64) -> Vec<JobEvent> {
+    events
+        .into_iter()
+        .filter(|ev| event_seq(ev) > since)
+        .collect()
+}
+
 enum LiveItem {
     Ev(JobEvent),
     /// 广播队列滞后、丢失了事件：通知前端 resync（重新拉取全量日志）。
@@ -155,12 +164,7 @@ pub async fn events(
     let rx = job.reporter.subscribe();
     let already_terminal = job.status().await.is_terminal();
 
-    let replay: Vec<JobEvent> = job
-        .reporter
-        .snapshot_logs()
-        .into_iter()
-        .filter(|ev| event_seq(ev) > since)
-        .collect();
+    let replay: Vec<JobEvent> = filter_events_since(job.reporter.snapshot_logs(), since);
     let replay_stream = stream::iter(replay.into_iter().map(|ev| Ok(event_to_sse(ev))));
 
     let live: std::pin::Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>> = {
@@ -208,4 +212,35 @@ pub async fn events(
             .text("keep-alive"),
     );
     Ok(sse)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn log(seq: u64) -> JobEvent {
+        JobEvent::Log {
+            seq,
+            ts_ms: 0,
+            text: format!("e{seq}"),
+        }
+    }
+
+    fn done(seq: u64) -> JobEvent {
+        JobEvent::Done {
+            seq,
+            ts_ms: 0,
+            status: "success".into(),
+        }
+    }
+
+    /// replay 游标是严格 `seq > since`：边界事件不重复，Done 不丢失。
+    #[test]
+    fn filter_since_uses_strict_seq_cursor() {
+        let events = vec![log(0), log(1), log(2), done(3)];
+        let seqs = |v: Vec<JobEvent>| v.iter().map(event_seq).collect::<Vec<_>>();
+        assert_eq!(seqs(filter_events_since(events.clone(), 1)), vec![2, 3]);
+        assert!(filter_events_since(events.clone(), 3).is_empty());
+        assert_eq!(seqs(filter_events_since(events, 0)), vec![1, 2, 3]);
+    }
 }

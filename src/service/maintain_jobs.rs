@@ -26,7 +26,7 @@ pub(super) async fn run_maintain_item_table(
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
-    let mut ctx = make_ctx(&snapshot)?;
+    let ctx = make_ctx(&snapshot)?;
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");
@@ -94,7 +94,7 @@ pub(super) async fn run_maintain_dst_recipes(
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
-    let mut ctx = make_ctx(&snapshot)?;
+    let ctx = make_ctx(&snapshot)?;
     reporter.log(format!("DST 版本: {}", ctx.version));
 
     reporter.stage("登录维基");

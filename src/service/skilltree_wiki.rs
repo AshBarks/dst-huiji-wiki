@@ -676,7 +676,7 @@ pub async fn run_skilltree_wiki(
     }
     let client = ctx.wiki().clone();
 
-    let all_characters = super::dataset::list_skill_characters(&mut ctx)?;
+    let all_characters = super::dataset::list_skill_characters(&ctx)?;
     let characters: Vec<String> = match &character {
         Some(filter) => {
             let filter = filter.to_lowercase();

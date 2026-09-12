@@ -24,7 +24,7 @@ dst-huiji-wiki/
 │   ├── wiki/                # MediaWiki API client
 │   ├── copyclip/            # Wiki module content updater (marker-based replacement)
 │   ├── scripts_sync/        # scripts.zip 同步:版本检测→归档旧树→解压新树 (update_scripts.py 移植)
-│   ├── context.rs           # DstContext (zip archive, wiki client, env setup)
+│   ├── context.rs           # DstContext (组合 GameSource + wiki client + env setup)
 │   ├── error.rs             # Error enum (thiserror) + Result<T>
 │   └── utils.rs             # diff_lines utility
 ├── examples/                # Test data files (.po, .lua, .json) + login.py
@@ -60,7 +60,7 @@ dst-huiji-wiki/
 
 | Symbol | Type | Location | Role |
 |--------|------|----------|------|
-| `DstContext` | Struct | src/context.rs | App context: zip archive, wiki client, env vars |
+| `DstContext` | Struct | src/context.rs | App context: `GameSource`（snapshot→live→zip）+ wiki client + env |
 | `JobKind` / `JobSpec` | Enum / 静态表 | src/service/kind.rs + src/service/job_spec.rs | 作业参数变体 + canonical name/wiki_access/resources/params 声明源 |
 | `WikiWriter` | Struct | src/service/wiki_write.rs | 写站流程唯一实现（diff/确认/decide_write/basetimestamp） |
 | `platform::*` | Module | src/platform/ | progress（Reporter/WriteMode）、config（env 路径集中）、fs（原子写）、game_source（snapshot→live→zip） |
@@ -102,7 +102,7 @@ dst-huiji-wiki/
 - `WikiMapper` trait: declarative mapping via `FieldMapping` enum (Direct/Transformed/Computed/Constant/Default/Ignored) + `MergeStrategy` (Overwrite/PreserveHistory/Merge/Custom)
 - `mapping::converter`: diff/merge 按【字段名】在两侧 schema 各自定位并对齐（不依赖字段下标/位置）；`compare_data`/`merge_new_records` 必须显式传入 `T::key_field()`
 - `CopyClipProcessor`: marker-based content replacement (`--BEGIN/--END`) in wiki Lua modules
-- `DstContext`: lazily opens ZIP archives of game scripts, provides unified access to PO files and Lua sources
+- `DstContext`: composes `platform::game_source::GameSource` (唯一 snapshot→live→zip 读取语义) with the wiki client; provides PO/Lua access
 - `RecipeParser`: handles Lua for-loops (numeric + generic/ipairs) to expand recipe definitions at parse time
 - `PrefabOverrideParser`: deep AST walking across function boundaries, tracks local variables and parameters to resolve prefab name overrides
 - `scripts_sync`: staging-first sync (extract to `incoming_<ts>` → rename live tree to snapshot → move staged tree in place, rollback on failure); timestamp collision degrades to a clear error + hint, no auto-suffix

@@ -1,10 +1,9 @@
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::models::PoFile;
 use crate::parser::PoParser;
+use crate::platform::game_source::GameSource;
 use crate::wiki::WikiClient;
-use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
-use zip::ZipArchive;
 
 /// A historical scripts snapshot discovered under `data/databundles/`.
 #[derive(Debug, Clone, serde::Serialize)]
@@ -13,13 +12,17 @@ pub struct SnapshotInfo {
     pub name: String,
 }
 
+/// 游戏数据上下文：`GameSource`（snapshot→live→zip 唯一读取语义）+ wiki 客户端。
+///
+/// 读取一律委托 [`GameSource`]，不再自行缓存 `ZipArchive`——每作业读取次数
+/// 很少（≤5），重开 zip 的代价可忽略，换来的是全项目只有一处读取顺序定义。
 pub struct DstContext {
     pub version: String,
     pub dst_root: String,
     /// Optional extracted snapshot directory name (e.g. `scripts_202605291134`).
     /// When set, script files are read from that directory instead of `scripts.zip`.
     pub snapshot: Option<String>,
-    archive: Option<ZipArchive<BufReader<std::fs::File>>>,
+    source: GameSource,
     pub(crate) client: WikiClient,
 }
 
@@ -31,22 +34,10 @@ impl DstContext {
 
     /// Creates a context with an optional snapshot selection.
     pub fn new(dst_root: String, snapshot: Option<String>) -> Result<Self> {
-        let dst_path = Path::new(&dst_root);
-        if !dst_path.exists() {
-            return Err(Error::DstDirNotFound(dst_root.clone()));
-        }
+        // GameSource::new 校验 dst_root 存在、snapshot 目录存在。
+        let source = GameSource::new(PathBuf::from(&dst_root), snapshot.clone())?;
 
-        if let Some(name) = &snapshot {
-            let dir = Self::snapshot_dir(dst_path, name);
-            if !dir.exists() {
-                return Err(Error::Config(format!(
-                    "Snapshot directory does not exist: {}",
-                    dir.to_string_lossy()
-                )));
-            }
-        }
-
-        let version_file = dst_path.join("version.txt");
+        let version_file = Path::new(&dst_root).join("version.txt");
         let version = match std::fs::read_to_string(&version_file) {
             Ok(v) => v.trim().to_string(),
             Err(e) => {
@@ -55,24 +46,21 @@ impl DstContext {
             }
         };
 
-        let client = WikiClient::from_env()
-            .map_err(|e| Error::Config(format!("Failed to create wiki client: {}", e)))?;
+        let client = WikiClient::from_env().map_err(|e| {
+            crate::error::Error::Config(format!("Failed to create wiki client: {}", e))
+        })?;
 
         Ok(Self {
             version,
             dst_root,
             snapshot,
-            archive: None,
+            source,
             client,
         })
     }
 
     fn databundles_dir(dst_root: &Path) -> PathBuf {
         dst_root.join("data/databundles")
-    }
-
-    fn snapshot_dir(dst_root: &Path, name: &str) -> PathBuf {
-        Self::databundles_dir(dst_root).join(name)
     }
 
     /// Lists all extracted scripts snapshots (`scripts_<timestamp>` directories),
@@ -98,78 +86,23 @@ impl DstContext {
         result
     }
 
-    pub(crate) fn open_scripts_zip(&mut self) -> Result<&mut ZipArchive<BufReader<std::fs::File>>> {
-        if self.archive.is_none() {
-            let scripts_zip = Path::new(&self.dst_root).join("data/databundles/scripts.zip");
-            if !scripts_zip.exists() {
-                return Err(Error::DstDirNotFound(
-                    scripts_zip.to_string_lossy().to_string(),
-                ));
-            }
-
-            let file = std::fs::File::open(&scripts_zip)?;
-            let reader = BufReader::new(file);
-            let archive = ZipArchive::new(reader)?;
-
-            self.archive = Some(archive);
-        }
-
-        Ok(self
-            .archive
-            .as_mut()
-            .expect("archive was verified/initialized as Some above"))
-    }
-
-    pub fn read_zip_file(&mut self, path: &str) -> Result<String> {
-        let archive = self.open_scripts_zip()?;
-
-        let mut file = archive
-            .by_name(path)
-            .map_err(|e| Error::ArchiveFileNotFound(format!("{}: {}", path, e)))?;
-
-        let mut content = String::new();
-        file.read_to_string(&mut content)?;
-        Ok(content)
+    /// 底层游戏数据源（snapshot 严格 → live 解压树 → scripts.zip）。
+    pub fn game_source(&self) -> &GameSource {
+        &self.source
     }
 
     /// Reads a game script file, honouring the selected snapshot.
     ///
     /// `rel_path` is relative to the `scripts/` root (a leading `scripts/` is
-    /// tolerated). Resolution order:
-    /// 1. selected snapshot directory (if any)
+    /// tolerated). Resolution order is defined by [`GameSource`]:
+    /// 1. selected snapshot directory (strict, if any)
     /// 2. live extracted `data/databundles/scripts/` directory (if present)
     /// 3. `scripts.zip` archive
-    pub fn read_script_file(&mut self, rel_path: &str) -> Result<String> {
-        let rel = rel_path.strip_prefix("scripts/").unwrap_or(rel_path);
-
-        if let Some(snapshot) = &self.snapshot {
-            let path = Self::snapshot_dir(Path::new(&self.dst_root), snapshot).join(rel);
-            return std::fs::read_to_string(&path).map_err(|e| {
-                Error::Io(std::io::Error::other(format!(
-                    "read {}: {}",
-                    path.to_string_lossy(),
-                    e
-                )))
-            });
-        }
-
-        let live = Self::databundles_dir(Path::new(&self.dst_root))
-            .join("scripts")
-            .join(rel);
-        if live.exists() {
-            return std::fs::read_to_string(&live).map_err(|e| {
-                Error::Io(std::io::Error::other(format!(
-                    "read {}: {}",
-                    live.to_string_lossy(),
-                    e
-                )))
-            });
-        }
-
-        self.read_zip_file(&format!("scripts/{}", rel))
+    pub fn read_script_file(&self, rel_path: &str) -> Result<String> {
+        self.source.read(rel_path)
     }
 
-    pub fn parse_po_file(&mut self, path: &str) -> Result<PoFile> {
+    pub fn parse_po_file(&self, path: &str) -> Result<PoFile> {
         let content = self.read_script_file(path)?;
         PoParser::parse(&content)
     }

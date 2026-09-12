@@ -139,7 +139,7 @@ impl Dataset {
 
 /// Loads a [`Dataset`] from game files for the given snapshot (None = latest).
 fn load_dataset(snapshot: Option<String>) -> Result<Arc<Dataset>> {
-    let mut ctx = crate::DstContext::new(
+    let ctx = crate::DstContext::new(
         crate::platform::config::dst_root_opt()
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default(),
@@ -201,7 +201,7 @@ fn load_dataset(snapshot: Option<String>) -> Result<Arc<Dataset>> {
     po_categories.sort_by_key(|c| std::cmp::Reverse(c.total));
 
     // --- skill tree characters ---
-    let skill_characters = list_skill_characters(&mut ctx)?;
+    let skill_characters = list_skill_characters(&ctx)?;
 
     // --- tuning constants ---
     let tuning_src = ctx
@@ -237,58 +237,17 @@ fn load_dataset(snapshot: Option<String>) -> Result<Arc<Dataset>> {
 }
 
 /// Lists available skill tree characters from the prefabs directory.
-pub fn list_skill_characters(ctx: &mut crate::DstContext) -> Result<Vec<String>> {
-    // Snapshot mode: scan the directory directly.
-    if let Some(snapshot) = &ctx.snapshot {
-        let dir = std::path::Path::new(&ctx.dst_root)
-            .join("data/databundles")
-            .join(snapshot)
-            .join("prefabs");
-        let mut chars = Vec::new();
-        if let Ok(entries) = std::fs::read_dir(&dir) {
-            for e in entries.flatten() {
-                let name = e.file_name().to_string_lossy().to_string();
-                if let Some(rest) = name.strip_prefix("skilltree_") {
-                    if let Some(char_name) = rest.strip_suffix(".lua") {
-                        if char_name != "defs" {
-                            chars.push(char_name.to_string());
-                        }
-                    }
-                }
-            }
-        }
-        chars.sort();
-        return Ok(chars);
-    }
-
-    // Zip mode: iterate archive entries.
-    let archive = ctx.open_scripts_zip()?;
-    let mut chars = Vec::new();
-    for i in 0..archive.len() {
-        let file = archive.by_index(i)?;
-        let name = file.name().to_string();
-        if let Some(rest) = name.strip_prefix("scripts/prefabs/skilltree_") {
-            if let Some(char_name) = rest.strip_suffix(".lua") {
-                if char_name != "defs" {
-                    chars.push(char_name.to_string());
-                }
-            }
-        }
-    }
-    chars.sort();
-    chars.dedup();
-    Ok(chars)
+///
+/// Uses the context's [`crate::platform::game_source::GameSource`], so
+/// snapshot → live → `scripts.zip` resolution matches every other read.
+pub fn list_skill_characters(ctx: &crate::DstContext) -> Result<Vec<String>> {
+    Ok(skilltree_chars_from_entries(
+        ctx.game_source().list_dir("prefabs")?,
+    ))
 }
 
-/// Lists available skill tree characters from local extracted scripts only.
-///
-/// Unlike [`list_skill_characters`], this does not construct a wiki client,
-/// so it can be used by local-only export jobs that should not require
-/// `HUIJI__*` credentials.
-pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>> {
-    let entries = crate::platform::game_source::GameSource::from_env(snapshot.map(str::to_string))?
-        .list_dir("prefabs")?;
-
+/// `prefabs/` 直接子项 → `skilltree_<char>.lua` 角色名（去重排序）。
+fn skilltree_chars_from_entries(entries: Vec<String>) -> Vec<String> {
     let mut chars = Vec::new();
     for name in entries {
         if let Some(rest) = name.strip_prefix("skilltree_") {
@@ -301,7 +260,18 @@ pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>
     }
     chars.sort();
     chars.dedup();
-    Ok(chars)
+    chars
+}
+
+/// Lists available skill tree characters from local extracted scripts only.
+///
+/// Unlike [`list_skill_characters`], this does not construct a wiki client,
+/// so it can be used by local-only export jobs that should not require
+/// `HUIJI__*` credentials.
+pub fn list_skill_characters_local(snapshot: Option<&str>) -> Result<Vec<String>> {
+    let entries = crate::platform::game_source::GameSource::from_env(snapshot.map(str::to_string))?
+        .list_dir("prefabs")?;
+    Ok(skilltree_chars_from_entries(entries))
 }
 
 fn count_tuning_keys(source: &str) -> usize {

@@ -817,13 +817,49 @@ pub async fn execute_job_with_mode(
     reporter.stage(&format!("{}（写入模式：{}）", kind.name(), mode.name()));
     // `Instrument` instead of `enter()`: an EnteredSpan is !Send and would
     // make this future unusable with tokio::spawn (WebUI job manager).
-    execute_job_inner(kind, reporter, mode)
+    let inner = execute_job_inner(kind, reporter, mode)
         .instrument(tracing::info_span!(
             "job",
             job = kind.name(),
             write_mode = mode.name()
         ))
-        .await
+        .await?;
+    Ok(wrap_report(kind.name(), inner))
+}
+
+/// 报告外壳（report schema v1，一步到位新结构）：
+///
+/// ```json
+/// {
+///   "report_schema_version": 1,
+///   "kind": "skilltree-wiki",
+///   "status": "success",          // 内层数据带字符串 status 时上提，否则 "success"
+///   "summary": {...},             // 可选：内层带 "summary" 键时上提
+///   "artifacts": [...],           // 可选：内层带 "artifacts" 键时上提
+///   "details": { ...原自由字段... } // 内层原样保留（含 status 原位置）
+/// }
+/// ```
+///
+/// 上层自动化只依赖外壳四键；作业各自的字段演进都收敛在 `details` 内。
+pub fn wrap_report(kind: &str, inner: serde_json::Value) -> serde_json::Value {
+    use serde_json::Value;
+    let status = inner
+        .get("status")
+        .and_then(Value::as_str)
+        .unwrap_or("success")
+        .to_string();
+    let mut shell = serde_json::Map::new();
+    shell.insert("report_schema_version".into(), serde_json::json!(1));
+    shell.insert("kind".into(), serde_json::json!(kind));
+    shell.insert("status".into(), serde_json::json!(status));
+    if let Some(summary) = inner.get("summary") {
+        shell.insert("summary".into(), summary.clone());
+    }
+    if let Some(artifacts) = inner.get("artifacts") {
+        shell.insert("artifacts".into(), artifacts.clone());
+    }
+    shell.insert("details".into(), inner);
+    serde_json::Value::Object(shell)
 }
 
 async fn execute_job_inner(
@@ -3004,6 +3040,33 @@ mod tests {
                 "前端 JOB_DEFS 键 `{k}` 不是合法的 JobKind serde tag"
             );
         }
+    }
+
+    /// 契约：report schema v1 外壳——kind/status 外提、可选 summary/
+    /// artifacts 上提、details 原样保留内层全部字段。
+    #[test]
+    fn contract_report_shell_v1() {
+        let shell = wrap_report(
+            "scripts-sync",
+            serde_json::json!({
+                "status": "up_to_date",
+                "version": "123",
+                "summary": { "pages": 3 },
+                "artifacts": ["a.json"],
+            }),
+        );
+        assert_eq!(shell["report_schema_version"], 1);
+        assert_eq!(shell["kind"], "scripts-sync");
+        assert_eq!(shell["status"], "up_to_date");
+        assert_eq!(shell["summary"]["pages"], 3);
+        assert_eq!(shell["artifacts"][0], "a.json");
+        assert_eq!(shell["details"]["version"], "123");
+        assert_eq!(shell["details"]["status"], "up_to_date");
+
+        let shell = wrap_report("parse-po", serde_json::json!({ "records": 5 }));
+        assert_eq!(shell["status"], "success");
+        assert!(shell.get("summary").is_none());
+        assert_eq!(shell["details"]["records"], 5);
     }
 
     #[test]

@@ -438,7 +438,7 @@ async function pageJobDetail(main, id) {
     </div>
     ${h.error ? `<p style="color:var(--err)">错误：${esc(h.error)}</p>` : ""}
     ${h.result && h.result.status === "rollback_skipped"
-      ? `<p style="color:var(--warn)">检测到版本回退（${esc(h.result.build || h.result.label)} < 已记录 ${esc(h.result.recorded_build || h.result.recorded_label)}）：本次未执行任何操作，未写入任何文件。</p>`
+      ? `<p style="color:var(--warn)">检测到版本回退（${esc(h.result.details?.build || h.result.details?.label)} < 已记录 ${esc(h.result.details?.recorded_build || h.result.details?.recorded_label)}）：本次未执行任何操作，未写入任何文件。</p>`
       : ""}
     <details><summary class="muted">任务参数</summary><pre>${esc(JSON.stringify(h.params, null, 2))}</pre></details>
     ${h.result ? `<details open><summary>执行结果</summary><pre>${esc(JSON.stringify(h.result, null, 2))}</pre></details>` : ""}`;

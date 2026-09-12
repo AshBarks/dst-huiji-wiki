@@ -954,13 +954,17 @@ pub async fn run(top: TopCommand) -> Result<()> {
                     .duration_since(UNIX_EPOCH)
                     .map(|d| d.as_millis() as u64)
                     .unwrap_or(0);
-                let report = serde_json::json!({
-                    "generated_at_ms": now_ms,
-                    "job": inv.kind.name(),
-                    "params": serde_json::to_value(&inv.kind).unwrap_or_default(),
-                    "write_mode": inv.mode.name(),
-                    "result": result,
-                });
+                // result 已是 report schema v1 外壳（wrap_report），
+                // 文件层再附加生成环境元数据。
+                let mut report = result;
+                if let Some(obj) = report.as_object_mut() {
+                    obj.insert("generated_at_ms".into(), serde_json::json!(now_ms));
+                    obj.insert(
+                        "params".into(),
+                        serde_json::to_value(&inv.kind).unwrap_or_default(),
+                    );
+                    obj.insert("write_mode".into(), serde_json::json!(inv.mode.name()));
+                }
                 dst_huiji_wiki::platform::fs::write_json_atomic(&path, &report)?;
                 println!("报告已写入 {:?}", path);
             }

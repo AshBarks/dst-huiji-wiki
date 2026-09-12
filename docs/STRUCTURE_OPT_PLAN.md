@@ -79,3 +79,31 @@
   - `update::SnapshotStore`（显式双目录 diff）保持独立，不属于同一语义域；
   - upload-image/upload-icons 只复用了 `decide_write`/确认策略，multipart 上传未纳入 WikiWriter；
   - JobSpec 参数校验（非法 type/source 早失败）尚未接入执行路径，仅完成 schema 声明与测试。
+
+## 进度台账（P2）
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P2.0 | 拆分映射盘点 | ✅ | — |
+| P2.1-2.3 | service/mod.rs 拆分：`service/kind.rs`（JobKind 枚举+派生）、`update/jobs.rs`（update_scan/update_index/symbol_annotate 下沉）、`service/map_jobs.rs`、`service/maintain_jobs.rs`（ItemTable/DstRecipes/CopyClip 核心）、`service/output.rs`（WriteCtx + output helpers）；mod.rs 3390→954 行（余 ~450 行测试） | ✅ | 46494ca |
+| P2.4 | web/api_data.rs → 目录模块 dataset/icons/assets/anim（mod.rs 只留 re-export 与共享 helper，路由注册不变）；1633→72+378+299+156+779 | ✅ | 2ea9be8 |
+| P2.5 | SSE seq 游标：`since` 参数语义改为事件单调序号，replay/live 两侧统一 `seq > since` 过滤（修订阅-快照竞态重复）；Lagged 时发 `{"type":"resync"}`，前端重拉全量日志（修 Done 丢失流不终止） | ✅ | e70743e |
+| P2.6 | JobManager 调度器评估：**取消语义维持现状**（P0 已禁硬取消+资源锁；不做协作式取消，收益/成本不划算——已拍板）。资源锁即调度器，P0 完成 | ✅ | — |
+| P2.7 | AGENTS.md 结构同步 | ✅ | （本提交） |
+
+### P2 收尾状态（2026-09-12）
+
+- `cargo test`：639 lib + 21 bin 全绿；fmt/clippy 干净；全程未做线上 wiki 写。
+- `DstContext` 与 GameSource 并存现状保留（语义均正确，重复度可控），未强行统一；
+  JobSpec 参数校验仍未接入执行路径 → 列入 P3 待办。
+
+## 进度台账（P3，待启动）
+
+| 项 | 说明 |
+|---|---|
+| P3.1 mapping 框架 | diff/merge 改按 `field_name → value` 对齐（key 用 `T::key_field()`）；schema 演进测试；MappingBuilder 删除或迁移（待拍板） |
+| P3.2 anim/index.rs 拆分 | 2112 行按 manifest/diff/index/remap 职责切分 |
+| P3.3 前端 ES modules | app.js 2724 行拆 api/jobs/pages/*，无打包器，服务端多 serve 静态文件（拆分方式待拍板） |
+| P3.4 技能树渲染单一源 | skilltree_widget.js 与 app.js 技能树部分收敛（wiki 端无 ESM，需拼接方案，待拍板） |
+| P3.5 parser 大文件（可选） | prefab_override 单遍历器重构（风险高，先差分测试）、skilltree.rs 拆分 |
+| P3.6 JobSpec 参数校验接入 | 非法 type/source/路径在执行前报错 |

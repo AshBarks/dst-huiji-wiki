@@ -172,7 +172,7 @@ pub async fn run(args: Commands) -> Result<()> {
             report_json,
         } => {
             execute(
-                JobKind::SkillTreeWiki {
+                JobKind::SkilltreeWiki {
                     character,
                     output: opt_path_to_string(&output)?,
                     snapshot,
@@ -189,7 +189,7 @@ pub async fn run(args: Commands) -> Result<()> {
             report_json,
         } => {
             execute(
-                JobKind::SkillTreeExport {
+                JobKind::SkilltreeExport {
                     character,
                     output: opt_path_to_string(&output)?,
                     snapshot,
@@ -430,7 +430,7 @@ pub async fn run(args: Commands) -> Result<()> {
                 WriteMode::AutoConfirm
             };
             execute(
-                JobKind::CorpusSync {
+                JobKind::CorpusFetch {
                     full,
                     dir: opt_path_to_string(&dir)?,
                     rc,

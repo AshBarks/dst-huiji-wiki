@@ -164,7 +164,7 @@ pub enum JobKind {
     /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
     /// defs JSON（保留页内 metainfo 与 icon_url；`output` 同时写出
     /// Skilltree.js 渲染器与图片清单）。`character` 为子串过滤。
-    SkillTreeWiki {
+    SkilltreeWiki {
         #[serde(default)]
         character: Option<String>,
         #[serde(default)]
@@ -173,7 +173,7 @@ pub enum JobKind {
         snapshot: Option<String>,
     },
     /// 把技能树数据导出为本地 JSON 文件；纯本地，不访问维基。
-    SkillTreeExport {
+    SkilltreeExport {
         #[serde(default)]
         character: Option<String>,
         #[serde(default)]
@@ -345,7 +345,7 @@ pub enum JobKind {
         #[serde(default)]
         out: Option<String>,
     },
-    CorpusSync {
+    CorpusFetch {
         #[serde(default)]
         full: bool,
         #[serde(default)]
@@ -561,11 +561,11 @@ impl JobKind {
             JobKind::MapRecipes { .. } => "map-recipes",
             JobKind::MaintainItemTable { .. } => "maintain-item-table",
             JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
-            JobKind::MaintainCopyClip { .. } => "maintain-copyclip",
+            JobKind::MaintainCopyClip { .. } => "maintain-copy-clip",
             JobKind::MaintainTemplateCheck { .. } => "maintain-template-check",
             JobKind::MaintainStrings { .. } => "maintain-strings",
-            JobKind::SkillTreeWiki { .. } => "skilltree-wiki",
-            JobKind::SkillTreeExport { .. } => "skilltree-export",
+            JobKind::SkilltreeWiki { .. } => "skilltree-wiki",
+            JobKind::SkilltreeExport { .. } => "skilltree-export",
             JobKind::UploadImage { .. } => "upload-image",
             JobKind::UploadIcons { .. } => "upload-icons",
             JobKind::PrefabOverrides { .. } => "prefab-overrides",
@@ -578,7 +578,7 @@ impl JobKind {
             JobKind::AnimDiff { .. } => "anim-diff",
             JobKind::AnimIndex { .. } => "anim-index",
             JobKind::SkinIndex { .. } => "skin-index",
-            JobKind::CorpusSync { .. } => "corpus-sync",
+            JobKind::CorpusFetch { .. } => "corpus-fetch",
             JobKind::CorpusIndex { .. } => "corpus-index",
             JobKind::UpdateIndex { .. } => "update-index",
             JobKind::UpdateScan { .. } => "update-scan",
@@ -600,10 +600,225 @@ impl JobKind {
                 | JobKind::MaintainCopyClip { .. }
                 | JobKind::MaintainStrings { .. }
                 | JobKind::MaintainWikitext { .. }
-                | JobKind::SkillTreeWiki { .. }
+                | JobKind::SkilltreeWiki { .. }
                 | JobKind::UploadImage { .. }
                 | JobKind::UploadIcons { .. }
         )
+    }
+
+    /// 每个变体一个最小实例（字段取占位值），供契约测试与文档枚举。
+    ///
+    /// 契约（`service::tests` 与 `commands::tests` 各自强制）：
+    /// - `name()` 在全集中唯一，且 == serde tag 的 kebab 形式；
+    /// - CLI 子命令名集合（除 `serve`）== `name()` 集合；
+    /// - 前端 `JOB_DEFS` 的键 ⊆ serde tag 集合。
+    pub fn all_variants() -> Vec<JobKind> {
+        vec![
+            JobKind::ParsePo {
+                input: String::new(),
+                output: None,
+                category: None,
+            },
+            JobKind::MapNames {
+                input: String::new(),
+                output: None,
+                compare: None,
+                merge: false,
+                version: None,
+            },
+            JobKind::MapRecipes {
+                input: String::new(),
+                output: None,
+                compare: None,
+                merge: false,
+                po_file: None,
+                version: None,
+            },
+            JobKind::MaintainItemTable {
+                output: None,
+                snapshot: None,
+            },
+            JobKind::MaintainDstRecipes {
+                output: None,
+                snapshot: None,
+            },
+            JobKind::MaintainCopyClip {
+                r#type: None,
+                output: None,
+                snapshot: None,
+            },
+            JobKind::MaintainTemplateCheck {
+                output: None,
+                snapshot: None,
+                skip_icon_status: false,
+            },
+            JobKind::MaintainStrings {
+                version: default_strings_version(),
+                snapshot: None,
+                output: None,
+                offline: false,
+                bucket_count: default_strings_buckets(),
+                rebalance: false,
+                limit: 0,
+            },
+            JobKind::SkilltreeWiki {
+                character: None,
+                output: None,
+                snapshot: None,
+            },
+            JobKind::SkilltreeExport {
+                character: None,
+                output: None,
+                snapshot: None,
+            },
+            JobKind::UploadImage {
+                path: String::new(),
+                name: None,
+                description: None,
+                comment: None,
+                ignore_warnings: false,
+            },
+            JobKind::PrefabOverrides {
+                input: String::new(),
+                output: None,
+            },
+            JobKind::PrefabOverridesDir {
+                input: None,
+                output: None,
+            },
+            JobKind::PrefabOverridesAudit {
+                scripts: None,
+                wiki_file: None,
+                output: None,
+            },
+            JobKind::MaintainPrefabOverrides {
+                scripts: None,
+                wiki_file: None,
+                output: None,
+            },
+            JobKind::ScriptsSync {
+                force: false,
+                dry_run: true,
+                state_path: None,
+            },
+            JobKind::ImagesSync {
+                force: false,
+                dry_run: true,
+                skip_wiki_status: true,
+            },
+            JobKind::UploadIcons {
+                build: None,
+                source: None,
+                file: None,
+                title: None,
+                only_missing: false,
+                ignore_warnings: false,
+                comment: None,
+            },
+            JobKind::AnimSync {
+                force: false,
+                dry_run: true,
+                label: None,
+                out: None,
+            },
+            JobKind::AnimDiff {
+                old: String::new(),
+                new: String::new(),
+                zip: None,
+            },
+            JobKind::AnimIndex {
+                scripts: String::new(),
+                anim: None,
+                out: None,
+            },
+            JobKind::SkinIndex {
+                scripts: None,
+                anim: None,
+                out: None,
+            },
+            JobKind::UpdateScan {
+                old: String::new(),
+                new: String::new(),
+                out: None,
+                corpus: None,
+                annotate: None,
+            },
+            JobKind::UpdateIndex {
+                root: String::new(),
+                out: None,
+            },
+            JobKind::CorpusFetch {
+                full: false,
+                dir: None,
+                rc: false,
+            },
+            JobKind::CorpusIndex {
+                dir: None,
+                join: None,
+            },
+            JobKind::SymbolAnnotate {
+                root: String::new(),
+                corpus: String::new(),
+                limit: default_symbol_limit(),
+                out: None,
+                verdicts: None,
+                llm: false,
+                batch_pages: default_symbol_batch_pages(),
+                batch_max_chars: default_symbol_batch_max_chars(),
+                skip_no_fact_pages: false,
+            },
+            JobKind::KnowledgeScanSymbols {
+                root: String::new(),
+                category: default_symbol_category(),
+                knowledge_dir: default_knowledge_dir(),
+                corpus: None,
+                sample_pages: default_sample_pages(),
+                limit: default_symbol_limit(),
+                force: false,
+                concurrency: default_concurrency(),
+                pass2_names: None,
+                pick_names: None,
+                refresh_auto: false,
+                confirm_empty: false,
+            },
+            JobKind::PageAssist {
+                knowledge_dir: default_knowledge_dir(),
+                page: None,
+                all: false,
+                json: false,
+                attribute: false,
+                corpus: None,
+            },
+            JobKind::KnowledgeSync {
+                old: String::new(),
+                new: default_sync_new(),
+                knowledge_dir: default_knowledge_dir(),
+                rescan: false,
+                limit: default_sync_limit(),
+                corpus: None,
+                draft: false,
+                review: None,
+            },
+            JobKind::KnowledgeScanWiki {
+                root: String::new(),
+                knowledge_dir: default_knowledge_dir(),
+                corpus: String::new(),
+                audit: false,
+                audit_symbols: None,
+                audit_max_pages: default_audit_max_pages(),
+                audit_batch_pages: default_audit_batch_pages(),
+                audit_batch_max_chars: default_audit_batch_max_chars(),
+                report: false,
+                classify: false,
+            },
+            JobKind::MaintainWikitext {
+                pages: Vec::new(),
+                template: String::new(),
+                set: Vec::new(),
+                remove: Vec::new(),
+                output: None,
+            },
+        ]
     }
 }
 
@@ -805,7 +1020,7 @@ async fn execute_job_inner(
             )
             .await
         }
-        JobKind::SkillTreeWiki {
+        JobKind::SkilltreeWiki {
             character,
             output,
             snapshot,
@@ -819,7 +1034,7 @@ async fn execute_job_inner(
             )
             .await
         }
-        JobKind::SkillTreeExport {
+        JobKind::SkilltreeExport {
             character,
             output,
             snapshot,
@@ -905,8 +1120,8 @@ async fn execute_job_inner(
         JobKind::SkinIndex { scripts, anim, out } => {
             run_skin_index(scripts.as_deref(), opt_path(anim), opt_path(out), reporter)
         }
-        JobKind::CorpusSync { full, dir, rc } => {
-            run_corpus_sync(*full, *rc, dir.as_deref(), reporter, mode).await
+        JobKind::CorpusFetch { full, dir, rc } => {
+            run_corpus_fetch(*full, *rc, dir.as_deref(), reporter, mode).await
         }
         JobKind::CorpusIndex { dir, join } => {
             run_corpus_index(dir.as_deref(), join.as_deref(), reporter, mode).await
@@ -1971,7 +2186,7 @@ fn run_skin_index(
     )
 }
 
-async fn run_corpus_sync(
+async fn run_corpus_fetch(
     full: bool,
     rc: bool,
     dir: Option<&str>,
@@ -2810,6 +3025,109 @@ mod tests {
                 assert!(snapshot.is_none());
             }
             _ => panic!("wrong variant"),
+        }
+    }
+
+    /// 契约：`name()` 全集唯一，且与 serde tag 一一对应（kebab ↔ snake）。
+    /// 防止再加变体时 CLI/JobKind/serde 三处名称继续漂移。
+    #[test]
+    fn contract_job_names_unique_and_aligned_with_serde_tags() {
+        let jobs = JobKind::all_variants();
+        assert_eq!(
+            jobs.len(),
+            32,
+            "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
+        );
+        let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();
+        names.sort_unstable();
+        let count = names.len();
+        names.dedup();
+        assert_eq!(names.len(), count, "JobKind::name() 存在重复：{names:?}");
+        for j in &jobs {
+            let tag = serde_json::to_value(j).unwrap()["kind"]
+                .as_str()
+                .unwrap()
+                .to_string();
+            assert_eq!(
+                tag,
+                j.name().replace('-', "_"),
+                "serde tag `{tag}` 与 name() `{}` 不一致",
+                j.name()
+            );
+        }
+    }
+
+    /// 契约：`touches_wiki()` 的集合固定为已知可写 job；新增可写变体必须
+    /// 显式更新本测试（并同步前端 JOB_DEFS 的 wiki 标记与确认流程）。
+    #[test]
+    fn contract_touches_wiki_is_the_expected_set() {
+        let expected: std::collections::BTreeSet<&str> = [
+            "maintain-item-table",
+            "maintain-dst-recipes",
+            "maintain-copy-clip",
+            "maintain-strings",
+            "maintain-wikitext",
+            "skilltree-wiki",
+            "upload-image",
+            "upload-icons",
+        ]
+        .into_iter()
+        .collect();
+        let actual: std::collections::BTreeSet<&str> = JobKind::all_variants()
+            .iter()
+            .filter(|j| j.touches_wiki())
+            .map(|j| j.name())
+            .collect();
+        assert_eq!(actual, expected, "touches_wiki 集合漂移");
+    }
+
+    /// 契约：前端 JOB_DEFS 的键必须是合法的 JobKind serde tag，
+    /// 保证 WebUI 提交的每个任务都能被 `/api/jobs` 反序列化。
+    #[test]
+    fn contract_frontend_job_defs_keys_are_valid_serde_tags() {
+        const APP_JS: &str = include_str!("../web/assets/app.js");
+        let start = APP_JS
+            .find("const JOB_DEFS = {")
+            .expect("app.js 缺少 JOB_DEFS 定义");
+        let block_end = start + APP_JS[start..].find("\n};").expect("JOB_DEFS 块未闭合");
+        let block = &APP_JS[start..block_end];
+
+        let tags: std::collections::BTreeSet<String> = JobKind::all_variants()
+            .iter()
+            .map(|j| {
+                serde_json::to_value(j).unwrap()["kind"]
+                    .as_str()
+                    .unwrap()
+                    .to_string()
+            })
+            .collect();
+
+        let mut keys = Vec::new();
+        for line in block.lines() {
+            let Some(rest) = line.strip_prefix("  ") else {
+                continue;
+            };
+            if rest.starts_with(' ') {
+                continue; // 嵌套字段行
+            }
+            let Some(idx) = rest.find(": {") else {
+                continue;
+            };
+            let key = &rest[..idx];
+            if !key.is_empty()
+                && key
+                    .chars()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+            {
+                keys.push(key.to_string());
+            }
+        }
+        assert!(!keys.is_empty(), "未能从 app.js 解析出 JOB_DEFS 键");
+        for k in keys {
+            assert!(
+                tags.contains(&k),
+                "前端 JOB_DEFS 键 `{k}` 不是合法的 JobKind serde tag"
+            );
         }
     }
 

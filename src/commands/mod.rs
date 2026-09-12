@@ -664,6 +664,41 @@ impl Commands {
 mod tests {
     use super::*;
 
+    /// 契约：CLI 子命令名集合（除纯 WebUI 的 `serve`）与
+    /// `JobKind::name()` 集合完全一致。加 CLI 命令必须同步加 JobKind，
+    /// 反之亦然；命名以 CLI 为准（`name()` 跟随）。
+    #[test]
+    fn contract_cli_names_match_job_kind_names() {
+        use clap::CommandFactory;
+        use dst_huiji_wiki::service::JobKind;
+
+        let cmd = Args::command();
+        let cli: std::collections::BTreeSet<String> = cmd
+            .get_subcommands()
+            .map(|s| s.get_name().to_string())
+            .collect();
+        assert!(cli.contains("serve"), "serve 子命令缺失，契约测试基准失效");
+
+        let jobs: std::collections::BTreeSet<String> = JobKind::all_variants()
+            .iter()
+            .map(|k| k.name().to_string())
+            .collect();
+
+        let cli_no_serve: std::collections::BTreeSet<String> = cli
+            .iter()
+            .filter(|n| n.as_str() != "serve")
+            .cloned()
+            .collect();
+        let mut diff = String::new();
+        for n in cli_no_serve.difference(&jobs) {
+            diff.push_str(&format!("\n  CLI 独有: {n}"));
+        }
+        for n in jobs.difference(&cli_no_serve) {
+            diff.push_str(&format!("\n  JobKind 独有: {n}"));
+        }
+        assert!(diff.is_empty(), "CLI 命令名与 JobKind::name() 漂移：{diff}");
+    }
+
     #[test]
     fn test_parse_po_command() {
         let args = Args::try_parse_from(["dst-huiji-wiki", "parse-po", "-i", "test.po"]);

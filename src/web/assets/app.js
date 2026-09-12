@@ -208,14 +208,14 @@ const JOB_DEFS = {
       { k: "skip_icon_status", type: "check", label: "跳过 live 图标存在性查询（只用本地 icon_meta）" },
     ],
   },
-  skill_tree_wiki: {
+  skilltree_wiki: {
     label: "维护技能树子页面 → 维基", wiki: true,
     fields: [
       { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
       { k: "output", label: "产物目录（可选，写 <Char>.lua 文件）" },
     ],
   },
-  skill_tree_export: {
+  skilltree_export: {
     label: "技能树数据导出到本地",
     fields: [
       { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },

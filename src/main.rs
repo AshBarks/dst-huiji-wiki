@@ -1,7 +1,6 @@
 mod commands;
 mod web;
 
-use clap::Parser;
 use tracing::Instrument;
 
 #[tokio::main]
@@ -10,13 +9,24 @@ async fn main() {
     dotenvy::dotenv().ok();
     tracing_subscriber::fmt::init();
 
-    let args = commands::Args::parse();
     let run_id = uuid::Uuid::new_v4();
-    let command_name = args.command.name();
+
+    // clap 在参数错误/--help 时自行退出；构造错误（非 UTF-8 路径等）在此兜底。
+    let top = match commands::parse() {
+        Ok(top) => top,
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            std::process::exit(2);
+        }
+    };
+    let command_name = match &top {
+        commands::TopCommand::Serve { .. } => "serve",
+        commands::TopCommand::Job(inv) => inv.kind.name(),
+    };
 
     // Every log line inside carries the run id + command for correlation.
     async {
-        if let Err(e) = commands::run(args.command).await {
+        if let Err(e) = commands::run(top).await {
             tracing::error!(error = %e, "command failed");
             eprintln!("Error: {}", e);
             std::process::exit(1);

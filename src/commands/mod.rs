@@ -1,1593 +1,1244 @@
-mod maintain;
+//! CLI：子命令与参数从 [`JOB_SPECS`]（JobSpec 注册表）+ 本模块的 CLI 视角
+//! 元数据生成（clap builder）。
+//!
+//! 分工：
+//! - `service::job_spec`：数据模型层——参数键/类型/默认值/必填（Web JSON
+//!   与 CLI 共用，契约测试对齐）；
+//! - 本模块 [`CLI_EXT`]：CLI 视角——定位参数、短旗标、旗标重命名/取反、
+//!   about 文案、`--yes/--dry-run/--report-json` 等跨切面旗标。
+//!
+//! 加新 Job：在 `job_spec.rs` 加一条 spec + 在 [`CLI_EXT`] 加一条 CLI 视角
+//! + 在 `job_from_matches` 加一个构造臂；三处由契约测试互相锁定。
 
-use clap::Parser;
+use clap::{Arg, ArgAction, Command};
+use dst_huiji_wiki::platform::progress::{ConfirmMode, StdoutReporter, WriteMode};
+use dst_huiji_wiki::service::job_spec::{ParamDefault, ParamKind, ParamSpec};
+use dst_huiji_wiki::service::{execute_job_with_mode, JobKind, JOB_SPECS};
+use dst_huiji_wiki::Result;
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 
-pub use maintain::run;
+// ---------------------------------------------------------------------------
+// CLI 视角元数据
+// ---------------------------------------------------------------------------
 
-#[derive(Parser, Debug)]
-#[command(name = "dst-huiji-wiki")]
-#[command(about = "饥荒联机版维基维护工具", long_about = None)]
-pub struct Args {
-    #[command(subcommand)]
-    pub command: Commands,
+/// 旗标特例：CLI 长旗标名与 spec 参数键不同，或取反写入。
+struct FlagRename {
+    key: &'static str,
+    long: &'static str,
+    /// CLI 旗标为 true 时向参数写入取反值（`--include-existing` →
+    /// `only_missing = false`）。
+    invert: bool,
 }
 
-#[derive(Parser, Debug, PartialEq)]
-pub enum Commands {
-    ParsePo {
-        #[arg(short, long)]
-        input: PathBuf,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        #[arg(short, long)]
-        category: Option<String>,
-    },
-    MapNames {
-        #[arg(short, long)]
-        input: PathBuf,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        #[arg(short, long)]
-        compare: Option<PathBuf>,
-        #[arg(short, long)]
-        merge: bool,
-        #[arg(short, long)]
-        version: Option<String>,
-    },
-    MapRecipes {
-        #[arg(short, long)]
-        input: PathBuf,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        #[arg(short, long)]
-        compare: Option<PathBuf>,
-        #[arg(short, long)]
-        merge: bool,
-        #[arg(long)]
-        po_file: Option<PathBuf>,
-        #[arg(short, long)]
-        version: Option<String>,
-    },
-    MaintainItemTable {
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    MaintainDSTRecipes {
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    MaintainCopyClip {
-        #[arg(short = 't', long)]
-        r#type: Option<String>,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 只读检查 模板:Tech/dst 与 模板:制作栏图标 对游戏数据的覆盖率
-    /// （可选把可粘贴片段写入 --output；不写维基）
-    #[command(name = "maintain-template-check")]
-    MaintainTemplateCheck {
-        /// 把可粘贴的补录片段写入该文件
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 使用指定 scripts 快照（默认当前 scripts 树）
-        #[arg(long)]
-        snapshot: Option<String>,
-        /// 跳过 live 图标存在性查询（只用 images-sync 的 icon_meta.json）
-        #[arg(long)]
-        skip_icon_status: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 解析游戏 strings.pot / chinese_s.po，生成 模块:<V> Strings CN/EN <NN>
-    /// 桶页与 Data:<V>_Strings_Index.json；逐桶语义对比后只写变化页，索引最后写
-    #[command(name = "maintain-strings")]
-    MaintainStrings {
-        /// 版本前缀（页面名与索引名），默认 DST
-        #[arg(long, default_value = "DST")]
-        version: String,
-        /// 使用指定 scripts 快照（默认当前 scripts 树）
-        #[arg(long)]
-        snapshot: Option<String>,
-        /// 本地产物输出目录（默认 output/strings/<VERSION>）
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 跳过现网对比（无维基流量）
-        #[arg(long)]
-        offline: bool,
-        /// 无现有索引时的等分桶数
-        #[arg(long, default_value_t = 100)]
-        bucket_count: usize,
-        /// 忽略现有索引边界，强制等量重切
-        #[arg(long)]
-        rebalance: bool,
-        /// Canary：最多写入 N 个桶页且不更新索引（0 = 不限制）
-        #[arg(long, default_value_t = 0)]
-        limit: usize,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只生成产物与对比，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的
-    /// defs JSON 并维护维基子页面（保留页内 metainfo/icon_url；--output 同时
-    /// 写出 Skilltree.js 渲染器与图片清单）
-    #[command(name = "skilltree-wiki")]
-    SkillTreeWiki {
-        /// 只处理名字包含该子串的角色（如 walter）
-        #[arg(short, long)]
-        character: Option<String>,
-        /// 同时把每个子页面内容与 Skilltree.js 写到该目录（<Char>.lua、Skilltree.js）
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 使用指定 scripts 快照（默认当前 scripts 树）
-        #[arg(long)]
-        snapshot: Option<String>,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只生成产物与 diff，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 把技能树数据导出为本地 JSON 文件（纯本地，不访问维基）
-    #[command(name = "skilltree-export")]
-    SkillTreeExport {
-        /// 只处理名字包含该子串的角色（如 walter）
-        #[arg(short, long)]
-        character: Option<String>,
-        /// 输出目录（默认 output/skilltree），每个角色写入 <角色>.json
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 使用指定 scripts 快照（默认当前 scripts 树）
-        #[arg(long)]
-        snapshot: Option<String>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 上传本地图片到维基（同名重传请加 --ignore-warnings；按 skilltree/
-    /// skilltree_icons/ inventoryimages/ 目录自动补分类描述）
-    #[command(name = "upload-image")]
-    UploadImage {
-        /// 本地图片路径
-        path: PathBuf,
-        /// 维基文件名（默认取路径文件名）
-        #[arg(long)]
-        name: Option<String>,
-        /// 文件描述 wikitext（默认按素材目录自动填分类）
-        #[arg(long)]
-        description: Option<String>,
-        /// 上传注释
-        #[arg(long)]
-        comment: Option<String>,
-        /// 忽略上传警告（同名重传时使用）
-        #[arg(long)]
-        ignore_warnings: bool,
-        /// 跳过确认，直接上传
-        #[arg(long)]
-        yes: bool,
-        /// 只报告将执行的操作，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    PrefabOverrides {
-        #[arg(short, long)]
-        input: PathBuf,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-    },
-    /// 扫描目录下全部 Lua 文件解析预制体重定向并合并（纯本地操作；
-    /// 目录缺省为 DST__ROOT/data/databundles/scripts/prefabs）
-    #[command(name = "prefab-overrides-dir")]
-    PrefabOverridesDir {
-        /// Lua 目录路径（缺省 DST__ROOT/data/databundles/scripts/prefabs）
-        #[arg(short, long)]
-        input: Option<PathBuf>,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-    },
-    /// 只读审计 模块:ItemTable/PrefabOverrides：线上条目 × 本地推导做
-    /// key/target 存在性验证，输出可推导/需人工补丁/可疑三张清单
-    #[command(name = "prefab-overrides-audit")]
-    PrefabOverridesAudit {
-        /// 游戏脚本根目录（缺省 DST__ROOT/data/databundles/scripts）
-        #[arg(long)]
-        scripts: Option<PathBuf>,
-        /// 线上页面原文文件（离线审计；缺省从维基拉取，只读）
-        #[arg(long)]
-        wiki_file: Option<PathBuf>,
-        /// 审计报告 JSON 输出路径
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-    },
-    /// 维护 模块:ItemTable/PrefabOverrides（只读 diff，不写维基）：本地推导
-    /// 与线上页面合并对比，产出更新/新增清单与本地页面文本
-    #[command(name = "maintain-prefab-overrides")]
-    MaintainPrefabOverrides {
-        /// 游戏脚本根目录（缺省 DST__ROOT/data/databundles/scripts）
-        #[arg(long)]
-        scripts: Option<PathBuf>,
-        /// 线上页面原文文件（离线对比；缺省从维基拉取，只读）
-        #[arg(long)]
-        wiki_file: Option<PathBuf>,
-        /// 产物目录：PrefabOverrides.lua + diff.json
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-    },
-    /// 同步更新后的游戏 scripts:归档旧树为快照、解压新 scripts.zip(纯本地操作)
-    ScriptsSync {
-        /// 忽略版本一致,强制同步
-        #[arg(long)]
-        force: bool,
-        /// 只报告将要执行的动作,不修改任何文件
-        #[arg(long)]
-        dry_run: bool,
-        /// 版本状态文件路径(默认 ./dst_version.txt)
-        #[arg(long)]
-        state: Option<PathBuf>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地图片操作),
-    /// 结束后刷新图标元数据并查询维基上传状态(可用 --skip-wiki-status 跳过)
-    ImagesSync {
-        /// 忽略增量与幂等检查,全量重跑
-        #[arg(long)]
-        force: bool,
-        /// 只盘点并报告计划,不写任何文件
-        #[arg(long)]
-        dry_run: bool,
-        /// 跳过维基上传状态查询（无凭据/离线时使用）
-        #[arg(long)]
-        skip_wiki_status: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 上传物品栏图标到维基（标题取映射表或 STRINGS.NAMES 英文名 + .png，
-    /// 描述 [[分类:物品栏图标]]；批量默认仅上传维基缺失的，需先运行
-    /// images-sync；--file + --title 手动指定站内文件名）
-    #[command(name = "upload-icons")]
-    UploadIcons {
-        /// 只上传首次加入该 build 的图标
-        #[arg(long)]
-        build: Option<String>,
-        /// 只上传指定来源的图标：inventory（物品栏）或 crafting（制作栏）
-        #[arg(long)]
-        source: Option<String>,
-        /// 只上传单个图标文件名（如 axe.png；优先于 --build）
-        #[arg(long)]
-        file: Option<String>,
-        /// 手动指定上传的 wiki 文件名（需配合 --file；会写入映射表）
-        #[arg(long)]
-        title: Option<String>,
-        /// 连同维基上已存在的图标一起上传（默认只上传缺失的）
-        #[arg(long)]
-        include_existing: bool,
-        /// 同名重传时忽略上传警告（ignorewarnings=1；按标题存在性自动启用）
-        #[arg(long)]
-        ignore_warnings: bool,
-        /// 上传注释
-        #[arg(long)]
-        comment: Option<String>,
-        /// 跳过确认，直接上传
-        #[arg(long)]
-        yes: bool,
-        /// 只报告将执行的操作，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 动画历史同步:更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR
-    AnimSync {
-        /// 忽略幂等检查,强制重新扫描/归档
-        #[arg(long)]
-        force: bool,
-        /// 只盘点并报告计划,不写任何文件
-        #[arg(long)]
-        dry_run: bool,
-        /// 版本标签(默认 DST__ROOT/version.txt)
-        #[arg(long)]
-        label: Option<String>,
-        /// 历史根目录(默认 $ANIM__OUT_DIR 或 output/anim)
-        #[arg(long)]
-        out: Option<PathBuf>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 对比两个动画目录的 zip/dyn 结构化 diff
-    AnimDiff {
-        /// 旧动画目录
-        old: PathBuf,
-        /// 新动画目录
-        new: PathBuf,
-        /// 只对比指定相对路径,如 dynamic/abigail_ice.dyn
-        #[arg(long)]
-        zip: Option<String>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 构建 prefab 与动画文件的关联索引（纯本地，不做皮肤关联）
-    AnimIndex {
-        /// 游戏脚本根目录（当前树或快照目录）
-        scripts: PathBuf,
-        /// 动画资源目录；缺省由 scripts 路径推导为 ../data/anim
-        #[arg(long)]
-        anim: Option<PathBuf>,
-        /// 输出 JSON 文件路径（默认 output/anim-index.json）
-        #[arg(short, long)]
-        out: Option<PathBuf>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 解析 skinprefabs.lua 生成 base_prefab → skins 皮肤索引（纯本地）
-    #[command(name = "skin-index")]
-    SkinIndex {
-        /// 游戏脚本根目录（当前树或快照目录）；缺省取 DST__ROOT/data/databundles/scripts
-        #[arg(long)]
-        scripts: Option<PathBuf>,
-        /// 动画资源目录；缺省由 scripts 路径推导为 ../data/anim
-        #[arg(long)]
-        anim: Option<PathBuf>,
-        /// 输出 JSON 文件路径（默认 output/skin-index.json）
-        #[arg(short, long)]
-        out: Option<PathBuf>,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）
-    CorpusFetch {
-        /// 忽略增量对账，全量重抓所有页面
-        #[arg(long)]
-        full: bool,
-        /// 语料根目录（默认 wikis）
-        #[arg(long)]
-        dir: Option<PathBuf>,
-        /// 只枚举与对账出报告，不写任何本地文件
-        #[arg(long)]
-        dry_run: bool,
-        /// recentchanges 增量通道(检查点缺失/过期自动回落枚举对账)
-        #[arg(long)]
-        rc: bool,
-    },
-    /// 快照差异 + 关联影响评估（M1，只读）：产出 impact.json 与 changes.patch
-    UpdateScan {
-        /// 旧快照（时间戳或目录名）
-        old: String,
-        /// 新快照（时间戳、目录名，或 "current" 表示当前 scripts 树）
-        new: String,
-        /// 输出目录（默认 output/scan/<old>_<new>/）
-        #[arg(short, long)]
-        out: Option<PathBuf>,
-        /// 语料 host 根目录（wikis/<host>/），提供时附加 Layer B 定级摘要
-        #[arg(long)]
-        corpus: Option<PathBuf>,
-        /// 输出 fn 标注骨架（prefabs 前 50 文件 + hound.lua）
-        #[arg(long)]
-        annotate: Option<PathBuf>,
-    },
-    /// 构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/
-    UpdateIndex {
-        /// 游戏脚本根目录（当前树或快照目录）
-        root: PathBuf,
-        /// 输出目录（默认 output/atlas/<build 号>/）
-        #[arg(short, long)]
-        out: Option<PathBuf>,
-    },
-    /// 从本地语料树重建派生索引（prefab 注册表等，纯本地操作）
-    CorpusIndex {
-        /// 语料根目录（默认 wikis，其下需恰好一个 host 树）
-        #[arg(long)]
-        dir: Option<PathBuf>,
-        /// 代码侧 index.json 路径：额外产出 join_report.json 校准报告
-        #[arg(long)]
-        join: Option<PathBuf>,
-        /// 只构建并报告统计，不写工件
-        #[arg(long)]
-        dry_run: bool,
-    },
-    /// Page→Symbol 标注 CLI：生成高引用 symbol 证据包和 Prompt，
-    /// 可选读取已有 LLM 输出并生成跨页一致性报告（纯本地，不写 wiki）
-    SymbolAnnotate {
-        /// 游戏脚本根目录（当前树或快照目录）
-        root: PathBuf,
-        /// 语料 host 根目录（wikis/<host>/）
-        #[arg(long)]
-        corpus: PathBuf,
-        /// 只处理引用量最高的前 N 个 symbol
-        #[arg(long, default_value_t = 20)]
-        limit: usize,
-        /// 输出目录（默认 output/symbol-annotate/）
-        #[arg(long)]
-        out: Option<PathBuf>,
-        /// 可选的 LLM/人工标注结果文件（JSON 数组或 SymbolAnnotationResponse）
-        #[arg(long)]
-        verdicts: Option<PathBuf>,
-        /// 配置了 LLM__API_KEY 时直接调用大模型生成标注；未配置则跳过
-        #[arg(long)]
-        llm: bool,
-        /// LLM 分批大小：每批最多交给模型的页面数（0 = 不按页数设限）
-        #[arg(long, default_value_t = 40)]
-        batch_pages: usize,
-        /// 每批渲染输入的字节预算（0 = 不按字节设限，默认 32000）
-        #[arg(long, default_value_t = dst_huiji_wiki::update::DEFAULT_BATCH_MAX_CHARS)]
-        batch_max_chars: usize,
-        /// 零候选证据的页面不送 LLM，本地合成 low-confidence missing 判定
-        #[arg(long)]
-        skip_no_fact_pages: bool,
-    },
-    /// M1:LLM 阅读符号源码,产出/更新 SymbolDoc 知识文档
-    KnowledgeScanSymbols {
-        /// 游戏脚本根目录(当前树或快照目录)
-        root: PathBuf,
-        /// 符号类别:component | brain | behaviour(默认 component)
-        #[arg(long, default_value = "component")]
-        category: String,
-        /// 知识文档根目录(默认 knowledge/)
-        #[arg(long, default_value = "knowledge")]
-        knowledge_dir: PathBuf,
-        /// wiki 语料 host 根目录;提供则启用 pass2 语料归因(link-wiki)
-        #[arg(long)]
-        corpus: Option<PathBuf>,
-        /// pass2 每符号采样的页面数
-        #[arg(long, default_value_t = 8)]
-        sample_pages: usize,
-        /// 只处理引用量最高的前 N 个 component
-        #[arg(long, default_value_t = 20)]
-        limit: usize,
-        /// 忽略 sha/prompt_rev 一致性,强制重扫
-        #[arg(long)]
-        force: bool,
-        /// 并行处理的组件数(默认 1 = 串行)
-        #[arg(long, default_value_t = 1)]
-        concurrency: usize,
-        /// 仅对指定文件名词干跑 pass2(逗号分隔);默认全部跑
-        #[arg(long, value_delimiter = ',')]
-        pass2_names: Option<Vec<String>>,
-        /// 仅选取指定文件名词干的符号(逗号分隔);默认按排序取 limit
-        #[arg(long, value_delimiter = ',')]
-        pick_names: Option<Vec<String>>,
-        /// 不调 LLM:仅用 AutoInfobox 冷数据刷新现有 component 文档的 auto_maintained
-        #[arg(long)]
-        refresh_auto: bool,
-        /// pass2 二次确认:采样 ≥3 页但判空时追加一次复查(防过严)
-        #[arg(long)]
-        confirm_empty: bool,
-    },
-    /// page-assist:给定页面输出覆盖缺口建议清单(读 PageSymbolMap,不调 LLM)
-    PageAssist {
-        /// 知识文档根目录(默认 knowledge/)
-        #[arg(long, default_value = "knowledge")]
-        knowledge_dir: PathBuf,
-        /// 页面 id(纯数字)或标题(精确匹配)
-        page: Option<String>,
-        /// 全库缺口榜(忽略 page 参数)
-        #[arg(long)]
-        all: bool,
-        /// 输出 JSON 而非 Markdown
-        #[arg(long)]
-        json: bool,
-        /// 目标 3:编辑归因模式(区域 × SymbolDoc;需 --corpus)
-        #[arg(long)]
-        attribute: bool,
-        /// wiki 语料根目录(归因模式必需)
-        #[arg(long)]
-        corpus: Option<PathBuf>,
-    },
-    /// M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)
-    KnowledgeSync {
-        /// 旧快照(时间戳或目录名,SnapshotStore 口径;--review 复核模式可省略)
-        old: Option<String>,
-        /// 新快照(时间戳、目录名,或 "current" 表示当前 scripts 树)
-        #[arg(default_value = "current")]
-        new: String,
-        /// 知识文档根目录(默认 knowledge/)
-        #[arg(long, default_value = "knowledge")]
-        knowledge_dir: PathBuf,
-        /// 级联重扫脏文档(调 LLM;默认仅输出清单)
-        #[arg(long)]
-        rescan: bool,
-        /// 详列的脏文档数上限
-        #[arg(long, default_value_t = 20)]
-        limit: usize,
-        /// wiki 语料根目录;提供则启用 prefab→页面交叉
-        #[arg(long)]
-        corpus: Option<PathBuf>,
-        /// Tier2:起草页面修订建议(需 --corpus 与 LLM 配置)
-        #[arg(long)]
-        draft: bool,
-        /// Tier2 复核:裁决文件路径(对既有报告的建议逐条 approve/reject)
-        #[arg(long)]
-        review: Option<PathBuf>,
-    },
-    /// M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)
-    KnowledgeScanWiki {
-        /// 游戏脚本根目录(当前树或快照目录)
-        root: PathBuf,
-        /// 知识文档根目录(默认 knowledge/)
-        #[arg(long, default_value = "knowledge")]
-        knowledge_dir: PathBuf,
-        /// wiki 语料 host 根目录
-        #[arg(long)]
-        corpus: PathBuf,
-        /// M2b:对确定性零证据对跑 LLM 审计(收编 symbol-annotate verdict)
-        #[arg(long)]
-        audit: bool,
-        /// 审计符号词干(逗号分隔,如 inspectable,hauntable);默认按缺口取前 10
-        #[arg(long, value_delimiter = ',')]
-        audit_symbols: Option<Vec<String>>,
-        /// 每符号送审页数上限(按 facts 富裕度排序)
-        #[arg(long, default_value_t = 60)]
-        audit_max_pages: usize,
-        /// LLM 每批页数上限
-        #[arg(long, default_value_t = 20)]
-        audit_batch_pages: usize,
-        /// LLM 每批字符数上限
-        #[arg(long, default_value_t = 24_000)]
-        audit_batch_max_chars: usize,
-        /// M2c:不重建地图,聚合现有 knowledge/pages 出报表(summary.json)
-        #[arg(long)]
-        report: bool,
-        /// M2 收尾:语义不一致对三分类(确定性)
-        #[arg(long)]
-        classify: bool,
-    },
-    /// 用 wikitext 解析器批量修改页面里指定模板的参数（外科手术式编辑，
-    /// 未修改部分逐字节还原；--dry-run 只产 diff 报告不写维基）
-    #[command(name = "maintain-wikitext")]
-    MaintainWikitext {
-        /// 页面标题（可多次）
-        #[arg(long = "page", required = true)]
-        pages: Vec<String>,
-        /// 目标模板名（归一化匹配，如 实体信息框/自动）
-        #[arg(long)]
-        template: String,
-        /// 设置参数 key=value（可多次；value 原样写入）
-        #[arg(long = "set")]
-        set: Vec<String>,
-        /// 删除参数（可多次）
-        #[arg(long = "remove")]
-        remove: Vec<String>,
-        /// 报告与新文本的输出目录
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// 跳过确认，直接写入维基
-        #[arg(long)]
-        yes: bool,
-        /// 只产 diff 报告，不写入维基（与 --yes 互斥）
-        #[arg(long, conflicts_with = "yes")]
-        dry_run: bool,
-        /// 将机器可读的执行报告（JSON）写入该文件
-        #[arg(long)]
-        report_json: Option<PathBuf>,
-    },
-    /// 启动 WebUI 服务器
-    Serve {
-        /// 监听地址（默认 127.0.0.1）
-        #[arg(long, default_value = "127.0.0.1")]
-        host: String,
-        /// 监听端口
-        #[arg(long, default_value_t = 8420)]
-        port: u16,
-    },
+const NO_RENAMES: &[FlagRename] = &[];
+
+/// 一个 Job 的 CLI 视角。
+struct CliExt {
+    /// == `JobSpec.name`（契约测试强制）。
+    name: &'static str,
+    about: &'static str,
+    /// 定位参数（spec key，按顺序）：(key, required)。
+    positionals: &'static [(&'static str, bool)],
+    /// 使用短旗标的选项：(key, short)。
+    shorts: &'static [(&'static str, char)],
+    /// 旗标重命名/取反。
+    renames: &'static [FlagRename],
+    /// 逗号分隔多值（`--x a,b`，可重复出现 `--x a --x b`）。
+    comma_lists: &'static [&'static str],
+    /// 是否有 `--yes/--dry-run` 写入策略旗标（仅 wiki 写作业）。
+    write_args: bool,
+    /// 是否有 `--report-json`。
+    report_json: bool,
+    /// 本地作业的 `--dry-run`（corpus 系：抑制本地写盘 → WriteMode::DryRun）。
+    local_dry_run: bool,
 }
 
-impl Commands {
-    /// Stable machine-readable name used in logs and reports.
-    pub fn name(&self) -> &'static str {
-        match self {
-            Commands::ParsePo { .. } => "parse-po",
-            Commands::MapNames { .. } => "map-names",
-            Commands::MapRecipes { .. } => "map-recipes",
-            Commands::MaintainItemTable { .. } => "maintain-item-table",
-            Commands::MaintainDSTRecipes { .. } => "maintain-dst-recipes",
-            Commands::MaintainCopyClip { .. } => "maintain-copy-clip",
-            Commands::MaintainTemplateCheck { .. } => "maintain-template-check",
-            Commands::MaintainStrings { .. } => "maintain-strings",
-            Commands::SkillTreeWiki { .. } => "skilltree-wiki",
-            Commands::SkillTreeExport { .. } => "skilltree-export",
-            Commands::UploadImage { .. } => "upload-image",
-            Commands::UploadIcons { .. } => "upload-icons",
-            Commands::PrefabOverrides { .. } => "prefab-overrides",
-            Commands::PrefabOverridesDir { .. } => "prefab-overrides-dir",
-            Commands::PrefabOverridesAudit { .. } => "prefab-overrides-audit",
-            Commands::MaintainPrefabOverrides { .. } => "maintain-prefab-overrides",
-            Commands::ScriptsSync { .. } => "scripts-sync",
-            Commands::ImagesSync { .. } => "images-sync",
-            Commands::AnimSync { .. } => "anim-sync",
-            Commands::AnimDiff { .. } => "anim-diff",
-            Commands::AnimIndex { .. } => "anim-index",
-            Commands::SkinIndex { .. } => "skin-index",
-            Commands::CorpusFetch { .. } => "corpus-fetch",
-            Commands::UpdateIndex { .. } => "update-index",
-            Commands::UpdateScan { .. } => "update-scan",
-            Commands::CorpusIndex { .. } => "corpus-index",
-            Commands::SymbolAnnotate { .. } => "symbol-annotate",
-            Commands::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
-            Commands::PageAssist { .. } => "page-assist",
-            Commands::KnowledgeSync { .. } => "knowledge-sync",
-            Commands::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
-            Commands::MaintainWikitext { .. } => "maintain-wikitext",
-            Commands::Serve { .. } => "serve",
+static CLI_EXT: &[CliExt] = &[
+    CliExt {
+        name: "parse-po",
+        about: "解析 PO 翻译文件为 wiki JSON",
+        positionals: &[],
+        shorts: &[("input", 'i'), ("output", 'o'), ("category", 'c')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "map-names",
+        about: "把 PO 物品名映射为 wiki JSON",
+        positionals: &[],
+        shorts: &[("input", 'i'), ("output", 'o'), ("compare", 'c'), ("merge", 'm'), ("version", 'v')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "map-recipes",
+        about: "把游戏配方映射为 wiki JSON",
+        positionals: &[],
+        shorts: &[("input", 'i'), ("output", 'o'), ("compare", 'c'), ("merge", 'm'), ("version", 'v')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-item-table",
+        about: "维护 模块:ItemTable（对比线上数据后写维基）",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-dst-recipes",
+        about: "维护 模块:DstRecipes（对比线上数据后写维基）",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-copy-clip",
+        about: "维护模块常量（rbtl/tech/filters/names，标记区间替换）",
+        positionals: &[],
+        shorts: &[("output", 'o'), ("type", 't')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-template-check",
+        about: "只读检查 模板:Tech/dst 与 模板:制作栏图标 对游戏数据的覆盖率（可选把可粘贴片段写入 --output；不写维基）",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-strings",
+        about: "解析游戏 strings.pot / chinese_s.po，生成 模块:<V> Strings CN/EN <NN> 桶页与 Data:<V>_Strings_Index.json；逐桶语义对比后只写变化页，索引最后写",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "skilltree-wiki",
+        about: "把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的 defs JSON 并维护维基子页面（保留页内 metainfo/icon_url；--output 同时写出 Skilltree.js 渲染器与图片清单）",
+        positionals: &[],
+        shorts: &[("character", 'c'), ("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "skilltree-export",
+        about: "把技能树数据导出为本地 JSON 文件（纯本地，不访问维基）",
+        positionals: &[],
+        shorts: &[("character", 'c'), ("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "upload-image",
+        about: "上传本地图片到维基（同名重传请加 --ignore-warnings；按 skilltree/ skilltree_icons/ inventoryimages/ 目录自动补分类描述）",
+        positionals: &[("path", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "prefab-overrides",
+        about: "解析单个 Lua 文件的预制体重定向",
+        positionals: &[],
+        shorts: &[("input", 'i'), ("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "prefab-overrides-dir",
+        about: "扫描目录下全部 Lua 文件解析预制体重定向并合并（纯本地操作；目录缺省为 DST__ROOT/data/databundles/scripts/prefabs）",
+        positionals: &[],
+        shorts: &[("input", 'i'), ("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "prefab-overrides-audit",
+        about: "只读审计 模块:ItemTable/PrefabOverrides：线上条目 × 本地推导做 key/target 存在性验证，输出可推导/需人工补丁/可疑三张清单",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-prefab-overrides",
+        about: "维护 模块:ItemTable/PrefabOverrides（只读 diff，不写维基）：本地推导与线上页面合并对比，产出更新/新增清单与本地页面文本",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "scripts-sync",
+        about: "同步更新后的游戏 scripts:归档旧树为快照、解压新 scripts.zip(纯本地操作)",
+        positionals: &[],
+        shorts: &[],
+        // `--state`（CLI 习惯名）写入 serde 的 `state_path`。
+        renames: &[FlagRename { key: "state_path", long: "state", invert: false }],
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "images-sync",
+        about: "处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地图片操作),结束后刷新图标元数据并查询维基上传状态(可用 --skip-wiki-status 跳过)",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "upload-icons",
+        about: "上传物品栏图标到维基（标题取映射表或 STRINGS.NAMES 英文名 + .png，描述 [[分类:物品栏图标]]；批量默认仅上传维基缺失的，需先运行 images-sync；--file + --title 手动指定站内文件名）",
+        positionals: &[],
+        shorts: &[],
+        renames: &[FlagRename { key: "only_missing", long: "include-existing", invert: true }],
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "anim-sync",
+        about: "动画历史同步:更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "anim-diff",
+        about: "对比两个动画目录的 zip/dyn 结构化 diff",
+        positionals: &[("old", true), ("new", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "anim-index",
+        about: "构建 prefab 与动画文件的关联索引（纯本地，不做皮肤关联）",
+        positionals: &[("scripts", true)],
+        shorts: &[("out", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "skin-index",
+        about: "解析 skinprefabs.lua 生成 base_prefab → skins 皮肤索引（纯本地）",
+        positionals: &[],
+        shorts: &[("out", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "corpus-fetch",
+        about: "抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）；唯一允许匿名读的作业",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: true,
+    },
+    CliExt {
+        name: "update-scan",
+        about: "快照差异 + 关联影响评估（M1，只读）：产出 impact.json 与 changes.patch",
+        positionals: &[("old", true), ("new", true)],
+        shorts: &[("out", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "update-index",
+        about: "构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/",
+        positionals: &[("root", true)],
+        shorts: &[("out", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "corpus-index",
+        about: "从本地语料树重建派生索引（prefab 注册表等，纯本地操作）",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: true,
+    },
+    CliExt {
+        name: "symbol-annotate",
+        about: "Page→Symbol 标注 CLI：生成高引用 symbol 证据包和 Prompt，可选读取已有 LLM 输出并生成跨页一致性报告（纯本地，不写 wiki）",
+        positionals: &[("root", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "knowledge-scan-symbols",
+        about: "M1:LLM 阅读符号源码,产出/更新 SymbolDoc 知识文档",
+        positionals: &[("root", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &["pass2_names", "pick_names"],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "page-assist",
+        about: "page-assist:给定页面输出覆盖缺口建议清单(读 PageSymbolMap,不调 LLM)",
+        positionals: &[("page", false)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "knowledge-sync",
+        about: "M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)",
+        // `old` 在 --review 复核模式下可省略；`new` 有默认值 "current"。
+        positionals: &[("old", false), ("new", false)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "knowledge-scan-wiki",
+        about: "M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)",
+        positionals: &[("root", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &["audit_symbols"],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "maintain-wikitext",
+        about: "用 wikitext 解析器批量修改页面里指定模板的参数（外科手术式编辑，未修改部分逐字节还原；--dry-run 只产 diff 报告不写维基）",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: &[FlagRename { key: "pages", long: "page", invert: false }],
+        comma_lists: &["pages", "set", "remove"],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+];
+
+fn ext(name: &str) -> &'static CliExt {
+    CLI_EXT
+        .iter()
+        .find(|e| e.name == name)
+        .unwrap_or_else(|| panic!("CLI_EXT 缺少 {name}"))
+}
+
+// ---------------------------------------------------------------------------
+// clap 命令构建
+// ---------------------------------------------------------------------------
+
+/// 构建完整 CLI（顶层 + serve + 32 个 job 子命令）。
+pub fn command() -> Command {
+    let mut top = Command::new("dst-huiji-wiki")
+        .about("饥荒联机版维基维护工具")
+        .subcommand_required(true)
+        .arg_required_else_help(true)
+        .subcommand(
+            Command::new("serve")
+                .about("启动 WebUI 服务器")
+                .arg(
+                    Arg::new("host")
+                        .long("host")
+                        .default_value("127.0.0.1")
+                        .help("监听地址（默认 127.0.0.1）"),
+                )
+                .arg(
+                    Arg::new("port")
+                        .long("port")
+                        .default_value("8420")
+                        .help("监听端口"),
+                ),
+        );
+
+    for spec in JOB_SPECS {
+        top = top.subcommand(job_subcommand(spec));
+    }
+    top
+}
+
+fn job_subcommand(spec: &dst_huiji_wiki::service::JobSpec) -> Command {
+    let ext = ext(spec.name);
+    let mut cmd = Command::new(spec.name).about(ext.about);
+
+    for param in spec.params {
+        // 定位参数由 positionals 表声明；renames 键在对应 rename 处建旗标。
+        if ext.positionals.iter().any(|(k, _)| *k == param.key) {
+            continue;
+        }
+        if ext.renames.iter().any(|r| r.key == param.key) {
+            continue;
+        }
+        cmd = cmd.arg(spec_option_arg(param, ext, param.key, param.key, false));
+    }
+
+    for (key, required) in ext.positionals {
+        let param = spec
+            .param(key)
+            .unwrap_or_else(|| panic!("spec {} 缺少定位参数 {key}", spec.name));
+        let mut arg = Arg::new(*key)
+            .help(param.help)
+            .action(ArgAction::Set)
+            .value_name(key);
+        if *required {
+            arg = arg.required(true);
+        } else if let Some(d) = default_value(param) {
+            arg = arg.default_value(d);
+        }
+        cmd = cmd.arg(arg);
+    }
+
+    for rename in ext.renames {
+        let param = spec
+            .param(rename.key)
+            .unwrap_or_else(|| panic!("spec {} 缺少 rename 键 {}", spec.name, rename.key));
+        cmd = cmd.arg(spec_option_arg(
+            param,
+            ext,
+            rename.key,
+            rename.long,
+            rename.invert,
+        ));
+    }
+
+    if ext.write_args {
+        cmd = cmd
+            .arg(
+                Arg::new("yes")
+                    .long("yes")
+                    .action(ArgAction::SetTrue)
+                    .help("跳过确认，直接写入维基"),
+            )
+            .arg(
+                Arg::new("dry_run")
+                    .long("dry-run")
+                    .action(ArgAction::SetTrue)
+                    .conflicts_with("yes")
+                    .help("只生成产物与 diff，不写入维基（与 --yes 互斥）"),
+            );
+    }
+    if ext.local_dry_run {
+        cmd = cmd.arg(
+            Arg::new("dry_run")
+                .long("dry-run")
+                .action(ArgAction::SetTrue)
+                .help("只枚举与对账出报告，不写任何本地文件"),
+        );
+    }
+    if ext.report_json {
+        cmd = cmd.arg(
+            Arg::new("report_json")
+                .long("report-json")
+                .action(ArgAction::Set)
+                .value_name("FILE")
+                .help("将机器可读的执行报告（JSON）写入该文件"),
+        );
+    }
+    cmd
+}
+
+/// 为一个 spec 参数构建 CLI Arg（选项形式）。
+fn spec_option_arg(
+    param: &ParamSpec,
+    ext: &CliExt,
+    id: &'static str,
+    long: &'static str,
+    invert: bool,
+) -> Arg {
+    let short = ext
+        .shorts
+        .iter()
+        .find(|(k, _)| *k == param.key)
+        .map(|(_, c)| *c);
+
+    let kind = if invert { ParamKind::Bool } else { param.kind };
+
+    let mut arg = match kind {
+        ParamKind::Bool => {
+            let mut a = Arg::new(id)
+                .long(long)
+                .action(ArgAction::SetTrue)
+                .help(param.help);
+            if invert {
+                a = a.help("连同维基上已存在的图标一起上传（默认只上传缺失的）");
+            }
+            a
+        }
+        ParamKind::Usize => {
+            let mut a = Arg::new(id)
+                .long(long)
+                .action(ArgAction::Set)
+                .help(param.help);
+            if let Some(d) = default_value(param) {
+                a = a.default_value(d);
+            }
+            a
+        }
+        ParamKind::StrList => {
+            // 多值参数（spec.comma/append 语义）：可重复出现；comma_lists
+            // 额外允许 `--x a,b` 逗号切分。
+            let mut a = Arg::new(id)
+                .long(long)
+                .action(ArgAction::Append)
+                .num_args(1)
+                .help(param.help);
+            if ext.comma_lists.contains(&param.key) {
+                a = a.value_delimiter(',');
+            }
+            a
+        }
+        ParamKind::Str | ParamKind::Path | ParamKind::OptStr | ParamKind::OptPath => {
+            let mut a = Arg::new(id)
+                .long(long)
+                .action(ArgAction::Set)
+                .help(param.help);
+            // 有默认值的 Str 视为可选（clap 不允许 required + default 并存）。
+            let has_default = default_value(param).is_some();
+            if matches!(param.kind, ParamKind::Str | ParamKind::Path) && !has_default {
+                a = a.required(true);
+            }
+            if let Some(d) = default_value(param) {
+                a = a.default_value(d);
+            }
+            a
+        }
+    };
+    if let Some(c) = short {
+        arg = arg.short(c);
+    }
+    arg
+}
+
+fn default_value(param: &ParamSpec) -> Option<&'static str> {
+    match param.default {
+        ParamDefault::None => None,
+        ParamDefault::Bool(_) => None,
+        ParamDefault::Int(n) => Some(Box::leak(n.to_string().into_boxed_str())),
+        ParamDefault::Str(s) => Some(s),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 解析
+// ---------------------------------------------------------------------------
+
+/// CLI 解析结果。
+pub enum TopCommand {
+    Serve { host: String, port: u16 },
+    Job(Invocation),
+}
+
+pub struct Invocation {
+    pub kind: JobKind,
+    pub mode: WriteMode,
+    pub report_json: Option<PathBuf>,
+}
+
+/// 解析进程参数（解析错误/--help 由 clap 直接处理进程退出）。
+pub fn parse() -> Result<TopCommand> {
+    let matches = command().get_matches();
+    top_from_matches(&matches)
+}
+
+fn top_from_matches(m: &clap::ArgMatches) -> Result<TopCommand> {
+    match m.subcommand() {
+        Some(("serve", sub)) => Ok(TopCommand::Serve {
+            host: sub.get_one::<String>("host").cloned().unwrap_or_default(),
+            port: sub
+                .get_one::<String>("port")
+                .and_then(|p| p.parse().ok())
+                .unwrap_or(8420),
+        }),
+        Some((name, sub)) => {
+            let spec = JOB_SPECS
+                .iter()
+                .find(|s| s.name == name)
+                .unwrap_or_else(|| panic!("未知子命令 {name}"));
+            let ext = ext(name);
+            let kind = job_from_matches(spec, ext, sub)?;
+
+            let mode = if ext.write_args {
+                let yes = sub.get_flag("yes");
+                let dry_run = sub.get_flag("dry_run");
+                if dry_run {
+                    WriteMode::DryRun
+                } else if yes {
+                    WriteMode::AutoConfirm
+                } else {
+                    WriteMode::Interactive
+                }
+            } else if ext.local_dry_run && sub.get_flag("dry_run") {
+                WriteMode::DryRun
+            } else {
+                WriteMode::AutoConfirm
+            };
+
+            let report_json = if ext.report_json {
+                sub.get_one::<String>("report_json")
+                    .cloned()
+                    .map(PathBuf::from)
+            } else {
+                None
+            };
+
+            Ok(TopCommand::Job(Invocation {
+                kind,
+                mode,
+                report_json,
+            }))
+        }
+        _ => unreachable!("subcommand_required(true)"),
+    }
+}
+
+// --- ArgMatches 取值辅助 ---
+
+fn val(m: &clap::ArgMatches, key: &str) -> String {
+    m.get_one::<String>(key)
+        .cloned()
+        .unwrap_or_else(|| panic!("参数 {key} 缺失"))
+}
+
+fn opt_val(m: &clap::ArgMatches, key: &str) -> Option<String> {
+    m.get_one::<String>(key).cloned()
+}
+
+fn flag(m: &clap::ArgMatches, key: &str) -> bool {
+    m.get_flag(key)
+}
+
+fn num(m: &clap::ArgMatches, key: &str) -> usize {
+    m.get_one::<String>(key)
+        .and_then(|v| v.parse().ok())
+        .unwrap_or_else(|| panic!("参数 {key} 不是非负整数"))
+}
+
+fn opt_list(m: &clap::ArgMatches, key: &str) -> Option<Vec<String>> {
+    let v: Vec<String> = m.get_many::<String>(key)?.cloned().collect();
+    Some(v).filter(|v| !v.is_empty())
+}
+
+fn list(m: &clap::ArgMatches, key: &str) -> Vec<String> {
+    m.get_many::<String>(key)
+        .map(|v| v.cloned().collect())
+        .unwrap_or_default()
+}
+
+/// 按 spec/CLI 元数据把 ArgMatches 组装成 [`JobKind`]。
+fn job_from_matches(
+    spec: &dst_huiji_wiki::service::JobSpec,
+    _ext: &CliExt,
+    m: &clap::ArgMatches,
+) -> Result<JobKind> {
+    let _ = spec;
+    Ok(match spec.name {
+        "parse-po" => JobKind::ParsePo {
+            input: val(m, "input"),
+            output: opt_val(m, "output"),
+            category: opt_val(m, "category"),
+        },
+        "map-names" => JobKind::MapNames {
+            input: val(m, "input"),
+            output: opt_val(m, "output"),
+            compare: opt_val(m, "compare"),
+            merge: flag(m, "merge"),
+            version: opt_val(m, "version"),
+        },
+        "map-recipes" => JobKind::MapRecipes {
+            input: val(m, "input"),
+            output: opt_val(m, "output"),
+            compare: opt_val(m, "compare"),
+            merge: flag(m, "merge"),
+            po_file: opt_val(m, "po_file"),
+            version: opt_val(m, "version"),
+        },
+        "maintain-item-table" => JobKind::MaintainItemTable {
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+        },
+        "maintain-dst-recipes" => JobKind::MaintainDstRecipes {
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+        },
+        "maintain-copy-clip" => JobKind::MaintainCopyClip {
+            r#type: opt_val(m, "type"),
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+        },
+        "maintain-template-check" => JobKind::MaintainTemplateCheck {
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+            skip_icon_status: flag(m, "skip_icon_status"),
+        },
+        "maintain-strings" => JobKind::MaintainStrings {
+            version: val(m, "version"),
+            snapshot: opt_val(m, "snapshot"),
+            output: opt_val(m, "output"),
+            offline: flag(m, "offline"),
+            bucket_count: num(m, "bucket_count"),
+            rebalance: flag(m, "rebalance"),
+            limit: num(m, "limit"),
+        },
+        "skilltree-wiki" => JobKind::SkilltreeWiki {
+            character: opt_val(m, "character"),
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+        },
+        "skilltree-export" => JobKind::SkilltreeExport {
+            character: opt_val(m, "character"),
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+        },
+        "upload-image" => JobKind::UploadImage {
+            path: val(m, "path"),
+            name: opt_val(m, "name"),
+            description: opt_val(m, "description"),
+            comment: opt_val(m, "comment"),
+            ignore_warnings: flag(m, "ignore_warnings"),
+        },
+        "prefab-overrides" => JobKind::PrefabOverrides {
+            input: val(m, "input"),
+            output: opt_val(m, "output"),
+        },
+        "prefab-overrides-dir" => JobKind::PrefabOverridesDir {
+            input: opt_val(m, "input"),
+            output: opt_val(m, "output"),
+        },
+        "prefab-overrides-audit" => JobKind::PrefabOverridesAudit {
+            scripts: opt_val(m, "scripts"),
+            wiki_file: opt_val(m, "wiki_file"),
+            output: opt_val(m, "output"),
+        },
+        "maintain-prefab-overrides" => JobKind::MaintainPrefabOverrides {
+            scripts: opt_val(m, "scripts"),
+            wiki_file: opt_val(m, "wiki_file"),
+            output: opt_val(m, "output"),
+        },
+        "scripts-sync" => JobKind::ScriptsSync {
+            force: flag(m, "force"),
+            dry_run: flag(m, "dry_run"),
+            state_path: opt_val(m, "state_path"),
+        },
+        "images-sync" => JobKind::ImagesSync {
+            force: flag(m, "force"),
+            dry_run: flag(m, "dry_run"),
+            skip_wiki_status: flag(m, "skip_wiki_status"),
+        },
+        "upload-icons" => JobKind::UploadIcons {
+            build: opt_val(m, "build"),
+            source: opt_val(m, "source"),
+            file: opt_val(m, "file"),
+            title: opt_val(m, "title"),
+            only_missing: !flag(m, "only_missing"),
+            ignore_warnings: flag(m, "ignore_warnings"),
+            comment: opt_val(m, "comment"),
+        },
+        "anim-sync" => JobKind::AnimSync {
+            force: flag(m, "force"),
+            dry_run: flag(m, "dry_run"),
+            label: opt_val(m, "label"),
+            out: opt_val(m, "out"),
+        },
+        "anim-diff" => JobKind::AnimDiff {
+            old: val(m, "old"),
+            new: val(m, "new"),
+            zip: opt_val(m, "zip"),
+        },
+        "anim-index" => JobKind::AnimIndex {
+            scripts: val(m, "scripts"),
+            anim: opt_val(m, "anim"),
+            out: opt_val(m, "out"),
+        },
+        "skin-index" => JobKind::SkinIndex {
+            scripts: opt_val(m, "scripts"),
+            anim: opt_val(m, "anim"),
+            out: opt_val(m, "out"),
+        },
+        "update-scan" => JobKind::UpdateScan {
+            old: val(m, "old"),
+            new: val(m, "new"),
+            out: opt_val(m, "out"),
+            corpus: opt_val(m, "corpus"),
+            annotate: opt_val(m, "annotate"),
+        },
+        "update-index" => JobKind::UpdateIndex {
+            root: val(m, "root"),
+            out: opt_val(m, "out"),
+        },
+        "corpus-fetch" => JobKind::CorpusFetch {
+            full: flag(m, "full"),
+            dir: opt_val(m, "dir"),
+            rc: flag(m, "rc"),
+        },
+        "corpus-index" => JobKind::CorpusIndex {
+            dir: opt_val(m, "dir"),
+            join: opt_val(m, "join"),
+        },
+        "symbol-annotate" => JobKind::SymbolAnnotate {
+            root: val(m, "root"),
+            corpus: val(m, "corpus"),
+            limit: num(m, "limit"),
+            out: opt_val(m, "out"),
+            verdicts: opt_val(m, "verdicts"),
+            llm: flag(m, "llm"),
+            batch_pages: num(m, "batch_pages"),
+            batch_max_chars: num(m, "batch_max_chars"),
+            skip_no_fact_pages: flag(m, "skip_no_fact_pages"),
+        },
+        "knowledge-scan-symbols" => JobKind::KnowledgeScanSymbols {
+            root: val(m, "root"),
+            category: val(m, "category"),
+            knowledge_dir: val(m, "knowledge_dir"),
+            corpus: opt_val(m, "corpus"),
+            sample_pages: num(m, "sample_pages"),
+            limit: num(m, "limit"),
+            force: flag(m, "force"),
+            concurrency: num(m, "concurrency"),
+            pass2_names: opt_list(m, "pass2_names"),
+            pick_names: opt_list(m, "pick_names"),
+            refresh_auto: flag(m, "refresh_auto"),
+            confirm_empty: flag(m, "confirm_empty"),
+        },
+        "page-assist" => JobKind::PageAssist {
+            knowledge_dir: val(m, "knowledge_dir"),
+            page: opt_val(m, "page"),
+            all: flag(m, "all"),
+            json: flag(m, "json"),
+            attribute: flag(m, "attribute"),
+            corpus: opt_val(m, "corpus"),
+        },
+        "knowledge-sync" => JobKind::KnowledgeSync {
+            old: opt_val(m, "old").unwrap_or_default(),
+            new: opt_val(m, "new").unwrap_or_else(|| "current".to_string()),
+            knowledge_dir: val(m, "knowledge_dir"),
+            rescan: flag(m, "rescan"),
+            limit: num(m, "limit"),
+            corpus: opt_val(m, "corpus"),
+            draft: flag(m, "draft"),
+            review: opt_val(m, "review"),
+        },
+        "knowledge-scan-wiki" => JobKind::KnowledgeScanWiki {
+            root: val(m, "root"),
+            knowledge_dir: val(m, "knowledge_dir"),
+            corpus: val(m, "corpus"),
+            audit: flag(m, "audit"),
+            audit_symbols: opt_list(m, "audit_symbols"),
+            audit_max_pages: num(m, "audit_max_pages"),
+            audit_batch_pages: num(m, "audit_batch_pages"),
+            audit_batch_max_chars: num(m, "audit_batch_max_chars"),
+            report: flag(m, "report"),
+            classify: flag(m, "classify"),
+        },
+        "maintain-wikitext" => JobKind::MaintainWikitext {
+            pages: list(m, "pages"),
+            template: val(m, "template"),
+            set: list(m, "set"),
+            remove: list(m, "remove"),
+            output: opt_val(m, "output"),
+        },
+        other => unreachable!("未实现构造臂的 job: {other}"),
+    })
+}
+
+// ---------------------------------------------------------------------------
+// 执行
+// ---------------------------------------------------------------------------
+
+pub async fn run(top: TopCommand) -> Result<()> {
+    match top {
+        TopCommand::Serve { host, port } => crate::web::serve(host, port).await?,
+        TopCommand::Job(inv) => {
+            // AutoConfirm/DryRun never consult the reporter (decide_write
+            // short-circuits), so stdin prompting stays Interactive-only.
+            let reporter = StdoutReporter {
+                confirm: ConfirmMode::Interactive,
+            };
+            let result = execute_job_with_mode(&inv.kind, &reporter, inv.mode).await?;
+
+            if let Some(path) = inv.report_json {
+                let now_ms = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .map(|d| d.as_millis() as u64)
+                    .unwrap_or(0);
+                let report = serde_json::json!({
+                    "generated_at_ms": now_ms,
+                    "job": inv.kind.name(),
+                    "params": serde_json::to_value(&inv.kind).unwrap_or_default(),
+                    "write_mode": inv.mode.name(),
+                    "result": result,
+                });
+                dst_huiji_wiki::platform::fs::write_json_atomic(&path, &report)?;
+                println!("报告已写入 {:?}", path);
+            }
         }
     }
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// 契约：CLI 子命令名集合（除纯 WebUI 的 `serve`）与
-    /// `JobKind::name()` 集合完全一致。加 CLI 命令必须同步加 JobKind，
-    /// 反之亦然；命名以 CLI 为准（`name()` 跟随）。
+    /// 契约：CLI_EXT 与 JOB_SPECS 一一对应；除跨切面旗标（yes/dry-run/
+    /// report-json）与显式 renames 外，CLI 旗标集合 == spec 参数键集合。
     #[test]
-    fn contract_cli_names_match_job_kind_names() {
-        use clap::CommandFactory;
-        use dst_huiji_wiki::service::JobKind;
+    fn contract_cli_flags_match_spec_params() {
+        for spec in JOB_SPECS {
+            let ext = ext(spec.name);
+            let cmd = job_subcommand(spec);
+            let cli_args: std::collections::BTreeSet<String> = cmd
+                .get_arguments()
+                .filter_map(|a| a.get_long().map(str::to_string))
+                .collect();
 
-        let cmd = Args::command();
-        let cli: std::collections::BTreeSet<String> = cmd
-            .get_subcommands()
-            .map(|s| s.get_name().to_string())
-            .collect();
-        assert!(cli.contains("serve"), "serve 子命令缺失，契约测试基准失效");
-
-        let jobs: std::collections::BTreeSet<String> = JobKind::all_variants()
-            .iter()
-            .map(|k| k.name().to_string())
-            .collect();
-
-        let cli_no_serve: std::collections::BTreeSet<String> = cli
-            .iter()
-            .filter(|n| n.as_str() != "serve")
-            .cloned()
-            .collect();
-        let mut diff = String::new();
-        for n in cli_no_serve.difference(&jobs) {
-            diff.push_str(&format!("\n  CLI 独有: {n}"));
-        }
-        for n in jobs.difference(&cli_no_serve) {
-            diff.push_str(&format!("\n  JobKind 独有: {n}"));
-        }
-        assert!(diff.is_empty(), "CLI 命令名与 JobKind::name() 漂移：{diff}");
-    }
-
-    #[test]
-    fn test_parse_po_command() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "parse-po", "-i", "test.po"]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::ParsePo {
-                input,
-                output,
-                category,
-            } => {
-                assert_eq!(input, PathBuf::from("test.po"));
-                assert!(output.is_none());
-                assert!(category.is_none());
+            let mut expected: std::collections::BTreeSet<String> = spec
+                .params
+                .iter()
+                .filter(|p| !ext.positionals.iter().any(|(k, _)| *k == p.key))
+                .map(|p| {
+                    ext.renames
+                        .iter()
+                        .find(|r| r.key == p.key)
+                        .map(|r| r.long.to_string())
+                        .unwrap_or_else(|| p.key.to_string())
+                })
+                .collect();
+            if ext.write_args {
+                expected.insert("yes".into());
+                expected.insert("dry-run".into());
             }
-            _ => panic!("Expected ParsePo command"),
-        }
-    }
-
-    #[test]
-    fn test_parse_po_command_with_all_options() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "parse-po",
-            "-i",
-            "test.po",
-            "-o",
-            "output.json",
-            "-c",
-            "NAMES",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::ParsePo {
-                input,
-                output,
-                category,
-            } => {
-                assert_eq!(input, PathBuf::from("test.po"));
-                assert_eq!(output, Some(PathBuf::from("output.json")));
-                assert_eq!(category, Some("NAMES".to_string()));
+            if ext.local_dry_run {
+                expected.insert("dry-run".into());
             }
-            _ => panic!("Expected ParsePo command"),
-        }
-    }
-
-    #[test]
-    fn test_map_names_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "map-names",
-            "-i",
-            "chinese_s.po",
-            "-o",
-            "names.json",
-            "-v",
-            "1.0.0",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MapNames {
-                input,
-                output,
-                compare,
-                merge,
-                version,
-            } => {
-                assert_eq!(input, PathBuf::from("chinese_s.po"));
-                assert_eq!(output, Some(PathBuf::from("names.json")));
-                assert!(compare.is_none());
-                assert!(!merge);
-                assert_eq!(version, Some("1.0.0".to_string()));
+            if ext.report_json {
+                expected.insert("report-json".into());
             }
-            _ => panic!("Expected MapNames command"),
-        }
-    }
-
-    #[test]
-    fn test_map_names_command_with_merge() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "map-names",
-            "-i",
-            "chinese_s.po",
-            "--compare",
-            "old.json",
-            "--merge",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MapNames {
-                input,
-                compare,
-                merge,
-                ..
-            } => {
-                assert_eq!(input, PathBuf::from("chinese_s.po"));
-                assert_eq!(compare, Some(PathBuf::from("old.json")));
-                assert!(merge);
-            }
-            _ => panic!("Expected MapNames command"),
-        }
-    }
-
-    #[test]
-    fn test_map_recipes_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "map-recipes",
-            "-i",
-            "recipes.lua",
-            "-o",
-            "recipes.json",
-            "--po-file",
-            "chinese_s.po",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MapRecipes {
-                input,
-                output,
-                po_file,
-                ..
-            } => {
-                assert_eq!(input, PathBuf::from("recipes.lua"));
-                assert_eq!(output, Some(PathBuf::from("recipes.json")));
-                assert_eq!(po_file, Some(PathBuf::from("chinese_s.po")));
-            }
-            _ => panic!("Expected MapRecipes command"),
-        }
-    }
-
-    #[test]
-    fn test_maintain_item_table_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "maintain-item-table",
-            "-o",
-            "item_table.json",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MaintainItemTable {
-                output,
-                yes,
-                dry_run,
-                report_json,
-            } => {
-                assert_eq!(output, Some(PathBuf::from("item_table.json")));
-                assert!(!yes);
-                assert!(!dry_run);
-                assert!(report_json.is_none());
-            }
-            _ => panic!("Expected MaintainItemTable command"),
-        }
-    }
-
-    #[test]
-    fn test_maintain_dst_recipes_command() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-dst-recipes"]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MaintainDSTRecipes { output, .. } => {
-                assert!(output.is_none());
-            }
-            _ => panic!("Expected MaintainDSTRecipes command"),
-        }
-    }
-
-    #[test]
-    fn test_maintain_yes_flag() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "maintain-item-table",
-            "--yes",
-            "--report-json",
-            "report.json",
-        ]);
-        let args = args.unwrap();
-        match args.command {
-            Commands::MaintainItemTable {
-                yes,
-                dry_run,
-                report_json,
-                ..
-            } => {
-                assert!(yes);
-                assert!(!dry_run);
-                assert_eq!(report_json, Some(PathBuf::from("report.json")));
-            }
-            _ => panic!("Expected MaintainItemTable command"),
-        }
-    }
-
-    #[test]
-    fn test_scripts_sync_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "scripts-sync"]).unwrap();
-        match args.command {
-            Commands::ScriptsSync {
-                force,
-                dry_run,
-                state,
-                report_json,
-            } => {
-                assert!(!force);
-                assert!(!dry_run);
-                assert!(state.is_none());
-                assert!(report_json.is_none());
-            }
-            _ => panic!("Expected ScriptsSync command"),
-        }
-    }
-
-    #[test]
-    fn test_scripts_sync_command_with_flags() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "scripts-sync",
-            "--force",
-            "--dry-run",
-            "--state",
-            "ver.txt",
-            "--report-json",
-            "report.json",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::ScriptsSync {
-                force,
-                dry_run,
-                state,
-                report_json,
-            } => {
-                assert!(force);
-                assert!(dry_run);
-                assert_eq!(state, Some(PathBuf::from("ver.txt")));
-                assert_eq!(report_json, Some(PathBuf::from("report.json")));
-            }
-            _ => panic!("Expected ScriptsSync command"),
-        }
-    }
-
-    #[test]
-    fn test_images_sync_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "images-sync"]).unwrap();
-        match args.command {
-            Commands::ImagesSync {
-                force,
-                dry_run,
-                skip_wiki_status,
-                report_json,
-            } => {
-                assert!(!force);
-                assert!(!dry_run);
-                assert!(!skip_wiki_status);
-                assert!(report_json.is_none());
-            }
-            _ => panic!("Expected ImagesSync command"),
-        }
-    }
-
-    #[test]
-    fn test_images_sync_command_with_flags() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "images-sync",
-            "--force",
-            "--dry-run",
-            "--skip-wiki-status",
-            "--report-json",
-            "report.json",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::ImagesSync {
-                force,
-                dry_run,
-                skip_wiki_status,
-                report_json,
-            } => {
-                assert!(force);
-                assert!(dry_run);
-                assert!(skip_wiki_status);
-                assert_eq!(report_json, Some(PathBuf::from("report.json")));
-            }
-            _ => panic!("Expected ImagesSync command"),
-        }
-    }
-
-    #[test]
-    fn test_upload_icons_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "upload-icons"]).unwrap();
-        match args.command {
-            Commands::UploadIcons {
-                build,
-                source,
-                file,
-                title,
-                include_existing,
-                ignore_warnings,
-                comment,
-                yes,
-                dry_run,
-                report_json,
-            } => {
-                assert!(build.is_none());
-                assert!(source.is_none());
-                assert!(file.is_none());
-                assert!(title.is_none());
-                assert!(!include_existing);
-                assert!(!ignore_warnings);
-                assert!(comment.is_none());
-                assert!(!yes);
-                assert!(!dry_run);
-                assert!(report_json.is_none());
-            }
-            _ => panic!("Expected UploadIcons command"),
-        }
-    }
-
-    #[test]
-    fn test_upload_icons_command_with_flags() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "upload-icons",
-            "--build",
-            "751350",
-            "--include-existing",
-            "--ignore-warnings",
-            "--comment",
-            "同步",
-            "--yes",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::UploadIcons {
-                build,
-                include_existing,
-                ignore_warnings,
-                comment,
-                yes,
-                ..
-            } => {
-                assert_eq!(build.as_deref(), Some("751350"));
-                assert!(include_existing);
-                assert!(ignore_warnings);
-                assert_eq!(comment.as_deref(), Some("同步"));
-                assert!(yes);
-            }
-            _ => panic!("Expected UploadIcons command"),
-        }
-    }
-
-    #[test]
-    fn test_upload_icons_command_manual_title() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "upload-icons",
-            "--file",
-            "multitool_axe_pickaxe.png",
-            "--title",
-            "Pick-Axe.png",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::UploadIcons { file, title, .. } => {
-                assert_eq!(file.as_deref(), Some("multitool_axe_pickaxe.png"));
-                assert_eq!(title.as_deref(), Some("Pick-Axe.png"));
-            }
-            _ => panic!("Expected UploadIcons command"),
-        }
-    }
-
-    #[test]
-    fn test_anim_sync_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "anim-sync"]).unwrap();
-        match args.command {
-            Commands::AnimSync {
-                force,
-                dry_run,
-                label,
-                out,
-                report_json,
-            } => {
-                assert!(!force);
-                assert!(!dry_run);
-                assert!(label.is_none());
-                assert!(out.is_none());
-                assert!(report_json.is_none());
-            }
-            _ => panic!("Expected AnimSync command"),
-        }
-    }
-
-    #[test]
-    fn test_anim_diff_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "anim-diff",
-            "old_anim",
-            "new_anim",
-            "--zip",
-            "dynamic/abigail_ice.dyn",
-            "--report-json",
-            "anim-diff.json",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::AnimDiff {
-                old,
-                new,
-                zip,
-                report_json,
-            } => {
-                assert_eq!(old, PathBuf::from("old_anim"));
-                assert_eq!(new, PathBuf::from("new_anim"));
-                assert_eq!(zip, Some("dynamic/abigail_ice.dyn".to_string()));
-                assert_eq!(report_json, Some(PathBuf::from("anim-diff.json")));
-            }
-            _ => panic!("Expected AnimDiff command"),
-        }
-    }
-
-    #[test]
-    fn test_update_index_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "update-index",
-            "/path/to/scripts",
-            "--out",
-            "output/atlas/custom",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::UpdateIndex { root, out } => {
-                assert_eq!(root, PathBuf::from("/path/to/scripts"));
-                assert_eq!(out, Some(PathBuf::from("output/atlas/custom")));
-            }
-            _ => panic!("Expected UpdateIndex command"),
-        }
-    }
-
-    #[test]
-    fn test_update_index_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "update-index", "scripts"]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::UpdateIndex { root, out } => {
-                assert_eq!(root, PathBuf::from("scripts"));
-                assert!(out.is_none());
-            }
-            _ => panic!("Expected UpdateIndex command"),
-        }
-    }
-
-    #[test]
-    fn test_symbol_annotate_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "symbol-annotate",
-            "scripts",
-            "--corpus",
-            "wikis/dontstarve.huijiwiki.com",
-            "--limit",
-            "10",
-            "--out",
-            "output/symbol-annotate/test",
-            "--verdicts",
-            "verdicts.json",
-            "--llm",
-            "--batch-pages",
-            "25",
-            "--batch-max-chars",
-            "16000",
-            "--skip-no-fact-pages",
-        ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::SymbolAnnotate {
-                root,
-                corpus,
-                limit,
-                out,
-                verdicts,
-                llm,
-                batch_pages,
-                batch_max_chars,
-                skip_no_fact_pages,
-            } => {
-                assert_eq!(root, PathBuf::from("scripts"));
-                assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
-                assert_eq!(limit, 10);
-                assert_eq!(out, Some(PathBuf::from("output/symbol-annotate/test")));
-                assert_eq!(verdicts, Some(PathBuf::from("verdicts.json")));
-                assert!(llm);
-                assert_eq!(batch_pages, 25);
-                assert_eq!(batch_max_chars, 16000);
-                assert!(skip_no_fact_pages);
-            }
-            _ => panic!("Expected SymbolAnnotate command"),
-        }
-
-        // knowledge-scan-symbols wiring
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "knowledge-scan-symbols",
-            "scripts",
-            "--corpus",
-            "wikis/dontstarve.huijiwiki.com",
-            "--sample-pages",
-            "12",
-            "--limit",
-            "3",
-            "--force",
-        ]);
-        match args.unwrap().command {
-            Commands::KnowledgeScanSymbols {
-                root,
-                category,
-                knowledge_dir,
-                corpus,
-                sample_pages,
-                limit,
-                force,
-                concurrency,
-                pass2_names,
-                pick_names,
-                refresh_auto,
-                confirm_empty,
-            } => {
-                assert_eq!(root, PathBuf::from("scripts"));
-                assert_eq!(category, "component");
-                assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
-                assert_eq!(
-                    corpus,
-                    Some(PathBuf::from("wikis/dontstarve.huijiwiki.com"))
-                );
-                assert_eq!(sample_pages, 12);
-                assert_eq!(limit, 3);
-                assert!(force);
-                assert_eq!(concurrency, 1);
-                assert_eq!(pass2_names, None);
-                assert_eq!(pick_names, None);
-                assert!(!refresh_auto);
-                assert!(!confirm_empty);
-            }
-            _ => panic!("Expected KnowledgeScanSymbols command"),
-        }
-
-        // M2a 命令解析
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "knowledge-scan-wiki",
-            "scripts",
-            "--corpus",
-            "wikis/dontstarve.huijiwiki.com",
-        ]);
-        match args.unwrap().command {
-            Commands::KnowledgeScanWiki {
-                root,
-                knowledge_dir,
-                corpus,
-                ..
-            } => {
-                assert_eq!(root, PathBuf::from("scripts"));
-                assert_eq!(knowledge_dir, PathBuf::from("knowledge"));
-                assert_eq!(corpus, PathBuf::from("wikis/dontstarve.huijiwiki.com"));
-            }
-            _ => panic!("Expected KnowledgeScanWiki command"),
-        }
-
-        // 新类别 flag 透传 + pass2 抽样名单
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "knowledge-scan-symbols",
-            "scripts",
-            "--category",
-            "brain",
-            "--limit",
-            "3",
-            "--pass2-names",
-            "wander,chaseandattack",
-        ]);
-        match args.unwrap().command {
-            Commands::KnowledgeScanSymbols {
-                category,
-                pass2_names,
-                ..
-            } => {
-                assert_eq!(category, "brain");
-                assert_eq!(
-                    pass2_names,
-                    Some(vec!["wander".to_string(), "chaseandattack".to_string()])
-                );
-            }
-            _ => panic!("Expected KnowledgeScanSymbols command"),
-        }
-
-        // Default: batching falls back to 40 pages per LLM request.
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "symbol-annotate",
-            "scripts",
-            "--corpus",
-            "wikis/dontstarve.huijiwiki.com",
-        ]);
-        match args.unwrap().command {
-            Commands::SymbolAnnotate {
-                batch_pages,
-                batch_max_chars,
-                ..
-            } => {
-                assert_eq!(batch_pages, 40);
-                assert_eq!(
-                    batch_max_chars,
-                    dst_huiji_wiki::update::DEFAULT_BATCH_MAX_CHARS
-                );
-            }
-            _ => panic!("Expected SymbolAnnotate command"),
-        }
-    }
-
-    #[test]
-    fn test_maintain_dry_run_flag() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-dst-recipes", "--dry-run"]);
-        let args = args.unwrap();
-        match args.command {
-            Commands::MaintainDSTRecipes { dry_run, .. } => assert!(dry_run),
-            _ => panic!("Expected MaintainDSTRecipes command"),
-        }
-    }
-
-    #[test]
-    fn test_maintain_yes_and_dry_run_conflict() {
-        let args =
-            Args::try_parse_from(["dst-huiji-wiki", "maintain-copy-clip", "--yes", "--dry-run"]);
-        assert!(
-            args.is_err(),
-            "--yes and --dry-run must be mutually exclusive"
-        );
-    }
-
-    #[test]
-    fn test_write_mode_flags_rejected_together_for_all_commands() {
-        for cmd in [
-            vec!["maintain-item-table"],
-            vec!["maintain-dst-recipes"],
-            vec!["maintain-copy-clip"],
-            vec!["maintain-strings"],
-        ] {
-            let mut argv = vec!["dst-huiji-wiki"];
-            argv.extend_from_slice(&cmd);
-            argv.push("--yes");
-            argv.push("--dry-run");
-            assert!(
-                Args::try_parse_from(&argv).is_err(),
-                "expected conflict for {:?}",
-                cmd
+            assert_eq!(
+                cli_args, expected,
+                "spec `{}` 的 CLI 旗标与参数声明不一致",
+                spec.name
             );
         }
     }
 
+    fn parse_args(argv: &[&str]) -> TopCommand {
+        let matches = command().try_get_matches_from(argv).unwrap();
+        top_from_matches(&matches).unwrap()
+    }
+
     #[test]
-    fn test_maintain_copyclip_command() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-copy-clip", "-t", "tech"]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::MaintainCopyClip { r#type, .. } => {
-                assert_eq!(r#type, Some("tech".to_string()));
+    fn parse_maintain_copyclip_type_flag() {
+        let top = parse_args(&["dst-huiji-wiki", "maintain-copy-clip", "-t", "tech"]);
+        let TopCommand::Job(inv) = top else {
+            panic!("expected job");
+        };
+        assert_eq!(inv.kind.name(), "maintain-copy-clip");
+        match inv.kind {
+            JobKind::MaintainCopyClip { r#type, .. } => {
+                assert_eq!(r#type.as_deref(), Some("tech"))
             }
-            _ => panic!("Expected MaintainCopyClip command"),
+            _ => panic!("wrong variant"),
         }
+        assert_eq!(inv.mode, WriteMode::Interactive);
     }
 
     #[test]
-    fn test_maintain_copyclip_command_all_types() {
-        let types = vec![
-            "recipe_builder_tag_lookup",
-            "tech",
-            "crafting_filters",
-            "crafting_names",
-        ];
-        for t in types {
-            let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-copy-clip", "-t", t]);
-            assert!(args.is_ok(), "Failed to parse type: {}", t);
-        }
+    fn parse_write_mode_flags() {
+        let top = parse_args(&["dst-huiji-wiki", "maintain-item-table", "--yes"]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        assert_eq!(inv.mode, WriteMode::AutoConfirm);
+
+        let top = parse_args(&["dst-huiji-wiki", "maintain-item-table", "--dry-run"]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        assert_eq!(inv.mode, WriteMode::DryRun);
     }
 
     #[test]
-    fn test_skilltree_export_command() {
-        let args = Args::try_parse_from([
+    fn parse_upload_icons_inverted_flag() {
+        let top = parse_args(&[
             "dst-huiji-wiki",
-            "skilltree-export",
-            "-c",
-            "walter",
-            "-o",
-            "output/skilltree",
-            "--report-json",
-            "report.json",
+            "upload-icons",
+            "--include-existing",
+            "--yes",
         ]);
-        assert!(args.is_ok());
-        let args = args.unwrap();
-        match args.command {
-            Commands::SkillTreeExport {
-                character,
-                output,
-                snapshot,
-                report_json,
-            } => {
-                assert_eq!(character, Some("walter".to_string()));
-                assert_eq!(output, Some(PathBuf::from("output/skilltree")));
-                assert!(snapshot.is_none());
-                assert_eq!(report_json, Some(PathBuf::from("report.json")));
-            }
-            _ => panic!("Expected SkillTreeExport command"),
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::UploadIcons { only_missing, .. } => assert!(!only_missing),
+            _ => panic!("wrong variant"),
+        }
+        // 缺省 only_missing = true（spec 默认）。
+        let top = parse_args(&["dst-huiji-wiki", "upload-icons"]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::UploadIcons { only_missing, .. } => assert!(only_missing),
+            _ => panic!("wrong variant"),
         }
     }
 
     #[test]
-    fn test_prefab_overrides_dir_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "prefab-overrides-dir"]).unwrap();
-        match args.command {
-            Commands::PrefabOverridesDir { input, output } => {
-                assert!(input.is_none());
-                assert!(output.is_none());
-            }
-            _ => panic!("Expected PrefabOverridesDir command"),
-        }
-
-        let args = Args::try_parse_from([
+    fn parse_scripts_sync_state_alias() {
+        let top = parse_args(&[
             "dst-huiji-wiki",
-            "prefab-overrides-dir",
-            "-i",
-            "scripts/prefabs",
-            "-o",
-            "overrides.json",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::PrefabOverridesDir { input, output } => {
-                assert_eq!(input, Some(PathBuf::from("scripts/prefabs")));
-                assert_eq!(output, Some(PathBuf::from("overrides.json")));
-            }
-            _ => panic!("Expected PrefabOverridesDir command"),
-        }
-    }
-
-    #[test]
-    fn test_prefab_overrides_audit_command_defaults() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "prefab-overrides-audit"]).unwrap();
-        match args.command {
-            Commands::PrefabOverridesAudit {
-                scripts,
-                wiki_file,
-                output,
+            "scripts-sync",
+            "--force",
+            "--state",
+            "/tmp/v.txt",
+        ]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::ScriptsSync {
+                force, state_path, ..
             } => {
-                assert!(scripts.is_none());
-                assert!(wiki_file.is_none());
-                assert!(output.is_none());
+                assert!(force);
+                assert_eq!(state_path, Some("/tmp/v.txt".to_string()));
             }
-            _ => panic!("Expected PrefabOverridesAudit command"),
+            _ => panic!("wrong variant"),
         }
-
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "prefab-overrides-audit",
-            "--scripts",
-            "/scripts",
-            "--wiki-file",
-            "page.wiki",
-            "-o",
-            "audit.json",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::PrefabOverridesAudit {
-                scripts,
-                wiki_file,
-                output,
-            } => {
-                assert_eq!(scripts, Some(PathBuf::from("/scripts")));
-                assert_eq!(wiki_file, Some(PathBuf::from("page.wiki")));
-                assert_eq!(output, Some(PathBuf::from("audit.json")));
-            }
-            _ => panic!("Expected PrefabOverridesAudit command"),
-        }
+        assert_eq!(inv.mode, WriteMode::AutoConfirm);
     }
 
     #[test]
-    fn test_maintain_prefab_overrides_command() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "maintain-prefab-overrides"]).unwrap();
-        match args.command {
-            Commands::MaintainPrefabOverrides {
-                scripts,
-                wiki_file,
-                output,
-            } => {
-                assert!(scripts.is_none());
-                assert!(wiki_file.is_none());
-                assert!(output.is_none());
-            }
-            _ => panic!("Expected MaintainPrefabOverrides command"),
-        }
-
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "maintain-prefab-overrides",
-            "--scripts",
-            "/scripts",
-            "--wiki-file",
-            "page.wiki",
-            "-o",
-            "output/prefab_overrides",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::MaintainPrefabOverrides { output, .. } => {
-                assert_eq!(output, Some(PathBuf::from("output/prefab_overrides")));
-            }
-            _ => panic!("Expected MaintainPrefabOverrides command"),
-        }
-    }
-
-    #[test]
-    fn test_commands_equality() {
-        let cmd1 = Commands::ParsePo {
-            input: PathBuf::from("test.po"),
-            output: None,
-            category: None,
-        };
-        let cmd2 = Commands::ParsePo {
-            input: PathBuf::from("test.po"),
-            output: None,
-            category: None,
-        };
-        let cmd3 = Commands::ParsePo {
-            input: PathBuf::from("other.po"),
-            output: None,
-            category: None,
-        };
-        assert_eq!(cmd1, cmd2);
-        assert_ne!(cmd1, cmd3);
-    }
-
-    #[test]
-    fn test_args_debug() {
-        let args = Args::try_parse_from(["dst-huiji-wiki", "parse-po", "-i", "test.po"]).unwrap();
-        let debug_str = format!("{:?}", args);
-        assert!(debug_str.contains("ParsePo"));
-    }
-
-    #[test]
-    fn test_upload_image_command() {
-        let args = Args::try_parse_from([
-            "dst-huiji-wiki",
-            "upload-image",
-            "a.png",
-            "--name",
-            "A.png",
-            "--ignore-warnings",
-            "--dry-run",
-        ])
-        .unwrap();
-        match args.command {
-            Commands::UploadImage {
-                path,
-                name,
-                ignore_warnings,
-                dry_run,
-                yes,
+    fn parse_maintain_strings_defaults_from_spec() {
+        let top = parse_args(&["dst-huiji-wiki", "maintain-strings"]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::MaintainStrings {
+                version,
+                bucket_count,
+                limit,
                 ..
             } => {
-                assert_eq!(path, PathBuf::from("a.png"));
-                assert_eq!(name.as_deref(), Some("A.png"));
-                assert!(ignore_warnings);
-                assert!(dry_run);
-                assert!(!yes);
+                assert_eq!(version, "DST");
+                assert_eq!(bucket_count, 100);
+                assert_eq!(limit, 0);
             }
-            _ => panic!("Expected UploadImage command"),
+            _ => panic!("wrong variant"),
         }
+    }
+
+    #[test]
+    fn parse_positionals_and_lists() {
+        let top = parse_args(&[
+            "dst-huiji-wiki",
+            "anim-diff",
+            "old_dir",
+            "new_dir",
+            "--zip",
+            "dynamic/a.dyn",
+        ]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::AnimDiff { old, new, zip } => {
+                assert_eq!(old, "old_dir");
+                assert_eq!(new, "new_dir");
+                assert_eq!(zip.as_deref(), Some("dynamic/a.dyn"));
+            }
+            _ => panic!("wrong variant"),
+        }
+
+        let top = parse_args(&[
+            "dst-huiji-wiki",
+            "maintain-wikitext",
+            "--page",
+            "a,b",
+            "--page",
+            "c",
+            "--template",
+            "实体信息框/自动",
+            "--set",
+            "k=1",
+        ]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::MaintainWikitext { pages, set, .. } => {
+                assert_eq!(pages, vec!["a", "b", "c"]);
+                assert_eq!(set, vec!["k=1"]);
+            }
+            _ => panic!("wrong variant"),
+        }
+    }
+
+    #[test]
+    fn parse_corpus_fetch_local_dry_run() {
+        let top = parse_args(&["dst-huiji-wiki", "corpus-fetch", "--dry-run"]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        assert_eq!(inv.mode, WriteMode::DryRun);
+        match inv.kind {
+            JobKind::CorpusFetch { full, rc, .. } => {
+                assert!(!full);
+                assert!(!rc);
+            }
+            _ => panic!("wrong variant"),
+        }
+    }
+
+    #[test]
+    fn parse_knowledge_sync_optional_old_and_default_new() {
+        let top = parse_args(&[
+            "dst-huiji-wiki",
+            "knowledge-sync",
+            "--review",
+            "verdicts.json",
+        ]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::KnowledgeSync {
+                old, new, review, ..
+            } => {
+                assert_eq!(old, "");
+                assert_eq!(new, "current");
+                assert_eq!(review, Some("verdicts.json".to_string()));
+            }
+            _ => panic!("wrong variant"),
+        }
+    }
+
+    #[test]
+    fn parse_knowledge_scan_symbols_comma_lists() {
+        let top = parse_args(&[
+            "dst-huiji-wiki",
+            "knowledge-scan-symbols",
+            "root_dir",
+            "--pass2_names",
+            "abigail,hound",
+            "--limit",
+            "5",
+        ]);
+        let TopCommand::Job(inv) = top else { panic!() };
+        match inv.kind {
+            JobKind::KnowledgeScanSymbols {
+                root,
+                pass2_names,
+                limit,
+                knowledge_dir,
+                ..
+            } => {
+                assert_eq!(root, "root_dir");
+                assert_eq!(
+                    pass2_names,
+                    Some(vec!["abigail".to_string(), "hound".to_string()])
+                );
+                assert_eq!(limit, 5);
+                assert_eq!(knowledge_dir, "knowledge");
+            }
+            _ => panic!("wrong variant"),
+        }
+    }
+
+    #[test]
+    fn parse_serve_subcommand() {
+        let top = parse_args(&["dst-huiji-wiki", "serve", "--port", "9000"]);
+        match top {
+            TopCommand::Serve { host, port } => {
+                assert_eq!(host, "127.0.0.1");
+                assert_eq!(port, 9000);
+            }
+            TopCommand::Job(_) => panic!("expected serve"),
+        }
+    }
+
+    #[test]
+    fn cli_names_cover_all_job_kinds() {
+        // 契约：CLI 子命令（除 serve）== JobKind 全集（现在同源于 JOB_SPECS）。
+        let cmd = command();
+        let cli: std::collections::BTreeSet<String> = cmd
+            .get_subcommands()
+            .map(|s| s.get_name().to_string())
+            .collect();
+        assert_eq!(cli.len(), JOB_SPECS.len() + 1); // + serve
     }
 }

@@ -904,7 +904,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
             ParamSpec {
                 key: "batch_max_chars",
                 kind: ParamKind::Usize,
-                default: ParamDefault::Int(24_000),
+                default: ParamDefault::Int(32_000),
                 required: false,
                 help: "每批字节预算",
             },

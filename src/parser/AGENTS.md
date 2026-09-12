@@ -30,20 +30,16 @@ src/parser/
 │                        #   at parse time. Uses RecipeContext for
 │                        #   tech/ingredient constant resolution.
 │                        #   Convenience: parse_recipes_from_file/str.
+├── skilltree/          # 技能树提取（mod/scan/eval/cond/analyze）
 └── prefab_override/     # Prefab name override extraction from Lua.
     ├── mod.rs           #   Re-exports: PrefabOverrideParser, types
-    ├── parser.rs        #   PrefabOverrideParser — 2657 lines (largest
-    │                    #     file in project). Deep AST walk across
-    │                    #     function boundaries. Tracks local vars +
-    │                    #     params to resolve prefab name overrides.
-    │                    #     Handles factory patterns, table.insert,
-    │                    #     ipairs, control flow branches.
-    │                    #     Also exports parse_prefab_overrides().
-    ├── types.rs         #   SourceLocation, PrefabNameOverride,
-    │                    #     OverrideValue (Static/Dynamic/Unknown),
-    │                    #     FunctionInfo, VariableValue
-    └── control_flow.rs  #   visit_control_flow_blocks — single helper
-                         #     that walks if/while/repeat/for blocks.
+    ├── parser/          #   PrefabOverrideParser（mod/analysis/deep 机械拆分）
+    │   ├── mod.rs       #     入口 parse()/collect_definitions + tests
+    │   ├── analysis.rs  #     工厂/表/SetPrefabName 分析
+    │   └── deep.rs      #     跨函数边界深度解析
+    └── types.rs         #   SourceLocation, PrefabNameOverride,
+                         #     OverrideValue (Static/Dynamic/Unknown),
+                         #     FunctionInfo, VariableValue
 ```
 
 ## WHERE TO LOOK
@@ -57,9 +53,9 @@ src/parser/
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |
 | 解析 模块:Strings 桶页 | `strings_data.rs` → `parse_strings_module` | 纯数据 `return {...}`；支持字符串/角色表与 Lua 转义还原 |
 | Tweak recipe parsing | `recipe.rs` → `RecipeParser` | Handles for-loop expansion; check extract_recipes() |
-| Fix prefab name extraction | `prefab_override/parser.rs` | Most complex file. Search by: collect_definitions, walk_block, resolve_override |
+| Fix prefab name extraction | `prefab_override/parser/{mod,analysis,deep}.rs` | 跨函数深度解析在 `deep.rs`；工厂/表分析在 `analysis.rs`；examples 指纹测试钉住行为 |
 | Add a new override value variant | `prefab_override/types.rs` | `OverrideValue` enum |
-| Modify control flow traversal | `prefab_override/control_flow.rs` | Single function, called from parser.rs |
+| 技能树提取 | `skilltree/` | `mod.rs` 入口/types，`scan.rs` 扫描，`eval.rs` 数值/字符串，`cond.rs` 条件翻译，`analyze.rs` 汇总 |
 
 ## CONVENTIONS
 

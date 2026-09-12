@@ -16,7 +16,7 @@ dst-huiji-wiki/
 │   ├── commands/            # CLI arg definitions + all handlers
 │   ├── web/                 # WebUI server (binary-only; axum routes, JobManager, embedded SPA assets)
 │   ├── parser/              # Game data parsers (Lua, PO, recipes, prefab overrides)
-│   │   └── prefab_override/ # Complex Lua AST walker (2657-line parser.rs)
+│   │   └── prefab_override/ # Complex Lua AST walker (parser/ 按职责分模块: mod/analysis/deep)
 │   ├── models/              # Data models (Recipe, PoEntry, TechReport)
 │   │   └── recipe/          # Recipe sub-models (ingredient, options, prototyper, context)
 │   ├── mapping/             # Data→wiki mapping framework (WikiMapper trait + 字段名对齐 diff/merge)
@@ -50,7 +50,7 @@ dst-huiji-wiki/
 | 维护 模块:Strings 桶页 | `src/service/strings_wiki.rs` | `maintain-strings`：解析 pot/po → key 大写归一 + 角色表合并 → 沿用现有索引边界分桶 → 逐桶语义对比后只写变化页，索引最后写（`--dry-run` 只产报告，`--limit N` canary 不写索引）；`src/models/strings.rs`（变换/分桶/渲染）、`src/parser/strings_data.rs`（桶页解析） |
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusFetch` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
-| Fix prefab name extraction | `src/parser/prefab_override/parser.rs` | 2657 lines, most complex file |
+| Fix prefab name extraction | `src/parser/prefab_override/parser/` | `mod.rs`(入口/收集) + `analysis.rs`(工厂/表分析) + `deep.rs`(跨函数深度解析)；行为由 examples 指纹测试钉住 |
 | Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; must stay in sync with `src/web/assets/app.js` skilltree section |
 | Upload an image | `src/service/upload_image.rs` | `upload-image` CLI; auto description by dir (`skilltree/`→技能树素材, `skilltree_icons/`→技能树图标, `inventoryimages/`→物品栏图标); `--ignore-warnings` for re-upload (needs `reupload` right) |
 | Upload inventory icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting`); WebUI 物品图标页来源切换 + 五态过滤 + 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name), applied by `images-sync` into `history/icon_meta.json` |
@@ -67,7 +67,7 @@ dst-huiji-wiki/
 | `WikiMapper` | Trait | src/mapping/mapper.rs | Core mapping interface: schema + rules + merge |
 | `WikiDataConverter` | Struct | src/mapping/converter.rs | Orchestrates mapping: parse → convert → compare → merge（diff/merge 按字段名对齐，显式 `key_field`）|
 | `RecipeParser` | Struct | src/parser/recipe.rs | Parses Recipe{} calls from Lua via full_moon AST |
-| `PrefabOverrideParser` | Struct | src/parser/prefab_override/parser.rs | Extracts prefab name overrides from Lua (factory patterns, control flow) |
+| `PrefabOverrideParser` | Struct | src/parser/prefab_override/parser/mod.rs | Extracts prefab name overrides from Lua (factory patterns, control flow) |
 | `LuaParser` | Struct | src/parser/lua.rs | Generic Lua variable/field location extraction |
 | `PoParser` | Struct | src/parser/po.rs | Nom-based PO file parser |
 | `WikiClient` | Struct | src/wiki/client.rs | MediaWiki API: login, get_page, edit_page, append/prepend, get_files_info (imageinfo), upload_file (multipart) |
@@ -127,7 +127,7 @@ cargo run --release -- --help      # Show CLI help
 - Structured logging: `cli_run` span (uuid run_id, command) wraps every invocation; `job` and `wiki_edit` (page, oldrevid/newrevid) spans inside service
 - `examples/` contains game data (.po, .lua) + a Python login script, NOT Rust examples — `cargo run --example` finds nothing
 - `src/commands/mod.rs` is builder-generated CLI from JobSpec + CLI_EXT tables (no derive enum)
-- `src/parser/prefab_override/parser.rs` is 2657 lines — the most complex file in the project
+- `src/parser/prefab_override/parser/` 已按职责拆为 mod/analysis/deep（原 3145 行单文件）；`src/parser/skilltree/` 拆为 mod/scan/eval/cond/analyze
 - CI cross-compiles to 4 targets (Linux x86_64, macOS x86_64 + aarch64, Windows x86_64)
 - Wiki API tests skip gracefully if `.env` not configured (won't fail in CI)
 - `reqwest = "0.13"` — newer than typical 0.12.x; verify intentional

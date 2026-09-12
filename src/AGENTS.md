@@ -17,8 +17,8 @@ src/
 │   ├── lua.rs            # LuaParser (variable/field location)
 │   ├── po.rs             # PoParser (nom-based PO)
 │   ├── recipe.rs         # RecipeParser (full_moon AST, matches Recipe2 calls)
-│   ├── skilltree.rs      # skill tree extractor (pos/connects with constant folding)
-│   └── prefab_override/  # PrefabOverrideParser(parser.rs/types.rs/control_flow.rs)
+│   ├── skilltree/        # skill tree extractor (mod/scan/eval/cond/analyze)
+│   └── prefab_override/  # PrefabOverrideParser(parser/{mod,analysis,deep}.rs + types.rs)
 ├── models/               # data model structs with serde derives
 │   ├── mod.rs
 │   ├── po.rs             # PoEntry, PoFile

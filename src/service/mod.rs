@@ -58,6 +58,7 @@ pub async fn execute_job_with_mode(
     reporter: &dyn Reporter,
     mode: WriteMode,
 ) -> Result<serde_json::Value> {
+    kind.validate()?;
     reporter.stage(&format!("{}（写入模式：{}）", kind.name(), mode.name()));
     // `Instrument` instead of `enter()`: an EnteredSpan is !Send and would
     // make this future unusable with tokio::spawn (WebUI job manager).

@@ -3,6 +3,7 @@
 //! 参数 schema/canonical 名等声明源在 [`super::job_spec`]；本文件只保留
 //! serde 变体定义、serde 默认值函数与按表派生的方法。
 
+use crate::error::{Error, Result};
 use serde::{Deserialize, Serialize};
 
 /// Everything the WebUI (or CLI) needs to describe one unit of work.
@@ -550,6 +551,50 @@ impl JobKind {
         self.spec().touches_wiki()
     }
 
+    /// 执行前的参数语义校验（CLI 与 Web 共用；此前非法 type/source 只能
+    /// 在执行中才发现，Web 提交的任务尤其浪费）。
+    pub fn validate(&self) -> Result<()> {
+        match self {
+            JobKind::MaintainCopyClip { r#type, .. } => {
+                if let Some(t) = r#type {
+                    const VALID: &[&str] = &[
+                        "recipe_builder_tag_lookup",
+                        "rbtl",
+                        "tech",
+                        "crafting_filters",
+                        "filters",
+                        "crafting_names",
+                        "names",
+                    ];
+                    if !VALID.contains(&t.as_str()) {
+                        return Err(Error::Config(format!(
+                            "非法的 copyclip 类型 `{t}`，有效值: rbtl | tech | filters | names"
+                        )));
+                    }
+                }
+                Ok(())
+            }
+            JobKind::UploadIcons { source, file, .. } => {
+                if let Some(s) = source {
+                    if s != "inventory" && s != "crafting" {
+                        return Err(Error::Config(format!(
+                            "非法的图标来源 `{s}`，有效值: inventory | crafting"
+                        )));
+                    }
+                }
+                if let Some(f) = file {
+                    if !f.ends_with(".png") {
+                        return Err(Error::Config(format!(
+                            "图标文件名必须是 .png（收到 `{f}`）"
+                        )));
+                    }
+                }
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
+
     /// 每个变体一个最小实例（字段取占位值），供契约测试与文档枚举。
     ///
     /// 契约（`service::tests` 与 `commands::tests` 各自强制）：
@@ -763,5 +808,77 @@ impl JobKind {
                 output: None,
             },
         ]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_rejects_bad_type_and_source() {
+        let bad = JobKind::MaintainCopyClip {
+            r#type: Some("nope".into()),
+            output: None,
+            snapshot: None,
+        };
+        assert!(bad.validate().is_err());
+
+        for ok in [
+            "rbtl",
+            "tech",
+            "filters",
+            "names",
+            "recipe_builder_tag_lookup",
+            "crafting_names",
+        ] {
+            let k = JobKind::MaintainCopyClip {
+                r#type: Some(ok.into()),
+                output: None,
+                snapshot: None,
+            };
+            assert!(k.validate().is_ok(), "{ok} 应合法");
+        }
+        // 缺省类型 = 全部，合法。
+        assert!(JobKind::MaintainCopyClip {
+            r#type: None,
+            output: None,
+            snapshot: None
+        }
+        .validate()
+        .is_ok());
+
+        let bad = JobKind::UploadIcons {
+            build: None,
+            source: Some("skin".into()),
+            file: None,
+            title: None,
+            only_missing: true,
+            ignore_warnings: false,
+            comment: None,
+        };
+        assert!(bad.validate().is_err());
+
+        let bad = JobKind::UploadIcons {
+            build: None,
+            source: None,
+            file: Some("axe.jpg".into()),
+            title: None,
+            only_missing: true,
+            ignore_warnings: false,
+            comment: None,
+        };
+        assert!(bad.validate().is_err());
+
+        let ok = JobKind::UploadIcons {
+            build: None,
+            source: Some("crafting".into()),
+            file: Some("axe.png".into()),
+            title: None,
+            only_missing: true,
+            ignore_warnings: false,
+            comment: None,
+        };
+        assert!(ok.validate().is_ok());
     }
 }

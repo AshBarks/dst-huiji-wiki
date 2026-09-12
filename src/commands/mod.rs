@@ -579,6 +579,35 @@ pub enum Commands {
         #[arg(long)]
         classify: bool,
     },
+    /// 用 wikitext 解析器批量修改页面里指定模板的参数（外科手术式编辑，
+    /// 未修改部分逐字节还原；--dry-run 只产 diff 报告不写维基）
+    #[command(name = "maintain-wikitext")]
+    MaintainWikitext {
+        /// 页面标题（可多次）
+        #[arg(long = "page", required = true)]
+        pages: Vec<String>,
+        /// 目标模板名（归一化匹配，如 实体信息框/自动）
+        #[arg(long)]
+        template: String,
+        /// 设置参数 key=value（可多次；value 原样写入）
+        #[arg(long = "set")]
+        set: Vec<String>,
+        /// 删除参数（可多次）
+        #[arg(long = "remove")]
+        remove: Vec<String>,
+        /// 报告与新文本的输出目录
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 跳过确认，直接写入维基
+        #[arg(long)]
+        yes: bool,
+        /// 只产 diff 报告，不写入维基（与 --yes 互斥）
+        #[arg(long, conflicts_with = "yes")]
+        dry_run: bool,
+        /// 将机器可读的执行报告（JSON）写入该文件
+        #[arg(long)]
+        report_json: Option<PathBuf>,
+    },
     /// 启动 WebUI 服务器
     Serve {
         /// 监听地址（默认 127.0.0.1）
@@ -625,6 +654,7 @@ impl Commands {
             Commands::PageAssist { .. } => "page-assist",
             Commands::KnowledgeSync { .. } => "knowledge-sync",
             Commands::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
+            Commands::MaintainWikitext { .. } => "maintain-wikitext",
             Commands::Serve { .. } => "serve",
         }
     }

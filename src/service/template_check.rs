@@ -20,6 +20,7 @@ use crate::models::{derive_station_aliases, StationAliasInputs, TechReport};
 use crate::parser::{
     parse_crafting_filter_lists, parse_prototyper_trees, parse_tech_constants, RecipeParser,
 };
+use crate::wikitext::{switch_cases, templates_in, Template, Wikicode};
 use crate::DstContext;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -121,43 +122,43 @@ struct CraftingBranch {
     icons: BTreeSet<String>,
 }
 
+/// 用 wikitext 解析器抠取 `filter|dst` 分支（取代旧的行扫描）。
+///
+/// 页面形状：`{{#switch: {{{1|ds}}} |filter|dst = {{#switch: {{{2|…}}}
+/// |工具={{inv|…}} |光源|照明={{inv|…}} |#default=…}} |tab|ds=… |#default=…}}`。
+/// 外层 `#switch` 的 `filter`/`dst` 分支值是内层站筛 `#switch`；收集其
+/// 非 `#default` 分支的全部 case 标签，及分支值里 `{{inv}}` 的首个位置参数。
 fn parse_crafting_branch(text: &str) -> CraftingBranch {
-    let Some(start) = text.find("|filter") else {
+    let code = Wikicode::parse(text);
+    let is_switch = |t: &Template| t.name_plain().trim_start().starts_with("#switch:");
+    let Some(outer) = code.templates().into_iter().find(|t| is_switch(t)) else {
         return CraftingBranch::default();
     };
-    let rest = &text[start..];
-    let end = rest.find("|#default").unwrap_or(rest.len());
-    let branch = &rest[..end];
+    let Some(branch) = switch_cases(outer)
+        .into_iter()
+        .find(|c| c.labels.iter().any(|l| l == "filter" || l == "dst"))
+    else {
+        return CraftingBranch::default();
+    };
+    let Some(inner) = templates_in(branch.value)
+        .into_iter()
+        .find(|t| is_switch(t))
+    else {
+        return CraftingBranch::default();
+    };
 
     let mut out = CraftingBranch::default();
-    for line in branch.lines() {
-        let trimmed = line.trim_start();
-        if !trimmed.starts_with('|') {
+    for case in switch_cases(inner) {
+        if case.is_default {
             continue;
         }
-        if let Some(eq) = trimmed.find('=') {
-            for part in trimmed[1..eq].split('|') {
-                let key = part.trim();
-                if !key.is_empty() && !key.starts_with('#') {
-                    out.keys.insert(key.to_string());
+        out.keys.extend(case.labels.iter().cloned());
+        for t in templates_in(case.value) {
+            if t.is_named("inv") {
+                if let Some(icon) = t.positional(1) {
+                    out.icons.insert(icon);
                 }
             }
-        }
-    }
-
-    let mut rest = branch;
-    while let Some(pos) = rest.find("{{inv|") {
-        let after = &rest[pos + "{{inv|".len()..];
-        let name: String = after
-            .chars()
-            .take_while(|c| *c != '|' && *c != '}')
-            .collect();
-        let name = name.trim();
-        if name.is_empty() {
-            rest = after;
-        } else {
-            rest = &after[name.len()..];
-            out.icons.insert(name.to_string());
         }
     }
     out

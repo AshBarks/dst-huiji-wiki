@@ -7,6 +7,7 @@ pub mod strings_wiki;
 pub mod template_check;
 pub mod upload_icons;
 pub mod upload_image;
+pub mod wikitext_edit;
 
 pub use progress::{CaptureReporter, ConfirmMode, JobEvent, Reporter, StdoutReporter};
 
@@ -475,6 +476,24 @@ pub enum JobKind {
         #[serde(default)]
         classify: bool,
     },
+    /// `maintain-wikitext`：wikitext 解析器驱动的模板参数外科手术式批量
+    /// 编辑（`set`/`remove`），逐页 diff；DryRun 只产报告不写维基。
+    MaintainWikitext {
+        /// 页面标题列表。
+        #[serde(default)]
+        pages: Vec<String>,
+        /// 目标模板名（归一化匹配）。
+        template: String,
+        /// `key=value` 形式的设置项。
+        #[serde(default)]
+        set: Vec<String>,
+        /// 要删除的参数名。
+        #[serde(default)]
+        remove: Vec<String>,
+        /// 报告与新文本的输出目录。
+        #[serde(default)]
+        output: Option<String>,
+    },
 }
 
 fn default_sync_new() -> String {
@@ -568,6 +587,7 @@ impl JobKind {
             JobKind::PageAssist { .. } => "page-assist",
             JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
             JobKind::SymbolAnnotate { .. } => "symbol-annotate",
+            JobKind::MaintainWikitext { .. } => "maintain-wikitext",
         }
     }
 
@@ -579,6 +599,7 @@ impl JobKind {
                 | JobKind::MaintainDstRecipes { .. }
                 | JobKind::MaintainCopyClip { .. }
                 | JobKind::MaintainStrings { .. }
+                | JobKind::MaintainWikitext { .. }
                 | JobKind::SkillTreeWiki { .. }
                 | JobKind::UploadImage { .. }
                 | JobKind::UploadIcons { .. }
@@ -725,6 +746,26 @@ async fn execute_job_inner(
                     bucket_count: *bucket_count,
                     rebalance: *rebalance,
                     limit: *limit,
+                },
+                reporter,
+                mode,
+            )
+            .await
+        }
+        JobKind::MaintainWikitext {
+            pages,
+            template,
+            set,
+            remove,
+            output,
+        } => {
+            wikitext_edit::run(
+                &wikitext_edit::WikitextEditParams {
+                    pages: pages.clone(),
+                    template: template.clone(),
+                    set: set.clone(),
+                    remove: remove.clone(),
+                    output: opt_path(output),
                 },
                 reporter,
                 mode,

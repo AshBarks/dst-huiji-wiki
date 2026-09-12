@@ -12,6 +12,7 @@ pub mod service;
 pub mod update;
 pub mod utils;
 pub mod wiki;
+pub mod wikitext;
 
 pub use context::DstContext;
 pub use context::SnapshotInfo;

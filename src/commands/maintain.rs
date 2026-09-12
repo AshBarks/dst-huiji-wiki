@@ -634,6 +634,29 @@ pub async fn run(args: Commands) -> Result<()> {
             )
             .await?;
         }
+        Commands::MaintainWikitext {
+            pages,
+            template,
+            set,
+            remove,
+            output,
+            yes,
+            dry_run,
+            report_json,
+        } => {
+            execute(
+                JobKind::MaintainWikitext {
+                    pages,
+                    template,
+                    set,
+                    remove,
+                    output: opt_path_to_string(&output)?,
+                },
+                write_mode(yes, dry_run),
+                report_json,
+            )
+            .await?;
+        }
         Commands::Serve { host, port } => {
             crate::web::serve(host, port).await?;
         }

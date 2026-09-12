@@ -96,9 +96,107 @@ fn h2_lines(text: &str, from: usize) -> Vec<(usize, String)> {
     out
 }
 
+/// One entity-infobox instance inside the lead zone.
+struct InfoboxSpan {
+    start: usize,
+    end: usize,
+    variant: String,
+    params: Vec<ParamSpan>,
+}
+
+/// 命名参数值 span（解析器版）：与旧实现相同的取值语义——跳过 `=` 后的
+/// 空格/制表符、值尾 trim；空值不产出锚点。
+fn parser_infobox_params(text: &str, t: &crate::wikitext::Template) -> Vec<ParamSpan> {
+    let mut out = Vec::new();
+    for arg in &t.args {
+        if !arg.named {
+            continue;
+        }
+        let name = crate::wikitext::plain(&arg.name).trim().to_string();
+        if name.is_empty() {
+            continue;
+        }
+        let Some((vs, ve)) = crate::wikitext::nodes_span(&arg.value) else {
+            continue;
+        };
+        let raw = &text[vs..ve];
+        let lead = raw.len() - raw.trim_start_matches([' ', '\t']).len();
+        let trimmed = raw[lead..].trim_end();
+        if trimmed.is_empty() {
+            continue;
+        }
+        out.push(ParamSpan {
+            name,
+            start_byte: vs + lead,
+            end_byte: vs + lead + trimmed.len(),
+            hash: fnv1a64(trimmed),
+        });
+    }
+    out
+}
+
+/// 变体名提取：第 2 个位置参数的值，去注释、截断到行首、trim。
+/// （旧行扫描对 variant 的取法等价于此；空变体返回 `None`。）
+fn infobox_variant(t: &crate::wikitext::Template) -> Option<String> {
+    let arg = t.args.iter().filter(|a| !a.named).nth(1)?;
+    let mut s = crate::wikitext::plain(&arg.value);
+    while let Some(a) = s.find("<!--") {
+        match s[a..].find("-->") {
+            Some(rel) => s.replace_range(a..a + rel + 3, ""),
+            None => break,
+        }
+    }
+    let s = s.split('\n').next().unwrap_or("").trim();
+    if s.is_empty() {
+        None
+    } else {
+        Some(s.to_string())
+    }
+}
+
+/// wikitext 解析器驱动的信息框识别（取代旧的字面头匹配 + 行式参数扫描）。
+///
+/// 识别条件与旧 `INFOBOX_HEADS` 等价：模板名归一化匹配
+/// `实体信息框/自动` / `实体信息框`，首个位置参数为 `dst`，且带第 2 个
+/// 位置参数（变体名，非空）。只取引言区（首个 h2 之前）的实例。
+fn parser_infoboxes(text: &str, zone_end: usize) -> Vec<InfoboxSpan> {
+    let code = crate::wikitext::Wikicode::parse(text);
+    let mut out: Vec<InfoboxSpan> = Vec::new();
+    for t in code.templates() {
+        if t.start >= zone_end {
+            continue;
+        }
+        if !(t.is_named("实体信息框/自动") || t.is_named("实体信息框")) {
+            continue;
+        }
+        if t.positional(1).as_deref() != Some("dst") {
+            continue;
+        }
+        let Some(variant) = infobox_variant(t) else {
+            continue;
+        };
+        let params = parser_infobox_params(text, t);
+        out.push(InfoboxSpan {
+            start: t.start,
+            end: t.end,
+            variant,
+            params,
+        });
+    }
+    out.sort_by_key(|s| s.start);
+    out.dedup_by(|a, b| a.start == b.start);
+    out
+}
+
+// ---------------------------------------------------------------------------
+// 旧实现（字面头匹配 + 行式参数扫描）。迁移期保留供语料差分对比
+// （`differential_old_vs_new_infobox_extraction`），稳定后删除。
+// ---------------------------------------------------------------------------
+
 /// End offset of the balanced `{{…}}` template starting at `open` (pointing
 /// at the first `{`). Falls back to the zone end when braces never balance
 /// (malformed corpus).
+#[cfg_attr(not(test), allow(dead_code))]
 fn template_end(text: &str, open: usize, zone_end: usize) -> usize {
     let bytes = text.as_bytes();
     let mut depth = 0i32;
@@ -122,13 +220,6 @@ fn template_end(text: &str, open: usize, zone_end: usize) -> usize {
     zone_end
 }
 
-/// One entity-infobox instance inside the lead zone.
-struct InfoboxSpan {
-    start: usize,
-    end: usize,
-    variant: String,
-}
-
 /// Named-parameter value spans inside one infobox template body.
 ///
 /// Line-oriented: a parameter starts at a line beginning `\|name =`; its
@@ -136,6 +227,7 @@ struct InfoboxSpan {
 /// span end (so wrapped multi-line values stay inside one anchor). The
 /// positional head (`\|dst\|<prefab>`) is not a named parameter and yields
 /// nothing.
+#[cfg_attr(not(test), allow(dead_code))]
 fn infobox_params(text: &str, start: usize, end: usize) -> Vec<ParamSpan> {
     let mut line_starts = vec![start];
     for (i, _) in text[start..end].match_indices('\n') {
@@ -202,6 +294,7 @@ fn infobox_params(text: &str, start: usize, end: usize) -> Vec<ParamSpan> {
     out
 }
 
+#[cfg_attr(not(test), allow(dead_code))]
 fn infobox_spans(text: &str, zone_end: usize) -> Vec<InfoboxSpan> {
     let mut spans: Vec<InfoboxSpan> = Vec::new();
     for head in INFOBOX_HEADS {
@@ -213,10 +306,12 @@ fn infobox_spans(text: &str, zone_end: usize) -> Vec<InfoboxSpan> {
                 .chars()
                 .take_while(|c| !matches!(c, '|' | '}' | '\n' | '['))
                 .collect();
+            let end = template_end(text, open, zone_end);
             spans.push(InfoboxSpan {
                 start: open,
-                end: template_end(text, open, zone_end),
+                end,
                 variant: arg.trim().to_string(),
+                params: infobox_params(text, open, end),
             });
             from = arg_start;
         }
@@ -231,7 +326,7 @@ fn infobox_spans(text: &str, zone_end: usize) -> Vec<InfoboxSpan> {
 pub fn segment(pageid: i64, wikitext: &str) -> Vec<Region> {
     let headings = h2_lines(wikitext, 0);
     let zone_end = headings.first().map(|&(s, _)| s).unwrap_or(wikitext.len());
-    let spans = infobox_spans(wikitext, zone_end);
+    let spans = parser_infoboxes(wikitext, zone_end);
     let multi_tab = spans.len() > 1;
 
     let mut out: Vec<Region> = Vec::new();
@@ -270,8 +365,7 @@ pub fn segment(pageid: i64, wikitext: &str) -> Vec<Region> {
             None
         };
         let stop = span.end.max(span.start);
-        let params = infobox_params(wikitext, span.start, stop);
-        push(&mut out, kind, title, span.start, stop, params);
+        push(&mut out, kind, title, span.start, stop, span.params.clone());
         cursor = stop;
     }
     push(&mut out, "intro", None, cursor, zone_end, Vec::new());
@@ -411,5 +505,133 @@ mod tests {
         assert_eq!(tab.params.len(), 2);
         let v = &page[tab.params[0].start_byte..tab.params[0].end_byte];
         assert!(v.contains("第一行") && v.contains("第二行继续"), "{v:?}");
+    }
+
+    /// 语料差分：旧（字面头匹配 + 行式扫描）与新（wikitext 解析器）的
+    /// 信息框提取对比。旧实现的行式启发在单行多参数、值含嵌套模板换行、
+    /// 行内参数等形态上会把相邻参数/闭合括号吞进值里；断言允许且仅允许
+    /// 这类"旧值 = 新值 ± 纯语法片段"的偏差，其余一律失败。
+    /// 语料缺失时跳过。
+    #[test]
+    fn differential_old_vs_new_infobox_extraction() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("wikis/dontstarve.huijiwiki.com/pages");
+        if !dir.is_dir() {
+            eprintln!("语料不存在，跳过差分测试");
+            return;
+        }
+        let mut pages = 0u32;
+        let mut old_total = 0usize;
+        let mut new_total = 0usize;
+        let mut issues: Vec<String> = Vec::new();
+        for entry in std::fs::read_dir(&dir).expect("读取语料目录") {
+            let path = entry.expect("读取目录项").path();
+            if path.extension().and_then(|e| e.to_str()) != Some("wikitext") {
+                continue;
+            }
+            let text = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("读取 {}: {e}", path.display()));
+            pages += 1;
+            let file = path.file_name().unwrap().to_string_lossy().into_owned();
+            let zone_end = h2_lines(&text, 0)
+                .first()
+                .map(|&(s, _)| s)
+                .unwrap_or(text.len());
+            let old_spans = infobox_spans(&text, zone_end);
+            let new_spans = parser_infoboxes(&text, zone_end);
+            old_total += old_spans.len();
+            new_total += new_spans.len();
+            let new_code = crate::wikitext::Wikicode::parse(&text);
+            let new_by_start: std::collections::HashMap<usize, &InfoboxSpan> =
+                new_spans.iter().map(|s| (s.start, s)).collect();
+            for o in &old_spans {
+                // 旧实现的垃圾条目：空变体（`|dst|` 后直接换行/闭括号）、
+                // 命名参数被当作变体（`|dst|分类=矿石`）、变体带 HTML 注释
+                // （旧字面扫描不认识注释）——新提取器有意跳过或剥注释
+                if o.variant.is_empty() || o.variant.contains('=') || o.variant.contains("<!--") {
+                    continue;
+                }
+                let Some(n) = new_by_start.get(&o.start) else {
+                    issues.push(format!(
+                        "{file}: 旧有新无 @{} variant={:?}",
+                        o.start, o.variant
+                    ));
+                    continue;
+                };
+                if o.variant != n.variant {
+                    issues.push(format!(
+                        "{file}: variant 不同 @{}: {:?} vs {:?}",
+                        o.start, o.variant, n.variant
+                    ));
+                }
+                if o.end != n.end {
+                    issues.push(format!(
+                        "{file}: span end 不同 @{}: {} vs {}",
+                        o.start, o.end, n.end
+                    ));
+                }
+                // 覆盖性判定：旧参数的字节范围必须被新模板各参数的
+                // 名字/值 span 完全覆盖（旧行扫描会把同行兄弟参数或
+                // 闭合括号吞进值里）；未覆盖处只允许分隔语法。
+                let new_tpl = new_code
+                    .templates()
+                    .into_iter()
+                    .find(|t| t.start == o.start);
+                let arg_spans: Vec<(usize, usize)> = new_tpl
+                    .map(|t| {
+                        t.args
+                            .iter()
+                            .flat_map(|a| {
+                                [
+                                    crate::wikitext::nodes_span(&a.name),
+                                    crate::wikitext::nodes_span(&a.value),
+                                ]
+                            })
+                            .flatten()
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                for p in &o.params {
+                    let mut uncovered: Vec<(usize, char)> = Vec::new();
+                    for (i, c) in text[p.start_byte..p.end_byte].char_indices() {
+                        let pos = p.start_byte + i;
+                        if arg_spans.iter().any(|(a, z)| pos >= *a && pos < *z) {
+                            continue;
+                        }
+                        if matches!(c, '|' | '=' | '{' | '}') || c.is_whitespace() {
+                            continue;
+                        }
+                        uncovered.push((pos, c));
+                    }
+                    if !uncovered.is_empty() {
+                        let oval = &text[p.start_byte..p.end_byte];
+                        issues.push(format!(
+                            "{file}: 旧参数 {:?} 值含无法覆盖的内容 @{}: {:?}（首处 {:?} @{}）",
+                            p.name, p.start_byte, oval, uncovered[0].1, uncovered[0].0
+                        ));
+                    }
+                }
+            }
+        }
+        eprintln!(
+            "差分：{pages} 页，旧 {old_total} 个信息框，新 {new_total} 个，问题 {} 个",
+            issues.len()
+        );
+        assert!(pages > 100, "语料页数异常: {pages}");
+        assert!(
+            new_total >= old_total,
+            "新提取器信息框数不应少于旧实现: {new_total} < {old_total}"
+        );
+        assert!(
+            issues.is_empty(),
+            "差分问题 {} 个:\n{}",
+            issues.len(),
+            issues
+                .iter()
+                .take(20)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
     }
 }

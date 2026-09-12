@@ -93,13 +93,13 @@ pub async fn run(
     });
     if let Some(out) = &params.output {
         std::fs::create_dir_all(out)?;
-        std::fs::write(
+        crate::platform::fs::write_text_atomic(
             out.join("report.json"),
             serde_json::to_string_pretty(&report)?,
         )?;
         for (title, text) in &new_texts {
             let safe = title.replace(['/', ':', '#'], "_");
-            std::fs::write(out.join(format!("{safe}.wikitext")), text)?;
+            crate::platform::fs::write_text_atomic(out.join(format!("{safe}.wikitext")), text)?;
         }
         reporter.log(format!("报告与新文本已写入 {:?}", out));
     }

@@ -29,12 +29,16 @@ fn tmp_path(path: &Path) -> std::path::PathBuf {
 }
 
 /// 原子写文本：先写同目录临时文件再 rename，父目录自动创建。
-pub fn write_text_atomic(path: &Path, body: &str) -> Result<()> {
+///
+/// 接受任意 `AsRef<Path>` / `AsRef<[u8]>`，方便从 `PathBuf`/`String`/`&str`
+/// 直接调用而不必手动取引用。
+pub fn write_text_atomic(path: impl AsRef<Path>, body: impl AsRef<[u8]>) -> Result<()> {
+    let path = path.as_ref();
     ensure_parent(path)?;
     let tmp = tmp_path(path);
     {
         let mut f = std::fs::File::create(&tmp)?;
-        f.write_all(body.as_bytes())?;
+        f.write_all(body.as_ref())?;
         f.sync_all().ok();
     }
     std::fs::rename(&tmp, path)?;
@@ -42,9 +46,9 @@ pub fn write_text_atomic(path: &Path, body: &str) -> Result<()> {
 }
 
 /// 原子写 JSON（pretty 序列化 + [`write_text_atomic`]）。
-pub fn write_json_atomic<T: serde::Serialize>(path: &Path, value: &T) -> Result<()> {
+pub fn write_json_atomic<T: serde::Serialize>(path: impl AsRef<Path>, value: &T) -> Result<()> {
     let body = serde_json::to_string_pretty(value)?;
-    write_text_atomic(path, &body)
+    write_text_atomic(path, body)
 }
 
 #[cfg(test)]

@@ -344,7 +344,7 @@ pub async fn run_prefab_overrides_audit(
     let text = serde_json::to_string_pretty(&report)?;
     match output {
         Some(path) => {
-            std::fs::write(&path, &text)?;
+            crate::platform::fs::write_text_atomic(&path, &text)?;
             reporter.log(format!("审计报告已写入 {}", path.display()));
         }
         None => reporter.log(text),

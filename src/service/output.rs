@@ -47,7 +47,7 @@ pub(super) async fn output_json_result_with_update(
     let new_json = WikiDataConverter::to_json_string(wiki_data)?;
 
     if let Some(output_path) = output {
-        std::fs::write(&output_path, &new_json)?;
+        crate::platform::fs::write_text_atomic(&output_path, &new_json)?;
         reporter.log(format!(
             "已写入 {} 条记录到 {:?}",
             wiki_data.data.len(),

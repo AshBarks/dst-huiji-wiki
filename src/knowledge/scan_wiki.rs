@@ -536,7 +536,7 @@ pub async fn run_scan_wiki(
             Err(_) => true,
         };
         if changed {
-            std::fs::write(&out_path, body)?;
+            crate::platform::fs::write_text_atomic(&out_path, &body)?;
             written += 1;
         } else {
             unchanged += 1;
@@ -742,7 +742,7 @@ async fn run_audit(
                     .await;
                 match raw {
                     Ok(text) => {
-                        let _ = std::fs::write(&raw_file, &text);
+                        let _ = crate::platform::fs::write_text_atomic(&raw_file, &text);
                         outcome = Some(Ok(text));
                         break;
                     }
@@ -988,7 +988,7 @@ pub fn run_page_map_report(
         .map(|e| e != body)
         .unwrap_or(true)
     {
-        std::fs::write(&out_path, body)?;
+        crate::platform::fs::write_text_atomic(&out_path, &body)?;
     }
     reporter.log(format!(
         "PageSymbolMap 报表: 页面 {} / 提及对页面 {pages_with_mention},对 {pairs}(stub {stub_pairs},未审计 stub {stub_unaudited}),语义不一致 {}",

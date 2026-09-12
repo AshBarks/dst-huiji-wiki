@@ -506,7 +506,7 @@ pub async fn run_knowledge_sync(
     if let Some(parent) = out_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(out_path, serde_json::to_string_pretty(&report)?)?;
+    crate::platform::fs::write_json_atomic(out_path, &report)?;
 
     if !drafts.is_empty() {
         reporter.log(format!("Tier2 起草 {} 条修订建议(人工审阅)", drafts.len()));
@@ -623,7 +623,7 @@ async fn draft_revision_suggestions(
             doc.path.replace('/', "_"),
             chrono_free_stamp(),
         ));
-        let _ = std::fs::write(&raw_path, &raw);
+        let _ = crate::platform::fs::write_text_atomic(&raw_path, &raw);
         let trimmed = raw.trim();
         let (Some(a), Some(b)) = (trimmed.find('{'), trimmed.rfind('}')) else {
             reporter.log(format!("起草输出无 JSON:{}", doc.path));
@@ -734,7 +734,7 @@ fn write_review_template(drafts: &[DraftSuggestion], reporter: &dyn Reporter) ->
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(path, serde_json::to_string_pretty(&entries)?)?;
+    crate::platform::fs::write_json_atomic(path, &entries)?;
     reporter.log(format!(
         "复核模板已写出 {},请人工填写 decision(approve/reject)后以 --review 回读",
         path.display()
@@ -802,7 +802,7 @@ fn run_review(
     if let Some(parent) = out_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(out_path, &md)?;
+    crate::platform::fs::write_text_atomic(out_path, &md)?;
     reporter.log(format!(
         "复核完成:approve {approved} / reject {rejected} / 未裁决 {},应用清单 {}(wiki 编辑仍需人工执行)",
         report.drafts.len() - approved - rejected,

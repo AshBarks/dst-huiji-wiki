@@ -171,7 +171,7 @@ impl ObjectStore {
         let hash = hash_file(src)?;
         let dest = self.path(&hash);
         if !dest.exists() {
-            std::fs::create_dir_all(dest.parent().expect("hash 前缀目录"))?;
+            crate::platform::fs::ensure_parent(&dest)?;
             std::fs::copy(src, &dest)?;
         }
         Ok(hash)
@@ -198,7 +198,7 @@ impl ManifestStore {
         std::fs::create_dir_all(&self.dir)?;
         let path = self.path(&manifest.build);
         let json = serde_json::to_string_pretty(manifest)?;
-        std::fs::write(&path, json)?;
+        crate::platform::fs::write_text_atomic(&path, json)?;
         Ok(path)
     }
 

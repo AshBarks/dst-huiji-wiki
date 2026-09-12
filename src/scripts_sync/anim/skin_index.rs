@@ -245,7 +245,7 @@ pub fn run_skin_index(
     if let Some(parent) = out_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(&out_path, serde_json::to_string_pretty(&artifact)?)?;
+    crate::platform::fs::write_text_atomic(&out_path, serde_json::to_string_pretty(&artifact)?)?;
 
     reporter.log(format!(
         "skin {} / base_prefab {} / build {} / 配对 {} / 缺文件 {}",

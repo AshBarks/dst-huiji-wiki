@@ -418,7 +418,7 @@ fn write_mapping(
     let json_output = serde_json::to_string_pretty(mapping)?;
     match output {
         Some(path) => {
-            std::fs::write(&path, &json_output)?;
+            crate::platform::fs::write_text_atomic(&path, &json_output)?;
             reporter.log(format!(
                 "已写入 {} 条映射到 {}",
                 mapping.len(),

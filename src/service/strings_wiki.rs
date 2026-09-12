@@ -130,7 +130,7 @@ pub async fn run(
     std::fs::create_dir_all(&out_dir)?;
     if !old_index.is_empty() {
         // 留存对比基线，便于事后审计与复现。
-        std::fs::write(
+        crate::platform::fs::write_text_atomic(
             out_dir.join(format!("{version}_Strings_Index.old.json")),
             serde_json::to_string(&StringsIndexFile {
                 data: old_index.clone(),
@@ -171,11 +171,11 @@ pub async fn run(
             report.push(page.to_row());
         }
         report_index(&plan, &existing_index.data, &mut report, reporter);
-        std::fs::write(
+        crate::platform::fs::write_text_atomic(
             out_dir.join("compare.json"),
             serde_json::to_string_pretty(&report)?,
         )?;
-        std::fs::write(
+        crate::platform::fs::write_text_atomic(
             out_dir.join("compare.md"),
             render_compare_md(&version, &report),
         )?;
@@ -205,7 +205,7 @@ pub async fn run(
                 params.limit,
             )
             .await?;
-            std::fs::write(
+            crate::platform::fs::write_text_atomic(
                 out_dir.join("apply.json"),
                 serde_json::to_string_pretty(&apply)?,
             )?;
@@ -307,7 +307,7 @@ fn write_artifacts(
     let index_file = StringsIndexFile {
         data: plan.index.clone(),
     };
-    std::fs::write(
+    crate::platform::fs::write_text_atomic(
         out_dir.join(format!("{version}_Strings_Index.json")),
         serde_json::to_string(&index_file)?,
     )?;
@@ -323,7 +323,7 @@ fn write_artifacts(
             } else {
                 en_bytes += text.len();
             }
-            std::fs::write(
+            crate::platform::fs::write_text_atomic(
                 out_dir.join(format!("{version}_Strings_{lang}_{}.lua", bucket.id)),
                 text,
             )?;

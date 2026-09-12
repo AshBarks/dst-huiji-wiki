@@ -96,7 +96,7 @@ impl CorpusStore {
     pub fn write_page(&self, pageid: i64, text: &str) -> Result<PathBuf> {
         std::fs::create_dir_all(self.pages_dir())?;
         let path = self.page_path(pageid);
-        std::fs::write(&path, text)?;
+        crate::platform::fs::write_text_atomic(&path, text)?;
         Ok(path)
     }
 
@@ -129,7 +129,7 @@ impl CorpusStore {
     pub fn save_manifest(&self, manifest: &CorpusManifest) -> Result<()> {
         std::fs::create_dir_all(&self.root)?;
         let path = self.root.join("manifest.json");
-        std::fs::write(&path, serde_json::to_string_pretty(manifest)?)?;
+        crate::platform::fs::write_json_atomic(&path, manifest)?;
         Ok(())
     }
 
@@ -173,7 +173,7 @@ impl CorpusStore {
             redirects.insert(m.title.clone(), target);
         }
         let redirects_path = index_dir.join("redirects.json");
-        std::fs::write(&redirects_path, serde_json::to_string_pretty(&redirects)?)?;
+        crate::platform::fs::write_json_atomic(&redirects_path, &redirects)?;
 
         let mut class_counts: BTreeMap<String, usize> = BTreeMap::new();
         let mut unknown: Vec<String> = Vec::new();
@@ -189,10 +189,7 @@ impl CorpusStore {
             "counts": class_counts,
             "unknown_titles": unknown,
         });
-        std::fs::write(
-            index_dir.join("classes_summary.json"),
-            serde_json::to_string_pretty(&summary)?,
-        )?;
+        crate::platform::fs::write_json_atomic(index_dir.join("classes_summary.json"), &summary)?;
         Ok(())
     }
 }

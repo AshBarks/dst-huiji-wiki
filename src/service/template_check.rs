@@ -498,7 +498,7 @@ pub async fn run(
         }
     }
     if let Some(path) = &params.output {
-        std::fs::write(path, &snippets_text)?;
+        crate::platform::fs::write_text_atomic(path, &snippets_text)?;
         reporter.log(format!("片段已写入 {}", path.display()));
     }
 

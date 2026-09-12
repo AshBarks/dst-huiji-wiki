@@ -196,9 +196,9 @@ pub async fn run_maintain_prefab_overrides(
     if let Some(dir) = output {
         std::fs::create_dir_all(&dir)?;
         let page_path = dir.join("PrefabOverrides.lua");
-        std::fs::write(&page_path, render_wiki_page(&merged_map)?)?;
+        crate::platform::fs::write_text_atomic(&page_path, render_wiki_page(&merged_map)?)?;
         let diff_path = dir.join("diff.json");
-        std::fs::write(&diff_path, serde_json::to_string_pretty(&diff)?)?;
+        crate::platform::fs::write_text_atomic(&diff_path, serde_json::to_string_pretty(&diff)?)?;
         reporter.log(format!("页面文本：{}", page_path.display()));
         reporter.log(format!("diff 报告：{}", diff_path.display()));
     } else {

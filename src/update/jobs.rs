@@ -204,7 +204,7 @@ pub(crate) async fn run_update_scan(
             ));
         }
         let cc_md_path = out_dir.join("create_check.md");
-        std::fs::write(&cc_md_path, cc_md)?;
+        crate::platform::fs::write_text_atomic(&cc_md_path, cc_md)?;
         reporter.log(format!(
             "Layer B 明细 {} 条（建议 {}，create_check {}）→ {}",
             graded.len(),
@@ -232,14 +232,14 @@ pub(crate) async fn run_update_scan(
         "tier0_hits": tier0.len(),
     });
     crate::platform::fs::write_json_atomic(
-        &out_dir.join("impact.json"),
+        out_dir.join("impact.json"),
         &serde_json::json!({
             "report": report,
             "tier0": tier0,
         }),
     )?;
     let patch = diff.to_patch(&old_root, &new_root)?;
-    std::fs::write(out_dir.join("changes.patch"), &patch)?;
+    crate::platform::fs::write_text_atomic(out_dir.join("changes.patch"), &patch)?;
 
     reporter.log(format!("受影响实体 {}", report.affected_entities.len()));
     reporter.log(format!("已写入 {}", out_dir.display()));
@@ -386,7 +386,7 @@ pub(crate) async fn run_symbol_annotate(
         prompts.push('\n');
     }
     let prompts_path = out_dir.join("symbol_prompts.md");
-    std::fs::write(&prompts_path, &prompts)?;
+    crate::platform::fs::write_text_atomic(&prompts_path, &prompts)?;
 
     let mut summary = serde_json::json!({
         "packs": packs.len(),
@@ -497,7 +497,7 @@ pub(crate) async fn run_symbol_annotate(
                                         }
                                     })
                                     .await?;
-                                std::fs::write(&raw_file, &raw).map_err(crate::error::Error::Io)?;
+                                crate::platform::fs::write_text_atomic(&raw_file, &raw)?;
                                 crate::update::parse_symbol_annotation_response(&raw).map_err(|e| {
                                     crate::error::Error::Llm(format!(
                                         "输出无法解析为 JSON（原始响应已保存到 {}）：{e}",
@@ -579,7 +579,7 @@ pub(crate) async fn run_symbol_annotate(
             md.push_str(&crate::update::render_coverage_report_md(r));
         }
         let cov_md = out_dir.join("symbol_coverage.md");
-        std::fs::write(&cov_md, &md)?;
+        crate::platform::fs::write_text_atomic(&cov_md, &md)?;
         reporter.log(format!(
             "覆盖报告 {} 个 symbol → {} / {}",
             reports.len(),

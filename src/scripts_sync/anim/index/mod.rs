@@ -404,7 +404,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     if let Some(parent) = out_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(&out_path, serde_json::to_string_pretty(&artifact)?)?;
+    crate::platform::fs::write_text_atomic(&out_path, serde_json::to_string_pretty(&artifact)?)?;
 
     // Tier-A 重映射索引产物：anim-index.json 的伴生文件，供 WebUI 的
     // override 选择器与渲染端点查询。
@@ -447,7 +447,10 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         "symbols": remap_index.symbols,
         "clothing": clothing_index,
     });
-    std::fs::write(&remap_path, serde_json::to_string_pretty(&remap_artifact)?)?;
+    crate::platform::fs::write_text_atomic(
+        &remap_path,
+        serde_json::to_string_pretty(&remap_artifact)?,
+    )?;
 
     // 版本快照：供 remap-diff 对比（同 label 覆盖，确定性输出保证幂等）。
     let snapshot_path = super::remap_history::save_remap_snapshot(

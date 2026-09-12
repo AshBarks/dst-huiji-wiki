@@ -364,7 +364,7 @@ pub async fn run_classify(
         "pairs": pairs,
     });
     let out_path = knowledge_root.join("inconsistent_classification.json");
-    std::fs::write(&out_path, serde_json::to_string_pretty(&out)?)?;
+    crate::platform::fs::write_json_atomic(&out_path, &out)?;
     reporter.log(format!(
         "分类完成:共 {} 对,报告 {}",
         pairs.len(),

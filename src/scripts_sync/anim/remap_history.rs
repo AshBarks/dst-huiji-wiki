@@ -232,7 +232,7 @@ pub fn save_remap_snapshot(dir: &Path, artifact: &serde_json::Value) -> Result<P
         .unwrap_or("unknown");
     std::fs::create_dir_all(dir)?;
     let path = dir.join(format!("{label}.json"));
-    std::fs::write(&path, serde_json::to_string_pretty(artifact)?)?;
+    crate::platform::fs::write_text_atomic(&path, serde_json::to_string_pretty(artifact)?)?;
     Ok(path)
 }
 

@@ -149,7 +149,7 @@ fn load_state(store: &CorpusStore) -> Option<RcState> {
 
 fn save_state(store: &CorpusStore, state: &RcState) -> Result<()> {
     let path = store.root().join("rc_state.json");
-    std::fs::write(path, serde_json::to_string_pretty(state)?)?;
+    crate::platform::fs::write_json_atomic(path, state)?;
     Ok(())
 }
 

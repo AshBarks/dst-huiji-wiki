@@ -611,7 +611,7 @@ async fn maintain_character(
             "{}.lua",
             page_title.rsplit('/').next().unwrap_or(character)
         ));
-        std::fs::write(&file, &new_content)?;
+        crate::platform::fs::write_text_atomic(&file, &new_content)?;
         reporter.log(format!("已写产物 {:?}", file));
     }
 
@@ -710,7 +710,7 @@ pub async fn run_skilltree_wiki(
     if let Some(dir) = output_dir.as_ref() {
         std::fs::create_dir_all(dir)?;
         let widget = dir.join("Skilltree.js");
-        std::fs::write(&widget, SKILLTREE_WIDGET_JS)?;
+        crate::platform::fs::write_text_atomic(&widget, SKILLTREE_WIDGET_JS)?;
         reporter.log(format!(
             "已写渲染器 {:?}（复制到维基 零件:Skilltree.js）",
             widget
@@ -803,7 +803,7 @@ pub async fn run_skilltree_export(
     for ch in &characters {
         let data = super::dataset::load_skill_tree(snapshot.as_deref(), ch, &strings_data)?;
         let file = output_dir.join(format!("{}.json", ch));
-        std::fs::write(&file, serde_json::to_string_pretty(&data)?)?;
+        crate::platform::fs::write_text_atomic(&file, serde_json::to_string_pretty(&data)?)?;
         reporter.log(format!("已导出 {:?}", file));
         files.push(file.to_string_lossy().to_string());
     }

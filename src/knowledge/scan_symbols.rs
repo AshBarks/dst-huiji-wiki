@@ -1100,7 +1100,7 @@ async fn generate_one(
         .await?;
 
     let raw_path = raw_dir.join(format!("{}__{}.json", key.doc_id(), prompt_rev));
-    std::fs::write(&raw_path, &raw)?;
+    crate::platform::fs::write_text_atomic(&raw_path, &raw)?;
     reporter.log(format!("raw 已归档 {}", raw_path.display()));
 
     parse_doc_tolerant(&raw).map_err(|e| {
@@ -1465,7 +1465,7 @@ async fn generate_wiki_once(
         .await?;
 
     let raw_path = raw_dir.join(format!("{}__wiki__{}.json", doc_id, prompt_rev));
-    std::fs::write(&raw_path, &raw)?;
+    crate::platform::fs::write_text_atomic(&raw_path, &raw)?;
     reporter.log(format!("pass2 raw 已归档 {}", raw_path.display()));
 
     parse_wiki_tolerant(&raw).map_err(|e| {
@@ -1553,7 +1553,7 @@ aspects:{aspects}
         doc.reference.doc_id(),
         doc.prompt_rev
     ));
-    let _ = std::fs::write(&raw_path, &raw);
+    let _ = crate::platform::fs::write_text_atomic(&raw_path, &raw);
     let Some(revised) = parse_search_terms_payload(&raw) else {
         reporter.log("search_terms 改写输出无法解析,保留原词".to_string());
         return;

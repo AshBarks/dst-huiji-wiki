@@ -181,7 +181,7 @@ pub fn batch_annotate(
         if let Some(parent) = target.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        std::fs::write(&target, annotate_file(f, artifact))?;
+        crate::platform::fs::write_text_atomic(&target, annotate_file(f, artifact))?;
         written.push(target);
     }
     Ok(written)

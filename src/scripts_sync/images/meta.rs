@@ -263,16 +263,10 @@ pub fn load(out_dir: &Path) -> Result<IconMeta> {
     Ok(meta)
 }
 
-/// 原子写入元数据（先写临时文件再重命名，避免与 WebUI 读并发损坏）。
+/// 原子写入元数据（避免与 WebUI 读并发损坏）。
 pub fn save(out_dir: &Path, meta: &IconMeta) -> Result<PathBuf> {
     let path = meta_path(out_dir);
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    let json = serde_json::to_string_pretty(meta)?;
-    let tmp = path.with_extension("json.tmp");
-    std::fs::write(&tmp, json)?;
-    std::fs::rename(&tmp, &path)?;
+    crate::platform::fs::write_json_atomic(&path, meta)?;
     Ok(path)
 }
 

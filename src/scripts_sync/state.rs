@@ -29,7 +29,7 @@ pub fn read_last_version(path: &Path) -> Result<Option<String>> {
 
 /// Persists the synced version to the state file.
 pub fn write_version(path: &Path, version: &str) -> Result<()> {
-    Ok(fs::write(path, format!("{version}\n"))?)
+    crate::platform::fs::write_text_atomic(path, format!("{version}\n"))
 }
 
 /// Whether a sync is needed: no record yet, or a version mismatch.

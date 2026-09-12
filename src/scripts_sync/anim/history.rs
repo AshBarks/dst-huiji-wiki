@@ -154,7 +154,7 @@ impl ManifestStore {
         std::fs::create_dir_all(&self.dir)?;
         let path = self.path(&manifest.label);
         let json = serde_json::to_string_pretty(manifest)?;
-        std::fs::write(&path, json)?;
+        crate::platform::fs::write_text_atomic(&path, json)?;
         Ok(path)
     }
 

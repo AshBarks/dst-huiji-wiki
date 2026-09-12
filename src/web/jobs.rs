@@ -151,8 +151,9 @@ pub struct JobManager {
     order: Mutex<VecDeque<Uuid>>,
     /// 同类任务互斥锁：按 `JobKind::name()` 懒创建、同名共享一把。
     kind_locks: Mutex<HashMap<&'static str, Arc<Mutex<()>>>>,
-    /// wiki 写互斥：`touches_wiki` 的任务全程持有，wiki 操作互不交错。
-    wiki_lock: Arc<Mutex<()>>,
+    /// 资源竞争域互斥锁：按 `JobSpec.resources`（"wiki"/"ktools_out"/…
+    /// 懒创建共享）。不同 kind 写同一资源目录时也能互斥。
+    resource_locks: Mutex<HashMap<&'static str, Arc<Mutex<()>>>>,
 }
 
 impl Default for JobManager {
@@ -167,7 +168,7 @@ impl JobManager {
             jobs: RwLock::new(BTreeMap::new()),
             order: Mutex::new(VecDeque::new()),
             kind_locks: Mutex::new(HashMap::new()),
-            wiki_lock: Arc::new(Mutex::new(())),
+            resource_locks: Mutex::new(HashMap::new()),
         }
     }
 
@@ -175,6 +176,12 @@ impl JobManager {
     async fn kind_lock(&self, kind: &'static str) -> Arc<Mutex<()>> {
         let mut locks = self.kind_locks.lock().await;
         Arc::clone(locks.entry(kind).or_default())
+    }
+
+    /// 资源竞争域的互斥锁（同名共享）。
+    async fn resource_lock(&self, resource: &'static str) -> Arc<Mutex<()>> {
+        let mut locks = self.resource_locks.lock().await;
+        Arc::clone(locks.entry(resource).or_default())
     }
 
     /// Submits a job and spawns it on the tokio runtime.
@@ -242,18 +249,21 @@ impl JobManager {
 
         // Worker task: 等待资源锁（排队）→ 原子地 Queued→Running → 跑到终态。
         let kind_permit = self.kind_lock(kind.name()).await;
-        let wiki_permit: Option<Arc<Mutex<()>>> = if kind.touches_wiki() {
-            Some(Arc::clone(&self.wiki_lock))
-        } else {
-            None
-        };
+        let mut resource_keys: Vec<&'static str> = kind.resources().to_vec();
+        resource_keys.sort_unstable();
+        let mut resource_permits = Vec::with_capacity(resource_keys.len());
+        for key in &resource_keys {
+            resource_permits.push(self.resource_lock(key).await);
+        }
         let task = Arc::clone(&handle);
         tokio::spawn(async move {
             let _kind = kind_permit.lock().await;
-            let _wiki = match wiki_permit.as_ref() {
-                Some(w) => Some(w.lock().await),
-                None => None,
-            };
+            // 严格按排序后的键序串行获取：不同任务的资源集合有交集时，
+            // 全局获取顺序一致，不会形成环等待。
+            let mut _resources = Vec::with_capacity(resource_permits.len());
+            for permit in &resource_permits {
+                _resources.push(permit.lock().await);
+            }
 
             // 取消与开跑的判定在同一把状态写锁下完成，二者不会交错。
             if !task.try_begin_run().await {
@@ -324,6 +334,16 @@ mod tests {
             result_json: Mutex::new(None),
             error: Mutex::new(None),
         })
+    }
+
+    #[tokio::test]
+    async fn resource_lock_shared_by_name_distinct_across_resources() {
+        let mgr = JobManager::new();
+        let w1 = mgr.resource_lock("wiki").await;
+        let w2 = mgr.resource_lock("wiki").await;
+        let k = mgr.resource_lock("ktools_out").await;
+        assert!(Arc::ptr_eq(&w1, &w2));
+        assert!(!Arc::ptr_eq(&w1, &k));
     }
 
     #[tokio::test]

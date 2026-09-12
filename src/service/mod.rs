@@ -1,4 +1,5 @@
 pub mod dataset;
+pub mod job_spec;
 pub mod prefab_overrides;
 pub mod skilltree_wiki;
 pub mod snapshot_diff;
@@ -8,6 +9,8 @@ pub mod upload_icons;
 pub mod upload_image;
 pub mod wiki_write;
 pub mod wikitext_edit;
+
+pub use job_spec::{JobSpec, WikiAccess, JOB_SPECS};
 
 use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
@@ -230,8 +233,8 @@ pub enum JobKind {
         /// 手动指定 wiki 文件名（需配合 `file`；写入映射表并上传）。
         #[serde(default)]
         title: Option<String>,
-        /// 批量时仅上传维基上尚不存在的图标。
-        #[serde(default)]
+        /// 批量时仅上传维基上尚不存在的图标（缺省 true，与 CLI/Web 默认一致）。
+        #[serde(default = "default_only_missing")]
         only_missing: bool,
         /// 同名重传发送 `ignorewarnings=1`。
         #[serde(default)]
@@ -449,6 +452,10 @@ pub enum JobKind {
     },
 }
 
+fn default_only_missing() -> bool {
+    true
+}
+
 fn default_sync_new() -> String {
     "current".to_string()
 }
@@ -506,57 +513,63 @@ fn default_strings_buckets() -> usize {
 }
 
 impl JobKind {
-    /// Human readable name used in job listings.
-    pub fn name(&self) -> &'static str {
+    /// 对应的 [`JobSpec`] 声明（canonical name/wiki_access/resources/params
+    /// 的唯一来源）。
+    pub fn spec(&self) -> &'static job_spec::JobSpec {
         match self {
-            JobKind::ParsePo { .. } => "parse-po",
-            JobKind::MapNames { .. } => "map-names",
-            JobKind::MapRecipes { .. } => "map-recipes",
-            JobKind::MaintainItemTable { .. } => "maintain-item-table",
-            JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
-            JobKind::MaintainCopyClip { .. } => "maintain-copy-clip",
-            JobKind::MaintainTemplateCheck { .. } => "maintain-template-check",
-            JobKind::MaintainStrings { .. } => "maintain-strings",
-            JobKind::SkilltreeWiki { .. } => "skilltree-wiki",
-            JobKind::SkilltreeExport { .. } => "skilltree-export",
-            JobKind::UploadImage { .. } => "upload-image",
-            JobKind::UploadIcons { .. } => "upload-icons",
-            JobKind::PrefabOverrides { .. } => "prefab-overrides",
-            JobKind::PrefabOverridesDir { .. } => "prefab-overrides-dir",
-            JobKind::PrefabOverridesAudit { .. } => "prefab-overrides-audit",
-            JobKind::MaintainPrefabOverrides { .. } => "maintain-prefab-overrides",
-            JobKind::ScriptsSync { .. } => "scripts-sync",
-            JobKind::ImagesSync { .. } => "images-sync",
-            JobKind::AnimSync { .. } => "anim-sync",
-            JobKind::AnimDiff { .. } => "anim-diff",
-            JobKind::AnimIndex { .. } => "anim-index",
-            JobKind::SkinIndex { .. } => "skin-index",
-            JobKind::CorpusFetch { .. } => "corpus-fetch",
-            JobKind::CorpusIndex { .. } => "corpus-index",
-            JobKind::UpdateIndex { .. } => "update-index",
-            JobKind::UpdateScan { .. } => "update-scan",
-            JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
-            JobKind::KnowledgeSync { .. } => "knowledge-sync",
-            JobKind::PageAssist { .. } => "page-assist",
-            JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
-            JobKind::SymbolAnnotate { .. } => "symbol-annotate",
-            JobKind::MaintainWikitext { .. } => "maintain-wikitext",
+            JobKind::ParsePo { .. } => &job_spec::JOB_SPECS[0],
+            JobKind::MapNames { .. } => &job_spec::JOB_SPECS[1],
+            JobKind::MapRecipes { .. } => &job_spec::JOB_SPECS[2],
+            JobKind::MaintainItemTable { .. } => &job_spec::JOB_SPECS[3],
+            JobKind::MaintainDstRecipes { .. } => &job_spec::JOB_SPECS[4],
+            JobKind::MaintainCopyClip { .. } => &job_spec::JOB_SPECS[5],
+            JobKind::MaintainTemplateCheck { .. } => &job_spec::JOB_SPECS[6],
+            JobKind::MaintainStrings { .. } => &job_spec::JOB_SPECS[7],
+            JobKind::SkilltreeWiki { .. } => &job_spec::JOB_SPECS[8],
+            JobKind::SkilltreeExport { .. } => &job_spec::JOB_SPECS[9],
+            JobKind::UploadImage { .. } => &job_spec::JOB_SPECS[10],
+            JobKind::PrefabOverrides { .. } => &job_spec::JOB_SPECS[11],
+            JobKind::PrefabOverridesDir { .. } => &job_spec::JOB_SPECS[12],
+            JobKind::PrefabOverridesAudit { .. } => &job_spec::JOB_SPECS[13],
+            JobKind::MaintainPrefabOverrides { .. } => &job_spec::JOB_SPECS[14],
+            JobKind::ScriptsSync { .. } => &job_spec::JOB_SPECS[15],
+            JobKind::ImagesSync { .. } => &job_spec::JOB_SPECS[16],
+            JobKind::UploadIcons { .. } => &job_spec::JOB_SPECS[17],
+            JobKind::AnimSync { .. } => &job_spec::JOB_SPECS[18],
+            JobKind::AnimDiff { .. } => &job_spec::JOB_SPECS[19],
+            JobKind::AnimIndex { .. } => &job_spec::JOB_SPECS[20],
+            JobKind::SkinIndex { .. } => &job_spec::JOB_SPECS[21],
+            JobKind::UpdateScan { .. } => &job_spec::JOB_SPECS[22],
+            JobKind::UpdateIndex { .. } => &job_spec::JOB_SPECS[23],
+            JobKind::CorpusFetch { .. } => &job_spec::JOB_SPECS[24],
+            JobKind::CorpusIndex { .. } => &job_spec::JOB_SPECS[25],
+            JobKind::SymbolAnnotate { .. } => &job_spec::JOB_SPECS[26],
+            JobKind::KnowledgeScanSymbols { .. } => &job_spec::JOB_SPECS[27],
+            JobKind::PageAssist { .. } => &job_spec::JOB_SPECS[28],
+            JobKind::KnowledgeSync { .. } => &job_spec::JOB_SPECS[29],
+            JobKind::KnowledgeScanWiki { .. } => &job_spec::JOB_SPECS[30],
+            JobKind::MaintainWikitext { .. } => &job_spec::JOB_SPECS[31],
         }
+    }
+
+    /// Human readable name used in job listings (canonical, == CLI name).
+    pub fn name(&self) -> &'static str {
+        self.spec().name
+    }
+
+    /// 中文显示名（Web 前端 / 日志）。
+    pub fn label(&self) -> &'static str {
+        self.spec().label
+    }
+
+    /// 资源竞争域（WebUI JobManager 跨任务互斥键）。
+    pub fn resources(&self) -> &'static [&'static str] {
+        self.spec().resources
     }
 
     /// Whether this job may edit pages on the wiki (needs explicit confirm).
     pub fn touches_wiki(&self) -> bool {
-        matches!(
-            self,
-            JobKind::MaintainItemTable { .. }
-                | JobKind::MaintainDstRecipes { .. }
-                | JobKind::MaintainCopyClip { .. }
-                | JobKind::MaintainStrings { .. }
-                | JobKind::MaintainWikitext { .. }
-                | JobKind::SkilltreeWiki { .. }
-                | JobKind::UploadImage { .. }
-                | JobKind::UploadIcons { .. }
-        )
+        self.spec().touches_wiki()
     }
 
     /// 每个变体一个最小实例（字段取占位值），供契约测试与文档枚举。

@@ -97,13 +97,33 @@
 - `DstContext` 与 GameSource 并存现状保留（语义均正确，重复度可控），未强行统一；
   JobSpec 参数校验仍未接入执行路径 → 列入 P3 待办。
 
-## 进度台账（P3，待启动）
+## 进度台账（P3）
 
-| 项 | 说明 |
+### P3 补充拍板（2026-09-12 第三轮）
+
+| 问题 | 决策 |
 |---|---|
-| P3.1 mapping 框架 | diff/merge 改按 `field_name → value` 对齐（key 用 `T::key_field()`）；schema 演进测试；MappingBuilder 删除或迁移（待拍板） |
-| P3.2 anim/index.rs 拆分 | 2112 行按 manifest/diff/index/remap 职责切分 |
-| P3.3 前端 ES modules | app.js 2724 行拆 api/jobs/pages/*，无打包器，服务端多 serve 静态文件（拆分方式待拍板） |
-| P3.4 技能树渲染单一源 | skilltree_widget.js 与 app.js 技能树部分收敛（wiki 端无 ESM，需拼接方案，待拍板） |
-| P3.5 parser 大文件（可选） | prefab_override 单遍历器重构（风险高，先差分测试）、skilltree.rs 拆分 |
-| P3.6 JobSpec 参数校验接入 | 非法 type/source/路径在执行前报错 |
+| MappingBuilder（仅测试使用，约 500 行） | **删除** |
+| 前端拆分 | **ES modules**（无打包器） |
+| 技能树渲染单一源 | **方案不动**（skilltree_widget.js 与 app.js 保持双份人工同步） |
+| parser 大文件重构 | **推迟**（P4/后续，动前先建差分测试） |
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P3.1 | mapping 按字段名对齐：compare_data/compare_records/merge 显式 key_field、逐字段按名对齐（历史侧缺字段视为 Null）；修 find_historical_record 误用历史下标取新值；schema 演进测试；**删除 MappingBuilder/SchemaBuilder**（537 行） | ✅ | abe98f8 |
+| P3.2 | JobSpec 参数校验接入执行路径：`JobKind::validate()`（copyclip type 枚举、upload-icons source/后缀），execute_job_with_mode 入口统一调用（CLI/Web 共用） | ✅ | 6e6e8ed |
+| P3.3 | anim/index.rs（2112 行）→ 目录模块：mod.rs（类型+run_index+测试）/scanner.rs（Lua 扫描器 ~1380 行） | ✅ | fa6374e |
+| P3.4 | 前端 ES modules：app.js 2724 行 → 入口 64 行 + 11 个模块；`/static/js/{*file}` 白名单路由；静态资产 no-cache；JOB_DEFS 契约测试迁移到新位置；浏览器实测 10 路由全部渲染 | ✅ | 7a063f4 |
+| P3.5 | 技能树单一源 / parser 重构 | ⏸ 拍板不动/推迟 | — |
+
+### P3 收尾状态（2026-09-12）
+
+- `cargo test`：616 lib + 21 bin 全绿；fmt/clippy 干净；全程未做线上 wiki 写。
+- 前端经真实浏览器验证：10 个路由全部渲染（dashboard/jobs/recipes/translations/
+  skills/constants/snapshots/anims/anim-assets 正常，icons 页为滚动加载，
+  代码与拆分前逐行一致）。
+- 遗留（P4/后续，均非阻塞）：
+  - parser 大文件（prefab_override 3145 行单遍历器重构、skilltree.rs 拆分）——拍板推迟；
+  - `DstContext` 与 GameSource 并存（语义均正确）；
+  - upload 的 multipart 流程未纳入 WikiWriter（确认策略已复用）；
+  - workspace 拆分（仅在编译时间/边界成为实际痛点时考虑）。

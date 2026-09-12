@@ -1,5 +1,6 @@
 //! Job submission / tracking endpoints (including the SSE event stream).
 
+use super::jobs::JobStatus;
 use super::state::AppState;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
@@ -44,11 +45,7 @@ pub async fn submit(
     // Wiki-touching jobs default to wiki-dry-run; explicit confirmation flips it.
     let handle = state
         .jobs
-        .submit(
-            req.kind,
-            req.wiki_dry_run,
-            Some(Arc::clone(&state.datasets)),
-        )
+        .submit(req.kind, req.wiki_dry_run, Some(Arc::clone(&state)))
         .await;
     Ok(Json(handle.summary().await))
 }
@@ -76,18 +73,39 @@ pub async fn get(
 }
 
 /// POST /api/jobs/:id/cancel
+///
+/// 取消仅对排队中（尚未开跑）的任务生效。运行中的任务不支持硬取消：
+/// 丢弃 future 可能把批量上传/文件搬移留在中间态。
 pub async fn cancel(
     State(state): State<Arc<AppState>>,
     Path(id): Path<String>,
-) -> std::result::Result<Json<serde_json::Value>, StatusCode> {
-    let id = parse_uuid(&id)?;
-    match state.jobs.get(id).await {
-        Some(job) => {
-            job.cancel.cancel();
-            Ok(Json(serde_json::json!({ "cancelling": true })))
-        }
-        None => Err(StatusCode::NOT_FOUND),
+) -> std::result::Result<Json<serde_json::Value>, (StatusCode, Json<serde_json::Value>)> {
+    let id = parse_uuid(&id)
+        .map_err(|code| (code, Json(serde_json::json!({ "error": "invalid job id" }))))?;
+    let job = state.jobs.get(id).await.ok_or(not_found("job not found"))?;
+    if job.try_cancel_from_queue().await {
+        return Ok(Json(serde_json::json!({ "cancelled": true })));
     }
+    match job.status().await {
+        JobStatus::Running => Err((
+            StatusCode::CONFLICT,
+            Json(serde_json::json!({
+                "error": "任务已在运行中，不支持取消（避免中断批量写入的中间态），请等待其完成。"
+            })),
+        )),
+        status => Ok(Json(serde_json::json!({
+            "cancelled": false,
+            "reason": "already_finished",
+            "status": status,
+        }))),
+    }
+}
+
+fn not_found(msg: &str) -> (StatusCode, Json<serde_json::Value>) {
+    (
+        StatusCode::NOT_FOUND,
+        Json(serde_json::json!({ "error": msg })),
+    )
 }
 
 fn event_to_sse(ev: JobEvent) -> Event {

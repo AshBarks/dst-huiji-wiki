@@ -443,8 +443,16 @@ async function pageJobDetail(main, id) {
     <details><summary class="muted">任务参数</summary><pre>${esc(JSON.stringify(h.params, null, 2))}</pre></details>
     ${h.result ? `<details open><summary>执行结果</summary><pre>${esc(JSON.stringify(h.result, null, 2))}</pre></details>` : ""}`;
     const cb = $("#cancelBtn");
-    if (cb) cb.onclick = async () => { await postJSON(`/api/jobs/${id}/cancel`); };
-    if (cb) cb.disabled = !["queued", "running"].includes(h.status);
+    if (cb) {
+      cb.onclick = async () => {
+        try { await postJSON(`/api/jobs/${id}/cancel`); }
+        catch (e) { alert("取消失败：" + e.message); }
+      };
+      // 运行中的任务不支持取消（避免硬中断批量写入的中间态）。
+      cb.disabled = h.status !== "queued";
+      cb.title = h.status === "running"
+        ? "运行中的任务不支持取消，请等待其完成" : "";
+    }
     const ab = $("#approveBtn");
     if (ab) ab.onclick = async () => {
       if (!confirm("将使用相同参数真实写入维基页面（不再走维基干跑）。确定继续？")) return;

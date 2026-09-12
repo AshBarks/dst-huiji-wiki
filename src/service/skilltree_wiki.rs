@@ -220,6 +220,18 @@ struct BuiltPage {
     missing_icon_urls: Vec<String>,
 }
 
+/// 解析“已有页面内容”为 defs JSON。
+///
+/// - 页面缺失或内容为空 → `Ok(None)`（走新建分支）；
+/// - 内容可解析 → `Ok(Some(v))`；
+/// - 内容非空但解析失败 → `Err(())`（调用方跳过该角色，不得覆盖写）。
+fn parse_existing(content: Option<&str>) -> std::result::Result<Option<serde_json::Value>, ()> {
+    match content {
+        Some(c) if !c.trim().is_empty() => parse_page_json(c).map(Some).ok_or(()),
+        _ => Ok(None),
+    }
+}
+
 /// 用新提取的 defs 组装子页面内容；已有页面保留 metainfo 与 icon_url。
 ///
 /// `metainfo.imgs` 按所需键合并：已有 URL 保留，缺失键写入空串并在报告里
@@ -517,25 +529,59 @@ struct CharacterOutcome {
     img_size_warnings: Vec<String>,
 }
 
+/// 跳过该角色（未做任何写维基动作）时的结果。
+fn skipped_outcome(status: &str) -> CharacterOutcome {
+    CharacterOutcome {
+        status: status.to_string(),
+        added: 0,
+        removed: 0,
+        missing_imgs: Vec::new(),
+        missing_icon_urls: Vec::new(),
+        img_size_warnings: Vec::new(),
+    }
+}
+
 /// 单个角色的完整维护流程。
 async fn maintain_character(
     client: &WikiClient,
     reporter: &dyn Reporter,
     mode: WriteMode,
     character: &str,
+    snapshot: Option<&str>,
     strings: &std::collections::BTreeMap<String, String>,
     output_dir: Option<&PathBuf>,
 ) -> Result<CharacterOutcome> {
     let page_title = page_title(character);
-    let content = read_game_file(None, &format!("prefabs/skilltree_{}.lua", character))?;
-    let tuning = super::dataset::load_tuning_numbers(None)?;
+    let content = read_game_file(snapshot, &format!("prefabs/skilltree_{}.lua", character))?;
+    let tuning = super::dataset::load_tuning_numbers(snapshot)?;
     let tree = parse_skill_tree_with_tuning(&content, character, &tuning)?;
 
-    let page = client.get_page(&page_title).await.ok();
-    let existing = page
-        .as_ref()
-        .and_then(|p| p.content.as_deref())
-        .and_then(parse_page_json);
+    // 只有确实“页面不存在”才走新建分支；限流/网络/认证错误一律中止该角色，
+    // 绝不能当作缺失页面无 basetimestamp 全量覆盖。
+    let page = match client.get_page(&page_title).await {
+        Ok(p) => Some(p),
+        Err(crate::error::Error::PageNotFound(_)) => None,
+        Err(e) => {
+            reporter.log(format!(
+                "{}：拉取页面失败（{}），已跳过以免覆盖线上内容。",
+                page_title, e
+            ));
+            return Ok(skipped_outcome("fetch_failed"));
+        }
+    };
+    // 已有页面必须能解析：把解析失败静默当作新页面，会在下次写入时丢掉
+    // 站内维护的 metainfo/icon_url。
+    let existing = match parse_existing(page.as_ref().and_then(|p| p.content.as_deref())) {
+        Ok(v) => v,
+        Err(()) => {
+            reporter.log(format!(
+                "{}：页面内容不是预期的 return [[JSON]] 格式，已跳过（请手工核对），\
+                 以免丢失站内 metainfo/icon_url。",
+                page_title
+            ));
+            return Ok(skipped_outcome("page_content_unparsable"));
+        }
+    };
 
     let mut built = build_page_content(&tree, strings, existing.as_ref());
     fill_missing_urls(client, &tree, &mut built, reporter, &page_title).await;
@@ -711,6 +757,7 @@ pub async fn run_skilltree_wiki(
             reporter,
             mode,
             ch,
+            snapshot.as_deref(),
             &strings_data.by_ctxt,
             output_dir.as_ref(),
         )
@@ -814,6 +861,20 @@ mod tests {
         let parsed = parse_page_json(content).unwrap();
         assert!(parsed.get("defs").is_some());
         assert!(parse_page_json("bad content").is_none());
+    }
+
+    #[test]
+    fn test_parse_existing_content_boundaries() {
+        // 缺失 / 空内容 → 走新建分支。
+        assert!(parse_existing(None).unwrap().is_none());
+        assert!(parse_existing(Some("")).unwrap().is_none());
+        assert!(parse_existing(Some("  \n")).unwrap().is_none());
+        // 正常页面 → 解析成功。
+        let page = "return [[\n{\"defs\":{}}\n]]";
+        assert!(parse_existing(Some(page)).unwrap().is_some());
+        // 非空但解析失败 → 跳过信号，绝不能当作新页面覆盖写。
+        assert!(parse_existing(Some("<html>404</html>")).is_err());
+        assert!(parse_existing(Some("return [[not json]]")).is_err());
     }
 
     fn sample_node(name: &str, icon: Option<&str>, infographic: bool) -> SkillNode {

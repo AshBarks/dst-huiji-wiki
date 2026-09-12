@@ -1,7 +1,9 @@
 //! In-process job manager: submission, status tracking, resource locks.
 //!
-//! Jobs run as tokio tasks; output is captured by a [`CaptureReporter`]
-//! which also broadcasts events to live SSE subscribers.
+//! Jobs run on a dedicated OS thread with its own current-thread tokio runtime
+//! (not on the axum worker pool), so CPU/IO-bound local runners cannot starve
+//! the HTTP server. Output is captured by a [`CaptureReporter`] which also
+//! broadcasts events to live SSE subscribers.
 //!
 //! Concurrency policy (P0):
 //! - Same-`JobKind` jobs are mutually exclusive (two `scripts-sync` runs must
@@ -15,8 +17,8 @@
 //!   the status write lock, so they can never interleave.
 
 use super::state::AppState;
-use dst_huiji_wiki::platform::progress::{CaptureReporter, JobEvent};
-use dst_huiji_wiki::service::{execute_job, JobKind};
+use dst_huiji_wiki::platform::progress::{CaptureReporter, JobEvent, WriteMode};
+use dst_huiji_wiki::service::{execute_job_with_mode, JobKind};
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -47,6 +49,22 @@ pub fn now_ms() -> u64 {
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis() as u64)
         .unwrap_or(0)
+}
+
+/// 把 WebUI 的 `wiki_dry_run` 映射为作业的 [`WriteMode`]。
+///
+/// - 会写 wiki 的作业：干跑 → [`WriteMode::DryRun`]（报告 skip 原因 `dry_run`），
+///   显式确认 → [`WriteMode::AutoConfirm`]；
+/// - 纯本地作业不消费该字段（其 `JobKind` 自带 `dry_run`），一律 `AutoConfirm`。
+///
+/// 此前 WebUI 走 `WriteMode::Interactive` + `CaptureReporter::confirm` 的
+/// 自动拒答，干跑在报告里表现为 `declined` 而非 `dry_run`，与 CLI 语义不一致。
+pub fn write_mode_for(kind: &JobKind, wiki_dry_run: bool) -> WriteMode {
+    if kind.touches_wiki() && wiki_dry_run {
+        WriteMode::DryRun
+    } else {
+        WriteMode::AutoConfirm
+    }
 }
 
 pub struct JobHandle {
@@ -186,9 +204,9 @@ impl JobManager {
 
     /// Submits a job and spawns it on the tokio runtime.
     ///
-    /// `wiki_dry_run` refuses every wiki write the job proposes (`true`
-    /// skips all writes so only diffs are produced, `false` applies them
-    /// directly). Local-only job kinds never consult this: their own
+    /// `wiki_dry_run` selects the job's [`WriteMode`] via [`write_mode_for`]
+    /// (`true` → `DryRun`, so only diffs are produced; `false` → `AutoConfirm`,
+    /// applying writes). Local-only job kinds never consult this: their own
     /// `JobKind` fields (e.g. `ScriptsSync.dry_run`) decide how much they
     /// touch the disk.
     ///
@@ -256,46 +274,75 @@ impl JobManager {
             resource_permits.push(self.resource_lock(key).await);
         }
         let task = Arc::clone(&handle);
-        tokio::spawn(async move {
-            let _kind = kind_permit.lock().await;
-            // 严格按排序后的键序串行获取：不同任务的资源集合有交集时，
-            // 全局获取顺序一致，不会形成环等待。
-            let mut _resources = Vec::with_capacity(resource_permits.len());
-            for permit in &resource_permits {
-                _resources.push(permit.lock().await);
-            }
+        let mode = write_mode_for(&kind, wiki_dry_run);
+        // 每个作业独占一条线程 + 自己的 current-thread runtime：本地重任务
+        // （parser / 文件扫描 / CPU）不再占用 axum 的 worker 线程池。此前
+        // 直接 `tokio::spawn` 会把整棵同步操作压在一个 worker 上。
+        // runtime 在该线程内析构，避免在 async 上下文里 drop Runtime 触发
+        // `Cannot drop a runtime` panic。
+        std::thread::spawn(move || {
+            let rt = match tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            {
+                Ok(rt) => rt,
+                Err(e) => {
+                    tracing::error!("job {} runtime init failed: {}", task.id, e);
+                    if let Ok(mut s) = task.status.try_write() {
+                        *s = JobStatus::Failed;
+                    }
+                    if let Ok(mut err) = task.error.try_lock() {
+                        *err = Some(format!("runtime init failed: {e}"));
+                    }
+                    if let Ok(mut f) = task.finished_at_ms.try_lock() {
+                        *f = Some(now_ms());
+                    }
+                    task.reporter.done("failed");
+                    return;
+                }
+            };
 
-            // 取消与开跑的判定在同一把状态写锁下完成，二者不会交错。
-            if !task.try_begin_run().await {
-                task.reporter.done("cancelled");
+            rt.block_on(async move {
+                let _kind = kind_permit.lock().await;
+                // 严格按排序后的键序串行获取：不同任务的资源集合有交集时，
+                // 全局获取顺序一致，不会形成环等待。
+                let mut _resources = Vec::with_capacity(resource_permits.len());
+                for permit in &resource_permits {
+                    _resources.push(permit.lock().await);
+                }
+
+                // 取消与开跑的判定在同一把状态写锁下完成，二者不会交错。
+                if !task.try_begin_run().await {
+                    task.reporter.done("cancelled");
+                    *task.finished_at_ms.lock().await = Some(now_ms());
+                    if let Some(st) = state.as_ref() {
+                        st.datasets.invalidate().await;
+                        st.invalidate_job_caches().await;
+                    }
+                    return;
+                }
+                *task.started_at_ms.lock().await = Some(now_ms());
+
+                match execute_job_with_mode(&task.kind, task.reporter.as_ref(), mode).await {
+                    Ok(result) => {
+                        *task.result_json.lock().await = Some(result);
+                        *task.status.write().await = JobStatus::Success;
+                        task.reporter.done("success");
+                    }
+                    Err(e) => {
+                        tracing::error!("job {} failed: {}", task.id, e);
+                        *task.error.lock().await = Some(e.to_string());
+                        *task.status.write().await = JobStatus::Failed;
+                        task.reporter.done("failed");
+                    }
+                }
                 *task.finished_at_ms.lock().await = Some(now_ms());
+
                 if let Some(st) = state.as_ref() {
                     st.datasets.invalidate().await;
                     st.invalidate_job_caches().await;
                 }
-                return;
-            }
-            *task.started_at_ms.lock().await = Some(now_ms());
-
-            match execute_job(&task.kind, task.reporter.as_ref()).await {
-                Ok(result) => {
-                    *task.result_json.lock().await = Some(result);
-                    *task.status.write().await = JobStatus::Success;
-                    task.reporter.done("success");
-                }
-                Err(e) => {
-                    tracing::error!("job {} failed: {}", task.id, e);
-                    *task.error.lock().await = Some(e.to_string());
-                    *task.status.write().await = JobStatus::Failed;
-                    task.reporter.done("failed");
-                }
-            }
-            *task.finished_at_ms.lock().await = Some(now_ms());
-
-            if let Some(st) = state.as_ref() {
-                st.datasets.invalidate().await;
-                st.invalidate_job_caches().await;
-            }
+            });
         });
 
         handle
@@ -334,6 +381,24 @@ mod tests {
             result_json: Mutex::new(None),
             error: Mutex::new(None),
         })
+    }
+
+    #[test]
+    fn write_mode_maps_wiki_dry_run_and_local_jobs() {
+        let wiki = JobKind::MaintainItemTable {
+            output: None,
+            snapshot: None,
+        };
+        assert_eq!(write_mode_for(&wiki, true), WriteMode::DryRun);
+        assert_eq!(write_mode_for(&wiki, false), WriteMode::AutoConfirm);
+
+        let local = JobKind::ParsePo {
+            input: "x.po".into(),
+            output: None,
+            category: None,
+        };
+        assert_eq!(write_mode_for(&local, true), WriteMode::AutoConfirm);
+        assert_eq!(write_mode_for(&local, false), WriteMode::AutoConfirm);
     }
 
     #[tokio::test]

@@ -21,11 +21,12 @@ use uuid::Uuid;
 pub struct SubmitJobRequest {
     #[serde(flatten)]
     pub kind: JobKind,
-    /// When true (default), every wiki write the job proposes is refused
-    /// (dry-run against the wiki). Only wiki-touching kinds are affected:
-    /// local-only kinds (scripts_sync, images_sync, …) gate their own disk
-    /// writes through `JobKind` fields of the same name — which stay
-    /// reachable precisely because this field is *not* named `dry_run`.
+    /// When true (default), wiki-touching jobs run in `WriteMode::DryRun`
+    /// (diffs only, no writes); false runs them in `AutoConfirm`. Only
+    /// wiki-touching kinds are affected: local-only kinds (scripts_sync,
+    /// images_sync, …) gate their own disk writes through `JobKind` fields of
+    /// the same name — which stay reachable precisely because this field is
+    /// *not* named `dry_run`.
     #[serde(default = "default_true")]
     pub wiki_dry_run: bool,
 }

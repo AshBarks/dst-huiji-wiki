@@ -474,13 +474,31 @@ async function pageJobDetail(main, id) {
   }
 
   if (!doneSeen && !terminal) {
-    // Ask the SSE stream to skip the events we already rendered from the
-    // REST detail response. This prevents duplicated logs/diffs after a
-    // refresh while still replaying any events that arrived in between.
-    const seenCount = (head.logs || []).length;
-    const es = new EventSource(`/api/jobs/${id}/events?since=${seenCount}`);
+    // `since` 是 seq 游标（事件单调序号）：服务端对 replay/live 两侧按
+    // seq 去重，刷新后重放不会重复。
+    const lastSeq = (head.logs || []).reduce((m, e) => Math.max(m, e.seq || 0), 0);
+    const es = new EventSource(`/api/jobs/${id}/events?since=${lastSeq}`);
     es.onmessage = (msg) => {
-      try { appendEv(JSON.parse(msg.data)); } catch {}
+      let ev = null;
+      try { ev = JSON.parse(msg.data); } catch {}
+      if (ev && ev.type === "resync") {
+        // 服务端广播滞后丢了事件：重新拉取全量日志并重放，Done 丢失也能恢复。
+        (async () => {
+          try {
+            const h2 = await getJSON(`/api/jobs/${id}`);
+            logEl.innerHTML = "";
+            for (const e2 of h2.logs || []) appendEv(e2);
+            for (const d2 of h2.diffs || []) appendDiff(d2);
+            if (["success", "failed", "cancelled"].includes(h2.status)) {
+              doneSeen = true;
+              es.close();
+              renderHead(h2);
+            }
+          } catch {}
+        })();
+        return;
+      }
+      try { appendEv(ev); } catch {}
       if (doneSeen) { es.close(); refreshHead(); }
     };
     es.onerror = () => { if (doneSeen) es.close(); };

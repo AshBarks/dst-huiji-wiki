@@ -113,11 +113,31 @@ fn event_to_sse(ev: JobEvent) -> Event {
     Event::default().data(serde_json::to_string(&ev).unwrap_or_default())
 }
 
+/// 事件的全局序号（CaptureReporter 内单调递增），作为 SSE 断线续传游标。
+fn event_seq(ev: &JobEvent) -> u64 {
+    match ev {
+        JobEvent::Log { seq, .. }
+        | JobEvent::Stage { seq, .. }
+        | JobEvent::Diff { seq, .. }
+        | JobEvent::Done { seq, .. } => *seq,
+    }
+}
+
+enum LiveItem {
+    Ev(JobEvent),
+    /// 广播队列滞后、丢失了事件：通知前端 resync（重新拉取全量日志）。
+    Resync,
+}
+
 /// GET /api/jobs/:id/events — live SSE stream of job events.
 ///
-/// The stream replays buffered history first (skipping `since` already-seen
-/// events when provided), then follows live events, terminating right after
-/// the terminal `Done` marker.
+/// The stream replays buffered history first, then follows live events,
+/// terminating right after the terminal `Done` marker.
+///
+/// `since` 是 **seq 游标**（事件单调序号），replay 与 live 两侧都按
+/// `seq > since` 过滤——订阅与快照之间产生的事件不会再同时出现在两侧
+/// （此前按条数跳过，前端去重不可靠）。广播队列滞后丢事件时发送
+/// `{"type":"resync"}`，前端重新拉取全量日志，Done 丢失也能恢复。
 pub async fn events(
     State(state): State<Arc<AppState>>,
     Path(id): Path<String>,
@@ -127,7 +147,7 @@ pub async fn events(
     let job = state.jobs.get(id).await.ok_or(StatusCode::NOT_FOUND)?;
     let since = q
         .get("since")
-        .and_then(|v| v.parse::<usize>().ok())
+        .and_then(|v| v.parse::<u64>().ok())
         .unwrap_or(0);
 
     // Subscribe before reading status so no events are missed.
@@ -138,16 +158,27 @@ pub async fn events(
         .reporter
         .snapshot_logs()
         .into_iter()
-        .skip(since)
+        .filter(|ev| event_seq(ev) > since)
         .collect();
     let replay_stream = stream::iter(replay.into_iter().map(|ev| Ok(event_to_sse(ev))));
 
     let live: std::pin::Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>> = {
         let finished = BroadcastStream::new(rx)
-            .filter_map(|res| async move { res.ok() })
-            .map(|ev| {
-                let payload = event_to_sse(ev.clone());
-                (payload, matches!(ev, JobEvent::Done { .. }))
+            .filter_map(move |res| async move {
+                match res {
+                    Ok(ev) if event_seq(&ev) > since => Some(LiveItem::Ev(ev)),
+                    Ok(_) => None,
+                    Err(tokio_stream::wrappers::errors::BroadcastStreamRecvError::Lagged(_)) => {
+                        Some(LiveItem::Resync)
+                    }
+                }
+            })
+            .map(|item| match item {
+                LiveItem::Ev(ev) => {
+                    let done = matches!(ev, JobEvent::Done { .. });
+                    (event_to_sse(ev), done)
+                }
+                LiveItem::Resync => (Event::default().data(r#"{"type":"resync"}"#), false),
             })
             // Emit everything, including the single Done marker, then stop.
             .scan(false, |done_seen, item| {

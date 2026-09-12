@@ -4,7 +4,7 @@ use super::output::finish_json_output;
 use super::path_str;
 use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
-use crate::models::PoEntry;
+use crate::models::{PoEntry, Recipe};
 use crate::parser::RecipeParser;
 use crate::platform::progress::Reporter;
 use std::path::PathBuf;
@@ -85,7 +85,11 @@ pub(super) async fn run_map_names(
         if !merge {
             let historical_json = std::fs::read_to_string(compare_path)?;
             let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-            reporter.log(compare_and_report(&wiki_data, &historical_data));
+            reporter.log(compare_and_report(
+                &wiki_data,
+                &historical_data,
+                PoEntry::key_field(),
+            ));
         }
     }
 
@@ -150,7 +154,11 @@ pub(super) async fn run_map_recipes(
         if !merge {
             let historical_json = std::fs::read_to_string(compare_path)?;
             let historical_data = WikiDataConverter::parse_wiki_json(&historical_json)?;
-            reporter.log(compare_and_report(&wiki_data, &historical_data));
+            reporter.log(compare_and_report(
+                &wiki_data,
+                &historical_data,
+                Recipe::key_field(),
+            ));
         }
     }
 

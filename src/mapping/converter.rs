@@ -265,17 +265,37 @@ fn format_field_change(field: &str, old: &Value, new: &Value) -> String {
     format!("{}: {} => {}", field, format_value(old), format_value(new))
 }
 
-pub fn compare_data(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> DataDiffReport {
+/// 按键字段名取记录的键值（各侧 schema 独立定位，字段顺序可以不同）。
+fn key_value(wiki_data: &WikiJsonData, record: &[Value], key_field: &str) -> Value {
+    wiki_data
+        .schema
+        .fields
+        .iter()
+        .position(|f| f.name == key_field)
+        .and_then(|idx| record.get(idx))
+        .cloned()
+        .unwrap_or(Value::Null)
+}
+
+/// 比较两份 wiki JSON 数据（`key_field` 是记录键的字段名，如 `T::key_field()`）。
+///
+/// 字段对齐按【字段名】进行：两侧 schema 的字段顺序不同、历史侧新增/缺少
+/// 字段时，diff 依然正确（缺失字段在旧值一侧视为 Null）。
+pub fn compare_data(
+    new_data: &WikiJsonData,
+    historical_data: &WikiJsonData,
+    key_field: &str,
+) -> DataDiffReport {
     let new_keys: Vec<Value> = new_data
         .data
         .iter()
-        .map(|r| r.first().cloned().unwrap_or(Value::Null))
+        .map(|r| key_value(new_data, r, key_field))
         .collect();
 
     let historical_keys: Vec<Value> = historical_data
         .data
         .iter()
-        .map(|r| r.first().cloned().unwrap_or(Value::Null))
+        .map(|r| key_value(historical_data, r, key_field))
         .collect();
 
     let added: Vec<Value> = new_keys
@@ -294,17 +314,10 @@ pub fn compare_data(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> 
         .data
         .iter()
         .filter_map(|new_record| {
-            let key = new_record.first().cloned().unwrap_or(Value::Null);
-            if let Some(historical_record) = historical_data.find_record_by_field(
-                new_data
-                    .schema
-                    .fields
-                    .first()
-                    .map(|f| f.name.as_str())
-                    .unwrap_or(""),
-                &key,
-            ) {
-                let changes = compare_records(new_record, historical_record, new_data);
+            let key = key_value(new_data, new_record, key_field);
+            if let Some(historical_record) = historical_data.find_record_by_field(key_field, &key) {
+                let changes =
+                    compare_records(new_record, historical_record, new_data, historical_data);
                 if !changes.is_empty() {
                     Some(RecordChange { key, changes })
                 } else {
@@ -325,19 +338,27 @@ pub fn compare_data(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> 
     }
 }
 
+/// 逐字段比较（按字段名在两侧 schema 中各自定位，不按下标）。
 fn compare_records(
     new_record: &[Value],
     historical_record: &[Value],
-    wiki_data: &WikiJsonData,
+    new_data: &WikiJsonData,
+    historical_data: &WikiJsonData,
 ) -> Vec<FieldChange> {
-    wiki_data
+    new_data
         .schema
         .fields
         .iter()
         .enumerate()
         .filter_map(|(idx, field)| {
             let new_val = new_record.get(idx).unwrap_or(&Value::Null);
-            let old_val = historical_record.get(idx).unwrap_or(&Value::Null);
+            let old_val = historical_data
+                .schema
+                .fields
+                .iter()
+                .position(|f| f.name == field.name)
+                .and_then(|i| historical_record.get(i))
+                .unwrap_or(&Value::Null);
 
             if new_val != old_val {
                 Some(FieldChange {
@@ -352,8 +373,12 @@ fn compare_records(
         .collect()
 }
 
-pub fn compare_and_report(new_data: &WikiJsonData, historical_data: &WikiJsonData) -> String {
-    let report = compare_data(new_data, historical_data);
+pub fn compare_and_report(
+    new_data: &WikiJsonData,
+    historical_data: &WikiJsonData,
+    key_field: &str,
+) -> String {
+    let report = compare_data(new_data, historical_data, key_field);
     let field_names: Vec<&str> = new_data
         .schema
         .fields
@@ -370,14 +395,26 @@ pub fn merge_new_records<T: WikiMapper>(
 ) -> WikiJsonData {
     let mut result = historical_data.clone();
 
+    let new_key_idx = T::schema()
+        .fields
+        .iter()
+        .position(|f| f.name == T::key_field())
+        .unwrap_or(0);
+
     for item in new_items {
         let new_record = item.to_wiki_record();
 
-        if let Some(existing_idx) = result.find_record_idx_by_field(T::key_field(), &new_record[0])
+        if let Some(existing_idx) =
+            result.find_record_idx_by_field(T::key_field(), &new_record[new_key_idx])
         {
             let schema = T::schema();
             let mut record_to_merge = new_record.clone();
-            T::merge_record_with_history(&mut record_to_merge, &result.data[existing_idx], &schema);
+            T::merge_record_with_history(
+                &mut record_to_merge,
+                &result.data[existing_idx],
+                &schema,
+                &result.schema,
+            );
             result.data[existing_idx] = record_to_merge;
         } else {
             result.data.push(new_record);
@@ -399,7 +436,78 @@ pub fn replace_records<T: WikiMapper>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::mapping::schema::{WikiFieldSchema, WikiSchema};
     use crate::models::PoEntry;
+
+    /// 构造一个只有两个字段的 wiki JSON 数据。
+    fn two_field_data(
+        key_name: &str,
+        rows: &[(&str, &str)],
+        extra_first: Option<&str>,
+    ) -> WikiJsonData {
+        use serde_json::json;
+        let mut fields = Vec::new();
+        if let Some(extra) = extra_first {
+            fields.push(WikiFieldSchema {
+                name: extra.to_string(),
+                field_type: "string".into(),
+                title: None,
+            });
+        }
+        fields.push(WikiFieldSchema {
+            name: key_name.to_string(),
+            field_type: "string".into(),
+            title: None,
+        });
+        fields.push(WikiFieldSchema {
+            name: "value".to_string(),
+            field_type: "string".into(),
+            title: None,
+        });
+        let mut data = WikiJsonData::new("test".into(), WikiSchema { fields }, None);
+        for (k, v) in rows {
+            let mut record = Vec::new();
+            if extra_first.is_some() {
+                record.push(json!("extra"));
+            }
+            record.push(json!(k));
+            record.push(json!(v));
+            data.add_record(record);
+        }
+        data
+    }
+
+    /// schema 演进：历史 schema 字段顺序不同（且多一个字段）时，diff 与
+    /// merge 仍按字段名正确对齐——不再依赖“键在第一位”的位置假设。
+    #[test]
+    fn schema_evolution_diff_and_merge_align_by_field_name() {
+        // 新 schema：[key, value]；历史 schema：[legacy, key, value]（键不在首位）。
+        let new_data = two_field_data("key", &[("axe", "new-desc")], None);
+        let historical = two_field_data(
+            "key",
+            &[("axe", "old-desc"), ("pickaxe", "keep")],
+            Some("legacy"),
+        );
+
+        let report = compare_data(&new_data, &historical, "key");
+        assert_eq!(report.total_new, 1);
+        assert_eq!(report.total_historical, 2);
+        // pickaxe 只存在于历史侧 → 记入删除；axe 修改。
+        assert_eq!(report.deleted.len(), 1);
+        assert_eq!(report.added.len(), 0);
+        assert_eq!(report.modified.len(), 1);
+        assert_eq!(report.modified[0].key, serde_json::json!("axe"));
+        assert_eq!(report.modified[0].changes.len(), 1);
+        assert_eq!(report.modified[0].changes[0].field_name, "value");
+        assert_eq!(
+            report.modified[0].changes[0].old_value,
+            serde_json::json!("old-desc")
+        );
+        assert_eq!(
+            report.modified[0].changes[0].new_value,
+            serde_json::json!("new-desc")
+        );
+    }
 
     fn create_po_entry(msgctxt: &str, msgstr: &str) -> PoEntry {
         PoEntry {

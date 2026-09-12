@@ -1,4 +1,4 @@
-use super::schema::{Schema, WikiJsonData};
+use super::schema::{Schema, WikiJsonData, WikiSchema};
 
 pub type JsonValue = serde_json::Value;
 
@@ -148,30 +148,45 @@ pub trait WikiMapper: Sized {
         historical_data: &'a WikiJsonData,
     ) -> Option<&'a Vec<JsonValue>> {
         let key_field = Self::key_field();
-        let key_idx = historical_data
+        // 新记录的键取自【新 schema】中键字段的位置；历史数据按键名在
+        // 【历史 schema】中的位置对齐——两侧字段顺序可以不同（schema 演进）。
+        let new_idx = Self::schema()
+            .fields
+            .iter()
+            .position(|f| f.name == key_field)?;
+        let new_key = new_record.get(new_idx)?;
+
+        let hist_idx = historical_data
             .schema
             .fields
             .iter()
             .position(|f| f.name == key_field)?;
-        let new_key = new_record.get(key_idx)?;
 
         historical_data
             .data
             .iter()
-            .find(|record| record.get(key_idx) == Some(new_key))
+            .find(|record| record.get(hist_idx) == Some(new_key))
     }
 
     fn merge_record_with_history(
         new_record: &mut Vec<JsonValue>,
         historical_record: &[JsonValue],
         schema: &Schema,
+        historical_schema: &WikiSchema,
     ) {
         let rules = Self::mapping_rules();
 
         for (idx, field) in schema.fields.iter().enumerate() {
             if let Some(rule) = rules.iter().find(|r| r.target_field == field.name) {
                 let new_value = &new_record[idx];
-                let historical_value = &historical_record[idx];
+                // 历史值按【字段名】在历史 schema 中的位置取；字段在历史
+                // schema 中缺失时视为 Null（新增字段场景）。
+                let historical_value = historical_schema
+                    .fields
+                    .iter()
+                    .position(|f| f.name == field.name)
+                    .and_then(|i| historical_record.get(i))
+                    .unwrap_or(&JsonValue::Null);
 
                 new_record[idx] = match &rule.merge_strategy {
                     MergeStrategy::Overwrite => new_value.clone(),
@@ -205,7 +220,12 @@ pub trait WikiMapper: Sized {
             if let Some(historical_record) =
                 Self::find_historical_record(new_record, historical_data)
             {
-                Self::merge_record_with_history(new_record, historical_record, &schema);
+                Self::merge_record_with_history(
+                    new_record,
+                    historical_record,
+                    &schema,
+                    &historical_data.schema,
+                );
             }
         }
     }

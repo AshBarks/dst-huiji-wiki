@@ -7,7 +7,9 @@ use super::make_ctx;
 use super::output::{output_copyclip_result_with_update, output_json_result_with_update, WriteCtx};
 use crate::error::{Error, Result};
 use crate::mapping::{compare_and_report, WikiDataConverter, WikiMapper};
-use crate::models::{derive_station_aliases, PoEntry, StationAliasInputs, StationAliasReport};
+use crate::models::{
+    derive_station_aliases, PoEntry, Recipe, StationAliasInputs, StationAliasReport,
+};
 use crate::parser::{
     extract_field_assignment_range, parse_crafting_filter_lists, parse_prototyper_trees,
     parse_tech_constants, RecipeParser,
@@ -69,7 +71,11 @@ pub(super) async fn run_maintain_item_table(
     let mut merged = false;
     if let Some(ref historical) = historical_data {
         PoEntry::merge_with_history(&mut wiki_data, historical);
-        reporter.log(compare_and_report(&wiki_data, historical));
+        reporter.log(compare_and_report(
+            &wiki_data,
+            historical,
+            PoEntry::key_field(),
+        ));
         merged = true;
     }
 
@@ -144,7 +150,11 @@ pub(super) async fn run_maintain_dst_recipes(
     let mut merged = false;
     if let Some(ref historical) = historical_data {
         crate::models::Recipe::merge_with_history(&mut wiki_data, historical);
-        reporter.log(compare_and_report(&wiki_data, historical));
+        reporter.log(compare_and_report(
+            &wiki_data,
+            historical,
+            Recipe::key_field(),
+        ));
         merged = true;
     }
 

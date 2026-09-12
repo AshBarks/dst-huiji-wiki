@@ -1,9 +1,7 @@
-mod builder;
 mod mapper;
 mod mappers;
 mod schema;
 
-pub use builder::{MappingBuilder, SchemaBuilder};
 pub use mapper::{
     FieldMapping, FieldMappingRule, JsonValue, MergeFn, MergePriority, MergeStrategy, WikiMapper,
 };

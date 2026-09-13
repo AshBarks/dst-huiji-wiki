@@ -226,6 +226,7 @@ pub async fn inventoryicons(
         status: &'static str,
         wiki_uploaded: Option<bool>,
         wiki_title: Option<String>,
+        crafting: Option<icon_meta::CraftingGroup>,
     }
 
     let resolve = |e: &IconEntry| -> Resolved {
@@ -241,6 +242,7 @@ pub async fn inventoryicons(
                 status: icon_status(m.title.as_deref(), m.name_en.as_deref(), exists),
                 wiki_uploaded: exists,
                 wiki_title: m.title.as_deref().map(|t| format!("File:{t}")),
+                crafting: m.crafting.clone(),
             };
         }
         let key = icon_meta::file_stem_key(&e.file);
@@ -260,6 +262,7 @@ pub async fn inventoryicons(
             note: None,
             status,
             wiki_uploaded: None,
+            crafting: None,
         }
     };
 
@@ -351,6 +354,7 @@ pub async fn inventoryicons(
                 "first_synced_at": e.first_synced_at,
                 "name_en": r.name_en,
                 "name_zh": r.name_zh,
+                "crafting": r.crafting,
                 "title": r.title,
                 "title_source": r.title_source,
                 "uploadable": r.uploadable,

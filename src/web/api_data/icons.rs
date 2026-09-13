@@ -102,9 +102,10 @@ pub async fn inventoryicon_versions(
 /// POST /api/data/inventoryicons/title — 设置/清除图标的 wiki 文件名映射。
 ///
 /// 请求体 `{ "file": "x.png", "title": "Pick-Axe.png" }`；`title` 为空或
-/// `null` 时清除映射（恢复自动标题）。映射写入 `icon_title_overrides.json`
-/// 并立即更新 `icon_meta.json`；标题变化时旧上传状态失效，并 best-effort
-/// 查询一次新标题的维基状态。
+/// `null` 时清除映射（恢复自动标题）；与自动命名一致的标题同样视为未指定，
+/// 不落映射表。映射写入 `icon_title_overrides.json` 并立即更新
+/// `icon_meta.json`；标题变化时旧上传状态失效，并 best-effort 查询一次
+/// 新标题的维基状态。
 pub async fn set_inventoryicon_title(
     State(state): State<Arc<AppState>>,
     Json(req): Json<IconTitleEditRequest>,
@@ -131,32 +132,43 @@ pub async fn set_inventoryicon_title(
         }
         None => None,
     };
-
-    let path = icon_meta::overrides_path();
-    let mut overrides =
-        icon_meta::load_overrides(&path).map_err(|e| internal_error(e.to_string()))?;
-    let changed = match &title {
-        Some(t) => overrides.get(&file) != Some(t.as_str()),
-        None => overrides.remove(&file).is_some(),
-    };
-    if let Some(t) = &title {
-        overrides.insert(&file, t);
-    }
-    if changed {
-        icon_meta::save_overrides(&path, &overrides).map_err(|e| internal_error(e.to_string()))?;
-    }
-
     let source_id = index
         .entries
         .iter()
         .find(|e| e.file == file)
         .map(|e| e.source.clone());
+
     let out_dir = ktools_out_dir();
     let mut meta = (*state
         .icon_meta()
         .await
         .map_err(|e| internal_error(e.to_string()))?)
     .clone();
+    // 与自动命名一致的手动标题视为未指定：不落映射表（等同清除），
+    // 覆盖表只收偏离默认的真例外。
+    let name_en = meta.icons.get(&file).and_then(|e| e.name_en.clone());
+    let is_default = title.as_deref().is_some_and(|t| {
+        icon_meta::title_is_default(&file, name_en.as_deref(), source_id.as_deref(), t)
+    });
+
+    let path = icon_meta::overrides_path();
+    let mut overrides =
+        icon_meta::load_overrides(&path).map_err(|e| internal_error(e.to_string()))?;
+    let changed = match (&title, is_default) {
+        (Some(_), true) => overrides.remove(&file).is_some(),
+        (Some(t), false) => {
+            let changed = overrides.get(&file) != Some(t.as_str());
+            if changed {
+                overrides.insert(&file, t);
+            }
+            changed
+        }
+        (None, _) => overrides.remove(&file).is_some(),
+    };
+    if changed {
+        icon_meta::save_overrides(&path, &overrides).map_err(|e| internal_error(e.to_string()))?;
+    }
+
     let entry = meta
         .icons
         .entry(file.clone())
@@ -164,6 +176,7 @@ pub async fn set_inventoryicon_title(
             name_en: None,
             name_zh: None,
             source: source_id.clone(),
+            crafting: None,
             title: None,
             title_source: None,
             uploadable: false,
@@ -254,6 +267,10 @@ fn wiki_status_json(status: Option<&WikiStatus>) -> Option<serde_json::Value> {
 }
 
 /// 文件名 stem（大写）→ (英文 msgid, 中文 msgstr)，取自 STRINGS.NAMES.* 条目。
+///
+/// 仅作为 `icon_meta.json` 完全缺失时的兜底，且只覆盖物品栏图标；制作栏
+/// 图标的命名解析在 `images-sync` 元数据构建时完成（CraftingKeys 解析链），
+/// 不在此重复实现。
 pub(super) async fn inventory_names(state: &AppState) -> HashMap<String, (String, String)> {
     match state.datasets.get_or_load(None).await {
         Ok(ds) => ds

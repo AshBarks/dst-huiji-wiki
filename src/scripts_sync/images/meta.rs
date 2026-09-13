@@ -1,5 +1,5 @@
-//! 物品图标元数据：`split/inventoryimages/` 文件名 → 生效的维基文件名
-//! （`title`，来自映射表或 `STRINGS.NAMES` 英文名）与上传状态。
+//! 物品图标元数据：`split/inventoryimages/` 与 `split/crafting_menu_icons/`
+//! 文件名 → 生效的维基文件名（`title`，来自映射表或游戏内英文名）与上传状态。
 //!
 //! 由 `images-sync` 生成并落盘为 `history/icon_meta.json`（派生数据，可随时
 //! 由 manifest + 游戏翻译表 + 映射表重建）；WebUI 与
@@ -7,14 +7,21 @@
 //! PO / 查询维基。
 //!
 //! 约定：
-//! - 收录两类图标：文件名 stem（大写，如 `abigail_flower.png` →
-//!   `ABIGAIL_FLOWER`）能在 `STRINGS.NAMES.*` 精确命中的；以及映射表
+//! - 物品栏图标收录文件名 stem（大写，如 `abigail_flower.png` →
+//!   `ABIGAIL_FLOWER`）能在 `STRINGS.NAMES.*` 精确命中的，以及映射表
 //!   [`IconTitleOverrides`] 中显式指定的（可为无英文名的皮肤/变体）；
+//! - 制作栏图标（`source=crafting`）走 [`CraftingKeys`] 解析链：filter 图标
+//!   经 `recipes_filter.lua` 的 `CRAFTING_FILTER_DEFS` 对到
+//!   `STRINGS.UI.CRAFTING_FILTERS.*`，station 图标经 `recipes.lua` 的
+//!   `PROTOTYPER_DEFS` 对到 `STRINGS.UI.CRAFTING_STATION_FILTERS.*`（无
+//!   `filter_text` 的回退 prefab 的 `STRINGS.NAMES.*` 显示名）；
 //! - 英文名以 `strings.pot` 为准（覆盖全部键），中文名取 `chinese_s.po`
 //!   非空 msgstr；只有英文没有中文时照常保留英文；
-//! - 生效标题优先级：映射表（按本地文件名）> 英文名自动生成；标题含 `{}`
-//!   等 MediaWiki 非法字符或 `/` 的条目标记 `uploadable = false` 并附
-//!   `note`，上传作业跳过（可用映射表或弹窗手动命名解决）；
+//! - 生效标题优先级：映射表（按本地文件名）> 英文名自动生成；自动标题对
+//!   制作栏图标追加 `Filter` / `Station Icon` 后缀（与 wiki
+//!   分类:制作栏图标 的主流命名一致）。标题含 `{}` 等 MediaWiki 非法字符
+//!   或 `/` 的条目标记 `uploadable = false` 并附 `note`，上传作业跳过
+//!   （可用映射表或弹窗手动命名解决）；
 //! - 映射表为 `config/icon_title_overrides.json`（扁平 JSON：本地文件名 →
 //!   wiki 文件名，均含 `.png`），可用 `ICON__TITLE_OVERRIDES` 覆盖路径；
 //! - wiki 状态按生效标题（去重后）查询，同名文件共享同一状态；标题变化时
@@ -154,6 +161,24 @@ pub enum TitleSource {
     Auto,
 }
 
+/// 制作栏图标的语义分组（由 [`CraftingKeys`] 解析链派生，随 images-sync
+/// 写入元数据；WebUI 制作栏图标页按此分组，不依赖文件名前缀猜测）。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum CraftingGroup {
+    /// 制作栏过滤器图标（对应 `STRINGS.UI.CRAFTING_FILTERS.<key>`）。
+    Filter {
+        /// 过滤器键；Lua 定义缺失时为 `None`。
+        key: Option<String>,
+    },
+    /// 制作站图标（对应 `STRINGS.UI.CRAFTING_STATION_FILTERS.<key>`；
+    /// 无 `filter_text` 的站为 `None`，显示名走 prefab 回退）。
+    Station {
+        /// 制作站过滤键。
+        key: Option<String>,
+    },
+}
+
 /// 单个图标的名称与上传信息。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IconMetaEntry {
@@ -167,6 +192,9 @@ pub struct IconMetaEntry {
     /// 旧元数据没有该字段时为 `None`（视为物品栏图标）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    /// 语义分组（仅制作栏图标）；旧元数据没有该字段时为 `None`。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub crafting: Option<CraftingGroup>,
     /// 生效的维基文件名（含 `.png`，无 `File:` 前缀）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
@@ -248,16 +276,24 @@ pub fn load(out_dir: &Path) -> Result<IconMeta> {
             format!("解析 {}: {}", path.display(), e),
         )))
     })?;
-    // 旧版元数据没有 title 字段：按英文名自动标题补齐，保证重跑 images-sync
-    // 之前 WebUI/上传仍可正常工作（映射表在下一次 refresh 时应用）。
-    for entry in meta.icons.values_mut() {
-        if entry.title.is_none() {
-            entry.title = entry.name_en.as_deref().and_then(auto_title);
-            entry.title_source = entry.title.as_ref().map(|_| TitleSource::Auto);
-            entry.uploadable = entry.title.is_some();
-            if let (None, Some(name_en)) = (&entry.title, entry.name_en.as_deref()) {
-                entry.note.get_or_insert_with(|| invalid_note(name_en));
-            }
+    // 旧版元数据没有 title 字段：按来源感知的自动标题补齐，保证重跑
+    // images-sync 之前 WebUI/上传仍可正常工作（映射表在下一次 refresh 时应用）。
+    let no_overrides = IconTitleOverrides::default();
+    for (file, entry) in meta.icons.iter_mut() {
+        if entry.title.is_some() {
+            continue;
+        }
+        let (title, title_source) = effective_title(
+            file,
+            entry.name_en.as_deref(),
+            &no_overrides,
+            entry.source.as_deref(),
+        );
+        entry.title = title;
+        entry.title_source = title_source;
+        entry.uploadable = entry.title.is_some();
+        if let (None, Some(name_en)) = (&entry.title, entry.name_en.as_deref()) {
+            entry.note.get_or_insert_with(|| invalid_note(name_en));
         }
     }
     Ok(meta)
@@ -272,22 +308,47 @@ pub fn save(out_dir: &Path, meta: &IconMeta) -> Result<PathBuf> {
 
 // -- 名称解析 ----------------------------------------------------------------
 
-/// `STRINGS.NAMES.<KEY>` 的中英文名表（键为大写）。
-#[derive(Debug, Clone, Default)]
-pub struct NameMaps {
-    /// KEY → 英文 msgid。
+/// 一个字符串命名空间的双语表（键为大写）。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Bilingual {
+    /// 英文（msgid）。
     pub en: BTreeMap<String, String>,
-    /// KEY → 中文 msgstr（仅非空翻译）。
+    /// 中文（msgstr，仅非空翻译）。
     pub zh: BTreeMap<String, String>,
 }
 
-impl NameMaps {
+impl Bilingual {
+    /// 键的中英文；英文必须存在，中文可缺（返回 `None`）。
+    pub fn get(&self, key: &str) -> Option<(String, Option<String>)> {
+        let en = self.en.get(key)?;
+        Some((en.clone(), self.zh.get(key).cloned()))
+    }
+
     pub fn is_empty(&self) -> bool {
         self.en.is_empty() && self.zh.is_empty()
     }
 }
 
-/// 解析 `STRINGS.NAMES.*` 条目。`english_pot` 提供英文全集（可补 chinese
+/// 游戏翻译表中图标命名相关命名空间的中英文名表（键为大写）。
+#[derive(Debug, Clone, Default)]
+pub struct NameMaps {
+    /// `STRINGS.NAMES.<KEY>`（物品名）。
+    pub names: Bilingual,
+    /// `STRINGS.UI.CRAFTING_FILTERS.<KEY>`（制作栏过滤器名）。
+    pub crafting_filters: Bilingual,
+    /// `STRINGS.UI.CRAFTING_STATION_FILTERS.<KEY>`（制作站过滤名）。
+    pub station_filters: Bilingual,
+}
+
+impl NameMaps {
+    pub fn is_empty(&self) -> bool {
+        self.names.en.is_empty()
+            && self.crafting_filters.en.is_empty()
+            && self.station_filters.en.is_empty()
+    }
+}
+
+/// 解析图标命名相关命名空间条目。`english_pot` 提供英文全集（可补 chinese
 /// 缺失的键）；`chinese_po` 同时提供英文兜底与中文翻译。
 pub fn parse_name_maps(chinese_po: &str, english_pot: Option<&str>) -> Result<NameMaps> {
     let zh_file = PoParser::parse(chinese_po)?;
@@ -300,25 +361,31 @@ pub fn parse_name_maps(chinese_po: &str, english_pot: Option<&str>) -> Result<Na
     Ok(maps)
 }
 
-/// `english_wins = true` 时覆盖已有英文名（strings.pot 为准）。
+/// 按 `msgctxt` 前缀路由到对应命名空间；`english_wins = true` 时覆盖已有
+/// 英文名（strings.pot 为准）。
 fn collect_names(file: &PoFile, maps: &mut NameMaps, english_wins: bool) {
     for e in &file.entries {
-        let Some(key) = e
-            .msgctxt
-            .as_deref()
-            .and_then(|c| c.strip_prefix("STRINGS.NAMES."))
-        else {
+        let Some(ctx) = e.msgctxt.as_deref() else {
+            continue;
+        };
+        let (bilingual, key) = if let Some(k) = ctx.strip_prefix("STRINGS.NAMES.") {
+            (&mut maps.names, k)
+        } else if let Some(k) = ctx.strip_prefix("STRINGS.UI.CRAFTING_FILTERS.") {
+            (&mut maps.crafting_filters, k)
+        } else if let Some(k) = ctx.strip_prefix("STRINGS.UI.CRAFTING_STATION_FILTERS.") {
+            (&mut maps.station_filters, k)
+        } else {
             continue;
         };
         let key = key.to_ascii_uppercase();
         let msgid = e.msgid.trim();
-        if !msgid.is_empty() && (english_wins || !maps.en.contains_key(&key)) {
-            maps.en.insert(key.clone(), msgid.to_string());
+        if !msgid.is_empty() && (english_wins || !bilingual.en.contains_key(&key)) {
+            bilingual.en.insert(key.clone(), msgid.to_string());
         }
         if !english_wins {
             let msgstr = e.msgstr.trim();
             if !msgstr.is_empty() {
-                maps.zh.insert(key, msgstr.to_string());
+                bilingual.zh.insert(key, msgstr.to_string());
             }
         }
     }
@@ -330,6 +397,97 @@ pub fn read_name_maps(dst_root: &Path) -> Result<NameMaps> {
     let chinese = read_game_text(dst_root, "languages/chinese_s.po")?;
     let pot = read_game_text(dst_root, "languages/strings.pot").ok();
     parse_name_maps(&chinese, pot.as_deref())
+}
+
+/// 制作栏图标（`source=crafting`）的显示名解析表：由游戏 Lua 定义推导，
+/// 把本地图标文件名映射到 [`NameMaps`] 中的翻译键。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct CraftingKeys {
+    /// filter 图标 stem 大写（如 `FILTER_TOOL`）→ `CRAFTING_FILTERS` 键。
+    /// 多个过滤器共用同一图标时取定义序最后一个（`filter_none` 归
+    /// `EVERYTHING` 而非 `CRAFTING_STATION`，与 wiki 既有命名一致）。
+    pub filters: BTreeMap<String, String>,
+    /// station 图标 stem 大写 → 定义序首个非空 `CRAFTING_STATION_FILTERS` 键。
+    pub station_filters: BTreeMap<String, String>,
+    /// station 图标 stem 大写 → 定义序首个 prefab 的 `NAMES` 键（无
+    /// `filter_text` 的站图标回退显示名用，如 `STATION_CARPENTRY` →
+    /// `CARPENTRY_STATION` = "Sawhorse"）。
+    pub station_prefabs: BTreeMap<String, String>,
+}
+
+impl CraftingKeys {
+    /// 由 [`crate::parser::crafting`] 的两个 Lua 表解析产物构建。
+    pub fn from_defs(
+        filters: &[crate::parser::crafting::FilterIconDef],
+        prototypers: &[crate::parser::crafting::PrototyperIconDef],
+    ) -> CraftingKeys {
+        let mut keys = CraftingKeys::default();
+        for def in filters {
+            keys.filters.insert(
+                def.image.to_ascii_uppercase(),
+                def.name.to_ascii_uppercase(),
+            );
+        }
+        for def in prototypers {
+            let stem = def.image.to_ascii_uppercase();
+            if let Some(key) = &def.filter_key {
+                keys.station_filters
+                    .entry(stem.clone())
+                    .or_insert_with(|| key.to_ascii_uppercase());
+            }
+            keys.station_prefabs
+                .entry(stem)
+                .or_insert_with(|| def.prefab.to_ascii_uppercase());
+        }
+        keys
+    }
+
+    /// 图标文件（如 `filter_tool.png` / `station_carpentry.png`）的显示名：
+    /// filter 图标查 `CRAFTING_FILTERS`，station 图标优先
+    /// `CRAFTING_STATION_FILTERS`、回退 prefab 的 `NAMES`。查不到返回 `None`。
+    pub fn display_name(&self, names: &NameMaps, file: &str) -> Option<(String, Option<String>)> {
+        let stem = file_stem_key(file);
+        if let Some(key) = self.filters.get(&stem) {
+            return names.crafting_filters.get(key);
+        }
+        if let Some(key) = self.station_filters.get(&stem) {
+            if let Some(found) = names.station_filters.get(key) {
+                return Some(found);
+            }
+        }
+        self.station_prefabs
+            .get(&stem)
+            .and_then(|key| names.names.get(key))
+    }
+
+    /// 图标文件的语义分组：filter/station 按解析链命中；station 无过滤名时
+    /// `key = None`（显示名走 prefab 回退）。两表都未命中的图标返回 `None`。
+    pub fn group(&self, file: &str) -> Option<CraftingGroup> {
+        let stem = file_stem_key(file);
+        if let Some(key) = self.filters.get(&stem) {
+            return Some(CraftingGroup::Filter {
+                key: Some(key.clone()),
+            });
+        }
+        if let Some(key) = self.station_filters.get(&stem) {
+            return Some(CraftingGroup::Station {
+                key: Some(key.clone()),
+            });
+        }
+        self.station_prefabs
+            .contains_key(&stem)
+            .then_some(CraftingGroup::Station { key: None })
+    }
+}
+
+/// 读取制作栏图标的显示名解析表：`recipes_filter.lua` + `recipes.lua`
+///（live 树或 `scripts.zip`，与 [`read_name_maps`] 同源）。
+pub fn read_crafting_keys(dst_root: &Path) -> Result<CraftingKeys> {
+    let source = crate::platform::game_source::GameSource::new(dst_root.to_path_buf(), None)?;
+    let filters =
+        crate::parser::crafting::parse_crafting_filter_defs(&source.read("recipes_filter.lua")?)?;
+    let prototypers = crate::parser::crafting::parse_prototyper_defs(&source.read("recipes.lua")?)?;
+    Ok(CraftingKeys::from_defs(&filters, &prototypers))
 }
 
 fn read_game_text(dst_root: &Path, rel: &str) -> Result<String> {
@@ -349,6 +507,16 @@ pub fn file_stem_key(file: &str) -> String {
 /// MediaWiki 标题禁用字符（`# < > [ ] | { }` 及控制字符）。
 fn invalid_title_char(c: char) -> bool {
     matches!(c, '#' | '<' | '>' | '[' | ']' | '|' | '{' | '}') || c.is_control()
+}
+
+/// 制作栏图标的自动标题后缀：`filter_*` → `Filter`，其余（`station_*`）→
+/// `Station Icon`，与 wiki 分类:制作栏图标 的主流命名一致。
+fn crafting_title_suffix(file: &str) -> &'static str {
+    if file.starts_with("filter_") {
+        "Filter"
+    } else {
+        "Station Icon"
+    }
 }
 
 /// 英文名 → `File:<英文名>.png`（MediaWiki 归一化：首字母大写、`_`→空格）。
@@ -420,19 +588,45 @@ pub fn normalize_explicit_title(raw: &str) -> Result<String> {
     Ok(format!("{normalized}.png"))
 }
 
-/// 一个文件当前的生效标题：映射表（按本地文件名）优先，其次英文名自动生成。
+/// 一个图标当前的生效标题：映射表（按本地文件名）优先，其次英文名自动
+/// 生成——制作栏图标（`source = Some("crafting")`）追加 `Filter` /
+/// `Station Icon` 后缀，其余直接用英文名。
+///
+/// 与自动命名相同的映射视为未指定（按 `Auto` 返回），防御手工编辑
+/// 映射表引入的冗余条目。
 pub fn effective_title(
     file: &str,
     name_en: Option<&str>,
     overrides: &IconTitleOverrides,
+    source: Option<&str>,
 ) -> (Option<String>, Option<TitleSource>) {
+    let auto = name_en.and_then(|name_en| match source {
+        Some("crafting") => auto_title(&format!("{name_en} {}", crafting_title_suffix(file))),
+        _ => auto_title(name_en),
+    });
     if let Some(title) = overrides.get(file) {
-        return (Some(title.to_string()), Some(TitleSource::Override));
+        if auto.as_deref() != Some(title) {
+            return (Some(title.to_string()), Some(TitleSource::Override));
+        }
     }
-    match name_en.and_then(auto_title) {
+    match auto {
         Some(title) => (Some(title), Some(TitleSource::Auto)),
         None => (None, None),
     }
+}
+
+/// 手动标题（已经 [`normalize_explicit_title`] 规范化）是否与自动命名一致。
+/// 一致时视为未指定：写路径不落映射表（覆盖表只收偏离默认的真例外）。
+/// 无英文名或英文名不可自动生成标题时永远返回 `false`（此时任何标题都是
+/// 真例外，如皮肤/占位符名）。
+pub fn title_is_default(
+    file: &str,
+    name_en: Option<&str>,
+    source: Option<&str>,
+    title: &str,
+) -> bool {
+    let (auto, _) = effective_title(file, name_en, &IconTitleOverrides::default(), source);
+    auto.as_deref() == Some(title)
 }
 
 /// 重新计算条目的 `title`/`title_source`/`uploadable`/`note`；标题变化时
@@ -442,7 +636,12 @@ pub fn refresh_entry_title(
     file: &str,
     overrides: &IconTitleOverrides,
 ) -> bool {
-    let (title, source) = effective_title(file, entry.name_en.as_deref(), overrides);
+    let (title, source) = effective_title(
+        file,
+        entry.name_en.as_deref(),
+        overrides,
+        entry.source.as_deref(),
+    );
     let changed = entry.title != title;
     if changed {
         entry.wiki = None;
@@ -470,19 +669,32 @@ fn invalid_note(name_en: &str) -> String {
 /// 由当前图标文件清单构建元数据；`previous` 中生效标题未变的条目的 wiki
 /// 状态会保留（避免每次 images-sync 重查全部标题）。
 ///
-/// `files` 为 `(文件名, 来源标识)` 对（来源见 `images::icons::ICON_SOURCES`）。
+/// `files` 为 `(文件名, 来源标识)` 对（来源见 `images::icons::ICON_SOURCES`）；
+/// `source = "crafting"` 的文件走 [`CraftingKeys::display_name`] 取名。
 pub fn build_meta(
     build: &str,
     files: impl IntoIterator<Item = (String, String)>,
     names: &NameMaps,
+    crafting: &CraftingKeys,
     overrides: &IconTitleOverrides,
     previous: &IconMeta,
 ) -> IconMeta {
     let mut icons = BTreeMap::new();
     for (file, source) in files {
-        let key = file_stem_key(&file);
-        let name_en = names.en.get(&key).cloned();
-        let (title, title_source) = effective_title(&file, name_en.as_deref(), overrides);
+        let (name_en, name_zh) = if source == "crafting" {
+            crafting
+                .display_name(names, &file)
+                .map(|(en, zh)| (Some(en), zh))
+                .unwrap_or_default()
+        } else {
+            let key = file_stem_key(&file);
+            (
+                names.names.en.get(&key).cloned(),
+                names.names.zh.get(&key).cloned(),
+            )
+        };
+        let (title, title_source) =
+            effective_title(&file, name_en.as_deref(), overrides, Some(source.as_str()));
         if name_en.is_none() && title.is_none() {
             continue;
         }
@@ -496,12 +708,18 @@ pub fn build_meta(
             .get(&file)
             .filter(|old| old.title == title)
             .and_then(|old| old.wiki.clone());
+        let crafting = if source == "crafting" {
+            crafting.group(&file)
+        } else {
+            None
+        };
         icons.insert(
             file,
             IconMetaEntry {
                 name_en,
-                name_zh: names.zh.get(&key).cloned(),
+                name_zh,
                 source: Some(source),
+                crafting,
                 title,
                 title_source,
                 uploadable,
@@ -554,20 +772,57 @@ msgstr ""
     #[test]
     fn test_parse_name_maps_merges_pot_and_zh() {
         let maps = parse_name_maps(ZH_PO, Some(EN_POT)).unwrap();
-        assert_eq!(maps.en.get("AXE").map(String::as_str), Some("Axe"));
-        assert_eq!(maps.zh.get("AXE").map(String::as_str), Some("斧头"));
+        assert_eq!(maps.names.en.get("AXE").map(String::as_str), Some("Axe"));
+        assert_eq!(maps.names.zh.get("AXE").map(String::as_str), Some("斧头"));
         // 只有英文、没有中文
         assert_eq!(
-            maps.en.get("EN_ONLY").map(String::as_str),
+            maps.names.en.get("EN_ONLY").map(String::as_str),
             Some("English Only")
         );
-        assert!(!maps.zh.contains_key("EN_ONLY"));
+        assert!(!maps.names.zh.contains_key("EN_ONLY"));
         // chinese_s.po 里 msgstr 为空 → 不产生中文
         assert_eq!(
-            maps.en.get("EMPTY_ZH").map(String::as_str),
+            maps.names.en.get("EMPTY_ZH").map(String::as_str),
             Some("Empty Zh")
         );
-        assert!(!maps.zh.contains_key("EMPTY_ZH"));
+        assert!(!maps.names.zh.contains_key("EMPTY_ZH"));
+    }
+
+    const ZH_PO_CRAFTING: &str = r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "STRINGS.UI.CRAFTING_FILTERS.TOOLS"
+msgid "Tools"
+msgstr "工具"
+
+msgctxt "STRINGS.UI.CRAFTING_STATION_FILTERS.CARPENTRY"
+msgid "Carpentry"
+msgstr "木工"
+
+msgctxt "STRINGS.UI.CRAFTING_STATION_FILTERS.EMPTY"
+msgid "Empty"
+msgstr ""
+"#;
+
+    #[test]
+    fn test_parse_name_maps_crafting_namespaces() {
+        let maps = parse_name_maps(ZH_PO_CRAFTING, None).unwrap();
+        assert_eq!(
+            maps.crafting_filters.get("TOOLS"),
+            Some(("Tools".into(), Some("工具".into())))
+        );
+        assert_eq!(
+            maps.station_filters.get("CARPENTRY"),
+            Some(("Carpentry".into(), Some("木工".into())))
+        );
+        // 空 msgstr → 只有英文
+        assert_eq!(
+            maps.station_filters.get("EMPTY"),
+            Some(("Empty".into(), None))
+        );
+        // 不影响 NAMES 命名空间
+        assert!(maps.names.is_empty());
     }
 
     #[test]
@@ -676,12 +931,339 @@ msgstr ""
             name_en: name_en.map(str::to_string),
             name_zh: None,
             source: Some("inventory".to_string()),
+            crafting: None,
             title: title.map(str::to_string),
             title_source: title.map(|_| TitleSource::Auto),
             uploadable: title.is_some(),
             note: None,
             wiki: None,
         }
+    }
+
+    #[test]
+    fn test_effective_title_crafting_suffix() {
+        let overrides = IconTitleOverrides::default();
+        // filter_* → "Filter" 后缀
+        assert_eq!(
+            effective_title(
+                "filter_tool.png",
+                Some("Tools"),
+                &overrides,
+                Some("crafting")
+            ),
+            (Some("Tools Filter.png".into()), Some(TitleSource::Auto))
+        );
+        // 其余（station_*）→ "Station Icon" 后缀
+        assert_eq!(
+            effective_title(
+                "station_carpentry.png",
+                Some("Sawhorse"),
+                &overrides,
+                Some("crafting")
+            ),
+            (
+                Some("Sawhorse Station Icon.png".into()),
+                Some(TitleSource::Auto)
+            )
+        );
+        // 物品栏来源保持无后缀
+        assert_eq!(
+            effective_title("axe.png", Some("Axe"), &overrides, Some("inventory")),
+            (Some("Axe.png".into()), Some(TitleSource::Auto))
+        );
+        assert_eq!(
+            effective_title("axe.png", Some("Axe"), &overrides, None),
+            (Some("Axe.png".into()), Some(TitleSource::Auto))
+        );
+        // 旧来源（无 source 字段）行为不变
+        // 映射表优先且不受后缀影响（值与自动命名不同才是真例外）
+        let mut ov = IconTitleOverrides::default();
+        ov.insert("station_carpentry.png", "Carpentry Station Icon.png");
+        assert_eq!(
+            effective_title(
+                "station_carpentry.png",
+                Some("Sawhorse"),
+                &ov,
+                Some("crafting")
+            ),
+            (
+                Some("Carpentry Station Icon.png".into()),
+                Some(TitleSource::Override)
+            )
+        );
+    }
+
+    #[test]
+    fn test_title_is_default() {
+        // 物品栏：与英文名标题一致 → 默认
+        assert!(title_is_default("axe.png", Some("Axe"), None, "Axe.png"));
+        // 不同的标题 → 非默认
+        assert!(!title_is_default(
+            "axe.png",
+            Some("Axe"),
+            None,
+            "Pick-Axe.png"
+        ));
+        // crafting：后缀参与推导
+        assert!(title_is_default(
+            "filter_tool.png",
+            Some("Tools"),
+            Some("crafting"),
+            "Tools Filter.png"
+        ));
+        assert!(!title_is_default(
+            "filter_tool.png",
+            Some("Tools"),
+            Some("crafting"),
+            "Tools.png"
+        ));
+        assert!(title_is_default(
+            "station_carpentry.png",
+            Some("Carpentry"),
+            Some("crafting"),
+            "Carpentry Station Icon.png"
+        ));
+        // 无英文名（皮肤/变体）：自动标题不存在，任何标题都是真例外
+        assert!(!title_is_default("skin.png", None, None, "Skin Icon.png"));
+        // 英文名含非法字符（自动标题不可用）：手动标题是真例外
+        assert!(!title_is_default(
+            "multitool_axe_pickaxe.png",
+            Some("Pick/Axe"),
+            None,
+            "Pick-Axe.png"
+        ));
+    }
+
+    #[test]
+    fn test_effective_title_ignores_default_override() {
+        let mut ov = IconTitleOverrides::default();
+        // 与自动命名相同的映射 → 按 Auto 处理，不视为特例
+        ov.insert("axe.png", "Axe.png");
+        assert_eq!(
+            effective_title("axe.png", Some("Axe"), &ov, None),
+            (Some("Axe.png".into()), Some(TitleSource::Auto))
+        );
+        // 不同的映射仍是真例外
+        ov.insert("axe.png", "Pick-Axe.png");
+        assert_eq!(
+            effective_title("axe.png", Some("Axe"), &ov, None),
+            (Some("Pick-Axe.png".into()), Some(TitleSource::Override))
+        );
+        // 无自动标题（英文名含 `/`）时映射照常生效
+        ov.remove("axe.png");
+        ov.insert("multitool_axe_pickaxe.png", "Pick-Axe.png");
+        assert_eq!(
+            effective_title("multitool_axe_pickaxe.png", Some("Pick/Axe"), &ov, None),
+            (Some("Pick-Axe.png".into()), Some(TitleSource::Override))
+        );
+    }
+
+    #[test]
+    fn test_crafting_keys_display_name() {
+        let filters = vec![
+            crate::parser::crafting::FilterIconDef {
+                name: "CRAFTING_STATION".into(),
+                image: "filter_none".into(),
+            },
+            crate::parser::crafting::FilterIconDef {
+                name: "EVERYTHING".into(),
+                image: "filter_none".into(),
+            },
+            crate::parser::crafting::FilterIconDef {
+                name: "TOOLS".into(),
+                image: "filter_tool".into(),
+            },
+        ];
+        let prototypers = vec![
+            crate::parser::crafting::PrototyperIconDef {
+                prefab: "researchlab".into(),
+                image: "station_science".into(),
+                filter_key: None,
+            },
+            crate::parser::crafting::PrototyperIconDef {
+                prefab: "carpentry_station".into(),
+                image: "station_carpentry".into(),
+                filter_key: Some("CARPENTRY".into()),
+            },
+        ];
+        let keys = CraftingKeys::from_defs(&filters, &prototypers);
+        // 同图标多过滤器：定义序最后一个胜出（filter_none → EVERYTHING）
+        let mut maps = NameMaps::default();
+        maps.crafting_filters
+            .en
+            .insert("TOOLS".into(), "Tools".into());
+        maps.crafting_filters
+            .zh
+            .insert("TOOLS".into(), "工具".into());
+        maps.crafting_filters
+            .en
+            .insert("EVERYTHING".into(), "Everything".into());
+        maps.station_filters
+            .en
+            .insert("CARPENTRY".into(), "Carpentry".into());
+        maps.station_filters
+            .zh
+            .insert("CARPENTRY".into(), "木工".into());
+        maps.names
+            .en
+            .insert("RESEARCHLAB".into(), "Science Machine".into());
+
+        assert_eq!(
+            keys.display_name(&maps, "filter_tool.png"),
+            Some(("Tools".into(), Some("工具".into())))
+        );
+        assert_eq!(
+            keys.display_name(&maps, "filter_none.png"),
+            Some(("Everything".into(), None))
+        );
+        // station：优先过滤名
+        assert_eq!(
+            keys.display_name(&maps, "station_carpentry.png"),
+            Some(("Carpentry".into(), Some("木工".into())))
+        );
+        // 无 filter_text：回退 prefab 名
+        assert_eq!(
+            keys.display_name(&maps, "station_science.png"),
+            Some(("Science Machine".into(), None))
+        );
+        // 未收录的图标
+        assert_eq!(keys.display_name(&maps, "station_unknown.png"), None);
+        assert_eq!(keys.display_name(&maps, "axe.png"), None);
+
+        // 语义分组：filter/station 按解析链，station 无过滤名 key 为 None
+        assert_eq!(
+            keys.group("filter_tool.png"),
+            Some(CraftingGroup::Filter {
+                key: Some("TOOLS".into())
+            })
+        );
+        // 同图标多过滤器：与 display_name 同规则（定义序最后者胜）
+        assert_eq!(
+            keys.group("filter_none.png"),
+            Some(CraftingGroup::Filter {
+                key: Some("EVERYTHING".into())
+            })
+        );
+        assert_eq!(
+            keys.group("station_carpentry.png"),
+            Some(CraftingGroup::Station {
+                key: Some("CARPENTRY".into())
+            })
+        );
+        assert_eq!(
+            keys.group("station_science.png"),
+            Some(CraftingGroup::Station { key: None })
+        );
+        assert_eq!(keys.group("axe.png"), None);
+        // serde 形态（WebUI 消费的字段形状）
+        assert_eq!(
+            serde_json::to_value(CraftingGroup::Filter { key: None }).unwrap(),
+            serde_json::json!({ "kind": "filter", "key": null })
+        );
+    }
+
+    #[test]
+    fn test_build_meta_crafting_icons() {
+        let maps = parse_name_maps(ZH_PO_CRAFTING, None).unwrap();
+        // prefab 回退显示名：station_science → researchlab
+        let mut maps = maps;
+        maps.names
+            .en
+            .insert("RESEARCHLAB".into(), "Science Machine".into());
+        let filters = vec![crate::parser::crafting::FilterIconDef {
+            name: "TOOLS".into(),
+            image: "filter_tool".into(),
+        }];
+        let prototypers = vec![
+            crate::parser::crafting::PrototyperIconDef {
+                prefab: "researchlab".into(),
+                image: "station_science".into(),
+                filter_key: None,
+            },
+            crate::parser::crafting::PrototyperIconDef {
+                prefab: "carpentry_station".into(),
+                image: "station_carpentry".into(),
+                filter_key: Some("CARPENTRY".into()),
+            },
+        ];
+        let keys = CraftingKeys::from_defs(&filters, &prototypers);
+        let crafting_files = |list: &[&str]| {
+            list.iter()
+                .map(|s| (s.to_string(), "crafting".to_string()))
+                .collect::<Vec<_>>()
+        };
+
+        let meta = build_meta(
+            "1",
+            crafting_files(&[
+                "filter_tool.png",
+                "station_carpentry.png",
+                "station_science.png",
+            ]),
+            &maps,
+            &keys,
+            &IconTitleOverrides::default(),
+            &IconMeta::default(),
+        );
+        // filter：显示名 + "Filter" 后缀标题
+        let tool = &meta.icons["filter_tool.png"];
+        assert_eq!(tool.name_en.as_deref(), Some("Tools"));
+        assert_eq!(tool.name_zh.as_deref(), Some("工具"));
+        assert_eq!(tool.title.as_deref(), Some("Tools Filter.png"));
+        assert_eq!(tool.source.as_deref(), Some("crafting"));
+        assert_eq!(
+            tool.crafting,
+            Some(CraftingGroup::Filter {
+                key: Some("TOOLS".into())
+            })
+        );
+        assert!(tool.uploadable);
+        // station 有过滤名："Station Icon" 后缀
+        let carpentry = &meta.icons["station_carpentry.png"];
+        assert_eq!(
+            carpentry.title.as_deref(),
+            Some("Carpentry Station Icon.png")
+        );
+        assert_eq!(carpentry.name_zh.as_deref(), Some("木工"));
+        assert_eq!(
+            carpentry.crafting,
+            Some(CraftingGroup::Station {
+                key: Some("CARPENTRY".into())
+            })
+        );
+        // station 无过滤名：prefab 显示名 + "Station Icon" 后缀标题
+        let science = &meta.icons["station_science.png"];
+        assert_eq!(science.name_en.as_deref(), Some("Science Machine"));
+        assert_eq!(
+            science.title.as_deref(),
+            Some("Science Machine Station Icon.png")
+        );
+        assert_eq!(science.crafting, Some(CraftingGroup::Station { key: None }));
+
+        // 映射表优先于自动标题；无键无映射的图标不收录
+        let mut ov = IconTitleOverrides::default();
+        ov.insert("station_science.png", "Science Station Icon.png");
+        let meta = build_meta(
+            "1",
+            crafting_files(&[
+                "filter_tool.png",
+                "station_science.png",
+                "station_unknown.png",
+            ]),
+            &maps,
+            &keys,
+            &ov,
+            &IconMeta::default(),
+        );
+        assert_eq!(
+            meta.icons["station_science.png"].title.as_deref(),
+            Some("Science Station Icon.png")
+        );
+        assert_eq!(
+            meta.icons["station_science.png"].title_source,
+            Some(TitleSource::Override)
+        );
+        assert!(!meta.icons.contains_key("station_unknown.png"));
     }
 
     #[test]
@@ -713,6 +1295,7 @@ msgstr ""
                 "placeholder.png",
             ]),
             &maps,
+            &CraftingKeys::default(),
             &IconTitleOverrides::default(),
             &previous,
         );
@@ -737,12 +1320,14 @@ msgstr ""
         // mock 里没有 placeholder 键，改为直接构造验证占位符逻辑
         let mut maps2 = maps;
         maps2
+            .names
             .en
             .insert("PLACEHOLDER".into(), "{item} Blueprint".into());
         let meta2 = build_meta(
             "100",
             files(&["placeholder.png"]),
             &maps2,
+            &CraftingKeys::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -763,6 +1348,7 @@ msgstr ""
             "1",
             files(&["axe.png", "skin.png", "other.png"]),
             &maps,
+            &CraftingKeys::default(),
             &ov,
             &IconMeta::default(),
         );
@@ -793,6 +1379,7 @@ msgstr ""
                 ("filter_tool.png".to_string(), "crafting".to_string()),
             ],
             &maps,
+            &CraftingKeys::default(),
             &ov,
             &IconMeta::default(),
         );
@@ -827,6 +1414,7 @@ msgstr ""
             "100",
             files(&["axe.png"]),
             &maps,
+            &CraftingKeys::default(),
             &IconTitleOverrides::default(),
             &previous,
         );
@@ -875,6 +1463,7 @@ msgstr ""
             "1",
             files(&["axe.png", "other_axe.png"]),
             &maps,
+            &CraftingKeys::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -896,6 +1485,7 @@ msgstr ""
             "42",
             files(&["axe.png"]),
             &maps,
+            &CraftingKeys::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -952,10 +1542,218 @@ msgstr ""
         std::fs::write(lang.join("strings.pot"), EN_POT).unwrap();
         let maps = read_name_maps(&root).unwrap();
         assert_eq!(
-            maps.en.get("EN_ONLY").map(String::as_str),
+            maps.names.en.get("EN_ONLY").map(String::as_str),
             Some("English Only")
         );
-        assert_eq!(maps.zh.get("AXE").map(String::as_str), Some("斧头"));
+        assert_eq!(maps.names.zh.get("AXE").map(String::as_str), Some("斧头"));
         std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// 真实游戏数据指纹：当前 atlas 的 54 个制作栏图标全部能解析出中英文
+    /// 显示名，且自动标题（含映射表 9 条例外）与 wiki 分类:制作栏图标 的
+    /// 既有文件名一一对应。本地无 `DST__ROOT` 时跳过（与 wiki API 测试同
+    /// 惯例，CI 不装游戏）。
+    #[test]
+    fn test_real_game_crafting_icons_resolve() {
+        let Ok(dst_root) = std::env::var("DST__ROOT") else {
+            return;
+        };
+        let dst_root = PathBuf::from(dst_root);
+        if !dst_root.join("data/databundles").exists() {
+            return;
+        }
+        let names = read_name_maps(&dst_root).unwrap();
+        let crafting = read_crafting_keys(&dst_root).unwrap();
+
+        // 映射表例外：wiki 命名偏离「英文名 + Filter/Station Icon」惯例的部分
+        // （Station Filter 后缀变体、prefab/编辑命名，均取自分类内现有文件名）。
+        let mut ov = IconTitleOverrides::default();
+        ov.insert("station_arcane.png", "Magic Station Icon.png");
+        ov.insert(
+            "station_carnivalgame_golfprops.png",
+            "Custom Course Shack Icon.png",
+        );
+        ov.insert("station_carpentry.png", "Sawhorse Station Icon.png");
+        ov.insert(
+            "station_foodprocessing.png",
+            "Seasonings Station Filter.png",
+        );
+        ov.insert(
+            "station_hermitcrab_shop.png",
+            "Bottle Exchange Station Filter.png",
+        );
+        ov.insert("station_none.png", "Without Station Icon.png");
+        ov.insert("station_orphanage.png", "Critters Station Filter.png");
+        ov.insert("station_rabbitking.png", "Rabbitking Station Icon.png");
+        ov.insert("station_science.png", "Science Station Icon.png");
+        ov.insert(
+            "station_shadow_forge.png",
+            "Shadowcrafting Station Icon.png",
+        );
+
+        let auto = [
+            ("filter_armour.png", "Armor Filter.png"),
+            ("filter_containers.png", "Storage Solutions Filter.png"),
+            ("filter_cooking.png", "Cooking Filter.png"),
+            ("filter_cosmetic.png", "Decorations Filter.png"),
+            ("filter_events.png", "Special Event Filter.png"),
+            ("filter_favorites.png", "Favorites Filter.png"),
+            ("filter_fire.png", "Light Sources Filter.png"),
+            ("filter_fishing.png", "Fishing Filter.png"),
+            ("filter_gardening.png", "Food & Gardening Filter.png"),
+            ("filter_health.png", "Healing Filter.png"),
+            ("filter_modded.png", "Modded Items Filter.png"),
+            ("filter_none.png", "Everything Filter.png"),
+            ("filter_rain.png", "Rain Gear Filter.png"),
+            ("filter_refine.png", "Refined Materials Filter.png"),
+            ("filter_riding.png", "Beefalo Riding Filter.png"),
+            ("filter_sailing.png", "Seafaring Filter.png"),
+            ("filter_science.png", "Prototypers & Stations Filter.png"),
+            ("filter_skull.png", "Magic Filter.png"),
+            ("filter_structure.png", "Structures Filter.png"),
+            ("filter_summer.png", "Summer Items Filter.png"),
+            ("filter_tool.png", "Tools Filter.png"),
+            ("filter_warable.png", "Clothing Filter.png"),
+            ("filter_weapon.png", "Weapons Filter.png"),
+            ("filter_winter.png", "Winter Items Filter.png"),
+            ("station_books.png", "Bookcase Station Icon.png"),
+            ("station_cartography.png", "Cartography Station Icon.png"),
+            ("station_celestial.png", "Celestial Station Icon.png"),
+            (
+                "station_crafting_table.png",
+                "Ancient Pseudoscience Station Icon.png",
+            ),
+            (
+                "station_feast_oven.png",
+                "Winter's Feast Cooking Station Icon.png",
+            ),
+            ("station_fishing.png", "Tackle Receptacle Station Icon.png"),
+            (
+                "station_hermitcrab_teashop.png",
+                "Tea Brewing Station Icon.png",
+            ),
+            ("station_host.png", "Cawnival Creation Station Icon.png"),
+            ("station_lunar_forge.png", "Brightsmithy Station Icon.png"),
+            ("station_madscience_lab.png", "Mad Science Station Icon.png"),
+            ("station_perd_offering.png", "Offerings Station Icon.png"),
+            ("station_prizebooth.png", "Trinket Trove Station Icon.png"),
+            ("station_sculpt.png", "Sculptures Station Icon.png"),
+            ("station_seafaring.png", "Think Tank Station Icon.png"),
+            ("station_shadow.png", "Codex Umbra Station Icon.png"),
+            ("station_shellweaver.png", "Combrining Station Icon.png"),
+            (
+                "station_turfcrafting.png",
+                "Terra Firma Tamper Station Icon.png",
+            ),
+            (
+                "station_vault_refiner.png",
+                "Sanctum Smithy Station Icon.png",
+            ),
+            (
+                "station_wagpunk_workstation.png",
+                "Fabrication Station Icon.png",
+            ),
+            ("station_wanderingtrader.png", "Trading Station Icon.png"),
+        ];
+        let overridden = [
+            ("station_arcane.png", "Magic Station Icon.png"),
+            (
+                "station_carnivalgame_golfprops.png",
+                "Custom Course Shack Icon.png",
+            ),
+            ("station_carpentry.png", "Sawhorse Station Icon.png"),
+            (
+                "station_foodprocessing.png",
+                "Seasonings Station Filter.png",
+            ),
+            (
+                "station_hermitcrab_shop.png",
+                "Bottle Exchange Station Filter.png",
+            ),
+            ("station_none.png", "Without Station Icon.png"),
+            ("station_orphanage.png", "Critters Station Filter.png"),
+            ("station_rabbitking.png", "Rabbitking Station Icon.png"),
+            ("station_science.png", "Science Station Icon.png"),
+            (
+                "station_shadow_forge.png",
+                "Shadowcrafting Station Icon.png",
+            ),
+        ];
+
+        for (file, expected) in auto.iter().chain(overridden.iter()) {
+            let (name_en, name_zh) = crafting
+                .display_name(&names, file)
+                .unwrap_or_else(|| panic!("{file} 应能解析出显示名（Lua 定义 + 翻译表）"));
+            assert!(!name_en.is_empty(), "{file} 英文名为空");
+            assert!(!name_zh.unwrap_or_default().is_empty(), "{file} 中文名为空");
+            let (title, source) = effective_title(file, Some(&name_en), &ov, Some("crafting"));
+            assert_eq!(
+                title.as_deref(),
+                Some(*expected),
+                "{file}（{name_en}）的自动标题与 wiki 分类命名不符"
+            );
+            let expected_source = if auto.iter().any(|(f, _)| f == file) {
+                TitleSource::Auto
+            } else {
+                TitleSource::Override
+            };
+            assert_eq!(source, Some(expected_source), "{file} 标题来源");
+        }
+        assert_eq!(auto.len() + overridden.len(), 54, "atlas 图标总数");
+
+        // 语义分组抽检：过滤器 / 制作站（无过滤名的 key 为 None）
+        assert_eq!(
+            crafting.group("filter_tool.png"),
+            Some(CraftingGroup::Filter {
+                key: Some("TOOLS".into())
+            })
+        );
+        assert_eq!(
+            crafting.group("station_carpentry.png"),
+            Some(CraftingGroup::Station {
+                key: Some("CARPENTRY".into())
+            })
+        );
+        assert_eq!(
+            crafting.group("station_none.png"),
+            Some(CraftingGroup::Station { key: None })
+        );
+        // 54 个图标全部能判定分组
+        for (file, _) in auto.iter().chain(overridden.iter()) {
+            assert!(crafting.group(file).is_some(), "{file} 应有语义分组");
+        }
+    }
+
+    /// 映射表防污染指纹：`config/icon_title_overrides.json` 的每个条目都必须
+    /// 偏离自动命名（覆盖表只收真例外，与自动命名相同的条目视为冗余）。
+    /// 本地无 `DST__ROOT` 时跳过（与 wiki API 测试同惯例，CI 不装游戏）。
+    #[test]
+    fn test_real_overrides_are_not_default_titles() {
+        let Ok(dst_root) = std::env::var("DST__ROOT") else {
+            return;
+        };
+        let dst_root = PathBuf::from(dst_root);
+        if !dst_root.join("data/databundles").exists() {
+            return;
+        }
+        let overrides = load_overrides(Path::new(OVERRIDES_DEFAULT_PATH)).unwrap();
+        assert!(!overrides.is_empty(), "映射表为空？（CWD 应为 crate 根）");
+        let names = read_name_maps(&dst_root).unwrap();
+        let crafting = read_crafting_keys(&dst_root).unwrap();
+        for (file, title) in overrides.0.iter() {
+            // 与 meta 构建同源的英文名：crafting 走解析链，物品栏查 NAMES
+            let (source, name_en) = if file.starts_with("filter_") || file.starts_with("station_") {
+                (
+                    Some("crafting"),
+                    crafting.display_name(&names, file).map(|(en, _)| en),
+                )
+            } else {
+                (None, names.names.en.get(&file_stem_key(file)).cloned())
+            };
+            assert!(
+                !title_is_default(file, name_en.as_deref(), source, title),
+                "映射表条目 {file} → {title} 与自动命名相同，属于冗余条目"
+            );
+        }
     }
 }

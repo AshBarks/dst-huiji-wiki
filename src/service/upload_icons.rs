@@ -4,9 +4,12 @@
 //! - 文件与名称：`history/icon_meta.json`（images-sync 生成的生效标题 +
 //!   上传状态）与 `current/split/<source.dir>/<file>`（当前图标内容）；
 //! - 生效标题：`config/icon_title_overrides.json` 映射表（按本地文件名）
-//!   优先，其次 `STRINGS.NAMES` 英文名自动生成（MediaWiki 归一化）；
-//! - 手动上传：`file` + `title` 同时给出时绕过映射/自动标题，直接把输入
-//!   （去 `File:` 前缀、补 `.png`、MediaWiki 归一化）写入映射表并上传；
+//!   优先，其次游戏内英文名自动生成（物品栏图标用 `STRINGS.NAMES`，
+//!   制作栏图标经 `CraftingKeys` 解析链并追加 `Filter`/`Station Icon`
+//!   后缀，MediaWiki 归一化）；
+//! - 手动上传：`file` + `title` 同时给出时绕过映射/自动标题，直接按输入
+//!   （去 `File:` 前缀、补 `.png`、MediaWiki 归一化）上传；与自动命名一致
+//!   的标题视为未指定，不写映射表（其余写入映射表）；
 //! - 选择：`file` 单个 > `build`（首次加入该 build 的图标）> `source`
 //!   （物品栏 / 制作栏）> 全部可上传；批量默认仅上传 wiki 上不存在的
 //!   （`only_missing`），显式指定的单个文件始终上传（是否覆盖自动按标题
@@ -69,7 +72,8 @@ pub struct UploadIconsParams {
     pub build: Option<String>,
     /// 只上传单个图标文件名（如 `axe.png`）。
     pub file: Option<String>,
-    /// 手动指定上传的 wiki 文件名（需配合 `file`）；写入映射表并绕过自动标题。
+    /// 手动指定上传的 wiki 文件名（需配合 `file`）；与自动命名一致时视为
+    /// 未指定，其余写入映射表并绕过自动标题。
     pub title: Option<String>,
     /// 只上传指定来源（`inventory` / `crafting`）；`None` = 全部来源。
     pub source: Option<String>,
@@ -104,14 +108,24 @@ pub async fn refresh_icon_meta(
         .map(|e| (e.file.clone(), e.source.clone()))
         .collect();
     let names = icon_meta::read_name_maps(dst_root)?;
+    // 制作栏图标名称解析失败只降级（制作栏图标无名），不影响物品栏图标。
+    let crafting = match icon_meta::read_crafting_keys(dst_root) {
+        Ok(keys) => keys,
+        Err(e) => {
+            reporter.log(format!(
+                "制作栏图标名称表解析失败，制作栏图标将不含名称：{e}"
+            ));
+            icon_meta::CraftingKeys::default()
+        }
+    };
     let overrides = icon_meta::load_overrides(&icon_meta::overrides_path())?;
     if names.is_empty() && overrides.is_empty() {
-        reporter.log("翻译表中没有 STRINGS.NAMES 条目，跳过图标元数据刷新".to_string());
+        reporter.log("翻译表中没有可用条目，跳过图标元数据刷新".to_string());
         return Ok(json!({ "status": "no_names" }));
     }
 
     let previous = icon_meta::load(out_dir)?;
-    let mut meta = icon_meta::build_meta(&build, files, &names, &overrides, &previous);
+    let mut meta = icon_meta::build_meta(&build, files, &names, &crafting, &overrides, &previous);
     let entries = meta.icons.len();
     let named = meta.icons.values().filter(|e| e.name_en.is_some()).count();
     let uploadable = meta.icons.values().filter(|e| e.uploadable).count();
@@ -249,7 +263,7 @@ pub fn select_files(
     if let Some(file) = file {
         let Some(entry) = meta.icons.get(file) else {
             return Err(Error::Config(format!(
-                "图标元数据中没有 {file}（可能没有 STRINGS.NAMES 英文名，或未运行 images-sync）"
+                "图标元数据中没有 {file}（可能没有对应的英文名，或未运行 images-sync）"
             )));
         };
         if !entry.uploadable {
@@ -356,6 +370,7 @@ fn apply_manual_title(
             name_en: None,
             name_zh: None,
             source: None,
+            crafting: None,
             title: None,
             title_source: None,
             uploadable: false,
@@ -389,7 +404,7 @@ pub async fn run_upload_icons(
         .as_deref()
         .map(icon_meta::normalize_explicit_title)
         .transpose()?;
-    let (manual_pending, manual_source) = if let Some(title) = manual_title.clone() {
+    let (manual_file, manual_source, manual_default) = if let Some(title) = manual_title.clone() {
         let Some(file) = params.file.clone() else {
             return Err(Error::Config(
                 "手动标题需要同时指定 file（WebUI 弹窗或 --file + --title）".to_string(),
@@ -399,9 +414,12 @@ pub async fn run_upload_icons(
             return Err(Error::Config("title 与 build 不能同时指定".to_string()));
         }
         let source = validate_icon_file(&out_dir, &file)?;
-        ((file, title), Some(source))
+        let name_en = meta.icons.get(&file).and_then(|e| e.name_en.clone());
+        let is_default =
+            icon_meta::title_is_default(&file, name_en.as_deref(), Some(source.id), &title);
+        (file, Some(source), is_default)
     } else {
-        ((String::new(), String::new()), None)
+        (String::new(), None, false)
     };
 
     let first_build = if params.file.is_none() && params.build.is_some() {
@@ -417,10 +435,22 @@ pub async fn run_upload_icons(
         None
     };
     let mut overrides = icon_meta::load_overrides(&icon_meta::overrides_path())?;
+    // 映射表是否真正变化（决定 Apply 阶段是否落盘）。
+    let mut overrides_changed = false;
     let mut selected = if let Some(title) = manual_title.as_deref() {
-        let file = manual_pending.0.clone();
-        // 仅映射表中不存在同名映射时写入（Apply 阶段落盘）。
-        overrides.insert(&file, title);
+        let file = manual_file.clone();
+        if manual_default {
+            // 与自动命名一致：视为未指定，只移除已有映射（若有）。
+            overrides_changed = overrides.remove(&file).is_some();
+            if overrides_changed {
+                reporter.log(format!("{file} 的手动标题与自动命名一致，已移除冗余映射"));
+            } else {
+                reporter.log(format!("{file} 的手动标题与自动命名一致，未写入映射表"));
+            }
+        } else {
+            overrides_changed = overrides.get(&file) != Some(title);
+            overrides.insert(&file, title);
+        }
         apply_manual_title(&mut meta, &overrides, &file, title);
         if let Some(source) = manual_source {
             if let Some(entry) = meta.icons.get_mut(&file) {
@@ -521,15 +551,11 @@ pub async fn run_upload_icons(
             }))
         }
         WriteDecision::Apply => {
-            // 手动标题同时写入映射表，保证后续展示/批量沿用。
-            if manual_title.is_some() {
+            // 手动标题同时写入映射表，保证后续展示/批量沿用；与自动命名
+            // 一致时映射表无变化，跳过落盘。
+            if manual_title.is_some() && overrides_changed {
                 let path = icon_meta::save_overrides(&icon_meta::overrides_path(), &overrides)?;
-                reporter.log(format!(
-                    "已更新映射表 {}：{} → {}",
-                    path.display(),
-                    manual_pending.0,
-                    manual_pending.1
-                ));
+                reporter.log(format!("已更新映射表 {}", path.display()));
             }
 
             let client = WikiClient::from_env()?;
@@ -647,6 +673,7 @@ mod tests {
                     name_en: Some((*name_en).to_string()),
                     name_zh: None,
                     source: Some("inventory".to_string()),
+                    crafting: None,
                     title,
                     title_source: Some(icon_meta::TitleSource::Auto),
                     uploadable: *uploadable,

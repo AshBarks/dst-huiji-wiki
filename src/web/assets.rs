@@ -12,7 +12,15 @@ pub const JS_MODULES: &[(&str, &str)] = &[
     ("util.js", include_str!("assets/js/util.js")),
     ("jobs.js", include_str!("assets/js/jobs.js")),
     ("skills.js", include_str!("assets/js/skills.js")),
-    ("icons.js", include_str!("assets/js/icons.js")),
+    ("icon_shared.js", include_str!("assets/js/icon_shared.js")),
+    (
+        "inventory_icons.js",
+        include_str!("assets/js/inventory_icons.js"),
+    ),
+    (
+        "crafting_icons.js",
+        include_str!("assets/js/crafting_icons.js"),
+    ),
     ("anim_assets.js", include_str!("assets/js/anim_assets.js")),
     (
         "pages/dashboard.js",

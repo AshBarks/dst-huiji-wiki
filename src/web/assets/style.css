@@ -134,6 +134,10 @@ code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-size:12px}
 .icon-card img{display:block;margin:0 auto;image-rendering:pixelated}
 .icon-card figcaption{margin-top:6px;font-size:12px}
 .icon-card figcaption span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+/* 制作栏图标：游戏内名称为主标题，文件名退居次行 */
+.icon-card--named figcaption b{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:600}
+.icon-card--named figcaption code{font-size:11px}
+.icon-card--named figcaption span .badge{margin-right:4px}
 .b-muted{background:var(--panel2);color:var(--muted)}
 .iv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:flex;
   align-items:center;justify-content:center}

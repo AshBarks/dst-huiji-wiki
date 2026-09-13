@@ -53,7 +53,7 @@ dst-huiji-wiki/
 | Fix prefab name extraction | `src/parser/prefab_override/parser/` | `mod.rs`(入口/收集) + `analysis.rs`(工厂/表分析) + `deep.rs`(跨函数深度解析)；行为由 examples 指纹测试钉住 |
 | Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; must stay in sync with `src/web/assets/app.js` skilltree section |
 | Upload an image | `src/service/upload_image.rs` | `upload-image` CLI; auto description by dir (`skilltree/`→技能树素材, `skilltree_icons/`→技能树图标, `inventoryimages/`→物品栏图标); `--ignore-warnings` for re-upload (needs `reupload` right) |
-| Upload inventory icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting`); WebUI 物品图标页来源切换 + 五态过滤 + 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name), applied by `images-sync` into `history/icon_meta.json` |
+| Upload inventory icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting`); WebUI 物品栏/制作栏图标两个独立页面（制作栏按 `icon_meta.json` 的 `crafting.kind` 分节；物品栏按 build 历史分组）+ 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name), applied by `images-sync` into `history/icon_meta.json` |
 | Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync), ICON__TITLE_OVERRIDES vars |
 
 ## CODE MAP

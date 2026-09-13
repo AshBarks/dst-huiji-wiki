@@ -10,7 +10,8 @@ import { pageAnims } from "./js/pages/anims.js";
 import { pageSnapshots } from "./js/pages/snapshots.js";
 import { pageJobs, pageJobDetail } from "./js/jobs.js";
 import { pageSkills } from "./js/skills.js";
-import { pageInventoryIcons } from "./js/icons.js";
+import { pageInventoryIcons } from "./js/inventory_icons.js";
+import { pageCraftingIcons } from "./js/crafting_icons.js";
 import { pageAnimAssets } from "./js/anim_assets.js";
 
 const routes = [
@@ -19,7 +20,8 @@ const routes = [
   ["recipes", "配方/材料", pageRecipes],
   ["translations", "翻译", pageTranslations],
   ["skills", "技能树", pageSkills],
-  ["icons", "物品图标", pageInventoryIcons],
+  ["inventory-icons", "物品栏图标", pageInventoryIcons],
+  ["crafting-icons", "制作栏图标", pageCraftingIcons],
   ["constants", "常量", pageConstants],
   ["snapshots", "快照对比", pageSnapshots],
   ["anims", "动画对比", pageAnims],

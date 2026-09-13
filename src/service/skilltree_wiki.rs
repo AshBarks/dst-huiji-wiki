@@ -857,6 +857,7 @@ mod tests {
             root: false,
             connects: vec![],
             icon: icon.map(str::to_string),
+            title_key: None,
             lock: false,
             locks: vec!["walter_ammo_lock".into()],
             lock_open: None,

@@ -22,6 +22,10 @@ pub struct SkillNode {
     pub root: bool,
     pub connects: Vec<String>,
     pub icon: Option<String>,
+    /// 内联标题引用原文（`STRINGS.SKILLTREE.<角色>.<键>_TITLE`）；名称管线的
+    /// 权威显示名来源，缺失时才回退节点名约定。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title_key: Option<String>,
     pub lock: bool,
     pub locks: Vec<String>,
     pub lock_open: Option<serde_json::Value>,
@@ -90,6 +94,9 @@ struct RawSkillDef {
     root: bool,
     connects: Vec<String>,
     icon: Option<String>,
+    /// 内联标题引用（`title = STRINGS.SKILLTREE.<角色>.<键>_TITLE` 的点路径
+    /// 原文）；命名管线据此取显示名，比「节点名 ≈ TITLE 键」约定更权威。
+    title: Option<String>,
     lock: bool,
     locks: Vec<String>,
     lock_open: Option<serde_json::Value>,
@@ -240,6 +247,7 @@ pub fn parse_skill_tree_with_tuning(
             root: def.root,
             connects: def.connects,
             icon,
+            title_key: def.title,
             lock,
             locks: def.locks,
             lock_open: def.lock_open,
@@ -396,6 +404,11 @@ return BuildSkillsData
         assert_eq!(alchemy1.x, -58.0);
         assert_eq!(alchemy1.y, 176.0);
         assert_eq!(alchemy1.icon.as_deref(), Some("wilson_alchemy_1"));
+        // 内联 title 引用原文（命名管线的权威显示名来源）
+        assert_eq!(
+            alchemy1.title_key.as_deref(),
+            Some("STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_1_TITLE")
+        );
         assert!(alchemy1.root);
         assert_eq!(
             alchemy1.connects,
@@ -409,6 +422,8 @@ return BuildSkillsData
             .unwrap();
         assert_eq!(alchemy2.y, 122.0); // 176 - 54
         assert_eq!(alchemy2.icon.as_deref(), Some("wilson_alchemy_gem_1"));
+        // 无显式 title 的节点走游戏的动态默认（键 = 节点名），title_key 为空
+        assert_eq!(alchemy2.title_key, None);
 
         let torch = tree
             .nodes

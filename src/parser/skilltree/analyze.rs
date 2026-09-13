@@ -517,6 +517,7 @@ pub(super) fn try_parse_skill(
         root: def.root,
         connects: def.connects,
         icon: def.icon,
+        title_key: def.title,
         lock,
         locks: def.locks,
         lock_open: def.lock_open,

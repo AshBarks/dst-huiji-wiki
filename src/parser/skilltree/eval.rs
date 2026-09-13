@@ -92,6 +92,22 @@ pub(super) fn eval_string(expr: &ast::Expression) -> Option<String> {
     }
 }
 
+/// 变量/点路径引用原文（如 `STRINGS.Skilltree.X.Y_TITLE`、`TUNING.X`），
+/// 去除内部空白；字符串与其余形态返回 `None`。
+pub(super) fn eval_var_path(expr: &ast::Expression) -> Option<String> {
+    match expr {
+        ast::Expression::Var(ast::Var::Name(name)) => Some(name.token().to_string()),
+        ast::Expression::Var(ast::Var::Expression(var_expr)) => Some(
+            var_expr
+                .to_string()
+                .chars()
+                .filter(|c| !c.is_whitespace())
+                .collect(),
+        ),
+        _ => None,
+    }
+}
+
 pub(super) fn field_name(field: &ast::Field) -> Option<String> {
     if let ast::Field::NameKey { key, .. } = field {
         return Some(key.token().to_string());
@@ -226,6 +242,7 @@ pub(super) fn raw_def_from_table(
             }
             "group" => def.group = eval_string(value),
             "icon" => def.icon = eval_string(value),
+            "title" => def.title = eval_var_path(value),
             "root" => {
                 def.root =
                     matches!(value, ast::Expression::Symbol(s) if s.token().to_string() == "true");

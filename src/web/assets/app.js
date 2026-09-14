@@ -12,6 +12,7 @@ import { pageJobs, pageJobDetail } from "./js/jobs.js";
 import { pageSkills } from "./js/skills.js";
 import { pageInventoryIcons } from "./js/inventory_icons.js";
 import { pageCraftingIcons } from "./js/crafting_icons.js";
+import { pageSkilltreeIcons } from "./js/skilltree_icons.js";
 import { pageAnimAssets } from "./js/anim_assets.js";
 
 const routes = [
@@ -22,6 +23,7 @@ const routes = [
   ["skills", "技能树", pageSkills],
   ["inventory-icons", "物品栏图标", pageInventoryIcons],
   ["crafting-icons", "制作栏图标", pageCraftingIcons],
+  ["skilltree-icons", "技能树图标", pageSkilltreeIcons],
   ["constants", "常量", pageConstants],
   ["snapshots", "快照对比", pageSnapshots],
   ["anims", "动画对比", pageAnims],

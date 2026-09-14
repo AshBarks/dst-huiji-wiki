@@ -191,7 +191,7 @@ pub async fn constants(
 }
 
 /// GET /api/data/inventoryicons — 图标网格（文件名/加入历史两种排序，
-/// 支持按来源过滤：inventory 物品栏 / crafting 制作栏 / all，按五态过滤：
+/// 支持按来源过滤：inventory 物品栏 / crafting 制作栏 / skilltree 技能树图标 / all，按五态过滤：
 /// 已上传/未上传/状态未知/无法上传/无英文名）。
 pub async fn inventoryicons(
     State(state): State<Arc<AppState>>,
@@ -226,12 +226,13 @@ pub async fn inventoryicons(
         status: &'static str,
         wiki_uploaded: Option<bool>,
         wiki_title: Option<String>,
-        crafting: Option<icon_meta::CraftingGroup>,
+        group: Option<icon_meta::IconGroup>,
     }
 
     let resolve = |e: &IconEntry| -> Resolved {
         if let Some(m) = meta.icons.get(&e.file) {
             let exists = m.wiki.as_ref().and_then(|w| w.exists);
+            let needs_upload = m.wiki.as_ref().is_some_and(|w| w.needs_upload());
             return Resolved {
                 name_en: m.name_en.clone(),
                 name_zh: m.name_zh.clone(),
@@ -240,9 +241,9 @@ pub async fn inventoryicons(
                 uploadable: m.uploadable,
                 note: m.note.clone(),
                 status: icon_status(m.title.as_deref(), m.name_en.as_deref(), exists),
-                wiki_uploaded: exists,
+                wiki_uploaded: if needs_upload { Some(false) } else { exists },
                 wiki_title: m.title.as_deref().map(|t| format!("File:{t}")),
-                crafting: m.crafting.clone(),
+                group: m.group.clone(),
             };
         }
         let key = icon_meta::file_stem_key(&e.file);
@@ -262,7 +263,7 @@ pub async fn inventoryicons(
             note: None,
             status,
             wiki_uploaded: None,
-            crafting: None,
+            group: None,
         }
     };
 
@@ -317,7 +318,7 @@ pub async fn inventoryicons(
             if m.name_en.is_some() {
                 summary.named += 1;
             }
-            if m.uploadable && m.wiki.as_ref().and_then(|w| w.exists) == Some(false) {
+            if m.uploadable && m.wiki.as_ref().is_some_and(|w| w.needs_upload()) {
                 summary.missing += 1;
             }
         }
@@ -342,6 +343,17 @@ pub async fn inventoryicons(
     let total = rows.len();
     let (page, page_size) = page_params(&q);
     let start = page.saturating_mul(page_size);
+
+    // 仅报告：站内已有指向旧文件的重定向占位页（分类外但 imageinfo 命中），
+    // 不进入补传集合；供技能树页展示“仅报告”提示。
+    let redirect_placeholders = index
+        .entries
+        .iter()
+        .filter(|e| source_ok(e))
+        .filter_map(|e| meta.icons.get(&e.file))
+        .filter(|m| m.wiki.as_ref().is_some_and(|w| w.redirect_placeholder()))
+        .count();
+
     let items: Vec<serde_json::Value> = rows
         .into_iter()
         .skip(start)
@@ -354,7 +366,7 @@ pub async fn inventoryicons(
                 "first_synced_at": e.first_synced_at,
                 "name_en": r.name_en,
                 "name_zh": r.name_zh,
-                "crafting": r.crafting,
+                "group": r.group,
                 "title": r.title,
                 "title_source": r.title_source,
                 "uploadable": r.uploadable,
@@ -377,6 +389,7 @@ pub async fn inventoryicons(
         "sources": sources,
         "status_counts": status_counts,
         "builds": builds,
+        "redirect_placeholders": redirect_placeholders,
         "items": items,
     })))
 }

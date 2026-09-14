@@ -10,6 +10,14 @@ const JOB_DEFS = {
     label: "维护模块常量 → 维基", wiki: true,
     fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
+  create_redirect: {
+    label: "创建页面重定向 → 维基", wiki: true,
+    fields: [
+      { k: "from", label: "源页面（如 File:Wendy potion duration.png）" },
+      { k: "to", label: "目标页面（如 File:Wendy potion 3.png）" },
+      { k: "summary", label: "编辑摘要（可选，默认「创建重定向」）" },
+    ],
+  },
   maintain_template_check: {
     label: "检查模板数据覆盖（只读）",
     fields: [
@@ -75,7 +83,7 @@ const JOB_DEFS = {
     label: "upload-icons 上传图标 → 维基", wiki: true,
     fields: [
       { k: "build", label: "只上传首次加入该 build 的图标（留空=全部有英文名的）" },
-      { k: "source", label: "只上传指定来源：inventory（物品栏）/ crafting（制作栏），留空=全部" },
+      { k: "source", label: "只上传指定来源：inventory（物品栏）/ crafting（制作栏）/ skilltree（技能树图标），留空=全部" },
       { k: "file", label: "只上传单个文件名（如 axe.png，优先于 build）" },
       { k: "title", label: "手动指定 wiki 文件名（需配合 file，如 Pick-Axe.png；会写入映射表）" },
       { k: "only_missing", type: "check", default: true, label: "仅上传维基缺失的（批量）" },

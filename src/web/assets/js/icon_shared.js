@@ -1,4 +1,4 @@
-//! 图标页共享件（物品栏 / 制作栏两页通用）：状态标签、徽章、
+//! 图标页共享件（物品栏 / 制作栏 / 技能树图标三页通用）：状态标签、徽章、
 //! 详情弹窗（历代版本 + 上传/映射编辑，接口按 file 寻址、来源无关）。
 "use strict";
 
@@ -45,6 +45,8 @@ export function mountIconDetail(main, onRefresh) {
     try {
       const r = await getJSON(`/api/data/inventoryicons/versions?file=${encodeURIComponent(file)}`);
       const names = [r.name_zh, r.name_en].filter(Boolean).join(" / ");
+      // 文件存在性以 imageinfo 为准；指向旧文件的重定向占位页仍算存在，
+      // 仅由分类对账报告，不进入自动补传。
       const exists = !!(r.wiki && r.wiki.exists === true);
       const badge = iconBadge(r);
       const source = r.title_source === "override" ? "映射" : r.title_source === "auto" ? "自动" : "无";

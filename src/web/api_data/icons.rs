@@ -1,4 +1,4 @@
-//! 物品图标端点（五态状态、版本清单、标题映射编辑）。
+//! 图标端点（五态状态、版本清单、标题映射编辑；物品栏/制作栏/技能树共用）。
 
 use super::super::state::{ktools_out_dir, AppState};
 use super::err_status;
@@ -11,6 +11,10 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 /// 五态判定：有效标题 + 上传状态；无标题时区分有英文名/无英文名。
+///
+/// 文件存在性以 `imageinfo` 为准：站内指向旧文件的 File 重定向也会判
+/// `exists=true`，因此重定向占位页不会显示为“未上传”，也不会进入补传集合；
+/// 它们只在技能树分类对账报告里单独列出。
 pub(super) fn icon_status(
     title: Option<&str>,
     name_en: Option<&str>,
@@ -176,7 +180,7 @@ pub async fn set_inventoryicon_title(
             name_en: None,
             name_zh: None,
             source: source_id.clone(),
-            crafting: None,
+            group: None,
             title: None,
             title_source: None,
             uploadable: false,
@@ -259,6 +263,7 @@ fn wiki_status_json(status: Option<&WikiStatus>) -> Option<serde_json::Value> {
     status.map(|w| {
         serde_json::json!({
             "exists": w.exists,
+            "in_category": w.in_category,
             "title": w.title,
             "url": w.url,
             "checked_at": w.checked_at,
@@ -310,5 +315,12 @@ mod tests {
         assert_eq!(icon_status(None, None, None), "unnamed");
         // 无英文名但有映射标题 → 按上传状态归类
         assert_eq!(icon_status(Some("Skin.png"), None, Some(false)), "missing");
+        // 指向旧文件的重定向占位页 imageinfo 存在，不显示为未上传。
+        assert_eq!(
+            icon_status(Some("Woby.png"), Some("Woby"), Some(true)),
+            "uploaded"
+        );
+        // 分类命中只作报告，不改变五态的 imageinfo 口径。
+        assert_eq!(icon_status(Some("Woby.png"), Some("Woby"), None), "unknown");
     }
 }

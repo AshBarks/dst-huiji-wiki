@@ -1,6 +1,8 @@
 // 维基技能树渲染器（复制到灰机维基 零件:Skilltree.js；若站内有
 // Gadget:Skilltree.js 副本也一并覆盖）
 //
+// 0.3.1: wiki 运行时技能树内容图标改走 Special:FilePath（本地预览路径不变），
+//        不再依赖模块内可能缺失/过期的 icon_url 与 metainfo.imgs。
 // 0.3.0 起坐标与游戏 widgets/redux/skilltreewidget.lua 和
 // skilltreebuilder.lua 对齐：
 //   - 角色背景按 521x320 绘制在 (5,50)
@@ -14,7 +16,7 @@
 //   - 支持节点上的 decorations（薇诺娜货架等多背景图）
 //   - 沃拓克斯天秤以圆点+文本等价呈现（游戏用 wortox_balance 动画砝码）
 (() => {
-    const VERSION = "0.3.0";
+    const VERSION = "0.3.1";
     console.log(`skilltree ${VERSION}`);
     const svgNamespace = "http://www.w3.org/2000/svg";
     const xlinkNamespace = "http://www.w3.org/1999/xlink";
@@ -71,6 +73,25 @@
 
     function capitalize(str) {
         return str.replace(/^./, (match) => match.toUpperCase());
+    }
+
+    // 本地文件 stem（如 walter_ammo_bag）→ wiki 文件名主干
+    // （Walter ammo bag.png，与 images-sync 的 auto_title 规则一致）。
+    function fileStemToTitle(stem) {
+        return capitalize(stem.replace(/_/g, " ")) + ".png";
+    }
+
+    // 本站历史遗留：global_redux 的按钮图标键与实际上传文件名不同。
+    const GLOBAL_REDUX_FILE_ALIASES = {
+        button_carny_long_normal: "button_long_normal",
+        button_carny_long_hover: "button_long_hover",
+        button_carny_long_down: "button_long_down",
+    };
+
+    function canUseMediaWikiFilePath() {
+        return typeof mw !== "undefined"
+            && mw.util
+            && typeof mw.util.getUrl === "function";
     }
 
     // 主函数,构建技能树
@@ -149,26 +170,24 @@
         }
 
         function globalReduxImg(name) {
-            if (typeof mw !== "undefined") {
-                const key = capitalize(name);
-                const imgUrls = metainfo.imgs || {};
-                if (imgUrls[key]) {
-                    return imgUrls[key];
-                }
-                console.error(`cant find img for ${key}`);
-                return null;
+            const stem = name.toLowerCase();
+            if (canUseMediaWikiFilePath()) {
+                const fileStem = GLOBAL_REDUX_FILE_ALIASES[stem] || stem;
+                return mw.util.getUrl("Special:FilePath/" + fileStemToTitle(fileStem));
             }
-            return `./images/global_redux/${name.toLowerCase()}.png`;
+            return `./images/global_redux/${stem}.png`;
         }
 
         function skilltreeIconImg(skillName) {
             const def = skilltreeDef[skillName];
-            if (typeof mw !== "undefined") {
-                if (!def.icon_url) {
-                    console.error(`cant find icon_url for ${skillName}`);
+            if (canUseMediaWikiFilePath()) {
+                if (!def.icon) {
+                    console.error(`cant find icon for ${skillName}`);
                     return null;
                 }
-                return def.icon_url;
+                // Special:FilePath 由文件名自动解析到当前上传版本，避免
+                // icon_url 缺失/过期（旧页面可能保留 ./images/... 或指向旧图）。
+                return mw.util.getUrl("Special:FilePath/" + fileStemToTitle(def.icon));
             }
             return `./images/skilltree_icons/${def.icon}.png`;
         }

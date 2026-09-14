@@ -23,6 +23,11 @@ pub const JS_MODULES: &[(&str, &str)] = &[
     ),
     ("anim_assets.js", include_str!("assets/js/anim_assets.js")),
     (
+        "skilltree_icons.js",
+        include_str!("assets/js/skilltree_icons.js"),
+    ),
+    ("source_icons.js", include_str!("assets/js/source_icons.js")),
+    (
         "pages/dashboard.js",
         include_str!("assets/js/pages/dashboard.js"),
     ),

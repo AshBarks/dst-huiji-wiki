@@ -38,7 +38,8 @@
   `defs[].icon_url`，首字母/下划线归一化由 client 处理），只有确实缺失的
   键才留空并在日志/`--report-json`里报告（手工上传后下次运行自动回填）
 - `--output`可同时把每个子页面内容写到本地目录（`<Char>.lua`），并写出
-  更新版渲染器`Skilltree.js`（复制到维基`零件:Skilltree.js`）
+  更新版渲染器`Skilltree.js`（复制到维基`零件:Skilltree.js`；v0.3.1 起
+  wiki 端技能树内容图标改走`Special:FilePath`，本地预览相对路径不变）
 - 按`--yes`/`--dry-run`/交互确认决定是否写入维基
 
 ## upload-image 图片上传流程

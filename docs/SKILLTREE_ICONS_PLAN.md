@@ -110,9 +110,32 @@ CAS 历史，缺命名、上传状态管理与浏览页。调查确认：
 
 - [x] 调查与定稿（本文档）
 - [x] 既有改动分批提交（d5d3406 制作栏命名管线 / a89b6d7 页面拆分）
-- [ ] Phase 1：命名链 + 来源注册（parser title_key、SkilltreeNames、IconGroup 泛化、
+- [x] Phase 1：命名链 + 来源注册（parser title_key、SkilltreeNames、IconGroup 泛化、
       ICON_SOURCES/upload 接入、指纹测试）
-- [ ] Phase 2：例外表 + 分类对账
-- [ ] Phase 3：WebUI 技能树图标页
-- [ ] Phase 4：渲染件图标路径修复
+- [x] Phase 2：例外表 + 分类对账
+- [x] Phase 3：WebUI 技能树图标页
+- [x] Phase 4：渲染件图标路径修复
 - [ ] wiki 端人工步骤：上传更新后的 零件:Skilltree.js（Phase 4 产物）
+
+## 6. 实现补充（本次）
+
+1. **动态 title 节点与节点名回退**：解析器对显式 `title = STRINGS...` 记录原文；
+   对 `data.title = ..._STRINGS[uppercase_name.."_TITLE"]` 这类动态循环不记录
+   原文，命名层回退到游戏默认规则（TITLE 键 = 节点名大写）。真实数据 321
+   个切片中 308 个能命名，剩余 13 个恰为 §1.2 的 atlas 孤儿（无静态节点），
+   按定稿仅报告不清理。因此 `config/skilltree_icon_names.json` 当前为空表，
+   仅保留兜底加载能力，待后续游戏版本/特殊图标再填充。
+2. **分类对账与重定向占位页**：分类:技能树图标 与本地生效标题对账得到
+   「本地缺 wiki 30 / wiki 遗留 54」。其中 29 个“缺失”标题在 wiki 上实际是
+   指向旧文件的 File 重定向（`imageinfo` 判定 exists=true），只有
+   `wendy_potion_duration.png` 完全不存在。定稿调整：**29 个重定向占位页
+   仅报告、不覆盖**。元数据新增 `wiki.in_category` 记录分类命中情况；
+   分类报告把 30 拆成 `redirect_placeholders = 29`（仅报告）与
+   `truly_missing = 1`（可上传），`upload-icons --source skilltree --dry-run`
+   现在只选中真正缺失的 1 个；WebUI 技能树页用“重定向占位 29（仅报告）”
+   徽章展示该计数。
+3. **渲染件路径**：`skilltree_icons` 内容图标与 `global_redux` 按钮在 MediaWiki
+   运行时改走 `mw.util.getUrl("Special:FilePath/<归一化名>")`，不再依赖模块内
+   可能缺失/过期的 `icon_url`/`metainfo.imgs`；`global_redux` 的 3 个历史别名
+   （`button_carny_long_*` → `button_long_*`）保留，避免 404。本地预览相对路径
+   不变。

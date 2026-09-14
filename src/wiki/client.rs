@@ -764,6 +764,44 @@ fn parse_allpages_info_entries(body: &Value) -> Result<(Vec<PageListingEntry>, O
 }
 
 #[derive(Debug, Deserialize)]
+struct RawCategoryMember {
+    title: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawCategoryBatch {
+    categorymembers: Option<Vec<RawCategoryMember>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawCategoryContinue {
+    #[serde(rename = "cmcontinue")]
+    cm_continue: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawCategoryResponse {
+    query: Option<RawCategoryBatch>,
+    #[serde(default, rename = "continue")]
+    cont: Option<RawCategoryContinue>,
+}
+
+/// Extracts `(titles, next_cmcontinue)` from one `list=categorymembers`
+/// batch.
+fn parse_category_members_batch(body: &Value) -> Result<(Vec<String>, Option<String>)> {
+    let parsed: RawCategoryResponse =
+        serde_json::from_value(body.clone()).map_err(|e| Error::WikiApi(e.to_string()))?;
+    let titles = parsed
+        .query
+        .and_then(|q| q.categorymembers)
+        .ok_or_else(|| Error::WikiApi("No categorymembers in response".to_string()))?
+        .into_iter()
+        .map(|m| m.title)
+        .collect();
+    Ok((titles, parsed.cont.and_then(|c| c.cm_continue)))
+}
+
+#[derive(Debug, Deserialize)]
 struct RawContentSlot {
     #[serde(rename = "*")]
     content: Option<String>,
@@ -839,6 +877,17 @@ fn parse_pages_content_response(body: &Value) -> Result<Vec<PageRevisionContent>
         });
     }
     Ok(out)
+}
+
+/// `技能树图标` / `Category:技能树图标` / `分类:技能树图标` →
+/// `Category:技能树图标`（MediaWiki API 的规范命名空间前缀）。
+fn category_title(raw: &str) -> String {
+    let trimmed = raw.trim();
+    let bare = trimmed
+        .strip_prefix("Category:")
+        .or_else(|| trimmed.strip_prefix("分类:"))
+        .unwrap_or(trimmed);
+    format!("Category:{}", bare.trim())
 }
 
 impl WikiClient {
@@ -1304,6 +1353,59 @@ impl WikiClient {
         Ok(titles)
     }
 
+    /// Lists page titles in a category via `list=categorymembers`, following
+    /// `cmcontinue` until exhausted (or `limit` titles collected).
+    ///
+    /// `category` may be bare (`技能树图标`) or prefixed (`Category:` /
+    /// `分类:`). A cache-busting `_` nonce is sent because huijiwiki's CDN
+    /// caches anonymous API GETs and category membership changes after
+    /// uploads do not purge it. Requests share the global throttle.
+    pub async fn list_category_members(
+        &self,
+        category: &str,
+        limit: Option<usize>,
+    ) -> Result<Vec<String>> {
+        let cmtitle = category_title(category);
+        let mut titles = Vec::new();
+        let mut cont: Option<String> = None;
+        loop {
+            let nonce = cache_buster();
+            let mut params: Vec<(String, String)> = vec![
+                ("action".to_string(), "query".to_string()),
+                ("list".to_string(), "categorymembers".to_string()),
+                ("cmtitle".to_string(), cmtitle.clone()),
+                ("cmlimit".to_string(), "max".to_string()),
+                ("cmprop".to_string(), "title".to_string()),
+                ("format".to_string(), "json".to_string()),
+                ("_".to_string(), nonce),
+            ];
+            if let Some(c) = &cont {
+                params.push(("cmcontinue".to_string(), c.clone()));
+            }
+            let params_ref: Vec<(&str, &str)> = params
+                .iter()
+                .map(|(k, v)| (k.as_str(), v.as_str()))
+                .collect();
+
+            let response = self.get(&params_ref).await?;
+            let body: Value = response.json().await?;
+            let (batch, next) = parse_category_members_batch(&body)?;
+            titles.extend(batch);
+
+            match next {
+                Some(c) => cont = Some(c),
+                None => break,
+            }
+            if let Some(max) = limit {
+                if titles.len() >= max {
+                    titles.truncate(max);
+                    break;
+                }
+            }
+        }
+        Ok(titles)
+    }
+
     /// Enumerates every page of a namespace (redirects included) via
     /// `generator=allpages` + `prop=info`, following `gapcontinue` until
     /// exhausted.
@@ -1515,6 +1617,45 @@ impl WikiClient {
             result.newrevid
         );
 
+        Ok(result)
+    }
+
+    /// 创建页面重定向：写入 `#REDIRECT [[target]]`。
+    ///
+    /// 只创建：若源标题已存在，则返回 [`Error::EditFailed`]，避免覆盖现有
+    /// 页面；源/目标标题为空或相同时返回 [`Error::Config`]。标题归一化
+    /// （下划线/空格、首字母大小写、`File:`/`文件:` 别名等）由 MediaWiki
+    /// 处理。
+    pub async fn create_redirect(
+        &self,
+        from: &str,
+        to: &str,
+        summary: Option<&str>,
+    ) -> Result<EditResult> {
+        let from = from.trim();
+        let to = to.trim();
+        if from.is_empty() {
+            return Err(Error::Config("重定向源页面标题不能为空".to_string()));
+        }
+        if to.is_empty() {
+            return Err(Error::Config("重定向目标页面标题不能为空".to_string()));
+        }
+        if from == to {
+            return Err(Error::Config("重定向源页面与目标页面不能相同".to_string()));
+        }
+        if self.page_exists(from).await? {
+            return Err(Error::EditFailed(format!(
+                "重定向源页面已存在，拒绝覆盖：{from}"
+            )));
+        }
+        let text = format!("#REDIRECT [[{to}]]");
+        let result = self.edit_page(from, &text, summary, false, None).await?;
+        tracing::info!(
+            "Successfully created redirect '{}' -> '{}' (newrevid: {:?})",
+            from,
+            to,
+            result.newrevid
+        );
         Ok(result)
     }
 
@@ -1884,6 +2025,52 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_category_members_batch_with_continuation() {
+        let body = serde_json::json!({
+            "batchcomplete": "",
+            "continue": {"cmcontinue": "page|abc", "continue": "-||"},
+            "query": {
+                "categorymembers": [
+                    {"pageid": 1, "ns": 6, "title": "File:Walter ammo bag.png"},
+                    {"pageid": 2, "ns": 6, "title": "File:Willow refuel.png"}
+                ]
+            }
+        });
+        let (titles, cont) = parse_category_members_batch(&body).unwrap();
+        assert_eq!(
+            titles,
+            vec!["File:Walter ammo bag.png", "File:Willow refuel.png"]
+        );
+        assert_eq!(cont.as_deref(), Some("page|abc"));
+
+        let done = serde_json::json!({
+            "batchcomplete": "",
+            "query": {"categorymembers": [{"pageid": 3, "ns": 6, "title": "File:A.png"}]}
+        });
+        let (titles, cont) = parse_category_members_batch(&done).unwrap();
+        assert_eq!(titles, vec!["File:A.png"]);
+        assert!(cont.is_none());
+
+        let empty = serde_json::json!({"batchcomplete": "", "query": {"categorymembers": []}});
+        let (titles, cont) = parse_category_members_batch(&empty).unwrap();
+        assert!(titles.is_empty() && cont.is_none());
+
+        // query/categorymembers missing is an API shape error.
+        let bad = serde_json::json!({"batchcomplete": ""});
+        assert!(parse_category_members_batch(&bad).is_err());
+    }
+
+    #[test]
+    fn test_category_title_normalizes_namespace_prefix() {
+        assert_eq!(category_title("技能树图标"), "Category:技能树图标");
+        assert_eq!(
+            category_title(" Category:技能树图标 "),
+            "Category:技能树图标"
+        );
+        assert_eq!(category_title("分类:技能树图标"), "Category:技能树图标");
+    }
+
+    #[test]
     fn test_parse_allpages_batch_with_continuation() {
         let body = serde_json::json!({
             "batchcomplete": "",
@@ -2141,5 +2328,25 @@ mod tests {
         assert!(missing.pageid.is_none());
 
         assert!(client.page_exists(TEST_PAGE).await.unwrap_or(false));
+    }
+
+    #[tokio::test]
+    async fn test_create_redirect_validation() {
+        let client = WikiClient::new(WikiConfig::new("example.huijiwiki.com", "u", "p", "k"))
+            .expect("test client");
+        assert!(matches!(
+            client.create_redirect("", "File:Target.png", None).await,
+            Err(Error::Config(_))
+        ));
+        assert!(matches!(
+            client.create_redirect("File:From.png", "", None).await,
+            Err(Error::Config(_))
+        ));
+        assert!(matches!(
+            client
+                .create_redirect("File:Same.png", "File:Same.png", None)
+                .await,
+            Err(Error::Config(_))
+        ));
     }
 }

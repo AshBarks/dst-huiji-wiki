@@ -42,6 +42,13 @@ pub fn icon_title_overrides_path() -> PathBuf {
         .unwrap_or_else(|| "config/icon_title_overrides.json".into())
 }
 
+/// 技能树图标显示名例外表（`SKILLTREE__ICON_NAMES`，
+/// 缺省 `config/skilltree_icon_names.json`）。
+pub fn skilltree_icon_names_path() -> PathBuf {
+    non_empty_env("SKILLTREE__ICON_NAMES")
+        .unwrap_or_else(|| "config/skilltree_icon_names.json".into())
+}
+
 fn non_empty_env(key: &str) -> Option<PathBuf> {
     std::env::var(key)
         .ok()

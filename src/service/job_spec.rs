@@ -567,7 +567,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
                 kind: ParamKind::OptStr,
                 default: ParamDefault::None,
                 required: false,
-                help: "来源：inventory / crafting（留空=全部）",
+                help: "来源：inventory / crafting / skilltree（留空=全部）",
             },
             ParamSpec {
                 key: "file",
@@ -1244,6 +1244,35 @@ pub static JOB_SPECS: &[JobSpec] = &[
             },
         ],
     },
+    JobSpec {
+        name: "create-redirect",
+        label: "创建页面重定向",
+        wiki_access: WikiAccess::Write,
+        resources: &["wiki"],
+        params: &[
+            ParamSpec {
+                key: "from",
+                kind: ParamKind::Str,
+                default: ParamDefault::None,
+                required: true,
+                help: "源页面标题（如 File:Wendy potion duration.png）",
+            },
+            ParamSpec {
+                key: "to",
+                kind: ParamKind::Str,
+                default: ParamDefault::None,
+                required: true,
+                help: "目标页面标题（如 File:Wendy potion 3.png）",
+            },
+            ParamSpec {
+                key: "summary",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "编辑摘要（可选）",
+            },
+        ],
+    },
 ];
 
 impl JobSpec {
@@ -1271,7 +1300,7 @@ mod tests {
     /// 契约：spec 表与 JobKind 变体一一对应（数量、名称、serde tag）。
     #[test]
     fn contract_spec_table_covers_every_variant() {
-        assert_eq!(JOB_SPECS.len(), 32);
+        assert_eq!(JOB_SPECS.len(), 33);
         let mut names: Vec<&str> = JOB_SPECS.iter().map(|s| s.name).collect();
         names.sort_unstable();
         let count = names.len();

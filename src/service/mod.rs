@@ -23,6 +23,7 @@ mod kind;
 mod maintain_jobs;
 mod map_jobs;
 mod output;
+mod redirect;
 
 pub use kind::JobKind;
 
@@ -344,6 +345,9 @@ async fn execute_job_inner(
                 mode,
             )
             .await
+        }
+        JobKind::CreateRedirect { from, to, summary } => {
+            redirect::run_create_redirect(from, to, summary.as_deref(), reporter, mode).await
         }
         JobKind::AnimSync {
             force,
@@ -801,7 +805,7 @@ mod tests {
         let jobs = JobKind::all_variants();
         assert_eq!(
             jobs.len(),
-            32,
+            33,
             "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
         );
         let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();
@@ -836,6 +840,7 @@ mod tests {
             "skilltree-wiki",
             "upload-image",
             "upload-icons",
+            "create-redirect",
         ]
         .into_iter()
         .collect();

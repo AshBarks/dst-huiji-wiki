@@ -245,7 +245,7 @@ static CLI_EXT: &[CliExt] = &[
     },
     CliExt {
         name: "upload-icons",
-        about: "上传物品栏图标到维基（标题取映射表或 STRINGS.NAMES 英文名 + .png，描述 [[分类:物品栏图标]]；批量默认仅上传维基缺失的，需先运行 images-sync；--file + --title 手动指定站内文件名）",
+        about: "上传图标到维基（物品栏/制作栏/技能树；标题按来源自动生成或取映射表，描述写对应分类；批量默认仅上传维基缺失的，需先运行 images-sync；--file + --title 手动指定站内文件名）",
         positionals: &[],
         shorts: &[],
         renames: &[FlagRename { key: "only_missing", long: "include-existing", invert: true }],
@@ -409,6 +409,17 @@ static CLI_EXT: &[CliExt] = &[
         report_json: true,
         local_dry_run: false,
     },
+    CliExt {
+        name: "create-redirect",
+        about: "在 wiki 上创建页面重定向（#REDIRECT [[目标]]；--dry-run 只预览 wikitext）",
+        positionals: &[("from", true), ("to", true)],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
 ];
 
 fn ext(name: &str) -> &'static CliExt {
@@ -422,7 +433,7 @@ fn ext(name: &str) -> &'static CliExt {
 // clap 命令构建
 // ---------------------------------------------------------------------------
 
-/// 构建完整 CLI（顶层 + serve + 32 个 job 子命令）。
+/// 构建完整 CLI（顶层 + serve + 33 个 job 子命令）。
 pub fn command() -> Command {
     let mut top = Command::new("dst-huiji-wiki")
         .about("饥荒联机版维基维护工具")
@@ -929,6 +940,11 @@ fn job_from_matches(
             set: list(m, "set"),
             remove: list(m, "remove"),
             output: opt_val(m, "output"),
+        },
+        "create-redirect" => JobKind::CreateRedirect {
+            from: val(m, "from"),
+            to: val(m, "to"),
+            summary: opt_val(m, "summary"),
         },
         other => unreachable!("未实现构造臂的 job: {other}"),
     })

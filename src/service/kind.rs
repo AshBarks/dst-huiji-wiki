@@ -194,16 +194,16 @@ pub enum JobKind {
         #[serde(default)]
         skip_wiki_status: bool,
     },
-    /// 上传图标到维基：标题取映射表（按本地文件名）或 `STRINGS.NAMES`
-    /// 英文名 + `.png`（描述按来源：物品栏 `[[分类:物品栏图标]]` / 制作栏
-    /// `[[分类:制作栏图标]]`）；批量默认仅上传维基缺失的（需先运行
-    /// images-sync 生成 `history/icon_meta.json`）；`file` + `title` 为
-    /// 手动指定文件名上传。
+    /// 上传图标到维基：标题取映射表（按本地文件名）或按来源自动命名
+    /// （描述按来源：物品栏 `[[分类:物品栏图标]]` / 制作栏
+    /// `[[分类:制作栏图标]]` / 技能树 `[[分类:技能树图标]]`）；批量默认仅
+    /// 上传维基缺失的（需先运行 images-sync 生成 `history/icon_meta.json`）；
+    /// `file` + `title` 为手动指定文件名上传。
     UploadIcons {
         /// 只上传首次加入该 build 的图标。
         #[serde(default)]
         build: Option<String>,
-        /// 只上传指定来源（`inventory` / `crafting`）；缺省全部来源。
+        /// 只上传指定来源（`inventory` / `crafting` / `skilltree`）；缺省全部来源。
         #[serde(default)]
         source: Option<String>,
         /// 只上传单个图标文件名（如 `axe.png`，优先于 `build`）。
@@ -429,6 +429,16 @@ pub enum JobKind {
         #[serde(default)]
         output: Option<String>,
     },
+    /// `create-redirect`：在 wiki 上创建页面重定向（`#REDIRECT [[目标]]`）。
+    CreateRedirect {
+        /// 源页面标题（如 `File:Wendy potion duration.png`）。
+        from: String,
+        /// 目标页面标题（如 `File:Wendy potion 3.png`）。
+        to: String,
+        /// 编辑摘要（可选；缺省写入「创建重定向」）。
+        #[serde(default)]
+        summary: Option<String>,
+    },
 }
 
 fn default_only_missing() -> bool {
@@ -528,6 +538,7 @@ impl JobKind {
             JobKind::KnowledgeSync { .. } => &super::job_spec::JOB_SPECS[29],
             JobKind::KnowledgeScanWiki { .. } => &super::job_spec::JOB_SPECS[30],
             JobKind::MaintainWikitext { .. } => &super::job_spec::JOB_SPECS[31],
+            JobKind::CreateRedirect { .. } => &super::job_spec::JOB_SPECS[32],
         }
     }
 
@@ -576,9 +587,9 @@ impl JobKind {
             }
             JobKind::UploadIcons { source, file, .. } => {
                 if let Some(s) = source {
-                    if s != "inventory" && s != "crafting" {
+                    if !["inventory", "crafting", "skilltree"].contains(&s.as_str()) {
                         return Err(Error::Config(format!(
-                            "非法的图标来源 `{s}`，有效值: inventory | crafting"
+                            "非法的图标来源 `{s}`，有效值: inventory | crafting | skilltree"
                         )));
                     }
                 }
@@ -588,6 +599,15 @@ impl JobKind {
                             "图标文件名必须是 .png（收到 `{f}`）"
                         )));
                     }
+                }
+                Ok(())
+            }
+            JobKind::CreateRedirect { from, to, .. } => {
+                if from.trim().is_empty() || to.trim().is_empty() {
+                    return Err(Error::Config("重定向源/目标页面标题不能为空".to_string()));
+                }
+                if from.trim() == to.trim() {
+                    return Err(Error::Config("重定向源页面与目标页面不能相同".to_string()));
                 }
                 Ok(())
             }
@@ -807,6 +827,11 @@ impl JobKind {
                 remove: Vec::new(),
                 output: None,
             },
+            JobKind::CreateRedirect {
+                from: String::new(),
+                to: String::new(),
+                summary: None,
+            },
         ]
     }
 }
@@ -847,6 +872,19 @@ mod tests {
         }
         .validate()
         .is_ok());
+
+        for source in ["inventory", "crafting", "skilltree"] {
+            let ok = JobKind::UploadIcons {
+                build: None,
+                source: Some(source.into()),
+                file: None,
+                title: None,
+                only_missing: true,
+                ignore_warnings: false,
+                comment: None,
+            };
+            assert!(ok.validate().is_ok(), "{source} 应合法");
+        }
 
         let bad = JobKind::UploadIcons {
             build: None,

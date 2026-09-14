@@ -4,14 +4,14 @@
 //! - 文件与名称：`history/icon_meta.json`（images-sync 生成的生效标题 +
 //!   上传状态）与 `current/split/<source.dir>/<file>`（当前图标内容）；
 //! - 生效标题：`config/icon_title_overrides.json` 映射表（按本地文件名）
-//!   优先，其次游戏内英文名自动生成（物品栏图标用 `STRINGS.NAMES`，
-//!   制作栏图标经 `CraftingKeys` 解析链并追加 `Filter`/`Station Icon`
-//!   后缀，MediaWiki 归一化）；
+//!   优先，其次按来源自动生成（物品栏图标用 `STRINGS.NAMES` 英文名，制作栏
+//!   图标经 `CraftingKeys` 解析链并追加 `Filter`/`Station Icon` 后缀，技能树
+//!   图标用文件 stem 归一化，MediaWiki 归一化）；
 //! - 手动上传：`file` + `title` 同时给出时绕过映射/自动标题，直接按输入
 //!   （去 `File:` 前缀、补 `.png`、MediaWiki 归一化）上传；与自动命名一致
 //!   的标题视为未指定，不写映射表（其余写入映射表）；
 //! - 选择：`file` 单个 > `build`（首次加入该 build 的图标）> `source`
-//!   （物品栏 / 制作栏）> 全部可上传；批量默认仅上传 wiki 上不存在的
+//!   （物品栏 / 制作栏 / 技能树）> 全部可上传；批量默认仅上传 wiki 上不存在的
 //!   （`only_missing`），显式指定的单个文件始终上传（是否覆盖自动按标题
 //!   存在性决定）；
 //! - 同名标题去重：多个图标命中同一标题时只上传第一个，其余记录在
@@ -32,22 +32,31 @@ use crate::scripts_sync::images::meta::{self as icon_meta, IconMeta};
 use crate::wiki::WikiClient;
 use serde_json::{json, Value};
 use std::collections::btree_map::Entry;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// 物品栏图标的固定描述分类。
 pub const ICON_CATEGORY: &str = "[[分类:物品栏图标]]";
 /// 制作栏图标的固定描述分类。
 pub const CRAFTING_ICON_CATEGORY: &str = "[[分类:制作栏图标]]";
+/// 技能树图标的固定描述分类。
+pub const SKILLTREE_ICON_CATEGORY: &str = "[[分类:技能树图标]]";
 /// 未显式指定时的上传注释（物品栏图标）。
 pub const UPLOAD_COMMENT: &str = "物品栏图标同步（images-sync）";
 /// 未显式指定时的上传注释（制作栏图标）。
 pub const CRAFTING_UPLOAD_COMMENT: &str = "制作栏图标同步（images-sync）";
+/// 未显式指定时的上传注释（技能树图标）。
+pub const SKILLTREE_UPLOAD_COMMENT: &str = "技能树图标同步（images-sync）";
+/// 技能树图标 wiki 分类名（不带 `Category:`/`[[分类:]]` 包装）。
+const SKILLTREE_CATEGORY_NAME: &str = "技能树图标";
+/// 分类对账报告中的样本上限。
+const CATEGORY_SAMPLE_LIMIT: usize = 20;
 
 /// 来源对应的描述分类。
 pub fn icon_category(source_id: &str) -> &'static str {
     match source_id {
         "crafting" => CRAFTING_ICON_CATEGORY,
+        "skilltree" => SKILLTREE_ICON_CATEGORY,
         _ => ICON_CATEGORY,
     }
 }
@@ -56,6 +65,7 @@ pub fn icon_category(source_id: &str) -> &'static str {
 pub fn upload_comment(source_id: &str) -> &'static str {
     match source_id {
         "crafting" => CRAFTING_UPLOAD_COMMENT,
+        "skilltree" => SKILLTREE_UPLOAD_COMMENT,
         _ => UPLOAD_COMMENT,
     }
 }
@@ -75,7 +85,7 @@ pub struct UploadIconsParams {
     /// 手动指定上传的 wiki 文件名（需配合 `file`）；与自动命名一致时视为
     /// 未指定，其余写入映射表并绕过自动标题。
     pub title: Option<String>,
-    /// 只上传指定来源（`inventory` / `crafting`）；`None` = 全部来源。
+    /// 只上传指定来源（`inventory` / `crafting` / `skilltree`）；`None` = 全部来源。
     pub source: Option<String>,
     /// 批量时仅上传 wiki 上尚不存在的；对单个 `file` 不生效。
     pub only_missing: bool,
@@ -118,20 +128,33 @@ pub async fn refresh_icon_meta(
             icon_meta::CraftingKeys::default()
         }
     };
+    let skilltree = match icon_meta::read_skilltree_names(dst_root) {
+        Ok(names) => names,
+        Err(e) => {
+            reporter.log(format!(
+                "技能树图标名称表解析失败，技能树图标将不含名称：{e}"
+            ));
+            icon_meta::SkilltreeNames::default()
+        }
+    };
     let overrides = icon_meta::load_overrides(&icon_meta::overrides_path())?;
-    if names.is_empty() && overrides.is_empty() {
+    if names.is_empty() && crafting.is_empty() && skilltree.is_empty() && overrides.is_empty() {
         reporter.log("翻译表中没有可用条目，跳过图标元数据刷新".to_string());
         return Ok(json!({ "status": "no_names" }));
     }
 
     let previous = icon_meta::load(out_dir)?;
-    let mut meta = icon_meta::build_meta(&build, files, &names, &crafting, &overrides, &previous);
+    let mut meta = icon_meta::build_meta(
+        &build, files, &names, &crafting, &skilltree, &overrides, &previous,
+    );
     let entries = meta.icons.len();
     let named = meta.icons.values().filter(|e| e.name_en.is_some()).count();
     let uploadable = meta.icons.values().filter(|e| e.uploadable).count();
 
     let mut wiki_checked = false;
     let mut wiki_error = None;
+    let mut category_report: Option<Value> = None;
+    let mut category_error: Option<String> = None;
     if check_wiki {
         let needs: Vec<String> = meta
             .icons
@@ -154,18 +177,43 @@ pub async fn refresh_icon_meta(
         } else {
             wiki_checked = true;
         }
+
+        // 分类:技能树图标 独立对账（本地有 wiki 无 / wiki 有本地无），只报告；
+        // 对账结果写入 wiki.in_category。指向旧文件的重定向占位页会单独归到
+        // redirect_placeholders，仅报告不覆盖；只有 truly_missing 才补传。
+        let local_titles = skilltree_local_titles(&meta);
+        if !local_titles.is_empty() {
+            match reconcile_skilltree_category(&mut meta).await {
+                Ok(report) => {
+                    reporter.log(format!(
+                        "技能树分类对账：本地 {} / 分类 {}；本地缺 wiki {}（重定向占位 {}，仅报告；真缺失 {}，可上传）；wiki 遗留 {}（仅报告）",
+                        report["local_count"].as_u64().unwrap_or(0),
+                        report["wiki_count"].as_u64().unwrap_or(0),
+                        report["missing_on_wiki"].as_u64().unwrap_or(0),
+                        report["redirect_placeholders"].as_u64().unwrap_or(0),
+                        report["truly_missing"].as_u64().unwrap_or(0),
+                        report["stale_on_wiki"].as_u64().unwrap_or(0),
+                    ));
+                    category_report = Some(report);
+                }
+                Err(e) => {
+                    reporter.log(format!("技能树分类对账失败（跳过）：{e}"));
+                    category_error = Some(e.to_string());
+                }
+            }
+        }
     }
 
     let path = icon_meta::save(out_dir, &meta)?;
     let missing = meta
         .icons
         .values()
-        .filter(|e| e.uploadable && e.wiki.as_ref().and_then(|w| w.exists) == Some(false))
+        .filter(|e| e.uploadable && e.wiki.as_ref().is_some_and(|w| w.needs_upload()))
         .count();
     let unknown = meta
         .icons
         .values()
-        .filter(|e| e.uploadable && e.wiki.is_none())
+        .filter(|e| e.uploadable && e.wiki.as_ref().is_none_or(|w| w.exists.is_none()))
         .count();
     let unuploadable = meta
         .icons
@@ -182,7 +230,7 @@ pub async fn refresh_icon_meta(
         overrides.len(),
         path.display()
     ));
-    Ok(json!({
+    let mut report = json!({
         "status": "ok",
         "build": meta.build,
         "entries": entries,
@@ -197,7 +245,14 @@ pub async fn refresh_icon_meta(
         "wiki_checked": wiki_checked,
         "wiki_error": wiki_error,
         "path": path.display().to_string(),
-    }))
+    });
+    if let Some(value) = category_report {
+        report["skilltree_category"] = value;
+    }
+    if let Some(error) = category_error {
+        report["skilltree_category_error"] = json!(error);
+    }
+    Ok(report)
 }
 
 /// 查询 `File:` 页面存在性并写回元数据；返回更新的文件数。
@@ -234,17 +289,101 @@ pub async fn query_wiki_status(meta: &mut IconMeta, files: &[String]) -> Result<
     for ((_, files), info) in targets.iter().zip(infos.iter()) {
         for file in files {
             if let Some(entry) = meta.icons.get_mut(file) {
+                let in_category = entry.wiki.as_ref().and_then(|w| w.in_category);
                 entry.wiki = Some(icon_meta::WikiStatus {
                     exists: Some(!info.missing),
                     checked_at: Some(now_ms()),
                     title: Some(info.title.clone()),
                     url: info.url.clone(),
+                    in_category,
                 });
                 checked += 1;
             }
         }
     }
     Ok(checked)
+}
+
+/// 本地技能树图标生效标题集合（规范化为 `File:...`，供分类对账）。
+fn skilltree_local_titles(meta: &IconMeta) -> BTreeSet<String> {
+    meta.icons
+        .iter()
+        .filter(|(_, e)| e.source.as_deref() == Some("skilltree"))
+        .filter_map(|(_, e)| e.title.as_deref())
+        .map(crate::wiki::file_title)
+        .collect()
+}
+
+/// 报告样本：有序集合前 [`CATEGORY_SAMPLE_LIMIT`] 项。
+fn sample_titles(titles: &BTreeSet<String>) -> Vec<String> {
+    titles.iter().take(CATEGORY_SAMPLE_LIMIT).cloned().collect()
+}
+
+/// 把分类对账结果写回 `wiki.in_category`（本地有但分类无 → `false`），
+/// 并产出只读报告。
+///
+/// 本地不在分类中的标题进一步区分：
+/// - `exists == Some(true)`：站内已有指向旧文件的重定向占位页，仅报告，
+///   不覆盖；
+/// - `exists == Some(false)`：真正缺失，可由 `upload-icons` 补传。
+fn apply_skilltree_category(meta: &mut IconMeta, wiki_titles: &BTreeSet<String>) -> Value {
+    let local_titles = skilltree_local_titles(meta);
+    let missing: BTreeSet<String> = local_titles.difference(wiki_titles).cloned().collect();
+    let stale: BTreeSet<String> = wiki_titles.difference(&local_titles).cloned().collect();
+    let mut redirects: BTreeSet<String> = BTreeSet::new();
+    let mut truly_missing: BTreeSet<String> = BTreeSet::new();
+
+    for entry in meta
+        .icons
+        .values_mut()
+        .filter(|e| e.source.as_deref() == Some("skilltree"))
+    {
+        let Some(title) = entry.title.as_deref() else {
+            continue;
+        };
+        let canonical = crate::wiki::file_title(title);
+        let in_category = wiki_titles.contains(&canonical);
+        if !in_category {
+            match entry.wiki.as_ref().and_then(|w| w.exists) {
+                Some(true) => {
+                    redirects.insert(canonical.clone());
+                }
+                Some(false) => {
+                    truly_missing.insert(canonical.clone());
+                }
+                None => {}
+            }
+        }
+        if let Some(wiki) = entry.wiki.as_mut() {
+            wiki.in_category = Some(in_category);
+        }
+    }
+
+    json!({
+        "category": SKILLTREE_CATEGORY_NAME,
+        "local_count": local_titles.len(),
+        "wiki_count": wiki_titles.len(),
+        "missing_on_wiki": missing.len(),
+        "redirect_placeholders": redirects.len(),
+        "truly_missing": truly_missing.len(),
+        "stale_on_wiki": stale.len(),
+        "missing_samples": sample_titles(&missing),
+        "redirect_placeholder_samples": sample_titles(&redirects),
+        "truly_missing_samples": sample_titles(&truly_missing),
+        "stale_samples": sample_titles(&stale),
+    })
+}
+
+/// 读取分类:技能树图标并与本地生效标题对账，更新 `wiki.in_category`；
+/// 只报告差异，不清理/不覆盖任何站内页面。
+async fn reconcile_skilltree_category(meta: &mut IconMeta) -> Result<Value> {
+    let client = WikiClient::from_env()?;
+    let members = client
+        .list_category_members(SKILLTREE_CATEGORY_NAME, None)
+        .await?;
+    let wiki_titles: BTreeSet<String> =
+        members.iter().map(|m| crate::wiki::file_title(m)).collect();
+    Ok(apply_skilltree_category(meta, &wiki_titles))
 }
 
 /// 选择待上传文件（纯函数，按文件名升序）。
@@ -370,7 +509,7 @@ fn apply_manual_title(
             name_en: None,
             name_zh: None,
             source: None,
-            crafting: None,
+            group: None,
             title: None,
             title_source: None,
             uploadable: false,
@@ -485,7 +624,12 @@ pub async fn run_upload_icons(
     } else if params.only_missing {
         let unknown: Vec<String> = selected
             .iter()
-            .filter(|f| meta.icons.get(*f).map(|e| e.wiki.is_none()).unwrap_or(true))
+            .filter(|f| {
+                meta.icons
+                    .get(*f)
+                    .and_then(|e| e.wiki.as_ref())
+                    .is_none_or(|w| w.exists.is_none())
+            })
             .cloned()
             .collect();
         if !unknown.is_empty() {
@@ -497,8 +641,7 @@ pub async fn run_upload_icons(
             meta.icons
                 .get(f)
                 .and_then(|e| e.wiki.as_ref())
-                .and_then(|w| w.exists)
-                == Some(false)
+                .is_some_and(|w| w.needs_upload())
         });
         if selected.is_empty() {
             reporter.log("所选图标在维基上均已存在，无需上传".to_string());
@@ -673,7 +816,7 @@ mod tests {
                     name_en: Some((*name_en).to_string()),
                     name_zh: None,
                     source: Some("inventory".to_string()),
-                    crafting: None,
+                    group: None,
                     title,
                     title_source: Some(icon_meta::TitleSource::Auto),
                     uploadable: *uploadable,
@@ -683,6 +826,88 @@ mod tests {
             );
         }
         meta
+    }
+
+    #[test]
+    fn test_skilltree_local_titles_and_category_diff() {
+        let mut meta = IconMeta::default();
+        // 本地：命中分类 / 重定向占位（exists=true 但不在分类）/ 真缺失。
+        for (file, name, exists) in [
+            ("walter_ammo_bag.png", "Walter ammo bag.png", true),
+            ("willow_refuel.png", "Willow refuel.png", true),
+            (
+                "wendy_potion_duration.png",
+                "Wendy potion duration.png",
+                false,
+            ),
+        ] {
+            meta.icons.insert(
+                file.to_string(),
+                IconMetaEntry {
+                    name_en: Some("X".to_string()),
+                    name_zh: None,
+                    source: Some("skilltree".to_string()),
+                    group: None,
+                    title: Some(name.to_string()),
+                    title_source: Some(icon_meta::TitleSource::Auto),
+                    uploadable: true,
+                    note: None,
+                    wiki: Some(icon_meta::WikiStatus {
+                        exists: Some(exists),
+                        ..Default::default()
+                    }),
+                },
+            );
+        }
+        let local = skilltree_local_titles(&meta);
+        assert_eq!(
+            local,
+            BTreeSet::from([
+                "File:Walter ammo bag.png".to_string(),
+                "File:Willow refuel.png".to_string(),
+                "File:Wendy potion duration.png".to_string(),
+            ])
+        );
+
+        let wiki = BTreeSet::from([
+            "File:Walter ammo bag.png".to_string(),
+            "File:Wendy petal 1.png".to_string(),
+        ]);
+        let diff = apply_skilltree_category(&mut meta, &wiki);
+        assert_eq!(diff["local_count"], 3);
+        assert_eq!(diff["wiki_count"], 2);
+        assert_eq!(diff["missing_on_wiki"], 2);
+        assert_eq!(diff["redirect_placeholders"], 1);
+        assert_eq!(diff["truly_missing"], 1);
+        assert_eq!(diff["stale_on_wiki"], 1);
+        assert_eq!(
+            diff["redirect_placeholder_samples"][0],
+            "File:Willow refuel.png"
+        );
+        assert_eq!(
+            diff["truly_missing_samples"][0],
+            "File:Wendy potion duration.png"
+        );
+        assert_eq!(diff["stale_samples"][0], "File:Wendy petal 1.png");
+        // 分类回写：
+        assert_eq!(
+            meta.icons["walter_ammo_bag.png"]
+                .wiki
+                .as_ref()
+                .unwrap()
+                .in_category,
+            Some(true)
+        );
+        let willow = meta.icons["willow_refuel.png"].wiki.as_ref().unwrap();
+        assert_eq!(willow.in_category, Some(false));
+        assert!(!willow.needs_upload());
+        assert!(willow.redirect_placeholder());
+        let wendy = meta.icons["wendy_potion_duration.png"]
+            .wiki
+            .as_ref()
+            .unwrap();
+        assert_eq!(wendy.in_category, Some(false));
+        assert!(wendy.needs_upload());
     }
 
     #[test]
@@ -813,12 +1038,14 @@ mod tests {
             checked_at: Some(1),
             title: None,
             url: None,
+            in_category: None,
         });
         meta.icons.get_mut("b.png").unwrap().wiki = Some(icon_meta::WikiStatus {
             exists: Some(false),
             checked_at: Some(1),
             title: None,
             url: None,
+            in_category: None,
         });
         let mut selected = select_files(&meta, None, None, None, None).unwrap();
         selected.retain(|f| {

@@ -1,5 +1,6 @@
-//! 物品图标元数据：`split/inventoryimages/` 与 `split/crafting_menu_icons/`
-//! 文件名 → 生效的维基文件名（`title`，来自映射表或游戏内英文名）与上传状态。
+//! 物品图标元数据：`split/inventoryimages/`、`split/crafting_menu_icons/` 与
+//! `split/skilltree_icons/` 文件名 → 生效的维基文件名（`title`，来自映射表
+//! 或游戏内名称/来源命名规则）与上传状态。
 //!
 //! 由 `images-sync` 生成并落盘为 `history/icon_meta.json`（派生数据，可随时
 //! 由 manifest + 游戏翻译表 + 映射表重建）；WebUI 与
@@ -17,9 +18,10 @@
 //!   `filter_text` 的回退 prefab 的 `STRINGS.NAMES.*` 显示名）；
 //! - 英文名以 `strings.pot` 为准（覆盖全部键），中文名取 `chinese_s.po`
 //!   非空 msgstr；只有英文没有中文时照常保留英文；
-//! - 生效标题优先级：映射表（按本地文件名）> 英文名自动生成；自动标题对
+//! - 生效标题优先级：映射表（按本地文件名）> 按来源自动命名；自动标题对
 //!   制作栏图标追加 `Filter` / `Station Icon` 后缀（与 wiki
-//!   分类:制作栏图标 的主流命名一致）。标题含 `{}` 等 MediaWiki 非法字符
+//!   分类:制作栏图标 的主流命名一致），技能树图标直接对文件 stem 做
+//!   MediaWiki 归一化（与 wiki 分类:技能树图标 既有命名一致）。标题含 `{}` 等 MediaWiki 非法字符
 //!   或 `/` 的条目标记 `uploadable = false` 并附 `note`，上传作业跳过
 //!   （可用映射表或弹窗手动命名解决）；
 //! - 映射表为 `config/icon_title_overrides.json`（扁平 JSON：本地文件名 →
@@ -149,6 +151,28 @@ pub struct WikiStatus {
     /// 当前版本直链（存在时）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
+    /// 是否命中对应 wiki 分类（目前用于技能树图标的 `分类:技能树图标`
+    /// 对账）；`None` = 尚未对账。标题不在分类内但文件页存在时，通常是指向
+    /// 旧文件的重定向占位页，只在分类报告中列出，不进入自动补传。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub in_category: Option<bool>,
+}
+
+impl WikiStatus {
+    /// 真正缺失、需要上传：文件本身在 wiki 上不存在。
+    ///
+    /// 注意不能只看 `in_category == false`：站内可能已有指向旧文件的
+    /// File 重定向占位页（`get_files_info` 跟随重定向判定 exists=true），
+    /// 这类页只报告、不覆盖，不进入上传集合。
+    pub fn needs_upload(&self) -> bool {
+        self.exists == Some(false)
+    }
+
+    /// 标题存在但不在目标分类中，典型为指向旧文件的重定向占位页。
+    /// 分类对账会单独报告这些条目，但不自动上传覆盖。
+    pub fn redirect_placeholder(&self) -> bool {
+        self.exists == Some(true) && self.in_category == Some(false)
+    }
 }
 
 /// 生效标题的来源。
@@ -157,32 +181,36 @@ pub struct WikiStatus {
 pub enum TitleSource {
     /// 来自例外映射表（`config/icon_title_overrides.json`）。
     Override,
-    /// 由 `STRINGS.NAMES` 英文名自动生成。
+    /// 由名称链自动生成（物品栏 `STRINGS.NAMES` 英文名；技能树文件 stem
+    /// 归一化等）。
     Auto,
 }
 
-/// 制作栏图标的语义分组（由 [`CraftingKeys`] 解析链派生，随 images-sync
-/// 写入元数据；WebUI 制作栏图标页按此分组，不依赖文件名前缀猜测）。
+/// 图标的语义分组（随 images-sync 写入元数据；WebUI 分节展示用，不依赖
+/// 文件名前缀猜测）。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
-pub enum CraftingGroup {
-    /// 制作栏过滤器图标（对应 `STRINGS.UI.CRAFTING_FILTERS.<key>`）。
-    Filter {
-        /// 过滤器键；Lua 定义缺失时为 `None`。
+pub enum IconGroup {
+    /// 制作栏图标（对应 `STRINGS.UI.CRAFTING_FILTERS` /
+    /// `STRINGS.UI.CRAFTING_STATION_FILTERS`）。
+    Crafting {
+        /// `filter`（制作栏过滤器）或 `station`（制作站）。
+        section: String,
+        /// 对应 STRINGS 键；Lua 定义缺失时为 `None`。
         key: Option<String>,
     },
-    /// 制作站图标（对应 `STRINGS.UI.CRAFTING_STATION_FILTERS.<key>`；
-    /// 无 `filter_text` 的站为 `None`，显示名走 prefab 回退）。
-    Station {
-        /// 制作站过滤键。
-        key: Option<String>,
+    /// 技能树图标。
+    Skilltree {
+        /// 角色名（图标名前缀，小写；节点表未命中时也按前缀回退）。
+        character: String,
     },
 }
 
 /// 单个图标的名称与上传信息。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IconMetaEntry {
-    /// 英文名（`STRINGS.NAMES.*` msgid）；无对应条目时省略。
+    /// 游戏内显示英文名（物品栏取 `STRINGS.NAMES.*`，技能树取节点内联
+    /// `title` 引用对应的 PO msgid）；无对应条目时省略。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name_en: Option<String>,
     /// 中文名；无翻译或 msgstr 为空时省略。
@@ -192,9 +220,9 @@ pub struct IconMetaEntry {
     /// 旧元数据没有该字段时为 `None`（视为物品栏图标）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
-    /// 语义分组（仅制作栏图标）；旧元数据没有该字段时为 `None`。
+    /// 语义分组；旧元数据没有该字段时为 `None`。
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub crafting: Option<CraftingGroup>,
+    pub group: Option<IconGroup>,
     /// 生效的维基文件名（含 `.png`，无 `File:` 前缀）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
@@ -242,11 +270,18 @@ impl IconMeta {
         let title_owned = title.or_else(|| Some(format!("File:{target}")));
         for e in self.icons.values_mut() {
             if e.title.as_deref() == Some(target.as_str()) {
+                // 技能树上传成功即已带分类；其余来源沿用既有对账值。
+                let in_category = if e.source.as_deref() == Some("skilltree") {
+                    Some(true)
+                } else {
+                    e.wiki.as_ref().and_then(|w| w.in_category)
+                };
                 e.wiki = Some(WikiStatus {
                     exists: Some(exists),
                     checked_at: Some(at),
                     title: title_owned.clone(),
                     url: url.clone(),
+                    in_category,
                 });
             }
         }
@@ -416,6 +451,13 @@ pub struct CraftingKeys {
 }
 
 impl CraftingKeys {
+    /// 三个映射均为空时视为没有可用制作栏命名数据。
+    pub fn is_empty(&self) -> bool {
+        self.filters.is_empty()
+            && self.station_filters.is_empty()
+            && self.station_prefabs.is_empty()
+    }
+
     /// 由 [`crate::parser::crafting`] 的两个 Lua 表解析产物构建。
     pub fn from_defs(
         filters: &[crate::parser::crafting::FilterIconDef],
@@ -462,21 +504,26 @@ impl CraftingKeys {
 
     /// 图标文件的语义分组：filter/station 按解析链命中；station 无过滤名时
     /// `key = None`（显示名走 prefab 回退）。两表都未命中的图标返回 `None`。
-    pub fn group(&self, file: &str) -> Option<CraftingGroup> {
+    pub fn group(&self, file: &str) -> Option<IconGroup> {
         let stem = file_stem_key(file);
         if let Some(key) = self.filters.get(&stem) {
-            return Some(CraftingGroup::Filter {
+            return Some(IconGroup::Crafting {
+                section: "filter".to_string(),
                 key: Some(key.clone()),
             });
         }
         if let Some(key) = self.station_filters.get(&stem) {
-            return Some(CraftingGroup::Station {
+            return Some(IconGroup::Crafting {
+                section: "station".to_string(),
                 key: Some(key.clone()),
             });
         }
         self.station_prefabs
             .contains_key(&stem)
-            .then_some(CraftingGroup::Station { key: None })
+            .then_some(IconGroup::Crafting {
+                section: "station".to_string(),
+                key: None,
+            })
     }
 }
 
@@ -488,6 +535,202 @@ pub fn read_crafting_keys(dst_root: &Path) -> Result<CraftingKeys> {
         crate::parser::crafting::parse_crafting_filter_defs(&source.read("recipes_filter.lua")?)?;
     let prototypers = crate::parser::crafting::parse_prototyper_defs(&source.read("recipes.lua")?)?;
     Ok(CraftingKeys::from_defs(&filters, &prototypers))
+}
+
+// -- 技能树图标命名 -----------------------------------------------------------
+
+/// 技能树图标的名称解析表（随 images-sync 构建）：
+/// 图标 → 节点内联 `title` 键（解析器提取，回退节点名约定）→
+/// PO `STRINGS.SKILLTREE.<角色>.<键>_TITLE` 双语名，例外表最后兜底。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SkilltreeNames {
+    /// icon stem 大写 → (角色大写, TITLE 键大写)。
+    pub icon_nodes: BTreeMap<String, (String, String)>,
+    /// (角色大写, TITLE 键大写) → (英文 msgid, 中文 msgstr 仅非空)。
+    pub titles: SkillTitleMap,
+    /// 例外表（`config/skilltree_icon_names.json`）：本地文件名 → (英文, 中文)。
+    pub extra: BTreeMap<String, (String, String)>,
+}
+
+impl SkilltreeNames {
+    pub fn is_empty(&self) -> bool {
+        self.icon_nodes.is_empty() && self.titles.is_empty() && self.extra.is_empty()
+    }
+
+    /// 图标文件的中英文名：例外表优先，其次节点表 + PO；都没有返回 `None`。
+    pub fn display_name(&self, file: &str) -> Option<(String, Option<String>)> {
+        if let Some((en, zh)) = self.extra.get(file) {
+            return Some((en.clone(), Some(zh.clone())));
+        }
+        let (char_name, key) = self.icon_nodes.get(&file_stem_key(file))?;
+        let (en, zh) = self.titles.get(&(char_name.clone(), key.clone()))?;
+        Some((en.clone(), zh.clone()))
+    }
+
+    /// 图标所属角色（小写）：节点表命中用其角色，否则回退文件名首段前缀
+    /// （角色名不含下划线，孤儿图标也总有分组）。
+    pub fn character(&self, file: &str) -> String {
+        if let Some((char_name, _)) = self.icon_nodes.get(&file_stem_key(file)) {
+            return char_name.to_lowercase();
+        }
+        file.split('_').next().unwrap_or("other").to_lowercase()
+    }
+}
+
+/// `STRINGS.SKILLTREE.<角色>.<键>_TITLE` → `(角色大写, 键大写)`，形态不符返回
+/// `None`。
+fn split_skilltree_title_path(path: &str) -> Option<(String, String)> {
+    let rest = path.strip_prefix("STRINGS.SKILLTREE.")?;
+    let key = rest.strip_suffix("_TITLE")?;
+    let (char_name, key) = key.split_once('.')?;
+    Some((char_name.to_ascii_uppercase(), key.to_ascii_uppercase()))
+}
+
+/// 本地别名形态的 title 引用（如 `SKILLTREESTRINGS.<键>_TITLE`）→ 键大写；
+/// 取末段并剥 `_TITLE` 后缀，剥不出时用末段原样。
+fn skilltree_alias_key(path: &str) -> String {
+    let last = path.rsplit('.').next().unwrap_or(path);
+    last.strip_suffix("_TITLE")
+        .unwrap_or(last)
+        .to_ascii_uppercase()
+}
+
+/// 技能树双语名表：(角色, TITLE 键) → (英文 msgid, 中文 msgstr 仅非空)。
+pub type SkillTitleMap = BTreeMap<(String, String), (String, Option<String>)>;
+
+/// 解析 PO 中 `STRINGS.SKILLTREE.<角色>.<键>_TITLE` 条目为双语名表。
+pub fn parse_skilltree_titles(chinese_po: &str) -> Result<SkillTitleMap> {
+    let file = PoParser::parse(chinese_po)?;
+    let mut out = BTreeMap::new();
+    for e in &file.entries {
+        let Some((pair, en, zh)) = (|| {
+            let ctx = e.msgctxt.as_deref()?;
+            if !ctx.starts_with("STRINGS.SKILLTREE.") || !ctx.ends_with("_TITLE") {
+                return None;
+            }
+            let (pair, en, zh) = (
+                split_skilltree_title_path(ctx)?,
+                e.msgid.trim(),
+                e.msgstr.trim(),
+            );
+            if en.is_empty() {
+                return None;
+            }
+            Some((
+                pair,
+                en.to_string(),
+                (!zh.is_empty()).then(|| zh.to_string()),
+            ))
+        })() else {
+            continue;
+        };
+        out.insert(pair, (en, zh));
+    }
+    Ok(out)
+}
+
+/// 技能树图标例外表路径。
+pub fn skilltree_icon_names_path() -> PathBuf {
+    crate::platform::config::skilltree_icon_names_path()
+}
+
+/// 例外表条目（`{ "en": ..., "zh": ... }`）。
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
+pub struct SkillNameEntry {
+    pub en: String,
+    pub zh: String,
+}
+
+/// 读取技能树图标例外表；文件不存在返回空表（不是错误）。
+pub fn load_skilltree_extra(path: &Path) -> Result<BTreeMap<String, (String, String)>> {
+    if !path.exists() {
+        return Ok(BTreeMap::new());
+    }
+    let text = std::fs::read_to_string(path).map_err(|e| {
+        Error::Io(std::io::Error::new(
+            e.kind(),
+            format!("读取 {}: {}", path.display(), e),
+        ))
+    })?;
+    let raw: BTreeMap<String, SkillNameEntry> = serde_json::from_str(&text).map_err(|e| {
+        Error::Json(serde_json::Error::io(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            format!("解析 {}: {}", path.display(), e),
+        )))
+    })?;
+    let mut out = BTreeMap::new();
+    for (file, entry) in raw {
+        if !is_icon_file_name(&file) {
+            return Err(Error::Config(format!(
+                "例外表 {} 的键 {file:?} 不是有效的图标文件名",
+                path.display()
+            )));
+        }
+        let en = entry.en.trim();
+        let zh = entry.zh.trim();
+        if en.is_empty() || zh.is_empty() {
+            return Err(Error::Config(format!(
+                "例外表 {} 中 {file:?} 的 en/zh 不能为空",
+                path.display()
+            )));
+        }
+        out.insert(file, (en.to_string(), zh.to_string()));
+    }
+    Ok(out)
+}
+
+/// 读取技能树图标命名表：PO `SKILLTREE` 命名空间 + 解析全部
+/// `prefabs/skilltree_<角色>.lua`（角色清单来自 PO TITLE 键）建节点表，
+/// 合并例外表。单角色读取/解析失败降级记日志（不影响其余角色）。
+pub fn read_skilltree_names(dst_root: &Path) -> Result<SkilltreeNames> {
+    let chinese = read_game_text(dst_root, "languages/chinese_s.po")?;
+    let titles = parse_skilltree_titles(&chinese)?;
+    let chars: std::collections::BTreeSet<String> = titles.keys().map(|(c, _)| c.clone()).collect();
+    let source = crate::platform::game_source::GameSource::new(dst_root.to_path_buf(), None)?;
+    let mut icon_nodes = BTreeMap::new();
+    for char_name in &chars {
+        let rel = format!("prefabs/skilltree_{}.lua", char_name.to_lowercase());
+        let lua = match source.read(&rel) {
+            Ok(lua) => lua,
+            Err(e) => {
+                tracing::warn!("跳过技能树命名：读取 {rel} 失败：{e}");
+                continue;
+            }
+        };
+        let tree = match crate::parser::skilltree::parse_skill_tree(&lua, &char_name.to_lowercase())
+        {
+            Ok(tree) => tree,
+            Err(e) => {
+                tracing::warn!("跳过技能树命名：解析 {rel} 失败：{e}");
+                continue;
+            }
+        };
+        for node in &tree.nodes {
+            let Some(icon) = &node.icon else {
+                continue;
+            };
+            // 内联 title 引用优先（角色与键取自引用原文）；游戏动态循环
+            // (`data.title = ..._STRINGS[uppercase_name.."_TITLE"]`) 的默认键
+            // 即节点名，故解析器未给出内联引用时回退节点名约定。部分角色文件
+            // 用本地别名（如 `SKILLTREESTRINGS.<键>_TITLE` = 角色命名空间），
+            // 此时键取末段、角色用解析角色。
+            let (char_key, key) = node
+                .title_key
+                .as_deref()
+                .map(|path| {
+                    split_skilltree_title_path(path)
+                        .unwrap_or_else(|| (char_name.clone(), skilltree_alias_key(path)))
+                })
+                .unwrap_or_else(|| (char_name.clone(), node.name.to_ascii_uppercase()));
+            icon_nodes.insert(icon.to_ascii_uppercase(), (char_key, key));
+        }
+    }
+    let extra = load_skilltree_extra(&skilltree_icon_names_path())?;
+    Ok(SkilltreeNames {
+        icon_nodes,
+        titles,
+        extra,
+    })
 }
 
 fn read_game_text(dst_root: &Path, rel: &str) -> Result<String> {
@@ -588,9 +831,10 @@ pub fn normalize_explicit_title(raw: &str) -> Result<String> {
     Ok(format!("{normalized}.png"))
 }
 
-/// 一个图标当前的生效标题：映射表（按本地文件名）优先，其次英文名自动
-/// 生成——制作栏图标（`source = Some("crafting")`）追加 `Filter` /
-/// `Station Icon` 后缀，其余直接用英文名。
+/// 一个图标当前的生效标题：映射表（按本地文件名）优先，其次按来源自动
+/// 生成——制作栏图标追加 `Filter` / `Station Icon` 后缀（游戏英文名），技能树
+/// 图标用文件 stem 归一化（wiki 端既有命名与游戏英文名无关），物品栏直接
+/// 用英文名。
 ///
 /// 与自动命名相同的映射视为未指定（按 `Auto` 返回），防御手工编辑
 /// 映射表引入的冗余条目。
@@ -600,10 +844,13 @@ pub fn effective_title(
     overrides: &IconTitleOverrides,
     source: Option<&str>,
 ) -> (Option<String>, Option<TitleSource>) {
-    let auto = name_en.and_then(|name_en| match source {
-        Some("crafting") => auto_title(&format!("{name_en} {}", crafting_title_suffix(file))),
-        _ => auto_title(name_en),
-    });
+    let auto = match source {
+        Some("skilltree") => auto_title(file.strip_suffix(".png").unwrap_or(file)),
+        _ => name_en.and_then(|name_en| match source {
+            Some("crafting") => auto_title(&format!("{name_en} {}", crafting_title_suffix(file))),
+            _ => auto_title(name_en),
+        }),
+    };
     if let Some(title) = overrides.get(file) {
         if auto.as_deref() != Some(title) {
             return (Some(title.to_string()), Some(TitleSource::Override));
@@ -670,28 +917,35 @@ fn invalid_note(name_en: &str) -> String {
 /// 状态会保留（避免每次 images-sync 重查全部标题）。
 ///
 /// `files` 为 `(文件名, 来源标识)` 对（来源见 `images::icons::ICON_SOURCES`）；
-/// `source = "crafting"` 的文件走 [`CraftingKeys::display_name`] 取名。
+/// 命名按来源分支：`crafting` 走 [`CraftingKeys::display_name`]，
+/// `skilltree` 走 [`SkilltreeNames::display_name`]，其余查 `STRINGS.NAMES`。
 pub fn build_meta(
     build: &str,
     files: impl IntoIterator<Item = (String, String)>,
     names: &NameMaps,
     crafting: &CraftingKeys,
+    skilltree: &SkilltreeNames,
     overrides: &IconTitleOverrides,
     previous: &IconMeta,
 ) -> IconMeta {
     let mut icons = BTreeMap::new();
     for (file, source) in files {
-        let (name_en, name_zh) = if source == "crafting" {
-            crafting
+        let (name_en, name_zh) = match source.as_str() {
+            "crafting" => crafting
                 .display_name(names, &file)
                 .map(|(en, zh)| (Some(en), zh))
-                .unwrap_or_default()
-        } else {
-            let key = file_stem_key(&file);
-            (
-                names.names.en.get(&key).cloned(),
-                names.names.zh.get(&key).cloned(),
-            )
+                .unwrap_or_default(),
+            "skilltree" => skilltree
+                .display_name(&file)
+                .map(|(en, zh)| (Some(en), zh))
+                .unwrap_or_default(),
+            _ => {
+                let key = file_stem_key(&file);
+                (
+                    names.names.en.get(&key).cloned(),
+                    names.names.zh.get(&key).cloned(),
+                )
+            }
         };
         let (title, title_source) =
             effective_title(&file, name_en.as_deref(), overrides, Some(source.as_str()));
@@ -708,10 +962,12 @@ pub fn build_meta(
             .get(&file)
             .filter(|old| old.title == title)
             .and_then(|old| old.wiki.clone());
-        let crafting = if source == "crafting" {
-            crafting.group(&file)
-        } else {
-            None
+        let group = match source.as_str() {
+            "crafting" => crafting.group(&file),
+            "skilltree" => Some(IconGroup::Skilltree {
+                character: skilltree.character(&file),
+            }),
+            _ => None,
         };
         icons.insert(
             file,
@@ -719,7 +975,7 @@ pub fn build_meta(
                 name_en,
                 name_zh,
                 source: Some(source),
-                crafting,
+                group,
                 title,
                 title_source,
                 uploadable,
@@ -931,7 +1187,7 @@ msgstr ""
             name_en: name_en.map(str::to_string),
             name_zh: None,
             source: Some("inventory".to_string()),
-            crafting: None,
+            group: None,
             title: title.map(str::to_string),
             title_source: title.map(|_| TitleSource::Auto),
             uploadable: title.is_some(),
@@ -1133,32 +1389,42 @@ msgstr ""
         // 语义分组：filter/station 按解析链，station 无过滤名 key 为 None
         assert_eq!(
             keys.group("filter_tool.png"),
-            Some(CraftingGroup::Filter {
+            Some(IconGroup::Crafting {
+                section: "filter".into(),
                 key: Some("TOOLS".into())
             })
         );
         // 同图标多过滤器：与 display_name 同规则（定义序最后者胜）
         assert_eq!(
             keys.group("filter_none.png"),
-            Some(CraftingGroup::Filter {
+            Some(IconGroup::Crafting {
+                section: "filter".into(),
                 key: Some("EVERYTHING".into())
             })
         );
         assert_eq!(
             keys.group("station_carpentry.png"),
-            Some(CraftingGroup::Station {
+            Some(IconGroup::Crafting {
+                section: "station".into(),
                 key: Some("CARPENTRY".into())
             })
         );
         assert_eq!(
             keys.group("station_science.png"),
-            Some(CraftingGroup::Station { key: None })
+            Some(IconGroup::Crafting {
+                section: "station".into(),
+                key: None
+            })
         );
         assert_eq!(keys.group("axe.png"), None);
         // serde 形态（WebUI 消费的字段形状）
         assert_eq!(
-            serde_json::to_value(CraftingGroup::Filter { key: None }).unwrap(),
-            serde_json::json!({ "kind": "filter", "key": null })
+            serde_json::to_value(IconGroup::Crafting {
+                section: "filter".into(),
+                key: None
+            })
+            .unwrap(),
+            serde_json::json!({ "kind": "crafting", "section": "filter", "key": null })
         );
     }
 
@@ -1202,6 +1468,7 @@ msgstr ""
             ]),
             &maps,
             &keys,
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -1212,8 +1479,9 @@ msgstr ""
         assert_eq!(tool.title.as_deref(), Some("Tools Filter.png"));
         assert_eq!(tool.source.as_deref(), Some("crafting"));
         assert_eq!(
-            tool.crafting,
-            Some(CraftingGroup::Filter {
+            tool.group,
+            Some(IconGroup::Crafting {
+                section: "filter".into(),
                 key: Some("TOOLS".into())
             })
         );
@@ -1226,8 +1494,9 @@ msgstr ""
         );
         assert_eq!(carpentry.name_zh.as_deref(), Some("木工"));
         assert_eq!(
-            carpentry.crafting,
-            Some(CraftingGroup::Station {
+            carpentry.group,
+            Some(IconGroup::Crafting {
+                section: "station".into(),
                 key: Some("CARPENTRY".into())
             })
         );
@@ -1238,7 +1507,13 @@ msgstr ""
             science.title.as_deref(),
             Some("Science Machine Station Icon.png")
         );
-        assert_eq!(science.crafting, Some(CraftingGroup::Station { key: None }));
+        assert_eq!(
+            science.group,
+            Some(IconGroup::Crafting {
+                section: "station".into(),
+                key: None
+            })
+        );
 
         // 映射表优先于自动标题；无键无映射的图标不收录
         let mut ov = IconTitleOverrides::default();
@@ -1252,6 +1527,7 @@ msgstr ""
             ]),
             &maps,
             &keys,
+            &SkilltreeNames::default(),
             &ov,
             &IconMeta::default(),
         );
@@ -1279,6 +1555,7 @@ msgstr ""
                     checked_at: Some(1),
                     title: Some("File:Axe.png".into()),
                     url: None,
+                    in_category: None,
                 }),
                 ..entry(Some("Axe"), Some("Axe.png"))
             },
@@ -1296,6 +1573,7 @@ msgstr ""
             ]),
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &previous,
         );
@@ -1328,6 +1606,7 @@ msgstr ""
             files(&["placeholder.png"]),
             &maps2,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -1349,6 +1628,7 @@ msgstr ""
             files(&["axe.png", "skin.png", "other.png"]),
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &ov,
             &IconMeta::default(),
         );
@@ -1380,6 +1660,7 @@ msgstr ""
             ],
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &ov,
             &IconMeta::default(),
         );
@@ -1406,6 +1687,7 @@ msgstr ""
                     checked_at: Some(1),
                     title: Some("File:Old.png".into()),
                     url: None,
+                    in_category: None,
                 }),
                 ..entry(Some("Old Name"), Some("Old.png"))
             },
@@ -1415,6 +1697,7 @@ msgstr ""
             files(&["axe.png"]),
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &previous,
         );
@@ -1431,6 +1714,7 @@ msgstr ""
                 checked_at: Some(1),
                 title: Some("File:Pick/Axe.png".into()),
                 url: None,
+                in_category: None,
             }),
             ..entry(Some("Pick/Axe"), Some("Pick/Axe.png"))
         };
@@ -1464,6 +1748,7 @@ msgstr ""
             files(&["axe.png", "other_axe.png"]),
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -1486,6 +1771,7 @@ msgstr ""
             files(&["axe.png"]),
             &maps,
             &CraftingKeys::default(),
+            &SkilltreeNames::default(),
             &IconTitleOverrides::default(),
             &IconMeta::default(),
         );
@@ -1531,6 +1817,297 @@ msgstr ""
         let dir = std::env::temp_dir().join(format!("icon_meta_missing_{}", std::process::id()));
         std::fs::remove_dir_all(&dir).ok();
         assert!(load(&dir).unwrap().icons.is_empty());
+    }
+
+    #[test]
+    fn test_effective_title_skilltree_uses_stem() {
+        let overrides = IconTitleOverrides::default();
+        // wiki 既有命名 = 文件 stem 归一化，与游戏英文名无关
+        assert_eq!(
+            effective_title("walter_ammo_bag.png", None, &overrides, Some("skilltree")),
+            (Some("Walter ammo bag.png".into()), Some(TitleSource::Auto))
+        );
+        assert_eq!(
+            effective_title(
+                "wx78_allegiance_shadow.png",
+                Some("Some Skill"),
+                &overrides,
+                Some("skilltree")
+            ),
+            (
+                Some("Wx78 allegiance shadow.png".into()),
+                Some(TitleSource::Auto)
+            )
+        );
+    }
+
+    #[test]
+    fn test_icon_group_serde_shape() {
+        assert_eq!(
+            serde_json::to_value(IconGroup::Crafting {
+                section: "filter".into(),
+                key: Some("TOOLS".into()),
+            })
+            .unwrap(),
+            serde_json::json!({"kind": "crafting", "section": "filter", "key": "TOOLS"})
+        );
+        assert_eq!(
+            serde_json::to_value(IconGroup::Skilltree {
+                character: "walter".into(),
+            })
+            .unwrap(),
+            serde_json::json!({"kind": "skilltree", "character": "walter"})
+        );
+        // 旧 schema 的 crafting 字段被忽略，新 group 缺省为空。
+        let legacy: IconMetaEntry = serde_json::from_value(serde_json::json!({
+            "name_en": "Axe",
+            "crafting": {"kind": "filter", "key": "TOOLS"}
+        }))
+        .unwrap();
+        assert!(legacy.group.is_none());
+    }
+
+    #[test]
+    fn test_wiki_status_needs_upload_semantics() {
+        // 传统口径：文件明确不存在。
+        let mut st = WikiStatus {
+            exists: Some(false),
+            ..Default::default()
+        };
+        assert!(st.needs_upload());
+        assert!(!st.redirect_placeholder());
+
+        // 文件页存在但不在目标分类：重定向占位页，仅报告不覆盖。
+        st = WikiStatus {
+            exists: Some(true),
+            in_category: Some(false),
+            ..Default::default()
+        };
+        assert!(!st.needs_upload());
+        assert!(st.redirect_placeholder());
+        // 命中分类且文件存在 → 已上传。
+        st = WikiStatus {
+            exists: Some(true),
+            in_category: Some(true),
+            ..Default::default()
+        };
+        assert!(!st.needs_upload());
+        assert!(!st.redirect_placeholder());
+        // 旧元数据（无分类对账）不因未知分类而误判缺失。
+        st = WikiStatus {
+            exists: Some(true),
+            in_category: None,
+            ..Default::default()
+        };
+        assert!(!st.needs_upload());
+    }
+
+    #[test]
+    fn test_load_skilltree_extra_validation() {
+        let dir = std::env::temp_dir().join(format!("skilltree_extra_{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        // 文件不存在不是错误。
+        assert!(load_skilltree_extra(&dir.join("missing.json"))
+            .unwrap()
+            .is_empty());
+
+        let bad_key = dir.join("bad_key.json");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(&bad_key, r#"{ "not_png.gif": { "en": "X", "zh": "Y" } }"#).unwrap();
+        assert!(load_skilltree_extra(&bad_key).is_err());
+
+        let empty_value = dir.join("empty_value.json");
+        std::fs::write(
+            &empty_value,
+            r#"{ "willow_refuel.png": { "en": "", "zh": "加注" } }"#,
+        )
+        .unwrap();
+        assert!(load_skilltree_extra(&empty_value).is_err());
+
+        let ok = dir.join("ok.json");
+        std::fs::write(
+            &ok,
+            r#"{ "willow_refuel.png": { "en": "Refuel", "zh": "加注燃料" } }"#,
+        )
+        .unwrap();
+        assert_eq!(
+            load_skilltree_extra(&ok).unwrap()["willow_refuel.png"],
+            ("Refuel".into(), "加注燃料".into())
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn test_parse_skilltree_titles() {
+        let po = r#"msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "STRINGS.SKILLTREE.WILLOW.WILLOW_FUEL_REFUEL_TITLE"
+msgid "Refuel"
+msgstr "加注燃料"
+
+msgctxt "STRINGS.SKILLTREE.WALTER.WALTER_AMMO_BAG_TITLE"
+msgid "Ammo Hoarder"
+msgstr ""
+
+msgctxt "STRINGS.SKILLTREE.WILLOW.WILLOW_EMPTY_TITLE"
+msgid ""
+msgstr ""
+"#;
+        let titles = parse_skilltree_titles(po).unwrap();
+        assert_eq!(titles.len(), 2);
+        assert_eq!(
+            titles[&("WILLOW".into(), "WILLOW_FUEL_REFUEL".into())],
+            ("Refuel".into(), Some("加注燃料".into()))
+        );
+        // 空 msgstr → 只有英文
+        assert_eq!(
+            titles[&("WALTER".into(), "WALTER_AMMO_BAG".into())],
+            ("Ammo Hoarder".into(), None)
+        );
+        // 路径拆分
+        assert_eq!(
+            split_skilltree_title_path("STRINGS.SKILLTREE.WILLOW.WILLOW_FUEL_REFUEL_TITLE"),
+            Some(("WILLOW".into(), "WILLOW_FUEL_REFUEL".into()))
+        );
+        assert_eq!(split_skilltree_title_path("STRINGS.NAMES.AXE"), None);
+    }
+
+    #[test]
+    fn test_build_meta_skilltree_icons() {
+        let names = NameMaps::default();
+        let crafting = CraftingKeys::default();
+        let mut skilltree = SkilltreeNames::default();
+        skilltree.icon_nodes.insert(
+            "WILLOW_REFUEL".into(),
+            ("WILLOW".into(), "WILLOW_FUEL_REFUEL".into()),
+        );
+        skilltree.titles.insert(
+            ("WILLOW".into(), "WILLOW_FUEL_REFUEL".into()),
+            ("Refuel".into(), Some("加注燃料".into())),
+        );
+        let files = vec![("willow_refuel.png".to_string(), "skilltree".to_string())];
+        let meta = build_meta(
+            "1",
+            files,
+            &names,
+            &crafting,
+            &skilltree,
+            &IconTitleOverrides::default(),
+            &IconMeta::default(),
+        );
+        let e = &meta.icons["willow_refuel.png"];
+        assert_eq!(e.name_en.as_deref(), Some("Refuel"));
+        assert_eq!(e.name_zh.as_deref(), Some("加注燃料"));
+        // 标题 = stem 归一化（wiki 既有命名），与英文名无关
+        assert_eq!(e.title.as_deref(), Some("Willow refuel.png"));
+        assert_eq!(
+            e.group,
+            Some(IconGroup::Skilltree {
+                character: "willow".into()
+            })
+        );
+        assert!(e.uploadable);
+
+        // 无名孤儿图标也有 stem 标题与角色分组（孤儿仅报告不排除）
+        let files = vec![("wx78_weird_orphan.png".to_string(), "skilltree".to_string())];
+        let meta = build_meta(
+            "1",
+            files,
+            &names,
+            &crafting,
+            &SkilltreeNames::default(),
+            &IconTitleOverrides::default(),
+            &IconMeta::default(),
+        );
+        let e = &meta.icons["wx78_weird_orphan.png"];
+        assert_eq!(e.title.as_deref(), Some("Wx78 weird orphan.png"));
+        assert_eq!(e.name_en, None);
+        assert_eq!(
+            e.group,
+            Some(IconGroup::Skilltree {
+                character: "wx78".into()
+            })
+        );
+
+        // 例外表（即使无节点表/PO 命中）提供兜底显示名。
+        let mut names = SkilltreeNames::default();
+        names.extra.insert(
+            "willow_refuel.png".into(),
+            ("Refuel (editorial)".into(), "加注燃料（编辑名）".into()),
+        );
+        assert_eq!(
+            names.display_name("willow_refuel.png"),
+            Some((
+                "Refuel (editorial)".into(),
+                Some("加注燃料（编辑名）".into())
+            ))
+        );
+    }
+
+    #[test]
+    fn test_read_skilltree_names_from_live_tree() {
+        let root = std::env::temp_dir().join(format!("skilltree_names_{}", std::process::id()));
+        std::fs::remove_dir_all(&root).ok();
+        let lang = root.join("data/databundles/scripts/languages");
+        let prefabs = root.join("data/databundles/scripts/prefabs");
+        std::fs::create_dir_all(&lang).unwrap();
+        std::fs::create_dir_all(&prefabs).unwrap();
+        std::fs::write(
+            lang.join("chinese_s.po"),
+            r#"msgctxt "STRINGS.SKILLTREE.WILLOW.WILLOW_FUEL_REFUEL_TITLE"
+msgid "Refuel"
+msgstr "加注燃料"
+"#,
+        )
+        .unwrap();
+        // 节点内联 title 键与节点名不同（真实差异形态）
+        std::fs::write(
+            prefabs.join("skilltree_willow.lua"),
+            r#"
+local function BuildSkillsData(SkillTreeFns)
+    local skills =
+    {
+        willow_refuel = {
+            title = STRINGS.SKILLTREE.WILLOW.WILLOW_FUEL_REFUEL_TITLE,
+            icon = "willow_refuel",
+            pos = {1, 2},
+            group = "fire",
+        },
+        willow_torch_1 = {
+            icon = "willow_torch",
+            pos = {3, 4},
+            group = "torch",
+        },
+    }
+    return SkillTreeFns.CreateSkillTree(skills)
+end
+"#,
+        )
+        .unwrap();
+        let names = read_skilltree_names(&root).unwrap();
+        // 内联 title 键命中（即使与节点名不同）
+        assert_eq!(
+            names.display_name("willow_refuel.png"),
+            Some(("Refuel".into(), Some("加注燃料".into())))
+        );
+        // 无内联 title 的节点回退节点名约定（表中无此键 → 无显示名）
+        assert_eq!(names.display_name("willow_torch.png"), None);
+        assert_eq!(names.character("willow_refuel.png"), "willow");
+        // 例外表优先于节点表
+        let path = root.join("extra.json");
+        std::fs::write(
+            &path,
+            r#"{ "willow_refuel.png": { "en": "Refuel!", "zh": "加注！" } }"#,
+        )
+        .unwrap();
+        let extra = load_skilltree_extra(&path).unwrap();
+        assert_eq!(
+            extra.get("willow_refuel.png"),
+            Some(&("Refuel!".into(), "加注！".into()))
+        );
+        std::fs::remove_dir_all(&root).ok();
     }
 
     #[test]
@@ -1704,24 +2281,57 @@ msgstr ""
         // 语义分组抽检：过滤器 / 制作站（无过滤名的 key 为 None）
         assert_eq!(
             crafting.group("filter_tool.png"),
-            Some(CraftingGroup::Filter {
+            Some(IconGroup::Crafting {
+                section: "filter".into(),
                 key: Some("TOOLS".into())
             })
         );
         assert_eq!(
             crafting.group("station_carpentry.png"),
-            Some(CraftingGroup::Station {
+            Some(IconGroup::Crafting {
+                section: "station".into(),
                 key: Some("CARPENTRY".into())
             })
         );
         assert_eq!(
             crafting.group("station_none.png"),
-            Some(CraftingGroup::Station { key: None })
+            Some(IconGroup::Crafting {
+                section: "station".into(),
+                key: None
+            })
         );
         // 54 个图标全部能判定分组
         for (file, _) in auto.iter().chain(overridden.iter()) {
             assert!(crafting.group(file).is_some(), "{file} 应有语义分组");
         }
+
+        // 技能树图标链路（第三来源）：icon → 节点内联 title 键 → PO
+        let skilltree = read_skilltree_names(&dst_root).unwrap();
+        assert!(!skilltree.icon_nodes.is_empty(), "技能树节点表不应为空");
+        assert_eq!(
+            skilltree.display_name("walter_ammo_bag.png"),
+            Some(("Ammo Hoarder".into(), Some("弹药囤积者".into())))
+        );
+        assert_eq!(
+            skilltree.character("walter_ammo_bag.png"),
+            "walter",
+            "节点表命中角色"
+        );
+        // 分组：节点表命中角色优先，未命中回退文件名前缀
+        assert_eq!(
+            skilltree.character("zzz_orphan.png"),
+            "zzz",
+            "未收录图标按前缀回退"
+        );
+        let overrides = IconTitleOverrides::default();
+        let (title, source) =
+            effective_title("walter_ammo_bag.png", None, &overrides, Some("skilltree"));
+        assert_eq!(
+            title.as_deref(),
+            Some("Walter ammo bag.png"),
+            "技能树标题 = stem 归一化"
+        );
+        assert_eq!(source, Some(TitleSource::Auto));
     }
 
     /// 映射表防污染指纹：`config/icon_title_overrides.json` 的每个条目都必须

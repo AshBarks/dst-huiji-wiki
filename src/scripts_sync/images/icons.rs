@@ -44,6 +44,12 @@ pub const ICON_SOURCES: &[IconSource] = &[
         dir: "crafting_menu_icons",
         label: "制作栏图标",
     },
+    IconSource {
+        id: "skilltree",
+        prefix: "split/skilltree_icons/",
+        dir: "skilltree_icons",
+        label: "技能树图标",
+    },
 ];
 
 /// 按稳定标识查来源。
@@ -327,6 +333,7 @@ mod tests {
                     ("split/inventoryimages/axe.png", "h1"),
                     ("split/crafting_menu_icons/filter_tool.png", "h2"),
                     ("split/crafting_menu_icons/station_carpentry.png", "h3"),
+                    ("split/skilltree_icons/walter_ammo_bag.png", "h4"),
                 ],
             ))
             .unwrap();
@@ -346,6 +353,12 @@ mod tests {
             .find(|e| e.file == "station_carpentry.png")
             .unwrap();
         assert_eq!(station.source, "crafting");
+        let skill = idx
+            .entries
+            .iter()
+            .find(|e| e.file == "walter_ammo_bag.png")
+            .unwrap();
+        assert_eq!(skill.source, "skilltree");
 
         std::fs::remove_dir_all(&ws).ok();
     }

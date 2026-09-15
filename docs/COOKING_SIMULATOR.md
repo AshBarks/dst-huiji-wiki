@@ -50,7 +50,8 @@ deprecated，但 `prefabs/fish.lua` 仍注册，且 wiki 标记为 cooking ingre
   - `and` / `or` 短路并返回操作数；
   - 字段缺失视为 `nil`。
 - 当前所有 raw recipe `weight` 均为 1，因此前端在最高优先级集合上做等概率抽取；
-  JSON 中保留 `weight` 字段，后续权重有调整时再切换为加权抽取。
+  JSON 中保留 `weight` 字段。若未来脚本出现非 1 weight，后端会拒绝编译，提示
+  先实现加权抽取，避免静默算错。
 - 同优先级候选以独立卡片全部显示，本次随机结果高亮；
   生命/饥饿/理智等料理数值暂后置，后续在 recipe payload 上追加 `stats` 字段即可。
 

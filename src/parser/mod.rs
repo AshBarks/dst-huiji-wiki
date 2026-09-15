@@ -1,5 +1,6 @@
 pub mod anim_override;
 pub mod clothing_overrides;
+pub mod cooking;
 pub mod crafting;
 pub mod lua;
 pub mod po;
@@ -14,6 +15,7 @@ pub use anim_override::{
     SymbolRemapEntry, SymbolRemapIndex,
 };
 pub use clothing_overrides::{parse_clothing_overrides, ClothingEntry, ResolvedClothingOverride};
+pub use cooking::{compile_from_sources, CookingSources};
 pub use crafting::{parse_crafting_filter_lists, parse_prototyper_trees, parse_tech_constants};
 pub use lua::{
     extract_field_assignment, extract_field_assignment_range, extract_variable,

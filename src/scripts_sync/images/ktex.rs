@@ -277,7 +277,8 @@ fn raw_rows(data: &[u8], m: &MipmapMeta, compression: Compression) -> Result<Vec
         if channels == 4 {
             out.extend_from_slice(&line[..4 * w]);
         } else {
-            for px in line[..3 * w].chunks_exact(3) {
+            let (pixels, _) = line[..3 * w].as_chunks::<3>();
+            for px in pixels {
                 out.extend_from_slice(&[px[0], px[1], px[2], 255]);
             }
         }

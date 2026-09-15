@@ -1,4 +1,6 @@
 pub mod cooking;
+pub mod cooking_assets;
+pub mod cooking_eval;
 pub mod dataset;
 pub mod job_spec;
 pub mod prefab_overrides;

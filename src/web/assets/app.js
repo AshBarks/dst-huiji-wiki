@@ -4,6 +4,7 @@
 import { $, esc, loadMeta, routeTimerRef } from "./js/util.js";
 import { pageDashboard } from "./js/pages/dashboard.js";
 import { pageRecipes } from "./js/pages/recipes.js";
+import { pageCooking } from "./js/pages/cooking.js";
 import { pageTranslations } from "./js/pages/translations.js";
 import { pageConstants } from "./js/pages/constants.js";
 import { pageAnims } from "./js/pages/anims.js";
@@ -19,6 +20,7 @@ const routes = [
   ["", "概览", pageDashboard],
   ["jobs", "任务", pageJobs],
   ["recipes", "配方/材料", pageRecipes],
+  ["cooking", "烹饪模拟", pageCooking],
   ["translations", "翻译", pageTranslations],
   ["skills", "技能树", pageSkills],
   ["inventory-icons", "物品栏图标", pageInventoryIcons],

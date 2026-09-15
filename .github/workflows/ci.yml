@@ -71,3 +71,18 @@ jobs:
 
       - name: Build
         run: cargo build --verbose
+
+  web-test:
+    name: Web evaluator tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run cooking evaluator tests
+        run: node --test src/web/assets/js/cooking_eval.test.mjs

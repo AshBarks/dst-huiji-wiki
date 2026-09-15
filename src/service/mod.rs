@@ -823,7 +823,7 @@ mod tests {
         let jobs = JobKind::all_variants();
         assert_eq!(
             jobs.len(),
-            33,
+            34,
             "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
         );
         let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();

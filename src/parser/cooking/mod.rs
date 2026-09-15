@@ -61,10 +61,27 @@ pub fn compile_from_sources(sources: &CookingSources<'_>) -> Result<CookingData>
         recipes.insert(recipe.name.clone(), recipe);
     }
     for recipe in warly {
+        if cookpot_names.contains(&recipe.name) {
+            // The shared payload cannot represent a name whose base-cookpot
+            // test differs from its portable-cookpot test. Fail loudly instead
+            // of silently picking one implementation. No such collision exists
+            // in current DST data.
+            return Err(Error::ParseError(format!(
+                "cooking compiler: Warly recipe `{}` collides with a base recipe; \
+                 per-cooker recipe variants are not supported",
+                recipe.name
+            )));
+        }
         portable_names.insert(recipe.name.clone());
-        // `cooking.lua` loads Warly recipes after preparedfoods/nonfoods; if a
-        // product name ever collides, the later entry wins there too.
         recipes.insert(recipe.name.clone(), recipe);
+    }
+
+    if let Some((name, _)) = recipes.iter().find(|(_, recipe)| recipe.weight != 1.0) {
+        return Err(Error::ParseError(format!(
+            "cooking compiler: recipe `{}` has weight != 1; weighted draws are not \
+             implemented in the current frontend",
+            name
+        )));
     }
 
     let mut cookers: BTreeMap<String, Vec<String>> = BTreeMap::new();
@@ -263,5 +280,46 @@ return items
                 .map(|v| v.trim().trim_matches('"').to_string())
                 .filter(|v| !v.is_empty())
         })
+    }
+    #[test]
+    fn rejects_warly_name_collision_and_non_unit_weight() {
+        let base = r#"
+local foods = { same = { test = function() return true end } }
+return foods
+"#;
+        let warly = r#"
+local foods = { same = { test = function() return true end } }
+return foods
+"#;
+        let collision = CookingSources {
+            cooking: COOKING,
+            oceanfish: OCEANFISH,
+            scrapbook_prefabs: SCRAPBOOK,
+            preparedfoods: base,
+            preparedfoods_warly: warly,
+            preparednonfoods: PREPARED_NONFOODS,
+        };
+        assert!(compile_from_sources(&collision).is_err());
+
+        let weighted = CookingSources {
+            preparedfoods: r#"
+local foods = { weighted = { test = function() return true end, weight = 2 } }
+return foods
+"#,
+            preparedfoods_warly: PREPARED_WARLY,
+            ..collision_inputs()
+        };
+        assert!(compile_from_sources(&weighted).is_err());
+    }
+
+    fn collision_inputs<'a>() -> CookingSources<'a> {
+        CookingSources {
+            cooking: COOKING,
+            oceanfish: OCEANFISH,
+            scrapbook_prefabs: SCRAPBOOK,
+            preparedfoods: PREPARED,
+            preparedfoods_warly: PREPARED_WARLY,
+            preparednonfoods: PREPARED_NONFOODS,
+        }
     }
 }

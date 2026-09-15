@@ -57,7 +57,7 @@ export function evalExpr(expr, env) {
     case "str":
       return String(expr[1]);
     case "var":
-      return env.vars[expr[1]];
+      return expr[1] === "cooker" ? env.cooker : env.vars[expr[1]];
     case "field":
       return readField(evalExpr(expr[1], env), String(expr[2]));
     case "not":

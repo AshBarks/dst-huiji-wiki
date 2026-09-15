@@ -77,6 +77,11 @@ test("evaluates the real recipe AST shape with short-circuit semantics", () => {
   assert.equal(truthy(evalExpr(ast, withMeat)), false);
 });
 
+test("cooker exposes the selected cooker name to future test expressions", () => {
+  assert.equal(evalExpr(["var", "cooker"], { cooker: "cookpot", vars: {} }), "cookpot");
+  assert.equal(evalExpr(["eq", ["var", "cooker"], ["str", "cookpot"]], { cooker: "cookpot", vars: {} }), true);
+});
+
 test("missing fields are nil; {x or 0} arithmetic works", () => {
   const env = buildEnv([{ key: "berries", tags: { fruit: 0.5 } }], "cookpot");
   const missing = ["or", ["field", ["var", "names"], "kelp"], ["num", 0]];

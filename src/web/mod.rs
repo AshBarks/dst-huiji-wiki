@@ -44,6 +44,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
         .route("/data/ingredients", get(api_data::ingredients))
         .route("/data/po/entries", get(api_data::po_entries))
         .route("/data/constants", get(api_data::constants))
+        .route("/data/cooking", get(api_data::cooking))
         .route("/data/inventoryicons", get(api_data::inventoryicons))
         .route(
             "/data/inventoryicons/versions",

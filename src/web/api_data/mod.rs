@@ -5,11 +5,13 @@
 
 mod anim;
 mod assets;
+mod cooking;
 mod dataset;
 mod icons;
 
 pub use anim::*;
 pub use assets::*;
+pub use cooking::*;
 pub use dataset::*;
 pub use icons::*;
 

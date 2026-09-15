@@ -3,6 +3,7 @@
 use crate::web::jobs::JobManager;
 use dst_huiji_wiki::scripts_sync::images::icons::{build_icons_index, IconsIndex};
 use dst_huiji_wiki::scripts_sync::images::meta::{self as icon_meta, IconMeta};
+use dst_huiji_wiki::service::cooking::CookingDataCache;
 use dst_huiji_wiki::service::dataset::{DatasetCache, SkillStringsData};
 use std::collections::{HashMap, VecDeque};
 use std::path::{Path, PathBuf};
@@ -38,6 +39,7 @@ struct DiffCache {
 pub struct AppState {
     pub jobs: JobManager,
     pub datasets: Arc<DatasetCache>,
+    pub cooking: Arc<CookingDataCache>,
     /// Cached SKILLTREE.* zh strings per snapshot selection.
     skill_strings: Mutex<HashMap<Option<String>, Arc<SkillStringsData>>>,
     /// Snapshot diff results keyed by `kind|from|to`.
@@ -106,6 +108,7 @@ impl AppState {
         Self {
             jobs: JobManager::new(),
             datasets: Arc::new(DatasetCache::new()),
+            cooking: Arc::new(CookingDataCache::new()),
             skill_strings: Mutex::new(HashMap::new()),
             diff_cache: Mutex::new(DiffCache::default()),
             icons_index: Mutex::new(None),
@@ -236,6 +239,7 @@ impl AppState {
     /// （scripts-sync、images-sync 等）可能改写其底层数据，这里统一清空。
     /// `icons_index` / `icon_meta` 自带签名键，无需处理。
     pub async fn invalidate_job_caches(&self) {
+        self.cooking.invalidate().await;
         self.skill_strings.lock().await.clear();
         let mut cache = self.diff_cache.lock().await;
         cache.map.clear();

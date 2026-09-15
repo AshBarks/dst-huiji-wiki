@@ -1,3 +1,4 @@
+pub mod cooking;
 pub mod dataset;
 pub mod job_spec;
 pub mod prefab_overrides;

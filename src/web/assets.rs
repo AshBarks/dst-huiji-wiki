@@ -10,10 +10,7 @@ pub const STYLE_CSS: &str = include_str!("assets/style.css");
 
 pub const JS_MODULES: &[(&str, &str)] = &[
     ("util.js", include_str!("assets/js/util.js")),
-    (
-        "cooking_eval.js",
-        include_str!("assets/js/cooking_eval.js"),
-    ),
+    ("cooking_eval.js", include_str!("assets/js/cooking_eval.js")),
     ("jobs.js", include_str!("assets/js/jobs.js")),
     ("skills.js", include_str!("assets/js/skills.js")),
     ("icon_shared.js", include_str!("assets/js/icon_shared.js")),

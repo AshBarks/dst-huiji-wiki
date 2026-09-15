@@ -680,8 +680,8 @@ cargo run --release -- cooking-game-export --output ../dst-cooking-game/assets -
 cargo run --release -- cooking-game-export --snapshot scripts_2026xxxx --output out/cooking-game
 ```
 
-输出包含 `manifest.json`（SHA-256 文件清单）、`data/cooking.json`、`images/*.png`
-和 `default-config.toml`。缺少图标时默认报错；确认可容忍时可加
+输出包含 `manifest.json`（SHA-256 文件清单）、`data/cooking.json`、`images/*.png`、
+`ui/*.png`（两口锅的 inventoryimages 图标 + Warly 角色头像）和 `default-config.toml`。缺少图标时默认报错；确认可容忍时可加
 `--allow-missing-icons`。
 
 #### `serve` - 启动 WebUI

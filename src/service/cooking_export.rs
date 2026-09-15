@@ -20,6 +20,17 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 pub const BUNDLE_SCHEMA_VERSION: u32 = 1;
+
+/// UI assets copied into the bundle, independent of the item icon set.
+/// `(bundle_relative_path, path_under_current/split/)`
+pub const UI_ASSETS: &[(&str, &str)] = &[
+    ("ui/cookpot.png", "inventoryimages/cookpot.png"),
+    (
+        "ui/portablecookpot.png",
+        "inventoryimages/portablecookpot_item.png",
+    ),
+    ("ui/warly.png", "saveslot_portraits/warly.png"),
+];
 pub const DEFAULT_CONFIG_TOML: &str = r#"# dst-cooking-game default configuration.
 n_ingredients = 9
 time_limit_secs = 30
@@ -172,7 +183,24 @@ pub fn run_cooking_export(
         Default::default()
     });
     let icon_resolver = IconResolver::from_index(&icons_index, &icon_meta);
-    let image_source = ktools.join("current/split/inventoryimages");
+    let split_root = ktools.join("current/split");
+    let image_source = split_root.join("inventoryimages");
+    let ui_assets: Vec<(String, PathBuf)> = UI_ASSETS
+        .iter()
+        .map(|(rel, src)| {
+            let path = split_root.join(src);
+            if path.is_file() {
+                Ok(((*rel).to_string(), path))
+            } else {
+                Err(Error::Config(format!(
+                    "缺少小游戏 UI 素材：{}（来自 {}/{}）",
+                    rel,
+                    ktools.display(),
+                    src
+                )))
+            }
+        })
+        .collect::<Result<Vec<_>>>()?;
 
     // --- stable IDs -----------------------------------------------------------------
     let mut ingredient_key_to_idx: HashMap<String, usize> = HashMap::new();
@@ -306,6 +334,11 @@ pub fn run_cooking_export(
     }
     std::fs::create_dir_all(out_dir.join("data"))?;
     std::fs::create_dir_all(out_dir.join("images"))?;
+    std::fs::create_dir_all(out_dir.join("ui"))?;
+
+    for (rel, src) in &ui_assets {
+        std::fs::copy(src, out_dir.join(rel))?;
+    }
 
     let mut image_files = BTreeSet::new();
     for ingredient in &bundle.ingredients {
@@ -339,6 +372,7 @@ pub fn run_cooking_export(
             size: meta.len(),
         });
     }
+    let image_count = image_files.len() + ui_assets.len();
     let manifest = BundleManifest {
         bundle_schema_version: BUNDLE_SCHEMA_VERSION,
         cooking_schema_version: data.schema_version,
@@ -351,7 +385,7 @@ pub fn run_cooking_export(
         counts: BundleCounts {
             ingredients: bundle.ingredients.len(),
             recipes: bundle.recipes.len(),
-            images: image_files.len(),
+            images: image_count,
             examples: example_count,
         },
         missing_icons: missing_icons.clone(),
@@ -384,7 +418,7 @@ pub fn run_cooking_export(
         counts: BundleCounts {
             ingredients: bundle.ingredients.len(),
             recipes: bundle.recipes.len(),
-            images: image_files.len(),
+            images: image_count,
             examples: example_count,
         },
         missing_icons,

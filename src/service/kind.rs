@@ -439,6 +439,20 @@ pub enum JobKind {
         #[serde(default)]
         summary: Option<String>,
     },
+    /// 导出独立烹饪小游戏数据包（JSON + 图片 + example_combo）。
+    CookingGameExport {
+        /// 输出目录（缺省 `output/cooking-game-bundle`）。
+        #[serde(default)]
+        output: Option<String>,
+        #[serde(default)]
+        snapshot: Option<String>,
+        /// 同时生成同名 `.zip`。
+        #[serde(default)]
+        zip: bool,
+        /// 缺少图标时仍继续导出（manifest 记录 warning 列表）。
+        #[serde(default)]
+        allow_missing_icons: bool,
+    },
 }
 
 fn default_only_missing() -> bool {
@@ -539,6 +553,7 @@ impl JobKind {
             JobKind::KnowledgeScanWiki { .. } => &super::job_spec::JOB_SPECS[30],
             JobKind::MaintainWikitext { .. } => &super::job_spec::JOB_SPECS[31],
             JobKind::CreateRedirect { .. } => &super::job_spec::JOB_SPECS[32],
+            JobKind::CookingGameExport { .. } => &super::job_spec::JOB_SPECS[33],
         }
     }
 
@@ -831,6 +846,12 @@ impl JobKind {
                 from: String::new(),
                 to: String::new(),
                 summary: None,
+            },
+            JobKind::CookingGameExport {
+                output: None,
+                snapshot: None,
+                zip: false,
+                allow_missing_icons: false,
             },
         ]
     }

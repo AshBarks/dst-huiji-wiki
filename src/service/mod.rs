@@ -1,6 +1,7 @@
 pub mod cooking;
 pub mod cooking_assets;
 pub mod cooking_eval;
+pub mod cooking_export;
 pub mod dataset;
 pub mod job_spec;
 pub mod prefab_overrides;
@@ -352,6 +353,20 @@ async fn execute_job_inner(
         JobKind::CreateRedirect { from, to, summary } => {
             redirect::run_create_redirect(from, to, summary.as_deref(), reporter, mode).await
         }
+        JobKind::CookingGameExport {
+            output,
+            snapshot,
+            zip,
+            allow_missing_icons,
+        } => cooking_export::run_cooking_export(
+            &cooking_export::CookingGameExportParams {
+                output: output.clone(),
+                snapshot: snapshot.clone(),
+                zip: *zip,
+                allow_missing_icons: *allow_missing_icons,
+            },
+            reporter,
+        ),
         JobKind::AnimSync {
             force,
             dry_run,

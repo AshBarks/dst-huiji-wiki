@@ -116,6 +116,15 @@ const JOB_DEFS = {
       { k: "out", label: "输出 JSON（可选，默认 output/skin-index.json）" },
     ],
   },
+  cooking_game_export: {
+    label: "导出烹饪小游戏数据包",
+    fields: [
+      { k: "output", label: "输出目录（可选，默认 output/cooking-game-bundle）" },
+      { k: "snapshot", label: "脚本快照目录名（可选，默认最新）" },
+      { k: "zip", type: "check", label: "同时生成同名 .zip" },
+      { k: "allow_missing_icons", type: "check", label: "缺少图标时继续（默认报错）" },
+    ],
+  },
 };
 
 export async function pageJobs(main) {

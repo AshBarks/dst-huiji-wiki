@@ -1273,6 +1273,42 @@ pub static JOB_SPECS: &[JobSpec] = &[
             },
         ],
     },
+    JobSpec {
+        name: "cooking-game-export",
+        label: "导出烹饪小游戏数据包",
+        wiki_access: WikiAccess::None,
+        resources: &["out"],
+        params: &[
+            ParamSpec {
+                key: "output",
+                kind: ParamKind::OptPath,
+                default: ParamDefault::None,
+                required: false,
+                help: "输出目录（缺省 output/cooking-game-bundle）",
+            },
+            ParamSpec {
+                key: "snapshot",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "脚本快照目录名（可选，缺省最新）",
+            },
+            ParamSpec {
+                key: "zip",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "同时生成同名 .zip",
+            },
+            ParamSpec {
+                key: "allow_missing_icons",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "缺少图标时继续导出（默认报错）",
+            },
+        ],
+    },
 ];
 
 impl JobSpec {
@@ -1300,7 +1336,7 @@ mod tests {
     /// 契约：spec 表与 JobKind 变体一一对应（数量、名称、serde tag）。
     #[test]
     fn contract_spec_table_covers_every_variant() {
-        assert_eq!(JOB_SPECS.len(), 33);
+        assert_eq!(JOB_SPECS.len(), 34);
         let mut names: Vec<&str> = JOB_SPECS.iter().map(|s| s.name).collect();
         names.sort_unstable();
         let count = names.len();

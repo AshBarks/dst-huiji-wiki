@@ -420,6 +420,17 @@ static CLI_EXT: &[CliExt] = &[
         report_json: true,
         local_dry_run: false,
     },
+    CliExt {
+        name: "cooking-game-export",
+        about: "把料理模拟数据、图标与 example_combo 打包给独立烹饪小游戏项目",
+        positionals: &[],
+        shorts: &[("output", 'o')],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
 ];
 
 fn ext(name: &str) -> &'static CliExt {
@@ -433,7 +444,7 @@ fn ext(name: &str) -> &'static CliExt {
 // clap 命令构建
 // ---------------------------------------------------------------------------
 
-/// 构建完整 CLI（顶层 + serve + 33 个 job 子命令）。
+/// 构建完整 CLI（顶层 + serve + 34 个 job 子命令）。
 pub fn command() -> Command {
     let mut top = Command::new("dst-huiji-wiki")
         .about("饥荒联机版维基维护工具")
@@ -945,6 +956,12 @@ fn job_from_matches(
             from: val(m, "from"),
             to: val(m, "to"),
             summary: opt_val(m, "summary"),
+        },
+        "cooking-game-export" => JobKind::CookingGameExport {
+            output: opt_val(m, "output"),
+            snapshot: opt_val(m, "snapshot"),
+            zip: flag(m, "zip"),
+            allow_missing_icons: flag(m, "allow_missing_icons"),
         },
         other => unreachable!("未实现构造臂的 job: {other}"),
     })

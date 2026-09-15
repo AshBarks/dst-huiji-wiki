@@ -24,6 +24,9 @@ pub const ICON_EXCEPTIONS: &[(&str, &str)] = &[
     ("tomato_cooked", "quagmire_tomato_cooked.png"),
 ];
 
+/// Upper-snake `STRINGS.NAMES.*` key -> (en, zh).
+pub type NameIndex = HashMap<String, (Option<String>, Option<String>)>;
+
 /// Pre-indexed inventory icons for `resolve()`.
 #[derive(Debug, Default)]
 pub struct IconResolver {
@@ -110,9 +113,7 @@ pub fn po_name_index(
 }
 
 /// Load the same index for local-only commands (no wiki client / credentials).
-pub fn load_po_name_index(
-    snapshot: Option<&str>,
-) -> Result<HashMap<String, (Option<String>, Option<String>)>> {
+pub fn load_po_name_index(snapshot: Option<&str>) -> Result<NameIndex> {
     let source = GameSource::from_env(snapshot.map(str::to_string))?;
     let content = source.read("languages/chinese_s.po")?;
     let po = PoParser::parse(&content)?;
@@ -129,10 +130,7 @@ pub fn load_po_name_index(
 }
 
 /// Resolve an upper-snake `STRINGS.NAMES.*` key through a name index.
-pub fn names_for(
-    index: &HashMap<String, (Option<String>, Option<String>)>,
-    prefab: &str,
-) -> (Option<String>, Option<String>) {
+pub fn names_for(index: &NameIndex, prefab: &str) -> (Option<String>, Option<String>) {
     index
         .get(&prefab.to_ascii_uppercase())
         .cloned()

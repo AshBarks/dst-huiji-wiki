@@ -62,8 +62,3 @@ async fn enrich(state: &AppState, data: &mut CookingData, snapshot: Option<Strin
         recipe.name_zh = zh;
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-}

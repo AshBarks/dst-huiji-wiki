@@ -664,6 +664,26 @@ cargo run --release -- page-assist [OPTIONS]
 
 ---
 
+#### `cooking-game-export` - 导出独立烹饪小游戏数据包
+
+把烹饪模拟数据、227 张引用图标、manifest 与每个食谱的已验证 `example_combo`
+导出为独立目录，供 `dst-cooking-game` 项目直接嵌入使用。
+
+```bash
+# 导出目录（默认 output/cooking-game-bundle）
+cargo run --release -- cooking-game-export --output ../dst-cooking-game/assets
+
+# 同时生成同名 zip
+cargo run --release -- cooking-game-export --output ../dst-cooking-game/assets --zip
+
+# 可指定脚本快照
+cargo run --release -- cooking-game-export --snapshot scripts_2026xxxx --output out/cooking-game
+```
+
+输出包含 `manifest.json`（SHA-256 文件清单）、`data/cooking.json`、`images/*.png`
+和 `default-config.toml`。缺少图标时默认报错；确认可容忍时可加
+`--allow-missing-icons`。
+
 #### `serve` - 启动 WebUI
 
 见上文 [WebUI（网页控制台）](#webui网页控制台)。

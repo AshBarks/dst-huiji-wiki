@@ -684,6 +684,12 @@ cargo run --release -- cooking-game-export --snapshot scripts_2026xxxx --output 
 `ui/*.png`（两口锅的 inventoryimages 图标 + Warly 角色头像）和 `default-config.toml`。缺少图标时默认报错；确认可容忍时可加
 `--allow-missing-icons`。
 
+`data/cooking.json` schema v2 起，每个食谱附带从 `test` AST 自动渲染的两列描述
+（语义对齐 wiki 烹饪料理描述表）：`desc_attrs`（属性要求，如「肉度 > 1，蛋度 > 1，蔬菜度 = 0」）
+与 `desc_special`（特殊要求，如「蝴蝶翅膀/月蛾翅膀 ≥ 1」），空串表示无该列要求。
+食材属性中文对照表在 `src/service/cooking_desc.rs`；游戏更新引入新 tag、
+未知食材 key 或无法渲染的表达式形态时导出直接报错，需显式补表而非静默降级。
+
 #### `serve` - 启动 WebUI
 
 见上文 [WebUI（网页控制台）](#webui网页控制台)。

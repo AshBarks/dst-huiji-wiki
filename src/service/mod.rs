@@ -1,5 +1,6 @@
 pub mod cooking;
 pub mod cooking_assets;
+pub mod cooking_desc;
 pub mod cooking_eval;
 pub mod cooking_export;
 pub mod dataset;

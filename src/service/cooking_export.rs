@@ -13,13 +13,14 @@ use crate::scripts_sync::images::icons::build_icons_index;
 use crate::scripts_sync::images::meta as icon_meta;
 use crate::service::cooking::load_cooking_data;
 use crate::service::cooking_assets::{load_po_name_index, names_for, IconResolver};
+use crate::service::cooking_desc::describe_recipe;
 use crate::service::cooking_eval::{collect_field_refs, eval_truthy, EvalEnv};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-pub const BUNDLE_SCHEMA_VERSION: u32 = 1;
+pub const BUNDLE_SCHEMA_VERSION: u32 = 2;
 
 /// UI assets copied into the bundle, independent of the item icon set.
 /// `(bundle_relative_path, path_under_current/split/)`
@@ -80,6 +81,10 @@ struct BundleRecipe {
     priority: f64,
     weight: f64,
     test: serde_json::Value,
+    /// 属性要求（wiki 料理描述表同列语义），tag 约束以「，」连接；无约束时为空串。
+    desc_attrs: String,
+    /// 特殊要求（具体食材计数），以「；」连接；无要求时为空串。
+    desc_special: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     name_en: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,12 +237,27 @@ pub fn run_cooking_export(
 
     let mut recipe_name_to_idx: HashMap<String, usize> = HashMap::new();
     let mut bundle_recipes = Vec::with_capacity(data.recipes.len());
+    // 描述渲染的名字表：别名 key 与 prefab 都指向显示名（中文优先，缺失回退 prefab）。
+    let mut desc_names: HashMap<String, String> = HashMap::new();
+    for ingredient in &bundle_ingredients {
+        let display = ingredient
+            .name_zh
+            .clone()
+            .unwrap_or_else(|| ingredient.prefab.clone());
+        desc_names
+            .entry(ingredient.key.clone())
+            .or_insert_with(|| display.clone());
+        desc_names
+            .entry(ingredient.prefab.clone())
+            .or_insert_with(|| display.clone());
+    }
     for (idx, recipe) in data.recipes.values().enumerate() {
         let (name_en, name_zh) = names_for(&names, &recipe.name);
         let icon = icon_resolver.resolve(&recipe.name, name_en.as_deref());
         if icon.is_none() {
             missing_icons.push(recipe.name.clone());
         }
+        let desc = describe_recipe(&recipe.name, &recipe.test, &desc_names)?;
         recipe_name_to_idx.insert(recipe.name.clone(), idx);
         bundle_recipes.push(BundleRecipe {
             id: idx as u32,
@@ -245,6 +265,8 @@ pub fn run_cooking_export(
             priority: recipe.priority,
             weight: recipe.weight,
             test: recipe.test.clone(),
+            desc_attrs: desc.attrs,
+            desc_special: desc.specials,
             name_en,
             name_zh,
             icon: icon.filter(|file| image_source.join(file).is_file()),

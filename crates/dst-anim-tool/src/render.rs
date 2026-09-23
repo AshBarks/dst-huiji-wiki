@@ -1462,7 +1462,13 @@ mod tests {
             &HashSet::new(),
         )
         .unwrap();
-        let has_opaque = rendered.image.as_raw().chunks_exact(4).any(|px| px[3] > 0);
+        let has_opaque = rendered
+            .image
+            .as_raw()
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .any(|px| px[3] > 0);
         assert!(
             has_opaque,
             "rendered image should have non-transparent pixels"
@@ -1926,7 +1932,7 @@ mod tests {
         ];
         let atlas_img = {
             let mut img = image::RgbaImage::new(16, 16);
-            for (i, px) in img.as_mut().chunks_exact_mut(4).enumerate() {
+            for (i, px) in img.as_mut().as_chunks_mut::<4>().0.iter_mut().enumerate() {
                 px.copy_from_slice(&[i as u8, 0, 0, 255]);
             }
             img

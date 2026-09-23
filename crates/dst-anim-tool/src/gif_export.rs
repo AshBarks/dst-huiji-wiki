@@ -132,7 +132,7 @@ impl QuantizeContext {
 
         let mut indices = Vec::with_capacity(rgba.len() / 4);
 
-        for chunk in rgba.chunks_exact(4) {
+        for chunk in rgba.as_chunks::<4>().0 {
             let a = chunk[3];
             if a < TRANSPARENT_ALPHA_THRESHOLD {
                 indices.push(0);

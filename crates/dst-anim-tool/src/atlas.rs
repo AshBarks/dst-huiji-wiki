@@ -10,7 +10,7 @@ fn calc_uv_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
     let mut max_u = f32::NEG_INFINITY;
     let mut min_v = f32::INFINITY;
     let mut max_v = f32::NEG_INFINITY;
-    for chunk in verts.chunks_exact(6) {
+    for chunk in verts.as_chunks::<6>().0 {
         min_u = min_u.min(chunk[0].u);
         max_u = max_u.max(chunk[1].u);
         max_v = max_v.max(chunk[0].v);
@@ -24,7 +24,7 @@ fn calc_xy_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
     let mut max_x = f32::NEG_INFINITY;
     let mut min_y = f32::INFINITY;
     let mut max_y = f32::NEG_INFINITY;
-    for chunk in verts.chunks_exact(6) {
+    for chunk in verts.as_chunks::<6>().0 {
         min_x = min_x.min(chunk[0].x);
         max_x = max_x.max(chunk[1].x);
         min_y = min_y.min(chunk[0].y);
@@ -78,7 +78,7 @@ fn compute_spans(img: &image::RgbaImage) -> SpriteSpans {
         let mut start = None;
         let mut end = 0usize;
         let mut opaque = true;
-        for (x, px) in row.chunks_exact(4).enumerate() {
+        for (x, px) in row.as_chunks::<4>().0.iter().enumerate() {
             if px[3] != 0 {
                 if start.is_none() {
                     start = Some(x);

@@ -8,8 +8,8 @@
 //! - `winter_ornaments.lua`：`MakeOrnament(id, base, ...)` 生成
 //!   `winter_ornament_<id>`，重定向到 `base`，含 `"plain"..i` 数值循环。
 
+use super::string_literal_text;
 use crate::error::{Error, Result};
-use crate::scripts_sync::anim::index::string_literal_text;
 use full_moon::ast::{self, Ast};
 use std::collections::{BTreeSet, HashMap};
 

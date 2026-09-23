@@ -8,6 +8,7 @@
 
 use std::collections::HashSet;
 
+use crate::parser::string_literal_text;
 use full_moon::ast;
 use full_moon::node::Node;
 
@@ -17,19 +18,6 @@ use super::symbols::{
 };
 
 /// Extracts the plain text of a string literal expression (quotes stripped).
-fn string_literal_text(raw: &str) -> String {
-    let t = raw.trim();
-    for q in ['"', '\''] {
-        if let Some(inner) = t.strip_prefix(q).and_then(|s| s.strip_suffix(q)) {
-            return inner.to_string();
-        }
-        if let Some(inner) = t.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
-            return inner.trim().to_string();
-        }
-    }
-    t.to_string()
-}
-
 fn classify_str_arg(expr: &ast::Expression) -> Option<String> {
     match expr {
         ast::Expression::String(s) => Some(string_literal_text(&s.to_string())),

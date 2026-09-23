@@ -10,6 +10,7 @@
 
 use crate::error::{Error, Result};
 use crate::models::CookingIngredient;
+use crate::parser::string_literal_text;
 use full_moon::ast::{self, Ast};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -497,19 +498,6 @@ fn short_call(call: &ast::FunctionCall) -> String {
     } else {
         text
     }
-}
-
-fn string_literal_text(raw: &str) -> String {
-    let text = raw.trim();
-    for quote in ['"', '\''] {
-        if let Some(inner) = text.strip_prefix(quote).and_then(|s| s.strip_suffix(quote)) {
-            return inner.to_string();
-        }
-    }
-    if let Some(inner) = text.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
-        return inner.trim().to_string();
-    }
-    text.to_string()
 }
 
 #[cfg(test)]

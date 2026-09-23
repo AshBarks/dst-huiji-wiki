@@ -9,6 +9,7 @@
 use super::expr::translate_test_function;
 use crate::error::{Error, Result};
 use crate::models::CookingRecipe;
+use crate::parser::string_literal_text;
 use full_moon::ast::{self, Ast};
 
 /// Parse one recipe source file into cooked recipes. `source_name` is stored
@@ -159,19 +160,6 @@ fn eval_const_f64(expr: &ast::Expression, recipe: &str, field: &str) -> Result<f
             expr.to_string().trim()
         ))),
     }
-}
-
-fn string_literal_text(raw: &str) -> String {
-    let text = raw.trim();
-    for quote in ['"', '\''] {
-        if let Some(inner) = text.strip_prefix(quote).and_then(|s| s.strip_suffix(quote)) {
-            return inner.to_string();
-        }
-    }
-    if let Some(inner) = text.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
-        return inner.trim().to_string();
-    }
-    text.to_string()
 }
 
 #[cfg(test)]

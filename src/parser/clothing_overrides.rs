@@ -17,6 +17,7 @@
 //! symbols = symbol_overrides ∪ keys(by_character 选中的表)；src = 形态表
 //! [sym] or sym，再被 by_character 表[sym] or src 覆盖。
 
+use super::string_literal_text;
 use crate::error::{Error, Result};
 use full_moon::ast;
 use full_moon::tokenizer::TokenReference;
@@ -249,19 +250,6 @@ fn string_expr(expr: &ast::Expression) -> Option<String> {
         ast::Expression::String(token) => Some(string_literal_text(&token.to_string())),
         _ => None,
     }
-}
-
-fn string_literal_text(raw: &str) -> String {
-    let t = raw.trim();
-    for q in ['"', '\''] {
-        if let Some(inner) = t.strip_prefix(q).and_then(|s| s.strip_suffix(q)) {
-            return inner.to_string();
-        }
-        if let Some(inner) = t.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
-            return inner.trim().to_string();
-        }
-    }
-    t.to_string()
 }
 
 #[cfg(test)]

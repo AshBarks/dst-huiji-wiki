@@ -2,6 +2,7 @@
 //! （自 index.rs 拆分；类型定义见 [`super`]）。
 
 use super::*;
+use crate::parser::string_literal_text;
 pub(crate) struct Scanner<'s> {
     source: &'s str,
     /// Local table variable name -> Asset entries collected from a literal
@@ -1223,19 +1224,6 @@ pub(crate) fn line_of(source: &str, byte: usize) -> u32 {
 }
 
 /// Extract the text of a Lua string literal (`"x"`, `'x'`, `[[x]]`).
-pub(crate) fn string_literal_text(raw: &str) -> String {
-    let t = raw.trim();
-    for q in ['"', '\''] {
-        if let Some(inner) = t.strip_prefix(q).and_then(|s| s.strip_suffix(q)) {
-            return inner.to_string();
-        }
-        if let Some(inner) = t.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
-            return inner.trim().to_string();
-        }
-    }
-    t.to_string()
-}
-
 pub(crate) fn normalize_asset_path(kind: &str, raw: &str) -> String {
     let mut p = raw.trim().to_string();
     if let Some(stripped) = p.strip_prefix("anim/") {

@@ -291,6 +291,21 @@ pub fn extract_field_assignment_range(
     LuaParser::locate_field_assignment_range(source, start_field_path, end_field_path)
 }
 
+/// 把 full_moon 字符串 token 的原始文本还原为字符串值：
+/// 去首尾空白，剥掉 `"..."` / `'...'` / `[[...]]`，长括号内容额外 trim。
+pub(crate) fn string_literal_text(raw: &str) -> String {
+    let text = raw.trim();
+    for quote in ['"', '\''] {
+        if let Some(inner) = text.strip_prefix(quote).and_then(|s| s.strip_suffix(quote)) {
+            return inner.to_string();
+        }
+    }
+    if let Some(inner) = text.strip_prefix("[[").and_then(|s| s.strip_suffix("]]")) {
+        return inner.trim().to_string();
+    }
+    text.to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

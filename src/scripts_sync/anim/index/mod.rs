@@ -518,7 +518,8 @@ pub(crate) fn collect_lua_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()
 
 mod scanner;
 
-pub(crate) use scanner::{line_of, string_literal_text};
+pub(crate) use crate::parser::string_literal_text;
+pub(crate) use scanner::line_of;
 use scanner::{load_anim_content, merge_content, sort_dedup_content, Scanner};
 #[cfg(test)]
 mod tests {

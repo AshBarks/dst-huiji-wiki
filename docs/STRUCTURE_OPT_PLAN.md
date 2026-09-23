@@ -185,3 +185,23 @@ P3 收尾后复核发现的非阻塞遗留，2026-09-12 拍板一并清理（par
 - 后续（按需，不阻塞）：出现真实外部消费者时再评估 dst-ktex / dst-mediawiki 抽取与 crates.io 发布；
   dst-anim-tool 集成测试保持本地跑（需 data/anim 软链），如需 CI 覆盖可引入可提交的 fixture；
   parser ↔ scripts_sync 的 `string_literal_text` 环（7 份重复实现）仍待收敛。
+
+## 进度台账（P6：收编收尾 + edition 统一 + 断环，2026-09-23）
+
+P5 收编后的决策落地（2026-09-23 拍板）：测试资源不打包（A+E）、edition 统一到 2021、
+dst-wikitext 暂不发布、顺手收敛重复实现。
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P6.1 | 数据依赖用例治理：43 个依赖本机 DST 资源（data/anim）的用例标 `#[ignore]`；CI 纳入 anim-tool non-GUI 测试（82 个）；本地 `--include-ignored` 跑全量 125 个 | ✅ | afd6e88 |
+| P6.2 | edition 统一到 2021：dst-anim-tool 由 2024 降级（`edition.workspace = true`），改写 23 处 let-chain；修 atlas.rs crop_cache 依赖 2024 if-let 临时值提前 drop 的死锁 | ✅ | ad9c1ea |
+| P6.3 | 收敛 string_literal_text 7 份实现（含 1 份跨模块导入）到 parser::lua，断开 parser↔scripts_sync 唯一真环；净减 55 行 | ✅ | 10f3f5d |
+
+### P6 收尾状态（2026-09-23）
+
+- `cargo test --workspace --exclude dst-anim-tool`：646 lib + 24 bin + 34 dst-wikitext 全绿；
+  anim-tool non-GUI：82 passed / 43 ignored（本地 `--include-ignored` 125 passed，GUI 另 3 个）；
+  fmt / clippy（workspace + anim-tool non-GUI + --all-features）干净。
+- 决策记录：测试资源不打包（版权）；dst-wikitext 暂不发布（外部用 git dep + tag）；
+  原 dst-anim-tool 仓库由用户自行归档，monorepo 为唯一 source of truth。
+- 遗留（可选）：合成 fixture（若要让数据测试进 CI）；dst-ktex / dst-mediawiki 抽取与发布（按需）。

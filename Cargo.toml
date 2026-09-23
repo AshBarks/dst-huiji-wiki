@@ -19,6 +19,7 @@ repository = "https://github.com/AshBarks/dst-huiji-wiki"
 [workspace.dependencies]
 dst-anim-tool = { path = "crates/dst-anim-tool", version = "0.1.0", default-features = false, features = ["gif"] }
 dst-wikitext = { path = "crates/dst-wikitext", version = "0.1.0" }
+dst-ktex = { path = "crates/dst-ktex", version = "0.1.0" }
 
 [dependencies]
 nom = "8"
@@ -26,6 +27,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 dst-anim-tool.workspace = true
 dst-wikitext.workspace = true
+dst-ktex.workspace = true
 thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -36,11 +38,9 @@ tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.13", features = ["json", "cookies", "query", "form", "multipart"] }
 dotenvy = "0.15"
 zip = "8"
-# 图片管线:PNG 解码/裁剪(split) + KTEX 容器解码(内置 ktech 等价实现) + atlas XML 布局解析
+# 图片管线:PNG 解码/裁剪(split) + KTEX 容器解码(见 crates/dst-ktex) + atlas XML 布局解析
 image = { version = "0.25", default-features = false, features = ["png"] }
 roxmltree = "0.20"
-# libsquish 的纯 Rust 移植(MIT):KTEX 的 DXT1/3/5 块解码
-texpresso = "2"
 toml = { version = "0.8", features = ["parse", "display"] }
 similar = "3"
 regex = "1"

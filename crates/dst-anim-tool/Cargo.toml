@@ -29,6 +29,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
 which = { version = "7", optional = true }
 zip = "2"
+dst-ktex.workspace = true
 
 [[bin]]
 name = "dst-anim-tool"

@@ -42,7 +42,7 @@ jobs:
         run: cargo test --workspace --exclude dst-anim-tool --verbose
 
       - name: Run tests (dst-anim-tool, non-GUI)
-        # 43 个依赖本机 DST 资源（data/anim）的用例已标 #[ignore]，CI 跑其余 82 个。
+        # 43 个依赖本机 DST 资源（data/anim）的用例已标 #[ignore]，CI 跑其余 67 个。
         run: cargo test -p dst-anim-tool --no-default-features --features cli,gif --verbose
 
   lint:

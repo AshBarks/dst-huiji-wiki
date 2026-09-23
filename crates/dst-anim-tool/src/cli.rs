@@ -456,11 +456,11 @@ fn cmd_info(inputs: &[PathBuf]) -> dst_anim_tool::error::Result<()> {
     for source in &archive.tex_sources {
         println!("  source '{}':", source.source_name);
         for (name, data) in &source.tex_files {
-            if let Ok(ktex) = dst_anim_tool::ktex::parse_ktex(data) {
-                match ktex.mipmaps.first() {
+            if let Ok((header, metas, _)) = dst_anim_tool::ktex::parse(data) {
+                match metas.first() {
                     Some(m0) => println!(
-                        "    {}: {}x{} {:?}",
-                        name, m0.width, m0.height, ktex.header.pixel_format
+                        "    {}: {}x{} {}",
+                        name, m0.width, m0.height, header.compression
                     ),
                     None => println!("    {}: 0 mipmaps", name),
                 }
@@ -500,8 +500,7 @@ fn cmd_decode(input: &Path, output_dir: &Path) -> dst_anim_tool::error::Result<(
     std::fs::create_dir_all(output_dir)?;
     let tex_files = archive.tex_files();
     for (name, data) in tex_files {
-        let ktex = dst_anim_tool::ktex::parse_ktex(data)?;
-        let img = ktex.to_image_rgba()?;
+        let img = dst_anim_tool::ktex::decode_rgba(data)?;
         let out_name = format!("{}.png", name);
         let out_path = output_dir.join(&out_name);
         img.save(&out_path)
@@ -612,8 +611,7 @@ mod tests {
         let tex_files = archive.tex_files();
         assert!(!tex_files.is_empty());
         for (name, data) in tex_files {
-            let ktex = dst_anim_tool::ktex::parse_ktex(data).unwrap();
-            let img = ktex.to_image_rgba().unwrap();
+            let img = dst_anim_tool::ktex::decode_rgba(data).unwrap();
             assert!(img.width() > 0);
             assert!(img.height() > 0);
             let out_name = format!("{}.png", name);

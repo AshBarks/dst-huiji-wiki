@@ -374,7 +374,7 @@ impl App {
                                     for tm in &atlas_entry.tex_meta {
                                         ui.label(
                                             egui::RichText::new(format!(
-                                                "{} ({}x{} {:?})",
+                                                "{} ({}x{} {})",
                                                 tm.name, tm.width, tm.height, tm.pixel_format
                                             ))
                                             .small()
@@ -396,7 +396,7 @@ impl App {
                                     for tm in &ae.tex_meta {
                                         ui.label(
                                             egui::RichText::new(format!(
-                                                "{} ({}x{} {:?})",
+                                                "{} ({}x{} {})",
                                                 tm.name, tm.width, tm.height, tm.pixel_format
                                             ))
                                             .small()

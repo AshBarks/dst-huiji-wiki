@@ -29,6 +29,7 @@ dst-huiji-wiki/
 │   └── utils.rs             # diff_lines utility
 ├── crates/                  # Cargo workspace 成员
 │   ├── dst-wikitext/        # 独立 crate：wikitext 无损解析/编辑（零依赖，可发布）
+│   ├── dst-ktex/            # 独立 crate：KTEX 解析/解码（app 与 dst-anim-tool 共用）
 │   └── dst-anim-tool/       # 收编的 DST 动画工具（app 仅用 default-features=false + gif）
 ├── examples/                # Test data files (.po, .lua, .json) + login.py
 ├── docs/                    # Design docs (PLAN.md, REFACTORING.md)
@@ -80,7 +81,7 @@ dst-huiji-wiki/
 | `TechReport` | Struct | src/models/tech_report.rs | Compares parsed vs wiki tech levels |
 | `Error` | Enum | src/error.rs | 14 variants (Io, PoParse, Http, WikiApi, Zip, etc.) |
 | `SyncParams` / `sync()` | Struct / Fn | src/scripts_sync/mod.rs | scripts.zip 同步入口:版本检测→staging 解压→快照归档→版本记录 |
-| `images::run()` / `ImagesSyncParams` | Fn / Struct | src/scripts_sync/images/mod.rs | 图片管线 images-sync:两源盘点→解压 images.zip→内置 KTEX 解码(ktex-rs)→xml 切割;最终产物入 CAS 差异历史 |
+| `images::run()` / `ImagesSyncParams` | Fn / Struct | src/scripts_sync/images/mod.rs | 图片管线 images-sync:两源盘点→解压 images.zip→KTEX 解码(dst-ktex)→xml 切割;最终产物入 CAS 差异历史 |
 | `ObjectStore` / `Manifest` / `diff_final_maps` | Struct / Fn | src/scripts_sync/images/history.rs | 内容寻址对象仓 + 每 build 全量清单 + 相邻 diff 纯函数 |
 
 ## CONVENTIONS
@@ -115,6 +116,7 @@ dst-huiji-wiki/
 cargo build --release              # 构建 app 二进制（default-members=.）
 cargo test --workspace --exclude dst-anim-tool   # app + dst-wikitext 全量测试（CI 同款）
 cargo test -p dst-wikitext         # 只测抽出的 wikitext crate
+cargo test -p dst-ktex             # 只测抽出的 KTEX crate（合成 fixture，无需游戏素材）
 cargo test -p dst-anim-tool --no-default-features --features cli,gif  # anim-tool（CI 模式：43 个数据用例 ignored）
 cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored  # 本地全量（需 data/anim 软链）
 cargo fmt --all --check            # Check formatting
@@ -125,9 +127,10 @@ cargo run --release -- --help      # Show CLI help
 ## NOTES
 - Workspace：根 package 是 app，`crates/*` 为成员；`default-members = ["."]`（裸 `cargo build`/`cargo test` 只作用于 app）
 - `crates/dst-wikitext`：零第三方依赖的 wikitext 无损解析/编辑 crate（可发布），app 通过 workspace dep 引用
+- `crates/dst-ktex`：KTEX 解析/解码共享 crate（app 与 dst-anim-tool 共用；`build_tex`/`compress_bc3` 可造合成 fixture）；`DECODER_VERSION` 变更会触发图片历史全量重处理
 - `crates/dst-anim-tool`：git subtree 收编（保留独立历史），app 以 `default-features = false, features = ["gif"]` 引用
 - anim-tool 的 43 个用例依赖本机 DST 游戏资源，已标 `#[ignore = "requires local DST game data (data/anim symlink)"]`；
-  CI 跑其余 82 个。本地建软链后跑全量：
+  CI 跑其余 67 个。本地建软链后跑全量：
   `mkdir -p crates/dst-anim-tool/data && ln -s "<DST>/data/anim" crates/dst-anim-tool/data/anim`
   然后 `cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored`
 - `.env` required for wiki operations (HUIJI__USERNAME, HUIJI__PASSWORD, HUIJI__X_AUTHKEY, DST__ROOT)

@@ -6,7 +6,7 @@ use rayon::prelude::*;
 
 use dst_anim_tool::archive::{parse_dyn, parse_zip, BinType};
 use dst_anim_tool::atlas::gather_atlas_images;
-use dst_anim_tool::ktex::parse_ktex;
+use dst_anim_tool::ktex::{decode_rgba, parse};
 use dst_anim_tool::render::{render_frame_with_elements, render_frame_with_elements_par};
 
 use super::{AnimEntry, App, AtlasEntry, BuildEntry, TexMeta};
@@ -72,14 +72,14 @@ impl App {
         let mut decoded = HashMap::new();
         let mut tex_meta = Vec::new();
         for (name, data) in tex_files {
-            if let Ok(ktex) = parse_ktex(data) {
-                if let Ok(img) = ktex.to_image_rgba() {
-                    let m0 = ktex.mipmaps.first();
+            if let Ok((header, metas, _)) = parse(data) {
+                if let Ok(img) = decode_rgba(data) {
+                    let m0 = metas.first();
                     tex_meta.push(TexMeta {
                         name: name.clone(),
                         width: m0.map(|m| m.width).unwrap_or(0),
                         height: m0.map(|m| m.height).unwrap_or(0),
-                        pixel_format: ktex.header.pixel_format,
+                        pixel_format: header.compression,
                     });
                     decoded.insert(name.clone(), Arc::new(img));
                 }

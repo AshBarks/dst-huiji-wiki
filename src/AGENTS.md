@@ -3,7 +3,7 @@
 **Scope**: All library code. Binary entrypoint is a thin shell.
 
 ## OVERVIEW
-16 public modules (lib.rs) + 1 binary-only module (main.rs:commands). Standalone files at root: `context.rs`, `error.rs`, `utils.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`, `corpus/`, `knowledge/`, `llm/`, `update/`, `scripts_sync/`, `service/`, `platform/`, `wikitext/`.
+15 public modules (lib.rs) + 1 binary-only module (main.rs:commands); workspace 成员在 `crates/`（`wikitext`/`ktex` 已抽为独立 crate）。Standalone files at root: `context.rs`, `error.rs`, `utils.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`, `corpus/`, `knowledge/`, `llm/`, `update/`, `scripts_sync/`, `service/`, `platform/`.
 
 ## STRUCTURE
 ```
@@ -51,16 +51,15 @@ src/
 │   │   │   └── scanner.rs # Lua 扫描器
 │   │   ├── preview.rs    # 渲染端点后端(SymbolOverrideMap/skin/override build 自动加载)
 │   │   └── ...
-│   ├── images/           # 图片管线 images-sync: 两源盘点→解压→内置解码→切割→差异历史
+│   ├── images/           # 图片管线 images-sync: 两源盘点→解压→dst-ktex 解码→切割→差异历史
 │   │   ├── mod.rs        # run() 编排 + ImagesSyncParams + 对账清理
 │   │   ├── scan.rs       # zip+loose 两源扫描 → 合并视图 (xml↔tex 联接)
-│   │   ├── ktex.rs       # KTEX 容器解析 + DXT1/3/5/RGB 解码(texpresso) + 反预乘
 │   │   ├── split.rs      # ktools atlas XML 解析 + UV 裁剪 (v 轴翻转)
 │   │   ├── meta.rs       # 物品图标元数据: icon_meta.json + 文件名映射表 + 五态标题/状态
 │   │   └── history.rs    # CAS 对象仓 + manifest + diff 纯函数
 │   └── state.rs          # dst_version.txt 状态文件 + 版本对比纯函数
 ├── context.rs            # DstContext (组合 GameSource + wiki client + env)
-├── error.rs              # Error enum (14 variants) + Result<T> alias
+├── error.rs              # Error enum (thiserror) + Result<T> alias
 └── utils.rs              # diff_lines() only (unified-diff utility)
 ```
 
@@ -72,7 +71,7 @@ src/
 | Trace what lib.rs re-exports | `src/lib.rs` lines 18-26 | DstContext, SnapshotInfo, CopyClip types, Error/Result, TechReport, diff helpers |
 | Add a binary-only entry point | `src/main.rs` | `mod commands` + match on args.command |
 | Add a new CLI command variant | `src/service/job_spec.rs` (`JOB_SPECS` 行) + `src/commands/mod.rs` (`CLI_EXT` 行 + `job_from_matches` 构造臂) | 契约测试强制 name/serde tag/CLI 旗标/前端 JOB_DEFS 一致 |
-| Check all Error variants | `src/error.rs` lines 4-46 | Io, PoParse, InvalidPoEntry, EnvVarNotFound, ParseError, Http, WikiApi, LoginFailed, EditFailed, Config, Zip, ArchiveFileNotFound, DstDirNotFound, Json |
+| Check all Error variants | `src/error.rs` | `enum Error`（含 KTEX/AnimTool/Zip/Json 等 `#[from]` 变体，以文件为准） |
 | Understand file vs directory modules | `src/` root | context.rs/error.rs/utils.rs = single files; everything else = directory |
 | Find where a concrete mapper lives | `src/mapping/mappers/` | Each mapper is its own file |
 | Update CopyClip wiki module config | `src/copyclip/config.rs` | TOML-based module/page mappings |

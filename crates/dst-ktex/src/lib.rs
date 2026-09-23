@@ -26,8 +26,21 @@
 //! `round(255·x/a)`，即整数式 `(255·x + a/2) / a`（奇数 a 时 255x mod a ≠
 //! a/2，与真四舍五入无差异，见单元测试）。
 
-use crate::error::{Error, Result};
 use image::DynamicImage;
+
+/// KTEX 解析/解码错误。
+#[derive(Debug, thiserror::Error)]
+pub enum KtexError {
+    /// 容器布局/端序/尺寸/截断等解析错误（保留原始诊断文本）。
+    #[error("{0}")]
+    Parse(String),
+    /// 未知的压缩格式位域值。
+    #[error("不支持的 KTEX 压缩格式值: {0}")]
+    UnsupportedCompression(u32),
+}
+
+/// crate 内 `Result` 别名。
+pub type Result<T> = std::result::Result<T, KtexError>;
 
 /// 当前解码器版本；写入 manifest，变更时触发全量重处理。
 pub const DECODER_VERSION: &str = "ktex-rs/1";
@@ -70,6 +83,18 @@ impl Compression {
     }
 }
 
+impl std::fmt::Display for Compression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::Dxt1 => "DXT1",
+            Self::Dxt3 => "DXT3",
+            Self::Dxt5 => "DXT5",
+            Self::Rgba => "RGBA",
+            Self::Rgb => "RGB",
+        })
+    }
+}
+
 /// KTEX 头字段（bits 值为原始位域值）。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KtexHeader {
@@ -108,7 +133,7 @@ impl Default for DecodeOptions {
 /// 头位域与 mipmap 元数据**（ktech 的 `io.read_integer` 两者共用同一 io）。
 pub fn parse(bytes: &[u8]) -> Result<(KtexHeader, Vec<MipmapMeta>, usize)> {
     if bytes.len() < 8 || &bytes[..4] != MAGIC {
-        return Err(Error::ParseError("非 KTEX 文件（magic 不符）".into()));
+        return Err(KtexError::Parse("非 KTEX 文件（magic 不符）".into()));
     }
     let le_word = u32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
     // 端序推断：post-caves fill 位于 bits 20..31，其低位字节 = bits 20..27。
@@ -159,11 +184,10 @@ pub fn parse(bytes: &[u8]) -> Result<(KtexHeader, Vec<MipmapMeta>, usize)> {
                 (word >> 18) & 0x3,
             )
         };
-    let compression = Compression::from_bits(compression_bits).ok_or_else(|| {
-        Error::ParseError(format!("不支持的 KTEX 压缩格式值: {compression_bits}"))
-    })?;
+    let compression = Compression::from_bits(compression_bits)
+        .ok_or(KtexError::UnsupportedCompression(compression_bits))?;
     if mipmap_count == 0 {
-        return Err(Error::ParseError("KTEX 无 mipmap（mipmap_count=0）".into()));
+        return Err(KtexError::Parse("KTEX 无 mipmap（mipmap_count=0）".into()));
     }
     let header = KtexHeader {
         platform,
@@ -176,7 +200,7 @@ pub fn parse(bytes: &[u8]) -> Result<(KtexHeader, Vec<MipmapMeta>, usize)> {
     let meta_off = 8usize;
     let meta_len = mipmap_count as usize * MIPMAP_META_SIZE;
     if bytes.len() < meta_off + meta_len {
-        return Err(Error::ParseError(
+        return Err(KtexError::Parse(
             "KTEX 头被截断（mipmap 元数据不足）".into(),
         ));
     }
@@ -198,16 +222,16 @@ pub fn decode_mipmap0(bytes: &[u8], opts: DecodeOptions) -> Result<DynamicImage>
     let (header, metas, data_off) = parse(bytes)?;
     let m = metas[0];
     if m.width == 0 || m.height == 0 {
-        return Err(Error::ParseError(format!(
+        return Err(KtexError::Parse(format!(
             "KTEX mipmap 0 尺寸非法: {}x{}",
             m.width, m.height
         )));
     }
     let end = data_off
         .checked_add(m.datasz as usize)
-        .ok_or_else(|| Error::ParseError("KTEX datasz 溢出".into()))?;
+        .ok_or_else(|| KtexError::Parse("KTEX datasz 溢出".into()))?;
     if bytes.len() < end {
-        return Err(Error::ParseError(format!(
+        return Err(KtexError::Parse(format!(
             "KTEX 数据被截断: 需 {} 字节, 实有 {}",
             end,
             bytes.len()
@@ -224,7 +248,7 @@ pub fn decode_mipmap0(bytes: &[u8], opts: DecodeOptions) -> Result<DynamicImage>
     };
 
     let mut img = image::RgbaImage::from_raw(m.width, m.height, rgba)
-        .ok_or_else(|| Error::ParseError("解码像素数与尺寸不符".into()))?;
+        .ok_or_else(|| KtexError::Parse("解码像素数与尺寸不符".into()))?;
     // UV 原点在左下 → 垂直翻转（ktech flip_image 默认 true）。
     image::imageops::flip_vertical_in_place(&mut img);
     if opts.demultiply {
@@ -239,7 +263,7 @@ pub fn decode_mipmap0(bytes: &[u8], opts: DecodeOptions) -> Result<DynamicImage>
 fn block_decode(format: texpresso::Format, data: &[u8], w: usize, h: usize) -> Result<Vec<u8>> {
     let expected = format.compressed_size(w, h);
     if data.len() < expected {
-        return Err(Error::ParseError(format!(
+        return Err(KtexError::Parse(format!(
             "KTEX mipmap 数据不足: 需 {expected}, 实有 {}",
             data.len()
         )));
@@ -259,13 +283,13 @@ fn raw_rows(data: &[u8], m: &MipmapMeta, compression: Compression) -> Result<Vec
     };
     let pitch = m.pitch as usize;
     if pitch < bpp * w {
-        return Err(Error::ParseError(format!(
+        return Err(KtexError::Parse(format!(
             "KTEX pitch ({pitch}) 小于行宽 ({}B)",
             bpp * w
         )));
     }
     if data.len() < pitch * (h - 1) + bpp * w {
-        return Err(Error::ParseError(format!(
+        return Err(KtexError::Parse(format!(
             "KTEX 未压缩数据不足: 需 {} 字节, 实有 {}",
             pitch * (h - 1) + bpp * w,
             data.len()
@@ -321,6 +345,30 @@ pub fn build_tex(header: KtexHeader, metas: &[MipmapMeta], data_blocks: &[Vec<u8
     out
 }
 
+/// 若最后一个 mipmap 数据块之后还有恰好 1 个字节，返回该字节的布尔值
+/// （旧 ktech/anim-tool 用它标记纹理是否已预乘 alpha）；否则返回 `None`。
+pub fn trailing_pre_multiply_alpha(bytes: &[u8]) -> Option<bool> {
+    let (_, metas, data_off) = parse(bytes).ok()?;
+    let data_end = metas
+        .iter()
+        .try_fold(data_off, |acc, m| acc.checked_add(m.datasz as usize))?;
+    if bytes.len() == data_end + 1 {
+        Some(bytes[data_end] != 0)
+    } else {
+        None
+    }
+}
+
+/// 用 texpresso 将 RGBA8 像素压成 BC3(DXT5) 块数据（测试 / fixture 生成用）。
+///
+/// 输出可直接作为 [`build_tex`] 的 `data_blocks`；宽高按 4 取整由 texpresso 处理。
+pub fn compress_bc3(rgba: &[u8], width: u32, height: u32) -> Vec<u8> {
+    let (w, h) = (width as usize, height as usize);
+    let mut out = vec![0u8; texpresso::Format::Bc3.compressed_size(w, h)];
+    texpresso::Format::Bc3.compress(rgba, w, h, texpresso::Params::default(), &mut out);
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -344,15 +392,7 @@ mod tests {
 
     fn dxt5_tex(img: &image::RgbaImage) -> Vec<u8> {
         let (w, h) = img.dimensions();
-        let raw = img.as_raw().clone();
-        let mut comp = vec![0u8; texpresso::Format::Bc3.compressed_size(w as usize, h as usize)];
-        texpresso::Format::Bc3.compress(
-            &raw,
-            w as usize,
-            h as usize,
-            texpresso::Params::default(),
-            &mut comp,
-        );
+        let comp = compress_bc3(img.as_raw(), w, h);
         let pitch = 16 * (w as usize).div_ceil(4);
         build_tex(
             header(Compression::Dxt5, 1),
@@ -472,22 +512,8 @@ mod tests {
         for px in blue.pixels_mut() {
             *px = Rgba([0, 0, 255, 255]);
         }
-        let compress = |img: &image::RgbaImage| {
-            let raw = img.as_raw().clone();
-            let mut comp = vec![
-                0u8;
-                texpresso::Format::Bc3
-                    .compressed_size(img.width() as usize, img.height() as usize)
-            ];
-            texpresso::Format::Bc3.compress(
-                &raw,
-                img.width() as usize,
-                img.height() as usize,
-                texpresso::Params::default(),
-                &mut comp,
-            );
-            comp
-        };
+        let compress =
+            |img: &image::RgbaImage| compress_bc3(img.as_raw(), img.width(), img.height());
         let (c0, c1) = (compress(&red), compress(&blue));
         let tex = build_tex(
             header(Compression::Dxt5, 2),
@@ -598,70 +624,13 @@ mod tests {
         assert_eq!(decoded.get_pixel(1, 1), Rgba([10, 20, 30, 255]));
     }
 
-    // -- conformance（对真实 corpus 与 ktech 产物逐像素对比） ----------------
-
-    /// 需要本机 DST + 既有 ktech 产物。手动运行：
-    /// `cargo test conformance -- --ignored --nocapture`
-    /// 前提：`current/kteched/` 仍为 ktech 产物（迁移到内置解码器后的首次
-    /// images-sync 会移除该目录，此后本测试自动跳过）。
     #[test]
-    #[ignore = "需要本机 DST 与 ktech 产物（KTOOLS__OUT_DIR/current/kteched）"]
-    fn conformance_against_ktech_output() {
-        use std::path::PathBuf;
-        let Some(dst_root) = crate::platform::config::dst_root_opt() else {
-            eprintln!("DST__ROOT 未设置，跳过");
-            return;
-        };
-        let out_dir = crate::platform::config::ktools_out_dir();
-        let out = out_dir;
-        let kteched = out.join("current/kteched");
-        let unzipped = out.join("current/unzipped");
-        if !kteched.is_dir() {
-            eprintln!("kteched 目录不存在（已迁移内置解码器？），跳过");
-            return;
-        }
-        let dst = PathBuf::from(&dst_root);
-        let scan = crate::scripts_sync::images::scan::scan(
-            &dst.join("data/databundles/images.zip"),
-            &dst.join("data/images"),
-            &unzipped,
-        )
-        .expect("scan 失败");
-
-        let mut compared = 0u64;
-        let mut skipped = 0u64;
-        let mut max_delta = [0u32; 4];
-        let mut over_one = 0u64;
-        for tex in &scan.all_tex {
-            let reference = kteched.join(format!("{}.png", tex.base));
-            let Ok(expected) = image::open(&reference) else {
-                skipped += 1;
-                continue;
-            };
-            let bytes = std::fs::read(&tex.path).expect("读取 tex 失败");
-            let got = match decode_mipmap0(&bytes, DecodeOptions::default()) {
-                Ok(img) => img.to_rgba8(),
-                Err(e) => panic!("解码 {} 失败: {e}", tex.base),
-            };
-            let expected = expected.to_rgba8();
-            assert_eq!(
-                got.dimensions(),
-                expected.dimensions(),
-                "{} 尺寸不一致",
-                tex.base
-            );
-            compared += 1;
-            for (g, e) in got.pixels().zip(expected.pixels()) {
-                for (c, (gv, ev)) in g.0.iter().zip(e.0.iter()).enumerate() {
-                    let d = (i32::from(*gv) - i32::from(*ev)).unsigned_abs();
-                    max_delta[c] = max_delta[c].max(d);
-                    if d > 1 {
-                        over_one += 1;
-                    }
-                }
-            }
-        }
-        println!("conformance: 对比 {compared} / 跳过 {skipped} / maxΔ = {max_delta:?} / Δ>1 像素 {over_one}");
-        assert_eq!(over_one, 0, "存在 Δ>1 的像素（maxΔ={max_delta:?}）");
+    fn test_trailing_pre_multiply_flag() {
+        let mut tex = dxt5_tex(&solid_image(4, 4, [255, 0, 0, 255]));
+        assert_eq!(trailing_pre_multiply_alpha(&tex), None);
+        tex.push(1);
+        assert_eq!(trailing_pre_multiply_alpha(&tex), Some(true));
+        *tex.last_mut().unwrap() = 0;
+        assert_eq!(trailing_pre_multiply_alpha(&tex), Some(false));
     }
 }

@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use crate::build_file::{BuildFile, BuildFrame, BuildVert, RowSpan, SpriteSpans};
 use crate::error::Result;
-use crate::ktex::parse_ktex;
+use crate::ktex::decode_rgba;
 
 fn calc_uv_bounds(verts: &[BuildVert]) -> (f32, f32, f32, f32) {
     let mut min_u = f32::INFINITY;
@@ -234,11 +234,9 @@ fn decode_atlas_images_inner(
     for atlas in atlases {
         let tex_data = tex_files.get(&atlas.name);
         if let Some(tex_data) = tex_data {
-            if let Ok(ktex) = parse_ktex(tex_data) {
-                if let Ok(img) = ktex.to_image_rgba() {
-                    images.push(Arc::new(img));
-                    continue;
-                }
+            if let Ok(img) = decode_rgba(tex_data) {
+                images.push(Arc::new(img));
+                continue;
             }
         }
         images.push(Arc::new(image::RgbaImage::new(1, 1)));

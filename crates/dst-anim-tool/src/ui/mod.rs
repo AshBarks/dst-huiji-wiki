@@ -14,14 +14,14 @@ use export::{BackgroundGifExport, BackgroundPngExport, GifExportResult, PngExpor
 
 use dst_anim_tool::archive::{parse_dyn, parse_zip};
 use dst_anim_tool::atlas::gather_atlas_images;
+use dst_anim_tool::ktex::Compression;
 use dst_anim_tool::render::BoundingBox;
-use dst_anim_tool::specs::PixelFormat;
 
 pub(super) struct TexMeta {
     name: String,
-    width: u16,
-    height: u16,
-    pixel_format: PixelFormat,
+    width: u32,
+    height: u32,
+    pixel_format: Compression,
 }
 
 pub(super) struct AtlasEntry {

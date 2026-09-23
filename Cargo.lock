@@ -1409,6 +1409,7 @@ name = "dst-anim-tool"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "dst-ktex",
  "eframe",
  "egui",
  "gif",
@@ -1431,6 +1432,7 @@ dependencies = [
  "clap",
  "dotenvy",
  "dst-anim-tool",
+ "dst-ktex",
  "dst-wikitext",
  "full_moon",
  "futures-util",
@@ -1444,7 +1446,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "similar",
- "texpresso",
  "thiserror 2.0.18",
  "tokio",
  "tokio-stream",
@@ -1454,6 +1455,15 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "zip 8.5.1",
+]
+
+[[package]]
+name = "dst-ktex"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "texpresso",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

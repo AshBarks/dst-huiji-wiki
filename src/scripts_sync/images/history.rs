@@ -59,7 +59,7 @@ pub struct Manifest {
     pub parent_build: Option<String>,
     /// 无失败为 true；partial 的 manifest 不作为 diff 基线。
     pub complete: bool,
-    /// 解码器版本（[`crate::scripts_sync::images::ktex::DECODER_VERSION`]）；
+    /// 解码器版本（[`dst_ktex::DECODER_VERSION`]）；
     /// 与当前不一致时触发全量重处理（旧 manifest 无此字段按空串处理）。
     #[serde(default)]
     pub decoder: String,

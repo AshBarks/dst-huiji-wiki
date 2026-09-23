@@ -61,6 +61,9 @@ pub enum Error {
     #[error("Animation parse error: {0}")]
     AnimTool(#[from] dst_anim_tool::error::Error),
 
+    #[error("KTEX error: {0}")]
+    Ktex(#[from] dst_ktex::KtexError),
+
     #[error("Zip archive error: {0}")]
     Zip(#[from] zip::result::ZipError),
 

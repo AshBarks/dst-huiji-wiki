@@ -1,5 +1,3 @@
-use crate::specs::PixelFormat;
-
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("invalid magic: expected {expected}, got {actual}")]
@@ -14,11 +12,8 @@ pub enum Error {
     #[error("no {0} found in archive")]
     MissingData(String),
 
-    #[error("unsupported pixel format: {0:?}")]
-    UnsupportedPixelFormat(PixelFormat),
-
-    #[error("invalid value for {typ}: {value}")]
-    InvalidValue { typ: &'static str, value: u32 },
+    #[error("KTEX error: {0}")]
+    Ktex(#[from] dst_ktex::KtexError),
 
     #[error("{0}")]
     Other(String),

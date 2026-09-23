@@ -17,7 +17,7 @@
 //!
 //! 增量与正确性规则：
 //! - 输入 hash 与 parent manifest 一致且产物在盘 → 跳过；
-//! - **解码器版本变更**（manifest.decoder ≠ [`ktex::DECODER_VERSION`]）或
+//! - **解码器版本变更**（manifest.decoder ≠ [`dst_ktex::DECODER_VERSION`]）或
 //!   **切割逻辑版本变更**（manifest.split_version ≠
 //!   [`split::SPLIT_VERSION`]）时等效 `--force`：全量重处理，diff 相对旧
 //!   基线如实反映；
@@ -38,7 +38,6 @@
 
 pub mod history;
 pub mod icons;
-pub mod ktex;
 pub mod meta;
 pub mod scan;
 pub mod split;
@@ -48,10 +47,10 @@ use crate::platform::progress::Reporter;
 use crate::scripts_sync::images::history::{
     diff_final_maps, FinalMap, Manifest, ManifestStore, ObjectStore,
 };
-use crate::scripts_sync::images::ktex::{DecodeOptions, DECODER_VERSION};
 use crate::scripts_sync::images::scan::{scan, ScanResult, UNZIP_DIR_NAME};
 use crate::scripts_sync::images::split::SPLIT_VERSION;
 use crate::scripts_sync::state;
+use dst_ktex::{self as ktex, DecodeOptions, DECODER_VERSION};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::BufReader;
@@ -292,8 +291,9 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
                     format!("读取 {}: {}", tex.path.display(), e),
                 ))
             })
-            .and_then(|bytes| ktex::decode_mipmap0(&bytes, DecodeOptions::default()))
-        {
+            .and_then(|bytes| {
+                ktex::decode_mipmap0(&bytes, DecodeOptions::default()).map_err(Into::into)
+            }) {
             Ok(img) => img,
             Err(e) => {
                 failures.push(Failure {
@@ -394,8 +394,9 @@ pub fn run(params: &ImagesSyncParams, reporter: &dyn Reporter) -> Result<serde_j
                     format!("读取 {}: {}", tex.path.display(), e),
                 ))
             })
-            .and_then(|bytes| ktex::decode_mipmap0(&bytes, DecodeOptions::default()))
-        {
+            .and_then(|bytes| {
+                ktex::decode_mipmap0(&bytes, DecodeOptions::default()).map_err(Into::into)
+            }) {
             Ok(img) => img,
             Err(e) => {
                 failures.push(Failure {
@@ -700,7 +701,8 @@ fn report_json(
 mod tests {
     use super::*;
     use crate::platform::progress::Reporter;
-    use crate::scripts_sync::images::ktex::{KtexHeader, MipmapMeta};
+    use dst_ktex as ktex;
+    use dst_ktex::{KtexHeader, MipmapMeta};
     use image::Rgba;
     use std::sync::Mutex;
 
@@ -751,16 +753,8 @@ mod tests {
 
     /// 任意 RGBA 图 → DXT5 KTEX 容器字节。
     fn make_tex(img: &image::RgbaImage) -> Vec<u8> {
-        use texpresso::Format;
         let (w, h) = img.dimensions();
-        let mut comp = vec![0u8; Format::Bc3.compressed_size(w as usize, h as usize)];
-        Format::Bc3.compress(
-            img.as_raw(),
-            w as usize,
-            h as usize,
-            texpresso::Params::default(),
-            &mut comp,
-        );
+        let comp = ktex::compress_bc3(img.as_raw(), w, h);
         ktex::build_tex(
             KtexHeader {
                 platform: 12,
@@ -1083,5 +1077,71 @@ mod tests {
         assert!(!dir.join("stale.png").exists());
         assert!(!ws.join("split/empty_dir_nested").exists()); // 空目录被移除
         std::fs::remove_dir_all(&ws).ok();
+    }
+
+    // -- conformance（对真实 corpus 与 ktech 产物逐像素对比） ----------------
+
+    /// 需要本机 DST + 既有 ktech 产物。手动运行：
+    /// `cargo test conformance -- --ignored --nocapture`
+    /// 前提：`current/kteched/` 仍为 ktech 产物（迁移到内置解码器后的首次
+    /// images-sync 会移除该目录，此后本测试自动跳过）。
+    #[test]
+    #[ignore = "需要本机 DST 与 ktech 产物（KTOOLS__OUT_DIR/current/kteched）"]
+    fn conformance_against_ktech_output() {
+        use std::path::PathBuf;
+        let Some(dst_root) = crate::platform::config::dst_root_opt() else {
+            eprintln!("DST__ROOT 未设置，跳过");
+            return;
+        };
+        let out_dir = crate::platform::config::ktools_out_dir();
+        let kteched = out_dir.join("current/kteched");
+        let unzipped = out_dir.join("current/unzipped");
+        if !kteched.is_dir() {
+            eprintln!("kteched 目录不存在（已迁移内置解码器？），跳过");
+            return;
+        }
+        let dst = PathBuf::from(&dst_root);
+        let scan = crate::scripts_sync::images::scan::scan(
+            &dst.join("data/databundles/images.zip"),
+            &dst.join("data/images"),
+            &unzipped,
+        )
+        .expect("scan 失败");
+
+        let mut compared = 0u64;
+        let mut skipped = 0u64;
+        let mut max_delta = [0u32; 4];
+        let mut over_one = 0u64;
+        for tex in &scan.all_tex {
+            let reference = kteched.join(format!("{}.png", tex.base));
+            let Ok(expected) = image::open(&reference) else {
+                skipped += 1;
+                continue;
+            };
+            let bytes = std::fs::read(&tex.path).expect("读取 tex 失败");
+            let got = match dst_ktex::decode_mipmap0(&bytes, dst_ktex::DecodeOptions::default()) {
+                Ok(img) => img.to_rgba8(),
+                Err(e) => panic!("解码 {} 失败: {e}", tex.base),
+            };
+            let expected = expected.to_rgba8();
+            assert_eq!(
+                got.dimensions(),
+                expected.dimensions(),
+                "{} 尺寸不一致",
+                tex.base
+            );
+            compared += 1;
+            for (g, e) in got.pixels().zip(expected.pixels()) {
+                for (c, (gv, ev)) in g.0.iter().zip(e.0.iter()).enumerate() {
+                    let d = (i32::from(*gv) - i32::from(*ev)).unsigned_abs();
+                    max_delta[c] = max_delta[c].max(d);
+                    if d > 1 {
+                        over_one += 1;
+                    }
+                }
+            }
+        }
+        println!("conformance: 对比 {compared} / 跳过 {skipped} / maxΔ = {max_delta:?} / Δ>1 像素 {over_one}");
+        assert_eq!(over_one, 0, "存在 Δ>1 的像素（maxΔ={max_delta:?}）");
     }
 }

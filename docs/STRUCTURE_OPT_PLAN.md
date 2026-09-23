@@ -205,3 +205,23 @@ dst-wikitext 暂不发布、顺手收敛重复实现。
 - 决策记录：测试资源不打包（版权）；dst-wikitext 暂不发布（外部用 git dep + tag）；
   原 dst-anim-tool 仓库由用户自行归档，monorepo 为唯一 source of truth。
 - 遗留（可选）：合成 fixture（若要让数据测试进 CI）；dst-ktex / dst-mediawiki 抽取与发布（按需）。
+
+## 进度台账（P7：抽 dst-ktex 共享 crate，2026-09-23）
+
+P6 讨论结论：dst-ktex 去重收益高（app 与 anim-tool 各有一套 KTEX 实现），
+以 app 的 ktech 兼容实现为基线合并；dst-mediawiki 暂缓（无第二消费者、竞品多）。
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P7.1 | 抽出 `crates/dst-ktex`：app 实现搬移 + 独立 `KtexError` + `trailing_pre_multiply_alpha`/`compress_bc3`；app 接入（texpresso 移入 crate、Error `#[from]` 映射、conformance 测试留 app） | ✅ | f32e55d |
+| P7.2 | anim-tool 切换到 dst-ktex：566 行实现 → 60 行薄封装，specs/error 清理 KTEX 专属类型 | ✅ | f32e55d |
+| P7.3 | parity 验收：3 个真实 tex 与旧解码器逐字节一致（maxΔ=0） | ✅ | f32e55d |
+
+### P7 收尾状态（2026-09-23）
+
+- dst-ktex 11 tests（`build_tex`/`compress_bc3` 合成 fixture，无需游戏素材）；
+  app 636 lib + 24 bin（conformance 1 ignored）；anim-tool 67 passed / 43 ignored
+  （本地 `--include-ignored` 110）；fmt/clippy（app workspace + anim-tool non-GUI + --all-features）全绿。
+- 净减 564 行；`DECODER_VERSION` 保持 `"ktex-rs/1"`，app 图片历史无需重处理。
+- 遗留（可选）：`split.rs`（atlas XML）可作为 dst-ktex 的 atlas feature 或独立 crate；
+  dst-mediawiki 待第二消费者/发布意向再评估。

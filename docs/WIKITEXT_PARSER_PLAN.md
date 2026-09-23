@@ -118,8 +118,8 @@
 
 ## 9. M1 落地记录（2026-09-12）
 
-- 模块：`src/wikitext/mod.rs`（节点类型 + serialize + `templates()` 遍历），
-  `src/wikitext/parse.rs`（手写扫描器：递归下降 + 构造跳转，字节级扫描、
+- 模块：`crates/dst-wikitext/src/lib.rs`（节点类型 + serialize + `templates()` 遍历），
+  `crates/dst-wikitext/src/parse.rs`（手写扫描器：递归下降 + 构造跳转，字节级扫描、
   ASCII 边界切片）。入口 `Wikicode::parse` / `serialize` / `templates` /
   `plain`；`parse` 永不失败。
 - 节点：Text / Comment / Template / TemplateParam / Link / ExtLink /

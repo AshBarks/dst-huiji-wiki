@@ -12,7 +12,7 @@ Rust CLI tool for maintaining the Don't Starve Together (DST) Huiji Wiki. Parses
 dst-huiji-wiki/
 ├── src/
 │   ├── main.rs              # Binary entry (tokio + clap dispatch)
-│   ├── lib.rs               # Library root (10 public modules)
+│   ├── lib.rs               # Library root (15 public modules；wikitext 已移至 crates/)
 │   ├── commands/            # CLI arg definitions + all handlers
 │   ├── web/                 # WebUI server (binary-only; axum routes, JobManager, embedded SPA assets)
 │   ├── parser/              # Game data parsers (Lua, PO, recipes, prefab overrides)
@@ -27,6 +27,9 @@ dst-huiji-wiki/
 │   ├── context.rs           # DstContext (组合 GameSource + wiki client + env setup)
 │   ├── error.rs             # Error enum (thiserror) + Result<T>
 │   └── utils.rs             # diff_lines utility
+├── crates/                  # Cargo workspace 成员
+│   ├── dst-wikitext/        # 独立 crate：wikitext 无损解析/编辑（零依赖，可发布）
+│   └── dst-anim-tool/       # 收编的 DST 动画工具（app 仅用 default-features=false + gif）
 ├── examples/                # Test data files (.po, .lua, .json) + login.py
 ├── docs/                    # Design docs (PLAN.md, REFACTORING.md)
 └── .github/workflows/      # CI (test+lint+build) + Release (4 cross-compile targets)
@@ -46,7 +49,7 @@ dst-huiji-wiki/
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs; `--type names` also derives CraftingNames station aliases from `constants.lua`/`tuning.lua` (`parse_*` in `src/parser/crafting.rs`, logic in `src/models/crafting_alias.rs`) |
 | Check 模板:Tech/dst & 模板:制作栏图标 coverage | `src/service/template_check.rs` | `maintain-template-check` CLI/Web job (read-only); config `config/template_check.json` (tech whitelist / CN alias / station fallback); snippets via `--output` |
-| Parse/modify wikitext | `src/wikitext/` + `src/service/wikitext_edit.rs` | Lossless round-trip DOM per docs/WIKITEXT_PARSER_PLAN.md: `Wikicode::parse`/`serialize`（永不失败）、`templates_named`/`param`/`sections`/`switch_cases` 读、`set_param`/`add_param`/`remove_param` 格式保持写（节点持字符串 + 字节 span，编辑后 span 作废）；可变遍历是回调式（`with_templates_named_mut`）；`maintain-wikitext` CLI 批量改模板参数；`segment.rs` 信息框提取已迁移并保留旧实现作差分 |
+| Parse/modify wikitext | `crates/dst-wikitext/` + `src/service/wikitext_edit.rs` | Lossless round-trip DOM per docs/WIKITEXT_PARSER_PLAN.md: `Wikicode::parse`/`serialize`（永不失败）、`templates_named`/`param`/`sections`/`switch_cases` 读、`set_param`/`add_param`/`remove_param` 格式保持写（节点持字符串 + 字节 span，编辑后 span 作废）；可变遍历是回调式（`with_templates_named_mut`）；`maintain-wikitext` CLI 批量改模板参数；`segment.rs` 信息框提取已迁移并保留旧实现作差分 |
 | 维护 模块:Strings 桶页 | `src/service/strings_wiki.rs` | `maintain-strings`：解析 pot/po → key 大写归一 + 角色表合并 → 沿用现有索引边界分桶 → 逐桶语义对比后只写变化页，索引最后写（`--dry-run` 只产报告，`--limit N` canary 不写索引）；`src/models/strings.rs`（变换/分桶/渲染）、`src/parser/strings_data.rs`（桶页解析） |
 | Harvest the wiki corpus | `src/corpus/` + `service::JobKind::CorpusFetch` | `corpus-fetch` CLI; layout/classifier per docs/WIKI_CORPUS_PLAN.md; output in gitignored `wikis/`; `corpus-index` rebuilds derived indexes (prefab registry / regions / facts) per docs/CORPUS_CODE_ATLAS_CONTRACT.md |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
@@ -109,14 +112,19 @@ dst-huiji-wiki/
 
 ## COMMANDS
 ```bash
-cargo build --release              # Build binary
-cargo test                         # Run all ~640 lib + ~20 bin inline tests
-cargo fmt --check                  # Check formatting
-cargo clippy -- -D warnings        # Lint (CI uses this)
+cargo build --release              # 构建 app 二进制（default-members=.）
+cargo test --workspace --exclude dst-anim-tool   # app + dst-wikitext 全量测试（CI 同款）
+cargo test -p dst-wikitext         # 只测抽出的 wikitext crate
+cargo test -p dst-anim-tool --no-default-features --features cli,gif  # 本地跑 anim-tool（部分用例需 data/anim）
+cargo fmt --all --check            # Check formatting
+cargo clippy --workspace --exclude dst-anim-tool --all-targets --all-features -- -D warnings  # Lint (CI uses this)
 cargo run --release -- --help      # Show CLI help
 ```
 
 ## NOTES
+- Workspace：根 package 是 app，`crates/*` 为成员；`default-members = ["."]`（裸 `cargo build`/`cargo test` 只作用于 app）
+- `crates/dst-wikitext`：零第三方依赖的 wikitext 无损解析/编辑 crate（可发布），app 通过 workspace dep 引用
+- `crates/dst-anim-tool`：git subtree 收编（保留独立历史），app 以 `default-features = false, features = ["gif"]` 引用；其集成测试需要 `crates/dst-anim-tool/data/anim` 软链到 DST 安装目录，CI 已排除
 - `.env` required for wiki operations (HUIJI__USERNAME, HUIJI__PASSWORD, HUIJI__X_AUTHKEY, DST__ROOT)
 - WikiClient: global throttle (default 1 QPS, `WIKI__QPS`) + retry on 403/429/GET-5xx (`WIKI__MAX_RETRIES`); POST only retries WAF-level 403/429
 - Edits carry `basetimestamp` + `assert=user`; conflicts surface as `Error::EditConflict`

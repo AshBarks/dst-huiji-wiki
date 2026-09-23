@@ -10,7 +10,7 @@ use super::make_ctx;
 use crate::error::{Error, Result};
 use crate::platform::progress::Reporter;
 use crate::platform::progress::{WriteDecision, WriteMode};
-use crate::wikitext::Wikicode;
+use dst_wikitext::Wikicode;
 use serde::Serialize;
 
 /// 一次 [`run`] 调用的参数。

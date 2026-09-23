@@ -20,8 +20,8 @@ use crate::parser::{
     parse_crafting_filter_lists, parse_prototyper_trees, parse_tech_constants, RecipeParser,
 };
 use crate::platform::progress::Reporter;
-use crate::wikitext::{switch_cases, templates_in, Template, Wikicode};
 use crate::DstContext;
+use dst_wikitext::{switch_cases, templates_in, Template, Wikicode};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};

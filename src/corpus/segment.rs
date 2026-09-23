@@ -106,17 +106,17 @@ struct InfoboxSpan {
 
 /// 命名参数值 span（解析器版）：与旧实现相同的取值语义——跳过 `=` 后的
 /// 空格/制表符、值尾 trim；空值不产出锚点。
-fn parser_infobox_params(text: &str, t: &crate::wikitext::Template) -> Vec<ParamSpan> {
+fn parser_infobox_params(text: &str, t: &dst_wikitext::Template) -> Vec<ParamSpan> {
     let mut out = Vec::new();
     for arg in &t.args {
         if !arg.named {
             continue;
         }
-        let name = crate::wikitext::plain(&arg.name).trim().to_string();
+        let name = dst_wikitext::plain(&arg.name).trim().to_string();
         if name.is_empty() {
             continue;
         }
-        let Some((vs, ve)) = crate::wikitext::nodes_span(&arg.value) else {
+        let Some((vs, ve)) = dst_wikitext::nodes_span(&arg.value) else {
             continue;
         };
         let raw = &text[vs..ve];
@@ -137,9 +137,9 @@ fn parser_infobox_params(text: &str, t: &crate::wikitext::Template) -> Vec<Param
 
 /// 变体名提取：第 2 个位置参数的值，去注释、截断到行首、trim。
 /// （旧行扫描对 variant 的取法等价于此；空变体返回 `None`。）
-fn infobox_variant(t: &crate::wikitext::Template) -> Option<String> {
+fn infobox_variant(t: &dst_wikitext::Template) -> Option<String> {
     let arg = t.args.iter().filter(|a| !a.named).nth(1)?;
-    let mut s = crate::wikitext::plain(&arg.value);
+    let mut s = dst_wikitext::plain(&arg.value);
     while let Some(a) = s.find("<!--") {
         match s[a..].find("-->") {
             Some(rel) => s.replace_range(a..a + rel + 3, ""),
@@ -160,7 +160,7 @@ fn infobox_variant(t: &crate::wikitext::Template) -> Option<String> {
 /// `实体信息框/自动` / `实体信息框`，首个位置参数为 `dst`，且带第 2 个
 /// 位置参数（变体名，非空）。只取引言区（首个 h2 之前）的实例。
 fn parser_infoboxes(text: &str, zone_end: usize) -> Vec<InfoboxSpan> {
-    let code = crate::wikitext::Wikicode::parse(text);
+    let code = dst_wikitext::Wikicode::parse(text);
     let mut out: Vec<InfoboxSpan> = Vec::new();
     for t in code.templates() {
         if t.start >= zone_end {
@@ -541,7 +541,7 @@ mod tests {
             let new_spans = parser_infoboxes(&text, zone_end);
             old_total += old_spans.len();
             new_total += new_spans.len();
-            let new_code = crate::wikitext::Wikicode::parse(&text);
+            let new_code = dst_wikitext::Wikicode::parse(&text);
             let new_by_start: std::collections::HashMap<usize, &InfoboxSpan> =
                 new_spans.iter().map(|s| (s.start, s)).collect();
             for o in &old_spans {
@@ -583,8 +583,8 @@ mod tests {
                             .iter()
                             .flat_map(|a| {
                                 [
-                                    crate::wikitext::nodes_span(&a.name),
-                                    crate::wikitext::nodes_span(&a.value),
+                                    dst_wikitext::nodes_span(&a.name),
+                                    dst_wikitext::nodes_span(&a.value),
                                 ]
                             })
                             .flatten()

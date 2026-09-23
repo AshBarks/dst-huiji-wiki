@@ -1431,6 +1431,7 @@ dependencies = [
  "clap",
  "dotenvy",
  "dst-anim-tool",
+ "dst-wikitext",
  "full_moon",
  "futures-util",
  "image",
@@ -1454,6 +1455,10 @@ dependencies = [
  "uuid",
  "zip 8.5.1",
 ]
+
+[[package]]
+name = "dst-wikitext"
+version = "0.1.0"
 
 [[package]]
 name = "dunce"

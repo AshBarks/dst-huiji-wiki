@@ -18,12 +18,14 @@ repository = "https://github.com/AshBarks/dst-huiji-wiki"
 
 [workspace.dependencies]
 dst-anim-tool = { path = "crates/dst-anim-tool", version = "0.1.0", default-features = false, features = ["gif"] }
+dst-wikitext = { path = "crates/dst-wikitext", version = "0.1.0" }
 
 [dependencies]
 nom = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 dst-anim-tool.workspace = true
+dst-wikitext.workspace = true
 thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

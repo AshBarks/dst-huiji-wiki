@@ -160,3 +160,28 @@ P3 收尾后复核发现的非阻塞遗留，2026-09-12 拍板一并清理（par
 | Web 作业隔离 | 独立线程 + 每线程 current-thread runtime（规避 Runtime 跨 async drop） |
 | unwrap 严格度 | 只修可触发的 3 处，其余不变量安全保留 |
 | parser 拆分深度 | 只做机械拆分，算法不动；upload multipart→WikiWriter 与 workspace 拆分仍不做 |
+
+## 进度台账（P5：workspace 收编，2026-09-22）
+
+背景：P4 收尾时拍板"workspace 拆分仅在编译时间/边界成为实际痛点时考虑"。随后发现
+`dst-anim-tool = { path = "../dst-anim-tool" }` 是**仓库外 path 依赖**——fresh clone / CI
+无法构建，外部项目也无法引用，必须先解决。复核结论：编译时间仍非痛点（warm check 1.4s），
+因此只做"**单仓 workspace + 抽出真正自包含的模块**"，不做全量拆分、不拆多仓。
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P5.1 | dst-anim-tool 收编：git subtree 导入 `crates/dst-anim-tool`（保留 32 条历史）、补 MIT LICENSE/元数据、移除子 Cargo.lock、修 chunks_exact clippy | ✅ | fd73980 + 5302736 |
+| P5.2 | Cargo workspace：根 `[workspace]`（members=crates/*, default-members=., resolver=3）+ workspace.package/dependencies，消除仓库外 path 依赖 | ✅ | 5302736 |
+| P5.3 | dst-wikitext 抽为独立 crate：`src/wikitext` → `crates/dst-wikitext`（零依赖、34 tests），app 引用改向，补发布元数据/README/LICENSE | ✅ | e4e448a |
+| P5.4 | CI 适配：test/clippy 改 `--workspace --exclude dst-anim-tool`（其集成测试需本机 `data/anim`）；anim-tool 单独跑 non-GUI clippy | ✅ | e4e448a |
+
+### P5 收尾状态（2026-09-22）
+
+- `cargo test --workspace --exclude dst-anim-tool`：646 lib + 24 bin + 34 dst-wikitext 全绿；
+  `cargo fmt --all --check` / workspace clippy / anim-tool(non-GUI) clippy 干净。
+- fresh clone 验证：`cargo check` 通过（原 path 依赖问题消除）；`cargo test -p dst-wikitext` 通过。
+- `cargo package -p dst-wikitext --offline` 验证通过，包内容仅 src/README/LICENSE/Cargo.toml。
+- 未执行任何线上 wiki 写操作；未推送到 GitHub（本地提交，待人工 push/tag）。
+- 后续（按需，不阻塞）：出现真实外部消费者时再评估 dst-ktex / dst-mediawiki 抽取与 crates.io 发布；
+  dst-anim-tool 集成测试保持本地跑（需 data/anim 软链），如需 CI 覆盖可引入可提交的 fixture；
+  parser ↔ scripts_sync 的 `string_literal_text` 环（7 份重复实现）仍待收敛。

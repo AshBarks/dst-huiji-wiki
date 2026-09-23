@@ -39,6 +39,7 @@ jobs:
           key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run tests (workspace, app + dst-wikitext)
+        # app 的 6 个 prefab fixture 用例需本机 examples/prefabs（gitignore），已标 #[ignore]。
         run: cargo test --workspace --exclude dst-anim-tool --verbose
 
       - name: Run tests (dst-anim-tool, non-GUI)

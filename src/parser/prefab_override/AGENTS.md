@@ -29,14 +29,14 @@ prefab_override/
 | Tweak string concatenation handling | `analysis.rs` / `deep.rs` `extract_override_*` | `OverrideValue::Static` vs `Dynamic` vs `Unknown` |
 | Add an override value variant | `types.rs` → `OverrideValue` enum | Static(String), Dynamic(String), Unknown |
 | Check what's publicly exported | `mod.rs` | Only parser + types re-exports |
-| Verify behavior after edits | `parser/mod.rs` → `test_all_prefabs_files` | Parses all `examples/prefabs/*.lua` and asserts a stable result fingerprint |
+| Verify behavior after edits | `parser/mod.rs` → `test_all_prefabs_files` | Parses all `examples/prefabs/*.lua` and asserts a stable result fingerprint（需本机游戏数据；已标 `#[ignore]`，本地 `cargo test -p dst-huiji-wiki --lib -- --include-ignored` 运行） |
 
 ## INTERNALS
 
 - **Two-phase design**: `collect_definitions()` scans the AST once, populating `self.functions` / `self.variables`. Then `parse()` walks again using this index.
 - **Visibility**: all split-out methods are `pub(super)` so `parser/mod.rs` can call them; struct fields stay private in `parser/mod.rs` (child modules can access ancestors' private items).
 - **OverrideValue semantics**: `Static` = resolved to a known string at parse time. `Dynamic` = value depends on runtime. `Unknown` = couldn't resolve.
-- **Fingerprint safety net**: `test_all_prefabs_files` hashes every example result; any behavioral change during refactors must not alter it.
+- **Fingerprint safety net**: `test_all_prefabs_files` hashes every example result; any behavioral change during refactors must not alter it. 该用例与另外 5 个 `examples/prefabs/*.lua` 用例都标 `#[ignore]`（数据在 gitignore 中），CI 不运行、本地 `--include-ignored` 运行。
 - **SourceLocation**: byte-range (`start_byte`/`end_byte`) + line-range, consistent with `src/parser/lua.rs`.
 
 ## CONVENTIONS (THIS SUBDIRECTORY)

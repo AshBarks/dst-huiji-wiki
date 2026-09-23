@@ -210,6 +210,12 @@ mod tests {
     use super::super::types::OverrideValue;
     use super::*;
 
+    /// 读取本机 DST 游戏数据 fixture（`examples/prefabs/` 已 gitignore）；
+    /// 缺失时返回 `None`。相关用例均标 `#[ignore]`，CI 不运行。
+    fn local_prefab(name: &str) -> Option<String> {
+        std::fs::read_to_string(format!("examples/prefabs/{name}")).ok()
+    }
+
     #[test]
     fn test_parse_simple_prefab_with_override() {
         let source = r#"
@@ -366,9 +372,12 @@ return Prefab("test_prefab", fn)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_altar_prototyper_example() {
-        let source = include_str!("../../../../examples/prefabs/altar_prototyper.lua");
-        let result = parse_prefab_overrides(source).unwrap();
+        let Some(source) = local_prefab("altar_prototyper.lua") else {
+            return;
+        };
+        let result = parse_prefab_overrides(&source).unwrap();
 
         assert!(result.len() >= 2, "Expected at least 2 prefab overrides");
 
@@ -398,9 +407,12 @@ return Prefab("test_prefab", fn)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_bundle_example() {
-        let source = include_str!("../../../../examples/prefabs/bundle.lua");
-        let result = parse_prefab_overrides(source).unwrap();
+        let Some(source) = local_prefab("bundle.lua") else {
+            return;
+        };
+        let result = parse_prefab_overrides(&source).unwrap();
 
         let redpouch_yotp = result.iter().find(|r| r.prefab_name == "redpouch_yotp");
         let redpouch_yotc = result.iter().find(|r| r.prefab_name == "redpouch_yotc");
@@ -431,9 +443,12 @@ return Prefab("test_prefab", fn)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_wormhole_limited_example() {
-        let source = include_str!("../../../../examples/prefabs/wormhole_limited.lua");
-        let result = parse_prefab_overrides(source).unwrap();
+        let Some(source) = local_prefab("wormhole_limited.lua") else {
+            return;
+        };
+        let result = parse_prefab_overrides(&source).unwrap();
 
         assert!(
             !result.is_empty(),
@@ -457,9 +472,12 @@ return Prefab("test_prefab", fn)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_wx78_drone_delivery_example() {
-        let source = include_str!("../../../../examples/prefabs/wx78_drone_delivery.lua");
-        let result = parse_prefab_overrides(source).unwrap();
+        let Some(source) = local_prefab("wx78_drone_delivery.lua") else {
+            return;
+        };
+        let result = parse_prefab_overrides(&source).unwrap();
 
         assert!(
             !result.is_empty(),
@@ -511,6 +529,7 @@ return makewormhole(1)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_all_prefabs_files() {
         let prefab_files = [
             "yots_worm_lantern",
@@ -708,9 +727,12 @@ return makewormhole(1)
     }
 
     #[test]
+    #[ignore = "requires local DST game data (examples/prefabs)"]
     fn test_deer_debug() {
-        let source = include_str!("../../../../examples/prefabs/deer.lua");
-        let parser = PrefabOverrideParser::new(source).unwrap();
+        let Some(source) = local_prefab("deer.lua") else {
+            return;
+        };
+        let parser = PrefabOverrideParser::new(&source).unwrap();
         let result = parser.parse().unwrap();
         for name in ["deer", "deer_red", "deer_blue"] {
             assert!(

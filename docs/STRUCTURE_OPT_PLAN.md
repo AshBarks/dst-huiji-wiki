@@ -225,3 +225,20 @@ P6 讨论结论：dst-ktex 去重收益高（app 与 anim-tool 各有一套 KTEX
 - 净减 564 行；`DECODER_VERSION` 保持 `"ktex-rs/1"`，app 图片历史无需重处理。
 - 遗留（可选）：`split.rs`（atlas XML）可作为 dst-ktex 的 atlas feature 或独立 crate；
   dst-mediawiki 待第二消费者/发布意向再评估。
+
+## 进度台账（P8：修复 CI 对 gitignore 游戏数据的编译期依赖，2026-09-23）
+
+背景：P7 推送后 CI 首次跑到编译阶段即失败——`src/parser/prefab_override/parser/mod.rs`
+的 5 个 `include_str!("examples/prefabs/*.lua")` 指向 gitignore 的本机游戏数据，
+fresh clone 下 lib test 无法编译；`test_all_prefabs_files` 运行时读取也会在 CI 全 fail。
+（此前 CI 被 dst-anim-tool 仓库外 path 依赖挡住，问题被掩盖。）
+
+| 阶段 | 项 | 状态 | 提交 |
+|---|---|---|---|
+| P8.1 | 6 个 prefab fixture 用例：`include_str!` → 运行时 `local_prefab()` 读取 + `#[ignore]`；本地 `--include-ignored` 保持全量可跑（含指纹测试） | ✅ | 628f80e |
+
+### P8 收尾状态（2026-09-23）
+
+- 模拟 CI（移走 `examples/prefabs/`）：630 lib + 24 bin + 11 dst-ktex + 34 dst-wikitext 全绿，7 ignored。
+- 本地有数据：prefab_override 过滤下 25 passed（含 6 个数据用例与指纹测试）。
+- 原则与 anim-tool 数据用例一致：游戏数据不入库，CI 跳过、本地显式 `--include-ignored` 运行。

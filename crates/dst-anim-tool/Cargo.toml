@@ -1,7 +1,7 @@
 [package]
 name = "dst-anim-tool"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 description = "Don't Starve Together 动画资源（anim.bin/KTEX/atlas）解析、预览与 GIF 导出"
 license = "MIT"
 repository.workspace = true

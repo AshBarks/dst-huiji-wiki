@@ -4,8 +4,8 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Arc;
 
-use crate::anim::{AnimFile, parse_anim};
-use crate::build_file::{BuildFile, parse_build};
+use crate::anim::{parse_anim, AnimFile};
+use crate::build_file::{parse_build, BuildFile};
 use crate::error::{Error, Result};
 use crate::specs::{MAGIC_ANIM, MAGIC_BILD};
 use crate::xor::xor_decrypt;

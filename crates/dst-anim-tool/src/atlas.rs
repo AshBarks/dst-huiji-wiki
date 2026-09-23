@@ -162,8 +162,11 @@ pub fn split_atlas(build: &mut BuildFile, atlas_images: &[Arc<image::RgbaImage>]
                 expected_w,
                 expected_h,
             );
-            let entry = if let Some(cached) = crop_cache.lock().unwrap().get(&key) {
-                cached.clone()
+            // 先把锁作用域收敛到本语句内（edition 2021 下 if-let 临时值活到整个 if/else 结束，
+            // 直接在 else 里二次 lock 会死锁）。
+            let cached = crop_cache.lock().unwrap().get(&key).cloned();
+            let entry = if let Some(cached) = cached {
+                cached
             } else {
                 let mut sprite =
                     image::imageops::crop_imm(atlas_img, src_x, src_y, src_w, src_h).to_image();
@@ -230,12 +233,13 @@ fn decode_atlas_images_inner(
     let mut images = Vec::new();
     for atlas in atlases {
         let tex_data = tex_files.get(&atlas.name);
-        if let Some(tex_data) = tex_data
-            && let Ok(ktex) = parse_ktex(tex_data)
-            && let Ok(img) = ktex.to_image_rgba()
-        {
-            images.push(Arc::new(img));
-            continue;
+        if let Some(tex_data) = tex_data {
+            if let Ok(ktex) = parse_ktex(tex_data) {
+                if let Ok(img) = ktex.to_image_rgba() {
+                    images.push(Arc::new(img));
+                    continue;
+                }
+            }
         }
         images.push(Arc::new(image::RgbaImage::new(1, 1)));
     }

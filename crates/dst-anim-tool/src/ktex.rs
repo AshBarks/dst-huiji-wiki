@@ -1,6 +1,6 @@
 use crate::error::{Error, Result};
 use crate::reader::Reader;
-use crate::specs::{MAGIC_KTEX, PRE_CAVE_SPEC, PixelFormat, Platform, TextureType, detect_spec};
+use crate::specs::{detect_spec, PixelFormat, Platform, TextureType, MAGIC_KTEX, PRE_CAVE_SPEC};
 
 #[derive(Debug, Clone)]
 pub struct KtexHeader {

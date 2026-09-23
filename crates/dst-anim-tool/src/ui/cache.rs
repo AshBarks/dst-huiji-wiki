@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use rayon::prelude::*;
 
-use dst_anim_tool::archive::{BinType, parse_dyn, parse_zip};
+use dst_anim_tool::archive::{parse_dyn, parse_zip, BinType};
 use dst_anim_tool::atlas::gather_atlas_images;
 use dst_anim_tool::ktex::parse_ktex;
 use dst_anim_tool::render::{render_frame_with_elements, render_frame_with_elements_par};
@@ -72,17 +72,17 @@ impl App {
         let mut decoded = HashMap::new();
         let mut tex_meta = Vec::new();
         for (name, data) in tex_files {
-            if let Ok(ktex) = parse_ktex(data)
-                && let Ok(img) = ktex.to_image_rgba()
-            {
-                let m0 = ktex.mipmaps.first();
-                tex_meta.push(TexMeta {
-                    name: name.clone(),
-                    width: m0.map(|m| m.width).unwrap_or(0),
-                    height: m0.map(|m| m.height).unwrap_or(0),
-                    pixel_format: ktex.header.pixel_format,
-                });
-                decoded.insert(name.clone(), Arc::new(img));
+            if let Ok(ktex) = parse_ktex(data) {
+                if let Ok(img) = ktex.to_image_rgba() {
+                    let m0 = ktex.mipmaps.first();
+                    tex_meta.push(TexMeta {
+                        name: name.clone(),
+                        width: m0.map(|m| m.width).unwrap_or(0),
+                        height: m0.map(|m| m.height).unwrap_or(0),
+                        pixel_format: ktex.header.pixel_format,
+                    });
+                    decoded.insert(name.clone(), Arc::new(img));
+                }
             }
         }
         (decoded, tex_meta)
@@ -140,10 +140,10 @@ impl App {
         self.frame_cache_order.retain(|&x| x != fi);
         self.frame_cache_order.push_back(fi);
         self.frame_cache_bytes += bytes;
-        while self.frame_cache_bytes > self.frame_cache_budget
-            && self.frame_cache.len() > 1
-            && let Some(old) = self.frame_cache_order.pop_front()
-        {
+        while self.frame_cache_bytes > self.frame_cache_budget && self.frame_cache.len() > 1 {
+            let Some(old) = self.frame_cache_order.pop_front() else {
+                break;
+            };
             if let Some(old_entry) = self.frame_cache.remove(&old) {
                 let old_bytes =
                     old_entry.image.width() as usize * old_entry.image.height() as usize * 4;
@@ -255,10 +255,9 @@ impl App {
                             &render_bounds,
                             1.0,
                             (0.0, 0.0),
-                        ) && sender
-                            .send((cache_gen_val, fi, rendered.image, off_x, off_y))
-                            .is_err()
-                        {}
+                        ) {
+                            let _ = sender.send((cache_gen_val, fi, rendered.image, off_x, off_y));
+                        }
                     }
                 });
         });
@@ -572,12 +571,13 @@ impl App {
                     let comp_canonical = companion
                         .canonicalize()
                         .unwrap_or_else(|_| companion.clone());
-                    if companion.exists()
-                        && let Ok(companion_data) = std::fs::read(&companion)
-                        && let Ok(companion_archive) = parse_dyn(&companion_data)
-                    {
-                        archive.merge(companion_archive);
-                        companion_canonical = Some(comp_canonical);
+                    if companion.exists() {
+                        if let Ok(companion_data) = std::fs::read(&companion) {
+                            if let Ok(companion_archive) = parse_dyn(&companion_data) {
+                                archive.merge(companion_archive);
+                                companion_canonical = Some(comp_canonical);
+                            }
+                        }
                     }
                 }
                 if has_tex && !has_build && !has_anim {
@@ -594,12 +594,13 @@ impl App {
                     let comp_canonical = companion
                         .canonicalize()
                         .unwrap_or_else(|_| companion.clone());
-                    if companion.exists()
-                        && let Ok(companion_data) = std::fs::read(&companion)
-                        && let Ok(companion_archive) = parse_zip(&companion_data)
-                    {
-                        archive.merge(companion_archive);
-                        companion_canonical = Some(comp_canonical);
+                    if companion.exists() {
+                        if let Ok(companion_data) = std::fs::read(&companion) {
+                            if let Ok(companion_archive) = parse_zip(&companion_data) {
+                                archive.merge(companion_archive);
+                                companion_canonical = Some(comp_canonical);
+                            }
+                        }
                     }
                 }
                 if archive.build.is_none() {
@@ -618,11 +619,11 @@ impl App {
 
         let mut build = archive.build.take();
 
-        if let Some(ref mut b) = build
-            && !decoded.is_empty()
-        {
-            let atlas_images = gather_atlas_images(b, &decoded);
-            let _ = dst_anim_tool::atlas::split_atlas(b, &atlas_images);
+        if let Some(ref mut b) = build {
+            if !decoded.is_empty() {
+                let atlas_images = gather_atlas_images(b, &decoded);
+                let _ = dst_anim_tool::atlas::split_atlas(b, &atlas_images);
+            }
         }
 
         LoadResult::Success(Box::new(LoadedData {

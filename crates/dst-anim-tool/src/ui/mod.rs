@@ -409,11 +409,11 @@ impl App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        if let Some(paths) = self.initial_files.take()
-            && !paths.is_empty()
-        {
-            for path in paths {
-                self.spawn_file_load(path, None);
+        if let Some(paths) = self.initial_files.take() {
+            if !paths.is_empty() {
+                for path in paths {
+                    self.spawn_file_load(path, None);
+                }
             }
         }
 

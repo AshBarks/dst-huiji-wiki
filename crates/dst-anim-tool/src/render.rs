@@ -191,16 +191,17 @@ fn find_symbol_frame<'a>(
         if br.disabled_symbols.contains(symbol_name_lower) {
             continue;
         }
-        if let Some(hint) = build_hint
-            && br.build.name.to_lowercase() != hint
-        {
-            continue;
+        if let Some(hint) = build_hint {
+            if br.build.name.to_lowercase() != hint {
+                continue;
+            }
         }
-        if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower)
-            && let Some(symbol) = br.build.symbols.get(sym_idx)
-            && let Some(frame) = symbol.frame_for_anim_frame(frame_num)
-        {
-            return Some(frame);
+        if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower) {
+            if let Some(symbol) = br.build.symbols.get(sym_idx) {
+                if let Some(frame) = symbol.frame_for_anim_frame(frame_num) {
+                    return Some(frame);
+                }
+            }
         }
     }
     None
@@ -387,14 +388,15 @@ pub fn prepare_animation_frames_with_overrides(
             disabled_elements,
             disabled_symbols,
             overrides,
-        ) && let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset)
-        {
-            union_left = union_left.min(bounds.left);
-            union_top = union_top.min(bounds.top);
-            union_right = union_right.max(bounds.right);
-            union_bottom = union_bottom.max(bounds.bottom);
-            prepared.push(Some(PreparedFrame { elements, bounds }));
-            continue;
+        ) {
+            if let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset) {
+                union_left = union_left.min(bounds.left);
+                union_top = union_top.min(bounds.top);
+                union_right = union_right.max(bounds.right);
+                union_bottom = union_bottom.max(bounds.bottom);
+                prepared.push(Some(PreparedFrame { elements, bounds }));
+                continue;
+            }
         }
         prepared.push(None);
     }
@@ -1131,16 +1133,14 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        assert!(
-            compute_frame_elements(
-                &anim_frame,
-                &build_list,
-                1.0,
-                &HashSet::new(),
-                &HashSet::new()
-            )
-            .is_none()
-        );
+        assert!(compute_frame_elements(
+            &anim_frame,
+            &build_list,
+            1.0,
+            &HashSet::new(),
+            &HashSet::new()
+        )
+        .is_none());
     }
 
     #[test]
@@ -1220,17 +1220,15 @@ mod tests {
             build: &build,
             disabled_symbols: &empty,
         }];
-        assert!(
-            compute_animation_bounds(
-                &frames,
-                &build_list,
-                1.0,
-                (0.0, 0.0),
-                &HashSet::new(),
-                &HashSet::new()
-            )
-            .is_none()
-        );
+        assert!(compute_animation_bounds(
+            &frames,
+            &build_list,
+            1.0,
+            (0.0, 0.0),
+            &HashSet::new(),
+            &HashSet::new()
+        )
+        .is_none());
     }
 
     #[test]

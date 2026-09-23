@@ -1,14 +1,14 @@
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
-use std::sync::Arc;
 use std::sync::mpsc;
+use std::sync::Arc;
 
 use rayon::prelude::*;
 
-use dst_anim_tool::gif_export::{GifWriter, ffmpeg_gif_from_sequence};
+use dst_anim_tool::gif_export::{ffmpeg_gif_from_sequence, GifWriter};
 use dst_anim_tool::render::{
-    SymbolOverrideMap, prepare_animation_frames_with_overrides, render_frame_with_elements,
-    snap_frame_bounds,
+    prepare_animation_frames_with_overrides, render_frame_with_elements, snap_frame_bounds,
+    SymbolOverrideMap,
 };
 
 pub enum GifExportResult {

@@ -6,22 +6,24 @@ impl App {
     pub fn show_top_bar(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("top_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                if ui.button("Open File").clicked()
-                    && let Some(paths) = rfd::FileDialog::new()
+                if ui.button("Open File").clicked() {
+                    if let Some(paths) = rfd::FileDialog::new()
                         .add_filter("DST Files", &["zip", "dyn", "bin"])
                         .pick_files()
-                {
-                    for path in paths {
-                        self.spawn_file_load(path, None);
+                    {
+                        for path in paths {
+                            self.spawn_file_load(path, None);
+                        }
                     }
                 }
 
-                if ui.button("Load Symbol Map").clicked()
-                    && let Some(path) = rfd::FileDialog::new()
+                if ui.button("Load Symbol Map").clicked() {
+                    if let Some(path) = rfd::FileDialog::new()
                         .add_filter("Symbol Map", &["toml", "txt"])
                         .pick_file()
-                {
-                    self.load_symbol_map(&path);
+                    {
+                        self.load_symbol_map(&path);
+                    }
                 }
 
                 if self.symbol_map_source.is_some()
@@ -41,15 +43,18 @@ impl App {
                 }
 
                 ui.add_enabled_ui(self.rendered_image.is_some(), |ui| {
-                    if ui.button("Export PNG").clicked()
-                        && let Some(img) = &self.rendered_image
-                        && let Some(path) = rfd::FileDialog::new()
-                            .add_filter("PNG", &["png"])
-                            .set_file_name("frame.png")
-                            .save_file()
-                        && let Err(e) = img.save(&path)
-                    {
-                        self.error_message = Some(format!("Failed to save PNG: {e}"));
+                    if ui.button("Export PNG").clicked() {
+                        if let Some(img) = &self.rendered_image {
+                            if let Some(path) = rfd::FileDialog::new()
+                                .add_filter("PNG", &["png"])
+                                .set_file_name("frame.png")
+                                .save_file()
+                            {
+                                if let Err(e) = img.save(&path) {
+                                    self.error_message = Some(format!("Failed to save PNG: {e}"));
+                                }
+                            }
+                        }
                     }
 
                     #[cfg(feature = "gif")]
@@ -363,40 +368,41 @@ impl App {
                             if ui.small_button("Browse .zip...").clicked() {
                                 browse_zip = Some(idx);
                             }
-                            if let Some(atlas_idx) = assigned
-                                && let Some(Some(atlas_entry)) = self.atlas_entries.get(*atlas_idx)
-                            {
-                                for tm in &atlas_entry.tex_meta {
-                                    ui.label(
-                                        egui::RichText::new(format!(
-                                            "{} ({}x{} {:?})",
-                                            tm.name, tm.width, tm.height, tm.pixel_format
-                                        ))
-                                        .small()
-                                        .color(egui::Color32::LIGHT_BLUE),
-                                    );
+                            if let Some(atlas_idx) = assigned {
+                                if let Some(Some(atlas_entry)) = self.atlas_entries.get(*atlas_idx)
+                                {
+                                    for tm in &atlas_entry.tex_meta {
+                                        ui.label(
+                                            egui::RichText::new(format!(
+                                                "{} ({}x{} {:?})",
+                                                tm.name, tm.width, tm.height, tm.pixel_format
+                                            ))
+                                            .small()
+                                            .color(egui::Color32::LIGHT_BLUE),
+                                        );
+                                    }
                                 }
                             }
                         }
 
                         if *has_build {
-                            if let Some(atlas_idx) = assigned
-                                && let Some(Some(ae)) = self.atlas_entries.get(*atlas_idx)
-                            {
-                                ui.label(
-                                    egui::RichText::new(format!("Atlas: {}", ae.source_name))
-                                        .small()
-                                        .italics(),
-                                );
-                                for tm in &ae.tex_meta {
+                            if let Some(atlas_idx) = assigned {
+                                if let Some(Some(ae)) = self.atlas_entries.get(*atlas_idx) {
                                     ui.label(
-                                        egui::RichText::new(format!(
-                                            "{} ({}x{} {:?})",
-                                            tm.name, tm.width, tm.height, tm.pixel_format
-                                        ))
-                                        .small()
-                                        .color(egui::Color32::LIGHT_BLUE),
+                                        egui::RichText::new(format!("Atlas: {}", ae.source_name))
+                                            .small()
+                                            .italics(),
                                     );
+                                    for tm in &ae.tex_meta {
+                                        ui.label(
+                                            egui::RichText::new(format!(
+                                                "{} ({}x{} {:?})",
+                                                tm.name, tm.width, tm.height, tm.pixel_format
+                                            ))
+                                            .small()
+                                            .color(egui::Color32::LIGHT_BLUE),
+                                        );
+                                    }
                                 }
                             }
 
@@ -523,19 +529,21 @@ impl App {
             need_re_render = true;
         }
 
-        if let Some(build_idx) = browse_dyn
-            && let Some(path) = rfd::FileDialog::new()
+        if let Some(build_idx) = browse_dyn {
+            if let Some(path) = rfd::FileDialog::new()
                 .add_filter("DST Atlas", &["dyn"])
                 .pick_file()
-        {
-            self.associate_dyn_to_build(build_idx, &path);
+            {
+                self.associate_dyn_to_build(build_idx, &path);
+            }
         }
-        if let Some(build_idx) = browse_zip
-            && let Some(path) = rfd::FileDialog::new()
+        if let Some(build_idx) = browse_zip {
+            if let Some(path) = rfd::FileDialog::new()
                 .add_filter("DST Build", &["zip"])
                 .pick_file()
-        {
-            self.associate_zip_to_pending_atlas(build_idx, &path);
+            {
+                self.associate_zip_to_pending_atlas(build_idx, &path);
+            }
         }
 
         if need_re_render {

@@ -972,6 +972,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn render_abigail_flower() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1431,6 +1432,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn render_abigail_flower_has_nontransparent_pixels() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1476,6 +1478,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn render_abigail_flower_all_frames() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1585,6 +1588,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn crop_render_matches_canvas_render() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1666,6 +1670,7 @@ mod tests {
 
     #[cfg(any(feature = "cli", feature = "gui"))]
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn par_render_matches_sequential() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1718,6 +1723,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn snapped_frame_bounds_match_union_render() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
@@ -1802,6 +1808,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn spans_fast_path_matches_fallback() {
         use crate::archive::parse_zip;
         use crate::atlas::{decode_atlas_images_from_tex, split_atlas};

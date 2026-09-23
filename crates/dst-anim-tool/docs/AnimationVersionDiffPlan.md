@@ -78,7 +78,7 @@ src/scripts_sync/anim/
 ```toml
 [dependencies]
 # 只需要 anim/build 解析时关闭默认 feature，避免编译 GUI/CLI/GIF 工具链
-dst-anim-tool = { path = "../dst-anim-tool", default-features = false }
+dst-anim-tool = { path = "crates/dst-anim-tool", default-features = false }
 ```
 
 `dst-anim-tool` 已做 feature 拆分：

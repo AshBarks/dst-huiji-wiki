@@ -212,6 +212,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_abigail_flower_zip() {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let result = parse_zip(&data).unwrap();
@@ -224,6 +225,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_abigail_ice_dyn() {
         let data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
         let result = parse_dyn(&data).unwrap();
@@ -232,6 +234,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn detect_anim_bin_type() {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
@@ -246,6 +249,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn detect_build_bin_type() {
         let data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
@@ -260,6 +264,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn merge_archives() {
         let zip_data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let dyn_data = std::fs::read("data/anim/dynamic/abigail_ice.dyn").unwrap();
@@ -293,6 +298,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn load_archives_multi() {
         let zip_path = std::path::PathBuf::from("data/anim/abigail_flower.zip");
         let result = load_archives(&[zip_path]).unwrap();

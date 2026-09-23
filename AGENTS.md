@@ -115,7 +115,8 @@ dst-huiji-wiki/
 cargo build --release              # 构建 app 二进制（default-members=.）
 cargo test --workspace --exclude dst-anim-tool   # app + dst-wikitext 全量测试（CI 同款）
 cargo test -p dst-wikitext         # 只测抽出的 wikitext crate
-cargo test -p dst-anim-tool --no-default-features --features cli,gif  # 本地跑 anim-tool（部分用例需 data/anim）
+cargo test -p dst-anim-tool --no-default-features --features cli,gif  # anim-tool（CI 模式：43 个数据用例 ignored）
+cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored  # 本地全量（需 data/anim 软链）
 cargo fmt --all --check            # Check formatting
 cargo clippy --workspace --exclude dst-anim-tool --all-targets --all-features -- -D warnings  # Lint (CI uses this)
 cargo run --release -- --help      # Show CLI help
@@ -124,7 +125,11 @@ cargo run --release -- --help      # Show CLI help
 ## NOTES
 - Workspace：根 package 是 app，`crates/*` 为成员；`default-members = ["."]`（裸 `cargo build`/`cargo test` 只作用于 app）
 - `crates/dst-wikitext`：零第三方依赖的 wikitext 无损解析/编辑 crate（可发布），app 通过 workspace dep 引用
-- `crates/dst-anim-tool`：git subtree 收编（保留独立历史），app 以 `default-features = false, features = ["gif"]` 引用；其集成测试需要 `crates/dst-anim-tool/data/anim` 软链到 DST 安装目录，CI 已排除
+- `crates/dst-anim-tool`：git subtree 收编（保留独立历史），app 以 `default-features = false, features = ["gif"]` 引用
+- anim-tool 的 43 个用例依赖本机 DST 游戏资源，已标 `#[ignore = "requires local DST game data (data/anim symlink)"]`；
+  CI 跑其余 82 个。本地建软链后跑全量：
+  `mkdir -p crates/dst-anim-tool/data && ln -s "<DST>/data/anim" crates/dst-anim-tool/data/anim`
+  然后 `cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored`
 - `.env` required for wiki operations (HUIJI__USERNAME, HUIJI__PASSWORD, HUIJI__X_AUTHKEY, DST__ROOT)
 - WikiClient: global throttle (default 1 QPS, `WIKI__QPS`) + retry on 403/429/GET-5xx (`WIKI__MAX_RETRIES`); POST only retries WAF-level 403/429
 - Edits carry `basetimestamp` + `assert=user`; conflicts surface as `Error::EditConflict`

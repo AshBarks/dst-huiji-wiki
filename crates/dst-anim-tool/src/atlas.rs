@@ -253,6 +253,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn split_atlas_abigail_flower() {
         use crate::archive::parse_zip;
 
@@ -489,6 +490,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn split_atlas_frame_dimensions_positive() {
         use crate::archive::parse_zip;
 
@@ -515,6 +517,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn split_atlas_multi_atlas() {
         use crate::archive::parse_zip;
 

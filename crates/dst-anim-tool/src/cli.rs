@@ -594,6 +594,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn decrypt_produces_valid_zip() {
         let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
         let data = std::fs::read(&input).unwrap();
@@ -603,6 +604,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn decode_dyn_to_png() {
         let input = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
         let archive = dst_anim_tool::archive::load_archives(&[input]).unwrap();
@@ -620,6 +622,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn load_skin_archive_dyn() {
         let skin_path = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.dyn");
         let archive = load_skin_archive(&skin_path).unwrap();
@@ -630,6 +633,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn load_skin_archive_build_zip() {
         let skin_path = std::path::PathBuf::from("data/anim/dynamic/abigail_ice.zip");
         let archive = load_skin_archive(&skin_path).unwrap();
@@ -640,6 +644,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn search_file_finds_symbol() {
         let path = std::path::PathBuf::from("data/anim/abigail_flower.zip");
         assert!(search_file(&path, "petal1", false).unwrap());
@@ -650,6 +655,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn collect_archives_recursive() {
         let tmp = std::env::temp_dir().join(format!(
             "dst_anim_tool_test_{}_{}",

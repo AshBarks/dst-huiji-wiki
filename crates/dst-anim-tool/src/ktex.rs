@@ -536,6 +536,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_ktex_real_file() {
         let zip_data = std::fs::read("data/anim/abigail_flower.zip").unwrap();
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(zip_data.as_slice())).unwrap();

@@ -250,6 +250,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_basic() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -331,6 +332,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_version() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -338,6 +340,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_bank_name() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -345,6 +348,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_animation_names() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -370,6 +374,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_frame_counts() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -394,6 +399,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_frame_rate() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -405,6 +411,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_elements_sorted_by_z() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -421,6 +428,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_frame_idx_sequential() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();
@@ -434,6 +442,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_anim_symbol_lower_is_lowercase() {
         let buf = read_anim_bin_from_zip("data/anim/abigail_flower.zip");
         let anim = parse_anim(&buf).unwrap();

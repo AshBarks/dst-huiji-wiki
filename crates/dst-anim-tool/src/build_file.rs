@@ -249,6 +249,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_basic() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -289,6 +290,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_version() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -296,6 +298,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_name() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -303,6 +306,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_symbol_count() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -310,6 +314,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_symbol_names() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -320,6 +325,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_atlas_count() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -328,6 +334,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_verts_nonempty() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -339,6 +346,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_vert_uv_range() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -365,6 +373,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_frame_index_consistency() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -521,6 +530,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_symbol_index() {
         let buf = read_build_bin_from_zip("data/anim/abigail_flower.zip");
         let build = parse_build(&buf).unwrap();
@@ -535,6 +545,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
     fn parse_build_multi_atlas() {
         let buf = read_build_bin_from_zip("data/anim/abigail_shield.zip");
         let build = parse_build(&buf).unwrap();

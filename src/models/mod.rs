@@ -5,7 +5,10 @@ pub mod recipe;
 pub mod strings;
 pub mod tech_report;
 
-pub use cooking::{CookingData, CookingIngredient, CookingRecipe, COOKING_SCHEMA_VERSION};
+pub use cooking::{
+    CookingData, CookingIngredient, CookingRecipe, CookingStats, CookingTemperature,
+    COOKING_SCHEMA_VERSION,
+};
 pub use crafting_alias::{
     derive_station_aliases, StationAlias, StationAliasInputs, StationAliasReport, UnresolvedReason,
     UnresolvedTreeKey,

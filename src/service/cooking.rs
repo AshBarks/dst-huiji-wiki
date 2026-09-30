@@ -21,6 +21,7 @@ pub fn load_cooking_data(snapshot: Option<String>) -> Result<CookingData> {
     let preparedfoods = source.read("preparedfoods.lua")?;
     let preparedfoods_warly = source.read("preparedfoods_warly.lua")?;
     let preparednonfoods = source.read("preparednonfoods.lua")?;
+    let tuning = source.read("tuning.lua")?;
 
     let mut data = compile_from_sources(&CookingSources {
         cooking: &cooking,
@@ -29,6 +30,7 @@ pub fn load_cooking_data(snapshot: Option<String>) -> Result<CookingData> {
         preparedfoods: &preparedfoods,
         preparedfoods_warly: &preparedfoods_warly,
         preparednonfoods: &preparednonfoods,
+        tuning: &tuning,
     })?;
     data.snapshot = snapshot.clone();
     data.label = match &snapshot {

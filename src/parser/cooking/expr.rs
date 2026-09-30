@@ -241,7 +241,8 @@ fn var_expr_to_field(var_expr: &ast::VarExpression, context: &str) -> Result<Exp
     Ok(expr)
 }
 
-fn short_expr(expr: &ast::Expression) -> String {
+/// One-line, length-capped rendering of an expression for error messages.
+pub(super) fn short_expr(expr: &ast::Expression) -> String {
     let mut text = expr.to_string().replace('\n', " ");
     text = text.split_whitespace().collect::<Vec<_>>().join(" ");
     if text.chars().count() > 120 {

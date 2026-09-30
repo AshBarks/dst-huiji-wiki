@@ -2,17 +2,21 @@
 //!
 //! Produces a self-contained directory (and optionally a zip) consumed by the
 //! independent `dst-cooking-game` project. The package contains the compiled
-//! recipe AST, selectable ingredients, icons, and one verified `example_combo`
+//! recipe AST, selectable ingredients, icons, each dish's food type, the
+//! playable-character roster with portraits, and one verified `example_combo`
 //! per recipe so the game backend can guarantee every refresh is solvable.
 
 use crate::error::{Error, Result};
+use crate::models::{CookingStats, CookingTemperature};
 use crate::platform::fs::write_json_atomic;
 use crate::platform::progress::Reporter;
 use crate::scripts_sync::anim::history::hash_file;
 use crate::scripts_sync::images::icons::build_icons_index;
 use crate::scripts_sync::images::meta as icon_meta;
 use crate::service::cooking::load_cooking_data;
-use crate::service::cooking_assets::{load_po_name_index, names_for, IconResolver};
+use crate::service::cooking_assets::{
+    character_name, foodtype_label, load_po_indexes, names_for, CharacterNames, IconResolver,
+};
 use crate::service::cooking_desc::describe_recipe;
 use crate::service::cooking_eval::{collect_field_refs, eval_truthy, EvalEnv};
 use serde::Serialize;
@@ -20,7 +24,14 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-pub const BUNDLE_SCHEMA_VERSION: u32 = 2;
+/// Bundle payload version. `3` adds recipe `foodtype` / `secondary_foodtype`
+/// (plus their zh labels), `4` adds `data/characters.json` and the character
+/// portraits under `ui/characters/`, `5` adds the entry-instant effect numbers
+/// (`stats`, `temperature`); the AST contract itself is unchanged.
+pub const BUNDLE_SCHEMA_VERSION: u32 = 5;
+
+/// `data/characters.json` contract version.
+pub const CHARACTERS_SCHEMA_VERSION: u32 = 1;
 
 /// UI assets copied into the bundle, independent of the item icon set.
 /// `(bundle_relative_path, path_under_current/split/)`
@@ -32,6 +43,16 @@ pub const UI_ASSETS: &[(&str, &str)] = &[
     ),
     ("ui/warly.png", "saveslot_portraits/warly.png"),
 ];
+
+/// Character portraits: source directory under `current/split/` and the bundle
+/// directory they are copied into. Every character is 120x104 RGBA, the same
+/// art the game shows in save slots (and the same art as `ui/warly.png`).
+pub const PORTRAIT_SRC_DIR: &str = "saveslot_portraits";
+pub const PORTRAIT_BUNDLE_DIR: &str = "ui/characters";
+
+/// `saveslot_portraits/` entries that are UI placeholders rather than playable
+/// characters. Keep in sync with the atlas if the game adds placeholder art.
+pub const PORTRAIT_PLACEHOLDERS: &[&str] = &["background", "mod", "mod_small", "random", "unknown"];
 pub const DEFAULT_CONFIG_TOML: &str = r#"# dst-cooking-game default configuration.
 n_ingredients = 9
 time_limit_secs = 30
@@ -53,7 +74,7 @@ pub struct CookingGameExportParams {
     pub allow_missing_icons: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 struct BundleSource {
     label: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,6 +106,24 @@ struct BundleRecipe {
     desc_attrs: String,
     /// 特殊要求（具体食材计数），以「；」连接；无要求时为空串。
     desc_special: String,
+    /// 入口瞬时数值：生命 / 饥饿 / 理智。非食物产物（`preparednonfoods.lua`）
+    /// 一律为 0（真实数值由各自的 prefab 决定，不在本包内）。
+    stats: CookingStats,
+    /// 冷热食物的温度 delta 与持续时间（仅部分料理有）。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    temperature: Option<CookingTemperature>,
+    /// 食物类型（`FOODTYPE.*` 名，如 `MEAT`）。`preparednonfoods.lua` 的非食物
+    /// 产物（如 `batnosehat`）没有类型，此时两个字段都不输出。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    foodtype: Option<String>,
+    /// 食物类型中文名（`STRINGS.SCRAPBOOK.FOODTYPE.*`，如 `肉`）。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    foodtype_zh: Option<String>,
+    /// 次要食物类型，仅少数料理有（怪物千层饼、怪物鞑靼、牛饲料）。
+    #[serde(skip_serializing_if = "Option::is_none")]
+    secondary_foodtype: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    secondary_foodtype_zh: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     name_en: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -105,6 +144,26 @@ struct BundleExample {
 struct BundleExampleItem {
     id: u32,
     count: u32,
+}
+
+#[derive(Debug, Serialize)]
+struct BundleCharacters {
+    schema_version: u32,
+    source: BundleSource,
+    characters: Vec<BundleCharacter>,
+}
+
+#[derive(Debug, Serialize)]
+struct BundleCharacter {
+    /// `saveslot_portraits` file stem, i.e. the in-game character prefab
+    /// (`wathgrithr`, `waxwell`, ...).
+    key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name_en: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name_zh: Option<String>,
+    /// Bundle-relative portrait path (`ui/characters/<key>.png`).
+    portrait: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -141,6 +200,7 @@ struct BundleManifest {
 struct BundleCounts {
     ingredients: usize,
     recipes: usize,
+    characters: usize,
     images: usize,
     examples: usize,
 }
@@ -175,10 +235,12 @@ pub fn run_cooking_export(
         data.label
     ));
 
-    let names = load_po_name_index(params.snapshot.as_deref()).unwrap_or_else(|e| {
+    let po = load_po_indexes(params.snapshot.as_deref()).unwrap_or_else(|e| {
         reporter.log(format!("PO 名称加载失败，将只输出 prefab 名：{}", e));
-        HashMap::new()
+        Default::default()
     });
+    let names = po.names;
+    let foodtype_labels = po.foodtypes;
 
     let ktools = crate::platform::config::ktools_out_dir();
     let manifests_dir = ktools.join("history/manifests");
@@ -206,6 +268,24 @@ pub fn run_cooking_export(
             }
         })
         .collect::<Result<Vec<_>>>()?;
+
+    // --- characters -----------------------------------------------------------------
+    let portraits = character_portraits(&split_root)?;
+    let (bundle_characters, unnamed_characters) = bundle_characters(&portraits, &po.characters);
+    if !unnamed_characters.is_empty() {
+        reporter.log(format!(
+            "警告：{} 个角色头像在 PO 中没有名字（仍会导出）：{}",
+            unnamed_characters.len(),
+            unnamed_characters.join(", ")
+        ));
+    }
+    let character_count = bundle_characters.len();
+    let mut bundle_ui_assets = ui_assets;
+    bundle_ui_assets.extend(
+        portraits
+            .iter()
+            .map(|(key, path)| (format!("{}/{}.png", PORTRAIT_BUNDLE_DIR, key), path.clone())),
+    );
 
     // --- stable IDs -----------------------------------------------------------------
     let mut ingredient_key_to_idx: HashMap<String, usize> = HashMap::new();
@@ -258,6 +338,16 @@ pub fn run_cooking_export(
             missing_icons.push(recipe.name.clone());
         }
         let desc = describe_recipe(&recipe.name, &recipe.test, &desc_names)?;
+        let foodtype_zh = recipe
+            .foodtype
+            .as_deref()
+            .and_then(|ty| foodtype_label(&foodtype_labels, ty))
+            .map(str::to_string);
+        let secondary_foodtype_zh = recipe
+            .secondary_foodtype
+            .as_deref()
+            .and_then(|ty| foodtype_label(&foodtype_labels, ty))
+            .map(str::to_string);
         recipe_name_to_idx.insert(recipe.name.clone(), idx);
         bundle_recipes.push(BundleRecipe {
             id: idx as u32,
@@ -267,6 +357,12 @@ pub fn run_cooking_export(
             test: recipe.test.clone(),
             desc_attrs: desc.attrs,
             desc_special: desc.specials,
+            stats: recipe.stats.clone(),
+            temperature: recipe.temperature.clone(),
+            foodtype: recipe.foodtype.clone(),
+            foodtype_zh,
+            secondary_foodtype: recipe.secondary_foodtype.clone(),
+            secondary_foodtype_zh,
             name_en,
             name_zh,
             icon: icon.filter(|file| image_source.join(file).is_file()),
@@ -357,8 +453,9 @@ pub fn run_cooking_export(
     std::fs::create_dir_all(out_dir.join("data"))?;
     std::fs::create_dir_all(out_dir.join("images"))?;
     std::fs::create_dir_all(out_dir.join("ui"))?;
+    std::fs::create_dir_all(out_dir.join(PORTRAIT_BUNDLE_DIR))?;
 
-    for (rel, src) in &ui_assets {
+    for (rel, src) in &bundle_ui_assets {
         std::fs::copy(src, out_dir.join(rel))?;
     }
 
@@ -378,6 +475,14 @@ pub fn run_cooking_export(
     }
 
     write_json_atomic(out_dir.join("data/cooking.json"), &bundle)?;
+    write_json_atomic(
+        out_dir.join("data/characters.json"),
+        &BundleCharacters {
+            schema_version: CHARACTERS_SCHEMA_VERSION,
+            source: bundle.source.clone(),
+            characters: bundle_characters,
+        },
+    )?;
     std::fs::write(out_dir.join("default-config.toml"), DEFAULT_CONFIG_TOML)?;
 
     // Manifest hashes are computed after data/images exist.
@@ -394,7 +499,7 @@ pub fn run_cooking_export(
             size: meta.len(),
         });
     }
-    let image_count = image_files.len() + ui_assets.len();
+    let image_count = image_files.len() + bundle_ui_assets.len();
     let manifest = BundleManifest {
         bundle_schema_version: BUNDLE_SCHEMA_VERSION,
         cooking_schema_version: data.schema_version,
@@ -407,6 +512,7 @@ pub fn run_cooking_export(
         counts: BundleCounts {
             ingredients: bundle.ingredients.len(),
             recipes: bundle.recipes.len(),
+            characters: character_count,
             images: image_count,
             examples: example_count,
         },
@@ -440,6 +546,7 @@ pub fn run_cooking_export(
         counts: BundleCounts {
             ingredients: bundle.ingredients.len(),
             recipes: bundle.recipes.len(),
+            characters: character_count,
             images: image_count,
             examples: example_count,
         },
@@ -461,6 +568,85 @@ fn cooker_indices(
         out.push(*idx);
     }
     Ok(out)
+}
+
+// ---------------------------------------------------------------------------
+// character portraits
+// ---------------------------------------------------------------------------
+
+/// Portrait file name -> character key, or `None` for non-PNG entries and UI
+/// placeholders (`background`, `random`, ...).
+fn portrait_key(file_name: &str) -> Option<&str> {
+    let key = file_name.strip_suffix(".png")?;
+    if key.is_empty()
+        || PORTRAIT_PLACEHOLDERS.contains(&key)
+        || !key
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+    {
+        return None;
+    }
+    Some(key)
+}
+
+/// Enumerate the character portraits produced by the image pipeline, sorted by
+/// key. The directory is authoritative: a character added by a game update is
+/// picked up without touching this exporter.
+fn character_portraits(split_root: &Path) -> Result<Vec<(String, PathBuf)>> {
+    let dir = split_root.join(PORTRAIT_SRC_DIR);
+    let entries = std::fs::read_dir(&dir).map_err(|e| {
+        Error::Config(format!(
+            "缺少角色头像素材目录：{}（来自 {}/{}，{}）",
+            dir.display(),
+            split_root.display(),
+            PORTRAIT_SRC_DIR,
+            e
+        ))
+    })?;
+    let mut out = Vec::new();
+    for entry in entries {
+        let path = entry?.path();
+        if !path.is_file() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+            continue;
+        };
+        if let Some(key) = portrait_key(name) {
+            out.push((key.to_string(), path));
+        }
+    }
+    out.sort();
+    if out.is_empty() {
+        return Err(Error::Config(format!(
+            "角色头像素材目录里没有可用头像：{}",
+            dir.display()
+        )));
+    }
+    Ok(out)
+}
+
+/// Build `characters.json` entries. Returns the entries plus the keys whose
+/// names are missing from the PO (exported anyway, reported by the caller).
+fn bundle_characters(
+    portraits: &[(String, PathBuf)],
+    names: &CharacterNames,
+) -> (Vec<BundleCharacter>, Vec<String>) {
+    let mut characters = Vec::with_capacity(portraits.len());
+    let mut unnamed = Vec::new();
+    for (key, _) in portraits {
+        let (name_en, name_zh) = character_name(names, key);
+        if name_en.is_none() && name_zh.is_none() {
+            unnamed.push(key.clone());
+        }
+        characters.push(BundleCharacter {
+            key: key.clone(),
+            name_en,
+            name_zh,
+            portrait: format!("{}/{}.png", PORTRAIT_BUNDLE_DIR, key),
+        });
+    }
+    (characters, unnamed)
 }
 
 // ---------------------------------------------------------------------------
@@ -827,5 +1013,97 @@ mod tests {
             crate::scripts_sync::anim::history::hash_bytes(b"abc"),
             "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
         );
+    }
+
+    #[test]
+    fn portrait_keys_skip_placeholders_and_non_png() {
+        assert_eq!(portrait_key("wilson.png"), Some("wilson"));
+        assert_eq!(portrait_key("wathgrithr.png"), Some("wathgrithr"));
+        assert_eq!(portrait_key("wx78.png"), Some("wx78"));
+        for placeholder in PORTRAIT_PLACEHOLDERS {
+            assert_eq!(portrait_key(&format!("{}.png", placeholder)), None);
+        }
+        assert_eq!(portrait_key("wilson.tex"), None);
+        assert_eq!(portrait_key(".png"), None);
+        assert_eq!(portrait_key("Wilson.png"), None);
+        assert_eq!(portrait_key("wilson 2.png"), None);
+    }
+
+    #[test]
+    fn bundle_characters_resolve_po_names() {
+        let portraits = vec![
+            (
+                "warly".to_string(),
+                PathBuf::from("/split/saveslot_portraits/warly.png"),
+            ),
+            (
+                "wonkey".to_string(),
+                PathBuf::from("/split/saveslot_portraits/wonkey.png"),
+            ),
+        ];
+        let names = CharacterNames::from([(
+            "warly".to_string(),
+            (Some("Warly".to_string()), Some("沃利".to_string())),
+        )]);
+        let (characters, unnamed) = bundle_characters(&portraits, &names);
+        assert_eq!(characters.len(), 2);
+        assert_eq!(characters[0].key, "warly");
+        assert_eq!(characters[0].name_zh.as_deref(), Some("沃利"));
+        assert_eq!(characters[0].portrait, "ui/characters/warly.png");
+        // Not in the PO: exported with the path only, reported to the caller.
+        assert_eq!(characters[1].name_zh, None);
+        assert_eq!(characters[1].portrait, "ui/characters/wonkey.png");
+        assert_eq!(unnamed, vec!["wonkey".to_string()]);
+    }
+
+    #[test]
+    fn bundle_recipe_serializes_food_types() {
+        let recipe = BundleRecipe {
+            id: 7,
+            name: "baconeggs".into(),
+            priority: 10.0,
+            weight: 1.0,
+            test: serde_json::json!([true]),
+            desc_attrs: String::new(),
+            desc_special: String::new(),
+            stats: CookingStats {
+                health: 20.0,
+                hunger: 37.5,
+                sanity: 5.0,
+            },
+            temperature: None,
+            foodtype: Some("MEAT".into()),
+            foodtype_zh: Some("肉".into()),
+            secondary_foodtype: None,
+            secondary_foodtype_zh: None,
+            name_en: None,
+            name_zh: None,
+            icon: None,
+            examples: Vec::new(),
+        };
+        let value = serde_json::to_value(&recipe).unwrap();
+        assert_eq!(value["foodtype"], "MEAT");
+        assert_eq!(value["foodtype_zh"], "肉");
+        // Absent secondary type stays out of the payload entirely.
+        assert!(value.get("secondary_foodtype").is_none());
+        assert!(value.get("secondary_foodtype_zh").is_none());
+        assert_eq!(value["stats"]["health"], 20.0);
+        assert_eq!(value["stats"]["hunger"], 37.5);
+        assert_eq!(value["stats"]["sanity"], 5.0);
+        // No temperature: the key stays out; `no_chill` is dropped when false.
+        assert!(value.get("temperature").is_none());
+
+        let warm = BundleRecipe {
+            temperature: Some(CookingTemperature {
+                delta: 40.0,
+                duration: 5.0,
+                no_chill: false,
+            }),
+            ..recipe
+        };
+        let value = serde_json::to_value(&warm).unwrap();
+        assert_eq!(value["temperature"]["delta"], 40.0);
+        assert_eq!(value["temperature"]["duration"], 5.0);
+        assert!(value["temperature"].get("no_chill").is_none());
     }
 }

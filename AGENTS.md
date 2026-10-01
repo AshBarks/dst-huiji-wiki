@@ -119,7 +119,7 @@ cargo test --workspace --exclude dst-anim-tool   # app + dst-wikitext 全量测�
 cargo test -p dst-huiji-wiki --lib -- --include-ignored  # 本地全量 app 测试（需 examples/prefabs；conformance 自动跳过）
 cargo test -p dst-wikitext         # 只测抽出的 wikitext crate
 cargo test -p dst-ktex             # 只测抽出的 KTEX crate（合成 fixture，无需游戏素材）
-cargo test -p dst-anim-tool --no-default-features --features cli,gif  # anim-tool（CI 模式：43 个数据用例 ignored）
+cargo test -p dst-anim-tool --no-default-features --features cli,gif  # anim-tool（CI 模式：50 个数据用例 ignored）
 cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored  # 本地全量（需 data/anim 软链）
 cargo fmt --all --check            # Check formatting
 cargo clippy --workspace --exclude dst-anim-tool --all-targets --all-features -- -D warnings  # Lint (CI uses this)
@@ -132,8 +132,8 @@ cargo run --release -- --help      # Show CLI help
 - `crates/dst-ktex`：KTEX 解析/解码共享 crate（app 与 dst-anim-tool 共用；`build_tex`/`compress_bc3` 可造合成 fixture）；`DECODER_VERSION` 变更会触发图片历史全量重处理
 - `crates/dst-anim-tool`：git subtree 收编（保留独立历史），app 以 `default-features = false, features = ["gif"]` 引用
 - app 的 6 个 prefab_override 用例依赖本机 `examples/prefabs/`（已 gitignore，CI 不可用），标 `#[ignore = "requires local DST game data (examples/prefabs)"]`；本地 `cargo test -p dst-huiji-wiki --lib -- --include-ignored` 跑全量（含指纹测试 `test_all_prefabs_files`）
-- anim-tool 的 43 个用例依赖本机 DST 游戏资源，已标 `#[ignore = "requires local DST game data (data/anim symlink)"]`；
-  CI 跑其余 67 个。本地建软链后跑全量：
+- anim-tool 的 50 个用例依赖本机 DST 游戏资源，已标 `#[ignore = "requires local DST game data (data/anim symlink)"]`；
+  CI 跑其余 72 个。本地建软链后跑全量：
   `mkdir -p crates/dst-anim-tool/data && ln -s "<DST>/data/anim" crates/dst-anim-tool/data/anim`
   然后 `cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored`
 - `.env` required for wiki operations (HUIJI__USERNAME, HUIJI__PASSWORD, HUIJI__X_AUTHKEY, DST__ROOT)

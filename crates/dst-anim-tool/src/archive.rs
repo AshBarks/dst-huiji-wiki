@@ -128,6 +128,27 @@ pub fn parse_file_by_path(path: &Path, data: &[u8]) -> Result<ParsedArchive> {
     }
 }
 
+pub fn load_archive_files(
+    paths: &[std::path::PathBuf],
+) -> Result<Vec<(std::path::PathBuf, ParsedArchive)>> {
+    let mut result = Vec::with_capacity(paths.len());
+    for path in paths {
+        let data = std::fs::read(path)?;
+        let mut archive = parse_file_by_path(path, &data)?;
+        let source_name = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown");
+        for source in &mut archive.tex_sources {
+            if source.source_name.is_empty() {
+                source.source_name = source_name.to_string();
+            }
+        }
+        result.push((path.clone(), archive));
+    }
+    Ok(result)
+}
+
 pub fn load_archives(paths: &[std::path::PathBuf]) -> Result<ParsedArchive> {
     if paths.is_empty() {
         return Err(Error::Other("no input files".to_string()));

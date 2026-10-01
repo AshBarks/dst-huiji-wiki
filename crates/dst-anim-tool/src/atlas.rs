@@ -73,6 +73,7 @@ fn compute_spans(img: &image::RgbaImage) -> SpriteSpans {
     let raw = img.as_raw();
     let mut rows = Vec::with_capacity(h);
     let mut fully_opaque = true;
+    let mut ink: Option<crate::build_file::InkRect> = None;
     for y in 0..h {
         let row = &raw[y * w * 4..(y + 1) * w * 4];
         let mut start = None;
@@ -92,6 +93,15 @@ fn compute_spans(img: &image::RgbaImage) -> SpriteSpans {
         match start {
             Some(s) => {
                 fully_opaque = fully_opaque && opaque && s == 0 && end == w;
+                let rect = ink.get_or_insert(crate::build_file::InkRect {
+                    min_x: s as u32,
+                    min_y: y as u32,
+                    max_x: end as u32,
+                    max_y: y as u32 + 1,
+                });
+                rect.min_x = rect.min_x.min(s as u32);
+                rect.max_x = rect.max_x.max(end as u32);
+                rect.max_y = y as u32 + 1;
                 rows.push(Some(RowSpan {
                     start: s,
                     end,
@@ -104,6 +114,7 @@ fn compute_spans(img: &image::RgbaImage) -> SpriteSpans {
     SpriteSpans {
         rows: rows.into_boxed_slice(),
         fully_opaque,
+        ink,
     }
 }
 
@@ -276,6 +287,33 @@ mod tests {
             .map(|s| s.frames.iter().filter(|f| f.image.is_some()).count())
             .sum();
         assert!(frames_with_images > 0);
+    }
+
+    #[test]
+    fn compute_spans_ink_rect() {
+        let mut img = image::RgbaImage::new(8, 6);
+        for y in 2..5 {
+            for x in 1..6 {
+                img.put_pixel(x, y, image::Rgba([10, 20, 30, 255]));
+            }
+        }
+        img.put_pixel(7, 0, image::Rgba([1, 2, 3, 255]));
+        let spans = compute_spans(&img);
+        let ink = spans.ink.unwrap();
+        assert_eq!(ink.min_x, 1);
+        assert_eq!(ink.min_y, 0);
+        assert_eq!(ink.max_x, 8);
+        assert_eq!(ink.max_y, 5);
+        assert_eq!(ink.width(), 7);
+        assert_eq!(ink.height(), 5);
+        assert!(!spans.fully_opaque);
+    }
+
+    #[test]
+    fn compute_spans_ink_none_when_transparent() {
+        let img = image::RgbaImage::new(4, 4);
+        let spans = compute_spans(&img);
+        assert!(spans.ink.is_none());
     }
 
     #[test]

@@ -1,14 +1,141 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
-#[cfg(any(feature = "cli", feature = "gui"))]
+#[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
 use crate::anim::AnimFrame;
-use crate::build_file::BuildFile;
+use crate::build_file::{BuildFile, InkRect};
 
 pub struct BuildRef<'a> {
     pub build: &'a BuildFile,
     pub disabled_symbols: &'a HashSet<String>,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum BoundsKind {
+    #[default]
+    Rect,
+    Ink,
+}
+
+#[derive(Clone)]
+pub struct RenderOptions {
+    pub scale: f32,
+    pub offset: (f32, f32),
+    disabled_elements: HashSet<(String, String)>,
+    disabled_symbols: HashSet<String>,
+    disabled_layers: HashSet<String>,
+    overrides: SymbolOverrideMap,
+    bounds_kind: BoundsKind,
+}
+
+fn normalize_element_set(set: HashSet<(String, String)>) -> HashSet<(String, String)> {
+    set.into_iter()
+        .map(|(s, l)| (s.to_lowercase(), l.to_lowercase()))
+        .collect()
+}
+
+fn normalize_str_set(set: HashSet<String>) -> HashSet<String> {
+    set.into_iter().map(|s| s.to_lowercase()).collect()
+}
+
+impl Default for RenderOptions {
+    fn default() -> Self {
+        Self::new(1.0, (0.0, 0.0))
+    }
+}
+
+impl RenderOptions {
+    pub fn new(scale: f32, offset: (f32, f32)) -> Self {
+        Self {
+            scale,
+            offset,
+            disabled_elements: HashSet::new(),
+            disabled_symbols: HashSet::new(),
+            disabled_layers: HashSet::new(),
+            overrides: SymbolOverrideMap::new(),
+            bounds_kind: BoundsKind::Rect,
+        }
+    }
+
+    pub fn with_disabled_elements(mut self, set: HashSet<(String, String)>) -> Self {
+        self.disabled_elements = normalize_element_set(set);
+        self
+    }
+
+    pub fn with_disabled_symbols(mut self, set: HashSet<String>) -> Self {
+        self.disabled_symbols = normalize_str_set(set);
+        self
+    }
+
+    pub fn with_disabled_layers(mut self, set: HashSet<String>) -> Self {
+        self.disabled_layers = normalize_str_set(set);
+        self
+    }
+
+    pub fn with_overrides(mut self, overrides: SymbolOverrideMap) -> Self {
+        self.overrides = overrides;
+        self
+    }
+
+    pub fn with_bounds_kind(mut self, kind: BoundsKind) -> Self {
+        self.bounds_kind = kind;
+        self
+    }
+
+    pub fn bounds_kind(&self) -> BoundsKind {
+        self.bounds_kind
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MissingSymbolKind {
+    NoSymbol,
+    NoFrame,
+    NoImage,
+}
+
+#[derive(Debug, Clone)]
+pub struct MissingSymbolInfo {
+    pub symbol: String,
+    pub layer: String,
+    pub lookup_symbol: String,
+    pub kind: MissingSymbolKind,
+    pub frames: Vec<usize>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct RenderDiagnostics {
+    pub missing: BTreeMap<(String, String), MissingSymbolInfo>,
+    pub skipped_frames: Vec<usize>,
+}
+
+impl RenderDiagnostics {
+    pub fn record(
+        &mut self,
+        symbol: &str,
+        layer: &str,
+        lookup_symbol: &str,
+        kind: MissingSymbolKind,
+        frame_pos: usize,
+    ) {
+        let key = (symbol.to_lowercase(), layer.to_lowercase());
+        let entry = self
+            .missing
+            .entry(key)
+            .or_insert_with(|| MissingSymbolInfo {
+                symbol: symbol.to_string(),
+                layer: layer.to_string(),
+                lookup_symbol: lookup_symbol.to_string(),
+                kind,
+                frames: Vec::new(),
+            });
+        entry.frames.push(frame_pos);
+    }
+
+    pub fn has_missing(&self) -> bool {
+        !self.missing.is_empty()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -179,14 +306,64 @@ pub struct BoundingBox {
 #[derive(Debug, Clone)]
 pub struct RenderedFrame {
     pub image: image::RgbaImage,
+    pub ink_bounds: Option<BoundingBox>,
 }
 
-fn find_symbol_frame<'a>(
+pub fn image_ink_bounds(image: &image::RgbaImage, canvas: &BoundingBox) -> Option<BoundingBox> {
+    let raw = image.as_raw();
+    let w = image.width() as usize;
+    let h = image.height() as usize;
+    let mut min_x = w;
+    let mut max_x = 0usize;
+    let mut min_y = h;
+    let mut max_y = 0usize;
+    let mut any = false;
+    for y in 0..h {
+        let row = &raw[y * w * 4..(y + 1) * w * 4];
+        let mut row_min = w;
+        let mut row_max = 0usize;
+        let mut row_any = false;
+        for x in 0..w {
+            if row[x * 4 + 3] != 0 {
+                if !row_any {
+                    row_any = true;
+                    row_min = x;
+                }
+                row_max = x;
+            }
+        }
+        if row_any {
+            any = true;
+            min_y = min_y.min(y);
+            max_y = y;
+            min_x = min_x.min(row_min);
+            max_x = max_x.max(row_max);
+        }
+    }
+    if !any {
+        return None;
+    }
+    Some(BoundingBox {
+        left: canvas.left + min_x as f32,
+        top: canvas.top + min_y as f32,
+        right: canvas.left + (max_x + 1) as f32,
+        bottom: canvas.top + (max_y + 1) as f32,
+    })
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LookupFailure {
+    NoSymbol,
+    NoFrame,
+}
+
+fn find_symbol_frame_res<'a>(
     build_list: &[BuildRef<'a>],
     symbol_name_lower: &str,
     frame_num: u32,
     build_hint: Option<&str>,
-) -> Option<&'a crate::build_file::BuildFrame> {
+) -> Result<&'a crate::build_file::BuildFrame, LookupFailure> {
+    let mut saw_symbol = false;
     for br in build_list {
         if br.disabled_symbols.contains(symbol_name_lower) {
             continue;
@@ -198,19 +375,35 @@ fn find_symbol_frame<'a>(
         }
         if let Some(&sym_idx) = br.build.symbol_index.get(symbol_name_lower) {
             if let Some(symbol) = br.build.symbols.get(sym_idx) {
+                saw_symbol = true;
                 if let Some(frame) = symbol.frame_for_anim_frame(frame_num) {
-                    return Some(frame);
+                    return Ok(frame);
                 }
             }
         }
     }
-    None
+    Err(if saw_symbol {
+        LookupFailure::NoFrame
+    } else {
+        LookupFailure::NoSymbol
+    })
+}
+
+#[cfg(test)]
+fn find_symbol_frame<'a>(
+    build_list: &[BuildRef<'a>],
+    symbol_name_lower: &str,
+    frame_num: u32,
+    build_hint: Option<&str>,
+) -> Option<&'a crate::build_file::BuildFrame> {
+    find_symbol_frame_res(build_list, symbol_name_lower, frame_num, build_hint).ok()
 }
 
 #[derive(Clone)]
 pub struct ElementData {
     pub sprite: std::sync::Arc<image::RgbaImage>,
     pub spans: Option<std::sync::Arc<crate::build_file::SpriteSpans>>,
+    pub ink: Option<InkRect>,
     pub bf_x: f32,
     pub bf_y: f32,
     pub dest_x: i64,
@@ -251,41 +444,94 @@ pub fn compute_frame_elements_with_overrides(
     disabled_symbols: &HashSet<String>,
     overrides: &SymbolOverrideMap,
 ) -> Option<Vec<ElementData>> {
+    let options = RenderOptions::new(scale, (0.0, 0.0))
+        .with_disabled_elements(disabled_elements.clone())
+        .with_disabled_symbols(disabled_symbols.clone())
+        .with_overrides(overrides.clone());
+    compute_frame_elements_core(anim_frame, build_list, &options, 0, None)
+}
+
+pub fn compute_frame_elements_opts(
+    anim_frame: &AnimFrame,
+    build_list: &[BuildRef<'_>],
+    options: &RenderOptions,
+) -> (Option<Vec<ElementData>>, RenderDiagnostics) {
+    let mut diagnostics = RenderDiagnostics::default();
+    let result =
+        compute_frame_elements_core(anim_frame, build_list, options, 0, Some(&mut diagnostics));
+    (result, diagnostics)
+}
+
+fn compute_frame_elements_core(
+    anim_frame: &AnimFrame,
+    build_list: &[BuildRef<'_>],
+    options: &RenderOptions,
+    frame_pos: usize,
+    mut diagnostics: Option<&mut RenderDiagnostics>,
+) -> Option<Vec<ElementData>> {
     let mut elements_data: Vec<ElementData> = Vec::new();
     for element in &anim_frame.elements {
-        if disabled_symbols.contains(&element.symbol_lower)
-            || (!disabled_elements.is_empty()
-                && disabled_elements
-                    .contains(&(element.symbol_lower.clone(), element.layer_name.clone())))
+        if options.disabled_symbols.contains(&element.symbol_lower)
+            || options.disabled_layers.contains(&element.layer_lower)
+            || (!options.disabled_elements.is_empty()
+                && options
+                    .disabled_elements
+                    .contains(&(element.symbol_lower.clone(), element.layer_lower.clone())))
         {
             continue;
         }
-        let (build_hint, lookup_symbol) = match overrides.get(&element.symbol_lower) {
+        let (build_hint, lookup_symbol) = match options.overrides.get(&element.symbol_lower) {
             Some(o) if o.build.is_empty() => (None, o.symbol.as_str()),
             Some(o) => (Some(o.build.as_str()), o.symbol.as_str()),
             None => (None, element.symbol_lower.as_str()),
         };
-        let bf = find_symbol_frame(build_list, lookup_symbol, element.frame_num, build_hint);
-        if let Some(bf) = bf {
-            let Some(sprite) = &bf.image else {
-                continue;
-            };
-            elements_data.push(ElementData {
-                sprite: sprite.clone(),
-                spans: bf.spans.clone(),
-                bf_x: bf.x,
-                bf_y: bf.y,
-                dest_x: bf.dest_x,
-                dest_y: bf.dest_y,
-                canvas_w: bf.canvas_w,
-                canvas_h: bf.canvas_h,
-                a: element.a * scale,
-                b: element.b * scale,
-                c: element.c * scale,
-                d: element.d * scale,
-                tx: element.tx,
-                ty: element.ty,
-            });
+        match find_symbol_frame_res(build_list, lookup_symbol, element.frame_num, build_hint) {
+            Ok(bf) => {
+                let Some(sprite) = &bf.image else {
+                    if let Some(diag) = diagnostics.as_deref_mut() {
+                        diag.record(
+                            &element.symbol,
+                            &element.layer_name,
+                            lookup_symbol,
+                            MissingSymbolKind::NoImage,
+                            frame_pos,
+                        );
+                    }
+                    continue;
+                };
+                elements_data.push(ElementData {
+                    sprite: sprite.clone(),
+                    spans: bf.spans.clone(),
+                    ink: bf.spans.as_ref().and_then(|s| s.ink),
+                    bf_x: bf.x,
+                    bf_y: bf.y,
+                    dest_x: bf.dest_x,
+                    dest_y: bf.dest_y,
+                    canvas_w: bf.canvas_w,
+                    canvas_h: bf.canvas_h,
+                    a: element.a * options.scale,
+                    b: element.b * options.scale,
+                    c: element.c * options.scale,
+                    d: element.d * options.scale,
+                    tx: element.tx,
+                    ty: element.ty,
+                });
+            }
+            Err(failure) => {
+                if let Some(diag) = diagnostics.as_deref_mut() {
+                    let kind = match failure {
+                        LookupFailure::NoSymbol => MissingSymbolKind::NoSymbol,
+                        LookupFailure::NoFrame => MissingSymbolKind::NoFrame,
+                    };
+                    diag.record(
+                        &element.symbol,
+                        &element.layer_name,
+                        lookup_symbol,
+                        kind,
+                        frame_pos,
+                    );
+                }
+            }
         }
     }
     if elements_data.is_empty() {
@@ -295,10 +541,131 @@ pub fn compute_frame_elements_with_overrides(
     }
 }
 
+fn extend_bbox(bbox: &mut (f32, f32, f32, f32), x: f32, y: f32) {
+    bbox.0 = bbox.0.min(x);
+    bbox.1 = bbox.1.min(y);
+    bbox.2 = bbox.2.max(x);
+    bbox.3 = bbox.3.max(y);
+}
+
+fn compute_element_bounds(
+    elem: &ElementData,
+    scale: f32,
+    offset: (f32, f32),
+    kind: BoundsKind,
+) -> Option<(f32, f32, f32, f32)> {
+    let w = elem.sprite.width() as f32;
+    let h = elem.sprite.height() as f32;
+    if w == 0.0 || h == 0.0 {
+        return None;
+    }
+    let center_x = elem.bf_x + (elem.dest_x as f32 + w / 2.0 - elem.canvas_w / 2.0);
+    let center_y = elem.bf_y + (elem.dest_y as f32 + h / 2.0 - elem.canvas_h / 2.0);
+    let elem_left = elem.tx * scale + offset.0 + center_x * elem.a + center_y * elem.c;
+    let elem_top = elem.ty * scale + offset.1 + center_x * elem.b + center_y * elem.d;
+
+    let map = |px: f32, py: f32| -> (f32, f32) {
+        let dx = px - w / 2.0;
+        let dy = py - h / 2.0;
+        (
+            elem_left + dx * elem.a + dy * elem.c,
+            elem_top + dx * elem.b + dy * elem.d,
+        )
+    };
+
+    let mut bbox = (
+        f32::INFINITY,
+        f32::INFINITY,
+        f32::NEG_INFINITY,
+        f32::NEG_INFINITY,
+    );
+    let mut any = false;
+
+    if kind == BoundsKind::Ink {
+        let crop_x_lo = (-elem.dest_x).max(0) as f32;
+        let crop_x_hi = (elem.canvas_w as i64 - elem.dest_x)
+            .min(elem.sprite.width() as i64)
+            .max(0) as f32;
+        let crop_y_lo = (-elem.dest_y).max(0) as f32;
+        let crop_y_hi = (elem.canvas_h as i64 - elem.dest_y)
+            .min(elem.sprite.height() as i64)
+            .max(0) as f32;
+
+        if let Some(spans) = &elem.spans {
+            for (y, row) in spans.rows.iter().enumerate() {
+                let Some(rs) = row else { continue };
+                let sx0 = (rs.start as f32).max(crop_x_lo);
+                let sx1 = (rs.end as f32).min(crop_x_hi);
+                let sy0 = (y as f32).max(crop_y_lo);
+                let sy1 = (y as f32 + 1.0).min(crop_y_hi);
+                if sx0 >= sx1 || sy0 >= sy1 {
+                    continue;
+                }
+                any = true;
+                for (px, py) in [(sx0, sy0), (sx1, sy0), (sx0, sy1), (sx1, sy1)] {
+                    let (x, y) = map(px, py);
+                    extend_bbox(&mut bbox, x, y);
+                }
+            }
+        }
+
+        if !any {
+            let sw = elem.sprite.width() as i64;
+            let sh = elem.sprite.height() as i64;
+            let (x0, y0, x1, y1) = match elem.ink {
+                Some(ink) => (
+                    ink.min_x as i64,
+                    ink.min_y as i64,
+                    ink.max_x as i64,
+                    ink.max_y as i64,
+                ),
+                None => (0, 0, sw, sh),
+            };
+            let x0 = x0.max(crop_x_lo as i64);
+            let x1 = x1.min(crop_x_hi as i64);
+            let y0 = y0.max(crop_y_lo as i64);
+            let y1 = y1.min(crop_y_hi as i64);
+            if x0 >= x1 || y0 >= y1 {
+                return None;
+            }
+            any = true;
+            for (px, py) in [
+                (x0 as f32, y0 as f32),
+                (x1 as f32, y0 as f32),
+                (x0 as f32, y1 as f32),
+                (x1 as f32, y1 as f32),
+            ] {
+                let (x, y) = map(px, py);
+                extend_bbox(&mut bbox, x, y);
+            }
+        }
+    } else {
+        any = true;
+        for (px, py) in [(0.0, 0.0), (w, 0.0), (0.0, h), (w, h)] {
+            let (x, y) = map(px, py);
+            extend_bbox(&mut bbox, x, y);
+        }
+    }
+
+    if !any {
+        return None;
+    }
+    Some(bbox)
+}
+
 pub fn compute_bounds_from_elements(
     elements_data: &[ElementData],
     scale: f32,
     offset: (f32, f32),
+) -> Option<BoundingBox> {
+    compute_bounds_from_elements_kind(elements_data, scale, offset, BoundsKind::Rect)
+}
+
+pub fn compute_bounds_from_elements_kind(
+    elements_data: &[ElementData],
+    scale: f32,
+    offset: (f32, f32),
+    kind: BoundsKind,
 ) -> Option<BoundingBox> {
     let mut top = f32::INFINITY;
     let mut left = f32::INFINITY;
@@ -306,26 +673,13 @@ pub fn compute_bounds_from_elements(
     let mut right = f32::NEG_INFINITY;
 
     for elem in elements_data {
-        let cw = elem.sprite.width() as f32;
-        let ch = elem.sprite.height() as f32;
-        let center_x = elem.bf_x + (elem.dest_x as f32 + cw / 2.0 - elem.canvas_w / 2.0);
-        let center_y = elem.bf_y + (elem.dest_y as f32 + ch / 2.0 - elem.canvas_h / 2.0);
-        let elem_left = elem.tx * scale + offset.0 + center_x * elem.a + center_y * elem.c;
-        let elem_top = elem.ty * scale + offset.1 + center_x * elem.b + center_y * elem.d;
-
-        let sw = elem.sprite.width() as f32;
-        let sh = elem.sprite.height() as f32;
-        let corners_x = [0.0, sw * elem.a, sh * elem.c, sw * elem.a + sh * elem.c];
-        let corners_y = [0.0, sw * elem.b, sh * elem.d, sw * elem.b + sh * elem.d];
-        let tw = corners_x.iter().cloned().fold(f32::NEG_INFINITY, f32::max)
-            - corners_x.iter().cloned().fold(f32::INFINITY, f32::min);
-        let th = corners_y.iter().cloned().fold(f32::NEG_INFINITY, f32::max)
-            - corners_y.iter().cloned().fold(f32::INFINITY, f32::min);
-
-        left = left.min(elem_left - tw / 2.0);
-        right = right.max(elem_left + tw / 2.0);
-        top = top.min(elem_top - th / 2.0);
-        bottom = bottom.max(elem_top + th / 2.0);
+        let Some((el, et, er, eb)) = compute_element_bounds(elem, scale, offset, kind) else {
+            continue;
+        };
+        left = left.min(el);
+        top = top.min(et);
+        right = right.max(er);
+        bottom = bottom.max(eb);
     }
 
     if left.is_infinite() || right.is_infinite() {
@@ -343,6 +697,7 @@ pub fn compute_bounds_from_elements(
 pub struct PreparedFrame {
     pub elements: Vec<ElementData>,
     pub bounds: BoundingBox,
+    pub ink_bounds: Option<BoundingBox>,
 }
 
 pub fn prepare_animation_frames(
@@ -374,30 +729,65 @@ pub fn prepare_animation_frames_with_overrides(
     disabled_symbols: &HashSet<String>,
     overrides: &SymbolOverrideMap,
 ) -> (Option<BoundingBox>, Vec<Option<PreparedFrame>>) {
+    let options = RenderOptions::new(scale, offset)
+        .with_disabled_elements(disabled_elements.clone())
+        .with_disabled_symbols(disabled_symbols.clone())
+        .with_overrides(overrides.clone());
+    let (bounds, prepared, _diagnostics) =
+        prepare_animation_frames_opts(frames, build_list, &options);
+    (bounds, prepared)
+}
+
+pub fn prepare_animation_frames_opts(
+    frames: &[AnimFrame],
+    build_list: &[BuildRef<'_>],
+    options: &RenderOptions,
+) -> (
+    Option<BoundingBox>,
+    Vec<Option<PreparedFrame>>,
+    RenderDiagnostics,
+) {
     let mut prepared: Vec<Option<PreparedFrame>> = Vec::with_capacity(frames.len());
+    let mut diagnostics = RenderDiagnostics::default();
     let mut union_top = f32::INFINITY;
     let mut union_left = f32::INFINITY;
     let mut union_bottom = f32::NEG_INFINITY;
     let mut union_right = f32::NEG_INFINITY;
 
-    for frame in frames {
-        if let Some(elements) = compute_frame_elements_with_overrides(
+    for (frame_pos, frame) in frames.iter().enumerate() {
+        let elements = compute_frame_elements_core(
             frame,
             build_list,
-            scale,
-            disabled_elements,
-            disabled_symbols,
-            overrides,
-        ) {
-            if let Some(bounds) = compute_bounds_from_elements(&elements, scale, offset) {
+            options,
+            frame_pos,
+            Some(&mut diagnostics),
+        );
+        if let Some(elements) = elements {
+            if let Some(bounds) = compute_bounds_from_elements_kind(
+                &elements,
+                options.scale,
+                options.offset,
+                options.bounds_kind,
+            ) {
+                let ink_bounds = compute_bounds_from_elements_kind(
+                    &elements,
+                    options.scale,
+                    options.offset,
+                    BoundsKind::Ink,
+                );
                 union_left = union_left.min(bounds.left);
                 union_top = union_top.min(bounds.top);
                 union_right = union_right.max(bounds.right);
                 union_bottom = union_bottom.max(bounds.bottom);
-                prepared.push(Some(PreparedFrame { elements, bounds }));
+                prepared.push(Some(PreparedFrame {
+                    elements,
+                    bounds,
+                    ink_bounds,
+                }));
                 continue;
             }
         }
+        diagnostics.skipped_frames.push(frame_pos);
         prepared.push(None);
     }
 
@@ -414,7 +804,7 @@ pub fn prepare_animation_frames_with_overrides(
         })
     };
 
-    (union_bounds, prepared)
+    (union_bounds, prepared, diagnostics)
 }
 
 pub fn compute_animation_bounds(
@@ -545,13 +935,17 @@ pub fn render_frame_with_elements(
         scale,
         offset,
     );
-    Some(RenderedFrame { image: canvas })
+    let ink_bounds = image_ink_bounds(&canvas, bounds);
+    Some(RenderedFrame {
+        image: canvas,
+        ink_bounds,
+    })
 }
 
-#[cfg(any(feature = "cli", feature = "gui"))]
+#[cfg(feature = "parallel")]
 const BAND_ROWS: usize = 64;
 
-#[cfg(any(feature = "cli", feature = "gui"))]
+#[cfg(feature = "parallel")]
 pub fn render_frame_with_elements_par(
     elements_data: &[ElementData],
     bounds: &BoundingBox,
@@ -584,7 +978,11 @@ pub fn render_frame_with_elements_par(
                 offset,
             );
         });
-    Some(RenderedFrame { image: canvas })
+    let ink_bounds = image_ink_bounds(&canvas, bounds);
+    Some(RenderedFrame {
+        image: canvas,
+        ink_bounds,
+    })
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1153,6 +1551,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.0,
             c: 0.0,
@@ -1185,6 +1584,7 @@ mod tests {
         let elements = vec![ElementData {
             sprite: std::sync::Arc::new(sprite),
             spans: None,
+            ink: None,
             bf_x: 0.0,
             bf_y: 0.0,
             dest_x: 0,
@@ -1208,6 +1608,187 @@ mod tests {
         assert!(
             (h - 10.0).abs() < 1.0,
             "height should be ~10 for identity, got {h}"
+        );
+    }
+
+    #[test]
+    fn compute_bounds_from_elements_ink_uses_spans() {
+        let sprite = image::RgbaImage::new(10, 10);
+        let elements = vec![ElementData {
+            sprite: std::sync::Arc::new(sprite),
+            spans: None,
+            ink: Some(InkRect {
+                min_x: 2,
+                min_y: 3,
+                max_x: 8,
+                max_y: 9,
+            }),
+            bf_x: 0.0,
+            bf_y: 0.0,
+            dest_x: 0,
+            dest_y: 0,
+            canvas_w: 10.0,
+            canvas_h: 10.0,
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 50.0,
+            ty: 50.0,
+        }];
+        let rect = compute_bounds_from_elements(&elements, 1.0, (0.0, 0.0)).unwrap();
+        assert_eq!(rect.left, 45.0);
+        assert_eq!(rect.top, 45.0);
+        assert_eq!(rect.right, 55.0);
+        assert_eq!(rect.bottom, 55.0);
+
+        let ink =
+            compute_bounds_from_elements_kind(&elements, 1.0, (0.0, 0.0), BoundsKind::Ink).unwrap();
+        assert_eq!(ink.left, 47.0);
+        assert_eq!(ink.top, 48.0);
+        assert_eq!(ink.right, 53.0);
+        assert_eq!(ink.bottom, 54.0);
+    }
+
+    #[test]
+    fn render_options_disable_layers_case_insensitive() {
+        let build = make_build_with_symbol("sym", 0, image::RgbaImage::new(10, 10));
+        let empty = HashSet::new();
+        let build_list = vec![BuildRef {
+            build: &build,
+            disabled_symbols: &empty,
+        }];
+        let elem = AnimElement {
+            z_index: 0.0,
+            symbol: "sym".into(),
+            symbol_lower: "sym".into(),
+            frame_num: 0,
+            layer_name: "HAT_Layer".into(),
+            layer_lower: "hat_layer".into(),
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 50.0,
+            ty: 50.0,
+        };
+        let anim_frame = make_anim_frame(vec![elem]);
+
+        let plain = RenderOptions::new(1.0, (0.0, 0.0));
+        assert!(compute_frame_elements_core(&anim_frame, &build_list, &plain, 0, None).is_some());
+
+        let hidden = RenderOptions::new(1.0, (0.0, 0.0))
+            .with_disabled_layers(HashSet::from(["HAT_LAYER".to_string()]));
+        assert!(
+            compute_frame_elements_core(&anim_frame, &build_list, &hidden, 0, None).is_none(),
+            "disabled layer should be matched case-insensitively"
+        );
+    }
+
+    #[test]
+    fn diagnostics_record_missing_symbol_and_frame() {
+        let build = make_build_with_symbol("body", 0, image::RgbaImage::new(10, 10));
+        let empty = HashSet::new();
+        let build_list = vec![BuildRef {
+            build: &build,
+            disabled_symbols: &empty,
+        }];
+        let make_elem = |symbol: &str, frame_num: u32| AnimElement {
+            z_index: 0.0,
+            symbol: symbol.into(),
+            symbol_lower: symbol.to_lowercase(),
+            frame_num,
+            layer_name: "Layer".into(),
+            layer_lower: "layer".into(),
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 0.0,
+            ty: 0.0,
+        };
+        let frames = vec![
+            make_anim_frame(vec![make_elem("nope", 0)]),
+            make_anim_frame(vec![make_elem("body", 99)]),
+        ];
+        let options = RenderOptions::new(1.0, (0.0, 0.0));
+        let (_, prepared, diag) = prepare_animation_frames_opts(&frames, &build_list, &options);
+        assert!(prepared.iter().all(|p| p.is_none()));
+        assert_eq!(diag.skipped_frames, vec![0, 1]);
+        assert_eq!(diag.missing.len(), 2);
+        let nope = diag
+            .missing
+            .get(&("nope".to_string(), "layer".to_string()))
+            .unwrap();
+        assert_eq!(nope.kind, MissingSymbolKind::NoSymbol);
+        assert_eq!(nope.frames, vec![0]);
+        let body = diag
+            .missing
+            .get(&("body".to_string(), "layer".to_string()))
+            .unwrap();
+        assert_eq!(body.kind, MissingSymbolKind::NoFrame);
+        assert_eq!(body.frames, vec![1]);
+    }
+
+    #[test]
+    #[ignore = "requires local DST game data (data/anim symlink)"]
+    fn ink_bounds_match_rendered_bbox_tallbird() {
+        use crate::archive::parse_zip;
+        use crate::atlas::{decode_atlas_images_from_tex, split_atlas};
+
+        let data = std::fs::read("data/anim/ds_tallbird_basic.zip").unwrap();
+        let mut archive = parse_zip(&data).unwrap();
+        let atlas_images = decode_atlas_images_from_tex(
+            &archive.build.as_ref().unwrap().atlases,
+            archive.tex_files(),
+        );
+        split_atlas(archive.build.as_mut().unwrap(), &atlas_images).unwrap();
+
+        let anim = archive.anim.as_ref().unwrap();
+        let empty = HashSet::new();
+        let build_list = vec![BuildRef {
+            build: archive.build.as_ref().unwrap(),
+            disabled_symbols: &empty,
+        }];
+        let bank = anim
+            .banks
+            .iter()
+            .find(|b| b.name.eq_ignore_ascii_case("tallbird"))
+            .unwrap();
+        let animation = bank
+            .animations
+            .iter()
+            .find(|a| a.name.eq_ignore_ascii_case("idle_side"))
+            .unwrap();
+
+        let options = RenderOptions::new(1.0, (0.0, 0.0));
+        let (union, prepared, _) =
+            prepare_animation_frames_opts(&animation.frames, &build_list, &options);
+        let union = union.unwrap();
+
+        let mut compared = 0usize;
+        let mut rect_vs_ink_bottom: Vec<f32> = Vec::new();
+        for pf in prepared.iter().flatten() {
+            let rendered =
+                render_frame_with_elements(&pf.elements, &union, 1.0, (0.0, 0.0)).unwrap();
+            let predicted = pf.ink_bounds.as_ref().unwrap();
+            let actual = rendered.ink_bounds.as_ref().unwrap();
+            assert!(
+                (predicted.left - actual.left).abs() <= 2.0
+                    && (predicted.top - actual.top).abs() <= 2.0
+                    && (predicted.right - actual.right).abs() <= 2.0
+                    && (predicted.bottom - actual.bottom).abs() <= 2.0,
+                "ink prediction {predicted:?} should match rendered {actual:?} within rasterization tolerance"
+            );
+            rect_vs_ink_bottom.push(pf.bounds.bottom - actual.bottom);
+            compared += 1;
+        }
+        assert_eq!(compared, 40);
+        rect_vs_ink_bottom.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let median = rect_vs_ink_bottom[rect_vs_ink_bottom.len() / 2];
+        assert!(
+            median > 10.0,
+            "rect bounds should be measurably looser than ink (median {median})"
         );
     }
 
@@ -1245,6 +1826,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.0,
             c: 0.0,
@@ -1281,6 +1863,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 0.0,
             b: 0.0,
             c: 0.0,
@@ -1316,6 +1899,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 2.0,
             b: 0.0,
             c: 0.0,
@@ -1357,6 +1941,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.5,
             c: -0.5,
@@ -1395,6 +1980,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.0,
             c: 0.0,
@@ -1531,6 +2117,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.0,
             c: 0.0,
@@ -1562,6 +2149,7 @@ mod tests {
             symbol_lower: "sym".into(),
             frame_num: 0,
             layer_name: "layer".into(),
+            layer_lower: "layer".into(),
             a: 1.0,
             b: 0.0,
             c: 0.0,
@@ -1666,7 +2254,7 @@ mod tests {
         }
     }
 
-    #[cfg(any(feature = "cli", feature = "gui"))]
+    #[cfg(feature = "parallel")]
     #[test]
     #[ignore = "requires local DST game data (data/anim symlink)"]
     fn par_render_matches_sequential() {
@@ -2092,6 +2680,7 @@ replace_with = 'fx_regen_02'
             symbol: "swap_object".into(),
             symbol_lower: "swap_object".into(),
             layer_name: "LAYER".into(),
+            layer_lower: "layer".into(),
             frame_num: 0,
             a: 1.0,
             b: 0.0,
@@ -2153,6 +2742,7 @@ replace_with = 'fx_regen_02'
             symbol: "swap_object".into(),
             symbol_lower: "swap_object".into(),
             layer_name: "LAYER".into(),
+            layer_lower: "layer".into(),
             frame_num: 0,
             a: 1.0,
             b: 0.0,

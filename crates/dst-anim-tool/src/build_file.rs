@@ -26,9 +26,28 @@ pub struct RowSpan {
     pub opaque: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct InkRect {
+    pub min_x: u32,
+    pub min_y: u32,
+    pub max_x: u32,
+    pub max_y: u32,
+}
+
+impl InkRect {
+    pub fn width(&self) -> u32 {
+        self.max_x - self.min_x
+    }
+
+    pub fn height(&self) -> u32 {
+        self.max_y - self.min_y
+    }
+}
+
 pub struct SpriteSpans {
     pub rows: Box<[Option<RowSpan>]>,
     pub fully_opaque: bool,
+    pub ink: Option<InkRect>,
 }
 
 #[derive(Clone)]

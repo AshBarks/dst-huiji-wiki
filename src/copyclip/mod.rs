@@ -59,13 +59,14 @@ impl CopyClipProcessor {
         new_content: &str,
     ) -> String {
         let mut result = String::new();
+        let new_content = crate::utils::normalize_line_endings(new_content);
 
         result.push_str(&content[..range.start_marker_end]);
 
         if !new_content.starts_with('\n') {
             result.push('\n');
         }
-        result.push_str(new_content);
+        result.push_str(&new_content);
         if !new_content.ends_with('\n') {
             result.push('\n');
         }
@@ -217,6 +218,19 @@ old content
         assert!(result.contains("-- COPYCLIPEND --"));
         assert!(result.contains("new content"));
         assert!(!result.contains("old content"));
+    }
+
+    #[test]
+    fn test_replace_between_markers_normalizes_crlf() {
+        let content = "-- COPYCLIPSTART --\nold content\n-- COPYCLIPEND --\n";
+        let range = CopyClipProcessor::find_marker_range(content).unwrap();
+        let result = CopyClipProcessor::replace_between_markers(content, &range, "a\r\nb\r\n");
+
+        assert!(
+            !result.contains('\r'),
+            "inserted content must be stored LF-only: {result:?}"
+        );
+        assert!(result.contains("a\nb\n"));
     }
 
     #[test]

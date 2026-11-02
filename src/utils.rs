@@ -30,6 +30,24 @@ fn unified_diff(old: &str, new: &str) -> String {
         .to_string()
 }
 
+/// Normalizes line endings: `\r\n` and lone `\r` both become `\n`.
+pub fn normalize_line_endings(s: &str) -> String {
+    s.replace("\r\n", "\n").replace('\r', "\n")
+}
+
+/// Canonical form for content comparison: line endings normalized and ASCII
+/// horizontal whitespace (space/tab) stripped from both ends of every line.
+///
+/// Non-ASCII whitespace (e.g. NBSP inside data strings) is deliberately kept,
+/// and a trailing newline difference is ignored.
+pub fn canonical_for_compare(s: &str) -> String {
+    normalize_line_endings(s)
+        .lines()
+        .map(|l| l.trim_matches([' ', '\t']))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 /// Counts added/removed content lines in a unified diff produced by
 /// [`diff_lines`]. `---`/`+++` headers and `@@` hunk markers are excluded.
 pub fn count_diff_stats(diff: &str) -> (usize, usize) {
@@ -145,6 +163,39 @@ mod tests {
         let result = diff_lines("斧头描述", "斧头说明");
         assert!(result.contains("-斧头描述"), "expected -斧头描述");
         assert!(result.contains("+斧头说明"), "expected +斧头说明");
+    }
+
+    #[test]
+    fn test_normalize_line_endings_handles_crlf_and_lone_cr() {
+        assert_eq!(normalize_line_endings("a\r\nb\rc\n"), "a\nb\nc\n");
+        assert_eq!(normalize_line_endings("no ending"), "no ending");
+    }
+
+    #[test]
+    fn test_canonical_for_compare_ignores_line_endings_and_edges() {
+        let old = "local x = 1\nlocal y = 2\n";
+        let new = "  local x = 1\t\r\n\tlocal y = 2  \r\n";
+        assert_eq!(
+            canonical_for_compare(old),
+            canonical_for_compare(new),
+            "CRLF plus leading/trailing spaces should be ignored"
+        );
+    }
+
+    #[test]
+    fn test_canonical_for_compare_keeps_inner_whitespace() {
+        assert_ne!(
+            canonical_for_compare("local x = 1"),
+            canonical_for_compare("local  x = 1")
+        );
+    }
+
+    #[test]
+    fn test_canonical_for_compare_keeps_non_ascii_whitespace() {
+        assert_ne!(
+            canonical_for_compare("x = \"a\""),
+            canonical_for_compare("x = \"\u{a0}a\"")
+        );
     }
 
     #[test]

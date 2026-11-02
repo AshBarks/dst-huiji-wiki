@@ -122,7 +122,7 @@ pub(super) async fn run_map_recipes(
                 WikiDataConverter::with_po_entries(po_data.entries.clone())
             }
             Err(e) => {
-                reporter.log(format!("警告：PO 文件加载失败：{}", e));
+                reporter.warn(format!("PO 文件加载失败：{}", e));
                 WikiDataConverter::new()
             }
         }

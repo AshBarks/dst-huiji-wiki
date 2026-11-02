@@ -431,6 +431,28 @@ static CLI_EXT: &[CliExt] = &[
         report_json: true,
         local_dry_run: false,
     },
+    CliExt {
+        name: "update-local",
+        about: "更新后本地摄取编排：scripts-sync → images-sync → anim-sync（缺省串行，任一步失败即中止）",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "update-data",
+        about: "更新后数据页编排：maintain-copy-clip → maintain-dst-recipes → maintain-item-table → maintain-strings（共用 --snapshot 与写入模式）",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
 ];
 
 fn ext(name: &str) -> &'static CliExt {
@@ -444,7 +466,7 @@ fn ext(name: &str) -> &'static CliExt {
 // clap 命令构建
 // ---------------------------------------------------------------------------
 
-/// 构建完整 CLI（顶层 + serve + 34 个 job 子命令）。
+/// 构建完整 CLI（顶层 + serve + 36 个 job 子命令）。
 pub fn command() -> Command {
     let mut top = Command::new("dst-huiji-wiki")
         .about("饥荒联机版维基维护工具")
@@ -962,6 +984,14 @@ fn job_from_matches(
             snapshot: opt_val(m, "snapshot"),
             zip: flag(m, "zip"),
             allow_missing_icons: flag(m, "allow_missing_icons"),
+        },
+        "update-local" => JobKind::UpdateLocal {
+            force: flag(m, "force"),
+            dry_run: flag(m, "dry_run"),
+            skip_wiki_status: flag(m, "skip_wiki_status"),
+        },
+        "update-data" => JobKind::UpdateData {
+            snapshot: opt_val(m, "snapshot"),
         },
         other => unreachable!("未实现构造臂的 job: {other}"),
     })

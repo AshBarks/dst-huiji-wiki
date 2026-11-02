@@ -646,7 +646,7 @@ async fn fetch_page_optional(
     match ctx.wiki().get_page(title).await {
         Ok(page) => page.content,
         Err(e) => {
-            reporter.log(format!("警告：获取 {title} 失败：{e}"));
+            reporter.warn(format!("获取 {title} 失败：{e}"));
             None
         }
     }
@@ -887,7 +887,7 @@ async fn check_icon_files(
                     }
                 }
             }
-            Err(e) => reporter.log(format!("警告：图标存在性查询失败：{e}")),
+            Err(e) => reporter.warn(format!("图标存在性查询失败：{e}")),
         }
     }
 
@@ -912,7 +912,7 @@ async fn check_icon_files(
                         }
                     }
                 }
-                Err(e) => reporter.log(format!("警告：图标修正建议查询失败：{e}")),
+                Err(e) => reporter.warn(format!("图标修正建议查询失败：{e}")),
             }
         }
     }

@@ -119,6 +119,7 @@ fn event_seq(ev: &JobEvent) -> u64 {
     match ev {
         JobEvent::Log { seq, .. }
         | JobEvent::Stage { seq, .. }
+        | JobEvent::Progress { seq, .. }
         | JobEvent::Diff { seq, .. }
         | JobEvent::Done { seq, .. } => *seq,
     }
@@ -222,6 +223,7 @@ mod tests {
         JobEvent::Log {
             seq,
             ts_ms: 0,
+            level: dst_huiji_wiki::platform::progress::LogLevel::Info,
             text: format!("e{seq}"),
         }
     }

@@ -57,7 +57,7 @@ pub(super) async fn run_maintain_item_table(
             &historical_json.to_string(),
         )?),
         Err(e) => {
-            reporter.log(format!("警告：获取历史数据失败：{}", e));
+            reporter.warn(format!("获取历史数据失败：{}", e));
             None
         }
     };
@@ -115,11 +115,11 @@ pub(super) async fn run_maintain_dst_recipes(
                 tech_report.compare_with_wiki(content);
                 reporter.log(tech_report.generate_report());
             } else {
-                reporter.log("警告：维基页面无内容".to_string());
+                reporter.warn("维基页面无内容".to_string());
             }
         }
         Err(e) => {
-            reporter.log(format!("警告：获取科技数据失败：{}", e));
+            reporter.warn(format!("获取科技数据失败：{}", e));
         }
     }
 
@@ -136,7 +136,7 @@ pub(super) async fn run_maintain_dst_recipes(
             &historical_json.to_string(),
         )?),
         Err(e) => {
-            reporter.log(format!("警告：获取历史数据失败：{}", e));
+            reporter.warn(format!("获取历史数据失败：{}", e));
             None
         }
     };
@@ -479,7 +479,7 @@ pub(super) async fn maintain_crafting_names(
                 ));
             }
         }
-        Err(e) => reporter.log(format!("警告：制作站别名派生失败：{e}")),
+        Err(e) => reporter.warn(format!("制作站别名派生失败：{e}")),
     }
 
     let stations_len = crafting_stations.len();

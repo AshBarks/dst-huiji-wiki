@@ -17,7 +17,7 @@
 //!   the status write lock, so they can never interleave.
 
 use super::state::AppState;
-use dst_huiji_wiki::platform::progress::{CaptureReporter, JobEvent, WriteMode};
+use dst_huiji_wiki::platform::progress::{CaptureReporter, JobEvent, LogLevel, WriteMode};
 use dst_huiji_wiki::service::{execute_job_with_mode, JobKind};
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::sync::Arc;
@@ -111,6 +111,14 @@ impl JobHandle {
     }
 
     pub async fn summary(&self) -> serde_json::Value {
+        let events = self.reporter.snapshot_logs();
+        let d = digest_events(&events);
+        let error = self
+            .error
+            .lock()
+            .await
+            .as_ref()
+            .map(|e| truncate_chars(e, 300));
         serde_json::json!({
             "id": self.id.to_string(),
             "kind": self.kind.name(),
@@ -120,7 +128,15 @@ impl JobHandle {
             "created_at_ms": self.created_at_ms,
             "started_at_ms": *self.started_at_ms.lock().await,
             "finished_at_ms": *self.finished_at_ms.lock().await,
-            "event_count": self.reporter.snapshot_logs().len(),
+            "event_count": events.len(),
+            "last_stage": d.last_stage,
+            "stage_index": d.stage_index,
+            "stage_total": d.stage_total,
+            "last_log": d.last_log,
+            "warn_count": d.warn_count,
+            "error_count": d.error_count,
+            "progress": d.progress,
+            "error": error,
         })
     }
 
@@ -163,6 +179,69 @@ impl JobHandle {
 }
 
 const MAX_JOBS_KEPT: usize = 200;
+
+/// 任务列表页需要的"最近进展"摘要（从事件流尾部归纳，O(n) 但事件有上限）。
+struct EventDigest {
+    last_stage: Option<String>,
+    stage_index: Option<usize>,
+    stage_total: Option<usize>,
+    last_log: Option<String>,
+    warn_count: usize,
+    error_count: usize,
+    progress: Option<serde_json::Value>,
+}
+
+fn digest_events(events: &[JobEvent]) -> EventDigest {
+    let mut d = EventDigest {
+        last_stage: None,
+        stage_index: None,
+        stage_total: None,
+        last_log: None,
+        warn_count: 0,
+        error_count: 0,
+        progress: None,
+    };
+    for ev in events {
+        match ev {
+            JobEvent::Log { level, text, .. } => {
+                match level {
+                    LogLevel::Warn => d.warn_count += 1,
+                    LogLevel::Error => d.error_count += 1,
+                    LogLevel::Debug | LogLevel::Info => {}
+                }
+                // 列表页只显示一行，截断避免长文案撑爆 payload。
+                d.last_log = Some(truncate_chars(text, 300));
+            }
+            JobEvent::Stage {
+                name, index, total, ..
+            } => {
+                d.last_stage = Some(name.clone());
+                d.stage_index = *index;
+                d.stage_total = *total;
+            }
+            JobEvent::Progress {
+                label, done, total, ..
+            } => {
+                d.progress = Some(serde_json::json!({
+                    "label": label,
+                    "done": done,
+                    "total": total,
+                }));
+            }
+            JobEvent::Diff { .. } | JobEvent::Done { .. } => {}
+        }
+    }
+    d
+}
+
+fn truncate_chars(s: &str, max: usize) -> String {
+    if s.chars().count() <= max {
+        return s.to_string();
+    }
+    let mut out: String = s.chars().take(max).collect();
+    out.push('…');
+    out
+}
 
 pub struct JobManager {
     jobs: RwLock<BTreeMap<Uuid, Arc<JobHandle>>>,
@@ -518,5 +597,46 @@ mod tests {
         assert_eq!(h.status().await, JobStatus::Failed);
         assert!(h.error.lock().await.is_some());
         assert!(h.finished_at_ms.lock().await.is_some());
+    }
+
+    #[test]
+    fn digest_reports_last_stage_levels_and_progress() {
+        use dst_huiji_wiki::platform::progress::LogLevel;
+        let events = vec![
+            JobEvent::Stage {
+                seq: 1,
+                ts_ms: 10,
+                name: "images-sync".into(),
+                index: Some(2),
+                total: Some(3),
+            },
+            JobEvent::Log {
+                seq: 2,
+                ts_ms: 11,
+                level: LogLevel::Info,
+                text: "开始".into(),
+            },
+            JobEvent::Log {
+                seq: 3,
+                ts_ms: 12,
+                level: LogLevel::Warn,
+                text: "慢".into(),
+            },
+            JobEvent::Progress {
+                seq: 4,
+                ts_ms: 13,
+                label: "bucket".into(),
+                done: 3,
+                total: Some(10),
+            },
+        ];
+        let d = digest_events(&events);
+        assert_eq!(d.last_stage.as_deref(), Some("images-sync"));
+        assert_eq!(d.stage_index, Some(2));
+        assert_eq!(d.stage_total, Some(3));
+        assert_eq!(d.last_log.as_deref(), Some("慢"));
+        assert_eq!(d.warn_count, 1);
+        assert_eq!(d.error_count, 0);
+        assert_eq!(d.progress.unwrap()["done"], 3);
     }
 }

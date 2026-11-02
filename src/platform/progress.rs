@@ -66,15 +66,67 @@ pub enum ConfirmMode {
     Auto(bool),
 }
 
+/// Severity of a [`JobEvent::Log`] line. Drives WebUI colouring/filtering.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LogLevel {
+    Debug,
+    Info,
+    Warn,
+    Error,
+}
+
+impl LogLevel {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            LogLevel::Debug => "debug",
+            LogLevel::Info => "info",
+            LogLevel::Warn => "warn",
+            LogLevel::Error => "error",
+        }
+    }
+}
+
 /// Progress sink used by all service jobs.
 ///
 /// CLI passes [`StdoutReporter`]; the WebUI passes [`CaptureReporter`],
 /// which records events for SSE streaming and later inspection.
 pub trait Reporter: Send + Sync {
-    /// A regular log line.
+    /// A regular log line (implicitly [`LogLevel::Info`]).
     fn log(&self, msg: String);
+
+    /// Log line with an explicit level. Default keeps custom reporters
+    /// working by prefixing the message; the built-in reporters override it
+    /// to emit structured events.
+    fn log_at(&self, level: LogLevel, msg: String) {
+        match level {
+            LogLevel::Warn => self.log(format!("警告：{msg}")),
+            LogLevel::Error => self.log(format!("错误：{msg}")),
+            LogLevel::Debug | LogLevel::Info => self.log(msg),
+        }
+    }
+
+    fn warn(&self, msg: String) {
+        self.log_at(LogLevel::Warn, msg);
+    }
+
+    fn error(&self, msg: String) {
+        self.log_at(LogLevel::Error, msg);
+    }
+
     /// A major phase transition (used as progress milestones).
     fn stage(&self, name: &str);
+
+    /// A numbered orchestration step (`index` 1-based). Composite jobs use
+    /// this so the WebUI can render "步骤 2/4" and nest the sub-stages.
+    fn step(&self, _index: usize, _total: usize, name: &str) {
+        self.stage(name);
+    }
+
+    /// Cheap machine-readable progress signal for batch loops (no log line).
+    /// Call sites should emit at a bounded rate (e.g. every 10 items).
+    fn progress(&self, _label: &str, _done: usize, _total: usize) {}
+
     /// A structured wiki-write diff preview for one page.
     fn diff(&self, page: &str, text: &str, added: usize, removed: usize);
     /// Ask whether a wiki write should be performed.
@@ -106,6 +158,20 @@ impl Reporter for StdoutReporter {
 
     fn stage(&self, name: &str) {
         println!("\n========== {} ==========", name);
+    }
+
+    fn step(&self, index: usize, total: usize, name: &str) {
+        println!("\n========== [{index}/{total}] {name} ==========");
+    }
+
+    /// CLI 侧保留可读的进度行，但按 10% 节流（每 20 条打印一次）。
+    fn progress(&self, label: &str, done: usize, total: usize) {
+        if total == 0 {
+            return;
+        }
+        if done == total || done.is_multiple_of(20) {
+            println!("{} {}/{}", label, done, total);
+        }
     }
 
     fn diff(&self, page: &str, text: &str, added: usize, removed: usize) {
@@ -146,12 +212,28 @@ pub enum JobEvent {
     Log {
         seq: u64,
         ts_ms: u64,
+        level: LogLevel,
         text: String,
     },
+    /// Phase transition. `index`/`total` are set by [`Reporter::step`]
+    /// (composite jobs) and `None` for ordinary sub-stages.
     Stage {
         seq: u64,
         ts_ms: u64,
         name: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        index: Option<usize>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        total: Option<usize>,
+    },
+    /// Batch progress (no log line): `done` of `total` items.
+    Progress {
+        seq: u64,
+        ts_ms: u64,
+        label: String,
+        done: usize,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        total: Option<usize>,
     },
     /// Structured wiki-write diff preview for one page.
     Diff {
@@ -240,9 +322,14 @@ impl CaptureReporter {
 
 impl Reporter for CaptureReporter {
     fn log(&self, msg: String) {
+        self.log_at(LogLevel::Info, msg);
+    }
+
+    fn log_at(&self, level: LogLevel, msg: String) {
         self.push(JobEvent::Log {
             seq: self.next_seq(),
             ts_ms: now_ms(),
+            level,
             text: msg,
         });
     }
@@ -252,6 +339,28 @@ impl Reporter for CaptureReporter {
             seq: self.next_seq(),
             ts_ms: now_ms(),
             name: name.to_string(),
+            index: None,
+            total: None,
+        });
+    }
+
+    fn step(&self, index: usize, total: usize, name: &str) {
+        self.push(JobEvent::Stage {
+            seq: self.next_seq(),
+            ts_ms: now_ms(),
+            name: name.to_string(),
+            index: Some(index),
+            total: Some(total),
+        });
+    }
+
+    fn progress(&self, label: &str, done: usize, total: usize) {
+        self.push(JobEvent::Progress {
+            seq: self.next_seq(),
+            ts_ms: now_ms(),
+            label: label.to_string(),
+            done,
+            total: Some(total),
         });
     }
 
@@ -268,5 +377,58 @@ impl Reporter for CaptureReporter {
 
     fn confirm(&self, _prompt: &str) -> bool {
         self.auto_confirm
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn capture_reporter_structures_levels_steps_and_progress() {
+        let r = CaptureReporter::new(true);
+        r.log("plain".into());
+        r.warn("slow".into());
+        r.step(2, 4, "images-sync");
+        r.progress("bucket", 10, 100);
+
+        let events = r.snapshot_logs();
+        let json: Vec<serde_json::Value> = events
+            .iter()
+            .map(|e| serde_json::to_value(e).unwrap())
+            .collect();
+
+        assert_eq!(json[0]["type"], "log");
+        assert_eq!(json[0]["level"], "info");
+        assert_eq!(json[1]["level"], "warn");
+        assert_eq!(json[2]["type"], "stage");
+        assert_eq!(json[2]["index"], 2);
+        assert_eq!(json[2]["total"], 4);
+        assert_eq!(json[3]["type"], "progress");
+        assert_eq!(json[3]["done"], 10);
+        assert_eq!(json[3]["total"], 100);
+    }
+
+    /// 自定义 Reporter 不实现 log_at 时仍然拿到带前缀的文本（向后兼容）。
+    #[test]
+    fn default_log_at_prefixes_warn_for_custom_reporters() {
+        struct R(std::sync::Mutex<Vec<String>>);
+        impl Reporter for R {
+            fn log(&self, msg: String) {
+                self.0.lock().unwrap().push(msg);
+            }
+            fn stage(&self, _name: &str) {}
+            fn diff(&self, _page: &str, _text: &str, _added: usize, _removed: usize) {}
+            fn confirm(&self, _prompt: &str) -> bool {
+                false
+            }
+        }
+
+        let r = R(std::sync::Mutex::new(Vec::new()));
+        r.warn("x".into());
+        r.error("y".into());
+        let logs = r.0.lock().unwrap();
+        assert_eq!(logs[0], "警告：x");
+        assert_eq!(logs[1], "错误：y");
     }
 }

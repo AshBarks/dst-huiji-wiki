@@ -29,7 +29,8 @@ pub struct PageEdit<'a> {
     pub old_content: Option<&'a str>,
     /// 所基于修订的时间戳（`PageInfo::last_rev_timestamp`），冲突保护。
     pub basetimestamp: Option<&'a str>,
-    /// diff 预览保留空白（wikitext 页 true；JSON 数据页用归一 diff，false）。
+    /// diff 预览保留空白（手工排版的 wikitext 页 true；JSON 数据页与
+    /// copyclip 的 Lua 模块块用归一 diff，false）。
     pub preserve_whitespace: bool,
     /// 编辑摘要。
     pub summary: &'a str,

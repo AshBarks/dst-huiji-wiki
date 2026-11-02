@@ -60,7 +60,7 @@ pub(super) async fn output_json_result_with_update(
     let page = match client.get_page(page_title).await {
         Ok(p) => p,
         Err(e) => {
-            reporter.log(format!("警告：获取维基当前数据失败：{}", e));
+            reporter.warn(format!("获取维基当前数据失败：{}", e));
             return Ok(
                 serde_json::json!({ "status": "fetch_failed", "records": wiki_data.data.len() }),
             );
@@ -70,7 +70,7 @@ pub(super) async fn output_json_result_with_update(
     let historical_content = match page.content {
         Some(c) => c,
         None => {
-            reporter.log(format!("警告：页面 '{}' 无内容", page_title));
+            reporter.warn(format!("页面 '{}' 无内容", page_title));
             return Ok(
                 serde_json::json!({ "status": "fetch_failed", "records": wiki_data.data.len() }),
             );
@@ -83,7 +83,7 @@ pub(super) async fn output_json_result_with_update(
     ) {
         Ok(v) => serde_json::to_string_pretty(&v)?,
         Err(e) => {
-            reporter.log(format!("警告：解析维基历史数据失败：{}", e));
+            reporter.warn(format!("解析维基历史数据失败：{}", e));
             return Ok(
                 serde_json::json!({ "status": "fetch_failed", "records": wiki_data.data.len() }),
             );

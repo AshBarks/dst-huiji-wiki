@@ -523,7 +523,9 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "images-sync",
         label: "处理游戏图片（images-sync）",
-        wiki_access: WikiAccess::None,
+        // 图片管线本身纯本地，但收尾会查一次维基上传状态（--skip-wiki-status
+        // 可关）；因此访问级别是只读而不是 None。
+        wiki_access: WikiAccess::Read,
         resources: &["ktools_out"],
         params: &[
             ParamSpec {
@@ -1309,6 +1311,49 @@ pub static JOB_SPECS: &[JobSpec] = &[
             },
         ],
     },
+    JobSpec {
+        name: "update-local",
+        label: "更新后本地摄取（scripts → images → anim）",
+        // 三步均不写维基；images-sync 会读一次上传状态，故整体为只读级别。
+        wiki_access: WikiAccess::Read,
+        resources: &["scripts_tree", "ktools_out", "anim_out"],
+        params: &[
+            ParamSpec {
+                key: "force",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "三步都忽略版本/幂等检查，强制重跑",
+            },
+            ParamSpec {
+                key: "dry_run",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "演练：三步都只报告计划、不写任何本地文件",
+            },
+            ParamSpec {
+                key: "skip_wiki_status",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "跳过 images-sync 的维基上传状态查询（离线/无凭据）",
+            },
+        ],
+    },
+    JobSpec {
+        name: "update-data",
+        label: "更新后数据页同步 → 维基",
+        wiki_access: WikiAccess::Write,
+        resources: &["wiki", "out"],
+        params: &[ParamSpec {
+            key: "snapshot",
+            kind: ParamKind::OptStr,
+            default: ParamDefault::None,
+            required: false,
+            help: "四步共用的 scripts 快照目录名（缺省最新/live 树）",
+        }],
+    },
 ];
 
 impl JobSpec {
@@ -1336,7 +1381,7 @@ mod tests {
     /// 契约：spec 表与 JobKind 变体一一对应（数量、名称、serde tag）。
     #[test]
     fn contract_spec_table_covers_every_variant() {
-        assert_eq!(JOB_SPECS.len(), 34);
+        assert_eq!(JOB_SPECS.len(), 36);
         let mut names: Vec<&str> = JOB_SPECS.iter().map(|s| s.name).collect();
         names.sort_unstable();
         let count = names.len();

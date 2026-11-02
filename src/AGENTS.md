@@ -80,6 +80,7 @@ src/
 | Read game data (snapshot/live/zip) | `src/platform/game_source.rs` | 唯一读取顺序定义；新增读取一律走 `GameSource` |
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync`; snapshot naming must stay `scripts_<yyyymmddhhmm>` for `DstContext::list_snapshots` |
 | 维护 模块:Strings 桶页 | `src/service/strings_wiki.rs` | `maintain-strings`：PO key 大写归一 + CHARACTERS 角色表合并 → 分桶 → 语义对比后只写变化页、索引最后写（`--dry-run` 只读）；纯逻辑在 `src/models/strings.rs`，桶页解析在 `src/parser/strings_data.rs` |
+| 改任务日志 / 事件流 / 任务详情页 | `src/platform/progress.rs`（`JobEvent`/`Reporter`）+ `src/web/jobs.rs`（summary/digest）+ `src/web/assets/js/jobs.js` | 事件类型：`log{level}` / `stage{index,total}` / `progress` / `diff` / `done`；编排作业用 `Reporter::step` 标步骤，前端按 step 嵌套 stage、折叠长日志、按级别过滤 |
 
 ## LOCAL CONVENTIONS
 - **Module files**: `mod.rs` only in directory modules. No other files contain `mod` declarations.

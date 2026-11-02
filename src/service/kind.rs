@@ -453,6 +453,28 @@ pub enum JobKind {
         #[serde(default)]
         allow_missing_icons: bool,
     },
+    /// `update-local`：更新后本地摄取编排，固定顺序
+    /// `scripts-sync → images-sync → anim-sync`；失败即中止。
+    /// 原作业仍可单独运行，本变体只做调度。
+    UpdateLocal {
+        /// 三步都忽略版本/幂等检查，强制重跑。
+        #[serde(default)]
+        force: bool,
+        /// 演练：三步都只报告计划、不写任何本地文件。
+        #[serde(default)]
+        dry_run: bool,
+        /// 跳过 images-sync 的维基上传状态查询（离线/无凭据）。
+        #[serde(default)]
+        skip_wiki_status: bool,
+    },
+    /// `update-data`：更新后数据页编排，固定顺序
+    /// `maintain-copy-clip → maintain-dst-recipes → maintain-item-table →
+    /// maintain-strings`；失败即中止。写站仍受 `WriteMode` 约束。
+    UpdateData {
+        /// 四步共用的 scripts 快照目录名（缺省最新/live 树）。
+        #[serde(default)]
+        snapshot: Option<String>,
+    },
 }
 
 fn default_only_missing() -> bool {
@@ -554,6 +576,8 @@ impl JobKind {
             JobKind::MaintainWikitext { .. } => &super::job_spec::JOB_SPECS[31],
             JobKind::CreateRedirect { .. } => &super::job_spec::JOB_SPECS[32],
             JobKind::CookingGameExport { .. } => &super::job_spec::JOB_SPECS[33],
+            JobKind::UpdateLocal { .. } => &super::job_spec::JOB_SPECS[34],
+            JobKind::UpdateData { .. } => &super::job_spec::JOB_SPECS[35],
         }
     }
 
@@ -853,6 +877,12 @@ impl JobKind {
                 zip: false,
                 allow_missing_icons: false,
             },
+            JobKind::UpdateLocal {
+                force: false,
+                dry_run: true,
+                skip_wiki_status: false,
+            },
+            JobKind::UpdateData { snapshot: None },
         ]
     }
 }
@@ -939,5 +969,46 @@ mod tests {
             comment: None,
         };
         assert!(ok.validate().is_ok());
+    }
+
+    /// WebUI 只提交 `{kind}` + 少量字段；编排变体必须能靠 serde default
+    /// 反序列化（否则前端勾不上参数时整单 400）。
+    #[test]
+    fn pipeline_variants_deserialize_with_defaults() {
+        let local: JobKind = serde_json::from_str(r#"{"kind":"update_local"}"#).unwrap();
+        match local {
+            JobKind::UpdateLocal {
+                force,
+                dry_run,
+                skip_wiki_status,
+            } => {
+                assert!(!force);
+                assert!(!dry_run, "默认必须是真实执行，演练要显式开");
+                assert!(!skip_wiki_status);
+            }
+            _ => panic!("wrong variant"),
+        }
+
+        let data: JobKind = serde_json::from_str(r#"{"kind":"update_data"}"#).unwrap();
+        match data {
+            JobKind::UpdateData { snapshot } => assert!(snapshot.is_none()),
+            _ => panic!("wrong variant"),
+        }
+
+        // 前端数字字段以 JSON number 提交，不能被当成字符串。
+        let strings: JobKind =
+            serde_json::from_str(r#"{"kind":"maintain_strings","bucket_count":100,"limit":3}"#)
+                .unwrap();
+        match strings {
+            JobKind::MaintainStrings {
+                bucket_count,
+                limit,
+                ..
+            } => {
+                assert_eq!(bucket_count, 100);
+                assert_eq!(limit, 3);
+            }
+            _ => panic!("wrong variant"),
+        }
     }
 }

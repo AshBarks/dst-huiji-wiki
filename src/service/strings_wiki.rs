@@ -520,9 +520,7 @@ async fn scan_pages(
                 ));
             }
         }
-        if (i + 1) % 20 == 0 {
-            reporter.log(format!("对比进度 {}/{}", i + 1, plan.buckets.len()));
-        }
+        reporter.progress("对比桶页", i + 1, plan.buckets.len());
     }
     Ok(scans)
 }
@@ -929,9 +927,7 @@ async fn apply_edits(
                 outcomes.push(failed_outcome(request, e.to_string()));
             }
         }
-        if (i + 1) % 20 == 0 {
-            reporter.log(format!("写入进度 {}/{}", i + 1, attempted));
-        }
+        reporter.progress("写入桶页", i + 1, attempted);
     }
 
     let mut index_updated = false;

@@ -104,3 +104,15 @@
 - 图标：分支内 `{{inv|X}}` 的 File 存在性（`history/icon_meta.json` 优先，`--skip-icon-status` 可离线；`%27` 类错误写法会给出解码建议）
 - 别名：tuning 派生别名 ⊄ 线上 CraftingNames（提示可用 `maintain-copy-clip --type names` 写入）；TECH 多键（如 LOST）只报告
 - 产出：控制台报告、`--report-json`、`--output` 可粘贴片段文件；永不写维基
+
+## update-local 更新后本地摄取编排（纯本地）
+固定顺序 `scripts-sync → images-sync → anim-sync`，缺省串行；任一步失败即中止（错误消息带步骤名），已完成步骤的产物保留。
+- 顺序约束：`images-sync` 的图标名称映射读 live `scripts/` 下的 PO，必须等 `scripts-sync` 换树完成；`anim-sync` 与前两步无依赖，放最后收尾版本。
+- `--force`/`--dry_run`/`--skip_wiki_status` 同时作用于三步；`--report-json` 输出 `{status, steps[]}` 聚合报告。
+- 原作业仍可单独运行；需要单步参数（如 `state_path`）时直接跑原命令。
+
+## update-data 更新后数据页编排（写维基）
+固定顺序 `maintain-copy-clip → maintain-dst-recipes → maintain-item-table → maintain-strings`，共用 `--snapshot` 与写入模式（`--yes`/`--dry-run`/交互确认）。
+- 顺序约束：新制作站键必须先写入 CraftingNames，否则 wiki 端 `模块:DSTRecipe.get_recipe_filter_cn` 会 assert。
+- `maintain-strings` 固定 `version=DST`、默认等分桶；只写变化桶页，索引最后写。
+- 任一步失败即中止（错误带步骤名）；各步自身幂等，重跑即可。不暴露各步 `output`，需要本地产物时单独跑原作业。

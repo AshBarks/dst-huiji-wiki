@@ -418,7 +418,7 @@ async fn check_background(
             }
         }
         Err(e) => {
-            reporter.log(format!("警告：查询背景信息失败：{}", e));
+            reporter.warn(format!("查询背景信息失败：{}", e));
             Vec::new()
         }
     }
@@ -467,7 +467,7 @@ async fn fill_missing_urls(
                     }
                 }
                 Err(e) => {
-                    reporter.log(format!("警告：查询图片信息失败：{}", e));
+                    reporter.warn(format!("查询图片信息失败：{}", e));
                     still_missing.extend(others);
                 }
             }
@@ -514,7 +514,7 @@ async fn fill_missing_urls(
                     reporter.log(format!("{}：已回填 {} 个图标 URL", page_title, filled));
                 }
             }
-            Err(e) => reporter.log(format!("警告：查询图标信息失败：{}", e)),
+            Err(e) => reporter.warn(format!("查询图标信息失败：{}", e)),
         }
     }
 }

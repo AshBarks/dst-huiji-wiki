@@ -28,6 +28,7 @@ mod kind;
 mod maintain_jobs;
 mod map_jobs;
 mod output;
+mod pipelines;
 mod redirect;
 
 pub use kind::JobKind;
@@ -374,6 +375,14 @@ async fn execute_job_inner(
             label,
             out,
         } => run_anim_sync(*force, *dry_run, label.clone(), opt_path(out), reporter).await,
+        JobKind::UpdateLocal {
+            force,
+            dry_run,
+            skip_wiki_status,
+        } => pipelines::run_update_local(*force, *dry_run, *skip_wiki_status, reporter).await,
+        JobKind::UpdateData { snapshot } => {
+            pipelines::run_update_data(snapshot.clone(), reporter, mode).await
+        }
         JobKind::AnimDiff { old, new, zip } => {
             run_anim_diff(
                 PathBuf::from(old),
@@ -824,7 +833,7 @@ mod tests {
         let jobs = JobKind::all_variants();
         assert_eq!(
             jobs.len(),
-            34,
+            36,
             "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
         );
         let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();
@@ -860,6 +869,7 @@ mod tests {
             "upload-image",
             "upload-icons",
             "create-redirect",
+            "update-data",
         ]
         .into_iter()
         .collect();

@@ -1,20 +1,23 @@
 //! 概览页
 "use strict";
 
-import { esc, fmtTime, api, getJSON, postJSON, statusBadge, META, currentSnapshot, $ } from "../util.js";
+import { esc, fmtTime, getJSON, postJSON, statusBadge, META, currentSnapshot, $ } from "../util.js";
 
 export async function pageDashboard(main) {
   let jobs = [];
   try { jobs = (await getJSON("/api/jobs")).jobs.slice(0, 6); } catch {}
-  const snaps = (await getJSON("/api/snapshots")).snapshots.length;
+  const snaps = (await getJSON("/api/snapshots")).snapshots;
   const cfg = await getJSON("/api/config");
   const ss = cfg.scripts_sync || {};
-  const scriptsDisabled = !ss.ready || ss.up_to_date;
   const scriptsStatus = !ss.ready
     ? "无法读取 version.txt，请检查 DST__ROOT"
     : ss.up_to_date
       ? `已是最新版本：${esc(ss.detected_version)}`
       : `记录 ${esc(ss.recorded_version || "无")} → 检测 ${esc(ss.detected_version)}，可同步`;
+
+  const snapOptions = [`<option value="">最新 / live 树</option>`]
+    .concat(snaps.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`))
+    .join("");
 
   main.innerHTML = `
     <div class="card-row">
@@ -22,13 +25,38 @@ export async function pageDashboard(main) {
       <div class="card"><div class="num">${META.ingredient_count}</div><span class="muted">材料种类</span></div>
       <div class="card"><div class="num">${META.po_total_entries}</div><span class="muted">翻译条目</span></div>
       <div class="card"><div class="num">${META.tuning_count}</div><span class="muted">TUNING 常量</span></div>
-      <div class="card"><div class="num">${snaps}</div><span class="muted">历史快照</span></div>
+      <div class="card"><div class="num">${snaps.length}</div><span class="muted">历史快照</span></div>
     </div>
     <div class="panel">
-      <h2>快捷操作</h2>
-      <div class="row">
-        <button class="btn" id="quickScriptsSync" ${scriptsDisabled ? "disabled" : ""}>scripts-sync 同步游戏脚本</button>
-        <span class="muted">${scriptsStatus}</span>
+      <h2>版本更新</h2>
+      <p class="muted" style="margin-top:0">${scriptsStatus}</p>
+      <div class="card-row">
+        <div class="card quick-card">
+          <div><b>update-local</b> <span class="muted">本地摄取</span></div>
+          <div class="steps">
+            <span class="step">scripts-sync</span><span class="step">images-sync</span><span class="step">anim-sync</span>
+          </div>
+          <p class="muted" style="margin:0">按序归档旧脚本树、解码游戏图片、归档动画历史；任一步失败即中止。</p>
+          <label style="display:flex;align-items:center;gap:6px;margin:0;color:var(--text)">
+            <input type="checkbox" id="ulDry" checked> 演练（不写任何本地文件）
+          </label>
+          <div><button class="btn" id="ulRun">开始本地摄取</button></div>
+        </div>
+        <div class="card quick-card">
+          <div><b>update-data</b> <span class="muted">数据页 → 维基</span></div>
+          <div class="steps">
+            <span class="step">copy-clip</span><span class="step">dst-recipes</span>
+            <span class="step">item-table</span><span class="step">strings</span>
+          </div>
+          <p class="muted" style="margin:0">先写模块常量（科技/制作站），再同步配方与物品表，最后只写变化的 Strings 桶页。</p>
+          <label>scripts 快照
+            <select id="udSnap">${snapOptions}</select>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;margin:0;color:var(--text)">
+            <input type="checkbox" id="udDry" checked> 维基干跑（只出 diff，不写入）
+          </label>
+          <div><button class="btn" id="udRun">开始数据页同步</button></div>
+        </div>
       </div>
     </div>
     <div class="panel">
@@ -45,16 +73,42 @@ export async function pageDashboard(main) {
       数据来源：<b>${esc(META.label)}</b>${currentSnapshot ? `（快照 ${esc(currentSnapshot)}）` : ""}
     </div>`;
 
-  const quickSyncBtn = $("#quickScriptsSync");
-  if (quickSyncBtn) quickSyncBtn.onclick = async () => {
-    if (!confirm("将执行 scripts-sync 同步游戏脚本（真实本地操作）。确定继续？")) return;
-    const j = await postJSON("/api/jobs", { kind: "scripts_sync" });
+  const submit = async (body, confirmText) => {
+    if (confirmText && !confirm(confirmText)) return;
+    const j = await postJSON("/api/jobs", body);
     location.hash = `#/jobs/${j.id}`;
   };
-}
 
-/* ---------------- jobs ---------------- */
-// Each entry: label; wiki: true => the job edits wiki pages, so the global
-// "wiki dry-run" checkbox applies and dry_run=false needs an extra confirm.
-// Local-only jobs (wiki: false) gate their own disk writes via JobKind
-// fields of the same shape; the global checkbox is hidden for them.
+  const ulBtn = $("#ulRun");
+  ulBtn.onclick = async () => {
+    const dry = $("#ulDry").checked;
+    ulBtn.disabled = true;
+    try {
+      await submit(
+        { kind: "update_local", dry_run: dry },
+        dry ? null : "update-local 将真实执行本地文件操作（scripts 换树、图片/动画归档）。确定继续？",
+      );
+    } catch (e) {
+      ulBtn.disabled = false;
+      alert("提交失败：" + e.message);
+    }
+  };
+
+  const udBtn = $("#udRun");
+  udBtn.onclick = async () => {
+    const dry = $("#udDry").checked;
+    const body = { kind: "update_data", wiki_dry_run: dry };
+    const snap = $("#udSnap").value;
+    if (snap) body.snapshot = snap;
+    udBtn.disabled = true;
+    try {
+      await submit(
+        body,
+        dry ? null : "update-data 将真实写入维基（模块常量 / 配方 / 物品表 / Strings 桶页）。确定继续？",
+      );
+    } catch (e) {
+      udBtn.disabled = false;
+      alert("提交失败：" + e.message);
+    }
+  };
+}

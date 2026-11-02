@@ -708,6 +708,7 @@ pub async fn run_upload_icons(
             let mut uploaded = Vec::new();
             let mut failed = Vec::new();
             for (i, file) in selected.iter().enumerate() {
+                reporter.progress(&format!("上传 {file}"), i + 1, selected.len());
                 let entry = &meta.icons[file];
                 let title = entry.title.clone().unwrap_or_default();
                 if title.is_empty() {
@@ -728,13 +729,6 @@ pub async fn run_upload_icons(
                 // 已存在则自动覆盖重传（ignorewarnings=1），无需前端猜测。
                 let exists = entry.wiki.as_ref().and_then(|w| w.exists) == Some(true);
                 let ignore_warnings = params.ignore_warnings || exists;
-                reporter.log(format!(
-                    "[{}/{}] {} → File:{}",
-                    i + 1,
-                    selected.len(),
-                    file,
-                    title
-                ));
                 let path = dir.join(file);
                 match client
                     .upload_file(
@@ -748,7 +742,7 @@ pub async fn run_upload_icons(
                 {
                     Ok(result) => {
                         reporter.log(format!(
-                            "  已上传 File:{}（{}）{}",
+                            "已上传 File:{}（{}）{}",
                             result.filename,
                             result.result,
                             result.url.as_deref().unwrap_or("")
@@ -766,7 +760,7 @@ pub async fn run_upload_icons(
                         }));
                     }
                     Err(e) => {
-                        reporter.log(format!("  上传失败 {file}: {e}"));
+                        reporter.error(format!("上传失败 {file}: {e}"));
                         failed.push(json!({
                             "file": file,
                             "title": title,

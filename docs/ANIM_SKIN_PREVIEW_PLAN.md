@@ -331,6 +331,11 @@ GET /api/anim/assets/preview
 
 ### 8.1 symbol 同名匹配 vs 间接映射（2026-09 调研结论）
 
+> 跟随挂点（`Follower:FollowSymbol`）的合成预览见
+> [ANIM_FOLLOW_FX.md](ANIM_FOLLOW_FX.md)。挂点 symbol 没有 build 贴图，
+> 但带有逐帧变换；预览按"挂点变换 × 跟随动画本地变换"合成，不经过
+> build 查找。
+
 **数据文件层面只有同名匹配。** `anim.bin` 帧元素只存 symbol 名哈希
 （Klei hash，小写名）+ 帧号 + layer/z；`build.bin` 的 symbols 表存名字
 与帧。引擎与 `dst-anim-tool`（render.rs `find_symbol_frame`）都按哈希

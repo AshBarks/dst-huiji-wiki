@@ -6,12 +6,14 @@
 
 use crate::error::{Error, Result};
 use crate::parser::anim_override::SymbolRemapIndex;
+use dst_anim_tool::anim::AnimAnimation;
 use dst_anim_tool::render::{
-    prepare_animation_frames_with_overrides, render_frame_with_elements, BuildRef,
-    SymbolOverrideMap,
+    compute_frame_elements_with_z, find_anchor_transform, merge_followed_elements,
+    render_frame_with_elements, union_bounds_from_element_frames, BuildRef, ElementData,
+    FollowStyle, SymbolOverrideMap,
 };
 use rayon::prelude::*;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::{Cursor, Write};
 use std::path::{Path, PathBuf};
@@ -23,6 +25,90 @@ use std::sync::{Arc, Mutex, OnceLock};
 pub enum RenderFormat {
     Gif,
     Png,
+}
+
+/// One follow-FX attachment: render `bank/animation` (from `file`, when set)
+/// and compose it onto `anchor` in the main animation, mirroring the game's
+/// `Follower:FollowSymbol(inst.GUID, anchor, ...)`.
+///
+/// Frame mapping: follower frame `j = (main_frame + frame_offset) mod
+/// follower_frame_count`. `frame_begin`/`frame_end` are interpreted as a
+/// window on the *main* animation's frame index (the semantics used by
+/// finite FX windows such as weapon swing trails); both are inclusive.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct FollowFxSpec {
+    pub anchor: String,
+    #[serde(default)]
+    pub bank: String,
+    #[serde(default, alias = "anim")]
+    pub animation: String,
+    #[serde(default)]
+    pub file: Option<String>,
+    #[serde(default)]
+    pub build: Option<String>,
+    #[serde(default)]
+    pub offset: Option<[f32; 2]>,
+    #[serde(default, alias = "phase")]
+    pub frame_offset: i64,
+    #[serde(default)]
+    pub frame_begin: Option<u32>,
+    #[serde(default)]
+    pub frame_end: Option<u32>,
+    /// `SetFinalOffset`: >0 draws the FX in front of the parent, <0 behind.
+    #[serde(default)]
+    pub final_offset: Option<i32>,
+    /// Literal `SetMultColour` to tint the composed sprites.
+    #[serde(default)]
+    pub mult_colour: Option<[f32; 4]>,
+    /// Literal `SetAddColour` to tint the composed sprites.
+    #[serde(default)]
+    pub add_colour: Option<[f32; 4]>,
+    /// `FollowSymbol` 第 7 参数（useframe，推断为跟随帧同步）。
+    #[serde(default)]
+    pub sync_frame: bool,
+    /// 工厂内 `SetFrame(math.random(...))`：前端可随机化相位。
+    #[serde(default)]
+    pub random_frame: bool,
+}
+
+impl FollowFxSpec {
+    fn offset_xy(&self) -> (f32, f32) {
+        self.offset.map(|o| (o[0], o[1])).unwrap_or((0.0, 0.0))
+    }
+
+    fn style(&self) -> FollowStyle {
+        FollowStyle {
+            offset: self.offset_xy(),
+            final_offset: self.final_offset.unwrap_or(0),
+            mult_colour: self.mult_colour,
+            add_colour: self.add_colour,
+        }
+    }
+
+    fn window_contains(&self, frame: usize) -> bool {
+        let idx = frame as u32;
+        self.frame_begin.is_none_or(|b| idx >= b) && self.frame_end.is_none_or(|e| idx <= e)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct FollowResolutionError {
+    pub anchor: String,
+    pub animation: String,
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct FollowReport {
+    pub anchor: String,
+    pub bank: String,
+    pub animation: String,
+    pub file: String,
+    pub attached_frames: usize,
+    pub anchor_missing_frames: Vec<usize>,
+    pub follower_empty_frames: Vec<usize>,
+    pub sync_frame: bool,
+    pub random_frame: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -50,6 +136,9 @@ pub struct RenderParams {
     /// 无 build 提示）。按 symbol 提取的索引
     /// （`parser::anim_override::SymbolRemapIndex`）可直接转换传入。
     pub symbol_overrides: Vec<(String, String, String)>,
+    /// Followed FX entities (`Follower:FollowSymbol`) to compose onto their
+    /// attachment-point symbols after the main animation is built.
+    pub follow_fx: Vec<FollowFxSpec>,
     pub bank: String,
     pub animation: String,
     pub format: RenderFormat,
@@ -426,13 +515,202 @@ fn build_info_json(file: &str, build: &dst_anim_tool::build_file::BuildFile) -> 
     })
 }
 
-/// Render a selected animation and return GIF or PNG-sequence zip bytes.
 /// A fully rendered animation sequence.
 pub struct RenderedAnimation {
+    /// Rendered frames in playback order (frames without drawable content are skipped).
     pub frames: Vec<image::RgbaImage>,
+    /// Original animation frame indices corresponding to `frames`.
+    pub frame_indices: Vec<u32>,
+    /// Total animation frame count, including frames skipped during rendering.
+    pub frame_count: usize,
     pub frame_rate: f32,
     pub animation_name: String,
     pub selected: String,
+    /// Per-attachment composition report (empty when no follow FX was requested).
+    pub follows: Vec<FollowReport>,
+    /// Follow specs that could not be resolved (missing bank/animation/build).
+    pub follow_errors: Vec<FollowResolutionError>,
+}
+
+/// Parsed archive backing one or more follow-FX specs.
+struct FollowArchive {
+    file: String,
+    archive: dst_anim_tool::archive::ParsedArchive,
+}
+
+/// One resolved follow attachment, borrowing the loaded animation and builds.
+struct FollowPlan<'a> {
+    spec: &'a FollowFxSpec,
+    file: String,
+    animation: &'a AnimAnimation,
+    build_refs: Vec<BuildRef<'a>>,
+}
+
+/// Resolve a follow spec's file argument to a safe archive path within
+/// `anim_root`, defaulting to the selected archive.
+fn follow_file_name(anim_root: &Path, spec: &FollowFxSpec, selected: &str) -> Result<String> {
+    let raw = spec.file.as_deref().unwrap_or(selected);
+    let file = normalize_file_argument(raw)?;
+    if !anim_root.join(&file).is_file() {
+        return Err(Error::Config(format!(
+            "follow animation file not found: {file}"
+        )));
+    }
+    Ok(file)
+}
+
+/// Parse the archives referenced by `specs` (deduped) and make sure every build
+/// they need is loaded. Appends missing builds to `builds`.
+fn load_follow_archives(
+    anim_root: &Path,
+    specs: &[FollowFxSpec],
+    selected: &str,
+    builds: &mut Vec<LoadedBuild>,
+) -> Result<Vec<FollowArchive>> {
+    let mut archives: Vec<FollowArchive> = Vec::new();
+    let mut wanted_builds: BTreeSet<String> = BTreeSet::new();
+    for spec in specs {
+        let Ok(file) = follow_file_name(anim_root, spec, selected) else {
+            continue;
+        };
+        if !archives.iter().any(|a| a.file == file) {
+            let path = anim_root.join(&file);
+            let data = std::fs::read(&path)?;
+            let archive = dst_anim_tool::archive::parse_file_by_path(&path, &data)?;
+            if let Some(build) = archive.build.as_ref() {
+                wanted_builds.insert(build.name.to_lowercase());
+            }
+            archives.push(FollowArchive { file, archive });
+        }
+        if let Some(build) = spec
+            .build
+            .as_deref()
+            .map(str::trim)
+            .filter(|b| !b.is_empty())
+        {
+            wanted_builds.insert(build.to_lowercase());
+        }
+    }
+    let existing: HashSet<String> = builds.iter().map(|b| b.build.name.to_lowercase()).collect();
+    let missing: HashSet<String> = wanted_builds
+        .into_iter()
+        .filter(|build| !existing.contains(build))
+        .collect();
+    if !missing.is_empty() {
+        for (name, path) in find_archives_with_build_names(anim_root, &missing)? {
+            if let Some(loaded) = load_build_from_archive(&path, name)? {
+                builds.push(loaded);
+            }
+        }
+    }
+    Ok(archives)
+}
+
+/// Resolve specs against loaded archives/builds. Unresolvable specs are
+/// reported (not fatal) so the preview still renders the base animation.
+fn resolve_follow_plans<'a>(
+    specs: &'a [FollowFxSpec],
+    archives: &'a [FollowArchive],
+    selected: &str,
+    default_bank: &str,
+    build_refs: &[BuildRef<'a>],
+) -> (Vec<FollowPlan<'a>>, Vec<FollowResolutionError>) {
+    let mut plans = Vec::new();
+    let mut errors = Vec::new();
+    for spec in specs {
+        let anchor = spec.anchor.trim();
+        if anchor.is_empty() {
+            continue;
+        }
+        let bank_name = if spec.bank.trim().is_empty() {
+            default_bank.trim()
+        } else {
+            spec.bank.trim()
+        };
+        let file = spec
+            .file
+            .as_deref()
+            .map(normalize_file_argument)
+            .transpose()
+            .unwrap_or_else(|_| Some(selected.to_string()))
+            .unwrap_or_else(|| selected.to_string());
+        let Some(archive) = archives.iter().find(|a| a.file == file) else {
+            errors.push(FollowResolutionError {
+                anchor: anchor.to_string(),
+                animation: spec.animation.clone(),
+                reason: format!("archive not loaded: {file}"),
+            });
+            continue;
+        };
+        let Some(anim_file) = archive.archive.anim.as_ref() else {
+            errors.push(FollowResolutionError {
+                anchor: anchor.to_string(),
+                animation: spec.animation.clone(),
+                reason: format!("{file} has no anim.bin"),
+            });
+            continue;
+        };
+        let Some(bank) = anim_file
+            .banks
+            .iter()
+            .find(|b| b.name.eq_ignore_ascii_case(bank_name))
+        else {
+            errors.push(FollowResolutionError {
+                anchor: anchor.to_string(),
+                animation: spec.animation.clone(),
+                reason: format!("bank not found: {bank_name}"),
+            });
+            continue;
+        };
+        let Some(animation) = bank
+            .animations
+            .iter()
+            .find(|a| a.name.eq_ignore_ascii_case(&spec.animation))
+        else {
+            errors.push(FollowResolutionError {
+                anchor: anchor.to_string(),
+                animation: spec.animation.clone(),
+                reason: format!("animation not found: {bank_name}/{}", spec.animation),
+            });
+            continue;
+        };
+        let wanted = spec
+            .build
+            .as_deref()
+            .map(str::trim)
+            .filter(|b| !b.is_empty())
+            .map(str::to_string)
+            .or_else(|| archive.archive.build.as_ref().map(|b| b.name.clone()));
+        let scoped: Vec<BuildRef<'a>> = match wanted {
+            Some(name) => build_refs
+                .iter()
+                .filter(|br| br.build.name.eq_ignore_ascii_case(&name))
+                .map(|br| BuildRef {
+                    build: br.build,
+                    disabled_symbols: br.disabled_symbols,
+                })
+                .collect(),
+            None => Vec::new(),
+        };
+        let build_refs = if scoped.is_empty() {
+            build_refs
+                .iter()
+                .map(|br| BuildRef {
+                    build: br.build,
+                    disabled_symbols: br.disabled_symbols,
+                })
+                .collect()
+        } else {
+            scoped
+        };
+        plans.push(FollowPlan {
+            spec,
+            file,
+            animation,
+            build_refs,
+        });
+    }
+    (plans, errors)
 }
 
 /// Render an animation to in-memory frames.
@@ -509,17 +787,24 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
     // files; scan the anim tree for archives providing them and append.
     ensure_override_builds_loaded(&params.anim_root, &params.symbol_overrides, &mut builds)?;
 
+    // Follow-FX archives/builds are loaded before the build set is frozen.
+    let follow_archives =
+        load_follow_archives(&params.anim_root, &params.follow_fx, &selected, &mut builds)?;
+
     let disabled_builds: HashSet<&str> =
         params.disabled_builds.iter().map(|s| s.as_str()).collect();
-    let hidden_symbols: HashSet<&str> = params.hidden_symbols.iter().map(|s| s.as_str()).collect();
+    let hidden_symbols: HashSet<String> = params
+        .hidden_symbols
+        .iter()
+        .map(|s| s.trim().to_lowercase())
+        .filter(|s| !s.is_empty())
+        .collect();
 
     for b in &mut builds {
         if disabled_builds.contains(b.name.as_str()) {
             continue;
         }
-        for sym in &hidden_symbols {
-            b.disabled_symbols.insert(sym.to_string());
-        }
+        b.disabled_symbols.extend(hidden_symbols.iter().cloned());
     }
 
     for (symbol, chosen) in &params.symbol_builds {
@@ -545,23 +830,102 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
         return Err(Error::Config("all builds are disabled".to_string()));
     }
 
-    let (bounds, prepared) = prepare_animation_frames_with_overrides(
-        &animation.frames,
+    let (follow_plans, follow_errors) = resolve_follow_plans(
+        &params.follow_fx,
+        &follow_archives,
+        &selected,
+        &params.bank,
         &build_refs,
-        1.0,
-        (0.0, 0.0),
-        &HashSet::new(),
-        &HashSet::new(),
-        &build_symbol_override_map(&params.symbol_overrides),
     );
 
+    let frame_count = animation.frames.len();
+    let overrides = build_symbol_override_map(&params.symbol_overrides);
+    let empty_overrides = SymbolOverrideMap::new();
+    let empty_elements: HashSet<(String, String)> = HashSet::new();
+    let mut reports: Vec<FollowReport> = follow_plans
+        .iter()
+        .map(|plan| FollowReport {
+            anchor: plan.spec.anchor.trim().to_string(),
+            bank: plan.spec.bank.clone(),
+            animation: plan.animation.name.clone(),
+            file: plan.file.clone(),
+            sync_frame: plan.spec.sync_frame,
+            random_frame: plan.spec.random_frame,
+            ..Default::default()
+        })
+        .collect();
+    let mut prepared_elements: Vec<Option<Vec<ElementData>>> = Vec::with_capacity(frame_count);
+
+    for (pos, frame) in animation.frames.iter().enumerate() {
+        let mut elements = compute_frame_elements_with_z(
+            frame,
+            &build_refs,
+            1.0,
+            &empty_elements,
+            &hidden_symbols,
+            &overrides,
+        );
+        for (plan_index, plan) in follow_plans.iter().enumerate() {
+            if !plan.spec.window_contains(pos) {
+                continue;
+            }
+            let anchor_symbol = plan.spec.anchor.trim().to_lowercase();
+            let Some(anchor) = find_anchor_transform(frame, &anchor_symbol) else {
+                reports[plan_index].anchor_missing_frames.push(pos);
+                continue;
+            };
+            let n = plan.animation.frames.len();
+            if n == 0 {
+                reports[plan_index].follower_empty_frames.push(pos);
+                continue;
+            }
+            let follower_frame = if plan.spec.sync_frame {
+                pos % n
+            } else {
+                (pos as i64 + plan.spec.frame_offset).rem_euclid(n as i64) as usize
+            };
+            let follower = compute_frame_elements_with_z(
+                &plan.animation.frames[follower_frame],
+                &plan.build_refs,
+                1.0,
+                &empty_elements,
+                &hidden_symbols,
+                &empty_overrides,
+            );
+            if follower.is_empty() {
+                reports[plan_index].follower_empty_frames.push(pos);
+                continue;
+            }
+            reports[plan_index].attached_frames += 1;
+            elements = merge_followed_elements(elements, &anchor, &follower, &plan.spec.style());
+        }
+        prepared_elements.push(if elements.is_empty() {
+            None
+        } else {
+            Some(
+                elements
+                    .into_iter()
+                    .map(|(_, element)| element)
+                    .collect::<Vec<_>>(),
+            )
+        });
+    }
+
+    let Some(bounds) = union_bounds_from_element_frames(
+        prepared_elements.iter().flatten().map(Vec::as_slice),
+        1.0,
+        (0.0, 0.0),
+    ) else {
+        return Err(Error::Config("no renderable frames produced".to_string()));
+    };
+
     let mut frames = Vec::new();
-    for pf in prepared.into_iter().flatten() {
-        let render_bounds = bounds.as_ref().unwrap_or(&pf.bounds);
-        if let Some(rendered) =
-            render_frame_with_elements(&pf.elements, render_bounds, 1.0, (0.0, 0.0))
-        {
+    let mut frame_indices = Vec::new();
+    for (pos, elements) in prepared_elements.into_iter().enumerate() {
+        let Some(elements) = elements else { continue };
+        if let Some(rendered) = render_frame_with_elements(&elements, &bounds, 1.0, (0.0, 0.0)) {
             frames.push(rendered.image);
+            frame_indices.push(animation.frames[pos].idx);
         }
     }
     if frames.is_empty() {
@@ -570,9 +934,13 @@ pub fn render_animation_frames(params: &RenderParams) -> Result<RenderedAnimatio
 
     Ok(RenderedAnimation {
         frames,
+        frame_indices,
+        frame_count,
         frame_rate: animation.frame_rate,
         animation_name: animation.name.clone(),
         selected,
+        follows: reports,
+        follow_errors,
     })
 }
 
@@ -605,23 +973,38 @@ pub fn render_animation(params: &RenderParams) -> Result<RenderOutput> {
     }
 }
 
-/// Render an animation as base64 PNG frames for in-browser preview.
+/// Render an animation as base64 PNG frames for in-browser preview. Each frame
+/// carries its original animation index so the client can keep skipped frames
+/// as blank timeline slots; `frame_count` is the full timeline length.
 pub fn render_animation_preview_json(params: &RenderParams) -> Result<serde_json::Value> {
-    let rendered = render_animation_frames(params)?;
+    let RenderedAnimation {
+        frames: rendered_frames,
+        frame_indices,
+        frame_count,
+        frame_rate,
+        animation_name,
+        follows,
+        follow_errors,
+        ..
+    } = render_animation_frames(params)?;
     let mut frames = Vec::new();
-    for frame in rendered.frames {
+    for (frame, idx) in rendered_frames.into_iter().zip(frame_indices) {
         let mut png = Cursor::new(Vec::new());
         image::DynamicImage::ImageRgba8(frame)
             .write_to(&mut png, image::ImageFormat::Png)
             .map_err(|e| Error::Config(format!("png encode: {e}")))?;
         frames.push(serde_json::json!({
+            "idx": idx,
             "data": format!("data:image/png;base64,{}", base64_encode(png.get_ref())),
         }));
     }
     Ok(serde_json::json!({
-        "frame_rate": rendered.frame_rate,
-        "animation": rendered.animation_name,
+        "frame_rate": frame_rate,
+        "frame_count": frame_count,
+        "animation": animation_name,
         "frames": frames,
+        "follows": follows,
+        "follow_errors": follow_errors,
     }))
 }
 
@@ -735,6 +1118,80 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
         }
     }
 
+    let build_symbols: BTreeSet<String> = build_info
+        .iter()
+        .filter_map(|v| v.get("symbols").and_then(|s| s.as_array()))
+        .flatten()
+        .filter_map(|s| s.as_str())
+        .map(|s| s.to_lowercase())
+        .collect();
+    let missing_symbols: Vec<String> = symbols
+        .iter()
+        .filter(|symbol| !build_symbols.contains(*symbol))
+        .cloned()
+        .collect();
+    let mut follow_candidates = serde_json::Map::new();
+    if !missing_symbols.is_empty() {
+        let mut candidates: Vec<(&str, &str, BTreeSet<String>)> = Vec::new();
+        for candidate_bank in &anim.banks {
+            for candidate_anim in &candidate_bank.animations {
+                if candidate_bank.name.eq_ignore_ascii_case(&bank.name)
+                    && candidate_anim.name.eq_ignore_ascii_case(&animation.name)
+                {
+                    continue;
+                }
+                let mut candidate_symbols = BTreeSet::new();
+                for frame in &candidate_anim.frames {
+                    for element in &frame.elements {
+                        candidate_symbols.insert(element.symbol_lower.clone());
+                    }
+                }
+                if candidate_symbols.is_empty() || !candidate_symbols.is_subset(&build_symbols) {
+                    continue;
+                }
+                candidates.push((
+                    candidate_bank.name.as_str(),
+                    candidate_anim.name.as_str(),
+                    candidate_symbols,
+                ));
+            }
+        }
+        for symbol in &missing_symbols {
+            let base = symbol.strip_suffix("_swap").unwrap_or(symbol);
+            let mut scored: Vec<(u32, &str, &str, &'static str)> = candidates
+                .iter()
+                .filter_map(|(candidate_bank, candidate_anim, _)| {
+                    let (score, reason) = follow_name_score(base, &candidate_anim.to_lowercase());
+                    (score > 0).then_some((score, *candidate_bank, *candidate_anim, reason))
+                })
+                .collect();
+            scored.sort_by(|a, b| {
+                b.0.cmp(&a.0)
+                    .then_with(|| a.2.to_lowercase().cmp(&b.2.to_lowercase()))
+            });
+            scored.dedup_by(|a, b| a.2.eq_ignore_ascii_case(b.2));
+            if scored.is_empty() {
+                continue;
+            }
+            follow_candidates.insert(
+                symbol.clone(),
+                serde_json::json!(scored
+                    .into_iter()
+                    .take(5)
+                    .map(
+                        |(score, candidate_bank, candidate_anim, reason)| serde_json::json!({
+                            "bank": candidate_bank,
+                            "animation": candidate_anim,
+                            "file": selected,
+                            "score": score,
+                            "reason": reason,
+                        })
+                    )
+                    .collect::<Vec<_>>()),
+            );
+        }
+    }
+
     Ok(serde_json::json!({
         "file": selected,
         "bank": bank.name,
@@ -744,7 +1201,37 @@ pub fn animation_info(params: &RenderParams) -> Result<serde_json::Value> {
         "frames": frames,
         "symbols": symbols.into_iter().collect::<Vec<_>>(),
         "builds": build_info,
+        "missing_symbols": missing_symbols,
+        "follow_candidates": follow_candidates,
     }))
+}
+
+/// Heuristic name score for pairing an attachment symbol with a same-file
+/// animation (follower FX). Only self-contained animations are considered
+/// candidates; this is the fallback when the Lua-derived follow index has no
+/// entry for the prefab.
+fn follow_name_score(base: &str, candidate: &str) -> (u32, &'static str) {
+    if base.is_empty() {
+        return (0, "");
+    }
+    if candidate == base {
+        return (100, "name");
+    }
+    if candidate == format!("fx_{base}") {
+        return (95, "fx-prefix");
+    }
+    let base_has_candidate = base.len() > candidate.len() && base.contains(candidate);
+    let candidate_has_base = candidate.len() > base.len() && candidate.contains(base);
+    if candidate.len() >= 3 && (base_has_candidate || candidate_has_base) {
+        return (60, "partial-name");
+    }
+    if candidate.starts_with("fx_") {
+        return (40, "fx-anim");
+    }
+    if candidate.ends_with("_loop") {
+        return (30, "loop-anim");
+    }
+    (0, "")
 }
 
 /// Search animation archives for builds that can serve the requested symbols,
@@ -901,6 +1388,96 @@ fn frames_to_zip(frames: &[image::RgbaImage], animation: &str) -> Result<Vec<u8>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn follow_name_score_prefers_exact_and_fx_prefix() {
+        assert_eq!(follow_name_score("fx_flame", "fx_flame"), (100, "name"));
+        assert_eq!(
+            follow_name_score("cape_front", "fx_cape_front"),
+            (95, "fx-prefix")
+        );
+        assert_eq!(
+            follow_name_score("cape_front", "fx_fabric"),
+            (40, "fx-anim")
+        );
+        assert_eq!(follow_name_score("", "anything"), (0, ""));
+    }
+
+    #[test]
+    fn follow_spec_accepts_js_payload() {
+        let spec: FollowFxSpec = serde_json::from_str(
+            r#"{"anchor":"cape_front_swap","bank":"shadow_thrall_wings","anim":"fx_cape_front","offset":[3,4],"phase":2,"frame_begin":1,"frame_end":9,"final_offset":-1,"mult_colour":[1,1,1,0.5],"add_colour":[0.1,0.2,0.3,1],"sync_frame":true,"random_frame":true}"#,
+        )
+        .unwrap();
+        assert_eq!(spec.animation, "fx_cape_front");
+        assert_eq!(spec.offset_xy(), (3.0, 4.0));
+        assert_eq!(spec.frame_offset, 2);
+        assert!(spec.window_contains(1));
+        assert!(spec.window_contains(9));
+        assert!(!spec.window_contains(0));
+        assert!(!spec.window_contains(10));
+        assert_eq!(spec.final_offset, Some(-1));
+        assert_eq!(spec.mult_colour, Some([1.0, 1.0, 1.0, 0.5]));
+        assert_eq!(spec.add_colour, Some([0.1, 0.2, 0.3, 1.0]));
+        assert!(spec.sync_frame);
+        assert!(spec.random_frame);
+        let style = spec.style();
+        assert_eq!(style.final_offset, -1);
+        assert_eq!(style.offset, (3.0, 4.0));
+    }
+
+    #[test]
+    #[ignore = "requires local DST game data (DST__ROOT)"]
+    fn composes_follow_fx_for_shadowthrall_wings() {
+        let Some(root) = crate::platform::config::dst_root_opt() else {
+            return;
+        };
+        let specs = [
+            ("cape_front_swap", "fx_cape_front"),
+            ("fx_flame_swap", "fx_flame"),
+            ("fx_fabric_swap", "fx_fabric"),
+        ]
+        .into_iter()
+        .map(|(anchor, animation)| FollowFxSpec {
+            anchor: anchor.to_string(),
+            bank: "shadow_thrall_wings".to_string(),
+            animation: animation.to_string(),
+            file: Some("shadow_thrall_wings.zip".to_string()),
+            ..Default::default()
+        })
+        .collect();
+        let params = RenderParams {
+            anim_root: root.join("data/anim"),
+            files: vec!["shadow_thrall_wings.zip".to_string()],
+            disabled_builds: Vec::new(),
+            hidden_symbols: Vec::new(),
+            symbol_builds: HashMap::new(),
+            skin_zip: None,
+            skin_dyn: None,
+            symbol_overrides: Vec::new(),
+            follow_fx: specs,
+            bank: "shadow_thrall_wings".to_string(),
+            animation: "idle_side".to_string(),
+            format: RenderFormat::Png,
+        };
+        let rendered = render_animation_frames(&params).unwrap();
+        assert_eq!(rendered.follows.len(), 3);
+        assert!(rendered.follow_errors.is_empty());
+        for report in &rendered.follows {
+            assert!(
+                report.attached_frames > 0,
+                "{} did not attach on any frame",
+                report.anchor
+            );
+        }
+        let plain = render_animation_frames(&RenderParams {
+            follow_fx: Vec::new(),
+            ..params
+        })
+        .unwrap();
+        assert!(plain.follows.is_empty());
+        assert_eq!(plain.frames.len(), rendered.frames.len());
+    }
 
     #[test]
     fn normalize_rejects_traversal() {

@@ -464,6 +464,10 @@ pub async fn anim_assets_prefab(
         "files": files,
         "build_files": build_files,
         "skins": skins,
+        "follow_index_version": index
+            .get("follow_index_version")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(0),
     })))
 }
 
@@ -484,6 +488,23 @@ pub async fn anim_assets_skins(
         .map(|group| renderable_skins(group))
         .unwrap_or_default();
     Ok(Json(serde_json::json!({ "skins": skins })))
+}
+
+/// Parse the `follows` query parameter: a JSON array of
+/// [`FollowFxSpec`](dst_huiji_wiki::scripts_sync::anim::preview::FollowFxSpec).
+/// Absent or empty means "no follow FX".
+fn follow_specs_param(
+    q: &std::collections::HashMap<String, String>,
+) -> std::result::Result<Vec<dst_huiji_wiki::scripts_sync::anim::preview::FollowFxSpec>, StatusCode>
+{
+    let Some(raw) = q
+        .get("follows")
+        .map(String::as_str)
+        .filter(|v| !v.trim().is_empty())
+    else {
+        return Ok(Vec::new());
+    };
+    serde_json::from_str(raw).map_err(|_| StatusCode::BAD_REQUEST)
 }
 
 /// GET /api/anim/assets/render?file=...&bank=...&animation=...&format=gif|png
@@ -528,6 +549,7 @@ pub async fn anim_assets_render(
         .get("symbol_overrides")
         .map(|raw| dst_huiji_wiki::scripts_sync::anim::preview::parse_symbol_overrides(raw))
         .unwrap_or_default();
+    let follow_fx = follow_specs_param(&q)?;
 
     let output = tokio::task::spawn_blocking(move || {
         dst_huiji_wiki::scripts_sync::anim::preview::render_animation(
@@ -540,6 +562,7 @@ pub async fn anim_assets_render(
                 skin_zip,
                 skin_dyn,
                 symbol_overrides,
+                follow_fx,
                 bank,
                 animation,
                 format,
@@ -596,6 +619,7 @@ pub async fn anim_assets_info(
                 skin_zip,
                 skin_dyn,
                 symbol_overrides: Vec::new(),
+                follow_fx: Vec::new(),
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Gif,
@@ -644,6 +668,7 @@ pub async fn anim_assets_preview(
         .get("symbol_overrides")
         .map(|raw| dst_huiji_wiki::scripts_sync::anim::preview::parse_symbol_overrides(raw))
         .unwrap_or_default();
+    let follow_fx = follow_specs_param(&q)?;
 
     let anim_root = anim_root_from_index_or_env()?;
     let value = tokio::task::spawn_blocking(move || {
@@ -657,6 +682,7 @@ pub async fn anim_assets_preview(
                 skin_zip,
                 skin_dyn,
                 symbol_overrides,
+                follow_fx,
                 bank,
                 animation,
                 format: dst_huiji_wiki::scripts_sync::anim::preview::RenderFormat::Png,

@@ -12,6 +12,7 @@
 use crate::error::Result;
 use crate::parser::anim_override::{parse_anim_overrides_in, SymbolOverrideCall, SymbolRemapIndex};
 use crate::parser::clothing_overrides::{parse_clothing_overrides, ClothingEntry};
+use crate::parser::follow_symbol::{parse_follow_symbols_in, FOLLOW_INDEX_VERSION};
 use crate::platform::progress::Reporter;
 use full_moon::ast;
 use full_moon::node::Node;
@@ -120,6 +121,10 @@ pub struct PrefabAnimRecord {
     pub related_files: Vec<String>,
     pub unresolved: Vec<UnresolvedRef>,
     pub content: AnimContent,
+    /// Attachment-point FX entities (`Follower:FollowSymbol`) created by this
+    /// prefab file. Additive field: absent in older artifacts.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub follow_fx: Vec<crate::parser::follow_symbol::FollowFxRecord>,
 }
 
 /// A resolved animation file reference attached to a prefab variant.
@@ -186,6 +191,9 @@ pub struct AnimIndexStats {
 #[derive(Debug, Clone, Serialize)]
 pub struct AnimIndexArtifact {
     pub schema_version: u32,
+    /// Version of the `follow_fx` data (0 = legacy artifact without it).
+    #[serde(default)]
+    pub follow_index_version: u32,
     pub scripts_root: String,
     pub anim_root: Option<String>,
     pub stats: AnimIndexStats,
@@ -262,7 +270,11 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             remap_calls.append(&mut calls);
         }
 
+        // FollowSymbol 关系（本地工厂 + 参数化工厂），按 prefab 文件整体归属。
+        let follow_fx = parse_follow_symbols_in(&source, Some(&stem)).unwrap_or_default();
+
         for mut record in file_index.prefabs {
+            record.follow_fx = follow_fx.clone();
             // Resolve existence now that we know anim_root.
             for anim in &mut record.anims {
                 anim.exists = anim_root.join(&anim.normalized).is_file();
@@ -378,6 +390,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
 
     let artifact = AnimIndexArtifact {
         schema_version: 1,
+        follow_index_version: FOLLOW_INDEX_VERSION,
         scripts_root: params.scripts_root.display().to_string(),
         anim_root: Some(anim_root.display().to_string()),
         stats: AnimIndexStats {

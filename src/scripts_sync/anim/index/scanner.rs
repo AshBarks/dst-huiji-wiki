@@ -52,6 +52,7 @@ impl<'s> Scanner<'s> {
                             line: 0,
                         }],
                         content: AnimContent::default(),
+                        follow_fx: Vec::new(),
                     }],
                     skipped_pkgref_dyn: 0,
                 };
@@ -821,6 +822,7 @@ impl<'s> Scanner<'s> {
                 related_files,
                 unresolved,
                 content: AnimContent::default(),
+                follow_fx: Vec::new(),
             });
         }
     }
@@ -1172,6 +1174,7 @@ impl<'s> Scanner<'s> {
             related_files,
             unresolved,
             content: AnimContent::default(),
+            follow_fx: Vec::new(),
         });
         true
     }

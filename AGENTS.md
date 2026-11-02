@@ -43,6 +43,7 @@ dst-huiji-wiki/
 | Add a new job type (CLI+Web) | `src/service/kind.rs` (variant) + `src/service/job_spec.rs` (spec 行) + `src/commands/mod.rs` (CLI_EXT 行 + 构造臂) | 契约测试强制四处一致（name/serde tag/CLI 旗标/前端 JOB_DEFS）|
 | Change WebUI behavior | `src/web/` | Binary-only module like commands; assets in `src/web/assets/` embedded via include_str! |
 | Add a data browse endpoint | `src/web/api_data/{dataset,icons,assets,anim}.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |
+| Preview followed FX (FollowSymbol anchors) | `docs/ANIM_FOLLOW_FX.md` + `src/parser/follow_symbol.rs` + `src/scripts_sync/anim/preview.rs` + `crates/dst-anim-tool/src/render.rs` | 挂点 symbol 无 build 贴图，用"挂点矩阵 × 跟随动画"合成；Lua 索引优先、同 bank 启发式兜底 |
 | Parse a new Lua data type | `src/parser/` | Add new module, re-export in mod.rs |
 | Add a new wiki data mapping | `src/mapping/mappers/` | Implement WikiMapper trait |
 | Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here (throttle+retry in `send_with_retry`) |

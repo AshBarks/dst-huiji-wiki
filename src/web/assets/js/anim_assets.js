@@ -30,7 +30,15 @@ export async function pageAnimAssets(main) {
     extraBuilds: new Set(),
     skins: [],
     selectedSkin: null,
-    previewTimer: null,
+    follows: {},
+    followTouched: new Set(),
+    anchorSymbols: new Set(),
+    followCandidates: {},
+    followReports: [],
+    followIndexVersion: 0,
+    previewPlayer: null,
+    previewRefreshTimer: null,
+    previewSeq: 0,
     manualQ: "",
     manualResults: [],
     manualChecked: new Set(),
@@ -49,6 +57,130 @@ export async function pageAnimAssets(main) {
     </div>
     <div id="animPane"></div>`;
   const view = () => $("#animPane");
+
+  // Stop playback and cancel pending refreshes before the detail DOM goes away;
+  // otherwise the interval keeps touching detached nodes.
+  const stopPreview = () => {
+    state.previewSeq++;
+    if (state.previewRefreshTimer) {
+      clearTimeout(state.previewRefreshTimer);
+      state.previewRefreshTimer = null;
+    }
+    if (state.previewPlayer) {
+      state.previewPlayer.dispose();
+      state.previewPlayer = null;
+    }
+  };
+
+  /* ---------------- 名字显示 / 复制 / 左栏调宽 ---------------- */
+
+  // `.zip` 与（Builds 的）`_build` 是整列公共后缀，列表里省略以把宽度让给
+  // 有区分度的部分；完整路径始终保留在 title 与中栏文件栏里。
+  function displayFileName(path, { build = false } = {}) {
+    let name = String(path ?? "");
+    if (name.endsWith(".zip")) name = name.slice(0, -4);
+    if (build && name.endsWith("_build")) name = name.slice(0, -6);
+    return name;
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  const LEFT_W_KEY = "anim-assets.left-width";
+  const LEFT_W_DEFAULT = 360;
+  const LEFT_W_MIN = 220;
+  const LEFT_W_MAX = 460;
+
+  function clampLeftWidth(w) {
+    return Math.min(LEFT_W_MAX, Math.max(LEFT_W_MIN, Math.round(Number(w) || 0)));
+  }
+
+  function readLeftWidth() {
+    try {
+      const n = parseInt(localStorage.getItem(LEFT_W_KEY) ?? "", 10);
+      return Number.isFinite(n) ? clampLeftWidth(n) : LEFT_W_DEFAULT;
+    } catch {
+      return LEFT_W_DEFAULT;
+    }
+  }
+
+  function storeLeftWidth(w) {
+    try { localStorage.setItem(LEFT_W_KEY, String(clampLeftWidth(w))); } catch { /* 隐私模式忽略 */ }
+  }
+
+  // 左栏宽度手柄：拖动实时改 --anim-left-w，松手落盘；双击/Home 复原。
+  // 窄屏（<=1100px）由 CSS 接管栅格，手柄隐藏且拖动无效。
+  function setupLeftResizer() {
+    const grid = view().querySelector(".anim-detail-grid");
+    const handle = view().querySelector(".anim-col-resize");
+    if (!grid || !handle) return;
+    const apply = (w) => {
+      const px = clampLeftWidth(w);
+      grid.style.setProperty("--anim-left-w", `${px}px`);
+      handle.setAttribute("aria-valuenow", String(px));
+    };
+    const isNarrow = () => window.matchMedia("(max-width:1100px)").matches;
+    const renderedWidth = () =>
+      grid.querySelector(".anim-col-left")?.getBoundingClientRect().width || LEFT_W_DEFAULT;
+    apply(readLeftWidth());
+
+    handle.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 || isNarrow()) return;
+      e.preventDefault();
+      const startX = e.clientX;
+      const startW = renderedWidth();
+      handle.setPointerCapture(e.pointerId);
+      handle.classList.add("dragging");
+      document.body.classList.add("anim-resizing");
+      const onMove = (ev) => apply(startW + ev.clientX - startX);
+      const onEnd = () => {
+        handle.removeEventListener("pointermove", onMove);
+        handle.removeEventListener("pointerup", onEnd);
+        handle.removeEventListener("pointercancel", onEnd);
+        handle.classList.remove("dragging");
+        document.body.classList.remove("anim-resizing");
+        try { handle.releasePointerCapture(e.pointerId); } catch { /* 已释放 */ }
+        storeLeftWidth(renderedWidth());
+      };
+      handle.addEventListener("pointermove", onMove);
+      handle.addEventListener("pointerup", onEnd);
+      handle.addEventListener("pointercancel", onEnd);
+    });
+
+    handle.addEventListener("dblclick", () => {
+      apply(LEFT_W_DEFAULT);
+      storeLeftWidth(LEFT_W_DEFAULT);
+    });
+
+    handle.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 40 : 16;
+      const cur = parseFloat(getComputedStyle(grid).getPropertyValue("--anim-left-w")) || LEFT_W_DEFAULT;
+      if (e.key === "ArrowLeft") apply(cur - step);
+      else if (e.key === "ArrowRight") apply(cur + step);
+      else if (e.key === "Home") apply(LEFT_W_DEFAULT);
+      else return;
+      e.preventDefault();
+      storeLeftWidth(parseFloat(getComputedStyle(grid).getPropertyValue("--anim-left-w")));
+    });
+  }
+
   main.querySelectorAll("[data-asset-tab]").forEach(btn => {
     btn.onclick = () => {
       state.tab = btn.dataset.assetTab;
@@ -68,6 +200,7 @@ export async function pageAnimAssets(main) {
   }
 
   function renderList() {
+    stopPreview();
     view().innerHTML = `
       <div class="panel">
         <h2>动画素材检索</h2>
@@ -122,11 +255,18 @@ export async function pageAnimAssets(main) {
     state.extraBuilds.clear();
     state.skins = [];
     state.selectedSkin = null;
+    state.follows = {};
+    state.followTouched = new Set();
+    state.anchorSymbols = new Set();
+    state.followCandidates = {};
+    state.followReports = [];
+    state.followIndexVersion = 0;
     const r = await apiJSON(`/api/anim/assets/prefab/${encodeURIComponent(file)}`);
     state.prefabItems = r.items || [];
     state.fileInfo = r.files || [];
     state.buildFiles = r.build_files || {};
     state.skins = r.skins || [];
+    state.followIndexVersion = Number(r.follow_index_version) || 0;
     for (const item of state.prefabItems) {
       for (const a of (item.anims || [])) {
         const p = a.normalized;
@@ -235,6 +375,139 @@ export async function pageAnimAssets(main) {
     return base.filter(f => f !== primary).concat([primary]);
   }
 
+  // FollowSymbol anchors: an animated symbol with no build sprite whose
+  // position drives a separate FX entity in the game.
+  function anchorLooksLikeFollow(sym) {
+    return /_swap$/.test(sym) || /(^|_)follow(_|$)/.test(sym);
+  }
+
+  function followFileForBank(bank) {
+    if (!bank || !state.selectedFile) return state.selectedFile;
+    const hasBank = (path) => (fileContent(path).banks || [])
+      .some(name => String(name).toLowerCase() === String(bank).toLowerCase());
+    if (hasBank(state.selectedFile)) return state.selectedFile;
+    for (const path of sessionFiles(state.selectedFile)) {
+      if (path !== state.selectedFile && hasBank(path)) return path;
+    }
+    return state.selectedFile;
+  }
+
+  function followSpecFromRecord(record, symbol) {
+    const offset = Array.isArray(record.offset) ? record.offset : [0, 0];
+    return {
+      anchor: symbol,
+      bank: record.bank || "",
+      animation: record.animation || "",
+      build: record.build || null,
+      file: followFileForBank(record.bank),
+      offset: [Number(offset[0]) || 0, Number(offset[1]) || 0],
+      phase: 0,
+      frame_begin: record.frame_begin ?? null,
+      frame_end: record.frame_end ?? null,
+      final_offset: record.final_offset ?? null,
+      mult_colour: record.mult_colour ?? null,
+      add_colour: record.add_colour ?? null,
+      sync_frame: !!record.sync_frame,
+      random_frame: !!record.random_frame,
+      enabled: true,
+    };
+  }
+
+  function followSpecFromCandidate(candidate, symbol) {
+    return {
+      anchor: symbol,
+      bank: candidate.bank || "",
+      animation: candidate.animation || "",
+      build: null,
+      file: candidate.file || state.selectedFile,
+      offset: [0, 0],
+      phase: 0,
+      frame_begin: null,
+      frame_end: null,
+      final_offset: null,
+      mult_colour: null,
+      add_colour: null,
+      sync_frame: false,
+      random_frame: false,
+      enabled: true,
+    };
+  }
+
+  function refreshFollowSpecs() {
+    const info = state.info;
+    if (!info) return;
+    const records = [];
+    for (const item of state.prefabItems || []) {
+      for (const record of (item.follow_fx || [])) records.push(record);
+    }
+    const byAnchor = new Map();
+    for (const record of records) {
+      const key = String(record.anchor || "").toLowerCase();
+      if (!key) continue;
+      if (!byAnchor.has(key)) byAnchor.set(key, []);
+      byAnchor.get(key).push(record);
+    }
+    const previous = state.follows || {};
+    const candidates = info.follow_candidates || {};
+    const buildSymbols = new Set();
+    for (const build of (info.builds || [])) {
+      for (const symbol of (build.symbols || [])) buildSymbols.add(String(symbol).toLowerCase());
+    }
+    const next = {};
+    const anchors = new Set();
+    for (const raw of (info.symbols || [])) {
+      const key = String(raw).toLowerCase();
+      if (state.followTouched.has(key) && Object.prototype.hasOwnProperty.call(previous, key)) {
+        next[key] = previous[key];
+        if (previous[key]) anchors.add(key);
+        continue;
+      }
+      const recs = byAnchor.get(key) || [];
+      const resolved = recs.find(record => record.animation);
+      if (resolved) {
+        anchors.add(key);
+        next[key] = { ...followSpecFromRecord(resolved, raw), source: "prefab" };
+        continue;
+      }
+      const cands = candidates[key] || [];
+      if (cands.length) {
+        anchors.add(key);
+        next[key] = {
+          ...followSpecFromCandidate(cands[0], raw),
+          source: recs.length ? "prefab+heuristic" : "heuristic",
+          candidates: cands,
+        };
+      } else if (!buildSymbols.has(key) && (recs.length || anchorLooksLikeFollow(key))) {
+        anchors.add(key);
+        next[key] = null;
+      }
+    }
+    state.follows = next;
+    state.anchorSymbols = anchors;
+    state.followCandidates = candidates;
+    state.followReports = [];
+  }
+
+  function followAnimChoices() {
+    const out = [];
+    const seen = new Set();
+    if (!state.selectedFile) return out;
+    for (const path of sessionFiles(state.selectedFile)) {
+      const content = fileContent(path);
+      const banks = content.banks || [];
+      const animations = content.animations || [];
+      for (const bank of banks) {
+        for (const anim of animations) {
+          const key = `${path}|${bank}|${anim}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push({ file: path, bank, anim });
+        }
+      }
+    }
+    return out;
+  }
+
   async function openAnimation(file, bank, anim) {
     state.selectedFile = file;
     state.selectedBank = bank;
@@ -258,10 +531,12 @@ export async function pageAnimAssets(main) {
           for (const e of entries) e.source = "tier_a";
         }
     } catch (e) { /* no remap artifact — selector stays hidden */ }
+    refreshFollowSpecs();
     renderAnimationDetail();
   }
 
   function renderAnimationDetail() {
+    stopPreview();
     const info = state.info;
     if (!info) return;
     const symbolSet = info.symbols || [];
@@ -323,14 +598,25 @@ export async function pageAnimAssets(main) {
         <div class="panel anim-col-center">
           <div class="row" style="justify-content:space-between;align-items:center">
             <button class="btn secondary" id="backToPrefab">${state.source === "manual" ? "返回手动文件" : "返回搜索"}</button>
-            <b><code>${esc(info.bank)} / ${esc(info.animation)}</code></b>
+            <b class="anim-anim-label" title="${esc(`${info.bank} / ${info.animation}`)}"><code>${esc(info.bank)} / ${esc(info.animation)}</code></b>
+          </div>
+          <div class="anim-file-bar" title="${esc(state.selectedFile || "")}">
+            <span class="muted">文件</span>
+            <code class="anim-file-path" id="animFilePath">${esc(state.selectedFile || "—")}</code>
+            <button class="btn link mini" id="copyAnimFile" title="复制完整文件路径">复制</button>
           </div>
           <div id="animPreview" style="flex:1;width:100%;height:100%;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(#fff 0 25%, #eee 0 50%) 0 0/16px 16px;border:1px solid var(--border);margin:8px 0;position:relative"></div>
-          <div id="frameCounter" style="text-align:center;margin-bottom:6px"></div>
+          <div class="row" style="justify-content:center;align-items:center;gap:6px;margin-bottom:6px">
+            <button class="btn secondary" id="prevFrame" disabled title="上一帧">上一帧</button>
+            <button class="btn" id="playPause" disabled title="播放 / 暂停">播放</button>
+            <button class="btn secondary" id="nextFrame" disabled title="下一帧">下一帧</button>
+            <span id="frameCounter" class="muted" style="min-width:180px;text-align:left"></span>
+          </div>
           <div class="row" style="justify-content:center;gap:8px">
             <button class="btn" id="exportGif">导出 GIF</button>
             <button class="btn secondary" id="exportPng">导出 PNG 序列</button>
           </div>
+          <div id="followStatus" class="muted" style="font-size:12px;text-align:center;margin-top:4px"></div>
         </div>
         <div class="anim-col-right">
           <div class="panel anim-side-panel">
@@ -348,9 +634,21 @@ export async function pageAnimAssets(main) {
             <div id="symbolDeps" style="overflow-y:auto;flex:1;min-height:0"></div>
           </div>
         </div>
+        <div class="anim-col-resize" role="separator" aria-orientation="vertical"
+          aria-label="调整左栏宽度" aria-valuemin="220" aria-valuemax="460" tabindex="0"
+          title="拖动调整左栏宽度（双击复原，方向键微调）"></div>
       </div>`;
 
     $("#backToPrefab").onclick = () => (state.source === "manual" ? renderManual() : renderList());
+
+    setupLeftResizer();
+
+    const copyFileBtn = $("#copyAnimFile");
+    if (copyFileBtn) copyFileBtn.onclick = async () => {
+      const ok = await copyText(state.selectedFile || "");
+      copyFileBtn.textContent = ok ? "已复制" : "复制失败";
+      setTimeout(() => { copyFileBtn.textContent = "复制"; }, 1200);
+    };
 
     // Skin switch: re-fetch info + preview with the selected skin package.
     const skinSel = $("#skinSel");
@@ -380,7 +678,7 @@ export async function pageAnimAssets(main) {
     }
     $("#leftAnims").innerHTML = Object.entries(groupedAnims).map(([file, items]) => `
       <details ${file === state.selectedFile ? "open" : ""} style="margin-bottom:2px">
-        <summary style="cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><code>${esc(file)}</code></summary>
+        <summary class="anim-group-summary" title="${esc(file)}"><code>${esc(displayFileName(file))}</code></summary>
         <div style="margin-left:10px">
           ${items.map(x => {
             const active = x.file === state.selectedFile && x.bank === state.selectedBank && x.anim === state.selectedAnim;
@@ -402,15 +700,15 @@ export async function pageAnimAssets(main) {
     $("#leftBuilds").innerHTML = builds.map(b => {
       const disabled = state.disabledBuilds.has(b.file);
       const syms = b.symbols || [];
+      const atlases = b.atlases || [];
       return `<details data-build-details="${esc(b.file)}" style="padding:1px 0">
-        <summary class="list-row" style="cursor:pointer" title="${esc(syms.join(", "))}">
+        <summary class="list-row" style="cursor:pointer" title="${esc(`${b.file} · ${syms.length} symbols / ${atlases.length} atlases`)}">
           <input type="checkbox" data-build-toggle="${esc(b.file)}" ${disabled ? "" : "checked"}>
-          <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
-          <span class="list-meta">${syms.length}s / ${(b.atlases || []).length}a</span>
+          <code class="list-name" title="${esc(b.file)}">${esc(displayFileName(b.file, { build: true }))}</code>
         </summary>
         <div style="margin:4px 0 6px 18px">
           <input type="text" placeholder="过滤 symbol…" data-build-filter="${esc(b.file)}" style="width:100%">
-          <div class="muted" style="font-size:12px;margin-top:2px">atlases: ${(b.atlases || []).map(esc).join(", ") || "—"}</div>
+          <div class="muted" style="font-size:12px;margin-top:2px">${syms.length} symbols · atlases: ${atlases.map(esc).join(", ") || "—"}</div>
           <div data-build-symbols style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;max-height:180px;overflow-y:auto">
             ${syms.map(s => `<span class="chip" style="font-size:11px">${esc(s)}</span>`).join("") || '<span class="muted">无 symbol</span>'}
           </div>
@@ -452,8 +750,11 @@ export async function pageAnimAssets(main) {
       };
     });
 
-    // One-click find build packages for missing symbols
+    // One-click find build packages for missing symbols. Attachment anchors
+    // are not build symbols: they are completed by composing a follower FX
+    // animation instead, so they must not be sent to the build scan.
     const missingSymbols = symbolSet.filter(sym =>
+      !state.anchorSymbols.has(sym.toLowerCase()) &&
       !builds.some(b => (b.symbols || []).some(x => x.toLowerCase() === sym.toLowerCase()))
     );
 
@@ -471,11 +772,10 @@ export async function pageAnimAssets(main) {
                 : "";
             const matched = (b.matched_symbols || []).join(",")
               || (b.remaps || []).map(r => `${r.symbol}→${r.src_symbol}`).join(",");
-            return `<div class="list-row">
+            return `<div class="list-row" title="${esc(`${b.file}${matched ? ` · ${matched}` : ""}`)}">
               <input type="checkbox" data-candidate-toggle="${esc(b.file)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
-              <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
+              <code class="list-name" title="${esc(b.file)}">${esc(displayFileName(b.file, { build: true }))}</code>
               ${via}
-              <span class="list-meta" title="${esc(matched)}">${esc(matched)}</span>
             </div>`;
           }).join("");
       $("#candidateBuilds").querySelectorAll("[data-candidate-toggle]").forEach(chk => {
@@ -574,9 +874,9 @@ export async function pageAnimAssets(main) {
       `;
     };
     $("#frameRange").oninput = (e) => {
-      const idx = parseInt(e.target.value) || 0;
-      renderFrameDetail(idx);
-      // Also seek preview if already loaded? Not implemented for simplicity.
+      const idx = parseInt(e.target.value, 10) || 0;
+      if (state.previewPlayer) state.previewPlayer.seek(idx);
+      else renderFrameDetail(idx);
     };
 
     // Right: symbol dependencies (re-rendered on state changes to stay consistent)
@@ -601,9 +901,71 @@ export async function pageAnimAssets(main) {
       return autoRemapIdx(sym);
     };
 
+    const renderAnchorRow = (sym, follow, choices) => {
+      const key = sym.toLowerCase();
+      const enabled = follow ? follow.enabled !== false : false;
+      const selectedKey = follow ? `${follow.file}|${follow.bank}|${follow.animation}` : "";
+      const source = !follow
+        ? "未解析"
+        : follow.source === "prefab"
+          ? "Lua FollowSymbol"
+          : follow.source === "manual"
+            ? "手动指定"
+            : "同 bank 启发式";
+      const options = choices.map(c => {
+        const value = `${c.file}|${c.bank}|${c.anim}`;
+        return `<option value="${esc(value)}" ${value === selectedKey ? "selected" : ""}>${esc(displayFileName(c.file))} · ${esc(c.bank)} / ${esc(c.anim)}</option>`;
+      }).join("");
+      const candidates = (state.followCandidates || {})[key] || [];
+      const candidateHint = candidates.length > 1 && !(follow && follow.source === "prefab")
+        ? `<div class="muted" style="font-size:11px">候选：${candidates.slice(0, 4).map(c => esc(c.animation)).join(", ")}</div>`
+        : "";
+      const badges = [];
+      if (follow && follow.sync_frame) badges.push('<span class="badge b-ok">同步帧</span>');
+      if (follow && follow.random_frame) badges.push('<span class="badge">随机起始帧</span>');
+      if (follow && follow.final_offset) {
+        badges.push(`<span class="badge">offset ${follow.final_offset > 0 ? "前" : "后"}${Math.abs(follow.final_offset)}</span>`);
+      }
+      if (follow && (follow.mult_colour || follow.add_colour)) badges.push('<span class="badge">染色</span>');
+      const phase = follow && Number.isFinite(follow.phase) ? follow.phase : 0;
+      const phaseHtml = follow ? `
+              <div class="row" style="gap:6px;align-items:center;margin-top:4px">
+                <span class="muted" style="font-size:11px">相位</span>
+                <input type="number" data-follow-phase="${esc(sym)}" value="${phase}" style="width:72px;font-size:12px" ${follow.sync_frame ? "disabled" : ""}>
+                <button class="btn link" data-follow-random="${esc(sym)}" ${follow.sync_frame ? "disabled" : ""}>随机</button>
+                ${follow.sync_frame ? '<span class="muted" style="font-size:11px">跟随帧已与主动画同步</span>' : ""}
+              </div>` : "";
+      return `
+        <div class="list-row">
+          <input type="checkbox" data-follow-toggle="${esc(sym)}" ${enabled ? "checked" : ""} ${follow ? "" : "disabled"}>
+          <details style="flex:1;min-width:0">
+            <summary style="cursor:pointer;display:flex;align-items:center;gap:4px">
+              <code class="list-name" style="flex:0 1 auto" title="${esc(sym)}">${esc(sym)}</code>
+              <span class="badge b-ok">anchor</span>
+              ${follow ? `<span class="muted" style="font-size:12px">↳ ${esc(follow.animation)}</span>` : '<span class="badge b-warn">未解析</span>'}
+              ${badges.join("")}
+            </summary>
+            <div style="margin-left:10px;padding:2px 0">
+              <select data-follow-anim="${esc(sym)}" style="width:100%;font-size:12px;padding:4px 6px">
+                <option value="">— 不挂接 —</option>
+                ${options}
+              </select>
+              ${candidateHint}
+              <div class="muted" style="font-size:11px">跟随 FX · 来源：${esc(source)}</div>
+              ${phaseHtml}
+            </div>
+          </details>
+        </div>`;
+    };
+
     const renderSymbolDeps = () => {
       const allBuilds = builds.concat((state.candidateBuilds || []).filter(b => state.extraBuilds.has(b.file)));
+      const followChoices = followAnimChoices();
       const symHtml = symbolSet.map(sym => {
+        const key = sym.toLowerCase();
+        if (state.anchorSymbols.has(key)) {
+          return renderAnchorRow(sym, state.follows[key] || null, followChoices);
+        }
         const providers = allBuilds.filter(b => (b.symbols || []).some(x => x.toLowerCase() === sym.toLowerCase()));
         const hidden = state.hiddenSymbols.has(sym);
         const chosen = state.symbolBuilds[sym] || "";
@@ -631,19 +993,22 @@ export async function pageAnimAssets(main) {
               </summary>
               <div style="margin-left:10px;padding:2px 0">
                 ${providers.length === 0 ? '<span class="muted">missing — no build provides this symbol</span>' : providers.map(b => `
-                  <label style="display:flex;align-items:center;gap:6px;padding:1px 0;font-size:12px">
+                  <label title="${esc(`${b.file}${b.name ? ` · ${b.name}` : ""}${b.skin ? " · skin" : ""}`)}"
+                    style="display:flex;align-items:center;gap:6px;padding:1px 0;font-size:12px">
                     <input type="radio" name="sym-${esc(sym)}" value="${esc(b.file)}"
                       data-sym-build="${esc(sym)}" ${effectiveChosen === b.file ? "checked" : ""}
                       ${state.disabledBuilds.has(b.file) ? "disabled" : ""}>
-                    <code class="list-name" title="${esc(b.file)}">${esc(b.file)}</code>
-                    <span class="list-meta">${esc(b.name)}${b.skin ? " · skin" : ""}</span>
+                    <code class="list-name" title="${esc(b.file)}">${esc(displayFileName(b.file, { build: true }))}</code>
                   </label>`).join("")}
                 ${remapHtml}
               </div>
             </details>
           </div>`;
       }).join("");
-      $("#symbolDeps").innerHTML = symHtml || '<p class="muted">无 symbol 依赖</p>';
+      const staleIndex = state.source === "prefab" && state.followIndexVersion < 1
+        ? '<p style="color:var(--warn);font-size:12px;margin:0 0 6px">当前 anim-index 未包含 FollowSymbol 数据（可能是旧产物），挂点仅用启发式候选；建议重跑 <code>anim-index</code>。</p>'
+        : "";
+      $("#symbolDeps").innerHTML = staleIndex + (symHtml || '<p class="muted">无 symbol 依赖</p>');
 
       view().querySelectorAll("[data-sym-toggle]").forEach(chk => {
         chk.onchange = () => {
@@ -683,6 +1048,57 @@ export async function pageAnimAssets(main) {
           e.preventDefault();
           e.stopPropagation();
           scanSymbolBuilds(btn.dataset.symScan);
+        });
+      });
+      view().querySelectorAll("[data-follow-toggle]").forEach(chk => {
+        chk.onchange = () => {
+          const key = chk.dataset.followToggle.toLowerCase();
+          const spec = state.follows[key];
+          if (!spec) return;
+          spec.enabled = chk.checked;
+          state.followTouched.add(key);
+          schedulePreviewRefresh();
+        };
+      });
+      view().querySelectorAll("[data-follow-anim]").forEach(sel => {
+        sel.onchange = () => {
+          const key = sel.dataset.followAnim.toLowerCase();
+          state.followTouched.add(key);
+          state.anchorSymbols.add(key);
+          if (!sel.value) {
+            state.follows[key] = null;
+          } else {
+            const [file, bank, animation] = sel.value.split("|");
+            state.follows[key] = {
+              ...followSpecFromCandidate({ file, bank, animation }, key),
+              source: "manual",
+            };
+          }
+          renderSymbolDeps();
+          schedulePreviewRefresh();
+        };
+      });
+      view().querySelectorAll("[data-follow-phase]").forEach(input => {
+        input.onchange = () => {
+          const key = input.dataset.followPhase.toLowerCase();
+          const spec = state.follows[key];
+          if (!spec) return;
+          spec.phase = Number.parseInt(input.value, 10) || 0;
+          state.followTouched.add(key);
+          schedulePreviewRefresh();
+        };
+      });
+      view().querySelectorAll("[data-follow-random]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const key = btn.dataset.followRandom.toLowerCase();
+          const spec = state.follows[key];
+          if (!spec) return;
+          spec.phase = Math.floor(Math.random() * 1000);
+          state.followTouched.add(key);
+          renderSymbolDeps();
+          schedulePreviewRefresh();
         });
       });
     };
@@ -761,6 +1177,27 @@ export async function pageAnimAssets(main) {
         if (r) so.push(`${sym}:${r.build || ""}:${r.src_symbol}`);
       }
       if (so.length) params.set("symbol_overrides", so.join(","));
+      const follows = [];
+      for (const [key, spec] of Object.entries(state.follows || {})) {
+        if (!spec || spec.enabled === false || !spec.animation) continue;
+        follows.push({
+          anchor: key,
+          bank: spec.bank || "",
+          animation: spec.animation,
+          file: spec.file || state.selectedFile,
+          build: spec.build || null,
+          offset: Array.isArray(spec.offset) ? spec.offset : null,
+          phase: spec.phase || 0,
+          frame_begin: spec.frame_begin ?? null,
+          frame_end: spec.frame_end ?? null,
+          final_offset: spec.final_offset ?? null,
+          mult_colour: spec.mult_colour ?? null,
+          add_colour: spec.add_colour ?? null,
+          sync_frame: !!spec.sync_frame,
+          random_frame: !!spec.random_frame,
+        });
+      }
+      if (follows.length) params.set("follows", JSON.stringify(follows));
       if (state.selectedSkin) {
         params.set("skin_zip", state.selectedSkin.zip || "");
         if (state.selectedSkin.dyn) params.set("skin_dyn", state.selectedSkin.dyn);
@@ -768,8 +1205,13 @@ export async function pageAnimAssets(main) {
       return params.toString();
     };
 
-    // Center preview with PNG frames + wheel zoom
+    // Center preview player: the info timeline is authoritative, and rendered
+    // images are keyed by original animation frame index so skipped frames stay
+    // as blank slots instead of shifting the counter and frame details.
     const previewArea = $("#animPreview");
+    const prevBtn = $("#prevFrame");
+    const playBtn = $("#playPause");
+    const nextBtn = $("#nextFrame");
     let zoom = 1;
     previewArea.addEventListener("wheel", (e) => {
       e.preventDefault();
@@ -778,39 +1220,176 @@ export async function pageAnimAssets(main) {
       if (img) img.style.transform = `scale(${zoom})`;
     }, { passive: false });
 
-    const startPreview = async () => {
+    const setControlsEnabled = (enabled) => {
+      prevBtn.disabled = !enabled;
+      playBtn.disabled = !enabled;
+      nextBtn.disabled = !enabled;
+    };
+    setControlsEnabled(false);
+
+    const createPlayer = ({ images, fps, startPos, startPlaying }) => {
+      const total = frames.length;
+      const maxPos = total - 1;
+      const clampPos = (p) => Math.max(0, Math.min(maxPos, p));
+      const fpsLabel = Number(fps.toFixed(2));
+      const player = {
+        pos: 0,
+        playing: false,
+        timer: null,
+        updateControls() {
+          prevBtn.disabled = this.pos <= 0;
+          nextBtn.disabled = this.pos >= maxPos;
+          playBtn.disabled = total <= 1;
+          playBtn.textContent = this.playing ? "暂停" : "播放";
+          $("#frameCounter").textContent =
+            `${this.pos + 1} / ${total} · ${fpsLabel} fps · ${this.playing ? "播放中" : "已暂停"}`;
+        },
+        renderAt(p) {
+          this.pos = clampPos(p);
+          const frame = frames[this.pos];
+          const img = $("#animFrame");
+          const empty = $("#animEmpty");
+          const src = frame ? images.get(frame.idx) : null;
+          if (!img) return;
+          if (src) {
+            img.src = src;
+            img.style.visibility = "visible";
+            if (empty) empty.style.display = "none";
+          } else {
+            img.removeAttribute("src");
+            img.style.visibility = "hidden";
+            if (empty) empty.style.display = "flex";
+          }
+          const range = $("#frameRange");
+          if (range) range.value = String(this.pos);
+          renderFrameDetail(this.pos);
+          this.updateControls();
+        },
+        play() {
+          if (total <= 1) {
+            this.playing = false;
+            this.updateControls();
+            return;
+          }
+          this.playing = true;
+          if (this.timer) clearInterval(this.timer);
+          this.timer = setInterval(() => {
+            const img = $("#animFrame");
+            if (!img || !img.isConnected) {
+              this.dispose();
+              return;
+            }
+            this.renderAt((this.pos + 1) % total);
+          }, 1000 / fps);
+          this.updateControls();
+        },
+        pause() {
+          if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+          }
+          this.playing = false;
+          this.updateControls();
+        },
+        toggle() {
+          if (this.playing) this.pause();
+          else this.play();
+        },
+        step(delta) {
+          this.pause();
+          this.renderAt(this.pos + delta);
+        },
+        seek(p) {
+          this.pause();
+          this.renderAt(p);
+        },
+        dispose() {
+          if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+          }
+          this.playing = false;
+        },
+      };
+      player.renderAt(clampPos(startPos));
+      if (startPlaying && total > 1) player.play();
+      return player;
+    };
+
+    const startPreview = async ({ preserve = false } = {}) => {
+      if (!previewArea.isConnected) {
+        stopPreview();
+        return;
+      }
+      const prev = preserve ? state.previewPlayer : null;
+      const prevPos = prev ? prev.pos : 0;
+      const prevPlaying = prev ? prev.playing : true;
+      const seq = ++state.previewSeq;
+      if (state.previewPlayer) {
+        state.previewPlayer.dispose();
+        state.previewPlayer = null;
+      }
+      if (!preserve) zoom = 1;
       previewArea.innerHTML = '<p class="muted">渲染中…</p>';
+      $("#frameCounter").textContent = "渲染中…";
+      setControlsEnabled(false);
       try {
         const res = await fetch(`/api/anim/assets/preview?${buildRenderParams("gif")}`);
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
-        const imgs = (data.frames || []).map(f => f.data);
-        if (imgs.length === 0) throw new Error("没有可预览帧");
-        if (state.previewTimer) clearInterval(state.previewTimer);
-        zoom = 1;
-        previewArea.innerHTML = `<img id="animFrame" style="max-width:100%;max-height:100%;width:auto;height:auto;transform-origin:center;border:1px solid var(--border)">`;
-        const img = $("#animFrame");
-        let idx = 0;
-        img.src = imgs[0];
-        $("#frameCounter").textContent = `1 / ${imgs.length}`;
-        renderFrameDetail(0);
-        const fps = Math.max(1, data.frame_rate || 15);
-        state.previewTimer = setInterval(() => {
-          idx = (idx + 1) % imgs.length;
-          img.src = imgs[idx];
-          $("#frameCounter").textContent = `${idx + 1} / ${imgs.length}`;
-          renderFrameDetail(idx);
-        }, 1000 / fps);
+        if (seq !== state.previewSeq || !previewArea.isConnected) return;
+        if (frames.length === 0) throw new Error("没有帧数据");
+        const reports = Array.isArray(data.follows) ? data.follows : [];
+        const followErrors = Array.isArray(data.follow_errors) ? data.follow_errors : [];
+        state.followReports = reports;
+        const followStatus = $("#followStatus");
+        if (followStatus) {
+          if (followErrors.length) {
+            followStatus.innerHTML = `<span style="color:var(--err)">跟随 FX 未解析：${followErrors.map(e => esc(e.anchor)).join(", ")}</span>`;
+          } else if (reports.length) {
+            const missingFollower = reports.reduce(
+              (n, r) => n + (r.follower_empty_frames || []).length,
+              0,
+            );
+            followStatus.textContent = `跟随 FX ${reports.length} 个 · 已合成${missingFollower ? ` · ${missingFollower} 帧跟随动画缺帧` : ""}`;
+          } else {
+            followStatus.textContent = "";
+          }
+        }
+        const images = new Map();
+        for (const f of (data.frames || [])) {
+          if (typeof f.idx === "number") images.set(f.idx, f.data);
+        }
+        if (images.size === 0) throw new Error("没有可预览帧");
+        const fps = Math.max(1, Number(data.frame_rate) || 15);
+        previewArea.innerHTML = `<img id="animFrame" style="max-width:100%;max-height:100%;width:auto;height:auto;transform-origin:center;border:1px solid var(--border);visibility:hidden;transform:scale(${zoom})">
+          <div id="animEmpty" class="muted" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none">本帧无可见元素</div>`;
+        setControlsEnabled(true);
+        const player = createPlayer({
+          images,
+          fps,
+          startPos: prevPos,
+          startPlaying: prevPlaying,
+        });
+        state.previewPlayer = player;
+        prevBtn.onclick = () => player.step(-1);
+        playBtn.onclick = () => player.toggle();
+        nextBtn.onclick = () => player.step(1);
       } catch (e) {
+        if (seq !== state.previewSeq || !previewArea.isConnected) return;
+        setControlsEnabled(false);
+        $("#frameCounter").textContent = "—";
         previewArea.innerHTML = `<p style="color:var(--err)">失败：${esc(e.message)}</p>`;
       }
     };
     startPreview();
 
-    let refreshTimer = null;
     const schedulePreviewRefresh = () => {
-      if (refreshTimer) clearTimeout(refreshTimer);
-      refreshTimer = setTimeout(() => startPreview(), 250);
+      if (state.previewRefreshTimer) clearTimeout(state.previewRefreshTimer);
+      state.previewRefreshTimer = setTimeout(() => {
+        state.previewRefreshTimer = null;
+        startPreview({ preserve: true });
+      }, 250);
     };
 
     $("#exportGif").onclick = async () => {
@@ -836,6 +1415,7 @@ export async function pageAnimAssets(main) {
 
   /* ---------------- manual file source ---------------- */
   async function renderManual() {
+    stopPreview();
     view().innerHTML = `
       <div class="panel">
         <h2>手动文件导入</h2>
@@ -975,6 +1555,12 @@ export async function pageAnimAssets(main) {
     state.extraBuilds.clear();
     state.skins = [];
     state.selectedSkin = null;
+    state.prefabItems = [];
+    state.follows = {};
+    state.followTouched = new Set();
+    state.anchorSymbols = new Set();
+    state.followCandidates = {};
+    state.followReports = [];
     for (const path of state.manualFiles) {
       const flat = flattenBanks(manualResultMeta(path));
       state.fileInfo.push({ path, content: flat });

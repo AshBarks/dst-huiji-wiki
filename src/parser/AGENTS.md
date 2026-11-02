@@ -16,6 +16,9 @@ src/parser/
 ├── clothing_overrides.rs # clothing.lua CLOTHING 数据表（Tier B）：symbol_overrides/
 │                        #   by_character/skintype 变体 → resolve_overrides() 复刻
 │                        #   skinner.lua 的 src_sym 合成规则
+├── follow_symbol.rs     # Follower:FollowSymbol 关系提取：本地工厂
+│                        #   (CreateCapeFx) + 参数化工厂 (AddFollowSymbol) →
+│                        #   FollowFxRecord（anchor/bank/build/animation/offset）
 ├── lua.rs               # LuaParser — 3 generic AST queries:
 │                        #   locate_variable, locate_field_assignment,
 │                        #   locate_variable_range. Returns VariableLocation/
@@ -48,6 +51,7 @@ src/parser/
 |------|----------|-------|
 | Extract symbol remap calls | `anim_override.rs` → `parse_anim_overrides_in` | Only string-literal args; groups via `SymbolRemapIndex::from_calls` |
 | Extract clothing symbol tables | `clothing_overrides.rs` → `parse_clothing_overrides` | `CLOTHING = {...}`; resolve via `ClothingEntry::resolve_overrides(name, character, skintype)` |
+| Extract follow-FX relations | `follow_symbol.rs` → `parse_follow_symbols_in` | `Follower:FollowSymbol` 挂点 → 跟随动画；本地工厂 + 参数化工厂，动态调用记为 unresolved |
 | Add a new Lua data parser | `src/parser/<name>.rs` | Full_moon AST, re-export in mod.rs |
 | Query Lua var/field locations | `lua.rs` → `LuaParser::locate_*` | Generic, returns byte-offset locations |
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |

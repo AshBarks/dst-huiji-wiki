@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
-use crate::anim::AnimFrame;
+use crate::anim::{AnimElement, AnimFrame};
 use crate::build_file::{BuildFile, InkRect};
 
 pub struct BuildRef<'a> {
@@ -418,6 +418,152 @@ pub struct ElementData {
     pub ty: f32,
 }
 
+/// Transform of one animation element, used as the parent transform for a
+/// follower FX entity (`Follower:FollowSymbol`).
+///
+/// Attachment-point symbols such as `cape_front_swap` have no build sprite but
+/// carry a per-frame transform in `anim.bin`; this is that transform.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct AnchorTransform {
+    pub a: f32,
+    pub b: f32,
+    pub c: f32,
+    pub d: f32,
+    pub tx: f32,
+    pub ty: f32,
+    /// The anchor element's `z_index`; used to splice the follower into the
+    /// parent's draw order.
+    pub z_index: f32,
+}
+
+impl AnchorTransform {
+    fn from_element(element: &AnimElement) -> Self {
+        Self {
+            a: element.a,
+            b: element.b,
+            c: element.c,
+            d: element.d,
+            tx: element.tx,
+            ty: element.ty,
+            z_index: element.z_index,
+        }
+    }
+
+    /// Compose this anchor transform with a follower element's local
+    /// transform.
+    ///
+    /// The renderer maps a local point `p` as `world = t + M·p` with
+    /// `M = [[a, c], [b, d]]`. A follower composes as `M' = A·M` and
+    /// `t' = T + A·t + offset`, matching the engine's `FollowSymbol`
+    /// semantics (verified against Klei's baked `scrapbook` animation).
+    ///
+    /// `offset` is the Lua `FollowSymbol` x/y offset in animation units.
+    pub fn compose_element(&self, element: &ElementData, offset: (f32, f32)) -> ElementData {
+        let mut out = element.clone();
+        out.a = self.a * element.a + self.c * element.b;
+        out.b = self.b * element.a + self.d * element.b;
+        out.c = self.a * element.c + self.c * element.d;
+        out.d = self.b * element.c + self.d * element.d;
+        out.tx = self.tx + offset.0 + self.a * element.tx + self.c * element.ty;
+        out.ty = self.ty + offset.1 + self.b * element.tx + self.d * element.ty;
+        out
+    }
+}
+
+/// Find the transform of an attachment-point symbol in one animation frame.
+/// `symbol_lower` must already be lowercase.
+pub fn find_anchor_transform(frame: &AnimFrame, symbol_lower: &str) -> Option<AnchorTransform> {
+    frame
+        .elements
+        .iter()
+        .find(|element| element.symbol_lower == symbol_lower)
+        .map(AnchorTransform::from_element)
+}
+
+/// Visual modifiers applied to a followed FX entity.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FollowStyle {
+    pub offset: (f32, f32),
+    /// `AnimState:SetFinalOffset`: >0 draws the whole FX in front of the
+    /// parent, <0 behind it.
+    pub final_offset: i32,
+    /// Literal `AnimState:SetMultColour(r, g, b, a)`.
+    pub mult_colour: Option<[f32; 4]>,
+    /// Literal `AnimState:SetAddColour(r, g, b, a)`.
+    pub add_colour: Option<[f32; 4]>,
+}
+
+impl Default for FollowStyle {
+    fn default() -> Self {
+        Self {
+            offset: (0.0, 0.0),
+            final_offset: 0,
+            mult_colour: None,
+            add_colour: None,
+        }
+    }
+}
+
+impl FollowStyle {
+    fn z_key(&self, anchor_z: f32) -> f32 {
+        anchor_z + self.final_offset as f32 * 1000.0
+    }
+}
+
+/// Apply the follower's `SetMultColour` / `SetAddColour` to an element.
+///
+/// The sprite is tinted once per element/frame; alpha changes invalidate the
+/// precomputed row spans so the renderer falls back to per-pixel compositing.
+pub fn apply_follow_tint(element: &mut ElementData, mult: Option<[f32; 4]>, add: Option<[f32; 4]>) {
+    let mult = mult.unwrap_or([1.0, 1.0, 1.0, 1.0]);
+    let add_rgb = add.map(|a| [a[0], a[1], a[2]]).unwrap_or([0.0; 3]);
+    if mult == [1.0, 1.0, 1.0, 1.0] && add_rgb == [0.0; 3] {
+        return;
+    }
+    let src = element.sprite.as_ref();
+    let (width, height) = (src.width(), src.height());
+    let mut tinted = image::RgbaImage::new(width, height);
+    for (dst, px) in tinted.pixels_mut().zip(src.pixels()) {
+        let channel = |index: usize, factor: f32, addend: f32| {
+            ((px[index] as f32 / 255.0 * factor + addend) * 255.0).clamp(0.0, 255.0) as u8
+        };
+        *dst = image::Rgba([
+            channel(0, mult[0], add_rgb[0]),
+            channel(1, mult[1], add_rgb[1]),
+            channel(2, mult[2], add_rgb[2]),
+            ((px[3] as f32 * mult[3]).clamp(0.0, 255.0)) as u8,
+        ]);
+    }
+    element.sprite = std::sync::Arc::new(tinted);
+    if mult[3] < 1.0 {
+        element.spans = None;
+        element.ink = None;
+    }
+}
+
+/// Splice composed follower elements into the parent's element stream.
+///
+/// `main` and `follower` are both z-ascending. Follower elements take the
+/// anchor's `z_index` (plus the FX entity's `SetFinalOffset` bias), so a
+/// stable sort places them after parent elements at the same z (a parented
+/// follower draws after its parent) while preserving the follower's own order.
+pub fn merge_followed_elements(
+    main: Vec<(f32, ElementData)>,
+    anchor: &AnchorTransform,
+    follower: &[(f32, ElementData)],
+    style: &FollowStyle,
+) -> Vec<(f32, ElementData)> {
+    let z = style.z_key(anchor.z_index);
+    let mut merged = main;
+    merged.extend(follower.iter().map(|(_, element)| {
+        let mut composed = anchor.compose_element(element, style.offset);
+        apply_follow_tint(&mut composed, style.mult_colour, style.add_colour);
+        (z, composed)
+    }));
+    merged.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+    merged
+}
+
 pub fn compute_frame_elements(
     anim_frame: &AnimFrame,
     build_list: &[BuildRef<'_>],
@@ -451,6 +597,25 @@ pub fn compute_frame_elements_with_overrides(
     compute_frame_elements_core(anim_frame, build_list, &options, 0, None)
 }
 
+/// Like [`compute_frame_elements_with_overrides`] but keeps each element's
+/// animation `z_index`, for splicing follower FX elements into the parent's
+/// draw order.
+#[allow(clippy::too_many_arguments)]
+pub fn compute_frame_elements_with_z(
+    anim_frame: &AnimFrame,
+    build_list: &[BuildRef<'_>],
+    scale: f32,
+    disabled_elements: &HashSet<(String, String)>,
+    disabled_symbols: &HashSet<String>,
+    overrides: &SymbolOverrideMap,
+) -> Vec<(f32, ElementData)> {
+    let options = RenderOptions::new(scale, (0.0, 0.0))
+        .with_disabled_elements(disabled_elements.clone())
+        .with_disabled_symbols(disabled_symbols.clone())
+        .with_overrides(overrides.clone());
+    compute_frame_elements_z_core(anim_frame, build_list, &options, 0, None)
+}
+
 pub fn compute_frame_elements_opts(
     anim_frame: &AnimFrame,
     build_list: &[BuildRef<'_>],
@@ -467,9 +632,25 @@ fn compute_frame_elements_core(
     build_list: &[BuildRef<'_>],
     options: &RenderOptions,
     frame_pos: usize,
-    mut diagnostics: Option<&mut RenderDiagnostics>,
+    diagnostics: Option<&mut RenderDiagnostics>,
 ) -> Option<Vec<ElementData>> {
-    let mut elements_data: Vec<ElementData> = Vec::new();
+    let elements =
+        compute_frame_elements_z_core(anim_frame, build_list, options, frame_pos, diagnostics);
+    if elements.is_empty() {
+        None
+    } else {
+        Some(elements.into_iter().map(|(_, element)| element).collect())
+    }
+}
+
+fn compute_frame_elements_z_core(
+    anim_frame: &AnimFrame,
+    build_list: &[BuildRef<'_>],
+    options: &RenderOptions,
+    frame_pos: usize,
+    mut diagnostics: Option<&mut RenderDiagnostics>,
+) -> Vec<(f32, ElementData)> {
+    let mut elements_data: Vec<(f32, ElementData)> = Vec::new();
     for element in &anim_frame.elements {
         if options.disabled_symbols.contains(&element.symbol_lower)
             || options.disabled_layers.contains(&element.layer_lower)
@@ -499,23 +680,26 @@ fn compute_frame_elements_core(
                     }
                     continue;
                 };
-                elements_data.push(ElementData {
-                    sprite: sprite.clone(),
-                    spans: bf.spans.clone(),
-                    ink: bf.spans.as_ref().and_then(|s| s.ink),
-                    bf_x: bf.x,
-                    bf_y: bf.y,
-                    dest_x: bf.dest_x,
-                    dest_y: bf.dest_y,
-                    canvas_w: bf.canvas_w,
-                    canvas_h: bf.canvas_h,
-                    a: element.a * options.scale,
-                    b: element.b * options.scale,
-                    c: element.c * options.scale,
-                    d: element.d * options.scale,
-                    tx: element.tx,
-                    ty: element.ty,
-                });
+                elements_data.push((
+                    element.z_index,
+                    ElementData {
+                        sprite: sprite.clone(),
+                        spans: bf.spans.clone(),
+                        ink: bf.spans.as_ref().and_then(|s| s.ink),
+                        bf_x: bf.x,
+                        bf_y: bf.y,
+                        dest_x: bf.dest_x,
+                        dest_y: bf.dest_y,
+                        canvas_w: bf.canvas_w,
+                        canvas_h: bf.canvas_h,
+                        a: element.a * options.scale,
+                        b: element.b * options.scale,
+                        c: element.c * options.scale,
+                        d: element.d * options.scale,
+                        tx: element.tx,
+                        ty: element.ty,
+                    },
+                ));
             }
             Err(failure) => {
                 if let Some(diag) = diagnostics.as_deref_mut() {
@@ -534,11 +718,7 @@ fn compute_frame_elements_core(
             }
         }
     }
-    if elements_data.is_empty() {
-        None
-    } else {
-        Some(elements_data)
-    }
+    elements_data
 }
 
 fn extend_bbox(bbox: &mut (f32, f32, f32, f32), x: f32, y: f32) {
@@ -791,20 +971,58 @@ pub fn prepare_animation_frames_opts(
         prepared.push(None);
     }
 
-    let union_bounds = if union_left.is_infinite() || union_right.is_infinite() {
-        None
-    } else {
-        let frac_x = union_left - union_left.floor();
-        let frac_y = union_top - union_top.floor();
-        Some(BoundingBox {
-            left: (union_left - 2.0).floor() + frac_x,
-            top: (union_top - 2.0).floor() + frac_y,
-            right: (union_right + 2.0).ceil() + frac_x,
-            bottom: (union_bottom + 2.0).ceil() + frac_y,
-        })
-    };
+    let union_bounds = stable_union_bounds(union_left, union_top, union_right, union_bottom);
 
     (union_bounds, prepared, diagnostics)
+}
+
+fn stable_union_bounds(
+    union_left: f32,
+    union_top: f32,
+    union_right: f32,
+    union_bottom: f32,
+) -> Option<BoundingBox> {
+    if union_left.is_infinite() || union_right.is_infinite() {
+        return None;
+    }
+    let frac_x = union_left - union_left.floor();
+    let frac_y = union_top - union_top.floor();
+    Some(BoundingBox {
+        left: (union_left - 2.0).floor() + frac_x,
+        top: (union_top - 2.0).floor() + frac_y,
+        right: (union_right + 2.0).ceil() + frac_x,
+        bottom: (union_bottom + 2.0).ceil() + frac_y,
+    })
+}
+
+/// Stable canvas box for a set of already-composed element frames.
+///
+/// Mirrors the union margin used by [`prepare_animation_frames_opts`] so the
+/// follow-FX compositor can produce the same canvas as the plain path.
+pub fn union_bounds_from_element_frames<'a, I>(
+    frames: I,
+    scale: f32,
+    offset: (f32, f32),
+) -> Option<BoundingBox>
+where
+    I: IntoIterator<Item = &'a [ElementData]>,
+{
+    let mut left = f32::INFINITY;
+    let mut top = f32::INFINITY;
+    let mut right = f32::NEG_INFINITY;
+    let mut bottom = f32::NEG_INFINITY;
+    for elements in frames {
+        let Some(bounds) =
+            compute_bounds_from_elements_kind(elements, scale, offset, BoundsKind::Rect)
+        else {
+            continue;
+        };
+        left = left.min(bounds.left);
+        top = top.min(bounds.top);
+        right = right.max(bounds.right);
+        bottom = bottom.max(bounds.bottom);
+    }
+    stable_union_bounds(left, top, right, bottom)
 }
 
 pub fn compute_animation_bounds(
@@ -1369,6 +1587,189 @@ mod tests {
             elements,
             events: Vec::new(),
         }
+    }
+
+    fn transform_elem(a: f32, b: f32, c: f32, d: f32, tx: f32, ty: f32) -> ElementData {
+        ElementData {
+            sprite: std::sync::Arc::new(image::RgbaImage::new(4, 4)),
+            spans: None,
+            ink: None,
+            bf_x: 0.0,
+            bf_y: 0.0,
+            dest_x: 0,
+            dest_y: 0,
+            canvas_w: 4.0,
+            canvas_h: 4.0,
+            a,
+            b,
+            c,
+            d,
+            tx,
+            ty,
+        }
+    }
+
+    #[test]
+    fn anchor_composition_matches_scrapbook_bake() {
+        let anchor = AnchorTransform {
+            a: -0.5940857,
+            b: -0.01800537,
+            c: 0.02183533,
+            d: -0.7189637,
+            tx: 2.649996,
+            ty: -267.6501,
+            z_index: 1.4285715,
+        };
+        let local = transform_elem(0.9781952, 0.0, 0.0, 1.0, -0.95, -0.8);
+        let composed = anchor.compose_element(&local, (0.0, 0.0));
+        assert!(
+            (composed.tx - 3.196909).abs() < 0.001,
+            "tx = {}",
+            composed.tx
+        );
+        assert!(
+            (composed.ty + 267.0578).abs() < 0.001,
+            "ty = {}",
+            composed.ty
+        );
+        assert!((composed.a + 0.5811318).abs() < 0.001, "a = {}", composed.a);
+        assert!(
+            (composed.b + 0.01761277).abs() < 0.001,
+            "b = {}",
+            composed.b
+        );
+        assert!(
+            (composed.c - 0.02183533).abs() < 0.001,
+            "c = {}",
+            composed.c
+        );
+        assert!((composed.d + 0.7189637).abs() < 0.001, "d = {}", composed.d);
+    }
+
+    #[test]
+    fn compose_applies_symbol_offset_in_anim_space() {
+        let anchor = AnchorTransform {
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 10.0,
+            ty: 20.0,
+            z_index: 0.0,
+        };
+        let local = transform_elem(1.0, 0.0, 0.0, 1.0, 3.0, 4.0);
+        let composed = anchor.compose_element(&local, (5.0, -6.0));
+        assert_eq!((composed.tx, composed.ty), (18.0, 18.0));
+    }
+
+    #[test]
+    fn merge_places_follower_after_parent_at_anchor_z() {
+        let anchor = AnchorTransform {
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 0.0,
+            ty: 0.0,
+            z_index: 0.5,
+        };
+        let main = vec![
+            (0.0, transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)),
+            (1.0, transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)),
+        ];
+        let follower = vec![
+            (0.0, transform_elem(1.0, 0.0, 0.0, 1.0, 1.0, 0.0)),
+            (0.0, transform_elem(1.0, 0.0, 0.0, 1.0, 2.0, 0.0)),
+        ];
+        let merged = merge_followed_elements(main, &anchor, &follower, &FollowStyle::default());
+        let zs: Vec<f32> = merged.iter().map(|(z, _)| *z).collect();
+        assert_eq!(zs, vec![0.0, 0.5, 0.5, 1.0]);
+        assert_eq!(merged[1].1.tx, 1.0);
+        assert_eq!(merged[2].1.tx, 2.0);
+    }
+
+    #[test]
+    fn merge_honours_final_offset() {
+        let anchor = AnchorTransform {
+            a: 1.0,
+            b: 0.0,
+            c: 0.0,
+            d: 1.0,
+            tx: 0.0,
+            ty: 0.0,
+            z_index: 0.5,
+        };
+        let follower = vec![(0.0, transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0))];
+        let main = || {
+            vec![
+                (0.0, transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)),
+                (1.0, transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)),
+            ]
+        };
+
+        let front = merge_followed_elements(
+            main(),
+            &anchor,
+            &follower,
+            &FollowStyle {
+                final_offset: 1,
+                ..Default::default()
+            },
+        );
+        assert_eq!(front.last().unwrap().0, 1000.5);
+
+        let behind = merge_followed_elements(
+            main(),
+            &anchor,
+            &follower,
+            &FollowStyle {
+                final_offset: -1,
+                ..Default::default()
+            },
+        );
+        assert_eq!(behind.first().unwrap().0, -999.5);
+    }
+
+    #[test]
+    fn follow_tint_multiplies_and_adds() {
+        let mut element = transform_elem(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        element.sprite = std::sync::Arc::new(image::RgbaImage::from_pixel(
+            1,
+            1,
+            image::Rgba([100, 200, 50, 255]),
+        ));
+        apply_follow_tint(&mut element, Some([0.5, 0.5, 0.5, 0.5]), None);
+        let px = element.sprite.get_pixel(0, 0);
+        assert_eq!(*px, image::Rgba([50, 100, 25, 127]));
+        assert!(element.spans.is_none());
+
+        apply_follow_tint(&mut element, None, Some([0.1, 0.2, 0.0, 1.0]));
+        let px = element.sprite.get_pixel(0, 0);
+        assert_eq!(px[0], 75);
+        assert_eq!(px[1], 151);
+        assert_eq!(px[2], 25);
+    }
+
+    #[test]
+    fn find_anchor_transform_reads_ghost_symbol() {
+        let frame = make_anim_frame(vec![AnimElement {
+            z_index: 0.25,
+            symbol: "cape_front_swap".into(),
+            symbol_lower: "cape_front_swap".into(),
+            frame_num: 0,
+            layer_name: "front".into(),
+            layer_lower: "front".into(),
+            a: 1.1,
+            b: 0.0,
+            c: 0.0,
+            d: 1.2,
+            tx: 7.0,
+            ty: 9.0,
+        }]);
+        let anchor = find_anchor_transform(&frame, "cape_front_swap").expect("anchor");
+        assert_eq!(anchor.z_index, 0.25);
+        assert_eq!((anchor.tx, anchor.ty), (7.0, 9.0));
+        assert!(find_anchor_transform(&frame, "missing").is_none());
     }
 
     #[test]

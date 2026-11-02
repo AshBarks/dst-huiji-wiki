@@ -2,6 +2,7 @@ pub mod anim_override;
 pub mod clothing_overrides;
 pub mod cooking;
 pub mod crafting;
+pub mod follow_symbol;
 pub mod lua;
 pub mod po;
 pub mod prefab_override;
@@ -17,6 +18,9 @@ pub use anim_override::{
 pub use clothing_overrides::{parse_clothing_overrides, ClothingEntry, ResolvedClothingOverride};
 pub use cooking::{compile_from_sources, CookingSources};
 pub use crafting::{parse_crafting_filter_lists, parse_prototyper_trees, parse_tech_constants};
+pub use follow_symbol::{
+    parse_follow_symbols, parse_follow_symbols_in, FollowConfidence, FollowFxRecord,
+};
 pub(crate) use lua::string_literal_text;
 pub use lua::{
     extract_field_assignment, extract_field_assignment_range, extract_variable,

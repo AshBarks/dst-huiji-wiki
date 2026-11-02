@@ -106,6 +106,14 @@ pub(super) async fn output_json_result_with_update(
         { "status": outcome.status, "page": page_title, "newrevid": outcome.newrevid }))
 }
 
+/// Copyclip 的"是否真的有变化"判定：忽略行尾/行首 ASCII 空白与换行符差异。
+///
+/// 与归一 diff（`preserve_whitespace = false`）保持一致——否则纯空白差异会
+/// 产生一次"diff 为空"的线上编辑。两侧内容仍按原样写入，本函数只决定要不要写。
+fn copyclip_content_changed(old: &str, new: &str) -> bool {
+    crate::utils::canonical_for_compare(old) != crate::utils::canonical_for_compare(new)
+}
+
 pub(super) async fn output_copyclip_result_with_update(
     ctx: &WriteCtx<'_>,
     page_title: &str,
@@ -114,7 +122,7 @@ pub(super) async fn output_copyclip_result_with_update(
     output: Option<PathBuf>,
     base_timestamp: Option<String>,
 ) -> Result<serde_json::Value> {
-    if target_content == updated_content {
+    if !copyclip_content_changed(target_content, updated_content) {
         ctx.reporter.log("未检测到变化。".to_string());
         return Ok(serde_json::json!({ "status": "no_changes" }));
     }
@@ -131,10 +139,30 @@ pub(super) async fn output_copyclip_result_with_update(
         new_content: updated_content,
         old_content: Some(target_content),
         basetimestamp: base_timestamp.as_deref(),
-        preserve_whitespace: true,
+        // Lua 模块块是生成的；归一 diff 避免缩进/行尾空白噪声。
+        preserve_whitespace: false,
         summary: "Update via dst-huiji-wiki tool",
     };
     let outcome = writer.propose(&edit, true).await?;
     Ok(serde_json::json!(
         { "status": outcome.status, "page": page_title, "newrevid": outcome.newrevid }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn copyclip_change_detection_ignores_line_endings_and_edge_whitespace() {
+        assert!(!copyclip_content_changed(
+            "local a = 1\nlocal b = 2\n",
+            "  local a = 1\r\n\tlocal b = 2  \r\n"
+        ));
+        // 行内空白与字符串内容仍然算变化。
+        assert!(copyclip_content_changed("local a = 1", "local  a = 1"));
+        assert!(copyclip_content_changed(
+            "local s = \"x\"",
+            "local s = \" x\""
+        ));
+    }
 }

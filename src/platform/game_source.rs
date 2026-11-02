@@ -90,7 +90,7 @@ impl GameSource {
         let mut names = BTreeSet::new();
         for i in 0..archive.len() {
             let file = archive.by_index(i)?;
-            let name = file.name();
+            let name = file.name()?;
             let Some(rest) = name.strip_prefix(&prefix) else {
                 continue;
             };

@@ -258,7 +258,7 @@ mod tests {
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).unwrap();
-            if file.name() == "build.bin" {
+            if file.name().unwrap() == "build.bin" {
                 let mut buf = Vec::new();
                 file.read_to_end(&mut buf).unwrap();
                 return buf;

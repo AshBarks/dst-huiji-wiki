@@ -22,7 +22,7 @@ mod tests {
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(zip_data.as_slice())).unwrap();
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).unwrap();
-            if file.name().ends_with(".tex") {
+            if file.name().unwrap().ends_with(".tex") {
                 let mut buf = Vec::new();
                 std::io::Read::read_to_end(&mut file, &mut buf).unwrap();
                 let (_, metas, _) = parse(&buf).unwrap();

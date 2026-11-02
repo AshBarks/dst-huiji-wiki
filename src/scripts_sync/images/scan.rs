@@ -91,7 +91,7 @@ pub fn scan(zip_path: &Path, loose_dir: &Path, zip_out_dir: &Path) -> Result<Sca
     let mut archive = zip::ZipArchive::new(std::io::BufReader::new(file))?;
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i)?;
-        let name = entry.name().replace('\\', "/");
+        let name = entry.name()?.replace('\\', "/");
         let base = match entry_base(&name) {
             Some(b) => b,
             None => continue,

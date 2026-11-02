@@ -54,7 +54,7 @@ pub fn parse_archive_bytes(bytes: &[u8]) -> Result<ParsedArchiveData> {
 
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i)?;
-        let name = entry.name().replace('\\', "/");
+        let name = entry.name()?.replace('\\', "/");
         if name == "anim.bin" {
             let mut buf = Vec::with_capacity(entry.size() as usize);
             entry.read_to_end(&mut buf)?;

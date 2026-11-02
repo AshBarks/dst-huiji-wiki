@@ -37,7 +37,9 @@ full_moon = { version = "2.2", features = ["lua52"] }
 tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.13", features = ["json", "cookies", "query", "form", "multipart"] }
 dotenvy = "0.15"
-zip = "8"
+# DST 的 databundles 是 deflate；关闭默认特性可去掉 zstd/bzip2/lzma/xz/aes，
+# 既缩小依赖面，也避开 zstd 的 RUSTSEC-2026-0403/0410。
+zip = { version = "9", default-features = false, features = ["deflate"] }
 # 图片管线:PNG 解码/裁剪(split) + KTEX 容器解码(见 crates/dst-ktex) + atlas XML 布局解析
 image = { version = "0.25", default-features = false, features = ["png"] }
 roxmltree = "0.20"

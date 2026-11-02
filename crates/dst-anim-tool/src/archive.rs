@@ -194,7 +194,7 @@ fn parse_zip_archive(
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
-        let name = file.name().to_string();
+        let name = file.name()?.to_string();
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)?;
 
@@ -261,7 +261,7 @@ mod tests {
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).unwrap();
-            if file.name() == "anim.bin" {
+            if file.name().unwrap() == "anim.bin" {
                 let mut buf = Vec::new();
                 file.read_to_end(&mut buf).unwrap();
                 assert_eq!(detect_bin_type(&buf), BinType::Anim);
@@ -276,7 +276,7 @@ mod tests {
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(data.as_slice())).unwrap();
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).unwrap();
-            if file.name() == "build.bin" {
+            if file.name().unwrap() == "build.bin" {
                 let mut buf = Vec::new();
                 file.read_to_end(&mut buf).unwrap();
                 assert_eq!(detect_bin_type(&buf), BinType::Build);

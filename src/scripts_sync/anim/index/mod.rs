@@ -12,7 +12,10 @@
 use crate::error::Result;
 use crate::parser::anim_override::{parse_anim_overrides_in, SymbolOverrideCall, SymbolRemapIndex};
 use crate::parser::clothing_overrides::{parse_clothing_overrides, ClothingEntry};
-use crate::parser::follow_symbol::{parse_follow_symbols_in, FOLLOW_INDEX_VERSION};
+use crate::parser::follow_symbol::{
+    parse_follow_symbols_and_entities, resolve_cross_file_follows, PrefabEntityConfig,
+    FOLLOW_INDEX_VERSION,
+};
 use crate::platform::progress::Reporter;
 use full_moon::ast;
 use full_moon::node::Node;
@@ -186,6 +189,8 @@ pub struct AnimIndexStats {
     pub missing_anim_paths: usize,
     pub multi_anim_files: usize,
     pub skipped_pkgref_dyn: usize,
+    /// 跨文件 `SpawnPrefab("x")` 回填成功的 FollowSymbol 关系数（去重）。
+    pub follow_cross_resolved: usize,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -243,6 +248,8 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
     let mut remap_calls: Vec<SymbolOverrideCall> = Vec::new();
 
     let mut content_cache: BTreeMap<String, AnimContent> = BTreeMap::new();
+    // prefab 名 → 定义文件里 fn() 的静态动画默认值，供跨文件 SpawnPrefab 回填。
+    let mut prefab_entities: BTreeMap<String, PrefabEntityConfig> = BTreeMap::new();
     let mut files: Vec<PathBuf> = Vec::new();
     collect_lua_files(&prefabs_dir, &mut files)?;
     files.sort();
@@ -270,8 +277,13 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             remap_calls.append(&mut calls);
         }
 
-        // FollowSymbol 关系（本地工厂 + 参数化工厂），按 prefab 文件整体归属。
-        let follow_fx = parse_follow_symbols_in(&source, Some(&stem)).unwrap_or_default();
+        // FollowSymbol 关系（本地工厂 + 参数化工厂），按 prefab 文件整体归属；
+        // 同时收集本文件 `Prefab("x", fn)` 的静态默认值，供跨文件回填。
+        let (follow_fx, file_entities) =
+            parse_follow_symbols_and_entities(&source, Some(&stem)).unwrap_or_default();
+        for (name, entity) in file_entities {
+            prefab_entities.entry(name).or_insert(entity);
+        }
 
         for mut record in file_index.prefabs {
             record.follow_fx = follow_fx.clone();
@@ -318,6 +330,26 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             }
         }
     }
+
+    // 跨文件回填：receiver 是 SpawnPrefab("x") 且 x 定义在别的文件时，
+    // 用全局 prefab 默认值补齐 bank/build/animation。
+    for record in &mut prefab_records {
+        resolve_cross_file_follows(&mut record.follow_fx, &prefab_entities);
+    }
+    let mut cross_resolved_keys = BTreeSet::new();
+    for record in &prefab_records {
+        for fx in &record.follow_fx {
+            if fx.spawn_prefab.is_some() && fx.animation.is_some() {
+                cross_resolved_keys.insert((
+                    record.prefab_file.clone(),
+                    fx.anchor.clone(),
+                    fx.spawn_prefab.clone(),
+                    fx.receiver.clone(),
+                ));
+            }
+        }
+    }
+    let follow_cross_resolved = cross_resolved_keys.len();
 
     // Tier-C 覆盖面：重映射调用也大量存在于 stategraphs（SG*.lua）与
     // components（skinner 等）。这些目录不做 prefab 结构扫描，仅提取调用。
@@ -403,6 +435,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             missing_anim_paths,
             multi_anim_files,
             skipped_pkgref_dyn,
+            follow_cross_resolved,
         },
         prefabs: prefab_records,
         anim_files,

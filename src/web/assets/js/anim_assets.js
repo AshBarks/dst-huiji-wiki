@@ -1005,8 +1005,8 @@ export async function pageAnimAssets(main) {
             </details>
           </div>`;
       }).join("");
-      const staleIndex = state.source === "prefab" && state.followIndexVersion < 1
-        ? '<p style="color:var(--warn);font-size:12px;margin:0 0 6px">当前 anim-index 未包含 FollowSymbol 数据（可能是旧产物），挂点仅用启发式候选；建议重跑 <code>anim-index</code>。</p>'
+      const staleIndex = state.source === "prefab" && state.followIndexVersion < 2
+        ? '<p style="color:var(--warn);font-size:12px;margin:0 0 6px">当前 anim-index 未包含最新 FollowSymbol 数据（旧产物），挂点仅用启发式候选；建议重跑 <code>anim-index</code>。</p>'
         : "";
       $("#symbolDeps").innerHTML = staleIndex + (symHtml || '<p class="muted">无 symbol 依赖</p>');
 

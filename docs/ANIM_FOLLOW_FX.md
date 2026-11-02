@@ -74,6 +74,7 @@ Lua 源码
   "sync_frame": false,
   "random_frame": true,
   "receiver": "cape",
+  "spawn_prefab": null,
   "confidence": "resolved",
   "prefab": "shadowthrall_wings"
 }
@@ -87,14 +88,35 @@ Lua 源码
   `Prefab("x", fn, ...)` 反查 `fn` 的实体配置；
 - **参数化工厂**：`AddFollowSymbol(inst, sym, anim)` 在调用点取实参；
 - **字符串常量 / `..` 拼接**；
-- **Unresolved**：跨文件 `SpawnPrefab`、状态图调用、动态 animation。
+- **跨文件 `SpawnPrefab`**：receiver 绑定到 `SpawnPrefab("x")` 但 `x`
+  定义在别的文件时，记录 `spawn_prefab = "x"`、`animation = null`；
+  由 `anim-index` 的第二遍全局回填补全（见 §2.3）。
+- **Unresolved**：动态 `SpawnPrefab(expr)`、状态图调用、动态 animation。
   记录仍保留（`animation` 缺失），前端提供手动选择。
 
-`anim-index` 顶层新增 `follow_index_version`（当前 1）；WebUI 读到 `0`
+`anim-index` 顶层新增 `follow_index_version`（当前 2）；WebUI 读到 `< 2`
 （旧产物）时会提示重跑 `anim-index`。字段为增量扩展，`schema_version`
 不变；旧产物读取时 `follow_fx` 为空，前端自动回退到启发式。
 
-### 2.2 启发式候选（后端）
+### 2.2 跨文件 `SpawnPrefab` 回填（`anim-index` 第二遍）
+
+`parse_follow_symbols_and_entities` 在同一次 AST 遍历里额外产出本文件每个
+`Prefab("x", fn, ...)` 的静态默认值（`bank` / `build` / `animation` /
+`SetFinalOffset` / 字面量颜色 / 随机帧）。`anim-index` 汇总成全脚本的
+`prefab → defaults` 表，再用 `resolve_cross_file_follows` 回填所有
+`spawn_prefab` 指向它的未解析记录：
+
+- 只补记录里为空的字段，调用点显式设置的值优先；
+- 回填成功即置 `confidence = resolved`；
+- 统计写入 `stats.follow_cross_resolved`（按
+  `(prefab_file, anchor, spawn_prefab, receiver)` 去重）；
+- 表构造器绑定（`inst.frostbreath = { fx = SpawnPrefab("frostbreath") }`）
+  会展开为 `inst.frostbreath.fx`，因此嵌套 receiver 也能命中。
+
+动态 `SpawnPrefab(fxname)`、定义文件里动画名本身是表达式（如
+`"idle"..tostring(i)`）的情况仍保持未解析。
+
+### 2.3 启发式候选（后端）
 
 `animation_info` 对**没有 build provider** 的 symbol，在同文件同 bank 的
 动画里找"自身所有 symbol 都有贴图"的动画作为候选，按名字打分：
@@ -109,8 +131,14 @@ Lua 源码
 
 返回 `follow_candidates: {symbol: [{bank, animation, file, score, reason}]}`。
 Lua 索引存在时以前者为准，启发式只作兜底/候选展示。当前 `anim-index`
-中 187 条去重关系有 110 条可解析（79 resolved + 31 static），其余 77 条
-保留为未解析记录。
+中 188 条去重关系有 113 条可解析（80 resolved + 33 static，其中 3 条由
+§2.2 跨文件回填），其余 75 条保留为未解析记录。
+
+未解析里相当一部分**不是精灵 FX**：`eyeflame`、`torchfire`、`character_fire`、
+`thurible_smoke`、`squideyelight` 等只有 `VFXEffect`/`Light`，没有
+`AnimState`，无法用"精灵 × 挂点矩阵"合成；另一类是动态
+`SpawnPrefab(expr)` 或动态 `PlayAnimation`（如 `makefn("collapse_small")`、
+`"idle"..tostring(i)`）。两类都需要不同的补法，不应混在精灵合成里。
 
 ## 3. 渲染合成
 
@@ -207,11 +235,13 @@ t' = T + A · t + offset
 - 每个挂点有相位输入框与"随机"按钮；`sync_frame` 为真时相位禁用并提示；
 - "补齐缺失 Symbol"不再扫描挂点；
 - 预览下方显示 `跟随 FX N 个 · 已合成`，`follow_errors` 红字列出；
-- `follow_index_version < 1` 时在 Symbol Dependencies 顶部提示索引过期。
+- `follow_index_version < 2` 时在 Symbol Dependencies 顶部提示索引过期。
 
 ## 5. 已知限制
 
-- 跨文件 `SpawnPrefab("xxx_fx")`、状态图内的 `FollowSymbol` 未解析；
+- 动态 `SpawnPrefab(expr)`、状态图内的 `FollowSymbol` 未解析；
+- 跨文件回填依赖被引用 prefab 在 `prefabs/` 下的静态 `fn()` 配置；若
+  `PlayAnimation` 本身是表达式（拼接/状态切换），该记录仍保持未解析；
 - 同一函数内分支里的多个 `PlayAnimation` 采用"最后赋值"近似：例如
   `tophat_shadow_fx` 的 `swirl_attachfn` front 分支会取到 else 分支的
   `swirl_back`，可在 UI 手动改；
@@ -229,8 +259,9 @@ t' = T + A · t + offset
 - `crates/dst-anim-tool`：合成公式（与 `scrapbook` 烘焙值对齐）、偏移、
   z 序插入、`SetFinalOffset` 前后偏移、颜色乘/加、挂点查找；
 - `src/parser/follow_symbol.rs`：本地工厂、参数化工厂、内联实体、字段绑定、
-  同文件 `SpawnPrefab`、字符串常量、offset/帧窗口、颜色/最终偏移/随机帧/
-  同步帧、动态 animation 的 unresolved 分支；
+  同文件/跨文件 `SpawnPrefab`（含表构造器绑定与 `resolve_cross_file_follows`）、
+  字符串常量、offset/帧窗口、颜色/最终偏移/随机帧/同步帧、动态 animation
+  的 unresolved 分支；
 - `src/scripts_sync/anim/preview.rs`：候选打分、JSON 契约（含新字段）；
   `#[ignore]` 真实数据用例合成 `shadow_thrall_wings/idle_side` 并断言 3 个
   挂点均有帧被挂接（`cargo test -p dst-huiji-wiki --lib -- --include-ignored`，

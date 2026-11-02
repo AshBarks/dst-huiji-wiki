@@ -18,8 +18,10 @@
 //! `SetMultColour`/`SetAddColour`、`SetFrame(math.random(...))`、
 //! `FollowSymbol` 第 7 参数（推断为跟随帧同步）。
 //!
-//! 动态拼接、跨文件 `SpawnPrefab`、状态图内的调用仍会作为
-//! `animation = None` 的未解析记录保留，交给前端手动补。
+//! 跨文件 `SpawnPrefab("x")` 在记录里保留 `spawn_prefab`，由 `anim-index`
+//! 的第二遍全局回填（`resolve_cross_file_follows`）补全；动态拼接、
+//! 动态 `SpawnPrefab(expr)`、状态图内的调用仍作为 `animation = None` 的
+//! 未解析记录保留，交给前端手动补。
 
 use crate::error::{Error, Result};
 use full_moon::ast;
@@ -28,7 +30,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// `anim-index` 跟随关系数据的版本；缺失该字段的旧产物视为 0。
-pub const FOLLOW_INDEX_VERSION: u32 = 1;
+pub const FOLLOW_INDEX_VERSION: u32 = 2;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -71,6 +73,9 @@ pub struct FollowFxRecord {
     pub random_frame: bool,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub receiver: String,
+    /// Receiver 绑定的 `SpawnPrefab("x")` 目标（未解析时用于跨文件回填）。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub spawn_prefab: Option<String>,
     pub confidence: FollowConfidence,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prefab: Option<String>,
@@ -89,9 +94,21 @@ pub fn parse_follow_symbols(source: &str) -> Result<Vec<FollowFxRecord>> {
 }
 
 pub fn parse_follow_symbols_in(source: &str, prefab: Option<&str>) -> Result<Vec<FollowFxRecord>> {
+    Ok(parse_follow_symbols_and_entities(source, prefab)?.0)
+}
+
+/// Same as [`parse_follow_symbols_in`], but also returns the static anim
+/// defaults of every `Prefab("x", fn, ...)` defined in this file. `anim-index`
+/// collects them into a global map and resolves cross-file `SpawnPrefab("x")`
+/// follow targets in a second pass.
+pub fn parse_follow_symbols_and_entities(
+    source: &str,
+    prefab: Option<&str>,
+) -> Result<(Vec<FollowFxRecord>, BTreeMap<String, PrefabEntityConfig>)> {
     let ast = full_moon::parse(source).map_err(Error::LuaParse)?;
     let mut collector = FunctionCollector::default();
     collector.visit_ast(&ast);
+    let entities = prefab_entities(&collector);
     let prefab_fns: BTreeSet<String> = collector.prefabs.values().cloned().collect();
     let mut resolver = FollowResolver {
         funcs: collector.funcs,
@@ -104,7 +121,95 @@ pub fn parse_follow_symbols_in(source: &str, prefab: Option<&str>) -> Result<Vec
         stack: Vec::new(),
     };
     resolver.visit_ast(&ast);
-    Ok(dedup(resolver.records))
+    Ok((dedup(resolver.records), entities))
+}
+
+fn prefab_entities(collector: &FunctionCollector) -> BTreeMap<String, PrefabEntityConfig> {
+    collector
+        .prefabs
+        .iter()
+        .filter_map(|(prefab_name, function)| {
+            let func = collector.funcs.get(function)?;
+            let entity = func.entities.get("inst").or_else(|| {
+                if func.entities.len() == 1 {
+                    func.entities.values().next()
+                } else {
+                    None
+                }
+            })?;
+            Some((prefab_name.clone(), PrefabEntityConfig::from_entity(entity)))
+        })
+        .collect()
+}
+
+/// Resolves records whose `receiver` is a cross-file `SpawnPrefab("x")` by
+/// copying `x`'s static bank/build/animation defaults. Only fills missing
+/// fields (explicit call-site values win) and counts resolved records.
+pub fn resolve_cross_file_follows(
+    records: &mut [FollowFxRecord],
+    entities: &BTreeMap<String, PrefabEntityConfig>,
+) -> usize {
+    let mut resolved = 0;
+    for record in records.iter_mut() {
+        if record.animation.is_some() {
+            continue;
+        }
+        let Some(name) = record.spawn_prefab.as_deref() else {
+            continue;
+        };
+        let Some(def) = entities.get(name) else {
+            continue;
+        };
+        let Some(animation) = def.animation.clone() else {
+            continue;
+        };
+        if record.bank.is_none() {
+            record.bank = def.bank.clone();
+        }
+        if record.build.is_none() {
+            record.build = def.build.clone();
+        }
+        record.animation = Some(animation);
+        if record.final_offset.is_none() {
+            record.final_offset = def.final_offset;
+        }
+        if record.mult_colour.is_none() {
+            record.mult_colour = def.mult_colour;
+        }
+        if record.add_colour.is_none() {
+            record.add_colour = def.add_colour;
+        }
+        record.random_frame |= def.random_frame;
+        record.confidence = FollowConfidence::Resolved;
+        resolved += 1;
+    }
+    resolved
+}
+
+/// Static anim defaults of one `Prefab("x", fn, ...)` definition.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct PrefabEntityConfig {
+    pub bank: Option<String>,
+    pub build: Option<String>,
+    pub animation: Option<String>,
+    pub final_offset: Option<i32>,
+    pub mult_colour: Option<[f32; 4]>,
+    pub add_colour: Option<[f32; 4]>,
+    pub random_frame: bool,
+}
+
+impl PrefabEntityConfig {
+    fn from_entity(entity: &EntityAnim) -> Self {
+        Self {
+            bank: entity.bank.clone(),
+            build: entity.build.clone(),
+            animation: entity.anim.clone(),
+            final_offset: entity.final_offset,
+            mult_colour: entity.mult_colour,
+            add_colour: entity.add_colour,
+            random_frame: entity.random_frame,
+        }
+    }
 }
 
 fn dedup(records: Vec<FollowFxRecord>) -> Vec<FollowFxRecord> {
@@ -248,6 +353,20 @@ impl FunctionCollector {
                     } else {
                         self.bindings.insert(name.to_string(), Binding::Alias(path));
                     }
+                }
+            }
+            // Table constructors commonly hold the FX binding:
+            // `inst.frostbreath = { fx = SpawnPrefab("frostbreath") }`.
+            // Record `inst.frostbreath.fx` so cross-file lookup can happen.
+            ast::Expression::TableConstructor(table) => {
+                for field in table.fields() {
+                    let (Some(key), Some(value)) =
+                        (table_field_key(field), table_field_value(field))
+                    else {
+                        continue;
+                    };
+                    let child = format!("{name}.{key}");
+                    self.visit_binding(&child, value);
                 }
             }
             _ => {}
@@ -410,6 +529,14 @@ impl FollowResolver {
         found
     }
 
+    fn spawn_prefab_for(&self, path: &str) -> Option<String> {
+        match self.bindings.get(path) {
+            Some(Binding::Spawn(name)) => Some(name.clone()),
+            Some(Binding::Alias(target)) => self.spawn_prefab_for(target),
+            _ => None,
+        }
+    }
+
     fn entity_for(&self, path: &str) -> Option<EntityAnim> {
         self.entity_for_depth(path, 0)
     }
@@ -465,6 +592,11 @@ impl FollowResolver {
         } else {
             confidence
         };
+        let spawn_prefab = if animation.is_none() {
+            self.spawn_prefab_for(receiver)
+        } else {
+            None
+        };
         self.records.push(FollowFxRecord {
             anchor: anchor.to_string(),
             bank: entity.bank,
@@ -479,6 +611,7 @@ impl FollowResolver {
             sync_frame,
             random_frame: entity.random_frame,
             receiver: receiver.to_string(),
+            spawn_prefab,
             confidence,
             prefab: self.prefab.clone(),
         });
@@ -914,6 +1047,26 @@ fn extract_string_literal(raw: &str) -> String {
     }
 }
 
+fn table_field_key(field: &ast::Field) -> Option<String> {
+    match field {
+        ast::Field::NameKey { key, .. } => Some(key.token().to_string()),
+        ast::Field::ExpressionKey {
+            key: ast::Expression::String(raw),
+            ..
+        } => Some(extract_string_literal(&raw.to_string())),
+        _ => None,
+    }
+}
+
+fn table_field_value(field: &ast::Field) -> Option<&ast::Expression> {
+    match field {
+        ast::Field::NameKey { value, .. }
+        | ast::Field::ExpressionKey { value, .. }
+        | ast::Field::NoKey(value) => Some(value),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1164,5 +1317,74 @@ end
         assert_eq!(records[0].offset, [56.0, -40.0]);
         assert_eq!(records[0].frame_begin, Some(3));
         assert_eq!(records[0].frame_end, Some(7));
+    }
+    #[test]
+    fn marks_cross_file_spawn_target() {
+        let source = r#"
+local function fn()
+    local inst = CreateEntity()
+    inst.fx = SpawnPrefab("gestalt_head")
+    inst.fx.Follower:FollowSymbol(inst.GUID, "head_fx", 0, 0, 0)
+end
+"#;
+        let records = parse_follow_symbols(source).unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].confidence, FollowConfidence::Unresolved);
+        assert_eq!(records[0].spawn_prefab.as_deref(), Some("gestalt_head"));
+        assert_eq!(records[0].animation, None);
+    }
+
+    #[test]
+    fn binds_table_constructor_fields() {
+        let source = r#"
+local function fn()
+    local inst = CreateEntity()
+    inst.frostbreath = {
+        fx = SpawnPrefab("frostbreath"),
+        fx2 = SpawnPrefab("frostbreath"),
+    }
+    inst.frostbreath.fx.Follower:FollowSymbol(inst.GUID, "breath_left", 0, 0, 0)
+end
+"#;
+        let records = parse_follow_symbols(source).unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].receiver, "inst.frostbreath.fx");
+        assert_eq!(records[0].spawn_prefab.as_deref(), Some("frostbreath"));
+    }
+
+    #[test]
+    fn resolves_cross_file_spawn_from_prefab_entities() {
+        let defs_source = r#"
+local function other_fn()
+    local inst = CreateEntity()
+    inst.AnimState:SetBank("gestalt_head")
+    inst.AnimState:SetBuild("gestalt_head")
+    inst.AnimState:PlayAnimation("idle_loop", true)
+    inst.AnimState:SetFinalOffset(1)
+    return inst
+end
+return Prefab("gestalt_head", other_fn, {})
+"#;
+        let (_, entities) =
+            parse_follow_symbols_and_entities(defs_source, Some("gestalt")).unwrap();
+        let entity = entities.get("gestalt_head").expect("prefab entity");
+        assert_eq!(entity.bank.as_deref(), Some("gestalt_head"));
+        assert_eq!(entity.animation.as_deref(), Some("idle_loop"));
+
+        let fx_source = r#"
+local function fn()
+    local inst = CreateEntity()
+    inst.blobhead = SpawnPrefab("gestalt_head")
+    inst.blobhead.Follower:FollowSymbol(inst.GUID, "head_fx", 0, 0, 0)
+end
+"#;
+        let mut records = parse_follow_symbols(fx_source).unwrap();
+        assert_eq!(records[0].animation, None);
+        assert_eq!(resolve_cross_file_follows(&mut records, &entities), 1);
+        assert_eq!(records[0].animation.as_deref(), Some("idle_loop"));
+        assert_eq!(records[0].bank.as_deref(), Some("gestalt_head"));
+        assert_eq!(records[0].build.as_deref(), Some("gestalt_head"));
+        assert_eq!(records[0].final_offset, Some(1));
+        assert_eq!(records[0].confidence, FollowConfidence::Resolved);
     }
 }

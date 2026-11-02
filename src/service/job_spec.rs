@@ -706,7 +706,8 @@ pub static JOB_SPECS: &[JobSpec] = &[
         name: "skin-index",
         label: "生成皮肤动画索引",
         wiki_access: WikiAccess::None,
-        resources: &["out"],
+        // 产物默认 output/skin-index.json；独立键避免与其它 out 作业互斥。
+        resources: &["out/skin-index"],
         params: &[
             ParamSpec {
                 key: "scripts",
@@ -735,7 +736,8 @@ pub static JOB_SPECS: &[JobSpec] = &[
         name: "update-scan",
         label: "快照 diff + 影响评估",
         wiki_access: WikiAccess::None,
-        resources: &["out"],
+        // 默认产物 output/scan/<old>_<new>；显式 --out 时锁仍按该键（约定默认路径）。
+        resources: &["out/scan"],
         params: &[
             ParamSpec {
                 key: "old",
@@ -778,7 +780,8 @@ pub static JOB_SPECS: &[JobSpec] = &[
         name: "update-index",
         label: "构建代码关联图",
         wiki_access: WikiAccess::None,
-        resources: &["out"],
+        // 默认产物 output/atlas/<build>。
+        resources: &["out/atlas"],
         params: &[
             ParamSpec {
                 key: "root",
@@ -1279,7 +1282,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
         name: "cooking-game-export",
         label: "导出烹饪小游戏数据包",
         wiki_access: WikiAccess::None,
-        resources: &["out"],
+        resources: &["out/cooking"],
         params: &[
             ParamSpec {
                 key: "output",
@@ -1339,6 +1342,13 @@ pub static JOB_SPECS: &[JobSpec] = &[
                 required: false,
                 help: "跳过 images-sync 的维基上传状态查询（离线/无凭据）",
             },
+            ParamSpec {
+                key: "from",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "从该步骤开始（scripts-sync | images-sync | anim-sync），跳过之前的步骤",
+            },
         ],
     },
     JobSpec {
@@ -1346,13 +1356,67 @@ pub static JOB_SPECS: &[JobSpec] = &[
         label: "更新后数据页同步 → 维基",
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
+        params: &[
+            ParamSpec {
+                key: "snapshot",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "四步共用的 scripts 快照目录名（缺省最新/live 树）",
+            },
+            ParamSpec {
+                key: "from",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "从该步骤开始（maintain-copy-clip | maintain-dst-recipes | maintain-item-table | maintain-strings）",
+            },
+        ],
+    },
+    JobSpec {
+        name: "update-assets",
+        label: "更新后素材同步 → 维基（icons → skilltree）",
+        wiki_access: WikiAccess::Write,
+        // upload-icons 读 icon_meta（ktools_out），skilltree-wiki 写本地
+        // Skilltree.js（out）；两者都持 wiki 锁，实际串行。
+        resources: &["wiki", "out", "ktools_out"],
         params: &[ParamSpec {
-            key: "snapshot",
+            key: "from",
             kind: ParamKind::OptStr,
             default: ParamDefault::None,
             required: false,
-            help: "四步共用的 scripts 快照目录名（缺省最新/live 树）",
+            help: "从该步骤开始（upload-icons | skilltree-wiki），跳过之前的步骤",
         }],
+    },
+    JobSpec {
+        name: "update-check",
+        label: "更新后只读核对（模板覆盖 + 预制体审计）",
+        // 只读；持 ktools_out 避免与 images-sync 并发时读到半截图标元数据。
+        wiki_access: WikiAccess::Read,
+        resources: &["ktools_out"],
+        params: &[
+            ParamSpec {
+                key: "snapshot",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "两步共用的 scripts 快照目录名（缺省最新/live 树）",
+            },
+            ParamSpec {
+                key: "skip_icon_status",
+                kind: ParamKind::Bool,
+                default: ParamDefault::Bool(false),
+                required: false,
+                help: "跳过模板检查的图标存在性查询（离线/无凭据）",
+            },
+            ParamSpec {
+                key: "from",
+                kind: ParamKind::OptStr,
+                default: ParamDefault::None,
+                required: false,
+                help: "从该步骤开始（maintain-template-check | prefab-overrides-audit）",
+            },
+        ],
     },
 ];
 
@@ -1381,7 +1445,7 @@ mod tests {
     /// 契约：spec 表与 JobKind 变体一一对应（数量、名称、serde tag）。
     #[test]
     fn contract_spec_table_covers_every_variant() {
-        assert_eq!(JOB_SPECS.len(), 36);
+        assert_eq!(JOB_SPECS.len(), 38);
         let mut names: Vec<&str> = JOB_SPECS.iter().map(|s| s.name).collect();
         names.sort_unstable();
         let count = names.len();

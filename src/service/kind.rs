@@ -466,6 +466,9 @@ pub enum JobKind {
         /// 跳过 images-sync 的维基上传状态查询（离线/无凭据）。
         #[serde(default)]
         skip_wiki_status: bool,
+        /// 从该步骤开始（跳过之前的步骤），用于失败后断点重跑。
+        #[serde(default)]
+        from: Option<String>,
     },
     /// `update-data`：更新后数据页编排，固定顺序
     /// `maintain-copy-clip → maintain-dst-recipes → maintain-item-table →
@@ -474,6 +477,30 @@ pub enum JobKind {
         /// 四步共用的 scripts 快照目录名（缺省最新/live 树）。
         #[serde(default)]
         snapshot: Option<String>,
+        /// 从该步骤开始（跳过之前的步骤），用于失败后断点重跑。
+        #[serde(default)]
+        from: Option<String>,
+    },
+    /// `update-assets`：更新后素材编排，固定顺序
+    /// `upload-icons → skilltree-wiki`；失败即中止。写站受 `WriteMode`。
+    UpdateAssets {
+        /// 从该步骤开始（跳过之前的步骤）。
+        #[serde(default)]
+        from: Option<String>,
+    },
+    /// `update-check`：更新后只读核对，固定顺序
+    /// `maintain-template-check + prefab-overrides-audit`。按
+    /// continue-on-error 执行，报告 `status` 区分 success/partial/failed。
+    UpdateCheck {
+        /// 共用的 scripts 快照目录名（缺省最新/live 树）。
+        #[serde(default)]
+        snapshot: Option<String>,
+        /// 跳过模板检查的图标存在性查询（离线/无凭据）。
+        #[serde(default)]
+        skip_icon_status: bool,
+        /// 从该步骤开始（跳过之前的步骤）。
+        #[serde(default)]
+        from: Option<String>,
     },
 }
 
@@ -578,6 +605,8 @@ impl JobKind {
             JobKind::CookingGameExport { .. } => &super::job_spec::JOB_SPECS[33],
             JobKind::UpdateLocal { .. } => &super::job_spec::JOB_SPECS[34],
             JobKind::UpdateData { .. } => &super::job_spec::JOB_SPECS[35],
+            JobKind::UpdateAssets { .. } => &super::job_spec::JOB_SPECS[36],
+            JobKind::UpdateCheck { .. } => &super::job_spec::JOB_SPECS[37],
         }
     }
 
@@ -648,6 +677,31 @@ impl JobKind {
                 if from.trim() == to.trim() {
                     return Err(Error::Config("重定向源页面与目标页面不能相同".to_string()));
                 }
+                Ok(())
+            }
+            JobKind::UpdateLocal { from, .. } => {
+                super::pipelines::step_start(
+                    super::pipelines::UPDATE_LOCAL_STEPS,
+                    from.as_deref(),
+                )?;
+                Ok(())
+            }
+            JobKind::UpdateData { from, .. } => {
+                super::pipelines::step_start(super::pipelines::UPDATE_DATA_STEPS, from.as_deref())?;
+                Ok(())
+            }
+            JobKind::UpdateAssets { from } => {
+                super::pipelines::step_start(
+                    super::pipelines::UPDATE_ASSETS_STEPS,
+                    from.as_deref(),
+                )?;
+                Ok(())
+            }
+            JobKind::UpdateCheck { from, .. } => {
+                super::pipelines::step_start(
+                    super::pipelines::UPDATE_CHECK_STEPS,
+                    from.as_deref(),
+                )?;
                 Ok(())
             }
             _ => Ok(()),
@@ -881,8 +935,18 @@ impl JobKind {
                 force: false,
                 dry_run: true,
                 skip_wiki_status: false,
+                from: None,
             },
-            JobKind::UpdateData { snapshot: None },
+            JobKind::UpdateData {
+                snapshot: None,
+                from: None,
+            },
+            JobKind::UpdateAssets { from: None },
+            JobKind::UpdateCheck {
+                snapshot: None,
+                skip_icon_status: false,
+                from: None,
+            },
         ]
     }
 }
@@ -981,19 +1045,52 @@ mod tests {
                 force,
                 dry_run,
                 skip_wiki_status,
+                from,
             } => {
                 assert!(!force);
                 assert!(!dry_run, "默认必须是真实执行，演练要显式开");
                 assert!(!skip_wiki_status);
+                assert!(from.is_none());
             }
             _ => panic!("wrong variant"),
         }
 
         let data: JobKind = serde_json::from_str(r#"{"kind":"update_data"}"#).unwrap();
         match data {
-            JobKind::UpdateData { snapshot } => assert!(snapshot.is_none()),
+            JobKind::UpdateData { snapshot, from } => {
+                assert!(snapshot.is_none());
+                assert!(from.is_none());
+            }
             _ => panic!("wrong variant"),
         }
+
+        let assets: JobKind = serde_json::from_str(r#"{"kind":"update_assets"}"#).unwrap();
+        assert!(matches!(assets, JobKind::UpdateAssets { from: None }));
+
+        let check: JobKind =
+            serde_json::from_str(r#"{"kind":"update_check","skip_icon_status":true}"#).unwrap();
+        match check {
+            JobKind::UpdateCheck {
+                snapshot,
+                skip_icon_status,
+                from,
+            } => {
+                assert!(snapshot.is_none());
+                assert!(skip_icon_status);
+                assert!(from.is_none());
+            }
+            _ => panic!("wrong variant"),
+        }
+
+        // `--from` 的非法步骤在 validate 阶段被拒（CLI/Web 都走这里）。
+        let bad = JobKind::UpdateLocal {
+            force: false,
+            dry_run: true,
+            skip_wiki_status: false,
+            from: Some("images".into()),
+        };
+        let err = bad.validate().unwrap_err();
+        assert!(err.to_string().contains("images-sync"), "{err}");
 
         // 前端数字字段以 JSON number 提交，不能被当成字符串。
         let strings: JobKind =

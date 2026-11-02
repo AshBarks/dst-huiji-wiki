@@ -40,6 +40,7 @@ dst-huiji-wiki/
 | Task | Location | Notes |
 |------|----------|-------|
 | Add a new CLI command | `src/service/job_spec.rs` (JobSpec 行) + `src/commands/mod.rs` (CLI_EXT 行 + `job_from_matches` 构造臂) | 子命令由 clap builder 从 JobSpec+CLI_EXT 生成；参数 schema 声明在 spec |
+| Run post-update orchestration | `src/service/pipelines.rs` | `update-local` (scripts→images→anim) / `update-data` / `update-assets` / `update-check`; `--from <step>` resume; order constraints in `docs/UPDATE_TASK_GROUPS.md` |
 | Add a new job type (CLI+Web) | `src/service/kind.rs` (variant) + `src/service/job_spec.rs` (spec 行) + `src/commands/mod.rs` (CLI_EXT 行 + 构造臂) | 契约测试强制四处一致（name/serde tag/CLI 旗标/前端 JOB_DEFS）|
 | Change WebUI behavior | `src/web/` | Binary-only module like commands; assets in `src/web/assets/` embedded via include_str! |
 | Add a data browse endpoint | `src/web/api_data/{dataset,icons,assets,anim}.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |

@@ -32,13 +32,13 @@
 | L1 数据页 | `maintain-strings` | 新 scripts 树 | `模块:<V> Strings *` + 索引 | **写** | `wiki`,`out` |
 | L2 素材 | `upload-icons` | `icon_meta.json` + manifests | wiki `File:` | **写** | `wiki` |
 | L2 素材 | `skilltree-wiki` | 新 scripts 树 + 站内图片 | `模块:Skilltree/<Char>` | **写** | `wiki`,`out` |
-| L2 素材 | `cooking-game-export` | split 切片 + manifests + scripts | 本地 bundle | 无 | `out` |
+| L2 素材 | `cooking-game-export` | split 切片 + manifests + scripts | 本地 bundle | 无 | `out/cooking` |
 | L3 核对/分析 | `maintain-template-check` | scripts + `icon_meta.json` + 线上模板/模块 | 报告/片段 | 读 | 无 |
 | L3 核对/分析 | `prefab-overrides-audit` | scripts + 线上页面 | 审计 JSON | 读 | 无 |
 | L3 核对/分析 | `maintain-prefab-overrides` | scripts + 线上页面 | 本地页面 + diff | 读 | `out` |
-| L3 核对/分析 | `update-scan` | `scripts_<old>` vs `current`（+ corpus） | `impact.json` / patch | 无 | `out` |
-| L3 核对/分析 | `update-index` | scripts | 关联索引 | 无 | `out` |
-| L3 核对/分析 | `anim-index` / `skin-index` | scripts + `data/anim` | 索引 JSON | 无 | `anim_out` / `out` |
+| L3 核对/分析 | `update-scan` | `scripts_<old>` vs `current`（+ corpus） | `impact.json` / patch | 无 | `out/scan` |
+| L3 核对/分析 | `update-index` | scripts | 关联索引 | 无 | `out/atlas` |
+| L3 核对/分析 | `anim-index` / `skin-index` | scripts + `data/anim` | 索引 JSON | 无 | `anim_out` / `out/skin-index` |
 | L3 核对/分析 | `corpus-fetch` → `corpus-index` | 维基主命名空间 | `wikis/` + 派生索引 | 读 / 无 | `corpus` |
 | L3 核对/分析 | `symbol-annotate` / `knowledge-*` | scripts + corpus + knowledge | 证据包/文档 | 无 | `out` / `knowledge` |
 | 人工 | `maintain-wikitext`、`create-redirect`、`upload-image` | 指定页面/文件 | 逐页编辑 | **写** | `wiki` |
@@ -85,7 +85,7 @@
 | 2 | `images-sync` | 生成 `icon_meta.json` 与 manifest；其名称映射读 **live** `scripts/languages/*.po`（`src/scripts_sync/images/meta.rs:429`），跑在 sync 之前就会用旧版名称 |
 | 3 | `anim-sync` | 只碰 `data/anim` 与 `ANIM__OUT_DIR`，与 1/2 无依赖；放最后是为了让"版本号 + 历史"在同一步收尾 |
 
-- **可并行性**：`images-sync`（`ktools_out`）与 `anim-sync`（`anim_out`）互不相干，可并行；`scripts-sync` 必须最先。串行实现更简单，先按串行。
+- **可并行性**：`images-sync`（`ktools_out`）与 `anim-sync`（`anim_out`）互不相干，理论上可并行；**当前仍按串行**——并行会让两个步骤的日志/进度事件交错，而 `Reporter::step` 只维护一个"当前步骤"，WebUI 无法归属事件。要做并行需先给 `JobEvent` 加 step 作用域（另立改造）。
 - **失败语义**：`scripts-sync` 失败（staging/换树回滚）必须中止；`images-sync` 失败则 `upload-icons`/`cooking-game-export`/`template-check` 全部不可信，也应中止（fail-fast）。
 - **资源并集**：`scripts_tree` + `ktools_out` + `anim_out`。
 
@@ -121,8 +121,8 @@
 | `maintain-template-check` | `maintain-copy-clip`、`upload-icons` | 否则会把「别名未写入 / 图标未上传」报成 error（`docs/FLOWS.md:105`） |
 | `prefab-overrides-audit` | `scripts-sync` | 只读线上页面 + 本地推导 |
 
-- 两者 `resources` 都是空数组，没有锁冲突，可以随时跑；合并成一个任务的收益是"一次拿到两份核对结论"。
-- 这是唯一建议 **continue-on-error** 的组合：一项失败不影响另一项的结论。
+- 已实施为 `update-check`：模板检查读图标元数据（`ktools_out`），因此声明 `resources = ["ktools_out"]`，避免与 `images-sync` 并发时读到半截元数据；预制体审计只读。
+- 这是唯一 **continue-on-error** 的组合：一项失败不影响另一项；作业本身返回成功，报告 `status` 区分 `success`/`partial`/`failed`，失败原因在 `steps[].error`。
 
 ### 3.5 保持独立（不并入编排）
 
@@ -156,19 +156,21 @@
 
 ## 5. 落地形态
 
-已落地两个编排变体，内部按固定序调用现有 `run_*`（`src/service/pipelines.rs`），**不复制任何逻辑**，原作业一字不动：
+已落地四个编排变体，内部按固定序调用现有 `run_*`（`src/service/pipelines.rs`），**不复制任何逻辑**，原作业一字不动：
 
 ```rust
-UpdateLocal { force: bool, dry_run: bool, skip_wiki_status: bool }
-UpdateData  { snapshot: Option<String> }
+UpdateLocal  { force: bool, dry_run: bool, skip_wiki_status: bool, from: Option<String> }
+UpdateData   { snapshot: Option<String>, from: Option<String> }
+UpdateAssets { from: Option<String> }
+UpdateCheck  { snapshot: Option<String>, skip_icon_status: bool, from: Option<String> }
 ```
 
-- **参数**：只暴露跨步骤有意义的（`force`/`dry_run`/`skip_wiki_status`、`snapshot`）；步骤内部参数沿用缺省，避免把 36 个作业的参数拼成一张大表。`update-data` 不暴露各步 `output`（路径语义各步不同），需要产物时单独跑原作业。
-- **资源**：取各步并集——`update-local` = `scripts_tree` + `ktools_out` + `anim_out`；`update-data` = `wiki` + `out`。简单、保守；代价是长任务期间挡住同键的独立作业。
-- **失败语义**：fail-fast，错误消息带步骤名（`<step> 步骤失败：…`）；已完成步骤的产物保留，子作业幂等，重跑即可。
-- **报告**：沿用 `CaptureReporter`，返回 `{ status, steps: [{ step, result }] }`，`--report-json` 直接落盘。
-- **契约**：`job_spec.rs`（行）、`kind.rs`（变体）、`commands/mod.rs`（`CLI_EXT` + 构造臂）、前端 `JOB_DEFS` 四处已对齐，契约测试覆盖。
-- **可选增强**：`--from <step>` 支持断点重跑（对齐 `update-scan` 的 `state.json` 先例）；`update-assets`/`update-check` 尚未实施。
+- **参数**：只暴露跨步骤有意义的（`force`/`dry_run`/`skip_wiki_status`、`snapshot`、`from`）；步骤内部参数沿用缺省，避免把 38 个作业的参数拼成一张大表。`update-data`/`update-assets` 不暴露各步 `output`（路径语义各步不同），需要产物时单独跑原作业。
+- **断点重跑**：`--from <step>` 跳过之前的步骤并在报告里给出 `skipped[]`；非法步骤在 `JobKind::validate` 阶段被拒（CLI/Web 都走这里），错误消息列出有效值。
+- **资源**：取各步并集——`update-local` = `scripts_tree` + `ktools_out` + `anim_out`；`update-data` = `wiki` + `out`；`update-assets` = `wiki` + `out` + `ktools_out`；`update-check` = `ktools_out`。简单、保守；代价是长任务期间挡住同键的独立作业。
+- **失败语义**：除 `update-check` 外 fail-fast，错误消息带步骤名（`<step> 步骤失败：…`）；已完成步骤的产物保留，子作业幂等，重跑即可。`update-check` 按 continue-on-error，报告 `status` 为 `success`/`partial`/`failed`。
+- **报告**：沿用 `CaptureReporter`，返回 `{ status, skipped, steps: [{ step, result }] }`（`update-check` 每步另有 `status`/`error`），`--report-json` 直接落盘；WebUI 任务详情按 `Reporter::step` 渲染为可折叠步骤。
+- **契约**：`job_spec.rs`（行）、`kind.rs`（变体）、`commands/mod.rs`（`CLI_EXT` + 构造臂）、前端 `JOB_DEFS` 四处已对齐；契约测试覆盖名称、CLI 旗标与前端键集合。
 
 **为什么不直接做一个通用 DAG 执行器**：参数 schema、互斥锁、前端表单都会爆炸；更新流程本身是固定的 4 条链，preset 更可测。
 
@@ -176,7 +178,7 @@ UpdateData  { snapshot: Option<String> }
 
 ## 6. 风险与注意
 
-1. **粗粒度 `out`**：`update-scan`、`update-index`、`cooking-game-export`、各 maintain-* 都声明 `out`，WebUI 里天然互斥。若要真并行，先把 `out` 拆成 `out/scan`、`out/ktools` 等子键——这是独立改造，不要混在编排任务里做。
+1. **粗粒度 `out`（部分已拆）**：`update-scan` → `out/scan`、`update-index` → `out/atlas`、`cooking-game-export` → `out/cooking`、`skin-index` → `out/skin-index` 已各自独立，可与 maintain-* 并发。仍共用 `out` 的是各 maintain-*（都持 `wiki` 锁，拆分无收益）、调试类作业（`--output` 可为任意路径，锁只能按默认目录近似）。自定义 `--output` 指向同一目录时不再互斥，这是已知取舍。
 2. **长事务的部分写入**：`update-data` 中途失败会留下"已写 2/4"。子作业幂等，但报告必须明确边界；必要时先 `--dry-run` 全量跑一遍。
 3. **`images-sync` 的隐式维基读**：它默认查上传状态（spec 已标 `Read`），但不持 `wiki` 锁。与写站任务并发时共享 QPS 配额（默认 1），长任务会让写站排队；需要时用 `--skip-wiki-status`。
 4. **bot 窗口**：`Data:DST Prefab/*` 由他方 bot 在更新后 1~3 天同步，`update-check`/`update-scan` 的结论要标注窗口，避免把"尚未同步"当成缺口。

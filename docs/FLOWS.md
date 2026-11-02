@@ -108,11 +108,25 @@
 ## update-local 更新后本地摄取编排（纯本地）
 固定顺序 `scripts-sync → images-sync → anim-sync`，缺省串行；任一步失败即中止（错误消息带步骤名），已完成步骤的产物保留。
 - 顺序约束：`images-sync` 的图标名称映射读 live `scripts/` 下的 PO，必须等 `scripts-sync` 换树完成；`anim-sync` 与前两步无依赖，放最后收尾版本。
-- `--force`/`--dry_run`/`--skip_wiki_status` 同时作用于三步；`--report-json` 输出 `{status, steps[]}` 聚合报告。
+- `--force`/`--dry_run`/`--skip_wiki_status` 同时作用于三步；`--report-json` 输出 `{status, skipped[], steps[]}` 聚合报告。
+- `--from <step>` 从指定步骤开始（`scripts-sync`/`images-sync`/`anim-sync`），跳过之前的步骤，用于失败后断点重跑；非法步骤在提交/校验阶段报错并列出有效值。
 - 原作业仍可单独运行；需要单步参数（如 `state_path`）时直接跑原命令。
 
 ## update-data 更新后数据页编排（写维基）
 固定顺序 `maintain-copy-clip → maintain-dst-recipes → maintain-item-table → maintain-strings`，共用 `--snapshot` 与写入模式（`--yes`/`--dry-run`/交互确认）。
 - 顺序约束：新制作站键必须先写入 CraftingNames，否则 wiki 端 `模块:DSTRecipe.get_recipe_filter_cn` 会 assert。
 - `maintain-strings` 固定 `version=DST`、默认等分桶；只写变化桶页，索引最后写。
-- 任一步失败即中止（错误带步骤名）；各步自身幂等，重跑即可。不暴露各步 `output`，需要本地产物时单独跑原作业。
+- 任一步失败即中止（错误带步骤名）；各步自身幂等，重跑即可。`--from <step>` 可从 `maintain-copy-clip`/`maintain-dst-recipes`/`maintain-item-table`/`maintain-strings` 起跑，但跳过 copy-clip 前必须确认 CraftingNames 已覆盖新键。
+- 不暴露各步 `output`，需要本地产物时单独跑原作业。
+
+## update-assets 更新后素材编排（写维基）
+固定顺序 `upload-icons → skilltree-wiki`，共用写入模式；任一步失败即中止。
+- 顺序约束：`skilltree-wiki` 的 `icon_url` 只回填站内已存在的图，必须等图标上传完成，否则留空并进 `missing_icon_urls`。
+- `upload-icons` 用缺省参数（全部来源、`only_missing`）；需要单文件/指定 build 时单独跑原作业。
+- `--from upload-icons|skilltree-wiki` 可跳过已完成的步骤。
+
+## update-check 更新后只读核对（continue-on-error）
+固定顺序 `maintain-template-check` + `prefab-overrides-audit`，两步互不依赖，按 continue-on-error 执行：一项失败不影响另一项。
+- 共用 `--snapshot`；`--skip_icon_status` 只作用于模板检查（离线/无凭据）。
+- 作业本身返回成功，报告 `status` 为 `success`/`partial`/`failed`，失败步骤在 `steps[].error` 给出原因并同时记 error 级日志。
+- 前提：`update-data` 与 `update-assets` 已跑完，否则「别名未写入/图标未上传」会被报成 error（假阳性）。

@@ -143,12 +143,29 @@ const JOB_DEFS = {
       { k: "force", type: "check", label: "三步都忽略版本/幂等检查，强制重跑" },
       { k: "dry_run", type: "check", label: "演练：三步都只报告计划、不写任何文件" },
       { k: "skip_wiki_status", type: "check", label: "跳过 images-sync 的维基上传状态查询" },
+      { k: "from", label: "从该步骤开始（scripts-sync / images-sync / anim-sync，留空=从头）" },
     ],
   },
   update_data: {
     label: "update-data 更新后数据页同步 → 维基", wiki: true,
     fields: [
       { k: "snapshot", label: "四步共用的 scripts 快照目录名（可选，留空=最新/live 树）" },
+      { k: "from", label: "从该步骤开始（copy-clip / dst-recipes / item-table / strings，留空=从头）" },
+    ],
+  },
+  update_assets: {
+    label: "update-assets 更新后素材同步（icons → skilltree）", wiki: true,
+    fields: [
+      { k: "from", label: "从该步骤开始（upload-icons / skilltree-wiki，留空=从头）" },
+    ],
+  },
+  update_check: {
+    label: "update-check 更新后只读核对（模板 + 预制体审计）",
+    readonly: true,
+    fields: [
+      { k: "snapshot", label: "两步共用的 scripts 快照目录名（可选）" },
+      { k: "skip_icon_status", type: "check", label: "跳过模板检查的图标存在性查询" },
+      { k: "from", label: "从该步骤开始（maintain-template-check / prefab-overrides-audit）" },
     ],
   },
 };
@@ -212,7 +229,9 @@ export async function pageJobs(main) {
         return `<label>${esc(label)}<input style="width:100%" data-field="${k}" value="${esc(defaultValue)}"></label>`;
       }).join("");
     const hasDryRun = hasDryRunField(def);
-    $("#jobHint").textContent = def.wiki
+    $("#jobHint").textContent = def.readonly
+      ? "只读核对：不写维基、不修改本地文件，可直接提交。"
+      : def.wiki
       ? "涉及维基写入的任务在维基干跑下只生成 diff 预览；取消勾选并经确认后直接写入。"
       : hasDryRun
         ? "纯本地任务不写维基；其参数中的“演练”勾选决定是否真实改动本地文件。"
@@ -242,7 +261,7 @@ export async function pageJobs(main) {
       if (!body.wiki_dry_run && !confirm("已关闭维基干跑：任务可能直接修改维基页面。确定继续？")) return;
     } else if (hasDryRunField(def) && !body.dry_run) {
       if (!confirm(`${def.label} 将真实执行本地文件操作（非演练）。确定继续？`)) return;
-    } else if (!hasDryRunField(def)) {
+    } else if (!def.readonly && !hasDryRunField(def)) {
       if (!confirm(`${def.label} 将真实执行本地文件操作。确定继续？`)) return;
     }
     try {

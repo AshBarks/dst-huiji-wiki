@@ -453,6 +453,28 @@ static CLI_EXT: &[CliExt] = &[
         report_json: true,
         local_dry_run: false,
     },
+    CliExt {
+        name: "update-assets",
+        about: "更新后素材编排：upload-icons → skilltree-wiki（任一步失败即中止）",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: true,
+        report_json: true,
+        local_dry_run: false,
+    },
+    CliExt {
+        name: "update-check",
+        about: "更新后只读核对：maintain-template-check + prefab-overrides-audit（continue-on-error）",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: true,
+        local_dry_run: false,
+    },
 ];
 
 fn ext(name: &str) -> &'static CliExt {
@@ -466,7 +488,7 @@ fn ext(name: &str) -> &'static CliExt {
 // clap 命令构建
 // ---------------------------------------------------------------------------
 
-/// 构建完整 CLI（顶层 + serve + 36 个 job 子命令）。
+/// 构建完整 CLI（顶层 + serve + 38 个 job 子命令）。
 pub fn command() -> Command {
     let mut top = Command::new("dst-huiji-wiki")
         .about("饥荒联机版维基维护工具")
@@ -989,9 +1011,19 @@ fn job_from_matches(
             force: flag(m, "force"),
             dry_run: flag(m, "dry_run"),
             skip_wiki_status: flag(m, "skip_wiki_status"),
+            from: opt_val(m, "from"),
         },
         "update-data" => JobKind::UpdateData {
             snapshot: opt_val(m, "snapshot"),
+            from: opt_val(m, "from"),
+        },
+        "update-assets" => JobKind::UpdateAssets {
+            from: opt_val(m, "from"),
+        },
+        "update-check" => JobKind::UpdateCheck {
+            snapshot: opt_val(m, "snapshot"),
+            skip_icon_status: flag(m, "skip_icon_status"),
+            from: opt_val(m, "from"),
         },
         other => unreachable!("未实现构造臂的 job: {other}"),
     })

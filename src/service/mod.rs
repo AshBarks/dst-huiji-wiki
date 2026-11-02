@@ -379,9 +379,35 @@ async fn execute_job_inner(
             force,
             dry_run,
             skip_wiki_status,
-        } => pipelines::run_update_local(*force, *dry_run, *skip_wiki_status, reporter).await,
-        JobKind::UpdateData { snapshot } => {
-            pipelines::run_update_data(snapshot.clone(), reporter, mode).await
+            from,
+        } => {
+            pipelines::run_update_local(
+                *force,
+                *dry_run,
+                *skip_wiki_status,
+                from.as_deref(),
+                reporter,
+            )
+            .await
+        }
+        JobKind::UpdateData { snapshot, from } => {
+            pipelines::run_update_data(snapshot.clone(), from.as_deref(), reporter, mode).await
+        }
+        JobKind::UpdateAssets { from } => {
+            pipelines::run_update_assets(from.as_deref(), reporter, mode).await
+        }
+        JobKind::UpdateCheck {
+            snapshot,
+            skip_icon_status,
+            from,
+        } => {
+            pipelines::run_update_check(
+                snapshot.clone(),
+                *skip_icon_status,
+                from.as_deref(),
+                reporter,
+            )
+            .await
         }
         JobKind::AnimDiff { old, new, zip } => {
             run_anim_diff(
@@ -833,7 +859,7 @@ mod tests {
         let jobs = JobKind::all_variants();
         assert_eq!(
             jobs.len(),
-            36,
+            38,
             "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
         );
         let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();
@@ -870,6 +896,7 @@ mod tests {
             "upload-icons",
             "create-redirect",
             "update-data",
+            "update-assets",
         ]
         .into_iter()
         .collect();

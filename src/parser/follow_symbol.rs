@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// `anim-index` 跟随关系数据的版本；缺失该字段的旧产物视为 0。
-pub const FOLLOW_INDEX_VERSION: u32 = 2;
+pub const FOLLOW_INDEX_VERSION: u32 = 3;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -76,6 +76,9 @@ pub struct FollowFxRecord {
     /// Receiver 绑定的 `SpawnPrefab("x")` 目标（未解析时用于跨文件回填）。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub spawn_prefab: Option<String>,
+    /// Follower 是粒子/光源 FX（无 `AnimState`），无法用精灵合成，UI 不建挂点。
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub non_sprite: bool,
     pub confidence: FollowConfidence,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prefab: Option<String>,
@@ -115,6 +118,7 @@ pub fn parse_follow_symbols_and_entities(
         bindings: collector.bindings,
         consts: collector.consts,
         prefabs: collector.prefabs,
+        inline_entities: collector.inline_prefabs,
         prefab_fns,
         prefab: prefab.map(str::to_string),
         records: Vec::new(),
@@ -125,21 +129,27 @@ pub fn parse_follow_symbols_and_entities(
 }
 
 fn prefab_entities(collector: &FunctionCollector) -> BTreeMap<String, PrefabEntityConfig> {
-    collector
-        .prefabs
+    let mut entities: BTreeMap<String, PrefabEntityConfig> = collector
+        .inline_prefabs
         .iter()
-        .filter_map(|(prefab_name, function)| {
-            let func = collector.funcs.get(function)?;
-            let entity = func.entities.get("inst").or_else(|| {
-                if func.entities.len() == 1 {
-                    func.entities.values().next()
-                } else {
-                    None
-                }
-            })?;
-            Some((prefab_name.clone(), PrefabEntityConfig::from_entity(entity)))
-        })
-        .collect()
+        .map(|(name, entity)| (name.clone(), PrefabEntityConfig::from_entity(entity)))
+        .collect();
+    for (prefab_name, function) in &collector.prefabs {
+        let Some(func) = collector.funcs.get(function) else {
+            continue;
+        };
+        let Some(entity) = func.entities.get("inst").or_else(|| {
+            if func.entities.len() == 1 {
+                func.entities.values().next()
+            } else {
+                None
+            }
+        }) else {
+            continue;
+        };
+        entities.insert(prefab_name.clone(), PrefabEntityConfig::from_entity(entity));
+    }
+    entities
 }
 
 /// Resolves records whose `receiver` is a cross-file `SpawnPrefab("x")` by
@@ -160,6 +170,10 @@ pub fn resolve_cross_file_follows(
         let Some(def) = entities.get(name) else {
             continue;
         };
+        if !def.has_anim_state && (def.has_vfx_effect || def.has_light) {
+            record.non_sprite = true;
+            continue;
+        }
         let Some(animation) = def.animation.clone() else {
             continue;
         };
@@ -192,6 +206,9 @@ pub struct PrefabEntityConfig {
     pub bank: Option<String>,
     pub build: Option<String>,
     pub animation: Option<String>,
+    pub has_anim_state: bool,
+    pub has_vfx_effect: bool,
+    pub has_light: bool,
     pub final_offset: Option<i32>,
     pub mult_colour: Option<[f32; 4]>,
     pub add_colour: Option<[f32; 4]>,
@@ -204,6 +221,9 @@ impl PrefabEntityConfig {
             bank: entity.bank.clone(),
             build: entity.build.clone(),
             animation: entity.anim.clone(),
+            has_anim_state: entity.has_anim_state,
+            has_vfx_effect: entity.has_vfx_effect,
+            has_light: entity.has_light,
             final_offset: entity.final_offset,
             mult_colour: entity.mult_colour,
             add_colour: entity.add_colour,
@@ -253,6 +273,14 @@ struct EntityAnim {
     bank: Option<String>,
     build: Option<String>,
     anim: Option<String>,
+    bank_param: Option<usize>,
+    build_param: Option<usize>,
+    /// `entity:AddAnimState()` was seen for this entity.
+    has_anim_state: bool,
+    /// `entity:AddVFXEffect()` was seen (particle FX).
+    has_vfx_effect: bool,
+    /// `entity:AddLight()` was seen.
+    has_light: bool,
     anim_param: Option<usize>,
     final_offset: Option<i32>,
     mult_colour: Option<[f32; 4]>,
@@ -271,6 +299,15 @@ impl EntityAnim {
         if other.anim.is_some() {
             self.anim = other.anim.clone();
         }
+        if other.bank_param.is_some() {
+            self.bank_param = other.bank_param;
+        }
+        if other.build_param.is_some() {
+            self.build_param = other.build_param;
+        }
+        self.has_anim_state |= other.has_anim_state;
+        self.has_vfx_effect |= other.has_vfx_effect;
+        self.has_light |= other.has_light;
         if other.anim_param.is_some() {
             self.anim_param = other.anim_param;
         }
@@ -312,6 +349,7 @@ struct FunctionCollector {
     consts: BTreeMap<String, String>,
     anim_aliases: BTreeMap<String, String>,
     prefabs: BTreeMap<String, String>,
+    inline_prefabs: BTreeMap<String, EntityAnim>,
     stack: Vec<(String, usize)>,
     pending: Vec<String>,
     body_depth: usize,
@@ -441,8 +479,39 @@ impl Visitor for FunctionCollector {
             } else {
                 None
             };
+            let bank_param = if method_name == "SetBank" {
+                args.first().and_then(|arg| param_index(func, arg))
+            } else {
+                None
+            };
+            let build_param = if method_name == "SetBuild" {
+                args.first().and_then(|arg| param_index(func, arg))
+            } else {
+                None
+            };
             let entity = func.entities.entry(entity_path).or_default();
-            apply_anim_state_method(entity, &method_name, &args, consts, anim_param);
+            // Any AnimState method implies the entity has a sprite state, even
+            // if the `AddAnimState()` call itself was not matched.
+            entity.has_anim_state = true;
+            apply_anim_state_method(
+                entity,
+                &method_name,
+                &args,
+                consts,
+                anim_param,
+                bank_param,
+                build_param,
+            );
+            return;
+        }
+        if let Some((path, method)) = component_call(call) {
+            let entity = func.entities.entry(path).or_default();
+            match method.as_str() {
+                "AddAnimState" => entity.has_anim_state = true,
+                "AddVFXEffect" => entity.has_vfx_effect = true,
+                "AddLight" => entity.has_light = true,
+                _ => {}
+            }
             return;
         }
         if let Some((path, method)) = follow_symbol_call(call) {
@@ -461,14 +530,43 @@ impl FunctionCollector {
         let Some(ast::Expression::String(name)) = args.first() else {
             return;
         };
-        let Some(function) = args.get(1).and_then(|expr| match expr {
-            ast::Expression::Var(ast::Var::Name(name)) => Some(name.token().to_string()),
-            _ => None,
-        }) else {
-            return;
+        let prefab_name = extract_string_literal(&name.to_string());
+        match args.get(1) {
+            Some(ast::Expression::Var(ast::Var::Name(function))) => {
+                self.prefabs
+                    .insert(prefab_name, function.token().to_string());
+            }
+            // `Prefab("x", function() return fn("bank") end, ...)`：把内层
+            // 调用的实参代进 fn 的种子/构建参数。
+            Some(ast::Expression::Function(function)) => {
+                if let Some(entity) = self.inline_return_entity(function.body()) {
+                    self.inline_prefabs.insert(prefab_name, entity);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn inline_return_entity(&self, body: &ast::FunctionBody) -> Option<EntityAnim> {
+        let expr = return_expression(body.block());
+        let ast::Expression::FunctionCall(call) = expr? else {
+            return None;
         };
-        self.prefabs
-            .insert(extract_string_literal(&name.to_string()), function);
+        let callee = simple_callee(call)?;
+        let func = self.funcs.get(&callee)?;
+        let mut entity = func
+            .entities
+            .get("inst")
+            .or_else(|| {
+                if func.entities.len() == 1 {
+                    func.entities.values().next()
+                } else {
+                    None
+                }
+            })?
+            .clone();
+        apply_entity_params(&mut entity, &call_args(call), &self.consts);
+        Some(entity)
     }
 }
 
@@ -477,6 +575,7 @@ struct FollowResolver {
     bindings: BTreeMap<String, Binding>,
     consts: BTreeMap<String, String>,
     prefabs: BTreeMap<String, String>,
+    inline_entities: BTreeMap<String, EntityAnim>,
     prefab_fns: BTreeSet<String>,
     prefab: Option<String>,
     records: Vec<FollowFxRecord>,
@@ -551,10 +650,11 @@ impl FollowResolver {
             .cloned();
         let bound = match self.bindings.get(path) {
             Some(Binding::Factory(callee)) => self.function_entity(callee, None),
-            Some(Binding::Spawn(name)) => self
-                .prefabs
-                .get(name)
-                .and_then(|function| self.function_entity(function, None)),
+            Some(Binding::Spawn(name)) => self.inline_entities.get(name).cloned().or_else(|| {
+                self.prefabs
+                    .get(name)
+                    .and_then(|function| self.function_entity(function, None))
+            }),
             Some(Binding::Alias(target)) => self.entity_for_depth(target, depth + 1),
             None => None,
         };
@@ -597,6 +697,8 @@ impl FollowResolver {
         } else {
             None
         };
+        // 有 AnimState 的才是精灵；只有 VFX/Light 的跟随者是粒子特效，无法合成。
+        let non_sprite = !entity.has_anim_state && (entity.has_vfx_effect || entity.has_light);
         self.records.push(FollowFxRecord {
             anchor: anchor.to_string(),
             bank: entity.bank,
@@ -612,6 +714,7 @@ impl FollowResolver {
             random_frame: entity.random_frame,
             receiver: receiver.to_string(),
             spawn_prefab,
+            non_sprite,
             confidence,
             prefab: self.prefab.clone(),
         });
@@ -692,16 +795,8 @@ impl FollowResolver {
             .cloned()
             .or_else(|| self.function_entity(callee, Some(&path)))
             .unwrap_or_default();
-        let animation = match entity.anim_param {
-            Some(index) => args
-                .get(index)
-                .and_then(|expr| resolve_string(expr, &self.consts))
-                .map(|(value, _)| value),
-            None => entity.anim.clone(),
-        };
-        if animation.is_some() {
-            entity.anim = animation.clone();
-        }
+        apply_entity_params(&mut entity, &args, &self.consts);
+        let animation = entity.anim.clone();
         let offset = [
             func.follow_offset.0.unwrap_or(0.0),
             func.follow_offset.1.unwrap_or(0.0),
@@ -900,22 +995,52 @@ fn anim_state_call<'a>(
     Some((entity_path, method_name, method_args(method)))
 }
 
+fn apply_entity_params(
+    entity: &mut EntityAnim,
+    args: &[&ast::Expression],
+    consts: &BTreeMap<String, String>,
+) {
+    if let Some(index) = entity.bank_param.take() {
+        if let Some((value, _)) = args.get(index).and_then(|arg| resolve_string(arg, consts)) {
+            entity.bank = Some(value);
+        }
+    }
+    if let Some(index) = entity.build_param.take() {
+        if let Some((value, _)) = args.get(index).and_then(|arg| resolve_string(arg, consts)) {
+            entity.build = Some(value);
+        }
+    }
+    if let Some(index) = entity.anim_param.take() {
+        if let Some((value, _)) = args.get(index).and_then(|arg| resolve_string(arg, consts)) {
+            entity.anim = Some(value);
+        }
+    }
+}
+
 fn apply_anim_state_method(
     entity: &mut EntityAnim,
     method: &str,
     args: &[&ast::Expression],
     consts: &BTreeMap<String, String>,
     anim_param: Option<usize>,
+    bank_param: Option<usize>,
+    build_param: Option<usize>,
 ) {
     match method {
         "SetBank" => {
             if let Some((value, _)) = args.first().and_then(|arg| resolve_string(arg, consts)) {
                 entity.bank = Some(value);
+                entity.bank_param = None;
+            } else {
+                entity.bank_param = bank_param;
             }
         }
         "SetBuild" => {
             if let Some((value, _)) = args.first().and_then(|arg| resolve_string(arg, consts)) {
                 entity.build = Some(value);
+                entity.build_param = None;
+            } else {
+                entity.build_param = build_param;
             }
         }
         "PlayAnimation" => {
@@ -1045,6 +1170,34 @@ fn extract_string_literal(raw: &str) -> String {
     } else {
         s.to_string()
     }
+}
+
+fn return_expression(block: &ast::Block) -> Option<&ast::Expression> {
+    if let Some(ast::LastStmt::Return(ret)) = block.last_stmt() {
+        if let Some(expr) = ret.returns().iter().next() {
+            return Some(expr);
+        }
+    }
+    None
+}
+
+fn component_call(call: &ast::FunctionCall) -> Option<(String, String)> {
+    let suffixes: Vec<&ast::Suffix> = call.suffixes().collect();
+    let ast::Suffix::Call(ast::Call::MethodCall(method)) = suffixes.last().copied()? else {
+        return None;
+    };
+    let method_name = method.name().token().to_string();
+    if !matches!(
+        method_name.as_str(),
+        "AddAnimState" | "AddVFXEffect" | "AddLight"
+    ) {
+        return None;
+    }
+    let path = path_from(call.prefix(), &suffixes[..suffixes.len() - 1])?;
+    Some((
+        path.strip_suffix(".entity").unwrap_or(&path).to_string(),
+        method_name,
+    ))
 }
 
 fn table_field_key(field: &ast::Field) -> Option<String> {
@@ -1386,5 +1539,66 @@ end
         assert_eq!(records[0].build.as_deref(), Some("gestalt_head"));
         assert_eq!(records[0].final_offset, Some(1));
         assert_eq!(records[0].confidence, FollowConfidence::Resolved);
+        assert!(!records[0].non_sprite);
+    }
+    #[test]
+    fn marks_particle_fx_as_non_sprite() {
+        let source = r#"
+local function fn()
+    local inst = CreateEntity()
+    local fx = CreateEntity()
+    fx.entity:AddVFXEffect()
+    fx.Follower:FollowSymbol(inst.GUID, "smoke_follow", 0, 0, 0)
+end
+"#;
+        let records = parse_follow_symbols(source).unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].animation, None);
+        assert!(records[0].non_sprite, "只有 VFXEffect 的 follower 不是精灵");
+    }
+
+    #[test]
+    fn marks_cross_file_particle_target_as_non_sprite() {
+        let defs_source = r#"
+local function smoke_fn()
+    local inst = CreateEntity()
+    inst.entity:AddVFXEffect()
+    return inst
+end
+return Prefab("smoke_fx", smoke_fn, {})
+"#;
+        let (_, entities) = parse_follow_symbols_and_entities(defs_source, Some("smoke")).unwrap();
+        let fx_source = r#"
+local function fn()
+    local inst = CreateEntity()
+    inst._smoke = SpawnPrefab("smoke_fx")
+    inst._smoke.Follower:FollowSymbol(inst.GUID, "smoke_follow", 0, 0, 0)
+end
+"#;
+        let mut records = parse_follow_symbols(fx_source).unwrap();
+        assert!(!records[0].non_sprite, "解析阶段还不知道跨文件目标是粒子");
+        assert_eq!(resolve_cross_file_follows(&mut records, &entities), 0);
+        assert!(records[0].non_sprite, "跨文件目标无 AnimState 时应标记");
+    }
+
+    #[test]
+    fn resolves_inline_prefab_wrapper_parameters() {
+        let source = r#"
+local function make(bank)
+    local inst = CreateEntity()
+    inst.AnimState:SetBank(bank)
+    inst.AnimState:SetBuild(bank)
+    inst.AnimState:PlayAnimation("idle", true)
+    return inst
+end
+return Prefab("gestalt_head", function() return make("brightmare_gestalt_head") end, {})
+"#;
+        let (_, entities) =
+            parse_follow_symbols_and_entities(source, Some("gestalt_head")).unwrap();
+        let entity = entities.get("gestalt_head").expect("inline prefab entity");
+        assert_eq!(entity.bank.as_deref(), Some("brightmare_gestalt_head"));
+        assert_eq!(entity.build.as_deref(), Some("brightmare_gestalt_head"));
+        assert_eq!(entity.animation.as_deref(), Some("idle"));
+        assert!(entity.has_anim_state);
     }
 }

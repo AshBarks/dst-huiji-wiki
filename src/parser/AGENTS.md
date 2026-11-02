@@ -51,7 +51,7 @@ src/parser/
 |------|----------|-------|
 | Extract symbol remap calls | `anim_override.rs` → `parse_anim_overrides_in` | Only string-literal args; groups via `SymbolRemapIndex::from_calls` |
 | Extract clothing symbol tables | `clothing_overrides.rs` → `parse_clothing_overrides` | `CLOTHING = {...}`; resolve via `ClothingEntry::resolve_overrides(name, character, skintype)` |
-| Extract follow-FX relations | `follow_symbol.rs` → `parse_follow_symbols_in` / `parse_follow_symbols_and_entities` | `Follower:FollowSymbol` 挂点 → 跟随动画；本地工厂 + 参数化工厂 + 表构造器绑定；跨文件 `SpawnPrefab` 记 `spawn_prefab`，由 `anim-index` 第二遍 `resolve_cross_file_follows` 回填 |
+| Extract follow-FX relations | `follow_symbol.rs` → `parse_follow_symbols_in` / `parse_follow_symbols_and_entities` | `Follower:FollowSymbol` 挂点 → 跟随动画；本地工厂 + 参数化工厂 + 表构造器绑定；跨文件 `SpawnPrefab` 记 `spawn_prefab`，由 `anim-index` 第二遍 `resolve_cross_file_follows` 回填（含 inline 包装参数）；只有 VFX/Light 的 follower 标 `non_sprite` |
 | Add a new Lua data parser | `src/parser/<name>.rs` | Full_moon AST, re-export in mod.rs |
 | Query Lua var/field locations | `lua.rs` → `LuaParser::locate_*` | Generic, returns byte-offset locations |
 | Parse .po translation files | `po.rs` → `PoParser::parse` | Nom combinators, returns PoFile |

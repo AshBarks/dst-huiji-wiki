@@ -191,6 +191,8 @@ pub struct AnimIndexStats {
     pub skipped_pkgref_dyn: usize,
     /// 跨文件 `SpawnPrefab("x")` 回填成功的 FollowSymbol 关系数（去重）。
     pub follow_cross_resolved: usize,
+    /// Follower 是粒子/光源 FX（无 AnimState）的关系数（去重）。
+    pub follow_non_sprite: usize,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -350,6 +352,20 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
         }
     }
     let follow_cross_resolved = cross_resolved_keys.len();
+    let mut non_sprite_keys = BTreeSet::new();
+    for record in &prefab_records {
+        for fx in &record.follow_fx {
+            if fx.non_sprite {
+                non_sprite_keys.insert((
+                    record.prefab_file.clone(),
+                    fx.anchor.clone(),
+                    fx.receiver.clone(),
+                    fx.spawn_prefab.clone(),
+                ));
+            }
+        }
+    }
+    let follow_non_sprite = non_sprite_keys.len();
 
     // Tier-C 覆盖面：重映射调用也大量存在于 stategraphs（SG*.lua）与
     // components（skinner 等）。这些目录不做 prefab 结构扫描，仅提取调用。
@@ -436,6 +452,7 @@ pub fn run_index(params: &AnimIndexParams, reporter: &dyn Reporter) -> Result<se
             multi_anim_files,
             skipped_pkgref_dyn,
             follow_cross_resolved,
+            follow_non_sprite,
         },
         prefabs: prefab_records,
         anim_files,

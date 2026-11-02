@@ -462,7 +462,10 @@ export async function pageAnimAssets(main) {
         if (previous[key]) anchors.add(key);
         continue;
       }
-      const recs = byAnchor.get(key) || [];
+      const allRecs = byAnchor.get(key) || [];
+      const recs = allRecs.filter(record => !record.non_sprite);
+      // 记录存在但全是粒子/光源 FX：精灵合成不可能，不建挂点（也不走名字启发式）。
+      if (allRecs.length && !recs.length) continue;
       const resolved = recs.find(record => record.animation);
       if (resolved) {
         anchors.add(key);
@@ -1005,7 +1008,7 @@ export async function pageAnimAssets(main) {
             </details>
           </div>`;
       }).join("");
-      const staleIndex = state.source === "prefab" && state.followIndexVersion < 2
+      const staleIndex = state.source === "prefab" && state.followIndexVersion < 3
         ? '<p style="color:var(--warn);font-size:12px;margin:0 0 6px">当前 anim-index 未包含最新 FollowSymbol 数据（旧产物），挂点仅用启发式候选；建议重跑 <code>anim-index</code>。</p>'
         : "";
       $("#symbolDeps").innerHTML = staleIndex + (symHtml || '<p class="muted">无 symbol 依赖</p>');

@@ -11,6 +11,6 @@ pub mod game_source;
 pub mod progress;
 
 pub use progress::{
-    decide_write, CaptureReporter, ConfirmMode, JobEvent, LogLevel, Reporter, StdoutReporter,
-    WriteDecision, WriteMode,
+    decide_write, CaptureReporter, ConfirmMode, JobDigest, JobEvent, LogLevel, ProgressDigest,
+    Reporter, StdoutReporter, WriteDecision, WriteMode,
 };

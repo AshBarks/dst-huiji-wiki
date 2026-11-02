@@ -261,12 +261,38 @@ fn now_ms() -> u64 {
 
 const LOG_BUFFER_SIZE: usize = 4000;
 
+/// Latest batch progress, mirrored from the most recent [`JobEvent::Progress`].
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ProgressDigest {
+    pub label: String,
+    pub done: usize,
+    pub total: Option<usize>,
+}
+
+/// Incremental summary of the newest events of a job.
+///
+/// Maintained under the same lock as the ring buffer on every
+/// [`CaptureReporter::push`], so the WebUI job list (`GET /api/jobs`) can read
+/// it in O(1) instead of cloning the whole buffer (which contains full-page
+/// [`JobEvent::Diff`] texts) for every job on every poll.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct JobDigest {
+    pub last_stage: Option<String>,
+    pub stage_index: Option<usize>,
+    pub stage_total: Option<usize>,
+    pub last_log: Option<String>,
+    pub warn_count: usize,
+    pub error_count: usize,
+    pub progress: Option<ProgressDigest>,
+}
+
 /// Records job output into an in-memory ring buffer and broadcasts it to
 /// live SSE subscribers. Confirmations are answered from a preset value so
 /// that web jobs never block on stdin.
 pub struct CaptureReporter {
     tx: broadcast::Sender<JobEvent>,
     logs: Mutex<VecDeque<JobEvent>>,
+    digest: Mutex<JobDigest>,
     seq: std::sync::atomic::AtomicU64,
     auto_confirm: bool,
 }
@@ -277,6 +303,7 @@ impl CaptureReporter {
         Self {
             tx,
             logs: Mutex::new(VecDeque::with_capacity(256)),
+            digest: Mutex::new(JobDigest::default()),
             seq: std::sync::atomic::AtomicU64::new(0),
             auto_confirm,
         }
@@ -295,8 +322,29 @@ impl CaptureReporter {
             .collect()
     }
 
+    /// Number of buffered events, without cloning them.
+    pub fn event_count(&self) -> usize {
+        self.logs.lock().expect("log mutex poisoned").len()
+    }
+
+    /// Cheap snapshot of the newest stage/log/progress for list views.
+    pub fn digest(&self) -> JobDigest {
+        self.digest.lock().expect("digest mutex poisoned").clone()
+    }
+
     fn push(&self, event: JobEvent) {
+        self.update_digest(&event);
         let mut logs = self.logs.lock().expect("log mutex poisoned");
+        // Consecutive progress events for the same label (e.g. one per uploaded
+        // file) would otherwise flush early logs out of the ring buffer. Keep
+        // only the latest one; live SSE subscribers still receive every event.
+        if let JobEvent::Progress { label, .. } = &event {
+            if let Some(JobEvent::Progress { label: prev, .. }) = logs.back() {
+                if prev == label {
+                    logs.pop_back();
+                }
+            }
+        }
         if logs.len() >= LOG_BUFFER_SIZE {
             logs.pop_front();
         }
@@ -304,6 +352,37 @@ impl CaptureReporter {
         drop(logs);
         // Sending fails when there are no subscribers; that is fine.
         let _ = self.tx.send(event);
+    }
+
+    fn update_digest(&self, event: &JobEvent) {
+        let mut d = self.digest.lock().expect("digest mutex poisoned");
+        match event {
+            JobEvent::Log { level, text, .. } => {
+                match level {
+                    LogLevel::Warn => d.warn_count += 1,
+                    LogLevel::Error => d.error_count += 1,
+                    LogLevel::Debug | LogLevel::Info => {}
+                }
+                d.last_log = Some(text.clone());
+            }
+            JobEvent::Stage {
+                name, index, total, ..
+            } => {
+                d.last_stage = Some(name.clone());
+                d.stage_index = *index;
+                d.stage_total = *total;
+            }
+            JobEvent::Progress {
+                label, done, total, ..
+            } => {
+                d.progress = Some(ProgressDigest {
+                    label: label.clone(),
+                    done: *done,
+                    total: *total,
+                });
+            }
+            JobEvent::Diff { .. } | JobEvent::Done { .. } => {}
+        }
     }
 
     fn next_seq(&self) -> u64 {
@@ -407,6 +486,45 @@ mod tests {
         assert_eq!(json[3]["type"], "progress");
         assert_eq!(json[3]["done"], 10);
         assert_eq!(json[3]["total"], 100);
+    }
+
+    #[test]
+    fn digest_tracks_latest_stage_log_and_progress() {
+        let r = CaptureReporter::new(true);
+        r.step(2, 4, "images-sync");
+        r.log("开始".into());
+        r.warn("慢".into());
+        r.progress("上传图标", 3, 10);
+
+        let d = r.digest();
+        assert_eq!(d.last_stage.as_deref(), Some("images-sync"));
+        assert_eq!(d.stage_index, Some(2));
+        assert_eq!(d.stage_total, Some(4));
+        assert_eq!(d.last_log.as_deref(), Some("慢"));
+        assert_eq!(d.warn_count, 1);
+        assert_eq!(d.error_count, 0);
+        let p = d.progress.expect("progress digest");
+        assert_eq!(p.label, "上传图标");
+        assert_eq!(p.done, 3);
+        assert_eq!(p.total, Some(10));
+        assert_eq!(r.event_count(), 4);
+    }
+
+    /// 同一 label 的连续 progress 只保留最后一条，避免批量上传把早先的
+    /// 日志挤出 4000 条环形缓冲。
+    #[test]
+    fn consecutive_progress_for_same_label_is_coalesced_in_buffer() {
+        let r = CaptureReporter::new(true);
+        r.progress("上传图标", 1, 100);
+        r.progress("上传图标", 2, 100);
+        r.progress("写入桶页", 1, 5);
+
+        assert_eq!(r.event_count(), 2);
+        match &r.snapshot_logs()[0] {
+            JobEvent::Progress { done, .. } => assert_eq!(*done, 2),
+            other => panic!("unexpected first event: {other:?}"),
+        }
+        assert_eq!(r.digest().progress.expect("progress").label, "写入桶页");
     }
 
     /// 自定义 Reporter 不实现 log_at 时仍然拿到带前缀的文本（向后兼容）。

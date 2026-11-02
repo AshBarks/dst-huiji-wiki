@@ -708,7 +708,9 @@ pub async fn run_upload_icons(
             let mut uploaded = Vec::new();
             let mut failed = Vec::new();
             for (i, file) in selected.iter().enumerate() {
-                reporter.progress(&format!("上传 {file}"), i + 1, selected.len());
+                // 固定 label：同一批上传的连续 progress 在环形缓冲里合并成一条，
+                // 具体文件名由成功/失败日志给出。
+                reporter.progress("上传图标", i + 1, selected.len());
                 let entry = &meta.icons[file];
                 let title = entry.title.clone().unwrap_or_default();
                 if title.is_empty() {

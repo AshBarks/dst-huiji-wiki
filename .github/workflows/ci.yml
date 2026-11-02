@@ -67,6 +67,14 @@ jobs:
       - name: Run clippy (dst-anim-tool, non-GUI)
         run: cargo clippy -p dst-anim-tool --no-default-features --features cli,gif --all-targets -- -D warnings
 
+      - name: Check WebUI JS syntax
+        # 只做语法级检查（ES modules 用 stdin + --input-type=module）；
+        # 浏览器交互冒烟见 docs/WEBUI_SMOKE.md，不进 CI 以免下载浏览器。
+        run: |
+          for f in src/web/assets/app.js src/web/assets/js/*.js src/web/assets/js/*.mjs src/web/assets/js/pages/*.js; do
+            node --input-type=module --check < "$f"
+          done
+
   build:
     name: Build
     runs-on: ubuntu-latest

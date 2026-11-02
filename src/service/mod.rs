@@ -860,7 +860,7 @@ mod tests {
         assert_eq!(
             jobs.len(),
             38,
-            "新增 JobKind 变体后请同步契约测试与前端 JOB_DEFS"
+            "新增 JobKind 变体后请同步契约测试与前端 JOB_UI"
         );
         let mut names: Vec<&str> = jobs.iter().map(|j| j.name()).collect();
         names.sort_unstable();
@@ -882,7 +882,7 @@ mod tests {
     }
 
     /// 契约：`touches_wiki()` 的集合固定为已知可写 job；新增可写变体必须
-    /// 显式更新本测试（并同步前端 JOB_DEFS 的 wiki 标记与确认流程）。
+    /// 显式更新本测试（并同步前端 `JOB_UI` 的确认流程）。
     #[test]
     fn contract_touches_wiki_is_the_expected_set() {
         let expected: std::collections::BTreeSet<&str> = [
@@ -908,53 +908,61 @@ mod tests {
         assert_eq!(actual, expected, "touches_wiki 集合漂移");
     }
 
-    /// 契约：前端 JOB_DEFS 的键必须是合法的 JobKind serde tag，
-    /// 保证 WebUI 提交的每个任务都能被 `/api/jobs` 反序列化。
+    /// 契约：前端 `JOB_UI` 的键必须是 `web_ui = true` 的作业，字段键必须在
+    /// 该作业的 `ParamSpec` 中，且有手写布局时不得漏掉必填参数。
+    ///
+    /// 下拉清单/标签/wiki 标记改由 `/api/jobs/specs` 从本表生成后，前端
+    /// 只剩"控件布局"这一处，测试把它钉在本表上。
     #[test]
-    fn contract_frontend_job_defs_keys_are_valid_serde_tags() {
+    fn contract_frontend_layout_matches_job_specs() {
         const JOBS_JS: &str = include_str!("../web/assets/js/jobs.js");
         let start = JOBS_JS
-            .find("const JOB_DEFS = {")
-            .expect("jobs.js 缺少 JOB_DEFS 定义");
-        let block_end = start + JOBS_JS[start..].find("\n};").expect("JOB_DEFS 块未闭合");
+            .find("const JOB_UI = {")
+            .expect("jobs.js 缺少 JOB_UI 定义");
+        let block_end = start + JOBS_JS[start..].find("\n};").expect("JOB_UI 块未闭合");
         let block = &JOBS_JS[start..block_end];
 
-        let tags: std::collections::BTreeSet<String> = JobKind::all_variants()
-            .iter()
-            .map(|j| {
-                serde_json::to_value(j).unwrap()["kind"]
-                    .as_str()
-                    .unwrap()
-                    .to_string()
-            })
-            .collect();
-
-        let mut keys = Vec::new();
-        for line in block.lines() {
+        // 顶格两空格的 `name: {` 是作业键；其后的 `k: "..."` 是字段键。
+        let mut entries: Vec<(String, Vec<String>)> = Vec::new();
+        for line in block.lines().skip(1) {
             let Some(rest) = line.strip_prefix("  ") else {
                 continue;
             };
             if rest.starts_with(' ') {
-                continue; // 嵌套字段行
-            }
-            let Some(idx) = rest.find(": {") else {
+                if let Some((_, fields)) = entries.last_mut() {
+                    if let Some(pos) = line.find("k: \"") {
+                        let after = &line[pos + 4..];
+                        let end = after.find('"').expect("字段键引号未闭合");
+                        fields.push(after[..end].to_string());
+                    }
+                }
                 continue;
-            };
-            let key = &rest[..idx];
-            if !key.is_empty()
-                && key
-                    .chars()
-                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
-            {
-                keys.push(key.to_string());
+            }
+            if let Some(idx) = rest.find(": {") {
+                entries.push((rest[..idx].to_string(), Vec::new()));
             }
         }
-        assert!(!keys.is_empty(), "未能从 app.js 解析出 JOB_DEFS 键");
-        for k in keys {
-            assert!(
-                tags.contains(&k),
-                "前端 JOB_DEFS 键 `{k}` 不是合法的 JobKind serde tag"
-            );
+        assert!(!entries.is_empty(), "未能从 jobs.js 解析出 JOB_UI 键");
+
+        for (tag, fields) in &entries {
+            let spec = JOB_SPECS
+                .iter()
+                .find(|s| s.name.replace('-', "_") == *tag)
+                .unwrap_or_else(|| panic!("JOB_UI 键 `{tag}` 不是已知 JobSpec"));
+            assert!(spec.web_ui, "`{tag}` 有前端布局但 web_ui=false");
+            for f in fields {
+                assert!(
+                    spec.param(f).is_some(),
+                    "作业 `{tag}` 的前端字段 `{f}` 不在 JobSpec params 中"
+                );
+            }
+            for p in spec.params.iter().filter(|p| p.required) {
+                assert!(
+                    fields.iter().any(|f| f == p.key),
+                    "作业 `{tag}` 缺少必填参数 `{}` 的前端字段",
+                    p.key
+                );
+            }
         }
     }
 

@@ -3,15 +3,14 @@
 
 import { esc, fmtTime, getJSON, postJSON, statusBadge, elFromHtml, $, routeTimerRef } from "./util.js";
 
-const JOB_DEFS = {
-  maintain_item_table: { label: "维护物品表 → 维基", wiki: true },
-  maintain_dst_recipes: { label: "维护配方表 → 维基", wiki: true },
+// 仅保留需要特殊控件/文案的作业布局；作业清单、标签、wiki 标记与参数
+// schema 全部来自 GET /api/jobs/specs（JobSpec 单一真源）。没有布局的
+// web_ui 作业按 ParamSpec 生成通用表单。
+const JOB_UI = {
   maintain_copy_clip: {
-    label: "维护模块常量 → 维基", wiki: true,
     fields: [{ k: "type", label: "类型：rbtl / tech / filters / names（留空=全部）" }],
   },
   maintain_strings: {
-    label: "维护 Strings 桶页 → 维基", wiki: true,
     fields: [
       { k: "version", label: "版本前缀（页面名与索引名，默认 DST）", default: "DST" },
       { k: "snapshot", label: "scripts 快照目录名（可选，留空=最新）" },
@@ -23,7 +22,6 @@ const JOB_DEFS = {
     ],
   },
   create_redirect: {
-    label: "创建页面重定向 → 维基", wiki: true,
     fields: [
       { k: "from", label: "源页面（如 File:Wendy potion duration.png）" },
       { k: "to", label: "目标页面（如 File:Wendy potion 3.png）" },
@@ -31,36 +29,30 @@ const JOB_DEFS = {
     ],
   },
   maintain_template_check: {
-    label: "检查模板数据覆盖（只读）",
     fields: [
       { k: "output", label: "可粘贴片段输出文件（可选，如 output/template_snippets.txt）" },
       { k: "skip_icon_status", type: "check", label: "跳过 live 图标存在性查询（只用本地 icon_meta）" },
     ],
   },
   skilltree_wiki: {
-    label: "维护技能树子页面 → 维基", wiki: true,
     fields: [
       { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
       { k: "output", label: "产物目录（可选，写 <Char>.lua 文件）" },
     ],
   },
   skilltree_export: {
-    label: "技能树数据导出到本地",
     fields: [
       { k: "character", label: "角色过滤子串（留空=全部，如 walter）" },
       { k: "output", label: "输出目录（可选，默认 output/skilltree）" },
     ],
   },
   prefab_overrides: {
-    label: "预制体重定向解析（单文件）",
     fields: [{ k: "input", label: "Lua 文件路径" }],
   },
   prefab_overrides_dir: {
-    label: "预制体重定向解析（目录）",
     fields: [{ k: "input", label: "Lua 目录路径（留空 = DST__ROOT/data/databundles/scripts/prefabs）" }],
   },
   prefab_overrides_audit: {
-    label: "预制体重定向审计（只读）",
     fields: [
       { k: "scripts", label: "游戏脚本根目录（留空 = DST__ROOT/data/databundles/scripts）" },
       { k: "wiki_file", label: "线上页面原文文件（可选，留空 = 在线拉取）" },
@@ -68,7 +60,6 @@ const JOB_DEFS = {
     ],
   },
   maintain_prefab_overrides: {
-    label: "维护预制体重定向（只读 diff）",
     fields: [
       { k: "scripts", label: "游戏脚本根目录（留空 = DST__ROOT/data/databundles/scripts）" },
       { k: "wiki_file", label: "线上页面原文文件（可选，留空 = 在线拉取）" },
@@ -76,7 +67,6 @@ const JOB_DEFS = {
     ],
   },
   scripts_sync: {
-    label: "scripts-sync 同步游戏脚本",
     fields: [
       { k: "force", type: "check", label: "强制重新同步（版本相同也执行）" },
       { k: "dry_run", type: "check", label: "演练：只报告计划、不动任何文件" },
@@ -84,7 +74,6 @@ const JOB_DEFS = {
     ],
   },
   images_sync: {
-    label: "images-sync 处理游戏图片",
     fields: [
       { k: "force", type: "check", label: "忽略增量与幂等检查，全量重跑（并重查上传状态）" },
       { k: "dry_run", type: "check", label: "演练：只盘点并报告计划、不写文件" },
@@ -92,7 +81,6 @@ const JOB_DEFS = {
     ],
   },
   upload_icons: {
-    label: "upload-icons 上传图标 → 维基", wiki: true,
     fields: [
       { k: "build", label: "只上传首次加入该 build 的图标（留空=全部有英文名的）" },
       { k: "source", label: "只上传指定来源：inventory（物品栏）/ crafting（制作栏）/ skilltree（技能树图标），留空=全部" },
@@ -104,7 +92,6 @@ const JOB_DEFS = {
     ],
   },
   anim_sync: {
-    label: "anim-sync 动画历史同步",
     fields: [
       { k: "force", type: "check", label: "强制重新归档（忽略幂等检查）" },
       { k: "dry_run", type: "check", label: "演练：只盘点并报告计划、不写文件" },
@@ -113,7 +100,6 @@ const JOB_DEFS = {
     ],
   },
   anim_diff: {
-    label: "anim-diff 动画目录对比",
     fields: [
       { k: "old", label: "旧动画目录" },
       { k: "new", label: "新动画目录" },
@@ -121,7 +107,6 @@ const JOB_DEFS = {
     ],
   },
   skin_index: {
-    label: "skin-index 生成皮肤动画索引",
     fields: [
       { k: "scripts", label: "游戏脚本根目录（留空=DST__ROOT/data/databundles/scripts）" },
       { k: "anim", label: "动画资源目录（可选，默认由 scripts 推导）" },
@@ -129,7 +114,6 @@ const JOB_DEFS = {
     ],
   },
   cooking_game_export: {
-    label: "导出烹饪小游戏数据包",
     fields: [
       { k: "output", label: "输出目录（可选，默认 output/cooking-game-bundle）" },
       { k: "snapshot", label: "脚本快照目录名（可选，默认最新）" },
@@ -138,7 +122,6 @@ const JOB_DEFS = {
     ],
   },
   update_local: {
-    label: "update-local 更新后本地摄取（scripts → images → anim）",
     fields: [
       { k: "force", type: "check", label: "三步都忽略版本/幂等检查，强制重跑" },
       { k: "dry_run", type: "check", label: "演练：三步都只报告计划、不写任何文件" },
@@ -147,20 +130,17 @@ const JOB_DEFS = {
     ],
   },
   update_data: {
-    label: "update-data 更新后数据页同步 → 维基", wiki: true,
     fields: [
       { k: "snapshot", label: "四步共用的 scripts 快照目录名（可选，留空=最新/live 树）" },
       { k: "from", label: "从该步骤开始（copy-clip / dst-recipes / item-table / strings，留空=从头）" },
     ],
   },
   update_assets: {
-    label: "update-assets 更新后素材同步（icons → skilltree）", wiki: true,
     fields: [
       { k: "from", label: "从该步骤开始（upload-icons / skilltree-wiki，留空=从头）" },
     ],
   },
   update_check: {
-    label: "update-check 更新后只读核对（模板 + 预制体审计）",
     readonly: true,
     fields: [
       { k: "snapshot", label: "两步共用的 scripts 快照目录名（可选）" },
@@ -192,12 +172,17 @@ function levelLabel(l) {
 /* ---------------- job list ---------------- */
 
 export async function pageJobs(main) {
+  // 作业清单、标签、wiki 标记与参数 schema 全部来自 JobSpec（单一真源）。
+  const specs = (await getJSON("/api/jobs/specs")).jobs;
+  // 选项值必须是 serde tag（snake）；`name` 是 CLI 的 kebab 名。
+  const specByName = Object.fromEntries(specs.map(s => [s.tag, s]));
+
   main.innerHTML = `
     <div class="panel">
       <h2>提交新任务</h2>
       <div class="row">
-        <select id="jobKind">${Object.entries(JOB_DEFS)
-          .map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select>
+        <select id="jobKind">${specs
+          .map(s => `<option value="${esc(s.tag)}">${esc(s.label)}</option>`).join("")}</select>
         <label id="dryRunRow" style="margin:0;display:flex;align-items:center;gap:6px;color:var(--text)">
           <input type="checkbox" id="dryRun" checked> 维基干跑（不写入维基，仅出 diff）</label>
         <button class="btn" id="submitJob">提交任务</button>
@@ -211,27 +196,47 @@ export async function pageJobs(main) {
     </div>`;
 
   const kindSel = $("#jobKind");
-  const hasDryRunField = (def) => (def.fields || []).some(f => (Array.isArray(f) ? f[0] : f.k) === "dry_run");
+
+  // 没有手写布局的 web_ui 作业：按 ParamSpec 生成通用表单。
+  const genericFields = (spec) => (spec.params || []).map(p => ({
+    k: p.key,
+    label: (p.help || p.key) + (p.required ? "（必填）" : ""),
+    type: p.kind === "bool" ? "check" : p.kind === "usize" ? "number" : p.kind === "str_list" ? "list" : "text",
+    default: p.default,
+    required: p.required,
+  }));
+  const fieldsFor = (name) => {
+    const layout = JOB_UI[name] || {};
+    return layout.fields || genericFields(specByName[name]);
+  };
+  const hasDryRunField = (fields) => (fields || []).some(f => (Array.isArray(f) ? f[0] : f.k) === "dry_run");
+
   const renderFields = () => {
-    const def = JOB_DEFS[kindSel.value];
-    $("#dryRunRow").style.display = def.wiki ? "" : "none";
-    $("#jobFields").innerHTML = (def.fields || [])
-      .map(f => {
-        const [k, label] = Array.isArray(f) ? f : [f.k, f.label];
-        const defaultValue = !Array.isArray(f) && typeof f.default === "function"
-          ? f.default()
-          : (!Array.isArray(f) ? (f.default || "") : "");
-        if (!Array.isArray(f) && f.type === "check")
-          return `<label style="display:flex;align-items:center;gap:6px;margin:6px 0;color:var(--text)">
-            <input type="checkbox" data-field="${k}" ${defaultValue ? "checked" : ""}> ${esc(label)}</label>`;
-        if (!Array.isArray(f) && f.type === "number")
-          return `<label>${esc(label)}<input type="number" min="0" step="1" style="width:100%" data-field="${k}" data-num="1" value="${esc(defaultValue)}"></label>`;
-        return `<label>${esc(label)}<input style="width:100%" data-field="${k}" value="${esc(defaultValue)}"></label>`;
-      }).join("");
-    const hasDryRun = hasDryRunField(def);
-    $("#jobHint").textContent = def.readonly
+    const name = kindSel.value;
+    const spec = specByName[name];
+    const layout = JOB_UI[name] || {};
+    const fields = fieldsFor(name);
+    $("#dryRunRow").style.display = spec.wiki ? "" : "none";
+    $("#jobFields").innerHTML = fields.map(f => {
+      const [k, label] = Array.isArray(f) ? f : [f.k, f.label];
+      const rawDefault = !Array.isArray(f) && typeof f.default === "function"
+        ? f.default()
+        : (!Array.isArray(f) ? f.default : "");
+      const defaultValue = rawDefault == null ? "" : rawDefault;
+      const required = !Array.isArray(f) && f.required ? " required" : "";
+      if (!Array.isArray(f) && f.type === "check")
+        return `<label style="display:flex;align-items:center;gap:6px;margin:6px 0;color:var(--text)">
+          <input type="checkbox" data-field="${k}" ${defaultValue === true || defaultValue === "true" ? "checked" : ""}> ${esc(label)}</label>`;
+      if (!Array.isArray(f) && f.type === "number")
+        return `<label>${esc(label)}<input type="number" min="0" step="1" style="width:100%" data-field="${k}" data-num="1" value="${esc(defaultValue)}"${required}></label>`;
+      if (!Array.isArray(f) && f.type === "list")
+        return `<label>${esc(label)}<input style="width:100%" data-field="${k}" data-list="1" placeholder="多个值用逗号分隔" value="${esc(defaultValue)}"${required}></label>`;
+      return `<label>${esc(label)}<input style="width:100%" data-field="${k}" value="${esc(defaultValue)}"${required}></label>`;
+    }).join("");
+    const hasDryRun = hasDryRunField(fields);
+    $("#jobHint").textContent = layout.readonly
       ? "只读核对：不写维基、不修改本地文件，可直接提交。"
-      : def.wiki
+      : spec.wiki
       ? "涉及维基写入的任务在维基干跑下只生成 diff 预览；取消勾选并经确认后直接写入。"
       : hasDryRun
         ? "纯本地任务不写维基；其参数中的“演练”勾选决定是否真实改动本地文件。"
@@ -241,11 +246,24 @@ export async function pageJobs(main) {
   renderFields();
 
   $("#submitJob").onclick = async () => {
-    const def = JOB_DEFS[kindSel.value];
-    const body = { kind: kindSel.value };
-    if (def.wiki) body.wiki_dry_run = $("#dryRun").checked;
+    const name = kindSel.value;
+    const spec = specByName[name];
+    const layout = JOB_UI[name] || {};
+    const fields = fieldsFor(name);
+
+    // 页面不是 <form>，required 属性不会自动校验。
+    const missing = Array.from(document.querySelectorAll("#jobFields input[required]"))
+      .find(i => !i.value.trim());
+    if (missing) {
+      missing.focus();
+      alert("请填写必填参数：" + (missing.closest("label")?.textContent.trim() || missing.dataset.field));
+      return;
+    }
+
+    const body = { kind: name };
+    if (spec.wiki) body.wiki_dry_run = $("#dryRun").checked;
     document.querySelectorAll("#jobFields input[data-field]").forEach(i => {
-      if (i.type === "checkbox") { if (i.checked) body[i.dataset.field] = true; }
+      if (i.type === "checkbox") { body[i.dataset.field] = i.checked; }
       else {
         const v = i.value.trim();
         if (v === "") return;
@@ -254,15 +272,19 @@ export async function pageJobs(main) {
           if (Number.isFinite(n)) body[i.dataset.field] = n;
           return;
         }
+        if (i.dataset.list === "1") {
+          body[i.dataset.field] = v.split(/[,，]/).map(x => x.trim()).filter(Boolean);
+          return;
+        }
         body[i.dataset.field] = v;
       }
     });
-    if (def.wiki) {
+    if (spec.wiki) {
       if (!body.wiki_dry_run && !confirm("已关闭维基干跑：任务可能直接修改维基页面。确定继续？")) return;
-    } else if (hasDryRunField(def) && !body.dry_run) {
-      if (!confirm(`${def.label} 将真实执行本地文件操作（非演练）。确定继续？`)) return;
-    } else if (!def.readonly && !hasDryRunField(def)) {
-      if (!confirm(`${def.label} 将真实执行本地文件操作。确定继续？`)) return;
+    } else if (hasDryRunField(fields) && !body.dry_run) {
+      if (!confirm(`${spec.label} 将真实执行本地文件操作（非演练）。确定继续？`)) return;
+    } else if (!layout.readonly && !hasDryRunField(fields)) {
+      if (!confirm(`${spec.label} 将真实执行本地文件操作。确定继续？`)) return;
     }
     try {
       const j = await postJSON("/api/jobs", body);

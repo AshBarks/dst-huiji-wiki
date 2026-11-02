@@ -70,7 +70,8 @@ src/
 | Understand module dependency order | `src/lib.rs` lines 1-16 | Declaration order is the compile order |
 | Trace what lib.rs re-exports | `src/lib.rs` lines 18-26 | DstContext, SnapshotInfo, CopyClip types, Error/Result, TechReport, diff helpers |
 | Add a binary-only entry point | `src/main.rs` | `mod commands` + match on args.command |
-| Add a new CLI command variant | `src/service/job_spec.rs` (`JOB_SPECS` 行) + `src/commands/mod.rs` (`CLI_EXT` 行 + `job_from_matches` 构造臂) | 契约测试强制 name/serde tag/CLI 旗标/前端 JOB_DEFS 一致 |
+| 新增/修改 WebUI 任务表单 | `src/service/job_spec.rs`（`web_ui` + `ParamSpec`） + `src/web/api_jobs.rs`（`GET /api/jobs/specs`） + `src/web/assets/js/jobs.js`（`JOB_UI` 只放特殊控件布局） | 无布局的 web_ui 作业按 ParamSpec 生成通用表单（Bool/Usize/StrList/文本）；契约测试校验字段键 ∈ params、必填参数不漏 |
+| Add a new CLI command variant | `src/service/job_spec.rs` (`JOB_SPECS` 行) + `src/commands/mod.rs` (`CLI_EXT` 行 + `job_from_matches` 构造臂) | 契约测试强制 name/serde tag/CLI 旗标一致；Web 表单见上一行 |
 | Check all Error variants | `src/error.rs` | `enum Error`（含 KTEX/AnimTool/Zip/Json 等 `#[from]` 变体，以文件为准） |
 | Understand file vs directory modules | `src/` root | context.rs/error.rs/utils.rs = single files; everything else = directory |
 | Find where a concrete mapper lives | `src/mapping/mappers/` | Each mapper is its own file |

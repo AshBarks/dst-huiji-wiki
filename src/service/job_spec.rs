@@ -1,13 +1,15 @@
 //! JobSpec 注册表：每个 Job 的 canonical name、wiki 访问级别、资源竞争域
 //! 与参数 schema 的集中声明。
 //!
-//! 此前 CLI（clap derive）、`JobKind::name()`、serde tag、前端 `JOB_DEFS`
+//! 此前 CLI（clap derive）、`JobKind::name()`、serde tag、前端表单 `JOB_UI`
 //! 四处各自维护名称与默认值，靠契约测试事后兜底；参数则只有字符串语义
 //! 校验，非法 `type`/`source`/路径要到执行中才报错。本表是唯一的声明源：
 //!
 //! - `JobKind::name()/touches_wiki()/resources()/spec()` 从本表派生；
-//! - CLI 子命令与参数（P1.6 起由 `commands` 从本表构建）、Web 前端
-//!   `JOB_DEFS` 的键/默认值以契约测试对齐本表；
+//! - CLI 子命令与参数（P1.6 起由 `commands` 从本表构建）；
+//! - WebUI 下拉/标签/wiki 标记/通用表单由 `GET /api/jobs/specs` 直接读本表
+//!   （`web_ui = true` 的作业），前端 `JOB_UI` 只保留特殊控件布局，并由契约
+//!   测试钉在 `ParamSpec` 上；
 //! - 资源竞争域供 WebUI JobManager 做跨任务互斥（同名即互斥的键）。
 
 /// Job 对 wiki 的访问级别。
@@ -63,6 +65,10 @@ pub struct JobSpec {
     pub name: &'static str,
     /// 中文显示名（Web 前端 / 日志）。
     pub label: &'static str,
+    /// 是否在 WebUI 的任务提交下拉中暴露。前端下拉直接由本表生成；
+    /// `web_ui = true` 而没有手写 `JOB_UI` 布局的作业，会按 `params`
+    /// 生成通用表单（Bool→勾选、Usize→数字、其余→文本）。
+    pub web_ui: bool,
     pub wiki_access: WikiAccess,
     /// 资源竞争域：WebUI JobManager 对同名资源全程互斥（如两个
     /// images-sync 并发写同一 KTOOLS__OUT_DIR）。写维基的任务一律含
@@ -91,6 +97,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "parse-po",
         label: "解析 PO 文件",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -108,6 +115,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "map-names",
         label: "映射物品名称",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -139,6 +147,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "map-recipes",
         label: "映射配方数据",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -177,6 +186,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-item-table",
         label: "维护物品表 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -193,6 +203,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-dst-recipes",
         label: "维护配方表 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -209,6 +220,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-copy-clip",
         label: "维护模块常量 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -232,6 +244,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-template-check",
         label: "检查模板数据覆盖（只读）",
+        web_ui: true,
         wiki_access: WikiAccess::Read,
         resources: &[],
         params: &[
@@ -261,6 +274,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-strings",
         label: "维护 Strings 桶页 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -318,6 +332,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "skilltree-wiki",
         label: "维护技能树子页面 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -341,6 +356,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "skilltree-export",
         label: "技能树数据导出到本地",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -370,6 +386,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "upload-image",
         label: "上传图片 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki"],
         params: &[
@@ -413,6 +430,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "prefab-overrides",
         label: "预制体重定向解析（单文件）",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[P_INPUT, P_OUTPUT],
@@ -420,6 +438,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "prefab-overrides-dir",
         label: "预制体重定向解析（目录）",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -436,6 +455,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "prefab-overrides-audit",
         label: "预制体重定向审计（只读）",
+        web_ui: true,
         wiki_access: WikiAccess::Read,
         resources: &[],
         params: &[
@@ -465,6 +485,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-prefab-overrides",
         label: "维护预制体重定向（只读 diff）",
+        web_ui: true,
         wiki_access: WikiAccess::Read,
         resources: &["out"],
         params: &[
@@ -494,6 +515,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "scripts-sync",
         label: "同步游戏脚本（scripts-sync）",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["scripts_tree"],
         params: &[
@@ -523,6 +545,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "images-sync",
         label: "处理游戏图片（images-sync）",
+        web_ui: true,
         // 图片管线本身纯本地，但收尾会查一次维基上传状态（--skip-wiki-status
         // 可关）；因此访问级别是只读而不是 None。
         wiki_access: WikiAccess::Read,
@@ -554,6 +577,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "upload-icons",
         label: "上传图标 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki"],
         params: &[
@@ -611,6 +635,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "anim-sync",
         label: "动画历史同步（anim-sync）",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["anim_out"],
         params: &[
@@ -647,6 +672,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "anim-diff",
         label: "动画目录对比",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &[],
         params: &[
@@ -676,6 +702,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "anim-index",
         label: "构建 prefab↔动画关联索引",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["anim_out"],
         params: &[
@@ -705,6 +732,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "skin-index",
         label: "生成皮肤动画索引",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         // 产物默认 output/skin-index.json；独立键避免与其它 out 作业互斥。
         resources: &["out/skin-index"],
@@ -735,6 +763,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-scan",
         label: "快照 diff + 影响评估",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         // 默认产物 output/scan/<old>_<new>；显式 --out 时锁仍按该键（约定默认路径）。
         resources: &["out/scan"],
@@ -779,6 +808,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-index",
         label: "构建代码关联图",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         // 默认产物 output/atlas/<build>。
         resources: &["out/atlas"],
@@ -802,6 +832,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "corpus-fetch",
         label: "抓取维基语料（corpus-fetch）",
+        web_ui: true,
         // 唯一允许匿名读的作业：批量全量抓取可接受站点旧缓存。
         wiki_access: WikiAccess::Read,
         resources: &["corpus"],
@@ -832,6 +863,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "corpus-index",
         label: "重建语料派生索引",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["corpus"],
         params: &[
@@ -854,6 +886,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "symbol-annotate",
         label: "Page→Symbol 标注",
+        web_ui: false,
         wiki_access: WikiAccess::None,
         resources: &["out"],
         params: &[
@@ -925,6 +958,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "knowledge-scan-symbols",
         label: "LLM 扫描符号生成知识文档",
+        web_ui: false,
         wiki_access: WikiAccess::None,
         resources: &["knowledge"],
         params: &[
@@ -1017,6 +1051,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "page-assist",
         label: "页面覆盖缺口建议（只读）",
+        web_ui: false,
         wiki_access: WikiAccess::None,
         resources: &[],
         params: &[
@@ -1067,6 +1102,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "knowledge-sync",
         label: "代码变更 → 知识文档同步",
+        web_ui: false,
         wiki_access: WikiAccess::None,
         resources: &["knowledge"],
         params: &[
@@ -1131,6 +1167,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "knowledge-scan-wiki",
         label: "PageSymbolMap 确定性骨架",
+        web_ui: false,
         wiki_access: WikiAccess::None,
         resources: &["knowledge"],
         params: &[
@@ -1209,6 +1246,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "maintain-wikitext",
         label: "wikitext 模板参数批量编辑 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -1252,6 +1290,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "create-redirect",
         label: "创建页面重定向",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki"],
         params: &[
@@ -1281,6 +1320,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "cooking-game-export",
         label: "导出烹饪小游戏数据包",
+        web_ui: true,
         wiki_access: WikiAccess::None,
         resources: &["out/cooking"],
         params: &[
@@ -1317,6 +1357,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-local",
         label: "更新后本地摄取（scripts → images → anim）",
+        web_ui: true,
         // 三步均不写维基；images-sync 会读一次上传状态，故整体为只读级别。
         wiki_access: WikiAccess::Read,
         resources: &["scripts_tree", "ktools_out", "anim_out"],
@@ -1354,6 +1395,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-data",
         label: "更新后数据页同步 → 维基",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         resources: &["wiki", "out"],
         params: &[
@@ -1376,6 +1418,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-assets",
         label: "更新后素材同步 → 维基（icons → skilltree）",
+        web_ui: true,
         wiki_access: WikiAccess::Write,
         // upload-icons 读 icon_meta（ktools_out），skilltree-wiki 写本地
         // Skilltree.js（out）；两者都持 wiki 锁，实际串行。
@@ -1391,6 +1434,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "update-check",
         label: "更新后只读核对（模板覆盖 + 预制体审计）",
+        web_ui: true,
         // 只读；持 ktools_out 避免与 images-sync 并发时读到半截图标元数据。
         wiki_access: WikiAccess::Read,
         resources: &["ktools_out"],

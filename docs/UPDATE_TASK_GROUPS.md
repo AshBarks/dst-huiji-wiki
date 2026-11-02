@@ -170,7 +170,7 @@ UpdateCheck  { snapshot: Option<String>, skip_icon_status: bool, from: Option<St
 - **资源**：取各步并集——`update-local` = `scripts_tree` + `ktools_out` + `anim_out`；`update-data` = `wiki` + `out`；`update-assets` = `wiki` + `out` + `ktools_out`；`update-check` = `ktools_out`。简单、保守；代价是长任务期间挡住同键的独立作业。
 - **失败语义**：除 `update-check` 外 fail-fast，错误消息带步骤名（`<step> 步骤失败：…`）；已完成步骤的产物保留，子作业幂等，重跑即可。`update-check` 按 continue-on-error，报告 `status` 为 `success`/`partial`/`failed`。
 - **报告**：沿用 `CaptureReporter`，返回 `{ status, skipped, steps: [{ step, result }] }`（`update-check` 每步另有 `status`/`error`），`--report-json` 直接落盘；WebUI 任务详情按 `Reporter::step` 渲染为可折叠步骤。
-- **契约**：`job_spec.rs`（行）、`kind.rs`（变体）、`commands/mod.rs`（`CLI_EXT` + 构造臂）、前端 `JOB_DEFS` 四处已对齐；契约测试覆盖名称、CLI 旗标与前端键集合。
+- **契约**：`job_spec.rs`（行）、`kind.rs`（变体）、`commands/mod.rs`（`CLI_EXT` + 构造臂）三处对齐；WebUI 下拉/标签/参数由 `/api/jobs/specs` 直接读 spec，前端 `JOB_UI` 只留控件布局。契约测试覆盖名称、CLI 旗标、布局字段 ∈ params 与必填覆盖。
 
 **为什么不直接做一个通用 DAG 执行器**：参数 schema、互斥锁、前端表单都会爆炸；更新流程本身是固定的 4 条链，preset 更可测。
 

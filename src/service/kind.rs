@@ -713,7 +713,7 @@ impl JobKind {
     /// 契约（`service::tests` 与 `commands::tests` 各自强制）：
     /// - `name()` 在全集中唯一，且 == serde tag 的 kebab 形式；
     /// - CLI 子命令名集合（除 `serve`）== `name()` 集合；
-    /// - 前端 `JOB_DEFS` 的键 ⊆ serde tag 集合。
+    /// - 前端 `JOB_UI` 的键 ⊆ `web_ui` 作业的 serde tag 集合。
     pub fn all_variants() -> Vec<JobKind> {
         vec![
             JobKind::ParsePo {

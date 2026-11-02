@@ -7,7 +7,8 @@ use axum::http::StatusCode;
 use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::Json;
 use dst_huiji_wiki::platform::progress::JobEvent;
-use dst_huiji_wiki::service::JobKind;
+use dst_huiji_wiki::service::job_spec::{ParamDefault, ParamKind};
+use dst_huiji_wiki::service::{JobKind, JOB_SPECS};
 use futures_util::stream::{self, Stream};
 use futures_util::StreamExt;
 use std::collections::HashMap;
@@ -50,6 +51,65 @@ pub async fn submit(
         .submit(req.kind, req.wiki_dry_run, Some(Arc::clone(&state)))
         .await;
     Ok(Json(handle.summary().await))
+}
+
+/// WebUI 可提交作业的声明（`JobSpec` 单一真源），供前端生成下拉与通用表单。
+///
+/// 只有 `web_ui = true` 的作业会出现在这里；标签/是否写站/参数 schema
+/// 均来自 `JOB_SPECS`，不再在前端重复维护。
+pub(crate) fn specs_json() -> serde_json::Value {
+    let jobs: Vec<serde_json::Value> = JOB_SPECS
+        .iter()
+        .filter(|s| s.web_ui)
+        .map(|s| {
+            let params: Vec<serde_json::Value> = s
+                .params
+                .iter()
+                .map(|p| {
+                    let kind = match p.kind {
+                        ParamKind::Str => "str",
+                        ParamKind::Path => "path",
+                        ParamKind::OptStr => "opt_str",
+                        ParamKind::OptPath => "opt_path",
+                        ParamKind::Bool => "bool",
+                        ParamKind::Usize => "usize",
+                        ParamKind::StrList => "str_list",
+                    };
+                    serde_json::json!({
+                        "key": p.key,
+                        "kind": kind,
+                        "default": default_json(p.default),
+                        "required": p.required,
+                        "help": p.help,
+                    })
+                })
+                .collect();
+            serde_json::json!({
+                // `name` 是 CLI 的 kebab 名；`tag` 是 serde/Web JSON 的
+                // snake 名，前端提交 `kind` 必须用后者。
+                "name": s.name,
+                "tag": s.name.replace('-', "_"),
+                "label": s.label,
+                "wiki": s.touches_wiki(),
+                "params": params,
+            })
+        })
+        .collect();
+    serde_json::json!({ "jobs": jobs })
+}
+
+fn default_json(d: ParamDefault) -> serde_json::Value {
+    match d {
+        ParamDefault::None => serde_json::Value::Null,
+        ParamDefault::Str(s) => serde_json::Value::from(s),
+        ParamDefault::Int(n) => serde_json::Value::from(n),
+        ParamDefault::Bool(b) => serde_json::Value::from(b),
+    }
+}
+
+/// GET /api/jobs/specs
+pub async fn specs() -> Json<serde_json::Value> {
+    Json(specs_json())
 }
 
 /// GET /api/jobs
@@ -244,5 +304,75 @@ mod tests {
         assert_eq!(seqs(filter_events_since(events.clone(), 1)), vec![2, 3]);
         assert!(filter_events_since(events.clone(), 3).is_empty());
         assert_eq!(seqs(filter_events_since(events, 0)), vec![1, 2, 3]);
+    }
+
+    /// `/api/jobs/specs` 是 WebUI 表单的唯一真源：只暴露 web_ui 作业，
+    /// 标签/wiki 标记/参数 schema 均来自 JOB_SPECS。
+    #[test]
+    fn specs_json_exposes_web_ui_jobs_and_param_schema() {
+        let v = specs_json();
+        let jobs = v["jobs"].as_array().expect("jobs array");
+        let names: Vec<&str> = jobs.iter().filter_map(|j| j["name"].as_str()).collect();
+
+        // 新暴露的通用表单作业与核心编排都在；LLM/调试类不暴露。
+        for name in [
+            "update-local",
+            "update-data",
+            "update-assets",
+            "update-check",
+            "update-scan",
+        ] {
+            assert!(names.contains(&name), "缺少 {name}");
+        }
+        // 前端提交的 kind 是 serde tag（snake），必须随 spec 一起下发。
+        let tags: Vec<&str> = jobs.iter().filter_map(|j| j["tag"].as_str()).collect();
+        assert!(tags.contains(&"update_scan"));
+        assert!(tags.contains(&"maintain_item_table"));
+        for name in [
+            "parse-po",
+            "corpus-fetch",
+            "maintain-wikitext",
+            "anim-index",
+        ] {
+            assert!(names.contains(&name), "缺少 {name}");
+        }
+        // LLM/知识线作业仍不在 WebUI 暴露（有成本、需单独确认）。
+        for name in ["knowledge-sync", "knowledge-scan-symbols", "page-assist"] {
+            assert!(!names.contains(&name), "不应暴露 {name}");
+        }
+
+        let local = jobs
+            .iter()
+            .find(|j| j["name"] == "update-local")
+            .expect("update-local spec");
+        assert_eq!(local["wiki"], false, "update-local 不写维基");
+        assert!(!local["label"].as_str().unwrap().is_empty());
+        let params = local["params"].as_array().expect("params");
+        let from = params
+            .iter()
+            .find(|p| p["key"] == "from")
+            .expect("from param");
+        assert_eq!(from["kind"], "opt_str");
+        assert_eq!(from["required"], false);
+        let dry = params
+            .iter()
+            .find(|p| p["key"] == "dry_run")
+            .expect("dry_run param");
+        assert_eq!(dry["kind"], "bool");
+        assert_eq!(dry["default"], false);
+
+        let check = jobs
+            .iter()
+            .find(|j| j["name"] == "update-check")
+            .expect("update-check spec");
+        assert_eq!(check["wiki"], false);
+        let skip = check["params"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["key"] == "skip_icon_status")
+            .expect("skip_icon_status");
+        assert_eq!(skip["kind"], "bool");
+        assert_eq!(skip["default"], false);
     }
 }

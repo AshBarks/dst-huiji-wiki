@@ -36,6 +36,7 @@ pub async fn serve(host: String, port: u16) -> dst_huiji_wiki::error::Result<()>
 
     let api = Router::new()
         .route("/jobs", post(api_jobs::submit).get(api_jobs::list))
+        .route("/jobs/specs", get(api_jobs::specs))
         .route("/jobs/{id}", get(api_jobs::get))
         .route("/jobs/{id}/cancel", post(api_jobs::cancel))
         .route("/jobs/{id}/events", get(api_jobs::events))

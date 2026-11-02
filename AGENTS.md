@@ -125,6 +125,7 @@ cargo test -p dst-anim-tool --no-default-features --features cli,gif  # anim-too
 cargo test -p dst-anim-tool --no-default-features --features cli,gif -- --include-ignored  # 本地全量（需 data/anim 软链）
 cargo fmt --all --check            # Check formatting
 cargo clippy --workspace --exclude dst-anim-tool --all-targets --all-features -- -D warnings  # Lint (CI uses this)
+cargo deny check                   # Dependencies: licenses/bans/sources/advisories (deny.toml; needs cargo-deny)
 cargo run --release -- --help      # Show CLI help
 ```
 
@@ -152,4 +153,5 @@ cargo run --release -- --help      # Show CLI help
 - CI cross-compiles to 4 targets (Linux x86_64, macOS x86_64 + aarch64, Windows x86_64)
 - Wiki API tests skip gracefully if `.env` not configured (won't fail in CI)
 - `reqwest = "0.13"` — newer than typical 0.12.x; verify intentional
+- 依赖治理：根 `deny.toml`（许可证允许清单 + advisories/bans/sources）；`zip` 关闭默认特性只留 `deflate`，并把 app 与 anim-tool 都升到 zip 9（8.x 的 extract 公告）
 - No `rust-toolchain.toml` — CI uses `dtolnay/rust-toolchain@stable`

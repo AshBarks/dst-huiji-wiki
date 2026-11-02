@@ -1,0 +1,50 @@
+# cargo-deny 配置：许可证允许清单 + 安全公告策略。
+#
+# 本地运行（需要 cargo-deny）：
+#   cargo deny check
+# CI 用 taiki-e/install-action 安装 cargo-deny 后执行同一份配置。
+
+[graph]
+# 和 CI 构建一致：不启用 optional GUI features（dst-anim-tool 的 egui 等）。
+all-features = false
+
+[advisories]
+version = 2
+unsound = "workspace"
+# 只对 workspace 直接依赖检查；传递依赖的 unmaintained 太噪声。
+unmaintained = "workspace"
+yanked = "warn"
+# 当前无豁免；新公告先升级依赖，确需豁免时在此登记 id + reason。
+ignore = []
+
+[licenses]
+version = 2
+# SPDX 表达式按"任一允许项满足即可"判定；保留常见的宽松/弱 copyleft 许可。
+allow = [
+    "0BSD",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "CC0-1.0",
+    "CDLA-Permissive-2.0",
+    "ISC",
+    "MIT",
+    "MIT-0",
+    "MPL-2.0",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+exceptions = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

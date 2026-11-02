@@ -75,6 +75,14 @@ jobs:
             node --input-type=module --check < "$f"
           done
 
+      - name: Install cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+
+      - name: Check dependency licenses, bans and advisories
+        run: cargo deny check
+
   build:
     name: Build
     runs-on: ubuntu-latest

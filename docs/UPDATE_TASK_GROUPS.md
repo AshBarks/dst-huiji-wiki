@@ -1,7 +1,7 @@
 # 更新后任务整合与执行顺序
 
 **状态**：已实施（`update-local` / `update-data`；只做调度，原作业保留）
-**范围**：`JOB_SPECS` 全部 34 个作业中与「游戏版本更新后」相关的部分
+**范围**：`JOB_SPECS` 全部 36 个作业中与「游戏版本更新后」相关的部分（含本文引入的 2 个编排作业）
 **关联**：[UPDATE_IMPACT_PLAN.md](UPDATE_IMPACT_PLAN.md)（终局是一条命令）、[FLOWS.md](FLOWS.md)（单作业流程）、[MAINTENANCE_TOOL_AUDIT.md](MAINTENANCE_TOOL_AUDIT.md)
 
 ---

@@ -242,3 +242,37 @@ fresh clone 下 lib test 无法编译；`test_all_prefabs_files` 运行时读取
 - 模拟 CI（移走 `examples/prefabs/`）：630 lib + 24 bin + 11 dst-ktex + 34 dst-wikitext 全绿，7 ignored。
 - 本地有数据：prefab_override 过滤下 25 passed（含 6 个数据用例与指纹测试）。
 - 原则与 anim-tool 数据用例一致：游戏数据不入库，CI 跳过、本地显式 `--include-ignored` 运行。
+
+## 进度台账（P9：注册层、大文件、文档基线收口，2026-11-03）
+
+依据：2026-11-03 结构复核（实测 154 个 rs 文件 / 72,932 行；模块 DAG 无环；
+增量 `cargo check` 2.5s）。结论：分层健康，成本集中在**作业登记层**、**文档基线**
+与**双份实现**，不在代码组织本身。
+
+### P9 拍板
+
+| 问题 | 决策 |
+|---|---|
+| `knowledge/` 入库 | **移出仓库**：保留本地文件、`git rm --cached`、`.gitignore`，并加 `KNOWLEDGE__ROOT` 可整体重定向（与 `examples/prefabs`、`data/anim` 同一处理方式） |
+| 注册层减重深度 | **不上 `job!` 宏**：`CliExt::DEFAULT` + 表驱动构造（`job_from_matches` 38 臂 → 1 个通用函数）+ `all_variants()` 由 spec 生成；宏会损害 rust-analyzer 跳转，收益不抵 |
+| 技能树单一源 | 以 `skilltree_widget.js`（维基 `零件:Skilltree.js`）为**唯一实现**，WebUI 复用同一文件；不引入 JS 打包器（沿用 P3 决策） |
+
+### 进度台账（P9）
+
+| 阶段 | 项 | 状态 | 说明 |
+|---|---|---|---|
+| P9.1 | 文档基线 | ✅ | `AGENTS.md` 补齐 `service/platform/corpus/update/knowledge/llm` 等此前缺失的模块（占 src 约 20%）；`src/AGENTS.md` 修"15 modules vs 10 pub mod"自相矛盾；新增 `docs/INDEX.md`（active/参考/历史/草案四档）；5 篇过期文档加"历史"横幅 |
+| P9.2 | 注册层减重 | ✅ | `CliExt::DEFAULT`（`CLI_EXT` 422→266 行）；`spec()` 改按名查表（去掉 38 个硬编码下标，消除表序错配风险）；`all_variants()` 由 `JOB_SPECS` 反序列化生成（-190 行）；`job_from_matches` 38 个手写臂 → 表驱动（-306 行）；新增 `ParamKind::OptStrList` 以区分 `Vec<String>`/`Option<Vec<String>>`；新增契约测试「每个 spec 都能用 CLI 默认值构造出 JobKind」 |
+| P9.3 | `knowledge/` 本地化 | ✅ | 2,043 文件 / 12MB 退出索引（磁盘保留）；`.gitignore` 加 `/knowledge`；`platform::config::{knowledge_root, resolve_knowledge_dir}`（`KNOWLEDGE__ROOT`，仅接管缺省名 `knowledge`，不覆盖显式 `--knowledge-dir`），scan-symbols/scan-wiki/sync/page-assist 四处接入 |
+| P9.4 | `images/meta.rs` 拆分 | ✅ | 2,369 → `mod.rs`（schema/IO + 30 测试）+ `names.rs` 408 + `title.rs` 181 + `overrides.rs` 103 + `build.rs` 87；对外路径 `images::meta::*` 不变 |
+| P9.5 | `wiki/client.rs` 拆分 | ✅ | 2,352 → `mod.rs` 409（配置/DTO/会话）+ `transport.rs` 406（登录/GET/POST/CSRF/节流重试）+ `endpoints.rs` 1,578（页面/文件/分类/编辑/上传 + 响应解析）；26 个用例按归属分入三个子模块 |
+| P9.6 | 技能树单一源 | ✅ | `skills.js` 603 → 84 行（只做拉数据/拼 DOM/注入素材路径）；widget 暴露 `window.SkilltreeWidget.buildAll()` 与 `window.skilltreeAssetUrl` 注入点（版本 0.3.1 → 0.4.0）；WebUI 经 `/static/js/skilltree_widget.js` 复用同一渲染器，删除第二份 1,500 行级渲染实现 |
+
+### P9 收尾状态（2026-11-03）
+
+- `cargo test --workspace --exclude dst-anim-tool`：679 lib + 27 bin + 11 dst-ktex + 34 dst-wikitext 全绿（8 ignored 为依赖本机游戏数据的用例）。
+- `cargo fmt --all --check`、workspace clippy `-D warnings` 干净；`node --check` 覆盖改写后的 `skills.js`/`job` 相关模块。
+- 技能树经真实浏览器验收（Playwright + headless Chromium）：wilson / walter 切换均渲染出 SVG（221 个图元、7 个图层组），控制台零报错。
+- 顺带修正：`knowledge-sync` 的 `old` 在 spec（required=true）、serde（无默认）与 CLI（可选定位参数）三处语义不一致，统一为「可选 + 缺省空串」。
+- 未执行任何线上 wiki 写操作。
+- 注意：`零件:Skilltree.js` 已升到 0.4.0，需重新导出并上传；release 版常驻 WebUI 需重启才会加载新的内嵌前端。

@@ -1,6 +1,9 @@
 // 维基技能树渲染器（复制到灰机维基 零件:Skilltree.js；若站内有
 // Gadget:Skilltree.js 副本也一并覆盖）
 //
+// 0.4.0: 单一源——WebUI 预览（/static/js/skilltree_widget.js）复用本文件，
+//        宿主可通过 window.skilltreeAssetUrl 注入素材路径；暴露
+//        window.SkilltreeWidget.buildAll() 供宿主在插入 DOM 后重建。
 // 0.3.1: wiki 运行时技能树内容图标改走 Special:FilePath（本地预览路径不变），
 //        不再依赖模块内可能缺失/过期的 icon_url 与 metainfo.imgs。
 // 0.3.0 起坐标与游戏 widgets/redux/skilltreewidget.lua 和
@@ -16,7 +19,7 @@
 //   - 支持节点上的 decorations（薇诺娜货架等多背景图）
 //   - 沃拓克斯天秤以圆点+文本等价呈现（游戏用 wortox_balance 动画砝码）
 (() => {
-    const VERSION = "0.3.1";
+    const VERSION = "0.4.0";
     console.log(`skilltree ${VERSION}`);
     const svgNamespace = "http://www.w3.org/2000/svg";
     const xlinkNamespace = "http://www.w3.org/1999/xlink";
@@ -65,10 +68,21 @@
     ];
     const INFO_TEXTURES = ["infographic", "infographic_over"];
 
-    // 读取每个 class 为 skilltree 的元素 为之构建技能树
-    const skilltreeEles = document.getElementsByClassName("skilltree");
-    for (const eleSkilltreeRoot of skilltreeEles) {
-        buildSkilltree(eleSkilltreeRoot);
+    // 构建页面上所有 class 为 skilltree 的元素。
+    //
+    // 维基页面加载时自动执行；WebUI 预览（web/assets/js/skills.js）在插入
+    // 新的 .skilltree 节点后调用 window.SkilltreeWidget.buildAll()。两个宿主
+    // 共用这一份渲染器，不再各维护一套。
+    function buildAll() {
+        for (const eleSkilltreeRoot of document.getElementsByClassName("skilltree")) {
+            buildSkilltree(eleSkilltreeRoot);
+        }
+    }
+    window.SkilltreeWidget = { buildAll, version: VERSION };
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", buildAll);
+    } else {
+        buildAll();
     }
 
     function capitalize(str) {
@@ -96,6 +110,8 @@
 
     // 主函数,构建技能树
     function buildSkilltree(rootEle) {
+        if (rootEle.dataset.skilltreeBuilt === "1") return;
+        rootEle.dataset.skilltreeBuilt = "1";
         const character = rootEle.dataset.character;
         const jsonEle = rootEle.querySelector(".def-json");
         const jsonObject = JSON.parse(jsonEle.innerText);
@@ -156,7 +172,16 @@
         let balanceLayer = null;
 
         // ---- 工具函数 ----
+        // 宿主注入的素材解析（WebUI 预览 → /static/split/...；维基不设置，
+        // 走下面的 Special:FilePath 或相对路径）。
+        function hostAssetUrl(kind, file) {
+            const resolve = window.skilltreeAssetUrl;
+            return typeof resolve === "function" ? resolve(kind, file) : null;
+        }
+
         function skilltreeImg(name) {
+            const hosted = hostAssetUrl("skilltree", name.toLowerCase());
+            if (hosted) return hosted;
             if (typeof mw !== "undefined") {
                 const key = capitalize(name);
                 const imgUrls = metainfo.imgs || {};
@@ -171,6 +196,8 @@
 
         function globalReduxImg(name) {
             const stem = name.toLowerCase();
+            const hosted = hostAssetUrl("global_redux", stem);
+            if (hosted) return hosted;
             if (canUseMediaWikiFilePath()) {
                 const fileStem = GLOBAL_REDUX_FILE_ALIASES[stem] || stem;
                 return mw.util.getUrl("Special:FilePath/" + fileStemToTitle(fileStem));
@@ -180,6 +207,10 @@
 
         function skilltreeIconImg(skillName) {
             const def = skilltreeDef[skillName];
+            if (def.icon) {
+                const hosted = hostAssetUrl("skilltree_icons", def.icon);
+                if (hosted) return hosted;
+            }
             if (canUseMediaWikiFilePath()) {
                 if (!def.icon) {
                     console.error(`cant find icon for ${skillName}`);

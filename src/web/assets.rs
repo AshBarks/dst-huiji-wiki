@@ -13,6 +13,11 @@ pub const JS_MODULES: &[(&str, &str)] = &[
     ("cooking_eval.js", include_str!("assets/js/cooking_eval.js")),
     ("jobs.js", include_str!("assets/js/jobs.js")),
     ("skills.js", include_str!("assets/js/skills.js")),
+    // 维基 零件:Skilltree.js 的唯一实现，WebUI 预览直接复用同一文件。
+    (
+        "skilltree_widget.js",
+        include_str!("../service/assets/skilltree_widget.js"),
+    ),
     ("icon_shared.js", include_str!("assets/js/icon_shared.js")),
     (
         "inventory_icons.js",

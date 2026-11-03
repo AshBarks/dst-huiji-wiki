@@ -200,7 +200,8 @@ pub async fn run_knowledge_sync(
             new_root.display()
         )));
     }
-    let knowledge_root = Path::new(&params.knowledge_dir);
+    let knowledge_root = crate::platform::config::resolve_knowledge_dir(&params.knowledge_dir);
+    let knowledge_root = knowledge_root.as_path();
 
     reporter.stage("树差异(Layer A 复用)");
     let diff = TreeDiff::diff_trees(&old_root, &new_root)?;

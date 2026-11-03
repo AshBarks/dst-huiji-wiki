@@ -25,7 +25,8 @@ pub async fn run_page_assist(
     params: &PageAssistParams,
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
-    let pages_dir = Path::new(&params.knowledge_dir).join("pages");
+    let knowledge_dir = crate::platform::config::resolve_knowledge_dir(&params.knowledge_dir);
+    let pages_dir = knowledge_dir.join("pages");
     let _ = reporter;
 
     if params.all {
@@ -43,7 +44,7 @@ pub async fn run_page_assist(
         let corpus = params.corpus.as_ref().ok_or_else(|| {
             Error::Config("--attribute 需要 --corpus 提供页面 wikitext".to_string())
         })?;
-        let rows = attribute_page(&map, Path::new(&params.knowledge_dir), Path::new(corpus))?;
+        let rows = attribute_page(&map, &knowledge_dir, Path::new(corpus))?;
         if params.json {
             let body = serde_json::to_string_pretty(&rows)?;
             println!("{body}");

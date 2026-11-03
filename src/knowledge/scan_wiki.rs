@@ -182,7 +182,8 @@ pub async fn run_scan_wiki(
     reporter: &dyn Reporter,
 ) -> Result<serde_json::Value> {
     let scripts_root = Path::new(&params.scripts_root);
-    let knowledge_root = Path::new(&params.knowledge_dir);
+    let knowledge_root = crate::platform::config::resolve_knowledge_dir(&params.knowledge_dir);
+    let knowledge_root = knowledge_root.as_path();
     let corpus_root = Path::new(&params.corpus);
 
     if params.report {

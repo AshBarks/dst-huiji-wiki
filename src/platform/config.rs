@@ -49,6 +49,28 @@ pub fn skilltree_icon_names_path() -> PathBuf {
         .unwrap_or_else(|| "config/skilltree_icon_names.json".into())
 }
 
+/// 知识库工作目录的缺省名（与知识类作业 spec 中 `knowledge_dir` 的缺省值
+/// 一致）。
+pub const DEFAULT_KNOWLEDGE_DIR: &str = "knowledge";
+
+/// 知识库工作目录（`KNOWLEDGE__ROOT`，缺省 `knowledge/`）。
+///
+/// 该目录是**本地数据**，不在版本库内（`.gitignore` 排除）；缺失时各作业
+/// 按需创建。`KNOWLEDGE__ROOT` 可整体重定向（数据盘、或与 `wikis/` 同盘）。
+pub fn knowledge_root() -> PathBuf {
+    non_empty_env("KNOWLEDGE__ROOT").unwrap_or_else(|| DEFAULT_KNOWLEDGE_DIR.into())
+}
+
+/// 解析知识库目录参数：显式传入的路径原样返回；只有等于缺省 `"knowledge"`
+/// 时才让 `KNOWLEDGE__ROOT` 接管（不覆盖用户的 `--knowledge-dir`）。
+pub fn resolve_knowledge_dir(requested: &str) -> PathBuf {
+    if requested == DEFAULT_KNOWLEDGE_DIR {
+        knowledge_root()
+    } else {
+        PathBuf::from(requested)
+    }
+}
+
 fn non_empty_env(key: &str) -> Option<PathBuf> {
     std::env::var(key)
         .ok()
@@ -58,6 +80,16 @@ fn non_empty_env(key: &str) -> Option<PathBuf> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn resolve_knowledge_dir_keeps_explicit_path() {
+        // 只有缺省名 "knowledge" 才让 KNOWLEDGE__ROOT 接管；显式路径原样保留。
+        let requested = std::path::Path::new("/data/knowledge-alt");
+        assert_eq!(
+            super::resolve_knowledge_dir("/data/knowledge-alt"),
+            requested
+        );
+    }
+
     #[test]
     fn env_semantics_documented() {
         // platform::config 的函数都读进程环境，测试进程内不做写入/恢复，

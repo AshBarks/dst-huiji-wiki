@@ -201,7 +201,7 @@ export async function pageJobs(main) {
   const genericFields = (spec) => (spec.params || []).map(p => ({
     k: p.key,
     label: (p.help || p.key) + (p.required ? "（必填）" : ""),
-    type: p.kind === "bool" ? "check" : p.kind === "usize" ? "number" : p.kind === "str_list" ? "list" : "text",
+    type: p.kind === "bool" ? "check" : p.kind === "usize" ? "number" : (p.kind === "str_list" || p.kind === "opt_str_list") ? "list" : "text",
     default: p.default,
     required: p.required,
   }));

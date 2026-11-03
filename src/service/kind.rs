@@ -369,7 +369,8 @@ pub enum JobKind {
     },
     /// M3:代码变更 → 脏文档 → 页面锚点交叉(确定性;--rescan 级联 LLM 重扫)
     KnowledgeSync {
-        /// 旧快照(时间戳或目录名)
+        /// 旧快照(时间戳或目录名)；CLI 可省略，缺省 ""。
+        #[serde(default)]
         old: String,
         /// 新快照(时间戳、目录名或 "current",默认 current)
         #[serde(default = "default_sync_new")]
@@ -565,54 +566,62 @@ fn default_strings_buckets() -> usize {
 }
 
 impl JobKind {
-    /// 对应的 [`JobSpec`] 声明（canonical name/wiki_access/resources/params
-    /// 的唯一来源）。
-    pub fn spec(&self) -> &'static super::job_spec::JobSpec {
+    /// canonical 名称（== CLI 子命令名 == serde tag 的 kebab 形式）。
+    ///
+    /// 与 [`JobSpec`] 表逐条对应，但不依赖表内顺序（契约测试强制集合一致）。
+    pub fn static_name(&self) -> &'static str {
         match self {
-            JobKind::ParsePo { .. } => &super::job_spec::JOB_SPECS[0],
-            JobKind::MapNames { .. } => &super::job_spec::JOB_SPECS[1],
-            JobKind::MapRecipes { .. } => &super::job_spec::JOB_SPECS[2],
-            JobKind::MaintainItemTable { .. } => &super::job_spec::JOB_SPECS[3],
-            JobKind::MaintainDstRecipes { .. } => &super::job_spec::JOB_SPECS[4],
-            JobKind::MaintainCopyClip { .. } => &super::job_spec::JOB_SPECS[5],
-            JobKind::MaintainTemplateCheck { .. } => &super::job_spec::JOB_SPECS[6],
-            JobKind::MaintainStrings { .. } => &super::job_spec::JOB_SPECS[7],
-            JobKind::SkilltreeWiki { .. } => &super::job_spec::JOB_SPECS[8],
-            JobKind::SkilltreeExport { .. } => &super::job_spec::JOB_SPECS[9],
-            JobKind::UploadImage { .. } => &super::job_spec::JOB_SPECS[10],
-            JobKind::PrefabOverrides { .. } => &super::job_spec::JOB_SPECS[11],
-            JobKind::PrefabOverridesDir { .. } => &super::job_spec::JOB_SPECS[12],
-            JobKind::PrefabOverridesAudit { .. } => &super::job_spec::JOB_SPECS[13],
-            JobKind::MaintainPrefabOverrides { .. } => &super::job_spec::JOB_SPECS[14],
-            JobKind::ScriptsSync { .. } => &super::job_spec::JOB_SPECS[15],
-            JobKind::ImagesSync { .. } => &super::job_spec::JOB_SPECS[16],
-            JobKind::UploadIcons { .. } => &super::job_spec::JOB_SPECS[17],
-            JobKind::AnimSync { .. } => &super::job_spec::JOB_SPECS[18],
-            JobKind::AnimDiff { .. } => &super::job_spec::JOB_SPECS[19],
-            JobKind::AnimIndex { .. } => &super::job_spec::JOB_SPECS[20],
-            JobKind::SkinIndex { .. } => &super::job_spec::JOB_SPECS[21],
-            JobKind::UpdateScan { .. } => &super::job_spec::JOB_SPECS[22],
-            JobKind::UpdateIndex { .. } => &super::job_spec::JOB_SPECS[23],
-            JobKind::CorpusFetch { .. } => &super::job_spec::JOB_SPECS[24],
-            JobKind::CorpusIndex { .. } => &super::job_spec::JOB_SPECS[25],
-            JobKind::SymbolAnnotate { .. } => &super::job_spec::JOB_SPECS[26],
-            JobKind::KnowledgeScanSymbols { .. } => &super::job_spec::JOB_SPECS[27],
-            JobKind::PageAssist { .. } => &super::job_spec::JOB_SPECS[28],
-            JobKind::KnowledgeSync { .. } => &super::job_spec::JOB_SPECS[29],
-            JobKind::KnowledgeScanWiki { .. } => &super::job_spec::JOB_SPECS[30],
-            JobKind::MaintainWikitext { .. } => &super::job_spec::JOB_SPECS[31],
-            JobKind::CreateRedirect { .. } => &super::job_spec::JOB_SPECS[32],
-            JobKind::CookingGameExport { .. } => &super::job_spec::JOB_SPECS[33],
-            JobKind::UpdateLocal { .. } => &super::job_spec::JOB_SPECS[34],
-            JobKind::UpdateData { .. } => &super::job_spec::JOB_SPECS[35],
-            JobKind::UpdateAssets { .. } => &super::job_spec::JOB_SPECS[36],
-            JobKind::UpdateCheck { .. } => &super::job_spec::JOB_SPECS[37],
+            JobKind::ParsePo { .. } => "parse-po",
+            JobKind::MapNames { .. } => "map-names",
+            JobKind::MapRecipes { .. } => "map-recipes",
+            JobKind::MaintainItemTable { .. } => "maintain-item-table",
+            JobKind::MaintainDstRecipes { .. } => "maintain-dst-recipes",
+            JobKind::MaintainCopyClip { .. } => "maintain-copy-clip",
+            JobKind::MaintainTemplateCheck { .. } => "maintain-template-check",
+            JobKind::MaintainStrings { .. } => "maintain-strings",
+            JobKind::SkilltreeWiki { .. } => "skilltree-wiki",
+            JobKind::SkilltreeExport { .. } => "skilltree-export",
+            JobKind::UploadImage { .. } => "upload-image",
+            JobKind::PrefabOverrides { .. } => "prefab-overrides",
+            JobKind::PrefabOverridesDir { .. } => "prefab-overrides-dir",
+            JobKind::PrefabOverridesAudit { .. } => "prefab-overrides-audit",
+            JobKind::MaintainPrefabOverrides { .. } => "maintain-prefab-overrides",
+            JobKind::ScriptsSync { .. } => "scripts-sync",
+            JobKind::ImagesSync { .. } => "images-sync",
+            JobKind::UploadIcons { .. } => "upload-icons",
+            JobKind::AnimSync { .. } => "anim-sync",
+            JobKind::AnimDiff { .. } => "anim-diff",
+            JobKind::AnimIndex { .. } => "anim-index",
+            JobKind::SkinIndex { .. } => "skin-index",
+            JobKind::UpdateScan { .. } => "update-scan",
+            JobKind::UpdateIndex { .. } => "update-index",
+            JobKind::CorpusFetch { .. } => "corpus-fetch",
+            JobKind::CorpusIndex { .. } => "corpus-index",
+            JobKind::SymbolAnnotate { .. } => "symbol-annotate",
+            JobKind::KnowledgeScanSymbols { .. } => "knowledge-scan-symbols",
+            JobKind::PageAssist { .. } => "page-assist",
+            JobKind::KnowledgeSync { .. } => "knowledge-sync",
+            JobKind::KnowledgeScanWiki { .. } => "knowledge-scan-wiki",
+            JobKind::MaintainWikitext { .. } => "maintain-wikitext",
+            JobKind::CreateRedirect { .. } => "create-redirect",
+            JobKind::CookingGameExport { .. } => "cooking-game-export",
+            JobKind::UpdateLocal { .. } => "update-local",
+            JobKind::UpdateData { .. } => "update-data",
+            JobKind::UpdateAssets { .. } => "update-assets",
+            JobKind::UpdateCheck { .. } => "update-check",
         }
     }
 
+    /// 对应的 [`JobSpec`] 声明（canonical name/wiki_access/resources/params
+    /// 的唯一来源）。按名称查表：调整 `JOB_SPECS` 中条目的顺序不会让
+    /// 变体错配到别人的声明。
+    pub fn spec(&self) -> &'static super::job_spec::JobSpec {
+        let name = self.static_name();
+        super::job_spec::JobSpec::by_name(name).unwrap_or_else(|| panic!("JobSpec 缺少 `{name}`"))
+    }
     /// Human readable name used in job listings (canonical, == CLI name).
     pub fn name(&self) -> &'static str {
-        self.spec().name
+        self.static_name()
     }
 
     /// 中文显示名（Web 前端 / 日志）。
@@ -708,247 +717,49 @@ impl JobKind {
         }
     }
 
-    /// 每个变体一个最小实例（字段取占位值），供契约测试与文档枚举。
+    /// 每个变体一个最小实例：必填参数取占位值，可选参数走 serde default。
+    ///
+    /// 直接由 [`super::job_spec::JOB_SPECS`] 生成，加作业时无需再手写一条。
+    /// 副作用是 `spec.required` 与变体字段的 serde 必填性被强制对齐：声明为
+    /// 必填却没有 serde default 的字段会在此 panic。
     ///
     /// 契约（`service::tests` 与 `commands::tests` 各自强制）：
     /// - `name()` 在全集中唯一，且 == serde tag 的 kebab 形式；
     /// - CLI 子命令名集合（除 `serve`）== `name()` 集合；
     /// - 前端 `JOB_UI` 的键 ⊆ `web_ui` 作业的 serde tag 集合。
     pub fn all_variants() -> Vec<JobKind> {
-        vec![
-            JobKind::ParsePo {
-                input: String::new(),
-                output: None,
-                category: None,
-            },
-            JobKind::MapNames {
-                input: String::new(),
-                output: None,
-                compare: None,
-                merge: false,
-                version: None,
-            },
-            JobKind::MapRecipes {
-                input: String::new(),
-                output: None,
-                compare: None,
-                merge: false,
-                po_file: None,
-                version: None,
-            },
-            JobKind::MaintainItemTable {
-                output: None,
-                snapshot: None,
-            },
-            JobKind::MaintainDstRecipes {
-                output: None,
-                snapshot: None,
-            },
-            JobKind::MaintainCopyClip {
-                r#type: None,
-                output: None,
-                snapshot: None,
-            },
-            JobKind::MaintainTemplateCheck {
-                output: None,
-                snapshot: None,
-                skip_icon_status: false,
-            },
-            JobKind::MaintainStrings {
-                version: default_strings_version(),
-                snapshot: None,
-                output: None,
-                offline: false,
-                bucket_count: default_strings_buckets(),
-                rebalance: false,
-                limit: 0,
-            },
-            JobKind::SkilltreeWiki {
-                character: None,
-                output: None,
-                snapshot: None,
-            },
-            JobKind::SkilltreeExport {
-                character: None,
-                output: None,
-                snapshot: None,
-            },
-            JobKind::UploadImage {
-                path: String::new(),
-                name: None,
-                description: None,
-                comment: None,
-                ignore_warnings: false,
-            },
-            JobKind::PrefabOverrides {
-                input: String::new(),
-                output: None,
-            },
-            JobKind::PrefabOverridesDir {
-                input: None,
-                output: None,
-            },
-            JobKind::PrefabOverridesAudit {
-                scripts: None,
-                wiki_file: None,
-                output: None,
-            },
-            JobKind::MaintainPrefabOverrides {
-                scripts: None,
-                wiki_file: None,
-                output: None,
-            },
-            JobKind::ScriptsSync {
-                force: false,
-                dry_run: true,
-                state_path: None,
-            },
-            JobKind::ImagesSync {
-                force: false,
-                dry_run: true,
-                skip_wiki_status: true,
-            },
-            JobKind::UploadIcons {
-                build: None,
-                source: None,
-                file: None,
-                title: None,
-                only_missing: false,
-                ignore_warnings: false,
-                comment: None,
-            },
-            JobKind::AnimSync {
-                force: false,
-                dry_run: true,
-                label: None,
-                out: None,
-            },
-            JobKind::AnimDiff {
-                old: String::new(),
-                new: String::new(),
-                zip: None,
-            },
-            JobKind::AnimIndex {
-                scripts: String::new(),
-                anim: None,
-                out: None,
-            },
-            JobKind::SkinIndex {
-                scripts: None,
-                anim: None,
-                out: None,
-            },
-            JobKind::UpdateScan {
-                old: String::new(),
-                new: String::new(),
-                out: None,
-                corpus: None,
-                annotate: None,
-            },
-            JobKind::UpdateIndex {
-                root: String::new(),
-                out: None,
-            },
-            JobKind::CorpusFetch {
-                full: false,
-                dir: None,
-                rc: false,
-            },
-            JobKind::CorpusIndex {
-                dir: None,
-                join: None,
-            },
-            JobKind::SymbolAnnotate {
-                root: String::new(),
-                corpus: String::new(),
-                limit: default_symbol_limit(),
-                out: None,
-                verdicts: None,
-                llm: false,
-                batch_pages: default_symbol_batch_pages(),
-                batch_max_chars: default_symbol_batch_max_chars(),
-                skip_no_fact_pages: false,
-            },
-            JobKind::KnowledgeScanSymbols {
-                root: String::new(),
-                category: default_symbol_category(),
-                knowledge_dir: default_knowledge_dir(),
-                corpus: None,
-                sample_pages: default_sample_pages(),
-                limit: default_symbol_limit(),
-                force: false,
-                concurrency: default_concurrency(),
-                pass2_names: None,
-                pick_names: None,
-                refresh_auto: false,
-                confirm_empty: false,
-            },
-            JobKind::PageAssist {
-                knowledge_dir: default_knowledge_dir(),
-                page: None,
-                all: false,
-                json: false,
-                attribute: false,
-                corpus: None,
-            },
-            JobKind::KnowledgeSync {
-                old: String::new(),
-                new: default_sync_new(),
-                knowledge_dir: default_knowledge_dir(),
-                rescan: false,
-                limit: default_sync_limit(),
-                corpus: None,
-                draft: false,
-                review: None,
-            },
-            JobKind::KnowledgeScanWiki {
-                root: String::new(),
-                knowledge_dir: default_knowledge_dir(),
-                corpus: String::new(),
-                audit: false,
-                audit_symbols: None,
-                audit_max_pages: default_audit_max_pages(),
-                audit_batch_pages: default_audit_batch_pages(),
-                audit_batch_max_chars: default_audit_batch_max_chars(),
-                report: false,
-                classify: false,
-            },
-            JobKind::MaintainWikitext {
-                pages: Vec::new(),
-                template: String::new(),
-                set: Vec::new(),
-                remove: Vec::new(),
-                output: None,
-            },
-            JobKind::CreateRedirect {
-                from: String::new(),
-                to: String::new(),
-                summary: None,
-            },
-            JobKind::CookingGameExport {
-                output: None,
-                snapshot: None,
-                zip: false,
-                allow_missing_icons: false,
-            },
-            JobKind::UpdateLocal {
-                force: false,
-                dry_run: true,
-                skip_wiki_status: false,
-                from: None,
-            },
-            JobKind::UpdateData {
-                snapshot: None,
-                from: None,
-            },
-            JobKind::UpdateAssets { from: None },
-            JobKind::UpdateCheck {
-                snapshot: None,
-                skip_icon_status: false,
-                from: None,
-            },
-        ]
+        super::job_spec::JOB_SPECS
+            .iter()
+            .map(minimal_instance)
+            .collect()
     }
+}
+
+/// 由 spec 构造该作业的最小实例：只填 spec 声明为必填的参数（占位值），
+/// 其余交给 serde default 补齐。
+fn minimal_instance(spec: &super::job_spec::JobSpec) -> JobKind {
+    use super::job_spec::ParamKind;
+    use serde_json::{json, Map, Value};
+
+    let mut obj = Map::new();
+    obj.insert("kind".into(), json!(spec.name.replace('-', "_")));
+    for p in spec.params.iter().filter(|p| p.required) {
+        let placeholder = match p.kind {
+            ParamKind::Str | ParamKind::Path => json!(""),
+            ParamKind::OptStr | ParamKind::OptPath => Value::Null,
+            ParamKind::Bool => json!(false),
+            ParamKind::Usize => json!(0),
+            ParamKind::StrList => json!([]),
+            ParamKind::OptStrList => Value::Null,
+        };
+        obj.insert(p.key.into(), placeholder);
+    }
+    serde_json::from_value(Value::Object(obj)).unwrap_or_else(|e| {
+        panic!(
+            "JobSpec `{}` 无法构造最小实例（spec.required 与 serde 字段必填性不一致？）: {e}",
+            spec.name
+        )
+    })
 }
 
 #[cfg(test)]

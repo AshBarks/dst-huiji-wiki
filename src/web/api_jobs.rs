@@ -74,6 +74,7 @@ pub(crate) fn specs_json() -> serde_json::Value {
                         ParamKind::Bool => "bool",
                         ParamKind::Usize => "usize",
                         ParamKind::StrList => "str_list",
+                        ParamKind::OptStrList => "opt_str_list",
                     };
                     serde_json::json!({
                         "key": p.key,

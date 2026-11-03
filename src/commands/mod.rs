@@ -8,7 +8,7 @@
 //!   about 文案、`--yes/--dry-run/--report-json` 等跨切面旗标。
 //!
 //! 加新 Job：在 `job_spec.rs` 加一条 spec + 在 [`CLI_EXT`] 加一条 CLI 视角
-//! + 在 `job_from_matches` 加一个构造臂；三处由契约测试互相锁定。
+//! （后者只写与缺省不同的字段）；`JobKind` 由 spec 表驱动构造，无手写臂。
 
 use clap::{Arg, ArgAction, Command};
 use dst_huiji_wiki::platform::progress::{ConfirmMode, StdoutReporter, WriteMode};
@@ -34,6 +34,11 @@ struct FlagRename {
 const NO_RENAMES: &[FlagRename] = &[];
 
 /// 一个 Job 的 CLI 视角。
+///
+/// 绝大多数作业只有 `name`/`about`/`shorts` 与 spec 不同，其余用
+/// [`CliExt::DEFAULT`] 补齐：新增条目写成
+/// `CliExt { name, about, shorts, ..CliExt::DEFAULT }`。
+#[derive(Clone, Copy)]
 struct CliExt {
     /// == `JobSpec.name`（契约测试强制）。
     name: &'static str,
@@ -54,426 +59,285 @@ struct CliExt {
     local_dry_run: bool,
 }
 
+impl CliExt {
+    /// 缺省 CLI 视角：无定位参数、无短旗标、无重命名/多值、无跨切面旗标。
+    const DEFAULT: CliExt = CliExt {
+        name: "",
+        about: "",
+        positionals: &[],
+        shorts: &[],
+        renames: NO_RENAMES,
+        comma_lists: &[],
+        write_args: false,
+        report_json: false,
+        local_dry_run: false,
+    };
+}
+
 static CLI_EXT: &[CliExt] = &[
     CliExt {
         name: "parse-po",
         about: "解析 PO 翻译文件为 wiki JSON",
-        positionals: &[],
         shorts: &[("input", 'i'), ("output", 'o'), ("category", 'c')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "map-names",
         about: "把 PO 物品名映射为 wiki JSON",
-        positionals: &[],
         shorts: &[("input", 'i'), ("output", 'o'), ("compare", 'c'), ("merge", 'm'), ("version", 'v')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "map-recipes",
         about: "把游戏配方映射为 wiki JSON",
-        positionals: &[],
         shorts: &[("input", 'i'), ("output", 'o'), ("compare", 'c'), ("merge", 'm'), ("version", 'v')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-item-table",
         about: "维护 模块:ItemTable（对比线上数据后写维基）",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-dst-recipes",
         about: "维护 模块:DstRecipes（对比线上数据后写维基）",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-copy-clip",
         about: "维护模块常量（rbtl/tech/filters/names，标记区间替换）",
-        positionals: &[],
         shorts: &[("output", 'o'), ("type", 't')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-template-check",
         about: "只读检查 模板:Tech/dst 与 模板:制作栏图标 对游戏数据的覆盖率（可选把可粘贴片段写入 --output；不写维基）",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-strings",
         about: "解析游戏 strings.pot / chinese_s.po，生成 模块:<V> Strings CN/EN <NN> 桶页与 Data:<V>_Strings_Index.json；逐桶语义对比后只写变化页，索引最后写",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "skilltree-wiki",
         about: "把游戏 skilltree_<char>.lua 提取为 模块:Skilltree/<Char> 子页面的 defs JSON 并维护维基子页面（保留页内 metainfo/icon_url；--output 同时写出 Skilltree.js 渲染器与图片清单）",
-        positionals: &[],
         shorts: &[("character", 'c'), ("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "skilltree-export",
         about: "把技能树数据导出为本地 JSON 文件（纯本地，不访问维基）",
-        positionals: &[],
         shorts: &[("character", 'c'), ("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "upload-image",
         about: "上传本地图片到维基（同名重传请加 --ignore-warnings；按 skilltree/ skilltree_icons/ inventoryimages/ 目录自动补分类描述）",
         positionals: &[("path", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "prefab-overrides",
         about: "解析单个 Lua 文件的预制体重定向",
-        positionals: &[],
         shorts: &[("input", 'i'), ("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "prefab-overrides-dir",
         about: "扫描目录下全部 Lua 文件解析预制体重定向并合并（纯本地操作；目录缺省为 DST__ROOT/data/databundles/scripts/prefabs）",
-        positionals: &[],
         shorts: &[("input", 'i'), ("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "prefab-overrides-audit",
         about: "只读审计 模块:ItemTable/PrefabOverrides：线上条目 × 本地推导做 key/target 存在性验证，输出可推导/需人工补丁/可疑三张清单",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-prefab-overrides",
         about: "维护 模块:ItemTable/PrefabOverrides（只读 diff，不写维基）：本地推导与线上页面合并对比，产出更新/新增清单与本地页面文本",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "scripts-sync",
         about: "同步更新后的游戏 scripts:归档旧树为快照、解压新 scripts.zip(纯本地操作)",
-        positionals: &[],
-        shorts: &[],
         // `--state`（CLI 习惯名）写入 serde 的 `state_path`。
         renames: &[FlagRename { key: "state_path", long: "state", invert: false }],
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "images-sync",
         about: "处理游戏图片资源:解压 images.zip、ktech 解码、按 xml 切割(纯本地图片操作),结束后刷新图标元数据并查询维基上传状态(可用 --skip-wiki-status 跳过)",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "upload-icons",
         about: "上传图标到维基（物品栏/制作栏/技能树；标题按来源自动生成或取映射表，描述写对应分类；批量默认仅上传维基缺失的，需先运行 images-sync；--file + --title 手动指定站内文件名）",
-        positionals: &[],
-        shorts: &[],
         renames: &[FlagRename { key: "only_missing", long: "include-existing", invert: true }],
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "anim-sync",
         about: "动画历史同步:更新后扫描 data/anim，归档 zip/dyn 到 ANIM__OUT_DIR",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "anim-diff",
         about: "对比两个动画目录的 zip/dyn 结构化 diff",
         positionals: &[("old", true), ("new", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "anim-index",
         about: "构建 prefab 与动画文件的关联索引（纯本地，不做皮肤关联）",
         positionals: &[("scripts", true)],
         shorts: &[("out", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "skin-index",
         about: "解析 skinprefabs.lua 生成 base_prefab → skins 皮肤索引（纯本地）",
-        positionals: &[],
         shorts: &[("out", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "corpus-fetch",
         about: "抓取维基主命名空间全量语料到本地目录（默认 wikis/，不入仓库）；唯一允许匿名读的作业",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
         local_dry_run: true,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-scan",
         about: "快照差异 + 关联影响评估（M1，只读）：产出 impact.json 与 changes.patch",
         positionals: &[("old", true), ("new", true)],
         shorts: &[("out", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-index",
         about: "构建代码关联索引（基础设施A）并缓存到 output/atlas/<build>/",
         positionals: &[("root", true)],
         shorts: &[("out", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "corpus-index",
         about: "从本地语料树重建派生索引（prefab 注册表等，纯本地操作）",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
         local_dry_run: true,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "symbol-annotate",
         about: "Page→Symbol 标注 CLI：生成高引用 symbol 证据包和 Prompt，可选读取已有 LLM 输出并生成跨页一致性报告（纯本地，不写 wiki）",
         positionals: &[("root", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "knowledge-scan-symbols",
         about: "M1:LLM 阅读符号源码,产出/更新 SymbolDoc 知识文档",
         positionals: &[("root", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
         comma_lists: &["pass2_names", "pick_names"],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "page-assist",
         about: "page-assist:给定页面输出覆盖缺口建议清单(读 PageSymbolMap,不调 LLM)",
         positionals: &[("page", false)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "knowledge-sync",
         about: "M3:代码变更 → 脏 SymbolDoc → 页面锚点交叉(确定性;--rescan 级联重扫)",
         // `old` 在 --review 复核模式下可省略；`new` 有默认值 "current"。
         positionals: &[("old", false), ("new", false)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "knowledge-scan-wiki",
         about: "M2a:PageSymbolMap 确定性骨架(路由/反转/数值配对,不调 LLM)",
         positionals: &[("root", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
         comma_lists: &["audit_symbols"],
-        write_args: false,
-        report_json: false,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "maintain-wikitext",
         about: "用 wikitext 解析器批量修改页面里指定模板的参数（外科手术式编辑，未修改部分逐字节还原；--dry-run 只产 diff 报告不写维基）",
-        positionals: &[],
         shorts: &[("output", 'o')],
         renames: &[FlagRename { key: "pages", long: "page", invert: false }],
         comma_lists: &["pages", "set", "remove"],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "create-redirect",
         about: "在 wiki 上创建页面重定向（#REDIRECT [[目标]]；--dry-run 只预览 wikitext）",
         positionals: &[("from", true), ("to", true)],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "cooking-game-export",
         about: "把料理模拟数据、图标与 example_combo 打包给独立烹饪小游戏项目",
-        positionals: &[],
         shorts: &[("output", 'o')],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-local",
         about: "更新后本地摄取编排：scripts-sync → images-sync → anim-sync（缺省串行，任一步失败即中止）",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-data",
         about: "更新后数据页编排：maintain-copy-clip → maintain-dst-recipes → maintain-item-table → maintain-strings（共用 --snapshot 与写入模式）",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-assets",
         about: "更新后素材编排：upload-icons → skilltree-wiki（任一步失败即中止）",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
         write_args: true,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
     CliExt {
         name: "update-check",
         about: "更新后只读核对：maintain-template-check + prefab-overrides-audit（continue-on-error）",
-        positionals: &[],
-        shorts: &[],
-        renames: NO_RENAMES,
-        comma_lists: &[],
-        write_args: false,
         report_json: true,
-        local_dry_run: false,
+        ..CliExt::DEFAULT
     },
 ];
 
@@ -634,7 +498,7 @@ fn spec_option_arg(
             }
             a
         }
-        ParamKind::StrList => {
+        ParamKind::StrList | ParamKind::OptStrList => {
             // 多值参数（spec.comma/append 语义）：可重复出现；comma_lists
             // 额外允许 `--x a,b` 逗号切分。
             let mut a = Arg::new(id)
@@ -763,19 +627,10 @@ fn opt_val(m: &clap::ArgMatches, key: &str) -> Option<String> {
     m.get_one::<String>(key).cloned()
 }
 
-fn flag(m: &clap::ArgMatches, key: &str) -> bool {
-    m.get_flag(key)
-}
-
 fn num(m: &clap::ArgMatches, key: &str) -> usize {
     m.get_one::<String>(key)
         .and_then(|v| v.parse().ok())
         .unwrap_or_else(|| panic!("参数 {key} 不是非负整数"))
-}
-
-fn opt_list(m: &clap::ArgMatches, key: &str) -> Option<Vec<String>> {
-    let v: Vec<String> = m.get_many::<String>(key)?.cloned().collect();
-    Some(v).filter(|v| !v.is_empty())
 }
 
 fn list(m: &clap::ArgMatches, key: &str) -> Vec<String> {
@@ -784,248 +639,51 @@ fn list(m: &clap::ArgMatches, key: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
-/// 按 spec/CLI 元数据把 ArgMatches 组装成 [`JobKind`]。
+/// 按 spec/CLI 元数据把 `ArgMatches` 组装成 [`JobKind`]。
+///
+/// 不再逐作业手写构造臂：按 [`ParamKind`] 从匹配结果取值（重命名用长旗标、
+/// `invert` 的 Bool 取反），拼成 JSON 后交给 serde。这样 CLI 参数、Web JSON
+/// 与 spec 表三者的对齐是**机器保证**的——`contract_every_spec_constructs_*`
+/// 会逐个作业验证 spec 声明的 kind 与变体字段类型一致。
 fn job_from_matches(
     spec: &dst_huiji_wiki::service::JobSpec,
-    _ext: &CliExt,
+    ext: &CliExt,
     m: &clap::ArgMatches,
 ) -> Result<JobKind> {
-    let _ = spec;
-    Ok(match spec.name {
-        "parse-po" => JobKind::ParsePo {
-            input: val(m, "input"),
-            output: opt_val(m, "output"),
-            category: opt_val(m, "category"),
-        },
-        "map-names" => JobKind::MapNames {
-            input: val(m, "input"),
-            output: opt_val(m, "output"),
-            compare: opt_val(m, "compare"),
-            merge: flag(m, "merge"),
-            version: opt_val(m, "version"),
-        },
-        "map-recipes" => JobKind::MapRecipes {
-            input: val(m, "input"),
-            output: opt_val(m, "output"),
-            compare: opt_val(m, "compare"),
-            merge: flag(m, "merge"),
-            po_file: opt_val(m, "po_file"),
-            version: opt_val(m, "version"),
-        },
-        "maintain-item-table" => JobKind::MaintainItemTable {
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-        },
-        "maintain-dst-recipes" => JobKind::MaintainDstRecipes {
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-        },
-        "maintain-copy-clip" => JobKind::MaintainCopyClip {
-            r#type: opt_val(m, "type"),
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-        },
-        "maintain-template-check" => JobKind::MaintainTemplateCheck {
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-            skip_icon_status: flag(m, "skip_icon_status"),
-        },
-        "maintain-strings" => JobKind::MaintainStrings {
-            version: val(m, "version"),
-            snapshot: opt_val(m, "snapshot"),
-            output: opt_val(m, "output"),
-            offline: flag(m, "offline"),
-            bucket_count: num(m, "bucket_count"),
-            rebalance: flag(m, "rebalance"),
-            limit: num(m, "limit"),
-        },
-        "skilltree-wiki" => JobKind::SkilltreeWiki {
-            character: opt_val(m, "character"),
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-        },
-        "skilltree-export" => JobKind::SkilltreeExport {
-            character: opt_val(m, "character"),
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-        },
-        "upload-image" => JobKind::UploadImage {
-            path: val(m, "path"),
-            name: opt_val(m, "name"),
-            description: opt_val(m, "description"),
-            comment: opt_val(m, "comment"),
-            ignore_warnings: flag(m, "ignore_warnings"),
-        },
-        "prefab-overrides" => JobKind::PrefabOverrides {
-            input: val(m, "input"),
-            output: opt_val(m, "output"),
-        },
-        "prefab-overrides-dir" => JobKind::PrefabOverridesDir {
-            input: opt_val(m, "input"),
-            output: opt_val(m, "output"),
-        },
-        "prefab-overrides-audit" => JobKind::PrefabOverridesAudit {
-            scripts: opt_val(m, "scripts"),
-            wiki_file: opt_val(m, "wiki_file"),
-            output: opt_val(m, "output"),
-        },
-        "maintain-prefab-overrides" => JobKind::MaintainPrefabOverrides {
-            scripts: opt_val(m, "scripts"),
-            wiki_file: opt_val(m, "wiki_file"),
-            output: opt_val(m, "output"),
-        },
-        "scripts-sync" => JobKind::ScriptsSync {
-            force: flag(m, "force"),
-            dry_run: flag(m, "dry_run"),
-            state_path: opt_val(m, "state_path"),
-        },
-        "images-sync" => JobKind::ImagesSync {
-            force: flag(m, "force"),
-            dry_run: flag(m, "dry_run"),
-            skip_wiki_status: flag(m, "skip_wiki_status"),
-        },
-        "upload-icons" => JobKind::UploadIcons {
-            build: opt_val(m, "build"),
-            source: opt_val(m, "source"),
-            file: opt_val(m, "file"),
-            title: opt_val(m, "title"),
-            only_missing: !flag(m, "only_missing"),
-            ignore_warnings: flag(m, "ignore_warnings"),
-            comment: opt_val(m, "comment"),
-        },
-        "anim-sync" => JobKind::AnimSync {
-            force: flag(m, "force"),
-            dry_run: flag(m, "dry_run"),
-            label: opt_val(m, "label"),
-            out: opt_val(m, "out"),
-        },
-        "anim-diff" => JobKind::AnimDiff {
-            old: val(m, "old"),
-            new: val(m, "new"),
-            zip: opt_val(m, "zip"),
-        },
-        "anim-index" => JobKind::AnimIndex {
-            scripts: val(m, "scripts"),
-            anim: opt_val(m, "anim"),
-            out: opt_val(m, "out"),
-        },
-        "skin-index" => JobKind::SkinIndex {
-            scripts: opt_val(m, "scripts"),
-            anim: opt_val(m, "anim"),
-            out: opt_val(m, "out"),
-        },
-        "update-scan" => JobKind::UpdateScan {
-            old: val(m, "old"),
-            new: val(m, "new"),
-            out: opt_val(m, "out"),
-            corpus: opt_val(m, "corpus"),
-            annotate: opt_val(m, "annotate"),
-        },
-        "update-index" => JobKind::UpdateIndex {
-            root: val(m, "root"),
-            out: opt_val(m, "out"),
-        },
-        "corpus-fetch" => JobKind::CorpusFetch {
-            full: flag(m, "full"),
-            dir: opt_val(m, "dir"),
-            rc: flag(m, "rc"),
-        },
-        "corpus-index" => JobKind::CorpusIndex {
-            dir: opt_val(m, "dir"),
-            join: opt_val(m, "join"),
-        },
-        "symbol-annotate" => JobKind::SymbolAnnotate {
-            root: val(m, "root"),
-            corpus: val(m, "corpus"),
-            limit: num(m, "limit"),
-            out: opt_val(m, "out"),
-            verdicts: opt_val(m, "verdicts"),
-            llm: flag(m, "llm"),
-            batch_pages: num(m, "batch_pages"),
-            batch_max_chars: num(m, "batch_max_chars"),
-            skip_no_fact_pages: flag(m, "skip_no_fact_pages"),
-        },
-        "knowledge-scan-symbols" => JobKind::KnowledgeScanSymbols {
-            root: val(m, "root"),
-            category: val(m, "category"),
-            knowledge_dir: val(m, "knowledge_dir"),
-            corpus: opt_val(m, "corpus"),
-            sample_pages: num(m, "sample_pages"),
-            limit: num(m, "limit"),
-            force: flag(m, "force"),
-            concurrency: num(m, "concurrency"),
-            pass2_names: opt_list(m, "pass2_names"),
-            pick_names: opt_list(m, "pick_names"),
-            refresh_auto: flag(m, "refresh_auto"),
-            confirm_empty: flag(m, "confirm_empty"),
-        },
-        "page-assist" => JobKind::PageAssist {
-            knowledge_dir: val(m, "knowledge_dir"),
-            page: opt_val(m, "page"),
-            all: flag(m, "all"),
-            json: flag(m, "json"),
-            attribute: flag(m, "attribute"),
-            corpus: opt_val(m, "corpus"),
-        },
-        "knowledge-sync" => JobKind::KnowledgeSync {
-            old: opt_val(m, "old").unwrap_or_default(),
-            new: opt_val(m, "new").unwrap_or_else(|| "current".to_string()),
-            knowledge_dir: val(m, "knowledge_dir"),
-            rescan: flag(m, "rescan"),
-            limit: num(m, "limit"),
-            corpus: opt_val(m, "corpus"),
-            draft: flag(m, "draft"),
-            review: opt_val(m, "review"),
-        },
-        "knowledge-scan-wiki" => JobKind::KnowledgeScanWiki {
-            root: val(m, "root"),
-            knowledge_dir: val(m, "knowledge_dir"),
-            corpus: val(m, "corpus"),
-            audit: flag(m, "audit"),
-            audit_symbols: opt_list(m, "audit_symbols"),
-            audit_max_pages: num(m, "audit_max_pages"),
-            audit_batch_pages: num(m, "audit_batch_pages"),
-            audit_batch_max_chars: num(m, "audit_batch_max_chars"),
-            report: flag(m, "report"),
-            classify: flag(m, "classify"),
-        },
-        "maintain-wikitext" => JobKind::MaintainWikitext {
-            pages: list(m, "pages"),
-            template: val(m, "template"),
-            set: list(m, "set"),
-            remove: list(m, "remove"),
-            output: opt_val(m, "output"),
-        },
-        "create-redirect" => JobKind::CreateRedirect {
-            from: val(m, "from"),
-            to: val(m, "to"),
-            summary: opt_val(m, "summary"),
-        },
-        "cooking-game-export" => JobKind::CookingGameExport {
-            output: opt_val(m, "output"),
-            snapshot: opt_val(m, "snapshot"),
-            zip: flag(m, "zip"),
-            allow_missing_icons: flag(m, "allow_missing_icons"),
-        },
-        "update-local" => JobKind::UpdateLocal {
-            force: flag(m, "force"),
-            dry_run: flag(m, "dry_run"),
-            skip_wiki_status: flag(m, "skip_wiki_status"),
-            from: opt_val(m, "from"),
-        },
-        "update-data" => JobKind::UpdateData {
-            snapshot: opt_val(m, "snapshot"),
-            from: opt_val(m, "from"),
-        },
-        "update-assets" => JobKind::UpdateAssets {
-            from: opt_val(m, "from"),
-        },
-        "update-check" => JobKind::UpdateCheck {
-            snapshot: opt_val(m, "snapshot"),
-            skip_icon_status: flag(m, "skip_icon_status"),
-            from: opt_val(m, "from"),
-        },
-        other => unreachable!("未实现构造臂的 job: {other}"),
+    use serde_json::{json, Map, Value};
+
+    let mut obj = Map::new();
+    obj.insert("kind".into(), json!(spec.name.replace('-', "_")));
+
+    for param in spec.params {
+        let invert = ext.renames.iter().any(|r| r.key == param.key && r.invert);
+        let value: Value = if invert {
+            // 取反旗标：CLI 给 true 表示参数为 false（只取 spec 默认的反面）。
+            json!(!m.get_flag(param.key))
+        } else {
+            match param.kind {
+                ParamKind::Bool => json!(m.get_flag(param.key)),
+                ParamKind::Usize => json!(num(m, param.key)),
+                ParamKind::StrList => json!(list(m, param.key)),
+                ParamKind::OptStrList => match list(m, param.key) {
+                    v if v.is_empty() => Value::Null,
+                    v => json!(v),
+                },
+                ParamKind::OptStr | ParamKind::OptPath => match opt_val(m, param.key) {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                },
+                ParamKind::Str | ParamKind::Path => json!(val(m, param.key)),
+            }
+        };
+        obj.insert(param.key.into(), value);
+    }
+
+    serde_json::from_value(Value::Object(obj)).map_err(|e| {
+        dst_huiji_wiki::Error::Config(format!(
+            "作业 `{}` 的 CLI 参数无法映射到 JobKind（spec 的 ParamKind 与 serde 字段类型不一致？）: {e}",
+            spec.name
+        ))
     })
 }
 
@@ -1111,6 +769,42 @@ mod tests {
                 "spec `{}` 的 CLI 旗标与参数声明不一致",
                 spec.name
             );
+        }
+    }
+
+    /// 契约：每个 spec 都能用 CLI 默认值（+ 定位参数占位）构造出 JobKind，
+    /// 且 name 与 spec 一致。这是"表驱动构造"的兜底：spec 的 `ParamKind`
+    /// 与变体字段类型不一致时，这里会直接失败。
+    #[test]
+    fn contract_every_spec_constructs_from_cli_defaults() {
+        for spec in JOB_SPECS {
+            let ext = ext(spec.name);
+            let mut argv = vec!["dst-huiji-wiki".to_string(), spec.name.to_string()];
+            // 定位参数按声明顺序各给一个占位值（必填/可选都接受）。
+            argv.extend(ext.positionals.iter().map(|_| "placeholder".to_string()));
+            // 必填的**非定位**参数必须显式给值；Usize 不能是占位词。
+            for p in spec.params.iter().filter(|p| {
+                p.required
+                    && !ext.positionals.iter().any(|(k, _)| *k == p.key)
+                    && !ext.renames.iter().any(|r| r.key == p.key)
+            }) {
+                argv.push(format!("--{}", p.key));
+                match p.kind {
+                    ParamKind::Bool => {}
+                    ParamKind::Usize => argv.push("1".to_string()),
+                    _ => argv.push("placeholder".to_string()),
+                }
+            }
+
+            let matches = command()
+                .try_get_matches_from(&argv)
+                .unwrap_or_else(|e| panic!("`{}` 参数解析失败: {e}", spec.name));
+            let sub = matches
+                .subcommand_matches(spec.name)
+                .unwrap_or_else(|| panic!("`{}` 子命令缺失", spec.name));
+            let kind = job_from_matches(spec, ext, sub)
+                .unwrap_or_else(|e| panic!("`{}` 构造失败: {e}", spec.name));
+            assert_eq!(kind.name(), spec.name);
         }
     }
 

@@ -32,7 +32,10 @@ pub enum ParamKind {
     OptPath,
     Bool,
     Usize,
+    /// 必填多值（serde `Vec<String>`）。
     StrList,
+    /// 可选多值（serde `Option<Vec<String>>`）：缺省为 null 而非空数组。
+    OptStrList,
 }
 
 /// 参数默认值（Web 前端展示与校验共用）。
@@ -92,7 +95,7 @@ const P_OUTPUT: ParamSpec = ParamSpec {
     help: "输出路径（可选）",
 };
 
-/// 全部 Job 的声明表（顺序与 `JobKind::all_variants()` 一致）。
+/// 全部 Job 的声明表（`JobKind::all_variants()` 直接由本表生成）。
 pub static JOB_SPECS: &[JobSpec] = &[
     JobSpec {
         name: "parse-po",
@@ -1020,14 +1023,14 @@ pub static JOB_SPECS: &[JobSpec] = &[
             },
             ParamSpec {
                 key: "pass2_names",
-                kind: ParamKind::StrList,
+                kind: ParamKind::OptStrList,
                 default: ParamDefault::None,
                 required: false,
                 help: "仅 pass2 指定文件名词干",
             },
             ParamSpec {
                 key: "pick_names",
-                kind: ParamKind::StrList,
+                kind: ParamKind::OptStrList,
                 default: ParamDefault::None,
                 required: false,
                 help: "仅处理指定符号",
@@ -1109,9 +1112,10 @@ pub static JOB_SPECS: &[JobSpec] = &[
             ParamSpec {
                 key: "old",
                 kind: ParamKind::Str,
-                default: ParamDefault::None,
-                required: true,
-                help: "旧快照（时间戳或目录名）",
+                // CLI 侧是可选定位参数（--review 复核模式可省略），缺省 ""。
+                default: ParamDefault::Str(""),
+                required: false,
+                help: "旧快照（时间戳或目录名，可省略）",
             },
             ParamSpec {
                 key: "new",
@@ -1201,7 +1205,7 @@ pub static JOB_SPECS: &[JobSpec] = &[
             },
             ParamSpec {
                 key: "audit_symbols",
-                kind: ParamKind::StrList,
+                kind: ParamKind::OptStrList,
                 default: ParamDefault::None,
                 required: false,
                 help: "审计指定符号",

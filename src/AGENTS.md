@@ -3,13 +3,13 @@
 **Scope**: All library code. Binary entrypoint is a thin shell.
 
 ## OVERVIEW
-15 public modules (lib.rs) + 1 binary-only module (main.rs:commands); workspace 成员在 `crates/`（`wikitext`/`ktex` 已抽为独立 crate）。Standalone files at root: `context.rs`, `error.rs`, `utils.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`, `corpus/`, `knowledge/`, `llm/`, `update/`, `scripts_sync/`, `service/`, `platform/`.
+15 public modules (lib.rs) + 2 binary-only modules（`main.rs`：`commands`、`web`）；workspace 成员在 `crates/`（`wikitext`/`ktex` 已抽为独立 crate）。Standalone files at root: `context.rs`, `error.rs`, `utils.rs`, `llm.rs`. Directory modules: `commands/`, `parser/`, `models/`, `mapping/`, `wiki/`, `copyclip/`, `corpus/`, `knowledge/`, `update/`, `scripts_sync/`, `service/`, `platform/`, `web/`.
 
 ## STRUCTURE
 ```
 src/
 ├── main.rs               # bin: mod commands + dispatch to commands::run()
-├── lib.rs                # 10 pub mod declarations + pub use of key types
+├── lib.rs                # 15 pub mod declarations + pub use of key types
 ├── commands/             # binary-only (NOT in lib.rs)
 │   └── mod.rs            # clap builder 从 JOB_SPECS + CLI_EXT 生成子命令；job_from_matches 构造 JobKind；run() 分发
 ├── parser/               # game data parsers
@@ -38,7 +38,7 @@ src/
 │   └── game_source.rs    # GameSource: snapshot(严格)→live→scripts.zip 唯一读取顺序
 ├── wiki/                 # MediaWiki API client
 │   ├── mod.rs
-│   └── client.rs         # WikiClient (login, get_page, edit_page, append/prepend)
+│   └── client/           # mod（配置/DTO/会话）+ transport（登录/HTTP/节流重试）+ endpoints（页面/文件/编辑/上传）
 ├── copyclip/             # marker-based wiki module content updater
 │   ├── mod.rs            # CopyClipProcessor
 │   └── config.rs         # TOML config for module constants
@@ -71,7 +71,7 @@ src/
 | Trace what lib.rs re-exports | `src/lib.rs` lines 18-26 | DstContext, SnapshotInfo, CopyClip types, Error/Result, TechReport, diff helpers |
 | Add a binary-only entry point | `src/main.rs` | `mod commands` + match on args.command |
 | 新增/修改 WebUI 任务表单 | `src/service/job_spec.rs`（`web_ui` + `ParamSpec`） + `src/web/api_jobs.rs`（`GET /api/jobs/specs`） + `src/web/assets/js/jobs.js`（`JOB_UI` 只放特殊控件布局） | 无布局的 web_ui 作业按 ParamSpec 生成通用表单（Bool/Usize/StrList/文本）；契约测试校验字段键 ∈ params、必填参数不漏；浏览器冒烟见 `docs/WEBUI_SMOKE.md` |
-| Add a new CLI command variant | `src/service/job_spec.rs` (`JOB_SPECS` 行) + `src/commands/mod.rs` (`CLI_EXT` 行 + `job_from_matches` 构造臂) | 契约测试强制 name/serde tag/CLI 旗标一致；Web 表单见上一行 |
+| Add a new CLI command variant | `src/service/job_spec.rs` (`JOB_SPECS` 行) + `src/commands/mod.rs` (`CLI_EXT` 行，只写非缺省字段) | 契约测试强制 name/serde tag/CLI 旗标一致；`JobKind` 由 spec 表驱动构造（无手写臂）；Web 表单见上一行 |
 | Check all Error variants | `src/error.rs` | `enum Error`（含 KTEX/AnimTool/Zip/Json 等 `#[from]` 变体，以文件为准） |
 | Understand file vs directory modules | `src/` root | context.rs/error.rs/utils.rs = single files; everything else = directory |
 | Find where a concrete mapper lives | `src/mapping/mappers/` | Each mapper is its own file |

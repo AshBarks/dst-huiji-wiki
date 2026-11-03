@@ -11,43 +11,49 @@ Rust CLI tool for maintaining the Don't Starve Together (DST) Huiji Wiki. Parses
 ```
 dst-huiji-wiki/
 ├── src/
-│   ├── main.rs              # Binary entry (tokio + clap dispatch)
-│   ├── lib.rs               # Library root (15 public modules；wikitext 已移至 crates/)
-│   ├── commands/            # CLI arg definitions + all handlers
-│   ├── web/                 # WebUI server (binary-only; axum routes, JobManager, embedded SPA assets)
-│   ├── parser/              # Game data parsers (Lua, PO, recipes, prefab overrides)
-│   │   └── prefab_override/ # Complex Lua AST walker (parser/ 按职责分模块: mod/analysis/deep)
-│   ├── models/              # Data models (Recipe, PoEntry, TechReport)
+│   ├── main.rs              # Binary entry (tokio + clap dispatch; `mod commands` + `mod web`)
+│   ├── lib.rs               # Library root (15 public modules；wikitext/ktex 已移至 crates/)
+│   ├── commands/            # CLI 构建与分发（binary-only）：JobSpec + CLI_EXT → clap builder
+│   ├── web/                 # WebUI server（binary-only）：axum 路由、JobManager、内嵌 SPA
+│   ├── service/             # 作业编排层：JobKind 分发 + 各维护作业实现
+│   ├── platform/            # 业务无关基础设施：Reporter/WriteMode、config、fs、GameSource
+│   ├── parser/              # 游戏数据解析（Lua/PO/配方/预制体/技能树/动画）
+│   │   └── prefab_override/ # 复杂 Lua AST walker（按职责分 mod/analysis/deep）
+│   ├── models/              # 数据模型（Recipe、PoEntry、TechReport、strings…）
 │   │   └── recipe/          # Recipe sub-models (ingredient, options, prototyper, context)
-│   ├── mapping/             # Data→wiki mapping framework (WikiMapper trait + 字段名对齐 diff/merge)
+│   ├── mapping/             # 数据→wiki 映射框架（WikiMapper + 字段名对齐 diff/merge）
 │   │   └── mappers/         # Concrete mappers (PoEntryMapper, RecipeMapper)
-│   ├── wiki/                # MediaWiki API client
-│   ├── copyclip/            # Wiki module content updater (marker-based replacement)
-│   ├── scripts_sync/        # scripts.zip 同步:版本检测→归档旧树→解压新树 (update_scripts.py 移植)
-│   ├── context.rs           # DstContext (组合 GameSource + wiki client + env setup)
+│   ├── wiki/                # MediaWiki API 客户端（client/{mod,transport,endpoints}）
+│   ├── copyclip/            # 模块常量区间替换（marker-based）
+│   ├── scripts_sync/        # scripts.zip / 图片 / 动画同步管线（images/meta 已拆 title/names/build）
+│   ├── corpus/              # wiki 语料采集与索引（corpus-fetch / corpus-index）
+│   ├── update/              # 更新影响评估：关联图集、快照 diff、Tier0 规则、符号标注
+│   ├── knowledge/           # 知识库流水线：符号/页面扫描、分类、同步
+│   ├── llm.rs               # OpenAI 兼容 LLM 客户端（SSE 流式）
+│   ├── context.rs           # DstContext (GameSource + wiki client + env)
 │   ├── error.rs             # Error enum (thiserror) + Result<T>
-│   └── utils.rs             # diff_lines utility
+│   └── utils.rs             # diff_lines 等工具
 ├── crates/                  # Cargo workspace 成员
 │   ├── dst-wikitext/        # 独立 crate：wikitext 无损解析/编辑（零依赖，可发布）
 │   ├── dst-ktex/            # 独立 crate：KTEX 解析/解码（app 与 dst-anim-tool 共用）
 │   └── dst-anim-tool/       # 收编的 DST 动画工具（app 仅用 default-features=false + gif）
-├── examples/                # Test data files (.po, .lua, .json) + login.py
-├── docs/                    # Design docs (PLAN.md, REFACTORING.md)
+├── examples/                # 测试用游戏数据 (.po, .lua, .json) + login.py（examples/prefabs 不入库）
+├── docs/                    # 设计文档；先看 docs/INDEX.md（active/参考/历史标注）
 └── .github/workflows/      # CI (test+lint+build) + Release (4 cross-compile targets)
 ```
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Add a new CLI command | `src/service/job_spec.rs` (JobSpec 行) + `src/commands/mod.rs` (CLI_EXT 行 + `job_from_matches` 构造臂) | 子命令由 clap builder 从 JobSpec+CLI_EXT 生成；参数 schema 声明在 spec |
+| Add a new CLI command | `src/service/job_spec.rs` (JobSpec 行) + `src/commands/mod.rs` (`CLI_EXT` 行，只写与缺省不同的字段) | 子命令由 clap builder 从 JobSpec+CLI_EXT 生成；`JobKind` 由 spec 表驱动构造（无手写臂），`all_variants()` 同样由表生成 |
 | Run post-update orchestration | `src/service/pipelines.rs` | `update-local` (scripts→images→anim) / `update-data` / `update-assets` / `update-check`; `--from <step>` resume; order constraints in `docs/UPDATE_TASK_GROUPS.md` |
-| Add a new job type (CLI+Web) | `src/service/kind.rs` (variant) + `src/service/job_spec.rs` (spec 行 + `web_ui`) + `src/commands/mod.rs` (CLI_EXT 行 + 构造臂) | 契约测试强制一致（name/serde tag/CLI 旗标）；`web_ui=true` 即由 `/api/jobs/specs` 自动出现在 WebUI，特殊控件才写 `JOB_UI` 布局 |
+| Add a new job type (CLI+Web) | `src/service/kind.rs` (variant) + `src/service/job_spec.rs` (spec 行 + `web_ui`) + `src/commands/mod.rs` (CLI_EXT 行) + `src/service/mod.rs` (dispatch 臂) | 契约测试强制一致（name/serde tag/CLI 旗标/spec↔变体字段类型）；`web_ui=true` 即由 `/api/jobs/specs` 自动出现在 WebUI，特殊控件才写 `JOB_UI` 布局 |
 | Change WebUI behavior | `src/web/` | Binary-only module like commands; assets in `src/web/assets/` embedded via include_str! |
 | Add a data browse endpoint | `src/web/api_data/{dataset,icons,assets,anim}.rs` + `src/service/dataset.rs` | Dataset is cached per snapshot in memory |
 | Preview followed FX (FollowSymbol anchors) | `docs/ANIM_FOLLOW_FX.md` + `src/parser/follow_symbol.rs` + `src/scripts_sync/anim/preview.rs` + `crates/dst-anim-tool/src/render.rs` | 挂点 symbol 无 build 贴图，用"挂点矩阵 × 跟随动画"合成；Lua 索引优先（含跨文件 SpawnPrefab 回填）、同 bank 启发式兜底 |
 | Parse a new Lua data type | `src/parser/` | Add new module, re-export in mod.rs |
 | Add a new wiki data mapping | `src/mapping/mappers/` | Implement WikiMapper trait |
-| Change wiki API interaction | `src/wiki/client.rs` | All HTTP/API logic here (throttle+retry in `send_with_retry`) |
+| Change wiki API interaction | `src/wiki/client/{transport,endpoints}.rs` | transport：登录/GET/POST/CSRF + 节流重试（`send_with_retry`）；endpoints：页面/文件/编辑/上传与响应解析 |
 | Change write/confirm policy | `src/platform/progress.rs` (`WriteMode`, `decide_write`) + `src/service/wiki_write.rs` (`WikiWriter`) | CLI --yes/--dry-run → WriteMode；写站流程统一走 WikiWriter（确认/decide_write/basetimestamp/span）|
 | Add a data model | `src/models/` | Add struct + serde derives |
 | Update CopyClip (module constants) | `src/copyclip/` | TOML config in config.rs; `--type names` also derives CraftingNames station aliases from `constants.lua`/`tuning.lua` (`parse_*` in `src/parser/crafting.rs`, logic in `src/models/crafting_alias.rs`) |
@@ -58,10 +64,10 @@ dst-huiji-wiki/
 | Sync scripts after a game update | `src/scripts_sync/` | `scripts-sync` CLI; archives live tree as `scripts_<ts>` snapshot (consumed by `DstContext::list_snapshots`), extracts `scripts.zip`, records version in `dst_version.txt`; image pipeline ported as `images-sync` (see below) |
 | Export the cooking minigame bundle | `src/service/cooking_export.rs` | `cooking-game-export` CLI; payload/AST parser in `src/parser/cooking/` + `src/service/cooking*.rs`, bundle layout & schema versions in docs/COOKING_SIMULATOR.md; recipe `foodtype` from `preparedfoods*.lua`, entry-instant `stats`/`temperature` from `preparedfoods*.lua` + `tuning.lua` (whitelist evaluator in `src/parser/cooking/tuning.rs`), character roster+portraits from `saveslot_portraits/` |
 | Fix prefab name extraction | `src/parser/prefab_override/parser/` | `mod.rs`(入口/收集) + `analysis.rs`(工厂/表分析) + `deep.rs`(跨函数深度解析)；行为由 examples 指纹测试钉住 |
-| Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js source; `skilltree-wiki --output` emits it as `Skilltree.js`; WebUI 预览使用独立的 `src/web/assets/js/skills.js`，两者按人工约定同步 |
+| Edit the wiki skilltree renderer | `src/service/assets/skilltree_widget.js` | 零件:Skilltree.js 的**唯一**实现；`skilltree-wiki --output` 输出为 `Skilltree.js`，WebUI 预览经 `/static/js/skilltree_widget.js` 复用同一渲染器（`skills.js` 只做数据/素材适配） |
 | Upload an image | `src/service/upload_image.rs` | `upload-image` CLI; auto description by dir (`skilltree/`→技能树素材, `skilltree_icons/`→技能树图标, `inventoryimages/`→物品栏图标); `--ignore-warnings` for re-upload (needs `reupload` right) |
-| Upload icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta.rs` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting\|skilltree`); WebUI 物品栏/制作栏/技能树图标三个仪表盘页（制作栏按 `icon_meta.json` 的 `group.section`，技能树按 `group.character`；物品栏按 build 历史）+ 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons` / `skilltree_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name，`SKILLTREE__ICON_NAMES` 可覆盖技能树例外表), applied by `images-sync` into `history/icon_meta.json`; 技能树分类对账写 `wiki.in_category`，重定向占位页仅报告、不覆盖 |
-| Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync), ICON__TITLE_OVERRIDES / SKILLTREE__ICON_NAMES vars |
+| Upload icons / edit wiki file names | `src/service/upload_icons.rs` + `src/scripts_sync/images/meta/` | `upload-icons` CLI (`--file`+`--title` manual, `--source inventory\|crafting\|skilltree`); WebUI 物品栏/制作栏/技能树图标三个仪表盘页（制作栏按 `icon_meta.json` 的 `group.section`，技能树按 `group.character`；物品栏按 build 历史）+ 弹窗编辑映射; icon sources in `src/scripts_sync/images/icons.rs` (`inventoryimages` / `crafting_menu_icons` / `skilltree_icons`); override table `config/icon_title_overrides.json` (local file name → wiki file name，`SKILLTREE__ICON_NAMES` 可覆盖技能树例外表), applied by `images-sync` into `history/icon_meta.json`; 技能树分类对账写 `wiki.in_category`，重定向占位页仅报告、不覆盖 |
+| Add environment config | `.env.example` → `.env` | HUIJI__*, DST__ROOT, KTOOLS__OUT_DIR (images-sync), KNOWLEDGE__ROOT (知识库本地数据), ICON__TITLE_OVERRIDES / SKILLTREE__ICON_NAMES |
 
 ## CODE MAP
 
@@ -77,7 +83,7 @@ dst-huiji-wiki/
 | `PrefabOverrideParser` | Struct | src/parser/prefab_override/parser/mod.rs | Extracts prefab name overrides from Lua (factory patterns, control flow) |
 | `LuaParser` | Struct | src/parser/lua.rs | Generic Lua variable/field location extraction |
 | `PoParser` | Struct | src/parser/po.rs | Nom-based PO file parser |
-| `WikiClient` | Struct | src/wiki/client.rs | MediaWiki API: login, get_page, edit_page, append/prepend, get_files_info (imageinfo), upload_file (multipart) |
+| `WikiClient` | Struct | src/wiki/client/mod.rs | MediaWiki API: login, get_page, edit_page, append/prepend, get_files_info (imageinfo), upload_file (multipart)；传输层在 `client/transport.rs`，端点在 `client/endpoints.rs` |
 | `CopyClipProcessor` | Struct | src/copyclip/mod.rs | Marker-based content replacement in wiki modules |
 | `Recipe` | Struct | src/models/recipe/mod.rs | Game recipe: name, ingredients, tech, options |
 | `PoEntry` / `PoFile` | Struct | src/models/po.rs | PO translation entry + file container |
@@ -100,7 +106,7 @@ dst-huiji-wiki/
 
 ## ANTI-PATTERNS (THIS PROJECT)
 - **DO NOT** add `rustfmt.toml` or `clippy.toml` — project uses Rust defaults
-- **DO NOT** create `tests/` directory — inline `#[cfg(test)]` is the decided convention (see docs/REFACTORING.md)
+- **DO NOT** create `tests/` directory — inline `#[cfg(test)]` is the decided convention（见 docs/STRUCTURE_OPT_PLAN.md）
 - **DO NOT** use `unwrap()` outside tests — use `Result` propagation with `?`
 - **DO NOT** add `unsafe` blocks — none exist, none should be needed
 - **DO NOT** put Rust examples in `examples/` — it contains game data fixtures, not runnable examples
@@ -155,3 +161,6 @@ cargo run --release -- --help      # Show CLI help
 - `reqwest = "0.13"` — newer than typical 0.12.x; verify intentional
 - 依赖治理：根 `deny.toml`（许可证允许清单 + advisories/bans/sources）；`zip` 关闭默认特性只留 `deflate`，并把 app 与 anim-tool 都升到 zip 9（8.x 的 extract 公告）
 - No `rust-toolchain.toml` — CI uses `dtolnay/rust-toolchain@stable`
+- `knowledge/` 是**本地数据**（已 gitignore，不入库）；`KNOWLEDGE__ROOT` 可整体重定向，缺省 `knowledge/`
+- 技能树渲染器单一源：`src/service/assets/skilltree_widget.js` 同时服务维基与 WebUI 预览（`/static/js/skilltree_widget.js` + `window.skilltreeAssetUrl` 素材注入）
+- 作业登记：`JobKind` 变体（`kind.rs`）+ spec 表（`job_spec.rs`）+ CLI 视角（`commands` 的 `CLI_EXT`）+ dispatch 臂；构造与 `all_variants()` 均由 spec 表驱动

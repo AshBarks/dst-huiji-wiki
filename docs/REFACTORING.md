@@ -1,5 +1,7 @@
 # 项目重构计划
 
+> **状态：历史（2026-04）**。本文记录当时的重构过程，文中的目录结构（如 `commands/maintain.rs`、`models/recipe.rs`）已不存在。现行结构见 [AGENTS.md](../AGENTS.md) 与 [INDEX.md](INDEX.md)。
+
 本文档记录了 `dst-huiji-wiki` 项目的代码结构优化。
 
 ## 重构状态

@@ -1,5 +1,7 @@
 # 剩余工作清单与执行指引
 
+> **状态：历史（2026-09）**。当时的剩余工作清单，多数条目已完成；进度以 [STRUCTURE_OPT_PLAN.md](STRUCTURE_OPT_PLAN.md) 为准。
+
 > 建立时间:2026-08-31。本文档盘点跨计划(知识线 M1~M3 / 语料线 / update 侧)的全部未完成项,每项给出**说明**(是什么、为什么)与**指导**(命令序列、判定标准、回填位置)。
 > 约定:接手者按需认领单项执行,完成后在本文对应项打勾并回填结果;完成且不再有后续的项移入 §D 已闭案。
 > 命令中的路径占位:`$BIN` = `target/release/dst-huiji-wiki`,`$SCRIPTS` = 游戏脚本根目录(默认 `"$HOME/.steam/debian-installation/steamapps/common/Don't Starve Together/data/databundles/scripts"`),语料 = `wikis/dontstarve.huijiwiki.com`。

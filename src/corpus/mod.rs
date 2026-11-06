@@ -8,6 +8,7 @@
 //! (redirect map, class summary) is derived and rebuildable.
 
 pub mod classify;
+pub mod code_links;
 pub mod facts;
 pub mod join;
 pub mod model;
@@ -319,10 +320,10 @@ pub async fn build_indexes(
     let fact_path = save_lines(store.root(), "facts.jsonl", &facts_buf)?;
     reporter.log(format!("已写 {}", fact_path.display()));
 
-    let mut artifacts = vec![
-        "index/pages_by_prefab.json",
-        "index/regions.jsonl",
-        "index/facts.jsonl",
+    let mut artifacts: Vec<String> = vec![
+        "index/pages_by_prefab.json".to_string(),
+        "index/regions.jsonl".to_string(),
+        "index/facts.jsonl".to_string(),
     ];
     let mut join_summary = serde_json::json!(null);
     if let Some(code_index) = join {
@@ -338,7 +339,7 @@ pub async fn build_indexes(
         ));
         let path = save_json(store.root(), "join_report.json", &report)?;
         reporter.log(format!("已写 {}", path.display()));
-        artifacts.push("index/join_report.json");
+        artifacts.push("index/join_report.json".to_string());
         join_summary = serde_json::json!({
             "match_rate_wiki": report.match_rate_wiki,
             "exact": report.exact_matches,
@@ -348,11 +349,64 @@ pub async fn build_indexes(
         });
     }
 
+    // 页面 ↔ 源码关联索引（第四类派生工件）：需要本地游戏脚本树，未配置
+    // DST__ROOT 或脚本树缺失时优雅跳过（与 corpus 语料本身无关）。
+    let mut code_links_summary = serde_json::json!(null);
+    match crate::platform::config::dst_root_opt() {
+        Some(dst_root) => {
+            let scripts_root = dst_root.join("data/databundles/scripts");
+            if scripts_root.is_dir() {
+                reporter.stage("页面 ↔ 源码关联索引");
+                let out = code_links::build(&store, &registry, &scripts_root, reporter)?;
+                let jsonl_path =
+                    save_lines(store.root(), "page_code_links.jsonl", &out.page_jsonl)?;
+                let prefab_path =
+                    save_json(store.root(), "prefab_code_links.json", &out.prefab_json)?;
+                let comp_path = save_json(
+                    store.root(),
+                    "component_code_links.json",
+                    &out.component_json,
+                )?;
+                let sg_path = save_json(
+                    store.root(),
+                    "stategraph_code_links.json",
+                    &out.stategraph_json,
+                )?;
+                let brain_path = save_json(store.root(), "brain_code_links.json", &out.brain_json)?;
+                for p in [&jsonl_path, &prefab_path, &comp_path, &sg_path, &brain_path] {
+                    reporter.log(format!("已写 {}", p.display()));
+                    artifacts.push(format!(
+                        "index/{}",
+                        p.file_name().unwrap_or_default().to_string_lossy()
+                    ));
+                }
+                let s = &out.summary;
+                reporter.log(format!(
+                    "函数级锚点页面 {}/{}，组件 {}、状态图 {}、行为树 {}、配方锚点 {}、断言候选 {}",
+                    s.pages_linked,
+                    s.pages,
+                    s.components,
+                    s.stategraphs,
+                    s.brains,
+                    s.recipe_anchors,
+                    s.assertion_hooks,
+                ));
+                code_links_summary = serde_json::to_value(&out.summary)?;
+            } else {
+                reporter.log("未找到游戏脚本树（DST__ROOT 下 data/databundles/scripts），跳过页面↔源码关联索引".to_string());
+            }
+        }
+        None => {
+            reporter.log("未配置 DST__ROOT，跳过页面↔源码关联索引".to_string());
+        }
+    }
+
     Ok(serde_json::json!({
         "host": host,
         "dry_run": false,
         "artifacts": artifacts,
         "join": join_summary,
+        "code_links": code_links_summary,
         "stats": serde_json::to_value(&registry.stats)?,
         "pages_without_prefab_count": registry.pages_without_prefab.len(),
         "regions": {"pages": pages_segmented, "total": region_count},
